@@ -14,6 +14,7 @@ runtime coexistence, ground-truth compliance, and an agent-assisted human-govern
 | [CONTEXT.md](CONTEXT.md) | The **ubiquitous language** (glossary) — read this to speak precisely |
 | [docs/adr/](docs/adr/) | The **decisions** and why (ADR-0001…0009) |
 | [docs/upstream/](docs/upstream/) | Upstream **project actions** (the gitsign/Flux #1068 effort) |
+| [docs/shift-left-dev-workflow.md](docs/shift-left-dev-workflow.md) | The **usable** -able: reproduce the cluster's admission verdict on your laptop, native CLIs only |
 | [research/](research/) | The **research dossiers** the design is built on (originals, Flux, synthesis) |
 
 ## The decisions, in one breath
