@@ -50,9 +50,13 @@ The PRD/ADR-0004/ADR-0008 originally cited `defenseunicorns/lula` for this pilla
   planes on KiND+LocalStack"): *On KiND with no live cloud, for one compliant and one deliberately
   non-compliant resource on each plane (a workload and a Crossplane RDS or S3 CR), `result2oscal`
   consumes the (Cluster)PolicyReport CRs and produces an OSCAL assessment-results document that
-  (a) schema-validates under `oscal-cli` and (b) marks each mapped NIST 800-53r5 control satisfied
+  (a) schema-validates (C2P's built-in OSCAL validation plus an independent schema validator) and
+  (b) marks each mapped NIST 800-53r5 control satisfied
   for the compliant resource and not-satisfied for the non-compliant one; the document is regenerable
-  in CI.*
+  in CI.* The non-compliant exemplar is admitted under an **Audit**-mode policy — a `Deny` gate
+  leaves no failing resource on-cluster to report, so gate controls' OSCAL evidence is **pass-only
+  by construction** (denied resources are compliance successes that leave no failure trail); the
+  not-satisfied path is therefore always demonstrated on the Audit tier.
 
 ## Position on maturity
 
@@ -78,3 +82,8 @@ The ValidatingPolicy→report mapping was proven live (KiND + Kyverno 1.18.2 + C
   A **~6-line jq shim** at collection time (copy `.scope` into each `results[].resources`) fixes it —
   smaller than the ~50 lines budgeted. The C2P collection job (CronJob / Flux `Kustomization`)
   carries this normalization; it is declarative jq, not bespoke tooling.
+- **Suffix normalization rides in the same shim.** The spike ran unsuffixed policy names; the build
+  deploys coexisting versions as `<policy>-<version>` (`nameSuffix`), which would break the
+  string-equality against the component-definition `Check_Id`s. The collection shim strips the
+  version suffix from `results[].policy` (the version dimension is already carried by the report's
+  `policy-version` context), so one component-definition maps all coexisting versions.

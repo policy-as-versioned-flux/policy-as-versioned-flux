@@ -110,8 +110,8 @@ The build is accepted only when each is demonstrably true:
 | **communicable** | Semver tags + release notes + advisory rationale; notification-controller broadcasts version changes | Alert fires on new tag; release notes render |
 | **consumable** | A consumer adds one label (workload) / the cluster adds one [`ResourceSet`](https://fluxoperator.dev/docs/crd/resourceset/) input | A new app onboards by setting one `policy-version` label |
 | **testable** | `kyverno test` fixtures (pass/fail) double as worked examples | CI runs fixtures; fixtures readable as docs |
-| **usable** | `flux build … --dry-run \| kyverno apply` locally and in CI; in-cluster SSA dry-run | A dev reproduces the cluster verdict on their laptop |
-| **updatable** | Renovate PRs the pin bump (`automerge:false`): native `flux` manager for literal app sources, a `customManager` for the fleet version-array (§6.2) | A new tag → a reviewable PR within one Renovate run |
+| **usable** | `flux build … --dry-run \| kyverno apply` locally and in CI; in-cluster SSA dry-run | A dev reproduces the admission verdict on their laptop, against the same pinned policy versions the cluster runs |
+| **updatable** | Renovate PRs the pin bump (`automerge:false`): one `customManager` (git-refs datasource) maintains every `{tag, commit}` pair (§6.2) | A new tag → a reviewable PR within one Renovate run |
 | **measurable** | Layered ground-truth: Flux revision + Kyverno [PolicyReports](https://kyverno.io/docs/policy-reports/) + OSCAL via [C2P](https://github.com/oscal-compass/compliance-to-policy-go); PR-state = adoption velocity | One dashboard (four panels, shared `cluster`+`policy-version` variable) answers the four CIO questions (§9); at P1 the workload plane is measured by revision + PolicyReports, OSCAL control-satisfaction lands with the cloud plane at P2 |
 
 ---
@@ -128,9 +128,9 @@ flowchart TD
   end
 
   subgraph Update["update lifecycle (PUSH, reviewed)"]
-    TAG -. new tag .-> REN["Renovate (flux manager for app sources;\ncustomManager for the version-array matrix)"]
+    TAG -. new tag .-> REN["Renovate customManager\n(git-refs: tag + resolved commit, all pins)"]
     REN -->|PR: bump {version, commit}, automerge:false| FLEET["fleet config repo"]
-    FLEET -->|CI: flux build/diff + kyverno apply/test + gitsign verify (offline Rekor bundle, pinned commit)| MERGE{{review + merge}}
+    FLEET -->|CI: flux build/diff + kyverno apply/test + gitsign verify (identity-pinned, offline Rekor bundle) + tag-resolves-to-SHA check| MERGE{{review + merge}}
   end
 
   subgraph Cluster["cluster (Flux Operator)"]
@@ -139,7 +139,7 @@ flowchart TD
     SRC --> KS["Kustomization(s) dependsOn kyverno, wait"]
     KS --> KY["Kyverno engine"]
     KY --> VP["ValidatingPolicy *-<v>\n(nameSuffix, version self-selector,\nAudit=lane / Deny=gate)"]
-    GUARD["orphan guard (catch-all)"] --> KY
+    GUARD["orphan guard (Deny catch-all:\nmissing/unknown version label)"] --> KY
     WL["workloads (label policy-version=<v>)"] -->|admission| VP
     XR["Crossplane CRs (RDS/S3)"] -->|admission| VP
   end
@@ -153,6 +153,11 @@ flowchart TD
 
 ### 5.1 Repo layout
 
+One workspace tree, several git repos: each top-level directory below is its **own repo** in the
+reference org. `policy/` is the semver-tagged dependency (so its `.github/workflows` runs from that
+repo's root); `fleet/` is the config repo Flux reconciles; `apps/` are the consumers. Tagging the
+policy repo versions policy alone — never fleet config or apps.
+
 ```
 policy-as-versioned-flux/
 ├── policy/                      # THE versioned policy source (== 2022 `policy` repo)
@@ -164,7 +169,7 @@ policy-as-versioned-flux/
 │   ├── tests/                   #   kyverno test fixtures (pass/fail = worked examples)
 │   └── .github/workflows/       #   tag -> gitsign-signed release; CI runs fixtures
 ├── fleet/                       # the config repo Flux reconciles
-│   ├── flux-instance.yaml        #   FluxInstance (Operator; distroless/FIPS)
+│   ├── flux-instance.yaml        #   FluxInstance (Operator; upstream-alpine — enterprise distroless/FIPS documented, ADR-0005)
 │   ├── resourcesets/             #   ResourceSet over the cluster x policyVersion matrix
 │   ├── infrastructure/kyverno/   #   engine HelmRelease + the orphan guard
 │   └── clusters/                 #   per-cluster inputs (cluster1 = all versions; cluster2 = >=2.0.0)
@@ -192,15 +197,20 @@ Crossplane provider CRs + managed resources (cloud plane).
 Policy is authored and reviewed as files in git, released as **semver git tags**, signed **keyless
 with [gitsign](https://github.com/sigstore/gitsign)** ([Sigstore](https://docs.sigstore.dev): ephemeral [Fulcio](https://github.com/sigstore/fulcio) cert via OIDC, logged in [Rekor](https://github.com/sigstore/rekor) — no GPG key custody).
 Consumed by a Flux `GitRepository` pinned on **`spec.ref.tag` and `spec.ref.commit`** (the tag's
-resolved SHA). Semver carries meaning: **major** = breaking tightening (e.g. free-text → enum),
-**minor** = backwards-compatible addition, **patch** = additive widening.
+resolved SHA). Semver carries meaning, defined by **verdict impact on currently-compliant
+workloads**: **major** = any change that can turn a pass into a fail at the gate (a new or
+tightened `Deny` policy, an `Audit`→`Deny` promotion, free-text → enum); **minor** = an addition
+that cannot fail an existing compliant workload (e.g. a new `Audit` policy); **patch** =
+fixes/widenings (the passing set only grows).
 
 **Integrity — pin the commit, not just the tag (ADR-0001).** A tag-only pin re-resolves every
 reconcile, so a force-moved tag would be pulled silently and the cluster would run something CI never
-verified. Renovate therefore writes the resolved **commit SHA** alongside the tag (`git-refs`
-datasource); Flux pins that immutable commit. Release tags are additionally **forge-protected/
-immutable** (GitHub ruleset / Immutable Releases), and `notification-controller` alerts on unexpected
-revision drift.
+verified. Renovate's `customManager` (§6.2, `git-refs` datasource) therefore writes the resolved
+**commit SHA** alongside the tag; Flux pins that immutable commit. Flux gives `spec.ref.commit`
+precedence, so the tag field is human documentation — CI additionally asserts the tag still
+resolves to the pinned SHA, so the pair cannot silently disagree. Release tags are additionally
+**forge-protected/immutable** (GitHub ruleset / Immutable Releases), and `notification-controller`
+broadcasts every revision change (an audit trail on which any drift is visible).
 
 **Known limitation (accepted, ADR-0001):** Flux `GitRepository.spec.verify` is PGP-only (v2.9, Jun
 2026, added SSH — still not Sigstore/gitsign) and cannot verify gitsign today, so there is **no
@@ -208,6 +218,9 @@ Flux-native verified-source gate on the floor**. Verification runs **in CI / at-
 verify` against a **persisted offline Rekor bundle**, `GITSIGN_REKOR_MODE=offline`, gitsign pinned —
 so the gate does not depend on Sigstore's public-good Rekor turndown schedule). Closing the on-cluster
 gate natively is the single upstream dependency — tracked as a project action against [fluxcd#1068](upstream/fluxcd-source-controller-1068-gitsign.md).
+CI verification is **identity-pinned** (expected OIDC issuer + subject — the release workflow's
+identity), not merely "a valid signature exists"; the offline Rekor mode is upstream-experimental,
+which is one more reason gitsign itself is pinned.
 
 ### 6.2 Adoption — pinned everywhere + Renovate PR (ADR-0002)
 
@@ -215,19 +228,23 @@ Consumers and clusters pin **exact** tags (+ commit SHA). New versions land **on
 CI-gated Renovate PR (`automerge:false`), in **every** environment. No live `ref.semver` ranges. The
 PR is the unit of debate that carries the "why".
 
-**Two update surfaces (ADR-0002).** Literal `GitRepository` app sources are bumped by Renovate's
-**native `flux` manager**. The fleet's single **`{version, commit}` array** — the one source of truth
-the `ResourceSet` expands into per-version sources (§6.4) — lives inside a `ResourceSet` the native
-manager cannot parse, so it is bumped by a Renovate **`customManager`** (git-refs datasource, ~10
-lines of declarative config, writing both fields). A `customManager` is **not** bespoke tooling in the
-sense the "no bespoke tooling" principle forbids (that targets the deleted bash/Docker checker); the
-exemption is explicit.
+**One update surface (ADR-0002).** Renovate's native `flux` manager tracks a `GitRepository`'s tag
+**or** its commit, exclusively — it cannot maintain the `{tag, commit}` pair the integrity model
+requires (§6.1). So **every** policy pin — consumer app sources and the fleet's single
+**`{version, commit}` array** the `ResourceSet` expands into per-version sources (§6.4) — is bumped
+by one Renovate **`customManager`** (git-refs datasource: tag as `currentValue`, resolved SHA as
+`currentDigest`; a few lines of declarative config). A `customManager` is **not** bespoke tooling in
+the sense the "no bespoke tooling" principle forbids (that targets the deleted bash/Docker checker);
+the exemption is explicit.
 
 ### 6.3 Engine & policy authoring — Kyverno CEL `ValidatingPolicy` (ADR-0003)
 
 Policies are CEL `ValidatingPolicy`. `validationActions` is the **enforcement-action axis**:
 `Audit` = lane-keeping (nudge + PolicyReport), `Deny` = gate ("locked door"). This is independent
-of adoption cadence. Background scans + PolicyReports give measurability for free.
+of adoption cadence. Background scans + PolicyReports give measurability for free (Kyverno **≥1.18**
+— ADR-0003). The engine itself is a governed dependency: the Kyverno `HelmRelease` is pinned and
+bumped via the same reviewed Renovate PR path as policy, because an engine upgrade can change
+verdicts across every installed policy version.
 
 ### 6.4 Multi-version coexistence (the crux) — `ResourceSet` matrix (ADR-0005)
 
@@ -239,8 +256,11 @@ A single cluster runs N policy versions side by side:
 3. **Version self-scoping** = each `ValidatingPolicy` matches only workloads carrying its
    `mycompany.com/policy-version` label (CEL `matchConstraints` objectSelector).
 4. **Workload opt-in** = the consumer stamps one version label.
-5. **Cluster narrows the set** = the fleet holds a **single `{version, commit}` array** (bumped by the
-   Renovate `customManager`, §6.2); a `ResourceSet` **`range`s** over it to generate the per-version
+5. **Cluster narrows the set** = the fleet holds a **single `{version, commit}` array**, carried as
+   one nested field of a single `ResourceSet` input (bumped by the Renovate `customManager`, §6.2 —
+   ResourceSet templates see only the current input set, so the array rides *inside* one input, where
+   both the per-version objects and the aggregate guard can `range` over it); the templates **`range`**
+   over it to generate the per-version
    source+Kustomization pairs, and the same array element sets `spec.ref.tag`+`spec.ref.commit` and,
    via `postBuild.substitute`, the policy bundle's self-selector label value. **One semver string,
    reused by three authors** (the ResourceSet input → the source ref + policy label; the consumer
@@ -250,11 +270,17 @@ A single cluster runs N policy versions side by side:
    the cloud-policy `Kustomization` additionally `dependsOn` the Crossplane provider CRDs being
    Established (so the admission webhook is registered — §6.5).
 7. **Orphan guard** = one deterministic catch-all `ValidatingPolicy` whose CEL carries a **literal
-   allow-list rendered from the same `{version}` array** (`!(label in ['1.0.0','2.0.0','2.1.1'])`),
-   regenerated by the ResourceSet on every array change, so it cannot drift from the installed set. It
-   flags any workload whose `policy-version` label is not installed. It starts in **Audit**; promotion
-   to **Deny** is an **editorial PR** flipping `validationActions` (never automated — ADR-0006), not a
-   timed transition. Closes the silent-ungovernance gap.
+   allow-list rendered from that same nested array**
+   (`!has(labels['policy-version']) || !(label in ['1.0.0','2.0.0','2.1.1'])` — a **missing** label
+   is a violation, not a pass), templated from the same input that installs the versions, so it
+   cannot drift from the installed set. Because every versioned policy — gates included — matches
+   only workloads that opt in via the label, the guard is what makes the gate tier a **locked door
+   rather than an opt-in door**: it runs **Deny** at admission (a workload must declare an installed
+   policy version to exist at all), with background-scan Audit reports surfacing pre-existing
+   orphans. A brownfield estate may start it in Audit and promote by **editorial PR** (never
+   automated or timed — ADR-0006). Closes the silent-ungovernance gap. Corollary: with the guard
+   holding the perimeter, the estate's gate strength equals its **weakest installed version** —
+   retiring an old version is a security action, not housekeeping.
 
 ### 6.5 Cloud plane — harvest collie, rebuild native (ADR-0004)
 
@@ -264,7 +290,8 @@ now-dropped Lula 1), so we take collie's reusable **IP** — the NIST 800-53r5 �
 and its **OSCAL catalogue** — and rebuild: **hand-author** the RDS/S3 rules as CEL `ValidatingPolicy`,
 **version them** as first-class dependencies (gitsign tags + commit pin, Renovate, coexistence,
 Audit/Deny), and reshape the OSCAL catalogue into a C2P **component-definition** (§6.6). Policies
-target **current Crossplane v2 + AWS provider-family** CRD groups. The same engine that judges
+target **current Crossplane v2 + AWS provider-family** CRD groups (v2 managed resources are
+namespaced by default; the policies and guard match the namespaced kinds). The same engine that judges
 workloads judges Crossplane CRs at admission — closing the runtime-cloud gap the talk admitted. Proof
 is **KiND-only, spec-based**: install the provider CRDs (no ProviderConfig/auth/reconcile), apply the
 CRs, and Kyverno judges the spec at admission; the cloud-policy `Kustomization` `dependsOn` the
@@ -275,7 +302,9 @@ ported.
 ### 6.6 Compliance / measurable — layered ground-truth (ADR-0008, ADR-0009)
 
 One dashboard, **four panels over four datasources** joined by a shared `cluster`+`policy-version`
-template variable (not a PromQL join): **Flux revision** (which version, where) · **PolicyReports**
+template variable (not a PromQL join): **Flux revision** (which version, where —
+`gotk_resource_info`, exposed via the flux2-monitoring-example kube-state-metrics
+`customResourceState` config, not by Flux itself) · **PolicyReports**
 via Policy Reporter → Prometheus (is it passing) · **OSCAL assessment-results** (controls satisfied)
 · **Renovate PR state** (adoption velocity — the 2022 "PR search away", explicitly relabelled). The
 OSCAL signal is produced by **Compliance-to-Policy (C2P) `result2oscal`** (CNCF Sandbox, ADR-0009),
@@ -340,7 +369,7 @@ required for acceptance.
 
 **P1 — Workload plane, end-to-end (proves the thesis).**
 policy repo with two `ValidatingPolicy` examples (one Audit/lane-keeping, one Deny/gate) + rationale
-+ `kyverno test` fixtures → gitsign-signed tags → CI gitsign verify → Renovate flux manager → [Flux
++ `kyverno test` fixtures → gitsign-signed tags → CI gitsign verify → Renovate customManager → [Flux
 Operator](https://fluxoperator.dev/) + `ResourceSet` multi-version coexistence on KiND (`cluster1`/`cluster2`) → orphan guard →
 layered compliance dashboard (Flux revision + PolicyReports). *Acceptance: all seven "-ables"
 demonstrable on the workload plane — with **measurable** at the revision + PolicyReports level
@@ -352,11 +381,16 @@ Harvest collie's OSCAL catalogue + RDS/S3 intent; hand-author the cloud `Validat
 version them; current Crossplane v2 provider-family CRDs in KiND; same engine governs Crossplane CR
 specs at admission; **C2P `result2oscal`** turns the PolicyReports into OSCAL for the dashboard.
 The C2P `ValidatingPolicy`→report-mapping is **proven** (spike in `spikes/c2p-validatingpolicy-oscal/`,
-ADR-0009): C2P keys on `results[].policy` = the VP name, and a ~6-line jq shim in the collection job
-normalizes Kyverno ≥1.18's per-resource report shape (`.scope`→`results[].resources`).
+ADR-0009): C2P keys on `results[].policy` = the VP name, and the jq shim in the collection job
+normalizes Kyverno ≥1.18's per-resource report shape (`.scope`→`results[].resources`) and strips the
+coexistence `nameSuffix` from `results[].policy` so versioned VP names match the
+component-definition `Check_Id`s.
 *Acceptance: a cloud policy (e.g. S3 encryption gate) versioned and coexisting; and, on KiND with no
-live cloud, for one compliant + one non-compliant resource per plane, `result2oscal` emits an OSCAL
-assessment-results doc that schema-validates (`oscal-cli`) and marks the mapped NIST control
+live cloud, for one compliant + one non-compliant resource per plane — the non-compliant exemplar
+admitted under an **Audit**-mode policy (a `Deny` gate leaves nothing on-cluster to report; gate
+controls' OSCAL evidence is pass-only by construction) — `result2oscal` emits an OSCAL
+assessment-results doc that schema-validates (C2P's built-in OSCAL validation plus an independent
+schema validator) and marks the mapped NIST control
 satisfied/not-satisfied — regenerable in CI.*
 
 **P3 — Governance + agent + last mile.**
@@ -389,6 +423,12 @@ PR state).
   Crossplane/CEL uplift cost lived in the dropped generator + auth.
 - **Crossplane adoption cost** → cloud-as-CR assumes Crossplane v2; admission-only proof needs CRDs
   only (no auth/reconcile). Acknowledged in scope.
+- **Kyverno report-API migration** → reports default to `wgpolicyk8s.io/v1alpha2` today;
+  `openreports.io` is opt-in and slated to become the default. Policy Reporter, C2P and the
+  collection shim all key on the report shape — tracked alongside the pinned engine (§6.3).
+- **Renovate array `customManager` unexercised** → the git-refs `currentValue`+`currentDigest`
+  pattern is documented, but not yet proven against the exact nested-array shape; a half-day spike
+  (same spirit as the C2P one) precedes P1.
 
 ---
 

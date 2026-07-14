@@ -32,5 +32,14 @@ policy-as-versioned-code still works on `flux bootstrap`; you simply hand-write 
 
 - Settles the coexistence-wiring question: **`ResourceSet` matrix** (clusters × policy versions),
   superseding the "N explicit pairs" option for the floor.
+- **The version array rides as a nested field of a single ResourceSet input.** ResourceSet templates
+  see only the current input set — there is no whole-`inputs` access — so the `{version, commit}`
+  array is one nested field of one input, and the templates `range` over it. That lets the
+  per-version source+Kustomization pairs *and* the aggregate orphan guard (whose CEL allow-list
+  embeds every installed version) render from the same value, which is what makes the
+  no-drift-by-construction claim true.
 - Adds the Flux Operator CRDs (`FluxInstance`, `ResourceSet`, `ResourceSetInputProvider`).
+- **The distroless/FIPS variants are ControlPlane enterprise** (paid registry + imagePullSecret).
+  The free, reproducible floor runs the `upstream-alpine` variant; the enterprise variants are
+  documented as the option for licensed public-sector estates, not required by the reference.
 - The reference doubles as a showcase of the ControlPlane Flux stack.

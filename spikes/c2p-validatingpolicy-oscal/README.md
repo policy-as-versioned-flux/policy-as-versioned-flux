@@ -2,7 +2,7 @@
 
 **Question (ADR-0009 build precondition).** All OSCAL Compass / Compliance-to-Policy (C2P) testdata
 uses legacy Kyverno `ClusterPolicy`. Does C2P v2 correctly consume the PolicyReports produced by a
-**CEL `ValidatingPolicy`** (`policies.kyverno.io/v1`, Kyverno ≥1.17) and emit correct OSCAL
+**CEL `ValidatingPolicy`** (`policies.kyverno.io/v1`, Kyverno ≥1.18) and emit correct OSCAL
 assessment-results? This is the one unproven dependency in the measurable pillar.
 
 **Verdict: YES, with a ~6-line collection-time shim.** Verified 2026-07-14 on KiND + Kyverno 1.18.2 +

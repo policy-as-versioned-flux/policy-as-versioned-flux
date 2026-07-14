@@ -28,11 +28,12 @@ drift to different resolved versions.
 - **Adoption cadence and enforcement action are independent axes.** The lane-keeping (Audit) vs
   gate (Deny) split governs *how strict* a policy is, not *how fast its version updates*. A
   lane-keeping policy is still bumped by a reviewed PR.
-- Renovate is a required component. **Two update surfaces, two managers:** consumer/app sources that
-  are literal `GitRepository` docs are bumped by Renovate's **native `flux` manager**; the fleet's
-  single version-array source of truth (which the ResourceSet expands into per-version sources — see
-  ADR-0005) lives inside a ControlPlane `ResourceSet` the native manager cannot parse, so it is bumped
-  by a Renovate **`customManager`** (git-refs datasource) that writes both the semver and its resolved
-  commit SHA. A `customManager` is a few lines of declarative Renovate config, **not** the bespoke
+- Renovate is a required component. **One update surface, one manager:** Renovate's native `flux`
+  manager tracks a `GitRepository`'s tag *or* its commit, exclusively — it cannot maintain the
+  `{tag, commit}` pair ADR-0001's integrity model requires. So every policy pin — consumer/app
+  sources and the fleet's single version-array source of truth (which the ResourceSet expands into
+  per-version sources — see ADR-0005) — is bumped
+  by one Renovate **`customManager`** (git-refs datasource: tag as `currentValue`, resolved commit
+  SHA as `currentDigest`). A `customManager` is a few lines of declarative Renovate config, **not** the bespoke
   bash/Docker checker the "no bespoke tooling" principle deleted — that exemption is explicit. The
   reviewed PR is also the unit that carries the "why" debate.

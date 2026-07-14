@@ -63,10 +63,12 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   non-technical ones (the talk's "Cleaner"). An explicitly **acknowledged open problem**, not
   something the system claims to solve.
 
-- **Policy version** — A semantic version of the whole policy body. Semver carries meaning:
-  **major** = breaking/incompatible tightening (e.g. free-text label → enum); **minor** =
-  backwards-compatible addition; **patch** = backwards-compatible fix/widening. ("Don't be fooled
-  by the decimal points — 1.20.0 > 1.3.0.")
+- **Policy version** — A semantic version of the whole policy body. Semver carries meaning, defined
+  by **verdict impact on currently-compliant workloads**: **major** = any change that can turn a
+  pass into a fail at the gate (a new or tightened `Deny` policy, an `Audit`→`Deny` promotion,
+  free-text label → enum); **minor** = an addition that cannot fail an existing compliant workload
+  (e.g. a new `Audit` policy); **patch** = fix/widening (the passing set only grows). ("Don't be
+  fooled by the decimal points — 1.20.0 > 1.3.0.")
 
 - **Multi-version coexistence** — A single runtime (cluster) must accept and evaluate **multiple
   policy versions simultaneously** (≥3), so old versions can be retired over a transition window
@@ -83,9 +85,13 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
 - **Consumer** — A repo/workload that depends on a policy version (the original's `app1..3`,
   `infra1..3`). Opts in to a version and is judged against it.
 
-- **Orphan guard** — A deterministic catch-all `ValidatingPolicy` that flags (Audit, later Deny)
-  any workload whose `policy-version` label is not in the cluster's currently-installed version set
-  (derived from the `ResourceSet` matrix). Closes the original's silent-ungovernance gap where a
+- **Orphan guard** — A deterministic catch-all `ValidatingPolicy` that **denies at admission** any
+  workload whose `policy-version` label is **missing or not in** the cluster's currently-installed
+  version set (derived from the `ResourceSet` version array), with background-scan Audit reports
+  covering pre-existing orphans (a brownfield estate may start it in Audit and promote by editorial
+  PR). Because every versioned policy — gates included — matches only workloads that opt in via the
+  label, the guard is what makes the gate tier a locked door rather than an opt-in door. Closes the
+  original's silent-ungovernance gap where a
   workload pinned to a retired version was matched by no policy.
 
 ---
@@ -122,7 +128,8 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
 
 - **Two planes:** **workload plane** (native Kubernetes workloads) and **cloud plane** (cloud
   resources). Both governed by the *same* versioned Kyverno engine. The cloud plane is built by
-  forking ControlPlane's **collie** (cloud-as-CR). See
+  **harvesting** ControlPlane's **collie** (cloud-as-CR) — its OSCAL catalogue + policy intent as
+  data; its generator/Lula toolchain dropped. See
   [ADR-0004](docs/adr/0004-cloud-plane-fork-collie.md).
 
 - **Deterministic policy.** Policy bodies contain no time-conditional logic (no expiry/start
@@ -138,9 +145,11 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   `policy-checker`. The 2022 bash/Docker checker is deleted, not ported.
 
 - **Proof = KiND, free & reproducible.** Workload plane runs fully on KiND; the cloud plane is
-  proven at the admission level (Crossplane CRs judged by Kyverno in KiND, LocalStack for
-  provisioning) with no cloud spend. `wait` + CEL health checks replace jsonpath polling. A
-  real-cloud e2e (live RDS/S3, C2P over realized state) is optional and documented.
+  proven at the admission level — current Crossplane v2 provider-family CRDs installed in KiND, CR
+  specs judged by Kyverno at admission (no ProviderConfig, auth, or reconcile); no LocalStack/AWS on
+  the critical path. `wait` + CEL health checks replace jsonpath polling. A
+  real-cloud e2e (live RDS/S3, optional LocalStack provisioning, C2P over realized state) is
+  optional and documented.
 
 ---
 

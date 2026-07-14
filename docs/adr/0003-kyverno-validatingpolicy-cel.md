@@ -21,10 +21,18 @@ remains the engine (it is the reference engine in both eras); only the policy-bo
   self-scoped via a CEL `matchConstraints` objectSelector on the `mycompany.com/policy-version`
   label (the direct analogue of the original's `match.selector`).
 - Background scans + PolicyReports come from the engine, feeding the "measurable" pillar.
-- **Version pin:** author every policy as `apiVersion: policies.kyverno.io/v1` (the GA CEL API, stable
-  since Kyverno **1.17**, Feb 2026 — not the `v1alpha1`/`v1beta1` forms in older tutorials). The
-  reference pins Kyverno **≥1.17** as a hard dependency. Because the build is all-`ValidatingPolicy`,
-  the `ClusterPolicy` removal (~1.20) is a non-event here rather than a migration risk.
+- **Version pin:** author every policy as `apiVersion: policies.kyverno.io/v1` (the GA CEL API —
+  introduced in Kyverno **1.17**, Feb 2026; marked **Stable in 1.18** — not the `v1alpha1`/`v1beta1`
+  forms in older tutorials). The reference pins Kyverno **≥1.18** as a hard dependency: 1.17.0
+  shipped with `ValidatingPolicy` background-scan PolicyReports broken
+  ([kyverno#15233](https://github.com/kyverno/kyverno/issues/15233), fixed 1.17.2), and that feature
+  is exactly what the measurable pillar (ADR-0008) rides on. Because the build is
+  all-`ValidatingPolicy`,
+  the `ClusterPolicy` removal (~1.20) is a non-event here rather than a migration risk. The engine
+  itself is a governed dependency — pinned, bumped via the same reviewed Renovate PR path as policy —
+  since an engine upgrade can change verdicts across every installed policy version; the pending
+  `wgpolicyk8s.io`→`openreports.io` report-API migration (opt-in today) is tracked for the same
+  reason.
 - `Audit` and `Deny` are set **per policy** (lane vs gate); they are not a graduated `[Audit, Deny]`
   list on one policy. An `Audit→Deny` promotion is an **editorial PR** flipping `validationActions`,
   never an automated/time-based transition (ADR-0006).

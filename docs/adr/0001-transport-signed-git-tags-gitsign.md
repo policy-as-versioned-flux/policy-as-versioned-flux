@@ -34,15 +34,23 @@ most legible, reviewable expression of "what is the policy and what version is i
 - **Post-merge tamper resistance — pin the resolved commit, not just the tag.** A `GitRepository`
   pinned on `spec.ref.tag` alone re-resolves the tag every reconcile, so a force-moved tag would be
   pulled silently, and the artifact on the cluster would no longer be the one CI verified. To close
-  this, Renovate writes the tag's **resolved commit SHA into `spec.ref.commit`** (via the `git-refs`
-  datasource); Flux pins that immutable commit and ignores any later tag force-move, and CI verifies
-  that exact SHA. As defence in depth, release tags are **forge-protected/immutable** (GitHub ruleset
-  / Immutable Releases; GitLab protected tags) and `notification-controller` alerts on any unexpected
-  revision drift.
-- **CI verification runs offline against a persisted Rekor bundle** (`GITSIGN_REKOR_MODE=offline`,
-  gitsign pinned): the Rekor inclusion proof is captured at tag-creation and verified from the tag
+  this, Renovate writes the tag's **resolved commit SHA into `spec.ref.commit`** — via the
+  `customManager` on the `git-refs` datasource (ADR-0002; Renovate's native `flux` manager tracks a
+  `GitRepository`'s tag *or* commit exclusively and cannot maintain the pair). Flux pins that
+  immutable commit and ignores any later tag force-move — `spec.ref.commit` takes precedence, making
+  the tag field human documentation — so CI verifies that exact SHA **and that the tag still
+  resolves to it** (a mismatched pair would otherwise be invisible at runtime). As defence in depth,
+  release tags are **forge-protected/immutable** (GitHub ruleset
+  / Immutable Releases; GitLab protected tags) and `notification-controller` broadcasts every
+  revision change (an audit trail on which any drift is visible).
+- **CI verification runs offline against a persisted Rekor bundle** (`GITSIGN_REKOR_MODE=offline` —
+  upstream-experimental, one more reason gitsign is pinned): the Rekor inclusion proof is captured at
+  tag-creation and verified from the tag
   object, so the CI gate does **not** depend on Sigstore's public-good Rekor search API (which is on
-  its own turndown/v2 schedule) and the story is air-gap-friendly.
+  its own turndown/v2 schedule) and the story is air-gap-friendly. Verification is
+  **identity-pinned** — the expected OIDC issuer + subject (the release workflow's identity) is part
+  of the CI contract, the git analogue of `matchOIDCIdentity`; "a valid signature exists" is not the
+  gate.
 - **Closing the on-cluster gate is a tracked project action** (encourage/raise upstream; see
   `docs/upstream/fluxcd-source-controller-1068-gitsign.md`). The floor does **not** block on it; the
   commit-pin + forge-immutability above make the accepted residual (no on-cluster keyless gate)

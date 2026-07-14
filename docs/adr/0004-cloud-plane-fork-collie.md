@@ -48,7 +48,8 @@ we are deleting, not in a handful of hand-authored policies.
 - **Take (as data):** collie's OSCAL 800-53r5 catalogue and the control→RDS/S3 intent; reshaped into
   a C2P **component-definition** mapping NIST controls ↔ our hand-authored policy names.
 - **Build:** the RDS/S3 CEL `ValidatingPolicy` bodies; target **current Crossplane v2 + AWS
-  provider-family** CRD groups. Proof is **KiND-only, spec-based** — install the provider CRDs (no
+  provider-family** CRD groups (v2 managed resources are namespaced by default; the policies and
+  the orphan guard match the namespaced kinds). Proof is **KiND-only, spec-based** — install the provider CRDs (no
   ProviderConfig, no auth, no reconcile); Kyverno judges the CR spec at admission and C2P attests from
   the PolicyReport. No LocalStack/AWS on the critical path (real-cloud/LocalStack e2e stays optional,
   §7). The cloud-policy `Kustomization` `dependsOn` the provider CRDs being Established so the

@@ -9,7 +9,7 @@ question, surfaced in one dashboard:
 
 | CIO question | Signal |
 |---|---|
-| Which policy version is each part of the estate on? | Flux source **revision** (`gotk_resource_info{revision}`) |
+| Which policy version is each part of the estate on? | Flux source **revision** (`gotk_resource_info{revision}` — exposed via the flux2-monitoring-example kube-state-metrics `customResourceState` config, not emitted by Flux itself) |
 | Is each workload actually passing? | Kyverno **PolicyReports** |
 | Does the estate satisfy control framework X? | **OSCAL assessment-results** emitted by **C2P `result2oscal`** from the Kyverno PolicyReports both planes already produce (ADR-0009) |
 | How many teams accepted the latest bump? | **Renovate PR** state (adoption velocity) |
