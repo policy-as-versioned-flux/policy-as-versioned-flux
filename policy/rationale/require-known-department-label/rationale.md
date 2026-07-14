@@ -20,8 +20,8 @@ reserved for the "catastrophic minority" -- access control, data
 classification, key management), a department label is a stretch, and this
 is candidly the demonstrator that proves the Audit/Deny mechanism split
 end-to-end (kustomize + CEL + version self-selector), not a claim that
-department labelling is catastrophic. A real estate should reserve `Deny`
-for the categories CONTEXT actually names.
+department labelling is catastrophic. A production estate should reserve
+`Deny` for the categories CONTEXT actually names.
 
 **Scope:** only denies a *present but unrecognised* value -- it does not
 require the label to exist (that is the lane-keeper's job, deliberately left
