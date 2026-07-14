@@ -18,8 +18,13 @@ remains the engine (it is the reference engine in both eras); only the policy-bo
   via PolicyReports), `Deny` = gate ("locked door"). This is the runtime expression of the
   mea-culpa's split, and is independent of adoption cadence (ADR-0002).
 - Multi-version coexistence is preserved: distinct `ValidatingPolicy` names per version, each
-  self-scoped via a CEL `matchConstraints` objectSelector on the `mycompany.com/policy-version`
-  label (the direct analogue of the original's `match.selector`).
+  self-scoped via a `matchConditions` CEL expression on the `mycompany.com/policy-version` label
+  (the direct analogue of the original's `match.selector`) -- **not** `matchConstraints`
+  `objectSelector`, corrected after issue 08's live testing found Kyverno's admission-controller
+  flattens every installed ValidatingPolicy's `objectSelector` into one shared Kubernetes
+  `ValidatingWebhookConfiguration` (last-reconciled wins, not unioned), so with >1 version
+  installed only the most-recently-reconciled version's workloads were ever evaluated at all.
+  `matchConditions` is evaluated per-policy inside Kyverno, not flattened onto the shared webhook.
 - Background scans + PolicyReports come from the engine, feeding the "measurable" pillar.
 - **Version pin:** author every policy as `apiVersion: policies.kyverno.io/v1` (the GA CEL API —
   introduced in Kyverno **1.17**, Feb 2026; marked **Stable in 1.18** — not the `v1alpha1`/`v1beta1`

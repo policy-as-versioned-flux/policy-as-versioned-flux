@@ -254,7 +254,11 @@ A single cluster runs N policy versions side by side:
    `{spec.ref.tag, spec.ref.commit}` pair (§6.1).
 2. **Collision-free objects** = the bundle's kustomize `nameSuffix: "-<v>"` (kept verbatim).
 3. **Version self-scoping** = each `ValidatingPolicy` matches only workloads carrying its
-   `mycompany.com/policy-version` label (CEL `matchConstraints` objectSelector).
+   `mycompany.com/policy-version` label, via a `matchConditions` CEL expression -- **not**
+   `matchConstraints` objectSelector, which Kyverno's admission-controller flattens across every
+   installed ValidatingPolicy into one shared webhook (last-reconciled wins, not unioned),
+   silently breaking coexistence the moment more than one version is installed (found live in
+   issue 08; `matchConditions` is evaluated per-policy inside Kyverno instead).
 4. **Workload opt-in** = the consumer stamps one version label.
 5. **Cluster narrows the set** = the fleet holds a **single `{version, commit}` array**, carried as
    one nested field of a single `ResourceSet` input (bumped by the Renovate `customManager`, §6.2 —
