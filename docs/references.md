@@ -64,11 +64,12 @@ confirm)" link anyway but could not be independently confirmed.
 - [Policy Reports — Kyverno docs](https://kyverno.io/docs/policy-reports/) — `PolicyReport` CRs and background scanning.
 - [ClusterPolicy (Deprecated) — Kyverno docs](https://kyverno.io/docs/policy-types/cluster-policy/policy-settings/) — deprecated as of 1.13.
 - [Crossplane — Cloud-Native Framework for Platform Engineering](https://crossplane.io) — CNCF project; cloud-as-CR.
-- [controlplaneio/collie](https://github.com/controlplaneio/collie) — OSCAL and Kyverno policy demo for AWS (forked + uplifted as the cloud plane).
+- [controlplaneio/collie](https://github.com/controlplaneio/collie) — OSCAL and Kyverno policy demo for AWS (harvested for its catalogue + policy intent; rebuilt native — ADR-0004).
 - [Collie: A toolkit for securing cloud controller provisioned infrastructure](https://control-plane.io/posts/collie-open-source-release/) — collie announcement (Apr 2023): NIST 800-53r5 Kyverno + OSCAL + Lula.
 - [OSCAL — Open Security Controls Assessment Language](https://pages.nist.gov/OSCAL) — NIST-led control-catalogue standard.
 - [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) — the US-federal control catalogue collie ships against.
-- [defenseunicorns/lula](https://github.com/defenseunicorns/lula) — compliance-as-code validation against live state.
+- [OSCAL Compass — Compliance-to-Policy (C2P), Go](https://github.com/oscal-compass/compliance-to-policy-go) — CNCF Sandbox; `result2oscal` turns Kyverno PolicyReports into OSCAL assessment-results. The measurable pillar's OSCAL emitter (ADR-0009).
+- [kyverno/policy-reporter](https://github.com/kyverno/policy-reporter) — PolicyReport → Prometheus/UI/dashboards; the live measurability layer.
 - [Sigstore Documentation](https://docs.sigstore.dev) — supply-chain signing/verification.
 - [sigstore/cosign](https://github.com/sigstore/cosign) — code signing for containers/OCI artifacts.
 - [sigstore/gitsign](https://github.com/sigstore/gitsign) — keyless Git signing via Sigstore.

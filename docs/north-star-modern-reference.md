@@ -15,7 +15,7 @@
 | Supply chain | gitsign + Rekor transparency | **SBOM + SLSA provenance** attestations on the artifact digest |
 | Verification gate | in CI / at-merge | **Flux-native, pre-apply** (`spec.verify`) on both OCI and (post-#1068) git |
 | Compliance catalogue | NIST 800-53r5 (from collie) | **UK NCSC CAF / GovAssure** [OSCAL](https://pages.nist.gov/OSCAL) catalogue (+ NIST retained) |
-| Proof | KiND + LocalStack | **real-cloud multi-cluster fleet e2e** (multi-account, live RDS/S3 + Lula) |
+| Proof | KiND (admission/spec-based, no cloud) | **real-cloud multi-cluster fleet e2e** (multi-account, live RDS/S3, C2P over realized state) |
 | Governance agent | bounded demonstrator | **production risk-intelligence agent** with live [Wardley mapping](https://medium.com/wardleymaps/exploring-the-map-ad0266fad59b) |
 | Engine | Kyverno-only | **engine-agnostic** mapping (Gatekeeper, Kubewarden, native VAP) |
 | Fleet | `ResourceSet` matrix (static inputs) | `ResourceSetInputProvider` pulling tags/PRs; **ephemeral policy previews** |
@@ -58,14 +58,15 @@ chain is not a new problem" point that the floor only gestures at via Rekor.
 collie ships **NIST 800-53r5** (US-federal); the floor keeps it as the worked example (ADR-0004,
 ADR-0008). The north-star authors a **UK NCSC Cyber Assessment Framework / GovAssure** OSCAL
 catalogue and maps the cloud policies to it, retaining NIST for portability. OSCAL is
-framework-agnostic, so this is additive — the same Lula machinery validates against either.
+framework-agnostic, so this is additive — the same C2P `result2oscal` mapping (ADR-0009) attests
+against either.
 
 ## 6. Real-cloud fleet e2e
 
 The floor proves coexistence and cloud-admission on KiND+LocalStack (no spend). The north-star runs
 a **multi-cluster, multi-account fleet**: clusters subscribing to different policy semver sets via
-`ResourceSet`, real RDS/S3 provisioned by [Crossplane](https://crossplane.io), Lula attesting control satisfaction against
-live resources, notification-controller posting commit-status compliance back to PRs across the
+`ResourceSet`, real RDS/S3 provisioned by [Crossplane](https://crossplane.io), C2P attesting control satisfaction from
+PolicyReports over live resources, notification-controller posting commit-status compliance back to PRs across the
 fleet. This is the "show the CIO the whole estate" proof at production shape.
 
 ## 7. The production governance agent

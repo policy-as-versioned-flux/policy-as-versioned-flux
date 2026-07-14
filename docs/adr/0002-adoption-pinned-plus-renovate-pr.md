@@ -5,8 +5,8 @@ status: accepted
 # Adoption cadence: pin exact versions everywhere, bump via reviewed Renovate PR
 
 Every consumer (and every cluster's set of installed policy versions) pins an **exact** policy tag
-on `GitRepository.spec.ref.tag`; new versions are adopted only via a **Renovate PR** that a human
-reviews and merges (`automerge:false`), in **every environment**. We deliberately reject Flux's
+(with its resolved commit SHA — ADR-0001) on `GitRepository.spec.ref`; new versions are adopted only
+via a **Renovate PR** that a human reviews and merges (`automerge:false`), in **every environment**. We deliberately reject Flux's
 live semver ranges (`spec.ref.semver`) — even though they are the GitOps-native, lower-toil move —
 because the thesis's non-negotiable is the **reviewed upgrade** ("debate happens in pull requests,
 not exemption requests"), and a live range silently deletes that review gate and lets clusters
@@ -28,5 +28,11 @@ drift to different resolved versions.
 - **Adoption cadence and enforcement action are independent axes.** The lane-keeping (Audit) vs
   gate (Deny) split governs *how strict* a policy is, not *how fast its version updates*. A
   lane-keeping policy is still bumped by a reviewed PR.
-- Renovate (native `flux` manager) is a required component; it bumps `spec.ref.tag`. The reviewed
-  PR is also the unit that carries the "why" debate.
+- Renovate is a required component. **Two update surfaces, two managers:** consumer/app sources that
+  are literal `GitRepository` docs are bumped by Renovate's **native `flux` manager**; the fleet's
+  single version-array source of truth (which the ResourceSet expands into per-version sources — see
+  ADR-0005) lives inside a ControlPlane `ResourceSet` the native manager cannot parse, so it is bumped
+  by a Renovate **`customManager`** (git-refs datasource) that writes both the semver and its resolved
+  commit SHA. A `customManager` is a few lines of declarative Renovate config, **not** the bespoke
+  bash/Docker checker the "no bespoke tooling" principle deleted — that exemption is explicit. The
+  reviewed PR is also the unit that carries the "why" debate.

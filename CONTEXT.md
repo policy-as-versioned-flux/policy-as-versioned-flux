@@ -100,7 +100,8 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
 
 - **Transport = signed git tags, keyless (gitsign).** Policy is distributed as semver **git tags**
   (faithful to 2022), signed **keyless** with `sigstore/gitsign` (no long-lived GPG keys). Consumed
-  via a Flux `GitRepository` pinned on `spec.ref.tag`. See [ADR-0001](docs/adr/0001-transport-signed-git-tags-gitsign.md).
+  via a Flux `GitRepository` pinned on `spec.ref.tag` **and `spec.ref.commit`** (the tag's resolved
+  SHA — force-move-proof; Renovate writes both). See [ADR-0001](docs/adr/0001-transport-signed-git-tags-gitsign.md).
   - **Known limitation (accepted):** Flux `GitRepository.spec.verify` is PGP-only and cannot verify
     gitsign signatures today, so there is **no Flux-native verified-source admission gate** on the
     floor. Verification happens **in CI / at-merge** (`gitsign verify` against Rekor). The native
@@ -139,7 +140,7 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
 - **Proof = KiND, free & reproducible.** Workload plane runs fully on KiND; the cloud plane is
   proven at the admission level (Crossplane CRs judged by Kyverno in KiND, LocalStack for
   provisioning) with no cloud spend. `wait` + CEL health checks replace jsonpath polling. A
-  real-cloud e2e (live RDS/S3 + Lula) is optional and documented.
+  real-cloud e2e (live RDS/S3, C2P over realized state) is optional and documented.
 
 ---
 
@@ -174,13 +175,18 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
 - **cloud-as-CR** — The pattern of representing cloud intent as Kubernetes CRs (via Crossplane) so
   the *same* Kyverno engine governs cloud at admission/runtime, exactly as it governs workloads.
 - **[collie](https://github.com/controlplaneio/collie)** — ControlPlane's (Apache-2.0, dormant since 2023) toolkit demonstrating Kyverno
-  governance + compliance for Crossplane-provisioned cloud infra. We fork and uplift it as the
-  cloud plane (ADR-0004).
+  governance + compliance for Crossplane-provisioned cloud infra. We **harvest** its reusable IP (the
+  NIST 800-53r5 → RDS/S3 policy intent + OSCAL catalogue) and rebuild the cloud plane natively; its
+  generator/Lula/bootstrap are dropped (ADR-0004).
 - **[OSCAL](https://pages.nist.gov/OSCAL)** — NIST's Open Security Controls Assessment Language: a machine-readable standard for
   expressing security control catalogues, baselines, and assessment results. The formal carrier of
   the "measurable" pillar on the cloud plane.
-- **[Lula](https://github.com/defenseunicorns/lula)** — A tool that validates OSCAL control definitions against live cluster/cloud state,
-  producing automated compliance assessment results.
+- **[C2P — Compliance-to-Policy](https://github.com/oscal-compass/compliance-to-policy-go)** — OSCAL Compass (CNCF Sandbox) tool. Its `result2oscal`
+  direction consumes the Kyverno PolicyReports the single engine already emits and produces OSCAL
+  **assessment-results** (controls satisfied/not). The carrier of the "measurable" pillar's control
+  attestation. See [ADR-0009](docs/adr/0009-oscal-attestation-via-c2p.md).
+- **[Policy Reporter](https://github.com/kyverno/policy-reporter)** — Kyverno sub-project: PolicyReport CRs → Prometheus/UI/dashboards. The
+  live measurability layer beneath C2P.
 - **NIST 800-53r5** — The US-federal control catalogue collie ships policies against (illustrative
   for UK; a UK CAF/GovAssure catalogue can be added — OSCAL is framework-agnostic).
 

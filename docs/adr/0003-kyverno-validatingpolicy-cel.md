@@ -21,6 +21,13 @@ remains the engine (it is the reference engine in both eras); only the policy-bo
   self-scoped via a CEL `matchConstraints` objectSelector on the `mycompany.com/policy-version`
   label (the direct analogue of the original's `match.selector`).
 - Background scans + PolicyReports come from the engine, feeding the "measurable" pillar.
+- **Version pin:** author every policy as `apiVersion: policies.kyverno.io/v1` (the GA CEL API, stable
+  since Kyverno **1.17**, Feb 2026 — not the `v1alpha1`/`v1beta1` forms in older tutorials). The
+  reference pins Kyverno **≥1.17** as a hard dependency. Because the build is all-`ValidatingPolicy`,
+  the `ClusterPolicy` removal (~1.20) is a non-event here rather than a migration risk.
+- `Audit` and `Deny` are set **per policy** (lane vs gate); they are not a graduated `[Audit, Deny]`
+  list on one policy. An `Audit→Deny` promotion is an **editorial PR** flipping `validationActions`,
+  never an automated/time-based transition (ADR-0006).
 - Pure Kubernetes-native `ValidatingAdmissionPolicy` (no Kyverno) was rejected for the floor — it
   drops PolicyReports/mutation/generation and abandons the reference engine — and is noted only as
   a north-star consideration.
