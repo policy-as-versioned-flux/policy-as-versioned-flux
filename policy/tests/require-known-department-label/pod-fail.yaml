@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-fail
+  labels:
+    mycompany.com/policy-version: 0.0.0-unset
+    department: not-a-real-department
+spec:
+  containers:
+    - name: app
+      image: nginx:latest

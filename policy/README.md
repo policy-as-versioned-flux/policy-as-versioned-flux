@@ -13,5 +13,14 @@ tests/<policy-name>/                kyverno test fixtures (pass/fail/skip =
                                     worked examples — the "testable" -able)
 ```
 
-Run `./verify.sh` to check out a policy end-to-end (`kyverno test` fixtures +
-kustomize version substitution).
+Two worked examples, one per enforcement tier (CONTEXT.md, lane-keeping vs
+gate):
+
+- `require-department-label` — `validationActions: Audit`, the lane-keeper.
+- `require-known-department-label` — `validationActions: Deny`, the gate.
+
+Run `./verify.sh` to check out both policies end-to-end (`kyverno test`
+fixtures + kustomize version substitution) — no cluster needed. Run
+`./verify-live.sh` against a live cluster (`fleet/up.sh`) to see the
+enforcement-action difference for real: the Audit policy reports a failure
+but admits the pod, the Deny policy refuses admission outright.

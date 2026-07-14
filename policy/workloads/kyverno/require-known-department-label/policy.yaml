@@ -1,0 +1,35 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-known-department-label
+  annotations:
+    policies.kyverno.io/title: Require known department label
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Gate (Deny): every Pod's `department` label, if present, must be one of
+      the known values -- a typo'd or made-up department silently breaks cost
+      attribution and any department-specific control routing. See
+      ../../rationale/require-known-department-label/rationale.md for the
+      "why". This version's nameSuffix and policy-version selector value are
+      substituted by kustomize (see kustomization.yaml) -- this base file is
+      the version-agnostic source.
+spec:
+  # Gate, not lane-keeping: a locked door, blocks admission (ADR-0003).
+  validationActions:
+    - Deny
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+    # Version self-scoping (PRD §6.4): only workloads opted in to this exact policy
+    # version are matched. Value is substituted per-version by kustomize.
+    objectSelector:
+      matchLabels:
+        mycompany.com/policy-version: 0.0.0-unset
+  validations:
+    - expression: >-
+        !has(object.metadata.labels) || !('department' in object.metadata.labels) ||
+        object.metadata.labels['department'] in ['platform', 'finance', 'security', 'engineering']
+      message: "The 'department' label, if set, must be one of: platform, finance, security, engineering."
