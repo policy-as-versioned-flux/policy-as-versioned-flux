@@ -11,7 +11,7 @@ an unrecognised value looks legitimate at a glance.
 **Intent:** this is the gate ("locked door") tier paired with the lane-keeper
 above -- both label the same field, but this one is `validationActions:
 Deny`. It is also this project's worked example of the semver-major case in
-[CONTEXT.md](../../../CONTEXT.md#core-thesis-terms): "free-text label →
+[CONTEXT.md](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/CONTEXT.md#core-thesis-terms): "free-text label →
 enum" is exactly a version bump that can turn a previously-passing workload
 (any string) into a failing one.
 

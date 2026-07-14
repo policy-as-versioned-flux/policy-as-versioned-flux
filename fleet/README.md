@@ -2,8 +2,8 @@
 
 The config repo Flux reconciles (PRD §5.1). Currently just the runtime floor
 (issue 05): a KiND cluster, the ControlPlane Flux Operator (`FluxInstance`,
-[ADR-0005](../docs/adr/0005-controlplane-flux-operator-resourceset.md)), and
-the Kyverno engine (`>=1.18`, [ADR-0003](../docs/adr/0003-kyverno-validatingpolicy-cel.md))
+[ADR-0005](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/docs/adr/0005-controlplane-flux-operator-resourceset.md)), and
+the Kyverno engine (`>=1.18`, [ADR-0003](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/docs/adr/0003-kyverno-validatingpolicy-cel.md))
 installed via a pinned `HelmRelease`. The `ResourceSet` coexistence matrix and
 per-version policy sources land in later issues.
 

@@ -1,8 +1,9 @@
 # policy
 
 The versioned policy source (PRD §5.1). Tagged semver releases of this repo
-*are* the dependency consumers pin — see [CONTEXT.md](../CONTEXT.md) and
-[ADR-0001](../docs/adr/0001-transport-signed-git-tags-gitsign.md)/[ADR-0002](../docs/adr/0002-adoption-pinned-plus-renovate-pr.md).
+*are* the dependency consumers pin — see the hub repo's
+[CONTEXT.md](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/CONTEXT.md) and
+[ADR-0001](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/docs/adr/0001-transport-signed-git-tags-gitsign.md)/[ADR-0002](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/docs/adr/0002-adoption-pinned-plus-renovate-pr.md).
 
 ```
 workloads/kyverno/<policy-name>/   ValidatingPolicy (CEL) + kustomization.yaml
