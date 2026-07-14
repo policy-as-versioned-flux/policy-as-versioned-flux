@@ -1,0 +1,18 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+  distribution:
+    # Pinned, not a range (ADR-0002 "pinned everywhere") -- the free,
+    # reproducible floor variant (ADR-0005); enterprise distroless/FIPS
+    # variants are documented, not required by the reference.
+    version: "2.9.2"
+    registry: "ghcr.io/fluxcd"
+    variant: "upstream-alpine"
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
