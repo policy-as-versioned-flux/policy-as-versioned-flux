@@ -1,0 +1,143 @@
+{
+  "component-definition": {
+    "uuid": "a065e23d-6ac0-4b73-a7a6-c3f76d2b59d2",
+    "metadata": {
+      "title": "Policy-as-Versioned-Flux spike",
+      "last-modified": "2026-07-14T00:00:00+00:00",
+      "version": "1.0",
+      "oscal-version": "1.1.2"
+    },
+    "components": [
+      {
+        "uuid": "04d90c66-6249-42d2-ad12-e94f2ecbeaed",
+        "type": "software",
+        "title": "Kubernetes",
+        "description": "Kubernetes",
+        "props": [
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "require-team-label",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Rule_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "Pods must carry a team label (asset ownership / inventory).",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "disallow-host-network",
+            "remarks": "rule_set_2"
+          },
+          {
+            "name": "Rule_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "Pods must not use the host network (boundary protection).",
+            "remarks": "rule_set_2"
+          }
+        ],
+        "control-implementations": [
+          {
+            "uuid": "bcdb290a-e726-4350-a06a-b7726b826e72",
+            "source": "https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json",
+            "props": [
+              {
+                "name": "Framework_Short_Name",
+                "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+                "value": "nist_800_53"
+              }
+            ],
+            "description": "NIST r5",
+            "implemented-requirements": [
+              {
+                "uuid": "850a08cf-eaeb-425f-9587-b3e18153862a",
+                "control-id": "cm-8",
+                "description": "",
+                "statements": [
+                  {
+                    "statement-id": "cm-8_smt.a",
+                    "uuid": "7c0ac8ea-5613-451f-8242-7702791727a2",
+                    "description": "",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+                        "value": "require-team-label"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "950a08cf-eaeb-425f-9587-b3e18153862b",
+                "control-id": "sc-7",
+                "description": "",
+                "statements": [
+                  {
+                    "statement-id": "sc-7_smt.a",
+                    "uuid": "8c0ac8ea-5613-451f-8242-7702791727a3",
+                    "description": "",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+                        "value": "disallow-host-network"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "uuid": "e3e0eb21-c1a5-44d8-b87a-aa983fe703ac",
+        "type": "validation",
+        "title": "Kyverno",
+        "description": "Kyverno",
+        "props": [
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-team-label",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Check_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-team-label",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Check_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-team-label",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "disallow-host-network",
+            "remarks": "rule_set_3"
+          },
+          {
+            "name": "Check_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "disallow-host-network",
+            "remarks": "rule_set_3"
+          },
+          {
+            "name": "Check_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "disallow-host-network",
+            "remarks": "rule_set_3"
+          }
+        ]
+      }
+    ]
+  }
+}

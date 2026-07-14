@@ -62,10 +62,19 @@ with the whole thesis (pin a dependency; adopt new versions via reviewed PR). CN
 and IBM Research backing make it the right long-horizon bet; it is Kyverno-native and adds no second
 validation engine.
 
-## Build precondition (one spike, before P2)
+## Build precondition — spike done, risk retired
 
-**ValidatingPolicy→report mapping must be confirmed once.** Every C2P example/testdata uses legacy
-`ClusterPolicy`; no CEL `ValidatingPolicy` example exists as of 2026-07. In principle it works — VP
-emits the same `wgpolicyk8s.io` PolicyReport/ClusterPolicyReport CRs and C2P keys on result entries,
-not policy kind — but the mapping keys must line up with VP report naming. A **one-day spike retires
-this** before P2 build; if the keys don't align, a ~50-line `result2oscal` mapping shim closes it.
+The ValidatingPolicy→report mapping was proven live (KiND + Kyverno 1.18.2 + C2P `v2.0.0-rc.1`,
+2026-07-14; runnable check in [`spikes/c2p-validatingpolicy-oscal/`](../../spikes/c2p-validatingpolicy-oscal/)). Findings:
+
+- **The crux holds.** C2P `result2oscal` keys on `results[].policy` only (string-equal to the
+  component-definition `Check_Id`). Kyverno writes the policy's own `metadata.name` there for a CEL
+  `ValidatingPolicy` exactly as for a `ClusterPolicy` (`rule`/`source`/kind are never read). So a
+  two-control component-definition mapped to two VPs produced correct OSCAL: the violated control
+  `not-satisfied`, the all-pass control `satisfied`, oscal-version 1.1.3, C2P-self-validated.
+- **One shape fix, confirmed and small.** Kyverno ≥1.18 emits **per-resource** reports with the
+  subject in `.scope` and `results[].resources = null`; C2P reads subjects from `results[].resources`,
+  so raw reports yield zero subjects and every in-scope control falsely defaults to `not-satisfied`.
+  A **~6-line jq shim** at collection time (copy `.scope` into each `results[].resources`) fixes it —
+  smaller than the ~50 lines budgeted. The C2P collection job (CronJob / Flux `Kustomization`)
+  carries this normalization; it is declarative jq, not bespoke tooling.

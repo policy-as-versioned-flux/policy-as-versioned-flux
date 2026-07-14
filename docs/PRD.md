@@ -351,8 +351,9 @@ orphan-guard shown.*
 Harvest collie's OSCAL catalogue + RDS/S3 intent; hand-author the cloud `ValidatingPolicy`s and
 version them; current Crossplane v2 provider-family CRDs in KiND; same engine governs Crossplane CR
 specs at admission; **C2P `result2oscal`** turns the PolicyReports into OSCAL for the dashboard.
-**Retire the C2P `ValidatingPolicy`→report-mapping spike first** (all upstream C2P testdata is legacy
-`ClusterPolicy`; confirm VP report naming keys cleanly, else apply the ~50-line shim — ADR-0009).
+The C2P `ValidatingPolicy`→report-mapping is **proven** (spike in `spikes/c2p-validatingpolicy-oscal/`,
+ADR-0009): C2P keys on `results[].policy` = the VP name, and a ~6-line jq shim in the collection job
+normalizes Kyverno ≥1.18's per-resource report shape (`.scope`→`results[].resources`).
 *Acceptance: a cloud policy (e.g. S3 encryption gate) versioned and coexisting; and, on KiND with no
 live cloud, for one compliant + one non-compliant resource per plane, `result2oscal` emits an OSCAL
 assessment-results doc that schema-validates (`oscal-cli`) and marks the mapped NIST control
