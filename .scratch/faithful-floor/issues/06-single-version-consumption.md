@@ -39,3 +39,11 @@ One fix along the way: Flux's drift-detection health check errored on `app1`'s P
 ("namespace not specified") until the manifest set `metadata.namespace: default` explicitly —
 relying on kubectl's implicit default-namespace behaviour doesn't work for Flux's server-side
 apply/diff.
+
+Code review caught a real gap: `ValidatingPolicy` has no standard `.status.conditions[type=Ready]`
+(only `.status.conditionStatus.ready`), so `wait: true` alone risked the policy Kustomizations
+reporting Ready as soon as SSA apply succeeded, before Kyverno's webhook was actually serving the
+policy -- added `healthCheckExprs` (CEL) to close the race, re-verified live afterward. The review
+also flagged the pinned commit SHA as mismatched against the tag; checked and it wasn't (the
+reviewer compared the tag *object*'s own SHA against the dereferenced commit SHA -- two different,
+both-correct values) -- no change needed there.
