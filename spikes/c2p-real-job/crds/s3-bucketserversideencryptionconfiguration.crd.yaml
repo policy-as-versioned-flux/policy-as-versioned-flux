@@ -1,0 +1,37 @@
+# MINIMAL STAND-IN CRD — not the real thing.
+#
+# In production the CRD `bucketserversideencryptionconfigurations.s3.aws.m.upbound.io`
+# ships from the Upbound AWS S3 provider-family package, installed declaratively via
+# Flux (fleet PR #6, ticket 18: crossplane -> crossplane-providers Kustomizations).
+# This throwaway KiND spike does NOT install Crossplane or any provider — it only needs
+# the CRD to EXIST so Kyverno can admit the CR and background-scan it into a
+# PolicyReport. So we register a schema-permissive stand-in (spec.forProvider is
+# preserve-unknown-fields) that is structurally identical where the CEL policy reads
+# (spec.forProvider.rule[].applyServerSideEncryptionByDefault.sseAlgorithm) but carries
+# none of the ~hundreds of upjet-generated fields. The CRs never reconcile (no provider,
+# no AWS auth) — exactly ticket 18's "sits unreconciled" posture — which is all the
+# admission + report mechanism this ticket proves requires.
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: bucketserversideencryptionconfigurations.s3.aws.m.upbound.io
+spec:
+  group: s3.aws.m.upbound.io
+  scope: Namespaced
+  names:
+    plural: bucketserversideencryptionconfigurations
+    singular: bucketserversideencryptionconfiguration
+    kind: BucketServerSideEncryptionConfiguration
+    listKind: BucketServerSideEncryptionConfigurationList
+  versions:
+    - name: v1beta1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true

@@ -1,0 +1,193 @@
+{
+  "component-definition": {
+    "uuid": "b1f5c0de-2a11-4e3c-9b77-0c2d9a1e7f42",
+    "metadata": {
+      "title": "Policy-as-Versioned-Flux — real cloud-plane compliance (C2P result2oscal)",
+      "last-modified": "2026-07-15T00:00:00+00:00",
+      "version": "1.0",
+      "oscal-version": "1.1.2",
+      "remarks": "Maps the two REAL cloud-plane ValidatingPolicies to their real NIST 800-53r5 controls (sc-28, cp-10 — the load-bearing compliance evidence). The workload-plane require-team-label -> cm-8 entry is ILLUSTRATIVE ONLY, present to prove the C2P mechanism is plane-agnostic; the real workload policies deliberately carry no NIST mapping (internal governance, not security controls). See README.md."
+    },
+    "components": [
+      {
+        "uuid": "6d0a2c31-8b44-4f0e-9a1b-11c2d3e4f501",
+        "type": "software",
+        "title": "Kubernetes",
+        "description": "Kubernetes cluster judged by the one versioned Kyverno engine (both planes).",
+        "props": [
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "require-s3-bucket-encryption",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Rule_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "REAL: Crossplane S3 BucketServerSideEncryptionConfiguration must set a server-side encryption algorithm (sc-28, protection of information at rest).",
+            "remarks": "rule_set_0"
+          },
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "require-rds-multi-az",
+            "remarks": "rule_set_2"
+          },
+          {
+            "name": "Rule_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "REAL: Crossplane RDS Instance should set spec.forProvider.multiAz (cp-10, information system recovery and reconstitution).",
+            "remarks": "rule_set_2"
+          },
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "require-team-label",
+            "remarks": "rule_set_4"
+          },
+          {
+            "name": "Rule_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+            "value": "ILLUSTRATIVE ONLY (not real production content): Pods must carry a team label. Present solely to prove the C2P mechanism is plane-agnostic; the cm-8 mapping here is not a real project control claim.",
+            "remarks": "rule_set_4"
+          }
+        ],
+        "control-implementations": [
+          {
+            "uuid": "a7b1c2d3-e4f5-4061-8273-9a0b1c2d3e40",
+            "source": "https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json",
+            "props": [
+              {
+                "name": "Framework_Short_Name",
+                "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal",
+                "value": "nist_800_53"
+              }
+            ],
+            "description": "NIST SP 800-53 rev5",
+            "implemented-requirements": [
+              {
+                "uuid": "11111111-e4f5-4061-8273-9a0b1c2d3e01",
+                "control-id": "sc-28",
+                "description": "",
+                "statements": [
+                  {
+                    "statement-id": "sc-28_smt.a",
+                    "uuid": "11111111-e4f5-4061-8273-9a0b1c2d3e02",
+                    "description": "",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+                        "value": "require-s3-bucket-encryption"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "22222222-e4f5-4061-8273-9a0b1c2d3e01",
+                "control-id": "cp-10",
+                "description": "",
+                "statements": [
+                  {
+                    "statement-id": "cp-10_smt.a",
+                    "uuid": "22222222-e4f5-4061-8273-9a0b1c2d3e02",
+                    "description": "",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+                        "value": "require-rds-multi-az"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "33333333-e4f5-4061-8273-9a0b1c2d3e01",
+                "control-id": "cm-8",
+                "description": "",
+                "statements": [
+                  {
+                    "statement-id": "cm-8_smt.a",
+                    "uuid": "33333333-e4f5-4061-8273-9a0b1c2d3e02",
+                    "description": "",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kubernetes",
+                        "value": "require-team-label"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "uuid": "7e1b3c42-9c55-4a1f-8b2c-22d3e4f5a602",
+        "type": "validation",
+        "title": "Kyverno",
+        "description": "The one versioned Kyverno CEL ValidatingPolicy engine.",
+        "props": [
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-s3-bucket-encryption",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Check_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-s3-bucket-encryption",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Check_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-s3-bucket-encryption",
+            "remarks": "rule_set_1"
+          },
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-rds-multi-az",
+            "remarks": "rule_set_3"
+          },
+          {
+            "name": "Check_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-rds-multi-az",
+            "remarks": "rule_set_3"
+          },
+          {
+            "name": "Check_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-rds-multi-az",
+            "remarks": "rule_set_3"
+          },
+          {
+            "name": "Rule_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-team-label",
+            "remarks": "rule_set_5"
+          },
+          {
+            "name": "Check_Id",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-team-label",
+            "remarks": "rule_set_5"
+          },
+          {
+            "name": "Check_Description",
+            "ns": "https://oscal-compass.github.io/compliance-trestle/schemas/oscal/cd/kyverno",
+            "value": "require-team-label",
+            "remarks": "rule_set_5"
+          }
+        ]
+      }
+    ]
+  }
+}

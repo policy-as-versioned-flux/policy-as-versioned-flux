@@ -1,0 +1,13 @@
+# Illustrative workload-plane compliant fixture (has the 'team' label).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-good
+  namespace: default
+  labels:
+    team: platform
+    app: demo
+spec:
+  containers:
+    - name: c
+      image: registry.k8s.io/pause:3.10

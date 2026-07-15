@@ -1,0 +1,36 @@
+# ILLUSTRATIVE workload-plane policy — NOT real production content.
+#
+# This is the spike's toy `require-team-label` (same as
+# spikes/c2p-validatingpolicy-oscal/manifests.yaml), mapped to NIST CM-8 in the
+# component-definition PURELY to prove the C2P mechanism is plane-agnostic: a
+# Pod-scoped CEL ValidatingPolicy flows into OSCAL exactly like the CR-scoped
+# cloud policies do.
+#
+# WHY A TOY, NOT A REAL WORKLOAD POLICY: the 3 real workload-plane policies in
+# pavf-policy (require-department-label, require-known-department-label,
+# require-owner-annotation) DELIBERATELY carry no NIST control mapping — they are
+# internal governance / cost-attribution concerns, not formally-mapped security
+# controls (a scoping decision, see pavf-policy rationale docs + ADR-0006 ethos).
+# Attaching a NIST control to real workload content would be a fabrication this
+# project explicitly guards against. So the workload demonstration uses a toy
+# policy whose CM-8 mapping is honestly labelled illustrative. The load-bearing,
+# real compliance evidence is the CLOUD plane (sc-28, cp-10) only.
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-team-label
+spec:
+  validationActions: [Audit]
+  autogen: {}
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: "has(object.metadata.labels) && 'team' in object.metadata.labels"
+      message: "Pods must carry a 'team' label (illustrative CM-8 asset inventory)."

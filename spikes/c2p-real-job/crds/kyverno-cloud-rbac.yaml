@@ -1,0 +1,20 @@
+# Kyverno's background + reports controllers get no access to arbitrary CRDs by
+# default, so without this they cannot list the Crossplane CRs and would emit ZERO
+# cloud-plane report results (the cloud controls would then all false-negative).
+# Kyverno's documented extension point is an aggregated ClusterRole carrying these
+# two labels; grant get/list/watch on exactly the two provider-family resources this
+# spike uses. (In production this RBAC rides along with the provider-family install.)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kyverno:cloud-cr-view
+  labels:
+    rbac.kyverno.io/aggregate-to-background-controller: "true"
+    rbac.kyverno.io/aggregate-to-reports-controller: "true"
+rules:
+  - apiGroups: ["s3.aws.m.upbound.io"]
+    resources: ["bucketserversideencryptionconfigurations"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["rds.aws.m.upbound.io"]
+    resources: ["instances"]
+    verbs: ["get", "list", "watch"]

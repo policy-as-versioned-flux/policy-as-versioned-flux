@@ -1,0 +1,47 @@
+# REAL cloud-plane policy content, copied verbatim from
+#   pavf-policy/cloud/require-s3-bucket-encryption/policy.yaml (main, pending v2.2.0)
+# with ONE deliberate change for this spike, called out below.
+#
+# CHANGE: validationActions Deny -> Audit.
+#   In production this is a Deny GATE (sc-28, encryption-at-rest). A Deny gate is
+#   "pass-only by construction" for OSCAL evidence: a non-compliant bucket is
+#   REJECTED at admission, so it never persists and never produces a failing
+#   PolicyReport — sc-28 could only ever show `satisfied`. ADR-0009 states exactly
+#   this and says the not-satisfied path "is always demonstrated on the Audit tier."
+#   To exercise C2P's not-satisfied code path for sc-28 in this mechanism spike, we
+#   run the policy in Audit so the violating fixture stays on-cluster and produces a
+#   fail report. The C2P result2oscal MAPPING mechanism (sc-28 <-> this policy name,
+#   satisfied when all pass, not-satisfied when any fail) is byte-identical whether
+#   the policy is Deny or Audit — only whether a failing report ever exists differs.
+#   This is a documented demonstration choice, NOT a claim that production runs Audit.
+#
+# matchConditions version-scope is kept as-is (== '2.2.0'); the real test fixtures
+# already carry the label mycompany.com/policy-version: "2.2.0", so the version-scope
+# gate is genuinely exercised rather than stripped.
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-s3-bucket-encryption
+spec:
+  validationActions:
+    - Audit          # SPIKE ONLY — production is Deny (see header). Real control: sc-28.
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["s3.aws.m.upbound.io"]
+        apiVersions: ["v1beta1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["bucketserversideencryptionconfigurations"]
+  matchConditions:
+    - name: version-scope
+      expression: >-
+        has(object.metadata.labels) &&
+        'mycompany.com/policy-version' in object.metadata.labels &&
+        object.metadata.labels['mycompany.com/policy-version'] == '2.2.0'
+  validations:
+    - expression: >-
+        has(object.spec.forProvider) && has(object.spec.forProvider.rule) &&
+        object.spec.forProvider.rule.exists(r,
+          has(r.applyServerSideEncryptionByDefault) &&
+          has(r.applyServerSideEncryptionByDefault.sseAlgorithm) &&
+          r.applyServerSideEncryptionByDefault.sseAlgorithm != '')
+      message: "spec.forProvider.rule[].applyServerSideEncryptionByDefault.sseAlgorithm must be set (AES256 or aws:kms)."

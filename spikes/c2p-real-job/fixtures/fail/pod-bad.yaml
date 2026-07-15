@@ -1,0 +1,10 @@
+# Illustrative workload-plane non-compliant fixture (missing the 'team' label).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-bad
+  namespace: default
+spec:
+  containers:
+    - name: c
+      image: registry.k8s.io/pause:3.10

@@ -1,0 +1,17 @@
+# Verbatim from pavf-policy/tests/require-s3-bucket-encryption/bucket-pass.yaml
+apiVersion: s3.aws.m.upbound.io/v1beta1
+kind: BucketServerSideEncryptionConfiguration
+metadata:
+  name: bucket-pass
+  namespace: default
+  labels:
+    mycompany.com/policy-version: "2.2.0"
+spec:
+  forProvider:
+    region: us-west-1
+    bucketSelector:
+      matchLabels:
+        testing.upbound.io/example-name: mybucket
+    rule:
+      - applyServerSideEncryptionByDefault:
+          sseAlgorithm: AES256

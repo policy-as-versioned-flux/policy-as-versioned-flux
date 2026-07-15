@@ -1,0 +1,16 @@
+# Verbatim from pavf-policy/tests/require-rds-multi-az/instance-fail.yaml
+# multiAz: false -> require-rds-multi-az FAILS -> cp-10 not-satisfied
+apiVersion: rds.aws.m.upbound.io/v1beta1
+kind: Instance
+metadata:
+  name: instance-fail
+  namespace: default
+  labels:
+    mycompany.com/policy-version: "2.2.0"
+spec:
+  forProvider:
+    region: us-west-1
+    engine: postgres
+    instanceClass: db.t3.micro
+    allocatedStorage: 20
+    multiAz: false

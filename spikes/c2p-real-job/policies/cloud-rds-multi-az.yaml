@@ -1,0 +1,30 @@
+# REAL cloud-plane policy content, copied VERBATIM from
+#   pavf-policy/cloud/require-rds-multi-az/policy.yaml (main, pending v2.2.0).
+# No changes: this policy is already Audit (a lane-keeper), so its violating fixture
+# stays on-cluster and produces a failing PolicyReport with no modification needed —
+# this is the "not-satisfied on the Audit tier" path ADR-0009 relies on. Real NIST
+# control: cp-10 (Information System Recovery and Reconstitution).
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-rds-multi-az
+spec:
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["rds.aws.m.upbound.io"]
+        apiVersions: ["v1beta1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["instances"]
+  matchConditions:
+    - name: version-scope
+      expression: >-
+        has(object.metadata.labels) &&
+        'mycompany.com/policy-version' in object.metadata.labels &&
+        object.metadata.labels['mycompany.com/policy-version'] == '2.2.0'
+  validations:
+    - expression: >-
+        has(object.spec.forProvider) && has(object.spec.forProvider.multiAz) &&
+        object.spec.forProvider.multiAz == true
+      message: "spec.forProvider.multiAz must be true."
