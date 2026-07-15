@@ -4,13 +4,12 @@
 
 **Blocked by:** 04 — Signed release pipeline.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] `2.0.0` contains a verdict-tightening change; a fixture compliant under `1.0.0` fails under `2.0.0`
 - [x] `2.1.x` contains an addition/widening that cannot fail an existing compliant workload, with fixtures proving it
 - [x] All tags gitsign-signed and CI-verified like `v1.0.0`
-- [ ] Release notes state what changed and why, per the semver-by-verdict-impact rule -- **fix
-      written, not yet proven live** (see Comments: blocked on a fresh gitsign OAuth login)
+- [x] Release notes state what changed and why, per the semver-by-verdict-impact rule
 
 ## Comments
 
@@ -42,3 +41,16 @@ also silently rerouted ordinary *commit* signing through gitsign's OIDC flow (th
 default is SSH commit signing, which needs no auth at all) -- caused a real 2-minute hang on a
 plain `git commit`. Fixed by using inline `git -c gpg.format=x509 -c gpg.x509.program=gitsign
 tag -s ...` for tag operations only, instead of persistent local config.
+
+**2026-07-15, last box resolved without a new tag:** re-examined the actual gap instead of
+assuming it required `v2.1.2`. The *tag* message for `v1.0.1`/`v2.0.1`/`v2.1.1` already carried
+the correct semver-by-verdict-impact narrative (gitsign signs the tag object, narrative included
+-- that part was never broken). What was actually wrong was narrower: the *GitHub Release* object
+for each -- a separate, unsigned piece of metadata -- only had `gh release create`'s
+auto-generated commit-list body, missing the narrative. That's editable directly
+(`gh release edit --notes-file`) without touching the tag, the commit, or any signature. Rebuilt
+each release's notes as tag-narrative + the existing verified-signature line (the exact shape
+`release.yml`'s fix now produces for future tags) and pushed it live for all three real releases.
+Verified by re-fetching each release body afterward: all three now state what changed and why.
+No gitsign OAuth needed -- the fix didn't actually require one, only the earlier assumption that
+"prove it" meant "cut a new tag" did.
