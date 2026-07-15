@@ -4,7 +4,7 @@
 
 **Blocked by:** 14 — Policy Reporter → Prometheus.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] `gotk_resource_info`-style revision metrics show every pinned policy version per cluster
 - [x] One dashboard, shared `cluster`+`policy-version` variable driving both panels
@@ -35,6 +35,9 @@ the dashboard ConfigMap carries the sidecar label, and selecting each of the thr
 versions resolves real, non-empty data on both panels (not just "some data exists somewhere" --
 counted per version).
 
-Landed via `policy-as-versioned-flux/fleet#4` (stacked on the still-open #3, branch ruleset
-requires PRs now, issue 12) -- CI-green, waiting on the user to review and merge (in order, #3
-then #4).
+Landed via `policy-as-versioned-flux/fleet#4`, merged 2026-07-15 (after #3, in order).
+`verify-flux-dashboard.sh` updated (was hardcoded to the retired `2.1.1` version string) and
+re-run green against the real, merged, live cluster: `gotk_resource_info` covers all 3 installed
+versions (`1.0.0`: 3 Flux resources/64 PolicyReport results, `2.0.0`: 3/64, `2.2.0`: 4/97 --
+`2.2.0` genuinely has more, it now also carries the cloud plane, issue 19), dashboard ConfigMap
+sidecar-discovered, every version resolves real non-empty data on both panels.

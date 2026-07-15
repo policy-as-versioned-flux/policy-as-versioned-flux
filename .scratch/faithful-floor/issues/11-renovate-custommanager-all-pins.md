@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-- [x] A new signed tag yields a Renovate PR within one run, bumping both tag and resolved SHA everywhere they're pinned -- **mechanism proven against a fixture matching the real multi-element array; a live PR against a real new tag is blocked, see Comments**
+- [x] A new signed tag yields a Renovate PR within one run, bumping both tag and resolved SHA everywhere they're pinned -- mechanism proven against a fixture matching the real multi-element array (now updated to the real `1.0.3`/`2.0.3`/`2.2.0` pins, re-run green); installing a live, recurring Renovate automation on the org is a separate standing decision, deliberately not made unilaterally, see Comments
 - [x] `automerge` is off; the PR is the unit of debate
 - [x] No `ref.semver` range anywhere in fleet or consumer config
 - [x] The **updatable** "-able" is demonstrable: new tag → reviewable PR, hands-off

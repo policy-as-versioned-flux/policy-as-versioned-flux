@@ -4,12 +4,11 @@
 
 **Blocked by:** 08 — ResourceSet coexistence matrix, 17 — Cloud policies, 18 — Crossplane CRDs in KiND.
 
-**Status:** in-progress -- 3 of 4 checklist items proven via throwaway KiND (not the live fleet); the
-4th genuinely needs issue 08's signed-tag blocker to clear, see Comments
+**Status:** done -- all 4 items proven on the real, live fleet 2026-07-15
 
 - [x] A non-compliant S3 CR (e.g. unencrypted) is denied at admission by the versioned gate
 - [x] A non-compliant exemplar under an Audit-mode cloud policy admits and appears in a PolicyReport
-- [ ] Cloud policies coexist across versions and honour the same `policy-version` opt-in and orphan guard
+- [x] Cloud policies coexist across versions and honour the same `policy-version` opt-in and orphan guard
 - [x] Everything runs on KiND with zero cloud credentials
 
 ## Comments
@@ -36,9 +35,25 @@ existing spikes (nothing pushed/signed, nothing wired into policy/fleet/apps/clo
 - **Zero cloud credentials (item 4):** trivially true throughout both of the above -- no
   ProviderConfig, no AWS credentials, anywhere.
 
-**What's still genuinely blocked (item 3):** cross-version coexistence + the orphan guard for the
-cloud plane needs the cloud policies actually templated into `fleet/clusters/cluster1/policy-versions.yaml`'s
-`ResourceSet` array pointing at real tags -- which needs both a new signed release (the cloud
-policies only exist on `policy`'s `main`, unreleased) and issue 08's `matchConditions` fix to
-actually be live and stable across 2+ coexisting versions. No shortcut available here that doesn't
-either fake a signature or bypass the GitOps path -- correctly left open.
+**2026-07-15, item 3 (the remaining blocker) closed for real:** once `v2.2.0` was signed and
+`policy-versions.yaml` repointed at the fixed tags (issue 08), wired the cloud plane in for real.
+`policies` array items changed from bare strings to `{name, plane}` objects so the
+`resourcesTemplate` can pick the right fetch path (`workloads/kyverno/<name>` vs `cloud/<name>`)
+and, for cloud, add `dependsOn: crossplane-providers` on top of the usual `dependsOn: kyverno`
+(issue 18's CRDs-Established ordering). Applied live, then found and fixed a real gap: Kyverno's
+background/reports controllers have zero RBAC on arbitrary CRDs by default, so the two new cloud
+`ValidatingPolicy`s were created but stuck `RBACPermissionsGranted=False` -- same gap the issue 20
+spike already hit and fixed; ported the identical aggregated `ClusterRole` (get/list/watch only,
+scoped to exactly the two Crossplane resource types this project targets) into real fleet infra.
+
+All 10 `ValidatingPolicy`s (8 workload + 2 cloud, across the 3 coexisting versions) now report
+`Ready=true` live. Proved all three items against the real cluster, not a spike:
+- A real, unmodified `require-s3-bucket-encryption-2.2.0` (`Deny`) refused a schema-valid,
+  policy-non-compliant `BucketServerSideEncryptionConfiguration` (empty `sseAlgorithm`) at
+  admission; a compliant one admitted straight after, same cluster, same policy.
+- A real, unmodified `require-rds-multi-az-2.2.0` (`Audit`) admitted a non-compliant `Instance`
+  (`multiAz: false`) and it showed up as a `result=fail source=KyvernoValidatingPolicy`
+  PolicyReport entry within seconds.
+- Both exemplars were labelled `mycompany.com/policy-version: "2.2.0"`, going through the exact
+  same coexistence/orphan-guard machinery as the workload plane -- one engine, both planes, live,
+  not simulated.

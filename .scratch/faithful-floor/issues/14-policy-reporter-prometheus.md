@@ -4,7 +4,7 @@
 
 **Blocked by:** 08 — ResourceSet coexistence matrix.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] PolicyReport results for all installed versions appear as Prometheus metrics
 - [x] A Grafana panel shows pass/fail counts filterable by `policy-version`
@@ -33,5 +33,7 @@ mentioning every installed version, then creates a pod that's non-compliant unde
 `require-owner-annotation` policy and confirms it shows `status="fail"` in Prometheus while
 staying `Running` throughout (polled, same async-report pattern as issues 03/06). Both green.
 
-Landed via `policy-as-versioned-flux/fleet#3` (branch ruleset requires PRs on `main` now, issue
-12) -- CI-green, waiting on the user to review and merge.
+Landed via `policy-as-versioned-flux/fleet#3`, merged 2026-07-15. `verify-monitoring.sh` updated
+(was hardcoded to the retired `2.1.1` version string) and re-run green against the real, merged,
+live cluster -- metrics present for all 3 currently-installed versions (`1.0.0`/`2.0.0`/`2.2.0`),
+non-compliant Audit workload reported as failing without eviction.

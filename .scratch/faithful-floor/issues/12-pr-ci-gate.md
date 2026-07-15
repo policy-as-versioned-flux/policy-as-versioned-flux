@@ -4,7 +4,7 @@
 
 **Blocked by:** 04 — Signed release pipeline, 11 — Renovate customManager.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] The bump PR's CI renders a flux diff of the change
 - [x] Fixtures for the incoming policy version run in the PR; a failing fixture fails the PR
@@ -35,8 +35,13 @@ doesn't touch those paths -- a well-known GitHub gotcha where the merge then blo
 waiting on a check that was never going to run. Moved the path decision into the script itself (a
 plain `git diff`), so the workflow always runs and always reports a real status.
 
-That fix (plus README docs) is sitting in an open, CI-green PR
-(policy-as-versioned-flux/fleet#2) rather than pushed directly to main -- the ruleset now requires
-it, and even if it didn't, merging my own PR without a human's review would contradict the exact
-"the PR is the unit of debate, never automerged" principle this ticket exists to prove. Waiting on
-the user to review and merge it.
+That fix (plus README docs) shipped as `policy-as-versioned-flux/fleet#2`, reviewed and merged by
+the user 2026-07-15 (not self-merged -- the exact "PR is the unit of debate" principle this ticket
+exists to prove).
+
+**Status: done.** Since then, `pr-gate-check.sh` has gated (and caught a real bug in) several more
+real PRs against this repo, including issue 08's tag-resolution fix and issue 19's cloud-plane
+wiring -- the latter changed `policies[]` from bare strings to `{name, plane}` objects, which broke
+the script's `jq`/path-construction assumptions; caught locally before push, fixed, re-tested
+locally (PASS), then confirmed green in real CI on the PR. The gate has now been exercised against
+a real structural schema change to the thing it parses, not just the original fixture scenarios.

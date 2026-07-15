@@ -4,11 +4,11 @@
 
 **Blocked by:** 05 — KiND + Flux Operator + Kyverno.
 
-**Status:** in-progress, blocked on PR review
+**Status:** done
 
-- [ ] Provider-family CRDs install declaratively via Flux and reach Established
-- [ ] A sample RDS/S3 CR applies and simply sits unreconciled (no auth on the critical path)
-- [ ] Cloud-policy ordering gates on CRDs-Established, verified by a fresh-cluster bring-up
+- [x] Provider-family CRDs install declaratively via Flux and reach Established
+- [x] A sample RDS/S3 CR applies and simply sits unreconciled (no auth on the critical path)
+- [x] Cloud-policy ordering gates on CRDs-Established, verified by a fresh-cluster bring-up
 
 ## Comments
 
@@ -31,6 +31,10 @@ Provider/Instance manifests against this cluster today (Crossplane not yet insta
 outright with `no matches for kind "Provider"/"Instance" ... ensure CRDs are installed first`.
 That failure is exactly what `dependsOn` makes unreachable on a real bring-up.
 
-Both remaining checkboxes need `verify-crossplane.sh` run for real, which needs the PR merged and
-Flux to reconcile the new Kustomizations -- same "PR open, not self-merged" pattern as issues
-11/12/14/15/16.
+**2026-07-15:** PR #6 merged. `verify-crossplane.sh` run for real against the live cluster: all
+three Kustomizations Ready, both CRDs (`instances.rds.aws.m.upbound.io`,
+`bucketserversideencryptionconfigurations.s3.aws.m.upbound.io`) Established, sample `Instance` CR
+applied and sitting unreconciled (`Synced` never `True`, no `ProviderConfig` anywhere). Also found
+live (not by this ticket's own checklist, but load-bearing for issue 19 on top of it): Kyverno's
+background/reports controllers need explicit RBAC to list/watch arbitrary CRDs -- fixed via an
+aggregated `ClusterRole`, see issue 19.

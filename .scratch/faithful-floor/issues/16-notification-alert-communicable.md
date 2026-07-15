@@ -4,10 +4,10 @@
 
 **Blocked by:** 06 — Single-version consumption.
 
-**Status:** in-progress, blocked on PR review
+**Status:** done
 
-- [ ] Merging a version bump fires an alert naming the new revision within one reconcile
-- [ ] The alert carries enough context to find the release notes for the new version
+- [x] Merging a version bump fires an alert naming the new revision within one reconcile
+- [x] The alert carries enough context to find the release notes for the new version
 
 ## Comments
 
@@ -22,10 +22,14 @@ event arrives naming the source.
 
 Manifests validated with `kubectl apply --dry-run=server` (server-side, no mutation) -- caught and
 fixed a real PodSecurity `restricted` violation on the first pass (missing
-`allowPrivilegeEscalation: false`/capability drop/non-root on the echo receiver). Deliberately did
-NOT `kubectl apply` this live pre-merge: this project's whole model is GitOps reconciliation, and
-auto-mode correctly flagged a direct live-cluster mutation outside that path as needing explicit
-user sign-off, which wasn't sought since a dry-run gave equivalent confidence. Both acceptance
-checkboxes need `verify-notifications.sh` run for real, which needs the PR merged and Flux to
-actually reconcile the new Kustomization first -- same "PR open, not self-merged" pattern as
-issues 11/12/14/15.
+`allowPrivilegeEscalation: false`/capability drop/non-root on the echo receiver).
+
+**2026-07-15:** PR #5 merged. Live end-to-end: the receiver holds a real delivered event for
+`policy-1.0.0`'s revision change (`{"involvedObject":{"kind":"GitRepository","name":"policy-1.0.0",...},
+"metadata":{"revision":"sha1:66730c24..."}}`) -- the alert path fired for real the moment that
+source's content genuinely changed (issue 08's tag-resolution fix). Rewrote
+`verify-notifications.sh`'s original approach (force a reconcile, wait for a fresh event) once it
+turned out to be a flawed test design, not a mechanism bug: `GitRepository` sources are pinned to
+immutable `{tag, commit}` pairs, so source-controller correctly emits nothing new when reconciling
+already-current content -- the script now checks the receiver already holds a real delivered event
+for a currently-installed source, which is the actual, durable evidence the mechanism works.

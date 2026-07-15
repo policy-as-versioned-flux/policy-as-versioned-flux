@@ -4,7 +4,7 @@
 
 **Blocked by:** 08 — ResourceSet coexistence matrix.
 
-**Status:** done (this ticket's own checklist; full cross-version stability inherits issue 08's open blocker, see Comments)
+**Status:** done, fully -- issue 08's blocker cleared 2026-07-15
 
 - [x] A workload with no `policy-version` label is denied at admission
 - [x] A workload labelled with a version not in the installed set is denied
@@ -28,9 +28,16 @@ didn't use it here since cluster1 is fresh, not brownfield. Excludes cluster-sys
 (kube-system, flux-system, kyverno, etc.) -- an unconstrained catch-all on all Pods would deny
 Kyverno's/Flux's own pod rollouts.
 
-Same caveat as issue 08: a fully stable run of ALL these checks simultaneously, with all three
-versions genuinely coexisting, needs the same new patch tags (v1.0.0/v2.0.0's Kustomizations are
-still reconciling from immutable tags carrying the pre-`matchConditions` `objectSelector` pattern,
-which destabilizes the *shared* Kyverno webhook cluster-wide, orphan-guard included, until every
-policy on the cluster is on the fixed pattern). See issue 08's Comments for the full story and
-what's blocked on.
+**2026-07-15:** issue 08's blocker cleared -- all three coexisting versions now run the
+matchConditions-fixed tags, so the guard's stability no longer depends on which policy last
+reconciled the shared webhook. `verify-orphan-guard.sh` (updated for the `2.2.0` line, was
+hardcoded to the retired `2.1.1`) re-run green against the live cluster: no-label and
+unknown-version pods refused, allow-list contains every currently-installed version, background
+scan reports pre-existing orphans without eviction.
+
+Also found and fixed live: the guard's namespace exclusion list didn't cover `crossplane-system`
+(added by issue 18), so Crossplane's own control-plane pods were being denied at admission --
+correctly enforced, wrongly scoped, since infrastructure pods aren't app workloads (same category
+as the already-excluded `kyverno`/`flux-system`). Added `crossplane-system` and `monitoring`
+(which had silently slipped through only because the guard wasn't reliably active until issue 08's
+fix landed cluster-wide) to the exclusion list.

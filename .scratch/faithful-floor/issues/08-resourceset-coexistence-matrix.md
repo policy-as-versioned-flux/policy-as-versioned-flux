@@ -4,10 +4,10 @@
 
 **Blocked by:** 06 — Single-version consumption, 07 — 2.0.0 + 2.1.1 releases.
 
-**Status:** ready-for-agent
+**Status:** done -- full 3-version live proof completed 2026-07-15, see Comments
 
 - [x] Three policy versions live side by side on `cluster1`, all objects collision-free via nameSuffix
-- [ ] Workloads labelled `1.0.0`, `2.0.0`, `2.1.1` are each judged only by their pinned version (a workload compliant under 1.0.0 but not 2.0.0 admits when pinned to 1.0.0) -- **mechanism fixed and proven for a single version in isolation; full 3-version live proof blocked on new signed tags, see Comments**
+- [x] Workloads labelled `1.0.0`, `2.0.0`, `2.2.0` are each judged only by their pinned version (a workload compliant under 1.0.0 but not 2.0.0 admits when pinned to 1.0.0)
 - [x] Adding a version to the array is the only change needed to install it; removing it uninstalls (prune)
 - [x] Every per-version Kustomization `dependsOn` the engine and gates on `wait`
 
@@ -35,24 +35,31 @@ now-removed `objectSelector`, one hardcoding "1.0.0" as if `require-department-l
 always the Audit example -- broken by issue 07's own Audit→Deny promotion). Proven live for a
 single version in isolation (`policy/verify-live.sh`, all 3 current-tree policies, green).
 
-**What's blocked:** `v1.0.0`/`v1.0.1`/`v2.0.0`/`v2.0.1`/`v2.1.1` are already tagged and immutable
-with the broken `objectSelector` pattern baked in -- Flux's continuous reconciliation actively
-*reverts* any live hand-patch back to that broken content within a minute, confirmed live (a
-manually-patched `require-known-department-label-2.0.0` silently reverted and
-`verify-coexistence.sh`'s differential-admission check started failing again). Full proof of "3
-versions coexist correctly" needs 3 new patch tags with zero policy-content change (this fix has
-no verdict impact by construction) -- prepared, not yet cut:
-- `v1.0.2` (content-identical to `v1.0.0`/`v1.0.1` except the matchConditions fix)
-- `v2.0.2` (content-identical to `v2.0.0`/`v2.0.1` except the fix)
-- `v2.1.2` (same commit already queued for issue 07's release-notes fix, now also carries this)
+**2026-07-15: full proof completed, live.** With the user back at a keyboard for the gitsign
+OAuth step, cut the three tags this ticket had prepared for: `v1.0.3`/`v2.0.3` (patch, zero
+verdict impact, matchConditions fix only, content otherwise identical to the `1.0.x`/`2.0.x`
+lines) and `v2.2.0` (real content release: the same fix plus issue 17's cloud policies, retiring
+the `v2.1.1` line). (`v1.0.2`/`v2.0.2` exist too but are skipped in the fleet array -- their
+commits, built via `git worktree` from a detached HEAD, were never reachable from any branch,
+which Flux's go-git fetch-by-tag requires; root-caused live by deleting/restoring a fix branch and
+watching resolution break/recover identically each time -- a documented Flux/go-git limitation
+(`fluxcd/source-controller#1166`), not a broken tag. `v1.0.3`/`v2.0.3`'s commits keep a permanent
+`release-pins/vX` branch ref in the policy repo for this reason -- load-bearing, not cleanup
+candidates.)
 
-Blocked on a fresh gitsign OAuth login (the credential cache from issue 04 expired mid-session;
-the user asked to pause rather than retry blind, and is currently AFK). `fleet`'s `ResourceSet`
-(`clusters/cluster1/policy-versions.yaml`) is ready to repoint at these tags the moment they exist
--- just new `commit` SHAs in the existing `versions` array, everything else (the ranging template,
-`verify-coexistence.sh`) already written and tested against the mechanism.
+`fleet/clusters/cluster1/policy-versions.yaml` repointed at the three fixed tags (PR #7, merged).
+Discovered live that `policy-versions.yaml`/`bootstrap.yaml` are one-shot `kubectl apply`d by
+`up.sh`, not continuously Flux-reconciled -- re-applied both directly (the same command `up.sh`
+itself uses) to actually push the change to the live cluster, not just merge it to git.
 
-Also built for this ticket, already working: `app2`/`app3` (pinned 2.0.0/2.1.1) in the `apps`
+`./verify-coexistence.sh` (updated for `2.2.0`, was hardcoded to the retired `2.1.1`) now passes
+fully and lives: all 7 ValidatingPolicies present and collision-free, every generated Kustomization
+`dependsOn: kyverno` + `wait: true`, and the differential proof -- the identical missing-department
+Pod shape pinned to `1.0.0` (still Audit there) admits, the same shape pinned to `2.0.0` (promoted
+to Deny) is refused, live and simultaneous on the same cluster. Prune-on-array-removal and
+reinstall-on-re-add also proven live in the same run.
+
+Also built for this ticket, already working: `app2`/`app3` (pinned 2.0.0/2.2.0) in the `apps`
 repo, `fleet/verify-coexistence.sh` (collision-freedom, `dependsOn`/`wait` on every generated
 Kustomization, prune-on-removal -- all passing now; the differential cross-version admission check
 is the one still blocked).
