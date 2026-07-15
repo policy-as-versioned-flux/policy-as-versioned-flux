@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 — Renovate spike, 08 — ResourceSet coexistence matrix.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] A new signed tag yields a Renovate PR within one run, bumping both tag and resolved SHA everywhere they're pinned -- mechanism proven against a fixture matching the real multi-element array (now updated to the real `1.0.3`/`2.0.3`/`2.2.0` pins, re-run green); installing a live, recurring Renovate automation on the org is a separate standing decision, deliberately not made unilaterally, see Comments
 - [x] `automerge` is off; the PR is the unit of debate

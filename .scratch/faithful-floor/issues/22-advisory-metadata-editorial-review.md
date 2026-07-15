@@ -4,7 +4,7 @@
 
 **Blocked by:** 03 — Gate VP + rationale layout.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Both workload policies (and the cloud pattern) carry conformant advisory metadata
 - [x] A check proves no policy body references any advisory field (determinism holds)

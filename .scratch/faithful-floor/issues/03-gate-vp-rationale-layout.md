@@ -4,7 +4,7 @@
 
 **Blocked by:** 02 — Policy repo scaffold + lane-keeping VP.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Gate policy denies a non-compliant fixture and passes a compliant one under `kyverno test`
 - [x] `validationActions: Deny`, same nameSuffix + version self-selector pattern as the lane-keeper

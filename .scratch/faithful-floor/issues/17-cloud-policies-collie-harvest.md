@@ -4,7 +4,7 @@
 
 **Blocked by:** 03 — Gate VP + rationale layout (the authoring pattern to follow).
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] At least an S3 encryption gate (Deny) and one RDS lane-keeper (Audit), each mapped to its NIST 800-53r5 control
 - [x] `kyverno test` fixtures pass/fail against Crossplane v2 CR specs

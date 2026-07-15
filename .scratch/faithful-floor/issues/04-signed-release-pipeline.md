@@ -4,7 +4,7 @@
 
 **Blocked by:** 03 — Gate VP + rationale layout.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Tagging a release produces a gitsign-signed tag; `gitsign verify` succeeds in CI with issuer+subject pinned
 - [x] Verification runs offline against a persisted Rekor bundle; gitsign is version-pinned

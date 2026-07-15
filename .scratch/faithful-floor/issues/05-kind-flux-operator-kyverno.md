@@ -4,7 +4,7 @@
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] One documented command sequence takes a laptop from nothing to a KiND cluster with Flux Operator and Kyverno healthy
 - [x] Kyverno installed via a pinned HelmRelease; readiness gated by `wait`/health checks, not polling

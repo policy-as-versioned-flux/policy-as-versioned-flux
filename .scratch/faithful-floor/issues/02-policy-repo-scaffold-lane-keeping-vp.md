@@ -4,7 +4,7 @@
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] `kyverno test` runs green locally against pass and fail fixtures
 - [x] The policy matches only workloads carrying its `policy-version` label (version self-scoping verified by a fixture)

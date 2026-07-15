@@ -4,7 +4,7 @@
 
 **Blocked by:** 06 — Single-version consumption.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Following the doc verbatim on a clean laptop reproduces the same admit/deny verdict the cluster gives for a sample workload
 - [x] The flow uses only native CLIs — no wrapper scripts

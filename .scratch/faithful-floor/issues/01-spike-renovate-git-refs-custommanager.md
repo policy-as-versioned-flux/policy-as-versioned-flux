@@ -4,7 +4,7 @@
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] A Renovate dry run against a fixture repo detects a new upstream tag and produces a PR bumping both the tag and the resolved SHA in the nested-array shape from PRD §6.4
 - [x] The same customManager config also bumps a consumer-style flat `{tag, commit}` pin

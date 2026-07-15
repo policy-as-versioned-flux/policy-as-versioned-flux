@@ -4,7 +4,7 @@
 
 **Blocked by:** 04 — Signed release pipeline (produces the `v1.0.0` tag to pin), 05 — KiND + Flux Operator + Kyverno.
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] The pinned source reconciles; the versioned ValidatingPolicies are live with their nameSuffix
 - [x] A compliant labelled workload admits; a gate-violating one is denied at admission
