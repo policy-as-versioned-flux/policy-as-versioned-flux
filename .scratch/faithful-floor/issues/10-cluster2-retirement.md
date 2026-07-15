@@ -4,12 +4,12 @@
 
 **Blocked by:** 08 — ResourceSet coexistence matrix, 09 — Orphan guard.
 
-**Status:** blocked -- genuinely, not just by graph label, see Comments
+**Status:** done -- issue 08's blocker cleared, all 4 items proven live 2026-07-15
 
-- [ ] `cluster1` (all versions) and `cluster2` (`>=2.0.0`) run from the same fleet config with different inputs
-- [ ] On `cluster2`, a workload pinned to `1.0.0` is denied by the orphan guard; the same workload admits on `cluster1`
-- [x] Retiring a version = one reviewed change to the array; policies prune and the guard tightens in the same reconcile -- **mechanism already proven, see Comments**
-- [ ] The silent-ungovernance gap of the 2022 implementation is demonstrably closed
+- [x] `cluster1` (all versions) and `cluster2` (`>=2.0.0`) run from the same fleet config with different inputs
+- [x] On `cluster2`, a workload pinned to `1.0.0` is denied by the orphan guard; the same workload admits on `cluster1`
+- [x] Retiring a version = one reviewed change to the array; policies prune and the guard tightens in the same reconcile
+- [x] The silent-ungovernance gap of the 2022 implementation is demonstrably closed
 
 ## Comments
 
@@ -40,3 +40,22 @@ allow-list cannot drift from what's installed), and issue 08's `verify-coexisten
 exercises prune-on-array-removal (Flux's `prune: true`) as a passing check. Checked that box on
 that basis; left the cross-cluster comparison and "gap demonstrably closed" boxes open since they
 specifically need the new tags issue 08 is waiting on.
+
+**2026-07-15, closed for real:** issue 08's blocker cleared (new signed tags, real live
+coexistence proof). Built `clusters/cluster2/` (own `bootstrap.yaml`/`policy-versions.yaml`, same
+self-referential/ResourceSet pattern as cluster1, narrowed to `{2.0.0, 2.2.0}` -- workload-plane
+only, deliberately minimal) and `up2.sh`/`down2.sh`. Brought up a real second KiND cluster
+(`kind-cluster2`) alongside the existing `kind-cluster1`, both live simultaneously.
+
+`verify-retirement.sh`, run for real against both live clusters at once, all green:
+- Confirmed cluster1 has the `1.0.0` line and cluster2 correctly doesn't.
+- The exact same Pod (`mycompany.com/policy-version: "1.0.0"`) was refused on cluster2 and
+  admitted on cluster1 -- live, simultaneous, cross-cluster differential proof.
+- Removed `2.0.0` from cluster2's array (one `yq` array-element removal + re-apply): its policies
+  pruned, and a workload pinned to the just-retired `2.0.0` was refused in the same reconcile --
+  the orphan guard tightened automatically. Restored cluster2's committed array afterward,
+  confirmed it came back.
+
+This is the full retirement-without-a-flag-day story from the ticket description, proven live, not
+narrated: narrowing or retiring is a one-line reviewed array change with an immediate, provable
+governance consequence -- the silent-ungovernance gap the 2022 implementation had is closed.
