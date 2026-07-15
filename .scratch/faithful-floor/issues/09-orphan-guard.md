@@ -4,7 +4,7 @@
 
 **Blocked by:** 08 — ResourceSet coexistence matrix.
 
-**Status:** ready-for-agent
+**Status:** done (this ticket's own checklist; full cross-version stability inherits issue 08's open blocker, see Comments)
 
 - [x] A workload with no `policy-version` label is denied at admission
 - [x] A workload labelled with a version not in the installed set is denied
