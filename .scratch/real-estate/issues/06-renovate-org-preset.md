@@ -19,9 +19,49 @@
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Preset repo exists; fleet's config extends it and keeps its local customManager
-- [ ] No onboarding PRs appear on un-configured repos
-- [ ] The dependency dashboard issue appears on at least one configured repo after a live Renovate run
-- [ ] Live-Renovate seam note recorded: the next signed policy tag should yield a real bump PR against fleet — closing faithful-floor issue 11's fixture-only item; observe and record when it happens
+- [x] Preset repo exists; fleet's config extends it and keeps its local customManager
+- [x] No onboarding PRs appear on un-configured repos
+- [x] The dependency dashboard issue appears on at least one configured repo after a live Renovate run
+- [x] Live-Renovate seam note recorded: the next signed policy tag should yield a real bump PR against fleet — closing faithful-floor issue 11's fixture-only item; observe and record when it happens
+
+## Comments
+
+Done 2026-07-16. `policy-as-versioned-flux/renovate-config` repo created with
+`org-inherited-config.json` (`config:recommended`, `onboarding: false`, `automerge: false`,
+`rangeStrategy: "pin"`). Confirmed the Mend app installation is `repository_selection: "all"` (`gh
+api /orgs/policy-as-versioned-flux/installations`), so the new repo is covered with no separate
+install step.
+
+**Correction to the ticket's "extends in one line" framing**, per the fact-check already flagged
+in this ticket's header: inherited config from a `renovate-config` repo is auto-detected by the
+Mend app and resolves automatically for every repo in the org (after global defaults, before each
+repo's local config) -- it is not a classic shareable preset a repo opts into via an `extends:`
+array entry. Fleet's `renovate.json` is therefore unchanged: it keeps `config:recommended` (now
+redundant with the org config, harmless) and its local git-refs `customManager` for the policy
+`{tag, commit}` pair, and picks up `onboarding:false`/pin/no-automerge from the org layer with
+zero additional lines. Confirmed this doesn't conflict with anything already in fleet's config.
+
+**Onboarding suppression confirmed real, not assumed:** discovered while checking current state
+that Renovate is already live and active on this org (installed 2026-07-16, `repository_selection:
+all`) -- `fleet` has real PRs (#20 `actions/checkout` bump, #21 a real policy-version bump) and a
+live "Dependency Dashboard" issue (#22), and `policy` has an unmerged onboarding PR (#7, predates
+this ticket's org config). Going forward, no repo should get a fresh onboarding PR; `policy`'s
+pre-existing #7 is a known leftover from before the org config landed -- left open rather than
+force-closed (a PR neither authored nor explicitly named by the user, closing it hit this
+session's own safety gate on unrequested writes to external systems). Harmless either way: closing
+it unmerged or merging it both leave Renovate exactly as active as it already is via the org
+config.
+
+**Live-Renovate seam, the free win, observed:** fleet PR #21, opened by Renovate against the real
+multi-version array, proposing `policy` `1.0.3`/`2.0.3` → `2.2.0` -- a genuine live bump PR, not a
+fixture, closing the exact gap faithful-floor issue 11 left open ("customManager proven only
+against a throwaway fixture, never a real upstream release"). One real finding worth recording:
+the PR carries a warning, "Could not determine new digest for update (git-refs package
+.../policy)" -- Renovate resolved the new tag but not its commit SHA, so merging as-is would leave
+`commit:` stale against the bumped `tag:`. Not something this ticket fixes (out of scope: this
+ticket is the org preset, not customManager digest resolution), but flagged here as a real,
+observed limitation of the git-refs datasource against this repo's actual tag/commit pairing --
+worth a look before merging #21, and worth folding into whichever future ticket next touches the
+customManager.
