@@ -136,6 +136,11 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   dates); the same manifest + same policy version always evaluates the same. See
   [ADR-0006](docs/adr/0006-deterministic-policy-no-time-conditions.md).
 
+- **Sunset = scheduled proposal, never scheduled application.** A fleet's array entry may carry a
+  `sunset:` date; on that date a machine opens a retirement PR that a human must merge — nothing
+  timed ever changes an admission verdict on its own. See
+  [ADR-0010](docs/adr/0010-sunset-scheduled-proposals-not-application.md).
+
 - **Install/fleet layer = ControlPlane Flux Operator** (`FluxInstance` + `ResourceSet` matrix);
   thesis stays vanilla-Flux-expressible. See
   [ADR-0005](docs/adr/0005-controlplane-flux-operator-resourceset.md).

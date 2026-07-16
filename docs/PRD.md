@@ -5,7 +5,7 @@
 | **Status** | Draft for review |
 | **Author** | Chris Nesbitt-Smith (CNS) with Claude |
 | **Posture** | Faithful-to-intent build. A separate [north-star report](north-star-modern-reference.md) documents the fuller modern reference. |
-| **Decisions** | [ADR-0001](adr/0001-transport-signed-git-tags-gitsign.md)…[ADR-0009](adr/0009-oscal-attestation-via-c2p.md); ubiquitous language in [CONTEXT.md](../CONTEXT.md) |
+| **Decisions** | [ADR-0001](adr/0001-transport-signed-git-tags-gitsign.md)…[ADR-0010](adr/0010-sunset-scheduled-proposals-not-application.md); ubiquitous language in [CONTEXT.md](../CONTEXT.md) |
 | **Research** | `research/01`–`03` (original work + thesis), `research/10`–`17` (Flux), `research/20`–`22` (synthesis) |
 
 > **One-line summary.** Re-implement CNS's *Policy as [Versioned] Code* thesis on Flux CD —

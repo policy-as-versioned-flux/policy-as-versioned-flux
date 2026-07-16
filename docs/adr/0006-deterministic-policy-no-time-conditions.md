@@ -22,3 +22,12 @@ reviewed, revertible PR — the same unit of debate as any other policy change.
 
 This supersedes the rejected expiry options (engine hard-expiry; class-aware auto-removal on a
 date): all of them embed time, all of them are non-deterministic, none of them ship.
+
+## Later extension: timed nudges to humans are not timed enforcement
+
+[ADR-0010](0010-sunset-scheduled-proposals-not-application.md) draws the boundary this ADR implies
+but doesn't name explicitly: a date may trigger a *reminder to a human* (a dashboard countdown, an
+escalating issue, a machine-opened proposal PR) without becoming *time-conditional policy state* —
+as long as nothing timed ever changes an admission verdict on its own, and every resulting change
+still lands via a reviewed, human-merged PR. Fleet-side sunset scheduling uses exactly this
+pattern.
