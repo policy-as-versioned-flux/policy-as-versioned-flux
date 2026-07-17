@@ -52,16 +52,23 @@ claim a permission boundary that doesn't actually exist for this operation.
 ## Follow-up (2026-07-17): "merging retires the version" was never actually tested — now it is
 
 An adversarial audit found a real, previously-unflagged gap: the "merging retires the version
-through the existing prune path" checkbox above was **only ever simulated**. `fleet#31` was
-deliberately closed unmerged (the real 2026-08-15 date hadn't arrived), and no PR removing an
-array element had ever actually been merged in this repo's history. Worse, the audit found the
-*reason* this mattered: `clusters/cluster1/policy-versions.yaml` and `apps.yaml` were one-shot
-`kubectl apply`'d by `up.sh` only — never wired into a continuously-reconciled Flux Kustomization.
-So even a real merge wouldn't have retired anything on the live cluster without an undocumented
-manual re-apply step, directly contradicting the checkbox's "through the existing prune... path"
-framing. The audit also caught this gap's live consequence: the cluster's `ResourceSet` had
-drifted out of band (hand-edited outside git), causing a real admission-control failure for two
-running apps — see ticket 07's follow-up.
+through the existing prune path" checkbox above had never been tested against a live-reconciling
+cluster. `fleet#31` was deliberately closed unmerged (the real 2026-08-15 date hadn't arrived).
+**Correction (2026-07-17, later adversarial pass)**: an earlier version of this note also claimed
+"no PR removing an array element had ever actually been merged in this repo's history" — that's
+false, and a second skeptic pass caught the first pass repeating it uncritically. `fleet#7`
+(merged 2026-07-15T09:43:13Z, merge commit `5b81e89`) genuinely removed the `v2.1.1` array entry
+via a real merged PR, two days before this follow-up's `fleet#56`/`#57`. What was actually still
+untested is narrower and more precise: at the time `fleet#7` merged, `clusters/cluster1/*.yaml`
+was one-shot `kubectl apply`'d by `up.sh` only — never wired into a continuously-reconciled Flux
+Kustomization — so merging `fleet#7` changed git but did **not**, by itself, retire anything on
+the live cluster; that still needed a separate manual `up.sh`/`kubectl apply` re-run, undocumented
+anywhere. So even a real merge wouldn't have retired anything on the live cluster without an
+undocumented manual re-apply step, directly contradicting the checkbox's "through the existing
+prune... path" framing — the gap was real, just not quite the gap the first draft described. The
+audit also caught this gap's live consequence: the cluster's `ResourceSet` had drifted out of band
+(hand-edited outside git), causing a real admission-control failure for two running apps — see
+ticket 07's follow-up.
 
 **Both fixed for real, not patched around:**
 1. Added a `cluster-state` Flux Kustomization (fleet, `bootstrap.yaml`) that continuously

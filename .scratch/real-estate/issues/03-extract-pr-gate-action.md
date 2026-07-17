@@ -39,3 +39,17 @@ already bumps).
    rendered and cross-checked, `PR gate: PASS`.
 
 Shipped as `fleet#23` (self-merged, standing authorization).
+
+## Follow-up (2026-07-17): the force-moved-tag rejection, re-proven live post-extraction
+
+Two adversarial audit passes independently flagged the same gap: `verify.sh`'s self-check only
+ever exercised the declared-version-mismatch rejection, never the *other* half of
+`pr-gate-check.sh`'s trust chain — the tag-resolves-to-commit check (`v$tag^{commit}` vs the array's
+claimed `commit:`, "force-moved tag or bad PR"). No CI run (PR #23's no-op path, PR #24's full
+success chain) ever exercised a bad-commit scenario either, so this was resting on unchanged code,
+not a fresh proof. Closed the gap directly: built a fixture against the real, tagged `pr-gate-action`
+component (the extracted script, not a copy) with a real `v1.0.3` tag but a bogus all-zero
+`commit:`, and ran the actual `pr-gate-check.sh` against it. Real output: `FAIL: v1.0.3 resolves to
+66730c2415791135ef90b43cf9868e7a26043d08, PR claims 0000...0000 -- force-moved tag or bad PR`,
+`== PR gate: FAIL ==`, non-zero exit. Both halves of the trust chain are now live-proven
+post-extraction, not just the one `verify.sh` already covered.

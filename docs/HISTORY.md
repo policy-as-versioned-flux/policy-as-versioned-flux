@@ -51,7 +51,8 @@ misdiagnosed the cause as SSH-signed commits (a real, but secondary, difference 
 tags). Once the actual branch-reachability cause was confirmed live, the wrong comment was fixed
 in a follow-up PR rather than quietly rewritten:
 [`fleet#11`](https://github.com/policy-as-versioned-flux/fleet/pull/11), "Correct root-cause
-comment: branch reachability, not SSH signing, confirmed live." Kept as an honest record, not
+comment: branch reachability, not (only) SSH signing" — its own title conceding SSH signing was a
+real, secondary factor, not fabricating a clean single cause. Kept as an honest record, not
 squashed away — the same "dated, reviewed, corrected in a PR" pattern this project asks of policy
 itself.
 
