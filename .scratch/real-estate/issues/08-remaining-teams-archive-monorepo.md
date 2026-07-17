@@ -8,9 +8,9 @@
 
 - [x] Four repos live, each admitted under its declared version, live-verified per team
 - [x] Cloud claims live in datastore's repo; the platform-planted exemplars are gone from fleet; the OSCAL finding still reports (now attributable to a team)
-- [x] ledger runs its vulnerable build on KiND; reports/api reconcile clean
+- [x] ledger runs its vulnerable build on KiND; reports/api's Flux Kustomizations reconcile clean (Ready=True) — `api`'s live PolicyReport also carries a non-blocking Audit-mode `require-owner-annotation-2.2.0` fail, same disclosed no-owner-annotation-yet gap ticket 10's readiness collector already surfaces for every 2.2.0 app; doesn't affect admission
 - [x] `apps` repo archived; fleet no longer references it
-- [x] Every team visible in per-version dashboard data with its own reconcile cadence
+- [x] Every team visible in per-version dashboard data, each reconciling independently on its own `GitRepository`/`Kustomization` pair (all currently share the same 1m poll interval — "independent," not "differently-scheduled")
 
 ## Comments
 
