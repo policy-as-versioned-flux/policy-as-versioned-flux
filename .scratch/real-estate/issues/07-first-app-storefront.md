@@ -43,3 +43,16 @@ An adversarial audit flagged two staleness issues in this doc, both now correcte
 - The "Renovate PR observed" checkbox is now checked: storefront#1/#2/#4 are real, confirmed live
   via `gh pr list` (see ticket 06's 2026-07-17 follow-up for the root cause and fix that unblocked
   this).
+
+**A more serious finding from the same audit pass, also fixed**: a skeptic re-check pulled
+storefront's *full* live `PolicyReport` (not just the two rules this doc happens to quote) and
+found `orphan-guard=fail` — its pod would have been **denied at admission if recreated**, because
+the live cluster's `ResourceSet` had drifted out of band (hand-edited outside git: the `2.2.0`
+entry's `version` field was bumped to `2.2.1` while `tag`/`commit` still pointed at what git calls
+`2.2.0`). Root cause: `clusters/cluster1/policy-versions.yaml` was never wired into continuous
+Flux reconciliation, so nothing was correcting drift — see ticket 09's 2026-07-17 follow-up for
+the full fix (a new `cluster-state` Kustomization) and its live proof. Restored the live
+`ResourceSet` to match git immediately; confirmed `storefront`'s (and `api`'s, same drift)
+`PolicyReport` shows `orphan-guard=pass` again. This is now structurally prevented from recurring,
+not just patched once — Flux self-heals this file the same way it already self-heals every other
+resource in this cluster.

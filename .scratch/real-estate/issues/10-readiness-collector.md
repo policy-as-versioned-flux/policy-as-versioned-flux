@@ -52,9 +52,11 @@ alone. Fixed, retagged, re-verified: `readiness-collector-verify` Job completed 
 1`), same correct per-team output.
 
 **Zero effect on admission/live PolicyReports, verified**: before and after every run, `kubectl
-get validatingpolicy` still shows exactly the real 9 installed policies (no shadow policies
-installed) and no `readiness`-named or extra `PolicyReport` objects appear on the cluster — the
-collector's report only ever exists as a local file inside its own ephemeral pod and the one
+get validatingpolicy` shows the same real installed-policy set (9 at the time this was written; now
+10 with `orphan-guard` from ticket 09, a separate later addition unrelated to this ticket) — no
+shadow policies from this component — and no `readiness`-named or extra `PolicyReport` objects
+appear on the cluster — the collector's report only ever exists as a local file inside its own
+ephemeral pod and the one
 `readiness-2.2.0` ConfigMap it's meant to publish.
 
 ## Follow-up (2026-07-17): undisclosed third fix, and a real governance gap, both closed

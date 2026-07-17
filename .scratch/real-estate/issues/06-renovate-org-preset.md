@@ -55,9 +55,13 @@ it unmerged or merging it both leave Renovate exactly as active as it already is
 config.
 
 **Live-Renovate seam, the free win, observed:** fleet PR #21, opened by Renovate against the real
-multi-version array, proposing `policy` `1.0.3`/`2.0.3` → `2.2.0` -- a genuine live bump PR, not a
-fixture, closing the exact gap faithful-floor issue 11 left open ("customManager proven only
-against a throwaway fixture, never a real upstream release"). One real finding worth recording:
+multi-version array, proposing `policy` `1.0.3`/`2.0.3` → `2.2.0` (at the time this was written;
+Renovate has since auto-rebased the same PR to target `2.2.1` after that tag was cut — the PR
+number and the underlying "real multi-version-array bump" mechanism are unchanged, only the target
+version has naturally moved on, expected behavior for a live, never-automerged PR) -- a genuine
+live bump PR, not a fixture, closing the exact gap faithful-floor issue 11 left open ("customManager
+proven only against a throwaway fixture, never a real upstream release"). One real finding worth
+recording:
 the PR carries a warning, "Could not determine new digest for update (git-refs package
 .../policy)" -- Renovate resolved the new tag but not its commit SHA, so merging as-is would leave
 `commit:` stale against the bumped `tag:`. Not something this ticket fixes (out of scope: this
@@ -104,7 +108,8 @@ forces creation past the limit, another real, intended dashboard feature):
 - `ledger#4`: **`org.apache.logging.log4j:log4j-core` → `v2.26.1`** — the exact dependency this
   team's whole story is about, now a real, live PR.
 - `storefront#4`: **Angular monorepo → v22** (`@angular/core`, `@angular/common`,
-  `@angular/compiler`, and five more, together).
+  `@angular/compiler`, and six more, together — 9 `@angular/*` packages total, count verified
+  directly against the live PR body).
 - `reports#4`: **Flask → v3**.
 - `api`: genuinely nothing headline-worthy rate-limited — only `actions/checkout` (CI tooling, not
   an app dependency) was ever open or rate-limited, confirming `api`'s "good citizen, current

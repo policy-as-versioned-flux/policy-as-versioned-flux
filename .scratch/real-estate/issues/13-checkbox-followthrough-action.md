@@ -17,16 +17,25 @@ shipped to **both** `policy` (`policy#9`) and `fleet` (`fleet#41`) — a scope e
 ticket's original "policy repo" framing, because ticket 09's sunset-escalator opens
 `agent-governance-review` issues on `fleet`, not `policy`. Same workflow, both repos.
 
-**Correction (2026-07-17): the checkbox text does NOT actually differ across templates.** The
-original claim above was wrong — re-read straight from `governance-agent/demonstrator.sh` (the
-CVE-review issue opener) and it uses the exact same three lines as the sunset-escalator's template
-word for word: `Yes -- closing with a note in rationale.md (bump last-reviewed)` /
-`No -- opening a PR to change it` / `Not sure -- needs discussion`. Matching is still by substring
-against the newly-checked line (diffing `changes.body.from` vs the current body, so only the box
-actually just checked in *this* edit reacts, not every already-checked box on an unrelated edit) —
-that mechanism is real and correct — but the stated *reason* for choosing substring-over-position
-matching (template divergence) doesn't hold; substring matching is still the right call regardless,
-since it's robust to either template phrasing the same outcome differently in the future.
+**Correction (2026-07-17), corrected again (2026-07-17, same day): the checkbox text DOES differ
+across templates — my first "correction" above was itself wrong, caught by an adversarial audit
+that quoted both scripts directly rather than trusting my restated claim.** Read straight from
+`governance-agent/demonstrator.sh` (lines 77-79) and `sunset-escalator.sh` (lines 98-100):
+
+| Outcome | `demonstrator.sh` (CVE-review) | `sunset-escalator.sh` (sunset) |
+|---|---|---|
+| defend as-is | `Yes -- closing with a note in rationale.md (bump last-reviewed)` | `No -- retirement can proceed as scheduled` |
+| change needed | `No -- opening a PR to change it` | `Yes -- pushing the \`sunset:\` date back is a reviewed PR, same as any other array change` |
+| needs discussion | `Not sure -- needs discussion` | `Not sure -- needs discussion` |
+
+Only the third line is identical. The first two don't just use different words — **Yes and No swap
+which real-world outcome they mean** between the two templates (in the CVE template, Yes=defend;
+in the sunset template, No=defend). This is exactly why matching must be by the checked line's own
+substring content, never by position/order: `- [x]` in position 1 means opposite things depending
+on which template opened the issue. The workflow code already handles this correctly and always
+did — each rule in `checkbox-followthrough.yml` has two OR'd regex patterns, one per template's
+actual wording (e.g. `/closing with a note|retirement can proceed as scheduled/i`) — so this was a
+narrative error in this doc's prose, not a functional bug in the shipped code.
 
 **Live-verified on real (throwaway, clearly marked, closed once observed) issues** — the same
 proof pattern as this session's throwaway PRs (#24, #31):
@@ -42,9 +51,11 @@ the *real* sunset issue (`fleet#30`) — blocked by this session's own safety cl
 judgment"). Correct call; redid the proof against dedicated throwaway issues instead, leaving
 `fleet#30`'s real decision untouched for an actual human to make.
 
-**Permissions, verified not assumed**: both workflow files grant `issues: write` (+`contents:
-read`, needed only to check out the workflow definition itself) — no `pull-requests` or `contents:
-write` anywhere, confirmed by reading the committed YAML directly.
+**Permissions, verified not assumed**: `checkbox-followthrough.yml` grants `issues: write` +
+`contents: read`; `weekly-governance-nag.yml` grants `issues: write` only, no `contents` key at all
+— even more restrictive than `checkbox-followthrough.yml`, not identical to it as an earlier
+version of this note implied. Neither file declares `pull-requests` or `contents: write` anywhere,
+confirmed by reading the committed YAML directly.
 
 ## Follow-up (2026-07-17): three real gaps found by adversarial verification, all closed
 

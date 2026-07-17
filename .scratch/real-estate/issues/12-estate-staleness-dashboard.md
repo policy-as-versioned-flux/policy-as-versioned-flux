@@ -40,8 +40,11 @@ rows, not screenshots:
   fixed to an array of `{team, pass, fail, ready}` rows.
 - Panel 3: `~29.3` days until policy 1.0.0's sunset — live-computed, matches the real
   `sunset: "2026-08-15"` field against today's date.
-- Panel 4: 4 real open Renovate PRs (`fleet`/`policy`), with real titles including the actual
-  `#21` bump PR ticket 06 observed as the live-Renovate seam's free win.
+- Panel 4: 4 real open Renovate PRs, all in `fleet` as of this date (`policy`'s own onboarding
+  hadn't unblocked yet — see ticket 06's 2026-07-17 follow-up), with real titles including the
+  actual `#21` bump PR ticket 06 observed as the live-Renovate seam's free win. The panel's query
+  is org-wide, not fleet-only — it just happened that `fleet` was the only repo with open Renovate
+  PRs on this particular date; the count naturally grows as more repos get scanned.
 
 **Two more real bugs found and fixed live along the way** (beyond what's listed above): the first
 `oscal-file-server` change (mounting the readiness ConfigMap via `subPath` under the same

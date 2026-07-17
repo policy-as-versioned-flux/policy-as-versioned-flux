@@ -8,7 +8,7 @@
 
 - [x] `sunset:` on an array entry produces escalating governance issues as the date approaches
 - [x] On the date, a retirement PR is machine-opened, never merged by machine — live-verified with a synthetic date
-- [x] Cluster state provably unchanged while the PR sits unmerged; merging it retires the version through the existing prune + guard-tighten path
+- [x] Cluster state provably unchanged while the PR sits unmerged; merging it retires the version through the existing prune + guard-tighten path — **now proven with a real merge, not just simulated** (see 2026-07-17 follow-up)
 - [x] The retirement-PR opener has no write access beyond opening PRs on fleet (token-scoped, same enforcement style as the governance agent) — see Comments for the honest version of this claim
 
 ## Comments
@@ -48,3 +48,39 @@ anywhere (same never-calls-the-forbidden-thing shape as the demonstrator), and `
 `allow_auto_merge: false` org-wide (verified for ADR-0010), removing even the scheduled/deferred
 merge path. Documented this distinction explicitly in the script header and README rather than
 claim a permission boundary that doesn't actually exist for this operation.
+
+## Follow-up (2026-07-17): "merging retires the version" was never actually tested — now it is
+
+An adversarial audit found a real, previously-unflagged gap: the "merging retires the version
+through the existing prune path" checkbox above was **only ever simulated**. `fleet#31` was
+deliberately closed unmerged (the real 2026-08-15 date hadn't arrived), and no PR removing an
+array element had ever actually been merged in this repo's history. Worse, the audit found the
+*reason* this mattered: `clusters/cluster1/policy-versions.yaml` and `apps.yaml` were one-shot
+`kubectl apply`'d by `up.sh` only — never wired into a continuously-reconciled Flux Kustomization.
+So even a real merge wouldn't have retired anything on the live cluster without an undocumented
+manual re-apply step, directly contradicting the checkbox's "through the existing prune... path"
+framing. The audit also caught this gap's live consequence: the cluster's `ResourceSet` had
+drifted out of band (hand-edited outside git), causing a real admission-control failure for two
+running apps — see ticket 07's follow-up.
+
+**Both fixed for real, not patched around:**
+1. Added a `cluster-state` Flux Kustomization (fleet, `bootstrap.yaml`) that continuously
+   reconciles `clusters/cluster1/policy-versions.yaml` + `apps.yaml` from git, the same
+   git-drives-cluster guarantee every other resource in this cluster already has. `up.sh` updated
+   to wait on it instead of `kubectl apply`-ing these files directly.
+2. **Re-ran the retirement proof for real**, with two actually-merged PRs, not a closed-unmerged
+   simulation:
+   - `fleet#56`: added a throwaway 4th version (`v2.1.1`, a real, already-tagged, signed, unused
+     release — not a fixture) to the array. **Merged.** Within one Flux reconcile interval, with
+     zero manual `kubectl` commands: a new `GitRepository/policy-2.1.1` appeared, its three
+     `Kustomization`s went Ready, and `orphan-guard`'s CEL allow-list picked up `'2.1.1'` —
+     confirmed live via `kubectl get gitrepository`/`kustomization`/`validatingpolicy`.
+   - `fleet#57`: removed that same array element. **Merged.** Within one reconcile interval, again
+     zero manual steps: `GitRepository/policy-2.1.1` and its three `Kustomization`s were gone
+     (Flux's own prune, not a `kubectl delete`), and `orphan-guard`'s allow-list was back to
+     exactly `['1.0.0', '2.0.0', '2.2.0']` — the pre-test state, byte-for-byte.
+
+"Merging retires the version through the existing prune + guard-tighten path" is now a proven
+fact about this cluster, not a simulated one. The real `1.0.0` retirement (via `fleet#30`'s live
+escalation issue, still open, real 2026-08-15 date) will go through the identical, now-verified
+mechanism when that date arrives and a human merges the machine-opened PR.
