@@ -141,7 +141,13 @@ mechanism (repo `renovate-config`, `repository_selection: all`) is real
 and correct, but it was never sufficient on its own — Mend's own `Require config file` org setting
 means every repo, including brand-new ones, needs *some* local Renovate config file (even a
 near-empty one) before Mend will act on it at all. "Zero lines needed" is corrected to "zero *new*
-lines beyond a minimal local file Mend requires regardless of org config."
+lines beyond a minimal local file Mend requires regardless of org config." **Precision note**: the
+dashboard's own "onboarded" status label doesn't perfectly track "has a local config file" — the
+hub repo (`policy-as-versioned-flux` itself, never in this ticket's scope) shows "onboarded" with
+zero config, zero detected dependencies, and zero PRs. The functional claim above is about what
+produces real PRs, which the hub repo's genuine zero-PR state doesn't contradict — but the
+dashboard label alone isn't a reliable proxy for "has a working local config," only the actual PR
+count is.
 
 ## Follow-up (2026-07-17): the same fix hadn't been applied everywhere it needed to be
 
@@ -167,8 +173,11 @@ was never missing a config file *conceptually* — its own onboarding PR (`polic
 Renovate", opened before the org-inherited config existed) had been sitting open and unmerged the
 whole time, and this ticket's original Comments section explicitly reasoned "closing it unmerged
 or merging it both leave Renovate exactly as active as it already is via the org config" —
-**that reasoning was wrong**, now corrected by live evidence: merging `policy#7` (which just adds
-the same minimal `renovate.json` Renovate itself proposed) immediately unblocked scanning.
+**that reasoning was wrong**, now corrected by live evidence: merging `policy#7` (which adds
+`renovate.json` with `{$schema, extends: [config:recommended]}` — Renovate's own onboarding
+proposal, six lines, not literally the bare `{$schema}`-only file used on storefront/ledger/reports/
+api/c2p-collector/readiness-collector, but the same *class* of minimal local-config fix) immediately
+unblocked scanning.
 Confirmed via a manual re-scan afterward: `policy` now shows real detected dependencies across all
 three workflow files, and produced two more real PRs, `policy#11`/`#12` (pin `actions/checkout`,
 bump to v7), confirmed via `gh pr list`.
