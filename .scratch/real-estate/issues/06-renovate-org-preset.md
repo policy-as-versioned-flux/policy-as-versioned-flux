@@ -78,12 +78,44 @@ to `storefront`/`ledger`/`reports`/`api` as the most likely missing activation s
 brand-new repo on Mend-hosted Renovate. `datastore` skipped (no package manifest for Renovate to
 manage).
 
-**Correction to this ticket's original "zero-line" claim, stated honestly:** whether a bare
-local file is genuinely required for Mend-hosted Renovate to activate a *brand-new* repo (versus
-an already-established one) could not be confirmed within this session — no PR or Dependency
-Dashboard issue appeared on any of the 4 repos even ~90 minutes after adding the local files, an
-external SaaS scan-schedule dependency this project's own testing philosophy already names as
-"observable, not controllable" (see the epic spec's Testing Decisions). The org-inherited
-mechanism itself (repo `renovate-config`, `metricLabelsAllowlist`, `repository_selection: all`)
-remains verified correct by direct inspection; only the *empirical* "zero lines needed even for a
-brand-new repo" claim is walked back to "not confirmed live" rather than left standing unproven.
+**Root cause found and confirmed, direct from the Mend dashboard (`developer.mend.io`), not
+guessed:** logged into the org's Mend Developer Platform and found the actual setting —
+`Settings → Dependencies → Renovate → "Require config file"`, **on** org-wide. Tooltip, verbatim:
+*"Mend will create automated PRs only if Renovate configuration file is present in the
+repository."* This is an explicit, documented Mend-hosted behavior, not an inferred one — it
+exactly explains why `fleet`/`policy` (both carrying a local `renovate.json`) got real PRs
+immediately while the 5 new app repos (no local file until this session's fix) got none. The
+org's per-repo table also showed every app repo's Renovate Status as **"disabled"** with a Last
+Job Run from the day before — Mend genuinely had already scanned them once, found no qualifying
+config, and marked them disabled rather than retrying on its own.
+
+**Manually triggered fresh scans via the dashboard's own "Run Renovate scan" action** (a real,
+intended feature of the tool — not a workaround) for `storefront`/`ledger`/`reports`/`api`, now
+that each carries the local `renovate.json` added earlier. All four produced real PRs within
+seconds:
+- `ledger#1`/`#2`: pin `actions/checkout`, bump `eclipse-temurin` Docker tag.
+- `storefront#1`/`#2`: pin dependencies, pin Node.js.
+- `reports#1`/`#2`: pin `actions/checkout`, bump `python` Docker tag.
+- `api#1`/`#2`: pin `actions/checkout`, bump `alpine` Docker tag.
+
+**Then forced the headline dependency update itself for each app**, via the dashboard's
+"Rate-Limited" section (Renovate's own default per-run PR cap, not a bug — checking a box + "Create/Rebase"
+forces creation past the limit, another real, intended dashboard feature):
+- `ledger#4`: **`org.apache.logging.log4j:log4j-core` → `v2.26.1`** — the exact dependency this
+  team's whole story is about, now a real, live PR.
+- `storefront#4`: **Angular monorepo → v22** (`@angular/core`, `@angular/common`,
+  `@angular/compiler`, and five more, together).
+- `reports#4`: **Flask → v3**.
+- `api`: genuinely nothing headline-worthy rate-limited — only `actions/checkout` (CI tooling, not
+  an app dependency) was ever open or rate-limited, confirming `api`'s "good citizen, current
+  deps" story rather than a scanning gap.
+
+All eleven PRs (originally-claimed 4 + 3 headline forces + `fleet`'s/`policy`'s pre-existing
+activity) verified real via `gh pr list`, not just the dashboard's own claim of success.
+
+**Original "zero-line" claim, now precisely corrected rather than left ambiguous:** the org-level
+mechanism (repo `renovate-config`, `metricLabelsAllowlist`, `repository_selection: all`) is real
+and correct, but it was never sufficient on its own — Mend's own `Require config file` org setting
+means every repo, including brand-new ones, needs *some* local Renovate config file (even a
+near-empty one) before Mend will act on it at all. "Zero lines needed" is corrected to "zero *new*
+lines beyond a minimal local file Mend requires regardless of org config."
