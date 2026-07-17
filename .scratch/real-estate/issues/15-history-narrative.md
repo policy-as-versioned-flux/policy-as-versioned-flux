@@ -30,3 +30,10 @@ Two deferred decisions named explicitly, not folded into scope: the two-org spli
 / model org) and the fresh-org redeploy (the "clean history" a demo viewer asked for — answered as
 this project's sequel, a reproducibility proof by actually redeploying fresh, not a rewrite of
 this org's real, thrashy history).
+
+## Follow-up (2026-07-17)
+
+This Comments section is dated the day the ticket was written; `docs/HISTORY.md` itself has since
+grown a substantial addition (the adversarial-verification hardening wave — see ticket 09's and
+this file's own follow-ups) that this section doesn't mention. Noted here rather than left
+silently out of date: the document is current, this bookkeeping paragraph just lagged it by a day.

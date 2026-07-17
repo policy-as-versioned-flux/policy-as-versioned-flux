@@ -73,9 +73,12 @@ running apps — see ticket 07's follow-up.
    - `fleet#56`: added a throwaway 4th version (`v2.1.1`, a real, already-tagged, signed release —
      not a fixture. **Correction**: an earlier draft of this note called it "unused"; a later
      adversarial check ran `git log -p -- clusters/cluster1/policy-versions.yaml` and found that's
-     wrong — `2ddc73e` genuinely installed `v2.1.1` as the array's third entry back on 2026-07-14,
-     and `5b81e89` retired it in favor of `v2.2.0` the same day, both well before this epic's own
-     tickets started. This PR reinstalled a version the array had briefly carried before, not a
+     wrong — `2ddc73e` genuinely installed `v2.1.1` as the array's third entry on 2026-07-14
+     17:28 +0100, and `5b81e89` retired it in favor of `v2.2.0` the next day, 2026-07-15 12:43
+     +0300 (a second adversarial pass caught this correction's own "the same day" as itself
+     inaccurate — different calendar days under any timezone, fixed here rather than left standing
+     a second time) — both well before this epic's own tickets started. This PR reinstalled a
+     version the array had briefly carried before, not a
      never-before-seen one — a real fact this doc got wrong on first write and is correcting here
      rather than leaving stand. It doesn't change what the PR actually proved: Flux genuinely
      installed it live via a real merge, with the same real tag/commit/signature either time) to
