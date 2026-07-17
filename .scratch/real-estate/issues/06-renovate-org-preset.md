@@ -119,3 +119,36 @@ and correct, but it was never sufficient on its own — Mend's own `Require conf
 means every repo, including brand-new ones, needs *some* local Renovate config file (even a
 near-empty one) before Mend will act on it at all. "Zero lines needed" is corrected to "zero *new*
 lines beyond a minimal local file Mend requires regardless of org config."
+
+## Follow-up (2026-07-17): the same fix hadn't been applied everywhere it needed to be
+
+An adversarial verification workflow found the remediation above was real but incomplete: two more
+org repos created the same day as the app-team repos — `c2p-collector` and `readiness-collector` —
+have genuine Renovate-manageable dependencies (Dockerfile base images, unpinned
+`actions/checkout`) and were sitting in the identical "disabled, scanned once, never retried"
+state, 24+ hours after creation, because they too lacked a local `renovate.json`. Same root cause,
+just never checked for on these two repos.
+
+Fixed the same way: added the identical minimal `renovate.json` to both repos, then manually
+triggered a fresh scan via the Mend dashboard's "Run Renovate scan" action for each. Both produced
+real PRs within seconds — confirmed via `gh pr list`, not just the dashboard's own claim:
+- `c2p-collector#1`/`#2`: pin `actions/checkout`, bump `alpine` Docker tag to v3.24.
+- `readiness-collector#1`/`#2`: pin `actions/checkout`, bump `alpine` Docker tag to v3.24.
+
+**A third repo, missed for a different reason: `policy` itself.** Checked the Mend dashboard's
+full 16-repo status table directly this time (not just the repos a prior ticket happened to
+touch) and found `policy` still showing `disabled`/`No dependencies detected`, despite having
+three real `.github/workflows/*.yml` files using `actions/checkout`/`actions/github-script` — a
+real github-actions manager surface. Root cause was subtly different from the others: `policy`
+was never missing a config file *conceptually* — its own onboarding PR (`policy#7`, "Configure
+Renovate", opened before the org-inherited config existed) had been sitting open and unmerged the
+whole time, and this ticket's original Comments section explicitly reasoned "closing it unmerged
+or merging it both leave Renovate exactly as active as it already is via the org config" —
+**that reasoning was wrong**, now corrected by live evidence: merging `policy#7` (which just adds
+the same minimal `renovate.json` Renovate itself proposed) immediately unblocked scanning.
+Confirmed via a manual re-scan afterward: `policy` now shows real detected dependencies across all
+three workflow files, and produced two more real PRs, `policy#11`/`#12` (pin `actions/checkout`,
+bump to v7), confirmed via `gh pr list`.
+
+All three repos are now genuinely onboarded, confirmed directly against the Mend dashboard's own
+per-repo status column (`onboarded`, not `disabled`) rather than inferred from PR existence alone.

@@ -4,11 +4,11 @@
 
 **Blocked by:** 06 — Renovate org preset (the repo extends it from birth).
 
-**Status:** done (Renovate seam pending observation)
+**Status:** done
 
 - [x] `storefront` repo with a real buildable app and deliberately old npm dependencies
 - [x] Fleet reconciles it; the workload is Running, admitted under 2.2.0's gates, live-verified
-- [ ] A real Renovate PR against storefront's dependencies is observed (live-Renovate seam) — repo is brand new, Renovate hasn't scanned it yet as of 2026-07-16; same "observable, not controllable" seam the spec names, will land on Mend's next scheduled run
+- [x] A real Renovate PR against storefront's dependencies is observed (live-Renovate seam) — resolved 2026-07-17 (see ticket 06's follow-up): storefront#1/#2/#4 are real, live PRs including the Angular monorepo bump
 - [x] The workload appears correctly in the existing dashboard's per-version data
 
 ## Comments
@@ -30,5 +30,16 @@ of the app pods total, `ledger`/`api`/`storefront`/`reports`) — the existing d
 panels see it without any dashboard change, exactly as the design predicts (a policy version is
 just another dependency).
 
-Image public on GHCR (`ghcr.io/policy-as-versioned-flux/storefront@sha256:2263b70...`), confirmed
-pullable with zero credentials.
+Image public on GHCR, confirmed pullable with zero credentials.
+
+## Follow-up (2026-07-17)
+
+An adversarial audit flagged two staleness issues in this doc, both now corrected:
+- The digest quoted above was superseded twice by later fixes (the npm lockfile fix, then shipping
+  real `node_modules` for scanner visibility — see ticket 11's comments). Deliberately not pinning
+  a specific digest in this doc anymore, since the deployed digest is expected to keep moving as
+  the app evolves; the live source of truth is `storefront`'s own `k8s/deployment.yaml`, currently
+  `sha256:ef53f41d...`.
+- The "Renovate PR observed" checkbox is now checked: storefront#1/#2/#4 are real, confirmed live
+  via `gh pr list` (see ticket 06's 2026-07-17 follow-up for the root cause and fix that unblocked
+  this).

@@ -41,8 +41,21 @@ GitOps-managed here. Once reconciled: a manually triggered Job ran in seconds (`
 panel was queried live through `/api/ds/query` (the established seam) — real row, `cp-10_smt`,
 `not-satisfied`, sourced from the pinned image's run, not a leftover from the old CronJob.
 
-Renovate's native `docker`/OCI-digest manager will see the pinned
-`ghcr.io/policy-as-versioned-flux/c2p-collector@sha256:...` line in `cronjob.yaml` out of the box
-— no customManager needed, same reasoning as ticket 03's Action pin.
-
 Shipped as `fleet#25` (self-merged, standing authorization).
+
+## Follow-up (2026-07-17): the Renovate-visibility checkbox was actually false, now fixed
+
+An adversarial verification workflow found the "same reasoning as ticket 03" claim above doesn't
+hold: unlike the `github-actions` manager (default-on), Renovate's `kubernetes` manager has empty
+`managerFilePatterns` by default and matches nothing until explicitly scoped — confirmed live via
+Renovate's own docs and a day-old Dependency Dashboard showing zero detected dependencies for this
+image pin. Fixed in `fleet#49`: added
+```json
+"kubernetes": { "managerFilePatterns": ["/^infrastructure/(c2p|readiness)/cronjob\\.yaml$/"] }
+```
+to fleet's `renovate.json` (scoped to both this ticket's pin and ticket 10's identical readiness-collector
+pin, same root cause). **Confirmed live** after merge: fleet's Dependency Dashboard now lists a new
+`kubernetes` section with both `infrastructure/c2p/cronjob.yaml` and
+`infrastructure/readiness/cronjob.yaml` as detected dependencies (each carrying a "could not
+determine new digest" caveat — the same already-documented, precedented limitation as the git-refs
+policy pin's digest-lookup warning, not a new problem).

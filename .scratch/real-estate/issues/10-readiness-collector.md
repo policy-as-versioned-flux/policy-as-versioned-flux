@@ -56,3 +56,24 @@ get validatingpolicy` still shows exactly the real 9 installed policies (no shad
 installed) and no `readiness`-named or extra `PolicyReport` objects appear on the cluster — the
 collector's report only ever exists as a local file inside its own ephemeral pod and the one
 `readiness-2.2.0` ConfigMap it's meant to publish.
+
+## Follow-up (2026-07-17): undisclosed third fix, and a real governance gap, both closed
+
+An adversarial audit found this doc's "two bugs found and fixed" narrative was incomplete: the
+repo's real commit history has a **third, undocumented commit** (`d29b63bc`, "fix: teams must be
+an array, not a map keyed by name") that also forced a retag of `v1.0.0` — the tagger's own message
+on the current tag object literally says "(fixed: array output shape)". Recorded here now rather
+than left silently missing: three fix iterations shipped, not two, each retagging `v1.0.0` in
+place. The live digest (`sha256:8c5d7814...`) is the final, fully-fixed build — functionally
+nothing was ever broken in production — but the repo had **zero forge-level tag protection**
+(`gh api .../rulesets` returned `[]`), meaning nothing actually prevented a bad force-move,
+contradicting ADR-0001's own stated requirement that release tags be forge-protected/immutable — a
+standard the `policy` repo does enforce via its `protect-release-tags` ruleset.
+
+**Fixed**: added the identical `protect-release-tags` ruleset (`deletion` + `non_fast_forward`
+rules on `refs/tags/v*`, `enforcement: active`) to `readiness-collector` — and audited every other
+tagged repo in the org while at it, since the same gap self-evidently applied everywhere, not just
+here. Found and fixed the identical gap on 7 more repos: `c2p-collector`, `pr-gate-action`,
+`handbook-generator`, `storefront`, `ledger`, `reports`, `api` — every tagged repo except `policy`
+was missing this. All 8 now confirmed live via `gh api .../rulesets` to carry the same ruleset
+`policy` already had.
