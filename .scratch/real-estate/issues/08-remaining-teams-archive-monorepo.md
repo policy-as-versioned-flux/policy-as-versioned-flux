@@ -44,8 +44,9 @@ team) and re-verified green, alongside `verify-coexistence.sh` and `verify-orpha
 entries per pod (4 total), datastore's RDS/S3 claims present (`datastore-rds-compliant`,
 `datastore-rds-noncompliant`, `datastore-s3-compliant`) and the OSCAL panel's live finding
 (`cp-10_smt`, `not-satisfied`) is now attributable to `datastore`'s own claim, not a
-platform-planted exemplar. All 5 images/packages confirmed public on GHCR (batch-fixed by the
-user as agreed) — `docker pull` with zero credentials succeeds.
+platform-planted exemplar. All 4 images (`ledger`/`reports`/`api`/`storefront` — `datastore` has no container image by
+design, see above) confirmed public on GHCR (batch-fixed by the user as agreed) — `docker pull`
+with zero credentials succeeds for all four.
 
 Shipped as `fleet#27` (app rewiring) + `fleet#28` (drive-by verify fix), both self-merged, standing
 authorization.

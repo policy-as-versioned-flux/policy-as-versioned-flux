@@ -56,8 +56,9 @@ get validatingpolicy` shows the same real installed-policy set (9 at the time th
 10 with `orphan-guard` from ticket 09, a separate later addition unrelated to this ticket) — no
 shadow policies from this component — and no `readiness`-named or extra `PolicyReport` objects
 appear on the cluster — the collector's report only ever exists as a local file inside its own
-ephemeral pod and the one
-`readiness-2.2.0` ConfigMap it's meant to publish.
+ephemeral pod and the one `readiness-2.2.0` ConfigMap it's meant to publish, in `monitoring` (the
+namespace its RBAC actually scopes it to — see 2026-07-17 follow-up for a stray manual-test copy
+that briefly existed elsewhere and has since been cleaned up).
 
 ## Follow-up (2026-07-17): undisclosed third fix, and a real governance gap, both closed
 
@@ -79,3 +80,16 @@ here. Found and fixed the identical gap on 7 more repos: `c2p-collector`, `pr-ga
 `handbook-generator`, `storefront`, `ledger`, `reports`, `api` — every tagged repo except `policy`
 was missing this. All 8 now confirmed live via `gh api .../rulesets` to carry the same ruleset
 `policy` already had.
+
+## Follow-up (2026-07-17, later): stray untracked ConfigMap found and cleaned up
+
+A later adversarial re-check queried `kubectl get configmap readiness-2.2.0 -A` (every namespace)
+rather than just `-n monitoring`, and found a **second** `readiness-2.2.0` ConfigMap sitting in the
+`default` namespace — contradicting the "the one ConfigMap it's meant to publish" claim above. Root
+cause confirmed, not guessed: the CronJob's own RBAC (`rbac.yaml`) scopes its ServiceAccount's
+configmap `get`/`update`/`patch`/`create` verbs strictly to `monitoring`, with no ClusterRole
+granting writes elsewhere — so the pipeline itself is structurally incapable of having created it.
+The stray copy's `kubectl.kubernetes.io/last-applied-configuration` annotation and creation
+timestamp (2026-07-16T15:54:33Z) both point to manual `kubectl apply` residue from an earlier live
+debugging session, never cleaned up. Deleted; the `monitoring` namespace copy (the real, RBAC-scoped,
+CronJob-published one) is now genuinely the only one.

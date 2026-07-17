@@ -70,8 +70,16 @@ running apps — see ticket 07's follow-up.
    to wait on it instead of `kubectl apply`-ing these files directly.
 2. **Re-ran the retirement proof for real**, with two actually-merged PRs, not a closed-unmerged
    simulation:
-   - `fleet#56`: added a throwaway 4th version (`v2.1.1`, a real, already-tagged, signed, unused
-     release — not a fixture) to the array. **Merged.** Within one Flux reconcile interval, with
+   - `fleet#56`: added a throwaway 4th version (`v2.1.1`, a real, already-tagged, signed release —
+     not a fixture. **Correction**: an earlier draft of this note called it "unused"; a later
+     adversarial check ran `git log -p -- clusters/cluster1/policy-versions.yaml` and found that's
+     wrong — `2ddc73e` genuinely installed `v2.1.1` as the array's third entry back on 2026-07-14,
+     and `5b81e89` retired it in favor of `v2.2.0` the same day, both well before this epic's own
+     tickets started. This PR reinstalled a version the array had briefly carried before, not a
+     never-before-seen one — a real fact this doc got wrong on first write and is correcting here
+     rather than leaving stand. It doesn't change what the PR actually proved: Flux genuinely
+     installed it live via a real merge, with the same real tag/commit/signature either time) to
+     the array. **Merged.** Within one Flux reconcile interval, with
      zero manual `kubectl` commands: a new `GitRepository/policy-2.1.1` appeared, its three
      `Kustomization`s went Ready, and `orphan-guard`'s CEL allow-list picked up `'2.1.1'` —
      confirmed live via `kubectl get gitrepository`/`kustomization`/`validatingpolicy`.

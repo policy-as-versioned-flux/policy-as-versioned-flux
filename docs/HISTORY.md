@@ -70,8 +70,7 @@ was never cross-checked against what its tag actually rendered). The CIO dashboa
 *is* but not what's *coming*. Sixteen pieces of real feedback, captured raw
 (`.scratch/demo-feedback/NOTES.md`), then grilled branch-by-branch into confirmed decisions
 (`.scratch/real-estate/spec.md`) — the mattpocock-skills `grilling` → `to-spec` → `to-tickets`
-pipeline, including one process correction along the way (tickets were drafted before the spec was
-written; caught, the premature work discarded, redone in the right order).
+pipeline.
 
 ## Episode 3: making the estate real (real-estate epic)
 
@@ -114,6 +113,53 @@ scan jobs colliding on a cache lock; a Kubernetes `subPath` mount colliding with
 ConfigMap's own directory mount; a bash-only `<<<` heredoc silently crashing a container whose real
 shell was busybox `ash` *after* its actual work had already succeeded. Each is recorded in its
 ticket's own comments, not smoothed over.
+
+**A second wave: turning "done" into "provably done."** Once all fifteen tickets were marked
+done, an explicit ask — prove it, adversarially — ran an independent multi-agent audit against
+every checkable claim across the whole epic: real commands against the live cluster and GitHub,
+not a re-read of the tickets' own narrative. It found five real gaps hiding behind "done" status,
+and a second, follow-up audit pass (after fixing those) found more — this is that same "fixes to
+the fixes, kept not hidden" pattern Episode 1 already established, one level up.
+
+The most structurally significant finding: `clusters/cluster1/policy-versions.yaml` and
+`apps.yaml` — the files that install/retire policy versions and team apps — were never actually
+wired into continuous Flux reconciliation. They were one-shot `kubectl apply`'d by `up.sh` at
+bring-up and never touched again by any controller. Two real consequences, both caught live: the
+cluster's `ResourceSet` had quietly drifted out of band (a hand-edited `version` field, no
+matching tag/commit change), which was actively denying two running apps at admission when the
+audit found it; and ticket 09's "merging a retirement PR retires the version" claim had only ever
+been *simulated* (a PR opened and deliberately closed unmerged, never actually merged). Fixed for
+real, not patched around: a new `cluster-state` Flux Kustomization
+([`fleet#55`](https://github.com/policy-as-versioned-flux/fleet/pull/55)) gives these files the
+same self-healing git-drives-cluster guarantee every other resource here already had, and the
+"merging retires the version" claim was re-proven with two PRs that were actually merged
+([`fleet#56`](https://github.com/policy-as-versioned-flux/fleet/pull/56)/[`#57`](https://github.com/policy-as-versioned-flux/fleet/pull/57))
+— install a throwaway version, watch Flux install it with zero manual steps; remove it, watch Flux
+prune it back out just as automatically.
+
+The other four gaps were smaller but real: Renovate's `kubernetes` manager needs explicit
+enablement (unlike the `github-actions` manager, it isn't default-on) — the c2p-collector and
+readiness-collector image pins weren't actually bumpable dependencies as claimed, now fixed
+([`fleet#49`](https://github.com/policy-as-versioned-flux/fleet/pull/49)); the same
+"repo lacks a local `renovate.json`" root cause ticket 06 diagnosed for four app repos turned out
+to apply to three more repos nobody had checked (`c2p-collector`, `readiness-collector`, and
+`policy` itself via its own year-old dormant onboarding PR); the weekly governance nag's "skips
+already-actioned issues" checkbox was ticked with no code behind it, now genuinely implemented and
+proven live, including the case where it correctly *doesn't* skip
+([`fleet#50`](https://github.com/policy-as-versioned-flux/fleet/pull/50)); and eight of nine
+tagged repos had no forge-level tag-immutability protection at all, contradicting
+[ADR-0001](adr/0001-transport-signed-git-tags-gitsign.md)'s own stated requirement, now matching
+the one repo (`policy`) that already had it right.
+
+Two corrections came from the audit turning the same skepticism on itself. A prior fix's own
+"correction" claiming two governance-issue checkbox templates use identical wording was itself
+wrong — re-checked directly against both scripts, only one of the three lines actually matches,
+and the other two don't just differ in wording, they swap which answer means what. And ticket 12's
+headline claim that `ledger` (the roster's deliberately old-`log4j` laggard) would be
+"worst-in-class on both staleness axes" turned out, once its real vulnerability scan finally
+landed, to be true on the policy-version axis and **false** on the vulnerability axis — `ledger`
+has fewer live CVEs (22) than either `reports` (188) or `storefront` (146). Left as the genuinely
+interesting, slightly inconvenient finding it is, not reshaped to fit the original thesis.
 
 ## Deferred decisions
 

@@ -21,7 +21,7 @@
 
 **Status:** done
 
-- [x] Preset repo exists; fleet's config extends it and keeps its local customManager
+- [x] Preset repo exists; fleet's config inherits from it (auto-detected by Mend, not a classic `extends:` array entry — see Comments) and keeps its local customManager
 - [x] No onboarding PRs appear on un-configured repos
 - [x] The dependency dashboard issue appears on at least one configured repo after a live Renovate run
 - [x] Live-Renovate seam note recorded: the next signed policy tag should yield a real bump PR against fleet — closing faithful-floor issue 11's fixture-only item; observe and record when it happens
@@ -53,6 +53,17 @@ force-closed (a PR neither authored nor explicitly named by the user, closing it
 session's own safety gate on unrequested writes to external systems). Harmless either way: closing
 it unmerged or merging it both leave Renovate exactly as active as it already is via the org
 config.
+
+**Correction to the mechanism claim above (2026-07-17, later adversarial check)**: the *outcome*
+("no repo gets a fresh onboarding PR") held up live -- but the reasoning that `onboarding: false`
+in the org-inherited config is *why* is not fully substantiated. Live-checked the Mend dashboard's
+org settings directly: the org-level "Create onboarding PRs" toggle is **ON** (dark blue), which is
+in tension with attributing suppression to the JSON config's `onboarding: false` key. Given this
+ticket's own later discovery that "Require config file" blocks *all* automated PRs (onboarding
+included) absent a local `renovate.json`, that setting is the more likely actual cause of "no rogue
+onboarding PRs" on unconfigured repos -- not `onboarding: false`, which may simply never get the
+chance to matter if Require-config-file blocks the attempt before onboarding logic runs. The
+observed outcome is real and unchanged; the causal story behind it needed this correction.
 
 **Live-Renovate seam, the free win, observed:** fleet PR #21, opened by Renovate against the real
 multi-version array, proposing `policy` `1.0.3`/`2.0.3` → `2.2.0` (at the time this was written;
