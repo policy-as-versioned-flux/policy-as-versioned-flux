@@ -65,3 +65,25 @@ ticket is the org preset, not customManager digest resolution), but flagged here
 observed limitation of the git-refs datasource against this repo's actual tag/commit pairing --
 worth a look before merging #21, and worth folding into whichever future ticket next touches the
 customManager.
+
+**Follow-up, 2026-07-17 (day after this ticket shipped): the 5 new app-team repos (tickets 07/08)
+stayed completely unscanned.** `storefront`/`ledger`/`reports`/`api` showed zero Renovate PRs and
+zero Dependency Dashboard issues over 24h+, despite `repository_selection: all` (re-verified) and
+correct org-inherited config. The one structural difference from `fleet`/`policy` (both scanned
+promptly): those two repos each carry their own local `renovate.json`; the 5 new repos relied
+purely on the org-inherited config with no local file at all — the exact "zero lines per repo"
+design this ticket set out to prove works. Added a minimal local `renovate.json`
+(`{"$schema": "..."}`, inheriting everything from the org config — not a real behavioural change)
+to `storefront`/`ledger`/`reports`/`api` as the most likely missing activation signal for a
+brand-new repo on Mend-hosted Renovate. `datastore` skipped (no package manifest for Renovate to
+manage).
+
+**Correction to this ticket's original "zero-line" claim, stated honestly:** whether a bare
+local file is genuinely required for Mend-hosted Renovate to activate a *brand-new* repo (versus
+an already-established one) could not be confirmed within this session — no PR or Dependency
+Dashboard issue appeared on any of the 4 repos even ~90 minutes after adding the local files, an
+external SaaS scan-schedule dependency this project's own testing philosophy already names as
+"observable, not controllable" (see the epic spec's Testing Decisions). The org-inherited
+mechanism itself (repo `renovate-config`, `metricLabelsAllowlist`, `repository_selection: all`)
+remains verified correct by direct inspection; only the *empirical* "zero lines needed even for a
+brand-new repo" claim is walked back to "not confirmed live" rather than left standing unproven.
