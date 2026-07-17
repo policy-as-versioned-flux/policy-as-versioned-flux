@@ -128,12 +128,17 @@ wired into continuous Flux reconciliation. They were one-shot `kubectl apply`'d 
 bring-up and never touched again by any controller. Two real consequences, both caught live: the
 cluster's `ResourceSet` had quietly drifted out of band (a hand-edited `version` field, no
 matching tag/commit change), which was actively denying two running apps at admission when the
-audit found it; and ticket 09's "merging a retirement PR retires the version" claim had only ever
-been *simulated* (a PR opened and deliberately closed unmerged, never actually merged). Fixed for
-real, not patched around: a new `cluster-state` Flux Kustomization
+audit found it; and ticket 09's "merging a retirement PR retires the version" claim had never been
+tested against a *continuously-reconciling* cluster — the closest real precedent,
+[`fleet#7`](https://github.com/policy-as-versioned-flux/fleet/pull/7), had genuinely merged and
+removed an array element back on 2026-07-15, but at that point `clusters/cluster1/*.yaml` wasn't
+wired into Flux at all, so the merge changed git without touching the live cluster. (A second
+adversarial pass caught an earlier draft of this very paragraph repeating the wrong, broader
+claim — "never actually merged" — even after ticket 09's own file had already corrected it; fixed
+here to match.) Fixed for real, not patched around: a new `cluster-state` Flux Kustomization
 ([`fleet#55`](https://github.com/policy-as-versioned-flux/fleet/pull/55)) gives these files the
 same self-healing git-drives-cluster guarantee every other resource here already had, and the
-"merging retires the version" claim was re-proven with two PRs that were actually merged
+"merging retires the version, live, with zero manual steps" claim was re-proven with two PRs
 ([`fleet#56`](https://github.com/policy-as-versioned-flux/fleet/pull/56)/[`#57`](https://github.com/policy-as-versioned-flux/fleet/pull/57))
 — install a throwaway version, watch Flux install it with zero manual steps; remove it, watch Flux
 prune it back out just as automatically.

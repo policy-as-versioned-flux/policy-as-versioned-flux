@@ -125,15 +125,19 @@ forces creation past the limit, another real, intended dashboard feature):
   package list at least twice as the estate evolved (9 counted 2026-07-17 morning, 10 by that
   afternoon) — the live PR body, not this doc, is the source of truth for the current set.
 - `reports#4`: **Flask → v3**.
-- `api`: genuinely nothing headline-worthy rate-limited — only `actions/checkout` (CI tooling, not
-  an app dependency) was ever open or rate-limited, confirming `api`'s "good citizen, current
-  deps" story rather than a scanning gap.
+- `api`: genuinely nothing headline-worthy in the rate-limited/forced bucket specifically. **Correction**:
+  an earlier version of this line overstated this as "only actions/checkout was ever open" —
+  that's wrong and self-contradicts this doc's own #1/#2 list two paragraphs up (`api#2`, an
+  `alpine` Docker tag bump, is also a real open PR, just not headline-worthy). The narrower, correct
+  claim: nothing in `api`'s rate-limited bucket ever needed forcing, confirming its "good citizen,
+  current deps" story rather than a scanning gap — but `api` does have the same routine #1/#2 pins
+  every other app repo got.
 
 All eleven PRs (originally-claimed 4 + 3 headline forces + `fleet`'s/`policy`'s pre-existing
 activity) verified real via `gh pr list`, not just the dashboard's own claim of success.
 
 **Original "zero-line" claim, now precisely corrected rather than left ambiguous:** the org-level
-mechanism (repo `renovate-config`, `metricLabelsAllowlist`, `repository_selection: all`) is real
+mechanism (repo `renovate-config`, `repository_selection: all`) is real
 and correct, but it was never sufficient on its own — Mend's own `Require config file` org setting
 means every repo, including brand-new ones, needs *some* local Renovate config file (even a
 near-empty one) before Mend will act on it at all. "Zero lines needed" is corrected to "zero *new*

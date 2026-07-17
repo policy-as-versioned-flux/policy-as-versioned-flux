@@ -25,10 +25,19 @@ legal`). Fixed to `engineering`, re-reconciled, admitted clean. Kept as evidence
 not theater — first bad label, caught and refused, exactly as designed.
 
 Live-verified: `storefront` Deployment `Running`, its `Kustomization` `Ready` with the real applied
-revision, and its pod produces real `policy_report_result` entries scoped to its own pod name (`4`
-of the app pods total, `ledger`/`api`/`storefront`/`reports`) — the existing dashboard's per-version
-panels see it without any dashboard change, exactly as the design predicts (a policy version is
-just another dependency).
+revision, and its workload produces real `policy_report_result` entries (`4` of the app workloads
+total, `ledger`/`api`/`storefront`/`reports`) — the existing dashboard's per-version panels see it
+without any dashboard change, exactly as the design predicts (a policy version is just another
+dependency). **Correction (2026-07-17, later adversarial pass)**: an earlier version of this line
+said these metrics are "scoped to its own pod name" — that's wrong. `policy-reporter`'s own config
+(`sourceFilters: uncontrolledOnly: true, kinds.exclude: [ReplicaSet]`) means Pod- and
+ReplicaSet-kind results never reach `/metrics` at all; what actually feeds Prometheus/Grafana is
+scoped to the owning **Deployment** name (`kind=Deployment, name=storefront`), confirmed by
+querying `policy-reporter`'s `/metrics` endpoint directly. The Pod-kind `PolicyReport` *does* still
+exist as a real Kubernetes object (`kubectl get policyreport` shows it, `orphan-guard: pass`
+included) — it just isn't the layer the dashboard reads from. The higher-level claim ("appears
+correctly in the dashboard's per-version data, zero dashboard changes needed") still holds; only
+the specific pod-vs-Deployment scoping detail was wrong.
 
 Image public on GHCR, confirmed pullable with zero credentials.
 
