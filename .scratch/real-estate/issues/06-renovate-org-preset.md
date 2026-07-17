@@ -118,9 +118,12 @@ seconds:
 forces creation past the limit, another real, intended dashboard feature):
 - `ledger#4`: **`org.apache.logging.log4j:log4j-core` → `v2.26.1`** — the exact dependency this
   team's whole story is about, now a real, live PR.
-- `storefront#4`: **Angular monorepo → v22** (`@angular/core`, `@angular/common`,
-  `@angular/compiler`, and six more, together — 9 `@angular/*` packages total, count verified
-  directly against the live PR body).
+- `storefront#4`: **Angular monorepo → v22** — Renovate's monorepo grouping bumps the whole
+  `@angular/*` family together in one PR (`core`, `common`, `compiler`, `compiler-cli`, `animations`,
+  `forms`, `platform-browser`, `platform-browser-dynamic`, `platform-server`, `router`). Not pinning
+  an exact package count in this doc on purpose: Renovate has already revised this PR's exact
+  package list at least twice as the estate evolved (9 counted 2026-07-17 morning, 10 by that
+  afternoon) — the live PR body, not this doc, is the source of truth for the current set.
 - `reports#4`: **Flask → v3**.
 - `api`: genuinely nothing headline-worthy rate-limited — only `actions/checkout` (CI tooling, not
   an app dependency) was ever open or rate-limited, confirming `api`'s "good citizen, current
