@@ -8,7 +8,7 @@
 
 - [x] New dashboard, sidecar-discovered, one row per team joining all four signals
 - [x] Every panel verified by querying through the Grafana query API and asserting real rows — no screenshot-only verification
-- [x] ledger visibly worst-in-class on both staleness axes; api visibly clean — the contrast reads at a glance (partially: see Comments for what's confirmed vs pending)
+- [x] ledger visibly worst-in-class on the policy-version axis; api visibly clean on both axes — the contrast reads at a glance (the vulnerability-axis "worst-in-class" framing turned out not to hold once real data landed; see Comments' 2026-07-17 follow-up)
 - [x] Existing CIO dashboard unchanged (beyond ticket 01)
 
 ## Comments
@@ -54,10 +54,16 @@ nginx `alias` instead. And a stale kubelet ConfigMap-volume mount required a pod
 up a genuinely-updated ConfigMap's new content — the fix was correct but its effect wasn't visible
 until the pod was cycled, caught by re-checking the raw served file before trusting the `/api/ds/query` result.
 
-**"ledger worst-in-class" — partially confirmed, honestly**: policy-version staleness for `ledger`
-(1.0.0, oldest in the roster) is confirmed via Panel 1 today. The vulnerability-count half of that
-claim is not yet confirmed for `ledger` specifically — see ticket 11's Comments for the honest
-account of why its live `trivy` scan didn't complete in-cluster this session. `api`'s clean
-contrast (0 vulnerabilities, current policy version) is confirmed. Panel 1's query itself is
-correct and will show `ledger`'s real count the moment its scan lands — no dashboard change
-needed, this is purely the upstream data-availability gap ticket 11 documents.
+**"ledger worst-in-class" — confirmed on one axis, genuinely NOT true on the other (2026-07-17
+follow-up)**: policy-version staleness for `ledger` (1.0.0, oldest in the roster) is confirmed via
+Panel 1. The vulnerability-count half was honestly flagged as unconfirmed at write-time (ledger's
+`trivy` scan hadn't completed — see ticket 11's Comments); it has since landed, and the real
+numbers overturn the "worst-in-class on both axes" framing rather than confirming it: `ledger` has
+**22** vulnerabilities, `reports` has **188**, `storefront` has **146** — ledger is the *least*
+vulnerable of the three, not the worst (`api` remains the true clean baseline at **0**). Queried
+directly against live Prometheus (`sum by (image_repository) (trivy_image_vulnerabilities)`) to
+confirm, not inferred from the dashboard alone. `api`'s clean contrast stands. Panel 1's query
+mechanism itself is and always was correct — it renders whatever the real data says, which is
+exactly what surfaced this: the epic's "ledger is the laggard on every axis" narrative was a
+reasonable design intent, not a guaranteed outcome, and real Java CVE density happened not to
+cooperate. Left as an honest, interesting finding rather than reshaped to fit the original thesis.
