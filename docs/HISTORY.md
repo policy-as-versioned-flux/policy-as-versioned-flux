@@ -149,7 +149,9 @@ readiness-collector image pins weren't actually bumpable dependencies as claimed
 ([`fleet#49`](https://github.com/policy-as-versioned-flux/fleet/pull/49)); the same
 "repo lacks a local `renovate.json`" root cause ticket 06 diagnosed for four app repos turned out
 to apply to three more repos nobody had checked (`c2p-collector`, `readiness-collector`, and
-`policy` itself via its own year-old dormant onboarding PR); the weekly governance nag's "skips
+`policy` itself via its own day-old dormant onboarding PR — this project's entire history spans
+2026-07-14 to 2026-07-18; nothing in it is a year old, an earlier draft of this line said "year-old"
+and a later adversarial pass caught it); the weekly governance nag's "skips
 already-actioned issues" checkbox was ticked with no code behind it, now genuinely implemented and
 proven live, including the case where it correctly *doesn't* skip
 ([`fleet#50`](https://github.com/policy-as-versioned-flux/fleet/pull/50)); and eight of nine

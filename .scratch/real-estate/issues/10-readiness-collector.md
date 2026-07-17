@@ -54,11 +54,19 @@ alone. Fixed, retagged, re-verified: `readiness-collector-verify` Job completed 
 **Zero effect on admission/live PolicyReports, verified**: before and after every run, `kubectl
 get validatingpolicy` shows the same real installed-policy set (9 at the time this was written; now
 10 with `orphan-guard` from ticket 09, a separate later addition unrelated to this ticket) — no
-shadow policies from this component — and no `readiness`-named or extra `PolicyReport` objects
-appear on the cluster — the collector's report only ever exists as a local file inside its own
-ephemeral pod and the one `readiness-2.2.0` ConfigMap it's meant to publish, in `monitoring` (the
-namespace its RBAC actually scopes it to — see 2026-07-17 follow-up for a stray manual-test copy
-that briefly existed elsewhere and has since been cleaned up).
+shadow policies from this component — and the collector's own report only ever exists as a local
+file inside its own ephemeral pod and the one `readiness-2.2.0` ConfigMap it's meant to publish, in
+`monitoring` (the namespace its RBAC actually scopes it to — see 2026-07-17 follow-up for a stray
+manual-test copy that briefly existed elsewhere and has since been cleaned up). **Correction**: an
+earlier version of this claim overstated the PolicyReport check as "no `readiness`-named ...
+objects appear on the cluster" — false as literally written. `kubectl get policyreport -A | grep -i
+readiness` genuinely returns 7 objects, but they're Kyverno's ordinary background-scan reports
+*about* the CronJob/Job/Pod resources themselves (all results `skip`, the same routine pattern
+every workload cluster-wide gets — `flux-system`'s own pods carry identical reports, 133
+`PolicyReport` objects exist cluster-wide in total). The actual claim that matters — no *shadow*
+`ValidatingPolicy`, no fabricated per-team compliance data leaking into the real admission
+`PolicyReport` system — still holds; only the literal "no readiness-named objects" wording was
+wrong.
 
 ## Follow-up (2026-07-17): undisclosed third fix, and a real governance gap, both closed
 

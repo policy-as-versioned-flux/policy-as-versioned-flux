@@ -38,7 +38,7 @@ A sunset date never touches that. It:
   prescribes for the mea-culpa's "delete-if-undefended" rule;
 - produces, on the date, a *proposal* (a PR sitting there, unmerged, changing nothing until
   someone acts) and a stream of *nudges to humans* (dashboard countdown, escalating issues, a
-  weekly stale nag on the eventual retirement PR if it sits unmerged — ticket 15's checkbox
+  weekly stale nag on the eventual retirement PR if it sits unmerged — ticket 13's checkbox
   follow-through). None of these are enforcement. ADR-0006 prohibits time-conditional *policy
   state*; it says nothing about time-conditional *human reminders*, which is what all of this is.
 
