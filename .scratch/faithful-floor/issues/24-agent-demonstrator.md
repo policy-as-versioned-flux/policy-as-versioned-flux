@@ -20,7 +20,7 @@ Live run against the real GitHub Security Advisories API for `kyverno/kyverno`: 
 advisories fetched. 26 filtered as noise (23 outside the 60-day recency window, several also
 below the `high` severity floor) -- zero issues opened for any of them, satisfying the
 noise-reduction criterion with real data, not a fixture. The one survivor, `CVE-2026-54523`
-(critical, published the day before the run -- a real, current `NamespacedGeneratingPolicy`
+(critical, published 2 days before the run -- a real, current `NamespacedGeneratingPolicy`
 privilege-escalation bug in Kyverno's engine), was surfaced and opened as 5 issues, one per
 policy (all 5 depend on the same engine, per SPEC.md's relevance rule), each using the ADR-0007
 decision-framing template verbatim:
@@ -38,3 +38,12 @@ started matching *other* policies' issues as if they were this policy's, silentl
 title (unique per policy+CVE by construction) fetched once per advisory and compared
 client-side, not via the search API. Re-ran; dedup correctly no-opped on the 3 existing issues
 and created the missing 2.
+
+**Correction (2026-07-18, wave-1 audit of the faithful-floor epic)**: the "27 fetched"/"23 outside
+the recency window" figures above don't reproduce against a live re-run -- the advisory feed keeps
+growing (`gh api repos/kyverno/kyverno/security-advisories --paginate | jq length` returns 29 as of
+this correction, of which 28 are non-survivors, all now outside a 60-day recency window from
+today). The figures above are what the 2026-07-15 run actually saw; re-running the same query on a
+later date returns a different total by construction, not evidence the original run was wrong. The
+substantive claim is unaffected: still exactly one survivor, still 5 real issues opened, still zero
+noise reaching the human.

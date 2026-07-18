@@ -28,6 +28,11 @@ and a passing sample workload: identical verdict, identical message, both ways.
 call the exact same `kyverno test`/`gitsign verify-tag`/`flux build --dry-run` invocations this
 doc walks through by hand, not a parallel/divergent implementation.
 
+**Correction (2026-07-18, wave-1 audit of the faithful-floor epic)**: `fleet/pr-gate-check.sh` no
+longer exists at that path -- real-estate epic ticket 03 extracted it into
+`policy-as-versioned-flux/pr-gate-action`. The cross-reference names the pre-extraction location;
+the same commands it points at are still what CI runs, just packaged differently.
+
 Named the one thing this flow can't reach: the shared-Kyverno-webhook bug issue 08 found only
 manifests with multiple policy versions installed simultaneously, which `kyverno apply`'s offline
 single-policy evaluation has no way to reproduce (that's what `fleet/verify-coexistence.sh` is

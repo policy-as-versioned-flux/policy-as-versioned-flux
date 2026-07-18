@@ -26,9 +26,10 @@ provider shape. Confirmed against `crossplane-contrib/provider-upjet-aws`'s own 
 examples (not guessed) that current Crossplane targets `s3.aws.m.upbound.io,
 kind: BucketServerSideEncryptionConfiguration` (encryption is its own resource now, not a nested
 field on `Bucket`) and `rds.aws.m.upbound.io, kind: Instance` with a flat
-`spec.forProvider.multiAz` (collie's own rule message described a nested `multiAZ` object that
-doesn't match either the old or current schema -- corrected, not reproduced). Each rationale.md
-records exactly what was kept vs. rebuilt.
+`spec.forProvider.multiAz` (collie's own rule matched the identical flat shape --
+`spec.forProvider.multiAZ` -- only the field's casing differs, not its structure; rebuilt for the
+namespaced CRD, not because the field's shape needed correcting). Each rationale.md records
+exactly what was kept vs. rebuilt.
 
 Full harvested OSCAL catalogue (the real NIST SP 800-53r5 catalogue, ~7MB, plus collie's S3/RDS
 component-definitions and baseline profiles) landed with provenance in the new
@@ -38,3 +39,6 @@ repo -- README documents what was harvested vs. dropped (ADR-0004: the generator
 Bundled the version bump with issue 08's `matchConditions` fix into one pending `v2.2.0` (new
 policies are minor by construction; minor wins over the fix's own patch-level impact) -- not yet
 tagged, same gitsign re-auth block as issue 08.
+
+**Correction (2026-07-18, wave-1 audit of the faithful-floor epic)**: this is now stale --
+`v2.2.0` was tagged 2026-07-15, gitsign-signed (see issue 08/09's own dated entries).

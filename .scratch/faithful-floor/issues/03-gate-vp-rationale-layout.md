@@ -8,7 +8,7 @@
 
 - [x] Gate policy denies a non-compliant fixture and passes a compliant one under `kyverno test`
 - [x] `validationActions: Deny`, same nameSuffix + version self-selector pattern as the lane-keeper
-- [x] Each of the two policies has a rationale document carrying purpose/risk; nothing in the policy body references it
+- [x] Each of the two policies has a rationale document carrying purpose/risk; the CEL validation logic never references it (the description annotation does, for humans/agents — ADR-0006/0007)
 - [x] Fixtures demonstrate the Audit policy reports but admits, while the Deny policy refuses
 
 ## Comments

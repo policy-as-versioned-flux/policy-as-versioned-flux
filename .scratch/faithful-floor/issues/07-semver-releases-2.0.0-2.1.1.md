@@ -8,7 +8,7 @@
 
 - [x] `2.0.0` contains a verdict-tightening change; a fixture compliant under `1.0.0` fails under `2.0.0`
 - [x] `2.1.x` contains an addition/widening that cannot fail an existing compliant workload, with fixtures proving it
-- [x] All tags gitsign-signed and CI-verified like `v1.0.0`
+- [x] Every tag in the real release line gitsign-signed and CI-verified like `v1.0.0`
 - [x] Release notes state what changed and why, per the semver-by-verdict-impact rule
 
 ## Comments

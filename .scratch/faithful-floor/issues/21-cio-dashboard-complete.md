@@ -40,7 +40,9 @@ it's Audit.
 cluster (not just "the datasource is registered"):**
 - OSCAL panel: `control=cp-10_smt, state=not-satisfied` -- exactly the one deliberately
   non-compliant RDS exemplar, correctly surfaced.
-- Renovate PR-state panel: 5 real, recent PRs on the fleet repo returned.
+- Renovate PR-state panel: real, live PR data for the fleet repo returned (not pinning an exact
+  count in this doc on purpose -- the repo's PR count keeps growing; the panel's own live query
+  against the real repo, not this doc, is the source of truth for current PR state).
 
 **Datasource honesty note:** used `yesoreyeram-infinity-datasource` for both new panels rather
 than the literal `github` plugin the ticket text names. Infinity querying GitHub's public REST API

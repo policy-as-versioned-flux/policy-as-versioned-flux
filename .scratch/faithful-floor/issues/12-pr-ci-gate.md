@@ -28,6 +28,11 @@ diff-detection path; a synthetic mismatched-commit case, proving the gate genuin
 pin rather than adopting it. Then proven live in real GitHub Actions with an actual test PR
 (policy-as-versioned-flux/fleet#1, closed without merging).
 
+**Correction (2026-07-18, wave-1 audit of the faithful-floor epic)**: `pr-gate-check.sh` no longer
+lives at `fleet/pr-gate-check.sh` -- real-estate epic ticket 03 extracted it into its own component
+repo, `policy-as-versioned-flux/pr-gate-action`, released and pinned like any governed dependency.
+The claims above describe the pre-extraction script; the behaviour they proved carried over intact.
+
 Found and fixed along the way: the gate is required by a branch ruleset
 (`policy-as-versioned-flux/fleet`, "require-pr-gate"), and a required check originally gated by
 the workflow's own `paths: [clusters/**]` trigger filter never reports any status on a PR that

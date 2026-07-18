@@ -27,3 +27,10 @@ different output purely because the tag's tree differs — nothing regenerated b
 No generated `HANDBOOK.md` is committed to the repo: doing so would itself be exactly the
 drift-the-moment-the-next-tag-lands problem this ticket exists to avoid. README documents the
 command instead.
+
+**Correction (2026-07-18, wave-1 audit of the faithful-floor epic)**: `policy` repo,
+`handbook/generate.sh <tag>` describes the pre-extraction location. Real-estate epic ticket 05
+moved the generator into its own component repo, `policy-as-versioned-flux/handbook-generator`,
+with a changed invocation shape -- `generate.sh <policy-checkout-path> <tag>` -- since it no longer
+assumes it's running inside the policy repo's own worktree. The policy repo's `handbook/` directory
+is gone; its README points at the component.
