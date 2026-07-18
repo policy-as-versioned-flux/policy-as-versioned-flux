@@ -38,3 +38,9 @@ applied and sitting unreconciled (`Synced` never `True`, no `ProviderConfig` any
 live (not by this ticket's own checklist, but load-bearing for issue 19 on top of it): Kyverno's
 background/reports controllers need explicit RBAC to list/watch arbitrary CRDs -- fixed via an
 aggregated `ClusterRole`, see issue 19.
+
+**Follow-up (2026-07-18)**: the `crossplane-sample` Kustomization managing this ticket's own
+`sample-unreconciled` fixture now shows `Ready: False` as a live consequence of issue 09's
+2026-07-18 cloud-plane orphan-guard extension -- the fixture is genuinely unaffected (untouched
+since 2026-07-15), only its Flux health status changed. See issue 09's own follow-up for the full
+explanation of why this is the governance design working as intended, not a regression.

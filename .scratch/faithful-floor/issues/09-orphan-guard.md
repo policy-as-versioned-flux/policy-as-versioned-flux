@@ -41,3 +41,29 @@ correctly enforced, wrongly scoped, since infrastructure pods aren't app workloa
 as the already-excluded `kyverno`/`flux-system`). Added `crossplane-system` and `monitoring`
 (which had silently slipped through only because the guard wasn't reliably active until issue 08's
 fix landed cluster-wide) to the exclusion list.
+
+## Follow-up (2026-07-18): a real, live interaction the cloud-plane extension surfaced
+
+A wave-2 audit found that real-estate ticket 19's follow-up (extending this guard's
+`resourceRules` to cover the two Crossplane CRD types) left the `crossplane-sample` Flux
+`Kustomization` permanently `Ready: False` -- it manages `sample-unreconciled` (issue 18's
+deliberately-unlabeled fixture), and Flux's own periodic drift-detection dry-run of that resource
+is now denied by the guard on every reconcile, since the object genuinely has no
+`mycompany.com/policy-version` label.
+
+**Investigated, not "fixed" -- this is the design working correctly, not a bug.** The live object
+itself is untouched (`creationTimestamp` unchanged since 2026-07-15, confirmed via `kubectl get`):
+a `Deny`-mode `ValidatingPolicy` only ever blocks the *API call*, never deletes what's already
+there, matching this guard's own "reported, never evicted" invariant exactly. What changed is
+*visibility*: this fleet's README states governance debt is meant to be "always visible" the
+moment something churns -- and Flux's own continuous reconciliation loop turns out to be a
+legitimate churn trigger, one this project hadn't previously had reason to notice, since no
+Crossplane CR was ever both Flux-managed *and* deliberately non-compliant until now. A perpetually
+unhealthy Kustomization for a genuinely non-compliant resource is arguably a *more* visible signal
+than a background `PolicyReport` a human has to go looking for -- consistent with, not a violation
+of, the stated design. Deliberately not "fixed" by relabelling `sample-unreconciled` (which would
+destroy its value as the live evidence real-estate ticket 19's own fix cites) or by dropping it
+from Flux management (unnecessary engineering for behavior that's actually correct). Left as a
+real, live, previously-unobserved interaction between two features that were each individually
+correct -- recorded honestly rather than smoothed over, same standard as every other finding in
+this epic.

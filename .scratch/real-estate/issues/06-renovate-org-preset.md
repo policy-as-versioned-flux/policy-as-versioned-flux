@@ -13,7 +13,8 @@
   was installed. "All repositories" → **Silent mode (dryRun=lookup): no PRs of any kind, including
   the fleet bump PRs we want**, until switched to Interactive. "Selected repositories" →
   onboarding PRs auto-created. So this ticket must FIRST check the app's mode at
-  developer.mend.io (org settings, link in NOTES.md) and set it to Interactive, THEN suppress
+  developer.mend.io (org settings, link in `.scratch/demo-feedback/NOTES.md`, item 13) and set it
+  to Interactive, THEN suppress
   onboarding via `onboarding=false` in the inherited config
   (docs.renovatebot.com/mend-hosted/hosted-apps-config/).
 

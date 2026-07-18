@@ -47,10 +47,13 @@ watching resolution break/recover identically each time -- a documented Flux/go-
 `release-pins/vX` branch ref in the policy repo for this reason -- load-bearing, not cleanup
 candidates.)
 
-`fleet/clusters/cluster1/policy-versions.yaml` repointed at the three fixed tags (PR #7, merged).
-Discovered live that `policy-versions.yaml`/`bootstrap.yaml` are one-shot `kubectl apply`d by
-`up.sh`, not continuously Flux-reconciled -- re-applied both directly (the same command `up.sh`
-itself uses) to actually push the change to the live cluster, not just merge it to git.
+`fleet/clusters/cluster1/policy-versions.yaml` repointed at the fixed tags (PR #7, then PR #8 1.5h
+later). **Correction (2026-07-18, wave-2 audit)**: this line originally credited PR #7 alone --
+`gh pr diff 7` shows it actually set tags to the still-broken `1.0.2`/`2.0.2`, not the working
+ones; PR #8 (merged 2026-07-15T11:15:41Z) is what genuinely landed `1.0.3`/`2.0.3`. Discovered live
+that `policy-versions.yaml`/`bootstrap.yaml` are one-shot `kubectl apply`d by `up.sh`, not
+continuously Flux-reconciled -- re-applied both directly (the same command `up.sh` itself uses) to
+actually push the change to the live cluster, not just merge it to git.
 
 `./verify-coexistence.sh` (updated for `2.2.0`, was hardcoded to the retired `2.1.1`) now passes
 fully and lives: all 7 ValidatingPolicies present and collision-free, every generated Kustomization
@@ -63,3 +66,18 @@ Also built for this ticket, already working: `app2`/`app3` (pinned 2.0.0/2.2.0) 
 repo, `fleet/verify-coexistence.sh` (collision-freedom, `dependsOn`/`wait` on every generated
 Kustomization, prune-on-removal -- all passing now; the differential cross-version admission check
 is the one still blocked).
+
+## Follow-up (2026-07-18): the dependsOn/wait check was vacuously passing, never actually running
+
+A wave-2 audit found `verify-coexistence.sh`'s "every generated Kustomization dependsOn kyverno
+and waits" check used a label selector (`fluxcd.controlplane.io/name=policy-versions`) that
+doesn't exist on the real objects -- the ResourceSet actually stamps
+`resourceset.fluxcd.controlplane.io/name`. The selector silently matched zero Kustomizations, so
+the loop body never executed and the script printed `OK` regardless of live state -- every prior
+"green" run of this check proved nothing. Fixed at
+[`fleet#63`](https://github.com/policy-as-versioned-flux/fleet/pull/63): corrected the selector,
+and loosened the `dependsOn` assertion (was `= kyverno` exactly, now checks `kyverno` is present)
+since fixing the selector immediately surfaced a real, previously-unexercised case the old
+assertion would have wrongly failed on: cloud-plane Kustomizations (issue 19) legitimately
+`dependsOn` both `kyverno` and `crossplane-providers`. Live-verified the corrected script
+end-to-end: all 9 Kustomizations genuinely matched and checked, green.
