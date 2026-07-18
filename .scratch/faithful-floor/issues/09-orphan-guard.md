@@ -42,6 +42,27 @@ as the already-excluded `kyverno`/`flux-system`). Added `crossplane-system` and 
 (which had silently slipped through only because the guard wasn't reliably active until issue 08's
 fix landed cluster-wide) to the exclusion list.
 
+## Follow-up (2026-07-17): the "changes in the same reconcile" claim was false for 3 days
+
+A wave-4 skeptic found this ticket's own checklist item -- "changing the array changes the guard
+in the same reconcile" / "cannot drift" -- was false in the live cluster from its creation
+(2026-07-14) until [`fleet#55`](https://github.com/policy-as-versioned-flux/fleet/pull/55) merged
+2026-07-17T16:59:58Z: `policy-versions.yaml` (the guard's own source array) was only ever
+`kubectl apply`'d by `up.sh`, never continuously Flux-reconciled, so a merged git change to the
+array did not actually change the guard's live allow-list without a manual re-apply -- `fleet#55`'s
+own PR body says this directly. Two sibling tickets (`real-estate/07-first-app-storefront.md`,
+`faithful-floor/10-cluster2-retirement.md`) already cite "ticket 09's 2026-07-17 follow-up" for
+this fix; this section is that follow-up, restored after the skeptic found it missing.
+
+**Real, live consequence during that gap, not hypothetical**: the live `ResourceSet` drifted out
+of band (hand-edited outside git), and the orphan guard -- correctly enforcing its own, now-stale
+allow-list -- denied admission to legitimate `storefront` and `api` pods. Documented in full in
+`real-estate/07-first-app-storefront.md`'s 2026-07-17 follow-up; not a new finding here, just the
+cross-reference this file should always have carried. Fixed the same way as every other instance
+of this root cause across this epic: a new `cluster-state` Flux Kustomization gives
+`policy-versions.yaml` the same continuous-reconciliation guarantee every other resource in this
+cluster already had.
+
 ## Follow-up (2026-07-18): a real, live interaction the cloud-plane extension surfaced
 
 A wave-2 audit found that real-estate ticket 19's follow-up (extending this guard's

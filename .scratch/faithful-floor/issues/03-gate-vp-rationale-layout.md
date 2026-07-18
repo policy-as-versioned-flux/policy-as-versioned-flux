@@ -28,3 +28,24 @@ proves the checklist's last claim directly, since `kyverno test` evaluates the C
 admission-webhook blocking — a pod missing `department` is admitted with a Fail entry in its
 PolicyReport (Audit: reports but admits), a pod with an unrecognised `department` is refused by the
 admission webhook outright (Deny: refuses). Ran both scripts green against `cluster1`.
+
+## Follow-up (2026-07-18): a real, systemic broken cross-reference, fixed on `main` only
+
+A wave-4 skeptic found the `policies.kyverno.io/description` annotation's rationale.md
+cross-reference had a broken relative path in 3 of 5 policies (`require-department-label`,
+`require-known-department-label`, `require-owner-annotation` -- the `cloud/*` two were already
+correct, one directory shallower) -- undetected by 9+ prior audit waves since none actually
+resolved the path. Fixed on `main`:
+[`policy#19`](https://github.com/policy-as-versioned-flux/policy/pull/19), plus a real check added
+to `verify.sh` that resolves this cross-reference for every policy going forward.
+
+**Deliberately not rolled into a new patch tag for the currently-pinned versions.** This is a
+metadata-only annotation, referenced by nothing the CEL validation logic or any admission verdict
+reads -- zero verdict impact, the same class of change that earlier justified v1.0.1/v1.0.3/etc as
+CI-only-fix patches. Unlike those (which fixed things actively broken in impactful ways -- an
+unresolvable git tag blocking installation entirely, a security-relevant signature leaking into
+public release notes), this is a cosmetic doc link with no functional consequence for anyone
+running the currently-installed `v1.0.3`/`v2.0.3`/`v2.2.0`. Cutting three coordinated patch tags
+and re-pinning fleet for this specific fix was judged disproportionate to its actual stakes;
+`main` is the correct, fixed source of truth, and the next real content release for each line will
+naturally carry it forward. Recorded as a real, considered gap, not silently left unmentioned.
