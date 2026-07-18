@@ -50,3 +50,26 @@ with zero credentials succeeds for all four.
 
 Shipped as `fleet#27` (app rewiring) + `fleet#28` (drive-by verify fix), both self-merged, standing
 authorization.
+
+## Follow-up (2026-07-18): the attribution claim was live-false; fixed for real
+
+A wave-12 adversarial audit found the "now attributable to datastore's own claim, not a
+platform-planted exemplar" claim above was, at the time, live-false: the actual `cp-10_smt` finding
+was attributed to `sample-unreconciled`, an unrelated, unlabeled Crossplane fixture from
+faithful-floor's issue 18 (a deliberately-never-reconciled sample proving CRD existence, with no
+connection to `datastore` at all) — not to either of `datastore`'s own claims. Root cause:
+`c2p-collector/run.sh` fed *every* cluster-wide `PolicyReport` result to `c2pcli result2oscal`,
+including `skip` results (the policy declining to evaluate a resource at all, e.g. one carrying
+none of the labels a version-scoped rule expects) — never a compliance signal, but apparently
+enough to compete with and override the two real `datastore` subjects in `result2oscal`'s own
+aggregation.
+
+**Fixed for real**: [`c2p-collector#4`](https://github.com/policy-as-versioned-flux/c2p-collector/pull/4)
+filters `skip` results out of the collector's input before they reach `result2oscal`, released as
+`v1.0.1`; [`fleet#59`](https://github.com/policy-as-versioned-flux/fleet/pull/59) bumped the
+CronJob's pinned digest. Live-verified after the real next scheduled run (11:00 UTC, not a manual
+trigger): the live `oscal-assessment-results` ConfigMap's `require-rds-multi-az` observation now
+carries exactly the two real `datastore` subjects — `datastore-rds-noncompliant` (`fail`, reason
+`spec.forProvider.multiAz must be true.`) and `datastore-rds-compliant` (`pass`) — with
+`sample-unreconciled` gone entirely, and the finding's overall status is `not-satisfied`. The
+claim this doc originally made is now actually true, not just narrated as true.
