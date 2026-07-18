@@ -27,11 +27,17 @@ threshold, dedup, batching) so a raw signal only becomes a surfaced decision if 
 four -- the whole point is a human sees one sentence, not a CVE feed. Decision framing is the
 ADR-0007 template verbatim, fixed regardless of which signal triggered it.
 
-The enforcement mechanism for "never edits enforcement" is a real technical boundary, not a
-behavioural promise: the agent's GitHub App token is scoped `issues: write`, `contents: read` on
-the `policy` repo, no `contents: write`/`pull-requests: write` at all -- so even a buggy agent
-gets a 403 from GitHub's own API if it ever tried to push a commit. Same pattern as issue 22's
-determinism proof: the guarantee comes from what's structurally possible, not from asking nicely.
+The enforcement mechanism for "never edits enforcement" is code-level, not a permission boundary:
+the demonstrator's only write path anywhere is `gh issue create` -- no `git`/`gh pr` call exists
+in the script at all, so there's no code path that could touch enforcement content even if it
+tried. Same never-calls-the-forbidden-thing pattern as ticket 09's sunset-escalator.sh.
+**Correction (2026-07-18, wave-1 audit of the faithful-floor epic)**: this paragraph originally
+claimed the mechanism was a scoped GitHub App token (`issues: write`, `contents: read` only,
+GitHub-API-enforced 403 on any write attempt) -- no such App or scoped token was ever actually set
+up; every write in this estate runs on the same full-access personal `gh` auth throughout, which
+genuinely could push a commit if the code asked it to. The real guarantee was always the code-level
+one above, not a permission boundary; SPEC.md and governance-agent/README.md carried the same
+overclaim and are corrected alongside this.
 
 Bounded demonstrator scope (issue 24) committed to one concrete signal source: GitHub Security
 Advisories for `kyverno/kyverno` itself -- already this project's own governed dependency
