@@ -58,6 +58,19 @@ mkdir -p "$WORK"
 echo "== 1. KiND cluster (from scratch; idempotent) =="
 kind get clusters 2>/dev/null | grep -qx "$CLUSTER" || kind create cluster --name "$CLUSTER" --wait 120s
 
+# Wave-1 audit (2026-07-18) found this job's kubectl/helm calls relied entirely on
+# `kind create cluster` having switched the ambient current-context, with nothing checking
+# it actually did -- when that assumption broke (however it broke: partial/manual run,
+# an environment where `kind create` silently no-ops, etc.), every apply below landed on
+# whatever cluster the ambient context happened to point at instead, undetected, on a
+# *shared* cluster in this project's case. Every kubectl/helm call from here on is
+# explicitly pinned to this job's own context -- it is structurally impossible for this
+# script to touch any other cluster, regardless of what the ambient context is.
+KCTX="kind-$CLUSTER"
+kubectl config get-contexts -o name | grep -qx "$KCTX" || { echo "FATAL: context $KCTX not found after cluster creation -- refusing to proceed against the ambient context"; exit 1; }
+kubectl() { command kubectl --context "$KCTX" "$@"; }
+helm() { command helm --kube-context "$KCTX" "$@"; }
+
 echo "== 2. Kyverno PINNED chart $KYVERNO_CHART (== app v1.18.2, matches fleet) =="
 helm repo add kyverno https://kyverno.github.io/kyverno/ >/dev/null 2>&1 || true
 helm repo update kyverno >/dev/null 2>&1

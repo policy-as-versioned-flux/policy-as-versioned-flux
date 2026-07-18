@@ -59,3 +59,33 @@ only, deliberately minimal) and `up2.sh`/`down2.sh`. Brought up a real second Ki
 This is the full retirement-without-a-flag-day story from the ticket description, proven live, not
 narrated: narrowing or retiring is a one-line reviewed array change with an immediate, provable
 governance consequence -- the silent-ungovernance gap the 2022 implementation had is closed.
+
+## Follow-up (2026-07-18): cluster2 had the same never-actually-wired-into-Flux gap cluster1 had
+
+A wave-1 audit found the retirement proof above (`yq` array-element removal + re-apply) never
+actually tested the GitOps mechanism it claims: `clusters/cluster2/policy-versions.yaml` was
+still, at that point, only ever `kubectl apply`'d directly by `up2.sh` -- the exact same gap
+`fleet#55` found and fixed for cluster1 (real-estate epic, ticket 09's 2026-07-17 follow-up), just
+never ported to cluster2. A merged git PR to this file would not have propagated without a manual
+re-apply, the same silent-ungovernance failure mode this ticket exists to close.
+
+**Fixed for real, same shape as cluster1**:
+[`fleet#62`](https://github.com/policy-as-versioned-flux/fleet/pull/62) adds a `cluster-state`
+Kustomization to `clusters/cluster2/bootstrap.yaml` and an explicit
+`clusters/cluster2/kustomization.yaml`. Live-verified on the real `cluster2`: applied the updated
+bootstrap, confirmed the `ResourceSet` picked up Flux ownership labels
+(`kustomize.toolkit.fluxcd.io/name: cluster-state`), then proved genuine self-healing --
+out-of-band `kubectl patch`'d the live `ResourceSet`'s first array entry from `2.0.0` to `9.9.9`,
+confirmed it stuck immediately, then confirmed it reverted back to the git-declared `2.0.0` on its
+own within one reconcile, no manual intervention.
+
+**Real, live flakiness hit during this proof, worth recording honestly**: partway through, the
+`fleet` `GitRepository` and `kyverno` `Kustomization` briefly vanished from cluster2 entirely (not
+pruned by anything in git -- both are hand-authored in `bootstrap.yaml`, outside any
+`ResourceSet`'s generated inventory), stalling reconciliation until a fresh `kubectl apply -f
+bootstrap.yaml` recreated them and the dependency chain recovered on its own. `flux-operator`'s
+pod on this cluster shows the same kind of restart history (2 restarts, ~4h25m before this check)
+already documented as a live, open question in real-estate ticket 16 for `cluster1` -- plausibly
+the same underlying instability, not independently root-caused here. Didn't block the fix: once
+recovered, every Kustomization and `ValidatingPolicy` reached `Ready=true` and the self-healing
+proof above completed cleanly.

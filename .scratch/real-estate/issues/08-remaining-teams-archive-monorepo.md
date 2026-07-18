@@ -73,3 +73,8 @@ carries exactly the two real `datastore` subjects — `datastore-rds-noncomplian
 `spec.forProvider.multiAz must be true.`) and `datastore-rds-compliant` (`pass`) — with
 `sample-unreconciled` gone entirely, and the finding's overall status is `not-satisfied`. The
 claim this doc originally made is now actually true, not just narrated as true.
+
+**Second correction, same day**: the very same contamination class recurred within hours, via a
+different unrelated fixture (`spikes/c2p-real-job/run.sh` leaking onto this shared cluster instead
+of its own throwaway one). Cleaned up and fixed at its actual root cause -- see faithful-floor
+ticket 20's 2026-07-18 follow-up.

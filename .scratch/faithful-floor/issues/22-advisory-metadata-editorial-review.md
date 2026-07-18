@@ -33,5 +33,8 @@ its own metadata from its own body, so the property already holds before any che
 explicit that `last-reviewed` is a human-set date, not something CI bumps (that would make the
 field lie about what it means). `demo-removal/run.sh`: a real, runnable add-then-remove sequence
 in a throwaway git worktree (doesn't touch the 5 real policies) -- proves removal is a structural
-git deletion: directory gone, `kustomize build` fails on the missing path, no lingering reference
-anywhere in the tree, `git diff --stat` between the two commits is pure deletions. Ran green.
+git deletion: directory gone, `kyverno test` has nothing left to run against, no lingering
+reference anywhere in the tree, `git diff --stat` between the two commits is pure deletions. Ran
+green. **Correction (2026-07-18, wave-1 audit)**: this line and `EDITORIAL-REVIEW.md`'s own copy
+of it previously claimed a `kustomize build` check runs as part of this proof -- it doesn't; the
+script only mentions that failure mode in a comment, never actually invokes `kustomize build`.

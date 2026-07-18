@@ -6,6 +6,13 @@
 
 **Status:** done
 
+**Correction (2026-07-18, wave-1 audit)**: the title and "What to build" above (and ADR-0007's
+Consequences section) commit to "opens a PR" -- the delivered demonstrator deliberately opens a
+GitHub issue instead (`governance-agent/SPEC.md` §4: the agent has no policy-content edits to
+propose, so a PR would imply a diff that never exists). The checklist below already hedges this
+correctly ("PR/issue"); the title/description never caught up to what was actually built and
+should have.
+
 - [x] Given a policy whose rationale is contradicted/staled by the signal, the agent opens a PR/issue framing the decision in business terms
 - [x] The PR proposes editorial review; no enforcement file is modified by the agent
 - [x] Noise reduction demonstrable: an irrelevant signal produces no PR

@@ -78,3 +78,10 @@ at admission with the same message a Pod gets; all three real, labelled `datasto
 exemplars still pass unaffected; `sample-unreconciled` now correctly shows `orphan-guard: fail` in
 its background `PolicyReport` while remaining un-evicted (still running, 3 days old) -- reported,
 never evicted, exactly the documented invariant.
+
+**Third correction, same day**: shortly after the orphan-guard fix above, a wave-1 audit found 3
+stray unversioned duplicate `ValidatingPolicy`s and 2 fixture Crossplane CRs sitting live on this
+same shared cluster, outside GitOps control -- leaked by `spikes/c2p-real-job/run.sh` applying
+directly to the ambient context instead of its own throwaway KiND cluster. Cleaned up and fixed at
+the actual root cause (a hard context guard, not a one-off cleanup) -- see faithful-floor ticket
+20's 2026-07-18 follow-up for the full story and live proof.

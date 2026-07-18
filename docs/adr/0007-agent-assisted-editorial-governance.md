@@ -39,6 +39,11 @@ problem — honest, as the mea-culpa frames it.
 ## Consequences
 
 - A new component (the governance agent) and a metadata schema enter the design.
-- The agent demonstrator is bounded: one external signal source, opens PRs, proves the contract.
+- The agent demonstrator is bounded: one external signal source, proves the contract. **Correction
+  (2026-07-18, wave-1 audit)**: this originally said "opens PRs" -- the actual demonstrator
+  (issue 24, `governance-agent/SPEC.md` §4) deliberately opens GitHub issues instead, because the
+  agent has no policy-content edits to propose; a PR implies a diff, and this signal path never
+  has one. The never-edits-enforcement invariant (issues:write only, no contents/pull-requests
+  write) is the point, not an implementation detail this line should have overridden.
 - This is the most novel, least-Flux part of the work and the clearest original contribution beyond
   both the 2022 implementation and collie.

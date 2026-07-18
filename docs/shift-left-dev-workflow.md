@@ -9,39 +9,45 @@ CLI you'd install anyway: `git`, `kyverno`, `kustomize`, `flux`, `gitsign`).
 CI runs the *same* commands (not a reimplementation of them), so laptop and
 CI cannot drift:
 [`policy/.github/workflows/release.yml`](https://github.com/policy-as-versioned-flux/policy/blob/main/.github/workflows/release.yml)
-and [`fleet/pr-gate-check.sh`](https://github.com/policy-as-versioned-flux/fleet/blob/main/pr-gate-check.sh)
+and [`pr-gate-action/pr-gate-check.sh`](https://github.com/policy-as-versioned-flux/pr-gate-action/blob/main/pr-gate-check.sh)
+(extracted from `fleet` into its own component repo, real-estate epic ticket 03)
 call `kyverno test`, `gitsign verify-tag`, and `flux build --dry-run` exactly
 as shown here — this doc's steps are a subset+narration of what those two
 already do, not a parallel invention.
 
 ## 0. Find what's actually pinned
 
-The versions a cluster runs live in one place:
+**Correction (2026-07-18, wave-1 audit)**: an earlier version of this section hardcoded a
+version/tag/commit table "as of this writing" — it drifted the very next day (issue 08 retired
+`v2.1.1` for `v2.2.0`) and every worked example below that used it started producing a *different*
+verdict than what it claimed, unnoticed until this audit. Querying the live cluster is the durable
+fix — it can't go stale the way a snapshotted table can:
+
+```sh
+kubectl get resourceset policy-versions -n flux-system \
+  -o jsonpath='{.spec.inputs[0].versions}' | jq .
+```
+
+Or read the git source of truth directly:
 [`fleet/clusters/cluster1/policy-versions.yaml`](https://github.com/policy-as-versioned-flux/fleet/blob/main/clusters/cluster1/policy-versions.yaml),
-`spec.inputs[0].versions[]`. As of this writing, `cluster1` pins:
-
-| `version` (label workloads use) | `tag` (what to check out) | `commit` |
-|---|---|---|
-| `1.0.0` | `v1.0.1` | `95a0576f04837b599b5cfbf1fae6908728197fc6` |
-| `2.0.0` | `v2.0.1` | `e505587b1f8ab674b6147a8c955f468b49fa9ab4` |
-| `2.1.1` | `v2.1.1` | `95579dd567b2c0e490ce56aeb0504290085651f6` |
-
-(`version` and `tag` differ for the first two because those are CI-only-fix
-patch releases — see the policy repo's README. Always check out by `tag`.)
+`spec.inputs[0].versions[]`. Either way, pick one entry and note its `version` (the label
+workloads use), `tag` (what to check out below — `version` and `tag` differ whenever a release is
+a CI-only-fix patch, see the policy repo's README), and `commit`. The rest of this doc calls that
+chosen tag `$TAG` and version `$VERSION` — substitute your own values from here on.
 
 ## 1. Clone the exact pinned commit
 
 ```sh
-git clone --branch v2.1.1 https://github.com/policy-as-versioned-flux/policy
+git clone --branch "$TAG" https://github.com/policy-as-versioned-flux/policy
 cd policy
-git rev-parse HEAD   # should print 95579dd567b2c0e490ce56aeb0504290085651f6
+git rev-parse HEAD   # should match the commit from step 0
 ```
 
 ## 2. Provenance: verify the tag before trusting anything in it
 
 ```sh
-git fetch origin '+refs/tags/v2.1.1:refs/tags/v2.1.1' --force  # see note below
-GITSIGN_REKOR_MODE=offline gitsign verify-tag v2.1.1 \
+git fetch origin "+refs/tags/$TAG:refs/tags/$TAG" --force  # see note below
+GITSIGN_REKOR_MODE=offline gitsign verify-tag "$TAG" \
   --certificate-identity=chris@cns.me.uk \
   --certificate-oidc-issuer=https://accounts.google.com
 ```
@@ -87,13 +93,13 @@ versions the cluster runs.**
 
 ```sh
 kustomize build workloads/kyverno/require-known-department-label > /tmp/policy.yaml
-cat > /tmp/sample-workload.yaml <<'EOF'
+cat > /tmp/sample-workload.yaml <<EOF
 apiVersion: v1
 kind: Pod
 metadata:
   name: sample-workload
   labels:
-    mycompany.com/policy-version: "2.1.1"
+    mycompany.com/policy-version: "$VERSION"
     department: not-a-real-department
 spec:
   containers:
@@ -103,7 +109,7 @@ EOF
 kyverno apply /tmp/policy.yaml --resource=/tmp/sample-workload.yaml
 ```
 ```
-policy require-known-department-label-2.1.1 -> resource default/Pod/sample-workload failed:
+policy require-known-department-label-$VERSION -> resource default/Pod/sample-workload failed:
 1 -  The 'department' label, if set, must be one of: platform, finance, security, engineering, legal.
 
 pass: 0, fail: 1, warn: 0, error: 0, skip: 0
@@ -120,7 +126,7 @@ Unlike steps 1–5, this one needs `kubectl` access to a real cluster (it's a
 diff *against* what's actually running there, not an offline render):
 
 ```sh
-flux diff kustomization policy-2.1.1-require-known-department-label \
+flux diff kustomization "policy-$VERSION-require-known-department-label" \
   --path=./workloads/kyverno/require-known-department-label
 ```
 

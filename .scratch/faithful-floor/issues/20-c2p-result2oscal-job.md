@@ -66,3 +66,38 @@ minimal schema-permissive **stand-ins**, not the real Upbound provider-family pa
 issue 18's Flux-installed packages). The C2P artifacts (component-definition, collection shim,
 independent schema validation) this ticket owns are done and ready for issue 19 to wire in once its
 signing blocker clears — same "real progress, downstream still blocked" state as issue 18.
+
+## Follow-up (2026-07-18): the spike's own cluster isolation was silently broken, twice
+
+A wave-1 audit found `spikes/c2p-real-job/run.sh` had leaked real writes onto the shared
+`kind-cluster1` live cluster -- 3 unversioned duplicate ValidatingPolicies (one in weaker `Audit`
+mode, materially different from the real `-2.2.0` Deny gate) plus 2 fixture Crossplane CRs, all
+outside GitOps control, contaminating ticket 08's live OSCAL-attribution proof (the exact class of
+bug that ticket's own c2p-collector fix had just closed, recurring via a different fixture). Root
+cause: the script's `kubectl`/`helm` calls relied entirely on `kind create cluster` having switched
+the ambient current-context, with no check that it actually had -- when that assumption broke
+(however it broke), every apply landed on whatever cluster the ambient context happened to point
+at instead, silently.
+
+**Cleaned up and fixed for real.** Deleted the 5 stray live artifacts. Hardened `run.sh`: every
+`kubectl`/`helm` call is now pinned via a shell-function override to this job's own
+`kind-$CLUSTER` context explicitly, with a hard `exit 1` guard if that context doesn't exist after
+cluster creation -- structurally impossible to touch any other cluster regardless of ambient state.
+Live-verified end-to-end: ran the full spike from `kind-cluster1`'s own context, confirmed
+`kubectl config current-context` was `kind-c2p-real-job` throughout, both OSCAL passes produced the
+expected satisfied/not-satisfied verdicts and validated against the independent schema, the
+throwaway cluster self-tore-down on exit, and `cluster1`'s own `ValidatingPolicy` set was
+byte-for-byte unchanged before and after the run.
+
+**Considered and deliberately deferred**: the same skeptic pass suggested c2p-collector's own
+aggregation (real-estate ticket 08's `run.sh`) is still architecturally permissive -- it filters
+`skip` results but folds in *any* resource carrying a matching `mycompany.com/policy-version`
+label regardless of whether Flux actually manages it (checkable via the
+`kustomize.toolkit.fluxcd.io/name` label every Flux-applied resource carries, confirmed present on
+all real `datastore` exemplars and absent on every stray artifact seen so far). That's a real,
+generalizable hardening -- but it requires an extra per-resource `kubectl get` lookup for every
+scoped resource in the collection pipeline (the `PolicyReport.scope` field doesn't carry labels),
+meaningful added complexity for a demo project where both *observed* root causes (the skip-result
+gap, this spike's context leak) are now independently closed at their actual source. Left as a
+known, considered opportunity for a future session rather than added speculatively for a
+contamination class that no longer has a live path to occur.

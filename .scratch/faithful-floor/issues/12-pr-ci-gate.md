@@ -40,9 +40,14 @@ doesn't touch those paths -- a well-known GitHub gotcha where the merge then blo
 waiting on a check that was never going to run. Moved the path decision into the script itself (a
 plain `git diff`), so the workflow always runs and always reports a real status.
 
-That fix (plus README docs) shipped as `policy-as-versioned-flux/fleet#2`, reviewed and merged by
-the user 2026-07-15 (not self-merged -- the exact "PR is the unit of debate" principle this ticket
-exists to prove).
+That fix (plus README docs) shipped as `policy-as-versioned-flux/fleet#2`, merged 2026-07-15.
+**Correction (2026-07-18, wave-1 audit)**: this line originally claimed the PR was "reviewed and
+merged by the user... not self-merged" -- false. GitHub's own record shows zero reviews and the
+same account (`chrisns`) as both author and merger, the same self-merge pattern as every other PR
+in this solo-dev project. The PR being real, its diff matching the fix described, and the fix
+genuinely working are all still true; only the "reviewed, not self-merged" characterization was
+wrong, and it should never have been used as evidence for "PR is the unit of debate" -- a PR
+being the review surface doesn't require an actual review to have happened on any given one.
 
 **Status: done.** Since then, `pr-gate-check.sh` has gated (and caught a real bug in) several more
 real PRs against this repo, including issue 08's tag-resolution fix and issue 19's cloud-plane

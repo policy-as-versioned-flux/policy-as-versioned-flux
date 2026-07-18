@@ -37,3 +37,25 @@ Named the one thing this flow can't reach: the shared-Kyverno-webhook bug issue 
 manifests with multiple policy versions installed simultaneously, which `kyverno apply`'s offline
 single-policy evaluation has no way to reproduce (that's what `fleet/verify-coexistence.sh` is
 for).
+
+## Follow-up (2026-07-18): the actual doc, not just this ticket's narrative, had gone stale
+
+A wave-1 adversarial audit found the previous "Correction" above fixed this ticket's own
+cross-reference wording but missed that `docs/shift-left-dev-workflow.md` -- the real shipped
+deliverable, not just this ticket wrapper -- was independently stale in a more serious way: its
+"as of this writing" pinned-version table (`v1.0.1`/`v2.0.1`/`v2.1.1`) was overtaken the very next
+day when issue 08 retired `v2.1.1` for `v2.2.0`, and every worked example downstream of that table
+(the `kyverno apply` verdict, the `flux diff` command) had been silently producing a *different*
+result than what the doc claimed ever since -- unnoticed for three days because nobody re-ran the
+doc verbatim after that retirement.
+
+**Fixed for real, and for the future**: rather than re-pinning a new snapshot that would just
+drift again, `docs/shift-left-dev-workflow.md` now tells the reader to query the live
+`ResourceSet` (or the git source of truth) in step 0 and carries the chosen `$TAG`/`$VERSION`
+through every subsequent step as a substitution, instead of a hardcoded literal. Live-verified
+end-to-end against the currently-pinned `v2.2.0`: clone, gitsign verify-tag, `./verify.sh`, the
+offline `kyverno apply` verdict, a live-cluster cross-check via `kubectl apply --dry-run=server`
+(identical denial message), and `flux diff` (empty, i.e. matches live state) -- all six steps,
+real commands, real output, matching what the doc now claims. Also fixed the doc's own
+`fleet/pr-gate-check.sh` link to point at its real current location,
+`pr-gate-action/pr-gate-check.sh`.
