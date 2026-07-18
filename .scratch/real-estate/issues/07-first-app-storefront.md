@@ -21,8 +21,14 @@ is the dependency staleness signal, not a compiled Angular bundle).
 
 **Real finding along the way:** the first deploy was refused — `department: retail` isn't in
 `require-known-department-label`'s allowed set (`platform, finance, security, engineering,
-legal`). Fixed to `engineering`, re-reconciled, admitted clean. Kept as evidence the gate is real,
-not theater — first bad label, caught and refused, exactly as designed.
+legal`). Fixed to `engineering`, re-reconciled, admitted clean **against every Deny-mode gate**
+(the actual admission-blocking tier). Kept as evidence the gate is real, not theater — first bad
+label, caught and refused, exactly as designed. **Precision note**: the pod's full live
+`PolicyReport` also carries a third, non-blocking result, `require-owner-annotation-2.2.0: fail`
+(`Audit` mode, not `Deny` — same disclosed no-owner-annotation-yet gap ticket 10 already documents
+for every 2.2.0 app, including `api`). "Admitted clean" is accurate for the Deny-tier gate this
+finding is about; it was never accurate for the full PolicyReport, and this doc should have said
+so from the start rather than only quoting the two passing Deny-mode results.
 
 Live-verified: `storefront` Deployment `Running`, its `Kustomization` `Ready` with the real applied
 revision, and its workload produces real `policy_report_result` entries (`4` of the app workloads

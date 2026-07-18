@@ -28,20 +28,43 @@ source, out of scope for this repo.
 
 **Real, live consequence, not hypothetical**: during each ~0.5s window, the two Kyverno
 `ValidatingPolicy` objects enforcing labels for policy version `1.0.0` are absent — a workload
-admission request landing in that exact window would not be evaluated against those two policies
-(though `orphan-guard`'s own allow-list was not observed to drop `'1.0.0'` during any captured
-window — it appears to reconcile on a separate path from the per-version `GitRepository`/
-`Kustomization` GC). On a project whose whole stated premise is deny-at-admission guarantees, an
-enforcement gap — even a sub-second one, recurring roughly hourly — is worth recording precisely
-rather than glossed over.
+admission request landing in that exact window would not be evaluated against those two policies.
 
-**Practical risk, assessed honestly**: low. The flap window is sub-second, self-heals without
-intervention, has never been observed to actually admit a non-compliant workload in this session
-(no incident correlates with any of the 24 timestamps), and only affects the specific policy
-version whose array entry happens to be processed on the affected reconcile pass. This is a
-genuine gap in an always-on guarantee, not a theoretical one — but it is not the kind of gap this
-epic's own tooling (Kyverno, Flux Kustomization, `orphan-guard`) can fix, since the bug is in a
-different controller's (`flux-operator`'s `ResourceSet` reconciler) own reconcile-loop timing.
+**Correction (2026-07-18, a skeptic pass on this very ticket)**: the original write-up claimed
+`orphan-guard`'s own allow-list was never observed to drop during a flap, "reconciling on a
+separate path" from the per-version objects — implying the cluster-wide catch-all stayed solid
+throughout. That's wrong. Live `kubectl get validatingpolicy orphan-guard` shows its own
+`creationTimestamp` is fresh (minutes old at check time, not the object's original install time),
+and the operator log contains real `"ValidatingPolicy/orphan-guard":"created"` events — not just
+`"configured"` (in-place update) — some with no adjacent per-version GC event nearby at all.
+`orphan-guard` itself gets deleted and recreated on its own cadence. This is a materially bigger
+blast radius than originally documented: during an `orphan-guard` flap window, **zero
+policy-version enforcement applies to any pod**, not just the two `1.0.0`-specific gates. Not
+currently broken (re-checked minutes after a recreation and it was actively blocking violating
+pods again), but the risk statement below is revised to reflect the real scope.
+
+**Likely-related, separately observed while investigating the correction above**: at the same time,
+`flux-operator`'s own pod was found actively crash-looping — 5 restarts in the preceding ~40
+minutes, `kubectl describe pod` showing repeated liveness/readiness probe failures
+(`context deadline exceeded`, i.e. timeouts, not panics) against a tight 1-second probe timeout.
+This plausibly explains the flap mechanism better than the original "slow reconcile pass" theory:
+every pod restart resets the ResourceSet controller's in-memory reconcile state, and the first
+reconcile after a cold start computing an incomplete desired-resource set (before its watch caches
+are fully warm) would produce exactly this delete-then-immediately-recreate pattern — for whichever
+objects are unlucky enough to be evaluated during that narrow window, which needn't be the same
+object every time. Not conclusively proven (didn't have time to correlate all 24 historical flap
+timestamps against operator pod restart history before this write-up), but a real, live,
+independently-observed fact worth recording rather than treating the two findings as unrelated.
+
+**Practical risk, assessed honestly, revised**: still real, and now known to be somewhat larger in
+scope than first documented (cluster-wide during an `orphan-guard` flap, not just two policies).
+Still self-heals without intervention, still hasn't been observed to actually admit a
+non-compliant workload in this session. If the crash-loop correlation above is right, the flap
+frequency plausibly tracks how often `flux-operator`'s pod restarts — which itself may be
+sensitive to how much concurrent API load the cluster is under (this session ran an unusually
+heavy, sustained adversarial-verification workload immediately before the crash-loop was
+observed) rather than being a constant background rate. Worth re-measuring under normal,
+non-audit load before treating the "~24 times over 4 days" baseline as representative.
 
 **Status: documented, not fixed — no faithful in-repo fix exists.** This is upstream
 `flux-operator`/`fluxcd.controlplane.io` controller behavior, not a defect in this project's own
@@ -54,4 +77,9 @@ away from the single-`ResourceSet`-with-nested-array design entirely — a much 
 change that would undermine ADR-0005's whole rationale for using a `ResourceSet` in the first
 place. Left as an honestly-recorded, low-risk, upstream-controller limitation for a future session
 (or an upstream bug report against `fluxcd.controlplane.io`/`flux-operator`) to pick up, rather than
-silently omitted from the epic's record.
+silently omitted from the epic's record. One candidate worth a future look, given the crash-loop
+correlation found above: `up.sh`'s `helm upgrade --install flux-operator` call passes no values
+override at all, so the chart's default (tight) liveness/readiness probe timeouts apply as-is —
+loosening them via a real Helm values change is a genuine in-repo lever, if a future session
+confirms probe-timeout-induced restarts are actually the flap's proximate cause rather than just a
+correlated observation.
