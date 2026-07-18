@@ -6,7 +6,10 @@ project's own standard for real bugs (see Episode 1's webhook-flattening/go-git 
 `docs/HISTORY.md`).
 
 **What's happening, live-confirmed**: `flux-operator`'s ResourceSet controller (`resourceset`
-controller, `fluxcd.controlplane.io`, chart-pinned `v0.55.0` per ADR-0005) periodically
+controller, `fluxcd.controlplane.io`, chart-pinned `v0.55.0` in `fleet`'s own `up.sh` — **correction
+(2026-07-18, wave-10 audit)**: an earlier draft of this line cited ADR-0005 for the version pin;
+ADR-0005 never mentions a version number, only the architectural choice to use a `ResourceSet` at
+all) periodically
 garbage-collects and immediately recreates `GitRepository/policy-1.0.0` and its two
 `Kustomization`s (`policy-1.0.0-require-department-label`, `policy-1.0.0-require-known-department-label`),
 with **no corresponding git change** — the array entry in `clusters/cluster1/policy-versions.yaml`

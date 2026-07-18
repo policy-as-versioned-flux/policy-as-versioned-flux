@@ -149,9 +149,9 @@ readiness-collector image pins weren't actually bumpable dependencies as claimed
 ([`fleet#49`](https://github.com/policy-as-versioned-flux/fleet/pull/49)); the same
 "repo lacks a local `renovate.json`" root cause ticket 06 diagnosed for four app repos turned out
 to apply to three more repos nobody had checked (`c2p-collector`, `readiness-collector`, and
-`policy` itself via its own day-old dormant onboarding PR — this project's entire history spans
-2026-07-14 to 2026-07-18; nothing in it is a year old, an earlier draft of this line said "year-old"
-and a later adversarial pass caught it); the weekly governance nag's "skips
+`policy` itself via its own day-old dormant onboarding PR (`policy#7`, opened 2026-07-16, merged
+2026-07-17 — genuinely a day old, not the "year-old" an earlier draft of this line claimed, which
+a later adversarial pass caught); the weekly governance nag's "skips
 already-actioned issues" checkbox was ticked with no code behind it, now genuinely implemented and
 proven live, including the case where it correctly *doesn't* skip
 ([`fleet#50`](https://github.com/policy-as-versioned-flux/fleet/pull/50)); and eight of nine
@@ -168,6 +168,20 @@ headline claim that `ledger` (the roster's deliberately old-`log4j` laggard) wou
 landed, to be true on the policy-version axis and **false** on the vulnerability axis — `ledger`
 has fewer live CVEs (22) than either `reports` (188) or `storefront` (146). Left as the genuinely
 interesting, slightly inconvenient finding it is, not reshaped to fit the original thesis.
+
+A later pass caught two more self-inflicted errors and one real, previously-undocumented gap. The
+"day-old, not year-old" correction above had itself over-corrected into a broader false claim —
+this document briefly asserted the *entire project's* history spans 2026-07-14 to 2026-07-18,
+when only the real-estate epic does; the hub repo's actual first commit is 2026-06-06, five weeks
+earlier. Ticket 16's ADR-0005 citation for `flux-operator`'s chart version pin was wrong — the
+pin lives in `fleet`'s own `up.sh`, not the ADR, which never mentions a version number. More
+substantively: an adversarial skeptic re-checking ticket 09 found that `sunset-escalator.sh`'s
+logic was real and demonstrated by hand, but nothing in the estate ever invoked it — ADR-0010's
+"on the date itself, a machine opens a retirement PR" was aspirational, not automated. Fixed with
+a real daily-cron GitHub Actions workflow in `fleet`
+([`fleet#58`](https://github.com/policy-as-versioned-flux/fleet/pull/58)) that runs the script
+against `fleet` using the workflow's own same-repo `GITHUB_TOKEN` — no new cross-repo secret
+needed, and the script still never calls `gh pr merge`.
 
 ## Deferred decisions
 

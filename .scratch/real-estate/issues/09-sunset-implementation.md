@@ -102,3 +102,23 @@ ticket 07's follow-up.
 fact about this cluster, not a simulated one. The real `1.0.0` retirement (via `fleet#30`'s live
 escalation issue, still open, real 2026-08-15 date) will go through the identical, now-verified
 mechanism when that date arrives and a human merges the machine-opened PR.
+
+## Follow-up (2026-07-18): the PR was proven, but nothing was scheduled to open it
+
+A wave-10 adversarial skeptic pass found a real, previously-unflagged gap in the line just above
+and in this ticket's own opening description ("on the date, a machine opens a retirement PR"):
+`sunset-escalator.sh`'s logic was genuinely correct and had been demonstrated by hand twice
+(`fleet#30`/`#31`), but nothing in the estate ever *invoked* it unattended — no cron, no GitHub
+Actions schedule, nothing. `governance-agent` had zero `.github/workflows/`, and no other
+workflow in the org called the script. Unless a human remembered to run it by hand on
+2026-08-15, no retirement PR would actually have appeared that day, directly contradicting
+ADR-0010's "on the date itself, a machine opens" framing and this ticket's own checklist.
+
+**Fixed for real**: added
+[`fleet#58`](https://github.com/policy-as-versioned-flux/fleet/pull/58), a daily cron GitHub
+Actions workflow (`fleet/.github/workflows/sunset-escalator.yml`) that checks out
+`sunset-escalator.sh` from the public `governance-agent` repo and runs it against `fleet` using
+the workflow's own same-repo `GITHUB_TOKEN` — no new cross-repo PAT/secret needed, since the
+workflow lives in the same repo it needs to write to. The script still never calls `gh pr merge`,
+so ADR-0010's invariant is unchanged; only the missing trigger was added. The real `1.0.0`
+retirement will now genuinely fire unattended on 2026-08-15, not depend on anyone remembering.
