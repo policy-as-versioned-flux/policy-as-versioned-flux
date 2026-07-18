@@ -57,3 +57,24 @@ All 10 `ValidatingPolicy`s (8 workload + 2 cloud, across the 3 coexisting versio
 - Both exemplars were labelled `mycompany.com/policy-version: "2.2.0"`, going through the exact
   same coexistence/orphan-guard machinery as the workload plane -- one engine, both planes, live,
   not simulated.
+
+## Follow-up (2026-07-18): "same orphan-guard machinery" was true only for labelled exemplars
+
+A wave-1 audit of the faithful-floor epic found the checklist's "honour the same policy-version
+opt-in and orphan guard" claim was narrower than it read: it held for the two deliberately-labelled
+exemplars above, but orphan-guard's own `matchConstraints.resourceRules` only ever matched core
+`v1` Pods -- a Crossplane CR carrying no label at all (e.g. issue 18's `sample-unreconciled`) was
+structurally invisible to the guard and admitted with a `skip` PolicyReport result, not denied,
+unlike an unlabeled Pod. This directly contradicted orphan-guard's own documented purpose in
+`policy-versions.yaml`: "the guard is what makes the gate tier a locked door rather than an
+opt-in door."
+
+**Fixed for real**: [`fleet#60`](https://github.com/policy-as-versioned-flux/fleet/pull/60)
+extends orphan-guard's `resourceRules` to also cover the two Crossplane CRD types
+(`s3.aws.m.upbound.io/bucketserversideencryptionconfigurations`,
+`rds.aws.m.upbound.io/instances`), matching the two cloud policies' own scoping exactly.
+Live-verified after merge and reconcile: a dry-run of an unlabelled RDS `Instance` is now denied
+at admission with the same message a Pod gets; all three real, labelled `datastore` cloud
+exemplars still pass unaffected; `sample-unreconciled` now correctly shows `orphan-guard: fail` in
+its background `PolicyReport` while remaining un-evicted (still running, 3 days old) -- reported,
+never evicted, exactly the documented invariant.
