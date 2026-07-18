@@ -55,6 +55,10 @@ GITSIGN_REKOR_MODE=offline gitsign verify-tag "$TAG" \
 > local tag ref flattened to point straight at the commit instead of the
 > annotated tag object `gitsign` needs to verify — found the hard way in
 > issue 04. The `git fetch --force` line re-fetches the real tag object.
+> **Note (2026-07-18)**: not reproducible with the git version on this machine today (2.53.0) --
+> a plain `git clone --branch` here already leaves a genuine annotated tag ref. Real on whatever
+> git version issue 04 hit; keeping the explicit re-fetch as a harmless, defensive no-op rather
+> than relying on every reader's git version matching this one.
 
 ## 3. Fixtures: does the CEL logic behave as documented?
 

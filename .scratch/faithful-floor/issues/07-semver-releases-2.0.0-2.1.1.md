@@ -21,12 +21,16 @@ to 2.0.0, was refused at admission (would have been admitted-but-reported under 
 admitted (refused under 2.0.1's narrower enum). `verify.sh` extended to also assert every policy
 in the tree agrees on one version (a policy version covers the whole body).
 
-Same signing-mistake-then-patch pattern as v1.0.0→v1.0.1 happened twice more, each caught by the
-release pipeline's own CI gate rather than silently shipping:
+Same signing-mistake-then-patch pattern as v1.0.0→v1.0.1 happened once more, and a second, different
+kind of gap surfaced the same way (found by review, not by CI): **correction (2026-07-18, wave-3
+skeptic pass)** -- the line above previously said both incidents below were "caught by the release
+pipeline's own CI gate", but only the first was; the second bullet's own text already says CI
+passed for `v2.1.1` (confirmed live: that run's conclusion is `success`) and the gap was found by
+manual review afterward, not a CI failure.
 - `v2.0.0` was accidentally SSH-signed (a global git-config default; the local override from
   issue 04 was lost when the repo clone was recreated after an earlier incident) →
   `gitsign verify-tag` failed in CI as designed → `v2.0.1` is the working major-2 release.
-- `v2.1.1` shipped correctly, but then I found "release notes state what changed and why" wasn't
+- `v2.1.1` shipped correctly (CI green), but then I found "release notes state what changed and why" wasn't
   actually true: `gh release create --generate-notes` alone only produces a commit-list changelog,
   not the semver-by-verdict-impact narrative written into the annotated tag message. Fixed
   `release.yml` to prepend `git tag -l --format='%(contents)'` to the release body — but proving

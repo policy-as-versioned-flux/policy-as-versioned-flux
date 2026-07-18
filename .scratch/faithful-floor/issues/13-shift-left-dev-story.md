@@ -7,7 +7,11 @@
 **Status:** done
 
 - [x] Following the doc verbatim on a clean laptop reproduces the same admit/deny verdict the cluster gives for a sample workload
-- [x] The flow uses only native CLIs — no wrapper scripts
+- [x] The flow uses only native CLIs — no wrapper scripts (**wave-3 nuance**: step 3 runs
+      `./verify.sh`, a real bash script, to check fixtures against the policy body -- a wrapper
+      by a plain reading. The steps that reproduce the actual admission verdict, steps 1/2/4/5/6,
+      are genuinely native-CLI-only; this item is accurate for the verdict-reproduction flow the
+      ticket is centrally about, not literally every command the doc mentions)
 - [x] CI runs the same commands, so laptop and CI cannot drift
 
 ## Comments
@@ -54,8 +58,14 @@ drift again, `docs/shift-left-dev-workflow.md` now tells the reader to query the
 `ResourceSet` (or the git source of truth) in step 0 and carries the chosen `$TAG`/`$VERSION`
 through every subsequent step as a substitution, instead of a hardcoded literal. Live-verified
 end-to-end against the currently-pinned `v2.2.0`: clone, gitsign verify-tag, `./verify.sh`, the
-offline `kyverno apply` verdict, a live-cluster cross-check via `kubectl apply --dry-run=server`
-(identical denial message), and `flux diff` (empty, i.e. matches live state) -- all six steps,
-real commands, real output, matching what the doc now claims. Also fixed the doc's own
+offline `kyverno apply` verdict, and `flux diff` (empty, i.e. matches live state) -- real commands,
+real output, matching what the doc now claims. **Correction (2026-07-18, wave-3 skeptic pass)**:
+the sentence above previously said this proof used `kubectl apply --dry-run=server` for the
+live-cluster cross-check -- that's what I actually ran, as a more cautious substitution, but the
+doc itself (line 118) instructs a plain `kubectl apply -f /tmp/sample-workload.yaml`, a real
+mutation the doc's own "try it" framing intends. My substitution wasn't disclosed as one; it
+should have been. The dry-run I ran did produce the identical denial message quoted in the doc, so
+the substantive verdict-reproduction claim still holds, but the doc's literal plain-apply command
+was not itself independently re-exercised in this specific pass. Also fixed the doc's own
 `fleet/pr-gate-check.sh` link to point at its real current location,
 `pr-gate-action/pr-gate-check.sh`.

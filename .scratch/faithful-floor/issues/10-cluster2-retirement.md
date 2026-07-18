@@ -79,13 +79,29 @@ out-of-band `kubectl patch`'d the live `ResourceSet`'s first array entry from `2
 confirmed it stuck immediately, then confirmed it reverted back to the git-declared `2.0.0` on its
 own within one reconcile, no manual intervention.
 
-**Real, live flakiness hit during this proof, worth recording honestly**: partway through, the
-`fleet` `GitRepository` and `kyverno` `Kustomization` briefly vanished from cluster2 entirely (not
-pruned by anything in git -- both are hand-authored in `bootstrap.yaml`, outside any
-`ResourceSet`'s generated inventory), stalling reconciliation until a fresh `kubectl apply -f
-bootstrap.yaml` recreated them and the dependency chain recovered on its own. `flux-operator`'s
-pod on this cluster shows the same kind of restart history (2 restarts, ~4h25m before this check)
-already documented as a live, open question in real-estate ticket 16 for `cluster1` -- plausibly
-the same underlying instability, not independently root-caused here. Didn't block the fix: once
-recovered, every Kustomization and `ValidatingPolicy` reached `Ready=true` and the self-healing
-proof above completed cleanly.
+**Correction (2026-07-18, wave-3 skeptic pass): the "flakiness" above was wrong -- a real, fully
+deterministic, self-inflicted bug, not correlated flux-operator instability.** A wave-3 skeptic
+did the log forensics the original claim skipped and found the true, provable cause: this proof's
+own `kubectl apply -f bootstrap.yaml` ran manually, live, before `GitRepository/fleet` had polled
+forward to the commit (`fleet#62`, `7bacade`) that added the new
+`clusters/cluster2/kustomization.yaml`. `cluster-state`'s *first* reconcile therefore ran against a
+directory containing only `bootstrap.yaml`/`policy-versions.yaml` and no explicit
+`kustomization.yaml` -- kustomize-controller auto-generated an implicit one from every file
+present, silently pulling `bootstrap.yaml`'s own hand-authored `GitRepository/fleet` and
+`Kustomization/kyverno` into `cluster-state`'s managed inventory (confirmed live:
+`kustomize-controller`'s log for that reconcile literally reads
+`'GitRepository/flux-system/fleet':'configured', 'Kustomization/flux-system/kyverno':'configured'`
+at revision `6f19614`, the commit *before* `fleet#62`). Ten seconds later `GitRepository/fleet`
+polled forward to `7bacade`, landing the explicit `kustomization.yaml` that lists only
+`policy-versions.yaml` -- `cluster-state` reconciled again, its inventory no longer included
+`fleet`/`kyverno`, and its own `prune: true` correctly deleted them
+(`kustomize-controller`'s log for that exact reconcile: `"garbage collection completed:
+GitRepository/flux-system/fleet deleted\nKustomization/flux-system/kyverno deleted"`, attributed
+to the `cluster-state` `Kustomization` by name). Recovered on its own once re-applied, exactly as
+originally reported -- only the *cause* was wrong. The real lesson: manually `kubectl apply`-ing a
+`bootstrap.yaml` change ahead of the `GitRepository`'s own poll interval can race a
+just-added-in-the-same-commit `kustomization.yaml`, and kustomize-controller's implicit-generation
+fallback silently absorbs whatever else is in the directory during that window. Worth remembering
+for any future manual apply of this file, not something flux-operator's crash-looping (still a
+real, separate, genuinely open question for `cluster1` -- see real-estate ticket 16) had anything
+to do with here.

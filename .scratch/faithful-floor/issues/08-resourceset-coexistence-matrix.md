@@ -62,10 +62,20 @@ Pod shape pinned to `1.0.0` (still Audit there) admits, the same shape pinned to
 to Deny) is refused, live and simultaneous on the same cluster. Prune-on-array-removal and
 reinstall-on-re-add also proven live in the same run.
 
-Also built for this ticket, already working: `app2`/`app3` (pinned 2.0.0/2.2.0) in the `apps`
+**Correction (2026-07-18, wave-3 skeptic pass)**: the paragraph below was an earlier, stale
+snapshot left standing after the paragraph above superseded it -- it claimed the differential
+cross-version admission check was "still blocked" when the paragraph directly above it already
+documents that check passing live. It also described `app2`/`app3` (in the old `apps` monorepo)
+as "already working" in the present tense; that stopped being true 2026-07-16, when real-estate
+ticket 08 deleted `app1`/`app2`/`app3` from the live cluster and archived the `apps` repo entirely
+(`gh repo view policy-as-versioned-flux/apps` shows `isArchived: true`), superseding them with
+`ledger`/`reports`/`api`/`datastore` + `storefront`. Left below for the historical record, not
+because it's still accurate:
+
+~~Also built for this ticket, already working: `app2`/`app3` (pinned 2.0.0/2.2.0) in the `apps`
 repo, `fleet/verify-coexistence.sh` (collision-freedom, `dependsOn`/`wait` on every generated
 Kustomization, prune-on-removal -- all passing now; the differential cross-version admission check
-is the one still blocked).
+is the one still blocked).~~
 
 ## Follow-up (2026-07-18): the dependsOn/wait check was vacuously passing, never actually running
 
