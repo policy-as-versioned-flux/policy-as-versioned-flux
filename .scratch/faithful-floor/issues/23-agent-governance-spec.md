@@ -28,9 +28,16 @@ four -- the whole point is a human sees one sentence, not a CVE feed. Decision f
 ADR-0007 template verbatim, fixed regardless of which signal triggered it.
 
 The enforcement mechanism for "never edits enforcement" is code-level, not a permission boundary:
-the demonstrator's only write path anywhere is `gh issue create` -- no `git`/`gh pr` call exists
-in the script at all, so there's no code path that could touch enforcement content even if it
-tried. Same never-calls-the-forbidden-thing pattern as ticket 09's sunset-escalator.sh.
+the demonstrator's only writes are `gh issue create` and `gh label create` (repo metadata, not
+enforcement content) -- no `git`/`gh pr` call exists in the script at all, so there's no code path
+that could touch enforcement content even if it tried. Same never-calls-the-forbidden-thing
+pattern as the real-estate epic's ticket-09 sunset-escalator.sh. **Correction (2026-07-20, wave-5
+skeptic pass)**: this and the governance-agent docs previously said "the only write is
+`gh issue create`", overlooking the `gh label create` on demonstrator.sh line 24 -- corrected in
+all four places (here, SPEC.md §5, README.md, and the script header). The load-bearing claim
+(nothing writes enforcement *content*) is unaffected; a label is not enforcement content. (Also
+note: "ticket 09" here means the *real-estate* epic's issue 09, where sunset-escalator.sh was
+built -- in this faithful-floor epic, issue 09 is orphan-guard.)
 **Correction (2026-07-18, wave-1 audit of the faithful-floor epic)**: this paragraph originally
 claimed the mechanism was a scoped GitHub App token (`issues: write`, `contents: read` only,
 GitHub-API-enforced 403 on any write attempt) -- no such App or scoped token was ever actually set

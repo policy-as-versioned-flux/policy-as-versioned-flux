@@ -7,13 +7,16 @@ runs — no cluster access required for most of this, no bespoke tooling (the
 CLI you'd install anyway: `git`, `kyverno`, `kustomize`, `flux`, `gitsign`).
 
 CI runs the *same* commands (not a reimplementation of them), so laptop and
-CI cannot drift:
+CI cannot drift.
+[`pr-gate-action/pr-gate-check.sh`](https://github.com/policy-as-versioned-flux/pr-gate-action/blob/main/pr-gate-check.sh)
+(extracted from `fleet` into its own component repo, real-estate epic ticket 03) runs all three of
+`kyverno test`, `gitsign verify-tag`, and `flux build --dry-run` exactly as shown here;
 [`policy/.github/workflows/release.yml`](https://github.com/policy-as-versioned-flux/policy/blob/main/.github/workflows/release.yml)
-and [`pr-gate-action/pr-gate-check.sh`](https://github.com/policy-as-versioned-flux/pr-gate-action/blob/main/pr-gate-check.sh)
-(extracted from `fleet` into its own component repo, real-estate epic ticket 03)
-call `kyverno test`, `gitsign verify-tag`, and `flux build --dry-run` exactly
-as shown here — this doc's steps are a subset+narration of what those two
-already do, not a parallel invention.
+runs the first two at release time. This doc's steps are a subset+narration of what those already
+do, not a parallel invention. **Correction (2026-07-20, wave-5 skeptic pass)**: an earlier version
+of this sentence claimed *each* of the two files calls all three commands — `release.yml` has no
+`flux build` (verified live: `grep -c 'flux build' release.yml` = 0). `pr-gate-check.sh` alone
+covers all three; that's what the no-drift guarantee actually rests on.
 
 ## 0. Find what's actually pinned
 
@@ -33,12 +36,15 @@ Or read the git source of truth directly:
 `spec.inputs[0].versions[]`. Either way, pick one entry and note its `version` (the label
 workloads use), `tag` (what to check out below — `version` and `tag` differ whenever a release is
 a CI-only-fix patch, see the policy repo's README), and `commit`. The rest of this doc calls that
-chosen tag `$TAG` and version `$VERSION` — substitute your own values from here on.
+chosen `tag` field `$TAG` and the `version` field `$VERSION` — substitute your own values from
+here on. **Note the `tag` field is stored un-prefixed here (`2.2.0`), but the actual git tag is
+`v`-prefixed (`v2.2.0`)** — the ResourceSet template adds the `v` (`tag: v<< $v.tag >>` in
+`policy-versions.yaml`), so the commands below check out `v$TAG`.
 
 ## 1. Clone the exact pinned commit
 
 ```sh
-git clone --branch "$TAG" https://github.com/policy-as-versioned-flux/policy
+git clone --branch "v$TAG" https://github.com/policy-as-versioned-flux/policy
 cd policy
 git rev-parse HEAD   # should match the commit from step 0
 ```
@@ -46,8 +52,8 @@ git rev-parse HEAD   # should match the commit from step 0
 ## 2. Provenance: verify the tag before trusting anything in it
 
 ```sh
-git fetch origin "+refs/tags/$TAG:refs/tags/$TAG" --force  # see note below
-GITSIGN_REKOR_MODE=offline gitsign verify-tag "$TAG" \
+git fetch origin "+refs/tags/v$TAG:refs/tags/v$TAG" --force  # see note below
+GITSIGN_REKOR_MODE=offline gitsign verify-tag "v$TAG" \
   --certificate-identity=chris@cns.me.uk \
   --certificate-oidc-issuer=https://accounts.google.com
 ```

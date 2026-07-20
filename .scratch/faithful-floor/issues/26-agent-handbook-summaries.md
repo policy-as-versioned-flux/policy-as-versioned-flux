@@ -12,6 +12,14 @@
 
 ## Comments
 
+> **Correction (2026-07-20, wave-5 skeptic pass)**: the location and invocation below are stale.
+> The generator was extracted out of the `policy` repo into its own `handbook-generator` repo by
+> the real-estate epic's ticket 05 (2026-07-16, commit `307a3ec`) -- the `policy` repo has no
+> `handbook/` dir today. Live invocation is now `generate.sh <policy-checkout-path> <tag>
+> [--with-summaries]` (an extra leading checkout-path arg, since it's a generic tool no longer
+> living inside the repo it reads). The cache moved with it. The substance below is intact; only
+> the path/command shape changed. Same extraction/staleness already noted on the sibling ticket 25.
+
 Done 2026-07-15. `policy` repo, `handbook/generate.sh <tag> --with-summaries`: for each policy, a
 real `claude -p` headless call is given that policy's exact `rationale.md` content and asked for
 a 2-3 sentence non-technical summary — genuinely agent-authored per run, not hand-written text

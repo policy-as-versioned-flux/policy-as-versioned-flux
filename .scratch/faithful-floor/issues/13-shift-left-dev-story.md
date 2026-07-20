@@ -69,3 +69,17 @@ the substantive verdict-reproduction claim still holds, but the doc's literal pl
 was not itself independently re-exercised in this specific pass. Also fixed the doc's own
 `fleet/pr-gate-check.sh` link to point at its real current location,
 `pr-gate-action/pr-gate-check.sh`.
+
+## Follow-up (2026-07-20): the wave-1 "durable fix" itself introduced a verbatim-breaking regression
+
+A wave-5 skeptic found that the very wave-1 rewrite praised above -- replacing the hardcoded
+version table with "query the live `ResourceSet` and substitute `$TAG`" -- introduced a new
+break: the `ResourceSet`'s `tag` field is stored *un-prefixed* (`2.2.0`), but the actual git tag
+is `v`-prefixed (`v2.2.0`; the template adds the `v`). So step 0 produced `$TAG=2.2.0` and step 1's
+`git clone --branch "$TAG"` failed outright (`fatal: Remote branch 2.2.0 not found`). The old
+hardcoded table happened to list `v`-prefixed tags and never hit this. Fixed the doc: step 0 now
+states the ref is `v`-prefixed and steps 1/2 clone/verify `v$TAG` -- live-verified that
+`git clone --branch v2.2.0` resolves to the expected commit. Separately, the skeptic found the
+doc's CI cross-reference claimed *both* named CI files call all three commands; corrected -- only
+`pr-gate-check.sh` runs all three, `release.yml` runs `kyverno test` + `gitsign verify-tag` but no
+`flux build` (verified live).
