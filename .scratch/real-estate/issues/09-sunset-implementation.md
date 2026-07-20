@@ -122,3 +122,35 @@ the workflow's own same-repo `GITHUB_TOKEN` — no new cross-repo PAT/secret nee
 workflow lives in the same repo it needs to write to. The script still never calls `gh pr merge`,
 so ADR-0010's invariant is unchanged; only the missing trigger was added. The real `1.0.0`
 retirement will now genuinely fire unattended on 2026-08-15, not depend on anyone remembering.
+
+## Follow-up (2026-07-20): the cron fired, but its retirement-PR path had never actually been exercised
+
+A wave-5 skeptic flagged that `fleet#58` was verified only on file-existence/contents evidence:
+the three real Actions runs (07-18/19/20) all took the *escalation-issue* branch (1.0.0's sunset
+was still ~28 days out), so the *retirement-PR* branch — the one that matters on 2026-08-15 — had
+never once run under the Actions `GITHUB_TOKEN`. Rather than argue it statically, I made the path
+testable (a `sunset_override` dispatch input) and ran it for real with an overridden post-sunset
+date. That empirical run found **three** distinct failures the retirement path would hit, in an
+order static analysis got wrong:
+
+1. **`git commit` → `fatal: empty ident name`** — the Actions runner has no git identity and the
+   script commits a fresh clone. The skeptic didn't predict this one, and it fires *first*, before
+   the push/create steps it did predict. Fixed: `fleet#66` sets the `github-actions[bot]` identity.
+2. **`git push` credentials** — the script's own `git clone` to a tmp dir bypasses
+   `actions/checkout`'s credential helper. Fixed: `fleet#65` runs `gh auth setup-git`.
+3. **`gh pr create` → `GitHub Actions is not permitted to create or approve pull requests`** — the
+   real, isolated, confirmed blocker, reproduced live after (1) and (2) were fixed and the branch
+   pushed successfully. This is the org/repo setting "Allow GitHub Actions to create and approve
+   pull requests" (REST `can_approve_pull_request_reviews`), OFF at the **org** level for
+   `policy-as-versioned-flux`.
+
+**Honest current state**: the retirement path is now fixed and proven up to the last step; the
+one thing standing between it and a fully-unattended 2026-08-15 retirement PR is a single
+org-level GitHub setting toggle. That's an org-admin action requiring `admin:org` scope this
+session's credentials don't (and shouldn't) hold — a genuine, correctly-scoped "needs an admin at
+the keyboard" step, now narrowed to exactly one checkbox (or, alternatively, swapping the
+workflow's `GITHUB_TOKEN` for a fine-grained PAT secret with `pull-requests: write`, which also
+needs the operator to create it). The escalation-issue path — which is what actually runs every
+day until the sunset date arrives — works fully unattended today, proven by three real runs.
+*(This section will be updated to "fully closed, retirement PR opens unattended" once that toggle
+is flipped and the forced-override test re-run confirms it.)*
