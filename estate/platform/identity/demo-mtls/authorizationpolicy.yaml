@@ -1,0 +1,21 @@
+# pong admits callers by SPIFFE principal, not network position. Only a peer
+# presenting the SPIRE-signed `ping` SVID may reach pong; anything else (no
+# SVID, or a different identity) is denied by the mesh even from the same node.
+#
+# This is the base-identity form. Ticket 17's posture-gated variant swaps the
+# exact principal for a posture-path prefix — e.g.
+#   principals: ["spiffe://acme.internal/posture/current/*"]  (glob prefix) —
+# so only current-posture callers reach it. Same mechanism, tightened source.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: pong-allow-ping
+  namespace: mesh-demo
+spec:
+  selector:
+    matchLabels: { app: pong }
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: ["spiffe://acme.internal/ns/mesh-demo/sa/ping"]

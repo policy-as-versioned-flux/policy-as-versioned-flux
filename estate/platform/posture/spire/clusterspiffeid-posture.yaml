@@ -1,0 +1,41 @@
+# The posture SVID (ticket 15). A SECOND ClusterSPIFFEID, coexisting with the
+# base `mesh-base` (estate/platform/identity/spire/clusterspiffeid-mesh.yaml):
+# its spiffeIDTemplate reads the Kyverno-stamped `posture.acme.io/version` label
+# and bakes  posture/<vN>  as a LEADING path segment of the SPIFFE URI.
+#
+#   base :  spiffe://acme.internal/ns/<ns>/sa/<sa>
+#   this :  spiffe://acme.internal/posture/<vN>/ns/<ns>/sa/<sa>
+#
+# Posture leads the path so Istio AuthorizationPolicy (ticket 17) matches it with
+# ONE prefix wildcard — `principals: ["spiffe://acme.internal/posture/2.0.0/*"]`
+# — and OpenBao's jwt role globs it in `bound_claims["/sub"]`. This is why the
+# label rides in the PATH, not a JWT claim: SPIRE has no native per-entry custom
+# claims (research 16 Q2 option D), but the URI SAN / `sub` IS signed by the
+# SPIRE CA — so posture is a real attested SVID property, not a soft k8s label.
+# The label is only the private template input; forge it and stamp-posture /
+# posture-trust-boundary (this ticket's Kyverno pair) refuse it at admission.
+#
+# spire-controller-manager reconciles this into one registration entry per
+# matching pod on Pod/CRD change and every ~10s gcInterval, so when the currency
+# controller (ticket 16) flips a stale pod's label, the entry (and thus the
+# renewing SVID) is gone within ~10s + one JWT TTL.
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: posture
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: posture
+spec:
+  spiffeIDTemplate: "spiffe://{{ .TrustDomain }}/posture/{{ index .PodMeta.Labels \"posture.acme.io/version\" }}/ns/{{ .PodMeta.Namespace }}/sa/{{ .PodSpec.ServiceAccountName }}"
+  # Meshed pods that carry a posture (stamped by Kyverno). A pod with no posture
+  # label matches only mesh-base and keeps its plain, un-postured SVID.
+  podSelector:
+    matchLabels:
+      spiffe.io/spire-managed-identity: "true"
+    matchExpressions:
+      - { key: "posture.acme.io/version", operator: Exists }
+  # X.509 for mTLS; JWT deliberately short so an out-of-currency caller loses its
+  # OpenBao secret within minutes once the label flips (research 16 Q4, ticket 17).
+  ttl: 1h
+  jwtTtl: 5m

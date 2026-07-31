@@ -1,0 +1,31 @@
+# Reach gate (ticket 17). Istio admits callers of customer-accounts-reset by
+# SPIFFE *principal*, matched against the CURRENT-posture path prefix — not by IP
+# and not by a per-caller allowlist. The prefix wildcard works because ticket 15
+# put posture as the LEADING path segment (spiffe://…/posture/<vN>/ns/…/sa/…):
+# ONE glob matches every current-posture identity regardless of ns/sa.
+#
+#   current caller SVID  spiffe://acme.internal/posture/2.0.0/ns/…/sa/teller-current  -> ALLOW
+#   stale caller SVID    spiffe://acme.internal/posture/1.0.0/ns/…/sa/teller-stale    -> no match
+#   base/de-postured SVID spiffe://acme.internal/ns/…/sa/…  (no posture segment)      -> no match
+#
+# ALLOW with a single rule => default-deny for everything the rule doesn't admit
+# (Istio: once any ALLOW policy selects a workload, unmatched requests are
+# denied). So the stale and de-postured callers lose reach with no extra Deny.
+#
+# "Current" == 2.0.0, the latest element of platform's version array
+# (distribution/versions.yaml). Retiring 2.0.0 (or bumping to 3.0.0) is the one
+# edit that moves the bar; keep this prefix and OpenBao's bound_claims glob
+# (openbao-role.yaml) on the SAME version — reach.py selfcheck asserts they agree.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: reset-allow-current-posture
+  namespace: tuppence-reset
+spec:
+  selector:
+    matchLabels: { app: customer-accounts-reset }
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: ["spiffe://acme.internal/posture/2.0.0/*"]

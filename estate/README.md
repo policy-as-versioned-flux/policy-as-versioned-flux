@@ -18,6 +18,19 @@ research-only (archived last, ticket 27).
 Dependency direction (every hop is a signed, versioned, Renovate-bumpable
 dependency): `nist`/`ico` → `platform` → `{driftwood,tuppence,ludlow}`.
 
+Two cross-cutting dirs (not repos): [`verify/`](verify/) holds the
+cross-institution money-shot beats (proportionality, provenance);
+[`talk/`](talk/) holds the Marp deck + demo runbook that tour the whole estate.
+
+## Touring the talk
+
+```sh
+estate/talk/verify-all.sh    # the deck's honesty gate: every LIVE beat -> a passing verify
+estate/talk/up.sh            # idempotent, offline-safe, audience-modular bring-up
+```
+
+See [`talk/deck.md`](talk/deck.md) (Marp) and [`talk/RUNBOOK.md`](talk/RUNBOOK.md).
+
 ## Quick start (driftwood — the live one)
 
 ```sh

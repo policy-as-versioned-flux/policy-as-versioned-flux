@@ -1,0 +1,40 @@
+# Coexistence + self-scoping matrix, offline (`kyverno test`).
+# Each version judges ONLY the pods that claim it; the other version's pods and
+# the unversioned pod are `skip` (out of scope) — proving matchConditions
+# self-scoping and side-by-side coexistence with no shared-webhook collision.
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: require-nonroot-coexistence
+policies:
+  - ../../policies/v1.0.0/require-nonroot.yaml
+  - ../../policies/v2.0.0/require-nonroot.yaml
+resources:
+  - resources.yaml
+results:
+  # --- policy 1.0.0 sees only the 1.0.0 pods ---
+  - policy: require-nonroot-1-0-0
+    kind: Pod
+    resources: [pod-1-compliant]
+    result: pass
+  - policy: require-nonroot-1-0-0
+    kind: Pod
+    resources: [pod-1-violating]
+    result: fail
+  - policy: require-nonroot-1-0-0
+    kind: Pod
+    resources: [pod-2-compliant, pod-2-violating, pod-unversioned]
+    result: skip
+  # --- policy 2.0.0 sees only the 2.0.0 pods ---
+  - policy: require-nonroot-2-0-0
+    kind: Pod
+    resources: [pod-2-compliant]
+    result: pass
+  - policy: require-nonroot-2-0-0
+    kind: Pod
+    resources: [pod-2-violating]
+    result: fail
+  - policy: require-nonroot-2-0-0
+    kind: Pod
+    resources: [pod-1-compliant, pod-1-violating, pod-unversioned]
+    result: skip

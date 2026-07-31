@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ludlow
+  labels:
+    app.kubernetes.io/part-of: ludlow
+    # ludlow is the US health / HIPAA institution (Deny-heavy, strictest risk skin).
+    policy-as-versioned.dev/institution: ludlow

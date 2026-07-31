@@ -1,0 +1,49 @@
+# tpm_devid — the SPIRE SERVER node-attestor that lets a LAPTOP earn a SPIFFE ID
+# from the SAME acme.internal trust domain that issues workload SVIDs (ticket 14).
+# The device becomes a first-class SPIFFE identity, not a parallel system — the
+# spec's "one attestation root, literal" for the device actor.
+#
+# HOW THIS APPLIES: this is a values OVERLAY for ticket 14's `spire` HelmRelease
+# (estate/platform/identity/spire/helmrelease.yaml) — it is NOT a second release
+# (that would collide). up.sh applies it as a Flux HelmRelease patch via
+# `valuesFrom`/merge; or a venue merges this block into that release's values and
+# re-reconciles. Kept in THIS ticket's area so ticket 14's file stays untouched.
+#
+# tpm_devid verifies, server-side, that the DevID key (IEEE 802.1AR) actually
+# lives in the laptop's TPM: it checks the endorsement-cert chain to a
+# MANUFACTURER CA and runs a proof-of-residency challenge. That is what makes the
+# device signal hardware-rooted, not a self-asserted label.
+#
+# Reality knob (be honest on stage): Apple-Silicon Macs have NO TPM (the Secure
+# Enclave is not DevID-compatible), so the STRONG tpm_devid tier runs on the
+# Windows/Linux EUDs via UTM vTPM (swtpm) — narrated as virtual, genuine on real
+# fleet hardware. The Mac's live hardware root is its Secure-Enclave WebAuthn key
+# (see secure-enclave.md). devid-ca.pem / etc. are the manufacturer/emulated-EK
+# trust anchors mounted into the server; supply the real ones for your fleet.
+spire-server:
+  nodeAttestor:
+    tpmDevID:
+      enabled: true
+    # Keep k8s_psat (workload nodes) enabled too — this ADDS device attestation,
+    # it does not replace node attestation for the cluster's own nodes.
+    k8sPsat:
+      enabled: true
+  # Trust anchors the server verifies the DevID against. For a real fleet these
+  # are the TPM manufacturers' endorsement/DevID CA roots; for the UTM vTPM demo
+  # they are the swtpm-emulated EK roots. Supply as a mounted secret at a venue.
+  # ponytail: paths only; mount the actual PEMs from OpenBao/secret at a venue.
+  extraVolumeMounts:
+    - name: devid-trust
+      mountPath: /run/spire/devid
+      readOnly: true
+  configMap:
+    server:
+      # The plugin block SPIRE server renders for tpm_devid. devid_ca_path chains
+      # to the manufacturer CA; endorsement_ca_path anchors the EK; both drive the
+      # proof-of-residency the server demands before issuing the device SVID.
+      plugins:
+        NodeAttestor:
+          tpm_devid:
+            plugin_data:
+              devid_ca_path: /run/spire/devid/devid-ca.pem
+              endorsement_ca_path: /run/spire/devid/endorsement-ca.pem

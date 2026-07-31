@@ -1,0 +1,13 @@
+{
+  "version": "v1",
+  "name": "driftwood: legacy-till runs root (EXC-2026-001 residual)",
+  "note": "warn = the exemption is in place: a root workload with a raw socket is a standing lateral-movement/priv-esc path (full LEF). deny = condition C met (non-root or hardened), the path largely closes. residual ALE of 'warn' is the £ the ledger entry carries. Triples (min,mode,max); £/GBP, events/yr.",
+  "warn": {
+    "lef": [1, 2, 5],
+    "lm": [3000, 8000, 20000]
+  },
+  "deny": {
+    "lef": [0, 0, 1],
+    "lm": [3000, 8000, 20000]
+  }
+}

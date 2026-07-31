@@ -1,0 +1,46 @@
+{
+  "component-definition": {
+    "uuid": "b0c2f0d0-0000-4000-8000-706176662d31",
+    "metadata": {
+      "title": "policy-as-versioned-flux — Kyverno ValidatingPolicy component",
+      "last-modified": "2026-07-31T00:00:00Z",
+      "version": "1.0.0",
+      "oscal-version": "1.1.2",
+      "remarks": "C2P component-definition: maps each hand-authored Kyverno ValidatingPolicy (the Check_Id result2oscal string-matches against PolicyReport results[].policy, version suffix stripped) to the NIST 800-53r5 control it evidences. This is the sole policy<->control mapping for the up-flow; add a control-mapping[] entry to teach result2oscal a new policy."
+    },
+    "components": [
+      {
+        "uuid": "b0c2f0d0-0000-4000-8000-706176662d63",
+        "type": "policy",
+        "title": "Kyverno CEL ValidatingPolicy engine",
+        "description": "The single versioned Kyverno engine; one result stream (wgpolicyk8s.io PolicyReports) for both planes.",
+        "control-implementations": [
+          {
+            "uuid": "b0c2f0d0-0000-4000-8000-706176662d69",
+            "source": "estate/nist/catalog/NIST_SP-800-53_rev5.2.0_catalog.json",
+            "description": "NIST SP 800-53 Rev 5.2.0",
+            "implemented-requirements": [
+              {
+                "uuid": "b0c2f0d0-0001-4000-8000-706176662d01",
+                "control-id": "nist-800-53:AC-6",
+                "description": "Least Privilege — a workload runs as non-root, or (if root) is attested + hardened.",
+                "props": [
+                  { "name": "Check_Id", "ns": "https://oscal-compass.github.io/compliance-trestle/plugins/kyverno", "value": "may-run-root-if-attested" },
+                  { "name": "Check_Id", "ns": "https://oscal-compass.github.io/compliance-trestle/plugins/kyverno", "value": "require-nonroot" }
+                ]
+              },
+              {
+                "uuid": "b0c2f0d0-0001-4000-8000-706176662d02",
+                "control-id": "nist-800-53:CM-6",
+                "description": "Configuration Settings — versioned policy is pinned; unversioned workloads are rejected.",
+                "props": [
+                  { "name": "Check_Id", "ns": "https://oscal-compass.github.io/compliance-trestle/plugins/kyverno", "value": "require-policy-version" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

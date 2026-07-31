@@ -1,0 +1,9 @@
+# Reconciled by the institution's `platform-distribution` Kustomization.
+# ONLY the ResourceSet — the version array. flux-operator expands it into the
+# per-version GitRepository/Kustomization set (which reconcile ./policies/vN)
+# plus the orphan-guard. tests/ and render-orphan-guard.py are dev/CI tooling,
+# deliberately not reconciled.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - versions.yaml

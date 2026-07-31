@@ -1,0 +1,49 @@
+# cage-netpol — the GENERATE half of the graded envelope.
+#
+# The cage-tier MUTATE stamps `posture.acme.io/caged: "true"` on a behind-posture
+# pod. This GENERATING policy fires off that label and generates, in the pod's own
+# namespace, a NetworkPolicy that locks caged pods down to egress DNS only — the
+# "reach" projection of the same posture decision (spec: a cage injects a
+# NetworkPolicy). A pod that fell behind keeps running, but can no longer phone
+# out. The netpol selects by the caged label, so one policy covers every caged pod
+# in the namespace; it is torn down when the last caged pod leaves (synchronize).
+#
+# Every CEL object value is dyn()-wrapped: generator.Apply takes a map(string,dyn)
+# and CEL infers a map's value type from its entries, so a heterogeneous k8s object
+# literal must cast each value or it will not compile. ponytail: verbose but
+# mechanical — the alternative (a data-source template) is more moving parts.
+apiVersion: policies.kyverno.io/v1alpha1
+kind: GeneratingPolicy
+metadata:
+  name: cage-netpol
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: graded-enforcement
+spec:
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: is-caged
+      expression: >-
+        object.metadata.?labels['posture.acme.io/caged'].orValue('') == 'true'
+  variables:
+    - name: nsName
+      expression: "string(object.metadata.namespace)"
+  generate:
+    - expression: >-
+        generator.Apply(variables.nsName, [dyn({
+          "apiVersion": dyn("networking.k8s.io/v1"),
+          "kind": dyn("NetworkPolicy"),
+          "metadata": dyn({"name": dyn("cage-egress-lockdown"), "namespace": dyn(variables.nsName),
+                       "labels": dyn({"app.kubernetes.io/managed-by": dyn("kyverno"), "posture.acme.io/cage": dyn("egress-lockdown")})}),
+          "spec": dyn({
+            "podSelector": dyn({"matchLabels": dyn({"posture.acme.io/caged": dyn("true")})}),
+            "policyTypes": dyn(["Egress"]),
+            "egress": dyn([dyn({
+              "to": dyn([dyn({"namespaceSelector": dyn({"matchLabels": dyn({"kubernetes.io/metadata.name": dyn("kube-system")})})})]),
+              "ports": dyn([dyn({"protocol": dyn("UDP"), "port": dyn(53)})])})])})})
+        ])

@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "name": "platform: the governance apparatus governs itself",
+  "org": "platform",
+  "note": "Reflexive self-governance — the apparatus priced under its OWN model. warn = the apparatus's integrity controls OFF (an unsigned/unbounded feed poisons the £, the AI proposer auto-merges a bad policy, Flux silently heals to a bad state); deny = the same three self-controls ON (signed+sourced+bounded feeds, bounded proposer, the PR gate as hard backstop). LM is large because the apparatus governs the WHOLE estate: a compromise mis-prices or mis-enforces everywhere, not in one workload. Triples are (min,mode,max); £/GBP, events per year. Scored by ../risk/enforce.py against platform-appetite.json — the same maths that judges driftwood/tuppence/ludlow, turned on itself.",
+  "warn": {
+    "lef": [2, 5, 10],
+    "lm": [50000, 150000, 500000]
+  },
+  "deny": {
+    "lef": [0, 0, 1],
+    "lm": [50000, 150000, 500000]
+  }
+}

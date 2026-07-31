@@ -1,0 +1,56 @@
+# Entitlement gate (ticket 17). The jwt auth method is already wired to SPIRE's
+# OIDC JWKS by the substrate (estate/platform/identity/openbao/jwt-auth.yaml);
+# this Job adds the posture-bound ROLE that actually gates secret issuance, plus
+# the secret it guards and the policy that reads it.
+#
+# The role's `bound_claims` globs the JWT-SVID `sub` (== the SPIFFE ID, signed by
+# the SPIRE CA) against the SAME current-posture prefix Istio gates reach on:
+#     sub  glob  spiffe://acme.internal/posture/2.0.0/*
+# A JWT-SVID whose path carries posture/2.0.0 logs in and its token can read
+# secret/customer-accounts-reset. A stale (posture/1.0.0) or de-postured (no
+# posture segment) SVID fails bound_claims -> login refused -> no secret. Same
+# attestation, one prefix: a caller drifting out of currency loses reach AND its
+# secret. `bound_audiences=openbao` so only JWT-SVIDs minted for this audience
+# count, and the token TTL is short (5m) so entitlement decays fast once the
+# posture SVID stops renewing (posture jwtTtl is also 5m).
+#
+# Idempotent, dev-mode (root token). Re-running up.sh re-applies cleanly.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: openbao-reset-role
+  namespace: openbao
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: setup
+          image: openbao/openbao:latest   # tunable knob — pin the tour version
+          env:
+            - { name: BAO_ADDR,  value: "http://openbao.openbao.svc:8200" }
+            - { name: BAO_TOKEN, value: "root" }
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              # the secret customer-accounts-reset needs (kv v2 is mounted at secret/ in dev mode)
+              bao kv put secret/customer-accounts-reset \
+                api_key="reset-svc-$(head -c8 /dev/urandom | od -An -tx1 | tr -d ' \n')"
+
+              # a policy granting read of exactly that secret
+              echo 'path "secret/data/customer-accounts-reset" { capabilities = ["read"] }' \
+                | bao policy write customer-accounts-reset -
+
+              # the posture-bound role: sub must glob the CURRENT posture prefix
+              bao write auth/jwt/role/posture \
+                role_type="jwt" \
+                user_claim="sub" \
+                bound_audiences="openbao" \
+                bound_claims_type="glob" \
+                bound_claims='{"sub":"spiffe://acme.internal/posture/2.0.0/*"}' \
+                token_policies="customer-accounts-reset" \
+                token_ttl="5m" \
+                token_max_ttl="5m"
+
+              echo "posture-gated OpenBao role 'posture' bound to spiffe://acme.internal/posture/2.0.0/*"

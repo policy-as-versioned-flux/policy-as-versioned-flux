@@ -1,0 +1,19 @@
+# Namespaces for the identity substrate. Inherited platform machinery: every
+# institution gets these three planes from the shared dependency, not per-repo copies.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: spire-system
+  labels: { platform.acme.io/plane: identity }
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+  labels: { platform.acme.io/plane: identity }
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openbao
+  labels: { platform.acme.io/plane: identity }

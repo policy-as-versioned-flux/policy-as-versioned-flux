@@ -1,0 +1,19 @@
+{
+  "_comment": "UTM (QEMU) VM spec for the Linux EUD (Debian/Ubuntu cloud image). Same swtpm-backed TPM 2.0 mechanism as the Windows EUD; see windows11-vtpm.json for the shared caveat.",
+  "name": "linux-eud",
+  "architecture": "x86_64",
+  "firmware": "uefi",
+  "secure_boot": false,
+  "cpu": 2,
+  "memory_mib": 4096,
+  "disk_gib": 20,
+  "iso": "REPLACE_WITH_LINUX_ISO_PATH",
+  "tpm": {
+    "version": "2.0",
+    "backend": "swtpm",
+    "state_dir": "state/linux-eud-tpm",
+    "note": "same emulated-EK caveat as the Windows EUD. On Linux, tpm2-tools (tpm2_getekcertificate) can read the swtpm EK cert directly on the guest to confirm the chain the SPIRE agent's tpm_devid attestor will present."
+  },
+  "network": "shared",
+  "narration": "virtual — emulated EK; mechanism identical to real fleet hardware (see README.md)"
+}

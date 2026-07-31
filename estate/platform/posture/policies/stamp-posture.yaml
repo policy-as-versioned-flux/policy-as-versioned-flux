@@ -1,0 +1,48 @@
+# stamp-posture — the ONLY writer of the posture label (the trust boundary's
+# first half). At admission, for any pod that claims a policy version
+# (`policy-as-versioned.dev/policy-version`, the same label the versioned
+# require-* ValidatingPolicies self-scope on and the orphan-guard allow-lists),
+# this MUTATING policy stamps `posture.acme.io/version` equal to that validated
+# claim. The stamped label is what the posture `ClusterSPIFFEID` reads to bake
+# `posture/vN` into the SVID path.
+#
+# Why a mutate (not a generate): posture must be an attribute OF the pod so the
+# spire-controller-manager template can read it. Kyverno's mutating webhook runs
+# BEFORE the validating webhook, so by the time posture-trust-boundary validates,
+# posture is already == the claimed version for every legit pod.
+#
+# TRUST BOUNDARY (research 16, risk #2): the mutation OVERWRITES unconditionally.
+# A forger who supplies `posture.acme.io/version=9.9.9` gets it clobbered back to
+# their real validated version — you cannot smuggle a posture the pipeline didn't
+# grant. Operations include UPDATE, so a post-admission relabel is re-clobbered too.
+apiVersion: policies.kyverno.io/v1alpha1
+kind: MutatingPolicy
+metadata:
+  name: stamp-posture
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: posture
+spec:
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    # Only pods that actually claim a version get a posture. No claim => no
+    # posture label => no posture SVID (they fall back to the base mesh SVID).
+    - name: claims-a-policy-version
+      expression: >-
+        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != ''
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        # posture := the validated policy-version claim. Server-side-apply merge,
+        # so it overwrites any user-supplied posture.acme.io/version.
+        expression: >-
+          Object{
+            metadata: Object.metadata{
+              labels: {"posture.acme.io/version": object.metadata.labels['policy-as-versioned.dev/policy-version']}
+            }
+          }

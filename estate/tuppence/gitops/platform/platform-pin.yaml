@@ -1,0 +1,46 @@
+# tuppence consumes `platform` as a PINNED, SIGNED dependency (the config-base
+# pattern, one level up): the same governance machinery is inherited, not
+# copy-pasted. tuppence does not author policy versions — it pins a signed
+# release of platform and lets Flux fan the version array out into this cluster.
+# Same pattern as driftwood's gitops/platform/platform-pin.yaml.
+#
+# Opt-in, NOT wired into gitops/apps (whose Kustomization health-gates on
+# wait: true) so it can't affect the Phase-0 reconcile beat. Apply it once the
+# cluster has its prerequisites (see estate/platform/distribution/README.md):
+#   * Kyverno       (the ValidatingPolicy CRDs the versions install)
+#   * flux-operator (the ResourceSet CRD that fans the array out)
+# then:  kubectl apply -k estate/tuppence/gitops/platform/
+#
+# Bump = one reviewed PR changing .spec.ref.tag (+commit) here — tuppence adopts
+# a platform improvement on its own cadence.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: platform
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/policy-as-versioned-platform/platform
+  ref:
+    tag: v0.1.0
+    # commit pinned at release by the wave-push (belt-and-braces immutability):
+    # commit: <40-char-sha>
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: platform-distribution
+  namespace: flux-system
+spec:
+  interval: 5m
+  retryInterval: 1m
+  timeout: 3m
+  sourceRef:
+    kind: GitRepository
+    name: platform
+  # ./distribution carries versions.yaml (the ResourceSet) — flux-operator
+  # expands its version array into the per-version GitRepository/Kustomization
+  # set + the orphan-guard.
+  path: ./distribution
+  prune: true   # retire a version upstream -> it prunes here on the next reconcile
+  wait: true

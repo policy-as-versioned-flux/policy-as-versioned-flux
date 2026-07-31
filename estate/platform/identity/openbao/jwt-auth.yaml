@@ -1,0 +1,31 @@
+# Substrate seam: enable OpenBao's jwt auth method and point it at SPIRE's OIDC
+# Discovery Provider JWKS, so a SPIRE JWT-SVID can be exchanged for OpenBao
+# access. This is the *plumbing* only — the posture-bound ROLE (bound_claims
+# glob on spiffe://.../posture/vN/*) that actually gates issuance is ticket 17.
+#
+# Runs as a post-install Job against dev-mode OpenBao (root token). Idempotent:
+# `bao auth enable` is a no-op if already enabled (|| true), config is upserted.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: openbao-jwt-setup
+  namespace: openbao
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: setup
+          image: openbao/openbao:latest   # tunable knob — pin the tour version
+          env:
+            - { name: BAO_ADDR,  value: "http://openbao.openbao.svc:8200" }
+            - { name: BAO_TOKEN, value: "root" }
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              bao auth enable jwt || true
+              bao write auth/jwt/config \
+                oidc_discovery_url="http://spire-spiffe-oidc-discovery-provider.spire-system.svc" \
+                default_role="posture"
+              echo "jwt auth wired to SPIRE OIDC JWKS; ticket 17 adds the posture role"

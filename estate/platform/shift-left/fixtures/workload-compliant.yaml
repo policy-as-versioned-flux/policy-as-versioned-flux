@@ -1,0 +1,8 @@
+# An institution dev's workload PR, pinned to policy-version 2.0.0 and
+# compliant with BOTH 1.0.0 and 2.0.0 -- passes the whole ±1 window.
+apiVersion: v1
+kind: Pod
+metadata: { name: checkout-svc, labels: { "policy-as-versioned.dev/policy-version": "2.0.0" } }
+spec:
+  securityContext: { runAsNonRoot: true }
+  containers: [{ name: c, image: nginx, securityContext: { readOnlyRootFilesystem: true } }]

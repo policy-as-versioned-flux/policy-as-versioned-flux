@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tuppence
+  labels:
+    app.kubernetes.io/part-of: tuppence
+    # tuppence is the fintech / FCA+PCI+GDPR institution (toward-strict risk skin).
+    policy-as-versioned.dev/institution: tuppence

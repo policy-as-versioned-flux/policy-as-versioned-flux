@@ -1,0 +1,89 @@
+{
+  "intel_version": "v1",
+  "published_by": "platform",
+  "horizon_years": 3,
+  "note": "Market-intelligence Wardley input -- the FIFTH, FORWARD feed (spec stories 28, 32). Each component sits on a Wardley map: `visibility` is the value-chain Y axis (1 = user-facing, 0 = deep infra), `evolution` is the X axis (0 genesis .. 0.25 custom .. 0.5 product .. 0.75 commodity .. 1). `velocity` is per-year rightward drift (commoditisation speed). For an `attacker-capability`, moving right = the attack COMMODITISING = its cost COLLAPSING = the linked war-game risk's loss-event-frequency rising BEFORE the reactive feed reports a single landed incident. `base_risk` is the current (reactive) FAIR posture + deployed move; the layer projects the forward LEF from the commoditisation movement and hands the war-gamer a forward scenario to re-price. Editorial, grounded in named public trajectories (NIST PQC timeline, RaaS/PhaaS marketplace reporting), not a live subscription.",
+  "components": [
+    {
+      "id": "pq-cryptanalysis",
+      "label": "Cryptographically-relevant quantum compute",
+      "actor": "attacker-capability",
+      "visibility": 0.15,
+      "evolution": 0.30,
+      "velocity": 0.05,
+      "links_risk": "pq-harvest-now-decrypt-later",
+      "source": "NIST PQC migration timeline; harvest-now-decrypt-later editorial",
+      "base_risk": {
+        "id": "pq-harvest-now-decrypt-later",
+        "name": "forward (AI-Wardley): harvest-now-decrypt-later against long-life data",
+        "deployed_move": "transfer",
+        "warn": {"lef": [0, 1, 3], "lm": [50000, 250000, 1500000]},
+        "behind": {"lef": [0, 1, 2], "lm": [50000, 250000, 1500000]},
+        "deny": {"lef": [0, 0, 1], "lm": [50000, 250000, 1500000]},
+        "costs": {"fix": 200000, "deny": 300000, "transfer": {"load": 0.9, "deductible": 80000}}
+      }
+    },
+    {
+      "id": "phishing-kits-aas",
+      "label": "AI phishing / deepfake voice kits as a service",
+      "actor": "attacker-capability",
+      "visibility": 0.55,
+      "evolution": 0.60,
+      "velocity": 0.12,
+      "links_risk": "phishing-credential-theft",
+      "source": "PhaaS marketplace + generative-voice-clone reporting; editorial velocity",
+      "base_risk": {
+        "id": "phishing-credential-theft-forward",
+        "name": "forward (AI-Wardley): commoditised AI-phishing -> operator credential theft",
+        "deployed_move": "cage",
+        "note": "Reactive base: a graded cage (WebAuthn step-up on the risky path) is the proportionate move while AI-phishing is rare. The forward view collapses the attack cost -> frequency climbs -> the cage residual balloons past a decisive WebAuthn-everywhere fix -> re-tune cage->fix BEFORE the campaign lands.",
+        "warn": {"lef": [0, 1, 5], "lm": [8000, 30000, 120000]},
+        "behind": {"lef": [0, 0, 3], "lm": [8000, 30000, 120000]},
+        "deny": {"lef": [0, 0, 1], "lm": [8000, 30000, 120000]},
+        "costs": {"fix": 25000, "deny": 40000, "transfer": {"load": 0.9, "deductible": 10000}}
+      }
+    },
+    {
+      "id": "ransomware-aas",
+      "label": "Ransomware-as-a-service kits + affiliate model",
+      "actor": "attacker-capability",
+      "visibility": 0.45,
+      "evolution": 0.70,
+      "velocity": 0.08,
+      "links_risk": "ransomware-workload",
+      "source": "RaaS affiliate-marketplace reporting; editorial velocity",
+      "base_risk": {
+        "id": "ransomware-workload-forward",
+        "name": "forward (AI-Wardley): commoditised RaaS detonates in a caged workload",
+        "deployed_move": "cage",
+        "note": "Reactive base: a graded cage is the proportionate move today. As the RaaS affiliate model commoditises, frequency climbs and the cage residual overtakes a decisive fix -> re-tune cage->fix ahead of the reactive feed.",
+        "warn": {"lef": [0, 2, 9], "lm": [30000, 120000, 500000]},
+        "behind": {"lef": [0, 1, 7], "lm": [30000, 120000, 500000]},
+        "deny": {"lef": [0, 0, 1], "lm": [30000, 120000, 500000]},
+        "costs": {"fix": 90000, "deny": 400000, "transfer": {"load": 0.8, "deductible": 60000}}
+      }
+    },
+    {
+      "id": "credential-stuffing-aas",
+      "label": "Credential-stuffing / combo-list services",
+      "actor": "attacker-capability",
+      "visibility": 0.50,
+      "evolution": 0.82,
+      "velocity": 0.03,
+      "links_risk": "phishing-credential-theft",
+      "source": "Long-commodity underground service; included as an already-commodity control case",
+      "base_risk": null
+    },
+    {
+      "id": "spiffe-workload-identity",
+      "label": "SPIFFE/SPIRE workload identity",
+      "actor": "defensive-capability",
+      "visibility": 0.35,
+      "evolution": 0.55,
+      "velocity": 0.10,
+      "links_risk": null,
+      "source": "SPIFFE graduation + managed-mesh adoption; commoditising DEFENCE (cheaper to run), not attack",
+      "base_risk": null
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+# Istio, wired to consume SPIRE identity instead of running its own CA.
+# `global.caName: SPIRE` switches istiod to pull workload certs from the SPIRE
+# agent over Envoy's SDS socket; meshed pods mount that socket via the
+# spiffe-csi-driver (installed by the SPIRE release). So the mesh's mTLS
+# identity IS the SPIFFE SVID signed by the SPIRE CA — one root, not two.
+# Source: https://istio.io/latest/docs/ops/integrations/spire/
+#
+# Versions/value-schema are a calibration knob — Istio value keys move between
+# minors; pin to the release you tour and re-run verify.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: istio
+  namespace: istio-system
+spec:
+  interval: 1h
+  type: oci
+  url: oci://gcr.io/istio-release/charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-base
+  namespace: istio-system
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: base
+      version: "1.24.0"         # tunable knob
+      sourceRef: { kind: HelmRepository, name: istio }
+  install: { crds: Create }
+  upgrade: { crds: CreateReplace }
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istiod
+  namespace: istio-system
+spec:
+  interval: 30m
+  dependsOn:
+    - { name: istio-base }
+  chart:
+    spec:
+      chart: istiod
+      version: "1.24.0"         # keep in lockstep with istio-base
+      sourceRef: { kind: HelmRepository, name: istio }
+  values:
+    global:
+      # THE integration switch: use SPIRE as the mesh CA over the SDS socket.
+      caName: SPIRE
+    # Istio must trust SVIDs from the SPIRE trust domain, and the socket path
+    # must match the SPIRE agent's socketPath.
+    pilot:
+      env:
+        ENABLE_CA_SERVER: "false"
+    sidecarInjectorWebhook:
+      # Custom injection template that mounts the SPIRE agent socket (CSI) into
+      # sidecars that opt in with the `spiffe.io/spire-managed-identity` label.
+      templates:
+        spire: |
+          spec:
+            containers:
+            - name: istio-proxy
+              volumeMounts:
+              - name: workload-socket
+                mountPath: /run/secrets/workload-spiffe-uds
+                readOnly: true
+            volumes:
+            - name: workload-socket
+              csi:
+                driver: "csi.spiffe.io"
+                readOnly: true

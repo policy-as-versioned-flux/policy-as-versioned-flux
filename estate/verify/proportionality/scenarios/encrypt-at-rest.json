@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "name": "shared control: PII stored at rest without encryption",
+  "control": "encrypt-at-rest",
+  "note": "The SAME control, the SAME triples, run against BOTH institutions. warn = an unencrypted-at-rest volume still admits (full LEF); deny = admission blocks it (LEF collapses toward zero). Triples are (min, mode, max); LEF = loss events/year, LM = £/event. Nothing here is institution-specific — the ONLY thing that differs across driftwood and ludlow is the risk-appetite tolerance band in ../../../platform/risk/appetite.json. That band alone flips the £-derived verdict Audit->Deny. That is proportionality: identical control, opposite enforcement, because the £ each institution can carry differs.",
+  "warn": {
+    "lef": [1, 2, 5],
+    "lm": [3000, 8000, 20000]
+  },
+  "deny": {
+    "lef": [0, 0, 1],
+    "lm": [3000, 8000, 20000]
+  }
+}

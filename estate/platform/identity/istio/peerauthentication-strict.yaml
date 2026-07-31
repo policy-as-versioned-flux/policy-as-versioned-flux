@@ -1,0 +1,11 @@
+# Mesh-wide STRICT mTLS. With SPIRE as the CA, "STRICT" means every accepted
+# connection carries a SPIRE-signed SPIFFE identity — plaintext is refused.
+# This is the substrate for the "trust the SVID, not the network position" beat.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: istio-system   # root namespace -> applies mesh-wide
+spec:
+  mtls:
+    mode: STRICT

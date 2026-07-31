@@ -1,0 +1,19 @@
+{
+  "_comment": "UTM (QEMU) VM spec for the Windows 11 EUD. TPM 2.0 is backed by swtpm — an EMULATED endorsement key (EK), not a manufacturer part. build-vm.sh renders this into the qemu-system-x86_64 + swtpm invocation UTM's GUI wraps; import the resulting disk into UTM (New VM > Existing image) if you want the GUI, or run headless with the printed command. Same mechanism a real fleet laptop uses — only the EK trust anchor differs (see ../windows-hello-for-business.md).",
+  "name": "windows11-eud",
+  "architecture": "x86_64",
+  "firmware": "uefi",
+  "secure_boot": true,
+  "cpu": 4,
+  "memory_mib": 8192,
+  "disk_gib": 64,
+  "iso": "REPLACE_WITH_WINDOWS11_ISO_PATH",
+  "tpm": {
+    "version": "2.0",
+    "backend": "swtpm",
+    "state_dir": "state/windows11-eud-tpm",
+    "note": "swtpm mints its own EK + EK cert at first start — emulated, not manufacturer-signed. tpm_devid's endorsement_ca_path must point at swtpm's self-signed EK CA for this VM to attest (see spire-tpm-devid-values.yaml in platform/access), not a real TPM manufacturer root."
+  },
+  "network": "shared",
+  "narration": "virtual — emulated EK; mechanism identical to real fleet hardware (see README.md)"
+}

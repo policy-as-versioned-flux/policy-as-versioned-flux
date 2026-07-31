@@ -1,0 +1,67 @@
+# The exemptions ledger — git IS the register, and this ResourceSet IS the ledger
+# (one file, exactly as distribution/versions.yaml is both the version array and
+# its ResourceSet). Each `spec.inputs[]` element is one genuine one-off that
+# CANNOT be expressed as a uniform conditional branch (may-run-root-if-attested
+# already dissolves the expressible ones). flux-operator renders resources ONCE
+# PER input element, so each entry renders its OWN PolicyException.
+#
+# Every entry is:  scoped (a CEL predicate, not a namespace-wide hole) · priced
+# (a FAIR scenario whose residual ALE is the £ it carries) · expiring (a date,
+# projected onto the rendered PolicyException as cleanup.kyverno.io/ttl) ·
+# versioned (pinned to the exact policy version) · owned (an accountable party).
+#
+# Delete an entry -> Flux (prune: true on the parent Kustomization) deletes its
+# PolicyException; the TTL is the belt-and-braces backstop if git ever fails to
+# prune. No entry -> no PolicyException. "No ledger entry, no exception" is literal.
+#
+# `../render-exemption.py` is the OFFLINE twin of the render below (the verify-*.sh
+# beats and the OSCAL up-flow read it, where flux-operator isn't in the loop) AND
+# the generator of each entry's OSCAL `risk` object. Both read this same inputs[].
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
+metadata:
+  name: policy-exemptions
+  namespace: flux-system
+  labels:
+    app.kubernetes.io/part-of: platform
+spec:
+  inputs:
+    - id: "EXC-2026-001"
+      policy: "may-run-root-if-attested"
+      version: "1.0.0"
+      namespace: "shop"
+      scope: "object.metadata.?labels['app'].orValue('') == 'legacy-till'"
+      owner: "platform-security"
+      control: "nist-800-53:AC-6"
+      expires: "2026-10-01"
+      scenario: "driftwood-root-residual.json"
+      reason: >-
+        legacy till firmware opens a raw socket (CAP_NET_RAW) at boot, so it
+        cannot drop ALL capabilities and thus cannot meet condition C of
+        may-run-root-if-attested. Accepted until the vendor firmware ships.
+  # flux-operator renders this ONCE PER inputs[] element; `inputs` is the current
+  # element (accessed `index (inputs) "field"`, the distribution/versions.yaml
+  # convention). So each ledger row renders exactly one PolicyException.
+  resourcesTemplate: |
+    ---
+    apiVersion: policies.kyverno.io/v1alpha1
+    kind: PolicyException
+    metadata:
+      name: << index (inputs) "id" | slugify >>
+      namespace: << index (inputs) "namespace" >>
+      labels:
+        app.kubernetes.io/part-of: platform
+        policy-as-versioned.dev/exemption: << index (inputs) "id" | quote >>
+      annotations:
+        # absolute expiry -> the Kyverno cleanup controller deletes this exception
+        # when the date is reached, so no exemption can outlive its declared expiry
+        # even if the git prune never happens. This is the TTL backstop.
+        cleanup.kyverno.io/ttl: << index (inputs) "expires" | quote >>
+        policy-as-versioned.dev/owner: << index (inputs) "owner" | quote >>
+    spec:
+      policyRefs:
+        - name: << index (inputs) "policy" >>-<< index (inputs) "version" | slugify >>
+          kind: ValidatingPolicy
+      matchConditions:
+        - name: exemption-scope
+          expression: << index (inputs) "scope" | quote >>

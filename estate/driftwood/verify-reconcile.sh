@@ -27,4 +27,14 @@ v=$(kubectl --context "$CTX" -n driftwood get cm driftwood-live-version \
     -o jsonpath='{.data.policyVersion}' 2>/dev/null)
 [ "$v" = "1.0.0" ] || fail "live version configmap not reconciled (got '$v')"
 
-echo "PASS: driftwood reconciles from a pinned GitRepository, healthy, content live."
+say "4. the pinned nist (regulator) dependency reconciled healthy"
+ready gitrepository nist flux-system
+kubectl --context "$CTX" -n flux-system get gitrepository nist \
+  -o jsonpath='{.spec.ref.tag}' | grep -qx v1.0.0 || fail "nist GitRepository not pinned to tag v1.0.0"
+kubectl --context "$CTX" -n flux-system get gitrepository nist \
+  -o jsonpath='{.spec.ref.commit}' | grep -qE '^[0-9a-f]{40}$' || fail "nist GitRepository commit not pinned"
+nv=$(kubectl --context "$CTX" -n driftwood get cm driftwood-nist-pin \
+    -o jsonpath='{.data.catalogVersion}' 2>/dev/null)
+[ "$nv" = "1.0.0" ] || fail "nist-pin configmap not reconciled (got '$nv')"
+
+echo "PASS: driftwood reconciles from a pinned GitRepository, healthy, content live, nist dependency pinned."

@@ -1,0 +1,75 @@
+# Pomerium Core (Apache-2.0) — the identity-aware proxy in FRONT of the KinD
+# kube-apiserver. This is the human/device carrier the spec locks in over
+# Teleport (whose Device Trust AND OIDC connectors are Enterprise-only).
+#
+# What it enforces, per request, before anything reaches the API server:
+#   1. an OIDC login against the estate issuer (Dex, ../oidc) — a known human;
+#   2. a phishing-resistant WebAuthn device enrolment (Secure-Enclave-bound key,
+#      unclonable) — Pomerium's own `device` PPL criterion;
+#   3. (device-SVID gate) the request's device is one SPIRE tpm_devid attested on
+#      the acme.internal root — see ../device. Absent ⇒ refused, not stepped up.
+# On allow, Pomerium signs a JWT (X-Pomerium-Jwt-Assertion) the kube-apiserver
+# trusts as an OIDC token → per-session Kubernetes RBAC. The *graded* decision
+# (which op needs which factors) is ../access.py; this route encodes the top tier.
+#
+# Versions are a calibration knob: pin to the appVersion you tour, re-run verify.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: pomerium
+  namespace: access
+spec:
+  interval: 1h
+  url: https://helm.pomerium.io
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pomerium
+  namespace: access
+spec:
+  interval: 30m
+  dependsOn:
+    - { name: dex, namespace: access }
+  chart:
+    spec:
+      chart: pomerium
+      version: "52.3.0"          # tunable knob — pin to the appVersion you tour
+      sourceRef: { kind: HelmRepository, name: pomerium }
+  values:
+    # Core (open-source) mode — no Enterprise console. Config is the source of truth.
+    config:
+      rootDomain: access.svc
+      # The estate OIDC issuer (Dex). Same root the gitsign committer authenticates to.
+      idp:
+        provider: oidc
+        url: http://dex.access.svc:5556/dex
+        clientID: pomerium
+        clientSecret: pomerium-oidc-secret   # ponytail: demo secret; OpenBao-source at a venue
+        scopes: [openid, email, profile]
+      # WebAuthn device enrolment lives at this URL; the passkey binds to the
+      # laptop's Secure Enclave / TPM (unclonable). This is what makes tier-2+
+      # ops require a real hardware-bound key, not just a password.
+      # (Pomerium serves /.pomerium/webauthn for enrolment.)
+      routes:
+        - from: https://kubernetes.access.svc
+          to: https://kubernetes.default.svc
+          # Sign a JWT the kube-apiserver trusts; forward the k8s bearer path.
+          allow_spdy: true
+          kubernetes_service_account_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+          # Policy-as-code (PPL): break-glass tier — an authenticated estate human
+          # AND a WebAuthn-enrolled, approved device. The device-SVID gate is
+          # applied in front of this by the SPIRE tpm_devid attestation (../device):
+          # a request whose mTLS carries no acme.internal device SVID never arrives.
+          policy:
+            - allow:
+                and:
+                  - authenticated_user: true
+                  - email:
+                      is: operator@acme.internal
+                  - device:
+                      is: approved          # WebAuthn-enrolled + approved device
+    # The signing key Pomerium uses for the JWT assertion the apiserver trusts.
+    # Demo value; a venue generates a real EC key and points the apiserver's
+    # --oidc-issuer-url / structured authn at Pomerium's JWKS.
+    signingKey: ""                          # ponytail: chart mounts a demo key; supply a real EC key at a venue

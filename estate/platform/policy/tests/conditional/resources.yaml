@@ -1,0 +1,58 @@
+# The conditional-policy matrix. All claim version 1.0.0 except the unversioned
+# one (which self-scopes OUT). Condition C = attested AND every container hardened
+# (readOnlyRootFilesystem + drop ALL caps). "You may run root IF C" — uniform.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nonroot
+  labels: { "policy-as-versioned.dev/policy-version": "1.0.0" }
+spec:
+  securityContext: { runAsNonRoot: true }
+  containers: [{ name: c, image: nginx }]
+---
+# Runs root but takes the conditional branch: attested AND hardened -> ADMITS.
+# No named team, no carve-out — anyone presenting C passes identically.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: root-attested-hardened
+  labels:
+    "policy-as-versioned.dev/policy-version": "1.0.0"
+    "policy-as-versioned.dev/root-attestation": "SEC-1234"
+spec:
+  containers:
+    - name: c
+      image: nginx
+      securityContext:
+        readOnlyRootFilesystem: true
+        capabilities: { drop: [ALL] }
+---
+# Runs root, no attestation -> FAILS (condition C not met).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: root-bare
+  labels: { "policy-as-versioned.dev/policy-version": "1.0.0" }
+spec:
+  containers: [{ name: c, image: nginx }]
+---
+# Attested but NOT hardened (no caps drop / no read-only fs) -> FAILS. C is
+# conjunctive: attestation alone is not a hole you can drive a workload through.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: root-attested-unhardened
+  labels:
+    "policy-as-versioned.dev/policy-version": "1.0.0"
+    "policy-as-versioned.dev/root-attestation": "SEC-1234"
+spec:
+  containers: [{ name: c, image: nginx }]
+---
+# No policy-version label -> out of scope of this versioned policy (self-scoping
+# via matchConditions, not objectSelector). SKIP.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unversioned
+spec:
+  containers: [{ name: c, image: nginx }]

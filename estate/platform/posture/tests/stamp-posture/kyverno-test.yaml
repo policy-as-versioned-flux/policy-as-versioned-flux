@@ -1,0 +1,22 @@
+# stamp-posture mutate matrix (offline, `kyverno test`):
+#   * a pod claiming a version gets posture == that version stamped;
+#   * a forger's hand-set posture is clobbered back to the validated version;
+#   * a pod with no version claim is skipped (no posture stamped).
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: stamp-posture
+policies:
+  - ../../policies/stamp-posture.yaml
+resources:
+  - resources.yaml
+results:
+  - policy: stamp-posture
+    kind: Pod
+    resources: [pod-claims-v2, pod-forger]
+    patchedResources: patched.yaml
+    result: pass
+  - policy: stamp-posture
+    kind: Pod
+    resources: [pod-unversioned]
+    result: skip

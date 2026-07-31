@@ -1,0 +1,13 @@
+{
+  "version": "v2",
+  "name": "driftwood: unversioned image ships cart PII (loss reassessed upward)",
+  "note": "Same event, tightened estimate: an ICO-fine reassessment widened per-event loss magnitude LM (1k,4k,9k)->(3k,10k,30k). LEF unchanged. Tightening the triple raises ALE_warn above driftwood's £40k tolerance -> enforce.py flips Audit->Deny. The escalation is justified by the £, not a timer. Diff vs v1 is one block; see PR.md.",
+  "warn": {
+    "lef": [2, 4, 9],
+    "lm": [3000, 10000, 30000]
+  },
+  "deny": {
+    "lef": [0, 0, 1],
+    "lm": [3000, 10000, 30000]
+  }
+}

@@ -1,0 +1,26 @@
+# posture-trust-boundary reject matrix (offline, `kyverno test`):
+#   * a legit pod (posture == validated claim) passes;
+#   * a forged posture (no claim, or claim != posture) is DENIED;
+#   * a pod with no posture is skipped (out of scope).
+# This is the "forging the label is refused" acceptance check, provable offline.
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: posture-trust-boundary
+policies:
+  - ../../policies/posture-trust-boundary.yaml
+resources:
+  - resources.yaml
+results:
+  - policy: posture-trust-boundary
+    kind: Pod
+    resources: [pod-legit]
+    result: pass
+  - policy: posture-trust-boundary
+    kind: Pod
+    resources: [pod-forged-no-claim, pod-forged-mismatch]
+    result: fail
+  - policy: posture-trust-boundary
+    kind: Pod
+    resources: [pod-no-posture]
+    result: skip

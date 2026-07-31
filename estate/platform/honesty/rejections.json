@@ -1,0 +1,19 @@
+{
+  "note": "The war-gamer's rejection ledger (story 33): every proposal a human declined at the PR gate, logged as evidence so the proposer LEARNS. proposer_bounds.py reads this — a proposal whose key was rejected >= reject_suppress times is suppressed (stop re-proposing what humans keep saying no to); a key rejected fewer times still proposes but is flagged so the reviewer sees the history. Key = '<org>/<control>'. The gate stays the hard backstop regardless: these bounds only cut reviewer noise, they never grant merge.",
+  "reject_suppress": 2,
+  "rejections": {
+    "tuppence/insider-abuse": {
+      "count": 2,
+      "reasons": [
+        "2025-11: transfer->fix rejected — HR-led control already funded, engineering fix duplicative",
+        "2026-02: re-proposed, rejected again — same rationale; stop re-opening"
+      ]
+    },
+    "tuppence/pq-harvest-now-decrypt-later": {
+      "count": 1,
+      "reasons": [
+        "2026-03: transfer->fix rejected once — PQ migration on the roadmap, not yet fundable"
+      ]
+    }
+  }
+}

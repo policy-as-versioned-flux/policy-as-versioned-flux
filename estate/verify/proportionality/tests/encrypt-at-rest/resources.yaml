@@ -1,0 +1,50 @@
+# The encrypt-at-rest matrix. All claim version 1.0.0 except the unversioned one
+# (which self-scopes OUT). The control: a pod mounting a PVC must carry
+# policy-as-versioned.dev/storage-encrypted=true. The BODY is identical across
+# driftwood and ludlow — only the action differs (Audit vs Deny), which is what
+# the money shot is about; the admission verdict on these inputs is the same.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: encrypted-pvc
+  labels:
+    "policy-as-versioned.dev/policy-version": "1.0.0"
+    "policy-as-versioned.dev/storage-encrypted": "true"
+spec:
+  volumes:
+    - name: data
+      persistentVolumeClaim: { claimName: pii }
+  containers: [{ name: c, image: nginx }]
+---
+# No persistent storage -> nothing to encrypt -> PASS.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-storage
+  labels: { "policy-as-versioned.dev/policy-version": "1.0.0" }
+spec:
+  containers: [{ name: c, image: nginx }]
+---
+# Mounts a PVC but is NOT marked encrypted-at-rest -> FAIL (Audit in driftwood
+# reports it; Deny in ludlow blocks it — same violation, proportionate response).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unencrypted-pvc
+  labels: { "policy-as-versioned.dev/policy-version": "1.0.0" }
+spec:
+  volumes:
+    - name: data
+      persistentVolumeClaim: { claimName: pii }
+  containers: [{ name: c, image: nginx }]
+---
+# No policy-version label -> out of scope (self-scoping via matchConditions). SKIP.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unversioned
+spec:
+  volumes:
+    - name: data
+      persistentVolumeClaim: { claimName: pii }
+  containers: [{ name: c, image: nginx }]

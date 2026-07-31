@@ -1,0 +1,60 @@
+{
+  "org": "tuppence",
+  "note": "War-game scenario library for the human/device + ransomware/PQ attack classes the war-gamer stress-tests against current controls (spec stories 28-33; the three-actor identity fold-in). Each risk is priced in the same (min,mode,max) FAIR shape everything else in this estate uses, so ../../tcor/tcor.py weighs the four risk-financing moves over it unchanged. `author` marks the AI-generated vs human-seed provenance the scenario library folds in; `deployed_move` is the currently-enforced posture the war-gamer checks the £-implied move against -- a mismatch is proportionality drift -> a policy PR.",
+  "risks": [
+    {
+      "id": "phishing-credential-theft",
+      "name": "human: phished operator credential -> console/kubectl access",
+      "author": "human-seed",
+      "deployed_move": "fix",
+      "note": "Pomerium Core WebAuthn (phishing-resistant) is the fix -- a cheap, decisive control, so fix stays cheapest.",
+      "warn": {"lef": [2, 5, 10], "lm": [8000, 30000, 120000]},
+      "deny": {"lef": [0, 0, 1], "lm": [8000, 30000, 120000]},
+      "costs": {"fix": 6000, "deny": 40000, "transfer": {"load": 0.5, "deductible": 10000}}
+    },
+    {
+      "id": "stolen-laptop-unattested-device",
+      "name": "device: stolen/unmanaged laptop reaches a gated op",
+      "author": "human-seed",
+      "deployed_move": "cage",
+      "note": "SPIRE tpm_devid / Secure-Enclave device SVID caps reach; the loss path is narrowed not closed (a determined attacker with the unlocked device retains residual) -> retain-with-mitigation.",
+      "warn": {"lef": [1, 3, 7], "lm": [15000, 60000, 200000]},
+      "behind": {"lef": [1, 2, 4], "lm": [15000, 60000, 200000]},
+      "deny": {"lef": [0, 0, 1], "lm": [15000, 60000, 200000]},
+      "costs": {"fix": 55000, "deny": 90000, "transfer": {"load": 0.7, "deductible": 40000}}
+    },
+    {
+      "id": "insider-abuse",
+      "name": "human: authorised insider abuses standing access",
+      "author": "ai-generated",
+      "deployed_move": "transfer",
+      "note": "Least-privilege + audit reduce but cannot close insider risk; a residual is retained and part ceded to a carrier (insider is a named cyber-policy peril).",
+      "warn": {"lef": [1, 2, 5], "lm": [20000, 90000, 350000]},
+      "behind": {"lef": [1, 2, 3], "lm": [20000, 90000, 350000]},
+      "deny": {"lef": [0, 0, 1], "lm": [20000, 90000, 350000]},
+      "costs": {"fix": 120000, "deny": 200000, "transfer": {"load": 0.6, "deductible": 50000}}
+    },
+    {
+      "id": "ransomware-workload",
+      "name": "workload: ransomware detonates in a caged workload",
+      "author": "human-seed",
+      "deployed_move": "deny",
+      "note": "Historically handled by a blunt deny (bottom rung). The war-gamer re-prices it: a graded cage + transfer beats deny on TCoR, so the deployed 'deny' posture is stale -> drift -> propose.",
+      "warn": {"lef": [2, 4, 9], "lm": [30000, 120000, 500000]},
+      "behind": {"lef": [1, 3, 6], "lm": [30000, 120000, 500000]},
+      "deny": {"lef": [0, 0, 1], "lm": [30000, 120000, 500000]},
+      "costs": {"fix": 90000, "deny": 400000, "transfer": {"load": 0.8, "deductible": 60000}}
+    },
+    {
+      "id": "pq-harvest-now-decrypt-later",
+      "name": "forward (AI-Wardley): harvest-now-decrypt-later against long-life data",
+      "author": "ai-generated",
+      "deployed_move": "transfer",
+      "note": "The forward Wardley view -- attack-cost collapse / PQ. Low frequency today, catastrophic long-horizon magnitude (decades-confidential data). Priced as a forward scenario the war-gamer runs AHEAD of the reactive feeds, not after a landing.",
+      "warn": {"lef": [0, 1, 3], "lm": [50000, 250000, 1500000]},
+      "behind": {"lef": [0, 1, 2], "lm": [50000, 250000, 1500000]},
+      "deny": {"lef": [0, 0, 1], "lm": [50000, 250000, 1500000]},
+      "costs": {"fix": 200000, "deny": 300000, "transfer": {"load": 0.9, "deductible": 80000}}
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tuppence-nist-pin
+  namespace: tuppence
+  labels:
+    app.kubernetes.io/part-of: tuppence
+    policy-as-versioned.dev/upstream: nist
+# Human/audit-readable mirror of flux-system/gotk-sync-nist.yaml's
+# GitRepository.spec.ref — which real 800-53 OSCAL catalog version this
+# institution's controls are proportioned against right now. Read by the
+# future OSCAL/c2p plumbing (platform); for this ticket it proves the pin is
+# live, reconciled, and bumpable like any other dependency.
+data:
+  catalogVersion: "1.0.0"
+  catalogTag: "v1.0.0"
+  nistRevision: "5.2.0"
+  oscalVersion: "1.2.2"

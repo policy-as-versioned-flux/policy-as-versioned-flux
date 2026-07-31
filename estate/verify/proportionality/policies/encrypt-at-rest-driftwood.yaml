@@ -1,0 +1,52 @@
+# encrypt-at-rest @ 1.0.0 — the SHARED control body, ONE artifact.
+#
+# This template is rendered ONCE PER INSTITUTION (render.py). Every line is
+# identical across driftwood and ludlow EXCEPT `validationActions`, and that one
+# field is NOT hand-authored — render.py stamps it from platform/risk/enforce.py,
+# which reads the FAIR £ (ALE_warn - ALE_deny) against the institution's appetite
+# band. So the divergence you see between policies/encrypt-at-rest-driftwood.yaml
+# (Audit) and policies/encrypt-at-rest-ludlow.yaml (Deny) is a pure function of
+# the £, not an editorial choice. That IS the money shot.
+#
+# Self-scoped by policy-version label (matchConditions, not objectSelector — the
+# distribution/README.md convention) so versions coexist without webhook collision.
+#
+# The action and the org name are the only substitution points (render.py).
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+metadata:
+  name: encrypt-at-rest-1-0-0
+  labels:
+    app.kubernetes.io/part-of: driftwood
+    policy-as-versioned.dev/policy: encrypt-at-rest
+    policy-as-versioned.dev/policy-version: "1.0.0"
+    # Provenance of the action: which institution's £ band produced it.
+    policy-as-versioned.dev/proportionality-org: driftwood
+spec:
+  # The proportionality lever. Stamped from the £ by render.py, never by hand.
+  validationActions: [Audit]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: only-this-policy-version
+      expression: >-
+        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '1.0.0'
+  variables:
+    # A pod stores PII at rest via a PVC. The control: every persistent volume the
+    # pod mounts must be marked encrypted-at-rest (the workload asserts the label
+    # its StorageClass guarantees). No PVC-backed storage -> nothing to encrypt.
+    - name: pvcVolumes
+      expression: >-
+        object.spec.?volumes.orValue([]).filter(v, has(v.persistentVolumeClaim))
+    - name: encrypted
+      expression: >-
+        object.metadata.?labels['policy-as-versioned.dev/storage-encrypted'].orValue('') == 'true'
+  validations:
+    - expression: "size(variables.pvcVolumes) == 0 || variables.encrypted"
+      message: >-
+        pods mounting persistent storage must carry
+        policy-as-versioned.dev/storage-encrypted=true (data encrypted at rest)

@@ -1,0 +1,10 @@
+# The graded enforcement envelope: the mutate that cages a behind-posture pod by
+# degree, the generate that locks down its egress, and the eviction PriorityClasses
+# the cage tiers reference. Flux applies this alongside the versioned require-*
+# policies; the cage only tightens who fell behind.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - priorityclasses.yaml
+  - cage-tier.yaml
+  - cage-netpol.yaml

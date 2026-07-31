@@ -1,0 +1,22 @@
+# Base identity for meshed workloads. spire-controller-manager renders one
+# registration entry per matching pod, giving every mesh member a SPIFFE ID of
+# the form  spiffe://acme.internal/ns/<ns>/sa/<serviceaccount>  — the identity
+# Envoy presents in mTLS and Istio AuthorizationPolicy matches on principals.
+#
+# This is the SUBSTRATE identity (no posture). Ticket 15 adds a *second*
+# ClusterSPIFFEID whose spiffeIDTemplate reads a Kyverno-stamped posture label
+# and bakes  posture/<vN>  into the path; the two coexist. Keeping posture out
+# of here keeps this file the plain "you are who you are" base identity.
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: mesh-base
+spec:
+  spiffeIDTemplate: "spiffe://{{ .TrustDomain }}/ns/{{ .PodMeta.Namespace }}/sa/{{ .PodSpec.ServiceAccountName }}"
+  # Only pods that opt into SPIRE-issued identity (the Istio+SPIRE CSI mount).
+  podSelector:
+    matchLabels:
+      spiffe.io/spire-managed-identity: "true"
+  # X.509-SVID for mTLS; short-ish so the CA rotation story is real.
+  ttl: 1h
+  jwtTtl: 5m

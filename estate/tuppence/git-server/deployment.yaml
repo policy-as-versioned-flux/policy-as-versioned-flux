@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-server
+  namespace: flux-system
+  labels: { app: git-server }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: git-server } }
+  template:
+    metadata:
+      labels: { app: git-server }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: git-server
+          image: tuppence-git:local
+          imagePullPolicy: Never   # image is kind-loaded, never pulled (offline)
+          ports: [{ containerPort: 8080 }]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+          readinessProbe:
+            httpGet: { path: /cgi-bin/git/tuppence.git/HEAD, port: 8080 }
+            initialDelaySeconds: 1
+            periodSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: git-server
+  namespace: flux-system
+spec:
+  selector: { app: git-server }
+  ports: [{ port: 80, targetPort: 8080 }]

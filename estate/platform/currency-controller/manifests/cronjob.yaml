@@ -1,0 +1,56 @@
+# The currency controller as a CronJob: one bounded reconcile pass per minute.
+# A CronJob (not a watch loop) is deliberate — it runs to completion and exits,
+# so nothing blocks and the "bounded interval" is literally the schedule. The
+# script is currency.py, mounted from the `currency-controller-src` ConfigMap
+# (created by up.sh with --from-file=currency.py, so there is ONE source of the
+# code, no copy pasted into YAML). Pure stdlib ⇒ a bare python image, no pip.
+#
+# interval budget: schedule 1m + spire-controller-manager gcInterval ~10s + one
+# jwtTtl (5m) ⇒ a retired pod is out of currency (SVID stops renewing) within
+# ~6m of the array edit. Shorten the schedule for a snappier stage demo.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: currency-controller
+  namespace: currency-system
+  labels:
+    app.kubernetes.io/part-of: platform
+spec:
+  schedule: "* * * * *"          # every minute — the bounded re-evaluation interval
+  concurrencyPolicy: Forbid       # never overlap two reconcile passes
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 120   # a pass that can't finish in 2m is killed, never hangs
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/part-of: platform
+          annotations:
+            sidecar.istio.io/inject: "false"   # a batch Job shouldn't wait on a mesh sidecar
+        spec:
+          serviceAccountName: currency-controller
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+          containers:
+            - name: reconcile
+              image: python:3.12-slim
+              command: ["python3", "/src/currency.py", "reconcile"]
+              # --action deposture is the default; set DEPOSTURE→evict here to
+              # switch the blunt lever, and SUPPORTED_VERSIONS to override the
+              # ResourceSet read on flux-operator-less demo paths.
+              args: []
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: { drop: ["ALL"] }
+              volumeMounts:
+                - { name: src, mountPath: /src, readOnly: true }
+          volumes:
+            - name: src
+              configMap:
+                name: currency-controller-src

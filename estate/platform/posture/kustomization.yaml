@@ -1,0 +1,9 @@
+# The posture projection layer (ticket 15), inherited platform machinery on top
+# of the identity substrate (ticket 14). Two Kyverno policies form the label
+# trust boundary; one ClusterSPIFFEID projects the label into the SVID path.
+# tests/ are dev/CI tooling, deliberately not reconciled.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - policies
+  - spire/clusterspiffeid-posture.yaml

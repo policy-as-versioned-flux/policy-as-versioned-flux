@@ -1,0 +1,39 @@
+# Canonical Flux sync for tuppence — same shape as driftwood's own gotk-sync.yaml.
+#
+# Pinned to a TAG + COMMIT, not a moving branch: git is the only way cluster
+# state changes, and the exact revision is immutable + attestable. The tag is
+# gitsign-signed (keyless → Rekor); that signature is verified out-of-band by
+# `git verify-tag` / Rekor lookup in the provenance beat (ticket 24) — Flux's
+# GitRepository.spec.verify only speaks OpenPGP, so we do NOT fake a PGP block
+# here; the pin + the signed tag are the provenance, not a mis-typed verify.
+#
+# For the offline touring demo, scripts/up.sh rewrites .spec.url to the
+# in-cluster git server and sets the freshly-seeded tag+commit (see up.sh).
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: tuppence
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/policy-as-versioned-tuppence/tuppence
+  ref:
+    tag: v1.0.0
+    # commit pinned at release by the wave-push (belt-and-braces immutability):
+    # commit: <40-char-sha>
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: tuppence
+  namespace: flux-system
+spec:
+  interval: 5m
+  retryInterval: 1m
+  timeout: 3m
+  sourceRef:
+    kind: GitRepository
+    name: tuppence
+  path: ./apps
+  prune: true   # prune-on-retire: remove what git no longer declares
+  wait: true    # health-gate the reconcile

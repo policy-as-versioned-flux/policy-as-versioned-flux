@@ -1,0 +1,8 @@
+{
+  "version": "v1",
+  "name": "ludlow: break-glass read of a patient record",
+  "org": "ludlow",
+  "note": "The risky op. Emergency privileged access to decades-confidential HIPAA patient data. Single-state triple (min,mode,max): the £ EXPOSURE of doing this op wrongly / from the wrong hands. carried ~= £2.4M -> top assurance band: a fresh attested device + step-up passkey, nothing less. A stale device can't even be caged to read-only here (a read-only peek at patient data is still the breach).",
+  "lef": [1, 2, 4],
+  "lm": [50000, 200000, 2000000]
+}

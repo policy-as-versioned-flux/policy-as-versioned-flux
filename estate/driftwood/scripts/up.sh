@@ -38,6 +38,20 @@ say "pinned revision: v1.0.0 @ ${COMMIT}"
 git -C "$WORK/seed" clone -q --bare "$WORK/seed" "$WORK/ctx/driftwood.git"
 cp "$GITSERVER_DIR/Dockerfile" "$GITSERVER_DIR/lighttpd.conf" "$WORK/ctx/"
 
+# 3b. seed driftwood's pinned nist dependency the same way, from estate/nist -
+say "seeding pinned nist catalog dependency"
+NIST_DIR="${HERE}/../nist"
+NIST_SEED="$WORK/nist-seed"
+rm -rf "$NIST_SEED"; mkdir -p "$NIST_SEED"
+cp -R "$NIST_DIR/catalog/." "$NIST_SEED/"
+git -C "$NIST_SEED" init -q -b main
+git -C "$NIST_SEED" -c user.email=regulator@nist -c user.name=nist add -A
+git -C "$NIST_SEED" -c user.email=regulator@nist -c user.name=nist commit -q -m "nist 800-53 catalog @ 1.0.0"
+git -C "$NIST_SEED" -c user.email=regulator@nist -c user.name=nist tag -a v1.0.0 -m "nist catalog v1.0.0"
+NIST_COMMIT="$(git -C "$NIST_SEED" rev-parse HEAD)"
+say "pinned nist revision: v1.0.0 @ ${NIST_COMMIT}"
+git -C "$NIST_SEED" clone -q --bare "$NIST_SEED" "$WORK/ctx/nist.git"
+
 docker build -q -t "$IMAGE" "$WORK/ctx" >/dev/null
 kind load docker-image "$IMAGE" --name "$CLUSTER"
 
@@ -71,13 +85,31 @@ spec:
   wait: true
 YAML
 
+say "applying pinned nist GitRepository (v1.0.0 @ ${NIST_COMMIT:0:12})"
+cat <<YAML | kubectl apply -f -
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: nist
+  namespace: flux-system
+  labels: { policy-as-versioned.dev/upstream: nist }
+spec:
+  interval: 5m
+  url: http://git-server.flux-system.svc.cluster.local/cgi-bin/git/nist.git
+  ref:
+    tag: v1.0.0
+    commit: ${NIST_COMMIT}
+YAML
+
 # 6. reconcile + report ----------------------------------------------------
 say "forcing reconcile"
 flux reconcile source git driftwood --context "$CTX"
+flux reconcile source git nist --context "$CTX"
 flux reconcile kustomization driftwood --with-source --context "$CTX"
 
 say "done. status:"
 flux get sources git driftwood --context "$CTX"
+flux get sources git nist --context "$CTX"
 flux get kustomizations driftwood --context "$CTX"
 echo
 say "run  estate/driftwood/verify-reconcile.sh  to assert the beat"

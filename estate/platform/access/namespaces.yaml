@@ -1,0 +1,9 @@
+# The human/device access plane. One namespace for the identity-aware proxy
+# (Pomerium Core) and the estate OIDC issuer (Dex) that fronts human login.
+# Device identity rides the EXISTING spire-system root (ticket 14) — no new
+# trust domain — so nothing device-side gets its own namespace here.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: access
+  labels: { platform.acme.io/plane: access }

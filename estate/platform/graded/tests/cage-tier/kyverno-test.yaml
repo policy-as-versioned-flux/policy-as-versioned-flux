@@ -1,0 +1,26 @@
+# Graded envelope, offline (`kyverno test`). The load-bearing assertion of ticket
+# 10: a behind-posture pod is MUTATED INTO ITS CAGE, not denied. The result is
+# `pass` (a mutation applied) with patchedResources proving the cage is present
+# (limits + eviction PriorityClass on every tier; drop-ALL caps + read-only-fs +
+# WAF sidecar on restricted/quarantine) — there is NO Deny anywhere. A pod in
+# currency (no tier) is skipped, proving the cage only tightens who fell behind.
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: cage-tier
+policies:
+  - ../../policies/cage-tier.yaml
+resources:
+  - resources.yaml
+results:
+  - policy: cage-tier
+    rule: cage-tier
+    kind: Pod
+    resources: [behind-baseline, behind-restricted, behind-quarantine]
+    patchedResources: patched.yaml
+    result: pass
+  - policy: cage-tier
+    rule: cage-tier
+    kind: Pod
+    resources: [in-currency]
+    result: skip

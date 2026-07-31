@@ -33,9 +33,31 @@ only speaks OpenPGP, so the gitsign signature is verified out-of-band by
 `git verify-tag` / Rekor rather than mis-declared as a PGP block; the pin + the
 signed tag are the provenance.
 
+## Pinned regulator dependency (`nist`)
+
+`gitops/flux-system/gotk-sync-nist.yaml` pins a specific signed tag+commit of
+the real `nist` 800-53 OSCAL catalog (`estate/nist`) as a Flux `GitRepository`
+— the same in-cluster git server driftwood's own source uses, serving both
+bare repos. `driftwood-nist-pin` (`gitops/apps/nist-pin-configmap.yaml`) is
+the human/audit-readable mirror of that pin. `verify-reconcile.sh` asserts
+both reconcile Ready and pinned.
+
+A regulator version bump arrives as a reviewable PR:
+`scripts/bump-nist-pin.sh v1.1.0` edits the pin on a branch and prints the
+diff — propose only, a human merges.
+
+## Pinned platform dependency (the config-base pattern)
+
+`gitops/platform/platform-pin.yaml` pins a specific signed tag+commit of
+`platform` and reconciles its `./distribution` — flux-operator fans the version
+array out into this cluster (per-version policies + orphan-guard). driftwood
+consumes the discipline; it never authors it. Opt-in (not in the Phase-0 `apps`
+reconcile) and needs Kyverno + flux-operator installed first — see
+[`estate/platform/distribution/README.md`](../platform/distribution/README.md).
+A platform bump arrives as a reviewed PR editing `.spec.ref.tag` here.
+
 ## What's here now vs later
 
 Phase 0 (this ticket): cluster + Flux + one reconciled version marker. Later
-tickets add the pinned `platform` dependency, the Kyverno CEL policy set (fanned
-out from platform's `ResourceSet` version array), the `nist`/`ico` pins, and the
-risk skin.
+tickets add the Kyverno CEL policy set (fanned out from platform's `ResourceSet`
+version array), the `ico` pin, and the risk skin.

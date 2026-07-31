@@ -1,0 +1,44 @@
+# Trust-boundary matrix inputs. These are the objects AS SEEN BY THE VALIDATING
+# webhook — i.e. after any mutation. `pod-legit` is what stamp-posture always
+# produces (posture == claim); the forgers are what a hand-set posture that the
+# mutate never produced looks like.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-legit
+  labels:
+    "policy-as-versioned.dev/policy-version": "2.0.0"
+    "posture.acme.io/version": "2.0.0"
+spec:
+  containers: [{ name: app, image: nginx }]
+---
+# Forger A: posture stamped by hand with no version claim behind it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-forged-no-claim
+  labels:
+    "posture.acme.io/version": "2.0.0"
+spec:
+  containers: [{ name: app, image: nginx }]
+---
+# Forger B: claims 1.0.0 but hand-sets posture 2.0.0 (privilege grab).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-forged-mismatch
+  labels:
+    "policy-as-versioned.dev/policy-version": "1.0.0"
+    "posture.acme.io/version": "2.0.0"
+spec:
+  containers: [{ name: app, image: nginx }]
+---
+# No posture at all => out of scope (base SVID, no posture path).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-no-posture
+  labels:
+    "policy-as-versioned.dev/policy-version": "2.0.0"
+spec:
+  containers: [{ name: app, image: nginx }]

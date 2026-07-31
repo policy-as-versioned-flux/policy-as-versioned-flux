@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tuppence-risk-appetite
+  namespace: tuppence
+  labels:
+    app.kubernetes.io/part-of: tuppence
+    policy-as-versioned.dev/upstream: platform-risk
+# Human/audit-readable mirror of ../../platform/risk/appetite.json's tolerance
+# for 'tuppence' — the £/year band platform/risk/enforce.py compares a control's
+# risk_bought against to pick Audit vs Deny (ADR-0006: justified by the £, never
+# a timer). This is the institution's risk skin, reconciled live like any other
+# pinned value; platform/risk/appetite.json remains the single source of truth,
+# this configmap is the in-cluster read of it.
+data:
+  toleranceGBP: "15000"
+  skin: "toward-strict"
+  org: "tuppence"

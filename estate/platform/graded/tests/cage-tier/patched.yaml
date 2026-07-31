@@ -1,0 +1,105 @@
+# Expected cages. Each behind-posture pod is MUTATED (admitted) into its tier's
+# cage — never denied. baseline is a nudge (limits + eviction PriorityClass, caps
+# intact); restricted/quarantine add drop-ALL caps, read-only-fs, and a WAF
+# sidecar sized by tier. The dials here are the deterministic expansion of the
+# named tier (cage.py holds the same table).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: behind-baseline
+  namespace: default
+  labels:
+    policy-as-versioned.dev/policy-version: "1.0.0"
+    posture.acme.io/tier: baseline
+    posture.acme.io/caged: "true"
+spec:
+  priorityClassName: cage-baseline
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        limits:
+          cpu: 500m
+          memory: 256Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: false
+        runAsNonRoot: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: behind-restricted
+  namespace: default
+  labels:
+    policy-as-versioned.dev/policy-version: "1.0.0"
+    posture.acme.io/tier: restricted
+    posture.acme.io/caged: "true"
+spec:
+  priorityClassName: cage-restricted
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        limits:
+          cpu: 250m
+          memory: 128Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL
+    - name: waf-sidecar
+      image: ghcr.io/acme/coraza-waf:cage
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: behind-quarantine
+  namespace: default
+  labels:
+    policy-as-versioned.dev/policy-version: "1.0.0"
+    posture.acme.io/tier: quarantine
+    posture.acme.io/caged: "true"
+spec:
+  priorityClassName: cage-quarantine
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        limits:
+          cpu: 100m
+          memory: 64Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL
+    - name: waf-sidecar
+      image: ghcr.io/acme/coraza-waf:cage
+      resources:
+        limits:
+          cpu: 250m
+          memory: 256Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL

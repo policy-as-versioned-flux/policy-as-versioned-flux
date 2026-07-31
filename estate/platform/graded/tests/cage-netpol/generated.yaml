@@ -1,0 +1,24 @@
+# The egress-lockdown NetworkPolicy the cage generates: caged pods may egress only
+# DNS (UDP/53 to kube-system). A behind-posture pod keeps running but cannot reach out.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cage-egress-lockdown
+  namespace: default
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: egress-lockdown
+spec:
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53

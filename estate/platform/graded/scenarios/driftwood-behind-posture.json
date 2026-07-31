@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "name": "driftwood: cart-service one policy version behind (posture stale)",
+  "note": "A single control state: the residual exposure of a workload that fell one policy version behind and is NOT denied (kept running). The cage collapses part of this; what survives is R'. Triples are (min, mode, max). All GBP, events/year.",
+  "behind": {
+    "lef": [3, 6, 12],
+    "lm": [1500, 5000, 9000]
+  }
+}

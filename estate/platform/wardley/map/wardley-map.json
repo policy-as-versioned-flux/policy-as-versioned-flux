@@ -1,0 +1,71 @@
+{
+  "intel_version": "v1",
+  "horizon_years": 3,
+  "components": [
+    {
+      "id": "pq-cryptanalysis",
+      "label": "Cryptographically-relevant quantum compute",
+      "actor": "attacker-capability",
+      "visibility": 0.15,
+      "evolution": 0.3,
+      "stage": "custom",
+      "projected": 0.45,
+      "projected_stage": "custom",
+      "movement": 0.15,
+      "commoditising": false,
+      "links_risk": "pq-harvest-now-decrypt-later"
+    },
+    {
+      "id": "phishing-kits-aas",
+      "label": "AI phishing / deepfake voice kits as a service",
+      "actor": "attacker-capability",
+      "visibility": 0.55,
+      "evolution": 0.6,
+      "stage": "product",
+      "projected": 0.96,
+      "projected_stage": "commodity",
+      "movement": 0.36,
+      "commoditising": true,
+      "links_risk": "phishing-credential-theft"
+    },
+    {
+      "id": "ransomware-aas",
+      "label": "Ransomware-as-a-service kits + affiliate model",
+      "actor": "attacker-capability",
+      "visibility": 0.45,
+      "evolution": 0.7,
+      "stage": "product",
+      "projected": 0.94,
+      "projected_stage": "commodity",
+      "movement": 0.24,
+      "commoditising": true,
+      "links_risk": "ransomware-workload"
+    },
+    {
+      "id": "credential-stuffing-aas",
+      "label": "Credential-stuffing / combo-list services",
+      "actor": "attacker-capability",
+      "visibility": 0.5,
+      "evolution": 0.82,
+      "stage": "commodity",
+      "projected": 0.91,
+      "projected_stage": "commodity",
+      "movement": 0.09,
+      "commoditising": false,
+      "links_risk": "phishing-credential-theft"
+    },
+    {
+      "id": "spiffe-workload-identity",
+      "label": "SPIFFE/SPIRE workload identity",
+      "actor": "defensive-capability",
+      "visibility": 0.35,
+      "evolution": 0.55,
+      "stage": "product",
+      "projected": 0.85,
+      "projected_stage": "commodity",
+      "movement": 0.3,
+      "commoditising": true,
+      "links_risk": null
+    }
+  ]
+}

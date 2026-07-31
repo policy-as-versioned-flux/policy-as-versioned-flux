@@ -1,0 +1,17 @@
+{
+  "note": "Risk appetite = the ground and the scoreboard. Per-institution tolerance limit in GBP/year. Enforcement is binary here (Audit vs Deny): a control's residual risk-bought (ALE_warn - ALE_deny) above the org's tolerance MUST escalate Audit->Deny; below it, Audit is proportionate. This is the number that justifies the flip - never a timer, never a date. Ordering is locked by the-whole-model: ludlow strictest (Deny-heavy, long-life health data), driftwood loosest (Audit-heavy, short-life cart data).",
+  "orgs": {
+    "driftwood": {
+      "tolerance": 40000,
+      "why": "UK retail, short-lived cart PII. Loosest appetite: carries up to £40k/yr residual before a Deny is proportionate."
+    },
+    "tuppence": {
+      "tolerance": 15000,
+      "why": "UK bank, customer accounts. Toward-strict."
+    },
+    "ludlow": {
+      "tolerance": 5000,
+      "why": "US health, HIPAA, decades-confidential. Strictest appetite: near-zero tolerance, so the same control that Audits in driftwood Denies here."
+    }
+  }
+}

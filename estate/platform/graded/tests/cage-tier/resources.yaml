@@ -1,0 +1,55 @@
+# Four pods across the gradient. Each behind-posture pod carries the tier the £
+# (cage.py) picked; the in-currency pod carries no tier. The test asserts every
+# behind pod is MUTATED INTO ITS CAGE (never denied), and the in-currency pod is
+# left untouched (skip).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: behind-baseline
+  namespace: default
+  labels:
+    policy-as-versioned.dev/policy-version: "1.0.0"
+    posture.acme.io/tier: baseline
+spec:
+  containers:
+    - name: app
+      image: nginx
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: behind-restricted
+  namespace: default
+  labels:
+    policy-as-versioned.dev/policy-version: "1.0.0"
+    posture.acme.io/tier: restricted
+spec:
+  containers:
+    - name: app
+      image: nginx
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: behind-quarantine
+  namespace: default
+  labels:
+    policy-as-versioned.dev/policy-version: "1.0.0"
+    posture.acme.io/tier: quarantine
+spec:
+  containers:
+    - name: app
+      image: nginx
+---
+# In currency: no cage tier. The policy leaves it alone (matchConditions skip).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: in-currency
+  namespace: default
+  labels:
+    policy-as-versioned.dev/policy-version: "2.0.0"
+spec:
+  containers:
+    - name: app
+      image: nginx

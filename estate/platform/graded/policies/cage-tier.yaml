@@ -1,0 +1,111 @@
+# cage-tier — the graded enforcement envelope, at admission.
+#
+# A behind-posture workload is NOT denied. It carries a cage TIER on its pod
+# (`posture.acme.io/tier`, one of baseline|restricted|quarantine — the tier the £
+# picked, see ../cage.py). This MUTATING policy expands that named tier into the
+# concrete DIALS and stamps them onto the pod, so the workload keeps running but
+# caged by degree. Deny is a separate, bottom-rung decision (cage.py emits it only
+# when even quarantine's residual is over-band); this policy never denies.
+#
+# TIERS OVER DIALS. The `dial` variable is the SAME table cage.py holds
+# (verify-graded.sh cross-checks the two never drift). The tier -> dials expansion
+# is a pure CEL map lookup: deterministic, no surprises.
+#
+#   baseline    a nudge: cpu/mem limits + a low eviction PriorityClass. No caps
+#               dropped, no read-only-fs, no WAF. Still admits.
+#   restricted  tighter limits, drop ALL caps, read-only root fs, a light WAF
+#               sidecar, a lower eviction PriorityClass.
+#   quarantine  tightest limits, drop ALL caps, read-only root fs, a HEAVY WAF
+#               sidecar, the lowest eviction PriorityClass. The hardest cage short
+#               of Deny.
+#
+# Least-privilege is still the floor for everyone via the estate's other policies;
+# this cage only *tightens* a workload that fell behind. The `caged` label it
+# stamps is what a NetworkPolicy generate (cage-netpol.yaml) and the eviction
+# PriorityClasses (priorityclasses.yaml) key on.
+apiVersion: policies.kyverno.io/v1alpha1
+kind: MutatingPolicy
+metadata:
+  name: cage-tier
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: graded-enforcement
+spec:
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    # Only pods carrying a cage tier get caged. No tier => untouched (a pod in
+    # currency is never caged by this policy). The tier is set upstream by the £
+    # (cage.py) / the currency controller, never self-asserted for a loosening —
+    # an unknown tier value falls through the map lookup and the mutation no-ops.
+    - name: carries-a-cage-tier
+      expression: >-
+        object.metadata.?labels['posture.acme.io/tier'].orValue('') in ['baseline', 'restricted', 'quarantine']
+  variables:
+    - name: tier
+      expression: "object.metadata.labels['posture.acme.io/tier']"
+    # The tier -> dials table. Mirror of cage.py TIERS (cpu/mem/priorityClass, the
+    # harden flag = dropAll && readOnlyRootFs, and the WAF sidecar sizing).
+    # `harden`/`wafCpu` are the '0'/'false' sentinels that keep the map homogeneous
+    # (CEL maps must be single-typed) while gating the optional dials below.
+    - name: dial
+      expression: >-
+        {'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline',  'harden':'false','wafCpu':'0',   'wafMem':'0'},
+         'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted','harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},
+         'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]
+  mutations:
+    # 1. Mergeable dials via server-side-apply: the caged label, the eviction
+    #    PriorityClass, per-container cpu/mem limits, the hardening securityContext
+    #    (read-only-fs + runAsNonRoot gated on the tier's harden flag), and — for
+    #    tiers that call for one — a WAF sidecar sized by tier. SSA merges the
+    #    containers list by name, so existing containers are tightened in place and
+    #    the sidecar is added.
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: >-
+          Object{
+            metadata: Object.metadata{ labels: {"posture.acme.io/caged": "true"} },
+            spec: Object.spec{
+              priorityClassName: variables.dial.pc,
+              containers: object.spec.containers.map(c, Object.spec.containers{
+                name: c.name,
+                resources: Object.spec.containers.resources{
+                  limits: {"cpu": variables.dial.cpu, "memory": variables.dial.mem}
+                },
+                securityContext: Object.spec.containers.securityContext{
+                  readOnlyRootFilesystem: variables.dial.harden == 'true',
+                  runAsNonRoot: variables.dial.harden == 'true',
+                  allowPrivilegeEscalation: false
+                }
+              }) + (variables.dial.wafCpu != '0' ? [Object.spec.containers{
+                name: "waf-sidecar",
+                image: "ghcr.io/acme/coraza-waf:cage",
+                resources: Object.spec.containers.resources{
+                  limits: {"cpu": variables.dial.wafCpu, "memory": variables.dial.wafMem}
+                },
+                securityContext: Object.spec.containers.securityContext{
+                  readOnlyRootFilesystem: true, runAsNonRoot: true, allowPrivilegeEscalation: false
+                }
+              }] : [])
+            }
+          }
+    # 2. Drop ALL capabilities on every container — but ONLY for the hardened tiers.
+    #    capabilities.drop is an atomic list, which SSA (mutation 1) may not merge,
+    #    so it goes through a JSONPatch. Baseline (harden=false) returns an empty
+    #    patch: a nudge keeps its caps. This mutation sees mutation 1's output, so
+    #    an injected WAF sidecar is hardened too.
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: >-
+          variables.dial.harden == 'true'
+            ? object.spec.containers.map(c,
+                JSONPatch{
+                  op: "add",
+                  path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/securityContext/capabilities",
+                  value: {"drop": ["ALL"]}
+                })
+            : []

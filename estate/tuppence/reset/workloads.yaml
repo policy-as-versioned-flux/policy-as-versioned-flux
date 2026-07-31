@@ -1,0 +1,113 @@
+# The workload flagship (ticket 17). `customer-accounts-reset` is tuppence's
+# sensitive service: it resets customer account credentials, so a stale caller
+# reaching it is a real breach. It accepts a caller ONLY if that caller's SPIRE
+# SVID attests the CURRENT policy version — the gate is the SVID path posture
+# segment (ticket 15), not the caller's network position or a per-service
+# allowlist. Two callers prove both sides of the gate on one root:
+#
+#   teller-current -> claims policy-version 2.0.0 (current) -> stamp-posture
+#       stamps posture=2.0.0 -> posture ClusterSPIFFEID bakes
+#       spiffe://acme.internal/posture/2.0.0/ns/tuppence-reset/sa/teller-current
+#       -> matches the AuthorizationPolicy prefix -> REACHES, and OpenBao's jwt
+#       role globs the same prefix -> GETS the secret.
+#   teller-stale   -> claims 1.0.0 (still supported, but below this service's
+#       bar) -> posture=1.0.0 -> SVID .../posture/1.0.0/... -> matches NEITHER
+#       glob -> REFUSED reach AND secret. Drift out of currency = lose both.
+#
+# Own namespace (istio-injection enabled) so the identity substrate injects the
+# Envoy sidecar; part-of tuppence. The posture segment leads the SVID path, so
+# the namespace name is irrelevant to the gate — one version prefix matches.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tuppence-reset
+  labels:
+    istio-injection: enabled
+    app.kubernetes.io/part-of: tuppence
+    policy-as-versioned.dev/institution: tuppence
+---
+# ---- the sensitive service ------------------------------------------------
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: customer-accounts-reset, namespace: tuppence-reset }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-accounts-reset
+  namespace: tuppence-reset
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: customer-accounts-reset } }
+  template:
+    metadata:
+      labels:
+        app: customer-accounts-reset
+        spiffe.io/spire-managed-identity: "true"          # opt into a SPIRE SVID
+        policy-as-versioned.dev/policy-version: "2.0.0"   # current bar; stamps posture
+    spec:
+      serviceAccountName: customer-accounts-reset
+      containers:
+        - name: app
+          image: hashicorp/http-echo:latest
+          args: ["-text=account reset OK", "-listen=:8080"]
+          ports: [{ containerPort: 8080 }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: customer-accounts-reset, namespace: tuppence-reset }
+spec:
+  selector: { app: customer-accounts-reset }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+# ---- current caller: attests 2.0.0, reaches + gets the secret -------------
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: teller-current, namespace: tuppence-reset }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teller-current
+  namespace: tuppence-reset
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: teller-current } }
+  template:
+    metadata:
+      labels:
+        app: teller-current
+        spiffe.io/spire-managed-identity: "true"
+        policy-as-versioned.dev/policy-version: "2.0.0"   # current
+    spec:
+      serviceAccountName: teller-current
+      containers:
+        - name: caller
+          image: curlimages/curl:latest
+          command: ["/bin/sh", "-c", "while true; do curl -sS -o /dev/null -w 'reset->%{http_code}\\n' customer-accounts-reset.tuppence-reset/ || true; sleep 5; done"]
+---
+# ---- stale caller: attests 1.0.0 (supported, but below the bar) -----------
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: teller-stale, namespace: tuppence-reset }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teller-stale
+  namespace: tuppence-reset
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: teller-stale } }
+  template:
+    metadata:
+      labels:
+        app: teller-stale
+        spiffe.io/spire-managed-identity: "true"
+        policy-as-versioned.dev/policy-version: "1.0.0"   # out of currency for this service
+    spec:
+      serviceAccountName: teller-stale
+      containers:
+        - name: caller
+          image: curlimages/curl:latest
+          command: ["/bin/sh", "-c", "while true; do curl -sS -o /dev/null -w 'reset->%{http_code}\\n' customer-accounts-reset.tuppence-reset/ || true; sleep 5; done"]

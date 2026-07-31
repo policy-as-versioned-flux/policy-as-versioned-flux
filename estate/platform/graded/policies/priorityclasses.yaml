@@ -1,0 +1,42 @@
+# Eviction priority — the cage's last dial. A caged pod keeps running, but under
+# node pressure it is the first to be evicted: the lower the PriorityClass value,
+# the sooner the kubelet reclaims it. Healthy in-currency workloads (default
+# globalDefault priority 0) outrank every caged tier, and the tighter the tier the
+# lower it sits. Negative values are legal and mean "below the default": a behind-
+# posture workload never starves a compliant one. `preemptionPolicy: Never` so a
+# caged pod fills spare capacity but never preempts anything to get scheduled.
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: cage-baseline
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: graded-enforcement
+value: -10
+preemptionPolicy: Never
+globalDefault: false
+description: "Graded cage — baseline tier: evicted before healthy workloads under pressure."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: cage-restricted
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: graded-enforcement
+value: -100
+preemptionPolicy: Never
+globalDefault: false
+description: "Graded cage — restricted tier: evicted before baseline-caged workloads."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: cage-quarantine
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: graded-enforcement
+value: -1000
+preemptionPolicy: Never
+globalDefault: false
+description: "Graded cage — quarantine tier: first to be evicted, the hardest cage short of Deny."

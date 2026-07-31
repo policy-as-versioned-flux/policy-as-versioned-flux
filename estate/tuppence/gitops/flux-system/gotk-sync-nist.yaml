@@ -1,0 +1,30 @@
+# Pinned upstream dependency: the real `nist` 800-53 OSCAL controls catalog
+# (estate/nist), consumed the same way `platform` is one level up — a signed,
+# versioned artifact pinned by tag+commit, not a moving branch. A regulator
+# change (nist bumps its catalog) arrives here as a reviewable PR that edits
+# .spec.ref, exactly like a dependency-bump PR (see driftwood's
+# scripts/bump-nist-pin.sh, same pattern reused for tuppence).
+#
+# On the real `policy-as-versioned-nist` GitHub remote this tag is
+# gitsign-signed (keyless -> Rekor), verified out-of-band via `git verify-tag`
+# / Rekor lookup (Flux's GitRepository.spec.verify only speaks OpenPGP) — same
+# convention as driftwood's own gotk-sync.yaml.
+#
+# For the offline touring demo, scripts/up.sh rewrites .spec.url to the
+# in-cluster git server (same git-server pod tuppence's own source uses —
+# GIT_HTTP_EXPORT_ALL serves both bare repos) and sets the freshly-seeded
+# tag+commit.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: nist
+  namespace: flux-system
+  labels:
+    policy-as-versioned.dev/upstream: nist
+spec:
+  interval: 5m
+  url: https://github.com/policy-as-versioned-nist/nist
+  ref:
+    tag: v1.0.0
+    # commit pinned at release by the wave-push (belt-and-braces immutability):
+    # commit: <40-char-sha>

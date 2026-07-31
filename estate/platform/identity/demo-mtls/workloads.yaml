@@ -1,0 +1,64 @@
+# Two meshed workloads proving mTLS on SPIFFE identity: `ping` calls `pong`.
+# Each has its own ServiceAccount, so each gets a distinct SPIRE SVID:
+#   ping -> spiffe://acme.internal/ns/mesh-demo/sa/ping
+#   pong -> spiffe://acme.internal/ns/mesh-demo/sa/pong
+# The AuthorizationPolicy (authorizationpolicy.yaml) then admits pong's callers
+# by SPIFFE *principal*, not IP — the "trust the SVID, not the network" beat.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mesh-demo
+  labels:
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: ping, namespace: mesh-demo }
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: pong, namespace: mesh-demo }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: pong, namespace: mesh-demo }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: pong } }
+  template:
+    metadata:
+      labels:
+        app: pong
+        spiffe.io/spire-managed-identity: "true"   # opt into SPIRE-issued SVID
+    spec:
+      serviceAccountName: pong
+      containers:
+        - name: pong
+          image: hashicorp/http-echo:latest
+          args: ["-text=pong", "-listen=:8080"]
+          ports: [{ containerPort: 8080 }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: pong, namespace: mesh-demo }
+spec:
+  selector: { app: pong }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: ping, namespace: mesh-demo }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: ping } }
+  template:
+    metadata:
+      labels:
+        app: ping
+        spiffe.io/spire-managed-identity: "true"
+    spec:
+      serviceAccountName: ping
+      containers:
+        - name: ping
+          image: curlimages/curl:latest
+          command: ["/bin/sh", "-c", "while true; do curl -sS pong.mesh-demo/ || true; sleep 5; done"]

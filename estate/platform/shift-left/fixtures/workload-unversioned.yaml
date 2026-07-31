@@ -1,0 +1,8 @@
+# No policy-version label -- out of scope of every versioned policy (same
+# self-scoping the distribution layer proves); shift-left has nothing to
+# check, so it passes trivially rather than guessing a target.
+apiVersion: v1
+kind: Pod
+metadata: { name: legacy-svc }
+spec:
+  containers: [{ name: c, image: nginx }]

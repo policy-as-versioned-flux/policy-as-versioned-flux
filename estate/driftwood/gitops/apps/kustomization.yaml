@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - version-configmap.yaml
+  - nist-pin-configmap.yaml

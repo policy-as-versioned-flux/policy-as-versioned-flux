@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tuppence-live-version
+  namespace: tuppence
+  labels:
+    app.kubernetes.io/part-of: tuppence
+# Phase-0 "one version live" marker. Later tickets replace this with the real
+# Kyverno ValidatingPolicy set fanned out from platform's ResourceSet version
+# array; for the bootstrap it is a minimal object that proves the GitRepository
+# reconciles healthy end to end.
+data:
+  policyVersion: "1.0.0"
+  reconciledBy: flux

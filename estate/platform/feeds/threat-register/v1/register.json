@@ -1,0 +1,25 @@
+{
+  "feed_version": "v1",
+  "published_by": "platform",
+  "note": "institution threat register -- annual loss-event-frequency (lef) per institution's headline threat, editorial and grounded in publicly reported incident base rates (Verizon DBIR sector breach-frequency ranges), not a live threat-intel subscription.",
+  "institutions": {
+    "driftwood": {
+      "threat": "cart/checkout PII exfiltration",
+      "flavour": "e-commerce, short-life cart data, high traffic/low sensitivity per-record",
+      "lef": [2, 4, 9],
+      "source": "DBIR retail-sector web-app-attack base rate, editorial midpoint"
+    },
+    "tuppence": {
+      "threat": "payment-fraud / account-takeover via API abuse",
+      "flavour": "fintech, FCA/PCI, availability+fraud flavour",
+      "lef": [3, 6, 14],
+      "source": "DBIR financial-sector base rate + card-scheme fraud-loss reporting, editorial midpoint"
+    },
+    "ludlow": {
+      "threat": "confidential health-record exfiltration",
+      "flavour": "HIPAA, decades-confidential, HNDL/harvest-now-decrypt-later exposure",
+      "lef": [1, 2, 5],
+      "source": "DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon"
+    }
+  }
+}
