@@ -43,3 +43,16 @@ later cut from the deck.
   even though the framing is narrated: accept a condition → £ rises; tighten a control → £ falls; a
   new threat/EOL lands → £ jumps.
 - Method + the moving-£ readout are build-work; the *angle* is the decision, and it's locked.
+
+## Update (2026-07-23) — the number is Total Cost of Risk, not just residual
+
+Grilling ticket 16 (enforcement response gradient) upgrades what the balance-sheet number *is*:
+
+> **TCoR = retained residual (ALE/TVaR) + cost of controls in force + risk transfer (premiums)**
+
+The graded-enforcement **cages** are the *cost-of-controls* term, and they make it **dynamic**: a
+workload/fleet drifting out of posture doesn't only raise the residual line — it raises the
+control-spend line as cages kick in (a cage is a *priced partial-reduce on a retained risk*: residual
+drops to R′>0 **and** costs C_cage/yr to run; **both** book to the sheet). "Compliant = cheap" becomes
+a **computed** crossover (`C_cage + R′` forever vs `C_fix` once → baseline), and it's the fork the
+war-gamer evaluates: **fix vs cage vs transfer vs deny**, chosen by TCoR. See [ticket 16](16-enforcement-response-gradient.md).

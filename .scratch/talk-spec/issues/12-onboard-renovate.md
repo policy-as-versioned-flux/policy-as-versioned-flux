@@ -9,7 +9,7 @@ Blocked by: 11
 
 ## Question
 
-Get Renovate running across `policy-as-versioned-{platform,driftwood,tuppence,caldera,nist,ico}` so
+Get Renovate running across `policy-as-versioned-{platform,driftwood,tuppence,ludlow,nist,ico}` so
 the dependency-bump story (regulator artifact bumps, policy-version bumps, app deps) is live.
 
 **Two real caveats that shape *how* and *when* this is done:**
@@ -33,12 +33,12 @@ Record in the Answer: which orgs were authorised, any billing/consent notes, and
 
 ## Progress (2026-07-23)
 
-- **`caldera` fully onboarded** as the template: Renovate Only · Silent **off** · Require config
+- **`ludlow` fully onboarded** as the template: Renovate Only · Silent **off** · Require config
   file **off** · Automated PRs on · Create onboarding PRs on. (Silent defaulted on via the wizard's
   "Scan Only"; fixed in Settings → Dependencies.)
 - **`driftwood`/`ico`/`nist`/`platform`/`tuppence`** — GitHub app installed (all-repositories), but
   the Mend onboarding + un-silence config still needs applying (they'll default to Silent like
-  caldera did). Deferred at the human's request; harmless while the orgs are empty, apply
+  ludlow did). Deferred at the human's request; harmless while the orgs are empty, apply
   before/at the build.
 - **Update:** the human fixed the un-silence config on the other five, so **all six orgs are now
   onboarded, Renovate Only, non-silent**. Remaining for full resolution: `renovate.json` present +

@@ -103,7 +103,7 @@ the repo's `docs/agents/issue-tracker.md` (local-markdown tracker, "Wayfinding o
   cluster shape → ticket 11.
 - [The fictitious organisation](issues/01-fictitious-organisation.md) — **not one org, a six-org
   topology, all live, all `policy-as-versioned-*`** (human created them 2026-07-23): `platform` (the
-  inherited discipline) + institutions `driftwood`/`tuppence`/`caldera` (e-comm/fintech/health) +
+  inherited discipline) + institutions `driftwood`/`tuppence`/`ludlow` (e-comm/fintech/health) +
   regulators `nist` (real OSCAL controls) & `ico` (real public fines, machine-readable). The prefix
   is the impersonation guardrail. Existing `policy-as-versioned-flux` → **archive as the last
   migration step**, not now. Portability + proportionality proven by *comparing* institutions (same
@@ -119,9 +119,9 @@ the repo's `docs/agents/issue-tracker.md` (local-markdown tracker, "Wayfinding o
   Audit→Deny is caught pre-deploy. Full doc: `research/08-enforcement-engines.md`.
 - [Risk & proportionality model](issues/04-risk-proportionality-model.md) — FAIR (freq×severity) →
   **ALE + VaR₉₅ + TVaR** + risk-load; proportionality = the four moves (avoid·reduce·transfer·retain);
-  five signed feeds; Bühlmann calibration. **Appetite locked:** `caldera` strictest (Deny-heavy),
+  five signed feeds; Bühlmann calibration. **Appetite locked:** `ludlow` strictest (Deny-heavy),
   `driftwood` loosest (Audit-heavy), `tuppence` toward-strict. **Money-shot:** same control = Audit in
-  `driftwood`, Deny in `caldera`, because the £ differs. £/bands derive during build.
+  `driftwood`, Deny in `ludlow`, because the £ differs. £/bands derive during build.
 - [Exemptions → conditional policy](issues/05-exemptions-ledger.md) — dissolved into CEL "you may X
   *if* C", uniform + versioned; residual of each permissive branch feeds the £. Mechanically:
   git-ledger entry → rendered `PolicyException` (Flux prune + ttl) → generates the OSCAL `risk`/POA&M.
@@ -143,18 +143,44 @@ the repo's `docs/agents/issue-tracker.md` (local-markdown tracker, "Wayfinding o
 - [Wardley strategic layer](issues/14-wardley-strategic-layer.md) — **AI + market-intel** anticipation
   of commoditisation / attack-cost-collapse / PQ, *ahead* of the reactive feeds; hands the war-gamer a
   forward view so proportionality re-tunes before the threat lands.
+- [Rename health institution: caldera → ludlow](issues/15-rename-caldera-to-ludlow.md) — `caldera`
+  clashed with `apache/caldera` (MITRE's adversary-emulation tool — a security-tool clash in a
+  security talk). Renamed to **`ludlow`** after vetting alternatives against security/k8s/AI tooling
+  (Cairn, Tarn, Meridian, Halcyon all clashed). Siblings clean; `nist`/`ico` intentionally real.
+  **Pending:** rename the GitHub org (user action).
+- [Enforcement response gradient](issues/16-enforcement-response-gradient.md) — enforcement is a
+  **proportionate graded response**, not admit/deny. **(A) self-envelope:** posture *cages your own*
+  runtime by degree (Kyverno mutate/generate). **(B) posture-as-identity:** the policy version becomes
+  a claim on the workload's **SPIFFE/SPIRE** SVID, gating **Istio** authz + **OpenBao** secrets — makes
+  provenance *continuous into runtime*. Least-privilege is the floor (trust never earns loose).
+  Economics = **Total Cost of Risk** (residual + dynamic cage-cost + transfer); war-gamer picks
+  fix/cage/transfer/deny by TCoR. Carrier = SPIFFE/SPIRE; tiers-over-dials; **build everything
+  estate-wide**, gating *density* follows proportionality. Spawned
+  [Kyverno→SPIRE research](issues/17-posture-identity-research.md) to de-risk the one non-trodden hand-off.
+- [Human & device identity](issues/18-human-and-device-identity.md) — posture-as-identity generalises
+  to **three actor classes: workload · human · device**, one SPIFFE + gitsign root. Human: gitsign
+  (supply chain, real) + **Pomerium Core** OIDC/WebAuthn for operational access. Device/EUD: **SPIRE
+  `tpm_devid`** device SPIFFE IDs on the same root — **Mac Secure-Enclave key = the genuine live root**,
+  Windows/Linux via **UTM vTPM VMs** (built full, narrated virtual). **Not Teleport** (Device Trust +
+  OIDC Enterprise-only — [carrier research](issues/19-human-device-carrier-research.md)). Closes
+  *provenance for every actor*.
 
 ## Not yet specified
 
-**MAP DECISION-COMPLETE (2026-07-23).** Every design decision is locked — nothing remains to *decide*
-before building. The frontier is empty of decision tickets; what's below is **build fog**, sequenced
-by the build order in [`the-whole-model.md`](the-whole-model.md) (Phases 0–5), and is the input to
-`/mattpocock-skills:implement`. These graduate into build tickets as each phase is picked up, not
-before — no decision blocks them.
+**All design decisions locked; spec folded; build tickets published.** The four extensions
+(enforcement gradient · Kyverno→SPIRE research · human/device identity · carrier research) are folded
+into [`the-whole-model.md`](the-whole-model.md) + `spec.md` under the *"it's all the policy"* spine,
+and `/to-tickets` has split the work into **27 tracer-bullet slices** (Phases 0–7) under
+[`build/`](build/), all `ready-for-agent`. **The map's charting job is done — it's now execution.**
+Build frontier = **[01 `fair.py`](build/01-fair-risk-engine.md)** +
+**[02 bootstrap](build/02-estate-cluster-flux-bootstrap.md)** (no blockers, parallelisable); next =
+`/mattpocock-skills:implement` per ticket, frontier-first, fresh context each. The **build fog** below
+is now those slices in `build/`:
 
 <!-- build fog — execution, not decisions (this map carries execution per Notes) -->
 - **The delivery refactor** — the six-org estate built fresh: `platform` discipline + the three
-  institution estates, Phases 0–5. The bulk of the build.
+  institution estates, Phases 0–5, now including the graded-response (mutate/generate) + posture-
+  identity (SPIRE/Istio/OpenBao) layer. The bulk of the build.
 - **The Marp deck arc & build** — slide structure now sharp (spine locked); authored against the
   built estate so every demo-live claim is real.
 - **Demo runbook & rehearsal** — the idempotent, offline-safe, resettable live-run script; last.

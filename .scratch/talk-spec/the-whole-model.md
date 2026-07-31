@@ -13,44 +13,169 @@ Policy is a **versioned dependency** (a lint/rule pack): pinned, signed, adopted
 That's the *mechanism*. Risk is the *ground*. The hourglass is the *structure*. The living loop is
 what keeps it *alive*.
 
+## It's all the policy (2026-07-23)
+
+**What the policy *is*:** not a compliance overlay, not exemptions, not added complexity — it is the
+**executable codification of how the organisation operates**, and the **formal record of every
+governance decision** taken. Each rule is a documented decision, **grounded in proportionality (£)**
+and **stress-tested by wargaming**. We're not carving special cases; we're writing down how the org
+runs. That recasts the vocabulary: "exemptions" are just *documented operating decisions* (no
+favours); the OSCAL up-flow is the *formal decision record*; provenance is *decision attribution*;
+versioning is the *decision history*; the war-gamer is how the decisions get *tested*.
+
+There are no subsystems — there is **one artifact, the policy** (versioned, signed, attestable), and
+everything else is either a *projection* of it or a *function around* it.
+
+**The policy@version is a workload's complete governance envelope.** "Which version of the policy do
+you satisfy?" is the single fact that determines every surface:
+- **admission** — may you run at all;
+- **runtime envelope** — how you're caged (resources / WAF / caps) if your posture is behind;
+- **identity** — the posture claim baked into your SPIFFE/SPIRE SVID;
+- **reach** — who you may call (Istio `AuthorizationPolicy` gates on that claim);
+- **entitlement** — what secrets you're issued (OpenBao gates on it).
+
+The graded "self-envelope" and "posture-as-identity" are **not two mechanisms** — they're two
+*projections* of the same versioned policy: one onto your own runtime, one onto your identity and
+relationships.
+
+**Around that one artifact runs a ring of functions:** *informed* by risk £ + the feeds → *proposed*
+by the war-gamer + humans → *distributed* by Flux (signed, pinned, pruned) → *projected/enforced* by
+Kyverno across every surface above → *evidenced* up as OSCAL → *priced* as TCoR. The hourglass, the
+six-org graph, the living loop — all of it is the **lifecycle of the one policy**.
+
+The thesis at its tightest: **policy is a versioned dependency — and that one dependency is the whole
+governance surface.** Every talk beat is the same object seen from a different angle; the build is one
+policy artifact with many projections, not N subsystems.
+
 ## The integrated picture
 
+```mermaid
+flowchart TB
+    wardley["<b>AI-Wardley</b><br/>commoditisation · market-intel<br/><i>(ANTICIPATE)</i>"]
+    feeds["<b>Signed feeds</b><br/>threat · CVE · EOL · penalties<br/><i>(OBSERVE)</i>"]
+
+    appetite[["<b>RISK APPETITE — £ per institution</b><br/>the ground &amp; the scoreboard"]]
+
+    subgraph hourglass["THE HOURGLASS — versioned &amp; signed end to end"]
+      direction TB
+
+      subgraph top["▽ intent — the wide top, tuned by the £"]
+        direction TB
+        principles["<b>PRINCIPLES</b><br/>what this institution cares about"]
+        controls["<b>CONTROLS</b> — Kyverno CEL ValidatingPolicy, versioned<br/>conditional policy: <i>“you may X if C”</i> (no exemptions)"]
+        tuning["<b>proportionality tuning</b><br/>Audit ↔ Deny · CVE tolerance · lifecycle/EOL pace<br/><i>set by the £ — a version bump = proportionality moving</i>"]
+        principles --> controls --> tuning
+      end
+
+      subgraph neck["◇ the neck — one admission decision"]
+        direction TB
+        dist["<b>Flux distributes</b> to the cluster<br/>signed GitRepository · ResourceSet fan-out<br/>prune-on-retire · drift-heal · orphan-guard"]
+        shiftleft["<b>shift-left</b> — ±1 version-skew<br/>same eval runs in CI <i>before</i> admission"]
+        admission["<b>ENFORCEMENT / ADMISSION</b><br/>Audit = observe · Deny = block"]
+        dist --> admission
+        shiftleft -. catches Audit→Deny pre-merge .-> admission
+      end
+
+      subgraph bottom["△ evidence &amp; accounting — the wide bottom, flows up"]
+        direction TB
+        evidence["<b>EVIDENCE</b><br/>PolicyReports → c2p → OSCAL observations / findings"]
+        ledger["<b>− EXEMPTIONS LEDGER</b> (the conditional branches)<br/>each: priced · scoped · expiring · versioned<br/>→ OSCAL risk / POA&amp;M objects"]
+        residual["<b>= RESIDUAL RISK (£)</b><br/>ALE + VaR₉₅ + TVaR + risk-load"]
+        evidence --> ledger --> residual
+      end
+
+      tuning --> dist
+      admission --> evidence
+    end
+
+    balance[["<b>BALANCE SHEET</b><br/>insurance · valuation · board"]]
+
+    wargamer{{"<b>WAR-GAMER</b><br/>governance-agent evolved<br/>stress-tests controls"}}
+    drift{"proportionality<br/>drift?"}
+    pr["opens a <b>POLICY PR</b><br/><i>proposes, never disposes</i>"]
+    gate["human review + PR-gate + gitsign"]
+
+    appetite -->|sets proportionality| tuning
+    controls --> wargamer
+    wardley --> wargamer
+    feeds --> wargamer
+    wargamer --> drift
+    drift -->|on drift| pr --> gate
+    gate -->|"signed release → estate re-tunes → £ moves"| controls
+    residual -.->|residual £| balance
+
+    classDef ground fill:#fde,stroke:#b48,stroke-width:2px;
+    class appetite,balance ground;
+    classDef neckzone fill:#eef,stroke:#66a,stroke-width:2px;
+    class dist,shiftleft,admission neckzone;
 ```
-   ANTICIPATE                RISK APPETITE (£ per institution) ── the ground & the scoreboard
-   AI-Wardley ──┐            ┌──────────────┴───────────────────────────────▲─────────────┐
-   (commodit-   │  sets proportionality                                     │ residual £  │
-    isation,    ▼            ▼                                              │  → BALANCE   │
-    market-  ┌──────────────────────────────────────────────┐             │    SHEET     │
-    intel)   │  PRINCIPLES → CONTROLS → ENFORCEMENT          │  the        │  (insurance, │
-   OBSERVE   │  Kyverno CEL · CONDITIONAL policy (no         │  hourglass  │   valuation, │
-   feeds:    │  exemptions) · ±1 shift-left checked in CI    │             │   board)     │
-   threat ·  │  Flux distributes: signed GitRepository,      │   EVIDENCE ─┘              │
-   CVE ·     │  ResourceSet fan-out, prune-on-retire, heal   │   (OSCAL risk objects)     │
-   EOL ·     └───────────────────────┬──────────────────────┘   flows UP ────────────────┘
-   penalties │                       ▼
-     ──────► │                  WAR-GAMER  ── stress-tests controls ──► proportionality drift?
-             │                  (governance-agent evolved)                     │
-             └──────────────────────────────────────────────────────► on drift: opens a POLICY PR
-                                                                              │  PROPOSES, never disposes
-                                        human review + PR-gate + gitsign ◄────┘
-                                                    │ signed release → estate re-tunes → £ moves
-              ── every actor & action attestable (gitsign keyless → Rekor): verify, don't trust ──
-```
+
+> Spanning everything: **every actor &amp; action is attestable** (`gitsign` keyless → Rekor) —
+> verify, don't trust. The whole hourglass — appetite, controls, ledger, evidence — is versioned, so
+> the £ at the bottom always matches the policy at the top.
 
 ## The six-org dependency & provenance graph
 
+```mermaid
+flowchart TB
+    subgraph upstreams["UPSTREAM DEPENDENCIES — versioned · signed · Renovate-bumpable"]
+      direction LR
+      nist["<b>…-nist</b><br/>800-53 OSCAL controls<br/><i>(real catalog)</i>"]
+      ico["<b>…-ico</b><br/>penalties@vYYYY.N → £<br/><i>(real public fines, repackaged)</i>"]
+      cve["<b>CVE feed</b><br/>trivy / GHSA"]
+      eol["<b>EOL feed</b><br/>endoflife.date"]
+      market["<b>market-intel</b><br/>adoption curves · vendor signals"]
+    end
+
+    subgraph platform["…-platform — THE SHARED DISCIPLINE (inherited by each institution, pinned + signed)"]
+      direction LR
+      fluxt["Flux distribution templates<br/>ResourceSet · GitRepository · prune · heal"]
+      fair["FAIR risk engine<br/>£: ALE · VaR₉₅ · TVaR · load"]
+      wargamer["war-gamer + AI-Wardley"]
+      render["ledger → PolicyException render"]
+      shiftleft["shift-left harness (±1 skew)"]
+      oscal["OSCAL / c2p plumbing"]
+    end
+
+    subgraph institutions["INSTITUTIONS — one KinD cluster each · all LIVE"]
+      direction TB
+      subgraph driftwood["…-driftwood · e-comm · PCI+GDPR · teaching default"]
+        direction TB
+        d_skin["<b>risk skin</b> — Audit-heavy (loosest)<br/>pins …-nist controls + …-ico penalties @version"]
+        d_pol["own <b>policies</b> — Kyverno CEL, versioned<br/>conditional 'you may X if C'"]
+        d_apps["own <b>apps</b>"]
+        d_teams["<b>teams → workloads → underlying tech</b><br/>adopt each policy version by PR (±1 skew)"]
+        d_cluster["own <b>KinD cluster</b><br/>Flux + Kyverno enforce at admission"]
+        d_skin --> d_pol --> d_teams
+        d_apps --> d_teams
+        d_pol -. enforced in .-> d_cluster
+      end
+      tuppence["<b>…-tuppence</b> · fintech · FCA+PCI+GDPR<br/>risk skin: toward-strict · scary £<br/><i>(same internal shape as driftwood ▲)</i>"]
+      ludlow["<b>…-ludlow</b> · US health · HIPAA<br/>risk skin: Deny-heavy (strictest) · long-life data<br/><i>(same internal shape ▲)</i>"]
+    end
+
+    fluxold["<b>…-flux</b> — existing estate<br/><i>research-only → ARCHIVE last</i>"]
+
+    nist   -->|controls| oscal
+    ico    -->|loss magnitude| fair
+    cve    --> wargamer
+    eol    --> wargamer
+    market --> wargamer
+
+    platform ==>|pinned, signed dependency| driftwood
+    platform ==>|pinned, signed dependency| tuppence
+    platform ==>|pinned, signed dependency| ludlow
+
+    classDef archive fill:#eee,stroke:#999,stroke-dasharray:4 3,color:#666;
+    class fluxold archive;
+    classDef reg fill:#efe,stroke:#4a4;
+    class nist,ico,cve,eol,market reg;
 ```
-  policy-as-versioned-nist ──(OSCAL controls, real)──┐
-  policy-as-versioned-ico  ──(penalties@v, £)────────┤ upstream, versioned, signed
-                                                      ▼
-  policy-as-versioned-platform ──(the discipline: Flux templates, FAIR engine, war-gamer,
-       │  Wardley layer, ledger→PolicyException render, shift-left harness, OSCAL plumbing)
-       │  inherited as a pinned, signed dependency by each institution ↓
-       ├──► policy-as-versioned-driftwood  (e-comm · PCI+GDPR · teaching default · FULLY LIVE)
-       ├──► policy-as-versioned-tuppence   (fintech · FCA+PCI+GDPR · scary £  · FULLY LIVE)
-       └──► policy-as-versioned-caldera    (US health · HIPAA · long-life data · FULLY LIVE)
-  (existing policy-as-versioned-flux → ARCHIVE as the last migration step)
-```
+
+> All orgs are `policy-as-versioned-*` (the prefix is the impersonation guardrail). **Every hop is a
+> signed, versioned dependency** — Renovate opens the bump PR at every level (regulator → platform →
+> institution → team), and `gitsign` → Rekor makes each bump attestable: regulator raises a fine →
+> `…-ico` bumps → the institution's £ re-tunes → proportionate controls tighten, all as reviewable PRs.
 
 ## What's built (nothing is a "nice-to-have")
 
@@ -98,9 +223,16 @@ what keeps it *alive*.
 1. **Risk engine + conditional policy + the £** — FAIR against `driftwood`; `nist` controls feed.
 2. **The other two institutions + `ico` penalties + the proportionality *comparison*** (same
    control, Audit in retail / Deny in health, different £) — the thesis's money shot.
-3. **Up-flow + balance sheet + shift-left** — OSCAL risk objects; residual → £; CI ±1 check.
-4. **The living loop** — feeds + war-gamer + AI-Wardley + provenance-for-every-actor.
-5. **Calibration + feed-integrity + reflexive** — the honesty/robustness layer.
+3. **Up-flow + balance sheet (TCoR) + shift-left** — OSCAL risk objects; residual → £; CI ±1 check.
+4. **Graded enforcement** — Kyverno mutate/generate cages a workload by posture (tiers over dials);
+   cage cost feeds TCoR.
+5. **Identity plane + workload posture-as-identity** — SPIRE + Istio + OpenBao; Kyverno→SPIRE posture
+   projection (SVID path) + currency controller + label trust-boundary; posture-gated reach + secrets
+   (workload flagship, `tuppence`).
+6. **Human/device plane** — Pomerium Core (OIDC + WebAuthn) + SPIRE `tpm_devid`; Mac Secure-Enclave
+   live; posture-gated human access (break-glass); UTM vTPM Windows/Linux EUD VMs (narrated-virtual).
+7. **Living loop + honesty** — feeds + war-gamer (wargames human/device paths too) + AI-Wardley +
+   provenance-for-every-actor; calibration + feed-integrity + reflexive self-governance.
 
 ## The talk's spine (through-line), and demonstrable-core vs narrated-vision
 
@@ -110,7 +242,7 @@ leaders. Three beats demoed **live**: *proportionality* (retail-vs-health), the 
 is the cold open and *balance-sheet* the close — both **narrated**, not demoed. Touring ⇒ two
 build requirements: **(a) reproducible on a laptop at a venue** (idempotent bring-up, offline-safe,
 resettable between runs); **(b) audience-modular** — re-foreground the institution that matches the
-room (`tuppence`/fintech, `caldera`/health, `driftwood`/general) with zero rebuild.
+room (`tuppence`/fintech, `ludlow`/health, `driftwood`/general) with zero rebuild.
 
 **Spine:** open on **what a breach costs** (risk, not GitOps) → policy is a **versioned dependency**
 (the lint-pack you already trust) → **proportionality** (same control, different verdict per

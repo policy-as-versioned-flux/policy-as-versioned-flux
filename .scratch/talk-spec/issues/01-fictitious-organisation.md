@@ -34,7 +34,7 @@ institutions*, plus the regulator sitting at the top of the dependency graph.
 | `policy-as-versioned-platform` | the **shared discipline** all institutions inherit — Flux distribution mechanism, FAIR engine, exemptions-ledger pattern, shift-left harness, OSCAL plumbing (dogfoods the thesis on the tooling itself) | real |
 | `policy-as-versioned-driftwood` | institution — **e-commerce** (the teaching default; PCI + GDPR) | fictitious business |
 | `policy-as-versioned-tuppence` | institution — **fintech/payments** (FCA + PCI + GDPR; scary £) | fictitious business |
-| `policy-as-versioned-caldera` | institution — **US health** (HIPAA) | fictitious business |
+| `policy-as-versioned-ludlow` | institution — **US health** (HIPAA) | fictitious business |
 | `policy-as-versioned-nist` | regulator — **controls** | **real** 800-53 OSCAL catalog |
 | `policy-as-versioned-ico` | regulator — **penalties** (`penalties@vYYYY.N`, machine-readable) | **real public** fine data, repackaged |
 
@@ -49,7 +49,7 @@ institutions*, plus the regulator sitting at the top of the dependency graph.
   now: it's the migration source and the currently-live demo, so archiving it early would break the
   running estate we're refactoring from. Tracked in the multi-org-topology ticket.
 - **Portability + proportionality is proven by comparison** — the identical "encrypt at rest"
-  control is `Audit` in `driftwood` and `Deny` in `caldera` because a HIPAA breach costs ~8× a
+  control is `Audit` in `driftwood` and `Deny` in `ludlow` because a HIPAA breach costs ~8× a
   retail one: same engine, same catalog dependency, different regulator skin, different £.
 
 **Hand-off:** the per-institution **risk skins** (appetite band, fine magnitudes, threat register

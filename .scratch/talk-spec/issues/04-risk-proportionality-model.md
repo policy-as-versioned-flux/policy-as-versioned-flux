@@ -39,11 +39,11 @@ proportionality = the **four risk-financing moves** (avoid · reduce · transfer
 five versioned **feed threads** (threat register · CVE · EOL · penalties · market-intel/Wardley);
 calibration via **credibility theory (Bühlmann)**; the £ framed as **economic/risk-based capital**.
 
-**Appetite framing locked (2026-07-23):** `caldera` **strictest** (Deny-heavy — HIPAA + decades-
+**Appetite framing locked (2026-07-23):** `ludlow` **strictest** (Deny-heavy — HIPAA + decades-
 confidential records → HNDL/PQ real); `driftwood` **loosest** (Audit-heavy — short-life cart data,
 HNDL≈0); `tuppence` **between, toward strict** (FCA/PCI fines, but an availability/fraud/op-resilience
 flavour). **Money-shot:** the *same* control (encrypt-at-rest / no-EOL-log4j) is **Audit in
-`driftwood`, Deny in `caldera`** — same rule, opposite verdict, because the £ says so.
+`driftwood`, Deny in `ludlow`** — same rule, opposite verdict, because the £ says so.
 
 Exact £, appetite bands, and the per-institution threat registers **derive** from FAIR + the feeds +
 the org briefs during the build; the *relative shape* is locked. Formalisation (formulas, data
