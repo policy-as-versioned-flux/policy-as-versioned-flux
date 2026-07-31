@@ -1,0 +1,23 @@
+s01   40w   14.6s
+s02   37w   14.6s
+s03   38w   11.8s
+s04   35w   14.4s
+s05   39w   13.8s
+s06   40w   17.0s
+s07   40w   15.5s
+s08   39w   16.6s
+s09   37w   15.9s
+s10   37w   15.6s
+s11   38w   14.3s
+s12   37w   15.5s
+s13   39w   15.1s
+s14   39w   16.6s
+s15   37w   15.8s
+s16   42w   14.6s
+s17   40w   15.4s
+s18   40w   13.5s
+s19   41w   14.3s
+s20   43w   13.0s
+
+TOTAL narration audio: 298.1s (video is fixed at 400s / 6:40)
+OVER-19s clips (need trimming): none

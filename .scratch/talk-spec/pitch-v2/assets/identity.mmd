@@ -1,0 +1,7 @@
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#17181a','primaryTextColor':'#fafcff','primaryBorderColor':'#1c64f2','lineColor':'#1c64f2','secondaryColor':'#141414','tertiaryColor':'#141414','fontFamily':'Montserrat,Helvetica,sans-serif','fontSize':'26px'}}}%%
+flowchart LR
+  POL["policy version<br/>you satisfy"] --> W["workload"] & H["human"] & D["device"]
+  W --> ROOT["one signed<br/>cryptographic root"]
+  H --> ROOT
+  D --> ROOT
+  ROOT --> V["verify — don't trust"]

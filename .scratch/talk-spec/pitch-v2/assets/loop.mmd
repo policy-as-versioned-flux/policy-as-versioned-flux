@@ -1,0 +1,7 @@
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#17181a','primaryTextColor':'#fafcff','primaryBorderColor':'#1c64f2','lineColor':'#1c64f2','secondaryColor':'#141414','tertiaryColor':'#141414','fontFamily':'Montserrat,Helvetica,sans-serif','fontSize':'26px'}}}%%
+flowchart LR
+  FEEDS["threats · CVEs · fines"] --> WG["WAR-GAMER<br/>stress-tests controls"]
+  WG -->|"drift?"| PR["signed pull request"]
+  PR --> HUM["human + gate"]
+  HUM --> EST["estate re-tunes"]
+  EST -->|"£ moves"| FEEDS

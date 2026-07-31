@@ -1,0 +1,7 @@
+# Regenerable build intermediates (kept out of history to avoid bloat)
+audio/
+audio_tight/
+seg/
+concat*.txt
+assets/pptr.json
+__pycache__/
