@@ -61,7 +61,7 @@ spec:
         enabled: true
       # Short TTLs = snappy revocation for the live "loses reach in minutes" beat.
       # JWT 5m so an out-of-currency caller loses its OpenBao secret fast (research 16 Q4).
-      ca_subject: { country: [UK], organization: [acme], common_name: acme.internal }
+      caSubject: { country: [UK], organization: [acme], commonName: acme.internal }
     spire-agent:
       # Agent socket exposed on-host so Istio's Envoy can pull SVIDs over the
       # SPIFFE Workload API (SDS). Path must match Istio's caAddress below.
