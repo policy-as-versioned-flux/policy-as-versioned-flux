@@ -147,7 +147,7 @@ the repo's `docs/agents/issue-tracker.md` (local-markdown tracker, "Wayfinding o
   clashed with `apache/caldera` (MITRE's adversary-emulation tool — a security-tool clash in a
   security talk). Renamed to **`ludlow`** after vetting alternatives against security/k8s/AI tooling
   (Cairn, Tarn, Meridian, Halcyon all clashed). Siblings clean; `nist`/`ico` intentionally real.
-  **Pending:** rename the GitHub org (user action).
+  **Done (2026-07-31):** GitHub org renamed caldera → ludlow via browser.
 - [Enforcement response gradient](issues/16-enforcement-response-gradient.md) — enforcement is a
   **proportionate graded response**, not admit/deny. **(A) self-envelope:** posture *cages your own*
   runtime by degree (Kyverno mutate/generate). **(B) posture-as-identity:** the policy version becomes

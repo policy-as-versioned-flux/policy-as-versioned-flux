@@ -29,7 +29,7 @@ institution and rename everywhere.
 - **Done:** all 22 text occurrences renamed across `map.md`, `the-whole-model.md`, `spec.md`, the
   affected tickets (01, 04, 12) and `pitch/slides.py`.
 
-**Pending real-world action (user):** rename the GitHub org `policy-as-versioned-caldera` →
-`policy-as-versioned-ludlow` (org Settings → rename). Safe now — the estate is empty (build-fresh),
+**GitHub org renamed (2026-07-31, via browser):** `policy-as-versioned-caldera` → `policy-as-versioned-ludlow`
+— done (`ludlow` resolves, `caldera` 404s; GitHub set up repo redirects). Was safe — the estate is empty (build-fresh),
 and GitHub preserves an app install across an org rename, so the Renovate onboarding (ticket 12)
 survives. The built `pitch.mp4` is stale regardless and re-renders from the updated `slides.py`.
