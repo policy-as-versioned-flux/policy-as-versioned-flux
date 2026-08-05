@@ -102,6 +102,7 @@ Book), `secure`, `dpia`, `atrs`, `ai-playbook`, `data-model`, `finops`, `roadmap
 - [The causal layer](issues/08-causal-layer.md) — **RESOLVED.** Calibrated-range elasticities (sign+lag+PERT) on a **typed evidence ladder** with **use-gating** (only grades 1–2 price a scored forecast; grade 5 = model assertion = where contamination hides); propagation gives **two outputs** — priced causal delta + unpriced structural blast-radius — composed by Monte-Carlo with depth attenuation + shared-ancestry handling. **Forecasts are a WEATHER FORECAST**: probabilistic, conditional-by-construction, scored by proper scoring rules + reliability diagrams over *volume*, never a verdict on one call; mitigation credit is evidence-graded (closes the unfalsifiability loophole). **Rival causal accounts coexist as ensemble spread**, adjudicated by calibration.
 - [The £ currency: regimes, constraints, whose £](issues/09-currency-regimes.md) — **RESOLVED.** The £ is **perspectival** (it belongs to whoever pays to run the twin; a union/regulator/employee body instantiates their own — free from the ticket-07 tenancy shape), **bounded** (ruin-class + forbidden options are **hard pre-filters, never prices**; paperclip risk is real so the constraint set is **published upfront**; universal legal/ethical floor vs perspective-declared red lines), **causally gated** (only evidence-graded paths to cash flow enter the £ — reputation/morale price via churn/attrition/grievance paths or stay register entries; the boundary is *derived, not declared*), and **non-verdictive** (a trade-off curve across the ensemble with a marked default — if two world-models disagree on pay-rise-vs-hardening, *that* is the headline).
 - [The twin inside the twin](issues/10-twin-inside-twin.md) — **RESOLVED** (2 ACs partial, carried forward). The twin is **an ordinary component set in its own graph**, **depth-1 bounded** (no inception); **fully transparent in method *and* content** (safe: public-record spines + synthetic substrate; the compartment mechanism exists, unused); **contestability is its primary feature — the map is a thing to argue *with***, challenges versioned, no hiding behind aggregation. **Reflexivity/Goodhart explicitly deferred** as a recorded limitation (covert sensors ruled out permanently). Carried forward: the twin threat-modelling *exercise*, and a named misuse catalogue.
+- [The sense→move loop](issues/11-sense-move-loop.md) — **RESOLVED.** Position is **inferred first, then correctable, with the twin pushing back** (an override is a provenanced claim that is itself scored — **humans get calibrated against evidence too**; amends 07's authored coordinate). **Binding is fully automated** at volume, trusted downstream not at the gate (grade-5 + use-gating + contestability + calibration). **Unbound signals decay unless the graph catches them** — model change retroactively re-interprets history, making **lead-time-to-recognition measurable** (the quantum/HNDL case, mechanised). **Observation propagates bidirectionally; intervention is downstream-only `do()`** — same edges, two rules. **Event-driven + scheduled emission**, the schedule protecting calibration from selection bias.
 
 ## Not yet specified
 
@@ -112,13 +113,9 @@ Book), `secure`, `dpia`, `atrs`, `ai-playbook`, `data-model`, `finops`, `roadmap
   (email, chat, commits, HR events, supply-chain, telemetry) the twin *senses*, with **planted weak
   signals + known ground truth** so detection and the what-if→materialises loop are validatable. The
   generator itself is a capability/skill.
-- **The Wardley evolution engine** — every tracked factor on genesis→commodity; signals move
-  components; movements **propagate through the dependency graph**; automated/maintained via
-  `/arckit:wardley`.
-- **Omni-signal horizon scanning** — ingest *anything* (external + internal) and classify each signal
-  against the twin: does it move a component? The ever-growing factor set; STEEP/foresight practice;
-  the **people/behavioural sensors** (comp, promotion, workload, email/chat/commit/working-patterns)
-  — each gated by the ethics/law guardrail.
+- **The behavioural sensor set + Goodhart** — the people/behavioural sensors (comp, promotion, workload,
+  email/chat/commit/working-patterns), each gated by the ethics/law guardrail; and **sensor gameability**,
+  deferred from tickets 10 + 11 and still owed a position.
 - **Retrospective history modelling + backtest (the falsifiability spine)** — reconstruct the
   flagship's *real* documented history as versioned Wardley/dependency states; score the engine's
   rewind→fast-forward projections against what actually happened. Doubles as the external honesty gate.
