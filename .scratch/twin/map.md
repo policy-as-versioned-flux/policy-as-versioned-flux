@@ -116,24 +116,28 @@ Book), `secure`, `dpia`, `atrs`, `ai-playbook`, `data-model`, `finops`, `roadmap
 
 ## Not yet specified
 
-<!-- the whole ambition lives here as fog until the foundation resolves it into tickets;
-     these are the parallel workstreams, each will graduate with its own acceptance criteria -->
+<!-- the whole ambition lives here as fog until the frontier reaches it;
+     the conceptual engine is now decided — what remains is contents, capabilities, and delivery -->
 
-  flagship's *real* documented history as versioned Wardley/dependency states; score the engine's
-  rewind→fast-forward projections against what actually happened. Doubles as the external honesty gate.
-  Needs the causal layer (Pearl rungs 2–3), not just a correlational graph.
 - **The scenario library contents** — populating the committed set (quantum/HNDL, bus-factor/key-person,
   insider/coercion, supply-shock, sanctions, M&A, memory cost, AI-model access, climate event) plus the
-  **opportunity plays**; these double as the **acceptance tests** each workstream satisfies. The *engine*
-  is decided (ticket 13); the *contents* are not.
-- **The £ risk currency + cross-domain pricing** — price impacts *and* candidate responses in one
-  currency; the pay-rise-vs-hardening comparison; calibration, back-testing, falsifiability.
-- **Reflexive governance & ethics** — the twin governs its own surveillance + AI (DPIA, minimisation,
-  transparency, AI assurance via ATRS / AI-playbook); the honesty/falsifiability discipline.
+  **opportunity plays** and the **backtest cases** (ticket 19's roster + the hindsight-resistance
+  controls). These double as the **acceptance tests** each workstream satisfies. The *engine* is decided
+  (ticket 13); the *contents* are not.
+- **The co-registered forecast book** — the contamination-proof external gate identified by
+  `research/prediction-markets.md`: which questions, which venues, the blind-emission protocol, the
+  scoring harness, and the honest labelling of what it does and does not test. Design is sketched in the
+  research; the decisions are not made.
+- **Build-time artefacts carried forward from resolved tickets** — the enumerated **sensor set** and the
+  operational **DPIA/gate workflow** (ticket 15); the **twin threat-modelling exercise** (ticket 10); the
+  **misuse-catalogue mechanisms** to formalise (published scope exclusions, constraint-removal logging
+  with attractiveness, the affected-parties register, the disparate-impact audit channel,
+  role-not-person signatures) (ticket 15); **AI assurance** (ATRS / ai-playbook) for the twin's own models.
 - **The skill inventory (skills-first)** — which reusable capabilities become agent skills
-  (twin-model, signal-classify, wardley-engine, scenario-runner, £-pricing) and their build order.
-- **Work backwards to the demo** — once the whole is planned, define the minimal demonstrable slice +
-  its acceptance criteria. (Blocked by the plan being fleshed out.)
+  (twin-model, signal-classify, wardley-engine, scenario-runner, £-pricing, substrate-generator,
+  calibration/scoring) and their build order.
+- **Work backwards to the demo** — with the whole now planned, define the minimal demonstrable slice +
+  its acceptance criteria.
 
 ## Out of scope
 
