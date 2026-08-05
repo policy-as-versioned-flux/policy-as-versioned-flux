@@ -14,10 +14,17 @@ inside every artefact the tool emits.
 bash twin/demo.sh          # sense -> run -> score, from a clean checkout
 ./bin/twin verify          # the invariant suite
 ./bin/twin grade           # computed depth grades, with evidence
-python3 -m pytest -q       # 62 tests across seams 1 and 2
 ```
 
-No install step and no new dependencies: python3, PyYAML and git, all already used by `estate/`.
+The tool itself needs only python3, PyYAML and git — all already used by `estate/`. The checks want a
+venv, pinned to the same versions CI uses:
+
+```sh
+python3 -m venv .venv
+.venv/bin/pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'
+.venv/bin/python -m pytest -q
+.venv/bin/mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores
+```
 
 ## The loop
 

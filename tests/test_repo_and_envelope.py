@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -99,10 +100,16 @@ def test_reads_come_from_the_ref_not_the_working_tree(scratch_repo: Path) -> Non
 # -- the envelope ------------------------------------------------------------------------------
 
 
-def _artefact(**overrides: object) -> Artefact:
-    base = dict(kind="probe", mark=DERIVED, command=["twin", "probe"], pins={}, depth={}, body={})
-    base.update(overrides)
-    return Artefact(**base)  # type: ignore[arg-type]
+def _artefact(**overrides: Any) -> Artefact:
+    base: dict[str, Any] = {
+        "kind": "probe",
+        "mark": DERIVED,
+        "command": ["twin", "probe"],
+        "pins": {},
+        "depth": {},
+        "body": {},
+    }
+    return Artefact(**{**base, **overrides})
 
 
 def test_an_unmarked_artefact_will_not_serialise() -> None:

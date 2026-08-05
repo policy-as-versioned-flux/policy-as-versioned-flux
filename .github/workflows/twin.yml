@@ -23,13 +23,13 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'mypy==1.14.1'
+      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'
       - name: the invariant suite
         run: ./bin/twin verify
       - name: tests
         run: python -m pytest -q
       - name: typecheck
-        run: python -m mypy twin tests conftest.py --ignore-missing-imports
+        run: python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores
       - name: the walking skeleton, end to end
         run: bash twin/demo.sh
 

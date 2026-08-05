@@ -63,7 +63,7 @@ class World:
     def load(cls, repo: ModelRepo, at_commit: str | None = None) -> "World":
         ref = repo.unit_ref_at(WORLD, at_commit) if at_commit else repo.unit_ref(WORLD)
         loaded = {name: _collection(repo, ref.tree, WORLD, name) for name in WORLD_COLLECTIONS}
-        return cls(ref=ref, **loaded)  # type: ignore[arg-type]
+        return cls(ref=ref, **loaded)
 
 
 @dataclass(frozen=True)
@@ -100,7 +100,7 @@ class Overlay:
             raise ModelError(f"{base}/meta.yaml: world_ref {world_ref!r} — {exc}") from None
 
         loaded = {name: _collection(repo, ref.tree, base, name) for name in OVERLAY_COLLECTIONS}
-        overlay = cls(org=org, ref=ref, world=world, **loaded)  # type: ignore[arg-type]
+        overlay = cls(org=org, ref=ref, world=world, **loaded)
         overlay._check_references()
         return overlay
 
