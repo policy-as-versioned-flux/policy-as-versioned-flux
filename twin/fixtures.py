@@ -182,6 +182,12 @@ proposition: dvd-rental-revenue-falls-faster-than-streaming-adds
 observed: true
 resolved_on: '2012-12-31'
 source: Fixture answer key (stands in for the segmental filing).
+contamination: low
+source_dated: true
+note: >-
+  The answer-key format (build ticket 08). `contamination` is what the memorisation discount
+  is computed from at build ticket 40; `source_dated` records whether the source carries a date
+  that can be checked against the execution time.
 """,
     "orgs/intel/components/foundry-services.yaml": """\
 id: foundry-services
@@ -220,6 +226,33 @@ evidence_grade: 5
 claimed_by: fixture-author (human)
 evidence: Reading of the disclosure.
 confidence: 0.7
+""",
+    "orgs/netflix/people/alex-rivera.yaml": """\
+id: alex-rivera
+role: Platform engineer
+""",
+    "orgs/netflix/people/sam-okafor.yaml": """\
+id: sam-okafor
+role: Logistics lead
+""",
+    "orgs/netflix/edges/alex-maintains-streaming-experience.yaml": """\
+id: alex-maintains-streaming-experience
+type: maintains
+from: alex-rivera
+to: streaming-experience
+""",
+    "orgs/netflix/edges/sam-owns-dvd-by-mail.yaml": """\
+id: sam-owns-dvd-by-mail
+type: owns
+from: sam-okafor
+to: dvd-by-mail
+""",
+    "orgs/netflix/edges/alex-knows-cloud-compute.yaml": """\
+id: alex-knows-cloud-compute
+type: knows
+from: alex-rivera
+to: cloud-compute
+note: A structural fact about who could rebuild it, and nothing about how they are doing.
 """,
     "orgs/intel/scenarios/euv-slip-2026.yaml": """\
 id: euv-slip-2026
@@ -274,6 +307,7 @@ def build(dest: str | Path) -> Path:
     world_commit = git(root, "rev-parse", "HEAD").strip()
 
     _write(root, OVERLAY_FILES)
+    _write(root, BEHAVIOURAL_FILES)
     for org in ("netflix", "intel"):
         _write(
             root,
@@ -286,6 +320,40 @@ def build(dest: str | Path) -> Path:
     git(root, "add", "-A")
     git(root, "commit", "-q", "-m", "org overlays")
     return root
+
+
+BEHAVIOURAL_FILES: dict[str, str] = {
+    "orgs/netflix/behavioural/meta.yaml": """\
+id: netflix-behavioural
+unit: behavioural
+org: netflix
+dpia: DPIA-2026-001
+lawful_basis: Legitimate interests; balancing test recorded in DPIA-2026-001.
+retention_days: 90
+advisory_only: true
+note: >-
+  Cohort-level only. There is no person field in an observation and no slot for special-category
+  data anywhere in the schema, so minimisation is structural rather than a policy to remember.
+""",
+    "orgs/netflix/behavioural/observations/deploy-friction-2011-q2.yaml": """\
+id: deploy-friction-2011-q2
+cohort: platform-engineering
+metric: deploy-lead-time-index
+value: 0.62
+observed_on: '2011-06-30'
+sensor: CI timings, aggregated weekly across the cohort.
+gameability: medium
+""",
+}
+
+
+def detach_behavioural(root: str | Path) -> str:
+    """Delete the behavioural overlay. Everything else must still load — that is the point of it
+    being a separate unit rather than a flag."""
+    path = Path(root)
+    git(path, "rm", "-r", "-q", "orgs/netflix/behavioural")
+    git(path, "commit", "-q", "-m", "detach the behavioural overlay")
+    return git(path, "rev-parse", "HEAD").strip()
 
 
 def advance_world(root: str | Path) -> str:

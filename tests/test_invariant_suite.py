@@ -175,7 +175,9 @@ def test_only_declared_guards_may_decline_to_assert() -> None:
     assert not may_skip("manifest_names_every_invariant", False, live)
     assert not may_skip("invariant_bodies_match_manifest_hashes", False, live)
     assert not may_skip("no_collapse_mechanism", True, live)
-    assert may_skip("only_as_consumed_scores", True, live), "pending, and says so in the manifest"
+
+    pending = next(e.name for e in load_manifest() if e.state == PENDING)
+    assert may_skip(pending, True, live), f"{pending} is pending, and says so in the manifest"
 
 
 def test_running_a_single_check_by_name_is_supported(tmp_path: Path) -> None:

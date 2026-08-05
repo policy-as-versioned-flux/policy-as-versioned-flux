@@ -17,6 +17,7 @@ from twin.cli import main
 from twin.index import IndexError_
 from twin.model import DirectionError, ModelError, Overlay
 from twin.repo import ModelRepo, RepoError
+from twin.schema import SchemaError
 from twin.verbs import VerbError
 
 
@@ -70,8 +71,9 @@ NO_PROVENANCE = (
 def test_a_signal_missing_its_schema_is_refused(
     scratch_repo: Path, caps, content: str, complaint: str
 ) -> None:
+    """Refused at load by the closed schema, not later by the verb — one home for the rule."""
     _rewrite(scratch_repo, "orgs/netflix/signals/price-separation-announced.yaml", content, "degrade the signal")
-    with pytest.raises(VerbError, match=complaint):
+    with pytest.raises(SchemaError, match=complaint):
         verbs.sense(ModelRepo.open(scratch_repo), caps, "netflix", "price-separation-announced", ["twin"])
 
 
@@ -212,3 +214,110 @@ def test_the_index_replaces_one_it_did_write(repo: ModelRepo, tmp_path: Path) ->
     (out / "stale.json").write_text("{}", encoding="utf-8")
     index.write(repo, out)
     assert index.read_digest(out) == first, "a stale file from an earlier build does not survive"
+
+
+# -- what the review round found ---------------------------------------------------------------
+
+
+ARTICLE_NINE_VALUES = [
+    ("cohort", "staff-on-long-term-sickness"),
+    ("cohort", "trade-union-members"),
+    ("metric", "health-status"),
+    ("metric", "religion"),
+]
+
+
+@pytest.mark.parametrize(("field", "value"), ARTICLE_NINE_VALUES)
+def test_article_nine_data_is_refused_as_a_value_not_only_as_a_field_name(
+    scratch_repo: Path, field: str, value: str
+) -> None:
+    """A cohort named for a protected group is an Article 9 record however tidy the field is."""
+    from twin.model import BehaviouralOverlay
+    from twin.schema import SpecialCategoryError
+
+    doc = {"id": "planted", "cohort": "a-cohort", "metric": "a-metric", "value": 0.5,
+           "observed_on": "2024-01-01", field: value}
+    _rewrite(
+        scratch_repo,
+        "orgs/netflix/behavioural/observations/planted.yaml",
+        "".join(f"{k}: {v!r}\n" for k, v in doc.items()),
+        "plant Article 9 data as a value",
+    )
+    with pytest.raises(SpecialCategoryError, match="Article 9"):
+        BehaviouralOverlay.load(ModelRepo.open(scratch_repo), "netflix")
+
+
+def test_a_tenant_named_in_world_prose_is_caught_whatever_the_case(scratch_repo: Path) -> None:
+    from twin.model import DirectionError
+
+    _rewrite(scratch_repo, "world/components/leak.yaml",
+             "id: leak\nname: Leak\nkind: activity\ndescription: Built for Netflix specifically.\n",
+             "name a tenant in prose, capitalised")
+    with pytest.raises(DirectionError):
+        Overlay.load(ModelRepo.open(scratch_repo), "netflix")
+
+
+def test_a_bundle_from_another_tenant_cannot_be_scored(model_repo_dir: Path, tmp_path: Path, caps) -> None:
+    """Propositions live in the shared world layer, so a proposition match is not a tenancy check."""
+    repo = ModelRepo.open(model_repo_dir)
+    intel = verbs.run(repo, caps, "intel", "euv-slip-2026", verbs.command_for("run", org="intel", scenario="euv-slip-2026"))
+    path = intel.write(tmp_path / "intel-bundle.json")
+
+    with pytest.raises(VerbError, match="never crosses a tenant boundary"):
+        verbs.score(repo, caps, "netflix", path, "dvd-decline-2011-resolved", ["twin", "score"])
+
+
+def test_an_untagged_forecast_does_not_score(model_repo_dir: Path, tmp_path: Path, caps) -> None:
+    """Defaulting an absent regime to the one value that scores would let the tag be *deleted*."""
+    from twin.canon import canonical_json
+
+    repo = ModelRepo.open(model_repo_dir)
+    bundle = verbs.run(repo, caps, "netflix", "dvd-decline-2011", verbs.command_for("run", org="netflix", scenario="dvd-decline-2011"))
+    doc = json.loads(bundle.to_bytes())
+    for forecast in doc["body"]["forecasts"]:
+        del forecast["regime"]
+    path = tmp_path / "untagged.json"
+    path.write_bytes(canonical_json(doc))
+
+    card = json.loads(verbs.score(repo, caps, "netflix", path, "dvd-decline-2011-resolved", ["twin", "score"]).to_bytes())
+    assert card["body"]["scores"] == []
+    assert {u["reason"] for u in card["body"]["unscoreable"]} == {"regime-untagged"}
+
+
+def test_an_execution_that_declares_itself_ineligible_does_not_score(
+    model_repo_dir: Path, tmp_path: Path, caps
+) -> None:
+    """The bundle's own declaration is read back, not just the per-forecast tag."""
+    from twin.canon import canonical_json
+
+    repo = ModelRepo.open(model_repo_dir)
+    bundle = verbs.run(repo, caps, "netflix", "dvd-decline-2011", verbs.command_for("run", org="netflix", scenario="dvd-decline-2011"))
+    doc = json.loads(bundle.to_bytes())
+    doc["body"]["regime"] = {**doc["body"]["regime"], "declared": "with-hindsight", "scoring_eligible": False}
+    path = tmp_path / "ineligible.json"
+    path.write_bytes(canonical_json(doc))
+
+    card = json.loads(verbs.score(repo, caps, "netflix", path, "dvd-decline-2011-resolved", ["twin", "score"]).to_bytes())
+    assert card["body"]["scores"] == []
+    assert {u["reason"] for u in card["body"]["unscoreable"]} == {"regime-disagrees-with-execution"}
+
+
+def test_a_forecast_with_no_resolvable_outcome_is_unscoreable_and_never_a_zero(
+    model_repo_dir: Path, tmp_path: Path, caps
+) -> None:
+    """A forecast nobody can resolve is not a bad forecast, so it must never carry a number."""
+    from twin.canon import canonical_json, walk_values
+
+    repo = ModelRepo.open(model_repo_dir)
+    bundle = verbs.run(repo, caps, "netflix", "dvd-decline-2011", verbs.command_for("run", org="netflix", scenario="dvd-decline-2011"))
+    doc = json.loads(bundle.to_bytes())
+    for forecast in doc["body"]["forecasts"]:
+        forecast["proposition"] = "euv-tool-deliveries-slip-past-2026"
+    path = tmp_path / "unresolvable.json"
+    path.write_bytes(canonical_json(doc))
+
+    card = json.loads(verbs.score(repo, caps, "netflix", path, "dvd-decline-2011-resolved", ["twin", "score"]).to_bytes())
+    assert card["body"]["scores"] == []
+    assert {u["reason"] for u in card["body"]["unscoreable"]} == {"no-resolvable-outcome"}
+    numbers = [v for _, v in walk_values(card["body"]["unscoreable"]) if isinstance(v, (int, float)) and not isinstance(v, bool)]
+    assert numbers == [], f"an unscoreable forecast carried a number: {numbers}"

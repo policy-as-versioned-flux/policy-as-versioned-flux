@@ -217,6 +217,9 @@ def _hash_changes_authorised(ctx: Context) -> str:
         entry.name
         for entry in current
         if (was := before.get(entry.name)) is not None
+        # A hash appearing for the first time is an invariant being *activated*, which the
+        # constitution asks for. Only a hash that moves from one value to another is a change.
+        and was.body_sha256 is not None
         and (was.body_sha256, was.refuses_keys) != (entry.body_sha256, entry.refuses_keys)
         and not _cites_decision_ticket(entry.authorised_by)
     ]

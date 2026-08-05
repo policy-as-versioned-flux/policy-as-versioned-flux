@@ -8,8 +8,8 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 20 \u2014 invariant checks strengthened after adversarial review; every change adds an assertion, none removes one"
-checks_module_sha256: 83661354f0e7d0cfeeafa1623d8e0a35d9cd4f1e40017a83f13a6dc80c8bd213
+checks_module_authorised_by: "decision ticket 20 \u2014 checks strengthened after review: reproduce coverage, schema closure, Article 9 by value, the behavioural gate"
+checks_module_sha256: 0189c179c3c4662e38ae5579fcee341801f94e0510079f133c192fb8cf06b112
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
@@ -20,8 +20,8 @@ invariants:
   - name: identical_pins_identical_bytes
     activating_ticket: '02'
     state: live
-    body_sha256: 066c769d712ef62adf6a9e938d521ff74f909d26bd14bf30182f25debff2dab8
-    authorised_by: "decision ticket 20 \u2014 invariant checks strengthened after adversarial review; every change adds an assertion, none removes one"
+    body_sha256: e346f0ea02df691174011c21f1eb8d17d6810780306634f7876803a4627a97b4
+    authorised_by: "decision ticket 20 \u2014 checks strengthened after review: reproduce coverage, schema closure, Article 9 by value, the behavioural gate"
     asserts: The same command against the same pins produces byte-identical output.
     note: >-
       The same-machine leg runs everywhere. The cross-architecture leg is the harness check
@@ -76,13 +76,24 @@ invariants:
 
   - name: only_as_consumed_scores
     activating_ticket: '08'
-    state: pending
+    state: live
+    body_sha256: 1e9bf4942598f5c25f80a7a44e20bd588b5164e84f092b5901f5f0f3a16c8ca9
     asserts: Only an as-consumed execution produces a scoring-eligible forecast.
 
   - name: no_special_category_slot
     activating_ticket: '12'
-    state: pending
-    asserts: Special-category data has no schema slot; compliance is an impossibility of representation.
+    state: live
+    body_sha256: 8fb4f6ef34b2bf4ab9e2262cb9ac28ed5fbdd20860fcc5cce495412c7b8b39e4
+    authorised_by: "decision ticket 20 \u2014 checks strengthened after review: reproduce coverage, schema closure, Article 9 by value, the behavioural gate"
+    asserts: >-
+      Special-category data has no schema slot: the schemas are closed, so there is no field for
+      it and compliance is an impossibility of representation rather than a rule.
+    note: >-
+      The value screen is a net, not a proof. `cohort` and `metric` are free identifiers, so a
+      protected group can still be described in words nobody listed. The structural guarantee is
+      about fields; the named list catches the obvious phrasings and the limit is stated in
+      twin/schema.py and twin/README.md rather than papered over.
+    refuses_keys: [biometric, biometric_data, church, disability, disabled, ethnic_origin, ethnicity, faith, genetic, genetic_data, health, health_condition, health_status, hiv, illness, medical, mosque, philosophical_belief, political_opinion, politics, pregnancy, pregnant, race, racial_origin, religion, religious_belief, sex_life, sexual_orientation, sexuality, sick_leave, sickness, synagogue, trade_union, trade_union_membership, union_member, union_membership]
 
   - name: grade_5_only_path_never_prices
     activating_ticket: '19'

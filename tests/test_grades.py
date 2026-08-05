@@ -98,17 +98,30 @@ def test_the_shipped_capabilities_are_all_partial_or_stub(caps: Capabilities) ->
     assert "full" not in grades.values()
 
 
-def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(caps: Capabilities) -> None:
-    """One `partial` capability must not mask a `stub` one — that is the whole point of the block."""
-    grades = {g.capability: g.grade for g in caps}
-    assert grades["domain-model"] == "stub" and grades["provenance"] == "partial", (
-        "this test needs two capabilities at different grades to discriminate min from max"
-    )
-    block = caps.depth_block(["domain-model", "provenance"])
-    assert block["grade"] == "stub"
-    assert set(block["capabilities"]) == {"domain-model", "provenance"}
-    assert block["capabilities"]["domain-model"]["unchecked"], "unchecked criteria travel with the artefact"
-    assert caps.depth_block(["provenance"])["grade"] == "partial"
+def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_path: Path) -> None:
+    """A `full` capability must not mask a `stub` one — that is the whole point of the block.
+
+    Built from a purpose-made set rather than the shipped one: the shipped capabilities all happen
+    to sit at the same grade today, and a fixture that cannot tell `min` from `max` asserts nothing.
+    """
+    _capability(tmp_path, "finished", "14", checked=[1, 2, 3, 4])
+    _capability(tmp_path, "started", "14", checked=[2])
+    _capability(tmp_path, "untouched", "14", checked=[])
+    caps = Capabilities.load(directory=tmp_path)
+
+    assert caps.depth_block(["finished"])["grade"] == "full"
+    assert caps.depth_block(["finished", "started"])["grade"] == "partial"
+    assert caps.depth_block(["finished", "untouched"])["grade"] == "stub"
+    assert caps.depth_block(["finished", "started", "untouched"])["grade"] == "stub"
+
+    block = caps.depth_block(["finished", "untouched"])
+    assert set(block["capabilities"]) == {"finished", "untouched"}
+    assert block["capabilities"]["untouched"]["unchecked"], "unchecked criteria travel with the artefact"
+    assert block["capabilities"]["finished"]["unchecked"] == []
+
+
+def test_the_shipped_capabilities_never_reach_full(caps: Capabilities) -> None:
+    assert "full" not in {g.grade for g in caps}
 
 
 def test_a_nested_checkbox_in_a_ticket_is_refused_rather_than_miscounted(tmp_path: Path) -> None:

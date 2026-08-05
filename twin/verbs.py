@@ -10,7 +10,6 @@ rather than described in prose somewhere nobody reads.
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import Any
 
@@ -21,14 +20,24 @@ from .canon import digest_of, sha256_hex
 from .grades import Capabilities
 from .model import ModelError, Overlay
 from .repo import ModelRepo
+from .schema import REGIMES
+from . import scoring
 
 CAPS_SENSE = ["domain-model", "provenance", "sense-move"]
 CAPS_RUN = ["domain-model", "provenance", "scenario-engine"]
 CAPS_SCORE = ["domain-model", "provenance", "sense-move"]
+CAPS_GRAPH = ["domain-model", "provenance"]
 
 KIND_BOUND_SIGNAL = "bound-signal"
 KIND_FORECAST_BUNDLE = "forecast-bundle"
 KIND_SCORE_CARD = "score-card"
+KIND_GRAPH = "graph"
+
+# Only an as-consumed execution produces a scoring-eligible forecast: the honest number is never
+# contaminated by what we know now (spec story 40). The *tag* lands here; the *gating* — refusing
+# a fact dated after T — is build ticket 36, and the artefact says so rather than implying it.
+SCORING_REGIME = "as-consumed"
+REGIME_GATING_TICKET = "build ticket 36"
 
 
 class VerbError(RuntimeError):
@@ -81,39 +90,12 @@ def _substrate_ref(doc: dict[str, Any], where: str) -> str | None:
 # -- sense ---------------------------------------------------------------------------------
 
 
-STEEP = ("social", "technological", "economic", "environmental", "political")
-ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-
-
-def validate_signal(signal_id: str, signal: dict[str, Any]) -> None:
-    """A signal is dated, STEEP-classed and provenanced, or it is not a signal.
-
-    Enforced rather than conventional: without this the schema is whatever the last author
-    happened to type, and "a dated signal binds to a component" would be a description of the
-    fixture rather than a property of the system.
-    """
-    date = str(signal.get("date", ""))
-    if not ISO_DATE.match(date):
-        raise VerbError(f"signal {signal_id!r} needs a `date` of the form YYYY-MM-DD, got {date!r}")
-    steep = str(signal.get("steep", "")).lower()
-    if steep not in STEEP:
-        raise VerbError(f"signal {signal_id!r} needs a `steep` class from {STEEP}, got {steep!r}")
-    if not str(signal.get("statement", "")).strip():
-        raise VerbError(f"signal {signal_id!r} needs a `statement` — what was observed")
-    if not str(signal.get("source", "")).strip():
-        raise VerbError(f"signal {signal_id!r} needs a `source` — where it was observed")
-    provenance = signal.get("provenance")
-    if not isinstance(provenance, dict) or not provenance:
-        raise VerbError(f"signal {signal_id!r} needs a non-empty `provenance` mapping")
-
-
 def sense(repo: ModelRepo, caps: Capabilities, org: str, signal_id: str, command: list[str]) -> Artefact:
     overlay = Overlay.load(repo, org)
     signal = overlay.signals.get(signal_id)
     if signal is None:
         known = ", ".join(sorted(overlay.signals)) or "none"
         raise VerbError(f"no signal {signal_id!r} in overlay {org!r} (have: {known})")
-    validate_signal(signal_id, signal)
 
     bindings = []
     for claim_id, claim in sorted(overlay.claims.items()):
@@ -153,6 +135,34 @@ def sense(repo: ModelRepo, caps: Capabilities, org: str, signal_id: str, command
     )
 
 
+# -- graph ---------------------------------------------------------------------------------
+
+
+def graph(repo: ModelRepo, caps: Capabilities, org: str, command: list[str]) -> Artefact:
+    """Emit the typed knowledge graph as an artefact.
+
+    Generated, never committed: downstream tracks test against a live contract rather than a
+    fossil (build ticket 12). Behavioural observations are absent by construction — they are a
+    separately gated unit and the graph has no route to them.
+    """
+    overlay = Overlay.load(repo, org)
+    built = overlay.graph()
+    body = built.as_dict()
+    body["bus_factor"] = {
+        component: holders
+        for component in sorted(built.components)
+        if (holders := built.bus_factor(component))
+    }
+    return Artefact(
+        kind=KIND_GRAPH,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_GRAPH),
+        body=body,
+    )
+
+
 # -- run -----------------------------------------------------------------------------------
 
 
@@ -182,6 +192,10 @@ def run(
     if not model_ids:
         raise VerbError(f"scenario {scenario_id!r} names no world models; a forecast is always relative to one")
 
+    regime = str(scenario.get("regime", SCORING_REGIME))
+    if regime not in REGIMES:
+        raise VerbError(f"scenario {scenario_id!r}: unknown information regime {regime!r}")
+
     pins = _pins(repo, overlay, caps, _substrate_ref(scenario, f"scenario {scenario_id}"))
     # A forecast travels on its own, so it carries the whole pin — including the command that
     # produced it, not just the refs it read (build ticket 06).
@@ -209,6 +223,7 @@ def run(
             "at": when,
             "horizon": scenario.get("horizon"),
             "components": components,
+            "regime": regime,
             "pins": forecast_pins,
         }
         forecast["id"] = digest_of(forecast)[:16]
@@ -229,6 +244,12 @@ def run(
                 "proposition": proposition_id,
                 "horizon": scenario.get("horizon"),
                 "question": scenario.get("question"),
+            },
+            "regime": {
+                "declared": regime,
+                "scoring_eligible": regime == SCORING_REGIME,
+                "gated": False,
+                "gating_lands_at": REGIME_GATING_TICKET,
             },
             "forecasts": forecasts,
         },
@@ -256,6 +277,14 @@ def score(
     bundle = load_artefact(forecast_path)
     if bundle["envelope"]["kind"] != KIND_FORECAST_BUNDLE:
         raise VerbError(f"{forecast_path} is a {bundle['envelope']['kind']!r}, not a forecast bundle")
+    bundle_org = bundle["envelope"]["pins"].get("org")
+    if bundle_org != org:
+        # Propositions live in the shared world layer, so a proposition match is not a tenancy
+        # check. Without this, one tenant's probabilities land verbatim in another's artefact.
+        raise VerbError(
+            f"that forecast bundle belongs to {bundle_org!r}, not {org!r}; a score card never "
+            "crosses a tenant boundary"
+        )
 
     observed = outcome.get("observed")
     if not isinstance(observed, bool):
@@ -263,25 +292,62 @@ def score(
     proposition_id = str(outcome.get("proposition", ""))
     overlay.proposition(proposition_id)
 
-    scores = []
+    # The execution's own declaration is read back, not just the per-forecast tag: a bundle that
+    # says `scoring_eligible: false` at the top must not score whatever its forecasts claim.
+    declared = bundle["body"].get("regime") or {}
+    declared_regime = declared.get("declared")
+    if declared_regime is not None and not declared.get("scoring_eligible", declared_regime == SCORING_REGIME):
+        declared_regime = str(declared_regime)
+
+    scores: list[dict[str, Any]] = []
+    unscoreable: list[dict[str, Any]] = []
     for forecast in bundle["body"]["forecasts"]:
+        entry = {"forecast_id": forecast["id"], "world_model": forecast["world_model"]}
+        # No default. Defaulting an untagged forecast to the one regime that scores would let the
+        # invariant be bypassed by *deleting* the tag rather than changing it, and would have the
+        # card invent a claim the bundle never made.
+        regime = forecast.get("regime")
+        if regime is None:
+            unscoreable.append(
+                {**entry, "reason": "regime-untagged",
+                 "detail": "the forecast declares no information regime, so it is not scoring-eligible"}
+            )
+            continue
+        if declared_regime is not None and regime != declared_regime:
+            unscoreable.append(
+                {**entry, "reason": "regime-disagrees-with-execution",
+                 "detail": f"forecast says {regime!r}, the execution declared {declared_regime!r}"}
+            )
+            continue
         if forecast.get("proposition") != proposition_id:
+            # Explicit, and never a zero: a forecast nobody can resolve is not a bad forecast.
+            unscoreable.append(
+                {**entry, "reason": "no-resolvable-outcome",
+                 "detail": f"forecasts {forecast.get('proposition')!r}, outcome resolves {proposition_id!r}"}
+            )
+            continue
+        if regime != SCORING_REGIME:
+            unscoreable.append(
+                {**entry, "reason": "regime-not-as-consumed",
+                 "detail": f"executed {regime!r}; only {SCORING_REGIME!r} produces a scoring-eligible forecast"}
+            )
             continue
         probability = float(forecast["probability"])
+        if not 0.0 < probability < 1.0:
+            unscoreable.append(
+                {**entry, "reason": "not-a-probability",
+                 "detail": f"{probability} is not strictly between 0 and 1"}
+            )
+            continue
         scores.append(
             {
-                # By pin, not by path: the forecast is named by what it is, not by where it sat.
-                "forecast_id": forecast["id"],
-                "world_model": forecast["world_model"],
+                **entry,
                 "probability": probability,
                 "observed": observed,
-                "brier": (probability - (1.0 if observed else 0.0)) ** 2,
+                "regime": str(regime),
+                **scoring.score(probability, observed),
                 "pins": forecast["pins"],
             }
-        )
-    if not scores:
-        raise VerbError(
-            f"no forecast in {forecast_path} addresses proposition {proposition_id!r}; nothing to score"
         )
 
     return Artefact(
@@ -297,15 +363,20 @@ def score(
                 "produced_by": bundle["envelope"]["produced_by"],
                 "pins": bundle["envelope"]["pins"],
             },
-            "outcome": {
+            "answer_key": {
                 "id": outcome_id,
                 "proposition": proposition_id,
                 "observed": observed,
                 "resolved_on": outcome.get("resolved_on"),
                 "source": outcome.get("source"),
+                "contamination": outcome.get("contamination"),
+                "source_dated": outcome.get("source_dated"),
             },
-            "rule": "brier",
+            "rules": list(scoring.RULES),
+            "orientation": "lower-is-better" if scoring.LOWER_IS_BETTER else "higher-is-better",
+            "significant_digits": scoring.SIGNIFICANT_DIGITS,
             "scores": scores,
+            "unscoreable": unscoreable,
         },
     )
 

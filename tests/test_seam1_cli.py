@@ -261,18 +261,20 @@ def test_ambiguous_org_is_refused_rather_than_guessed(
     assert not (tmp_path / "nope.json").exists()
 
 
-def test_the_brier_score_is_the_brier_score(model_repo_dir: Path, tmp_path: Path) -> None:
+def test_the_scores_are_the_scores(model_repo_dir: Path, tmp_path: Path) -> None:
     """Pinned numerically. Ordering assertions survive swapping the rule for absolute error."""
     bundle, card = tmp_path / "bundle.json", tmp_path / "card.json"
     _forecast(model_repo_dir, bundle)
     _score(model_repo_dir, bundle, card)
 
     body = json.loads(card.read_bytes())["body"]
-    assert body["rule"] == "brier"
-    scores = {s["world_model"]: (s["probability"], s["brier"]) for s in body["scores"]}
-    assert scores["twin-default"] == (0.62, pytest.approx(0.1444))
-    assert scores["rival-fast-commoditisation"] == (0.81, pytest.approx(0.0361))
-    assert scores["netflix-believed"] == (0.25, pytest.approx(0.5625))
+    assert body["rules"] == ["brier", "log_loss"] and body["orientation"] == "lower-is-better"
+    scores = {s["world_model"]: s for s in body["scores"]}
+    assert scores["twin-default"]["brier"] == pytest.approx(0.1444)
+    assert scores["rival-fast-commoditisation"]["brier"] == pytest.approx(0.0361)
+    assert scores["netflix-believed"]["brier"] == pytest.approx(0.5625)
+    assert scores["netflix-believed"]["log_loss"] == pytest.approx(1.38629436112)
+    assert {s["regime"] for s in body["scores"]} == {"as-consumed"}
 
 
 def test_the_same_pins_give_the_same_bytes_from_a_separate_process(model_repo_dir: Path, tmp_path: Path) -> None:

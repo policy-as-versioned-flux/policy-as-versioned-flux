@@ -56,3 +56,32 @@ jobs:
         env:
           TWIN_CI_ARCH_MATRIX: '1'
         run: ./bin/twin verify --only identical_pins_identical_bytes --only cross_architecture_determinism
+      - name: emit an artefact for another machine to reproduce
+        run: |
+          ./bin/twin fixture --out /tmp/model
+          ./bin/twin run --repo /tmp/model --org netflix --scenario dvd-decline-2011 --out /tmp/bundle.json
+          ./bin/twin score --repo /tmp/model --org netflix --forecast /tmp/bundle.json \
+            --outcome dvd-decline-2011-resolved --out /tmp/score-card.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: emitted-${{ matrix.arch }}
+          path: /tmp/score-card.json
+
+  # Build ticket 10: verification runs on a *different machine* from the one that produced the
+  # artefact. The x86 Linux runner emits; this job recomputes it from its pins on arm64 macOS,
+  # having built the model repository itself from the same deterministic recipe.
+  reproduce-elsewhere:
+    needs: determinism
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install 'pyyaml==6.0.3'
+      - uses: actions/download-artifact@v4
+        with: {name: emitted-x86_64-linux, path: /tmp/from-elsewhere}
+      - name: reproduce an artefact emitted on x86_64 Linux
+        run: |
+          ./bin/twin fixture --out /tmp/model
+          ./bin/twin verify /tmp/from-elsewhere/score-card.json --repo /tmp/model

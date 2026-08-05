@@ -25,7 +25,10 @@ from .index import IndexError_
 from .invariants import FAIL, PASS, SKIP
 from .invariants.harness import LIVE, MANIFEST_PATH, Suite, load_manifest
 from .model import ModelError
+from .reproduce import ReproduceError
 from .repo import ModelRepo, RepoError
+from .schema import SchemaError
+from .scoring import ScoreError
 from .verbs import VerbError
 
 
@@ -97,6 +100,40 @@ def cmd_score(args: argparse.Namespace) -> int:
     return _emit(artefact, args.out)
 
 
+def cmd_graph(args: argparse.Namespace) -> int:
+    repo, caps, org = _open(args)
+    return _emit(verbs.graph(repo, caps, org, verbs.command_for("graph", org=org)), args.out)
+
+
+def cmd_validate(args: argparse.Namespace) -> int:
+    """The gate an author or CI runs before committing. Nothing here writes model files, so
+    "validated on write" means validated at the boundary the model crosses to get in."""
+    from .model import BehaviouralOverlay, Overlay, World, orgs
+
+    repo = ModelRepo.open(args.repo, args.ref)
+    _say(f"validating {args.repo} at {repo.pin.commit[:12]}")
+    World.load(repo)
+    print("  ok   world layer")
+    for org in orgs(repo):
+        overlay = Overlay.load(repo, org)
+        counts = {
+            name: len(getattr(overlay, name))
+            for name in ("components", "signals", "claims", "scenarios", "outcomes", "people", "edges")
+        }
+        print(f"  ok   overlay {org}: " + ", ".join(f"{v} {k}" for k, v in counts.items() if v))
+        try:
+            gated = BehaviouralOverlay.load(repo, org)
+        except ModelError:
+            print(f"       {org} has no behavioural overlay (the default, and the supported state)")
+        else:
+            print(
+                f"  ok   {org} behavioural overlay: {len(gated.observations)} cohort observations, "
+                f"DPIA {gated.meta['dpia']}, advisory only, {gated.meta['retention_days']}-day retention"
+            )
+    print("PASS: every object validates against its closed schema")
+    return 0
+
+
 def cmd_index(args: argparse.Namespace) -> int:
     repo = ModelRepo.open(args.repo, args.ref)
     out = index.write(repo, args.out)
@@ -137,6 +174,8 @@ def cmd_grade(args: argparse.Namespace) -> int:
 
 
 def cmd_verify(args: argparse.Namespace) -> int:
+    if args.artefact:
+        return _reproduce(args.artefact, args.repo)
     if args.rehash:
         return _rehash(args.authorise)
     if args.bless_goldens:
@@ -173,6 +212,36 @@ def cmd_verify(args: argparse.Namespace) -> int:
         for r in failed:
             print(f"  FAIL {r.name}: {r.detail}")
     return 0 if ok else 1
+
+
+def _reproduce(artefact_path: str, repo_path: str | None) -> int:
+    """`twin verify <artefact>` — recompute it from its pins and say whether it reproduces."""
+    from .reproduce import reproduce
+
+    if not repo_path:
+        print(
+            "twin verify <artefact> needs --repo: the pin records which model tree was read, "
+            "not where that repository lives on this machine.",
+            file=sys.stderr,
+        )
+        return 2
+    report = reproduce(repo_path, artefact_path)
+    _say(f"reproducing {artefact_path} from its pins")
+    for link in report.chain:
+        mark = "ok  " if link.reproduces else "FAIL"
+        print(f"  {mark} {link.kind:<18} {link.actual[:16]} (recorded {link.expected[:16]})")
+    mark = "ok  " if report.expected == report.actual else "FAIL"
+    print(f"  {mark} {report.kind:<18} {report.actual[:16]} (recorded {report.expected[:16]})")
+    print("  tolerance: none — byte identity. Scores carry a declared "
+          f"{__import__('twin.scoring', fromlist=['x']).SIGNIFICANT_DIGITS}-significant-digit quantisation in the format.")
+    if report.reproduces:
+        print("\nREPRODUCES: the pins are sufficient to recompute this artefact exactly.")
+        return 0
+    if report.diff:
+        print("\ndiverged:")
+        print(report.diff)
+    print("\nDIVERGES: the recorded pins do not recompute this artefact. The attestation is a claim, not a proof.")
+    return 1
 
 
 def _rehash(authorise: str | None) -> int:
@@ -373,6 +442,13 @@ def build_parser() -> argparse.ArgumentParser:
     score.add_argument("--out", required=True)
     score.set_defaults(fn=cmd_score)
 
+    graph = with_org(with_repo(subs.add_parser("graph", help="emit the typed knowledge graph")))
+    graph.add_argument("--out", required=True)
+    graph.set_defaults(fn=cmd_graph)
+
+    validate = with_repo(subs.add_parser("validate", help="validate every object against its schema"))
+    validate.set_defaults(fn=cmd_validate)
+
     idx = with_repo(subs.add_parser("index", help="build the derived index (never authoritative)"))
     idx.add_argument("--out", required=True)
     idx.set_defaults(fn=cmd_index)
@@ -385,7 +461,9 @@ def build_parser() -> argparse.ArgumentParser:
     grade.add_argument("--capability", default=None)
     grade.set_defaults(fn=cmd_grade)
 
-    verify = subs.add_parser("verify", help="run the invariant suite")
+    verify = subs.add_parser("verify", help="run the invariant suite, or reproduce an artefact")
+    verify.add_argument("artefact", nargs="?", help="an artefact to recompute from its pins")
+    verify.add_argument("--repo", default=None, help="the model repository the pins refer to")
     verify.add_argument("--only", action="append", default=[], help="check name or number; repeatable")
     verify.add_argument("--list", action="store_true", help="list the checks without running them")
     verify.add_argument("--rehash", action="store_true", help="re-pin check-body hashes in the manifest")
@@ -407,6 +485,9 @@ REFUSALS = (
     AttestationError,
     BlobRefError,
     IndexError_,
+    ReproduceError,
+    SchemaError,
+    ScoreError,
     yaml.YAMLError,
     OSError,
     RecursionError,

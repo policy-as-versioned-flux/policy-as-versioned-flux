@@ -15,6 +15,7 @@ import pytest
 from twin import fixtures
 from twin.model import ModelError, Overlay, World, check_direction, orgs
 from twin.repo import ModelRepo
+from twin.schema import SchemaError
 
 
 def test_world_and_overlays_are_separately_versioned_units(repo: ModelRepo) -> None:
@@ -38,12 +39,36 @@ def test_an_overlay_stays_pinned_while_the_world_moves(scratch_repo: Path) -> No
 
 
 def test_an_overlay_without_a_pinned_world_ref_will_not_load(scratch_repo: Path) -> None:
+    """Refused by the meta schema now that meta files are validated, not later by the loader."""
     meta = scratch_repo / "orgs" / "netflix" / "meta.yaml"
     meta.write_text("id: netflix\nunit: overlay\norg: netflix\n", encoding="utf-8")
     fixtures.git(scratch_repo, "add", "-A")
     fixtures.git(scratch_repo, "commit", "-q", "-m", "drop the world pin")
 
-    with pytest.raises(ModelError, match="world_ref"):
+    with pytest.raises((ModelError, SchemaError), match="world_ref"):
+        Overlay.load(ModelRepo.open(scratch_repo), "netflix")
+
+
+def test_a_meta_file_is_validated_like_everything_else(scratch_repo: Path) -> None:
+    """The meta schemas existed with no call site, so Article 9 data could sit in one unread."""
+    meta = scratch_repo / "orgs" / "netflix" / "meta.yaml"
+    meta.write_text(meta.read_text(encoding="utf-8") + "health_status: mostly fine\n", encoding="utf-8")
+    fixtures.git(scratch_repo, "add", "-A")
+    fixtures.git(scratch_repo, "commit", "-q", "-m", "plant Article 9 data in the meta file")
+
+    with pytest.raises(SchemaError, match="Article 9"):
+        Overlay.load(ModelRepo.open(scratch_repo), "netflix")
+
+
+def test_a_directory_nobody_loads_is_refused_rather_than_ignored(scratch_repo: Path) -> None:
+    """Silently ignoring it would let an author think their file is in the model. It is not."""
+    stray = scratch_repo / "orgs" / "netflix" / "assets"
+    stray.mkdir()
+    (stray / "a-database.yaml").write_text("id: a-database\n", encoding="utf-8")
+    fixtures.git(scratch_repo, "add", "-A")
+    fixtures.git(scratch_repo, "commit", "-q", "-m", "add a directory nothing reads")
+
+    with pytest.raises(ModelError, match="nothing loads assets"):
         Overlay.load(ModelRepo.open(scratch_repo), "netflix")
 
 

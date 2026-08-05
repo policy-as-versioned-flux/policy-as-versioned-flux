@@ -16,12 +16,16 @@ from dataclasses import dataclass
 from typing import Any
 
 from .repo import ModelRepo, RepoError, UnitRef, load_yaml
+from .schema import COLLECTION_KINDS, PERSON_EDGES, STRUCTURAL_EDGE, validate
 
 WORLD = "world"
 ORGS = "orgs"
+BEHAVIOURAL = "behavioural"
 
 WORLD_COLLECTIONS = ("components", "propositions", "world_models")
-OVERLAY_COLLECTIONS = ("components", "world_models", "signals", "claims", "scenarios", "outcomes")
+OVERLAY_COLLECTIONS = (
+    "components", "world_models", "signals", "claims", "scenarios", "outcomes", "people", "edges",
+)
 
 
 class ModelError(RuntimeError):
@@ -33,18 +37,35 @@ class DirectionError(ModelError):
 
 
 def _collection(repo: ModelRepo, tree: str, prefix: str, subdir: str) -> dict[str, dict[str, Any]]:
+    """Load and validate one collection. Every object is typed by the directory it sits in."""
+    kind = COLLECTION_KINDS[subdir]
     out: dict[str, dict[str, Any]] = {}
     for path in repo.list_tree(tree, subdir):
         if not path.endswith((".yaml", ".yml")):
             continue
         doc = repo.read_yaml_at(tree, path)
-        ident = doc.get("id")
-        if not ident:
-            raise ModelError(f"{prefix}/{path}: every model object needs an `id`")
+        validate(kind, doc, f"{prefix}/{path}")
+        ident = str(doc["id"])
         if ident in out:
             raise ModelError(f"{prefix}/{subdir}: duplicate id {ident!r}")
-        out[str(ident)] = doc
+        out[ident] = doc
     return out
+
+
+def _refuse_unread_directories(repo: ModelRepo, tree: str, prefix: str, known: tuple[str, ...]) -> None:
+    """A directory nobody loads is a directory nobody validates.
+
+    Silently ignoring it would let an author believe their file is in the model — and would let
+    Article 9 data sit in the repository unread rather than refused.
+    """
+    stray = sorted(
+        {p.split("/")[0] for p in repo.list_tree(tree) if "/" in p} - set(known)
+    )
+    if stray:
+        raise ModelError(
+            f"{prefix}: nothing loads {', '.join(stray)}, so nothing validates it. "
+            f"This unit reads {', '.join(known)} and refuses to ignore anything else."
+        )
 
 
 def orgs(repo: ModelRepo) -> list[str]:
@@ -62,6 +83,8 @@ class World:
     @classmethod
     def load(cls, repo: ModelRepo, at_commit: str | None = None) -> "World":
         ref = repo.unit_ref_at(WORLD, at_commit) if at_commit else repo.unit_ref(WORLD)
+        validate("world-meta", repo.read_yaml_at(ref.tree, "meta.yaml"), f"{WORLD}/meta.yaml")
+        _refuse_unread_directories(repo, ref.tree, WORLD, WORLD_COLLECTIONS)
         loaded = {name: _collection(repo, ref.tree, WORLD, name) for name in WORLD_COLLECTIONS}
         return cls(ref=ref, **loaded)
 
@@ -79,6 +102,8 @@ class Overlay:
     claims: dict[str, dict[str, Any]]
     scenarios: dict[str, dict[str, Any]]
     outcomes: dict[str, dict[str, Any]]
+    people: dict[str, dict[str, Any]]
+    edges: dict[str, dict[str, Any]]
 
     @classmethod
     def load(cls, repo: ModelRepo, org: str) -> "Overlay":
@@ -88,6 +113,8 @@ class Overlay:
             raise ModelError(f"no overlay for org {org!r} (expected {base}/meta.yaml)")
         ref = repo.unit_ref(base)
         meta = repo.read_yaml_at(ref.tree, "meta.yaml")
+        validate("overlay-meta", meta, f"{base}/meta.yaml")
+        _refuse_unread_directories(repo, ref.tree, base, OVERLAY_COLLECTIONS + (BEHAVIOURAL,))
         world_ref = meta.get("world_ref")
         if not world_ref:
             raise ModelError(
@@ -130,9 +157,114 @@ class Overlay:
             for need in comp.get("needs", []) or []:
                 if need not in self.components and need not in self.world.components:
                     raise ModelError(f"component {ident!r} needs {need!r}, which does not exist")
+        for ident, edge in sorted(self.edges.items()):
+            if edge["type"] == STRUCTURAL_EDGE:
+                raise ModelError(
+                    f"edge {ident!r}: structural {STRUCTURAL_EDGE!r} edges are declared as a "
+                    "component's `needs`, so the value chain reads as a value chain. One edge, one home."
+                )
+            if edge["from"] not in self.people:
+                raise ModelError(f"edge {ident!r}: {edge['from']!r} is not a person in this overlay")
+            self.component(str(edge["to"]))
+
+    def graph(self) -> "Graph":
+        """The typed knowledge graph: one edge collection, two authoring sites.
+
+        Structural edges are authored as a component's `needs` because the Wardley value chain
+        should read as one; person edges are authored as first-class objects because they are not
+        a chain. Both arrive here as the same typed edge.
+        """
+        components = {**self.world.components, **self.components}
+        # Both layers: the world layer carries the common value chain and an overlay may shadow a
+        # node of it. Reading only the overlay would drop the shared spine from every graph.
+        edges = [
+            Edge(id=f"{ident}--{STRUCTURAL_EDGE}--{need}", type=STRUCTURAL_EDGE, source=ident, target=str(need))
+            for ident, comp in sorted(components.items())
+            for need in dict.fromkeys(comp.get("needs", []) or [])  # a repeated `needs` is one edge
+        ]
+        edges += [
+            Edge(id=ident, type=str(e["type"]), source=str(e["from"]), target=str(e["to"]))
+            for ident, e in sorted(self.edges.items())
+        ]
+        return Graph(
+            org=self.org,
+            components=components,
+            people=dict(self.people),
+            edges=tuple(sorted(edges, key=lambda e: (e.type, e.source, e.target))),
+        )
 
     def pins(self) -> dict[str, Any]:
         return {"overlay": self.ref.as_dict(), "world": self.world.ref.as_dict(), "org": self.org}
+
+
+@dataclass(frozen=True)
+class Edge:
+    id: str
+    type: str
+    source: str
+    target: str
+
+    def as_dict(self) -> dict[str, str]:
+        return {"id": self.id, "type": self.type, "from": self.source, "to": self.target}
+
+
+@dataclass(frozen=True)
+class Graph:
+    """Components and people as nodes, typed edges between them. No behavioural data, ever."""
+
+    org: str
+    components: dict[str, dict[str, Any]]
+    people: dict[str, dict[str, Any]]
+    edges: tuple[Edge, ...]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "org": self.org,
+            "components": [
+                {"id": i, "kind": c["kind"], "evolution": c.get("evolution"), "visibility": c.get("visibility")}
+                for i, c in sorted(self.components.items())
+            ],
+            "people": [{"id": i, "role": p.get("role")} for i, p in sorted(self.people.items())],
+            "edges": [e.as_dict() for e in self.edges],
+        }
+
+    def bus_factor(self, component: str) -> list[str]:
+        """Who would have to be replaced. The only reason people are in the graph at all."""
+        return sorted({e.source for e in self.edges if e.type in PERSON_EDGES and e.target == component})
+
+
+@dataclass(frozen=True)
+class BehaviouralOverlay:
+    """The most private object in the system, and a separately gated unit.
+
+    Never reached by `Overlay.load`. It has its own directory, its own metadata, and its own
+    admission requirements, so detaching it is a demonstrable act rather than a promise: delete
+    the directory and everything else still loads (decision tickets 07 and 15).
+    """
+
+    org: str
+    ref: UnitRef
+    meta: dict[str, Any]
+    observations: dict[str, dict[str, Any]]
+
+    @classmethod
+    def load(cls, repo: ModelRepo, org: str) -> "BehaviouralOverlay":
+        base = f"{ORGS}/{org}/{BEHAVIOURAL}"
+        if not repo.exists(f"{base}/meta.yaml"):
+            raise ModelError(
+                f"org {org!r} has no behavioural overlay. Its absence is the default and the "
+                "supported state; nothing else in the model depends on it."
+            )
+        ref = repo.unit_ref(base)
+        meta = repo.read_yaml_at(ref.tree, "meta.yaml")
+        validate("behavioural-meta", meta, f"{base}/meta.yaml")
+        if not meta.get("advisory_only"):
+            raise ModelError(
+                f"{base}/meta.yaml declares advisory_only: false. Behavioural inference is "
+                "advisory only — Article 22 does not permit it to decide anything."
+            )
+        observations = _collection(repo, ref.tree, base, "observations")
+        return cls(org=org, ref=ref, meta=meta, observations=observations)
 
 
 def enforce_direction(repo: ModelRepo) -> None:
@@ -190,7 +322,11 @@ def check_direction(repo: ModelRepo) -> list[str]:
             if p.endswith((".yaml", ".yml"))
         }
         forbidden = (org_ids | overlay_ids) - {str(i) for i in world_ids if i}
-        prose = re.compile(r"\b(" + "|".join(re.escape(o) for o in sorted(org_ids)) + r")\b") if org_ids else None
+        prose = (
+            re.compile(r"\b(" + "|".join(re.escape(o) for o in sorted(org_ids)) + r")\b", re.IGNORECASE)
+            if org_ids
+            else None
+        )
 
         for path in repo.list_tree(tree):
             raw = repo.read_blob(tree, path).decode("utf-8", "replace")

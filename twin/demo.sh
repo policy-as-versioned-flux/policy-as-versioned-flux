@@ -46,26 +46,47 @@ say "4. the spread is the point — what each world model believed, and what it 
 python3 - "$OUT/score-card.json" <<'PY'
 import json, sys
 card = json.load(open(sys.argv[1]))["body"]
-print(f"  outcome {card['outcome']['id']}: observed={card['outcome']['observed']}"
-      f" (resolved {card['outcome']['resolved_on']})")
+key = card["answer_key"]
+print(f"  answer key {key['id']}: observed={key['observed']}, resolved {key['resolved_on']},"
+      f" contamination {key['contamination']}")
 print(f"  scoring the bundle sha256:{card['subject']['sha256'][:16]}... by pin, not by path")
+print(f"  rules {', '.join(card['rules'])} ({card['orientation']})")
 for s in sorted(card["scores"], key=lambda s: s["brier"]):
-    print(f"    {s['world_model']:<28} p={s['probability']:<5} brier={s['brier']:.4f}  [{s['forecast_id']}]")
+    print(f"    {s['world_model']:<28} p={s['probability']:<6} brier={s['brier']:<8.4f}"
+          f" log-loss={s['log_loss']:<8.4f} [{s['regime']}]")
+for u in card["unscoreable"]:
+    print(f"    unscoreable: {u['world_model']} — {u['reason']}")
 PY
 
-say "5. the derived index is derived — drop it, rebuild it from git alone"
+say "5. the graph — components, people, typed edges, and nothing behavioural anywhere in it"
+"$TWIN" graph --repo "$MODEL" --org netflix --out "$OUT/graph.json" >/dev/null || fail "graph failed"
+python3 - "$OUT/graph.json" <<'PY'
+import json, sys
+g = json.load(open(sys.argv[1]))["body"]
+print(f"  {len(g['components'])} components, {len(g['people'])} people, {len(g['edges'])} typed edges")
+for component, holders in sorted(g["bus_factor"].items()):
+    print(f"    bus factor  {component:<22} {', '.join(holders)}")
+PY
+
+say "6. reproduce the score card from its pins alone — including the bundle it scored"
+"$TWIN" verify "$OUT/score-card.json" --repo "$MODEL" || fail "the score card did not reproduce"
+
+say "7. every object validates against its closed schema, and Article 9 data cannot be written"
+"$TWIN" validate --repo "$MODEL" || fail "validation failed"
+
+say "8. the derived index is derived — drop it, rebuild it from git alone"
 "$TWIN" index --repo "$MODEL" --out "$WORK/index" || fail "index build failed"
 rm -rf "$WORK/index"
 "$TWIN" index --repo "$MODEL" --out "$WORK/index" || fail "index rebuild failed"
 
-say "6. determinism — the same command against the same ref, byte for byte"
+say "9. determinism — the same command against the same ref, byte for byte"
 "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
   --out "$OUT/forecast-bundle-again.json" >/dev/null || fail "second run failed"
 cmp -s "$OUT/forecast-bundle.json" "$OUT/forecast-bundle-again.json" \
   || fail "the same pins produced different bytes"
 echo "  ok   identical bytes"
 
-say "7. a dirty tree is refused — the pin has to describe what you are reading"
+say "10. a dirty tree is refused — the pin has to describe what you are reading"
 echo "# scribble" >> "$MODEL/world/meta.yaml"
 if "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
      --out "$OUT/should-not-exist.json" >/dev/null 2>&1; then

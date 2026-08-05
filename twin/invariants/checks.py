@@ -23,11 +23,17 @@ from .. import REPO_DIR
 from .. import artefact as artefact_mod
 from .. import attest, fixtures, index, verbs
 from ..artefact import AUTHORED, DERIVED, Artefact, ArtefactError
-from ..canon import sha256_hex, walk_keys
+from ..canon import canonical_json, sha256_hex, walk_keys
 from ..grades import Capabilities, GradeError
 from ..model import check_direction
 from ..repo import ModelRepo
 from . import Violated, invariant
+
+
+def load_manifest():  # noqa: ANN201 - re-exported lazily to avoid a circular import at module load
+    from .harness import load_manifest as _load
+
+    return _load()
 
 if TYPE_CHECKING:  # pragma: no cover
     from .harness import Context
@@ -69,10 +75,14 @@ def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefac
     )
     card_path = card.write(out_dir / "score-card.json")
 
+    graph = verbs.graph(repo, ctx.caps, NETFLIX, verbs.command_for("graph", org=NETFLIX))
+    graph_path = graph.write(out_dir / "graph.json")
+
     return {
         bound.kind: (bound, bound_path),
         bundle.kind: (bundle, bundle_path),
         card.kind: (card, card_path),
+        graph.kind: (graph, graph_path),
     }
 
 
@@ -147,6 +157,24 @@ def _identical_pins_identical_bytes(ctx: "Context") -> str:
     if seeds[0] != first[verbs.KIND_FORECAST_BUNDLE]:
         raise Violated("the CLI and the library produce different bytes for the same pins")
 
+    # The operational form of the same property: an artefact recomputed from its own pins,
+    # through the same path an auditor would use, including the chain a score card carries.
+    from ..reproduce import reproduce
+
+    card_path = emit_all(ctx)[verbs.KIND_SCORE_CARD][1]
+    report = reproduce(ctx.repo_dir, card_path)
+    if not report.reproduces:
+        raise Violated(f"a freshly emitted score card did not reproduce from its pins: {report.diff[:400]}")
+    if [link.kind for link in report.chain] != [verbs.KIND_FORECAST_BUNDLE]:
+        raise Violated("reproducing a score card did not recompute the forecast bundle it scored")
+
+    nudged = ctx.tmp / "nudged-card.json"
+    doc = json.loads(card_path.read_bytes())
+    doc["body"]["scores"][0]["brier"] = 0.0
+    nudged.write_bytes(canonical_json(doc))
+    if reproduce(ctx.repo_dir, nudged).reproduces:
+        raise Violated("a hand-edited score card reproduced anyway; verify is not comparing anything")
+
     golden = golden_digests()
     if not golden:
         raise Violated(
@@ -158,7 +186,10 @@ def _identical_pins_identical_bytes(ctx: "Context") -> str:
         raise Violated(f"artefact bytes differ from the committed golden digests for: {', '.join(drifted)}")
     if set(golden) != set(first):
         raise Violated(f"the goldens cover {sorted(golden)}; this run emitted {sorted(first)}")
-    return f"{len(first)} artefacts identical across runs, processes, hash seeds and the committed goldens"
+    return (
+        f"{len(first)} artefacts identical across runs, processes, hash seeds and the committed "
+        "goldens; a score card reproduces from its pins and a hand-edited one does not"
+    )
 
 
 def subprocess_digest(ctx: "Context", hash_seed: str) -> str:
@@ -237,6 +268,122 @@ def _every_capability_depth_graded(ctx: "Context") -> str:
             if summary["grade"] not in ("stub", "partial", "full"):
                 raise Violated(f"{kind}: capability {name} has grade {summary['grade']!r}")
     return f"{len(used)} capabilities graded by computed checklist; typed grades refused"
+
+
+@invariant("only_as_consumed_scores")
+def _only_as_consumed_scores(ctx: "Context") -> str:
+    """The honest number is never contaminated by what we know now."""
+    from ..canon import canonical_json
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    _, bundle_path = emit_all(ctx)[verbs.KIND_FORECAST_BUNDLE]
+    card = json.loads(emit_all(ctx)[verbs.KIND_SCORE_CARD][1].read_bytes())["body"]
+
+    if not card["scores"]:
+        raise Violated("the as-consumed fixture produced no scores at all")
+    tags = {s.get("regime") for s in card["scores"]}
+    if tags != {verbs.SCORING_REGIME}:
+        raise Violated(f"scores carry regimes {sorted(map(str, tags))}; only as-consumed may score")
+
+    # A bundle executed under any other regime must produce an explicit unscoreable result and
+    # never a number — a zero would read as a confident forecast that was wrong.
+    for regime in ("as-knowable", "with-hindsight"):
+        doc = json.loads(bundle_path.read_bytes())
+        doc["body"]["regime"]["declared"] = regime
+        for forecast in doc["body"]["forecasts"]:
+            forecast["regime"] = regime
+        tampered = ctx.tmp / f"bundle-{regime}.json"
+        tampered.write_bytes(canonical_json(doc))
+
+        artefact = verbs.score(
+            repo, ctx.caps, NETFLIX, tampered, OUTCOME,
+            verbs.command_for("score", org=NETFLIX, outcome=OUTCOME, forecast_sha256="tampered"),
+        )
+        body = json.loads(artefact.to_bytes())["body"]
+        if body["scores"]:
+            raise Violated(f"a {regime!r} execution produced {len(body['scores'])} score(s)")
+        reasons = {u["reason"] for u in body["unscoreable"]}
+        if reasons != {"regime-not-as-consumed"}:
+            raise Violated(f"a {regime!r} execution was refused for {sorted(reasons)}, not its regime")
+        if any(isinstance(v, (int, float)) and not isinstance(v, bool) for _, v in _pairs(body["unscoreable"])):
+            raise Violated("an unscoreable forecast still carried a number")
+    return f"{len(card['scores'])} as-consumed scores; as-knowable and with-hindsight refused explicitly"
+
+
+@invariant("no_special_category_slot")
+def _no_special_category_slot(ctx: "Context") -> str:
+    """Article 9 compliance is an impossibility of representation, not a rule someone could relax."""
+    from ..model import BehaviouralOverlay, Overlay
+    from ..schema import SPECIAL_CATEGORY, SchemaError, SpecialCategoryError, validate
+
+    declared = next(e.refuses_keys for e in load_manifest() if e.name == "no_special_category_slot")
+    if not declared:
+        raise Violated("no_special_category_slot declares no Article 9 categories in the manifest")
+    missing = [k for k in declared if k not in SPECIAL_CATEGORY]
+    if missing:
+        raise Violated(
+            f"the schema no longer names {', '.join(missing)} as special category — a category was "
+            "removed from twin/schema.py while the manifest still declares it"
+        )
+
+    # There is no slot: the schemas are closed, so an Article 9 field cannot even be spelled.
+    for category in declared:
+        try:
+            validate("person", {"id": "someone", category: "any value at all"}, "planted")
+        except SpecialCategoryError:
+            continue
+        except SchemaError as exc:
+            raise Violated(f"{category!r} was refused as an unknown field rather than as Article 9: {exc}") from None
+        raise Violated(f"a person carrying {category!r} validated; there is a slot after all")
+
+    # And nowhere to hide one, at any depth, inside a free-form container.
+    try:
+        validate(
+            "signal",
+            {
+                "id": "planted", "date": "2011-07-12", "steep": "economic", "source": "s",
+                "statement": "t", "provenance": {"observed_by": "x", "notes": [{"health": "poor"}]},
+            },
+            "planted",
+        )
+    except SpecialCategoryError:
+        pass
+    else:
+        raise Violated("Article 9 data nested inside a free-form mapping validated")
+
+    # The closure is what makes the data unrepresentable; the name list only improves the message.
+    try:
+        validate("person", {"id": "someone", "morale": 0.4}, "planted")
+    except SchemaError as exc:
+        if "schema is closed" not in str(exc):
+            raise Violated(f"an undeclared field was refused for the wrong reason: {exc}") from None
+    else:
+        raise Violated("an undeclared field validated; the schemas are not closed")
+
+    # And by value, not only by key: a cohort or a metric can name a category just as well.
+    for probe in ({"cohort": "staff-on-long-term-sickness"}, {"metric": "religion"}):
+        try:
+            validate(
+                "observation",
+                {"id": "planted", "cohort": "a-cohort", "metric": "a-metric", "value": 0.5,
+                 "observed_on": "2024-01-01", **probe},
+                "planted",
+            )
+        except SpecialCategoryError:
+            continue
+        raise Violated(f"an observation naming Article 9 data in a value validated: {probe}")
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    if hasattr(Overlay.load(repo, NETFLIX), "observations"):
+        raise Violated("loading an overlay reached the behavioural unit")
+    surfaces = [Overlay.load(repo, org).graph().as_dict() for org in ("netflix", "intel")]
+    surfaces.append(BehaviouralOverlay.load(repo, "netflix").observations)
+    surfaces += [json.loads(path.read_bytes()) for _, (_, path) in sorted(emit_all(ctx).items())]
+    for surface in surfaces:
+        present = set(declared) & _keys(surface)
+        if present:
+            raise Violated(f"a loaded or emitted surface carries {', '.join(sorted(present))}")
+    return f"{len(declared)} Article 9 categories with no representation, at any depth"
 
 
 @invariant("world_never_references_overlay")
@@ -346,3 +493,9 @@ def _derived_never_human_signed(ctx: "Context") -> str:
 
 def _keys(node: Any) -> set[str]:
     return set(walk_keys(node))
+
+
+def _pairs(node: Any) -> list[tuple[str, Any]]:
+    from ..canon import walk_values
+
+    return walk_values(node)
