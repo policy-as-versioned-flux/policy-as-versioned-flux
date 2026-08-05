@@ -1,0 +1,117 @@
+# The invariant manifest.
+#
+# Every invariant the constitution names appears here with the build ticket that must activate
+# it. `pending` is the only honest way to not assert something, and an invariant still pending
+# after its activating ticket has closed is itself a CI failure.
+#
+# `body_sha256` pins each live check's test body; `checks_module_sha256` pins the module around
+# them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
+# `authorised_by` citing the decision ticket that permits it.
+schema: twin.invariants/v1
+checks_module_authorised_by: "decision ticket 20 \u2014 invariant checks strengthened after adversarial review; every change adds an assertion, none removes one"
+checks_module_sha256: 83661354f0e7d0cfeeafa1623d8e0a35d9cd4f1e40017a83f13a6dc80c8bd213
+invariants:
+  - name: store_rebuildable_from_git
+    activating_ticket: '01'
+    state: live
+    body_sha256: b572dd86014916b9c4d4e2fab197bd9999643e23b39acefe36adca8ba1ff7d09
+    asserts: Any derived index can be dropped and rebuilt from the repository alone.
+
+  - name: identical_pins_identical_bytes
+    activating_ticket: '02'
+    state: live
+    body_sha256: 066c769d712ef62adf6a9e938d521ff74f909d26bd14bf30182f25debff2dab8
+    authorised_by: "decision ticket 20 \u2014 invariant checks strengthened after adversarial review; every change adds an assertion, none removes one"
+    asserts: The same command against the same pins produces byte-identical output.
+    note: >-
+      The same-machine leg runs everywhere. The cross-architecture leg is the harness check
+      `cross_architecture_determinism`, which skips outside the CI matrix rather than faking it.
+
+  - name: every_artefact_marked
+    activating_ticket: '03'
+    state: live
+    body_sha256: a66721d8574ad56e8a816a52f2ecde709b524e9278852827042c133c484269bd
+    asserts: Every artefact is marked authored or derived, enforced rather than conventional.
+
+  - name: every_capability_depth_graded
+    activating_ticket: '03'
+    state: live
+    body_sha256: 6530afaeed67aec6086f21d70e13ceb57b729541daf973eefb6668266e238a5f
+    asserts: >-
+      Every capability carries a depth grade computed from its owning decision ticket's
+      acceptance criteria; a typed grade is refused and names the unchecked criteria.
+
+  - name: world_never_references_overlay
+    activating_ticket: '04'
+    state: live
+    body_sha256: b06b40755b95b041232bff515e6c496dc15c2ec1a53ee9a16410adacf0d9a8bd
+    asserts: An overlay may reference the world layer; the world layer may never reference an overlay.
+
+  - name: no_collapse_mechanism
+    activating_ticket: '06'
+    state: live
+    body_sha256: 5c70480e3db3d1df867e352d813e51dfd0c4a15d3c37d92b064a4736653b85b5
+    authorised_by: "decision ticket 20 \u2014 invariant checks strengthened after adversarial review; every change adds an assertion, none removes one"
+    asserts: An execution emits multiple forecasts and no code path collapses them to one.
+    refuses_keys: [consensus, consensus_forecast, combined_forecast, collapsed, point_forecast, best_forecast]
+
+  - name: no_recommended_action_field
+    activating_ticket: '06'
+    state: live
+    body_sha256: bc5ea3fc26926316898e29bc8e37927b0faa42729ff3e00ba4022f773c56af2b
+    authorised_by: "decision ticket 20 \u2014 invariant checks strengthened after adversarial review; every change adds an assertion, none removes one"
+    asserts: No artefact carries a recommended-action field; a planted one is refused at emission.
+    refuses_keys: [recommended_action, recommendation, recommended]
+
+  - name: derived_never_human_signed
+    activating_ticket: '11'
+    state: live
+    body_sha256: a1f51a0cfcf89e64391f7862e6c776ba36f164176b56ceaab6a5896a6a256d9e
+    asserts: >-
+      A derived artefact refuses a human signature; an authored artefact requires one.
+    note: >-
+      Activated ahead of its ticket at structural depth — extending the suite, never weakening
+      it. Build ticket 11 deepens this to cryptographic signing, at which point a hand-touched
+      derived artefact also fails the reproducibility check.
+
+  - name: only_as_consumed_scores
+    activating_ticket: '08'
+    state: pending
+    asserts: Only an as-consumed execution produces a scoring-eligible forecast.
+
+  - name: no_special_category_slot
+    activating_ticket: '12'
+    state: pending
+    asserts: Special-category data has no schema slot; compliance is an impossibility of representation.
+
+  - name: grade_5_only_path_never_prices
+    activating_ticket: '19'
+    state: pending
+    asserts: >-
+      A scenario whose only causal path runs through a grade-5 edge produces an unpriced
+      structural blast radius, never a price.
+
+  - name: ruin_class_absent_not_priced
+    activating_ticket: '28'
+    state: pending
+    asserts: A ruin-class option is absent from the output entirely, not present with a large number.
+
+  - name: prefilter_precedes_pricing
+    activating_ticket: '28'
+    state: pending
+    asserts: The constraint pre-filter runs before pricing, so no number is ever comparable against a red line.
+
+  - name: as_consumed_admits_no_post_T_fact
+    activating_ticket: '36'
+    state: pending
+    asserts: An as-consumed execution cannot reference a fact dated after T, by construction rather than by review.
+
+  - name: price_levels_never_probabilities
+    activating_ticket: '59'
+    state: pending
+    asserts: Prediction-market price levels enter as signals, never as probabilities.
+
+  - name: standing_library_covers_committed_classes
+    activating_ticket: '69'
+    state: pending
+    asserts: The standing scenario library covers every committed scenario class.

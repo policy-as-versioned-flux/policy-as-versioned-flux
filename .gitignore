@@ -1,1 +1,10 @@
 research/repos/
+estate/**/.work/
+
+# Added by ggshield
+.cache_ggshield
+
+# twin: python bytecode and pytest scratch
+__pycache__/
+*.pyc
+.pytest_cache/

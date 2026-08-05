@@ -1,0 +1,11 @@
+{
+  "authorised_by": "decision ticket 20 \u2014 three capability criteria unticked after audit, which changes the depth block every artefact carries",
+  "capabilities_digest": "6f0cc764fefec919cf1dbb08ff5e374e0c43d3ce0208e22b9b4ed2e8524dab3a",
+  "digests": {
+    "bound-signal": "91a1d7c92a9614804c4a055ad4f5aaff0434c1dd35c3a1e70b04c7f7a998b7d3",
+    "forecast-bundle": "4375ebb5884e7597f5b2e4da2b909c178de42e349d33ab76f7d64ee472de5bbc",
+    "score-card": "959beef4b22606dea7593aa1974dda447949fc948ee48271cd06c906c50a0ef9"
+  },
+  "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
+  "tool_version": "0.1.0"
+}

@@ -1,0 +1,30 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+capability: sense-move
+owning_ticket: '11'
+criteria:
+  - index: 1
+    text: "A signal object defined in ubiquitous language, with provenance + STEEP class."
+    checked: true
+    evidence: "twin/verbs.py sense() plus the fixture signals — a dated, STEEP-tagged, provenanced signal binds to a component through a committed grade-5 claim and emits a bound-signal artefact."
+    ticked_by: build ticket 05
+  - index: 2
+    text: "The binding mechanism decided, incl. what is automated vs judged vs reviewed."
+    checked: false
+  - index: 3
+    text: "Authored-vs-inferred position decided, consistent with ticket 07's authored/derived split."
+    checked: false
+  - index: 4
+    text: "Observation-propagation semantics, distinguished from ticket 08's intervention propagation."
+    checked: false
+  - index: 5
+    text: "Weak-signal retention + promotion rule."
+    checked: false
+  - index: 6
+    text: "A stated position on sensor gameability."
+    checked: false
+  - index: 7
+    text: "The loop's cadence + re-price triggers, sufficient to generate forecast volume."
+    checked: false
+  - index: 8
+    text: "Exercised on a real signal for each co-flagship."
+    checked: false

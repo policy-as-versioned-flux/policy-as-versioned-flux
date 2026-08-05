@@ -1,0 +1,18 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+capability: provenance
+owning_ticket: '14'
+criteria:
+  - index: 1
+    text: "Decided: artefact attestation vs reasoning-chain attestation (or both, with the seam)."
+    checked: false
+  - index: 2
+    text: "An actor-identity model covering humans and agents, and what a signature asserts."
+    checked: false
+  - index: 3
+    text: "The chain-depth rule for a recommendation, and materialised-vs-reconstructable."
+    checked: false
+  - index: 4
+    text: "A stated purpose for attestation, consistent with the transparency decision."
+    checked: true
+    evidence: "Reproducibility first, realised rather than asserted: the artefact carries no wall clock, host or interpreter, and identical_pins_identical_bytes is the suite's first live invariant."
+    ticked_by: build ticket 01

@@ -1,0 +1,27 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+capability: scenario-engine
+owning_ticket: '13'
+criteria:
+  - index: 1
+    text: "The scenario object defined, incl. its references and its relationship to forecasts."
+    checked: true
+    evidence: "twin/verbs.py run() — a scenario references {components, graph version, world models, time} and emits forecasts as a list, always, one per named world model."
+    ticked_by: build ticket 06
+  - index: 2
+    text: "Concrete semantics for fast-forward, rewind and play, each distinguished."
+    checked: false
+  - index: 3
+    text: "Where scenarios live + how they are versioned/diffed."
+    checked: false
+  - index: 4
+    text: "How opportunity/gameplay moves are proposed, with the negativity counterweight addressed."
+    checked: false
+  - index: 5
+    text: "Admissibility rule for the scenario library."
+    checked: false
+  - index: 6
+    text: "A selection/prioritisation rule for which scenarios run (the combinatorics answer)."
+    checked: false
+  - index: 7
+    text: "Exercised on one fear scenario and one opportunity scenario across the co-flagships."
+    checked: false

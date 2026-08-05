@@ -1,0 +1,58 @@
+name: twin
+
+on:
+  push:
+    # `.scratch/twin/**` is in the filter on purpose: three guards read the constitution, the
+    # build-ticket statuses and the decision tickets' acceptance criteria. Excluding them would
+    # mean the commit that makes a guard true never runs the guard.
+    paths: ['twin/**', 'tests/**', 'conftest.py', 'pytest.ini', '.scratch/twin/**', '.github/workflows/twin.yml']
+  pull_request:
+    paths: ['twin/**', 'tests/**', 'conftest.py', 'pytest.ini', '.scratch/twin/**', '.github/workflows/twin.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # hash_changes_are_authorised needs the manifest's own history
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'mypy==1.14.1'
+      - name: the invariant suite
+        run: ./bin/twin verify
+      - name: tests
+        run: python -m pytest -q
+      - name: typecheck
+        run: python -m mypy twin tests conftest.py --ignore-missing-imports
+      - name: the walking skeleton, end to end
+        run: bash twin/demo.sh
+
+  # `identical_pins_identical_bytes` on more than one architecture. Seeded floating-point
+  # identity across platform maths libraries is the landmine, and it is cheap now and
+  # architectural later. Every runner recomputes the artefacts and compares against the same
+  # committed golden digests, so a divergence fails on the architecture that diverged.
+  determinism:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04,     arch: x86_64-linux}
+          - {os: ubuntu-24.04-arm, arch: aarch64-linux}
+          - {os: macos-14,         arch: arm64-darwin}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install 'pyyaml==6.0.3'
+      - name: identical pins, identical bytes
+        env:
+          TWIN_CI_ARCH_MATRIX: '1'
+        run: ./bin/twin verify --only identical_pins_identical_bytes --only cross_architecture_determinism

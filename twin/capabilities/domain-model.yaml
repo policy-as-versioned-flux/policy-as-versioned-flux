@@ -1,0 +1,27 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+# Decision ticket 07 is resolved; almost none of it is built. `grade` is absent on purpose —
+# it is computed from the ticks below and cannot be typed.
+capability: domain-model
+owning_ticket: '07'
+criteria:
+  - index: 1
+    text: "A named core ontology (entity types + relationship types + the backbone) in ubiquitous language."
+    checked: false
+  - index: 2
+    text: "The layering decision (one graph vs coupled) with the seam(s) defined."
+    checked: false
+  - index: 3
+    text: "Edge-semantics decision incl. the structural-vs-causal distinction."
+    checked: false
+  - index: 4
+    text: "The temporal/versioning model + how scenarios are represented."
+    checked: false
+  - index: 5
+    text: "The representation/format decision (reuse vs custom) with what's authored vs derived."
+    checked: false
+  - index: 6
+    text: "Where the £/risk, people, assets and signals attach to the graph."
+    checked: false
+  - index: 7
+    text: "Exercised against Netflix + Intel (does the model actually hold each subject?)."
+    checked: false
