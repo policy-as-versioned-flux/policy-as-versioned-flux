@@ -8,8 +8,8 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 11, 13 and 14: signature types and the derived-artefact anomaly, roll-ups with no authored or stored form, and no inherited action band on the Wardley relations"
-checks_module_sha256: b7082ec2d705eabddb896dc1ee4ea1b73190c24e79106cf9a0b63fc6a5289b20
+checks_module_authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 18, 19, 26 and 27 under decision tickets 08 and 09: every verb's capabilities are depth-graded, and the grade-5 use-gate is asserted on the emitted blast radius and on the scenario exposure that emits a figure"
+checks_module_sha256: 2918b24a77377ac82d015cba7fc719faa43244d696822a9a583b9306dcc47a6c
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
@@ -37,7 +37,8 @@ invariants:
   - name: every_capability_depth_graded
     activating_ticket: '03'
     state: live
-    body_sha256: 6530afaeed67aec6086f21d70e13ceb57b729541daf973eefb6668266e238a5f
+    body_sha256: 41f94ba01d371ab0adda96fb3ed3b42ca8b539b5930175efb1e136ffa83f17dc
+    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 18, 19, 26 and 27 under decision tickets 08 and 09: every verb's capabilities are depth-graded, and the grade-5 use-gate is asserted on the emitted blast radius"
     asserts: >-
       Every capability carries a depth grade computed from its owning decision ticket's
       acceptance criteria; a typed grade is refused and names the unchecked criteria.
@@ -99,10 +100,18 @@ invariants:
 
   - name: grade_5_only_path_never_prices
     activating_ticket: '19'
-    state: pending
+    state: live
+    body_sha256: a261861be2c9fc02a23ee1fe54316f0e4c8f7f7f0d43945774d6179a4fcc86fd
+    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 18, 19, 26 and 27 under decision tickets 08 and 09: every verb's capabilities are depth-graded, and the grade-5 use-gate is asserted on the emitted blast radius and on the scenario exposure that emits a figure"
     asserts: >-
       A scenario whose only causal path runs through a grade-5 edge produces an unpriced
       structural blast radius, never a price.
+    note: >-
+      Checked at three depths: the published ladder admits only grades 1-2; the emitted blast
+      radius leaves a grade-5-only component unpriced while still admitting a fully-graded path,
+      so the gate is a gate and not a wall; and the blast-radius body is closed with no
+      price-shaped key in it, so an unpriced result has nowhere to put a number. The threshold is
+      pinned in the artefact, so moving it moves a digest.
 
   - name: ruin_class_absent_not_priced
     activating_ticket: '28'

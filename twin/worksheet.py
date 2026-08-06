@@ -38,6 +38,15 @@ _K = re.compile(r"^K\((?P<component>[^)]+)\)$")
 _R = re.compile(r"^R\((?P<source>[^\s)]+)\s*->\s*(?P<target>[^\s)]+)\)$")
 _ELASTICITY = re.compile(r"^elasticity\.(?P<edge>[a-z0-9-]+)\.(?P<point>min|mode|max)$")
 _ROLLUP = re.compile(r"^rollups\.(?P<name>[a-z0-9_]+)$")
+_GRADE = re.compile(r"^evidence_grade\.(?P<edge>[a-z0-9-]+)$")
+_BLAST = re.compile(r"^blast\.(?P<origin>[a-z0-9-]+)\.(?P<what>reached|admitted_to_pricing|unpriced)$")
+_EXPOSURE = re.compile(r"^exposure\.declared\.(?P<perspective>[a-z0-9-]+)$")
+_SPREAD = re.compile(r"^exposure\.spread(\.(?P<component>[a-z0-9-]+))?$")
+
+# Which emitted artefact each family of keys is resolved against. One worksheet, several
+# artefacts: the graph stopped being the only place a hand-computable number lands at build
+# ticket 19.
+GRAPH, BLAST, EXPOSURE = "graph", "blast", "exposure"
 
 
 class WorksheetError(RuntimeError):
@@ -107,8 +116,47 @@ def load(path: Path | None = None) -> tuple[str, list[Line]]:
     return role.group(1), lines
 
 
-def resolve(key: str, body: dict[str, Any]) -> float | None:
-    """One worksheet key against an emitted graph artefact. `None` means nothing computes it yet."""
+def resolve(key: str, bodies: dict[str, dict[str, Any]]) -> float | None:
+    """One worksheet key against the emitted artefacts. `None` means nothing computes it yet."""
+    body = bodies.get(GRAPH, {})
+
+    grade = _GRADE.match(key)
+    if grade:
+        for edge in body.get("edges", []):
+            if edge["id"] == grade.group("edge") and "evidence_grade" in edge:
+                return float(edge["evidence_grade"])
+        return None
+
+    radius = _BLAST.match(key)
+    if radius:
+        blast = bodies.get(BLAST)
+        if blast is None or blast.get("origin") != radius.group("origin"):
+            return None
+        admitted, unpriced = blast["admitted_to_pricing"], blast["unpriced"]
+        return float(
+            {"reached": len(admitted) + len(unpriced),
+             "admitted_to_pricing": len(admitted),
+             "unpriced": len(unpriced)}[radius.group("what")]
+        )
+
+    declared = _EXPOSURE.match(key)
+    if declared:
+        figures = bodies.get(EXPOSURE, {}).get("declared_exposure", {})
+        value = figures.get(declared.group("perspective"))
+        return None if value is None else float(value)
+
+    spread = _SPREAD.match(key)
+    if spread:
+        exposure = bodies.get(EXPOSURE, {})
+        component = spread.group("component")
+        if component is None:
+            value = exposure.get("exposure_spread")
+            return None if value is None else float(value)
+        for row in exposure.get("attribution", []):
+            if row["component"] == component:
+                return None if row["spread"] is None else float(row["spread"])
+        return None
+
     rollup = _ROLLUP.match(key)
     if rollup:
         value = body.get("rollups", {}).get(rollup.group("name"))
@@ -137,11 +185,36 @@ def resolve(key: str, body: dict[str, Any]) -> float | None:
     return None
 
 
-def check(body: dict[str, Any], path: Path | None = None) -> list[Result]:
+# Which pocket-org artefacts the worksheet is checked against, and the arguments that produce
+# them. Named here so the CLI and the suite check the same three things rather than drifting.
+BLAST_ORIGIN = "shared-database"
+SCENARIO = "portal-availability-2026"
+
+
+def bodies_for(repo: Any, caps: Any) -> dict[str, dict[str, Any]]:
+    """Emit the pocket org's graph, blast radius and exposure, and return their bodies."""
+    import json
+
+    from . import verbs
+
+    org = POCKET_ORG
+    emitted = {
+        GRAPH: verbs.graph(repo, caps, org, verbs.command_for("graph", org=org)),
+        BLAST: verbs.blast(
+            repo, caps, org, BLAST_ORIGIN, verbs.command_for("blast", org=org, origin=BLAST_ORIGIN)
+        ),
+        EXPOSURE: verbs.exposure(
+            repo, caps, org, SCENARIO, None, verbs.command_for("exposure", org=org, scenario=SCENARIO)
+        ),
+    }
+    return {name: json.loads(art.to_bytes())["body"] for name, art in emitted.items()}
+
+
+def check(bodies: dict[str, dict[str, Any]], path: Path | None = None) -> list[Result]:
     _, lines = load(path)
     results = []
     for line in lines:
-        actual = resolve(line.key, body)
+        actual = resolve(line.key, bodies)
         results.append(Result(line=line, actual=actual, pending=actual is None))
     return results
 

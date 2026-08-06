@@ -239,6 +239,17 @@ class ModelRepo:
             raise RepoError(f"{rel}: expected a mapping, got {type(loaded).__name__}")
         return loaded
 
+    def commits_touching(self, subpath: str) -> list[str]:
+        """Every commit under the pin that touched this path, oldest first.
+
+        How the history of an authored value is read back — the evidence-grade immutability check
+        compares what a file said at each of these against the regrade record (build ticket 18).
+        Renames are not followed, which is stated in `twin/evidence.py` rather than implied.
+        """
+        full = _join(self.pin.root, subpath)
+        out = _git_text(self.worktree, "rev-list", "--reverse", self.pin.commit, "--", full)
+        return [line.strip() for line in out.splitlines() if line.strip()]
+
     def list_tree(self, tree: str, prefix: str = "") -> list[str]:
         # `-z` because without it git C-quotes any path with a non-ASCII byte, and a quoted name
         # would silently fail the `.yaml` suffix test — the same pins loading a different model.

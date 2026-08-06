@@ -1,12 +1,12 @@
 # `twin`
 
-Build tickets 01–08 and 10–15 and 17 of `.scratch/twin/`. One dated signal binds to a component; one
-scenario execution emits forecasts — plural; one recorded outcome scores them under proper scoring
-rules; any artefact recomputes from its own pins. Scoring is in the first slice rather than
-retrofitted, because without it we cannot tell whether any later capability helped, and because
-scoring dictates what every other component must record.
+Build tickets 01–08, 10–15, 17–19 and 26–27 of `.scratch/twin/`. One dated signal binds to a
+component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
+proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
+rather than retrofitted, because without it we cannot tell whether any later capability helped, and
+because scoring dictates what every other component must record.
 
-**This is 15 of 77 build tickets.** What is not built is listed below and, more usefully, is named
+**This is 19 of 77 build tickets.** What is not built is listed below and, more usefully, is named
 inside every artefact the tool emits.
 
 ## Run it
@@ -19,6 +19,9 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin validate --repo R               # every object against its closed schema
 ./bin/twin graph --repo R --org netflix    # the typed knowledge graph
 ./bin/twin map --repo R --org netflix      # the Wardley map, rendered from that graph
+./bin/twin blast --repo R --origin C       # what is downstream, and which of it may be priced
+./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
+./bin/twin constraints --out F             # the published constraint set, floor and exclusions
 ./bin/twin worksheet --repo P              # the pocket org against its hand-computed worksheet
 ./bin/twin sign <artefact> --role R        # accountability for an authored artefact
 ./bin/twin grade                           # computed depth grades, with evidence
@@ -51,13 +54,17 @@ flowchart LR
   R["<b>twin run</b><br/>scenario at a declared time"] --> FB["forecast-bundle<br/><i>forecasts, always a list</i>"]
   C["<b>twin score</b><br/>proper rules, as-consumed only"] --> SC["score-card<br/><i>names the bundle by pin</i>"]
   G["<b>twin graph</b>"] --> GR["graph<br/><i>components · people · typed edges<br/>Wardley map · derived roll-ups</i>"]
+  BL["<b>twin blast</b><br/>one traversal, two outputs"] --> BR["blast-radius<br/><i>admitted to pricing · unpriced<br/>closed body, no price slot</i>"]
+  X["<b>twin exposure</b><br/>every declared perspective"] --> XP["scenario-exposure<br/><i>one figure per eye · the spread</i>"]
 
-  repo --> S & R & C & G
+  repo --> S & R & C & G & BL & X
   FB -- "by sha256, never by path" --> C
   B -. "no route from anything above" .-> G
   GR -- "no authoring step" --> M["<b>twin map</b><br/><i>a render, not a second model</i>"]
+  CS["<b>twin constraints</b><br/><i>authored · signed by role<br/>floor · exclusions · the gate</i>"]
+  CS -. "pinned by version and digest in" .-> BR & XP
 
-  BS & FB & SC & GR --> A["attestation sidecar<br/>runtime · agent signature · no human hands"]
+  BS & FB & SC & GR & BR & XP --> A["attestation sidecar<br/>runtime · agent signature · no human hands"]
   A --> V["<b>twin verify artefact</b><br/><i>recompute the chain from pins</i>"]
   A --> AT["<b>twin verify --attestation</b><br/><i>read it back: digest, signatures, anomaly</i>"]
 ```
@@ -87,22 +94,71 @@ any role's signature. The upgrade is sigstore/gitsign with in-toto subject diges
 present nothing is signed and the sidecar says which variable is missing, rather than carrying a
 placeholder that reads as signed.
 
+## Two things the £ rests on, before there is a £
+
+**The evidence ladder** (`twin/evidence-ladder.yaml`) is five typed grades, strongest first, each
+with a written admission criterion: dated natural experiment, repeated historical co-movement,
+literature or domain theory, calibrated expert judgement, model assertion. The grade travels *with*
+the claim, and **only grades 1–2 may price a scored forecast** — grade 5 is exactly where
+parametric contamination hides, because an edge a model asserted from training data looks identical
+to a well-evidenced one unless something forces the distinction.
+
+A grade is immutable without a **regrade event** recording who moved it and why. Two guards: at
+load, the recorded chain must be contiguous and end at the grade the file declares; at `twin
+validate`, the file's **git history** is read and every observed change must be covered by a
+regrade. Direction is derived and named — `strengthened` (to a lower number) or `weakened` — because
+"up" is ambiguous on this ladder, and strengthening is the direction to be suspicious of.
+
+**The constraint set** (`twin/constraints.yaml`, published by `twin constraints`) is the universal
+floor, the scope exclusions and the stated positions. The floor is not the operator's to move; a
+perspective adds red lines beside it, and one that reuses a floor id does not load. Scope exclusions
+name what the twin was *not* asked to model, which does not stop strategic non-modelling but does
+remove its deniability. Three positions are required by name — no power layer (stated), exit-cost
+asymmetry (unsolved), reflexivity and Goodhart-on-the-twin (deferred) — and covert sensing is
+recorded as `permanently-excluded`, which the loader checks is not the deferral beside it.
+
+The pricing threshold ships in the same artefact, because changing what may be priced is the same
+kind of act as changing what may be chosen.
+
+## Whose £
+
+The £ is perspectival: it belongs to whoever pays to run the twin. A perspective declares who pays,
+what they value and their red lines, as an ordinary file in the model repository. `twin exposure`
+reports a scenario under **every** declared perspective — naming none does not default to the
+employer's, because that would be exactly the unstated firm's-£ the design refuses — and the
+per-component spread between them is in the artefact rather than left to whoever runs the diff.
+
+**The use-gate reaches here too — one rule, three jobs.** A valuation carries its own evidence
+grade, and only a valuation inside the published threshold carries a figure at all. Anything weaker
+is a **register entry**: named beside the number, with no amount, because the schema refuses one at
+that grade. That is what stops a perspective declaring "reputation damage = £X", which is the
+shadow price decision ticket 09 explicitly rejected. The gate lives at the source rather than in the
+output: a grade-5 valuation carrying an amount does not load.
+
+The admitted figures are **declared valuations, not modelled prices**, and the artefact says so:
+nothing propagates yet, no severity is sampled, and the constraint pre-filter that must run before
+any pricing is build ticket 28. `prefilter.applied` is `false` in the output rather than implied.
+
 ## The pocket org
 
-Five components, six edges, named elasticities, and a committed worksheet
+Five components, six edges, named elasticities, two perspectives, and a committed worksheet
 (`twin/pocket-org-worksheet.md`) with every number worked out **by hand** and the arithmetic shown.
-`twin worksheet --repo <pocket repo>` checks the emitted artefact against all twenty-nine lines.
+`twin worksheet --repo <pocket repo>` checks the emitted graph, blast radius and exposure against
+all forty lines.
 
 This exists because a refusal test catches a reintroduced **absence** and nothing else. It is
 satisfied by a degenerate system: a PERT triple that is present but garbage, a score tagged with the
 wrong regime, an elasticity that stops being recalibrated three tickets later. All of those stay
 green under every refusal test, and all of them fail here.
 
-Twenty-three lines are computable today and match. Six carry their arithmetic already and name the
+Thirty-four lines are computable today and match. Six carry their arithmetic already and name the
 build ticket that must make them computable — propagation at 20, price at 30. **A pending line whose
 build ticket has closed is a failure**, the same shape as an invariant still pending after its
 activating ticket. Every subsequent derivation-path ticket adds its own line: that contract is
-written into the worksheet, because a ticket that lands without a line here has no yardstick.
+written into the worksheet, because a ticket that lands without a line here has no yardstick. Build
+tickets 18, 19 and 26 added eleven between them — the two evidence grades, the admissible-edge
+count, the blast radius from the shared database, and both perspectives' exposures with the spread
+attributed component by component.
 
 The worksheet is `authored` and signed as such. Everywhere else in this system a hand-typed number is
 refused; this is the one place a human number is the authority, and the mark is what says so.
@@ -116,30 +172,41 @@ reaches `full`, and nothing can be typed as `full`.
 |---|---|---|---|
 | `domain-model` | 07 | partial | 1 / 7 |
 | `causal-layer` | 08 | partial | 1 / 5 |
+| `currency-regimes` | 09 | partial | 2 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 1 / 8 |
 | `scenario-engine` | 13 | partial | 1 / 7 |
 
-**7 of 35**, and every artefact now carries an overall depth of `partial` rather than `stub`. That
-moved because `domain-model` gained its first ticked criterion, and the overall grade is the *worst*
-of the capabilities that produced the artefact. **Read `partial` as "at least one of N", not as
-"most of the way there"** — the strongest capability here stands at two ticks out of four, and four
-of the six stand at one. `./bin/twin grade` prints the denominators.
+**9 of 41**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
+there"** — the strongest capabilities here stand at two ticks, and four of the seven stand at one.
+`./bin/twin grade` prints the denominators.
 
-`causal-layer` is new: it was added at build ticket 17, when the causal layer first had code to
-measure — before that, a capability file with nothing behind it would have been a slot claiming a
-capability existed.
+`currency-regimes` is new: it was added at build ticket 26, when the £ first had code to measure — a
+perspective that declares who pays, and a constraint set it may add to and may never override.
+Before that, a capability file with nothing behind it would have been a slot claiming a capability
+existed, which is the same reason `causal-layer` waited until build ticket 17.
 
-Three criteria were ticked this round and all three survived. Three others were considered and left
-unticked because each rested on **one clause of a multi-clause criterion**, which is the same ground on
-which five were withdrawn across the previous two rounds:
+Two criteria were ticked this round and both survived. Several others were considered and left
+unticked, on the same ground five were withdrawn on in earlier rounds — each rested on **one clause
+of a multi-clause criterion**, or on machinery that does not exist:
 
+- **decision ticket 08 AC 2** (intervention **and** counterfactual semantics, incl. structural-only
+  paths) — build ticket 19 delivered the structural-only half and neither of the other two, so
+  `causal-layer` gains nothing this round and stands at 1/5.
+- **decision ticket 09 ACs 3–6** — the comparable remainder, the incommensurables, the objective
+  function and the rival-model spread all need a pricing engine that is not here.
+- **decision ticket 15** has **no capability file at all.** Build ticket 27 published the scope
+  exclusions, the power-layer disclaimer, exit-cost asymmetry and the permanent covert-sensing
+  exclusion — all from that ticket's *resolution*, none of them one of its five acceptance
+  criteria. So none is ticked, and a capability file at 0/5 would be a slot claiming a capability
+  existed.
 - **decision ticket 07 AC 5** (representation/format reuse-vs-custom **and** authored-vs-derived) —
-  the authored/derived split is now structural in three places, but the format decision is recorded
+  the authored/derived split is now structural in four places, but the format decision is recorded
   nowhere in code.
-- **decision ticket 07 AC 6** (where £, risk, people, **assets** and signals attach) — people and
-  signals attach; assets have no schema and £ has no engine.
+- **decision ticket 07 AC 6** (where £, risk, people, **assets** and signals attach) — people,
+  signals and now a declared valuation attach; assets have no schema.
 - **decision ticket 14 AC 2's third clause** — an agent signature carries runtime and tool version but
   no model version and no config digest, because nothing here is produced by a model yet.
 
@@ -147,26 +214,27 @@ which five were withdrawn across the previous two rounds:
 and the build ticket that earned it.
 
 **Scoring and calibration are still outside this ledger.** No capability file is owned by a decision
-ticket that governs scoring, so build ticket 08's work does not appear in the 35. That is a hole in the
+ticket that governs scoring, so build ticket 08's work does not appear in the 41. That is a hole in the
 honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 17 pass, 0 fail, 6 pending, 1 skipped and not faked. `pytest -q` — 291 tests
+`./bin/twin verify` — 18 pass, 0 fail, 5 pending, 1 skipped and not faked. `pytest -q` — 357 tests
 across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
 |---|---|
-| `store_rebuildable_from_git` | `grade_5_only_path_never_prices` (19) |
-| `identical_pins_identical_bytes` | `ruin_class_absent_not_priced` (28) |
-| `every_artefact_marked` | `prefilter_precedes_pricing` (28) |
-| `every_capability_depth_graded` | `as_consumed_admits_no_post_T_fact` (36) |
-| `world_never_references_overlay` | `price_levels_never_probabilities` (59) |
-| `no_collapse_mechanism` | `standing_library_covers_committed_classes` (69) |
+| `store_rebuildable_from_git` | `ruin_class_absent_not_priced` (28) |
+| `identical_pins_identical_bytes` | `prefilter_precedes_pricing` (28) |
+| `every_artefact_marked` | `as_consumed_admits_no_post_T_fact` (36) |
+| `every_capability_depth_graded` | `price_levels_never_probabilities` (59) |
+| `world_never_references_overlay` | `standing_library_covers_committed_classes` (69) |
+| `no_collapse_mechanism` | |
 | `no_recommended_action_field` | |
 | `derived_never_human_signed` (cryptographic) | |
 | `only_as_consumed_scores` | |
 | `no_special_category_slot` | |
+| `grade_5_only_path_never_prices` | |
 
 **The constitution names sixteen invariants and the manifest may not grow a seventeenth without the
 constitution changing first.** So build tickets 13, 14 and 11 each *extended* an existing check rather
@@ -174,6 +242,13 @@ than adding one — roll-ups with no authored and no stored form onto `store_reb
 refusal to inherit arckit's action bands onto `no_recommended_action_field`, and detection of a planted
 human signature onto `derived_never_human_signed`. Each body change cites its authorising decision
 ticket in the manifest, which is what `hash_changes_are_authorised` checks.
+
+`grade_5_only_path_never_prices` went live at build ticket 19. It asserts at four depths — the
+ladder, the traversal, the **scenario exposure** and the closed bodies — and the scenario leg is the
+one that matters: a traversal emits no money, so a gate asserted only there would be asserted only
+where nothing could go wrong. It also asserts the **positive** leg as hard as the negative one: a
+fully-graded path is admitted. A gate that admits nothing passes every refusal test in the check
+while making the system useless, so "is it a gate or a wall" is asked explicitly.
 
 Two guards were added to the **harness** instead, because each guards a yardstick rather than the
 system: `worksheet_matches_the_pocket_org` (the hand-computed numbers still hold) and
@@ -214,10 +289,28 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Nothing propagates.** Causal edges now carry sign, lag and a calibrated elasticity, and are
   validated on write — but no Monte-Carlo reads them, there is no depth attenuation, no shared-
   ancestry handling and no intervention-versus-observation distinction. (Build tickets 20–22.)
-- **No £.** No FAIR engine, no PERT sampling, no TVaR, no constraint pre-filter, no trade-off
-  curve. The four pricing invariants are pending and there is nothing for them to guard yet.
-  The pocket-org worksheet already carries the price line, hand-computed, as the yardstick those
-  tickets must match. (23–33.)
+- **No £ engine.** No FAIR engine, no PERT sampling, no TVaR, no trade-off curve. `twin exposure`
+  reports what each perspective *declared* a component is worth, which is not a modelled price and
+  says so in `basis`. The pocket-org worksheet already carries the price line, hand-computed, as
+  the yardstick those tickets must match. (23–25, 29–33.)
+- **Nothing enforces the constraint set.** It is published, versioned and signed, and the
+  pre-filter that removes a ruin-class or forbidden option from a choice set *before* pricing is
+  build ticket 28. `ruin_class_absent_not_priced` and `prefilter_precedes_pricing` stay pending,
+  and every exposure artefact records `prefilter.applied: false` rather than implying otherwise.
+- **The use-gate decides admission, not magnitude.** A path is admitted to pricing or reported as
+  an unpriced blast radius, and a valuation is admitted or held in the register — but no path is
+  ever *priced*, because there is no pricing engine. The blast-radius body is closed with no price
+  slot and a register entry carries no figure, so both stay true by construction. (30.)
+- **The evidence-grade history check runs at `twin validate`, not at load.** It costs a git process
+  per commit per graded file, so `graph`, `blast` and `exposure` will emit from a repository whose
+  grade moved unrecorded. `twin validate` is the gate an author or CI runs, and it exits non-zero;
+  nothing stops somebody skipping it.
+- **The evidence-grade history check does not follow renames.** Moving a file and changing its
+  grade in the same commit reads as a new file at its original grade. Named in
+  `twin/evidence.py`; `git log --follow` per file is the upgrade if it matters.
+- **The misuse catalogue, the affected-parties register and the disparate-impact audit channel
+  are not built.** Build ticket 27 published the scope exclusion that says the system cannot
+  currently be checked for disparate impact. Saying so is not fixing it. (61, 62.)
 - **The pocket org's severity has no empirical anchor.** The £1,000,000 in the worksheet is a
   fixture number, stated as such. Build ticket 25 replaces it with an anchored one.
 - **The information regime is a tag, not a gate.** Every forecast declares its regime and only
@@ -272,8 +365,13 @@ Named here so the skeleton cannot quietly become the definition of done.
 ```
 twin/
   cli.py          seam 1 — the artefact CLI, the primary boundary
-  verbs.py        sense / run / score / graph
+  verbs.py        sense / run / score / graph / blast / exposure
   schema.py       the closed typed schema; Article 9 has no slot because there is no slot
+  blast.py        the reverse-dependency traversal, and the closed body with no price slot
+  evidence.py     the evidence ladder, the use-gate, and the regrade record
+  evidence-ladder.yaml      five typed grades and the published pricing threshold
+  constraints.py  the universal floor, the scope exclusions, the stated positions
+  constraints.yaml          the constraint set itself — authored, versioned, signed on publish
   scoring.py      Brier and log loss, and the declared quantisation
   wardley.py      evolution positions and D/K/R, inherited from arckit with its caveats
   reproduce.py    recompute an artefact, and its chain, from its own pins

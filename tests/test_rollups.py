@@ -51,7 +51,9 @@ def test_changing_a_constituent_changes_the_rollup_with_no_separate_step(scratch
 
     after = _rollups(scratch_repo)
     assert after["components"] == before["components"] + 1  # type: ignore[operator]
-    assert after["components_by_kind"]["capability"] == 1  # type: ignore[index]
+    kinds_before: dict[str, int] = before["components_by_kind"]  # type: ignore[assignment]
+    kinds_after: dict[str, int] = after["components_by_kind"]  # type: ignore[assignment]
+    assert kinds_after["capability"] == kinds_before.get("capability", 0) + 1
     assert after["components_positioned_on_the_map"] == before["components_positioned_on_the_map"] + 1  # type: ignore[operator]
 
 

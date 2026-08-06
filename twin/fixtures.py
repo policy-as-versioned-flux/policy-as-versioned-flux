@@ -132,6 +132,15 @@ visibility: 0.85
 needs:
   - content-delivery-network
 """,
+    # Downstream of everything and evidenced by nothing. It exists so the use-gate has a real
+    # subject: the only causal path here runs through a grade-5 model assertion.
+    "orgs/netflix/components/brand-goodwill.yaml": """\
+id: brand-goodwill
+name: Brand goodwill
+kind: capability
+evolution: genesis
+visibility: 0.6
+""",
     "orgs/netflix/world_models/netflix-believed.yaml": """\
 id: netflix-believed
 name: The org's believed map
@@ -171,6 +180,7 @@ horizon: '2012-12-31'
 components:
   - dvd-by-mail
   - streaming-experience
+  - brand-goodwill
 world_models:
   - twin-default
   - rival-fast-commoditisation
@@ -290,6 +300,134 @@ confidence: 0.4
 note: >-
   A degenerate triple, on purpose. It is permitted and it is flagged, so false precision is
   visible in the artefact rather than hidden behind a range that has no width.
+""",
+    # The two ends of the use-gate, in one graph (build ticket 19). One edge is evidenced well
+    # enough to carry a price; the other is a model assertion and never will be, however wide its
+    # range says it is. Both are representable, and they must not look equally confident.
+    "orgs/netflix/edges/cdn-capacity-lifts-streaming.yaml": """\
+id: cdn-capacity-lifts-streaming
+type: influences
+from: content-delivery-network
+to: streaming-experience
+sign: positive
+lag_days: 60
+elasticity:
+  min: 0.1
+  mode: 0.25
+  max: 0.4
+evidence_grade: 2
+confidence: 0.55
+note: >-
+  Repeated historical co-movement across more than one delivery build-out. Inside the published
+  threshold, so a path made only of edges like this one may carry a price.
+""",
+    "orgs/netflix/edges/price-separation-erodes-goodwill.yaml": """\
+id: price-separation-erodes-goodwill
+type: influences
+from: dvd-by-mail
+to: brand-goodwill
+sign: negative
+lag_days: 30
+elasticity:
+  min: 0.05
+  mode: 0.3
+  max: 0.9
+evidence_grade: 5
+confidence: 0.2
+note: >-
+  A model assertion. Nothing observed it, nothing published it, nobody calibrated it. The width
+  of the range is the honest part and it still never prices — this is exactly where parametric
+  contamination hides.
+""",
+    # A regrade in each direction, so both are exercised. Strengthening is the one to be
+    # suspicious of: it is how a model assertion becomes a measurement.
+    "orgs/netflix/regrades/streaming-displaces-dvd-strengthened.yaml": """\
+id: streaming-displaces-dvd-strengthened
+subject: streaming-displaces-dvd
+from_grade: 4
+to_grade: 3
+regraded_on: '2026-02-01'
+by_role: model-steward
+reason: >-
+  A published account of the same displacement mechanism was found, so the claim moved off
+  calibrated judgement and onto domain theory.
+evidence: The reference is recorded against the edge; the mechanism is still not observed here.
+note: >-
+  Strengthened — to a lower number, which is the direction worth looking at twice.
+""",
+    "orgs/intel/regrades/euv-delay-slips-the-node-weakened.yaml": """\
+id: euv-delay-slips-the-node-weakened
+subject: euv-delay-slips-the-node
+from_grade: 1
+to_grade: 2
+regraded_on: '2026-03-15'
+by_role: model-steward
+reason: >-
+  The series behind the original grade covers repeated co-movement rather than a dated change
+  with observable data on both sides of it.
+evidence: Review of the source series against the ladder's grade-1 admission criterion.
+""",
+    # Two perspectives over the same overlay (build ticket 26). Nothing here ranks them and
+    # nothing defaults to the first: `twin exposure` with no `--perspective` reports both.
+    "orgs/netflix/perspectives/the-operator.yaml": """\
+id: the-operator
+name: The operator paying to run this twin
+party: employer
+pays: >-
+  The organisation running the twin. The figures below are theirs and are stated as theirs
+  rather than dressed as neutral.
+values:
+  streaming-experience:
+    amount: 120000000
+    evidence_grade: 2
+    basis: >-
+      Subscription revenue attributable to the experience, from repeated segment reporting.
+  dvd-by-mail:
+    amount: 40000000
+    evidence_grade: 2
+    basis: Rental revenue on the dated separation, measured on both sides of it.
+  brand-goodwill:
+    evidence_grade: 5
+    basis: >-
+      A model assertion about reputational worth, with no path to a cash flow anybody measured.
+      It carries no amount, because at this grade the schema refuses one — the register entry is
+      the honest form and "reputation damage = the number below" is the rejected one.
+ruin:
+  insolvency: >-
+    Any option carrying a real chance that the organisation cannot meet its obligations.
+forbidden:
+  no-response-that-depends-on-secrecy: >-
+    Any response whose effect depends on the people it affects not knowing it is in place.
+""",
+    "orgs/netflix/perspectives/the-staff-council.yaml": """\
+id: the-staff-council
+name: The staff council's own perspective
+party: employee-body
+pays: >-
+  The staff council, from its own funds. It shares the world layer, holds its own valuation, and
+  needed no privilege from anybody to instantiate this.
+values:
+  streaming-experience:
+    amount: 3000000
+    evidence_grade: 2
+    basis: Members employed on the experience, at published pay scales.
+  dvd-by-mail:
+    amount: 9000000
+    evidence_grade: 2
+    basis: Members employed in physical distribution, at published pay scales.
+  brand-goodwill:
+    evidence_grade: 4
+    basis: >-
+      A calibrated judgement about how a reputational move reaches members. Recorded as judgement
+      and outside the threshold, so it is a register entry and carries no figure.
+ruin:
+  loss-of-livelihood: >-
+    Any option carrying a real chance that a member cannot meet their own obligations.
+forbidden:
+  no-compulsory-severance: Any response that requires compulsory severance.
+note: >-
+  The same scenario prices differently here, and the difference is the point. The employer's
+  valuation is not the neutral one; it is one of these two.
 """,
     "orgs/intel/scenarios/euv-slip-2026.yaml": """\
 id: euv-slip-2026
@@ -522,6 +660,55 @@ confidence: 0.5
 note: >-
   Degenerate on purpose, so the worksheet carries one flagged edge and one honest range.
 """,
+    "orgs/pocket/scenarios/portal-availability-2026.yaml": """\
+id: portal-availability-2026
+question: Does the customer portal miss its availability target over the horizon?
+proposition: the-portal-misses-its-availability-target
+at: '2026-01-01'
+horizon: '2026-12-31'
+components:
+  - customer-portal
+  - order-service
+world_models:
+  - reference-map
+""",
+    # Two perspectives, hand-computable on purpose: 400000 + 250000 = 650000 against
+    # 50000 + 120000 = 170000, so the spread is 480000 and every figure is checkable by eye.
+    "orgs/pocket/perspectives/the-operator.yaml": """\
+id: the-operator
+name: The operator paying to run this twin
+party: employer
+pays: The organisation running the twin.
+values:
+  customer-portal:
+    amount: 400000
+    evidence_grade: 2
+    basis: Order value lost per hour of portal outage, from repeated incident records.
+  order-service:
+    amount: 250000
+    evidence_grade: 1
+    basis: The dated outage of 2025, with order volume measured on both sides of it.
+ruin:
+  insolvency: Any option carrying a real chance that the organisation cannot meet its obligations.
+""",
+    "orgs/pocket/perspectives/the-staff-council.yaml": """\
+id: the-staff-council
+name: The staff council's own perspective
+party: employee-body
+pays: The staff council, from its own funds.
+values:
+  customer-portal:
+    amount: 50000
+    evidence_grade: 2
+    basis: Members on portal support, at published pay scales.
+  order-service:
+    amount: 120000
+    evidence_grade: 1
+    basis: The dated outage of 2025, with overtime recorded on both sides of it.
+ruin:
+  loss-of-livelihood: >-
+    Any option carrying a real chance that a member cannot meet their own obligations.
+""",
 }
 
 
@@ -541,6 +728,59 @@ def build_pocket_org(dest: str | Path) -> Path:
     git(root, "add", "-A")
     git(root, "commit", "-q", "-m", "the pocket org")
     return root
+
+
+def plant_unrecorded_regrade(root: str | Path, grade: int = 1) -> str:
+    """Move an evidence grade in a commit and record nothing. The history check must bite.
+
+    The chain check cannot see this: after the edit the edge simply declares a different grade
+    and there is no chain to be inconsistent with. Only the file's own history says a grade moved
+    (build ticket 18).
+    """
+    path = Path(root)
+    rel = "orgs/netflix/edges/cdn-capacity-lifts-streaming.yaml"
+    text = (path / rel).read_text(encoding="utf-8")
+    (path / rel).write_text(
+        text.replace("evidence_grade: 2", f"evidence_grade: {grade}"), encoding="utf-8", newline="\n"
+    )
+    git(path, "add", "-A")
+    git(path, "commit", "-q", "-m", "quietly promote an edge to a stronger grade")
+    return git(path, "rev-parse", "HEAD").strip()
+
+
+def record_a_regrade(root: str | Path, grade: int = 4) -> str:
+    """Move an evidence grade **and** write the regrade event, in one commit.
+
+    The counterpart to `plant_unrecorded_regrade`: without it the history check would be vacuous
+    here, because every fixture regrade records a move that predates the repository and there is
+    no observed change for the check to match against.
+    """
+    path = Path(root)
+    rel = "orgs/netflix/edges/cdn-capacity-lifts-streaming.yaml"
+    text = (path / rel).read_text(encoding="utf-8")
+    (path / rel).write_text(
+        text.replace("evidence_grade: 2", f"evidence_grade: {grade}"), encoding="utf-8", newline="\n"
+    )
+    _write(
+        path,
+        {
+            "orgs/netflix/regrades/cdn-capacity-weakened.yaml": f"""\
+id: cdn-capacity-weakened
+subject: cdn-capacity-lifts-streaming
+from_grade: 2
+to_grade: {grade}
+regraded_on: '2026-06-01'
+by_role: model-steward
+reason: >-
+  Review found the co-movement rested on one build-out rather than several, so the claim now
+  rests on judgement.
+evidence: Review of the underlying series.
+"""
+        },
+    )
+    git(path, "add", "-A")
+    git(path, "commit", "-q", "-m", "regrade an edge, and record the regrade")
+    return git(path, "rev-parse", "HEAD").strip()
 
 
 def plant_world_violation(root: str | Path) -> str:

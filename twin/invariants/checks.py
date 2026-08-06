@@ -44,6 +44,11 @@ NETFLIX = "netflix"
 SIGNAL = "price-separation-announced"
 SCENARIO = "dvd-decline-2011"
 OUTCOME = "dvd-decline-2011-resolved"
+# The blast-radius subject (build ticket 19). From the delivery network, one component is
+# reachable through a fully-graded causal path and one is reachable only through a grade-5 model
+# assertion — so the fixture exercises the gate in both directions rather than one.
+BLAST_ORIGIN = "content-delivery-network"
+GRADE_5_ONLY = "brand-goodwill"
 
 
 # -- shared subjects -----------------------------------------------------------------------
@@ -78,11 +83,25 @@ def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefac
     graph = verbs.graph(repo, ctx.caps, NETFLIX, verbs.command_for("graph", org=NETFLIX))
     graph_path = graph.write(out_dir / "graph.json")
 
+    radius = verbs.blast(
+        repo, ctx.caps, NETFLIX, BLAST_ORIGIN,
+        verbs.command_for("blast", org=NETFLIX, origin=BLAST_ORIGIN),
+    )
+    radius_path = radius.write(out_dir / "blast-radius.json")
+
+    exposed = verbs.exposure(
+        repo, ctx.caps, NETFLIX, SCENARIO, None,
+        verbs.command_for("exposure", org=NETFLIX, scenario=SCENARIO),
+    )
+    exposed_path = exposed.write(out_dir / "scenario-exposure.json")
+
     return {
         bound.kind: (bound, bound_path),
         bundle.kind: (bundle, bundle_path),
         card.kind: (card, card_path),
         graph.kind: (graph, graph_path),
+        radius.kind: (radius, radius_path),
+        exposed.kind: (exposed, exposed_path),
     }
 
 
@@ -270,8 +289,15 @@ def _every_artefact_marked(ctx: "Context") -> str:
 
 @invariant("every_capability_depth_graded")
 def _every_capability_depth_graded(ctx: "Context") -> str:
-    """A capability with no depth grade fails to load, and no grade may be typed."""
-    used = sorted(set(verbs.CAPS_SENSE) | set(verbs.CAPS_RUN) | set(verbs.CAPS_SCORE))
+    """A capability with no depth grade fails to load, and no grade may be typed.
+
+    The list is every capability any verb declares, so a verb added later without a graded
+    capability behind it fails here rather than emitting an artefact that grades nothing.
+    """
+    used = sorted(
+        set(verbs.CAPS_SENSE) | set(verbs.CAPS_RUN) | set(verbs.CAPS_SCORE)
+        | set(verbs.CAPS_GRAPH) | set(verbs.CAPS_BLAST) | set(verbs.CAPS_EXPOSURE)
+    )
     for name in used:
         ctx.caps.require(name)
 
@@ -597,6 +623,152 @@ def _derived_never_human_signed(ctx: "Context") -> str:
     return (
         "derived artefacts refuse human signatures and a planted one is detected on read; "
         "authored artefacts require one; the two signature types never substitute"
+    )
+
+
+@invariant("grade_5_only_path_never_prices")
+def _grade_5_only_path_never_prices(ctx: "Context") -> str:
+    """A path evidenced only by a model assertion emits a blast radius, never a price.
+
+    Grade 5 is where parametric contamination hides: an edge a model asserted from training data
+    looks exactly like a well-evidenced one unless the schema forces the distinction. So the gate
+    is checked at four depths — the ladder that defines it, the traversal that applies it, the
+    **scenario** whose valuation it gates, and the bodies that have nowhere to put a price even if
+    somebody wanted one there.
+
+    The scenario leg is the one that matters most. A traversal emits no money at all, so a gate
+    asserted only there would be asserted only where nothing could go wrong; the scenario exposure
+    is where a figure actually appears, and that is where a grade-5 claim must fail to become one.
+
+    The positive leg matters as much as the negative one. A gate that admits nothing is a wall,
+    and a wall would pass every refusal test in this check while making the system useless, so a
+    well-evidenced path must still be admitted.
+    """
+    from .. import blast, evidence, verbs as verbs_mod
+    from ..blast import BELOW_THRESHOLD
+    from ..schema import CAUSAL_EDGE, EVIDENCE_GRADES, SchemaError, validate
+
+    threshold = evidence.threshold()
+    admits = [g for g in EVIDENCE_GRADES if evidence.may_price(g)]
+    if admits != [1, 2] or evidence.may_price(5):
+        raise Violated(
+            f"the published ladder admits grades {admits} to pricing; only 1-2 may price a scored "
+            "forecast, and grade 5 never may"
+        )
+    for grade in EVIDENCE_GRADES:
+        if not str(evidence.rung(grade).get("admits", "")).strip():
+            raise Violated(f"grade {grade} has no written admission criterion, so it admits anything")
+
+    body = json.loads(emit_all(ctx)[verbs_mod.KIND_BLAST_RADIUS][1].read_bytes())["body"]
+    admitted = {e["component"]: e for e in body["admitted_to_pricing"]}
+    unpriced = {e["component"]: e for e in body["unpriced"]}
+    if not admitted:
+        raise Violated(
+            "the fixture admits nothing to pricing, so this check cannot tell a gate from a wall"
+        )
+    for name, entry in sorted(admitted.items()):
+        if int(entry["worst_evidence_grade"]) > threshold:
+            raise Violated(f"{name} was admitted on a path whose weakest hop is grade {entry['worst_evidence_grade']}")
+        if any(hop["hop"] != CAUSAL_EDGE for hop in entry["path"]):
+            raise Violated(f"{name} was admitted on a path with a structural hop, where no mechanism is claimed")
+
+    entry = unpriced.get(GRADE_5_ONLY)
+    if entry is None:
+        raise Violated(
+            f"the fixture no longer reaches {GRADE_5_ONLY!r}, whose only causal path runs through a "
+            "grade-5 model assertion — this invariant has lost its subject"
+        )
+    if GRADE_5_ONLY in admitted:
+        raise Violated(f"{GRADE_5_ONLY} was admitted to pricing through a grade-5 model assertion")
+    if int(entry["worst_evidence_grade"]) != 5 or entry["reason"] != BELOW_THRESHOLD:
+        raise Violated(
+            f"{GRADE_5_ONLY} is unpriced for {entry['reason']!r} at grade "
+            f"{entry['worst_evidence_grade']}, not as a grade-5 path"
+        )
+
+    # A distinct artefact type, not a price with a null field: the body is closed and there is no
+    # price-shaped name in the set of keys it may carry, at any depth.
+    price_shaped = {"price", "prices", "priced", "cost", "costs", "gbp", "amount", "loss",
+                    "expected_loss", "severity", "delta", "monetary_value", "declared_value"}
+    present = sorted(price_shaped & blast.BODY_KEYS)
+    if present:
+        raise Violated(f"the blast-radius body declares a slot for {', '.join(present)}")
+    stray = sorted(_keys(body) - blast.BODY_KEYS)
+    if stray:
+        raise Violated(f"an emitted blast radius carries undeclared field(s) {', '.join(stray)}")
+    try:
+        blast.refuse_undeclared_keys({**body, "price": 1})
+    except ArtefactError:
+        pass
+    else:
+        raise Violated("a planted price field serialised into a blast radius rather than being refused")
+
+    # The scenario leg. The traversal above emits no money; this is where a figure appears, so
+    # this is where a grade-5 claim has to fail to become one.
+    exposure = json.loads(emit_all(ctx)[verbs_mod.KIND_SCENARIO_EXPOSURE][1].read_bytes())["body"]
+    if GRADE_5_ONLY not in exposure["scenario"]["components"]:
+        raise Violated(
+            f"the fixture scenario no longer names {GRADE_5_ONLY!r}, so no perspective is even "
+            "offered the chance to price a grade-5 claim and this leg asserts nothing"
+        )
+    for entry in exposure["perspectives"]:
+        priced = {e["component"] for e in entry["admitted"]}
+        if GRADE_5_ONLY in priced:
+            raise Violated(f"perspective {entry['id']!r} priced {GRADE_5_ONLY} at a gated grade")
+        if not priced:
+            raise Violated(f"perspective {entry['id']!r} admitted nothing, so the gate is a wall here")
+        held = {e["component"]: e for e in entry["register"]}
+        if GRADE_5_ONLY not in held:
+            raise Violated(
+                f"perspective {entry['id']!r} neither priced nor registered {GRADE_5_ONLY}; a "
+                "weakly-evidenced valuation is a register entry, never a silent omission"
+            )
+        if evidence.may_price(int(held[GRADE_5_ONLY]["evidence_grade"])):
+            raise Violated(f"perspective {entry['id']!r} registered a valuation that may price")
+        for name, figures in ((e["component"], e) for e in entry["register"]):
+            numbers = [v for _, v in _pairs(figures) if isinstance(v, (int, float)) and not isinstance(v, bool)]
+            if [n for n in numbers if n != figures["evidence_grade"]]:
+                raise Violated(f"a register entry for {name} carries a figure beside its grade")
+    if any(row["declared_value"][e["id"]] is not None
+           for row in exposure["attribution"] if row["component"] == GRADE_5_ONLY
+           for e in exposure["perspectives"]):
+        raise Violated(f"{GRADE_5_ONLY} carries an attributed figure despite never being admitted")
+
+    # And the schema refuses the figure at the source, so the artefact is not the only guard.
+    try:
+        validate(
+            "perspective",
+            {"id": "planted", "name": "Planted", "party": "employer", "pays": "somebody",
+             "ruin": {"insolvency": "a boundary"},
+             "values": {"a-component": {"amount": 1, "evidence_grade": 5, "basis": "asserted"}}},
+            "planted",
+        )
+    except SchemaError:
+        pass
+    else:
+        raise Violated("a grade-5 valuation carrying an amount validated; the gate is not at the source")
+
+    # The threshold is a published parameter, pinned where the gate was applied — so moving it
+    # moves the digest every gating artefact records, and cannot be done quietly.
+    if body["gating"]["pin"] != evidence.pin():
+        raise Violated("the emitted blast radius does not pin the ladder it gated against")
+    loosened = ctx.tmp / "loosened-ladder" / "evidence-ladder.yaml"
+    loosened.parent.mkdir(parents=True, exist_ok=True)
+    loosened.write_text(
+        evidence.LADDER_PATH.read_text(encoding="utf-8")
+        .replace("pricing_threshold: 2", "pricing_threshold: 5")
+        .replace("may_price: false", "may_price: true"),
+        encoding="utf-8",
+    )
+    if evidence.pin(loosened)["digest"] == evidence.pin()["digest"]:
+        raise Violated("a ladder with a different threshold has the same digest; the pin says nothing")
+    if not evidence.may_price(5, loosened):
+        raise Violated("the threshold is not what decides admission; something else is gating")
+    return (
+        f"grades {admits} price and 5 never does; {len(admitted)} admitted on fully-graded paths and "
+        f"{GRADE_5_ONLY} unpriced at grade 5; every perspective registers it without a figure and "
+        "the schema refuses one; the blast body is closed with no price slot; the threshold is "
+        "pinned in the artefact and moving it moves the digest"
     )
 
 

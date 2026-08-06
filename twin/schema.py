@@ -15,6 +15,7 @@ validate` is the gate an author or CI runs before the commit.
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass, field
 from typing import Any, Callable
@@ -38,6 +39,12 @@ SIGNS = ("positive", "negative")
 EVIDENCE_GRADES = (1, 2, 3, 4, 5)
 REGIMES = ("as-consumed", "as-knowable", "with-hindsight")
 CONTAMINATION = ("low", "high", "control")
+# Who a perspective belongs to. Enumerated so that "a non-employer party can instantiate one" is
+# checkable rather than asserted — and deliberately flat: nothing anywhere ranks these, and there
+# is no field by which one could (build ticket 26).
+PARTIES = (
+    "employer", "employee-body", "union", "regulator", "customer-body", "supplier", "other",
+)
 
 # UK GDPR Article 9.
 #
@@ -140,6 +147,67 @@ def evidence_grade(value: Any, where: str) -> None:
         raise SchemaError(f"{where}: expected an evidence grade 1-5, got {value!r}")
 
 
+def amount(value: Any, where: str) -> None:
+    """A declared money figure. Non-negative, finite, and never a bool.
+
+    Deliberately unitless in the schema: the unit belongs to the perspective that declared it,
+    and a perspective prices in its own terms (decision ticket 09, Q1).
+    """
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise SchemaError(f"{where}: expected a number, got {value!r}")
+    if not math.isfinite(float(value)):
+        raise SchemaError(f"{where}: expected a finite number, got {value!r}")
+    if float(value) < 0:
+        raise SchemaError(f"{where}: expected a non-negative number, got {value!r}")
+
+
+def valuation(value: Any, where: str) -> None:
+    """What a perspective says a component is worth to it, and what backs that claim.
+
+    Closed like everything else, and **graded**: the £ boundary is the same use-gate the causal
+    layer runs on. Only a valuation evidenced at the published threshold carries an `amount`;
+    anything weaker is a register entry with no figure at all, reported beside the number and
+    never inside it (decision ticket 09, Q4). That is what stops reputation becoming
+    "reputation damage = £X" — the rejected shadow price.
+    """
+    if not isinstance(value, dict):
+        raise SchemaError(f"{where}: expected a valuation mapping, got {value!r}")
+    unknown = sorted((set(value) - {"amount", "evidence_grade", "basis"}), key=str)
+    if unknown:
+        raise SchemaError(
+            f"{where}: unknown field(s) {', '.join(str(u) for u in unknown)}; a valuation is "
+            "amount, evidence_grade and basis"
+        )
+    missing = sorted({"evidence_grade", "basis"} - set(value))
+    if missing:
+        raise SchemaError(
+            f"{where}: missing {', '.join(missing)}. A figure with no grade behind it is exactly "
+            "the shadow price decision ticket 09 refuses."
+        )
+    evidence_grade(value["evidence_grade"], f"{where}.evidence_grade")
+    text(value["basis"], f"{where}.basis")
+
+    # Imported here rather than at module scope: `twin.evidence` reads this module's grade tuple,
+    # so importing it eagerly would close a cycle.
+    from .evidence import may_price
+
+    grade = int(value["evidence_grade"])
+    if may_price(grade) and "amount" not in value:
+        raise SchemaError(
+            f"{where}: evidence grade {grade} admits a figure and none is declared. A valuation "
+            "inside the threshold and carrying no amount is a gap, not a register entry."
+        )
+    if not may_price(grade) and "amount" in value:
+        raise SchemaError(
+            f"{where}: evidence grade {grade} is outside the pricing threshold, so this valuation "
+            "may not carry an amount. It is a register entry — reported beside the number, never "
+            "inside it — because inventing comparability the evidence does not support is the "
+            "move decision ticket 09 rejected."
+        )
+    if "amount" in value:
+        amount(value["amount"], f"{where}.amount")
+
+
 def pert(value: Any, where: str) -> None:
     """A calibrated range as a min/mode/max triple.
 
@@ -217,11 +285,14 @@ class Schema:
         refuse_special_category(doc, where)
         refuse_authored_rollups(doc, where)
         known = set(self.required) | set(self.optional)
-        unknown = sorted(set(doc) - known)
+        # Sorted and rendered by `str`: YAML 1.1 reads a bare `on:` or `yes:` as a *boolean* key,
+        # so an untrusted model file can hand us a key set that is not all strings — and a
+        # refusal that raises a TypeError while formatting its own message is not a refusal.
+        unknown = sorted((set(doc) - known), key=str)
         if unknown:
             raise SchemaError(
-                f"{where}: unknown field(s) {', '.join(unknown)}. The schema is closed — "
-                f"it accepts {', '.join(sorted(known))} and nothing else."
+                f"{where}: unknown field(s) {', '.join(str(u) for u in unknown)}. The schema is "
+                f"closed — it accepts {', '.join(sorted(known))} and nothing else."
             )
         missing = sorted(set(self.required) - set(doc))
         if missing:
@@ -333,17 +404,52 @@ SCHEMAS: dict[str, Schema] = {
         },
         optional={"substrate": text},
     ),
+    # `evidence_grade` is the ladder's rung, not any whole number: the grade travels with the
+    # claim, so an off-ladder value would be a claim whose strength nothing can read (ticket 18).
     "claim": Schema(
         required={
             "id": ident,
             "kind": one_of("binding"),
             "signal": ident,
             "component": ident,
-            "evidence_grade": whole,
+            "evidence_grade": evidence_grade,
             "claimed_by": text,
             "evidence": text,
         },
         optional={"confidence": unit_interval},
+    ),
+    # A grade is immutable without one of these (build ticket 18). It records who moved it, when,
+    # from what, to what and why — and the direction is *derived* from the two grades rather than
+    # authored, because a record that lets you type the direction lets you type the wrong one.
+    "regrade": Schema(
+        required={
+            "id": ident,
+            "subject": ident,
+            "from_grade": evidence_grade,
+            "to_grade": evidence_grade,
+            "regraded_on": date,
+            "by_role": ident,
+            "reason": text,
+            "evidence": text,
+        },
+        optional={"note": text},
+    ),
+    # Whose £ this is (build ticket 26). There is no field here that ranks one perspective above
+    # another and none that removes a universal constraint, which is what "a perspective may add
+    # to the floor and never override it" means when it is structural.
+    "perspective": Schema(
+        required={
+            "id": ident,
+            "name": text,
+            "party": one_of(*PARTIES),
+            "pays": text,
+            "values": mapping_of(valuation),
+            # Required, not optional. Ruin is perspective-relative — insolvency for a firm,
+            # livelihood for a person — so a perspective that declares no boundary has silently
+            # inherited somebody else's.
+            "ruin": mapping_of(text),
+        },
+        optional={"forbidden": mapping_of(text), "note": text},
     ),
     "scenario": Schema(
         required={
@@ -467,9 +573,41 @@ def _refine_edge(doc: dict[str, Any], where: str) -> None:
         )
 
 
+def _refine_regrade(doc: dict[str, Any], where: str) -> None:
+    """A regrade moves a grade, and somebody in a registered role stands behind the move."""
+    from .sign import SignatureError, role_ids
+
+    if int(doc["from_grade"]) == int(doc["to_grade"]):
+        raise SchemaError(
+            f"{where}: regrades {doc['subject']!r} from grade {doc['from_grade']} to the same "
+            "grade. A regrade that changes nothing is not a regrade."
+        )
+    try:
+        known = role_ids()
+    except SignatureError as exc:  # pragma: no cover - a broken register is its own error
+        raise SchemaError(f"{where}: {exc}") from None
+    if str(doc["by_role"]) not in known:
+        raise SchemaError(
+            f"{where}: by_role {doc['by_role']!r} is not in the register (have: {', '.join(known)}). "
+            "A regrade records who moved a grade, and a role nobody holds records nobody."
+        )
+
+
+def _refine_perspective(doc: dict[str, Any], where: str) -> None:
+    """A perspective may add constraints to the universal floor and may never override it."""
+    from .constraints import ConstraintError, refuse_floor_override
+
+    try:
+        refuse_floor_override(doc)
+    except ConstraintError as exc:
+        raise SchemaError(f"{where}: {exc}") from None
+
+
 REFINEMENTS: dict[str, Callable[[dict[str, Any], str], None]] = {
     "component": _refine_component,
     "edge": _refine_edge,
+    "regrade": _refine_regrade,
+    "perspective": _refine_perspective,
 }
 
 
@@ -494,5 +632,7 @@ COLLECTION_KINDS: dict[str, str] = {
     "outcomes": "outcome",
     "people": "person",
     "edges": "edge",
+    "regrades": "regrade",
+    "perspectives": "perspective",
     "observations": "observation",
 }

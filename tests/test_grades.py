@@ -95,7 +95,8 @@ def test_the_shipped_capabilities_are_all_partial_or_stub(caps: Capabilities) ->
     """The walking skeleton must not be able to claim `full` anywhere."""
     grades = {g.capability: g.grade for g in caps}
     assert set(grades) == {
-        "causal-layer", "domain-model", "honest-build", "provenance", "scenario-engine", "sense-move"
+        "causal-layer", "currency-regimes", "domain-model", "honest-build", "provenance",
+        "scenario-engine", "sense-move",
     }
     assert "full" not in grades.values()
 

@@ -1,11 +1,13 @@
 {
-  "authorised_by": "decision ticket 07 \u2014 the graph artefact gains the Wardley map and derived roll-ups (build tickets 13, 14) and the fixture gains graded causal edges (build ticket 17), so every artefact's model-repository pin moves",
-  "capabilities_digest": "2b428978062b78916d2671082fedbed74f2d1780ca36bf638babdf316a738b7c",
+  "authorised_by": "decision ticket 20 \u2014 build tickets 18, 19, 26 and 27: a grade-5 edge, two regrades and two perspectives in the fixture; two new artefact kinds; graded valuations, so a weakly-evidenced one is a register entry with no figure",
+  "capabilities_digest": "c265326dceed2b39faaf711189f2d013f5ea647bc4e81ce5d5f6566fca603102",
   "digests": {
-    "bound-signal": "8005193ea26c4685e256b807879df2d42ef3a4c91463665b92a7a50804497700",
-    "forecast-bundle": "7d1a466b521deda83c5ebc5ff2377e13082a64bf478c7bf081463b035019e1b9",
-    "graph": "21acf490b91815f027ea4ac59a71fca8251d32ce44e088c768b3d92869851b93",
-    "score-card": "8eb892d58127215a4a551c8daf336e1302eb45bcaa00010feddcbeef4cf5b5e3"
+    "blast-radius": "36ffb570e55229613f2b82b3496194aa6773565008fe653a6bb80045525fd7b4",
+    "bound-signal": "53c74343120ea7aae1e1e39672c54fea807ab830a8953d5c663057aaca31d7c5",
+    "forecast-bundle": "ab100f13b14ed52dc0dfafa35d02360a89e66226e843456cd2dd11384951301d",
+    "graph": "c81c3412d496afcbb244277d135265c6283f3ae9f7ad052513d5a36f47638cf7",
+    "scenario-exposure": "ba9ba6f63c5574fb1edd8dc58297be8ffe5f3caad15c95918d2ee135467e1852",
+    "score-card": "17e87d560a99c7fdce48060b64469abf8a350aa80680dcf82154c8ac24873871"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

@@ -253,19 +253,13 @@ def _worksheet_matches(ctx: Context) -> str:
     see — a triple that is present but garbage, an elasticity nobody recalibrated three tickets
     later. Both stay green under every refusal test and both fail here.
     """
-    import json
-
-    from .. import fixtures, verbs, worksheet
+    from .. import fixtures, worksheet
     from ..repo import ModelRepo
 
     pocket = ctx.tmp / "pocket-org"
     if not pocket.exists():
         fixtures.build_pocket_org(pocket)
-    artefact = verbs.graph(
-        ModelRepo.open(pocket), ctx.caps, worksheet.POCKET_ORG,
-        verbs.command_for("graph", org=worksheet.POCKET_ORG),
-    )
-    results = worksheet.check(json.loads(artefact.to_bytes())["body"])
+    results = worksheet.check(worksheet.bodies_for(ModelRepo.open(pocket), ctx.caps))
     differing = [
         f"line {r.line.index} ({r.line.key}): worksheet {r.line.expected}, artefact {r.actual}"
         for r in results

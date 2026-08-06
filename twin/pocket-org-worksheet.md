@@ -11,10 +11,11 @@ that is present but garbage, a score tagged with the wrong regime, an elasticity
 recalibrated three tickets later — all of those keep every refusal test green. This worksheet is
 what they fail against.
 
-`twin worksheet --repo <a pocket-org repository>` checks the emitted graph artefact against every
-line below. Values are compared at **6 decimal places**, declared here rather than hidden inside
-the comparison, because the expected column is decimal and the computed one is binary floating
-point.
+`twin worksheet --repo <a pocket-org repository>` checks the emitted artefacts against every line
+below — the **graph**, the **blast radius** from `shared-database`, and the **exposure** of
+scenario `portal-availability-2026` under both declared perspectives. Values are compared at
+**6 decimal places**, declared here rather than hidden inside the comparison, because the expected
+column is decimal and the computed one is binary floating point.
 
 ## The contract every later ticket inherits
 
@@ -89,6 +90,36 @@ the attenuation is unfalsifiable.
 The constraint pre-filter (build ticket 28) runs **before** any of this, so none of these figures
 is ever comparable against a red line. That ordering gets its own line when it lands.
 
+**The use-gate**, by evidence grade. The published threshold is 2, so only an edge at grade 1 or 2
+may carry a price:
+
+- `database-slows-orders` is grade 3 — literature or domain theory, so it may not price
+- `orders-slow-the-portal` is grade 2 — repeated historical co-movement, so it may
+- one of the two causal edges is therefore admissible to pricing
+
+**The blast radius** from a shock at `shared-database`, following causal edges forwards and
+`needs` edges backwards to whoever depends on the node:
+
+- `order-service` — reached causally at grade 3, and structurally as a dependent
+- `customer-portal` — reached along `shared-database -> order-service -> customer-portal`, whose
+  weakest hop is grade 3
+- `identity-store` — reached only structurally, so no mechanism is claimed at all
+- three components reached, and **nothing** admitted to pricing: every path out of the database
+  crosses the grade-3 edge, so the honest answer here is an unpriced structural blast radius
+
+**The exposure** of scenario `portal-availability-2026`, whose components are `customer-portal`
+and `order-service`, under each declared perspective:
+
+- the operator: `400000 + 250000 = 650000`
+- the staff council: `50000 + 120000 = 170000`
+- the spread between the two eyes: `650000 - 170000 = 480000`
+- attributable to `customer-portal`: `400000 - 50000 = 350000`
+- attributable to `order-service`: `250000 - 120000 = 130000`
+
+These are **declared valuations**, not modelled prices: nothing propagates yet and no severity is
+sampled, so the figures are what each perspective says a component is worth to it. The spread is
+the point — no single number is the organisation's number, because there is no such thing.
+
 ## The table
 
 Every line the code must match. `pending` lines carry the arithmetic already; the build ticket
@@ -125,3 +156,14 @@ named is the one that must make them computable.
 | 27 | `price.customer-portal.mode` | `200000` | 1000000 x 0.20 | build ticket 30 |
 | 28 | `price.customer-portal.min` | `120000` | 1000000 x 0.12 | build ticket 30 |
 | 29 | `price.customer-portal.max` | `280000` | 1000000 x 0.28 | build ticket 30 |
+| 30 | `evidence_grade.database-slows-orders` | `3` | authored, literature or domain theory | build ticket 18 |
+| 31 | `evidence_grade.orders-slow-the-portal` | `2` | authored, repeated co-movement | build ticket 18 |
+| 32 | `rollups.causal_edges_admissible_to_pricing` | `1` | only orders->portal is at grade 2 or better | build ticket 19 |
+| 33 | `blast.shared-database.reached` | `3` | order-service, customer-portal, identity-store | build ticket 19 |
+| 34 | `blast.shared-database.admitted_to_pricing` | `0` | every path out crosses the grade-3 edge | build ticket 19 |
+| 35 | `blast.shared-database.unpriced` | `3` | 3 reached, 0 priced | build ticket 19 |
+| 36 | `exposure.declared.the-operator` | `650000` | 400000 + 250000 | build ticket 26 |
+| 37 | `exposure.declared.the-staff-council` | `170000` | 50000 + 120000 | build ticket 26 |
+| 38 | `exposure.spread` | `480000` | 650000 - 170000 | build ticket 26 |
+| 39 | `exposure.spread.customer-portal` | `350000` | 400000 - 50000 | build ticket 26 |
+| 40 | `exposure.spread.order-service` | `130000` | 250000 - 120000 | build ticket 26 |

@@ -17,6 +17,7 @@ from twin.cli import main
 from twin.invariants.checks import golden_digests
 
 NETFLIX = ["--org", "netflix"]
+KEY = "a-test-key"
 
 
 def _run(repo_dir: Path, *args: str) -> int:
@@ -301,3 +302,66 @@ def test_the_same_pins_give_the_same_bytes_from_a_separate_process(model_repo_di
         assert proc.returncode == 0, proc.stderr.decode()
         digests.add(sha256_hex(out.read_bytes()))
     assert len(digests) == 1, "iteration order is reaching the output"
+
+
+# -- the gate, the perspective and the published constraint set (build tickets 19, 26, 27) ------
+
+
+def test_blast_emits_the_two_halves_and_names_the_gate(model_repo_dir: Path, tmp_path: Path) -> None:
+    out = tmp_path / "blast.json"
+    assert _run(model_repo_dir, "blast", *NETFLIX, "--origin", "content-delivery-network",
+                "--out", str(out)) == 0
+
+    doc = json.loads(out.read_bytes())
+    assert doc["envelope"]["kind"] == "blast-radius"
+    assert doc["envelope"]["mark"] == "derived"
+    body = doc["body"]
+    assert {e["component"] for e in body["admitted_to_pricing"]} == {"streaming-experience"}
+    assert {e["component"] for e in body["unpriced"]} == {"brand-goodwill", "dvd-by-mail"}
+    assert body["gating"]["pin"]["pricing_threshold"] == 2
+
+
+def test_exposure_reports_every_perspective_and_the_spread(model_repo_dir: Path, tmp_path: Path) -> None:
+    """Naming none must not default to the operator's — that is the unstated firm's-£."""
+    out = tmp_path / "exposure.json"
+    assert _run(model_repo_dir, "exposure", *NETFLIX, "--scenario", "dvd-decline-2011",
+                "--out", str(out)) == 0
+
+    body = json.loads(out.read_bytes())["body"]
+    assert set(body["declared_exposure"]) == {"the-operator", "the-staff-council"}
+    assert body["exposure_spread"] == 148000000.0
+    assert body["prefilter"]["applied"] is False
+
+
+def test_the_constraint_set_is_authored_and_signed_as_a_role(tmp_path: Path) -> None:
+    """The second place in this system where a human declaration is the authority."""
+    from twin import attest, sign
+
+    out = tmp_path / "constraint-set.json"
+    os.environ[sign.KEY_ENV] = KEY
+    try:
+        assert main(["constraints", "--out", str(out)]) == 0
+    finally:
+        del os.environ[sign.KEY_ENV]
+
+    doc = json.loads(out.read_bytes())
+    assert doc["envelope"]["mark"] == "authored"
+    assert doc["envelope"]["depth"]["grade"] is None
+    sidecar = attest.load(attest.sidecar_for(out))
+    signatures = sidecar["human_involvement"]["signatures"]
+    assert [s["role"] for s in signatures] == ["constraint-owner"]
+    assert attest.check(sidecar, out.read_bytes(), sign.signing_key(KEY)) == []
+
+
+def test_a_derived_artefact_from_a_new_verb_still_refuses_a_human_signature(
+    model_repo_dir: Path, tmp_path: Path
+) -> None:
+    from twin import sign
+
+    out = tmp_path / "blast.json"
+    _run(model_repo_dir, "blast", *NETFLIX, "--origin", "content-delivery-network", "--out", str(out))
+    os.environ[sign.KEY_ENV] = KEY
+    try:
+        assert main(["sign", str(out), "--role", "model-steward"]) == 2
+    finally:
+        del os.environ[sign.KEY_ENV]

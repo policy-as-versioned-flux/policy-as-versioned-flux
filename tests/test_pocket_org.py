@@ -33,13 +33,8 @@ def test_the_artefact_matches_the_worksheet(pocket: Path, capsys: pytest.Capture
 def test_every_line_is_either_matched_or_pending_on_an_open_ticket(pocket: Path) -> None:
     from twin.grades import Capabilities
     from twin.repo import ModelRepo
-    from twin import verbs
 
-    artefact = verbs.graph(
-        ModelRepo.open(pocket), Capabilities.load(), worksheet.POCKET_ORG,
-        verbs.command_for("graph", org=worksheet.POCKET_ORG),
-    )
-    results = worksheet.check(json.loads(artefact.to_bytes())["body"])
+    results = worksheet.check(worksheet.bodies_for(ModelRepo.open(pocket), Capabilities.load()))
 
     assert len(results) >= 20, "a worksheet this thin would not catch anything"
     assert all(r.ok or r.pending for r in results)

@@ -1,0 +1,79 @@
+# The evidence ladder (build ticket 18), from decision ticket 08, Q2.
+#
+# Five typed grades, strongest first. `how we know` is recorded separately from `how sure we are`:
+# a single scalar loses exactly that distinction, because you can be confident in a grade-3
+# literature mechanism and unsure about a grade-1 experiment with noisy measurement.
+#
+# The grade travels **with** the claim rather than in a side table. The whole use-gate depends on
+# it, so the strength of a claim has to be inseparable from the claim.
+#
+# Versioned. Bump `version` in the same commit as any change to `grades` or `pricing_threshold`.
+# Every artefact that gates on this ladder records the version and the digest it gated against,
+# so changing the threshold is as visible as changing the constraint set.
+schema: twin.evidence-ladder/v1
+version: 1
+
+# Only grades 1-2 may price a scored forecast (decision ticket 08, Q2; build ticket 19). Grade 5
+# is a model assertion and is exactly where parametric contamination hides: an edge asserted from
+# training data looks identical to a well-evidenced one unless the schema forces the distinction.
+#
+# This is a threshold on the ladder, not a switch. A weaker claim is still representable, still
+# traversable and still visible in the output — it produces an unpriced structural blast radius
+# instead of a number.
+pricing_threshold: 2
+
+grades:
+  - grade: 1
+    name: dated natural experiment
+    admits: >-
+      A dated change with observable data on both sides of it. The date is what makes it
+      checkable: the change happened at a time, and the effect was measured after that time.
+    example: >-
+      A dated price change, with subscriber numbers measured before and after it.
+    may_price: true
+
+  - grade: 2
+    name: repeated historical co-movement
+    admits: >-
+      The same relationship observed moving together across several instances, periods or
+      organisations. One co-movement is a coincidence; the repetition is the evidence.
+    example: >-
+      Tooling delivery slipping ahead of a process-node slip, across more than one node.
+    may_price: true
+
+  - grade: 3
+    name: literature or domain theory
+    admits: >-
+      An established mechanism from published work or domain theory, not observed here. The
+      mechanism is real; whether it operates in this organisation is not evidenced.
+    example: >-
+      A published mechanism relating grievance to insider risk, applied to an org nobody measured.
+    may_price: false
+
+  - grade: 4
+    name: calibrated expert judgement
+    admits: >-
+      A judgement from a calibration-trained estimator, recorded explicitly **as** judgement and
+      never as an observation. The estimator is named by role, and the range is theirs.
+    example: >-
+      A calibrated range for an elasticity nobody has ever measured directly.
+    may_price: false
+
+  - grade: 5
+    name: model assertion
+    admits: >-
+      A model asserted the relationship. Nothing observed it, nothing published it and nobody
+      calibrated it. This grade exists so that the assertion is visible and auditable rather than
+      indistinguishable from evidence.
+    example: >-
+      A causal edge a language model produced because the relationship is familiar to it.
+    may_price: false
+
+# A regrade moves a claim between rungs. Direction is named rather than implied, because "up" is
+# ambiguous on a ladder whose strongest rung is numbered 1.
+directions:
+  # To a lower number: the claim is now asserted to rest on stronger evidence. This is the
+  # direction to be suspicious of — it is how a model assertion becomes a measurement.
+  strengthened: to a stronger grade (a lower number)
+  # To a higher number: the claim is now asserted to rest on weaker evidence than was recorded.
+  weakened: to a weaker grade (a higher number)

@@ -22,7 +22,7 @@ from .grades import Capabilities
 from .model import ModelError, Overlay
 from .repo import ModelRepo
 from .schema import REGIMES
-from . import scoring
+from . import blast as blast_mod, constraints, evidence, scoring
 
 CAPS_SENSE = ["domain-model", "provenance", "sense-move"]
 CAPS_RUN = ["domain-model", "provenance", "scenario-engine"]
@@ -30,11 +30,15 @@ CAPS_SCORE = ["domain-model", "provenance", "sense-move"]
 # The graph now carries causal edges and a Wardley map, so the causal layer is one of the
 # capabilities that produced it and its depth travels with the artefact (build ticket 17).
 CAPS_GRAPH = ["domain-model", "provenance", "causal-layer"]
+CAPS_BLAST = ["causal-layer", "domain-model", "provenance"]
+CAPS_EXPOSURE = ["currency-regimes", "domain-model", "provenance"]
 
 KIND_BOUND_SIGNAL = "bound-signal"
 KIND_FORECAST_BUNDLE = "forecast-bundle"
 KIND_SCORE_CARD = "score-card"
 KIND_GRAPH = "graph"
+KIND_BLAST_RADIUS = "blast-radius"
+KIND_SCENARIO_EXPOSURE = "scenario-exposure"
 
 # Only an as-consumed execution produces a scoring-eligible forecast: the honest number is never
 # contaminated by what we know now (spec story 40). The *tag* lands here; the *gating* — refusing
@@ -169,6 +173,186 @@ def graph(repo: ModelRepo, caps: Capabilities, org: str, command: list[str]) -> 
         depth=caps.depth_block(CAPS_GRAPH),
         body=body,
     )
+
+
+# -- blast ---------------------------------------------------------------------------------
+
+
+def blast(repo: ModelRepo, caps: Capabilities, org: str, origin: str, command: list[str]) -> Artefact:
+    """The unpriced structural blast radius, and what may be priced beside it (build ticket 19).
+
+    One traversal, two outputs. A path prices only when every hop claims a mechanism *and* every
+    mechanism is evidenced at or inside the published threshold; everything else is reported as
+    connected-but-unpriceable, which is an answer rather than a gap. A scenario whose only causal
+    path runs through a grade-5 model assertion therefore emits a blast radius and never a price.
+    """
+    overlay = Overlay.load(repo, org)
+    body = blast_mod.radius(overlay.graph(), origin)
+    blast_mod.refuse_undeclared_keys(body)
+    return Artefact(
+        kind=KIND_BLAST_RADIUS,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_BLAST),
+        body=body,
+    )
+
+
+# -- exposure ------------------------------------------------------------------------------
+
+
+def exposure(
+    repo: ModelRepo,
+    caps: Capabilities,
+    org: str,
+    scenario_id: str,
+    perspective_ids: list[str] | None,
+    command: list[str],
+) -> Artefact:
+    """The same scenario, under each declared perspective (build ticket 26).
+
+    The £ belongs to whoever pays to run the twin, so a scenario has no single figure — it has one
+    per eye, and the difference between them is attributable component by component. Nothing here
+    picks a perspective: with none named, **every** perspective in the overlay is reported, because
+    defaulting to the operator's would be exactly the unstated firm's-£ the design refuses.
+
+    **The use-gate reaches here too** (build ticket 19, decision ticket 09 Q4 — one rule, three
+    jobs). A valuation carries its own evidence grade, and only a valuation inside the published
+    threshold enters the figure. Anything weaker is a **register entry**: named beside the number,
+    carrying no amount at all, because the schema refuses one. That is what stops a perspective
+    declaring "reputation damage = £X", which is the shadow price decision ticket 09 rejected.
+
+    What this is **not**: a modelled price. Nothing propagates yet (build ticket 20), no severity
+    is sampled (23-25) and the constraint pre-filter that must run before any pricing is build
+    ticket 28. The admitted figures are the perspective's own declared valuations and the artefact
+    says so in `basis` rather than implying otherwise.
+    """
+    overlay = Overlay.load(repo, org)
+    scenario = overlay.scenarios.get(scenario_id)
+    if scenario is None:
+        known = ", ".join(sorted(overlay.scenarios)) or "none"
+        raise VerbError(f"no scenario {scenario_id!r} in overlay {org!r} (have: {known})")
+
+    chosen = sorted(perspective_ids) if perspective_ids else sorted(overlay.perspectives)
+    if not chosen:
+        raise VerbError(
+            f"overlay {org!r} declares no perspective. The £ belongs to whoever pays to run the "
+            "twin, so a scenario cannot be valued until somebody says who they are."
+        )
+    # A repeated component is one component: it would otherwise be valued twice and appear twice
+    # in the attribution, which reads as two different things worth the same.
+    components = list(dict.fromkeys(str(c) for c in scenario.get("components", []) or []))
+
+    entries: list[dict[str, Any]] = []
+    for perspective_id in chosen:
+        perspective = overlay.perspectives.get(perspective_id)
+        if perspective is None:
+            known = ", ".join(sorted(overlay.perspectives)) or "none"
+            raise VerbError(f"no perspective {perspective_id!r} in overlay {org!r} (have: {known})")
+        declared = {str(k): v for k, v in (perspective.get("values") or {}).items()}
+        admitted: list[dict[str, Any]] = []
+        register: list[dict[str, Any]] = []
+        for component in components:
+            valuation = declared.get(component)
+            if valuation is None:
+                continue
+            grade = int(valuation["evidence_grade"])
+            if evidence.may_price(grade):
+                admitted.append(
+                    {"component": component, "declared_value": float(valuation["amount"]),
+                     "evidence_grade": grade, "basis": valuation["basis"]}
+                )
+            else:
+                # No figure, anywhere. The schema refuses one at this grade, so the register is a
+                # list of names and reasons rather than a price with a null field.
+                register.append(
+                    {"component": component, "evidence_grade": grade, "basis": valuation["basis"],
+                     "reason": (
+                         f"evidence grade {grade} is outside the published threshold, so this is "
+                         "reported beside the figure and never inside it"
+                     )}
+                )
+        entries.append(
+            {
+                "id": perspective_id,
+                "name": perspective.get("name"),
+                "party": perspective.get("party"),
+                "pays": perspective.get("pays"),
+                "constraint_set": constraints.resolve(perspective),
+                "admitted": admitted,
+                "register": register,
+                "declared_exposure": sum(e["declared_value"] for e in admitted),
+                # A component this perspective never valued at all — distinct from one it valued
+                # too weakly to price, which is in the register above.
+                "unvalued": [c for c in components if c not in declared],
+            }
+        )
+
+    return Artefact(
+        kind=KIND_SCENARIO_EXPOSURE,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, _substrate_ref(scenario, f"scenario {scenario_id}")),
+        depth=caps.depth_block(CAPS_EXPOSURE),
+        body={
+            "scenario": {
+                "id": scenario_id,
+                "at": scenario.get("at"),
+                "question": scenario.get("question"),
+                "components": components,
+            },
+            "basis": {
+                "kind": "declared-valuation",
+                "propagated": False,
+                "severity_sampled": False,
+                "note": (
+                    "each figure is a valuation the perspective declared for a component, not a "
+                    "modelled price: nothing propagates yet (build ticket 20), no severity "
+                    "distribution is sampled (23-25) and no causal path has been priced (30)"
+                ),
+            },
+            "gating": evidence.published(),
+            "prefilter": {
+                "applied": False,
+                "lands_at": "build ticket 28",
+                "note": (
+                    "the constraint pre-filter that removes ruin-class and forbidden options "
+                    "before any pricing has not been built, so no figure here has been compared "
+                    "against a red line — and the constraint set each perspective resolves is "
+                    "published beside it so a reader can see what it will filter on"
+                ),
+            },
+            "perspectives": entries,
+            "declared_exposure": {e["id"]: e["declared_exposure"] for e in entries},
+            "exposure_spread": _spread([e["declared_exposure"] for e in entries]),
+            "attribution": [
+                {
+                    "component": component,
+                    # `null` for a perspective that admitted no figure — because it never valued
+                    # this component, or because it valued it too weakly to price. Zero would say
+                    # "worth nothing to them", which is a different claim and usually a false one.
+                    "declared_value": {e["id"]: _admitted(e, component) for e in entries},
+                    "spread": _spread([_admitted(e, component) for e in entries]),
+                }
+                for component in components
+            ],
+        },
+    )
+
+
+def _admitted(entry: dict[str, Any], component: str) -> float | None:
+    return next((e["declared_value"] for e in entry["admitted"] if e["component"] == component), None)
+
+
+def _spread(values: list[Any]) -> float | None:
+    """The width between the widest and narrowest figure, or nothing if there is only one eye.
+
+    A spread, never a chosen number: two perspectives disagreeing about what a component is worth
+    is the decision-relevant fact, and any single figure here would destroy it.
+    """
+    numbers = [float(v) for v in values if v is not None]
+    return max(numbers) - min(numbers) if len(numbers) > 1 else None
 
 
 # -- run -----------------------------------------------------------------------------------

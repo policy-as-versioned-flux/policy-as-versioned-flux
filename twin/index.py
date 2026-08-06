@@ -50,6 +50,8 @@ def _overlay_index(repo: Any, org: str) -> dict[str, Any]:
         "outcomes": sorted(overlay.outcomes),
         "people": sorted(overlay.people),
         "edges": sorted(overlay.edges),
+        "perspectives": sorted(overlay.perspectives),
+        "regrades": sorted(overlay.regrades),
         # The behavioural overlay is deliberately absent. A derived index of the most private
         # object in the system would be a copy of it that nobody gated.
     }

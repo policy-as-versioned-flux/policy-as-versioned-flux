@@ -72,7 +72,32 @@ PY
 say "6. the map — rendered from that same graph, with no separate authoring step"
 "$TWIN" map --repo "$MODEL" --org netflix || fail "map failed"
 
-say "7. the attestation sidecar, read back — a write-only attestation is not tamper-evidence"
+say "7. the blast radius — one traversal, two outputs, and the boundary between them visible"
+"$TWIN" blast --repo "$MODEL" --org netflix --origin content-delivery-network \
+  --out "$OUT/blast-radius.json" >/dev/null || fail "blast failed"
+python3 - "$OUT/blast-radius.json" <<'BLAST'
+import json, sys
+b = json.load(open(sys.argv[1]))["body"]
+print(f"  gate: {b['gating']['rule']}")
+for e in b["admitted_to_pricing"]:
+    print(f"    price     {e['component']:<24} depth {e['depth']}, weakest grade {e['worst_evidence_grade']}")
+for e in b["unpriced"]:
+    grade = e["worst_evidence_grade"]
+    print(f"    unpriced  {e['component']:<24} {e['reason']}"
+          + (f" (grade {grade})" if grade is not None else ""))
+raw = json.dumps(b)
+assert not any(k in raw for k in ('"price":', '"cost":', '"severity":')), "a price leaked in"
+print("  the unpriced half is a distinct artefact type, not a price with a null field")
+BLAST
+
+say "8. the same scenario under two perspectives — the £ belongs to whoever pays to run the twin"
+"$TWIN" exposure --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
+  --out "$OUT/scenario-exposure.json" || fail "exposure failed"
+
+say "9. the constraint set, published upfront — paperclip risk disclosed rather than discovered"
+"$TWIN" constraints --out "$OUT/constraint-set.json" || fail "constraints failed"
+
+say "10. the attestation sidecar, read back — a write-only attestation is not tamper-evidence"
 "$TWIN" verify "$OUT/score-card.json" --attestation || fail "the sidecar did not hold"
 python3 - "$OUT/score-card.json.att.json" <<'PY'
 import json, sys
@@ -88,29 +113,29 @@ fi
 echo "  ok   a planted human signature on a derived artefact is a detectable anomaly"
 mv "$OUT/score-card.json.att.json.clean" "$OUT/score-card.json.att.json"
 
-say "8. the pocket org — five components, six edges, checked against a hand-computed worksheet"
+say "11. the pocket org — five components, six edges, checked against a hand-computed worksheet"
 "$TWIN" fixture --pocket-org --out "$WORK/pocket" >/dev/null || fail "pocket fixture failed"
 "$TWIN" worksheet --repo "$WORK/pocket" || fail "the pocket org no longer matches its worksheet"
 
-say "9. reproduce the score card from its pins alone — including the bundle it scored"
+say "12. reproduce the score card from its pins alone — including the bundle it scored"
 "$TWIN" verify "$OUT/score-card.json" --repo "$MODEL" || fail "the score card did not reproduce"
 
-say "10. every object validates against its closed schema, and Article 9 data cannot be written"
+say "13. every object validates against its closed schema, and Article 9 data cannot be written"
 "$TWIN" validate --repo "$MODEL" || fail "validation failed"
 
-say "11. the derived index is derived — drop it, rebuild it from git alone"
+say "14. the derived index is derived — drop it, rebuild it from git alone"
 "$TWIN" index --repo "$MODEL" --out "$WORK/index" || fail "index build failed"
 rm -rf "$WORK/index"
 "$TWIN" index --repo "$MODEL" --out "$WORK/index" || fail "index rebuild failed"
 
-say "12. determinism — the same command against the same ref, byte for byte"
+say "15. determinism — the same command against the same ref, byte for byte"
 "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
   --out "$OUT/forecast-bundle-again.json" >/dev/null || fail "second run failed"
 cmp -s "$OUT/forecast-bundle.json" "$OUT/forecast-bundle-again.json" \
   || fail "the same pins produced different bytes"
 echo "  ok   identical bytes"
 
-say "13. a dirty tree is refused — the pin has to describe what you are reading"
+say "16. a dirty tree is refused — the pin has to describe what you are reading"
 echo "# scribble" >> "$MODEL/world/meta.yaml"
 if "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
      --out "$OUT/should-not-exist.json" >/dev/null 2>&1; then

@@ -15,7 +15,7 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-from . import wardley
+from . import evidence, wardley
 from .repo import ModelRepo, RepoError, UnitRef, load_yaml
 from .schema import (
     CAUSAL_EDGE,
@@ -34,6 +34,7 @@ BEHAVIOURAL = "behavioural"
 WORLD_COLLECTIONS = ("components", "propositions", "world_models")
 OVERLAY_COLLECTIONS = (
     "components", "world_models", "signals", "claims", "scenarios", "outcomes", "people", "edges",
+    "perspectives", "regrades",
 )
 
 
@@ -113,6 +114,8 @@ class Overlay:
     outcomes: dict[str, dict[str, Any]]
     people: dict[str, dict[str, Any]]
     edges: dict[str, dict[str, Any]]
+    perspectives: dict[str, dict[str, Any]]
+    regrades: dict[str, dict[str, Any]]
 
     @classmethod
     def load(cls, repo: ModelRepo, org: str) -> "Overlay":
@@ -182,6 +185,48 @@ class Overlay:
             if edge["from"] not in self.people:
                 raise ModelError(f"edge {ident!r}: {edge['from']!r} is not a person in this overlay")
             self.component(str(edge["to"]))
+        self._check_regrades()
+        for ident, perspective in sorted(self.perspectives.items()):
+            for component_id in sorted(perspective.get("values", {})):
+                try:
+                    self.component(str(component_id))
+                except ModelError:
+                    raise ModelError(
+                        f"perspective {ident!r} values {component_id!r}, which is not a component "
+                        "in this overlay or its pinned world layer"
+                    ) from None
+
+    def _check_regrades(self) -> None:
+        """A grade is immutable without a regrade record, and the record has to add up.
+
+        The chain must be contiguous and must end at the grade the file now declares. This is the
+        half that runs on every load; the half that reads git history is `twin validate`, because
+        it costs a process per commit per graded file and a load happens constantly.
+        """
+        graded = {k: v for name in evidence.GRADED_COLLECTIONS for k, v in getattr(self, name).items()}
+        for ident, regrade in sorted(self.regrades.items()):
+            subject = str(regrade["subject"])
+            if subject not in graded:
+                raise ModelError(
+                    f"regrade {ident!r} names subject {subject!r}, which is not an edge or a claim "
+                    "in this overlay. A regrade with no subject records nothing."
+                )
+        for subject, doc in sorted(graded.items()):
+            if "evidence_grade" not in doc:
+                continue
+            chain = evidence.chain_for(subject, self.regrades)
+            try:
+                evidence.check_chain(subject, int(doc["evidence_grade"]), chain, f"overlay {self.org!r}")
+            except evidence.EvidenceError as exc:
+                raise ModelError(str(exc)) from None
+
+    def regrade_records(self) -> list[dict[str, Any]]:
+        """Every regrade, with its direction derived. Ordered by subject, then oldest first."""
+        return [
+            evidence.record(regrade)
+            for subject in sorted({str(r["subject"]) for r in self.regrades.values()})
+            for regrade in evidence.chain_for(subject, self.regrades)
+        ]
 
     def graph(self) -> "Graph":
         """The typed knowledge graph: one edge collection, two authoring sites.
@@ -213,6 +258,7 @@ class Overlay:
             components=components,
             people=dict(self.people),
             edges=tuple(sorted(edges, key=lambda e: (e.type, e.source, e.target))),
+            regrades=tuple(self.regrade_records()),
         )
 
     def pins(self) -> dict[str, Any]:
@@ -229,6 +275,10 @@ class Edge:
     # kind, because only a causal edge measures anything (build ticket 17).
     causal: dict[str, Any] | None = None
 
+    @property
+    def grade(self) -> int | None:
+        return int(self.causal["evidence_grade"]) if self.causal else None
+
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"id": self.id, "type": self.type, "from": self.source, "to": self.target}
         if self.causal:
@@ -236,6 +286,13 @@ class Edge:
             # Flagged on read rather than refused on write: a point estimate is representable,
             # but it must never be readable as a range.
             out["degenerate_elasticity"] = degenerate(self.causal["elasticity"])
+            # The rung, spelled out, and the gate that reads it (build tickets 18 and 19). A
+            # number on its own says nothing about what admitted it, and a reader of the graph
+            # should not have to hold a five-rung ladder in their head to know whether an edge
+            # can carry a price.
+            grade = int(self.causal["evidence_grade"])
+            out["evidence_grade_name"] = str(evidence.rung(grade)["name"])
+            out["may_price"] = evidence.may_price(grade)
         return out
 
 
@@ -247,6 +304,7 @@ class Graph:
     components: dict[str, dict[str, Any]]
     people: dict[str, dict[str, Any]]
     edges: tuple[Edge, ...]
+    regrades: tuple[dict[str, Any], ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -257,6 +315,7 @@ class Graph:
             ],
             "people": [{"id": i, "role": p.get("role")} for i, p in sorted(self.people.items())],
             "edges": [e.as_dict() for e in self.edges],
+            "regrades": list(self.regrades),
         }
 
     def bus_factor(self, component: str) -> list[str]:
@@ -294,6 +353,21 @@ class Graph:
             "causal_edges": len(causal),
             "causal_edges_with_degenerate_elasticity": sum(
                 1 for e in causal if e.causal and degenerate(e.causal["elasticity"])
+            ),
+            # How much of the causal layer could carry a price at all (build ticket 19). A count
+            # rather than a ratio: a ratio of two small numbers reads as a quality score.
+            "causal_edges_admissible_to_pricing": sum(
+                1 for e in causal if e.grade is not None and evidence.may_price(e.grade)
+            ),
+            "causal_edges_by_evidence_grade": dict(
+                sorted((str(g), sum(1 for e in causal if e.grade == g)) for g in {e.grade for e in causal})
+            ),
+            "regrades": len(self.regrades),
+            "regrades_by_direction": dict(
+                sorted(
+                    (d, sum(1 for r in self.regrades if r["direction"] == d))
+                    for d in {str(r["direction"]) for r in self.regrades}
+                )
             ),
             "components_with_a_named_holder": sum(
                 1 for i in self.components if self.bus_factor(i)

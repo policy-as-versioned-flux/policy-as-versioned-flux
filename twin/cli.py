@@ -16,11 +16,13 @@ from pathlib import Path
 
 import yaml
 
-from . import TOOL_VERSION, attest, fixtures, index, invariants, sign, verbs
+from . import TOOL_VERSION, attest, constraints, evidence, fixtures, index, invariants, sign, verbs
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
 from .blob import BlobRefError
 from .canon import canonical_json, sha256_hex
+from .constraints import ConstraintError
+from .evidence import EvidenceError
 from .grades import Capabilities, GradeError
 from .index import IndexError_
 from .invariants import FAIL, PASS, SKIP
@@ -103,6 +105,84 @@ def cmd_score(args: argparse.Namespace) -> int:
     return _emit(artefact, args.out)
 
 
+def cmd_blast(args: argparse.Namespace) -> int:
+    repo, caps, org = _open(args)
+    artefact = verbs.blast(
+        repo, caps, org, args.origin, verbs.command_for("blast", org=org, origin=args.origin)
+    )
+    body = artefact.body
+    _say(
+        f"{org}: blast radius from {args.origin!r} — {len(body['admitted_to_pricing'])} admitted "
+        f"to pricing, {len(body['unpriced'])} connected and unpriceable"
+    )
+    for entry in body["admitted_to_pricing"]:
+        print(f"  price   {entry['component']:<28} depth {entry['depth']}, weakest grade "
+              f"{entry['worst_evidence_grade']}")
+    for entry in body["unpriced"]:
+        print(f"  unpriced {entry['component']:<27} {entry['reason']}")
+    return _emit(artefact, args.out)
+
+
+def cmd_exposure(args: argparse.Namespace) -> int:
+    repo, caps, org = _open(args)
+    artefact = verbs.exposure(
+        repo,
+        caps,
+        org,
+        args.scenario,
+        args.perspective or None,
+        verbs.command_for(
+            "exposure",
+            org=org,
+            scenario=args.scenario,
+            perspectives=",".join(sorted(args.perspective)) if args.perspective else None,
+        ),
+    )
+    body = artefact.body
+    _say(f"{org}: scenario {args.scenario!r} under {len(body['perspectives'])} perspective(s)")
+    for entry in body["perspectives"]:
+        print(f"  {entry['id']:<22} {entry['party']:<15} declared exposure {entry['declared_exposure']}")
+        for held in entry["register"]:
+            print(f"    register  {held['component']:<24} grade {held['evidence_grade']}, no figure")
+    for row in body["attribution"]:
+        figures = ", ".join(f"{k}={v}" for k, v in sorted(row["declared_value"].items()))
+        print(f"    {row['component']:<24} {figures}   spread {row['spread']}")
+    print(f"  spread across perspectives: {body['exposure_spread']}")
+    print("  a spread, never a chosen number — the disagreement is the decision-relevant part")
+    print(f"  gate: {body['gating']['rule']}")
+    print("  a register entry carries no figure at all — beside the number, never inside it")
+    return _emit(artefact, args.out)
+
+
+def cmd_constraints(args: argparse.Namespace) -> int:
+    """Publish the constraint set — the floor, the scope exclusions and the stated positions.
+
+    Authored, like the worksheet, and signed as a role. The universal floor and the evidence
+    ladder's pricing threshold ship together on purpose: changing what may be priced has to be as
+    visible as changing what may be chosen, and one artefact is how that stays true.
+    """
+    published = constraints.published()
+    artefact = constraints.artefact(verbs.command_for("constraints"))
+    path = artefact.write(args.out)
+    material = sign.signing_key()
+    signatures = [sign.human(constraints.ROLE, artefact.digest(), material)] if material else []
+    sidecar = attest.write(artefact, path, signatures)
+
+    _say(f"constraint set -> {path} (authored, role {constraints.ROLE!r})")
+    for entry in published["universal_floor"]:
+        print(f"  floor      {entry['class']:<10} {entry['id']}")
+    for entry in published["scope_exclusions"]:
+        print(f"  excluded              {entry['id']}")
+    for entry in published["positions"]:
+        print(f"  position   {entry['status']:<21} {entry['id']}")
+    print(f"  gate       grades 1-{evidence.threshold()} may price a scored forecast")
+    if material is None:
+        print(f"  unsigned: set {sign.KEY_ENV}, then `twin sign {path} --role {constraints.ROLE}`")
+        return 0
+    print(f"  signed as role {constraints.ROLE!r} -> {sidecar.name}")
+    return 0
+
+
 def cmd_graph(args: argparse.Namespace) -> int:
     repo, caps, org = _open(args)
     return _emit(verbs.graph(repo, caps, org, verbs.command_for("graph", org=org)), args.out)
@@ -140,10 +220,9 @@ def cmd_worksheet(args: argparse.Namespace) -> int:
         return 2
 
     repo, caps, org = _open(args)
-    artefact = verbs.graph(repo, caps, org, verbs.command_for("graph", org=org))
-    results = worksheet.check(json.loads(artefact.to_bytes())["body"])
+    results = worksheet.check(worksheet.bodies_for(repo, caps))
 
-    _say(f"{worksheet.WORKSHEET_PATH.name} against the graph of {org!r}")
+    _say(f"{worksheet.WORKSHEET_PATH.name} against the emitted artefacts of {org!r}")
     for result in results:
         line = result.line
         if result.pending:
@@ -217,13 +296,27 @@ def cmd_validate(args: argparse.Namespace) -> int:
     _say(f"validating {args.repo} at {repo.pin.commit[:12]}")
     World.load(repo)
     print("  ok   world layer")
+    problems: list[str] = []
     for org in orgs(repo):
         overlay = Overlay.load(repo, org)
         counts = {
             name: len(getattr(overlay, name))
-            for name in ("components", "signals", "claims", "scenarios", "outcomes", "people", "edges")
+            for name in (
+                "components", "signals", "claims", "scenarios", "outcomes", "people", "edges",
+                "perspectives", "regrades",
+            )
         }
         print(f"  ok   overlay {org}: " + ", ".join(f"{v} {k}" for k, v in counts.items() if v))
+        # The half of evidence-grade immutability that reads git history (build ticket 18). It
+        # lives here rather than in the loader because it costs a process per commit per graded
+        # file, and this is the gate an author or CI runs before the commit.
+        found = evidence.history_violations(repo, overlay.ref.path, overlay.ref.tree, overlay.regrades)
+        if found:
+            problems += found
+            for violation in found:
+                print(f"  FAIL {violation}")
+        else:
+            print(f"       {org}: every recorded evidence-grade change carries a regrade event")
         try:
             gated = BehaviouralOverlay.load(repo, org)
         except ModelError:
@@ -233,6 +326,12 @@ def cmd_validate(args: argparse.Namespace) -> int:
                 f"  ok   {org} behavioural overlay: {len(gated.observations)} cohort observations, "
                 f"DPIA {gated.meta['dpia']}, advisory only, {gated.meta['retention_days']}-day retention"
             )
+    if problems:
+        print(
+            f"\nFAIL: {len(problems)} evidence grade(s) moved with no regrade event. A grade is "
+            "immutable without one recording who moved it and why."
+        )
+        return 1
     print("PASS: every object validates against its closed schema")
     return 0
 
@@ -619,6 +718,30 @@ def build_parser() -> argparse.ArgumentParser:
     wmap = with_org(with_repo(subs.add_parser("map", help="render the Wardley map from the graph")))
     wmap.set_defaults(fn=cmd_map)
 
+    radius = with_org(with_repo(subs.add_parser(
+        "blast", help="what is downstream of a component, and which of it may be priced"
+    )))
+    radius.add_argument("--origin", required=True, help="the component the shock starts at")
+    radius.add_argument("--out", required=True)
+    radius.set_defaults(fn=cmd_blast)
+
+    exposed = with_org(with_repo(subs.add_parser(
+        "exposure", help="a scenario valued under each declared perspective"
+    )))
+    exposed.add_argument("--scenario", required=True)
+    exposed.add_argument(
+        "--perspective", action="append", default=[],
+        help="repeatable; with none given, every perspective in the overlay is reported",
+    )
+    exposed.add_argument("--out", required=True)
+    exposed.set_defaults(fn=cmd_exposure)
+
+    published = subs.add_parser(
+        "constraints", help="publish the constraint set, the scope exclusions and the positions"
+    )
+    published.add_argument("--out", required=True)
+    published.set_defaults(fn=cmd_constraints)
+
     validate = with_repo(subs.add_parser("validate", help="validate every object against its schema"))
     validate.set_defaults(fn=cmd_validate)
 
@@ -670,6 +793,8 @@ REFUSALS = (
     RepoError,
     ModelError,
     VerbError,
+    ConstraintError,
+    EvidenceError,
     GradeError,
     ArtefactError,
     AttestationError,
