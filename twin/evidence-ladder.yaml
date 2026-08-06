@@ -7,11 +7,13 @@
 # The grade travels **with** the claim rather than in a side table. The whole use-gate depends on
 # it, so the strength of a claim has to be inseparable from the claim.
 #
-# Versioned. Bump `version` in the same commit as any change to `grades` or `pricing_threshold`.
-# Every artefact that gates on this ladder records the version and the digest it gated against,
-# so changing the threshold is as visible as changing the constraint set.
+# Versioned. Bump `version` in the same commit as any change to `grades`, `pricing_threshold` or
+# `path_admission_threshold`. Every artefact that gates on this ladder records the version and the
+# digest it gated against, so changing a threshold is as visible as changing the constraint set.
+#
+# v2 (build ticket 29) adds `path_admission_threshold` beside the pricing gate.
 schema: twin.evidence-ladder/v1
-version: 1
+version: 2
 
 # Only grades 1-2 may price a scored forecast (decision ticket 08, Q2; build ticket 19). Grade 5
 # is a model assertion and is exactly where parametric contamination hides: an edge asserted from
@@ -21,6 +23,21 @@ version: 1
 # traversable and still visible in the output — it produces an unpriced structural blast radius
 # instead of a number.
 pricing_threshold: 2
+
+# What may enter the £ at all (build ticket 29, decision ticket 09 Q4). An impact prices only if a
+# causal path runs from the component to a cash flow the perspective declared, and every hop on
+# that path is graded at or inside this threshold.
+#
+# Published here, beside the use-gate, because they are the same kind of decision: one says which
+# claims may carry a number, the other says which impacts may become one. Two separate thresholds
+# rather than one reused, so that widening the currency is a visible act and not a side effect of
+# widening the gate.
+#
+# The consequence is the point: the pricing boundary is **derived, not declared**. Nobody can mark
+# something priceable. Reputation and morale price through modelled churn, attrition and grievance
+# paths, or they do not price at all — and the answer to "why isn't morale in the £?" is never "we
+# decided it doesn't count" but "no evidenced causal path yet", which somebody can go and fix.
+path_admission_threshold: 2
 
 grades:
   - grade: 1

@@ -1,13 +1,15 @@
 {
-  "authorised_by": "decision ticket 20 \u2014 build tickets 18, 19, 26 and 27: a grade-5 edge, two regrades and two perspectives in the fixture; two new artefact kinds; graded valuations, so a weakly-evidenced one is a register entry with no figure",
-  "capabilities_digest": "c265326dceed2b39faaf711189f2d013f5ea647bc4e81ce5d5f6566fca603102",
+  "authorised_by": "decision ticket 20 \u2014 review fixes for build tickets 20, 23, 28 and 29: the propagation body is closed and capped, the removal record is closed separately, exposure splits declared cash flow from derived path, and the declared precision reaches the whole triple",
+  "capabilities_digest": "0c8c350194bda0fe352ac2024e937bff95db3c105bb88922a789ce49d86c503f",
   "digests": {
-    "blast-radius": "36ffb570e55229613f2b82b3496194aa6773565008fe653a6bb80045525fd7b4",
-    "bound-signal": "53c74343120ea7aae1e1e39672c54fea807ab830a8953d5c663057aaca31d7c5",
-    "forecast-bundle": "ab100f13b14ed52dc0dfafa35d02360a89e66226e843456cd2dd11384951301d",
-    "graph": "c81c3412d496afcbb244277d135265c6283f3ae9f7ad052513d5a36f47638cf7",
-    "scenario-exposure": "ba9ba6f63c5574fb1edd8dc58297be8ffe5f3caad15c95918d2ee135467e1852",
-    "score-card": "17e87d560a99c7fdce48060b64469abf8a350aa80680dcf82154c8ac24873871"
+    "blast-radius": "52411e4bbb696490e3f1db1049b1e18c0939c2e5eeb489819f5d1da332ecc8ae",
+    "bound-signal": "f673ddbe1f25caf6f59bc96fdec42be2e70cc9c37e9cf66ead77c55d0d2701b3",
+    "forecast-bundle": "00e96275e4353111ac65f3a37cfe2a7e0086cda06505a6e630f48601a193dc57",
+    "graph": "385e05aa3c7d1c8f95332987326a6320c28c55eeb05bed92c6b821098c41f363",
+    "priced-option-set": "ad9376a8eebd6ab18d7ed93fb99031ca06234416d179e67bcbe86b2a5605db08",
+    "propagation": "841088a8fabd957aa511fa3d33b1d09cdd33c5a33a40d8b247b2cc65a6d22e62",
+    "scenario-exposure": "2d3a6d672e590d24e132eb403b3f577e736aa0f3a7cdf131ab643da25d971a2b",
+    "score-card": "9b9464691014008e9541a67e10d056e5909405e813fcdd3482de5007badba84d"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

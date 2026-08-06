@@ -376,6 +376,9 @@ party: employer
 pays: >-
   The organisation running the twin. The figures below are theirs and are stated as theirs
   rather than dressed as neutral.
+cash_flow:
+  - streaming-experience
+  - dvd-by-mail
 values:
   streaming-experience:
     amount: 120000000
@@ -406,6 +409,9 @@ party: employee-body
 pays: >-
   The staff council, from its own funds. It shares the world layer, holds its own valuation, and
   needed no privilege from anybody to instantiate this.
+cash_flow:
+  - streaming-experience
+  - dvd-by-mail
 values:
   streaming-experience:
     amount: 3000000
@@ -428,6 +434,51 @@ forbidden:
 note: >-
   The same scenario prices differently here, and the difference is the point. The employer's
   valuation is not the neutral one; it is one of these two.
+""",
+    # Candidate responses (build ticket 28). Two of the three cross a red line, and both are
+    # priced at almost nothing on purpose: the pre-filter never looks at a cost, so the cheapness
+    # is what makes "no magnitude brings it back" visible rather than merely asserted.
+    "orgs/netflix/responses/expand-the-delivery-network.yaml": """\
+id: expand-the-delivery-network
+name: Expand the delivery network
+addresses: content-delivery-network
+cost:
+  min: 20000000
+  mode: 45000000
+  max: 90000000
+note: >-
+  Crosses nothing. It survives the pre-filter and is costed as a range, never as a point.
+""",
+    "orgs/netflix/responses/instrument-viewers-without-telling-them.yaml": """\
+id: instrument-viewers-without-telling-them
+name: Instrument viewers without telling them
+addresses: streaming-experience
+cost:
+  min: 1
+  mode: 1
+  max: 1
+crosses:
+  no-covert-sensing: >-
+    The whole effect depends on the subjects not knowing the sensor is there.
+note: >-
+  Removed by the universal floor, in every twin, at any price. Costed at one unit in the model so
+  that the pre-filter's indifference to magnitude is demonstrable rather than claimed.
+""",
+    "orgs/netflix/responses/stake-the-quarter-on-one-title.yaml": """\
+id: stake-the-quarter-on-one-title
+name: Stake the quarter on one title
+addresses: streaming-experience
+cost:
+  min: 5
+  mode: 5
+  max: 5
+crosses:
+  insolvency: >-
+    A real chance the organisation cannot meet its obligations if the title does not land.
+note: >-
+  Ruin-class for the operator and not for the staff council, which declares a different boundary.
+  The same option is therefore removed under one eye and survives under the other, which is what
+  perspective-relative ruin means when it is mechanical rather than rhetorical.
 """,
     "orgs/intel/scenarios/euv-slip-2026.yaml": """\
 id: euv-slip-2026
@@ -660,6 +711,10 @@ confidence: 0.5
 note: >-
   Degenerate on purpose, so the worksheet carries one flagged edge and one honest range.
 """,
+    # `identity-store` is in the scenario so the £ boundary has a refused impact to demonstrate.
+    # The operator values it well enough to carry a figure and no causal path runs from it to the
+    # operator's cash flow, so it passes the use-gate and fails admission. Two different questions,
+    # and the worksheet checks both answers (build ticket 29).
     "orgs/pocket/scenarios/portal-availability-2026.yaml": """\
 id: portal-availability-2026
 question: Does the customer portal miss its availability target over the horizon?
@@ -669,6 +724,7 @@ horizon: '2026-12-31'
 components:
   - customer-portal
   - order-service
+  - identity-store
 world_models:
   - reference-map
 """,
@@ -679,6 +735,8 @@ id: the-operator
 name: The operator paying to run this twin
 party: employer
 pays: The organisation running the twin.
+cash_flow:
+  - customer-portal
 values:
   customer-portal:
     amount: 400000
@@ -688,6 +746,13 @@ values:
     amount: 250000
     evidence_grade: 1
     basis: The dated outage of 2025, with order volume measured on both sides of it.
+  identity-store:
+    amount: 90000
+    evidence_grade: 2
+    basis: >-
+      Support hours on identity incidents, from repeated records. Well enough evidenced to carry
+      a figure, and no causal edge leaves this component, so nothing reaches the operator's cash
+      flow and the figure stays outside the currency.
 ruin:
   insolvency: Any option carrying a real chance that the organisation cannot meet its obligations.
 """,
@@ -696,6 +761,9 @@ id: the-staff-council
 name: The staff council's own perspective
 party: employee-body
 pays: The staff council, from its own funds.
+cash_flow:
+  - customer-portal
+  - order-service
 values:
   customer-portal:
     amount: 50000
@@ -708,6 +776,45 @@ values:
 ruin:
   loss-of-livelihood: >-
     Any option carrying a real chance that a member cannot meet their own obligations.
+""",
+    # Three candidate responses, and the two that cross a red line are priced at almost nothing on
+    # purpose (build ticket 28). The pre-filter never reads a cost, so cheapness is what makes
+    # "no magnitude brings an excluded option back" demonstrable rather than asserted.
+    "orgs/pocket/responses/add-a-read-replica.yaml": """\
+id: add-a-read-replica
+name: Add a read replica
+addresses: shared-database
+cost:
+  min: 10000
+  mode: 25000
+  max: 70000
+note: >-
+  Crosses nothing, so it survives the pre-filter and is costed. Its mean is 30000 by hand:
+  (10000 + 4 x 25000 + 70000) / 6.
+""",
+    "orgs/pocket/responses/watch-the-team-quietly.yaml": """\
+id: watch-the-team-quietly
+name: Watch the team quietly
+addresses: order-service
+cost:
+  min: 5000
+  mode: 5000
+  max: 5000
+crosses:
+  no-covert-sensing: >-
+    The effect depends entirely on the people it measures not knowing it is running.
+""",
+    "orgs/pocket/responses/bet-the-org-on-one-supplier.yaml": """\
+id: bet-the-org-on-one-supplier
+name: Bet the org on one supplier
+addresses: shared-database
+cost:
+  min: 1000
+  mode: 1000
+  max: 1000
+crosses:
+  insolvency: >-
+    A real chance the organisation cannot meet its obligations if the supplier fails.
 """,
 }
 

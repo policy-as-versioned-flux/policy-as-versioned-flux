@@ -53,8 +53,9 @@ _REASON_RANK = {None: 0, BELOW_THRESHOLD: 1, NO_MECHANISM: 2}
 BODY_KEYS = frozenset(
     {
         "origin", "traversal", "gating", "admitted_to_pricing", "unpriced",
-        "inherited_from", "max_depth", "truncated", "known_limits",
-        "pin", "version", "pricing_threshold", "digest", "rule", "grades",
+        "inherited_from", "max_depth", "truncated", "known_limits", "gated_at_grade",
+        "pin", "version", "pricing_threshold", "path_admission_threshold", "digest",
+        "rule", "admission_rule", "grades",
         "grade", "name", "admits", "example", "may_price",
         "component", "worst_evidence_grade", "depth", "path", "reason", "detail",
         "edge", "hop", "evidence_grade",
@@ -117,7 +118,10 @@ def classify(component: str, path: tuple[tuple["Edge", bool], ...], threshold: i
     all_causal = all(is_causal for _, is_causal in path)
     grades = [edge.grade for edge, is_causal in path if is_causal and edge.grade is not None]
     worst = max(grades) if grades else None
-    if all_causal and worst is not None and evidence.may_price(worst):
+    # Compared against the threshold this traversal was given, not against a threshold fetched
+    # here: the caller decides which published number it is gating on, and the message and the
+    # decision then cannot disagree (build ticket 29).
+    if all_causal and worst is not None and worst <= threshold:
         return Reached(component, None, None, worst, path)
     if all_causal:
         return Reached(
@@ -138,13 +142,20 @@ def classify(component: str, path: tuple[tuple["Edge", bool], ...], threshold: i
     )
 
 
-def radius(graph: "Graph", origin: str, max_depth: int = MAX_DEPTH) -> dict[str, Any]:
-    """Every component downstream of `origin`, split by whether it may carry a price."""
+def radius(
+    graph: "Graph", origin: str, max_depth: int = MAX_DEPTH, threshold: int | None = None
+) -> dict[str, Any]:
+    """Every component downstream of `origin`, split by whether it may carry a price.
+
+    `threshold` defaults to the published pricing gate. Admission to the £ passes its own
+    published threshold instead (build ticket 29), so the two can be moved independently and a
+    reader of the artefact can see which one this traversal used.
+    """
     from .model import ModelError
 
     if origin not in graph.components:
         raise ModelError(f"no component {origin!r} in the graph of {graph.org!r}")
-    threshold = evidence.threshold()
+    threshold = evidence.threshold() if threshold is None else int(threshold)
 
     causal_out: dict[str, list["Edge"]] = {}
     structural_in: dict[str, list["Edge"]] = {}
@@ -182,6 +193,7 @@ def radius(graph: "Graph", origin: str, max_depth: int = MAX_DEPTH) -> dict[str,
             "inherited_from": "/arckit:impact",
             "max_depth": max_depth,
             "truncated": truncated,
+            "gated_at_grade": threshold,
             "known_limits": list(KNOWN_LIMITS),
         },
         "gating": evidence.published(),

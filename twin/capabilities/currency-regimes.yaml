@@ -19,7 +19,9 @@ criteria:
     ticked_by: build ticket 27
   - index: 3
     text: "The comparable-remainder boundary defined and defensible."
-    checked: false
+    checked: true
+    evidence: "twin/admission.py and twin/evidence-ladder.yaml `path_admission_threshold` — an impact enters the £ only through a causal path to a cash flow the perspective declared, graded at or inside a separately published threshold. The boundary is computed from the graph, so no author can mark anything priceable, and a refused impact comes back carrying the unpriced structural blast radius rather than silence."
+    ticked_by: build ticket 29
   - index: 4
     text: "Treatment of each named incommensurable, incl. where we refuse to price."
     checked: false

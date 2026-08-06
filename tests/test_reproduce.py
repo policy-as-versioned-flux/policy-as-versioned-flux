@@ -22,7 +22,10 @@ NETFLIX = ["--org", "netflix"]
 
 @pytest.fixture()
 def artefacts(model_repo_dir: Path, tmp_path: Path) -> dict[str, Path]:
-    out = {name: tmp_path / f"{name}.json" for name in ("bound-signal", "forecast-bundle", "score-card", "graph")}
+    out = {
+        name: tmp_path / f"{name}.json"
+        for name in ("bound-signal", "forecast-bundle", "score-card", "graph", "propagation", "priced-option-set")
+    }
     assert main(["sense", "--repo", str(model_repo_dir), *NETFLIX,
                  "--signal", "price-separation-announced", "--out", str(out["bound-signal"])]) == 0
     assert main(["run", "--repo", str(model_repo_dir), *NETFLIX,
@@ -31,10 +34,19 @@ def artefacts(model_repo_dir: Path, tmp_path: Path) -> dict[str, Path]:
                  "--forecast", str(out["forecast-bundle"]), "--outcome", "dvd-decline-2011-resolved",
                  "--out", str(out["score-card"])]) == 0
     assert main(["graph", "--repo", str(model_repo_dir), *NETFLIX, "--out", str(out["graph"])]) == 0
+    # A sampled artefact reproduces from its pins for the same reason a scored one does: the seed
+    # and the draw count are part of the format, not a runtime choice (build tickets 20 and 28).
+    assert main(["propagate", "--repo", str(model_repo_dir), *NETFLIX,
+                 "--origin", "content-delivery-network", "--out", str(out["propagation"])]) == 0
+    assert main(["options", "--repo", str(model_repo_dir), *NETFLIX,
+                 "--perspective", "the-operator", "--out", str(out["priced-option-set"])]) == 0
     return out
 
 
-@pytest.mark.parametrize("kind", ["bound-signal", "forecast-bundle", "score-card", "graph"])
+@pytest.mark.parametrize(
+    "kind",
+    ["bound-signal", "forecast-bundle", "score-card", "graph", "propagation", "priced-option-set"],
+)
 def test_every_artefact_reproduces_from_its_pins(model_repo_dir: Path, artefacts: dict[str, Path], kind: str) -> None:
     report = reproduce(model_repo_dir, artefacts[kind])
     assert report.reproduces, report.diff

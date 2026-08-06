@@ -25,6 +25,10 @@ PERSPECTIVE = {
     "name": "A union's own perspective",
     "party": "union",
     "pays": "The members, from their subscriptions.",
+    # Where this perspective's money moves. Required since build ticket 29: the £ boundary is
+    # derived from a causal path to a declared cash flow, and a perspective naming none would
+    # silently inherit somebody else's ledger.
+    "cash_flow": ["dvd-by-mail"],
     "values": {
         "dvd-by-mail": {"amount": 1000.0, "evidence_grade": 2, "basis": "Members in distribution."},
         "brand-goodwill": {"evidence_grade": 5, "basis": "A model assertion about worth."},
@@ -159,13 +163,15 @@ def test_an_overlay_with_no_perspective_refuses_rather_than_assuming_one(
 
 
 def test_the_exposure_says_what_it_is_not(repo: ModelRepo, caps: Capabilities) -> None:
-    """A declared valuation, before propagation, severity and the pre-filter that must precede it."""
+    """A declared valuation, before propagation and severity are joined to the £."""
     body = _exposure(repo, caps)
     assert body["basis"]["kind"] == "declared-valuation"
     assert body["basis"]["propagated"] is False
     assert body["basis"]["severity_sampled"] is False
+    # The pre-filter exists and runs in `twin options`; there is no choice set here to filter,
+    # because these are valuations of components rather than candidate responses.
     assert body["prefilter"]["applied"] is False
-    assert body["prefilter"]["lands_at"] == "build ticket 28"
+    assert "twin options" in body["prefilter"]["note"]
 
 
 def test_a_component_nobody_valued_is_null_and_not_zero(repo: ModelRepo, caps: Capabilities, tmp_path: Path) -> None:

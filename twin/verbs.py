@@ -22,7 +22,15 @@ from .grades import Capabilities
 from .model import ModelError, Overlay
 from .repo import ModelRepo
 from .schema import REGIMES
-from . import blast as blast_mod, constraints, evidence, scoring
+from . import (
+    admission as admission_mod,
+    blast as blast_mod,
+    constraints,
+    evidence,
+    options as options_mod,
+    propagate as propagate_mod,
+    scoring,
+)
 
 CAPS_SENSE = ["domain-model", "provenance", "sense-move"]
 CAPS_RUN = ["domain-model", "provenance", "scenario-engine"]
@@ -31,7 +39,11 @@ CAPS_SCORE = ["domain-model", "provenance", "sense-move"]
 # capabilities that produced it and its depth travels with the artefact (build ticket 17).
 CAPS_GRAPH = ["domain-model", "provenance", "causal-layer"]
 CAPS_BLAST = ["causal-layer", "domain-model", "provenance"]
-CAPS_EXPOSURE = ["currency-regimes", "domain-model", "provenance"]
+# Exposure reads the causal layer now: which impacts enter the £ is derived from a graded path to
+# a declared cash flow, so the causal layer's depth travels with the figure (build ticket 29).
+CAPS_EXPOSURE = ["causal-layer", "currency-regimes", "domain-model", "provenance"]
+CAPS_PROPAGATE = ["causal-layer", "domain-model", "provenance"]
+CAPS_OPTIONS = ["currency-regimes", "domain-model", "provenance"]
 
 KIND_BOUND_SIGNAL = "bound-signal"
 KIND_FORECAST_BUNDLE = "forecast-bundle"
@@ -39,6 +51,8 @@ KIND_SCORE_CARD = "score-card"
 KIND_GRAPH = "graph"
 KIND_BLAST_RADIUS = "blast-radius"
 KIND_SCENARIO_EXPOSURE = "scenario-exposure"
+KIND_PROPAGATION = "propagation"
+KIND_PRICED_OPTIONS = "priced-option-set"
 
 # Only an as-consumed execution produces a scoring-eligible forecast: the honest number is never
 # contaminated by what we know now (spec story 40). The *tag* lands here; the *gating* — refusing
@@ -199,6 +213,67 @@ def blast(repo: ModelRepo, caps: Capabilities, org: str, origin: str, command: l
     )
 
 
+# -- propagate -----------------------------------------------------------------------------
+
+
+def propagate(repo: ModelRepo, caps: Capabilities, org: str, origin: str, command: list[str]) -> Artefact:
+    """Compose a shock through the causal layer by Monte-Carlo (build ticket 20).
+
+    Three numbers per path, on purpose: the composed triple (exact, hand-checkable, unattenuated),
+    the attenuated one, and the sampled spread. An attenuated figure whose un-attenuated form was
+    never shown makes the attenuation unfalsifiable, and a product of modes is not the mode of a
+    product — so all three are emitted and none of them stands in for the others.
+
+    Structural edges do not appear here at all. A `needs` edge claims no mechanism, so nothing
+    composes along it; that exposure is the unpriced blast radius and it stays unpriced.
+    """
+    overlay = Overlay.load(repo, org)
+    body = propagate_mod.propagate(overlay.graph(), origin)
+    propagate_mod.refuse_undeclared_keys(body)
+    propagate_mod.refuse_directional_magnitudes(body)
+    return Artefact(
+        kind=KIND_PROPAGATION,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_PROPAGATE),
+        body=body,
+    )
+
+
+# -- options -------------------------------------------------------------------------------
+
+
+def options(
+    repo: ModelRepo, caps: Capabilities, org: str, perspective_id: str, command: list[str]
+) -> Artefact:
+    """The choice set after the constraint pre-filter, with the survivors costed (ticket 28).
+
+    The pre-filter runs first and it never sees a cost, which is why no magnitude can bring an
+    excluded option back. A removed option is absent from `priced` and its record carries no
+    figure at all — a constraint is not a very large price, because a price can be outbid.
+    """
+    overlay = Overlay.load(repo, org)
+    perspective = overlay.perspectives.get(perspective_id)
+    if perspective is None:
+        known = ", ".join(sorted(overlay.perspectives)) or "none"
+        raise VerbError(f"no perspective {perspective_id!r} in overlay {org!r} (have: {known})")
+    if not overlay.responses:
+        raise VerbError(
+            f"overlay {org!r} declares no candidate response, so there is no choice set to filter "
+            "or to cost"
+        )
+    admitted = options_mod.prefilter(perspective, overlay.responses)
+    return Artefact(
+        kind=KIND_PRICED_OPTIONS,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_OPTIONS),
+        body=admitted.priced(),
+    )
+
+
 # -- exposure ------------------------------------------------------------------------------
 
 
@@ -223,12 +298,19 @@ def exposure(
     carrying no amount at all, because the schema refuses one. That is what stops a perspective
     declaring "reputation damage = £X", which is the shadow price decision ticket 09 rejected.
 
-    What this is **not**: a modelled price. Nothing propagates yet (build ticket 20), no severity
-    is sampled (23-25) and the constraint pre-filter that must run before any pricing is build
-    ticket 28. The admitted figures are the perspective's own declared valuations and the artefact
-    says so in `basis` rather than implying otherwise.
+    **And a second gate, derived rather than declared** (build ticket 29). A well-graded valuation
+    still enters the figure only if a causal path runs from the component to a cash flow this
+    perspective declared. A perspective names where its money is; nobody names what is priceable.
+    An impact with no such path is a register entry whose reason is falsifiable — "no evidenced
+    causal path yet", never "we decided it does not count".
+
+    What this is **not**: a modelled price. Nothing propagates into these figures yet (`twin
+    propagate` composes the causal layer, build ticket 20, and build ticket 30 is what joins it to
+    the £) and no severity is sampled (24-25). The admitted figures are the perspective's own
+    declared valuations and the artefact says so in `basis` rather than implying otherwise.
     """
     overlay = Overlay.load(repo, org)
+    graph = overlay.graph()
     scenario = overlay.scenarios.get(scenario_id)
     if scenario is None:
         known = ", ".join(sorted(overlay.scenarios)) or "none"
@@ -251,6 +333,12 @@ def exposure(
             known = ", ".join(sorted(overlay.perspectives)) or "none"
             raise VerbError(f"no perspective {perspective_id!r} in overlay {org!r} (have: {known})")
         declared = {str(k): v for k, v in (perspective.get("values") or {}).items()}
+        # Derived first, and for every component in the scenario rather than only the valued ones:
+        # whether an impact could enter the £ at all is a fact about the graph, not about whether
+        # somebody happened to put a number on it.
+        verdicts = [admission_mod.admit(graph, perspective, c) for c in components]
+        admissible = {v["component"] for v in verdicts if v["admitted"]}
+        basis_of = {v["component"]: v.get("basis") for v in verdicts}
         admitted: list[dict[str, Any]] = []
         register: list[dict[str, Any]] = []
         for component in components:
@@ -258,20 +346,35 @@ def exposure(
             if valuation is None:
                 continue
             grade = int(valuation["evidence_grade"])
-            if evidence.may_price(grade):
-                admitted.append(
-                    {"component": component, "declared_value": float(valuation["amount"]),
-                     "evidence_grade": grade, "basis": valuation["basis"]}
-                )
-            else:
+            held = {"component": component, "evidence_grade": grade, "basis": valuation["basis"]}
+            if not evidence.may_price(grade):
                 # No figure, anywhere. The schema refuses one at this grade, so the register is a
                 # list of names and reasons rather than a price with a null field.
                 register.append(
-                    {"component": component, "evidence_grade": grade, "basis": valuation["basis"],
-                     "reason": (
-                         f"evidence grade {grade} is outside the published threshold, so this is "
-                         "reported beside the figure and never inside it"
-                     )}
+                    {**held, "reason": (
+                        f"evidence grade {grade} is outside the published threshold, so this is "
+                        "reported beside the figure and never inside it"
+                    )}
+                )
+            elif component not in admissible:
+                # Well enough evidenced to carry a figure, and with nowhere for that figure to
+                # reach. The two gates ask different questions, and this is the one the £ boundary
+                # answers: no path, no price, and the reason is something somebody can falsify.
+                register.append(
+                    {**held, "reason": (
+                        "no causal path at an adequate grade reaches a cash flow this perspective "
+                        "declared, so the impact stays outside the currency — not because it does "
+                        "not count, but because no evidenced path has been shown yet"
+                    )}
+                )
+            else:
+                # `admitted_because` travels with the figure. A component the perspective named
+                # as its own cash flow enters with no path and no grade behind the path — that is
+                # the one route to the £ that rests on a declaration, and a reader must be able to
+                # see which figures took it (build ticket 29, the named limit in twin/admission.py).
+                admitted.append(
+                    {**held, "declared_value": float(valuation["amount"]),
+                     "admitted_because": basis_of[component]}
                 )
         entries.append(
             {
@@ -280,9 +383,23 @@ def exposure(
                 "party": perspective.get("party"),
                 "pays": perspective.get("pays"),
                 "constraint_set": constraints.resolve(perspective),
+                "cash_flow": admission_mod.cash_flows(perspective),
+                # The derived boundary, shown rather than applied silently. A refused impact
+                # carries the unpriced structural blast radius, because "connected and
+                # unpriceable" is the answer, not a gap (build ticket 29).
+                "admission": [admission_mod.compact(v) for v in verdicts],
                 "admitted": admitted,
                 "register": register,
                 "declared_exposure": sum(e["declared_value"] for e in admitted),
+                # Split, never one figure. A declared cash flow enters on the perspective's word;
+                # a graded path enters on evidence. Summing them into one number would hide which
+                # half of the exposure rests on which, and that is the decision-relevant part.
+                "exposure_by_basis": {
+                    basis: sum(
+                        e["declared_value"] for e in admitted if e["admitted_because"] == basis
+                    )
+                    for basis in sorted({e["admitted_because"] for e in admitted})
+                },
                 # A component this perspective never valued at all — distinct from one it valued
                 # too weakly to price, which is in the register above.
                 "unvalued": [c for c in components if c not in declared],
@@ -308,19 +425,20 @@ def exposure(
                 "severity_sampled": False,
                 "note": (
                     "each figure is a valuation the perspective declared for a component, not a "
-                    "modelled price: nothing propagates yet (build ticket 20), no severity "
-                    "distribution is sampled (23-25) and no causal path has been priced (30)"
+                    "modelled price: the causal layer composes in `twin propagate` (build ticket "
+                    "20) and is not joined to the £ until build ticket 30, and no severity "
+                    "distribution is sampled (24-25)"
                 ),
             },
             "gating": evidence.published(),
             "prefilter": {
                 "applied": False,
-                "lands_at": "build ticket 28",
                 "note": (
-                    "the constraint pre-filter that removes ruin-class and forbidden options "
-                    "before any pricing has not been built, so no figure here has been compared "
-                    "against a red line — and the constraint set each perspective resolves is "
-                    "published beside it so a reader can see what it will filter on"
+                    "the constraint pre-filter removes ruin-class and forbidden options before any "
+                    "pricing, and it runs in `twin options` (build ticket 28). There is no choice "
+                    "set here to filter: these are declared valuations of components, not "
+                    "candidate responses. The constraint set each perspective resolves is "
+                    "published beside the figures so a reader can see what would be filtered."
                 ),
             },
             "perspectives": entries,

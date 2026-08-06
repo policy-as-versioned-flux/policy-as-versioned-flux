@@ -28,6 +28,8 @@ from .index import IndexError_
 from .invariants import FAIL, PASS, SKIP
 from .invariants.harness import LIVE, MANIFEST_PATH, Suite, load_manifest
 from .model import ModelError
+from .pert import PertError
+from .propagate import AttenuationError
 from .reproduce import ReproduceError
 from .repo import ModelRepo, RepoError
 from .schema import SchemaError
@@ -120,6 +122,58 @@ def cmd_blast(args: argparse.Namespace) -> int:
               f"{entry['worst_evidence_grade']}")
     for entry in body["unpriced"]:
         print(f"  unpriced {entry['component']:<27} {entry['reason']}")
+    return _emit(artefact, args.out)
+
+
+def cmd_propagate(args: argparse.Namespace) -> int:
+    repo, caps, org = _open(args)
+    artefact = verbs.propagate(
+        repo, caps, org, args.origin, verbs.command_for("propagate", org=org, origin=args.origin)
+    )
+    body = artefact.body
+    _say(
+        f"{org}: a shock at {args.origin!r} composes to {len(body['reached'])} component(s) along "
+        f"{sum(len(r['paths']) for r in body['reached'])} causal path(s)"
+    )
+    for reached in body["reached"]:
+        for path in reached["paths"]:
+            mark = "*" if path["primary"] else " "
+            if path["directional_only"]:
+                print(f"  {mark} {reached['component']:<26} depth {path['depth']}  "
+                      f"{path['sign']} direction only, no magnitude")
+                continue
+            composed, attenuated = path["composed"], path["attenuated"]
+            print(
+                f"  {mark} {reached['component']:<26} depth {path['depth']}  "
+                f"composed {composed['min']:.4f}/{composed['mode']:.4f}/{composed['max']:.4f}  "
+                f"x{path['attenuation']} -> {attenuated['min']:.4f}/{attenuated['mode']:.4f}/"
+                f"{attenuated['max']:.4f}  sampled p50 {path['sampled']['p50']:.4f}"
+            )
+    print(f"  {body['attenuation']['rule']}")
+    print(f"  {body['traversal']['paths_are_not_aggregated']}")
+    return _emit(artefact, args.out)
+
+
+def cmd_options(args: argparse.Namespace) -> int:
+    repo, caps, org = _open(args)
+    artefact = verbs.options(
+        repo, caps, org, args.perspective,
+        verbs.command_for("options", org=org, perspective=args.perspective),
+    )
+    body = artefact.body
+    pre = body["prefilter"]
+    _say(
+        f"{org}: {len(pre['considered'])} option(s) considered for {args.perspective!r}, "
+        f"{len(pre['admitted'])} priced, {len(pre['removed'])} removed before pricing"
+    )
+    for record in pre["removed"]:
+        print(f"  removed  {record['option']:<30} {record['class']} — {record['constraint']} "
+              f"({record['tier']} tier), no figure")
+    for entry in body["priced"]:
+        cost = entry["cost"]
+        print(f"  priced   {entry['option']:<30} {cost['min']}/{cost['mode']}/{cost['max']} "
+              f"mean {cost['mean']}, sampled p50 {entry['sampled']['p50']}")
+    print("  a constraint is not a very large price: a removed option carries no number at all")
     return _emit(artefact, args.out)
 
 
@@ -736,6 +790,20 @@ def build_parser() -> argparse.ArgumentParser:
     exposed.add_argument("--out", required=True)
     exposed.set_defaults(fn=cmd_exposure)
 
+    moved = with_org(with_repo(subs.add_parser(
+        "propagate", help="compose a shock through the causal layer, with depth attenuation"
+    )))
+    moved.add_argument("--origin", required=True, help="the component the shock starts at")
+    moved.add_argument("--out", required=True)
+    moved.set_defaults(fn=cmd_propagate)
+
+    choices = with_org(with_repo(subs.add_parser(
+        "options", help="the choice set after the constraint pre-filter, with survivors costed"
+    )))
+    choices.add_argument("--perspective", required=True, help="whose constraint set filters the options")
+    choices.add_argument("--out", required=True)
+    choices.set_defaults(fn=cmd_options)
+
     published = subs.add_parser(
         "constraints", help="publish the constraint set, the scope exclusions and the positions"
     )
@@ -793,8 +861,10 @@ REFUSALS = (
     RepoError,
     ModelError,
     VerbError,
+    AttenuationError,
     ConstraintError,
     EvidenceError,
+    PertError,
     GradeError,
     ArtefactError,
     AttestationError,

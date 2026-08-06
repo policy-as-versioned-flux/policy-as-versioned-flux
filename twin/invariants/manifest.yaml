@@ -8,8 +8,8 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 18, 19, 26 and 27 under decision tickets 08 and 09: every verb's capabilities are depth-graded, and the grade-5 use-gate is asserted on the emitted blast radius and on the scenario exposure that emits a figure"
-checks_module_sha256: 2918b24a77377ac82d015cba7fc719faa43244d696822a9a583b9306dcc47a6c
+checks_module_authorised_by: "decision ticket 20 \u2014 prefilter_precedes_pricing strengthened under decision ticket 09: the free-function check becomes an allow-list on the module's public surface, because a keyword match on price/cost/value misses a pricing function under any other name"
+checks_module_sha256: 26d06c91c1355aecb105571472987da0eea2f100c7e64135baa0d46cdee186c2
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
@@ -37,8 +37,8 @@ invariants:
   - name: every_capability_depth_graded
     activating_ticket: '03'
     state: live
-    body_sha256: 41f94ba01d371ab0adda96fb3ed3b42ca8b539b5930175efb1e136ffa83f17dc
-    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 18, 19, 26 and 27 under decision tickets 08 and 09: every verb's capabilities are depth-graded, and the grade-5 use-gate is asserted on the emitted blast radius"
+    body_sha256: 9aa18559a58e49f9be3fa53dd9d64d004e20455b5888f4fe121af5de870fa61e
+    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 20, 23, 28 and 29 under decision tickets 08 and 09: propagation and the priced option set join the emitted set, every verb's capabilities stay depth-graded, and the two constraint pre-filter invariants activate"
     asserts: >-
       Every capability carries a depth grade computed from its owning decision ticket's
       acceptance criteria; a typed grade is refused and names the unchecked criteria.
@@ -115,13 +115,32 @@ invariants:
 
   - name: ruin_class_absent_not_priced
     activating_ticket: '28'
-    state: pending
+    state: live
+    body_sha256: 161d75067da61b28780486ed2ac1387c281fa40f7337f9bc9a505e43b6e2a168
     asserts: A ruin-class option is absent from the output entirely, not present with a large number.
+    note: >-
+      Checked where a number would appear: the excluded option is not in the priced list, its
+      removal record carries no figure at any depth, the body is closed so there is no slot for
+      one, and re-running the pre-filter with the cost driven to zero and to an absurd number
+      changes nothing — because a cost is not an input to the decision. The positive leg is
+      asserted too: ruin is perspective-relative, so the same option still survives under an eye
+      that declares a different boundary, and a filter that removed everything would be a wall.
 
   - name: prefilter_precedes_pricing
     activating_ticket: '28'
-    state: pending
+    state: live
+    body_sha256: 2a785521debd934206598997b6894088b9216525383fc6343c363e6f0a72742f
+    authorised_by: "decision ticket 20 \u2014 prefilter_precedes_pricing strengthened under decision ticket 09: the free-function check becomes an allow-list on the module's public surface, because a keyword match on price/cost/value misses a pricing function under any other name"
     asserts: The constraint pre-filter runs before pricing, so no number is ever comparable against a red line.
+    note: >-
+      Structural, not an ordering convention. Pricing is a method on the pre-filter's product, so
+      there is no free function that could be handed unfiltered options; and that product refuses
+      to be constructed any other way, so the first lock cannot be bypassed. The emitted choice set
+      is checked against both: survivors and removals partition what was considered, and every id
+      the filter removed on appears in the published constraint set.
+      The module's public surface is asserted as an **allow-list** rather than screened for
+      price-shaped names: a free function that prices an unfiltered option reopens the ordering
+      whatever it is called, and a keyword match would miss one named `tally`.
 
   - name: as_consumed_admits_no_post_T_fact
     activating_ticket: '36'

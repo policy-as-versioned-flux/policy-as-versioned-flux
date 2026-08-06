@@ -208,27 +208,39 @@ def valuation(value: Any, where: str) -> None:
         amount(value["amount"], f"{where}.amount")
 
 
+def _triple(value: Any, where: str, point: Validator, noun: str) -> None:
+    """The shape every min/mode/max triple has. Only the point validator differs."""
+    if not isinstance(value, dict):
+        raise SchemaError(f"{where}: expected a min/mode/max mapping, got {value!r}")
+    unknown = sorted(set(value) - {"min", "mode", "max"})
+    if unknown:
+        raise SchemaError(f"{where}: unknown field(s) {', '.join(unknown)}; {noun} is min, mode, max")
+    missing = sorted({"min", "mode", "max"} - set(value))
+    if missing:
+        raise SchemaError(f"{where}: missing {', '.join(missing)}; a range needs all three points")
+    for key in ("min", "mode", "max"):
+        point(value[key], f"{where}.{key}")
+    low, mode, high = (float(value["min"]), float(value["mode"]), float(value["max"]))
+    if not low <= mode <= high:
+        raise SchemaError(f"{where}: expected min <= mode <= max, got {low} / {mode} / {high}")
+
+
 def pert(value: Any, where: str) -> None:
     """A calibrated range as a min/mode/max triple.
 
     Closed like everything else: exactly these three keys. A triple is how an elasticity states
     its own uncertainty, and a single number cannot — which is why there is no scalar form.
     """
-    if not isinstance(value, dict):
-        raise SchemaError(f"{where}: expected a min/mode/max mapping, got {value!r}")
-    unknown = sorted(set(value) - {"min", "mode", "max"})
-    if unknown:
-        raise SchemaError(f"{where}: unknown field(s) {', '.join(unknown)}; a PERT triple is min, mode, max")
-    missing = sorted({"min", "mode", "max"} - set(value))
-    if missing:
-        raise SchemaError(f"{where}: missing {', '.join(missing)}; a range needs all three points")
-    for key in ("min", "mode", "max"):
-        unit_interval(value[key], f"{where}.{key}")
-    low, mode, high = (float(value["min"]), float(value["mode"]), float(value["max"]))
-    if not low <= mode <= high:
-        raise SchemaError(
-            f"{where}: expected min <= mode <= max, got {low} / {mode} / {high}"
-        )
+    _triple(value, where, unit_interval, "a PERT triple")
+
+
+def money_pert(value: Any, where: str) -> None:
+    """A calibrated cost range: the same triple, unbounded above.
+
+    Separate from `pert` because the domains are different and conflating them would be a real
+    error: an elasticity is a magnitude in the unit interval, and a cost is not.
+    """
+    _triple(value, where, amount, "a cost triple")
 
 
 def degenerate(triple: dict[str, Any]) -> bool:
@@ -448,8 +460,24 @@ SCHEMAS: dict[str, Schema] = {
             # livelihood for a person — so a perspective that declares no boundary has silently
             # inherited somebody else's.
             "ruin": mapping_of(text),
+            # Where this perspective's money actually moves (build ticket 29). Required for the
+            # same reason `ruin` is: the £ boundary is derived from a causal path to a cash flow,
+            # and a perspective that names no cash flow has silently inherited somebody else's
+            # ledger. Declaring where the money is is legitimate; declaring what is priceable is
+            # not, and this field cannot do the second — admission is computed from the graph.
+            "cash_flow": list_of(ident),
         },
         optional={"forbidden": mapping_of(text), "note": text},
+    ),
+    # A candidate response (build ticket 28). It carries a cost range and the red lines it crosses,
+    # and it never carries a verdict: nothing here ranks one option above another, and the
+    # pre-filter that removes an excluded one runs before anything prices the rest.
+    #
+    # `crosses` names constraints, never magnitudes. A constraint is not a very large price, so
+    # there is no field here by which a big enough number could buy an excluded option.
+    "response": Schema(
+        required={"id": ident, "name": text, "addresses": ident, "cost": money_pert},
+        optional={"crosses": mapping_of(text), "note": text},
     ),
     "scenario": Schema(
         required={
@@ -634,5 +662,6 @@ COLLECTION_KINDS: dict[str, str] = {
     "edges": "edge",
     "regrades": "regrade",
     "perspectives": "perspective",
+    "responses": "response",
     "observations": "observation",
 }

@@ -84,9 +84,18 @@ def ladder(path: Path | None = None) -> dict[str, Any]:
                 )
         if not isinstance(rung_doc.get("may_price"), bool):
             raise EvidenceError(f"{source}: grade {rung_doc.get('grade')} does not say whether it may price")
-    threshold = doc.get("pricing_threshold")
-    if threshold not in EVIDENCE_GRADES:
-        raise EvidenceError(f"{source}: pricing_threshold {threshold!r} is not a grade on this ladder")
+    # `bool` excluded explicitly, as everywhere else a grade is read: `True == 1` in Python, so
+    # `pricing_threshold: true` would pass a bare membership test and silently mean the strongest
+    # rung. A threshold set by a typo is a gate nobody chose.
+    for field in ("pricing_threshold", "path_admission_threshold"):
+        value = doc.get(field)
+        if isinstance(value, bool) or value not in EVIDENCE_GRADES:
+            raise EvidenceError(
+                f"{source}: {field} {value!r} is not a grade on this ladder. It decides what may "
+                "carry a number, so a ladder that does not state one gates on nothing while still "
+                "looking published."
+            )
+    threshold = doc["pricing_threshold"]
     for rung_doc in grades:
         if bool(rung_doc["may_price"]) != (int(rung_doc["grade"]) <= int(threshold)):
             raise EvidenceError(
@@ -100,6 +109,15 @@ def ladder(path: Path | None = None) -> dict[str, Any]:
 
 def threshold(path: Path | None = None) -> int:
     return int(ladder(path)["pricing_threshold"])
+
+
+def admission_threshold(path: Path | None = None) -> int:
+    """The grade a causal path to cash flow must hold to admit an impact to the £ (ticket 29).
+
+    A separate threshold rather than `pricing_threshold` reused, so that widening the currency is
+    an act somebody has to perform rather than a side effect of widening the use-gate.
+    """
+    return int(ladder(path)["path_admission_threshold"])
 
 
 def rung(grade: int) -> dict[str, Any]:
@@ -124,6 +142,7 @@ def pin(path: Path | None = None) -> dict[str, Any]:
     return {
         "version": int(doc["version"]),
         "pricing_threshold": int(doc["pricing_threshold"]),
+        "path_admission_threshold": int(doc["path_admission_threshold"]),
         "digest": digest_of(doc),
     }
 
@@ -136,6 +155,11 @@ def published() -> dict[str, Any]:
         "rule": (
             f"only grades 1-{doc['pricing_threshold']} may price a scored forecast; a weaker path "
             "is reported as an unpriced structural blast radius"
+        ),
+        "admission_rule": (
+            f"an impact enters the £ only through a causal path to a declared cash flow whose "
+            f"weakest hop is graded 1-{doc['path_admission_threshold']}; the boundary is derived "
+            "from the graph and nobody can declare something priceable"
         ),
         "grades": [
             {

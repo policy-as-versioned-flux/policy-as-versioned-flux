@@ -333,6 +333,50 @@ def test_exposure_reports_every_perspective_and_the_spread(model_repo_dir: Path,
     assert body["prefilter"]["applied"] is False
 
 
+# -- propagation and the priced choice set (build tickets 20, 23, 28) ---------------------------
+
+
+def test_propagate_emits_composed_attenuated_and_sampled(model_repo_dir: Path, tmp_path: Path) -> None:
+    """All three, side by side. An attenuated figure alone makes the attenuation unfalsifiable."""
+    out = tmp_path / "propagation.json"
+    assert _run(model_repo_dir, "propagate", *NETFLIX, "--origin", "content-delivery-network",
+                "--out", str(out)) == 0
+
+    doc = json.loads(out.read_bytes())
+    assert doc["envelope"]["kind"] == "propagation"
+    assert doc["envelope"]["mark"] == "derived"
+    body = doc["body"]
+    assert {r["component"] for r in body["reached"]} == {"streaming-experience", "dvd-by-mail", "brand-goodwill"}
+
+    first = next(p for r in body["reached"] if r["component"] == "streaming-experience" for p in r["paths"])
+    assert first["composed"]["mode"] == 0.25, "one hop is the authored triple itself"
+    assert first["attenuation"] == 1.0
+    assert first["sampled"]["draws"] == 2000
+    assert first["may_price"] is True
+    assert body["attenuation"]["pin"]["directional_beyond_depth"] == 4
+    assert body["calibration"]["document"] == "calibration.md"
+
+
+def test_options_removes_before_it_prices(model_repo_dir: Path, tmp_path: Path) -> None:
+    out = tmp_path / "options.json"
+    assert _run(model_repo_dir, "options", *NETFLIX, "--perspective", "the-operator",
+                "--out", str(out)) == 0
+
+    doc = json.loads(out.read_bytes())
+    assert doc["envelope"]["kind"] == "priced-option-set"
+    body = doc["body"]
+    assert {e["option"] for e in body["priced"]} == {"expand-the-delivery-network"}
+    assert {r["option"] for r in body["prefilter"]["removed"]} == {
+        "instrument-viewers-without-telling-them", "stake-the-quarter-on-one-title"
+    }
+    assert body["prefilter"]["ran_before_pricing"] is True
+
+
+def test_a_perspective_the_overlay_does_not_hold_is_a_sentence(model_repo_dir: Path, tmp_path: Path) -> None:
+    assert _run(model_repo_dir, "options", *NETFLIX, "--perspective", "nobody",
+                "--out", str(tmp_path / "options.json")) == 2
+
+
 def test_the_constraint_set_is_authored_and_signed_as_a_role(tmp_path: Path) -> None:
     """The second place in this system where a human declaration is the authority."""
     from twin import attest, sign

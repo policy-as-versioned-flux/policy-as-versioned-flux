@@ -90,14 +90,50 @@ assert not any(k in raw for k in ('"price":', '"cost":', '"severity":')), "a pri
 print("  the unpriced half is a distinct artefact type, not a price with a null field")
 BLAST
 
-say "8. the same scenario under two perspectives — the £ belongs to whoever pays to run the twin"
+say "8. propagation — composed, attenuated and sampled, all three, so attenuation is falsifiable"
+"$TWIN" propagate --repo "$MODEL" --org netflix --origin content-delivery-network \
+  --out "$OUT/propagation.json" >/dev/null || fail "propagate failed"
+python3 - "$OUT/propagation.json" <<'PROP'
+import json, sys
+b = json.load(open(sys.argv[1]))["body"]
+print(f"  {b['attenuation']['rule']}")
+for reached in b["reached"]:
+    for path in reached["paths"]:
+        if path["directional_only"]:
+            print(f"    {reached['component']:<24} depth {path['depth']}  direction only, no magnitude")
+            continue
+        c, a = path["composed"], path["attenuated"]
+        print(f"    {reached['component']:<24} depth {path['depth']}  "
+              f"composed {c['min']:.3f}/{c['mode']:.3f}/{c['max']:.3f}  x{path['attenuation']}  "
+              f"-> {a['min']:.3f}/{a['mode']:.3f}/{a['max']:.3f}  sampled p50 {path['sampled']['p50']:.3f}")
+assert b["traversal"]["paths_are_not_aggregated"], "the non-aggregation statement went missing"
+print("  structural edges do not propagate, and paths are never summed — shared ancestry is ticket 21")
+PROP
+
+say "9. the pre-filter — a constraint is not a very large price, because a price can be outbid"
+"$TWIN" options --repo "$MODEL" --org netflix --perspective the-operator \
+  --out "$OUT/priced-option-set.json" || fail "options failed"
+python3 - "$OUT/priced-option-set.json" <<'OPT'
+import json, sys
+b = json.load(open(sys.argv[1]))["body"]
+removed = {r["option"] for r in b["prefilter"]["removed"]}
+priced = {e["option"] for e in b["priced"]}
+assert not removed & priced, "an excluded option was priced"
+for record in b["prefilter"]["removed"]:
+    numbers = [v for v in record.values() if isinstance(v, (int, float)) and not isinstance(v, bool)]
+    assert not numbers, f"a figure survived on {record['option']}: {numbers}"
+print(f"  {len(removed)} removed before pricing, carrying no figure; {len(priced)} priced")
+print("  the removed options cost almost nothing — the pre-filter never reads a cost")
+OPT
+
+say "10. the same scenario under two perspectives — the £ belongs to whoever pays to run the twin"
 "$TWIN" exposure --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
   --out "$OUT/scenario-exposure.json" || fail "exposure failed"
 
-say "9. the constraint set, published upfront — paperclip risk disclosed rather than discovered"
+say "11. the constraint set, published upfront — paperclip risk disclosed rather than discovered"
 "$TWIN" constraints --out "$OUT/constraint-set.json" || fail "constraints failed"
 
-say "10. the attestation sidecar, read back — a write-only attestation is not tamper-evidence"
+say "12. the attestation sidecar, read back — a write-only attestation is not tamper-evidence"
 "$TWIN" verify "$OUT/score-card.json" --attestation || fail "the sidecar did not hold"
 python3 - "$OUT/score-card.json.att.json" <<'PY'
 import json, sys
@@ -113,29 +149,29 @@ fi
 echo "  ok   a planted human signature on a derived artefact is a detectable anomaly"
 mv "$OUT/score-card.json.att.json.clean" "$OUT/score-card.json.att.json"
 
-say "11. the pocket org — five components, six edges, checked against a hand-computed worksheet"
+say "13. the pocket org — five components, six edges, checked against a hand-computed worksheet"
 "$TWIN" fixture --pocket-org --out "$WORK/pocket" >/dev/null || fail "pocket fixture failed"
 "$TWIN" worksheet --repo "$WORK/pocket" || fail "the pocket org no longer matches its worksheet"
 
-say "12. reproduce the score card from its pins alone — including the bundle it scored"
+say "14. reproduce the score card from its pins alone — including the bundle it scored"
 "$TWIN" verify "$OUT/score-card.json" --repo "$MODEL" || fail "the score card did not reproduce"
 
-say "13. every object validates against its closed schema, and Article 9 data cannot be written"
+say "15. every object validates against its closed schema, and Article 9 data cannot be written"
 "$TWIN" validate --repo "$MODEL" || fail "validation failed"
 
-say "14. the derived index is derived — drop it, rebuild it from git alone"
+say "16. the derived index is derived — drop it, rebuild it from git alone"
 "$TWIN" index --repo "$MODEL" --out "$WORK/index" || fail "index build failed"
 rm -rf "$WORK/index"
 "$TWIN" index --repo "$MODEL" --out "$WORK/index" || fail "index rebuild failed"
 
-say "15. determinism — the same command against the same ref, byte for byte"
+say "17. determinism — the same command against the same ref, byte for byte"
 "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
   --out "$OUT/forecast-bundle-again.json" >/dev/null || fail "second run failed"
 cmp -s "$OUT/forecast-bundle.json" "$OUT/forecast-bundle-again.json" \
   || fail "the same pins produced different bytes"
 echo "  ok   identical bytes"
 
-say "16. a dirty tree is refused — the pin has to describe what you are reading"
+say "18. a dirty tree is refused — the pin has to describe what you are reading"
 echo "# scribble" >> "$MODEL/world/meta.yaml"
 if "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
      --out "$OUT/should-not-exist.json" >/dev/null 2>&1; then

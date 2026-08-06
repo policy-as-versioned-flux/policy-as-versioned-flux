@@ -1,12 +1,12 @@
 # `twin`
 
-Build tickets 01–08, 10–15, 17–19 and 26–27 of `.scratch/twin/`. One dated signal binds to a
+Build tickets 01–08, 10–15, 17–20 and 26–29 of `.scratch/twin/`, plus 23 at `partial`. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 19 of 77 build tickets.** What is not built is listed below and, more usefully, is named
+**This is 22 of 77 build tickets closed, and one more part-built.** What is not built is listed below and, more usefully, is named
 inside every artefact the tool emits.
 
 ## Run it
@@ -20,6 +20,8 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin graph --repo R --org netflix    # the typed knowledge graph
 ./bin/twin map --repo R --org netflix      # the Wardley map, rendered from that graph
 ./bin/twin blast --repo R --origin C       # what is downstream, and which of it may be priced
+./bin/twin propagate --repo R --origin C   # compose a shock along causal edges, with attenuation
+./bin/twin options --repo R --perspective P # the choice set after the pre-filter, survivors costed
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
 ./bin/twin constraints --out F             # the published constraint set, floor and exclusions
 ./bin/twin worksheet --repo P              # the pocket org against its hand-computed worksheet
@@ -55,16 +57,18 @@ flowchart LR
   C["<b>twin score</b><br/>proper rules, as-consumed only"] --> SC["score-card<br/><i>names the bundle by pin</i>"]
   G["<b>twin graph</b>"] --> GR["graph<br/><i>components · people · typed edges<br/>Wardley map · derived roll-ups</i>"]
   BL["<b>twin blast</b><br/>one traversal, two outputs"] --> BR["blast-radius<br/><i>admitted to pricing · unpriced<br/>closed body, no price slot</i>"]
-  X["<b>twin exposure</b><br/>every declared perspective"] --> XP["scenario-exposure<br/><i>one figure per eye · the spread</i>"]
+  P["<b>twin propagate</b><br/>Monte-Carlo along causal edges"] --> PR["propagation<br/><i>composed · attenuated · sampled<br/>past depth 4, direction only</i>"]
+  OP["<b>twin options</b><br/>pre-filter, then price"] --> OS["priced-option-set<br/><i>removed carries no figure<br/>closed body, no price slot on it</i>"]
+  X["<b>twin exposure</b><br/>every declared perspective"] --> XP["scenario-exposure<br/><i>one figure per eye · the spread<br/>admitted only via a graded path to cash</i>"]
 
-  repo --> S & R & C & G & BL & X
+  repo --> S & R & C & G & BL & P & OP & X
   FB -- "by sha256, never by path" --> C
   B -. "no route from anything above" .-> G
   GR -- "no authoring step" --> M["<b>twin map</b><br/><i>a render, not a second model</i>"]
   CS["<b>twin constraints</b><br/><i>authored · signed by role<br/>floor · exclusions · the gate</i>"]
-  CS -. "pinned by version and digest in" .-> BR & XP
+  CS -. "pinned by version and digest in" .-> BR & XP & OS
 
-  BS & FB & SC & GR & BR & XP --> A["attestation sidecar<br/>runtime · agent signature · no human hands"]
+  BS & FB & SC & GR & BR & PR & OS & XP --> A["attestation sidecar<br/>runtime · agent signature · no human hands"]
   A --> V["<b>twin verify artefact</b><br/><i>recompute the chain from pins</i>"]
   A --> AT["<b>twin verify --attestation</b><br/><i>read it back: digest, signatures, anomaly</i>"]
 ```
@@ -118,7 +122,73 @@ asymmetry (unsolved), reflexivity and Goodhart-on-the-twin (deferred) — and co
 recorded as `permanently-excluded`, which the loader checks is not the deferral beside it.
 
 The pricing threshold ships in the same artefact, because changing what may be priced is the same
-kind of act as changing what may be chosen.
+kind of act as changing what may be chosen. A **second** threshold ships beside it —
+`path_admission_threshold`, the grade a causal path to cash flow must hold before an impact enters
+the £ at all. Two numbers rather than one reused, so widening the currency is an act somebody has
+to perform and not a side effect of widening the use-gate.
+
+## The pre-filter, and why it is not a very large price
+
+`twin options` reads the candidate responses in an overlay, removes the ones that cross a
+constraint in force for the named perspective, and only then costs what is left. The ordering is
+the whole point: a price can be outbid, so with enough upside an optimiser finds the number that
+buys a monstrous option, and a very large penalty still asserts that a number exists.
+
+The ordering is **structural, not a convention**. Pricing is a method on the pre-filter's own
+product, so the module exports no function that would take an unfiltered option and return a
+number; and before it prices anything, that product **re-derives the filter** from the constraint
+set it carries and refuses if the answer disagrees. The re-derivation is the lock that holds: the
+construction sentinel alone was carried straight through `dataclasses.replace`, which is the
+ordinary way to copy a frozen dataclass and therefore exactly the innocent refactor it claimed to
+stop. A removed option is absent from the priced list and its record is closed to nine string
+fields, so it has nowhere to put a figure — as a number or in words.
+
+The pre-filter never reads a cost. That is why no input magnitude brings an excluded option back —
+the magnitude is not an input to the decision — and the fixtures price both excluded options at
+almost nothing so the property is demonstrable rather than asserted.
+
+Ruin is perspective-relative. `stake-the-quarter-on-one-title` crosses the operator's declared
+insolvency boundary and is removed under that eye; the staff council declares a different boundary
+and the same option survives under theirs. The universal floor binds both.
+
+## Propagation, and the three numbers it reports
+
+`twin propagate` composes a shock along `influences` edges by Monte-Carlo. Every path reports
+three things, side by side and never one instead of another:
+
+- the **composed** triple — the point-wise product of the authored elasticities. Exact arithmetic,
+  hand-checkable, and un-attenuated.
+- the **attenuated** triple — the composed one scaled by the published depth schedule
+  (`twin/attenuation.yaml`, versioned and pinned in the artefact).
+- the **sampled** spread — PERT draws through the graph, so uncertainty compounds honestly instead
+  of being averaged away. A product of modes is not the mode of a product.
+
+Both the composed and the attenuated numbers stay in the output, because an attenuated figure whose
+un-attenuated form was never shown makes the attenuation unfalsifiable.
+
+Past depth 4 a path carries a **direction and no magnitude**. Not a small number — none, and no
+`composed`, `attenuated` or `sampled` key to put one in. The path is still named, graded and dated,
+because a direction a reader cannot locate in the graph is not a direction. A five-hop elasticity
+chain is not a number.
+
+The walk stops one depth past the schedule and reports at most 32 paths per component, ranked
+best-evidenced first and truncated second. Simple-path enumeration is exponential in branching
+factor: before the cap, a dense eleven-component graph produced a 331 MB artefact from 464 KB of
+YAML, and 97% of it was paths carrying no magnitude. Every kind of pruning — depth, path count,
+cycle — is disclosed in `traversal`, because an artefact that pruned silently is claiming a
+completeness it has not got.
+
+**Structural edges do not propagate.** A `needs` edge claims no mechanism, so nothing composes
+along it; that exposure is the blast radius and it stays unpriced. And several paths out of one
+shock are **reported separately and never summed** — they share ancestry, so aggregating them
+double-counts, and aggregation with explicit dependence is build ticket 21.
+
+`twin/calibration.md` is the authoring discipline a triple is *supposed* to come from: a 90%
+credible interval with a most-likely value, five steps required by name. Every artefact that
+samples pins it by digest, so a step that disappears from the document fails on read rather than
+lapsing quietly. **No triple in this repository has been through it** — nothing records an
+estimator, a date or a reference class against a triple, so the discipline is enforced as a
+document and not as an authoring workflow. That is why build ticket 23 is `partial`.
 
 ## Whose £
 
@@ -135,30 +205,59 @@ that grade. That is what stops a perspective declaring "reputation damage = £X"
 shadow price decision ticket 09 explicitly rejected. The gate lives at the source rather than in the
 output: a grade-5 valuation carrying an amount does not load.
 
+**And a second gate, derived rather than declared.** A well-graded valuation still enters the
+figure only when a causal path runs from the component to a cash flow that perspective declared,
+with every hop inside the published admission threshold. A perspective says **where its money is**;
+nobody says **what is priceable**. So the £ is only ever as wide as the causal layer can justify,
+and the answer to "why isn't morale in the £?" is never *"we decided it doesn't count"* but *"no
+evidenced causal path yet"* — a falsifiable claim somebody can go and fix. A refused impact comes
+back carrying the unpriced structural blast radius, because "connected and unpriceable" is the
+answer rather than a gap.
+
+The pocket org demonstrates both gates disagreeing on purpose. `identity-store` carries a grade-2
+valuation that the use-gate admits, and no causal edge leaves it, so nothing reaches the operator's
+declared cash flow and the figure stays out of the currency. Two different questions, two different
+answers, in one artefact.
+
+**The named limit.** A component the perspective declares *as* its cash flow is admitted with no
+path and no grade, because it is the ledger rather than a claim about the ledger — and that is the
+one route by which an author reaches the £ without evidence. Name `brand-goodwill` a cash flow and
+a reputational figure enters with nothing behind it. So every admitted figure carries
+`admitted_because`, and `exposure_by_basis` subtotals the declared and the derived halves
+separately: a figure resting on somebody's word and a figure resting on a graded path are never
+summed into one indistinguishable number. Constraining what may be *called* a cash flow is a
+modelling question this code does not answer, and `twin/admission.py` says so.
+
 The admitted figures are **declared valuations, not modelled prices**, and the artefact says so:
-nothing propagates yet, no severity is sampled, and the constraint pre-filter that must run before
-any pricing is build ticket 28. `prefilter.applied` is `false` in the output rather than implied.
+the causal layer composes in `twin propagate` and is not joined to the £ until build ticket 30, and
+no severity is sampled. `prefilter.applied` is `false` in an exposure rather than implied — there
+is no choice set there to filter, because these are valuations of components rather than candidate
+responses, and the pre-filter runs in `twin options`.
 
 ## The pocket org
 
-Five components, six edges, named elasticities, two perspectives, and a committed worksheet
-(`twin/pocket-org-worksheet.md`) with every number worked out **by hand** and the arithmetic shown.
-`twin worksheet --repo <pocket repo>` checks the emitted graph, blast radius and exposure against
-all forty lines.
+Five components, six edges, named elasticities, two perspectives, three candidate responses, and a
+committed worksheet (`twin/pocket-org-worksheet.md`) with every number worked out **by hand** and
+the arithmetic shown. `twin worksheet --repo <pocket repo>` checks the emitted graph, blast radius,
+exposure, propagation and priced option set against all fifty-four lines.
 
 This exists because a refusal test catches a reintroduced **absence** and nothing else. It is
 satisfied by a degenerate system: a PERT triple that is present but garbage, a score tagged with the
 wrong regime, an elasticity that stops being recalibrated three tickets later. All of those stay
 green under every refusal test, and all of them fail here.
 
-Thirty-four lines are computable today and match. Six carry their arithmetic already and name the
-build ticket that must make them computable — propagation at 20, price at 30. **A pending line whose
-build ticket has closed is a failure**, the same shape as an invariant still pending after its
-activating ticket. Every subsequent derivation-path ticket adds its own line: that contract is
-written into the worksheet, because a ticket that lands without a line here has no yardstick. Build
-tickets 18, 19 and 26 added eleven between them — the two evidence grades, the admissible-edge
-count, the blast radius from the shared database, and both perspectives' exposures with the spread
-attributed component by component.
+Fifty-one lines are computable today and match. Three carry their arithmetic already and name the
+build ticket that must make them computable — price at 30. **A pending line whose build ticket has
+closed is a failure**, the same shape as an invariant still pending after its activating ticket.
+Every subsequent derivation-path ticket adds its own line: that contract is written into the
+worksheet, because a ticket that lands without a line here has no yardstick. Build tickets 20, 23,
+28 and 29 added fourteen between them — the two PERT means, the attenuation factors and the
+attenuated triple at depth 2, the three option counts and the survivor's mean cost, and the three
+admission verdicts including the one that is refused.
+
+The un-attenuated propagation lines (24–26) stay in the table beside the attenuated ones (43–47)
+rather than being replaced by them, because both must be visible or the attenuation is
+unfalsifiable.
 
 The worksheet is `authored` and signed as such. Everywhere else in this system a hand-typed number is
 refused; this is the one place a human number is the authority, and the mark is what says so.
@@ -172,31 +271,39 @@ reaches `full`, and nothing can be typed as `full`.
 |---|---|---|---|
 | `domain-model` | 07 | partial | 1 / 7 |
 | `causal-layer` | 08 | partial | 1 / 5 |
-| `currency-regimes` | 09 | partial | 2 / 6 |
+| `currency-regimes` | 09 | partial | 3 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 1 / 8 |
 | `scenario-engine` | 13 | partial | 1 / 7 |
 
-**9 of 41**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**10 of 41**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capabilities here stand at two ticks, and four of the seven stand at one.
+there"** — the strongest capability here stands at three ticks, and five of the seven stand at one.
 `./bin/twin grade` prints the denominators.
 
-`currency-regimes` is new: it was added at build ticket 26, when the £ first had code to measure — a
-perspective that declares who pays, and a constraint set it may add to and may never override.
-Before that, a capability file with nothing behind it would have been a slot claiming a capability
-existed, which is the same reason `causal-layer` waited until build ticket 17.
+`currency-regimes` is the one that moved: build ticket 29 made the comparable-remainder boundary
+real, and it is ticked because the boundary is now **computed** — an impact enters the £ only
+through a graded causal path to a declared cash flow, and there is no field anywhere by which an
+author could declare something priceable.
 
-Two criteria were ticked this round and both survived. Several others were considered and left
-unticked, on the same ground five were withdrawn on in earlier rounds — each rested on **one clause
-of a multi-clause criterion**, or on machinery that does not exist:
+**One** criterion was ticked this round. Four build tickets landed and three of them tick nothing,
+which is the honest arithmetic rather than a disappointing one. Several criteria were considered
+and left unticked, on the same ground five were withdrawn on in earlier rounds — each rested on
+**one clause of a multi-clause criterion**, or on machinery that does not exist:
 
 - **decision ticket 08 AC 2** (intervention **and** counterfactual semantics, incl. structural-only
-  paths) — build ticket 19 delivered the structural-only half and neither of the other two, so
-  `causal-layer` gains nothing this round and stands at 1/5.
-- **decision ticket 09 ACs 3–6** — the comparable remainder, the incommensurables, the objective
-  function and the rival-model spread all need a pricing engine that is not here.
+  paths) — build ticket 20 delivered propagation and the structural-only refusal, and neither
+  `do()` semantics nor counterfactuals. Those are build tickets 22 and 35, so `causal-layer` gains
+  nothing this round and stands at 1/5.
+- **decision ticket 08 AC 4** (identification and confounding discipline) — shared ancestry is
+  named in the propagation artefact as *not* handled, and naming a gap is not closing it. Build
+  ticket 21.
+- **decision ticket 09 AC 4** (each named incommensurable, incl. where we refuse to price) — the
+  register entry now has two distinct reasons rather than one, but existential and tail risk are
+  build ticket 24 and the affected-parties register is 61, so "each" is not yet true.
+- **decision ticket 09 ACs 5–6** — the objective function and the rival-model spread need a
+  trade-off curve across the ensemble, which is build ticket 33.
 - **decision ticket 15** has **no capability file at all.** Build ticket 27 published the scope
   exclusions, the power-layer disclaimer, exit-cost asymmetry and the permanent covert-sensing
   exclusion — all from that ticket's *resolution*, none of them one of its five acceptance
@@ -219,22 +326,24 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 18 pass, 0 fail, 5 pending, 1 skipped and not faked. `pytest -q` — 357 tests
+`./bin/twin verify` — 20 pass, 0 fail, 3 pending, 1 skipped and not faked. `pytest -q` — 439 tests
 across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
 |---|---|
-| `store_rebuildable_from_git` | `ruin_class_absent_not_priced` (28) |
-| `identical_pins_identical_bytes` | `prefilter_precedes_pricing` (28) |
-| `every_artefact_marked` | `as_consumed_admits_no_post_T_fact` (36) |
-| `every_capability_depth_graded` | `price_levels_never_probabilities` (59) |
-| `world_never_references_overlay` | `standing_library_covers_committed_classes` (69) |
+| `store_rebuildable_from_git` | `as_consumed_admits_no_post_T_fact` (36) |
+| `identical_pins_identical_bytes` | `price_levels_never_probabilities` (59) |
+| `every_artefact_marked` | `standing_library_covers_committed_classes` (69) |
+| `every_capability_depth_graded` | |
+| `world_never_references_overlay` | |
 | `no_collapse_mechanism` | |
 | `no_recommended_action_field` | |
 | `derived_never_human_signed` (cryptographic) | |
 | `only_as_consumed_scores` | |
 | `no_special_category_slot` | |
 | `grade_5_only_path_never_prices` | |
+| `ruin_class_absent_not_priced` | |
+| `prefilter_precedes_pricing` | |
 
 **The constitution names sixteen invariants and the manifest may not grow a seventeenth without the
 constitution changing first.** So build tickets 13, 14 and 11 each *extended* an existing check rather
@@ -249,6 +358,23 @@ one that matters: a traversal emits no money, so a gate asserted only there woul
 where nothing could go wrong. It also asserts the **positive** leg as hard as the negative one: a
 fully-graded path is admitted. A gate that admits nothing passes every refusal test in the check
 while making the system useless, so "is it a gate or a wall" is asked explicitly.
+
+`ruin_class_absent_not_priced` and `prefilter_precedes_pricing` went live at build ticket 28, and
+both assert the positive leg as hard as the negative one. The first re-runs the pre-filter with the
+excluded option's cost driven to zero and to an absurd number and demands the same verdict, then
+checks that the ruin-class option **still survives** the perspective that declares no such
+boundary — a filter that removed everything would pass every refusal in the check while making the
+tool useless. The second asserts the ordering out of two structural locks rather than a convention:
+no free pricing function exists in the module, and a hand-built `Admitted` set is refused. Those
+locks are locks and not proofs — Python has no private constructor, so somebody reaching for the
+module's underscore-prefixed sentinel can still build one by hand. They stop the innocent refactor
+and the accidental reordering, and they make a deliberate bypass something an author has to write
+down. The ceiling is named in `twin/options.py` rather than implied.
+
+The first lock is asserted as an **allow-list** on the module's public surface, not as a screen for
+price-shaped names. A free function that prices an unfiltered option reopens the ordering whatever
+it is called, and a keyword match on `price`, `cost` and `value` would wave through one named
+`tally`. So the check names the three functions the module may export and fails on a fourth.
 
 Two guards were added to the **harness** instead, because each guards a yardstick rather than the
 system: `worksheet_matches_the_pocket_org` (the hand-computed numbers still hold) and
@@ -286,21 +412,44 @@ verbatim. An artefact is exactly as sensitive as the model repository it came fr
 
 Named here so the skeleton cannot quietly become the definition of done.
 
-- **Nothing propagates.** Causal edges now carry sign, lag and a calibrated elasticity, and are
-  validated on write — but no Monte-Carlo reads them, there is no depth attenuation, no shared-
-  ancestry handling and no intervention-versus-observation distinction. (Build tickets 20–22.)
-- **No £ engine.** No FAIR engine, no PERT sampling, no TVaR, no trade-off curve. `twin exposure`
-  reports what each perspective *declared* a component is worth, which is not a modelled price and
-  says so in `basis`. The pocket-org worksheet already carries the price line, hand-computed, as
-  the yardstick those tickets must match. (23–25, 29–33.)
-- **Nothing enforces the constraint set.** It is published, versioned and signed, and the
-  pre-filter that removes a ruin-class or forbidden option from a choice set *before* pricing is
-  build ticket 28. `ruin_class_absent_not_priced` and `prefilter_precedes_pricing` stay pending,
-  and every exposure artefact records `prefilter.applied: false` rather than implying otherwise.
-- **The use-gate decides admission, not magnitude.** A path is admitted to pricing or reported as
-  an unpriced blast radius, and a valuation is admitted or held in the register — but no path is
-  ever *priced*, because there is no pricing engine. The blast-radius body is closed with no price
-  slot and a register entry carries no figure, so both stay true by construction. (30.)
+- **Propagation ignores shared ancestry.** Several paths out of one shock are reported separately
+  and never summed, because summing them would double-count — but nothing aggregates them with
+  explicit dependence either, so a reader with two paths to one component has two numbers and no
+  supported way to combine them. The artefact says so in `traversal.paths_are_not_aggregated`
+  rather than implying an answer. (Build ticket 21.)
+- **No intervention-versus-observation distinction.** `twin propagate` composes influence along
+  causal edges; nothing distinguishes `do(x)` from observing x, so upstream beliefs are untouched
+  in both cases and only one of those is correct. (22.)
+- **Propagation is not joined to the £.** The engine composes elasticities and the currency
+  reports declared valuations, and no code path multiplies a severity by a propagated influence.
+  The pocket-org worksheet carries the three price lines hand-computed as the yardstick build
+  ticket 30 must match, and they are the only pending lines left.
+- **No heavy tails, no TVaR, no empirical severity anchor, no trade-off curve.** PERT sampling
+  exists and everything above it does not. (24, 25, 31–33.)
+- **No triple in this repository has been through the calibration procedure.** `twin/calibration.md`
+  is documented, required by name on read, and pinned by digest into every artefact that samples —
+  but the elasticities and costs in the fixtures are invented numbers exercising the shape. The
+  discipline is enforced as a document, not as an authoring workflow, and nothing checks that a
+  human followed it.
+- **The use-gate and the admission gate decide admission, not magnitude.** A path is admitted to
+  pricing or reported as an unpriced blast radius; a valuation is admitted, held for its grade, or
+  held for having no path to cash flow — but no path is ever *priced*, because there is no pricing
+  engine. The blast-radius body is closed with no price slot and a register entry carries no
+  figure, so both stay true by construction. (30.)
+- **The pre-filter reads an authored `crosses` list.** An option declares which red line it
+  crosses; nothing infers it. The constraint **set** is the authority on what exists — an id no
+  perspective and no floor declares refuses to load — but an option that quietly omits the
+  constraint it really crosses survives, and no code can currently tell. The *magnitude* leg is
+  airtight, because a cost is not an input to the decision; the *identification* leg is
+  self-reported. The artefact says so in `prefilter.known_limit` rather than implying otherwise.
+- **A perspective can reach the £ by naming a cash flow.** Admission is derived for everything
+  else, but a component named as the ledger itself needs no path and no grade. `admitted_because`
+  and `exposure_by_basis` make the two halves separable in every artefact; nothing constrains what
+  may be called a cash flow.
+- **The Monte-Carlo is reproducible within one interpreter version, not across all of them.** The
+  Beta variate is the standard library's, so a different Python may draw a different stream from
+  the same seed. The composed and attenuated triples are exact arithmetic and are unaffected. The
+  artefact states the condition in `sampler.reproducible_within` rather than claiming more.
 - **The evidence-grade history check runs at `twin validate`, not at load.** It costs a git process
   per commit per graded file, so `graph`, `blast` and `exposure` will emit from a repository whose
   grade moved unrecorded. `twin validate` is the gate an author or CI runs, and it exits non-zero;
@@ -348,9 +497,10 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Cross-machine verification has never run.** The `reproduce-elsewhere` CI job emits a score card
   on x86_64 Linux and recomputes it on arm64 macOS. Declared and wired; unproven. This and the
   two-architecture leg are the two acceptance criteria left unticked across tickets 01–12.
-- **Two named entity types are missing.** Decision ticket 07 names `Asset`/`DataAsset` and
-  `Response`/`Control` in the core ontology; neither has a schema, which is why domain-model's
-  first criterion stays unticked.
+- **One named entity type is still missing.** Decision ticket 07 names `Asset`/`DataAsset` and
+  `Response`/`Control` in the core ontology. Build ticket 28 gave `Response` a schema — id, name,
+  the component it addresses, a cost triple and the red lines it crosses — and `Asset` has none,
+  which is why domain-model's first criterion stays unticked.
 - **The Wardley positions are authored, and nothing judges them.** `evolution` and
   `evolution_position` are whatever the model repository says. Which position a component actually
   holds is a judgement, and the judge — with human override and pushback — is build ticket 44.
@@ -365,11 +515,17 @@ Named here so the skeleton cannot quietly become the definition of done.
 ```
 twin/
   cli.py          seam 1 — the artefact CLI, the primary boundary
-  verbs.py        sense / run / score / graph / blast / exposure
+  verbs.py        sense / run / score / graph / blast / propagate / options / exposure
   schema.py       the closed typed schema; Article 9 has no slot because there is no slot
   blast.py        the reverse-dependency traversal, and the closed body with no price slot
+  propagate.py    Monte-Carlo along causal edges, and the depth schedule that stops it
+  attenuation.yaml          the versioned depth factors, and where a number stops existing
+  pert.py         calibrated triples, their analytic moments, and seeded sampling
+  calibration.md  the authoring discipline behind a triple — pinned by every artefact that samples
+  options.py      the constraint pre-filter, and the only door to pricing behind it
+  admission.py    the £ boundary, derived from a graded causal path to a declared cash flow
   evidence.py     the evidence ladder, the use-gate, and the regrade record
-  evidence-ladder.yaml      five typed grades and the published pricing threshold
+  evidence-ladder.yaml      five typed grades, the pricing gate and the admission threshold
   constraints.py  the universal floor, the scope exclusions, the stated positions
   constraints.yaml          the constraint set itself — authored, versioned, signed on publish
   scoring.py      Brier and log loss, and the declared quantisation

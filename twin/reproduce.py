@@ -32,7 +32,7 @@ from .canon import sha256_hex
 from .grades import Capabilities
 from .repo import ModelRepo, RepoError
 
-VERBS = ("sense", "run", "score", "graph")
+VERBS = ("sense", "run", "score", "graph", "propagate", "options")
 
 
 class ReproduceError(RuntimeError):
@@ -110,6 +110,10 @@ def replay(worktree: str | Path, caps: Capabilities, doc: dict[str, Any]) -> tup
         return verbs.run(repo, caps, org, _need(flags, "scenario", command), command, at=flags.get("at")), []
     if verb == "graph":
         return verbs.graph(repo, caps, org, command), []
+    if verb == "propagate":
+        return verbs.propagate(repo, caps, org, _need(flags, "origin", command), command), []
+    if verb == "options":
+        return verbs.options(repo, caps, org, _need(flags, "perspective", command), command), []
 
     subject = doc["body"]["subject"]
     bundle, chain = replay(

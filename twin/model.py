@@ -34,7 +34,7 @@ BEHAVIOURAL = "behavioural"
 WORLD_COLLECTIONS = ("components", "propositions", "world_models")
 OVERLAY_COLLECTIONS = (
     "components", "world_models", "signals", "claims", "scenarios", "outcomes", "people", "edges",
-    "perspectives", "regrades",
+    "perspectives", "regrades", "responses",
 )
 
 
@@ -116,6 +116,7 @@ class Overlay:
     edges: dict[str, dict[str, Any]]
     perspectives: dict[str, dict[str, Any]]
     regrades: dict[str, dict[str, Any]]
+    responses: dict[str, dict[str, Any]]
 
     @classmethod
     def load(cls, repo: ModelRepo, org: str) -> "Overlay":
@@ -195,6 +196,64 @@ class Overlay:
                         f"perspective {ident!r} values {component_id!r}, which is not a component "
                         "in this overlay or its pinned world layer"
                     ) from None
+            for component_id in perspective.get("cash_flow", []) or []:
+                try:
+                    self.component(str(component_id))
+                except ModelError:
+                    raise ModelError(
+                        f"perspective {ident!r} names {component_id!r} as a cash flow, and it is "
+                        "not a component in this overlay or its pinned world layer"
+                    ) from None
+        self._check_scenarios()
+        self._check_responses()
+
+    def _check_scenarios(self) -> None:
+        """A scenario names components that exist.
+
+        Checked here rather than only where it bites: `twin validate` used to pass a repository
+        that `twin exposure` then refused, because the scenario's components were never resolved
+        and admission is the first thing that needs them to exist.
+        """
+        for ident, scenario in sorted(self.scenarios.items()):
+            for component_id in scenario.get("components", []) or []:
+                try:
+                    self.component(str(component_id))
+                except ModelError:
+                    raise ModelError(
+                        f"scenario {ident!r} names component {component_id!r}, which is not a "
+                        "component in this overlay or its pinned world layer"
+                    ) from None
+
+    def _check_responses(self) -> None:
+        """A response addresses a real component and crosses a constraint somebody declared.
+
+        The second half is what keeps the pre-filter honest. A `crosses` id that matches nothing
+        would silently never filter, so an option could name a red line that does not exist and
+        survive every perspective — which is the same failure as having no constraint at all.
+        """
+        from . import constraints
+
+        declarable = constraints.floor_ids() | {
+            str(i)
+            for perspective in self.perspectives.values()
+            for field in ("ruin", "forbidden")
+            for i in (perspective.get(field) or {})
+        }
+        for ident, response in sorted(self.responses.items()):
+            try:
+                self.component(str(response["addresses"]))
+            except ModelError:
+                raise ModelError(
+                    f"response {ident!r} addresses {response['addresses']!r}, which is not a "
+                    "component in this overlay or its pinned world layer"
+                ) from None
+            unknown = sorted({str(c) for c in (response.get("crosses") or {})} - declarable)
+            if unknown:
+                raise ModelError(
+                    f"response {ident!r} says it crosses {', '.join(unknown)}, which no universal "
+                    "constraint and no perspective in this overlay declares. A red line nobody "
+                    "declared filters nothing, so this option would survive every pre-filter."
+                )
 
     def _check_regrades(self) -> None:
         """A grade is immutable without a regrade record, and the record has to add up.

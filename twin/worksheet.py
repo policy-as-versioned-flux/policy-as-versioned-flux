@@ -42,11 +42,23 @@ _GRADE = re.compile(r"^evidence_grade\.(?P<edge>[a-z0-9-]+)$")
 _BLAST = re.compile(r"^blast\.(?P<origin>[a-z0-9-]+)\.(?P<what>reached|admitted_to_pricing|unpriced)$")
 _EXPOSURE = re.compile(r"^exposure\.declared\.(?P<perspective>[a-z0-9-]+)$")
 _SPREAD = re.compile(r"^exposure\.spread(\.(?P<component>[a-z0-9-]+))?$")
+_PERT = re.compile(r"^pert\.(?P<edge>[a-z0-9-]+)\.mean$")
+_ATTENUATION = re.compile(r"^propagation\.attenuation\.(?P<component>[a-z0-9-]+)$")
+_ATTENUATED = re.compile(
+    r"^propagation\.attenuated\.(?P<component>[a-z0-9-]+)\.(?P<point>min|mode|max)$"
+)
+_COMPOSED = re.compile(r"^propagation\.(?P<component>[a-z0-9-]+)\.(?P<point>min|mode|max)$")
+_OPTIONS = re.compile(
+    r"^options\.(?P<perspective>[a-z0-9-]+)\.(?P<what>considered|removed|priced)$"
+)
+_OPTION_PRICE = re.compile(r"^option_price\.(?P<option>[a-z0-9-]+)\.mean$")
+_ADMISSION = re.compile(r"^admission\.(?P<perspective>[a-z0-9-]+)\.(?P<component>[a-z0-9-]+)$")
 
 # Which emitted artefact each family of keys is resolved against. One worksheet, several
 # artefacts: the graph stopped being the only place a hand-computable number lands at build
 # ticket 19.
 GRAPH, BLAST, EXPOSURE = "graph", "blast", "exposure"
+PROPAGATION, OPTIONS = "propagation", "options"
 
 
 class WorksheetError(RuntimeError):
@@ -139,6 +151,55 @@ def resolve(key: str, bodies: dict[str, dict[str, Any]]) -> float | None:
              "unpriced": len(unpriced)}[radius.group("what")]
         )
 
+    moments = _PERT.match(key)
+    if moments:
+        for entry in bodies.get(PROPAGATION, {}).get("elasticities", []):
+            if entry["edge"] == moments.group("edge"):
+                return float(entry["mean"])
+        return None
+
+    for pattern, field in ((_ATTENUATED, "attenuated"), (_COMPOSED, "composed")):
+        match = pattern.match(key)
+        if match:
+            path = _primary_path(bodies, match.group("component"))
+            return None if path is None or field not in path else float(path[field][match.group("point")])
+
+    attenuation = _ATTENUATION.match(key)
+    if attenuation:
+        path = _primary_path(bodies, attenuation.group("component"))
+        return None if path is None else _maybe(path.get("attenuation"))
+
+    counted = _OPTIONS.match(key)
+    if counted:
+        body = bodies.get(OPTIONS, {})
+        if body.get("perspective") != counted.group("perspective"):
+            return None
+        what = counted.group("what")
+        # `priced` reads the priced list rather than the pre-filter's `admitted`, so a survivor
+        # that somehow failed to be costed shows up as a difference instead of being counted twice.
+        if what == "priced":
+            return float(len(body["priced"]))
+        return float(len(body["prefilter"][what]))
+
+    costed = _OPTION_PRICE.match(key)
+    if costed:
+        for entry in bodies.get(OPTIONS, {}).get("priced", []):
+            if entry["option"] == costed.group("option"):
+                return float(entry["cost"]["mean"])
+        return None
+
+    admitted = _ADMISSION.match(key)
+    if admitted:
+        for entry in bodies.get(EXPOSURE, {}).get("perspectives", []):
+            if entry["id"] != admitted.group("perspective"):
+                continue
+            for verdict in entry.get("admission", []):
+                if verdict["component"] == admitted.group("component"):
+                    # 1 and 0 rather than true and false: the worksheet compares numbers, and an
+                    # admission is a yes or a no with nothing in between.
+                    return 1.0 if verdict["admitted"] else 0.0
+        return None
+
     declared = _EXPOSURE.match(key)
     if declared:
         figures = bodies.get(EXPOSURE, {}).get("declared_exposure", {})
@@ -185,14 +246,29 @@ def resolve(key: str, bodies: dict[str, dict[str, Any]]) -> float | None:
     return None
 
 
+def _primary_path(bodies: dict[str, dict[str, Any]], component: str) -> dict[str, Any] | None:
+    """The ranked-first path to a component in the emitted propagation, if there is one."""
+    for reached in bodies.get(PROPAGATION, {}).get("reached", []):
+        if reached["component"] != component:
+            continue
+        return next((p for p in reached["paths"] if p["primary"]), None)
+    return None
+
+
+def _maybe(value: Any) -> float | None:
+    return None if value is None else float(value)
+
+
 # Which pocket-org artefacts the worksheet is checked against, and the arguments that produce
-# them. Named here so the CLI and the suite check the same three things rather than drifting.
+# them. Named here so the CLI and the suite check the same things rather than drifting.
 BLAST_ORIGIN = "shared-database"
+PROPAGATION_ORIGIN = "shared-database"
 SCENARIO = "portal-availability-2026"
+PERSPECTIVE = "the-operator"
 
 
 def bodies_for(repo: Any, caps: Any) -> dict[str, dict[str, Any]]:
-    """Emit the pocket org's graph, blast radius and exposure, and return their bodies."""
+    """Emit every pocket-org artefact the worksheet is checked against, and return their bodies."""
     import json
 
     from . import verbs
@@ -205,6 +281,13 @@ def bodies_for(repo: Any, caps: Any) -> dict[str, dict[str, Any]]:
         ),
         EXPOSURE: verbs.exposure(
             repo, caps, org, SCENARIO, None, verbs.command_for("exposure", org=org, scenario=SCENARIO)
+        ),
+        PROPAGATION: verbs.propagate(
+            repo, caps, org, PROPAGATION_ORIGIN,
+            verbs.command_for("propagate", org=org, origin=PROPAGATION_ORIGIN),
+        ),
+        OPTIONS: verbs.options(
+            repo, caps, org, PERSPECTIVE, verbs.command_for("options", org=org, perspective=PERSPECTIVE)
         ),
     }
     return {name: json.loads(art.to_bytes())["body"] for name, art in emitted.items()}

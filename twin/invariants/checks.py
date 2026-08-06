@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Any
 from .. import REPO_DIR
 from .. import artefact as artefact_mod
 from .. import attest, fixtures, index, sign, verbs
+from .. import constraints as constraints_mod
 from ..artefact import AUTHORED, DERIVED, Artefact, ArtefactError
 from ..canon import canonical_json, sha256_hex, walk_keys
 from ..grades import Capabilities, GradeError
@@ -49,6 +50,16 @@ OUTCOME = "dvd-decline-2011-resolved"
 # assertion — so the fixture exercises the gate in both directions rather than one.
 BLAST_ORIGIN = "content-delivery-network"
 GRADE_5_ONLY = "brand-goodwill"
+# The propagation subject (build ticket 20). Same origin as the blast radius on purpose: the two
+# artefacts then describe the same shock, and the difference between what composes and what is
+# merely downstream is readable by putting them side by side.
+PROPAGATE_ORIGIN = "content-delivery-network"
+# The choice set and its two removals (build ticket 28). One crosses the universal floor and one
+# crosses this perspective's own ruin boundary, so both tiers are exercised.
+PERSPECTIVE = "the-operator"
+OTHER_PERSPECTIVE = "the-staff-council"
+RUIN_CLASS_OPTION = "stake-the-quarter-on-one-title"
+FLOOR_OPTION = "instrument-viewers-without-telling-them"
 
 
 # -- shared subjects -----------------------------------------------------------------------
@@ -95,6 +106,18 @@ def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefac
     )
     exposed_path = exposed.write(out_dir / "scenario-exposure.json")
 
+    moved = verbs.propagate(
+        repo, ctx.caps, NETFLIX, PROPAGATE_ORIGIN,
+        verbs.command_for("propagate", org=NETFLIX, origin=PROPAGATE_ORIGIN),
+    )
+    moved_path = moved.write(out_dir / "propagation.json")
+
+    choices = verbs.options(
+        repo, ctx.caps, NETFLIX, PERSPECTIVE,
+        verbs.command_for("options", org=NETFLIX, perspective=PERSPECTIVE),
+    )
+    choices_path = choices.write(out_dir / "priced-option-set.json")
+
     return {
         bound.kind: (bound, bound_path),
         bundle.kind: (bundle, bundle_path),
@@ -102,6 +125,8 @@ def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefac
         graph.kind: (graph, graph_path),
         radius.kind: (radius, radius_path),
         exposed.kind: (exposed, exposed_path),
+        moved.kind: (moved, moved_path),
+        choices.kind: (choices, choices_path),
     }
 
 
@@ -297,6 +322,7 @@ def _every_capability_depth_graded(ctx: "Context") -> str:
     used = sorted(
         set(verbs.CAPS_SENSE) | set(verbs.CAPS_RUN) | set(verbs.CAPS_SCORE)
         | set(verbs.CAPS_GRAPH) | set(verbs.CAPS_BLAST) | set(verbs.CAPS_EXPOSURE)
+        | set(verbs.CAPS_PROPAGATE) | set(verbs.CAPS_OPTIONS)
     )
     for name in used:
         ctx.caps.require(name)
@@ -769,6 +795,188 @@ def _grade_5_only_path_never_prices(ctx: "Context") -> str:
         f"{GRADE_5_ONLY} unpriced at grade 5; every perspective registers it without a figure and "
         "the schema refuses one; the blast body is closed with no price slot; the threshold is "
         "pinned in the artefact and moving it moves the digest"
+    )
+
+
+@invariant("ruin_class_absent_not_priced")
+def _ruin_class_absent_not_priced(ctx: "Context") -> str:
+    """An excluded option is absent from the choice set, never present with a large number.
+
+    A very large penalty still asserts that a price exists, and with enough upside an optimiser
+    finds it. So this is checked where a number would appear: the option is not in `priced`, its
+    removal record carries no figure at any depth, and no magnitude brings it back.
+
+    The magnitude leg is the one that matters. Both fixture options are costed at almost nothing,
+    so a filter that secretly read a cost would let the cheap ones through; the check then re-runs
+    the pre-filter with the cost driven to zero and to an absurd number and demands the same
+    verdict, because the cost is not an input to the decision at all.
+
+    The positive leg matters as much. A pre-filter that removed everything would pass every
+    refusal here while making the tool useless, and ruin is perspective-relative — so an option
+    removed under one eye must still survive under another that declares a different boundary.
+    """
+    from .. import options as options_mod
+    from ..model import Overlay
+
+    body = json.loads(emit_all(ctx)[verbs.KIND_PRICED_OPTIONS][1].read_bytes())["body"]
+    priced = {entry["option"] for entry in body["priced"]}
+    removed = {entry["option"]: entry for entry in body["prefilter"]["removed"]}
+
+    if not priced:
+        raise Violated("the fixture prices nothing, so this check cannot tell a filter from a wall")
+    for name in (RUIN_CLASS_OPTION, FLOOR_OPTION):
+        if name not in removed:
+            raise Violated(
+                f"{name!r} is no longer removed by the pre-filter — this invariant has lost the "
+                "subject that proves an excluded option never reaches a number"
+            )
+        if name in priced:
+            raise Violated(f"{name!r} was excluded and priced anyway")
+    if removed[RUIN_CLASS_OPTION]["class"] != constraints_mod.RUIN:
+        raise Violated(f"{RUIN_CLASS_OPTION!r} is removed as {removed[RUIN_CLASS_OPTION]['class']!r}, not ruin")
+    if removed[FLOOR_OPTION]["tier"] != "universal":
+        raise Violated(f"{FLOOR_OPTION!r} is not removed by the universal floor")
+
+    for name, record in sorted(removed.items()):
+        numbers = [f"{k}={v}" for k, v in _pairs(record) if isinstance(v, (int, float)) and not isinstance(v, bool)]
+        if numbers:
+            raise Violated(f"the removal record for {name} carries {', '.join(numbers)}")
+
+    # No magnitude brings it back. The pre-filter never reads a cost, so driving one to zero and
+    # one to an absurd number must change nothing.
+    repo = ModelRepo.open(ctx.repo_dir)
+    overlay = Overlay.load(repo, NETFLIX)
+    perspective = overlay.perspectives[PERSPECTIVE]
+    for cost in ({"min": 0, "mode": 0, "max": 0}, {"min": 1e12, "mode": 1e15, "max": 1e18}):
+        nudged = {
+            ident: ({**doc, "cost": cost} if ident == RUIN_CLASS_OPTION else doc)
+            for ident, doc in overlay.responses.items()
+        }
+        again = options_mod.prefilter(perspective, nudged).priced()
+        if RUIN_CLASS_OPTION in {e["option"] for e in again["priced"]}:
+            raise Violated(f"{RUIN_CLASS_OPTION!r} reappeared in the priced set at cost {cost}")
+
+    # The gate is a gate. Ruin is perspective-relative, so the same option survives under an eye
+    # that declares a different boundary — and that is correct modelling, not a leak.
+    other = options_mod.prefilter(overlay.perspectives[OTHER_PERSPECTIVE], overlay.responses).priced()
+    if RUIN_CLASS_OPTION not in {e["option"] for e in other["priced"]}:
+        raise Violated(
+            f"{RUIN_CLASS_OPTION!r} is removed under {OTHER_PERSPECTIVE!r} too, which declares no "
+            "such boundary — the pre-filter is holding a list of its own rather than reading the "
+            "constraint set each perspective resolves"
+        )
+    if FLOOR_OPTION in {e["option"] for e in other["priced"]}:
+        raise Violated(f"{FLOOR_OPTION!r} survived a perspective; the universal floor is negotiable")
+
+    # And the body is closed, so an excluded option has nowhere to put a number even if somebody
+    # later wanted one there.
+    stray = sorted(_keys(body) - options_mod.BODY_KEYS)
+    if stray:
+        raise Violated(f"an emitted priced option set carries undeclared field(s) {', '.join(stray)}")
+    try:
+        options_mod.refuse_priced_removals(
+            {**body, "prefilter": {**body["prefilter"],
+                                   "removed": [{**removed[RUIN_CLASS_OPTION], "cost": 1}]}}
+        )
+    except ArtefactError:
+        pass
+    else:
+        raise Violated("a planted cost on a removal record serialised rather than being refused")
+    return (
+        f"{len(removed)} options removed before pricing at both tiers, carrying no figure; neither "
+        f"a zero nor an absurd cost brings one back; {len(priced)} priced, and the ruin-class one "
+        "still survives the perspective that declares no such boundary"
+    )
+
+
+@invariant("prefilter_precedes_pricing")
+def _prefilter_precedes_pricing(ctx: "Context") -> str:
+    """The pre-filter runs before pricing, asserted structurally rather than by ordering.
+
+    An ordering convention is a comment: it holds until somebody calls the functions the other way
+    round. So the property is built out of two locks and this check asserts both of them.
+
+    First, pricing is a **method on the pre-filter's product**. There is no free function in
+    `twin/options.py` that takes an option and returns a number, so there is nothing to call in
+    the wrong order.
+
+    Second, that product refuses to be built any other way. Without this the first lock would be
+    bypassed by constructing the object directly and pricing whatever you liked.
+    """
+    import inspect as inspect_mod
+
+    from .. import options as options_mod
+    from ..constraints import ConstraintError
+    from ..model import Overlay
+
+    # An allow-list, not a name filter. A free function that prices an unfiltered option would
+    # reopen the ordering whatever it was called, and `tally` or `summarise` gives away nothing —
+    # so the assertion is that the module's public surface is exactly these three, and anything
+    # new forces a deliberate decision rather than slipping past a keyword match.
+    #
+    # Only what this module defines: an imported helper is somebody else's surface.
+    ALLOWED = {"prefilter", "refuse_undeclared_keys", "refuse_priced_removals"}
+    public = {
+        name
+        for name, value in vars(options_mod).items()
+        if not name.startswith("_") and inspect_mod.isfunction(value)
+        and getattr(value, "__module__", "") == options_mod.__name__
+    }
+    if public != ALLOWED:
+        raise Violated(
+            f"twin/options.py exposes {', '.join(sorted(public)) or 'nothing'} at module level; "
+            f"this invariant admits exactly {', '.join(sorted(ALLOWED))}. Pricing is a method on "
+            "the pre-filter's product precisely so that no callable can be handed unfiltered "
+            "options, and a new free function is how that gets reopened. Adding one needs an "
+            "authorising decision ticket."
+        )
+    if not callable(getattr(options_mod.Admitted, "priced", None)):
+        raise Violated("Admitted no longer carries the pricing method, so the seam has moved")
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    overlay = Overlay.load(repo, NETFLIX)
+    perspective = overlay.perspectives[PERSPECTIVE]
+
+    try:
+        options_mod.Admitted(
+            perspective=PERSPECTIVE, options=(), removed=(), considered=(), constraint_set={}
+        )
+    except ConstraintError:
+        pass
+    else:
+        raise Violated(
+            "an Admitted set was constructed without the pre-filter, so anything at all could be "
+            "priced and `prefilter_precedes_pricing` would be an ordering convention"
+        )
+
+    admitted = options_mod.prefilter(perspective, overlay.responses)
+    body = admitted.priced()
+    if not body["prefilter"]["ran_before_pricing"]:
+        raise Violated("the emitted choice set does not record that the pre-filter ran first")
+    considered, survived = set(body["prefilter"]["considered"]), set(body["prefilter"]["admitted"])
+    excluded = {entry["option"] for entry in body["prefilter"]["removed"]}
+    if not survived <= considered or not excluded <= considered:
+        raise Violated("the choice set prices or removes an option nobody considered")
+    if survived & excluded:
+        raise Violated(f"{', '.join(sorted(survived & excluded))} is both removed and admitted")
+    if {e["option"] for e in body["priced"]} != survived:
+        raise Violated("the priced list and the pre-filter's survivors disagree")
+
+    # The pre-filter reads the published constraint set and holds no list of its own: the ids it
+    # filtered on are exactly the ids the resolved set publishes.
+    in_force = {str(c["id"]) for c in body["prefilter"]["constraint_set"]["constraints"]}
+    filtered_on = {entry["constraint"] for entry in body["prefilter"]["removed"]}
+    if not filtered_on <= in_force:
+        raise Violated(
+            f"the pre-filter removed options on {', '.join(sorted(filtered_on - in_force))}, which "
+            "the published constraint set does not contain"
+        )
+    if not constraints_mod.floor_ids() <= in_force:
+        raise Violated("the resolved constraint set does not contain the whole universal floor")
+    return (
+        f"pricing is a method on the pre-filter's product and no free pricing function exists; a "
+        f"hand-built Admitted set is refused; {len(considered)} options considered, {len(excluded)} "
+        f"removed on published constraints and {len(survived)} priced"
     )
 
 

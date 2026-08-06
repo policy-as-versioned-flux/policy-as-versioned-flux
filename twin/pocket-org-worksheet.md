@@ -12,8 +12,9 @@ recalibrated three tickets later — all of those keep every refusal test green.
 what they fail against.
 
 `twin worksheet --repo <a pocket-org repository>` checks the emitted artefacts against every line
-below — the **graph**, the **blast radius** from `shared-database`, and the **exposure** of
-scenario `portal-availability-2026` under both declared perspectives. Values are compared at
+below — the **graph**, the **blast radius** from `shared-database`, the **exposure** of scenario
+`portal-availability-2026` under both declared perspectives, the **propagation** of a shock at
+`shared-database`, and the **priced option set** under the operator. Values are compared at
 **6 decimal places**, declared here rather than hidden inside the comparison, because the expected
 column is decimal and the computed one is binary floating point.
 
@@ -76,9 +77,44 @@ depth attenuation:
 - depth 1, at order-service: the edge triple itself, `[0.3, 0.5, 0.7]`
 - depth 2, at customer-portal: `[0.3 x 0.4, 0.5 x 0.4, 0.7 x 0.4] = [0.12, 0.20, 0.28]`
 
-Build ticket 20 introduces depth attenuation, and when it does it must **add its own lines**
-here rather than change these: these are the un-attenuated numbers, and both must be visible or
-the attenuation is unfalsifiable.
+Build ticket 20 introduced depth attenuation, and it **added its own lines** below rather than
+changing these: these are the un-attenuated numbers, and both must be visible or the attenuation
+is unfalsifiable.
+
+**The attenuated influence**, from the published schedule: factor `1.0` at depth 1 and `0.8` at
+depth 2. Both the composed and the attenuated numbers stay in the table, which is what makes the
+attenuation falsifiable rather than merely applied.
+
+- depth 1, at order-service: `[0.3, 0.5, 0.7] x 1.0 = [0.3, 0.5, 0.7]` — one hop is the authored
+  claim itself and nothing has compounded yet
+- depth 2, at customer-portal: `[0.12, 0.20, 0.28] x 0.8 = [0.096, 0.16, 0.224]`
+
+**The PERT means** of the two authored elasticities, `(min + 4 x mode + max) / 6`:
+
+- `database-slows-orders`: `(0.3 + 4 x 0.5 + 0.7) / 6 = 3.0 / 6 = 0.5`
+- `orders-slow-the-portal`: `(0.4 + 4 x 0.4 + 0.4) / 6 = 2.4 / 6 = 0.4` — degenerate, so the mean
+  is the point
+
+**The choice set**, under the operator, after the constraint pre-filter runs. Three responses are
+authored; two cross a red line in force for this perspective and are removed **before** anything
+is priced, so neither carries a figure anywhere:
+
+- `add-a-read-replica` crosses nothing and is priced. Its mean cost is
+  `(10000 + 4 x 25000 + 70000) / 6 = 180000 / 6 = 30000`
+- `watch-the-team-quietly` crosses `no-covert-sensing`, which is on the universal floor
+- `bet-the-org-on-one-supplier` crosses `insolvency`, which the operator declares as ruin-class
+- both removed options cost almost nothing, which is the point: the pre-filter never reads a cost,
+  so no magnitude can bring either back
+
+**Admission to the £**, under the operator, whose only declared cash flow is `customer-portal`.
+The boundary is derived from the graph, so no author can mark an impact priceable:
+
+- `customer-portal` is itself the declared cash flow, so it needs no path
+- `order-service` reaches it along `orders-slow-the-portal`, whose grade is 2 and therefore inside
+  the published admission threshold
+- `identity-store` has no causal edge leaving it at all, so nothing reaches the cash flow and the
+  impact is refused — and it is refused **while carrying a grade-2 valuation**, which is what
+  makes the use-gate and the admission gate visibly two different questions
 
 **Expected price** of a total `customer-portal` outage, at the mode of that propagation:
 
@@ -88,7 +124,9 @@ the attenuation is unfalsifiable.
 - expected loss across the range: `1000000 x [0.12, 0.28] = [120000, 280000]`
 
 The constraint pre-filter (build ticket 28) runs **before** any of this, so none of these figures
-is ever comparable against a red line. That ordering gets its own line when it lands.
+is ever comparable against a red line. It has landed, and its lines are the three option counts
+(48-50): the ordering itself is not a number, so what the table can check is that the counts add
+up and that nothing removed carries a figure.
 
 **The use-gate**, by evidence grade. The published threshold is 2, so only an edge at grade 1 or 2
 may carry a price:
@@ -107,18 +145,22 @@ may carry a price:
 - three components reached, and **nothing** admitted to pricing: every path out of the database
   crosses the grade-3 edge, so the honest answer here is an unpriced structural blast radius
 
-**The exposure** of scenario `portal-availability-2026`, whose components are `customer-portal`
-and `order-service`, under each declared perspective:
+**The exposure** of scenario `portal-availability-2026`, whose components are `customer-portal`,
+`order-service` and `identity-store`, under each declared perspective. The operator values all
+three; the third is refused by the admission gate below and so never reaches the sum:
 
-- the operator: `400000 + 250000 = 650000`
-- the staff council: `50000 + 120000 = 170000`
+- the operator: `400000 + 250000 = 650000`, and **not** the `90000` on `identity-store`
+- the staff council: `50000 + 120000 = 170000`, and it never valued `identity-store` at all
 - the spread between the two eyes: `650000 - 170000 = 480000`
 - attributable to `customer-portal`: `400000 - 50000 = 350000`
 - attributable to `order-service`: `250000 - 120000 = 130000`
+- attributable to `identity-store`: nothing, from either eye — `null`, never zero, because zero
+  would say "worth nothing to them" and that is a different claim
 
-These are **declared valuations**, not modelled prices: nothing propagates yet and no severity is
-sampled, so the figures are what each perspective says a component is worth to it. The spread is
-the point — no single number is the organisation's number, because there is no such thing.
+These are **declared valuations**, not modelled prices: the causal layer composes in `twin
+propagate` and is not joined to the £ until build ticket 30, and no severity is sampled. The
+figures are what each perspective says a component is worth to it. The spread is the point — no
+single number is the organisation's number, because there is no such thing.
 
 ## The table
 
@@ -167,3 +209,17 @@ named is the one that must make them computable.
 | 38 | `exposure.spread` | `480000` | 650000 - 170000 | build ticket 26 |
 | 39 | `exposure.spread.customer-portal` | `350000` | 400000 - 50000 | build ticket 26 |
 | 40 | `exposure.spread.order-service` | `130000` | 250000 - 120000 | build ticket 26 |
+| 41 | `pert.database-slows-orders.mean` | `0.5` | (0.3 + 4 x 0.5 + 0.7) / 6 | build ticket 23 |
+| 42 | `pert.orders-slow-the-portal.mean` | `0.4` | (0.4 + 4 x 0.4 + 0.4) / 6, degenerate | build ticket 23 |
+| 43 | `propagation.attenuation.order-service` | `1` | depth 1, the authored claim itself | build ticket 20 |
+| 44 | `propagation.attenuation.customer-portal` | `0.8` | depth 2 on the published schedule | build ticket 20 |
+| 45 | `propagation.attenuated.customer-portal.min` | `0.096` | 0.12 x 0.8 | build ticket 20 |
+| 46 | `propagation.attenuated.customer-portal.mode` | `0.16` | 0.2 x 0.8 | build ticket 20 |
+| 47 | `propagation.attenuated.customer-portal.max` | `0.224` | 0.28 x 0.8 | build ticket 20 |
+| 48 | `options.the-operator.considered` | `3` | three authored responses | build ticket 28 |
+| 49 | `options.the-operator.removed` | `2` | one record per crossed line: covert sensing, the ruin bet | build ticket 28 |
+| 50 | `options.the-operator.priced` | `1` | only the read replica crosses nothing | build ticket 28 |
+| 51 | `option_price.add-a-read-replica.mean` | `30000` | (10000 + 4 x 25000 + 70000) / 6 | build ticket 28 |
+| 52 | `admission.the-operator.customer-portal` | `1` | itself the declared cash flow | build ticket 29 |
+| 53 | `admission.the-operator.order-service` | `1` | reaches it at grade 2 | build ticket 29 |
+| 54 | `admission.the-operator.identity-store` | `0` | no causal edge leaves it | build ticket 29 |
