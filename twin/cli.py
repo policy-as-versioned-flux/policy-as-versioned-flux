@@ -16,10 +16,11 @@ from pathlib import Path
 
 import yaml
 
-from . import TOOL_VERSION, attest, fixtures, index, invariants, verbs
-from .artefact import Artefact, ArtefactError
+from . import TOOL_VERSION, attest, fixtures, index, invariants, sign, verbs
+from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
 from .blob import BlobRefError
+from .canon import canonical_json, sha256_hex
 from .grades import Capabilities, GradeError
 from .index import IndexError_
 from .invariants import FAIL, PASS, SKIP
@@ -29,6 +30,7 @@ from .reproduce import ReproduceError
 from .repo import ModelRepo, RepoError
 from .schema import SchemaError
 from .scoring import ScoreError
+from .sign import SignatureError
 from .verbs import VerbError
 
 
@@ -39,9 +41,10 @@ def _say(message: str) -> None:
 def _emit(artefact: Artefact, out: str) -> int:
     path = artefact.write(out)
     sidecar = attest.write(artefact, path)
+    status = json.loads(sidecar.read_bytes()).get("signature_status") or "agent-signed (origin only)"
     depth = artefact.depth
     print(f"{artefact.kind} -> {path}")
-    print(f"  attestation  {sidecar.name} (machine-attested, {attest.UNSIGNED})")
+    print(f"  attestation  {sidecar.name} ({status})")
     print(f"  sha256       {artefact.digest()}")
     print(f"  depth        {depth['grade']}")
     for name, summary in sorted(depth.get("capabilities", {}).items()):
@@ -105,6 +108,106 @@ def cmd_graph(args: argparse.Namespace) -> int:
     return _emit(verbs.graph(repo, caps, org, verbs.command_for("graph", org=org)), args.out)
 
 
+def cmd_map(args: argparse.Namespace) -> int:
+    """Render the Wardley map. Reads the graph artefact's own `wardley` block and nothing else,
+    so a map cannot say something the graph does not (build ticket 14)."""
+    from .wardley import plot
+
+    repo, caps, org = _open(args)
+    artefact = verbs.graph(repo, caps, org, verbs.command_for("graph", org=org))
+    body = artefact.body["wardley"]
+    _say(f"{org}: {len(body['positions'])} components on the map, rendered from the graph")
+    print(plot(body))
+    for entry in body["dependency_risk"]:
+        print(f"  R({entry['from']} -> {entry['to']}) = {entry['dependency_risk']:.3f}")
+    if body["unpositioned"]:
+        print(f"  off the map (no evolution stage): {', '.join(body['unpositioned'])}")
+    print(
+        "\n  D, K and R describe a position. They are not forecasts, nothing scores them, and no\n"
+        "  action band is inherited with them — the reader draws the action, never the artefact."
+    )
+    return 0
+
+
+def cmd_worksheet(args: argparse.Namespace) -> int:
+    """Check the pocket-org artefact against the hand-computed worksheet (build ticket 15)."""
+    from . import worksheet
+
+    if args.emit:
+        return _emit_worksheet(args.emit)
+    if not args.repo:
+        print("twin worksheet needs --repo (a pocket-org repository) or --emit", file=sys.stderr)
+        return 2
+
+    repo, caps, org = _open(args)
+    artefact = verbs.graph(repo, caps, org, verbs.command_for("graph", org=org))
+    results = worksheet.check(json.loads(artefact.to_bytes())["body"])
+
+    _say(f"{worksheet.WORKSHEET_PATH.name} against the graph of {org!r}")
+    for result in results:
+        line = result.line
+        if result.pending:
+            print(f"  ..   {line.index:>2}  {line.key:<52} {line.expected:<10} pending {line.asserted_by}")
+        else:
+            mark = "ok  " if result.ok else "FAIL"
+            print(f"  {mark} {line.index:>2}  {line.key:<52} {line.expected:<10} got {result.actual}")
+
+    failed = [r for r in results if not r.pending and not r.ok]
+    pending = [r for r in results if r.pending]
+    late = worksheet.overdue(results)
+    print(
+        f"\n{len(results) - len(pending) - len(failed)} match, {len(failed)} differ, "
+        f"{len(pending)} pending, compared at {worksheet.DECIMAL_PLACES} decimal places"
+    )
+    for problem in late:
+        print(f"  OVERDUE {problem}")
+    if failed or late:
+        return 1
+    return 0
+
+
+def _emit_worksheet(out: str) -> int:
+    """The worksheet as an authored artefact — the one place a human number is the authority."""
+    from . import worksheet
+
+    role, lines = worksheet.load()
+    artefact = Artefact(
+        kind="worksheet",
+        mark=AUTHORED,
+        # No output path in the command, for the same reason no other verb records one: a machine
+        # path in the envelope breaks identical bytes across machines.
+        command=verbs.command_for("worksheet"),
+        pins={"worksheet_sha256": sha256_hex(worksheet.WORKSHEET_PATH.read_bytes()), "role": role},
+        # No grade, rather than a grade of `authored`. A depth grade measures how much of a
+        # decision ticket a **capability** has realised, and no capability produced this: the
+        # number here is the authority instead of a derivation of one.
+        depth={
+            "grade": None,
+            "capabilities": {},
+            "note": "authored by a human in a declared role; no capability produced it",
+        },
+        body={
+            "subject": worksheet.POCKET_ORG,
+            "decimal_places": worksheet.DECIMAL_PLACES,
+            "lines": [
+                {"index": line.index, "key": line.key, "expected": line.expected,
+                 "arithmetic": line.arithmetic, "asserted_by": line.asserted_by}
+                for line in lines
+            ],
+        },
+    )
+    path = artefact.write(out)
+    material = sign.signing_key()
+    signatures = [sign.human(role, artefact.digest(), material)] if material else []
+    sidecar = attest.write(artefact, path, signatures)
+    print(f"worksheet -> {path} (authored, role {role!r})")
+    if material is None:
+        print(f"  unsigned: set {sign.KEY_ENV}, then `twin sign {path} --role {role}`")
+        return 0
+    print(f"  signed as role {role!r} -> {sidecar.name}")
+    return 0
+
+
 def cmd_validate(args: argparse.Namespace) -> int:
     """The gate an author or CI runs before committing. Nothing here writes model files, so
     "validated on write" means validated at the boundary the model crosses to get in."""
@@ -143,8 +246,8 @@ def cmd_index(args: argparse.Namespace) -> int:
 
 
 def cmd_fixture(args: argparse.Namespace) -> int:
-    root = fixtures.build(args.out)
-    print(f"fixture model repository -> {root}")
+    root = fixtures.build_pocket_org(args.out) if args.pocket_org else fixtures.build(args.out)
+    print(f"{'pocket-org' if args.pocket_org else 'fixture'} model repository -> {root}")
     print("  deterministic: same content, same commit sha, on every machine")
     return 0
 
@@ -174,6 +277,8 @@ def cmd_grade(args: argparse.Namespace) -> int:
 
 
 def cmd_verify(args: argparse.Namespace) -> int:
+    if args.artefact and args.attestation:
+        return _attestation(args.artefact)
     if args.artefact:
         return _reproduce(args.artefact, args.repo)
     if args.rehash:
@@ -212,6 +317,71 @@ def cmd_verify(args: argparse.Namespace) -> int:
         for r in failed:
             print(f"  FAIL {r.name}: {r.detail}")
     return 0 if ok else 1
+
+
+def _attestation(artefact_path: str) -> int:
+    """Read the sidecar back. A write-only attestation is not tamper-evidence (build ticket 11)."""
+    path = attest.sidecar_for(artefact_path)
+    if not path.is_file():
+        print(f"no attestation sidecar at {path}", file=sys.stderr)
+        return 2
+    doc = attest.load(path)
+    problems = attest.check(doc, Path(artefact_path).read_bytes())
+    _say(f"checking {path.name} against {artefact_path}")
+    print(f"  subject      {doc['subject']['kind']} {doc['subject']['sha256'][:16]} ({doc['mark']})")
+    signatures = doc.get("human_involvement", {}).get("signatures") or []
+    for signature in signatures:
+        print(f"  human        role {signature.get('role')!r}, asserts {signature.get('asserts')}")
+    agent_signature = doc.get("agent_signature")
+    print(
+        f"  agent        {agent_signature['value'][:16]}, asserts origin only"
+        if agent_signature
+        else f"  agent        none ({doc.get('signature_status')})"
+    )
+    if problems:
+        for problem in problems:
+            print(f"  FAIL {problem}")
+        print("\nANOMALY: this attestation does not hold.")
+        return 1
+    print(
+        "\nHOLDS: the sidecar attests these exact bytes, and "
+        + ("a role is accountable for the judgement inside." if doc["mark"] == AUTHORED
+           else "no human touched this derived artefact.")
+    )
+    return 0
+
+
+def cmd_sign(args: argparse.Namespace) -> int:
+    """Sign an authored artefact as a role. Refuses a derived one — that is the whole invariant."""
+    from .artefact import load as load_artefact
+
+    material = sign.signing_key()
+    if material is None:
+        print(f"twin sign: no signing key; set {sign.KEY_ENV}", file=sys.stderr)
+        return 2
+
+    doc = load_artefact(args.artefact)
+    if doc["envelope"]["mark"] != AUTHORED:
+        print(
+            f"twin sign: {args.artefact} is marked {doc['envelope']['mark']!r}. Only an authored "
+            "artefact carries a human signature; derived_never_human_signed forbids the rest.",
+            file=sys.stderr,
+        )
+        return 2
+
+    sidecar = attest.sidecar_for(args.artefact)
+    if not sidecar.is_file():
+        print(f"twin sign: no attestation sidecar at {sidecar}", file=sys.stderr)
+        return 2
+
+    raw = Path(args.artefact).read_bytes()
+    signature = sign.human(args.role, sha256_hex(raw), material)
+    existing = attest.load(sidecar)
+    existing["human_involvement"] = {"present": True, "signatures": [signature]}
+    sidecar.write_bytes(canonical_json(existing))
+    print(f"signed {args.artefact} as role {args.role!r} -> {sidecar.name}")
+    print("  asserts accountability for the judgement inside, and nothing about reproducibility")
+    return 0
 
 
 def _reproduce(artefact_path: str, repo_path: str | None) -> int:
@@ -446,6 +616,9 @@ def build_parser() -> argparse.ArgumentParser:
     graph.add_argument("--out", required=True)
     graph.set_defaults(fn=cmd_graph)
 
+    wmap = with_org(with_repo(subs.add_parser("map", help="render the Wardley map from the graph")))
+    wmap.set_defaults(fn=cmd_map)
+
     validate = with_repo(subs.add_parser("validate", help="validate every object against its schema"))
     validate.set_defaults(fn=cmd_validate)
 
@@ -455,7 +628,21 @@ def build_parser() -> argparse.ArgumentParser:
 
     fixture = subs.add_parser("fixture", help="build the deterministic fixture model repository")
     fixture.add_argument("--out", required=True)
+    fixture.add_argument(
+        "--pocket-org", action="store_true", help="build the pocket-org golden fixture instead"
+    )
     fixture.set_defaults(fn=cmd_fixture)
+
+    sheet = with_org(subs.add_parser("worksheet", help="check the pocket org against its hand-computed worksheet"))
+    sheet.add_argument("--repo", default=None, help="path to a pocket-org model repository")
+    sheet.add_argument("--ref", default="HEAD", help="git ref to pin (default HEAD)")
+    sheet.add_argument("--emit", default=None, help="write the worksheet as an authored artefact")
+    sheet.set_defaults(fn=cmd_worksheet)
+
+    signer = subs.add_parser("sign", help="sign an authored artefact as a role")
+    signer.add_argument("artefact", help="path to an authored artefact")
+    signer.add_argument("--role", required=True, help=f"one of: {', '.join(sign.role_ids())}")
+    signer.set_defaults(fn=cmd_sign)
 
     grade = subs.add_parser("grade", help="show computed depth grades")
     grade.add_argument("--capability", default=None)
@@ -464,6 +651,9 @@ def build_parser() -> argparse.ArgumentParser:
     verify = subs.add_parser("verify", help="run the invariant suite, or reproduce an artefact")
     verify.add_argument("artefact", nargs="?", help="an artefact to recompute from its pins")
     verify.add_argument("--repo", default=None, help="the model repository the pins refer to")
+    verify.add_argument(
+        "--attestation", action="store_true", help="check the artefact's sidecar rather than replaying it"
+    )
     verify.add_argument("--only", action="append", default=[], help="check name or number; repeatable")
     verify.add_argument("--list", action="store_true", help="list the checks without running them")
     verify.add_argument("--rehash", action="store_true", help="re-pin check-body hashes in the manifest")
@@ -488,6 +678,7 @@ REFUSALS = (
     ReproduceError,
     SchemaError,
     ScoreError,
+    SignatureError,
     yaml.YAMLError,
     OSError,
     RecursionError,

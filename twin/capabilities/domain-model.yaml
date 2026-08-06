@@ -12,7 +12,9 @@ criteria:
     checked: false
   - index: 3
     text: "Edge-semantics decision incl. the structural-vs-causal distinction."
-    checked: false
+    checked: true
+    evidence: "twin/schema.py EDGE_TYPES and _refine_edge — `needs` says the value chain would break, `influences` says a change here moves something there by a signed, lagged, calibrated amount. Each family refuses the other's fields on write, and the graded-edge fixture is asserted as a boundary contract."
+    ticked_by: build ticket 17
   - index: 4
     text: "The temporal/versioning model + how scenarios are represented."
     checked: false

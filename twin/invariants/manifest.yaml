@@ -8,13 +8,14 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 20 \u2014 checks strengthened after review: reproduce coverage, schema closure, Article 9 by value, the behavioural gate"
-checks_module_sha256: 0189c179c3c4662e38ae5579fcee341801f94e0510079f133c192fb8cf06b112
+checks_module_authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 11, 13 and 14: signature types and the derived-artefact anomaly, roll-ups with no authored or stored form, and no inherited action band on the Wardley relations"
+checks_module_sha256: b7082ec2d705eabddb896dc1ee4ea1b73190c24e79106cf9a0b63fc6a5289b20
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
     state: live
-    body_sha256: b572dd86014916b9c4d4e2fab197bd9999643e23b39acefe36adca8ba1ff7d09
+    body_sha256: a4727ee5ec7d365a1858407326ece7750823faf44981710b2292037073e7a807
+    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 11, 13 and 14: signature types and the derived-artefact anomaly, roll-ups with no authored or stored form, and no inherited action band on the Wardley relations"
     asserts: Any derived index can be dropped and rebuilt from the repository alone.
 
   - name: identical_pins_identical_bytes
@@ -58,15 +59,16 @@ invariants:
   - name: no_recommended_action_field
     activating_ticket: '06'
     state: live
-    body_sha256: bc5ea3fc26926316898e29bc8e37927b0faa42729ff3e00ba4022f773c56af2b
-    authorised_by: "decision ticket 20 \u2014 invariant checks strengthened after adversarial review; every change adds an assertion, none removes one"
+    body_sha256: aac63cd12f0b99d9edc0faed8f719d31480361768be64d5963519cbc2a1227f3
+    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 11, 13 and 14: signature types and the derived-artefact anomaly, roll-ups with no authored or stored form, and no inherited action band on the Wardley relations"
     asserts: No artefact carries a recommended-action field; a planted one is refused at emission.
     refuses_keys: [recommended_action, recommendation, recommended]
 
   - name: derived_never_human_signed
     activating_ticket: '11'
     state: live
-    body_sha256: a1f51a0cfcf89e64391f7862e6c776ba36f164176b56ceaab6a5896a6a256d9e
+    body_sha256: 691972d334ffa083c78b8639b80b60a20583f99ee9e98de171e9de3e2b4299b6
+    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 11, 13 and 14: signature types and the derived-artefact anomaly, roll-ups with no authored or stored form, and no inherited action band on the Wardley relations"
     asserts: >-
       A derived artefact refuses a human signature; an authored artefact requires one.
     note: >-

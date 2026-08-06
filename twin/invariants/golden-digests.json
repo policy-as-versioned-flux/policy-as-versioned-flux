@@ -1,11 +1,11 @@
 {
-  "authorised_by": "decision ticket 20 \u2014 two capability ticks withdrawn after audit, which changes the depth block every artefact carries",
-  "capabilities_digest": "6f0cc764fefec919cf1dbb08ff5e374e0c43d3ce0208e22b9b4ed2e8524dab3a",
+  "authorised_by": "decision ticket 07 \u2014 the graph artefact gains the Wardley map and derived roll-ups (build tickets 13, 14) and the fixture gains graded causal edges (build ticket 17), so every artefact's model-repository pin moves",
+  "capabilities_digest": "2b428978062b78916d2671082fedbed74f2d1780ca36bf638babdf316a738b7c",
   "digests": {
-    "bound-signal": "365329354c0f488a4b8d88aa5d436c622ebfa4a42b435b0c5878fe7b967898ce",
-    "forecast-bundle": "a8c39e7bca3fc22009db97da609a543fe675084800c7ff2a9a47eaf9aed0d0f8",
-    "graph": "475aa238521edc03c5f469a3f3d59ee8addfb07f4698a9f7997e8f8f23c2c35e",
-    "score-card": "2057b5f02824d2073c9e34569158aa29044e1ced006e7e9156eeb208c95cdad9"
+    "bound-signal": "8005193ea26c4685e256b807879df2d42ef3a4c91463665b92a7a50804497700",
+    "forecast-bundle": "7d1a466b521deda83c5ebc5ff2377e13082a64bf478c7bf081463b035019e1b9",
+    "graph": "21acf490b91815f027ea4ac59a71fca8251d32ce44e088c768b3d92869851b93",
+    "score-card": "8eb892d58127215a4a551c8daf336e1302eb45bcaa00010feddcbeef4cf5b5e3"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

@@ -1,23 +1,27 @@
 # `twin`
 
-Build tickets 01–08, 10 and 12 of `.scratch/twin/`. One dated signal binds to a component; one
+Build tickets 01–08 and 10–15 and 17 of `.scratch/twin/`. One dated signal binds to a component; one
 scenario execution emits forecasts — plural; one recorded outcome scores them under proper scoring
 rules; any artefact recomputes from its own pins. Scoring is in the first slice rather than
 retrofitted, because without it we cannot tell whether any later capability helped, and because
 scoring dictates what every other component must record.
 
-**This is 10 of 77 build tickets.** What is not built is listed below and, more usefully, is named
+**This is 15 of 77 build tickets.** What is not built is listed below and, more usefully, is named
 inside every artefact the tool emits.
 
 ## Run it
 
 ```sh
-bash twin/demo.sh                        # the whole loop, from a clean checkout
-./bin/twin verify                        # the invariant suite
-./bin/twin verify <artefact> --repo R    # recompute that artefact from its own pins
-./bin/twin validate --repo R             # every object against its closed schema
-./bin/twin graph --repo R --org netflix  # the typed knowledge graph
-./bin/twin grade                         # computed depth grades, with evidence
+bash twin/demo.sh                          # the whole loop, from a clean checkout
+./bin/twin verify                          # the invariant suite
+./bin/twin verify <artefact> --repo R      # recompute that artefact from its own pins
+./bin/twin verify <artefact> --attestation # check its sidecar: digest, signatures, the anomaly
+./bin/twin validate --repo R               # every object against its closed schema
+./bin/twin graph --repo R --org netflix    # the typed knowledge graph
+./bin/twin map --repo R --org netflix      # the Wardley map, rendered from that graph
+./bin/twin worksheet --repo P              # the pocket org against its hand-computed worksheet
+./bin/twin sign <artefact> --role R        # accountability for an authored artefact
+./bin/twin grade                           # computed depth grades, with evidence
 ```
 
 The tool itself needs only python3, PyYAML and git — all already used by `estate/`. The checks want a
@@ -46,20 +50,62 @@ flowchart LR
   S["<b>twin sense</b><br/>dated signal + grade-5 claim"] --> BS["bound-signal"]
   R["<b>twin run</b><br/>scenario at a declared time"] --> FB["forecast-bundle<br/><i>forecasts, always a list</i>"]
   C["<b>twin score</b><br/>proper rules, as-consumed only"] --> SC["score-card<br/><i>names the bundle by pin</i>"]
-  G["<b>twin graph</b>"] --> GR["graph<br/><i>components · people · typed edges</i>"]
+  G["<b>twin graph</b>"] --> GR["graph<br/><i>components · people · typed edges<br/>Wardley map · derived roll-ups</i>"]
 
   repo --> S & R & C & G
   FB -- "by sha256, never by path" --> C
   B -. "no route from anything above" .-> G
+  GR -- "no authoring step" --> M["<b>twin map</b><br/><i>a render, not a second model</i>"]
 
-  BS & FB & SC & GR --> A["attestation sidecar<br/>runtime · no human hands"]
+  BS & FB & SC & GR --> A["attestation sidecar<br/>runtime · agent signature · no human hands"]
   A --> V["<b>twin verify artefact</b><br/><i>recompute the chain from pins</i>"]
+  A --> AT["<b>twin verify --attestation</b><br/><i>read it back: digest, signatures, anomaly</i>"]
 ```
 
 Every artefact carries its pins, an authored/derived mark, and the computed depth grade of every
 capability that produced it. Machine-varying facts — wall clock, host, interpreter — are absent
 from the artefact and live in the sidecar, which is what lets identical pins give identical bytes
-across architectures.
+across architectures. The signature lives there too, for the same reason: a keyed value in the
+envelope would break identical bytes on the first machine holding a different key.
+
+## Two kinds of signature
+
+A **human** signature asserts accountability for a judgement and binds to a **role** from the
+versioned register in `twin/roles.yaml`, never to a named individual. An **agent** signature asserts
+reproducible origin — runtime and tool version — and states in the artefact what it does *not*
+assert: correctness, accountability, human review. The two are refused as a type error before their
+values are even checked, so one can never stand in for the other.
+
+The consequence is the interesting half. A derived artefact may carry the second and may **never**
+carry the first, so a signature attests the *absence* of human involvement, CI-style. A derived
+artefact with human fingerprints on it is a **detectable anomaly** rather than a breach of
+convention: `twin verify <artefact> --attestation` reports it, on evidence.
+
+`ponytail:` the mechanism is HMAC-SHA256 keyed from `TWIN_SIGNING_KEY`, and the ceiling is named in
+`twin/sign.py` — **a shared key proves possession, not identity**, so anybody holding it can produce
+any role's signature. The upgrade is sigstore/gitsign with in-toto subject digests. With no key
+present nothing is signed and the sidecar says which variable is missing, rather than carrying a
+placeholder that reads as signed.
+
+## The pocket org
+
+Five components, six edges, named elasticities, and a committed worksheet
+(`twin/pocket-org-worksheet.md`) with every number worked out **by hand** and the arithmetic shown.
+`twin worksheet --repo <pocket repo>` checks the emitted artefact against all twenty-nine lines.
+
+This exists because a refusal test catches a reintroduced **absence** and nothing else. It is
+satisfied by a degenerate system: a PERT triple that is present but garbage, a score tagged with the
+wrong regime, an elasticity that stops being recalibrated three tickets later. All of those stay
+green under every refusal test, and all of them fail here.
+
+Twenty-three lines are computable today and match. Six carry their arithmetic already and name the
+build ticket that must make them computable — propagation at 20, price at 30. **A pending line whose
+build ticket has closed is a failure**, the same shape as an invariant still pending after its
+activating ticket. Every subsequent derivation-path ticket adds its own line: that contract is
+written into the worksheet, because a ticket that lands without a line here has no yardstick.
+
+The worksheet is `authored` and signed as such. Everywhere else in this system a hand-typed number is
+refused; this is the one place a human number is the authority, and the mark is what says so.
 
 ## What is honestly built
 
@@ -68,25 +114,45 @@ reaches `full`, and nothing can be typed as `full`.
 
 | capability | decision ticket | grade | ticked |
 |---|---|---|---|
-| `domain-model` | 07 | stub | 0 / 7 |
-| `provenance` | 14 | partial | 1 / 4 |
+| `domain-model` | 07 | partial | 1 / 7 |
+| `causal-layer` | 08 | partial | 1 / 5 |
+| `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 1 / 8 |
 | `scenario-engine` | 13 | partial | 1 / 7 |
 
-**4 of 30**, so every artefact carries an overall depth of `stub`. Two criteria were ticked in this
-round and both were withdrawn after audit, each having rested on one clause of a multi-clause
-criterion — the same ground on which three were withdrawn in the previous round. `./bin/twin grade`
-prints every unticked criterion by name, and each surviving tick names its evidence and the build
-ticket that earned it.
+**7 of 35**, and every artefact now carries an overall depth of `partial` rather than `stub`. That
+moved because `domain-model` gained its first ticked criterion, and the overall grade is the *worst*
+of the capabilities that produced the artefact. **Read `partial` as "at least one of N", not as
+"most of the way there"** — the strongest capability here stands at two ticks out of four, and four
+of the six stand at one. `./bin/twin grade` prints the denominators.
 
-**Scoring and calibration are outside this ledger.** No capability file is owned by a decision ticket
-that governs scoring, so build ticket 08's work does not appear in the 30. That is a hole in the
+`causal-layer` is new: it was added at build ticket 17, when the causal layer first had code to
+measure — before that, a capability file with nothing behind it would have been a slot claiming a
+capability existed.
+
+Three criteria were ticked this round and all three survived. Three others were considered and left
+unticked because each rested on **one clause of a multi-clause criterion**, which is the same ground on
+which five were withdrawn across the previous two rounds:
+
+- **decision ticket 07 AC 5** (representation/format reuse-vs-custom **and** authored-vs-derived) —
+  the authored/derived split is now structural in three places, but the format decision is recorded
+  nowhere in code.
+- **decision ticket 07 AC 6** (where £, risk, people, **assets** and signals attach) — people and
+  signals attach; assets have no schema and £ has no engine.
+- **decision ticket 14 AC 2's third clause** — an agent signature carries runtime and tool version but
+  no model version and no config digest, because nothing here is produced by a model yet.
+
+`./bin/twin grade` prints every unticked criterion by name, and each surviving tick names its evidence
+and the build ticket that earned it.
+
+**Scoring and calibration are still outside this ledger.** No capability file is owned by a decision
+ticket that governs scoring, so build ticket 08's work does not appear in the 35. That is a hole in the
 honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 15 pass, 0 fail, 6 pending, 1 skipped and not faked. `pytest -q` — 218 tests
+`./bin/twin verify` — 17 pass, 0 fail, 6 pending, 1 skipped and not faked. `pytest -q` — 291 tests
 across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
@@ -98,9 +164,21 @@ across seams 1 and 2.
 | `world_never_references_overlay` | `price_levels_never_probabilities` (59) |
 | `no_collapse_mechanism` | `standing_library_covers_committed_classes` (69) |
 | `no_recommended_action_field` | |
-| `derived_never_human_signed` (structural) | |
+| `derived_never_human_signed` (cryptographic) | |
 | `only_as_consumed_scores` | |
 | `no_special_category_slot` | |
+
+**The constitution names sixteen invariants and the manifest may not grow a seventeenth without the
+constitution changing first.** So build tickets 13, 14 and 11 each *extended* an existing check rather
+than adding one — roll-ups with no authored and no stored form onto `store_rebuildable_from_git`, the
+refusal to inherit arckit's action bands onto `no_recommended_action_field`, and detection of a planted
+human signature onto `derived_never_human_signed`. Each body change cites its authorising decision
+ticket in the manifest, which is what `hash_changes_are_authorised` checks.
+
+Two guards were added to the **harness** instead, because each guards a yardstick rather than the
+system: `worksheet_matches_the_pocket_org` (the hand-computed numbers still hold) and
+`graded_edge_fixture_holds_its_contract` (the generated causal-edge fixture still carries what the £
+and skills tracks depend on).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared
@@ -133,11 +211,15 @@ verbatim. An artefact is exactly as sensitive as the model repository it came fr
 
 Named here so the skeleton cannot quietly become the definition of done.
 
-- **No causal layer.** Structural dependencies only. Nothing propagates, nothing intervenes, there
-  is no Monte-Carlo and no depth attenuation. (Build tickets 17, 20–22.)
+- **Nothing propagates.** Causal edges now carry sign, lag and a calibrated elasticity, and are
+  validated on write — but no Monte-Carlo reads them, there is no depth attenuation, no shared-
+  ancestry handling and no intervention-versus-observation distinction. (Build tickets 20–22.)
 - **No £.** No FAIR engine, no PERT sampling, no TVaR, no constraint pre-filter, no trade-off
   curve. The four pricing invariants are pending and there is nothing for them to guard yet.
-  (23–33.)
+  The pocket-org worksheet already carries the price line, hand-computed, as the yardstick those
+  tickets must match. (23–33.)
+- **The pocket org's severity has no empirical anchor.** The £1,000,000 in the worksheet is a
+  fixture number, stated as such. Build ticket 25 replaces it with an anchored one.
 - **The information regime is a tag, not a gate.** Every forecast declares its regime and only
   `as-consumed` scores — but nothing refuses a fact dated after T, so `as-consumed` is currently a
   claim the model repository makes rather than a property the engine enforces. The artefact says
@@ -150,8 +232,9 @@ Named here so the skeleton cannot quietly become the definition of done.
   but there are no reliability diagrams over volume (09), no contamination discount (40) and no
   hindsight-resistance inversion (41). The answer-key format carries the `contamination` slot the
   discount will read; nothing computes it.
-- **No signing.** `signature` is null and says so; the authored/derived split is enforced
-  structurally but not cryptographically. (11.)
+- **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
+  produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
+  sigstore/gitsign, named in `twin/sign.py`.
 - **No skills, and therefore no seam 3.** The six skills are non-deterministic by construction and
   need their own eval harness; none exists, so skill regression would currently go silent. (42.)
 - **No substrate.** The content-hash reference form round-trips against nothing. (48–51.)
@@ -163,19 +246,26 @@ Named here so the skeleton cannot quietly become the definition of done.
   position and cannot change a forecast. The spec's skeleton is "signal → binds to a component →
   **an inferred position moves** → execution"; the middle step is missing, so `sense` and `run`
   are two verbs over one repository rather than one loop.
-- **Attestations are write-only.** A sidecar is emitted and nothing ever reads one back or
-  verifies it, so it provides no tamper-evidence even in principle yet. (11.)
+- **Nothing verifies a signature in CI.** `TWIN_SIGNING_KEY` is unset there, so the suite exercises
+  the signing path with its own key and the emitted artefacts stay unsigned. Signing the real
+  pipeline needs a key in CI and an owner for it, and neither exists.
 - **Overlay-to-overlay isolation has tests but no invariant.** The constitution's sixteen cover
   the world→overlay direction, not tenant→tenant reads, and the manifest may not grow a
   seventeenth without the constitution changing first.
 - **Cross-machine verification has never run.** The `reproduce-elsewhere` CI job emits a score card
   on x86_64 Linux and recomputes it on arm64 macOS. Declared and wired; unproven. This and the
   two-architecture leg are the two acceptance criteria left unticked across tickets 01–12.
-- **The graph has no causal edges.** `needs`, `maintains`, `knows` and `owns` are the whole
-  vocabulary; there is no direction, sign, lag, elasticity or evidence grade. (17.)
 - **Two named entity types are missing.** Decision ticket 07 names `Asset`/`DataAsset` and
   `Response`/`Control` in the core ontology; neither has a schema, which is why domain-model's
   first criterion stays unticked.
+- **The Wardley positions are authored, and nothing judges them.** `evolution` and
+  `evolution_position` are whatever the model repository says. Which position a component actually
+  holds is a judgement, and the judge — with human override and pushback — is build ticket 44.
+- **The causal edges in the fixtures are toys.** Sign, lag and elasticity are invented numbers
+  exercising the shape. Decision ticket 08 asks for a real claim from each co-flagship, and neither
+  exists, which is why the causal layer's fifth criterion stays unticked.
+- **No reliability diagram and no scheduled emission.** Calibration is measured over volume and
+  there is no volume: emission is still hand-initiated, so the record can be selected. (09.)
 
 ## Layout
 
@@ -185,16 +275,21 @@ twin/
   verbs.py        sense / run / score / graph
   schema.py       the closed typed schema; Article 9 has no slot because there is no slot
   scoring.py      Brier and log loss, and the declared quantisation
+  wardley.py      evolution positions and D/K/R, inherited from arckit with its caveats
   reproduce.py    recompute an artefact, and its chain, from its own pins
   repo.py         the pinned model repository; reads go through a git tree, never the worktree
-  model.py        world layer, org overlays, the typed graph, the gated behavioural unit
+  model.py        world layer, org overlays, the typed graph, derived roll-ups, the gated unit
   artefact.py     the envelope; forbidden field names refused at emission
-  attest.py       attestation sidecars — where machine-varying facts go
+  attest.py       attestation sidecars — written, and read back
+  sign.py         two signature types that never substitute for each other
+  roles.yaml      the versioned role register a signature binds to
   grades.py       depth grades as computed checklists
+  worksheet.py    the pocket-org worksheet, parsed and checked
+  pocket-org-worksheet.md   the hand-computed yardstick — authored, and the authority
   blob.py         content-hash references for bulk substrate
   index.py        the derived index — a store, and therefore never authoritative
   canon.py        canonical serialisation
-  fixtures.py     the deterministic fixture model repository
+  fixtures.py     the deterministic fixture repositories — flagship and pocket org
   capabilities/   one checklist per decision ticket that has code
   invariants/     manifest, harness, checks, golden digests
   demo.sh         the end-to-end

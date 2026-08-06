@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, Any
 
 from .. import REPO_DIR
 from .. import artefact as artefact_mod
-from .. import attest, fixtures, index, verbs
+from .. import attest, fixtures, index, sign, verbs
 from ..artefact import AUTHORED, DERIVED, Artefact, ArtefactError
 from ..canon import canonical_json, sha256_hex, walk_keys
 from ..grades import Capabilities, GradeError
@@ -112,7 +112,13 @@ def module_hash() -> str:
 
 @invariant("store_rebuildable_from_git")
 def _store_rebuildable_from_git(ctx: "Context") -> str:
-    """Any derived index can be dropped and rebuilt from the repository alone."""
+    """Any derived index can be dropped and rebuilt from the repository alone.
+
+    Extended at build ticket 13 to the aggregates: a roll-up is computed from its constituents on
+    read and has **no authored and no stored form**, which is what makes "an aggregate can never
+    drift from its constituents" structural rather than a discipline. There is no second copy to
+    drift.
+    """
     repo = ModelRepo.open(ctx.repo_dir)
     out = ctx.tmp / "derived-index"
 
@@ -128,7 +134,42 @@ def _store_rebuildable_from_git(ctx: "Context") -> str:
         raise Violated(f"rebuilt index differs: {first[:12]} then {second[:12]}")
     if not (out / "world.json").is_file():
         raise Violated("rebuild produced no world index")
-    return f"index dropped and rebuilt from git alone, identically ({first[:12]})"
+
+    from ..schema import ROLLUP_FIELDS, SCHEMAS, SchemaError, validate
+
+    for name, schema in SCHEMAS.items():
+        declared = (set(schema.required) | set(schema.optional)) & set(ROLLUP_FIELDS)
+        if declared:
+            raise Violated(f"schema {name!r} declares a slot for an authored aggregate: {', '.join(sorted(declared))}")
+    for field in ROLLUP_FIELDS:
+        try:
+            validate(
+                "signal",
+                {"id": "planted", "date": "2011-07-12", "steep": "economic", "source": "s",
+                 "statement": "t", "provenance": {"observed_by": "x", field: 1}},
+                "planted",
+            )
+        except SchemaError:
+            continue
+        raise Violated(f"an authored {field!r} validated inside a free-form mapping")
+
+    for path in sorted(out.rglob("*.json")):
+        stored = set(_keys(json.loads(path.read_bytes()))) & set(ROLLUP_FIELDS)
+        if stored:
+            raise Violated(f"the derived index stores an aggregate ({', '.join(sorted(stored))})")
+
+    # And the roll-up follows its constituents with no separate step: the same graph, read twice,
+    # with one constituent added in between.
+    graph = verbs.graph(repo, ctx.caps, NETFLIX, verbs.command_for("graph", org=NETFLIX))
+    body = json.loads(graph.to_bytes())["body"]
+    if body["rollups"]["components"] != len(body["components"]):
+        raise Violated("a roll-up disagrees with the constituents it was computed from")
+    if body["rollups"]["edges"] != len(body["edges"]):
+        raise Violated("the edge roll-up disagrees with the edges beside it")
+    return (
+        f"index dropped and rebuilt from git alone, identically ({first[:12]}); "
+        f"{len(ROLLUP_FIELDS)} aggregate field names have no authored or stored form"
+    )
 
 
 @invariant("identical_pins_identical_bytes")
@@ -432,10 +473,40 @@ def _no_collapse_mechanism(ctx: "Context") -> str:
 
 @invariant("no_recommended_action_field")
 def _no_recommended_action_field(ctx: "Context") -> str:
-    """Output is a map to be argued with, never a verdict that ends the argument."""
+    """Output is a map to be argued with, never a verdict that ends the argument.
+
+    Extended at build ticket 14, where the Wardley maths was inherited from arckit. arckit
+    publishes each of D, K and R alongside an **action band** — "must invest", "strong candidate
+    for outsourcing". The number is inherited; the band is a recommended action under another
+    name and is not. The reader draws the action; the artefact never states it.
+    """
     for _, (_, path) in sorted(emit_all(ctx).items()):
         _refusals_hold("no_recommended_action_field", json.loads(path.read_bytes()))
-    return "no recommendation field in any artefact; every declared one is refused at emission"
+
+    graph = json.loads(emit_all(ctx)[verbs.KIND_GRAPH][1].read_bytes())["body"]
+    wardley = graph.get("wardley")
+    if not wardley or not wardley["positions"]:
+        raise Violated("the graph carries no map, so this check asserts nothing about it")
+    if wardley["axis"].get("action_bands_inherited") is not False:
+        raise Violated("the map claims to have inherited arckit's action bands")
+
+    # Scanned over the map's content, not over `axis`, which is provenance about the inheritance
+    # and is where the refusal itself is declared.
+    banned = ("action", "band", "verdict", "advice", "should", "must_invest", "outsource")
+    content = {k: v for k, v in wardley.items() if k != "axis"}
+    for key, value in _pairs(content):
+        if any(word in key.lower() for word in banned):
+            raise Violated(f"the map carries an action-shaped field ({key})")
+        if isinstance(value, str) and any(word in value.lower() for word in ("must invest", "should ")):
+            raise Violated(f"the map states an action in prose at {key}")
+    for entry in wardley["positions"]:
+        for field in ("differentiation_pressure", "commodity_leverage"):
+            if not isinstance(entry[field], (int, float)):
+                raise Violated(f"{entry['component']}: {field} is not a number — a band would be")
+    return (
+        "no recommendation field in any artefact; every declared one is refused at emission; "
+        f"{len(wardley['positions'])} map positions carry numbers and no inherited action band"
+    )
 
 
 def _refusals_hold(invariant_name: str, doc: dict[str, Any]) -> None:
@@ -471,24 +542,62 @@ def _refusals_hold(invariant_name: str, doc: dict[str, Any]) -> None:
 
 @invariant("derived_never_human_signed")
 def _derived_never_human_signed(ctx: "Context") -> str:
-    """For a derived artefact, human involvement is a defect, not a warrant."""
-    signature = {"identity": "someone@example.invalid", "asserts": "accountability"}
-    for kind, (art, _) in sorted(emit_all(ctx).items()):
-        doc = attest.build(art)
+    """For a derived artefact, human involvement is a defect, not a warrant.
+
+    Two depths. **Structural**: a human signature cannot be attached at emission. **Cryptographic**
+    (build ticket 11): a sidecar edited afterwards to carry one is *detected* when it is read
+    back, which is what turns a convention breach into an anomaly.
+    """
+    material = b"invariant-suite-key"
+    planted = {"identity": "someone@example.invalid", "asserts": "accountability"}
+
+    for kind, (art, path) in sorted(emit_all(ctx).items()):
+        doc = attest.build(art, material=material)
         if doc["mark"] != DERIVED:
             raise Violated(f"{kind} is not marked derived")
         if attest.human_signed(doc):
             raise Violated(f"{kind} attestation claims human involvement")
+        if attest.check(doc, path.read_bytes(), material):
+            raise Violated(f"a freshly emitted {kind} sidecar does not verify: {attest.check(doc, path.read_bytes(), material)}")
         try:
-            attest.build(art, [signature])
+            attest.build(art, [planted], material=material)
         except attest.AttestationError:
+            pass
+        else:
+            raise Violated(f"a human signature attached to derived {kind} without refusal")
+
+        # Emission refused it, so plant it the only way left: edit the sidecar afterwards.
+        tampered = {**doc, "human_involvement": {"present": True, "signatures": [planted]}}
+        if not any("derived_never_human_signed" in p for p in attest.check(tampered, path.read_bytes(), material)):
+            raise Violated(f"a hand-edited {kind} sidecar claiming human involvement was not detected")
+
+    # The two signature types are not interchangeable, in either direction.
+    subject = sha256_hex(b"a subject")
+    human = sign.human("model-steward", subject, material)
+    agent = sign.agent(subject, {"python": "3.12"}, material)
+    if set(sign.AGENT_ASSERTS_NOTHING_ABOUT) - set(agent["asserts_nothing_about"]):
+        raise Violated("an agent signature no longer declares what it does not assert")
+    for signature, wrong in ((human, sign.AGENT), (agent, sign.HUMAN)):
+        try:
+            sign.verify(signature, wrong, subject, material)
+        except sign.SignatureError:
             continue
-        raise Violated(f"a human signature attached to derived {kind} without refusal")
+        raise Violated(f"a {signature['type']} signature verified as a {wrong} one")
+    if "role" not in human or set(human) & set(sign.PERSONAL_FIELDS):
+        raise Violated("a human signature names an individual rather than a role")
 
     authored = Artefact(kind="constraint-set", mark=AUTHORED, command=["twin"], pins={}, depth={}, body={})
-    if not attest.human_signed(attest.build(authored, [signature])):
+    signed = attest.build(authored, [sign.human("model-steward", authored.digest(), material)], material=material)
+    if not attest.human_signed(signed):
         raise Violated("an authored artefact could not carry the human signature that gives it accountability")
-    return "derived artefacts refuse human signatures; authored artefacts require them"
+    if attest.check(signed, authored.to_bytes(), material):
+        raise Violated(f"a signed authored artefact did not verify: {attest.check(signed, authored.to_bytes(), material)}")
+    if not attest.check(attest.build(authored, material=material), authored.to_bytes(), material):
+        raise Violated("an unsigned authored artefact verified; nobody is accountable for it")
+    return (
+        "derived artefacts refuse human signatures and a planted one is detected on read; "
+        "authored artefacts require one; the two signature types never substitute"
+    )
 
 
 def _keys(node: Any) -> set[str]:

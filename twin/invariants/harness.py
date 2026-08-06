@@ -244,6 +244,94 @@ def _hashes(entries: list[Entry], doc: dict[str, object]) -> dict[str, object]:
     return out
 
 
+@harness_check("worksheet_matches_the_pocket_org")
+def _worksheet_matches(ctx: Context) -> str:
+    """The continuous coherence mechanism (build ticket 15).
+
+    A guard on the suite rather than an invariant, because the worksheet is a **second yardstick**
+    alongside the constitution: it is what catches the degenerate system a refusal test cannot
+    see — a triple that is present but garbage, an elasticity nobody recalibrated three tickets
+    later. Both stay green under every refusal test and both fail here.
+    """
+    import json
+
+    from .. import fixtures, verbs, worksheet
+    from ..repo import ModelRepo
+
+    pocket = ctx.tmp / "pocket-org"
+    if not pocket.exists():
+        fixtures.build_pocket_org(pocket)
+    artefact = verbs.graph(
+        ModelRepo.open(pocket), ctx.caps, worksheet.POCKET_ORG,
+        verbs.command_for("graph", org=worksheet.POCKET_ORG),
+    )
+    results = worksheet.check(json.loads(artefact.to_bytes())["body"])
+    differing = [
+        f"line {r.line.index} ({r.line.key}): worksheet {r.line.expected}, artefact {r.actual}"
+        for r in results
+        if not r.pending and not r.ok
+    ]
+    if differing:
+        raise Violated("the pocket org no longer matches its hand-computed worksheet: " + "; ".join(differing))
+    late = worksheet.overdue(results)
+    if late:
+        raise Violated("a worksheet line is pending past its build ticket: " + "; ".join(late))
+    pending = sum(1 for r in results if r.pending)
+    return f"{len(results) - pending} hand-computed lines match, {pending} pending on open tickets"
+
+
+@harness_check("graded_edge_fixture_holds_its_contract")
+def _graded_edge_contract(ctx: Context) -> str:
+    """The boundary contract the £ and skills tracks build against (build ticket 17).
+
+    Generated rather than committed, so it cannot fossilise — and asserted here, so a track that
+    depends on it finds out at this seam rather than three tickets downstream.
+    """
+    import json
+
+    from .. import verbs
+    from ..model import Overlay
+    from ..repo import ModelRepo
+    from ..schema import CAUSAL_EDGE, SchemaError, validate
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    graded = []
+    for org in sorted({"netflix", "intel"}):
+        artefact = verbs.graph(repo, ctx.caps, org, verbs.command_for("graph", org=org))
+        for edge in json.loads(artefact.to_bytes())["body"]["edges"]:
+            if edge["type"] != CAUSAL_EDGE:
+                if any(f in edge for f in ("sign", "lag_days", "elasticity", "evidence_grade")):
+                    raise Violated(f"a {edge['type']!r} edge asserts a quantity it cannot measure")
+                continue
+            missing = [f for f in ("sign", "lag_days", "elasticity", "evidence_grade") if f not in edge]
+            if missing:
+                raise Violated(f"causal edge {edge['id']!r} asserts no {', '.join(missing)}")
+            if set(edge["elasticity"]) != {"min", "mode", "max"}:
+                raise Violated(f"causal edge {edge['id']!r} carries an elasticity that is not a triple")
+            if "degenerate_elasticity" not in edge:
+                raise Violated(f"causal edge {edge['id']!r} does not say whether its triple has width")
+            graded.append(edge)
+
+    if not graded:
+        raise Violated("the fixture emits no graded causal edge, so downstream tracks have no contract")
+    if not any(e["degenerate_elasticity"] for e in graded):
+        raise Violated("no degenerate triple in the fixture, so the false-precision flag is never exercised")
+    if not any(not e["degenerate_elasticity"] for e in graded):
+        raise Violated("every triple in the fixture is degenerate, so a real range is never exercised")
+
+    # And the refusal itself: a causal edge that drops one of its assertions does not load.
+    stripped = {k: v for k, v in graded[0].items() if k not in ("elasticity", "degenerate_elasticity")}
+    try:
+        validate("edge", {**stripped, "from": "comp-a", "to": "comp-b"}, "planted")
+    except SchemaError:
+        pass
+    else:
+        raise Violated("a causal edge with no elasticity validated; propagation would run on hand-waving")
+    if not Overlay.load(repo, "netflix").edges:
+        raise Violated("the fixture overlay carries no first-class edges at all")
+    return f"{len(graded)} graded causal edges, one degenerate and flagged; a stripped one is refused"
+
+
 @harness_check("cross_architecture_determinism", may_skip=True)
 def _cross_arch(ctx: Context) -> str:
     """The identical-bytes claim across architectures. Proven by CI, never locally."""

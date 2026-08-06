@@ -96,10 +96,16 @@ def test_a_weakened_test_body_is_caught(tmp_path: Path, monkeypatch: pytest.Monk
 
 
 def test_a_hash_that_moved_with_no_citation_is_caught(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """The weakening this guard exists for: gut a check, re-pin its hash, commit both together."""
+    """The weakening this guard exists for: gut a check, re-pin its hash, commit both together.
+
+    The subject is whichever live invariant currently carries no citation, chosen rather than
+    named: an invariant picks one up the first time its body legitimately changes, and a hardcoded
+    name would turn this guard's own test green the day that happened.
+    """
+    uncited = next(e.name for e in load_manifest() if e.state == LIVE and not e.authorised_by)
     baseline = [
         Entry(name=e.name, activating_ticket=e.activating_ticket, state=e.state, asserts="",
-              body_sha256="f" * 64 if e.name == "store_rebuildable_from_git" else e.body_sha256,
+              body_sha256="f" * 64 if e.name == uncited else e.body_sha256,
               refuses_keys=e.refuses_keys)
         for e in load_manifest()
     ]
@@ -111,7 +117,7 @@ def test_a_hash_that_moved_with_no_citation_is_caught(tmp_path: Path, monkeypatc
         "twin.invariants.harness.manifest_doc", lambda path=None: {"checks_module_sha256": "unchanged"}
     )
     result = _one("hash_changes_are_authorised", tmp_path)
-    assert result.status == FAIL and "store_rebuildable_from_git" in result.detail
+    assert result.status == FAIL and uncited in result.detail
 
 
 def test_a_deleted_refusal_is_caught(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

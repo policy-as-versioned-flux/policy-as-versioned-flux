@@ -100,7 +100,7 @@ def test_a_repository_carrying_article_nine_data_will_not_load(scratch_repo: Pat
 def test_the_graph_carries_both_authoring_sites_as_one_typed_edge_set(repo: ModelRepo) -> None:
     graph = Overlay.load(repo, "netflix").graph()
     kinds = {e.type for e in graph.edges}
-    assert kinds == {"needs", "maintains", "owns", "knows"}
+    assert kinds == {"needs", "maintains", "owns", "knows", "influences"}
     assert ("streaming-experience", "cloud-compute") in {(e.source, e.target) for e in graph.edges}
     assert ("alex-rivera", "streaming-experience") in {(e.source, e.target) for e in graph.edges}
 

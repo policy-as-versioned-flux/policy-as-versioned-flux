@@ -19,6 +19,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
+from .wardley import WardleyError, band
+
 _CAMEL = re.compile(r"([a-z0-9])([A-Z])")
 IDENT = re.compile(r"^[a-z0-9][a-z0-9-]{1,63}$")
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -26,8 +28,14 @@ ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 COMPONENT_KINDS = ("capability", "activity", "practice", "data")
 EVOLUTION = ("genesis", "custom-built", "product", "commodity")
 STEEP = ("social", "technological", "economic", "environmental", "political")
-EDGE_TYPES = ("needs", "maintains", "knows", "owns")
+EDGE_TYPES = ("needs", "maintains", "knows", "owns", "influences")
 STRUCTURAL_EDGE, PERSON_EDGES = "needs", ("maintains", "knows", "owns")
+# The structural/causal distinction, made in the type rather than in a comment (decision ticket
+# 07, AC 3). `needs` says the value chain would break; `influences` says a change here moves
+# something there, by this much, in this direction, after this long.
+CAUSAL_EDGE = "influences"
+SIGNS = ("positive", "negative")
+EVIDENCE_GRADES = (1, 2, 3, 4, 5)
 REGIMES = ("as-consumed", "as-knowable", "with-hindsight")
 CONTAMINATION = ("low", "high", "control")
 
@@ -58,6 +66,18 @@ class SchemaError(ValueError):
 
 class SpecialCategoryError(SchemaError):
     """An attempt to author Article 9 data. There is nowhere to put it."""
+
+
+class RollUpError(SchemaError):
+    """An attempt to author an aggregate. Roll-ups are computed from constituents on read."""
+
+
+# Field names that would hold an authored aggregate (build ticket 13). Like the Article 9 list,
+# this is a net rather than the guarantee: the guarantee is that the schemas are closed and no
+# roll-up is declared in any of them, so an aggregate has no home. The list exists to give a
+# specific error inside the one place a closed schema cannot see — a free-form mapping.
+# Deliberately narrow: `count` and `summary` are ordinary words in provenance prose.
+ROLLUP_FIELDS = ("aggregate", "aggregates", "roll_up", "rollup", "rollups", "subtotal", "total", "totals")
 
 
 Validator = Callable[[Any, str], None]
@@ -109,6 +129,49 @@ def probability(value: Any, where: str) -> None:
         )
 
 
+def evidence_grade(value: Any, where: str) -> None:
+    """The evidence ladder, 1 to 5. The ladder itself is build ticket 18; the slot is here.
+
+    Integers only, and `bool` excluded explicitly. `True == 1` and `3.0 == 3` in Python, so
+    without both guards `evidence_grade: true` would pass as the weakest grade and `3.0` would
+    reach the artefact as `3.0` — a rung on a five-rung ladder written as if it were continuous.
+    """
+    if not isinstance(value, int) or isinstance(value, bool) or value not in EVIDENCE_GRADES:
+        raise SchemaError(f"{where}: expected an evidence grade 1-5, got {value!r}")
+
+
+def pert(value: Any, where: str) -> None:
+    """A calibrated range as a min/mode/max triple.
+
+    Closed like everything else: exactly these three keys. A triple is how an elasticity states
+    its own uncertainty, and a single number cannot — which is why there is no scalar form.
+    """
+    if not isinstance(value, dict):
+        raise SchemaError(f"{where}: expected a min/mode/max mapping, got {value!r}")
+    unknown = sorted(set(value) - {"min", "mode", "max"})
+    if unknown:
+        raise SchemaError(f"{where}: unknown field(s) {', '.join(unknown)}; a PERT triple is min, mode, max")
+    missing = sorted({"min", "mode", "max"} - set(value))
+    if missing:
+        raise SchemaError(f"{where}: missing {', '.join(missing)}; a range needs all three points")
+    for key in ("min", "mode", "max"):
+        unit_interval(value[key], f"{where}.{key}")
+    low, mode, high = (float(value["min"]), float(value["mode"]), float(value["max"]))
+    if not low <= mode <= high:
+        raise SchemaError(
+            f"{where}: expected min <= mode <= max, got {low} / {mode} / {high}"
+        )
+
+
+def degenerate(triple: dict[str, Any]) -> bool:
+    """A triple with no width. Permitted, and flagged wherever it is read (build ticket 17).
+
+    Not refused: an elasticity genuinely known to a point is representable. But a point estimate
+    wearing a range's clothes is false precision, so it is never allowed to look like a range.
+    """
+    return float(triple["min"]) == float(triple["mode"]) == float(triple["max"])
+
+
 def one_of(*allowed: str) -> Validator:
     def check(value: Any, where: str) -> None:
         if value not in allowed:
@@ -152,6 +215,7 @@ class Schema:
 
     def validate(self, doc: dict[str, Any], where: str) -> None:
         refuse_special_category(doc, where)
+        refuse_authored_rollups(doc, where)
         known = set(self.required) | set(self.optional)
         unknown = sorted(set(doc) - known)
         if unknown:
@@ -203,6 +267,26 @@ def refuse_special_category(node: Any, where: str) -> None:
         _refuse_scalar(node, where)
 
 
+def refuse_authored_rollups(node: Any, where: str) -> None:
+    """No object may author an aggregate, at any depth (build ticket 13).
+
+    A stored roll-up is a second copy of a fact, and a second copy is a thing that can drift from
+    the first. Every aggregate in this system is computed from its constituents on read, so
+    changing a constituent changes the roll-up with no separate step and no chance to disagree.
+    """
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if str(key).lower().replace("-", "_") in ROLLUP_FIELDS:
+                raise RollUpError(
+                    f"{where}: {key!r} authors an aggregate. Roll-ups are derived — computed from "
+                    "their constituents on read — so there is no authored form to write here."
+                )
+            refuse_authored_rollups(value, f"{where}.{key}")
+    elif isinstance(node, list):
+        for i, value in enumerate(node):
+            refuse_authored_rollups(value, f"{where}[{i}]")
+
+
 def _refuse_scalar(value: Any, where: str) -> None:
     category = _article_nine(value) if isinstance(value, str) else None
     if category:
@@ -225,6 +309,9 @@ SCHEMAS: dict[str, Schema] = {
         required={"id": ident, "name": text, "kind": one_of(*COMPONENT_KINDS)},
         optional={
             "evolution": one_of(*EVOLUTION),
+            # The axis position itself, finer than the stage. Optional because a stage is
+            # already a position: absent, the band midpoint is derived (build ticket 14).
+            "evolution_position": unit_interval,
             "visibility": unit_interval,
             "needs": list_of(ident),
             "description": text,
@@ -287,9 +374,19 @@ SCHEMAS: dict[str, Schema] = {
         optional={"note": text},
     ),
     "person": Schema(required={"id": ident}, optional={"role": text}),
+    # One schema, two edge families. Which fields are required depends on the type, and
+    # `_refine_edge` below is what enforces that — a causal edge without an elasticity is not a
+    # causal edge, and a person edge carrying one is asserting something it cannot know.
     "edge": Schema(
         required={"id": ident, "type": one_of(*EDGE_TYPES), "from": ident, "to": ident},
-        optional={"note": text},
+        optional={
+            "note": text,
+            "sign": one_of(*SIGNS),
+            "lag_days": whole,
+            "elasticity": pert,
+            "evidence_grade": evidence_grade,
+            "confidence": unit_interval,
+        },
     ),
     # The gated unit. Cohort-level by construction — there is no `person` field, which is what
     # "aggregate over individual, cohort over person" means when it is structural rather than a
@@ -313,11 +410,77 @@ SCHEMAS: dict[str, Schema] = {
 }
 
 
+CAUSAL_FIELDS = ("sign", "lag_days", "elasticity", "evidence_grade")
+
+
+def _refine_component(doc: dict[str, Any], where: str) -> None:
+    """Positions are first-class, so a half-position is refused (build ticket 14).
+
+    A component with a stage and no visibility has no place on the map, and a reader who sees
+    one axis populated will assume the other was considered. Both, or neither.
+    """
+    from .wardley import WardleyError, band
+
+    has_stage, has_visibility = "evolution" in doc, "visibility" in doc
+    if has_stage != has_visibility:
+        missing = "visibility" if has_stage else "evolution"
+        raise SchemaError(
+            f"{where}: declares one map axis and not the other (missing {missing}). A component "
+            "is positioned on both axes or on neither — a half-position reads as a whole one."
+        )
+    if "evolution_position" not in doc:
+        return
+    if not has_stage:
+        raise SchemaError(f"{where}: declares evolution_position without the evolution stage it refines")
+    try:
+        low, high = band(str(doc["evolution"]))
+    except WardleyError as exc:
+        raise SchemaError(f"{where}: {exc}") from None
+    value = float(doc["evolution_position"])
+    if not low <= value < high and not (high == 1.0 and value == 1.0):
+        raise SchemaError(
+            f"{where}: evolution_position {value} is outside the {doc['evolution']!r} band "
+            f"[{low}, {high}) — the stage and the position must be the same claim"
+        )
+
+
+def _refine_edge(doc: dict[str, Any], where: str) -> None:
+    """A causal edge asserts sign, lag and elasticity; a structural or person edge asserts none.
+
+    Propagation that runs on directional hand-waving is what this refuses (build ticket 17): an
+    `influences` edge with no elasticity would still be traversable, and would quietly become a
+    "some effect, unknown size" that a Monte-Carlo cannot honestly use.
+    """
+    causal = doc.get("type") == CAUSAL_EDGE
+    present = [f for f in CAUSAL_FIELDS if f in doc]
+    if causal:
+        missing = [f for f in CAUSAL_FIELDS if f not in doc]
+        if missing:
+            raise SchemaError(
+                f"{where}: a {CAUSAL_EDGE!r} edge must declare {', '.join(missing)} — a causal "
+                "claim without sign, lag and a calibrated elasticity is a direction, not a quantity"
+            )
+    elif present:
+        raise SchemaError(
+            f"{where}: a {doc.get('type')!r} edge carries {', '.join(present)}, which only a "
+            f"{CAUSAL_EDGE!r} edge may assert. A structural dependency is not a measured effect."
+        )
+
+
+REFINEMENTS: dict[str, Callable[[dict[str, Any], str], None]] = {
+    "component": _refine_component,
+    "edge": _refine_edge,
+}
+
+
 def validate(kind: str, doc: dict[str, Any], where: str) -> None:
     schema = SCHEMAS.get(kind)
     if schema is None:
         raise SchemaError(f"{where}: no schema for {kind!r}")
     schema.validate(doc, where)
+    refine = REFINEMENTS.get(kind)
+    if refine is not None:
+        refine(doc, where)
 
 
 # Which schema a file gets, by the collection directory it sits in.

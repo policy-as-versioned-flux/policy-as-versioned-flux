@@ -3,8 +3,9 @@
 # forecasts — plural; one recorded outcome scores them. Sense -> run -> score, from a clean
 # checkout, with the loop closed before anything is deepened (build ticket 07).
 #
-# Everything here is stub depth and says so: each artefact carries the computed depth grade of
-# every capability that produced it, and prints exactly which acceptance criteria are unchecked.
+# Every capability here is `partial`, meaning at least one acceptance criterion of its owning
+# decision ticket and rarely more: each artefact carries the computed depth grade of every
+# capability that produced it, and prints exactly which criteria are still unchecked.
 #
 # Exits non-zero if any step fails. OFFLINE: python3 + PyYAML + git, nothing else.
 set -euo pipefail
@@ -68,25 +69,48 @@ for component, holders in sorted(g["bus_factor"].items()):
     print(f"    bus factor  {component:<22} {', '.join(holders)}")
 PY
 
-say "6. reproduce the score card from its pins alone — including the bundle it scored"
+say "6. the map — rendered from that same graph, with no separate authoring step"
+"$TWIN" map --repo "$MODEL" --org netflix || fail "map failed"
+
+say "7. the attestation sidecar, read back — a write-only attestation is not tamper-evidence"
+"$TWIN" verify "$OUT/score-card.json" --attestation || fail "the sidecar did not hold"
+python3 - "$OUT/score-card.json.att.json" <<'PY'
+import json, sys
+doc = json.load(open(sys.argv[1]))
+doc["human_involvement"] = {"present": True, "signatures": [{"role": "model-steward"}]}
+json.dump(doc, open(sys.argv[1] + ".tampered", "w"))
+PY
+mv "$OUT/score-card.json.att.json" "$OUT/score-card.json.att.json.clean"
+mv "$OUT/score-card.json.att.json.tampered" "$OUT/score-card.json.att.json"
+if "$TWIN" verify "$OUT/score-card.json" --attestation >/dev/null 2>&1; then
+  fail "a derived artefact claiming human involvement was not detected"
+fi
+echo "  ok   a planted human signature on a derived artefact is a detectable anomaly"
+mv "$OUT/score-card.json.att.json.clean" "$OUT/score-card.json.att.json"
+
+say "8. the pocket org — five components, six edges, checked against a hand-computed worksheet"
+"$TWIN" fixture --pocket-org --out "$WORK/pocket" >/dev/null || fail "pocket fixture failed"
+"$TWIN" worksheet --repo "$WORK/pocket" || fail "the pocket org no longer matches its worksheet"
+
+say "9. reproduce the score card from its pins alone — including the bundle it scored"
 "$TWIN" verify "$OUT/score-card.json" --repo "$MODEL" || fail "the score card did not reproduce"
 
-say "7. every object validates against its closed schema, and Article 9 data cannot be written"
+say "10. every object validates against its closed schema, and Article 9 data cannot be written"
 "$TWIN" validate --repo "$MODEL" || fail "validation failed"
 
-say "8. the derived index is derived — drop it, rebuild it from git alone"
+say "11. the derived index is derived — drop it, rebuild it from git alone"
 "$TWIN" index --repo "$MODEL" --out "$WORK/index" || fail "index build failed"
 rm -rf "$WORK/index"
 "$TWIN" index --repo "$MODEL" --out "$WORK/index" || fail "index rebuild failed"
 
-say "9. determinism — the same command against the same ref, byte for byte"
+say "12. determinism — the same command against the same ref, byte for byte"
 "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
   --out "$OUT/forecast-bundle-again.json" >/dev/null || fail "second run failed"
 cmp -s "$OUT/forecast-bundle.json" "$OUT/forecast-bundle-again.json" \
   || fail "the same pins produced different bytes"
 echo "  ok   identical bytes"
 
-say "10. a dirty tree is refused — the pin has to describe what you are reading"
+say "13. a dirty tree is refused — the pin has to describe what you are reading"
 echo "# scribble" >> "$MODEL/world/meta.yaml"
 if "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
      --out "$OUT/should-not-exist.json" >/dev/null 2>&1; then

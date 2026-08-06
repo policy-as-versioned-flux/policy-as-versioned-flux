@@ -148,13 +148,18 @@ def test_canonical_json_is_stable_under_key_order() -> None:
 
 
 def test_a_derived_artefact_refuses_a_human_signature() -> None:
-    signature = {"identity": "someone@example.invalid"}
+    from twin import sign
+
+    signature = sign.human("model-steward", _artefact().digest(), b"a-test-key")
     with pytest.raises(AttestationError, match="derived_never_human_signed"):
         attest.build(_artefact(), [signature])
 
 
 def test_an_authored_artefact_carries_the_signature_that_gives_it_accountability() -> None:
-    doc = attest.build(_artefact(mark="authored"), [{"identity": "someone@example.invalid"}])
+    from twin import sign
+
+    authored = _artefact(mark="authored")
+    doc = attest.build(authored, [sign.human("model-steward", authored.digest(), b"a-test-key")])
     assert attest.human_signed(doc)
 
 

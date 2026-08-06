@@ -4,8 +4,9 @@ One dated signal binds to a component; one scenario executes and emits forecasts
 scored against a recorded outcome. The loop closes before anything is deepened, because scoring
 dictates what every other component must record (spec: "Scoring, first").
 
-Everything here is stub depth. What is unchecked is visible in each artefact's `depth` block
-rather than described in prose somewhere nobody reads.
+Every capability here sits at `partial`, which means **at least one** of its owning decision
+ticket's acceptance criteria, not most of them. What is unchecked is visible in each artefact's
+`depth` block rather than described in prose somewhere nobody reads.
 """
 
 from __future__ import annotations
@@ -26,7 +27,9 @@ from . import scoring
 CAPS_SENSE = ["domain-model", "provenance", "sense-move"]
 CAPS_RUN = ["domain-model", "provenance", "scenario-engine"]
 CAPS_SCORE = ["domain-model", "provenance", "sense-move"]
-CAPS_GRAPH = ["domain-model", "provenance"]
+# The graph now carries causal edges and a Wardley map, so the causal layer is one of the
+# capabilities that produced it and its depth travels with the artefact (build ticket 17).
+CAPS_GRAPH = ["domain-model", "provenance", "causal-layer"]
 
 KIND_BOUND_SIGNAL = "bound-signal"
 KIND_FORECAST_BUNDLE = "forecast-bundle"
@@ -153,6 +156,11 @@ def graph(repo: ModelRepo, caps: Capabilities, org: str, command: list[str]) -> 
         for component in sorted(built.components)
         if (holders := built.bus_factor(component))
     }
+    # Both derived on read from the components and edges above, in the same pass that emitted
+    # them: the map has no authoring step (build ticket 14) and the roll-ups have no authored
+    # form (build ticket 13).
+    body["wardley"] = built.wardley()
+    body["rollups"] = built.rollups()
     return Artefact(
         kind=KIND_GRAPH,
         mark=DERIVED,

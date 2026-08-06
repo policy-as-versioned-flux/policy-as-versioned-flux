@@ -1,0 +1,23 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+# Added at build ticket 17, when the causal layer first had code to measure. Before that, a
+# capability file with nothing behind it would have been a slot claiming a capability existed.
+capability: causal-layer
+owning_ticket: '08'
+criteria:
+  - index: 1
+    text: "A causal-edge schema (assertion + evidence grade + confidence) in ubiquitous language."
+    checked: true
+    evidence: "twin/schema.py — an `influences` edge asserts sign, lag, a min/mode/max elasticity, an evidence grade 1-5 and an optional confidence, all validated on write. A degenerate triple is permitted and flagged rather than refused, so false precision is visible."
+    ticked_by: build ticket 17
+  - index: 2
+    text: "Defined intervention + counterfactual semantics, incl. behaviour on structural-only paths."
+    checked: false
+  - index: 3
+    text: "The intervention-aware scoring rule, with a worked example of a mitigated non-event."
+    checked: false
+  - index: 4
+    text: "A stated identification/confounding discipline + its honest limits."
+    checked: false
+  - index: 5
+    text: "Exercised on a real claim from each co-flagship (Qwikster→churn; EUV delay→node slip)."
+    checked: false

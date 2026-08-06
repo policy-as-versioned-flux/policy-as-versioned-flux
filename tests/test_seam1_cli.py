@@ -147,7 +147,10 @@ def test_an_attestation_sidecar_accompanies_every_artefact(model_repo_dir: Path,
     assert sidecar["mark"] == "derived"
     assert sidecar["human_involvement"] == {"present": False, "signatures": []}
     assert sidecar["produced_by"]["runtime"]["python"], "runtime facts live here, not in the artefact"
-    assert sidecar["signature"] is None and "build ticket 11" in sidecar["signature_status"]
+    # Unsigned here because the test environment holds no key, and the sidecar says which one
+    # is missing rather than carrying a placeholder that reads as signed.
+    assert sidecar["agent_signature"] is None
+    assert "TWIN_SIGNING_KEY" in sidecar["signature_status"]
 
 
 def test_the_artefact_carries_no_machine_varying_fact(model_repo_dir: Path, tmp_path: Path) -> None:

@@ -7,7 +7,9 @@ criteria:
     checked: false
   - index: 2
     text: "An actor-identity model covering humans and agents, and what a signature asserts."
-    checked: false
+    checked: true
+    evidence: "twin/sign.py — a human signature asserts accountability and binds to a role from a versioned register, never to an individual; an agent signature asserts reproducible origin and names what it does not assert. The two are non-interchangeable by type, and a human signature on a derived artefact is detected when the sidecar is read back."
+    ticked_by: build ticket 11
   - index: 3
     text: "The chain-depth rule for a recommendation, and materialised-vs-reconstructable."
     checked: false

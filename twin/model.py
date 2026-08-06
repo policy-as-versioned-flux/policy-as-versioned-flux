@@ -15,8 +15,17 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
+from . import wardley
 from .repo import ModelRepo, RepoError, UnitRef, load_yaml
-from .schema import COLLECTION_KINDS, PERSON_EDGES, STRUCTURAL_EDGE, validate
+from .schema import (
+    CAUSAL_EDGE,
+    CAUSAL_FIELDS,
+    COLLECTION_KINDS,
+    PERSON_EDGES,
+    STRUCTURAL_EDGE,
+    degenerate,
+    validate,
+)
 
 WORLD = "world"
 ORGS = "orgs"
@@ -163,6 +172,13 @@ class Overlay:
                     f"edge {ident!r}: structural {STRUCTURAL_EDGE!r} edges are declared as a "
                     "component's `needs`, so the value chain reads as a value chain. One edge, one home."
                 )
+            if edge["type"] == CAUSAL_EDGE:
+                # Component to component. A causal edge from a person would be a claim about a
+                # named individual's effect on the world, which is the thing decision ticket 15
+                # refuses; people reach the graph through role edges only.
+                self.component(str(edge["from"]))
+                self.component(str(edge["to"]))
+                continue
             if edge["from"] not in self.people:
                 raise ModelError(f"edge {ident!r}: {edge['from']!r} is not a person in this overlay")
             self.component(str(edge["to"]))
@@ -183,7 +199,13 @@ class Overlay:
             for need in dict.fromkeys(comp.get("needs", []) or [])  # a repeated `needs` is one edge
         ]
         edges += [
-            Edge(id=ident, type=str(e["type"]), source=str(e["from"]), target=str(e["to"]))
+            Edge(
+                id=ident,
+                type=str(e["type"]),
+                source=str(e["from"]),
+                target=str(e["to"]),
+                causal={f: e[f] for f in CAUSAL_FIELDS + ("confidence",) if f in e} or None,
+            )
             for ident, e in sorted(self.edges.items())
         ]
         return Graph(
@@ -203,9 +225,18 @@ class Edge:
     type: str
     source: str
     target: str
+    # Sign, lag, elasticity and evidence grade — present on a causal edge, absent on every other
+    # kind, because only a causal edge measures anything (build ticket 17).
+    causal: dict[str, Any] | None = None
 
-    def as_dict(self) -> dict[str, str]:
-        return {"id": self.id, "type": self.type, "from": self.source, "to": self.target}
+    def as_dict(self) -> dict[str, Any]:
+        out: dict[str, Any] = {"id": self.id, "type": self.type, "from": self.source, "to": self.target}
+        if self.causal:
+            out.update(self.causal)
+            # Flagged on read rather than refused on write: a point estimate is representable,
+            # but it must never be readable as a range.
+            out["degenerate_elasticity"] = degenerate(self.causal["elasticity"])
+        return out
 
 
 @dataclass(frozen=True)
@@ -231,6 +262,44 @@ class Graph:
     def bus_factor(self, component: str) -> list[str]:
         """Who would have to be replaced. The only reason people are in the graph at all."""
         return sorted({e.source for e in self.edges if e.type in PERSON_EDGES and e.target == component})
+
+    def wardley(self) -> dict[str, Any]:
+        """The map, derived from this graph. No authoring step (build ticket 14)."""
+        return wardley.map_of(self.components, self.edges)
+
+    def rollups(self) -> dict[str, Any]:
+        """Aggregates, computed from the constituents on every read (build ticket 13).
+
+        There is no authored form and no stored form: a roll-up exists only for as long as it
+        takes to serialise it. That is what makes "an aggregate can never drift from its
+        constituents" structural — there is no second copy to drift.
+        """
+        causal = [e for e in self.edges if e.type == CAUSAL_EDGE]
+        by_kind: dict[str, int] = {}
+        by_stage: dict[str, int] = {}
+        for doc in self.components.values():
+            by_kind[str(doc["kind"])] = by_kind.get(str(doc["kind"]), 0) + 1
+            stage = doc.get("evolution")
+            if stage is not None:
+                by_stage[str(stage)] = by_stage.get(str(stage), 0) + 1
+        return {
+            "components": len(self.components),
+            "components_by_kind": dict(sorted(by_kind.items())),
+            "components_by_evolution": dict(sorted(by_stage.items())),
+            "people": len(self.people),
+            "edges": len(self.edges),
+            "edges_by_type": dict(
+                sorted((t, sum(1 for e in self.edges if e.type == t)) for t in {e.type for e in self.edges})
+            ),
+            "causal_edges": len(causal),
+            "causal_edges_with_degenerate_elasticity": sum(
+                1 for e in causal if e.causal and degenerate(e.causal["elasticity"])
+            ),
+            "components_with_a_named_holder": sum(
+                1 for i in self.components if self.bus_factor(i)
+            ),
+            "components_positioned_on_the_map": len(wardley.positions(self.components)),
+        }
 
 
 @dataclass(frozen=True)

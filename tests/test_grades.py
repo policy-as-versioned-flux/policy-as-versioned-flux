@@ -94,7 +94,9 @@ def test_an_ungraded_capability_cannot_be_used(caps: Capabilities) -> None:
 def test_the_shipped_capabilities_are_all_partial_or_stub(caps: Capabilities) -> None:
     """The walking skeleton must not be able to claim `full` anywhere."""
     grades = {g.capability: g.grade for g in caps}
-    assert set(grades) == {"domain-model", "honest-build", "provenance", "scenario-engine", "sense-move"}
+    assert set(grades) == {
+        "causal-layer", "domain-model", "honest-build", "provenance", "scenario-engine", "sense-move"
+    }
     assert "full" not in grades.values()
 
 

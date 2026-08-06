@@ -254,6 +254,43 @@ from: alex-rivera
 to: cloud-compute
 note: A structural fact about who could rebuild it, and nothing about how they are doing.
 """,
+    # The graded-edge fixture (build ticket 17): the boundary contract the £ track and the
+    # skills track test against. Generated, never committed, so it cannot fossilise — a
+    # downstream track reads it out of the emitted graph artefact.
+    "orgs/netflix/edges/streaming-displaces-dvd.yaml": """\
+id: streaming-displaces-dvd
+type: influences
+from: streaming-experience
+to: dvd-by-mail
+sign: negative
+lag_days: 180
+elasticity:
+  min: 0.2
+  mode: 0.45
+  max: 0.8
+evidence_grade: 3
+confidence: 0.5
+note: >-
+  A calibrated range, not a point. The width is the honest part: nobody knows this number to
+  two decimal places and a triple says so where a single figure would not.
+""",
+    "orgs/intel/edges/euv-delay-slips-the-node.yaml": """\
+id: euv-delay-slips-the-node
+type: influences
+from: euv-lithography
+to: leading-edge-process-node
+sign: negative
+lag_days: 365
+elasticity:
+  min: 0.5
+  mode: 0.5
+  max: 0.5
+evidence_grade: 2
+confidence: 0.4
+note: >-
+  A degenerate triple, on purpose. It is permitted and it is flagged, so false precision is
+  visible in the artefact rather than hidden behind a range that has no width.
+""",
     "orgs/intel/scenarios/euv-slip-2026.yaml": """\
 id: euv-slip-2026
 question: Does the tooling required for the next node arrive late enough to matter?
@@ -371,6 +408,139 @@ def advance_world(root: str | Path) -> str:
     git(path, "add", "-A")
     git(path, "commit", "-q", "-m", "world moves on")
     return git(path, "rev-parse", "HEAD").strip()
+
+
+# -- the pocket org (build ticket 15) ------------------------------------------------------
+#
+# Five components, six edges, named elasticities, and every number chosen so a reviewer can do
+# the arithmetic in their head. It exists to catch the class of failure a refusal test cannot:
+# a PERT triple that is present but garbage, an elasticity that stops being recalibrated three
+# tickets later, a propagation that changed and nobody noticed. Those all stay green under a
+# refusal test and all fail here, against `twin/pocket-org-worksheet.md`.
+#
+# It also decouples two tracks. The £ chain takes a distribution as input and does not care
+# whether it came from Monte-Carlo propagation or from this fixture, so pricing can run parallel
+# to propagation instead of behind it.
+
+POCKET_WORLD: dict[str, str] = {
+    # Names no tenant, in any file, in any field or any prose — `world_never_references_overlay`
+    # holds for this fixture exactly as it does for the flagship one.
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: Deliberately thin. The subject is the overlay; the world layer holds no components.
+""",
+    "world/propositions/the-portal-misses-its-availability-target.yaml": """\
+id: the-portal-misses-its-availability-target
+text: The customer portal misses its stated availability target over the horizon.
+""",
+    "world/world_models/reference-map.yaml": """\
+id: reference-map
+name: The reference map
+credence: 0.5
+beliefs:
+  the-portal-misses-its-availability-target: 0.4
+""",
+}
+
+POCKET_OVERLAY: dict[str, str] = {
+    "orgs/pocket/components/customer-portal.yaml": """\
+id: customer-portal
+name: Customer portal
+kind: activity
+evolution: product
+evolution_position: 0.6
+visibility: 0.9
+needs:
+  - order-service
+""",
+    "orgs/pocket/components/order-service.yaml": """\
+id: order-service
+name: Order service
+kind: activity
+evolution: product
+evolution_position: 0.5
+visibility: 0.7
+needs:
+  - payment-gateway
+  - identity-store
+""",
+    "orgs/pocket/components/payment-gateway.yaml": """\
+id: payment-gateway
+name: Payment gateway
+kind: activity
+evolution: commodity
+evolution_position: 0.8
+visibility: 0.5
+""",
+    "orgs/pocket/components/identity-store.yaml": """\
+id: identity-store
+name: Identity store
+kind: data
+evolution: custom-built
+evolution_position: 0.4
+visibility: 0.3
+needs:
+  - shared-database
+""",
+    "orgs/pocket/components/shared-database.yaml": """\
+id: shared-database
+name: Shared database
+kind: data
+evolution: commodity
+evolution_position: 0.9
+visibility: 0.1
+""",
+    "orgs/pocket/edges/database-slows-orders.yaml": """\
+id: database-slows-orders
+type: influences
+from: shared-database
+to: order-service
+sign: negative
+lag_days: 7
+elasticity:
+  min: 0.3
+  mode: 0.5
+  max: 0.7
+evidence_grade: 3
+confidence: 0.6
+""",
+    "orgs/pocket/edges/orders-slow-the-portal.yaml": """\
+id: orders-slow-the-portal
+type: influences
+from: order-service
+to: customer-portal
+sign: negative
+lag_days: 14
+elasticity:
+  min: 0.4
+  mode: 0.4
+  max: 0.4
+evidence_grade: 2
+confidence: 0.5
+note: >-
+  Degenerate on purpose, so the worksheet carries one flagged edge and one honest range.
+""",
+}
+
+
+def build_pocket_org(dest: str | Path) -> Path:
+    """The pocket-org model repository. Same deterministic recipe as `build`."""
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, POCKET_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(root, POCKET_OVERLAY)
+    _write(root, {"orgs/pocket/meta.yaml": f"id: pocket\nunit: overlay\norg: pocket\nworld_ref: {world_commit}\n"})
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the pocket org")
+    return root
 
 
 def plant_world_violation(root: str | Path) -> str:
