@@ -146,6 +146,34 @@ class Triple:
             1.0 + 4.0 * (self.high - self.mode) / width,
         )
 
+    def raw_moment(self, k: int) -> float:
+        """`E[X^k]`, analytically. The yardstick the sampled figures are checked against.
+
+        Needed by shared-ancestry aggregation (build ticket 21): when two paths share an edge,
+        the expectation of their product carries that edge **squared**, and the difference
+        between `E[X^2]` and `E[X]^2` is exactly the double-counting a naive independence
+        assumption would invent. Analytic rather than sampled, because the pocket-org worksheet
+        has to be hand-checkable and a Monte-Carlo estimate is not.
+
+        `X = min + w*B` with `B ~ Beta(alpha, beta)` and `alpha + beta = 6`, so
+        `E[B^j] = prod (alpha + i) / (6 + i)` and the binomial expansion does the rest.
+        `k = 1` recovers the PERT mean and `k = 2` recovers the PERT variance, which is what
+        makes this a yardstick rather than a second opinion.
+        """
+        if k < 0:
+            raise PertError(f"a raw moment is of order zero or more, not {k}")
+        if self.degenerate:
+            return float(self.low) ** k
+        alpha, _ = self.shape
+        width = self.high - self.low
+        total = 0.0
+        beta_moment = 1.0
+        for j in range(k + 1):
+            if j:
+                beta_moment *= (alpha + j - 1) / (6.0 + j - 1)
+            total += math.comb(k, j) * self.low ** (k - j) * width**j * beta_moment
+        return total
+
     def sample(self, rng: random.Random) -> float:
         """One draw. A degenerate triple draws its point and consumes no randomness."""
         if self.degenerate:

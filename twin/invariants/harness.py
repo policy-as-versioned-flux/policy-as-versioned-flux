@@ -7,13 +7,14 @@ import re
 import subprocess
 import tempfile
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator
 
 import yaml
 
 from .. import REPO_DIR
+from ..artefact import Artefact
 from ..grades import Capabilities
 from . import (
     FAIL,
@@ -104,6 +105,10 @@ class Context:
     repo_dir: Path
     caps: Capabilities
     ci_matrix: bool
+    # `emit_all`'s memo, keyed by output directory. Held on the context rather than in a module
+    # global so it dies with the scratch directory it describes, and so two suite runs in one
+    # process cannot hand each other stale artefacts.
+    emitted: dict[str, dict[str, tuple[Artefact, Path]]] = field(default_factory=dict)
 
 
 # -- checks on the suite itself ------------------------------------------------------------
@@ -324,6 +329,82 @@ def _graded_edge_contract(ctx: Context) -> str:
     if not Overlay.load(repo, "netflix").edges:
         raise Violated("the fixture overlay carries no first-class edges at all")
     return f"{len(graded)} graded causal edges, one degenerate and flagged; a stripped one is refused"
+
+
+@harness_check("an_intervention_never_reaches_upstream")
+def _intervention_never_reaches_upstream(ctx: Context) -> str:
+    """`do()` propagates downstream only (build ticket 22).
+
+    A guard rather than an invariant, because the constitution's sixteen invariants are the named
+    *absences* and this is a semantic property of one verb — the same kind of thing the graded-edge
+    fixture's contract is. It belongs in the suite regardless: a system that lets an intervention
+    back-propagate concludes that taking an action changed the past, and that conclusion would
+    read as an ordinary number in an ordinary artefact.
+
+    Three legs. The emitted pair must differ upstream and agree downstream; the refusal must bite
+    on a planted violation; and the fixture must actually have something upstream to update, or
+    the first leg is vacuous.
+
+    **The downstream-identity leg is a property of this implementation, not of causal inference.**
+    Conditioning and intervening give the same downstream answer only because nothing here models
+    a backdoor path — which is exactly the identification discipline decision ticket 08 AC 4 is
+    still holding open. When that lands, `observe()` will legitimately differ downstream and this
+    leg must be narrowed rather than defended. Named here so the guard cannot quietly become the
+    reason the AC-4 work is not done: the constitution calls that skeleton-as-ceiling.
+    """
+    import json
+
+    from ..artefact import ArtefactError
+    from ..primitives import refuse_upstream_under_intervention
+    from ..verbs import KIND_INTERVENTION, KIND_OBSERVATION
+    from .checks import emit_all
+
+    emitted = emit_all(ctx)
+    doing = json.loads(emitted[KIND_INTERVENTION][1].read_bytes())["body"]
+    learning = json.loads(emitted[KIND_OBSERVATION][1].read_bytes())["body"]
+
+    if not learning["upstream"]:
+        raise Violated(
+            "the observed component has no causal ancestor in the fixture, so 'do() updates "
+            "nothing upstream' is true of a component nothing could update"
+        )
+    if doing["upstream"]:
+        named = ", ".join(str(e.get("component")) for e in doing["upstream"])
+        raise Violated(f"an intervention updated belief about {named}; acting did not change the past")
+    if not doing["severed"]:
+        raise Violated("the intervened component has no incoming edge to sever, so nothing is asserted")
+    if doing["downstream"] != learning["downstream"]:
+        raise Violated(
+            "doing and learning produced different downstream halves. The difference between them "
+            "lives above the causal composition; a difference inside it is a second implementation"
+        )
+    # And the refusal itself, on a planted violation — the leg that proves the guard is a guard.
+    try:
+        refuse_upstream_under_intervention({**doing, "upstream": [{"component": "planted"}]})
+    except ArtefactError:
+        pass
+    else:
+        raise Violated("a planted upstream belief update survived an intervention's emission")
+
+    # The guard has to be *wired*, not merely present. Nothing reachable through the public API
+    # can violate it today — the intervention branch hardcodes an empty upstream — so deleting the
+    # call would leave every test green while removing the protection that matters the moment
+    # somebody changes that branch. Asserted on the emitting function's source, the same way
+    # `no_collapse_mechanism` asserts the absence of a collapse affordance.
+    import inspect
+
+    from .. import verbs
+
+    if "refuse_upstream_under_intervention" not in inspect.getsource(verbs._query):
+        raise Violated(
+            "the emitting function no longer calls refuse_upstream_under_intervention. The guard "
+            "cannot bite through the public API today, which is exactly why its removal has to "
+            "fail here rather than wait for the branch that would need it."
+        )
+    return (
+        f"do({doing['component']}) severs {len(doing['severed'])} edge(s) and updates nothing "
+        f"upstream; observe() updates {len(learning['upstream'])}; the downstream halves are identical"
+    )
 
 
 @harness_check("cross_architecture_determinism", may_skip=True)

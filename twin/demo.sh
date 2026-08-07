@@ -107,8 +107,48 @@ for reached in b["reached"]:
               f"composed {c['min']:.3f}/{c['mode']:.3f}/{c['max']:.3f}  x{path['attenuation']}  "
               f"-> {a['min']:.3f}/{a['mode']:.3f}/{a['max']:.3f}  sampled p50 {path['sampled']['p50']:.3f}")
 assert b["traversal"]["paths_are_not_aggregated"], "the non-aggregation statement went missing"
-print("  structural edges do not propagate, and paths are never summed — shared ancestry is ticket 21")
+for reached in b["reached"]:
+    joint = reached.get("joint")
+    if joint is None or joint["exact"] is None:
+        continue
+    assert joint["exact"] <= joint["if_independent"], "the dependence correction went the wrong way"
+    shared = ", ".join(joint["shared_edges"]) or "nothing"
+    print(f"    joint {reached['component']:<24} {joint['exact']:.4f} against "
+          f"{joint['if_independent']:.4f} if independent; shares {shared}")
+print("  structural edges do not propagate, and paths are combined by noisy-OR rather than summed")
+print("  a shared edge is drawn once per trial, so a common cause is not counted twice — every")
+print("  component here is reached by one path, so there is nothing to combine and the two figures")
+print("  agree trivially. The diamond that exercises the discount is in the pocket org, step 13")
 PROP
+
+say "8b. doing versus learning — an intervention does not rewrite its own causes"
+"$TWIN" intervene --repo "$MODEL" --org netflix --component streaming-experience \
+  --out "$OUT/intervention.json" >/dev/null || fail "intervene failed"
+"$TWIN" observe --repo "$MODEL" --org netflix --component streaming-experience \
+  --out "$OUT/observation.json" >/dev/null || fail "observe failed"
+python3 - "$OUT/intervention.json" "$OUT/observation.json" <<'DO'
+import json, sys
+doing = json.load(open(sys.argv[1]))["body"]
+learning = json.load(open(sys.argv[2]))["body"]
+assert doing["upstream"] == [], "an intervention updated a belief about its own causes"
+assert learning["upstream"], "an observation updated nothing upstream"
+assert doing["downstream"] == learning["downstream"], "the downstream halves diverged"
+print(f"  do({doing['component']}): severs {', '.join(e['edge'] for e in doing['severed'])},"
+      f" updates nothing upstream")
+print(f"  observe({learning['component']}): severs nothing, updates belief about "
+      f"{', '.join(e['component'] for e in learning['upstream'])} — and carries no magnitude there")
+print("  the downstream halves are byte-identical: the difference lives above the composition")
+DO
+
+say "8c. rewind — the refusals. Every fixture commit shares one date, so a later instant"
+say "    resolves to HEAD; the dated-change case is tests/test_primitives.py"
+"$TWIN" rewind --repo "$MODEL" --org netflix --at 2026-06-01T00:00:00+00:00 \
+  --out "$OUT/rewound-model.json" >/dev/null || fail "rewind failed"
+if "$TWIN" rewind --repo "$MODEL" --org netflix --at 1999-01-01 \
+     --out "$OUT/should-not-exist.json" >/dev/null 2>&1; then
+  fail "a rewind to before the model existed returned an empty state"
+fi
+echo "  ok   a rewind to before the model existed is refused, not answered with an empty model"
 
 say "9. the pre-filter — a constraint is not a very large price, because a price can be outbid"
 "$TWIN" options --repo "$MODEL" --org netflix --perspective the-operator \
@@ -149,7 +189,7 @@ fi
 echo "  ok   a planted human signature on a derived artefact is a detectable anomaly"
 mv "$OUT/score-card.json.att.json.clean" "$OUT/score-card.json.att.json"
 
-say "13. the pocket org — five components, six edges, checked against a hand-computed worksheet"
+say "13. the pocket org — five components, eight edges, checked against a hand-computed worksheet"
 "$TWIN" fixture --pocket-org --out "$WORK/pocket" >/dev/null || fail "pocket fixture failed"
 "$TWIN" worksheet --repo "$WORK/pocket" || fail "the pocket org no longer matches its worksheet"
 

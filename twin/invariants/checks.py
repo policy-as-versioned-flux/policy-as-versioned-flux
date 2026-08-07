@@ -56,6 +56,15 @@ GRADE_5_ONLY = "brand-goodwill"
 PROPAGATE_ORIGIN = "content-delivery-network"
 # The choice set and its two removals (build ticket 28). One crosses the universal floor and one
 # crosses this perspective's own ruin boundary, so both tiers are exercised.
+# The subject of the do/observe pair (build ticket 22). It has a cause above it and an effect
+# below it, so both operations reach the same components downstream and differ only upstream —
+# which is the distinction, with nothing else moving.
+QUERY_COMPONENT = "streaming-experience"
+# The rewind subject (build ticket 35). Every fixture commit carries one fixed date, so any later
+# instant resolves to HEAD on every machine and the emitted state is byte-stable. The dated-change
+# case — where rewind reads a number that was later overwritten — is `tests/test_primitives.py`,
+# because it needs a second commit at a second date and the fixture is deliberately single-dated.
+REWIND_AT = "2026-06-01T00:00:00+00:00"
 PERSPECTIVE = "the-operator"
 OTHER_PERSPECTIVE = "the-staff-council"
 RUIN_CLASS_OPTION = "stake-the-quarter-on-one-title"
@@ -66,7 +75,19 @@ FLOOR_OPTION = "instrument-viewers-without-telling-them"
 
 
 def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefact, Path]]:
-    """One of each artefact kind, from the fixture repository. The subjects every check asserts on."""
+    """One of each artefact kind, from the fixture repository. The subjects every check asserts on.
+
+    Memoised per (context, directory). Fifteen checks ask for these and the set is deterministic
+    by construction — that is the property half of them are asserting — so re-deriving it fifteen
+    times only buys wall-clock. Build ticket 21 made that expensive enough to notice: three more
+    artefacts, two of which run a full 2000-draw propagation.
+
+    The determinism legs that *need* a second derivation ask for one by name, with `into` set to
+    a different directory, so they still get one.
+    """
+    cached = ctx.emitted.get(into)
+    if cached is not None:
+        return cached
     repo = ModelRepo.open(ctx.repo_dir)
     out_dir = ctx.tmp / into
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -118,7 +139,27 @@ def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefac
     )
     choices_path = choices.write(out_dir / "priced-option-set.json")
 
-    return {
+    acted = verbs.intervene(
+        repo, ctx.caps, NETFLIX, QUERY_COMPONENT,
+        verbs.command_for("intervene", org=NETFLIX, component=QUERY_COMPONENT),
+    )
+    acted_path = acted.write(out_dir / "intervention.json")
+
+    learned = verbs.observe(
+        repo, ctx.caps, NETFLIX, QUERY_COMPONENT,
+        verbs.command_for("observe", org=NETFLIX, component=QUERY_COMPONENT),
+    )
+    learned_path = learned.write(out_dir / "observation.json")
+
+    from ..primitives import rewind
+
+    past = verbs.rewind(
+        rewind(ctx.repo_dir, REWIND_AT), ctx.caps, NETFLIX, REWIND_AT,
+        verbs.command_for("rewind", org=NETFLIX, at=REWIND_AT),
+    )
+    past_path = past.write(out_dir / "rewound-model.json")
+
+    emitted = {
         bound.kind: (bound, bound_path),
         bundle.kind: (bundle, bundle_path),
         card.kind: (card, card_path),
@@ -127,7 +168,12 @@ def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefac
         exposed.kind: (exposed, exposed_path),
         moved.kind: (moved, moved_path),
         choices.kind: (choices, choices_path),
+        acted.kind: (acted, acted_path),
+        learned.kind: (learned, learned_path),
+        past.kind: (past, past_path),
     }
+    ctx.emitted[into] = emitted
+    return emitted
 
 
 def recompute_digests(ctx: "Context") -> dict[str, str]:
@@ -323,6 +369,7 @@ def _every_capability_depth_graded(ctx: "Context") -> str:
         set(verbs.CAPS_SENSE) | set(verbs.CAPS_RUN) | set(verbs.CAPS_SCORE)
         | set(verbs.CAPS_GRAPH) | set(verbs.CAPS_BLAST) | set(verbs.CAPS_EXPOSURE)
         | set(verbs.CAPS_PROPAGATE) | set(verbs.CAPS_OPTIONS)
+        | set(verbs.CAPS_QUERY) | set(verbs.CAPS_REWIND)
     )
     for name in used:
         ctx.caps.require(name)
@@ -500,7 +547,15 @@ def _world_never_references_overlay(ctx: "Context") -> str:
 
 @invariant("no_collapse_mechanism")
 def _no_collapse_mechanism(ctx: "Context") -> str:
-    """An execution emits multiple forecasts and nothing collapses them."""
+    """An execution emits multiple forecasts and nothing collapses them.
+
+    **Extended at build ticket 21**, which introduced the first aggregate in this system that
+    could plausibly stand in for the things it aggregates. A component reached by several causal
+    paths now carries a combined `joint` figure, and the risk that creates is precisely the one
+    this invariant exists for: a single number that ends the conversation. So the combined figure
+    is asserted to be an **addition** to the paths and never a replacement — every path is still
+    reported individually beside it, with its own composed, attenuated and sampled triples.
+    """
     _, path = emit_all(ctx)[verbs.KIND_FORECAST_BUNDLE]
     body = json.loads(path.read_bytes())["body"]
     forecasts = body.get("forecasts")
@@ -513,6 +568,36 @@ def _no_collapse_mechanism(ctx: "Context") -> str:
 
     _refusals_hold("no_collapse_mechanism", json.loads(path.read_bytes()))
 
+    moved = json.loads(emit_all(ctx)[verbs.KIND_PROPAGATION][1].read_bytes())["body"]
+    combined = 0
+    for reached in moved["reached"]:
+        if "joint" not in reached:
+            continue
+        combined += 1
+        joint, paths = reached["joint"], reached["paths"]
+        if not paths:
+            raise Violated(f"{reached['component']}: a combined figure with no paths beside it")
+        if joint["paths_combined"] + joint["paths_directional"] != len(paths):
+            raise Violated(
+                f"{reached['component']}: the combined figure covers "
+                f"{joint['paths_combined']} + {joint['paths_directional']} of {len(paths)} paths — "
+                "a path that is neither combined nor named as directional has been absorbed"
+            )
+        for entry in paths:
+            if entry["directional_only"]:
+                continue
+            if not all(k in entry for k in ("composed", "attenuated", "sampled")):
+                raise Violated(
+                    f"{reached['component']}: a path lost its own figures once a combined one "
+                    "existed. The combined figure is an addition, never a replacement."
+                )
+        # The reference the discount is from. Without it the correction is unfalsifiable, which is
+        # the same failure as an attenuated number with no un-attenuated one beside it.
+        if "if_independent" not in joint:
+            raise Violated(f"{reached['component']}: a combined figure with nothing to compare it against")
+    if not combined:
+        raise Violated("no component carries a combined figure, so this leg asserts nothing")
+
     from .. import cli  # imported here: the CLI imports the suite, so the suite must not import it early
 
     for module in (verbs, cli):
@@ -520,7 +605,10 @@ def _no_collapse_mechanism(ctx: "Context") -> str:
         for needle in ("--collapse", "--single", "--consensus", "--point-estimate", "def collapse", "def consensus"):
             if needle in source:
                 raise Violated(f"{module.__name__} offers a collapse affordance ({needle!r})")
-    return f"{len(forecasts)} forecasts emitted, no collapse affordance anywhere"
+    return (
+        f"{len(forecasts)} forecasts emitted, no collapse affordance anywhere; "
+        f"{combined} combined propagation figures, each beside every path it combines"
+    )
 
 
 @invariant("no_recommended_action_field")

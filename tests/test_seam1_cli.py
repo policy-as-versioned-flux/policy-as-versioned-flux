@@ -357,6 +357,71 @@ def test_propagate_emits_composed_attenuated_and_sampled(model_repo_dir: Path, t
     assert body["calibration"]["document"] == "calibration.md"
 
 
+def test_propagate_combines_the_paths_and_shows_what_independence_would_have_said(
+    model_repo_dir: Path, tmp_path: Path
+) -> None:
+    """Build ticket 21 at seam 1: the combined figure, and the reference it is a discount from."""
+    out = tmp_path / "propagation.json"
+    assert _run(model_repo_dir, "propagate", *NETFLIX, "--origin", "content-delivery-network",
+                "--out", str(out)) == 0
+
+    body = json.loads(out.read_bytes())["body"]
+    joint = next(r for r in body["reached"] if r["component"] == "dvd-by-mail")["joint"]
+    # This fixture reaches every component by exactly one path, so the *numbers* here cannot
+    # demonstrate the discount — `exact == if_independent` follows from noisy-OR of one term
+    # whatever the code does. What seam 1 can assert is that the block is emitted, complete, and
+    # says what it is. The discount itself is asserted at seam 2, where a diamond can be built.
+    assert joint["paths_combined"] == 1 and joint["shared_edges"] == []
+    assert joint["exact"] == joint["if_independent"], "one path, so there is nothing to discount"
+    assert joint["double_counting_avoided"] == 0
+    assert joint["sign"] in ("positive", "negative")
+    assert joint["paths_dropped_by_cap"] == 0
+    assert "noisy-OR" in joint["rule"] and "never summed" in joint["rule"]
+    assert "conditional on the shared edges" in joint["assumption"]
+    assert "drawn once per trial" in body["sampler"]["seeded_by"]
+
+
+def test_intervene_and_observe_differ_only_upstream(model_repo_dir: Path, tmp_path: Path) -> None:
+    """Build ticket 22 at seam 1. Doing a thing does not rewrite its own causes."""
+    acted, learned = tmp_path / "intervention.json", tmp_path / "observation.json"
+    subject = ["--component", "streaming-experience"]
+    assert _run(model_repo_dir, "intervene", *NETFLIX, *subject, "--out", str(acted)) == 0
+    assert _run(model_repo_dir, "observe", *NETFLIX, *subject, "--out", str(learned)) == 0
+
+    doing = json.loads(acted.read_bytes())
+    learning = json.loads(learned.read_bytes())
+    assert doing["envelope"]["kind"] == "intervention"
+    assert learning["envelope"]["kind"] == "observation"
+
+    assert doing["body"]["upstream"] == []
+    assert [e["edge"] for e in doing["body"]["severed"]] == ["cdn-capacity-lifts-streaming"]
+    assert [e["component"] for e in learning["body"]["upstream"]] == ["content-delivery-network"]
+    assert learning["body"]["severed"] == []
+    # The half that must be identical, asserted as bytes rather than as a count: the two
+    # operations differ above the causal composition and nowhere inside it.
+    assert doing["body"]["downstream"] == learning["body"]["downstream"]
+
+
+def test_rewind_emits_the_model_state_at_a_declared_time(model_repo_dir: Path, tmp_path: Path) -> None:
+    """Build ticket 35 at seam 1. A model state, and the commit it resolved to."""
+    out = tmp_path / "rewound.json"
+    assert main(["rewind", *NETFLIX, "--repo", str(model_repo_dir),
+                 "--at", "2026-06-01T00:00:00+00:00", "--out", str(out)]) == 0
+
+    doc = json.loads(out.read_bytes())
+    assert doc["envelope"]["kind"] == "rewound-model"
+    body = doc["body"]
+    assert body["rewound_to"] == "2026-06-01T00:00:00+00:00"
+    assert body["resolved"]["commit"] == doc["envelope"]["pins"]["model_repo"]["commit"]
+    assert body["rollups"]["components"] == len(body["graph"]["components"])
+    assert "abduction" in body["abduction"]
+
+
+def test_rewinding_before_the_model_existed_is_a_sentence(model_repo_dir: Path, tmp_path: Path) -> None:
+    assert main(["rewind", *NETFLIX, "--repo", str(model_repo_dir),
+                 "--at", "1999-01-01", "--out", str(tmp_path / "rewound.json")]) == 2
+
+
 def test_options_removes_before_it_prices(model_repo_dir: Path, tmp_path: Path) -> None:
     out = tmp_path / "options.json"
     assert _run(model_repo_dir, "options", *NETFLIX, "--perspective", "the-operator",

@@ -63,14 +63,21 @@ def test_a_moved_position_fails_the_worksheet(tmp_path: Path) -> None:
     assert main(["worksheet", "--repo", str(repo)]) == 1
 
 
-def test_the_pocket_org_is_five_components_and_six_edges(pocket: Path) -> None:
+def test_the_pocket_org_is_five_components_and_eight_edges(pocket: Path) -> None:
+    """Build ticket 21 added the two edges that close the diamond, and nothing else."""
     from twin.model import Overlay
     from twin.repo import ModelRepo
 
     graph = Overlay.load(ModelRepo.open(pocket), worksheet.POCKET_ORG).graph()
     assert len(graph.components) == 5, "hand-computable means small"
-    assert len(graph.edges) == 6
-    assert sum(1 for e in graph.edges if e.causal) == 2, "named elasticities"
+    assert len(graph.edges) == 8
+    assert sum(1 for e in graph.edges if e.causal) == 4, "named elasticities"
+    # The diamond itself: two routes from the database to the portal, sharing their first hop.
+    routes = {
+        ("shared-database", "order-service"), ("order-service", "customer-portal"),
+        ("order-service", "payment-gateway"), ("payment-gateway", "customer-portal"),
+    }
+    assert {(e.source, e.target) for e in graph.edges if e.causal} == routes
 
 
 def test_the_worksheet_declares_the_role_accountable_for_its_numbers() -> None:

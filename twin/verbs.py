@@ -11,6 +11,7 @@ ticket's acceptance criteria, not most of them. What is unchecked is visible in 
 
 from __future__ import annotations
 
+import datetime
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +29,7 @@ from . import (
     constraints,
     evidence,
     options as options_mod,
+    primitives as primitives_mod,
     propagate as propagate_mod,
     scoring,
 )
@@ -44,6 +46,11 @@ CAPS_BLAST = ["causal-layer", "domain-model", "provenance"]
 CAPS_EXPOSURE = ["causal-layer", "currency-regimes", "domain-model", "provenance"]
 CAPS_PROPAGATE = ["causal-layer", "domain-model", "provenance"]
 CAPS_OPTIONS = ["currency-regimes", "domain-model", "provenance"]
+# `do()` and `observe()` are the causal layer's intervention semantics (build ticket 22).
+CAPS_QUERY = ["causal-layer", "domain-model", "provenance"]
+# Rewind is the scenario engine's time primitive (build ticket 35), and it is a fact about the
+# model repository, so provenance travels with it too.
+CAPS_REWIND = ["domain-model", "provenance", "scenario-engine"]
 
 KIND_BOUND_SIGNAL = "bound-signal"
 KIND_FORECAST_BUNDLE = "forecast-bundle"
@@ -53,6 +60,9 @@ KIND_BLAST_RADIUS = "blast-radius"
 KIND_SCENARIO_EXPOSURE = "scenario-exposure"
 KIND_PROPAGATION = "propagation"
 KIND_PRICED_OPTIONS = "priced-option-set"
+KIND_INTERVENTION = "intervention"
+KIND_OBSERVATION = "observation"
+KIND_REWOUND_MODEL = "rewound-model"
 
 # Only an as-consumed execution produces a scoring-eligible forecast: the honest number is never
 # contaminated by what we know now (spec story 40). The *tag* lands here; the *gating* — refusing
@@ -228,9 +238,10 @@ def propagate(repo: ModelRepo, caps: Capabilities, org: str, origin: str, comman
     composes along it; that exposure is the unpriced blast radius and it stays unpriced.
     """
     overlay = Overlay.load(repo, org)
+    # The closed body and the directional-magnitude refusal are enforced inside
+    # `propagate_mod.propagate`, not here: build ticket 22 gave that body a second producer, and
+    # a guard applied by one caller is a guard the other caller does not have.
     body = propagate_mod.propagate(overlay.graph(), origin)
-    propagate_mod.refuse_undeclared_keys(body)
-    propagate_mod.refuse_directional_magnitudes(body)
     return Artefact(
         kind=KIND_PROPAGATION,
         mark=DERIVED,
@@ -238,6 +249,148 @@ def propagate(repo: ModelRepo, caps: Capabilities, org: str, origin: str, comman
         pins=_pins(repo, overlay, caps, None),
         depth=caps.depth_block(CAPS_PROPAGATE),
         body=body,
+    )
+
+
+# -- intervene and observe (build ticket 22) ------------------------------------------------
+
+
+def _query(
+    repo: ModelRepo,
+    caps: Capabilities,
+    org: str,
+    query: primitives_mod.Do | primitives_mod.Observe,
+    command: list[str],
+) -> Artefact:
+    """One shock, two readings of it. The downstream half is identical; the upstream half is not.
+
+    Emitting them through one function is deliberate: it is what makes "the downstream halves are
+    the same" a property of the code rather than a claim about two implementations that could
+    drift. The difference between doing and learning lives entirely above the causal composition,
+    which is exactly what Pearl's `do()` says it should.
+    """
+    overlay = Overlay.load(repo, org)
+    graph = overlay.graph()
+    if query.component not in graph.components:
+        raise VerbError(f"no component {query.component!r} in the graph of {org!r}")
+
+    downstream = propagate_mod.propagate(graph, query.component)
+    # Narrowed here rather than behind a boolean, because a boolean is what the type checker
+    # cannot follow: with `is_intervention` in the way, `mypy` reported the union reaching both
+    # `severed()` and `updated_beliefs()`. That refusal is the ticket's third criterion working.
+    if isinstance(query, primitives_mod.Do):
+        is_intervention, severed = True, primitives_mod.severed(graph, query)
+        upstream: list[dict[str, Any]] = []
+        traversal = primitives_mod.upstream_traversal(
+            primitives_mod.UPSTREAM_MAX_DEPTH, truncated=False, ran=False
+        )
+    else:
+        is_intervention, severed = False, []
+        upstream, traversal = primitives_mod.updated_beliefs(graph, query)
+    body: dict[str, Any] = {
+        "operation": query.verb,
+        "component": query.component,
+        "semantics": {
+            "propagates": "downstream only" if is_intervention else "downstream and upstream",
+            "maps_to": "Pearl's do(x) — action" if is_intervention else "conditioning on an observation",
+            "why": (
+                "doing a thing does not rewrite its own causes, so an intervention severs the "
+                "incoming edges and never updates belief about them"
+                if is_intervention
+                else "learning a fact is evidence about what produced it, so belief updates "
+                "everywhere the graph connects — causes included"
+            ),
+            "upstream_carries_no_magnitude": (
+                "an authored elasticity is d(target)/d(cause); inverting it into a diagnostic "
+                "magnitude needs a prior over the causes that nothing in this model authors, so "
+                "an updated ancestor is named, graded and located and carries no number"
+            ),
+        },
+        "downstream": downstream,
+        "severed": severed,
+        "upstream": upstream,
+        # Where the upstream walk stopped, published for the reason the propagation publishes
+        # its own truncation: a walk that stopped early and said nothing is claiming a
+        # completeness it has not got.
+        "upstream_traversal": traversal,
+    }
+    primitives_mod.refuse_upstream_under_intervention(body)
+    return Artefact(
+        kind=KIND_INTERVENTION if is_intervention else KIND_OBSERVATION,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_QUERY),
+        body=body,
+    )
+
+
+def intervene(
+    repo: ModelRepo, caps: Capabilities, org: str, component: str, command: list[str]
+) -> Artefact:
+    """`do(component)`. Incoming causal edges cut, propagation downstream only."""
+    return _query(repo, caps, org, primitives_mod.Do(component), command)
+
+
+def observe(
+    repo: ModelRepo, caps: Capabilities, org: str, component: str, command: list[str]
+) -> Artefact:
+    """`observe(component)`. Nothing cut, and belief updates about the causes too."""
+    return _query(repo, caps, org, primitives_mod.Observe(component), command)
+
+
+# -- rewind (build ticket 35) ---------------------------------------------------------------
+
+
+def rewind(repo: ModelRepo, caps: Capabilities, org: str, at: str, command: list[str]) -> Artefact:
+    """The model state at a declared time, emitted so it can be read rather than described.
+
+    The repository handed in is **already** rewound — `twin/primitives.py` resolves the time to a
+    commit and opens it — so this verb is an ordinary read of an ordinary repository. That is the
+    demonstration: nothing here knows it is looking at the past.
+
+    It does check the time it was told, though, and that is not ceremony. Every other refusal for
+    this verb lives in `ModelRepo.open_at_time`, which only the CLI calls; hand this function a
+    repository at HEAD and a date in 1999 and it would otherwise emit an artefact claiming to be
+    the model as it stood then. Cheap to check, because the pin already records when it was
+    committed.
+    """
+    from .repo import RepoError
+
+    try:
+        moment = ModelRepo.parse_moment(at)
+    except RepoError as exc:
+        raise VerbError(str(exc)) from None
+    committed = datetime.datetime.fromisoformat(repo.pin.committed)
+    if committed > moment:
+        raise VerbError(
+            f"this repository is pinned at a commit dated {repo.pin.committed}, which is after "
+            f"{at}. A rewind emits the model as it stood at the declared time, so a pin from "
+            "after that time is a different model wearing the wrong date."
+        )
+    overlay = Overlay.load(repo, org)
+    graph = overlay.graph()
+    return Artefact(
+        kind=KIND_REWOUND_MODEL,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_REWIND),
+        body={
+            "rewound_to": at,
+            "resolved": {
+                "commit": repo.pin.commit,
+                "committed": repo.pin.committed,
+                "tree": repo.pin.tree,
+            },
+            "abduction": (
+                "Pearl's abduction step. A model state, not a filtered view: the graph below was "
+                "loaded from the commit that was current at the declared time, so an elasticity "
+                "recalibrated since reads here as it read then"
+            ),
+            "graph": graph.as_dict(),
+            "rollups": graph.rollups(),
+        },
     )
 
 

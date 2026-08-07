@@ -10,6 +10,12 @@ criteria:
   - index: 2
     text: "Concrete semantics for fast-forward, rewind and play, each distinguished."
     checked: false
+    # Partly built, and less of it than it looks. **Play** is `do(x)` from build ticket 22.
+    # **Rewind** is `twin/primitives.py rewind()` at build ticket 35, and that is only the *time*
+    # half: decision ticket 13 Q2 defines rewind as restoring the graph to a past state **under an
+    # information gate**, and Q2b makes recording the regime a hard rule. That gate is build ticket
+    # 36 and does not exist, so `rewound-model` records no regime. **Fast-forward** — projection
+    # with no intervention — is build ticket 37. Two of three verbs, and one of those is a half.
   - index: 3
     text: "Where scenarios live + how they are versioned/diffed."
     checked: false

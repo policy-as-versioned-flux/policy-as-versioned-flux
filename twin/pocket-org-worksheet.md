@@ -14,9 +14,10 @@ what they fail against.
 `twin worksheet --repo <a pocket-org repository>` checks the emitted artefacts against every line
 below — the **graph**, the **blast radius** from `shared-database`, the **exposure** of scenario
 `portal-availability-2026` under both declared perspectives, the **propagation** of a shock at
-`shared-database`, and the **priced option set** under the operator. Values are compared at
-**6 decimal places**, declared here rather than hidden inside the comparison, because the expected
-column is decimal and the computed one is binary floating point.
+`shared-database`, the **priced option set** under the operator, and the **intervention** and the
+**observation** at `order-service`. Values are compared at **6 decimal places**, declared here
+rather than hidden inside the comparison, because the expected column is decimal and the computed
+one is binary floating point.
 
 ## The contract every later ticket inherits
 
@@ -26,7 +27,7 @@ ticket that is already closed is a failure of this worksheet, not of the code.
 
 ## The organisation
 
-Five components, six edges. The world layer is deliberately empty of components, so every number
+Five components, eight edges. The world layer is deliberately empty of components, so every number
 below comes from the overlay.
 
 ```mermaid
@@ -43,7 +44,19 @@ flowchart TD
   IS -- needs --> DB
   DB -. "influences −, lag 7d<br/>elasticity 0.3 / 0.5 / 0.7" .-> OS
   OS -. "influences −, lag 14d<br/>elasticity 0.4 / 0.4 / 0.4" .-> CP
+  OS -. "influences −, lag 3d<br/>elasticity 0.5 / 0.5 / 0.5" .-> PG
+  PG -. "influences +, lag 5d<br/>elasticity 0.5 / 0.5 / 0.5" .-> CP
 ```
+
+The last two causal edges close the **diamond** build ticket 21 needs: a shock at `shared-database`
+reaches `customer-portal` two ways, and both cross `database-slows-orders`. That shared edge is
+what a naive independence assumption counts twice.
+
+**The signs are load-bearing.** A chain's sign is the product of its hops, so the long route needs
+an even number of negatives to end up pointing the same way as the short one: `−` then `−` gives
+`+`, and `−` then `−` then `+` gives `+` as well. Two routes that disagreed in direction would not
+be combined at all — one raising the portal and one lowering it have no single magnitude between
+them — and the diamond would have nothing left to demonstrate.
 
 ## The arithmetic, by hand
 
@@ -89,7 +102,44 @@ attenuation falsifiable rather than merely applied.
   claim itself and nothing has compounded yet
 - depth 2, at customer-portal: `[0.12, 0.20, 0.28] x 0.8 = [0.096, 0.16, 0.224]`
 
-**The PERT means** of the two authored elasticities, `(min + 4 x mode + max) / 6`:
+**The diamond, and the common cause it does not count twice** (build ticket 21). Two paths run from
+`shared-database` to `customer-portal`, and both start with `database-slows-orders`:
+
+- through the order service: depth 2, attenuation `0.8`, remainder `0.4`, so `I1 = 0.32 x S`
+- through the payment gateway: depth 3, attenuation `0.6`, remainder `0.5 x 0.5 = 0.25`, so
+  `I2 = 0.15 x S`
+- both are `+`, so they combine; the combined figure carries that sign
+
+`S` is the shared triple `[0.3, 0.5, 0.7]`, whose PERT mean is `0.5` and whose PERT variance is
+`(0.5 - 0.3) x (0.7 - 0.5) / 7 = 0.04 / 7`. Paths are combined by **noisy-OR**,
+`1 - (1 - I1)(1 - I2)`, never added — two routes for one shock cannot total more than one certain
+route. Expanding it:
+
+- combined, with the dependence:
+  `E[I1] + E[I2] - E[I1 x I2] = 0.32 x 0.5 + 0.15 x 0.5 - 0.32 x 0.15 x E[S²]`, and
+  `E[S²] = 0.5² + 0.04 / 7 = 0.255714285714...`, giving `0.235 - 0.012274285714 = 0.222725714286`
+- as if the two were independent: the same sum with `E[S]²` in place of `E[S²]`, giving
+  `0.235 - 0.048 x 0.25 = 0.223`
+- the difference is exactly `0.048 x 0.04 / 7 = 0.000274285714`, which is `0.048` **times** the
+  variance of the common cause. That product is the double count avoided
+
+Both figures are emitted, for the same reason the composed triple is emitted beside the attenuated
+one: a dependence correction whose un-corrected form was never shown is unfalsifiable. The
+remainders are degenerate on purpose, so the whole difference comes from one triple and a reviewer
+can check it by hand.
+
+**Doing versus learning**, at `order-service` (build ticket 22). The downstream halves are
+identical, which is the point — the difference between `do()` and `observe()` lives entirely
+upstream:
+
+- both reach `customer-portal` and `payment-gateway`, so both report **2** components downstream
+- `do(order-service)` severs its **1** incoming causal edge, `database-slows-orders`, and updates
+  belief about **0** components upstream — doing a thing does not rewrite its own causes
+- `observe(order-service)` severs **0** edges and updates belief about **1** component upstream,
+  `shared-database`, because learning that orders moved is evidence about what moved them
+
+**The PERT means** of the two elasticities that carry width. The other two are the diamond's
+legs, both degenerate at `0.5`, so their means are their points. `(min + 4 x mode + max) / 6`:
 
 - `database-slows-orders`: `(0.3 + 4 x 0.5 + 0.7) / 6 = 3.0 / 6 = 0.5`
 - `orders-slow-the-portal`: `(0.4 + 4 x 0.4 + 0.4) / 6 = 2.4 / 6 = 0.4` — degenerate, so the mean
@@ -141,8 +191,9 @@ may carry a price:
 - `order-service` — reached causally at grade 3, and structurally as a dependent
 - `customer-portal` — reached along `shared-database -> order-service -> customer-portal`, whose
   weakest hop is grade 3
+- `payment-gateway` — reached causally along the diamond's first leg, also at grade 3
 - `identity-store` — reached only structurally, so no mechanism is claimed at all
-- three components reached, and **nothing** admitted to pricing: every path out of the database
+- four components reached, and **nothing** admitted to pricing: every path out of the database
   crosses the grade-3 edge, so the honest answer here is an unpriced structural blast radius
 
 **The exposure** of scenario `portal-availability-2026`, whose components are `customer-portal`,
@@ -170,9 +221,9 @@ named is the one that must make them computable.
 | # | line | expected | arithmetic | asserted by |
 |---|------|----------|------------|-------------|
 | 1 | `rollups.components` | `5` | five component files | build ticket 15 |
-| 2 | `rollups.edges` | `6` | four structural, two causal | build ticket 15 |
-| 3 | `rollups.causal_edges` | `2` | database->orders, orders->portal | build ticket 15 |
-| 4 | `rollups.causal_edges_with_degenerate_elasticity` | `1` | orders->portal is 0.4/0.4/0.4 | build ticket 17 |
+| 2 | `rollups.edges` | `8` | four structural, four causal | build ticket 15 |
+| 3 | `rollups.causal_edges` | `4` | database->orders, orders->portal, and the diamond's two legs | build ticket 15 |
+| 4 | `rollups.causal_edges_with_degenerate_elasticity` | `3` | orders->portal and both diamond legs | build ticket 17 |
 | 5 | `rollups.components_positioned_on_the_map` | `5` | every component declares both axes | build ticket 14 |
 | 6 | `D(customer-portal)` | `0.36` | 0.9 x 0.4 | build ticket 14 |
 | 7 | `D(order-service)` | `0.35` | 0.7 x 0.5 | build ticket 14 |
@@ -201,9 +252,9 @@ named is the one that must make them computable.
 | 30 | `evidence_grade.database-slows-orders` | `3` | authored, literature or domain theory | build ticket 18 |
 | 31 | `evidence_grade.orders-slow-the-portal` | `2` | authored, repeated co-movement | build ticket 18 |
 | 32 | `rollups.causal_edges_admissible_to_pricing` | `1` | only orders->portal is at grade 2 or better | build ticket 19 |
-| 33 | `blast.shared-database.reached` | `3` | order-service, customer-portal, identity-store | build ticket 19 |
+| 33 | `blast.shared-database.reached` | `4` | order-service, customer-portal, payment-gateway, identity-store | build ticket 19 |
 | 34 | `blast.shared-database.admitted_to_pricing` | `0` | every path out crosses the grade-3 edge | build ticket 19 |
-| 35 | `blast.shared-database.unpriced` | `3` | 3 reached, 0 priced | build ticket 19 |
+| 35 | `blast.shared-database.unpriced` | `4` | 4 reached, 0 priced | build ticket 19 |
 | 36 | `exposure.declared.the-operator` | `650000` | 400000 + 250000 | build ticket 26 |
 | 37 | `exposure.declared.the-staff-council` | `170000` | 50000 + 120000 | build ticket 26 |
 | 38 | `exposure.spread` | `480000` | 650000 - 170000 | build ticket 26 |
@@ -223,3 +274,16 @@ named is the one that must make them computable.
 | 52 | `admission.the-operator.customer-portal` | `1` | itself the declared cash flow | build ticket 29 |
 | 53 | `admission.the-operator.order-service` | `1` | reaches it at grade 2 | build ticket 29 |
 | 54 | `admission.the-operator.identity-store` | `0` | no causal edge leaves it | build ticket 29 |
+| 55 | `joint.customer-portal.paths` | `2` | through the order service, and round through the gateway | build ticket 21 |
+| 56 | `joint.customer-portal.shared_edges` | `1` | both routes cross database-slows-orders | build ticket 21 |
+| 57 | `joint.customer-portal.exact` | `0.222726` | 0.235 - 0.048 x (0.25 + 0.04/7) | build ticket 21 |
+| 58 | `joint.customer-portal.if_independent` | `0.223` | 0.235 - 0.048 x 0.25 | build ticket 21 |
+| 59 | `joint.customer-portal.double_counting_avoided` | `0.000274` | 0.048 x the common cause's variance, 0.04/7 | build ticket 21 |
+| 60 | `joint.payment-gateway.shared_edges` | `0` | one path only, so nothing is shared | build ticket 21 |
+| 61 | `joint.payment-gateway.double_counting_avoided` | `0` | no shared ancestry, no correction | build ticket 21 |
+| 62 | `intervene.order-service.severed` | `1` | do() cuts database-slows-orders | build ticket 22 |
+| 63 | `intervene.order-service.upstream` | `0` | doing a thing does not rewrite its own causes | build ticket 22 |
+| 64 | `observe.order-service.upstream` | `1` | learning it moved is evidence about shared-database | build ticket 22 |
+| 65 | `observe.order-service.severed` | `0` | an observation severs nothing; nothing was done | build ticket 22 |
+| 66 | `intervene.order-service.reached` | `2` | customer-portal and payment-gateway | build ticket 22 |
+| 67 | `observe.order-service.reached` | `2` | the same two: the downstream halves are identical | build ticket 22 |

@@ -8,8 +8,8 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 20 \u2014 prefilter_precedes_pricing strengthened under decision ticket 09: the free-function check becomes an allow-list on the module's public surface, because a keyword match on price/cost/value misses a pricing function under any other name"
-checks_module_sha256: 26d06c91c1355aecb105571472987da0eea2f100c7e64135baa0d46cdee186c2
+checks_module_authorised_by: "decision ticket 08 \u2014 emit_all memoised after build ticket 21 tripled its cost; fifteen checks re-derived a deterministic artefact set fifteen times"
+checks_module_sha256: 118782a2dbb2d58cbb9680e47871988904b183d9b8444559b37d0bd124b755a1
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
@@ -37,8 +37,8 @@ invariants:
   - name: every_capability_depth_graded
     activating_ticket: '03'
     state: live
-    body_sha256: 9aa18559a58e49f9be3fa53dd9d64d004e20455b5888f4fe121af5de870fa61e
-    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 20, 23, 28 and 29 under decision tickets 08 and 09: propagation and the priced option set join the emitted set, every verb's capabilities stay depth-graded, and the two constraint pre-filter invariants activate"
+    body_sha256: ea739ef53b942ee53620fc18deb4fb4b8bb78a80ed1caf3b099a1062cc66a0d5
+    authorised_by: "decision ticket 08 \u2014 checks strengthened for build tickets 21, 22 and 35: the do/observe pair and the rewound model state join the emitted set, and every verb's capabilities stay depth-graded"
     asserts: >-
       Every capability carries a depth grade computed from its owning decision ticket's
       acceptance criteria; a typed grade is refused and names the unchecked criteria.
@@ -52,8 +52,8 @@ invariants:
   - name: no_collapse_mechanism
     activating_ticket: '06'
     state: live
-    body_sha256: 5c70480e3db3d1df867e352d813e51dfd0c4a15d3c37d92b064a4736653b85b5
-    authorised_by: "decision ticket 20 \u2014 invariant checks strengthened after adversarial review; every change adds an assertion, none removes one"
+    body_sha256: b97e0cdf1b33f0c45d21d69c203d94e46e31c5edd1e9727ca9e56c8af2ab84e3
+    authorised_by: "decision ticket 08 \u2014 no_collapse_mechanism strengthened for build ticket 21: the combined propagation figure is the first aggregate that could stand in for what it aggregates, so every path is asserted to survive beside it with its own figures and its independence reference"
     asserts: An execution emits multiple forecasts and no code path collapses them to one.
     refuses_keys: [consensus, consensus_forecast, combined_forecast, collapsed, point_forecast, best_forecast]
 

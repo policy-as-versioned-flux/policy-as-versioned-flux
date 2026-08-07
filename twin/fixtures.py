@@ -497,11 +497,20 @@ world_models:
 }
 
 
-def git(cwd: Path, *args: str) -> str:
+def git(cwd: Path, *args: str, dated: str | None = None) -> str:
+    """Run git in the fixture's fixed environment.
+
+    `dated` overrides the fixed commit date for one call. Every fixture commit otherwise carries
+    the same instant, which is what makes the tree reproducible — and is also why a fixture that
+    needs two states *separated in time* has to say so explicitly (build ticket 35).
+    """
+    env = dict(_GIT_ENV)
+    if dated:
+        env.update({"GIT_AUTHOR_DATE": dated, "GIT_COMMITTER_DATE": dated})
     proc = subprocess.run(
         ["git", *_CONFIG, *args],
         cwd=str(cwd),
-        env=dict(_GIT_ENV),
+        env=env,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -601,8 +610,10 @@ def advance_world(root: str | Path) -> str:
 
 # -- the pocket org (build ticket 15) ------------------------------------------------------
 #
-# Five components, six edges, named elasticities, and every number chosen so a reviewer can do
-# the arithmetic in their head. It exists to catch the class of failure a refusal test cannot:
+# Five components, eight edges, named elasticities, and every number chosen so a reviewer can do
+# the arithmetic in their head. Build ticket 21 added the two edges that close the diamond, so a
+# common cause has somewhere to be double-counted and visibly is not.
+# It exists to catch the class of failure a refusal test cannot:
 # a PERT triple that is present but garbage, an elasticity that stops being recalibrated three
 # tickets later, a propagation that changed and nobody noticed. Those all stay green under a
 # refusal test and all fail here, against `twin/pocket-org-worksheet.md`.
@@ -710,6 +721,51 @@ evidence_grade: 2
 confidence: 0.5
 note: >-
   Degenerate on purpose, so the worksheet carries one flagged edge and one honest range.
+""",
+    # The diamond (build ticket 21). A shock at `shared-database` reaches `customer-portal` two
+    # ways — directly through the order service, and round through the payment gateway — and both
+    # routes cross `database-slows-orders`. That shared edge is what a naive independence
+    # assumption would count twice, so both remainders are degenerate on purpose: the whole of the
+    # difference between the combined figure and the independent one is then the variance of the
+    # one shared triple, and a reviewer can do that subtraction by hand.
+    "orgs/pocket/edges/orders-slow-payments.yaml": """\
+id: orders-slow-payments
+type: influences
+from: order-service
+to: payment-gateway
+sign: negative
+lag_days: 3
+elasticity:
+  min: 0.5
+  mode: 0.5
+  max: 0.5
+evidence_grade: 3
+confidence: 0.4
+note: >-
+  The first leg of the diamond. Degenerate on purpose: the shared edge is the only source of
+  width, so the shared-ancestry discount is hand-computable.
+""",
+    "orgs/pocket/edges/payments-lift-the-portal.yaml": """\
+id: payments-lift-the-portal
+type: influences
+from: payment-gateway
+to: customer-portal
+sign: positive
+lag_days: 5
+elasticity:
+  min: 0.5
+  mode: 0.5
+  max: 0.5
+evidence_grade: 3
+confidence: 0.4
+note: >-
+  The second leg of the diamond, closing it back on the portal. Positive rather than negative,
+  and the sign is load-bearing: a chain's sign is the product of its hops, so the route
+  database -> orders -> payments -> portal must carry an even number of negatives to end up
+  pointing the same way as database -> orders -> portal. Two routes that disagree in direction
+  are not combined at all, which would leave the diamond with nothing to demonstrate.
+  Grade 3 so the use-gate's own worksheet lines do not move: the diamond exercises dependence,
+  not the gate.
 """,
     # `identity-store` is in the scenario so the £ boundary has a refused impact to demonstrate.
     # The operator values it well enough to carry a figure and no causal path runs from it to the
@@ -835,6 +891,39 @@ def build_pocket_org(dest: str | Path) -> Path:
     git(root, "add", "-A")
     git(root, "commit", "-q", "-m", "the pocket org")
     return root
+
+
+# The moment the pocket org's shared elasticity was recalibrated, for the rewind primitive to
+# land either side of (build ticket 35). Later than `_FIXED_DATE`, so the two states are
+# separable by time rather than only by commit id.
+#
+# **The half hour is deliberate.** A probe on the hour then sits half an hour before this commit
+# and one hour after it read against a different offset, so a timezone defect changes which
+# commit comes back. Dated on the hour, every plausible misreading landed on the same side and
+# the timezone test asserted nothing.
+RECALIBRATED_ON = "2026-06-01T00:30:00+00:00"
+
+
+def recalibrate_the_shared_elasticity(
+    root: str | Path, at: str = RECALIBRATED_ON, maximum: float = 0.9
+) -> str:
+    """Widen `database-slows-orders` in a commit dated `at`, changing nothing else.
+
+    What the rewind primitive is checked against (build ticket 35). A **filtered view** of today's
+    model can hide rows added since, and it cannot restore the number this replaces — so a
+    backtest run through one would score the past using today's elasticity and call the result
+    honest. Restoring it needs a real past model state, which is what rewind returns.
+
+    The evidence grade is untouched on purpose: moving one needs a regrade record, and this
+    fixture is about a recalibrated *number*, not a re-evidenced claim.
+    """
+    path = Path(root)
+    rel = "orgs/pocket/edges/database-slows-orders.yaml"
+    text = (path / rel).read_text(encoding="utf-8")
+    (path / rel).write_text(text.replace("max: 0.7", f"max: {maximum}"), encoding="utf-8", newline="\n")
+    git(path, "add", "-A")
+    git(path, "commit", "-q", "-m", "recalibrate the database-to-orders elasticity", dated=at)
+    return git(path, "rev-parse", "HEAD").strip()
 
 
 def plant_unrecorded_regrade(root: str | Path, grade: int = 1) -> str:

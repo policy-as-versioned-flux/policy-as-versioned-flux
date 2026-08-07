@@ -32,7 +32,7 @@ from .canon import sha256_hex
 from .grades import Capabilities
 from .repo import ModelRepo, RepoError
 
-VERBS = ("sense", "run", "score", "graph", "propagate", "options")
+VERBS = ("sense", "run", "score", "graph", "propagate", "options", "intervene", "observe", "rewind")
 
 
 class ReproduceError(RuntimeError):
@@ -114,6 +114,15 @@ def replay(worktree: str | Path, caps: Capabilities, doc: dict[str, Any]) -> tup
         return verbs.propagate(repo, caps, org, _need(flags, "origin", command), command), []
     if verb == "options":
         return verbs.options(repo, caps, org, _need(flags, "perspective", command), command), []
+    if verb == "intervene":
+        return verbs.intervene(repo, caps, org, _need(flags, "component", command), command), []
+    if verb == "observe":
+        return verbs.observe(repo, caps, org, _need(flags, "component", command), command), []
+    if verb == "rewind":
+        # No second rewind here. The recorded `model_repo` pin **is** the commit the rewind
+        # resolved to, so re-resolving the timestamp would replay the lookup rather than the
+        # derivation — and would diverge the moment a commit landed between them.
+        return verbs.rewind(repo, caps, org, _need(flags, "at", command), command), []
 
     subject = doc["body"]["subject"]
     bundle, chain = replay(

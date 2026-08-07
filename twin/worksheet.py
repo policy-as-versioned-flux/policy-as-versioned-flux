@@ -48,6 +48,14 @@ _ATTENUATED = re.compile(
     r"^propagation\.attenuated\.(?P<component>[a-z0-9-]+)\.(?P<point>min|mode|max)$"
 )
 _COMPOSED = re.compile(r"^propagation\.(?P<component>[a-z0-9-]+)\.(?P<point>min|mode|max)$")
+_JOINT = re.compile(
+    r"^joint\.(?P<component>[a-z0-9-]+)\."
+    r"(?P<what>paths|shared_edges|exact|if_independent|double_counting_avoided)$"
+)
+_QUERY = re.compile(
+    r"^(?P<operation>intervene|observe)\.(?P<component>[a-z0-9-]+)\."
+    r"(?P<what>severed|upstream|reached)$"
+)
 _OPTIONS = re.compile(
     r"^options\.(?P<perspective>[a-z0-9-]+)\.(?P<what>considered|removed|priced)$"
 )
@@ -59,6 +67,7 @@ _ADMISSION = re.compile(r"^admission\.(?P<perspective>[a-z0-9-]+)\.(?P<component
 # ticket 19.
 GRAPH, BLAST, EXPOSURE = "graph", "blast", "exposure"
 PROPAGATION, OPTIONS = "propagation", "options"
+INTERVENTION, OBSERVATION = "intervention", "observation"
 
 
 class WorksheetError(RuntimeError):
@@ -164,6 +173,33 @@ def resolve(key: str, bodies: dict[str, dict[str, Any]]) -> float | None:
             path = _primary_path(bodies, match.group("component"))
             return None if path is None or field not in path else float(path[field][match.group("point")])
 
+    combined = _JOINT.match(key)
+    if combined:
+        for reached in bodies.get(PROPAGATION, {}).get("reached", []):
+            if reached["component"] != combined.group("component") or "joint" not in reached:
+                continue
+            joint, what = reached["joint"], combined.group("what")
+            if what == "paths":
+                return float(joint["paths_combined"])
+            if what == "shared_edges":
+                # The count, not the names: a worksheet line is a number, and how many edges two
+                # paths have in common is exactly the fact the diamond is checking.
+                return float(len(joint["shared_edges"]))
+            return None if joint[what] is None else float(joint[what])
+        return None
+
+    asked = _QUERY.match(key)
+    if asked:
+        body = bodies.get(
+            {"intervene": INTERVENTION, "observe": OBSERVATION}[asked.group("operation")], {}
+        )
+        if body.get("component") != asked.group("component"):
+            return None
+        what = asked.group("what")
+        if what == "reached":
+            return float(len(body["downstream"]["reached"]))
+        return float(len(body[{"severed": "severed", "upstream": "upstream"}[what]]))
+
     attenuation = _ATTENUATION.match(key)
     if attenuation:
         path = _primary_path(bodies, attenuation.group("component"))
@@ -265,6 +301,10 @@ BLAST_ORIGIN = "shared-database"
 PROPAGATION_ORIGIN = "shared-database"
 SCENARIO = "portal-availability-2026"
 PERSPECTIVE = "the-operator"
+# The subject of the do/observe pair (build ticket 22). `order-service` on purpose: it has both a
+# cause above it and effects below it, so the downstream halves match and only the upstream halves
+# differ — which is the whole of the distinction, isolated.
+QUERY_COMPONENT = "order-service"
 
 
 def bodies_for(repo: Any, caps: Any) -> dict[str, dict[str, Any]]:
@@ -288,6 +328,14 @@ def bodies_for(repo: Any, caps: Any) -> dict[str, dict[str, Any]]:
         ),
         OPTIONS: verbs.options(
             repo, caps, org, PERSPECTIVE, verbs.command_for("options", org=org, perspective=PERSPECTIVE)
+        ),
+        INTERVENTION: verbs.intervene(
+            repo, caps, org, QUERY_COMPONENT,
+            verbs.command_for("intervene", org=org, component=QUERY_COMPONENT),
+        ),
+        OBSERVATION: verbs.observe(
+            repo, caps, org, QUERY_COMPONENT,
+            verbs.command_for("observe", org=org, component=QUERY_COMPONENT),
         ),
     }
     return {name: json.loads(art.to_bytes())["body"] for name, art in emitted.items()}

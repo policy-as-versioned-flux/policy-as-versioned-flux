@@ -23,6 +23,11 @@ import yaml
 
 OBJECT_ID = re.compile(r"^[0-9a-f]{40}$|^[0-9a-f]{64}$")
 
+# The years git's date parser can actually compare against. Outside this window it does not fail
+# — it falls back to `now`, so `--before=1968-06-01` returns the newest commit rather than none.
+# Measured, not assumed: 1968 returns HEAD against a 2026 repository, 1970 onwards does not.
+GIT_EPOCH_YEARS = (1970, 2099)
+
 # Git reads configuration and environment that can change what it returns, and in two cases what
 # it *executes*. A model repository can arrive as a directory rather than a clone, so its local
 # config is not trusted: `core.fsmonitor` and a hooks path are commands, and `core.quotePath`
@@ -196,6 +201,84 @@ class ModelRepo:
         repo = cls(worktree, Pin(root=root, commit=commit, tree=tree, committed=committed))
         repo._refuse_gitlinks()
         return repo
+
+    @staticmethod
+    def parse_moment(at: str) -> datetime.datetime:
+        """An ISO 8601 instant git can actually compare against, or a refusal.
+
+        Separate from `open_at_time` because two callers need it: the opener, and any verb that
+        was *handed* an already-open repository and has to check the time it was told. A guard
+        that only one caller runs is a guard the other callers do not have.
+        """
+        stamp = str(at).strip()
+        if not stamp:
+            raise RepoError("a rewind needs a time; a rewind to no particular moment is not a rewind")
+        try:
+            moment = datetime.datetime.fromisoformat(stamp)
+        except ValueError:
+            raise RepoError(
+                f"{stamp!r} is not an ISO 8601 time. git reads a date it cannot parse as `now` and "
+                "returns the newest commit, so an unparseable time would answer a question about "
+                "the past with today's model. Use `2026-06-01` or `2026-06-01T12:00:00+00:00`."
+            ) from None
+        if not GIT_EPOCH_YEARS[0] <= moment.year <= GIT_EPOCH_YEARS[1]:
+            # The same silent fallback as an unparseable date, and less obvious: `fromisoformat`
+            # happily accepts a year git cannot represent, git reads it as `now`, and the answer
+            # comes back as the newest commit. Bounded here because a date this reader accepts
+            # must be one git can actually compare against.
+            raise RepoError(
+                f"{stamp!r} is outside the years git can represent "
+                f"({GIT_EPOCH_YEARS[0]}-{GIT_EPOCH_YEARS[1]}). Outside that window git falls back "
+                "to `now` and returns the newest commit, so the answer would be today's model "
+                "wearing a date from another century."
+            )
+        # A time with no offset is UTC, explicitly. This is the **second** of two mechanisms —
+        # `_env()` already pins `TZ=UTC` for every git call, so deleting this line changes no
+        # behaviour today, and a mutation test will report it as redundant. It stays because the
+        # two guard different things: `TZ` guards what git does with the string, this guards what
+        # *this* function means by it, and a future caller that formats the moment itself would
+        # otherwise inherit the machine's clock.
+        return moment if moment.tzinfo else moment.replace(tzinfo=datetime.timezone.utc)
+
+    @classmethod
+    def open_at_time(cls, path: str | Path, at: str) -> "ModelRepo":
+        """The repository as it stood at `at` — the last commit at or before that moment.
+
+        The git access for the rewind primitive (build ticket 35) lives here rather than in
+        `twin/primitives.py`, so every command this system runs goes through the same hardened
+        environment. What it *means* is documented there.
+
+        Refuses a time before the first commit rather than opening an empty tree, and refuses a
+        time it cannot parse rather than passing it to git. **That second refusal is not
+        defensive tidying.** `git rev-list --before=not-a-date` exits 0 and returns HEAD, so a
+        typo would silently hand back today's model as though it were the past — a confident
+        wrong answer to a question about history, which is the failure this whole system is built
+        to refuse.
+
+        A time with no offset is read as UTC, explicitly, rather than left to git and the
+        machine's clock. `--before` is inclusive, so one instant resolves to one commit
+        everywhere.
+        """
+        root = Path(path).resolve()
+        if not root.is_dir():
+            raise RepoError(f"no model repository at {root}")
+        stamp = str(at).strip()
+        moment = cls.parse_moment(at)
+        worktree = Path(_git_text(root, "rev-parse", "--show-toplevel").strip()).resolve()
+        found = _git_text(worktree, "rev-list", "-1", f"--before={moment.isoformat()}", "HEAD").strip()
+        if not found:
+            roots = _git_text(worktree, "rev-list", "--max-parents=0", "HEAD").strip().splitlines()
+            born = (
+                _git_text(worktree, "show", "-s", "--format=%cI", roots[-1]).strip()
+                if roots
+                else "never — this repository has no commits"
+            )
+            raise RepoError(
+                f"cannot read {root} at {stamp!r}: it did not exist yet, and its first commit is "
+                f"dated {born}. An empty model is a claim that there was nothing in the "
+                "organisation, which is a different answer from 'there was no model'."
+            )
+        return cls.open(root, ref=found)
 
     def _refuse_gitlinks(self) -> None:
         """A submodule under the model root would load as empty, silently. Refuse instead."""

@@ -12,6 +12,14 @@ criteria:
   - index: 2
     text: "Defined intervention + counterfactual semantics, incl. behaviour on structural-only paths."
     checked: false
+    # Deliberately still unchecked after build ticket 22. Two of the three legs are built:
+    # **intervention semantics** at build ticket 22 (`twin/primitives.py` — do() cuts the incoming
+    # edges and propagates downstream only, observe() updates belief bidirectionally, and the two
+    # are separate types so a swap is a type error), and **structural-only-path behaviour** at
+    # build ticket 20 (a `needs` edge claims no mechanism, so nothing composes along it). The
+    # **counterfactual** is abduction -> action -> prediction; abduction landed at build ticket 35
+    # and prediction (fast-forward) is build ticket 37. Two thirds of a composition is not the
+    # composition.
   - index: 3
     text: "The intervention-aware scoring rule, with a worked example of a mitigated non-event."
     checked: false

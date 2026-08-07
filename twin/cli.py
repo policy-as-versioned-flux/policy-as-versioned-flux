@@ -29,6 +29,8 @@ from .invariants import FAIL, PASS, SKIP
 from .invariants.harness import LIVE, MANIFEST_PATH, Suite, load_manifest
 from .model import ModelError
 from .pert import PertError
+from .primitives import PrimitiveError
+from . import propagate as propagate_mod
 from .propagate import AttenuationError
 from .reproduce import ReproduceError
 from .repo import ModelRepo, RepoError
@@ -151,6 +153,70 @@ def cmd_propagate(args: argparse.Namespace) -> int:
             )
     print(f"  {body['attenuation']['rule']}")
     print(f"  {body['traversal']['paths_are_not_aggregated']}")
+    return _emit(artefact, args.out)
+
+
+def _say_query(args: argparse.Namespace, artefact: Artefact) -> int:
+    body = artefact.body
+    _say(f"{body['component']}: {body['operation']} — propagates {body['semantics']['propagates']}")
+    for entry in body["severed"]:
+        print(f"  severed  {entry['edge']:<34} {entry['from']} -> {entry['to']}, "
+              f"grade {entry['evidence_grade']}")
+    for entry in body["upstream"]:
+        print(f"  updated  {entry['component']:<34} depth {entry['depth']}, weakest grade "
+              f"{entry['worst_evidence_grade']}, no magnitude")
+    for reached in body["downstream"]["reached"]:
+        joint = reached.get("joint")
+        if joint is None:
+            figure = "direction only, no magnitude"
+        elif joint["sign"] == propagate_mod.MIXED:
+            figure = "routes disagree in direction, so they are not combined"
+        elif joint["exact"] is None:
+            figure = f"joint sampled p50 {joint['sampled']['p50']}, past the exact-form bound"
+        else:
+            figure = f"joint {joint['exact']} ({joint['sign']})"
+        print(f"  downstream {reached['component']:<32} {len(reached['paths'])} path(s), {figure}")
+    print(f"  {body['semantics']['why']}")
+    if not body["upstream"] and body["operation"] == "intervene":
+        print("  nothing upstream: doing a thing does not rewrite its own causes")
+    return _emit(artefact, args.out)
+
+
+def cmd_intervene(args: argparse.Namespace) -> int:
+    repo, caps, org = _open(args)
+    return _say_query(args, verbs.intervene(
+        repo, caps, org, args.component,
+        verbs.command_for("intervene", org=org, component=args.component),
+    ))
+
+
+def cmd_observe(args: argparse.Namespace) -> int:
+    repo, caps, org = _open(args)
+    return _say_query(args, verbs.observe(
+        repo, caps, org, args.component,
+        verbs.command_for("observe", org=org, component=args.component),
+    ))
+
+
+def cmd_rewind(args: argparse.Namespace) -> int:
+    """The model as it stood at a declared time — a model state, not a filtered view."""
+    from .primitives import rewind
+
+    repo = rewind(args.repo, args.at)
+    caps = Capabilities.load()
+    org = verbs.resolve_org(repo, args.org)
+    artefact = verbs.rewind(
+        repo, caps, org, args.at, verbs.command_for("rewind", org=org, at=args.at)
+    )
+    body = artefact.body
+    _say(
+        f"{org} as at {args.at}: commit {body['resolved']['commit'][:12]}, committed "
+        f"{body['resolved']['committed']}"
+    )
+    rollups = body["rollups"]
+    print(f"  {rollups['components']} components, {rollups['edges']} edges, "
+          f"{rollups['causal_edges']} causal")
+    print("  a model state, not a filtered view: everything downstream reads it unchanged")
     return _emit(artefact, args.out)
 
 
@@ -797,6 +863,30 @@ def build_parser() -> argparse.ArgumentParser:
     moved.add_argument("--out", required=True)
     moved.set_defaults(fn=cmd_propagate)
 
+    # Two subcommands rather than one with a flag, for the reason `Do` and `Observe` are two
+    # types: a boolean is one typo away from an intervention that rewrites its own causes.
+    acted = with_org(with_repo(subs.add_parser(
+        "intervene", help="do(x): cut the incoming causal edges and propagate downstream only"
+    )))
+    acted.add_argument("--component", required=True, help="the component acted on")
+    acted.add_argument("--out", required=True)
+    acted.set_defaults(fn=cmd_intervene)
+
+    learned = with_org(with_repo(subs.add_parser(
+        "observe", help="observe(x): belief updates downstream and about the causes too"
+    )))
+    learned.add_argument("--component", required=True, help="the component observed")
+    learned.add_argument("--out", required=True)
+    learned.set_defaults(fn=cmd_observe)
+
+    past = with_org(subs.add_parser(
+        "rewind", help="the model state at a declared time (Pearl's abduction)"
+    ))
+    past.add_argument("--repo", required=True, help="path to the model repository")
+    past.add_argument("--at", required=True, help="an ISO time; the last commit at or before it")
+    past.add_argument("--out", required=True)
+    past.set_defaults(fn=cmd_rewind)
+
     choices = with_org(with_repo(subs.add_parser(
         "options", help="the choice set after the constraint pre-filter, with survivors costed"
     )))
@@ -865,6 +955,7 @@ REFUSALS = (
     ConstraintError,
     EvidenceError,
     PertError,
+    PrimitiveError,
     GradeError,
     ArtefactError,
     AttestationError,

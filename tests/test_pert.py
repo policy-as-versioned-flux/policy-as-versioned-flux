@@ -33,6 +33,40 @@ def test_the_variance_is_the_pert_variance(triple: tuple[float, float, float], _
     assert found.variance == pytest.approx((found.mean - found.low) * (found.high - found.mean) / 7.0)
 
 
+@pytest.mark.parametrize("triple,_expected", CASES)
+def test_the_raw_moments_recover_the_mean_and_the_variance(
+    triple: tuple[float, float, float], _expected: float
+) -> None:
+    """The yardstick claim, made falsifiable (build ticket 21).
+
+    `raw_moment` is derived from the Beta shape parameters and the PERT mean and variance are
+    derived from the triple directly. They are two independent routes to the same numbers, so
+    agreement is evidence and a docstring saying so is not.
+    """
+    found = Triple(*triple)
+    assert found.raw_moment(0) == pytest.approx(1.0)
+    assert found.raw_moment(1) == pytest.approx(found.mean)
+    assert found.raw_moment(2) - found.raw_moment(1) ** 2 == pytest.approx(found.variance)
+
+
+@pytest.mark.parametrize("triple,_expected", CASES)
+def test_the_raw_moments_agree_with_the_sampler(
+    triple: tuple[float, float, float], _expected: float
+) -> None:
+    """Third order too, which is where a wrong Beta recursion first shows and the variance does not."""
+    found = Triple(*triple)
+    stream = pert.stream(f"moments:{triple}")
+    draws = [found.sample(stream) for _ in range(60000)]
+    for order in (2, 3):
+        empirical = sum(value**order for value in draws) / len(draws)
+        assert empirical == pytest.approx(found.raw_moment(order), rel=0.02)
+
+
+def test_a_negative_raw_moment_is_a_refusal() -> None:
+    with pytest.raises(PertError, match="order zero or more"):
+        Triple(0.3, 0.5, 0.7).raw_moment(-1)
+
+
 @pytest.mark.parametrize("triple,expected_mean", CASES)
 def test_sampling_converges_on_the_analytic_moments(
     triple: tuple[float, float, float], expected_mean: float

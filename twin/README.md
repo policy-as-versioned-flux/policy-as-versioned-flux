@@ -1,12 +1,12 @@
 # `twin`
 
-Build tickets 01–08, 10–15, 17–20 and 26–29 of `.scratch/twin/`, plus 23 at `partial`. One dated signal binds to a
+Build tickets 01–08, 10–15, 17–22, 26–29 and 35 of `.scratch/twin/`, plus 23 at `partial`. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 22 of 77 build tickets closed, and one more part-built.** What is not built is listed below and, more usefully, is named
+**This is 25 of 77 build tickets closed, and one more part-built.** What is not built is listed below and, more usefully, is named
 inside every artefact the tool emits.
 
 ## Run it
@@ -21,6 +21,9 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin map --repo R --org netflix      # the Wardley map, rendered from that graph
 ./bin/twin blast --repo R --origin C       # what is downstream, and which of it may be priced
 ./bin/twin propagate --repo R --origin C   # compose a shock along causal edges, with attenuation
+./bin/twin intervene --repo R --component C # do(x): cut the incoming edges, propagate downstream
+./bin/twin observe --repo R --component C  # observe(x): belief updates about the causes too
+./bin/twin rewind --repo R --at T          # the model state at a declared time (abduction)
 ./bin/twin options --repo R --perspective P # the choice set after the pre-filter, survivors costed
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
 ./bin/twin constraints --out F             # the published constraint set, floor and exclusions
@@ -57,11 +60,13 @@ flowchart LR
   C["<b>twin score</b><br/>proper rules, as-consumed only"] --> SC["score-card<br/><i>names the bundle by pin</i>"]
   G["<b>twin graph</b>"] --> GR["graph<br/><i>components · people · typed edges<br/>Wardley map · derived roll-ups</i>"]
   BL["<b>twin blast</b><br/>one traversal, two outputs"] --> BR["blast-radius<br/><i>admitted to pricing · unpriced<br/>closed body, no price slot</i>"]
-  P["<b>twin propagate</b><br/>Monte-Carlo along causal edges"] --> PR["propagation<br/><i>composed · attenuated · sampled<br/>past depth 4, direction only</i>"]
+  P["<b>twin propagate</b><br/>Monte-Carlo along causal edges"] --> PR["propagation<br/><i>composed · attenuated · sampled<br/>joint, with shared ancestry discounted<br/>past depth 4, direction only</i>"]
+  DO["<b>twin intervene</b> / <b>twin observe</b><br/>do(x) versus learning x"] --> DR["intervention · observation<br/><i>same downstream half<br/>do() updates nothing upstream</i>"]
+  RW["<b>twin rewind</b><br/>the model at a declared time"] --> RM["rewound-model<br/><i>a model state, not a filtered view<br/>before the model existed, it refuses</i>"]
   OP["<b>twin options</b><br/>pre-filter, then price"] --> OS["priced-option-set<br/><i>removed carries no figure<br/>closed body, no price slot on it</i>"]
   X["<b>twin exposure</b><br/>every declared perspective"] --> XP["scenario-exposure<br/><i>one figure per eye · the spread<br/>admitted only via a graded path to cash</i>"]
 
-  repo --> S & R & C & G & BL & P & OP & X
+  repo --> S & R & C & G & BL & P & DO & RW & OP & X
   FB -- "by sha256, never by path" --> C
   B -. "no route from anything above" .-> G
   GR -- "no authoring step" --> M["<b>twin map</b><br/><i>a render, not a second model</i>"]
@@ -179,9 +184,43 @@ cycle — is disclosed in `traversal`, because an artefact that pruned silently 
 completeness it has not got.
 
 **Structural edges do not propagate.** A `needs` edge claims no mechanism, so nothing composes
-along it; that exposure is the blast radius and it stays unpriced. And several paths out of one
-shock are **reported separately and never summed** — they share ancestry, so aggregating them
-double-counts, and aggregation with explicit dependence is build ticket 21.
+along it; that exposure is the blast radius and it stays unpriced.
+
+**Several paths out of one shock are reported separately and never summed** — they share
+ancestry, so adding them double-counts. They are **combined**, which is a different operation
+(build ticket 21). Each reached component with at least one path inside the attenuation boundary carries a `joint`
+figure combined by **noisy-OR**,
+`1 - prod(1 - influence)`, with the dependence carried **structurally**: a shared edge is drawn
+once per Monte-Carlo trial, so two paths agree exactly to the extent that they share edges. The
+stated assumption is that, conditional on the shared edges, the disjoint remainders are
+independent; the stated limit is that a common cause the graph does not contain is not modelled
+at all. Beside it sits `if_independent` — the same marginals under an independence assumption —
+so the discount is a subtraction a reader can take rather than a correction they must accept. A
+Gaussian copula on the path outputs was rejected: it needs a correlation matrix nobody in this
+system authors, and it would impose a second dependence structure alongside the graph's own.
+
+**`do()` and `observe()` are separate operations with separate types** (build ticket 22).
+Observation propagates bidirectionally — learning a fact is evidence about what produced it.
+Intervention propagates downstream only and **reports** the target's incoming edges as cut,
+because doing a thing does not rewrite its own causes. Nothing is removed from the graph and
+nothing needs to be: the walk runs forward from the target, so an incoming edge is never traversed
+under either operation. The two downstream halves are byte-identical, and that is asserted rather
+than assumed. `twin/primitives.py` gives each its own type, so a swap is
+a `mypy` error rather than a runtime surprise, and the emitted intervention is refused if it
+carries any upstream belief update at all. An updated ancestor is named, graded and located in the
+graph and carries **no magnitude**: inverting an authored elasticity into a diagnostic number
+needs a prior over the causes that nothing in this model authors.
+
+**`twin rewind` is Pearl's abduction** (build ticket 35). The repository is the model and git
+dates every version of it, so the past is a commit rather than a projection: rewind opens the
+repository at the last commit on or before the declared time, and everything downstream reads it
+unchanged. That is why `do()` at a past time needs no special case. A filtered view would fail on
+the case that matters — it can hide rows added since, and it cannot restore an elasticity that was
+later recalibrated, so a backtest through one would score the past with today's numbers.
+Rewinding to before the model existed **refuses**, because an empty model is a claim about the
+organisation rather than an answer about the model. So does a time that is not ISO 8601: git reads
+a date it cannot parse as `now` and hands back the newest commit, so an unvalidated timestamp
+would answer a question about the past with today's model and say nothing about having done so.
 
 `twin/calibration.md` is the authoring discipline a triple is *supposed* to come from: a 90%
 credible interval with a most-likely value, five steps required by name. Every artefact that
@@ -236,10 +275,10 @@ responses, and the pre-filter runs in `twin options`.
 
 ## The pocket org
 
-Five components, six edges, named elasticities, two perspectives, three candidate responses, and a
+Five components, eight edges, named elasticities, two perspectives, three candidate responses, and a
 committed worksheet (`twin/pocket-org-worksheet.md`) with every number worked out **by hand** and
 the arithmetic shown. `twin worksheet --repo <pocket repo>` checks the emitted graph, blast radius,
-exposure, propagation and priced option set against all fifty-four lines.
+exposure, propagation, priced option set, intervention and observation against all sixty-seven lines.
 
 This exists because a refusal test catches a reintroduced **absence** and nothing else. It is
 satisfied by a degenerate system: a PERT triple that is present but garbage, a score tagged with the
@@ -293,12 +332,16 @@ and left unticked, on the same ground five were withdrawn on in earlier rounds �
 **one clause of a multi-clause criterion**, or on machinery that does not exist:
 
 - **decision ticket 08 AC 2** (intervention **and** counterfactual semantics, incl. structural-only
-  paths) — build ticket 20 delivered propagation and the structural-only refusal, and neither
-  `do()` semantics nor counterfactuals. Those are build tickets 22 and 35, so `causal-layer` gains
-  nothing this round and stands at 1/5.
-- **decision ticket 08 AC 4** (identification and confounding discipline) — shared ancestry is
-  named in the propagation artefact as *not* handled, and naming a gap is not closing it. Build
-  ticket 21.
+  paths) — two of its three legs are now built. `do()` and `observe()` have distinct semantics and
+  distinct types (build ticket 22), and a structural-only path still composes nothing. The
+  **counterfactual** is abduction → action → prediction: abduction landed at build ticket 35 and
+  prediction (fast-forward) is build ticket 37, so this stays unchecked and `causal-layer` stands
+  at 1/5. Two thirds of a composition is not the composition.
+- **decision ticket 08 AC 4** (identification and confounding discipline) — shared ancestry is now
+  detected and discounted (build ticket 21), which is the free structural half of decision ticket
+  08's Q5: shared ancestors of two paths surface automatically. The authored half — a mandatory
+  alternative-explanation field on every grade-1/2 edge — does not exist, so the criterion stays
+  unchecked.
 - **decision ticket 09 AC 4** (each named incommensurable, incl. where we refuse to price) — the
   register entry now has two distinct reasons rather than one, but existential and tail risk are
   build ticket 24 and the affected-parties register is 61, so "each" is not yet true.
@@ -412,14 +455,21 @@ verbatim. An artefact is exactly as sensitive as the model repository it came fr
 
 Named here so the skeleton cannot quietly become the definition of done.
 
-- **Propagation ignores shared ancestry.** Several paths out of one shock are reported separately
-  and never summed, because summing them would double-count — but nothing aggregates them with
-  explicit dependence either, so a reader with two paths to one component has two numbers and no
-  supported way to combine them. The artefact says so in `traversal.paths_are_not_aggregated`
-  rather than implying an answer. (Build ticket 21.)
-- **No intervention-versus-observation distinction.** `twin propagate` composes influence along
-  causal edges; nothing distinguishes `do(x)` from observing x, so upstream beliefs are untouched
-  in both cases and only one of those is correct. (22.)
+- **Shared ancestry is corrected only where the graph can see it.** The `joint` figure discounts a
+  common cause that appears as a shared edge, exactly (build ticket 21). A common cause **outside**
+  the graph — two edges independently authored from the same underlying driver nobody modelled —
+  is not corrected and cannot be, and the artefact states that limit in `joint.assumption` rather
+  than implying the correction is complete. The exact form also stops at ten paths per component;
+  past that the figure is sampled only, and the artefact says where it stopped.
+- **The counterfactual is two thirds built.** Rewind (abduction) and `do()` (action) exist and
+  compose; fast-forward (prediction) does not, so `rewind → play → fast-forward` cannot yet be run
+  end to end. (Build ticket 37.) The backtest needs one more thing on top: decision ticket 13
+  makes the **information regime** part of rewind, and the gate that refuses a post-T fact is
+  build ticket 36. `twin rewind` records no regime, so what exists is the time half only.
+- **An observation reports no diagnostic magnitude.** `observe(x)` names the ancestors whose belief
+  it updates and refuses to put a number on the update, because inverting an elasticity needs a
+  prior over the causes that nothing authors. That is a refusal rather than a gap, and it is the
+  honest state until somebody authors priors. (Build ticket 22.)
 - **Propagation is not joined to the £.** The engine composes elasticities and the currency
   reports declared valuations, and no code path multiplies a severity by a propagated influence.
   The pocket-org worksheet carries the three price lines hand-computed as the yardstick build
@@ -515,10 +565,13 @@ Named here so the skeleton cannot quietly become the definition of done.
 ```
 twin/
   cli.py          seam 1 — the artefact CLI, the primary boundary
-  verbs.py        sense / run / score / graph / blast / propagate / options / exposure
+  verbs.py        sense / run / score / graph / blast / propagate / intervene / observe /
+                  rewind / options / exposure
   schema.py       the closed typed schema; Article 9 has no slot because there is no slot
   blast.py        the reverse-dependency traversal, and the closed body with no price slot
-  propagate.py    Monte-Carlo along causal edges, and the depth schedule that stops it
+  propagate.py    Monte-Carlo along causal edges, the depth schedule that stops it, and the
+                  shared-ancestry discount that stops a common cause counting twice
+  primitives.py   the two composable primitives — do()/observe(), and rewind as abduction
   attenuation.yaml          the versioned depth factors, and where a number stops existing
   pert.py         calibrated triples, their analytic moments, and seeded sampling
   calibration.md  the authoring discipline behind a triple — pinned by every artefact that samples
