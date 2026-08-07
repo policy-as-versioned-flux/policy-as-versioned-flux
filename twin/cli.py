@@ -22,6 +22,7 @@ from .attest import AttestationError
 from .blob import BlobRefError
 from .canon import canonical_json, sha256_hex
 from .constraints import ConstraintError
+from .drift import DriftError
 from .evidence import EvidenceError
 from .grades import Capabilities, GradeError
 from .index import IndexError_
@@ -32,9 +33,10 @@ from .pert import PertError
 from .primitives import PrimitiveError
 from . import propagate as propagate_mod
 from .propagate import AttenuationError
+from .regimes import RegimeError
 from .reproduce import ReproduceError
 from .repo import ModelRepo, RepoError
-from .schema import SchemaError
+from .schema import REGIMES, SchemaError
 from .scoring import ScoreError
 from .sign import SignatureError
 from .verbs import VerbError
@@ -86,9 +88,45 @@ def cmd_run(args: argparse.Namespace) -> int:
         caps,
         org,
         args.scenario,
-        verbs.command_for("run", org=org, scenario=args.scenario, at=args.at),
+        args.regime,
+        verbs.command_for(
+            "run", org=org, scenario=args.scenario, regime=args.regime, at=args.at
+        ),
         at=args.at,
     )
+    gate = artefact.body["regime"]
+    withheld = gate["gate"]["withheld"]
+    _say(
+        f"{org}: {args.scenario} under {gate['declared']} — "
+        f"{'scoring-eligible' if gate['scoring_eligible'] else 'not scoring-eligible'}, "
+        f"{len(withheld)} fact(s) withheld by date"
+    )
+    for entry in withheld:
+        print(f"  withheld {entry['id']:<34} {entry['collection']}, dated {entry['dated']}")
+    if not gate["gate"]["ingestion_history"]["available"]:
+        print(f"  ingestion history unavailable: {gate['gate']['ingestion_history']['consequence']}")
+    return _emit(artefact, args.out)
+
+
+def cmd_regimes(args: argparse.Namespace) -> int:
+    """The two gaps, computed. Sensing and interpretation, localised rather than inferred."""
+    repo, caps, org = _open(args)
+    artefact = verbs.regime_gap(
+        repo,
+        caps,
+        org,
+        args.scenario,
+        verbs.command_for("regimes", org=org, scenario=args.scenario, at=args.at),
+        at=args.at,
+    )
+    localisation = artefact.body["localisation"]
+    _say(f"{org}: {args.scenario} under all three regimes")
+    for regime, count in sorted(localisation["admitted_counts"].items()):
+        print(f"  {regime:<16} {count} fact(s) admitted")
+    for entry in localisation["gaps"]:
+        names = ", ".join(entry["facts"]) or "none"
+        print(f"  {entry['localises']:<16} {' vs '.join(entry['between'])}: {names}")
+    print(f"  model residual not computed: {localisation['model_residual']['why']}")
     return _emit(artefact, args.out)
 
 
@@ -196,6 +234,47 @@ def cmd_observe(args: argparse.Namespace) -> int:
         repo, caps, org, args.component,
         verbs.command_for("observe", org=org, component=args.component),
     ))
+
+
+def cmd_drift(args: argparse.Namespace) -> int:
+    """The Flux drift measurement so far (build ticket 64). A reduction, never a verdict.
+
+    Prints rather than emitting an artefact: the input is a probe log outside any model
+    repository, so there are no pins to recompute it from and an envelope claiming otherwise
+    would be the one dishonest thing in the file.
+    """
+    import datetime
+
+    from . import drift
+
+    # The wall clock, named as such. Coverage is "how much of the window has passed", which is a
+    # question about now — and `report` takes it as an argument so the reduction stays a function
+    # of its inputs.
+    now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat()
+    body = drift.report(now)
+    cover = body["coverage"]
+    _say(f"Flux drift measurement, {cover['window_opens']} to {cover['window_closes']}")
+    print(f"  question     {body['question']}")
+    print(f"  owner        {body['owner']}")
+    print(
+        f"  window       {cover['window_elapsed_fraction']:.0%} elapsed, "
+        f"{cover['samples_reachable']}/{cover['samples_expected_by_now']} expected samples "
+        f"({cover['sampled_fraction']:.0%} coverage)"
+    )
+    for hole in cover["gaps_wider_than_the_cadence"]:
+        print(f"  gap          {hole['from']} -> {hole['to']} ({hole['hours']}h unobserved)")
+    for event in body["drift_events"]:
+        interval = (
+            "no deploy observed yet" if event["since_deploy_seconds"] is None
+            else f"{event['since_deploy_seconds']}s after the last deploy"
+        )
+        print(f"  drift        {event['subject']:<26} {event['from']!r} -> {event['to']!r}, {interval}")
+    if not body["drift_events"]:
+        print("  no drift event observed yet — read that against the coverage above, not instead of it")
+    for entry in body["open_preconditions"]:
+        print(f"  precondition {entry['id']:<26} blocks {entry['blocks']}, owner: {entry['owner']}")
+    print(f"  no verdict:  {body['why_no_verdict']}")
+    return 0
 
 
 def cmd_rewind(args: argparse.Namespace) -> int:
@@ -821,9 +900,28 @@ def build_parser() -> argparse.ArgumentParser:
 
     run = with_org(with_repo(subs.add_parser("run", help="execute a scenario; emits forecasts, plural")))
     run.add_argument("--scenario", required=True)
+    # Required, with no default (build ticket 36). The regime a default would pick is the one
+    # whose forecasts score, so an omitted flag would be a silent claim to the honest gate.
+    run.add_argument(
+        "--regime", required=True, choices=list(REGIMES),
+        help="the information gate this execution runs under; no default, and only as-consumed scores",
+    )
     run.add_argument("--at", default=None, help="override the scenario's declared time")
     run.add_argument("--out", required=True)
     run.set_defaults(fn=cmd_run)
+
+    gap = with_org(with_repo(subs.add_parser(
+        "regimes", help="one scenario under all three regimes, with the two gaps computed"
+    )))
+    gap.add_argument("--scenario", required=True)
+    gap.add_argument("--at", default=None, help="override the scenario's declared time")
+    gap.add_argument("--out", required=True)
+    gap.set_defaults(fn=cmd_regimes)
+
+    drifted = subs.add_parser(
+        "drift", help="the Flux drift measurement so far — coverage, events, and no verdict"
+    )
+    drifted.set_defaults(fn=cmd_drift)
 
     score = with_org(with_repo(subs.add_parser("score", help="score a forecast bundle against an outcome")))
     score.add_argument("--forecast", required=True, help="path to a forecast-bundle artefact")
@@ -953,9 +1051,11 @@ REFUSALS = (
     VerbError,
     AttenuationError,
     ConstraintError,
+    DriftError,
     EvidenceError,
     PertError,
     PrimitiveError,
+    RegimeError,
     GradeError,
     ArtefactError,
     AttestationError,

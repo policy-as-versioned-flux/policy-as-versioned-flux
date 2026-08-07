@@ -28,7 +28,7 @@ def artefacts(model_repo_dir: Path, tmp_path: Path) -> dict[str, Path]:
     }
     assert main(["sense", "--repo", str(model_repo_dir), *NETFLIX,
                  "--signal", "price-separation-announced", "--out", str(out["bound-signal"])]) == 0
-    assert main(["run", "--repo", str(model_repo_dir), *NETFLIX,
+    assert main(["run", "--repo", str(model_repo_dir), *NETFLIX, "--regime", "as-consumed",
                  "--scenario", "dvd-decline-2011", "--out", str(out["forecast-bundle"])]) == 0
     assert main(["score", "--repo", str(model_repo_dir), *NETFLIX,
                  "--forecast", str(out["forecast-bundle"]), "--outcome", "dvd-decline-2011-resolved",
@@ -162,6 +162,7 @@ def test_a_card_scored_after_a_later_commit_still_reproduces(model_repo_dir: Pat
     repo_dir = fixtures.build(tmp_path / "later")
     bundle, card = tmp_path / "b.json", tmp_path / "c.json"
     assert main(["run", "--repo", str(repo_dir), *NETFLIX, "--scenario", "dvd-decline-2011",
+                 "--regime", "as-consumed",
                  "--out", str(bundle)]) == 0
     fixtures.git(repo_dir, "commit", "-q", "--allow-empty", "-m", "the answer key arrives later")
     assert main(["score", "--repo", str(repo_dir), *NETFLIX, "--forecast", str(bundle),

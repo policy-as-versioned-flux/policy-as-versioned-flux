@@ -1,10 +1,10 @@
 {
-  "authorised_by": "decision ticket 08 \u2014 review of build tickets 21 and 22: the combined figure gains a sign and refuses to net opposing directions, it reports paths dropped by the cap, and the observation reports where its upstream walk stopped",
+  "authorised_by": "decision ticket 13 \u2014 build ticket 36: the forecast bundle's regime block now carries the gate that ran, so the bundle and the card it feeds move",
   "capabilities_digest": "0c8c350194bda0fe352ac2024e937bff95db3c105bb88922a789ce49d86c503f",
   "digests": {
     "blast-radius": "52411e4bbb696490e3f1db1049b1e18c0939c2e5eeb489819f5d1da332ecc8ae",
     "bound-signal": "f673ddbe1f25caf6f59bc96fdec42be2e70cc9c37e9cf66ead77c55d0d2701b3",
-    "forecast-bundle": "00e96275e4353111ac65f3a37cfe2a7e0086cda06505a6e630f48601a193dc57",
+    "forecast-bundle": "3c0957666c7bf69e8691cee6e8caf033800dfc3a8b299b5799eb20ce1a905105",
     "graph": "385e05aa3c7d1c8f95332987326a6320c28c55eeb05bed92c6b821098c41f363",
     "intervention": "75e737f7aaa81809b0a8cf853e93228b69bec5f70d700666f7282c22693283b1",
     "observation": "441dff4dc3520ec3ad0300e8ffa49276d1d4b282cf261bcbd745442ca1ed4cb8",
@@ -12,7 +12,7 @@
     "propagation": "c9cd88c71020e021c0eacdffd2a3a592e6dc64b6f8de106b40f3b68cef304d10",
     "rewound-model": "4c8aa95fa47fa2c4aaad94dc951e8d679ce453717cce5063cc49c4dfa30c0efe",
     "scenario-exposure": "2d3a6d672e590d24e132eb403b3f577e736aa0f3a7cdf131ab643da25d971a2b",
-    "score-card": "9b9464691014008e9541a67e10d056e5909405e813fcdd3482de5007badba84d"
+    "score-card": "af02b9451c39e358c6433e43dced7227838eb6ff01796ca4be3bf0b9fdc2931e"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

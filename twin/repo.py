@@ -179,6 +179,15 @@ class ModelRepo:
         self.pin = pin
         self.direction_checked = False  # set once the world/overlay direction rule has been enforced
 
+    @property
+    def model_root(self) -> Path:
+        """The directory this repository was opened on — what `open`/`open_at_time` take.
+
+        The worktree is not it: the model root may be a subdirectory, and reopening on the
+        worktree would silently widen what is read (build ticket 36 reopens at a past commit).
+        """
+        return self.worktree / self.pin.root if self.pin.root else self.worktree
+
     # -- opening -------------------------------------------------------------------------
 
     @classmethod

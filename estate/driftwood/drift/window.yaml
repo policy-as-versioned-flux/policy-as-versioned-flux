@@ -1,0 +1,88 @@
+# The pre-registration for the Flux drift measurement (build ticket 64, spec story 85).
+#
+# **This file is the declaration, and its first commit is the proof it was made up front.** The
+# harness guard `drift_window_was_declared_before_it_was_measured` reads this file's git history
+# and refuses if any sample in `samples.jsonl` predates it. A window chosen after seeing the
+# results is not a measurement, and "we declared it up front" is a claim somebody would otherwise
+# have to take on trust.
+#
+# Nothing here states an expected answer. The verdict is build ticket 65 and it reads this data;
+# writing the conclusion into the instrument is how a measurement becomes a demonstration.
+schema: drift.window/v1
+version: 1
+
+question: >-
+  Does the state of a deployed control diverge from its declared state **between deploys**? The
+  spec claims continuous reconciliation is required rather than a deploy-time attestation, and
+  drift between deploys is the candidate justification. If controls do not drift, a point-in-time
+  attestation suffices and Flux is a convenience rather than an enabler.
+
+# Stated before any sample exists. Both bounds, so the window cannot be extended until the answer
+# looks better, and cannot be truncated once it looks worse.
+window:
+  opens: '2026-08-07'
+  closes: '2026-11-06'
+  # 91 days. Long enough that a monthly maintenance cycle falls inside it at least twice, which is
+  # the shortest cadence on which somebody plausibly hand-edits a cluster.
+  days: 91
+
+# How often the probe is expected to run. A gap wider than this is a **coverage hole**, reported
+# as such — a window that was sampled three times is not a 91-day measurement, and an instrument
+# whose silence reads as "no drift" is worse than no instrument.
+cadence:
+  every_minutes: 60
+  tolerance_minutes: 15
+
+# What is measured, and where the two states come from. `desired` is what git says through the
+# pinned Flux revision; `observed` is what the cluster actually holds.
+subjects:
+  - id: driftwood-live-version
+    repository: policy-as-versioned-driftwood
+    cluster: kind-driftwood
+    control: The reconciled policy version the cluster reports as live.
+    desired_from: gitops/apps/version-configmap.yaml
+    observed_from: configmap/driftwood-live-version -n driftwood, key policyVersion
+
+  - id: driftwood-nist-pin
+    repository: policy-as-versioned-driftwood
+    cluster: kind-driftwood
+    control: The pinned regulator catalogue version this institution consumes.
+    desired_from: gitops/apps/nist-pin-configmap.yaml
+    observed_from: configmap/driftwood-nist-pin -n driftwood, key catalogVersion
+
+  - id: driftwood-namespace
+    repository: policy-as-versioned-driftwood
+    cluster: kind-driftwood
+    control: The namespace the reconciled content lands in. Its absence is total drift.
+    desired_from: gitops/apps/namespace.yaml
+    observed_from: namespace/driftwood
+
+# What counts as a drift event, declared before any is seen. A transition, not a state: a subject
+# that was already divergent when the window opened is a starting condition rather than drift.
+drift_event:
+  definition: >-
+    A subject whose observed state matched its desired state in one sample and did not in the
+    next, with no deploy between the two. "No deploy between the two" is the whole claim: a
+    divergence that follows a deploy is a deploy, and a deploy-time attestation would catch it.
+  deploy_marker: >-
+    The Flux Kustomization's lastAppliedRevision. A change to it between two samples is a deploy,
+    and the interval is measured from the deploy that preceded the divergence.
+  interval: >-
+    Seconds from the last observed deploy to the first sample in which the subject was divergent.
+    An upper bound, not the moment of divergence: the probe samples on a cadence, so the true
+    interval lies between this figure and this figure minus one cadence.
+
+# Declared here so it cannot be added later. A measurement that could report only positives would
+# be unfalsifiable in the direction that matters most to this spec.
+outcomes_that_would_falsify_the_spec:
+  - No drift event in any subject across the full window, at coverage above 90%.
+  - Every drift event immediately follows a deploy, so a deploy-time attestation would catch it.
+
+# Who runs the probe, and where. Not a hosted CI runner: the cluster is local KinD and a hosted
+# runner cannot reach it, so a scheduled workflow would report an unreachable cluster every hour
+# and prove nothing. The probe writes an `unreachable` sample when it cannot sample, which is what
+# stops a stopped cron from reading as a stable estate.
+operation:
+  owner: Chris Nesbitt-Smith
+  runner: operator cron on the machine holding the kind-driftwood cluster
+  crontab: "0 * * * * cd <repo> && estate/driftwood/drift/probe.sh >> estate/driftwood/drift/probe.log 2>&1"

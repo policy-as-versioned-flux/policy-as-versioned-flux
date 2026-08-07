@@ -39,6 +39,17 @@ SIGNS = ("positive", "negative")
 EVIDENCE_GRADES = (1, 2, 3, 4, 5)
 REGIMES = ("as-consumed", "as-knowable", "with-hindsight")
 CONTAMINATION = ("low", "high", "control")
+
+# Which collections hold a **dated fact about the world**, and which field carries the date
+# (build ticket 36). Declared here rather than derived from the schemas, for the reason the
+# invariant manifest declares its refused field names: a gate that works out its own subject
+# from the thing it is gating is a tautology, and deleting a line would silently shrink it.
+#
+# A regrade is deliberately absent. It is the twin's own record-keeping about how strong a claim
+# is, not a fact it ingested about the world, and the information regimes gate the second. The
+# limit is real and named in `twin/regimes.py`: a regrade dated after T still moves a grade under
+# `as-knowable`, and only the rewind leg removes it.
+DATED_FACTS = {"signals": "date", "outcomes": "resolved_on"}
 # Who a perspective belongs to. Enumerated so that "a non-employer party can instantiate one" is
 # checkable rather than asserted — and deliberately flat: nothing anywhere ranks these, and there
 # is no field by which one could (build ticket 26).
@@ -479,6 +490,12 @@ SCHEMAS: dict[str, Schema] = {
         required={"id": ident, "name": text, "addresses": ident, "cost": money_pert},
         optional={"crosses": mapping_of(text), "note": text},
     ),
+    # A scenario carries **no regime** (build ticket 36). The regime is a required parameter of
+    # the execution, and a scenario-level field would be a default in everything but name: an
+    # author who omitted the flag would silently inherit whichever regime the file happened to
+    # declare, and a file that declared none would silently inherit the one that scores. The
+    # regime is a property of *this run's* information gate, not of the question being asked, and
+    # the same scenario is meant to be run under all three.
     "scenario": Schema(
         required={
             "id": ident,
@@ -488,7 +505,7 @@ SCHEMAS: dict[str, Schema] = {
             "components": list_of(ident),
             "world_models": list_of(ident),
         },
-        optional={"horizon": date, "substrate": text, "regime": one_of(*REGIMES)},
+        optional={"horizon": date, "substrate": text},
     ),
     # The answer-key format (build ticket 08): the boundary fixture the answer-key track tests
     # against. `contamination` is the slot the Enron control fills at build ticket 40.

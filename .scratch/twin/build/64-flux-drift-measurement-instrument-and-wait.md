@@ -13,13 +13,55 @@ blocks Actions from creating PRs is currently off and needs an admin** to change
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** instrumented, measuring (2026-08-07) — closes when the window closes, 2026-11-06
 
 **Reading list:** Decision ticket 22 (the Flux falsification test as recorded). Spec story 85.
 
-- [ ] Real enactment repositories instrumented to record control state continuously.
-- [ ] Measurement runs for a declared window and the window is stated up front, not chosen after seeing results.
-- [ ] Drift events recorded with the interval between deploy and divergence.
-- [ ] The org Actions-create-PRs setting is recorded as an open precondition with a named owner.
-- [ ] Extends the invariant suite; never weakens it. Any invariant change names the invariant and cites the authorising decision ticket.
-- [ ] Declares its depth grade as a **computed checklist** against the owning decision ticket's acceptance criteria — `full` is derived from the checklist, never asserted.
+- [x] Real enactment repositories instrumented to record control state continuously.
+      `estate/driftwood/drift/probe.sh` samples the real `kind-driftwood` cluster: three control
+      subjects, the Flux Kustomization's `lastAppliedRevision` as the deploy marker, and the
+      suspend state. One JSON line per run, appended. **A run that cannot reach the cluster still
+      writes a sample**, because an instrument whose silence reads as stability is worse than no
+      instrument.
+- [x] Measurement runs for a declared window and the window is stated up front, not chosen after seeing results.
+      `estate/driftwood/drift/window.yaml` declares both bounds, the cadence, the subjects, what
+      counts as a drift event, and the two outcomes that would falsify the spec. Its first commit
+      is the proof: the harness guard `drift_window_was_declared_before_it_was_measured` reads the
+      file's git history and fails if any sample predates it. `Window.load` refuses a window that
+      names no falsifier and one that names no operator.
+- [x] Drift events recorded with the interval between deploy and divergence.
+      `twin/drift.py events()` — a subject that changed between two consecutive samples with no
+      revision change between them, carrying `since_deploy_seconds` from the last observed deploy.
+      Declared as an **upper bound** in the window and again in the event, because the probe
+      samples on a cadence.
+- [x] The org Actions-create-PRs setting is recorded as an open precondition with a named owner.
+      `estate/driftwood/drift/preconditions.yaml`, and `twin drift` prints it. Owner: an
+      organisation administrator — the twin operator cannot change it. It blocks build ticket 66.
+- [x] Extends the invariant suite; never weakens it. Any invariant change names the invariant and cites the authorising decision ticket.
+      A **harness guard**, not a seventeenth invariant: the constitution names sixteen and may not
+      grow one without changing first, and this guards a yardstick — the pre-registration — the
+      same way `worksheet_matches_the_pocket_org` guards the worksheet.
+- [x] Declares its depth grade as a **computed checklist** against the owning decision ticket's acceptance criteria — `full` is derived from the checklist, never asserted.
+      **No capability file, and that is the honest answer.** There is no decision ticket 22 in
+      `.scratch/twin/issues/` — the reading list names one that was never written — so there are
+      no acceptance criteria to compute a checklist against. A capability file with an invented
+      yardstick would be a slot claiming a capability existed, which is the same refusal decision
+      ticket 15 got at build ticket 27.
+
+## Comments
+
+**This ticket does not close today; it starts a clock.** Everything buildable is built and the
+window runs to 2026-11-06. `twin drift` reports coverage first and events second on purpose: "no
+drift observed" at 0% coverage and "no drift observed" at 95% coverage are different claims, and
+build ticket 65 needs to be able to tell them apart.
+
+**The reading list names a decision ticket that does not exist.** Build ticket 65 cites the same
+one. The Flux falsification test is recorded in the spec (story 85) and nowhere else, so 65 has
+no resolved decision to derive its verdict's *form* from. Worth resolving before 65 opens, and
+recorded here rather than discovered then.
+
+**No scheduled workflow, on purpose.** The cluster is local KinD and a hosted runner cannot reach
+it, so a cron in GitHub Actions would record an unreachable cluster every hour and prove nothing.
+The runner is operator cron on the machine holding the cluster, named in the window with its
+crontab line. That is a genuine weakness — a probe nobody runs produces a coverage hole, and the
+guard against it is that the hole is visible rather than that it cannot happen.

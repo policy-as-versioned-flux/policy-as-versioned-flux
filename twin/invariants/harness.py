@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 import os
 import re
 import subprocess
@@ -329,6 +330,63 @@ def _graded_edge_contract(ctx: Context) -> str:
     if not Overlay.load(repo, "netflix").edges:
         raise Violated("the fixture overlay carries no first-class edges at all")
     return f"{len(graded)} graded causal edges, one degenerate and flagged; a stripped one is refused"
+
+
+@harness_check("drift_window_was_declared_before_it_was_measured")
+def _drift_window_declared_up_front(ctx: Context) -> str:
+    """The Flux measurement's window was pre-registered (build ticket 64).
+
+    A guard on the suite rather than an invariant, for the same reason the pocket-org worksheet is
+    one: the constitution names sixteen invariants and may not grow a seventeenth without the
+    constitution changing first, and this guards a **yardstick** — the pre-registration — rather
+    than an absence in the system.
+
+    The claim "the window was stated up front, not chosen after seeing results" is otherwise
+    something a reader has to take on trust. Here it is read out of git: the window file's first
+    commit must predate every sample in the probe log. Retuning the window once the data looked
+    inconvenient would fail this, and rewriting the history to hide that is a different act from
+    editing a file.
+
+    The window also has to name what would falsify the spec, and `Window.load` refuses one that
+    does not — a measurement that can only come back one way is a demonstration.
+    """
+    from .. import drift
+
+    window = drift.Window.load()  # refuses a window with no falsifier and no named owner
+    samples = drift.load_samples()
+
+    declared = _first_commit_date(REPO_DIR, drift.WINDOW_PATH)
+    if declared is None:
+        if samples:
+            raise Violated(
+                f"{len(samples)} probe sample(s) exist and the window has never been committed, so "
+                "nothing establishes that it was declared before the data arrived"
+            )
+        return (
+            f"window {window.opens}..{window.closes} declared with {len(window.falsifiers)} "
+            "falsifier(s), uncommitted and unmeasured — the state at the start of a measurement"
+        )
+
+    early = [s["ts"] for s in samples if drift._moment(s["ts"]) < declared]
+    if early:
+        raise Violated(
+            f"{len(early)} probe sample(s) predate the window's first commit ({declared.isoformat()}), "
+            f"earliest {min(early)} — the window was not declared before it was measured"
+        )
+    return (
+        f"window {window.opens}..{window.closes} committed {declared.date().isoformat()}, "
+        f"{len(window.falsifiers)} declared falsifier(s), {len(samples)} sample(s), none earlier"
+    )
+
+
+def _first_commit_date(root: Path, path: Path) -> datetime.datetime | None:
+    """When a file first entered git history, or `None` if it never has."""
+    rel = path.relative_to(root).as_posix()
+    out = _git(root, "log", "--diff-filter=A", "--format=%cI", "--", rel)
+    stamps = [line for line in (out or "").splitlines() if line.strip()]
+    if not stamps:
+        return None
+    return datetime.datetime.fromisoformat(stamps[-1].strip().replace("Z", "+00:00"))
 
 
 @harness_check("an_intervention_never_reaches_upstream")

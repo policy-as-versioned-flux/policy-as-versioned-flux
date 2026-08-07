@@ -45,6 +45,10 @@ NETFLIX = "netflix"
 SIGNAL = "price-separation-announced"
 SCENARIO = "dvd-decline-2011"
 OUTCOME = "dvd-decline-2011-resolved"
+# The regime the shared subjects run under (build ticket 36). Named rather than omitted, because
+# there is no default: `only_as_consumed_scores` needs a scoring-eligible bundle, so this is the
+# one that produces one, and the regimes that do not are exercised where that is the point.
+REGIME = "as-consumed"
 # The blast-radius subject (build ticket 19). From the delivery network, one component is
 # reachable through a fully-graded causal path and one is reachable only through a grade-5 model
 # assertion — so the fixture exercises the gate in both directions rather than one.
@@ -98,7 +102,8 @@ def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefac
     bound_path = bound.write(out_dir / "bound-signal.json")
 
     bundle = verbs.run(
-        repo, ctx.caps, NETFLIX, SCENARIO, verbs.command_for("run", org=NETFLIX, scenario=SCENARIO)
+        repo, ctx.caps, NETFLIX, SCENARIO, REGIME,
+        verbs.command_for("run", org=NETFLIX, scenario=SCENARIO, regime=REGIME),
     )
     bundle_path = bundle.write(out_dir / "forecast-bundle.json")
 
@@ -330,7 +335,7 @@ def subprocess_digest(ctx: "Context", hash_seed: str) -> str:
     env = {**os.environ, "PYTHONHASHSEED": hash_seed, "PYTHONPATH": str(REPO_DIR)}
     proc = subprocess.run(
         [sys.executable, "-P", "-m", "twin", "run", "--repo", str(ctx.repo_dir),
-         "--org", NETFLIX, "--scenario", SCENARIO, "--out", str(out)],
+         "--org", NETFLIX, "--scenario", SCENARIO, "--regime", REGIME, "--out", str(out)],
         env=env, cwd=str(REPO_DIR), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
     )
     if proc.returncode != 0:
@@ -448,6 +453,131 @@ def _only_as_consumed_scores(ctx: "Context") -> str:
         if any(isinstance(v, (int, float)) and not isinstance(v, bool) for _, v in _pairs(body["unscoreable"])):
             raise Violated("an unscoreable forecast still carried a number")
     return f"{len(card['scores'])} as-consumed scores; as-knowable and with-hindsight refused explicitly"
+
+
+@invariant("as_consumed_admits_no_post_T_fact")
+def _as_consumed_admits_no_post_t_fact(ctx: "Context") -> str:
+    """An as-consumed execution cannot reference a fact dated after T, by construction (ticket 36).
+
+    "By construction" is the load-bearing word, so the check asserts the *construction* rather
+    than the outcome. Four legs, and the first two are what make it structural:
+
+    * **No default.** `verbs.run` takes the regime as a parameter with no default value, and
+      omitting it is a refusal. A default would make the gate bypassable by leaving a flag off,
+      and the value a default would pick is the one whose forecasts score. The scenario schema
+      carries no regime field either, for the same reason: an authored one is a default wearing
+      a different hat.
+    * **Absence, not screening.** The facts a regime withholds are missing from the overlay the
+      execution reads, so there is no post-T fact available to reference.
+    * **The planted fact fails the run.** A fact dated after T and committed *before* it is the
+      one shape the rewind cannot remove; bound to a component the scenario forecasts, it is a
+      refusal rather than a silent redaction.
+    * **A gate, not a wall.** The same fixture still runs under as-consumed without the plant,
+      and still emits forecasts — a gate that refused everything would pass every refusal in this
+      check while making the regime useless.
+    """
+    import inspect
+
+    from .. import regimes as regimes_mod
+    from ..regimes import RegimeError
+    from ..schema import DATED_FACTS, REGIMES, SchemaError, validate
+
+    signature = inspect.signature(verbs.run)
+    if signature.parameters["regime"].default is not inspect.Parameter.empty:
+        raise Violated("verbs.run defaults its regime; the one a default would pick is the one that scores")
+    try:
+        verbs.run(ModelRepo.open(ctx.repo_dir), ctx.caps, NETFLIX, SCENARIO, None, ["twin", "run"])
+    except RegimeError:
+        pass
+    else:
+        raise Violated("an execution with no declared regime ran; the regime has a default somewhere")
+    try:
+        validate(
+            "scenario",
+            {"id": "planted", "question": "q", "proposition": "p", "at": "2011-07-12",
+             "components": ["c"], "world_models": ["m"], "regime": verbs.SCORING_REGIME},
+            "planted",
+        )
+    except SchemaError:
+        pass
+    else:
+        raise Violated(
+            "a scenario declaring its own regime validated. An authored regime is a default: an "
+            "execution that omitted the flag would inherit whatever the file happened to say"
+        )
+
+    clean = ctx.tmp / "regime-org"
+    if not clean.exists():
+        fixtures.build_regime_org(clean)
+    repo = ModelRepo.open(clean)
+    scenario, org, at = "did-it-land-2011", fixtures.REGIME_ORG, fixtures.REGIME_T
+
+    bundles = {}
+    for regime in REGIMES:
+        artefact = verbs.run(
+            repo, ctx.caps, org, scenario, regime,
+            verbs.command_for("run", org=org, scenario=scenario, regime=regime),
+        )
+        bundles[regime] = json.loads(artefact.to_bytes())["body"]
+    consumed = bundles[verbs.SCORING_REGIME]
+    if not consumed["forecasts"]:
+        raise Violated("the as-consumed execution emitted no forecast, so the gate is a wall")
+    if not consumed["regime"]["gated"] or not consumed["regime"]["scoring_eligible"]:
+        raise Violated("the as-consumed bundle does not declare itself gated and scoring-eligible")
+
+    # Absence, not screening: what this regime admitted is a strict subset of what the loosest one
+    # did, and the difference is named rather than counted.
+    admitted = {
+        regime: {f"{c}/{i}" for c, ids in body["regime"]["gate"]["admitted"].items() for i in ids}
+        for regime, body in bundles.items()
+    }
+    if not admitted[regimes_mod.WITH_HINDSIGHT] - admitted[verbs.SCORING_REGIME]:
+        raise Violated(
+            "as-consumed and with-hindsight admitted the same facts in this fixture, so the gate "
+            "is asserted where nothing could go wrong"
+        )
+    for collection, field in sorted(DATED_FACTS.items()):
+        late = [
+            ident
+            for ident in admitted[verbs.SCORING_REGIME]
+            if ident.startswith(f"{collection}/")
+        ]
+        for ident in late:
+            doc = getattr(regimes_mod.Overlay.load(repo, org), collection)[ident.split("/", 1)[1]]
+            if str(doc[field]) > at:
+                raise Violated(f"as-consumed admitted {ident}, dated {doc[field]} — after {at}")
+
+    # The planted fact. Committed before T so the rewind keeps it; dated after T so only the date
+    # filter can catch it; bound to the forecast subject so silence would be the wrong answer.
+    planted = ctx.tmp / "regime-org-planted"
+    if not planted.exists():
+        fixtures.build_regime_org(planted, planted=True)
+    planted_repo = ModelRepo.open(planted)
+    try:
+        verbs.run(
+            planted_repo, ctx.caps, org, scenario, verbs.SCORING_REGIME,
+            verbs.command_for("run", org=org, scenario=scenario, regime=verbs.SCORING_REGIME),
+        )
+    except RegimeError as exc:
+        if "planted-post-t" not in str(exc):
+            raise Violated(f"the as-consumed run refused, but not for the planted fact: {exc}") from None
+    else:
+        raise Violated(
+            "a fact dated after T and committed before it was quietly withheld rather than "
+            "refusing the run, so an as-consumed forecast was produced about a redacted subject"
+        )
+    # And it is the *regime* that refuses, not the repository: the same plant runs with hindsight.
+    loose = verbs.run(
+        planted_repo, ctx.caps, org, scenario, regimes_mod.WITH_HINDSIGHT,
+        verbs.command_for("run", org=org, scenario=scenario, regime=regimes_mod.WITH_HINDSIGHT),
+    )
+    if not json.loads(loose.to_bytes())["body"]["forecasts"]:
+        raise Violated("the planted fixture emits nothing under any regime, so the refusal proves nothing")
+    return (
+        f"regime has no default and no schema slot; as-consumed admits "
+        f"{len(admitted[verbs.SCORING_REGIME])} of {len(admitted[regimes_mod.WITH_HINDSIGHT])} facts "
+        "and still forecasts; a post-T fact bound to the subject refuses the run"
+    )
 
 
 @invariant("no_special_category_slot")

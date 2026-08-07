@@ -8,8 +8,8 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 08 \u2014 emit_all memoised after build ticket 21 tripled its cost; fifteen checks re-derived a deterministic artefact set fifteen times"
-checks_module_sha256: 118782a2dbb2d58cbb9680e47871988904b183d9b8444559b37d0bd124b755a1
+checks_module_authorised_by: "decision ticket 13 \u2014 build ticket 36 activates as_consumed_admits_no_post_T_fact and turns the regime tag into a load-through gate; emit_all and the subprocess determinism probe now name the regime, because there is no default"
+checks_module_sha256: 2a4b340ed5ec713b2fbbb44f473b292b2205d6f4d21c50c387a08dbb385dbd45
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
@@ -144,8 +144,18 @@ invariants:
 
   - name: as_consumed_admits_no_post_T_fact
     activating_ticket: '36'
-    state: pending
+    state: live
+    body_sha256: 45d4aa475a288e925079c95a8e485cce927bb802061dc0172e7fb94fe75cf201
+    authorised_by: "decision ticket 13 \u2014 build ticket 36 activates as_consumed_admits_no_post_T_fact and turns the regime tag into a load-through gate; emit_all and the subprocess determinism probe now name the regime, because there is no default"
     asserts: An as-consumed execution cannot reference a fact dated after T, by construction rather than by review.
+    note: >-
+      Asserted as a construction rather than as an outcome. The regime is a parameter with no
+      default and the scenario schema has no slot for one, so the gate cannot be bypassed by
+      omission; withheld facts are absent from the overlay the execution reads rather than
+      screened out of it; and a fact dated after T but committed before it — the one shape the
+      rewind cannot remove — refuses the run when it is bound to a component the scenario
+      forecasts. The positive leg is asserted too: the same fixture still forecasts under
+      as-consumed, so the gate is a gate and not a wall.
 
   - name: price_levels_never_probabilities
     activating_ticket: '59'

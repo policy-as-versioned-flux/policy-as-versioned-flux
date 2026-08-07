@@ -30,7 +30,8 @@ def _sense(repo_dir: Path, out: Path) -> int:
 
 def _forecast(repo_dir: Path, out: Path, at: str | None = None) -> int:
     extra = ["--at", at] if at else []
-    return _run(repo_dir, "run", *NETFLIX, "--scenario", "dvd-decline-2011", *extra, "--out", str(out))
+    return _run(repo_dir, "run", *NETFLIX, "--scenario", "dvd-decline-2011",
+                "--regime", "as-consumed", *extra, "--out", str(out))
 
 
 def _score(repo_dir: Path, bundle: Path, out: Path) -> int:
@@ -210,6 +211,8 @@ def test_a_live_scenario_has_no_answer_key_to_score_against(model_repo_dir: Path
                 "intel",
                 "--scenario",
                 "euv-slip-2026",
+                "--regime",
+                "as-consumed",
                 "--out",
                 str(bundle),
             ]
@@ -258,7 +261,7 @@ def test_ambiguous_org_is_refused_rather_than_guessed(
     """
     assert (
         main(["run", "--repo", str(model_repo_dir), "--scenario", "dvd-decline-2011",
-              "--out", str(tmp_path / "nope.json")])
+              "--regime", "as-consumed", "--out", str(tmp_path / "nope.json")])
         == 2
     )
     assert "--org is required" in capsys.readouterr().err
@@ -294,7 +297,8 @@ def test_the_same_pins_give_the_same_bytes_from_a_separate_process(model_repo_di
         out = tmp_path / f"seed-{seed}.json"
         proc = subprocess.run(
             [sys.executable, "-P", "-m", "twin", "run", "--repo", str(model_repo_dir),
-             "--org", "netflix", "--scenario", "dvd-decline-2011", "--out", str(out)],
+             "--org", "netflix", "--scenario", "dvd-decline-2011", "--regime", "as-consumed",
+             "--out", str(out)],
             cwd=str(REPO_DIR),
             env={**os.environ, "PYTHONHASHSEED": seed, "PYTHONPATH": str(REPO_DIR)},
             capture_output=True,

@@ -32,7 +32,8 @@ from .canon import sha256_hex
 from .grades import Capabilities
 from .repo import ModelRepo, RepoError
 
-VERBS = ("sense", "run", "score", "graph", "propagate", "options", "intervene", "observe", "rewind")
+VERBS = ("sense", "run", "score", "graph", "propagate", "options", "intervene", "observe", "rewind",
+         "regimes")
 
 
 class ReproduceError(RuntimeError):
@@ -107,7 +108,17 @@ def replay(worktree: str | Path, caps: Capabilities, doc: dict[str, Any]) -> tup
     if verb == "sense":
         return verbs.sense(repo, caps, org, _need(flags, "signal", command), command), []
     if verb == "run":
-        return verbs.run(repo, caps, org, _need(flags, "scenario", command), command, at=flags.get("at")), []
+        # The regime is read from the recorded command, never defaulted. A replay that guessed it
+        # could reproduce an `as-consumed` bundle from a `with-hindsight` execution and report a
+        # match, which is the one thing this whole module exists to make impossible.
+        return verbs.run(
+            repo, caps, org, _need(flags, "scenario", command), _need(flags, "regime", command),
+            command, at=flags.get("at"),
+        ), []
+    if verb == "regimes":
+        return verbs.regime_gap(
+            repo, caps, org, _need(flags, "scenario", command), command, at=flags.get("at")
+        ), []
     if verb == "graph":
         return verbs.graph(repo, caps, org, command), []
     if verb == "propagate":

@@ -31,6 +31,7 @@ from . import (
     options as options_mod,
     primitives as primitives_mod,
     propagate as propagate_mod,
+    regimes as regimes_mod,
     scoring,
 )
 
@@ -51,6 +52,9 @@ CAPS_QUERY = ["causal-layer", "domain-model", "provenance"]
 # Rewind is the scenario engine's time primitive (build ticket 35), and it is a fact about the
 # model repository, so provenance travels with it too.
 CAPS_REWIND = ["domain-model", "provenance", "scenario-engine"]
+# The information regimes are rewind's other half — decision ticket 13 Q2 defines a rewind as
+# restoring the model under an information gate, and sense-move owns what counts as ingested.
+CAPS_REGIMES = ["domain-model", "provenance", "scenario-engine", "sense-move"]
 
 KIND_BOUND_SIGNAL = "bound-signal"
 KIND_FORECAST_BUNDLE = "forecast-bundle"
@@ -63,12 +67,12 @@ KIND_PRICED_OPTIONS = "priced-option-set"
 KIND_INTERVENTION = "intervention"
 KIND_OBSERVATION = "observation"
 KIND_REWOUND_MODEL = "rewound-model"
+KIND_REGIME_GAP = "regime-gap"
 
 # Only an as-consumed execution produces a scoring-eligible forecast: the honest number is never
-# contaminated by what we know now (spec story 40). The *tag* lands here; the *gating* — refusing
-# a fact dated after T — is build ticket 36, and the artefact says so rather than implying it.
-SCORING_REGIME = "as-consumed"
-REGIME_GATING_TICKET = "build ticket 36"
+# contaminated by what we know now (spec story 40). Build ticket 36 turned the tag into a gate —
+# the model is *loaded through* the regime, so a post-T fact is absent rather than screened.
+SCORING_REGIME = regimes_mod.AS_CONSUMED
 
 
 class VerbError(RuntimeError):
@@ -630,8 +634,26 @@ def _spread(values: list[Any]) -> float | None:
 
 
 def run(
-    repo: ModelRepo, caps: Capabilities, org: str, scenario_id: str, command: list[str], at: str | None = None
+    repo: ModelRepo,
+    caps: Capabilities,
+    org: str,
+    scenario_id: str,
+    regime: str | None,
+    command: list[str],
+    at: str | None = None,
 ) -> Artefact:
+    """Execute a scenario under a declared information regime. Emits forecasts, plural.
+
+    `regime` has **no default** (build ticket 36, AC 1). It is positional and it is checked before
+    anything else happens, because the one regime a default would pick is the one whose forecasts
+    score — so an omitted flag would be a silent claim to have run under the honest gate.
+
+    The gate is applied by **loading the model through it**: under `as-consumed` the overlay is
+    read at the last commit on or before T and every fact dated after T is withheld, so the
+    execution below has no post-T fact available to reference. Referencing one is not a mistake
+    this function could make.
+    """
+    regime = regimes_mod.require(regime)
     overlay = Overlay.load(repo, org)
     scenario = overlay.scenarios.get(scenario_id)
     if scenario is None:
@@ -641,6 +663,23 @@ def run(
     when = at or scenario.get("at")
     if not when:
         raise VerbError(f"scenario {scenario_id!r} declares no `at`; an execution happens at a declared time")
+
+    # From here the model is whatever this regime admits. The scenario is re-resolved against it
+    # rather than carried over: under `as-consumed` the repository is reopened at T, and a
+    # scenario authored later did not exist then — which is an answer, not an inconvenience.
+    ungated, history = regimes_mod.read_at(repo, org, regime, str(when), loaded=overlay)
+    scenario = ungated.scenarios.get(scenario_id)
+    if scenario is None:
+        raise VerbError(
+            f"scenario {scenario_id!r} does not exist in overlay {org!r} as it stood at {when} "
+            f"under the {regime!r} regime. It was authored later, so there was no such question "
+            "to ask at that time."
+        )
+    overlay, gate = regimes_mod.apply(ungated, regime, str(when), history)
+    regimes_mod.refuse_redacted_subject(
+        gate, ungated, [str(c) for c in scenario.get("components", []) or []],
+        f"scenario {scenario_id!r}",
+    )
 
     proposition_id = str(scenario.get("proposition", ""))
     proposition = overlay.proposition(proposition_id)
@@ -654,10 +693,6 @@ def run(
     model_ids = [str(m) for m in scenario.get("world_models", []) or []]
     if not model_ids:
         raise VerbError(f"scenario {scenario_id!r} names no world models; a forecast is always relative to one")
-
-    regime = str(scenario.get("regime", SCORING_REGIME))
-    if regime not in REGIMES:
-        raise VerbError(f"scenario {scenario_id!r}: unknown information regime {regime!r}")
 
     pins = _pins(repo, overlay, caps, _substrate_ref(scenario, f"scenario {scenario_id}"))
     # A forecast travels on its own, so it carries the whole pin — including the command that
@@ -711,10 +746,60 @@ def run(
             "regime": {
                 "declared": regime,
                 "scoring_eligible": regime == SCORING_REGIME,
-                "gated": False,
-                "gating_lands_at": REGIME_GATING_TICKET,
+                # No longer a tag with a promise attached (build ticket 36). The gate ran, and
+                # what it withheld is in the artefact rather than described in prose somewhere.
+                "gated": True,
+                "gate": gate,
             },
             "forecasts": forecasts,
+        },
+    )
+
+
+# -- regimes: the three-way gap (build ticket 36) --------------------------------------------
+
+
+def regime_gap(
+    repo: ModelRepo, caps: Capabilities, org: str, scenario_id: str, command: list[str],
+    at: str | None = None,
+) -> Artefact:
+    """The same scenario under all three regimes, with the two gaps computed (build ticket 36).
+
+    The gaps are the localisation diagnostic and they are **computed here**, not left for a reader
+    to infer from three artefacts side by side: `as-consumed` versus `as-knowable` localises to
+    sensing, `as-knowable` versus `with-hindsight` localises to interpretation. Wrong under all
+    three localises to the model, and that third comparison is reported as *not computed* with the
+    reason, because nothing here infers a probability from a fact yet.
+    """
+    overlay = Overlay.load(repo, org)
+    scenario = overlay.scenarios.get(scenario_id)
+    if scenario is None:
+        known = ", ".join(sorted(overlay.scenarios)) or "none"
+        raise VerbError(f"no scenario {scenario_id!r} in overlay {org!r} (have: {known})")
+    when = str(at or scenario.get("at") or "")
+    if not when:
+        raise VerbError(f"scenario {scenario_id!r} declares no `at`; a regime gate needs a time")
+
+    reports = {}
+    for regime in REGIMES:
+        ungated, history = regimes_mod.read_at(repo, org, regime, when, loaded=overlay)
+        _, report = regimes_mod.apply(ungated, regime, when, history)
+        reports[regime] = report
+
+    return Artefact(
+        kind=KIND_REGIME_GAP,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, _substrate_ref(scenario, f"scenario {scenario_id}")),
+        depth=caps.depth_block(CAPS_REGIMES),
+        body={
+            "scenario": {"id": scenario_id, "at": when, "question": scenario.get("question")},
+            "regimes": [reports[regime] for regime in REGIMES],
+            "localisation": regimes_mod.gap(reports),
+            "scoring": (
+                f"only {SCORING_REGIME!r} produces a scoring-eligible forecast; the other two "
+                "exist to localise a failure, never to be scored against"
+            ),
         },
     )
 

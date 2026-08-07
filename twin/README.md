@@ -1,12 +1,14 @@
 # `twin`
 
-Build tickets 01–08, 10–15, 17–22, 26–29 and 35 of `.scratch/twin/`, plus 23 at `partial`. One dated signal binds to a
+Build tickets 01–08, 10–15, 17–22, 26–29, 35 and 36 of `.scratch/twin/`, plus 23 at `partial` and 64
+instrumented and measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 25 of 77 build tickets closed, and one more part-built.** What is not built is listed below and, more usefully, is named
+**This is 26 of 77 build tickets closed, one part-built, and one measuring against a clock that runs
+to 2026-11-06.** What is not built is listed below and, more usefully, is named
 inside every artefact the tool emits.
 
 ## Run it
@@ -24,6 +26,9 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin intervene --repo R --component C # do(x): cut the incoming edges, propagate downstream
 ./bin/twin observe --repo R --component C  # observe(x): belief updates about the causes too
 ./bin/twin rewind --repo R --at T          # the model state at a declared time (abduction)
+./bin/twin run --repo R --scenario S --regime as-consumed   # the gate is required, with no default
+./bin/twin regimes --repo R --scenario S   # the same scenario under all three, with the gaps
+./bin/twin drift                           # the Flux drift measurement: coverage, events, no verdict
 ./bin/twin options --repo R --perspective P # the choice set after the pre-filter, survivors costed
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
 ./bin/twin constraints --out F             # the published constraint set, floor and exclusions
@@ -222,6 +227,67 @@ organisation rather than an answer about the model. So does a time that is not I
 a date it cannot parse as `now` and hands back the newest commit, so an unvalidated timestamp
 would answer a question about the past with today's model and say nothing about having done so.
 
+## The three information regimes, and why the gaps are the point
+
+**`twin run` takes a regime and has no default** (build ticket 36). The regime a default would
+pick is the one whose forecasts score, so an omitted flag would be a silent claim to have run
+under the honest gate. A scenario cannot declare one either: an authored regime is a default
+wearing a different hat, and the schema has no slot for it.
+
+* **`as-consumed`** — only what the twin had ingested by T. Two filters, because there are two
+  ways a post-T fact can arrive: the repository is reopened **as it stood at T**, and any fact
+  that survives that but is *dated* after T is withheld.
+* **`as-knowable`** — everything dated on or before T, whenever it was ingested.
+* **`with-hindsight`** — unrestricted.
+
+The differences are the diagnostic, and `twin regimes` computes them rather than leaving three
+artefacts side by side for a reader to subtract. `as-consumed` versus `as-knowable` localises to
+**sensing** — it was there to be found and we did not have it. `as-knowable` versus
+`with-hindsight` localises to **interpretation** — nothing dated by T said it, so reading the
+outcome as foreseeable from those facts is hindsight. Wrong under all three localises to the
+**model**, and that third figure is reported as **not computed**, with the reason: a forecast here
+reads a world model's declared belief and nothing infers it from a signal, so the three
+probabilities are identical by construction and a residual of zero would read as "the model is
+fine" rather than as "nothing consumes a signal".
+
+**The gate is absence, not screening.** The model is *loaded through* the regime, so a withheld
+fact is missing from the overlay the execution reads — there is no post-T fact available to
+reference, and referencing one is not a mistake the code could make. A claim goes with the signal
+it binds, because a reading of a document the twin did not have is not a claim the twin held.
+
+**A withheld fact that the execution could still have reached is a refusal.** A post-T fact bound
+by a claim to a component the scenario forecasts stops the run rather than being redacted from it,
+because running a scenario whose subject matter has been redacted answers a different question —
+under the one regime whose forecasts score. The answer key is the deliberate exception: it is
+dated after T by definition and nothing forecasts it, so it is withheld quietly. Refusing on its
+presence would make a backtest impossible in every repository that holds the key it will be scored
+against.
+
+Two limits are named in `twin/regimes.py` rather than implied. **The rewind leg needs a repository
+that existed at T** — the Netflix subject is dated 2011 and its model repository was built this
+year, so `as-consumed` there rests on fact dates alone and the artefact records
+`ingestion_history.available: false` with the consequence. Only the regime fixture's commit
+history straddles T, which is why the sensing gap needs it. And **a regrade is not date-gated**:
+`schema.DATED_FACTS` covers facts about the world, and a regrade is the twin's own record of how
+strong a claim is.
+
+## Flux drift: instrumented, and waiting
+
+Build ticket 64 started a clock rather than closing. The spec claims policy-as-code needs
+*continuous* proof-of-force; drift between deploys is the candidate justification and it has to be
+demonstrated. `estate/driftwood/drift/` is the instrument — a pre-registered window, a probe that
+samples the real KinD cluster, and open preconditions with named owners. `twin/drift.py` reduces
+the log; `twin drift` prints it. **The verdict is build ticket 65 and this reaches none**: writing
+the conclusion into the instrument is how a measurement becomes a demonstration.
+
+Two properties carry the honesty. The window's first commit must predate every sample, checked by
+the harness guard `drift_window_was_declared_before_it_was_measured` reading git history — so
+"stated up front" is not a claim a reader takes on trust, and a window retuned after the data
+looked inconvenient fails the suite. And a probe that cannot reach the cluster **still writes a
+sample**, so an outage is a coverage hole rather than a quiet stretch of no drift. `twin drift`
+reports coverage before events, because "no drift in 91 days" and "no drift in the hours we were
+looking" are different claims and only one is falsifiable.
+
 `twin/calibration.md` is the authoring discipline a triple is *supposed* to come from: a 90%
 credible interval with a most-likely value, five steps required by name. Every artefact that
 samples pins it by digest, so a step that disappears from the document fails on read rather than
@@ -369,14 +435,14 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 20 pass, 0 fail, 3 pending, 1 skipped and not faked. `pytest -q` — 439 tests
+`./bin/twin verify` — 23 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 523 tests
 across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
 |---|---|
-| `store_rebuildable_from_git` | `as_consumed_admits_no_post_T_fact` (36) |
-| `identical_pins_identical_bytes` | `price_levels_never_probabilities` (59) |
-| `every_artefact_marked` | `standing_library_covers_committed_classes` (69) |
+| `store_rebuildable_from_git` | `price_levels_never_probabilities` (59) |
+| `identical_pins_identical_bytes` | `standing_library_covers_committed_classes` (69) |
+| `every_artefact_marked` | |
 | `every_capability_depth_graded` | |
 | `world_never_references_overlay` | |
 | `no_collapse_mechanism` | |
@@ -387,6 +453,7 @@ across seams 1 and 2.
 | `grade_5_only_path_never_prices` | |
 | `ruin_class_absent_not_priced` | |
 | `prefilter_precedes_pricing` | |
+| `as_consumed_admits_no_post_T_fact` | |
 
 **The constitution names sixteen invariants and the manifest may not grow a seventeenth without the
 constitution changing first.** So build tickets 13, 14 and 11 each *extended* an existing check rather
@@ -419,10 +486,20 @@ price-shaped names. A free function that prices an unfiltered option reopens the
 it is called, and a keyword match on `price`, `cost` and `value` would wave through one named
 `tally`. So the check names the three functions the module may export and fails on a fourth.
 
-Two guards were added to the **harness** instead, because each guards a yardstick rather than the
-system: `worksheet_matches_the_pocket_org` (the hand-computed numbers still hold) and
+`as_consumed_admits_no_post_T_fact` went live at build ticket 36, and it asserts the
+**construction** rather than the outcome: the regime is a parameter with no default and the
+scenario schema has no slot for one, so the gate cannot be bypassed by omission; withheld facts
+are absent from the overlay the execution reads rather than screened out of it; and a fact dated
+after T but committed before it — the one shape the rewind cannot remove — refuses the run when a
+claim binds it to a component the scenario forecasts. The positive leg is asserted as hard as the
+negative one: the same fixture still forecasts under `as-consumed`, because a gate that refused
+everything would pass every refusal in the check while making the regime useless.
+
+Three guards were added to the **harness** instead, because each guards a yardstick rather than the
+system: `worksheet_matches_the_pocket_org` (the hand-computed numbers still hold),
 `graded_edge_fixture_holds_its_contract` (the generated causal-edge fixture still carries what the £
-and skills tracks depend on).
+and skills tracks depend on) and `drift_window_was_declared_before_it_was_measured` (build ticket
+64's pre-registration predates its own data, read out of git history rather than promised).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared
@@ -463,9 +540,10 @@ Named here so the skeleton cannot quietly become the definition of done.
   past that the figure is sampled only, and the artefact says where it stopped.
 - **The counterfactual is two thirds built.** Rewind (abduction) and `do()` (action) exist and
   compose; fast-forward (prediction) does not, so `rewind → play → fast-forward` cannot yet be run
-  end to end. (Build ticket 37.) The backtest needs one more thing on top: decision ticket 13
-  makes the **information regime** part of rewind, and the gate that refuses a post-T fact is
-  build ticket 36. `twin rewind` records no regime, so what exists is the time half only.
+  end to end. (Build ticket 37.) Decision ticket 13's other half — the **information regime** as
+  part of rewind — landed at build ticket 36, so `run` now reads the model through the gate. The
+  `rewound-model` artefact `twin rewind` emits still records no regime, because a rewind on its
+  own is a model state rather than an execution; the regime belongs to the run that reads it.
 - **An observation reports no diagnostic magnitude.** `observe(x)` names the ancestors whose belief
   it updates and refuses to put a number on the update, because inverting an elasticity needs a
   prior over the causes that nothing authors. That is a refusal rather than a gap, and it is the
@@ -512,12 +590,19 @@ Named here so the skeleton cannot quietly become the definition of done.
   currently be checked for disparate impact. Saying so is not fixing it. (61, 62.)
 - **The pocket org's severity has no empirical anchor.** The £1,000,000 in the worksheet is a
   fixture number, stated as such. Build ticket 25 replaces it with an anchored one.
-- **The information regime is a tag, not a gate.** Every forecast declares its regime and only
-  `as-consumed` scores — but nothing refuses a fact dated after T, so `as-consumed` is currently a
-  claim the model repository makes rather than a property the engine enforces. The artefact says
-  so, in `regime.gated`. (36.)
-- **No rewind, no intervention, no backtest.** The two primitives the engine composes from are
-  absent; `run` is time-forward with an authored belief and no inference. (35, 37.)
+- **The regime gate is only as strong as the repository's own history.** The date filter always
+  runs; the ingestion-history filter needs a commit at or before T, and a retrospective subject
+  dated 2011 in a repository built this year has none. `as-consumed` there rests on fact dates
+  alone, which is genuinely weaker, and the artefact records `ingestion_history.available: false`
+  with the consequence rather than looking stronger than it was. A regrade is not date-gated at
+  all: it is the twin's own record of a claim's strength, not a fact about the world. (36.)
+- **The three-way gap localises two failures, not three.** Sensing and interpretation are computed
+  from the fact sets each regime admits. The **model** residual needs a forecast that moves when
+  the fact base moves, and nothing here infers a probability from a signal — so it is reported as
+  *not computed*, never as zero. That is the honest state until the sense→move loop closes.
+- **No fast-forward, and therefore no backtest.** Rewind (abduction), `do()` (action) and the
+  information gate on rewind all exist; projection with no intervention does not, so
+  `rewind → play → fast-forward` cannot be run end to end. (37.)
 - **Forecast probabilities are read from a world model's declared belief.** Nothing infers them.
   This is the honest stub: the plumbing is real, the judgement is authored.
 - **Calibration is one score card, not a record.** Brier and log loss are proper and regime-tagged,
@@ -572,6 +657,10 @@ twin/
   propagate.py    Monte-Carlo along causal edges, the depth schedule that stops it, and the
                   shared-ancestry discount that stops a common cause counting twice
   primitives.py   the two composable primitives — do()/observe(), and rewind as abduction
+  regimes.py      the three information regimes, the gate the model is loaded through, and the
+                  two gaps that localise a failure to sensing or to interpretation
+  drift.py        the Flux drift reduction — events, and the coverage that says what they are
+                  worth. No verdict: that is build ticket 65
   attenuation.yaml          the versioned depth factors, and where a number stops existing
   pert.py         calibrated triples, their analytic moments, and seeded sampling
   calibration.md  the authoring discipline behind a triple — pinned by every artefact that samples

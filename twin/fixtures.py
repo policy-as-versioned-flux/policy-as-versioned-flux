@@ -994,3 +994,202 @@ def plant_world_violation(root: str | Path) -> str:
     git(path, "add", "-A")
     git(path, "commit", "-q", "-m", "plant a directional violation")
     return git(path, "rev-parse", "HEAD").strip()
+
+
+# -- the regime org (build ticket 36) --------------------------------------------------------
+#
+# The only fixture whose **commit history straddles the execution time**. Every other repository
+# here carries one fixed commit date, which is what makes their bytes reproducible — and it is
+# also why none of them can demonstrate the sensing gap, because the sensing gap is precisely the
+# difference between when a fact was dated and when the twin ingested it.
+#
+# One fact in each band, so all three regimes differ and neither gap is vacuous:
+#
+# | fact                | dated      | ingested   | as-consumed | as-knowable | with-hindsight |
+# |---------------------|------------|------------|-------------|-------------|----------------|
+# | `known-early`       | 2011-07-01 | 2011-07-02 | yes         | yes         | yes            |
+# | `known-late`        | 2011-07-05 | 2011-08-20 | no          | yes         | yes            |
+# | `after-the-fact`    | 2011-09-01 | 2011-09-02 | no          | no          | yes            |
+# | the outcome         | 2012-12-31 | 2013-01-05 | no          | no          | yes            |
+REGIME_T = "2011-07-12"
+REGIME_ORG = "backtest"
+
+_REGIME_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/components/mail-order-catalogue.yaml": """\
+id: mail-order-catalogue
+name: Mail-order catalogue
+kind: activity
+evolution: product
+visibility: 0.8
+""",
+    "world/propositions/catalogue-revenue-falls.yaml": """\
+id: catalogue-revenue-falls
+text: Catalogue revenue falls faster than the online channel replaces it.
+resolves_on: '2012-12-31'
+""",
+    "world/world_models/steady-decline.yaml": """\
+id: steady-decline
+name: Steady decline
+credence: 0.6
+beliefs:
+  catalogue-revenue-falls: 0.55
+""",
+}
+
+_REGIME_BASE: dict[str, str] = {
+    "orgs/backtest/scenarios/did-it-land-2011.yaml": f"""\
+id: did-it-land-2011
+question: Was the decline visible from what the twin held at the time?
+proposition: catalogue-revenue-falls
+at: '{REGIME_T}'
+horizon: '2012-12-31'
+components:
+  - mail-order-catalogue
+world_models:
+  - steady-decline
+""",
+}
+
+_REGIME_KNOWN_EARLY: dict[str, str] = {
+    "orgs/backtest/signals/known-early.yaml": """\
+id: known-early
+date: '2011-07-01'
+steep: economic
+source: Trade press
+statement: Catalogue order volumes are reported down year on year.
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/known-early
+""",
+}
+
+_REGIME_KNOWN_LATE: dict[str, str] = {
+    "orgs/backtest/signals/known-late.yaml": """\
+id: known-late
+date: '2011-07-05'
+steep: economic
+source: Regulatory filing
+statement: A supplier discloses a collapse in catalogue fulfilment volume.
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/known-late
+""",
+}
+
+_REGIME_AFTER: dict[str, str] = {
+    "orgs/backtest/signals/after-the-fact.yaml": """\
+id: after-the-fact
+date: '2011-09-01'
+steep: economic
+source: Quarterly results
+statement: The quarter confirms the decline.
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/after-the-fact
+""",
+}
+
+_REGIME_OUTCOME: dict[str, str] = {
+    "orgs/backtest/outcomes/did-it-land-resolved.yaml": """\
+id: did-it-land-resolved
+proposition: catalogue-revenue-falls
+observed: true
+resolved_on: '2012-12-31'
+source: Fixture answer key.
+contamination: low
+source_dated: true
+""",
+}
+
+# The planted post-T fact (build ticket 36, AC 3). Dated **after** the execution time and
+# committed **before** it, which is the one shape the rewind cannot catch: at T this file is in
+# the repository, so only the date filter removes it. It is bound by a claim to the component the
+# scenario forecasts, so removing it silently would answer a different question from the one
+# asked — and the as-consumed run refuses instead.
+_REGIME_PLANTED: dict[str, str] = {
+    "orgs/backtest/signals/planted-post-t.yaml": """\
+id: planted-post-t
+date: '2011-09-15'
+steep: economic
+source: A source that did not exist yet
+statement: The decline is confirmed, in a document dated two months after the execution time.
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/planted
+""",
+    "orgs/backtest/claims/bind-planted-to-catalogue.yaml": """\
+id: bind-planted-to-catalogue
+kind: binding
+signal: planted-post-t
+component: mail-order-catalogue
+evidence_grade: 5
+claimed_by: fixture-author (human)
+evidence: Reading of a document from the future.
+""",
+}
+
+
+def build_regime_org(dest: str | Path, planted: bool = False) -> Path:
+    """A model repository whose ingestion history straddles the execution time.
+
+    Commits are dated in order, so `git rev-list --before` walks a monotonic history — a fixture
+    that back-dated a commit behind its own parent would make the rewind's answer depend on how
+    far git chooses to keep walking.
+
+    With `planted`, a fact dated after T lands in a commit dated **before** T. That is the shape
+    the rewind cannot remove, so it is the one that proves the date filter is doing work.
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _REGIME_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2011-06-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    # The overlay exists before the scenario does, so a rewind can land between them. That is the
+    # case where "the model existed and this question had not been asked yet" is an answer rather
+    # than an empty repository.
+    _write(
+        root,
+        {"orgs/backtest/meta.yaml": (
+            f"id: {REGIME_ORG}\nunit: overlay\norg: {REGIME_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay, before anybody asked a question",
+        dated="2011-06-05T00:00:00+00:00")
+
+    _write(root, _REGIME_BASE)
+    _write(root, _REGIME_KNOWN_EARLY)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the scenario, and what we had early",
+        dated="2011-07-02T00:00:00+00:00")
+
+    if planted:
+        _write(root, _REGIME_PLANTED)
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", "a fact dated after the execution time, committed before it",
+            dated="2011-07-10T00:00:00+00:00")
+
+    _write(root, _REGIME_KNOWN_LATE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "a fact we could have had by then, ingested late",
+        dated="2011-08-20T00:00:00+00:00")
+
+    _write(root, _REGIME_AFTER)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "a fact dated after the execution time",
+        dated="2011-09-02T00:00:00+00:00")
+
+    _write(root, _REGIME_OUTCOME)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the answer key", dated="2013-01-05T00:00:00+00:00")
+    return root

@@ -121,7 +121,7 @@ def test_the_world_layer_cannot_reference_an_overlay_any_of_these_ways(
 def test_the_direction_rule_is_enforced_on_load_not_only_in_the_suite(scratch_repo: Path, tmp_path: Path) -> None:
     """A rule that holds for the fixture and not for your repository is a property of the fixture."""
     _rewrite(scratch_repo, "world/components/leak.yaml", LEAK_IN_PROSE, "plant a leak")
-    assert main(["run", "--repo", str(scratch_repo), "--org", "netflix", "--scenario",
+    assert main(["run", "--repo", str(scratch_repo), "--org", "netflix", "--regime", "as-consumed", "--scenario",
                  "dvd-decline-2011", "--out", str(tmp_path / "nope.json")]) == 2
     assert not (tmp_path / "nope.json").exists()
 
@@ -260,7 +260,8 @@ def test_a_tenant_named_in_world_prose_is_caught_whatever_the_case(scratch_repo:
 def test_a_bundle_from_another_tenant_cannot_be_scored(model_repo_dir: Path, tmp_path: Path, caps) -> None:
     """Propositions live in the shared world layer, so a proposition match is not a tenancy check."""
     repo = ModelRepo.open(model_repo_dir)
-    intel = verbs.run(repo, caps, "intel", "euv-slip-2026", verbs.command_for("run", org="intel", scenario="euv-slip-2026"))
+    intel = verbs.run(repo, caps, "intel", "euv-slip-2026", "as-consumed",
+                      verbs.command_for("run", org="intel", scenario="euv-slip-2026", regime="as-consumed"))
     path = intel.write(tmp_path / "intel-bundle.json")
 
     with pytest.raises(VerbError, match="never crosses a tenant boundary"):
@@ -272,7 +273,8 @@ def test_an_untagged_forecast_does_not_score(model_repo_dir: Path, tmp_path: Pat
     from twin.canon import canonical_json
 
     repo = ModelRepo.open(model_repo_dir)
-    bundle = verbs.run(repo, caps, "netflix", "dvd-decline-2011", verbs.command_for("run", org="netflix", scenario="dvd-decline-2011"))
+    bundle = verbs.run(repo, caps, "netflix", "dvd-decline-2011", "as-consumed",
+                       verbs.command_for("run", org="netflix", scenario="dvd-decline-2011", regime="as-consumed"))
     doc = json.loads(bundle.to_bytes())
     for forecast in doc["body"]["forecasts"]:
         del forecast["regime"]
@@ -291,7 +293,8 @@ def test_an_execution_that_declares_itself_ineligible_does_not_score(
     from twin.canon import canonical_json
 
     repo = ModelRepo.open(model_repo_dir)
-    bundle = verbs.run(repo, caps, "netflix", "dvd-decline-2011", verbs.command_for("run", org="netflix", scenario="dvd-decline-2011"))
+    bundle = verbs.run(repo, caps, "netflix", "dvd-decline-2011", "as-consumed",
+                       verbs.command_for("run", org="netflix", scenario="dvd-decline-2011", regime="as-consumed"))
     doc = json.loads(bundle.to_bytes())
     doc["body"]["regime"] = {**doc["body"]["regime"], "declared": "with-hindsight", "scoring_eligible": False}
     path = tmp_path / "ineligible.json"
@@ -309,7 +312,8 @@ def test_a_forecast_with_no_resolvable_outcome_is_unscoreable_and_never_a_zero(
     from twin.canon import canonical_json, walk_values
 
     repo = ModelRepo.open(model_repo_dir)
-    bundle = verbs.run(repo, caps, "netflix", "dvd-decline-2011", verbs.command_for("run", org="netflix", scenario="dvd-decline-2011"))
+    bundle = verbs.run(repo, caps, "netflix", "dvd-decline-2011", "as-consumed",
+                       verbs.command_for("run", org="netflix", scenario="dvd-decline-2011", regime="as-consumed"))
     doc = json.loads(bundle.to_bytes())
     for forecast in doc["body"]["forecasts"]:
         forecast["proposition"] = "euv-tool-deliveries-slip-past-2026"

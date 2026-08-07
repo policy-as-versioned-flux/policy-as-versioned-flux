@@ -33,9 +33,22 @@ say "1. sense — a dated signal binds to a component through a committed grade-
   --out "$OUT/bound-signal.json" || fail "sense failed"
 
 say "2. run — one scenario, three rival world models, three forecasts. Nothing collapses them."
+say "   the regime is required and has no default; only as-consumed scores."
 "$TWIN" run --repo "$MODEL" --org netflix \
-  --scenario dvd-decline-2011 \
+  --scenario dvd-decline-2011 --regime as-consumed \
   --out "$OUT/forecast-bundle.json" || fail "run failed"
+
+say "2b. the same scenario under all three regimes — the two gaps, computed not inferred"
+"$TWIN" regimes --repo "$MODEL" --org netflix \
+  --scenario dvd-decline-2011 \
+  --out "$OUT/regime-gap.json" || fail "regimes failed"
+
+say "2c. an execution with no declared regime is refused, not defaulted"
+if "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
+     --out "$OUT/should-not-exist.json" >/dev/null 2>&1; then
+  fail "an execution ran with no regime"
+fi
+echo "  ok   refused"
 
 say "3. score — a recorded outcome scores the forecasts, naming them by pin and never by path"
 "$TWIN" score --repo "$MODEL" --org netflix \
@@ -205,7 +218,7 @@ rm -rf "$WORK/index"
 "$TWIN" index --repo "$MODEL" --out "$WORK/index" || fail "index rebuild failed"
 
 say "17. determinism — the same command against the same ref, byte for byte"
-"$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
+"$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 --regime as-consumed \
   --out "$OUT/forecast-bundle-again.json" >/dev/null || fail "second run failed"
 cmp -s "$OUT/forecast-bundle.json" "$OUT/forecast-bundle-again.json" \
   || fail "the same pins produced different bytes"
@@ -213,7 +226,7 @@ echo "  ok   identical bytes"
 
 say "18. a dirty tree is refused — the pin has to describe what you are reading"
 echo "# scribble" >> "$MODEL/world/meta.yaml"
-if "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
+if "$TWIN" run --repo "$MODEL" --org netflix --scenario dvd-decline-2011 --regime as-consumed \
      --out "$OUT/should-not-exist.json" >/dev/null 2>&1; then
   fail "a dirty model repository ran anyway"
 fi
