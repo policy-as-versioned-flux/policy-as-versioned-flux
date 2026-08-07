@@ -166,17 +166,63 @@ The boundary is derived from the graph, so no author can mark an impact priceabl
   impact is refused — and it is refused **while carrying a grade-2 valuation**, which is what
   makes the use-gate and the admission gate visibly two different questions
 
-**Expected price** of a total `customer-portal` outage, at the mode of that propagation:
+**The price** (build ticket 30), and the correction this worksheet needed before it could be one.
 
-- authored severity, `S = 1000000` — a fixture number with **no empirical anchor**, which build
-  ticket 25 replaces with one that has
-- expected loss at the mode: `1000000 x 0.20 = 200000`
-- expected loss across the range: `1000000 x [0.12, 0.28] = [120000, 280000]`
+Lines 27-29 previously read `1000000 x [0.12, 0.20, 0.28]` — an authored severity scaled by the
+propagation from `shared-database`. **Both halves of that were wrong, and they were wrong because
+they were authored at build ticket 15 and three gates landed after them.**
+
+1. *The path may not price.* Every route out of `shared-database` crosses `database-slows-orders`
+   at grade 3, and the published threshold is 2. This same worksheet says so at line 34:
+   `blast.shared-database.admitted_to_pricing = 0`. The old lines asked for a number the rest of
+   the table already said could not exist.
+2. *The severity had no home.* `1000000` lived in this prose and nowhere in the model. Giving it
+   one would put **two** authored magnitudes on `customer-portal` under one eye — a severity and
+   the operator's declared valuation of `400000` — with nothing reconciling them and an author
+   free to move the price through whichever is watched less.
+
+So the price is **the perspective's own declared valuation scaled by the propagated influence**,
+and there is no severity anywhere. One authored magnitude per component per eye, already
+evidence-graded, and the £ stays perspectival right down into the price.
+
+The priced shock is at `order-service`, because `orders-slow-the-portal` is the only causal edge in
+this organisation graded well enough to price. Depth 1, so the attenuation factor is `1.0` and the
+composed and attenuated figures agree — which is why these lines are unambiguous.
+
+- the operator: `400000 x 0.4 = 160000`, flat, because that edge is degenerate on purpose
+- the staff council: `50000 x 0.4 = 20000`
+- the spread between the two eyes: `160000 - 20000 = 140000`
+- `payment-gateway` is reached from `order-service` along `orders-slow-payments` at grade 3, so it
+  is **refused** and carries no figure
+- the same shock at `shared-database` prices **nothing** under either eye, which is the gate
+  working rather than the tool failing
+
+**The flat price is a finding, not a simplification.** The pocket org's only legal price is a point
+because its only admissible edge has no width, and the edge that carries a real range may not
+price. That is the honest shape of a model whose best-evidenced claim is also its least uncertain.
+
+**Response pricing and mitigation credit.** Four responses are authored now; two survive the
+operator's pre-filter and are costed in the same unit as the impact:
+
+- `retrain-the-on-call-rota` — not a technical control. Mean cost
+  `(2000 + 4 x 5000 + 14000) / 6 = 36000 / 6 = 6000`. It claims a reduction of `[0.1, 0.25, 0.4]`
+  at grade 2, so the claim may price: credit `160000 x [0.1, 0.25, 0.4] = [16000, 40000, 64000]`,
+  whose PERT mean is `(16000 + 4 x 40000 + 64000) / 6 = 240000 / 6 = 40000`
+- `add-a-read-replica` — a technical control. Mean cost `30000`, five times the rota. It claims a
+  **larger** reduction of `[0.4, 0.5, 0.6]` and claims it at grade 3, so it earns **no credit at
+  all**. Not a discounted one: an unevidenced counterfactual is free to assert, and "the incident
+  did not happen because of our control" is a causal claim like any other
+
+That comparison is the whole point of one unit. A rota change and a database change are priced on
+the same scale, the cheaper one is the non-technical one, and the more confident claim is the one
+the evidence gate refuses.
+
+Under the **staff council** a third option survives, because that perspective declares
+loss-of-livelihood rather than insolvency: `bet-the-org-on-one-supplier` is costed and claims no
+mitigation at all, so it earns nothing. Silence is not an average reduction.
 
 The constraint pre-filter (build ticket 28) runs **before** any of this, so none of these figures
-is ever comparable against a red line. It has landed, and its lines are the three option counts
-(48-50): the ordering itself is not a number, so what the table can check is that the counts add
-up and that nothing removed carries a figure.
+is ever comparable against a red line.
 
 **The use-gate**, by evidence grade. The published threshold is 2, so only an edge at grade 1 or 2
 may carry a price:
@@ -246,9 +292,9 @@ named is the one that must make them computable.
 | 24 | `propagation.customer-portal.min` | `0.12` | 0.3 x 0.4 | build ticket 20 |
 | 25 | `propagation.customer-portal.mode` | `0.2` | 0.5 x 0.4 | build ticket 20 |
 | 26 | `propagation.customer-portal.max` | `0.28` | 0.7 x 0.4 | build ticket 20 |
-| 27 | `price.customer-portal.mode` | `200000` | 1000000 x 0.20 | build ticket 30 |
-| 28 | `price.customer-portal.min` | `120000` | 1000000 x 0.12 | build ticket 30 |
-| 29 | `price.customer-portal.max` | `280000` | 1000000 x 0.28 | build ticket 30 |
+| 27 | `price.order-service.the-operator.customer-portal.mode` | `160000` | 400000 x 0.4, the operator's own declared valuation | build ticket 30 |
+| 28 | `price.order-service.the-staff-council.customer-portal.mode` | `20000` | 50000 x 0.4, the same shock under the other eye | build ticket 30 |
+| 29 | `price.order-service.spread.customer-portal` | `140000` | 160000 - 20000; no single organisational price exists | build ticket 30 |
 | 30 | `evidence_grade.database-slows-orders` | `3` | authored, literature or domain theory | build ticket 18 |
 | 31 | `evidence_grade.orders-slow-the-portal` | `2` | authored, repeated co-movement | build ticket 18 |
 | 32 | `rollups.causal_edges_admissible_to_pricing` | `1` | only orders->portal is at grade 2 or better | build ticket 19 |
@@ -267,9 +313,9 @@ named is the one that must make them computable.
 | 45 | `propagation.attenuated.customer-portal.min` | `0.096` | 0.12 x 0.8 | build ticket 20 |
 | 46 | `propagation.attenuated.customer-portal.mode` | `0.16` | 0.2 x 0.8 | build ticket 20 |
 | 47 | `propagation.attenuated.customer-portal.max` | `0.224` | 0.28 x 0.8 | build ticket 20 |
-| 48 | `options.the-operator.considered` | `3` | three authored responses | build ticket 28 |
+| 48 | `options.the-operator.considered` | `4` | four authored responses; build ticket 30 added the on-call rota | build ticket 28 |
 | 49 | `options.the-operator.removed` | `2` | one record per crossed line: covert sensing, the ruin bet | build ticket 28 |
-| 50 | `options.the-operator.priced` | `1` | only the read replica crosses nothing | build ticket 28 |
+| 50 | `options.the-operator.priced` | `2` | the read replica and the rota both cross nothing | build ticket 28 |
 | 51 | `option_price.add-a-read-replica.mean` | `30000` | (10000 + 4 x 25000 + 70000) / 6 | build ticket 28 |
 | 52 | `admission.the-operator.customer-portal` | `1` | itself the declared cash flow | build ticket 29 |
 | 53 | `admission.the-operator.order-service` | `1` | reaches it at grade 2 | build ticket 29 |
@@ -287,3 +333,12 @@ named is the one that must make them computable.
 | 65 | `observe.order-service.severed` | `0` | an observation severs nothing; nothing was done | build ticket 22 |
 | 66 | `intervene.order-service.reached` | `2` | customer-portal and payment-gateway | build ticket 22 |
 | 67 | `observe.order-service.reached` | `2` | the same two: the downstream halves are identical | build ticket 22 |
+| 68 | `price.order-service.the-operator.customer-portal.min` | `160000` | 400000 x 0.4; flat, because that edge is degenerate | build ticket 30 |
+| 69 | `price.order-service.the-operator.customer-portal.max` | `160000` | 400000 x 0.4; the only priceable edge carries no width | build ticket 30 |
+| 70 | `price.order-service.the-operator.payment-gateway.priced` | `0` | reached at grade 3, so refused and carrying no figure | build ticket 30 |
+| 71 | `price.shared-database.the-operator.customer-portal.priced` | `0` | every route out crosses the grade-3 edge | build ticket 30 |
+| 72 | `option_price.retrain-the-on-call-rota.mean` | `6000` | (2000 + 4 x 5000 + 14000) / 6 | build ticket 30 |
+| 73 | `credit.order-service.the-operator.retrain-the-on-call-rota.mean` | `40000` | (16000 + 4 x 40000 + 64000) / 6, from 160000 x [0.1, 0.25, 0.4] | build ticket 30 |
+| 74 | `credit.order-service.the-operator.retrain-the-on-call-rota.mode` | `40000` | 160000 x 0.25 | build ticket 30 |
+| 75 | `credit.order-service.the-operator.add-a-read-replica.credited` | `0` | a grade-3 mitigation claim earns nothing, not a discount | build ticket 30 |
+| 76 | `credit.order-service.the-staff-council.bet-the-org-on-one-supplier.credited` | `0` | it claims no mitigation; silence is not an average reduction | build ticket 30 |

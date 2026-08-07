@@ -33,7 +33,7 @@ from .grades import Capabilities
 from .repo import ModelRepo, RepoError
 
 VERBS = ("sense", "run", "score", "graph", "propagate", "options", "intervene", "observe", "rewind",
-         "regimes")
+         "regimes", "price")
 
 
 class ReproduceError(RuntimeError):
@@ -115,6 +115,8 @@ def replay(worktree: str | Path, caps: Capabilities, doc: dict[str, Any]) -> tup
             repo, caps, org, _need(flags, "scenario", command), _need(flags, "regime", command),
             command, at=flags.get("at"),
         ), []
+    if verb == "price":
+        return verbs.price(repo, caps, org, _need(flags, "origin", command), None, command), []
     if verb == "regimes":
         return verbs.regime_gap(
             repo, caps, org, _need(flags, "scenario", command), command, at=flags.get("at")

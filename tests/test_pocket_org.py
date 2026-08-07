@@ -38,8 +38,15 @@ def test_every_line_is_either_matched_or_pending_on_an_open_ticket(pocket: Path)
 
     assert len(results) >= 20, "a worksheet this thin would not catch anything"
     assert all(r.ok or r.pending for r in results)
-    assert any(r.pending for r in results), "the contract later tickets inherit is written down"
     assert worksheet.overdue(results) == [], "a pending line whose ticket has closed is a silent gap"
+
+    # The contract every later ticket inherits is asserted on the **worksheet's own text**, not on
+    # a pending line happening to exist. It did until build ticket 30, which was the last ticket
+    # owing one — and an assertion that a pending line exists would then have forced somebody to
+    # keep one open to stay green, which is the opposite of what the contract asks for.
+    assert "## The contract every later ticket inherits" in worksheet.WORKSHEET_PATH.read_text(
+        encoding="utf-8"
+    ), "the contract later tickets inherit is written down"
 
 
 def test_a_changed_elasticity_fails_the_worksheet(tmp_path: Path) -> None:

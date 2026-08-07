@@ -29,6 +29,7 @@ from . import (
     constraints,
     evidence,
     options as options_mod,
+    pricing,
     primitives as primitives_mod,
     propagate as propagate_mod,
     regimes as regimes_mod,
@@ -47,6 +48,9 @@ CAPS_BLAST = ["causal-layer", "domain-model", "provenance"]
 CAPS_EXPOSURE = ["causal-layer", "currency-regimes", "domain-model", "provenance"]
 CAPS_PROPAGATE = ["causal-layer", "domain-model", "provenance"]
 CAPS_OPTIONS = ["currency-regimes", "domain-model", "provenance"]
+# The price is the causal layer multiplied by the currency, so both depths travel with it
+# (build ticket 30). Neither capability alone produced this figure.
+CAPS_PRICE = ["causal-layer", "currency-regimes", "domain-model", "provenance"]
 # `do()` and `observe()` are the causal layer's intervention semantics (build ticket 22).
 CAPS_QUERY = ["causal-layer", "domain-model", "provenance"]
 # Rewind is the scenario engine's time primitive (build ticket 35), and it is a fact about the
@@ -68,6 +72,7 @@ KIND_INTERVENTION = "intervention"
 KIND_OBSERVATION = "observation"
 KIND_REWOUND_MODEL = "rewound-model"
 KIND_REGIME_GAP = "regime-gap"
+KIND_PRICED_IMPACT = "priced-impact"
 
 # Only an as-consumed execution produces a scoring-eligible forecast: the honest number is never
 # contaminated by what we know now (spec story 40). Build ticket 36 turned the tag into a gate —
@@ -431,6 +436,92 @@ def options(
     )
 
 
+# -- price (build ticket 30) -----------------------------------------------------------------
+
+
+def price(
+    repo: ModelRepo,
+    caps: Capabilities,
+    org: str,
+    origin: str,
+    perspective_ids: list[str] | None,
+    command: list[str],
+) -> Artefact:
+    """One shock, priced under each declared perspective, with the responses beside it (ticket 30).
+
+    This is where the causal layer meets the £. Until now `twin propagate` composed elasticities
+    and emitted no money, and `twin exposure` reported declared valuations and propagated nothing.
+    A price here is the perspective's own declared valuation scaled by the propagated influence,
+    and there is no severity slot anywhere — one authored magnitude per component per eye, so
+    there is no second number an author could move the price through.
+
+    **Nothing here picks a perspective.** With none named, every perspective in the overlay is
+    priced and the spread between them is in the artefact — the same refusal `twin exposure`
+    makes, because defaulting to the employer's is exactly the unstated firm's-£ the design
+    rejects. Two eyes disagreeing about what a shock costs is the decision-relevant fact.
+    """
+    overlay = Overlay.load(repo, org)
+    graph = overlay.graph()
+    if not overlay.responses:
+        raise VerbError(
+            f"overlay {org!r} declares no candidate response, so there is nothing to price against "
+            "the impact"
+        )
+    chosen = sorted(perspective_ids) if perspective_ids else sorted(overlay.perspectives)
+    if not chosen:
+        raise VerbError(
+            f"overlay {org!r} declares no perspective. A price belongs to whoever pays to run the "
+            "twin, so a shock cannot be priced until somebody says who they are."
+        )
+
+    entries = []
+    for perspective_id in chosen:
+        perspective = overlay.perspectives.get(perspective_id)
+        if perspective is None:
+            known = ", ".join(sorted(overlay.perspectives)) or "none"
+            raise VerbError(f"no perspective {perspective_id!r} in overlay {org!r} (have: {known})")
+        entries.append(pricing.price(graph, perspective, origin, overlay.responses))
+
+    components = sorted({i["component"] for e in entries for i in e["impacts"]})
+    return Artefact(
+        kind=KIND_PRICED_IMPACT,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_PRICE),
+        body={
+            "origin": origin,
+            "perspectives": entries,
+            # Per component, per eye, and the width between them. A single organisational price
+            # is the collapse this system refuses: there is no such thing.
+            "attribution": [
+                {
+                    "component": component,
+                    "priced": {
+                        e["perspective"]: _price_at(e, component) for e in entries
+                    },
+                    "spread": pricing.spread([_price_at(e, component) for e in entries]),
+                }
+                for component in components
+            ],
+            "not_a_ranking": (
+                "prices, costs and credits in one unit, in the order they were authored. Nothing "
+                "marks one option best and nothing recommends one"
+            ),
+        },
+    )
+
+
+def _price_at(entry: dict[str, Any], component: str) -> float | None:
+    """The attenuated modal price of a component under one eye, or nothing if it was refused.
+
+    `None` rather than zero, for the reason the exposure attribution uses it: zero says "this
+    shock costs them nothing", which is a different claim and usually a false one.
+    """
+    found = next((i for i in entry["impacts"] if i["component"] == component), None)
+    return None if found is None else float(found["price"]["attenuated"]["mode"])
+
+
 # -- exposure ------------------------------------------------------------------------------
 
 
@@ -461,10 +552,12 @@ def exposure(
     An impact with no such path is a register entry whose reason is falsifiable — "no evidenced
     causal path yet", never "we decided it does not count".
 
-    What this is **not**: a modelled price. Nothing propagates into these figures yet (`twin
-    propagate` composes the causal layer, build ticket 20, and build ticket 30 is what joins it to
-    the £) and no severity is sampled (24-25). The admitted figures are the perspective's own
-    declared valuations and the artefact says so in `basis` rather than implying otherwise.
+    What this is **not**: a modelled price. Nothing propagates into these figures — they are the
+    perspective's own declared valuations of the components a scenario names, and the artefact says
+    so in `basis` rather than implying otherwise. `twin price` is the verb that multiplies one of
+    these valuations by a propagated influence (build ticket 30), and it is a different question:
+    this asks what a scenario's components are worth to each eye, and that asks what one shock
+    costs them. Neither is a substitute for the other.
     """
     overlay = Overlay.load(repo, org)
     graph = overlay.graph()
@@ -582,9 +675,10 @@ def exposure(
                 "severity_sampled": False,
                 "note": (
                     "each figure is a valuation the perspective declared for a component, not a "
-                    "modelled price: the causal layer composes in `twin propagate` (build ticket "
-                    "20) and is not joined to the £ until build ticket 30, and no severity "
-                    "distribution is sampled (24-25)"
+                    "modelled price. `twin price` multiplies one of these by a propagated "
+                    "influence (build ticket 30) and answers a different question: this says what "
+                    "a scenario's components are worth to each eye, and that says what one shock "
+                    "costs them. No severity distribution is sampled anywhere (24-25)"
                 ),
             },
             "gating": evidence.published(),

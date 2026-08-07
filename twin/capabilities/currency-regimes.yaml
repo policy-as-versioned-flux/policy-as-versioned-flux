@@ -25,6 +25,14 @@ criteria:
   - index: 4
     text: "Treatment of each named incommensurable, incl. where we refuse to price."
     checked: false
+    # Closer, and still not "each". Build ticket 30 gave the register five distinct refusal
+    # reasons — the path is graded too weakly, the perspective declares no valuation, the
+    # valuation is graded too weakly, no graded path reaches a cash flow, the path carries a
+    # direction and no magnitude — plus three more for a mitigation claim that earns nothing.
+    # Reputation and morale therefore have a real treatment: they price through a modelled path or
+    # they stay in the register with a falsifiable reason. Existential and tail risk are build
+    # ticket 24 and have none, and ethical harms wait on the affected-parties register at 61.
+    # Five of the six named incommensurables is not each of them.
   - index: 5
     text: "A stated objective function with its qualifications."
     checked: false

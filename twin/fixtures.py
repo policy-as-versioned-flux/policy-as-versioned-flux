@@ -844,9 +844,47 @@ cost:
   min: 10000
   mode: 25000
   max: 70000
+mitigates:
+  component: customer-portal
+  reduction:
+    min: 0.4
+    mode: 0.5
+    max: 0.6
+  evidence_grade: 3
+  basis: >-
+    A published mechanism relating read capacity to request latency, not observed in this
+    organisation. The claim is larger than the on-call rota's and it is evidenced more weakly, so
+    it earns no credit at all — an unevidenced counterfactual is free to assert.
 note: >-
   Crosses nothing, so it survives the pre-filter and is costed. Its mean is 30000 by hand:
   (10000 + 4 x 25000 + 70000) / 6.
+""",
+    # The cross-domain comparison build ticket 30 asks for. A rota change is not a technical
+    # control, it prices well below one, and it is the only one of the two whose mitigation claim
+    # is evidenced well enough to earn anything. Both halves are the point: the same unit makes
+    # them comparable, and the evidence grade decides which claim survives.
+    "orgs/pocket/responses/retrain-the-on-call-rota.yaml": """\
+id: retrain-the-on-call-rota
+name: Retrain and widen the on-call rota
+addresses: order-service
+cost:
+  min: 2000
+  mode: 5000
+  max: 14000
+mitigates:
+  component: customer-portal
+  reduction:
+    min: 0.1
+    mode: 0.25
+    max: 0.4
+  evidence_grade: 2
+  basis: >-
+    Time-to-recovery moved with rota depth across the four outages of 2024-25, measured on both
+    sides of each rota change. Repeated co-movement, so it may price.
+note: >-
+  Crosses nothing, so it survives the pre-filter and is costed. Its mean is 6000 by hand:
+  (2000 + 4 x 5000 + 14000) / 6. It costs a fifth of the read replica and it is not a technical
+  control, which is the comparison the single unit exists to make possible.
 """,
     "orgs/pocket/responses/watch-the-team-quietly.yaml": """\
 id: watch-the-team-quietly

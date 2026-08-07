@@ -183,6 +183,11 @@ say "10. the same scenario under two perspectives — the £ belongs to whoever 
 "$TWIN" exposure --repo "$MODEL" --org netflix --scenario dvd-decline-2011 \
   --out "$OUT/scenario-exposure.json" || fail "exposure failed"
 
+say "10b. the price — the causal layer multiplied by the currency, under every declared eye"
+say "     an HR lever and a technical control in one unit; an unevidenced claim earns nothing"
+"$TWIN" price --repo "$MODEL" --org netflix --origin content-delivery-network \
+  --out "$OUT/priced-impact.json" || fail "price failed"
+
 say "11. the constraint set, published upfront — paperclip risk disclosed rather than discovered"
 "$TWIN" constraints --out "$OUT/constraint-set.json" || fail "constraints failed"
 

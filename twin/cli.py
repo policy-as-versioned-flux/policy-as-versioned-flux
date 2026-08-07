@@ -236,6 +236,36 @@ def cmd_observe(args: argparse.Namespace) -> int:
     ))
 
 
+def cmd_price(args: argparse.Namespace) -> int:
+    """One shock, priced under every declared perspective, with the responses beside it."""
+    repo, caps, org = _open(args)
+    artefact = verbs.price(
+        repo, caps, org, args.origin, args.perspective,
+        verbs.command_for("price", org=org, origin=args.origin),
+    )
+    body = artefact.body
+    _say(f"{org}: a shock at {args.origin!r}, priced under {len(body['perspectives'])} perspective(s)")
+    for entry in body["perspectives"]:
+        print(f"  {entry['perspective']}")
+        for impact in entry["impacts"]:
+            price = impact["price"]["attenuated"]
+            print(f"    price    {impact['component']:<24} {price['min']:,.0f} / "
+                  f"{price['mode']:,.0f} / {price['max']:,.0f}  grade "
+                  f"{impact['worst_evidence_grade']}")
+        for held in entry["register"]:
+            print(f"    unpriced {held['component']:<24} {held['reason']}")
+        for option in entry["responses"]["priced"]:
+            credit = option["mitigation"].get("credit")
+            earned = f"credit {credit['mode']:,.0f}" if credit else option["mitigation"]["reason"]
+            print(f"    option   {option['option']:<24} cost {option['cost']['mean']:,.0f}, {earned}")
+    for row in body["attribution"]:
+        if row["spread"] is not None:
+            print(f"  spread   {row['component']:<26} {row['spread']:,.0f} between the widest and "
+                  "narrowest eye")
+    print(f"  {body['not_a_ranking']}")
+    return _emit(artefact, args.out)
+
+
 def cmd_drift(args: argparse.Namespace) -> int:
     """The Flux drift measurement so far (build ticket 64). A reduction, never a verdict.
 
@@ -917,6 +947,17 @@ def build_parser() -> argparse.ArgumentParser:
     gap.add_argument("--at", default=None, help="override the scenario's declared time")
     gap.add_argument("--out", required=True)
     gap.set_defaults(fn=cmd_regimes)
+
+    priced = with_org(with_repo(subs.add_parser(
+        "price", help="a shock priced under every declared perspective, with the responses beside it"
+    )))
+    priced.add_argument("--origin", required=True, help="the component the shock starts at")
+    priced.add_argument(
+        "--perspective", action="append", default=[],
+        help="repeatable; with none given, every perspective in the overlay is priced",
+    )
+    priced.add_argument("--out", required=True)
+    priced.set_defaults(fn=cmd_price)
 
     drifted = subs.add_parser(
         "drift", help="the Flux drift measurement so far — coverage, events, and no verdict"

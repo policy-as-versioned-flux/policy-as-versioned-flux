@@ -8,8 +8,8 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 13 \u2014 build ticket 36 activates as_consumed_admits_no_post_T_fact and turns the regime tag into a load-through gate; emit_all and the subprocess determinism probe now name the regime, because there is no default"
-checks_module_sha256: 2a4b340ed5ec713b2fbbb44f473b292b2205d6f4d21c50c387a08dbb385dbd45
+checks_module_authorised_by: "decision ticket 09 \u2014 build ticket 30 joins the causal layer to the currency, so grade_5_only_path_never_prices gains the priced-impact leg where the largest figures now appear, and prefilter_precedes_pricing extends its allow-list to twin/pricing.py because a lock on one module while a sibling prices freely is not a lock"
+checks_module_sha256: 19afba61d19ef3350bf6692277334d0e2df83908b0769bc2cfe7448ee508649c
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
@@ -101,8 +101,8 @@ invariants:
   - name: grade_5_only_path_never_prices
     activating_ticket: '19'
     state: live
-    body_sha256: a261861be2c9fc02a23ee1fe54316f0e4c8f7f7f0d43945774d6179a4fcc86fd
-    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 18, 19, 26 and 27 under decision tickets 08 and 09: every verb's capabilities are depth-graded, and the grade-5 use-gate is asserted on the emitted blast radius and on the scenario exposure that emits a figure"
+    body_sha256: 795c0b7d5fe7f644eac9cf3e6efb36fc4e4d2660eb0d230e50c9f7874c0cd85a
+    authorised_by: "decision ticket 09 \u2014 build ticket 30 joins the causal layer to the currency, so grade_5_only_path_never_prices gains the priced-impact leg where the largest figures now appear, and prefilter_precedes_pricing extends its allow-list to twin/pricing.py because a lock on one module while a sibling prices freely is not a lock"
     asserts: >-
       A scenario whose only causal path runs through a grade-5 edge produces an unpriced
       structural blast radius, never a price.
@@ -129,8 +129,8 @@ invariants:
   - name: prefilter_precedes_pricing
     activating_ticket: '28'
     state: live
-    body_sha256: 2a785521debd934206598997b6894088b9216525383fc6343c363e6f0a72742f
-    authorised_by: "decision ticket 20 \u2014 prefilter_precedes_pricing strengthened under decision ticket 09: the free-function check becomes an allow-list on the module's public surface, because a keyword match on price/cost/value misses a pricing function under any other name"
+    body_sha256: 69e5f6c8c372d184712ef3cc6ca825a814b946b4bc04ec0fd2a5ff1fbe88016a
+    authorised_by: "decision ticket 09 \u2014 build ticket 30 joins the causal layer to the currency, so grade_5_only_path_never_prices gains the priced-impact leg where the largest figures now appear, and prefilter_precedes_pricing extends its allow-list to twin/pricing.py because a lock on one module while a sibling prices freely is not a lock"
     asserts: The constraint pre-filter runs before pricing, so no number is ever comparable against a red line.
     note: >-
       Structural, not an ordering convention. Pricing is a method on the pre-filter's product, so

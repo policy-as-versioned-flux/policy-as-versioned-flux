@@ -219,6 +219,43 @@ def valuation(value: Any, where: str) -> None:
         amount(value["amount"], f"{where}.amount")
 
 
+def mitigation(value: Any, where: str) -> None:
+    """What a response claims it removes from an impact, and what backs that claim.
+
+    Build ticket 30. **Mitigation credit is a causal claim like any other**, so it carries a grade
+    and is use-gated on the same rule. That closes the classic unfalsifiability loophole: "the
+    incident did not happen *because* of our control" asserts a counterfactual, and asserting it
+    is free unless something forces the evidence to travel with it.
+
+    The gate is at credit time rather than here, and the asymmetry with `valuation` is deliberate.
+    A weakly-graded valuation may not carry an **amount**, because an amount at grade 5 *is* the
+    shadow price. A weakly-graded reduction is a **claim**, not a figure — it becomes money only
+    when something multiplies it by a priced impact, and that is where it earns nothing.
+    """
+    if not isinstance(value, dict):
+        raise SchemaError(f"{where}: expected a mitigation mapping, got {value!r}")
+    fields = {"component", "reduction", "evidence_grade", "basis"}
+    unknown = sorted((set(value) - fields), key=str)
+    if unknown:
+        raise SchemaError(
+            f"{where}: unknown field(s) {', '.join(str(u) for u in unknown)}; a mitigation claim "
+            "is component, reduction, evidence_grade and basis"
+        )
+    missing = sorted(fields - set(value))
+    if missing:
+        raise SchemaError(
+            f"{where}: missing {', '.join(missing)}. A reduction with no grade behind it would "
+            "take default credit, and 'the incident did not happen because of our control' is a "
+            "causal claim that has to carry its evidence like any other."
+        )
+    ident(value["component"], f"{where}.component")
+    # A unit-interval triple, never a scalar: a control that removes "half" of an impact knows
+    # that no better than an elasticity knows its own point, and the range is the honest form.
+    pert(value["reduction"], f"{where}.reduction")
+    evidence_grade(value["evidence_grade"], f"{where}.evidence_grade")
+    text(value["basis"], f"{where}.basis")
+
+
 def _triple(value: Any, where: str, point: Validator, noun: str) -> None:
     """The shape every min/mode/max triple has. Only the point validator differs."""
     if not isinstance(value, dict):
@@ -486,9 +523,12 @@ SCHEMAS: dict[str, Schema] = {
     #
     # `crosses` names constraints, never magnitudes. A constraint is not a very large price, so
     # there is no field here by which a big enough number could buy an excluded option.
+    # `mitigates` is optional, and its absence is the honest default (build ticket 30). A response
+    # that claims nothing earns nothing — the alternative is a default credit, which is exactly
+    # the unfalsifiable claim the grade exists to stop.
     "response": Schema(
         required={"id": ident, "name": text, "addresses": ident, "cost": money_pert},
-        optional={"crosses": mapping_of(text), "note": text},
+        optional={"crosses": mapping_of(text), "note": text, "mitigates": mitigation},
     ),
     # A scenario carries **no regime** (build ticket 36). The regime is a required parameter of
     # the execution, and a scenario-level field would be a default in everything but name: an

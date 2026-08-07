@@ -58,6 +58,11 @@ GRADE_5_ONLY = "brand-goodwill"
 # artefacts then describe the same shock, and the difference between what composes and what is
 # merely downstream is readable by putting them side by side.
 PROPAGATE_ORIGIN = "content-delivery-network"
+# The priced impact (build ticket 30). Same origin again, so the propagation, the blast radius and
+# the price all describe one shock and a reader can lay them side by side. It is also the origin
+# that reaches `brand-goodwill` through a grade-5 assertion and `streaming-experience` through a
+# graded path, so the £ gate is exercised in both directions in one artefact.
+PRICE_ORIGIN = "content-delivery-network"
 # The choice set and its two removals (build ticket 28). One crosses the universal floor and one
 # crosses this perspective's own ruin boundary, so both tiers are exercised.
 # The subject of the do/observe pair (build ticket 22). It has a cause above it and an effect
@@ -144,6 +149,12 @@ def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefac
     )
     choices_path = choices.write(out_dir / "priced-option-set.json")
 
+    valued = verbs.price(
+        repo, ctx.caps, NETFLIX, PRICE_ORIGIN, None,
+        verbs.command_for("price", org=NETFLIX, origin=PRICE_ORIGIN),
+    )
+    valued_path = valued.write(out_dir / "priced-impact.json")
+
     acted = verbs.intervene(
         repo, ctx.caps, NETFLIX, QUERY_COMPONENT,
         verbs.command_for("intervene", org=NETFLIX, component=QUERY_COMPONENT),
@@ -173,6 +184,7 @@ def emit_all(ctx: "Context", into: str = "artefacts") -> dict[str, tuple[Artefac
         exposed.kind: (exposed, exposed_path),
         moved.kind: (moved, moved_path),
         choices.kind: (choices, choices_path),
+        valued.kind: (valued, valued_path),
         acted.kind: (acted, acted_path),
         learned.kind: (learned, learned_path),
         past.kind: (past, past_path),
@@ -978,6 +990,64 @@ def _grade_5_only_path_never_prices(ctx: "Context") -> str:
            for e in exposure["perspectives"]):
         raise Violated(f"{GRADE_5_ONLY} carries an attributed figure despite never being admitted")
 
+    # The **priced impact** (build ticket 30). This is now the place where the largest figures in
+    # the system appear — a valuation multiplied by a propagated influence — so a gate asserted
+    # only on the exposure would be asserted only where the smaller numbers are.
+    # Named `impact_body` rather than `priced`: the scenario leg above binds `priced` to a set of
+    # component names, and reusing the name would shadow one meaning with another.
+    impact_body = json.loads(emit_all(ctx)[verbs_mod.KIND_PRICED_IMPACT][1].read_bytes())["body"]
+    for entry in impact_body["perspectives"]:
+        named = {i["component"] for i in entry["impacts"]}
+        if not named:
+            raise Violated(
+                f"perspective {entry['perspective']!r} priced nothing at all, so the £ gate is a "
+                "wall here and this leg asserts nothing"
+            )
+        if GRADE_5_ONLY in named:
+            raise Violated(f"{GRADE_5_ONLY} was priced through a grade-5 model assertion")
+        for impact in entry["impacts"]:
+            if int(impact["worst_evidence_grade"]) > threshold:
+                raise Violated(
+                    f"{impact['component']} was priced on a path whose weakest hop is grade "
+                    f"{impact['worst_evidence_grade']}"
+                )
+            if not evidence.may_price(int(impact["valuation"]["evidence_grade"])):
+                raise Violated(f"{impact['component']} was priced from a gated valuation")
+        held = {r["component"]: r for r in entry["register"]}
+        if GRADE_5_ONLY not in held:
+            raise Violated(
+                f"perspective {entry['perspective']!r} neither priced nor registered "
+                f"{GRADE_5_ONLY}; a refused impact is a register entry, never a silent omission"
+            )
+        # A refusal carries no money. Not a zero — zero is a price, and it is the wrong one.
+        for record in entry["register"]:
+            figures = [
+                f"{k}={v}" for k, v in _pairs(record)
+                if isinstance(v, (int, float)) and not isinstance(v, bool)
+                and k not in ("depth", "worst_evidence_grade", "evidence_grade")
+            ]
+            if figures:
+                raise Violated(
+                    f"the register entry for {record['component']} carries {', '.join(figures)}; a "
+                    "refused impact carries no figure, and a zero is a price rather than a refusal"
+                )
+        # Mitigation credit is the same gate on a different claim: an unevidenced counterfactual
+        # earns nothing rather than a discount.
+        for option in entry["responses"]["priced"]:
+            claim = option["mitigation"]
+            if "credit" in claim and not evidence.may_price(int(claim["evidence_grade"])):
+                raise Violated(
+                    f"{option['option']} earned mitigation credit on a grade "
+                    f"{claim['evidence_grade']} claim; 'the incident did not happen because of our "
+                    "control' is a causal claim and is gated like one"
+                )
+            if "credit" not in claim and "reason" not in claim:
+                raise Violated(f"{option['option']} neither earned credit nor said why not")
+    # The **positive** leg of the mitigation gate lives in the pocket-org worksheet rather than
+    # here, because this fixture authors no mitigation claim at all: worksheet line 73 pins a real
+    # credit of 40000 and lines 75-76 pin the two refusals. A gate that credited nothing would
+    # pass every refusal above while making the credit useless, and that is where it fails.
+
     # And the schema refuses the figure at the source, so the artefact is not the only guard.
     try:
         validate(
@@ -1010,8 +1080,9 @@ def _grade_5_only_path_never_prices(ctx: "Context") -> str:
         raise Violated("the threshold is not what decides admission; something else is gating")
     return (
         f"grades {admits} price and 5 never does; {len(admitted)} admitted on fully-graded paths and "
-        f"{GRADE_5_ONLY} unpriced at grade 5; every perspective registers it without a figure and "
-        "the schema refuses one; the blast body is closed with no price slot; the threshold is "
+        f"{GRADE_5_ONLY} unpriced at grade 5; every perspective registers it without a figure in "
+        "both the exposure and the priced impact, and the schema refuses one; mitigation credit is "
+        "gated on the same rule; the blast body is closed with no price slot; the threshold is "
         "pinned in the artefact and moving it moves the digest"
     )
 
@@ -1150,6 +1221,34 @@ def _prefilter_precedes_pricing(ctx: "Context") -> str:
         )
     if not callable(getattr(options_mod.Admitted, "priced", None)):
         raise Violated("Admitted no longer carries the pricing method, so the seam has moved")
+
+    # Build ticket 30 gave response pricing a **second** module, and a lock asserted on one module
+    # while a sibling prices freely is not a lock. So the same allow-list runs on `twin/pricing.py`,
+    # and the thing it is really asserting is that nothing there takes a raw response: `price`
+    # reaches the choice set only through `options.prefilter(...)`, so an excluded option is absent
+    # at any magnitude here exactly as it is in `twin options`.
+    from .. import pricing as pricing_mod
+
+    PRICING_ALLOWED = {"impacts", "price", "refuse_undeclared_keys", "refuse_unpriced_figures",
+                       "spread"}
+    pricing_public = {
+        name
+        for name, value in vars(pricing_mod).items()
+        if not name.startswith("_") and inspect_mod.isfunction(value)
+        and getattr(value, "__module__", "") == pricing_mod.__name__
+    }
+    if pricing_public != PRICING_ALLOWED:
+        raise Violated(
+            f"twin/pricing.py exposes {', '.join(sorted(pricing_public)) or 'nothing'} at module "
+            f"level; this invariant admits exactly {', '.join(sorted(PRICING_ALLOWED))}. Adding a "
+            "callable here is how response pricing stops going through the pre-filter."
+        )
+    source = inspect_mod.getsource(pricing_mod.price)
+    if "options_mod.prefilter(" not in source:
+        raise Violated(
+            "twin/pricing.py no longer reaches the choice set through the pre-filter, so an "
+            "excluded option could be priced here while remaining absent from `twin options`"
+        )
 
     repo = ModelRepo.open(ctx.repo_dir)
     overlay = Overlay.load(repo, NETFLIX)

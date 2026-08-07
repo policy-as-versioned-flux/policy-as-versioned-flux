@@ -61,6 +61,18 @@ _OPTIONS = re.compile(
 )
 _OPTION_PRICE = re.compile(r"^option_price\.(?P<option>[a-z0-9-]+)\.mean$")
 _ADMISSION = re.compile(r"^admission\.(?P<perspective>[a-z0-9-]+)\.(?P<component>[a-z0-9-]+)$")
+# The join of the causal layer to the £ (build ticket 30). Keyed by origin as well as perspective,
+# because a price is a fact about a *shock* — and the two origins in the table are there to show
+# the gate admitting one and refusing the other.
+_PRICE = re.compile(
+    r"^price\.(?P<origin>[a-z0-9-]+)\.(?P<perspective>[a-z0-9-]+)\.(?P<component>[a-z0-9-]+)\."
+    r"(?P<point>min|mode|max|priced)$"
+)
+_PRICE_SPREAD = re.compile(r"^price\.(?P<origin>[a-z0-9-]+)\.spread\.(?P<component>[a-z0-9-]+)$")
+_CREDIT = re.compile(
+    r"^credit\.(?P<origin>[a-z0-9-]+)\.(?P<perspective>[a-z0-9-]+)\.(?P<option>[a-z0-9-]+)\."
+    r"(?P<point>min|mode|max|mean|credited)$"
+)
 
 # Which emitted artefact each family of keys is resolved against. One worksheet, several
 # artefacts: the graph stopped being the only place a hand-computable number lands at build
@@ -68,6 +80,9 @@ _ADMISSION = re.compile(r"^admission\.(?P<perspective>[a-z0-9-]+)\.(?P<component
 GRAPH, BLAST, EXPOSURE = "graph", "blast", "exposure"
 PROPAGATION, OPTIONS = "propagation", "options"
 INTERVENTION, OBSERVATION = "intervention", "observation"
+# Two priced shocks, keyed by origin (build ticket 30). One the gate admits and one it refuses,
+# because a gate asserted only where it passes is asserted only where nothing could go wrong.
+PRICE = "price"
 
 
 class WorksheetError(RuntimeError):
@@ -224,6 +239,13 @@ def resolve(key: str, bodies: dict[str, dict[str, Any]]) -> float | None:
                 return float(entry["cost"]["mean"])
         return None
 
+    for pattern, reader in (
+        (_PRICE, _priced_impact), (_PRICE_SPREAD, _price_spread), (_CREDIT, _mitigation_credit)
+    ):
+        match = pattern.match(key)
+        if match:
+            return reader(bodies.get(f"{PRICE}:{match.group('origin')}"), match)
+
     admitted = _ADMISSION.match(key)
     if admitted:
         for entry in bodies.get(EXPOSURE, {}).get("perspectives", []):
@@ -282,6 +304,59 @@ def resolve(key: str, bodies: dict[str, dict[str, Any]]) -> float | None:
     return None
 
 
+def _eye(body: dict[str, Any] | None, perspective: str) -> dict[str, Any] | None:
+    if body is None:
+        return None
+    return next((e for e in body["perspectives"] if e["perspective"] == perspective), None)
+
+
+def _priced_impact(body: dict[str, Any] | None, match: "re.Match[str]") -> float | None:
+    """One component's price under one eye, or `0` where the gate refused it.
+
+    `priced` is `1` or `0` rather than a figure, for the reason an admission verdict is: a refused
+    impact carries no number anywhere, so the only thing the table can compare is whether it was
+    priced at all.
+    """
+    entry = _eye(body, match.group("perspective"))
+    if entry is None:
+        return None
+    component, point = match.group("component"), match.group("point")
+    found = next((i for i in entry["impacts"] if i["component"] == component), None)
+    if point == "priced":
+        return 0.0 if found is None else 1.0
+    return None if found is None else float(found["price"]["attenuated"][point])
+
+
+def _price_spread(body: dict[str, Any] | None, match: "re.Match[str]") -> float | None:
+    if body is None:
+        return None
+    for row in body["attribution"]:
+        if row["component"] == match.group("component"):
+            return None if row["spread"] is None else float(row["spread"])
+    return None
+
+
+def _mitigation_credit(body: dict[str, Any] | None, match: "re.Match[str]") -> float | None:
+    """What a response earned, or `0` where its claim earned nothing.
+
+    `credited` is the leg that matters: an unevidenced mitigation claim must come back with no
+    figure at all, and a table that could only read figures would never notice the difference
+    between "earned nothing" and "earned zero".
+    """
+    entry = _eye(body, match.group("perspective"))
+    if entry is None:
+        return None
+    option = next(
+        (o for o in entry["responses"]["priced"] if o["option"] == match.group("option")), None
+    )
+    if option is None:
+        return None
+    credit = option["mitigation"].get("credit")
+    if match.group("point") == "credited":
+        return 1.0 if credit else 0.0
+    return None if credit is None else float(credit[match.group("point")])
+
+
 def _primary_path(bodies: dict[str, dict[str, Any]], component: str) -> dict[str, Any] | None:
     """The ranked-first path to a component in the emitted propagation, if there is one."""
     for reached in bodies.get(PROPAGATION, {}).get("reached", []):
@@ -305,6 +380,10 @@ PERSPECTIVE = "the-operator"
 # cause above it and effects below it, so the downstream halves match and only the upstream halves
 # differ — which is the whole of the distinction, isolated.
 QUERY_COMPONENT = "order-service"
+# The two priced shocks (build ticket 30). `order-service` is the only origin whose path to the
+# portal is graded well enough to price, and `shared-database` is the one every route out of which
+# crosses the grade-3 edge. Both, because a gate asserted only where it admits is not a gate.
+PRICE_ORIGINS = ("order-service", "shared-database")
 
 
 def bodies_for(repo: Any, caps: Any) -> dict[str, dict[str, Any]]:
@@ -338,6 +417,10 @@ def bodies_for(repo: Any, caps: Any) -> dict[str, dict[str, Any]]:
             verbs.command_for("observe", org=org, component=QUERY_COMPONENT),
         ),
     }
+    for origin in PRICE_ORIGINS:
+        emitted[f"{PRICE}:{origin}"] = verbs.price(
+            repo, caps, org, origin, None, verbs.command_for("price", org=org, origin=origin)
+        )
     return {name: json.loads(art.to_bytes())["body"] for name, art in emitted.items()}
 
 
