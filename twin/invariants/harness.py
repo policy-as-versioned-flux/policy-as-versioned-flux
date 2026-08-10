@@ -10,7 +10,7 @@ import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator
+from typing import Any, Iterator
 
 import yaml
 
@@ -432,6 +432,492 @@ def _var_shaped_summary_hides_the_tail(ctx: Context) -> str:
         f"identical VaR ({light_var:.2f}) at alpha={alpha:.4f} for xi=0.1 and xi=0.7; TVaR "
         f"diverges ({light_tvar:.2f} vs {heavy_tvar:.2f}); xi>=1 refuses at the shape boundary "
         "and xi=0.99 still computes"
+    )
+
+
+@harness_check("a_constraint_removal_with_no_computed_attractiveness_is_rejected")
+def _a_constraint_removal_with_no_computed_attractiveness_is_rejected(ctx: Context) -> str:
+    """Removing a constraint requires logging the excluded option's computed attractiveness —
+    computed, not stated (build ticket 62, decision ticket 15's carried-forward item).
+
+    A guard on the suite rather than an invariant, the same shape `causal_accounts_have_no_privileged_default`
+    is: this asserts a **semantic property of a module's contract**, not one of the constitution's
+    sixteen fixed names.
+
+    Three legs, on the netflix fixture's `the-operator` perspective and `stake-the-quarter-on-one-title`
+    (which crosses `insolvency`, a constraint that perspective declares itself). First,
+    `compute_attractiveness` returns a real, nonzero figure re-derived from `options.prefilter()`
+    — not a stand-in. Second, `log_removal`'s own signature carries no float parameter a caller
+    could hand it instead of letting the figure be computed — checked against the signature, not
+    merely by calling it correctly. Third, `verify_removals` refuses a removal with no matching
+    log entry, and accepts the identical removal once one exists.
+    """
+    from .. import misuse as misuse_mod
+    from ..model import Overlay
+    from ..repo import ModelRepo
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    overlay = Overlay.load(repo, "netflix")
+    perspective = overlay.perspectives["the-operator"]
+    option, constraint = "stake-the-quarter-on-one-title", "insolvency"
+
+    figure = misuse_mod.compute_attractiveness(perspective, overlay.responses, option, constraint)
+    if not figure.get("mode"):
+        raise Violated(f"compute_attractiveness returned no real figure: {figure}")
+
+    import inspect
+
+    for name, param in inspect.signature(misuse_mod.log_removal).parameters.items():
+        if param.annotation in (float, "float"):
+            raise Violated(f"log_removal accepts a raw float parameter {name!r} — attractiveness could be stated")
+
+    after = {**perspective, "ruin": {}}
+    unlogged = misuse_mod.verify_removals(perspective, after, [])
+    if not unlogged:
+        raise Violated("an unlogged removal of a perspective's own declared constraint verified clean")
+
+    log_entry = misuse_mod.log_removal(
+        perspective, overlay.responses, option, constraint, "constraint-owner",
+        "guard-planted removal", "2026-08-10", path=ctx.tmp / "guard-removal-log.jsonl",
+    )
+    logged = misuse_mod.verify_removals(perspective, after, [log_entry])
+    if logged:
+        raise Violated(f"the identical removal, now logged with a computed figure, still failed verification: {logged}")
+
+    return (
+        f"attractiveness computed as mode={figure['mode']} (not stated); log_removal accepts no "
+        "raw float; an unlogged removal is rejected and the same removal logged clean verifies"
+    )
+
+
+@harness_check("a_challenge_to_a_constituent_survives_an_unrelated_resolution")
+def _a_challenge_to_a_constituent_survives_an_unrelated_resolution(ctx: Context) -> str:
+    """Contestability is a primary workflow, and a challenge to one claim cannot be closed by a
+    resolution to another (build ticket 60, decision tickets 07/15).
+
+    A guard on the suite rather than an invariant, the same shape `position_deltas_have_no_privileged_default`
+    is: this asserts a **semantic property of a module's contract**, not one of the constitution's
+    sixteen fixed names.
+
+    Two legs on the fixture graph. First, `resolve()` can only ever build a resolution whose
+    `claim_path` equals its challenge's — proven by round-tripping a real challenge through it and
+    checking the two agree, not merely by reading the function's signature. Second, the refusal:
+    `refuse_answering_a_different_claim` bites on a hand-built resolution that names a different
+    path, and `for_artefact` still reports the original challenge as open when the only resolution
+    on file is for that unrelated path — a challenge to a constituent is not answered by a
+    resolution to an aggregate that happens to share the artefact.
+    """
+    import json
+
+    from .. import challenges as challenges_mod
+    from ..artefact import ArtefactError, digest_of_file, load as load_artefact
+    from ..grades import Capabilities
+    from ..repo import ModelRepo
+    from ..verbs import graph as graph_verb
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    artefact = graph_verb(repo, ctx.caps, "netflix", ["twin", "graph"])
+    graph_path = ctx.tmp / "guard-graph.json"
+    artefact.write(graph_path)
+    doc = load_artefact(graph_path)
+    sha = digest_of_file(graph_path)
+
+    challenge = challenges_mod.raise_challenge(
+        doc, sha, "components[1].evolution", "guard-planted dispute", ["twin", "challenge"]
+    )
+    challenge_doc = json.loads(challenge.to_bytes())
+    resolution = challenges_mod.resolve(challenge_doc, challenge.digest(), "guard response", ["twin", "resolve-challenge"])
+    if resolution.body["claim_path"] != challenge.body["claim_path"]:
+        raise Violated("resolve() produced a resolution whose claim_path differs from its challenge's")
+
+    unrelated = {
+        "envelope": {"kind": challenges_mod.KIND_RESOLUTION},
+        "body": {
+            "challenge_sha256": "not-this-challenge", "claim_path": "components[0].evolution",
+            "response": "unrelated",
+        },
+    }
+    try:
+        challenges_mod.refuse_answering_a_different_claim(challenge_doc, unrelated)
+    except ArtefactError:
+        pass
+    else:
+        raise Violated("a resolution naming a different claim_path was not refused")
+
+    report = challenges_mod.for_artefact(sha, [challenge_doc], [unrelated])
+    if not report["has_unresolved_challenges"]:
+        raise Violated("an unrelated resolution on the same artefact closed a constituent's challenge")
+    if report["open"][0]["claim_path"] != "components[1].evolution":
+        raise Violated("the open challenge reported does not name the claim that was actually challenged")
+
+    return (
+        "resolve() reproduces its challenge's own claim_path; a hand-built resolution naming a "
+        "different one is refused; an unrelated resolution on the same artefact leaves the "
+        "original challenge reported open, not silently closed"
+    )
+
+
+@harness_check("skill_eval_harness_is_agnostic_and_thresholds_are_guarded")
+def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> str:
+    """Seam 3: the skill-eval harness is skill-agnostic, its thresholds are versioned, and a
+    lowered threshold needs a citation the way a moved invariant hash does (build ticket 42,
+    decision ticket 20).
+
+    A guard on the suite rather than an invariant, for the same reason `prefilter_precedes_pricing`
+    inspects `twin/options.py`'s public surface: this asserts **structural properties of a module's
+    contract**, checked against its source and against git history, not trusted from a docstring.
+
+    Three legs. First, none of `twin/skills.py`'s harness functions hardcode one of the six real
+    skills' names — checked against each function's own source, the same way
+    `test_skills.py::test_the_harness_is_skill_agnostic` is, so the suite catches it even if that
+    test is ever deleted. Second, a fixture skill (`toy-classifier`) actually runs end to end and
+    a degraded one fails its threshold — proving the harness does something, not merely that it
+    imports. Third, a threshold that decreased since the manifest's last committed version needs
+    an `authorised_by` citing a decision ticket — the same `hash_changes_are_authorised` pattern,
+    applied to a second file.
+    """
+    import inspect
+
+    from .. import skills as skills_mod
+
+    real_skills = (
+        "signal-classify", "causal-claims", "evolution-judge", "substrate-generator",
+        "gameplay-lens", "ethics-gate",
+    )
+    for fn in (
+        skills_mod.evaluate, skills_mod.threshold_for, skills_mod.load_thresholds,
+        skills_mod.record_score, skills_mod.load_scores, skills_mod.detect_regression,
+    ):
+        body = inspect.getsource(fn)
+        hit = [s for s in real_skills if s in body]
+        if hit:
+            raise Violated(f"{fn.__name__} names {', '.join(hit)} — the harness is not skill-agnostic")
+
+    good = skills_mod.evaluate("toy-classifier", skills_mod.toy_classifier, skills_mod.TOY_SKILL_CORPUS)
+    if not good.passed:
+        raise Violated("the fixture skill failed its own corpus running correctly — the harness has no subject")
+    bad = skills_mod.evaluate("toy-classifier", lambda x: "wrong", skills_mod.TOY_SKILL_CORPUS)
+    if bad.passed:
+        raise Violated("a skill that gets every item wrong still passed — the threshold is not gating anything")
+
+    current = skills_mod.load_thresholds()
+    head = _thresholds_at(REPO_DIR, "HEAD")
+    if head is None:
+        return (
+            f"{len(real_skills)} real skill names absent from every harness function; the fixture "
+            "skill passes and a degraded one fails; no committed threshold history to compare yet"
+        )
+    lowered = [
+        name
+        for name, entry in current["thresholds"].items()
+        if name in head["thresholds"]
+        and float(entry["threshold"]) < float(head["thresholds"][name]["threshold"])
+        and not _cites_decision_ticket(str(entry.get("authorised_by") or ""))
+    ]
+    if lowered:
+        raise Violated(
+            "threshold(s) lowered with no authorising decision ticket cited in `authorised_by`: "
+            + ", ".join(sorted(lowered))
+        )
+    return (
+        f"{len(real_skills)} real skill names absent from every harness function; the fixture "
+        "skill passes and a degraded one fails; no threshold lowered since HEAD without a citation"
+    )
+
+
+def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
+    rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
+    out = _git(root, "show", f"{ref}:{rel}")
+    if out is None:
+        return None
+    return dict(yaml.safe_load(out))
+
+
+@harness_check("carillion_answer_key_is_dated_and_adversarial")
+def _carillion_answer_key_is_dated_and_adversarial(ctx: Context) -> str:
+    """The primary backtest key names contemporaneous, adversarial sources and a real rewind can
+    read its own history (build ticket 38, decision ticket 19's evidence-asymmetry argument).
+
+    A guard on the suite rather than an invariant, for the same reason `graded_edge_fixture_holds_its_contract`
+    is: this asserts a **property of a fixture's contract downstream tickets (39-41, 71-77) will
+    build against**, not an absence the constitution names.
+
+    Four legs. Every signal carries a dated fact and a non-placeholder citation. No signal cites
+    HC 769 (the post-collapse inquiry report) — that would be hindsight leaking into what is
+    supposed to be contemporaneous ground truth, and the outcome is where that citation belongs.
+    The commit history is monotonically dated, which is what makes `ingestion_history` a real
+    rewind here rather than the date-filter-only fallback the main netflix/intel fixture is
+    limited to. And the world layer names no tenant, the same direction rule every fixture holds.
+    """
+    import subprocess
+
+    from .. import fixtures
+    from ..model import Overlay, check_direction
+    from ..repo import ModelRepo
+
+    carillion_dir = ctx.tmp / "carillion-repo"
+    if not carillion_dir.exists():
+        fixtures.build_carillion_org(carillion_dir)
+    repo = ModelRepo.open(carillion_dir)
+    overlay = Overlay.load(repo, fixtures.CARILLION_ORG)
+
+    if len(overlay.signals) < 3:
+        raise Violated(f"the Carillion key carries only {len(overlay.signals)} signal(s)")
+    for signal_id, signal in overlay.signals.items():
+        url = signal.get("provenance", {}).get("url", "")
+        if not url.startswith("https://"):
+            raise Violated(f"signal {signal_id!r} carries no https citation")
+        if "example.invalid" in url:
+            raise Violated(f"signal {signal_id!r} carries a placeholder citation, not a real one")
+        if "769" in url:
+            raise Violated(f"signal {signal_id!r} cites HC 769 — a post-collapse inquiry report is hindsight")
+        if not str(signal.get("date", "")).count("-") == 2:
+            raise Violated(f"signal {signal_id!r} carries no dated fact")
+
+    outcome = overlay.outcomes.get("carillion-collapse-resolved")
+    if outcome is None:
+        raise Violated("the Carillion overlay carries no resolved outcome")
+    if outcome.get("contamination") != "low":
+        raise Violated(f"the answer key declares contamination={outcome.get('contamination')!r}, not 'low'")
+    if "769" not in str(outcome.get("source", "")):
+        raise Violated("the answer key's own source does not cite HC 769 — the adversarial post-mortem is unnamed")
+
+    proc = subprocess.run(
+        ["git", "log", "--format=%cI", "--reverse"], cwd=str(carillion_dir),
+        stdout=subprocess.PIPE, check=True,
+    )
+    from datetime import datetime as _dt
+
+    dates = [_dt.fromisoformat(line) for line in proc.stdout.decode().splitlines()]
+    if dates != sorted(dates):
+        raise Violated("the Carillion fixture's commit history is not monotonically dated")
+
+    violations = check_direction(repo)
+    if violations:
+        raise Violated(f"the world layer references the carillion tenant: {'; '.join(violations)}")
+
+    return (
+        f"{len(overlay.signals)} dated signal(s), each citing a live https source and none citing "
+        "the post-collapse HC 769; the answer key itself does; commit history spans "
+        f"{dates[0].date()}..{dates[-1].date()} monotonically; the world layer names no tenant"
+    )
+
+
+@harness_check("backtest_is_a_pure_composition")
+def _backtest_is_a_pure_composition(ctx: Context) -> str:
+    """`twin backtest` is rewind plus projection, with no backtest-specific code path
+    (build ticket 37, decision ticket 13 Q2: "the backtest is not a special mode and needs no
+    separate harness").
+
+    A guard on the suite rather than an invariant, the same shape `an_intervention_never_reaches_upstream`
+    is: the constitution's sixteen are fixed, and this asserts a **structural property of the CLI
+    command itself** — checked against its source, not merely claimed by its docstring, for the
+    reason `prefilter_precedes_pricing` inspects `twin/options.py`'s public surface rather than
+    trusting a comment: a property that only holds by convention is a property that erodes the
+    first time somebody is in a hurry.
+
+    Two legs. First, the source: `cmd_backtest` calls `rewind(` and `verbs.run(` and references no
+    propagation, intervention or scoring machinery of its own — a second implementation hiding
+    behind the same name would still pass a black-box output check, so this reads the function
+    body directly. Second, the composition actually computes the same thing `run()` computes on
+    its own: rewinding explicitly first and then calling `run()` at the same time produces a
+    forecast identical to calling `run()` directly at that time, save for which command is
+    recorded as having produced it — proving the explicit rewind adds no second derivation, only
+    an explicit statement of what `run()`'s own regime gate already does internally.
+    """
+    import inspect
+
+    from .. import cli, verbs
+
+    source = inspect.getsource(cli.cmd_backtest)
+    if "rewind(" not in source or "verbs.run(" not in source:
+        raise Violated("cmd_backtest no longer calls both rewind( and verbs.run( — the composition changed")
+    forbidden = ("propagate", "Do(", "Observe(", "scoring.")
+    hit = [f for f in forbidden if f in source]
+    if hit:
+        raise Violated(f"cmd_backtest references {', '.join(hit)} — a second code path beside rewind+run")
+
+    from ..cli import main as cli_main
+
+    at = "2026-01-01"
+    backtest_out, run_out = ctx.tmp / "guard-backtest.json", ctx.tmp / "guard-run.json"
+    rc1 = cli_main([
+        "backtest", "--repo", str(ctx.repo_dir), "--org", "netflix", "--scenario", "dvd-decline-2011",
+        "--regime", "as-consumed", "--at", at, "--out", str(backtest_out),
+    ])
+    rc2 = cli_main([
+        "run", "--repo", str(ctx.repo_dir), "--org", "netflix", "--scenario", "dvd-decline-2011",
+        "--regime", "as-consumed", "--at", at, "--out", str(run_out),
+    ])
+    if rc1 != 0 or rc2 != 0:
+        raise Violated(f"backtest or run exited non-zero (backtest={rc1}, run={rc2})")
+
+    import json
+
+    def strip(body: dict) -> dict:
+        return {**body, "forecasts": [
+            {k: v for k, v in f.items() if k not in ("id", "pins")} for f in body["forecasts"]
+        ]}
+
+    backtest_body = strip(json.loads(backtest_out.read_bytes())["body"])
+    run_body = strip(json.loads(run_out.read_bytes())["body"])
+    if backtest_body != run_body:
+        raise Violated(
+            "an explicit rewind followed by run() computed a different forecast than run() alone "
+            "at the same time — backtest is not the same primitives run() already composes internally"
+        )
+    return (
+        "cmd_backtest's source calls exactly rewind( and verbs.run(, references no propagation, "
+        "intervention or scoring machinery; an explicit rewind+run and run() alone compute the "
+        "identical forecast at the same time, differing only in which command produced it"
+    )
+
+
+@harness_check("causal_accounts_have_no_privileged_default")
+def _causal_accounts_have_no_privileged_default(ctx: Context) -> str:
+    """No causal account — including this overlay's own `edges` collection — is required
+    (build ticket 32, decision tickets 07/08).
+
+    A guard on the suite rather than an invariant, the same shape
+    `position_deltas_have_no_privileged_default` is for world models: the constitution's sixteen
+    are fixed, and this asserts a **semantic property of a module's contract**.
+
+    Three legs, on the netflix fixture's three rival accounts (`netflix-base-case`,
+    `rival-aggressive-cannibalisation`, `rival-conservative-view`) all overriding the same edge.
+    First, dropping any one of the three still computes and the survivors' own spread figures do
+    not move — the same "no privileged position" property `positions.py` established, carried
+    into the causal layer. Second, `Overlay.causal_graph` reads a named account and this overlay's
+    own `edges` collection through the *same call*: propagating the graph a named account builds
+    and propagating `overlay.graph()` directly reach the same components, proving there is no
+    special code path for "the primary one". Third, the schema itself: a `causal-account` document
+    carrying a planted `author`/`created_at`/`priority` field does not load — adjudication by
+    authorship or recency has no field to attach to, not merely a convention against reading one.
+    """
+    from .. import causal_accounts as causal_accounts_mod
+    from ..model import Overlay
+    from ..propagate import propagate
+    from ..repo import ModelRepo
+    from ..schema import SchemaError, validate
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    overlay = Overlay.load(repo, "netflix")
+    all_accounts = ["netflix-base-case", "rival-aggressive-cannibalisation", "rival-conservative-view"]
+    origin = "streaming-experience"
+
+    full = causal_accounts_mod.ensemble_spread(overlay, all_accounts, origin)
+    full_by_component = {r["component"]: r["by_account"] for r in full["spread"]}
+    for dropped in all_accounts:
+        remaining = [a for a in all_accounts if a != dropped]
+        narrowed = causal_accounts_mod.ensemble_spread(overlay, remaining, origin)
+        if {a["account"] for a in narrowed["accounts"]} != set(remaining):
+            raise Violated(f"dropping {dropped!r} changed which accounts the remainder computed")
+        for row in narrowed["spread"]:
+            for account_id, value in row["by_account"].items():
+                if value != full_by_component[row["component"]][account_id]:
+                    raise Violated(
+                        f"dropping {dropped!r} moved {account_id!r}'s own figure for "
+                        f"{row['component']!r} — an account's arithmetic depended on who else was named"
+                    )
+
+    via_account = propagate(overlay.causal_graph("netflix-base-case"), origin)
+    via_overlay = propagate(overlay.graph(), origin)
+    if {e["component"] for e in via_account["reached"]} != {e["component"] for e in via_overlay["reached"]}:
+        raise Violated(
+            "propagating a named account's graph and propagating overlay.graph() directly reach "
+            "different components — there is a code path privileging one over the other"
+        )
+
+    base_doc = {
+        "id": "planted", "name": "planted",
+        "edges": {"e": {"from": "streaming-experience", "to": "dvd-by-mail", "sign": "negative",
+                         "lag_days": 1, "elasticity": {"min": 0.1, "mode": 0.2, "max": 0.3},
+                         "evidence_grade": 3}},
+    }
+    for field_name in ("author", "authored_by", "created_at", "priority"):
+        try:
+            validate("causal-account", {**base_doc, field_name: "x"}, "planted")
+        except SchemaError:
+            pass
+        else:
+            raise Violated(f"a causal-account document carrying {field_name!r} validated")
+
+    return (
+        f"{len(all_accounts)} accounts, each dispensable, none privileged; dropping any one "
+        "leaves the rest's own figures unmoved; a named account and overlay.graph() reach the "
+        "same components; a planted author/date field on a causal-account is refused"
+    )
+
+
+@harness_check("unanchored_severity_parameters_are_marked_not_assumed")
+def _unanchored_severity_parameters_are_marked(ctx: Context) -> str:
+    """An anchored severity subject names which of its parameters are defensible and which are
+    illustrative (build ticket 25, decision ticket 09's TVaR-over-VaR commitment deepened).
+
+    A guard on the suite rather than an invariant, for the same reason
+    `a_var_shaped_summary_hides_what_tvar_surfaces` is: the constitution's sixteen may not grow a
+    seventeenth without the constitution changing first, and this asserts a **semantic property of
+    a module's contract** — every anchored parameter carries a citation method, every unanchored
+    one carries a reason, and the two are never conflated by the loader.
+
+    Two legs. First, the committed anchor file: at least one parameter is genuinely anchored
+    (cited or fit from cited quantiles) and at least one is genuinely not, on the committed subject
+    — a file that anchored nothing would make "marked, not assumed" vacuous, and a file that left
+    nothing unanchored would never exercise the honest-gap path at all. Second, the refusal itself:
+    an anchor file that flips a parameter to `anchored: true` with no `method`, or to
+    `anchored: false` with no `reason`, does not load — checked directly against
+    `twin/anchoring.py`'s loader rather than trusted to hold because the schema was written the
+    right way round.
+    """
+    import copy
+
+    from .. import anchoring
+
+    doc = anchoring.load()
+    subject = doc["subjects"][0]
+    params = subject["parameters"]
+    anchored_names = [n for n, p in params.items() if p.get("anchored")]
+    unanchored_names = [n for n, p in params.items() if not p.get("anchored")]
+    if not anchored_names:
+        raise Violated(f"subject {subject['id']!r} anchors nothing; 'marked, not assumed' has no positive leg here")
+    if not unanchored_names:
+        raise Violated(
+            f"subject {subject['id']!r} leaves nothing unanchored; the honest-gap path this guard "
+            "exists for is never exercised"
+        )
+    result = anchoring.anchored(str(subject["id"]))
+    for p in result.parameters:
+        if p.anchored and not p.method:
+            raise Violated(f"parameter {p.name!r} is anchored but carries no method in the loaded result")
+        if not p.anchored and not p.note:
+            raise Violated(f"parameter {p.name!r} is unanchored but carries no reason in the loaded result")
+
+    # The refusal, on a planted violation of each shape.
+    import tempfile
+    from pathlib import Path
+
+    import yaml
+
+    for planted_name, planted_entry, expect in (
+        ("xi", {"anchored": False}, "no reason"),
+        ("beta", {"anchored": True}, "no method"),
+    ):
+        broken = copy.deepcopy(doc)
+        broken["subjects"][0]["parameters"][planted_name] = planted_entry
+        with tempfile.TemporaryDirectory(prefix="twin-anchor-guard-") as scratch:
+            path = Path(scratch) / "broken.yaml"
+            path.write_text(yaml.safe_dump(broken), encoding="utf-8")
+            try:
+                anchoring.load.__wrapped__(path)  # bypass the lru_cache: a fresh path each time anyway
+            except anchoring.AnchoringError as exc:
+                if expect not in str(exc):
+                    raise Violated(f"planting {planted_name}={planted_entry} was refused, but not for {expect!r}: {exc}") from None
+            else:
+                raise Violated(f"planting {planted_name}={planted_entry} loaded without refusal")
+
+    return (
+        f"subject {subject['id']!r}: {len(anchored_names)} anchored ({', '.join(sorted(anchored_names))}), "
+        f"{len(unanchored_names)} unanchored ({', '.join(sorted(unanchored_names))}); a planted "
+        "anchored-with-no-method or unanchored-with-no-reason is refused"
     )
 
 

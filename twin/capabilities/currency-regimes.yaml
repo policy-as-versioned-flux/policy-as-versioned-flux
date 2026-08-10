@@ -34,10 +34,16 @@ criteria:
     # too (build ticket 24): `twin severity` reports a loss-exceedance curve (VaR beside TVaR,
     # never VaR alone) rather than collapsing the tail into the causal £ chain, which has no
     # severity slot for it by design — the refusal to price a point figure for ruin-adjacent risk
-    # is itself the treatment. Nothing in the pocket org or the fixtures calls it yet, because
-    # anchoring it to a real component's parameters is build ticket 25's job. Ethical harms still
-    # wait on the affected-parties register at 61. Five of the six named incommensurables is not
-    # each of them.
+    # is itself the treatment. Build ticket 25 anchors it: `twin severity-anchor` fits the curve
+    # from named, dated public sources (twin/severity-anchors.yaml) rather than illustrative
+    # numbers, and names honestly which of its five parameters are defensible (mu, sigma,
+    # threshold — cited or fit from cited quantiles) and which are not (xi, beta — no public
+    # single-source fit exists, so they carry a reason rather than a false anchor) with the
+    # headline TVaR's sensitivity to the unanchored one reported alongside it. Still nothing in
+    # the pocket org or the fixtures calls it — anchoring a real component's own severity to this
+    # subject, rather than exercising the subject standalone, is not this ticket's job either.
+    # Ethical harms still wait on the affected-parties register at 61. Five of the six named
+    # incommensurables is not each of them.
   - index: 5
     text: "A stated objective function with its qualifications."
     checked: false

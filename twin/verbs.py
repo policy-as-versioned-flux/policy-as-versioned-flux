@@ -71,6 +71,9 @@ CAPS_POSITIONS = ["domain-model", "provenance", "scenario-engine", "sense-move"]
 # world/overlay split, decision ticket 07 Q1b) to produce an evidence-adjacent £ figure
 # (decision ticket 09) — build ticket 31.
 CAPS_CREDIBILITY = ["currency-regimes", "domain-model", "provenance"]
+# Rival causal accounts read the causal layer (each account is a claim about measured effect, the
+# same vocabulary an `influences` edge asserts) over the domain model's graph — build ticket 32.
+CAPS_CAUSAL_ACCOUNTS = ["causal-layer", "domain-model", "provenance"]
 
 KIND_BOUND_SIGNAL = "bound-signal"
 KIND_FORECAST_BUNDLE = "forecast-bundle"
@@ -89,6 +92,8 @@ KIND_RELIABILITY_DIAGRAM = "reliability-diagram"
 KIND_POSITION_DELTAS = "position-deltas"
 KIND_CREDIBILITY_BLEND = "credibility-blend"
 KIND_LOSS_EXCEEDANCE = "loss-exceedance-curve"
+KIND_ANCHORED_LOSS_EXCEEDANCE = "anchored-loss-exceedance-curve"
+KIND_CAUSAL_ACCOUNT_SPREAD = "causal-account-spread"
 
 # Calibration's own capability, decision ticket 11 — the same set `score` already carries, because
 # a reliability diagram reads scores `score` produced and adds no domain of its own.
@@ -992,6 +997,37 @@ def credibility(
     )
 
 
+# -- causal accounts: rival causal accounts as ensemble spread (build ticket 32) ------------
+
+
+def causal_accounts(
+    repo: ModelRepo, caps: Capabilities, org: str, origin: str, account_ids: list[str], command: list[str]
+) -> Artefact:
+    """Every named rival causal account's own propagation from `origin`, and the spread between
+    them — the causal-layer counterpart to `positions()`'s belief spread.
+
+    Nothing here picks a favourite account: `twin/causal_accounts.py` reads every id identically,
+    this overlay's own `edges` collection included as just another nameable account, and the
+    spread across the named set — not any one account's figure — is the reported uncertainty.
+    """
+    from . import causal_accounts as causal_accounts_mod
+
+    overlay = Overlay.load(repo, org)
+    try:
+        body = causal_accounts_mod.ensemble_spread(overlay, account_ids, origin)
+    except causal_accounts_mod.CausalAccountError as exc:
+        raise VerbError(str(exc)) from exc
+
+    return Artefact(
+        kind=KIND_CAUSAL_ACCOUNT_SPREAD,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_CAUSAL_ACCOUNTS),
+        body=body,
+    )
+
+
 # -- score ---------------------------------------------------------------------------------
 
 
@@ -1199,6 +1235,49 @@ def severity_curve(
         },
         depth=caps.depth_block(CAPS_SEVERITY),
         body={"curve": curve},
+    )
+
+
+# -- empirical severity anchoring (build ticket 25) ------------------------------------------
+
+
+def anchored_severity_curve(
+    subject_id: str, alphas: list[float], caps: Capabilities, command: list[str],
+    sensitivity_grid: list[float] | None = None,
+) -> Artefact:
+    """A loss-exceedance curve fit from `twin/severity-anchors.yaml`'s cited quantiles, rather
+    than from raw parameters named on the command line (`twin severity`'s own path, untouched).
+
+    Every parameter travels with whether it is anchored (cited, or fit from cited quantiles) or
+    not, so a reader sees which numbers in the curve below are defensible and which are
+    illustrative rather than having to trust the module that produced them. `sensitivity_grid`,
+    when given, sweeps the unanchored `xi` at the highest requested alpha and reports how far the
+    headline TVaR moves — the anchoring's own honesty about what it does not pin, made visible in
+    the artefact rather than only in the YAML.
+    """
+    from . import anchoring
+
+    if not alphas:
+        raise VerbError("no confidence level named; a loss-exceedance curve over nothing is not a curve")
+    try:
+        result = anchoring.anchored(subject_id)
+        curve = result.severity.loss_exceedance_curve(alphas)
+        sensitivity_report = (
+            anchoring.sensitivity(subject_id, max(alphas), sensitivity_grid) if sensitivity_grid else None
+        )
+    except (anchoring.AnchoringError, SeverityError, PertError) as exc:
+        raise VerbError(str(exc)) from exc
+
+    return Artefact(
+        kind=KIND_ANCHORED_LOSS_EXCEEDANCE,
+        mark=DERIVED,
+        command=command,
+        pins={
+            "tool": {"name": "twin", "version": TOOL_VERSION, "capabilities_digest": caps.digest},
+            "anchors": anchoring.pin(),
+        },
+        depth=caps.depth_block(CAPS_SEVERITY),
+        body={"anchoring": result.as_dict(), "curve": curve, "sensitivity": sensitivity_report},
     )
 
 

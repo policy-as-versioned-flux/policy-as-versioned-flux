@@ -339,6 +339,71 @@ note: >-
   of the range is the honest part and it still never prices — this is exactly where parametric
   contamination hides.
 """,
+    # Two rival causal accounts (build ticket 32), both overriding the same edge id so the
+    # ensemble spread has something real to compute: the base case restates
+    # `streaming-displaces-dvd` almost exactly (proving an account naming the status quo is not
+    # structurally special), the rival claims a materially faster, stronger displacement.
+    "orgs/netflix/causal_accounts/netflix-base-case.yaml": """\
+id: netflix-base-case
+name: The base case (restates the overlay's own edge)
+edges:
+  streaming-displaces-dvd:
+    from: streaming-experience
+    to: dvd-by-mail
+    sign: negative
+    lag_days: 180
+    elasticity:
+      min: 0.2
+      mode: 0.45
+      max: 0.8
+    evidence_grade: 3
+    confidence: 0.5
+note: >-
+  Held as a named account in its own right, not read implicitly from the overlay's `edges`
+  collection — so an ensemble that includes it is exercising the same code path any other named
+  account would go through, with no special case for "the primary one".
+""",
+    "orgs/netflix/causal_accounts/rival-aggressive-cannibalisation.yaml": """\
+id: rival-aggressive-cannibalisation
+name: Streaming cannibalises DVD faster than the base case assumes
+edges:
+  streaming-displaces-dvd:
+    from: streaming-experience
+    to: dvd-by-mail
+    sign: negative
+    lag_days: 120
+    elasticity:
+      min: 0.5
+      mode: 0.65
+      max: 0.9
+    evidence_grade: 3
+    confidence: 0.45
+note: >-
+  Same evidence grade as the base case, same edge, same two components — a genuine disagreement
+  about magnitude and lag, which is exactly what a rival causal account is for. Nothing here says
+  which is right; the reported uncertainty is the spread between them, adjudicated over time by
+  calibration and never by authorship or recency.
+""",
+    "orgs/netflix/causal_accounts/rival-conservative-view.yaml": """\
+id: rival-conservative-view
+name: Streaming and DVD are more independent than the base case assumes
+edges:
+  streaming-displaces-dvd:
+    from: streaming-experience
+    to: dvd-by-mail
+    sign: negative
+    lag_days: 240
+    elasticity:
+      min: 0.05
+      mode: 0.15
+      max: 0.3
+    evidence_grade: 3
+    confidence: 0.4
+note: >-
+  A third named account, so "dropping any one changes nothing about the rest" has three to drop
+  from rather than two — the same reason build ticket 16's netflix fixture carries three world
+  models rather than two.
+""",
     # A regrade in each direction, so both are exercised. Strengthening is the one to be
     # suspicious of: it is how a model assertion becomes a measurement.
     "orgs/netflix/regrades/streaming-displaces-dvd-strengthened.yaml": """\
@@ -1270,4 +1335,311 @@ def build_regime_org(dest: str | Path, planted: bool = False) -> Path:
     _write(root, _REGIME_OUTCOME)
     git(root, "add", "-A")
     git(root, "commit", "-q", "-m", "the answer key", dated="2013-01-05T00:00:00+00:00")
+    return root
+
+
+# -- the Carillion answer key (build ticket 38, decision ticket 19) -------------------------
+#
+# The primary backtest key. Chosen for low notoriety over fame
+# (.scratch/twin/research/opportunity-cases.md, .scratch/twin/research/flagship-osint-scoping-wave2.md):
+# success against a famous collapse is not
+# distinguishable from reciting it, and Carillion is unusually well-instrumented precisely
+# because it is not famous in the way Enron or Lehman are.
+#
+# Every signal below is a real, dated, publicly documented fact, cited at the point it is
+# authored. Two kinds of source, deliberately not one: **contemporaneous company disclosures**
+# (the profit warnings, the liquidation itself — dated the day they happened) and **adversarial
+# regulatory findings** (the FCA's 2022 decision notices, which retrospectively ruled three 2016-17
+# announcements misleading — the announcements themselves are dated and contemporaneous even
+# though the finding that they were misleading came later; each signal's `date` is the
+# announcement's own date, not the finding's, because that is the date the fact was public). HC 769
+# (the joint BEIS/Work and Pensions Committees' report, published 2018-05-16) is cited only on the
+# outcome, never on a signal: it is the resolved answer, and using it to date a signal would be
+# hindsight leaking into ground truth that is supposed to be contemporaneous.
+#
+# Commits are dated to match, in order — the same discipline `build_regime_org` uses — so a real
+# rewind (`primitives.rewind`, not the date-filter-only fallback) can walk this history: unlike the
+# main netflix/intel fixture, this repository's own commits span 2016-2018, so `twin backtest`
+# against `--at 2017-07-10` (the day of the first profit warning) reads a repository that actually
+# existed then rather than falling back to `ingestion_history.available: false`.
+
+CARILLION_ORG = "carillion"
+
+# The world layer is shared and may never reference a tenant (`world_never_references_overlay`),
+# so the proposition here is deliberately generic — the same way netflix's own proposition never
+# says "Netflix" — and Carillion's own name lives only in the overlay below, where a tenant is
+# expected to appear.
+_CARILLION_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/contractor-enters-insolvency-by-2018.yaml": """\
+id: contractor-enters-insolvency-by-2018
+text: The subject enters compulsory liquidation before the end of 2018.
+resolves_on: '2018-12-31'
+""",
+}
+
+_CARILLION_BASE: dict[str, str] = {
+    "orgs/carillion/components/carillion-uk-construction.yaml": """\
+id: carillion-uk-construction
+name: Carillion's UK construction and support-services business
+kind: activity
+evolution: product
+visibility: 0.5
+""",
+    "orgs/carillion/world_models/market-consensus-2016.yaml": """\
+id: market-consensus-2016
+name: Market consensus, pre-crisis
+credence: 0.6
+note: >-
+  A low prior, deliberately — Carillion was a FTSE 250 constituent and a going concern by every
+  public account until 2017. The point of a low-notoriety key is that the twin has to earn a
+  higher belief from the signals below, not start from one.
+beliefs:
+  contractor-enters-insolvency-by-2018: 0.05
+""",
+    "orgs/carillion/scenarios/would-the-twin-have-flagged-it.yaml": """\
+id: would-the-twin-have-flagged-it
+question: >-
+  As of the first profit warning, would the twin already have had grounds to flag Carillion's UK
+  construction business?
+proposition: contractor-enters-insolvency-by-2018
+at: '2017-07-10'
+horizon: '2018-12-31'
+components:
+  - carillion-uk-construction
+world_models:
+  - market-consensus-2016
+""",
+}
+
+# Three RNS announcements the FCA's 2022 decision notices (Richard Adam; Zafar Khan; Carillion plc
+# (in liquidation), all fca.org.uk/publication/decision-notices/) later ruled "recklessly ...
+# misleading", for not reflecting "significant deteriorations in the expected financial
+# performance of Carillion's UK construction business". Dated at each announcement's own date, and
+# in three separate dicts rather than one so each can be committed on its own real-dated commit.
+_CARILLION_MISLEADING_RNS_1: dict[str, str] = {
+    "orgs/carillion/signals/rns-2016-12-07.yaml": """\
+id: rns-2016-12-07
+date: '2016-12-07'
+steep: economic
+source: Carillion plc RNS announcement, 2016-12-07
+statement: >-
+  A trading update on financial performance generally and the UK construction business
+  specifically. The FCA's 2022 decision notices later found this announcement, and two that
+  followed it, reckless and misleading for not reflecting the business's true deterioration.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.fca.org.uk/publication/decision-notices/carillion-plc-in-liquidation-2022.pdf
+""",
+}
+
+_CARILLION_MISLEADING_RNS_2: dict[str, str] = {
+    "orgs/carillion/signals/rns-2017-03-01.yaml": """\
+id: rns-2017-03-01
+date: '2017-03-01'
+steep: economic
+source: Carillion plc RNS announcement, 2017-03-01
+statement: >-
+  A second trading update, also later found reckless and misleading by the FCA for the same
+  reason as the 2016-12-07 announcement.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.fca.org.uk/publication/decision-notices/carillion-plc-in-liquidation-2022.pdf
+""",
+}
+
+_CARILLION_MISLEADING_RNS_3: dict[str, str] = {
+    "orgs/carillion/signals/rns-2017-05-03.yaml": """\
+id: rns-2017-05-03
+date: '2017-05-03'
+steep: economic
+source: Carillion plc RNS announcement, 2017-05-03
+statement: >-
+  A third trading update, the last of the three the FCA's 2022 decision notices found reckless
+  and misleading — after this date the finding is that increasing financial risk in the UK
+  construction business was being concealed rather than merely unrecognised.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.fca.org.uk/publication/decision-notices/carillion-plc-in-liquidation-2022.pdf
+""",
+}
+
+_CARILLION_PROFIT_WARNING_1: dict[str, str] = {
+    "orgs/carillion/signals/profit-warning-2017-07-10.yaml": """\
+id: profit-warning-2017-07-10
+date: '2017-07-10'
+steep: economic
+source: Carillion plc trading update and press coverage, 2017-07-10
+statement: >-
+  A profit warning: GBP 845m of contract write-downs concentrated in UK construction and Middle
+  East markets, the chief executive resigns with immediate effect, the interim dividend is
+  cancelled, and the shares lose roughly 70% of their value over the announcement and the two
+  trading days that followed.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://commonslibrary.parliament.uk/research-briefings/cbp-8206/
+""",
+}
+
+_CARILLION_SHORT_INTEREST: dict[str, str] = {
+    "orgs/carillion/signals/short-interest-2017-09-30.yaml": """\
+id: short-interest-2017-09-30
+date: '2017-09-30'
+steep: economic
+source: IHS Markit securities-lending data, reported in financial press, 2017-09-30
+statement: >-
+  Carillion is reported among the most heavily shorted stocks on the London Stock Exchange by
+  percentage of shares outstanding on loan — a dated, adversarial market position visible under
+  the FCA's net-short-position disclosure regime, not a retrospective narrative.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.fca.org.uk/markets/short-selling/notification-disclosure-net-short-positions
+""",
+}
+
+_CARILLION_PROFIT_WARNING_2: dict[str, str] = {
+    "orgs/carillion/signals/profit-warning-2017-09-29.yaml": """\
+id: profit-warning-2017-09-29
+date: '2017-09-29'
+steep: economic
+source: Carillion plc trading update, 2017-09-29
+statement: >-
+  A second profit warning: cumulative contract write-downs reach GBP 1,045m, equivalent to the
+  company's previous seven years of profit combined.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://commonslibrary.parliament.uk/carillion-collapse-what-went-wrong/
+""",
+}
+
+_CARILLION_PROFIT_WARNING_3: dict[str, str] = {
+    "orgs/carillion/signals/profit-warning-2017-11-17.yaml": """\
+id: profit-warning-2017-11-17
+date: '2017-11-17'
+steep: economic
+source: Carillion plc trading update, 2017-11-17
+statement: >-
+  A third profit warning; the shares fall further and net debt guidance deteriorates again.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://feeds.bbci.co.uk/news/business-42022956
+""",
+}
+
+_CARILLION_LIQUIDATION: dict[str, str] = {
+    "orgs/carillion/signals/compulsory-liquidation-2018-01-15.yaml": """\
+id: compulsory-liquidation-2018-01-15
+date: '2018-01-15'
+steep: political
+source: High Court compulsory liquidation order, 2018-01-15
+statement: >-
+  A compulsory liquidation order is made against Carillion plc on the petition of its own
+  directors. The High Court appoints the Official Receiver as liquidator with immediate effect.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://commonslibrary.parliament.uk/research-briefings/cbp-8206/
+""",
+}
+
+def _carillion_claim(signal_id: str) -> dict[str, str]:
+    """One claim binding `signal_id` to the single component this key exercises. Grade 1
+    ("dated natural experiment" — twin/evidence-ladder.yaml): every signal is a dated, observable
+    event with data on both sides of it, not a model assertion.
+
+    A function rather than a batched dict, so `build_carillion_org` can commit each claim in the
+    same commit as the signal it binds — the claim exists in this repository's history as of the
+    same real date the signal does, not months later after the collapse (build ticket 38 review).
+    """
+    return {
+        f"orgs/carillion/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: carillion-uk-construction
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "The signal is a dated, publicly documented event about this business; the citation is on the signal itself."
+"""
+    }
+
+_CARILLION_OUTCOME: dict[str, str] = {
+    "orgs/carillion/outcomes/carillion-collapse-resolved.yaml": """\
+id: carillion-collapse-resolved
+proposition: contractor-enters-insolvency-by-2018
+observed: true
+resolved_on: '2018-01-15'
+source: >-
+  High Court compulsory liquidation order, 2018-01-15; adversarial post-mortem in HC 769 (the
+  joint Business, Energy and Industrial Strategy and Work and Pensions Committees' report
+  "Carillion", published 2018-05-16, https://publications.parliament.uk/pa/cm201719/cmselect/cmworpen/769/769.pdf).
+contamination: low
+source_dated: true
+note: >-
+  Chosen for low notoriety over fame (.scratch/twin/research/opportunity-cases.md): a model that flags Carillion
+  is not distinguishable from one that has memorised Enron unless the key itself is obscure enough
+  that reciting it is not an option. HC 769 is cited here, on the outcome, and nowhere on a signal
+  above — it is published after resolution and using it to date a signal would let hindsight into
+  ground truth that is supposed to be contemporaneous.
+""",
+}
+
+
+def build_carillion_org(dest: str | Path) -> Path:
+    """The primary backtest key (build ticket 38): a real, dated, adversarially-sourced answer
+    key, with commit history that actually spans 2016-2018 so a real rewind has something to read.
+
+    Signals are committed close to their own real date — the twin is modelled as having ingested
+    each fact roughly when it became public — which is what makes `as-consumed` here a genuine
+    test of the ingestion-history leg rather than the date-filter-only fallback the main
+    netflix/intel fixture is limited to (`twin/regimes.py`'s first named limit).
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _CARILLION_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2016-11-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/carillion/meta.yaml": (
+            f"id: {CARILLION_ORG}\nunit: overlay\norg: {CARILLION_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _CARILLION_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the first misleading update",
+        dated="2016-11-15T00:00:00+00:00")
+
+    for signal_id, files, message, dated in (
+        ("rns-2016-12-07", _CARILLION_MISLEADING_RNS_1, "an RNS trading update", "2016-12-07T09:00:00+00:00"),
+        ("rns-2017-03-01", _CARILLION_MISLEADING_RNS_2, "a second RNS trading update", "2017-03-01T09:00:00+00:00"),
+        ("rns-2017-05-03", _CARILLION_MISLEADING_RNS_3, "a third RNS trading update", "2017-05-03T09:00:00+00:00"),
+        ("profit-warning-2017-07-10", _CARILLION_PROFIT_WARNING_1, "the first profit warning",
+         "2017-07-10T09:00:00+00:00"),
+        ("profit-warning-2017-09-29", _CARILLION_PROFIT_WARNING_2, "the second profit warning",
+         "2017-09-29T09:00:00+00:00"),
+        ("short-interest-2017-09-30", _CARILLION_SHORT_INTEREST, "the short-interest position, reported",
+         "2017-09-30T09:00:00+00:00"),
+        ("profit-warning-2017-11-17", _CARILLION_PROFIT_WARNING_3, "the third profit warning",
+         "2017-11-17T09:00:00+00:00"),
+        ("compulsory-liquidation-2018-01-15", _CARILLION_LIQUIDATION, "compulsory liquidation",
+         "2018-01-15T09:00:00+00:00"),
+    ):
+        # Signal and claim land in the same commit: the binding exists in this repository's
+        # history as of the same real date the signal does, not batched in months later.
+        _write(root, {**files, **_carillion_claim(signal_id)})
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", message, dated=dated)
+
+    _write(root, _CARILLION_OUTCOME)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the answer key, citing HC 769", dated="2018-05-17T00:00:00+00:00")
     return root

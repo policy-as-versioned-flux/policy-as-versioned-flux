@@ -8,7 +8,7 @@
 # so a role that was later renamed, split or withdrawn does not silently change what an old
 # signature meant. Bump `version` in the same commit as any change to `roles`.
 schema: twin.roles/v1
-version: 1
+version: 2
 roles:
   - id: model-steward
     accountable_for: >-
@@ -23,3 +23,11 @@ roles:
       A perspective's red lines and the universal floor it may not override. Lands with build
       ticket 26; the role is registered ahead of it so the register does not change under a
       signature made in between.
+  - id: challenger
+    accountable_for: >-
+      A challenge raised against a specific claim in a specific artefact (build ticket 60) — that
+      the claim named is the one disputed, and the reason given is theirs.
+  - id: challenge-resolver
+    accountable_for: >-
+      A resolution recorded against a challenge — that the same claim the challenge named has been
+      addressed, not a different, more comfortable one.

@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 11 \u2014 build ticket 09 ticks sense-move criterion 7 (scheduled cadence + volume), moving the capabilities digest embedded in every artefact's pins",
-  "capabilities_digest": "4e20903b2c7dee13212c47345ca4718e3af515b28a8276a29fdec9c50f45504e",
+  "authorised_by": "decision ticket 08 \u2014 build tickets 32, 37 and 60 add netflix causal_accounts fixture files and capability-yaml checks that move capabilities_digest, so every fixture artefact's digest moves with them",
+  "capabilities_digest": "940e80bea330111c42921a1b113601bd38e73d387960a82d5b17ed374ac458a3",
   "digests": {
-    "blast-radius": "e664b8bcbb0a371fc480f620b2d03825fd000d12f3863977e9a9c642711c70df",
-    "bound-signal": "b0ba59c62a72f9923bac56f61378198bfe9744e3a2c26049888b1b3d5f4b809a",
-    "forecast-bundle": "a486002252362f4066a075f5805918c00b08290c9848e4707a22fc3c4cda3e07",
-    "graph": "78686a6628eee38dcffa0706c5b5b83c4d1f856ae629a12b49812589aa5ba3d3",
-    "intervention": "e6c6a2aea115f6f5e4e5baf33fefe6729c190f5c786c4a16330c2fa55f28ae18",
-    "observation": "85a78a7648f16e71cdc73e91b6d277fa955aa233bdd8d6b16b7b5ab1cd8e9fe5",
-    "priced-impact": "5bc0d4be9b85c4fcd913f8b9d5f2afd76eb06824d1eda75905b53c872d357b8a",
-    "priced-option-set": "aaa36fa34c05e2f77ee66fecc48f9e6c544195f58b4407595c479f2b266c61ea",
-    "propagation": "757480c77ae2d79a75ba6698095ff5aec0dd40c77b98c1b0c086cd1d97b1b814",
-    "rewound-model": "c0fa8404c0edfaaca105a901fac0011bdfb9aaf2aed8c051136a02939fe52920",
-    "scenario-exposure": "de5b8b1ff89fe4b18ed2cdb1596b23ac59812238678f03b31703878ee896d6a8",
-    "score-card": "3d38ea66fee73748692ac74a4b1da9218b34ea2e39edae033dac13a493898ff4"
+    "blast-radius": "7c0fb2ec9a4d4b5323c3e3f3265f9f8d5e244f54d2a69a02c2075c655123909f",
+    "bound-signal": "28bc9ae89bf6a7217cc1600c61949087b9a1663f8448eb7dfda00a267531aa04",
+    "forecast-bundle": "ea7a3fcfc27be715ef5d08b157ecadfd7b0dd3ca5c9901412626ae73fad87a6a",
+    "graph": "2f48bcef88e5bd7c308d1149ed125392c911d3c2007ed08b2c9d2540ba5aec8e",
+    "intervention": "d1a09fdc378ca0257af3a15a7f2c5928e73182420800b8b822ae94307ad037d2",
+    "observation": "f4a1fa58232609db019631cf3c2ffcab4edeb1c952716ad666c8d04ad6209cdb",
+    "priced-impact": "39ada414e504013d141b47fb876d988ef0a4460351516b8aca1dd581bfc602ac",
+    "priced-option-set": "79fbcece6d13e1f942b1c8f560db9ffd4e8af3234774645e6a37978c0e4e3101",
+    "propagation": "594fd7c81f7c13e06bb3a2ea1b99fc3f9795c1620c34158938e30d0f9a441a80",
+    "rewound-model": "28551013884e812f085d3b268a1c301e5a93af3071c15974722af36ea44b1046",
+    "scenario-exposure": "2bf4c23afa6cb9a897a80deb00f1248975e17fdbcd7fdc7405df49a6450e686c",
+    "score-card": "fb8ec3f39968d75564f278510130b3fb2520a38a2e3ee6605fba4ef1d341ec0a"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

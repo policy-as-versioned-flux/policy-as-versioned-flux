@@ -176,7 +176,7 @@ def test_a_card_scored_after_a_later_commit_still_reproduces(model_repo_dir: Pat
 @pytest.mark.parametrize(
     ("command", "complaint"),
     [
-        (["twin", "backtest", "--org", "netflix"], "not a replayable command"),
+        (["twin", "backtest", "--org", "netflix"], "names no --scenario"),
         (["twin", "run", "--org", "netflix"], "names no --scenario"),
         (["twin", "run", "--scenario", "dvd-decline-2011"], "names no --org"),
         (["twin"], "not a replayable command"),

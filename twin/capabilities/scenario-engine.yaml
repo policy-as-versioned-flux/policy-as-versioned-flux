@@ -9,14 +9,9 @@ criteria:
     ticked_by: build ticket 06
   - index: 2
     text: "Concrete semantics for fast-forward, rewind and play, each distinguished."
-    checked: false
-    # Two of three verbs now, and both whole. **Play** is `do(x)` from build ticket 22. **Rewind**
-    # is `twin/primitives.py rewind()` at build ticket 35 for the *time* half, and build ticket 36
-    # supplied the other half decision ticket 13 Q2 asks for — a past state restored **under an
-    # information gate**, with Q2b's hard rule met because the regime is a required execution
-    # parameter with no default and the gate it ran travels in the artefact. **Fast-forward** —
-    # projection with no intervention — is build ticket 37 and does not exist, so this criterion
-    # stays unchecked. Two thirds of a three-verb semantics is not the semantics.
+    checked: true
+    evidence: "twin/verbs.py run() is fast-forward — projection with no intervention, demonstrated in tests/test_four_verbs.py::test_projection_is_run_with_no_intervention. twin/primitives.py rewind() is the time half of rewind (build ticket 35) and twin/regimes.py the information-gate half (build ticket 36). twin/primitives.py Do is play (build ticket 22). Build ticket 37 composes the two primitives into all four operations — projection alone, do() alone (act-now), rewind+do() (the counterfactual), rewind+run() (the backtest, `twin backtest`) — with no backtest-specific code path: harness guard backtest_is_a_pure_composition asserts an explicit rewind+run computes the identical forecast run() alone computes at the same time, differing only in which command produced it."
+    ticked_by: build ticket 37
   - index: 3
     text: "Where scenarios live + how they are versioned/diffed."
     checked: false

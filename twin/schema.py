@@ -464,6 +464,25 @@ def _refuse_scalar(value: Any, where: str) -> None:
         )
 
 
+# One causal-account edge override: the same causal vocabulary an `influences` edge asserts
+# (`from`/`to`/`sign`/`lag_days`/`elasticity`/`evidence_grade`), minus `id` and `type` — the
+# mapping key supplies the id and every entry is implicitly `influences`, because a rival account
+# is a claim about a *measured effect*, never about which components structurally depend on which.
+_CAUSAL_ACCOUNT_EDGE = Schema(
+    required={
+        "from": ident, "to": ident, "sign": one_of(*SIGNS), "lag_days": whole,
+        "elasticity": pert, "evidence_grade": evidence_grade,
+    },
+    optional={"confidence": unit_interval, "calibration": calibration},
+)
+
+
+def _causal_account_edge(value: Any, where: str) -> None:
+    if not isinstance(value, dict):
+        raise SchemaError(f"{where}: expected a mapping")
+    _CAUSAL_ACCOUNT_EDGE.validate(value, where)
+
+
 SCHEMAS: dict[str, Schema] = {
     "world-meta": Schema(
         required={"id": ident, "unit": one_of("world")},
@@ -653,6 +672,17 @@ SCHEMAS: dict[str, Schema] = {
     "own-data": Schema(
         required={"id": ident, "subject": ident, "observations": list_of(amount), "basis": text},
     ),
+    # A rival causal account (build ticket 32, decision tickets 07/08): a named, sparse set of
+    # overrides on specific causal edges, held beside the overlay's own `edges` collection rather
+    # than replacing it wholesale — most of a graph is never in dispute, and an account exists to
+    # say where this one differs, not to re-author everything. Deliberately closed to exactly
+    # `id`/`name`/`edges`/`note`: no field here could rank one account above another by who wrote
+    # it or when (decision ticket 08 — adjudicated by calibration over time, never by authorship
+    # or recency), because the schema has no slot for either to attach to.
+    "causal-account": Schema(
+        required={"id": ident, "name": text, "edges": mapping_of(_causal_account_edge)},
+        optional={"note": text},
+    ),
 }
 
 
@@ -781,4 +811,5 @@ COLLECTION_KINDS: dict[str, str] = {
     "observations": "observation",
     "priors": "prior",
     "own_data": "own-data",
+    "causal_accounts": "causal-account",
 }

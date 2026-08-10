@@ -1,0 +1,19 @@
+# Versioned pass thresholds for the skill-eval harness (build ticket 42, decision ticket 20).
+#
+# One threshold per skill: the minimum fraction of a fixture corpus a skill must get right to
+# pass. Lowering a threshold is exactly as visible as lowering an invariant's pinned hash
+# (twin/invariants/manifest.yaml) — the harness check `skill_thresholds_lowered_only_with_citation`
+# refuses a decrease with no `authorised_by` citing a decision ticket.
+#
+# `toy-classifier` is a fixture skill, not one of the six real skills (signal-classify,
+# causal-claims, evolution-judge, substrate-generator, gameplay-lens, ethics-gate) — none of those
+# exist yet (decision ticket 20). It exists to prove the harness against something, because a
+# harness tested only against skills that do not exist yet is untested.
+schema: twin.skill-thresholds/v1
+version: 1
+thresholds:
+  toy-classifier:
+    threshold: 0.8
+    note: >-
+      A fixture skill's corpus is small and hand-authored, so 0.8 is a round, defensible bar
+      rather than a fitted one.

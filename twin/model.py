@@ -35,7 +35,7 @@ BEHAVIOURAL = "behavioural"
 WORLD_COLLECTIONS = ("components", "propositions", "world_models", "priors")
 OVERLAY_COLLECTIONS = (
     "components", "world_models", "signals", "claims", "scenarios", "outcomes", "people", "edges",
-    "perspectives", "regrades", "responses", "own_data",
+    "perspectives", "regrades", "responses", "own_data", "causal_accounts",
 )
 
 
@@ -142,6 +142,10 @@ class Overlay:
     # Sparse own-data observations, keyed by the file's own id (build ticket 31). Looked up by
     # subject via `own_data_for`, the overlay half of the credibility blend.
     own_data: dict[str, dict[str, Any]]
+    # Rival causal accounts (build ticket 32) — each a sparse set of overrides on specific causal
+    # edge ids, held beside `edges` rather than replacing it. None is canonical; `causal_graph`
+    # treats every id the same way, this overlay's own `edges` collection included.
+    causal_accounts: dict[str, dict[str, Any]]
 
     @classmethod
     def load(cls, repo: ModelRepo, org: str) -> "Overlay":
@@ -184,6 +188,12 @@ class Overlay:
         if ident in self.world.world_models:
             return self.world.world_models[ident]
         raise ModelError(f"no world model {ident!r} in overlay {self.org!r} or its pinned world layer")
+
+    def causal_account(self, ident: str) -> dict[str, Any]:
+        if ident not in self.causal_accounts:
+            known = ", ".join(sorted(self.causal_accounts)) or "none"
+            raise ModelError(f"no causal account {ident!r} in overlay {self.org!r} (have: {known})")
+        return self.causal_accounts[ident]
 
     def proposition(self, ident: str) -> dict[str, Any]:
         if ident in self.world.propositions:
@@ -245,6 +255,20 @@ class Overlay:
         self._check_scenarios()
         self._check_responses()
         self._check_own_data()
+        self._check_causal_accounts()
+
+    def _check_causal_accounts(self) -> None:
+        for account_id, account in sorted(self.causal_accounts.items()):
+            for edge_id, override in sorted(account["edges"].items()):
+                for end in ("from", "to"):
+                    try:
+                        self.component(str(override[end]))
+                    except ModelError:
+                        raise ModelError(
+                            f"causal account {account_id!r} edge {edge_id!r}: {end} "
+                            f"{override[end]!r} is not a component in this overlay or its "
+                            "pinned world layer"
+                        ) from None
 
     def _check_own_data(self) -> None:
         """Own-data observations name a subject a world-layer prior actually declares.
@@ -381,6 +405,35 @@ class Overlay:
             people=dict(self.people),
             edges=tuple(sorted(edges, key=lambda e: (e.type, e.source, e.target))),
             regrades=tuple(self.regrade_records()),
+        )
+
+    def causal_graph(self, account_id: str) -> "Graph":
+        """The graph `graph()` builds, with a named rival causal account's edge overrides applied
+        (build ticket 32). Sparse by design: an account overrides only the causal edge ids it
+        names, so most of a graph is inherited unchanged and an account exists to say where it
+        differs, not to re-author everything. Structural and person edges never change — a causal
+        account is a claim about measured effect, never about which components exist.
+        """
+        account = self.causal_account(account_id)
+        base = self.graph()
+        overrides = {str(k): v for k, v in account["edges"].items()}
+        edges = [e for e in base.edges if not (e.type == CAUSAL_EDGE and e.id in overrides)]
+        edges += [
+            Edge(
+                id=ident,
+                type=CAUSAL_EDGE,
+                source=str(e["from"]),
+                target=str(e["to"]),
+                causal={f: e[f] for f in CAUSAL_FIELDS + CAUSAL_ONLY_OPTIONAL + ("confidence",) if f in e},
+            )
+            for ident, e in sorted(overrides.items())
+        ]
+        return Graph(
+            org=self.org,
+            components=base.components,
+            people=base.people,
+            edges=tuple(sorted(edges, key=lambda e: (e.type, e.source, e.target))),
+            regrades=base.regrades,
         )
 
     def pins(self) -> dict[str, Any]:

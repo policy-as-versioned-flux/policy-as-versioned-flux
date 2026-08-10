@@ -26,12 +26,15 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin intervene --repo R --component C # do(x): cut the incoming edges, propagate downstream
 ./bin/twin observe --repo R --component C  # observe(x): belief updates about the causes too
 ./bin/twin rewind --repo R --at T          # the model state at a declared time (abduction)
+./bin/twin backtest --repo R --org O --scenario S --regime as-consumed --at T # rewind, then run — one composition
 ./bin/twin run --repo R --scenario S --regime as-consumed   # the gate is required, with no default
 ./bin/twin regimes --repo R --scenario S   # the same scenario under all three, with the gaps
 ./bin/twin positions --repo R --org O --scenario S  # believed, rival, revealed — and the deltas between them
+./bin/twin causal-accounts --repo R --org O --origin X --account A1 --account A2 # rival causal accounts, spread not privilege
 ./bin/twin sweep --repo R [--repo R2 ...]  # every scenario, every org, unconditionally — no --scenario
 ./bin/twin reliability --score-card C1 --score-card C2 # bins over a pooled population, empty bins shown
 ./bin/twin severity --mu M --sigma S --threshold U --xi X --beta B --alpha A # loss-exceedance: VaR beside TVaR
+./bin/twin severity-anchor --subject data-breach-loss --alpha A # the same curve, fit from cited public quantiles
 ./bin/twin drift                           # the Flux drift measurement: coverage, events, no verdict
 ./bin/twin options --repo R --perspective P # the choice set after the pre-filter, survivors costed
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
@@ -40,6 +43,9 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin credibility --repo R --org O --subject S  # the world prior blended with an org's own sparse data
 ./bin/twin worksheet --repo P              # the pocket org against its hand-computed worksheet
 ./bin/twin sign <artefact> --role R        # accountability for an authored artefact
+./bin/twin challenge --artefact A --claim-path P --reason R --out O   # dispute one claim in one artefact
+./bin/twin resolve-challenge --challenge C --response R --out O       # names only what the challenge named
+./bin/twin verify <artefact> --repo R --challenge C1 [--challenge C2 ...]  # shows open/resolved challenges too
 ./bin/twin grade                           # computed depth grades, with evidence
 ```
 
@@ -277,6 +283,74 @@ history straddles T, which is why the sensing gap needs it. And **a regrade is n
 `schema.DATED_FACTS` covers facts about the world, and a regrade is the twin's own record of how
 strong a claim is.
 
+## `twin backtest`, and all four operations from two primitives
+
+Decision ticket 13 Q2's claim is that the whole product surface is compositions of exactly two
+primitives — time (`rewind`) and intervention (`do`/`observe`) — and that claim was untested until
+build ticket 37 demonstrated all four: **projection** (fast-forward) is `twin run` with no
+intervention; **act-now** is `twin intervene` with no rewind; the **counterfactual** is
+`primitives.rewind()` followed by `twin intervene`; the **backtest** is `primitives.rewind()`
+followed by `twin run` — literally, not by convention. `cmd_backtest` calls exactly
+`primitives.rewind` and `verbs.run` and nothing else, checked against its own source by harness
+guard `backtest_is_a_pure_composition` rather than trusted from its docstring — the same discipline
+`prefilter_precedes_pricing` applies to `twin/options.py`'s public surface.
+
+**The composition computes what `run()` already computes, not a second implementation of it.**
+`run()`'s own `as-consumed` regime already rewinds internally through `regimes.read_at()`; calling
+`primitives.rewind()` explicitly first and then `run()` at the same time produces a
+byte-identical forecast to calling `run()` alone, save for which command is recorded as having
+produced it (`tests/test_four_verbs.py::test_backtest_and_run_compute_the_identical_forecast`).
+That redundancy is the point: it proves the explicit two-primitive composition and `run()`'s own
+internal machinery are the same mechanism, not two mechanisms that happen to agree today.
+
+`twin backtest`'s own subject-matter limit is the one `twin/regimes.py` already names: the netflix
+fixture's git history begins 2026-01-01, so a rewind to the `dvd-decline-2011` scenario's own
+declared 2011 date refuses honestly (`PrimitiveError`) rather than answering with today's model
+wearing 2011's date. `tests/test_four_verbs.py` backtests at `2026-01-01` instead — the one date
+this synthetic fixture's own history can actually support — to demonstrate the mechanism rather
+than a historically faithful Netflix backtest, which decision ticket 22's demo-slice work (co-
+flagship scoring) is where that belongs.
+
+Scoring is not folded into `backtest` — it emits a `forecast-bundle`, the identical artefact kind
+`run()` emits, and the existing `twin score` runs on it exactly as it would on `run()`'s output
+(`tests/test_four_verbs.py::test_a_backtest_scores_against_the_record`). `reproduce.py`'s `VERBS`
+now names `backtest` too, reusing `run()`'s own replay branch rather than a second one: a
+backtest's pins are the rewound commit `primitives.rewind` already resolved to, so replaying it is
+replaying `run()` against a repository already opened at that pin.
+
+## The Carillion answer key: the primary backtest, and a repository that actually has history
+
+`fixtures.build_carillion_org()` (build ticket 38) is the primary backtest key research chose
+(`.scratch/twin/research/opportunity-cases.md`, `.scratch/twin/research/flagship-osint-scoping-wave2.md`) for **low notoriety
+over fame**: a model that flags Carillion is not distinguishable from one that has memorised Enron
+unless the key itself is obscure enough that reciting it is not an option. Carillion is unusually
+well-instrumented for this — a free, dated, statutory FCA short-position disclosure regime and a
+joint parliamentary inquiry (HC 769) give contemporaneous, adversarial ground truth rather than a
+cooperative survivor narrative.
+
+Eight signals, each a real, dated, publicly documented fact, cited by URL: three RNS trading
+updates (7 Dec 2016, 1 Mar 2017, 3 May 2017) the FCA's 2022 decision notices later ruled
+"recklessly ... misleading" for not disclosing the UK construction business's true deterioration;
+three profit warnings (10 Jul, 29 Sep, 17 Nov 2017); a reported short-interest position (30 Sep
+2017); and the compulsory liquidation itself (15 Jan 2018). **HC 769 is cited only on the outcome,
+published 16 May 2018** — never on a signal, because it postdates every one of them and using it to
+date a signal would let hindsight into ground truth that is supposed to be contemporaneous. The
+outcome declares `contamination: low`, the same field build ticket 40's discount will eventually
+read.
+
+**This repository's own commits are dated to match, in order (2016-11-01 through 2018-05-17) —
+the discipline `build_regime_org` established — so `twin backtest --at 2017-08-01` reads a
+repository that genuinely existed then.** That is the one thing the main netflix/intel fixture
+cannot do: netflix's `dvd-decline-2011` scenario is dated 2011 but its repository was built this
+year, so `regimes.ingestion_history` there reports `available: false` and `as-consumed` rests on
+fact dates alone. Carillion's does not — `ingestion_history.available` is `true` at every date
+`tests/test_carillion.py` tries, because a real commit exists to resolve to.
+
+The world layer's proposition is deliberately generic (`contractor-enters-insolvency-by-2018`),
+the same way netflix's own proposition never says "Netflix": `world_never_references_overlay`
+refuses a component or world model that names the tenant, so Carillion's name lives only in the
+`carillion` overlay, where a tenant is expected to appear.
+
 ## Believed, rival, revealed — and no privileged map
 
 `twin positions` (build ticket 16) is the other half of "no code path collapses an ensemble": once
@@ -299,6 +373,95 @@ suite level by harness guard `position_deltas_have_no_privileged_default`. Nothi
 which id is "believed" versus "rival": that would itself be the schema-level privilege the ticket
 refuses, so the module treats a scenario's whole `world_models` list identically and lets each
 world model's own `name` field carry whatever role its author gave it.
+
+## Rival causal accounts, and the ensemble spread they carry
+
+`twin causal-accounts` (build ticket 32) gives the causal layer the same treatment `twin
+positions` gives belief: `positions.py` already lets rival **world models** — belief
+probabilities — coexist with no privilege between them, but two evidenced people can also
+disagree about *how, mechanically, a shock actually propagates*, and until this ticket nothing
+represented that. A `causal-account` (`twin/schema.py`) is a named, **sparse** set of overrides on
+specific causal edge ids — most of a graph is never in dispute, so an account exists to say where
+it differs, not to re-author everything — and `Overlay.causal_graph(account_id)` reads it beside
+the overlay's own `edges` collection, which is itself just another nameable account with no code
+path privileging it.
+
+`twin/causal_accounts.py`'s `ensemble_spread` propagates each named account's own graph
+independently (`twin/propagate.py`, unmodified) and compares the primary path's attenuated mean at
+every reached component — the **spread between accounts, not either account's figure alone, is
+the reported uncertainty**. On the netflix fixture, `netflix-base-case` restates the overlay's own
+`streaming-displaces-dvd` edge, and `rival-aggressive-cannibalisation` / `rival-conservative-view`
+each claim a materially different magnitude and lag for the same edge — three genuinely rival
+accounts of the same causal claim, exercised in `tests/test_causal_accounts.py`.
+
+**Adjudication is by calibration, never by authorship or recency — structurally, not by
+convention.** The `causal-account` schema is closed to `id`/`name`/`edges`/`note`: there is no
+field for an author or a date, so nothing could rank one account above another by either even if a
+caller wanted to. Harness guard `causal_accounts_have_no_privileged_default` asserts three things
+at once: dropping any one of the three named accounts changes nothing about the others' own
+figures; propagating a named account's graph and propagating `overlay.graph()` directly reach the
+same components (there is no special "primary" code path); and a `causal-account` document
+carrying a planted `author`/`created_at`/`priority` field does not load. This module builds no
+calibration mechanism of its own — rival causal accounts do not themselves emit the scoreable
+forecasts `twin/scoring.py` grades, a world model still does that via `twin run`/`twin score` — so
+"adjudicated by calibration over time" is a property this ticket makes representable, not a
+scoring loop it closes.
+
+## Contestability: arguing with the artefact is the workflow
+
+`twin challenge` / `twin resolve-challenge` (build ticket 60) make good on the unifying principle
+the constitution states outright: **a single number ends a conversation; a map sustains one.**
+A challenge is a versioned, signed, authored artefact (the same shape `twin constraints` is)
+naming exactly one claim in exactly one artefact — a dotted key-path, the same format
+`canon.walk_values` already produces — and freezing the value it disputed at the moment it was
+raised, so a later edit to the challenged artefact cannot retroactively change what was contested.
+
+**No hiding behind aggregation, structurally rather than by review.** `challenges.resolve()` takes
+no `claim_path` parameter: the path a resolution addresses is read out of the challenge it
+resolves, so there is no argument through which a resolution could talk about a roll-up instead of
+the constituent that was actually disputed. `refuse_answering_a_different_claim` is the second
+lock, for a resolution ever built by a path other than `resolve()` itself — the same double-lock
+`primitives.refuse_upstream_under_intervention` is for an intervention's body. Harness guard
+`a_challenge_to_a_constituent_survives_an_unrelated_resolution` demonstrates the failure mode
+directly: a resolution exists on the same artefact, for a *different* claim, and the original
+challenge still reports open.
+
+**Visible wherever the challenged artefact is visible, not a hidden queue.** `twin verify
+<artefact> --challenge C1 --challenge C2` prints every open and resolved challenge against that
+artefact before reproducing it — `challenges.for_artefact()` is the one function that decides what
+counts as open, so a reader of any tool built on it sees the same state rather than each caller
+inventing its own notion of "resolved". Two roles (`challenger`, `challenge-resolver`) join the
+register signatures already bind to, never a named individual.
+
+## The misuse catalogue, and logging a constraint removal with what it was worth
+
+`twin/misuse-catalogue.yaml` (build ticket 62) closes decision ticket 15's carried-forward item:
+seven entries, each naming a **mechanism**, not just a risk — a risk is a sentence anyone could
+write, a mechanism is the code a reader can go and check (`prefilter_precedes_pricing`,
+`derived_never_human_signed`, the regime gate, this ticket's own removal log, build ticket 60's
+`refuse_answering_a_different_claim`). Six of the seven point at mechanisms that already existed
+before this ticket; the catalogue is what makes them legible as a *set*.
+
+**Attractiveness is computed, never stated — a property of the code, not a habit of whoever calls
+it.** `misuse.log_removal()` carries no float parameter anywhere in its signature (harness guard
+`a_constraint_removal_with_no_computed_attractiveness_is_rejected` checks the signature itself,
+not just correct usage of it): the only way to produce a figure is to name a perspective, an
+option and the constraint being removed, and `compute_attractiveness()` re-runs
+`twin/options.py`'s own `prefilter()` with that one constraint stripped from the perspective's own
+declarations. On the netflix fixture, `the-operator` declares `insolvency` itself and
+`stake-the-quarter-on-one-title` crosses it — removing it re-prices that option at its real,
+authored cost rather than a number typed into a log.
+
+**Only a perspective's own declared constraint can be removed this way.** The universal floor is
+not a perspective's to remove — `refuse_floor_override` already forbids a perspective from even
+shadowing a floor id — so `compute_attractiveness` refuses when the named constraint is not one
+`the-operator` (or whichever perspective) declares itself. Removing a floor constraint is a
+governance-document edit, a larger and separate act this module does not cover.
+
+**A removal with no attractiveness record is rejected.** `verify_removals()` compares a
+perspective's declared constraint ids before and after and demands a matching log entry for every
+one that disappeared — logged per perspective, so a removal recorded against one perspective does
+not silently cover the same constraint id removed from another.
 
 ## The credibility prior: the world/overlay split earning its keep
 
@@ -453,8 +616,21 @@ Generalised Pareto tail at an authored peaks-over-threshold cut, reporting VaR b
 VaR alone — at every declared confidence level. It is standalone, the same shape `twin
 reliability` already is: no organisation, no component, no `ModelRepo`, because `twin price`
 prices a component from the perspective's declared valuation and deliberately carries no severity
-slot (see above). Anchoring these five parameters to a real component's evidence is build ticket
-25's separate job.
+slot (see above).
+
+**Anchored, not just illustrative (build ticket 25).** `twin severity-anchor --subject
+data-breach-loss` fits the same curve from `twin/severity-anchors.yaml`'s cited public quantiles
+rather than command-line floats. Three of the five parameters are defensible: `mu` and `sigma` are
+an exact closed-form two-point calibration against Cyentia IRIS 2025's median ($600K) and 95th
+percentile ($32M) loss figures for the 2015-2024 incident dataset, and `threshold` is set to that
+same 95th-percentile amount, so `tail_probability` derives to 0.05 by construction rather than
+being a second authored number. `xi` and `beta` are **marked unanchored, with a reason, rather
+than quietly assumed**: no public source in the reading list reports a fitted GPD shape for
+cyber-loss severity, only the qualitative finding (Eling & Wirfs 2019) that real fits on
+operational-risk cyber-loss data can be heavy enough to be infinite-mean — motivating an
+illustrative `xi` in that neighbourhood rather than a false anchor. `--sensitivity-xi` sweeps that
+unanchored parameter and reports how far the headline TVaR moves, so the honesty about what is not
+pinned is visible in the artefact, not only in the YAML.
 
 **TVaR, not VaR, is the point.** VaR names a threshold and says nothing about what lies beyond it.
 Two severities can share an identical VaR — at the tail threshold's own exceedance probability,
@@ -612,7 +788,7 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 28 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 653 tests
+`./bin/twin verify` — 35 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 753 tests
 across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
@@ -750,19 +926,31 @@ Named here so the skeleton cannot quietly become the definition of done.
   that organisation is graded well enough to price, so exactly one shock produces a figure. That
   is the design working, and it is also a very thin demonstration — the flagship subjects at
   71–77 are where a real evidence base has to carry it.
-- **Heavy tails and TVaR exist now; no empirical anchor and no trade-off curve.** Build ticket 24
-  built `twin/severity.py` — a lognormal body spliced to a GPD tail, TVaR in closed form, a
-  loss-exceedance curve — but it is standalone: nothing in `twin price` or the pocket org calls
-  it, because a price is still a declared valuation scaled point-wise by a propagated influence,
-  on purpose (`twin/pricing.py`'s no-severity-slot decision). Its own TVaR is tail-only too — a
-  confidence level whose VaR lands inside the lognormal body is refused rather than answered,
-  because that needs the body's own partial-mean formula, which this module does not carry
-  (`ponytail:` note in `twin/severity.py`). (25, 32–33.) Build ticket 25's subject changed with
-  build ticket 30: it anchors **valuations** now, because there is no severity to anchor. The
-  credibility-weighted blend those valuations will eventually be estimated *through* is build
-  ticket 31, and it is built — but nothing yet calls it from `twin exposure` or `twin price`,
-  because wiring a specific valuation through the blend is a modelling decision for whichever
-  ticket anchors that valuation, not a decision the blend mechanism itself makes.
+- **Heavy tails and TVaR exist now, anchored but still standalone; no trade-off curve.** Build
+  ticket 24 built `twin/severity.py` — a lognormal body spliced to a GPD tail, TVaR in closed
+  form, a loss-exceedance curve. Build ticket 25 anchored three of its five parameters to named,
+  dated public sources (`twin/severity-anchors.yaml`, `twin severity-anchor`) and marked the
+  other two — the GPD shape and scale — as honestly unanchored rather than falsely pinned, no
+  public source in the reading list fitting them for cyber loss. It is still standalone, though:
+  nothing in `twin price` or the pocket org calls it, because a price is still a declared
+  valuation scaled point-wise by a propagated influence, on purpose (`twin/pricing.py`'s
+  no-severity-slot decision). Its own TVaR is tail-only too — a confidence level whose VaR lands
+  inside the lognormal body is refused rather than answered, because that needs the body's own
+  partial-mean formula, which this module does not carry (`ponytail:` note in
+  `twin/severity.py`). (25, 32–33.) **A note this file carried from build ticket 30 said ticket
+  25's subject would change to anchoring the pocket org's own perspective **valuations** instead
+  of severity, since nothing consumes severity's parameters — that pivot did not happen.** The
+  build ticket's own acceptance criteria (`.scratch/twin/build/25-*.md`) are about the severity
+  distribution, unchanged, and this build satisfies them directly; anchoring the pocket org's
+  `400000`/`50000` fixture valuations would also mean hand-recomputing roughly fifteen
+  interlocking worksheet lines (27-28, 36-40, 68-69, and the credibility lines they feed) for a
+  synthetic hand-computable fixture that has no real-world counterpart to cite anyway, which is a
+  substantially larger and separately-scoped change than this ticket's text asks for. Recorded
+  here rather than silently picked either way — see the next bullet. The credibility-weighted
+  blend a real valuation would eventually be estimated *through* is build ticket 31, and it is
+  built — but nothing yet calls it from `twin exposure` or `twin price`, because wiring a specific
+  valuation through the blend is a modelling decision for whichever ticket anchors that
+  valuation, not a decision the blend mechanism itself makes.
 - **Mitigation credit is subtracted by the reader, not by the artefact.** Cost and credit are
   reported in the same unit and nothing computes a net, because a net is one number and one
   number ends the conversation. The trade-off curve across the ensemble is build ticket 33.
@@ -771,9 +959,10 @@ Named here so the skeleton cannot quietly become the definition of done.
   but the elasticities and costs in the fixtures are invented numbers exercising the shape. The
   discipline is enforced as a document, not as an authoring workflow, and nothing checks that a
   human followed it.
-- **The pocket org's severity has no empirical anchor, and neither do its valuations.** The
-  operator's `400000` and the staff council's `50000` are fixture numbers, stated as such. Build
-  ticket 25 replaces them with anchored ones.
+- **The pocket org's own valuations still have no empirical anchor.** The operator's `400000` and
+  the staff council's `50000` are fixture numbers, stated as such — `twin/severity.py`'s standalone
+  parameters are anchored now (build ticket 25), the pocket org's declared valuations are not, and
+  the two remain separate the way `twin/pricing.py`'s no-severity-slot decision keeps them.
 - **The pre-filter reads an authored `crosses` list.** An option declares which red line it
   crosses; nothing infers it. The constraint **set** is the authority on what exists — an id no
   perspective and no floor declares refuses to load — but an option that quietly omits the
@@ -808,9 +997,12 @@ Named here so the skeleton cannot quietly become the definition of done.
   from the fact sets each regime admits. The **model** residual needs a forecast that moves when
   the fact base moves, and nothing here infers a probability from a signal — so it is reported as
   *not computed*, never as zero. That is the honest state until the sense→move loop closes.
-- **No fast-forward, and therefore no backtest.** Rewind (abduction), `do()` (action) and the
-  information gate on rewind all exist; projection with no intervention does not, so
-  `rewind → play → fast-forward` cannot be run end to end. (37.)
+- **Fast-forward and backtest now exist, composed from the same two primitives, and inherit the
+  next bullet's stub too.** `rewind → play → fast-forward` runs end to end (`twin backtest`,
+  build ticket 37) — but "fast-forward" here is still `run()` reading a world model's *declared*
+  belief, the honest stub the next bullet names, not a causal simulation forward in time. What
+  build ticket 37 adds is the composition and the proof it is not a second implementation, not a
+  richer projection than `run()` already had.
 - **Forecast probabilities are read from a world model's declared belief.** Nothing infers them.
   This is the honest stub: the plumbing is real, the judgement is authored.
 - **Calibration is diagrams over what has actually been emitted, not a growing record.** Brier and
@@ -823,8 +1015,14 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
   produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
   sigstore/gitsign, named in `twin/sign.py`.
-- **No skills, and therefore no seam 3.** The six skills are non-deterministic by construction and
-  need their own eval harness; none exists, so skill regression would currently go silent. (42.)
+- **Seam 3 exists; no skill does yet.** `twin/skills.py` (build ticket 42) is the eval harness the
+  six non-deterministic skills need: run a skill against a fixture corpus, score it against a
+  versioned threshold, record score-over-time per model version, and surface a model upgrade that
+  degrades judgement as a regression rather than letting it go silent. It is skill-agnostic by
+  construction — `evaluate()` takes a bare callable and a corpus, and no harness function names one
+  of the six real skills — exercised against a fixture skill (`toy-classifier`), because a harness
+  tested only against skills that do not exist yet is untested. None of the six exist, so the
+  harness has run against nothing real: this closes the mechanism, not the gap it guards.
 - **No substrate.** The content-hash reference form round-trips against nothing. (48–51.)
 - **The two-architecture determinism check has never run.** The CI matrix is declared and the
   golden digests are committed; the claim is wired, not proven.

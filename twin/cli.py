@@ -164,6 +164,23 @@ def cmd_credibility(args: argparse.Namespace) -> int:
     return _emit(artefact, args.out)
 
 
+def cmd_causal_accounts(args: argparse.Namespace) -> int:
+    """Rival causal accounts, each propagated independently, and the spread between them."""
+    repo, caps, org = _open(args)
+    artefact = verbs.causal_accounts(
+        repo, caps, org, args.origin, args.account,
+        verbs.command_for("causal-accounts", org=org, origin=args.origin, account="+".join(sorted(args.account))),
+    )
+    body = artefact.body
+    _say(f"{org}: shock at {args.origin!r} across {len(body['accounts'])} account(s)")
+    for row in body["spread"]:
+        by = ", ".join(f"{a}={v}" for a, v in sorted(row["by_account"].items()))
+        print(f"  {row['component']:<24} range={row['range']:<12} ({by})")
+    if not body["spread"]:
+        print("  no reached component carries a magnitude under every account named")
+    return _emit(artefact, args.out)
+
+
 def cmd_score(args: argparse.Namespace) -> int:
     from .artefact import digest_of_file
 
@@ -225,6 +242,30 @@ def cmd_severity(args: argparse.Namespace) -> int:
     for row in artefact.body["curve"]:
         tvar = "-" if row["tvar"] is None else f"{row['tvar']:.2f}"
         print(f"  alpha={row['alpha']:<7} var={row['var']:<14.2f} tvar={tvar}")
+    return _emit(artefact, args.out)
+
+
+def cmd_severity_anchor(args: argparse.Namespace) -> int:
+    command = verbs.command_for(
+        "severity-anchor", subject=args.subject, alpha=",".join(str(a) for a in sorted(args.alpha)),
+        sensitivity_xi=",".join(str(x) for x in sorted(args.sensitivity_xi)) if args.sensitivity_xi else None,
+    )
+    caps = Capabilities.load()
+    artefact = verbs.anchored_severity_curve(
+        args.subject, args.alpha, caps, command, sensitivity_grid=args.sensitivity_xi or None
+    )
+    anchoring = artefact.body["anchoring"]
+    unanchored = [p["name"] for p in anchoring["parameters"] if not p["anchored"]]
+    _say(
+        f"{args.subject!r}: {anchoring['anchored_count']} anchored parameter(s), "
+        f"{anchoring['unanchored_count']} unanchored ({', '.join(unanchored) or 'none'})"
+    )
+    for row in artefact.body["curve"]:
+        tvar = "-" if row["tvar"] is None else f"{row['tvar']:.2f}"
+        print(f"  alpha={row['alpha']:<7} var={row['var']:<14.2f} tvar={tvar}")
+    if artefact.body["sensitivity"]:
+        spread = artefact.body["sensitivity"]["spread"]
+        print(f"  sensitivity (xi sweep): TVaR ranges {spread['min']:.2f} .. {spread['max']:.2f}")
     return _emit(artefact, args.out)
 
 
@@ -410,6 +451,32 @@ def cmd_rewind(args: argparse.Namespace) -> int:
     return _emit(artefact, args.out)
 
 
+def cmd_backtest(args: argparse.Namespace) -> int:
+    """Rewind plus projection (build ticket 37): what the model would have forecast as of a past
+    time, scored against the record once `twin score` runs on this command's output.
+
+    No backtest-specific code path — this function is `primitives.rewind` followed by `verbs.run`
+    and nothing else, the same two calls `cmd_rewind` and `cmd_run` already make separately.
+    Harness guard `backtest_is_a_pure_composition` asserts this against the source, not merely
+    the docstring.
+    """
+    from .primitives import rewind
+
+    repo = rewind(args.repo, args.at)
+    caps = Capabilities.load()
+    org = verbs.resolve_org(repo, args.org)
+    command = verbs.command_for(
+        "backtest", org=org, scenario=args.scenario, at=args.at, regime=args.regime
+    )
+    artefact = verbs.run(repo, caps, org, args.scenario, args.regime, command, at=args.at)
+    gate = artefact.body["regime"]
+    _say(
+        f"{org}: {args.scenario} rewound to {args.at} — "
+        f"{'scoring-eligible' if gate['scoring_eligible'] else 'not scoring-eligible'} under {gate['declared']}"
+    )
+    return _emit(artefact, args.out)
+
+
 def cmd_options(args: argparse.Namespace) -> int:
     repo, caps, org = _open(args)
     artefact = verbs.options(
@@ -490,6 +557,71 @@ def cmd_constraints(args: argparse.Namespace) -> int:
         print(f"  unsigned: set {sign.KEY_ENV}, then `twin sign {path} --role {constraints.ROLE}`")
         return 0
     print(f"  signed as role {constraints.ROLE!r} -> {sidecar.name}")
+    return 0
+
+
+def cmd_challenge(args: argparse.Namespace) -> int:
+    """Raise a challenge against one claim in an existing artefact (build ticket 60)."""
+    from . import challenges
+    from .artefact import digest_of_file
+    from .artefact import load as load_artefact
+
+    challenged_doc = load_artefact(args.artefact)
+    challenged_sha256 = digest_of_file(args.artefact)
+    try:
+        artefact = challenges.raise_challenge(
+            challenged_doc, challenged_sha256, args.claim_path, args.reason,
+            verbs.command_for(
+                "challenge", artefact_sha256=challenged_sha256, claim_path=args.claim_path,
+            ),
+        )
+    except challenges.ChallengeError as exc:
+        print(f"twin challenge: {exc}", file=sys.stderr)
+        return 2
+    path = artefact.write(args.out)
+    material = sign.signing_key()
+    signatures = [sign.human(args.role, artefact.digest(), material)] if material else []
+    sidecar = attest.write(artefact, path, signatures)
+
+    _say(f"challenge -> {path} (authored, role {args.role!r})")
+    print(f"  claim      {args.claim_path}")
+    print(f"  disputed   {artefact.body['challenged_value']!r}")
+    print(f"  reason     {args.reason}")
+    if material is None:
+        print(f"  unsigned: set {sign.KEY_ENV}, then `twin sign {path} --role {args.role}`")
+        return 0
+    print(f"  signed as role {args.role!r} -> {sidecar.name}")
+    return 0
+
+
+def cmd_resolve_challenge(args: argparse.Namespace) -> int:
+    """Resolve a challenge — the resolution names only what the challenge itself named."""
+    from . import challenges
+    from .artefact import digest_of_file
+    from .artefact import load as load_artefact
+
+    challenge_doc = load_artefact(args.challenge)
+    challenge_sha256 = digest_of_file(args.challenge)
+    try:
+        artefact = challenges.resolve(
+            challenge_doc, challenge_sha256, args.response,
+            verbs.command_for("resolve-challenge", challenge_sha256=challenge_sha256),
+        )
+    except challenges.ChallengeError as exc:
+        print(f"twin resolve-challenge: {exc}", file=sys.stderr)
+        return 2
+    path = artefact.write(args.out)
+    material = sign.signing_key()
+    signatures = [sign.human(args.role, artefact.digest(), material)] if material else []
+    sidecar = attest.write(artefact, path, signatures)
+
+    _say(f"resolution -> {path} (authored, role {args.role!r})")
+    print(f"  claim      {artefact.body['claim_path']}")
+    print(f"  response   {args.response}")
+    if material is None:
+        print(f"  unsigned: set {sign.KEY_ENV}, then `twin sign {path} --role {args.role}`")
+        return 0
+    print(f"  signed as role {args.role!r} -> {sidecar.name}")
     return 0
 
 
@@ -689,6 +821,7 @@ def cmd_verify(args: argparse.Namespace) -> int:
     if args.artefact and args.attestation:
         return _attestation(args.artefact)
     if args.artefact:
+        _show_challenges(args.artefact, args.challenge)
         return _reproduce(args.artefact, args.repo)
     if args.rehash:
         return _rehash(args.authorise)
@@ -791,6 +924,31 @@ def cmd_sign(args: argparse.Namespace) -> int:
     print(f"signed {args.artefact} as role {args.role!r} -> {sidecar.name}")
     print("  asserts accountability for the judgement inside, and nothing about reproducibility")
     return 0
+
+
+def _show_challenges(artefact_path: str, challenge_paths: list[str]) -> None:
+    """Challenges are visible wherever the challenged artefact is visible (build ticket 60) — so
+    inspecting an artefact through `twin verify` is where they show, not a separate queue a reader
+    has to know to check."""
+    if not challenge_paths:
+        return
+    from . import challenges
+    from .artefact import digest_of_file
+    from .artefact import load as load_artefact
+
+    artefact_sha256 = digest_of_file(artefact_path)
+    docs = [load_artefact(p) for p in challenge_paths]
+    known_challenges = [d for d in docs if d["envelope"]["kind"] == challenges.KIND_CHALLENGE]
+    known_resolutions = [d for d in docs if d["envelope"]["kind"] == challenges.KIND_RESOLUTION]
+    report = challenges.for_artefact(artefact_sha256, known_challenges, known_resolutions)
+    if not report["open"] and not report["resolved"]:
+        return
+    _say(f"challenges against {artefact_path}")
+    for entry in report["open"]:
+        print(f"  OPEN     {entry['claim_path']:<40} {entry['reason']}")
+    for entry in report["resolved"]:
+        print(f"  resolved {entry['claim_path']:<40} {entry['response']}")
+    print()
 
 
 def _reproduce(artefact_path: str, repo_path: str | None) -> int:
@@ -1059,6 +1217,17 @@ def build_parser() -> argparse.ArgumentParser:
     credenced.add_argument("--out", required=True)
     credenced.set_defaults(fn=cmd_credibility)
 
+    accounted = with_org(with_repo(subs.add_parser(
+        "causal-accounts", help="rival causal accounts, each propagated independently, and the spread between them"
+    )))
+    accounted.add_argument("--origin", required=True, help="the component the shock starts at")
+    accounted.add_argument(
+        "--account", action="append", required=True, default=[],
+        help="a causal-account id (this overlay's own edges may be named too); repeatable, at least two",
+    )
+    accounted.add_argument("--out", required=True)
+    accounted.set_defaults(fn=cmd_causal_accounts)
+
     score = with_org(with_repo(subs.add_parser("score", help="score a forecast bundle against an outcome")))
     score.add_argument("--forecast", required=True, help="path to a forecast-bundle artefact")
     score.add_argument("--outcome", required=True)
@@ -1101,6 +1270,21 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sev.add_argument("--out", required=True)
     sev.set_defaults(fn=cmd_severity)
+
+    anchor = subs.add_parser(
+        "severity-anchor", help="a loss-exceedance curve fit from twin/severity-anchors.yaml's cited quantiles"
+    )
+    anchor.add_argument("--subject", required=True, help="a subject id from twin/severity-anchors.yaml")
+    anchor.add_argument(
+        "--alpha", type=float, action="append", required=True, default=[],
+        help="a confidence level for the curve; repeatable",
+    )
+    anchor.add_argument(
+        "--sensitivity-xi", type=float, action="append", default=[],
+        help="sweep the unanchored xi across these values at the highest --alpha; repeatable",
+    )
+    anchor.add_argument("--out", required=True)
+    anchor.set_defaults(fn=cmd_severity_anchor)
 
     graph = with_org(with_repo(subs.add_parser("graph", help="emit the typed knowledge graph")))
     graph.add_argument("--out", required=True)
@@ -1158,6 +1342,19 @@ def build_parser() -> argparse.ArgumentParser:
     past.add_argument("--out", required=True)
     past.set_defaults(fn=cmd_rewind)
 
+    backtested = with_org(subs.add_parser(
+        "backtest", help="rewind plus projection: what the model would have forecast as of a past time"
+    ))
+    backtested.add_argument("--repo", required=True, help="path to the model repository")
+    backtested.add_argument("--at", required=True, help="an ISO time; rewinds to it, then runs the scenario as of it")
+    backtested.add_argument("--scenario", required=True)
+    backtested.add_argument(
+        "--regime", required=True, choices=list(REGIMES),
+        help="the information gate this execution runs under; no default, and only as-consumed scores",
+    )
+    backtested.add_argument("--out", required=True)
+    backtested.set_defaults(fn=cmd_backtest)
+
     choices = with_org(with_repo(subs.add_parser(
         "options", help="the choice set after the constraint pre-filter, with survivors costed"
     )))
@@ -1170,6 +1367,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     published.add_argument("--out", required=True)
     published.set_defaults(fn=cmd_constraints)
+
+    challenged = subs.add_parser(
+        "challenge", help="raise a challenge against one claim in an existing artefact"
+    )
+    challenged.add_argument("--artefact", required=True, help="path to the artefact being challenged")
+    challenged.add_argument(
+        "--claim-path", required=True,
+        help="the dotted key-path into the artefact's body naming the disputed claim",
+    )
+    challenged.add_argument("--reason", required=True)
+    challenged.add_argument("--role", default="challenger")
+    challenged.add_argument("--out", required=True)
+    challenged.set_defaults(fn=cmd_challenge)
+
+    resolved = subs.add_parser("resolve-challenge", help="resolve a challenge, naming only what it named")
+    resolved.add_argument("--challenge", required=True, help="path to the challenge artefact being resolved")
+    resolved.add_argument("--response", required=True)
+    resolved.add_argument("--role", default="challenge-resolver")
+    resolved.add_argument("--out", required=True)
+    resolved.set_defaults(fn=cmd_resolve_challenge)
 
     validate = with_repo(subs.add_parser("validate", help="validate every object against its schema"))
     validate.set_defaults(fn=cmd_validate)
@@ -1205,6 +1422,10 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--repo", default=None, help="the model repository the pins refer to")
     verify.add_argument(
         "--attestation", action="store_true", help="check the artefact's sidecar rather than replaying it"
+    )
+    verify.add_argument(
+        "--challenge", action="append", default=[],
+        help="path to a challenge or resolution artefact; repeatable, shown against `artefact` if it applies",
     )
     verify.add_argument("--only", action="append", default=[], help="check name or number; repeatable")
     verify.add_argument("--list", action="store_true", help="list the checks without running them")
