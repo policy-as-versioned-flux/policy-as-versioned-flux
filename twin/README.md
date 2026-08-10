@@ -1,13 +1,13 @@
 # `twin`
 
-Build tickets 01–08, 10–15, 17–22, 26–30, 35 and 36 of `.scratch/twin/`, plus 23 at `partial` and 64
+Build tickets 01–15, 17–22, 26–30, 35 and 36 of `.scratch/twin/`, plus 23 at `partial` and 64
 instrumented and measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 27 of 77 build tickets closed, one part-built, and one measuring against a clock that runs
+**This is 28 of 77 build tickets closed, one part-built, and one measuring against a clock that runs
 to 2026-11-06.** What is not built is listed below and, more usefully, is named
 inside every artefact the tool emits.
 
@@ -28,6 +28,8 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin rewind --repo R --at T          # the model state at a declared time (abduction)
 ./bin/twin run --repo R --scenario S --regime as-consumed   # the gate is required, with no default
 ./bin/twin regimes --repo R --scenario S   # the same scenario under all three, with the gaps
+./bin/twin sweep --repo R [--repo R2 ...]  # every scenario, every org, unconditionally — no --scenario
+./bin/twin reliability --score-card C1 --score-card C2 # bins over a pooled population, empty bins shown
 ./bin/twin drift                           # the Flux drift measurement: coverage, events, no verdict
 ./bin/twin options --repo R --perspective P # the choice set after the pre-filter, survivors costed
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
@@ -439,20 +441,30 @@ reaches `full`, and nothing can be typed as `full`.
 | `currency-regimes` | 09 | partial | 3 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
-| `sense-move` | 11 | partial | 1 / 8 |
+| `sense-move` | 11 | partial | 2 / 8 |
 | `scenario-engine` | 13 | partial | 1 / 7 |
 
-**10 of 41**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**11 of 41**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capability here stands at three ticks, and five of the seven stand at one.
+there"** — the strongest capability here stands at three ticks, and four of the seven stand at one.
 `./bin/twin grade` prints the denominators.
 
-**Nothing was ticked this round, and the arithmetic did not move at all.** Three build tickets
-landed — the information gate (36), the drift instrument (64) and the join of the causal layer to
-the £ (30) — and none of them completes a criterion. That is the honest number rather than a
-disappointing one, and build ticket 30 is the clearest case: it is the largest capability in the
-system by code and it ticks nothing, because decision ticket 09's remaining criteria each want
-something it does not build.
+**Nothing was ticked in the round before this one, and the arithmetic did not move at all.** Three
+build tickets landed — the information gate (36), the drift instrument (64) and the join of the
+causal layer to the £ (30) — and none of them completed a criterion. That was the honest number
+rather than a disappointing one, and build ticket 30 was the clearest case: it is the largest
+capability in the system by code and it ticked nothing, because decision ticket 09's remaining
+criteria each wanted something it did not build.
+
+**Build ticket 09 ticks one criterion, and it is the only one this round.** `sense-move` AC 7 —
+"the loop's cadence + re-price triggers, sufficient to generate forecast volume" — moves from
+unchecked to checked: `twin sweep` is the scheduled half, `twin run --scenario` (unchanged since
+build ticket 06) is the event-driven half, and the pair now satisfy the criterion together.
+`scenario-engine` AC 6 — the selection/prioritisation rule — stays unticked on purpose: decision
+ticket 13's resolution wants **four** admission routes (standing library, precondition-triggered,
+event-triggered, ad-hoc), this ticket builds only the first, and a criterion asking for four routes
+is not satisfied by one of them, however central. Precondition-triggered sweeps are build ticket 46
+and library curation is build ticket 69.
 
 Several criteria were considered and left unticked, on the same ground five were withdrawn on in
 earlier rounds — each rested on **one clause of a multi-clause criterion**, or on machinery that
@@ -501,7 +513,7 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 23 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 542 tests
+`./bin/twin verify` — 25 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 572 tests
 across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
@@ -569,11 +581,16 @@ claim binds it to a component the scenario forecasts. The positive leg is assert
 negative one: the same fixture still forecasts under `as-consumed`, because a gate that refused
 everything would pass every refusal in the check while making the regime useless.
 
-Three guards were added to the **harness** instead, because each guards a yardstick rather than the
-system: `worksheet_matches_the_pocket_org` (the hand-computed numbers still hold),
-`graded_edge_fixture_holds_its_contract` (the generated causal-edge fixture still carries what the £
-and skills tracks depend on) and `drift_window_was_declared_before_it_was_measured` (build ticket
-64's pre-registration predates its own data, read out of git history rather than promised).
+Six checks were added to the **harness** instead, because each guards a yardstick or a semantic
+property rather than a named absence the constitution enumerates: `worksheet_matches_the_pocket_org`
+(the hand-computed numbers still hold), `graded_edge_fixture_holds_its_contract` (the generated
+causal-edge fixture still carries what the £ and skills tracks depend on),
+`an_intervention_never_reaches_upstream` (`do()` stays downstream-only; build ticket 22),
+`drift_window_was_declared_before_it_was_measured` (build ticket 64's pre-registration predates its
+own data, read out of git history rather than promised), `drift_window_is_actually_being_sampled`
+(the window is receiving samples, not merely declared — added after a probe went silent for three
+days and nothing noticed) and `scheduled_emission_ignores_signal_presence` (two sweeps over an
+unchanged repository emit the same forecast count, not a shrinking one; build ticket 09).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared
@@ -681,10 +698,13 @@ Named here so the skeleton cannot quietly become the definition of done.
   `rewind → play → fast-forward` cannot be run end to end. (37.)
 - **Forecast probabilities are read from a world model's declared belief.** Nothing infers them.
   This is the honest stub: the plumbing is real, the judgement is authored.
-- **Calibration is one score card, not a record.** Brier and log loss are proper and regime-tagged,
-  but there are no reliability diagrams over volume (09), no contamination discount (40) and no
-  hindsight-resistance inversion (41). The answer-key format carries the `contamination` slot the
-  discount will read; nothing computes it.
+- **Calibration is diagrams over what has actually been emitted, not a growing record.** Brier and
+  log loss are proper and regime-tagged, and `twin reliability` now bins a population of score
+  cards with empty bins shown rather than hidden (09) — but there is no contamination discount (40)
+  and no hindsight-resistance inversion (41), and nothing yet accumulates score cards over time on
+  a schedule of its own: `twin sweep` produces the forecast volume, a human still runs `twin score`
+  and `twin reliability` by hand once outcomes resolve. The answer-key format carries the
+  `contamination` slot the discount will read; nothing computes it.
 - **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
   produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
   sigstore/gitsign, named in `twin/sign.py`.
@@ -718,16 +738,22 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **The causal edges in the fixtures are toys.** Sign, lag and elasticity are invented numbers
   exercising the shape. Decision ticket 08 asks for a real claim from each co-flagship, and neither
   exists, which is why the causal layer's fifth criterion stays unticked.
-- **No reliability diagram and no scheduled emission.** Calibration is measured over volume and
-  there is no volume: emission is still hand-initiated, so the record can be selected. (09.)
+- **`twin sweep` exists; nothing calls it on a clock.** Unconditional, cross-repository, no
+  `--scenario` flag — but a scheduler still has to invoke it. The same gap build ticket 64 left for
+  `estate/driftwood/` to own: the instrument is built, the cron/CI cadence around it is not. (09.)
+- **The standing scenario set is unfiltered, because there is no library yet.** `sweep()` runs every
+  scenario in every overlay it is pointed at; the admissibility rule, precondition-triggered plays
+  and event-triggered re-runs decision ticket 13 names are build tickets 46 and 69, not this one.
 
 ## Layout
 
 ```
 twin/
   cli.py          seam 1 — the artefact CLI, the primary boundary
-  verbs.py        sense / run / score / graph / blast / propagate / intervene / observe /
-                  rewind / options / exposure
+  verbs.py        sense / run / score / reliability / graph / blast / propagate / intervene /
+                  observe / rewind / options / exposure
+  schedule.py     the scheduled sweep — every scenario, every org, an org of repositories,
+                  unconditionally, with no staleness skip
   schema.py       the closed typed schema; Article 9 has no slot because there is no slot
   blast.py        the reverse-dependency traversal, and the closed body with no price slot
   propagate.py    Monte-Carlo along causal edges, the depth schedule that stops it, and the
@@ -748,7 +774,8 @@ twin/
   evidence-ladder.yaml      five typed grades, the pricing gate and the admission threshold
   constraints.py  the universal floor, the scope exclusions, the stated positions
   constraints.yaml          the constraint set itself — authored, versioned, signed on publish
-  scoring.py      Brier and log loss, and the declared quantisation
+  scoring.py      Brier and log loss, the declared quantisation, and the reliability diagram
+                  over a pooled population of score cards
   wardley.py      evolution positions and D/K/R, inherited from arckit with its caveats
   reproduce.py    recompute an artefact, and its chain, from its own pins
   repo.py         the pinned model repository; reads go through a git tree, never the worktree

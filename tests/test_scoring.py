@@ -11,7 +11,7 @@ import math
 
 import pytest
 
-from twin.scoring import LOWER_IS_BETTER, SIGNIFICANT_DIGITS, brier, log_loss, quantise
+from twin.scoring import LOWER_IS_BETTER, SIGNIFICANT_DIGITS, ScoreError, brier, log_loss, quantise, reliability_diagram
 
 GRID = [0.02, 0.1, 0.25, 0.4, 0.5, 0.63, 0.8, 0.95, 0.99]
 
@@ -89,3 +89,68 @@ def test_quantisation_keeps_far_more_precision_than_any_decision_needs() -> None
     assert quantise(0.123456789012345) == pytest.approx(0.123456789012, abs=1e-14)
     assert quantise(0.5) == 0.5
     assert quantise(0.0) == 0.0
+
+
+# -- the reliability diagram --------------------------------------------------------------------
+
+
+def _entry(probability: float, observed: bool) -> dict:
+    return {"probability": probability, "observed": observed}
+
+
+def test_bins_carry_the_forecasts_that_land_in_their_range() -> None:
+    scores = [_entry(0.05, False), _entry(0.85, True), _entry(0.9, True), _entry(0.92, False)]
+    diagram = reliability_diagram(scores, bins=10)
+    assert diagram["total"] == 4
+    by_index = {b["bin"]: b for b in diagram["bins"]}
+    assert by_index[0]["count"] == 1
+    assert by_index[0]["range"] == [0.0, 0.1]
+    assert by_index[8]["count"] == 1  # 0.85 falls in [0.8, 0.9)
+    assert by_index[9]["count"] == 2  # 0.9 and 0.92 both fall in [0.9, 1.0]
+
+
+def test_an_empty_bin_carries_a_count_and_no_fabricated_average() -> None:
+    """A count of zero is shown rather than omitted — an omitted bin cannot be seen to be thin."""
+    diagram = reliability_diagram([_entry(0.05, True)], bins=10)
+    empty = [b for b in diagram["bins"] if b["bin"] != 0]
+    assert len(empty) == 9
+    assert all(b["count"] == 0 for b in empty)
+    assert all(b["mean_forecast"] is None for b in empty)
+    assert all(b["empirical_frequency"] is None for b in empty)
+
+
+def test_every_bin_is_reported_even_from_an_empty_population() -> None:
+    diagram = reliability_diagram([], bins=4)
+    assert diagram["total"] == 0
+    assert [b["count"] for b in diagram["bins"]] == [0, 0, 0, 0]
+
+
+def test_empirical_frequency_is_the_observed_rate_within_a_bin() -> None:
+    scores = [_entry(0.75, True), _entry(0.78, True), _entry(0.72, False)]
+    diagram = reliability_diagram(scores, bins=10)
+    bin_7 = next(b for b in diagram["bins"] if b["bin"] == 7)
+    assert bin_7["count"] == 3
+    assert bin_7["empirical_frequency"] == pytest.approx(2 / 3)
+    assert bin_7["mean_forecast"] == pytest.approx((0.75 + 0.78 + 0.72) / 3)
+
+
+def test_a_probability_on_a_bin_edge_falls_in_the_bin_it_opens() -> None:
+    """0.5 belongs to [0.5, 0.6), not [0.4, 0.5) — `int(p * bins)`, not a rounding rule."""
+    diagram = reliability_diagram([_entry(0.5, True)], bins=10)
+    assert next(b for b in diagram["bins"] if b["bin"] == 5)["count"] == 1
+    assert next(b for b in diagram["bins"] if b["bin"] == 4)["count"] == 0
+
+
+def test_a_forecast_of_exactly_one_stays_in_the_top_bin_not_a_phantom_eleventh() -> None:
+    diagram = reliability_diagram([_entry(1.0 - 1e-12, True)], bins=10)
+    assert next(b for b in diagram["bins"] if b["bin"] == 9)["count"] == 1
+
+
+def test_bins_must_be_at_least_one() -> None:
+    with pytest.raises(ScoreError, match="at least one bin"):
+        reliability_diagram([], bins=0)
+
+
+def test_an_out_of_range_probability_is_refused_not_silently_clamped() -> None:
+    with pytest.raises(ValueError, match="strictly between 0 and 1"):
+        reliability_diagram([_entry(1.5, True)], bins=10)

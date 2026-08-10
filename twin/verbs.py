@@ -73,6 +73,11 @@ KIND_OBSERVATION = "observation"
 KIND_REWOUND_MODEL = "rewound-model"
 KIND_REGIME_GAP = "regime-gap"
 KIND_PRICED_IMPACT = "priced-impact"
+KIND_RELIABILITY_DIAGRAM = "reliability-diagram"
+
+# Calibration's own capability, decision ticket 11 — the same set `score` already carries, because
+# a reliability diagram reads scores `score` produced and adds no domain of its own.
+CAPS_RELIABILITY = CAPS_SCORE
 
 # Only an as-consumed execution produces a scoring-eligible forecast: the honest number is never
 # contaminated by what we know now (spec story 40). Build ticket 36 turned the tag into a gate —
@@ -1020,6 +1025,51 @@ def score(
             "scores": scores,
             "unscoreable": unscoreable,
         },
+    )
+
+
+# -- reliability diagram (build ticket 09) --------------------------------------------------
+
+
+def reliability(
+    score_card_paths: list[str | Path], caps: Capabilities, command: list[str], bins: int = 10,
+) -> Artefact:
+    """A reliability diagram over a population of score cards, pooled.
+
+    One score card is one execution's worth of scored forecasts. Nothing here re-derives a score:
+    it reads the `scores` each named card already computed — already filtered to `as-consumed` by
+    `score()` itself — and pools them into bins, so a thin bin is visible as a small count rather
+    than a confident-looking bar (spec story 44).
+    """
+    if not score_card_paths:
+        raise VerbError("no score card named; a reliability diagram over nothing is not a diagram")
+
+    sources: list[dict[str, Any]] = []
+    pooled: list[dict[str, Any]] = []
+    for raw_path in score_card_paths:
+        path = Path(raw_path)
+        card_bytes = path.read_bytes()
+        card = load_artefact(path)
+        if card["envelope"]["kind"] != KIND_SCORE_CARD:
+            raise VerbError(f"{path} is a {card['envelope']['kind']!r}, not a score card")
+        scores = card["body"]["scores"]
+        sources.append(
+            {"sha256": sha256_hex(card_bytes), "pins": card["envelope"]["pins"], "scored": len(scores)}
+        )
+        pooled.extend(scores)
+
+    diagram = scoring.reliability_diagram(pooled, bins=bins)
+
+    return Artefact(
+        kind=KIND_RELIABILITY_DIAGRAM,
+        mark=DERIVED,
+        command=command,
+        pins={
+            "tool": {"name": "twin", "version": TOOL_VERSION, "capabilities_digest": caps.digest},
+            "score_cards": sources,
+        },
+        depth=caps.depth_block(CAPS_RELIABILITY),
+        body={"bin_count": bins, "bins": diagram["bins"], "total_scored": diagram["total"]},
     )
 
 

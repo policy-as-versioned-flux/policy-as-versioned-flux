@@ -10,6 +10,7 @@ Both rules here are losses: **lower is better**, stated once so nothing downstre
 from __future__ import annotations
 
 import math
+from typing import Any
 
 class ScoreError(ValueError):
     """Not scoreable. A refusal, not a bug."""
@@ -61,3 +62,47 @@ def score(probability: float, observed: bool) -> dict[str, float]:
         "brier": quantise(brier(probability, observed)),
         "log_loss": quantise(log_loss(probability, observed)),
     }
+
+
+# -- the reliability diagram (build ticket 09; spec story 44) --------------------------------
+
+
+def reliability_diagram(scores: list[dict[str, Any]], bins: int = 10) -> dict[str, Any]:
+    """Bin a scored-forecast **population** by predicted probability.
+
+    Calibration is a property of volume, so this reads many scored forecasts at once (`scores`,
+    pooled across as many score cards as the caller names) rather than judging one.
+
+    Every bin is reported, including an empty one — the **count** is what stops a thin bin
+    masquerading as calibration, and omitting an empty bin would hide the thinnest one of all.
+    `mean_forecast` and `empirical_frequency` are `None` on an empty bin: there is no average of
+    zero numbers, and reporting `0.0` there would read as "always wrong" rather than "nothing
+    landed here yet".
+    """
+    if bins < 1:
+        raise ScoreError(f"a reliability diagram needs at least one bin, got {bins}")
+    width = 1.0 / bins
+    counts = [0] * bins
+    sums = [0.0] * bins
+    observed_counts = [0] * bins
+    for entry in scores:
+        p = _check(float(entry["probability"]))
+        index = min(int(p * bins), bins - 1)
+        counts[index] += 1
+        sums[index] += p
+        if entry["observed"]:
+            observed_counts[index] += 1
+
+    out = []
+    for i in range(bins):
+        n = counts[i]
+        out.append(
+            {
+                "bin": i,
+                "range": [quantise(i * width), quantise((i + 1) * width)],
+                "count": n,
+                "mean_forecast": quantise(sums[i] / n) if n else None,
+                "empirical_frequency": quantise(observed_counts[i] / n) if n else None,
+            }
+        )
+    return {"bins": out, "total": len(scores)}

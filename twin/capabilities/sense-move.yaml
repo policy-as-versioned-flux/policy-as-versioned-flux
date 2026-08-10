@@ -24,7 +24,9 @@ criteria:
     checked: false
   - index: 7
     text: "The loop's cadence + re-price triggers, sufficient to generate forecast volume."
-    checked: false
+    checked: true
+    evidence: "twin/schedule.py sweep() is the scheduled half — every scenario in every org overlay of every named repository, run unconditionally, with no staleness skip (harness guard scheduled_emission_ignores_signal_presence proves two runs over an unchanged repository emit the same count). twin run --scenario X, unchanged since build ticket 06, is the event-driven half decision ticket 11 Q5 asks to sit beside it."
+    ticked_by: build ticket 09
   - index: 8
     text: "Exercised on a real signal for each co-flagship."
     checked: false

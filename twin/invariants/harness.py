@@ -446,6 +446,50 @@ def _first_commit_date(root: Path, path: Path) -> datetime.datetime | None:
     return datetime.datetime.fromisoformat(stamps[-1].strip().replace("Z", "+00:00"))
 
 
+@harness_check("scheduled_emission_ignores_signal_presence")
+def _sweep_is_not_event_gated(ctx: Context) -> str:
+    """A scheduled sweep emits the same volume twice running, nothing having changed (build ticket 09).
+
+    A guard on the suite rather than an invariant, for the same reason the pocket-org worksheet and
+    the drift window are: the constitution names sixteen invariants and may not grow a seventeenth
+    without the constitution changing first, and this guards a **property of the scheduler**, not an
+    absence in the emitted artefact shape.
+
+    `twin/schedule.py` carries no staleness check by design — decision ticket 11 Q5's whole point is
+    that a twin which only re-forecasts on change would score beautifully and mean nothing, because
+    the boring "no material change expected" days are exactly what a reliability diagram needs to
+    see. Two sweeps back to back over the same, unchanged repository, with no signal added between
+    them, are asserted to emit the **same** forecast count — not zero the second time, which is what
+    a hash-staleness skip (the very thing arckit's inherited `--refresh` machinery does, and the
+    thing this ticket explicitly declines to inherit) would produce.
+
+    The positive leg matters as much as the equality: a sweep that executed nothing both times would
+    pass the equality trivially while asserting nothing about emission at all.
+    """
+    from .. import schedule
+    from ..repo import ModelRepo
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    first = schedule.sweep([repo], ctx.caps, ["twin", "sweep"])
+    second = schedule.sweep([repo], ctx.caps, ["twin", "sweep"])
+
+    first_counts, second_counts = first.body["counts"], second.body["counts"]
+    if first_counts["executed"] == 0:
+        raise Violated("the sweep executed no scenario at all, so 'unconditional emission' asserts nothing")
+    if first_counts["failed"] or second_counts["failed"]:
+        raise Violated(f"the sweep failed on a fixture scenario: {first.body['failures'] + second.body['failures']}")
+    if first_counts["forecasts"] != second_counts["forecasts"]:
+        raise Violated(
+            f"two sweeps over the same unchanged repository emitted different forecast counts "
+            f"({first_counts['forecasts']} then {second_counts['forecasts']}) — emission is gated on "
+            "something other than the standing scenario set"
+        )
+    return (
+        f"{first_counts['executed']} scenario(s) across {first_counts['repos']} repo(s) emitted "
+        f"{first_counts['forecasts']} forecast(s) on both of two consecutive, unconditional sweeps"
+    )
+
+
 @harness_check("an_intervention_never_reaches_upstream")
 def _intervention_never_reaches_upstream(ctx: Context) -> str:
     """`do()` propagates downstream only (build ticket 22).

@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 09 \u2014 build ticket 30: the exposure's basis note no longer says the causal layer is unjoined to the \u00a3, because twin price joins it",
-  "capabilities_digest": "0c8c350194bda0fe352ac2024e937bff95db3c105bb88922a789ce49d86c503f",
+  "authorised_by": "decision ticket 11 \u2014 build ticket 09 ticks sense-move criterion 7 (scheduled cadence + volume), moving the capabilities digest embedded in every artefact's pins",
+  "capabilities_digest": "4e20903b2c7dee13212c47345ca4718e3af515b28a8276a29fdec9c50f45504e",
   "digests": {
-    "blast-radius": "52411e4bbb696490e3f1db1049b1e18c0939c2e5eeb489819f5d1da332ecc8ae",
-    "bound-signal": "f673ddbe1f25caf6f59bc96fdec42be2e70cc9c37e9cf66ead77c55d0d2701b3",
-    "forecast-bundle": "3c0957666c7bf69e8691cee6e8caf033800dfc3a8b299b5799eb20ce1a905105",
-    "graph": "385e05aa3c7d1c8f95332987326a6320c28c55eeb05bed92c6b821098c41f363",
-    "intervention": "75e737f7aaa81809b0a8cf853e93228b69bec5f70d700666f7282c22693283b1",
-    "observation": "441dff4dc3520ec3ad0300e8ffa49276d1d4b282cf261bcbd745442ca1ed4cb8",
-    "priced-impact": "883496737a76c0ec741c8c0ef2a630112eecd7764fce028e57303a7e4213d4e9",
-    "priced-option-set": "ad9376a8eebd6ab18d7ed93fb99031ca06234416d179e67bcbe86b2a5605db08",
-    "propagation": "c9cd88c71020e021c0eacdffd2a3a592e6dc64b6f8de106b40f3b68cef304d10",
-    "rewound-model": "4c8aa95fa47fa2c4aaad94dc951e8d679ce453717cce5063cc49c4dfa30c0efe",
-    "scenario-exposure": "ef9ca77984b1ad51fc292429eb294f70d1a54a305b08cdeff893e2482261158f",
-    "score-card": "af02b9451c39e358c6433e43dced7227838eb6ff01796ca4be3bf0b9fdc2931e"
+    "blast-radius": "e664b8bcbb0a371fc480f620b2d03825fd000d12f3863977e9a9c642711c70df",
+    "bound-signal": "b0ba59c62a72f9923bac56f61378198bfe9744e3a2c26049888b1b3d5f4b809a",
+    "forecast-bundle": "a486002252362f4066a075f5805918c00b08290c9848e4707a22fc3c4cda3e07",
+    "graph": "78686a6628eee38dcffa0706c5b5b83c4d1f856ae629a12b49812589aa5ba3d3",
+    "intervention": "e6c6a2aea115f6f5e4e5baf33fefe6729c190f5c786c4a16330c2fa55f28ae18",
+    "observation": "85a78a7648f16e71cdc73e91b6d277fa955aa233bdd8d6b16b7b5ab1cd8e9fe5",
+    "priced-impact": "5bc0d4be9b85c4fcd913f8b9d5f2afd76eb06824d1eda75905b53c872d357b8a",
+    "priced-option-set": "aaa36fa34c05e2f77ee66fecc48f9e6c544195f58b4407595c479f2b266c61ea",
+    "propagation": "757480c77ae2d79a75ba6698095ff5aec0dd40c77b98c1b0c086cd1d97b1b814",
+    "rewound-model": "c0fa8404c0edfaaca105a901fac0011bdfb9aaf2aed8c051136a02939fe52920",
+    "scenario-exposure": "de5b8b1ff89fe4b18ed2cdb1596b23ac59812238678f03b31703878ee896d6a8",
+    "score-card": "3d38ea66fee73748692ac74a4b1da9218b34ea2e39edae033dac13a493898ff4"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

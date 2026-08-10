@@ -16,7 +16,7 @@ from pathlib import Path
 
 import yaml
 
-from . import TOOL_VERSION, attest, constraints, evidence, fixtures, index, invariants, sign, verbs
+from . import TOOL_VERSION, attest, constraints, evidence, fixtures, index, invariants, schedule, sign, verbs
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
 from .blob import BlobRefError
@@ -144,6 +144,39 @@ def cmd_score(args: argparse.Namespace) -> int:
             "score", org=org, outcome=args.outcome, forecast_sha256=digest_of_file(args.forecast)
         ),
     )
+    return _emit(artefact, args.out)
+
+
+def cmd_sweep(args: argparse.Namespace) -> int:
+    """Every scenario, every org, every named repository. No `--scenario` flag exists here.
+
+    That absence is the point (build ticket 09): a human names nothing at run time, so the record
+    cannot be selected towards the scenarios someone felt confident about.
+    """
+    repos = [ModelRepo.open(path, args.ref) for path in args.repo]
+    caps = Capabilities.load()
+    command = verbs.command_for("sweep", regime="as-consumed", at=args.at)
+    artefact = schedule.sweep(repos, caps, command, at=args.at)
+    counts = artefact.body["counts"]
+    _say(
+        f"sweep across {counts['repos']} repo(s): {counts['executed']} execution(s), "
+        f"{counts['forecasts']} forecast(s), {counts['failed']} failure(s)"
+    )
+    for failure in artefact.body["failures"]:
+        print(f"  failed  {failure['org']}/{failure['scenario']}: {failure['reason']}")
+    return _emit(artefact, args.out)
+
+
+def cmd_reliability(args: argparse.Namespace) -> int:
+    caps = Capabilities.load()
+    command = verbs.command_for("reliability", bins=str(args.bins))
+    artefact = verbs.reliability(args.score_card, caps, command, bins=args.bins)
+    _say(f"reliability diagram over {artefact.body['total_scored']} scored forecast(s), {args.bins} bin(s)")
+    for entry in artefact.body["bins"]:
+        lo, hi = entry["range"]
+        mean = "-" if entry["mean_forecast"] is None else f"{entry['mean_forecast']:.2f}"
+        freq = "-" if entry["empirical_frequency"] is None else f"{entry['empirical_frequency']:.2f}"
+        print(f"  [{lo:.1f}, {hi:.1f})  n={entry['count']:<4} mean={mean:<6} observed={freq}")
     return _emit(artefact, args.out)
 
 
@@ -969,6 +1002,28 @@ def build_parser() -> argparse.ArgumentParser:
     score.add_argument("--outcome", required=True)
     score.add_argument("--out", required=True)
     score.set_defaults(fn=cmd_score)
+
+    swept = subs.add_parser(
+        "sweep",
+        help="run every scenario in every org, across a named org of repositories — unconditionally",
+    )
+    swept.add_argument(
+        "--repo", action="append", required=True, default=[],
+        help="path to a model repository; repeatable — the standing set spans an org of repositories",
+    )
+    swept.add_argument("--ref", default="HEAD", help="git ref to pin, applied to every named repository")
+    swept.add_argument("--at", default=None, help="override every scenario's declared time")
+    swept.add_argument("--out", required=True)
+    swept.set_defaults(fn=cmd_sweep)
+
+    diagram = subs.add_parser("reliability", help="a reliability diagram over a population of score cards")
+    diagram.add_argument(
+        "--score-card", action="append", required=True, default=[],
+        help="path to a score-card artefact; repeatable",
+    )
+    diagram.add_argument("--bins", type=int, default=10)
+    diagram.add_argument("--out", required=True)
+    diagram.set_defaults(fn=cmd_reliability)
 
     graph = with_org(with_repo(subs.add_parser("graph", help="emit the typed knowledge graph")))
     graph.add_argument("--out", required=True)

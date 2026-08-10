@@ -238,10 +238,41 @@ fi
 git -C "$MODEL" checkout -- world/meta.yaml
 echo "  ok   refused"
 
+say "19. sweep — every scenario in every org, unconditionally, with no --scenario flag to set"
+"$TWIN" sweep --repo "$MODEL" --out "$OUT/sweep.json" || fail "sweep failed"
+python3 - "$OUT/sweep.json" <<'SWEEP'
+import json, sys
+b = json.load(open(sys.argv[1]))["body"]
+c = b["counts"]
+assert c["executed"] > 0, "the sweep executed nothing"
+assert not b["failures"], f"the sweep failed on a fixture scenario: {b['failures']}"
+print(f"  {c['executed']} scenario(s) across {c['repos']} repo(s), {c['forecasts']} forecast(s), no --scenario flag")
+SWEEP
+
+say "20. the reliability diagram — a population of score cards, pooled, with empty bins shown"
+say "    two --score-card flags here, not one: pooling is proved at the seam a caller uses"
+"$TWIN" score --repo "$MODEL" --org netflix \
+  --forecast "$OUT/forecast-bundle.json" \
+  --outcome dvd-decline-2011-resolved \
+  --out "$OUT/score-card-2.json" || fail "second score failed"
+"$TWIN" reliability --score-card "$OUT/score-card.json" --score-card "$OUT/score-card-2.json" \
+  --out "$OUT/reliability-diagram.json" || fail "reliability failed"
+python3 - "$OUT/reliability-diagram.json" <<'REL'
+import json, sys
+b = json.load(open(sys.argv[1]))["body"]
+assert len(b["bins"]) == b["bin_count"], "a bin went missing"
+assert b["total_scored"] == 6, "two identically-scored cards should pool to double the count"
+print(f"  {b['bin_count']} bins over {b['total_scored']} scored forecast(s) from 2 named cards; an empty bin carries a zero count, never a gap")
+for entry in b["bins"]:
+    lo, hi = entry["range"]
+    print(f"    [{lo:.1f}, {hi:.1f})  n={entry['count']}")
+REL
+
 echo
 echo "PASS: sense -> run -> score closes the loop from a clean checkout. Forecasts are a list,"
 echo "scored by pin; the store is rebuildable from git; identical pins give identical bytes; a"
-echo "dirty tree is refused. Every artefact declares which acceptance criteria are still"
+echo "dirty tree is refused. sweep runs the standing scenario set unconditionally and reliability"
+echo "bins the record it produces. Every artefact declares which acceptance criteria are still"
 echo "unchecked, so the skeleton cannot quietly become the definition of done."
 echo
 echo "artefacts: $OUT"

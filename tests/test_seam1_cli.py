@@ -478,3 +478,94 @@ def test_a_derived_artefact_from_a_new_verb_still_refuses_a_human_signature(
         assert main(["sign", str(out), "--role", "model-steward"]) == 2
     finally:
         del os.environ[sign.KEY_ENV]
+
+
+# -- sweep and the reliability diagram (build ticket 09) --------------------------------------
+
+
+def test_sweep_runs_every_scenario_with_no_scenario_flag_to_set(model_repo_dir: Path, tmp_path: Path) -> None:
+    """There is no `--scenario` on this verb — that absence is the point."""
+    out = tmp_path / "sweep.json"
+    assert main(["sweep", "--repo", str(model_repo_dir), "--out", str(out)]) == 0
+
+    body = json.loads(out.read_bytes())["body"]
+    assert body["counts"] == {"repos": 1, "executed": 2, "failed": 0, "forecasts": 6}
+
+
+def test_sweep_spans_multiple_repos_named_by_repeated_flag(tmp_path: Path) -> None:
+    pocket_dir = fixtures.build_pocket_org(tmp_path / "pocket")
+    default_dir = fixtures.build(tmp_path / "default")
+    out = tmp_path / "sweep.json"
+
+    assert main([
+        "sweep", "--repo", str(default_dir), "--repo", str(pocket_dir), "--out", str(out),
+    ]) == 0
+
+    body = json.loads(out.read_bytes())["body"]
+    assert body["counts"]["repos"] == 2
+    assert body["counts"]["executed"] == 3
+
+
+def test_reliability_pools_scores_across_named_score_cards(model_repo_dir: Path, tmp_path: Path) -> None:
+    bundle, card = tmp_path / "bundle.json", tmp_path / "card.json"
+    _forecast(model_repo_dir, bundle)
+    assert _score(model_repo_dir, bundle, card) == 0
+
+    out = tmp_path / "reliability.json"
+    assert main(["reliability", "--score-card", str(card), "--out", str(out)]) == 0
+
+    body = json.loads(out.read_bytes())["body"]
+    assert body["bin_count"] == 10
+    assert body["total_scored"] == 3  # the three world models scored above
+    assert sum(b["count"] for b in body["bins"]) == 3
+
+
+def test_reliability_pools_scores_across_two_separately_named_score_cards(
+    model_repo_dir: Path, tmp_path: Path
+) -> None:
+    """The population claim, proven at the seam a caller actually uses — not just the pure function.
+
+    Two independently emitted score cards, named by two repeated `--score-card` flags: the pool
+    has to be the union, not whichever file happened to load last.
+    """
+    bundle = tmp_path / "bundle.json"
+    _forecast(model_repo_dir, bundle)
+    card_a, card_b = tmp_path / "card-a.json", tmp_path / "card-b.json"
+    assert _score(model_repo_dir, bundle, card_a) == 0
+    assert _score(model_repo_dir, bundle, card_b) == 0
+
+    out = tmp_path / "reliability.json"
+    assert main([
+        "reliability", "--score-card", str(card_a), "--score-card", str(card_b), "--out", str(out),
+    ]) == 0
+
+    doc = json.loads(out.read_bytes())
+    assert doc["body"]["total_scored"] == 6  # 3 world models, from each of two named cards
+    assert sum(b["count"] for b in doc["body"]["bins"]) == 6
+    assert len(doc["envelope"]["pins"]["score_cards"]) == 2
+
+
+def test_reliability_refuses_a_forecast_bundle_named_where_a_score_card_belongs(
+    model_repo_dir: Path, tmp_path: Path
+) -> None:
+    bundle = tmp_path / "bundle.json"
+    _forecast(model_repo_dir, bundle)
+    out = tmp_path / "reliability.json"
+    assert main(["reliability", "--score-card", str(bundle), "--out", str(out)]) == 2
+
+
+def test_reliability_names_its_score_cards_by_digest_not_by_path(
+    model_repo_dir: Path, tmp_path: Path
+) -> None:
+    from twin.canon import sha256_hex
+
+    bundle, card = tmp_path / "bundle.json", tmp_path / "card.json"
+    _forecast(model_repo_dir, bundle)
+    _score(model_repo_dir, bundle, card)
+    out = tmp_path / "reliability.json"
+    main(["reliability", "--score-card", str(card), "--out", str(out)])
+
+    raw = out.read_text(encoding="utf-8")
+    assert str(card) not in raw and str(tmp_path) not in raw
+    doc = json.loads(raw)
+    assert doc["envelope"]["pins"]["score_cards"][0]["sha256"] == sha256_hex(card.read_bytes())
