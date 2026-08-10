@@ -130,6 +130,40 @@ def cmd_regimes(args: argparse.Namespace) -> int:
     return _emit(artefact, args.out)
 
 
+def cmd_positions(args: argparse.Namespace) -> int:
+    """Believed map, rival forecasts, revealed truth — and the deltas between them."""
+    repo, caps, org = _open(args)
+    artefact = verbs.positions(
+        repo, caps, org, args.scenario, verbs.command_for("positions", org=org, scenario=args.scenario)
+    )
+    body = artefact.body
+    _say(f"{org}: {args.scenario!r} — {len(body['positions'])} position(s), {len(body['abstained'])} abstained")
+    for row in body["pairwise"]:
+        print(f"  delta    {row['a']:<24} vs {row['b']:<24} {row['delta']}")
+    if body["revealed"]["resolved"]:
+        for row in body["against_revealed"]:
+            print(f"  scored   {row['id']:<24} brier {row['brier']:<10} log_loss {row['log_loss']}")
+    else:
+        print(f"  revealed: not yet — {body['revealed']['reason']}")
+    print(f"  {body['no_privileged_position']}")
+    return _emit(artefact, args.out)
+
+
+def cmd_credibility(args: argparse.Namespace) -> int:
+    """The credibility-weighted blend of a world-layer prior with an org's own sparse data."""
+    repo, caps, org = _open(args)
+    artefact = verbs.credibility(
+        repo, caps, org, args.subject, verbs.command_for("credibility", org=org, subject=args.subject)
+    )
+    body = artefact.body
+    own, blended = body["own_data"], body["blended"]
+    _say(f"{org}: {args.subject!r} — n={own['n']}, z={body['credibility']['z']}")
+    print(f"  world prior  {body['world_prior']['min']}/{body['world_prior']['mode']}/{body['world_prior']['max']}")
+    print(f"  own data     {own['note'] if own['n'] == 0 else own['mean']}")
+    print(f"  blended      {blended['min']}/{blended['mode']}/{blended['max']}")
+    return _emit(artefact, args.out)
+
+
 def cmd_score(args: argparse.Namespace) -> int:
     from .artefact import digest_of_file
 
@@ -996,6 +1030,20 @@ def build_parser() -> argparse.ArgumentParser:
         "drift", help="the Flux drift measurement so far — coverage, events, and no verdict"
     )
     drifted.set_defaults(fn=cmd_drift)
+
+    positioned = with_org(with_repo(subs.add_parser(
+        "positions", help="believed map, rival forecasts, revealed truth — and the deltas between them"
+    )))
+    positioned.add_argument("--scenario", required=True)
+    positioned.add_argument("--out", required=True)
+    positioned.set_defaults(fn=cmd_positions)
+
+    credenced = with_org(with_repo(subs.add_parser(
+        "credibility", help="blend a world-layer prior with an org's own sparse data"
+    )))
+    credenced.add_argument("--subject", required=True, help="the subject a world-layer prior names")
+    credenced.add_argument("--out", required=True)
+    credenced.set_defaults(fn=cmd_credibility)
 
     score = with_org(with_repo(subs.add_parser("score", help="score a forecast bundle against an outcome")))
     score.add_argument("--forecast", required=True, help="path to a forecast-bundle artefact")

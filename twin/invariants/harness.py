@@ -280,6 +280,92 @@ def _worksheet_matches(ctx: Context) -> str:
     return f"{len(results) - pending} hand-computed lines match, {pending} pending on open tickets"
 
 
+@harness_check("position_deltas_have_no_privileged_default")
+def _position_deltas_have_no_privileged_default(ctx: Context) -> str:
+    """No world model — including the org's own believed map — is required (build ticket 16).
+
+    A guard on the suite rather than an invariant, for the same reason the pocket-org worksheet
+    and the drift window are: the constitution's sixteen are named *absences*, and this asserts a
+    **semantic property of a module's contract** instead — the same kind of thing
+    `an_intervention_never_reaches_upstream` guards.
+
+    Three legs. Dropping any one of the netflix fixture's three world models — including
+    `netflix-believed`, the org's own map, and `twin-default`, the twin's own default reference —
+    still computes, and the survivors' own scores against revealed truth do not move. And the
+    artefact body carries no field named `actual`: the only way a privileged position could creep
+    back in is a schema slot for one, and there is none to plant.
+    """
+    from ..model import Overlay
+    from ..positions import deltas
+    from ..repo import ModelRepo
+
+    proposition = "dvd-rental-revenue-falls-faster-than-streaming-adds"
+    all_models = ["twin-default", "rival-fast-commoditisation", "netflix-believed"]
+    overlay = Overlay.load(ModelRepo.open(ctx.repo_dir), "netflix")
+
+    full = deltas(overlay, proposition, all_models)
+    if "actual" in full:
+        raise Violated("the artefact carries a field named 'actual' — a privileged position exists")
+    full_scores = {row["id"]: row["brier"] for row in full["against_revealed"]}
+
+    for dropped in all_models:
+        remaining = [m for m in all_models if m != dropped]
+        body = deltas(overlay, proposition, remaining)
+        if {p["id"] for p in body["positions"]} != set(remaining):
+            raise Violated(f"dropping {dropped!r} changed which positions the remainder computed")
+        for row in body["against_revealed"]:
+            if row["brier"] != full_scores[row["id"]]:
+                raise Violated(
+                    f"dropping {dropped!r} moved {row['id']!r}'s own score against revealed truth "
+                    "— a position's arithmetic depended on who else was in the room"
+                )
+    return f"{len(all_models)} positions, each dispensable, none privileged; scores stay put when any one is dropped"
+
+
+@harness_check("credibility_blend_falls_back_to_the_world_prior_alone")
+def _credibility_blend_has_no_hidden_default(ctx: Context) -> str:
+    """A subject with no own-data prices from the world-layer prior alone, and says so
+    (build ticket 31, AC 2) — and a subject that *has* own-data actually moves off it.
+
+    Two legs, both on the pocket-org fixture: `payment-fraud-loss` carries a world prior and no
+    `own_data` file, so its blend must equal the prior exactly with `n=0` declared. Rebuilds the
+    fixture once per suite run, memoised the same way the pocket-org worksheet guard is.
+    """
+    from .. import fixtures, verbs
+    from ..grades import Capabilities
+    from ..model import Overlay
+    from ..repo import ModelRepo
+
+    pocket = ctx.tmp / "pocket-org"
+    if not pocket.exists():
+        fixtures.build_pocket_org(pocket)
+    repo = ModelRepo.open(pocket)
+    overlay = Overlay.load(repo, "pocket")
+
+    unpriced = verbs.credibility(
+        repo, ctx.caps, "pocket", "payment-fraud-loss",
+        verbs.command_for("credibility", org="pocket", subject="payment-fraud-loss"),
+    ).body
+    if unpriced["own_data"]["n"] != 0:
+        raise Violated("payment-fraud-loss carries an own_data file in the fixture; this guard needs none")
+    prior = overlay.prior("payment-fraud-loss")["industry"]
+    if unpriced["blended"] != {"min": float(prior["min"]), "mode": float(prior["mode"]), "max": float(prior["max"])}:
+        raise Violated("a subject with no own-data did not blend to exactly its world-layer prior")
+
+    priced = verbs.credibility(
+        repo, ctx.caps, "pocket", "identity-store-incident-cost",
+        verbs.command_for("credibility", org="pocket", subject="identity-store-incident-cost"),
+    ).body
+    if priced["own_data"]["n"] == 0:
+        raise Violated("identity-store-incident-cost carries no own_data in the fixture; this guard needs some")
+    if priced["blended"] == priced["world_prior"]:
+        raise Violated("own-data present and the blend did not move off the world-layer prior at all")
+    return (
+        f"payment-fraud-loss (n=0) blends to exactly its prior; identity-store-incident-cost "
+        f"(n={priced['own_data']['n']}) moves off it — z={priced['credibility']['z']}"
+    )
+
+
 @harness_check("graded_edge_fixture_holds_its_contract")
 def _graded_edge_contract(ctx: Context) -> str:
     """The boundary contract the £ and skills tracks build against (build ticket 17).

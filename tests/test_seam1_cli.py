@@ -569,3 +569,84 @@ def test_reliability_names_its_score_cards_by_digest_not_by_path(
     assert str(card) not in raw and str(tmp_path) not in raw
     doc = json.loads(raw)
     assert doc["envelope"]["pins"]["score_cards"][0]["sha256"] == sha256_hex(card.read_bytes())
+
+
+# -- positions (build ticket 16) ------------------------------------------------------------
+
+
+def test_positions_emits_deltas_and_scores_for_a_scenarios_ensemble(model_repo_dir: Path, tmp_path: Path) -> None:
+    out = tmp_path / "positions.json"
+    assert _run(
+        model_repo_dir, "positions", *NETFLIX, "--scenario", "dvd-decline-2011", "--out", str(out)
+    ) == 0
+
+    body = json.loads(out.read_bytes())["body"]
+    assert body["scenario"]["id"] == "dvd-decline-2011"
+    assert {p["id"] for p in body["positions"]} == {
+        "twin-default", "rival-fast-commoditisation", "netflix-believed",
+    }
+    assert len(body["pairwise"]) == 3
+    assert body["revealed"]["resolved"] is True
+    assert {row["id"] for row in body["against_revealed"]} == {p["id"] for p in body["positions"]}
+    assert "actual" not in body, "no field anywhere holds a privileged position"
+
+
+def test_positions_refuses_an_unknown_scenario(model_repo_dir: Path, tmp_path: Path) -> None:
+    out = tmp_path / "positions.json"
+    assert _run(
+        model_repo_dir, "positions", *NETFLIX, "--scenario", "no-such-scenario", "--out", str(out)
+    ) == 2
+    assert not out.exists()
+
+
+# -- credibility (build ticket 31) -----------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def pocket_repo_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    return fixtures.build_pocket_org(tmp_path_factory.mktemp("pocket") / "repo")
+
+
+def test_credibility_blends_own_data_with_the_world_prior(pocket_repo_dir: Path, tmp_path: Path) -> None:
+    out = tmp_path / "credibility.json"
+    assert _run(
+        pocket_repo_dir, "credibility", "--org", "pocket",
+        "--subject", "identity-store-incident-cost", "--out", str(out),
+    ) == 0
+
+    body = json.loads(out.read_bytes())["body"]
+    assert body["own_data"]["n"] == 3
+    assert 0.0 < body["credibility"]["z"] < 1.0
+    assert body["blended"] != body["world_prior"], "own-data present, so the blend moved off the prior"
+
+
+def test_credibility_with_no_own_data_returns_the_world_prior_exactly(
+    pocket_repo_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    out = tmp_path / "credibility.json"
+    assert _run(
+        pocket_repo_dir, "credibility", "--org", "pocket",
+        "--subject", "payment-fraud-loss", "--out", str(out),
+    ) == 0
+
+    body = json.loads(out.read_bytes())["body"]
+    assert body["own_data"] == {
+        "n": 0, "mean": None, "variance": None,
+        "note": "no own-data observations; pricing from the world-layer prior alone",
+    }
+    world = body["world_prior"]
+    assert body["blended"] == {"min": world["min"], "mode": world["mode"], "max": world["max"]}
+
+    printed = capsys.readouterr().out
+    assert "world-layer prior alone" in printed, (
+        "the CLI summary must show the honest-default note, not a bare None"
+    )
+
+
+def test_credibility_refuses_an_unknown_subject(pocket_repo_dir: Path, tmp_path: Path) -> None:
+    out = tmp_path / "credibility.json"
+    assert _run(
+        pocket_repo_dir, "credibility", "--org", "pocket",
+        "--subject", "no-such-subject", "--out", str(out),
+    ) == 2
+    assert not out.exists()

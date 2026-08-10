@@ -32,10 +32,10 @@ WORLD = "world"
 ORGS = "orgs"
 BEHAVIOURAL = "behavioural"
 
-WORLD_COLLECTIONS = ("components", "propositions", "world_models")
+WORLD_COLLECTIONS = ("components", "propositions", "world_models", "priors")
 OVERLAY_COLLECTIONS = (
     "components", "world_models", "signals", "claims", "scenarios", "outcomes", "people", "edges",
-    "perspectives", "regrades", "responses",
+    "perspectives", "regrades", "responses", "own_data",
 )
 
 
@@ -79,6 +79,23 @@ def _refuse_unread_directories(repo: ModelRepo, tree: str, prefix: str, known: t
         )
 
 
+def _refuse_duplicate_subject(collection: dict[str, dict[str, Any]], prefix: str, subdir: str) -> None:
+    """Two files naming the same `subject` leaves it ambiguous which one is authoritative.
+
+    The `id` uniqueness `_collection` already checks guards the file name; this guards the
+    field the credibility blend actually looks up by (build ticket 31).
+    """
+    seen: dict[str, str] = {}
+    for ident, doc in sorted(collection.items()):
+        subject = str(doc["subject"])
+        if subject in seen:
+            raise ModelError(
+                f"{prefix}/{subdir}: {seen[subject]!r} and {ident!r} both name subject "
+                f"{subject!r} — a subject may have only one authority per layer"
+            )
+        seen[subject] = ident
+
+
 def orgs(repo: ModelRepo) -> list[str]:
     seen = {p.split("/")[1] for p in repo.list(ORGS) if p.count("/") >= 2}
     return sorted(seen)
@@ -90,6 +107,9 @@ class World:
     components: dict[str, dict[str, Any]]
     propositions: dict[str, dict[str, Any]]
     world_models: dict[str, dict[str, Any]]
+    # The credibility-theory industry prior (build ticket 31, decision ticket 07 Q1b). Keyed by
+    # subject via `Overlay.prior`, not by id here — the id is just the file's own identifier.
+    priors: dict[str, dict[str, Any]]
 
     @classmethod
     def load(cls, repo: ModelRepo, at_commit: str | None = None) -> "World":
@@ -97,6 +117,7 @@ class World:
         validate("world-meta", repo.read_yaml_at(ref.tree, "meta.yaml"), f"{WORLD}/meta.yaml")
         _refuse_unread_directories(repo, ref.tree, WORLD, WORLD_COLLECTIONS)
         loaded = {name: _collection(repo, ref.tree, WORLD, name) for name in WORLD_COLLECTIONS}
+        _refuse_duplicate_subject(loaded["priors"], WORLD, "priors")
         return cls(ref=ref, **loaded)
 
 
@@ -118,6 +139,9 @@ class Overlay:
     perspectives: dict[str, dict[str, Any]]
     regrades: dict[str, dict[str, Any]]
     responses: dict[str, dict[str, Any]]
+    # Sparse own-data observations, keyed by the file's own id (build ticket 31). Looked up by
+    # subject via `own_data_for`, the overlay half of the credibility blend.
+    own_data: dict[str, dict[str, Any]]
 
     @classmethod
     def load(cls, repo: ModelRepo, org: str) -> "Overlay":
@@ -166,6 +190,19 @@ class Overlay:
             return self.world.propositions[ident]
         raise ModelError(f"no proposition {ident!r} in the pinned world layer")
 
+    def prior(self, subject: str) -> dict[str, Any]:
+        """The industry prior for a subject (build ticket 31). Priors live in the world layer only
+        — there is no overlay-authored prior, because "industry" is the shared layer's whole job."""
+        found = [p for p in self.world.priors.values() if p["subject"] == subject]
+        if not found:
+            known = ", ".join(sorted({p["subject"] for p in self.world.priors.values()})) or "none"
+            raise ModelError(f"no world-layer prior for subject {subject!r} (have: {known})")
+        return found[0]
+
+    def own_data_for(self, subject: str) -> dict[str, Any] | None:
+        """This org's own observations for a subject, or `None` — the honest default (build ticket 31)."""
+        return next((d for d in self.own_data.values() if d["subject"] == subject), None)
+
     def _check_references(self) -> None:
         for ident, comp in sorted(self.components.items()):
             for need in comp.get("needs", []) or []:
@@ -207,6 +244,24 @@ class Overlay:
                     ) from None
         self._check_scenarios()
         self._check_responses()
+        self._check_own_data()
+
+    def _check_own_data(self) -> None:
+        """Own-data observations name a subject a world-layer prior actually declares.
+
+        An own-data file for a subject nobody published an industry prior for is orphaned: the
+        blend has a numerator and no denominator to weigh it against (build ticket 31).
+        """
+        _refuse_duplicate_subject(self.own_data, f"{ORGS}/{self.org}", "own_data")
+        world_subjects = {str(p["subject"]) for p in self.world.priors.values()}
+        for ident, doc in sorted(self.own_data.items()):
+            subject = str(doc["subject"])
+            if subject not in world_subjects:
+                raise ModelError(
+                    f"own-data {ident!r} names subject {subject!r}, which no world-layer prior "
+                    "declares. Own-data blends against an industry prior; with none published "
+                    "for this subject there is nothing to blend it into."
+                )
 
     def _check_scenarios(self) -> None:
         """A scenario names components that exist.

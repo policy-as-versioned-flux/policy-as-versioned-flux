@@ -58,6 +58,39 @@ def test_a_belief_of_certainty_is_refused(value: float) -> None:
         )
 
 
+# -- credibility (build ticket 31) -------------------------------------------------------------
+
+PRIOR = {
+    "id": "a-prior", "subject": "a-subject",
+    "industry": {"min": 20000, "mode": 50000, "max": 140000},
+    "basis": "Industry loss study, fixture.",
+}
+OWN_DATA = {"id": "a-sample", "subject": "a-subject", "observations": [30000, 50000], "basis": "Incident log."}
+
+
+def test_a_prior_validates() -> None:
+    validate("prior", PRIOR, "planted")
+
+
+def test_a_prior_with_an_unknown_field_is_refused() -> None:
+    with pytest.raises(SchemaError, match="schema is closed"):
+        validate("prior", {**PRIOR, "amount": 1}, "planted")
+
+
+def test_own_data_validates() -> None:
+    validate("own-data", OWN_DATA, "planted")
+
+
+def test_own_data_needs_at_least_one_observation() -> None:
+    with pytest.raises(SchemaError, match="non-empty"):
+        validate("own-data", {**OWN_DATA, "observations": []}, "planted")
+
+
+def test_own_data_observations_must_be_non_negative() -> None:
+    with pytest.raises(SchemaError, match="non-negative"):
+        validate("own-data", {**OWN_DATA, "observations": [-1]}, "planted")
+
+
 # -- Article 9 ---------------------------------------------------------------------------------
 
 

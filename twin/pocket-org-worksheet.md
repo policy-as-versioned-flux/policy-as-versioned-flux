@@ -14,10 +14,11 @@ what they fail against.
 `twin worksheet --repo <a pocket-org repository>` checks the emitted artefacts against every line
 below — the **graph**, the **blast radius** from `shared-database`, the **exposure** of scenario
 `portal-availability-2026` under both declared perspectives, the **propagation** of a shock at
-`shared-database`, the **priced option set** under the operator, and the **intervention** and the
-**observation** at `order-service`. Values are compared at **6 decimal places**, declared here
-rather than hidden inside the comparison, because the expected column is decimal and the computed
-one is binary floating point.
+`shared-database`, the **priced option set** under the operator, the **intervention** and the
+**observation** at `order-service`, two **priced shocks**, and the **credibility blend** of
+`identity-store-incident-cost` (build ticket 31). Values are compared at **6 decimal places**,
+declared here rather than hidden inside the comparison, because the expected column is decimal
+and the computed one is binary floating point.
 
 ## The contract every later ticket inherits
 
@@ -342,3 +343,9 @@ named is the one that must make them computable.
 | 74 | `credit.order-service.the-operator.retrain-the-on-call-rota.mode` | `40000` | 160000 x 0.25 | build ticket 30 |
 | 75 | `credit.order-service.the-operator.add-a-read-replica.credited` | `0` | a grade-3 mitigation claim earns nothing, not a discount | build ticket 30 |
 | 76 | `credit.order-service.the-staff-council.bet-the-org-on-one-supplier.credited` | `0` | it claims no mitigation; silence is not an average reduction | build ticket 30 |
+| 77 | `credibility.identity-store-incident-cost.n` | `3` | three own-data observations: 30000, 50000, 40000 | build ticket 31 |
+| 78 | `credibility.identity-store-incident-cost.own_mean` | `40000` | (30000 + 50000 + 40000) / 3 | build ticket 31 |
+| 79 | `credibility.identity-store-incident-cost.z` | `0.932039` | 3 / (3 + K), K = own_variance / world_variance = 100000000 / (3200000000/7) = 7/32 | build ticket 31 |
+| 80 | `credibility.identity-store-incident-cost.blended_min` | `10679.611650` | 20000 + 0.932039 x (40000 - 50000) | build ticket 31 |
+| 81 | `credibility.identity-store-incident-cost.blended_mode` | `40679.611650` | 50000 + 0.932039 x (40000 - 50000) | build ticket 31 |
+| 82 | `credibility.identity-store-incident-cost.blended_max` | `130679.611650` | 140000 + 0.932039 x (40000 - 50000) | build ticket 31 |

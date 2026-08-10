@@ -639,6 +639,20 @@ SCHEMAS: dict[str, Schema] = {
         required={"id": ident, "cohort": ident, "metric": ident, "value": unit_interval, "observed_on": date},
         optional={"sensor": text, "gameability": one_of("low", "medium", "high"), "note": text},
     ),
+    # The industry prior, authored in the world layer (build ticket 31, decision ticket 07 Q1b —
+    # the world/overlay split IS the credibility-theory structure). `subject` is a free identifier
+    # naming whatever this estimates; nothing here ties it to a component, because the blend is a
+    # generic mechanism, not a pricing one.
+    "prior": Schema(
+        required={"id": ident, "subject": ident, "industry": money_pert, "basis": text},
+    ),
+    # An org's own sparse observations for a subject a world-layer prior names (build ticket 31).
+    # Absence of this file for a subject is the honest default — the org prices from the world
+    # prior alone — so `observations` is required non-empty rather than optional-and-empty: a file
+    # that exists but claims no data is a different, confusing way to say the same thing.
+    "own-data": Schema(
+        required={"id": ident, "subject": ident, "observations": list_of(amount), "basis": text},
+    ),
 }
 
 
@@ -765,4 +779,6 @@ COLLECTION_KINDS: dict[str, str] = {
     "perspectives": "perspective",
     "responses": "response",
     "observations": "observation",
+    "priors": "prior",
+    "own_data": "own-data",
 }

@@ -642,6 +642,28 @@ credence: 0.5
 beliefs:
   the-portal-misses-its-availability-target: 0.4
 """,
+    # The credibility blend's world half (build ticket 31). Hand-checkable numbers: PERT mean
+    # (20000 + 4x50000 + 140000) / 6 = 60000, variance (60000-20000) x (140000-60000) / 7 =
+    # 3200000000/7. `identity-store-incident-cost` carries own-data below; `payment-fraud-loss`
+    # deliberately does not, so "no own-data prices from the prior alone" has a real subject too.
+    "world/priors/identity-store-incident-cost.yaml": """\
+id: identity-store-incident-cost
+subject: identity-store-incident-cost
+industry:
+  min: 20000
+  mode: 50000
+  max: 140000
+basis: Cyentia-IRIS-class industry severity study, fixture stand-in.
+""",
+    "world/priors/payment-fraud-loss.yaml": """\
+id: payment-fraud-loss
+subject: payment-fraud-loss
+industry:
+  min: 5000
+  mode: 15000
+  max: 60000
+basis: Industry fraud-loss study, fixture stand-in.
+""",
 }
 
 POCKET_OVERLAY: dict[str, str] = {
@@ -917,6 +939,16 @@ cost:
 crosses:
   insolvency: >-
     A real chance the organisation cannot meet its obligations if the supplier fails.
+""",
+    # The credibility blend's overlay half (build ticket 31). Three own-data points, hand-checkable:
+    # mean (30000+50000+40000)/3 = 40000; sample variance ((30000-40000)^2 + (50000-40000)^2 +
+    # (40000-40000)^2) / 2 = 100000000. K = own_variance / world_variance = 100000000 /
+    # (3200000000/7) = 7/32 = 0.21875. Z = n/(n+K) = 3/(3 + 7/32) = 96/103.
+    "orgs/pocket/own_data/identity-store-incidents.yaml": """\
+id: identity-store-incidents
+subject: identity-store-incident-cost
+observations: [30000, 50000, 40000]
+basis: Three dated identity-store incident postmortems, cost measured on both sides of each.
 """,
 }
 

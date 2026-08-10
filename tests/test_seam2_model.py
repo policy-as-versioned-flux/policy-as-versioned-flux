@@ -118,6 +118,90 @@ def test_a_world_file_pointing_into_the_overlay_tree_is_caught(tmp_path: Path) -
     assert any("points into the overlay tree" in v for v in violations)
 
 
+# -- credibility priors and own-data (build ticket 31) ------------------------------------------
+
+
+def _add_prior(
+    root: Path, subject: str = "a-subject", ident: str = "a-prior", orgs_to_repin: tuple[str, ...] = ()
+) -> None:
+    """A world-layer prior, added on a fresh commit. Overlays stay pinned to their old
+    `world_ref` unless named in `orgs_to_repin` — the same re-pin `advance_world` exercises."""
+    (root / "world" / "priors").mkdir(parents=True, exist_ok=True)
+    (root / "world" / "priors" / f"{ident}.yaml").write_text(
+        f"id: {ident}\nsubject: {subject}\nindustry:\n  min: 20000\n  mode: 50000\n  max: 140000\n"
+        "basis: Industry loss study, fixture.\n",
+        encoding="utf-8",
+    )
+    fixtures.git(root, "add", "-A")
+    fixtures.git(root, "commit", "-q", "-m", "add a world-layer prior")
+    world_commit = fixtures.git(root, "rev-parse", "HEAD").strip()
+    if orgs_to_repin:
+        for org in orgs_to_repin:
+            (root / "orgs" / org / "meta.yaml").write_text(
+                f"id: {org}\nunit: overlay\norg: {org}\nworld_ref: {world_commit}\n", encoding="utf-8"
+            )
+        fixtures.git(root, "add", "-A")
+        fixtures.git(root, "commit", "-q", "-m", "re-pin to the world commit carrying the prior")
+
+
+def _add_own_data(root: Path, org: str, subject: str = "a-subject", ident: str = "a-sample") -> None:
+    directory = root / "orgs" / org / "own_data"
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / f"{ident}.yaml").write_text(
+        f"id: {ident}\nsubject: {subject}\nobservations: [30000, 50000]\nbasis: Incident log.\n",
+        encoding="utf-8",
+    )
+    fixtures.git(root, "add", "-A")
+    fixtures.git(root, "commit", "-q", "-m", "add own-data")
+
+
+def test_a_prior_resolves_by_subject_not_by_id(scratch_repo: Path) -> None:
+    _add_prior(scratch_repo, subject="a-subject", ident="a-prior", orgs_to_repin=("netflix",))
+    netflix = Overlay.load(ModelRepo.open(scratch_repo), "netflix")
+    assert netflix.prior("a-subject")["id"] == "a-prior"
+    with pytest.raises(ModelError, match="no world-layer prior"):
+        netflix.prior("no-such-subject")
+
+
+def test_two_priors_for_the_same_subject_are_refused(scratch_repo: Path) -> None:
+    _add_prior(scratch_repo, subject="a-subject", ident="first", orgs_to_repin=("netflix",))
+    _add_prior(scratch_repo, subject="a-subject", ident="second", orgs_to_repin=("netflix",))
+    with pytest.raises(ModelError, match="both name subject"):
+        Overlay.load(ModelRepo.open(scratch_repo), "netflix")
+
+
+def test_own_data_with_no_matching_prior_is_refused(scratch_repo: Path) -> None:
+    _add_own_data(scratch_repo, "netflix", subject="an-unpriced-subject")
+    with pytest.raises(ModelError, match="no world-layer prior declares"):
+        Overlay.load(ModelRepo.open(scratch_repo), "netflix")
+
+
+def test_own_data_resolves_by_subject_and_absence_is_the_default(scratch_repo: Path) -> None:
+    _add_prior(scratch_repo, subject="a-subject", orgs_to_repin=("netflix",))
+    _add_own_data(scratch_repo, "netflix", subject="a-subject")
+    netflix = Overlay.load(ModelRepo.open(scratch_repo), "netflix")
+    own = netflix.own_data_for("a-subject")
+    assert own is not None and own["observations"] == [30000, 50000]
+    assert netflix.own_data_for("a-subject-with-none") is None
+
+
+def test_two_own_data_files_for_the_same_subject_are_refused(scratch_repo: Path) -> None:
+    _add_prior(scratch_repo, subject="a-subject", orgs_to_repin=("netflix",))
+    _add_own_data(scratch_repo, "netflix", subject="a-subject", ident="first")
+    _add_own_data(scratch_repo, "netflix", subject="a-subject", ident="second")
+    with pytest.raises(ModelError, match="both name subject"):
+        Overlay.load(ModelRepo.open(scratch_repo), "netflix")
+
+
+def test_own_data_never_reaches_a_tenant_that_did_not_author_it(scratch_repo: Path) -> None:
+    """One org's sparse own-data is the whole reason it lives in the overlay, not the world."""
+    _add_prior(scratch_repo, subject="a-subject", orgs_to_repin=("netflix", "intel"))
+    _add_own_data(scratch_repo, "netflix", subject="a-subject")
+    intel = Overlay.load(ModelRepo.open(scratch_repo), "intel")
+    assert intel.own_data_for("a-subject") is None
+    assert intel.prior("a-subject")["id"] == "a-prior", "the prior is in the shared world layer"
+
+
 def test_a_dangling_dependency_is_refused_at_load(scratch_repo: Path) -> None:
     component = scratch_repo / "orgs" / "netflix" / "components" / "dvd-by-mail.yaml"
     component.write_text(

@@ -73,6 +73,11 @@ _CREDIT = re.compile(
     r"^credit\.(?P<origin>[a-z0-9-]+)\.(?P<perspective>[a-z0-9-]+)\.(?P<option>[a-z0-9-]+)\."
     r"(?P<point>min|mode|max|mean|credited)$"
 )
+# The credibility blend (build ticket 31), keyed by subject.
+_CREDIBILITY = re.compile(
+    r"^credibility\.(?P<subject>[a-z0-9-]+)\."
+    r"(?P<what>n|own_mean|z|blended_min|blended_mode|blended_max)$"
+)
 
 # Which emitted artefact each family of keys is resolved against. One worksheet, several
 # artefacts: the graph stopped being the only place a hand-computable number lands at build
@@ -83,6 +88,9 @@ INTERVENTION, OBSERVATION = "intervention", "observation"
 # Two priced shocks, keyed by origin (build ticket 30). One the gate admits and one it refuses,
 # because a gate asserted only where it passes is asserted only where nothing could go wrong.
 PRICE = "price"
+# The credibility blend's own subject (build ticket 31).
+CREDIBILITY = "credibility"
+CREDIBILITY_SUBJECT = "identity-store-incident-cost"
 
 
 class WorksheetError(RuntimeError):
@@ -245,6 +253,20 @@ def resolve(key: str, bodies: dict[str, dict[str, Any]]) -> float | None:
         match = pattern.match(key)
         if match:
             return reader(bodies.get(f"{PRICE}:{match.group('origin')}"), match)
+
+    blend = _CREDIBILITY.match(key)
+    if blend:
+        credibility_body = bodies.get(CREDIBILITY)
+        if credibility_body is None or credibility_body.get("subject") != blend.group("subject"):
+            return None
+        what = blend.group("what")
+        if what == "n":
+            return float(credibility_body["own_data"]["n"])
+        if what == "own_mean":
+            return _maybe(credibility_body["own_data"]["mean"])
+        if what == "z":
+            return float(credibility_body["credibility"]["z"])
+        return float(credibility_body["blended"][what.removeprefix("blended_")])
 
     admitted = _ADMISSION.match(key)
     if admitted:
@@ -421,6 +443,10 @@ def bodies_for(repo: Any, caps: Any) -> dict[str, dict[str, Any]]:
         emitted[f"{PRICE}:{origin}"] = verbs.price(
             repo, caps, org, origin, None, verbs.command_for("price", org=org, origin=origin)
         )
+    emitted[CREDIBILITY] = verbs.credibility(
+        repo, caps, org, CREDIBILITY_SUBJECT,
+        verbs.command_for("credibility", org=org, subject=CREDIBILITY_SUBJECT),
+    )
     return {name: json.loads(art.to_bytes())["body"] for name, art in emitted.items()}
 
 

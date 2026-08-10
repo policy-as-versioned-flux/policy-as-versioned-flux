@@ -1,13 +1,13 @@
 # `twin`
 
-Build tickets 01–15, 17–22, 26–30, 35 and 36 of `.scratch/twin/`, plus 23 at `partial` and 64
+Build tickets 01–22, 26–31, 35 and 36 of `.scratch/twin/`, plus 23 at `partial` and 64
 instrumented and measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 28 of 77 build tickets closed, one part-built, and one measuring against a clock that runs
+**This is 30 of 77 build tickets closed, one part-built, and one measuring against a clock that runs
 to 2026-11-06.** What is not built is listed below and, more usefully, is named
 inside every artefact the tool emits.
 
@@ -28,6 +28,7 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin rewind --repo R --at T          # the model state at a declared time (abduction)
 ./bin/twin run --repo R --scenario S --regime as-consumed   # the gate is required, with no default
 ./bin/twin regimes --repo R --scenario S   # the same scenario under all three, with the gaps
+./bin/twin positions --repo R --org O --scenario S  # believed, rival, revealed — and the deltas between them
 ./bin/twin sweep --repo R [--repo R2 ...]  # every scenario, every org, unconditionally — no --scenario
 ./bin/twin reliability --score-card C1 --score-card C2 # bins over a pooled population, empty bins shown
 ./bin/twin drift                           # the Flux drift measurement: coverage, events, no verdict
@@ -35,6 +36,7 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
 ./bin/twin price --repo R --origin C       # a shock priced under every eye, responses beside it
 ./bin/twin constraints --out F             # the published constraint set, floor and exclusions
+./bin/twin credibility --repo R --org O --subject S  # the world prior blended with an org's own sparse data
 ./bin/twin worksheet --repo P              # the pocket org against its hand-computed worksheet
 ./bin/twin sign <artefact> --role R        # accountability for an authored artefact
 ./bin/twin grade                           # computed depth grades, with evidence
@@ -274,6 +276,58 @@ history straddles T, which is why the sensing gap needs it. And **a regrade is n
 `schema.DATED_FACTS` covers facts about the world, and a regrade is the twin's own record of how
 strong a claim is.
 
+## Believed, rival, revealed — and no privileged map
+
+`twin positions` (build ticket 16) is the other half of "no code path collapses an ensemble": once
+several positions exist, the *deltas between them* are the point, not merely their separate
+display. A believed map and a rival forecast are typed identically — both are ordinary
+`world-model` objects, distinguished only by the name their author gave them — and revealed truth
+is not even a world model: it is derived from a resolved `outcome`, so there is no schema slot
+anywhere a privileged "actual" map could occupy.
+
+Every unordered pair of named positions gets a plain delta, `|a - b|`, because there is no ground
+truth between two forecasts to score against. Every position with a resolved outcome to compare
+against also gets the same proper score (`twin/scoring.py`'s Brier and log loss) any forecast
+gets — the twin's own default reference travels through the identical call as a rival's id, with
+no branch anywhere that treats one specially.
+
+**Dropping any one position changes nothing about the rest.** Removing the org's own believed map,
+or the twin's own default reference, from the set still computes, and the survivors' own figures
+do not move — demonstrated on the netflix fixture in `tests/test_positions.py` and asserted at the
+suite level by harness guard `position_deltas_have_no_privileged_default`. Nothing here classifies
+which id is "believed" versus "rival": that would itself be the schema-level privilege the ticket
+refuses, so the module treats a scenario's whole `world_models` list identically and lets each
+world model's own `name` field carry whatever role its author gave it.
+
+## The credibility prior: the world/overlay split earning its keep
+
+`twin credibility` (build ticket 31) is the blend the world/overlay split existed to enable but had
+not yet delivered: an **industry prior**, authored once in the world layer as a money-shaped PERT
+triple, blended with an org's own **sparse own-data**, authored in its overlay as a plain list of
+past observations. Bühlmann–Straub credibility weighting decides how much of each:
+
+    estimate = Z x (own-data mean) + (1 - Z) x (industry prior mode),   Z = n / (n + K)
+
+`Z` rises with the volume of own-data and falls with its variance — `twin/credibility.py` sets `K`
+from the ratio of the org's own-data variance to the industry prior's own variance, the honest
+single-org substitute for a portfolio-estimated between-risk variance research 02 describes; the
+`ponytail:` comment in the module names the upgrade path if the world layer ever carries more than
+one org's worth of hypothetical means.
+
+**An org with no own-data prices from the world prior alone, and says so.** The pocket-org fixture
+carries two subjects on purpose: `identity-store-incident-cost` has three own-data observations
+and blends off the prior, and `payment-fraud-loss` has none and blends to exactly its industry
+prior, with `own_data.n: 0` and a stated note rather than a silent default. Harness guard
+`credibility_blend_falls_back_to_the_world_prior_alone` asserts both directions on the fixture, and
+`twin/pocket-org-worksheet.md` lines 77–82 hand-check every figure of the priced subject.
+
+The blend never narrows the industry prior's own width from a handful of own-data points — the
+whole triple translates by the credibility-weighted shift in its mode, so a handful of
+observations moves the centre without manufacturing a narrower band than the evidence supports.
+`ponytail:` nothing clips the translated bounds, so an own-mean far below a wide prior's mode can
+in principle carry the low end negative; the ceiling is named in `twin/credibility.py` rather than
+guarded against, because clipping would be its own, quieter form of false precision.
+
 ## Flux drift: instrumented, and waiting
 
 Build ticket 64 started a clock rather than closing. The spec claims policy-as-code needs
@@ -393,20 +447,21 @@ gate admits, so the edge that carries a real range is the one that may not price
 
 ## The pocket org
 
-Five components, eight edges, named elasticities, two perspectives, four candidate responses, and a
-committed worksheet (`twin/pocket-org-worksheet.md`) with every number worked out **by hand** and
-the arithmetic shown. `twin worksheet --repo <pocket repo>` checks the emitted graph, blast radius,
-exposure, propagation, priced option set, intervention, observation and **two priced shocks**
-against all seventy-six lines.
+Five components, eight edges, named elasticities, two perspectives, four candidate responses, two
+world-layer priors, and a committed worksheet (`twin/pocket-org-worksheet.md`) with every number
+worked out **by hand** and the arithmetic shown. `twin worksheet --repo <pocket repo>` checks the
+emitted graph, blast radius, exposure, propagation, priced option set, intervention, observation,
+**two priced shocks** and the **credibility blend** of `identity-store-incident-cost` (build
+ticket 31) against all eighty-two lines.
 
 This exists because a refusal test catches a reintroduced **absence** and nothing else. It is
 satisfied by a degenerate system: a PERT triple that is present but garbage, a score tagged with the
 wrong regime, an elasticity that stops being recalibrated three tickets later. All of those stay
 green under every refusal test, and all of them fail here.
 
-**All seventy-six lines are computable and match. Nothing is pending.** A pending line whose build
+**All eighty-two lines are computable and match. Nothing is pending.** A pending line whose build
 ticket has closed is a failure, the same shape as an invariant still pending after its activating
-ticket, and build ticket 30 was the last one owing a line.
+ticket, and build ticket 31 was the last one to add lines (77-82).
 
 Every derivation-path ticket adds its own line: that contract is written into the worksheet,
 because a ticket that lands without a line here has no yardstick.
@@ -466,6 +521,14 @@ event-triggered, ad-hoc), this ticket builds only the first, and a criterion ask
 is not satisfied by one of them, however central. Precondition-triggered sweeps are build ticket 46
 and library curation is build ticket 69.
 
+**Build tickets 16 and 31 landed this round and ticked nothing, and that is the honest number
+again.** Both build real, tested mechanisms — the believed/rival/revealed deltas and the
+Bühlmann–Straub blend — against capability checklists that already exist (`domain-model`,
+`provenance`, `scenario-engine`, `sense-move`, `currency-regimes`); neither ticket's work is
+precisely what any of those capabilities' remaining acceptance criteria ask for, so ticking one to
+mark the ticket "worth something" would be exactly the self-declared grading `twin/grades.py`
+exists to refuse. The arithmetic stays at **11 of 41** two rounds running.
+
 Several criteria were considered and left unticked, on the same ground five were withdrawn on in
 earlier rounds — each rested on **one clause of a multi-clause criterion**, or on machinery that
 does not exist:
@@ -513,7 +576,7 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 25 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 572 tests
+`./bin/twin verify` — 27 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 622 tests
 across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
@@ -581,7 +644,7 @@ claim binds it to a component the scenario forecasts. The positive leg is assert
 negative one: the same fixture still forecasts under `as-consumed`, because a gate that refused
 everything would pass every refusal in the check while making the regime useless.
 
-Six checks were added to the **harness** instead, because each guards a yardstick or a semantic
+Eight checks were added to the **harness** instead, because each guards a yardstick or a semantic
 property rather than a named absence the constitution enumerates: `worksheet_matches_the_pocket_org`
 (the hand-computed numbers still hold), `graded_edge_fixture_holds_its_contract` (the generated
 causal-edge fixture still carries what the £ and skills tracks depend on),
@@ -589,8 +652,12 @@ causal-edge fixture still carries what the £ and skills tracks depend on),
 `drift_window_was_declared_before_it_was_measured` (build ticket 64's pre-registration predates its
 own data, read out of git history rather than promised), `drift_window_is_actually_being_sampled`
 (the window is receiving samples, not merely declared — added after a probe went silent for three
-days and nothing noticed) and `scheduled_emission_ignores_signal_presence` (two sweeps over an
-unchanged repository emit the same forecast count, not a shrinking one; build ticket 09).
+days and nothing noticed), `scheduled_emission_ignores_signal_presence` (two sweeps over an
+unchanged repository emit the same forecast count, not a shrinking one; build ticket 09),
+`position_deltas_have_no_privileged_default` (dropping any one position, including the org's own
+believed map, changes nothing about the rest; build ticket 16) and
+`credibility_blend_falls_back_to_the_world_prior_alone` (a subject with no own-data blends to
+exactly its industry prior; one with own-data moves off it; build ticket 31).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared
@@ -646,8 +713,12 @@ Named here so the skeleton cannot quietly become the definition of done.
   71–77 are where a real evidence base has to carry it.
 - **No heavy tails, no TVaR, no empirical anchor, no trade-off curve.** PERT sampling exists and
   everything above it does not. A price is a triple scaled point-wise, so the tail of a loss
-  distribution is not modelled at all. (24, 25, 31–33.) Build ticket 25's subject changed with
-  build ticket 30: it anchors **valuations** now, because there is no severity to anchor.
+  distribution is not modelled at all. (24, 25, 32–33.) Build ticket 25's subject changed with
+  build ticket 30: it anchors **valuations** now, because there is no severity to anchor. The
+  credibility-weighted blend those valuations will eventually be estimated *through* is build
+  ticket 31, and it is built — but nothing yet calls it from `twin exposure` or `twin price`,
+  because wiring a specific valuation through the blend is a modelling decision for whichever
+  ticket anchors that valuation, not a decision the blend mechanism itself makes.
 - **Mitigation credit is subtracted by the reader, not by the artefact.** Cost and credit are
   reported in the same unit and nothing computes a net, because a net is one number and one
   number ends the conversation. The trade-off curve across the ensemble is build ticket 33.
@@ -751,7 +822,12 @@ Named here so the skeleton cannot quietly become the definition of done.
 twin/
   cli.py          seam 1 — the artefact CLI, the primary boundary
   verbs.py        sense / run / score / reliability / graph / blast / propagate / intervene /
-                  observe / rewind / options / exposure
+                  observe / rewind / options / exposure / positions / credibility
+  positions.py    believed map, rival forecasts, revealed truth — no schema-level privilege
+                  between them, and the pairwise deltas computed and scored, not just displayed
+  credibility.py  Bühlmann–Straub: the world-layer industry prior blended with an org's own
+                  sparse overlay data, visible in the artefact and never narrowed by a handful
+                  of points
   schedule.py     the scheduled sweep — every scenario, every org, an org of repositories,
                   unconditionally, with no staleness skip
   schema.py       the closed typed schema; Article 9 has no slot because there is no slot

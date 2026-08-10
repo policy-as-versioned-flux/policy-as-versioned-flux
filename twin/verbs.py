@@ -27,14 +27,17 @@ from . import (
     admission as admission_mod,
     blast as blast_mod,
     constraints,
+    credibility as credibility_mod,
     evidence,
     options as options_mod,
+    positions as positions_mod,
     pricing,
     primitives as primitives_mod,
     propagate as propagate_mod,
     regimes as regimes_mod,
     scoring,
 )
+from .pert import Triple
 
 CAPS_SENSE = ["domain-model", "provenance", "sense-move"]
 CAPS_RUN = ["domain-model", "provenance", "scenario-engine"]
@@ -59,6 +62,14 @@ CAPS_REWIND = ["domain-model", "provenance", "scenario-engine"]
 # The information regimes are rewind's other half — decision ticket 13 Q2 defines a rewind as
 # restoring the model under an information gate, and sense-move owns what counts as ingested.
 CAPS_REGIMES = ["domain-model", "provenance", "scenario-engine", "sense-move"]
+# The believed/rival/revealed deltas read a scenario's ensemble (scenario-engine) and score
+# positions against an outcome (sense-move) — the same pair `run` and `score` each own, joined
+# here rather than duplicated (build ticket 16).
+CAPS_POSITIONS = ["domain-model", "provenance", "scenario-engine", "sense-move"]
+# The credibility blend reads a world-layer prior against an org's overlay own-data (the
+# world/overlay split, decision ticket 07 Q1b) to produce an evidence-adjacent £ figure
+# (decision ticket 09) — build ticket 31.
+CAPS_CREDIBILITY = ["currency-regimes", "domain-model", "provenance"]
 
 KIND_BOUND_SIGNAL = "bound-signal"
 KIND_FORECAST_BUNDLE = "forecast-bundle"
@@ -74,6 +85,8 @@ KIND_REWOUND_MODEL = "rewound-model"
 KIND_REGIME_GAP = "regime-gap"
 KIND_PRICED_IMPACT = "priced-impact"
 KIND_RELIABILITY_DIAGRAM = "reliability-diagram"
+KIND_POSITION_DELTAS = "position-deltas"
+KIND_CREDIBILITY_BLEND = "credibility-blend"
 
 # Calibration's own capability, decision ticket 11 — the same set `score` already carries, because
 # a reliability diagram reads scores `score` produced and adds no domain of its own.
@@ -899,6 +912,76 @@ def regime_gap(
                 f"only {SCORING_REGIME!r} produces a scoring-eligible forecast; the other two "
                 "exist to localise a failure, never to be scored against"
             ),
+        },
+    )
+
+
+# -- positions: believed, rival, revealed (build ticket 16) ---------------------------------
+
+
+def positions(
+    repo: ModelRepo, caps: Capabilities, org: str, scenario_id: str, command: list[str]
+) -> Artefact:
+    """Every position a scenario's ensemble holds, the deltas between them, and each one scored
+    against revealed truth where it has resolved.
+
+    Reads the scenario's own `world_models` list — the identical ensemble `twin run` forecasts
+    over — rather than inventing a second notion of which positions are "in play". Nothing here
+    picks out the org's believed map or the twin's default reference as special: every id is
+    resolved, delta'd and scored through the same call (`twin/positions.py`).
+    """
+    overlay = Overlay.load(repo, org)
+    scenario = overlay.scenarios.get(scenario_id)
+    if scenario is None:
+        known = ", ".join(sorted(overlay.scenarios)) or "none"
+        raise VerbError(f"no scenario {scenario_id!r} in overlay {org!r} (have: {known})")
+    proposition_id = str(scenario.get("proposition", ""))
+    model_ids = [str(m) for m in scenario.get("world_models", []) or []]
+    if not model_ids:
+        raise VerbError(f"scenario {scenario_id!r} names no world models; there is nothing to delta")
+
+    body = positions_mod.deltas(overlay, proposition_id, model_ids)
+    return Artefact(
+        kind=KIND_POSITION_DELTAS,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, _substrate_ref(scenario, f"scenario {scenario_id}")),
+        depth=caps.depth_block(CAPS_POSITIONS),
+        body={"scenario": {"id": scenario_id, "question": scenario.get("question")}, **body},
+    )
+
+
+# -- credibility: the world/overlay blend (build ticket 31) ---------------------------------
+
+
+def credibility(
+    repo: ModelRepo, caps: Capabilities, org: str, subject: str, command: list[str]
+) -> Artefact:
+    """The credibility-weighted blend of a world-layer prior with this org's own sparse data.
+
+    An org with no `own_data` file for `subject` prices from the world-layer prior alone, and
+    the artefact says so (`twin/credibility.py`): absence is the honest default, not an error.
+    """
+    overlay = Overlay.load(repo, org)
+    prior = overlay.prior(subject)
+    own = overlay.own_data_for(subject)
+    raw_observations: list[Any] = own["observations"] if own else []
+    observations = [float(v) for v in raw_observations]
+    industry = Triple.of(prior["industry"])
+    result = credibility_mod.blend(subject, industry, observations)
+
+    return Artefact(
+        kind=KIND_CREDIBILITY_BLEND,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_CREDIBILITY),
+        body={
+            "prior_id": prior["id"],
+            "prior_basis": prior.get("basis"),
+            "own_data_id": own["id"] if own else None,
+            "own_data_basis": own.get("basis") if own else None,
+            **result.as_dict(),
         },
     )
 
