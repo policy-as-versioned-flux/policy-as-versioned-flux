@@ -41,7 +41,11 @@ What the addendum corrects is the inference ticket 65 may draw, not the data.
       suspend state. One JSON line per run, appended. **A run that cannot reach the cluster still
       writes a sample**, because an instrument whose silence reads as stability is worse than no
       instrument.
-- [ ] **The probe is actually scheduled and a sample has arrived.** Reopened 2026-08-10. The guard proves the window was declared before the data; nothing proved any data exists. A liveness check belongs on the suite: zero samples inside an open window is a failing state, not a quiet one.
+- [~] **The probe is actually scheduled and a sample has arrived.** Reopened 2026-08-10, part done.
+      The instrument is **verified working**: run by hand at 09:51Z, cluster reachable, Flux ready,
+      all three subjects sampled. The guard `drift_window_is_actually_being_sampled` is now on the
+      suite and proven to bite on both silence and staleness. **What remains is the schedule** — no
+      crontab entry exists, and installing one is the operator's to run, not the twin's.
 - [x] Measurement runs for a declared window and the window is stated up front, not chosen after seeing results.
       `estate/driftwood/drift/window.yaml` declares both bounds, the cadence, the subjects, what
       counts as a drift event, and the two outcomes that would falsify the spec. Its first commit

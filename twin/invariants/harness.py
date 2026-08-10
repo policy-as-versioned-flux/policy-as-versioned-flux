@@ -379,6 +379,63 @@ def _drift_window_declared_up_front(ctx: Context) -> str:
     )
 
 
+@harness_check("drift_window_is_actually_being_sampled")
+def _drift_window_is_being_sampled(ctx: Context) -> str:
+    """An open measurement window is receiving samples (build ticket 64).
+
+    **This guard exists because its absence cost three days of a ninety-one-day window.** On
+    2026-08-10 the probe was found never to have run: no `samples.jsonl`, no crontab entry, the
+    cluster up and `probe.sh` executable. Ticket 64 had said "measuring" since 2026-08-07.
+
+    `drift_window_was_declared_before_it_was_measured` was green throughout, and correctly so — it
+    proves the window predates the data, and it is vacuously satisfied by no data at all. Nothing
+    proved any data existed. A pre-registration guard and a liveness guard are different guards,
+    and the plan had built only the first.
+
+    `window.yaml` predicted this in its own words — *"a probe nobody owns stops running and nobody
+    notices, and a stopped probe is what produces a confident 'no drift'"* — and it happened anyway,
+    which is the argument for a mechanism over a warning.
+
+    The check is deliberately weak on cadence and strict on silence. A gap wider than the declared
+    cadence is a coverage hole that `reduce.py` reports as one, and coverage is ticket 65's problem.
+    Total silence inside an open window is this guard's problem, because it is the failure that
+    reads as a result.
+    """
+    from .. import drift
+
+    window = drift.Window.load()
+    samples = drift.load_samples()
+    # Wall-clock, deliberately. Liveness is the one property that cannot be asserted from pinned
+    # inputs: the whole question is whether anything has happened *lately*, and a pinned clock
+    # would make this guard green forever at the moment it was written.
+    today = datetime.datetime.now(datetime.timezone.utc)
+
+    opens, closes = drift._day(window.opens), drift._day(window.closes)
+    if today < opens:
+        return f"window {window.opens}..{window.closes} has not opened; nothing owed yet"
+    if not samples:
+        elapsed = (min(today, closes) - opens).days
+        raise Violated(
+            f"the window opened {window.opens} and holds no sample after {elapsed} day(s). "
+            "An unsampled window is not a measurement, and a silent instrument reads as a stable "
+            f"estate — schedule the probe ({window.owner} owns it) before {window.closes}"
+        )
+
+    latest = max(drift._moment(s["ts"]) for s in samples)
+    stale_for = today - latest
+    horizon = datetime.timedelta(days=1)
+    if today <= closes and stale_for > horizon:
+        raise Violated(
+            f"the window is open and the newest sample is {stale_for.days} day(s) old "
+            f"({latest.isoformat()}). The probe has stopped, and a stopped probe writes no "
+            "`unreachable` sample either — the silence is indistinguishable from stability"
+        )
+    return (
+        f"{len(samples)} sample(s) in an open window, newest {latest.date().isoformat()}, "
+        f"{(closes - today).days} day(s) left"
+    )
+
+
 def _first_commit_date(root: Path, path: Path) -> datetime.datetime | None:
     """When a file first entered git history, or `None` if it never has."""
     rel = path.relative_to(root).as_posix()
