@@ -181,6 +181,27 @@ def cmd_causal_accounts(args: argparse.Namespace) -> int:
     return _emit(artefact, args.out)
 
 
+def cmd_trade_off(args: argparse.Namespace) -> int:
+    """Every admitted response's net cost of risk, per named causal account — never one figure."""
+    repo, caps, org = _open(args)
+    artefact = verbs.trade_off(
+        repo, caps, org, args.origin, args.perspective, args.account,
+        verbs.command_for(
+            "trade-off", org=org, origin=args.origin, perspective=args.perspective,
+            account="+".join(sorted(args.account)),
+        ),
+    )
+    body = artefact.body
+    _say(f"{org}/{args.perspective}: a shock at {args.origin!r}, {len(body['curve'])} response(s) "
+         f"across {len(body['accounts'])} account(s)")
+    for point in body["curve"]:
+        by = ", ".join(f"{a}={v:,.0f}" for a, v in sorted(point["net_cost_of_risk"]["by_account"].items()))
+        print(f"  {point['option']:<28} range={point['net_cost_of_risk']['range']:,.0f}  ({by})")
+    print(f"  agreement  unanimous={body['agreement']['unanimous']}  {body['agreement']['note']}")
+    print(f"  default    {body['default']['option']} — {body['default']['basis']}")
+    return _emit(artefact, args.out)
+
+
 def cmd_score(args: argparse.Namespace) -> int:
     from .artefact import digest_of_file
 
@@ -1227,6 +1248,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     accounted.add_argument("--out", required=True)
     accounted.set_defaults(fn=cmd_causal_accounts)
+
+    traded = with_org(with_repo(subs.add_parser(
+        "trade-off", help="net cost of risk per response, across rival causal accounts, with a marked default"
+    )))
+    traded.add_argument("--origin", required=True, help="the component the shock starts at")
+    traded.add_argument("--perspective", required=True, help="whose £ the curve is drawn in")
+    traded.add_argument(
+        "--account", action="append", required=True, default=[],
+        help="a causal-account id (this overlay's own edges may be named too); repeatable, at least two",
+    )
+    traded.add_argument("--out", required=True)
+    traded.set_defaults(fn=cmd_trade_off)
 
     score = with_org(with_repo(subs.add_parser("score", help="score a forecast bundle against an outcome")))
     score.add_argument("--forecast", required=True, help="path to a forecast-bundle artefact")

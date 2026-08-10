@@ -74,6 +74,10 @@ CAPS_CREDIBILITY = ["currency-regimes", "domain-model", "provenance"]
 # Rival causal accounts read the causal layer (each account is a claim about measured effect, the
 # same vocabulary an `influences` edge asserts) over the domain model's graph — build ticket 32.
 CAPS_CAUSAL_ACCOUNTS = ["causal-layer", "domain-model", "provenance"]
+# The trade-off curve joins the causal layer's ensemble spread (32) to the £ (30, currency-regimes)
+# — the same two capabilities `price` itself carries, because a curve across the ensemble is
+# `pricing.price` run once per named account and nothing else — build ticket 33.
+CAPS_TRADEOFF = ["causal-layer", "currency-regimes", "domain-model", "provenance"]
 
 KIND_BOUND_SIGNAL = "bound-signal"
 KIND_FORECAST_BUNDLE = "forecast-bundle"
@@ -94,6 +98,7 @@ KIND_CREDIBILITY_BLEND = "credibility-blend"
 KIND_LOSS_EXCEEDANCE = "loss-exceedance-curve"
 KIND_ANCHORED_LOSS_EXCEEDANCE = "anchored-loss-exceedance-curve"
 KIND_CAUSAL_ACCOUNT_SPREAD = "causal-account-spread"
+KIND_TRADE_OFF_CURVE = "trade-off-curve"
 
 # Calibration's own capability, decision ticket 11 — the same set `score` already carries, because
 # a reliability diagram reads scores `score` produced and adds no domain of its own.
@@ -1024,6 +1029,54 @@ def causal_accounts(
         command=command,
         pins=_pins(repo, overlay, caps, None),
         depth=caps.depth_block(CAPS_CAUSAL_ACCOUNTS),
+        body=body,
+    )
+
+
+# -- trade-off curve: net cost of risk across the causal-account ensemble (build ticket 33) -
+
+
+def trade_off(
+    repo: ModelRepo,
+    caps: Capabilities,
+    org: str,
+    origin: str,
+    perspective_id: str,
+    account_ids: list[str],
+    command: list[str],
+) -> Artefact:
+    """Every admitted response's net cost of risk, under every named rival causal account, with a
+    marked default (build ticket 33).
+
+    One eye's own curve: `twin price` already reports what a shock costs and what a response earns
+    in credit, and `twin causal-accounts` already lets rival accounts disagree about how a shock
+    propagates. This runs `pricing.price` once per named account, unmodified, and reports cost
+    minus credit per account rather than picking one. Nothing here averages the ensemble away or
+    ranks an option: the reader draws the trade-off, and the default is one marked point on it.
+    """
+    from . import tradeoff as tradeoff_mod
+
+    overlay = Overlay.load(repo, org)
+    perspective = overlay.perspectives.get(perspective_id)
+    if perspective is None:
+        known = ", ".join(sorted(overlay.perspectives)) or "none"
+        raise VerbError(f"no perspective {perspective_id!r} in overlay {org!r} (have: {known})")
+    if not overlay.responses:
+        raise VerbError(
+            f"overlay {org!r} declares no candidate response, so there is no curve to compare "
+            "across the ensemble"
+        )
+    try:
+        body = tradeoff_mod.curve(overlay, perspective, origin, overlay.responses, account_ids)
+    except tradeoff_mod.TradeOffError as exc:
+        raise VerbError(str(exc)) from exc
+
+    return Artefact(
+        kind=KIND_TRADE_OFF_CURVE,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth=caps.depth_block(CAPS_TRADEOFF),
         body=body,
     )
 

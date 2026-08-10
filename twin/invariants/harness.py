@@ -848,6 +848,78 @@ def _causal_accounts_have_no_privileged_default(ctx: Context) -> str:
     )
 
 
+@harness_check("trade_off_curve_reports_disagreement_never_a_scalar")
+def _trade_off_curve_reports_disagreement_never_a_scalar(ctx: Context) -> str:
+    """The trade-off curve across the ensemble surfaces disagreement rather than averaging it
+    away, and carries no recommended-action field (build ticket 33, decision tickets 09/13).
+
+    A guard on the suite rather than an invariant, the same shape `causal_accounts_have_no_privileged_default`
+    and `position_deltas_have_no_privileged_default` are: this asserts a **semantic property of a
+    module's contract**, not one of the constitution's fixed sixteen — and it re-asserts
+    `no_recommended_action_field`'s own banned-word scan against this richer output, per build
+    ticket 33's own checklist, rather than growing the constitution's fixed set.
+
+    Two legs, on the netflix fixture's `netflix-base-case` / `rival-cdn-headwind` accounts — the
+    pair that actually disagrees about a component graded well enough to price.
+    `streaming-displaces-dvd`, the edge build ticket 32's other three accounts share, is graded 3
+    and never clears the published pricing threshold (2), so a curve built only from those would
+    have nowhere for a response's own net figure to move, however much the accounts disagree about
+    the elasticity. First, the disagreement is real and reported **per account** rather than
+    averaged: `expand-the-delivery-network`'s own net cost of risk differs between the two named
+    accounts by a strictly positive `range`, and both accounts' own figures are present in
+    `by_account` — not folded into a mean before it reaches the artefact. Second, the same
+    banned-word scan `no_recommended_action_field` runs against the Wardley map runs here too, and
+    finds nothing: no key or prose value in the curve names an action, a verdict or advice, and the
+    `default` it does carry names its own `basis` rather than asserting an answer.
+    """
+    from .. import tradeoff as tradeoff_mod
+    from . import NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES
+    from ..canon import walk_keys, walk_values
+    from ..model import Overlay
+    from ..repo import ModelRepo
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    overlay = Overlay.load(repo, "netflix")
+    perspective = overlay.perspectives["the-operator"]
+    accounts = ["netflix-base-case", "rival-cdn-headwind"]
+
+    body = tradeoff_mod.curve(overlay, perspective, "content-delivery-network", overlay.responses, accounts)
+
+    point = next((p for p in body["curve"] if p["option"] == "expand-the-delivery-network"), None)
+    if point is None:
+        raise Violated("the curve carries no entry for expand-the-delivery-network")
+    by_account = point["net_cost_of_risk"]["by_account"]
+    if set(by_account) != set(accounts):
+        raise Violated(f"the curve does not report a net figure for every named account: {by_account}")
+    if len(set(by_account.values())) < 2:
+        raise Violated(
+            "two accounts that genuinely disagree about the cdn edge's elasticity produced the "
+            f"identical net figure under both: {by_account} — the disagreement did not reach the curve"
+        )
+    if point["net_cost_of_risk"]["range"] <= 0:
+        raise Violated(f"a nonzero spread in by_account did not produce a positive range: {point}")
+
+    # Imported, not re-typed: `no_recommended_action_field` (checks.py) and this guard now read
+    # the identical tuple, so one cannot be edited to close a blind spot while the other quietly
+    # stays behind. `ranking` is deliberately not in it: `not_a_ranking` is a field this very
+    # artefact carries (embedded from `pricing.price()`) to say the opposite.
+    for key in walk_keys(body):
+        if any(word in key.lower() for word in NO_ACTION_BANNED_KEYS):
+            raise Violated(f"the trade-off curve carries an action-shaped field ({key})")
+    for key, value in walk_values(body):
+        if isinstance(value, str) and any(phrase in value.lower() for phrase in NO_ACTION_BANNED_PHRASES):
+            raise Violated(f"the trade-off curve states an action in prose at {key}: {value!r}")
+
+    if "basis" not in body["default"]:
+        raise Violated("the default carries no basis — a default with no reason is a verdict wearing a hat")
+
+    return (
+        f"expand-the-delivery-network's net cost of risk ranges {point['net_cost_of_risk']['range']:,.0f} "
+        f"across {len(accounts)} accounts ({by_account}), reported per account rather than "
+        "averaged; no action-shaped field found; the default names its own basis"
+    )
+
+
 @harness_check("unanchored_severity_parameters_are_marked_not_assumed")
 def _unanchored_severity_parameters_are_marked(ctx: Context) -> str:
     """An anchored severity subject names which of its parameters are defensible and which are

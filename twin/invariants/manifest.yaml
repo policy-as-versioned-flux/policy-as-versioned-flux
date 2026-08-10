@@ -8,8 +8,8 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 09 \u2014 build ticket 30 joins the causal layer to the currency, so grade_5_only_path_never_prices gains the priced-impact leg where the largest figures now appear, and prefilter_precedes_pricing extends its allow-list to twin/pricing.py because a lock on one module while a sibling prices freely is not a lock"
-checks_module_sha256: 19afba61d19ef3350bf6692277334d0e2df83908b0769bc2cfe7448ee508649c
+checks_module_authorised_by: "decision ticket 09 \u2014 build ticket 33: no_recommended_action_field's banned-word/phrase lists moved to shared constants (twin/invariants/__init__.py: NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES) so the new trade_off_curve_reports_disagreement_never_a_scalar harness guard imports rather than re-types them; the check's own logic and refusal behaviour are unchanged, only the body text moved"
+checks_module_sha256: 2d93cabc8b7575f08ca87e0c33f1802cb63f7c1ae78ec68f1ae5fdbbde1c2e57
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
@@ -60,8 +60,8 @@ invariants:
   - name: no_recommended_action_field
     activating_ticket: '06'
     state: live
-    body_sha256: aac63cd12f0b99d9edc0faed8f719d31480361768be64d5963519cbc2a1227f3
-    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 11, 13 and 14: signature types and the derived-artefact anomaly, roll-ups with no authored or stored form, and no inherited action band on the Wardley relations"
+    body_sha256: 167d27b817a985f2ec344aed26451852c5ebcb9ce15858a1727c9ca5f04b7a80
+    authorised_by: "decision ticket 09 \u2014 build ticket 33: no_recommended_action_field's banned-word/phrase lists moved to shared constants (twin/invariants/__init__.py: NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES) so the new trade_off_curve_reports_disagreement_never_a_scalar harness guard imports rather than re-types them; the check's own logic and refusal behaviour are unchanged, only the body text moved"
     asserts: No artefact carries a recommended-action field; a planted one is refused at emission.
     refuses_keys: [recommended_action, recommendation, recommended]
 

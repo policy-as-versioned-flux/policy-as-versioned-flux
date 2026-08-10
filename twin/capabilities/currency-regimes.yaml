@@ -46,7 +46,11 @@ criteria:
     # incommensurables is not each of them.
   - index: 5
     text: "A stated objective function with its qualifications."
-    checked: false
+    checked: true
+    evidence: "twin/tradeoff.py curve() and twin verbs.trade_off() (twin trade-off) — the objective function decision ticket 09 Q3 names, minimise-total-net-cost-of-risk, computed as a trade-off curve across the named causal-account ensemble with a marked default rather than asserted as an answer. The default's own `basis` field states it is a default point, not a recommendation, and no_recommended_action_field-style scanning (harness guard trade_off_curve_reports_disagreement_never_a_scalar) asserts no action-shaped field or phrase exists anywhere in the body."
+    ticked_by: build ticket 33
   - index: 6
     text: "How rival-model £ spread is reported."
-    checked: false
+    checked: true
+    evidence: "twin/tradeoff.py curve() reports each admitted response's net cost of risk per named account in `curve[].net_cost_of_risk.by_account`, never averaged, plus the range between them; `agreement.cheapest_by_account` and `agreement.unanimous` surface a ranking disagreement explicitly rather than smoothing it into the default. This is the causal-account half of the spread ticket 16 already gave rival world models: `twin causal-accounts` (32) reports disagreement in a propagated influence, and this ticket carries that disagreement through pricing into a response's own comparable figure."
+    ticked_by: build ticket 33

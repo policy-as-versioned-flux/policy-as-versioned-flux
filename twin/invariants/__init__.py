@@ -23,6 +23,13 @@ from typing import Callable
 
 PASS, FAIL, SKIP = "PASS", "FAIL", "SKIP"
 
+# The banned-word scan `no_recommended_action_field` runs (`checks.py`). Any other check that
+# re-asserts the same property against a different artefact — build ticket 33's harness guard is
+# the first — imports these rather than re-typing them, so the two cannot quietly drift apart the
+# way a hand-copied literal would.
+NO_ACTION_BANNED_KEYS = ("action", "band", "verdict", "advice", "should", "must_invest", "outsource")
+NO_ACTION_BANNED_PHRASES = ("must invest", "should ")
+
 
 class Violated(Exception):
     """The invariant does not hold."""
@@ -111,6 +118,8 @@ from .harness import Context, Suite, run  # noqa: E402,F401
 __all__ = [
     "Context",
     "FAIL",
+    "NO_ACTION_BANNED_KEYS",
+    "NO_ACTION_BANNED_PHRASES",
     "PASS",
     "Result",
     "SKIP",

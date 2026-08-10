@@ -28,7 +28,7 @@ from ..canon import canonical_json, sha256_hex, walk_keys
 from ..grades import Capabilities, GradeError
 from ..model import check_direction
 from ..repo import ModelRepo
-from . import Violated, invariant
+from . import NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES, Violated, invariant
 
 
 def load_manifest():  # noqa: ANN201 - re-exported lazily to avoid a circular import at module load
@@ -774,12 +774,11 @@ def _no_recommended_action_field(ctx: "Context") -> str:
 
     # Scanned over the map's content, not over `axis`, which is provenance about the inheritance
     # and is where the refusal itself is declared.
-    banned = ("action", "band", "verdict", "advice", "should", "must_invest", "outsource")
     content = {k: v for k, v in wardley.items() if k != "axis"}
     for key, value in _pairs(content):
-        if any(word in key.lower() for word in banned):
+        if any(word in key.lower() for word in NO_ACTION_BANNED_KEYS):
             raise Violated(f"the map carries an action-shaped field ({key})")
-        if isinstance(value, str) and any(word in value.lower() for word in ("must invest", "should ")):
+        if isinstance(value, str) and any(phrase in value.lower() for phrase in NO_ACTION_BANNED_PHRASES):
             raise Violated(f"the map states an action in prose at {key}")
     for entry in wardley["positions"]:
         for field in ("differentiation_pressure", "commodity_leverage"):

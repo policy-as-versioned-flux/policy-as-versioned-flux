@@ -31,6 +31,7 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin regimes --repo R --scenario S   # the same scenario under all three, with the gaps
 ./bin/twin positions --repo R --org O --scenario S  # believed, rival, revealed — and the deltas between them
 ./bin/twin causal-accounts --repo R --org O --origin X --account A1 --account A2 # rival causal accounts, spread not privilege
+./bin/twin trade-off --repo R --org O --origin X --perspective P --account A1 --account A2 # net cost of risk per response, across the account ensemble, marked default
 ./bin/twin sweep --repo R [--repo R2 ...]  # every scenario, every org, unconditionally — no --scenario
 ./bin/twin reliability --score-card C1 --score-card C2 # bins over a pooled population, empty bins shown
 ./bin/twin severity --mu M --sigma S --threshold U --xi X --beta B --alpha A # loss-exceedance: VaR beside TVaR
@@ -609,6 +610,56 @@ simplification. `orders-slow-the-portal` is degenerate on purpose and it is also
 gate admits, so the edge that carries a real range is the one that may not price. Worksheet lines
 68-69 pin both ends at `160000` and say why.
 
+## The trade-off curve across the ensemble
+
+`twin trade-off` (build ticket 33) is where the two previous sections meet. `twin price` reports
+what a response costs and what it earns in mitigation credit, under one causal account's own
+propagation; `twin causal-accounts` lets rival accounts disagree about how a shock propagates, with
+no privileged account. Until this ticket the two never touched — cost and credit sat in one
+artefact with nothing computing the net between them, and an account's disagreement never reached a
+response's own figure. `twin/tradeoff.py` runs `pricing.price` once per named account, unmodified,
+and reports `net_cost_of_risk = cost.mode - credit.mode` **per account, side by side** rather than
+averaged into one line — decision ticket 09 Q3's objective function, minimise-total-net-cost-of-
+risk, marked as a default point across the ensemble rather than asserted as an answer.
+
+**Two accounts had to be picked with care, because most of the fixture's disagreement never reaches
+a priceable figure.** Build ticket 32's three causal accounts (`netflix-base-case`,
+`rival-aggressive-cannibalisation`, `rival-conservative-view`) all override `streaming-displaces-dvd`,
+graded 3 — outside the published pricing threshold (2) under every one of them, so a curve built
+only from those has nowhere for a response's own net figure to move, however much the accounts
+disagree about the elasticity. `rival-cdn-headwind` (build ticket 33) instead overrides
+`cdn-capacity-lifts-streaming`, grade 2, the one edge the fixture prices directly — and
+`expand-the-delivery-network` now carries a `mitigates` claim against `streaming-experience`, the
+component that edge reaches, so the disagreement has a response to move.
+`tests/test_tradeoff.py::test_a_credited_responses_own_net_cost_moves_across_the_ensemble`
+demonstrates the property directly; the same file's
+`test_the_three_streaming_displaces_dvd_accounts_never_move_a_net_figure` demonstrates the negative
+case, so the reason the new account exists is asserted, not just narrated here.
+
+**The default is computed, never declared, and names its own basis.** The option whose *mean* net
+cost of risk across the named accounts is lowest — mean rather than any one account's own figure,
+because no account is privileged — with the artefact's `default.basis` saying so in words. **When
+the accounts disagree about which option is cheapest, `agreement.cheapest_by_account` and
+`agreement.unanimous` say so explicitly**, ahead of the default, rather than folding it into a
+single figure a reader would have to reconstruct by subtracting rows themselves. On the netflix
+fixture under `the-staff-council` two responses are admitted at once
+(`expand-the-delivery-network` and `stake-the-quarter-on-one-title`, the second surviving only
+because the council declares a different ruin boundary than the operator) and the choice stays
+unanimous — the honest result of a five-pound response sitting beside a forty-five-million-pound
+one, not a sign the ensemble comparison was never exercised on more than one option.
+
+**`no_recommended_action_field` is re-asserted against this richer output, and re-registered under
+its own name rather than folded into the constitution's fixed sixteen.** Harness guard
+`trade_off_curve_reports_disagreement_never_a_scalar` runs the identical banned-word scan
+`no_recommended_action_field` runs against the Wardley map — no key or prose value naming an
+action, a verdict or advice — against the trade-off curve, and additionally asserts the positive
+leg: the credited response's own net figure differs by account with a strictly positive `range`,
+so "no verdict" cannot be satisfied by "no comparison" either. The same guard is what caught the
+first draft of this artefact: a field literally named `not_a_verdict`, meant as the human-readable
+disclaimer every other artefact in this system carries, tripped the very scan it was trying to
+pass, because the banned-word list matches substrings in field *names*, not just prose. It is
+`reading_note` in the shipped artefact for exactly that reason.
+
 ## Heavy-tailed severity, TVaR, and the loss-exceedance curve
 
 `twin severity` (build ticket 24) is the FAIR engine's tail model: a lognormal body spliced to a
@@ -701,16 +752,19 @@ reaches `full`, and nothing can be typed as `full`.
 |---|---|---|---|
 | `domain-model` | 07 | partial | 1 / 7 |
 | `causal-layer` | 08 | partial | 1 / 5 |
-| `currency-regimes` | 09 | partial | 3 / 6 |
+| `currency-regimes` | 09 | partial | 5 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 2 / 8 |
-| `scenario-engine` | 13 | partial | 1 / 7 |
+| `scenario-engine` | 13 | partial | 2 / 7 |
 
-**11 of 41**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**14 of 41**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capability here stands at three ticks, and four of the seven stand at one.
-`./bin/twin grade` prints the denominators.
+there"** — the strongest capability here stands at five ticks, and three of the seven still stand at
+one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
+count — the two rows below track only as far as build ticket 33 tells their story; `scenario-engine`
+moved to 2/7 at build ticket 37 (AC 2, fast-forward/rewind/play distinguished) without its own round
+being narrated here.
 
 **Nothing was ticked in the round before this one, and the arithmetic did not move at all.** Three
 build tickets landed — the information gate (36), the drift instrument (64) and the join of the
@@ -735,7 +789,22 @@ Bühlmann–Straub blend — against capability checklists that already exist (`
 `provenance`, `scenario-engine`, `sense-move`, `currency-regimes`); neither ticket's work is
 precisely what any of those capabilities' remaining acceptance criteria ask for, so ticking one to
 mark the ticket "worth something" would be exactly the self-declared grading `twin/grades.py`
-exists to refuse. The arithmetic stays at **11 of 41** two rounds running.
+exists to refuse. The arithmetic stayed at **11 of 41** two rounds running, at the time this
+paragraph was written.
+
+**Build ticket 33 ticks two criteria at once, `currency-regimes` ACs 5 and 6, and moves the
+capability further in one round than any before it (3/6 to 5/6).** `twin/tradeoff.py`'s trade-off
+curve is decision ticket 09's stated objective function (AC 5) — minimise-total-net-cost-of-risk,
+computed across the named causal-account ensemble and marked as a default rather than declared as
+an answer — and its `curve[].net_cost_of_risk.by_account` is how rival-model £ spread is reported
+(AC 6), the causal-account half of the spread ticket 16 already gave rival world models. The two
+were ticked together because build ticket 33 is the one ticket satisfying both, not because ticking
+in pairs is the norm: every other round in this log ticked at most one criterion, or none.
+`currency-regimes` now has one criterion left, AC 4 (each named incommensurable, treated), which
+this ticket does not touch. The table above also folds in build ticket 37's untold tick
+(`scenario-engine` AC 2) — found while re-deriving this section's numbers from `./bin/twin grade`
+rather than hand-editing them forward, which is the more honest way to have done this from the
+start.
 
 Several criteria were considered and left unticked, on the same ground five were withdrawn on in
 earlier rounds — each rested on **one clause of a multi-clause criterion**, or on machinery that
@@ -761,11 +830,8 @@ does not exist:
   a priced point, and refusing to reduce ruin-adjacent risk to a single figure is itself the
   treatment. Nothing in the pocket org or the fixtures calls it yet; anchoring it to a real
   component is build ticket 25. Ethical harms still wait on the affected-parties register at 61.
-  Five of six named incommensurables is not each of them.
-- **decision ticket 09 ACs 5–6** — the objective function and the rival-model spread need a
-  trade-off curve across the ensemble, which is build ticket 33. Build ticket 30 deliberately
-  stops short of it: cost and credit are reported in one unit and **nothing computes a net**,
-  because a net is one number and one number ends the conversation.
+  Five of six named incommensurables is not each of them. It is also, as of build ticket 33, the
+  **only** criterion `currency-regimes` still has open — ACs 5 and 6 are ticked; see above.
 - **decision ticket 15** has **no capability file at all.** Build ticket 27 published the scope
   exclusions, the power-layer disclaimer, exit-cost asymmetry and the permanent covert-sensing
   exclusion — all from that ticket's *resolution*, none of them one of its five acceptance
@@ -951,9 +1017,16 @@ Named here so the skeleton cannot quietly become the definition of done.
   built — but nothing yet calls it from `twin exposure` or `twin price`, because wiring a specific
   valuation through the blend is a modelling decision for whichever ticket anchors that
   valuation, not a decision the blend mechanism itself makes.
-- **Mitigation credit is subtracted by the reader, not by the artefact.** Cost and credit are
-  reported in the same unit and nothing computes a net, because a net is one number and one
-  number ends the conversation. The trade-off curve across the ensemble is build ticket 33.
+- **The trade-off curve (33) compares causal accounts, not rival world models or perspectives.**
+  `twin trade-off` names one perspective and a causal-account ensemble; it does not also sweep
+  every perspective (26) or every world model (16) in the same call, so a reader wanting all three
+  axes at once still has to run several commands and read them side by side rather than one
+  artefact. Build ticket 33's own scope is decision tickets 09 and 13, blocked by 30 and 32 only.
+- **The trade-off curve's default breaks ties by mean net cost, and nothing has stress-tested that
+  choice against a case where the mean itself misleads** — a heavy-tailed disagreement where one
+  account is a wild outlier could pull the mean past what most named accounts would pick. The
+  artefact states the basis in words so the choice is visible and inspectable, but no alternative
+  (median, a named reference account) was built or rejected in writing.
 - **No triple in this repository has been through the calibration procedure.** `twin/calibration.md`
   is documented, required by name on read, and pinned by digest into every artefact that samples —
   but the elasticities and costs in the fixtures are invented numbers exercising the shape. The
@@ -1090,6 +1163,8 @@ twin/
   admission.py    the £ boundary, derived from a graded causal path to a declared cash flow
   pricing.py      the join — a declared valuation scaled by a propagated influence, and
                   mitigation credit gated as the causal claim it is
+  tradeoff.py     the trade-off curve across the causal-account ensemble — net cost of risk per
+                  account, side by side, and a computed default that names its own basis
   evidence.py     the evidence ladder, the use-gate, and the regrade record
   evidence-ladder.yaml      five typed grades, the pricing gate and the admission threshold
   constraints.py  the universal floor, the scope exclusions, the stated positions

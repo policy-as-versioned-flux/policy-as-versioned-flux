@@ -404,6 +404,36 @@ note: >-
   from rather than two — the same reason build ticket 16's netflix fixture carries three world
   models rather than two.
 """,
+    # A fourth account, overriding a *different* edge from the other three (build ticket 33).
+    # `streaming-displaces-dvd` is grade 3 under every account above, which never clears the
+    # published pricing threshold (2) — so a curve built only from those three would have nowhere
+    # for a response's own net cost of risk to move, however much the accounts disagree about the
+    # elasticity. `cdn-capacity-lifts-streaming` is grade 2 and reaches `streaming-experience`
+    # directly from `content-delivery-network`, which is both priceable and the component
+    # `expand-the-delivery-network`'s own mitigation claim names.
+    "orgs/netflix/causal_accounts/rival-cdn-headwind.yaml": """\
+id: rival-cdn-headwind
+name: CDN capacity buys less streaming lift than the base case assumes
+edges:
+  cdn-capacity-lifts-streaming:
+    from: content-delivery-network
+    to: streaming-experience
+    sign: positive
+    lag_days: 90
+    elasticity:
+      min: 0.02
+      mode: 0.08
+      max: 0.2
+    evidence_grade: 2
+    confidence: 0.4
+note: >-
+  Same evidence grade as the base case (`netflix-base-case`, which inherits this edge unchanged
+  from the overlay's own `edges` collection), same two components — a genuine disagreement about
+  magnitude on a component that actually prices, which `netflix-base-case` versus
+  `rival-aggressive-cannibalisation`/`rival-conservative-view` cannot demonstrate: those three all
+  share `streaming-displaces-dvd`, graded 3, always outside the pricing threshold. Nothing here
+  says which account is right.
+""",
     # A regrade in each direction, so both are exercised. Strengthening is the one to be
     # suspicious of: it is how a model assertion becomes a measurement.
     "orgs/netflix/regrades/streaming-displaces-dvd-strengthened.yaml": """\
@@ -511,8 +541,22 @@ cost:
   min: 20000000
   mode: 45000000
   max: 90000000
+mitigates:
+  component: streaming-experience
+  reduction:
+    min: 0.1
+    mode: 0.2
+    max: 0.3
+  evidence_grade: 2
+  basis: >-
+    Capacity headroom measured directly against past delivery incidents at this scale, on both
+    sides of prior expansions.
 note: >-
-  Crosses nothing. It survives the pre-filter and is costed as a range, never as a point.
+  Crosses nothing. It survives the pre-filter and is costed as a range, never as a point. The
+  mitigation claim reaches `streaming-experience` — the one component `cdn-capacity-lifts-streaming`
+  prices well enough to reach directly — so build ticket 33's trade-off curve has a response whose
+  own net cost of risk actually moves across rival causal accounts, rather than only the underlying
+  impact moving beneath a response that never claims it.
 """,
     "orgs/netflix/responses/instrument-viewers-without-telling-them.yaml": """\
 id: instrument-viewers-without-telling-them
