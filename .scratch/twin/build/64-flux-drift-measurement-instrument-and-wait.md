@@ -11,9 +11,27 @@ everything else.
 Record now, as a precondition rather than a ticket-66 discovery: the **org-wide GitHub setting that
 blocks Actions from creating PRs is currently off and needs an admin** to change.
 
+**Scope limit, recorded 2026-08-10 in `window.yaml` and not a change to the measurement.** This
+instrument measures **state** drift: every subject compares a control's observed state against its
+declared state. It cannot see **action** drift, where a control holds its declared state for the
+whole window while an action crosses it. The window, subjects, drift definition and falsifiers are
+exactly as pre-registered, and the guard still reads this file's first commit against the samples.
+What the addendum corrects is the inference ticket 65 may draw, not the data.
+
 **Blocked by:** 01
 
-**Status:** instrumented, measuring (2026-08-07) — closes when the window closes, 2026-11-06
+**Status:** instrumented, **NOT MEASURING** — corrected 2026-08-10. Window 2026-08-07..2026-11-06.
+
+> **The probe has never run.** There is no `samples.jsonl`, there is no crontab entry, and the
+> harness reports `0 sample(s)`. The `kind-driftwood` cluster exists and `probe.sh` is executable,
+> so the instrument was built and never scheduled. Three of ninety-one days are already gone.
+>
+> The status line said "measuring" for three days. It was wrong, and this file was the only place
+> anybody would have looked.
+>
+> This is the exact failure `window.yaml` predicted in its own words: *"a probe nobody owns stops
+> running and nobody notices, and a stopped probe is what produces a confident 'no drift'."* It
+> predicted it, and it still happened, because nothing checked that a sample had ever arrived.
 
 **Reading list:** Decision ticket 22 (the Flux falsification test as recorded). Spec story 85.
 
@@ -23,6 +41,7 @@ blocks Actions from creating PRs is currently off and needs an admin** to change
       suspend state. One JSON line per run, appended. **A run that cannot reach the cluster still
       writes a sample**, because an instrument whose silence reads as stability is worse than no
       instrument.
+- [ ] **The probe is actually scheduled and a sample has arrived.** Reopened 2026-08-10. The guard proves the window was declared before the data; nothing proved any data exists. A liveness check belongs on the suite: zero samples inside an open window is a failing state, not a quiet one.
 - [x] Measurement runs for a declared window and the window is stated up front, not chosen after seeing results.
       `estate/driftwood/drift/window.yaml` declares both bounds, the cadence, the subjects, what
       counts as a drift event, and the two outcomes that would falsify the spec. Its first commit

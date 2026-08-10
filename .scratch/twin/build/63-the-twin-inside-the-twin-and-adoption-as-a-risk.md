@@ -9,6 +9,22 @@ information control, not by being wrong. **Accuracy does not save an instrument.
 does not automatically win the argument, and a system whose whole pitch is transparency should model
 that about itself rather than assume it away.
 
+**A second risk about itself, dated 2026-08-06 and recorded 2026-08-10.** The spec states that the £
+engine's whole value depends on **most levers not being code**. AWS is betting the other way: agent
+tool-call governance is being productised, and agent behaviour is a fast-growing share of
+organisational action.
+
+If agents become the dominant actuator of organisational action, the fraction of levers that **are**
+code rises, and the twin's comparative advantage — comparing an HR lever against a security control
+— narrows toward territory a policy engine plus a spend dashboard already covers.
+
+This is a Wardley evolution argument against the thesis's **durability**, not its correctness. It is
+exactly the shape of risk this ticket exists to price about the twin, so price it rather than note
+it. The sharper reading is also worth recording: if the machine-enforceable arm just moved toward
+commodity, then ticket 30's response pricing should now return a **cheaper** option in that class
+than it did last week. The twin's answer changes because the world changed. That is the thesis
+working, not the thesis threatened.
+
 **Blocked by:** 33, 12
 
 **Status:** ready-for-agent

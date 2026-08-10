@@ -9,6 +9,34 @@ Also lands the three positions the spec carries openly rather than patching: the
 disclaimer of a power layer**, **exit-cost asymmetry as an unsolved harm**, and **reflexivity and
 Goodhart-on-the-twin as a deferred limitation with covert sensing ruled out permanently**.
 
+**Candidate borrow, evaluated 2026-08-10: plain Cedar, not AWS Dogwood.**
+
+Two-tier composition — a universal floor plus perspective red lines, where a perspective may add but
+never remove — currently rests on a hand-written id-collision refusal. Cedar's set union with
+deterministic rule keys would make that a **semantic property** instead of a guard somebody
+maintains. Cedar also has a symbolic compiler proven in Lean, giving **sound and complete** SMT
+analysis: equivalence, more-permissive, less-permissive, shadowed permits, impossible conditions.
+
+**Dogwood's temporal layer is rejected for this, and the mechanism is the reason.** Lowering hoists
+each temporal condition into an uninterpreted boolean context field **keyed on the rule**, so two
+syntactically identical guards become two independent free booleans. Equivalence checking then
+reports spurious "Incomparable", and the impossible-conditions check goes blind to temporal
+contradictions the Dogwood guide itself documents. Taking Cedar keeps the analysis; taking Dogwood
+spends it.
+
+Four further findings, verified by building and running the reference CLI on 2026-08-10:
+
+- **No disjunction exists in the temporal sublanguage.** "Grade is 1 or 2" is not writable as one
+  clause. That alone rules it out for anything grade-shaped.
+- **Most of this floor is not request-shaped.** `no-special-category-representation` holds because
+  the schemas are closed and there is no field to put it in. A `forbid` would be strictly weaker: it
+  lets the field exist and refuses the request, which is the "very large penalty" this constraint
+  set's own preamble rejects.
+- **Cedar decides one request; ticket 28's guarantee is about a choice set and an artefact body.**
+  Nothing in either language asserts that no number was computed before a decision.
+- **`forbid`-overrides-`permit` is numeric-free**, so a constraint genuinely cannot be outbid. That
+  matches what the closed removal-key set already gives. It is a draw, not a win.
+
 **Blocked by:** 26
 
 **Status:** done (2026-08-06)

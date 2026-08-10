@@ -78,6 +78,32 @@ outcomes_that_would_falsify_the_spec:
   - No drift event in any subject across the full window, at coverage above 90%.
   - Every drift event immediately follows a deploy, so a deploy-time attestation would catch it.
 
+# ADDENDUM, added 2026-08-10, three days into a 91-day window. Nothing above is changed: the
+# window, the subjects, the drift definition and the falsifiers are exactly as pre-registered, and
+# the guard still reads this file's first commit against the samples. What is corrected here is the
+# **inference from the measurement**, which was narrower than the framing assumed.
+#
+# The prompt was AWS Dogwood (2026-08-06), but the finding does not depend on that product. It has
+# at least five independent implementations, of which Dogwood is the newest: Progent (Apr 2025),
+# AgentSpec (Mar 2025), Agent-C (Mar 2026), Causal Past Logic (May 2026), VIGIL (Jun 2026).
+scope_limit:
+  measures: >-
+    STATE continuity only. Every subject above compares a control's observed state against its
+    declared state. That is what this instrument can see.
+  does_not_measure: >-
+    ACTION continuity. A control can hold its declared state for the whole window while an action
+    crosses it, and no sample here would show that. Proving no action crossed a control is a
+    different claim, needs a different instrument, and is continuous in a different sense.
+  consequence_for_the_verdict: >-
+    A null result falsifies "continuous proof of STATE is required". It does NOT settle whether
+    continuous proof of ACTION is required, and build ticket 65 must not read it as though it did.
+    The two falsifiers above stand as written and are not weakened; their reach is narrower than
+    the original question implied, and saying so before the data arrives is the point of saying it
+    at all.
+  what_would_settle_the_other_branch: >-
+    A second declared window with its own pre-registration, measuring action-boundary crossings.
+    Not opened. Recorded here so its absence is visible rather than assumed away.
+
 # Who runs the probe, and where. Not a hosted CI runner: the cluster is local KinD and a hosted
 # runner cannot reach it, so a scheduled workflow would report an unreachable cluster every hour
 # and prove nothing. The probe writes an `unreachable` sample when it cannot sample, which is what

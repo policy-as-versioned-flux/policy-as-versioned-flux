@@ -9,6 +9,20 @@ drop.** Only the entries the demo beats happen to need would have been written; 
 forced the rest to exist, and the map treats the library contents as the acceptance tests each
 workstream satisfies. Ownerless contents means dropped acceptance tests.
 
+**A dated signal for the AI-model-access class, recorded 2026-08-10.** AWS published Dogwood on
+2026-08-06 under Apache 2.0 and shipped it in Bedrock AgentCore Policy. Read as a world-layer
+signal rather than a tool decision, it dates a movement on the evolution axis:
+
+- **Point-in-time tool-call authorisation has reached commodity.** The OpenID AuthZEN Authorization
+  API 1.0 shipped Standards Track in March 2026, OPA is discussing native support, and Styra's
+  commercial layer collapsed after an Apple acqui-hire. A vendor-neutral wire protocol plus a
+  collapsing premium layer is the commodity marker.
+- **Temporal, sequence-of-actions authorisation is still genesis.** No standards body has a temporal
+  profile. Five competing syntaxes exist and none maps to another.
+
+The scenario should carry both halves, because the doctrine they imply is opposite: inherit the
+commodity layer, do not build on the genesis one.
+
 **Blocked by:** 09, 33, 37
 
 **Status:** ready-for-agent
