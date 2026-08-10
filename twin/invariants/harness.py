@@ -366,6 +366,75 @@ def _credibility_blend_has_no_hidden_default(ctx: Context) -> str:
     )
 
 
+@harness_check("a_var_shaped_summary_hides_what_tvar_surfaces")
+def _var_shaped_summary_hides_the_tail(ctx: Context) -> str:
+    """TVaR over VaR, asserted as a permanent property rather than left as a one-off test
+    (build ticket 24, decision ticket 09's TVaR-over-VaR commitment).
+
+    A guard on the suite rather than a seventeenth invariant, for the same reason
+    `position_deltas_have_no_privileged_default` and `credibility_blend_falls_back_to_the_world_prior_alone`
+    are: the constitution names sixteen invariants and may not grow a seventeenth without the
+    constitution changing first, and this asserts a **semantic property of a module's contract**.
+
+    Two legs. First, the demonstration the ticket asks for: two severities sharing a lognormal
+    body, threshold and GPD scale, differing only in tail shape, carry an *identical* VaR at the
+    threshold's own exceedance probability — a report carrying VaR alone could not tell a light
+    tail from a heavy one apart at that point — while TVaR, the average of what actually lies
+    beyond it, differs sharply. Second, the shape-parameter boundary: past `xi == 1` a GPD's mean
+    does not exist, and TVaR must refuse there rather than silently dividing by a `(1 - xi)` that
+    has gone to zero or negative.
+    """
+    import math
+
+    from ..severity import Severity, SeverityError
+
+    body = {"mu": 10.0, "sigma": 1.5, "threshold": 100_000.0, "beta": 80_000.0}
+    light = Severity(**body, xi=0.1)
+    heavy = Severity(**body, xi=0.7)
+    if light.tail_probability != heavy.tail_probability:
+        raise Violated(
+            "two severities sharing a body and threshold disagree on tail_probability — it is "
+            "meant to be derived from the body alone, not from the tail that follows it"
+        )
+    alpha = 1.0 - light.tail_probability
+    light_var, heavy_var = light.var(alpha), heavy.var(alpha)
+    if abs(light_var - heavy_var) > 1e-6 * max(light_var, heavy_var):
+        raise Violated(
+            f"VaR differs between a light tail ({light_var}) and a heavy one ({heavy_var}) at the "
+            "threshold's own exceedance probability, where the two distributions are identical "
+            "below the splice — this leg has lost its subject"
+        )
+    light_tvar, heavy_tvar = light.tvar(alpha), heavy.tvar(alpha)
+    if heavy_tvar <= light_var:
+        raise Violated("the heavy tail's TVaR did not even clear the shared VaR; the tail carries no mass")
+    if heavy_tvar < light_tvar * 1.5:
+        raise Violated(
+            f"a heavy tail's TVaR ({heavy_tvar}) is not materially larger than a light tail's "
+            f"({light_tvar}) despite identical VaR — TVaR is not surfacing what VaR hides"
+        )
+
+    for xi in (1.0, 1.5, 4.0):
+        boundary = Severity(**body, xi=xi)
+        boundary_alpha = 1.0 - boundary.tail_probability + 0.01
+        try:
+            boundary.tvar(boundary_alpha)
+        except SeverityError as exc:
+            if "does not exist" not in str(exc):
+                raise Violated(f"xi={xi} was refused, but not for the shape boundary: {exc}") from None
+        else:
+            raise Violated(f"xi={xi} computed a TVaR; a GPD shape at or past 1 has no mean to average")
+
+    # And the positive leg of that boundary: refusing is not a wall that bites below it too.
+    if not math.isfinite(Severity(**body, xi=0.99).tvar(1.0 - Severity(**body, xi=0.99).tail_probability + 0.01)):
+        raise Violated("a shape just below the boundary failed to produce a finite TVaR")
+
+    return (
+        f"identical VaR ({light_var:.2f}) at alpha={alpha:.4f} for xi=0.1 and xi=0.7; TVaR "
+        f"diverges ({light_tvar:.2f} vs {heavy_tvar:.2f}); xi>=1 refuses at the shape boundary "
+        "and xi=0.99 still computes"
+    )
+
+
 @harness_check("graded_edge_fixture_holds_its_contract")
 def _graded_edge_contract(ctx: Context) -> str:
     """The boundary contract the £ and skills tracks build against (build ticket 17).

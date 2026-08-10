@@ -30,9 +30,14 @@ criteria:
     # valuation is graded too weakly, no graded path reaches a cash flow, the path carries a
     # direction and no magnitude — plus three more for a mitigation claim that earns nothing.
     # Reputation and morale therefore have a real treatment: they price through a modelled path or
-    # they stay in the register with a falsifiable reason. Existential and tail risk are build
-    # ticket 24 and have none, and ethical harms wait on the affected-parties register at 61.
-    # Five of the six named incommensurables is not each of them.
+    # they stay in the register with a falsifiable reason. Existential and tail risk now have one
+    # too (build ticket 24): `twin severity` reports a loss-exceedance curve (VaR beside TVaR,
+    # never VaR alone) rather than collapsing the tail into the causal £ chain, which has no
+    # severity slot for it by design — the refusal to price a point figure for ruin-adjacent risk
+    # is itself the treatment. Nothing in the pocket org or the fixtures calls it yet, because
+    # anchoring it to a real component's parameters is build ticket 25's job. Ethical harms still
+    # wait on the affected-parties register at 61. Five of the six named incommensurables is not
+    # each of them.
   - index: 5
     text: "A stated objective function with its qualifications."
     checked: false

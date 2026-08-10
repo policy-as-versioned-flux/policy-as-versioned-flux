@@ -31,6 +31,7 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin positions --repo R --org O --scenario S  # believed, rival, revealed — and the deltas between them
 ./bin/twin sweep --repo R [--repo R2 ...]  # every scenario, every org, unconditionally — no --scenario
 ./bin/twin reliability --score-card C1 --score-card C2 # bins over a pooled population, empty bins shown
+./bin/twin severity --mu M --sigma S --threshold U --xi X --beta B --alpha A # loss-exceedance: VaR beside TVaR
 ./bin/twin drift                           # the Flux drift measurement: coverage, events, no verdict
 ./bin/twin options --repo R --perspective P # the choice set after the pre-filter, survivors costed
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
@@ -445,6 +446,37 @@ simplification. `orders-slow-the-portal` is degenerate on purpose and it is also
 gate admits, so the edge that carries a real range is the one that may not price. Worksheet lines
 68-69 pin both ends at `160000` and say why.
 
+## Heavy-tailed severity, TVaR, and the loss-exceedance curve
+
+`twin severity` (build ticket 24) is the FAIR engine's tail model: a lognormal body spliced to a
+Generalised Pareto tail at an authored peaks-over-threshold cut, reporting VaR beside TVaR — never
+VaR alone — at every declared confidence level. It is standalone, the same shape `twin
+reliability` already is: no organisation, no component, no `ModelRepo`, because `twin price`
+prices a component from the perspective's declared valuation and deliberately carries no severity
+slot (see above). Anchoring these five parameters to a real component's evidence is build ticket
+25's separate job.
+
+**TVaR, not VaR, is the point.** VaR names a threshold and says nothing about what lies beyond it.
+Two severities can share an identical VaR — at the tail threshold's own exceedance probability,
+sharing a body, a threshold and a GPD scale but differing in shape gives *exactly* the same VaR,
+because the tail's inverse is zero at its own boundary regardless of shape — and diverge sharply
+in TVaR once the tail's heaviness differs. `test_a_var_shaped_summary_hides_what_tvar_surfaces`
+demonstrates it directly, and `a_var_shaped_summary_hides_what_tvar_surfaces` carries the same
+property into the permanent suite as a harness guard, the same shape build tickets 16 and 31 left
+behind rather than a seventeenth invariant — the constitution's sixteen are fixed.
+
+**The shape-parameter boundary refuses rather than lies.** A GPD's mean is `beta / (1 - xi)`,
+which stops existing at `xi >= 1`. `tvar()` refuses there by name, rather than returning whatever
+a division by zero or a negative denominator produces — the same discipline `pert.quantise`
+applies to an overflowing triple.
+
+`ponytail:` TVaR here is **tail-only**. A confidence level whose VaR lands inside the lognormal
+body — below the declared threshold — is refused rather than answered, because reaching it needs
+the body's own partial-mean formula (`∫ x f(x) dx` up to the threshold), a second closed form this
+module does not carry. Every call this system makes today asks for TVaR at a confidence high
+enough that the declared tail already covers it; add the body-region formula if a caller ever
+needs otherwise.
+
 ## The pocket org
 
 Five components, eight edges, named elasticities, two perspectives, four candidate responses, two
@@ -548,8 +580,12 @@ does not exist:
   register now carries **five** distinct refusal reasons rather than two (build ticket 30), plus
   three more for a mitigation claim that earns nothing, so reputation and morale have a real
   treatment: they price through a modelled path or they stay in the register with a falsifiable
-  reason. Existential and tail risk are build ticket 24 and have none, and ethical harms wait on
-  the affected-parties register at 61. Five of six named incommensurables is not each of them.
+  reason. Existential and tail risk now have one too (build ticket 24): `twin severity` reports a
+  loss-exceedance curve — VaR beside TVaR, never VaR alone — rather than collapsing the tail into
+  a priced point, and refusing to reduce ruin-adjacent risk to a single figure is itself the
+  treatment. Nothing in the pocket org or the fixtures calls it yet; anchoring it to a real
+  component is build ticket 25. Ethical harms still wait on the affected-parties register at 61.
+  Five of six named incommensurables is not each of them.
 - **decision ticket 09 ACs 5–6** — the objective function and the rival-model spread need a
   trade-off curve across the ensemble, which is build ticket 33. Build ticket 30 deliberately
   stops short of it: cost and credit are reported in one unit and **nothing computes a net**,
@@ -576,7 +612,7 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 27 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 622 tests
+`./bin/twin verify` — 28 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 653 tests
 across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
@@ -644,7 +680,7 @@ claim binds it to a component the scenario forecasts. The positive leg is assert
 negative one: the same fixture still forecasts under `as-consumed`, because a gate that refused
 everything would pass every refusal in the check while making the regime useless.
 
-Eight checks were added to the **harness** instead, because each guards a yardstick or a semantic
+Nine checks were added to the **harness** instead, because each guards a yardstick or a semantic
 property rather than a named absence the constitution enumerates: `worksheet_matches_the_pocket_org`
 (the hand-computed numbers still hold), `graded_edge_fixture_holds_its_contract` (the generated
 causal-edge fixture still carries what the £ and skills tracks depend on),
@@ -655,9 +691,12 @@ own data, read out of git history rather than promised), `drift_window_is_actual
 days and nothing noticed), `scheduled_emission_ignores_signal_presence` (two sweeps over an
 unchanged repository emit the same forecast count, not a shrinking one; build ticket 09),
 `position_deltas_have_no_privileged_default` (dropping any one position, including the org's own
-believed map, changes nothing about the rest; build ticket 16) and
+believed map, changes nothing about the rest; build ticket 16),
 `credibility_blend_falls_back_to_the_world_prior_alone` (a subject with no own-data blends to
-exactly its industry prior; one with own-data moves off it; build ticket 31).
+exactly its industry prior; one with own-data moves off it; build ticket 31) and
+`a_var_shaped_summary_hides_what_tvar_surfaces` (two severities sharing a body and threshold carry
+an identical VaR and a divergent TVaR once their tail shape differs, and the shape-parameter
+boundary refuses rather than dividing by zero; build ticket 24).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared
@@ -711,9 +750,14 @@ Named here so the skeleton cannot quietly become the definition of done.
   that organisation is graded well enough to price, so exactly one shock produces a figure. That
   is the design working, and it is also a very thin demonstration — the flagship subjects at
   71–77 are where a real evidence base has to carry it.
-- **No heavy tails, no TVaR, no empirical anchor, no trade-off curve.** PERT sampling exists and
-  everything above it does not. A price is a triple scaled point-wise, so the tail of a loss
-  distribution is not modelled at all. (24, 25, 32–33.) Build ticket 25's subject changed with
+- **Heavy tails and TVaR exist now; no empirical anchor and no trade-off curve.** Build ticket 24
+  built `twin/severity.py` — a lognormal body spliced to a GPD tail, TVaR in closed form, a
+  loss-exceedance curve — but it is standalone: nothing in `twin price` or the pocket org calls
+  it, because a price is still a declared valuation scaled point-wise by a propagated influence,
+  on purpose (`twin/pricing.py`'s no-severity-slot decision). Its own TVaR is tail-only too — a
+  confidence level whose VaR lands inside the lognormal body is refused rather than answered,
+  because that needs the body's own partial-mean formula, which this module does not carry
+  (`ponytail:` note in `twin/severity.py`). (25, 32–33.) Build ticket 25's subject changed with
   build ticket 30: it anchors **valuations** now, because there is no severity to anchor. The
   credibility-weighted blend those valuations will eventually be estimated *through* is build
   ticket 31, and it is built — but nothing yet calls it from `twin exposure` or `twin price`,
@@ -821,8 +865,8 @@ Named here so the skeleton cannot quietly become the definition of done.
 ```
 twin/
   cli.py          seam 1 — the artefact CLI, the primary boundary
-  verbs.py        sense / run / score / reliability / graph / blast / propagate / intervene /
-                  observe / rewind / options / exposure / positions / credibility
+  verbs.py        sense / run / score / reliability / severity / graph / blast / propagate /
+                  intervene / observe / rewind / options / exposure / positions / credibility
   positions.py    believed map, rival forecasts, revealed truth — no schema-level privilege
                   between them, and the pairwise deltas computed and scored, not just displayed
   credibility.py  Bühlmann–Straub: the world-layer industry prior blended with an org's own
@@ -842,6 +886,8 @@ twin/
   attenuation.yaml          the versioned depth factors, and where a number stops existing
   pert.py         calibrated triples, their analytic moments, and seeded sampling
   calibration.md  the authoring discipline behind a triple — pinned by every artefact that samples
+  severity.py     lognormal body + GPD tail, TVaR in closed form, the loss-exceedance curve —
+                  standalone, no severity slot on any component
   options.py      the constraint pre-filter, and the only door to pricing behind it
   admission.py    the £ boundary, derived from a graded causal path to a declared cash flow
   pricing.py      the join — a declared valuation scaled by a propagated influence, and

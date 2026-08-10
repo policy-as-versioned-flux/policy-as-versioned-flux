@@ -214,6 +214,20 @@ def cmd_reliability(args: argparse.Namespace) -> int:
     return _emit(artefact, args.out)
 
 
+def cmd_severity(args: argparse.Namespace) -> int:
+    command = verbs.command_for(
+        "severity", mu=str(args.mu), sigma=str(args.sigma), threshold=str(args.threshold),
+        xi=str(args.xi), beta=str(args.beta), alpha=",".join(str(a) for a in sorted(args.alpha)),
+    )
+    caps = Capabilities.load()
+    artefact = verbs.severity_curve(args.mu, args.sigma, args.threshold, args.xi, args.beta, args.alpha, caps, command)
+    _say(f"loss-exceedance curve, {len(artefact.body['curve'])} confidence level(s)")
+    for row in artefact.body["curve"]:
+        tvar = "-" if row["tvar"] is None else f"{row['tvar']:.2f}"
+        print(f"  alpha={row['alpha']:<7} var={row['var']:<14.2f} tvar={tvar}")
+    return _emit(artefact, args.out)
+
+
 def cmd_blast(args: argparse.Namespace) -> int:
     repo, caps, org = _open(args)
     artefact = verbs.blast(
@@ -1072,6 +1086,21 @@ def build_parser() -> argparse.ArgumentParser:
     diagram.add_argument("--bins", type=int, default=10)
     diagram.add_argument("--out", required=True)
     diagram.set_defaults(fn=cmd_reliability)
+
+    sev = subs.add_parser(
+        "severity", help="a loss-exceedance curve over a declared lognormal-body/GPD-tail severity"
+    )
+    sev.add_argument("--mu", type=float, required=True, help="the lognormal body's underlying-normal mean")
+    sev.add_argument("--sigma", type=float, required=True, help="the lognormal body's underlying-normal sigma")
+    sev.add_argument("--threshold", type=float, required=True, help="the peaks-over-threshold cut, authored")
+    sev.add_argument("--xi", type=float, required=True, help="the GPD tail's shape parameter")
+    sev.add_argument("--beta", type=float, required=True, help="the GPD tail's scale parameter")
+    sev.add_argument(
+        "--alpha", type=float, action="append", required=True, default=[],
+        help="a confidence level for the curve; repeatable",
+    )
+    sev.add_argument("--out", required=True)
+    sev.set_defaults(fn=cmd_severity)
 
     graph = with_org(with_repo(subs.add_parser("graph", help="emit the typed knowledge graph")))
     graph.add_argument("--out", required=True)

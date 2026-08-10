@@ -268,11 +268,27 @@ for entry in b["bins"]:
     print(f"    [{lo:.1f}, {hi:.1f})  n={entry['count']}")
 REL
 
+say "21. the loss-exceedance curve — VaR beside TVaR, never VaR alone, and the shape boundary refused"
+"$TWIN" severity --mu 10.0 --sigma 1.5 --threshold 100000 --xi 0.3 --beta 80000 \
+  --alpha 0.9 --alpha 0.95 --alpha 0.99 \
+  --out "$OUT/loss-exceedance-curve.json" || fail "severity failed"
+python3 - "$OUT/loss-exceedance-curve.json" <<'SEV'
+import json, sys
+b = json.load(open(sys.argv[1]))["body"]
+curve = b["curve"]
+assert len(curve) == 3, "one row per named confidence level"
+assert all(row["tvar"] >= row["var"] for row in curve), "TVaR must never be smaller than VaR"
+print(f"  {len(curve)} confidence level(s), a declared threshold, no severity slot on any component")
+for row in curve:
+    print(f"    alpha={row['alpha']}  var={row['var']:.2f}  tvar={row['tvar']:.2f}")
+SEV
+
 echo
 echo "PASS: sense -> run -> score closes the loop from a clean checkout. Forecasts are a list,"
 echo "scored by pin; the store is rebuildable from git; identical pins give identical bytes; a"
 echo "dirty tree is refused. sweep runs the standing scenario set unconditionally and reliability"
-echo "bins the record it produces. Every artefact declares which acceptance criteria are still"
-echo "unchecked, so the skeleton cannot quietly become the definition of done."
+echo "bins the record it produces. severity is the FAIR engine's tail model, standalone, and"
+echo "reports TVaR beside VaR rather than VaR alone. Every artefact declares which acceptance"
+echo "criteria are still unchecked, so the skeleton cannot quietly become the definition of done."
 echo
 echo "artefacts: $OUT"

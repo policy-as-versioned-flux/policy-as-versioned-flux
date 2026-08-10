@@ -37,7 +37,8 @@ from . import (
     regimes as regimes_mod,
     scoring,
 )
-from .pert import Triple
+from .pert import PertError, Triple
+from .severity import Severity, SeverityError
 
 CAPS_SENSE = ["domain-model", "provenance", "sense-move"]
 CAPS_RUN = ["domain-model", "provenance", "scenario-engine"]
@@ -87,10 +88,15 @@ KIND_PRICED_IMPACT = "priced-impact"
 KIND_RELIABILITY_DIAGRAM = "reliability-diagram"
 KIND_POSITION_DELTAS = "position-deltas"
 KIND_CREDIBILITY_BLEND = "credibility-blend"
+KIND_LOSS_EXCEEDANCE = "loss-exceedance-curve"
 
 # Calibration's own capability, decision ticket 11 — the same set `score` already carries, because
 # a reliability diagram reads scores `score` produced and adds no domain of its own.
 CAPS_RELIABILITY = CAPS_SCORE
+# The FAIR engine's tail model is decision ticket 09's territory — the same £-currency decision
+# that commits to TVaR over VaR (build ticket 24) — and it is standalone, so it carries no other
+# capability's depth the way `price` carries the causal layer's.
+CAPS_SEVERITY = ["currency-regimes"]
 
 # Only an as-consumed execution produces a scoring-eligible forecast: the honest number is never
 # contaminated by what we know now (spec story 40). Build ticket 36 turned the tag into a gate —
@@ -1153,6 +1159,46 @@ def reliability(
         },
         depth=caps.depth_block(CAPS_RELIABILITY),
         body={"bin_count": bins, "bins": diagram["bins"], "total_scored": diagram["total"]},
+    )
+
+
+# -- heavy-tailed severity: TVaR and the loss-exceedance curve (build ticket 24) -------------
+
+
+def severity_curve(
+    mu: float, sigma: float, threshold: float, xi: float, beta: float, alphas: list[float],
+    caps: Capabilities, command: list[str],
+) -> Artefact:
+    """A loss-exceedance curve over a declared lognormal-body/GPD-tail severity.
+
+    Standalone — no organisation, no component, no `ModelRepo` — the same shape `reliability`
+    already is: a derived artefact over authored parameters rather than a graph read. This is
+    deliberate: `twin/pricing.py` prices a component from the perspective's declared valuation
+    and carries no severity slot on purpose (see its docstring), so the FAIR engine's tail model
+    is not a field the schema makes room for either. Anchoring these five parameters to real
+    evidence is build ticket 25's job, separated because the implementation and the empirical
+    work are different jobs.
+    """
+    if not alphas:
+        raise VerbError("no confidence level named; a loss-exceedance curve over nothing is not a curve")
+    try:
+        distribution = Severity(mu=mu, sigma=sigma, threshold=threshold, xi=xi, beta=beta)
+        curve = distribution.loss_exceedance_curve(alphas)
+    except (SeverityError, PertError) as exc:
+        # `quantise()` is `pert`'s, reused rather than reinvented, and it raises `PertError` on an
+        # overflowing figure — a severity-shaped refusal wearing the sibling module's name.
+        raise VerbError(str(exc)) from exc
+
+    return Artefact(
+        kind=KIND_LOSS_EXCEEDANCE,
+        mark=DERIVED,
+        command=command,
+        pins={
+            "tool": {"name": "twin", "version": TOOL_VERSION, "capabilities_digest": caps.digest},
+            "severity": distribution.as_dict(),
+        },
+        depth=caps.depth_block(CAPS_SEVERITY),
+        body={"curve": curve},
     )
 
 

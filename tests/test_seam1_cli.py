@@ -571,6 +571,72 @@ def test_reliability_names_its_score_cards_by_digest_not_by_path(
     assert doc["envelope"]["pins"]["score_cards"][0]["sha256"] == sha256_hex(card.read_bytes())
 
 
+# -- the loss-exceedance curve (build ticket 24) -----------------------------------------------
+
+SEVERITY_ARGS = [
+    "--mu", "10.0", "--sigma", "1.5", "--threshold", "100000", "--xi", "0.3", "--beta", "80000",
+]
+
+
+def test_severity_reports_var_beside_tvar_at_every_named_confidence_level(tmp_path: Path) -> None:
+    out = tmp_path / "curve.json"
+    assert main([
+        "severity", *SEVERITY_ARGS, "--alpha", "0.9", "--alpha", "0.95", "--alpha", "0.99", "--out", str(out),
+    ]) == 0
+
+    body = json.loads(out.read_bytes())["body"]
+    curve = body["curve"]
+    assert [row["alpha"] for row in curve] == [0.9, 0.95, 0.99]
+    for row in curve:
+        assert row["tvar"] is not None and row["tvar"] >= row["var"]
+
+
+def test_severity_names_a_refusal_per_row_rather_than_failing_the_whole_curve(tmp_path: Path) -> None:
+    """A confidence level whose VaR falls below the declared tail still emits — as a row that
+    names why it carries no TVaR, not as a command failure (mirrors the register-entry pattern
+    `twin price` uses: a refusal is a row with a reason, never a silent gap)."""
+    out = tmp_path / "curve.json"
+    assert main([
+        "severity", *SEVERITY_ARGS, "--alpha", "0.5", "--out", str(out),
+    ]) == 0
+
+    row = json.loads(out.read_bytes())["body"]["curve"][0]
+    assert row["var"] is not None
+    assert row["tvar"] is None
+    assert "lognormal body" in row["tvar_refused"]
+
+
+def test_severity_refuses_a_shape_at_the_boundary_where_the_mean_does_not_exist(tmp_path: Path) -> None:
+    out = tmp_path / "curve.json"
+    assert main([
+        "severity", "--mu", "10.0", "--sigma", "1.5", "--threshold", "100000", "--xi", "1.0",
+        "--beta", "80000", "--alpha", "0.99", "--out", str(out),
+    ]) == 0
+    row = json.loads(out.read_bytes())["body"]["curve"][0]
+    assert row["tvar"] is None
+    assert "does not exist" in row["tvar_refused"]
+
+
+def test_severity_refuses_a_non_positive_sigma_with_exit_code_two(tmp_path: Path) -> None:
+    out = tmp_path / "curve.json"
+    assert main([
+        "severity", "--mu", "10.0", "--sigma", "0", "--threshold", "100000", "--xi", "0.3",
+        "--beta", "80000", "--alpha", "0.99", "--out", str(out),
+    ]) == 2
+    assert not out.exists()
+
+
+def test_severity_pins_its_declared_parameters_and_carries_no_severity_slot_on_a_component(
+    tmp_path: Path,
+) -> None:
+    """Standalone, the same shape `reliability` already is: no `--repo`, no `--org`."""
+    out = tmp_path / "curve.json"
+    main(["severity", *SEVERITY_ARGS, "--alpha", "0.9", "--out", str(out)])
+    pins = json.loads(out.read_bytes())["envelope"]["pins"]
+    assert pins["severity"]["threshold"] == 100000.0
+    assert pins["severity"]["tail_probability"] not in (None, 0.0, 1.0)
+
+
 # -- positions (build ticket 16) ------------------------------------------------------------
 
 
