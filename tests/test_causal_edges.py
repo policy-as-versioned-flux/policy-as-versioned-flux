@@ -85,6 +85,50 @@ def test_a_degenerate_triple_is_permitted_and_flagged() -> None:
     assert degenerate(GRADED["elasticity"]) is False  # type: ignore[arg-type]
 
 
+def test_a_causal_edge_may_carry_a_calibration_record() -> None:
+    """Proof that the range came from the procedure, not that it must have (build ticket 23)."""
+    validate("edge", {**GRADED, "calibration": {
+        "estimator": "model-steward", "date": "2026-01-01", "reference_class": "similar-edges",
+    }}, "ok")
+
+
+def test_a_structural_edge_may_not_carry_a_calibration_record() -> None:
+    """No triple, nothing to calibrate — same refusal as any other causal-only field."""
+    with pytest.raises(SchemaError, match="only a 'influences' edge may assert"):
+        validate(
+            "edge",
+            {
+                "id": "an-edge", "type": "needs", "from": "comp-a", "to": "comp-b",
+                "calibration": {
+                    "estimator": "model-steward", "date": "2026-01-01", "reference_class": "x",
+                },
+            },
+            "planted",
+        )
+
+
+@pytest.mark.parametrize("missing", ["estimator", "date", "reference_class"])
+def test_a_calibration_record_missing_any_field_is_refused(missing: str) -> None:
+    record = {"estimator": "model-steward", "date": "2026-01-01", "reference_class": "similar-edges"}
+    del record[missing]
+    with pytest.raises(SchemaError, match=missing):
+        validate("edge", {**GRADED, "calibration": record}, "planted")
+
+
+def test_the_pocket_org_shared_elasticity_carries_a_calibration_record(tmp_path: Path) -> None:
+    """The one non-degenerate elasticity in the pocket org — the yardstick this ticket needed:
+    at least one triple in the repository demonstrably went through the procedure."""
+    pocket_repo = ModelRepo.open(fixtures.build_pocket_org(tmp_path / "pocket"))
+    graph = Overlay.load(pocket_repo, "pocket").graph()
+    edge = next(e for e in graph.edges if e.id == "database-slows-orders")
+    assert edge.causal is not None
+    assert edge.causal["calibration"] == {
+        "estimator": "model-steward",
+        "date": "2025-12-15",
+        "reference_class": "outage-postmortems-for-shared-database-dependencies-on-order-processing",
+    }
+
+
 def test_the_graded_edge_fixture_reaches_the_emitted_graph(repo: ModelRepo, caps: Capabilities) -> None:
     """The boundary contract the £ and skills tracks test against — generated, never committed."""
     for org, edge_id, flagged in (("netflix", "streaming-displaces-dvd", False),

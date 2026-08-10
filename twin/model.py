@@ -20,6 +20,7 @@ from .repo import ModelRepo, RepoError, UnitRef, load_yaml
 from .schema import (
     CAUSAL_EDGE,
     CAUSAL_FIELDS,
+    CAUSAL_ONLY_OPTIONAL,
     COLLECTION_KINDS,
     PERSON_EDGES,
     STRUCTURAL_EDGE,
@@ -308,7 +309,14 @@ class Overlay:
                 type=str(e["type"]),
                 source=str(e["from"]),
                 target=str(e["to"]),
-                causal={f: e[f] for f in CAUSAL_FIELDS + ("confidence",) if f in e} or None,
+                # `CAUSAL_ONLY_OPTIONAL` (`calibration`) is optional provenance, not a causal
+                # assertion (build ticket 23) — carried through beside `confidence` for the same
+                # reason: a reader of the graph should not have to open the source file to see it.
+                # Read from the schema's own constant so a future addition there does not also
+                # need remembering here.
+                causal={
+                    f: e[f] for f in CAUSAL_FIELDS + CAUSAL_ONLY_OPTIONAL + ("confidence",) if f in e
+                } or None,
             )
             for ident, e in sorted(self.edges.items())
         ]

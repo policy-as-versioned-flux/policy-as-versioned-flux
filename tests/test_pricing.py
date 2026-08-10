@@ -23,7 +23,10 @@ from twin.schema import SchemaError, validate
 
 OPERATOR, COUNCIL = "the-operator", "the-staff-council"
 PRICED_ORIGIN, REFUSED_ORIGIN = "order-service", "shared-database"
-RESPONSE = {"id": "r", "name": "R", "addresses": "shared-database",
+# `"id": "r"` would fail `ident`'s own minimum length (2 chars) before any of the fields below
+# are ever reached, which would make every test that builds on this fixture vacuous — passing for
+# the wrong reason. Caught while adding the calibration tests below.
+RESPONSE = {"id": "response-r", "name": "R", "addresses": "shared-database",
             "cost": {"min": 1.0, "mode": 2.0, "max": 3.0}}
 
 
@@ -146,22 +149,45 @@ def test_a_claim_against_an_unpriced_impact_earns_nothing(pocket_repo_dir: Path,
 def test_a_mitigation_claim_with_no_grade_does_not_load() -> None:
     """Structural, not a review step: there is no slot for an ungraded reduction."""
     for missing in ("evidence_grade", "reduction", "component", "basis"):
-        claim = {"component": "c", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
+        claim = {"component": "component-c", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
                  "evidence_grade": 2, "basis": "measured"}
         del claim[missing]
-        with pytest.raises(SchemaError):
+        with pytest.raises(SchemaError, match=missing):
             validate("response", {**RESPONSE, "mitigates": claim}, "planted")
 
 
 def test_a_reduction_must_be_a_range_not_a_point() -> None:
     """A control that removes 'half' an impact knows that no better than an elasticity does."""
-    with pytest.raises(SchemaError):
+    with pytest.raises(SchemaError, match="min/mode/max mapping"):
         validate(
             "response",
-            {**RESPONSE, "mitigates": {"component": "c", "reduction": 0.5,
+            {**RESPONSE, "mitigates": {"component": "component-c", "reduction": 0.5,
                                        "evidence_grade": 2, "basis": "b"}},
             "planted",
         )
+
+
+# -- calibration provenance, optional beside a cost triple (build ticket 23) ------------------
+
+
+def test_a_response_may_carry_a_calibration_record() -> None:
+    validate("response", {**RESPONSE, "calibration": {
+        "estimator": "model-steward", "date": "2026-01-01", "reference_class": "similar-rewrites",
+    }}, "ok")
+
+
+@pytest.mark.parametrize("missing", ["estimator", "date", "reference_class"])
+def test_a_calibration_record_missing_any_field_is_refused(missing: str) -> None:
+    record = {"estimator": "model-steward", "date": "2026-01-01", "reference_class": "similar-rewrites"}
+    del record[missing]
+    with pytest.raises(SchemaError, match=missing):
+        validate("response", {**RESPONSE, "calibration": record}, "planted")
+
+
+def test_a_calibration_record_is_closed() -> None:
+    record = {"estimator": "model-steward", "date": "2026-01-01", "reference_class": "x", "confidence": 0.9}
+    with pytest.raises(SchemaError, match="unknown field"):
+        validate("response", {**RESPONSE, "calibration": record}, "planted")
 
 
 # -- the worked cross-domain comparison ------------------------------------------------------
@@ -201,7 +227,7 @@ def test_the_price_body_is_closed(pocket_repo_dir: Path, caps) -> None:
 def test_a_register_entry_carrying_a_figure_is_refused() -> None:
     with pytest.raises(ArtefactError, match="nowhere to put a figure"):
         pricing.refuse_unpriced_figures(
-            {"register": [{"component": "c", "reason": "r", "detail": "d", "price": 1}]}
+            {"register": [{"component": "component-c", "reason": "r", "detail": "d", "price": 1}]}
         )
 
 

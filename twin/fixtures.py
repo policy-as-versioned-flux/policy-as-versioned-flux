@@ -692,6 +692,10 @@ evolution: commodity
 evolution_position: 0.9
 visibility: 0.1
 """,
+    # The only genuinely wide elasticity in the pocket org (both diamond legs are degenerate on
+    # purpose), so it is the one that carries a calibration record: proof that at least one triple
+    # in this repository went through the procedure `twin/calibration.md` describes, rather than
+    # a schema slot that exists and is never demonstrably used (build ticket 23).
     "orgs/pocket/edges/database-slows-orders.yaml": """\
 id: database-slows-orders
 type: influences
@@ -705,6 +709,10 @@ elasticity:
   max: 0.7
 evidence_grade: 3
 confidence: 0.6
+calibration:
+  estimator: model-steward
+  date: 2025-12-15
+  reference_class: outage-postmortems-for-shared-database-dependencies-on-order-processing
 """,
     "orgs/pocket/edges/orders-slow-the-portal.yaml": """\
 id: orders-slow-the-portal

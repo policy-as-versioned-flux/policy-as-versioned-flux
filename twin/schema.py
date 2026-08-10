@@ -256,6 +256,43 @@ def mitigation(value: Any, where: str) -> None:
     text(value["basis"], f"{where}.basis")
 
 
+def calibration(value: Any, where: str) -> None:
+    """Authoring-time provenance for a calibrated range: who estimated it, when, against what
+    reference class (build ticket 23, `twin/calibration.md` steps
+    `record-the-estimator-and-the-date` and `name-the-reference-class`).
+
+    Optional beside a triple, not required of one. Every triple is still representable without
+    this — a wide, honestly-uncertain range is not a worse citizen than a well-provenanced one —
+    but without the slot, "the procedure was used" could never be more than assumed. With it, at
+    least one triple in the repository can carry proof that it went through the five steps rather
+    than being authored as a spreadsheet guess with two decorations either side.
+
+    Not to be confused with the *other* `"calibration"` key this codebase emits — `pert.procedure()`
+    in `twin/options.py` and `twin/propagate.py`, the pinned digest of the discipline itself. That
+    one names which document was in force for a whole artefact; this one names who followed it for
+    one triple. The two never appear in the same body.
+    """
+    if not isinstance(value, dict):
+        raise SchemaError(f"{where}: expected a calibration mapping, got {value!r}")
+    fields = {"estimator", "date", "reference_class"}
+    unknown = sorted((set(value) - fields), key=str)
+    if unknown:
+        raise SchemaError(
+            f"{where}: unknown field(s) {', '.join(str(u) for u in unknown)}; a calibration record "
+            "is estimator, date and reference_class"
+        )
+    missing = sorted(fields - set(value))
+    if missing:
+        raise SchemaError(
+            f"{where}: missing {', '.join(missing)}. An estimate with no date cannot be checked "
+            "against what happened next, and one with no named reference class is a grade 4 or 5 "
+            "claim wearing a calibrated range's clothes."
+        )
+    text(value["estimator"], f"{where}.estimator")
+    date(value["date"], f"{where}.date")
+    text(value["reference_class"], f"{where}.reference_class")
+
+
 def _triple(value: Any, where: str, point: Validator, noun: str) -> None:
     """The shape every min/mode/max triple has. Only the point validator differs."""
     if not isinstance(value, dict):
@@ -528,7 +565,10 @@ SCHEMAS: dict[str, Schema] = {
     # the unfalsifiable claim the grade exists to stop.
     "response": Schema(
         required={"id": ident, "name": text, "addresses": ident, "cost": money_pert},
-        optional={"crosses": mapping_of(text), "note": text, "mitigates": mitigation},
+        optional={
+            "crosses": mapping_of(text), "note": text, "mitigates": mitigation,
+            "calibration": calibration,
+        },
     ),
     # A scenario carries **no regime** (build ticket 36). The regime is a required parameter of
     # the execution, and a scenario-level field would be a default in everything but name: an
@@ -577,6 +617,7 @@ SCHEMAS: dict[str, Schema] = {
             "elasticity": pert,
             "evidence_grade": evidence_grade,
             "confidence": unit_interval,
+            "calibration": calibration,
         },
     ),
     # The gated unit. Cohort-level by construction — there is no `person` field, which is what
@@ -601,7 +642,10 @@ SCHEMAS: dict[str, Schema] = {
 }
 
 
+# A causal edge must assert all four; a fifth, `calibration`, may accompany one but is never
+# required — an uncalibrated-but-honest range is still a legal claim (build ticket 23).
 CAUSAL_FIELDS = ("sign", "lag_days", "elasticity", "evidence_grade")
+CAUSAL_ONLY_OPTIONAL = ("calibration",)
 
 
 def _refine_component(doc: dict[str, Any], where: str) -> None:
@@ -643,7 +687,7 @@ def _refine_edge(doc: dict[str, Any], where: str) -> None:
     "some effect, unknown size" that a Monte-Carlo cannot honestly use.
     """
     causal = doc.get("type") == CAUSAL_EDGE
-    present = [f for f in CAUSAL_FIELDS if f in doc]
+    present = [f for f in CAUSAL_FIELDS + CAUSAL_ONLY_OPTIONAL if f in doc]
     if causal:
         missing = [f for f in CAUSAL_FIELDS if f not in doc]
         if missing:
