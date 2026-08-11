@@ -23,3 +23,10 @@ thresholds:
       The heuristic scores 1.0 on the pooled Carillion/NMC/Wirecard/Enron corpus (build ticket
       43); the threshold is set below that measured score, at the same round 0.8 bar
       toy-classifier uses, rather than padded up to the achieved number.
+  evolution-judge:
+    threshold: 0.75
+    note: >-
+      The heuristic scores 1.0 on its own four-org dated-position corpus (build ticket 44); set
+      below that at 0.75 — one item is allowed to miss out of four — because the corpus is small
+      (one dated position per backtest org) and a threshold equal to the achieved score would be
+      indistinguishable from no threshold at all.

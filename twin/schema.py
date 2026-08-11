@@ -522,17 +522,20 @@ SCHEMAS: dict[str, Schema] = {
     ),
     # `evidence_grade` is the ladder's rung, not any whole number: the grade travels with the
     # claim, so an off-ladder value would be a claim whose strength nothing can read (ticket 18).
+    # `signal` is optional here, not required: a `binding` claim names the signal it binds, but a
+    # `position` (evolution-judge's own inference, build ticket 44) or `override` (a human's
+    # correction) claims a component's evolution position from *accumulated* evidence, not one
+    # signal — `_refine_claim` below enforces which kind needs which field.
     "claim": Schema(
         required={
             "id": ident,
-            "kind": one_of("binding"),
-            "signal": ident,
+            "kind": one_of("binding", "position", "override"),
             "component": ident,
             "evidence_grade": evidence_grade,
             "claimed_by": text,
             "evidence": text,
         },
-        optional={"confidence": unit_interval},
+        optional={"signal": ident, "confidence": unit_interval, "evolution_position": unit_interval},
     ),
     # A grade is immutable without one of these (build ticket 18). It records who moved it, when,
     # from what, to what and why — and the direction is *derived* from the two grades rather than
@@ -780,11 +783,50 @@ def _refine_perspective(doc: dict[str, Any], where: str) -> None:
         raise SchemaError(f"{where}: {exc}") from None
 
 
+def _refine_claim(doc: dict[str, Any], where: str) -> None:
+    """Which fields a claim needs depends on its kind, and — like `_refine_component`'s "both, or
+    neither" — a kind may carry only the fields its own contract names, never the other kind's
+    (build ticket 44).
+
+    A `binding` names the one signal it binds (unchanged since build ticket 43) and carries no
+    `evolution_position`: it is not a position claim wearing a binding's kind. A `position` or
+    `override` claims a component's place on the evolution axis instead, so it must carry the
+    value it asserts rather than a signal it does not have. An `override` is additionally
+    attributable to a **registered role**, the same discipline `_refine_regrade` already applies
+    to `by_role` — a correction free text could claim from anyone is not what "attributable to a
+    role" means.
+    """
+    kind = doc.get("kind")
+    if kind == "binding":
+        if "signal" not in doc:
+            raise SchemaError(f"{where}: a 'binding' claim must name the signal it binds")
+        if "evolution_position" in doc:
+            raise SchemaError(f"{where}: a 'binding' claim declares evolution_position, which only a 'position' or 'override' claim asserts")
+    if kind in ("position", "override"):
+        if "evolution_position" not in doc:
+            raise SchemaError(f"{where}: a {kind!r} claim must declare the evolution_position it asserts")
+        if "signal" in doc:
+            raise SchemaError(f"{where}: a {kind!r} claim declares signal, which only a 'binding' claim asserts")
+    if kind == "override":
+        from .sign import SignatureError, role_ids
+
+        try:
+            known = role_ids()
+        except SignatureError as exc:  # pragma: no cover - a broken register is its own error
+            raise SchemaError(f"{where}: {exc}") from None
+        if str(doc["claimed_by"]) not in known:
+            raise SchemaError(
+                f"{where}: override claimed_by {doc['claimed_by']!r} is not in the role register "
+                f"(have: {', '.join(known)}) — an override is attributable to a role, not free text"
+            )
+
+
 REFINEMENTS: dict[str, Callable[[dict[str, Any], str], None]] = {
     "component": _refine_component,
     "edge": _refine_edge,
     "regrade": _refine_regrade,
     "perspective": _refine_perspective,
+    "claim": _refine_claim,
 }
 
 

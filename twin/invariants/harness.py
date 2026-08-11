@@ -675,6 +675,74 @@ def _signal_classify_is_grade_5_by_construction(ctx: Context) -> str:
     )
 
 
+@harness_check("evolution_judge_output_is_graded_by_construction_and_never_silent")
+def _evolution_judge_output_is_graded_by_construction_and_never_silent(ctx: Context) -> str:
+    """`evolution-judge` (build ticket 44, decision ticket 11 Q1): the twin's own inference is
+    grade 5 by construction, an override is grade 4 and attributable to a registered role, an
+    override cannot be constructed without the twin's own prior inference, and the twin's pushback
+    is never empty — the same structural-plus-live two-leg shape
+    `signal_classify_is_grade_5_by_construction` uses, extended to the override half ticket 43 did
+    not need.
+
+    Also runs the skill end to end against its real labelled corpus (the four backtest orgs'
+    dated positions `tests/test_evolution_judge.py` also evaluates against, built fresh here in
+    `ctx.tmp`) and proves a degraded judge fails the threshold.
+    """
+    import inspect
+
+    from .. import evolution_judge as ej
+    from .. import skills as skills_mod
+
+    judge_params = inspect.signature(ej.judge).parameters
+    if "grade" in judge_params or "evidence_grade" in judge_params:
+        raise Violated("evolution_judge.judge() accepts a grade-shaped parameter — grade 5 is no longer by construction")
+
+    override_params = inspect.signature(ej.override).parameters
+    if "grade" in override_params or "evidence_grade" in override_params:
+        raise Violated("evolution_judge.override() accepts a grade-shaped parameter — grade 4 is no longer by construction")
+    if list(override_params)[0] != "inferred":
+        raise Violated(
+            "evolution_judge.override()'s first parameter is not 'inferred' — decision ticket 11 Q1 requires "
+            "inference before any human input is accepted, structurally, not by convention"
+        )
+
+    sample = {"component": {"id": "x", "name": "A trading business."}, "evidence": []}
+    inferred = ej.judge(sample)
+    if inferred["claim"].get("evidence_grade") != 5:
+        raise Violated(f"evolution_judge.judge() emitted evidence_grade {inferred['claim'].get('evidence_grade')!r}, not 5")
+
+    correction = ej.override(inferred, "x", 0.9, "model-steward", "a review found stronger commoditisation")
+    if correction.get("evidence_grade") != 4:
+        raise Violated(f"evolution_judge.override() emitted evidence_grade {correction.get('evidence_grade')!r}, not 4")
+
+    from ..sign import role_ids
+
+    if correction["claimed_by"] not in role_ids():
+        raise Violated("evolution_judge.override() accepted a claimed_by not in the role register")
+
+    disagreeing = ej.pushback(inferred, correction)
+    agreeing = ej.pushback(inferred, ej.override(inferred, "x", inferred["claim"]["evolution_position"], "model-steward", "confirmed"))
+    if not disagreeing.get("statement") or not agreeing.get("statement"):
+        raise Violated("evolution_judge.pushback() returned an empty statement — silence is not an option, agreement included")
+
+    corpus = ej.labelled_corpus(ctx.tmp / "evolution-judge-corpus")
+    good = skills_mod.evaluate(ej.SKILL, ej.judge, corpus, scorer=ej.scorer)
+    if not good.passed:
+        raise Violated("evolution-judge failed its own labelled corpus running correctly — the harness has no subject")
+    bad = skills_mod.evaluate(
+        ej.SKILL, lambda payload: {"evolution_position": 0.999}, corpus, scorer=ej.scorer,
+    )
+    if bad.passed:
+        raise Violated("a judge that gets every item wrong still passed — the threshold is not gating anything")
+
+    return (
+        "no grade-shaped parameter exists on judge() or override(); judge() always emits grade 5, "
+        "override() always emits grade 4 and refuses an unregistered role, override() cannot run "
+        "without an inferred claim first, pushback() is never silent on agreement or disagreement; "
+        f"the real {len(corpus)}-item labelled corpus passes and a degraded judge fails its threshold"
+    )
+
+
 def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
     rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     out = _git(root, "show", f"{ref}:{rel}")

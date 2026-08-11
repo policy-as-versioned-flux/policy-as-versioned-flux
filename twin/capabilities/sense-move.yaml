@@ -14,7 +14,9 @@ criteria:
     ticked_by: build ticket 43
   - index: 3
     text: "Authored-vs-inferred position decided, consistent with ticket 07's authored/derived split."
-    checked: false
+    checked: true
+    evidence: "twin/evolution_judge.py: position is inferred first from accumulated evidence (judge(), grade 5 by construction) and a human may then correct it (override(), grade 4, attributable to a registered role) — decision ticket 11 Q1's inferred-first order, structurally enforced (override() cannot run without judge()'s own output as its first argument). The twin never goes silent: pushback() always states its basis, agreement included. Extends twin/schema.py's claim schema (kind 'position'/'override', evolution_position field) and the invariant suite (evolution_judge_output_is_graded_by_construction_and_never_silent)."
+    ticked_by: build ticket 44
   - index: 4
     text: "Observation-propagation semantics, distinguished from ticket 08's intervention propagation."
     checked: false
