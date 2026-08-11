@@ -1,19 +1,19 @@
 {
-  "authorised_by": null,
-  "capabilities_digest": "1eb2ea1089122819d44949abd49bb99dedf463fe0253fb2da1ccedb7ca17234e",
+  "authorised_by": "decision ticket 12 \u2014 build ticket 48 adds the synthetic-substrate capability file, moving capabilities_digest and every artefact's tool pin",
+  "capabilities_digest": "d5235e77e57863017e6855c294f0c6522b6cb0f02f77b8002a6f385b4c6122ec",
   "digests": {
-    "blast-radius": "8009123e5abcaec625065cda416c80037f220cade636ff0e97c5207ccd1be3bc",
-    "bound-signal": "42f59417387ea8cfe1d802182d4721b3b9153ec6ad1f8aecc9f23ac33c97b8d1",
-    "forecast-bundle": "6189c628c6442e242b93f1b03dd04ef5f00c532a4f932ba4966633abe048a91d",
-    "graph": "d328f002835aa85f31c091368893917f42f6e85537c2c3a3cd00c0ab342a8a7e",
-    "intervention": "3b08c53a76cfa35c907ecc75e5564dc5f79d762dc8405c9e5927d11d6588c518",
-    "observation": "ec42ccb7a3710655c4fa96bcfc3749a0bdd1e68b1626aa6c00a5a19c1ce54b4b",
-    "priced-impact": "b99248089e42963484cb5718aaf3fd4c05aadf14fb8178beae59302b7ba6af44",
-    "priced-option-set": "0fb93f999e31a17fe015bd34652706f289db851dcd6eb536d54c767e17ada1c5",
-    "propagation": "bb899c8531e2caf2c76b95a7df84111c5818eae1e1d1b717f3a3c1fd8b8476e5",
-    "rewound-model": "2872d65be907b5f1edee06399647d6c77dffa82a72f8f3d1286cf1d7796be793",
-    "scenario-exposure": "09e840175a456bddaa9a24b64d0ad4a96fdc8813ccffdd9b59b777fc793718bb",
-    "score-card": "5d96823df1140ecaad836443f8fafd65a899a7cbc524ad9be8d8c9c7e87a5e0d"
+    "blast-radius": "d9d6cc98c350f26eaa8408db91d99fda9ce038cb31ecdfa53ddcbb4ab55f4773",
+    "bound-signal": "a147871e353bf816c99dae25e930219dbb88c34af4acfc4aa50e2ffd2f904208",
+    "forecast-bundle": "08647bddb00c6d3e32fe7cdd316d9ca4fcad7de9d4c199fac6987f3a82084bb5",
+    "graph": "9f7fd7f24f4fbc27b222a704bc603fba528c3e3cd8afdcab16c832c1becbc472",
+    "intervention": "d95611452026591acccef5fd0688df58a1fed9d993cd9f964b3960da12f1f808",
+    "observation": "005b99a915ecc934031645f5f3b712aef2eafd7d263f4df74649d43cdf051366",
+    "priced-impact": "966776ee2a56ae9f262af765891905989390f9061544adcd5c058795e31e331e",
+    "priced-option-set": "aef9c9bc27df2afce7443173d17cc621fcdc1c1df0b60c824c5ee50d3d733962",
+    "propagation": "da50347e35c352ff0a2074e3af05ab3031fb6b1c7a090cb3bca8339908ac9f1a",
+    "rewound-model": "07e0113b15ed95d1acb69d7e95f6a6c1fbd887a1b34b7d08e2e6308a31dfec75",
+    "scenario-exposure": "8652834e61f0ec61b3529ed12429fb615a6629f9d7636526cba80bfc334927b3",
+    "score-card": "0d5a065305dd0f44c9d1bba605f4722ea3a5fcaca2d25ad273a75b6691fe7abf"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

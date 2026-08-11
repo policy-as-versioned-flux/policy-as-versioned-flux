@@ -1617,6 +1617,109 @@ def _cross_arch(ctx: Context) -> str:
     return f"{len(golden)} artefacts byte-identical on {os.uname().machine}"
 
 
+@harness_check("substrate_regeneration_is_not_deterministic_so_it_is_authored")
+def _substrate_regeneration_is_not_deterministic_so_it_is_authored(ctx: Context) -> str:
+    """The authored-or-derived spike (build ticket 48, decision tickets 12 and 14): regenerated
+    substrate is classified `authored`, and the reasons this holds are checked, not narrated.
+
+    A guard on the suite rather than an invariant, the same shape `causal_accounts_have_no_privileged_default`
+    is: this asserts a **semantic property of the spike's own finding**, not one of the
+    constitution's fixed sixteen.
+
+    Four legs. First, the toy demonstration of what "derived" would require: a pure, seeded
+    generator with no external entropy reproduces byte-for-byte from the identical recipe, every
+    time. Second, the tension the ticket names: a stand-in for a live model call — drawing on
+    entropy the recipe cannot pin, the one honest thing an API call actually is — does **not**
+    reproduce from the identical recipe, which is why `identical_pins_identical_bytes` cannot be
+    asserted for real substrate generation. Third, the boundary made explicit: an artefact carrying
+    substrate content itself, marked `authored`, accepts a human signature, while a derived
+    artefact that only references the substrate by content hash still refuses one —
+    `derived_never_human_signed` (build ticket 11) checked against this new case, not merely
+    unchanged by omission. Fourth, the "twin verify attempt": a `sense` artefact pinning a real,
+    non-empty substrate reference reproduces cleanly from its pins alone, without the substrate
+    bytes ever being written anywhere `twin` can read them — the reference participates in
+    derivation, the bytes behind it never do.
+    """
+    import tempfile
+
+    from .. import attest, cli, sign, verbs
+    from ..artefact import AUTHORED, DERIVED, Artefact
+    from ..attest import AttestationError
+    from ..blob import BlobRef
+    from ..reproduce import reproduce
+    from ..repo import ModelRepo
+    from ..substrate import SubstrateRecipe, generate_deterministic, generate_non_reproducible
+
+    recipe = SubstrateRecipe(
+        id="guard-recipe", seed=11, templates=("a mundane line", "another mundane line"),
+        model_version="toy-model-v1",
+    )
+    if generate_deterministic(recipe) != generate_deterministic(recipe):
+        raise Violated("the pure, seeded generator did not reproduce from the identical recipe")
+    if generate_non_reproducible(recipe) == generate_non_reproducible(recipe):
+        raise Violated(
+            "the stand-in live-model generator reproduced from the identical recipe twice in a "
+            "row — the tension this spike exists to demonstrate has gone missing"
+        )
+
+    payload = generate_deterministic(recipe)
+    ref = BlobRef.of(payload)
+    batch = Artefact(
+        kind="substrate-batch", mark=AUTHORED, command=["twin", "substrate"],
+        pins={"recipe_id": recipe.id}, depth={}, body={"substrate": str(ref)},
+    )
+    attest.build(batch, [sign.human("model-steward", batch.digest(), b"guard-key")])
+
+    referencing = Artefact(
+        kind="bound-signal", mark=DERIVED, command=["twin", "sense"],
+        pins={"substrate": str(ref)}, depth={}, body={},
+    )
+    try:
+        attest.build(referencing, [sign.human("model-steward", referencing.digest(), b"guard-key")])
+    except AttestationError:
+        pass
+    else:
+        raise Violated("a derived artefact referencing substrate by hash accepted a human signature")
+
+    signal_dir = ctx.tmp / "substrate-guard-repo"
+    if not signal_dir.exists():
+        fixtures.build(signal_dir)
+        (signal_dir / "orgs" / "intel" / "signals" / "toy-substrate-signal.yaml").write_text(
+            f"id: toy-substrate-signal\ndate: '2024-08-02'\nsteep: economic\n"
+            f"source: toy substrate spike\nstatement: A planted signal inside the toy substrate.\n"
+            f"substrate: {ref}\nprovenance:\n  observed_by: fixture\n"
+            f"  url: https://example.invalid/fixture/toy-substrate\n",
+            encoding="utf-8",
+        )
+        (signal_dir / "orgs" / "intel" / "claims" / "bind-toy-substrate-signal.yaml").write_text(
+            "id: bind-toy-substrate-signal\nkind: binding\nsignal: toy-substrate-signal\n"
+            "component: foundry-services\nevidence_grade: 5\n"
+            "claimed_by: fixture-author (human)\nevidence: Reading of the toy substrate.\n",
+            encoding="utf-8",
+        )
+        fixtures.git(signal_dir, "add", "-A")
+        fixtures.git(signal_dir, "commit", "-q", "-m", "toy substrate signal")
+
+    with tempfile.TemporaryDirectory(prefix="twin-substrate-guard-") as scratch:
+        out = Path(scratch) / "bound-signal.json"
+        rc = cli.main(
+            ["sense", "--repo", str(signal_dir), "--org", "intel",
+             "--signal", "toy-substrate-signal", "--out", str(out)]
+        )
+        if rc != 0:
+            raise Violated("emitting the substrate-referencing sense artefact failed")
+        report = reproduce(str(signal_dir), str(out))
+        if not report.reproduces:
+            raise Violated(f"the substrate-referencing artefact did not reproduce from its pins: {report.diff}")
+
+    return (
+        "the pure seeded generator reproduces from an identical recipe; the stand-in live-model "
+        "generator does not; an authored substrate batch accepts a human signature and a derived "
+        "reference to it still refuses one; a substrate-referencing sense artefact reproduces from "
+        "its pins with the substrate bytes never written anywhere twin can read them"
+    )
+
+
 def _git(root: Path, *args: str) -> str | None:
     proc = subprocess.run(
         ["git", *args], cwd=str(root), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
