@@ -833,6 +833,12 @@ _FURTHER_ANSWER_KEYS: tuple[_FurtherAnswerKey, ...] = (
     ("nmc", fixtures.build_nmc_health_org, "nmc-administration-resolved", "healthcareandprotection.com", "low"),
     ("wirecard", fixtures.build_wirecard_org, "wirecard-insolvency-resolved", "bundestag.de", "high"),
     ("enron", fixtures.build_enron_org, "enron-bankruptcy-resolved", "powers.report", "control"),
+    # The primary missed-opportunity case (build ticket 71, decision tickets 19/22): the same
+    # dated-and-cited contract, holding even though the proposition is a missed opportunity
+    # rather than a collapse — the table has no opinion on which direction a proposition names,
+    # only that it is dated, cited and resolved honestly.
+    ("royal-mail", fixtures.build_royal_mail_org, "royal-mail-concedes-the-automation-shortfall-2019",
+     "ipc.be", "low"),
 )
 
 
