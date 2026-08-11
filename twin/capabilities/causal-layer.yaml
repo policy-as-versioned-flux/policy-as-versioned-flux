@@ -1,0 +1,31 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+# Added at build ticket 17, when the causal layer first had code to measure. Before that, a
+# capability file with nothing behind it would have been a slot claiming a capability existed.
+capability: causal-layer
+owning_ticket: '08'
+criteria:
+  - index: 1
+    text: "A causal-edge schema (assertion + evidence grade + confidence) in ubiquitous language."
+    checked: true
+    evidence: "twin/schema.py — an `influences` edge asserts sign, lag, a min/mode/max elasticity, an evidence grade 1-5 and an optional confidence, all validated on write. A degenerate triple is permitted and flagged rather than refused, so false precision is visible."
+    ticked_by: build ticket 17
+  - index: 2
+    text: "Defined intervention + counterfactual semantics, incl. behaviour on structural-only paths."
+    checked: false
+    # Deliberately still unchecked after build ticket 22. Two of the three legs are built:
+    # **intervention semantics** at build ticket 22 (`twin/primitives.py` — do() cuts the incoming
+    # edges and propagates downstream only, observe() updates belief bidirectionally, and the two
+    # are separate types so a swap is a type error), and **structural-only-path behaviour** at
+    # build ticket 20 (a `needs` edge claims no mechanism, so nothing composes along it). The
+    # **counterfactual** is abduction -> action -> prediction; abduction landed at build ticket 35
+    # and prediction (fast-forward) is build ticket 37. Two thirds of a composition is not the
+    # composition.
+  - index: 3
+    text: "The intervention-aware scoring rule, with a worked example of a mitigated non-event."
+    checked: false
+  - index: 4
+    text: "A stated identification/confounding discipline + its honest limits."
+    checked: false
+  - index: 5
+    text: "Exercised on a real claim from each co-flagship (Qwikster→churn; EUV delay→node slip)."
+    checked: false

@@ -1,0 +1,43 @@
+# The depth-attenuation schedule (build ticket 20), from decision ticket 08, Q3.
+#
+# Long chains multiply uncertainty until the answer is noise. A five-hop elasticity chain is not a
+# number, and a propagation engine that composes one anyway manufactures confidence out of depth.
+#
+# Data rather than code, for the reason the evidence ladder is: a reader who does not write Python
+# can see how fast influence decays, and changing the decay is a diff against a version number.
+#
+# Two separate statements, and they are different claims:
+#
+#   * `factors` scales the composed influence at each depth. It says a longer chain carries less.
+#   * `directional_beyond_depth` is where the number stops existing at all. Past it a result
+#     degrades to **directional only** and drops out of the priced set — it is not a small number,
+#     it is no number.
+#
+# Versioned. Bump `version` in the same commit as any change below. Every artefact that attenuates
+# records the version and digest it attenuated against.
+schema: twin.attenuation/v1
+version: 1
+
+# Past this depth a propagated result carries a sign and nothing else.
+directional_beyond_depth: 4
+
+# Depth 1 is the edge's own triple, unattenuated: a single hop is the claim the author made, and
+# scaling it here would mean the schedule disagreed with the model.
+factors:
+  - depth: 1
+    factor: 1.0
+    because: >-
+      One hop is the authored claim itself. Nothing has compounded yet.
+  - depth: 2
+    factor: 0.8
+    because: >-
+      Two independently-estimated ranges have been composed. The composition is credible and the
+      confidence in it is not the product of the two confidences.
+  - depth: 3
+    factor: 0.6
+    because: >-
+      Three hops is where a chain starts describing a mechanism nobody has observed end to end.
+  - depth: 4
+    factor: 0.4
+    because: >-
+      The last depth carrying a number. Beyond here the honest output is a direction.
