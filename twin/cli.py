@@ -611,6 +611,67 @@ def cmd_constraints(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_affected_parties(args: argparse.Namespace) -> int:
+    """Emit the affected-parties register: every outsider a scenario named as bearing a modelled
+    consequence, published alongside the constraint set (build ticket 61)."""
+    repo, caps, org = _open(args)
+    artefact = verbs.affected_parties(repo, caps, org, verbs.command_for("affected-parties", org=org))
+    return _emit(artefact, args.out)
+
+
+def cmd_disparate_impact_audit(args: argparse.Namespace) -> int:
+    """Raise a disparate-impact audit finding — sealed to the same special-category refusal the
+    model repository itself carries (build ticket 61)."""
+    from . import disparate_impact
+
+    try:
+        artefact = disparate_impact.raise_audit(
+            args.finding, args.source, verbs.command_for("disparate-impact-audit"),
+        )
+    except disparate_impact.DisparateImpactError as exc:
+        print(f"twin disparate-impact-audit: {exc}", file=sys.stderr)
+        return 2
+    path = artefact.write(args.out)
+    sidecar = attest.write(artefact, path)
+
+    _say(f"disparate-impact audit -> {path} (open — {disparate_impact.RESPONDENT_ROLE!r} responds)")
+    print(f"  finding    {artefact.body['finding']}")
+    print(f"  source     {artefact.body['source']}")
+    print(f"  attestation  {sidecar.name}")
+    return 0
+
+
+def cmd_disparate_impact_respond(args: argparse.Namespace) -> int:
+    """Respond to a disparate-impact audit. Only the registered respondent role may (build ticket 61)."""
+    from . import disparate_impact
+    from .artefact import digest_of_file
+    from .artefact import load as load_artefact
+
+    audit_doc = load_artefact(args.audit)
+    audit_sha256 = digest_of_file(args.audit)
+    try:
+        artefact = disparate_impact.respond(
+            audit_doc, audit_sha256, args.response, args.role,
+            verbs.command_for("disparate-impact-respond", audit_sha256=audit_sha256),
+        )
+    except disparate_impact.DisparateImpactError as exc:
+        print(f"twin disparate-impact-respond: {exc}", file=sys.stderr)
+        return 2
+    path = artefact.write(args.out)
+    material = sign.signing_key()
+    signatures = [sign.human(args.role, artefact.digest(), material)] if material else []
+    sidecar = attest.write(artefact, path, signatures)
+
+    _say(f"disparate-impact response -> {path} (authored, role {args.role!r})")
+    print(f"  finding    {artefact.body['finding']}")
+    print(f"  response   {args.response}")
+    if material is None:
+        print(f"  unsigned: set {sign.KEY_ENV}, then `twin sign {path} --role {args.role}`")
+        return 0
+    print(f"  signed as role {args.role!r} -> {sidecar.name}")
+    return 0
+
+
 def cmd_challenge(args: argparse.Namespace) -> int:
     """Raise a challenge against one claim in an existing artefact (build ticket 60)."""
     from . import challenges
@@ -1445,6 +1506,29 @@ def build_parser() -> argparse.ArgumentParser:
     )
     published.add_argument("--out", required=True)
     published.set_defaults(fn=cmd_constraints)
+
+    parties = with_org(with_repo(subs.add_parser(
+        "affected-parties", help="the affected-parties register, published alongside the constraint set"
+    )))
+    parties.add_argument("--out", required=True)
+    parties.set_defaults(fn=cmd_affected_parties)
+
+    audited = subs.add_parser(
+        "disparate-impact-audit", help="raise a disparate-impact audit finding (sealed channel)"
+    )
+    audited.add_argument("--finding", required=True, help="what differs, never the protected characteristic")
+    audited.add_argument("--source", required=True, help="where the disparity was measured, outside this system")
+    audited.add_argument("--out", required=True)
+    audited.set_defaults(fn=cmd_disparate_impact_audit)
+
+    responded_di = subs.add_parser(
+        "disparate-impact-respond", help="respond to a disparate-impact audit as the registered respondent"
+    )
+    responded_di.add_argument("--audit", required=True, help="path to the audit artefact being responded to")
+    responded_di.add_argument("--response", required=True)
+    responded_di.add_argument("--role", default="disparate-impact-respondent")
+    responded_di.add_argument("--out", required=True)
+    responded_di.set_defaults(fn=cmd_disparate_impact_respond)
 
     challenged = subs.add_parser(
         "challenge", help="raise a challenge against one claim in an existing artefact"

@@ -25,6 +25,7 @@ from .repo import ModelRepo
 from .schema import REGIMES
 from . import (
     admission as admission_mod,
+    affected_parties as affected_parties_mod,
     blast as blast_mod,
     constraints,
     credibility as credibility_mod,
@@ -99,6 +100,7 @@ KIND_LOSS_EXCEEDANCE = "loss-exceedance-curve"
 KIND_ANCHORED_LOSS_EXCEEDANCE = "anchored-loss-exceedance-curve"
 KIND_CAUSAL_ACCOUNT_SPREAD = "causal-account-spread"
 KIND_TRADE_OFF_CURVE = "trade-off-curve"
+KIND_AFFECTED_PARTIES = "affected-parties-register"
 
 # Calibration's own capability, decision ticket 11 — the same set `score` already carries, because
 # a reliability diagram reads scores `score` produced and adds no domain of its own.
@@ -239,6 +241,34 @@ def graph(repo: ModelRepo, caps: Capabilities, org: str, command: list[str]) -> 
         pins=_pins(repo, overlay, caps, None),
         depth=caps.depth_block(CAPS_GRAPH),
         body=body,
+    )
+
+
+def affected_parties(repo: ModelRepo, caps: Capabilities, org: str, command: list[str]) -> Artefact:
+    """Emit the affected-parties register: every outsider a scenario in this overlay named as
+    bearing a modelled consequence (build ticket 61, decision ticket 15).
+
+    A computed roll-up of what scenario authoring already declared — `twin/affected_parties.py`
+    does the reading, this just wraps it as an artefact. No capability file tracks decision
+    ticket 15 (build ticket 62's `twin/misuse.py` and build ticket 60's `twin/challenges.py` carry
+    the identical note), so the depth block names no capability rather than fabricating one to
+    fill the slot.
+    """
+    overlay = Overlay.load(repo, org)
+    return Artefact(
+        kind=KIND_AFFECTED_PARTIES,
+        mark=DERIVED,
+        command=command,
+        pins=_pins(repo, overlay, caps, None),
+        depth={
+            "grade": None,
+            "capabilities": {},
+            "note": (
+                "a computed roll-up of scenario-authored declarations; no capability file tracks "
+                "decision ticket 15 (see build tickets 60 and 62's identical note)"
+            ),
+        },
+        body=affected_parties_mod.published(overlay),
     )
 
 

@@ -483,6 +483,23 @@ def _causal_account_edge(value: Any, where: str) -> None:
     _CAUSAL_ACCOUNT_EDGE.validate(value, where)
 
 
+# One entry in a scenario's affected-parties register (build ticket 61, decision ticket 15's
+# Q4 mechanism list: "an affected-parties register — outsiders bearing modelled costs are named,
+# though outside the currency"). Inline on the scenario, the same way a causal account's `edges`
+# are inline rather than a separate referenced collection — the register is a claim about *this*
+# scenario's own consequences, not a thing authored once and reused.
+_AFFECTED_PARTY = Schema(
+    required={"id": ident, "who": text, "consequence": text},
+    optional={"note": text},
+)
+
+
+def _affected_party(value: Any, where: str) -> None:
+    if not isinstance(value, dict):
+        raise SchemaError(f"{where}: expected a mapping")
+    _AFFECTED_PARTY.validate(value, where)
+
+
 SCHEMAS: dict[str, Schema] = {
     "world-meta": Schema(
         required={"id": ident, "unit": one_of("world")},
@@ -606,6 +623,12 @@ SCHEMAS: dict[str, Schema] = {
             "at": date,
             "components": list_of(ident),
             "world_models": list_of(ident),
+            # Required, not optional (build ticket 61): the affected-parties register is
+            # populated as a step of scenario authoring, never a thing an author could skip by
+            # omission. `list_of` is already non-empty-only — the same rule `components` and
+            # `world_models` already carry — so a scenario cannot satisfy this by declaring an
+            # empty list either; naming at least one outsider is part of authoring the scenario.
+            "affected_parties": list_of(_affected_party),
         },
         optional={"horizon": date, "substrate": text},
     ),

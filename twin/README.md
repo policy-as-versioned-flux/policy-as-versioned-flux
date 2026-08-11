@@ -43,6 +43,9 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
 ./bin/twin price --repo R --origin C       # a shock priced under every eye, responses beside it
 ./bin/twin constraints --out F             # the published constraint set, floor and exclusions
+./bin/twin affected-parties --repo R --org O --out F  # who bears a modelled consequence with no perspective, alongside the constraint set
+./bin/twin disparate-impact-audit --finding F --source S --out O      # raise a finding — sealed, never names the protected characteristic
+./bin/twin disparate-impact-respond --audit A --response R --out O    # only the registered respondent role may close it
 ./bin/twin credibility --repo R --org O --subject S  # the world prior blended with an org's own sparse data
 ./bin/twin worksheet --repo P              # the pocket org against its hand-computed worksheet
 ./bin/twin sign <artefact> --role R        # accountability for an authored artefact
@@ -496,6 +499,38 @@ artefact before reproducing it — `challenges.for_artefact()` is the one functi
 counts as open, so a reader of any tool built on it sees the same state rather than each caller
 inventing its own notion of "resolved". Two roles (`challenger`, `challenge-resolver`) join the
 register signatures already bind to, never a named individual.
+
+## The affected-parties register and the disparate-impact channel
+
+Decision ticket 15's Q4 named two mechanisms nothing yet delivered: "an affected-parties
+register — outsiders bearing modelled costs are named, though outside the currency" and "a
+sealed audit channel for disparate impact, or an explicit admission the system cannot be checked
+for it." Build ticket 61 closes both. Neither constrains power — the spec is explicit about
+that, and `twin/constraints.yaml`'s own `power-asymmetry` scope exclusion says so — but
+invisibility is a separate harm from powerlessness, and this one is addressable.
+
+**The register is authored per scenario, not bolted on afterwards.** `twin/schema.py`'s
+`scenario` schema carries a required `affected_parties` field, and `list_of` is already
+non-empty-only — the same rule `components`/`world_models` already carry — so a scenario cannot
+satisfy "populated" with an empty list either. `twin/affected_parties.py` does no authoring of
+its own: `register()` flattens every scenario's own declarations in an overlay, and
+`twin affected-parties --repo R --org O --out F` emits it as a derived artefact carrying
+`constraints.pin()` — the identical version and digest `twin constraints` itself reports, which
+is what "published alongside the constraint set" means structurally rather than by convention.
+
+**Sealed, the same way the model itself is sealed.** A disparate-impact finding is necessarily
+made *outside* the twin — the model cannot represent a protected characteristic anywhere
+(`no-special-category-representation`, the universal floor) — so `twin/disparate_impact.py`'s
+`twin disparate-impact-audit --finding F --source S --out O` runs the identical
+`refuse_special_category` refusal the model repository runs on every field it validates. An
+auditor reports what differs and where it was checked; the channel that reports what the twin
+cannot see is bound by the same refusal, not exempted from it.
+
+**A defined respondent role, structurally rather than by convention.** `twin
+disparate-impact-respond --audit A --response R --role disparate-impact-respondent --out O`
+refuses a response naming any role but that one — a new entry in `twin/roles.yaml` — even when
+the role supplied is itself registered for something else. A route anybody could answer has no
+defined respondent.
 
 ## The misuse catalogue, and logging a constraint removal with what it was worth
 

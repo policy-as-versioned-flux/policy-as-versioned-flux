@@ -1,19 +1,19 @@
 {
-  "authorised_by": null,
+  "authorised_by": "decision ticket 15 -- build ticket 61 adds the required affected_parties field to the scenario schema, changing the fixture's scenario content and therefore the committed golden digests",
   "capabilities_digest": "1eb2ea1089122819d44949abd49bb99dedf463fe0253fb2da1ccedb7ca17234e",
   "digests": {
-    "blast-radius": "8009123e5abcaec625065cda416c80037f220cade636ff0e97c5207ccd1be3bc",
-    "bound-signal": "42f59417387ea8cfe1d802182d4721b3b9153ec6ad1f8aecc9f23ac33c97b8d1",
-    "forecast-bundle": "6189c628c6442e242b93f1b03dd04ef5f00c532a4f932ba4966633abe048a91d",
-    "graph": "d328f002835aa85f31c091368893917f42f6e85537c2c3a3cd00c0ab342a8a7e",
-    "intervention": "3b08c53a76cfa35c907ecc75e5564dc5f79d762dc8405c9e5927d11d6588c518",
-    "observation": "ec42ccb7a3710655c4fa96bcfc3749a0bdd1e68b1626aa6c00a5a19c1ce54b4b",
-    "priced-impact": "b99248089e42963484cb5718aaf3fd4c05aadf14fb8178beae59302b7ba6af44",
-    "priced-option-set": "0fb93f999e31a17fe015bd34652706f289db851dcd6eb536d54c767e17ada1c5",
-    "propagation": "bb899c8531e2caf2c76b95a7df84111c5818eae1e1d1b717f3a3c1fd8b8476e5",
-    "rewound-model": "2872d65be907b5f1edee06399647d6c77dffa82a72f8f3d1286cf1d7796be793",
-    "scenario-exposure": "09e840175a456bddaa9a24b64d0ad4a96fdc8813ccffdd9b59b777fc793718bb",
-    "score-card": "5d96823df1140ecaad836443f8fafd65a899a7cbc524ad9be8d8c9c7e87a5e0d"
+    "blast-radius": "27f435c15cf431e6e24119386324bf3b346bb368fb623bfe5cc2aff688db5414",
+    "bound-signal": "ce4f6b7c2d26e174188bc9461047154a138432873bd7c0248a79d61dffb890e0",
+    "forecast-bundle": "864167a6979d7929056e7889efddebe21f78c76999eae9220970678a8f2ce7c1",
+    "graph": "4036847261f65e94e703d0b16df485cdb2c8ee703045bf28cc5979f4997a4349",
+    "intervention": "8e5dd669dcc101e8931c4ad33d4d14ec10283107bd1092962582e1844fc327b9",
+    "observation": "89a58e630bddf4f143f2053b712a028b9324f182051a035efda7df48cd72e662",
+    "priced-impact": "ed0e7cf94660b7afba874b4aeb6820da37fe31552a668e6bfb51037626cf88d6",
+    "priced-option-set": "e756e6cf9378991263e8ade6c0c4d4cb5043ba9e275d5009454803fce79a68bc",
+    "propagation": "27cd5d6666badb3dfdca57fd912c2dfd810d683df2143d9227bb2239943abd5f",
+    "rewound-model": "e0c436892a170e46900cb3f4d66b017fee46a2b8ef3d6142f6352128dc4f0db8",
+    "scenario-exposure": "c60ea0c30cfeef7820c4e79b55991c209c2b7cdc7acee64bef8e203d658f3cc2",
+    "score-card": "864a2085d4ef06cb84e2d039f6c2d95573adc01d39481c8cf7391b858d0eda6b"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"
