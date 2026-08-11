@@ -621,7 +621,11 @@ SCHEMAS: dict[str, Schema] = {
             "contamination": one_of(*CONTAMINATION),
             "source_dated": boolean,
         },
-        optional={"note": text},
+        # `hindsight_trap` (build ticket 41): true only on a case where the contemporaneous
+        # record and the now-canonical story diverge, so a scored forecast that confidently
+        # agrees with the canonical story is evidence of memorisation, not skill. Optional and
+        # false by omission — every other answer key makes no such claim.
+        optional={"note": text, "hindsight_trap": boolean},
     ),
     "person": Schema(required={"id": ident}, optional={"role": text}),
     # One schema, two edge families. Which fields are required depends on the type, and

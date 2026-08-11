@@ -2155,3 +2155,626 @@ def build_wirecard_org(dest: str | Path) -> Path:
     git(root, "commit", "-q", "-m", "the answer key, citing the 2021 Bundestag inquiry report",
         dated="2021-06-23T00:00:00+00:00")
     return root
+
+
+# -- Enron: the contamination control (build ticket 40, decision ticket 19, spec story 46) --
+#
+# Not a fourth low-notoriety key — the opposite. An LLM asked about Enron has read the ending, so
+# "flagging" it in 2001 is indistinguishable from reciting it in 2026. Carried deliberately as a
+# **control**: the same fixture contract as Carillion/NMC/Wirecard (dated signals, a closed
+# schema, an adversarial post-mortem cited only on the outcome, a real monotonic commit history),
+# so the gap between performance here and performance on an obscure key (Carillion or NMC — not
+# Wirecard, ticket 39's own note) is a like-for-like measurement, not an excuse. `CONTAMINATION`
+# reserves `"control"` for exactly this fixture (twin/schema.py).
+
+ENRON_ORG = "enron"
+
+_ENRON_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/the-subject-enters-bankruptcy-protection-by-2002.yaml": """\
+id: the-subject-enters-bankruptcy-protection-by-2002
+text: The subject files for bankruptcy protection before the end of 2002.
+resolves_on: '2002-12-31'
+""",
+}
+
+_ENRON_BASE: dict[str, str] = {
+    "orgs/enron/components/energy-trading-book.yaml": """\
+id: energy-trading-book
+name: The subject's energy-trading and mark-to-market business
+kind: activity
+evolution: product
+visibility: 0.5
+""",
+    "orgs/enron/world_models/market-consensus-2001.yaml": """\
+id: market-consensus-2001
+name: Market consensus, pre-crisis
+credence: 0.6
+note: >-
+  A low prior, deliberately — the subject was a Fortune 500 constituent, repeatedly named
+  "America's Most Innovative Company", and a going concern by every public account until the CEO's
+  resignation below. The point of a contamination control is the same as a low-notoriety key: the
+  twin has to earn a higher belief from the signals, not start from one, and here the point is
+  sharper still — the whole subject exists so that any inflation above what the signals earn is
+  measurable rather than merely suspected.
+beliefs:
+  the-subject-enters-bankruptcy-protection-by-2002: 0.03
+""",
+    "orgs/enron/scenarios/would-the-twin-have-flagged-it.yaml": """\
+id: would-the-twin-have-flagged-it
+question: >-
+  As of the CEO's sudden resignation, would the twin already have had grounds to flag the
+  subject's energy-trading business?
+proposition: the-subject-enters-bankruptcy-protection-by-2002
+at: '2001-08-14'
+horizon: '2002-12-31'
+components:
+  - energy-trading-book
+world_models:
+  - market-consensus-2001
+""",
+}
+
+_ENRON_SKILLING_RESIGNS: dict[str, str] = {
+    "orgs/enron/signals/skilling-resigns-2001-08-14.yaml": """\
+id: skilling-resigns-2001-08-14
+date: '2001-08-14'
+steep: economic
+source: Press coverage of the subject's own announcement, 2001-08-14
+statement: >-
+  The president and chief executive resigns with no forewarning, citing personal reasons; the
+  chairman resumes the CEO role he had held for fifteen years before the departing executive took
+  it over.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://money.cnn.com/2001/08/14/companies/enron/index.htm
+""",
+}
+
+_ENRON_Q3_LOSS: dict[str, str] = {
+    "orgs/enron/signals/q3-loss-and-equity-writedown-2001-10-16.yaml": """\
+id: q3-loss-and-equity-writedown-2001-10-16
+date: '2001-10-16'
+steep: economic
+source: The subject's own SEC 8-K earnings-release exhibit, 2001-10-16
+statement: >-
+  A third-quarter loss of USD 618 million is announced alongside a USD 1.2 billion reduction to
+  shareholders' equity, tied to the unwind of related-party special-purpose entities.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.sec.gov/Archives/edgar/data/1024401/000095012901504015/h92082ex99-2.txt
+""",
+}
+
+_ENRON_RESTATEMENT: dict[str, str] = {
+    "orgs/enron/signals/restatement-1997-2000-2001-11-08.yaml": """\
+id: restatement-1997-2000-2001-11-08
+date: '2001-11-08'
+steep: economic
+source: The subject's own SEC 8-K filing, 2001-11-08
+statement: >-
+  The subject restates 1997-2000 financial results, reducing previously reported net income by
+  USD 586 million and increasing reported debt by USD 2.6 billion, after concluding three
+  related-party special-purpose entities should have been consolidated onto its own balance sheet.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.sec.gov/Archives/edgar/data/0001024401/000095012901503835/h91831e8-k.txt
+""",
+}
+
+_ENRON_CHAPTER_11: dict[str, str] = {
+    "orgs/enron/signals/chapter-11-filed-2001-12-02.yaml": """\
+id: chapter-11-filed-2001-12-02
+date: '2001-12-02'
+steep: economic
+source: The subject's own SEC 8-K press-release exhibit, 2001-12-02
+statement: >-
+  The subject and a first group of affiliated entities file voluntary Chapter 11 petitions in the
+  US Bankruptcy Court for the Southern District of New York — at the time the largest such filing
+  in US history.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.sec.gov/Archives/edgar/data/0001024401/000102440101500046/ex-99_1.txt
+""",
+}
+
+
+def _enron_claim(signal_id: str) -> dict[str, str]:
+    """One claim binding `signal_id` to the single component this key exercises. Grade 1
+    ("dated natural experiment" — twin/evidence-ladder.yaml): every signal is a dated,
+    observable event with data on both sides of it, not a model assertion."""
+    return {
+        f"orgs/enron/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: energy-trading-book
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "The signal is a dated, publicly documented event about this business; the citation is on the signal itself."
+"""
+    }
+
+
+_ENRON_OUTCOME: dict[str, str] = {
+    "orgs/enron/outcomes/enron-bankruptcy-resolved.yaml": """\
+id: enron-bankruptcy-resolved
+proposition: the-subject-enters-bankruptcy-protection-by-2002
+observed: true
+resolved_on: '2001-12-02'
+source: >-
+  The subject's own Chapter 11 filing, 2001-12-02; adversarial post-mortem in the Report of
+  Investigation by the Special Investigative Committee of the Board of Directors (the "Powers
+  Report"), published 2002-02-01 (http://i.cnn.net/cnn/2002/LAW/02/02/enron.report/powers.report.pdf).
+contamination: control
+source_dated: true
+note: >-
+  Not a fourth low-notoriety key — the opposite (build ticket 40, decision ticket 19). Any system
+  built on a model that has read the ending cannot demonstrate anticipation on this subject; it is
+  carried so the gap between performance here and performance on an obscure key is a measured
+  memorisation-leakage discount, applied to every backtest score, rather than an acknowledged and
+  ignored threat. The Powers Report is cited here, on the outcome, and nowhere on a signal above —
+  it is published just over two months after resolution and using it to date a signal would let
+  hindsight into ground truth that is supposed to be contemporaneous.
+""",
+}
+
+
+def build_enron_org(dest: str | Path) -> Path:
+    """The contamination-control fixture (build ticket 40): real, dated, publicly documented
+    signals culminating in a Chapter 11 filing, with commit history that spans the real 2001
+    timeline so a real rewind has something to read — built to the identical contract
+    `build_carillion_org` and the further-answer-key builders hold, so scoring against this
+    fixture is comparable to scoring against an obscure one rather than a different measurement.
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _ENRON_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2001-07-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/enron/meta.yaml": (
+            f"id: {ENRON_ORG}\nunit: overlay\norg: {ENRON_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _ENRON_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the resignation",
+        dated="2001-07-15T00:00:00+00:00")
+
+    for signal_id, files, message, dated in (
+        ("skilling-resigns-2001-08-14", _ENRON_SKILLING_RESIGNS, "the CEO's sudden resignation",
+         "2001-08-14T21:00:00+00:00"),
+        ("q3-loss-and-equity-writedown-2001-10-16", _ENRON_Q3_LOSS, "the third-quarter loss and equity writedown",
+         "2001-10-16T09:00:00+00:00"),
+        ("restatement-1997-2000-2001-11-08", _ENRON_RESTATEMENT, "the restatement of 1997-2000 results",
+         "2001-11-08T09:00:00+00:00"),
+        ("chapter-11-filed-2001-12-02", _ENRON_CHAPTER_11, "the Chapter 11 filing",
+         "2001-12-02T09:00:00+00:00"),
+    ):
+        _write(root, {**files, **_enron_claim(signal_id)})
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", message, dated=dated)
+
+    _write(root, _ENRON_OUTCOME)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the answer key, citing the 2002 Powers Report",
+        dated="2002-02-02T00:00:00+00:00")
+    return root
+
+
+# -- Hindsight-resistance cases (build ticket 41, decision ticket 19, spec story 47) ---------
+#
+# Two cases where the contemporaneous record contradicts the canonical story. Each carries **two**
+# world models on the same scenario rather than one: `contemporaneous-consensus` reasons from what
+# was actually knowable at the time, `canonical-hindsight-consensus` reports the belief a system
+# would hold if it had retrieved the now-common retelling instead of reasoning from period
+# evidence. Both forecast the same proposition in the same execution — `no_collapse_mechanism`
+# already guarantees the ensemble is never collapsed to one — so scoring both against the recorded
+# (contemporaneous, not canonical) outcome is the demonstration ticket 41's AC asks for with no new
+# scoring code: a system that has memorised the canonical story scores worse, structurally, because
+# the canonical story and the contemporaneous ground truth disagree. `hindsight_trap: true` on the
+# outcome (twin/schema.py) makes the inversion explicit in the score card rather than implicit in
+# which case it happens to be.
+
+_HINDSIGHT_PROPOSITION: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/contemporaneous-market-reaction-is-approving.yaml": """\
+id: contemporaneous-market-reaction-is-approving
+text: >-
+  In the days immediately following the subject's strategic decision, the market's reaction — its
+  own share price move, and any material public reaction from a named shareholder — is approving
+  rather than critical.
+resolves_on: '2020-12-31'
+""",
+}
+
+# -- AstraZeneca rejects Pfizer (2014) ---------------------------------------------------------
+
+ASTRAZENECA_ORG = "astrazeneca"
+
+_ASTRAZENECA_BASE: dict[str, str] = {
+    "orgs/astrazeneca/components/independent-oncology-strategy.yaml": """\
+id: independent-oncology-strategy
+name: The subject's independent-strategy oncology pipeline
+kind: activity
+evolution: product
+visibility: 0.5
+""",
+    "orgs/astrazeneca/world_models/contemporaneous-consensus.yaml": """\
+id: contemporaneous-consensus
+name: Contemporaneous market consensus
+credence: 0.6
+note: >-
+  Reasons from what was knowable at the board's decision: a ~2% holder (Schroders) is publicly
+  and immediately critical of a "quick" rejection of a large cash-and-stock premium, with no
+  contemporaneous data yet showing the market shares the board's confidence.
+beliefs:
+  contemporaneous-market-reaction-is-approving: 0.2
+""",
+    "orgs/astrazeneca/world_models/canonical-hindsight-consensus.yaml": """\
+id: canonical-hindsight-consensus
+name: Canonical-hindsight consensus
+credence: 0.6
+note: >-
+  The belief a system reciting the now-common "the subject was right to say no" retelling would
+  report — the same story a 2026-08-02 piece re-amplifies by framing a prospective mega-merger as
+  "twelve years after spurning" this bid. The trap is the conflation: being vindicated over a
+  twelve-year horizon is not the same claim as being approved of in the week it happened, and only
+  a system that has retrieved the ending rather than reasoned from the week's own evidence would
+  confuse the two.
+beliefs:
+  contemporaneous-market-reaction-is-approving: 0.85
+""",
+    "orgs/astrazeneca/scenarios/would-the-twin-recite-the-ending.yaml": """\
+id: would-the-twin-recite-the-ending
+question: >-
+  As of the board's rejection, would the twin's forecast mistake the now-canonical "the subject
+  was right" story for the contemporaneous market verdict?
+proposition: contemporaneous-market-reaction-is-approving
+at: '2014-05-19'
+horizon: '2014-05-31'
+components:
+  - independent-oncology-strategy
+world_models:
+  - contemporaneous-consensus
+  - canonical-hindsight-consensus
+""",
+}
+
+_ASTRAZENECA_OFFER_RAISED: dict[str, str] = {
+    "orgs/astrazeneca/signals/pfizer-raises-final-offer-2014-05-18.yaml": """\
+id: pfizer-raises-final-offer-2014-05-18
+date: '2014-05-18'
+steep: economic
+source: Bloomberg, 2014-05-18
+statement: >-
+  A rival names a "final" cash-and-stock proposal valuing the subject at roughly GBP 69bn (about
+  USD 117bn), raised from its earlier approaches.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.bloomberg.com/news/articles/2014-05-18/pfizer-raises-offer-for-astrazeneca-to-117-billion
+""",
+}
+
+_ASTRAZENECA_BOARD_REJECTS: dict[str, str] = {
+    "orgs/astrazeneca/signals/board-rejects-final-proposal-2014-05-19.yaml": """\
+id: board-rejects-final-proposal-2014-05-19
+date: '2014-05-19'
+steep: economic
+source: The subject's own press release, 2014-05-19
+statement: >-
+  The board unanimously rejects the rival's final proposal as "not in the interests of
+  shareholders", reasserting its own independent standalone strategy.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.astrazeneca.com/media-centre/press-releases/2014/astrazeneca-board-rejects-pfizers-final-proposal-19052014.html
+""",
+}
+
+_ASTRAZENECA_SHAREHOLDER_CRITICISM: dict[str, str] = {
+    "orgs/astrazeneca/signals/shareholder-criticism-and-share-fall-2014-05-20.yaml": """\
+id: shareholder-criticism-and-share-fall-2014-05-20
+date: '2014-05-20'
+steep: economic
+source: Fortune, 2014-05-20
+statement: >-
+  Shares fall roughly 13% in early trading; a named holder (Schroders, ~2%) publicly criticises
+  the "quick" rejection and urges the board to re-engage — a dated, adversarial-to-the-board
+  reaction, not a retrospective one.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://fortune.com/2014/05/20/astrazeneca-shareholders-upset-by-quick-pfizer-rejection
+""",
+}
+
+
+def _astrazeneca_claim(signal_id: str) -> dict[str, str]:
+    """One claim binding `signal_id` to the single component this key exercises. Grade 1
+    ("dated natural experiment" — twin/evidence-ladder.yaml): every signal is a dated,
+    observable event with data on both sides of it, not a model assertion."""
+    return {
+        f"orgs/astrazeneca/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: independent-oncology-strategy
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "The signal is a dated, publicly documented event about this business; the citation is on the signal itself."
+"""
+    }
+
+
+_ASTRAZENECA_OUTCOME: dict[str, str] = {
+    "orgs/astrazeneca/outcomes/az-market-verdict-resolved.yaml": """\
+id: az-market-verdict-resolved
+proposition: contemporaneous-market-reaction-is-approving
+observed: false
+resolved_on: '2014-05-20'
+source: >-
+  Fortune, 2014-05-20 (https://fortune.com/2014/05/20/astrazeneca-shareholders-upset-by-quick-pfizer-rejection);
+  the rival formally withdrew two hours ahead of the UK Takeover Code "put up or shut up" deadline,
+  2014-05-26 (https://www.cnbc.com/2014/05/27/how-astrazeneca-escaped-pfizers-clutches-this-time.html);
+  the canonical retelling this fixture tests against is a 2026-08-02 piece framing a prospective
+  mega-merger as "twelve years after spurning" this bid
+  (https://www.techtimes.com/articles/322735/20260802/astrazeneca-targets-400b-bristol-myers-squibb-merger-twelve-years-after-spurning-pfizer.htm).
+contamination: high
+source_dated: true
+hindsight_trap: true
+note: >-
+  A hindsight-resistance control, not a scored seize (build ticket 41, decision ticket 19). The
+  contemporaneous record and the canonical story disagree: the market punished the rejection by
+  double digits and a named holder publicly opposed it, yet the rejection is now retold — including
+  as recently as 2026 — as visionary. A system that confidently flags this as a clean, well-received
+  call is reciting the ending. `contamination: high` for the same reason Wirecard earns it (build
+  ticket 39): the canonical retelling is exactly what makes this case findable in a training corpus.
+""",
+}
+
+
+def build_astrazeneca_org(dest: str | Path) -> Path:
+    """The first hindsight-resistance case (build ticket 41): real, dated, publicly documented
+    signals culminating in the contemporaneous market's actual reaction, with two world models
+    on one scenario so an as-consumed execution emits both the honest and the canonical-hindsight
+    forecast in a single, un-collapsed bundle.
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _HINDSIGHT_PROPOSITION)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2014-04-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/astrazeneca/meta.yaml": (
+            f"id: {ASTRAZENECA_ORG}\nunit: overlay\norg: {ASTRAZENECA_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _ASTRAZENECA_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the raised offer",
+        dated="2014-05-01T00:00:00+00:00")
+
+    for signal_id, files, message, dated in (
+        ("pfizer-raises-final-offer-2014-05-18", _ASTRAZENECA_OFFER_RAISED, "the raised final offer",
+         "2014-05-18T09:00:00+00:00"),
+        ("board-rejects-final-proposal-2014-05-19", _ASTRAZENECA_BOARD_REJECTS, "the board's rejection",
+         "2014-05-19T09:00:00+00:00"),
+        ("shareholder-criticism-and-share-fall-2014-05-20", _ASTRAZENECA_SHAREHOLDER_CRITICISM,
+         "the shareholder criticism and the share-price fall", "2014-05-20T09:00:00+00:00"),
+    ):
+        _write(root, {**files, **_astrazeneca_claim(signal_id)})
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", message, dated=dated)
+
+    _write(root, _ASTRAZENECA_OUTCOME)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the answer key, citing the 2026 canonical retelling",
+        dated="2026-08-03T00:00:00+00:00")
+    return root
+
+
+# -- Sanofi exits diabetes/cardiovascular for GLP-1 obesity (2019) ---------------------------
+
+SANOFI_ORG = "sanofi"
+
+_SANOFI_BASE: dict[str, str] = {
+    "orgs/sanofi/components/diabetes-cardiovascular-portfolio.yaml": """\
+id: diabetes-cardiovascular-portfolio
+name: The subject's diabetes and cardiovascular R&D portfolio
+kind: activity
+evolution: product
+visibility: 0.5
+""",
+    "orgs/sanofi/world_models/contemporaneous-consensus.yaml": """\
+id: contemporaneous-consensus
+name: Contemporaneous market consensus
+credence: 0.6
+note: >-
+  Reasons from what was knowable at the strategy day: no contemporaneous shareholder criticism is
+  on the record, the exit is framed as overdue cost discipline against a portfolio the subject's
+  own new chief executive says lacks first-in-class or best-in-class programmes, and the GLP-1
+  obesity market the exit forgoes had not yet produced an approved blockbuster in this class.
+beliefs:
+  contemporaneous-market-reaction-is-approving: 0.75
+""",
+    "orgs/sanofi/world_models/canonical-hindsight-consensus.yaml": """\
+id: canonical-hindsight-consensus
+name: Canonical-hindsight consensus
+credence: 0.6
+note: >-
+  The belief a system reciting the now-common "the subject missed GLP-1" retelling would report —
+  a framing that only crystallised after a rival's obesity drug won approval in 2021 and became a
+  blockbuster from 2022 onward. The trap is the same conflation as the AstraZeneca case in reverse:
+  a decision that reads as a costly miss once a market matures years later is not the same claim as
+  a decision the market disapproved of in the week it was made, and only a system that has
+  retrieved the later narrative rather than reasoned from the week's own evidence would confuse the
+  two.
+beliefs:
+  contemporaneous-market-reaction-is-approving: 0.15
+""",
+    "orgs/sanofi/scenarios/would-the-twin-recite-the-ending.yaml": """\
+id: would-the-twin-recite-the-ending
+question: >-
+  As of the strategy day, would the twin's forecast mistake the now-canonical "the subject missed
+  GLP-1" story for the contemporaneous market verdict?
+proposition: contemporaneous-market-reaction-is-approving
+at: '2019-12-10'
+horizon: '2019-12-31'
+components:
+  - diabetes-cardiovascular-portfolio
+world_models:
+  - contemporaneous-consensus
+  - canonical-hindsight-consensus
+""",
+}
+
+_SANOFI_PREVIEW: dict[str, str] = {
+    "orgs/sanofi/signals/strategy-day-previewed-2019-12-09.yaml": """\
+id: strategy-day-previewed-2019-12-09
+date: '2019-12-09'
+steep: economic
+source: FiercePharma, 2019-12-09
+statement: >-
+  Ahead of the next day's investor strategy day, trade press previews that the new chief executive
+  will step back from the subject's historical diabetes and cardiovascular strongholds.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.fiercepharma.com/pharma/ahead-tuesday-investor-confab-sanofi-ceo-hudson-delivers-vision-for-drugmaker
+""",
+}
+
+_SANOFI_STRATEGY_ANNOUNCED: dict[str, str] = {
+    "orgs/sanofi/signals/play-to-win-strategy-announced-2019-12-10.yaml": """\
+id: play-to-win-strategy-announced-2019-12-10
+date: '2019-12-10'
+steep: economic
+source: The subject's own Capital Markets Day press release, 2019-12-10
+statement: >-
+  The subject announces it will stop diabetes and cardiovascular R&D, will not launch its GLP-1
+  candidate for obesity, and will redirect toward specialty care and immunology.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.sanofi.com/assets/dotcom/content-app/events/investor-presentation/2019/Capital-Markets-Day/2019_12_10_CMD_Press_Release_EN_v_Final.pdf
+""",
+}
+
+_SANOFI_MARKET_APPROVES: dict[str, str] = {
+    "orgs/sanofi/signals/shares-rise-on-the-announcement-2019-12-10.yaml": """\
+id: shares-rise-on-the-announcement-2019-12-10
+date: '2019-12-10'
+steep: economic
+source: BioPharma Dive, 2019-12-10
+statement: >-
+  Shares trade up roughly 5% the morning of the announcement, with no material contemporaneous
+  shareholder criticism on the record — a dated market reaction, not a retrospective one.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.biopharmadive.com/news/sanofi-stop-diabetes-heart-research-paul-hudson-strategy/568790/
+""",
+}
+
+
+def _sanofi_claim(signal_id: str) -> dict[str, str]:
+    """One claim binding `signal_id` to the single component this key exercises. Grade 1
+    ("dated natural experiment" — twin/evidence-ladder.yaml): every signal is a dated,
+    observable event with data on both sides of it, not a model assertion."""
+    return {
+        f"orgs/sanofi/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: diabetes-cardiovascular-portfolio
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "The signal is a dated, publicly documented event about this business; the citation is on the signal itself."
+"""
+    }
+
+
+_SANOFI_OUTCOME: dict[str, str] = {
+    "orgs/sanofi/outcomes/sanofi-market-verdict-resolved.yaml": """\
+id: sanofi-market-verdict-resolved
+proposition: contemporaneous-market-reaction-is-approving
+observed: true
+resolved_on: '2019-12-10'
+source: >-
+  BioPharma Dive, 2019-12-10 (https://www.biopharmadive.com/news/sanofi-stop-diabetes-heart-research-paul-hudson-strategy/568790/);
+  the subject's own Capital Markets Day press release, 2019-12-10.
+contamination: high
+source_dated: true
+hindsight_trap: true
+note: >-
+  A hindsight-resistance control paired inversely with AstraZeneca (build ticket 41, decision
+  ticket 19): the market approved this exit at the time, and only once a rival's obesity drug in
+  the same drug class won approval in 2021 and became a blockbuster did commentary begin reframing
+  the exit as a missed opportunity. Unlike the AstraZeneca case, no single dated canonical-retelling
+  article is cited here — the reframing is diffuse trade-press consensus rather than one
+  identifiable piece — so `contamination: high` rests on the fame of the GLP-1/obesity story the
+  exit forwent, not on a named article, and this case's harness guard checks the world-model gap
+  rather than a hindsight-domain absence from the signals. A system that confidently flags this
+  2019 decision as a clear strategic error is reciting a 2021-onward narrative.
+""",
+}
+
+
+def build_sanofi_org(dest: str | Path) -> Path:
+    """The second hindsight-resistance case (build ticket 41), inverse of AstraZeneca: real,
+    dated, publicly documented signals culminating in the contemporaneous market's actual
+    reaction, with the same two-world-model shape so a single execution emits both forecasts.
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _HINDSIGHT_PROPOSITION)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2019-11-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/sanofi/meta.yaml": (
+            f"id: {SANOFI_ORG}\nunit: overlay\norg: {SANOFI_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _SANOFI_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the strategy day",
+        dated="2019-11-15T00:00:00+00:00")
+
+    for signal_id, files, message, dated in (
+        ("strategy-day-previewed-2019-12-09", _SANOFI_PREVIEW, "the strategy day, previewed",
+         "2019-12-09T09:00:00+00:00"),
+        ("play-to-win-strategy-announced-2019-12-10", _SANOFI_STRATEGY_ANNOUNCED, "the strategy announced",
+         "2019-12-10T08:00:00+00:00"),
+        ("shares-rise-on-the-announcement-2019-12-10", _SANOFI_MARKET_APPROVES, "shares rise on the announcement",
+         "2019-12-10T14:00:00+00:00"),
+    ):
+        _write(root, {**files, **_sanofi_claim(signal_id)})
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", message, dated=dated)
+
+    _write(root, _SANOFI_OUTCOME)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the answer key", dated="2019-12-11T00:00:00+00:00")
+    return root

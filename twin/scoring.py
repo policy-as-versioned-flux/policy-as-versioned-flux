@@ -67,6 +67,65 @@ def score(probability: float, observed: bool) -> dict[str, float]:
 # -- the reliability diagram (build ticket 09; spec story 44) --------------------------------
 
 
+def _mean(entries: list[dict[str, Any]], rule: str) -> float:
+    return sum(float(e[rule]) for e in entries) / len(entries)
+
+
+def measure_discount(
+    enron: list[dict[str, Any]],
+    obscure: list[dict[str, Any]],
+    rule: str = "brier",
+    hindsight_memorising: list[dict[str, Any]] | None = None,
+    hindsight_honest: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """The memorisation-leakage discount (build ticket 40; decision ticket 19).
+
+    Measured, never hardcoded: the mean `rule` loss on an obscure (low-notoriety) key, minus the
+    mean loss on the Enron contamination-control key. A forecaster that has memorised Enron's
+    ending scores artificially well there — a lower loss than its honest skill on an obscure case
+    earns — and that gap is exactly the inflation, priced. A positive discount is evidence of
+    inflation; the sign is not clamped, because a model with no such advantage would show a gap
+    near zero rather than a floor.
+
+    Build ticket 41's hindsight-resistance cases fold into this same number rather than sitting
+    beside it (that ticket's AC): when both `hindsight_*` lists are given, the memorising-versus-
+    honest world model's own gap on those cases is measured the same way — mean loss on the
+    memorising world model minus mean loss on the honest one — and averaged with the
+    Enron-versus-obscure gap. Both legs are reported in `legs` so the basis stays inspectable; the
+    two are not the same physical quantity, but both are evidence of the same threat, and the
+    project's own culture is to price a threat rather than merely note it.
+    """
+    if rule not in RULES:
+        raise ScoreError(f"{rule!r} is not a scoring rule; have {RULES}")
+    if not enron or not obscure:
+        raise ScoreError("the discount needs at least one Enron score and one obscure-key score")
+    if bool(hindsight_memorising) != bool(hindsight_honest):
+        raise ScoreError(
+            "both hindsight_memorising and hindsight_honest are needed to fold in the hindsight gap, or neither"
+        )
+
+    legs: list[dict[str, Any]] = [
+        {
+            "leg": "enron-vs-obscure",
+            "gap": quantise(_mean(obscure, rule) - _mean(enron, rule)),
+            "n_control": len(enron),
+            "n_obscure": len(obscure),
+        }
+    ]
+    if hindsight_memorising and hindsight_honest:
+        legs.append(
+            {
+                "leg": "hindsight-memorising-vs-honest",
+                "gap": quantise(_mean(hindsight_memorising, rule) - _mean(hindsight_honest, rule)),
+                "n_memorising": len(hindsight_memorising),
+                "n_honest": len(hindsight_honest),
+            }
+        )
+
+    discount = quantise(sum(float(leg["gap"]) for leg in legs) / len(legs))
+    return {"rule": rule, "discount": discount, "legs": legs}
+
+
 def reliability_diagram(scores: list[dict[str, Any]], bins: int = 10) -> dict[str, Any]:
     """Bin a scored-forecast **population** by predicted probability.
 

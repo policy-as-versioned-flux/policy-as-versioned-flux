@@ -11,7 +11,17 @@ import math
 
 import pytest
 
-from twin.scoring import LOWER_IS_BETTER, SIGNIFICANT_DIGITS, ScoreError, brier, log_loss, quantise, reliability_diagram
+from twin.scoring import (
+    LOWER_IS_BETTER,
+    SIGNIFICANT_DIGITS,
+    ScoreError,
+    brier,
+    log_loss,
+    measure_discount,
+    quantise,
+    reliability_diagram,
+    score,
+)
 
 GRID = [0.02, 0.1, 0.25, 0.4, 0.5, 0.63, 0.8, 0.95, 0.99]
 
@@ -154,3 +164,95 @@ def test_bins_must_be_at_least_one() -> None:
 def test_an_out_of_range_probability_is_refused_not_silently_clamped() -> None:
     with pytest.raises(ValueError, match="strictly between 0 and 1"):
         reliability_diagram([_entry(1.5, True)], bins=10)
+
+
+# -- the memorisation-leakage discount (build ticket 40) ---------------------------------------
+
+
+def test_the_discount_is_measured_from_the_enron_versus_obscure_gap() -> None:
+    """AC: the discount is measured, never hardcoded."""
+    enron = [score(0.02, False)]  # a very confident, very cheap-looking win
+    obscure = [score(0.4, False)]  # a more honest, more expensive miss
+    result = measure_discount(enron, obscure, rule="brier")
+    assert result["rule"] == "brier"
+    assert result["discount"] == pytest.approx(brier(0.4, False) - brier(0.02, False))
+    assert result["legs"] == [
+        {"leg": "enron-vs-obscure", "gap": result["discount"], "n_control": 1, "n_obscure": 1}
+    ]
+
+
+def test_the_discount_changes_when_the_underlying_performance_changes() -> None:
+    """AC: a test asserts it changes when the underlying performance changes — the discount is
+    not a constant wearing a function's clothes."""
+    enron = [score(0.02, False)]
+    obscure_a = [score(0.4, False)]
+    obscure_b = [score(0.1, False)]
+    a = measure_discount(enron, obscure_a, rule="brier")
+    b = measure_discount(enron, obscure_b, rule="brier")
+    assert a["discount"] != b["discount"]
+
+
+def test_a_positive_discount_means_enron_looked_artificially_cheap() -> None:
+    enron = [score(0.02, False)]  # near-certain and right: an artificially cheap loss
+    obscure = [score(0.5, False)]  # honest uncertainty, a more expensive loss
+    result = measure_discount(enron, obscure, rule="brier")
+    assert result["discount"] > 0
+
+
+def test_a_gap_near_zero_when_enron_earns_no_special_advantage() -> None:
+    """The sign is not clamped: a forecaster with no memorisation advantage on Enron shows a gap
+    near zero rather than a floor at zero."""
+    enron = [score(0.3, False)]
+    obscure = [score(0.3, False)]
+    result = measure_discount(enron, obscure, rule="brier")
+    assert result["discount"] == pytest.approx(0.0)
+
+
+def test_the_discount_is_reported_separately_from_the_raw_score() -> None:
+    """AC: reported separately so both are visible — `measure_discount` never mutates its inputs."""
+    enron = [score(0.02, False)]
+    obscure = [score(0.4, False)]
+    before = [dict(s) for s in enron + obscure]
+    measure_discount(enron, obscure, rule="brier")
+    assert enron + obscure == before
+
+
+def test_hindsight_legs_fold_into_the_same_discount_rather_than_sitting_beside_it() -> None:
+    """AC (build ticket 41): results feed the contamination discount rather than sitting
+    alongside it — the number itself moves when the hindsight legs are supplied."""
+    enron = [score(0.02, False)]
+    obscure = [score(0.4, False)]
+    without_hindsight = measure_discount(enron, obscure, rule="brier")
+
+    memorising = [score(0.9, False)]  # confidently wrong: recites the canonical story
+    honest = [score(0.2, False)]  # correctly uncertain: reasons from the period record
+    with_hindsight = measure_discount(
+        enron, obscure, rule="brier", hindsight_memorising=memorising, hindsight_honest=honest
+    )
+
+    assert with_hindsight["discount"] != without_hindsight["discount"]
+    assert [leg["leg"] for leg in with_hindsight["legs"]] == [
+        "enron-vs-obscure", "hindsight-memorising-vs-honest",
+    ]
+    hindsight_leg = with_hindsight["legs"][1]
+    assert hindsight_leg["gap"] == pytest.approx(brier(0.9, False) - brier(0.2, False))
+    assert hindsight_leg["gap"] > 0, "the memorising world model should score worse than the honest one"
+
+
+def test_both_hindsight_lists_are_needed_together_or_neither() -> None:
+    enron = [score(0.02, False)]
+    obscure = [score(0.4, False)]
+    with pytest.raises(ScoreError, match="both hindsight_memorising and hindsight_honest"):
+        measure_discount(enron, obscure, hindsight_memorising=[score(0.9, False)])
+
+
+def test_the_discount_needs_at_least_one_score_on_each_side() -> None:
+    with pytest.raises(ScoreError, match="at least one Enron score"):
+        measure_discount([], [score(0.4, False)])
+    with pytest.raises(ScoreError, match="at least one Enron score"):
+        measure_discount([score(0.4, False)], [])
+
+
+def test_an_unknown_rule_is_refused() -> None:
+    with pytest.raises(ScoreError, match="is not a scoring rule"):
+        measure_discount([score(0.4, False)], [score(0.4, False)], rule="made-up-rule")

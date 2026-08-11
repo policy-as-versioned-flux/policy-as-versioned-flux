@@ -1091,6 +1091,7 @@ def score(
     forecast_path: str | Path,
     outcome_id: str,
     command: list[str],
+    discount: dict[str, Any] | None = None,
 ) -> Artefact:
     overlay = Overlay.load(repo, org)
     outcome = overlay.outcomes.get(outcome_id)
@@ -1164,16 +1165,21 @@ def score(
                  "detail": f"{probability} is not strictly between 0 and 1"}
             )
             continue
-        scores.append(
-            {
-                **entry,
-                "probability": probability,
-                "observed": observed,
-                "regime": str(regime),
-                **scoring.score(probability, observed),
-                "pins": forecast["pins"],
-            }
-        )
+        raw = scoring.score(probability, observed)
+        entry = {
+            **entry,
+            "probability": probability,
+            "observed": observed,
+            "regime": str(regime),
+            **raw,
+            "pins": forecast["pins"],
+        }
+        if discount is not None:
+            # Reported alongside the raw score, never in place of it (build ticket 40 AC): the
+            # raw `brier`/`log_loss` above are untouched, and `adjusted_<rule>` is additive.
+            entry["discount"] = discount["discount"]
+            entry[f"adjusted_{discount['rule']}"] = scoring.quantise(raw[discount["rule"]] + discount["discount"])
+        scores.append(entry)
 
     return Artefact(
         kind=KIND_SCORE_CARD,
@@ -1196,17 +1202,38 @@ def score(
                 "source": outcome.get("source"),
                 "contamination": outcome.get("contamination"),
                 "source_dated": outcome.get("source_dated"),
+                # Build ticket 41: explicit in the score card, not implicit in which outcome it
+                # happens to be. False by omission, matching every answer key that makes no
+                # hindsight-resistance claim.
+                "hindsight_trap": bool(outcome.get("hindsight_trap", False)),
             },
             "rules": list(scoring.RULES),
             "orientation": "lower-is-better" if scoring.LOWER_IS_BETTER else "higher-is-better",
             "significant_digits": scoring.SIGNIFICANT_DIGITS,
             "scores": scores,
             "unscoreable": unscoreable,
+            # Build ticket 40: `None` when no discount basis was supplied — an absent measurement,
+            # never a zero, which is the same discipline `reliability_diagram`'s empty bins hold.
+            "contamination_discount": discount,
         },
     )
 
 
-# -- reliability diagram (build ticket 09) --------------------------------------------------
+# -- reliability diagram (build ticket 09), the discount (build ticket 40) -------------------
+
+
+def load_score_card(path: str | Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Load one score-card artefact, kind-checked, returning `(doc, its scores)`.
+
+    The single place that knows what a score card's `body.scores` looks like from the outside —
+    `reliability()` below and `cli.cmd_score`'s discount loading (build ticket 40) both pool
+    scores from named cards, and shared the same read-and-validate loop until this was pulled out
+    from under them.
+    """
+    doc = load_artefact(path)
+    if doc["envelope"]["kind"] != KIND_SCORE_CARD:
+        raise VerbError(f"{path} is a {doc['envelope']['kind']!r}, not a score card")
+    return doc, doc["body"]["scores"]
 
 
 def reliability(
@@ -1227,10 +1254,7 @@ def reliability(
     for raw_path in score_card_paths:
         path = Path(raw_path)
         card_bytes = path.read_bytes()
-        card = load_artefact(path)
-        if card["envelope"]["kind"] != KIND_SCORE_CARD:
-            raise VerbError(f"{path} is a {card['envelope']['kind']!r}, not a score card")
-        scores = card["body"]["scores"]
+        card, scores = load_score_card(path)
         sources.append(
             {"sha256": sha256_hex(card_bytes), "pins": card["envelope"]["pins"], "scored": len(scores)}
         )

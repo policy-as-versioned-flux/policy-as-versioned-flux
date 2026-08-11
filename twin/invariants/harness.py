@@ -704,26 +704,31 @@ def _carillion_answer_key_is_dated_and_adversarial(ctx: Context) -> str:
 
 
 # One fixture builder, one hindsight source, one declared contamination class per row — the
-# table a new low-notoriety key adds a row to rather than a new copy of the whole check (build
-# ticket 39). The builder travels with its row rather than being re-derived from the org string,
-# so a third key is one line here and needs no branch anywhere in the check body.
+# table a new answer-key fixture adds a row to rather than a new copy of the whole check (build
+# ticket 39, extended at build ticket 40). The builder travels with its row rather than being
+# re-derived from the org string, so a further key is one line here and needs no branch anywhere
+# in the check body. Enron's row differs from NMC/Wirecard's only in its declared class
+# (`contamination: control`, not `low`/`high`) — the table already had no opinion on which values
+# are valid, so it needed no widening to take it.
 _FurtherAnswerKey = tuple[str, Callable[[Path], Path], str, str, str]
 _FURTHER_ANSWER_KEYS: tuple[_FurtherAnswerKey, ...] = (
     ("nmc", fixtures.build_nmc_health_org, "nmc-administration-resolved", "healthcareandprotection.com", "low"),
     ("wirecard", fixtures.build_wirecard_org, "wirecard-insolvency-resolved", "bundestag.de", "high"),
+    ("enron", fixtures.build_enron_org, "enron-bankruptcy-resolved", "powers.report", "control"),
 )
 
 
 @harness_check("further_answer_keys_are_dated_and_evidenced")
 def _further_answer_keys_are_dated_and_evidenced(ctx: Context) -> str:
-    """The two further low-notoriety keys (build ticket 39, decision ticket 19) hold the same
-    contract `carillion_answer_key_is_dated_and_adversarial` checks for the primary one: every
-    signal is dated and cites a live https source, no signal cites the post-collapse adversarial
-    finding that belongs on the outcome alone, the outcome declares a `contamination` class from
-    the schema's enum, and the fixture's own commit history is monotonically dated.
+    """The further answer keys (build ticket 39, extended at build ticket 40; decision ticket 19)
+    hold the same contract `carillion_answer_key_is_dated_and_adversarial` checks for the primary
+    one: every signal is dated and cites a live https source, no signal cites the post-collapse
+    adversarial finding that belongs on the outcome alone, the outcome declares a `contamination`
+    class from the schema's enum, and the fixture's own commit history is monotonically dated.
 
-    Two fixtures, one loop over `_FURTHER_ANSWER_KEYS`, rather than a second near-duplicate check
-    per fixture — the row is what a third low-notoriety key would add.
+    One loop over `_FURTHER_ANSWER_KEYS`, rather than a near-duplicate check per fixture — the row
+    is what a further key adds, whether it is another low-notoriety case or (Enron) the
+    contamination control itself.
     """
     from ..model import Overlay, check_direction
     from ..repo import ModelRepo
@@ -777,6 +782,122 @@ def _further_answer_keys_are_dated_and_evidenced(ctx: Context) -> str:
         reports.append(f"{org}: {len(overlay.signals)} signal(s), contamination={expected_contamination}")
 
     return "; ".join(reports)
+
+
+@harness_check("measure_discount_is_computed_not_hardcoded")
+def _measure_discount_is_computed_not_hardcoded(ctx: Context) -> str:
+    """The memorisation-leakage discount is genuinely a measurement, not a constant wearing a
+    function's clothes (build ticket 40, decision ticket 19).
+
+    The fixture side of ticket 40 (dated signals, no hindsight leak, `contamination: control`,
+    world-layer direction, monotonic commit history) is Enron's row in `_FURTHER_ANSWER_KEYS`,
+    checked by `further_answer_keys_are_dated_and_evidenced` above — repeating it here would be
+    exactly the near-duplicate check that table exists to avoid. This guard covers only what that
+    one cannot: that `scoring.measure_discount` produces a different number when the underlying
+    scores change — proof, run at CI time rather than trusted from a comment, that nothing
+    hardcoded the figure.
+    """
+    from ..scoring import measure_discount, score
+
+    low = [score(0.05, True), score(0.1, True)]
+    high = [score(0.4, True), score(0.6, True)]
+    a = measure_discount(low, high, rule="brier")
+    b = measure_discount(high, low, rule="brier")
+    if a["discount"] == b["discount"]:
+        raise Violated("measure_discount produced the same figure for two different score populations")
+
+    return (
+        f"measure_discount({low!r}, {high!r})={a['discount']} != "
+        f"measure_discount({high!r}, {low!r})={b['discount']}"
+    )
+
+
+@harness_check("hindsight_resistance_cases_score_a_memorising_system_worse")
+def _hindsight_resistance_cases_score_a_memorising_system_worse(ctx: Context) -> str:
+    """Both hindsight-resistance cases hold the dated-and-cited contract, declare the trap
+    explicitly on the outcome, and demonstrate the thing they exist to demonstrate: a world model
+    that recites the canonical story scores worse than one that reasons from the contemporaneous
+    record (build ticket 41, decision ticket 19).
+
+    A guard on the suite rather than an invariant, the same shape the answer-key guards above are.
+    Table-driven over the two cases (AstraZeneca, Sanofi) rather than duplicated, the same
+    discipline `further_answer_keys_are_dated_and_evidenced` holds — each row differs only in
+    which world model is expected to win, because the two cases are an inverse pair.
+    """
+    from .. import fixtures, verbs
+    from ..model import Overlay, check_direction
+    from ..repo import ModelRepo
+    from ..scoring import measure_discount
+
+    cases = (
+        (fixtures.build_astrazeneca_org, fixtures.ASTRAZENECA_ORG, "az-market-verdict-resolved", "az"),
+        (fixtures.build_sanofi_org, fixtures.SANOFI_ORG, "sanofi-market-verdict-resolved", "sanofi"),
+    )
+    scenario_id = "would-the-twin-recite-the-ending"
+    reports: list[str] = []
+    honest_scores: dict[str, dict] = {}
+    memorising_scores: dict[str, dict] = {}
+
+    for builder, org, outcome_id, tag in cases:
+        repo_dir = ctx.tmp / tag
+        if not repo_dir.exists():
+            builder(repo_dir)
+        repo = ModelRepo.open(repo_dir)
+        overlay = Overlay.load(repo, org)
+
+        outcome = overlay.outcomes.get(outcome_id)
+        if outcome is None:
+            raise Violated(f"the {tag} overlay carries no resolved outcome {outcome_id!r}")
+        if outcome.get("hindsight_trap") is not True:
+            raise Violated(f"the {tag} answer key does not declare hindsight_trap: true")
+
+        scenario = overlay.scenarios.get(scenario_id)
+        if scenario is None:
+            raise Violated(f"the {tag} overlay carries no scenario {scenario_id!r}")
+        if set(scenario.get("world_models", [])) != {"contemporaneous-consensus", "canonical-hindsight-consensus"}:
+            raise Violated(f"the {tag} scenario does not name both hindsight world models")
+
+        violations = check_direction(repo)
+        if violations:
+            raise Violated(f"the world layer references the {tag} tenant: {'; '.join(violations)}")
+
+        bundle_artefact = verbs.run(
+            repo, ctx.caps, org, scenario_id, "as-consumed",
+            ["twin", "run", "--org", org, "--scenario", scenario_id, "--regime", "as-consumed"],
+        )
+        with tempfile.TemporaryDirectory(prefix="twin-hindsight-guard-") as scratch:
+            bundle_path = Path(scratch) / "bundle.json"
+            bundle_path.write_bytes(bundle_artefact.to_bytes())
+            card = verbs.score(
+                repo, ctx.caps, org, bundle_path, outcome_id,
+                ["twin", "score", "--org", org, "--outcome", outcome_id],
+            )
+        by_model = {entry["world_model"]: entry for entry in card.body["scores"]}
+        if set(by_model) != {"contemporaneous-consensus", "canonical-hindsight-consensus"}:
+            raise Violated(f"the {tag} score card does not carry both world models' scores")
+        honest, memorising = by_model["contemporaneous-consensus"], by_model["canonical-hindsight-consensus"]
+        if memorising["brier"] <= honest["brier"]:
+            raise Violated(
+                f"the {tag} canonical-hindsight world model did not score worse than the honest "
+                f"one (memorising brier={memorising['brier']}, honest brier={honest['brier']})"
+            )
+        honest_scores[tag], memorising_scores[tag] = honest, memorising
+        reports.append(f"{tag}: memorising brier={memorising['brier']} > honest brier={honest['brier']}")
+
+    # The results feed the same discount ticket 40 measures, rather than sitting beside it.
+    enron_stub = [{"brier": 0.9409, "log_loss": 2.813}]
+    obscure_stub = [{"brier": 0.9025, "log_loss": 2.708}]
+    without = measure_discount(enron_stub, obscure_stub, rule="brier")
+    with_hindsight = measure_discount(
+        enron_stub, obscure_stub, rule="brier",
+        hindsight_memorising=list(memorising_scores.values()), hindsight_honest=list(honest_scores.values()),
+    )
+    if with_hindsight["discount"] == without["discount"]:
+        raise Violated("folding the hindsight-resistance scores into measure_discount changed nothing")
+
+    return "; ".join(reports) + (
+        f"; discount without hindsight={without['discount']}, with hindsight={with_hindsight['discount']}"
+    )
 
 
 @harness_check("backtest_is_a_pure_composition")

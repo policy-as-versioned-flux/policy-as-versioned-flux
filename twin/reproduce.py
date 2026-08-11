@@ -142,6 +142,20 @@ def replay(worktree: str | Path, caps: Capabilities, doc: dict[str, Any]) -> tup
         # derivation — and would diverge the moment a commit landed between them.
         return verbs.rewind(repo, caps, org, _need(flags, "at", command), command), []
 
+    if flags.get("discount_sha256"):
+        # A discount (build ticket 40) is measured from other score cards named by path at the
+        # CLI, never recorded in the pinned command (`discount_sha256` is pinned by digest for
+        # the same reason `forecast_sha256` is — see `verbs.command_for`'s docstring), so there
+        # is nothing here to re-derive it from. This is the same honest limit `twin reliability`
+        # already carries: pooling other artefacts' content is not part of the `VERBS` replay
+        # chain, and a discount-carrying score card inherits it rather than reproducing falsely.
+        raise ReproduceError(
+            f"{' '.join(command)}: this score card names --discount-sha256 {flags['discount_sha256']!r}; "
+            "a discount is measured from other score cards named by path at the CLI, not pinned "
+            "in the command, so it cannot be replayed from pins alone — the same limit `twin "
+            "reliability` already carries for its own pooled inputs"
+        )
+
     subject = doc["body"]["subject"]
     bundle, chain = replay(
         worktree, caps, {"envelope": {**subject, "kind": subject["kind"], "produced_by": subject["produced_by"]}, "body": {}}

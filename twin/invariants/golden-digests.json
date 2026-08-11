@@ -1,5 +1,5 @@
 {
-  "authorised_by": "decision ticket 09 \u2014 build ticket 33 ticks currency-regimes ACs 5 and 6, moving capabilities_digest, and adds the netflix rival-cdn-headwind causal_accounts fixture plus a mitigates block on expand-the-delivery-network, so every fixture artefact's digest moves with them",
+  "authorised_by": "decision ticket 19 \u2014 build ticket 40 adds contamination_discount (nullable) and hindsight_trap to every score-card body, so the score-card fixture digest moves even for artefacts that carry no discount",
   "capabilities_digest": "160bf30ba60b3e499d605d7ca826ae51803ff6f56aed339c9cf2a3a0e782c629",
   "digests": {
     "blast-radius": "dc4f7f06a171de13bb282b96d92378f3501bcb69729070eba94435ad16cc6e23",
@@ -13,7 +13,7 @@
     "propagation": "c12edc4b69d6af0ad959ac0f11fe8a8e38ab301d32c1e4f09e0a559418e612ed",
     "rewound-model": "804da4ffde06c373fa3690f34466cb899ede2c0d3cef1a252c43cc07598b2125",
     "scenario-exposure": "79e9c0ce51dbd33b18101779abdf50caff6df6c74338ca13b6e3b783de5bf5a0",
-    "score-card": "7eebb7e8a3331edf748a237395426d9b02778e27a9f40698064494dd7f7b1c07"
+    "score-card": "1b10d77e18dcd8cf910c71cb7edd5be1b1b862c28ad3823076dbb23a82100d88"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

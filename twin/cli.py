@@ -37,7 +37,7 @@ from .regimes import RegimeError
 from .reproduce import ReproduceError
 from .repo import ModelRepo, RepoError
 from .schema import REGIMES, SchemaError
-from .scoring import ScoreError
+from .scoring import RULES, ScoreError
 from .sign import SignatureError
 from .verbs import VerbError
 
@@ -202,10 +202,38 @@ def cmd_trade_off(args: argparse.Namespace) -> int:
     return _emit(artefact, args.out)
 
 
+def _pooled_scores(paths: list[str]) -> list[dict]:
+    """`body.scores` from each named score-card artefact, concatenated (build ticket 40).
+
+    A thin wrapper over `verbs.load_score_card` — the read-and-kind-check itself lives there,
+    shared with `cmd_reliability`, rather than duplicated here.
+    """
+    scores: list[dict] = []
+    for raw_path in paths:
+        _, card_scores = verbs.load_score_card(raw_path)
+        scores.extend(card_scores)
+    return scores
+
+
 def cmd_score(args: argparse.Namespace) -> int:
     from .artefact import digest_of_file
+    from .canon import digest_of
+    from .scoring import measure_discount
 
     repo, caps, org = _open(args)
+
+    discount = None
+    discount_sha256 = None
+    if args.discount_enron or args.discount_obscure:
+        discount = measure_discount(
+            _pooled_scores(args.discount_enron), _pooled_scores(args.discount_obscure), rule=args.discount_rule,
+        )
+        # Pinned by digest, never by path — the same reason `--forecast` is recorded as
+        # `forecast_sha256` (`command_for`'s own docstring): a machine-local path in the command
+        # would break `identical_pins_identical_bytes` across machines. The discount's own
+        # `--discount-enron`/`--discount-obscure` paths never enter the recorded command.
+        discount_sha256 = digest_of(discount)
+
     artefact = verbs.score(
         repo,
         caps,
@@ -213,8 +241,10 @@ def cmd_score(args: argparse.Namespace) -> int:
         args.forecast,
         args.outcome,
         verbs.command_for(
-            "score", org=org, outcome=args.outcome, forecast_sha256=digest_of_file(args.forecast)
+            "score", org=org, outcome=args.outcome, forecast_sha256=digest_of_file(args.forecast),
+            discount_sha256=discount_sha256,
         ),
+        discount=discount,
     )
     return _emit(artefact, args.out)
 
@@ -1264,6 +1294,21 @@ def build_parser() -> argparse.ArgumentParser:
     score = with_org(with_repo(subs.add_parser("score", help="score a forecast bundle against an outcome")))
     score.add_argument("--forecast", required=True, help="path to a forecast-bundle artefact")
     score.add_argument("--outcome", required=True)
+    score.add_argument(
+        "--discount-enron", action="append", default=[],
+        help="path to a score-card artefact scored against the Enron contamination control; repeatable "
+             "(build ticket 40) — with --discount-obscure, folds a measured memorisation-leakage "
+             "discount into this score card",
+    )
+    score.add_argument(
+        "--discount-obscure", action="append", default=[],
+        help="path to a score-card artefact scored against a low-notoriety key (Carillion or NMC, not "
+             "Wirecard); repeatable",
+    )
+    score.add_argument(
+        "--discount-rule", default="brier", choices=list(RULES),
+        help="the scoring rule the discount is measured in",
+    )
     score.add_argument("--out", required=True)
     score.set_defaults(fn=cmd_score)
 

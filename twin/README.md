@@ -1,13 +1,13 @@
 # `twin`
 
-Build tickets 01–39, 42, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
+Build tickets 01–42, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
 measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 42 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 44 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -338,8 +338,7 @@ three profit warnings (10 Jul, 29 Sep, 17 Nov 2017); a reported short-interest p
 2017); and the compulsory liquidation itself (15 Jan 2018). **HC 769 is cited only on the outcome,
 published 16 May 2018** — never on a signal, because it postdates every one of them and using it to
 date a signal would let hindsight into ground truth that is supposed to be contemporaneous. The
-outcome declares `contamination: low`, the same field build ticket 40's discount will eventually
-read.
+outcome declares `contamination: low`, the same field build ticket 40's discount reads.
 
 **This repository's own commits are dated to match, in order (2016-11-01 through 2018-05-17) —
 the discipline `build_regime_org` established — so `twin backtest --at 2017-08-01` reads a
@@ -373,6 +372,48 @@ which `no_special_category_slot` refuses everywhere a string is scanned, deliber
 design (the word "health" is an Article 9 category, context-free — "a false positive costs an
 author one rename"). The org id became `nmc`; two citations were swapped for real alternative
 coverage of the identical facts. No signal was weakened or dropped to work around it.
+
+## Enron as contamination control, and the hindsight-resistance pair
+
+`fixtures.build_enron_org()` (build ticket 40) is not a fourth low-notoriety key — the opposite.
+An LLM asked about Enron has read the ending, so "flagging" it in 2001 is indistinguishable from
+reciting it in 2026. It is carried deliberately as a **control**, to the same dated-and-cited
+contract Carillion/NMC/Wirecard hold: four real signals (the CEO's sudden resignation, 14 Aug
+2001; the Q3 loss and equity writedown, 16 Oct 2001; the 1997-2000 restatement, 8 Nov 2001; the
+Chapter 11 filing, 2 Dec 2001), the Powers Report cited only on the outcome (published just over
+two months after resolution, 1 Feb 2002), and `contamination: control` — the value
+`CONTAMINATION` (`twin/schema.py`) reserved for exactly this fixture rather than `"low"`.
+
+`scoring.measure_discount()` turns the contamination threat into a number: the mean-loss gap
+between an obscure key's score population (Carillion or NMC — never Wirecard, per ticket 39's own
+finding) and Enron's, quantised, never a literal — a harness guard recomputes it against two
+different synthetic populations at CI time and refuses if they match, and two pure-function tests
+assert it moves when the underlying scores do. `twin score --discount-enron <card>...
+--discount-obscure <card>...` folds a measured discount into any score card: raw `brier`/
+`log_loss` stay untouched, `discount` and `adjusted_<rule>` sit beside them, and
+`contamination_discount` on the card body is `None` — never a fabricated zero — when no discount
+was supplied. The discount is pinned by digest, never by path, the same reason `--forecast` is
+recorded as `forecast_sha256`; a discount-carrying score card honestly refuses to replay from its
+pins alone, the identical limit `twin reliability`'s own pooled score-card inputs already carry.
+
+`fixtures.build_astrazeneca_org()` and `build_sanofi_org()` (build ticket 41) are an inverse pair
+of **hindsight-resistance controls**: cases where the contemporaneous record contradicts the
+canonical story, so confident agreement with the canonical story is evidence of memorisation, not
+skill. AstraZeneca rejected Pfizer's bid in May 2014 and was punished for it — shares fell 11-13%,
+a named ~2% holder (Schroders) was publicly critical — and is now retold as visionary, as recently
+as a 2 Aug 2026 piece framing a prospective Bristol Myers Squibb megadeal as "twelve years after
+spurning" Pfizer. Sanofi exited diabetes/cardiovascular for GLP-1 obesity in December 2019 and was
+approved for it (+5% on the day, no contemporaneous criticism), and is now retold as a strategic
+miss once a rival's obesity drug became a blockbuster from 2022. Each fixture carries **two world
+models** on one scenario — `contemporaneous-consensus` reasons from what was knowable at the time,
+`canonical-hindsight-consensus` reports the belief a system reciting the now-common story would
+hold — so `no_collapse_mechanism` already forbids collapsing the two forecasts one execution
+emits, and scoring both against the *contemporaneous* outcome is the inversion: no special-cased
+scoring code, just a canonical story that disagrees with the recorded ground truth.
+`hindsight_trap: true` on the outcome (`twin/schema.py`) makes that explicit in the score card.
+Both cases demonstrate the point through the real CLI: `canonical-hindsight-consensus` scores
+markedly worse (higher brier and log-loss) than `contemporaneous-consensus`, and their own gap
+folds into the identical `measure_discount()` rather than sitting beside it as a second number.
 
 ## Believed, rival, revealed — and no privileged map
 
@@ -1117,11 +1158,12 @@ Named here so the skeleton cannot quietly become the definition of done.
   This is the honest stub: the plumbing is real, the judgement is authored.
 - **Calibration is diagrams over what has actually been emitted, not a growing record.** Brier and
   log loss are proper and regime-tagged, and `twin reliability` now bins a population of score
-  cards with empty bins shown rather than hidden (09) — but there is no contamination discount (40)
-  and no hindsight-resistance inversion (41), and nothing yet accumulates score cards over time on
-  a schedule of its own: `twin sweep` produces the forecast volume, a human still runs `twin score`
-  and `twin reliability` by hand once outcomes resolve. The answer-key format carries the
-  `contamination` slot the discount will read; nothing computes it.
+  cards with empty bins shown rather than hidden (09). The contamination discount (40) and the
+  hindsight-resistance inversion (41) are built and measured, not merely a schema slot — but
+  nothing yet accumulates score cards over time on a schedule of its own: `twin sweep` produces the
+  forecast volume, a human still runs `twin score` and `twin reliability` by hand once outcomes
+  resolve, and the discount is folded in explicitly per score card (`--discount-enron`/
+  `--discount-obscure`) rather than applied automatically to every one that could use it.
 - **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
   produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
   sigstore/gitsign, named in `twin/sign.py`.
