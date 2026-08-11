@@ -1,0 +1,80 @@
+# Empirical anchoring for twin/severity.py's lognormal-body/GPD-tail model (build ticket 25),
+# from decision ticket 09 and research 02 (cyber severity is heavy-tailed and a single scalar
+# regression head — the reason Google TabFM was rejected — cannot express the shape).
+#
+# Versioned so a re-anchoring is a visible change: bump `version` in the same commit as any change
+# to a subject's cited quantiles or fitted parameters. Every artefact `twin severity --anchor`
+# emits records this file's version and digest, the same way the evidence ladder and the
+# constraint set are pinned.
+#
+# Two parameters are cited directly (`method: cited`); two are fit by closed-form two-point
+# calibration from cited quantiles of the SAME source (`method: fit-from-quantiles`, exact working
+# in twin/anchoring.py); the tail shape and scale carry no defensible single-source fit at all and
+# are marked `anchored: false` rather than quietly assumed — see `xi`/`beta` below.
+schema: twin.severity-anchors/v1
+version: 1
+
+subjects:
+  - id: data-breach-loss
+    description: >-
+      Cost of a publicly reported data-breach/security-incident event, all industries, all sizes —
+      the general-purpose severity subject `twin severity --anchor data-breach-loss` prices.
+    quantiles:
+      # Both points from the same report and the same underlying dataset window, so the fit is
+      # internally consistent rather than splicing two different populations together.
+      - probability: 0.50
+        amount: 600000
+        basis: "median loss, 2015-2024 incident dataset"
+        source: "Cyentia Institute, IRIS 2025: It's About Time"
+        url: "https://www.cyentia.com/wp-content/uploads/2025/06/IRIS-2025.pdf"
+        dated: "2025-06"
+        accessed: "2026-08-10"
+      - probability: 0.95
+        amount: 32000000
+        basis: "95th-percentile loss, 2015-2024 incident dataset"
+        source: "Cyentia Institute, IRIS 2025: It's About Time"
+        url: "https://www.cyentia.com/wp-content/uploads/2025/06/IRIS-2025.pdf"
+        dated: "2025-06"
+        accessed: "2026-08-10"
+    parameters:
+      mu:
+        anchored: true
+        method: fit-from-quantiles
+        note: "ln(median) exactly, since a lognormal's median sits at z=0 — the median quantile alone pins mu."
+      sigma:
+        anchored: true
+        method: fit-from-quantiles
+        note: "closed-form two-point calibration against the median and the 95th-percentile quantile above."
+      threshold:
+        anchored: true
+        method: cited
+        note: >-
+          set equal to the cited 95th-percentile amount, so the peaks-over-threshold cut is a named
+          data point rather than an authored guess, and tail_probability derives to 0.05 by
+          construction — consistent with the quantile it was cited from, not a second independent number.
+      xi:
+        anchored: false
+        illustrative_value: 0.6
+        reason: >-
+          No public source in this file's reading list reports a fitted GPD shape parameter for
+          cyber-loss severity. The qualitative evidence is real and cited (Eling & Wirfs 2019 found
+          fits on operational-risk cyber-loss data heavy enough to be infinite-mean, i.e. xi >= 1,
+          for some subsets), which motivates choosing an illustrative value in the heavy-but-finite
+          neighbourhood rather than pinning a number to a study this system did not itself refit.
+        qualitative_source: "Eling, M. and Wirfs, J. (2019), 'What are the actual costs of cyber risk events?', European Journal of Operational Research 272, 1109-1119"
+        accessed: "2026-08-10"
+      beta:
+        anchored: false
+        illustrative_value: 15000000
+        reason: >-
+          The GPD scale is set only up to whatever xi is chosen alongside it, so an unanchored xi
+          makes beta unanchored too — there is no source pinning it independently. Chosen so the
+          curve's 99th-percentile TVaR lands in the same order of magnitude as IRIS Xtreme's
+          extreme-loss figures (median of the 100 largest events ~$47M; over one in four exceed
+          $100M), used only as a plausibility check on the resulting shape, never as a fitted point:
+          IRIS Xtreme conditions on "the 100 largest events" rather than a probability within the
+          general population this subject's body/tail are fit against, so it cannot honestly supply
+          a quantile pair the way the two IRIS 2025 points above do.
+        qualitative_source: "Cyentia Institute, IRIS Xtreme: 100 Largest Cyber Loss Events"
+        url: "https://www.cyentia.com/2020-iris-xtreme/"
+        accessed: "2026-08-10"

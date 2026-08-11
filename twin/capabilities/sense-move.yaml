@@ -1,0 +1,36 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+capability: sense-move
+owning_ticket: '11'
+criteria:
+  - index: 1
+    text: "A signal object defined in ubiquitous language, with provenance + STEEP class."
+    checked: true
+    evidence: "twin/verbs.py sense() plus the fixture signals — a dated, STEEP-tagged, provenanced signal binds to a component through a committed grade-5 claim and emits a bound-signal artefact."
+    ticked_by: build ticket 05
+  - index: 2
+    text: "The binding mechanism decided, incl. what is automated vs judged vs reviewed."
+    checked: true
+    evidence: "twin/signal_classify.py: binding is automated at volume through the seam-3 skill harness (twin/skills.py, build ticket 42), evaluated against the pooled Carillion/NMC/Wirecard/Enron labelled corpus with a declared threshold (twin/skill-thresholds.yaml). Automated output is grade 5 by construction (no parameter can set it higher, checked structurally by the harness guard signal_classify_is_grade_5_by_construction) and stays contestable (build ticket 60) rather than gated at ingestion — decision ticket 11 Q2's 'judged' and 'reviewed' halves."
+    ticked_by: build ticket 43
+  - index: 3
+    text: "Authored-vs-inferred position decided, consistent with ticket 07's authored/derived split."
+    checked: true
+    evidence: "twin/evolution_judge.py: position is inferred first from accumulated evidence (judge(), grade 5 by construction) and a human may then correct it (override(), grade 4, attributable to a registered role) — decision ticket 11 Q1's inferred-first order, structurally enforced (override() cannot run without judge()'s own output as its first argument). The twin never goes silent: pushback() always states its basis, agreement included. Extends twin/schema.py's claim schema (kind 'position'/'override', evolution_position field) and the invariant suite (evolution_judge_output_is_graded_by_construction_and_never_silent)."
+    ticked_by: build ticket 44
+  - index: 4
+    text: "Observation-propagation semantics, distinguished from ticket 08's intervention propagation."
+    checked: false
+  - index: 5
+    text: "Weak-signal retention + promotion rule."
+    checked: false
+  - index: 6
+    text: "A stated position on sensor gameability."
+    checked: false
+  - index: 7
+    text: "The loop's cadence + re-price triggers, sufficient to generate forecast volume."
+    checked: true
+    evidence: "twin/schedule.py sweep() is the scheduled half — every scenario in every org overlay of every named repository, run unconditionally, with no staleness skip (harness guard scheduled_emission_ignores_signal_presence proves two runs over an unchanged repository emit the same count). twin run --scenario X, unchanged since build ticket 06, is the event-driven half decision ticket 11 Q5 asks to sit beside it."
+    ticked_by: build ticket 09
+  - index: 8
+    text: "Exercised on a real signal for each co-flagship."
+    checked: false
