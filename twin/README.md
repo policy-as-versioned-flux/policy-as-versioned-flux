@@ -1,13 +1,13 @@
 # `twin`
 
-Build tickets 01–43, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
+Build tickets 01–45, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
 measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 45 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 47 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -814,20 +814,20 @@ reaches `full`, and nothing can be typed as `full`.
 | capability | decision ticket | grade | ticked |
 |---|---|---|---|
 | `domain-model` | 07 | partial | 1 / 7 |
-| `causal-layer` | 08 | partial | 1 / 5 |
+| `causal-layer` | 08 | partial | 2 / 5 |
 | `currency-regimes` | 09 | partial | 5 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 2 / 8 |
 | `scenario-engine` | 13 | partial | 2 / 7 |
 
-**14 of 41**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**15 of 41**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
 there"** — the strongest capability here stands at five ticks, and three of the seven still stand at
 one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
-count — the two rows below track only as far as build ticket 33 tells their story; `scenario-engine`
-moved to 2/7 at build ticket 37 (AC 2, fast-forward/rewind/play distinguished) without its own round
-being narrated here.
+count — the rows below track only as far as build ticket 33 tells their story, plus build ticket
+45's tick on `causal-layer` narrated just below; `scenario-engine` moved to 2/7 at build ticket 37
+(AC 2, fast-forward/rewind/play distinguished) without its own round being narrated here.
 
 **Nothing was ticked in the round before this one, and the arithmetic did not move at all.** Three
 build tickets landed — the information gate (36), the drift instrument (64) and the join of the
@@ -892,13 +892,23 @@ does not exist:
   paths) — two of its three legs are now built. `do()` and `observe()` have distinct semantics and
   distinct types (build ticket 22), and a structural-only path still composes nothing. The
   **counterfactual** is abduction → action → prediction: abduction landed at build ticket 35 and
-  prediction (fast-forward) is build ticket 37, so this stays unchecked and `causal-layer` stands
-  at 1/5. Two thirds of a composition is not the composition.
-- **decision ticket 08 AC 4** (identification and confounding discipline) — shared ancestry is now
-  detected and discounted (build ticket 21), which is the free structural half of decision ticket
-  08's Q5: shared ancestors of two paths surface automatically. The authored half — a mandatory
-  alternative-explanation field on every grade-1/2 edge — does not exist, so the criterion stays
-  unchecked.
+  prediction (fast-forward) is build ticket 37, so this stays unchecked. Two thirds of a
+  composition is not the composition.
+- **decision ticket 08 AC 4 is now ticked (build ticket 45), and this corrects an earlier
+  mischaracterization here.** This file previously credited build ticket 21's shared-ancestry
+  correction (`propagate.py`'s `shares_ancestry`) with "the free structural half" of Q5's
+  confounder discipline. Ticket 21's own file disclaimed that directly: what it built is
+  shared-**edge** detection among the several *paths* already drawn from one origin — a
+  path-dependence correction — and "nothing in `twin/` computes common ancestors of an edge's two
+  **endpoints**", which is what Q5 actually asks for. `twin/causal_claims.py`'s
+  `shared_ancestors()` is that detector, built fresh at ticket 45: a component adjacent to both of
+  a proposed edge's endpoints surfaces as a candidate confounder, demonstrated on real fixture
+  structure (`content-delivery-network` for both ends of `streaming-displaces-dvd`,
+  `foundry-services` for both ends of `euv-delay-slips-the-node`). The mandatory
+  alternative-explanation field exists too (`propose()`'s `alternatives`, never empty). Formal
+  identification (do-calculus, back-door analysis) stays out of scope, per Q5's own text rejecting
+  it as a blanket requirement — the honest limit is stated in the module docstring: one hop, not
+  the full transitive closure. `causal-layer` moves to 2/5.
 - **decision ticket 09 AC 4** (each named incommensurable, incl. where we refuse to price) — the
   register now carries **five** distinct refusal reasons rather than two (build ticket 30), plus
   three more for a mitigation claim that earns nothing, so reputation and morale have a real
@@ -932,8 +942,9 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 35 pass, 0 fail, 2 pending, 1 skipped and not faked. `pytest -q` — 753 tests
-across seams 1 and 2.
+`./bin/twin verify` — 40 pass, 2 pending, 2 skipped and not faked (a fresh worktree has no earlier
+manifest commit to diff, so `hash_changes_are_authorised` skips too, alongside the CI-only
+cross-architecture leg). `pytest -q` — 909 tests across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
 |---|---|
@@ -1167,18 +1178,23 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
   produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
   sigstore/gitsign, named in `twin/sign.py`.
-- **Seam 3 exists; one of six skills does now, and it is a heuristic stand-in.** `twin/skills.py`
-  (build ticket 42) is the eval harness: run a skill against a fixture corpus, score it against a
-  versioned threshold, record score-over-time per model version, and surface a model upgrade that
-  degrades judgement as a regression rather than letting it go silent. It is skill-agnostic by
-  construction — `evaluate()` takes a bare callable and a corpus, and no harness function names one
-  of the six real skills. `signal-classify` (`twin/signal_classify.py`, build ticket 43) is the
-  first real skill through it: a keyword and word-overlap heuristic, not a model call, evaluated
-  against the pooled Carillion/NMC/Wirecard/Enron labelled corpus — proven only against `political`
-  and `economic` signals, since every committed fixture signal is one of the two, so it makes no
-  claim about `social`, `technological` or `environmental`. Five of the six (`causal-claims`,
-  `evolution-judge`, `substrate-generator`, `gameplay-lens`, `ethics-gate`) still do not exist, so
-  the harness has proven itself against one real subject and nothing yet for the other five.
+- **Seam 3 exists; three of six skills do now, and all three are heuristic stand-ins.**
+  `twin/skills.py` (build ticket 42) is the eval harness: run a skill against a fixture corpus,
+  score it against a versioned threshold, record score-over-time per model version, and surface a
+  model upgrade that degrades judgement as a regression rather than letting it go silent. It is
+  skill-agnostic by construction — `evaluate()` takes a bare callable and a corpus, and no harness
+  function names one of the six real skills. `signal-classify` (build ticket 43) and
+  `evolution-judge` (build ticket 44) were the first two through it, both fixed-grade-by-construction
+  keyword heuristics. `causal-claims` (build ticket 45) is the third and the first whose own grade
+  genuinely varies with its input rather than being fixed — which is why it is scored on grade
+  accuracy as a separate, asymmetrically-penalised metric from claim accuracy, registered as a
+  second entry on the same skill (`causal-claims-grade-accuracy`) rather than a bespoke mechanism.
+  None of the three is a model call. `signal-classify` is proven only against `political` and
+  `economic` signals, since every committed fixture signal is one of the two, so it makes no claim
+  about `social`, `technological` or `environmental`; `causal-claims`'s four-item corpus spans
+  grades 2 through 5 but never exercises grade 1. Three of the six (`substrate-generator`,
+  `gameplay-lens`, `ethics-gate`) still do not exist, so the harness has proven itself against
+  three real subjects and nothing yet for the other three.
 - **No substrate.** The content-hash reference form round-trips against nothing. (48–51.)
 - **The two-architecture determinism check has never run.** The CI matrix is declared and the
   golden digests are committed; the claim is wired, not proven.
@@ -1201,9 +1217,12 @@ Named here so the skeleton cannot quietly become the definition of done.
   `Response`/`Control` in the core ontology. Build ticket 28 gave `Response` a schema — id, name,
   the component it addresses, a cost triple and the red lines it crosses — and `Asset` has none,
   which is why domain-model's first criterion stays unticked.
-- **The Wardley positions are authored, and nothing judges them.** `evolution` and
-  `evolution_position` are whatever the model repository says. Which position a component actually
-  holds is a judgement, and the judge — with human override and pushback — is build ticket 44.
+- **The Wardley positions in a committed model repository are still authored, and the judge is not
+  wired to them.** `evolution` and `evolution_position` are whatever the model repository says.
+  Which position a component actually holds is a judgement, and the judge — with human override
+  and pushback — exists now as a skill (`twin/evolution_judge.py`, build ticket 44), evaluated in
+  isolation at seam 3; nothing in the live `sense`/`run` pipeline calls it yet, the same gap the
+  "sensing is a dead end" bullet above names.
 - **The causal edges in the fixtures are toys.** Sign, lag and elasticity are invented numbers
   exercising the shape. Decision ticket 08 asks for a real claim from each co-flagship, and neither
   exists, which is why the causal layer's fifth criterion stays unticked.

@@ -743,6 +743,74 @@ def _evolution_judge_output_is_graded_by_construction_and_never_silent(ctx: Cont
     )
 
 
+@harness_check("causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory")
+def _causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory(ctx: Context) -> str:
+    """`causal-claims` (build ticket 45, decision ticket 08 Q5): unlike `signal-classify` and
+    `evolution-judge`, this skill's own evidence grade genuinely varies with its input rather than
+    being fixed by construction — so the property to guard is not "always grade N" but **the
+    asymmetric penalty and the mandatory alternative-explanation field survive contact with a
+    proposer that cheats in the dangerous direction.**
+
+    Three legs. First, a proposer that gets every claim's sign/lag/elasticity right but stamps
+    every grade to the strongest rung (1) passes the claim metric and fails the grade metric at
+    0.0 — the precise failure this ticket exists to catch, run here against the real labelled
+    corpus rather than trusted from a docstring. Second, `propose()`'s own `alternatives` field is
+    never empty, checked directly against its output with no candidate confounders supplied at
+    all, so the mandatory field cannot silently become optional. Third, `shared_ancestors()`
+    genuinely finds the real, fixture-authored shared dependency on both co-flagship edges
+    (`content-delivery-network` for netflix's `streaming-displaces-dvd`, `foundry-services` for
+    intel's `euv-delay-slips-the-node`) — a confounder detector that never fires on real data
+    proves nothing by existing.
+    """
+    from .. import causal_claims as cc
+    from .. import skills as skills_mod
+    from ..model import Overlay
+    from ..repo import ModelRepo
+
+    corpus = cc.labelled_corpus(ctx.tmp / "causal-claims-corpus")
+
+    def over_grades_everything(payload: dict[str, Any]) -> dict[str, Any]:
+        honest = cc.propose(payload)
+        honest["edge"]["evidence_grade"] = 1
+        return honest
+
+    claim_result = skills_mod.evaluate(cc.SKILL, over_grades_everything, corpus, scorer=cc.scorer)
+    if not claim_result.passed:
+        raise Violated("a proposer with the right sign/lag/elasticity but the wrong grade should still pass the claim metric")
+    grade_result = skills_mod.evaluate(cc.GRADE_SKILL, over_grades_everything, corpus, scorer=cc.grade_scorer)
+    if grade_result.passed or grade_result.score != 0.0:
+        raise Violated(
+            f"a proposer that over-grades every item to the strongest rung scored {grade_result.score} on the "
+            "grade metric and passed — the asymmetric penalty is not gating the dangerous direction"
+        )
+
+    no_confounders = cc.propose(
+        {
+            "from": {"id": "x", "name": "X"}, "to": {"id": "y", "name": "Y"},
+            "evidence": [{"statement": "A model assertion.", "source": "s"}],
+            "candidate_confounders": [],
+        }
+    )
+    if not no_confounders["alternatives"]:
+        raise Violated("propose() returned an empty alternatives field — the mandatory alternative-explanation field is not mandatory")
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    netflix_graph = Overlay.load(repo, "netflix").graph()
+    netflix_confounders = cc.shared_ancestors(netflix_graph, "streaming-experience", "dvd-by-mail")
+    if "content-delivery-network" not in netflix_confounders:
+        raise Violated("shared_ancestors() did not find the real shared dependency on the netflix co-flagship edge")
+    intel_graph = Overlay.load(repo, "intel").graph()
+    intel_confounders = cc.shared_ancestors(intel_graph, "euv-lithography", "leading-edge-process-node")
+    if "foundry-services" not in intel_confounders:
+        raise Violated("shared_ancestors() did not find the real shared dependency on the intel co-flagship edge")
+
+    return (
+        "over-grading every item to grade 1 passes the claim metric and fails the grade metric at "
+        "0.0; propose() never returns an empty alternatives field; shared_ancestors() finds the "
+        "real shared dependency on both co-flagship edges"
+    )
+
+
 def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
     rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     out = _git(root, "show", f"{ref}:{rel}")
