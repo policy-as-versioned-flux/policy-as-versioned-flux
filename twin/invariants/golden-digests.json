@@ -1,19 +1,19 @@
 {
-  "authorised_by": null,
-  "capabilities_digest": "1eb2ea1089122819d44949abd49bb99dedf463fe0253fb2da1ccedb7ca17234e",
+  "authorised_by": "decision ticket 13 \u2014 build ticket 69: scenario-engine.yaml criterion 5 (admissibility rule) ticks from the standing-library invariant, moving scenario-engine to 3/7 and the shared capabilities_digest embedded in every artefact's pins, so every golden digest moves though no scoring rule or serialisation changed",
+  "capabilities_digest": "57241d4aa4549aabe28d9b70036a9b8b9e04575722aa1daa3ea0667f17748fac",
   "digests": {
-    "blast-radius": "8009123e5abcaec625065cda416c80037f220cade636ff0e97c5207ccd1be3bc",
-    "bound-signal": "42f59417387ea8cfe1d802182d4721b3b9153ec6ad1f8aecc9f23ac33c97b8d1",
-    "forecast-bundle": "6189c628c6442e242b93f1b03dd04ef5f00c532a4f932ba4966633abe048a91d",
-    "graph": "d328f002835aa85f31c091368893917f42f6e85537c2c3a3cd00c0ab342a8a7e",
-    "intervention": "3b08c53a76cfa35c907ecc75e5564dc5f79d762dc8405c9e5927d11d6588c518",
-    "observation": "ec42ccb7a3710655c4fa96bcfc3749a0bdd1e68b1626aa6c00a5a19c1ce54b4b",
-    "priced-impact": "b99248089e42963484cb5718aaf3fd4c05aadf14fb8178beae59302b7ba6af44",
-    "priced-option-set": "0fb93f999e31a17fe015bd34652706f289db851dcd6eb536d54c767e17ada1c5",
-    "propagation": "bb899c8531e2caf2c76b95a7df84111c5818eae1e1d1b717f3a3c1fd8b8476e5",
-    "rewound-model": "2872d65be907b5f1edee06399647d6c77dffa82a72f8f3d1286cf1d7796be793",
-    "scenario-exposure": "09e840175a456bddaa9a24b64d0ad4a96fdc8813ccffdd9b59b777fc793718bb",
-    "score-card": "5d96823df1140ecaad836443f8fafd65a899a7cbc524ad9be8d8c9c7e87a5e0d"
+    "blast-radius": "0518a08bd1f674e312a5c10a4a6304e3cf1d29c83b3e9e5e7f8dd1f8fab1d9bc",
+    "bound-signal": "90aa23f8d43b0d417c54c47f996c58135c073bd61492ea61eb8cf019cb702a90",
+    "forecast-bundle": "0bd9c56524c4d56b0b52bba99e36bd0d65371ac5df9d18c71448fbfe9a6b3886",
+    "graph": "0d254f1dd0c99c25311a9a7b9f7db2b85f5214f50dfd9363adbcd739d85c084b",
+    "intervention": "954a480d9afdf9af4c454304baaf3642c2bc64d95aff31d64e918ce6ab96e8b7",
+    "observation": "de26cd44bdb50374c665748f8fe5f33bcba72149713fe9a0f07d07437c07ec39",
+    "priced-impact": "acbf2de1e2191d8792725410931ded58d2c006ab9b406e15069527a8bc9bb02f",
+    "priced-option-set": "0c80e01a84dfdb00b936f02db949aaed7561773508888a83958041e551b5cf37",
+    "propagation": "f76cc17a37a63ab94a2c2a6d83f3759983071a090965af162cff1cec30b891f9",
+    "rewound-model": "81578043e96f995026e0817f63e0cde24ae31d2665407a41cf091847440339eb",
+    "scenario-exposure": "583b80a3801e336ff5b93736d6dd26c37a12d1922eee95bf1572070529c62d32",
+    "score-card": "614d35cc283ddeb6aab50dbc35598512a7a57927a06e593635614f4196a97ff5"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

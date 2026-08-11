@@ -8,8 +8,8 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 09 \u2014 build ticket 33: no_recommended_action_field's banned-word/phrase lists moved to shared constants (twin/invariants/__init__.py: NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES) so the new trade_off_curve_reports_disagreement_never_a_scalar harness guard imports rather than re-types them; the check's own logic and refusal behaviour are unchanged, only the body text moved"
-checks_module_sha256: 2d93cabc8b7575f08ca87e0c33f1802cb63f7c1ae78ec68f1ae5fdbbde1c2e57
+checks_module_authorised_by: "decision ticket 13 \u2014 build ticket 69: adds the standing_library_covers_committed_classes check (schema.py's new COMMITTED_SCENARIO_CLASSES enum + a scenario.class field) to checks.py, so the checks module hash moves; no existing check body changed"
+checks_module_sha256: 19da186f4e06a75776aff3de30e4b78c829b61ce553b60e74a9311b8049d114c
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
@@ -164,5 +164,6 @@ invariants:
 
   - name: standing_library_covers_committed_classes
     activating_ticket: '69'
-    state: pending
+    state: live
+    body_sha256: 8e572e436c5c5e8f7755c1cf82dfeee49c7d53e61a3ee99077bd271076008422
     asserts: The standing scenario library covers every committed scenario class.
