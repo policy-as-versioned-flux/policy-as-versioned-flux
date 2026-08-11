@@ -1,13 +1,13 @@
 # `twin`
 
-Build tickets 01–42, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
+Build tickets 01–43, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
 measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 44 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 45 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -1167,14 +1167,18 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
   produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
   sigstore/gitsign, named in `twin/sign.py`.
-- **Seam 3 exists; no skill does yet.** `twin/skills.py` (build ticket 42) is the eval harness the
-  six non-deterministic skills need: run a skill against a fixture corpus, score it against a
+- **Seam 3 exists; one of six skills does now, and it is a heuristic stand-in.** `twin/skills.py`
+  (build ticket 42) is the eval harness: run a skill against a fixture corpus, score it against a
   versioned threshold, record score-over-time per model version, and surface a model upgrade that
   degrades judgement as a regression rather than letting it go silent. It is skill-agnostic by
   construction — `evaluate()` takes a bare callable and a corpus, and no harness function names one
-  of the six real skills — exercised against a fixture skill (`toy-classifier`), because a harness
-  tested only against skills that do not exist yet is untested. None of the six exist, so the
-  harness has run against nothing real: this closes the mechanism, not the gap it guards.
+  of the six real skills. `signal-classify` (`twin/signal_classify.py`, build ticket 43) is the
+  first real skill through it: a keyword and word-overlap heuristic, not a model call, evaluated
+  against the pooled Carillion/NMC/Wirecard/Enron labelled corpus — proven only against `political`
+  and `economic` signals, since every committed fixture signal is one of the two, so it makes no
+  claim about `social`, `technological` or `environmental`. Five of the six (`causal-claims`,
+  `evolution-judge`, `substrate-generator`, `gameplay-lens`, `ethics-gate`) still do not exist, so
+  the harness has proven itself against one real subject and nothing yet for the other five.
 - **No substrate.** The content-hash reference form round-trips against nothing. (48–51.)
 - **The two-architecture determinism check has never run.** The CI matrix is declared and the
   golden digests are committed; the claim is wired, not proven.

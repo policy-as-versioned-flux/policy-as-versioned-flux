@@ -17,3 +17,9 @@ thresholds:
     note: >-
       A fixture skill's corpus is small and hand-authored, so 0.8 is a round, defensible bar
       rather than a fitted one.
+  signal-classify:
+    threshold: 0.8
+    note: >-
+      The heuristic scores 1.0 on the pooled Carillion/NMC/Wirecard/Enron corpus (build ticket
+      43); the threshold is set below that measured score, at the same round 0.8 bar
+      toy-classifier uses, rather than padded up to the achieved number.

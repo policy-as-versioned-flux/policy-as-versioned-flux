@@ -9,7 +9,9 @@ criteria:
     ticked_by: build ticket 05
   - index: 2
     text: "The binding mechanism decided, incl. what is automated vs judged vs reviewed."
-    checked: false
+    checked: true
+    evidence: "twin/signal_classify.py: binding is automated at volume through the seam-3 skill harness (twin/skills.py, build ticket 42), evaluated against the pooled Carillion/NMC/Wirecard/Enron labelled corpus with a declared threshold (twin/skill-thresholds.yaml). Automated output is grade 5 by construction (no parameter can set it higher, checked structurally by the harness guard signal_classify_is_grade_5_by_construction) and stays contestable (build ticket 60) rather than gated at ingestion — decision ticket 11 Q2's 'judged' and 'reviewed' halves."
+    ticked_by: build ticket 43
   - index: 3
     text: "Authored-vs-inferred position decided, consistent with ticket 07's authored/derived split."
     checked: false

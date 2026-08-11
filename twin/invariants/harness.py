@@ -625,6 +625,56 @@ def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> 
     )
 
 
+@harness_check("signal_classify_is_grade_5_by_construction")
+def _signal_classify_is_grade_5_by_construction(ctx: Context) -> str:
+    """`signal-classify` (build ticket 43, decision ticket 11 Q2): an automated binding claim is
+    grade 5 by construction, and nothing about calling the skill can produce a different grade —
+    checked against its own source (no grade-shaped parameter exists to call it with) and against
+    its actual output, the same two-leg shape `skill_eval_harness_is_agnostic_and_thresholds_are_guarded`
+    uses for the harness itself.
+
+    Also runs the skill end to end against its real labelled corpus (the pooled
+    Carillion/NMC/Wirecard/Enron signals `tests/test_signal_classify.py` also evaluates against,
+    built fresh here in `ctx.tmp` the same way `carillion_answer_key_is_dated_and_adversarial`
+    builds its own fixture) and proves a degraded classifier fails the threshold — a harness with
+    no subject running proves nothing.
+    """
+    import inspect
+
+    from .. import signal_classify as sc
+    from .. import skills as skills_mod
+
+    params = inspect.signature(sc.classify).parameters
+    if "grade" in params or "evidence_grade" in params:
+        raise Violated("signal_classify.classify() accepts a grade-shaped parameter — grade 5 is no longer by construction")
+
+    sample = {
+        "statement": "A trading update on financial performance.",
+        "source": "Company announcement",
+        "candidates": [{"id": "x", "name": "y"}],
+    }
+    grade = sc.classify(sample)["claim"].get("evidence_grade")
+    if grade != 5:
+        raise Violated(f"signal_classify.classify() emitted evidence_grade {grade!r}, not 5")
+
+    corpus = sc.labelled_corpus(ctx.tmp / "signal-classify-corpus")
+    good = skills_mod.evaluate(sc.SKILL, sc.classify, corpus, scorer=sc.scorer)
+    if not good.passed:
+        raise Violated("signal-classify failed its own labelled corpus running correctly — the harness has no subject")
+    bad = skills_mod.evaluate(
+        sc.SKILL,
+        lambda payload: {"steep": "environmental", "claim": {"component": "not-a-real-component"}},
+        corpus, scorer=sc.scorer,
+    )
+    if bad.passed:
+        raise Violated("a classifier that gets every item wrong still passed — the threshold is not gating anything")
+
+    return (
+        "no grade-shaped parameter exists on classify(); every call returns evidence_grade 5; "
+        f"the real {len(corpus)}-item labelled corpus passes and a degraded classifier fails its threshold"
+    )
+
+
 def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
     rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     out = _git(root, "show", f"{ref}:{rel}")
