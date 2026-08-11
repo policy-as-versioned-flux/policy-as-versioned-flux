@@ -1,0 +1,56 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+# Added at build ticket 26, when the £ first had code to measure: a perspective that declares who
+# pays, and a constraint set it may add to and may never override. Before that, a capability file
+# here would have been a slot claiming a capability existed.
+#
+# `grade` is absent on purpose — it is computed from the ticks below and cannot be typed.
+capability: currency-regimes
+owning_ticket: '09'
+criteria:
+  - index: 1
+    text: "Named stakeholder(s) for the currency; multi-stakeholder decision made."
+    checked: true
+    evidence: "twin/schema.py `perspective` and twin/verbs.py exposure() — a perspective names who pays and which party they are, any party may declare one, and `twin exposure` with no --perspective reports every perspective rather than defaulting to the employer's."
+    ticked_by: build ticket 26
+  - index: 2
+    text: "An explicit constraint class (ruin + forbidden) with schema representation and a membership rule."
+    checked: true
+    evidence: "twin/constraints.yaml and twin/constraints.py — two named classes, `ruin` and `forbidden`, represented in the universal floor and in the perspective schema, with the membership rule that a perspective adds to the floor and a perspective reusing a floor id does not load."
+    ticked_by: build ticket 27
+  - index: 3
+    text: "The comparable-remainder boundary defined and defensible."
+    checked: true
+    evidence: "twin/admission.py and twin/evidence-ladder.yaml `path_admission_threshold` — an impact enters the £ only through a causal path to a cash flow the perspective declared, graded at or inside a separately published threshold. The boundary is computed from the graph, so no author can mark anything priceable, and a refused impact comes back carrying the unpriced structural blast radius rather than silence."
+    ticked_by: build ticket 29
+  - index: 4
+    text: "Treatment of each named incommensurable, incl. where we refuse to price."
+    checked: false
+    # Closer, and still not "each". Build ticket 30 gave the register five distinct refusal
+    # reasons — the path is graded too weakly, the perspective declares no valuation, the
+    # valuation is graded too weakly, no graded path reaches a cash flow, the path carries a
+    # direction and no magnitude — plus three more for a mitigation claim that earns nothing.
+    # Reputation and morale therefore have a real treatment: they price through a modelled path or
+    # they stay in the register with a falsifiable reason. Existential and tail risk now have one
+    # too (build ticket 24): `twin severity` reports a loss-exceedance curve (VaR beside TVaR,
+    # never VaR alone) rather than collapsing the tail into the causal £ chain, which has no
+    # severity slot for it by design — the refusal to price a point figure for ruin-adjacent risk
+    # is itself the treatment. Build ticket 25 anchors it: `twin severity-anchor` fits the curve
+    # from named, dated public sources (twin/severity-anchors.yaml) rather than illustrative
+    # numbers, and names honestly which of its five parameters are defensible (mu, sigma,
+    # threshold — cited or fit from cited quantiles) and which are not (xi, beta — no public
+    # single-source fit exists, so they carry a reason rather than a false anchor) with the
+    # headline TVaR's sensitivity to the unanchored one reported alongside it. Still nothing in
+    # the pocket org or the fixtures calls it — anchoring a real component's own severity to this
+    # subject, rather than exercising the subject standalone, is not this ticket's job either.
+    # Ethical harms still wait on the affected-parties register at 61. Five of the six named
+    # incommensurables is not each of them.
+  - index: 5
+    text: "A stated objective function with its qualifications."
+    checked: true
+    evidence: "twin/tradeoff.py curve() and twin verbs.trade_off() (twin trade-off) — the objective function decision ticket 09 Q3 names, minimise-total-net-cost-of-risk, computed as a trade-off curve across the named causal-account ensemble with a marked default rather than asserted as an answer. The default's own `basis` field states it is a default point, not a recommendation, and no_recommended_action_field-style scanning (harness guard trade_off_curve_reports_disagreement_never_a_scalar) asserts no action-shaped field or phrase exists anywhere in the body."
+    ticked_by: build ticket 33
+  - index: 6
+    text: "How rival-model £ spread is reported."
+    checked: true
+    evidence: "twin/tradeoff.py curve() reports each admitted response's net cost of risk per named account in `curve[].net_cost_of_risk.by_account`, never averaged, plus the range between them; `agreement.cheapest_by_account` and `agreement.unanimous` surface a ranking disagreement explicitly rather than smoothing it into the default. This is the causal-account half of the spread ticket 16 already gave rival world models: `twin causal-accounts` (32) reports disagreement in a propagated influence, and this ticket carries that disagreement through pricing into a response's own comparable figure."
+    ticked_by: build ticket 33

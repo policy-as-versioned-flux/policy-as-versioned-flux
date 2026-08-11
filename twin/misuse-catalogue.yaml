@@ -1,0 +1,82 @@
+# The misuse catalogue (build ticket 62), from decision ticket 15's carried-forward item: "the
+# misuse-catalogue mechanisms to formalise."
+#
+# Each entry names a MECHANISM, not just a risk — a risk on its own is a sentence anyone could
+# write; a mechanism is the code, invariant or artefact that actually blocks it, so a reader can
+# go and check it rather than take the catalogue's word for it. Where the mechanism is a harness
+# guard or an invariant, its name here is the same name `twin verify` reports.
+#
+# Versioned: bump `version` in the same commit as any change to an entry below.
+schema: twin.misuse-catalogue/v1
+version: 1
+entries:
+  - id: prices-a-forbidden-option-by-raising-the-stakes
+    risk: >-
+      An operator raises an option's value high enough that a forbidden option becomes too
+      attractive to leave excluded, and pricing runs on it anyway.
+    mechanism: >-
+      twin/options.py: pricing is a method on `Admitted`, the only object `prefilter()` produces,
+      and no free function in the module takes an unfiltered option. Invariant
+      `prefilter_precedes_pricing` asserts both locks against the module's own public surface.
+    source: decision ticket 09; build ticket 28
+
+  - id: launders-a-price-through-severity
+    risk: >-
+      A component's tail-risk figure is inflated to smuggle a de facto price for something the
+      constraint set forbids pricing directly.
+    mechanism: >-
+      twin/pricing.py carries no severity slot by design (see its own module docstring);
+      twin/severity.py is standalone and nothing in the derivation path reads it into a priced
+      figure.
+    source: build ticket 24
+
+  - id: retroactively-edits-a-forecast-once-the-outcome-is-known
+    risk: >-
+      A forecast or score card is hand-edited after the fact to look better calibrated than it
+      was, defeating the whole point of scoring.
+    mechanism: >-
+      Invariant `identical_pins_identical_bytes` and twin/reproduce.py: an artefact must recompute
+      byte-identically from the pins it recorded, so a hand-edited value is detected as a
+      reproduction failure rather than trusted.
+    source: decision ticket 14
+
+  - id: launders-hindsight-into-a-scored-forecast
+    risk: >-
+      A forecast run with the benefit of hindsight is reported as though it were made honestly at
+      the time, manufacturing false confidence in the calibration record.
+    mechanism: >-
+      twin/regimes.py's regime tag has no default and gates by construction — a withheld fact is
+      absent from the overlay an execution reads, not merely flagged — and `twin/verbs.py score()`
+      reads a bundle's own declared regime, refusing to score anything but `as-consumed`.
+    source: decision ticket 13; build ticket 36
+
+  - id: signs-a-hand-touched-derived-value
+    risk: >-
+      A derived output is hand-edited and then human-signed to make the edit look authoritative
+      rather than tampered with.
+    mechanism: >-
+      Invariant `derived_never_human_signed` and twin/attest.py `check()`: a derived artefact
+      carrying a human signature is a detectable anomaly, not a convention breach — the check
+      fails on evidence.
+    source: build ticket 11
+
+  - id: quietly-removes-a-red-line-when-the-option-it-blocked-gets-attractive
+    risk: >-
+      A perspective drops one of its own declared constraints exactly when the option it excluded
+      has become commercially tempting, and nobody records why.
+    mechanism: >-
+      twin/misuse.py `log_removal()`: logging a removal requires a computed attractiveness figure
+      — the excluded option's cost, re-derived by re-running `options.prefilter()` with the
+      constraint stripped, never typed by the caller — and `verify_removals()` refuses a removal
+      with no matching log entry.
+    source: decision ticket 15; build ticket 62
+
+  - id: hides-a-challenge-to-a-constituent-behind-an-aggregate
+    risk: >-
+      A challenge to one specific figure is waved off by pointing at an unrelated total that
+      still looks fine.
+    mechanism: >-
+      twin/challenges.py `resolve()` reads the claim path it addresses from the challenge it
+      resolves, never from the caller, and `refuse_answering_a_different_claim` is the second
+      lock for a resolution ever built by a different path.
+    source: build ticket 60

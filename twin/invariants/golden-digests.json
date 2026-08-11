@@ -1,0 +1,20 @@
+{
+  "authorised_by": null,
+  "capabilities_digest": "1eb2ea1089122819d44949abd49bb99dedf463fe0253fb2da1ccedb7ca17234e",
+  "digests": {
+    "blast-radius": "8009123e5abcaec625065cda416c80037f220cade636ff0e97c5207ccd1be3bc",
+    "bound-signal": "42f59417387ea8cfe1d802182d4721b3b9153ec6ad1f8aecc9f23ac33c97b8d1",
+    "forecast-bundle": "6189c628c6442e242b93f1b03dd04ef5f00c532a4f932ba4966633abe048a91d",
+    "graph": "d328f002835aa85f31c091368893917f42f6e85537c2c3a3cd00c0ab342a8a7e",
+    "intervention": "3b08c53a76cfa35c907ecc75e5564dc5f79d762dc8405c9e5927d11d6588c518",
+    "observation": "ec42ccb7a3710655c4fa96bcfc3749a0bdd1e68b1626aa6c00a5a19c1ce54b4b",
+    "priced-impact": "b99248089e42963484cb5718aaf3fd4c05aadf14fb8178beae59302b7ba6af44",
+    "priced-option-set": "0fb93f999e31a17fe015bd34652706f289db851dcd6eb536d54c767e17ada1c5",
+    "propagation": "bb899c8531e2caf2c76b95a7df84111c5818eae1e1d1b717f3a3c1fd8b8476e5",
+    "rewound-model": "2872d65be907b5f1edee06399647d6c77dffa82a72f8f3d1286cf1d7796be793",
+    "scenario-exposure": "09e840175a456bddaa9a24b64d0ad4a96fdc8813ccffdd9b59b777fc793718bb",
+    "score-card": "5d96823df1140ecaad836443f8fafd65a899a7cbc524ad9be8d8c9c7e87a5e0d"
+  },
+  "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
+  "tool_version": "0.1.0"
+}

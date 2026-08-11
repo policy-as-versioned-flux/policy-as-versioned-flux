@@ -1,0 +1,33 @@
+# The role register (build ticket 11).
+#
+# A signature binds to a **role**, never to a named individual. Accountability still attaches —
+# somebody holds the role — but the artefact does not create a personal target, which is the
+# whole point of decision ticket 15's treatment of the people in the model.
+#
+# Versioned: a signature records the version and the digest of the register it was made against,
+# so a role that was later renamed, split or withdrawn does not silently change what an old
+# signature meant. Bump `version` in the same commit as any change to `roles`.
+schema: twin.roles/v1
+version: 2
+roles:
+  - id: model-steward
+    accountable_for: >-
+      The contents of a model repository: which components exist, how they are positioned, and
+      which claims are committed against them.
+  - id: worksheet-author
+    accountable_for: >-
+      The hand-computed numbers in a golden worksheet. The one place in this system where a
+      human number is the authority rather than a derived one (build ticket 15).
+  - id: constraint-owner
+    accountable_for: >-
+      A perspective's red lines and the universal floor it may not override. Lands with build
+      ticket 26; the role is registered ahead of it so the register does not change under a
+      signature made in between.
+  - id: challenger
+    accountable_for: >-
+      A challenge raised against a specific claim in a specific artefact (build ticket 60) — that
+      the claim named is the one disputed, and the reason given is theirs.
+  - id: challenge-resolver
+    accountable_for: >-
+      A resolution recorded against a challenge — that the same claim the challenge named has been
+      addressed, not a different, more comfortable one.
