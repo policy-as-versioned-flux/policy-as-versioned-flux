@@ -1,1 +1,17 @@
 research/repos/
+estate/**/.work/
+
+# The Flux drift probe's own output (build ticket 64). Machine-local measurement, appended
+# hourly; the window that governs it is committed, and the guard that checks the window was
+# declared up front reads git history for the *window*, never for these.
+estate/driftwood/drift/samples.jsonl
+estate/driftwood/drift/probe.log
+
+# Added by ggshield
+.cache_ggshield
+
+# twin: dev environment, python bytecode and pytest scratch
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
