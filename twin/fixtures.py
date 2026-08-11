@@ -2778,3 +2778,282 @@ def build_sanofi_org(dest: str | Path) -> Path:
     git(root, "add", "-A")
     git(root, "commit", "-q", "-m", "the answer key", dated="2019-12-11T00:00:00+00:00")
     return root
+
+
+# -- The twin inside the twin (build ticket 63, decision ticket 10) --------------------------
+#
+# The twin as an ordinary component set in its own graph, depth-1 bounded, plus the risk decision
+# ticket 10 names about the twin as authority: corporate prediction markets at Google and Ford beat
+# their own experts by up to a 25% MSE reduction and were killed anyway — by manager incentives and
+# information control, not by being wrong (Cowgill & Zitzewitz 2015). Accuracy does not save an
+# instrument, and this fixture prices that risk rather than noting it.
+#
+# The world layer names no tenant, as every other fixture's does: the proposition is about "a
+# decision-support instrument" in general, and only the overlay says which one.
+TWIN_SELF_ORG = "twin-self"
+
+_TWIN_SELF_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/a-decision-support-tool-is-curtailed-despite-accuracy.yaml": """\
+id: a-decision-support-tool-is-curtailed-despite-accuracy
+text: >-
+  A decision-support instrument that measurably improves on the expert judgement it augments has
+  its use curtailed, or is decommissioned outright, by its own sponsoring organisation within its
+  first years of operation, for reasons other than its forecast accuracy.
+resolves_on: '2028-08-11'
+""",
+}
+
+_TWIN_SELF_OVERLAY: dict[str, str] = {
+    # Depth-1 bounded (decision ticket 10, Q1): the twin appears here as an ordinary component,
+    # and this file does not model a further twin modelling this twin. No schema slot exists for
+    # that second layer at all — there is nowhere to put it, which is the structural half of the
+    # bound. The other half, the graph-traversal half, is the two-edge cycle below.
+    "orgs/twin-self/components/the-twin-model.yaml": """\
+id: the-twin-model
+name: The twin's own forecasting and pricing engine
+kind: capability
+evolution: custom-built
+evolution_position: 0.35
+visibility: 0.2
+description: >-
+  The analytical engine this repository's own tool implements: sensing, propagation, pricing and
+  scoring. It appears here as components and its risks are priced (decision ticket 10, Q1) — it
+  does not model a further "twin modelling this twin" as a further layer.
+""",
+    "orgs/twin-self/components/the-twin-adoption.yaml": """\
+id: the-twin-adoption
+name: The sponsoring organisation's continued use of the twin's output in real decisions
+kind: practice
+evolution: genesis
+evolution_position: 0.1
+visibility: 0.5
+description: >-
+  Not the software. Whether a decision-maker actually cites the twin's output when a decision is
+  made — the practice corporate prediction markets at Google and Ford also depended on, and lost.
+""",
+    "orgs/twin-self/people/the-twin-maintainer.yaml": """\
+id: the-twin-maintainer
+role: sole maintainer of the-twin-model
+""",
+    "orgs/twin-self/edges/maintainer-maintains-the-model.yaml": """\
+id: maintainer-maintains-the-model
+type: maintains
+from: the-twin-maintainer
+to: the-twin-model
+note: >-
+  One name. Bus factor 1 from the day this component exists (decision ticket 10, Q1) — "the twin
+  becomes the org's biggest new bus-factor-1 risk" — computed by twin/model.py's own bus_factor(),
+  the identical mechanism any other component's holder count uses.
+""",
+    # The self-referential cycle the depth bound is checked against. `accuracy-earns-continued-
+    # adoption` is Cowgill & Zitzewitz's own finding (repeated across three organisations, grade
+    # 2); `adoption-sustains-the-model` is an ordinary resourcing dependency, not the reflexivity
+    # decision ticket 10, Q4 defers (which is about the twin's *sensing* of its own effect on the
+    # world it measures, not about a graph edge). Together they close a two-node cycle:
+    # `twin propagate --origin the-twin-model` reaches `the-twin-adoption`, and the return edge
+    # back to `the-twin-model` is cut — traversed once, not recursed — by the identical simple-
+    # path rule build ticket 21 gave every cycle in the causal layer (twin/propagate.py), applied
+    # here to the twin's own self-reference for the first time.
+    "orgs/twin-self/edges/accuracy-earns-continued-adoption.yaml": """\
+id: accuracy-earns-continued-adoption
+type: influences
+from: the-twin-model
+to: the-twin-adoption
+sign: positive
+lag_days: 90
+elasticity:
+  min: 0.1
+  mode: 0.3
+  max: 0.5
+evidence_grade: 2
+confidence: 0.5
+note: >-
+  Cowgill & Zitzewitz (2015) find the same relationship — an efficient internal market — repeated
+  across three organisations in one peer-reviewed study: repeated historical co-movement, grade 2,
+  may price. The paper's own headline finding is that this edge alone did not save any of the
+  three; see the world model's own note.
+""",
+    "orgs/twin-self/edges/adoption-sustains-the-model.yaml": """\
+id: adoption-sustains-the-model
+type: influences
+from: the-twin-adoption
+to: the-twin-model
+sign: positive
+lag_days: 30
+elasticity:
+  min: 0.2
+  mode: 0.4
+  max: 0.6
+evidence_grade: 3
+confidence: 0.4
+note: >-
+  An ordinary resourcing loop — continued sponsorship is what funds the maintainer's time and the
+  compute this component needs to keep running — not the reflexivity decision ticket 10, Q4 defers
+  (the twin sensing its own effect on the world it measures). Domain judgement, not a relationship
+  measured in this organisation, so grade 3: it may not price, and its only job here is to close
+  the cycle with the edge above.
+""",
+    "orgs/twin-self/world_models/documented-corporate-prediction-market-pattern.yaml": """\
+id: documented-corporate-prediction-market-pattern
+name: The documented cross-firm pattern for internal decision-support markets
+credence: 0.6
+note: >-
+  Cowgill & Zitzewitz (2015), "Corporate Prediction Markets: Evidence from Google, Ford, and Firm
+  X", Review of Economic Studies 82(4):1309
+  (https://academic.oup.com/restud/article-abstract/82/4/1309/2607345): markets were relatively
+  efficient at all three firms, improving on incumbent expert forecasts by up to a 25% reduction in
+  mean-squared error. Accuracy was never the reported failure mode. Google's own published history
+  (Asterisk, "The Death and Life of Prediction Markets at Google",
+  https://asteriskmag.com/issues/08/the-death-and-life-of-prediction-markets-at-google) names the
+  proximate causes as sponsor departure and a regulatory dead end for the first market, and — on
+  its successor, the supply-chain forecasting market Gleangen — a manager-incentive gap: managers
+  "didn't stand to benefit much even if [it] did improve the final accuracy." Manager incentives
+  and information control killed an instrument that was working, which is exactly the risk this
+  world model prices rather than notes.
+beliefs:
+  a-decision-support-tool-is-curtailed-despite-accuracy: 0.55
+""",
+    "orgs/twin-self/signals/cowgill-zitzewitz-2015-corporate-prediction-markets.yaml": """\
+id: cowgill-zitzewitz-2015-corporate-prediction-markets
+date: '2015-10-01'
+steep: economic
+source: >-
+  Cowgill & Zitzewitz (2015), "Corporate Prediction Markets: Evidence from Google, Ford, and Firm
+  X", Review of Economic Studies 82(4):1309. Issue-level date (Vol 82, Issue 4); the source does
+  not publish a day-level date and none is asserted here.
+statement: >-
+  A peer-reviewed study of three corporate internal prediction markets, including Google and Ford,
+  finds each was relatively efficient — improving on incumbent expert forecasts by up to a 25%
+  reduction in mean-squared error — and that all three were nonetheless later shut down or
+  curtailed, for reasons the study and Google's own published account attribute to sponsor
+  departure, regulatory obstacles and manager incentives, not to forecast inaccuracy.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://academic.oup.com/restud/article-abstract/82/4/1309/2607345
+""",
+    "orgs/twin-self/claims/bind-cowgill-zitzewitz-2015-corporate-prediction-markets.yaml": """\
+id: bind-cowgill-zitzewitz-2015-corporate-prediction-markets
+kind: binding
+signal: cowgill-zitzewitz-2015-corporate-prediction-markets
+component: the-twin-adoption
+evidence_grade: 2
+claimed_by: fixture-author (human)
+evidence: >-
+  The same relationship — an efficient internal market, killed by incentives rather than accuracy
+  — observed moving together across three organisations in one peer-reviewed study: repeated
+  historical co-movement, evidence-ladder.yaml grade 2, may price.
+""",
+    "orgs/twin-self/scenarios/adoption-risk-2026.yaml": """\
+id: adoption-risk-2026
+question: >-
+  Does this organisation curtail or end its use of the twin's output within the next two years,
+  for reasons other than its forecast accuracy?
+proposition: a-decision-support-tool-is-curtailed-despite-accuracy
+at: '2026-08-11'
+horizon: '2028-08-11'
+components:
+  - the-twin-model
+  - the-twin-adoption
+world_models:
+  - documented-corporate-prediction-market-pattern
+""",
+    "orgs/twin-self/perspectives/the-twin-sponsor.yaml": """\
+id: the-twin-sponsor
+name: The organisation sponsoring the twin's continued operation
+party: employer
+pays: The organisation that funds the twin's maintainer time and compute.
+cash_flow:
+  - the-twin-adoption
+values:
+  the-twin-adoption:
+    amount: 500000
+    evidence_grade: 2
+    basis: >-
+      The comparative, one-currency analysis this instrument alone produces across an HR lever and
+      a security control, approximated from the cost of the manual, per-domain analysis it would
+      otherwise take to reproduce even one flagship comparison.
+ruin:
+  loss-of-the-only-cross-domain-comparison: >-
+    Any option carrying a real chance the organisation loses continued access to a one-currency
+    comparison across domains it has no other way to produce.
+""",
+    # Two candidate responses, both costed and neither backed by strong-enough evidence to earn
+    # mitigation credit — an honest finding, not a gap: "accuracy does not save an instrument" and
+    # nor, on the evidence actually cited, does a plausible-sounding governance fix.
+    "orgs/twin-self/responses/fund-it-as-a-standing-product-not-a-side-project.yaml": """\
+id: fund-it-as-a-standing-product-not-a-side-project
+name: Fund it as a standing product with a named owner, not a side project
+addresses: the-twin-adoption
+cost:
+  min: 15000
+  mode: 60000
+  max: 165000
+mitigates:
+  component: the-twin-adoption
+  reduction:
+    min: 0.05
+    mode: 0.15
+    max: 0.3
+  evidence_grade: 3
+  basis: >-
+    Cowgill's own retrospective on Prophit's closure ("I regret that we shut down Prophit. We
+    should have treated the internal instance as a product in its own right, not as a stepping
+    stone") — a domain judgement from one documented case, not a relationship measured across
+    organisations, so it may not price (evidence-ladder.yaml grade 3).
+note: Crosses nothing, so it survives the pre-filter and is costed.
+""",
+    "orgs/twin-self/responses/publish-full-method-and-content-transparency.yaml": """\
+id: publish-full-method-and-content-transparency
+name: Publish full method-and-content transparency to every stakeholder, not only sponsors
+addresses: the-twin-model
+cost:
+  min: 5000
+  mode: 15000
+  max: 40000
+mitigates:
+  component: the-twin-adoption
+  reduction:
+    min: 0.05
+    mode: 0.1
+    max: 0.2
+  evidence_grade: 3
+  basis: >-
+    Reasoned by analogy with decision ticket 10, Q2's own transparency choice, not measured
+    against this literature directly — a domain judgement, not a repeated co-movement, so it may
+    not price (evidence-ladder.yaml grade 3).
+note: Crosses nothing, so it survives the pre-filter and is costed.
+""",
+}
+
+
+def build_twin_self_org(dest: str | Path) -> Path:
+    """The twin inside the twin (build ticket 63): the twin as an ordinary, depth-1-bounded
+    component set in its own graph, with adoption modelled as a priced scenario rather than a
+    note, and the Google/Ford evidence cited in the scenario's basis (decision ticket 10).
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _TWIN_SELF_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2026-08-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/twin-self/meta.yaml": (
+            f"id: {TWIN_SELF_ORG}\nunit: overlay\norg: {TWIN_SELF_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _TWIN_SELF_OVERLAY)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the twin as a component in its own graph, and the adoption scenario",
+        dated="2026-08-11T00:00:00+00:00")
+    return root

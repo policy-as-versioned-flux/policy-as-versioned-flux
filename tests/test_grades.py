@@ -96,7 +96,7 @@ def test_the_shipped_capabilities_are_all_partial_or_stub(caps: Capabilities) ->
     grades = {g.capability: g.grade for g in caps}
     assert set(grades) == {
         "causal-layer", "currency-regimes", "domain-model", "honest-build", "provenance",
-        "scenario-engine", "sense-move",
+        "scenario-engine", "sense-move", "twin-inside-twin",
     }
     assert "full" not in grades.values()
 
