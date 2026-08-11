@@ -1,15 +1,17 @@
 # `twin`
 
-Build tickets 01–22, 26–31, 35 and 36 of `.scratch/twin/`, plus 23 at `partial` and 64
-instrumented and measuring. One dated signal binds to a
+Build tickets 01–38, 42, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
+measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 30 of 77 build tickets closed, one part-built, and one measuring against a clock that runs
-to 2026-11-06.** What is not built is listed below and, more usefully, is named
-inside every artefact the tool emits.
+**This is 41 of 77 build tickets closed, and one measuring against a clock that runs
+to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
+established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
+has been authored through it (see "Flux drift", below). What is not built is listed below and,
+more usefully, is named inside every artefact the tool emits.
 
 ## Run it
 
@@ -805,6 +807,21 @@ this ticket does not touch. The table above also folds in build ticket 37's unto
 (`scenario-engine` AC 2) — found while re-deriving this section's numbers from `./bin/twin grade`
 rather than hand-editing them forward, which is the more honest way to have done this from the
 start.
+
+**Build ticket 34's coherence audit found that seven build tickets (25, 32, 37, 38, 42, 60 and 62)
+had real, tested, committed code and no closed ticket file.** The commit that built them (`ace64f8`)
+never came back to set their `Status:` line to `done` or check off their acceptance criteria, so
+`.scratch/twin/build/` disagreed with what `twin/`, `tests/` and this file already said was true —
+and this file's own opening banner ("30 of 77 build tickets closed") was stale for the same reason,
+missing tickets 24, 25, 32, 33, 37, 38, 42, 60 and 62 entirely — and separately undercounting
+ticket 23, whose own checklist was already closed but which the old banner carved out as "at
+`partial`" rather than counting. Both are fixed here: the seven ticket files are closed against
+the evidence that already existed for them (none tick a new capability criterion — `./bin/twin
+grade`'s arithmetic does not move), and the banner now reads 41 of 77 — the old 30, plus the nine
+tickets named above, plus ticket 23's correction, plus ticket 34 itself, closing. Named as the
+finding it is rather than silently corrected, per this ticket's own brief:
+"if integration problems are found here rather than confirmed absent, the plan has failed its own
+early-detection brief."
 
 Several criteria were considered and left unticked, on the same ground five were withdrawn on in
 earlier rounds — each rested on **one clause of a multi-clause criterion**, or on machinery that
