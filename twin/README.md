@@ -1,13 +1,13 @@
 # `twin`
 
-Build tickets 01–38, 42, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
+Build tickets 01–39, 42, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
 measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 41 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 42 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -353,6 +353,26 @@ The world layer's proposition is deliberately generic (`contractor-enters-insolv
 the same way netflix's own proposition never says "Netflix": `world_never_references_overlay`
 refuses a component or world model that names the tenant, so Carillion's name lives only in the
 `carillion` overlay, where a tenant is expected to appear.
+
+## Two further keys, and one honest notoriety finding
+
+`fixtures.build_nmc_health_org()` and `fixtures.build_wirecard_org()` (build ticket 39) add two
+more real, dated, publicly documented backtest keys, to the same contract Carillion's does, so
+Carillion alone does not carry the falsifiability claim. Ticket 39's own AC asked for the
+low-notoriety claim to be **evidenced, not asserted** — and evidencing it produced a finding
+rather than a rubber stamp. NMC Health earns `contamination: low` on Carillion's footing:
+specialist financial-press coverage only, no book, no documentary. Wirecard does not — a
+bestselling book, a Netflix documentary and mainstream coverage the size of Enron's earn it
+`contamination: high` instead of spec story 45's shorthand grouping of all three as
+"low-notoriety". `CONTAMINATION` (`twin/schema.py`) already reserved that value; build ticket 40's
+Enron-versus-obscure gap should draw its "obscure" leg from Carillion or NMC Health, not Wirecard.
+
+Sourcing NMC Health's key cost more than the diff shows: most real, on-topic citations for it —
+including the FCA's own Final Notice — name the company with the hyphenated slug `nmc-health`,
+which `no_special_category_slot` refuses everywhere a string is scanned, deliberately and by
+design (the word "health" is an Article 9 category, context-free — "a false positive costs an
+author one rename"). The org id became `nmc`; two citations were swapped for real alternative
+coverage of the identical facts. No signal was weakened or dropped to work around it.
 
 ## Believed, rival, revealed — and no privileged map
 

@@ -142,7 +142,7 @@ for machine-enforceable controls and as the substrate proving a control is in fo
 ### Falsifiability and scoring
 
 44. As a **sceptic**, I want forecasts scored by proper scoring rules with reliability diagrams over volume, so that calibration is a measured property rather than a claim.
-45. As a **sceptic**, I want backtests run against **low-notoriety** answer keys (Carillion primary, NMC Health, Wirecard), so that success is not explicable by fame.
+45. As a **sceptic**, I want backtests run against **low-notoriety** answer keys (Carillion primary, NMC Health, Wirecard), so that success is not explicable by fame. *(Build ticket 39 finding: Wirecard does not meet this bar — a bestselling book and a Netflix documentary put it on a level with Enron — so it is built and scored as a second contamination `high` case instead, alongside Enron at build ticket 40; Carillion and NMC Health are this story's actual low-notoriety pair.)*
 46. As a **sceptic**, I want **Enron carried as a contamination control** and a measured memorisation-leakage discount applied to every backtest score, so that the contamination threat is quantified rather than acknowledged.
 47. As a **sceptic**, I want **hindsight-resistance controls** — cases where the contemporaneous record contradicts the canonical story — so that confident agreement with the canonical story functions as a **memorisation detector**.
 48. As a **sceptic**, I want a **co-registered forecast book**: blind forecasts on the same questions, timestamps and resolutions as liquid prediction markets, so that there exists at least one external gate that contamination cannot reach.

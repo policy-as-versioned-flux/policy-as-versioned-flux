@@ -1687,3 +1687,471 @@ def build_carillion_org(dest: str | Path) -> Path:
     git(root, "add", "-A")
     git(root, "commit", "-q", "-m", "the answer key, citing HC 769", dated="2018-05-17T00:00:00+00:00")
     return root
+
+
+# -- NMC Health and Wirecard: two further low-notoriety keys (build ticket 39, decision ticket
+# 19, spec story 45) -------------------------------------------------------------------------
+#
+# Two more real, dated, adversarially-sourced backtest keys, so Carillion alone does not carry
+# the falsifiability claim. Each is built to the identical contract as `build_carillion_org`: an
+# isolated repository, commits dated to match the real timeline, every signal a real publicly
+# documented fact cited by URL, the post-collapse adversarial finding cited only on the outcome.
+#
+# Ticket 39's AC ("notoriety assessed and recorded per case, so the low-notoriety claim is
+# evidenced rather than asserted") produced a finding rather than a rubber stamp. NMC Health
+# earns `contamination: low` on the same basis Carillion does: specialist financial-press
+# coverage, no book, no documentary, no name recognition outside finance and UK-listed
+# healthcare. Wirecard does not — it is the subject of a bestselling book (Dan McCrum's "Money
+# Men"), a Netflix documentary ("Skandal!", 2022) and sustained mainstream coverage the size of
+# Enron's, so `contamination: high` records that honestly rather than inherit the spec story's
+# shorthand grouping of all three as "low-notoriety". `CONTAMINATION` (twin/schema.py) already
+# reserves exactly this value for exactly this case; only `low` and `control` had a fixture
+# claiming them before this ticket. Consequence for build ticket 40: its Enron-versus-obscure gap
+# should draw its "obscure" leg from Carillion or NMC Health, not Wirecard.
+
+_INSOLVENCY_PROPOSITION: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/the-subject-enters-formal-insolvency-proceedings-by-2020.yaml": """\
+id: the-subject-enters-formal-insolvency-proceedings-by-2020
+text: >-
+  The subject enters administration, insolvency proceedings or an equivalent formal process
+  before the end of 2020.
+resolves_on: '2020-12-31'
+""",
+}
+
+# -- NMC Health ---------------------------------------------------------------------------------
+
+NMC_ORG = "nmc"
+
+_NMC_BASE: dict[str, str] = {
+    "orgs/nmc/components/uk-listed-hospital-group.yaml": """\
+id: uk-listed-hospital-group
+name: The subject's UK-listed hospital operations
+kind: activity
+evolution: product
+visibility: 0.5
+""",
+    "orgs/nmc/world_models/market-consensus-2019.yaml": """\
+id: market-consensus-2019
+name: Market consensus, pre-crisis
+credence: 0.6
+note: >-
+  A low prior, deliberately — the subject was a FTSE 100 constituent and a going concern by every
+  public account until the report below. The point of a low-notoriety key is that the twin has to
+  earn a higher belief from the signals below, not start from one.
+beliefs:
+  the-subject-enters-formal-insolvency-proceedings-by-2020: 0.03
+""",
+    "orgs/nmc/scenarios/would-the-twin-have-flagged-it.yaml": """\
+id: would-the-twin-have-flagged-it
+question: >-
+  As of the short-seller's report, would the twin already have had grounds to flag the subject's
+  UK-listed hospital operations?
+proposition: the-subject-enters-formal-insolvency-proceedings-by-2020
+at: '2019-12-17'
+horizon: '2020-12-31'
+components:
+  - uk-listed-hospital-group
+world_models:
+  - market-consensus-2019
+""",
+}
+
+_NMC_MUDDY_WATERS: dict[str, str] = {
+    "orgs/nmc/signals/muddy-waters-report-2019-12-17.yaml": """\
+id: muddy-waters-report-2019-12-17
+date: '2019-12-17'
+steep: economic
+source: Muddy Waters Capital LLC research report, 2019-12-17
+statement: >-
+  A capital-backed short-seller publishes a dated research report alleging inflated asset
+  purchase prices, an overstated cash balance and understated group debt, and discloses a short
+  position in the subject.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://muddywatersresearch.com/research/nmc/mw-is-short-nmc/
+""",
+}
+
+_NMC_TRADING_SUSPENDED: dict[str, str] = {
+    "orgs/nmc/signals/trading-suspended-2020-02-27.yaml": """\
+id: trading-suspended-2020-02-27
+date: '2020-02-27'
+steep: economic
+source: Financial press, 2020-02-27
+statement: >-
+  Trading in the subject's shares is suspended on the London Stock Exchange, the night after the
+  chief executive is dismissed, the treasury team is suspended and the chief financial officer is
+  granted an extended leave of absence.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://gulfnews.com/business/markets/uae-hospital-operator-nmcs-shares-to-be-temporarily-suspended-1.70003164
+""",
+}
+
+_NMC_DEBT_5BN: dict[str, str] = {
+    "orgs/nmc/signals/debt-revised-5bn-2020-03-10.yaml": """\
+id: debt-revised-5bn-2020-03-10
+date: '2020-03-10'
+steep: economic
+source: Company trading update, 2020-03-10
+statement: >-
+  The subject discloses that group debt is materially above the previously reported figure, at
+  approximately USD 5 billion against USD 2.1 billion last reported, and that over USD 2.7
+  billion of facilities were not previously disclosed to or approved by the board.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://accountancyage.com/2020/03/11/nmc-healths-debt-soars/
+""",
+}
+
+_NMC_DEBT_6_6BN: dict[str, str] = {
+    "orgs/nmc/signals/debt-revised-6-6bn-2020-03-24.yaml": """\
+id: debt-revised-6-6bn-2020-03-24
+date: '2020-03-24'
+steep: economic
+source: Company disclosure via the London Stock Exchange, 2020-03-24
+statement: >-
+  The subject discloses group debt now estimated at approximately USD 6.6 billion, comprised of
+  over 75 debt facilities from over 80 financial institutions; the chief financial officer
+  resigns with immediate effect.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://gulfnews.com/business/banking/66-billion---nmc-healths-total-debt-as-of-now-1.1585044949682
+""",
+}
+
+_NMC_ADMINISTRATION: dict[str, str] = {
+    "orgs/nmc/signals/administrators-appointed-2020-04-09.yaml": """\
+id: administrators-appointed-2020-04-09
+date: '2020-04-09'
+steep: economic
+source: Company announcement, 2020-04-09
+statement: >-
+  The High Court of England and Wales appoints administrators to the subject's UK holding
+  company following a creditor petition.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.businesswire.com/news/home/20200409005840/en/
+""",
+}
+
+
+def _nmc_claim(signal_id: str) -> dict[str, str]:
+    """One claim binding `signal_id` to the single component this key exercises. Grade 1
+    ("dated natural experiment" — twin/evidence-ladder.yaml): every signal is a dated,
+    observable event with data on both sides of it, not a model assertion."""
+    return {
+        f"orgs/nmc/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: uk-listed-hospital-group
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "The signal is a dated, publicly documented event about this business; the citation is on the signal itself."
+"""
+    }
+
+
+_NMC_OUTCOME: dict[str, str] = {
+    "orgs/nmc/outcomes/nmc-administration-resolved.yaml": """\
+id: nmc-administration-resolved
+proposition: the-subject-enters-formal-insolvency-proceedings-by-2020
+observed: true
+resolved_on: '2020-04-09'
+source: >-
+  FCA Final Notice to the subject (in administration), 17 November 2023, censuring it for market
+  abuse: misleading the market about its level of indebtedness and failing to declare
+  related-party transactions between 7 March 2019 and 27 February 2020
+  (https://healthcareandprotection.com/fca-censures-healthcare-operator-nmc-for-misleading-market-about-debt/).
+contamination: low
+source_dated: true
+note: >-
+  Notoriety assessed, not asserted (build ticket 39): specialist financial and healthcare-trade
+  press covered this collapse; it carries no book, no documentary and no household-name
+  recognition, the same footing as Carillion. The FCA Final Notice is cited here, on the outcome,
+  and nowhere on a signal above — it is published more than three years after resolution and
+  using it to date a signal would let hindsight into ground truth that is supposed to be
+  contemporaneous.
+""",
+}
+
+
+def build_nmc_health_org(dest: str | Path) -> Path:
+    """The second low-notoriety backtest key (build ticket 39): real, dated, publicly
+    documented signals culminating in administration, with commit history that spans the real
+    2019-2020 timeline so a real rewind has something to read."""
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _INSOLVENCY_PROPOSITION)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2019-11-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/nmc/meta.yaml": (
+            f"id: {NMC_ORG}\nunit: overlay\norg: {NMC_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _NMC_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the short report",
+        dated="2019-11-15T00:00:00+00:00")
+
+    for signal_id, files, message, dated in (
+        ("muddy-waters-report-2019-12-17", _NMC_MUDDY_WATERS, "a capital-backed short report",
+         "2019-12-17T09:00:00+00:00"),
+        ("trading-suspended-2020-02-27", _NMC_TRADING_SUSPENDED, "trading suspended",
+         "2020-02-27T09:00:00+00:00"),
+        ("debt-revised-5bn-2020-03-10", _NMC_DEBT_5BN, "debt revised to ~$5bn",
+         "2020-03-10T09:00:00+00:00"),
+        ("debt-revised-6-6bn-2020-03-24", _NMC_DEBT_6_6BN, "debt revised to ~$6.6bn",
+         "2020-03-24T09:00:00+00:00"),
+        ("administrators-appointed-2020-04-09", _NMC_ADMINISTRATION, "administrators appointed",
+         "2020-04-09T09:00:00+00:00"),
+    ):
+        _write(root, {**files, **_nmc_claim(signal_id)})
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", message, dated=dated)
+
+    _write(root, _NMC_OUTCOME)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the answer key, citing the 2023 FCA Final Notice",
+        dated="2023-11-18T00:00:00+00:00")
+    return root
+
+
+# -- Wirecard -------------------------------------------------------------------------------
+
+WIRECARD_ORG = "wirecard"
+
+_WIRECARD_BASE: dict[str, str] = {
+    "orgs/wirecard/components/third-party-acquiring-business.yaml": """\
+id: third-party-acquiring-business
+name: The subject's third-party payment-acquiring business
+kind: activity
+evolution: product
+visibility: 0.6
+""",
+    "orgs/wirecard/world_models/market-consensus-2016.yaml": """\
+id: market-consensus-2016
+name: Market consensus, pre-crisis
+credence: 0.6
+note: >-
+  A low prior at the scenario's own start date, before the mainstream coverage that later made
+  this subject famous — the point ticket 39's notoriety assessment names honestly: this fixture
+  earns `contamination: high`, not `low`, because that fame arrived well before resolution.
+beliefs:
+  the-subject-enters-formal-insolvency-proceedings-by-2020: 0.03
+""",
+    "orgs/wirecard/scenarios/would-the-twin-have-flagged-it.yaml": """\
+id: would-the-twin-have-flagged-it
+question: >-
+  As of the first anonymous fraud dossier, would the twin already have had grounds to flag the
+  subject's third-party acquiring business?
+proposition: the-subject-enters-formal-insolvency-proceedings-by-2020
+at: '2016-02-24'
+horizon: '2020-12-31'
+components:
+  - third-party-acquiring-business
+world_models:
+  - market-consensus-2016
+""",
+}
+
+_WIRECARD_ZATARRA: dict[str, str] = {
+    "orgs/wirecard/signals/zatarra-report-2016-02-24.yaml": """\
+id: zatarra-report-2016-02-24
+date: '2016-02-24'
+steep: economic
+source: Contemporaneous commentary on the anonymous Zatarra Research & Investigations dossier
+statement: >-
+  An anonymous 100-page dossier alleges money laundering and accounting irregularities tied to
+  the subject's Asian operations; the subject's shares fall sharply intraday before recovering
+  most of the loss on the CEO's denial.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://brontecapital.blogspot.com/2016/02/the-amazing-zatarra-research-piece-on.html
+""",
+}
+
+_WIRECARD_FT_INVESTIGATION: dict[str, str] = {
+    "orgs/wirecard/signals/ft-investigation-2019-01-30.yaml": """\
+id: ft-investigation-2019-01-30
+date: '2019-01-30'
+steep: economic
+source: Press coverage of the Financial Times investigation, 2019-01-30
+statement: >-
+  A Financial Times investigation, drawing on internal whistleblower documents, alleges forged
+  and backdated contracts in a string of suspicious transactions in the subject's Asia-Pacific
+  business.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://pressgazette.co.uk/news/ft-wirecard-investigation-dan-mccrum/
+""",
+}
+
+_WIRECARD_BAFIN_BAN: dict[str, str] = {
+    "orgs/wirecard/signals/bafin-short-selling-ban-2019-02-18.yaml": """\
+id: bafin-short-selling-ban-2019-02-18
+date: '2019-02-18'
+steep: political
+source: BaFin General Administrative Act, 2019-02-18
+statement: >-
+  Germany's federal financial regulator bans, with immediate effect, the establishment or
+  increase of net short positions in the subject's shares — its first-ever single-firm short
+  ban, and a dated, official record that the subject's accounts were under public dispute.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.bafin.de/SharedDocs/Veroeffentlichungen/EN/Meldung/2019/meldung_190218_Allg_Vfg_Wirecard_Verbot_Leerverkaufspositionen_en.html
+""",
+}
+
+_WIRECARD_KPMG: dict[str, str] = {
+    "orgs/wirecard/signals/kpmg-special-audit-2020-04-28.yaml": """\
+id: kpmg-special-audit-2020-04-28
+date: '2020-04-28'
+steep: economic
+source: KPMG special audit report, delivered 2020-04-27, disclosed 2020-04-28
+statement: >-
+  A special audit commissioned in response to the press allegations reports that KPMG could not
+  verify the majority of the third-party acquiring business's reported sales revenue and
+  customer relationships for 2016-2018.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://wirecard.com/wp-content/uploads/2021/01/AH_2020_04_28_KPMG-report.pdf
+""",
+}
+
+_WIRECARD_EY_REFUSAL: dict[str, str] = {
+    "orgs/wirecard/signals/ey-refuses-signoff-2020-06-18.yaml": """\
+id: ey-refuses-signoff-2020-06-18
+date: '2020-06-18'
+steep: economic
+source: Auditor statement reported in financial press, 2020-06-18
+statement: >-
+  The subject's auditor declines to sign off the prior year's accounts, stating it cannot find
+  sufficient evidence for EUR 1.9 billion of cash reported on trust accounts, around a quarter of
+  the balance sheet; the subject notes indications the confirming balances may have been
+  falsified.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.proactiveinvestors.co.uk/companies/news/922230/wirecard-rocked-as-auditor-ey-refuses-to-sign-off-accounts-over-missing-cash-922230.html
+""",
+}
+
+_WIRECARD_INSOLVENCY: dict[str, str] = {
+    "orgs/wirecard/signals/insolvency-filed-2020-06-25.yaml": """\
+id: insolvency-filed-2020-06-25
+date: '2020-06-25'
+steep: economic
+source: Company disclosure under EU Market Abuse Regulation Article 17, 2020-06-25
+statement: >-
+  The management board files an application for the opening of insolvency proceedings with the
+  district court of Munich, citing impending insolvency and over-indebtedness.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://wirecard.com/2020/06/25/wirecard-ag-application-for-opening-of-insolvency-proceedings/
+""",
+}
+
+
+def _wirecard_claim(signal_id: str) -> dict[str, str]:
+    """One claim binding `signal_id` to the single component this key exercises. Grade 1
+    ("dated natural experiment" — twin/evidence-ladder.yaml): every signal is a dated,
+    observable event with data on both sides of it, not a model assertion."""
+    return {
+        f"orgs/wirecard/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: third-party-acquiring-business
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "The signal is a dated, publicly documented event about this business; the citation is on the signal itself."
+"""
+    }
+
+
+_WIRECARD_OUTCOME: dict[str, str] = {
+    "orgs/wirecard/outcomes/wirecard-insolvency-resolved.yaml": """\
+id: wirecard-insolvency-resolved
+proposition: the-subject-enters-formal-insolvency-proceedings-by-2020
+observed: true
+resolved_on: '2020-06-25'
+source: >-
+  Deutscher Bundestag, final report of the 3rd committee of inquiry ("Wirecard"), published
+  2021-06-22 (https://www.bundestag.de/dokumente/textarchiv/2021/kw25-de-3ua-bericht-847030),
+  and the subject's own insolvency filing of 2020-06-25.
+contamination: high
+source_dated: true
+note: >-
+  Notoriety assessed, not asserted (build ticket 39): honest assessment finds this case is NOT
+  low-notoriety, unlike this ticket's other two answer keys — a bestselling book (Dan McCrum's
+  "Money Men"), a Netflix documentary ("Skandal!", 2022) and sustained mainstream coverage put it
+  on a level with Enron. `contamination: high` records that rather than inherit spec story 45's shorthand
+  grouping of all three cases as "low-notoriety"; build ticket 40's Enron-versus-obscure gap
+  should not draw its "obscure" leg from this fixture. The Bundestag inquiry report is cited only
+  on the outcome, published nearly a year after resolution — never on a signal, the same
+  discipline HC 769 holds for Carillion.
+""",
+}
+
+
+def build_wirecard_org(dest: str | Path) -> Path:
+    """The third low-notoriety-in-name-only backtest key (build ticket 39): real, dated,
+    publicly documented signals culminating in an insolvency filing, with commit history that
+    spans the real 2016-2020 timeline so a real rewind has something to read."""
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _INSOLVENCY_PROPOSITION)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2016-01-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/wirecard/meta.yaml": (
+            f"id: {WIRECARD_ORG}\nunit: overlay\norg: {WIRECARD_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _WIRECARD_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the Zatarra dossier",
+        dated="2016-02-01T00:00:00+00:00")
+
+    for signal_id, files, message, dated in (
+        ("zatarra-report-2016-02-24", _WIRECARD_ZATARRA, "an anonymous fraud dossier",
+         "2016-02-24T09:00:00+00:00"),
+        ("ft-investigation-2019-01-30", _WIRECARD_FT_INVESTIGATION, "a whistleblower-sourced investigation",
+         "2019-01-30T09:00:00+00:00"),
+        ("bafin-short-selling-ban-2019-02-18", _WIRECARD_BAFIN_BAN, "the regulator's short-selling ban",
+         "2019-02-18T09:00:00+00:00"),
+        ("kpmg-special-audit-2020-04-28", _WIRECARD_KPMG, "the special audit report",
+         "2020-04-28T09:00:00+00:00"),
+        ("ey-refuses-signoff-2020-06-18", _WIRECARD_EY_REFUSAL, "the auditor's refusal to sign off",
+         "2020-06-18T09:00:00+00:00"),
+        ("insolvency-filed-2020-06-25", _WIRECARD_INSOLVENCY, "the insolvency filing",
+         "2020-06-25T09:00:00+00:00"),
+    ):
+        _write(root, {**files, **_wirecard_claim(signal_id)})
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", message, dated=dated)
+
+    _write(root, _WIRECARD_OUTCOME)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the answer key, citing the 2021 Bundestag inquiry report",
+        dated="2021-06-23T00:00:00+00:00")
+    return root

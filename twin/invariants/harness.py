@@ -10,11 +10,11 @@ import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any, Callable, Iterator
 
 import yaml
 
-from .. import REPO_DIR
+from .. import REPO_DIR, fixtures
 from ..artefact import Artefact
 from ..grades import Capabilities
 from . import (
@@ -701,6 +701,82 @@ def _carillion_answer_key_is_dated_and_adversarial(ctx: Context) -> str:
         "the post-collapse HC 769; the answer key itself does; commit history spans "
         f"{dates[0].date()}..{dates[-1].date()} monotonically; the world layer names no tenant"
     )
+
+
+# One fixture builder, one hindsight source, one declared contamination class per row — the
+# table a new low-notoriety key adds a row to rather than a new copy of the whole check (build
+# ticket 39). The builder travels with its row rather than being re-derived from the org string,
+# so a third key is one line here and needs no branch anywhere in the check body.
+_FurtherAnswerKey = tuple[str, Callable[[Path], Path], str, str, str]
+_FURTHER_ANSWER_KEYS: tuple[_FurtherAnswerKey, ...] = (
+    ("nmc", fixtures.build_nmc_health_org, "nmc-administration-resolved", "healthcareandprotection.com", "low"),
+    ("wirecard", fixtures.build_wirecard_org, "wirecard-insolvency-resolved", "bundestag.de", "high"),
+)
+
+
+@harness_check("further_answer_keys_are_dated_and_evidenced")
+def _further_answer_keys_are_dated_and_evidenced(ctx: Context) -> str:
+    """The two further low-notoriety keys (build ticket 39, decision ticket 19) hold the same
+    contract `carillion_answer_key_is_dated_and_adversarial` checks for the primary one: every
+    signal is dated and cites a live https source, no signal cites the post-collapse adversarial
+    finding that belongs on the outcome alone, the outcome declares a `contamination` class from
+    the schema's enum, and the fixture's own commit history is monotonically dated.
+
+    Two fixtures, one loop over `_FURTHER_ANSWER_KEYS`, rather than a second near-duplicate check
+    per fixture — the row is what a third low-notoriety key would add.
+    """
+    from ..model import Overlay, check_direction
+    from ..repo import ModelRepo
+
+    reports: list[str] = []
+    for org, builder, outcome_id, hindsight_domain, expected_contamination in _FURTHER_ANSWER_KEYS:
+        repo_dir = ctx.tmp / org
+        if not repo_dir.exists():
+            builder(repo_dir)
+        repo = ModelRepo.open(repo_dir)
+        overlay = Overlay.load(repo, org)
+
+        if len(overlay.signals) < 3:
+            raise Violated(f"the {org} key carries only {len(overlay.signals)} signal(s)")
+        for signal_id, signal in overlay.signals.items():
+            url = signal.get("provenance", {}).get("url", "")
+            if not url.startswith("https://"):
+                raise Violated(f"{org} signal {signal_id!r} carries no https citation")
+            if "example.invalid" in url:
+                raise Violated(f"{org} signal {signal_id!r} carries a placeholder citation, not a real one")
+            if hindsight_domain in url:
+                raise Violated(f"{org} signal {signal_id!r} cites the post-collapse adversarial finding")
+            if not str(signal.get("date", "")).count("-") == 2:
+                raise Violated(f"{org} signal {signal_id!r} carries no dated fact")
+
+        outcome = overlay.outcomes.get(outcome_id)
+        if outcome is None:
+            raise Violated(f"the {org} overlay carries no resolved outcome {outcome_id!r}")
+        if outcome.get("contamination") != expected_contamination:
+            raise Violated(
+                f"the {org} answer key declares contamination={outcome.get('contamination')!r}, "
+                f"not {expected_contamination!r} — the ticket 39 notoriety assessment"
+            )
+        if hindsight_domain not in str(outcome.get("source", "")):
+            raise Violated(f"the {org} answer key's own source does not cite the adversarial finding")
+        if not str(outcome.get("note", "")).strip():
+            raise Violated(f"the {org} answer key carries no notoriety-assessment note")
+
+        violations = check_direction(repo)
+        if violations:
+            raise Violated(f"the world layer references the {org} tenant: {'; '.join(violations)}")
+
+        proc = subprocess.run(
+            ["git", "log", "--format=%cI", "--reverse"], cwd=str(repo_dir),
+            stdout=subprocess.PIPE, check=True,
+        )
+        commit_dates = [datetime.datetime.fromisoformat(line) for line in proc.stdout.decode().splitlines()]
+        if commit_dates != sorted(commit_dates):
+            raise Violated(f"the {org} fixture's commit history is not monotonically dated")
+
+        reports.append(f"{org}: {len(overlay.signals)} signal(s), contamination={expected_contamination}")
+
+    return "; ".join(reports)
 
 
 @harness_check("backtest_is_a_pure_composition")
