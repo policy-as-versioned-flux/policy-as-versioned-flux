@@ -1,13 +1,13 @@
 # `twin`
 
-Build tickets 01–43, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
+Build tickets 01–44, 46, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
 measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 45 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 47 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -35,6 +35,7 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin causal-accounts --repo R --org O --origin X --account A1 --account A2 # rival causal accounts, spread not privilege
 ./bin/twin trade-off --repo R --org O --origin X --perspective P --account A1 --account A2 # net cost of risk per response, across the account ensemble, marked default
 ./bin/twin sweep --repo R [--repo R2 ...]  # every scenario, every org, unconditionally — no --scenario
+./bin/twin gameplay-sweep --repo R [--repo R2 ...] # every org, scanned for gameplay preconditions — opportunity candidates, unconditionally
 ./bin/twin reliability --score-card C1 --score-card C2 # bins over a pooled population, empty bins shown
 ./bin/twin severity --mu M --sigma S --threshold U --xi X --beta B --alpha A # loss-exceedance: VaR beside TVaR
 ./bin/twin severity-anchor --subject data-breach-loss --alpha A # the same curve, fit from cited public quantiles
@@ -1167,7 +1168,7 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
   produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
   sigstore/gitsign, named in `twin/sign.py`.
-- **Seam 3 exists; one of six skills does now, and it is a heuristic stand-in.** `twin/skills.py`
+- **Seam 3 exists; three of six skills do now, and each is a heuristic stand-in.** `twin/skills.py`
   (build ticket 42) is the eval harness: run a skill against a fixture corpus, score it against a
   versioned threshold, record score-over-time per model version, and surface a model upgrade that
   degrades judgement as a regression rather than letting it go silent. It is skill-agnostic by
@@ -1176,9 +1177,17 @@ Named here so the skeleton cannot quietly become the definition of done.
   first real skill through it: a keyword and word-overlap heuristic, not a model call, evaluated
   against the pooled Carillion/NMC/Wirecard/Enron labelled corpus — proven only against `political`
   and `economic` signals, since every committed fixture signal is one of the two, so it makes no
-  claim about `social`, `technological` or `environmental`. Five of the six (`causal-claims`,
-  `evolution-judge`, `substrate-generator`, `gameplay-lens`, `ethics-gate`) still do not exist, so
-  the harness has proven itself against one real subject and nothing yet for the other five.
+  claim about `social`, `technological` or `environmental`. `evolution-judge`
+  (`twin/evolution_judge.py`, build ticket 44) is the second, inferring a component's evolution
+  position from accumulated evidence and pushing back on a human override. `gameplay-lens`
+  (`twin/gameplay_lens.py`, build ticket 46) is the third: a two-play catalogue (`land-grab`,
+  `exploit-commoditisation`) checked against evolution position, dependency structure and
+  ownership, swept unconditionally across every org by `gameplay_lens.sweep()` rather than waiting
+  for a signal to push a candidate forward — the structural counterweight decision ticket 13 Q3
+  names, with the opportunity count reported beside each org's signal count so the counterweight is
+  measurable rather than only claimed. Three of the six (`causal-claims`, `substrate-generator`,
+  `ethics-gate`) still do not exist, so the harness has proven itself against three real subjects
+  and nothing yet for the other three.
 - **No substrate.** The content-hash reference form round-trips against nothing. (48–51.)
 - **The two-architecture determinism check has never run.** The CI matrix is declared and the
   golden digests are committed; the claim is wired, not proven.
@@ -1207,12 +1216,16 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **The causal edges in the fixtures are toys.** Sign, lag and elasticity are invented numbers
   exercising the shape. Decision ticket 08 asks for a real claim from each co-flagship, and neither
   exists, which is why the causal layer's fifth criterion stays unticked.
-- **`twin sweep` exists; nothing calls it on a clock.** Unconditional, cross-repository, no
-  `--scenario` flag — but a scheduler still has to invoke it. The same gap build ticket 64 left for
-  `estate/driftwood/` to own: the instrument is built, the cron/CI cadence around it is not. (09.)
+- **`twin sweep` and `twin gameplay-sweep` both exist; nothing calls either on a clock.**
+  Unconditional, cross-repository, no `--scenario` or `--component` flag on either — but a
+  scheduler still has to invoke them. The same gap build ticket 64 left for `estate/driftwood/` to
+  own: the instrument is built, the cron/CI cadence around it is not. (09, 46.)
 - **The standing scenario set is unfiltered, because there is no library yet.** `sweep()` runs every
-  scenario in every overlay it is pointed at; the admissibility rule, precondition-triggered plays
-  and event-triggered re-runs decision ticket 13 names are build tickets 46 and 69, not this one.
+  scenario in every overlay it is pointed at; the admissibility rule and event-triggered re-runs
+  decision ticket 13 names are build ticket 69, not this one. Build ticket 46 built the
+  precondition-triggered half — `gameplay_lens.sweep()` — as its own scan rather than folding it
+  into `schedule.sweep()`'s scenario loop, because a precondition match is not a scenario execution
+  and has no forecast to emit.
 
 ## Layout
 

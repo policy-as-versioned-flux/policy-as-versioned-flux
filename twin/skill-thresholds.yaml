@@ -30,3 +30,10 @@ thresholds:
       below that at 0.75 — one item is allowed to miss out of four — because the corpus is small
       (one dated position per backtest org) and a threshold equal to the achieved score would be
       indistinguishable from no threshold at all.
+  gameplay-lens:
+    threshold: 0.65
+    note: >-
+      The catalogue scores 1.0 on its own three-org corpus (build ticket 46: netflix land-grab,
+      intel's negative case, pocket's exploit-commoditisation); set below that at 0.65 — one item
+      is allowed to miss out of three, the same one-slack-item reasoning evolution-judge's own
+      threshold applies to its four-item corpus — rather than padded up to the achieved score.
