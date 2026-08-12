@@ -811,6 +811,84 @@ def _causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory(ctx:
     )
 
 
+@harness_check("gameplay_lens_is_grade_5_and_reports_no_recommendation")
+def _gameplay_lens_is_grade_5_and_reports_no_recommendation(ctx: Context) -> str:
+    """`gameplay-lens` (build ticket 46, decision ticket 13 Q3): a proposed play is grade 5 by
+    construction — checked against `propose()`'s own source and against its actual output, the
+    same two-leg shape `signal_classify_is_grade_5_by_construction` uses — and the scheduled sweep
+    that pulls opportunity candidates forward carries no recommended-action field, re-asserting
+    `no_recommended_action_field`'s own banned-word scan against a third artefact
+    (`trade_off_curve_reports_disagreement_never_a_scalar` was the second) rather than growing the
+    constitution's fixed sixteen.
+
+    Three legs. First, structural-plus-live grade-5: no grade-shaped parameter on `propose()`, and
+    a real call emits `evidence_grade: 5`. Second, the real labelled corpus (the same three org
+    maps `tests/test_gameplay_lens.py` evaluates against, built fresh here in `ctx.tmp`) passes and
+    a skill that proposes nothing fails the threshold — a harness with no subject proves nothing.
+    Third, `sweep()`'s own artefact on the netflix/intel fixture carries both an opportunity count
+    and a signal count side by side — the AC this ticket's checklist names, "opportunity output
+    volume is reported alongside threat output volume" — and the identical banned-word/phrase scan
+    `no_recommended_action_field` runs finds nothing in it.
+    """
+    import inspect
+
+    from . import NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES
+    from .. import gameplay_lens as gl
+    from .. import skills as skills_mod
+    from ..canon import walk_keys, walk_values
+    from ..repo import ModelRepo
+
+    params = inspect.signature(gl.propose).parameters
+    if "grade" in params or "evidence_grade" in params:
+        raise Violated("gameplay_lens.propose() accepts a grade-shaped parameter — grade 5 is no longer by construction")
+
+    sample = {
+        "positions": [
+            {"component": "c", "stage": "product", "evolution": 0.65, "visibility": 0.5},
+            {"component": "adj", "stage": "commodity", "evolution": 0.9, "visibility": 0.2},
+        ],
+        "edges": [
+            {"id": "e1", "type": "needs", "from": "c", "to": "adj"},
+            {"id": "e2", "type": "knows", "from": "person", "to": "adj"},
+        ],
+        "org_components": ["c"],
+    }
+    hits = gl.propose(sample)["opportunities"]
+    if not hits or any(o["claim"].get("evidence_grade") != 5 for o in hits):
+        raise Violated(f"gameplay_lens.propose() emitted a non-grade-5 claim: {hits}")
+
+    corpus = gl.labelled_corpus(ctx.tmp / "gameplay-lens-corpus")
+    good = skills_mod.evaluate(gl.SKILL, gl.propose, corpus, scorer=gl.scorer)
+    if not good.passed:
+        raise Violated("gameplay-lens failed its own labelled corpus running correctly — the harness has no subject")
+    bad = skills_mod.evaluate(gl.SKILL, lambda payload: {"opportunities": []}, corpus, scorer=gl.scorer)
+    if bad.passed:
+        raise Violated("a skill that proposes nothing still passed — the threshold is not gating anything")
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    swept = gl.sweep([repo], ctx.caps, ["twin", "gameplay-sweep"])
+    counts = swept.body["counts"]
+    if not (counts.get("opportunities", 0) > 0 and counts.get("signals", 0) > 0):
+        raise Violated(
+            f"the sweep did not report both a positive opportunity count and a positive signal "
+            f"count side by side: {counts}"
+        )
+
+    for key in walk_keys(swept.body):
+        if any(word in key.lower() for word in NO_ACTION_BANNED_KEYS):
+            raise Violated(f"the gameplay sweep carries an action-shaped field ({key})")
+    for key, value in walk_values(swept.body):
+        if isinstance(value, str) and any(phrase in value.lower() for phrase in NO_ACTION_BANNED_PHRASES):
+            raise Violated(f"the gameplay sweep states an action in prose at {key}: {value!r}")
+
+    return (
+        "no grade-shaped parameter exists on propose(); every opportunity carries evidence_grade "
+        f"5; the real {len(corpus)}-item labelled corpus passes and a skill that proposes nothing "
+        f"fails its threshold; the sweep reports {counts['opportunities']} opportunity candidate(s) "
+        f"beside {counts['signals']} signal(s), and no action-shaped field found in it"
+    )
+
+
 def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
     rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     out = _git(root, "show", f"{ref}:{rel}")

@@ -16,7 +16,7 @@ from pathlib import Path
 
 import yaml
 
-from . import TOOL_VERSION, attest, constraints, evidence, fixtures, index, invariants, schedule, sign, verbs
+from . import TOOL_VERSION, attest, constraints, evidence, fixtures, gameplay_lens, index, invariants, schedule, sign, verbs
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
 from .blob import BlobRefError
@@ -266,6 +266,22 @@ def cmd_sweep(args: argparse.Namespace) -> int:
     )
     for failure in artefact.body["failures"]:
         print(f"  failed  {failure['org']}/{failure['scenario']}: {failure['reason']}")
+    return _emit(artefact, args.out)
+
+
+def cmd_gameplay_sweep(args: argparse.Namespace) -> int:
+    """Every org, every named repository. No component or scenario is named — the sweep goes
+    looking for gameplay preconditions itself (build ticket 46, decision ticket 13 Q3).
+    """
+    repos = [ModelRepo.open(path, args.ref) for path in args.repo]
+    caps = Capabilities.load()
+    command = verbs.command_for("gameplay-sweep")
+    artefact = gameplay_lens.sweep(repos, caps, command)
+    counts = artefact.body["counts"]
+    _say(
+        f"gameplay sweep across {counts['repos']} repo(s), {counts['orgs']} org(s): "
+        f"{counts['opportunities']} opportunity candidate(s) pulled, {counts['signals']} signal(s) pushed"
+    )
     return _emit(artefact, args.out)
 
 
@@ -1324,6 +1340,18 @@ def build_parser() -> argparse.ArgumentParser:
     swept.add_argument("--at", default=None, help="override every scenario's declared time")
     swept.add_argument("--out", required=True)
     swept.set_defaults(fn=cmd_sweep)
+
+    gamed = subs.add_parser(
+        "gameplay-sweep",
+        help="scan every org, across a named org of repositories, for gameplay preconditions — unconditionally",
+    )
+    gamed.add_argument(
+        "--repo", action="append", required=True, default=[],
+        help="path to a model repository; repeatable — the sweep spans an org of repositories",
+    )
+    gamed.add_argument("--ref", default="HEAD", help="git ref to pin, applied to every named repository")
+    gamed.add_argument("--out", required=True)
+    gamed.set_defaults(fn=cmd_gameplay_sweep)
 
     diagram = subs.add_parser("reliability", help="a reliability diagram over a population of score cards")
     diagram.add_argument(

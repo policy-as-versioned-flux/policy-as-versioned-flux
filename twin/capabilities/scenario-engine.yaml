@@ -17,7 +17,9 @@ criteria:
     checked: false
   - index: 4
     text: "How opportunity/gameplay moves are proposed, with the negativity counterweight addressed."
-    checked: false
+    checked: true
+    evidence: "twin/gameplay_lens.py propose() checks a two-play catalogue (land-grab, exploit-commoditisation) against the current map's evolution positions, needs-edge dependency structure and ownership, with the reason and the checked preconditions attached per opportunity. gameplay_lens.sweep() runs it unconditionally across every org overlay of every named repository, no human naming a component — the structural pull against the record's push (decision ticket 13 Q3) — and reports opportunity-candidate volume beside each org's bound-signal volume in the same artefact so the counterweight is measurable."
+    ticked_by: build ticket 46
   - index: 5
     text: "Admissibility rule for the scenario library."
     checked: false

@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 08 \u2014 build ticket 45 ticks causal-layer AC 4 (the stated confounding discipline), which moves the capabilities digest every artefact pins and therefore every golden digest",
-  "capabilities_digest": "f2df3330d217f50a39ecdd50b541834d8cc9df8b93f61946df0aca1893044fb8",
+  "authorised_by": "decision ticket 13 \u2014 build ticket 46: gameplay-lens ticks scenario-engine AC4 (opportunity/gameplay moves proposed), which adds a capability checklist item and moves every artefact's capabilities_digest; the underlying derivation is unchanged, only the depth-grade checklist total",
+  "capabilities_digest": "8265b4515831640036d268058607826f748b99c154ec235b1f6aab211edcefd2",
   "digests": {
-    "blast-radius": "3bec3fd99e86e50033ab0e899ac312717cb1cf39f340ca132aba37e3acb8a444",
-    "bound-signal": "494adf060ed0a0e5b202ee3d9ac263d1c81c7a74c7d9a1c95aa521bb6cf372fe",
-    "forecast-bundle": "42d8dd13742dae692e4525a8ec8f9c664ec6e416fb74a486f7f6cd541ddf95a1",
-    "graph": "f7bbc3f81bbf12a8cd56b788810aa7823b2a6184d7c30428cdddc1535d5ce9b7",
-    "intervention": "d33e95c4c69e495ed4df73df4c5038fc097fd58d93e5cbba5a310d044b732fdf",
-    "observation": "47de590845746d2fe66b83bc2f1305a58a04c743f7080bdd92bf3cbffe16b290",
-    "priced-impact": "7206c2398b5a04bfe52d9807d0bd0235297cf834179feb1ad8fe308ee44bc33d",
-    "priced-option-set": "57f010e0d90b4a14efed731c80e051e44d20b6de42928e0cd15eb67783a68799",
-    "propagation": "fbe7f4004116e805bb4fd8e0543a3a6891803e55cd093cd5c089d422c25f88a0",
-    "rewound-model": "cb82d9adabe14666a8a51c4fd25a489c802707193698b230cb8c49ebcb10f1f6",
-    "scenario-exposure": "b9a8780d9a7b48aa8fa9ff861c3a3a36024adaad5e31a28c6996ccb1b9e6ad2b",
-    "score-card": "d873d7c7ea48bd544b6959a978214b91f34416564b72163ae160a8c54dddc617"
+    "blast-radius": "32ebe60fd2b2bde39bc6d8f3f74513779dc3753f5532cd656c9d549204b177cf",
+    "bound-signal": "4a1428f0dcf32215a8b59ead6206b0e727dd4e950e10ac06d5c35a9c835349bd",
+    "forecast-bundle": "05938e0c6df25336d845b89afe1e653af2aef8d23fbe8e1a8e9a8379361e1c32",
+    "graph": "c1deb968ca2b4eb63421aed2f7073117c4250965b28341bd518a4b31a8a44881",
+    "intervention": "c0f7faf0d62fb22fb725080860ccaf5cb7ca7313754e6366e9f1b1ebea880414",
+    "observation": "238462f02cb831b86eb0f46e072f02f71fa603808751340944ba1f8bee9d62ac",
+    "priced-impact": "e1235592736fd8727ccd0297949eeae71c82f5c655bfa9f6c0a5d1f2d9131872",
+    "priced-option-set": "7b141551ed05c0967a6371165b333e46ff1c358f3904e360000e20b2da063378",
+    "propagation": "4bb363fc25f731f611b5abd7f5748f5bf4b3347719770fe0873a0f75b1821760",
+    "rewound-model": "dad3160c70fa7bb3a4bbe330483cfcbcab2909aa953f6614f9d2f6f4b3d759a9",
+    "scenario-exposure": "17bd77b9926cf7914bc91b88c3b859ee3a57300ec881c2fbada349e023afd197",
+    "score-card": "7f5fb194febc1a8ec2498515cdabc4e3482663d53403692c4308a652bc126c13"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"
