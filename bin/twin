@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# The `twin` command. No install step: the repository is the package.
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# `-P` keeps the current directory off sys.path. Without it, running twin from inside a model
+# repository would import that repository's `yaml.py` ahead of the real one — and `cd model-repo
+# && ../bin/twin verify` is the natural workflow.
+exec env PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 -P -m twin "$@"
