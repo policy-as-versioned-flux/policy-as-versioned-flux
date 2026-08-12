@@ -1,0 +1,42 @@
+# The benchmark question selection rule (build ticket 57, decision ticket 21 Q2).
+#
+# "A versioned, pre-registered mechanical rule" — committed here the same way
+# twin/constraints.yaml and twin/evidence-ladder.yaml are, so a change to it is as visible as a
+# change to either: a dated diff in this file's own git history, not a private judgement call
+# made per run. `twin/benchmark.py::select_questions` applies it and nothing else decides which
+# questions are drawn.
+#
+# Every field is stated in resolvable terms on purpose (decision ticket 21 Q2): a liquidity
+# threshold, a resolution-horizon window and a category list, so applying the rule to a candidate
+# pool needs no interpretation — two runs against the identical pool always draw the identical
+# set. `confidence_bins` is what makes "spans the full confidence range" checkable rather than
+# asserted: the selection is required to place at least one question in every bin, not merely to
+# avoid only-the-obvious questions at the extremes.
+#
+# Bump `version` in the same commit as any change to a field below — the identical discipline
+# twin/evidence-ladder.yaml's own header states for its thresholds.
+schema: twin.benchmark-selection-rule/v1
+version: '1'
+
+# Resolvable-terms eligibility filter. A candidate question qualifies only if all three hold.
+min_liquidity: 50000.0
+min_horizon_days: 7
+max_horizon_days: 365
+categories: [macro, geopolitics, technology, corporate-outcome, regulatory]
+
+# Half-open [lo, hi) except the top bin, which is closed at 1.0 — six bins spanning the full
+# range, the "full confidence range" decision ticket 21 Q2 requires demonstrated, not merely
+# claimed, via the emitted distribution.
+confidence_bins:
+  - [0.0, 0.1]
+  - [0.1, 0.3]
+  - [0.3, 0.5]
+  - [0.5, 0.7]
+  - [0.7, 0.9]
+  - [0.9, 1.0]
+
+# The volume valve decision ticket 21 Q2 names explicitly: "(c) random sampling as a volume valve
+# if the rule selects too many." Applies only once the mechanical filter above selects more than
+# this; the seed makes the cut-down deterministic rather than an ad hoc trim.
+max_questions: 40
+sample_seed: 20260812
