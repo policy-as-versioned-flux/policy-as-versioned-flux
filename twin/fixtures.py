@@ -185,6 +185,13 @@ world_models:
   - twin-default
   - rival-fast-commoditisation
   - netflix-believed
+affected_parties:
+  - id: dvd-fulfilment-centre-contract-workers
+    who: Contract staff at third-party DVD fulfilment centres, not employed by this org.
+    consequence: A faster decline closes fulfilment volume they depend on, on a shorter notice than direct staff get.
+  - id: independent-video-rental-retailers
+    who: Independent video-rental shops with no seat in this model.
+    consequence: The same shift that this scenario forecasts accelerates their closure; this twin never runs on their behalf.
 """,
     "orgs/netflix/outcomes/dvd-decline-2011-resolved.yaml": """\
 id: dvd-decline-2011-resolved
@@ -602,6 +609,13 @@ world_models:
   - twin-default
   - rival-fast-commoditisation
   - intel-believed
+affected_parties:
+  - id: fab-construction-contractors
+    who: Contractors building the fab capacity this scenario is priced against.
+    consequence: A slip changes the schedule they are staffed to, and this model does not carry their perspective.
+  - id: downstream-fabless-customers
+    who: Fabless customers depending on the foundry capacity this scenario forecasts.
+    consequence: A late node delays their own product roadmaps; they hold no perspective this twin runs under.
 """,
 }
 
@@ -922,6 +936,10 @@ components:
   - identity-store
 world_models:
   - reference-map
+affected_parties:
+  - id: third-party-integration-partners
+    who: External integrators whose own products call this org's customer portal, with no seat in this model.
+    consequence: A portal outage cascades into their own customers' support queues; this twin prices it only from the operator's side.
 """,
     # Two perspectives, hand-computable on purpose: 400000 + 250000 = 650000 against
     # 50000 + 120000 = 170000, so the spread is 480000 and every figure is checkable by eye.
@@ -1240,6 +1258,10 @@ components:
   - mail-order-catalogue
 world_models:
   - steady-decline
+affected_parties:
+  - id: catalogue-fulfilment-warehouse-staff
+    who: Warehouse staff fulfilling catalogue orders, employed by a third-party logistics contractor.
+    consequence: A confirmed decline reduces the shift volume they are booked for; they hold no perspective in this fixture.
 """,
 }
 
@@ -1458,6 +1480,17 @@ components:
   - carillion-uk-construction
 world_models:
   - market-consensus-2016
+affected_parties:
+  - id: unpaid-subcontractors
+    who: >-
+      Subcontractors and suppliers to Carillion's UK construction business, real and widely
+      reported: the 2018 liquidation left thousands unpaid.
+    consequence: An insolvency this scenario forecasts leaves their invoices unrecoverable; this model runs from the market's perspective, never theirs.
+  - id: defined-benefit-pension-scheme-members
+    who: >-
+      Members of Carillion's defined-benefit pension schemes — around 30,000, per the 2018
+      joint parliamentary inquiry (HC 769) this repository's own outcome cites.
+    consequence: An insolvency crystallises a scheme deficit the scenario prices nowhere; the twin has no perspective that is theirs.
 """,
 }
 
@@ -1760,6 +1793,13 @@ components:
   - uk-listed-hospital-group
 world_models:
   - market-consensus-2019
+affected_parties:
+  - id: hospital-network-patients
+    who: Patients relying on continuity of care at the subject's UK-listed hospital network.
+    consequence: Formal insolvency proceedings threaten continuity of the service they depend on; this scenario is priced from the market's perspective, never the patients'.
+  - id: hospital-network-frontline-workforce
+    who: Frontline clinical and support staff across the hospital network, not party to this model.
+    consequence: An insolvency this scenario forecasts puts their employment at direct risk, with no perspective in this fixture representing them.
 """,
 }
 
@@ -1966,6 +2006,15 @@ components:
   - third-party-acquiring-business
 world_models:
   - market-consensus-2016
+affected_parties:
+  - id: prepaid-cardholders
+    who: >-
+      Holders of prepaid cards issued through the subject's card-solutions business, real
+      consumers with no seat in this model.
+    consequence: An insolvency this scenario forecasts freezes their card balances overnight; the twin runs from the market's perspective, never theirs.
+  - id: small-merchant-payment-customers
+    who: Small merchants relying on the subject's payment processing, not represented in this model.
+    consequence: Formal insolvency proceedings cut off their payment processing with no notice; this scenario prices none of their exposure.
 """,
 }
 
@@ -2217,6 +2266,17 @@ components:
   - energy-trading-book
 world_models:
   - market-consensus-2001
+affected_parties:
+  - id: employee-401k-holders
+    who: >-
+      Employees whose retirement savings were concentrated in the subject's own stock through
+      its 401(k) plan, real and widely documented.
+    consequence: A bankruptcy this scenario forecasts wipes out those savings; the twin runs from the market's perspective, never the employees'.
+  - id: california-electricity-ratepayers
+    who: >-
+      Californian electricity ratepayers exposed to the energy-trading book's market conduct
+      during the 2000-2001 crisis, real and documented in the subsequent FERC investigations.
+    consequence: The trading book's own conduct raised prices they paid; this scenario forecasts the book's own solvency, never their exposure to it.
 """,
 }
 
@@ -2454,6 +2514,12 @@ components:
 world_models:
   - contemporaneous-consensus
   - canonical-hindsight-consensus
+affected_parties:
+  - id: uk-based-r-and-d-workforce
+    who: >-
+      The subject's UK-based research workforce, whose jobs were a real, publicly argued factor
+      in resisting the takeover this scenario models.
+    consequence: A completed acquisition risks the site consolidation that argument warned of; this scenario forecasts the board's own decision, never the workforce's stake in it.
 """,
 }
 
@@ -2645,6 +2711,10 @@ components:
 world_models:
   - contemporaneous-consensus
   - canonical-hindsight-consensus
+affected_parties:
+  - id: existing-diabetes-and-cardiovascular-patients
+    who: Patients depending on the subject's continued investment in these therapy areas, not represented in this model.
+    consequence: An exit this scenario forecasts reduces future investment in treatments they rely on; the twin prices the market's reaction, never the patients' stake.
 """,
 }
 

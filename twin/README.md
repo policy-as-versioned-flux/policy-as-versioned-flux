@@ -1,13 +1,13 @@
 # `twin`
 
-Build tickets 01–46, 60 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
+Build tickets 01–46, 60, 61 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
 measuring. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 47 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 48 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -44,6 +44,9 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
 ./bin/twin price --repo R --origin C       # a shock priced under every eye, responses beside it
 ./bin/twin constraints --out F             # the published constraint set, floor and exclusions
+./bin/twin affected-parties --repo R --org O --out F  # who bears a modelled consequence with no perspective, alongside the constraint set
+./bin/twin disparate-impact-audit --finding F --source S --out O      # raise a finding — sealed, never names the protected characteristic
+./bin/twin disparate-impact-respond --audit A --response R --out O    # only the registered respondent role may close it
 ./bin/twin credibility --repo R --org O --subject S  # the world prior blended with an org's own sparse data
 ./bin/twin worksheet --repo P              # the pocket org against its hand-computed worksheet
 ./bin/twin sign <artefact> --role R        # accountability for an authored artefact
@@ -498,6 +501,38 @@ counts as open, so a reader of any tool built on it sees the same state rather t
 inventing its own notion of "resolved". Two roles (`challenger`, `challenge-resolver`) join the
 register signatures already bind to, never a named individual.
 
+## The affected-parties register and the disparate-impact channel
+
+Decision ticket 15's Q4 named two mechanisms nothing yet delivered: "an affected-parties
+register — outsiders bearing modelled costs are named, though outside the currency" and "a
+sealed audit channel for disparate impact, or an explicit admission the system cannot be checked
+for it." Build ticket 61 closes both. Neither constrains power — the spec is explicit about
+that, and `twin/constraints.yaml`'s own `power-asymmetry` scope exclusion says so — but
+invisibility is a separate harm from powerlessness, and this one is addressable.
+
+**The register is authored per scenario, not bolted on afterwards.** `twin/schema.py`'s
+`scenario` schema carries a required `affected_parties` field, and `list_of` is already
+non-empty-only — the same rule `components`/`world_models` already carry — so a scenario cannot
+satisfy "populated" with an empty list either. `twin/affected_parties.py` does no authoring of
+its own: `register()` flattens every scenario's own declarations in an overlay, and
+`twin affected-parties --repo R --org O --out F` emits it as a derived artefact carrying
+`constraints.pin()` — the identical version and digest `twin constraints` itself reports, which
+is what "published alongside the constraint set" means structurally rather than by convention.
+
+**Sealed, the same way the model itself is sealed.** A disparate-impact finding is necessarily
+made *outside* the twin — the model cannot represent a protected characteristic anywhere
+(`no-special-category-representation`, the universal floor) — so `twin/disparate_impact.py`'s
+`twin disparate-impact-audit --finding F --source S --out O` runs the identical
+`refuse_special_category` refusal the model repository runs on every field it validates. An
+auditor reports what differs and where it was checked; the channel that reports what the twin
+cannot see is bound by the same refusal, not exempted from it.
+
+**A defined respondent role, structurally rather than by convention.** `twin
+disparate-impact-respond --audit A --response R --role disparate-impact-respondent --out O`
+refuses a response naming any role but that one — a new entry in `twin/roles.yaml` — even when
+the role supplied is itself registered for something else. A route anybody could answer has no
+defined respondent.
+
 ## The misuse catalogue, and logging a constraint removal with what it was worth
 
 `twin/misuse-catalogue.yaml` (build ticket 62) closes decision ticket 15's carried-forward item:
@@ -872,7 +907,9 @@ count — most rows below track only as far as build ticket 33 tells their story
 45's tick on `causal-layer` narrated just below. `scenario-engine` moved to 2/7 across build
 tickets 37 (AC 2, fast-forward/rewind/play distinguished) and 46 (AC 4, opportunity/gameplay
 moves, narrated below), and `sense-move` moved to 4/8 across build tickets 43 and 44 — none of
-those three moves narrated in its own round here.
+those three moves narrated in its own round here. Decision ticket 15 (build ticket 61) has no
+capability file at all, so the affected-parties register and disparate-impact channel move
+nothing in this table — see their own section above.
 
 **Nothing was ticked in the round before this one, and the arithmetic did not move at all.** Three
 build tickets landed — the information gate (36), the drift instrument (64) and the join of the
@@ -998,9 +1035,9 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 40 pass, 2 pending, 2 skipped and not faked (a fresh worktree has no earlier
+`./bin/twin verify` — 42 pass, 2 pending, 2 skipped and not faked (a fresh worktree has no earlier
 manifest commit to diff, so `hash_changes_are_authorised` skips too, alongside the CI-only
-cross-architecture leg). `pytest -q` — 909 tests across seams 1 and 2.
+cross-architecture leg). `pytest -q` — 942 tests across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
 |---|---|
@@ -1305,6 +1342,10 @@ Named here so the skeleton cannot quietly become the definition of done.
   precondition-triggered half — `gameplay_lens.sweep()` — as its own scan rather than folding it
   into `schedule.sweep()`'s scenario loop, because a precondition match is not a scenario execution
   and has no forecast to emit.
+- **The affected-parties register and disparate-impact channel are both purely additive, exercised
+  only on fixture data.** Build ticket 61's register aggregates what scenario authoring already
+  declares; the disparate-impact channel is sealed and role-gated. Neither reaches a live pipeline
+  and neither has run against a real, non-fixture finding.
 
 ## Layout
 

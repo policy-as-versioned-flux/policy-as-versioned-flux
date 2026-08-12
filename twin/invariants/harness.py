@@ -549,11 +549,67 @@ def _a_challenge_to_a_constituent_survives_an_unrelated_resolution(ctx: Context)
         raise Violated("an unrelated resolution on the same artefact closed a constituent's challenge")
     if report["open"][0]["claim_path"] != "components[1].evolution":
         raise Violated("the open challenge reported does not name the claim that was actually challenged")
-
     return (
         "resolve() reproduces its challenge's own claim_path; a hand-built resolution naming a "
         "different one is refused; an unrelated resolution on the same artefact leaves the "
         "original challenge reported open, not silently closed"
+    )
+
+
+@harness_check("disparate_impact_audit_channel_is_sealed_and_role_gated")
+def _disparate_impact_audit_channel_is_sealed_and_role_gated(ctx: Context) -> str:
+    """The sealed audit channel decision ticket 15 Q3b finding 4 asks for (build ticket 61):
+    "Disparate impact needs no protected field to occur, but does need one to be measured. Needs a
+    sealed audit channel, or an explicit admission that the system cannot be checked for it."
+
+    A guard on the suite rather than an invariant, the same shape
+    `a_challenge_to_a_constituent_survives_an_unrelated_resolution` is: this asserts a **semantic
+    property of a module's contract**, not one of the constitution's sixteen fixed names.
+
+    Two legs. First, sealed: `raise_audit()` runs the identical `refuse_special_category` refusal
+    the model repository itself carries — a finding that names the protected characteristic
+    (rather than describing the disparity it produced) is refused, exactly as a component or claim
+    naming one already is. Second, role-gated: `respond()` refuses a response naming any role but
+    `disparate-impact-respondent`, even when the role supplied is itself registered — a channel any
+    registered role could close is not answerable to a *defined* respondent.
+    """
+    import json
+
+    from .. import disparate_impact as di_mod
+
+    try:
+        di_mod.raise_audit(
+            "disparity by race across cohorts", "guard-planted audit", ["twin", "disparate-impact-audit"]
+        )
+    except di_mod.DisparateImpactError:
+        pass
+    else:
+        raise Violated("an audit finding naming a protected characteristic was not refused")
+
+    clean = di_mod.raise_audit(
+        "cohort A receives systematically worse trade-off ranges than cohort B", "guard-planted audit",
+        ["twin", "disparate-impact-audit"],
+    )
+    audit_doc = json.loads(clean.to_bytes())
+    audit_sha = clean.digest()
+
+    for wrong_role in ("model-steward", "challenge-resolver", "constraint-owner"):
+        try:
+            di_mod.respond(audit_doc, audit_sha, "response text", wrong_role, ["twin", "disparate-impact-respond"])
+        except di_mod.DisparateImpactError:
+            continue
+        raise Violated(f"a response from registered role {wrong_role!r} (not the respondent) was not refused")
+
+    ok = di_mod.respond(
+        audit_doc, audit_sha, "response text", di_mod.RESPONDENT_ROLE, ["twin", "disparate-impact-respond"]
+    )
+    if ok.body["responded_by_role"] != di_mod.RESPONDENT_ROLE:
+        raise Violated("a response from the registered respondent did not record its own role")
+
+    return (
+        "a finding naming a protected characteristic is refused; a response from any role but "
+        f"{di_mod.RESPONDENT_ROLE!r} is refused (checked against three registered roles); the "
+        "defined respondent, structurally checked, succeeds"
     )
 
 

@@ -8,7 +8,7 @@
 # so a role that was later renamed, split or withdrawn does not silently change what an old
 # signature meant. Bump `version` in the same commit as any change to `roles`.
 schema: twin.roles/v1
-version: 2
+version: 3
 roles:
   - id: model-steward
     accountable_for: >-
@@ -31,3 +31,8 @@ roles:
     accountable_for: >-
       A resolution recorded against a challenge — that the same claim the challenge named has been
       addressed, not a different, more comfortable one.
+  - id: disparate-impact-respondent
+    accountable_for: >-
+      A response to a disparate-impact audit (build ticket 61, decision ticket 15 Q3b finding 4) —
+      the one role a sealed audit channel is answerable to, so "somebody has to respond" is a fact
+      about the register rather than whoever happened to see the finding first.
