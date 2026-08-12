@@ -54,3 +54,10 @@ thresholds:
       intel's negative case, pocket's exploit-commoditisation); set below that at 0.65 — one item
       is allowed to miss out of three, the same one-slack-item reasoning evolution-judge's own
       threshold applies to its four-item corpus — rather than padded up to the achieved score.
+  substrate-generator:
+    threshold: 0.8
+    note: >-
+      The reference generator (build ticket 49) scores 1.0 on its own three-recipe labelled corpus
+      (zero, sparse and one-per-channel planted-signal schedules); the threshold is set below that
+      at the same round 0.8 bar signal-classify/causal-claims use, never padded up to the achieved
+      score.
