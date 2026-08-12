@@ -3032,6 +3032,15 @@ components:
   - the-twin-adoption
 world_models:
   - documented-corporate-prediction-market-pattern
+affected_parties:
+  - id: downstream-decision-recipients
+    who: >-
+      Staff elsewhere in the organisation whose own decisions are currently informed by the
+      twin's forecasts, holding no funding or maintenance stake modelled here.
+    consequence: >-
+      A curtailment this scenario forecasts removes an input to their decisions with no notice
+      keyed to their own timelines; this model prices the sponsor's and maintainer's stakes,
+      never theirs.
 """,
     "orgs/twin-self/perspectives/the-twin-sponsor.yaml": """\
 id: the-twin-sponsor
