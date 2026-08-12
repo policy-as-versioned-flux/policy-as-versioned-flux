@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 08 and decision ticket 13 \u2014 Wave A integration merge of build tickets 45 and 46: causal-layer AC4 and scenario-engine AC4 both tick in the same merged state, moving capabilities_digest and every artefact's tool pin beyond what either ticket's own committed golden file recorded alone",
-  "capabilities_digest": "37e7143992534e59b2d755b4749f015b148bea4afe7989810bafb3d73c0ef8d9",
+  "authorised_by": "decision ticket 12 \u2014 build ticket 48 adds the synthetic-substrate capability file, moving capabilities_digest and every artefact's tool pin",
+  "capabilities_digest": "d5235e77e57863017e6855c294f0c6522b6cb0f02f77b8002a6f385b4c6122ec",
   "digests": {
-    "blast-radius": "2e178dcf6f355ada268115dfc1f6816d88ebbd234f5fb36ff1665ac7a1627147",
-    "bound-signal": "c43ed15b88a22fcb6155a7043cecb45c544275af7f9339a0772178a099d3e0c3",
-    "forecast-bundle": "af5d5899d7485a017bbc5c72713c8ac5dad79af16cce1c3222931c3abd529f63",
-    "graph": "1ab262c63752a1d4d87389cdfaa1eeabb29198edeffa8ca1f568a8b091c2513f",
-    "intervention": "cac587ae22db6311f856bfae0a8ab64a79e42e469545054658f7f54ce733d4af",
-    "observation": "dcacbb64dbe4b9fdfb69483443dfdeb515adea494b401d5db20852c1bcee9f7a",
-    "priced-impact": "0c5cd50f1e4f0053fc2bbe6c32c1bb908fa5f8fa19a72aeae5f957d34db4a992",
-    "priced-option-set": "268284a5207f439a990595d0ad27d7ff33a9a1b2fbefcb63081575130d4459a8",
-    "propagation": "6c71449c37ba29ecf4b1994707a21482a7d12d7608082d5f0e5b56c3fc5e4a91",
-    "rewound-model": "d10de3bfa45f990e581ca19662920e5a0d61979a72f9b951474a2efec9f707f2",
-    "scenario-exposure": "192a7c4986783628e354bd13481b5aa1f6ef840f8564eb5bdbec0a18eefbd28c",
-    "score-card": "d32b32be5f5492c53c2da9a27f69129217878aa47b89e66b607a96aa63b6bc24"
+    "blast-radius": "d9d6cc98c350f26eaa8408db91d99fda9ce038cb31ecdfa53ddcbb4ab55f4773",
+    "bound-signal": "a147871e353bf816c99dae25e930219dbb88c34af4acfc4aa50e2ffd2f904208",
+    "forecast-bundle": "08647bddb00c6d3e32fe7cdd316d9ca4fcad7de9d4c199fac6987f3a82084bb5",
+    "graph": "9f7fd7f24f4fbc27b222a704bc603fba528c3e3cd8afdcab16c832c1becbc472",
+    "intervention": "d95611452026591acccef5fd0688df58a1fed9d993cd9f964b3960da12f1f808",
+    "observation": "005b99a915ecc934031645f5f3b712aef2eafd7d263f4df74649d43cdf051366",
+    "priced-impact": "966776ee2a56ae9f262af765891905989390f9061544adcd5c058795e31e331e",
+    "priced-option-set": "aef9c9bc27df2afce7443173d17cc621fcdc1c1df0b60c824c5ee50d3d733962",
+    "propagation": "da50347e35c352ff0a2074e3af05ab3031fb6b1c7a090cb3bca8339908ac9f1a",
+    "rewound-model": "07e0113b15ed95d1acb69d7e95f6a6c1fbd887a1b34b7d08e2e6308a31dfec75",
+    "scenario-exposure": "8652834e61f0ec61b3529ed12429fb615a6629f9d7636526cba80bfc334927b3",
+    "score-card": "0d5a065305dd0f44c9d1bba605f4722ea3a5fcaca2d25ad273a75b6691fe7abf"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"
