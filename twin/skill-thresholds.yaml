@@ -30,3 +30,20 @@ thresholds:
       below that at 0.75 — one item is allowed to miss out of four — because the corpus is small
       (one dated position per backtest org) and a threshold equal to the achieved score would be
       indistinguishable from no threshold at all.
+  causal-claims:
+    threshold: 0.8
+    note: >-
+      Claim accuracy (sign, lag, elasticity) on the co-flagship edges plus two more from the same
+      fixture (build ticket 45). The heuristic scores 1.0 on its own four-item corpus; the
+      threshold is set below that at the same round 0.8 bar signal-classify uses, never padded up
+      to the achieved score.
+  causal-claims-grade-accuracy:
+    threshold: 0.8
+    note: >-
+      A **second, separate metric on the same skill** (build ticket 45, decision ticket 08 Q2) —
+      not a seventh skill, the same way `toy-classifier` above is not one of the six real ones.
+      Scored by `causal_claims.grade_scorer()`'s asymmetric rule: any over-graded claim (stronger
+      than the true grade) fails outright, one rung of under-grading is tolerated. The heuristic
+      scores 1.0 on its own corpus; the threshold stays at the same round 0.8 bar rather than
+      being fitted, so a systematic over-grading drift has room to be caught before it reaches the
+      floor rather than only once it does.
