@@ -1035,9 +1035,8 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 42 pass, 2 pending, 2 skipped and not faked (a fresh worktree has no earlier
-manifest commit to diff, so `hash_changes_are_authorised` skips too, alongside the CI-only
-cross-architecture leg). `pytest -q` — 942 tests across seams 1 and 2.
+`./bin/twin verify` — 45 pass, 2 pending, 1 skipped and not faked (the CI-only cross-architecture
+leg). `pytest -q` — 942 tests across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
 |---|---|
