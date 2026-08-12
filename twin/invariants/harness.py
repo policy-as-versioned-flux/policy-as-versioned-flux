@@ -1081,6 +1081,61 @@ def _ingest_runs_unattended_with_provenance_and_measured_throughput(ctx: Context
     )
 
 
+@harness_check("unbound_pool_retains_a_decayed_signal_rather_than_dropping_it")
+def _unbound_pool_retains_decayed_signals(ctx: Context) -> str:
+    """`twin/unbound_pool.py` (build ticket 54, decision ticket 11 Q3): a signal the graph cannot
+    yet interpret is retained with decay, never discarded — plain decay-to-zero would be
+    indistinguishable from the deletion Q3 explicitly rejects unless a decayed-out signal stays
+    visible in the pool's own report rather than quietly ceasing to be listed.
+
+    Two legs, both against the default fixture's `netflix` overlay (its own signal collection is
+    mutated in memory only — nothing here is committed, the same throwaway-input shape
+    `signal_classify_is_grade_5_by_construction` uses for its synthetic sample). Live: a signal
+    planted ten years before the declared time — comfortably past the published threshold at any
+    sane half-life — is still present in `pool()`'s own output, `decayed: true`, carrying a
+    computed `decayed_on` date: not absent, not silently dropped. Structural: the observable
+    `pool_size`/`age_distribution` a reader actually watches excludes it, so "recorded" and
+    "still counted as live" are demonstrably two different properties rather than one field doing
+    both jobs.
+    """
+    from .. import unbound_pool
+    from ..model import Overlay
+    from ..repo import ModelRepo
+
+    overlay = Overlay.load(ModelRepo.open(ctx.repo_dir), "netflix")
+    ancient_id = "harness-guard-ancient-signal"
+    overlay.signals[ancient_id] = {
+        "id": ancient_id,
+        "date": "2000-01-01",
+        "steep": "technological",
+        "source": "harness guard",
+        "statement": "planted directly, never committed — a decayed-out signal must not vanish",
+        "provenance": {},
+    }
+
+    entries = unbound_pool.pool(overlay, "2026-01-01")
+    planted = next((e for e in entries if e["id"] == ancient_id), None)
+    if planted is None:
+        raise Violated("a decayed-out signal is absent from pool()'s own report — silently dropped")
+    if not planted["decayed"]:
+        raise Violated(f"a signal aged {planted['age_days']} days did not cross the decay threshold")
+    if not planted.get("decayed_on"):
+        raise Violated("a decayed signal carries no decayed_on date")
+
+    live_count = sum(1 for e in entries if not e["decayed"])
+    reported = unbound_pool.age_distribution(entries)
+    if sum(reported.values()) != live_count:
+        raise Violated("age_distribution counts do not match the live (non-decayed) pool")
+    if planted["id"] in {e["id"] for e in entries if not e["decayed"]}:
+        raise Violated("a decayed signal is still counted as live")
+
+    return (
+        f"a signal {planted['age_days']} days old stays in the pool report (decayed: true, "
+        f"decayed_on {planted['decayed_on']}) rather than being dropped, and is excluded from "
+        "the observable live pool_size/age_distribution rather than double-counted"
+    )
+
+
 @harness_check("substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants")
 def _substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants(ctx: Context) -> str:
     """Spine anchoring and free-running (build ticket 50, decision ticket 12 Q3): the substrate

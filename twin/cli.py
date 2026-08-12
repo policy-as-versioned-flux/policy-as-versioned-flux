@@ -16,7 +16,10 @@ from pathlib import Path
 
 import yaml
 
-from . import TOOL_VERSION, attest, constraints, evidence, fixtures, gameplay_lens, index, invariants, schedule, sign, verbs
+from . import (
+    TOOL_VERSION, attest, constraints, evidence, fixtures, gameplay_lens, index, invariants,
+    schedule, sign, unbound_pool, verbs,
+)
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
 from .blob import BlobRefError
@@ -78,6 +81,28 @@ def cmd_sense(args: argparse.Namespace) -> int:
     artefact = verbs.sense(
         repo, caps, org, args.signal, verbs.command_for("sense", org=org, signal=args.signal)
     )
+    return _emit(artefact, args.out)
+
+
+def cmd_unbound_pool(args: argparse.Namespace) -> int:
+    """Unbound signals retained with decay, not discarded (decision ticket 11 Q3)."""
+    repo, caps, org = _open(args)
+    artefact = unbound_pool.unbound_pool_artefact(
+        repo, caps, org, args.at, verbs.command_for("unbound-pool", org=org, at=args.at)
+    )
+    body = artefact.body
+    _say(
+        f"{org}: {body['pool_size']} signal(s) live in the unbound pool as of {args.at}, "
+        f"{body['decayed_out_count']} decayed out"
+    )
+    for label, count in body["age_distribution"].items():
+        print(f"  {label:<4} half-life(s)  {count}")
+    for entry in body["signals"]:
+        state = "decayed" if entry["decayed"] else "live"
+        print(
+            f"  {entry['id']:<40} age={entry['age_days']:>5}d  weight={entry['weight']:<8} "
+            f"{state:<8} decays-out {entry['decayed_on']}"
+        )
     return _emit(artefact, args.out)
 
 
@@ -1294,6 +1319,16 @@ def build_parser() -> argparse.ArgumentParser:
     sense.add_argument("--signal", required=True)
     sense.add_argument("--out", required=True)
     sense.set_defaults(fn=cmd_sense)
+
+    pooled = with_org(with_repo(subs.add_parser(
+        "unbound-pool", help="unbound signals retained with decay, not discarded"
+    )))
+    pooled.add_argument(
+        "--at", required=True,
+        help="the declared time (YYYY-MM-DD); every unbound signal's age is computed against it",
+    )
+    pooled.add_argument("--out", required=True)
+    pooled.set_defaults(fn=cmd_unbound_pool)
 
     run = with_org(with_repo(subs.add_parser("run", help="execute a scenario; emits forecasts, plural")))
     run.add_argument("--scenario", required=True)

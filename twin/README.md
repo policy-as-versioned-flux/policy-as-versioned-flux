@@ -7,7 +7,7 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 58 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 59 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -1080,6 +1080,47 @@ forbidden way — nothing free-running but the plant, decision ticket 12 Q3's ow
 **Ticks `synthetic-substrate` AC 1.** The real/synthetic seam is now defined and enforced, not
 only decided — `synthetic-substrate` moves from 1/7 to 2/7, still `partial`. AC 3's lead time and
 difficulty-distribution clauses remain the fidelity eval suite's own job (51).
+
+## The decaying unbound-signal pool
+
+`twin/unbound_pool.py` (build ticket 54, decision ticket 11 Q3) is the retention half of "weak
+signal handling": a signal `signal_classify` cannot yet bind to any component is not the same as a
+signal that does not matter — Q3's own words, "by construction the earliest, weakest signals are
+exactly the ones that bind to nothing *yet* — discarding deletes what the system exists to catch."
+Plain decay to nothing was rejected too: it would preferentially delete the longest-lead-time
+signals, the most valuable ones, which is what makes the promotion/rescue half (a model change
+triggering a retrospective sweep) build ticket 55's necessary next step rather than optional
+polish. This ticket builds only retention; nothing here rebinds a signal.
+
+**Retained, structurally rather than by discipline.** `unbound_ids()` reads every signal in an
+org's overlay carrying no `binding` claim — the exact complement of what `twin/verbs.py`'s
+`sense()` already refuses to emit a bound-signal for — and nothing in this module, or anywhere
+else in the codebase, deletes a committed signal file. `pool()` computes an age and a decay weight
+for each and reports every one, decayed or not.
+
+**The decay function is a published parameter**, `twin/decay.yaml`
+(`half_life_days`, `decayed_out_threshold`), validated on read the way `twin/attenuation.yaml` and
+`twin/evidence-ladder.yaml` are — a reader who does not write Python can see how fast a signal
+decays, and retuning the half-life against real lead-time-to-recognition data (Q3's own
+"calibratable knob") is a diff against a version number, not a code change.
+
+**A decayed-out signal is recorded, never dropped.** `twin unbound-pool --repo R --org O --at T`
+emits an `unbound-signal-pool` artefact whose `signals` list carries every unbound signal
+regardless of decay state — `decayed: true` and a computed `decayed_on` date beside the ones past
+the threshold, so "when does this leave the live pool" is always answerable even before it has.
+Only the two **observable** figures the ticket asks for, `pool_size` and `age_distribution` (a
+histogram binned by half-life multiple, the same empty-bins-included discipline
+`twin/benchmark.py`'s `confidence_distribution` uses against its own rule), exclude a decayed
+entry — demonstrated on the suite's own fixture by harness guard
+`unbound_pool_retains_a_decayed_signal_rather_than_dropping_it`, which plants a ten-thousand-day-old
+signal and checks it stays listed while dropping out of the live count.
+
+**Ticks nothing.** `unbound_pool_artefact()` reuses `sense-move`'s existing depth grade
+(`CAPS_UNBOUND_POOL = verbs.CAPS_SENSE`) rather than a capability of its own, the same choice build
+ticket 53's `ingest.py` made. AC 5 ("Weak-signal retention + promotion rule") is conjunctive and
+this ticket builds only its first half, so it stays unticked on purpose — ticking it now would be
+exactly the premature-done the computed-checklist discipline exists to catch. `sense-move` stays at
+5/8; build ticket 55's retrospective sweep is expected to complete the pair.
 
 ## What is honestly built
 
