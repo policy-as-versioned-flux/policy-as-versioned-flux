@@ -4,7 +4,9 @@ owning_ticket: '12'
 criteria:
   - index: 1
     text: "The real/synthetic seam defined, with a consistency rule between spine and substrate."
-    checked: false
+    checked: true
+    evidence: "twin/spine.py — the spine is the org's own real, dated `signal` documents (Spine.from_overlay reads twin/model.py's Overlay.signals directly, no second authored format), and the consistency rule is enforced rather than declared: reconcile() refuses, naming what is missing, if the substrate does not carry every spine fact knowable by a checkpoint (anchor()), verbatim; reconcile_at_every_checkpoint() runs that check once per distinct spine date. diff_against_spine() demonstrates the free-running half — everything not anchored — stays wide on the real Carillion fixture, so a planted signal sits among dozens of non-plant decoys rather than standing alone as the diff's sole residual (the failure decision ticket 12 Q3 names as 'actively dangerous'), while an over-anchored negative control does expose the plant as the sole residual, proving the guard measures a real property."
+    ticked_by: build ticket 50
   - index: 2
     text: "A fidelity target + a stated list of what would make the substrate an unfair test."
     checked: false

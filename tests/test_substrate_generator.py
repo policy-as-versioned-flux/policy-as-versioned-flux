@@ -163,10 +163,15 @@ def test_the_synthetic_substrate_capability_grade_stays_partial() -> None:
     distribution — and this ticket builds burial only; AC 3 stays unticked on the same "one
     clause of a multi-clause criterion" ground several earlier tickets already left criteria on
     (README). The grade is still computed, not asserted — the same check `test_substrate.py`
-    already runs, re-run here to pin that this ticket did not quietly move it."""
+    already runs, re-run here to pin that this ticket did not quietly move it.
+
+    AC 1 (the real/synthetic seam) is build ticket 50's own tick, not this one's — this asserts
+    only what ticket 49 itself moved, so `{5}` here would go stale the moment 50 landed; it is
+    `test_spine.py::test_the_synthetic_substrate_capability_grade_moves_to_2_of_7` that pins the
+    post-50 state."""
     caps = Capabilities.load()
     graded = caps.require("synthetic-substrate")
     assert graded.owning_ticket == "12"
     assert graded.grade == "partial"
     checked = {c.index for c in graded.criteria if c.checked}
-    assert checked == {5}
+    assert {5} <= checked

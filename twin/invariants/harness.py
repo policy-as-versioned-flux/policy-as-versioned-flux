@@ -1081,6 +1081,109 @@ def _ingest_runs_unattended_with_provenance_and_measured_throughput(ctx: Context
     )
 
 
+@harness_check("substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants")
+def _substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants(ctx: Context) -> str:
+    """Spine anchoring and free-running (build ticket 50, decision ticket 12 Q3): the substrate
+    must never contradict a dated public fact, but is free wherever the record is silent — and the
+    concrete danger decision ticket 12 names is over-anchoring: a substrate derived entirely from
+    the spine except for its plants would let a diff against the spine locate every one.
+
+    A guard on the suite rather than an invariant, the same shape
+    `substrate_generator_is_mundane_by_default_and_records_measurability_winning` is: this asserts
+    a **structural property of a module's contract**, not one of the constitution's sixteen fixed
+    names.
+
+    Four legs, on the real Carillion answer key (build ticket 38) rather than an invented spine —
+    `Spine.from_overlay` reads the org's own 8 real, dated, cited signals directly. First, a
+    substrate batch missing the spine's facts fails `reconcile()`, naming what is absent. Second,
+    once `anchor()` has inserted them, `reconcile_at_every_checkpoint()` — one reconciliation per
+    distinct spine date, not only the last — passes at every one of the 8. Third, knowability
+    dates genuinely gate through `twin/regimes.py`'s own machinery: a malformed checkpoint fails
+    with `regimes.RegimeError`, the identical exception every other regime-gated read raises, not
+    a parallel parser that happens to agree with it today. Fourth, the diff attack itself: a
+    substrate batch carrying one planted signal, anchored against the real spine, still leaves the
+    plant inside a `free_running` residual dozens of lines wide — the diff alone does not single
+    it out — while a batch built the forbidden way (nothing free-running but the plant) leaves the
+    plant as the *entire* residual, so the guard is proven to measure a real property rather than
+    passing on every input.
+    """
+    from .. import fixtures
+    from ..model import Overlay
+    from ..regimes import RegimeError, cutoff
+    from ..repo import ModelRepo
+    from ..spine import Spine, SpineError, anchor, diff_against_spine, reconcile, reconcile_at_every_checkpoint
+    from ..substrate import SubstrateRecipe
+    from ..substrate_generator import generate
+
+    carillion_dir = ctx.tmp / "carillion-repo"
+    if not carillion_dir.exists():
+        fixtures.build_carillion_org(carillion_dir)
+    overlay = Overlay.load(ModelRepo.open(carillion_dir), fixtures.CARILLION_ORG)
+    spine = Spine.from_overlay(overlay)
+    if len(spine.facts) < 3:
+        raise Violated(f"the Carillion spine carries only {len(spine.facts)} fact(s) — too thin to guard with")
+
+    recipe = SubstrateRecipe(
+        id="spine-guard-recipe", seed=13,
+        templates=(
+            "Lunch order chat in #ops.", "A long thread about the staging environment.",
+            "Expense report chasing.", "Sprint planning grumbling.",
+        ),
+        model_version="toy-model-v1",
+        planted_signals=("a director's calendar clears for three unexplained days",),
+    )
+    batch = generate(recipe)
+    checkpoint = max(f.date for f in spine.facts)
+
+    try:
+        reconcile(batch, spine, checkpoint)
+    except SpineError:
+        pass
+    else:
+        raise Violated("reconcile() passed on a batch that never had the spine anchored into it")
+
+    anchored_batch = anchor(batch, spine, checkpoint)
+    reports = reconcile_at_every_checkpoint(anchored_batch, spine)
+    if [r["checkpoint"] for r in reports] != sorted({f.date for f in spine.facts}):
+        raise Violated("reconcile_at_every_checkpoint did not run once per distinct spine date, in order")
+    if reports[-1]["reconciled"] != sorted(f.id for f in spine.facts):
+        raise Violated("the final checkpoint did not reconcile every spine fact")
+
+    try:
+        cutoff("2018-01-15T00:00:00Z")
+    except RegimeError:
+        pass
+    else:
+        raise Violated("cutoff() accepted a non-YYYY-MM-DD checkpoint")
+    try:
+        spine.at("2018-01-15T00:00:00Z")
+    except RegimeError:
+        pass
+    else:
+        raise Violated("Spine.at() did not route its checkpoint through regimes.cutoff()")
+
+    plant_line = f"[{batch['focus_entity']}] {batch['plants'][0]['signal']}"
+    diff = diff_against_spine(anchored_batch, spine)
+    if plant_line not in diff["free_running"]:
+        raise Violated("the planted signal did not survive as free-running content")
+    decoys = len(diff["free_running"]) - 1
+    if decoys < 10:
+        raise Violated(f"only {decoys} non-plant decoy(s) sit beside the plant in free_running — the diff attack would work")
+
+    over_anchored = {"channels": {"events": [f.statement for f in spine.facts] + [plant_line]}}
+    rigged = diff_against_spine(over_anchored, spine)
+    if rigged["free_running"] != [plant_line]:
+        raise Violated("the over-anchored negative control did not expose the plant as the sole residual — this guard proves nothing")
+
+    return (
+        f"a batch missing the {len(spine.facts)}-fact real Carillion spine fails reconcile(); once "
+        "anchored it reconciles at every one of the spine's own dated checkpoints; a malformed "
+        "checkpoint fails through regimes.RegimeError, not a parallel parser; the diff attack "
+        f"leaves the plant beside {decoys} non-plant decoy(s), while an over-anchored control "
+        "exposes it as the sole residual"
+    )
+
+
 def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
     rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     out = _git(root, "show", f"{ref}:{rel}")
