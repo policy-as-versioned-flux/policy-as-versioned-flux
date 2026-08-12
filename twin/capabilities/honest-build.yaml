@@ -1,0 +1,18 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+capability: honest-build
+owning_ticket: '20'
+criteria:
+  - index: 1
+    text: "A definition of \"skill\" for this project, and the unit of packaging."
+    checked: false
+  - index: 2
+    text: "The inventory: which capabilities are skills, which are code, which are inherited from arckit."
+    checked: false
+  - index: 3
+    text: "A build order with the bootstrap sequence made explicit."
+    checked: true
+    evidence: "The walking skeleton runs end to end from a clean checkout — sense to run to score — via twin/demo.sh, with each capability's depth grade computed and travelling in every artefact."
+    ticked_by: build ticket 07
+  - index: 4
+    text: "Each skill's owned decision-record (which resolved ticket defines its contract)."
+    checked: false

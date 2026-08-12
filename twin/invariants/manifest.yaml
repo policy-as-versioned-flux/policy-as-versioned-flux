@@ -1,0 +1,169 @@
+# The invariant manifest.
+#
+# Every invariant the constitution names appears here with the build ticket that must activate
+# it. `pending` is the only honest way to not assert something, and an invariant still pending
+# after its activating ticket has closed is itself a CI failure.
+#
+# `body_sha256` pins each live check's test body; `checks_module_sha256` pins the module around
+# them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
+# `authorised_by` citing the decision ticket that permits it.
+schema: twin.invariants/v1
+checks_module_authorised_by: "decision ticket 13 \u2014 build ticket 69: adds the standing_library_covers_committed_classes check (schema.py's new COMMITTED_SCENARIO_CLASSES enum + a scenario.class field) to checks.py, so the checks module hash moves; no existing check body changed"
+checks_module_sha256: 19da186f4e06a75776aff3de30e4b78c829b61ce553b60e74a9311b8049d114c
+invariants:
+  - name: store_rebuildable_from_git
+    activating_ticket: '01'
+    state: live
+    body_sha256: a4727ee5ec7d365a1858407326ece7750823faf44981710b2292037073e7a807
+    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 11, 13 and 14: signature types and the derived-artefact anomaly, roll-ups with no authored or stored form, and no inherited action band on the Wardley relations"
+    asserts: Any derived index can be dropped and rebuilt from the repository alone.
+
+  - name: identical_pins_identical_bytes
+    activating_ticket: '02'
+    state: live
+    body_sha256: e346f0ea02df691174011c21f1eb8d17d6810780306634f7876803a4627a97b4
+    authorised_by: "decision ticket 20 \u2014 checks strengthened after review: reproduce coverage, schema closure, Article 9 by value, the behavioural gate"
+    asserts: The same command against the same pins produces byte-identical output.
+    note: >-
+      The same-machine leg runs everywhere. The cross-architecture leg is the harness check
+      `cross_architecture_determinism`, which skips outside the CI matrix rather than faking it.
+
+  - name: every_artefact_marked
+    activating_ticket: '03'
+    state: live
+    body_sha256: a66721d8574ad56e8a816a52f2ecde709b524e9278852827042c133c484269bd
+    asserts: Every artefact is marked authored or derived, enforced rather than conventional.
+
+  - name: every_capability_depth_graded
+    activating_ticket: '03'
+    state: live
+    body_sha256: ea739ef53b942ee53620fc18deb4fb4b8bb78a80ed1caf3b099a1062cc66a0d5
+    authorised_by: "decision ticket 08 \u2014 checks strengthened for build tickets 21, 22 and 35: the do/observe pair and the rewound model state join the emitted set, and every verb's capabilities stay depth-graded"
+    asserts: >-
+      Every capability carries a depth grade computed from its owning decision ticket's
+      acceptance criteria; a typed grade is refused and names the unchecked criteria.
+
+  - name: world_never_references_overlay
+    activating_ticket: '04'
+    state: live
+    body_sha256: b06b40755b95b041232bff515e6c496dc15c2ec1a53ee9a16410adacf0d9a8bd
+    asserts: An overlay may reference the world layer; the world layer may never reference an overlay.
+
+  - name: no_collapse_mechanism
+    activating_ticket: '06'
+    state: live
+    body_sha256: b97e0cdf1b33f0c45d21d69c203d94e46e31c5edd1e9727ca9e56c8af2ab84e3
+    authorised_by: "decision ticket 08 \u2014 no_collapse_mechanism strengthened for build ticket 21: the combined propagation figure is the first aggregate that could stand in for what it aggregates, so every path is asserted to survive beside it with its own figures and its independence reference"
+    asserts: An execution emits multiple forecasts and no code path collapses them to one.
+    refuses_keys: [consensus, consensus_forecast, combined_forecast, collapsed, point_forecast, best_forecast]
+
+  - name: no_recommended_action_field
+    activating_ticket: '06'
+    state: live
+    body_sha256: 167d27b817a985f2ec344aed26451852c5ebcb9ce15858a1727c9ca5f04b7a80
+    authorised_by: "decision ticket 09 \u2014 build ticket 33: no_recommended_action_field's banned-word/phrase lists moved to shared constants (twin/invariants/__init__.py: NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES) so the new trade_off_curve_reports_disagreement_never_a_scalar harness guard imports rather than re-types them; the check's own logic and refusal behaviour are unchanged, only the body text moved"
+    asserts: No artefact carries a recommended-action field; a planted one is refused at emission.
+    refuses_keys: [recommended_action, recommendation, recommended]
+
+  - name: derived_never_human_signed
+    activating_ticket: '11'
+    state: live
+    body_sha256: 691972d334ffa083c78b8639b80b60a20583f99ee9e98de171e9de3e2b4299b6
+    authorised_by: "decision ticket 20 \u2014 checks strengthened for build tickets 11, 13 and 14: signature types and the derived-artefact anomaly, roll-ups with no authored or stored form, and no inherited action band on the Wardley relations"
+    asserts: >-
+      A derived artefact refuses a human signature; an authored artefact requires one.
+    note: >-
+      Activated ahead of its ticket at structural depth — extending the suite, never weakening
+      it. Build ticket 11 deepens this to cryptographic signing, at which point a hand-touched
+      derived artefact also fails the reproducibility check.
+
+  - name: only_as_consumed_scores
+    activating_ticket: '08'
+    state: live
+    body_sha256: 1e9bf4942598f5c25f80a7a44e20bd588b5164e84f092b5901f5f0f3a16c8ca9
+    asserts: Only an as-consumed execution produces a scoring-eligible forecast.
+
+  - name: no_special_category_slot
+    activating_ticket: '12'
+    state: live
+    body_sha256: 8fb4f6ef34b2bf4ab9e2262cb9ac28ed5fbdd20860fcc5cce495412c7b8b39e4
+    authorised_by: "decision ticket 20 \u2014 checks strengthened after review: reproduce coverage, schema closure, Article 9 by value, the behavioural gate"
+    asserts: >-
+      Special-category data has no schema slot: the schemas are closed, so there is no field for
+      it and compliance is an impossibility of representation rather than a rule.
+    note: >-
+      The value screen is a net, not a proof. `cohort` and `metric` are free identifiers, so a
+      protected group can still be described in words nobody listed. The structural guarantee is
+      about fields; the named list catches the obvious phrasings and the limit is stated in
+      twin/schema.py and twin/README.md rather than papered over.
+    refuses_keys: [biometric, biometric_data, church, disability, disabled, ethnic_origin, ethnicity, faith, genetic, genetic_data, health, health_condition, health_status, hiv, illness, medical, mosque, philosophical_belief, political_opinion, politics, pregnancy, pregnant, race, racial_origin, religion, religious_belief, sex_life, sexual_orientation, sexuality, sick_leave, sickness, synagogue, trade_union, trade_union_membership, union_member, union_membership]
+
+  - name: grade_5_only_path_never_prices
+    activating_ticket: '19'
+    state: live
+    body_sha256: 795c0b7d5fe7f644eac9cf3e6efb36fc4e4d2660eb0d230e50c9f7874c0cd85a
+    authorised_by: "decision ticket 09 \u2014 build ticket 30 joins the causal layer to the currency, so grade_5_only_path_never_prices gains the priced-impact leg where the largest figures now appear, and prefilter_precedes_pricing extends its allow-list to twin/pricing.py because a lock on one module while a sibling prices freely is not a lock"
+    asserts: >-
+      A scenario whose only causal path runs through a grade-5 edge produces an unpriced
+      structural blast radius, never a price.
+    note: >-
+      Checked at three depths: the published ladder admits only grades 1-2; the emitted blast
+      radius leaves a grade-5-only component unpriced while still admitting a fully-graded path,
+      so the gate is a gate and not a wall; and the blast-radius body is closed with no
+      price-shaped key in it, so an unpriced result has nowhere to put a number. The threshold is
+      pinned in the artefact, so moving it moves a digest.
+
+  - name: ruin_class_absent_not_priced
+    activating_ticket: '28'
+    state: live
+    body_sha256: 161d75067da61b28780486ed2ac1387c281fa40f7337f9bc9a505e43b6e2a168
+    asserts: A ruin-class option is absent from the output entirely, not present with a large number.
+    note: >-
+      Checked where a number would appear: the excluded option is not in the priced list, its
+      removal record carries no figure at any depth, the body is closed so there is no slot for
+      one, and re-running the pre-filter with the cost driven to zero and to an absurd number
+      changes nothing — because a cost is not an input to the decision. The positive leg is
+      asserted too: ruin is perspective-relative, so the same option still survives under an eye
+      that declares a different boundary, and a filter that removed everything would be a wall.
+
+  - name: prefilter_precedes_pricing
+    activating_ticket: '28'
+    state: live
+    body_sha256: 69e5f6c8c372d184712ef3cc6ca825a814b946b4bc04ec0fd2a5ff1fbe88016a
+    authorised_by: "decision ticket 09 \u2014 build ticket 30 joins the causal layer to the currency, so grade_5_only_path_never_prices gains the priced-impact leg where the largest figures now appear, and prefilter_precedes_pricing extends its allow-list to twin/pricing.py because a lock on one module while a sibling prices freely is not a lock"
+    asserts: The constraint pre-filter runs before pricing, so no number is ever comparable against a red line.
+    note: >-
+      Structural, not an ordering convention. Pricing is a method on the pre-filter's product, so
+      there is no free function that could be handed unfiltered options; and that product refuses
+      to be constructed any other way, so the first lock cannot be bypassed. The emitted choice set
+      is checked against both: survivors and removals partition what was considered, and every id
+      the filter removed on appears in the published constraint set.
+      The module's public surface is asserted as an **allow-list** rather than screened for
+      price-shaped names: a free function that prices an unfiltered option reopens the ordering
+      whatever it is called, and a keyword match would miss one named `tally`.
+
+  - name: as_consumed_admits_no_post_T_fact
+    activating_ticket: '36'
+    state: live
+    body_sha256: 45d4aa475a288e925079c95a8e485cce927bb802061dc0172e7fb94fe75cf201
+    authorised_by: "decision ticket 13 \u2014 build ticket 36 activates as_consumed_admits_no_post_T_fact and turns the regime tag into a load-through gate; emit_all and the subprocess determinism probe now name the regime, because there is no default"
+    asserts: An as-consumed execution cannot reference a fact dated after T, by construction rather than by review.
+    note: >-
+      Asserted as a construction rather than as an outcome. The regime is a parameter with no
+      default and the scenario schema has no slot for one, so the gate cannot be bypassed by
+      omission; withheld facts are absent from the overlay the execution reads rather than
+      screened out of it; and a fact dated after T but committed before it — the one shape the
+      rewind cannot remove — refuses the run when it is bound to a component the scenario
+      forecasts. The positive leg is asserted too: the same fixture still forecasts under
+      as-consumed, so the gate is a gate and not a wall.
+
+  - name: price_levels_never_probabilities
+    activating_ticket: '59'
+    state: pending
+    asserts: Prediction-market price levels enter as signals, never as probabilities.
+
+  - name: standing_library_covers_committed_classes
+    activating_ticket: '69'
+    state: live
+    body_sha256: 8e572e436c5c5e8f7755c1cf82dfeee49c7d53e61a3ee99077bd271076008422
+    asserts: The standing scenario library covers every committed scenario class.

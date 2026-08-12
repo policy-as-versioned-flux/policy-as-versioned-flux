@@ -1,0 +1,43 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+capability: scenario-engine
+owning_ticket: '13'
+criteria:
+  - index: 1
+    text: "The scenario object defined, incl. its references and its relationship to forecasts."
+    checked: true
+    evidence: "twin/verbs.py run() — a scenario references {components, graph version, world models, time} and emits forecasts as a list, always, one per named world model."
+    ticked_by: build ticket 06
+  - index: 2
+    text: "Concrete semantics for fast-forward, rewind and play, each distinguished."
+    checked: true
+    evidence: "twin/verbs.py run() is fast-forward — projection with no intervention, demonstrated in tests/test_four_verbs.py::test_projection_is_run_with_no_intervention. twin/primitives.py rewind() is the time half of rewind (build ticket 35) and twin/regimes.py the information-gate half (build ticket 36). twin/primitives.py Do is play (build ticket 22). Build ticket 37 composes the two primitives into all four operations — projection alone, do() alone (act-now), rewind+do() (the counterfactual), rewind+run() (the backtest, `twin backtest`) — with no backtest-specific code path: harness guard backtest_is_a_pure_composition asserts an explicit rewind+run computes the identical forecast run() alone computes at the same time, differing only in which command produced it."
+    ticked_by: build ticket 37
+  - index: 3
+    text: "Where scenarios live + how they are versioned/diffed."
+    checked: false
+  - index: 4
+    text: "How opportunity/gameplay moves are proposed, with the negativity counterweight addressed."
+    checked: true
+    evidence: "twin/gameplay_lens.py propose() checks a two-play catalogue (land-grab, exploit-commoditisation) against the current map's evolution positions, needs-edge dependency structure and ownership, with the reason and the checked preconditions attached per opportunity. gameplay_lens.sweep() runs it unconditionally across every org overlay of every named repository, no human naming a component — the structural pull against the record's push (decision ticket 13 Q3) — and reports opportunity-candidate volume beside each org's bound-signal volume in the same artefact so the counterweight is measurable."
+    ticked_by: build ticket 46
+  - index: 5
+    text: "Admissibility rule for the scenario library."
+    checked: true
+    evidence: >-
+      twin/schema.py's closed COMMITTED_SCENARIO_CLASSES enum and the optional scenario.class
+      field make "belongs to the standing library" mechanical: a scenario is admissible by
+      carrying one of the nine committed classes (or by being unconditionally swept per build
+      ticket 09 — decision ticket 13's other admissibility arm). fixtures.build_library_org
+      populates all nine; harness guard standing_library_covers_committed_classes
+      (twin/invariants/checks.py) fails CI the moment one is silently dropped, demonstrated in
+      tests/test_scenario_library.py::test_dropping_a_committed_class_from_the_library_fails_the_invariant.
+      The full "preconditions/triggers checkable against the map" reading of admissibility — the
+      precondition-triggered arm — stays for build ticket 46 (gameplay-lens); this ticket closes
+      only the committed-set arm.
+    ticked_by: build ticket 69
+  - index: 6
+    text: "A selection/prioritisation rule for which scenarios run (the combinatorics answer)."
+    checked: false
+  - index: 7
+    text: "Exercised on one fear scenario and one opportunity scenario across the co-flagships."
+    checked: false

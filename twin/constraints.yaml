@@ -1,0 +1,172 @@
+# The constraint set (build ticket 27), from decision tickets 09 and 15.
+#
+# Published upfront, on purpose. If everything carries a price, a large enough number eventually
+# makes a monstrous option optimal — so some options are removed from the choice set **before any
+# pricing happens**. A very large penalty still asserts that a price exists, and with enough
+# upside an optimiser finds it.
+#
+# Paperclip-maximiser risk cannot be engineered away. It can only be made **inspectable**: a twin
+# with a suspiciously short constraint list is then visibly suspicious. That is the honest
+# defence, and publishing this file is the whole of it.
+#
+# Two tiers. This file is the **universal floor** — identical in every twin and not negotiable by
+# the operator. A perspective declares its own red lines in its own file in the model repository
+# and may **add** to the floor; it has no way to remove from it, and a perspective whose
+# constraint reuses a floor id does not load.
+#
+# Versioned. Bump `version` in the same commit as any change below. Every artefact that resolves
+# a constraint set records the version and digest it resolved against.
+schema: twin.constraints/v1
+version: 1
+
+universal_floor:
+  - id: no-special-category-representation
+    class: forbidden
+    forbids: >-
+      Representing, inferring or storing special-category data about any person, in any layer of
+      the model, at any depth.
+    because: >-
+      Compliance here is an impossibility of representation rather than a rule someone could
+      relax: the schemas are closed, so there is no field to put it in.
+    source: decision tickets 07, 09 and 15
+
+  - id: no-covert-sensing
+    class: forbidden
+    forbids: >-
+      Any sensor whose subjects have not been told it exists.
+    because: >-
+      Permanently excluded rather than deferred. Everyone knows what is measured, so gaming is a
+      certainty to design for rather than a risk to detect.
+    source: decision tickets 10 and 15
+
+  - id: no-individual-attribution
+    class: forbidden
+    forbids: >-
+      Using person-to-component knowledge edges as an input to any retrospective scenario that
+      attributes an outcome to a named individual.
+    because: >-
+      The data is legitimately needed for capability questions — bus factor, succession,
+      resilience — and blame attribution after an incident is a different question wearing the
+      same inputs. This is a scenario-level admissibility rule, not a data restriction.
+    source: decision ticket 15, Q3
+
+  - id: no-individual-level-output
+    class: forbidden
+    forbids: >-
+      Producing any behavioural output about an identified person rather than a cohort.
+    because: >-
+      Aggregate over individual, cohort over person. An observation has no person field, so the
+      rule is structural rather than a discipline to remember.
+    source: decision ticket 15, Q1
+
+  - id: no-automatic-enactment
+    class: forbidden
+    forbids: >-
+      Any path by which the twin changes the world without a human deciding to.
+    because: >-
+      The twin proposes only. It is advisory by law and by design, and a trade-off curve has
+      nothing to auto-execute.
+    source: decision ticket 09, Q3; UK GDPR Article 22
+
+  - id: no-ruin-class-option
+    class: ruin
+    forbids: >-
+      Any option carrying a real chance of destroying the party that bears it.
+    because: >-
+      An expected-value average is only meaningful if you survive to keep playing. Ruin is
+      excluded, never priced. The **rule** is universal; the **boundary** is perspective-relative
+      — insolvency for a firm, loss of livelihood for a person — and each perspective declares
+      its own. One interaction worth stating rather than discovering: a boundary phrased in
+      special-category terms cannot be declared at all, because the constraint above it refuses
+      the words. The floor binds the perspectives as well as the operator.
+    source: decision ticket 09, Q2
+
+# What the twin was **not** asked to model, listed. This does not stop strategic non-modelling;
+# it removes its deniability. Documented foreseeability creates liability, so the rational
+# deployer scopes a twin to exclude the scenarios most likely to produce it — and a sensor ladder
+# that says "must feed a named scenario someone will act on" supplies the principled vocabulary
+# for refusing to look. Publishing the refusals is what makes that legible.
+scope_exclusions:
+  - id: power-asymmetry
+    excluded: >-
+      Who may act, on whom, with what asymmetry, and with what recourse.
+    because: >-
+      Every constraint in this design is epistemic — what may be represented, inferred, produced,
+      traced or exported. Not one constrains power, and a system cannot constrain power it does
+      not hold.
+    source: decision ticket 15, Q4
+
+  - id: harms-to-non-contracting-parties
+    excluded: >-
+      Costs borne by suppliers, contractors, applicants and acquisition targets.
+    because: >-
+      A perspectival currency puts them outside the £ by construction, and "they can run their
+      own twin" is not an answer available to a six-person subcontractor. The affected-parties
+      register that at least names them lands at build ticket 61.
+    source: decision ticket 15, Q3b finding 2
+
+  - id: disparate-impact-measurement
+    excluded: >-
+      Whether any output falls differently on a protected group.
+    because: >-
+      Structural unrepresentability of special-category data prevents the **detection** of
+      discrimination, not the discrimination. Disparate impact needs no protected field to occur
+      but does need one to be measured. The sealed audit channel is build ticket 61; until it
+      exists this system cannot be checked for it, which is stated rather than implied.
+    source: decision ticket 15, Q3b finding 4
+
+  - id: the-twins-own-liability
+    excluded: >-
+      The discoverability and liability consequences of running the twin at all.
+    because: >-
+      Modelling them would give the operator a reason to scope the twin around them, which is the
+      behaviour this section exists to make visible.
+    source: decision ticket 15, Q3b finding 1
+
+  - id: individual-behaviour
+    excluded: >-
+      The behaviour of any identified person.
+    because: >-
+      Sensed at cohort level or not at all. Listed here as well as in the floor, because a reader
+      of the output should not have to infer an absence from a constraint.
+    source: decision ticket 15, Q1
+
+# Positions this design carries openly rather than patching. Each is stated by name, because
+# "presumably covered" is how absences happen.
+positions:
+  - id: no-power-layer
+    status: stated
+    states: >-
+      No power layer is claimed and none exists. Constraining who may act, on whom, and with what
+      recourse belongs to law and governance outside the twin. The epistemic constraints in this
+      file protect nobody on their own, and the design must stop reading as though they do. What
+      the twin can do is refuse to be the alibi and make asymmetry legible.
+    source: decision ticket 15, Q4
+
+  - id: exit-cost-asymmetry
+    status: unsolved
+    states: >-
+      From structural fields this design has already decided are legitimate — compensation
+      history, working patterns, location, skill specificity — the twin can identify who cannot
+      afford to leave. That is precisely the population the grievance-to-insider counter-price
+      fails to protect, because the counter-price only bites for people who can credibly go. No
+      structural constraint is proposed. Inventing a reassuring rule here would be worse than the
+      honest gap, so it is carried as a known harm.
+    source: decision ticket 15, Q3b finding 3
+
+  - id: reflexivity-and-goodhart-on-the-twin
+    status: deferred
+    states: >-
+      The twin changes the organisation it measures, and an organisation that knows how it is
+      measured optimises for the measurement. This is a real limitation and it is deferred, not
+      solved. Fast improvement is treated as grounds for suspicion and never as a verdict, which
+      is a backstop rather than an answer.
+    source: decision tickets 10, 11 and 15, Q2
+
+  - id: covert-sensing
+    status: permanently-excluded
+    states: >-
+      Covert sensors are ruled out permanently. This is not the deferral above and must not be
+      read as one: there is no future ticket that admits a sensor whose subjects were not told it
+      exists.
+    source: decision tickets 10 and 15
