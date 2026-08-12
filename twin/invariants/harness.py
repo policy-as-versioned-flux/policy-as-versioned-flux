@@ -2309,6 +2309,99 @@ def _twin_self_reference_is_cut_not_recursed(ctx: Context) -> str:
     )
 
 
+@harness_check("ethics_gate_ladder_stops_early_and_fast_improvement_is_never_an_automatic_finding")
+def _ethics_gate_ladder_stops_early_and_fast_improvement_is_never_an_automatic_finding(ctx: Context) -> str:
+    """`ethics-gate` (build ticket 47, decision ticket 15 Q1/Q2): the sensor admission ladder
+    stops at its first failing rung rather than evaluating the rest, and a fast-improvement flag
+    can never become an adverse finding without a human's own adjudication, attached to a
+    registered role — the same structural-plus-live shape the other five skill guards use.
+
+    Five legs. First, the ladder genuinely stops: a necessity/proportionality payload that would
+    raise if ever read (empty dicts, missing the keys `_check_necessity`/`_check_proportionality`
+    require) sits behind a failing purpose rung, and `walk_ladder()` does not raise — proving the
+    later rungs were never called, not merely that the reported result happens to be right.
+    Second, the positive leg of the same property: a fully-passing walk carries a non-empty
+    `justification` on every evaluated rung, so "recorded justification per rung" is checked
+    against real output. Third, `flag_fast_improvement()`'s own output carries no action- or
+    verdict-shaped field or phrase — the identical banned-word/phrase scan
+    `no_recommended_action_field` runs, re-asserted against a fourth artefact
+    (`trade_off_curve_reports_disagreement_never_a_scalar` was the second,
+    `gameplay_lens_is_grade_5_and_reports_no_recommendation` the third). Fourth,
+    `adjudicate_fast_improvement()` refuses to run against a flag that was never raised and
+    refuses an unregistered role, checked against the real role register
+    (`twin/roles.yaml`) rather than trusted from a docstring. Fifth, the real labelled corpus (the
+    same five sensor proposals `tests/test_ethics_gate.py` evaluates against, built fresh here)
+    passes its threshold and a skill that admits everything fails it — a harness with no subject
+    proves nothing.
+    """
+    from . import NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES
+    from .. import ethics_gate as eg
+    from .. import skills as skills_mod
+    from ..canon import walk_keys, walk_values
+    from ..sign import role_ids
+
+    poison: dict[str, Any] = {}
+    stopped = eg.walk_ladder(
+        {"purpose": {"scenario": "", "will_act": False}, "necessity": poison, "proportionality": poison}
+    )
+    if stopped["admitted"] or stopped["stopped_at"] != "purpose" or len(stopped["rungs"]) != 1:
+        raise Violated(f"the ladder did not stop cleanly at the first failing rung: {stopped}")
+
+    passing = eg.walk_ladder(
+        {
+            "purpose": {"scenario": "s", "will_act": True},
+            "necessity": {"kind": "structural", "level": "aggregate", "alternatives": []},
+            "proportionality": {"intrusion_cost": 10.0, "value_illuminated": 1000.0},
+        }
+    )
+    if not passing["admitted"] or not all(r["justification"] for r in passing["rungs"]):
+        raise Violated(f"a fully-passing ladder walk is missing a justification somewhere: {passing}")
+
+    flag = eg.flag_fast_improvement({"sensor": {"id": "guard-sensor"}, "baseline": 10.0, "current": 30.0})
+    if not flag["flagged"]:
+        raise Violated("a 200% improvement did not flag at the default threshold — this leg needs a raised flag")
+    for key in walk_keys(flag):
+        if any(word in key.lower() for word in NO_ACTION_BANNED_KEYS):
+            raise Violated(f"flag_fast_improvement()'s own output carries an action/verdict-shaped field ({key})")
+    for key, value in walk_values(flag):
+        if isinstance(value, str) and any(phrase in value.lower() for phrase in NO_ACTION_BANNED_PHRASES):
+            raise Violated(f"flag_fast_improvement() states an action in prose at {key}: {value!r}")
+
+    try:
+        eg.adjudicate_fast_improvement({"sensor": "guard-sensor", "flagged": False}, "model-steward", "clear", "reviewed")
+    except eg.EthicsGateError:
+        pass
+    else:
+        raise Violated("adjudicate_fast_improvement() ran against a clear (unflagged) input")
+    try:
+        eg.adjudicate_fast_improvement(flag, "nobody-in-the-register", "genuine improvement", "reviewed")
+    except eg.EthicsGateError:
+        pass
+    else:
+        raise Violated("adjudicate_fast_improvement() accepted a claimed_by not in the role register")
+    adjudicated = eg.adjudicate_fast_improvement(flag, "model-steward", "genuine improvement", "reviewed the underlying data")
+    if adjudicated["claimed_by"] not in role_ids():
+        raise Violated("the adjudication's own claimed_by is not in the role register")
+
+    corpus = eg.labelled_corpus()
+    good = skills_mod.evaluate(eg.SKILL, eg.admit, corpus, scorer=eg.scorer)
+    if not good.passed:
+        raise Violated("ethics-gate failed its own labelled corpus running correctly — the harness has no subject")
+    bad = skills_mod.evaluate(
+        eg.SKILL, lambda payload: {"admitted": True, "ladder": {"stopped_at": None}}, corpus, scorer=eg.scorer,
+    )
+    if bad.passed:
+        raise Violated("a skill that admits everything still passed — the threshold is not gating anything")
+
+    return (
+        "the ladder stops at its first failing rung without touching the rest; a fully-passing "
+        "walk carries a justification on every rung; flag_fast_improvement() carries no "
+        "action/verdict-shaped field or phrase; adjudication refuses an unflagged input and an "
+        f"unregistered role; the real {len(corpus)}-item labelled corpus passes and a skill that "
+        "admits everything fails its threshold"
+    )
+
+
 def _git(root: Path, *args: str) -> str | None:
     proc = subprocess.run(
         ["git", *args], cwd=str(root), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL

@@ -1,13 +1,13 @@
 # `twin`
 
-Build tickets 01–46, 60, 61 and 62 of `.scratch/twin/` are closed; 64 is instrumented and
-measuring. One dated signal binds to a
+Most build tickets under `.scratch/twin/` are closed; 64 is instrumented and
+measuring, not closed. One dated signal binds to a
 component; one scenario execution emits forecasts — plural; one recorded outcome scores them under
 proper scoring rules; any artefact recomputes from its own pins. Scoring is in the first slice
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 48 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 58 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -599,6 +599,69 @@ perspective's declared constraint ids before and after and demands a matching lo
 one that disappeared — logged per perspective, so a removal recorded against one perspective does
 not silently cover the same constraint id removed from another.
 
+## The admission ladder, DPIA triage, gameability and the fast-improvement backstop
+
+`twin/ethics_gate.py` (build ticket 47) is `ethics-gate`, the sixth and last of the six skills seam
+3 (build ticket 42) exists to evaluate, and the first build ticket to give decision ticket 15's own
+resolution a mechanism rather than only a paragraph — the reconciling doctrine "model the mechanism
+universally, sense sparingly" now has code that a sensor proposal actually has to pass.
+
+**The ladder stops, structurally.** `walk_ladder()` walks purpose, then necessity, then
+proportionality, in that order, and a failing rung ends the loop before the next rung's check
+function is even called — the harness guard proves it by handing the necessity and proportionality
+rungs a payload that would raise if either were ever read, sitting behind a purpose rung that
+fails first, and `walk_ladder()` does not raise. Purpose asks whether a named scenario will act on
+this sensor at all — a sensor feeding nothing is surveillance for its own sake. Necessity is a
+computed intrusiveness ranking, not a hand-wave: structural outranks behavioural, aggregate
+outranks cohort, cohort outranks individual, decision ticket 15 Q1's own words, and the rung fails
+the moment any considered alternative is less intrusive than the one chosen. Proportionality
+compares an illuminated value against an intrusion cost directly — "computable, not a hand-wave" —
+and every evaluated rung carries a non-empty `justification`, on a pass as much as a fail.
+
+**The DPIA gate and the ladder are two distinct checks, exercised as two.** `dpia_triage()` names
+the ICO's own 2023 monitoring-guidance triggers (research 05 Part B.2): email or message
+monitoring, keystroke monitoring, biometric data, profiling, or a risk of financial loss to the
+worker. `admit()` combines the two: a sensor is admitted only when the ladder passes **and**, where
+a DPIA is mandatory, the payload records it complete — so a proposal can fail for either reason, and
+`tests/test_ethics_gate.py::test_admit_refuses_when_dpia_mandatory_and_not_complete_even_though_ladder_passes`
+demonstrates the ladder passing while the DPIA gate alone still blocks admission. Together with
+build ticket 07's pre-existing, unchanged detachment of the behavioural overlay as a separately-
+gated store, this is decision ticket 15's own resolution of its operational-gate criterion,
+verbatim: "admission requires passing the ladder + a DPIA."
+
+**Gameability is a first-class, recorded attribute, not vigilance.** `classify_gameability()`
+marks a sensor `goodhart-proof` only on positive evidence that gaming its metric requires doing the
+genuinely desired thing (decision ticket 15's own worked example: a bus-factor score gamed by
+actually spreading knowledge); everything else — decision ticket 15's own named examples, commit
+counts, message sentiment, hours-online — falls to the safe default, `marked`. `prefer()` is the
+preference rule itself, applied to a set of candidates and recording which it chose and why, rather
+than a stated intention nothing reads.
+
+**Fast improvement is a flag, never a verdict — checked the same way `no_recommended_action_field`
+is.** `flag_fast_improvement()`'s own output has nowhere to put an adverse finding: its keys and
+prose are scanned against the identical banned-word/phrase lists that invariant runs
+(`trade_off_curve_reports_disagreement_never_a_scalar` and
+`gameplay_lens_is_grade_5_and_reports_no_recommendation` are the two prior re-assertions), so
+"suspicion, never a verdict" is a property of the code rather than a habit of whoever reads it. The
+only way a flag becomes an actual finding is `adjudicate_fast_improvement()` — refuses to run
+against a flag that was never raised, and refuses a role the register (`twin/roles.yaml`) does not
+carry — the same "inferred/flagged first, human second, and the human is scored too" shape
+`twin/evolution_judge.py` established for evolution positions.
+
+**`twin/capabilities/ethics-gate.yaml` exists for the first time, and ticks three of decision
+ticket 15's five criteria.** AC 1 (the admission rule) and AC 3 (the Goodhart position) and AC 5
+(the operational gate mechanism) move to checked, each citing this ticket; AC 2 (the sensor set
+itself) stays open because decision ticket 15's own resolution carries it forward as a build-time
+artefact, not a decision this ticket makes; AC 4 (a named misuse catalogue) also stays open —
+`twin/misuse-catalogue.yaml` (build ticket 62) is a real, tested artefact, but it names misuses of
+the twin's own governance machinery, not the behavioural-sensing misuse catalogue (suppressing pay,
+justifying layoffs, surveillance creep, ...) decision ticket 15's own Q3/Q3b table names, and a tick
+here would need code realising *that* catalogue, which does not exist yet. `ethics-gate` grades
+`partial` at 3/5 — never `full`, and never asserted as such. The same code also ticks
+`twin/capabilities/sense-move.yaml` AC 6 (decision ticket 11, "a stated position on sensor
+gameability") — one module, two capabilities, because gameability is genuinely where sensing and
+its ethics gate overlap; `sense-move` moves from 4/8 to 5/8.
+
 ## The credibility prior: the world/overlay split earning its keep
 
 `twin credibility` (build ticket 31) is the blend the world/overlay split existed to enable but had
@@ -1030,22 +1093,46 @@ reaches `full`, and nothing can be typed as `full`.
 | `currency-regimes` | 09 | partial | 5 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
-| `sense-move` | 11 | partial | 4 / 8 |
-| `scenario-engine` | 13 | partial | 2 / 7 |
+| `sense-move` | 11 | partial | 5 / 8 |
+| `scenario-engine` | 13 | partial | 4 / 7 |
 | `synthetic-substrate` | 12 | partial | 2 / 7 |
+| `forecast-book` | 21 | partial | 1 / 6 |
+| `twin-inside-twin` | 10 | partial | 2 / 5 |
+| `ethics-gate` | 15 | partial | 3 / 5 |
 
-**19 of 48**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**28 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capability here stands at five ticks, and four of the eight still stand at
-one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
-count — most rows below track only as far as build ticket 33 tells their story, plus build ticket
-45's tick on `causal-layer` narrated just below. `scenario-engine` moved to 2/7 across build
-tickets 37 (AC 2, fast-forward/rewind/play distinguished) and 46 (AC 4, opportunity/gameplay
-moves, narrated below), and `sense-move` moved to 4/8 across build tickets 43 and 44 — none of
-those three moves narrated in its own round here. `synthetic-substrate` moved to 2/7 at build
-ticket 50 (AC 1, narrated just above). Decision ticket 15 (build ticket 61) has no capability file
-at all, so the affected-parties register and disparate-impact channel move nothing in this table —
-see their own section above.
+there"** — the strongest capability here stands at five ticks, and three of the eleven still stand
+at one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
+count.
+
+**Re-deriving this round found the table three capabilities and two ticks stale, the same shape of
+drift build ticket 48 caught once before and build ticket 34's coherence audit caught at scale.**
+`forecast-book` (build ticket 57, AC 1 ticked) and `twin-inside-twin` (build ticket 63, ACs 1 and 3
+ticked) were built and narrated in their own sections above but never folded into this table or its
+total; `scenario-engine` was carrying build ticket 69's own AC 5 tick (the standing-library
+admissibility rule) without it ever reaching this row, so its own two entries below undercounted it
+at 2/7 rather than the real 4/7. All three are corrected here, from `./bin/twin grade`'s own output
+rather than by re-deriving each ticket's history by hand. `scenario-engine` moved to its now-stale
+2/7 across build tickets 37 (AC 2, fast-forward/rewind/play distinguished) and 46 (AC 4,
+opportunity/gameplay moves, narrated below), and `sense-move` moved to 4/8 across build tickets 43
+and 44 — none of those three moves narrated in its own round here. `synthetic-substrate` moved to
+2/7 at build ticket 50 (AC 1, narrated just above).
+
+**`ethics-gate` is a new row (build ticket 47) against a decision ticket — 15 — that had no
+capability file at all before this ticket**, the same gap build ticket 61 found and declined to
+fill with an empty one; see "The admission ladder, DPIA triage, gameability and the
+fast-improvement backstop" above for what ticks and what stays open. The same ticket's code also
+ticks `sense-move` AC 6 ("a stated position on sensor gameability", decision ticket 11) — moving
+that row from 4/8 to 5/8 — because sensor gameability is the genuine overlap between sensing and
+its ethics gate, and one module answers both capabilities' own criteria rather than two separate
+ones happening to agree. `twin-inside-twin` (decision ticket 10) is a separate capability from
+`ethics-gate`: its own AC 4 ("a stated position on Goodhart/reflexivity, incl. which sensors are
+most gameable") is about the twin's reflexive effect on *itself*, explicitly deferred at decision
+ticket 10 Q4 and carried to a workstream this ticket is not — decision ticket 15's Q2 Goodhart
+position, about gaming *employee-facing* sensors, is a
+different question, and build ticket 47 answers only that one. Nothing here moves
+`twin-inside-twin`'s own unticked AC 4.
 
 **Nothing was ticked in the round before this one, and the arithmetic did not move at all.** Three
 build tickets landed — the information gate (36), the drift instrument (64) and the join of the
@@ -1149,11 +1236,13 @@ does not exist:
   component is build ticket 25. Ethical harms still wait on the affected-parties register at 61.
   Five of six named incommensurables is not each of them. It is also, as of build ticket 33, the
   **only** criterion `currency-regimes` still has open — ACs 5 and 6 are ticked; see above.
-- **decision ticket 15** has **no capability file at all.** Build ticket 27 published the scope
-  exclusions, the power-layer disclaimer, exit-cost asymmetry and the permanent covert-sensing
-  exclusion — all from that ticket's *resolution*, none of them one of its five acceptance
-  criteria. So none is ticked, and a capability file at 0/5 would be a slot claiming a capability
-  existed.
+- **decision ticket 15** now has a capability file (`ethics-gate`, build ticket 47, 3/5) — see "The
+  admission ladder, DPIA triage, gameability and the fast-improvement backstop", above. Before that
+  ticket it had none: build ticket 27 published the scope exclusions, the power-layer disclaimer,
+  exit-cost asymmetry and the permanent covert-sensing exclusion — all from that ticket's
+  *resolution*, none of them one of its five acceptance criteria — so nothing was ticked, and a
+  capability file at 0/5 would have been a slot claiming a capability existed with nothing behind
+  it.
 - **decision ticket 07 AC 5** (representation/format reuse-vs-custom **and** authored-vs-derived) —
   the authored/derived split is now structural in four places, but the format decision is recorded
   nowhere in code.
@@ -1166,13 +1255,13 @@ does not exist:
 and the build ticket that earned it.
 
 **Scoring and calibration are still outside this ledger.** No capability file is owned by a decision
-ticket that governs scoring, so build ticket 08's work does not appear in the 41. That is a hole in the
+ticket that governs scoring, so build ticket 08's work does not appear in the 64. That is a hole in the
 honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 45 pass, 2 pending, 1 skipped and not faked (the CI-only cross-architecture
-leg). `pytest -q` — 942 tests across seams 1 and 2.
+`./bin/twin verify` — 52 pass, 1 pending, 1 skipped and not faked (the CI-only cross-architecture
+leg). `pytest -q` — 1101 tests across seams 1 and 2.
 
 | live | pending, with the ticket that activates it |
 |---|---|

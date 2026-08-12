@@ -25,7 +25,9 @@ criteria:
     checked: false
   - index: 6
     text: "A stated position on sensor gameability."
-    checked: false
+    checked: true
+    evidence: "twin/ethics_gate.py (build ticket 47, decision ticket 15 Q2): classify_gameability() marks a sensor goodhart-proof only on positive evidence that gaming its metric requires doing the genuinely desired thing, defaulting to marked otherwise; prefer() applies that as a preference rule among candidates and records the choice; flag_fast_improvement()/adjudicate_fast_improvement() build the backstop — a fast-improving metric is grounds for suspicion, never an automatic finding, and only a human holding a registered role can adjudicate one. The same code ticks ethics-gate AC 3 (decision ticket 15) — sensor gameability is the genuine overlap between sensing (this capability) and its ethics gate."
+    ticked_by: build ticket 47
   - index: 7
     text: "The loop's cadence + re-price triggers, sufficient to generate forecast volume."
     checked: true

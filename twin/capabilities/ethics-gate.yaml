@@ -1,0 +1,60 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+#
+# Decision ticket 15 had no capability file at all until this ticket (build ticket 61 found the
+# gap and declined to create a 0/5 file, which would have claimed a capability existed with
+# nothing behind it). Two of its five acceptance criteria stay unticked here on purpose: AC 2
+# (the sensor set + granularity decision) is explicitly carried forward as a build-time artefact
+# by the decision ticket's own resolution, not this ticket's job; AC 4 (the named misuse
+# catalogue) is NOT the same artefact as build ticket 62's `twin/misuse-catalogue.yaml` — that
+# catalogue names misuses of the twin's own governance machinery (pricing, scoring, derivation),
+# not the behavioural-sensing misuse catalogue (suppressing pay, justifying layoffs, surveillance
+# creep, ...) decision ticket 15's own Q3/Q3b table names. A tick here needs code that realises
+# *that* catalogue, which does not exist yet.
+capability: ethics-gate
+owning_ticket: '15'
+criteria:
+  - index: 1
+    text: "A sensor admission rule reconciling total-scope ambition with minimisation."
+    checked: true
+    evidence: >-
+      twin/ethics_gate.py walk_ladder(): purpose, then necessity, then proportionality, walked in
+      order with a recorded justification per rung, stopping at the first failing rung — harness
+      guard ethics_gate_ladder_stops_early_and_fast_improvement_is_never_an_automatic_finding
+      proves the later rungs are never evaluated once an earlier one fails, by handing them a
+      payload that would raise if ever read. Decision ticket 15 Q1's ladder, mechanised rather
+      than only decided in prose.
+    ticked_by: build ticket 47
+  - index: 2
+    text: "The sensor set + granularity decision."
+    checked: false
+  - index: 3
+    text: "A stated Goodhart position with the most-gameable sensors named."
+    checked: true
+    evidence: >-
+      twin/ethics_gate.py classify_gameability() and prefer(): a sensor is marked goodhart-proof
+      (gaming the metric requires doing the genuinely desired thing) or marked (the safe default —
+      cheaply gamed for no useful effect), and prefer() records which candidate the preference
+      rule chose, and why. flag_fast_improvement()/adjudicate_fast_improvement() build the
+      backstop (Q2c): a fast-improving metric raises a flag whose own output carries no
+      action/verdict-shaped field (checked against the same banned-word scan
+      no_recommended_action_field runs), and only a human holding a registered role
+      (twin/roles.yaml) can adjudicate it into an actual finding. Decision ticket 15 Q2 already
+      named the position and its worked examples (bus-factor vs. commit counts/message
+      sentiment/hours-online) in prose; this ticket is the first to give it a mechanism.
+    ticked_by: build ticket 47
+  - index: 4
+    text: "A named misuse catalogue, each with its blocking constraint."
+    checked: false
+  - index: 5
+    text: "The operational gate mechanism, incl. what detaching the overlay means."
+    checked: true
+    evidence: >-
+      Two halves, matching decision ticket 15's own resolution verbatim. Detachment: build ticket
+      07's behavioural overlay is a separately-gated store, a demonstrable act, unchanged by this
+      ticket. Admission: twin/ethics_gate.py admit() combines walk_ladder() with dpia_triage() —
+      a sensor is admitted only when the ladder passes AND, where a DPIA is mandatory under the
+      ICO's 2023 monitoring guidance (email/message/keystroke/biometric monitoring, profiling, or
+      financial-loss risk to the worker — research 05 Part B.2), the payload records
+      dpia.complete. tests/test_ethics_gate.py::test_admit_refuses_when_dpia_mandatory_and_not_complete_even_though_ladder_passes
+      demonstrates the ladder and the DPIA gate operating as two distinct checks, not one.
+    ticked_by: build ticket 47

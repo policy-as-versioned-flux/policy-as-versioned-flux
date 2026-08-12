@@ -6,9 +6,9 @@
 # refuses a decrease with no `authorised_by` citing a decision ticket.
 #
 # `toy-classifier` is a fixture skill, not one of the six real skills (signal-classify,
-# causal-claims, evolution-judge, substrate-generator, gameplay-lens, ethics-gate) — none of those
-# exist yet (decision ticket 20). It exists to prove the harness against something, because a
-# harness tested only against skills that do not exist yet is untested.
+# causal-claims, evolution-judge, substrate-generator, gameplay-lens, ethics-gate) — all six now
+# exist, as of build ticket 47 (decision ticket 20). It exists to prove the harness against
+# something, because a harness tested only against skills that do not exist yet is untested.
 schema: twin.skill-thresholds/v1
 version: 1
 thresholds:
@@ -60,4 +60,11 @@ thresholds:
       The reference generator (build ticket 49) scores 1.0 on its own three-recipe labelled corpus
       (zero, sparse and one-per-channel planted-signal schedules); the threshold is set below that
       at the same round 0.8 bar signal-classify/causal-claims use, never padded up to the achieved
+      score.
+  ethics-gate:
+    threshold: 0.8
+    note: >-
+      The reference gate (build ticket 47) scores 1.0 on its own five-item labelled corpus, which
+      spans every way the ladder can stop plus the DPIA-gated case; the threshold is set below
+      that at the same round 0.8 bar most of the other skills use, never padded up to the achieved
       score.
