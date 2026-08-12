@@ -253,5 +253,7 @@ def test_the_synthetic_substrate_capability_grade_is_computed_partial() -> None:
     graded = caps.require("synthetic-substrate")
     assert graded.owning_ticket == "12"
     assert graded.grade == "partial"
+    # AC 5 was ticked here (build ticket 48); AC 1 joined it at build ticket 50
+    # (twin/spine.py) — this test only pins "still partial, still computed", not the exact set.
     checked = {c.index for c in graded.criteria if c.checked}
-    assert checked == {5}
+    assert {5} <= checked

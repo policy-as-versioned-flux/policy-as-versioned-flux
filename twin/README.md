@@ -932,13 +932,55 @@ suite, the same four-leg shape the other three skill guards already take.
 
 **Does not move the `synthetic-substrate` capability grade.** Decision ticket 12's AC 3 (the
 planting protocol) asks for the full bundle — strength, lead time, burial *and* difficulty
-distribution — and this ticket builds burial (the one-per-channel cap) only; lead time is the
-actionability horizon (ticket 50) and a distribution of difficulty is the fidelity eval suite's
-own job (51). AC 3 stays unticked on the same "one clause of a multi-clause criterion" ground
-several earlier tickets already left criteria on, rather than ticked for building real code that
-happens to be adjacent to it. `synthetic-substrate` stays at 1/7, `partial` — unchanged from build
-ticket 48, and re-asserted rather than silently left to drift
-(`tests/test_substrate_generator.py::test_the_synthetic_substrate_capability_grade_stays_partial`).
+distribution — and this ticket builds burial (the one-per-channel cap) only; a distribution of
+difficulty is the fidelity eval suite's own job (51). AC 3 stays unticked on the same "one clause
+of a multi-clause criterion" ground several earlier tickets already left criteria on, rather than
+ticked for building real code that happens to be adjacent to it. `synthetic-substrate` stays at
+1/7, `partial` — unchanged from build ticket 48, and re-asserted rather than silently left to
+drift (`tests/test_substrate_generator.py::test_the_synthetic_substrate_capability_grade_stays_partial`).
+
+## The spine: anchored where dated, free-running where silent
+
+`twin/spine.py` (build ticket 50, decision ticket 12 Q3) is the seam AC 1 asks to be defined: "the
+spine is authoritative and immutable; the substrate may never contradict a dated public fact, but
+is free wherever the record is silent — which is almost everywhere." Two failure modes named
+there, both real. **Over-anchoring** — generating the whole substrate from the spine — is
+"actively dangerous": if nothing but the plants were left un-derived from the public record,
+diffing the substrate against the spine would recover the plants directly, a rigged test dressed
+as a rigorous one. **Silent drift** — never checking at all — lets an authored substrate quietly
+say something the record contradicts.
+
+**The spine is not a new authored format.** `Spine.from_overlay()` reads an org's own real, dated
+`signal` documents directly — the Carillion/NMC/Wirecard/Enron answer keys (build tickets 38-41)
+already carry them. `DATED_FACTS["signals"] == "date"` (`twin/schema.py`) is already the field
+`twin/regimes.py` gates `as-consumed`/`as-knowable` on, so a spine fact's knowability date is the
+identical field the regime gate already understands — `Spine.at()` calls `regimes.cutoff()`
+itself, so a malformed checkpoint fails with `regimes.RegimeError`, proving reuse rather than a
+parallel parser that happens to agree with it today.
+
+**Reconciliation is checked, not assumed.** `anchor()` inserts every spine fact knowable by a
+checkpoint, verbatim, into a generated substrate batch (`twin/substrate_generator.py`'s own output
+shape) — additive only, so free-running content already there is untouched. `reconcile()` refuses,
+naming what is missing, if the batch does not carry a fact it should; `reconcile_at_every_checkpoint()`
+runs that check once per distinct spine date — AC 1's "at every dated checkpoint", not only the
+last one.
+
+**The diff attack, demonstrated both ways.** `diff_against_spine()` splits every substrate line
+into `anchored` (matches a spine fact verbatim) and `free_running` (everything else) — exactly the
+split an adversary computing "the substrate minus the spine" would see. On the real Carillion
+fixture, a batch carrying one planted signal leaves the plant beside dozens of non-plant mundane
+decoys in `free_running`, so the diff alone does not single it out
+(`tests/test_spine.py::test_the_diff_attack_does_not_locate_plants`, and the identical property
+carried into the permanent suite by harness guard
+`substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants`). The negative control
+proves the guard is measuring something real rather than passing on every input: a batch built the
+forbidden way — nothing free-running but the plant, decision ticket 12 Q3's own
+"generate-everything-from-the-spine" case — does expose the plant as the diff's sole residual
+(`tests/test_spine.py::test_over_anchoring_would_have_made_the_plant_the_unique_residual`).
+
+**Ticks `synthetic-substrate` AC 1.** The real/synthetic seam is now defined and enforced, not
+only decided — `synthetic-substrate` moves from 1/7 to 2/7, still `partial`. AC 3's lead time and
+difficulty-distribution clauses remain the fidelity eval suite's own job (51).
 
 ## What is honestly built
 
@@ -954,9 +996,9 @@ reaches `full`, and nothing can be typed as `full`.
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 4 / 8 |
 | `scenario-engine` | 13 | partial | 2 / 7 |
-| `synthetic-substrate` | 12 | partial | 1 / 7 |
+| `synthetic-substrate` | 12 | partial | 2 / 7 |
 
-**18 of 48**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**19 of 48**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
 there"** — the strongest capability here stands at five ticks, and four of the eight still stand at
 one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
@@ -964,9 +1006,10 @@ count — most rows below track only as far as build ticket 33 tells their story
 45's tick on `causal-layer` narrated just below. `scenario-engine` moved to 2/7 across build
 tickets 37 (AC 2, fast-forward/rewind/play distinguished) and 46 (AC 4, opportunity/gameplay
 moves, narrated below), and `sense-move` moved to 4/8 across build tickets 43 and 44 — none of
-those three moves narrated in its own round here. Decision ticket 15 (build ticket 61) has no
-capability file at all, so the affected-parties register and disparate-impact channel move
-nothing in this table — see their own section above.
+those three moves narrated in its own round here. `synthetic-substrate` moved to 2/7 at build
+ticket 50 (AC 1, narrated just above). Decision ticket 15 (build ticket 61) has no capability file
+at all, so the affected-parties register and disparate-impact channel move nothing in this table —
+see their own section above.
 
 **Nothing was ticked in the round before this one, and the arithmetic did not move at all.** Three
 build tickets landed — the information gate (36), the drift instrument (64) and the join of the
@@ -1364,10 +1407,11 @@ Named here so the skeleton cannot quietly become the definition of done.
   nothing here can promise it reproduces given the same pins. Build ticket 49 built the generator
   itself — multi-channel, mundane by default, seeded and regenerable — but as a heuristic stand-in,
   the same limit `signal-classify` through `gameplay-lens` already carry, not an actual call to a
-  model provider (none is reachable from this suite). Spine anchoring against the public record
-  (50) and the fidelity eval suite that tunes signal-to-noise, plant difficulty and reporting
-  asymmetry against a target (51) do not exist yet, so decision ticket 12's Q3/Q3c consistency and
-  negativity-bias resolutions are not yet realised in code, only decided.
+  model provider (none is reachable from this suite). Build ticket 50 anchored the substrate
+  against the public record (decision ticket 12 Q3's consistency rule, enforced by `twin/spine.py`
+  rather than only decided) — but the fidelity eval suite that tunes signal-to-noise, plant
+  difficulty and reporting asymmetry against a target (51) does not exist yet, so Q3c's
+  negativity-bias resolution is still not realised in code.
 - **The two-architecture determinism check has never run.** The CI matrix is declared and the
   golden digests are committed; the claim is wired, not proven.
 - **The subjects are fixtures.** Netflix and Intel here are toy value chains with invented
