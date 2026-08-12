@@ -1,0 +1,24 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+# Decision ticket 10 is resolved; this is the first capability file built for it (build ticket 63).
+capability: twin-inside-twin
+owning_ticket: '10'
+criteria:
+  - index: 1
+    text: "The twin represented as components + scenarios inside its own graph."
+    checked: true
+    evidence: "twin/fixtures.py build_twin_self_org(): a standalone org overlay ('twin-self') carrying the twin as two ordinary components (the-twin-model, the-twin-adoption), a person (the-twin-maintainer) giving it bus-factor 1, and a scenario (adoption-risk-2026) that runs and emits forecasts through the normal machinery — graph, blast, propagate, run, price and options all execute against it unmodified (tests/test_twin_inside_twin.py)."
+    ticked_by: build ticket 63
+  - index: 2
+    text: "A threat model for the twin, with controls priced in the same currency."
+    checked: false
+  - index: 3
+    text: "A decision-governance model: query rights, citation rules, contestability, advisory-vs-binding."
+    checked: true
+    evidence: "twin/challenges.py (build ticket 60): contestability by construction, exercised unmodified against an artefact about the twin's own graph (a priced-impact artefact from the twin-self fixture) — 'twin challenge' raises a dispute, 'twin verify --challenge' surfaces it beside the reproduced artefact, with no special-casing by subject. Query rights are moot under full transparency (decision ticket 10's own Q2 resolution); advisory-vs-binding is answered structurally by no_recommended_action_field and the trade-off curve's marked default (build ticket 33) — nothing in this system emits a binding instruction, on itself or on any other subject."
+    ticked_by: build ticket 60
+  - index: 4
+    text: "A stated position on Goodhart/reflexivity, incl. which sensors are most gameable."
+    checked: false
+  - index: 5
+    text: "Named misuse cases with the constraint that blocks each."
+    checked: false

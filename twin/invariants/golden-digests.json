@@ -1,0 +1,20 @@
+{
+  "authorised_by": "decision ticket 19 and decision ticket 22 \u2014 Wave A integration merge of build ticket 71, the final branch in this wave, on top of the already-merged 45+46+48+61+63+69 state: capabilities_digest moves with the merged checklist state",
+  "capabilities_digest": "97d56b45524a40f03cf261069a7445837bee9bd3e1701e68a18f6acfd9134c9c",
+  "digests": {
+    "blast-radius": "c5b28bb349902293ec71c9dc4b3776e755ed4b0f034404c68a382facf5ee27d9",
+    "bound-signal": "13170314abcb8e748dbf4778ba6ac3ddda17ead9e75f7df78d64e9547fe78889",
+    "forecast-bundle": "293024a718bffc66ca752ca98b0318e75b9391a398470d4ed392d3bcda39cfe6",
+    "graph": "a0e017cb9a1f40ae5cafb96d36dc8da239468bf5e12bdbf1d70e2bae1d84d0e0",
+    "intervention": "1847fbe56624d5efd37406ad4958453b1f618eab478b1e6b4f9467f8dd6775d5",
+    "observation": "44c12612ad8b17d7f488a15af18d936f43fecaa539aef45f7cf7accc82b2e9c9",
+    "priced-impact": "a17c84436d6f60b7d1ce2e64a1b1bde1f8ec63d0ead84ff452a05de4a17e8f48",
+    "priced-option-set": "ab41e3765bb5629769d0ed88b8848649c2046af6b20c09c65914f45d348f0a5b",
+    "propagation": "35b954f8cddee81e3a794c316a7a6f528b35368d3d154a8366bb7ffaf7be3cbc",
+    "rewound-model": "793112a019f7320f924c2660b3b02cda6a565a6d5ef92229d5d0ac7528ee3aaa",
+    "scenario-exposure": "e2d44c4511d953f8fd5e1f0dbfebb4cc18612911a51f5b9388062b2ce46c5c2c",
+    "score-card": "53252cf8e021bf5f0ccc14eca2bc353d8b8abcea43c1fb61308a6ed52e039443"
+  },
+  "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
+  "tool_version": "0.1.0"
+}
