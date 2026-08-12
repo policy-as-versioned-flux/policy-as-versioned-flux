@@ -1922,6 +1922,71 @@ def _substrate_regeneration_is_not_deterministic_so_it_is_authored(ctx: Context)
     )
 
 
+@harness_check("twin_self_reference_is_cut_not_recursed")
+def _twin_self_reference_is_cut_not_recursed(ctx: Context) -> str:
+    """The twin inside the twin (build ticket 63, decision ticket 10, Q1): "self-modelling
+    terminates at depth 1 — the twin appears as components and its risks are priced, but it does
+    not model 'the twin modelling the twin' as a further layer. Graph traversal detects and cuts
+    self-referential cycles."
+
+    A guard on the suite rather than an invariant, the same shape `causal_accounts_have_no_privileged_default`
+    and `drift_window_was_declared_before_it_was_measured` are: this asserts a **semantic property
+    of the twin's own fixture**, not one of the constitution's fixed sixteen.
+
+    Two legs. First, the structural half: a component's schema carries no field by which a further
+    nested "twin modelling this twin" layer could even be attached — the schemas are closed, so a
+    planted field for one does not load, the identical mechanism `no_special_category_slot` uses
+    for a different absence. Second, the traversal half, on the twin's own fixture
+    (`fixtures.build_twin_self_org`): `the-twin-model` and `the-twin-adoption` close a genuine
+    two-node causal cycle (accuracy earns adoption; adoption sustains the model), and propagating
+    from either origin reaches the other exactly once — the return leg, a depth-2 attempt, is cut
+    by `twin/propagate.py`'s existing simple-path rule (build ticket 21) rather than recursed, and
+    the cut is disclosed (`truncated: true`, the cycle named in `known_limits`) rather than silent.
+    """
+    from .. import fixtures
+    from ..model import Overlay
+    from ..propagate import propagate
+    from ..repo import ModelRepo
+    from ..schema import SchemaError, validate
+
+    base = {"id": "the-twin-model", "name": "The twin's own engine", "kind": "capability"}
+    for planted in ("models_graph", "nested_twin", "twin_of"):
+        try:
+            validate("component", {**base, planted: "x"}, "planted")
+        except SchemaError:
+            pass
+        else:
+            raise Violated(f"a component carrying a planted {planted!r} field validated")
+
+    repo_dir = ctx.tmp / "twin-self"
+    if not repo_dir.exists():
+        fixtures.build_twin_self_org(repo_dir)
+    overlay = Overlay.load(ModelRepo.open(repo_dir), fixtures.TWIN_SELF_ORG)
+    graph = overlay.graph()
+
+    for origin, expect in (("the-twin-model", "the-twin-adoption"), ("the-twin-adoption", "the-twin-model")):
+        body = propagate(graph, origin)
+        reached = [r["component"] for r in body["reached"]]
+        if reached != [expect]:
+            raise Violated(f"propagating from {origin!r} reached {reached}, expected [{expect!r}]")
+        if body["traversal"]["truncated"] is not True:
+            raise Violated(
+                f"propagating from {origin!r} through the twin's own self-referential cycle did "
+                "not report truncated — a depth-2 attempt recursed instead of being cut"
+            )
+        if not any("cyclic" in limit for limit in body["traversal"]["known_limits"]):
+            raise Violated(
+                f"propagating from {origin!r} was truncated but the cycle is not named in "
+                f"known_limits: {body['traversal']['known_limits']}"
+            )
+
+    return (
+        "a component carrying a planted models_graph/nested_twin/twin_of field is refused at "
+        "load; propagating the twin's own fixture from either side of its self-referential cycle "
+        "reaches the other component exactly once and the return leg is cut, disclosed, not silent"
+    )
+
+
 def _git(root: Path, *args: str) -> str | None:
     proc = subprocess.run(
         ["git", *args], cwd=str(root), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
