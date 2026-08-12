@@ -9,13 +9,19 @@ criteria:
     ticked_by: build ticket 57
   - index: 2
     text: "Venue decision + the observe-vs-participate call (incl. UK legality)."
-    checked: false
+    checked: true
+    evidence: "Decided at decision ticket 21 Q4: observe only, never participate (no UK gambling exposure; play-money forecasts land within 1-5pp of real-money ones, so money-backing buys no epistemic gain). Made structural, not merely stated: twin/forecast_book.py exposes exactly `emit`, `score_resolution`, `is_blind` — no function that takes a stake, a side or an order — asserted as an allow-list by harness guard `forecast_book_is_blind_by_construction_and_observe_only` (the same discipline `prefilter_precedes_pricing` uses on twin/options.py, so a differently-named position-placing function would still be caught), and every emitted forecast-emission body carries `observe_only: true, position_placed: false`."
+    ticked_by: build ticket 58
   - index: 3
     text: "A blind-emission protocol that is mechanically enforceable."
-    checked: false
+    checked: true
+    evidence: "twin/forecast_book.py's emit() refuses to build an emission artefact timed at or after its question's own declared resolution_window_opens_at — checked at the boundary and past it, not merely on obviously-late input — via is_blind(), the identical function an auditor re-runs later against nothing but the artefact's own recorded body. Signed and pinned through the existing machinery, reused rather than reinvented: emit() returns a `derived` Artefact, which attest.build() agent-signs and refuses a human signature on (derived_never_human_signed), so 'we forecast before we looked' is a provable claim, not an assurance."
+    ticked_by: build ticket 58
   - index: 4
     text: "An explicit claim-scope statement: what a good score proves and what it does not."
-    checked: false
+    checked: true
+    evidence: "twin/forecast_book.py's CLAIM_SCOPE constant, carried in the body of every forecast-emission and resolution-score artefact this module emits (published with every result, not stated once in prose): `evidences` names non-overconfidence in general world-forecasting on a pre-registered, blind, co-registered question set; `does_not_evidence` names Wardley propagation, the causal elasticities, £ pricing, the org-specific overlay and anything at organisational scale explicitly; `residual_limit` states decision ticket 21 Q1's own honesty condition — the quarantine proves no direct ingestion, not that priors were unshaped by market-adjacent information arriving some other way."
+    ticked_by: build ticket 58
   - index: 5
     text: "The circularity question resolved (signal source vs benchmark)."
     checked: false

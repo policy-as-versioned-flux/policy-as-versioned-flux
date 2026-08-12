@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 15 \u2014 build ticket 47 (ethics-gate) changes computed artefact bytes",
-  "capabilities_digest": "36a91390be13a0c52274a116c37d8629b3ae5af93ce4a48b2d2ccc52851bd630",
+  "authorised_by": "decision ticket 21 \u2014 build ticket 58 (blind pinned emission and resolution scoring) changes computed artefact bytes",
+  "capabilities_digest": "1cfa625389d1d657be637c289ba36bc7b69ee6861961822b6249214e623741cf",
   "digests": {
-    "blast-radius": "03f6909178e98aca5d425bf049f62d20c201c67a75bc113f39b484d7ae206f56",
-    "bound-signal": "b1496c5cd81f66ba5d19738758733006a990e107df0d9ab428d08a02c3af0306",
-    "forecast-bundle": "b97142574f197255fa6395920d425d8f3981c48dd1ec032aee08bfaba2a5b4b6",
-    "graph": "061af7bd2ebea8eb691f102d4759aaf40a790a0b374a22dcf5a584ef1b6f5118",
-    "intervention": "6dc19b0ea9d843a9dc73d1cfdbb3d1c02c8b08ace5e924f000faacb700de5f19",
-    "observation": "0ffe22ebba0f5ed61ded672abe7d7a32be27ee963a0bd90a2ffeb93902791dd3",
-    "priced-impact": "fc6d0ef917f643a0cc46a32464fd9ac11b4b6f723d0ba1f6bc75d214085f5d32",
-    "priced-option-set": "f9c44904735d4cc84ad8db5d2b797d2eb29db6c3e92f209430befeb92a871839",
-    "propagation": "037292a3bda5f0eebe234f301e513670c992cba0d4427994761ad2a17b160e3b",
-    "rewound-model": "6d5d2ad49eb14d28007e7c95e95cb53eb6e4f8e4dcd142416b967506c002fd22",
-    "scenario-exposure": "1fc1c3ecb59994ea45954a312f8c0ed8cf5e1f5f8615b60b67ac0e7cf83b6197",
-    "score-card": "b1eaed5393631ed65e9dc495be2555a598c7aced77832c4b3387d7970ce8aa4d"
+    "blast-radius": "7a95074097bc9482707ea8b445c8af8e5055e3986831fac75cd5831156170018",
+    "bound-signal": "5e9c8849f9bc1e35668454a763e768ec0f3e19d50adb4c11d74886c4ceb33103",
+    "forecast-bundle": "c689fa7af61f859621611d5929f022b2a4dbc87ac13487cb52cb73bb7cf148b4",
+    "graph": "025dbec0e902f463c0ee48c440160146baf745809d3815941eb9a906745c0674",
+    "intervention": "6eb8a4b96ecc492db657ecd8072ed5252c88ff901dc686712734a777c2a1fd71",
+    "observation": "2fcd725ee20ba49937960daa5ca8d20de4145d651b960f4f5dec093fe6acfaaf",
+    "priced-impact": "51720752768a3e17f983aa2038596f8dd3fea6179568272e7ea7a750abdaa3ab",
+    "priced-option-set": "6d0d0b87308326bc5462f9db95eff6a0a34321d3f7b9e8dbf5557c5f8395dc5d",
+    "propagation": "bd990b5c70ed9f99d2e67dd225d5e0641b6a8ae3c00bc83ce2f29305adc2aa9b",
+    "rewound-model": "e6761a8cca44b4618ea11859ea7b11969c546016cd7ccd205a13804aee1060f9",
+    "scenario-exposure": "8477760e19c8025013f833daa4ce3b2b514d40ea8eae93d5e007157d1bcb82bd",
+    "score-card": "2c19d804ef0f501a1852978c0c9995b9b28d2937e99cdec07d24fa6fb7c18f21"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

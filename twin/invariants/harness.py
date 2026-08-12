@@ -1316,6 +1316,102 @@ def _benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach(c
     )
 
 
+@harness_check("forecast_book_is_blind_by_construction_and_observe_only")
+def _forecast_book_is_blind_by_construction_and_observe_only(ctx: Context) -> str:
+    """Blind pinned emission, resolution scoring, and the narrow claim (build ticket 58, decision
+    ticket 21 Q1(c)/Q4/Q5): temporal separation is refused structurally rather than reviewed, the
+    module's public surface cannot place a position, resolution scoring reuses `twin/scoring.py`
+    rather than re-implementing it, and the narrow claim scope travels with every emitted result —
+    the same structural-plus-live shape
+    `benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach` uses, extended here
+    to a module-surface allow-list rather than a single function pair.
+
+    Four legs. First, structural refusal: an emission timed at the resolution window's own open
+    and one timed past it are both refused, and the identical inputs a month earlier succeed — a
+    gate, not a wall. Second, observe-only: `twin/forecast_book.py`'s exposed function surface is
+    asserted as an **allow-list**, the same discipline `prefilter_precedes_pricing` uses on
+    `twin/options.py`, so a differently-named position-placing function would still be caught, not
+    only one matching an obvious keyword. Third, scoring: `score_resolution`'s own source calls
+    `scoring.score(`, and its output matches `twin/scoring.py`'s own `brier`/`log_loss` bit for
+    bit rather than a second implementation drifting from it. Fourth, the claim scope: both
+    artefacts this module emits carry `claim_scope`, and its `does_not_evidence` names Wardley
+    propagation, the causal elasticities, £ pricing and the org overlay explicitly, checked
+    against the emitted body rather than asserted in prose.
+    """
+    import inspect
+
+    from .. import forecast_book as fb
+    from .. import scoring
+
+    question = {"id": "guard-q-1", "resolution_window_opens_at": "2026-09-01T00:00:00Z"}
+    command = ["twin", "forecast-emit"]
+
+    for late in ("2026-09-01T00:00:00Z", "2026-09-02T00:00:00Z"):
+        try:
+            fb.emit(ctx.caps, question, "twin-default", 0.3, late, command)
+        except fb.ForecastBookError:
+            continue
+        raise Violated(f"an emission timed at or after the resolution window ({late}) was not refused")
+
+    emission = fb.emit(ctx.caps, question, "twin-default", 0.3, "2026-08-01T00:00:00Z", command)
+    if emission.body["position_placed"] is not False or emission.body["observe_only"] is not True:
+        raise Violated(f"a blind emission did not record observe-only/no-position: {emission.body}")
+    if not fb.is_blind(emission.body["emitted_at"], emission.body["resolution_window_opens_at"]):
+        raise Violated(
+            "is_blind() disagrees with the artefact it just built, against that artefact's own "
+            "recorded body"
+        )
+
+    allowed = {"emit", "score_resolution", "is_blind"}
+    banned_verbs = ("place", "stake", "bet", "buy", "sell", "trade", "order", "wager", "hedge", "position")
+    public = {
+        name
+        for name, value in vars(fb).items()
+        if not name.startswith("_") and inspect.isfunction(value) and getattr(value, "__module__", "") == fb.__name__
+    }
+    if public != allowed:
+        raise Violated(
+            f"twin/forecast_book.py exposes {', '.join(sorted(public)) or 'nothing'} at module "
+            f"level; this guard admits exactly {', '.join(sorted(allowed))} — observe-only is "
+            "structural, so a new callable here needs a deliberate decision, not a keyword scan"
+        )
+    for name in public:
+        hit = [v for v in banned_verbs if v in name.lower()]
+        if hit:
+            raise Violated(f"{name} contains a position-shaped verb ({', '.join(hit)}) despite passing the allow-list")
+
+    source = inspect.getsource(fb.score_resolution)
+    if "scoring.score(" not in source:
+        raise Violated(
+            "score_resolution() does not call twin/scoring.py's score() — a second scoring "
+            "implementation may have crept in"
+        )
+    resolved = fb.score_resolution(ctx.caps, emission.envelope(), emission.digest(), True, ["twin", "forecast-score"])
+    expected = scoring.score(0.3, True)
+    if (resolved.body["brier"], resolved.body["log_loss"]) != (expected["brier"], expected["log_loss"]):
+        raise Violated(f"score_resolution() did not reproduce twin/scoring.py's own score: {resolved.body} vs {expected}")
+
+    for artefact in (emission, resolved):
+        scope = artefact.body.get("claim_scope") or {}
+        does_not = " ".join(str(s) for s in scope.get("does_not_evidence", [])).lower()
+        missing = [
+            phrase
+            for phrase in ("wardley propagation", "causal elasticities", "£ pricing", "org")
+            if phrase not in does_not
+        ]
+        if missing:
+            raise Violated(f"{artefact.kind}'s claim_scope does not name {missing}: {scope}")
+
+    return (
+        "an emission at or after its resolution window is refused (checked at the boundary and "
+        "past it); a blind emission records observe_only/position_placed correctly and is_blind() "
+        f"agrees with its own recorded body; the module's public surface is exactly "
+        f"{', '.join(sorted(allowed))}, none position-shaped; score_resolution() calls "
+        "scoring.score() and reproduces its output bit for bit; both the emission and the "
+        "resolution score carry a claim_scope naming what the gate does not evidence"
+    )
+
+
 def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
     rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     out = _git(root, "show", f"{ref}:{rel}")
