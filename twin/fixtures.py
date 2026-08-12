@@ -3136,3 +3136,380 @@ def build_twin_self_org(dest: str | Path) -> Path:
     git(root, "commit", "-q", "-m", "the twin as a component in its own graph, and the adoption scenario",
         dated="2026-08-11T00:00:00+00:00")
     return root
+
+
+# -- the standing scenario library (build ticket 69) ---------------------------------------
+#
+# One executable scenario per committed class (decision ticket 13; spec story 43): quantum/HNDL,
+# bus-factor/key-person, insider/coercion, supply-shock, sanctions, M&A, memory cost, AI-model
+# access, climate event. Every subject is world layer, because none of the nine is specific to
+# any one tenant — the "library" org overlay adds nothing of its own beyond the scenarios
+# themselves and one reference world model, the same shape the pocket org's thin world already
+# established. M&A is framed as the opportunity leg rather than the threat leg (ticket 69's own
+# AC: "opportunity plays represented, not only threats") — the class is symmetric, and choosing
+# the seize framing here is what makes that true of the library's contents rather than asserted
+# about them. AI-model access carries two components rather than one: the ticket's own dated
+# signal (recorded 2026-08-10) says point-in-time tool-call authorisation has reached commodity
+# while temporal, sequence-of-actions authorisation is still genesis, and the doctrine the two
+# positions imply is opposite, so one evolution field could not carry both.
+
+LIBRARY_ORG = "library"
+
+_LIBRARY_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: >-
+  The nine committed scenario classes (build ticket 69). Generic by construction — none names a
+  tenant — so any org overlay could reference them; one overlay exists only to run them.
+""",
+    "world/components/cryptographic-key-material.yaml": """\
+id: cryptographic-key-material
+name: Cryptographic key material
+kind: data
+evolution: product
+visibility: 0.2
+""",
+    "world/components/concentrated-knowledge-domain.yaml": """\
+id: concentrated-knowledge-domain
+name: Concentrated knowledge domain
+kind: capability
+evolution: custom-built
+visibility: 0.3
+""",
+    "world/components/privileged-access-role.yaml": """\
+id: privileged-access-role
+name: Privileged access role
+kind: capability
+evolution: custom-built
+visibility: 0.15
+""",
+    "world/components/tier-one-supplier-relationship.yaml": """\
+id: tier-one-supplier-relationship
+name: Tier-one supplier relationship
+kind: activity
+evolution: product
+visibility: 0.4
+""",
+    "world/components/cross-border-trade-lane.yaml": """\
+id: cross-border-trade-lane
+name: Cross-border trade lane
+kind: activity
+evolution: product
+visibility: 0.35
+""",
+    "world/components/adjacent-capability-platform.yaml": """\
+id: adjacent-capability-platform
+name: Adjacent capability platform
+kind: capability
+evolution: product
+visibility: 0.3
+""",
+    "world/components/training-compute-budget.yaml": """\
+id: training-compute-budget
+name: Training compute budget
+kind: activity
+evolution: product
+visibility: 0.25
+""",
+    "world/components/point-in-time-tool-authorisation.yaml": """\
+id: point-in-time-tool-authorisation
+name: Point-in-time tool-call authorisation
+kind: practice
+evolution: commodity
+visibility: 0.5
+""",
+    "world/components/temporal-sequence-authorisation.yaml": """\
+id: temporal-sequence-authorisation
+name: Temporal, sequence-of-actions authorisation
+kind: practice
+evolution: genesis
+visibility: 0.1
+""",
+    "world/components/primary-operating-site.yaml": """\
+id: primary-operating-site
+name: Primary operating site
+kind: activity
+evolution: product
+visibility: 0.3
+""",
+    "world/propositions/harvest-now-decrypt-later-breaks-current-encryption-by-2035.yaml": """\
+id: harvest-now-decrypt-later-breaks-current-encryption-by-2035
+text: >-
+  Cryptographically relevant quantum computing breaks currently-deployed public-key encryption
+  before 2035, exposing data harvested and stored today under a harvest-now-decrypt-later attack.
+""",
+    "world/propositions/a-bus-factor-one-holder-departs-within-the-horizon.yaml": """\
+id: a-bus-factor-one-holder-departs-within-the-horizon
+text: >-
+  The sole holder of a bus-factor-one component departs, is incapacitated, or otherwise becomes
+  unavailable within the scenario horizon.
+""",
+    "world/propositions/a-privileged-insider-acts-within-the-horizon.yaml": """\
+id: a-privileged-insider-acts-within-the-horizon
+text: >-
+  A person holding privileged access acts against the organisation's interest — through
+  grievance, ideology or external coercion — within the scenario horizon.
+""",
+    "world/propositions/a-tier-one-supplier-fails-to-deliver-within-the-horizon.yaml": """\
+id: a-tier-one-supplier-fails-to-deliver-within-the-horizon
+text: A tier-one supplier fails to deliver against a material contract within the scenario horizon.
+""",
+    "world/propositions/a-sanctions-regime-blocks-a-material-trade-lane.yaml": """\
+id: a-sanctions-regime-blocks-a-material-trade-lane
+text: >-
+  A newly imposed sanctions regime blocks or materially restricts a trade lane the organisation
+  depends on, within the scenario horizon.
+""",
+    "world/propositions/an-adjacent-capability-becomes-acquirable-within-the-horizon.yaml": """\
+id: an-adjacent-capability-becomes-acquirable-within-the-horizon
+text: >-
+  A strategically adjacent capability becomes acquirable on favourable terms — no incumbent
+  bidder, a motivated seller — within the scenario horizon.
+""",
+    "world/propositions/memory-price-per-gb-changes-training-economics.yaml": """\
+id: memory-price-per-gb-changes-training-economics
+text: >-
+  Memory price per gigabyte moves enough within the scenario horizon to materially change the
+  cost structure of large model training runs.
+""",
+    "world/propositions/a-temporal-authorisation-standard-consolidates-before-2028.yaml": """\
+id: a-temporal-authorisation-standard-consolidates-before-2028
+text: >-
+  A vendor-neutral standard for temporal, sequence-of-actions authorisation over AI agent tool
+  calls consolidates before 2028, the way point-in-time authorisation already has.
+""",
+    "world/propositions/a-primary-site-suffers-a-declared-climate-event.yaml": """\
+id: a-primary-site-suffers-a-declared-climate-event
+text: >-
+  A primary operating site suffers a declared climate event — flood, wildfire, extreme-heat
+  closure — within the scenario horizon.
+""",
+    "world/world_models/reference-map.yaml": """\
+id: reference-map
+name: The reference map for the committed scenario classes
+credence: 0.5
+note: >-
+  One shared reference. It carries no privileged status — build ticket 16 already refuses one —
+  and sits alongside whatever rival forecast an org's own overlay adds on top of it.
+beliefs:
+  harvest-now-decrypt-later-breaks-current-encryption-by-2035: 0.15
+  a-bus-factor-one-holder-departs-within-the-horizon: 0.35
+  a-privileged-insider-acts-within-the-horizon: 0.08
+  a-tier-one-supplier-fails-to-deliver-within-the-horizon: 0.2
+  a-sanctions-regime-blocks-a-material-trade-lane: 0.12
+  an-adjacent-capability-becomes-acquirable-within-the-horizon: 0.3
+  memory-price-per-gb-changes-training-economics: 0.4
+  a-temporal-authorisation-standard-consolidates-before-2028: 0.1
+  a-primary-site-suffers-a-declared-climate-event: 0.18
+""",
+}
+
+_LIBRARY_OVERLAY: dict[str, str] = {
+    "orgs/library/scenarios/quantum-hndl-2026.yaml": """\
+id: quantum-hndl-2026
+question: Does harvest-now-decrypt-later exposure become live before today's encryption is retired?
+proposition: harvest-now-decrypt-later-breaks-current-encryption-by-2035
+at: '2026-08-10'
+horizon: '2035-12-31'
+components:
+  - cryptographic-key-material
+world_models:
+  - reference-map
+class: quantum-hndl
+affected_parties:
+  - id: data-subjects-under-current-encryption
+    who: People whose records are encrypted under today's standard, holding no seat in this model.
+    consequence: A break this scenario forecasts exposes data already harvested and stored against it; the twin prices the holder's exposure, never theirs.
+""",
+    "orgs/library/scenarios/bus-factor-key-person-2026.yaml": """\
+id: bus-factor-key-person-2026
+question: Does a bus-factor-one component lose its sole holder within the horizon?
+proposition: a-bus-factor-one-holder-departs-within-the-horizon
+at: '2026-08-10'
+horizon: '2027-08-10'
+components:
+  - concentrated-knowledge-domain
+world_models:
+  - reference-map
+class: bus-factor-key-person
+affected_parties:
+  - id: dependent-colleagues
+    who: Colleagues whose own work depends on the departing holder's tacit knowledge, not represented in this model.
+    consequence: A departure this scenario forecasts leaves their own work blocked on knowledge nobody transferred; the twin prices the org's exposure, never theirs.
+""",
+    "orgs/library/scenarios/insider-coercion-2026.yaml": """\
+id: insider-coercion-2026
+question: Does a privileged insider act against the organisation within the horizon?
+proposition: a-privileged-insider-acts-within-the-horizon
+at: '2026-08-10'
+horizon: '2027-08-10'
+components:
+  - privileged-access-role
+world_models:
+  - reference-map
+class: insider-coercion
+affected_parties:
+  - id: customers-behind-the-privileged-access
+    who: Customers whose data or accounts the coerced role can reach, not represented in this model.
+    consequence: An act this scenario forecasts crosses their own data or access with no notice to them; the twin prices the organisation's exposure, never theirs.
+""",
+    "orgs/library/scenarios/supply-shock-2026.yaml": """\
+id: supply-shock-2026
+question: Does a tier-one supplier fail to deliver within the horizon?
+proposition: a-tier-one-supplier-fails-to-deliver-within-the-horizon
+at: '2026-08-10'
+horizon: '2027-08-10'
+components:
+  - tier-one-supplier-relationship
+world_models:
+  - reference-map
+class: supply-shock
+affected_parties:
+  - id: supplier-workforce
+    who: The supplier's own workforce, whose livelihoods depend on the contract, not represented in this model.
+    consequence: A failure this scenario forecasts is priced from the buyer's side only; the twin carries no perspective for the workforce whose contract it is.
+""",
+    "orgs/library/scenarios/sanctions-2026.yaml": """\
+id: sanctions-2026
+question: Does a new sanctions regime block a material trade lane within the horizon?
+proposition: a-sanctions-regime-blocks-a-material-trade-lane
+at: '2026-08-10'
+horizon: '2027-08-10'
+components:
+  - cross-border-trade-lane
+world_models:
+  - reference-map
+class: sanctions
+affected_parties:
+  - id: downstream-lane-customers
+    who: End customers depending on goods that move through the sanctioned trade lane, not represented in this model.
+    consequence: A block this scenario forecasts cuts their supply with no notice keyed to their own timelines; the twin prices the organisation's exposure, never theirs.
+""",
+    # The opportunity leg. Same committed class an acquisition threat would use — M&A is
+    # symmetric — framed here as the seize rather than the defend (decision ticket 13 Q3's
+    # land-grab shape): no incumbent, a motivated seller, the org holding the adjacent capability.
+    "orgs/library/scenarios/m-and-a-2026.yaml": """\
+id: m-and-a-2026
+question: Can the organisation acquire a strategically adjacent capability before a rival does?
+proposition: an-adjacent-capability-becomes-acquirable-within-the-horizon
+at: '2026-08-10'
+horizon: '2027-08-10'
+components:
+  - adjacent-capability-platform
+world_models:
+  - reference-map
+class: m-and-a
+affected_parties:
+  - id: acquired-capabilitys-current-workforce
+    who: Staff of the adjacent capability's current owner, whose roles the acquisition may fold or cut, not represented in this model.
+    consequence: A completed acquisition this scenario forecasts is priced as the acquirer's opportunity only; the twin carries no perspective for the workforce being acquired.
+""",
+    "orgs/library/scenarios/memory-cost-2026.yaml": """\
+id: memory-cost-2026
+question: Does memory price per gigabyte move enough to change training economics within the horizon?
+proposition: memory-price-per-gb-changes-training-economics
+at: '2026-08-10'
+horizon: '2027-08-10'
+components:
+  - training-compute-budget
+world_models:
+  - reference-map
+class: memory-cost
+affected_parties:
+  - id: downstream-model-users
+    who: Users and customers of models trained under this budget, whose own access or cost depends on it, not represented in this model.
+    consequence: A price move this scenario forecasts changes training economics the organisation prices; the twin carries no perspective for what that shift passes downstream.
+""",
+    # Carries both halves of the dated signal named in this build ticket (recorded 2026-08-10):
+    # point-in-time tool-call authorisation at commodity, temporal sequence-of-actions
+    # authorisation still at genesis. Both components are named because the doctrine is opposite
+    # for each — inherit the first, do not build on the second — and one could not stand for both.
+    "orgs/library/scenarios/ai-model-access-2026.yaml": """\
+id: ai-model-access-2026
+question: >-
+  Does a vendor-neutral standard for temporal, sequence-of-actions authorisation consolidate the
+  way point-in-time tool-call authorisation already has?
+proposition: a-temporal-authorisation-standard-consolidates-before-2028
+at: '2026-08-10'
+horizon: '2028-12-31'
+components:
+  - point-in-time-tool-authorisation
+  - temporal-sequence-authorisation
+world_models:
+  - reference-map
+class: ai-model-access
+affected_parties:
+  - id: smaller-integrators-adapting-to-the-standard
+    who: Smaller vendors and integrators who must adapt their own tooling to a consolidating standard, not represented in this model.
+    consequence: A consolidation this scenario forecasts is priced as the organisation's own adoption cost; the twin carries no perspective for the smaller parties adapting around it.
+""",
+    "orgs/library/scenarios/climate-event-2026.yaml": """\
+id: climate-event-2026
+question: Does a primary operating site suffer a declared climate event within the horizon?
+proposition: a-primary-site-suffers-a-declared-climate-event
+at: '2026-08-10'
+horizon: '2027-08-10'
+components:
+  - primary-operating-site
+world_models:
+  - reference-map
+class: climate-event
+affected_parties:
+  - id: local-site-workforce-and-community
+    who: The workforce and surrounding community at the primary operating site, not represented in this model.
+    consequence: An event this scenario forecasts is priced as the organisation's own continuity risk; the twin carries no perspective for those bearing the event itself.
+""",
+}
+
+
+def build_library_org(dest: str | Path) -> Path:
+    """The standing scenario library's own org (build ticket 69; decision ticket 13).
+
+    One executable scenario per committed class, all nine world-layer so any org overlay could
+    reuse them — this org exists only to run them on the schedule ticket 09 already built.
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _LIBRARY_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2026-08-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(root, _LIBRARY_OVERLAY)
+    _write(
+        root,
+        {
+            "orgs/library/meta.yaml": (
+                f"id: {LIBRARY_ORG}\nunit: overlay\norg: {LIBRARY_ORG}\nworld_ref: {world_commit}\n"
+            )
+        },
+    )
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the standing scenario library", dated="2026-08-10T00:00:00+00:00")
+    return root
+
+
+def build_standing_library(root: str | Path) -> list[Path]:
+    """Every repository build ticket 69's standing library sweeps, in one call.
+
+    Fear scenarios (the co-flagships), the committed-class/opportunity library, and every
+    backtest answer key sit in the return value together. `schedule.sweep()` already runs any
+    repo list identically (build ticket 09), so this is the whole of the "no separate harness"
+    AC (per build ticket 37): nothing here is a bespoke backtest runner, it is a list of repos.
+    """
+    base = Path(root)
+    return [
+        build(base / "default"),
+        build_library_org(base / "library"),
+        build_pocket_org(base / "pocket"),
+        build_carillion_org(base / "carillion"),
+        build_nmc_health_org(base / "nmc"),
+        build_wirecard_org(base / "wirecard"),
+        build_enron_org(base / "enron"),
+        build_astrazeneca_org(base / "astrazeneca"),
+        build_sanofi_org(base / "sanofi"),
+    ]

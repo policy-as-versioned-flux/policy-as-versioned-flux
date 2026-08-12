@@ -22,7 +22,19 @@ criteria:
     ticked_by: build ticket 46
   - index: 5
     text: "Admissibility rule for the scenario library."
-    checked: false
+    checked: true
+    evidence: >-
+      twin/schema.py's closed COMMITTED_SCENARIO_CLASSES enum and the optional scenario.class
+      field make "belongs to the standing library" mechanical: a scenario is admissible by
+      carrying one of the nine committed classes (or by being unconditionally swept per build
+      ticket 09 — decision ticket 13's other admissibility arm). fixtures.build_library_org
+      populates all nine; harness guard standing_library_covers_committed_classes
+      (twin/invariants/checks.py) fails CI the moment one is silently dropped, demonstrated in
+      tests/test_scenario_library.py::test_dropping_a_committed_class_from_the_library_fails_the_invariant.
+      The full "preconditions/triggers checkable against the map" reading of admissibility — the
+      precondition-triggered arm — stays for build ticket 46 (gameplay-lens); this ticket closes
+      only the committed-set arm.
+    ticked_by: build ticket 69
   - index: 6
     text: "A selection/prioritisation rule for which scenarios run (the combinatorics answer)."
     checked: false

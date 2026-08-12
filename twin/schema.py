@@ -40,6 +40,15 @@ EVIDENCE_GRADES = (1, 2, 3, 4, 5)
 REGIMES = ("as-consumed", "as-knowable", "with-hindsight")
 CONTAMINATION = ("low", "high", "control")
 
+# The committed scenario classes (build ticket 69; decision ticket 13, spec story 43; the map's
+# "not yet specified" scenario-library-contents item). Named once here rather than left to grep
+# through fixture ids, so the invariant that enumerates them and a fixture that drops one by typo
+# fail the same way — on the list, not on a reader's memory of it.
+COMMITTED_SCENARIO_CLASSES = (
+    "quantum-hndl", "bus-factor-key-person", "insider-coercion", "supply-shock", "sanctions",
+    "m-and-a", "memory-cost", "ai-model-access", "climate-event",
+)
+
 # Which collections hold a **dated fact about the world**, and which field carries the date
 # (build ticket 36). Declared here rather than derived from the schemas, for the reason the
 # invariant manifest declares its refused field names: a gate that works out its own subject
@@ -630,7 +639,12 @@ SCHEMAS: dict[str, Schema] = {
             # empty list either; naming at least one outsider is part of authoring the scenario.
             "affected_parties": list_of(_affected_party),
         },
-        optional={"horizon": date, "substrate": text},
+        # `class` (build ticket 69) is optional and absent from every scenario authored before
+        # this ticket — it names which of the standing library's committed classes this scenario
+        # realises, and only that closed set, so a typo is a load-time refusal rather than a
+        # silently uncounted class. A scenario naming no class (every flagship/backtest scenario
+        # so far) is simply not part of the committed-set enumeration; nothing about it changes.
+        optional={"horizon": date, "substrate": text, "class": one_of(*COMMITTED_SCENARIO_CLASSES)},
     ),
     # The answer-key format (build ticket 08): the boundary fixture the answer-key track tests
     # against. `contamination` is the slot the Enron control fills at build ticket 40.

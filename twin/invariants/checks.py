@@ -26,7 +26,8 @@ from .. import constraints as constraints_mod
 from ..artefact import AUTHORED, DERIVED, Artefact, ArtefactError
 from ..canon import canonical_json, sha256_hex, walk_keys
 from ..grades import Capabilities, GradeError
-from ..model import check_direction
+from ..model import Overlay, check_direction
+from .. import schema as schema_mod
 from ..repo import ModelRepo
 from . import NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES, Violated, invariant
 
@@ -1294,6 +1295,30 @@ def _prefilter_precedes_pricing(ctx: "Context") -> str:
         f"hand-built Admitted set is refused; {len(considered)} options considered, {len(excluded)} "
         f"removed on published constraints and {len(survived)} priced"
     )
+
+
+@invariant("standing_library_covers_committed_classes")
+def _standing_library_covers_committed_classes(ctx: "Context") -> str:
+    """The committed set (build ticket 69; decision ticket 13, spec story 43) is code, not prose.
+
+    A class silently dropped from the library — a deleted scenario file, a typo in `class` — is a
+    load-time refusal at the source first (`schema.py`'s closed enum on `scenario.class`) and a
+    suite failure here second, rather than a gap nobody notices until asked. Built fresh under
+    `ctx.tmp` rather than reused from the shared default fixture, the same way the pocket-org
+    worksheet guard builds its own subject: this property is about the library, not the flagships.
+    """
+    library_dir = ctx.tmp / "standing-library-classes"
+    if not library_dir.exists():
+        fixtures.build_library_org(library_dir)
+    overlay = Overlay.load(ModelRepo.open(library_dir), fixtures.LIBRARY_ORG)
+    present = {str(s["class"]) for s in overlay.scenarios.values() if s.get("class")}
+    committed = set(schema_mod.COMMITTED_SCENARIO_CLASSES)
+    missing = sorted(committed - present)
+    if missing:
+        raise Violated(
+            "the standing library is missing an executable scenario for: " + ", ".join(missing)
+        )
+    return f"the standing library covers all {len(committed)} committed classes: {', '.join(sorted(present))}"
 
 
 def _keys(node: Any) -> set[str]:
