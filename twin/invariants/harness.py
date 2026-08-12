@@ -945,6 +945,76 @@ def _gameplay_lens_is_grade_5_and_reports_no_recommendation(ctx: Context) -> str
     )
 
 
+@harness_check("substrate_generator_is_mundane_by_default_and_records_measurability_winning")
+def _substrate_generator_is_mundane_by_default(ctx: Context) -> str:
+    """`substrate-generator` (build ticket 49, decision ticket 12 Q1/Q4): the fifth of the six
+    skills seam 3 exists to evaluate — regeneration from a pinned recipe is reproducible
+    (ticket 48's own mechanics, reused rather than reinvented), the output stays mostly mundane
+    even at its plant-count ceiling, and the believability/measurability conflict the ticket's own
+    checklist names is resolved in the artefact rather than only in prose.
+
+    A guard on the suite rather than an invariant, the same shape
+    `gameplay_lens_is_grade_5_and_reports_no_recommendation` is: this asserts **structural
+    properties of a module's contract**, not one of the constitution's sixteen fixed names.
+
+    Four legs. First, regenerating a batch from the identical recipe reproduces byte-for-byte —
+    `generate()` draws no entropy `random.Random(recipe.seed)` and `generate_deterministic`
+    (ticket 48) do not already pin. Second, a batch scheduling one plant per channel — the
+    structural ceiling `SubstrateGeneratorError` enforces — still clears `MIN_MUNDANE_FRACTION`.
+    Third, the recorded `resolution` names measurability winning over believability, checked
+    against real output rather than trusted from the module docstring. Fourth, the real labelled
+    corpus (the same three recipes `tests/test_substrate_generator.py` evaluates against, built
+    fresh here) passes end to end and a generator that emits nothing fails the threshold — a
+    harness with no subject proves nothing.
+    """
+    from .. import skills as skills_mod
+    from .. import substrate_generator as sg
+    from ..substrate import SubstrateRecipe
+
+    recipe = SubstrateRecipe(
+        id="guard-recipe", seed=99,
+        templates=(
+            "Lunch order chat in #ops.", "A long thread about the staging environment.",
+            "Expense report chasing.", "Sprint planning grumbling.",
+        ),
+        model_version="toy-model-v1",
+        planted_signals=("a", "b", "c", "d"),
+    )
+    first = sg.generate(recipe)
+    second = sg.generate(recipe)
+    if first != second:
+        raise Violated("regenerating from the identical recipe did not reproduce byte-for-byte")
+
+    if len(first["plants"]) != len(sg.CHANNELS):
+        raise Violated(f"a plant-per-channel recipe scheduled {len(first['plants'])} plant(s), not {len(sg.CHANNELS)}")
+    if sg.mundane_fraction(first) < sg.MIN_MUNDANE_FRACTION:
+        raise Violated(
+            f"a batch at the plant-count ceiling scored mundane_fraction={sg.mundane_fraction(first)}, "
+            f"below the floor {sg.MIN_MUNDANE_FRACTION}"
+        )
+
+    resolution = first["resolution"].lower()
+    if "measurability" not in resolution or "believ" not in resolution:
+        raise Violated(f"the recorded resolution does not name measurability winning over believability: {first['resolution']!r}")
+
+    corpus = sg.labelled_corpus()
+    good = skills_mod.evaluate(sg.SKILL, sg.generate_from_recipe_yaml, corpus, scorer=sg.scorer)
+    if not good.passed:
+        raise Violated("substrate-generator failed its own labelled corpus running correctly — the harness has no subject")
+    bad = skills_mod.evaluate(
+        sg.SKILL, lambda text: {"channels": {}, "plants": [], "resolution": ""}, corpus, scorer=sg.scorer,
+    )
+    if bad.passed:
+        raise Violated("a generator that emits nothing still passed — the threshold is not gating anything")
+
+    return (
+        "regenerating from the identical recipe reproduces byte-for-byte; a plant-per-channel "
+        f"batch still clears mundane_fraction >= {sg.MIN_MUNDANE_FRACTION}; the resolution names "
+        f"measurability winning; the real {len(corpus)}-item labelled corpus passes and a silent "
+        "generator fails its threshold"
+    )
+
+
 def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
     rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     out = _git(root, "show", f"{ref}:{rel}")

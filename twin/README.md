@@ -883,6 +883,63 @@ Not built here: the real generator (49), spine anchoring and free-running (50), 
 eval suite (51) — this ticket is the recipe format, real regeneration mechanics and the spike only,
 deliberately cheap, per the ticket's own brief ("for pennies, rather than architecturally later").
 
+## The substrate generator: multi-channel, mundane by default, measurability recorded
+
+`twin/substrate_generator.py` (build ticket 49) is the fifth of the six skills seam 3 exists to
+evaluate: one pinned `SubstrateRecipe` (ticket 48, unmodified) in, a coherent **multi-modal**
+substrate out — org events, communications, HR records and telemetry, decision ticket 12's own
+four examples of the medium a signal is later sensed inside.
+
+**Seeded and regenerable via ticket 48's mechanics, literally rather than by analogy.** Each
+channel's own lines are produced by calling `substrate.generate_deterministic` itself — the recipe's
+templates round-robin across the four channels, each channel getting its own derived (still pure
+`random.Random`, still reproducible) recipe — so two calls against the identical recipe reproduce
+byte-for-byte, on any machine, the same guarantee ticket 48 demonstrated for its own toy generator.
+This is the deterministic reference implementation `signal-classify` through `gameplay-lens` are
+already this shape of: not a live model call (none is reachable from this suite), and not a claim
+about what one would produce.
+
+**Coherent**, in the one sense a heuristic generator can actually check: every batch draws one
+shared "focus" entity from the recipe's own seed, and every line in every channel carries it — a
+batch is not four unrelated lists of sentences.
+
+**Mundane by default, structurally rather than by convention.** `generate()` caps planted signals
+at one per channel — `SubstrateGeneratorError` if a recipe schedules more than the four channels
+can each carry one of, rather than silently dropping the overflow — so even a batch at the ceiling
+(one plant in every channel at once) stays mostly ordinary content, checked against
+`MIN_MUNDANE_FRACTION` by both the labelled corpus and the harness guard below.
+
+**Where believability and measurability conflict, the resolution is recorded, and measurability
+wins — as data, not only as a decided question in `.scratch/twin/issues/12-synthetic-substrate.md`.**
+The concrete conflict: a believable substrate would scatter each planted signal at an unpredictable
+position among the mundane lines, and vary how many plants land in a channel, for verisimilitude.
+Doing that would make hit rate and burial depth unmeasurable against a known ground truth, so
+`generate()` always inserts a channel's plant at the fixed midpoint index of that channel's line
+list instead, and every emitted batch carries that trade-off in its own `resolution` field —
+`tests/test_substrate_generator.py::test_the_resolution_names_measurability_winning_over_believability`
+checks the field on real output, not the prose describing it.
+
+**Registered into the seam-3 harness the same way as the other four.** `skill-thresholds.yaml`
+gains one entry (`substrate-generator`, threshold 0.8, same round bar `signal-classify` and
+`causal-claims` use); `labelled_corpus()` gives three recipes spanning zero, sparse and
+one-per-channel plant schedules, evaluated through `generate_from_recipe_yaml` — a thin wrapper
+reusing `SubstrateRecipe`'s own versioned YAML round-trip (ticket 48) rather than inventing a
+second serialisation just so a `SubstrateRecipe` object is digestible by `evaluate()`'s corpus
+hash. Harness guard `substrate_generator_is_mundane_by_default_and_records_measurability_winning`
+carries reproducibility, the mundane-fraction floor at the plant-count ceiling, the recorded
+resolution and the real corpus passing (with a silent generator failing it) into the permanent
+suite, the same four-leg shape the other three skill guards already take.
+
+**Does not move the `synthetic-substrate` capability grade.** Decision ticket 12's AC 3 (the
+planting protocol) asks for the full bundle — strength, lead time, burial *and* difficulty
+distribution — and this ticket builds burial (the one-per-channel cap) only; lead time is the
+actionability horizon (ticket 50) and a distribution of difficulty is the fidelity eval suite's
+own job (51). AC 3 stays unticked on the same "one clause of a multi-clause criterion" ground
+several earlier tickets already left criteria on, rather than ticked for building real code that
+happens to be adjacent to it. `synthetic-substrate` stays at 1/7, `partial` — unchanged from build
+ticket 48, and re-asserted rather than silently left to drift
+(`tests/test_substrate_generator.py::test_the_synthetic_substrate_capability_grade_stays_partial`).
+
 ## What is honestly built
 
 Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Nothing
@@ -1270,7 +1327,7 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
   produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
   sigstore/gitsign, named in `twin/sign.py`.
-- **Seam 3 exists; four of six skills do now, and each is a heuristic stand-in.** `twin/skills.py`
+- **Seam 3 exists; five of six skills do now, and each is a heuristic stand-in.** `twin/skills.py`
   (build ticket 42) is the eval harness: run a skill against a fixture corpus, score it against a
   versioned threshold, record score-over-time per model version, and surface a model upgrade that
   degrades judgement as a regression rather than letting it go silent. It is skill-agnostic by
@@ -1291,16 +1348,26 @@ Named here so the skeleton cannot quietly become the definition of done.
   against evolution position, dependency structure and ownership, swept unconditionally across
   every org by `gameplay_lens.sweep()` rather than waiting for a signal to push a candidate forward
   — the structural counterweight decision ticket 13 Q3 names, with the opportunity count reported
-  beside each org's signal count so the counterweight is measurable rather than only claimed. None
-  of the four is a model call. Two of the six (`substrate-generator`, `ethics-gate`) still do not
-  exist, so the harness has proven itself against four real subjects and nothing yet for the other
-  two.
-- **Substrate exists in toy form only; the real generator does not.** Build ticket 48 built the
-  recipe format (versioned, seeded), a toy generator that regenerates byte-for-byte from a recipe
-  and seed, and the authored-or-derived spike: regenerated substrate is classified `authored`,
-  because a real generator will be an LLM call and nothing here can promise it reproduces given the
-  same pins. The seeded-LLM generator itself (49), spine anchoring against the public record (50)
-  and the fidelity eval suite (51) do not exist yet.
+  beside each org's signal count so the counterweight is measurable rather than only claimed.
+  `substrate-generator` (`twin/substrate_generator.py`, build ticket 49) is the fifth: a coherent
+  multi-channel (events, communications, HR, telemetry) reference generator built from one pinned
+  recipe, reusing ticket 48's own `generate_deterministic` per channel so regeneration reproduces
+  byte-for-byte, capped at one planted signal per channel so the output stays mundane by
+  construction, and recording — in the artefact, not only in prose — the concrete point where
+  believability and measurability conflict (a realistic scatter of plants would be unmeasurable; a
+  fixed, recorded position wins). None of the five is a model call. One of the six (`ethics-gate`)
+  still does not exist, so the harness has proven itself against five real subjects and nothing yet
+  for the last one.
+- **Substrate generation is a real, tested reference implementation; it is not a live model call.**
+  Build ticket 48 built the recipe format (versioned, seeded) and the authored-or-derived spike:
+  regenerated substrate is classified `authored`, because a real generator will be an LLM call and
+  nothing here can promise it reproduces given the same pins. Build ticket 49 built the generator
+  itself — multi-channel, mundane by default, seeded and regenerable — but as a heuristic stand-in,
+  the same limit `signal-classify` through `gameplay-lens` already carry, not an actual call to a
+  model provider (none is reachable from this suite). Spine anchoring against the public record
+  (50) and the fidelity eval suite that tunes signal-to-noise, plant difficulty and reporting
+  asymmetry against a target (51) do not exist yet, so decision ticket 12's Q3/Q3c consistency and
+  negativity-bias resolutions are not yet realised in code, only decided.
 - **The two-architecture determinism check has never run.** The CI matrix is declared and the
   golden digests are committed; the claim is wired, not proven.
 - **The subjects are fixtures.** Netflix and Intel here are toy value chains with invented
