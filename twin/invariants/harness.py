@@ -1015,6 +1015,72 @@ def _substrate_generator_is_mundane_by_default(ctx: Context) -> str:
     )
 
 
+@harness_check("ingest_runs_unattended_with_provenance_and_measured_throughput")
+def _ingest_runs_unattended_with_provenance_and_measured_throughput(ctx: Context) -> str:
+    """`twin/ingest.py` (build ticket 53, decision ticket 11 Q2): binding runs fully automated
+    *at throughput* — no human gate at entry, every item provenanced, and the throughput actually
+    achieved is measured rather than assumed. The same two-leg shape
+    `signal_classify_is_grade_5_by_construction` uses, applied to the pipeline that calls the
+    skill at volume rather than to the skill alone.
+
+    Two legs. Structural: `ingest_run`'s own source calls `signal_classify.classify` directly, in
+    a loop, with nothing resembling a confirmation, review or approval step in its call graph —
+    checked against the source text itself, the same discipline
+    `skill_eval_harness_is_agnostic_and_thresholds_are_guarded` uses to keep a harness honest
+    about what it does not call. Live: a real run against the default fixture's `netflix`
+    overlay, at a declared volume, actually classifies every item — each carrying `provenance`
+    naming the substrate blob, the recipe and its own index — stays grade 5 throughout (the
+    downstream gate this ticket's "no gate at entry" argument rests on), and reports a measured
+    `items_per_second` computed from wall-clock elapsed time rather than a hardcoded figure.
+    """
+    import inspect
+
+    from .. import ingest as ingest_mod
+    from ..repo import ModelRepo
+    from ..substrate import SubstrateRecipe
+
+    source = inspect.getsource(ingest_mod.ingest_run)
+    for banned in ("input(", "approve", "review", "sign.human", "confirm"):
+        if banned in source:
+            raise Violated(f"ingest_run's own source contains {banned!r} — a human gate may exist at entry")
+
+    recipe = SubstrateRecipe(
+        id="harness-guard-recipe",
+        seed=11,
+        templates=(
+            "A trading update describes deteriorating margins in the core business.",
+            "An industry report flags rising input costs across the sector.",
+        ),
+        model_version="toy-model-v1",
+    )
+    repo = ModelRepo.open(ctx.repo_dir)
+    declared_count = 60
+    artefact = ingest_mod.ingest_run(repo, ctx.caps, "netflix", recipe, declared_count, ["twin", "ingest"])
+    body = artefact.body
+
+    accounted_for = len(body["items"]) + len(body["failures"])
+    if accounted_for != declared_count:
+        raise Violated(f"declared {declared_count} item(s), accounted for {accounted_for}")
+    if not body["items"]:
+        raise Violated("no item was actually classified — the pipeline has no subject")
+    for item in body["items"]:
+        if item["claim"]["evidence_grade"] != 5:
+            raise Violated(f"an ingested item carries evidence_grade {item['claim']['evidence_grade']!r}, not 5")
+        provenance = item.get("provenance", {})
+        if not {"substrate", "recipe", "index"} <= provenance.keys():
+            raise Violated(f"an ingested item carries incomplete provenance: {provenance}")
+
+    throughput = body["throughput"]
+    if throughput["elapsed_seconds"] <= 0 or not throughput["items_per_second"]:
+        raise Violated(f"throughput was not actually measured: {throughput}")
+
+    return (
+        "ingest_run's own source calls no confirmation/review/approval step; "
+        f"{len(body['items'])} of {declared_count} declared item(s) classified at grade 5, each "
+        f"carrying full provenance, measured at {throughput['items_per_second']:.1f} items/sec"
+    )
+
+
 def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
     rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     out = _git(root, "show", f"{ref}:{rel}")
