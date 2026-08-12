@@ -3513,3 +3513,302 @@ def build_standing_library(root: str | Path) -> list[Path]:
         build_astrazeneca_org(base / "astrazeneca"),
         build_sanofi_org(base / "sanofi"),
     ]
+
+
+# -- Royal Mail: the missed-opportunity primary case (build ticket 71, decision tickets 19, 22,
+# spec story 90) ------------------------------------------------------------------------------
+#
+# Every prior answer key (Carillion, NMC Health, Wirecard, Enron) is a collapse — decision ticket
+# 19's own research found that no opportunity case can meet the collapse roster's evidential bar,
+# for a structural reason: there is no short side of an opportunity, so the instruments that make
+# a collapse key possible (a capital-backed short thesis, a statutory adverse-position register,
+# a court-forced inquiry) simply have no opportunity-side equivalent. Royal Mail — parcel
+# automation (2013-19) is research 19's recommended exception: a **missed** opportunity whose
+# counterfactual sits inside the subject's own audited filings (GLS, the more-automated
+# continental parcels subsidiary, reported line-by-line in the same segmental accounts as the
+# under-automated domestic business) rather than needing an outside rival's numbers, anchored by
+# a **legally-liable flotation prospectus** dated years before the shortfall it forecast.
+#
+# Netflix cannot carry this beat (decision ticket 22): its story is famous, so a twin
+# "anticipating" it is indistinguishable from reciting it. Royal Mail's parcels-automation
+# shortfall carries no book, no documentary and no household-name recognition — the same
+# low-notoriety footing Carillion and NMC Health hold, evidenced rather than asserted per build
+# ticket 39's discipline (see the outcome's own note).
+
+ROYAL_MAIL_ORG = "royal-mail"
+
+_ROYAL_MAIL_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/automation-shortfall-forces-a-remedial-investment-by-2019.yaml": """\
+id: automation-shortfall-forces-a-remedial-investment-by-2019
+text: >-
+  The subject concedes, through a materially enlarged capital-investment commitment, that its UK
+  parcels and letters operation has not kept pace with the automated sorting capacity already
+  running at rival couriers and at its own more-automated overseas parcels subsidiary, before the
+  end of 2019.
+resolves_on: '2019-12-31'
+""",
+}
+
+_ROYAL_MAIL_BASE: dict[str, str] = {
+    "orgs/royal-mail/components/uk-parcels-and-letters-operator.yaml": """\
+id: uk-parcels-and-letters-operator
+name: The subject's UK parcels and letters operations
+kind: activity
+evolution: product
+visibility: 0.5
+""",
+    "orgs/royal-mail/world_models/market-consensus-2013.yaml": """\
+id: market-consensus-2013
+name: Market consensus, at flotation
+credence: 0.6
+note: >-
+  A low prior, deliberately — the subject floated as a going concern with a board-endorsed
+  transformation strategy and no market expectation of a remedial catch-up investment. The point
+  of a low-notoriety key is that the twin has to earn a higher belief from the signals below, not
+  start from one.
+beliefs:
+  automation-shortfall-forces-a-remedial-investment-by-2019: 0.05
+""",
+    "orgs/royal-mail/scenarios/would-the-twin-have-flagged-it.yaml": """\
+id: would-the-twin-have-flagged-it
+question: >-
+  As of its own legally-liable flotation prospectus, would the twin already have had grounds to
+  flag that the subject's UK parcels-automation investment risked falling behind the pace its own
+  forecast — and its more-automated overseas parcels subsidiary's own segmental results —
+  implied?
+proposition: automation-shortfall-forces-a-remedial-investment-by-2019
+at: '2013-09-27'
+horizon: '2019-12-31'
+components:
+  - uk-parcels-and-letters-operator
+world_models:
+  - market-consensus-2013
+affected_parties:
+  - id: postal-and-delivery-workforce
+    who: >-
+      The subject's own postal and delivery workforce, represented by the Communication Workers
+      Union — real and documented: the union's own "Four Pillars of Security" statement
+      (2018-01-31, this org's own signal cwu-four-pillars-2018-01-31) records automated
+      mail-centre and delivery-office deployment still under industrial negotiation more than
+      four years after the prospectus this scenario reads forecast the automation shift.
+    consequence: >-
+      An automation shortfall this scenario forecasts is priced from the market's perspective,
+      the prospectus's own; the workforce whose roles the automation programme reshapes holds no
+      perspective this twin runs under.
+""",
+}
+
+_ROYAL_MAIL_IPO_PROSPECTUS: dict[str, str] = {
+    "orgs/royal-mail/signals/ipo-prospectus-2013-09-27.yaml": """\
+id: ipo-prospectus-2013-09-27
+date: '2013-09-27'
+steep: economic
+source: Royal Mail plc prospectus for its initial public offering, published 2013-09-27
+statement: >-
+  The subject's own statutory flotation prospectus forecasts UK addressed letter volumes
+  declining by approximately 4-6% a year and parcel volumes continuing to grow as a share of
+  total mail — the trend its UK parcels-automation investment would need to keep pace with.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://data.parliament.uk/DepositedPapers/Files/DEP2013-1579/Royal_Mail_-_Full_Prospectus_soft_copy_version_only.pdf
+  legal_status: >-
+    A statutory prospectus under Part VI of FSMA 2000 and the UK Prospectus Rules — the issuer
+    and its directors carry legal liability under FSMA s.90 for a false or misleading statement
+    in it, unlike an ordinary investor presentation or analyst note.
+""",
+}
+
+_ROYAL_MAIL_DPD_HUB: dict[str, str] = {
+    "orgs/royal-mail/signals/dpd-hinckley-hub-2015-09-24.yaml": """\
+id: dpd-hinckley-hub-2015-09-24
+date: '2015-09-24'
+steep: technological
+source: Post & Parcel, 2015-09-24
+statement: >-
+  Rival UK parcels courier DPD officially opens a fully automated GBP100m sorting hub in
+  Hinckley, capable of processing up to 720,000 parcels a night — a dated, publicly disclosed
+  automation-capacity figure from a direct domestic rival, two years after the subject's own
+  flotation prospectus.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://postandparcel.info/68179/news/dpd-officially-opens-new-hinckley-parcel-hub/
+""",
+}
+
+_ROYAL_MAIL_HERMES_HUB: dict[str, str] = {
+    "orgs/royal-mail/signals/hermes-rugby-hub-2017-08-17.yaml": """\
+id: hermes-rugby-hub-2017-08-17
+date: '2017-08-17'
+steep: technological
+source: Post & Parcel, 2017-08-17
+statement: >-
+  A second rival courier, Hermes, opens a GBP31m automated "Midlands Super Hub" in Rugby able to
+  process more than one million parcels a day — a second dated rival automation-capacity tell,
+  inside the subject's own scenario horizon.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://postandparcel.info/82464/news/parcel/hermes-opens-new-midlands-super-hub-2/
+""",
+}
+
+_ROYAL_MAIL_CWU_AGREEMENT: dict[str, str] = {
+    "orgs/royal-mail/signals/cwu-four-pillars-2018-01-31.yaml": """\
+id: cwu-four-pillars-2018-01-31
+date: '2018-01-31'
+steep: social
+source: Communication Workers Union, Postal Executive statement, 2018-01-31
+statement: >-
+  The subject's postal workers' union unanimously endorses a pay, pensions and "Four Pillars of
+  Security" agreement covering automated mail-centre and delivery-office deployment — the
+  subject's own domestic automation rollout still under industrial negotiation more than four
+  years after its prospectus forecast the shift it depended on.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.cwu.org/ltb/ltb-059-18-pay-four-pillars-agreement/
+""",
+}
+
+_ROYAL_MAIL_GLS_SEGMENT: dict[str, str] = {
+    "orgs/royal-mail/signals/gls-outperforms-ukpil-fy2017-18-2018-05-17.yaml": """\
+id: gls-outperforms-ukpil-fy2017-18-2018-05-17
+date: '2018-05-17'
+steep: economic
+source: Royal Mail plc Full Year Results 2017-18, reported in specialist logistics trade press, 2018-05-17
+statement: >-
+  The subject's own FY2017-18 full-year results report its continental GLS parcels subsidiary
+  growing underlying revenue by around 10%, while the domestic UKPIL segment stays flat on
+  revenue with letters revenue down around 4% — the counterfactual reported line-by-line inside
+  the subject's own segmental accounts, with no outside-rival inference required.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.ti-insight.com/strong-gls-results-offset-declining-letter-volumes-for-royal-mail-once-again-in-2017-18/
+""",
+}
+
+_ROYAL_MAIL_PROFIT_WARNING: dict[str, str] = {
+    "orgs/royal-mail/signals/profit-warning-2018-10-01.yaml": """\
+id: profit-warning-2018-10-01
+date: '2018-10-01'
+steep: economic
+source: Reuters, via Business Standard, 2018-10-01
+statement: >-
+  The subject issues a market-moving RNS profit warning, cutting its cost-transformation target
+  from GBP230m to GBP100m and citing worse-than-expected letter-volume decline and productivity
+  pressure; shares fall by more than a fifth within minutes.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.business-standard.com/amp/article/reuters/royal-mail-shares-slide-on-profit-and-costs-warning-118100101126_1.html
+""",
+}
+
+
+def _royal_mail_claim(signal_id: str) -> dict[str, str]:
+    """One claim binding `signal_id` to the single component this key exercises. Grade 1
+    ("dated natural experiment" — twin/evidence-ladder.yaml): every signal is a dated,
+    observable public fact or a statutory disclosure, not a model assertion."""
+    return {
+        f"orgs/royal-mail/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: uk-parcels-and-letters-operator
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "The signal is a dated, publicly documented event about this business; the citation is on the signal itself."
+"""
+    }
+
+
+_ROYAL_MAIL_OUTCOME: dict[str, str] = {
+    "orgs/royal-mail/outcomes/royal-mail-concedes-the-automation-shortfall-2019.yaml": """\
+id: royal-mail-concedes-the-automation-shortfall-2019
+proposition: automation-shortfall-forces-a-remedial-investment-by-2019
+observed: true
+resolved_on: '2019-05-23'
+source: >-
+  The subject's own announcement of a c.GBP1.8bn five-year UK investment programme, including
+  three new automated parcel hubs, 2019-05-23
+  (https://www.ipc.be/news-portal/general-news/2019/05/23/08/02/royal-mail-to-invest-around-1-bn-pounds-in-uk-over-five-years).
+contamination: low
+source_dated: true
+note: >-
+  Notoriety assessed, not asserted (decision ticket 19, build ticket 39's discipline): the
+  subject's parcels-automation shortfall carries no book, no documentary and no household-name
+  recognition outside specialist logistics and financial trade press — the same low-notoriety
+  footing the suite's other low-contamination collapse keys hold. Chosen as the primary
+  missed-opportunity case (decision ticket 22) because the counterfactual sits inside the
+  subject's own audited filings (GLS,
+  reported in the same segmental accounts) rather than needing an outside rival's numbers, and
+  because a legally-liable flotation prospectus dates the forecast the subject then underinvested
+  against. The unverified "~12% automation vs rivals' 70-90%" figure research 19 could not trace
+  to a primary source is deliberately absent from every signal above.
+""",
+}
+
+
+def build_royal_mail_org(dest: str | Path) -> Path:
+    """The primary missed-opportunity backtest key (build ticket 71, decision tickets 19 and 22):
+    a real, dated, publicly documented answer key to the identical contract the collapse keys
+    hold, with commit history that spans the real 2013-2019 timeline so a real rewind has
+    something to read.
+
+    Six signals, each a real, dated, publicly documented fact cited by URL: the subject's own
+    2013 flotation prospectus (legally liable, forecasting the letters/parcels shift); two rival
+    automation-hub openings (DPD Hinckley 2015, Hermes Rugby 2017); the subject's own labour
+    agreement covering automated deployment (Jan 2018); the subject's own FY2017-18 results,
+    where GLS's segmental figures sit beside UKPIL's in the identical filing; and the Oct 2018
+    profit warning that first conceded the shortfall publicly. The outcome — the subject's own
+    May 2019 GBP1.8bn remedial investment announcement — is cited only there, never on a signal,
+    the same hindsight discipline build ticket 38 established for Carillion's HC 769.
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _ROYAL_MAIL_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2013-08-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/royal-mail/meta.yaml": (
+            f"id: {ROYAL_MAIL_ORG}\nunit: overlay\norg: {ROYAL_MAIL_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _ROYAL_MAIL_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the prospectus",
+        dated="2013-09-01T00:00:00+00:00")
+
+    for signal_id, files, message, dated in (
+        ("ipo-prospectus-2013-09-27", _ROYAL_MAIL_IPO_PROSPECTUS, "the flotation prospectus",
+         "2013-09-27T09:00:00+00:00"),
+        ("dpd-hinckley-hub-2015-09-24", _ROYAL_MAIL_DPD_HUB, "a rival automated hub opens",
+         "2015-09-24T09:00:00+00:00"),
+        ("hermes-rugby-hub-2017-08-17", _ROYAL_MAIL_HERMES_HUB, "a second rival automated hub opens",
+         "2017-08-17T09:00:00+00:00"),
+        ("cwu-four-pillars-2018-01-31", _ROYAL_MAIL_CWU_AGREEMENT, "the Four Pillars agreement",
+         "2018-01-31T09:00:00+00:00"),
+        ("gls-outperforms-ukpil-fy2017-18-2018-05-17", _ROYAL_MAIL_GLS_SEGMENT,
+         "the FY2017-18 results, GLS beside UKPIL", "2018-05-17T09:00:00+00:00"),
+        ("profit-warning-2018-10-01", _ROYAL_MAIL_PROFIT_WARNING, "the profit warning",
+         "2018-10-01T09:00:00+00:00"),
+    ):
+        # Signal and claim land in the same commit: the binding exists in this repository's
+        # history as of the same real date the signal does, not batched in months later.
+        _write(root, {**files, **_royal_mail_claim(signal_id)})
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", message, dated=dated)
+
+    _write(root, _ROYAL_MAIL_OUTCOME)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the answer key, citing the GBP1.8bn investment concession",
+        dated="2019-05-23T00:00:00+00:00")
+    return root
