@@ -1,0 +1,24 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+capability: forecast-book
+owning_ticket: '21'
+criteria:
+  - index: 1
+    text: "A question-selection rule that does not reintroduce selection bias."
+    checked: true
+    evidence: "twin/benchmark-selection-rule.yaml — versioned, committed and stated in resolvable terms (liquidity threshold, resolution horizon, category list); twin/benchmark.py's select_questions() applies it mechanically (sorted by id, no judgement call) and reproducibly (the identical rule against the identical pool always draws the identical set), with a deterministic seeded volume valve for when the mechanical filter selects too many. Selected sets are required to span every declared confidence bin, checked against the emitted distribution rather than asserted."
+    ticked_by: build ticket 57
+  - index: 2
+    text: "Venue decision + the observe-vs-participate call (incl. UK legality)."
+    checked: false
+  - index: 3
+    text: "A blind-emission protocol that is mechanically enforceable."
+    checked: false
+  - index: 4
+    text: "An explicit claim-scope statement: what a good score proves and what it does not."
+    checked: false
+  - index: 5
+    text: "The circularity question resolved (signal source vs benchmark)."
+    checked: false
+  - index: 6
+    text: "A proportionality verdict: is it worth building at this coverage?"
+    checked: false

@@ -1081,6 +1081,83 @@ def _ingest_runs_unattended_with_provenance_and_measured_throughput(ctx: Context
     )
 
 
+@harness_check("benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach")
+def _benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach(ctx: Context) -> str:
+    """Benchmark question selection and ingestion quarantine (build ticket 57, decision ticket
+    21 Q1(b)/Q2): the committed selection rule is mechanical and reproducible, the selected set
+    spans the full confidence range, and a quarantine breach planted in ingestion provenance is
+    actually caught — the same structural-plus-live shape
+    `signal_classify_is_grade_5_by_construction` uses, extended here to a selection-plus-audit
+    pair rather than a single function.
+
+    Four legs, against the real committed rule (`twin/benchmark-selection-rule.yaml`), never a
+    hand-typed stand-in. First, reproducibility: the identical rule against an identical pool
+    selects the identical set twice. Second, the selected set spans every bin the rule declares —
+    checked against `spans_full_confidence_range()`'s own computed answer. Third, the negative
+    leg: auditing ingestion-provenance records that never mention a quarantined id reports clean.
+    Fourth, the AC this ticket names directly: a quarantined question's id planted in a nested
+    provenance field — a recipe id, a free-text note — is caught by `audit_quarantine`, at both an
+    old and a since-elapsed record, because nothing in the audit reads a timestamp to filter by.
+    """
+    from .. import benchmark as bm
+
+    rule = bm.SelectionRule.load()
+    midpoints = [lo + (hi - lo) / 2 for lo, hi in rule.confidence_bins for _ in range(3)]
+    pool = [
+        {
+            "id": f"guard-q-{i:02d}",
+            "category": rule.categories[i % len(rule.categories)],
+            "liquidity": rule.min_liquidity * 2,
+            "horizon_days": (rule.min_horizon_days + rule.max_horizon_days) // 2,
+            "implied_probability": p,
+        }
+        for i, p in enumerate(midpoints)
+    ]
+
+    first = bm.select_questions(rule, pool)
+    second = bm.select_questions(rule, pool)
+    if first != second:
+        raise Violated("select_questions() against the identical rule and pool did not reproduce identically")
+    if not first.spans_full_confidence_range():
+        raise Violated(f"the selected set does not span every declared confidence bin: {first.distribution}")
+
+    clean_records: list[tuple[str, dict[str, Any]]] = [
+        ("ingest-run#1", {"provenance": {"substrate": "sha256:aa:1", "recipe": "unrelated-recipe", "index": 0}}),
+        ("ingest-run#2", {"provenance": {"substrate": "sha256:bb:1", "recipe": "another-recipe", "index": 1}}),
+    ]
+    clean = bm.audit_quarantine(first, clean_records)
+    if clean:
+        raise Violated(f"a quarantine audit against records naming no quarantined id reported a breach: {clean}")
+
+    planted_id = next(iter(first.ids))
+    breached_records = [
+        *clean_records,
+        # "at any lag": an old record and one long since elapsed both carry the planted breach,
+        # buried in a nested field rather than a single obviously-checked one.
+        (
+            "ingest-run#0-old",
+            {"provenance": {"substrate": "sha256:cc:1", "recipe": f"derived-from-{planted_id}", "index": 0}},
+        ),
+        (
+            "ingest-run#99-elapsed",
+            {"provenance": {"substrate": "sha256:dd:1", "recipe": "unrelated", "note": f"see also {planted_id}"}},
+        ),
+    ]
+    breaches = bm.audit_quarantine(first, breached_records)
+    caught = {b.where for b in breaches}
+    if "ingest-run#0-old" not in caught or "ingest-run#99-elapsed" not in caught:
+        raise Violated(f"a planted quarantine breach was not caught at both lags: caught {caught}")
+    if any(b.question_id != planted_id for b in breaches):
+        raise Violated(f"a breach was reported against the wrong question id: {breaches}")
+
+    return (
+        "select_questions() reproduces byte-identically against the committed rule; the selected "
+        f"{len(first.questions)}-question set spans all {len(first.distribution)} declared "
+        "confidence bins; a clean provenance audit reports no breach; a quarantined id planted in "
+        "a nested field of an old and a since-elapsed record is caught at both"
+    )
+
+
 def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
     rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     out = _git(root, "show", f"{ref}:{rel}")

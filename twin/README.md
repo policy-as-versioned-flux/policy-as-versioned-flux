@@ -419,6 +419,42 @@ Both cases demonstrate the point through the real CLI: `canonical-hindsight-cons
 markedly worse (higher brier and log-loss) than `contemporaneous-consensus`, and their own gap
 folds into the identical `measure_discount()` rather than sitting beside it as a second number.
 
+## The co-registered forecast book: selection and quarantine
+
+`twin/benchmark.py` (build ticket 57) is the first half of decision ticket 21's external gate —
+the one mechanism the memorisation problem cannot reach, because a forward-dated question cannot
+be in any training corpus. Two mechanisms, both decided at ticket 21 Q1/Q2 and neither built
+before this ticket.
+
+**The selection rule is mechanical, versioned and pre-registered, not a per-run judgement call.**
+`twin/benchmark-selection-rule.yaml` states everything in resolvable terms — a liquidity
+threshold, a resolution-horizon window, a category list — the same discipline
+`twin/evidence-ladder.yaml`'s thresholds carry, and a change to it is a dated diff in this file's
+own git history rather than invisible drift. `select_questions()` applies it and nothing else
+decides which questions are drawn: candidates are sorted by id before anything touches them, so
+arrival order cannot bias what a volume cap keeps, and the one place chance enters is decision
+ticket 21 Q2's own named exception — "(c) random sampling as a volume valve if the rule selects
+too many" — drawn from the rule's own committed seed, so a re-run against the identical pool
+selects the identical subset. **The full confidence range is demonstrated, not claimed:**
+`BenchmarkSet.spans_full_confidence_range()` is true only once every declared bin holds at least
+one selected question, checked against the emitted `distribution` rather than asserted in prose.
+
+**The quarantine is a scan across ingestion provenance, never a single named field.**
+`audit_quarantine()` serialises each ingestion-provenance record whole and checks it for a
+substring match against every quarantined question id, so a breach hiding in a nested field — a
+recipe id, a source string, a claim's own text — is caught rather than only a field a caller
+happened to check. Nothing here reads a timestamp, which is what makes the quarantine hold "at
+any lag": an old record and one audited long afterward are scanned identically, and
+`tests/test_benchmark.py` plants a breach at both.
+
+**The residual limit is stated, not papered over (decision ticket 21 Q1).** A clean audit proves
+*no direct ingestion* of a quarantined id. It says nothing about whether the twin's priors were
+shaped by market-adjacent information arriving some other way — narrowing that gap is temporal
+separation's job (build ticket 58), not this ticket's. `twin/capabilities/forecast-book.yaml`
+records the honest state: one of decision ticket 21's six acceptance criteria is checked by this
+ticket's code, the other five (venue, blind emission, claim scope, the rest of circularity,
+proportionality) are build tickets 58 and 59's, so the capability grades `partial`, never `full`.
+
 ## Believed, rival, revealed — and no privileged map
 
 `twin positions` (build ticket 16) is the other half of "no code path collapses an ensemble": once
@@ -1412,6 +1448,12 @@ Named here so the skeleton cannot quietly become the definition of done.
   only on fixture data.** Build ticket 61's register aggregates what scenario authoring already
   declares; the disparate-impact channel is sealed and role-gated. Neither reaches a live pipeline
   and neither has run against a real, non-fixture finding.
+- **The co-registered forecast book has a selection rule and a quarantine; it has no market
+  connection at all.** Build ticket 57 built the mechanical selection rule and the ingestion
+  quarantine/audit against a caller-supplied candidate pool; nothing yet fetches real questions
+  from Kalshi, Polymarket or Metaculus, nothing emits a blind, pinned-and-signed forecast before a
+  resolution window (58), and nothing ingests a price *move* as a world-layer signal (59) — so the
+  claim this gate can make today is that the mechanism is honest, not that it has been run.
 
 ## Layout
 
