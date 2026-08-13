@@ -7,10 +7,10 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 64 of 77 build tickets closed, and one measuring against a clock that runs
-to 2026-11-06.** (Recounted from each ticket's own `Status:` line rather than carried forward by
-hand — the previous banner, 60, had drifted the same way this file's own "What is honestly built"
-section repeatedly finds and corrects.) Ticket 23's own checklist is closed, but the calibration
+**This is 65 of 77 build tickets closed, and one measuring against a clock that runs
+to 2026-11-06.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
+rather than carried forward by hand — the previous banner, 64, was itself off by one the same way
+this file's own "What is honestly built" section repeatedly finds and corrects.) Ticket 23's own checklist is closed, but the calibration
 discipline it established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
 more usefully, is named inside every artefact the tool emits.
