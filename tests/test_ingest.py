@@ -7,12 +7,15 @@ is as disposable as the rest of this system.
 from __future__ import annotations
 
 import inspect
+import json
+from pathlib import Path
 
 import pytest
 
 from twin import ingest
 from twin.artefact import DERIVED
 from twin.blob import BlobRef
+from twin.cli import main
 from twin.grades import Capabilities
 from twin.model import Overlay
 from twin.repo import ModelRepo
@@ -151,3 +154,60 @@ def test_candidates_of_merges_world_and_overlay_components(repo: ModelRepo) -> N
     merged = {**overlay.world.components, **overlay.components}
     assert ids == set(merged)
     assert all({"id", "name"} == set(c) for c in candidates)
+
+
+# -- the full loop: raw substrate through skills, sensing, execution and scoring (build ticket 56) --
+#
+# Each stage already had its own reproducible evidence in isolation — this ingest module proves
+# substrate -> skill at volume, `twin/demo.sh` (run in CI) proves sense -> run -> score — but
+# nothing chained all four in one place before this ticket's coherence audit. This test is that
+# chain, using only real fixtures and the real CLI/verbs, so it is evidence a reader can point to
+# and pytest re-runs on every change rather than a one-off manual command.
+
+
+def test_the_full_loop_runs_from_raw_substrate_through_skills_sensing_execution_and_scoring(
+    repo: ModelRepo, caps: Capabilities, tmp_path: Path
+) -> None:
+    """Stage 1: raw substrate, classified at volume by the real `signal-classify` skill — no
+    human gate, grade 5 by construction (`ingest_run`, exercised on its own above). Stage 2:
+    sensing binds a dated signal to a component through a committed grade-5 claim (`twin sense`,
+    against the fixture's own `price-separation-announced` signal). Sensing reads a *committed*
+    claim, not a skill's live output in this run — `twin/ingest.py`'s own module docstring names
+    why the two stay structurally separate ("sensing is a dead end": nothing yet consumes a bound
+    signal to move a forecast), and this test re-confirms that disclosed limit rather than
+    papering over it by wiring something that does not exist. Stage 3: a scenario executes under
+    a declared regime, emitting forecasts, always a list. Stage 4: a recorded outcome scores them
+    under proper scoring rules.
+    """
+    # Stage 1 — raw substrate signals through the real signal-classify skill, at volume.
+    ingested = ingest.ingest_run(repo, caps, "netflix", _recipe(), 25, COMMAND)
+    assert ingested.body["items"], "the skill classified nothing from raw substrate"
+    assert all(item["claim"]["evidence_grade"] == 5 for item in ingested.body["items"])
+
+    # Stage 2 — sensing binds a dated signal to a component through a committed grade-5 claim.
+    bound_signal = tmp_path / "bound-signal.json"
+    assert main([
+        "sense", "--repo", str(repo.model_root), "--org", "netflix",
+        "--signal", "price-separation-announced", "--out", str(bound_signal),
+    ]) == 0
+    sensed = json.loads(bound_signal.read_bytes())
+    assert sensed["envelope"]["kind"] == "bound-signal"
+    assert sensed["body"]["bindings"]
+
+    # Stage 3 — a scenario executes under a declared regime; forecasts are always a list.
+    bundle = tmp_path / "forecast-bundle.json"
+    assert main([
+        "run", "--repo", str(repo.model_root), "--org", "netflix",
+        "--scenario", "dvd-decline-2011", "--regime", "as-consumed", "--out", str(bundle),
+    ]) == 0
+    forecasts = json.loads(bundle.read_bytes())
+    assert len(forecasts["body"]["forecasts"]) > 1, "an execution must emit multiple forecasts"
+
+    # Stage 4 — a recorded outcome scores them under proper scoring rules.
+    card = tmp_path / "score-card.json"
+    assert main([
+        "score", "--repo", str(repo.model_root), "--org", "netflix",
+        "--forecast", str(bundle), "--outcome", "dvd-decline-2011-resolved", "--out", str(card),
+    ]) == 0
+    scored = json.loads(card.read_bytes())
+    assert scored["body"]["scores"], "nothing scored against the resolved outcome"

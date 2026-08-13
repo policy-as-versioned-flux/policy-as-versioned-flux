@@ -1582,28 +1582,42 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 52 pass, 1 pending, 1 skipped and not faked (the CI-only cross-architecture
-leg). `pytest -q` — 1101 tests across seams 1 and 2.
+`./bin/twin verify` — 57 pass, 1 fails (`drift_window_is_actually_being_sampled`, a live-cluster
+probe-staleness check that fails whenever build ticket 64's probe has not sampled recently — the
+one check in the suite that reads the actual wall clock rather than the model repository, so it is
+expected to go red between samples and is not a coherence defect), 1 skipped and not faked (the
+CI-only cross-architecture leg), 0 pending. `pytest -q` — 1223 tests across seams 1 and 2. (Build
+ticket 56's coherence audit re-derived these counts from a live run rather than carrying the
+previous round's numbers forward — see "What is honestly built", below, for the same discipline
+applied to the capability table.)
 
-| live | pending, with the ticket that activates it |
-|---|---|
-| `store_rebuildable_from_git` | `price_levels_never_probabilities` (59) |
-| `identical_pins_identical_bytes` | `standing_library_covers_committed_classes` (69) |
-| `every_artefact_marked` | |
-| `every_capability_depth_graded` | |
-| `world_never_references_overlay` | |
-| `no_collapse_mechanism` | |
-| `no_recommended_action_field` | |
-| `derived_never_human_signed` (cryptographic) | |
-| `only_as_consumed_scores` | |
-| `no_special_category_slot` | |
-| `grade_5_only_path_never_prices` | |
-| `ruin_class_absent_not_priced` | |
-| `prefilter_precedes_pricing` | |
-| `as_consumed_admits_no_post_T_fact` | |
+| live |
+|---|
+| `store_rebuildable_from_git` |
+| `identical_pins_identical_bytes` |
+| `every_artefact_marked` |
+| `every_capability_depth_graded` |
+| `world_never_references_overlay` |
+| `no_collapse_mechanism` |
+| `no_recommended_action_field` |
+| `derived_never_human_signed` (cryptographic) |
+| `only_as_consumed_scores` |
+| `no_special_category_slot` |
+| `grade_5_only_path_never_prices` |
+| `ruin_class_absent_not_priced` |
+| `prefilter_precedes_pricing` |
+| `as_consumed_admits_no_post_T_fact` |
+| `price_levels_never_probabilities` |
+| `standing_library_covers_committed_classes` |
 
-**The constitution names sixteen invariants and the manifest may not grow a seventeenth without the
-constitution changing first.** So build tickets 13, 14 and 11 each *extended* an existing check rather
+**All sixteen invariants the constitution names are now live — the manifest's last `pending` entry
+retired at build ticket 59** (`price_levels_never_probabilities`; `standing_library_covers_committed_classes`
+had already gone live earlier in the merged history, at build ticket 69, despite its lower ticket
+number — see "Price moves as world-layer signals", above). This table previously carried both as
+still-pending long after they activated, the same shape of drift build ticket 34's coherence audit
+found in the capability table once before; build ticket 56's own coherence audit found and fixed
+it here. The constitution's own rule stands unchanged: the manifest may not grow a seventeenth
+without the constitution changing first. So build tickets 13, 14 and 11 each *extended* an existing check rather
 than adding one — roll-ups with no authored and no stored form onto `store_rebuildable_from_git`, the
 refusal to inherit arckit's action bands onto `no_recommended_action_field`, and detection of a planted
 human signature onto `derived_never_human_signed`. Each body change cites its authorising decision
@@ -1785,9 +1799,6 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **The evidence-grade history check does not follow renames.** Moving a file and changing its
   grade in the same commit reads as a new file at its original grade. Named in
   `twin/evidence.py`; `git log --follow` per file is the upgrade if it matters.
-- **The misuse catalogue, the affected-parties register and the disparate-impact audit channel
-  are not built.** Build ticket 27 published the scope exclusion that says the system cannot
-  currently be checked for disparate impact. Saying so is not fixing it. (61, 62.)
 - **The regime gate is only as strong as the repository's own history.** The date filter always
   runs; the ingestion-history filter needs a commit at or before T, and a retrospective subject
   dated 2011 in a repository built this year has none. `as-consumed` there rests on fact dates
@@ -1817,7 +1828,7 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
   produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
   sigstore/gitsign, named in `twin/sign.py`.
-- **Seam 3 exists; five of six skills do now, and each is a heuristic stand-in.** `twin/skills.py`
+- **Seam 3 exists; all six skills do now, and each is a heuristic stand-in.** `twin/skills.py`
   (build ticket 42) is the eval harness: run a skill against a fixture corpus, score it against a
   versioned threshold, record score-over-time per model version, and surface a model upgrade that
   degrades judgement as a regression rather than letting it go silent. It is skill-agnostic by
@@ -1845,9 +1856,19 @@ Named here so the skeleton cannot quietly become the definition of done.
   byte-for-byte, capped at one planted signal per channel so the output stays mundane by
   construction, and recording — in the artefact, not only in prose — the concrete point where
   believability and measurability conflict (a realistic scatter of plants would be unmeasurable; a
-  fixed, recorded position wins). None of the five is a model call. One of the six (`ethics-gate`)
-  still does not exist, so the harness has proven itself against five real subjects and nothing yet
-  for the last one.
+  fixed, recorded position wins). `ethics-gate` (`twin/ethics_gate.py`, build ticket 47) is the
+  sixth and last — the admission ladder, DPIA triage, gameability and the fast-improvement
+  backstop (see "The admission ladder", above). None of the six is a model call, each stays a
+  heuristic stand-in, and the upgrade path for each is named in its own module docstring: swap the
+  function body for a model call, and nothing in its test, its harness guard or `twin/skills.py`
+  itself has to change. **`twin/skill-scores.jsonl` carries a real, dated score-over-time entry for
+  all six** (plus `causal-claims`' separate grade-accuracy metric) as of build ticket 56's
+  coherence audit — the harness had been exercised against every real corpus inside CI's own
+  per-skill guards since each skill was built, but `record_score()` itself had never actually been
+  called against the committed log for a real skill until this ticket ran
+  `twin/record_skill_scores.py` and found the log missing entirely. That is now fixed and
+  reproducible, not a one-off: re-run the same module after a real model swap and it appends a
+  fresh entry `detect_regression()` can compare against this baseline.
 - **Substrate generation is a real, tested reference implementation; it is not a live model call.**
   Build ticket 48 built the recipe format (versioned, seeded) and the authored-or-derived spike:
   regenerated substrate is classified `authored`, because a real generator will be an LLM call and
@@ -1860,11 +1881,14 @@ Named here so the skeleton cannot quietly become the definition of done.
   signal-to-noise, plant difficulty, spine consistency, reporting asymmetry and mundanity against a
   declared target each — Q3c's negativity-bias resolution is realised in code (`reporting_asymmetry`,
   measured and produced as the same property), and `tune()` demonstrates a real gap closing over
-  more than one iteration rather than a call built to pass. Still not built: decision ticket 12 AC
-  3's strength and lead-time clauses (only the distribution-of-difficulty and burial clauses have
-  code behind them, across build tickets 49 and 51), and AC 4's blind/adversarial separation
-  mechanism between planter and detector — decided in prose (decision ticket 12 Q2) but never
-  mechanised.
+  more than one iteration rather than a call built to pass. Build ticket 52 mechanised AC 4's
+  blind/adversarial separation between planter and detector (`twin/planter.py`, `twin/detector.py`,
+  `twin/scorer.py` — see "The planter/detector/scorer split", above): the detector is behaviourally
+  blind to ground truth, checked by AST scan and by indifference to a spliced-in decoy key, and a
+  plant's actionability horizon scores a late detection near zero rather than the same as a timely
+  one. Still not built: decision ticket 12 AC 3's strength and lead-time clauses — only the
+  distribution-of-difficulty and burial clauses have code behind them, across build tickets 49 and
+  51 — which is why `synthetic-substrate` sits at 4/7 rather than higher.
 - **The two-architecture determinism check has never run.** The CI matrix is declared and the
   golden digests are committed; the claim is wired, not proven.
 - **The subjects are fixtures.** Netflix and Intel here are toy value chains with invented
@@ -1899,22 +1923,31 @@ Named here so the skeleton cannot quietly become the definition of done.
   Unconditional, cross-repository, no `--scenario` or `--component` flag on either — but a
   scheduler still has to invoke them. The same gap build ticket 64 left for `estate/driftwood/` to
   own: the instrument is built, the cron/CI cadence around it is not. (09, 46.)
-- **The standing scenario set is unfiltered, because there is no library yet.** `sweep()` runs every
-  scenario in every overlay it is pointed at; the admissibility rule and event-triggered re-runs
-  decision ticket 13 names are build ticket 69, not this one. Build ticket 46 built the
-  precondition-triggered half — `gameplay_lens.sweep()` — as its own scan rather than folding it
-  into `schedule.sweep()`'s scenario loop, because a precondition match is not a scenario execution
-  and has no forecast to emit.
+- **The standing scenario set has an admissibility rule now; it still has no selection or
+  prioritisation rule.** Build ticket 69 gave "belongs to the standing library" a mechanical test
+  — the closed `COMMITTED_SCENARIO_CLASSES` enum (see "Price moves as world-layer signals", above,
+  for the invariant it completed) — but `sweep()` still runs every scenario in every overlay it is
+  pointed at unconditionally rather than choosing among them: decision ticket 13's own
+  selection/prioritisation criterion (`scenario-engine` AC 6) stays open, which is why the
+  capability sits at 4/7 rather than higher. Build ticket 46 built the precondition-triggered half
+  — `gameplay_lens.sweep()` — as its own scan rather than folding it into `schedule.sweep()`'s
+  scenario loop, because a precondition match is not a scenario execution and has no forecast to
+  emit.
 - **The affected-parties register and disparate-impact channel are both purely additive, exercised
   only on fixture data.** Build ticket 61's register aggregates what scenario authoring already
   declares; the disparate-impact channel is sealed and role-gated. Neither reaches a live pipeline
   and neither has run against a real, non-fixture finding.
-- **The co-registered forecast book has a selection rule and a quarantine; it has no market
-  connection at all.** Build ticket 57 built the mechanical selection rule and the ingestion
-  quarantine/audit against a caller-supplied candidate pool; nothing yet fetches real questions
-  from Kalshi, Polymarket or Metaculus, nothing emits a blind, pinned-and-signed forecast before a
-  resolution window (58), and nothing ingests a price *move* as a world-layer signal (59) — so the
-  claim this gate can make today is that the mechanism is honest, not that it has been run.
+- **The co-registered forecast book has a selection rule, a quarantine, blind pinned emission and
+  a price-move signal source now; it still has no live venue connection.** Build ticket 57 built
+  the mechanical selection rule and the ingestion quarantine/audit, build ticket 58 the blind
+  pinned-emission and resolution-scoring protocol, and build ticket 59 price moves as a
+  quarantine-respecting world-layer signal source (see "Blind pinned emission" and "Price moves as
+  world-layer signals", above) — `forecast-book` moved from 1/6 at build ticket 57 to 5/6. What is
+  still missing is the thing all three run against: every one of them reads a caller-supplied
+  fixture price/question series, because no live venue connection to Kalshi, Polymarket or
+  Metaculus is reachable from this offline suite, and only decision ticket 21 AC 6's own
+  proportionality verdict — is it worth building at this coverage — stays open, a judgement rather
+  than a code artefact.
 
 ## Layout
 

@@ -681,6 +681,71 @@ def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> 
     )
 
 
+def _score_log_history(root: Path) -> list[str]:
+    """Commits that changed the score-over-time log, newest first — the same shape
+    `_manifest_history` gives the invariant manifest."""
+    from .. import skills as skills_mod
+
+    rel = skills_mod.SCORES_PATH.relative_to(root).as_posix()
+    out = _git(root, "log", "--format=%H", "--", rel)
+    return [line for line in (out or "").splitlines() if line]
+
+
+def _score_log_at(root: Path, ref: str) -> list[str] | None:
+    """Every non-blank line the score-over-time log carried at `ref`, or `None` if it did not
+    exist there yet."""
+    from .. import skills as skills_mod
+
+    rel = skills_mod.SCORES_PATH.relative_to(root).as_posix()
+    out = _git(root, "show", f"{ref}:{rel}")
+    if out is None:
+        return None
+    return [line for line in out.splitlines() if line.strip()]
+
+
+@harness_check("skill_score_log_is_append_only", may_skip=True)
+def _skill_score_log_is_append_only(ctx: Context) -> str:
+    """`twin/skills.py`'s own `record_score()` docstring names this guard as already asserting
+    the log's append-only discipline against git history, the identical shape
+    `hash_changes_are_authorised` already gives the invariant manifest. Build ticket 56's
+    coherence audit found the guard itself had never actually been built — invisible while
+    `twin/skill-scores.jsonl` stayed empty, and a real gap the moment this same ticket gave the
+    log its first genuine entries (`twin/record_skill_scores.py`): nothing stopped a later edit
+    from silently rewriting or deleting a recorded score.
+
+    Same two-branch shape as `hash_changes_are_authorised`: an uncommitted change is compared
+    against the committed baseline directly, because in CI the checkout *is* HEAD and only the
+    file's own git history — the previous committed version against the one just landed — can
+    catch a violation the last commit itself made.
+    """
+    from .. import skills as skills_mod
+
+    current = (
+        [line for line in skills_mod.SCORES_PATH.read_text(encoding="utf-8").splitlines() if line.strip()]
+        if skills_mod.SCORES_PATH.is_file()
+        else []
+    )
+    head = _score_log_at(REPO_DIR, "HEAD")
+
+    if head is not None and head != current:
+        baseline, source = head, "the committed log (uncommitted change)"
+    else:
+        history = _score_log_history(REPO_DIR)
+        if len(history) < 2:
+            raise Skip("the score-over-time log has fewer than two committed versions; nothing to compare yet")
+        earlier = _score_log_at(REPO_DIR, history[1])
+        if earlier is None:
+            raise Skip(f"could not read the log at {history[1][:12]}")
+        baseline, source = earlier, f"the previous version ({history[1][:12]})"
+
+    if current[: len(baseline)] != baseline:
+        raise Violated(
+            f"a previously-committed skill-score entry was edited, reordered or removed against {source} "
+            "— the log must only ever grow"
+        )
+    return f"{len(baseline)} line(s) against {source} unchanged; {len(current) - len(baseline)} new"
+
+
 @harness_check("signal_classify_is_grade_5_by_construction")
 def _signal_classify_is_grade_5_by_construction(ctx: Context) -> str:
     """`signal-classify` (build ticket 43, decision ticket 11 Q2): an automated binding claim is
