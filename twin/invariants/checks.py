@@ -1321,6 +1321,101 @@ def _standing_library_covers_committed_classes(ctx: "Context") -> str:
     return f"the standing library covers all {len(committed)} committed classes: {', '.join(sorted(present))}"
 
 
+@invariant("price_levels_never_probabilities")
+def _price_levels_never_probabilities(ctx: "Context") -> str:
+    """Prediction-market price levels enter as signals, never as probabilities (build ticket 59,
+    decision ticket 21; research 17 S3.1: favourite-longshot bias rejects unbiasedness in every
+    subsample tested, worst in the low-price tail this system prices).
+
+    Four legs. First, the refusal is a hard failure, not a warning: `as_probability` raises for
+    every level handed to it and its own source carries no warning machinery, only a raise —
+    checked at the source, because a check that only calls the function once cannot tell "always
+    refuses" from "refused this particular value". Second, price MOVES — the derivative, never a
+    level in isolation — are what the ingestion pipeline turns into signal statements, asserted
+    against the real fixture graph so the candidates are genuine components, not a hand-typed
+    stand-in. Third, the emitted artefact carries no probability-shaped field anywhere, at any
+    depth, even though it does carry the raw levels a move was computed from — explicitly
+    labelled `price_level_from`/`price_level_to`, never `probability` or `implied_probability`,
+    and it cites the bias evidence a reader would otherwise have to go find for themselves.
+    Fourth, decision ticket 21 Q1(b)'s "signal source vs benchmark" split holds end to end: a
+    quarantined question id is excluded before classification ever runs, and build ticket 57's
+    own quarantine audit — run over the resulting ingestion-provenance records rather than a
+    hand-typed stand-in — reports it clean, so the two mechanisms agree because they are
+    exercised together, not because they happen to.
+    """
+    from .. import benchmark as bm
+    from .. import market_signals as ms
+
+    for level in (0.01, 0.1, 0.5, 0.9, 0.99):
+        try:
+            ms.as_probability(ms.PriceObservation("probe", "kalshi", "2026-06-01", level))
+        except ms.PriceLevelAsProbabilityError:
+            continue
+        raise Violated(f"as_probability({level}) returned a value instead of refusing")
+    source = inspect.getsource(ms.as_probability)
+    for banned in ("warnings.warn(", ".warning(", "logging.warn(", "print("):
+        if banned in source:
+            raise Violated(f"as_probability's own source contains {banned!r} — a refusal that could be silenced")
+    if "raise" not in source:
+        raise Violated("as_probability's own source contains no raise — nothing here actually refuses")
+
+    observations = [
+        ms.PriceObservation("cyberattack-iran-june", "kalshi", "2026-06-01", 0.08),
+        ms.PriceObservation("cyberattack-iran-june", "kalshi", "2026-06-08", 0.19),
+        ms.PriceObservation("cyberattack-iran-june", "polymarket", "2026-06-15", 0.31),
+        ms.PriceObservation("quarantined-question-1", "kalshi", "2026-06-01", 0.55),
+        ms.PriceObservation("quarantined-question-1", "kalshi", "2026-06-10", 0.61),
+    ]
+    moves = ms.price_moves(observations)
+    if len(moves) != 3:
+        raise Violated(f"expected 3 consecutive moves from 5 dated observations across 2 questions, got {len(moves)}")
+    if any(hasattr(m, "probability") or hasattr(m, "implied_probability") for m in moves):
+        raise Violated("a PriceMove carries a probability-shaped attribute")
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    artefact = ms.market_signal_run(
+        repo, ctx.caps, NETFLIX, moves, frozenset({"quarantined-question-1"}),
+        ["twin", "market-signal-run"],
+    )
+    body = json.loads(artefact.to_bytes())["body"]
+    if not body["items"]:
+        raise Violated("no price-move signal was classified against the real fixture graph")
+
+    forbidden = {"probability", "implied_probability", "belief"}
+    present = forbidden & _keys(body)
+    if present:
+        raise Violated(f"the market-signal-run body carries a probability-shaped field: {', '.join(sorted(present))}")
+    if body["bias_evidence"] != ms.BIAS_CITATION or "favourite-longshot" not in body["bias_evidence"]:
+        raise Violated("the artefact that consumes these signals does not cite the bias evidence")
+
+    ingested_ids = {row["provenance"]["question_id"] for row in body["items"] + body["failures"]}
+    if "quarantined-question-1" in ingested_ids:
+        raise Violated("a quarantined question id was classified into a signal")
+    excluded_ids = {e["question_id"] for e in body["excluded_quarantined"]}
+    if excluded_ids != {"quarantined-question-1"}:
+        raise Violated(f"quarantine exclusion at ingestion did not hold: excluded {excluded_ids}")
+
+    # Build ticket 57's own audit, over this ticket's own live ingestion provenance — the two
+    # mechanisms asserted together, so "signal source vs benchmark" is one demonstrated pipeline
+    # rather than two that happen to agree today.
+    benchmark = bm.BenchmarkSet(
+        rule_version="probe", rule_digest="probe",
+        questions=({"id": "quarantined-question-1"},), distribution={},
+    )
+    records = [(f"market-signal-run#{i}", item) for i, item in enumerate(body["items"])]
+    breaches = bm.audit_quarantine(benchmark, records)
+    if breaches:
+        raise Violated(f"build ticket 57's quarantine audit found a breach in this pipeline's own output: {breaches}")
+
+    return (
+        "as_probability refuses every level handed to it, by construction, with no warning path; "
+        f"{len(body['items'])} price-move signals classified against the real fixture graph with no "
+        "probability-shaped field anywhere in the artefact and the bias evidence cited; a "
+        "quarantined question id is excluded before classification runs, and build ticket 57's own "
+        "audit confirms the result clean"
+    )
+
+
 def _keys(node: Any) -> set[str]:
     return set(walk_keys(node))
 

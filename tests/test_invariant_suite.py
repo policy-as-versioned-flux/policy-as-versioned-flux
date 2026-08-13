@@ -134,9 +134,19 @@ def test_a_deleted_refusal_is_caught(tmp_path: Path, monkeypatch: pytest.MonkeyP
 def test_an_invariant_pending_past_a_closed_ticket_fails(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """A synthetic pending entry, not one fished out of the real manifest: build ticket 59
+    activates the constitution's last pending invariant (`price_levels_never_probabilities`), so
+    the committed manifest can legitimately carry zero pending entries from here on, and this
+    test's premise must not depend on that changing again."""
+    synthetic = [
+        *load_manifest(),
+        Entry(name="a-synthetic-pending-probe", activating_ticket="99", state=PENDING, asserts=""),
+    ]
+    monkeypatch.setattr("twin.invariants.harness.load_manifest", lambda path=None: synthetic)
     monkeypatch.setattr("twin.invariants.harness.build_ticket_status", lambda number: "done (2026-08-05)")
     result = _one("no_invariant_pending_past_its_ticket", tmp_path)
     assert result.status == FAIL and "pending past a closed ticket" in result.detail
+    assert "a-synthetic-pending-probe" in result.detail
 
 
 def test_an_implemented_but_unlisted_check_is_caught(
@@ -182,8 +192,19 @@ def test_only_declared_guards_may_decline_to_assert() -> None:
     assert not may_skip("invariant_bodies_match_manifest_hashes", False, live)
     assert not may_skip("no_collapse_mechanism", True, live)
 
-    pending = next(e.name for e in load_manifest() if e.state == PENDING)
-    assert may_skip(pending, True, live), f"{pending} is pending, and says so in the manifest"
+    # `may_skip`'s own rule for an invariant is exactly "not in the live set" — checked directly,
+    # rather than by fishing a real `pending` entry out of the committed manifest. Build ticket 59
+    # activates the constitution's last pending invariant (`price_levels_never_probabilities`), so
+    # the manifest can legitimately carry zero pending entries from here on, and this test's
+    # premise must not depend on one always existing.
+    assert not {e.name for e in load_manifest() if e.state == PENDING}, (
+        "a pending invariant exists again — this assertion is a sanity check, not the property "
+        "under test; if it fails, a future ticket added one back, which is fine, but the assertion "
+        "below should still hold regardless"
+    )
+    not_live = "a-hypothetically-pending-invariant"
+    assert not_live not in live
+    assert may_skip(not_live, True, live), "an invariant absent from the live set may skip"
 
 
 def test_running_a_single_check_by_name_is_supported(tmp_path: Path) -> None:

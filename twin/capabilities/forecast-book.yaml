@@ -24,7 +24,9 @@ criteria:
     ticked_by: build ticket 58
   - index: 5
     text: "The circularity question resolved (signal source vs benchmark)."
-    checked: false
+    checked: true
+    evidence: "twin/market_signals.py's market_signal_run() is the 'signal source' half decision ticket 21 Q1(b) names — price MOVES from a non-quarantined market feed signal-classify freely, exactly as Q1(b) decided — proactively excluding a quarantined question id before classification ever runs, not only auditable after the fact. The 'benchmark' half is build ticket 57's quarantine (twin/benchmark.py). The two are asserted together, not separately: the harness guard price_levels_never_probabilities runs 57's own audit_quarantine() over 59's live ingestion-provenance output and requires a clean result, so 'signal source vs benchmark' is one demonstrated pipeline rather than two mechanisms that happen to agree today. Levels never masquerade as probabilities either: as_probability() refuses unconditionally (price_levels_never_probabilities, the invariant), and no emitted artefact carries a probability-shaped field."
+    ticked_by: build ticket 59
   - index: 6
     text: "A proportionality verdict: is it worth building at this coverage?"
     checked: false
