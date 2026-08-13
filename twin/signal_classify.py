@@ -74,14 +74,27 @@ def _steep(statement: str, source: str) -> str:
     return result
 
 
-def _bind(statement: str, source: str, candidates: list[dict[str, str]]) -> str:
+def best_match(statement: str, source: str, candidates: list[dict[str, str]]) -> tuple[dict[str, str], int]:
+    """The candidate `_bind` would choose, and its token-overlap score.
+
+    The score is what lets a caller outside this module (`twin/retrospective_sweep.py`, build
+    ticket 55) tell a genuine match from `_bind`'s own tie-broken default across candidates that
+    share no vocabulary with the signal at all: `_bind` always returns *something* — `max` over an
+    empty overlap is still a choice — but a score of zero means nothing about the current
+    candidate set actually bears on the signal.
+    """
     signal_tokens = _tokens(statement, source)
 
     def score(candidate: dict[str, str]) -> int:
         candidate_tokens = _tokens(candidate["id"].replace("-", " "), candidate.get("name", ""))
         return len(signal_tokens & candidate_tokens)
 
-    return max(candidates, key=score)["id"]
+    best = max(candidates, key=score)
+    return best, score(best)
+
+
+def _bind(statement: str, source: str, candidates: list[dict[str, str]]) -> str:
+    return best_match(statement, source, candidates)[0]["id"]
 
 
 def classify(payload: dict[str, Any]) -> dict[str, Any]:

@@ -18,8 +18,10 @@ version: 1
 
 # Days for a signal's retained weight to halve. Decision ticket 11 Q3: "a calibratable knob, tuned
 # against real lead times from the backtest suite" — not guessed. 180 days is this ticket's
-# starting point; retuning it against real lead-time-to-recognition data is build ticket 55's job,
-# once that data exists to tune against.
+# starting point. Build ticket 55's retrospective_sweep.py is what makes lead-time-to-recognition
+# a measured number rather than a guess (one worked case is in tests/test_retrospective_sweep.py);
+# retuning this half-life against it waits on the backtest suite accumulating enough real rescued
+# cases to tune against, not on this single demonstration.
 half_life_days: 180
 
 # Below this weight a signal is recorded as decayed out of the live pool. Not deleted — every

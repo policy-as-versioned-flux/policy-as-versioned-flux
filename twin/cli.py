@@ -18,7 +18,7 @@ import yaml
 
 from . import (
     TOOL_VERSION, attest, constraints, evidence, fixtures, gameplay_lens, index, invariants,
-    schedule, sign, unbound_pool, verbs,
+    retrospective_sweep, schedule, sign, unbound_pool, verbs,
 )
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
@@ -102,6 +102,27 @@ def cmd_unbound_pool(args: argparse.Namespace) -> int:
         print(
             f"  {entry['id']:<40} age={entry['age_days']:>5}d  weight={entry['weight']:<8} "
             f"{state:<8} decays-out {entry['decayed_on']}"
+        )
+    return _emit(artefact, args.out)
+
+
+def cmd_retrospective_sweep(args: argparse.Namespace) -> int:
+    """A model change rebinds what has become interpretable (decision ticket 11 Q3)."""
+    repo, caps, org = _open(args)
+    artefact = retrospective_sweep.retrospective_sweep_artefact(
+        repo, caps, org, args.at, verbs.command_for("retrospective-sweep", org=org, at=args.at)
+    )
+    body = artefact.body
+    _say(
+        f"{org}: {body['counts']['rebound']} signal(s) rebound out of "
+        f"{body['counts']['pool_size_examined']} examined as of {args.at}, "
+        f"{body['counts']['still_unbound']} still unbound"
+    )
+    for entry in body["rebound"]:
+        print(
+            f"  {entry['id']:<40} -> {entry['component']:<30} "
+            f"lead-time-to-recognition={entry['lead_time_to_recognition_days']}d "
+            f"(decayed before rescue: {entry['had_decayed_before_rescue']})"
         )
     return _emit(artefact, args.out)
 
@@ -1329,6 +1350,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     pooled.add_argument("--out", required=True)
     pooled.set_defaults(fn=cmd_unbound_pool)
+
+    swept_retro = with_org(with_repo(subs.add_parser(
+        "retrospective-sweep", help="a model change rebinds what has become interpretable"
+    )))
+    swept_retro.add_argument(
+        "--at", required=True,
+        help="the declared time (YYYY-MM-DD); pool-entry date to this is lead-time-to-recognition",
+    )
+    swept_retro.add_argument("--out", required=True)
+    swept_retro.set_defaults(fn=cmd_retrospective_sweep)
 
     run = with_org(with_repo(subs.add_parser("run", help="execute a scenario; emits forecasts, plural")))
     run.add_argument("--scenario", required=True)
