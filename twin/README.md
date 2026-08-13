@@ -455,6 +455,67 @@ records the honest state: one of decision ticket 21's six acceptance criteria is
 ticket's code, the other five (venue, blind emission, claim scope, the rest of circularity,
 proportionality) are build tickets 58 and 59's, so the capability grades `partial`, never `full`.
 
+## Blind pinned emission, resolution scoring, and the narrow claim
+
+`twin/forecast_book.py` (build ticket 58) builds decision ticket 21's second mechanism —
+**temporal separation** — on the *same* questions build ticket 57 selects: a forecast pinned and
+signed **before** its question's resolution window opens, so *"we forecast before we looked"* is
+provable rather than assured, and a resolution scored against that exact pinned emission once the
+question resolves.
+
+**Blind by construction, not by review.** `emit()` refuses to build a `forecast-emission` artefact
+timed at or after its question's own declared `resolution_window_opens_at` — checked at the
+boundary itself and past it, the same "gate, not an assurance" discipline
+`as_consumed_admits_no_post_T_fact` (`twin/regimes.py`) uses for a different post-T leak.
+`is_blind()` is the *same* function that refusal calls internally, so an auditor holding nothing
+but the artefact's own recorded body — not the code that built it — can recompute the identical
+check later rather than trust that it fired. Timestamps are fixed-width `YYYY-MM-DDTHH:MM:SSZ`,
+validated by regex and compared as plain strings, the identical discipline `twin/regimes.py`'s
+`cutoff()` already uses for its own dated cutoff, so blindness is a string comparison someone can
+redo by eye rather than a parser someone has to trust.
+
+**Signed and pinned through the existing machinery, reused rather than reinvented.** `emit()`
+returns a `derived` `Artefact` — precisely the shape `twin/attest.py`'s `build()` already
+agent-signs and refuses a human signature on (`derived_never_human_signed`, unchanged): a forecast
+computed entirely from its own pins is not a judgement anybody signs off on.
+`tests/test_forecast_book.py` exercises this directly against the real `twin/sign.py`/
+`twin/attest.py` code, not a stand-in: a genuine agent-signed sidecar round-trips clean through
+`attest.check()`, and a hand-built human signature on an emission is refused.
+
+**Resolution scoring is co-registered, not merely same-named.** `score_resolution()` takes no
+question id or timestamp as a fresh parameter — both travel from the pinned emission's own pins
+and body, so a resolution can only ever be scored against the exact question and the exact
+emission it was pinned to, never a same-id stand-in supplied out of step. A doctored emission
+whose body no longer attests blindness against its own recorded timestamps is refused rather than
+scored — a defence against a forged or hand-edited artefact, not only against the honest path
+`emit()` already gates. Scoring itself calls `twin/scoring.py`'s `score()` directly; both the test
+suite and the harness guard assert the output reproduces `brier`/`log_loss` bit for bit, so a
+second scoring implementation cannot quietly drift from the first.
+
+**Observe-only is structural (decision ticket 21 Q4).** `twin/forecast_book.py` exposes exactly
+three functions — `emit`, `score_resolution`, `is_blind` — asserted as an **allow-list**, the same
+discipline `prefilter_precedes_pricing` uses on `twin/options.py`: a differently-named
+position-placing function would still be caught, not only one matching an obvious keyword. There
+is no function here that takes a stake, a side or an order, and every emission's body also records
+`observe_only: true, position_placed: false` directly.
+
+**The narrow claim scope travels with every result (decision ticket 21 Q5).** `CLAIM_SCOPE` is
+carried in the body of both the `forecast-emission` and the `resolution-score` artefacts, not
+stated once in prose: `evidences` names non-overconfidence in general world-forecasting on a
+pre-registered, blind, co-registered question set; `does_not_evidence` names Wardley propagation,
+the causal elasticities, £ pricing and the org-specific overlay explicitly; `residual_limit`
+restates decision ticket 21 Q1's own honesty condition — the quarantine (build ticket 57) proves
+no *direct* ingestion, never that the twin's priors were unshaped by market-adjacent information
+arriving some other way.
+
+**Three more of decision ticket 21's six acceptance criteria are honestly ticked** — venue +
+observe-vs-participate, the blind-emission protocol, the claim-scope statement — moving
+`forecast-book` from build ticket 57's 1/6 to **4/6**, still `partial`. What stays unticked:
+circularity's remaining half (wiring the quarantine onto a *live* ingestion path is build ticket
+59's, once price moves actually enter as signals) and the proportionality verdict, which is a
+judgement already recorded in decision ticket 21's own resolution text rather than a code artefact
+any build ticket computes.
+
 ## Believed, rival, revealed — and no privileged map
 
 `twin positions` (build ticket 16) is the other half of "no code path collapses an ensemble": once
@@ -1235,15 +1296,18 @@ reaches `full`, and nothing can be typed as `full`.
 | `sense-move` | 11 | partial | 6 / 8 |
 | `scenario-engine` | 13 | partial | 4 / 7 |
 | `synthetic-substrate` | 12 | partial | 3 / 7 |
-| `forecast-book` | 21 | partial | 1 / 6 |
+| `forecast-book` | 21 | partial | 4 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
 
-**29 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+<!-- NOTE: totals below are stale pending the ticket 59 merge (also touches forecast-book);
+     final verification recomputes this whole block from `./bin/twin grade`'s real output. -->
+**31 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capability here stands at six ticks, and three of the eleven still stand
+there"** — the strongest capability here stands at five ticks, and two of the eleven still stand
 at one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
-count.
+count. `forecast-book` moved from 1/6 to 4/6 at build ticket 58 (venue + observe-only, the
+blind-emission protocol, the claim-scope statement — narrated above).
 
 **Build ticket 51 ticks `synthetic-substrate` AC 2** (a fidelity target + a stated unfair-test
 list, `twin/substrate_eval.py`) — moving the row from 2/7 to 3/7; see "The substrate fidelity eval
