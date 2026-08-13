@@ -7,7 +7,7 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 59 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 60 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -1081,6 +1081,58 @@ forbidden way — nothing free-running but the plant, decision ticket 12 Q3's ow
 only decided — `synthetic-substrate` moves from 1/7 to 2/7, still `partial`. AC 3's lead time and
 difficulty-distribution clauses remain the fidelity eval suite's own job (51).
 
+## The substrate fidelity eval suite: fidelity measured, not asserted
+
+`twin/substrate_eval.py` (build ticket 51, decision ticket 12) is the fourth and final ticket of
+the substrate chain — 48 (recipe format), 49 (generator), 50 (spine) — and the one that answers
+"what makes this substrate a fair test?" with a **measurement**, not a paragraph. Decision ticket
+12's own resolution names the eval suite as the concrete form of Q1's "measurability wins ties":
+five dimensions, each a **declared target and a computed current value**: signal-to-noise, plant
+difficulty, spine consistency, reporting asymmetry and mundanity. None is a manual eyeball —
+`evaluate_fidelity()` reads a real generated batch and returns a `FidelityMetric` per dimension,
+each carrying its own target band and the value actually measured against it.
+
+**Tuning is a real loop, not a call that happens to pass.** The generator's own committed mundane
+templates (ticket 49) carry no polarity vocabulary at all, so a batch built from them alone
+measures `reporting_asymmetry == 0.0` — a genuine, honest miss against any target above zero. This
+module's own negative/positive template pools (`NEGATIVE_TEMPLATES` outnumbered 6:3 over
+`POSITIVE_TEMPLATES` — ticket 49's own generator contract is untouched) are mixed at a tunable
+ratio, and `tune()` raises that ratio step by step until every one of the five bands is cleared at
+once. On the real Carillion spine, a balanced 50/50 starting mix measurably misses
+`reporting_asymmetry` (0.586 against a 0.6 floor); the loop converges in two iterations to a batch
+whose final `reporting_asymmetry` sits at 0.62 — above 0.5, matching the direction of the record's
+real skew, not merely inside a band centred on balance.
+
+**Negativity bias is the same property as reporting asymmetry, not a second one.** Decision ticket
+12 Q3c: "reporting asymmetry as measured and negativity bias as produced are the same asymmetry" —
+one metric, `reporting_asymmetry()`, covers both the ticket's own AC checklist items rather than
+splitting them across two mechanisms that would have to agree with each other.
+
+**The unfair-test list is stated and demonstrated, not only stated.** `UNFAIR_TEST_CONDITIONS`
+names decision ticket 12's own five failure modes and the dimension (or, for over-anchoring, the
+existing ticket-50 guard) that catches each — and `tests/test_substrate_eval.py` constructs a real
+batch for every one: silent drift (an un-anchored batch) fails `spine_consistency`; the
+pre-camouflage plant wording (`UNCAMOUFLAGED_PLANTED_SIGNALS`, sharing almost no vocabulary with
+the generated pools) fails `plant_difficulty` at 0.0; a balanced 50/50 mix fails
+`reporting_asymmetry`; and a batch at the structural minimum `lines_per_channel=1` fails
+`mundanity`. Over-anchoring is named for completeness but is not a new dimension here — it is
+build ticket 50's own `diff_against_spine` that catches it, and `spine_consistency` alone would
+read an over-anchored batch as tautologically clean.
+
+**The suite is the acceptance test for ticket 49's depth grade.** Harness guard
+`substrate_fidelity_is_measured_and_tuning_closes_a_real_gap` runs `substrate_generator.generate()`
+end to end through `evaluate_fidelity()`: a properly tuned recipe's real output clears all five
+bands at once, and a degraded batch (balanced polarity, un-camouflaged wording) fails more than
+one dimension simultaneously — a harness with no subject proves nothing.
+
+**Ticks `synthetic-substrate` AC 2.** "A fidelity target + a stated list of what would make the
+substrate an unfair test" is now the eval suite itself, not a claim about it —
+`synthetic-substrate` moves from 2/7 to 3/7, still `partial`. AC 3's strength and lead-time clauses
+(decision ticket 12's own planting protocol) are not this ticket's: "plant difficulty" (the
+distribution-of-difficulty clause) is measured here, but strength and lead time are not, so AC 3
+stays unticked on the same "one clause of a multi-clause criterion" ground build ticket 49 already
+left it on.
+
 ## The decaying unbound-signal pool
 
 `twin/unbound_pool.py` (build ticket 54, decision ticket 11 Q3) is the retention half of "weak
@@ -1136,16 +1188,20 @@ reaches `full`, and nothing can be typed as `full`.
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 5 / 8 |
 | `scenario-engine` | 13 | partial | 4 / 7 |
-| `synthetic-substrate` | 12 | partial | 2 / 7 |
+| `synthetic-substrate` | 12 | partial | 3 / 7 |
 | `forecast-book` | 21 | partial | 1 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
 
-**28 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**29 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
 there"** — the strongest capability here stands at five ticks, and three of the eleven still stand
 at one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
 count.
+
+**Build ticket 51 ticks `synthetic-substrate` AC 2** (a fidelity target + a stated unfair-test
+list, `twin/substrate_eval.py`) — moving the row from 2/7 to 3/7 and the total from 28/64 to 29/64;
+see "The substrate fidelity eval suite", above.
 
 **Re-deriving this round found the table three capabilities and two ticks stale, the same shape of
 drift build ticket 48 caught once before and build ticket 34's coherence audit caught at scale.**
@@ -1575,9 +1631,15 @@ Named here so the skeleton cannot quietly become the definition of done.
   the same limit `signal-classify` through `gameplay-lens` already carry, not an actual call to a
   model provider (none is reachable from this suite). Build ticket 50 anchored the substrate
   against the public record (decision ticket 12 Q3's consistency rule, enforced by `twin/spine.py`
-  rather than only decided) — but the fidelity eval suite that tunes signal-to-noise, plant
-  difficulty and reporting asymmetry against a target (51) does not exist yet, so Q3c's
-  negativity-bias resolution is still not realised in code.
+  rather than only decided), and build ticket 51's `twin/substrate_eval.py` now tunes
+  signal-to-noise, plant difficulty, spine consistency, reporting asymmetry and mundanity against a
+  declared target each — Q3c's negativity-bias resolution is realised in code (`reporting_asymmetry`,
+  measured and produced as the same property), and `tune()` demonstrates a real gap closing over
+  more than one iteration rather than a call built to pass. Still not built: decision ticket 12 AC
+  3's strength and lead-time clauses (only the distribution-of-difficulty and burial clauses have
+  code behind them, across build tickets 49 and 51), and AC 4's blind/adversarial separation
+  mechanism between planter and detector — decided in prose (decision ticket 12 Q2) but never
+  mechanised.
 - **The two-architecture determinism check has never run.** The CI matrix is declared and the
   golden digests are committed; the claim is wired, not proven.
 - **The subjects are fixtures.** Netflix and Intel here are toy value chains with invented

@@ -219,10 +219,17 @@ def test_over_anchoring_would_have_made_the_plant_the_unique_residual() -> None:
 def test_the_synthetic_substrate_capability_grade_moves_to_2_of_7() -> None:
     """Build ticket 50 ticks decision ticket 12's AC 1 (the real/synthetic seam, with a
     consistency rule) — the same computed-checklist check `test_substrate_generator.py` already
-    runs, re-run here to pin that this ticket moved it and did not move anything else."""
+    runs, re-run here to pin that this ticket moved it and did not move anything else.
+
+    `{1, 5} <= checked`, not `==`: the same subset shape `test_substrate_generator.py`'s own pin
+    uses, for the identical reason — asserting exact equality here would go stale the moment a
+    later ticket ticks a further criterion, which is exactly what build ticket 51 does next (AC
+    2). It is `tests/test_substrate_eval.py::test_the_synthetic_substrate_capability_grade_moves_to_3_of_7`
+    that pins the post-51 state.
+    """
     caps = Capabilities.load()
     graded = caps.require("synthetic-substrate")
     assert graded.owning_ticket == "12"
     assert graded.grade == "partial"
     checked = {c.index for c in graded.criteria if c.checked}
-    assert checked == {1, 5}
+    assert {1, 5} <= checked

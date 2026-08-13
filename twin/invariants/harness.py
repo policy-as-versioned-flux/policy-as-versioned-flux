@@ -1239,6 +1239,83 @@ def _substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants(ctx
     )
 
 
+@harness_check("substrate_fidelity_is_measured_and_tuning_closes_a_real_gap")
+def _substrate_fidelity_is_measured_and_tuning_closes_a_real_gap(ctx: Context) -> str:
+    """The substrate fidelity eval suite (build ticket 51, decision ticket 12): fidelity is
+    *defined and tuned by measurement*, not asserted in prose — five declared, targeted
+    dimensions (signal-to-noise, plant difficulty, spine consistency, reporting asymmetry,
+    mundanity), a real tuning loop that closes a genuine gap rather than one built to pass on the
+    first call, and negativity bias measured as the same property as reporting asymmetry
+    (decision ticket 12 Q3c, spec story 60).
+
+    A guard on the suite rather than an invariant, the same shape
+    `substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants` is: this asserts
+    **structural and live properties of a module's contract**, not one of the constitution's
+    sixteen fixed names.
+
+    Five legs, on the real Carillion spine (build ticket 38) `spine.py`'s own guard already
+    builds from. First, `evaluate_fidelity()` returns exactly the five named dimensions, each
+    carrying its own declared target band from `TARGETS` — checked against real output, not
+    trusted from the module docstring. Second, the real gap `tune()` exists to close: a balanced
+    (50/50) template mix genuinely misses the `reporting_asymmetry` target — not a strawman built
+    to fail. Third, `tune()` converges over more than one iteration to a batch that clears every
+    band at once — a real loop, not a single call that happens to pass. Fourth, the converged
+    batch's own `reporting_asymmetry` sits above 0.5: the negativity bias is *produced*, matching
+    the record's real skew, not merely inside an arbitrary band centred on balance. Fifth, the
+    suite has teeth: a degraded batch (balanced polarity, un-camouflaged plant wording) fails
+    `passes()` on more than one dimension — a harness with no subject proves nothing.
+    """
+    from .. import fixtures
+    from ..model import Overlay
+    from ..repo import ModelRepo
+    from ..spine import Spine
+    from .. import substrate_eval as se
+
+    carillion_dir = ctx.tmp / "carillion-repo"
+    if not carillion_dir.exists():
+        fixtures.build_carillion_org(carillion_dir)
+    overlay = Overlay.load(ModelRepo.open(carillion_dir), fixtures.CARILLION_ORG)
+    spine = Spine.from_overlay(overlay)
+    checkpoint = max(f.date for f in spine.facts)
+
+    tuned_batch = se.generate(se._recipe_for(0.6, se.PLANTED_SIGNALS, seed=42))
+    metrics = se.evaluate_fidelity(tuned_batch, spine, checkpoint)
+    if {m.name for m in metrics} != set(se.TARGETS):
+        raise Violated(f"evaluate_fidelity() did not return exactly the five declared dimensions: {[m.name for m in metrics]}")
+
+    balanced_batch = se.generate(se._recipe_for(0.5, se.PLANTED_SIGNALS, seed=42))
+    balanced_metrics = {m.name: m for m in se.evaluate_fidelity(balanced_batch, spine, checkpoint)}
+    if balanced_metrics["reporting_asymmetry"].within_target:
+        raise Violated("a balanced 50/50 template mix passed reporting_asymmetry — the tuning loop has no real gap to close")
+
+    result = se.tune(spine, checkpoint)
+    if not result.converged:
+        raise Violated(f"tune() did not converge within its own default budget: {result.iterations} iteration(s)")
+    if result.iterations <= 1:
+        raise Violated("tune() converged on its first step — not a loop closing a real gap")
+    if not se.passes(result.final.metrics):
+        raise Violated(f"tune() reported converged but its final step does not pass: {[m.as_dict() for m in result.final.metrics]}")
+
+    final_asymmetry = next(m.value for m in result.final.metrics if m.name == "reporting_asymmetry")
+    if final_asymmetry <= 0.5:
+        raise Violated(f"the tuned batch's reporting_asymmetry ({final_asymmetry}) does not skew negative — the bias was not produced")
+
+    degraded = se.generate(se._recipe_for(0.5, se.UNCAMOUFLAGED_PLANTED_SIGNALS, seed=42))
+    degraded_metrics = se.evaluate_fidelity(degraded, spine, checkpoint)
+    if se.passes(degraded_metrics):
+        raise Violated("a degraded (balanced, un-camouflaged) batch passed the full suite — it is not gating anything")
+    failing = {m.name for m in degraded_metrics if not m.within_target}
+    if len(failing) < 2:
+        raise Violated(f"the degraded batch failed only {failing} — expected more than one dimension to catch it")
+
+    return (
+        "evaluate_fidelity() returns exactly the five declared dimensions; a balanced 50/50 mix "
+        f"genuinely misses reporting_asymmetry; tune() converges in {result.iterations} iteration(s) "
+        f"to a batch passing every band, with reporting_asymmetry={final_asymmetry} skewing negative; "
+        f"a degraded batch fails {len(failing)} dimension(s) at once ({', '.join(sorted(failing))})"
+    )
+
+
 @harness_check("benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach")
 def _benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach(ctx: Context) -> str:
     """Benchmark question selection and ingestion quarantine (build ticket 57, decision ticket

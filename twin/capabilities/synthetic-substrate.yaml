@@ -9,7 +9,9 @@ criteria:
     ticked_by: build ticket 50
   - index: 2
     text: "A fidelity target + a stated list of what would make the substrate an unfair test."
-    checked: false
+    checked: true
+    evidence: "twin/substrate_eval.py — five declared, targeted dimensions (signal_to_noise, plant_difficulty, spine_consistency, reporting_asymmetry, mundanity), each a real value computed from a batch's own content, not a manual eyeball: evaluate_fidelity() and TARGETS give every dimension a target band, and UNFAIR_TEST_CONDITIONS states what would make the substrate an unfair test, matching decision ticket 12's own list — over-anchored noise (caught by build ticket 50's diff_against_spine), silent drift, a trivially findable plant, a falsely balanced positive/negative split, and volume too thin to bury a plant — each demonstrated failing its own dimension on a real, deliberately-constructed batch (tests/test_substrate_eval.py), not merely asserted plausible. tune() is the supported tuning loop AC asks for: a balanced 50/50 template mix genuinely misses the reporting-asymmetry target, and the loop converges over more than one iteration to a batch that clears every band, negativity bias included (decision ticket 12 Q3c, spec story 60 — reporting asymmetry as measured and negativity bias as produced are the same property)."
+    ticked_by: build ticket 51
   - index: 3
     text: "The planting protocol (strength, lead time, burial, distribution of difficulty)."
     checked: false
