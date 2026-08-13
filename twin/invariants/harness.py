@@ -1136,6 +1136,72 @@ def _unbound_pool_retains_decayed_signals(ctx: Context) -> str:
     )
 
 
+@harness_check("retrospective_sweep_rescues_a_decayed_signal_when_a_model_change_binds_it")
+def _retrospective_sweep_rescues_a_decayed_signal(ctx: Context) -> str:
+    """`twin/retrospective_sweep.py` (build ticket 55, decision ticket 11 Q3): a model change — a
+    new component sharing the signal's own vocabulary, standing in for "adding a component,
+    dependency or causal edge" — rescues a signal out of the unbound pool even after it has
+    decayed. That is the whole point of the rescue path: plain decay alone would preferentially
+    delete the longest-lead-time signals, exactly the ones a rescue mechanism exists to catch.
+
+    Two legs, both against the default fixture's `netflix` overlay (mutated in memory only, the
+    same throwaway-input shape `unbound_pool_retains_a_decayed_signal_rather_than_dropping_it`
+    uses). Before: a signal planted 1000 days before the declared time — comfortably past
+    `twin/decay.yaml`'s own threshold — whose statement shares no vocabulary with any of the
+    seven netflix/world candidates, sweeps to `still_unbound`. After: the identical signal, swept
+    against an overlay that also carries one new component sharing its own vocabulary, sweeps to
+    `rebound` — `had_decayed_before_rescue` true and `lead_time_to_recognition_days` equal to its
+    full age — proving decay is recorded on the way through, never a barrier to rescue.
+    """
+    from .. import retrospective_sweep
+    from ..model import Overlay
+    from ..repo import ModelRepo
+
+    signal_id = "harness-guard-quantum-signal"
+    signal_date = "2023-06-01"
+    at = "2026-01-01"
+    signal_doc = {
+        "id": signal_id,
+        "date": signal_date,
+        "steep": "technological",
+        "source": "harness guard: an obscure materials-science preprint",
+        "statement": "planted directly, never committed — a graphene-composite radiation shielding advance nothing yet reads",
+        "provenance": {},
+    }
+
+    before = Overlay.load(ModelRepo.open(ctx.repo_dir), "netflix")
+    before.signals[signal_id] = signal_doc
+    before_result = retrospective_sweep.sweep(before, at)
+    if signal_id not in {e["id"] for e in before_result["still_unbound"]}:
+        raise Violated("a signal with no matching component did not sweep to still_unbound")
+    if signal_id in {e["id"] for e in before_result["rebound"]}:
+        raise Violated("a signal with no matching component in the graph rebound anyway")
+
+    after = Overlay.load(ModelRepo.open(ctx.repo_dir), "netflix")
+    after.signals[signal_id] = signal_doc
+    after.components["graphene-composite-shielding"] = {
+        "id": "graphene-composite-shielding",
+        "name": "Graphene-composite radiation shielding",
+        "kind": "capability",
+    }
+    after_result = retrospective_sweep.sweep(after, at)
+    rebound = {e["id"]: e for e in after_result["rebound"]}
+    if signal_id not in rebound:
+        raise Violated("adding a matching component did not rescue the signal")
+    entry = rebound[signal_id]
+    if not entry["had_decayed_before_rescue"]:
+        raise Violated("the harness guard's own planted signal was not actually decayed before rescue")
+    if entry["lead_time_to_recognition_days"] <= 0:
+        raise Violated(f"lead_time_to_recognition_days was not positive: {entry['lead_time_to_recognition_days']}")
+    if entry["component"] != "graphene-composite-shielding":
+        raise Violated(f"rescued onto the wrong component: {entry['component']!r}")
+
+    return (
+        f"a signal {entry['lead_time_to_recognition_days']} days old (decayed before rescue: true) "
+        "stays still_unbound with no matching component, and rebinds the moment a model change adds one"
+    )
+
+
 @harness_check("substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants")
 def _substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants(ctx: Context) -> str:
     """Spine anchoring and free-running (build ticket 50, decision ticket 12 Q3): the substrate

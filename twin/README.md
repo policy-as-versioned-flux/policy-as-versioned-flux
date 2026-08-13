@@ -1174,6 +1174,52 @@ this ticket builds only its first half, so it stays unticked on purpose — tick
 exactly the premature-done the computed-checklist discipline exists to catch. `sense-move` stays at
 5/8; build ticket 55's retrospective sweep is expected to complete the pair.
 
+## Retrospective sweep and lead-time-to-recognition
+
+`twin/retrospective_sweep.py` (build ticket 55, decision ticket 11 Q3) is the other half of "weak
+signal handling": build ticket 54 built retention, and Q3's own resolution names what retention
+alone cannot do — "a model change rescues: adding a component, dependency or causal edge triggers
+a **retrospective sweep** of the unbound pool, and a signal the new structure binds is promoted out
+and its decay reset." This is that sweep, and the mechanism it makes measurable — the number of
+days between a signal entering the pool and the model finally catching up to it.
+
+**No history is diffed.** "The new structure" is simply whatever `Overlay.load` reads once a model
+change has been committed, so re-running `signal_classify` against the *current* candidate set —
+`twin/ingest.py`'s own `candidates_of()` (build ticket 53), reused rather than re-derived — from
+scratch already means "re-examined against the new structure." `sweep(overlay, at)` walks every
+entry `unbound_pool.pool()` reports, decayed or not, and attempts a rebind against it.
+
+**A rescue must be genuine, not a rubber stamp.** `signal_classify._bind` always returns *some*
+candidate — `max` over zero token-overlap is still a choice — so this ticket adds
+`signal_classify.best_match()`, exposing the score behind that choice: a signal whose best-scoring
+candidate shares no vocabulary at all stays in `still_unbound` rather than getting silently bound
+to whatever candidate happened to sort first.
+
+**Decay never blocks rescue**, demonstrated rather than merely stated: harness guard
+`retrospective_sweep_rescues_a_decayed_signal_when_a_model_change_binds_it` plants a signal 945
+days old — comfortably past `twin/decay.yaml`'s own threshold — and shows it sweeps to
+`still_unbound` with no matching component and to `rebound` the moment one exists, carrying
+`had_decayed_before_rescue: true`. `tests/test_retrospective_sweep.py`'s own worked case makes the
+same point on the standing library's `quantum-hndl` scenario class (build ticket 69): a
+materials-science signal about a lattice-based cryptanalysis advance sits unbound and decays for
+over two and a half years until a new component names exactly the cryptographic dependency it
+bears on — decision ticket 11 Q3's own example ("our authentication depends on this cryptographic
+primitive... surfacing a paper from three years ago that now clearly bears on you"), made real
+rather than illustrative.
+
+**Lead-time-to-recognition is reported as a first-class output**, not an internal statistic:
+`twin retrospective-sweep --repo R --org O --at T` emits a `retrospective-sweep` artefact whose
+body carries `lead_time_to_recognition` — per-signal days from `pool_entry_date` to
+`binding_date`, plus `min_days`/`max_days`/`mean_days` — beside the `rebound` and `still_unbound`
+lists themselves, so a reader never has to re-derive the metric this ticket exists to surface.
+
+**Ticks `sense-move` AC 5.** The criterion ("weak-signal retention + promotion rule") is
+conjunctive, and both halves now genuinely exist together — retention from build ticket 54,
+promotion here — so `twin/capabilities/sense-move.yaml` moves from 5/8 to 6/8. Nothing else about
+the criterion is stretched to make the tick: promotion is gated on a real, scored match, decay
+state is carried through rather than hidden, and the metric Q3's own resolution names
+("free measurement for the backtest") is the artefact's own first-class field.
+
 ## What is honestly built
 
 Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Nothing
@@ -1186,7 +1232,7 @@ reaches `full`, and nothing can be typed as `full`.
 | `currency-regimes` | 09 | partial | 5 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
-| `sense-move` | 11 | partial | 5 / 8 |
+| `sense-move` | 11 | partial | 6 / 8 |
 | `scenario-engine` | 13 | partial | 4 / 7 |
 | `synthetic-substrate` | 12 | partial | 3 / 7 |
 | `forecast-book` | 21 | partial | 1 / 6 |
@@ -1195,13 +1241,20 @@ reaches `full`, and nothing can be typed as `full`.
 
 **29 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capability here stands at five ticks, and three of the eleven still stand
+there"** — the strongest capability here stands at six ticks, and three of the eleven still stand
 at one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
 count.
 
 **Build ticket 51 ticks `synthetic-substrate` AC 2** (a fidelity target + a stated unfair-test
-list, `twin/substrate_eval.py`) — moving the row from 2/7 to 3/7 and the total from 28/64 to 29/64;
-see "The substrate fidelity eval suite", above.
+list, `twin/substrate_eval.py`) — moving the row from 2/7 to 3/7; see "The substrate fidelity eval
+suite", above.
+
+**Build ticket 55 ticks `sense-move` AC 5** ("weak-signal retention + promotion rule"), moving the
+row from 5/8 to 6/8. The criterion is conjunctive and build ticket 54 built only its retention
+half on purpose (see "The decaying unbound-signal pool", above); `twin/retrospective_sweep.py`
+built the promotion half — a model change rebinds a signal the pool has been carrying, decayed or
+not — so both halves now genuinely exist together and the tick is earned rather than asserted; see
+"Retrospective sweep and lead-time-to-recognition", below.
 
 **Re-deriving this round found the table three capabilities and two ticks stale, the same shape of
 drift build ticket 48 caught once before and build ticket 34's coherence audit caught at scale.**

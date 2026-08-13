@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from twin.schema import SCHEMAS, STEEP
-from twin.signal_classify import SKILL, SignalClassifyError, classify, labelled_corpus, scorer
+from twin.signal_classify import SKILL, SignalClassifyError, best_match, classify, labelled_corpus, scorer
 from twin.skills import evaluate, threshold_for
 
 
@@ -130,6 +130,42 @@ def test_classify_tags_an_ordinary_trading_update_as_economic() -> None:
         }
     )
     assert result["steep"] == "economic"
+
+
+# -- best_match: the score that tells a genuine bind from _bind's own tie-broken default --------
+# (build ticket 55: `twin/retrospective_sweep.py` needs to know whether a match is real.)
+
+
+def test_best_match_scores_zero_when_nothing_overlaps() -> None:
+    candidate, score = best_match(
+        "Anything at all.", "Anything",
+        [{"id": "only-one", "name": "The only component"}],
+    )
+    assert candidate["id"] == "only-one"  # _bind's own default: a choice, but not a genuine one
+    assert score == 0
+
+
+def test_best_match_score_is_the_shared_token_count() -> None:
+    candidate, score = best_match(
+        "A trading update on financial performance generally and the UK construction business specifically.",
+        "Carillion plc RNS announcement, 2016-12-07",
+        [
+            {"id": "energy-trading-book", "name": "The subject's energy-trading and mark-to-market business"},
+            {"id": "carillion-uk-construction", "name": "Carillion's UK construction and support-services business"},
+        ],
+    )
+    assert candidate["id"] == "carillion-uk-construction"
+    assert score > 0
+
+
+def test_bind_agrees_with_best_match() -> None:
+    """`classify()`'s own binding is `best_match`'s top candidate, not a second, drifting choice."""
+    statement = "A profit warning: contract write-downs, the chief executive resigns."
+    source = "Company trading update, 2017-07-10"
+    candidates = [{"id": "a", "name": "Alpha"}, {"id": "b", "name": "profit warning contract"}]
+    result = classify({"statement": statement, "source": source, "candidates": candidates})
+    candidate, _ = best_match(statement, source, candidates)
+    assert result["claim"]["component"] == candidate["id"]
 
 
 # -- the labelled corpus ----------------------------------------------------------------------

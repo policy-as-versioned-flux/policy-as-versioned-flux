@@ -22,7 +22,9 @@ criteria:
     checked: false
   - index: 5
     text: "Weak-signal retention + promotion rule."
-    checked: false
+    checked: true
+    evidence: "Conjunctive, and both halves now exist. Retention: twin/unbound_pool.py (build ticket 54) reads every unbound signal, weighs it against a published decay function (twin/decay.yaml) and reports it, decayed or not, never dropped. Promotion: twin/retrospective_sweep.py (build ticket 55) re-examines every unbound signal against the current model's candidate components (twin/ingest.py's candidates_of(), reused) and rebinds one a model change makes interpretable, gated on signal_classify.best_match()'s own score so a rebind is genuine rather than signal_classify's own tie-broken default — a signal past the decay threshold is rescued exactly the same as a live one (harness guard retrospective_sweep_rescues_a_decayed_signal_when_a_model_change_binds_it), and each rebound signal carries a computed lead_time_to_recognition_days from pool-entry date to binding date, reported as a first-class body field rather than an internal statistic."
+    ticked_by: build ticket 55
   - index: 6
     text: "A stated position on sensor gameability."
     checked: true
