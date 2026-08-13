@@ -1382,6 +1382,105 @@ def _substrate_fidelity_is_measured_and_tuning_closes_a_real_gap(ctx: Context) -
     )
 
 
+@harness_check("planter_detector_scorer_are_structurally_separated_and_late_detection_scores_near_zero")
+def _planter_detector_scorer_are_structurally_separated(ctx: Context) -> str:
+    """The planter/detector/scorer split (build ticket 52, decision ticket 12 AC 4, Q2, Q3b):
+    "a planter agent holds ground truth in a sealed artefact; a detector agent runs with no access
+    to it and no shared context; a scorer reads both" — and every plant carries an actionability
+    horizon so a late detection scores as the near-zero option value it actually is.
+
+    A guard on the suite rather than an invariant, the same shape the other three substrate-chain
+    guards are: this asserts structural and behavioural properties of three modules' contracts,
+    not one of the constitution's sixteen fixed names.
+
+    Five legs. First, `twin/detector.py` imports nothing naming `planter` — an AST scan of its own
+    real source, not a promise in a docstring. Second, `detector.detect()` is behaviourally blind
+    to ground truth, not merely unwired to it: called on the planter's real public view and on an
+    identical dict with a decoy `plants` key spliced in (the exact key `planter.PlantedWorld.public`
+    never carries), it returns byte-identical output either way — it does not even look. Third, a
+    plant detected on or before its own actionability horizon scores `TIMELY_SCORE`. Fourth, the
+    identical plant detected one day after its own horizon scores `LATE_SCORE` — near zero, not
+    zero — and the reason string names the horizon and says why. Fifth, every `ScoreResult` carries
+    the shared-prior limitation verbatim, the limit decision ticket 12 Q2 records rather than
+    papers over: a synthetic result evidences detection mechanics only, never anticipation of the
+    world.
+    """
+    import ast
+    import inspect
+
+    from .. import detector as detector_mod
+    from .. import planter as planter_mod
+    from .. import scorer as scorer_mod
+    from ..substrate import SubstrateRecipe
+
+    detector_source = inspect.getsource(detector_mod)
+    tree = ast.parse(detector_source)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            names = [a.name for a in node.names]
+        elif isinstance(node, ast.ImportFrom):
+            names = [node.module or ""] + [a.name for a in node.names]
+        else:
+            continue
+        if any("planter" in n for n in names):
+            raise Violated(f"twin/detector.py imports something naming 'planter': {names}")
+
+    signal = "an unusual incident review opens after hours, examining finance access"
+    recipe = SubstrateRecipe(
+        id="pds-guard-recipe", seed=7,
+        templates=(
+            "Lunch order chat in #ops.", "A long thread about the staging environment.",
+            "Expense report chasing.", "Sprint planning grumbling.",
+        ),
+        model_version="toy-model-v1", planted_signals=(signal,),
+    )
+    world = planter_mod.plant(recipe, horizons={signal: "2018-06-01"})
+    if "plants" in world.public:
+        raise Violated("PlantedWorld.public still carries the 'plants' key — ground truth leaked to the detector")
+
+    honest = detector_mod.detect(world.public)
+    decoy_public = {
+        **world.public,
+        "plants": [{"channel": "events", "index": 0, "signal": "not the real ground truth"}],
+    }
+    tampered = detector_mod.detect(decoy_public)
+    if honest != tampered:
+        raise Violated(
+            "detect() produced different output when a decoy 'plants' key was present — it is "
+            "reading ground truth it should never see"
+        )
+
+    p = world.ground_truth[0]
+    on_target_detection = (detector_mod.Detection(channel=p.channel, index=p.index, line=p.signal, outlier_score=0.0),)
+
+    timely = scorer_mod.score(world.ground_truth, on_target_detection, detected_at="2018-05-01")
+    if timely.plant_scores[0].score != scorer_mod.TIMELY_SCORE or not timely.plant_scores[0].timely:
+        raise Violated("a detection before the actionability horizon did not score as timely")
+
+    late = scorer_mod.score(world.ground_truth, on_target_detection, detected_at="2018-06-02")
+    late_ps = late.plant_scores[0]
+    if late_ps.timely is not False or late_ps.score != scorer_mod.LATE_SCORE or late_ps.score >= 0.1:
+        raise Violated(f"a detection after the actionability horizon did not score near zero: {late_ps}")
+    if "2018-06-01" not in late_ps.reason or "horizon" not in late_ps.reason.lower():
+        raise Violated(f"the late score's reason does not name the horizon it missed: {late_ps.reason!r}")
+
+    missed = scorer_mod.score(world.ground_truth, (), detected_at="2018-05-01")
+    if missed.plant_scores[0].score != scorer_mod.MISSED_SCORE or missed.plant_scores[0].detected:
+        raise Violated("an undetected plant did not score as missed")
+
+    for result in (timely, late, missed):
+        if result.limitation != planter_mod.SHARED_PRIOR_LIMITATION:
+            raise Violated("a ScoreResult did not carry the shared-prior limitation verbatim")
+
+    return (
+        "twin/detector.py imports nothing naming 'planter'; detect() returns identical output "
+        "with and without a decoy ground-truth key present; a plant detected before its "
+        f"actionability horizon scores {scorer_mod.TIMELY_SCORE}, the identical plant detected "
+        f"after it scores {late_ps.score} with the horizon named in the reason, and a missed plant "
+        f"scores {scorer_mod.MISSED_SCORE}; every result carries the shared-prior limitation verbatim"
+    )
+
+
 @harness_check("benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach")
 def _benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach(ctx: Context) -> str:
     """Benchmark question selection and ingestion quarantine (build ticket 57, decision ticket

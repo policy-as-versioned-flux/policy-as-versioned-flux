@@ -217,10 +217,15 @@ def test_a_degraded_batch_fails_the_full_fidelity_suite(spine: Spine, latest_che
 def test_the_synthetic_substrate_capability_grade_moves_to_3_of_7() -> None:
     """Build ticket 51 ticks decision ticket 12's AC 2 (a fidelity target + a stated unfair-test
     list) — the eval suite itself is the realisation, not a claim about it. AC 1 (build ticket 50)
-    and AC 5 (build ticket 48) are unchanged; re-run here to pin exactly what this ticket moved."""
+    and AC 5 (build ticket 48) are unchanged; re-run here to pin exactly what this ticket moved.
+
+    A subset check, not an exact match: a later ticket (build ticket 52 ticks AC 4) legitimately
+    grows this set further, and this test's own job is only "ticket 51's tick still holds", the
+    same forward-compatible shape build ticket 50 left `test_substrate.py` and
+    `test_substrate_generator.py` in for the identical reason."""
     caps = Capabilities.load()
     graded = caps.require("synthetic-substrate")
     assert graded.owning_ticket == "12"
     assert graded.grade == "partial"
     checked = {c.index for c in graded.criteria if c.checked}
-    assert checked == {1, 2, 5}
+    assert {1, 2, 5} <= checked

@@ -7,9 +7,11 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 60 of 77 build tickets closed, and one measuring against a clock that runs
-to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
-established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
+**This is 64 of 77 build tickets closed, and one measuring against a clock that runs
+to 2026-11-06.** (Recounted from each ticket's own `Status:` line rather than carried forward by
+hand — the previous banner, 60, had drifted the same way this file's own "What is honestly built"
+section repeatedly finds and corrects.) Ticket 23's own checklist is closed, but the calibration
+discipline it established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
 more usefully, is named inside every artefact the tool emits.
 
@@ -1243,6 +1245,54 @@ distribution-of-difficulty clause) is measured here, but strength and lead time 
 stays unticked on the same "one clause of a multi-clause criterion" ground build ticket 49 already
 left it on.
 
+## The planter/detector/scorer split, and actionability horizons
+
+`twin/planter.py`, `twin/detector.py` and `twin/scorer.py` (build ticket 52, decision ticket 12
+AC 4, Q2, Q3b) are the last piece of the substrate chain's own adversarial-separation acceptance
+criterion: "a planter agent holds ground truth in a sealed artefact; a detector agent runs with no
+access to it and no shared context; a scorer reads both." Three tickets (48, 49, 50) built *what*
+the substrate is; this one builds *who is allowed to know what about a plant*, structurally rather
+than by convention.
+
+**The split is enforced, not promised.** `planter.plant()` is the only function in this codebase
+that ever reads `substrate_generator.generate()`'s own `plants` field; it hands a detector only
+`PlantedWorld.public` — the identical batch with that field stripped. `twin/detector.py` imports
+nothing naming `planter` at all (an AST scan of its real source,
+`tests/test_detector.py::test_detector_module_imports_nothing_naming_planter`), and `detect()` is
+behaviourally blind, not merely unwired: called on the honest public view and on an identical dict
+with a decoy `plants` key spliced back in, it returns byte-identical output either way — it does
+not even look at the key (`test_detect_is_indifferent_to_a_spliced_in_ground_truth_key`). A
+careless caller handing the detector the sealed ground truth by mistake still could not leak it
+through. The scorer (`twin/scorer.py`) is the one module allowed to see both, and takes them as two
+independent arguments — `score(ground_truth, detections, detected_at)` — never a merged object
+either side wrote into.
+
+**The limit decision ticket 12 Q2 names is recorded, not papered over.** Planter and detector are
+the same model family and share priors here, same as they would in a live deployment before that
+is deliberately varied — a synthetic result is never evidence the twin anticipates the world, only
+that the detection machinery works. `planter.SHARED_PRIOR_LIMITATION` states this once and
+`scorer.ScoreResult.limitation` carries it verbatim on every result this module returns — published
+with the score itself, not left in a footnote a caller has to go find
+(`tests/test_scorer.py::test_every_score_result_carries_the_shared_prior_limitation_verbatim`).
+
+**Every plant carries an actionability horizon, and detection is scored against it (Q3b).**
+`horizons` is supplied to `planter.plant()` alongside the recipe — not folded into
+`SubstrateRecipe` itself, ticket 48's own closed, versioned schema describes what text to generate,
+not the planter's own ground-truth metadata — and `plant()` refuses a recipe whose planted signals
+are not every one covered by a horizon. `scorer.score()` compares its own `detected_at` argument
+against each plant's `Plant.actionability_horizon` (day-string comparison, the same ordering
+`regimes.cutoff` and `Spine.at` already use): a plant found on or before its horizon scores
+`TIMELY_SCORE` (1.0); found after, `LATE_SCORE` (0.05) — near zero, not zero, because a late
+detection is a post-mortem, not nothing — and the reason string names the horizon and says the
+point of no return has passed. A plant never detected scores `MISSED_SCORE` (0.0) and names the
+miss. "Finding it late is not finding it" is a scored property here, not only a stated one.
+
+**Ticks `synthetic-substrate` AC 4.** "A blind/adversarial separation mechanism between planter and
+detector" is now the planter/detector/scorer split itself — `synthetic-substrate` moves from 3/7 to
+4/7, still `partial`. AC 3 (the planting protocol) stays unticked: the actionability horizon
+supplies its lead-time clause, but "strength" is untouched, so it stays on the same "one clause of
+a multi-clause criterion" ground build tickets 49 and 51 already left it on.
+
 ## The decaying unbound-signal pool
 
 `twin/unbound_pool.py` (build ticket 54, decision ticket 11 Q3) is the retention half of "weak
@@ -1344,20 +1394,24 @@ reaches `full`, and nothing can be typed as `full`.
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 6 / 8 |
 | `scenario-engine` | 13 | partial | 4 / 7 |
-| `synthetic-substrate` | 12 | partial | 3 / 7 |
+| `synthetic-substrate` | 12 | partial | 4 / 7 |
 | `forecast-book` | 21 | partial | 5 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
 
-<!-- NOTE: totals below are provisional (58's 3 ticks + 59's 1 tick on forecast-book, assumed
-     non-overlapping); final verification recomputes this whole block from `./bin/twin grade`'s
-     real output rather than trusting this hand-sum. -->
-**32 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**35 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capability here stands at five ticks, and two of the eleven still stand
-at one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
-count. `forecast-book` moved from 1/6 to 4/6 at build ticket 58 (venue + observe-only, the
-blind-emission protocol, the claim-scope statement — narrated above).
+there"** — the strongest capability here stands at six ticks, and one of the eleven still stands at
+one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
+count — re-derived here rather than trusting the stale, hand-carried "32" the previous round left
+behind (the same provisional-total drift this file names repeatedly below). `forecast-book` moved
+from 1/6 to 4/6 at build ticket 58 (venue + observe-only, the blind-emission protocol, the
+claim-scope statement — narrated above).
+
+**Build ticket 52 ticks `synthetic-substrate` AC 4** (a blind/adversarial separation mechanism
+between planter and detector, `twin/planter.py` + `twin/detector.py` + `twin/scorer.py`) — moving
+the row from 3/7 to 4/7; see "The planter/detector/scorer split, and actionability horizons",
+above.
 
 **Build ticket 51 ticks `synthetic-substrate` AC 2** (a fidelity target + a stated unfair-test
 list, `twin/substrate_eval.py`) — moving the row from 2/7 to 3/7; see "The substrate fidelity eval

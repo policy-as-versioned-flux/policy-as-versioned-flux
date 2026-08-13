@@ -17,7 +17,9 @@ criteria:
     checked: false
   - index: 4
     text: "A blind/adversarial separation mechanism between planter and detector."
-    checked: false
+    checked: true
+    evidence: "twin/planter.py, twin/detector.py, twin/scorer.py — a real, enforced adversarial split, not a promise: the planter (twin/planter.py) is the only module that ever reads substrate_generator.generate()'s plants field, and hands the detector only PlantedWorld.public (the batch with plants stripped); the detector (twin/detector.py) imports nothing naming planter (checked by AST scan of its real source, tests/test_detector.py::test_detector_module_imports_nothing_naming_planter) and is behaviourally blind, not merely unwired — detect() returns byte-identical output whether or not a decoy plants key is spliced into its input (test_detect_is_indifferent_to_a_spliced_in_ground_truth_key), so ground truth cannot leak back in even if a caller tried; the scorer (twin/scorer.py) reads both as two independent arguments (ground_truth, detections — never a merged object). The limit decision ticket 12 Q2 names is recorded, not papered over: every ScoreResult carries SHARED_PRIOR_LIMITATION verbatim (planter and detector share model priors; a synthetic result is never evidence the twin anticipates the world). Every plant also carries an actionability horizon (Plant.actionability_horizon): a detection on or before it scores TIMELY_SCORE, one after scores LATE_SCORE — near-zero, not zero — with the horizon named in the reason string, and a missed plant scores MISSED_SCORE (tests/test_scorer.py; harness guard planter_detector_scorer_are_structurally_separated_and_late_detection_scores_near_zero)."
+    ticked_by: build ticket 52
   - index: 5
     text: "Generation method + reproducibility/versioning decision."
     checked: true
