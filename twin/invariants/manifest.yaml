@@ -8,8 +8,8 @@
 # them so a weakened helper cannot make a check pass unnoticed. A changed hash needs
 # `authorised_by` citing the decision ticket that permits it.
 schema: twin.invariants/v1
-checks_module_authorised_by: "decision ticket 13 \u2014 build ticket 69: adds the standing_library_covers_committed_classes check (schema.py's new COMMITTED_SCENARIO_CLASSES enum + a scenario.class field) to checks.py, so the checks module hash moves; no existing check body changed"
-checks_module_sha256: 19da186f4e06a75776aff3de30e4b78c829b61ce553b60e74a9311b8049d114c
+checks_module_authorised_by: "decision ticket 21 - build ticket 59: adds price_levels_never_probabilities check to checks.py, so the module hash moves; no existing check body changed"
+checks_module_sha256: 231b921792eed978ef9a4a3d3f764954f1d84b48ec395216fc7b5db5d87464b1
 invariants:
   - name: store_rebuildable_from_git
     activating_ticket: '01'
@@ -159,7 +159,8 @@ invariants:
 
   - name: price_levels_never_probabilities
     activating_ticket: '59'
-    state: pending
+    state: live
+    body_sha256: bfc3760c1e6eeadd150e8dbf0ce8a71e181f5bb853b07f80072c2df570ec268c
     asserts: Prediction-market price levels enter as signals, never as probabilities.
 
   - name: standing_library_covers_committed_classes

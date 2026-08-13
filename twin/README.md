@@ -7,7 +7,7 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 59 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 60 of 77 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** Ticket 23's own checklist is closed, but the calibration discipline it
 established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
@@ -454,6 +454,55 @@ separation's job (build ticket 58), not this ticket's. `twin/capabilities/foreca
 records the honest state: one of decision ticket 21's six acceptance criteria is checked by this
 ticket's code, the other five (venue, blind emission, claim scope, the rest of circularity,
 proportionality) are build tickets 58 and 59's, so the capability grades `partial`, never `full`.
+
+## Price moves as world-layer signals, never price levels as probabilities
+
+`twin/market_signals.py` (build ticket 59) is the "signal source" half decision ticket 21 Q1(b)
+names, beside build ticket 57's "benchmark" half. Research 17's load-bearing finding is specific
+rather than fastidious: Mincer–Zarnowitz regressions reject unbiasedness **in every subsample
+tested** (Bürgi, Deng & Whelan 2026), worst in the **low-price tail** — exactly the region this
+system exists to price. "Use only liquid markets" does not fix it: the null is rejected in every
+liquidity quintile and every trade-size quintile. So a price *level* never enters this system as a
+probability; a price *move* — the derivative, a dated externally-authored event — does, through
+the normal sensing path.
+
+**The refusal is a mechanism, not a comment.** `as_probability()` exists for exactly one reason: to
+be the function a future caller reaches for when tempted to turn a price into a belief, and it
+raises `PriceLevelAsProbabilityError` unconditionally, citing the bias evidence in its own message,
+with no warning path a caller could silence. `price_moves()` computes the derivative between
+consecutive dated observations of the same question and nothing here has a field named
+`probability` or `implied_probability` — the two levels a move was computed from survive only as
+`from_level`/`to_level`, explicitly labelled.
+
+**Price moves ingest through the identical mechanism build ticket 53 already proved at volume.**
+`market_signal_run()` turns each move into a dated statement ("kalshi price for 'X' moved from
+0.08 to 0.19 between ... and ...") and runs it through `signal_classify.classify()` unattended, the
+same no-human-gate pipeline `twin/ingest.py` exercises over synthetic substrate — automated output
+stays grade 5 by construction, trusted downstream rather than gated at entry, exactly as decision
+ticket 11 Q2 already decided for every other signal this system senses. Every emitted artefact
+cites the bias evidence verbatim in its own body, so a reader never has to go find the finding to
+understand why a level is missing where a probability might be expected.
+
+**Decision ticket 21 Q1(b)'s "signal source vs benchmark" split now holds end to end, not just on
+paper.** A quarantined question id (`twin/benchmark.py`, build ticket 57) is excluded **before**
+`signal-classify` ever runs — proactive, not only auditable after the fact — and the harness guard
+`price_levels_never_probabilities` runs build ticket 57's own `audit_quarantine()` over this
+pipeline's live ingestion-provenance output and requires it clean, so the two mechanisms are
+asserted together rather than trusted to agree. `twin/capabilities/forecast-book.yaml` AC5 ("the
+circularity question resolved — signal source vs benchmark") ticks on that evidence, moving
+`forecast-book` to 2/6. The other four criteria — the venue/observe-only decision in code, the
+blind pinned-emission protocol, the published claim-scope statement, and the proportionality
+verdict — stay open for build ticket 58, whose own job is the benchmark's blind-emission half, not
+this ticket's live signal-source half.
+
+**This is also the sixteenth and last invariant the constitution names activating** —
+`twin/invariants/manifest.yaml` now carries zero `pending` entries. That retired an unstated
+assumption two suite-guard tests carried (`tests/test_invariant_suite.py`): both fished "any
+pending entry" out of the real, committed manifest as their own test subject, which is exactly the
+kind of thing that stops existing once every invariant has activated. Fixed by decoupling each
+test's subject from the manifest's live state — a synthetic pending entry for one, `may_skip`'s own
+rule checked against a name provably absent from the live set for the other — never by weakening
+either check itself.
 
 ## Believed, rival, revealed — and no privileged map
 
@@ -1137,15 +1186,19 @@ reaches `full`, and nothing can be typed as `full`.
 | `sense-move` | 11 | partial | 5 / 8 |
 | `scenario-engine` | 13 | partial | 4 / 7 |
 | `synthetic-substrate` | 12 | partial | 2 / 7 |
-| `forecast-book` | 21 | partial | 1 / 6 |
+| `forecast-book` | 21 | partial | 2 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
 
-**28 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**29 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
 there"** — the strongest capability here stands at five ticks, and three of the eleven still stand
 at one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
 count.
+
+**Build ticket 59 ticks one criterion, `forecast-book` AC5** ("the circularity question resolved —
+signal source vs benchmark"), moving the row from 1/6 to 2/6 and the total from 28/64 to 29/64 —
+see "Price moves as world-layer signals, never price levels as probabilities", above.
 
 **Re-deriving this round found the table three capabilities and two ticks stale, the same shape of
 drift build ticket 48 caught once before and build ticket 34's coherence audit caught at scale.**
