@@ -278,3 +278,11 @@ def test_the_orchestrator_script_runs_exactly_the_declared_trials() -> None:
     script = (drift.FORCED_CAMPAIGN_PATH.parent / "forced-campaign.sh").read_text(encoding="utf-8")
     for trial_id in drift.REQUIRED_FORCED_TRIALS:
         assert f'run_trial "{trial_id}"' in script, f"forced-campaign.sh never runs {trial_id!r}"
+
+
+def test_the_orchestrator_script_resolution_matches_the_pre_registration() -> None:
+    """The other place the script hardcodes what the YAML declares, for the same reason."""
+    campaign = ForcedCampaign.load()
+    script = (drift.FORCED_CAMPAIGN_PATH.parent / "forced-campaign.sh").read_text(encoding="utf-8")
+    assert f"SAMPLE_EVERY_SECONDS={campaign.sample_every_seconds}" in script
+    assert f"WINDOW_MINUTES={campaign.window_minutes}" in script

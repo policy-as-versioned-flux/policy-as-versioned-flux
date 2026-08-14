@@ -108,6 +108,48 @@ decision ticket 12 Q2 (the shared-prior limitation this ticket routes around rat
       against the six items above, is the evidence: six checked, zero unchecked, all six citing
       the file, test or command that makes each true rather than asserting it.
 
+## Also found and fixed: two-axis review of the diff (`d9448a7...HEAD`)
+
+Same discipline build ticket 56 names for itself: findings recorded and fixed, not glossed over.
+
+- **Standards axis.** `twin/README.md`'s own "The invariants" section — the file's own
+  documented convention of listing every harness check by name and the live `./bin/twin verify`
+  pass count — had gone stale the moment this ticket's tenth harness guard was added and never
+  reflected there, the same shape of drift build ticket 56's audit found and fixed once before.
+  Fixed: pass count corrected 57 → 58 (re-derived from a live run, not carried forward),
+  `forced_campaign_pre_registered_and_walled_off` added to the enumerated list, "Nine checks" →
+  "Ten checks", `pytest -q` count corrected to the live 1236.
+- **Spec axis, real gap.** The `scale-left-unreverted` trial's target (`flux-system/git-server`,
+  chosen because `driftwood`'s own namespace runs no Deployment) is not Flux-managed — it is
+  applied by `scripts/up.sh`, outside GitOps — and `probe.sh` never observed it at all. Every one
+  of that trial's 120 samples would have shown the three window subjects unchanged throughout,
+  which is not evidence of anything: neither "does Flux catch it" nor "does the probe catch it"
+  had a mechanism to be measured. Fixed: `probe.sh` gained a fourth, non-window field
+  (`git_server_available_replicas`) — additive only, `Window.subjects` still reads only the three
+  named ids, so build ticket 64's own reduction is unaffected — and `forced-campaign.yaml`'s trial
+  now names the limitation and the fix in its own text rather than only in this section.
+- **Spec axis, real gap.** `forced_campaign_pre_registered_and_walled_off`'s leak check (a
+  timestamp-set intersection) would miss a misrouted `DRIFT_SAMPLES` override that sent a forced
+  sample straight into build ticket 64's own log: a sample that never reached the campaign's own
+  log leaves no timestamp there to intersect against, so it would slip through undetected — and no
+  test exercised any of the check's failure branches at all, unlike every sibling harness guard.
+  Fixed: `FORCED_DRIFT_MARKER` (`twin/drift.py`) — the literal value only the campaign's own
+  configmap-edit trial ever writes — is now scanned for directly in the organic log, independent
+  of and checked before the timestamp comparisons, so a misrouted write is caught regardless of
+  which file it landed in. Three direct tests added
+  (`tests/test_invariant_suite.py::test_a_forced_drift_marker_in_the_organic_log_is_caught` and two
+  siblings) exercising all three failure branches via monkeypatching, matching the pattern every
+  other harness guard in the suite already uses.
+- **Spec axis, minor.** The sampling resolution (`SAMPLE_EVERY_SECONDS`/`WINDOW_MINUTES` in
+  `forced-campaign.sh`) was cross-checked against `forced-campaign.yaml`'s `resolution:` only by
+  comment, unlike the trial-id equivalence, which already had a test. Fixed:
+  `test_the_orchestrator_script_resolution_matches_the_pre_registration` added.
+- **Standards axis, judgement calls, not fixed** — noted, left as found: `ForcedCampaign.load`'s
+  owner-refusal message is terser than `Window.load`'s sibling message (minor tone inconsistency,
+  not worth the abstraction a shared helper would cost for two call sites); the orchestrator-script
+  consistency tests read the bash script's literal source rather than an emitted artefact, a
+  documented, deliberate trade-off (no YAML parser in bash) rather than an oversight.
+
 ## What is honestly not yet true
 
 The instrument is built and every claim above is checked against real code, real tests and the
@@ -135,7 +177,12 @@ person choosing the moment a real cluster gets mutated four times in a row.
   forced_campaign_pre_registered_and_walled_off, is not in the failure list and passed clean)
 
 .venv/bin/python -m pytest -q
-  1231 passed, 1 failed in 1172.21s (0:19:32)
-  Same single, pre-existing, unrelated failure as above — identical detail message, unmoved by
-  anything this ticket touched.
+  1235 passed, 1 failed in 319.51s (0:05:19) — re-run after the review fixes above and after
+  pytest-xdist became the default (pytest.ini, `-n auto`); same single, pre-existing, unrelated
+  failure as above, unmoved by anything this ticket touched.
+
+.venv/bin/python -m twin verify
+  RESULT: 58 passed, 1 failed, 2 skipped (0 pending invariants, 2 skipped and not faked)
+  Same known failure. 57 → 58 is this ticket's own tenth harness guard going live, not a change
+  elsewhere in the suite.
 ```

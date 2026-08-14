@@ -216,3 +216,64 @@ def test_body_hash_is_stable_and_distinguishes_bodies() -> None:
     one, two = checks["store_rebuildable_from_git"], checks["no_collapse_mechanism"]
     assert body_hash(one) == body_hash(one)
     assert body_hash(one) != body_hash(two)
+
+
+# -- the forced-drift campaign is walled off from the organic log (build ticket 78) -----------
+
+
+def test_a_forced_drift_marker_in_the_organic_log_is_caught(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The failure a timestamp intersection alone would miss: a misrouted `DRIFT_SAMPLES`
+    override that sent a forced sample straight into build ticket 64's own log, leaving no entry
+    in the campaign's own log to intersect against."""
+    from twin import drift
+
+    def fake_load_samples(path: Path | None = None) -> list[dict]:
+        if path is None:
+            return [
+                {
+                    "ts": "2026-08-14T00:00:00Z",
+                    "reachable": True,
+                    "subjects": {"driftwood-live-version": drift.FORCED_DRIFT_MARKER},
+                }
+            ]
+        return []
+
+    monkeypatch.setattr(drift, "load_samples", fake_load_samples)
+    result = _one("forced_campaign_pre_registered_and_walled_off", tmp_path)
+    assert result.status == FAIL and drift.FORCED_DRIFT_MARKER in result.detail
+
+
+def test_a_forced_campaign_sample_predating_its_pre_registration_is_caught(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from twin import drift
+
+    def fake_load_samples(path: Path | None = None) -> list[dict]:
+        if path is None:
+            return []
+        return [{"ts": "2020-01-01T00:00:00Z", "reachable": True, "subjects": {}}]
+
+    monkeypatch.setattr(drift, "load_samples", fake_load_samples)
+    monkeypatch.setattr(
+        "twin.invariants.harness._first_commit_date",
+        lambda root, path: drift._moment("2026-01-01T00:00:00Z"),
+    )
+    result = _one("forced_campaign_pre_registered_and_walled_off", tmp_path)
+    assert result.status == FAIL and "predate" in result.detail
+
+
+def test_a_forced_sample_timestamp_leaking_into_the_organic_log_is_caught(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from twin import drift
+
+    shared = [{"ts": "2026-08-14T00:00:00Z", "reachable": True, "subjects": {"a": "b"}}]
+    monkeypatch.setattr(drift, "load_samples", lambda path=None: shared)
+    monkeypatch.setattr(
+        "twin.invariants.harness._first_commit_date",
+        lambda root, path: drift._moment("2020-01-01T00:00:00Z"),
+    )
+    result = _one("forced_campaign_pre_registered_and_walled_off", tmp_path)
+    assert result.status == FAIL and "appear in both" in result.detail

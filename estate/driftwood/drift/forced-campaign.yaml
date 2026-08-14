@@ -85,7 +85,13 @@ trials:
       A kubectl scale left unreverted. The driftwood namespace itself runs no Deployment — Phase 0
       is ConfigMaps only, per estate/driftwood/README.md — so the target is the in-cluster
       git-server Flux's GitRepository pulls from: the nearest real, reachable, reversible
-      Deployment a plausible operator could scale down and forget to scale back.
+      Deployment a plausible operator could scale down and forget to scale back. Named limitation:
+      git-server is applied by scripts/up.sh, not reconciled by the driftwood Kustomization, so
+      Flux itself neither manages nor corrects it — this trial measures the probe's latency to
+      notice, not Flux's, and probe.sh gained a fourth, non-window field
+      (git_server_available_replicas) specifically so this trial's samples carry a real signal at
+      all; without it every one of its 120 samples would have shown the three window subjects
+      unchanged throughout, which is not evidence of anything.
     action: >-
       kubectl --context kind-driftwood -n flux-system scale deployment git-server --replicas=0
     undo: >-

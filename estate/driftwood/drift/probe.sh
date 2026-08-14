@@ -50,6 +50,13 @@ READY="$(kc -n flux-system get kustomization driftwood -o jsonpath='{.status.con
 SINCE="$(kc -n flux-system get kustomization driftwood -o jsonpath='{.status.conditions[?(@.type=="Ready")].lastTransitionTime}')"
 SUSPENDED="$(kc -n flux-system get kustomization driftwood -o jsonpath='{.spec.suspend}')"
 
+# Not one of window.yaml's three declared subjects — build ticket 78's "scale left unreverted"
+# trial targets this Deployment (driftwood's own namespace runs none), and neither Flux nor the
+# other three fields would show any effect of scaling it, so its own sample would otherwise carry
+# no signal of the forced action at all. Additive only: `Window.subjects` still reads only the
+# three named ids, so build ticket 64's own reduction is unaffected by this field's presence.
+GIT_SERVER_AVAILABLE="$(kc -n flux-system get deployment git-server -o jsonpath='{.status.availableReplicas}')"
+
 # Observed state, one field per subject in window.yaml. Absent reads as the empty string, which is
 # a divergence from any non-empty desired value — a control that has been deleted is total drift
 # and must not read as "unchanged".
@@ -57,12 +64,13 @@ LIVE_VERSION="$(kc -n "$NS" get cm driftwood-live-version -o jsonpath='{.data.po
 NIST_PIN="$(kc -n "$NS" get cm driftwood-nist-pin -o jsonpath='{.data.catalogVersion}')"
 NAMESPACE="$(kc get ns "$NS" -o jsonpath='{.metadata.name}')"
 
-printf '{"ts":"%s","reachable":true,"revision":"%s","ready":"%s","ready_since":"%s","suspended":"%s","subjects":{"driftwood-live-version":"%s","driftwood-nist-pin":"%s","driftwood-namespace":"%s"}}\n' \
+printf '{"ts":"%s","reachable":true,"revision":"%s","ready":"%s","ready_since":"%s","suspended":"%s","git_server_available_replicas":"%s","subjects":{"driftwood-live-version":"%s","driftwood-nist-pin":"%s","driftwood-namespace":"%s"}}\n' \
   "$TS" \
   "$(json_string "$REVISION")" \
   "$(json_string "$READY")" \
   "$(json_string "$SINCE")" \
   "$(json_string "${SUSPENDED:-false}")" \
+  "$(json_string "$GIT_SERVER_AVAILABLE")" \
   "$(json_string "$LIVE_VERSION")" \
   "$(json_string "$NIST_PIN")" \
   "$(json_string "$NAMESPACE")" >> "$OUT"

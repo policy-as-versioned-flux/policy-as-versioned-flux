@@ -66,6 +66,15 @@ REQUIRED_FORCED_TRIALS = (
     "resource-deleted-outright",
 )
 
+# The value `forced-campaign.yaml`'s `configmap-edit-outside-gitops` trial writes
+# (`forced-campaign.sh`'s first `run_trial` call) — never a value any declared subject legitimately
+# holds. A timestamp-set intersection between the two logs misses a *misrouted* write (a broken
+# `DRIFT_SAMPLES` override landing a forced sample in build ticket 64's own organic log rather than
+# the campaign's), because a sample that never reached the forced log has no timestamp to
+# intersect against. This marker is the second, independent check: it is unmistakably contamination
+# wherever it turns up, regardless of which file the sample landed in.
+FORCED_DRIFT_MARKER = "FORCED-DRIFT-TEST"
+
 # The verdict is build ticket 65's, and naming it here rather than leaving the field absent is the
 # same move as `model_residual.computed: false` in the regime gap — an absent conclusion reads as
 # an oversight, a refused one reads as a boundary.

@@ -2474,6 +2474,21 @@ def _forced_campaign_pre_registered_and_walled_off(ctx: Context) -> str:
 
     campaign = drift.ForcedCampaign.load()  # refuses a file missing any required declaration
     forced_samples = drift.load_samples(campaign.samples_path)
+    organic = drift.load_samples()
+
+    # Independent of the timestamp checks below, and checked first: `FORCED_DRIFT_MARKER` is only
+    # ever written by the campaign's own configmap-edit trial, so its presence anywhere in the
+    # organic log is unmistakable contamination — including the failure a timestamp intersection
+    # alone would miss, a misrouted `DRIFT_SAMPLES` override that sent a forced sample straight to
+    # `samples.jsonl` and so left no matching entry in the campaign's own log to intersect against.
+    marked = [s["ts"] for s in organic if drift.FORCED_DRIFT_MARKER in str(s.get("subjects", {}))]
+    if marked:
+        raise Violated(
+            f"build ticket 64's organic samples.jsonl carries the forced-campaign marker "
+            f"{drift.FORCED_DRIFT_MARKER!r} at {len(marked)} timestamp(s), earliest {min(marked)} "
+            "— a forced sample reached the organic log, whether or not it also reached the "
+            "campaign's own"
+        )
 
     declared = _first_commit_date(REPO_DIR, drift.FORCED_CAMPAIGN_PATH)
     if declared is None:
@@ -2491,7 +2506,6 @@ def _forced_campaign_pre_registered_and_walled_off(ctx: Context) -> str:
             f"({declared.isoformat()}), earliest {min(early)}"
         )
 
-    organic = drift.load_samples()
     leaked = {s["ts"] for s in forced_samples} & {s["ts"] for s in organic}
     if leaked:
         raise Violated(
@@ -2501,7 +2515,8 @@ def _forced_campaign_pre_registered_and_walled_off(ctx: Context) -> str:
         )
     return (
         f"{len(campaign.trials)} trial(s) declared, committed {declared.date().isoformat()}, "
-        f"{len(forced_samples)} forced sample(s), none earlier, none leaked into the organic log"
+        f"{len(forced_samples)} forced sample(s), none earlier, none leaked into the organic log, "
+        "no marker contamination"
     )
 
 
