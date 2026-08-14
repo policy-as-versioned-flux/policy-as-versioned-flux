@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 from twin import drift
-from twin.drift import DriftError, Window
+from twin.drift import DriftError, ForcedCampaign, Window
 
 WINDOW = """\
 schema: drift.window/v1
@@ -162,3 +162,119 @@ def test_the_committed_window_and_preconditions_load(tmp_path: Path) -> None:
     body = drift.report("2026-08-07T12:00:00Z")
     assert body["verdict"] is None and body["verdict_lands_at"] == "build ticket 65"
     assert [p["id"] for p in body["open_preconditions"]] == ["org-actions-may-not-create-prs"]
+
+
+# -- the forced-drift latency campaign (build ticket 78) --------------------------------------
+
+FORCED_CAMPAIGN = """\
+schema: drift.forced_campaign/v1
+version: 1
+question: How fast do Flux and the probe catch a forced, plausible operator action?
+not_organic_drift_evidence: >-
+  Excluded from build ticket 65's organic-drift tally by construction: written to a separate log.
+resolution: {sample_every_seconds: 15, window_minutes: 30}
+samples: {path: forced-campaign-samples.jsonl}
+trials:
+  - id: configmap-edit-outside-gitops
+    action: kubectl patch cm x
+    undo: kubectl patch cm x back
+  - id: scale-left-unreverted
+    action: kubectl scale deploy x --replicas=0
+    undo: kubectl scale deploy x --replicas=1
+  - id: kustomization-suspended-left-suspended
+    action: kubectl patch kustomization x suspend=true
+    undo: kubectl patch kustomization x suspend=false
+  - id: resource-deleted-outright
+    action: kubectl delete cm y
+    undo: wait for Flux to recreate it
+operation: {owner: A Named Human}
+"""
+
+
+def _write_campaign(tmp_path: Path, text: str = FORCED_CAMPAIGN) -> Path:
+    path = tmp_path / "forced-campaign.yaml"
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
+def test_a_forced_campaign_with_all_four_trials_loads(tmp_path: Path) -> None:
+    campaign = ForcedCampaign.load(_write_campaign(tmp_path))
+    assert campaign.trials == (
+        "configmap-edit-outside-gitops",
+        "scale-left-unreverted",
+        "kustomization-suspended-left-suspended",
+        "resource-deleted-outright",
+    )
+    assert campaign.sample_every_seconds == 15
+    assert campaign.window_minutes == 30
+    assert campaign.samples_path.name == "forced-campaign-samples.jsonl"
+    assert campaign.owner == "A Named Human"
+
+
+def test_a_forced_campaign_missing_a_trial_does_not_load(tmp_path: Path) -> None:
+    text = FORCED_CAMPAIGN.replace(
+        "  - id: resource-deleted-outright\n"
+        "    action: kubectl delete cm y\n"
+        "    undo: wait for Flux to recreate it\n",
+        "",
+    )
+    with pytest.raises(DriftError, match="exactly the four trials"):
+        ForcedCampaign.load(_write_campaign(tmp_path, text))
+
+
+def test_a_trial_with_no_undo_does_not_load(tmp_path: Path) -> None:
+    text = FORCED_CAMPAIGN.replace("    undo: kubectl patch cm x back\n", "")
+    with pytest.raises(DriftError, match="no undo step"):
+        ForcedCampaign.load(_write_campaign(tmp_path, text))
+
+
+def test_a_trial_with_no_action_does_not_load(tmp_path: Path) -> None:
+    text = FORCED_CAMPAIGN.replace("    action: kubectl patch cm x\n", "")
+    with pytest.raises(DriftError, match="names no action"):
+        ForcedCampaign.load(_write_campaign(tmp_path, text))
+
+
+def test_a_campaign_naming_no_owner_does_not_load(tmp_path: Path) -> None:
+    text = FORCED_CAMPAIGN.replace("operation: {owner: A Named Human}", "operation: {}")
+    with pytest.raises(DriftError, match="names no operator"):
+        ForcedCampaign.load(_write_campaign(tmp_path, text))
+
+
+def test_a_campaign_silent_on_organic_evidence_does_not_load(tmp_path: Path) -> None:
+    text = FORCED_CAMPAIGN.replace(
+        "not_organic_drift_evidence: >-\n"
+        "  Excluded from build ticket 65's organic-drift tally by construction: written to a "
+        "separate log.\n",
+        "",
+    )
+    with pytest.raises(DriftError, match="not evidence for the organic-drift verdict"):
+        ForcedCampaign.load(_write_campaign(tmp_path, text))
+
+
+def test_a_campaign_reusing_the_organic_samples_path_does_not_load(tmp_path: Path) -> None:
+    """Forcing the very thing build ticket 64 counts must never land in its own log."""
+    text = FORCED_CAMPAIGN.replace(
+        "samples: {path: forced-campaign-samples.jsonl}", "samples: {path: samples.jsonl}"
+    )
+    with pytest.raises(DriftError, match="organic log"):
+        ForcedCampaign.load(_write_campaign(tmp_path, text))
+
+
+def test_the_committed_forced_campaign_loads(tmp_path: Path) -> None:
+    """The real pre-registration, not a fixture of one."""
+    committed = ForcedCampaign.load()
+    assert len(committed.trials) == 4
+    assert committed.owner and committed.not_organic_drift_evidence
+    assert committed.samples_path != drift.SAMPLES_PATH
+
+
+def test_the_orchestrator_script_runs_exactly_the_declared_trials() -> None:
+    """`forced-campaign.sh` is the executable form of the pre-registration; the two must agree.
+
+    Bash cannot parse YAML without a new dependency, so the script hardcodes its own trial
+    definitions — this is the regression test that catches the two silently drifting apart,
+    standing in for the parser this repository deliberately does not add.
+    """
+    script = (drift.FORCED_CAMPAIGN_PATH.parent / "forced-campaign.sh").read_text(encoding="utf-8")
+    for trial_id in drift.REQUIRED_FORCED_TRIALS:
+        assert f'run_trial "{trial_id}"' in script, f"forced-campaign.sh never runs {trial_id!r}"

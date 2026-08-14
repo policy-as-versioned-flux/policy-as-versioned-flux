@@ -52,8 +52,19 @@ from . import REPO_DIR
 WINDOW_PATH = REPO_DIR / "estate" / "driftwood" / "drift" / "window.yaml"
 SAMPLES_PATH = REPO_DIR / "estate" / "driftwood" / "drift" / "samples.jsonl"
 PRECONDITIONS_PATH = REPO_DIR / "estate" / "driftwood" / "drift" / "preconditions.yaml"
+FORCED_CAMPAIGN_PATH = REPO_DIR / "estate" / "driftwood" / "drift" / "forced-campaign.yaml"
 
 WINDOW_SCHEMA = "drift.window/v1"
+FORCED_CAMPAIGN_SCHEMA = "drift.forced_campaign/v1"
+
+# The fixed, named action set build ticket 78 requires — not an improvising agent choosing
+# freely, which would itself carry model-prior bias about what "realistic" tampering looks like.
+REQUIRED_FORCED_TRIALS = (
+    "configmap-edit-outside-gitops",
+    "scale-left-unreverted",
+    "kustomization-suspended-left-suspended",
+    "resource-deleted-outright",
+)
 
 # The verdict is build ticket 65's, and naming it here rather than leaving the field absent is the
 # same move as `model_residual.computed: false` in the regime gap — an absent conclusion reads as
@@ -124,6 +135,91 @@ class Window:
             tolerance_minutes=int(cadence.get("tolerance_minutes", 0)),
             subjects=subjects,
             falsifiers=falsifiers,
+            owner=owner,
+        )
+
+
+@dataclass(frozen=True)
+class ForcedCampaign:
+    """The forced-drift latency campaign's pre-registration (build ticket 78).
+
+    A companion instrument to `Window`, not a replacement for it. `Window` waits on organic
+    behaviour to answer a base-rate question; this forces four named, scripted, reversible
+    actions against the same real cluster and answers a *mechanism* question instead — when a
+    plausible change happens, do Flux and the probe catch it, and how fast? Loaded rather than
+    trusted, for the same reason `Window.load` is: a file that can declare anything is not a
+    declaration until something refuses the ones that don't hold their own guardrails.
+    """
+
+    question: str
+    not_organic_drift_evidence: str
+    trials: tuple[str, ...]
+    sample_every_seconds: int
+    window_minutes: int
+    samples_path: Path
+    owner: str
+
+    @classmethod
+    def load(cls, path: Path | None = None) -> "ForcedCampaign":
+        source = path or FORCED_CAMPAIGN_PATH
+        doc = yaml.safe_load(source.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict) or doc.get("schema") != FORCED_CAMPAIGN_SCHEMA:
+            raise DriftError(f"{source}: not a {FORCED_CAMPAIGN_SCHEMA} document")
+
+        trial_docs = doc.get("trials") or []
+        ids = tuple(str(t.get("id", "")) for t in trial_docs)
+        if set(ids) != set(REQUIRED_FORCED_TRIALS) or len(ids) != len(REQUIRED_FORCED_TRIALS):
+            raise DriftError(
+                f"{source}: declares {sorted(ids)}, not exactly the four trials build ticket 78 "
+                f"names: {sorted(REQUIRED_FORCED_TRIALS)}"
+            )
+        for trial in trial_docs:
+            if not str(trial.get("action", "")).strip():
+                raise DriftError(f"{source}: trial {trial.get('id')!r} names no action")
+            if not str(trial.get("undo", "")).strip():
+                raise DriftError(
+                    f"{source}: trial {trial.get('id')!r} names no undo step — every action needs "
+                    "a companion, pre-recorded undo (build ticket 78)"
+                )
+
+        resolution = doc.get("resolution") or {}
+        sample_every_seconds = int(resolution.get("sample_every_seconds", 0))
+        window_minutes = int(resolution.get("window_minutes", 0))
+        if sample_every_seconds <= 0 or window_minutes <= 0:
+            raise DriftError(
+                f"{source}: `resolution` must declare a positive sample_every_seconds and "
+                "window_minutes"
+            )
+
+        samples = str((doc.get("samples") or {}).get("path", "")).strip()
+        if not samples:
+            raise DriftError(f"{source}: names no samples path")
+        samples_path = (source.parent / samples).resolve()
+        if samples_path.name == SAMPLES_PATH.name:
+            raise DriftError(
+                f"{source}: samples path must not be build ticket 64's organic log "
+                f"({SAMPLES_PATH}) — forcing the very thing the organic measurement counts would "
+                "contaminate it"
+            )
+
+        not_organic = str(doc.get("not_organic_drift_evidence", "")).strip()
+        if "65" not in not_organic:
+            raise DriftError(
+                f"{source}: `not_organic_drift_evidence` must state explicitly, citing build "
+                "ticket 65, that this campaign is not evidence for the organic-drift verdict"
+            )
+
+        owner = str((doc.get("operation") or {}).get("owner", "")).strip()
+        if not owner:
+            raise DriftError(f"{source}: names no operator")
+
+        return cls(
+            question=str(doc.get("question", "")).strip(),
+            not_organic_drift_evidence=not_organic,
+            trials=ids,
+            sample_every_seconds=sample_every_seconds,
+            window_minutes=window_minutes,
+            samples_path=samples_path,
             owner=owner,
         )
 

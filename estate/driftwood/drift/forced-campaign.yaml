@@ -1,0 +1,124 @@
+# The pre-registration for the forced-drift latency campaign (build ticket 78), sibling to
+# build ticket 64's `window.yaml` in form and rigor.
+#
+# **This is a mechanism instrument, not an organic-drift instrument.** It forces four named,
+# scripted, reversible actions against the real kind-driftwood cluster and measures how fast Flux
+# and the probe catch each one. It does NOT measure whether drift happens unforced — that is
+# build ticket 64's window and build ticket 65's verdict — and `not_organic_drift_evidence` below
+# states so in the file itself. This campaign's events never enter build ticket 65's tally: they
+# are written to a separate log (`samples.path` below), never to `samples.jsonl`, and
+# `twin/drift.py`'s `ForcedCampaign.load` refuses a file that names `samples.jsonl` as its own log.
+#
+# Decided via a `/wayfinder` grilling session, 2026-08-13/14 (see build ticket 78's own file for
+# the full record). Three other mechanisms were weighed and rejected first: reconstructing history
+# for the existing window (kind-driftwood is 12 days old; nothing to reverse into), fabricated
+# synthetic samples (the `samples.jsonl` guard checks only a timestamp, not provenance — a
+# fabrication would pass undetected and hand build ticket 65 a false verdict), and an
+# LLM-generated adversary (decision ticket 12 Q2: planter and detector share model priors, so a
+# synthetic result evidences detection machinery only, never the world — `twin/planter.py`,
+# `SHARED_PRIOR_LIMITATION`). This campaign goes around the *problem* rather than finding a way
+# around that limit: it stays on real infrastructure instead of synthesising anything.
+schema: drift.forced_campaign/v1
+version: 1
+
+question: >-
+  When a plausible operator action happens on the real kind-driftwood cluster, do Flux and the
+  probe catch it, and how fast? A mechanism question, not build ticket 65's base-rate question —
+  forcing the very thing an unforced-rate measurement counts is not evidence of the unforced rate.
+
+not_organic_drift_evidence: >-
+  This campaign's events are excluded from build ticket 65's organic-drift tally by construction,
+  not by discipline after the fact: they land in `forced-campaign-samples.jsonl`, a separate log
+  from build ticket 64's `samples.jsonl`, and `ForcedCampaign.load` refuses a file that names the
+  organic log as its own. A reader of build ticket 65's verdict who finds a forced event inside it
+  has found a bug, not a result.
+
+resolution:
+  sample_every_seconds: 15
+  window_minutes: 30
+  rationale: >-
+    30 minutes is well past the ~5-minute reconcile interval already observed on this cluster
+    (`ReconciliationSucceeded` events, ~103m/97m/92m apart in the sampled history — see build
+    ticket 64) — chosen so the actual correction curve is captured, not just its endpoints.
+    15-second sampling resolves that curve at a granularity build ticket 64's hourly cadence
+    cannot; it does not replace that cadence, it answers a different question at a different one.
+
+samples:
+  path: forced-campaign-samples.jsonl
+  # Untracked, same reason as build ticket 64's samples.jsonl: machine-local measurement output,
+  # and the artefacts that belong in the repository are all reproducible.
+
+guardrails:
+  baseline_verification: >-
+    The cluster is verified back to declared-state baseline before the next trial runs, and
+    before build ticket 64's passive probe's next hourly sample. `forced-campaign.sh` refuses to
+    start a trial with less than 40 minutes left before the next hour boundary, so a trial's
+    action, its 30-minute sampling window, its undo and its baseline re-check all complete inside
+    the current hour — leaving forced divergence live when the hourly cron samples would record a
+    mechanism event as if it were organic drift, which is exactly the contamination this
+    guardrail exists to refuse.
+  coexistence: >-
+    `forced-campaign.sh` never suspends, pauses, or edits build ticket 64's crontab or
+    `probe.sh`. Both instruments read the same cluster; this one also writes to it, on its own
+    schedule, into its own log, calling the same unmodified `probe.sh` for each sample so the two
+    logs share one sample shape.
+  reversibility: >-
+    Every trial's undo step is scripted and pre-recorded below, not improvised after the fact. A
+    baseline check that fails after undo halts the campaign rather than proceeding to the next
+    trial on a cluster already known to be wrong.
+
+trials:
+  - id: configmap-edit-outside-gitops
+    describes: A manual kubectl edit on a ConfigMap outside GitOps.
+    action: >-
+      kubectl --context kind-driftwood -n driftwood patch configmap driftwood-live-version
+      --type merge -p '{"data":{"policyVersion":"FORCED-DRIFT-TEST"}}'
+    undo: >-
+      kubectl --context kind-driftwood -n driftwood patch configmap driftwood-live-version
+      --type merge -p '{"data":{"policyVersion":"1.0.0"}}'
+    baseline_check: >-
+      configmap/driftwood-live-version data.policyVersion == "1.0.0" (the value declared in
+      gitops/apps/version-configmap.yaml)
+
+  - id: scale-left-unreverted
+    describes: >-
+      A kubectl scale left unreverted. The driftwood namespace itself runs no Deployment — Phase 0
+      is ConfigMaps only, per estate/driftwood/README.md — so the target is the in-cluster
+      git-server Flux's GitRepository pulls from: the nearest real, reachable, reversible
+      Deployment a plausible operator could scale down and forget to scale back.
+    action: >-
+      kubectl --context kind-driftwood -n flux-system scale deployment git-server --replicas=0
+    undo: >-
+      kubectl --context kind-driftwood -n flux-system scale deployment git-server --replicas=1
+    baseline_check: >-
+      deployment/git-server -n flux-system spec.replicas == 1 and status.availableReplicas == 1
+
+  - id: kustomization-suspended-left-suspended
+    describes: The Flux Kustomization suspended and left suspended.
+    action: >-
+      kubectl --context kind-driftwood -n flux-system patch kustomization driftwood
+      --type merge -p '{"spec":{"suspend":true}}'
+    undo: >-
+      kubectl --context kind-driftwood -n flux-system patch kustomization driftwood
+      --type merge -p '{"spec":{"suspend":false}}'
+    baseline_check: kustomization/driftwood -n flux-system spec.suspend == false
+
+  - id: resource-deleted-outright
+    describes: A Flux-managed resource deleted outright.
+    action: >-
+      kubectl --context kind-driftwood -n driftwood delete configmap driftwood-nist-pin
+    undo: >-
+      Flux reconciliation recreates it — the Kustomization is not suspended, so the next reconcile
+      re-applies gitops/apps/nist-pin-configmap.yaml — and `forced-campaign.sh` waits for it to
+      reappear rather than kubectl-applying it by hand, so the undo exercises the real recovery
+      path rather than substituting for it.
+    baseline_check: >-
+      configmap/driftwood-nist-pin exists, data.catalogVersion == "1.0.0"
+
+operation:
+  owner: Chris Nesbitt-Smith
+  runner: >-
+    Operator shell, run by hand from a terminal holding the kind-driftwood context — not cron.
+    This is a bounded, roughly two-hour run started deliberately once, unlike build ticket 64's
+    standing hourly probe.
+  script: estate/driftwood/drift/forced-campaign.sh

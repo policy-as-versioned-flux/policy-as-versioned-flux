@@ -98,6 +98,29 @@ Only one ticket starts immediately (01). After 04 the openable set is 05, 10, 42
 skills and Flux drift measurement run genuinely parallel from there, and 64 is deliberately early
 because it needs elapsed calendar time and nothing from the twin.
 
+## Wait, plant, or force — in that order of suspicion
+
+Added 2026-08-14, from build ticket 78. A ticket that needs real-world evidence and reaches for a
+long passive wait should check one thing first: can the same real system be made to produce the
+evidence now, on purpose, faster — rather than either waiting on it to happen unprompted, or
+generating a synthetic stand-in for it?
+
+**A passive wait is the default and the weakest excuse to skip.** It is real evidence, but slow, and
+on a system with no genuine operator population behind it, a wait can end in a null result that
+means "nothing happened" rather than "nothing happens" — build ticket 64's own limitation.
+
+**A synthetic stand-in is refused when the same model family would generate and grade it.** Decision
+ticket 12 Q2 already found the failure mode: shared priors mean a synthetic result evidences the
+detection machinery, never the world. This does not change per-ticket; it is a structural limit on
+what synthetic evidence can ever claim to be.
+
+**Forcing the real system is preferred when it is available.** A bounded, scripted, reversible
+action against the real system under test produces real data about a real mechanism, faster than
+waiting and without the shared-prior ceiling — at the cost of answering a *mechanism* question
+("does the system catch a known change, and how fast") rather than the *base-rate* question a
+passive wait answers ("does this happen unprompted, and how often"). The two are not
+interchangeable and a ticket citing this section states plainly which one it is answering.
+
 ## The standing guard
 
 > "Be careful to not allow scope to drop in this and prematurely declare things as done, and make

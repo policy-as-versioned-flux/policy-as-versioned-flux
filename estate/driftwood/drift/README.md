@@ -1,7 +1,7 @@
-# Flux drift measurement — instrument and wait
+# Flux drift measurement — two instruments, one cluster
 
-Build ticket 64 of `.scratch/twin/`, from spec story 85. **Run the test rather than assume the
-answer.**
+Build tickets 64 and 78 of `.scratch/twin/`, from spec story 85. **Run the test rather than assume
+the answer.**
 
 The spec claims policy-as-code needs *continuous* proof-of-force. Drift between deploys is the
 candidate justification: a control silently removed after deployment is exactly the case a
@@ -9,25 +9,35 @@ point-in-time attestation misses and reconciliation catches. That must be demons
 controls do not drift, a deploy-time attestation suffices, Flux is a convenience rather than an
 enabler, and the spec is amended.
 
-This directory is the **instrument**. It reaches no conclusion. The verdict is build ticket 65 and
-it reads this data — writing the conclusion into the instrument is how a measurement becomes a
-demonstration.
+This directory is the **instrument** — both of them. Neither reaches a conclusion. Build ticket
+64's window waits on organic behaviour and answers a *base-rate* question: does a control drift
+without anyone intending it? Build ticket 78's campaign forces four named actions and answers a
+*mechanism* question instead: when a plausible change happens, do Flux and the probe catch it, and
+how fast? The two never merge — build ticket 78's own pre-registration states in the file itself
+that its events are not evidence for build ticket 64's tally — and build ticket 65 reads only the
+first.
 
-It is started near the front of the build on purpose. It needs elapsed calendar time and nothing
-from the twin, so starting it at its natural dependency position would delay the answer by a
-whole measurement window on top of everything else.
+Build ticket 64's window is started near the front of the build on purpose: it needs elapsed
+calendar time and nothing from the twin, so starting it at its natural dependency position would
+delay the answer by a whole measurement window on top of everything else. Build ticket 78's
+campaign carries no such wait — it runs once, in hours, because forcing the action is exactly what
+lets it skip the wait.
 
-## The four files
+## The files
 
 | file | what it is |
 |---|---|
-| [`window.yaml`](window.yaml) | The **pre-registration**. The question, both window bounds, the cadence, the subjects, what counts as a drift event, and what outcome would falsify the spec. |
+| [`window.yaml`](window.yaml) | Build ticket 64's **pre-registration**. The question, both window bounds, the cadence, the subjects, what counts as a drift event, and what outcome would falsify the spec. |
 | [`preconditions.yaml`](preconditions.yaml) | Open preconditions with named owners. Today: the org-level "Actions may create pull requests" toggle is off, which blocks build ticket 66. |
-| [`probe.sh`](probe.sh) | One sample of control state, appended to `samples.jsonl`. A fact, never a verdict. |
-| `samples.jsonl` | The log. Untracked — it is machine-local measurement output, and committing it would put a growing binary-shaped blob in a repository whose other artefacts are all reproducible. |
+| [`probe.sh`](probe.sh) | One sample of control state, appended to `samples.jsonl`. A fact, never a verdict. Called by both instruments — build ticket 78's campaign never forks or edits it. |
+| `samples.jsonl` | Build ticket 64's organic log. Untracked — machine-local measurement output, and committing it would put a growing binary-shaped blob in a repository whose other artefacts are all reproducible. |
+| [`forced-campaign.yaml`](forced-campaign.yaml) | Build ticket 78's **pre-registration**. The four named trials, each with its action and its pre-recorded undo, the sampling resolution, and the guardrails that keep it walled off from ticket 64's log. |
+| [`forced-campaign.sh`](forced-campaign.sh) | Runs the four trials in sequence: verify baseline, act, sample every 15s for 30 minutes, undo, verify baseline again. |
+| `forced-campaign-samples.jsonl` | Build ticket 78's log. Untracked, same reason as `samples.jsonl` — and deliberately a *different file*, so the two can never be conflated on disk. |
 
-The reduction lives in [`twin/drift.py`](../../../twin/drift.py), because build ticket 65 builds
-its verdict on top of it and the twin's test suite is where a wrong number gets caught.
+The reduction lives in [`twin/drift.py`](../../../twin/drift.py) — `Window` for build ticket 64,
+`ForcedCampaign` for build ticket 78 — because build ticket 65 builds its verdict on top of the
+first and the twin's test suite is where a wrong number gets caught.
 
 ## Run it
 

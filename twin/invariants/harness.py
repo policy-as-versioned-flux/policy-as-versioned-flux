@@ -2456,6 +2456,55 @@ def _first_commit_date(root: Path, path: Path) -> datetime.datetime | None:
     return datetime.datetime.fromisoformat(stamps[-1].strip().replace("Z", "+00:00"))
 
 
+@harness_check("forced_campaign_pre_registered_and_walled_off")
+def _forced_campaign_pre_registered_and_walled_off(ctx: Context) -> str:
+    """The forced-drift latency campaign predates its data and never leaks into the organic log
+    (build ticket 78).
+
+    Same shape as `drift_window_was_declared_before_it_was_measured`, for the same reason: a
+    campaign whose pre-registration could be edited after seeing an inconvenient result is not a
+    pre-registration. `ForcedCampaign.load` already refuses a file that omits any of the four
+    named trials, an undo step for each, or the explicit "not organic-drift evidence" statement
+    citing build ticket 65 — what only git history and the real logs can add is that the file
+    predates the data, and that none of its samples have actually landed in build ticket 64's
+    organic log. A forced mechanism event inside build ticket 65's verdict would be a bug, not a
+    result, and this is the guard that would catch it.
+    """
+    from .. import drift
+
+    campaign = drift.ForcedCampaign.load()  # refuses a file missing any required declaration
+    forced_samples = drift.load_samples(campaign.samples_path)
+
+    declared = _first_commit_date(REPO_DIR, drift.FORCED_CAMPAIGN_PATH)
+    if declared is None:
+        if forced_samples:
+            raise Violated(
+                f"{len(forced_samples)} forced-campaign sample(s) exist and forced-campaign.yaml "
+                "has never been committed, so nothing establishes it was declared before the data"
+            )
+        return f"{len(campaign.trials)} trial(s) declared, uncommitted and unrun"
+
+    early = [s["ts"] for s in forced_samples if drift._moment(s["ts"]) < declared]
+    if early:
+        raise Violated(
+            f"{len(early)} forced-campaign sample(s) predate forced-campaign.yaml's first commit "
+            f"({declared.isoformat()}), earliest {min(early)}"
+        )
+
+    organic = drift.load_samples()
+    leaked = {s["ts"] for s in forced_samples} & {s["ts"] for s in organic}
+    if leaked:
+        raise Violated(
+            f"{len(leaked)} timestamp(s) appear in both the forced-campaign log and build ticket "
+            "64's organic samples.jsonl — the wall between mechanism evidence and organic "
+            "evidence has been crossed"
+        )
+    return (
+        f"{len(campaign.trials)} trial(s) declared, committed {declared.date().isoformat()}, "
+        f"{len(forced_samples)} forced sample(s), none earlier, none leaked into the organic log"
+    )
+
+
 @harness_check("scheduled_emission_ignores_signal_presence")
 def _sweep_is_not_event_gated(ctx: Context) -> str:
     """A scheduled sweep emits the same volume twice running, nothing having changed (build ticket 09).

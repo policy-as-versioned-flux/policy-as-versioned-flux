@@ -112,3 +112,33 @@ operation:
   owner: Chris Nesbitt-Smith
   runner: operator cron on the machine holding the kind-driftwood cluster
   crontab: "0 * * * * cd <repo> && estate/driftwood/drift/probe.sh >> estate/driftwood/drift/probe.log 2>&1"
+
+# ADDENDUM, added 2026-08-13. Nothing above is changed: the window, the subjects, the drift
+# definition and the falsifiers are exactly as pre-registered. This addendum states a policy the
+# original file left implicit, and names a limitation the policy does not remove.
+#
+# Raised before any deliberate edit was made, not after: kind-driftwood is a solo demo cluster,
+# not a system a real operations team maintains. The window's own sizing reasoning above — "long
+# enough that a monthly maintenance cycle falls inside it at least twice, which is the shortest
+# cadence on which somebody plausibly hand-edits a cluster" — assumes exactly that kind of real
+# operational population. This cluster has none.
+intervention_policy:
+  policy: observation-only
+  statement: >-
+    No subject's state is changed on purpose for any reason connected to this window, by the
+    operator or by an agent, for the whole of it. A drift event, if one is recorded, is organic or
+    it is not counted as this measurement's evidence.
+  rationale: >-
+    Build ticket 52 already draws this line for the synthetic substrate elsewhere in this
+    repository: a planted signal evidences detection mechanics only, never anticipation of the
+    world. The same split applies here — a deliberately caused divergence would show that the
+    probe and Flux can catch a change we already know we made, not whether divergence happens on
+    its own. The window's question, above, is about the latter.
+  named_limitation: >-
+    kind-driftwood has no real operator population performing routine maintenance. The window was
+    sized on the assumption that one exists. A null result at window close may mean "controls
+    hold" or may mean "nobody was here to cause the natural experiment this window expects" — the
+    instrument cannot distinguish the two, and observation-only does not resolve that; it only
+    refuses to paper over the gap with a manufactured event.
+  decided_by: Chris Nesbitt-Smith
+  recorded_on: '2026-08-13'

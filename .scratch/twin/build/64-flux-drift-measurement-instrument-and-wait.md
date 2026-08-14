@@ -88,3 +88,12 @@ it, so a cron in GitHub Actions would record an unreachable cluster every hour a
 The runner is operator cron on the machine holding the cluster, named in the window with its
 crontab line. That is a genuine weakness — a probe nobody runs produces a coverage hole, and the
 guard against it is that the hole is visible rather than that it cannot happen.
+
+**Observation-only, decided 2026-08-13, before the crontab was installed.** `window.yaml`'s
+`intervention_policy` addendum records it: no subject's state is deliberately changed for the
+whole window, mirroring the planter/detector split build ticket 52 already draws elsewhere in this
+repository. Named alongside it as a limitation rather than a fix: `kind-driftwood` has no real
+operator population doing routine maintenance, which is what the window's 91-day sizing assumed
+would eventually hand-edit something. A null result at close may mean "controls hold" or "nobody
+was here" — this instrument cannot tell the two apart, and observation-only does not resolve that,
+only refuses to manufacture a false answer to it.
