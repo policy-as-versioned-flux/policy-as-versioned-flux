@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 18 \u2014 build ticket 67 ticks the enactment capability's fourth criterion (graded enforcement and posture-as-identity), so the capabilities digest every artefact pins moves; no derivation changed",
-  "capabilities_digest": "78a038ede1d845a7d9014b80ab446162c4a9f014dc0724db17148b4bdfe868c6",
+  "authorised_by": "decision ticket 18 \u2014 build ticket 68 ticks the enactment capability's second criterion (multi-channel enactment sensing) and adds enactment signals, claims and a non-IT response to the intel fixture, so the capabilities digest and the model-repo pin both move; no derivation changed",
+  "capabilities_digest": "78b2e99f9b8a08f1c0af5872351047359749cf58c46915d51e13c831ddb14246",
   "digests": {
-    "blast-radius": "0e76b2c27f6f979908639659f17bde9c1a9cba170eefe42a99d2e1a0abe7cd1d",
-    "bound-signal": "83e54210a57bb384fc7114efe3322ce035fc65021dfc68bf2f278fe252528ab8",
-    "forecast-bundle": "f353e45c9d76d6fb83ffca48f6692f939441241e0cef3952aab68f3c5bb3c168",
-    "graph": "7369497af31a146e3edafb18997047227200cde0291d410929f35d288fd231e3",
-    "intervention": "e141934a79bd792231df4f84fdf42fc68a0e23f29302e73c31e59305b29257f1",
-    "observation": "7f1a7ef15c22d45d39f67851fca1cf3798727bed730d6da170421addfaf6693f",
-    "priced-impact": "06484657177c4d856ee9094edbc53621c6a4bfc8aed6930f79d4fbead52db42e",
-    "priced-option-set": "d21be54e07768e86edacd0fd1cb3e720449e10ea72659201b0932830a3975e7d",
-    "propagation": "108047e2616f19002d9146637666c7d05331147709e09e0e92930fd606a11cec",
-    "rewound-model": "9ff01e55cb3e84860ce857dabab273d1f422c389197d33b559f9e927e75eccd9",
-    "scenario-exposure": "db79e8d21848fa099451eb148772fe7b53589cebeeaeb92b2a1da5ba53027e43",
-    "score-card": "52cb800187ef07e9c4aa45c0990db7e44ca5e4e58eca14ca1b734c51d02ecf0b"
+    "blast-radius": "3bf1c3a564c4c365bd8a336945f362dce6f9ca820fa35e23c489f63bc427a3d4",
+    "bound-signal": "e6e14349c109ee62dc5a67e663f2494d56f82743ba08f4937d71ae0117af8d77",
+    "forecast-bundle": "1af00abd2e88158db63fe5f278def2e34b936e2a68f4ccbf89328896f5a38ea3",
+    "graph": "0b3e4e47e8b77ecaa230da361284e498474a5a84693c97650a9811a5b2ee6553",
+    "intervention": "8812b5c27a0c319958c64720095e4dd5368c8c76e12abc4be5240b4ea79f288f",
+    "observation": "15a1a663137911ed09865a3a9435b719925192a3cf7cde66dafd656ea627ab9b",
+    "priced-impact": "98ddb018a0f924eccf545cf30afa35f0899d49c678e96a00ab06014a3ab6c202",
+    "priced-option-set": "09c942ab73fffcf89d935166bde3464b29456434052d9bc876c11bc60b1ac72b",
+    "propagation": "783e48926a7ba5b3cf64dac5e98ca9d2e18edf02cf7a36be9d393cde1290cdc0",
+    "rewound-model": "699fcbfc724fbb1ff71429a6c4b0b20c88b84f8bf3685313fd5bda08dc01e0dc",
+    "scenario-exposure": "acfdd4421517a7b500dd7bcd03098e570d62bbf3e68710a3deb0deb10297d51f",
+    "score-card": "ed383fa70be846f7210c5964d6141fc838c06e8fafaa27cc79f8822f5ecac7c0"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

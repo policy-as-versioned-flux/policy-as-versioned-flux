@@ -11,7 +11,9 @@ criteria:
     ticked_by: build ticket 66
   - index: 2
     text: "A mechanism for non-IT enactment + tracking, or an explicit admission of blindness."
-    checked: false
+    checked: true
+    evidence: "The criterion offers a mechanism OR an admission of blindness, and build ticket 68 supplies the mechanism decision ticket 18 Q3 chose: enactment is SENSED, through channels, with corroboration setting the evidence grade. There is no non-IT tracking pipeline, because there is no enactment pipeline at all — a declaration and a payroll run are ordinary `signal` documents bound by ordinary `claim` documents, and `verbs.sense` walks a claim that binds to a response through the same loop as one that binds to a component, emitting the same `bound-signal` artefact (harness check `enactment_is_sensed_and_corroboration_sets_the_grade`). twin/enactment-channels.yaml is a versioned, CLOSED table of six channels; the closure is what makes 'no channel is privileged' structural, because privileging one would need a field and there is none. twin/corroboration.py refuses a table where any channel prices alone, computes the grade as the strongest single-channel rung strengthened one rung per INDEPENDENT channel, and counts every subject-declared channel as one between them — so a subject cannot corroborate itself by declaring twice, and an uncorroborated self-declaration cannot reach a price-eligible grade. The non-IT case is exercised rather than described: the fixture's `raise-the-tooling-team-retention-award` is a pay lever occupying no enforcement rung, tracked to grade 2 by a declaration corroborated by a cohort-level payroll run — the verification-substrate role of decision ticket 18 Q2, with nothing enforcing it. Decision ticket 18 Q3's own guard is run rather than restated: the payroll channel is the only one observing people at all, and the table is refused at load unless twin/ethics_gate.py admits it. WHERE THIS TICK STOPS, so a reader can disagree with it knowingly. Two limits, both real. First, the CHANNEL IS DECLARED AND NOT VERIFIED: nothing here checks that the merged change, the payroll run or the counter-signature exists, so the corroboration rule holds against a mislabelling declarant only to the extent that attribution deters one — an enactment claim is refused unless `claimed_by` is a registered role, the same discipline an `override` carries, which makes a mislabelled channel somebody's to answer for rather than anonymous. Second, this tracks whether a lever was pulled and grades how well that is evidenced; nothing yet CONSUMES the graded action state — no forecast branches on it and no mitigation credit requires it — which is criterion 5 and stays unchecked."
+    ticked_by: build ticket 68
   - index: 3
     text: "A verdict on policy-as-versioned-dependency: survives / survives-narrowed / rejected, on the risk basis."
     checked: true
@@ -25,3 +27,11 @@ criteria:
   - index: 5
     text: "The action-state feedback path that closes ticket 08's conditional-forecast loop."
     checked: false
+    # Deliberately unchecked after build ticket 68, which built the read side of this path and
+    # says so. `corroboration.state(overlay, response)` answers "was the recommendation acted
+    # upon, and how well is that evidenced" from the ordinary model. What closes decision ticket
+    # 08's loop is a CONSUMER: mitigation credit that requires an evidenced enactment, so that
+    # "the incident did not happen because of our control" needs both a graded reduction claim and
+    # a graded observation that the control was put in place. `twin/pricing.py` gates only the
+    # first today. Ticking this on the read side alone would be the constitution's own
+    # premature-done failure mode.

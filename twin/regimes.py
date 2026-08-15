@@ -275,12 +275,16 @@ def refuse_redacted_subject(
     withheld = {w["id"]: w for w in report["withheld"] if w["collection"] == "signals"}
     if not withheld:
         return
+    # The subject is resolved through `Overlay.forecast_subject`, never read off the claim. Build
+    # ticket 68 added a claim kind whose subject is a response, and `claim['component']` would have
+    # covered it by accident — silently, in the direction of under-refusing. Whether an enactment
+    # is about the subject matter is a decision, and it is taken in one place with its reason.
     named = sorted(
         {
             f"{claim['signal']} (dated {withheld[str(claim['signal'])]['dated']}, bound to "
-            f"{claim['component']} by {ident})"
+            f"{overlay.forecast_subject(claim)} by {ident})"
             for ident, claim in overlay.claims.items()
-            if str(claim.get("signal")) in withheld and str(claim.get("component")) in components
+            if str(claim.get("signal")) in withheld and overlay.forecast_subject(claim) in components
         }
     )
     if named:

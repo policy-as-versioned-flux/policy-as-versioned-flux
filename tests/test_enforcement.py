@@ -331,7 +331,9 @@ def test_a_lever_that_is_not_code_appears_as_occupying_no_rung(model_repo_dir: P
 def test_the_capability_now_ticks_decision_ticket_18s_fourth_criterion(caps: Capabilities) -> None:
     grade = caps.require("enactment")
     assert grade.owning_ticket == "18"
-    assert [c.index for c in grade.criteria if c.checked] == [1, 3, 4]
+    # This ticket's own criterion, and only that. The whole ticked list is asserted once, in
+    # tests/test_enact.py — asserting it here too makes every future tick a two-file edit.
+    assert 4 in {c.index for c in grade.criteria if c.checked}
 
 
 def _write_move(root: Path, ident: str, subject: str, by_role: str = "model-steward", org: str = "intel") -> None:

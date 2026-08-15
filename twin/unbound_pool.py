@@ -127,9 +127,18 @@ def pin(path: Path | None = None) -> dict[str, Any]:
 
 
 def unbound_ids(overlay: Overlay) -> set[str]:
-    """Every signal in this overlay with no `binding` claim naming it — the exact complement of
-    what `twin/verbs.py`'s `sense()` refuses to emit a bound-signal for."""
-    bound = {str(c["signal"]) for c in overlay.claims.values() if c.get("kind") == "binding"}
+    """Every signal in this overlay no claim binds — the exact complement of what
+    `twin/verbs.py`'s `sense()` refuses to emit a bound-signal for.
+
+    Read from the shared `SIGNAL_BINDING_KINDS` rather than from the literal `"binding"`: build
+    ticket 68 added a second kind that binds a signal, and a screen for the first one alone would
+    have put every sensed enactment into the decaying pool while `sense()` bound it happily.
+    """
+    from .schema import SIGNAL_BINDING_KINDS
+
+    bound = {
+        str(c["signal"]) for c in overlay.claims.values() if c.get("kind") in SIGNAL_BINDING_KINDS
+    }
     return set(overlay.signals) - bound
 
 

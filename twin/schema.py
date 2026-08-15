@@ -37,6 +37,17 @@ STRUCTURAL_EDGE, PERSON_EDGES = "needs", ("maintains", "knows", "owns")
 CAUSAL_EDGE = "influences"
 SIGNS = ("positive", "negative")
 EVIDENCE_GRADES = (1, 2, 3, 4, 5)
+# The claim kind whose subject is a **response** rather than a component (build ticket 68): it
+# observes that a lever was pulled, not that the world moved. Spelled once, here, beside the kinds
+# it joins — `twin/corroboration.py` re-exports it as that module's `KIND` rather than repeating
+# the literal, because a second spelling of a kind is a screen that silently stops matching.
+ENACTMENT = "enactment"
+# What a claim can be about.
+CLAIM_KINDS = ("binding", "position", "override", ENACTMENT)
+# The kinds that bind a **dated signal** to something. Named once here rather than left as a
+# literal in each reader, because a reader that screens for `"binding"` alone treats an enactment
+# signal as unbound — which is how it would end up in the decaying pool while being fully sensed.
+SIGNAL_BINDING_KINDS = ("binding", ENACTMENT)
 REGIMES = ("as-consumed", "as-knowable", "with-hindsight")
 CONTAMINATION = ("low", "high", "control")
 
@@ -598,16 +609,28 @@ SCHEMAS: dict[str, Schema] = {
     # `position` (evolution-judge's own inference, build ticket 44) or `override` (a human's
     # correction) claims a component's evolution position from *accumulated* evidence, not one
     # signal — `_refine_claim` below enforces which kind needs which field.
+    #
+    # `component` is optional for the same reason, and only since build ticket 68: an `enactment`
+    # claim binds its signal to a **response** rather than to a component, because what it observes
+    # is that a lever was pulled and not that the world moved. It is the same record type wearing a
+    # different subject — decision ticket 18 Q3 refuses a parallel one — so the kind-specific
+    # requirement moves into `_refine_claim` rather than the subject becoming a free-for-all.
     "claim": Schema(
         required={
             "id": ident,
-            "kind": one_of("binding", "position", "override"),
-            "component": ident,
+            "kind": one_of(*CLAIM_KINDS),
             "evidence_grade": evidence_grade,
             "claimed_by": text,
             "evidence": text,
         },
-        optional={"signal": ident, "confidence": unit_interval, "evolution_position": unit_interval},
+        optional={
+            "component": ident,
+            "response": ident,
+            "channel": ident,
+            "signal": ident,
+            "confidence": unit_interval,
+            "evolution_position": unit_interval,
+        },
     ),
     # A grade is immutable without one of these (build ticket 18). It records who moved it, when,
     # from what, to what and why — and the direction is *derived* from the two grades rather than
@@ -898,8 +921,58 @@ def _refine_claim(doc: dict[str, Any], where: str) -> None:
     attributable to a **registered role**, the same discipline `_refine_regrade` already applies
     to `by_role` — a correction free text could claim from anyone is not what "attributable to a
     role" means.
+
+    An `enactment` (build ticket 68) names a signal and a **response**, never a component, and
+    names the channel that observed it. It carries no `confidence`: corroboration across channels
+    is what sets the weight of an enactment, and a per-claim confidence would be a second knob
+    pointing at the same thing — the one an author reaches for when the computed grade is lower
+    than they wanted. Like an `override`, it is attributable to a **registered role**, and for a
+    sharper reason: the channel is a *declared* property of the claim, so mislabelling a
+    self-declaration as machine evidence is the cheap route to a price-eligible grade. Nothing
+    here can verify that the merged change or the payroll run exists, so what it can do instead is
+    make the labelling attributable rather than anonymous.
     """
+    from .corroboration import CorroborationError, refuse_disagreeing_grade
+    from .sign import SignatureError, role_ids
+
     kind = doc.get("kind")
+    if kind == ENACTMENT:
+        for field in ("signal", "response", "channel"):
+            if field not in doc:
+                raise SchemaError(
+                    f"{where}: an {ENACTMENT!r} claim must name the {field} it "
+                    f"{'binds' if field == 'signal' else 'observes'}"
+                )
+        for field in ("component", "evolution_position", "confidence"):
+            if field in doc:
+                raise SchemaError(
+                    f"{where}: an {ENACTMENT!r} claim declares {field}, which it does not have. It "
+                    "binds to a response rather than a component, and corroboration across "
+                    "channels is what weights it"
+                )
+        try:
+            known = role_ids()
+        except SignatureError as exc:  # pragma: no cover - a broken register is its own error
+            raise SchemaError(f"{where}: {exc}") from None
+        if str(doc["claimed_by"]) not in known:
+            raise SchemaError(
+                f"{where}: enactment claimed_by {doc['claimed_by']!r} is not in the role register "
+                f"(have: {', '.join(known)}). The channel is declared rather than verified, so "
+                "labelling a self-declaration as machine evidence is the cheap route to a price — "
+                "and a label free text could apply from anyone is nobody's to answer for"
+            )
+        try:
+            refuse_disagreeing_grade(doc, where)
+        except CorroborationError as exc:
+            raise SchemaError(str(exc)) from None
+        return
+    if "component" not in doc:
+        raise SchemaError(f"{where}: a {kind!r} claim must name the component it is about")
+    for field in ("response", "channel"):
+        if field in doc:
+            raise SchemaError(
+                f"{where}: a {kind!r} claim declares {field}, which only an {ENACTMENT!r} claim does"
+            )
     if kind == "binding":
         if "signal" not in doc:
             raise SchemaError(f"{where}: a 'binding' claim must name the signal it binds")

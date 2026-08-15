@@ -2894,6 +2894,183 @@ def _enforcement_is_a_spectrum_and_never_prices_a_rung(ctx: Context) -> str:
     )
 
 
+@harness_check("enactment_is_sensed_and_corroboration_sets_the_grade")
+def _enactment_is_sensed_and_corroboration_sets_the_grade(ctx: Context) -> str:
+    """Enactment reaches the model through the ordinary sensing path, and no channel prices alone (68).
+
+    A guard on the suite rather than an invariant, for the reason build tickets 66 and 67's are:
+    the constitution names sixteen invariants and may not grow a seventeenth without the
+    constitution changing first.
+
+    **The leg that matters is the one about self-corroboration.** Decision ticket 18 Q3 admits
+    declarations as sensor inputs precisely because corroboration is what sets the weight, and the
+    incentive that produces — be verifiable rather than be watched — survives only while a subject
+    cannot corroborate itself. So the assertion is that a claim set made entirely of the subject's
+    own channels never reaches a price-eligible grade, however many channels it uses and however
+    many times each one speaks.
+
+    **"No enactment-specific pipeline" is asserted structurally, not by a name screen.** The
+    assertion is that the same `sense()` call emits the same artefact kind for a signal that binds
+    to a component and for one that binds to a response, and that the enactment lives in the
+    overlay's ordinary `signals` and `claims` collections. A parallel pipeline would have to show
+    up as a second verb, a second artefact kind or a second collection, and there is none.
+    """
+    import copy
+
+    from .. import corroboration, evidence, verbs
+    from ..model import Overlay
+    from ..repo import ModelRepo
+    from ..schema import SchemaError, validate
+
+    CORROBORATED, SELF_DECLARED = "pin-the-tooling-image-set", "report-node-schedule-variance"
+    DECLARED_SIGNAL, COMPONENT_SIGNAL = "tooling-pins-declared-in-place", "foundry-segment-loss-disclosed"
+
+    # -- no channel prices alone, and a table where one does is refused ----------------------
+    channels = corroboration.channel_ids()
+    pricing_alone = sorted(c for c in channels if evidence.may_price(corroboration.alone_grade(c)))
+    if pricing_alone:
+        raise Violated(
+            f"channel(s) {', '.join(pricing_alone)} price alone. Every channel observes a proxy "
+            "for 'this response was enacted', and the step from proxy to enactment is unevidenced "
+            "in any single instance — a channel that skips corroboration makes the rule decorative"
+        )
+    scratch = ctx.tmp / "enactment-channels"
+    scratch.mkdir(parents=True, exist_ok=True)
+    for index, mutate in enumerate((
+        lambda d: d["channels"][1].update(alone=evidence.threshold()),
+        lambda d: d["channels"][0].update(required_for_price=True),
+        lambda d: next(c for c in d["channels"] if c["observes_people"]).pop("admission"),
+    )):
+        doc = copy.deepcopy(corroboration.table())
+        mutate(doc)
+        path = scratch / f"mutated-{index}.yaml"
+        path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+        try:
+            corroboration.table(path)
+        except corroboration.CorroborationError:
+            continue
+        raise Violated(
+            f"the channel table admitted mutation {index}: a channel that prices alone, a channel "
+            "carrying a field that could privilege it, or a channel that observes people and walks "
+            "no admission ladder. Each one is a rule this table exists to hold."
+        )
+
+    # -- a subject cannot corroborate itself, however many of its own channels it uses --------
+    doubled = copy.deepcopy(corroboration.table())
+    twin_channel = copy.deepcopy(next(c for c in doubled["channels"] if c["declared_by_subject"]))
+    twin_channel["channel"] = "self-declaration-elsewhere"
+    doubled["channels"].append(twin_channel)
+    doubled_path = scratch / "two-subject-channels.yaml"
+    doubled_path.write_text(yaml.safe_dump(doubled, sort_keys=False), encoding="utf-8")
+    self_only = corroboration.corroborate(
+        [
+            {"id": "one", "channel": "self-declaration"},
+            {"id": "two", "channel": "self-declaration"},
+            {"id": "three", "channel": "self-declaration-elsewhere"},
+        ],
+        doubled_path,
+    )
+    if self_only["independent_channels"] != 1 or self_only["may_price"]:
+        raise Violated(
+            f"three of the subject's own claims across two of its own channels reached "
+            f"{self_only['independent_channels']} independent channel(s) at grade "
+            f"{self_only['evidence_grade']}. A subject that can corroborate itself makes the "
+            "cheapest route to credit 'say it again', which inverts the whole incentive"
+        )
+
+    # -- reconciliation state is one channel among several ------------------------------------
+    machine = [c for c in channels if not corroboration.channel(c)["declared_by_subject"]]
+    if "reconciliation-state" not in machine or len(machine) < 2:
+        raise Violated(
+            "reconciliation state is not among the independent channels, or it is the only one — "
+            "either way build ticket 65's open verdict has been decided here by fiat"
+        )
+    def pair(other: str) -> int:
+        """The grade a declaration plus one machine channel reaches."""
+        graded = corroboration.corroborate(
+            [{"id": "a", "channel": "self-declaration"}, {"id": "b", "channel": other}]
+        )
+        return int(graded["evidence_grade"])
+
+    reconciled = pair("reconciliation-state")
+    differing = sorted(c for c in machine if c != "reconciliation-state" and pair(c) != reconciled)
+    if differing:
+        raise Violated(
+            f"swapping the reconciler for {', '.join(differing)} changes the grade, so "
+            "reconciliation state is privileged after all — before the verdict that would justify it"
+        )
+
+    # -- the fixture's two cases: corroborated prices, self-declared does not ------------------
+    repo = ModelRepo.open(ctx.repo_dir)
+    intel = Overlay.load(repo, "intel")
+    corroborated = corroboration.state(intel, CORROBORATED)
+    declared = corroboration.state(intel, SELF_DECLARED)
+    if not corroborated["may_price"] or corroborated["evidence_grade"] >= corroborated["strongest_alone"]:
+        raise Violated(
+            f"a response observed by {corroborated['independent_channels']} independent channel(s) "
+            f"grades {corroborated['evidence_grade']} against a strongest-alone of "
+            f"{corroborated['strongest_alone']} — corroboration buys nothing, so the channels are "
+            "a taxonomy rather than a mechanism"
+        )
+    if declared["may_price"]:
+        raise Violated(
+            "an uncorroborated self-declaration reached a price-eligible grade, so declaring that "
+            "you acted earns the same credit as being seen to"
+        )
+
+    # -- the grade is computed: no claim may name its own --------------------------------------
+    planted = {
+        "id": "an-enactment", "kind": "enactment", "signal": "a-signal", "response": "a-response",
+        "channel": "self-declaration", "evidence_grade": evidence.threshold(),
+        "claimed_by": "model-steward", "evidence": "They said so.",
+    }
+    try:
+        validate("claim", planted, "planted")
+    except SchemaError:
+        pass
+    else:
+        raise Violated(
+            "a self-declaration typed itself at a price-eligible grade. A claim free to name its "
+            "own rung makes the corroboration rule advisory"
+        )
+
+    # -- one verb, one artefact kind, one set of collections -----------------------------------
+    emitted = {
+        signal: verbs.sense(repo, ctx.caps, "intel", signal, verbs.command_for("sense", signal=signal))
+        for signal in (DECLARED_SIGNAL, COMPONENT_SIGNAL)
+    }
+    kinds = {artefact.kind for artefact in emitted.values()}
+    if kinds != {verbs.KIND_BOUND_SIGNAL}:
+        raise Violated(
+            f"sensing a component binding and an enactment produced {sorted(kinds)}. A second "
+            "artefact kind is a second pipeline wearing the first one's name"
+        )
+    for claim in corroboration.claims_for(intel, CORROBORATED):
+        if claim["id"] not in intel.claims or str(claim["signal"]) not in intel.signals:
+            raise Violated(
+                f"enactment claim {claim['id']!r} or its signal lives outside the overlay's "
+                "ordinary claims and signals collections — which is the parallel record type "
+                "decision ticket 18 Q3 refused"
+            )
+    if not emitted[DECLARED_SIGNAL].body["action_state"] or emitted[COMPONENT_SIGNAL].body["action_state"]:
+        raise Violated(
+            "the action state is emitted for the wrong signal: a component binding reports one, or "
+            "an enactment reports none. The loop's read side is the whole point of the ticket"
+        )
+
+    return (
+        f"{len(channels)} channels, none pricing alone ({len(machine)} independent of the "
+        f"subject); a table that prices alone, one carrying a privileging field and a "
+        f"people-observing channel with no admission ladder are all refused; three self-declared "
+        f"claims across two of the subject's own channels stay at 1 independent channel and grade "
+        f"{self_only['evidence_grade']}; the reconciler is interchangeable with "
+        f"{len(machine) - 1} other machine channel(s); the fixture's corroborated response grades "
+        f"{corroborated['evidence_grade']} from a strongest-alone of {corroborated['strongest_alone']} "
+        f"and prices, its self-declared one grades {declared['evidence_grade']} and does not; a "
+        f"claim naming its own grade is refused; both signal kinds sense to {verbs.KIND_BOUND_SIGNAL}"
+    )
+
+
 @harness_check("scheduled_emission_ignores_signal_presence")
 def _sweep_is_not_event_gated(ctx: Context) -> str:
     """A scheduled sweep emits the same volume twice running, nothing having changed (build ticket 09).

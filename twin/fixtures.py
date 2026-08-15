@@ -536,6 +536,175 @@ evidence: >-
   The two admission records, and the re-measured reduction at the new rung — the move does not
   inherit the credit claimed at the old one.
 """,
+    # A lever that is not code (build ticket 68). It occupies no enforcement rung, because there is
+    # no enforcement point to occupy — which is decision ticket 18 Q2's majority case, and the
+    # reason policy-as-versioned-dependency narrowed to being *a* channel rather than the shape of
+    # governance. It is still tracked, through the same sensing path as the machine-enforceable
+    # controls: the verification substrate, not the enactment channel.
+    "orgs/intel/responses/raise-the-tooling-team-retention-award.yaml": """\
+id: raise-the-tooling-team-retention-award
+name: Raise the retention award for the fab tooling engineering cohort
+addresses: foundry-services
+cost:
+  min: 1200000
+  mode: 1800000
+  max: 2600000
+note: >-
+  Not code, so it occupies no enforcement rung and carries no posture. It is enacted by a payroll
+  run and evidenced by one, which is the verification-substrate half of decision ticket 18 Q2:
+  a versioned, signed record that a lever was pulled, with nothing enforcing it.
+""",
+    # Enactment sensed through channels (build ticket 68, decision ticket 18 Q3). Six ordinary
+    # signals and six ordinary claims — no enactment collection, no enactment pipeline — carrying
+    # the three cases the corroboration rule exists to separate:
+    #
+    #   pin-the-tooling-image-set    a declaration corroborated by a reconciler: two independent
+    #                                channels, so the grade strengthens from 3 to 2 and prices.
+    #   raise-the-tooling-team-...   the non-IT lever, corroborated by a payroll run rather than by
+    #                                anything policy could enforce.
+    #   report-node-schedule-variance  the same party declaring twice: one independent channel
+    #                                however many times it speaks, so it stays at 4 and prices
+    #                                nothing.
+    "orgs/intel/signals/tooling-pins-declared-in-place.yaml": f"""\
+id: tooling-pins-declared-in-place
+date: '2026-04-10'
+steep: technological
+source: Platform team change record
+statement: >-
+  The fab tooling image set is now pinned to signed digests in every fab control-plane cluster.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/tooling-pins-declared
+""",
+    "orgs/intel/claims/enacted-pins-declared.yaml": """\
+id: enacted-pins-declared
+kind: enactment
+signal: tooling-pins-declared-in-place
+response: pin-the-tooling-image-set
+channel: self-declaration
+evidence_grade: 4
+claimed_by: model-steward
+evidence: >-
+  The platform team's own record that it pinned the image set. Nothing outside the subject
+  observed it, which is what the channel's rung is worth alone.
+""",
+    "orgs/intel/signals/fab-cluster-reconciled-against-pinned-source.yaml": f"""\
+id: fab-cluster-reconciled-against-pinned-source
+date: '2026-04-12'
+steep: technological
+source: Reconciler status report
+statement: >-
+  The fab control-plane cluster reports reconciled against the pinned policy source.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/fab-reconciled
+""",
+    "orgs/intel/claims/enacted-pins-reconciled.yaml": """\
+id: enacted-pins-reconciled
+kind: enactment
+signal: fab-cluster-reconciled-against-pinned-source
+response: pin-the-tooling-image-set
+channel: reconciliation-state
+evidence_grade: 3
+claimed_by: model-steward
+evidence: >-
+  The reconciler's own dated report. One channel among six and privileged by nothing: build
+  ticket 65's verdict on whether continuous proof of force is required at all is still open.
+""",
+    "orgs/intel/signals/retention-award-declared-made.yaml": f"""\
+id: retention-award-declared-made
+date: '2026-04-30'
+steep: economic
+source: Reward team change record
+statement: >-
+  The retention award for the fab tooling engineering cohort was raised at the April review.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/retention-declared
+""",
+    "orgs/intel/claims/enacted-retention-award-declared.yaml": """\
+id: enacted-retention-award-declared
+kind: enactment
+signal: retention-award-declared-made
+response: raise-the-tooling-team-retention-award
+channel: self-declaration
+evidence_grade: 4
+claimed_by: model-steward
+evidence: The reward team's own record that it raised the award.
+""",
+    "orgs/intel/signals/retention-award-in-the-payroll-run.yaml": f"""\
+id: retention-award-in-the-payroll-run
+date: '2026-05-06'
+steep: economic
+source: Payroll run summary
+statement: >-
+  The April payroll run for the fab tooling engineering cohort carries the raised award.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/retention-payroll
+""",
+    "orgs/intel/claims/enacted-retention-award-in-payroll.yaml": """\
+id: enacted-retention-award-in-payroll
+kind: enactment
+signal: retention-award-in-the-payroll-run
+response: raise-the-tooling-team-retention-award
+channel: payroll-record
+evidence_grade: 3
+claimed_by: model-steward
+evidence: >-
+  The cohort's payroll run, read at cohort level and never per person. A lever nothing can
+  enforce, evidenced anyway — which is the whole of the verification-substrate role.
+""",
+    "orgs/intel/signals/variance-reporting-declared-live.yaml": f"""\
+id: variance-reporting-declared-live
+date: '2026-05-01'
+steep: technological
+source: Gate review record
+statement: >-
+  Node schedule variance is now reported at every gate review.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/variance-declared
+""",
+    "orgs/intel/claims/enacted-variance-reporting-declared.yaml": """\
+id: enacted-variance-reporting-declared
+kind: enactment
+signal: variance-reporting-declared-live
+response: report-node-schedule-variance
+channel: self-declaration
+evidence_grade: 4
+claimed_by: model-steward
+evidence: The same party that owns the response stating that it enacted it.
+""",
+    "orgs/intel/signals/variance-reporting-declared-live-again.yaml": f"""\
+id: variance-reporting-declared-live-again
+date: '2026-05-20'
+steep: technological
+source: Gate review record
+statement: >-
+  Node schedule variance reporting is confirmed live at the following gate review.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/variance-declared-again
+""",
+    "orgs/intel/claims/enacted-variance-reporting-declared-again.yaml": """\
+id: enacted-variance-reporting-declared-again
+kind: enactment
+signal: variance-reporting-declared-live-again
+response: report-node-schedule-variance
+channel: self-declaration
+evidence_grade: 4
+claimed_by: model-steward
+evidence: >-
+  The second declaration, deliberately. A subject saying the same thing twice through the same
+  channel corroborates nothing, and this is the fixture that proves the rule bites.
+""",
     # Two perspectives over the same overlay (build ticket 26). Nothing here ranks them and
     # nothing defaults to the first: `twin exposure` with no `--perspective` reports both.
     "orgs/netflix/perspectives/the-operator.yaml": """\

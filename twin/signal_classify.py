@@ -177,7 +177,15 @@ def labelled_corpus(tmp_dir: Path) -> list[dict[str, Any]]:
     for org, (builder, component) in _ORGS.items():
         repo_dir = builder(tmp_dir / org)
         overlay = Overlay.load(ModelRepo.open(repo_dir), org)
-        claims_by_signal = {claim["signal"]: claim for claim in overlay.claims.values()}
+        # Binding claims only. This corpus measures a STEEP tag and a component binding, so a
+        # claim of any other kind is not a labelled item here — and reading `component` off one
+        # that has none (a `position`, or an `enactment` bound to a response) would raise rather
+        # than skip.
+        claims_by_signal = {
+            claim["signal"]: claim
+            for claim in overlay.claims.values()
+            if claim.get("kind") == "binding"
+        }
         for signal_id, signal in sorted(overlay.signals.items()):
             claim = claims_by_signal[signal_id]
             items.append(

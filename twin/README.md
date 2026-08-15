@@ -7,12 +7,12 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 66 of 78 build tickets closed, and one measuring against a clock that runs
+**This is 68 of 78 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
-rather than carried forward by hand — the previous banner, 64, was itself off by one the same way
-this file's own "What is honestly built" section repeatedly finds and corrects. The **denominator**
-was stale one round ago rather than the numerator: build ticket 78 was written after that banner
-and never joined the total, so 77 should have been 78. Same drift, other half of the fraction.)
+rather than carried forward by hand — the previous banner, 66, was two behind by the time it was
+read, because build ticket 67 closed without bumping it. That is the same drift this file's own
+"What is honestly built" section repeatedly finds and corrects, and the reason the count is a grep
+rather than a number somebody remembers to increment.)
 **Build ticket 66 built its refusal and did not close**, because criterion 1 is conjunctive and only
 its second half exists: no merge capability, at two layers, and no pull request opened. It was
 briefly marked done and then unmarked — see "Propose only, in two layers", below, for what is built
@@ -1014,6 +1014,98 @@ artefact and to the role binding, never to the commit.
 twin enforcement --repo <model-repo> --org intel --out posture.json
 ```
 
+## Enactment, sensed through channels
+
+Build ticket 68, from decision ticket 18 Q3. The question ticket 08 leaves open is **was the
+recommendation acted upon?**, and the answer is not a new record type. An enactment is an
+observation, and it reaches the model through the sensing path that already exists.
+
+**A declaration and a machine-verified fact are both sensor inputs.** Each is an ordinary `signal`
+document bound by an ordinary `claim`. The only thing that changed is what a claim can bind *to*: a
+`component`, as since build ticket 05, or a **response**, which is what an enactment observes. The
+`claim` schema gained a fourth kind rather than a parallel record type, `twin sense` walks both
+kinds through one loop, and both emit the same `bound-signal` artefact. There is no enactment
+ingest, no enactment verb and no enactment collection anywhere, and the suite asserts that absence
+rather than describing it.
+
+**Corroboration sets the grade.** `twin/enactment-channels.yaml` is a versioned, closed table of
+six channels. Each declares what it observes, whether the subject of the response is the one
+declaring it, and the rung it holds **alone**:
+
+| channel | alone | declared by the subject |
+|---|---|---|
+| `self-declaration` | 4 | yes |
+| `merged-change` | 3 | no |
+| `payroll-record` | 3 | no |
+| `counter-signed-contract` | 3 | no |
+| `pinned-policy-version` | 3 | no |
+| `reconciliation-state` | 3 | no |
+
+The grade is the strongest single-channel rung, **strengthened one rung per independent channel
+beyond the first**, floored at rung 1. Two channels agreeing is the ladder's own grade 2 — the same
+relationship observed across more than one instance — and three is grade 1. The rule is a reading
+of the evidence ladder, not a second ladder beside it.
+
+**No channel prices alone, and the loader refuses a table where one does.** Every channel observes
+a *proxy* for the claim being graded. The claim is "this response was actually enacted"; the
+proxies are a declaration, a merged change, a payroll line, a counter-signature, a moved pin, a
+reconciler's report. The step from proxy to enactment is a mechanism nobody has evidenced in this
+instance, which is grade 3's own distinction. The acceptance criterion asks only that an
+uncorroborated *self-declaration* cannot price; making it a rule about every channel is stronger,
+simpler, and removes the argument about which channel deserves the exemption.
+
+**A subject cannot corroborate itself.** Every subject-declared channel counts as **one** between
+them, so a set that is entirely self-declared never strengthens and never reaches a price-eligible
+grade. Without that, the cheapest route to credit for acting would be to declare twice — which
+inverts the incentive the whole mechanism exists to set. What survives is the one decision ticket
+18 Q3 wanted: **be verifiable rather than be watched.** A declaration corroborated by a reconciler
+grades higher than either alone, and nobody had to be monitored to get there.
+
+**Reconciliation state is one row of six.** Build ticket 65 pre-registered whether the risk basis
+requires *continuous* proof of force, and its verdict cannot be read until the window closes on
+2026-11-06. A channel graded up ahead of that verdict would be this repository deciding the answer
+by fiat; graded down is the same act in the other direction. So the suite swaps the reconciler for
+every other machine channel and asserts the grade does not move — and the table is **closed**, which
+is what makes "not privileged" structural: privileging a channel needs a field, and there is none.
+
+**The surveillance guard is run, not restated.** Decision ticket 18 Q3 attaches one: multi-channel
+sensing does not licence sensing people to verify enactment, which still passes decision ticket
+15's ladder. `payroll-record` is the only channel that observes people at all — at cohort level,
+never per person — so it carries an admission block, and the table is refused at load unless
+`twin/ethics_gate.py` admits it. A channel that observes nobody and carries one is refused too: a
+gate applied where it was not needed is how it stops being read where it is.
+
+The fixture carries the three cases the rule exists to separate. `pin-the-tooling-image-set` is a
+declaration corroborated by a reconciler — two independent channels, grade 2, and it prices.
+`raise-the-tooling-team-retention-award` is a **lever that is not code**, occupying no enforcement
+rung because there is no enforcement point to occupy, tracked to grade 2 by a declaration and a
+payroll run: the verification-substrate half of decision ticket 18 Q2, with nothing enforcing it.
+`report-node-schedule-variance` is the same party declaring twice, which stays at grade 4 and
+prices nothing.
+
+**The channel is declared, not verified — so it is attributable.** `channel` is a free identifier,
+and nothing here checks that the merged change or the payroll run exists. The cheap route past "a
+subject cannot corroborate itself" would therefore be to declare, then file your own
+`merged-change` claim. What the schema can do it does: an enactment claim is attributable to a
+**registered role**, the same discipline an `override` already carries. A mislabelled channel is
+somebody's to answer for rather than anonymous, and the limit is stated rather than papered over.
+
+**An enactment is evidence about no component, and one place says so.** `Overlay.forecast_subject`
+is the single decision about what a claim is evidence *about* — the as-consumed refusal reads it
+rather than reaching for `claim["component"]`. For an enactment it returns `None`: a response
+`addresses` a component, but an execution reads components, world models and propositions and
+never reads a response, so a dated enactment cannot change what an execution answers. Decision
+ticket 18's AC 5 is what changes that, and the method records it.
+
+**What this does not do.** It answers whether a lever was pulled and grades how well that is
+evidenced. Nothing yet *consumes* the graded action state — no forecast branches on it, and
+mitigation credit does not require it — which is decision ticket 18's AC 5 and stays unticked. See
+"What is honestly built", below.
+
+```bash
+twin sense --repo <model-repo> --org intel --signal tooling-pins-declared-in-place
+```
+
 ## Whose £
 
 The £ is perspectival: it belongs to whoever pays to run the twin. A perspective declares who pays,
@@ -1585,9 +1677,9 @@ reaches `full`, and nothing can be typed as `full`.
 | `forecast-book` | 21 | partial | 5 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
-| `enactment` | 18 | partial | 3 / 5 |
+| `enactment` | 18 | partial | 4 / 5 |
 
-**38 of 69**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**39 of 69**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
 there"** — the strongest capability here stands at six ticks, and one of the twelve still stands at
 one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
@@ -1599,16 +1691,27 @@ claim-scope statement — narrated above).
 **`enactment` is a new row (build ticket 66) against a decision ticket — 18 — that had no
 capability file at all before it**, the third time that gap has been found and filled rather than
 left empty (build ticket 47 for decision ticket 15, build ticket 63 for decision ticket 10). It
-ticks two of the five: AC 1 (act-vs-propose decided, with the boundary stated) and AC 3 (the verdict
-on policy-as-versioned-dependency, realised in code rather than restated — `--channel` admits
-exactly the two narrowed roles and has no default). The other three stay unticked and are named
-work: ACs 2 and 5 are build ticket 68's multi-channel enactment sensing. The denominator grew by
+ticked two of the five on the day it was created: AC 1 (act-vs-propose decided, with the boundary
+stated) and AC 3 (the verdict on policy-as-versioned-dependency, realised in code rather than
+restated — `--channel` admits exactly the two narrowed roles and has no default). The other three
+were unticked and named work; build tickets 67 and 68 have since taken two of them, below. The denominator grew by
 five and the numerator by two, so the fraction moved **down**, from 35/64 to 37/69. That is the
 arithmetic behaving correctly: a new capability file admits its own unbuilt criteria into the count
 on the day it is created.
 
+**Build ticket 68 ticks AC 2**, the mechanism for non-IT enactment and tracking, moving the row to
+4/5 and the table to 39/69. The criterion offers a mechanism *or* an admission of blindness, and
+the mechanism is the one decision ticket 18 Q3 chose: enactment is sensed, through channels, with
+corroboration setting the grade. **AC 5 stays unchecked on purpose.** The ticket built the *read*
+side of the action-state path — `corroboration.state(overlay, response)` answers "was the
+recommendation acted upon, and how well is that evidenced" — and what closes decision ticket 08's
+loop is a *consumer*: mitigation credit that requires an evidenced enactment, so that "the incident
+did not happen because of our control" needs both a graded reduction claim and a graded observation
+that the control was ever put in place. `twin/pricing.py` gates only the first. Ticking AC 5 on the
+read side alone is the constitution's own premature-done failure mode, named rather than committed.
+
 **Build ticket 67 ticks AC 4**, the verdict on graded enforcement and posture-as-identity, moving
-the row to 3/5 and the table to 38/69. Both halves are realised rather than restated: the rung
+the row to 3/5 and the table to 38/69 at the time. Both halves are realised rather than restated: the rung
 ladder carries no number and the same control is one `Option` at every rung, so graded enforcement
 genuinely needs no special status; and posture-as-identity is computed from two declared facts with
 no field to declare it, five unsupported cases named as excluded. Where that tick stops is written
@@ -1919,7 +2022,14 @@ layer's named failure mode) and `enforcement_is_a_spectrum_and_never_prices_a_ru
 the sharper leg — the same control produces an identical `Option` at the loosest and the tightest
 rung, so a rung cannot reach the £ at all; posture-as-identity is asserted as computed rather than
 declarable, with the fixture's controls landing on both sides of the line; and a rung tightened in
-a commit with no move record is caught in git history, where the chain check cannot see it).
+a commit with no move record is caught in git history, where the chain check cannot see it) and
+`enactment_is_sensed_and_corroboration_sets_the_grade` (build ticket 68: no channel prices alone
+and three mutations of the channel table are each refused; the leg that matters is
+self-corroboration — three of the subject's own claims across two of its own channels stay at one
+independent channel and never price; the reconciler is asserted interchangeable with every other
+machine channel, because build ticket 65's verdict is not readable yet; and "no
+enactment-specific pipeline" is asserted structurally rather than by a name screen — one verb, one
+artefact kind, and the enactment living in the overlay's ordinary signals and claims).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared
@@ -2214,6 +2324,15 @@ Named here so the skeleton cannot quietly become the definition of done.
   Metaculus is reachable from this offline suite, and only decision ticket 21 AC 6's own
   proportionality verdict — is it worth building at this coverage — stays open, a judgement rather
   than a code artefact.
+- **The action-state loop has a read side and no consumer.** Build ticket 68 grades whether a
+  response was actually enacted, from the channels that observed it. Nothing reads that grade to
+  change a number: `twin/pricing.py` gates mitigation credit on the *reduction* claim's own
+  evidence grade and never asks whether the control was ever put in place, so "the incident did not
+  happen because of our control" still rests on one graded claim rather than two. That wiring is
+  what closes decision ticket 08's conditional-forecast loop and is why decision ticket 18's AC 5
+  is unticked. It is a larger change than it looks: every fixture response and the pocket-org
+  worksheet would have to be re-derived, because a response with no enactment observation at all
+  currently earns full credit.
 
 ## Layout
 
@@ -2270,6 +2389,10 @@ twin/
   enforcement.py  the enforcement rungs, the move record, and posture-as-identity computed
                   from two declared facts rather than declared by anybody
   enforcement-grades.yaml   the versioned rung ladder — and no number anywhere on it
+  corroboration.py the enactment sensor channels, and the grade computed across them — no
+                  channel prices alone, and a subject cannot corroborate itself
+  enactment-channels.yaml   the versioned, closed channel table — closed so that no channel can
+                  be given a status the others have not got
   grades.py       depth grades as computed checklists
   worksheet.py    the pocket-org worksheet, parsed and checked
   pocket-org-worksheet.md   the hand-computed yardstick — authored, and the authority

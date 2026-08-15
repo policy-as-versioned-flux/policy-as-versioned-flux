@@ -258,6 +258,7 @@ class Overlay:
                     ) from None
         self._check_scenarios()
         self._check_responses()
+        self._check_enactment_claims()
         self._check_enforcement_moves()
         self._check_own_data()
         self._check_causal_accounts()
@@ -338,6 +339,61 @@ class Overlay:
                     f"response {ident!r} says it crosses {', '.join(unknown)}, which no universal "
                     "constraint and no perspective in this overlay declares. A red line nobody "
                     "declared filters nothing, so this option would survive every pre-filter."
+                )
+
+    def forecast_subject(self, claim: dict[str, Any]) -> str | None:
+        """The component a claim is evidence *about*, or `None` if it is evidence about no
+        component (build ticket 68).
+
+        One place decides this, rather than each reader reaching for `claim["component"]` and
+        silently covering only the kinds its author had in mind. `twin/regimes.py`'s post-T
+        refusal is the caller that matters: it refuses an as-consumed execution when a withheld
+        fact is about something the scenario forecasts, and a reader that resolved the subject
+        itself would quietly stop covering the next kind somebody adds.
+
+        **An `enactment` returns `None`, deliberately.** It says a response was enacted. A
+        response `addresses` a component, but that names what the lever acts *on* — it does not
+        make the observation evidence about that component's state, and an execution reads
+        components, world models and propositions and never reads a response at all. So a dated
+        enactment cannot change what an execution answers, and refusing the run over one would
+        refuse a fact nothing could have consumed.
+
+        **What changes this:** decision ticket 18's AC 5, when a forecast becomes conditional on
+        whether a response was enacted. At that point an enactment *is* about the subject matter,
+        and this method must return the response's component. It is unticked today, which is why
+        this returns `None` and says so rather than leaving the question unasked.
+        """
+        from .corroboration import KIND as ENACTMENT
+
+        if str(claim.get("kind")) == ENACTMENT:
+            return None
+        component = claim.get("component")
+        return str(component) if component else None
+
+    def _check_enactment_claims(self) -> None:
+        """An enactment claim names a response and a signal that exist here (build ticket 68).
+
+        Checked at load rather than where it bites, for the reason `_check_scenarios` is: an
+        enactment claim naming a response nobody declared would corroborate a phantom, and the
+        corroborated grade would climb on channels observing nothing.
+        """
+        from .corroboration import KIND as ENACTMENT
+
+        for ident, claim in sorted(self.claims.items()):
+            if str(claim.get("kind")) != ENACTMENT:
+                continue
+            response_id = str(claim["response"])
+            if response_id not in self.responses:
+                known = ", ".join(sorted(self.responses)) or "none"
+                raise ModelError(
+                    f"claim {ident!r} observes response {response_id!r} being enacted, and this "
+                    f"overlay declares no such response (have: {known})"
+                )
+            signal_id = str(claim["signal"])
+            if signal_id not in self.signals:
+                raise ModelError(
+                    f"claim {ident!r} binds signal {signal_id!r}, which is not a signal in this "
+                    "overlay — an enactment is a dated observation like any other"
                 )
 
     def _check_regrades(self) -> None:

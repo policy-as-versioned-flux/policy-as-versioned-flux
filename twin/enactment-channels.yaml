@@ -1,0 +1,182 @@
+# The enactment sensor channels (build ticket 68), from decision ticket 18 Q3.
+#
+# An enactment is not a new record type. It is an observation, bound to the **Response** the way a
+# signal binds to a Component, and it reaches the model through the ordinary sensing path. What
+# this file adds is the one thing that path does not already carry: **which channel observed it**,
+# and what a single channel is worth on its own.
+#
+# The claim every channel bears on is the same one: **"this response was actually enacted."** No
+# channel observes that directly. Each observes a *proxy* — a declaration, a merged change, a
+# payroll line, a counter-signature, a moved pin, a reconciler's report — and the step from proxy
+# to enactment is a mechanism nobody has evidenced *in this instance*. That is why no channel
+# prices alone, and the loader refuses a table where one does.
+#
+# Corroboration is what earns the grade. Several channels agreeing is worth more than any of them
+# alone, and the incentive that falls out of it is the point: **be verifiable rather than be
+# watched**. If a declaration and a reconciler agree, nobody has to be monitored.
+#
+# Versioned. Bump `version` in the same commit as any change to `channels` or to the corroboration
+# rule. Every artefact that grades against this table records the version and the digest it graded
+# against, so changing what a channel is worth is as visible as changing the evidence ladder.
+#
+# The table is **closed**: `twin/corroboration.py` refuses a key it does not declare. That is what
+# makes "no channel is privileged" structural rather than a promise — there is no field by which
+# one channel could outrank another, so reconciliation state is one row among six whatever build
+# ticket 65's verdict turns out to be.
+schema: twin.enactment-channels/v1
+version: 1
+
+channels:
+  - channel: self-declaration
+    name: A declaration by the party that owns the response
+    declared_by_subject: true
+    observes_people: false
+    alone: 4
+    observes: >-
+      Somebody in a role states that the response was enacted. Nothing outside the subject
+      observed it, and nothing outside the subject could contradict it.
+    alone_because: >-
+      Grade 4 is the rung for a judgement recorded explicitly AS judgement and never as an
+      observation, attributable to a named role — which is exactly what a declaration is. The
+      rung's written criterion says `calibration-trained estimator`, and a declarant is not
+      necessarily one; that is a stated imperfection in the fit, not a hidden one. What the rung
+      is chosen for is the property the decision needs: an unverified assertion carries no number.
+    example: >-
+      The platform team records that the tooling image set is now pinned in every fab cluster.
+
+  - channel: merged-change
+    name: A merged change in the repository that carries the lever
+    declared_by_subject: false
+    observes_people: false
+    alone: 3
+    observes: >-
+      A pull request that carries the response landed, at a date, in a repository somebody else
+      controls the merge button on.
+    alone_because: >-
+      The mechanism is real and well established — merging is how a change to a versioned
+      dependency ships — but whether it operated here is not evidenced by the merge. A change can
+      land and never be consumed, which is grade 3's own distinction: the mechanism is real,
+      whether it operates in this organisation is not evidenced.
+    example: >-
+      The pull request raising the policy version merged on a date recorded in the repository.
+
+  - channel: payroll-record
+    name: A payroll change recording that a non-IT lever was enacted
+    declared_by_subject: false
+    observes_people: true
+    alone: 3
+    observes: >-
+      The payroll system records, at cohort level, that a pay award the response proposed was
+      actually made. Never an individual's pay, and never anybody's pay over time.
+    alone_because: >-
+      A payroll line evidences that money moved, at a date. Whether the lever the response
+      described is what moved it is the unevidenced step, so the same grade-3 reading applies as
+      to a merged change.
+    example: >-
+      The pay award the retention response proposed appears in the cohort's payroll run.
+    # Decision ticket 18 Q3's guard, run rather than restated: multi-channel sensing does not
+    # licence sensing people to verify enactment. This channel is the only one here that observes
+    # people at all, so it walks decision ticket 15's admission ladder and the DPIA triage, and
+    # `twin/corroboration.py` refuses the table if `twin/ethics_gate.py` does not admit it.
+    admission:
+      sensor:
+        id: payroll-record
+        name: Cohort-level payroll confirmation that a pay lever was enacted
+      purpose:
+        scenario: insider-coercion
+        will_act: true
+      necessity:
+        kind: structural
+        level: aggregate
+        alternatives:
+          - kind: behavioural
+            level: individual
+          - kind: behavioural
+            level: cohort
+      proportionality:
+        intrusion_cost: 0.1
+        value_illuminated: 0.6
+      dpia:
+        channels: []
+        profiling: false
+        financial_loss_risk: false
+        complete: false
+
+  - channel: counter-signed-contract
+    name: A contract counter-signed by a party that is not the subject
+    declared_by_subject: false
+    observes_people: false
+    alone: 3
+    observes: >-
+      An agreement carrying the response was signed by somebody with an interest in it being
+      true, at a date, and that party would not sign a thing that had not happened.
+    alone_because: >-
+      A counter-signature evidences an agreement, not an operation. The supplier switch is
+      contracted; whether it is running is the step nothing here observes.
+    example: >-
+      The replacement supplier's contract is counter-signed and dated.
+
+  - channel: pinned-policy-version
+    name: A consuming repository's dependency pin moved to the version carrying the control
+    declared_by_subject: false
+    observes_people: false
+    alone: 3
+    observes: >-
+      A repository that consumes the policy dependency now pins the version that carries this
+      control, read out of that repository's own committed sources.
+    alone_because: >-
+      This is the enactment channel decision ticket 18 Q2 narrowed policy-as-versioned-dependency
+      down to, and it evidences what a repository DECLARES it consumes. `twin/enact.py` already
+      states the limit that keeps it at grade 3: every pin in this estate names a tag and no
+      commit, so the pin is as immutable as the tag, and nothing here verifies a signature.
+    example: >-
+      driftwood's GitRepository pin moves to the platform tag that carries the pinned image set.
+
+  - channel: reconciliation-state
+    name: A continuous reconciler reporting the cluster matches its declared source
+    declared_by_subject: false
+    observes_people: false
+    alone: 3
+    observes: >-
+      A reconciliation loop reports, at a date, that the running state matches the source the
+      pinned version declares.
+    alone_because: >-
+      Deliberately the same rung as every other machine channel, and this is the row where that
+      matters most. Build ticket 65 pre-registered whether the risk basis requires CONTINUOUS
+      proof of force, and its verdict is not readable until the window closes on 2026-11-06. A
+      channel graded up in advance of that verdict would be this repository deciding the answer
+      by fiat; a channel graded down would be the same act in the other direction. So it is one
+      row among six, and the table is closed against a field that could make it more.
+      The rule that no channel prices alone applies here too, and it is worth saying why that is
+      not build ticket 65's question answered early: this table grades "was this response
+      enacted", and the unevidenced step is proxy-to-enactment, which every channel has. Build
+      ticket 65 asks whether a priced impact's causal path needs an interval-shaped hop evidenced
+      continuously. Reconciliation state answering the second question well would still not make
+      it answer the first one alone.
+    example: >-
+      Flux reports the fab cluster reconciled against the pinned policy source.
+
+# How the channels compose. The prose says what the rule is; `step_rungs` is the number the code
+# actually applies, so the two cannot disagree about the step size — `twin/corroboration.py` reads
+# the field and refuses a table whose step would move nothing.
+corroboration:
+  rule: >-
+    Start at the strongest single-channel grade among the channels that observed this response,
+    then strengthen one rung for every INDEPENDENT channel beyond the first, floored at the
+    ladder's strongest rung. Channels the subject declares count once between them, so declaring
+    the same thing twice corroborates nothing.
+  step_rungs: 1
+  reading: >-
+    Two independent channels agreeing is the ladder's own grade 2 — the same relationship
+    observed across more than one instance — and three is grade 1, a dated change with
+    observable data on more than one side of it. The rule is a reading of the ladder, not a
+    second ladder.
+  self_corroboration: >-
+    A subject cannot corroborate itself. Every channel with `declared_by_subject: true` counts as
+    one channel between them, so a set that is entirely self-declared never strengthens and never
+    reaches a price-eligible grade. That is the acceptance criterion made structural rather than
+    checked at the point of use.
+  absence: >-
+    No channel having observed a response is NOT an enactment at a weak grade. It is no
+    observation at all, and it is reported as such — a grade would say we looked and found
+    something thin, and nobody looked.

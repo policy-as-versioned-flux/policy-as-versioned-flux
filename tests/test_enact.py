@@ -196,5 +196,6 @@ def test_the_capability_is_graded_against_decision_ticket_18(caps: Capabilities)
     grade = caps.require(enact.CAPABILITY)
     assert grade.owning_ticket == "18"
     assert grade.grade == "partial"
-    # Criterion 4 is build ticket 67's, ticked beside these two rather than by this ticket.
-    assert [c.index for c in grade.criteria if c.checked] == [1, 3, 4]
+    # Criteria 2 and 4 are build tickets 68 and 67's, ticked beside these two rather than by this
+    # ticket. Criterion 5 stays unchecked: nothing consumes the graded action state yet.
+    assert [c.index for c in grade.criteria if c.checked] == [1, 2, 3, 4]

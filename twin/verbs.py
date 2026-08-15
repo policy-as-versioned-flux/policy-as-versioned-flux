@@ -22,7 +22,7 @@ from .canon import digest_of, sha256_hex
 from .grades import Capabilities
 from .model import ModelError, Overlay
 from .repo import ModelRepo
-from .schema import REGIMES
+from .schema import REGIMES, SIGNAL_BINDING_KINDS
 from . import (
     admission as admission_mod,
     affected_parties as affected_parties_mod,
@@ -42,6 +42,11 @@ from .pert import PertError, Triple
 from .severity import Severity, SeverityError
 
 CAPS_SENSE = ["domain-model", "provenance", "sense-move"]
+# Added to `sense`'s set when a signal binds to a response rather than a component (build ticket
+# 68). One capability rather than a set of its own: an enactment observation is the sensing
+# capability's machinery pointed at a different subject, and only the corroborated grade is
+# enactment's own work.
+CAPS_ENACTMENT = ["enactment"]
 CAPS_RUN = ["domain-model", "provenance", "scenario-engine"]
 CAPS_SCORE = ["domain-model", "provenance", "sense-move"]
 # The graph now carries causal edges and a Wardley map, so the causal layer is one of the
@@ -167,6 +172,16 @@ def _substrate_ref(doc: dict[str, Any], where: str) -> str | None:
 
 
 def sense(repo: ModelRepo, caps: Capabilities, org: str, signal_id: str, command: list[str]) -> Artefact:
+    """One dated signal, and everything it binds to.
+
+    **Build ticket 68 widened the subject, not the pipeline.** A signal binds to a component
+    (`binding`) or to a response (`enactment`), and both walk this one loop. A declaration that a
+    lever was pulled and a reconciler's report that it is running are ordinary signals with
+    ordinary claims; there is no enactment ingest anywhere, and this function is the reason there
+    does not need to be.
+    """
+    from . import corroboration
+
     overlay = Overlay.load(repo, org)
     signal = overlay.signals.get(signal_id)
     if signal is None:
@@ -174,10 +189,27 @@ def sense(repo: ModelRepo, caps: Capabilities, org: str, signal_id: str, command
         raise VerbError(f"no signal {signal_id!r} in overlay {org!r} (have: {known})")
 
     bindings = []
+    responses: set[str] = set()
     for claim_id, claim in sorted(overlay.claims.items()):
-        if claim.get("kind") != "binding" or claim.get("signal") != signal_id:
+        kind = str(claim.get("kind", ""))
+        if kind not in SIGNAL_BINDING_KINDS or claim.get("signal") != signal_id:
             continue
         grade = int(claim.get("evidence_grade", 0))
+        held = {
+            "claim": claim_id,
+            "kind": kind,
+            "evidence_grade": grade,
+            "claimed_by": claim.get("claimed_by"),
+            "evidence": claim.get("evidence"),
+        }
+        if kind == corroboration.KIND:
+            # The grade here is what one channel is worth alone, and the schema already refused a
+            # claim that disagreed with the table. What the response is actually graded at is
+            # computed below, across every channel that has observed it.
+            response_id = str(claim["response"])
+            responses.add(response_id)
+            bindings.append({**held, "response": response_id, "channel": str(claim["channel"])})
+            continue
         if grade != 5:
             # Skills sit upstream of this seam: their output is a committed grade-5 claim file,
             # and from the CLI's point of view it is just input.
@@ -186,28 +218,38 @@ def sense(repo: ModelRepo, caps: Capabilities, org: str, signal_id: str, command
                 "binding claims are grade 5 by construction"
             )
         component_id = str(claim.get("component", ""))
-        component = overlay.component(component_id)
+        overlay.component(component_id)  # resolved for the refusal, not for the value
         bindings.append(
             {
-                "claim": claim_id,
+                **held,
                 "component": component_id,
                 "component_layer": "overlay" if component_id in overlay.components else "world",
-                "evidence_grade": grade,
-                "claimed_by": claim.get("claimed_by"),
-                "evidence": claim.get("evidence"),
                 "confidence": claim.get("confidence"),
             }
         )
     if not bindings:
         raise VerbError(f"signal {signal_id!r} has no binding claim; an unbound signal does not sense")
 
+    # The action state of every response this signal bears on, computed across *all* channels
+    # rather than only this signal's — the answer to "was the recommendation acted upon?" is a
+    # property of the response, and one channel's observation is never the whole of it.
+    action_state = [corroboration.state(overlay, response_id) for response_id in sorted(responses)]
+
     return Artefact(
         kind=KIND_BOUND_SIGNAL,
         mark=DERIVED,
         command=command,
         pins=_pins(repo, overlay, caps, _substrate_ref(signal, f"signal {signal_id}")),
-        depth=caps.depth_block(CAPS_SENSE),
-        body={"signal": signal, "bindings": bindings},
+        # The enactment capability's depth travels with the artefact only when it produced part of
+        # it. A signal that binds to components alone is the sensing capability's own output and
+        # says so, rather than carrying a grade for work it did not do.
+        depth=caps.depth_block(CAPS_SENSE + (CAPS_ENACTMENT if action_state else [])),
+        body={
+            "signal": signal,
+            "bindings": bindings,
+            "action_state": action_state,
+            "channels": corroboration.published() if action_state else None,
+        },
     )
 
 
