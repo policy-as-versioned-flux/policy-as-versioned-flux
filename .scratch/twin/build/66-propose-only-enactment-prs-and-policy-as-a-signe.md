@@ -30,15 +30,96 @@ Cedar if a policy layer is wanted, and treat action-boundary monitoring as the *
 
 **Blocked by:** 65
 
-**Status:** ready-for-agent
+**Status:** refusal built, **PR CHANNEL NOT WIRED** — 2026-08-15. The same honest split build
+tickets 64 and 78 carry. Criterion 1 is conjunctive and only its second half exists: nothing in
+`twin/` opens a pull request, so the ticket does not close on a criterion it has half-built. The
+precedent is build ticket 54, which built the retention half of a conjunctive criterion on purpose
+and left the tick to 55 once the promotion half genuinely existed beside it.
 
 **Reading list:** Decision ticket 18 (enactment arm). Spec stories 80, 81, 82.
 
-- [ ] The twin opens PRs and has no merge capability, structurally.
-- [ ] **A second layer at the tool-call boundary**, so the guarantee survives the twin gaining a shell tool, an MCP GitHub server or a subagent with `gh`. Structural absence alone does not survive composition.
-- [ ] The two layers are stated as layers, with the failure mode of each named: an absence has no call site to forget, and a policy check is a call site that can be forgotten.
+- [ ] The twin opens PRs and has no merge capability, structurally. **Half.** No merge capability is
+      built and asserted at two layers. Opening a pull request is not: `twin propose` emits an
+      `enactment-proposal` artefact and nothing in `twin/` has touched a live repository. Wiring
+      the channel needs a reachable remote and an authorised push, which is an outward-facing act
+      this ticket did not take.
+- [x] **A second layer at the tool-call boundary**, so the guarantee survives the twin gaining a shell tool, an MCP GitHub server or a subagent with `gh`. Structural absence alone does not survive composition.
+- [x] The two layers are stated as layers, with the failure mode of each named: an absence has no call site to forget, and a policy check is a call site that can be forgotten.
 - [ ] Policy ships as a signed, version-pinned dependency consumed by real separate repositories.
-- [ ] Agent signatures on proposals assert origin only; no proposal carries implied endorsement.
-- [ ] The narrowed claim is written into the artefact: this is one enactment arm among many.
-- [ ] Extends the invariant suite; never weakens it. Any invariant change names the invariant and cites the authorising decision ticket.
-- [ ] Declares its depth grade as a **computed checklist** against the owning decision ticket's acceptance criteria — `full` is derived from the checklist, never asserted.
+      **Read and reported, with two words qualified.** Six cross-repository pins across three
+      consumers are real and version-pinned. **Signed** is the sources' own declaration and is
+      verified by nothing here — no tag checked, no Rekor entry looked up, and
+      `estate/verify/provenance/verify-provenance.sh` records that this repository's own commits are
+      not keyless-signed either. **Separate** is true by URL and not yet by existence:
+      `estate/README.md` describes a monorepo-style working tree whose directories become their own
+      repositories *at split*. Both are stated as limits inside the artefact rather than asserted.
+- [x] Agent signatures on proposals assert origin only; no proposal carries implied endorsement.
+- [x] The narrowed claim is written into the artefact: this is one enactment arm among many.
+- [x] Extends the invariant suite; never weakens it. Any invariant change names the invariant and cites the authorising decision ticket.
+- [x] Declares its depth grade as a **computed checklist** against the owning decision ticket's acceptance criteria — `full` is derived from the checklist, never asserted.
+
+## What was built
+
+`twin/enact.py` is layer 1 and `twin propose` is its only verb: it emits an `enactment-proposal`
+artefact and there is no sibling command, and no flag on this one, that disposes. The harness guard
+`enactment_is_propose_only_at_both_layers` asserts the module's public surface as an **allow-list**
+(`propose`, `dependency_pins`) rather than screening for merge-shaped names, on the reasoning
+`prefilter_precedes_pricing` already uses: a keyword match would miss one named `land`.
+
+`twin/enact_guard.py` is layer 2 — a `PreToolUse` hook, stdlib only, importing nothing from `twin/`
+because it runs outside the package it guards. It refuses `gh pr merge`, the REST shape of the same
+act, and a direct push to an enactment repository (resolving a bare remote rather than only reading
+the command line), plus any tool whose name says `merge` — which is how an MCP GitHub server names
+it. It fired on this ticket's own implementation session, refusing a `Bash` call that carried the
+merge string in a test fixture, which is the first evidence it does anything.
+
+The two layers are stated as layers in the emitted artefact and in `twin/README.md`, each with the
+failure mode of the other's construction: layer 1 fails under composition and cannot be forgotten;
+layer 2 fails by a forgotten call site and cannot be composed around. The guard closes layer 2's own
+failure mode by reading its registration back out of `.claude/settings.json`.
+
+**Endorsement is refused structurally rather than by a field.** The proposal is a *derived*
+artefact, so `derived_never_human_signed` already refuses a human signature on it: there is no slot
+an endorsement could be written into, and a hand-touched proposal is a detectable anomaly. No new
+invariant was needed and none was weakened.
+
+`dependency_pins()` reads the real pins out of the estate's committed Flux sources — six
+cross-repository, across three separate consumer repositories (driftwood, ludlow and tuppence, each
+pinning `platform` and `nist` by signed tag), plus three self-syncs counted separately because a
+repository syncing itself consumes nobody's policy. It reports the limit with them: **every commit
+line in the estate is a commented-out placeholder**, so each is a tag pin, and a tag can be moved.
+
+`twin/capabilities/enactment.yaml` is decision ticket 18's first capability file. Two of five tick;
+ACs 2 and 5 are build ticket 68, AC 4 is build ticket 67.
+
+## What this does not do
+
+Two of these are why the ticket does not close.
+
+- **No pull request is opened against a live repository.** The proposal is the artefact; the channel
+  that would carry it to GitHub is the estate's existing `propose-policy-pr.sh`. This is criterion
+  1's unbuilt half.
+- **Nothing verifies the signature or the force.** The pins evidence what the repositories *declare*
+  they consume. No tag is verified, no Rekor entry is looked up, and no cluster is asked whether a
+  control is running. Whether continuous proof of force is even required is build ticket 65's
+  question and is still open. This is criterion 4's qualification.
+- **The tool-name leg of layer 2 is a keyword screen**, which is the technique layer 1 refuses on
+  principle. The difference is that layer 1 can enumerate its own public surface and this cannot:
+  the MCP tool namespace is unbounded and mostly not ours. `squash_pull_request` is caught because
+  `squash` is listed; a server that calls it `apply_changes` is caught by nothing here. The command
+  patterns have the same ceiling — a differently-named wrapper, or a hand-rolled `curl` against the
+  REST API, is not matched. The upgrade named in the module removes the guessing entirely: a GitHub
+  App token with `pull_requests: write` and no `contents: write`, which makes the refusal the
+  server's rather than ours.
+- **A subagent is not asserted anywhere.** Whether a runtime routes a subagent's tool calls through
+  its hooks is the runtime's property, so neither the suite nor the tests claim it. What is
+  asserted is that `decide` refuses whatever it is handed, and that the registration routes *every*
+  tool name to it rather than a merge-shaped subset — the matcher gap that a first draft of this
+  ticket left open and both review axes found independently.
+
+## What remains before this closes
+
+1. Wire the PR channel: `twin propose` opens a real pull request against an enactment repository,
+   and demonstrably does not merge it.
+2. Verify rather than repeat the signature: check a consumed tag, or record honestly that the
+   estate's tags are unsigned today.

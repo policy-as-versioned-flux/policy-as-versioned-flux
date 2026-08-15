@@ -2579,6 +2579,164 @@ def _flux_verdict_is_pre_registered_and_derived(ctx: Context) -> str:
     )
 
 
+@harness_check("enactment_is_propose_only_at_both_layers")
+def _enactment_is_propose_only_at_both_layers(ctx: Context) -> str:
+    """The twin proposes and never disposes, asserted at both layers (build ticket 66).
+
+    A guard on the suite rather than an invariant, for the reason the drift window and the pocket
+    worksheet are: the constitution names sixteen invariants and may not grow a seventeenth without
+    the constitution changing first.
+
+    **Layer 1 is asserted as an allow-list, not as a name screen.** A free function that merges
+    reopens the question whatever it is called, and `land` or `ship` gives nothing away to a
+    keyword match — so the assertion is that `twin/enact.py`'s public surface is *exactly* these
+    functions, and a new one forces a deliberate decision.
+
+    **Layer 2 is asserted on the three composition paths build ticket 66 names** — a shell tool, an
+    MCP GitHub server, a subagent with `gh` — because layer 1 holds unchanged through every one of
+    them and the guarantee does not. The positive leg is asserted with them: opening a pull request
+    is admitted, so this is a gate and not a wall.
+
+    **The registration is asserted too, and that is the half that will actually rot.** Layer 2's
+    named failure mode is a forgotten call site, so the check reads `.claude/settings.json` back and
+    fails if the hook has gone. Nothing else in this repository would notice.
+    """
+    import inspect
+    import json
+
+    from .. import attest, verbs
+    from .. import enact as enact_mod
+    from .. import enact_guard
+    from ..artefact import DERIVED
+    from ..repo import ModelRepo
+
+    # -- layer 1: the structural absence -----------------------------------------------------
+    ALLOWED = {"dependency_pins", "propose"}
+    public = {
+        name
+        for name, value in vars(enact_mod).items()
+        if not name.startswith("_") and inspect.isfunction(value)
+        and getattr(value, "__module__", "") == enact_mod.__name__
+    }
+    if public != ALLOWED:
+        raise Violated(
+            f"twin/enact.py exposes {', '.join(sorted(public)) or 'nothing'} at module level; this "
+            f"guard admits exactly {', '.join(sorted(ALLOWED))}. A callable that disposes reopens "
+            "propose-only whatever it is named, so adding one needs an authorising decision ticket."
+        )
+
+    # -- layer 2: the tool-call boundary, on the paths that defeat layer 1 --------------------
+    composed = (
+        ("a shell tool", "Bash", {"command": "gh pr merge 42 --squash"}),
+        ("a shell tool", "Bash", {"command": "gh api --method PUT repos/o/r/pulls/42/merge"}),
+        ("a shell tool, auto-merge", "Bash", {"command": "cd /tmp/work && gh pr merge --auto 7"}),
+        ("an MCP GitHub server", "mcp__github__merge_pull_request", {"pullNumber": 42}),
+        ("an MCP server naming the act differently", "mcp__forge__squash_pull_request", {"n": 42}),
+    )
+    # A subagent is deliberately absent from this table. Its calls reach `decide` only if the
+    # runtime routes a subagent's tool calls through its hooks, which is the runtime's property and
+    # not this repository's to assert — a row here would read as an assertion nothing checks.
+    for path, tool, payload in composed:
+        if enact_guard.decide(tool, payload) is None:
+            raise Violated(
+                f"the tool-call boundary admits a merge through {path} ({tool}: {payload}) — layer 1 "
+                "holds unchanged through that composition, so this is the layer that has to refuse it"
+            )
+    admitted = (
+        ("Bash", {"command": "gh pr create --title 'propose: raise the CDN pin' --body ..."}),
+        ("Bash", {"command": "git commit -m 'propose'"}),
+        ("Read", {"file_path": "twin/enact.py"}),
+    )
+    for tool, payload in admitted:
+        refused = enact_guard.decide(tool, payload)
+        if refused is not None:
+            raise Violated(
+                f"the tool-call boundary refuses {tool} {payload} ({refused}) — proposing is the "
+                "one thing the twin is for, and a guard that refuses it is a wall rather than a gate"
+            )
+
+    # -- layer 2's own failure mode: the call site, read back out of the registration ---------
+    settings_path = REPO_DIR / ".claude" / "settings.json"
+    if not settings_path.is_file():
+        raise Violated(f"{settings_path} is missing, so layer 2 is registered nowhere")
+    hooks = json.loads(settings_path.read_text(encoding="utf-8")).get("hooks", {})
+    matchers = [
+        str(group.get("matcher", ""))
+        for group in hooks.get("PreToolUse", [])
+        if any("enact_guard.py" in str(e.get("command", "")) for e in group.get("hooks", []))
+    ]
+    if not matchers:
+        raise Violated(
+            "no PreToolUse hook in .claude/settings.json runs twin/enact_guard.py — layer 2's "
+            "named failure mode is a forgotten call site, and this is it happening"
+        )
+    # The registration must not itself be a name screen. `decide` can only refuse a call the
+    # runtime routes to it, so a matcher reading `.*merge.*` would put the exact defect layer 1's
+    # allow-list exists to avoid one level further out: a tool named `land_pull_request` would
+    # never reach the guard at all, and every assertion above would still pass.
+    UNREVEALING = ("land_pull_request", "shortcuts_execute", "Bash")
+    for name in UNREVEALING:
+        if not any(re.fullmatch(m, name) for m in matchers):
+            raise Violated(
+                f"the PreToolUse matcher(s) {matchers} do not route {name!r} to the guard. A "
+                "matcher that screens for merge-shaped names is the same mistake as a merge-shaped "
+                "name screen on layer 1, moved one level out where nothing else would catch it."
+            )
+
+    # -- the proposal itself: derived, so no endorsement can be attached to it ----------------
+    repo = ModelRepo.open(ctx.repo_dir)
+    proposal = enact_mod.propose(
+        repo, ctx.caps, "netflix", "expand-the-delivery-network", enact_mod.POLICY,
+        verbs.command_for("propose", org="netflix", response="expand-the-delivery-network", channel=enact_mod.POLICY),
+    )
+    if proposal.mark != DERIVED:
+        raise Violated(
+            "an enactment proposal is not marked derived, so derived_never_human_signed no longer "
+            "refuses a human signature on it and a proposal could carry an endorsement"
+        )
+    material = b"invariant-suite-key"
+    try:
+        attest.build(proposal, [{"identity": "someone@example.invalid", "asserts": "accountability"}], material=material)
+    except attest.AttestationError:
+        pass
+    else:
+        raise Violated("a human signature attached to an enactment proposal — that is an endorsement")
+
+    body = proposal.body
+    layers = body["layers"]
+    if len(layers) != 2 or any(not (layer.get("holds") and layer.get("fails_when")) for layer in layers):
+        raise Violated(
+            "the proposal does not state both layers with the failure mode of each; a proposal "
+            "silent about how its own guarantee fails will be read as not having one"
+        )
+    if not body["dependency"]["pins"] or not body["dependency"]["limits"]:
+        raise Violated(
+            "the proposal names no real consumed dependency pin, or names them with no stated "
+            "limit — 'signed, pinned, consumed by real separate repositories' is a claim about "
+            "files, and a tag pin with its commit line commented out is not the pin it reads as"
+        )
+    try:
+        enact_mod.propose(
+            repo, ctx.caps, "netflix", "expand-the-delivery-network", "whatever-is-convenient",
+            verbs.command_for("propose", org="netflix"),
+        )
+    except enact_mod.EnactError:
+        pass
+    else:
+        raise Violated("an unnamed enactment channel was admitted, so the narrowing is decorative")
+
+    dependency = body["dependency"]
+    return (
+        f"layer 1 exposes exactly {', '.join(sorted(ALLOWED))}; layer 2 refuses {len(composed)} "
+        f"disposition shape(s) and admits {len(admitted)} proposing one(s), routed by a matcher "
+        f"that admits a tool name revealing nothing about merging; the proposal is derived and "
+        f"refuses a human signature; {dependency['cross_repository_pins']} cross-repository pin(s) "
+        f"across {len(dependency['consumer_repositories'])} consumers "
+        f"({dependency['self_sync_pins']} self-sync, counted apart), {len(dependency['limits'])} "
+        "limit(s) stated"
+    )
+
+
 @harness_check("scheduled_emission_ignores_signal_presence")
 def _sweep_is_not_event_gated(ctx: Context) -> str:
     """A scheduled sweep emits the same volume twice running, nothing having changed (build ticket 09).

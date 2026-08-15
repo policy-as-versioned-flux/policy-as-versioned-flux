@@ -195,9 +195,15 @@ def test_an_unreplayable_command_is_a_sentence_not_a_traceback(
     assert main(["verify", str(broken), "--repo", str(model_repo_dir)]) == 2
 
 
-def test_reproducing_leaves_no_temporary_files_behind(model_repo_dir: Path, artefacts: dict[str, Path]) -> None:
+def test_reproducing_leaves_no_temporary_files_behind(
+    model_repo_dir: Path, artefacts: dict[str, Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Pointed at this test's own directory rather than the shared one: `pytest -n auto` runs a
+    # worker per CPU, and a sibling worker reproducing at the same moment leaves a `twin-replay-*`
+    # directory in the system temp that this assertion would read as our leak.
     import tempfile
 
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
     before = set(Path(tempfile.gettempdir()).glob("twin-replay-*"))
     reproduce(model_repo_dir, artefacts["score-card"])
     assert set(Path(tempfile.gettempdir()).glob("twin-replay-*")) == before

@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 from . import (
-    TOOL_VERSION, attest, constraints, evidence, fixtures, gameplay_lens, index, invariants,
+    TOOL_VERSION, attest, constraints, enact, evidence, fixtures, gameplay_lens, index, invariants,
     retrospective_sweep, schedule, sign, unbound_pool, verbs,
 )
 from .artefact import AUTHORED, Artefact, ArtefactError
@@ -678,6 +678,39 @@ def cmd_affected_parties(args: argparse.Namespace) -> int:
     consequence, published alongside the constraint set (build ticket 61)."""
     repo, caps, org = _open(args)
     artefact = verbs.affected_parties(repo, caps, org, verbs.command_for("affected-parties", org=org))
+    return _emit(artefact, args.out)
+
+
+def cmd_propose(args: argparse.Namespace) -> int:
+    """Propose enacting a response. There is no sibling command that disposes, and there is no
+    flag on this one that would (build ticket 66)."""
+    repo, caps, org = _open(args)
+    try:
+        artefact = enact.propose(
+            repo, caps, org, args.response, args.channel,
+            verbs.command_for("propose", org=org, response=args.response, channel=args.channel),
+        )
+    except enact.EnactError as exc:
+        print(f"twin propose: {exc}", file=sys.stderr)
+        return 2
+    body = artefact.body
+    _say(f"{org}: proposes {body['response']['id']} via the {body['channel']['role']!r} channel")
+    print(f"  means      {body['channel']['means']}")
+    print(f"  disposed   {body['disposition']['disposed_by']}")
+    for layer in body["layers"]:
+        print(f"  layer      {layer['layer']:<20} {layer['where']}")
+        print(f"    holds      {layer['holds']}")
+        print(f"    fails when {layer['fails_when']}")
+    dependency = body["dependency"]
+    print(
+        f"  dependency {dependency['cross_repository_pins']} cross-repository pin(s) "
+        f"({dependency['self_sync_pins']} self-sync, counted separately): "
+        f"{', '.join(dependency['dependencies']) or 'none'} consumed by "
+        f"{', '.join(dependency['consumer_repositories']) or 'nobody'}"
+    )
+    for limit in dependency["limits"]:
+        print(f"    limit      {limit}")
+    print(f"  narrowed   {body['narrowed_claim']}")
     return _emit(artefact, args.out)
 
 
@@ -1606,6 +1639,17 @@ def build_parser() -> argparse.ArgumentParser:
     )))
     parties.add_argument("--out", required=True)
     parties.set_defaults(fn=cmd_affected_parties)
+
+    proposed = with_org(with_repo(subs.add_parser(
+        "propose", help="propose enacting a response; the twin never disposes"
+    )))
+    proposed.add_argument("--response", required=True, help="the response this proposal would enact")
+    proposed.add_argument(
+        "--channel", required=True, choices=sorted(enact.CHANNELS),
+        help="which of the two narrowed roles policy plays here; there is no default",
+    )
+    proposed.add_argument("--out", required=True)
+    proposed.set_defaults(fn=cmd_propose)
 
     audited = subs.add_parser(
         "disparate-impact-audit", help="raise a disparate-impact audit finding (sealed channel)"

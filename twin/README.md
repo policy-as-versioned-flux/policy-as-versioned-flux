@@ -7,10 +7,16 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 65 of 77 build tickets closed, and one measuring against a clock that runs
+**This is 65 of 78 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
 rather than carried forward by hand — the previous banner, 64, was itself off by one the same way
-this file's own "What is honestly built" section repeatedly finds and corrects.) Ticket 23's own checklist is closed, but the calibration
+this file's own "What is honestly built" section repeatedly finds and corrects. The **denominator**
+was stale this round rather than the numerator: build ticket 78 was written after the last banner
+and never joined the total, so 77 should have been 78. Same drift, other half of the fraction.)
+**Build ticket 66 built its refusal and did not close**, because criterion 1 is conjunctive and only
+its second half exists: no merge capability, at two layers, and no pull request opened. It was
+briefly marked done and then unmarked — see "Propose only, in two layers", below, for what is built
+and what the numerator is still waiting on. Ticket 23's own checklist is closed, but the calibration
 discipline it established (`twin/calibration.md`) sees no adoption yet — no committed triple in this repository
 has been authored through it (see "Flux drift", below). What is not built is listed below and,
 more usefully, is named inside every artefact the tool emits.
@@ -47,6 +53,7 @@ bash twin/demo.sh                          # the whole loop, from a clean checko
 ./bin/twin price --repo R --origin C       # a shock priced under every eye, responses beside it
 ./bin/twin constraints --out F             # the published constraint set, floor and exclusions
 ./bin/twin affected-parties --repo R --org O --out F  # who bears a modelled consequence with no perspective, alongside the constraint set
+./bin/twin propose --repo R --org O --response X --channel policy|record --out F  # propose enacting a response; there is no verb that disposes
 ./bin/twin disparate-impact-audit --finding F --source S --out O      # raise a finding — sealed, never names the protected characteristic
 ./bin/twin disparate-impact-respond --audit A --response R --out O    # only the registered respondent role may close it
 ./bin/twin credibility --repo R --org O --subject S  # the world prior blended with an org's own sparse data
@@ -827,6 +834,102 @@ lapsing quietly. **No triple in this repository has been through it** — nothin
 estimator, a date or a reference class against a triple, so the discipline is enforced as a
 document and not as an authoring workflow. That is why build ticket 23 is `partial`.
 
+## Propose only, in two layers
+
+Build ticket 66. The twin opens pull requests and never merges them. That is **derived rather than
+inherited**: the prior estate asserted "propose, never dispose", and decision ticket 18 Q1 re-derived
+it from three places, any one of which would be enough. Article 22 admits no solely-automated
+significant decision. A trade-off curve has nothing to auto-execute, so choosing a point on it is
+inherently the human's act. An agent signature asserts reproducible origin rather than endorsement,
+so an agent-initiated change has nobody accountable behind it. Graduated autonomy — auto-apply the
+cheap reversible things — was rejected because cheapness is computed by the twin's own £ model,
+which is explicitly never authoritative: **the twin would be deciding its own leash length.**
+
+**The interesting part is that one layer is not enough, and this repository's own code said so
+first.** `twin/options.py` already carried `ponytail: a lock, not a proof`. The original criterion
+made propose-only a structural absence — no merge code path exists — and that is weaker than it
+reads. "No merge code path" is a property of `twin/` **as it is today**, and the twin is an agent:
+the day it gains a shell tool, an MCP GitHub server or a subagent with `gh`, the absence still
+holds and the guarantee is gone, **with no diff to `twin/` at all**. The constitution says code is
+disposable by default, so an absence has a scheduled expiry.
+
+So there are two layers, and the point of stating them as layers is that they fail in **opposite
+directions**:
+
+| | layer 1 — `twin/enact.py` | layer 2 — `twin/enact_guard.py` |
+|---|---|---|
+| what it is | a structural absence: no merge code path | a constraint at the tool-call boundary |
+| how it is asserted | an allow-list on the module's public surface, not a name screen — `land` or `ship` gives nothing away to a keyword match | a `PreToolUse` hook refusing a disposing call before it runs, a subagent's included |
+| how it fails | **composition** — new capability, no diff here | **a forgotten call site** — a policy check is a call site, and a deleted hook fails open in silence |
+| what it cannot fail by | being forgotten; an absence has no call site | composition; every added capability still ends in a tool call |
+
+Each layer's failure mode is covered by what the other layer is made of, which is why keeping both
+is not belt-and-braces. `enactment_is_propose_only_at_both_layers` asserts layer 1's surface, drives
+layer 2 through the disposition shapes that defeat layer 1, and — the half that will actually rot —
+reads the registration back out of `.claude/settings.json`. The positive leg is asserted with them:
+opening a pull request is admitted, so this is a gate and not a wall.
+
+**The registration check is the interesting one, because a first draft of this ticket got it
+wrong.** The hook was registered with the matcher `Bash|.*[Mm]erge.*`, and the suite only asserted
+that *some* hook mentioned `enact_guard.py`. `decide` can only refuse a call the runtime routes to
+it, so that matcher put layer 1's rejected technique — a merge-shaped name screen — one level
+further out, where nothing else would catch it: a tool named `land_pull_request` would never reach
+the guard, and every other assertion would still pass. The matcher is now `.*` and the suite asserts
+that it routes tool names which reveal nothing about merging.
+
+**One leg is honestly a keyword screen, and says so.** Layer 2 matches MCP tool *names* against a
+verb list, because unlike layer 1's public surface the MCP namespace is unbounded and mostly not
+ours — there is nothing to enumerate. `squash_pull_request` is caught because `squash` is listed;
+a server that calls it `apply_changes` is caught by nothing here. The upgrade named in the module
+removes the guessing: a GitHub App token with `pull_requests: write` and no `contents: write`, which
+makes the refusal the server's rather than ours.
+
+**A subagent is asserted nowhere.** Whether a runtime routes a subagent's tool calls through its
+hooks is the runtime's property, not this repository's to claim, so neither the suite nor the tests
+have a row for it.
+
+**No endorsement, structurally rather than by convention.** A proposal is a **derived** artefact, so
+`derived_never_human_signed` refuses a human signature on it: there is no field an endorsement could
+be written into, and a hand-touched proposal becomes a detectable anomaly rather than a breach of
+etiquette. `twin propose` therefore has no `--sign` and no `--role`.
+
+**Policy as a signed, pinned dependency survives — narrowed, and the narrowing is the load-bearing
+half.** Decision ticket 18 Q2 tested the prior estate's central thesis against the risk basis. What
+survives is that a control modifying a named FAIR factor must be **provably in force**, and a signed
+pinned version makes that verifiable rather than asserted. What does not survive is the claim that
+versioned policy is *how governance works*: responses are priced by the FAIR factor they modify and
+**most levers are not code** — a pay rise, a JIT access change, a supplier switch — so if versioned
+policy were the shape of governance, the cross-domain comparison the whole £ engine exists for could
+not exist. It narrows to exactly two roles, and `--channel` is required with no default so a
+proposal cannot avoid saying which claim it is making: `policy` (the enactment channel for a
+machine-enforceable control) or `record` (the verification substrate for a lever that is not code).
+
+The pins are read, not described. `dependency_pins()` walks the estate's committed Flux sources and
+finds **six cross-repository pins** across three separate consumer repositories — driftwood, ludlow
+and tuppence each pinning `platform` and `nist` by signed tag. Three further pins are institutions
+syncing themselves, which consume nobody's policy, so they are counted separately rather than
+inflating the only number the claim rests on. Both are reported with the limit that decides what
+they are worth: **every commit line in this estate is a commented-out placeholder**, so each pin is a
+tag pin, and a tag can be moved. "Pinned" currently means "pinned to a movable name". The artefact
+says so rather than letting the word carry weight the files do not support.
+
+**Two words in that criterion are doing less work than they look like they are, and the artefact
+says so rather than letting them pass.** *Signed* is the sources' own declaration, checked by
+nothing here: no tag is verified, no Rekor entry is looked up, and
+`estate/verify/provenance/verify-provenance.sh` records that this repository's own commits are not
+keyless-signed either. So "signed" is a property of the design, not an observation. *Separate* is
+true by URL and not yet by existence: `estate/README.md` describes a monorepo-style working tree
+whose top-level directories become their own GitHub repositories **at split**, and each `up.sh`
+rewrites the pinned URL to an in-cluster git server for the offline demo. The pins name real
+separate repositories; whether those repositories are live is a question this code does not ask.
+Both sit in the artefact's `limits`, not in its asserted half.
+
+**This is why build ticket 66 built its refusal and did not close.** Criterion 1 wants the twin to
+open pull requests *and* have no merge capability; the second half is built and asserted at two
+layers, and the first half does not exist — nothing in `twin/` has touched a live repository.
+Wiring it needs a reachable remote and an authorised push. The ticket records the split rather than
+claiming the whole, which is the same shape build tickets 64 and 78 already carry.
+
 ## Whose £
 
 The £ is perspectival: it belongs to whoever pays to run the twin. A perspective declares who pays,
@@ -1398,15 +1501,35 @@ reaches `full`, and nothing can be typed as `full`.
 | `forecast-book` | 21 | partial | 5 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
+| `enactment` | 18 | partial | 2 / 5 |
 
-**35 of 64**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**37 of 69**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capability here stands at six ticks, and one of the eleven still stands at
+there"** — the strongest capability here stands at six ticks, and one of the twelve still stands at
 one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
 count — re-derived here rather than trusting the stale, hand-carried "32" the previous round left
 behind (the same provisional-total drift this file names repeatedly below). `forecast-book` moved
 from 1/6 to 4/6 at build ticket 58 (venue + observe-only, the blind-emission protocol, the
 claim-scope statement — narrated above).
+
+**`enactment` is a new row (build ticket 66) against a decision ticket — 18 — that had no
+capability file at all before it**, the third time that gap has been found and filled rather than
+left empty (build ticket 47 for decision ticket 15, build ticket 63 for decision ticket 10). It
+ticks two of the five: AC 1 (act-vs-propose decided, with the boundary stated) and AC 3 (the verdict
+on policy-as-versioned-dependency, realised in code rather than restated — `--channel` admits
+exactly the two narrowed roles and has no default). The other three stay unticked and are named
+work: ACs 2 and 5 are build ticket 68's multi-channel enactment sensing, and AC 4 is build ticket
+67's graded enforcement and posture-as-identity. The denominator grew by five and the numerator by
+two, so the fraction moved **down**, from 35/64 to 37/69. That is the arithmetic behaving correctly:
+a new capability file admits its own unbuilt criteria into the count on the day it is created.
+
+AC 3's tick was challenged in review and survives with its boundary written into the checklist. The
+challenge is fair and worth repeating here: the verdict's own rationale is that a signed pinned
+version makes "this control is actually running" *verifiable* rather than asserted, and this code
+verifies neither the signature nor the force. The tick is for the **verdict** the criterion asks
+for — survives-narrowed, made structural by a channel parameter with no default — and not for the
+verification that verdict argues will one day be possible. The capability file says so in its own
+evidence field, so a reader can disagree with the tick knowingly rather than discover the gap.
 
 **Build ticket 52 ticks `synthetic-substrate` AC 4** (a blind/adversarial separation mechanism
 between planter and detector, `twin/planter.py` + `twin/detector.py` + `twin/scorer.py`) — moving
@@ -1582,13 +1705,14 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 59 pass, 1 fails (`drift_window_is_actually_being_sampled`, a live-cluster
+`./bin/twin verify` — 60 pass, 1 fails (`drift_window_is_actually_being_sampled`, a live-cluster
 probe-staleness check that fails whenever build ticket 64's probe has not sampled recently, so it
 is expected to go red between samples and is not a coherence defect), 2 skipped and not faked (the
-CI-only cross-architecture leg), 0 pending. `pytest -q` — 1263 tests across seams 1 and 2. (Build
+CI-only cross-architecture leg), 0 pending. `pytest -q` — 1287 tests across seams 1 and 2, of which
+`test_the_suite_is_green` goes red with the same probe staleness above. (Build
 ticket 56's coherence audit re-derived these counts from a live run rather than carrying the
 previous round's numbers forward — see "What is honestly built", below, for the same discipline
-applied to the capability table. Build tickets 78 and 65 re-derived them again the same way.)
+applied to the capability table. Build tickets 78, 65 and 66 re-derived them again the same way.)
 
 Two checks read the actual wall clock rather than the model repository, and both do it because the
 property they guard is about *now*: `drift_window_is_actually_being_sampled` (is the probe alive?)
@@ -1669,7 +1793,7 @@ claim binds it to a component the scenario forecasts. The positive leg is assert
 negative one: the same fixture still forecasts under `as-consumed`, because a gate that refused
 everything would pass every refusal in the check while making the regime useless.
 
-Eleven checks were added to the **harness** instead, because each guards a yardstick or a semantic
+Twelve checks were added to the **harness** instead, because each guards a yardstick or a semantic
 property rather than a named absence the constitution enumerates: `worksheet_matches_the_pocket_org`
 (the hand-computed numbers still hold), `graded_edge_fixture_holds_its_contract` (the generated
 causal-edge fixture still carries what the £ and skills tracks depend on),
@@ -1694,7 +1818,11 @@ the campaign's own log is still caught) and `flux_verdict_is_pre_registered_and_
 ticket 65's decision rule predates its data, read out of git the same way, and the residual
 `point-in-time` branch never resolves by elimination while the action-boundary branch is
 unmeasured — the one guard here whose failure mode is a false inference rather than a wrong
-number).
+number) and `enactment_is_propose_only_at_both_layers` (build ticket 66: layer 1's public surface
+against an allow-list, layer 2 driven through the three composition paths that defeat layer 1 and
+one proposing call it must still admit, and — the leg that will actually rot — layer 2's own
+registration read back out of `.claude/settings.json`, because a forgotten call site is that
+layer's named failure mode).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared
@@ -1842,6 +1970,23 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Signing proves possession, not identity.** HMAC with a shared key: anybody holding the key can
   produce any role's signature, so it detects tampering and does not attribute it. The upgrade is
   sigstore/gitsign, named in `twin/sign.py`.
+- **`twin propose` emits a proposal; it does not open a pull request.** The artefact is the
+  proposal, and the channel that would carry it to GitHub is the estate's existing
+  `estate/platform/wargamer/propose-policy-pr.sh`, which build ticket 66 deliberately did not
+  rewrite. Nothing in `twin/` has touched a live repository.
+- **Layer 2 is a net over the shapes a merge takes here, not a proof.** `twin/enact_guard.py`
+  matches `gh pr merge`, the REST form, a push to an enactment remote, and any tool whose *name*
+  says merge. A differently-named wrapper, or a hand-rolled `curl` against the API with a token,
+  is not matched — and a `cd elsewhere && git push` inside one command resolves the wrong
+  repository. The upgrade named in the module is a credential that **cannot** merge: a GitHub App
+  token with `pull_requests: write` and no `contents: write`, which moves the refusal to the
+  server. Layer 1 is what stands behind the gaps, which is why both exist.
+- **The dependency pins are read from committed sources, not from a running cluster.** Six
+  cross-repository pins across three consumer repositories evidence what those repositories
+  *declare* they consume — three further pins are institutions syncing themselves and consume
+  nobody's policy, so they are counted apart rather than folded into the total. None of them
+  evidences that a control is in force right now, and every one pins a tag with its commit line
+  commented out — so "pinned" currently means "pinned to a movable name".
 - **Seam 3 exists; all six skills do now, and each is a heuristic stand-in.** `twin/skills.py`
   (build ticket 42) is the eval harness: run a skill against a fixture corpus, score it against a
   versioned threshold, record score-over-time per model version, and surface a model upgrade that
@@ -2011,6 +2156,10 @@ twin/
   attest.py       attestation sidecars — written, and read back
   sign.py         two signature types that never substitute for each other
   roles.yaml      the versioned role register a signature binds to
+  enact.py        propose-only, layer 1 — the absence, and the two narrowed channels policy
+                  ships through. There is no sibling that disposes
+  enact_guard.py  propose-only, layer 2 — the tool-call boundary, which is where the guarantee
+                  survives the twin gaining a shell tool or a subagent with `gh`
   grades.py       depth grades as computed checklists
   worksheet.py    the pocket-org worksheet, parsed and checked
   pocket-org-worksheet.md   the hand-computed yardstick — authored, and the authority

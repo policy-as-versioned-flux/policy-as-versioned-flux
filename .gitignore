@@ -10,6 +10,13 @@ estate/driftwood/drift/probe.log
 # Added by ggshield
 .cache_ggshield
 
+# Agent-runtime config. `.claude/settings.json` IS committed — build ticket 66's second
+# propose-only layer is registered there, and the invariant suite reads the registration back out,
+# so a deleted hook is a red test rather than an open door. The local override and its lockfile
+# are per-machine and are not.
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
 # twin: dev environment, python bytecode and pytest scratch
 .venv/
 __pycache__/

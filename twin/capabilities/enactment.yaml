@@ -1,0 +1,25 @@
+# The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
+# Decision ticket 18 is resolved; this is the first capability file built for it (build ticket 66),
+# the same gap build ticket 47 found for decision ticket 15 and filled rather than left empty.
+capability: enactment
+owning_ticket: '18'
+criteria:
+  - index: 1
+    text: "Act-vs-propose decided, with the boundary stated."
+    checked: true
+    evidence: "twin/enact.py exposes `propose` and nothing that disposes, asserted against an allow-list rather than a name screen (harness check `enactment_is_propose_only_at_both_layers`); twin/enact_guard.py refuses a disposing tool call at the PreToolUse boundary, so the guarantee survives the twin gaining a shell tool, an MCP GitHub server or a subagent with `gh`. The boundary is stated in the emitted artefact as two layers with the failure mode of each named — composition for the absence, a forgotten call site for the check — and the carve-out is stated with it: the twin acts freely on its own model and never on the world."
+    ticked_by: build ticket 66
+  - index: 2
+    text: "A mechanism for non-IT enactment + tracking, or an explicit admission of blindness."
+    checked: false
+  - index: 3
+    text: "A verdict on policy-as-versioned-dependency: survives / survives-narrowed / rejected, on the risk basis."
+    checked: true
+    evidence: "The criterion asks for a VERDICT on the risk basis, and twin/enact.py realises that verdict rather than restating it: `--channel` is required with no default and admits exactly the two roles decision ticket 18 Q2 narrowed to — enactment channel for machine-enforceable controls, verification substrate for the levers that are not code — so a proposal cannot avoid saying which claim it is making, and the narrowing is structural rather than a sentence in a docstring. `dependency_pins()` reads the real pins the estate's separate repositories consume: six cross-repository (driftwood, ludlow and tuppence each pinning platform and nist by tag), with three self-syncs counted apart because a repository syncing itself consumes nobody's policy. WHERE THIS TICK STOPS, so a reader can disagree with it knowingly: the verdict's own rationale is that a signed pinned version makes 'this control is actually running' VERIFIABLE rather than asserted, and this code verifies neither the signature nor the force — no tag is checked, no Rekor entry looked up, no cluster asked. Both are stated as limits inside the artefact and named in build ticket 66's 'what remains'. The tick is for the verdict the criterion asks for, not for the verification the verdict argues will one day be possible."
+    ticked_by: build ticket 66
+  - index: 4
+    text: "A verdict on graded enforcement and posture-as-identity on the same basis."
+    checked: false
+  - index: 5
+    text: "The action-state feedback path that closes ticket 08's conditional-forecast loop."
+    checked: false
