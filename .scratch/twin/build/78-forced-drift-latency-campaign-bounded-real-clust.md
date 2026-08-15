@@ -34,12 +34,22 @@ organic-drift tally by construction, not by discipline after the fact.
 
 **Blocked by:** none — does not depend on build ticket 64's window and can start immediately.
 
-**Status:** instrumented, **CAMPAIGN NOT YET RUN** — 2026-08-14. Same honest split ticket 64 itself
-drew: the instrument is built, tested and verified against the real cluster's actual resource
-shapes, and the campaign has not yet been executed for real. `forced-campaign-samples.jsonl` does
-not exist yet. Running it takes roughly two hours of real, repeated mutation against
-`kind-driftwood` and needs the operator's go-ahead to start — see the note at the foot of this
-file.
+**Status:** done (2026-08-15). Run for real, operator's go-ahead given 2026-08-15. All four trials
+completed: action applied, sampled every 15s for 30m, undo applied, baseline verified restored,
+each one before the next started and before build ticket 64's hourly probe could next fire — the
+`SAFETY_MARGIN_MINUTES=40` guard held throughout a real ~3.5-hour run (13:58–17:30 UTC), never
+needing more than a few minutes' wait since each trial finished well inside its hour. 464 real
+samples in `forced-campaign-samples.jsonl` (untracked, as declared). Post-run baseline check
+against the live cluster, independent of the script's own: `driftwood-live-version=1.0.0`,
+`driftwood-nist-pin=1.0.0`, Kustomization not suspended, `git-server` at 1/1 replicas — all four
+match the pre-registered baseline exactly.
+`forced_campaign_pre_registered_and_walled_off` exercised against this real run for the first
+time (previously only ever run against zero samples): `./bin/twin verify` — PASS, "4 trial(s)
+declared, committed 2026-08-14, 464 forced sample(s), none earlier, none leaked into the organic
+log, no marker contamination." The reduction/latency analysis this data would feed is not part of
+this ticket's own checklist — it measures the mechanism and captures the evidence; reading what
+the 464 samples say about *how fast* is naturally a follow-on ticket's job, the same relationship
+build ticket 64 has to build ticket 65.
 
 **Reading list:** Build ticket 64 (the passive probe it runs alongside), build ticket 52 and
 decision ticket 12 Q2 (the shared-prior limitation this ticket routes around rather than crosses).
@@ -150,16 +160,21 @@ Same discipline build ticket 56 names for itself: findings recorded and fixed, n
   consistency tests read the bash script's literal source rather than an emitted artefact, a
   documented, deliberate trade-off (no YAML parser in bash) rather than an oversight.
 
-## What is honestly not yet true
+## What is honestly true now, and what still isn't
 
-The instrument is built and every claim above is checked against real code, real tests and the
-real cluster's real resource shapes — not simulated. What has **not** happened yet: the campaign
-has not been run. No trial has fired, `forced-campaign-samples.jsonl` does not exist, and nothing
-here is evidence of how fast Flux or the probe actually respond. That is a real, roughly two-hour,
-repeated mutation of `kind-driftwood` and needs the operator to start it deliberately — see build
-ticket 00's own "wait, plant, or force" section, added alongside this ticket: forcing is preferred
-over waiting exactly because it answers the mechanism question *now*, but "now" still means a real
-person choosing the moment a real cluster gets mutated four times in a row.
+Run for real 2026-08-15, 13:58–17:30 UTC, on the operator's go-ahead — see build ticket 00's own
+"wait, plant, or force" section, added alongside this ticket: forcing answers the mechanism
+question *now* rather than waiting on it, and "now" meant a real person choosing the moment a
+real cluster got mutated four times in a row, which happened. 464 real samples exist, the wall to
+build ticket 64's organic log held (checked structurally, not just narrated), and the cluster
+verified back at declared baseline both by the script's own checks during the run and by an
+independent check afterward.
+
+What still isn't true: nothing here is a *verdict* on how fast Flux or the probe respond. This
+ticket's own checklist asked for the instrument and the run, not the reduction — the 464 samples
+are raw evidence, unread. Turning them into a latency figure per trial (and stating what "how
+fast" means precisely, the way build ticket 65 pins down what "drift" means for the organic
+window) is a follow-on ticket's job, not retrofitted here.
 
 ## Evidence
 
