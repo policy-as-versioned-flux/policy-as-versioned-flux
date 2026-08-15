@@ -17,8 +17,8 @@ from pathlib import Path
 import yaml
 
 from . import (
-    TOOL_VERSION, attest, constraints, enact, evidence, fixtures, gameplay_lens, index, invariants,
-    retrospective_sweep, schedule, sign, unbound_pool, verbs,
+    TOOL_VERSION, attest, constraints, enact, enforcement, evidence, fixtures, gameplay_lens,
+    index, invariants, retrospective_sweep, schedule, sign, unbound_pool, verbs,
 )
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
@@ -681,6 +681,45 @@ def cmd_affected_parties(args: argparse.Namespace) -> int:
     return _emit(artefact, args.out)
 
 
+def cmd_enforcement(args: argparse.Namespace) -> int:
+    """Publish the enforcement posture: where every control sits on the ladder, what its identity
+    proves, and every recorded move between rungs (build ticket 67).
+
+    Authored and signed as a role, like the constraint set: which rung a control occupies is a
+    declaration, and the point of criterion 3 is that somebody stands behind the consequence a
+    control carries.
+    """
+    repo, _, org = _open(args)
+    artefact = enforcement.artefact(repo, org, verbs.command_for("enforcement", org=org))
+    path = artefact.write(args.out)
+    material = sign.signing_key()
+    signatures = [sign.human(enforcement.ROLE, artefact.digest(), material)] if material else []
+    sidecar = attest.write(artefact, path, signatures)
+
+    body = artefact.body
+    _say(f"{org}: enforcement posture -> {path} (authored, role {enforcement.ROLE!r})")
+    for rung in body["ladder"]["grades"]:
+        outcome = "changes the outcome" if rung["changes_the_outcome"] else "leaves the outcome alone"
+        print(f"  rung       {rung['rank']} {rung['grade']:<10} {outcome}")
+    for control in body["controls"]:
+        posture = control["posture_as_identity"]
+        stands = "posture-as-identity" if posture["admitted"] else f"excluded: {posture['excluded_as']}"
+        print(f"  control    {control['control']:<30} {control['grade']:<10} {stands}")
+    for control in body["not_enforced"]["controls"]:
+        print(f"  no rung    {control['control']:<30} a lever that is not code")
+    for move in body["moves"]:
+        print(
+            f"  move       {move['subject']:<30} {move['from_grade']} -> {move['to_grade']} "
+            f"({move['direction']}, {move['moved_on']}, role {move['by_role']!r})"
+        )
+    print(f"  {body['ladder']['grade_never_prices']}")
+    if material is None:
+        print(f"  unsigned: set {sign.KEY_ENV}, then `twin sign {path} --role {enforcement.ROLE}`")
+        return 0
+    print(f"  signed as role {enforcement.ROLE!r} -> {sidecar.name}")
+    return 0
+
+
 def cmd_propose(args: argparse.Namespace) -> int:
     """Propose enacting a response. There is no sibling command that disposes, and there is no
     flag on this one that would (build ticket 66)."""
@@ -952,7 +991,7 @@ def cmd_validate(args: argparse.Namespace) -> int:
             name: len(getattr(overlay, name))
             for name in (
                 "components", "signals", "claims", "scenarios", "outcomes", "people", "edges",
-                "perspectives", "regrades",
+                "perspectives", "regrades", "responses", "enforcement_moves",
             )
         }
         print(f"  ok   overlay {org}: " + ", ".join(f"{v} {k}" for k, v in counts.items() if v))
@@ -966,6 +1005,18 @@ def cmd_validate(args: argparse.Namespace) -> int:
                 print(f"  FAIL {violation}")
         else:
             print(f"       {org}: every recorded evidence-grade change carries a regrade event")
+        # The same half for enforcement rungs (build ticket 67). Separate from the loop above
+        # because the two records are separate: a regrade moves what we believe, a move changes
+        # what a control does, and one must not be offered in place of the other.
+        moved = enforcement.history_violations(
+            repo, overlay.ref.path, overlay.ref.tree, overlay.enforcement_moves
+        )
+        if moved:
+            problems += moved
+            for violation in moved:
+                print(f"  FAIL {violation}")
+        else:
+            print(f"       {org}: every recorded enforcement-grade change carries a move event")
         try:
             gated = BehaviouralOverlay.load(repo, org)
         except ModelError:
@@ -977,8 +1028,9 @@ def cmd_validate(args: argparse.Namespace) -> int:
             )
     if problems:
         print(
-            f"\nFAIL: {len(problems)} evidence grade(s) moved with no regrade event. A grade is "
-            "immutable without one recording who moved it and why."
+            f"\nFAIL: {len(problems)} grade(s) moved with no event recording the move. A grade is "
+            "immutable without one recording who moved it and why — an evidence grade needs a "
+            "regrade, an enforcement grade needs a move, and neither stands in for the other."
         )
         return 1
     print("PASS: every object validates against its closed schema")
@@ -1639,6 +1691,12 @@ def build_parser() -> argparse.ArgumentParser:
     )))
     parties.add_argument("--out", required=True)
     parties.set_defaults(fn=cmd_affected_parties)
+
+    posture = with_org(with_repo(subs.add_parser(
+        "enforcement", help="publish the enforcement posture: rungs, moves, posture-as-identity"
+    )))
+    posture.add_argument("--out", required=True)
+    posture.set_defaults(fn=cmd_enforcement)
 
     proposed = with_org(with_repo(subs.add_parser(
         "propose", help="propose enacting a response; the twin never disposes"

@@ -7,11 +7,11 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 65 of 78 build tickets closed, and one measuring against a clock that runs
+**This is 66 of 78 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
 rather than carried forward by hand — the previous banner, 64, was itself off by one the same way
 this file's own "What is honestly built" section repeatedly finds and corrects. The **denominator**
-was stale this round rather than the numerator: build ticket 78 was written after the last banner
+was stale one round ago rather than the numerator: build ticket 78 was written after that banner
 and never joined the total, so 77 should have been 78. Same drift, other half of the fraction.)
 **Build ticket 66 built its refusal and did not close**, because criterion 1 is conjunctive and only
 its second half exists: no merge capability, at two layers, and no pull request opened. It was
@@ -930,6 +930,90 @@ layers, and the first half does not exist — nothing in `twin/` has touched a l
 Wiring it needs a reachable remote and an authorised push. The ticket records the split rather than
 claiming the whole, which is the same shape build tickets 64 and 78 already carry.
 
+## Graded enforcement, and posture-as-identity narrowed
+
+Build ticket 67. The other two prior-estate hypotheses, tested on the risk basis rather than
+inherited. Decision ticket 18 Q4: **graded enforcement survives, posture-as-identity survives
+narrowed.** Both verdicts are realised here rather than restated.
+
+**Consequence is a spectrum, and `block` is the bottom rung of it.**
+`twin/enforcement-grades.yaml` is a versioned four-rung ladder — `observe`, `warn`, `constrain`,
+`block` — and a control occupies exactly one rung. Two rungs change the outcome and two do not,
+which is the property everything else is scoped by. The ladder is data rather than code for the
+reason the evidence ladder is: a reader who does not write Python can see what each rung admits,
+and changing a rung is a diff against a version number.
+
+| rung | changes the outcome | realised by |
+|---|---|---|
+| `observe` | no | Kyverno `Audit` in `estate/driftwood` |
+| `warn` | no | **nothing in this estate** — named because the ladder is the vocabulary |
+| `constrain` | yes | `estate/platform/graded` — mutate + generate cages a workload by degree |
+| `block` | yes | Kyverno `Enforce` in `estate/platform/posture` |
+
+**The load-bearing half is that a rung carries no number.** Decision ticket 18 Q4 admitted graded
+enforcement precisely because it needs **no special status**: it is a control that modifies a FAIR
+factor by degree, and the £ engine already prices partial mitigation through the control's own
+evidence-graded `mitigates` claim. A reduction per rung would quietly turn that into a **free
+multiplier** — tighten the rung, earn more credit, evidence nothing — which is exactly the
+unfalsifiable claim build ticket 30's grade exists to stop. So the loader refuses a number on a
+rung, the response schema refuses one inside an `enforcement` block, and the suite asserts the
+sharper thing: **the same control produces an identical `Option` at every rung.** `Option` is the
+only object the pre-filter accepts and therefore the only thing that can reach a price, so the rung
+is structurally invisible to the £. Moving a control up a rung earns nothing on its own; it earns
+what somebody can evidence at the new rung, which is why the fixture's move record says the
+re-measured reduction travelled with it.
+
+**Posture-as-identity is computed, never declared.** The prior estate's version was a philosophy an
+author could assert. Here a control qualifies on two declared facts and nothing else: its rung
+**changes the outcome**, and its posture is **stamped by something that is not the subject**. There
+is no field to declare it with — the schema refuses `posture_as_identity` as an unknown key, the
+same move that makes a depth grade derived rather than typed. Five cases are named as excluded and
+published in the artefact:
+
+- **a lever that is not code** — no enforcement point to bind an identity to. A pay rise cannot be
+  a path segment in an SVID, and most levers are this one.
+- **a rung that does not change the outcome** — an identity stamped by an observing control attests
+  that the control ran, never that anything was in force.
+- **a posture the subject can write** — the identity then carries the subject's own claim. The
+  estate's trust boundary exists for exactly this, and a control with no trusted stamper is
+  excluded by rule.
+- **posture-as-identity as a governance philosophy** — admitted as an implementation of "provably
+  in force" for the machine-enforceable subset, refused as the shape of governance.
+- **proof that a control is in force *now*** — the identity attests the posture at issue, not
+  since. Whether continuous proof of force is required at all is build ticket 65's pre-registered
+  question and is open.
+
+Declaring a trusted stamper at a rung that changes nothing is **refused at load** rather than
+computed to `false`, because the field would otherwise sit in the model looking like the claim
+while meaning nothing — and a claim reading bigger than it is was the original defect.
+
+**Moving a control between rungs is versioned like an evidence grade, and for the same reason.** A
+rung travels with a control, so an edited rung is an edited control. `enforcement_moves` records
+who moved it, when, from what, to what and why; the chain must be contiguous and end where the
+control now stands; and `twin validate` reads the file's **git history**, which is the half that
+catches the first unrecorded move, before any chain exists to be inconsistent with. The two records
+are deliberately separate — a regrade moves what we *believe*, a move changes what a control
+*does* — so neither is ever offered in place of the other, and the suite asserts that a regrade
+does not cover a rung change.
+
+**Deleting a control's `enforcement` block counts as a move, and adding one does not.** The
+asymmetry is deliberate: a control that gains a rung has none to have moved from, while one that
+loses its rung loses every consequence it carried — and a deletion is the shape a weakening takes
+when nothing forces it to be recorded. The history check reads a missing block as `(no rung)`,
+which is not a valid rung, so no move record can ever cover the removal and it is always reported.
+
+**"Signed" is qualified in the artefact rather than left to read bigger than it is**, the same way
+build ticket 66 qualified it on the dependency pins. The published posture is **authored** — which
+rung a control occupies is a declaration — so `derived_never_human_signed`'s counterpart requires a
+human signature on it, and every move names a registered role. What is *not* signed is the git
+commit that carried the move: this repository's commits are not keyless-signed, which
+`estate/verify/provenance/verify-provenance.sh` already records. So "signed" attaches to the
+artefact and to the role binding, never to the commit.
+
+```bash
+twin enforcement --repo <model-repo> --org intel --out posture.json
+```
+
 ## Whose £
 
 The £ is perspectival: it belongs to whoever pays to run the twin. A perspective declares who pays,
@@ -1501,9 +1585,9 @@ reaches `full`, and nothing can be typed as `full`.
 | `forecast-book` | 21 | partial | 5 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
-| `enactment` | 18 | partial | 2 / 5 |
+| `enactment` | 18 | partial | 3 / 5 |
 
-**37 of 69**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**38 of 69**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
 there"** — the strongest capability here stands at six ticks, and one of the twelve still stands at
 one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
@@ -1518,10 +1602,18 @@ left empty (build ticket 47 for decision ticket 15, build ticket 63 for decision
 ticks two of the five: AC 1 (act-vs-propose decided, with the boundary stated) and AC 3 (the verdict
 on policy-as-versioned-dependency, realised in code rather than restated — `--channel` admits
 exactly the two narrowed roles and has no default). The other three stay unticked and are named
-work: ACs 2 and 5 are build ticket 68's multi-channel enactment sensing, and AC 4 is build ticket
-67's graded enforcement and posture-as-identity. The denominator grew by five and the numerator by
-two, so the fraction moved **down**, from 35/64 to 37/69. That is the arithmetic behaving correctly:
-a new capability file admits its own unbuilt criteria into the count on the day it is created.
+work: ACs 2 and 5 are build ticket 68's multi-channel enactment sensing. The denominator grew by
+five and the numerator by two, so the fraction moved **down**, from 35/64 to 37/69. That is the
+arithmetic behaving correctly: a new capability file admits its own unbuilt criteria into the count
+on the day it is created.
+
+**Build ticket 67 ticks AC 4**, the verdict on graded enforcement and posture-as-identity, moving
+the row to 3/5 and the table to 38/69. Both halves are realised rather than restated: the rung
+ladder carries no number and the same control is one `Option` at every rung, so graded enforcement
+genuinely needs no special status; and posture-as-identity is computed from two declared facts with
+no field to declare it, five unsupported cases named as excluded. Where that tick stops is written
+into the checklist the same way AC 3's is: **signed** attaches to the authored posture artefact and
+to each move's role binding, and not to the git commit that carried the move.
 
 AC 3's tick was challenged in review and survives with its boundary written into the checklist. The
 challenge is fair and worth repeating here: the verdict's own rationale is that a signed pinned
@@ -1822,7 +1914,12 @@ number) and `enactment_is_propose_only_at_both_layers` (build ticket 66: layer 1
 against an allow-list, layer 2 driven through the three composition paths that defeat layer 1 and
 one proposing call it must still admit, and — the leg that will actually rot — layer 2's own
 registration read back out of `.claude/settings.json`, because a forgotten call site is that
-layer's named failure mode).
+layer's named failure mode) and `enforcement_is_a_spectrum_and_never_prices_a_rung` (build ticket
+67: every rung is occupiable, a priced rung and a priced enforcement block are both refused, and
+the sharper leg — the same control produces an identical `Option` at the loosest and the tightest
+rung, so a rung cannot reach the £ at all; posture-as-identity is asserted as computed rather than
+declarable, with the fixture's controls landing on both sides of the line; and a rung tightened in
+a commit with no move record is caught in git history, where the chain check cannot see it).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared
@@ -1981,6 +2078,16 @@ Named here so the skeleton cannot quietly become the definition of done.
   repository. The upgrade named in the module is a credential that **cannot** merge: a GitHub App
   token with `pull_requests: write` and no `contents: write`, which moves the refusal to the
   server. Layer 1 is what stands behind the gaps, which is why both exist.
+- **An enforcement rung is a declaration, checked against nothing running.** A control declaring
+  `constrain` says where it is enforced; no cluster is asked whether it is. That is the same limit
+  the dependency pins carry, and posture-as-identity's fifth named exclusion is exactly it: the
+  identity attests the posture at issue, never since.
+- **`warn` has no realisation in this estate.** The rung is named because the ladder is the
+  vocabulary, and its own entry says so rather than implying a Kyverno mode that exists.
+- **A move is versioned but its commit is not signed.** The move record names a registered role and
+  the published posture is authored and human-signed; the git commit carrying the move is not
+  keyless-signed, which `estate/verify/provenance/verify-provenance.sh` already records for this
+  repository's commits generally. Same upgrade as the signing entry above.
 - **The dependency pins are read from committed sources, not from a running cluster.** Six
   cross-repository pins across three consumer repositories evidence what those repositories
   *declare* they consume — three further pins are institutions syncing themselves and consume
@@ -2160,6 +2267,9 @@ twin/
                   ships through. There is no sibling that disposes
   enact_guard.py  propose-only, layer 2 — the tool-call boundary, which is where the guarantee
                   survives the twin gaining a shell tool or a subagent with `gh`
+  enforcement.py  the enforcement rungs, the move record, and posture-as-identity computed
+                  from two declared facts rather than declared by anybody
+  enforcement-grades.yaml   the versioned rung ladder — and no number anywhere on it
   grades.py       depth grades as computed checklists
   worksheet.py    the pocket-org worksheet, parsed and checked
   pocket-org-worksheet.md   the hand-computed yardstick — authored, and the authority

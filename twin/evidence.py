@@ -31,7 +31,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import yaml
 
@@ -230,6 +230,38 @@ def check_chain(subject: str, current_grade: int, chain: list[dict[str, Any]], w
         )
 
 
+def unrecorded_changes(
+    repo: Any,
+    unit_path: str,
+    tree: str,
+    subdirs: tuple[str, ...],
+    read_at: Callable[[Any, str, str], tuple[str, Any] | None],
+) -> list[tuple[str, str, Any, Any, str]]:
+    """Every observed change of a graded value, as `(path, subject, was, now, commit)`.
+
+    The walk rather than the judgement: it reads what each file declared at every commit that
+    touched it and reports where that value changed. Shared with `twin/enforcement.py`, whose
+    enforcement grades move under exactly the same rule and would otherwise carry a second copy of
+    this loop — and a second copy of a check like this is how one of them quietly stops biting.
+    """
+    changes: list[tuple[str, str, Any, Any, str]] = []
+    for subdir in subdirs:
+        for rel in repo.list_tree(tree, subdir):
+            if not rel.endswith((".yaml", ".yml")):
+                continue
+            full = f"{unit_path}/{rel}" if unit_path else rel
+            observed: list[tuple[str, str, Any]] = []
+            for commit in repo.commits_touching(full):
+                seen = read_at(repo, commit, full)
+                if seen is None:
+                    continue
+                if not observed or observed[-1][2] != seen[1]:
+                    observed.append((commit, seen[0], seen[1]))
+            for (_, _, was), (commit, subject, now) in zip(observed, observed[1:]):
+                changes.append((full, subject, was, now, commit))
+    return changes
+
+
 def history_violations(repo: Any, unit_path: str, tree: str, regrades: dict[str, dict[str, Any]]) -> list[str]:
     """Every change an evidence grade has ever undergone, checked against the regrade record.
 
@@ -237,26 +269,14 @@ def history_violations(repo: Any, unit_path: str, tree: str, regrades: dict[str,
     catches the first unrecorded move, where there is no chain yet — by reading what the file said
     at every commit that touched it.
     """
-    violations: list[str] = []
-    for subdir in GRADED_COLLECTIONS:
-        for rel in repo.list_tree(tree, subdir):
-            if not rel.endswith((".yaml", ".yml")):
-                continue
-            full = f"{unit_path}/{rel}" if unit_path else rel
-            observed: list[tuple[str, str, int]] = []
-            for commit in repo.commits_touching(full):
-                seen = _graded_at(repo, commit, full)
-                if seen is None:
-                    continue
-                if not observed or observed[-1][2] != seen[1]:
-                    observed.append((commit, seen[0], seen[1]))
-            for (_, _, was), (commit, subject, now) in zip(observed, observed[1:]):
-                if not _covered(regrades, subject, was, now):
-                    violations.append(
-                        f"{full}: evidence grade of {subject!r} moved {was} -> {now} at commit "
-                        f"{commit[:12]} with no regrade event recording who moved it and why"
-                    )
-    return sorted(violations)
+    return sorted(
+        f"{full}: evidence grade of {subject!r} moved {was} -> {now} at commit "
+        f"{commit[:12]} with no regrade event recording who moved it and why"
+        for full, subject, was, now, commit in unrecorded_changes(
+            repo, unit_path, tree, GRADED_COLLECTIONS, _graded_at
+        )
+        if not _covered(regrades, subject, was, now)
+    )
 
 
 def _graded_at(repo: Any, commit: str, full: str) -> tuple[str, int] | None:

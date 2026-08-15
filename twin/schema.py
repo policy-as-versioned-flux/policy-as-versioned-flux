@@ -265,6 +265,52 @@ def mitigation(value: Any, where: str) -> None:
     text(value["basis"], f"{where}.basis")
 
 
+def enforcement(value: Any, where: str) -> None:
+    """Which rung of the enforcement ladder a control occupies, and where it is enforced.
+
+    Build ticket 67. **No number lives here.** A rung orders consequence; what the control removes
+    is its own `mitigates` claim with its own evidence grade, so tightening a rung earns nothing
+    on its own — which is what stops graded enforcement becoming a free multiplier.
+
+    `stamped_by` is the only input to posture-as-identity an author supplies, and it is not the
+    claim: the claim is computed from this field plus the rung's own `changes_the_outcome`
+    (`twin/enforcement.py`). Decision ticket 18 Q4 narrowed posture-as-identity to an
+    implementation of "provably in force", so there is no field here to declare it with.
+    """
+    from .enforcement import EnforcementError, grades, refuse_untrusted_stamp
+
+    if not isinstance(value, dict):
+        raise SchemaError(f"{where}: expected an enforcement mapping, got {value!r}")
+    fields = {"grade", "point"}
+    optional = {"stamped_by"}
+    unknown = sorted((set(value) - fields - optional), key=str)
+    if unknown:
+        raise SchemaError(
+            f"{where}: unknown field(s) {', '.join(str(u) for u in unknown)}; enforcement is grade, "
+            "point and an optional stamped_by. A reduction or a cost here would be a price on a "
+            "rung, which is credit nobody evidenced."
+        )
+    missing = sorted(fields - set(value))
+    if missing:
+        raise SchemaError(
+            f"{where}: missing {', '.join(missing)}. A rung with no named enforcement point cannot "
+            "be checked against anything, and a control with no rung has no stated consequence."
+        )
+    known = grades()
+    if value["grade"] not in known:
+        raise SchemaError(
+            f"{where}.grade: {value['grade']!r} is not a rung on the enforcement ladder "
+            f"(have: {', '.join(known)})"
+        )
+    text(value["point"], f"{where}.point")
+    if "stamped_by" in value:
+        text(value["stamped_by"], f"{where}.stamped_by")
+    try:
+        refuse_untrusted_stamp(value, where)
+    except EnforcementError as exc:
+        raise SchemaError(str(exc)) from None
+
+
 def calibration(value: Any, where: str) -> None:
     """Authoring-time provenance for a calibrated range: who estimated it, when, against what
     reference class (build ticket 23, `twin/calibration.md` steps
@@ -616,7 +662,27 @@ SCHEMAS: dict[str, Schema] = {
         optional={
             "crosses": mapping_of(text), "note": text, "mitigates": mitigation,
             "calibration": calibration,
+            # Optional, and its absence is the majority case rather than an omission (build ticket
+            # 67). Most levers are not code, so most controls occupy no rung at all — which is the
+            # same finding that narrowed policy-as-versioned-dependency.
+            "enforcement": enforcement,
         },
+    ),
+    # Moving a control between rungs (build ticket 67). Shaped like a regrade and separate from
+    # one: a regrade moves what we *believe*, this moves what a control *does*, and merging them
+    # would let one record be offered as the other.
+    "enforcement-move": Schema(
+        required={
+            "id": ident,
+            "subject": ident,
+            "from_grade": text,
+            "to_grade": text,
+            "moved_on": date,
+            "by_role": ident,
+            "reason": text,
+            "evidence": text,
+        },
+        optional={"note": text},
     ),
     # A scenario carries **no regime** (build ticket 36). The regime is a required parameter of
     # the execution, and a scenario-level field would be a default in everything but name: an
@@ -858,10 +924,38 @@ def _refine_claim(doc: dict[str, Any], where: str) -> None:
             )
 
 
+def _refine_enforcement_move(doc: dict[str, Any], where: str) -> None:
+    """A move goes between two real rungs, and somebody in a registered role stands behind it."""
+    from .enforcement import EnforcementError, direction, grades
+    from .sign import SignatureError, role_ids
+
+    known_grades = grades()
+    for field in ("from_grade", "to_grade"):
+        if doc[field] not in known_grades:
+            raise SchemaError(
+                f"{where}: {field} {doc[field]!r} is not a rung on the enforcement ladder "
+                f"(have: {', '.join(known_grades)})"
+            )
+    try:
+        direction(str(doc["from_grade"]), str(doc["to_grade"]))
+    except EnforcementError as exc:
+        raise SchemaError(f"{where}: {exc} — it moves {doc['subject']!r} nowhere") from None
+    try:
+        known = role_ids()
+    except SignatureError as exc:  # pragma: no cover - a broken register is its own error
+        raise SchemaError(f"{where}: {exc}") from None
+    if str(doc["by_role"]) not in known:
+        raise SchemaError(
+            f"{where}: by_role {doc['by_role']!r} is not in the register (have: {', '.join(known)}). "
+            "A move records who changed what a control does, and a role nobody holds records nobody."
+        )
+
+
 REFINEMENTS: dict[str, Callable[[dict[str, Any], str], None]] = {
     "component": _refine_component,
     "edge": _refine_edge,
     "regrade": _refine_regrade,
+    "enforcement-move": _refine_enforcement_move,
     "perspective": _refine_perspective,
     "claim": _refine_claim,
 }
@@ -889,6 +983,7 @@ COLLECTION_KINDS: dict[str, str] = {
     "people": "person",
     "edges": "edge",
     "regrades": "regrade",
+    "enforcement_moves": "enforcement-move",
     "perspectives": "perspective",
     "responses": "response",
     "observations": "observation",

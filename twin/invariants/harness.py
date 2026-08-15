@@ -2737,6 +2737,163 @@ def _enactment_is_propose_only_at_both_layers(ctx: Context) -> str:
     )
 
 
+@harness_check("enforcement_is_a_spectrum_and_never_prices_a_rung")
+def _enforcement_is_a_spectrum_and_never_prices_a_rung(ctx: Context) -> str:
+    """Consequence is a spectrum, a rung buys no credit, and posture-as-identity is computed (67).
+
+    A guard on the suite rather than an invariant, for the same reason build ticket 66's is: the
+    constitution names sixteen invariants and may not grow a seventeenth without the constitution
+    changing first.
+
+    **The leg that matters is the one about money.** Decision ticket 18 Q4 admitted graded
+    enforcement on the basis that it needs *no special status* — a control that modifies a FAIR
+    factor by degree, priced by the £ engine's existing partial-mitigation path. A rung that
+    carried a number would quietly turn that into a free multiplier: tighten the rung, earn more
+    credit, with nothing evidencing it. So the assertion is that a rung is **invisible to
+    pricing** — the same control at the loosest and the tightest rung produces an identical
+    `Option`, which is the only thing that reaches the pre-filter and therefore the only thing
+    that can reach a price.
+
+    **Posture-as-identity is asserted as computed rather than declarable.** The prior estate's
+    version was a philosophy an author could assert; here it is derived from two declared facts,
+    and the fixture carries a control on each side of the line.
+    """
+    from .. import attest, enforcement, options, verbs
+    from ..artefact import AUTHORED
+    from ..model import Overlay
+    from ..repo import ModelRepo
+    from ..schema import SchemaError, validate
+
+    # -- the ladder is a spectrum, and every rung is occupiable -------------------------------
+    rungs = enforcement.grades()
+    if len(rungs) < 3 or enforcement.changes_the_outcome(rungs[0]) or not enforcement.changes_the_outcome(rungs[-1]):
+        raise Violated(
+            f"the ladder runs {rungs}: a cliff edge with extra steps, not a spectrum. The bottom "
+            "rung must change the outcome and the top one must not, or grading buys nothing"
+        )
+    intervening = [g for g in rungs if enforcement.changes_the_outcome(g)]
+    if len(intervening) < 2:
+        raise Violated(
+            f"only {intervening} changes the outcome, so {rungs[-1]!r} is the mechanism rather than "
+            "the bottom rung — which is the cliff edge this ticket exists to remove"
+        )
+    for rung in rungs:
+        validate(
+            "response",
+            {
+                "id": "a-control", "name": "A control", "addresses": "foundry-services",
+                "cost": {"min": 1, "mode": 2, "max": 3},
+                "enforcement": {"grade": rung, "point": "somewhere a decision is taken"},
+            },
+            f"occupancy check at {rung!r}",
+        )
+
+    # -- a rung carries no number, and cannot reach a price -----------------------------------
+    priced_rung = dict(enforcement.ladder())
+    priced_rung["grades"] = [{**dict(enforcement.ladder()["grades"][0]), "reduction": 0.4}]
+    scratch = ctx.tmp / "priced-rung.yaml"
+    scratch.write_text(yaml.safe_dump(priced_rung), encoding="utf-8")
+    try:
+        enforcement.ladder(scratch)
+    except enforcement.EnforcementError:
+        pass
+    else:
+        raise Violated(
+            "a rung carrying a reduction was admitted. A number on a rung is credit nobody "
+            "evidenced: tighten the rung, earn more. The £ comes from the control's own graded "
+            "mitigation claim and from nowhere else."
+        )
+    for banned in ({"reduction": {"min": 0, "mode": 0.5, "max": 1}}, {"cost": 5}, {"posture_as_identity": True}):
+        try:
+            validate(
+                "response",
+                {
+                    "id": "a-control", "name": "A control", "addresses": "foundry-services",
+                    "cost": {"min": 1, "mode": 2, "max": 3},
+                    "enforcement": {"grade": rungs[-1], "point": "an enforcement point", **banned},
+                },
+                "planted",
+            )
+        except SchemaError:
+            continue
+        raise Violated(
+            f"a control declared {sorted(banned)} inside its enforcement block. A price there is a "
+            "rung that buys credit; a declared posture-as-identity is the philosophy decision "
+            "ticket 18 Q4 refused, asserted by the party it flatters"
+        )
+
+    repo = ModelRepo.open(ctx.repo_dir)
+    intel = Overlay.load(repo, "intel")
+    control = dict(intel.responses["pin-the-tooling-image-set"])
+    at_loosest = dict(control, enforcement={**control["enforcement"], "grade": rungs[0]})
+    if options.Option.of(control) != options.Option.of(at_loosest):
+        raise Violated(
+            "the same control produces a different Option at a different rung, so the rung reaches "
+            "the pre-filter and therefore the price. Graded enforcement would then be a multiplier "
+            "the £ engine never agreed to."
+        )
+
+    # -- posture-as-identity: computed from two facts, and excluded by name otherwise ----------
+    admitted = enforcement.posture_as_identity(control)
+    if not admitted["admitted"]:
+        raise Violated(
+            f"the fixture's machine-enforceable control is excluded as {admitted['excluded_as']!r}, "
+            "so the supported case is asserted nowhere and the narrowing is a refusal of everything"
+        )
+    unstamped = dict(control, enforcement={k: v for k, v in control["enforcement"].items() if k != "stamped_by"})
+    observing = dict(intel.responses["report-node-schedule-variance"])
+    lever = dict(intel.responses["report-node-schedule-variance"])
+    lever.pop("enforcement")
+    for subject, expected in ((unstamped, 2), (observing, 1), (lever, 0)):
+        verdict = enforcement.posture_as_identity(subject)
+        if verdict["admitted"] or verdict["excluded_as"] != enforcement.POSTURE_EXCLUSIONS[expected]["case"]:
+            raise Violated(
+                f"a control that should be excluded as "
+                f"{enforcement.POSTURE_EXCLUSIONS[expected]['case']!r} came back as {verdict}. "
+                "Posture-as-identity survives only where the evidence supports it, and each "
+                "unsupported case is named rather than silently admitted"
+            )
+
+    # -- a rung moves only with a record, and the record is git-versioned ----------------------
+    moved = ctx.tmp / "moved-repo"
+    if not moved.exists():
+        fixtures.build(moved)
+        fixtures.plant_unrecorded_enforcement_move(moved)
+    moved_repo = ModelRepo.open(moved)
+    moved_overlay = Overlay.load(moved_repo, "intel")
+    found = enforcement.history_violations(
+        moved_repo, moved_overlay.ref.path, moved_overlay.ref.tree, moved_overlay.enforcement_moves
+    )
+    if not found:
+        raise Violated(
+            "a control was tightened to the bottom rung in a commit with no move event covering "
+            "it, and nothing noticed. The chain check cannot see this, so the git history is the "
+            "only thing that can"
+        )
+
+    # -- the published posture is authored, so somebody is accountable for where a control sits --
+    posture = enforcement.artefact(repo, "intel", verbs.command_for("enforcement", org="intel"))
+    if posture.mark != AUTHORED:
+        raise Violated(
+            "the enforcement posture is not authored, so nothing requires a human signature on it "
+            "— and 'moving a control between grades is a signed change' has nobody behind it"
+        )
+    problems = attest.check(attest.build(posture, []), posture.to_bytes(), material=b"invariant-suite-key")
+    if not any("no human signature" in problem for problem in problems):
+        raise Violated(
+            f"an unsigned authored posture raised {problems or 'nothing'} — an authored artefact "
+            "with no human signature has nobody accountable for it, and the sidecar must say so"
+        )
+
+    return (
+        f"{len(rungs)} rungs, {len(intervening)} of them changing the outcome; a priced rung and a "
+        f"priced enforcement block are both refused; the same control is one Option at {rungs[0]!r} "
+        f"and at {rungs[-1]!r}; posture-as-identity admitted for 1 control and excluded by name for "
+        f"3, of {len(enforcement.POSTURE_EXCLUSIONS)} named cases; {len(found)} unrecorded move(s) "
+        "caught in git history; the posture is authored and unsigned reads as unsigned"
+    )
+
+
 @harness_check("scheduled_emission_ignores_signal_presence")
 def _sweep_is_not_event_gated(ctx: Context) -> str:
     """A scheduled sweep emits the same volume twice running, nothing having changed (build ticket 09).

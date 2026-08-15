@@ -36,6 +36,7 @@ WORLD_COLLECTIONS = ("components", "propositions", "world_models", "priors")
 OVERLAY_COLLECTIONS = (
     "components", "world_models", "signals", "claims", "scenarios", "outcomes", "people", "edges",
     "perspectives", "regrades", "responses", "own_data", "causal_accounts",
+    "enforcement_moves",
 )
 
 
@@ -146,6 +147,9 @@ class Overlay:
     # edge ids, held beside `edges` rather than replacing it. None is canonical; `causal_graph`
     # treats every id the same way, this overlay's own `edges` collection included.
     causal_accounts: dict[str, dict[str, Any]]
+    # Every move of a control between enforcement rungs (build ticket 67). Held beside `regrades`
+    # rather than inside it: a regrade moves what we believe, a move changes what a control does.
+    enforcement_moves: dict[str, dict[str, Any]]
 
     @classmethod
     def load(cls, repo: ModelRepo, org: str) -> "Overlay":
@@ -254,6 +258,7 @@ class Overlay:
                     ) from None
         self._check_scenarios()
         self._check_responses()
+        self._check_enforcement_moves()
         self._check_own_data()
         self._check_causal_accounts()
 
@@ -358,6 +363,48 @@ class Overlay:
                 evidence.check_chain(subject, int(doc["evidence_grade"]), chain, f"overlay {self.org!r}")
             except evidence.EvidenceError as exc:
                 raise ModelError(str(exc)) from None
+
+    def _check_enforcement_moves(self) -> None:
+        """A rung is immutable without a move record, and the record has to add up.
+
+        The same two-part discipline the evidence grade already carries, for the same reason: the
+        chain check runs on every load, and the half that reads git history is `twin validate`,
+        because it costs a process per commit per response file.
+        """
+        from . import enforcement
+
+        for ident, move in sorted(self.enforcement_moves.items()):
+            subject = str(move["subject"])
+            if subject not in self.responses:
+                raise ModelError(
+                    f"enforcement move {ident!r} names subject {subject!r}, which is not a response "
+                    "in this overlay. A move with no control records nothing."
+                )
+            if not (self.responses[subject].get("enforcement") or {}):
+                raise ModelError(
+                    f"enforcement move {ident!r} moves {subject!r}, which occupies no rung at all. "
+                    "A lever that is not code has no consequence to move, and pretending otherwise "
+                    "is how policy-as-code becomes the definition of governance again."
+                )
+        for subject, response in sorted(self.responses.items()):
+            declared = (response.get("enforcement") or {}).get("grade")
+            if declared is None:
+                continue
+            chain = enforcement.chain_for(subject, self.enforcement_moves)
+            try:
+                enforcement.check_chain(subject, str(declared), chain, f"overlay {self.org!r}")
+            except enforcement.EnforcementError as exc:
+                raise ModelError(str(exc)) from None
+
+    def enforcement_move_records(self) -> list[dict[str, Any]]:
+        """Every move, with its direction derived. Ordered by control, then oldest first."""
+        from . import enforcement
+
+        return [
+            enforcement.record(move)
+            for subject in sorted({str(m["subject"]) for m in self.enforcement_moves.values()})
+            for move in enforcement.chain_for(subject, self.enforcement_moves)
+        ]
 
     def regrade_records(self) -> list[dict[str, Any]]:
         """Every regrade, with its direction derived. Ordered by subject, then oldest first."""

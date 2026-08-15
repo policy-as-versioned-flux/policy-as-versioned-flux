@@ -1,0 +1,70 @@
+# The enforcement ladder (build ticket 67, from decision ticket 18 Q4).
+#
+# Consequence is a **spectrum rather than a cliff edge**: `block` is the bottom rung of a ladder,
+# never the mechanism. A control occupies exactly one rung, and moving it between rungs is a
+# recorded, role-attributed change (`enforcement_moves`, `twin/enforcement.py`).
+#
+# Data rather than code, for the reason the evidence ladder is: a reader who does not write Python
+# can see what each rung admits, and changing a rung is a diff against a version number.
+#
+# **No rung carries a number, and the loader refuses one.** Decision ticket 18 Q4 found that graded
+# enforcement needs no special status — it is a control that modifies a FAIR factor *by degree*,
+# and the £ engine already prices partial mitigation through the control's own evidence-graded
+# `mitigates` claim. A reduction per rung would be a free multiplier: tighten the rung, earn more
+# credit, with nothing evidencing it. That is exactly the unfalsifiable claim build ticket 30's
+# grade exists to stop, so the ladder orders consequence and prices nothing.
+#
+# `changes_the_outcome` is the property posture-as-identity is scoped by, not decoration. An
+# identity stamped by a control that leaves the outcome alone attests that the control ran, never
+# that anything was in force — the action would have proceeded identically without it.
+schema: twin.enforcement-grades/v1
+version: 1
+grades:
+  - grade: observe
+    rank: 1
+    changes_the_outcome: false
+    admits: >-
+      The control records the action and lets it proceed unchanged. Everything it produces is
+      evidence about the past; nothing about it constrains the present.
+    does_not: >-
+      Prove that anything was in force. An estate that runs every policy in audit mode is
+      indistinguishable, from the outside, from one that runs none of them.
+    realised_by: >-
+      Kyverno `Audit` in estate/driftwood — the policy report is written and admission proceeds.
+  - grade: warn
+    rank: 2
+    changes_the_outcome: false
+    admits: >-
+      The control tells the actor at the decision point and lets the action proceed. It changes
+      who knows, and it changes nothing about what happens.
+    does_not: >-
+      Differ from `observe` in outcome. It is a separate rung because it differs in *cost* — a
+      warning is a lever on behaviour, priced like any other, and collapsing it into `observe`
+      would hide a control that has a real run-cost and a real effect on people.
+    realised_by: >-
+      Nothing in this estate. Named as a rung because the ladder is the vocabulary, and a rung
+      with no realisation is honest where a silently absent one is not.
+  - grade: constrain
+    rank: 3
+    changes_the_outcome: true
+    admits: >-
+      The action proceeds in a narrowed form. The subject keeps running and loses capability:
+      tighter limits, dropped privileges, a cut reach.
+    does_not: >-
+      Close the loss path. A constrained subject still runs, so the residual stays above zero and
+      the cage's own run-cost is a real cost that belongs in the comparison.
+    realised_by: >-
+      estate/platform/graded — Kyverno mutate + generate cages a behind-posture workload by
+      degree (cpu/memory limits, dropped capabilities, read-only filesystem, egress lockdown).
+  - grade: block
+    rank: 4
+    changes_the_outcome: true
+    admits: >-
+      The action is refused. The loss path is closed and the capability is gone with it.
+    does_not: >-
+      Deserve its status as the default consequence. It is one rung of four, reached when the
+      tightest rung below it still leaves a residual over the appetite band — which is the whole
+      of "a spectrum rather than a cliff edge".
+    realised_by: >-
+      Kyverno `Enforce` in estate/platform/posture — a pod whose posture label disagrees with its
+      validated claim is denied.

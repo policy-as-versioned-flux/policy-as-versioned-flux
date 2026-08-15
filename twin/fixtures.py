@@ -469,6 +469,73 @@ reason: >-
   with observable data on both sides of it.
 evidence: Review of the source series against the ladder's grade-1 admission criterion.
 """,
+    # Two machine-enforceable controls at different rungs of the enforcement ladder (build ticket
+    # 67). They live on `intel` rather than `netflix` because netflix's three responses are the
+    # majority case the narrowing is about — levers that are not code, occupying no rung at all.
+    #
+    # One qualifies for posture-as-identity and one does not, and neither declares it: admission
+    # is computed from the rung's `changes_the_outcome` and from whether the posture is stamped by
+    # something that is not the subject.
+    "orgs/intel/responses/pin-the-tooling-image-set.yaml": """\
+id: pin-the-tooling-image-set
+name: Pin the fab tooling image set to signed digests
+addresses: foundry-services
+cost:
+  min: 400000
+  mode: 900000
+  max: 2000000
+enforcement:
+  grade: constrain
+  point: >-
+    Admission control on the fab control-plane cluster: an unpinned image is admitted with its
+    egress cut and its capabilities dropped, rather than refused.
+  stamped_by: >-
+    the admission controller, which is the only writer of the posture label; the workload has no
+    patch grant on its own pod
+mitigates:
+  component: foundry-services
+  reduction:
+    min: 0.05
+    mode: 0.12
+    max: 0.25
+  evidence_grade: 2
+  basis: >-
+    Measured against tooling-image incidents on both sides of the pinning change at two fabs.
+note: >-
+  Occupies `constrain` rather than `block` because the tightest rung would stop the line. The
+  rung carries no number: the reduction above is the control's own graded claim, and it would
+  have to be re-evidenced at any other rung.
+""",
+    "orgs/intel/responses/report-node-schedule-variance.yaml": """\
+id: report-node-schedule-variance
+name: Report node schedule variance at every gate review
+addresses: foundry-services
+cost:
+  min: 50000
+  mode: 120000
+  max: 300000
+note: >-
+  At `observe`, and therefore excluded from posture-as-identity by rule: an identity stamped by a
+  control that leaves the outcome alone attests that the control ran, never that anything was in
+  force. It carries no `mitigates` claim either — a control that claims nothing earns nothing.
+enforcement:
+  grade: observe
+  point: The gate review record; the gate proceeds either way.
+""",
+    "orgs/intel/enforcement_moves/pin-the-tooling-image-set-tightened.yaml": """\
+id: pin-the-tooling-image-set-tightened
+subject: pin-the-tooling-image-set
+from_grade: warn
+to_grade: constrain
+moved_on: '2026-04-02'
+by_role: model-steward
+reason: >-
+  Two unpinned tooling images reached a fab under the warning rung, which changed who knew and
+  changed nothing about what happened.
+evidence: >-
+  The two admission records, and the re-measured reduction at the new rung — the move does not
+  inherit the credit claimed at the old one.
+""",
     # Two perspectives over the same overlay (build ticket 26). Nothing here ranks them and
     # nothing defaults to the first: `twin exposure` with no `--perspective` reports both.
     "orgs/netflix/perspectives/the-operator.yaml": """\
@@ -1181,6 +1248,80 @@ evidence: Review of the underlying series.
     )
     git(path, "add", "-A")
     git(path, "commit", "-q", "-m", "regrade an edge, and record the regrade")
+    return git(path, "rev-parse", "HEAD").strip()
+
+
+ENFORCED_CONTROL = "orgs/intel/responses/pin-the-tooling-image-set.yaml"
+
+
+def plant_unrecorded_enforcement_move(root: str | Path, grade: str = "block") -> str:
+    """Move a control between rungs in a commit and record nothing. The history check must bite.
+
+    The chain check cannot see this (build ticket 67): after the edit the control simply declares
+    a different rung, the one recorded move still ends where the file now stands only if it
+    happens to, and there is otherwise no chain to be inconsistent with. Only the file's own
+    history says the consequence changed.
+    """
+    path = Path(root)
+    text = (path / ENFORCED_CONTROL).read_text(encoding="utf-8")
+    (path / ENFORCED_CONTROL).write_text(
+        text.replace("grade: constrain", f"grade: {grade}"), encoding="utf-8", newline="\n"
+    )
+    _write(
+        path,
+        {
+            # The recorded move has to be extended too, or the chain check catches this on load
+            # and the history check never gets its turn — which would make the leg vacuous.
+            "orgs/intel/enforcement_moves/pin-the-tooling-image-set-tightened.yaml": f"""\
+id: pin-the-tooling-image-set-tightened
+subject: pin-the-tooling-image-set
+from_grade: warn
+to_grade: {grade}
+moved_on: '2026-04-02'
+by_role: model-steward
+reason: >-
+  Backdated over the original move so that only git history disagrees. The record now claims a
+  move that never happened in one step.
+evidence: The two admission records.
+"""
+        },
+    )
+    git(path, "add", "-A")
+    git(path, "commit", "-q", "-m", "quietly tighten a control to the bottom rung")
+    return git(path, "rev-parse", "HEAD").strip()
+
+
+def record_an_enforcement_move(root: str | Path, grade: str = "block") -> str:
+    """Move a control between rungs **and** write the move event, in one commit.
+
+    The counterpart to `plant_unrecorded_enforcement_move`, and the reason `record_a_regrade`
+    exists beside its own plant: the fixture's committed move predates the repository, so without
+    this the history check would have no observed change to match against and would pass vacuously.
+    """
+    path = Path(root)
+    text = (path / ENFORCED_CONTROL).read_text(encoding="utf-8")
+    (path / ENFORCED_CONTROL).write_text(
+        text.replace("grade: constrain", f"grade: {grade}"), encoding="utf-8", newline="\n"
+    )
+    _write(
+        path,
+        {
+            f"orgs/intel/enforcement_moves/pin-the-tooling-image-set-to-{grade}.yaml": f"""\
+id: pin-the-tooling-image-set-to-{grade}
+subject: pin-the-tooling-image-set
+from_grade: constrain
+to_grade: {grade}
+moved_on: '2026-07-01'
+by_role: model-steward
+reason: >-
+  An unpinned image reached a fab with its egress already cut, so the rung below stopped being
+  proportionate to what it was leaving open.
+evidence: The admission record, and the re-measured reduction at the new rung.
+"""
+        },
+    )
+    git(path, "add", "-A")
+    git(path, "commit", "-q", "-m", "move a control between rungs, and record the move")
     return git(path, "rev-parse", "HEAD").strip()
 
 
