@@ -2520,6 +2520,65 @@ def _forced_campaign_pre_registered_and_walled_off(ctx: Context) -> str:
     )
 
 
+@harness_check("flux_verdict_is_pre_registered_and_derived")
+def _flux_verdict_is_pre_registered_and_derived(ctx: Context) -> str:
+    """The verdict's decision rule predates its data, and the elimination path stays closed
+    (build ticket 65).
+
+    Two guards in one, because they fail as one thing. `verdict.yaml` declares the risk basis, the
+    coverage floor, the three branches and the spec amendment for the failing case — and a decision
+    rule written once the data is in view is not a decision rule, so its first commit is read out
+    of git the same way `drift_window_was_declared_before_it_was_measured` reads the window's.
+
+    The second half is the one that actually bites, and it bites on live data every run: a null
+    state-drift result must never produce a verdict concluding the residual `point-in-time` branch,
+    because build ticket 64's window cannot see the third branch at all. `Protocol.load` refuses a
+    two-branch protocol and `decide` refuses to resolve the residual while any branch is unmeasured,
+    but both are code somebody could relax; this asserts the property against the real files, so
+    relaxing either shows up here rather than in a durable artefact six months from now.
+    """
+    from .. import drift, verdict
+
+    protocol = verdict.Protocol.load()  # refuses a missing branch, a missing amendment, a lone product
+    window = drift.Window.load()
+    decided = verdict.decide(protocol, window, drift.load_samples(), datetime.datetime.now(datetime.timezone.utc).isoformat())
+
+    declared = _first_commit_date(REPO_DIR, verdict.PROTOCOL_PATH)
+    closes = drift._day(window.closes)
+    if declared is None:
+        if datetime.datetime.now(datetime.timezone.utc) > closes:
+            raise Violated(
+                f"the measurement window closed {window.closes} and verdict.yaml has never been "
+                "committed, so nothing establishes the decision rule was fixed before the result"
+            )
+    elif declared > closes:
+        raise Violated(
+            f"verdict.yaml was first committed {declared.date().isoformat()}, after the window "
+            f"closed {window.closes} — the decision rule was written with the data in view"
+        )
+
+    residual = decided["branches"][verdict.RESIDUAL]
+    action = decided["branches"][verdict.ACTION]
+    if residual["state"] != verdict.PENDING and action["state"] == verdict.UNMEASURED:
+        raise Violated(
+            f"the residual point-in-time branch reads {residual['state']!r} while the "
+            "action-boundary branch is unmeasured — a verdict reached by elimination against an "
+            "incomplete set, which is the exact false dichotomy build ticket 65 exists to refuse"
+        )
+    if decided["verdict"] and action["state"] == verdict.UNMEASURED:
+        if decided["branches"][verdict.STATE]["state"] != verdict.HELD:
+            raise Violated(
+                f"a verdict was emitted ({decided['verdict']!r}) with the action-boundary branch "
+                "unmeasured and the state branch not held — no branch earned it"
+            )
+    return (
+        f"{len(protocol.branches)} branches, floor {protocol.minimum_coverage:.0%}, amendment "
+        f"drafted; state={decided['branches'][verdict.STATE]['state']}, "
+        f"residual={residual['state']}, action={action['state']}, verdict="
+        f"{decided['verdict'] or 'none yet'}"
+    )
+
+
 @harness_check("scheduled_emission_ignores_signal_presence")
 def _sweep_is_not_event_gated(ctx: Context) -> str:
     """A scheduled sweep emits the same volume twice running, nothing having changed (build ticket 09).

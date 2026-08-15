@@ -1582,14 +1582,19 @@ honesty instrument itself, not a claim that the work is done.
 
 ## The invariants
 
-`./bin/twin verify` — 58 pass, 1 fails (`drift_window_is_actually_being_sampled`, a live-cluster
-probe-staleness check that fails whenever build ticket 64's probe has not sampled recently — the
-one check in the suite that reads the actual wall clock rather than the model repository, so it is
-expected to go red between samples and is not a coherence defect), 1 skipped and not faked (the
-CI-only cross-architecture leg), 0 pending. `pytest -q` — 1236 tests across seams 1 and 2. (Build
+`./bin/twin verify` — 59 pass, 1 fails (`drift_window_is_actually_being_sampled`, a live-cluster
+probe-staleness check that fails whenever build ticket 64's probe has not sampled recently, so it
+is expected to go red between samples and is not a coherence defect), 2 skipped and not faked (the
+CI-only cross-architecture leg), 0 pending. `pytest -q` — 1263 tests across seams 1 and 2. (Build
 ticket 56's coherence audit re-derived these counts from a live run rather than carrying the
 previous round's numbers forward — see "What is honestly built", below, for the same discipline
-applied to the capability table. Build ticket 78 re-derived them again the same way.)
+applied to the capability table. Build tickets 78 and 65 re-derived them again the same way.)
+
+Two checks read the actual wall clock rather than the model repository, and both do it because the
+property they guard is about *now*: `drift_window_is_actually_being_sampled` (is the probe alive?)
+and `flux_verdict_is_pre_registered_and_derived` (has the window closed, and was the decision rule
+committed before it did?). A pinned clock would make both green forever at the moment they were
+written.
 
 | live |
 |---|
@@ -1664,7 +1669,7 @@ claim binds it to a component the scenario forecasts. The positive leg is assert
 negative one: the same fixture still forecasts under `as-consumed`, because a gate that refused
 everything would pass every refusal in the check while making the regime useless.
 
-Ten checks were added to the **harness** instead, because each guards a yardstick or a semantic
+Eleven checks were added to the **harness** instead, because each guards a yardstick or a semantic
 property rather than a named absence the constitution enumerates: `worksheet_matches_the_pocket_org`
 (the hand-computed numbers still hold), `graded_edge_fixture_holds_its_contract` (the generated
 causal-edge fixture still carries what the £ and skills tracks depend on),
@@ -1685,7 +1690,11 @@ boundary refuses rather than dividing by zero; build ticket 24) and
 its own data the same way build ticket 64's window does, and its samples never appear in build
 ticket 64's organic log — checked both by timestamp intersection and by scanning the organic log
 for a marker only the campaign's own trial ever writes, so a misrouted sample that never reached
-the campaign's own log is still caught).
+the campaign's own log is still caught) and `flux_verdict_is_pre_registered_and_derived` (build
+ticket 65's decision rule predates its data, read out of git the same way, and the residual
+`point-in-time` branch never resolves by elimination while the action-boundary branch is
+unmeasured — the one guard here whose failure mode is a false inference rather than a wrong
+number).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared

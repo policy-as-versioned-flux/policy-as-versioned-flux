@@ -110,6 +110,13 @@ class Window:
     subjects: tuple[str, ...]
     falsifiers: tuple[str, ...]
     owner: str
+    # The addendum's own words, carried on the object rather than left in the file, because build
+    # ticket 65's verdict has to cite what this instrument could not see and a citation that means
+    # re-opening the yaml is one an artefact quietly stops making. Empty when the window declares
+    # no scope limit, and `verdict.decide` refuses to conclude on such a window rather than
+    # inventing a limitation for it.
+    does_not_measure: str = ""
+    scope_consequence: str = ""
 
     @classmethod
     def load(cls, path: Path | None = None) -> "Window":
@@ -136,6 +143,7 @@ class Window:
                 f"{source}: names no operator. A probe nobody owns stops running and nobody notices, "
                 "and a stopped probe is what produces a confident 'no drift'."
             )
+        scope = doc.get("scope_limit") or {}
         return cls(
             question=str(doc.get("question", "")).strip(),
             opens=opens,
@@ -145,6 +153,8 @@ class Window:
             subjects=subjects,
             falsifiers=falsifiers,
             owner=owner,
+            does_not_measure=str(scope.get("does_not_measure", "")).strip(),
+            scope_consequence=str(scope.get("consequence_for_the_verdict", "")).strip(),
         )
 
 

@@ -264,6 +264,80 @@ def test_a_forced_campaign_sample_predating_its_pre_registration_is_caught(
     assert result.status == FAIL and "predate" in result.detail
 
 
+def test_a_verdict_protocol_committed_after_the_window_closed_is_caught(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A decision rule written with the data already in view is not a decision rule."""
+    from twin import drift
+
+    monkeypatch.setattr(
+        "twin.invariants.harness._first_commit_date",
+        lambda root, path: drift._moment("2099-01-01T00:00:00Z"),
+    )
+    result = _one("flux_verdict_is_pre_registered_and_derived", tmp_path)
+    assert result.status == FAIL and "with the data in view" in result.detail
+
+
+def test_an_uncommitted_verdict_protocol_after_the_window_closed_is_caught(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The arm that goes live the day the window closes: a decision rule never committed at all.
+
+    Until then it is vacuously satisfied, the same way `drift_window_was_declared_before_it_was_
+    measured` is vacuous on an empty log — so it is asserted here rather than waited for.
+    """
+    import dataclasses
+
+    from twin import drift
+
+    closed = dataclasses.replace(drift.Window.load(), closes="2020-01-01")
+    monkeypatch.setattr(drift.Window, "load", classmethod(lambda cls, path=None: closed))
+    monkeypatch.setattr("twin.invariants.harness._first_commit_date", lambda root, path: None)
+    result = _one("flux_verdict_is_pre_registered_and_derived", tmp_path)
+    assert result.status == FAIL and "never been committed" in result.detail
+
+
+def test_a_verdict_reached_by_elimination_is_caught(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The defect build ticket 65 exists to prevent, asserted against the guard itself.
+
+    `decide` is replaced with one that resolves the residual `point-in-time` branch while the
+    action-boundary branch is still unmeasured — exactly what relaxing the closed elimination path
+    in `twin/verdict.py` would produce.
+    """
+    from twin import verdict
+
+    real = verdict.decide
+
+    def fake_decide(protocol, window, samples, now):
+        decided = real(protocol, window, samples, now)
+        decided["branches"][verdict.RESIDUAL]["state"] = verdict.HELD
+        decided["verdict"] = "point-in-time attestation suffices"
+        return decided
+
+    monkeypatch.setattr(verdict, "decide", fake_decide)
+    result = _one("flux_verdict_is_pre_registered_and_derived", tmp_path)
+    assert result.status == FAIL and "elimination" in result.detail
+
+
+def test_a_verdict_emitted_with_no_branch_earning_it_is_caught(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from twin import verdict
+
+    real = verdict.decide
+
+    def fake_decide(protocol, window, samples, now):
+        decided = real(protocol, window, samples, now)
+        decided["verdict"] = "Flux is a convenience"
+        return decided
+
+    monkeypatch.setattr(verdict, "decide", fake_decide)
+    result = _one("flux_verdict_is_pre_registered_and_derived", tmp_path)
+    assert result.status == FAIL and "no branch earned it" in result.detail
+
+
 def test_a_forced_sample_timestamp_leaking_into_the_organic_log_is_caught(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
