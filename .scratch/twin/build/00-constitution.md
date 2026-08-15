@@ -121,6 +121,24 @@ waiting and without the shared-prior ceiling — at the cost of answering a *mec
 passive wait answers ("does this happen unprompted, and how often"). The two are not
 interchangeable and a ticket citing this section states plainly which one it is answering.
 
+## A pre-registered threshold needs a reachability guard, not only a liveness one
+
+Added 2026-08-15, from build ticket 70. A pre-registration that names a threshold also names a
+**deadline nobody wrote down**: the last moment at which the instrument can still reach it. Miss that
+moment and the measurement is settled, whatever the instrument does next.
+
+Build ticket 70 found this live, and the interesting part is that **nothing was hidden**. Ticket 64
+recorded "NOT MEASURING" and named the missing crontab; ticket 65 recorded "1% coverage". Both were
+honest and neither was green. What no file carried was that the shortfall would **expire**: ticket
+64's guard asks "did a sample land today", which a daily hand-run satisfies at 4% coverage, and
+ticket 65 reads coverage only after the window closes. A rate reads as recoverable. **"We are
+behind" and "there are ten hours left" are different facts, and only the first was ever computed.**
+
+So: any ticket that pre-registers a threshold against a sampled instrument states, in code, the
+moment that threshold expires, and fails while there is still time to act. `twin/drift.py`'s
+`floor_reachable()` is the worked example. A guard that only fires when the answer is already lost
+is a record, not a guard.
+
 ## The standing guard
 
 > "Be careful to not allow scope to drop in this and prematurely declare things as done, and make

@@ -222,6 +222,18 @@ class Capabilities:
             )
         return self._graded[name]
 
+    def aggregate(self) -> tuple[int, int]:
+        """Ticked and total across every capability (build ticket 70).
+
+        A per-capability grade was computed from the day ticket 03 built the checklists; the
+        aggregate over them never was, so the published figure was a hand-sum and went stale twice.
+        Trivial arithmetic — which is the point. It was never wrong because it was hard.
+        """
+        return (
+            sum(1 for g in self for c in g.criteria if c.checked),
+            sum(len(g.criteria) for g in self),
+        )
+
     def depth_block(self, names: list[str]) -> dict[str, Any]:
         """The `depth` slot of an artefact envelope: every capability that produced it."""
         used = {n: self.require(n).summary() for n in sorted(set(names))}

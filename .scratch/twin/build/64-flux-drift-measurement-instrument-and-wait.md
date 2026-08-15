@@ -97,3 +97,26 @@ operator population doing routine maintenance, which is what the window's 91-day
 would eventually hand-edit something. A null result at close may mean "controls hold" or "nobody
 was here" — this instrument cannot tell the two apart, and observation-only does not resolve that,
 only refuses to manufacture a false answer to it.
+
+## Checked and cleared by build ticket 70's audit, 2026-08-15
+
+Recorded because the audit initially blamed this ticket and was wrong, and a correction nobody can
+find is not a correction.
+
+Build ticket 70 found that the drift window will not reach the 90% coverage floor build ticket 65
+pre-registered, and its first draft attributed that to this ticket and 65 jointly, on the reasoning
+that "both tickets were green". **This ticket was not green and did not hide anything.** Its status
+reads `instrumented, **NOT MEASURING**`, its AC 2 is `[~]` rather than ticked, and it states the gap
+in its own words: "What remains is the schedule — no crontab entry exists, and installing one is the
+operator's to run, not the twin's." Every fact the audit needed was already on this page.
+
+The finding belongs to build ticket 65, which chose the floor. This ticket declared a cadence, said
+plainly nobody was keeping it, and had no threshold of its own to miss. **No acceptance criterion
+here is amended and none should be.**
+
+One thing does now sit slightly differently. `drift_window_is_actually_being_sampled`'s docstring
+hands coverage on — "coverage is ticket 65's problem" — which was a reasonable split and is why the
+liveness guard checks staleness rather than rate. It stays as written. The reachability question
+that fell between the two guards is now `flux_coverage_floor_is_still_reachable`, a third guard, for
+the reason this ticket's own guard docstring already gives about the first two: a pre-registration
+guard and a liveness guard are different guards.

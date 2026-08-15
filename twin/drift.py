@@ -143,12 +143,23 @@ class Window:
                 f"{source}: names no operator. A probe nobody owns stops running and nobody notices, "
                 "and a stopped probe is what produces a confident 'no drift'."
             )
+        every = int(cadence.get("every_minutes", 0))
+        if every <= 0:
+            # Refused at load rather than defended against in every reader (build ticket 70). A
+            # window declaring no cadence has no expected sample count, so coverage is undefined
+            # and every downstream figure divides by it. `coverage`'s own `if window.cadence_minutes`
+            # guard predates this and is now unreachable; it is left where it is rather than
+            # removed, because deleting a guard is how one comes back.
+            raise DriftError(
+                f"{source}: declares a cadence of {every} minutes. Without one there is no expected "
+                "sample count, so no coverage figure and no floor to reach."
+            )
         scope = doc.get("scope_limit") or {}
         return cls(
             question=str(doc.get("question", "")).strip(),
             opens=opens,
             closes=closes,
-            cadence_minutes=int(cadence.get("every_minutes", 0)),
+            cadence_minutes=every,
             tolerance_minutes=int(cadence.get("tolerance_minutes", 0)),
             subjects=subjects,
             falsifiers=falsifiers,
@@ -361,6 +372,79 @@ def coverage(window: Window, samples: list[dict[str, Any]], now: str) -> dict[st
             "'no drift in 91 days' and 'no drift in the hours we were looking' are different "
             "claims, and an unsampled window supports neither. An unreachable probe still writes "
             "a sample, so a stopped instrument shows up here rather than as a stable estate."
+        ),
+    }
+
+
+def floor_reachable(
+    window: Window, samples: list[dict[str, Any]], now: str, floor: float
+) -> dict[str, Any]:
+    """Can a coverage floor still be reached at the declared cadence, and by when (ticket 70).
+
+    `coverage` reports what has been observed. This reports what *can still be* observed, which is
+    the question nobody asked: an instrument sampling at 1% of its cadence is not merely behind,
+    it is spending a budget that does not refill. Every hour of silence inside the window is an
+    hour of coverage nothing later can buy back, so a floor stops being reachable at a computable
+    moment, and after that moment the reading is settled whatever the probe does next.
+
+    Build ticket 70's audit found this unguarded. Both tickets recorded that the probe was behind —
+    ticket 64 as "NOT MEASURING", ticket 65 as "1% coverage" — and neither computed the deadline
+    that shortfall implied, because ticket 64's guard asks about the last day and ticket 65 reads
+    coverage only after the window has closed. "Behind" and "irrecoverable" are different facts.
+
+    `now` is a parameter for the same reason `coverage`'s is: the arithmetic is a function of its
+    inputs. The wall clock belongs to the caller, and the harness guard is the caller that has one.
+
+    **Counts raw reachable samples, exactly as `coverage` does, and so inherits its gameability**:
+    1966 hand-runs in one afternoon would read as a met floor, though no sensible reading of the
+    window would call that coverage. Deliberate rather than overlooked. This figure has to agree
+    with the one `verdict.decide` actually gates on, and a stricter count here would report a floor
+    as out of reach that the verdict would then accept. Fix it in `coverage` or not at all.
+    """
+    opens, closes, moment = _day(window.opens), _day(window.closes), _moment(now)
+    cadence = datetime.timedelta(minutes=window.cadence_minutes)  # `Window.load` refuses a zero
+    total = (closes - opens) / cadence
+    # Strictly above the floor, matching the window's own falsifier ("coverage above 90%") and
+    # `verdict.decide`'s `<=` test. At exactly the floor the branch does not resolve, so a target
+    # of exactly the floor would compute a deadline for an outcome that reads as pending.
+    #
+    # The second line is not belt-and-braces. `int(floor * total) + 1` is one short whenever the
+    # product lands just under an integer in binary: `0.29 * 100` is 28.999999999999996, so the
+    # target computes as 29, and 29/100 is *not* above 0.29. Rather than reason about which floors
+    # are exact, the target is checked against `decide`'s own comparison and nudged if it fails.
+    needed = int(floor * total) + 1
+    if needed / total <= floor:
+        needed += 1
+    reachable_samples = [s for s in samples if s.get("reachable")]
+    outstanding = needed - len(reachable_samples)
+
+    # Whole cadence intervals only: a probe started part-way through an interval does not observe
+    # that interval, and rounding the part up is how a deadline that has already passed reads as
+    # ten minutes of slack. `total` stays fractional, because it is a window length rather than a
+    # count of opportunities somebody still has.
+    remaining_slots = max(0, int((closes - moment) / cadence))
+    ceiling = min(1.0, (len(reachable_samples) + remaining_slots) / total)
+    # The last moment a probe could start and still take `outstanding` samples before the window
+    # closes. `None` once the floor is either already met or already gone: there is no deadline
+    # for something that needs no action, and none for something no action can reach.
+    latest_start = closes - outstanding * cadence
+    return {
+        "floor": floor,
+        "window_closes": window.closes,
+        "as_at": now,
+        "cadence_minutes": window.cadence_minutes,
+        "samples_reachable": len(reachable_samples),
+        "samples_expected_over_window": int(total),
+        "samples_needed": needed,
+        "ceiling": round(ceiling, 4),
+        "reachable": ceiling > floor,
+        "latest_start": (
+            None if outstanding <= 0 or latest_start < moment else latest_start.isoformat()
+        ),
+        "why_this_matters": (
+            "an unsampled hour inside the window cannot be sampled later, so a coverage floor "
+            "stops being reachable at a computable moment. After it, 'no drift observed' is "
+            "unreadable against the pre-registration however diligently the probe runs."
         ),
     }
 

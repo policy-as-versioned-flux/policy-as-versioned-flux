@@ -2446,6 +2446,88 @@ def _drift_window_is_being_sampled(ctx: Context) -> str:
     )
 
 
+@harness_check("flux_coverage_floor_is_still_reachable")
+def _flux_coverage_floor_is_still_reachable(ctx: Context) -> str:
+    """The pre-registered coverage floor can still be reached at the declared cadence (ticket 70).
+
+    **What was missing was never the news that the probe was behind. It was the deadline.** Build
+    ticket 70's audit first wrote this guard up as "two tickets, each green, composing into a
+    measurement that cannot be read", and review showed that framing was false. Both tickets were
+    honest about the shortfall in their own files:
+
+    - Build ticket 64 reads `Status: instrumented, **NOT MEASURING**` and its AC 2 is open, in its
+      own words *"What remains is the schedule — no crontab entry exists"*.
+    - Build ticket 65 reads `Status: pre-registered, **VERDICT PENDING**` and records the figure
+      itself: *"9% elapsed at 1% coverage"*.
+
+    So the early-detection design caught the silence, twice, and said so. **What no ticket, guard or
+    artefact carried was that the shortfall had an expiry.** Unsampled hours do not come back, so a
+    floor stops being reachable at a computable moment, and after it the continuous-state branch
+    closes `unmeasured` whatever the probe does. "We are behind" and "there are ten hours left" are
+    different facts and only the first was ever computed. That is what this guard adds: not the
+    shortfall, the irreversibility of it.
+
+    **It does not go quiet when the window closes.** An earlier draft returned a pass there, on the
+    reasoning that the fact was settled and `twin verdict` would report it. Review caught that:
+    `flux_verdict_is_pre_registered_and_derived` passes on a branch reading `unmeasured`, so the
+    suite would have gone fully green on 2026-11-06 over a measurement that produced no result —
+    silence reading as stability, which is the failure the whole drift instrument exists to refuse.
+    A closed window simply offers no remaining slots, so the same arithmetic answers "was it
+    reached" and the guard is red on exactly the case the verdict cannot read.
+    """
+    from .. import drift
+    from ..verdict import Protocol
+
+    window, floor = drift.Window.load(), Protocol.load().minimum_coverage
+    samples = drift.load_samples()
+    # Wall-clock, for the same reason the liveness guard's is: the whole property is whether time
+    # is still available, and a pinned clock would make this green forever at the moment it was
+    # written — which is precisely how the gap it guards went unseen.
+    now = datetime.datetime.now(datetime.timezone.utc)
+    opens, closes = drift._day(window.opens), drift._day(window.closes)
+    if now < opens:
+        return f"window {window.opens}..{window.closes} has not opened; the full floor is still available"
+
+    # Stringified because `floor_reachable` takes the moment as a parameter in the log's own format,
+    # the same way `coverage` does — the wall clock stops here and the arithmetic below it stays a
+    # function of its inputs.
+    reach = drift.floor_reachable(window, samples, now.strftime("%Y-%m-%dT%H:%M:%SZ"), floor)
+    taken = f"{reach['samples_reachable']}/{reach['samples_needed']} sample(s)"
+    # A closed window offers no remaining slots, so `ceiling` collapses to the coverage actually
+    # achieved and `reachable` becomes exactly the gate `verdict.decide` applies. One expression
+    # answers both questions, and the guard is red on exactly the case the verdict cannot read.
+    closed = now > closes
+    if not reach["reachable"]:
+        raise Violated(
+            (
+                f"the window closed {window.closes} at {reach['ceiling']:.1%} coverage, under its "
+                f"pre-registered floor of {floor:.0%} ({taken}). The measurement produced no "
+                "readable result and never will"
+                if closed
+                else (
+                    f"the pre-registered coverage floor of {floor:.0%} can no longer be reached: "
+                    f"{taken}, only {closes - now} of window left to take them in, a ceiling of "
+                    f"{reach['ceiling']:.1%}"
+                )
+            )
+            + f". The continuous-state branch closes `unmeasured`, so {drift.VERDICT_TICKET}'s "
+            "primary falsifier is unanswerable and the residual branch cannot be concluded either. "
+            f"{window.owner} owns the probe; window.yaml's `operation.crontab` is the line that was "
+            "never installed. **This guard staying red is the finding, not a defect in it** — see "
+            "build ticket 70's finding 1. It goes green only if the floor is actually reached"
+        )
+    if closed:
+        return f"window closed {window.closes} at {reach['ceiling']:.1%}, above its {floor:.0%} floor"
+    if reach["latest_start"] is None:
+        # Already banked. There is no deadline for something no further action is needed for, and
+        # printing one would read as a countdown on a floor that is met.
+        return f"floor {floor:.0%} already met on samples taken: {taken}"
+    return (
+        f"floor {floor:.0%} still reachable (ceiling {reach['ceiling']:.1%}); {taken}, "
+        f"start sampling by {reach['latest_start']} or it is gone"
+    )
+
+
 def _first_commit_date(root: Path, path: Path) -> datetime.datetime | None:
     """When a file first entered git history, or `None` if it never has."""
     rel = path.relative_to(root).as_posix()

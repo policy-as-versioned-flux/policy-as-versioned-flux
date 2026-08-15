@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
 
+from twin import PACKAGE_DIR
 from twin.grades import Capabilities, GradeError, acceptance_criteria
 
 
@@ -126,6 +128,35 @@ def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_
 
 def test_the_shipped_capabilities_never_reach_full(caps: Capabilities) -> None:
     assert "full" not in {g.grade for g in caps}
+
+
+# -- the aggregate is computed, not hand-summed (build ticket 70) -----------------------------
+
+
+def test_the_aggregate_is_the_sum_of_the_computed_checklists(tmp_path: Path) -> None:
+    _capability(tmp_path, "finished", "14", checked=[1, 2, 3, 4])
+    _capability(tmp_path, "started", "14", checked=[2])
+    assert Capabilities.load(directory=tmp_path).aggregate() == (5, 8)
+
+
+def test_the_published_aggregate_matches_the_computed_one(caps: Capabilities) -> None:
+    """`twin/README.md` publishes the aggregate in prose, and prose does not recompute itself.
+
+    Build ticket 70's audit found the aggregate was the one figure in the depth-grade system that
+    was never computed: `twin grade` printed twelve rows and no total, so the published number was
+    a hand-sum. This file's own history records it going stale twice — carried as "32" after it had
+    moved, then as "35/64" after build ticket 68 moved it again — each time caught by a human
+    re-adding twelve numbers, which is the mechanism that failed. This is that check, mechanised.
+    """
+    checked, total = caps.aggregate()
+    # Anchored to the section that owns the table, not to the first bold fraction in the file:
+    # `**11 of 41**` appears elsewhere, and a test that reads whichever came first would start
+    # asserting about a different number the day somebody moves a paragraph.
+    section = (PACKAGE_DIR / "README.md").read_text(encoding="utf-8").split("## What is honestly built", 1)
+    assert len(section) == 2, "twin/README.md no longer has the section that publishes the aggregate"
+    published = re.search(r"\*\*(\d+) of (\d+)\*\*", section[1])
+    assert published, "twin/README.md no longer publishes an aggregate for the capability table"
+    assert (int(published.group(1)), int(published.group(2))) == (checked, total)
 
 
 def test_a_nested_checkbox_in_a_ticket_is_refused_rather_than_miscounted(tmp_path: Path) -> None:

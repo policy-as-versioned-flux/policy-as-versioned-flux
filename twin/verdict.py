@@ -165,10 +165,12 @@ class Protocol:
 
         gate = doc.get("reading_gate") or {}
         floor = float(gate.get("minimum_coverage", 0) or 0)
-        if not 0 < floor <= 1:
+        if not 0 < floor < 1:
             raise VerdictError(
-                f"{source}: minimum_coverage {floor!r} is not a fraction above zero. A floor of "
-                "zero reads 'no drift observed' at no coverage as a result."
+                f"{source}: minimum_coverage {floor!r} is not a fraction strictly between zero and "
+                "one. A floor of zero reads 'no drift observed' at no coverage as a result, and a "
+                "floor of one is unsatisfiable: the gate asks for coverage ABOVE the floor and "
+                "nothing exceeds a fully-sampled window, so the branch could never resolve."
             )
 
         owner = str((doc.get("operation") or {}).get("owner", "")).strip()

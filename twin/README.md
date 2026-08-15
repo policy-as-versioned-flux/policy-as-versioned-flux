@@ -7,8 +7,9 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 68 of 78 build tickets closed, and one measuring against a clock that runs
-to 2026-11-06.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
+**This is 69 of 78 build tickets closed, and one measuring against a clock that runs
+to 2026-11-06 and will not reach its own pre-registered coverage floor. See "The confirmatory audit
+was not confirmatory", below.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
 rather than carried forward by hand — the previous banner, 66, was two behind by the time it was
 read, because build ticket 67 closed without bumping it. That is the same drift this file's own
 "What is honestly built" section repeatedly finds and corrects, and the reason the count is a grep
@@ -826,6 +827,14 @@ looked inconvenient fails the suite. And a probe that cannot reach the cluster *
 sample**, so an outage is a coverage hole rather than a quiet stretch of no drift. `twin drift`
 reports coverage before events, because "no drift in 91 days" and "no drift in the hours we were
 looking" are different claims and only one is falsifiable.
+
+**Read the rest of this section knowing the instrument failed.** The declared hourly crontab was
+never installed, the log holds 3 samples against 211 owed, and from 2026-08-16T05:00Z the 90%
+coverage floor build ticket 65 pre-registered is permanently out of reach. Build ticket 70's audit
+found it and the owner decided to record it rather than restart the probe. `twin drift` now prints
+the deadline and `flux_coverage_floor_is_still_reachable` fails once it passes. Full account in
+"The confirmatory audit was not confirmatory", below. Both properties above held throughout, which
+is the point: they are the guards that were built, and neither was watching this.
 
 `twin/calibration.md` is the authoring discipline a triple is *supposed* to come from: a 90%
 credible interval with a most-likely value, five steps required by name. Every artefact that
@@ -1684,7 +1693,16 @@ capabilities that produced it. **Read `partial` as "at least one of N", not as "
 there"** — the strongest capability here stands at six ticks, and one of the twelve still stands at
 one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
 count — re-derived here rather than trusting the stale, hand-carried "32" the previous round left
-behind (the same provisional-total drift this file names repeatedly below). `forecast-book` moved
+behind (the same provisional-total drift this file names repeatedly below).
+
+**The aggregate above is now printed by `./bin/twin grade` too, and it was not before build ticket
+70.** That is finding 2 of the confirmatory audit, below. The rows were computed from the day build
+ticket 03 built the checklists; the total under them was somebody re-adding twelve numbers, which is
+why it went stale twice ("32", then "35/64") and was corrected by hand both times.
+`tests/test_grades.py::test_the_published_aggregate_matches_the_computed_one` now reads this
+paragraph's own figure back out of the file and fails if it drifts from `Capabilities.aggregate()`.
+
+`forecast-book` moved
 from 1/6 to 4/6 at build ticket 58 (venue + observe-only, the blind-emission protocol, the
 claim-scope statement — narrated above).
 
@@ -1898,22 +1916,99 @@ and the build ticket that earned it.
 ticket that governs scoring, so build ticket 08's work does not appear in the 64. That is a hole in the
 honesty instrument itself, not a claim that the work is done.
 
+## The confirmatory audit was not confirmatory
+
+Build ticket 70 was the last audit before the subject beats and its own brief says it should be
+boring. It was not. Its brief also says what to do about that: "if integration problems are
+discovered here, the early-detection design has failed, and that finding is more important than the
+fix."
+
+**It found two problems, and both are the same shape.** Neither is a units defect, a derivation
+defect or a bookkeeping defect, which is what the three earlier audits found. These are **horizon**
+defects: a fact everybody had, and nobody had the consequence of.
+
+Worth saying before the detail, because the first draft of this section got it wrong and the code
+review caught it: **on finding 1 the early-detection design did not fail.** Build tickets 64 and 65
+both recorded the shortfall on their own faces and neither was green. The audit discovered no hidden
+defect. What it discovered is that every existing statement of the problem was a *rate* — "1%
+coverage", "NOT MEASURING" — and a rate reads as recoverable when this one is not.
+
+### Finding 1: the shortfall was known, its expiry date was not
+
+The numbers first. `estate/driftwood/drift/window.yaml` opened a 91-day window on 2026-08-07 and
+declares an hourly cadence. By 2026-08-15 the log held **3 reachable samples against the 211 that
+cadence owed**, which is 1% coverage. The cause is that `window.yaml`'s `operation.crontab` is a
+documented line that **nobody installed**. There is no crontab entry and no `probe.log`. Every
+sample is a hand-run.
+
+`estate/driftwood/drift/verdict.yaml` pre-registers a **90% coverage floor** and reads it only once
+the window has closed. The window owes 2184 samples in total, so the floor needs 1966 of them, and
+an unsampled hour cannot be sampled later. **From 2026-08-16T05:00Z no probing schedule can reach
+the floor.** After that, `verdict.decide` returns `unmeasured` for `continuous-state` whatever
+happens next, and `point-in-time` cannot be concluded either, because it is entailed only when both
+continuous branches are falsified.
+
+Neither ticket was green. Build ticket 64 reads `Status: instrumented, NOT MEASURING` with AC 2 open
+and the missing crontab named in its own words; build ticket 65 reads `VERDICT PENDING` and records
+"9% elapsed at 1% coverage". **Nothing was concealed and nothing needs correcting in either file.**
+What neither carried is the deadline, because neither was positioned to: ticket 64's guard asks
+whether a sample landed in the last day, which a daily hand-run satisfies at 4% coverage, and it
+hands the rest on in its own docstring ("coverage is ticket 65's problem"); ticket 65 reads coverage
+only once the window has closed, which is the first moment nothing can be done. **The finding
+belongs to 65, which chose the floor — pre-registering a threshold against a sampled instrument
+commits you to a deadline whether or not you compute it.** Both tickets are amended in place: 65
+with the finding, 64 with a note recording that it was checked and cleared.
+
+`twin/drift.py`'s `floor_reachable()` now computes whether a floor can still be reached at the
+declared cadence, and the last moment a probe could start and still reach it. The harness guard
+`flux_coverage_floor_is_still_reachable` runs it on the wall clock and fails once the floor is gone.
+`./bin/twin drift` prints the deadline where the operator already looks.
+
+**The probe itself was not fixed, by the owner's decision, taken during the audit.** So the honest
+expected state is a red guard from 2026-08-16 until the window closes, a `continuous-state` branch
+that closes `unmeasured` on 2026-11-06, and no verdict on the residual branch either. Three samples
+show no drift and no deploy across eight days. **That is not a result at the pre-registered floor
+and must not be read as one.** The elimination path staying closed on this outcome is build ticket
+65's own protection working exactly as designed.
+
+### Finding 2: the capability aggregate was the one figure nobody computed
+
+Build ticket 03 made every depth grade a computed checklist and refused a typed one, **per
+capability** — none of its acceptance criteria mentions an aggregate, so this belonged to no ticket
+until build ticket 70's own AC 4 asked for it. The aggregate over the twelve was never computed
+anywhere. `./bin/twin grade` printed twelve rows and no total, so the published figure in this file
+was a human re-adding twelve numbers. It went stale twice — carried as "32", then as "35/64" — and
+both corrections were made by the same hand method that had already failed.
+`Capabilities.aggregate()` now computes it, `./bin/twin grade` prints it, and a test reads the
+figure back out of this file. The number was correct today, so nothing is corrected. Only the
+mechanism is.
+
+The audit then made the identical mistake inside its own write-up, which is the most useful thing
+either finding produced. The deadline above was hand-computed as **05:24Z** in five places while
+`floor_reachable()` returned **05:00Z**, and the `twin grade` output was quoted from memory rather
+than from the command. Both were caught by review, not by a person re-reading. A hand-carried number
+is not a discipline problem.
+
 ## The invariants
 
-`./bin/twin verify` — 60 pass, 1 fails (`drift_window_is_actually_being_sampled`, a live-cluster
+`./bin/twin verify` — 63 pass, 1 fails (`drift_window_is_actually_being_sampled`, a live-cluster
 probe-staleness check that fails whenever build ticket 64's probe has not sampled recently, so it
 is expected to go red between samples and is not a coherence defect), 2 skipped and not faked (the
-CI-only cross-architecture leg), 0 pending. `pytest -q` — 1287 tests across seams 1 and 2, of which
-`test_the_suite_is_green` goes red with the same probe staleness above. (Build
+CI-only cross-architecture leg), 0 pending. `pytest -q` — 1367 tests across seams 1 and 2, of which
+`test_the_suite_is_green` goes red with the same probe staleness above. **From 2026-08-16 a second
+check, `flux_coverage_floor_is_still_reachable`, goes red and stays red until the window closes.
+That is build ticket 70's finding 1, above, not a new defect.** (Build
 ticket 56's coherence audit re-derived these counts from a live run rather than carrying the
 previous round's numbers forward — see "What is honestly built", below, for the same discipline
 applied to the capability table. Build tickets 78, 65 and 66 re-derived them again the same way.)
 
-Two checks read the actual wall clock rather than the model repository, and both do it because the
-property they guard is about *now*: `drift_window_is_actually_being_sampled` (is the probe alive?)
-and `flux_verdict_is_pre_registered_and_derived` (has the window closed, and was the decision rule
-committed before it did?). A pinned clock would make both green forever at the moment they were
-written.
+Three checks read the actual wall clock rather than the model repository, and all three do it
+because the property they guard is about *now*: `drift_window_is_actually_being_sampled` (is the
+probe alive?), `flux_verdict_is_pre_registered_and_derived` (has the window closed, and was the
+decision rule committed before it did?) and `flux_coverage_floor_is_still_reachable` (build ticket
+70 — is there still time to reach the pre-registered floor?). A pinned clock would make all three
+green forever at the moment they were written, which is how the gap the third one guards went
+unseen.
 
 | live |
 |---|
@@ -2355,8 +2450,9 @@ twin/
   primitives.py   the two composable primitives — do()/observe(), and rewind as abduction
   regimes.py      the three information regimes, the gate the model is loaded through, and the
                   two gaps that localise a failure to sensing or to interpretation
-  drift.py        the Flux drift reduction — events, and the coverage that says what they are
-                  worth. No verdict: that is build ticket 65
+  drift.py        the Flux drift reduction — events, the coverage that says what they are worth,
+                  and whether a pre-registered floor can still be reached at all. No verdict:
+                  that is build ticket 65
   attenuation.yaml          the versioned depth factors, and where a number stops existing
   pert.py         calibrated triples, their analytic moments, and seeded sampling
   calibration.md  the authoring discipline behind a triple — pinned by every artefact that samples

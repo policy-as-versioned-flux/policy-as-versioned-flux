@@ -140,6 +140,26 @@ def test_a_coverage_floor_of_zero_does_not_load(tmp_path: Path) -> None:
         _protocol(tmp_path, text)
 
 
+def test_a_coverage_floor_of_one_does_not_load(tmp_path: Path) -> None:
+    """The gate asks for coverage *above* the floor, so a floor of 1 can never be cleared.
+
+    Found by build ticket 70's review of its own reachability guard: a floor of 1 loaded fine and
+    made `floor_reachable` report the floor permanently out of reach on a window that had not even
+    opened. The unsatisfiable protocol is the defect, not the guard reading it.
+    """
+    text = PROTOCOL.replace("minimum_coverage: 0.90", "minimum_coverage: 1.0")
+    with pytest.raises(VerdictError, match="minimum_coverage"):
+        _protocol(tmp_path, text)
+
+
+def test_a_window_declaring_no_cadence_does_not_load(tmp_path: Path) -> None:
+    """Without a cadence there is no expected sample count, so coverage divides by nothing."""
+    path = tmp_path / "no-cadence.yaml"
+    path.write_text(WINDOW.replace("every_minutes: 60", "every_minutes: 0"), encoding="utf-8")
+    with pytest.raises(drift.DriftError, match="cadence"):
+        Window.load(path)
+
+
 # -- the branches resolve separately, and only on their own evidence ---------------------------
 
 
@@ -361,3 +381,103 @@ def test_the_live_verdict_is_pending_because_the_window_is_open() -> None:
     decided = verdict.decide(Protocol.load(), Window.load(), drift.load_samples(), "2026-08-15T00:00:00Z")
     assert decided["verdict"] is None
     assert decided["branches"]["continuous-state"]["state"] == verdict.PENDING
+
+
+# -- can the floor still be reached at all? (build ticket 70) ---------------------------------
+#
+# The composition build ticket 70's audit found unguarded. Ticket 64 built the instrument and said
+# in its own guard's docstring that "coverage is ticket 65's problem"; ticket 65 pre-registered a
+# 90% floor and never asked whether the instrument could deliver it. Both are green apart and the
+# pair cannot produce a reading.
+
+
+def test_an_empty_window_that_has_only_just_opened_can_still_reach_the_floor(window: Window) -> None:
+    reach = drift.floor_reachable(window, [], "2026-01-01T00:00:00Z", 0.90)
+    assert reach["reachable"] is True
+    assert reach["ceiling"] == 1.0
+    assert reach["latest_start"] == "2026-01-01T23:00:00+00:00"
+
+
+def test_a_window_left_unsampled_past_its_latest_start_can_never_reach_the_floor(
+    window: Window,
+) -> None:
+    """Two days of silence in a ten-day window at 90% is already unrecoverable."""
+    reach = drift.floor_reachable(window, [], "2026-01-03T00:00:00Z", 0.90)
+    assert reach["reachable"] is False
+    assert reach["ceiling"] < 0.90
+    assert reach["latest_start"] is None
+    assert reach["samples_needed"] == 217  # floor(0.9 * 240) + 1 — *above* the floor, not at it
+
+
+def test_the_sample_target_is_the_one_the_verdict_would_actually_accept(window: Window) -> None:
+    """The target is checked against `decide`'s own comparison, not assumed from the arithmetic.
+
+    `int(floor * total) + 1` is one short whenever the product lands just under an integer in
+    binary. `0.29 * 240` is 69.6 and safe, but the same expression on a 100-interval window gives
+    28.999999999999996, so the target computes as 29 and 29/100 is *not* above 0.29. Asserted
+    directly against the rule `verdict.decide` applies, on a floor chosen because it is inexact.
+    """
+    for floor in (0.29, 0.58, 0.87, 0.90):
+        reach = drift.floor_reachable(window, [], "2026-01-01T00:00:00Z", floor)
+        needed, total = reach["samples_needed"], reach["samples_expected_over_window"]
+        assert needed / total > floor, f"floor {floor}: {needed}/{total} does not clear it"
+        assert (needed - 1) / total <= floor, f"floor {floor}: {needed} is more than the minimum"
+
+
+def test_the_latest_start_is_exactly_the_moment_the_floor_slips_away(window: Window) -> None:
+    """The deadline is a real boundary, not an estimate: one minute either side of it decides."""
+    on_time = drift.floor_reachable(window, [], "2026-01-01T23:00:00Z", 0.90)
+    too_late = drift.floor_reachable(window, [], "2026-01-01T23:01:00Z", 0.90)
+    assert on_time["reachable"] is True
+    assert too_late["reachable"] is False
+
+
+def test_samples_already_taken_count_towards_the_floor(window: Window, tmp_path: Path) -> None:
+    """The deadline moves later as samples land — otherwise it is a countdown, not a measurement."""
+    samples = _full_coverage_log(tmp_path, drifts=False)[:48]
+    with_samples = drift.floor_reachable(window, samples, "2026-01-03T00:00:00Z", 0.90)
+    without = drift.floor_reachable(window, [], "2026-01-03T00:00:00Z", 0.90)
+    assert with_samples["samples_reachable"] == 48
+    assert with_samples["ceiling"] > without["ceiling"]
+
+
+def test_an_unreachable_probe_writes_a_sample_but_it_does_not_count(
+    window: Window, tmp_path: Path
+) -> None:
+    """`coverage` counts only reachable samples, and so does this — a probe that could not see the
+    cluster observed nothing, however faithfully it recorded that."""
+    path = tmp_path / "unreachable.jsonl"
+    path.write_text(
+        "".join(
+            json.dumps({"ts": f"2026-01-01T{at:02d}:00:00Z", "reachable": False, "subjects": {}}) + "\n"
+            for at in range(24)
+        ),
+        encoding="utf-8",
+    )
+    reach = drift.floor_reachable(window, drift.load_samples(path), "2026-01-02T00:00:00Z", 0.90)
+    assert reach["samples_reachable"] == 0
+    assert reach["reachable"] is False
+
+
+def test_the_live_instrument_cannot_reach_the_live_protocols_floor() -> None:
+    """**The finding build ticket 70's audit exists to surface, pinned to a fixed clock.**
+
+    Not a hypothetical. The committed window opened 2026-08-07 declaring an hourly cadence; the
+    committed log holds three samples against the 211 that cadence owed by 2026-08-15, because
+    `window.yaml`'s `operation.crontab` is a documented line nobody installed. From
+    2026-08-16T05:00Z onward no probing schedule can bring the continuous-state branch above its
+    own pre-registered floor, so build ticket 65's primary branch closes `unmeasured` whatever
+    happens next.
+
+    Pinned to a fixed `now` so it records the finding permanently rather than re-deciding it
+    against the wall clock. The wall-clock half is the harness guard
+    `flux_coverage_floor_is_still_reachable`, which is where a live estate gets told in time.
+    """
+    live_window, live_floor = Window.load(), Protocol.load().minimum_coverage
+    samples = drift.load_samples()
+
+    before = drift.floor_reachable(live_window, samples, "2026-08-16T05:00:00Z", live_floor)
+    after = drift.floor_reachable(live_window, samples, "2026-08-16T06:00:00Z", live_floor)
+    assert before["reachable"] is True, "the finding is dated from the wrong side of the deadline"
+    assert after["reachable"] is False
+    assert after["ceiling"] < live_floor

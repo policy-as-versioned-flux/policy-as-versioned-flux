@@ -240,3 +240,30 @@ Re-run after the review fixes above.
   40  PASS  flux_verdict_is_pre_registered_and_derived  3 branches, floor 90%, amendment drafted;
             state=pending, residual=pending, action=unmeasured, verdict=none yet
 ```
+
+## Found later: the floor had an expiry date and this ticket never computed it
+
+Added by build ticket 70's confirmatory audit, 2026-08-15, following build ticket 34's precedent of
+amending the ticket that should have caught a finding rather than only naming it.
+
+This ticket pre-registered `minimum_coverage: 0.90` and honestly recorded the shortfall against it
+("9% elapsed at **1% coverage**"). What it did not do is compute what that shortfall would cost.
+Pre-registering a threshold against a sampled instrument commits you to a **deadline**, whether or
+not anybody works it out: unsampled hours cannot be sampled later, so the floor stops being
+reachable at a fixed moment. For this window that moment is **2026-08-16T05:00Z** — 1966 samples
+needed of 2184 owed, 3 taken, and from then on no probing schedule reaches it.
+
+The reading gate is `requires_window_closed: true`, so this ticket's own machinery looks at coverage
+for the first time on 2026-11-06, which is the first moment nothing can be done about it. That is
+correct for reading a verdict and useless as a warning. The two needed to be separate and were not.
+
+**What changed:** `twin/drift.py` `floor_reachable()` and the harness guard
+`flux_coverage_floor_is_still_reachable`. `Protocol.load` also now refuses a floor of 1, which the
+old `0 < floor <= 1` admitted and which no window can ever clear under an *above-the-floor* gate.
+
+**Consequence for this ticket, recorded rather than fixed.** The owner was asked during the audit
+whether to install the probe schedule and declined. So `continuous-state` will close **`unmeasured`**
+rather than `falsified`, `amendment_if_falsified` above does **not** fire, spec story 81 is not
+amended, and the residual `point-in-time` branch cannot be concluded either. The elimination path
+staying closed on this outcome is this ticket's own protection working as designed. Nothing here is
+weakened to accommodate that: the floor stands at 0.90 and the window stands as declared.

@@ -27,7 +27,7 @@ from .canon import canonical_json, sha256_hex
 from .constraints import ConstraintError
 from .drift import DriftError
 from .evidence import EvidenceError
-from .grades import Capabilities, GradeError
+from .grades import FULL, Capabilities, GradeError
 from .index import IndexError_
 from .invariants import FAIL, PASS, SKIP
 from .invariants.harness import LIVE, MANIFEST_PATH, Suite, load_manifest
@@ -528,6 +528,29 @@ def cmd_drift(args: argparse.Namespace) -> int:
     )
     for hole in cover["gaps_wider_than_the_cadence"]:
         print(f"  gap          {hole['from']} -> {hole['to']} ({hole['hours']}h unobserved)")
+    # Build ticket 70: the deadline, printed where the operator already looks. `coverage` says what
+    # was observed; this says how long the pre-registered floor stays available, which is the half
+    # nobody could see while the probe was quietly running at 1% of its cadence. The floor is the
+    # verdict's number, read here rather than in `drift.report` so the instrument keeps knowing
+    # nothing about its own reading.
+    # ponytail: re-reads the window and the log `drift.report` already loaded, so the probe
+    # appending between the two reads would let this line describe a log one sample newer than the
+    # coverage line above. Immaterial for a printed report; give `report` the floor and one loaded
+    # log if this ever feeds anything that is not a human's terminal.
+    from .verdict import Protocol
+
+    reach = drift.floor_reachable(drift.Window.load(), drift.load_samples(), now, Protocol.load().minimum_coverage)
+    if reach["reachable"]:
+        print(
+            f"  floor        {reach['floor']:.0%} still reachable (ceiling {reach['ceiling']:.1%}); "
+            f"sampling must start by {reach['latest_start']}"
+        )
+    else:
+        print(
+            f"  floor        {reach['floor']:.0%} UNREACHABLE — ceiling {reach['ceiling']:.1%}. "
+            f"{drift.VERDICT_TICKET}'s continuous-state branch closes `unmeasured` whatever "
+            "happens next; unsampled hours do not come back"
+        )
     for event in body["drift_events"]:
         interval = (
             "no deploy observed yet" if event["since_deploy_seconds"] is None
@@ -1070,6 +1093,20 @@ def cmd_grade(args: argparse.Namespace) -> int:
             print(f"  [{mark}] {c.index}. {c.text}")
             if c.checked:
                 print(f"        {c.ticked_by}: {c.evidence}")
+    if not args.capability:
+        # Build ticket 70: printed, not left to the reader. Every row here is computed and the
+        # total over them was not, so the published aggregate was somebody re-adding twelve
+        # numbers by hand — and it went stale twice before a coherence audit caught it.
+        checked, total = caps.aggregate()
+        graded = list(caps)
+        # The `full` count is counted rather than stated. Printing "none `full`" as a constant in
+        # the one command whose subject is computed-not-typed grades would be the same mistake in
+        # miniature.
+        at_full = sum(1 for g in graded if g.grade == FULL)
+        _say(
+            f"aggregate: {checked} of {total} across {len(graded)} capabilities, "
+            f"{at_full} at `full`"
+        )
     return 0
 
 
