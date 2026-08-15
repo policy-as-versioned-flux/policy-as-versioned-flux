@@ -292,7 +292,49 @@ def cmd_score(args: argparse.Namespace) -> int:
         ),
         discount=discount,
     )
+    _say_score(artefact)
     return _emit(artefact, args.out)
+
+
+def _say_score(artefact: Artefact) -> None:
+    """The scores, as they land (build ticket 72, decision ticket 22).
+
+    Worst first — and *worst* is read from the card's own `orientation`, not assumed. The beat
+    whose thesis is "we can prove when we're wrong" cannot be embarrassed by a red result, and a
+    surface that has to be scrolled to reach the bad news reports it only technically. Deriving
+    the direction rather than hardcoding `reverse=True` matters because `orientation` is itself
+    derived, from `scoring.LOWER_IS_BETTER`: flip that constant with the sort hardcoded and the
+    label would change while the order silently did not.
+
+    Printed here rather than in each caller: `twin/demo.sh` read the score card back with its own
+    inline reader, and a second beat doing the same would have been the second place a score gets
+    formatted — and the first place one could be quietly left out.
+    """
+    body = artefact.body
+    key = body["answer_key"]
+    _say(
+        f"{key['id']}: observed={key['observed']}, resolved {key['resolved_on']}, "
+        f"contamination {key['contamination']}"
+    )
+    discount = body["contamination_discount"]
+    if discount is None:
+        print("  contamination discount: not measured — no --discount-enron/--discount-obscure basis given")
+    else:
+        legs = ", ".join(f"{leg['leg']} {leg['gap']:+}" for leg in discount["legs"])
+        print(f"  contamination discount: {discount['discount']:+} on {discount['rule']} ({legs})")
+    print(f"  rules {', '.join(body['rules'])} ({body['orientation']}) — {len(body['scores'])} scored, "
+          f"{len(body['unscoreable'])} unscoreable")
+    # Sorted on brier whichever rule the discount was measured in: a card scores one outcome, so
+    # every entry shares an `observed`, and brier and log_loss are both monotone in |p - observed|
+    # over a fixed one. The two rules therefore cannot disagree about which forecast is worst.
+    worst_first = body["orientation"] == "lower-is-better"
+    for s in sorted(body["scores"], key=lambda s: s["brier"], reverse=worst_first):
+        adjusted = s.get(f"adjusted_{discount['rule']}") if discount else None
+        tail = "" if adjusted is None else f"  adjusted {discount['rule']} {adjusted:.4f}"
+        print(f"    {s['world_model']:<28} p={s['probability']:<6} brier={s['brier']:<8.4f}"
+              f" log-loss={s['log_loss']:<8.4f} [{s['regime']}]{tail}")
+    for u in body["unscoreable"]:
+        print(f"    unscoreable: {u['world_model']:<17} {u['reason']} — {u['detail']}")
 
 
 def cmd_sweep(args: argparse.Namespace) -> int:
@@ -1069,8 +1111,8 @@ def cmd_index(args: argparse.Namespace) -> int:
 
 
 def cmd_fixture(args: argparse.Namespace) -> int:
-    root = fixtures.build_pocket_org(args.out) if args.pocket_org else fixtures.build(args.out)
-    print(f"{'pocket-org' if args.pocket_org else 'fixture'} model repository -> {root}")
+    root = fixtures.BUILDERS[args.name](args.out)
+    print(f"{args.name} model repository -> {root}")
     print("  deterministic: same content, same commit sha, on every machine")
     return 0
 
@@ -1080,6 +1122,11 @@ def cmd_fixture(args: argparse.Namespace) -> int:
 
 def cmd_grade(args: argparse.Namespace) -> int:
     caps = Capabilities.load()
+    if args.capability:
+        # `require` raises and names what exists. Without this the filter matched nothing, printed
+        # nothing and exited 0, so a surface asking for one capability's grade — `twin/beat-royal-
+        # mail.sh` step 5 — would announce a computed grade after printing none at all.
+        caps.require(args.capability)
     for graded in caps:
         if args.capability and graded.capability != args.capability:
             continue
@@ -1792,8 +1839,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     fixture = subs.add_parser("fixture", help="build the deterministic fixture model repository")
     fixture.add_argument("--out", required=True)
+    # `--name`, not `--org`: three of these build no org at all, and everywhere else in this CLI
+    # `--org` names an overlay. A boolean `--pocket-org` stood here until build ticket 72, which
+    # is the same choice spelled a second way — and a second spelling that silently won when both
+    # were given.
     fixture.add_argument(
-        "--pocket-org", action="store_true", help="build the pocket-org golden fixture instead"
+        "--name", default="default", choices=sorted(fixtures.BUILDERS),
+        help="which fixture repository to build (default: %(default)s)",
     )
     fixture.set_defaults(fn=cmd_fixture)
 

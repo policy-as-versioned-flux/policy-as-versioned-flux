@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 import subprocess
 from pathlib import Path
+from typing import Callable
 
 # Empty-blob digest: a substrate reference that deliberately resolves to nothing, so the
 # reference form is exercised with no substrate present.
@@ -3810,19 +3811,13 @@ def build_standing_library(root: str | Path) -> list[Path]:
     backtest answer key sit in the return value together. `schedule.sweep()` already runs any
     repo list identically (build ticket 09), so this is the whole of the "no separate harness"
     AC (per build ticket 37): nothing here is a bespoke backtest runner, it is a list of repos.
+
+    The list is `BUILDERS` itself rather than a second copy of it. Build ticket 71 authored the
+    Royal Mail answer key and did not add it here, so the standing library swept five answer keys
+    and not the sixth — a gap that only a hand-maintained second list can have.
     """
     base = Path(root)
-    return [
-        build(base / "default"),
-        build_library_org(base / "library"),
-        build_pocket_org(base / "pocket"),
-        build_carillion_org(base / "carillion"),
-        build_nmc_health_org(base / "nmc"),
-        build_wirecard_org(base / "wirecard"),
-        build_enron_org(base / "enron"),
-        build_astrazeneca_org(base / "astrazeneca"),
-        build_sanofi_org(base / "sanofi"),
-    ]
+    return [make(base / name) for name, make in BUILDERS.items()]
 
 
 # -- Royal Mail: the missed-opportunity primary case (build ticket 71, decision tickets 19, 22,
@@ -4122,3 +4117,23 @@ def build_royal_mail_org(dest: str | Path) -> Path:
     git(root, "commit", "-q", "-m", "the answer key, citing the GBP1.8bn investment concession",
         dated="2019-05-23T00:00:00+00:00")
     return root
+
+
+# -- the one list of fixture repositories (build ticket 72) -----------------------------------
+#
+# Read by `build_standing_library` above and by `twin fixture --name` at the CLI, so a shell
+# surface can build any answer key by name and the sweep covers exactly what the CLI can build.
+# A dict rather than `getattr(fixtures, f"build_{name}_org")`: a typo then lists what exists
+# instead of raising AttributeError, and the set stays enumerable for argparse's own `choices`.
+BUILDERS: dict[str, Callable[[str | Path], Path]] = {
+    "default": build,
+    "library": build_library_org,
+    "pocket": build_pocket_org,
+    "carillion": build_carillion_org,
+    "nmc": build_nmc_health_org,
+    "wirecard": build_wirecard_org,
+    "enron": build_enron_org,
+    "astrazeneca": build_astrazeneca_org,
+    "sanofi": build_sanofi_org,
+    "royal-mail": build_royal_mail_org,
+}

@@ -13,7 +13,10 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 TWIN="$ROOT/bin/twin"
 
-WORK="${1:-$(mktemp -d -t twin-demo)}"
+# An explicit `XXXXXXXX` template rather than `mktemp -d -t twin-demo`: BSD mktemp appends the
+# random suffix for you, GNU coreutils refuses with "too few X's in template" — so the -t form
+# aborts this script on its first line on Linux, which is where CI runs it.
+WORK="${1:-$(mktemp -d "${TMPDIR:-/tmp}/twin-demo.XXXXXXXX")}"
 MODEL="$WORK/model"
 OUT="$WORK/artefacts"
 
@@ -56,20 +59,11 @@ say "3. score — a recorded outcome scores the forecasts, naming them by pin an
   --outcome dvd-decline-2011-resolved \
   --out "$OUT/score-card.json" || fail "score failed"
 
-say "4. the spread is the point — what each world model believed, and what it cost"
+say "4. the spread is the point — the scores themselves printed by step 3, worst first"
 python3 - "$OUT/score-card.json" <<'PY'
 import json, sys
 card = json.load(open(sys.argv[1]))["body"]
-key = card["answer_key"]
-print(f"  answer key {key['id']}: observed={key['observed']}, resolved {key['resolved_on']},"
-      f" contamination {key['contamination']}")
 print(f"  scoring the bundle sha256:{card['subject']['sha256'][:16]}... by pin, not by path")
-print(f"  rules {', '.join(card['rules'])} ({card['orientation']})")
-for s in sorted(card["scores"], key=lambda s: s["brier"]):
-    print(f"    {s['world_model']:<28} p={s['probability']:<6} brier={s['brier']:<8.4f}"
-          f" log-loss={s['log_loss']:<8.4f} [{s['regime']}]")
-for u in card["unscoreable"]:
-    print(f"    unscoreable: {u['world_model']} — {u['reason']}")
 PY
 
 say "5. the graph — components, people, typed edges, and nothing behavioural anywhere in it"
@@ -208,7 +202,7 @@ echo "  ok   a planted human signature on a derived artefact is a detectable ano
 mv "$OUT/score-card.json.att.json.clean" "$OUT/score-card.json.att.json"
 
 say "13. the pocket org — five components, eight edges, checked against a hand-computed worksheet"
-"$TWIN" fixture --pocket-org --out "$WORK/pocket" >/dev/null || fail "pocket fixture failed"
+"$TWIN" fixture --name pocket --out "$WORK/pocket" >/dev/null || fail "pocket fixture failed"
 "$TWIN" worksheet --repo "$WORK/pocket" || fail "the pocket org no longer matches its worksheet"
 
 say "14. reproduce the score card from its pins alone — including the bundle it scored"
@@ -254,7 +248,7 @@ say "    two --score-card flags here, not one: pooling is proved at the seam a c
 "$TWIN" score --repo "$MODEL" --org netflix \
   --forecast "$OUT/forecast-bundle.json" \
   --outcome dvd-decline-2011-resolved \
-  --out "$OUT/score-card-2.json" || fail "second score failed"
+  --out "$OUT/score-card-2.json" >/dev/null || fail "second score failed"
 "$TWIN" reliability --score-card "$OUT/score-card.json" --score-card "$OUT/score-card-2.json" \
   --out "$OUT/reliability-diagram.json" || fail "reliability failed"
 python3 - "$OUT/reliability-diagram.json" <<'REL'

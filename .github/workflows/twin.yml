@@ -32,6 +32,8 @@ jobs:
         run: python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores
       - name: the walking skeleton, end to end
         run: bash twin/demo.sh
+      - name: the falsifiability beat, end to end
+        run: bash twin/beat-royal-mail.sh
 
   # `identical_pins_identical_bytes` on more than one architecture. Seeded floating-point
   # identity across platform maths libraries is the landmine, and it is cheap now and

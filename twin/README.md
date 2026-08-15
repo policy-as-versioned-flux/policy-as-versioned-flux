@@ -7,7 +7,7 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 69 of 78 build tickets closed, and one measuring against a clock that runs
+**This is 70 of 78 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06 and will not reach its own pre-registered coverage floor. See "The confirmatory audit
 was not confirmatory", below.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
 rather than carried forward by hand — the previous banner, 66, was two behind by the time it was
@@ -26,6 +26,7 @@ more usefully, is named inside every artefact the tool emits.
 
 ```sh
 bash twin/demo.sh                          # the whole loop, from a clean checkout
+bash twin/beat-royal-mail.sh               # the falsifiability beat: rewind, project, score, red
 ./bin/twin verify                          # the invariant suite
 ./bin/twin verify <artefact> --repo R      # recompute that artefact from its own pins
 ./bin/twin verify <artefact> --attestation # check its sidecar: digest, signatures, the anomaly
@@ -842,6 +843,37 @@ samples pins it by digest, so a step that disappears from the document fails on 
 lapsing quietly. **No triple in this repository has been through it** — nothing records an
 estimator, a date or a reference class against a triple, so the discipline is enforced as a
 document and not as an authoring workflow. That is why build ticket 23 is `partial`.
+
+## The falsifiability beat, and the score is red
+
+Build ticket 72. `bash twin/beat-royal-mail.sh` rewinds Royal Mail to 2018-06-01 under
+`as-consumed`, projects, and scores against the answer key build ticket 71 authored. **The result
+is bad: brier 0.9025, worse than a coin flip.** The one world model this key carries is the market
+consensus at flotation, which put the automation shortfall at 0.05, and it happened.
+
+That is the beat, not a defect in it. The thesis it exists to carry is *"we can prove when we're
+wrong"*, and a demo of that thesis which only ever shows good scores has demonstrated nothing.
+Netflix cannot carry this beat for the same reason: its story is famous, so anticipating it is
+indistinguishable from reciting it.
+
+**So the guarding is all on the ways a red result could quietly stop being visible**, and none of
+it is on the size of the number. Between the bundle and the card, every emitted forecast is either
+scored or named in `unscoreable` with a reason — a poor forecast cannot leave by the door an
+unresolvable one uses. Between the card and the screen, `twin score` prints every world model the
+card scored, descending, so on a `lower-is-better` rule **the bad news is the first row rather than
+the last**. And the harness guard `a_scored_forecast_is_never_silently_dropped` asserts the *worst*
+score stays worse than a flat 0.5 — a threshold that passes when an ensemble member gets it right,
+and fails when somebody re-authors the losing belief.
+
+The score printing lives in `cmd_score`, not in the beat. `twin/demo.sh` had been reading a score
+card back with its own inline reader; a second beat doing the same would have made the beat the
+first place a score could go missing.
+
+What the beat does **not** show is the ensemble. This key carries one world model, so the execution
+emits one forecast, plurality is satisfied trivially rather than demonstrated, and the three
+regimes produce identical probabilities — which is why `twin regimes` **declines to compute a model
+residual** here and says why, rather than reporting a zero that would read as "the model is fine".
+The ensemble is build ticket 74's beat.
 
 ## Propose only, in two layers
 
@@ -1687,13 +1719,23 @@ reaches `full`, and nothing can be typed as `full`.
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
 | `enactment` | 18 | partial | 4 / 5 |
+| `demo-slice` | 22 | stub | 0 / 4 |
 
-**39 of 69**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
+**39 of 73**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
 capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capability here stands at six ticks, and one of the twelve still stands at
-one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
+there"** — the strongest capability here stands at six ticks, and one of the thirteen still stands
+at one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
 count — re-derived here rather than trusting the stale, hand-carried "32" the previous round left
 behind (the same provisional-total drift this file names repeatedly below).
+
+**`demo-slice` is a new row (build ticket 72) against decision ticket 22, which had no capability
+file before it** — the fourth time that gap has been found and filled rather than left empty
+(build ticket 47 for decision ticket 15, 63 for 10, 66 for 18). It ticked nothing on the day it was
+created, and `stub` is the honest reading: build ticket 72 runs the first of four demo beats, AC 2
+needs all three subjects, and ACs 1, 3 and 4 are build ticket 77's own work. The denominator grew
+by four and the numerator did not move. That is what filling this gap is *for* — the demo was the
+one capability on screen carrying no grade at all, which is the skeleton-as-ceiling failure the
+constitution names, in the one place a viewer would see it.
 
 **The aggregate above is now printed by `./bin/twin grade` too, and it was not before build ticket
 70.** That is finding 2 of the confirmatory audit, below. The rows were computed from the day build
@@ -2499,6 +2541,7 @@ twin/
   capabilities/   one checklist per decision ticket that has code
   invariants/     manifest, harness, checks, golden digests
   demo.sh         the end-to-end
+  beat-royal-mail.sh   the falsifiability beat — rewind, project, score, and the score is red
 ```
 
 Code here is **disposable by default**. The durable artefacts are the versioned model repository

@@ -2070,6 +2070,185 @@ def _backtest_is_a_pure_composition(ctx: Context) -> str:
     )
 
 
+@harness_check("a_scored_forecast_is_never_silently_dropped")
+def _a_scored_forecast_is_never_silently_dropped(ctx: Context) -> str:
+    """The falsifiability beat's own refusal (build ticket 72, decision ticket 22).
+
+    The beat's thesis is *"we can prove when we're wrong"*, and its Royal Mail result is red: the
+    market consensus at flotation put the shortfall at 0.05 and it happened, so the brier is worse
+    than a coin flip. The thesis survives that and does not survive hiding it, so the ways it
+    could be hidden are the thing to guard.
+
+    Three legs, black-box rather than by reading a comment. **Nothing is dropped between the
+    bundle and the card**: every forecast the execution emitted is either scored or named in
+    `unscoreable` with a reason, so a poor forecast cannot leave by the same door a genuinely
+    unresolvable one uses. **Nothing is dropped between the card and the screen**: `twin score`'s
+    own stdout names every world model the card scored, so the surface a viewer watches cannot
+    report a subset of what the artefact holds. **The red result is not tuned away**: the worst
+    forecast on this key stays worse than a flat 0.5. That last one is asserted on the *worst*
+    score rather than a fixed figure, so adding a world model that gets it right — which is the
+    whole point of an ensemble — passes, and quietly re-authoring the losing belief does not.
+    """
+    import contextlib
+    import io
+    import json
+
+    from ..cli import main as cli_main
+
+    org, scenario = "royal-mail", "would-the-twin-have-flagged-it"
+    key = "royal-mail-concedes-the-automation-shortfall-2019"
+
+    # The same scratch paths the other answer-key guards use, so one suite run builds one
+    # Carillion rather than two (`carillion-repo` is this file's existing name for it).
+    repos: dict[str, Path] = {}
+    for name, dirname in ((org, org), ("carillion", "carillion-repo"), ("enron", "enron")):
+        repo_dir = ctx.tmp / dirname
+        if not repo_dir.exists():
+            fixtures.BUILDERS[name](repo_dir)
+        repos[name] = repo_dir
+
+    out = ctx.tmp / "beat"
+    bundle = out / "forecast-bundle.json"
+    if cli_main([
+        "backtest", "--repo", str(repos[org]), "--org", org, "--scenario", scenario,
+        "--regime", "as-consumed", "--at", "2018-06-01", "--out", str(bundle),
+    ]) != 0:
+        raise Violated("the beat's rewind-and-project leg exited non-zero")
+
+    legs: dict[str, Path] = {}
+    for name, outcome in (("carillion", "carillion-collapse-resolved"), ("enron", "enron-bankruptcy-resolved")):
+        leg_bundle, leg_card = out / f"{name}-bundle.json", out / f"{name}-card.json"
+        rc1 = cli_main([
+            "run", "--repo", str(repos[name]), "--org", name, "--scenario", scenario,
+            "--regime", "as-consumed", "--out", str(leg_bundle),
+        ])
+        rc2 = cli_main([
+            "score", "--repo", str(repos[name]), "--org", name, "--forecast", str(leg_bundle),
+            "--outcome", outcome, "--out", str(leg_card),
+        ])
+        if rc1 != 0 or rc2 != 0:
+            raise Violated(f"the {name} discount leg exited non-zero (run={rc1}, score={rc2})")
+        legs[name] = leg_card
+
+    card = out / "score-card.json"
+    printed = io.StringIO()
+    with contextlib.redirect_stdout(printed):
+        rc = cli_main([
+            "score", "--repo", str(repos[org]), "--org", org, "--forecast", str(bundle),
+            "--outcome", key, "--discount-enron", str(legs["enron"]),
+            "--discount-obscure", str(legs["carillion"]), "--out", str(card),
+        ])
+    if rc != 0:
+        raise Violated("the beat's scoring leg exited non-zero")
+
+    emitted = json.loads(bundle.read_bytes())["body"]["forecasts"]
+    body = json.loads(card.read_bytes())["body"]
+    if not body["scores"]:
+        raise Violated("the beat scored nothing, so it demonstrates no falsifiability at all")
+
+    # The partition is checked on two cards, because on the beat's own card it cannot fail: this
+    # key carries one world model and nothing unscoreable, so `scores + unscoreable == emitted`
+    # reduces to "one score exists", which the line above already says. The second card is the
+    # fixture org run under `with-hindsight` — every forecast is then ineligible, so the
+    # `unscoreable` list is the populated one and the arithmetic has both halves to get wrong.
+    # A leg that cannot fail is not a guard, it is a sentence.
+    # A third card for the same reason, and it is also the only one that can exercise the ordering
+    # leg below: the beat's key carries one world model, so "the worst is printed first" is true of
+    # a list of one however it is sorted. The fixture org carries three.
+    spread: dict[str, tuple[Path, Path, str]] = {}
+    for regime in ("with-hindsight", "as-consumed"):
+        spread_bundle = out / f"{regime}-bundle.json"
+        spread_card = out / f"{regime}-card.json"
+        rc1 = cli_main([
+            "run", "--repo", str(ctx.repo_dir), "--org", "netflix", "--scenario", "dvd-decline-2011",
+            "--regime", regime, "--out", str(spread_bundle),
+        ])
+        spread_printed = io.StringIO()
+        with contextlib.redirect_stdout(spread_printed):
+            rc2 = cli_main([
+                "score", "--repo", str(ctx.repo_dir), "--org", "netflix",
+                "--forecast", str(spread_bundle), "--outcome", "dvd-decline-2011-resolved",
+                "--out", str(spread_card),
+            ])
+        if rc1 != 0 or rc2 != 0:
+            raise Violated(f"the {regime} card could not be built (run={rc1}, score={rc2})")
+        spread[regime] = (spread_bundle, spread_card, spread_printed.getvalue())
+
+    hindsight_bundle, hindsight_card, _ = spread["with-hindsight"]
+    partitions = [(bundle, card), (hindsight_bundle, hindsight_card), spread["as-consumed"][:2]]
+    for bundle_path, card_path in partitions:
+        forecasts = json.loads(bundle_path.read_bytes())["body"]["forecasts"]
+        scored = json.loads(card_path.read_bytes())["body"]
+        reported = len(scored["scores"]) + len(scored["unscoreable"])
+        if reported != len(forecasts):
+            raise Violated(
+                f"{card_path.name}: {len(forecasts)} forecast(s) emitted, {reported} reported — a "
+                "forecast left without being scored and without being named unscoreable"
+            )
+    hindsight = json.loads(hindsight_card.read_bytes())["body"]
+    if not hindsight["unscoreable"] or hindsight["scores"]:
+        raise Violated(
+            "the with-hindsight card scored something or named nothing unscoreable, so the "
+            "partition check has no populated `unscoreable` side to exercise"
+        )
+
+    worst = max(body["scores"], key=lambda s: s["brier"])
+    if worst["brier"] <= 0.25:
+        raise Violated(
+            f"the worst forecast on this key scores {worst['brier']}, better than a flat 0.5 — the "
+            "beat's red result has been tuned away, and a falsifiability demo that only passes "
+            "proves nothing"
+        )
+
+    # The **figure**, not merely the world model's name: a surface that printed the names and
+    # dropped the numbers would satisfy a name-only check while showing nothing of the result,
+    # and this leg's whole claim is that the red result reaches the screen. And the worst one is
+    # required to be the first score printed, because "reported" and "reported where somebody
+    # reads it" are the difference between an honest surface and a technically-complete one.
+    for label, scored_body, on_screen in (
+        ("the beat's card", body, printed.getvalue()),
+        ("the three-model card", json.loads(spread["as-consumed"][1].read_bytes())["body"],
+         spread["as-consumed"][2]),
+    ):
+        entries = scored_body["scores"]
+        lines = [line for line in on_screen.splitlines()
+                 if any(s["world_model"] in line for s in entries)]
+        for entry in entries:
+            shown = [line for line in lines if entry["world_model"] in line]
+            if not shown or f"{entry['brier']:.4f}" not in shown[0]:
+                raise Violated(
+                    f"{label}: `twin score` did not print {entry['world_model']}'s own score "
+                    f"({entry['brier']}) — a scored forecast reached the card and not the screen"
+                )
+        poorest = max(entries, key=lambda s: s["brier"])
+        if not lines or poorest["world_model"] not in lines[0]:
+            raise Violated(
+                f"{label}: the worst forecast ({poorest['world_model']}, brier {poorest['brier']}) "
+                "is not the first score printed — the bad news sits below better news, on a "
+                "lower-is-better rule"
+            )
+
+    discount = body["contamination_discount"]
+    if discount is None:
+        raise Violated("the beat's card carries no contamination discount despite both legs being supplied")
+    # Keyed off the measured rule rather than assuming brier, because `--discount-rule` accepts
+    # log_loss. A discount of exactly zero is a legitimate measurement — `scoring.measure_discount`
+    # declines to clamp the sign precisely so that "no memorisation advantage" can be reported —
+    # so the raw and adjusted figures being equal is checked as presence, never as difference.
+    if f"adjusted_{discount['rule']}" not in worst:
+        raise Violated(
+            f"the discounted card reports no adjusted_{discount['rule']} beside the raw figure"
+        )
+
+    return (
+        f"the partition holds on both a scoring card ({len(emitted)} emitted, "
+        f"{len(body['scores'])} scored) and an all-unscoreable one "
+        f"({len(hindsight['unscoreable'])} named, 0 scored); every scored forecast's own figure "
+        f"reaches stdout; the worst is brier {worst['brier']} and is printed first, worse than a "
+        "coin flip and still the headline"
+    )
+
+
 @harness_check("causal_accounts_have_no_privileged_default")
 def _causal_accounts_have_no_privileged_default(ctx: Context) -> str:
     """No causal account — including this overlay's own `edges` collection — is required

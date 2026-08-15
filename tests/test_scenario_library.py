@@ -86,17 +86,19 @@ def test_the_standing_library_sweeps_with_no_separate_harness(tmp_path: Path, ca
     artefact = schedule.sweep(repos, caps, ["twin", "sweep"])
 
     assert not artefact.body["failures"]
-    assert artefact.body["counts"]["repos"] == 9
     classes_run = {
         e["body"]["scenario"]["proposition"]
         for e in artefact.body["executions"]
         if e["org"] == fixtures.LIBRARY_ORG
     }
     assert len(classes_run) == 9, "every committed-class scenario ran inside the one sweep"
-    # The backtest answer keys sit in the identical executions list — no second code path.
+    # The backtest answer keys sit in the identical executions list — no second code path. Derived
+    # from `BUILDERS` rather than listed by hand: a hand-kept copy of this set is exactly what let
+    # build ticket 71's Royal Mail key sit outside the sweep unnoticed. The three excluded names
+    # are the repositories whose overlays are not answer keys.
     orgs_run = {e["org"] for e in artefact.body["executions"]}
-    for backtest_org in ("carillion", "nmc", "wirecard", "enron", "astrazeneca", "sanofi"):
-        assert backtest_org in orgs_run
+    answer_keys = set(fixtures.BUILDERS) - {"default", "library", "pocket"}
+    assert answer_keys <= orgs_run, f"answer keys built but never swept: {sorted(answer_keys - orgs_run)}"
 
 
 def test_dropping_a_committed_class_from_the_library_fails_the_invariant(
