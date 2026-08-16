@@ -27,6 +27,7 @@ more usefully, is named inside every artefact the tool emits.
 ```sh
 bash twin/demo.sh                          # the whole loop, from a clean checkout
 bash twin/beat-royal-mail.sh               # the falsifiability beat: rewind, project, score, red
+bash twin/beat-netflix.sh                  # the whole-engine beat: fear, seize, price, curve
 ./bin/twin verify                          # the invariant suite
 ./bin/twin verify <artefact> --repo R      # recompute that artefact from its own pins
 ./bin/twin verify <artefact> --attestation # check its sidecar: digest, signatures, the anomaly
@@ -874,7 +875,71 @@ What the beat does **not** show is the ensemble. This key carries one world mode
 emits one forecast, plurality is satisfied trivially rather than demonstrated, and the three
 regimes produce identical probabilities — which is why `twin regimes` **declines to compute a model
 residual** here and says why, rather than reporting a zero that would read as "the model is fine".
-The ensemble is build ticket 74's beat.
+The ensemble is the next section's beat.
+
+## The whole-engine beat: fear and seize from one dated state, then the curve
+
+Build ticket 74. `bash twin/beat-netflix.sh` runs the engine on the Netflix spine build ticket 73
+assembled. **No score, deliberately**: this org carries no answer key, because Netflix's fame makes
+anticipation indistinguishable from recital. The beat asserts that absence rather than working
+round it — `tests/test_netflix_beat.py::test_this_subject_carries_no_answer_key_and_the_engine_says_so`
+checks the overlay has no outcome at all and that `twin score` refuses and names what exists.
+
+**Both paths run from one commit, not from one date string.** `twin rewind --at 2011-08-01`
+resolves the date to a commit; the threat path projects from it (`twin backtest`, three rival world
+models, probabilities 0.05 / 0.15 / 0.55 and nothing merging them), and the opportunity path sweeps
+**that same commit** (`twin gameplay-sweep --ref`, a `land-grab` on `streaming-service` because the
+org holds the adjacent `personalisation-technology`). Two different answers to "what did the model
+look like on the day" would make fear and seize incomparable, which is the whole reason to run them
+at one date, and only the pins catch it. The sweep reports 1 opportunity pulled beside 3 signals
+pushed, so decision ticket 13 Q3's counterweight is a measured ratio on a real subject.
+
+**The dated cut is mechanical.** `fixtures.build_netflix_org` commits each layer on the date its own
+evidence lands: the value chain on 2011-04-26 (the Q1 letter names personalisation technology), the
+rival world models on 2011-07-26 (the Q2 letter frames the separation as a strength), and the whole
+causal-and-pricing layer on 2012-01-26 — because the Q4 2011 letter is the first to report domestic
+streaming and domestic DVD as separate segments, which is what supplies both a valuation and the
+after-side of a grade-1 claim. At 2011-08-01 the overlay therefore carries **no causal edge and no
+perspective**, and back-dating that commit fails the harness guard however the prose reads.
+
+**The cross-domain comparison, and its honest asymmetry.** One shock at `dvd-by-mail`, priced under
+`the-operator`, puts a non-technical lever (`hold-the-bundled-price-for-one-quarter` — a price held
+and a letter, costed from the subject's own published $5.99 monthly uplift against the roughly
+800,000 domestic members its Q3 letter reports leaving) beside a technical control
+(`ship-one-bill-and-one-sign-in-across-the-two-plans`) in the same unit. **The lever is the one with
+the evidence.** Its mitigation claim rests on two dated price changes in this same business and
+prices; the control's rests on domain theory nobody measured here, is graded 3, and is **refused a
+figure with the reason attached** rather than given a zero. A governance tool showing the
+engineering control winning here would be showing a number nothing behind it supports. A third
+option, `rank-domestic-members-by-cancellation-risk`, is the cheapest of the three and is removed by
+the universal floor before anything prices it.
+
+**The curve is the output, and the accounts disagree.** Three rival causal accounts read the same
+two filings and disagree about how much of the separation crossed to the streaming side — 0.10,
+0.35 and 0.05 on the same grade-1 edge. Believe `the-shock-crossed-to-the-streaming-side` and the
+price hold is cheapest; believe either of the other two and the billing rebuild is.
+`agreement.unanimous` is `false` and `cheapest_by_account` says which is which, ahead of the
+computed default. **This is the first fixture in this repository where that happens on real
+content**: build ticket 33 recorded that no real fixture made two accounts disagree about the
+cheapest response and called its unit test the honest substitute until one existed. This is it.
+
+**Versioned enactment, in the narrowed form that makes the same argument.** `twin propose
+--channel record`, not `--channel policy`, because the control is a lever that is not code — a
+versioned signed record that it was enacted, without a policy enforcing it. The proposal's own
+`narrowed_claim` reads *policy-as-code is AN enactment arm, not THE definition of governance;
+most levers are not code, so if versioned policy were the shape of governance the cross-domain
+comparison the £ engine exists for could not exist* — which is the sentence the paragraph above is
+a worked example of.
+
+The harness guard `netflix_runs_both_paths_and_the_curve_keeps_the_disagreement` asserts all six
+legs, and it was probed rather than reasoned about: making the two accounts agree, back-dating the
+pricing layer, and regrading the refused claim so it prices each fail it.
+
+**One asymmetry this beat found and did not close.** A perspective's valuation is evidence-graded
+and a mitigation claim is evidence-graded; **a response's `cost` is not**, because the schema has no
+slot for it. So the two levers' cost ranges are authored, and the fixture writes out the arithmetic
+in the response's own `note` instead of claiming a grade it cannot carry. Naming it here rather than
+adding a slot: widening the schema needs an authorising decision ticket, and this ticket has none.
 
 ## Propose only, in two layers
 
@@ -1272,12 +1337,14 @@ cost of risk across the named accounts is lowest — mean rather than any one ac
 because no account is privileged — with the artefact's `default.basis` saying so in words. **When
 the accounts disagree about which option is cheapest, `agreement.cheapest_by_account` and
 `agreement.unanimous` say so explicitly**, ahead of the default, rather than folding it into a
-single figure a reader would have to reconstruct by subtracting rows themselves. On the netflix
-fixture under `the-staff-council` two responses are admitted at once
+single figure a reader would have to reconstruct by subtracting rows themselves. On the walking-
+skeleton netflix fixture under `the-staff-council` two responses are admitted at once
 (`expand-the-delivery-network` and `stake-the-quarter-on-one-title`, the second surviving only
 because the council declares a different ruin boundary than the operator) and the choice stays
 unanimous — the honest result of a five-pound response sitting beside a forty-five-million-pound
-one, not a sign the ensemble comparison was never exercised on more than one option.
+one, not a sign the ensemble comparison was never exercised on more than one option. **The
+disagreement itself lands at build ticket 74**, on the real Netflix spine, where a price hold and a
+billing rebuild swap places across three rival accounts: see "the whole-engine beat" above.
 
 **`no_recommended_action_field` is re-asserted against this richer output, and re-registered under
 its own name rather than folded into the constitution's fixed sixteen.** Harness guard
@@ -2607,6 +2674,7 @@ twin/
   invariants/     manifest, harness, checks, golden digests
   demo.sh         the end-to-end
   beat-royal-mail.sh   the falsifiability beat — rewind, project, score, and the score is red
+  beat-netflix.sh      the whole-engine beat — fear and seize on one dated state, then the curve
 ```
 
 Code here is **disposable by default**. The durable artefacts are the versioned model repository

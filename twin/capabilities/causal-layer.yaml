@@ -31,3 +31,11 @@ criteria:
   - index: 5
     text: "Exercised on a real claim from each co-flagship (Qwikster→churn; EUV delay→node slip)."
     checked: false
+    # The Netflix half is real after build ticket 74 and the Intel half is not, so this stays
+    # unchecked. `the-separation-reaches-the-streaming-service` in `fixtures.build_netflix_org` is
+    # a grade-1 causal edge on the real subject — the evidence ladder's own grade-1 example, a
+    # dated price change with subscriber numbers on both sides of it, from the Q2 and Q3 2011
+    # letters — carried through propagation into a price and into a trade-off curve, with three
+    # rival accounts disagreeing about its magnitude. `euv-delay-slips-the-node` is still only in
+    # the walking-skeleton fixture, whose intel org cites `example.invalid`; the real Intel spine
+    # is build ticket 75. "Each co-flagship" means each of them.

@@ -4285,6 +4285,333 @@ evidence: "The signal is the subject's own filed quarterly disclosure; the citat
     }
 
 
+# -- the three layers the whole-engine beat needs (build ticket 74) -----------------------------
+#
+# Each is committed on the date its **own evidence** lands, not on the date the fixture author
+# wrote it. That is the whole reason this repository is a git history rather than a directory: a
+# rewind to 2011-08-01 reads a model that has the value chain and the ensemble and does **not**
+# have the causal layer, because the causal layer rests on filings that did not exist yet.
+#
+# The dates, and what each one waits for:
+#
+#   2011-04-26  the value chain      the Q1 letter names personalisation technology
+#   2011-07-26  the rival ensemble   the Q2 letter frames the separation as a strength
+#   2012-01-26  the causal layer     the Q4 letter is the first to report the two domestic
+#                                    segments separately, which is what supplies both a valuation
+#                                    and the after-side of a grade-1 edge
+
+_NETFLIX_VALUE_CHAIN: dict[str, str] = {
+    "orgs/netflix/components/personalisation-technology.yaml": """\
+id: personalisation-technology
+name: The subject's personalisation technology
+kind: capability
+evolution: custom-built
+visibility: 0.2
+""",
+    # A group, not a person. The schema's `person` unit is `{id, role}` and carries no name field,
+    # and the universal floor forbids behavioural output about an identified person — so an
+    # engineering group is the unit that belongs here on a real subject. The gameplay lens names
+    # the holder in its reason, and naming a cohort is the only form of that sentence the floor
+    # admits.
+    "orgs/netflix/people/the-personalisation-engineering-group.yaml": """\
+id: the-personalisation-engineering-group
+role: engineering group
+""",
+    # The same component file, rewritten in this commit to declare what it needs. A `needs` edge
+    # is a component's own `needs` list and has no other home, so the value chain reads as a value
+    # chain; nothing composes along it and it never prices. It is here because adjacency is what
+    # the gameplay lens reads a land-grab precondition from.
+    "orgs/netflix/components/streaming-service.yaml": """\
+id: streaming-service
+name: The subject's streaming service
+kind: activity
+evolution: product
+visibility: 0.8
+needs:
+  - personalisation-technology
+""",
+    "orgs/netflix/edges/the-group-maintains-personalisation.yaml": """\
+id: the-group-maintains-personalisation
+type: maintains
+from: the-personalisation-engineering-group
+to: personalisation-technology
+note: >-
+  Ownership of an adjacent capability, which is the second leg of the land-grab precondition. The
+  Q1 2011 letter attributes the quarter's growth to increased spending on content, personalisation
+  technology and the brand, so the subject's own filing is what says it holds this.
+""",
+}
+
+_NETFLIX_ENSEMBLE: dict[str, str] = {
+    "orgs/netflix/world_models/the-subjects-own-framing-2011-07.yaml": """\
+id: the-subjects-own-framing-2011-07
+name: The subject's own framing, in the Q2 2011 letter
+credence: 0.5
+note: >-
+  Read from this org's own signal q2-2011-letter-2011-07-25, which frames the recently introduced
+  price changes as funding further streaming content. A framing that reports the separation as a
+  strength holds almost no probability of a domestic reversal within two quarters. Held as one
+  rival among three and privileged in no way: the subject's own view loads through the same slot
+  every other belief does.
+beliefs:
+  a-priced-separation-precedes-a-domestic-subscriber-reversal: 0.05
+""",
+    "orgs/netflix/world_models/the-cannibalisation-sceptic-2011-07.yaml": """\
+id: the-cannibalisation-sceptic-2011-07
+name: The sceptic who reads a repriced separation as a churn event
+credence: 0.4
+note: >-
+  **Authored in 2026 by a fixture author who knows what happened**, and that is exactly why this
+  org carries no answer key and this belief is never scored. On a story this famous a high belief
+  is indistinguishable from recital (decision ticket 22), so it earns nothing by being right. It
+  is here to give the ensemble a real spread to report, and the disclosure travels with it rather
+  than sitting in a footnote somewhere else.
+beliefs:
+  a-priced-separation-precedes-a-domestic-subscriber-reversal: 0.55
+""",
+    # The same scenario file, rewritten in this commit to name all three world models. A model
+    # repository is versioned, so widening an ensemble is an ordinary dated commit — and a rewind
+    # to before this date reads the one-model scenario that actually existed then.
+    "orgs/netflix/scenarios/would-the-twin-have-flagged-it.yaml": """\
+id: would-the-twin-have-flagged-it
+question: >-
+  Reading only the subject's own quarterly reporting, would the twin have had grounds to flag that
+  separating the bundled plans risked a domestic subscriber reversal within two quarters?
+proposition: a-priced-separation-precedes-a-domestic-subscriber-reversal
+at: '2011-01-26'
+horizon: '2011-12-31'
+components:
+  - streaming-service
+  - dvd-by-mail
+world_models:
+  - market-consensus-2011
+  - the-subjects-own-framing-2011-07
+  - the-cannibalisation-sceptic-2011-07
+affected_parties:
+  - id: domestic-members-on-the-bundled-plan
+    who: >-
+      The subject's own domestic members who held the previously bundled plan — real and recorded
+      in the subject's own filing: the Q3 2011 letter (this org's own signal
+      q3-2011-letter-2011-10-24) states that the subject "greatly upset many domestic Netflix
+      members" through the pricing change, and reports about 800,000 of them leaving.
+    consequence: >-
+      The separation is modelled here from the shareholder's perspective, because the shareholder
+      letter is the record that exists. The members who absorbed the price rise hold no perspective
+      this twin runs under, and their leaving is visible only as a subscriber count.
+""",
+}
+
+# Everything that had to wait for the Q4 2011 letter (filed 2012-01-25), which is the first one to
+# report domestic streaming and domestic DVD as separate segments. Two things need it: a valuation
+# for each component, and the after-side of a grade-1 causal edge.
+_NETFLIX_PRICING: dict[str, str] = {
+    "orgs/netflix/edges/the-separation-reaches-the-streaming-service.yaml": """\
+id: the-separation-reaches-the-streaming-service
+type: influences
+from: dvd-by-mail
+to: streaming-service
+sign: negative
+lag_days: 90
+elasticity:
+  min: 0.05
+  mode: 0.1
+  max: 0.2
+evidence_grade: 1
+confidence: 0.5
+note: >-
+  The evidence ladder's own grade-1 example, on this subject: a dated price change with subscriber
+  numbers measured on both sides of it. The Q2 2011 letter dates the change and states its size
+  ($9.99 to $15.98 for a member holding both plans, taking effect on each subscriber's renewal
+  date from September); the Q3 2011 letter reports domestic subscribers falling from 24.6 million
+  at 30 June to 23.8 million at 30 September. Committed on 2012-01-26 rather than at the
+  separation, because until the Q4 letter split the two domestic segments there was no after-side
+  to read on the streaming side at all — which is what a grade-1 claim needs and what a rewind to
+  2011-08-01 correctly does not have.
+""",
+    "orgs/netflix/causal_accounts/the-shock-stayed-on-the-dvd-side.yaml": """\
+id: the-shock-stayed-on-the-dvd-side
+name: The separation cost DVD subscribers and barely reached streaming
+edges:
+  the-separation-reaches-the-streaming-service:
+    from: dvd-by-mail
+    to: streaming-service
+    sign: negative
+    lag_days: 90
+    elasticity:
+      min: 0.05
+      mode: 0.1
+      max: 0.2
+    evidence_grade: 1
+    confidence: 0.5
+note: >-
+  Restates the overlay's own edge exactly, and is held as a named account in its own right rather
+  than read implicitly — so an ensemble including it runs the same code path any rival does, with
+  no special case for "the status quo one". Its reading: the Q4 2011 letter reports domestic DVD
+  subscriptions falling from 13.93 million to 11.17 million in the quarter while domestic
+  streaming rose from 21.45 million to 21.67 million, so what the separation destroyed was
+  overwhelmingly on the side that was repriced.
+""",
+    "orgs/netflix/causal_accounts/the-shock-crossed-to-the-streaming-side.yaml": """\
+id: the-shock-crossed-to-the-streaming-side
+name: The separation damaged the whole relationship, streaming included
+edges:
+  the-separation-reaches-the-streaming-service:
+    from: dvd-by-mail
+    to: streaming-service
+    sign: negative
+    lag_days: 90
+    elasticity:
+      min: 0.2
+      mode: 0.35
+      max: 0.55
+    evidence_grade: 1
+    confidence: 0.45
+note: >-
+  The same edge, the same two components and the **same evidence grade** — a disagreement about
+  magnitude and nothing else, which is what a rival causal account is for. Its reading: the Q3
+  2011 letter attributes the loss to the DVD-related pricing changes *and* to the
+  proposed-and-cancelled rebranding, and says the subject "greatly upset many domestic Netflix
+  members" — damage to the relationship rather than to one plan. Nothing here says which account
+  is right; calibration over time adjudicates, never authorship or recency.
+""",
+    "orgs/netflix/causal_accounts/the-damage-was-mostly-the-rebrand.yaml": """\
+id: the-damage-was-mostly-the-rebrand
+name: The pricing change carried little of it; the rebrand carried the rest
+edges:
+  the-separation-reaches-the-streaming-service:
+    from: dvd-by-mail
+    to: streaming-service
+    sign: negative
+    lag_days: 90
+    elasticity:
+      min: 0.02
+      mode: 0.05
+      max: 0.1
+    evidence_grade: 1
+    confidence: 0.4
+note: >-
+  A third account, reading the *other* cause the Q3 2011 letter names. That letter attributes the
+  loss to the DVD-related pricing changes **and** to the proposed-and-cancelled rebranding of the
+  DVD service; this account holds that the rebrand carried most of the streaming-side damage, and
+  the subject reversed the rebrand itself. The pricing edge is therefore weak here. Three accounts
+  rather than two so that "dropping any one changes nothing about the rest" has three to drop
+  from — the same reason the walking-skeleton fixture carries three.
+""",
+    "orgs/netflix/perspectives/the-operator.yaml": """\
+id: the-operator
+name: The subject's own board, whose letters these are
+party: employer
+pays: >-
+  The organisation itself. The figures below are its own reported segment revenue and are stated
+  as its own rather than dressed as neutral. Nothing here is held on behalf of the members who
+  absorbed the price rise; the scenario's affected-parties register names them and says exactly
+  that.
+cash_flow:
+  - streaming-service
+  - dvd-by-mail
+values:
+  streaming-service:
+    amount: 476000000
+    evidence_grade: 2
+    basis: >-
+      Domestic streaming segment revenue of $476 million for Q4 2011, as the subject's own Q4 2011
+      letter to shareholders reports it (this org's signal q4-2011-letter-2012-01-25). One
+      quarter, taken as reported, with no annualisation and no authored arithmetic on top of it.
+  dvd-by-mail:
+    amount: 370000000
+    evidence_grade: 2
+    basis: >-
+      Domestic DVD segment revenue of $370 million for Q4 2011, from the same table in the same
+      letter, on the same terms.
+ruin:
+  insolvency: >-
+    Any option carrying a real chance that the organisation cannot meet its obligations.
+""",
+    "orgs/netflix/responses/hold-the-bundled-price-for-one-quarter.yaml": """\
+id: hold-the-bundled-price-for-one-quarter
+name: Hold the bundled price for one quarter for the members most exposed
+addresses: dvd-by-mail
+cost:
+  min: 30000000
+  mode: 45000000
+  max: 70000000
+mitigates:
+  component: streaming-service
+  reduction:
+    min: 0.3
+    mode: 0.4
+    max: 0.5
+  evidence_grade: 2
+  basis: >-
+    Two dated price changes in this same business with subscriber data on both sides of each — the
+    November 2010 change, whose one-quarter impact the Q2 2011 letter reports, and the July 2011
+    separation. That repetition is what the grade rests on. The magnitude **within** the range is
+    the authored part and is stated as such: two instances evidence the relationship, not the
+    0.4.
+note: >-
+  The non-technical lever. No engineering: a price held, and a letter. Costed as a range from two
+  figures the subject published — a $5.99 monthly uplift for a member on the combined plan ($9.99
+  to $15.98, Q2 2011 letter) held for three months, across two, three and five times the roughly
+  800,000 domestic members the Q3 2011 letter reports leaving, rounded to the nearest five
+  million. The response schema carries no evidence grade for a cost, so nothing here can claim
+  this figure is measured, and the arithmetic is written out instead.
+""",
+    "orgs/netflix/responses/ship-one-bill-and-one-sign-in-across-the-two-plans.yaml": """\
+id: ship-one-bill-and-one-sign-in-across-the-two-plans
+name: Ship one bill and one sign-in across the two separated plans
+addresses: streaming-service
+cost:
+  min: 10000000
+  mode: 15000000
+  max: 22000000
+mitigates:
+  component: streaming-service
+  reduction:
+    min: 0.05
+    mode: 0.1
+    max: 0.16
+  evidence_grade: 3
+  basis: >-
+    An established mechanism from domain theory — a split billing and sign-in experience raises
+    churn — which nobody has measured on this subject. The Q3 2011 letter names the cancelled
+    rebranding beside the pricing change as a cause, which is suggestive and is not a measurement
+    of what unifying the two would have removed.
+note: >-
+  The technical control, and the honest asymmetry of this beat: **its mitigation claim is graded
+  outside the pricing threshold and earns no credit at all**, so its net cost of risk is its cost
+  and does not move when the causal account changes. The lever beside it is the one with the
+  evidence. A governance tool that showed the engineering control winning here would be showing a
+  number nothing behind it supports. The cost is authored — the schema grades a valuation and a
+  mitigation claim and does not grade a cost, which is a real asymmetry and is named rather than
+  hidden.
+""",
+    "orgs/netflix/responses/rank-domestic-members-by-cancellation-risk.yaml": """\
+id: rank-domestic-members-by-cancellation-risk
+name: Rank domestic members by cancellation risk and call them
+addresses: streaming-service
+cost:
+  min: 2000000
+  mode: 3000000
+  max: 5000000
+crosses:
+  no-individual-level-output: >-
+    The method is a per-member ranking acted on member by member, which is a behavioural output
+    about an identified person rather than a cohort.
+note: >-
+  Removed by the universal floor before anything prices it, and deliberately the cheapest of the
+  three: the pre-filter never looks at a cost, so cheapness is what makes "no magnitude brings it
+  back" demonstrable rather than merely asserted. It leaves the curve carrying no figure at all.
+""",
+}
+
+# (date, message, files). Ordered by date below, interleaved with the spine's own checkpoints.
+_NETFLIX_LAYERS: tuple[tuple[str, str, dict[str, str]], ...] = (
+    ("2011-04-26", "the value chain the Q1 letter names", _NETFLIX_VALUE_CHAIN),
+    ("2011-07-26", "two rival world models, one the subject's own framing", _NETFLIX_ENSEMBLE),
+    ("2012-01-26", "the causal layer, the eye that pays, and the candidate responses", _NETFLIX_PRICING),
+)
+
+
 def build_netflix_org(dest: str | Path) -> Path:
     """The Netflix public spine (build ticket 73): six dated checkpoints, quarterly cadence.
 
@@ -4318,15 +4645,27 @@ def build_netflix_org(dest: str | Path) -> Path:
     git(root, "commit", "-q", "-m", "the overlay and the scenario, before the first checkpoint",
         dated="2011-01-01T00:00:00+00:00")
 
-    for signal_id, date, component, steep, accession, statement in _NETFLIX_SPINE:
-        # Signal and claim in one commit, on the checkpoint's own date: the binding exists in this
-        # repository's history as of the date the filing does, so a rewind reads a real state.
-        _write(root, {
-            **_netflix_signal(signal_id, date, steep, accession, statement),
-            **_netflix_claim(signal_id, component),
-        })
+    # Signal and claim in one commit, on the checkpoint's own date: the binding exists in this
+    # repository's history as of the date the filing does, so a rewind reads a real state. The
+    # three build-ticket-74 layers interleave by date for the same reason — every commit here is
+    # dated by the evidence it rests on, so what a rewind can see is decided by the record and not
+    # by the order somebody wrote the fixture in.
+    commits: list[tuple[str, str, dict[str, str]]] = [
+        (
+            date,
+            f"checkpoint: {signal_id}",
+            {
+                **_netflix_signal(signal_id, date, steep, accession, statement),
+                **_netflix_claim(signal_id, component),
+            },
+        )
+        for signal_id, date, component, steep, accession, statement in _NETFLIX_SPINE
+    ]
+    commits += list(_NETFLIX_LAYERS)
+    for date, message, files in sorted(commits, key=lambda entry: entry[0]):
+        _write(root, files)
         git(root, "add", "-A")
-        git(root, "commit", "-q", "-m", f"checkpoint: {signal_id}", dated=f"{date}T21:00:00+00:00")
+        git(root, "commit", "-q", "-m", message, dated=f"{date}T21:00:00+00:00")
     return root
 
 

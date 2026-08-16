@@ -145,9 +145,16 @@ def _assemble(
     """The pure part of `curve()`: the per-option rows, the ranking agreement across accounts, and
     the computed default — none of it needing a model repository, so it is a plain function of
     already-computed numbers and is exercised directly with synthetic figures in
-    `tests/test_tradeoff.py` (a real fixture with the specific numbers to make two accounts
-    disagree about which response is cheapest has not been authored; this is the honest substitute
-    until one is).
+    `tests/test_tradeoff.py`.
+
+    Those synthetic figures used to be the *only* place a ranking disagreement appeared: build
+    ticket 33 recorded that no real fixture made two accounts disagree about which response is
+    cheapest, and called the unit test the honest substitute until one existed. Build ticket 74
+    authored it — `fixtures.build_netflix_org`, where a price hold and a billing rebuild swap
+    places depending on how much of the separation you believe crossed to the streaming side
+    (`tests/test_netflix_beat.py`, harness guard
+    `netflix_runs_both_paths_and_the_curve_keeps_the_disagreement`). The synthetic test stays,
+    because it can vary numbers a real subject's own filings cannot.
     """
     points = []
     for option_id in option_ids:

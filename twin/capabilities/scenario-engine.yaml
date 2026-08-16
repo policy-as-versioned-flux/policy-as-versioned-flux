@@ -41,3 +41,12 @@ criteria:
   - index: 7
     text: "Exercised on one fear scenario and one opportunity scenario across the co-flagships."
     checked: false
+    # Half of it exists after build ticket 74, and half a criterion is not a criterion. **Netflix
+    # has both**, on dated evidence and through the ordinary verbs: the fear scenario is
+    # `would-the-twin-have-flagged-it` rewound to 2011-08-01 under `as-consumed` (`twin backtest`,
+    # three rival world models), and the opportunity is a `land-grab` on `streaming-service`
+    # pulled by `twin gameplay-sweep` from the very commit that rewind resolved — pulled rather
+    # than pushed, which is what makes it the opportunity half rather than a second threat.
+    # **Intel has neither on a real spine**: the `euv-slip-2026` scenario lives in the walking-
+    # skeleton fixture, which cites `example.invalid`, and the real Intel spine is build ticket
+    # 75's own work. This ticks when that lands.
