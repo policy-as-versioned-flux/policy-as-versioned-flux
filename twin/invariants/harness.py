@@ -14,7 +14,7 @@ from typing import Any, Callable, Iterator
 
 import yaml
 
-from .. import REPO_DIR, fixtures
+from .. import PACKAGE_DIR, REPO_DIR, fixtures
 from ..artefact import Artefact
 from ..grades import Capabilities
 from . import (
@@ -1543,6 +1543,122 @@ def _planter_detector_scorer_are_structurally_separated(ctx: Context) -> str:
         f"actionability horizon scores {scorer_mod.TIMELY_SCORE}, the identical plant detected "
         f"after it scores {late_ps.score} with the horizon named in the reason, and a missed plant "
         f"scores {scorer_mod.MISSED_SCORE}; every result carries the shared-prior limitation verbatim"
+    )
+
+
+@harness_check("netflix_substrate_is_free_running_and_every_plant_carries_a_horizon")
+def _netflix_substrate_is_free_running_and_every_plant_carries_a_horizon(ctx: Context) -> str:
+    """The Netflix substrate as a whole (build ticket 73, decision ticket 12 Q3, Q3b): the
+    committed recipe against the committed spine, on the real subject rather than a guard-local
+    stand-in.
+
+    A guard on the suite rather than an invariant, the same shape the other four substrate-chain
+    guards are. It differs from them in what it runs on: they assert module contracts against
+    recipes they build themselves, and this one asserts that the **committed content** — a real
+    recipe and a real six-filing spine, both in git — actually holds those contracts. A mechanism
+    that works on its own fixtures and fails on the subject it shipped for is the failure this
+    guard exists to catch.
+
+    Five legs. First, free-running: not one generated line restates a spine fact, so the diff
+    against the spine has no anchored residual to subtract and the plants stay buried among
+    dozens of decoys (decision ticket 12 Q3). Second, every plant carries a declared actionability
+    horizon and a reason, read from the committed `twin/plant-horizons.yaml` — `plant()` refuses
+    the recipe otherwise, so this leg is what stops that refusal from being the shipped state.
+    Third, drift between the two committed documents is refused in the direction `plant()` does
+    not cover: a horizons file naming a signal the recipe never plants is a stale seal, and it
+    fails rather than reads as covering a plant that is gone. Fourth, every fidelity dimension
+    lands inside its declared band on the real subject. Fifth, the report is emitted, reproduces
+    byte-for-byte from identical pins, and carries a row for **every** plant including the ones
+    nothing detected — a report that dropped its misses would publish a hit rate over a
+    denominator it had quietly shrunk.
+    """
+    from .. import planter as planter_mod, substrate_report
+    from ..model import Overlay
+    from ..planter import PlanterError
+    from ..repo import ModelRepo
+    from ..spine import Spine, diff_against_spine
+    from ..substrate import SubstrateRecipe
+    from ..substrate_eval import evaluate_fidelity
+    from ..substrate_generator import generate
+    from ..verbs import command_for
+
+    checkpoint = "2011-10-24"
+    recipe_path = PACKAGE_DIR / "netflix-substrate-recipe.yaml"
+    recipe = SubstrateRecipe.from_yaml(recipe_path.read_text(encoding="utf-8"))
+
+    netflix_dir = ctx.tmp / "netflix-repo"
+    if not netflix_dir.exists():
+        fixtures.build_netflix_org(netflix_dir)
+    overlay = Overlay.load(ModelRepo.open(netflix_dir), "netflix")
+    spine = Spine.from_overlay(overlay)
+
+    batch = generate(recipe)
+    split = diff_against_spine(batch, spine)
+    if split["anchored"]:
+        raise Violated(
+            f"{len(split['anchored'])} generated line(s) restate a spine fact — the substrate is "
+            "anchored where it should be free-running, and a diff against the spine narrows the "
+            "search for the plants"
+        )
+
+    dates, reasons = planter_mod.horizons_for(recipe)
+    missing = [s for s in recipe.planted_signals if s not in dates or not reasons.get(s)]
+    if missing:
+        raise Violated(f"{len(missing)} committed plant(s) carry no declared horizon or reason: {missing}")
+
+    drifted = ctx.tmp / "drifted-horizons.yaml"
+    drifted.write_text(
+        "schema: twin.plant-horizons/v1\nrecipes:\n"
+        f"  {recipe.id}:\n    - signal: a signal this recipe never plants\n"
+        "      horizon: '2011-09-30'\n      reason: a stale seal\n",
+        encoding="utf-8",
+    )
+    try:
+        planter_mod.horizons_for(recipe, path=drifted)
+    except PlanterError:
+        pass
+    else:
+        raise Violated("a horizons document naming a signal the recipe never plants was accepted")
+
+    metrics = evaluate_fidelity(batch, spine, checkpoint)
+    outside = [m.name for m in metrics if not m.within_target]
+    if outside:
+        raise Violated(f"the committed Netflix substrate falls outside its declared band(s): {outside}")
+
+    command = command_for(
+        "substrate", org="netflix", checkpoint=checkpoint, detected_at=checkpoint,
+        recipe=recipe_path.name,
+    )
+    first = substrate_report.report(
+        ModelRepo.open(netflix_dir), ctx.caps, "netflix", recipe_path, checkpoint, checkpoint, command
+    )
+    second = substrate_report.report(
+        ModelRepo.open(netflix_dir), ctx.caps, "netflix", recipe_path, checkpoint, checkpoint, command
+    )
+    if first.to_bytes() != second.to_bytes():
+        raise Violated("two substrate reports from identical pins are not byte-identical")
+
+    reported = first.body["detection"]["plants"]
+    if len(reported) != len(recipe.planted_signals):
+        raise Violated(
+            f"the report carries {len(reported)} plant row(s) for {len(recipe.planted_signals)} "
+            "planted signal(s) — a miss was dropped rather than scored"
+        )
+    if not any(not row["detected"] for row in reported):
+        raise Violated(
+            "no plant is reported as missed; this guard is asserted against a report that keeps "
+            "its misses, and one with none proves nothing about whether it would"
+        )
+    if first.body["detection"]["limitation"] != planter_mod.SHARED_PRIOR_LIMITATION:
+        raise Violated("the report does not carry the shared-prior limitation verbatim")
+
+    hit_rate = first.body["detection"]["hit_rate"]
+    return (
+        f"the committed Netflix recipe restates none of the spine's {len(spine.facts)} facts; all "
+        f"{len(recipe.planted_signals)} plants carry a declared horizon and reason, and a horizons "
+        "file drifted from the recipe is refused; every fidelity dimension is inside its band at "
+        f"{checkpoint}; the report reproduces byte-for-byte and scores every plant, misses "
+        f"included, at a hit rate of {hit_rate}"
     )
 
 

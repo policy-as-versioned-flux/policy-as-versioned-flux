@@ -6,9 +6,11 @@ The substrate machinery gives the mechanism; it does not give the content.
 
 **Blocked by:** 52, 70
 
-**Status:** spine and substrate built, **PLANTS AND REPORTING NOT WIRED** — 2026-08-16. The same
-honest split build tickets 64, 65 and 66 carry: what exists is described, what does not is named
-rather than left to be inferred from a green tick.
+**Status:** done — 2026-08-16, in two parts. Part 1 built the spine and the substrate and left two
+criteria unticked with what was missing named on each. Part 2 declared the horizons, wired the
+walk, and built the `twin substrate` surface the reporting criterion asked for. What part 2 does
+**not** do is move a capability grade: `synthetic-substrate` stays at 4/7, because decision ticket
+12 AC 3 asks for a planting protocol of four clauses and this supplies two of them.
 
 **Reading list:** Decision tickets 06, 12, 22. Spec story 91.
 
@@ -34,19 +36,40 @@ rather than left to be inferred from a green tick.
       fact, because generating the substrate from the spine is what would make the plants findable
       by diffing against it (decision ticket 12 Q3). The subscriber numbers and the Qwikster
       reversal appear nowhere in it — they are the spine's business, anchored in at evaluation.
-- [ ] Fidelity measured by the ticket-51 eval suite and reported.
-      **Measured, not yet reported.** `substrate_eval.evaluate_fidelity` against the real spine at
-      the 2011-10-24 checkpoint puts all five dimensions inside their target bands first time:
-      signal_to_noise 0.121 (0.05-0.25), plant_difficulty 0.275 (0.05-0.5), spine_consistency
-      1.000, reporting_asymmetry 0.667 (0.6-0.95), mundanity 0.879 (0.7-1.0). What is missing is
-      the *reported* half: there is no `twin` verb that emits a fidelity artefact, so the figures
-      exist only when someone calls the library. This criterion stays unticked until that surface
-      exists, rather than being ticked on the measurement alone.
-- [ ] Plants placed with actionability horizons, planter/detector/scorer split enforced.
+- [x] Fidelity measured by the ticket-51 eval suite and reported.
+      `substrate_eval.evaluate_fidelity` against the real spine at the 2011-10-24 checkpoint puts
+      all five dimensions inside their target bands first time: signal_to_noise 0.121 (0.05-0.25),
+      plant_difficulty 0.275 (0.05-0.5), spine_consistency 1.000, reporting_asymmetry 0.667
+      (0.6-0.95), mundanity 0.879 (0.7-1.0). **Reported** by `twin substrate`
+      (`twin/substrate_report.py`), which emits a `substrate-report` artefact carrying the five
+      metrics with their bands, the anchored/free-running split, and the plant walk below — one
+      artefact rather than two, because both are readings of one generated batch at one checkpoint
+      and a reader comparing two files would be comparing two different batches. Marked `derived`:
+      it carries no substrate content, only measurements over a batch `generate()` produces with no
+      external entropy, and two reports from identical pins are byte-identical.
+- [x] Plants placed with actionability horizons, planter/detector/scorer split enforced.
       The four planted signals are written and camouflaged — each borrows vocabulary from the lines
-      it sits among, which is what keeps `plant_difficulty` off its trivially-findable floor. **No
-      actionability horizon is declared for any of them yet**, so `planter.plant()` would refuse
-      this recipe today, exactly as decision ticket 12 Q3b intends. The planter/detector/scorer
-      walk is not wired.
-- [ ] Extends the invariant suite; never weakens it. Any invariant change names the invariant and cites the authorising decision ticket.
-- [ ] Declares its depth grade as a **computed checklist** against the owning decision ticket's acceptance criteria — `full` is derived from the checklist, never asserted.
+      it sits among, which is what keeps `plant_difficulty` off its trivially-findable floor. Each
+      now carries a declared horizon **and a reason** in `twin/plant-horizons.yaml`, a versioned
+      document keyed by recipe id and read only by `twin/planter.py` — the sealed side of the split,
+      the module `twin/detector.py` imports nothing from. `planter.horizons_for()` refuses a horizon
+      with no reason, an unparseable date, or a signal the recipe never plants; `plant()` already
+      refused a signal with no horizon at all. The walk runs end to end on the real subject and
+      **the number is bad: a hit rate of 25%**, one plant of four, reported at the top of the
+      output with a row for every plant including the three nothing found. `twin/detector.py` is
+      ticket 52's lexical-outlier stand-in, so that figure is about the heuristic and not the
+      subject — `SHARED_PRIOR_LIMITATION` travels beside it saying so.
+- [x] Extends the invariant suite; never weakens it. Any invariant change names the invariant and cites the authorising decision ticket.
+      Harness guard `netflix_substrate_is_free_running_and_every_plant_carries_a_horizon`, five
+      legs on the **committed** recipe and the **committed** spine rather than a guard-local
+      stand-in: no generated line restates a spine fact; every plant carries a horizon and a
+      reason; a horizons document drifted from the recipe is refused; every fidelity dimension is
+      inside its band; the report reproduces byte-for-byte and scores every plant, misses included.
+      No invariant body changed and no manifest hash moved.
+- [x] Declares its depth grade as a **computed checklist** against the owning decision ticket's acceptance criteria — `full` is derived from the checklist, never asserted.
+      The report's envelope carries `synthetic-substrate` at `partial`, 4/7 of decision ticket 12,
+      naming AC 3, 6 and 7 as unchecked. Nothing here ticks AC 3: the actionability horizon
+      supplies its lead-time clause and `plant_difficulty` its burial clause, but "strength" is
+      unmodelled and there is no declared *distribution* of difficulty across plants — one plant
+      per channel at a fixed midpoint, each as hard to find as its wording happens to make it.
+      Two of four clauses is not a criterion.

@@ -1110,6 +1110,48 @@ def cmd_index(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_substrate(args: argparse.Namespace) -> int:
+    """The substrate's fidelity and its planted-signal walk, in one artefact (build ticket 73).
+
+    Prints the honest numbers before emitting: five dimensions with their bands, and a hit rate
+    that is whatever the detector managed. `twin/detector.py` is a lexical-outlier stand-in, so a
+    low rate here is a fact about that heuristic, not about the subject — which is why the
+    shared-prior limitation prints beside it rather than in a footnote.
+    """
+    from . import substrate_report
+
+    repo, caps, org = _open(args)
+    detected_at = args.detected_at or args.checkpoint
+    artefact = substrate_report.report(
+        repo, caps, org, args.recipe, args.checkpoint, detected_at,
+        verbs.command_for(
+            "substrate", org=org, checkpoint=args.checkpoint, detected_at=detected_at,
+            recipe=Path(args.recipe).name,
+        ),
+    )
+    body = artefact.body
+    _say(f"{org}: substrate fidelity at {args.checkpoint}, detection scored at {detected_at}")
+    for metric in body["fidelity"]["metrics"]:
+        state = "within" if metric["within_target"] else "OUTSIDE"
+        print(
+            f"  {metric['name']:<20} {metric['value']:.3f}  {state} "
+            f"[{metric['target_low']}, {metric['target_high']}]"
+        )
+    spine = body["spine"]
+    print(
+        f"  free-running         {spine['free_running_lines']} line(s) against "
+        f"{spine['anchored_lines']} anchored — the diff-against-the-spine attack has "
+        "somewhere to hide a plant"
+    )
+    detection = body["detection"]
+    print(f"  hit rate             {detection['hit_rate']:.0%}, mean score {detection['mean_score']:.3f}")
+    for entry in detection["plants"]:
+        state = "missed" if not entry["detected"] else ("timely" if entry["timely"] else "LATE")
+        print(f"    {entry['channel']:<16} {state:<7} horizon {entry['actionability_horizon']}  {entry['reason']}")
+    print(f"  limitation:  {detection['limitation']}")
+    return _emit(artefact, args.out)
+
+
 def cmd_fixture(args: argparse.Namespace) -> int:
     root = fixtures.BUILDERS[args.name](args.out)
     print(f"{args.name} model repository -> {root}")
@@ -1836,6 +1878,18 @@ def build_parser() -> argparse.ArgumentParser:
     idx = with_repo(subs.add_parser("index", help="build the derived index (never authoritative)"))
     idx.add_argument("--out", required=True)
     idx.set_defaults(fn=cmd_index)
+
+    substrate = with_org(with_repo(subs.add_parser(
+        "substrate", help="measure a substrate recipe's fidelity and score its planted signals"
+    )))
+    substrate.add_argument("--recipe", required=True, help="path to a twin.substrate-recipe/v1 recipe")
+    substrate.add_argument("--checkpoint", required=True, help="the spine date to anchor and measure at")
+    substrate.add_argument(
+        "--detected-at", default=None,
+        help="the date the detector's run is scored as happening (default: the checkpoint)",
+    )
+    substrate.add_argument("--out", required=True)
+    substrate.set_defaults(fn=cmd_substrate)
 
     fixture = subs.add_parser("fixture", help="build the deterministic fixture model repository")
     fixture.add_argument("--out", required=True)

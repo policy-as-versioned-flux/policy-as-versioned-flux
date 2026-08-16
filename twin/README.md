@@ -49,6 +49,7 @@ bash twin/beat-royal-mail.sh               # the falsifiability beat: rewind, pr
 ./bin/twin reliability --score-card C1 --score-card C2 # bins over a pooled population, empty bins shown
 ./bin/twin severity --mu M --sigma S --threshold U --xi X --beta B --alpha A # loss-exceedance: VaR beside TVaR
 ./bin/twin severity-anchor --subject data-breach-loss --alpha A # the same curve, fit from cited public quantiles
+./bin/twin substrate --repo R --org O --recipe F --checkpoint D # five fidelity bands, and every plant scored against its own horizon
 ./bin/twin drift                           # the Flux drift measurement: coverage, events, no verdict
 ./bin/twin options --repo R --perspective P # the choice set after the pre-filter, survivors costed
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
@@ -1613,6 +1614,66 @@ detector" is now the planter/detector/scorer split itself — `synthetic-substra
 supplies its lead-time clause, but "strength" is untouched, so it stays on the same "one clause of
 a multi-clause criterion" ground build tickets 49 and 51 already left it on.
 
+## Netflix: the subject the substrate chain shipped for, and the report that publishes its figures
+
+Build tickets 48-52 built the substrate mechanism against recipes they wrote themselves. Build
+ticket 73 is the mechanism pointed at a real subject, and it landed in two parts because two of its
+four criteria were genuinely unmet when the first half was committed.
+
+**The spine is six SEC filings, read from the filings.** `fixtures.build_netflix_org()`:
+2011-01-26, 2011-04-25, 2011-07-25, 2011-09-15, 2011-10-24, 2012-01-25 — every one an EX-99.1
+letter to shareholders, cited by accession number. The cadence is the subject's own quarterly
+reporting, with the September interim guidance cut sitting between two quarters because that is
+where the subject broke its own cadence to disclose. **No answer key, deliberately** (decision
+ticket 22): the story is famous enough that anticipating it cannot be told apart from reciting it,
+so Royal Mail carries the falsifiability beat and this subject carries the engine.
+
+**The substrate is free-running, and that is checked rather than intended.**
+`twin/netflix-substrate-recipe.yaml` is 24 templates and four planted signals of 2011 Los Gatos
+operational chatter the public record is silent about. Not one line restates, contradicts or hints
+at a spine fact — the subscriber numbers and the Qwikster reversal appear nowhere in it — because
+generating the substrate from the spine is exactly what would let a reader recover the plants by
+diffing against it (decision ticket 12 Q3). `diff_against_spine` on the raw batch returns an empty
+`anchored` list and 28 free-running lines, so the five spine facts anchored in at evaluation leave
+the plants inside a residual five times their own size.
+
+**Every plant carries a horizon, and the horizons live on the planter's side of the seal.**
+`twin/plant-horizons.yaml` is a versioned document keyed by recipe id, read only by
+`twin/planter.py` — the module `twin/detector.py` imports nothing from. Each entry carries a
+YYYY-MM-DD horizon **and a reason**, and `horizons_for()` refuses one with no reason, an unparseable
+date, or a signal the recipe never plants. The dates are authored ground truth about a synthetic
+substrate and say so in the file itself; what is real is the consequence, which is that
+`scorer.score()` prices a late find near zero.
+
+**`twin substrate` is the reported half.** One recipe against one org's spine at one checkpoint:
+the five fidelity dimensions with their bands, the anchored/free-running split, and the
+planter/detector/scorer walk over the plants that batch actually carries. Both readings sit in one
+artefact because they are two readings of one generated batch — a reader comparing two files would
+be comparing two different batches. On the real subject every dimension lands inside its band first
+time (signal_to_noise 0.121, plant_difficulty 0.275, spine_consistency 1.000, reporting_asymmetry
+0.667, mundanity 0.879), and the walk's number is worse: **a hit rate of 25%**, one plant of four.
+That figure is reported at the top of the output rather than buried, and the report carries a row
+for every plant including the three nothing found, because a hit rate over a quietly shrunk
+denominator is the easiest number in this system to fake. The detector is build ticket 52's
+lexical-outlier stand-in, so 25% is a fact about that heuristic and not about the subject — which
+is why `SHARED_PRIOR_LIMITATION` prints beside it.
+
+The report is `derived`: it carries no substrate content, only measurements over a batch
+`substrate_generator.generate()` produces without external entropy, and two reports from identical
+pins are byte-identical. Swap that generator for a live model call and the mark stops being
+defensible, which is why the recipe's `model_version` is pinned in the envelope.
+
+Harness guard `netflix_substrate_is_free_running_and_every_plant_carries_a_horizon` carries all of
+it into the permanent suite, on the committed recipe and the committed spine rather than a
+guard-local stand-in: a mechanism that works on its own fixtures and fails on the subject it
+shipped for is what that guard exists to catch.
+
+**Moves no capability grade.** `synthetic-substrate` stays at 4/7. AC 3 (the planting protocol)
+now has its lead-time clause declared per plant and its burial clause measured, but "strength" is
+unmodelled and there is no declared *distribution* of difficulty across plants — one plant per
+channel at a fixed midpoint, each as hard to find as its wording happens to make it. Two of four
+clauses is not a criterion.
+
 ## The decaying unbound-signal pool
 
 `twin/unbound_pool.py` (build ticket 54, decision ticket 11 Q3) is the retention half of "weak
@@ -2534,6 +2595,10 @@ twin/
   grades.py       depth grades as computed checklists
   worksheet.py    the pocket-org worksheet, parsed and checked
   pocket-org-worksheet.md   the hand-computed yardstick — authored, and the authority
+  substrate_report.py  `twin substrate` — the fidelity bands and the planted-signal walk, in one
+                  artefact, so the figures exist without a Python prompt
+  plant-horizons.yaml   the actionability horizons, sealed on the planter's side of the split
+  netflix-substrate-recipe.yaml  one real subject's substrate, free-running against its spine
   blob.py         content-hash references for bulk substrate
   index.py        the derived index — a store, and therefore never authoritative
   canon.py        canonical serialisation

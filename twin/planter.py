@@ -22,15 +22,28 @@ versioned schema — `twin.substrate-recipe/v1` — describes *what text to gene
 planter's own ground-truth metadata about when a plant stops being actionable). `plant()` refuses
 a recipe whose planted signals are not every one covered by a horizon: "every plant carries an
 actionability horizon" is enforced here, not merely documented.
+
+`horizons_for()` is where a committed recipe's horizons come from: `twin/plant-horizons.yaml`, a
+versioned document keyed by recipe id, read the way `twin/decay.yaml` and `twin/evidence-ladder.yaml`
+are. It lives on this side of the seal deliberately — a horizon is ground truth, and
+`twin/detector.py` imports nothing from this module (build ticket 73).
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Mapping
 
+import yaml
+
+from . import PACKAGE_DIR
+from .regimes import RegimeError, cutoff
 from .substrate import SubstrateRecipe
 from .substrate_generator import LINES_PER_CHANNEL, generate
+
+HORIZONS_PATH = PACKAGE_DIR / "plant-horizons.yaml"
+HORIZONS_SCHEMA = "twin.plant-horizons/v1"
 
 SHARED_PRIOR_LIMITATION = (
     "planter and detector are the same model family and share model priors (decision ticket 12 "
@@ -41,7 +54,58 @@ SHARED_PRIOR_LIMITATION = (
 
 
 class PlanterError(RuntimeError):
-    """A recipe schedules a planted signal with no declared actionability horizon."""
+    """A recipe schedules a planted signal with no declared actionability horizon, or a horizons
+    document has drifted from the recipe it claims to cover."""
+
+
+def horizons_for(recipe: SubstrateRecipe, path: Path | None = None) -> tuple[dict[str, str], dict[str, str]]:
+    """`({signal: horizon}, {signal: reason})` for a committed recipe, validated on read.
+
+    Drift in either direction is refused rather than absorbed. A horizons document naming a signal
+    the recipe never plants is a stale seal — the plant it was written for is gone, and the file
+    still reads as covering it. A recipe whose signals this document misses is `plant()`'s own
+    refusal, left there because that is where the requirement lives.
+
+    A horizon is validated by `regimes.cutoff` itself, not by a second date parser: it is compared
+    against `detected_at` as text in `twin/scorer.py`, which is the identical day-string ordering
+    the regime gate and `Spine.at` already use, so a horizon in another shape compares wrong rather
+    than failing (`twin/spine.py` makes the same choice for the same reason).
+    """
+    source = path or HORIZONS_PATH
+    doc = yaml.safe_load(source.read_text(encoding="utf-8"))
+    if not isinstance(doc, dict) or doc.get("schema") != HORIZONS_SCHEMA:
+        raise PlanterError(f"{source}: not a {HORIZONS_SCHEMA} document")
+    declared = doc.get("recipes") or {}
+    entries = declared.get(recipe.id) if isinstance(declared, dict) else None
+    if not isinstance(entries, list):
+        raise PlanterError(
+            f"{source}: no actionability horizons declared for recipe {recipe.id!r} "
+            f"(have: {', '.join(sorted(declared)) if isinstance(declared, dict) else 'none'})"
+        )
+    planted = set(recipe.planted_signals)
+    dates: dict[str, str] = {}
+    reasons: dict[str, str] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise PlanterError(f"{source}: recipe {recipe.id!r} has a horizon entry that is not a mapping: {entry!r}")
+        signal = str(entry.get("signal", "")).strip()
+        reason = str(entry.get("reason", "")).strip()
+        if signal not in planted:
+            raise PlanterError(
+                f"{source}: recipe {recipe.id!r} never plants {signal!r} — the horizons document "
+                "has drifted from the recipe it covers"
+            )
+        try:
+            horizon = cutoff(str(entry.get("horizon", "")).strip())
+        except RegimeError as exc:
+            raise PlanterError(f"{source}: {signal!r} declares an unusable horizon — {exc}") from None
+        if not reason:
+            raise PlanterError(
+                f"{source}: {signal!r} declares a horizon with no reason — an undated-looking date "
+                "nobody can argue with is how a self-declared number gets in"
+            )
+        dates[signal], reasons[signal] = horizon, reason
+    return dates, reasons
 
 
 @dataclass(frozen=True)

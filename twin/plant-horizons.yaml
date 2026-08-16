@@ -1,0 +1,56 @@
+# Actionability horizons — the planter's own sealed ground truth (build ticket 73, decision
+# ticket 12 Q3b).
+#
+# WHY THIS IS A SEPARATE FILE FROM THE RECIPE.
+#
+# `twin/substrate.py`'s recipe format (`twin.substrate-recipe/v1`) is closed and versioned, and it
+# describes *what text to generate*. A horizon is not that. It is the planter's metadata about
+# when a plant stops being worth finding, and `twin/planter.py` is the only module that may read
+# it — `twin/detector.py` imports nothing from there, which is the property the invariant suite's
+# `planter_detector_scorer_are_structurally_separated_...` guard proves on the real source. Folding
+# horizons into the recipe would put ground truth in the same document the substrate is generated
+# from, which is the seal this split exists to keep.
+#
+# THESE DATES ARE AUTHORED, AND THEY ARE NOT FACTS ABOUT NETFLIX.
+#
+# The substrate is free-running synthetic 2011 operational chatter (see the recipe's own header).
+# Its plants are invented, so their horizons are invented too. What is real is the *rule* below and
+# the consequence: `twin/scorer.py` scores a detection after its horizon at LATE_SCORE — near zero,
+# not zero — so a system that finds everything eventually still reports a bad number.
+schema: twin.plant-horizons/v1
+rule: >-
+  A plant's actionability horizon is the last date on which acting on that signal could still
+  change the outcome the signal points at. After it, only a post-mortem remains. Every horizon
+  below is dated from the plant's own in-world escalation path, not from a spine checkpoint: the
+  spine is what the subject said in public, and a horizon is about what an insider could still do.
+authored: >-
+  Authored ground truth about a synthetic substrate, not evidence about the real subject. A
+  detection score computed against these dates measures the detection machinery only — never that
+  the twin anticipates the world (twin/planter.py's SHARED_PRIOR_LIMITATION, published with every
+  result).
+recipes:
+  netflix-2011-operational:
+    - signal: an unusual incident review opens after hours, examining access to the member billing export
+      horizon: '2011-09-30'
+      reason: >-
+        The review is open, so the export's credentials can still be revoked while it runs. It is
+        scoped to a quarter's billing data, and at the quarter end that data has been exported in
+        full — revoking access afterwards changes nothing that has already left.
+    - signal: a press query is withdrawn abruptly, days after an earlier complaint thread was escalated
+      horizon: '2011-10-24'
+      reason: >-
+        A withdrawn query means the story moved somewhere the subject cannot see, and it can still
+        be chased while it is unpublished. The subject's own quarterly disclosure is the last day
+        it sets the framing itself; after that it is responding to someone else's.
+    - signal: a senior engineer's calendar clears for three unexplained days, following an earlier resignation
+      horizon: '2011-11-15'
+      reason: >-
+        Three weeks from the cleared calendar to the end of the notice period the resignation
+        started. While the engineer is still employed the question can be asked directly; at exit
+        the access is revoked, the laptop is wiped, and nobody can establish what the days were.
+    - signal: an overnight export of the member table runs outside the scheduled batch, with no ticket raised
+      horizon: '2011-09-20'
+      reason: >-
+        The batch host keeps thirty days of transfer logs. Until they rotate, where the export went
+        is recoverable and the destination can be blocked. After they rotate the export is known to
+        have happened and unknowable in every other respect.
