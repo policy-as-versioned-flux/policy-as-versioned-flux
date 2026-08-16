@@ -1,0 +1,70 @@
+# The Netflix behavioural substrate recipe (build ticket 73; decision tickets 06, 12, 22).
+#
+# Ticket 73's whole point: "the substrate machinery gives the mechanism; it does not give the
+# content". Build tickets 48-52 built the mechanism. This file is the content, for one real
+# subject, and it is a **recipe** rather than a stored corpus because decision ticket 12 chose
+# regenerable over merely stored — the substrate is reproduced from these lines and this seed, so
+# what is versioned in git is small enough to read and argue with.
+#
+# WHERE THE CONTENT COMES FROM, AND WHERE IT DELIBERATELY DOES NOT.
+#
+# The spine (`fixtures.build_netflix_org`) is six SEC-filed letters to shareholders, and it is
+# immutable and real. Everything here is **free-running**: 2011 Los Gatos operational chatter that
+# the public record is silent about, because generating it from the spine would make the plants
+# trivially findable by diffing against the spine (decision ticket 12 Q3, and build ticket 50's
+# `diff_against_spine` is the guard that catches it). No line here restates, contradicts or hints
+# at a spine fact. The subscriber numbers, the pricing decision and the Qwikster reversal appear
+# nowhere below — they are the spine's business, anchored in at evaluation time.
+#
+# THE ORDER OF `templates` IS LOAD-BEARING. `substrate_generator.generate()` round-robins them
+# across the four channels by position (`templates[i % len(CHANNELS)]`), so index 0, 4, 8 ... land
+# in `events`, index 1, 5, 9 ... in `communications`, and so on. Reordering this list silently
+# re-channels every line.
+#
+# The negative lean is deliberate and measured, not decorative: decision ticket 12 Q3c and spec
+# story 60 treat the record's negativity bias as a property to reproduce, and
+# `substrate_eval.reporting_asymmetry` reads it back out with a target band. Incidents, delays and
+# complaints get written down; the weeks where nothing happened do not.
+schema: twin.substrate-recipe/v1
+id: netflix-2011-operational
+seed: 20111024
+model_version: deterministic-template-draw/v1
+templates:
+  # -- events ---------------------------------------------------------------------------------
+  - An incident review opens after the catalogue page fails to load for west-coast members.
+  # -- communications -------------------------------------------------------------------------
+  - A press query about the plan structure is logged for the communications desk.
+  # -- hr -------------------------------------------------------------------------------------
+  - A senior engineer's resignation is confirmed after months of friction over the on-call rota.
+  # -- telemetry ------------------------------------------------------------------------------
+  - Overnight batch reports a shortfall against the plan for disc despatch volume.
+  - The overnight sortation run at the disc hub is delayed by a jammed feeder.
+  - An investigation into a mis-sent billing email opens with the member-services team.
+  - The disc-hub shift roster is posted for the month.
+  - Cache hit rate on the west-coast edge holds steady overnight.
+  - A customer complaint about split billing escalates to the member-services lead.
+  - The weekly member-sentiment digest circulates with no commentary.
+  - Two seasonal packing contractors missed their induction slots.
+  - A brief outage on the recommendations service is recorded at 02:14.
+  - The quarterly all-hands is moved to the main room at Los Gatos.
+  - A blog draft on the two-plan structure slips past its review date.
+  - A team celebrates a record month for disc turnaround.
+  - Streaming concurrency growth is logged against the weekly baseline.
+  - A milestone is reached on the device-certification backlog, and the lead is praised.
+  - The launch note for a new device partner is scheduled.
+  - Headcount planning for the streaming group is delayed pending budget sign-off.
+  - The nightly reconciliation job is delayed by an upstream lock.
+  - The vendor contract for disc packaging is cancelled after repeated missed deadlines.
+  - A customer complaint thread is escalated from the member forums.
+  - An exit interview is scheduled with a member-services supervisor.
+  - Disc-return scan volumes are written to the warehouse feed.
+# One per channel, camouflaged the way build ticket 51's own PLANTED_SIGNALS are: each borrows
+# vocabulary from the lines it will sit among ("incident review", "opens", "complaint",
+# "resignation", "overnight", "batch") rather than describing the anomaly in a foreign register.
+# A plant that shares no vocabulary with its surroundings is findable by a lexical-outlier scan
+# and evidences nothing; `substrate_eval.plant_difficulty` reads that back with a target band.
+planted_signals:
+  - an unusual incident review opens after hours, examining access to the member billing export
+  - a press query is withdrawn abruptly, days after an earlier complaint thread was escalated
+  - a senior engineer's calendar clears for three unexplained days, following an earlier resignation
+  - an overnight export of the member table runs outside the scheduled batch, with no ticket raised

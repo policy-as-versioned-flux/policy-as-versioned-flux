@@ -4119,6 +4119,217 @@ def build_royal_mail_org(dest: str | Path) -> Path:
     return root
 
 
+# -- Netflix: the public spine (build ticket 73, decision tickets 06, 12, 22, spec story 91) ---
+#
+# The co-flagship that carries the whole engine, and the one that **cannot** carry falsifiability:
+# its story is famous, so a twin "anticipating" 2011 is indistinguishable from reciting it
+# (decision ticket 22). That is why this fixture has no answer key. It is a spine to generate a
+# behavioural substrate against, not a case to score.
+#
+# Distinct from the toy `netflix` overlay in `build()`, which carries one signal citing
+# `example.invalid` and exists to exercise the walking skeleton. This is the real subject: six
+# dated checkpoints at the quarterly cadence the subject itself reports on, every one an EX-99.1
+# letter to shareholders filed with the SEC on the date it is dated. Primary filings rather than
+# press coverage, for the reason build ticket 71 preferred a statutory prospectus: a filing is
+# dated by the filing, not by when somebody wrote about it.
+
+NETFLIX_ORG = "netflix"
+
+_SEC = "https://www.sec.gov/Archives/edgar/data/1065280"
+
+_NETFLIX_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/a-priced-separation-precedes-a-domestic-subscriber-reversal.yaml": """\
+id: a-priced-separation-precedes-a-domestic-subscriber-reversal
+text: >-
+  The subject separates two previously bundled services into separately priced plans, and then
+  reports a net decline in domestic subscribers within two reporting quarters of doing so.
+resolves_on: '2011-12-31'
+""",
+}
+
+_NETFLIX_BASE: dict[str, str] = {
+    "orgs/netflix/components/streaming-service.yaml": """\
+id: streaming-service
+name: The subject's streaming service
+kind: activity
+evolution: product
+visibility: 0.8
+""",
+    "orgs/netflix/components/dvd-by-mail.yaml": """\
+id: dvd-by-mail
+name: The subject's DVD-by-mail service
+kind: activity
+evolution: commodity
+visibility: 0.4
+""",
+    "orgs/netflix/world_models/market-consensus-2011.yaml": """\
+id: market-consensus-2011
+name: Market consensus, at the start of 2011
+credence: 0.6
+note: >-
+  The subject entered 2011 having just passed 20 million subscribers on its own reporting, with no
+  market expectation of a domestic reversal. A low prior is the honest starting point; the twin has
+  to earn a higher belief from the checkpoints, not begin holding one.
+beliefs:
+  a-priced-separation-precedes-a-domestic-subscriber-reversal: 0.15
+""",
+    "orgs/netflix/scenarios/would-the-twin-have-flagged-it.yaml": """\
+id: would-the-twin-have-flagged-it
+question: >-
+  Reading only the subject's own quarterly reporting, would the twin have had grounds to flag that
+  separating the bundled plans risked a domestic subscriber reversal within two quarters?
+proposition: a-priced-separation-precedes-a-domestic-subscriber-reversal
+at: '2011-01-26'
+horizon: '2011-12-31'
+components:
+  - streaming-service
+  - dvd-by-mail
+world_models:
+  - market-consensus-2011
+affected_parties:
+  - id: domestic-members-on-the-bundled-plan
+    who: >-
+      The subject's own domestic members who held the previously bundled plan — real and recorded
+      in the subject's own filing: the Q3 2011 letter (this org's own signal
+      q3-2011-letter-2011-10-24) states that the subject "greatly upset many domestic Netflix
+      members" through the pricing change, and reports about 800,000 of them leaving.
+    consequence: >-
+      The separation is modelled here from the shareholder's perspective, because the shareholder
+      letter is the record that exists. The members who absorbed the price rise hold no perspective
+      this twin runs under, and their leaving is visible only as a subscriber count.
+""",
+}
+
+# Each entry: signal id, date, component it binds to, STEEP class, accession path, statement.
+# Every statement is drawn from the filing named beside it and was read from that filing.
+_NETFLIX_SPINE: tuple[tuple[str, str, str, str, str, str], ...] = (
+    (
+        "q4-2010-letter-2011-01-26", "2011-01-26", "streaming-service", "economic",
+        "000119312511014840/dex991.htm",
+        "The subject's own Q4 2010 letter to shareholders reports passing 20 million subscribers in "
+        "the closing hours of 2010, at 20.01 million, and calls it another outstanding quarter.",
+    ),
+    (
+        "q1-2011-letter-2011-04-25", "2011-04-25", "streaming-service", "economic",
+        "000119312511107751/dex991.htm",
+        "The Q1 2011 letter reports 23.6 million subscribers globally and attributes the growth to "
+        "increased spending on content, personalisation technology and the brand.",
+    ),
+    (
+        "q2-2011-letter-2011-07-25", "2011-07-25", "dvd-by-mail", "economic",
+        "000119312511196126/dex991.htm",
+        "The Q2 2011 letter reports over 25 million global subscribers, up 70% from 15 million a "
+        "year earlier, and frames the recently introduced price changes as funding further "
+        "streaming content — the separation reported as a strength, one quarter before it is not.",
+    ),
+    (
+        "guidance-cut-2011-09-15", "2011-09-15", "dvd-by-mail", "economic",
+        "000119312511248698/d231910dex991.htm",
+        "Two months after separating streaming and DVD-by-mail into two distinct services, the "
+        "subject lowers its domestic subscriber estimates for Q3 2011 while leaving its financial "
+        "and international guidance unchanged — the first dated admission, in its own filing, that "
+        "the separation cost domestic subscribers.",
+    ),
+    (
+        "q3-2011-letter-2011-10-24", "2011-10-24", "dvd-by-mail", "economic",
+        "000119312511278716/d246709dex991.htm",
+        "The Q3 2011 letter reports domestic subscribers falling from 24.6 million at 30 June to "
+        "23.8 million at 30 September, and attributes the loss to DVD-related pricing changes and "
+        "to the proposed-and-now-cancelled rebranding of the DVD service.",
+    ),
+    (
+        "q4-2011-letter-2012-01-25", "2012-01-25", "streaming-service", "economic",
+        "000119312512023436/d290258dex991.htm",
+        "The Q4 2011 letter reports members streaming over 2 billion hours in the quarter across 47 "
+        "countries, with the subject describing itself as leading the development of Internet TV.",
+    ),
+)
+
+
+def _netflix_signal(signal_id: str, date: str, steep: str, accession: str, statement: str) -> dict[str, str]:
+    return {
+        f"orgs/netflix/signals/{signal_id}.yaml": f"""\
+id: {signal_id}
+date: '{date}'
+steep: {steep}
+source: Netflix, Inc. letter to shareholders, filed with the SEC as Form 8-K exhibit 99.1, {date}
+statement: >-
+  {statement}
+provenance:
+  observed_by: fixture-author, from the primary filing
+  url: {_SEC}/{accession}
+  legal_status: >-
+    An exhibit to a Form 8-K filed under the Securities Exchange Act of 1934. The filing date is
+    the date of record, so the checkpoint cannot be back-dated by later commentary about it.
+"""
+    }
+
+
+def _netflix_claim(signal_id: str, component: str) -> dict[str, str]:
+    return {
+        f"orgs/netflix/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: {component}
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "The signal is the subject's own filed quarterly disclosure; the citation is on the signal itself."
+"""
+    }
+
+
+def build_netflix_org(dest: str | Path) -> Path:
+    """The Netflix public spine (build ticket 73): six dated checkpoints, quarterly cadence.
+
+    Every checkpoint is an EX-99.1 letter to shareholders filed with the SEC, read from the filing
+    rather than from coverage of it. The cadence is the subject's own — January, April, July,
+    October, January — with the 2011-09-15 interim guidance cut sitting between two of them,
+    because that is where the subject itself broke cadence to disclose.
+
+    **No answer key, deliberately** (decision ticket 22). Netflix cannot carry the falsifiability
+    beat: the story is famous enough that anticipating it cannot be told apart from reciting it.
+    This is a spine to anchor a behavioural substrate to, and the substrate is where the
+    instrumented test cases live.
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _NETFLIX_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2010-12-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/netflix/meta.yaml": (
+            f"id: {NETFLIX_ORG}\nunit: overlay\norg: {NETFLIX_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _NETFLIX_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the first checkpoint",
+        dated="2011-01-01T00:00:00+00:00")
+
+    for signal_id, date, component, steep, accession, statement in _NETFLIX_SPINE:
+        # Signal and claim in one commit, on the checkpoint's own date: the binding exists in this
+        # repository's history as of the date the filing does, so a rewind reads a real state.
+        _write(root, {
+            **_netflix_signal(signal_id, date, steep, accession, statement),
+            **_netflix_claim(signal_id, component),
+        })
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", f"checkpoint: {signal_id}", dated=f"{date}T21:00:00+00:00")
+    return root
+
+
 # -- the one list of fixture repositories (build ticket 72) -----------------------------------
 #
 # Read by `build_standing_library` above and by `twin fixture --name` at the CLI, so a shell
@@ -4136,4 +4347,5 @@ BUILDERS: dict[str, Callable[[str | Path], Path]] = {
     "astrazeneca": build_astrazeneca_org,
     "sanofi": build_sanofi_org,
     "royal-mail": build_royal_mail_org,
+    "netflix": build_netflix_org,
 }
