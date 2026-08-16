@@ -61,7 +61,11 @@ jobs:
       - name: emit an artefact for another machine to reproduce
         run: |
           ./bin/twin fixture --out /tmp/model
-          ./bin/twin run --repo /tmp/model --org netflix --scenario dvd-decline-2011 --out /tmp/bundle.json
+          # `--regime` is required and has no default (build ticket 36, invariant
+          # `as_consumed_admits_no_post_T_fact`). This line predated that and was never updated, so
+          # the step exited 2 on every architecture the first time CI ran after the change.
+          ./bin/twin run --repo /tmp/model --org netflix --scenario dvd-decline-2011 \
+            --regime as-consumed --out /tmp/bundle.json
           ./bin/twin score --repo /tmp/model --org netflix --forecast /tmp/bundle.json \
             --outcome dvd-decline-2011-resolved --out /tmp/score-card.json
       - uses: actions/upload-artifact@v4
