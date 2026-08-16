@@ -39,6 +39,7 @@ import json
 import re
 import subprocess
 import sys
+from pathlib import Path
 from typing import Any
 
 # Every repository this estate enacts into carries the org prefix — it is the impersonation
@@ -70,32 +71,84 @@ _PUSH = re.compile(r"\bgit\b[^\n;&|]*?\bpush\b(?P<rest>[^\n;&|]*)")
 DENY = "deny"
 
 
+def _remote_url(remote: str, cwd: str | None) -> str:
+    try:
+        return subprocess.run(
+            ["git", "remote", "get-url", "--push", remote],
+            cwd=cwd or None, capture_output=True, text=True, timeout=5, check=False,
+        ).stdout
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def _normalise(url: str) -> str:
+    """`host/org/repo`, lowercased, so an ssh remote and an https one compare equal.
+
+    Compared as a whole repository rather than by the `policy-as-versioned-*` token, because the
+    token is an **org** name here and the org holds enactment repositories beside the twin's own:
+    `.../policy-as-versioned-flux/policy` and `.../policy-as-versioned-flux/policy-as-versioned-flux`
+    share it and are not the same repository at all.
+    """
+    trimmed = url.strip().rstrip("/")
+    if trimmed.endswith(".git"):
+        trimmed = trimmed[: -len(".git")]
+    trimmed = re.sub(r"^[a-z+]+://", "", trimmed, flags=re.I)
+    trimmed = re.sub(r"^[^/@]+@", "", trimmed)
+    return trimmed.replace(":", "/", 1).lower()
+
+
+def _own_repository(cwd: str | None) -> str:
+    """This checkout's own push URL — the twin's model, not the world.
+
+    Resolved from this file's location rather than from the caller's `cwd`, or a `cd` into an
+    enactment repository would make that repository "our own". Empty when there is no origin, and
+    an empty string matches no target, so the refusal stays closed when it cannot tell.
+    """
+    del cwd
+    return _normalise(_remote_url("origin", str(Path(__file__).resolve().parents[1])))
+
+
 def _push_target(command: str, cwd: str | None) -> str | None:
-    """What a `git push` in this command would actually write to, or `None` if it is not one.
+    """What a `git push` in this command would write to, or `None` if the twin may write there.
 
     The URL is usually not on the command line — `git push origin main` names a remote, and the
     remote is what has to be resolved. `ponytail:` resolved against `cwd`, so a `cd elsewhere &&
     git push` inside one command reads the wrong repository; the URL leg still catches the case
     where the target is named outright.
+
+    **The carve-out (2026-08-16, repository owner, standing instruction).** A push to *this*
+    repository is admitted. Decision ticket 18 Q1 reads "the twin changes its own model constantly
+    and the world never without a human", and this repository is the model: `twin/`, the decision
+    record and the fixtures. The enactment repositories are the other `policy-as-versioned-*` ones
+    (`-nist`, `-platform`, `-driftwood`, `-tuppence`, `-ludlow`, `-ico`, `-code`), and a push to any
+    of those is refused exactly as before. **This is still a weakening**, and naming it as anything
+    else would be the "removed refusal that never shows in a diff" the constitution warns about:
+    before this, the twin could not write to any remote, so a bad commit needed a human to travel.
+    Now it can publish its own model unattended, and only the world is gated. The owner asked for
+    that, four times, and the accountability moved to them by that instruction rather than by an
+    argument in code.
     """
     found = _PUSH.search(command)
     if not found:
         return None
-    named = ENACTMENT_REPOSITORY.search(found.group(0))
-    if named:
-        return named.group(0)
 
-    tokens = [t for t in found.group("rest").split() if not t.startswith("-")]
-    remote = tokens[0] if tokens else "origin"
-    try:
-        url = subprocess.run(
-            ["git", "remote", "get-url", "--push", remote],
-            cwd=cwd or None, capture_output=True, text=True, timeout=5, check=False,
-        ).stdout
-    except (OSError, subprocess.SubprocessError):
-        return None
+    # The first non-flag argument after `push` is the target: either a URL outright, or a remote
+    # name that has to be resolved. Taken as one argument rather than by scanning the whole
+    # command, because the comparison below is against a repository and " main" on the end of it
+    # is not one.
+    arguments = [t for t in found.group("rest").split() if not t.startswith("-")]
+    target = arguments[0] if arguments else "origin"
+    url = target if ("://" in target or "@" in target or "/" in target) else _remote_url(target, cwd)
+
     resolved = ENACTMENT_REPOSITORY.search(url)
-    return resolved.group(0) if resolved else None
+    if not resolved:
+        return None
+
+    # Equality, not a suffix test: `endswith` would admit `evil-github.com/…/policy-as-versioned-flux`.
+    own = _own_repository(cwd)
+    if own and _normalise(url) == own:
+        return None
+    return resolved.group(0)
 
 
 def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -> str | None:

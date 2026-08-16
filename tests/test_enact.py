@@ -87,6 +87,59 @@ def test_layer_2_resolves_a_bare_remote_rather_than_only_reading_the_command(tmp
     assert enact_guard.decide("Bash", {"command": "git push origin main"}, str(tmp_path)) is None
 
 
+# -- the carve-out: the twin's own model, and only that ----------------------------------------
+#
+# 2026-08-16, on the repository owner's standing instruction. Decision ticket 18 Q1 reads "the twin
+# changes its own model constantly and the world never without a human", and the push leg had been
+# refusing both: this repository is the model. It is a weakening even so — before it, the twin
+# could reach no remote at all — and these tests fix how far it goes, because the boundary between
+# "its own model" and "the world" is now load-bearing rather than rhetorical.
+
+OWN_REPOSITORY = "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux"
+SIBLING_IN_THE_SAME_ORG = "https://github.com/policy-as-versioned-flux/policy"
+
+
+@pytest.mark.parametrize("url", [OWN_REPOSITORY, OWN_REPOSITORY + ".git",
+                                "git@github.com:policy-as-versioned-flux/policy-as-versioned-flux.git"])
+def test_a_push_to_the_twins_own_repository_is_admitted(url: str) -> None:
+    """The model, not the world. Every remote spelling of it, since an ssh remote and an https one
+    are the same repository and a guard that admitted only one form would be a coin toss."""
+    assert enact_guard.decide("Bash", {"command": f"git push {url} main"}) is None
+
+
+def test_a_push_to_a_sibling_repository_in_the_same_org_is_still_refused() -> None:
+    """The sharp edge of the carve-out, and the reason it compares whole repositories rather than
+    the `policy-as-versioned-*` prefix: that prefix is the **org**, and the org holds the enactment
+    repositories beside the twin's own. Matching on it would have opened every one of them."""
+    refused = enact_guard.decide("Bash", {"command": f"git push {SIBLING_IN_THE_SAME_ORG} main"})
+    assert refused is not None, "the carve-out leaked from the twin's own repository to the org"
+    assert "enactment repository" in refused
+
+
+def test_the_carve_out_is_anchored_to_this_file_not_to_the_callers_directory(tmp_path: Path) -> None:
+    """A `cd` into an enactment repository must not make that repository "our own". The guard
+    resolves its own origin from `__file__`, so the caller's `cwd` cannot move the boundary."""
+    import subprocess
+
+    impostor = tmp_path / "impostor"
+    impostor.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=impostor, check=True)
+    subprocess.run(
+        ["git", "remote", "add", "origin", "https://github.com/policy-as-versioned-nist/nist"],
+        cwd=impostor, check=True,
+    )
+    assert enact_guard.decide("Bash", {"command": "git push origin main"}, str(impostor)) is not None
+
+
+def test_the_refusal_stays_closed_when_the_guard_cannot_resolve_its_own_origin(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An unresolvable origin must not read as "everything is our own". Fail closed: with no
+    known own repository, every enactment target is refused exactly as it was before."""
+    monkeypatch.setattr(enact_guard, "_own_repository", lambda cwd: "")
+    assert enact_guard.decide("Bash", {"command": f"git push {OWN_REPOSITORY} main"}) is not None
+
+
 def _feed(monkeypatch: pytest.MonkeyPatch, payload: str) -> None:
     monkeypatch.setattr("sys.stdin", io.StringIO(payload))
 
