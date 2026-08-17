@@ -1938,6 +1938,169 @@ def _netflix_runs_both_paths_and_the_curve_keeps_the_disagreement(ctx: Context) 
     )
 
 
+@harness_check("intel_forecast_is_pinned_signed_and_names_its_own_unscoreability")
+def _intel_forecast_is_pinned_signed_and_names_its_own_unscoreability(ctx: Context) -> str:
+    """The live, unresolved, pinned forecast (build ticket 75, decision tickets 06, 22).
+
+    **Emitted through the scheduled production line, not hand-made (AC 4).** `twin sweep` is
+    "the normal scheduled production line" `twin/schedule.py`'s own docstring names: no human
+    names a scenario, in contrast to `twin run --scenario X`. This guard drives `cli.main` for
+    `sweep`, never `run`, for the artefact it presents as the forecast — and then separately
+    drives `run` on the identical scenario purely to obtain a standalone `forecast-bundle` file to
+    feed `score`'s file-based interface, asserting the two are byte-identical
+    (`digest_of_file`, the same check `identical_pins_identical_bytes` makes elsewhere). A
+    hand-authored forecast could not reproduce this: the number the demo shows is exactly the
+    number the scheduler would have produced with nobody watching.
+
+    **Explicitly unscoreable, and the artefact says so (AC 2) — never a side channel.** Adversarial
+    review of build ticket 74 found prose that explained a caveat only in a script's own `echo`
+    lines, never reaching the artefact itself; this guard asserts the unscoreable statement and
+    the resolution window are read back out of the *emitted forecast bundle's own body*
+    (`scenario.question`), not merely present in the fixture source. It also asserts the absence
+    is structural, not narrated: the `intel` overlay carries zero outcomes, checked directly
+    against `Overlay.load`, and `twin score` against any outcome id refuses and names the same
+    absence build ticket 74 already demonstrated for Netflix — for a different, stated reason
+    (that story is over; this one has not happened yet).
+
+    **The resolution date is published in the artefact too (AC 3), held to the identical
+    standard.** Checked against `execution["body"]["scenario"]["horizon"]` — the emitted bundle —
+    never against `Overlay.proposition(...)["resolves_on"]`, which is the source a reader holding
+    only the artefact cannot see.
+
+    **Pinned and signed before any resolution (AC 1).** Both emitted artefacts are derived, carry
+    pins, and their attestation sidecars report `agent-signed`, never `unsigned` and never a human
+    signature — `derived_never_human_signed` already asserts the mechanism globally; this checks
+    it actually fires on this org's own artefacts rather than trusting it by inference.
+
+    **The depth grade travels with the artefact, computed rather than typed (AC 6).** Read back
+    from the sweep artefact's own `envelope.depth`, never asserted separately in this guard.
+    """
+    import json
+
+    from ..artefact import digest_of_file
+    from ..attest import SUFFIX as ATTEST_SUFFIX
+    from ..cli import main as cli_main
+    from ..model import Overlay
+    from ..repo import ModelRepo
+
+    org = "intel"
+    scenario_id = "does-the-14a-bet-land-a-named-customer"
+
+    intel_dir = ctx.tmp / "intel-repo"
+    if not intel_dir.exists():
+        fixtures.build_intel_org(intel_dir)
+    out = ctx.tmp / "intel-forecast-guard"
+    out.mkdir(exist_ok=True)
+
+    # No answer key exists, structurally, before anything else runs — the permanent half of AC 2.
+    overlay = Overlay.load(ModelRepo.open(intel_dir), org)
+    if overlay.outcomes:
+        raise Violated(
+            f"the intel overlay carries {len(overlay.outcomes)} outcome(s); this fixture's own "
+            "contract is that none is ever authored, because the proposition has not resolved"
+        )
+
+    old_key = os.environ.get("TWIN_SIGNING_KEY")
+    os.environ["TWIN_SIGNING_KEY"] = "invariant-suite-key"
+    try:
+        def run_cli(args: list[str], outfile: str) -> dict:
+            path = out / outfile
+            rc = cli_main([*args, "--out", str(path)])
+            if rc != 0:
+                raise Violated(f"`twin {' '.join(args)}` exited {rc}")
+            return json.loads(path.read_bytes())
+
+        def signed(outfile: str) -> None:
+            sidecar = json.loads((out / f"{outfile}{ATTEST_SUFFIX}").read_bytes())
+            # `signature_status` is `None` exactly when a signing key produced an agent signature
+            # (`attest.build`); a truthy value there names why it did *not* sign — see
+            # `twin/attest.py`'s own `None if material else UNSIGNED`.
+            status = sidecar.get("signature_status")
+            if status is not None or not sidecar.get("agent_signature"):
+                raise Violated(f"{outfile}: expected an agent-signed sidecar, got status={status!r}")
+            if sidecar.get("human_involvement", {}).get("present"):
+                raise Violated(f"{outfile}: carries human involvement on a derived artefact")
+
+        # -- the scheduled production line, and nothing hand-made behind it -----------------------
+        swept = run_cli(["sweep", "--repo", str(intel_dir)], "sweep.json")
+        signed("sweep.json")
+        executions = swept["body"]["executions"]
+        if len(executions) != 1 or swept["body"]["failures"]:
+            raise Violated(
+                f"expected exactly one clean execution sweeping the intel repository, got "
+                f"{len(executions)} execution(s) and {len(swept['body']['failures'])} failure(s)"
+            )
+        execution = executions[0]
+        if execution["scenario"] != scenario_id or execution["org"] != org:
+            raise Violated(f"sweep ran the wrong scenario: {execution['org']}/{execution['scenario']}")
+
+        standalone = run_cli(
+            ["run", "--repo", str(intel_dir), "--org", org, "--scenario", scenario_id,
+             "--regime", "as-consumed"],
+            "run.json",
+        )
+        signed("run.json")
+        standalone_digest = digest_of_file(out / "run.json")
+        if execution["forecast_bundle"]["sha256"] != standalone_digest:
+            raise Violated(
+                "the sweep-embedded forecast bundle is not byte-identical to a standalone `twin "
+                "run` on the same scenario — the scheduled forecast and an independently "
+                "reproduced one disagree, so it is not provably the same computation"
+            )
+
+        forecasts = standalone["body"]["forecasts"]
+        if len(forecasts) < 2 or len({f["probability"] for f in forecasts}) < 2:
+            raise Violated(
+                f"expected plural, distinct forecasts on an ensemble with genuine disagreement, "
+                f"got {[f['probability'] for f in forecasts]}"
+            )
+
+        # -- the resolution date is published IN THE ARTEFACT, not only in the fixture source ------
+        # (AC 3). Held to the identical standard as the unscoreability check just below: read back
+        # from the emitted body's own `scenario.horizon` — which `verbs.run` already copies from
+        # the scenario's `horizon` field for every fixture in this file, unmodified by this ticket
+        # — never from `Overlay.proposition(...)["resolves_on"]`, which is the *source*, not what a
+        # reader holding only the artefact would see.
+        if execution["body"]["scenario"]["horizon"] != "2027-06-30":
+            raise Violated(
+                f"the emitted forecast bundle's own scenario.horizon is "
+                f"{execution['body']['scenario']['horizon']!r}, not the declared resolution date"
+            )
+
+        # -- explicitly unscoreable, published in the artefact's own body, not a side channel -----
+        question = execution["body"]["scenario"]["question"].lower()
+        for needle in ("unscoreable", "second half of 2026", "first half of 2027", "twin score"):
+            if needle not in question:
+                raise Violated(
+                    f"the emitted forecast bundle's own scenario.question does not mention "
+                    f"{needle!r} — the resolution window and checking procedure must be published "
+                    "with the artefact, not only in the fixture source or a script's own prose"
+                )
+
+        # -- and the refusal is real, not narrated -------------------------------------------------
+        score_out = out / "score.json"
+        rc = cli_main([
+            "score", "--repo", str(intel_dir), "--org", org, "--forecast", str(out / "run.json"),
+            "--outcome", "any-outcome-at-all", "--out", str(score_out),
+        ])
+        if rc == 0:
+            raise Violated("`twin score` succeeded against an overlay that carries no outcome")
+        if score_out.exists():
+            raise Violated("`twin score` wrote an artefact despite refusing")
+    finally:
+        if old_key is None:
+            os.environ.pop("TWIN_SIGNING_KEY", None)
+        else:
+            os.environ["TWIN_SIGNING_KEY"] = old_key
+
+    return (
+        f"`twin sweep` and a standalone `twin run` agree byte-for-byte on {scenario_id!r} "
+        f"({len(forecasts)} distinct forecasts); both artefacts are pinned and agent-signed; the "
+        "emitted body names its own unscoreability, resolution window and checking procedure; "
+        "the intel overlay carries zero outcomes and `twin score` refuses against it"
+    )
+
+
 @harness_check("benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach")
 def _benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach(ctx: Context) -> str:
     """Benchmark question selection and ingestion quarantine (build ticket 57, decision ticket

@@ -4667,6 +4667,321 @@ def build_netflix_org(dest: str | Path) -> Path:
     return root
 
 
+# -- Intel: the live, unresolved spine (build ticket 75, decision tickets 06, 22, spec story 92) -
+#
+# The most honest artefact in the demo: a forward forecast where the fixture author does not know
+# the answer either. Nine real, dated, cited signals — the subject's own primary press releases
+# where one exists (intc.com/newsroom.intel.com), contemporaneous trade-press reporting of the
+# subject's own dated disclosures otherwise (graded 2, never 1, for exactly that reason) — read
+# from the source cited on each, not recalled. **No outcome is authored, and none ever will be by
+# this fixture.** Netflix carries no outcome because its story already happened and scoring it
+# would be recital (decision ticket 22); this org carries no outcome because its story has not
+# happened yet — `twin score` refuses identically against both, for two different honest reasons,
+# and this org's own scenario says which reason applies to it.
+#
+# Distinct from the toy `intel` overlay in `build()`, which cites `example.invalid` and exists to
+# exercise the walking skeleton (`euv-delay-slips-the-node` — decision ticket 08 AC 5's own note
+# that a real Intel spine is this ticket's work, not that one's). This is the real subject.
+
+INTEL_ORG = "intel"
+
+_INTEL_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/a-leading-edge-foundry-node-lands-a-named-external-customer.yaml": """\
+id: a-leading-edge-foundry-node-lands-a-named-external-customer
+text: >-
+  The subject discloses a named external customer's firm, committed decision to manufacture
+  production silicon on the subject's own newest leading-edge foundry process node — not a
+  prospective customer merely evaluating a test chip, and not a customer using an older,
+  already-proven process the subject already sells commercially.
+resolves_on: '2027-06-30'
+""",
+}
+
+_INTEL_BASE: dict[str, str] = {
+    "orgs/intel/components/leading-edge-foundry-node.yaml": """\
+id: leading-edge-foundry-node
+name: The subject's newest leading-edge foundry process node
+kind: capability
+evolution: genesis
+visibility: 0.6
+""",
+    "orgs/intel/components/external-foundry-customer-base.yaml": """\
+id: external-foundry-customer-base
+name: The subject's external (non-captive) foundry customer relationships
+kind: activity
+evolution: custom-built
+visibility: 0.5
+""",
+    "orgs/intel/world_models/market-caution-2026.yaml": """\
+id: market-caution-2026
+name: Caution — active engagement, zero leading-edge commitments to date
+credence: 0.55
+note: >-
+  Grounded in the subject's own record as of this scenario's own date: exactly one external
+  foundry customer has been named (this org's signal fortinet-foundry-deal-2026-07-22) and it
+  sits on an older, already-proven process, not the leading-edge node the proposition asks about.
+  The subject's own CEO has said the leading-edge foundry business would need to be reconsidered
+  without a confirmed external customer for it (this org's signal
+  tan-14a-customer-guidance-2026-01-23). Active engagement is not a commitment, and this world
+  model prices the gap between the two.
+beliefs:
+  a-leading-edge-foundry-node-lands-a-named-external-customer: 0.3
+""",
+    "orgs/intel/world_models/market-momentum-2026.yaml": """\
+id: market-momentum-2026
+name: Momentum — two capitalised bets and a named decision window
+credence: 0.45
+note: >-
+  Grounded in the same subject's own dated record, read the other way: a national government
+  converted its own funding into a 9.9% equity stake rather than a grant (this org's signal
+  us-government-equity-stake-2025-08-22), a rival chipmaker invested $5bn in the subject's common
+  stock in the same quarter (this org's signal nvidia-5bn-investment-2025-09-18), and the
+  subject's own CEO named a firm decision window rather than an open-ended one
+  (tan-14a-customer-guidance-2026-01-23). Three independent, capitalised bets inside twelve months
+  is evidence a cautious reading has to weigh, not dismiss.
+beliefs:
+  a-leading-edge-foundry-node-lands-a-named-external-customer: 0.55
+""",
+    "orgs/intel/scenarios/does-the-14a-bet-land-a-named-customer.yaml": """\
+id: does-the-14a-bet-land-a-named-customer
+question: >-
+  Reading only the subject's own quarterly reporting and its own stated guidance: will the
+  subject disclose a named external customer's firm, committed decision to manufacture on its
+  newest leading-edge foundry node, inside the window the subject's own CEO named on the record —
+  firm supplier decisions starting in the second half of 2026 and extending into the first half
+  of 2027 (this org's signal tan-14a-customer-guidance-2026-01-23)? This forecast is emitted
+  before that window closes and before the answer is known to anyone, including this twin.
+  **It is explicitly unscoreable today**: no outcome has been authored for this proposition in
+  this overlay, and none will be until the subject actually discloses one. The checking procedure
+  is the same one every other forecast in this system uses, named rather than assumed: read the
+  subject's own quarterly earnings releases and calls from the second half of 2026 through the
+  first half of 2027 (this org's own signals are drawn from newsroom.intel.com and SEC EDGAR, CIK
+  0000050863 — the venue every signal below already cites), author an outcome naming this
+  proposition once the subject discloses a result, and run `twin score` against it. Until that
+  outcome exists, `twin score` refuses on this proposition and names the absence — on this
+  fixture exactly as it already does on the Netflix fixture, for a different reason: that story
+  is over and this one is not.
+proposition: a-leading-edge-foundry-node-lands-a-named-external-customer
+at: '2026-08-17'
+horizon: '2027-06-30'
+components:
+  - leading-edge-foundry-node
+  - external-foundry-customer-base
+world_models:
+  - market-caution-2026
+  - market-momentum-2026
+affected_parties:
+  - id: the-us-government-as-shareholder
+    who: >-
+      Real and recorded in this org's own signal us-government-equity-stake-2025-08-22: the US
+      government holds 433.3 million shares (9.9%) of the subject, converted from CHIPS Act and
+      Secure Enclave funding rather than paid for, plus a warrant that vests only if the
+      subject's foundry business falls under 51% ownership.
+    consequence: >-
+      This scenario is modelled from no perspective at all — build ticket 75 authors a forecast
+      only, no perspective or response — so the government's own exposure to the outcome this
+      scenario forecasts is visible here and nowhere else in this overlay.
+""",
+}
+
+_SEC_INTEL = "https://www.sec.gov/Archives/edgar/data/50863"
+
+# (signal id, date, component it binds to, STEEP class, evidence grade, source, url, statement).
+# Grade 1 where the source is the subject's own primary release; grade 2 where it is
+# contemporaneous trade-press reporting of the subject's own dated disclosure rather than the
+# primary document itself — the ladder's own distinction, not a rounding choice.
+_INTEL_SPINE: tuple[tuple[str, str, str, str, int, str, str, str], ...] = (
+    (
+        "q2-2024-results-2024-08-01", "2024-08-01", "leading-edge-foundry-node", "economic", 1,
+        "Intel Corporation, Q2 2024 financial results press release",
+        "https://www.intc.com/news-events/press-releases/detail/1704/"
+        "intel-reports-second-quarter-2024-financial-results",
+        "The subject's own Q2 2024 results report a $1.6 billion net loss and announce a $10 "
+        "billion cost-reduction plan, including cutting more than 15% of headcount (over 15,000 "
+        "roles) and suspending the dividend from Q4 2024 — the crisis that precedes every "
+        "leading-edge-foundry decision that follows it.",
+    ),
+    (
+        "gelsinger-retires-2024-12-02", "2024-12-02", "external-foundry-customer-base", "social", 1,
+        "Intel Corporation, retirement of CEO Pat Gelsinger, press release",
+        "https://www.intc.com/news-events/press-releases/detail/1719/"
+        "intel-announces-retirement-of-ceo-pat-gelsinger",
+        "The subject's own board announces the retirement of CEO Pat Gelsinger, effective "
+        "1 December 2024, naming interim co-CEOs while a search proceeds — the leadership vacancy "
+        "the foundry strategy is reset inside.",
+    ),
+    (
+        "falcon-shores-cancelled-2025-01-31", "2025-01-31", "leading-edge-foundry-node",
+        "technological", 2,
+        "The Register, reporting the subject's own Q4 2024 earnings call",
+        "https://www.theregister.com/2025/01/31/intel_q4_2024/",
+        "On the subject's own Q4 2024 earnings call, interim co-CEO Michelle Johnston Holthaus "
+        "confirms the Falcon Shores AI accelerator will not launch commercially and will be used "
+        "as an internal test chip only — the AI-accelerator miss the leading-edge foundry bet now "
+        "has to be funded without.",
+    ),
+    (
+        "tan-appointed-ceo-2025-03-12", "2025-03-12", "external-foundry-customer-base", "social", 1,
+        "Intel Corporation, appointment of Lip-Bu Tan as CEO, press release",
+        "https://www.intc.com/news-events/press-releases/detail/1730/"
+        "intel-appoints-lip-bu-tan-as-chief-executive-officer",
+        "The subject's own board appoints Lip-Bu Tan as CEO, effective 18 March 2025 — the tenure "
+        "under which every later signal in this org's own spine is dated.",
+    ),
+    (
+        "us-government-equity-stake-2025-08-22", "2025-08-22", "leading-edge-foundry-node",
+        "political", 2,
+        "CNBC, reporting the subject's own disclosed transaction with the US Department of Commerce",
+        "https://www.cnbc.com/2025/08/22/intel-goverment-equity-stake.html",
+        "The US government agrees to convert $5.7 billion in remaining CHIPS Act grants and $3.2 "
+        "billion in Secure Enclave funding into an equity stake — 433.3 million shares, 9.9% of "
+        "the subject, at $20.47 a share — rather than paying them out as grants; the transaction "
+        "closes 27 August 2025.",
+    ),
+    (
+        "nvidia-5bn-investment-2025-09-18", "2025-09-18", "leading-edge-foundry-node", "economic", 2,
+        "CNBC, reporting the subject's own announced transaction with Nvidia",
+        "https://www.cnbc.com/2025/09/18/intel-nvidia-investment.html",
+        "Nvidia announces a $5 billion investment in the subject's common stock at $23.28 a share, "
+        "alongside a partnership to co-develop x86 data-centre and PC products; the subject's "
+        "shares close up roughly 22-23% on the day, its best single day in almost 38 years.",
+    ),
+    (
+        "tan-14a-customer-guidance-2026-01-23", "2026-01-23", "leading-edge-foundry-node",
+        "economic", 2,
+        "Tom's Hardware, reporting the subject's own earnings call",
+        "https://www.tomshardware.com/tech-industry/semiconductors/"
+        "intel-says-it-has-two-prospective-customers-for-14a-expects-to-hear-about-commitments-"
+        "in-second-half-of-2026",
+        "On the subject's own earnings call, CEO Lip-Bu Tan states that engagements with "
+        "potential external customers on the leading-edge node are active, that two prospective "
+        "customers are evaluating it, and that \"customers will begin to make firm supplier "
+        "decisions starting in the second half of this year, and extending into the first half "
+        "of 2027\" — the decision window this org's own scenario asks about, on the subject's own "
+        "record rather than authored for the demo.",
+    ),
+    (
+        "fortinet-foundry-deal-2026-07-22", "2026-07-22", "external-foundry-customer-base",
+        "economic", 2,
+        "The Motley Fool, reporting the subject's own disclosed foundry customer",
+        "https://www.fool.com/investing/2026/07/22/intels-foundry-just-landed-its-first-named-outside/",
+        "The subject lands its first named external foundry customer, Fortinet, for its SP6 "
+        "security chip — on the older, already-proven Intel 4 process, not the leading-edge node "
+        "this org's own proposition asks about. The subject's shares jump over 8%, closing at "
+        "$105.40.",
+    ),
+    (
+        "q2-2026-results-2026-07-23", "2026-07-23", "external-foundry-customer-base", "economic", 1,
+        "Intel Corporation, Q2 2026 financial results, filed with the SEC",
+        f"{_SEC_INTEL}/000005086326000155/q226earningsrelease.htm",
+        "The subject's own Q2 2026 results report revenue of $16.1 billion, up 25% year on year "
+        "and its fastest quarterly growth in over fifteen years, with data-centre revenue up 59% "
+        "to $6.3 billion — and still zero named external customers for the leading-edge node.",
+    ),
+)
+
+
+def _intel_signal(
+    signal_id: str, date: str, steep: str, grade: int, source: str, url: str, statement: str,
+) -> dict[str, str]:
+    legal_status = (
+        "The subject's own primary release; the release date is the date of record."
+        if grade == 1
+        else "Contemporaneous trade-press reporting of the subject's own dated disclosure, not "
+        "the primary filing itself — graded 2 on the evidence ladder for exactly that reason."
+    )
+    return {
+        f"orgs/intel/signals/{signal_id}.yaml": f"""\
+id: {signal_id}
+date: '{date}'
+steep: {steep}
+source: {source}, {date}
+statement: >-
+  {statement}
+provenance:
+  observed_by: fixture-author, from the source cited
+  url: {url}
+  legal_status: >-
+    {legal_status}
+"""
+    }
+
+
+def _intel_claim(signal_id: str, component: str, grade: int) -> dict[str, str]:
+    evidence = (
+        "The signal is the subject's own primary release; the citation is on the signal itself."
+        if grade == 1
+        else "The signal is contemporaneous trade-press reporting of the subject's own dated "
+        "disclosure; the citation is on the signal itself, and the grade reflects the one step "
+        "of removal from the primary document."
+    )
+    return {
+        f"orgs/intel/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: {component}
+evidence_grade: {grade}
+claimed_by: fixture-author (human)
+evidence: "{evidence}"
+"""
+    }
+
+
+def build_intel_org(dest: str | Path) -> Path:
+    """The Intel live spine (build ticket 75): nine dated checkpoints, no answer key, ever.
+
+    Every checkpoint is real, dated and cited — the subject's own primary release where one
+    exists, contemporaneous trade-press reporting of the subject's own dated disclosure otherwise,
+    graded 2 rather than 1 for exactly that reason. **No outcome is authored.** Unlike every other
+    fixture in this file, that is not a gap this fixture will later close: the proposition resolves
+    in the future, so authoring one now would be inventing the answer this ticket exists to
+    demonstrate the twin does not have.
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _INTEL_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2024-07-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/intel/meta.yaml": (
+            f"id: {INTEL_ORG}\nunit: overlay\norg: {INTEL_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _INTEL_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the first checkpoint",
+        dated="2024-07-15T00:00:00+00:00")
+
+    # Signal and claim in one commit, on the checkpoint's own date: the binding exists in this
+    # repository's history as of the date the source does, so a rewind reads a real state.
+    for signal_id, date, component, steep, grade, source, url, statement in _INTEL_SPINE:
+        _write(
+            root,
+            {
+                **_intel_signal(signal_id, date, steep, grade, source, url, statement),
+                **_intel_claim(signal_id, component, grade),
+            },
+        )
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", f"checkpoint: {signal_id}", dated=f"{date}T21:00:00+00:00")
+
+    # No outcome commit. See the module docstring above this function: this is the one fixture in
+    # this file where that absence is permanent by design, not a gap another build ticket closes.
+    return root
+
+
 # -- the one list of fixture repositories (build ticket 72) -----------------------------------
 #
 # Read by `build_standing_library` above and by `twin fixture --name` at the CLI, so a shell
@@ -4685,4 +5000,5 @@ BUILDERS: dict[str, Callable[[str | Path], Path]] = {
     "sanofi": build_sanofi_org,
     "royal-mail": build_royal_mail_org,
     "netflix": build_netflix_org,
+    "intel": build_intel_org,
 }

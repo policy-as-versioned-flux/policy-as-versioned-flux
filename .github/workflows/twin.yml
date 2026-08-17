@@ -36,6 +36,8 @@ jobs:
         run: bash twin/beat-royal-mail.sh
       - name: the whole-engine beat, end to end
         run: bash twin/beat-netflix.sh
+      - name: the live, unresolved, pinned forecast, end to end
+        run: bash twin/beat-intel.sh
 
   # `identical_pins_identical_bytes` on more than one architecture. Seeded floating-point
   # identity across platform maths libraries is the landmine, and it is cheap now and

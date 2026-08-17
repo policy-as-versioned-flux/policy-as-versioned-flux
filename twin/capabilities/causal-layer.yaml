@@ -36,6 +36,10 @@ criteria:
     # a grade-1 causal edge on the real subject — the evidence ladder's own grade-1 example, a
     # dated price change with subscriber numbers on both sides of it, from the Q2 and Q3 2011
     # letters — carried through propagation into a price and into a trade-off curve, with three
-    # rival accounts disagreeing about its magnitude. `euv-delay-slips-the-node` is still only in
-    # the walking-skeleton fixture, whose intel org cites `example.invalid`; the real Intel spine
-    # is build ticket 75. "Each co-flagship" means each of them.
+    # rival accounts disagreeing about its magnitude. **The real Intel spine now exists (build
+    # ticket 75, `fixtures.build_intel_org`) and still carries no causal edge**: the ticket's own
+    # checklist asked for a pinned, signed, unscoreable forward forecast, not a causal claim, so
+    # none was authored — widening scope beyond what was asked is not this ticket's to do.
+    # `euv-delay-slips-the-node` is still only in the walking-skeleton fixture, whose intel org
+    # cites `example.invalid`. "Each co-flagship" means each of them, and this stays unchecked
+    # until a real, cited causal edge lands on the real spine.

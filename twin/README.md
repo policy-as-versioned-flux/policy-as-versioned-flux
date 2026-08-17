@@ -7,7 +7,7 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 70 of 78 build tickets closed, and one measuring against a clock that runs
+**This is 73 of 78 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06 and will not reach its own pre-registered coverage floor. See "The confirmatory audit
 was not confirmatory", below.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
 rather than carried forward by hand — the previous banner, 66, was two behind by the time it was
@@ -1768,6 +1768,50 @@ now has its lead-time clause declared per plant and its burial clause measured, 
 unmodelled and there is no declared *distribution* of difficulty across plants — one plant per
 channel at a fixed midpoint, each as hard to find as its wording happens to make it. Two of four
 clauses is not a criterion.
+
+## Intel: the forecast nobody, including the twin, can check yet
+
+Royal Mail proves the twin can be checked. Netflix shows the engine. **Intel shows the twin will
+be checked next** (decision ticket 22's own slice summary) — build ticket 75, `twin/beat-intel.sh`,
+four ordinary CLI verbs, no beat-specific code path.
+
+**The spine is nine real, dated, cited signals**, `fixtures.build_intel_org()`: the 2024-08-01
+crisis results, the 2024-12-02 and 2025-03-12 leadership transition, the 2025-01-31 AI-accelerator
+cancellation, the 2025-08-22 US government equity stake, the 2025-09-18 Nvidia investment, the
+2026-01-23 earnings call on which Intel's own CEO names the decision window this ticket's
+proposition asks about, and the 2026-07-22/23 checkpoints that close the spine with the first
+named foundry customer — on an older process, not the leading-edge one — and Q2 2026 results.
+Three are Intel's own primary releases (grade 1); six are contemporaneous trade-press reporting of
+Intel's own dated disclosures (grade 2, honestly one step removed from the primary document).
+
+**No outcome is authored, and none ever will be by this fixture.** Unlike Netflix — no outcome
+because the story is over and scoring it would be recital — Intel carries no outcome because the
+proposition genuinely has not resolved: does a named external customer commit to Intel's
+leading-edge foundry node inside the window Intel's own CEO named on the record, second half of
+2026 into first half of 2027. `twin score` refuses identically to Netflix's own refusal, for the
+opposite reason, and the scenario's own `question` says which reason applies here.
+
+**Emitted through `twin sweep`, never `twin run --scenario` — the scheduled production line, not
+hand-made.** The sweep's embedded forecast bundle is asserted byte-identical to an independently
+run standalone `twin run` on the same scenario, so the number the demo shows is provably the one
+the scheduler would have produced with nobody watching. Two rival world models genuinely disagree
+(0.3 caution, 0.55 momentum), so the forecast is plural, not a single figure dressed as one.
+
+**The unscoreable statement, the resolution date and the checking procedure travel in the emitted
+artefact's own body**, not only in the fixture source or a script's prose — build ticket 74's own
+review found exactly that gap once, in a different beat, and this ticket is tested against it
+directly. Read back out of `body.scenario.question`, which flows into every forecast bundle
+through `verbs.run`'s existing, unmodified field — deliberately not a new field on the shared
+per-forecast dict, which would move every golden digest in the repository for one ticket's own
+narrow claim.
+
+One new harness guard, `intel_forecast_is_pinned_signed_and_names_its_own_unscoreability`, drives
+`cli.main` throughout and is not a constitutional invariant — no manifest entry, no hash to move.
+**Moves no capability grade to `full`.** `scenario-engine` gains a real fear scenario on Intel
+(4/7, unchanged count — criterion 7 stays unchecked: no opportunity scenario exists on the real
+spine) and `causal-layer` stays at its prior count too (criterion 5 stays unchecked: this ticket
+authored a forecast, not a causal edge). Both capability files name exactly what is still missing
+rather than describing a real Intel spine as future work now that one exists.
 
 ## The decaying unbound-signal pool
 

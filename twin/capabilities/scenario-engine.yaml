@@ -47,6 +47,12 @@ criteria:
     # three rival world models), and the opportunity is a `land-grab` on `streaming-service`
     # pulled by `twin gameplay-sweep` from the very commit that rewind resolved — pulled rather
     # than pushed, which is what makes it the opportunity half rather than a second threat.
-    # **Intel has neither on a real spine**: the `euv-slip-2026` scenario lives in the walking-
-    # skeleton fixture, which cites `example.invalid`, and the real Intel spine is build ticket
-    # 75's own work. This ticks when that lands.
+    # **Intel now has half, on a real spine, after build ticket 75**: `fixtures.build_intel_org`
+    # replaces the walking-skeleton's `example.invalid`-cited toy with nine real, dated, cited
+    # signals, and `does-the-14a-bet-land-a-named-customer` is a genuine fear scenario on it — a
+    # live, unresolved, forward forecast, emitted through `twin sweep`. Build ticket 75's own
+    # checklist asked for exactly that and nothing wider. What is still missing, named rather than
+    # assumed: no opportunity/gameplay scenario exists on the real Intel spine — `twin
+    # gameplay-sweep` has nothing to pull there, only `euv-slip-2026` in the toy fixture does, and
+    # that one still cites `example.invalid`. This ticks when a real opportunity scenario lands on
+    # the real spine, not before.
