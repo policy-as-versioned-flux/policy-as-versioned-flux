@@ -4291,6 +4291,101 @@ def _ethics_gate_ladder_stops_early_and_fast_improvement_is_never_an_automatic_f
     )
 
 
+@harness_check("does_not_do_register_is_generated_never_typed")
+def _does_not_do_register_is_generated_never_typed(ctx: Context) -> str:
+    """The does-not-do register turns decision ticket 15's published-scope-exclusions device on
+    the demo itself (build ticket 77, decision tickets 15 and 22): what a viewer is shown must
+    never silently drift from what the depth-grade checklists actually say.
+
+    One leg, checked by mutation rather than by reading the module's source for the absence of a
+    file constant: checking one criterion off in a capability's own checklist has to remove
+    exactly its entry from the register. A cached or hand-maintained list that happened to agree
+    with the checklists today would pass every other check in this suite and still fail this one
+    the moment a checklist changed under it.
+    """
+    import dataclasses
+
+    from ..canon import digest_of
+    from ..does_not_do import register
+    from ..grades import Capabilities
+
+    caps = ctx.caps
+    before = register(caps)
+    graded = next((g for g in caps if g.unchecked), None)
+    if graded is None:
+        raise Skip("every loaded capability is already `full`; there is nothing left to check off")
+    target = graded.unchecked[0]
+    ticked = dataclasses.replace(target, checked=True, evidence="guard-plant", ticked_by="guard")
+    patched_criteria = tuple(ticked if c.index == target.index else c for c in graded.criteria)
+    patched_grade = dataclasses.replace(graded, criteria=patched_criteria)
+    patched = {
+        g.capability: (patched_grade if g.capability == graded.capability else g) for g in caps
+    }
+    # Recomputed, not `caps.digest` carried over: that digest is `digest_of` the *unpatched*
+    # summaries (`grades.py`'s own `Capabilities.load`), and reusing it here would hand back a
+    # `Capabilities` instance whose own digest lies about the criteria it actually holds.
+    patched_digest = digest_of({name: g.summary() for name, g in sorted(patched.items())})
+    after = register(Capabilities(patched, patched_digest))
+
+    if len(before) - len(after) != 1:
+        raise Violated(
+            f"checking off {graded.capability} AC {target.index} changed the register by "
+            f"{len(before) - len(after)} entries, not 1 — it is not tracking the checklist live"
+        )
+    survivor = f"{graded.capability}-{target.index}"
+    if any(e["id"] == survivor for e in after):
+        raise Violated(f"{survivor} survived in the register after its criterion was checked off")
+    return f"{len(before)} unchecked criteria registered; checking one off removed exactly it"
+
+
+@harness_check("the_demo_sequence_earns_credibility_before_it_spends_it")
+def _the_demo_sequence_earns_credibility_before_it_spends_it(ctx: Context) -> str:
+    """Decision ticket 22's resolved thesis order — falsifiability (b), then versioned governance
+    (c), concluding in the one-currency comparison (a) — made structural rather than narrated
+    (build ticket 77): "the order IS the argument." CI step ordering drifted from this once
+    already (royal-mail, netflix, intel priced the second beat, not the third), so this is checked
+    against the beats' own source rather than trusted to stay narrated correctly.
+
+    Three legs, all read off literal text — the same trade-off build ticket 78's own
+    orchestrator-consistency checks made, because no bash parser exists here to do better.
+    `beat-sequence.sh` names the three beats in the declared order; neither `beat-royal-mail.sh`
+    nor `beat-intel.sh` calls a pricing verb, so £ cannot leak into either falsifiability beat; and
+    inside `beat-netflix.sh`, `twin propose` (versioned governance, (c)) is called before both
+    `twin price` and `twin trade-off` (the one-currency comparison, (a), which labels both steps),
+    so the comparison concludes the beat rather than opening it.
+
+    `tests/test_beat_sequence.py` exercises this exact function through `invariants.run(only=[...])`
+    rather than re-implementing the same regex checks a second time — one definition, run from
+    both `twin verify` and `pytest -q`.
+    """
+    sequence = (PACKAGE_DIR / "beat-sequence.sh").read_text(encoding="utf-8")
+    names = re.findall(r"beat-(royal-mail|intel|netflix)\.sh", sequence)
+    first_seen = list(dict.fromkeys(names))
+    if first_seen != ["royal-mail", "intel", "netflix"]:
+        raise Violated(
+            f"beat-sequence.sh names the beats in order {first_seen}, not the declared "
+            "royal-mail, intel, netflix — falsifiability before governance before the comparison"
+        )
+    for name in ("beat-royal-mail.sh", "beat-intel.sh"):
+        text = (PACKAGE_DIR / name).read_text(encoding="utf-8")
+        if re.search(r'"\$TWIN"\s+(price|trade-off)\b', text):
+            raise Violated(f"{name} calls a pricing verb — £ must not appear before the third beat")
+    netflix = (PACKAGE_DIR / "beat-netflix.sh").read_text(encoding="utf-8")
+    propose_at = netflix.find('"$TWIN" propose')
+    price_at = netflix.find('"$TWIN" price')
+    trade_off_at = netflix.find('"$TWIN" trade-off')
+    if -1 in (propose_at, price_at, trade_off_at):
+        raise Violated("beat-netflix.sh no longer calls all three of propose, price and trade-off")
+    if propose_at > price_at or propose_at > trade_off_at:
+        raise Violated(
+            "beat-netflix.sh prices or trades off before it proposes — (a) is not sequenced after (c)"
+        )
+    return (
+        "royal-mail, intel, netflix in that order; £ absent from the first two beats; propose "
+        "precedes both price and trade-off in the third"
+    )
+
+
 def _git(root: Path, *args: str) -> str | None:
     proc = subprocess.run(
         ["git", *args], cwd=str(root), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL

@@ -7,13 +7,13 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 73 of 78 build tickets closed, and one measuring against a clock that runs
+**This is 75 of 78 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06 and will not reach its own pre-registered coverage floor. See "The confirmatory audit
 was not confirmatory", below.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
-rather than carried forward by hand — the previous banner, 66, was two behind by the time it was
-read, because build ticket 67 closed without bumping it. That is the same drift this file's own
-"What is honestly built" section repeatedly finds and corrects, and the reason the count is a grep
-rather than a number somebody remembers to increment.)
+rather than carried forward by hand — the previous banner, 73, was already one behind the live
+count when build ticket 77's own recount found it. That is the same drift this file's own "What is
+honestly built" section repeatedly finds and corrects, and the reason the count is a grep rather
+than a number somebody remembers to increment.)
 **Build ticket 66 built its refusal and did not close**, because criterion 1 is conjunctive and only
 its second half exists: no merge capability, at two layers, and no pull request opened. It was
 briefly marked done and then unmarked — see "Propose only, in two layers", below, for what is built
@@ -26,8 +26,10 @@ more usefully, is named inside every artefact the tool emits.
 
 ```sh
 bash twin/demo.sh                          # the whole loop, from a clean checkout
+bash twin/beat-sequence.sh                 # the demo, in its declared order: b -> b -> c -> a
 bash twin/beat-royal-mail.sh               # the falsifiability beat: rewind, project, score, red
-bash twin/beat-netflix.sh                  # the whole-engine beat: fear, seize, price, curve
+bash twin/beat-intel.sh                    # the live beat: pinned, signed, unscoreable, says so
+bash twin/beat-netflix.sh                  # the whole-engine beat: fear, seize, propose, price, curve
 ./bin/twin verify                          # the invariant suite
 ./bin/twin verify <artefact> --repo R      # recompute that artefact from its own pins
 ./bin/twin verify <artefact> --attestation # check its sidecar: digest, signatures, the anomaly
@@ -2233,16 +2235,16 @@ is not a discipline problem.
 
 ## The invariants
 
-`./bin/twin verify` — 63 pass, 1 fails (`drift_window_is_actually_being_sampled`, a live-cluster
+`./bin/twin verify` — 68 pass, 2 fail (`drift_window_is_actually_being_sampled`, a live-cluster
 probe-staleness check that fails whenever build ticket 64's probe has not sampled recently, so it
-is expected to go red between samples and is not a coherence defect), 2 skipped and not faked (the
-CI-only cross-architecture leg), 0 pending. `pytest -q` — 1367 tests across seams 1 and 2, of which
-`test_the_suite_is_green` goes red with the same probe staleness above. **From 2026-08-16 a second
-check, `flux_coverage_floor_is_still_reachable`, goes red and stays red until the window closes.
-That is build ticket 70's finding 1, above, not a new defect.** (Build
+is expected to go red between samples and is not a coherence defect; and
+`flux_coverage_floor_is_still_reachable`, red since 2026-08-16 and staying red until the window
+closes — build ticket 70's finding 1, above, not a new defect), 2 skipped and not faked (the
+CI-only cross-architecture leg), 0 pending. `pytest -q` — 1444 tests across seams 1 and 2, 1443 of
+which pass; `test_the_suite_is_green` goes red with the same two failures above. (Build
 ticket 56's coherence audit re-derived these counts from a live run rather than carrying the
 previous round's numbers forward — see "What is honestly built", below, for the same discipline
-applied to the capability table. Build tickets 78, 65 and 66 re-derived them again the same way.)
+applied to the capability table. Build tickets 78, 65, 66 and 77 re-derived them again the same way.)
 
 Three checks read the actual wall clock rather than the model repository, and all three do it
 because the property they guard is about *now*: `drift_window_is_actually_being_sampled` (is the
@@ -2325,7 +2327,7 @@ claim binds it to a component the scenario forecasts. The positive leg is assert
 negative one: the same fixture still forecasts under `as-consumed`, because a gate that refused
 everything would pass every refusal in the check while making the regime useless.
 
-Twelve checks were added to the **harness** instead, because each guards a yardstick or a semantic
+Sixteen checks were added to the **harness** instead, because each guards a yardstick or a semantic
 property rather than a named absence the constitution enumerates: `worksheet_matches_the_pocket_org`
 (the hand-computed numbers still hold), `graded_edge_fixture_holds_its_contract` (the generated
 causal-edge fixture still carries what the £ and skills tracks depend on),
@@ -2366,7 +2368,16 @@ self-corroboration — three of the subject's own claims across two of its own c
 independent channel and never price; the reconciler is asserted interchangeable with every other
 machine channel, because build ticket 65's verdict is not readable yet; and "no
 enactment-specific pipeline" is asserted structurally rather than by a name screen — one verb, one
-artefact kind, and the enactment living in the overlay's ordinary signals and claims).
+artefact kind, and the enactment living in the overlay's ordinary signals and claims) and
+`does_not_do_register_is_generated_never_typed` (build ticket 77: decision ticket 15's
+published-scope-exclusions device turned on the demo itself, checked by mutation — checking one
+criterion off in a capability's own checklist removes exactly its entry from the does-not-do
+register, proving a live read rather than a cache that happened to agree with the checklists once)
+and `the_demo_sequence_earns_credibility_before_it_spends_it` (build ticket 77: decision ticket
+22's resolved thesis order — falsifiability, then versioned governance, concluding in the
+one-currency comparison — read off the beat scripts' own source, because CI's step order had
+already drifted from it once: royal-mail, intel and netflix run in that declared order, neither
+falsifiability beat calls a pricing verb, and inside netflix `propose` precedes `price`).
 
 A live invariant that skips counts as a failure, and so does a harness guard that skips without
 declaring itself skippable. Pending is the only honest way to not assert something, and it is declared

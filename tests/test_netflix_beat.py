@@ -85,6 +85,17 @@ def beat(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
         "options", "--repo", str(repo), "--org", ORG, "--perspective", PERSPECTIVE,
         "--out", str(paths["options"]),
     ]) == 0
+    # Order matches `twin/beat-netflix.sh` since build ticket 77: substrate (a method footnote),
+    # then propose (versioned governance, (c)), then price/trade-off (the one-currency comparison,
+    # (a)) — the beat's concluding claim, per decision ticket 22's resolved thesis order.
+    assert main([
+        "substrate", "--repo", str(repo), "--org", ORG, "--recipe", str(RECIPE_PATH),
+        "--checkpoint", CHECKPOINT, "--out", str(paths["substrate"]),
+    ]) == 0
+    assert main([
+        "propose", "--repo", str(repo), "--org", ORG, "--response", LEVER,
+        "--channel", "record", "--out", str(paths["proposal"]),
+    ]) == 0
     assert main([
         "price", "--repo", str(repo), "--org", ORG, "--origin", ORIGIN, "--out", str(paths["price"]),
     ]) == 0
@@ -92,14 +103,6 @@ def beat(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
     assert main([
         "trade-off", "--repo", str(repo), "--org", ORG, "--origin", ORIGIN,
         "--perspective", PERSPECTIVE, *accounts, "--out", str(paths["curve"]),
-    ]) == 0
-    assert main([
-        "propose", "--repo", str(repo), "--org", ORG, "--response", LEVER,
-        "--channel", "record", "--out", str(paths["proposal"]),
-    ]) == 0
-    assert main([
-        "substrate", "--repo", str(repo), "--org", ORG, "--recipe", str(RECIPE_PATH),
-        "--checkpoint", CHECKPOINT, "--out", str(paths["substrate"]),
     ]) == 0
 
     return {"repo": repo, "resolved": resolved, **paths}

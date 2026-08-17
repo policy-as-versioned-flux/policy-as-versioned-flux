@@ -32,12 +32,12 @@ jobs:
         run: python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores
       - name: the walking skeleton, end to end
         run: bash twin/demo.sh
-      - name: the falsifiability beat, end to end
-        run: bash twin/beat-royal-mail.sh
-      - name: the whole-engine beat, end to end
-        run: bash twin/beat-netflix.sh
-      - name: the live, unresolved, pinned forecast, end to end
-        run: bash twin/beat-intel.sh
+      # A single step, not three: `beat-sequence.sh` (build ticket 77) is the demo's declared
+      # order — b (royal-mail), b (intel), c-then-a (netflix) — and three independently-ordered
+      # CI steps could silently drift from it the way this workflow's own step order once did
+      # (royal-mail, netflix, intel priced its beat before the third one ran).
+      - name: the demo sequence, end to end
+        run: bash twin/beat-sequence.sh
 
   # `identical_pins_identical_bytes` on more than one architecture. Seeded floating-point
   # identity across platform maths libraries is the landmine, and it is cheap now and

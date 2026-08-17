@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # THE WHOLE-ENGINE BEAT (build ticket 74; decision ticket 22; spec stories 91, 93).
 #
-# Fear and seize, both on dated evidence, then the cross-domain comparison the demo is
-# sequenced to end on: a non-technical lever and a technical control, priced in one unit,
-# with the rival causal accounts disagreeing about which one is cheaper.
+# Fear and seize, both on dated evidence, then versioned governance, then the cross-domain
+# comparison the demo is sequenced to end on: a non-technical lever and a technical control,
+# priced in one unit, with the rival causal accounts disagreeing about which one is cheaper.
 #
 # Netflix carries this beat and Royal Mail did not. Royal Mail proved the twin can be checked;
 # this one shows what the engine does once you believe it can. The order is the argument —
-# credibility earned first, then spent — and the one-currency comparison is the conclusion
-# rather than the opening, because it is the most seductive claim and the least defensible
-# standing alone.
+# credibility earned first, then spent (decision ticket 22; made structural rather than narrated
+# at build ticket 77) — so enactment (the governance claim, (c)) runs before pricing (the
+# one-currency comparison, (a)), and pricing is the conclusion rather than the opening, because
+# it is the most seductive claim and the least defensible standing alone.
 #
 # NO SCORE HERE, AND THAT IS DELIBERATE. This org carries no answer key. Netflix's story is
 # famous enough that a twin "anticipating" 2011 cannot be told apart from reciting it, so a
@@ -95,7 +96,23 @@ say "3. the eye that pays, and the pre-filter that runs BEFORE anything prices"
 "$TWIN" options --repo "$WORK/netflix" --org "$ORG" --perspective "$PERSPECTIVE" \
   --out "$OUT/options.json" || fail "options failed"
 
-say "4. THE CROSS-DOMAIN COMPARISON — a non-technical lever against a technical control"
+say "4. the synthetic substrate, and the limitation that travels beside every result from it"
+say "   a method footnote, not a thesis claim — placed before governance and pricing, not after"
+"$TWIN" substrate --repo "$WORK/netflix" --org "$ORG" --recipe "$RECIPE" \
+  --checkpoint "$CHECKPOINT" --out "$OUT/substrate-report.json" || fail "substrate failed"
+
+say "5. VERSIONED GOVERNANCE (c) — the twin proposes, and there is no command that disposes"
+say "   through the 'record' channel, because this lever is not code: a signed versioned record"
+say "   that it was enacted, without policy enforcing it"
+"$TWIN" propose --repo "$WORK/netflix" --org "$ORG" \
+  --response hold-the-bundled-price-for-one-quarter --channel record \
+  --out "$OUT/enactment-proposal.json" || fail "propose failed"
+echo "  the dependency block's own last limit says whose estate those pins are (not netflix's) —"
+echo "  the caveat travels IN the artefact, not only in this terminal."
+echo "  read the narrowed claim beside step 6: most levers are not code, so if versioned policy"
+echo "  were the shape of governance, the cross-domain comparison could not exist at all."
+
+say "6. THE CROSS-DOMAIN COMPARISON (a) — a non-technical lever against a technical control"
 say "   one shock at '$ORIGIN', one unit, and the mitigation claims graded separately"
 "$TWIN" price --repo "$WORK/netflix" --org "$ORG" --origin "$ORIGIN" --out "$OUT/price.json" \
   || fail "price failed"
@@ -103,8 +120,9 @@ echo "  the lever is the one with the evidence. The engineering control's claim 
 echo "  earns no credit at all — a governance tool showing the control winning here would be"
 echo "  showing a number nothing behind it supports."
 
-say "5. THE OUTPUT IS A CURVE — and the accounts disagree about which response is cheapest"
+say "7. THE OUTPUT IS A CURVE (a) — and the accounts disagree about which response is cheapest"
 say "   three rival readings of the same two filings, none privileged, nothing averaging them away"
+say "   the beat's last computed claim, by design — decision ticket 22: earn credibility, then spend it"
 "$TWIN" trade-off --repo "$WORK/netflix" --org "$ORG" --origin "$ORIGIN" \
   --perspective "$PERSPECTIVE" \
   --account the-shock-stayed-on-the-dvd-side \
@@ -126,31 +144,17 @@ print(f"  the default is {body['default']['option']}, one marked point on the cu
       "draws the trade-off")
 CURVE
 
-say "6. VERSIONED ENACTMENT — the twin proposes, and there is no command that disposes"
-say "   through the 'record' channel, because this lever is not code: a signed versioned record"
-say "   that it was enacted, without policy enforcing it"
-"$TWIN" propose --repo "$WORK/netflix" --org "$ORG" \
-  --response hold-the-bundled-price-for-one-quarter --channel record \
-  --out "$OUT/enactment-proposal.json" || fail "propose failed"
-echo "  the dependency block's own last limit says whose estate those pins are (not netflix's) —"
-echo "  the caveat travels IN the artefact, not only in this terminal."
-echo "  read the narrowed claim beside step 4: most levers are not code, so if versioned policy"
-echo "  were the shape of governance, the cross-domain comparison could not exist at all."
-
-say "7. the synthetic substrate, and the limitation that travels beside every result from it"
-"$TWIN" substrate --repo "$WORK/netflix" --org "$ORG" --recipe "$RECIPE" \
-  --checkpoint "$CHECKPOINT" --out "$OUT/substrate-report.json" || fail "substrate failed"
-
 say "8. the demo's own depth grade, and the engine's — computed checklists, never typed"
 "$TWIN" grade --capability demo-slice || fail "grade failed"
 "$TWIN" grade --capability scenario-engine || fail "grade failed"
 
 echo
-echo "PASS: a threat path and an opportunity path both ran end to end on the same dated state."
-echo "A non-technical lever and a technical control were priced in one unit, and which of them is"
-echo "cheapest depends on which causal account you believe — reported as a curve with the"
-echo "disagreement first, never as a verdict. Enactment was proposed and never disposed. The"
-echo "shared-prior limitation travels with the substrate result. No score: this subject carries"
-echo "no answer key, and says so."
+echo "PASS: a threat path and an opportunity path both ran end to end on the same dated state. The"
+echo "shared-prior limitation travelled with the substrate result before either later claim was"
+echo "made. Enactment was proposed and never disposed — versioned governance, spent before the"
+echo "beat's concluding claim rather than after it. A non-technical lever and a technical control"
+echo "were then priced in one unit, and which of them is cheapest depends on which causal account"
+echo "you believe — reported as a curve with the disagreement first, never as a verdict, and the"
+echo "last thing this beat computes. No score: this subject carries no answer key, and says so."
 echo
 echo "artefacts: $OUT"

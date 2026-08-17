@@ -17,8 +17,8 @@ from pathlib import Path
 import yaml
 
 from . import (
-    TOOL_VERSION, attest, constraints, enact, enforcement, evidence, fixtures, gameplay_lens,
-    index, invariants, retrospective_sweep, schedule, sign, unbound_pool, verbs,
+    TOOL_VERSION, attest, constraints, does_not_do, enact, enforcement, evidence, fixtures,
+    gameplay_lens, index, invariants, retrospective_sweep, schedule, sign, unbound_pool, verbs,
 )
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
@@ -736,6 +736,26 @@ def cmd_constraints(args: argparse.Namespace) -> int:
         return 0
     print(f"  signed as role {constraints.ROLE!r} -> {sidecar.name}")
     return 0
+
+
+def cmd_does_not_do(args: argparse.Namespace) -> int:
+    """Publish the does-not-do register: every unchecked acceptance criterion across every loaded
+    capability (build ticket 77, decision tickets 15 and 22).
+
+    Derived, not authored: `does_not_do.register()` reads the checklists `twin grade` already
+    computes, so this cannot be typed by hand — the same guarantee that makes a grade `full`
+    computed rather than asserted.
+    """
+    caps = Capabilities.load()
+    body = does_not_do.published(caps)
+    artefact = does_not_do.artefact(verbs.command_for("does-not-do"), caps, body)
+    _say(
+        f"does-not-do register: {body['criteria_checked']}/{body['criteria_total']} criteria met "
+        f"across {body['capabilities_surveyed']} capabilities, {len(body['entries'])} unchecked"
+    )
+    for entry in body["entries"]:
+        print(f"  does-not-do  {entry['id']:<22} {entry['does_not_do']}")
+    return _emit(artefact, args.out)
 
 
 def cmd_affected_parties(args: argparse.Namespace) -> int:
@@ -1811,6 +1831,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     published.add_argument("--out", required=True)
     published.set_defaults(fn=cmd_constraints)
+
+    not_done = subs.add_parser(
+        "does-not-do", help="publish the does-not-do register, generated from unchecked depth-grade criteria"
+    )
+    not_done.add_argument("--out", required=True)
+    not_done.set_defaults(fn=cmd_does_not_do)
 
     parties = with_org(with_repo(subs.add_parser(
         "affected-parties", help="the affected-parties register, published alongside the constraint set"
