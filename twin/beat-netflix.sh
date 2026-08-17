@@ -61,7 +61,7 @@ forecasts = body["forecasts"]
 if len(forecasts) < 2:
     raise SystemExit(f"{len(forecasts)} forecast(s) emitted — there is no ensemble to show")
 for f in sorted(forecasts, key=lambda f: f["probability"]):
-    print(f"  {f['world_model']:<34} p={f['probability']}")
+    print(f"  {f['world_model']:<36} p={f['probability']}")
 ps = [f["probability"] for f in forecasts]
 print(f"  {len(forecasts)} forecasts, spread {max(ps) - min(ps):.2f}, and no field anywhere that "
       "merges them")
@@ -130,11 +130,10 @@ say "6. VERSIONED ENACTMENT — the twin proposes, and there is no command that 
 say "   through the 'record' channel, because this lever is not code: a signed versioned record"
 say "   that it was enacted, without policy enforcing it"
 "$TWIN" propose --repo "$WORK/netflix" --org "$ORG" \
-  --response ship-one-bill-and-one-sign-in-across-the-two-plans --channel record \
+  --response hold-the-bundled-price-for-one-quarter --channel record \
   --out "$OUT/enactment-proposal.json" || fail "propose failed"
-echo "  the dependency block above is THIS repository's own estate, not the subject's: twin/enact.py"
-echo "  reads estate/ from the tool's repository, because the pins it counts are the ones we can"
-echo "  actually inspect. The subject has no repository here and no pins are claimed on its behalf."
+echo "  the dependency block's own last limit says whose estate those pins are (not netflix's) —"
+echo "  the caveat travels IN the artefact, not only in this terminal."
 echo "  read the narrowed claim beside step 4: most levers are not code, so if versioned policy"
 echo "  were the shape of governance, the cross-domain comparison could not exist at all."
 

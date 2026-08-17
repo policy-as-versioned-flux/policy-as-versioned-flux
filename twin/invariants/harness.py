@@ -1669,44 +1669,69 @@ def _netflix_runs_both_paths_and_the_curve_keeps_the_disagreement(ctx: Context) 
     A guard on the suite rather than an invariant, and the sibling of build ticket 73's
     `netflix_substrate_is_free_running_and_every_plant_carries_a_horizon`: that one asserts the
     committed *content* holds the substrate contracts, this one asserts the committed content
-    actually drives the engine. Six legs.
+    actually drives the engine.
 
-    **One dated state, two directions.** The rewind primitive resolves 2011-08-01 to a commit; the
-    threat path projects from it and the opportunity path sweeps *that same commit*. Two different
-    answers to "what did the model look like on the day" would make the paths incomparable, which
-    is the whole reason for running them at one date.
+    **Black-box at seam 1, deliberately, with one seam-2 exception named below.** Adversarial
+    review of the first draft found it drove `verbs.run`/`verbs.price`/`verbs.trade_off` directly
+    — a call sequence, which the constitution scopes to seam 2 ("numerical and structural
+    properties only, never call sequences") and its own sibling guard,
+    `a_scored_forecast_is_never_silently_dropped`, already gets right. Every leg below drives
+    `cli.main` and reads the artefact it wrote, the same way `twin/beat-netflix.sh` does, so
+    renaming or reordering an internal verb function cannot leave this green while the CLI itself
+    is broken.
 
-    **The cut is real, not narrated.** At 2011-08-01 the overlay carries no causal edge and no
-    perspective, because both rest on filings that did not exist yet. This is the leg that makes
-    "on dated evidence" mechanical: back-date the pricing layer into an earlier commit and it
-    fails, however the prose reads.
+    **One dated state, two directions, independently resolved.** `twin backtest --at` and `twin
+    rewind --at` are two separate CLI invocations, each resolving 2011-08-01 on its own — the same
+    shape the beat script's own steps 1 and 2 are. The first draft instead opened one rewound repo
+    once and handed it to both paths, so the pin comparison it ran could only ever agree with
+    itself; here the two resolutions are genuinely independent and are asserted against each
+    other, which would catch `cmd_backtest`'s internal rewind ever diverging from `cmd_rewind`'s.
 
-    **The comparison is cross-domain and the refusal survives it.** A non-technical lever and a
-    technical control are costed in one unit, and the control's mitigation claim is graded outside
-    the pricing threshold and earns **no credit field at all** — a named refusal, never a zero.
+    **The cut is real, not narrated.** At 2011-08-01, `twin options` for `the-operator` fails —
+    the perspective rests on a filing that did not exist yet — and the rewound state's own
+    `rollups.causal_edges` is zero. Both read from artefacts the CLI emits, not from an `Overlay`
+    reached into directly.
 
-    **The curve keeps the disagreement.** The two accounts name different cheapest options and
-    `unanimous` is false. Asserted on `cheapest_by_account` rather than on a figure, so
-    re-authoring a cost that happens to preserve the flip still passes and one that collapses it
-    does not.
+    **The comparison is cross-domain, direction-named, and the refusal survives it.** The lever
+    (`hold-the-bundled-price-for-one-quarter`) earns mitigation credit; the control
+    (`ship-one-bill-and-one-sign-in-across-the-two-plans`) is refused credit with a reason, never
+    given a zero. Named by id rather than "some response earned nothing", so swapping the two
+    responses' evidence grades — inverting the beat's own argument — fails here rather than
+    passing because *a* refusal still exists.
 
-    **No account is privileged.** Dropping either one leaves the other's net cost of risk exactly
-    as it was, which is `causal_accounts`' own contract, checked here on a real subject.
+    **The curve keeps the disagreement, and the refused option's own figure never moves.** The
+    three accounts disagree about which response is cheapest — asserted on `cheapest_by_account`,
+    so a re-authored cost that preserves the flip still passes and one that collapses it does not
+    — and the control's `net_cost_of_risk.range` is zero across all three, because nothing here
+    ever credits it regardless of which account is asked.
 
-    **The shared-prior limitation is paired with the capability, not with one artefact.** Ticket
-    73 asserted one report carries it; this asserts the pairing over *every* artefact the beat
-    emits — any artefact whose depth block names `synthetic-substrate` carries the limitation
-    verbatim. A second surface claiming that capability without it fails here.
+    **No account is privileged — asserted directly on the propagation maths, not through the CLI.**
+    This is the one deliberate seam-2 leg: `tradeoff.curve()` called on one hoisted overlay, the
+    same function `tests/test_tradeoff.py` already exercises. Three extra `twin trade-off`
+    invocations here would pay ~1.6s to re-derive an overlay that has not changed in order to
+    re-check a property that is purely about `net_cost_of_risk` arithmetic, never about CLI
+    wiring — exactly the "numerical and structural properties only" seam 2 exists for, so this leg
+    stays there rather than moving to seam 1 for uniformity's own sake.
+
+    **Versioned enactment is proposed, on the lever, through the channel it is not code.**
+    `twin propose --channel record` on the lever, not the control — the beat found and fixed a
+    defect where its own script proposed the code control through the not-code channel.
+
+    **The shared-prior limitation is paired with the capability, over every artefact the beat
+    actually emits.** Ticket 73 asserted one report carries it; this asserts the pairing over all
+    eight — backtest, rewind, gameplay-sweep, options, price, trade-off, propose and substrate —
+    not the three the first draft happened to have already built for other reasons. Adversarial
+    review proved the gap by adding `synthetic-substrate` to `CAPS_PRICE` and watching the old,
+    narrower walk pass anyway.
     """
     import json
 
-    from .. import gameplay_lens, planter as planter_mod, substrate_report, verbs
-    from ..model import Overlay
-    from ..primitives import rewind
-    from ..repo import ModelRepo
+    from ..cli import main as cli_main
 
     org, at, checkpoint = "netflix", "2011-08-01", "2011-10-24"
     origin, perspective_id = "dvd-by-mail", "the-operator"
+    lever_id = "hold-the-bundled-price-for-one-quarter"
+    control_id = "ship-one-bill-and-one-sign-in-across-the-two-plans"
     accounts = [
         "the-shock-stayed-on-the-dvd-side",
         "the-shock-crossed-to-the-streaming-side",
@@ -1716,83 +1741,142 @@ def _netflix_runs_both_paths_and_the_curve_keeps_the_disagreement(ctx: Context) 
     netflix_dir = ctx.tmp / "netflix-repo"
     if not netflix_dir.exists():
         fixtures.build_netflix_org(netflix_dir)
-    head = ModelRepo.open(netflix_dir)
+    out = ctx.tmp / "netflix-engine-guard"
+    out.mkdir(exist_ok=True)
 
-    # -- one dated state, two directions ---------------------------------------------------
-    past = rewind(netflix_dir, at)
-    threat = verbs.run(
-        past, ctx.caps, org, "would-the-twin-have-flagged-it", "as-consumed",
-        verbs.command_for("backtest", org=org, at=at, regime="as-consumed"), at=at,
+    def run(args: list[str], outfile: str) -> dict:
+        path = out / outfile
+        rc = cli_main([*args, "--out", str(path)])
+        if rc != 0:
+            raise Violated(f"`twin {' '.join(args)}` exited {rc}")
+        return json.loads(path.read_bytes())
+
+    # -- one dated state, two directions, independently resolved --------------------------------
+    threat = run(
+        ["backtest", "--repo", str(netflix_dir), "--org", org,
+         "--scenario", "would-the-twin-have-flagged-it", "--regime", "as-consumed", "--at", at],
+        "threat.json",
     )
-    forecasts = threat.body["forecasts"]
+    rewound = run(["rewind", "--repo", str(netflix_dir), "--org", org, "--at", at], "rewind.json")
+    threat_commit = threat["envelope"]["pins"]["model_repo"]["commit"]
+    resolved_commit = rewound["body"]["resolved"]["commit"]
+    if threat_commit != resolved_commit:
+        raise Violated(
+            "`twin backtest` and `twin rewind` resolved 2011-08-01 to two different commits — "
+            "the threat path and the opportunity path would be reading different states while "
+            "the beat narrates one"
+        )
+
+    forecasts = threat["body"]["forecasts"]
     if len(forecasts) < 2:
         raise Violated(
             f"the threat path emits {len(forecasts)} forecast(s) at {at}; an ensemble beat with "
             "nothing to spread is the plurality refusal satisfied trivially rather than shown"
         )
-    swept = gameplay_lens.sweep(
-        [ModelRepo.open(netflix_dir, past.pin.commit)], ctx.caps, verbs.command_for("gameplay-sweep")
+    distinct = len({f["probability"] for f in forecasts})
+    if distinct < 2:
+        raise Violated(
+            f"the threat path emits {len(forecasts)} forecast(s) at {at} but only {distinct} "
+            "distinct probability among them — an ensemble that agrees with itself demonstrates "
+            "nothing about plurality"
+        )
+
+    swept = run(
+        ["gameplay-sweep", "--repo", str(netflix_dir), "--ref", resolved_commit],
+        "sweep.json",
     )
-    if not swept.body["opportunities"]:
+    if not swept["body"]["opportunities"]:
         raise Violated(
             f"the opportunity path pulls nothing at {at} — the seize half of the beat has no "
             "content, so only the threat half is being demonstrated"
         )
-    if swept.pins["repos"][0]["commit"] != past.pin.commit:
-        raise Violated("the opportunity sweep did not run on the commit the rewind resolved")
+    if swept["envelope"]["pins"]["repos"][0]["commit"] != resolved_commit:
+        raise Violated("the opportunity sweep did not run on the commit `twin rewind` resolved")
 
-    # -- the cut is real ---------------------------------------------------------------------
-    then = Overlay.load(past, org)
-    leaked = sorted(then.perspectives) + [e.id for e in then.graph().edges if e.causal]
-    if leaked:
+    # -- the cut is real, checked through the CLI rather than a direct Overlay reach-in ----------
+    options_past_rc = cli_main([
+        "options", "--repo", str(netflix_dir), "--ref", resolved_commit, "--org", org,
+        "--perspective", perspective_id, "--out", str(out / "options-past.json"),
+    ])
+    if options_past_rc == 0:
         raise Violated(
-            f"at {at} the overlay already carries {', '.join(leaked)}; the pricing layer rests on "
-            "filings dated after that day, so its presence here means a commit was back-dated"
+            f"`twin options` succeeded for {perspective_id!r} at the commit {at} resolves to; "
+            "the pricing layer rests on filings dated after that day and the perspective should "
+            "not exist yet — a commit was back-dated"
+        )
+    if rewound["body"]["rollups"]["causal_edges"] != 0:
+        raise Violated(
+            f"the rewound state at {at} already carries a causal edge; back-dating the pricing "
+            "layer would defeat the point of running the threat path from before it existed"
         )
 
-    # -- the cross-domain comparison, and the refusal that survives it -------------------------
-    now = Overlay.load(head, org)
-    priced = verbs.price(
-        head, ctx.caps, org, origin, None, verbs.command_for("price", org=org, origin=origin)
-    ).body
+    options_head = run(
+        ["options", "--repo", str(netflix_dir), "--org", org, "--perspective", perspective_id],
+        "options-head.json",
+    )
+    admitted = set(options_head["body"]["prefilter"]["admitted"])
+    if not {lever_id, control_id} <= admitted:
+        raise Violated(
+            f"expected {lever_id!r} and {control_id!r} admitted by the pre-filter at HEAD, got "
+            f"{sorted(admitted)}"
+        )
+
+    # -- the cross-domain comparison, direction-named, and the refusal that survives it ---------
+    price_doc = run(
+        ["price", "--repo", str(netflix_dir), "--org", org, "--origin", origin], "price.json"
+    )
+    priced = price_doc["body"]
     eye = next(e for e in priced["perspectives"] if e["perspective"] == perspective_id)
     mitigations = {r["option"]: r["mitigation"] for r in eye["responses"]["priced"]}
-    if len(mitigations) < 2:
+    if lever_id not in mitigations or control_id not in mitigations:
         raise Violated(
-            f"{len(mitigations)} response(s) priced under {perspective_id}; a lever cannot be "
-            "compared against a control without both of them on the page"
+            f"expected {lever_id!r} and {control_id!r} both priced under {perspective_id!r}, got "
+            f"{sorted(mitigations)} — a lever cannot be compared against a control without both "
+            "of them on the page"
         )
-    refused = {o: m for o, m in mitigations.items() if "credit" not in m}
-    if not refused:
-        raise Violated(
-            "every priced response earned mitigation credit, so this fixture no longer shows a "
-            "claim graded outside the threshold being refused a figure rather than given a zero"
-        )
-    for option, mitigation in refused.items():
-        if "reason" not in mitigation:
-            raise Violated(f"{option} earned no credit and carries no reason it earned none")
+    if "credit" not in mitigations[lever_id]:
+        raise Violated(f"{lever_id!r} earned no mitigation credit; the lever with the evidence "
+                       "should price")
+    if "credit" in mitigations[control_id]:
+        raise Violated(f"{control_id!r} earned mitigation credit; its claim is graded outside "
+                       "the pricing threshold and should be refused a figure, not given one")
+    if "reason" not in mitigations[control_id]:
+        raise Violated(f"{control_id!r} earned no credit and carries no reason it earned none")
 
-    # -- the curve keeps the disagreement ------------------------------------------------------
-    curve = verbs.trade_off(
-        head, ctx.caps, org, origin, perspective_id, accounts,
-        verbs.command_for("trade-off", org=org, origin=origin, perspective=perspective_id,
-                          account="+".join(sorted(accounts))),
-    ).body
+    # -- the curve keeps the disagreement, and the refused option's own figure never moves -------
+    account_args = [arg for a in accounts for arg in ("--account", a)]
+    curve_doc = run(
+        ["trade-off", "--repo", str(netflix_dir), "--org", org, "--origin", origin,
+         "--perspective", perspective_id, *account_args],
+        "curve.json",
+    )
+    curve = curve_doc["body"]
     agreement = curve["agreement"]
     if agreement["unanimous"] or len(set(agreement["cheapest_by_account"].values())) < 2:
         raise Violated(
             "the named accounts agree on the cheapest response, so the one committed fixture in "
             "this repository that makes an ensemble disagreement visible no longer does"
         )
+    control_row = next(p for p in curve["curve"] if p["option"] == control_id)
+    if control_row["net_cost_of_risk"]["range"] != 0:
+        raise Violated(
+            f"{control_id!r} earns no credit under any named account, so its own net cost of "
+            f"risk should not move across the ensemble; the reported range is "
+            f"{control_row['net_cost_of_risk']['range']}"
+        )
+    if sorted(control_row["uncredited_by"]) != sorted(accounts):
+        raise Violated(f"{control_id!r} should be uncredited by every named account")
 
-    # -- no account is privileged --------------------------------------------------------------
+    # -- no account is privileged (seam 2, deliberately: see docstring) -------------------------
+    from .. import tradeoff as tradeoff_mod
+    from ..model import Overlay
+    from ..repo import ModelRepo
+
+    overlay = Overlay.load(ModelRepo.open(netflix_dir), org)
+    perspective = overlay.perspectives[perspective_id]
     for dropped in accounts:
         kept = [a for a in accounts if a != dropped]
-        without = verbs.trade_off(
-            head, ctx.caps, org, origin, perspective_id, kept,
-            verbs.command_for("trade-off", org=org, origin=origin, perspective=perspective_id,
-                              account="+".join(sorted(kept))),
-        ).body
+        without = tradeoff_mod.curve(overlay, perspective, origin, overlay.responses, kept)
         for account in kept:
             before = {p["option"]: p["net_cost_of_risk"]["by_account"][account] for p in curve["curve"]}
             after = {p["option"]: p["net_cost_of_risk"]["by_account"][account] for p in without["curve"]}
@@ -1802,23 +1886,39 @@ def _netflix_runs_both_paths_and_the_curve_keeps_the_disagreement(ctx: Context) 
                     "being computed from the company it keeps rather than from its own graph alone"
                 )
 
-    # -- the limitation is paired with the capability, not with one artefact --------------------
-    recipe_path = PACKAGE_DIR / "netflix-substrate-recipe.yaml"
-    emitted = [threat, swept, substrate_report.report(
-        head, ctx.caps, org, recipe_path, checkpoint, checkpoint,
-        verbs.command_for("substrate", org=org, checkpoint=checkpoint, detected_at=checkpoint,
-                          recipe=recipe_path.name),
-    )]
+    # -- versioned enactment, proposed on the lever, through the not-code channel ----------------
+    proposal = run(
+        ["propose", "--repo", str(netflix_dir), "--org", org, "--response", lever_id,
+         "--channel", "record"],
+        "proposal.json",
+    )
+    if proposal["body"]["response"]["id"] != lever_id:
+        raise Violated(
+            f"the enactment proposal names {proposal['body']['response']['id']!r}, not "
+            f"{lever_id!r} — the beat's own defect (proposing the code control through the "
+            "not-code channel) would reproduce silently if this drifted back"
+        )
+
+    # -- the limitation is paired with the capability, over every artefact the beat emits --------
+    from .. import planter as planter_mod
+
+    substrate = run(
+        ["substrate", "--repo", str(netflix_dir), "--org", org,
+         "--recipe", str(PACKAGE_DIR / "netflix-substrate-recipe.yaml"),
+         "--checkpoint", checkpoint],
+        "substrate.json",
+    )
+    emitted = [threat, rewound, swept, options_head, price_doc, curve_doc, proposal, substrate]
     claimed = 0
     for artefact in emitted:
-        if "synthetic-substrate" not in artefact.depth["capabilities"]:
+        if "synthetic-substrate" not in artefact["envelope"]["depth"]["capabilities"]:
             continue
         claimed += 1
-        if planter_mod.SHARED_PRIOR_LIMITATION not in json.dumps(artefact.body):
+        if planter_mod.SHARED_PRIOR_LIMITATION not in json.dumps(artefact["body"]):
             raise Violated(
-                f"a {artefact.kind} artefact declares the synthetic-substrate capability and "
-                "carries no shared-prior limitation; a synthetic result travelling without it "
-                "reads as evidence about the world"
+                f"a {artefact['envelope']['kind']} artefact declares the synthetic-substrate "
+                "capability and carries no shared-prior limitation; a synthetic result "
+                "travelling without it reads as evidence about the world"
             )
     if not claimed:
         raise Violated("no emitted artefact claimed the synthetic-substrate capability, so the "
@@ -1826,12 +1926,15 @@ def _netflix_runs_both_paths_and_the_curve_keeps_the_disagreement(ctx: Context) 
 
     cheapest = ", ".join(f"{a}->{o}" for a, o in sorted(agreement["cheapest_by_account"].items()))
     return (
-        f"one rewind to {at} drives both paths: {len(forecasts)} rival forecasts and "
-        f"{len(swept.body['opportunities'])} opportunity pulled from the same commit, with no "
-        f"causal edge or perspective back-dated into it; {len(mitigations)} responses priced in "
-        f"one unit and {len(refused)} refused credit with a reason; the accounts disagree "
-        f"({cheapest}) and dropping either leaves the other's figures untouched; "
-        f"{claimed} artefact carrying the synthetic-substrate capability carries the limitation"
+        f"`twin backtest` and `twin rewind` independently resolved {at} to the same commit; "
+        f"{len(forecasts)} rival forecasts ({distinct} distinct) and "
+        f"{len(swept['body']['opportunities'])} opportunity pulled from it, with `twin options` "
+        f"refusing the perspective and 0 causal edges at that commit; {lever_id!r} priced with "
+        f"credit and {control_id!r} refused with a reason, its own net cost of risk unmoved "
+        f"across every account; the accounts disagree ({cheapest}) and dropping any one leaves "
+        f"the rest untouched; enactment proposed on the lever through `record`; "
+        f"{claimed}/{len(emitted)} emitted artefacts claim synthetic-substrate and all carry the "
+        "limitation"
     )
 
 

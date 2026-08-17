@@ -48,13 +48,18 @@ def caps() -> Capabilities:
     return Capabilities.load()
 
 
+RECIPE_PATH = Path(__file__).resolve().parents[1] / "twin" / "netflix-substrate-recipe.yaml"
+CHECKPOINT = "2011-10-24"
+
+
 @pytest.fixture(scope="session")
 def beat(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
     """The beat's own artefacts, produced through the CLI exactly as the script produces them.
 
-    Session-scoped: one fixture repository and six commands, built once. The script itself is run
-    by CI rather than by pytest, for the same reason `twin/demo.sh` and `twin/beat-royal-mail.sh`
-    are — a shell surface is checked by running it, and running it twice per suite buys nothing.
+    Session-scoped: one fixture repository and eight commands, built once. The script itself is
+    run by CI rather than by pytest, for the same reason `twin/demo.sh` and
+    `twin/beat-royal-mail.sh` are — a shell surface is checked by running it, and running it twice
+    per suite buys nothing.
     """
     work = tmp_path_factory.mktemp("netflix-beat")
     repo = fixtures.build_netflix_org(work / "repo")
@@ -62,7 +67,8 @@ def beat(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
 
     paths = {
         name: out / f"{name}.json"
-        for name in ("bundle", "rewind", "sweep", "options", "price", "curve", "proposal")
+        for name in ("bundle", "rewind", "sweep", "options", "price", "curve", "proposal",
+                     "substrate")
     }
     assert main([
         "backtest", "--repo", str(repo), "--org", ORG, "--scenario", SCENARIO,
@@ -88,8 +94,12 @@ def beat(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
         "--perspective", PERSPECTIVE, *accounts, "--out", str(paths["curve"]),
     ]) == 0
     assert main([
-        "propose", "--repo", str(repo), "--org", ORG, "--response", CONTROL,
+        "propose", "--repo", str(repo), "--org", ORG, "--response", LEVER,
         "--channel", "record", "--out", str(paths["proposal"]),
+    ]) == 0
+    assert main([
+        "substrate", "--repo", str(repo), "--org", ORG, "--recipe", str(RECIPE_PATH),
+        "--checkpoint", CHECKPOINT, "--out", str(paths["substrate"]),
     ]) == 0
 
     return {"repo": repo, "resolved": resolved, **paths}
@@ -111,6 +121,9 @@ def test_both_paths_run_from_the_one_state_the_rewind_resolved(beat: dict[str, P
     """
     threat = _body(beat["bundle"])
     assert len(threat["forecasts"]) >= 2, "no ensemble to spread across on the threat side"
+    # Length alone passes on three identical probabilities — a real ensemble disagrees.
+    distinct = {f["probability"] for f in threat["forecasts"]}
+    assert len(distinct) >= 2, f"all {len(threat['forecasts'])} forecasts agree: {distinct}"
 
     sweep = json.loads(beat["sweep"].read_bytes())
     assert sweep["envelope"]["pins"]["repos"][0]["commit"] == beat["resolved"]
@@ -126,8 +139,10 @@ def test_opportunities_are_pulled_and_signals_are_pushed_side_by_side(beat: dict
     """
     counts = _body(beat["sweep"])["counts"]
     assert counts["opportunities"] >= 1
-    # Three of the six filings are knowable at 2011-08-01. The point of the assertion is that the
-    # pushed volume is reported at all, beside the pulled one.
+    # Pins build ticket 73's own spine dates: three of the six filings are dated on or before
+    # 2011-08-01 (`tests/test_netflix.py` asserts the six dates directly). Exact rather than
+    # `>= 1`, because a filing quietly moving across the AT boundary should fail a test somewhere,
+    # and this is the one number in this file that would catch it.
     assert counts["signals"] == 3
 
 
@@ -244,7 +259,14 @@ def test_dropping_any_one_account_changes_nothing_about_the_rest(beat: dict[str,
 def test_the_disagreement_reaches_the_surface_before_the_default(beat: dict[str, Path]) -> None:
     """Printed order, not only artefact content. A disagreement a reader has to scroll past the
     default to find is reported only technically — the same reasoning that puts the worst score
-    first in `cli._say_score`."""
+    first in `cli._say_score`.
+
+    Anchored on the line prefixes `cli.cmd_trade_off` actually prints (`"  agreement  "`,
+    `"  default    "`), not on the bare words: `body['agreement']['note']` itself contains the
+    word "default" when the accounts disagree ("... rather than smoothed into the default
+    below ..."), so a plain `printed.index("agreement") < printed.index("default")` would still
+    pass with the default line deleted outright — the exact regression this test exists to catch.
+    """
     out = io.StringIO()
     args = [arg for account in ACCOUNTS for arg in ("--account", account)]
     with contextlib.redirect_stdout(out):
@@ -254,7 +276,7 @@ def test_the_disagreement_reaches_the_surface_before_the_default(beat: dict[str,
             "--out", str(beat["repo"].parent / "printed.json"),
         ]) == 0
     printed = out.getvalue()
-    assert printed.index("agreement") < printed.index("default")
+    assert printed.index("  agreement  ") < printed.index("  default    ")
     assert "unanimous=False" in printed
 
 
@@ -264,23 +286,35 @@ def test_the_disagreement_reaches_the_surface_before_the_default(beat: dict[str,
 def test_enactment_is_proposed_through_the_channel_a_lever_that_is_not_code_uses(
     beat: dict[str, Path],
 ) -> None:
-    """The `record` channel, not `policy` — and the narrowed claim is what makes this beat's own
-    argument, so it is asserted rather than only printed.
+    """The `record` channel, not `policy` — proposed on the price hold, not the billing rebuild.
 
     Decision ticket 22 gives Netflix thesis (c), proportionate versioned governance in its
-    narrowed form. The narrowing *is* the point here: the technical control is a lever that is not
-    policy-as-code, so it carries a versioned signed record that it was enacted rather than a
-    policy enforcing it. If versioned policy were the shape of governance, the cross-domain
-    comparison two sections up could not exist at all.
+    narrowed form. The narrowing *is* the point here, and it has to land on the right response:
+    `record` is the channel for a lever that is **not** code, and `LEVER` (the price hold) is the
+    one that is not code — `CONTROL` (a billing/SSO rebuild) is code with a real enforcement
+    point, the textbook `policy` case. Proposing `CONTROL` through `record` would print "this
+    lever is not code" directly under a response that is, and this test asserts the response id
+    itself rather than only the channel's own constant text, so that mistake fails here rather
+    than only reading wrong on screen.
+
+    If versioned policy were the shape of governance, the cross-domain comparison two sections up
+    could not exist at all — that is `narrowed_claim`, asserted on its content rather than as an
+    opaque constant, since `enact.NARROWED_CLAIM` is identical for every org and every proposal
+    and `tests/test_enact.py` already pins it directly.
 
     That the twin proposes and never disposes is `enactment_is_propose_only_at_both_layers`' job
     at both layers, and is not restated here.
     """
     body = _body(beat["proposal"])
-    assert body["response"]["id"] == CONTROL
+    assert body["response"]["id"] == LEVER
     assert body["channel"]["role"] == "record"
-    assert "not code" in body["channel"]["means"]
     assert "cross-domain comparison" in body["narrowed_claim"]
+    # The estate caveat travels in the artefact, not only in the script's own echo lines — see
+    # twin/enact.py `_dependency_block`'s last `limits` entry.
+    assert any(
+        "not from any repository" in limit and repr(ORG) in limit
+        for limit in body["dependency"]["limits"]
+    )
 
 
 # -- ACs 5 and 6: the suite, and the computed grade ------------------------------------------------
@@ -295,7 +329,7 @@ def test_every_artefact_the_beat_emits_carries_computed_depth_grades(
     merely checked for shape: a grade written into an envelope by hand satisfies any shape check,
     and that is the failure depth grades exist to prevent.
     """
-    for name in ("bundle", "rewind", "sweep", "options", "price", "curve", "proposal"):
+    for name in ("bundle", "rewind", "sweep", "options", "price", "curve", "proposal", "substrate"):
         depth = json.loads(beat[name].read_bytes())["envelope"]["depth"]
         assert depth["capabilities"], f"the {name} artefact names no producing capability"
         for capability, summary in depth["capabilities"].items():

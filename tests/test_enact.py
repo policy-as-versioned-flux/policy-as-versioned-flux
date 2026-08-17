@@ -218,6 +218,26 @@ def test_an_unknown_response_is_refused(model_repo_dir: Path, caps: Capabilities
         enact.propose(repo, caps, "netflix", "no-such-response", enact.RECORD, ["twin", "propose"])
 
 
+def test_a_response_that_crosses_the_universal_floor_is_refused_not_priced(
+    model_repo_dir: Path, caps: Capabilities
+) -> None:
+    """A proposal is not a second door past the constraint pre-filter.
+
+    `twin options`/`twin price` remove `instrument-viewers-without-telling-them` before anything
+    prices it (`no-covert-sensing`, the universal floor). Nothing about that removal used to reach
+    `twin propose`, which reads the overlay directly — so the excluded option had a signed,
+    derived, priced proposal available to it through a second verb. Asserted on the message naming
+    the crossed floor id, not merely on the raised type, so a refusal for the wrong reason (an
+    unknown response, an unknown channel) does not satisfy this test.
+    """
+    repo = ModelRepo.open(model_repo_dir)
+    with pytest.raises(enact.EnactError, match="no-covert-sensing"):
+        enact.propose(
+            repo, caps, "netflix", "instrument-viewers-without-telling-them", enact.RECORD,
+            ["twin", "propose"],
+        )
+
+
 def test_the_dependency_pins_are_real_and_report_what_they_do_not_establish(proposal: Artefact) -> None:
     """Consumed by real separate repositories is a claim about files, so it is read from them."""
     dependency = proposal.body["dependency"]

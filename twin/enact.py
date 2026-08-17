@@ -61,6 +61,7 @@ import yaml
 from . import REPO_DIR, TOOL_VERSION
 from .artefact import DERIVED, Artefact
 from .canon import digest_of
+from .constraints import floor_ids
 from .grades import Capabilities
 from .model import Overlay
 from .repo import ModelRepo
@@ -165,7 +166,7 @@ def dependency_pins(estate_dir: Path | None = None) -> list[dict[str, Any]]:
     return pins
 
 
-def _dependency_block(pins: list[dict[str, Any]]) -> dict[str, Any]:
+def _dependency_block(pins: list[dict[str, Any]], org: str) -> dict[str, Any]:
     consumed = [p for p in pins if p["cross_repository"]]
     unpinned = [p for p in pins if not p["commit_pinned"]]
     return {
@@ -214,6 +215,13 @@ def _dependency_block(pins: list[dict[str, Any]]) -> dict[str, Any]:
                 "Whether continuous proof of force is required at all is build ticket 65's "
                 "question and is still open."
             ),
+            (
+                f"these pins are read from this tool's own repository ({ESTATE_DIR.relative_to(REPO_DIR).as_posix()}), "
+                f"not from any repository {org!r} owns. The dependency block above evidences "
+                "what THIS estate consumes; it names no pin, tag or repository belonging to the "
+                f"subject the proposal is about, and {org!r} is not assumed to have an estate "
+                "under Flux at all."
+            ),
         ],
     }
 
@@ -247,6 +255,23 @@ def propose(
         known = ", ".join(sorted(overlay.responses)) or "none"
         raise EnactError(f"no response {response_id!r} in overlay {org!r} (have: {known})")
 
+    # The universal floor, checked here rather than trusted to have been checked upstream. This
+    # verb has no `--perspective`, so a perspective's own declared red lines are out of scope for
+    # it — but the floor binds every perspective identically (`twin/constraints.yaml`'s own
+    # words), so a response crossing a floor id is refused regardless of which eye is asking. This
+    # is a real gap the beat's own review found: `twin options`/`twin price` run this response
+    # through the pre-filter and never see it again, so nothing stopped `twin propose` reading the
+    # overlay directly and pricing a response the choice set had already removed.
+    crossed = sorted(set(response.get("crosses") or {}) & floor_ids())
+    if crossed:
+        raise EnactError(
+            f"{response_id!r} crosses the universal floor ({', '.join(crossed)}) and is refused "
+            "before pricing by `twin options`/`twin price`; a proposal is not a second door "
+            "past the constraint pre-filter. A perspective's own declared red lines are not "
+            "checked here — this verb carries no perspective — and that is a stated limit, not "
+            "a clearance."
+        )
+
     pins = dependency_pins()
     return Artefact(
         kind=KIND,
@@ -272,7 +297,7 @@ def propose(
                 "mitigates": response.get("mitigates"),
             },
             "channel": {"role": channel, "means": CHANNELS[channel]},
-            "dependency": _dependency_block(pins),
+            "dependency": _dependency_block(pins, org),
             "disposition": {
                 "state": "proposed",
                 "proposed_by": "the twin, as an agent",

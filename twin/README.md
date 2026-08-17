@@ -919,21 +919,49 @@ two filings and disagree about how much of the separation crossed to the streami
 0.35 and 0.05 on the same grade-1 edge. Believe `the-shock-crossed-to-the-streaming-side` and the
 price hold is cheapest; believe either of the other two and the billing rebuild is.
 `agreement.unanimous` is `false` and `cheapest_by_account` says which is which, ahead of the
-computed default. **This is the first fixture in this repository where that happens on real
-content**: build ticket 33 recorded that no real fixture made two accounts disagree about the
-cheapest response and called its unit test the honest substitute until one existed. This is it.
+computed default. The refused response's own net cost of risk carries `range: 0` across all
+three — nothing here ever credits it, so it cannot move regardless of which account is asked, and
+that absence is asserted directly rather than inferred from the refusal alone. **This is the first
+fixture in this repository where a real ranking disagreement happens on real content**: build
+ticket 33 recorded that no real fixture made two accounts disagree about the cheapest response and
+called its unit test the honest substitute until one existed. This is it.
 
 **Versioned enactment, in the narrowed form that makes the same argument.** `twin propose
---channel record`, not `--channel policy`, because the control is a lever that is not code — a
-versioned signed record that it was enacted, without a policy enforcing it. The proposal's own
-`narrowed_claim` reads *policy-as-code is AN enactment arm, not THE definition of governance;
-most levers are not code, so if versioned policy were the shape of governance the cross-domain
-comparison the £ engine exists for could not exist* — which is the sentence the paragraph above is
-a worked example of.
+--response hold-the-bundled-price-for-one-quarter --channel record`, not `--channel policy` — the
+price hold is the lever that is not code, so it carries a versioned signed record that it was
+enacted, without a policy enforcing it. (An early draft of this beat proposed the *billing rebuild*
+through this channel, which is code with a real enforcement point — the textbook `policy` case,
+printed under a `means` line that said the opposite. Both `twin/beat-netflix.sh` and the harness
+guard now name the response id, so that mistake fails rather than only reading wrong on screen.)
+The proposal's own `narrowed_claim` reads *policy-as-code is AN enactment arm, not THE definition
+of governance; most levers are not code, so if versioned policy were the shape of governance the
+cross-domain comparison the £ engine exists for could not exist* — the sentence the paragraph above
+is a worked example of. The proposal's own `dependency.limits` also names whose estate the
+cross-repository pins beside it belong to (this tool's own, never the subject's) — the caveat
+travels in the artefact, not only in the beat script's terminal output.
 
-The harness guard `netflix_runs_both_paths_and_the_curve_keeps_the_disagreement` asserts all six
-legs, and it was probed rather than reasoned about: making the two accounts agree, back-dating the
-pricing layer, and regrading the refused claim so it prices each fail it.
+The harness guard `netflix_runs_both_paths_and_the_curve_keeps_the_disagreement` drives `twin`
+through `cli.main` end to end — backtest, rewind, gameplay-sweep, options, price, trade-off,
+propose, substrate — the same seam the beat script itself uses, rather than calling the verb
+functions directly; the one exception is the no-account-privileged leg, asserted straight against
+`tradeoff.curve()`'s own arithmetic, because that property is about propagation maths and never
+about CLI wiring. It was probed rather than only reasoned about: making the accounts agree,
+back-dating the pricing layer, regrading the refused claim so it prices, swapping the lever's and
+control's evidence grades, and widening a capability list to falsely claim `synthetic-substrate`
+each fail it, and `tests/test_enact.py` carries the committed negative case for the pre-filter
+bypass below.
+
+**A gap this ticket found and closed: `twin propose` read the overlay directly, past the
+constraint pre-filter.** `twin options`/`twin price` remove an excluded response — one that
+crosses the universal floor — before anything prices it. Nothing stopped `twin propose` reading
+`overlay.responses` on its own and emitting a signed, derived proposal for that same response with
+a cost beside it: a second door past a filter the first one closes. `twin/enact.py`'s `propose()`
+now refuses a response whose `crosses` names a universal floor id, before it reads a channel or
+builds a body — mirroring the existing `channel not in CHANNELS` refusal in shape and in message.
+It checks the floor only: this verb carries no `--perspective`, so a perspective's own declared red
+lines stay out of scope, and the refusal says so rather than reading as broader than it is.
+`tests/test_enact.py::test_a_response_that_crosses_the_universal_floor_is_refused_not_priced`
+asserts the message names the crossed constraint, not merely that some exception was raised.
 
 **One asymmetry this beat found and did not close.** A perspective's valuation is evidence-graded
 and a mitigation claim is evidence-graded; **a response's `cost` is not**, because the schema has no

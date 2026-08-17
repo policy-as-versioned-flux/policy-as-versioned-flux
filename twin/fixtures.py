@@ -4213,7 +4213,10 @@ _NETFLIX_SPINE: tuple[tuple[str, str, str, str, str, str], ...] = (
         "q4-2010-letter-2011-01-26", "2011-01-26", "streaming-service", "economic",
         "000119312511014840/dex991.htm",
         "The subject's own Q4 2010 letter to shareholders reports passing 20 million subscribers in "
-        "the closing hours of 2010, at 20.01 million, and calls it another outstanding quarter.",
+        "the closing hours of 2010, at 20.01 million, and calls it another outstanding quarter. The "
+        "same letter reports that in November 2010 the subject introduced a $7.99 per month "
+        "pure-streaming plan and raised the price of its combination streaming-and-DVD plans — the "
+        "first of the two dated price changes build ticket 74's price-hold response cites.",
     ),
     (
         "q1-2011-letter-2011-04-25", "2011-04-25", "streaming-service", "economic",
@@ -4317,19 +4320,15 @@ visibility: 0.2
 id: the-personalisation-engineering-group
 role: engineering group
 """,
-    # The same component file, rewritten in this commit to declare what it needs. A `needs` edge
-    # is a component's own `needs` list and has no other home, so the value chain reads as a value
-    # chain; nothing composes along it and it never prices. It is here because adjacency is what
-    # the gameplay lens reads a land-grab precondition from.
-    "orgs/netflix/components/streaming-service.yaml": """\
-id: streaming-service
-name: The subject's streaming service
-kind: activity
-evolution: product
-visibility: 0.8
-needs:
-  - personalisation-technology
-""",
+    # The same component file, rewritten in this commit to declare what it needs — derived from
+    # `_NETFLIX_BASE`'s own string rather than a second literal, so the two cannot drift apart. A
+    # `needs` edge is a component's own `needs` list and has no other home, so the value chain
+    # reads as a value chain; nothing composes along it and it never prices. It is here because
+    # adjacency is what the gameplay lens reads a land-grab precondition from.
+    "orgs/netflix/components/streaming-service.yaml": (
+        _NETFLIX_BASE["orgs/netflix/components/streaming-service.yaml"]
+        + "needs:\n  - personalisation-technology\n"
+    ),
     "orgs/netflix/edges/the-group-maintains-personalisation.yaml": """\
 id: the-group-maintains-personalisation
 type: maintains
@@ -4341,6 +4340,20 @@ note: >-
   technology and the brand, so the subject's own filing is what says it holds this.
 """,
 }
+
+def _require_replaced(text: str, old: str, new: str) -> str:
+    """`text.replace(old, new)`, refused if `old` is not there to replace.
+
+    A plain `.replace()` on a moved anchor returns the original text unchanged with no error — a
+    silent no-op that would ship the un-widened base string under the widened one's own comment.
+    Used below to derive the ensemble's scenario file from `_NETFLIX_BASE`'s own string rather
+    than duplicating it, so "the two stay in sync" is a fact this function checks rather than one
+    trusted to hold.
+    """
+    if old not in text:
+        raise RuntimeError(f"fixture derivation anchor {old!r} not found in the base text")
+    return text.replace(old, new)
+
 
 _NETFLIX_ENSEMBLE: dict[str, str] = {
     "orgs/netflix/world_models/the-subjects-own-framing-2011-07.yaml": """\
@@ -4369,36 +4382,18 @@ note: >-
 beliefs:
   a-priced-separation-precedes-a-domestic-subscriber-reversal: 0.55
 """,
-    # The same scenario file, rewritten in this commit to name all three world models. A model
-    # repository is versioned, so widening an ensemble is an ordinary dated commit — and a rewind
-    # to before this date reads the one-model scenario that actually existed then.
-    "orgs/netflix/scenarios/would-the-twin-have-flagged-it.yaml": """\
-id: would-the-twin-have-flagged-it
-question: >-
-  Reading only the subject's own quarterly reporting, would the twin have had grounds to flag that
-  separating the bundled plans risked a domestic subscriber reversal within two quarters?
-proposition: a-priced-separation-precedes-a-domestic-subscriber-reversal
-at: '2011-01-26'
-horizon: '2011-12-31'
-components:
-  - streaming-service
-  - dvd-by-mail
-world_models:
-  - market-consensus-2011
-  - the-subjects-own-framing-2011-07
-  - the-cannibalisation-sceptic-2011-07
-affected_parties:
-  - id: domestic-members-on-the-bundled-plan
-    who: >-
-      The subject's own domestic members who held the previously bundled plan — real and recorded
-      in the subject's own filing: the Q3 2011 letter (this org's own signal
-      q3-2011-letter-2011-10-24) states that the subject "greatly upset many domestic Netflix
-      members" through the pricing change, and reports about 800,000 of them leaving.
-    consequence: >-
-      The separation is modelled here from the shareholder's perspective, because the shareholder
-      letter is the record that exists. The members who absorbed the price rise hold no perspective
-      this twin runs under, and their leaving is visible only as a subscriber count.
-""",
+    # The same scenario file, widened in this commit to name all three world models — derived from
+    # `_NETFLIX_BASE`'s own string by inserting the two new ids after the one that was already
+    # there, so a later edit to the question, the horizon or the affected-parties register cannot
+    # fork silently between the two copies. A model repository is versioned, so widening an
+    # ensemble is an ordinary dated commit, and a rewind to before this date reads the one-model
+    # scenario that actually existed then.
+    "orgs/netflix/scenarios/would-the-twin-have-flagged-it.yaml": _require_replaced(
+        _NETFLIX_BASE["orgs/netflix/scenarios/would-the-twin-have-flagged-it.yaml"],
+        "world_models:\n  - market-consensus-2011\n",
+        "world_models:\n  - market-consensus-2011\n  - the-subjects-own-framing-2011-07\n"
+        "  - the-cannibalisation-sceptic-2011-07\n",
+    ),
 }
 
 # Everything that had to wait for the Q4 2011 letter (filed 2012-01-25), which is the first one to
@@ -4495,7 +4490,9 @@ note: >-
   DVD service; this account holds that the rebrand carried most of the streaming-side damage, and
   the subject reversed the rebrand itself. The pricing edge is therefore weak here. Three accounts
   rather than two so that "dropping any one changes nothing about the rest" has three to drop
-  from — the same reason the walking-skeleton fixture carries three.
+  from — the walking-skeleton fixture makes the same case with a fourth
+  (`orgs/netflix/causal_accounts/rival-cdn-headwind.yaml`, build ticket 33): more than two rivals
+  is what proves no account is being read as privileged, one to drop and still have a rest.
 """,
     "orgs/netflix/perspectives/the-operator.yaml": """\
 id: the-operator
@@ -4543,11 +4540,12 @@ mitigates:
     max: 0.5
   evidence_grade: 2
   basis: >-
-    Two dated price changes in this same business with subscriber data on both sides of each — the
-    November 2010 change, whose one-quarter impact the Q2 2011 letter reports, and the July 2011
-    separation. That repetition is what the grade rests on. The magnitude **within** the range is
-    the authored part and is stated as such: two instances evidence the relationship, not the
-    0.4.
+    Two dated price changes in this same business, each reported in this org's own filed signal —
+    the November 2010 change (this org's signal q4-2010-letter-2011-01-26, filed two months after
+    it: a $7.99 pure-streaming plan introduced and the combination plans raised) and the July 2011
+    separation (q2-2011-letter-2011-07-25 and q3-2011-letter-2011-10-24, before and after). That
+    repetition is what the grade rests on. The magnitude **within** the range is the authored part
+    and is stated as such: two instances evidence the relationship, not the 0.4.
 note: >-
   The non-technical lever. No engineering: a price held, and a letter. Costed as a range from two
   figures the subject published — a $5.99 monthly uplift for a member on the combined plan ($9.99
