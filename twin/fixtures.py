@@ -4982,6 +4982,338 @@ def build_intel_org(dest: str | Path) -> Path:
     return root
 
 
+# -- Kodak and Maersk: the breadth portfolio, at declared stub depth (build ticket 76, decision
+# tickets 01 and 06) ----------------------------------------------------------------------------
+#
+# Decision ticket 01: portfolio orgs "stay lighter ... and don't carry the backtest burden" the
+# flagships and the answer-key suite do. So each of these is one component, one pre-signal world
+# model, one scenario and two real dated signals — present and sweepable, not a fifth answer key.
+# No outcome is authored for either: that is not this ticket's gap to close, it is decision ticket
+# 01's own boundary for what a portfolio org is. Depth beyond this is each org's own independent
+# upgrade track (build ticket 76 AC 2), never gated on the co-flagships.
+#
+# Decision ticket 06 picked these two for the tempo each one's real history exercises that neither
+# co-flagship does: Kodak is slow-drift capability-rigidity (the subject's own market intelligence
+# forecast the threat decades ahead of the collapse it forecast); Maersk is a single dated cyber
+# incident forcing an operational-resilience response in days, not decades.
+
+KODAK_ORG = "kodak"
+
+_KODAK_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/digital-photography-displaces-the-subjects-film-business.yaml": """\
+id: digital-photography-displaces-the-subjects-film-business
+text: >-
+  Digital capture displaces silver-halide film as the dominant format for the subject's
+  mainstream consumer photography business.
+""",
+}
+
+_KODAK_BASE: dict[str, str] = {
+    "orgs/kodak/components/consumer-film-and-imaging-business.yaml": """\
+id: consumer-film-and-imaging-business
+name: The subject's consumer film and imaging business
+kind: activity
+evolution: product
+visibility: 0.5
+""",
+    "orgs/kodak/world_models/internal-consensus-pre-study.yaml": """\
+id: internal-consensus-pre-study
+name: The subject's own internal consensus, before its market-intelligence study
+credence: 0.8
+note: >-
+  The subject's own culture treated film as durable and digital as a future improvement TO film,
+  not a replacement for it — the frame its 1981 internal study challenged and the frame this
+  fixture's low prior represents.
+beliefs:
+  digital-photography-displaces-the-subjects-film-business: 0.05
+""",
+    "orgs/kodak/scenarios/would-the-twin-have-flagged-it.yaml": """\
+id: would-the-twin-have-flagged-it
+question: >-
+  As of the subject's own internal foresight study, would the twin already have had grounds to
+  flag that digital capture would displace the subject's consumer film business?
+proposition: digital-photography-displaces-the-subjects-film-business
+at: '1981-01-01'
+horizon: '2012-12-31'
+components:
+  - consumer-film-and-imaging-business
+world_models:
+  - internal-consensus-pre-study
+affected_parties:
+  - id: subject-manufacturing-workforce-and-retirees
+    who: The subject's manufacturing and retail workforce, whose jobs and pensions depend on the film business's continued scale.
+    consequence: A confirmed shift to digital threatens their employment and pensions; this scenario is priced from the market's perspective only, never theirs.
+  - id: independent-photo-finishing-partners
+    who: Independent photo-finishing and retail partners whose business model depends on film volume, not party to this model.
+    consequence: A confirmed shift to digital threatens their revenue, with no perspective in this fixture representing them.
+""",
+}
+
+_KODAK_INTERNAL_STUDY: dict[str, str] = {
+    "orgs/kodak/signals/internal-foresight-study-1981.yaml": """\
+id: internal-foresight-study-1981
+date: '1981-01-01'
+steep: technological
+source: >-
+  Retrospective account (Chunka Mui, "How Kodak Failed", Forbes, 2012-01-18), drawing on Vincent
+  Barabba's own account of the subject's 1981 internal market-intelligence study
+statement: >-
+  The subject's own market-intelligence function, under Vincent Barabba, completes an internal
+  study concluding digital photography will displace film as the dominant consumer format, with
+  roughly a ten-year window before the threat becomes acute — an accurate forecast the subject
+  does not act on. Only the year is publicly documented; day and month are not, so this signal is
+  dated to 1981-01-01 as a placeholder for "year known, exact date unknown", named here rather
+  than left silent.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.forbes.com/sites/chunkamui/2012/01/18/how-kodak-failed/
+""",
+}
+
+_KODAK_BANKRUPTCY: dict[str, str] = {
+    "orgs/kodak/signals/chapter-11-filing-2012-01-19.yaml": """\
+id: chapter-11-filing-2012-01-19
+date: '2012-01-19'
+steep: economic
+source: CNN Money, 2012-01-19
+statement: >-
+  The subject and its US subsidiaries file for Chapter 11 bankruptcy protection in the US
+  Bankruptcy Court for the Southern District of New York, having failed to complete the digital
+  transition its own 1981 study forecast.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://money.cnn.com/2012/01/19/news/companies/kodak_bankruptcy/index.htm
+""",
+}
+
+
+# Per-signal evidence text (build ticket 76): both claims grade 1 — the same "dated, publicly
+# documented event" footing every fixture in this file uses — but signal 1's provenance is a
+# retrospective secondary account rather than a contemporaneous filing, and that gap is named here
+# rather than glossed over, because it is part of why this org sits in the portfolio at declared
+# stub depth rather than the backtest suite.
+_KODAK_CLAIM_EVIDENCE: dict[str, str] = {
+    "internal-foresight-study-1981": (
+        "A retrospective, multiply-corroborated secondary account (Barabba's own writing plus "
+        "independent retrospectives concur on date and substance) of a dated 1981 internal "
+        "study, not a contemporaneous filing — weaker provenance than the contemporaneous "
+        "disclosures the flagship and backtest-suite fixtures cite."
+    ),
+    "chapter-11-filing-2012-01-19": (
+        "The signal is a dated, publicly documented event about this business; the citation is "
+        "on the signal itself."
+    ),
+}
+
+
+def _kodak_claim(signal_id: str) -> dict[str, str]:
+    return {
+        f"orgs/kodak/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: consumer-film-and-imaging-business
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "{_KODAK_CLAIM_EVIDENCE[signal_id]}"
+"""
+    }
+
+
+def build_kodak_org(dest: str | Path) -> Path:
+    """The first breadth-portfolio org (build ticket 76): slow-drift capability rigidity.
+
+    Two real, dated, cited signals; no outcome. See `_KODAK_CLAIM_EVIDENCE` for why signal 1's
+    grade-1 claim still names a provenance caveat the others in this file don't need.
+    """
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _KODAK_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="1975-01-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/kodak/meta.yaml": (
+            f"id: {KODAK_ORG}\nunit: overlay\norg: {KODAK_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _KODAK_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the internal study",
+        dated="1980-06-01T00:00:00+00:00")
+
+    for signal_id, files, message, dated in (
+        ("internal-foresight-study-1981", _KODAK_INTERNAL_STUDY, "the internal foresight study",
+         "1981-01-01T09:00:00+00:00"),
+        ("chapter-11-filing-2012-01-19", _KODAK_BANKRUPTCY, "the Chapter 11 filing",
+         "2012-01-19T09:00:00+00:00"),
+    ):
+        _write(root, {**files, **_kodak_claim(signal_id)})
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", message, dated=dated)
+
+    # No outcome commit — decision ticket 01's boundary for a portfolio org, not a gap. See the
+    # module comment above this section.
+    return root
+
+
+# -- Maersk --------------------------------------------------------------------------------------
+
+MAERSK_ORG = "maersk"
+
+_MAERSK_WORLD: dict[str, str] = {
+    "world/meta.yaml": """\
+id: world
+unit: world
+name: Shared world layer
+description: The common landscape. Names no tenant.
+""",
+    "world/propositions/a-single-cyber-incident-idles-global-operations-for-days.yaml": """\
+id: a-single-cyber-incident-idles-global-operations-for-days
+text: >-
+  A single cyber incident idles the subject's global container-shipping IT operations —
+  booking, terminal handling and core enterprise systems — for multiple days at once.
+""",
+}
+
+_MAERSK_BASE: dict[str, str] = {
+    "orgs/maersk/components/global-container-logistics-it.yaml": """\
+id: global-container-logistics-it
+name: The subject's global container-shipping IT operations
+kind: activity
+evolution: product
+visibility: 0.5
+""",
+    "orgs/maersk/world_models/market-consensus-2016.yaml": """\
+id: market-consensus-2016
+name: Market and industry consensus on cyber exposure, pre-incident
+credence: 0.7
+note: >-
+  Container shipping's own operational-technology posture drew limited outside scrutiny before
+  2017; the industry's own contingency planning assumed a cyber incident would degrade one
+  system, not idle global booking and terminal operations at once.
+beliefs:
+  a-single-cyber-incident-idles-global-operations-for-days: 0.04
+""",
+    "orgs/maersk/scenarios/would-the-twin-have-flagged-it.yaml": """\
+id: would-the-twin-have-flagged-it
+question: >-
+  Before the incident, would the twin already have had grounds to flag that a single cyber
+  incident could idle the subject's global container-shipping IT operations for days at once?
+proposition: a-single-cyber-incident-idles-global-operations-for-days
+at: '2017-06-27'
+horizon: '2017-12-31'
+components:
+  - global-container-logistics-it
+world_models:
+  - market-consensus-2016
+affected_parties:
+  - id: shippers-and-supply-chain-customers
+    who: Freight-forwarders and cargo owners relying on the subject's booking and terminal systems, not party to this model.
+    consequence: A multi-day IT outage stops bookings and terminal handling for goods they depend on moving; this scenario is priced from the market's perspective only.
+  - id: port-and-terminal-frontline-staff
+    who: Terminal and logistics staff at the subject's ports, not party to this model.
+    consequence: A forced manual fallback during the outage falls on them directly, with no perspective in this fixture representing them.
+""",
+}
+
+_MAERSK_ATTACK: dict[str, str] = {
+    "orgs/maersk/signals/notpetya-disrupts-it-2017-06-27.yaml": """\
+id: notpetya-disrupts-it-2017-06-27
+date: '2017-06-27'
+steep: technological
+source: The subject's own investor-relations announcement, 2017-06-27
+statement: >-
+  The subject discloses that its IT systems are down across multiple sites and business units
+  because of a cyber attack (the NotPetya malware), forcing a manual fallback across global
+  container-shipping operations.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://investor.maersk.com/news-releases/news-release-details/cyber-attack-update
+""",
+}
+
+_MAERSK_COST: dict[str, str] = {
+    "orgs/maersk/signals/notpetya-cost-disclosed-2017-08-16.yaml": """\
+id: notpetya-cost-disclosed-2017-08-16
+date: '2017-08-16'
+steep: economic
+source: CNBC, 2017-08-16, reporting the subject's own interim financial report
+statement: >-
+  The subject discloses in its interim financial report that the cyberattack is expected to cost
+  the group between USD 200 million and USD 300 million in lost revenue and remediation.
+provenance:
+  observed_by: fixture-author, from the public record
+  url: https://www.cnbc.com/2017/08/16/maersk-says-notpetya-cyberattack-could-cost-300-million.html
+""",
+}
+
+
+def _maersk_claim(signal_id: str) -> dict[str, str]:
+    """Both signals are dated, publicly documented events with primary-source provenance (the
+    subject's own release, or contemporaneous reporting of it) — grade 1, uncontroversially, the
+    same footing as every backtest-suite fixture's own contemporaneous signals."""
+    return {
+        f"orgs/maersk/claims/bind-{signal_id}.yaml": f"""\
+id: bind-{signal_id}
+kind: binding
+signal: {signal_id}
+component: global-container-logistics-it
+evidence_grade: 1
+claimed_by: fixture-author (human)
+evidence: "The signal is a dated, publicly documented event about this business; the citation is on the signal itself."
+"""
+    }
+
+
+def build_maersk_org(dest: str | Path) -> Path:
+    """The second breadth-portfolio org (build ticket 76): a single dated cyber incident and the
+    operational-resilience response it forces. Two real, dated, cited signals; no outcome — the
+    same decision-ticket-01 boundary named on `build_kodak_org`."""
+    root = Path(dest)
+    root.mkdir(parents=True, exist_ok=True)
+    git(root, "init", "-q", "-b", "main", "--object-format=sha1")
+
+    _write(root, _MAERSK_WORLD)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "world layer", dated="2016-01-01T00:00:00+00:00")
+    world_commit = git(root, "rev-parse", "HEAD").strip()
+
+    _write(
+        root,
+        {"orgs/maersk/meta.yaml": (
+            f"id: {MAERSK_ORG}\nunit: overlay\norg: {MAERSK_ORG}\nworld_ref: {world_commit}\n"
+        )},
+    )
+    _write(root, _MAERSK_BASE)
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "the overlay and the scenario, before the incident",
+        dated="2016-06-01T00:00:00+00:00")
+
+    for signal_id, files, message, dated in (
+        ("notpetya-disrupts-it-2017-06-27", _MAERSK_ATTACK, "the incident, disclosed",
+         "2017-06-27T09:00:00+00:00"),
+        ("notpetya-cost-disclosed-2017-08-16", _MAERSK_COST, "the cost, disclosed",
+         "2017-08-16T09:00:00+00:00"),
+    ):
+        _write(root, {**files, **_maersk_claim(signal_id)})
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", message, dated=dated)
+
+    # No outcome commit — decision ticket 01's boundary for a portfolio org, not a gap.
+    return root
+
+
 # -- the one list of fixture repositories (build ticket 72) -----------------------------------
 #
 # Read by `build_standing_library` above and by `twin fixture --name` at the CLI, so a shell
@@ -5001,4 +5333,6 @@ BUILDERS: dict[str, Callable[[str | Path], Path]] = {
     "royal-mail": build_royal_mail_org,
     "netflix": build_netflix_org,
     "intel": build_intel_org,
+    "kodak": build_kodak_org,
+    "maersk": build_maersk_org,
 }
