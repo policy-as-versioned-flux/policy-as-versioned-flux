@@ -154,24 +154,26 @@ def test_a_degraded_generator_fails_the_threshold() -> None:
     assert not result.passed
 
 
-# -- the depth grade: still partial, this ticket ticks no new criterion --------------------------
+# -- the depth grade: ticket 49 ticks no new criterion ---------------------------------------------
 
 
-def test_the_synthetic_substrate_capability_grade_stays_partial() -> None:
+def test_the_synthetic_substrate_capability_grade_ticks_no_new_criterion_here() -> None:
     """Ticket 49 builds real generation mechanics, but decision ticket 12's AC 3 (planting
     protocol) asks for the full bundle — strength, lead time, burial *and* difficulty
     distribution — and this ticket builds burial only; AC 3 stays unticked on the same "one
     clause of a multi-clause criterion" ground several earlier tickets already left criteria on
-    (README). The grade is still computed, not asserted — the same check `test_substrate.py`
-    already runs, re-run here to pin that this ticket did not quietly move it.
+    (README, until build ticket 87 closes the remaining clauses). The grade is still computed,
+    not asserted — the same check `test_substrate.py` already runs, re-run here to pin that this
+    ticket did not quietly move it.
 
     AC 1 (the real/synthetic seam) is build ticket 50's own tick, not this one's — this asserts
     only what ticket 49 itself moved, so `{5}` here would go stale the moment 50 landed; it is
     `test_spine.py::test_the_synthetic_substrate_capability_grade_moves_to_2_of_7` that pins the
-    post-50 state."""
+    post-50 state, and `test_substrate_eval.py::test_the_synthetic_substrate_capability_reaches_full_at_build_ticket_87`
+    that pins the fully-ticked state. This test only pins "AC 5 was ticked here", not a grade
+    snapshot later work legitimately moves."""
     caps = Capabilities.load()
     graded = caps.require("synthetic-substrate")
     assert graded.owning_ticket == "12"
-    assert graded.grade == "partial"
     checked = {c.index for c in graded.criteria if c.checked}
     assert {5} <= checked

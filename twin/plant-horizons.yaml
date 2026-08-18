@@ -17,6 +17,12 @@
 # Its plants are invented, so their horizons are invented too. What is real is the *rule* below and
 # the consequence: `twin/scorer.py` scores a detection after its horizon at LATE_SCORE — near zero,
 # not zero — so a system that finds everything eventually still reports a bad number.
+#
+# STRENGTH (build ticket 87, decision ticket 12's own "strength, lead time, burial, distribution of
+# difficulty"). A unit-interval float per plant: how strong the underlying signal is, judged from
+# its own in-world escalation path, independent of how well it is camouflaged in its surroundings
+# (that is `plant_difficulty`'s job, not this one). Declared, not computed — the planter's own
+# ground truth about severity, the same way the horizon is ground truth about timing.
 schema: twin.plant-horizons/v1
 rule: >-
   A plant's actionability horizon is the last date on which acting on that signal could still
@@ -32,24 +38,28 @@ recipes:
   netflix-2011-operational:
     - signal: an unusual incident review opens after hours, examining access to the member billing export
       horizon: '2011-09-30'
+      strength: 0.75
       reason: >-
         The review is open, so the export's credentials can still be revoked while it runs. It is
         scoped to a quarter's billing data, and at the quarter end that data has been exported in
         full — revoking access afterwards changes nothing that has already left.
     - signal: a press query is withdrawn abruptly, days after an earlier complaint thread was escalated
       horizon: '2011-10-24'
+      strength: 0.55
       reason: >-
         A withdrawn query means the story moved somewhere the subject cannot see, and it can still
         be chased while it is unpublished. The subject's own quarterly disclosure is the last day
         it sets the framing itself; after that it is responding to someone else's.
     - signal: a senior engineer's calendar clears for three unexplained days, following an earlier resignation
       horizon: '2011-11-15'
+      strength: 0.4
       reason: >-
         Three weeks from the cleared calendar to the end of the notice period the resignation
         started. While the engineer is still employed the question can be asked directly; at exit
         the access is revoked, the laptop is wiped, and nobody can establish what the days were.
     - signal: an overnight export of the member table runs outside the scheduled batch, with no ticket raised
       horizon: '2011-09-20'
+      strength: 0.85
       reason: >-
         The batch host keeps thirty days of transfer logs. Until they rotate, where the export went
         is recoverable and the destination can be blocked. After they rotate the export is known to

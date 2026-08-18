@@ -27,6 +27,15 @@ actionability horizon" is enforced here, not merely documented.
 versioned document keyed by recipe id, read the way `twin/decay.yaml` and `twin/evidence-ladder.yaml`
 are. It lives on this side of the seal deliberately — a horizon is ground truth, and
 `twin/detector.py` imports nothing from this module (build ticket 73).
+
+**Strength (build ticket 87, decision ticket 12's own "planting protocol: strength, lead time,
+burial, distribution of difficulty").** Lead time was already the actionability horizon above;
+burial and its distribution are `substrate_eval.plant_difficulty`/`plant_difficulty_spread`. Only
+strength — how loud the ground-truth signal itself is, independent of how well it is buried — had
+no field anywhere. `Plant.strength` is that field: a declared unit-interval value, read from
+`plant-horizons.yaml` beside the horizon and reason it already carries, and enforced the identical
+way — `plant()` refuses a recipe whose planted signals are not every one covered by a strength, the
+same "every plant must carry one" discipline Q3b already established for the horizon.
 """
 
 from __future__ import annotations
@@ -58,8 +67,11 @@ class PlanterError(RuntimeError):
     document has drifted from the recipe it claims to cover."""
 
 
-def horizons_for(recipe: SubstrateRecipe, path: Path | None = None) -> tuple[dict[str, str], dict[str, str]]:
-    """`({signal: horizon}, {signal: reason})` for a committed recipe, validated on read.
+def horizons_for(
+    recipe: SubstrateRecipe, path: Path | None = None
+) -> tuple[dict[str, str], dict[str, str], dict[str, float]]:
+    """`({signal: horizon}, {signal: reason}, {signal: strength})` for a committed recipe,
+    validated on read.
 
     Drift in either direction is refused rather than absorbed. A horizons document naming a signal
     the recipe never plants is a stale seal — the plant it was written for is gone, and the file
@@ -70,6 +82,10 @@ def horizons_for(recipe: SubstrateRecipe, path: Path | None = None) -> tuple[dic
     against `detected_at` as text in `twin/scorer.py`, which is the identical day-string ordering
     the regime gate and `Spine.at` already use, so a horizon in another shape compares wrong rather
     than failing (`twin/spine.py` makes the same choice for the same reason).
+
+    `strength` is a plain unit-interval float (build ticket 87) — how strong the planted signal
+    itself is, a declared property distinct from how well it is buried (`plant_difficulty`) or how
+    long it stays actionable (the horizon above).
     """
     source = path or HORIZONS_PATH
     doc = yaml.safe_load(source.read_text(encoding="utf-8"))
@@ -85,6 +101,7 @@ def horizons_for(recipe: SubstrateRecipe, path: Path | None = None) -> tuple[dic
     planted = set(recipe.planted_signals)
     dates: dict[str, str] = {}
     reasons: dict[str, str] = {}
+    strengths: dict[str, float] = {}
     for entry in entries:
         if not isinstance(entry, dict):
             raise PlanterError(f"{source}: recipe {recipe.id!r} has a horizon entry that is not a mapping: {entry!r}")
@@ -104,8 +121,19 @@ def horizons_for(recipe: SubstrateRecipe, path: Path | None = None) -> tuple[dic
                 f"{source}: {signal!r} declares a horizon with no reason — an undated-looking date "
                 "nobody can argue with is how a self-declared number gets in"
             )
-        dates[signal], reasons[signal] = horizon, reason
-    return dates, reasons
+        if "strength" not in entry:
+            raise PlanterError(
+                f"{source}: {signal!r} declares a horizon with no strength — every plant's own "
+                "severity is declared beside its lead time and burial (decision ticket 12 Q3)"
+            )
+        try:
+            strength = float(entry["strength"])
+        except (TypeError, ValueError):
+            raise PlanterError(f"{source}: {signal!r} declares an unusable strength {entry['strength']!r}") from None
+        if not 0.0 <= strength <= 1.0:
+            raise PlanterError(f"{source}: {signal!r} declares a strength {strength!r} outside [0, 1]")
+        dates[signal], reasons[signal], strengths[signal] = horizon, reason, strength
+    return dates, reasons, strengths
 
 
 @dataclass(frozen=True)
@@ -120,6 +148,7 @@ class Plant:
     index: int
     signal: str
     actionability_horizon: str  # YYYY-MM-DD: the point of no return (decision ticket 12 Q3b)
+    strength: float  # 0..1: how strong the signal itself is, declared apart from its burial (build ticket 87)
 
 
 @dataclass(frozen=True)
@@ -136,12 +165,13 @@ class PlantedWorld:
 def plant(
     recipe: SubstrateRecipe,
     horizons: Mapping[str, str],
+    strengths: Mapping[str, float],
     lines_per_channel: int = LINES_PER_CHANNEL,
 ) -> PlantedWorld:
-    """The planter. One recipe (ticket 48's own, unmodified) and one actionability horizon per
-    planted signal in; a sealed `PlantedWorld` out. `substrate_generator.generate()` (ticket 49,
-    unmodified) does the actual text generation — this function's own job is holding the ground
-    truth apart from what it hands onward.
+    """The planter. One recipe (ticket 48's own, unmodified), one actionability horizon and one
+    strength per planted signal in; a sealed `PlantedWorld` out.
+    `substrate_generator.generate()` (ticket 49, unmodified) does the actual text generation —
+    this function's own job is holding the ground truth apart from what it hands onward.
     """
     missing = [s for s in recipe.planted_signals if s not in horizons]
     if missing:
@@ -149,11 +179,22 @@ def plant(
             f"planter: {len(missing)} planted signal(s) have no declared actionability horizon: "
             f"{missing} — every plant must carry one (decision ticket 12 Q3b)"
         )
+    missing_strengths = [s for s in recipe.planted_signals if s not in strengths]
+    if missing_strengths:
+        raise PlanterError(
+            f"planter: {len(missing_strengths)} planted signal(s) have no declared strength: "
+            f"{missing_strengths} — every plant must carry one, the same discipline as its "
+            "actionability horizon (decision ticket 12 Q3, build ticket 87)"
+        )
+    out_of_range = {s: v for s, v in strengths.items() if s in recipe.planted_signals and not 0.0 <= float(v) <= 1.0}
+    if out_of_range:
+        raise PlanterError(f"planter: strength must be in [0, 1], got {out_of_range}")
     batch = generate(recipe, lines_per_channel)
     ground_truth = tuple(
         Plant(
             channel=p["channel"], index=p["index"], signal=p["signal"],
             actionability_horizon=horizons[p["signal"]],
+            strength=float(strengths[p["signal"]]),
         )
         for p in batch["plants"]
     )

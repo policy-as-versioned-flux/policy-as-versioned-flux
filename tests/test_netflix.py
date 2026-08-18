@@ -85,20 +85,25 @@ def test_every_fidelity_dimension_lands_inside_its_band(
     assert passes(tuple(metrics.values()))
     assert round(metrics["signal_to_noise"].value, 3) == 0.121
     assert round(metrics["plant_difficulty"].value, 3) == 0.275
+    assert round(metrics["plant_difficulty_spread"].value, 3) == 0.6
     assert metrics["spine_consistency"].value == 1.0
     assert round(metrics["reporting_asymmetry"].value, 3) == 0.667
     assert round(metrics["mundanity"].value, 3) == 0.879
+    assert metrics["contamination"].value == 0.0
 
 
 # -- the horizons: declared, or the planter refuses the recipe -------------------------------------
 
 
 def test_every_planted_signal_carries_a_declared_horizon_and_a_reason(recipe: SubstrateRecipe) -> None:
-    dates, reasons = planter.horizons_for(recipe)
+    dates, reasons, strengths = planter.horizons_for(recipe)
     assert set(dates) == set(recipe.planted_signals)
     assert set(reasons) == set(recipe.planted_signals)
+    assert set(strengths) == set(recipe.planted_signals)
     for date in dates.values():
         assert len(date) == 10 and date.startswith("2011-")
+    for strength in strengths.values():
+        assert 0.0 <= strength <= 1.0
 
 
 def test_a_horizon_file_declaring_a_signal_the_recipe_never_plants_is_refused(
@@ -158,7 +163,8 @@ def test_a_horizon_with_no_reason_is_refused(recipe: SubstrateRecipe, tmp_path: 
 
 
 def test_the_walk_finds_one_plant_of_four_and_says_so(recipe: SubstrateRecipe) -> None:
-    world = plant(recipe, planter.horizons_for(recipe)[0])
+    dates, _reasons, strengths = planter.horizons_for(recipe)
+    world = plant(recipe, dates, strengths)
     assert len(world.ground_truth) == 4
     assert "plants" not in world.public
 
@@ -194,7 +200,8 @@ def test_twin_substrate_emits_a_report_carrying_both_halves(
     body = doc["body"]
     assert body["fidelity"]["passes"] is True
     assert [m["name"] for m in body["fidelity"]["metrics"]] == [
-        "signal_to_noise", "plant_difficulty", "spine_consistency", "reporting_asymmetry", "mundanity",
+        "signal_to_noise", "plant_difficulty", "plant_difficulty_spread", "spine_consistency",
+        "reporting_asymmetry", "mundanity", "contamination",
     ]
     assert body["spine"]["anchored_lines"] == 5
     assert body["spine"]["free_running_lines"] == 28
@@ -203,6 +210,7 @@ def test_twin_substrate_emits_a_report_carrying_both_halves(
     for entry in body["detection"]["plants"]:
         assert entry["actionability_horizon"]
         assert entry["horizon_reason"]
+        assert 0.0 <= entry["strength"] <= 1.0
 
 
 def test_the_report_reproduces_byte_for_byte(netflix_repo_dir: Path, tmp_path: Path) -> None:

@@ -52,7 +52,7 @@ bash twin/beat-netflix.sh                  # the whole-engine beat: fear, seize,
 ./bin/twin reliability --score-card C1 --score-card C2 # bins over a pooled population, empty bins shown
 ./bin/twin severity --mu M --sigma S --threshold U --xi X --beta B --alpha A # loss-exceedance: VaR beside TVaR
 ./bin/twin severity-anchor --subject data-breach-loss --alpha A # the same curve, fit from cited public quantiles
-./bin/twin substrate --repo R --org O --recipe F --checkpoint D # five fidelity bands, and every plant scored against its own horizon
+./bin/twin substrate --repo R --org O --recipe F --checkpoint D # seven fidelity bands, and every plant scored against its own horizon
 ./bin/twin drift                           # the Flux drift measurement: coverage, events, no verdict
 ./bin/twin options --repo R --perspective P # the choice set after the pre-filter, survivors costed
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
@@ -1656,18 +1656,20 @@ difficulty-distribution clauses remain the fidelity eval suite's own job (51).
 the substrate chain — 48 (recipe format), 49 (generator), 50 (spine) — and the one that answers
 "what makes this substrate a fair test?" with a **measurement**, not a paragraph. Decision ticket
 12's own resolution names the eval suite as the concrete form of Q1's "measurability wins ties":
-five dimensions, each a **declared target and a computed current value**: signal-to-noise, plant
-difficulty, spine consistency, reporting asymmetry and mundanity. None is a manual eyeball —
-`evaluate_fidelity()` reads a real generated batch and returns a `FidelityMetric` per dimension,
-each carrying its own target band and the value actually measured against it.
+five dimensions at this ticket, each a **declared target and a computed current value**:
+signal-to-noise, plant difficulty, spine consistency, reporting asymmetry and mundanity (build
+ticket 87 later adds two more — plant-difficulty spread and contamination — see "The planting
+protocol's missing legs", below). None is a manual eyeball — `evaluate_fidelity()` reads a real
+generated batch and returns a `FidelityMetric` per dimension, each carrying its own target band
+and the value actually measured against it.
 
 **Tuning is a real loop, not a call that happens to pass.** The generator's own committed mundane
 templates (ticket 49) carry no polarity vocabulary at all, so a batch built from them alone
 measures `reporting_asymmetry == 0.0` — a genuine, honest miss against any target above zero. This
 module's own negative/positive template pools (`NEGATIVE_TEMPLATES` outnumbered 6:3 over
 `POSITIVE_TEMPLATES` — ticket 49's own generator contract is untouched) are mixed at a tunable
-ratio, and `tune()` raises that ratio step by step until every one of the five bands is cleared at
-once. On the real Carillion spine, a balanced 50/50 starting mix measurably misses
+ratio, and `tune()` raises that ratio step by step until every declared band is cleared at
+once (five at this ticket, seven from build ticket 87 on). On the real Carillion spine, a balanced 50/50 starting mix measurably misses
 `reporting_asymmetry` (0.586 against a 0.6 floor); the loop converges in two iterations to a batch
 whose final `reporting_asymmetry` sits at 0.62 — above 0.5, matching the direction of the record's
 real skew, not merely inside a band centred on balance.
@@ -1690,8 +1692,8 @@ read an over-anchored batch as tautologically clean.
 
 **The suite is the acceptance test for ticket 49's depth grade.** Harness guard
 `substrate_fidelity_is_measured_and_tuning_closes_a_real_gap` runs `substrate_generator.generate()`
-end to end through `evaluate_fidelity()`: a properly tuned recipe's real output clears all five
-bands at once, and a degraded batch (balanced polarity, un-camouflaged wording) fails more than
+end to end through `evaluate_fidelity()`: a properly tuned recipe's real output clears every
+declared band at once, and a degraded batch (balanced polarity, un-camouflaged wording) fails more than
 one dimension simultaneously — a harness with no subject proves nothing.
 
 **Ticks `synthetic-substrate` AC 2.** "A fidelity target + a stated list of what would make the
@@ -1809,6 +1811,50 @@ now has its lead-time clause declared per plant and its burial clause measured, 
 unmodelled and there is no declared *distribution* of difficulty across plants — one plant per
 channel at a fixed midpoint, each as hard to find as its wording happens to make it. Two of four
 clauses is not a criterion.
+
+## The planting protocol's missing legs, and the checks that did not exist yet
+
+Build ticket 87 closes decision ticket 12's last three unticked acceptance criteria — AC 3 (the
+planting protocol), AC 6 (anti-contamination) and AC 7 (ethics/non-identification) — moving
+`synthetic-substrate` from 4/7 (`partial`) to **7/7, `full`**, the third capability to reach it.
+
+**AC 3's own remaining clauses.** `twin/planter.py`'s `Plant` gains a `strength` field — a declared
+unit-interval value read from `twin/plant-horizons.yaml` beside the horizon and reason it already
+carries, enforced with the identical "every plant must carry one" discipline `plant()` already
+applies to the horizon (`tests/test_planter.py::test_plant_refuses_a_planted_signal_with_no_declared_strength`).
+The committed Netflix recipe's four plants now declare real, differentiated strengths (0.4-0.85).
+"Distribution of difficulty" was the one clause with no check at all: `plant_difficulty` measured
+only a *mean* landing in a band, so a batch where every plant sat at the identical difficulty
+passed it. `twin/substrate_eval.py`'s new `plant_difficulty_spread()` — the max-minus-min across a
+batch's own per-plant scores, sharing its computation with `plant_difficulty` via one new helper
+— closes that gap as a sixth `TARGETS` dimension: a uniform-difficulty batch
+(`UNCAMOUFLAGED_PLANTED_SIGNALS`, every plant at difficulty 0.0) now genuinely fails it, while the
+camouflaged default and the real committed Netflix substrate both show a real spread (0.333 and
+0.6 respectively).
+
+**AC 6 and AC 7 share one scan, and do two different jobs.** `KNOWN_REAL_ENTITIES` is a small,
+named blocklist — the org roster already committed across the backtest and flagship fixtures
+(Carillion, Enron, Wirecard, NMC Health, Kodak, Netflix, Intel, Maersk, AstraZeneca, Sanofi, Royal
+Mail) plus three real, publicly-named people tied to those same events — deliberately distinct
+from `twin/scoring.py`'s Enron-as-control discount, which prices memorisation on the real-history
+backtest suite and has no view of this module's synthetic output. `contamination_hits()` scans a
+batch's *free-running* content only, skipping any line identical to one of `spine.anchor()`'s own
+inserted facts: those legitimately name the real subject verbatim (Carillion's own spine facts say
+"Carillion" — that is what anchoring is for), so scanning them would flag the consistency mechanism
+decision ticket 12 Q3 requires, not a leak
+(`tests/test_substrate_eval.py::test_contamination_ignores_the_anchored_spine_facts`, which confirms
+a real anchored fact naming Carillion is present and still scores clean). AC 6's own dimension,
+`contamination()`, is a seventh `TARGETS` entry with a zero-tolerance band `(0.0, 0.0)`. AC 7 is the
+harder gate sharing that same scan: `refuse_if_contaminated()` raises rather than reports, wired
+into `substrate_report.report()` before a batch's report is committed as an artefact — proven to
+fire on a planted collision, not merely to run clean:
+`test_refuse_if_contaminated_fires_on_a_planted_real_name_collision` plants "Markus Braun" (real,
+publicly identifiable) into a constructed batch and asserts the raised error names it.
+
+**The self-review found one stale fact in the ticket's own draft**: it named `twin/schema.py` as
+`Plant`'s home; `Plant` has always lived in `twin/planter.py` (schema.py's `Schema`/`SCHEMAS`
+machinery is the *model-repository* format and was never the substrate ground-truth type). The
+field was added where the type actually is.
 
 ## Intel: the forecast nobody, including the twin, can check yet
 
@@ -1943,7 +1989,7 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Two
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Three
 capabilities now reach `full` — computed, not typed, and reached the same way every other tick in
 this table was: real code, cited live.
 
@@ -1956,17 +2002,18 @@ this table was: real code, cited live.
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 6 / 8 |
 | `scenario-engine` | 13 | partial | 4 / 7 |
-| `synthetic-substrate` | 12 | partial | 4 / 7 |
+| `synthetic-substrate` | 12 | full | 7 / 7 |
 | `forecast-book` | 21 | full | 6 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
 | `enactment` | 18 | partial | 4 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**46 of 73**, across thirteen capabilities, two of them `full`. An artefact's overall depth is
+**49 of 73**, across thirteen capabilities, three of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
-where `domain-model` or `forecast-book` is one of the capabilities they cite. `./bin/twin grade`
-prints the denominators, and this table is its output, not a hand-kept count — re-derived here
+where `domain-model`, `forecast-book` or `synthetic-substrate` is one of the capabilities they
+cite. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
+count — re-derived here
 rather than trusting a stale total (the same provisional-total drift this file names repeatedly
 below).
 
@@ -2657,25 +2704,12 @@ Named here so the skeleton cannot quietly become the definition of done.
   reproducible, not a one-off: re-run the same module after a real model swap and it appends a
   fresh entry `detect_regression()` can compare against this baseline.
 - **Substrate generation is a real, tested reference implementation; it is not a live model call.**
-  Build ticket 48 built the recipe format (versioned, seeded) and the authored-or-derived spike:
-  regenerated substrate is classified `authored`, because a real generator will be an LLM call and
-  nothing here can promise it reproduces given the same pins. Build ticket 49 built the generator
-  itself — multi-channel, mundane by default, seeded and regenerable — but as a heuristic stand-in,
-  the same limit `signal-classify` through `gameplay-lens` already carry, not an actual call to a
-  model provider (none is reachable from this suite). Build ticket 50 anchored the substrate
-  against the public record (decision ticket 12 Q3's consistency rule, enforced by `twin/spine.py`
-  rather than only decided), and build ticket 51's `twin/substrate_eval.py` now tunes
-  signal-to-noise, plant difficulty, spine consistency, reporting asymmetry and mundanity against a
-  declared target each — Q3c's negativity-bias resolution is realised in code (`reporting_asymmetry`,
-  measured and produced as the same property), and `tune()` demonstrates a real gap closing over
-  more than one iteration rather than a call built to pass. Build ticket 52 mechanised AC 4's
-  blind/adversarial separation between planter and detector (`twin/planter.py`, `twin/detector.py`,
-  `twin/scorer.py` — see "The planter/detector/scorer split", above): the detector is behaviourally
-  blind to ground truth, checked by AST scan and by indifference to a spliced-in decoy key, and a
-  plant's actionability horizon scores a late detection near zero rather than the same as a timely
-  one. Still not built: decision ticket 12 AC 3's strength and lead-time clauses — only the
-  distribution-of-difficulty and burial clauses have code behind them, across build tickets 49 and
-  51 — which is why `synthetic-substrate` sits at 4/7 rather than higher.
+  The recipe format (versioned, seeded, build ticket 48) and the generator (multi-channel, mundane
+  by default, build ticket 49) are a heuristic stand-in, the same limit `signal-classify` through
+  `gameplay-lens` already carry — no model provider is reachable from this suite. Everything else
+  decision ticket 12 asked for is real code with a live citation (see "The substrate fidelity eval
+  suite", "The planter/detector/scorer split" and "The planting protocol's missing legs", above):
+  `synthetic-substrate` reaches `full`, 7/7, at build ticket 87, the third capability to.
 - **The two-architecture determinism check has never run.** The CI matrix is declared and the
   golden digests are committed; the claim is wired, not proven.
 - **The subjects are fixtures.** Netflix and Intel here are toy value chains with invented

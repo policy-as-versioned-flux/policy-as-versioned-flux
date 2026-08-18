@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 21 \u2014 build ticket 84 closes forecast-book's remaining acceptance criterion (AC 6, the proportionality verdict), so every artefact's capabilities_digest and depth block move; no scoring rule, serialisation or engine output changed",
-  "capabilities_digest": "cd44563850b5da6105cb6d8a8b7d74acd0db34328b9bf0efade7d7c9499d4341",
+  "authorised_by": "decision ticket 12 \u2014 build ticket 87 ticks synthetic-substrate ACs 3/6/7, changing caps.digest embedded in every artefact's pins",
+  "capabilities_digest": "8c7e965dc2aaa912eaaeed7246f1afc1ec61ea49b7d8e56a16aba93e6562e20b",
   "digests": {
-    "blast-radius": "8b5bd89a18f8c9656c62a86d63b4ce220f293d851e82c6209d417726f5ccc133",
-    "bound-signal": "68134dcba529cc55dcef24cf1c4c40cec5b6bd4e0d3f7dad47b66d0113883b72",
-    "forecast-bundle": "9b4becca5b08e0e6f9069a7e208bb49fc0b0ce5de494051544bbccd97866d478",
-    "graph": "dec31ed1f0827ef5eac35609d96f28b5a721a2ca1e6a7a952733f9df9ca8491e",
-    "intervention": "541e52753f6ddc568767f62de9ca8408b25b0f4e56dbf0417b15db8d1703efea",
-    "observation": "6a232e23adcb7fc8b17e7746c8dad23780c7581fb700082b45d7e5689b1bff4a",
-    "priced-impact": "b6190051c101a09a120fd464d30b7ea7ba0d4112298184e365f4816f77d5e7c6",
-    "priced-option-set": "fdaec6089dd4271f248d5ee17d6627a71876d9a086a0e1d2ad6906ebe62ca004",
-    "propagation": "c084c9c27f73f2ee38808c8b9962fb4997820385b20360c32231aa3c8bec65ed",
-    "rewound-model": "777d52808394af121291894843d9c69187cbd000769dca2ad46faed424455c9b",
-    "scenario-exposure": "5e0472355e430b7a3a13d1672894cec5cd5a0f2d2312089d89dbb42a887be378",
-    "score-card": "fde7e555fd1c187709ca3f34689b1350284cf5264bfcf45fb56af09bf684c2b5"
+    "blast-radius": "4141991e6b9c6520e5ec0ed4d56307d037b6cd9eeed51c4b2d83b0ac6e5a85e4",
+    "bound-signal": "60d688948a20b442547fb8426d4017afbae9ad31b574375907b4508ff3280f77",
+    "forecast-bundle": "eefb8207ff44c3c9222bf03a1b95d6ef68f52ca6dc3086335b1935889271812b",
+    "graph": "0be8798188d17a3e220147812a58076393b79f6fc0ff7424c85678f938a42e79",
+    "intervention": "0d1564104f9a7506fa01b438c3aacbf4f9cc5bb68a255fe705835b0af0f77900",
+    "observation": "bcd1d6cf63ef24c46dce5ae50a55c8f3cff0f51389d003e1208aeb8bd787cc1d",
+    "priced-impact": "bb35eb808b5dbecf2c2f03073e6fab6d4f92d792a89f39f7c9ebed084e56d8b0",
+    "priced-option-set": "ceb0d3f5c71b1e21e690a69d504d785fd21c8296c9b9c2ec5b3d9cc4ecce6d69",
+    "propagation": "a3e107117064e215ecdf641bedc9b8479d001fb3a3d3ca2b09c6bcd1471c00d9",
+    "rewound-model": "168ac60075f87d455c6a69ab805a0a7c07e269f5afd212f626acdca6465147b8",
+    "scenario-exposure": "f77cf977fd40f37d49f04bcf21302bcb94de0283e6eaee1042c25cad81b8871d",
+    "score-card": "9fa8b7a367868e9cb7e1641e81a2683afd93d964791ae0d09a0dc8f777fcd1c8"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

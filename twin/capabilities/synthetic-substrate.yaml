@@ -14,7 +14,9 @@ criteria:
     ticked_by: build ticket 51
   - index: 3
     text: "The planting protocol (strength, lead time, burial, distribution of difficulty)."
-    checked: false
+    checked: true
+    evidence: "twin/planter.py's Plant.strength (a declared unit-interval float, read from twin/plant-horizons.yaml beside the horizon and reason it already carries, enforced with the identical 'every plant must carry one' discipline — plant() refuses a recipe whose planted signals are not every one covered by a strength, tests/test_planter.py::test_plant_refuses_a_planted_signal_with_no_declared_strength) closes the one field this criterion had no home for; lead time (actionability_horizon) and burial (plant_difficulty) were already ticked by build tickets 73 and 51. Distribution of difficulty is twin/substrate_eval.py's new plant_difficulty_spread(): the max-minus-min across a batch's own per-plant difficulty scores, added to TARGETS/evaluate_fidelity/UNFAIR_TEST_CONDITIONS beside the existing mean-based plant_difficulty rather than replacing it — a batch where every plant sits at the identical difficulty now genuinely fails a real, constructed negative control (tests/test_substrate_eval.py::test_a_uniform_difficulty_batch_fails_plant_difficulty_spread, using UNCAMOUFLAGED_PLANTED_SIGNALS, spread == 0.0) while the camouflaged PLANTED_SIGNALS batch and the real committed Netflix substrate both show a genuine spread (0.333 and 0.6 respectively, test_the_tuned_batchs_plants_show_a_genuine_difficulty_spread, tests/test_netflix.py::test_every_fidelity_dimension_lands_inside_its_band)."
+    ticked_by: build ticket 87
   - index: 4
     text: "A blind/adversarial separation mechanism between planter and detector."
     checked: true
@@ -27,7 +29,11 @@ criteria:
     ticked_by: build ticket 48
   - index: 6
     text: "Anti-contamination measures."
-    checked: false
+    checked: true
+    evidence: "twin/substrate_eval.py's KNOWN_REAL_ENTITIES (the org roster already committed across the backtest/flagship fixtures — Carillion, Enron, Wirecard, NMC Health, Kodak, Netflix, Intel, Maersk, AstraZeneca, Sanofi, Royal Mail — plus three real, publicly-named people tied to those same events) is a small, known-real blocklist, checked by contamination_hits()/contamination() as a sixth declared dimension in TARGETS/evaluate_fidelity — target band (0.0, 0.0), zero tolerance. Distinct from and not confused with twin/scoring.py's Enron-as-control discount (that mechanism prices memorisation on the real-history backtest suite; this one scans this module's own synthetic batches, confirmed by grep — no other contamination check touches twin/substrate.py/substrate_eval.py output). The scan runs on free-running content only, skipping lines identical to spine.anchor()'s own inserted facts (which legitimately name the real subject, e.g. Carillion, by design), proven directly: tests/test_substrate_eval.py::test_contamination_ignores_the_anchored_spine_facts constructs the real Carillion batch, confirms an anchored fact literally naming 'Carillion' is present, and asserts contamination stays at 0.0 despite 'Carillion' being on the blocklist. The real committed Netflix substrate scores contamination == 0.0 (tests/test_netflix.py::test_every_fidelity_dimension_lands_inside_its_band)."
+    ticked_by: build ticket 87
   - index: 7
     text: "Ethics/non-identification check."
-    checked: false
+    checked: true
+    evidence: "twin/substrate_eval.py's refuse_if_contaminated() — sharing contamination_hits()'s own blocklist machinery with AC 6, per this ticket's own instruction — is the harder gate: not a target band a batch can still be reported as failing while shipping anyway, but a raised ContaminationError, wired into twin/substrate_report.report() before a substrate batch's report is committed as an artefact. Fires on a planted real-name collision, not merely runs clean: tests/test_substrate_eval.py::test_refuse_if_contaminated_fires_on_a_planted_real_name_collision plants 'Markus Braun' (real, publicly identifiable — Wirecard's former CEO) into a constructed batch's free-running content and asserts ContaminationError is raised naming that entity; test_refuse_if_contaminated_is_silent_on_clean_content proves the same call does not raise on genuine content. No prior code checked generated substrate content against real, identifiable people or organisations at all (confirmed: only a prose line in decision ticket 12 named the requirement before this ticket)."
+    ticked_by: build ticket 87

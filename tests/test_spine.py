@@ -225,11 +225,11 @@ def test_the_synthetic_substrate_capability_grade_moves_to_2_of_7() -> None:
     uses, for the identical reason — asserting exact equality here would go stale the moment a
     later ticket ticks a further criterion, which is exactly what build ticket 51 does next (AC
     2). It is `tests/test_substrate_eval.py::test_the_synthetic_substrate_capability_grade_moves_to_3_of_7`
-    that pins the post-51 state.
+    that pins the post-51 state, and `test_the_synthetic_substrate_capability_reaches_full_at_build_ticket_87`
+    that pins the fully-ticked state. The grade itself is not re-asserted here for the same reason.
     """
     caps = Capabilities.load()
     graded = caps.require("synthetic-substrate")
     assert graded.owning_ticket == "12"
-    assert graded.grade == "partial"
     checked = {c.index for c in graded.criteria if c.checked}
     assert {1, 5} <= checked

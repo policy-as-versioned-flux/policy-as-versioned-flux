@@ -1,5 +1,5 @@
-"""The substrate fidelity eval suite (build ticket 51): fidelity is defined and tuned by
-measurement — five declared, targeted dimensions, a real tuning loop that closes a genuine gap,
+"""The substrate fidelity eval suite (build tickets 51, 87): fidelity is defined and tuned by
+measurement — seven declared, targeted dimensions, a real tuning loop that closes a genuine gap,
 and negativity bias measured as the same property as reporting asymmetry.
 """
 
@@ -9,23 +9,29 @@ from pathlib import Path
 
 import pytest
 
-from twin import fixtures
+from twin import fixtures, spine as spine_mod
 from twin.grades import Capabilities
 from twin.model import Overlay
 from twin.repo import ModelRepo
 from twin.spine import Spine
 from twin.substrate_generator import MIN_MUNDANE_FRACTION, generate
 from twin.substrate_eval import (
+    KNOWN_REAL_ENTITIES,
     PLANTED_SIGNALS,
     TARGETS,
     UNCAMOUFLAGED_PLANTED_SIGNALS,
     UNFAIR_TEST_CONDITIONS,
+    ContaminationError,
     FidelityMetric,
     _recipe_for,
     classify_polarity,
+    contamination,
+    contamination_hits,
     evaluate_fidelity,
     passes,
     plant_difficulty,
+    plant_difficulty_spread,
+    refuse_if_contaminated,
     reporting_asymmetry,
     spine_consistency,
     tune,
@@ -60,7 +66,7 @@ def earliest_checkpoint(spine: Spine) -> str:
 # -- each dimension is a computed metric with a declared target and a current value --------------
 
 
-def test_evaluate_fidelity_returns_five_named_dimensions_with_targets_and_values(
+def test_evaluate_fidelity_returns_every_named_dimension_with_targets_and_values(
     spine: Spine, latest_checkpoint: str
 ) -> None:
     batch = generate(_recipe_for(0.6, PLANTED_SIGNALS, seed=42))
@@ -85,8 +91,8 @@ def test_within_target_is_computed_from_the_declared_band_not_a_flag() -> None:
 
 def test_the_tuned_generator_output_passes_every_declared_target(spine: Spine, latest_checkpoint: str) -> None:
     """The suite as the acceptance test for ticket 49's depth grade: a properly tuned recipe's
-    real generator output — `substrate_generator.generate()`, unmodified — clears all five bands
-    at once, not merely one at a time."""
+    real generator output — `substrate_generator.generate()`, unmodified — clears every declared
+    band at once, not merely one at a time."""
     result = tune(spine, latest_checkpoint)
     assert result.converged
     assert passes(result.final.metrics)
@@ -219,13 +225,115 @@ def test_the_synthetic_substrate_capability_grade_moves_to_3_of_7() -> None:
     list) — the eval suite itself is the realisation, not a claim about it. AC 1 (build ticket 50)
     and AC 5 (build ticket 48) are unchanged; re-run here to pin exactly what this ticket moved.
 
-    A subset check, not an exact match: a later ticket (build ticket 52 ticks AC 4) legitimately
-    grows this set further, and this test's own job is only "ticket 51's tick still holds", the
-    same forward-compatible shape build ticket 50 left `test_substrate.py` and
-    `test_substrate_generator.py` in for the identical reason."""
+    A subset check, not an exact match: later tickets (52 ticks AC 4; 87 ticks ACs 3, 6, 7 and
+    moves the capability to `full`) legitimately grow this set further, and this test's own job is
+    only "ticket 51's tick still holds", the same forward-compatible shape build ticket 50 left
+    `test_substrate.py` and `test_substrate_generator.py` in for the identical reason. The grade
+    itself is re-asserted at build ticket 87's own test, below, rather than pinned here."""
     caps = Capabilities.load()
     graded = caps.require("synthetic-substrate")
     assert graded.owning_ticket == "12"
-    assert graded.grade == "partial"
     checked = {c.index for c in graded.criteria if c.checked}
     assert {1, 2, 5} <= checked
+
+
+def test_the_synthetic_substrate_capability_reaches_full_at_build_ticket_87() -> None:
+    """AC 3 (planting protocol: strength, distribution of difficulty), AC 6 (anti-contamination)
+    and AC 7 (ethics/non-identification) close the last three unticked ACs — decision ticket 12's
+    own seven, all seven now checked."""
+    caps = Capabilities.load()
+    graded = caps.require("synthetic-substrate")
+    assert graded.grade == "full"
+    checked = {c.index for c in graded.criteria if c.checked}
+    assert checked == {1, 2, 3, 4, 5, 6, 7}
+
+
+# -- distribution of difficulty: AC 3's remaining clause (build ticket 87) -----------------------
+
+
+def test_plant_difficulty_spread_is_zero_for_fewer_than_two_plants() -> None:
+    no_plants = {"channels": {"events": ["a line"]}, "plants": []}
+    assert plant_difficulty_spread(no_plants) == 0.0
+    one_plant = generate(_recipe_for(0.6, PLANTED_SIGNALS[:1], seed=42))
+    assert plant_difficulty_spread(one_plant) == 0.0
+
+
+def test_a_uniform_difficulty_batch_fails_plant_difficulty_spread(spine: Spine, latest_checkpoint: str) -> None:
+    """Every plant in `UNCAMOUFLAGED_PLANTED_SIGNALS` shares no vocabulary with its surroundings
+    at all — a real batch where every plant sits at the identical (trivial) difficulty, so the
+    spread across them is genuinely zero, not merely asserted plausible."""
+    batch = generate(_recipe_for(0.5, UNCAMOUFLAGED_PLANTED_SIGNALS, seed=42))
+    metrics = {m.name: m for m in evaluate_fidelity(batch, spine, latest_checkpoint)}
+    assert metrics["plant_difficulty_spread"].value == 0.0
+    assert not metrics["plant_difficulty_spread"].within_target
+
+
+def test_the_tuned_batchs_plants_show_a_genuine_difficulty_spread(spine: Spine, latest_checkpoint: str) -> None:
+    """The camouflaged plants land at genuinely different difficulty scores — the real spread AC 3
+    asks to be measured, not a mean that happens to fall inside a band."""
+    batch = generate(_recipe_for(0.6, PLANTED_SIGNALS, seed=42))
+    metrics = {m.name: m for m in evaluate_fidelity(batch, spine, latest_checkpoint)}
+    assert metrics["plant_difficulty_spread"].value > 0.0
+    assert metrics["plant_difficulty_spread"].within_target
+
+
+# -- contamination: AC 6's fidelity dimension, and AC 7's harder refusal (build ticket 87) --------
+
+
+def test_contamination_is_zero_for_ordinary_generated_content(spine: Spine, latest_checkpoint: str) -> None:
+    batch = generate(_recipe_for(0.6, PLANTED_SIGNALS, seed=42))
+    metrics = {m.name: m for m in evaluate_fidelity(batch, spine, latest_checkpoint)}
+    assert metrics["contamination"].value == 0.0
+    assert metrics["contamination"].within_target
+
+
+def test_contamination_hits_fires_on_a_real_entity_in_free_running_content() -> None:
+    """The planted collision AC 7 asks to be proven, not merely run: a line naming a real,
+    identifiable person (`KNOWN_REAL_ENTITIES`) is caught, and a clean batch is not."""
+    assert "Jeffrey Skilling" in KNOWN_REAL_ENTITIES
+    clean = {"channels": {"events": ["An incident review opens after hours."]}}
+    assert contamination_hits(clean) == ()
+    assert contamination(clean) == 0.0
+
+    dirty = {"channels": {"events": ["A note references Jeffrey Skilling's old memo."]}}
+    hits = contamination_hits(dirty)
+    assert len(hits) == 1
+    assert hits[0]["entity"] == "Jeffrey Skilling"
+    assert hits[0]["channel"] == "events"
+    assert contamination(dirty) == 1.0
+
+
+def test_contamination_ignores_the_anchored_spine_facts(spine: Spine, latest_checkpoint: str) -> None:
+    """`spine.anchor()` inserts the real Carillion spine's own statements verbatim, and some of
+    those statements literally name 'Carillion' — the org this substrate is *for*. Scanning the
+    anchored half would flag the consistency mechanism decision ticket 12 Q3 requires, not a leak,
+    so it must score clean."""
+    assert "Carillion" in KNOWN_REAL_ENTITIES
+    batch = generate(_recipe_for(0.6, PLANTED_SIGNALS, seed=42))
+    anchored = spine_mod.anchor(batch, spine, latest_checkpoint)
+    assert any("Carillion" in fact["statement"] for fact in anchored["anchored"]), (
+        "the fixture no longer anchors a fact naming Carillion — this test's own premise has drifted"
+    )
+    assert contamination_hits(anchored) == ()
+    assert contamination(anchored) == 0.0
+
+
+def test_refuse_if_contaminated_is_silent_on_clean_content(spine: Spine, latest_checkpoint: str) -> None:
+    batch = generate(_recipe_for(0.6, PLANTED_SIGNALS, seed=42))
+    anchored = spine_mod.anchor(batch, spine, latest_checkpoint)
+    refuse_if_contaminated(anchored)  # does not raise
+
+
+def test_refuse_if_contaminated_fires_on_a_planted_real_name_collision() -> None:
+    """AC 7, literally: a check that flags a generated entity matching a real, identifiable person
+    or organisation before a batch is committed — proven by planting the collision and watching
+    the refusal name it, not merely calling the function and observing it runs clean."""
+    contaminated = {
+        "channels": {
+            "events": ["A routine deploy note."],
+            "hr": ["An exit interview references Markus Braun's old team."],
+        },
+        "plants": [],
+    }
+    with pytest.raises(ContaminationError, match="Markus Braun"):
+        refuse_if_contaminated(contaminated)

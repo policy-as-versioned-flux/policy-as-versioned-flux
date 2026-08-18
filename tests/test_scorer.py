@@ -14,7 +14,10 @@ from twin.grades import Capabilities
 from twin.planter import SHARED_PRIOR_LIMITATION, Plant
 from twin.scorer import LATE_SCORE, MISSED_SCORE, TIMELY_SCORE, ScoreResult, score
 
-_PLANT = Plant(channel="events", index=3, signal="a distinctive planted line", actionability_horizon="2018-06-01")
+_PLANT = Plant(
+    channel="events", index=3, signal="a distinctive planted line",
+    actionability_horizon="2018-06-01", strength=0.6,
+)
 
 
 def test_score_takes_ground_truth_and_detections_as_two_independent_arguments() -> None:
@@ -75,9 +78,9 @@ def test_every_score_result_carries_the_shared_prior_limitation_verbatim() -> No
 
 def test_hit_rate_and_mean_score_across_multiple_plants() -> None:
     """One timely, one late (its own horizon already passed by `detected_at`), one missed."""
-    timely = Plant(channel="events", index=0, signal="s1", actionability_horizon="2018-12-01")
-    late = Plant(channel="hr", index=1, signal="s2", actionability_horizon="2018-01-01")
-    missed = Plant(channel="telemetry", index=2, signal="s3", actionability_horizon="2018-06-01")
+    timely = Plant(channel="events", index=0, signal="s1", actionability_horizon="2018-12-01", strength=0.5)
+    late = Plant(channel="hr", index=1, signal="s2", actionability_horizon="2018-01-01", strength=0.5)
+    missed = Plant(channel="telemetry", index=2, signal="s3", actionability_horizon="2018-06-01", strength=0.5)
     detections = (
         Detection(channel="events", index=0, line="x", outlier_score=0.0),
         Detection(channel="hr", index=1, line="x", outlier_score=0.0),
@@ -95,12 +98,13 @@ def test_hit_rate_and_mean_score_across_multiple_plants() -> None:
 def test_the_synthetic_substrate_capability_grade_moves_to_4_of_7() -> None:
     """Build ticket 52 ticks decision ticket 12's AC 4 (a blind/adversarial separation mechanism
     between planter and detector) — the planter/detector/scorer split itself is the realisation.
-    AC 3 (planting protocol) stays unticked: the actionability horizon covers the lead-time clause
-    but "strength" is untouched, the same "one clause of a multi-clause criterion" ground build
-    tickets 49 and 51 already left it on."""
+
+    A subset check, not an exact match — the same forward-compatible shape
+    `test_spine.py`/`test_substrate_generator.py`'s own pins use, since build ticket 87 legitimately
+    ticks AC 3, 6 and 7 later and moves the capability to `full`; this test's own job is only
+    "ticket 52's tick still holds"."""
     caps = Capabilities.load()
     graded = caps.require("synthetic-substrate")
     assert graded.owning_ticket == "12"
-    assert graded.grade == "partial"
     checked = {c.index for c in graded.criteria if c.checked}
-    assert checked == {1, 2, 4, 5}
+    assert {1, 2, 4, 5} <= checked

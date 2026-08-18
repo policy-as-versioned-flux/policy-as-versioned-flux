@@ -62,7 +62,7 @@ def report(
     repo: ModelRepo, caps: Capabilities, org: str, recipe_path: str | Path, checkpoint: str,
     detected_at: str, command: list[str],
 ) -> Artefact:
-    """One recipe against one org's spine at one checkpoint: five fidelity dimensions, and the
+    """One recipe against one org's spine at one checkpoint: seven fidelity dimensions, and the
     planter/detector/scorer walk over the plants that batch actually carries.
 
     `detected_at` is the date the detector's run is scored as having happened, which is what
@@ -79,10 +79,14 @@ def report(
     metrics = substrate_eval.evaluate_fidelity(batch, spine, checkpoint)
     # The over-anchoring attack, counted (build ticket 50). The free-running half has to dominate,
     # or a reader diffing the substrate against the spine recovers the plants directly.
-    split = spine_mod.diff_against_spine(spine_mod.anchor(batch, spine, checkpoint), spine)
+    anchored = spine_mod.anchor(batch, spine, checkpoint)
+    split = spine_mod.diff_against_spine(anchored, spine)
+    # AC 7's hard gate (build ticket 87): refused before the batch's own report is committed as an
+    # artefact, not merely reported as a failing fidelity dimension a reader could ignore.
+    substrate_eval.refuse_if_contaminated(anchored)
 
-    dates, reasons = planter.horizons_for(recipe)
-    world = planter.plant(recipe, dates)
+    dates, reasons, strengths = planter.horizons_for(recipe)
+    world = planter.plant(recipe, dates, strengths)
     result = score(world.ground_truth, detect(world.public), detected_at=detected_at)
 
     return Artefact(
@@ -144,6 +148,7 @@ def _detection(result: ScoreResult, reasons: dict[str, str]) -> dict[str, Any]:
                 "signal": p.plant.signal,
                 "actionability_horizon": p.plant.actionability_horizon,
                 "horizon_reason": reasons[p.plant.signal],
+                "strength": p.plant.strength,
                 "detected": p.detected,
                 "timely": p.timely,
                 "score": p.score,

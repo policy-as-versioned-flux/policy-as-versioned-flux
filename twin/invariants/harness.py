@@ -1372,12 +1372,12 @@ def _substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants(ctx
 
 @harness_check("substrate_fidelity_is_measured_and_tuning_closes_a_real_gap")
 def _substrate_fidelity_is_measured_and_tuning_closes_a_real_gap(ctx: Context) -> str:
-    """The substrate fidelity eval suite (build ticket 51, decision ticket 12): fidelity is
-    *defined and tuned by measurement*, not asserted in prose — five declared, targeted
-    dimensions (signal-to-noise, plant difficulty, spine consistency, reporting asymmetry,
-    mundanity), a real tuning loop that closes a genuine gap rather than one built to pass on the
-    first call, and negativity bias measured as the same property as reporting asymmetry
-    (decision ticket 12 Q3c, spec story 60).
+    """The substrate fidelity eval suite (build tickets 51, 87; decision ticket 12): fidelity is
+    *defined and tuned by measurement*, not asserted in prose — seven declared, targeted
+    dimensions (signal-to-noise, plant difficulty, plant-difficulty spread, spine consistency,
+    reporting asymmetry, mundanity, contamination), a real tuning loop that closes a genuine gap
+    rather than one built to pass on the first call, and negativity bias measured as the same
+    property as reporting asymmetry (decision ticket 12 Q3c, spec story 60).
 
     A guard on the suite rather than an invariant, the same shape
     `substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants` is: this asserts
@@ -1385,8 +1385,8 @@ def _substrate_fidelity_is_measured_and_tuning_closes_a_real_gap(ctx: Context) -
     sixteen fixed names.
 
     Five legs, on the real Carillion spine (build ticket 38) `spine.py`'s own guard already
-    builds from. First, `evaluate_fidelity()` returns exactly the five named dimensions, each
-    carrying its own declared target band from `TARGETS` — checked against real output, not
+    builds from. First, `evaluate_fidelity()` returns exactly the declared dimensions named in
+    `TARGETS`, each carrying its own declared target band — checked against real output, not
     trusted from the module docstring. Second, the real gap `tune()` exists to close: a balanced
     (50/50) template mix genuinely misses the `reporting_asymmetry` target — not a strawman built
     to fail. Third, `tune()` converges over more than one iteration to a batch that clears every
@@ -1412,7 +1412,7 @@ def _substrate_fidelity_is_measured_and_tuning_closes_a_real_gap(ctx: Context) -
     tuned_batch = se.generate(se._recipe_for(0.6, se.PLANTED_SIGNALS, seed=42))
     metrics = se.evaluate_fidelity(tuned_batch, spine, checkpoint)
     if {m.name for m in metrics} != set(se.TARGETS):
-        raise Violated(f"evaluate_fidelity() did not return exactly the five declared dimensions: {[m.name for m in metrics]}")
+        raise Violated(f"evaluate_fidelity() did not return exactly the {len(se.TARGETS)} declared dimensions: {[m.name for m in metrics]}")
 
     balanced_batch = se.generate(se._recipe_for(0.5, se.PLANTED_SIGNALS, seed=42))
     balanced_metrics = {m.name: m for m in se.evaluate_fidelity(balanced_batch, spine, checkpoint)}
@@ -1440,7 +1440,7 @@ def _substrate_fidelity_is_measured_and_tuning_closes_a_real_gap(ctx: Context) -
         raise Violated(f"the degraded batch failed only {failing} — expected more than one dimension to catch it")
 
     return (
-        "evaluate_fidelity() returns exactly the five declared dimensions; a balanced 50/50 mix "
+        f"evaluate_fidelity() returns exactly the {len(se.TARGETS)} declared dimensions; a balanced 50/50 mix "
         f"genuinely misses reporting_asymmetry; tune() converges in {result.iterations} iteration(s) "
         f"to a batch passing every band, with reporting_asymmetry={final_asymmetry} skewing negative; "
         f"a degraded batch fails {len(failing)} dimension(s) at once ({', '.join(sorted(failing))})"
@@ -1499,7 +1499,7 @@ def _planter_detector_scorer_are_structurally_separated(ctx: Context) -> str:
         ),
         model_version="toy-model-v1", planted_signals=(signal,),
     )
-    world = planter_mod.plant(recipe, horizons={signal: "2018-06-01"})
+    world = planter_mod.plant(recipe, horizons={signal: "2018-06-01"}, strengths={signal: 0.6})
     if "plants" in world.public:
         raise Violated("PlantedWorld.public still carries the 'plants' key — ground truth leaked to the detector")
 
@@ -1601,10 +1601,12 @@ def _netflix_substrate_is_free_running_and_every_plant_carries_a_horizon(ctx: Co
             "search for the plants"
         )
 
-    dates, reasons = planter_mod.horizons_for(recipe)
-    missing = [s for s in recipe.planted_signals if s not in dates or not reasons.get(s)]
+    dates, reasons, strengths = planter_mod.horizons_for(recipe)
+    missing = [
+        s for s in recipe.planted_signals if s not in dates or not reasons.get(s) or s not in strengths
+    ]
     if missing:
-        raise Violated(f"{len(missing)} committed plant(s) carry no declared horizon or reason: {missing}")
+        raise Violated(f"{len(missing)} committed plant(s) carry no declared horizon, reason or strength: {missing}")
 
     drifted = ctx.tmp / "drifted-horizons.yaml"
     drifted.write_text(

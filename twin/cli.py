@@ -1157,7 +1157,7 @@ def cmd_index(args: argparse.Namespace) -> int:
 def cmd_substrate(args: argparse.Namespace) -> int:
     """The substrate's fidelity and its planted-signal walk, in one artefact (build ticket 73).
 
-    Prints the honest numbers before emitting: five dimensions with their bands, and a hit rate
+    Prints the honest numbers before emitting: seven dimensions with their bands, and a hit rate
     that is whatever the detector managed. `twin/detector.py` is a lexical-outlier stand-in, so a
     low rate here is a fact about that heuristic, not about the subject — which is why the
     shared-prior limitation prints beside it rather than in a footnote.
