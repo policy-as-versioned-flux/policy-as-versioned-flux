@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 10 \u2014 build ticket 83 closes twin-inside-twin AC 2, 4, 5 (threat model, Goodhart position, misuse-of-the-twin-itself), moving the capability to full and changing every artefact's capabilities_digest pin",
-  "capabilities_digest": "2612a1b249c9bb63c43b5900e88d56a83d96949a2790d651174701674816e5b6",
+  "authorised_by": "decision ticket 18 \u2014 enactment reaches full, AC 5 closed (build ticket 86)",
+  "capabilities_digest": "06e498b9c183e343a58cff6d6f6ba4bcb948f17f9b1069a9e90cc3351f1b15ec",
   "digests": {
-    "blast-radius": "198efdeede09f7a5d6b3cc71e363867c03d69b19f30b3720076fabe377926706",
-    "bound-signal": "12735a264daa365d18886ea88e45e01d925a2040252b2b2c513fc578ff3fabd7",
-    "forecast-bundle": "8b0b3bcb6d3efde3b788f0ea4a14c865d71372c4b9bd792b97d18159c155ec41",
-    "graph": "b591ed9583f26775764c4e23755057b9eee8166f7c87e66b1c38214863f7fb22",
-    "intervention": "f6b54e14072581f206d4dbe2a0e6f0917d8ffabde27ca0ca0fbaceaf2da4986b",
-    "observation": "7055db6dd8d095a100e82f633feee592bae64c74a86bb20940c321fda6626181",
-    "priced-impact": "9461a0f6e3f753ea8daaa9bfd57812efd58c45537b4fcafac18e5329dc43a74c",
-    "priced-option-set": "a02aa708a8e21684ad812d6fc1236e13380011457810029d2baa4edab8ff2004",
-    "propagation": "9e52439f9bb372bf1630edbb4957f689221f57386a12592a1d1415cd6c27a4b2",
-    "rewound-model": "6985f44de7af9d10a186e0d699d7f58b6a54890361096d1aac5fe9da3d9e2ac6",
-    "scenario-exposure": "2fe7788735e63d14032b76c6d75df592f39d52aea35007e2c0d7fab373f5ea12",
-    "score-card": "392e7ff8a836dd5583a89a2a1dab6e238c1721c0d0ee0074cafb39cdcb32aa69"
+    "blast-radius": "67f4332c611ec668f8a576424ab1a10617b9d525284f4263e37bdc5ba0e9daa9",
+    "bound-signal": "aa9c90718a8192b395541d5c098f8843244d5aa3d8aaa29ccc0b0613e792d91f",
+    "forecast-bundle": "3c203038e31ce7d26189a4d6128ebdbce24f3a38f30eb40216d18b2f4529f0b3",
+    "graph": "87afd7bac7ddf897398f83c02c9cbd54bb56a30bebdecf98120d5f4d86d6ecb8",
+    "intervention": "974b5768025139deb349bc5edcabd599c7ef4b67d7128dd4319675c2b3f0dd4f",
+    "observation": "7bae3da2c1da009552a54db2e59109de39067f5ef509a6b1144d54dbf30f525b",
+    "priced-impact": "e54809c7b8d1dc022224115dd6d7cc17a3b71704122e310727a9d60840892496",
+    "priced-option-set": "b1485637e6c248e61d9f1be148582301774adfe435245bdfc4bfea46a143e959",
+    "propagation": "d16600d3c633b7a385df6fb7a28dd374e54a03688a87dd8adf6f9f85ddf311ea",
+    "rewound-model": "bcf77459a9bca45de91d90821206e87e3f09a0de6f361a3d9b3cbcda83fdd5fc",
+    "scenario-exposure": "be3c8d7db8ca96f68eef2f7e22e426b65bca47e7ee1c3b64e301ac403d3d8e12",
+    "score-card": "7a997de5bb474d08f2a43367cf8429703361552034b58b07e61fcda8a8d9e0e9"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

@@ -26,12 +26,37 @@ criteria:
     ticked_by: build ticket 67
   - index: 5
     text: "The action-state feedback path that closes ticket 08's conditional-forecast loop."
-    checked: false
-    # Deliberately unchecked after build ticket 68, which built the read side of this path and
-    # says so. `corroboration.state(overlay, response)` answers "was the recommendation acted
-    # upon, and how well is that evidenced" from the ordinary model. What closes decision ticket
-    # 08's loop is a CONSUMER: mitigation credit that requires an evidenced enactment, so that
-    # "the incident did not happen because of our control" needs both a graded reduction claim and
-    # a graded observation that the control was put in place. `twin/pricing.py` gates only the
-    # first today. Ticking this on the read side alone would be the constitution's own
-    # premature-done failure mode.
+    checked: true
+    evidence: "Build ticket 68 built the read side; build ticket 86 built the CONSUMER, at exactly
+      the join build ticket 68's own AC 2 evidence named as open: `twin/pricing.py`'s `_credit()`
+      computed mitigation credit purely from a response's own `mitigates` claim and its evidence
+      grade, never calling `corroboration.state()` — confirmed by grep before this ticket, zero
+      hits. `_credit()` now calls it, against the OPTION the claim credits rather than the
+      component it reduces: a claim evidenced well enough to price is still refused — named
+      `pricing.NOT_ENACTED`, distinct from `pricing.CLAIM_TOO_WEAK` — if that option carries no
+      corroborated enactment. Two different causal assertions, checked separately: 'this removes
+      part of the impact' (the claim's own evidence grade) and 'this was actually done'
+      (`corroboration.state()`), so 'the incident did not happen because of our control' can no
+      longer be asserted on an evidenced-but-unenacted control. Threaded through both call sites
+      that reach `_credit()` — `twin/verbs.py`'s `price()` and `twin/tradeoff.py`'s `curve()` —
+      with `overlay` a required parameter of `pricing.price()` rather than a default-able one,
+      because a parameter free to be omitted would be a silent way to skip the gate. Worked
+      example, the criterion's own literal ask: identical claims, identical priced impact, one
+      option corroborated as enacted and one not, scoring differently —
+      `tests/test_pricing.py::test_identical_claims_score_differently_by_corroborated_enactment`,
+      reusing build ticket 68's own `pin-the-tooling-image-set` (corroborated) and
+      `report-node-schedule-variance` (self-declared only) fixture cases so the split is
+      attributable to nothing but the enactment state. Harness guard
+      `mitigation_credit_is_gated_on_corroborated_enactment_not_just_claimed_evidence` mirrors
+      `enforcement_is_a_spectrum_and_never_prices_a_rung`'s shape: the same differential at the
+      unit level, plus the live `verbs.price()` artefact path on the pocket-org fixture, first
+      crediting `retrain-the-on-call-rota` against its own (newly added) corroborating enactment
+      claims and then refusing the identical claim the moment those two claims are stripped from
+      an otherwise-identical fixture. WHERE THIS TICK STOPS, so a reader can disagree with it
+      knowingly: an enactment is still evidence about no PROPOSITION or world model —
+      `Overlay.forecast_subject` still returns `None` for it, unchanged by this ticket — so a
+      forecast still does not branch on action state; only mitigation credit consumes it. And the
+      channel-declared-not-verified limit build ticket 68's own AC 2 evidence already named is
+      unchanged and unclosed by this ticket: gating credit on a declared channel still trusts the
+      declaration, not an independent check that the merged change or payroll run exists."
+    ticked_by: build ticket 86

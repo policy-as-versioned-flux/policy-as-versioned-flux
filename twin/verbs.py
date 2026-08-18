@@ -614,7 +614,7 @@ def price(
         if perspective is None:
             known = ", ".join(sorted(overlay.perspectives)) or "none"
             raise VerbError(f"no perspective {perspective_id!r} in overlay {org!r} (have: {known})")
-        entries.append(pricing.price(graph, perspective, origin, overlay.responses))
+        entries.append(pricing.price(graph, perspective, origin, overlay.responses, overlay))
 
     components = sorted({i["component"] for e in entries for i in e["impacts"]})
     return Artefact(

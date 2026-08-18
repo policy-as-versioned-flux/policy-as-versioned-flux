@@ -101,7 +101,7 @@ def curve(
     names: dict[str, str] = {}
     for account_id in ids:
         graph = overlay.causal_graph(account_id)
-        priced = pricing.price(graph, perspective, origin, responses)
+        priced = pricing.price(graph, perspective, origin, responses, overlay)
         ensemble.append({"account": account_id, "price": priced})
         for entry in priced["responses"]["priced"]:
             option_id = entry["option"]

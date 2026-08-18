@@ -41,6 +41,15 @@ free unless the evidence has to travel with it.
 that declares no `mitigates` block claims nothing and gets no credit field; a response whose claim
 is graded outside the threshold gets a register entry naming the grade. Neither gets a number.
 
+**Build ticket 86 closes decision ticket 08's action-state loop at this join.** A well-evidenced
+mitigation claim is still only half of "the incident did not happen because of our control" — the
+other half is that the control was actually put in place, which `twin/corroboration.py` (build
+ticket 68) already answers from the ordinary model. `_credit()` reads it: an option whose response
+carries no corroborated enactment is refused credit with a named reason, even when its own
+mitigation claim is evidenced well enough to price. A claim and an enactment are two different
+causal assertions — "this removes part of the impact" and "this was done" — and crediting one
+without the other would let an unenacted control price exactly as a real one does.
+
 ## The ordering lock survives
 
 Pricing a response still runs through `options.prefilter(...).priced()` and nothing here ever sees
@@ -60,13 +69,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from . import admission, evidence, options as options_mod, propagate as propagate_mod
+from . import admission, corroboration, evidence, options as options_mod, propagate as propagate_mod
 from .artefact import ArtefactError
 from .canon import walk_keys
 from .pert import Triple, quantise
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .model import Graph
+    from .model import Graph, Overlay
 
 # Why an impact could not be priced. Each is falsifiable by somebody: evidence a path, evidence a
 # valuation, or show a route to the money.
@@ -79,6 +88,7 @@ DIRECTIONAL_ONLY = "the-path-carries-a-direction-and-no-magnitude"
 # Why a response earned no credit.
 CLAIMS_NONE = "this-response-claims-no-mitigation"
 CLAIM_TOO_WEAK = "the-mitigation-claim-is-graded-outside-the-pricing-threshold"
+NOT_ENACTED = "the-option-this-claims-to-credit-has-no-corroborated-enactment"
 NOTHING_PRICED_THERE = "the-impact-this-claims-to-reduce-was-not-priced"
 
 BODY_KEYS = options_mod.BODY_KEYS | frozenset(
@@ -221,7 +231,8 @@ def impacts(
 
 
 def _credit(
-    option: dict[str, Any], claim: dict[str, Any] | None, priced: list[dict[str, Any]]
+    option: dict[str, Any], claim: dict[str, Any] | None, priced: list[dict[str, Any]],
+    overlay: "Overlay",
 ) -> dict[str, Any]:
     """What a response earns, or why it earns nothing. Never a default.
 
@@ -243,6 +254,16 @@ def _credit(
                           f"graded {grade}, outside the published pricing threshold. 'The incident "
                           "did not happen because of our control' is a causal claim like any "
                           "other, and an unevidenced one earns nothing rather than a default"}
+    option_id = str(option["option"])
+    action_state = corroboration.state(overlay, option_id)
+    if not action_state["may_price"]:
+        return {**held, "reason": NOT_ENACTED,
+                "detail": f"the claim that this removes part of the impact at {reduces!r} is "
+                          f"evidenced well enough to price, but {option_id!r} itself has no "
+                          f"corroborated enactment: {action_state['why']} 'The incident did not "
+                          "happen because of our control' needs the control to have actually been "
+                          "put in place, evidenced like everything else here — a mitigation claim "
+                          "does not earn credit for a control nobody has seen enacted"}
     impact = next((i for i in priced if i["component"] == reduces), None)
     if impact is None:
         return {**held, "reason": NOTHING_PRICED_THERE,
@@ -263,19 +284,24 @@ def _credit(
 
 
 def price(graph: "Graph", perspective: dict[str, Any], origin: str,
-          responses: dict[str, dict[str, Any]]) -> dict[str, Any]:
+          responses: dict[str, dict[str, Any]], overlay: "Overlay") -> dict[str, Any]:
     """One shock, one eye: the impacts it prices, and what each admissible response costs and buys.
 
     The response half runs through the constraint pre-filter first and reads its product, never
     the raw responses — so an excluded option is absent here at any magnitude, exactly as it is
     absent from `twin options`.
+
+    `overlay` is required, not defaulted: mitigation credit is gated on corroborated enactment
+    (build ticket 86) via `corroboration.state(overlay, ...)`, and a parameter free to be omitted
+    would be a silent way to skip the gate — exactly the default this module's own culture refuses
+    everywhere else.
     """
     priced, register, traversal = impacts(graph, perspective, origin)
     admitted = options_mod.prefilter(perspective, responses)
     choice_set = admitted.priced()
     for entry in choice_set["priced"]:
         claim = (responses.get(entry["option"]) or {}).get("mitigates")
-        entry["mitigation"] = _credit(entry, claim, priced)
+        entry["mitigation"] = _credit(entry, claim, priced, overlay)
 
     body = {
         "origin": origin,

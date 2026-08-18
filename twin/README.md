@@ -1371,10 +1371,23 @@ rather than reaching for `claim["component"]`. For an enactment it returns `None
 never reads a response, so a dated enactment cannot change what an execution answers. Decision
 ticket 18's AC 5 is what changes that, and the method records it.
 
-**What this does not do.** It answers whether a lever was pulled and grades how well that is
-evidenced. Nothing yet *consumes* the graded action state — no forecast branches on it, and
-mitigation credit does not require it — which is decision ticket 18's AC 5 and stays unticked. See
-"What is honestly built", below.
+**Build ticket 86 wires the consumer.** `twin/pricing.py`'s `_credit()` now calls
+`corroboration.state(overlay, option_id)`: a mitigation claim evidenced well enough to price is
+still refused — named `pricing.NOT_ENACTED`, distinct from `pricing.CLAIM_TOO_WEAK` — if the
+option it credits has no corroborated enactment. Two different causal assertions, checked
+separately: "this removes part of the impact" (the claim's own evidence grade) and "this was
+actually done" (`corroboration.state()`), so "the incident did not happen because of our control"
+can no longer be asserted on an evidenced-but-unenacted control. Decision ticket 18's AC 5
+closes. Threaded through both call sites that reach `_credit()` — `verbs.price()` and
+`tradeoff.curve()` — with `overlay` a required parameter of `pricing.price()` rather than a
+default-able one, because a parameter free to be omitted would be a silent way to skip the gate.
+
+**What this still does not do.** An enactment carries no evidence about a *proposition* or a world
+model — `Overlay.forecast_subject` still returns `None` for it, unchanged by this ticket — so a
+forecast still does not branch on action state; only mitigation credit consumes it. And the
+channel-declared-not-verified limit named above is unchanged: gating credit on a declared channel
+still trusts the declaration, not an independent check that the merged change or payroll run
+exists. See "What is honestly built", below.
 
 ```bash
 twin sense --repo <model-repo> --org intel --signal tooling-pins-declared-in-place
@@ -2104,16 +2117,26 @@ this table was: real code, cited live.
 | `forecast-book` | 21 | full | 6 / 6 |
 | `twin-inside-twin` | 10 | full | 5 / 5 |
 | `ethics-gate` | 15 | full | 5 / 5 |
-| `enactment` | 18 | partial | 4 / 5 |
+| `enactment` | 18 | full | 5 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**60 of 73**, across thirteen capabilities, eight of them `full`. An artefact's overall depth is
+**61 of 73**, across thirteen capabilities, nine of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
 where `domain-model`, `causal-layer`, `currency-regimes`, `forecast-book`, `synthetic-substrate`,
-`ethics-gate`, `sense-move` or `twin-inside-twin` is one of the capabilities they cite. `./bin/twin grade` prints the
-denominators, and this table is its output, not a hand-kept count — re-derived here
-rather than trusting a stale total (the same provisional-total drift this file names repeatedly
-below).
+`ethics-gate`, `sense-move`, `twin-inside-twin` or `enactment` is one of the capabilities they
+cite. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
+count — re-derived here rather than trusting a stale total (the same provisional-total drift this
+file names repeatedly below).
+
+**`enactment` moved from 4/5 to 5/5, `full`, at build ticket 86.** AC 5 asked for the
+action-state feedback path that closes decision ticket 08's conditional-forecast loop. Build
+ticket 68 built the read side (`corroboration.state()`); nothing consumed it —
+`twin/pricing.py`'s `_credit()` computed mitigation credit purely from a response's own
+`mitigates` claim and its evidence grade. It now also calls `corroboration.state(overlay,
+option_id)`: a claim evidenced well enough to price is still refused, named `pricing.NOT_ENACTED`,
+if the option it credits has no corroborated enactment — two causal assertions checked
+separately, "this removes part of the impact" and "this was actually done". See "Enactment, sensed
+through channels", above, for the full account.
 
 **`twin-inside-twin` moved from 2/5 to 5/5, `full`, at build ticket 83.** Three gaps closed
 together, all reusing existing general-purpose machinery per the ticket's own instruction: a
@@ -2211,6 +2234,14 @@ ticket 09 AC 4's ethical-harms leg" directly, and
 `tests/test_affected_parties.py::test_published_names_ethical_harms_as_the_incommensurable_it_treats`
 exercises the ethical-harms case specifically, the same standard reputation, morale and
 existential/tail risk already met. See "decision ticket 09 AC 4" below for what this corrects.
+
+**`enactment` reaches `full` at build ticket 86**, decision ticket 18's last acceptance criterion
+(AC 5, the action-state feedback path that closes decision ticket 08's conditional-forecast loop).
+Build ticket 68 built the read side and named AC 5 the unconsumed remainder in its own evidence
+text, below; this ticket is the consumer, wired at exactly the join build ticket 68 left open —
+`twin/pricing.py`'s `_credit()` now refuses mitigation credit, named `pricing.NOT_ENACTED`, on an
+option with no corroborated enactment, even where its own claim is evidenced well enough to price.
+See "Enactment, sensed through channels" and "What is honestly built" above for the full account.
 
 **`enactment` is a new row (build ticket 66) against a decision ticket — 18 — that had no
 capability file at all before it**, the third time that gap has been found and filled rather than
@@ -2505,16 +2536,16 @@ is not a discipline problem.
 
 ## The invariants
 
-`./bin/twin verify` — 68 pass, 2 fail (`drift_window_is_actually_being_sampled`, a live-cluster
+`./bin/twin verify` — 69 pass, 2 fail (`drift_window_is_actually_being_sampled`, a live-cluster
 probe-staleness check that fails whenever build ticket 64's probe has not sampled recently, so it
 is expected to go red between samples and is not a coherence defect; and
 `flux_coverage_floor_is_still_reachable`, red since 2026-08-16 and staying red until the window
 closes — build ticket 70's finding 1, above, not a new defect), 2 skipped and not faked (the
-CI-only cross-architecture leg), 0 pending. `pytest -q` — 1444 tests across seams 1 and 2, 1443 of
+CI-only cross-architecture leg), 0 pending. `pytest -q` — 1499 tests across seams 1 and 2, 1498 of
 which pass; `test_the_suite_is_green` goes red with the same two failures above. (Build
 ticket 56's coherence audit re-derived these counts from a live run rather than carrying the
 previous round's numbers forward — see "What is honestly built", below, for the same discipline
-applied to the capability table. Build tickets 78, 65, 66 and 77 re-derived them again the same way.)
+applied to the capability table. Build tickets 78, 65, 66, 77 and 86 re-derived them again the same way.)
 
 Three checks read the actual wall clock rather than the model repository, and all three do it
 because the property they guard is about *now*: `drift_window_is_actually_being_sampled` (is the

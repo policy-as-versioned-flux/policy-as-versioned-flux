@@ -268,7 +268,7 @@ def test_propose_emits_from_the_cli(model_repo_dir: Path, tmp_path: Path) -> Non
 def test_the_capability_is_graded_against_decision_ticket_18(caps: Capabilities) -> None:
     grade = caps.require(enact.CAPABILITY)
     assert grade.owning_ticket == "18"
-    assert grade.grade == "partial"
     # Criteria 2 and 4 are build tickets 68 and 67's, ticked beside these two rather than by this
-    # ticket. Criterion 5 stays unchecked: nothing consumes the graded action state yet.
-    assert [c.index for c in grade.criteria if c.checked] == [1, 2, 3, 4]
+    # ticket. Criterion 5 is build ticket 86's: `_credit()` now consumes the graded action state.
+    assert grade.grade == "full"
+    assert [c.index for c in grade.criteria if c.checked] == [1, 2, 3, 4, 5]

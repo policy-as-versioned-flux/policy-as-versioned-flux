@@ -62,7 +62,11 @@ def beat(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
     per suite buys nothing.
     """
     work = tmp_path_factory.mktemp("netflix-beat")
-    repo = fixtures.build_netflix_org(work / "repo")
+    # `build_and_corroborate_netflix_org`, not `build_netflix_org`: `LEVER` needs corroborated
+    # enactment to keep earning mitigation credit under the new gate (build ticket 86), and this
+    # is the beat the corroboration belongs in — see `build_and_corroborate_netflix_org`'s own
+    # docstring for why `tests/test_netflix.py` must not go through it.
+    repo = fixtures.build_and_corroborate_netflix_org(work / "repo")
     out = work / "artefacts"
 
     paths = {

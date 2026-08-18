@@ -1740,9 +1740,18 @@ def _netflix_runs_both_paths_and_the_curve_keeps_the_disagreement(ctx: Context) 
         "the-damage-was-mostly-the-rebrand",
     ]
 
-    netflix_dir = ctx.tmp / "netflix-repo"
+    # Deliberately its own directory name, `netflix-repo-corroborated` rather than the plain
+    # `netflix-repo` build ticket 73's sibling guard
+    # (`netflix_substrate_is_free_running_and_every_plant_carries_a_horizon`) already caches at —
+    # both guards share one `ctx.tmp` for the whole suite run, and that guard's own spine-fidelity
+    # assertions need the org build ticket 86 must NOT touch, so the two builds cannot share a
+    # cache key now that one of them means something different from the other.
+    netflix_dir = ctx.tmp / "netflix-repo-corroborated"
     if not netflix_dir.exists():
-        fixtures.build_netflix_org(netflix_dir)
+        # `build_and_corroborate_netflix_org`, not `build_netflix_org`: the lever needs
+        # corroborated enactment to keep earning mitigation credit under the new gate (build
+        # ticket 86) — the same wrapper `twin fixture --name netflix` registers.
+        fixtures.build_and_corroborate_netflix_org(netflix_dir)
     out = ctx.tmp / "netflix-engine-guard"
     out.mkdir(exist_ok=True)
 
@@ -4385,6 +4394,107 @@ def _the_demo_sequence_earns_credibility_before_it_spends_it(ctx: Context) -> st
     return (
         "royal-mail, intel, netflix in that order; £ absent from the first two beats; propose "
         "precedes both price and trade-off in the third"
+    )
+
+
+@harness_check("mitigation_credit_is_gated_on_corroborated_enactment_not_just_claimed_evidence")
+def _mitigation_credit_is_gated_on_corroborated_enactment_not_just_claimed_evidence(
+    ctx: Context,
+) -> str:
+    """The action-state feedback path that closes decision ticket 08's conditional-forecast loop
+    (build ticket 86, decision ticket 18 AC 5).
+
+    A guard on the suite rather than an invariant, for the reason build tickets 66, 67 and 68's
+    are: the constitution names sixteen invariants and may not grow a seventeenth without the
+    constitution changing first.
+
+    Build ticket 68 built the read side: `corroboration.state(overlay, response)` answers whether
+    a recommendation was actually acted upon, and how well evidenced that is. Nothing consumed it
+    — `pricing._credit()` computed mitigation credit purely from the response's own `mitigates`
+    claim and its own evidence grade. **The leg that matters is that the two causal claims are
+    checked separately**: a response can be evidenced well enough to price and still earn nothing,
+    because "this removes part of the impact" and "this was actually done" are different
+    assertions and only one of them used to be gated. The assertion is that an identical claim
+    scores differently depending only on the option's own corroborated enactment state, and that
+    this holds through the live artefact path (`verbs.price`), not only inside the unit function.
+    """
+    from .. import fixtures, pricing, verbs
+    from ..model import Overlay
+    from ..repo import ModelRepo
+
+    # -- the same claim, credited or refused purely on the option's own enactment state -------
+    repo = ModelRepo.open(ctx.repo_dir)
+    intel = Overlay.load(repo, "intel")
+    claim = {
+        "component": "a-component", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
+        "evidence_grade": 2, "basis": "identical claim, planted for the harness guard",
+    }
+    priced = [{"component": "a-component",
+               "price": {"attenuated": {"min": 100.0, "mode": 200.0, "max": 300.0}}}]
+    corroborated = pricing._credit({"option": "pin-the-tooling-image-set"}, claim, priced, intel)
+    self_declared = pricing._credit(
+        {"option": "report-node-schedule-variance"}, claim, priced, intel
+    )
+    if "credit" not in corroborated or self_declared.get("reason") != pricing.NOT_ENACTED:
+        raise Violated(
+            f"the identical claim produced {corroborated} against a corroborated option and "
+            f"{self_declared} against an uncorroborated one — the gate is not distinguishing them"
+        )
+    if self_declared.get("reason") == pricing.CLAIM_TOO_WEAK:
+        raise Violated(
+            "an uncorroborated option's refusal read as the claim's own grade being too weak. "
+            "It is grade 2, well inside the pricing threshold — conflating the two reasons would "
+            "make a corroborated claim indistinguishable from an unevidenced one in the artefact"
+        )
+
+    # -- the live artefact path threads the same gate, not just the unit function -------------
+    def _mitigation(body: dict, option: str, perspective: str) -> dict:
+        entry = next(e for e in body["perspectives"] if e["perspective"] == perspective)
+        return next(o for o in entry["responses"]["priced"] if o["option"] == option)["mitigation"]
+
+    pocket = ctx.tmp / "pocket-with-enactment"
+    if not pocket.exists():
+        fixtures.build_pocket_org(pocket)
+    live = verbs.price(
+        ModelRepo.open(pocket), ctx.caps, "pocket", "order-service", None,
+        verbs.command_for("price", org="pocket", origin="order-service"),
+    ).body
+    if "credit" not in _mitigation(live, "retrain-the-on-call-rota", "the-operator"):
+        raise Violated(
+            "retrain-the-on-call-rota earns no credit against its own fixture, which carries "
+            "corroborated enactment for it — either the gate or the fixture regressed"
+        )
+
+    # -- strip the corroborating enactment claims, and the same response is refused -----------
+    scratch = ctx.tmp / "pocket-no-enactment"
+    if not scratch.exists():
+        fixtures.build_pocket_org(scratch)
+        for stray in (
+            "orgs/pocket/claims/enacted-rota-retrained-declared.yaml",
+            "orgs/pocket/claims/enacted-rota-runbook-merged.yaml",
+        ):
+            (scratch / stray).unlink()
+        fixtures.git(scratch, "add", "-A")
+        fixtures.git(
+            scratch, "commit", "-q", "-m", "strip corroborating enactment for the harness guard"
+        )
+    stripped = verbs.price(
+        ModelRepo.open(scratch), ctx.caps, "pocket", "order-service", None,
+        verbs.command_for("price", org="pocket", origin="order-service"),
+    ).body
+    stripped_mitigation = _mitigation(stripped, "retrain-the-on-call-rota", "the-operator")
+    if stripped_mitigation.get("reason") != pricing.NOT_ENACTED:
+        raise Violated(
+            f"stripping retrain-the-on-call-rota's two corroborating enactment claims left the "
+            f"mitigation at {stripped_mitigation}, not refused as NOT_ENACTED — the same claim, "
+            "the same fixture, the only thing removed was the evidence that it happened"
+        )
+
+    return (
+        "an identical claim credits against a corroborated option and refuses as "
+        "NOT_ENACTED (never CLAIM_TOO_WEAK) against an uncorroborated one; the live price "
+        "artefact credits retrain-the-on-call-rota against its own fixture's corroborated "
+        "enactment and refuses it the moment that corroboration is stripped from the same fixture"
     )
 
 

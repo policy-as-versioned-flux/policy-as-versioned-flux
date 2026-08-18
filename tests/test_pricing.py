@@ -146,6 +146,59 @@ def test_a_claim_against_an_unpriced_impact_earns_nothing(pocket_repo_dir: Path,
     assert "credit" not in rota["mitigation"]
 
 
+# -- mitigation credit, gated on corroborated enactment (build ticket 86, AC 5) --------------
+
+
+def test_identical_claims_score_differently_by_corroborated_enactment(repo: ModelRepo) -> None:
+    """AC 5's worked example: the identical mitigation claim, against the identical priced
+    impact, credited for one option and refused for the other — the only thing that differs is
+    what `corroboration.state()` says about each option's own enactment.
+
+    `pin-the-tooling-image-set` and `report-node-schedule-variance` are build ticket 68's own
+    corroborated and self-declared-only fixture cases, reused rather than re-planted: the claim
+    under test here is a fresh, identical plant either way, so the credit/refusal split is
+    attributable to nothing but the enactment state.
+    """
+    intel = Overlay.load(repo, "intel")
+    claim = {
+        "component": "a-component", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
+        "evidence_grade": 2, "basis": "identical claim, planted for the worked example",
+    }
+    priced = [{"component": "a-component",
+               "price": {"attenuated": {"min": 100.0, "mode": 200.0, "max": 300.0}}}]
+
+    corroborated = pricing._credit({"option": "pin-the-tooling-image-set"}, claim, priced, intel)
+    self_declared = pricing._credit(
+        {"option": "report-node-schedule-variance"}, claim, priced, intel
+    )
+
+    assert "reason" not in corroborated
+    assert corroborated["credit"]["mode"] == pytest.approx(40.0)
+
+    assert self_declared["reason"] == pricing.NOT_ENACTED
+    assert "credit" not in self_declared
+    # The claim's own evidence grade is held beside the refusal — this is not `CLAIM_TOO_WEAK`,
+    # the same grade-2 claim that priced above is refused here for a different reason entirely.
+    assert self_declared["evidence_grade"] == 2
+
+
+def test_a_claim_against_an_option_with_no_enactment_claims_at_all_is_also_refused(
+    repo: ModelRepo,
+) -> None:
+    """The gate fails closed: an option nobody has ever observed enacting anything is refused the
+    same way an uncorroborated self-declaration is, not defaulted to credited."""
+    intel = Overlay.load(repo, "intel")
+    claim = {
+        "component": "a-component", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
+        "evidence_grade": 2, "basis": "planted",
+    }
+    priced = [{"component": "a-component",
+               "price": {"attenuated": {"min": 100.0, "mode": 200.0, "max": 300.0}}}]
+    result = pricing._credit({"option": "an-option-nobody-ever-declared"}, claim, priced, intel)
+    assert result["reason"] == pricing.NOT_ENACTED
+    assert "credit" not in result
+
+
 def test_a_mitigation_claim_with_no_grade_does_not_load() -> None:
     """Structural, not a review step: there is no slot for an ungraded reduction."""
     for missing in ("evidence_grade", "reduction", "component", "basis"):

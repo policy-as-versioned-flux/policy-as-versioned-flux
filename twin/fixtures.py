@@ -802,6 +802,60 @@ note: >-
   own net cost of risk actually moves across rival causal accounts, rather than only the underlying
   impact moving beneath a response that never claims it.
 """,
+    # Build ticket 86: mitigation credit is gated on corroborated enactment. Two independent
+    # channels, neither the subject alone — the same shape as `intel`'s `pin-the-tooling-image-set`
+    # — so this response still earns credit through `pricing._credit()`'s new gate rather than
+    # being refused as `pricing.NOT_ENACTED`. Dated before this overlay's own scenario `at`
+    # (`dvd-decline-2011`, T = 2011-07-12): a later date would be withheld by the as-consumed gate
+    # and change `test_a_post_T_fact_bound_to_nothing_the_scenario_forecasts_does_not_refuse`'s own
+    # exact withheld-list assertion, which is no part of what this ticket is about.
+    "orgs/netflix/signals/delivery-network-expansion-declared-live.yaml": f"""\
+id: delivery-network-expansion-declared-live
+date: '2011-05-01'
+steep: technological
+source: Platform team change record
+statement: >-
+  The delivery network expansion is declared live across the affected regions.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/netflix-cdn-expansion-declared
+""",
+    "orgs/netflix/claims/enacted-cdn-expansion-declared.yaml": """\
+id: enacted-cdn-expansion-declared
+kind: enactment
+signal: delivery-network-expansion-declared-live
+response: expand-the-delivery-network
+channel: self-declaration
+evidence_grade: 4
+claimed_by: model-steward
+evidence: The platform team's own record that the expansion is live.
+""",
+    "orgs/netflix/signals/delivery-network-capacity-change-merged.yaml": f"""\
+id: delivery-network-capacity-change-merged
+date: '2011-05-03'
+steep: technological
+source: Infrastructure repository merge record
+statement: >-
+  The capacity change carrying the delivery network expansion merged in the infrastructure
+  repository.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/netflix-cdn-expansion-merged
+""",
+    "orgs/netflix/claims/enacted-cdn-expansion-merged.yaml": """\
+id: enacted-cdn-expansion-merged
+kind: enactment
+signal: delivery-network-capacity-change-merged
+response: expand-the-delivery-network
+channel: merged-change
+evidence_grade: 3
+claimed_by: model-steward
+evidence: >-
+  The merged capacity change, in a repository the infrastructure team rather than the platform
+  team controls the merge button on.
+""",
     "orgs/netflix/responses/instrument-viewers-without-telling-them.yaml": """\
 id: instrument-viewers-without-telling-them
 name: Instrument viewers without telling them
@@ -1279,6 +1333,58 @@ note: >-
   Crosses nothing, so it survives the pre-filter and is costed. Its mean is 6000 by hand:
   (2000 + 4 x 5000 + 14000) / 6. It costs a fifth of the read replica and it is not a technical
   control, which is the comparison the single unit exists to make possible.
+""",
+    # Build ticket 86: mitigation credit is gated on corroborated enactment, not on the mitigation
+    # claim's own evidence grade alone. Without these two channels the response above would be
+    # refused credit as `pricing.NOT_ENACTED` regardless of how well `mitigates` is evidenced —
+    # so the worksheet's hand-checked credit (line 73, `40000`) now depends on this being here,
+    # exactly as it already depended on the claim's own grade-2 evidence.
+    "orgs/pocket/signals/on-call-rota-retrained-declared.yaml": f"""\
+id: on-call-rota-retrained-declared
+date: '2026-02-01'
+steep: economic
+source: Ops team change record
+statement: >-
+  The on-call rota has been retrained and widened, per the change proposed.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/pocket-rota-declared
+""",
+    "orgs/pocket/claims/enacted-rota-retrained-declared.yaml": """\
+id: enacted-rota-retrained-declared
+kind: enactment
+signal: on-call-rota-retrained-declared
+response: retrain-the-on-call-rota
+channel: self-declaration
+evidence_grade: 4
+claimed_by: model-steward
+evidence: The ops team's own record that the widened rota is in place.
+""",
+    "orgs/pocket/signals/on-call-runbook-merged.yaml": f"""\
+id: on-call-runbook-merged
+date: '2026-02-03'
+steep: technological
+source: Ops repository merge record
+statement: >-
+  The updated on-call runbook, reflecting the retrained and widened rota, merged in the ops
+  repository.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/pocket-runbook-merged
+""",
+    "orgs/pocket/claims/enacted-rota-runbook-merged.yaml": """\
+id: enacted-rota-runbook-merged
+kind: enactment
+signal: on-call-runbook-merged
+response: retrain-the-on-call-rota
+channel: merged-change
+evidence_grade: 3
+claimed_by: model-steward
+evidence: >-
+  The merged runbook change, in a repository the ops lead rather than the on-call engineer
+  controls the merge button on.
 """,
     "orgs/pocket/responses/watch-the-team-quietly.yaml": """\
 id: watch-the-team-quietly
@@ -4814,6 +4920,107 @@ def build_netflix_org(dest: str | Path) -> Path:
     return root
 
 
+def corroborate_the_price_hold_as_enacted(root: str | Path) -> str:
+    """Two enactment records for `hold-the-bundled-price-for-one-quarter` (build ticket 86),
+    self-declaration plus merged-change — the same shape as `intel`'s `pin-the-tooling-image-set`
+    — so the response reaches a price-eligible corroborated-enactment grade rather than being
+    refused as `pricing.NOT_ENACTED`.
+
+    **Deliberately not part of `build_netflix_org()` itself.** `test_the_spine_is_six_dated_
+    checkpoints` asserts this org's spine is EXACTLY the subject's six real, dated SEC filings —
+    `Spine.from_overlay()` reads every signal in the overlay with no filter, so any signal this
+    function adds would inflate that count regardless of content. These two are not real dated
+    public facts; they are the same kind of invented enactment record `intel`'s fixture already
+    carries for a candidate response, and mixing an invented record into the six real ones would
+    make "the spine is exactly the public record" a claim this repository could no longer back.
+    Callers that need the price hold corroborated (`tests/test_netflix_beat.py`) call this
+    explicitly, after `build_netflix_org()`; callers that need the real spine untouched
+    (`tests/test_netflix.py`) do not call it at all.
+
+    Both commits are dated after `test_netflix_beat.py`'s own rewind point (2011-08-01,
+    `AT` in that file) — `test_opportunities_are_pulled_and_signals_are_pushed_side_by_side`
+    pins `counts["signals"] == 3` at that rewound commit, read from git history rather than the
+    schema's own `date` field, so a commit landing after it is invisible there regardless of what
+    date the signal itself declares.
+    """
+    path = Path(root)
+    _write(path, {
+        "orgs/netflix/signals/bundled-price-hold-declared.yaml": f"""\
+id: bundled-price-hold-declared
+date: '2011-11-01'
+steep: economic
+source: Billing team change record
+statement: >-
+  The bundled price is held for the affected members through the quarter, per the proposed hold.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/netflix-price-hold-declared
+""",
+        "orgs/netflix/claims/enacted-price-hold-declared.yaml": """\
+id: enacted-price-hold-declared
+kind: enactment
+signal: bundled-price-hold-declared
+response: hold-the-bundled-price-for-one-quarter
+channel: self-declaration
+evidence_grade: 4
+claimed_by: model-steward
+evidence: The billing team's own record that the hold is in place.
+""",
+    })
+    git(path, "add", "-A")
+    git(path, "commit", "-q", "-m", "an enactment record for the price-hold response (build ticket 86)",
+        dated="2011-11-01T21:00:00+00:00")
+    _write(path, {
+        "orgs/netflix/signals/bundled-price-hold-configuration-merged.yaml": f"""\
+id: bundled-price-hold-configuration-merged
+date: '2011-11-03'
+steep: technological
+source: Billing system repository merge record
+statement: >-
+  The billing configuration change carrying the price hold merged in the billing system's
+  repository.
+substrate: {ABSENT_SUBSTRATE}
+provenance:
+  observed_by: fixture
+  url: https://example.invalid/fixture/netflix-price-hold-merged
+""",
+        "orgs/netflix/claims/enacted-price-hold-merged.yaml": """\
+id: enacted-price-hold-merged
+kind: enactment
+signal: bundled-price-hold-configuration-merged
+response: hold-the-bundled-price-for-one-quarter
+channel: merged-change
+evidence_grade: 3
+claimed_by: model-steward
+evidence: >-
+  The merged billing configuration change, in a repository the billing systems team rather than
+  the pricing analyst controls the merge button on.
+""",
+    })
+    git(path, "add", "-A")
+    git(path, "commit", "-q", "-m", "a second, independent enactment record for the same response",
+        dated="2011-11-03T21:00:00+00:00")
+    return git(path, "rev-parse", "HEAD").strip()
+
+
+def build_and_corroborate_netflix_org(dest: str | Path) -> Path:
+    """`build_netflix_org()`, plus `corroborate_the_price_hold_as_enacted()` (build ticket 86).
+
+    What `BUILDERS["netflix"]` registers, so every real consumer of `twin fixture --name
+    netflix` — `twin/beat-netflix.sh`, the harness guard
+    `netflix_runs_both_paths_and_the_curve_keeps_the_disagreement`,
+    `tests/test_netflix_beat.py` — gets a repository where the lever earns mitigation credit,
+    with one call rather than two repeated at each site. `tests/test_netflix.py` calls
+    `build_netflix_org()` directly instead, on purpose: its own acceptance criterion is that the
+    org's spine is exactly the subject's six real filings, and this wrapper is precisely the
+    thing that must never reach it.
+    """
+    root = build_netflix_org(dest)
+    corroborate_the_price_hold_as_enacted(root)
+    return root
+
+
 # -- Intel: the live, unresolved spine (build ticket 75, decision tickets 06, 22, spec story 92) -
 #
 # The most honest artefact in the demo: a forward forecast where the fixture author does not know
@@ -5547,7 +5754,7 @@ BUILDERS: dict[str, Callable[[str | Path], Path]] = {
     "astrazeneca": build_astrazeneca_org,
     "sanofi": build_sanofi_org,
     "royal-mail": build_royal_mail_org,
-    "netflix": build_netflix_org,
+    "netflix": build_and_corroborate_netflix_org,
     "intel": build_intel_org,
     "kodak": build_kodak_org,
     "maersk": build_maersk_org,
