@@ -349,20 +349,24 @@ def test_every_artefact_the_beat_emits_carries_computed_depth_grades(
 def test_the_scenario_engine_criterion_this_beat_touches_needs_the_other_co_flagship(
     caps: Capabilities,
 ) -> None:
-    """AC 6, and the honest reading: **this ticket moves no grade.**
+    """AC 7, and the honest reading updated as this test's own prior docstring asked: **this beat
+    moved no grade on its own, and build ticket 88 is the ticket that supplied the other half.**
 
     Decision ticket 13 AC 7 asks for one fear scenario and one opportunity scenario *across the
-    co-flagships*. Netflix now has both, on dated evidence, through the ordinary verbs. Intel has
-    neither on a real spine — that is build ticket 75 — so half a criterion is not a criterion,
-    and `full` stays derived rather than typed. Build ticket 75 is expected to tick this and to
-    change this test with it; a test that had to be edited is the visible form of that.
+    co-flagships*. Netflix has had both since this beat's own build ticket (74), on dated
+    evidence, through the ordinary verbs. Intel had only its fear scenario on the real spine
+    (build ticket 75) until build ticket 88 added `euv-readiness-wins-the-14a-opportunity` — the
+    real, cited EUV causal edge (build ticket 81) read the upside way — to
+    `fixtures.build_intel_org`. AC 7 is ticked now, and every other AC in `scenario-engine`
+    besides, so the capability itself reached `full`.
     """
     graded = caps.require("scenario-engine")
     unchecked = {c["index"] for c in graded.summary()["unchecked"]}
-    assert 7 in unchecked, (
-        "decision ticket 13 AC 7 is ticked; if the Intel half now exists, update this test and "
-        "say which ticket supplied it"
+    assert 7 not in unchecked, (
+        "decision ticket 13 AC 7 is unticked again; if the Intel opportunity scenario was "
+        "removed, either restore it or revert this test and say why"
     )
+    assert not unchecked, f"scenario-engine has other unchecked criteria too: {sorted(unchecked)}"
 
 
 def test_the_beat_script_is_executable() -> None:

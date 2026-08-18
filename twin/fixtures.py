@@ -5057,6 +5057,18 @@ text: >-
   already-proven process the subject already sells commercially.
 resolves_on: '2027-06-30'
 """,
+    # The opportunity half of decision ticket 13 AC 7 (build ticket 88), wrapping build ticket
+    # 81's own real EUV causal edge in a proposition read the upside way: the fear scenario below
+    # asks whether the tooling holds long enough to matter; this one is the same lever, framed as
+    # what winning it would mean, not what missing it would cost.
+    "world/propositions/euv-readiness-holds-through-the-14a-go-no-go.yaml": """\
+id: euv-readiness-holds-through-the-14a-go-no-go
+text: >-
+  The subject's High-NA EUV lithography tooling for its newest leading-edge process node stays on
+  schedule through the subject's own reported 2026 go/no-go decision point for that node — the
+  reverse of skipping EUV at an earlier node, which delayed that node by roughly five years.
+resolves_on: '2026-12-31'
+""",
 }
 
 _INTEL_BASE: dict[str, str] = {
@@ -5088,6 +5100,11 @@ note: >-
   model prices the gap between the two.
 beliefs:
   a-leading-edge-foundry-node-lands-a-named-external-customer: 0.3
+  # The opportunity-scenario belief (build ticket 88): even this cautious reading gives even odds
+  # to the narrower, purely technical claim — the tooling itself installed and passed acceptance
+  # testing (this org's own edge `euv-delay-slips-the-node`'s own note) — while staying doubtful
+  # that readiness alone converts into the wider commercial win above.
+  euv-readiness-holds-through-the-14a-go-no-go: 0.5
 """,
     "orgs/intel/world_models/market-momentum-2026.yaml": """\
 id: market-momentum-2026
@@ -5103,6 +5120,11 @@ note: >-
   is evidence a cautious reading has to weigh, not dismiss.
 beliefs:
   a-leading-edge-foundry-node-lands-a-named-external-customer: 0.55
+  # The opportunity-scenario belief (build ticket 88): a momentum reading of the identical fact
+  # `market-caution-2026` also holds — install and acceptance testing already complete (this
+  # org's own edge `euv-delay-slips-the-node`'s own note) — reads readiness as more likely to hold
+  # than not, the reverse of the historical pattern the same edge's own note cites.
+  euv-readiness-holds-through-the-14a-go-no-go: 0.7
 """,
     "orgs/intel/scenarios/does-the-14a-bet-land-a-named-customer.yaml": """\
 id: does-the-14a-bet-land-a-named-customer
@@ -5194,6 +5216,44 @@ note: >-
   Grade 2, not 1: this is the mechanism repeating on the same subject over time, not a single
   dated change with a measured effect on both sides of it — the range is wide because nobody has
   measured this magnitude for 14A itself, only observed the sign hold on the node before it.
+""",
+    # The real opportunity scenario decision ticket 13 AC 7 asks for (build ticket 88): the
+    # identical EUV edge above, read the upside way. Netflix's own opportunity (decision ticket
+    # 13's resolution) needed no authored scenario at all — `twin gameplay-sweep` pulled a
+    # land-grab straight from the map. This overlay declares no person edges and no component near
+    # the product/commodity band (`euv-lithography`, `leading-edge-foundry-node` and
+    # `external-foundry-customer-base` all sit at genesis/custom-built), so gameplay-lens's own two
+    # checkable plays (`twin/gameplay_lens.py`) have nothing to fire on here — a real, named gap,
+    # not a silent one — and the opportunity has to be authored as a scenario instead, on the same
+    # real, cited edge and world models the fear scenario already uses.
+    "orgs/intel/scenarios/euv-readiness-wins-the-14a-opportunity.yaml": """\
+id: euv-readiness-wins-the-14a-opportunity
+question: >-
+  Having chosen the industry's first commercial deployment of High-NA EUV for its newest
+  leading-edge node — the reverse of skipping EUV at an earlier node, which delayed that node by
+  roughly five years — does the subject's tooling readiness hold through its own named 2026
+  go/no-go decision point, positioning it to win the external customer commitment two prospective
+  customers are already evaluating?
+proposition: euv-readiness-holds-through-the-14a-go-no-go
+at: '2026-08-17'
+horizon: '2026-12-31'
+components:
+  - euv-lithography
+  - leading-edge-foundry-node
+  - external-foundry-customer-base
+world_models:
+  - market-caution-2026
+  - market-momentum-2026
+affected_parties:
+  - id: rival-leading-edge-foundries
+    who: >-
+      TSMC and Samsung Foundry, the incumbent leading-edge foundries pursuing the same
+      prospective external customers this scenario's proposition asks about.
+    consequence: >-
+      The subject's own EUV readiness holding is these rivals' own competitive exposure, the
+      mirror image of the government's own exposure the fear scenario
+      (`does-the-14a-bet-land-a-named-customer`) already names; this model holds no perspective
+      for them either.
 """,
 }
 

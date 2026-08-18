@@ -26,6 +26,9 @@ OUT="$WORK/artefacts"
 
 ORG=intel
 SCENARIO=does-the-14a-bet-land-a-named-customer
+# The opportunity half of decision ticket 13 AC 7 (build ticket 88) — the same real EUV edge
+# step 0c exercises below, wrapped the upside way, replacing the toy `euv-slip-2026` fixture.
+OPPORTUNITY_SCENARIO=euv-readiness-wins-the-14a-opportunity
 
 # AC 1 is "pinned and signed" — demonstrated, not left to whatever the caller's shell happens to
 # have exported. `twin verify --attestation` reports HOLDS on an unsigned artefact too (tamper
@@ -101,24 +104,34 @@ say "3. the same forecast, reproduced independently through the ordinary run ver
 "$TWIN" verify "$OUT/forecast-bundle.json" --repo "$WORK/intel" \
   || fail "the forecast bundle did not reproduce from its own pins"
 
-say "3b. the sweep and the standalone run agree byte-for-byte — nothing here was hand-made"
-python3 - "$OUT/sweep.json" "$OUT/forecast-bundle.json" <<'CHECK'
+say "3a. the opportunity half of decision ticket 13 AC 7 — the same real EUV edge, read upside"
+"$TWIN" run --repo "$WORK/intel" --org "$ORG" --scenario "$OPPORTUNITY_SCENARIO" --regime as-consumed \
+  --out "$OUT/opportunity-bundle.json" >/dev/null || fail "opportunity run failed"
+"$TWIN" verify "$OUT/opportunity-bundle.json" --repo "$WORK/intel" \
+  || fail "the opportunity bundle did not reproduce from its own pins"
+
+say "3b. the sweep and both standalone runs agree byte-for-byte — nothing here was hand-made"
+python3 - "$OUT/sweep.json" "$OUT/forecast-bundle.json" "$OUT/opportunity-bundle.json" <<'CHECK'
 import hashlib, json, sys
 sweep = json.load(open(sys.argv[1]))["body"]
-standalone_bytes = open(sys.argv[2], "rb").read()
-standalone_sha256 = hashlib.sha256(standalone_bytes).hexdigest()
 executions = sweep["executions"]
-if len(executions) != 1 or sweep["failures"]:
-    raise SystemExit(f"expected one clean execution, got {len(executions)}, {len(sweep['failures'])} failure(s)")
-embedded = executions[0]["forecast_bundle"]["sha256"]
-if embedded != standalone_sha256:
-    raise SystemExit(f"sweep embedded {embedded}, standalone run digests to {standalone_sha256} — disagree")
-forecasts = executions[0]["body"]["forecasts"]
-probs = sorted({f["probability"] for f in forecasts})
-if len(probs) < 2:
-    raise SystemExit(f"expected plural, distinct forecasts, got {probs}")
-print(f"  ok   {len(forecasts)} forecast(s), {len(probs)} distinct probabilities: {probs}")
-print(f"  ok   sweep-embedded digest == standalone `twin run` digest ({embedded[:16]}...)")
+if len(executions) != 2 or sweep["failures"]:
+    raise SystemExit(f"expected two clean executions (fear + opportunity), got {len(executions)}, "
+                      f"{len(sweep['failures'])} failure(s)")
+by_scenario = {e["scenario"]: e for e in executions}
+for scenario, path in (("does-the-14a-bet-land-a-named-customer", sys.argv[2]),
+                        ("euv-readiness-wins-the-14a-opportunity", sys.argv[3])):
+    standalone_sha256 = hashlib.sha256(open(path, "rb").read()).hexdigest()
+    embedded = by_scenario[scenario]["forecast_bundle"]["sha256"]
+    if embedded != standalone_sha256:
+        raise SystemExit(f"{scenario}: sweep embedded {embedded}, standalone digests to "
+                          f"{standalone_sha256} — disagree")
+    forecasts = by_scenario[scenario]["body"]["forecasts"]
+    probs = sorted({f["probability"] for f in forecasts})
+    if len(probs) < 2:
+        raise SystemExit(f"{scenario}: expected plural, distinct forecasts, got {probs}")
+    print(f"  ok   {scenario}: {len(forecasts)} forecast(s), {len(probs)} distinct: {probs}")
+print("  ok   sweep-embedded digests == standalone `twin run` digests, both scenarios")
 CHECK
 
 say "4. explicitly unscoreable — published in the artefact's own body, not a placeholder"

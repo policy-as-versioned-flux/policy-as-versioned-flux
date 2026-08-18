@@ -7,13 +7,14 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 75 of 78 build tickets closed, and one measuring against a clock that runs
+**This is 85 of 92 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06 and will not reach its own pre-registered coverage floor. See "The confirmatory audit
 was not confirmatory", below.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
-rather than carried forward by hand — the previous banner, 73, was already one behind the live
-count when build ticket 77's own recount found it. That is the same drift this file's own "What is
-honestly built" section repeatedly finds and corrects, and the reason the count is a grep rather
-than a number somebody remembers to increment.)
+rather than carried forward by hand — the previous banner, 75 of 78, was already nine tickets
+behind the live count when build ticket 88's own recount found it, the same drift build ticket 77
+found in the banner before that. That is the same drift this file's own "What is honestly built"
+section repeatedly finds and corrects, and the reason the count is a grep rather than a number
+somebody remembers to increment.)
 **Build ticket 66 built its refusal and did not close**, because criterion 1 is conjunctive and only
 its second half exists: no merge capability, at two layers, and no pull request opened. It was
 briefly marked done and then unmarked — see "Propose only, in two layers", below, for what is built
@@ -44,6 +45,7 @@ bash twin/beat-netflix.sh                  # the whole-engine beat: fear, seize,
 ./bin/twin backtest --repo R --org O --scenario S --regime as-consumed --at T # rewind, then run — one composition
 ./bin/twin run --repo R --scenario S --regime as-consumed   # the gate is required, with no default
 ./bin/twin regimes --repo R --scenario S   # the same scenario under all three, with the gaps
+./bin/twin scenario-diff --repo R --org O --scenario S --before REF1 --after REF2 # a scenario definition, versioned by git, rendered as a map-diff
 ./bin/twin positions --repo R --org O --scenario S  # believed, rival, revealed — and the deltas between them
 ./bin/twin causal-accounts --repo R --org O --origin X --account A1 --account A2 # rival causal accounts, spread not privilege
 ./bin/twin trade-off --repo R --org O --origin X --perspective P --account A1 --account A2 # net cost of risk per response, across the account ensemble, marked default
@@ -2011,6 +2013,49 @@ spine) and `causal-layer` stays at its prior count too (criterion 5 stays unchec
 authored a forecast, not a causal edge). Both capability files name exactly what is still missing
 rather than describing a real Intel spine as future work now that one exists.
 
+## The map-diff renderer, the four-tier proof, and Intel's real opportunity scenario
+
+Build ticket 88 closes `scenario-engine`'s last three criteria in one round — 4/7 to `full`, 7/7.
+
+**AC 3, "where scenarios live and how they are versioned/diffed."** Git already carried the
+storage half (build ticket 06); the gap was a renderer. `twin/scenario_diff.py`'s `diff()` takes a
+scenario id and two git refs — a branch-per-scenario pair, or two commits on one branch — and
+reports two legs: a field-level diff of the scenario itself (question, proposition, at, horizon,
+components, world models) and a **map-diff**, the positions (`Graph.wardley()`, no separate
+authoring step, build ticket 14) of every component either side's overlay places. Wired as `twin
+scenario-diff`. A scenario present on only one side is reported (`scenario_present`), not refused
+— mid-flight branch authoring is a real state a map-diff should be able to show.
+
+**AC 6, the selection/prioritisation rule (the combinatorics answer).** Decision ticket 13's four
+tiers are proven the complete, non-overlapping set by reading the source directly
+(`tests/test_scenario_selection_tiers.py`), the same discipline `backtest_is_a_pure_composition`
+already uses for a CLI command's own structural claim. Exactly two primitives can produce a
+scenario execution or an opportunity anywhere in this codebase — `verbs.run()` and
+`gameplay_lens.propose()`/`.sweep()` — and every call site of either across `twin/*.py` is one of:
+`schedule.sweep()` (tier 1, standing library, an unconditional loop naming no scenario),
+`gameplay_lens.sweep()` (tier 2, precondition-triggered, an unconditional scan naming no
+component), or `cli.cmd_run`/`cli.cmd_backtest` (tiers 3 and 4, event-triggered and ad-hoc — the
+identical call, because decision ticket 13 distinguishes the two only by *why* a human or
+automation invoked it, never by a different code path). `reproduce.replay` also calls
+`verbs.run()`, but originates nothing: it reads the scenario id out of an artefact's own already-
+recorded command, never a fresh argument. A fifth caller anywhere would fail the test.
+
+**AC 7, the real opportunity scenario.** Netflix already had both a fear and an opportunity
+scenario (build ticket 74). Intel had only its fear scenario on the real spine
+(`does-the-14a-bet-land-a-named-customer`, build ticket 75); its would-be opportunity side was the
+toy `euv-slip-2026` fixture citing `example.invalid`, on a different overlay entirely. This ticket
+adds `euv-readiness-wins-the-14a-opportunity` to `fixtures.build_intel_org`, wrapping build ticket
+81's own real, cited EUV causal edge the upside way: does the subject's own High-NA EUV tooling
+readiness hold through its own named 2026 go/no-go, positioning it to win the external customer
+commitment — the reverse of the historical slip the same edge's own note cites. Checked live
+rather than assumed: `gameplay_lens.propose()` finds nothing to pull on this org's overlay (no
+person edges, no component near the product/commodity band), so unlike Netflix's pulled land-grab,
+this opportunity is authored as a scenario on the same real edge and world models the fear
+scenario already uses. `twin/beat-intel.sh` runs both scenarios standalone and inside `twin
+sweep`, byte-identical either way — the standing library now sweeps two clean executions, not one,
+which is why the pre-existing harness guard's own assertion moved from "exactly one" to "exactly
+two, both scenarios present."
+
 ## The decaying unbound-signal pool
 
 `twin/unbound_pool.py` (build ticket 54, decision ticket 11 Q3) is the retention half of "weak
@@ -2100,7 +2145,7 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Seven
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Ten
 capabilities now reach `full` — computed, not typed, and reached the same way every other tick in
 this table was: real code, cited live.
 
@@ -2112,7 +2157,7 @@ this table was: real code, cited live.
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | full | 8 / 8 |
-| `scenario-engine` | 13 | partial | 4 / 7 |
+| `scenario-engine` | 13 | full | 7 / 7 |
 | `synthetic-substrate` | 12 | full | 7 / 7 |
 | `forecast-book` | 21 | full | 6 / 6 |
 | `twin-inside-twin` | 10 | full | 5 / 5 |
@@ -2120,13 +2165,15 @@ this table was: real code, cited live.
 | `enactment` | 18 | full | 5 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**61 of 73**, across thirteen capabilities, nine of them `full`. An artefact's overall depth is
+**64 of 73**, across thirteen capabilities, ten of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
 where `domain-model`, `causal-layer`, `currency-regimes`, `forecast-book`, `synthetic-substrate`,
-`ethics-gate`, `sense-move`, `twin-inside-twin` or `enactment` is one of the capabilities they
-cite. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
-count — re-derived here rather than trusting a stale total (the same provisional-total drift this
-file names repeatedly below).
+`ethics-gate`, `sense-move`, `twin-inside-twin`, `enactment` or `scenario-engine` is one of the
+capabilities they cite. `./bin/twin grade` prints the denominators, and this table is its output,
+not a hand-kept count — re-derived here rather than trusting a stale total (the same
+provisional-total drift this file names repeatedly below). (The "Seven capabilities" figure this
+paragraph carried before build ticket 88 was itself already one behind the table's own nine full
+rows — recomputed here rather than incremented by one on top of a stale base.)
 
 **`enactment` moved from 4/5 to 5/5, `full`, at build ticket 86.** AC 5 asked for the
 action-state feedback path that closes decision ticket 08's conditional-forecast loop. Build
@@ -2939,16 +2986,20 @@ Named here so the skeleton cannot quietly become the definition of done.
   Unconditional, cross-repository, no `--scenario` or `--component` flag on either — but a
   scheduler still has to invoke them. The same gap build ticket 64 left for `estate/driftwood/` to
   own: the instrument is built, the cron/CI cadence around it is not. (09, 46.)
-- **The standing scenario set has an admissibility rule now; it still has no selection or
-  prioritisation rule.** Build ticket 69 gave "belongs to the standing library" a mechanical test
-  — the closed `COMMITTED_SCENARIO_CLASSES` enum (see "Price moves as world-layer signals", above,
-  for the invariant it completed) — but `sweep()` still runs every scenario in every overlay it is
-  pointed at unconditionally rather than choosing among them: decision ticket 13's own
-  selection/prioritisation criterion (`scenario-engine` AC 6) stays open, which is why the
-  capability sits at 4/7 rather than higher. Build ticket 46 built the precondition-triggered half
-  — `gameplay_lens.sweep()` — as its own scan rather than folding it into `schedule.sweep()`'s
-  scenario loop, because a precondition match is not a scenario execution and has no forecast to
-  emit.
+- **The standing scenario set's admissibility and selection rules are both closed now; the clock
+  that would call them still is not.** Build ticket 69 gave "belongs to the standing library" a
+  mechanical test — the closed `COMMITTED_SCENARIO_CLASSES` enum (see "Price moves as world-layer
+  signals", above). Build ticket 88 proved decision ticket 13's own four tiers (standing library,
+  precondition-triggered, event-triggered, ad-hoc) are the complete, non-overlapping set —
+  `tests/test_scenario_selection_tiers.py` checks every call site of `verbs.run()` and
+  `gameplay_lens.propose()`/`.sweep()` across `twin/*.py` directly, the way
+  `backtest_is_a_pure_composition` checks a CLI command's own source — which is why
+  `scenario-engine` reached `full` (7/7). `sweep()` still runs every scenario in every overlay it
+  is pointed at unconditionally rather than choosing among them, which is the point: tier 1's own
+  job is to be unbiased, not selective. `gameplay_lens.sweep()` stays its own scan rather than
+  folding into `schedule.sweep()`'s scenario loop, because a precondition match is not a scenario
+  execution and has no forecast to emit. The bullet above still holds: nothing calls either on a
+  clock yet.
 - **The affected-parties register and disparate-impact channel are both purely additive, exercised
   only on fixture data.** Build ticket 61's register aggregates what scenario authoring already
   declares; the disparate-impact channel is sealed and role-gated. Neither reaches a live pipeline

@@ -2033,17 +2033,22 @@ def _intel_forecast_is_pinned_signed_and_names_its_own_unscoreability(ctx: Conte
                 raise Violated(f"{outfile}: carries human involvement on a derived artefact")
 
         # -- the scheduled production line, and nothing hand-made behind it -----------------------
+        # Two clean executions, not one: build ticket 88 adds the real opportunity scenario
+        # (decision ticket 13 AC 7) beside this fear scenario in the identical overlay, and the
+        # standing library (tier 1) sweeps every scenario in it unconditionally.
         swept = run_cli(["sweep", "--repo", str(intel_dir)], "sweep.json")
         signed("sweep.json")
         executions = swept["body"]["executions"]
-        if len(executions) != 1 or swept["body"]["failures"]:
+        if len(executions) != 2 or swept["body"]["failures"]:
             raise Violated(
-                f"expected exactly one clean execution sweeping the intel repository, got "
-                f"{len(executions)} execution(s) and {len(swept['body']['failures'])} failure(s)"
+                f"expected exactly two clean executions sweeping the intel repository (fear + "
+                f"opportunity), got {len(executions)} execution(s) and "
+                f"{len(swept['body']['failures'])} failure(s)"
             )
-        execution = executions[0]
-        if execution["scenario"] != scenario_id or execution["org"] != org:
-            raise Violated(f"sweep ran the wrong scenario: {execution['org']}/{execution['scenario']}")
+        by_scenario = {e["scenario"]: e for e in executions if e["org"] == org}
+        if scenario_id not in by_scenario:
+            raise Violated(f"sweep never ran {org}/{scenario_id}: got {sorted(by_scenario)}")
+        execution = by_scenario[scenario_id]
 
         standalone = run_cli(
             ["run", "--repo", str(intel_dir), "--org", org, "--scenario", scenario_id,

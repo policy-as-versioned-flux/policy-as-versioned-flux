@@ -18,7 +18,8 @@ import yaml
 
 from . import (
     TOOL_VERSION, attest, constraints, does_not_do, enact, enforcement, evidence, fixtures,
-    gameplay_lens, index, invariants, ontology, retrospective_sweep, schedule, sign, unbound_pool, verbs,
+    gameplay_lens, index, invariants, ontology, retrospective_sweep, scenario_diff, schedule, sign,
+    unbound_pool, verbs,
 )
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
@@ -39,6 +40,7 @@ from .propagate import AttenuationError
 from .regimes import RegimeError
 from .reproduce import ReproduceError
 from .repo import ModelRepo, RepoError
+from .scenario_diff import ScenarioDiffError
 from .schema import REGIMES, SchemaError
 from .scoring import RULES, ScoreError
 from .sign import SignatureError
@@ -151,6 +153,39 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(f"  withheld {entry['id']:<34} {entry['collection']}, dated {entry['dated']}")
     if not gate["gate"]["ingestion_history"]["available"]:
         print(f"  ingestion history unavailable: {gate['gate']['ingestion_history']['consequence']}")
+    return _emit(artefact, args.out)
+
+
+def cmd_scenario_diff(args: argparse.Namespace) -> int:
+    """Two scenario definitions, rendered as a map-diff (build ticket 88, decision ticket 13 AC 3).
+
+    Git already supplies the storage/versioning half — `--before`/`--after` are just two refs,
+    branches or commits alike, the way research 03's branch-per-scenario is meant to be read.
+    """
+    caps = Capabilities.load()
+    repo_before = ModelRepo.open(args.repo, args.before)
+    org = verbs.resolve_org(repo_before, args.org)
+    artefact = scenario_diff.diff(
+        args.repo, caps, org, args.scenario, args.before, args.after,
+        verbs.command_for(
+            "scenario-diff", org=org, scenario=args.scenario, before=args.before, after=args.after
+        ),
+    )
+    body = artefact.body
+    map_diff = body["map"]
+    _say(
+        f"{org}/{args.scenario}: {args.before} -> {args.after} — "
+        f"{len(body['scenario_fields'])} field(s) changed, "
+        f"{len(map_diff['moved'])} component(s) moved, "
+        f"{len(map_diff['added'])} added, {len(map_diff['removed'])} removed"
+    )
+    for field, delta in sorted(body["scenario_fields"].items()):
+        print(f"  {field:<14} {delta}")
+    for move in map_diff["moved"]:
+        print(
+            f"  moved {move['component']:<30} {move['stage']['before']} -> {move['stage']['after']}"
+            f" (evolution {move['evolution']['before']:.2f} -> {move['evolution']['after']:.2f})"
+        )
     return _emit(artefact, args.out)
 
 
@@ -1628,6 +1663,18 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--out", required=True)
     run.set_defaults(fn=cmd_run)
 
+    diffed_scenario = with_org(subs.add_parser(
+        "scenario-diff", help="two scenario definitions, rendered as a map-diff"
+    ))
+    diffed_scenario.add_argument("--repo", required=True, help="path to the model repository")
+    diffed_scenario.add_argument("--scenario", required=True)
+    diffed_scenario.add_argument(
+        "--before", required=True, help="git ref (branch, tag, or commit) for the earlier side"
+    )
+    diffed_scenario.add_argument("--after", required=True, help="git ref for the later side")
+    diffed_scenario.add_argument("--out", required=True)
+    diffed_scenario.set_defaults(fn=cmd_scenario_diff)
+
     gap = with_org(with_repo(subs.add_parser(
         "regimes", help="one scenario under all three regimes, with the two gaps computed"
     )))
@@ -2013,6 +2060,7 @@ REFUSALS = (
     BlobRefError,
     IndexError_,
     ReproduceError,
+    ScenarioDiffError,
     SchemaError,
     ScoreError,
     SignatureError,

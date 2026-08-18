@@ -30,6 +30,9 @@ from twin.verbs import CAPS_RUN
 ORG = fixtures.INTEL_ORG
 SCENARIO = "does-the-14a-bet-land-a-named-customer"
 PROPOSITION = "a-leading-edge-foundry-node-lands-a-named-external-customer"
+# The opportunity half of decision ticket 13 AC 7 (build ticket 88) — the same real EUV edge as
+# the fear scenario, wrapped the upside way.
+OPPORTUNITY_SCENARIO = "euv-readiness-wins-the-14a-opportunity"
 
 BEAT = Path(__file__).resolve().parents[1] / "twin" / "beat-intel.sh"
 
@@ -49,11 +52,15 @@ def beat(
     out = work / "artefacts"
     out.mkdir()
 
-    paths = {name: out / f"{name}.json" for name in ("sweep", "run")}
+    paths = {name: out / f"{name}.json" for name in ("sweep", "run", "opportunity_run")}
     assert main(["sweep", "--repo", str(repo), "--out", str(paths["sweep"])]) == 0
     assert main([
         "run", "--repo", str(repo), "--org", ORG, "--scenario", SCENARIO,
         "--regime", "as-consumed", "--out", str(paths["run"]),
+    ]) == 0
+    assert main([
+        "run", "--repo", str(repo), "--org", ORG, "--scenario", OPPORTUNITY_SCENARIO,
+        "--regime", "as-consumed", "--out", str(paths["opportunity_run"]),
     ]) == 0
     return {"repo": repo, **paths}
 
@@ -113,15 +120,23 @@ def test_the_standalone_run_is_also_signed_and_reproduces_from_its_pins(beat: di
 def test_the_sweep_embedded_forecast_is_byte_identical_to_a_standalone_run(beat: dict[str, Path]) -> None:
     """Nothing here was hand-made for the demo.
 
-    `twin sweep` names no scenario at run time; a standalone `twin run` on the identical scenario
-    is the independent computation this test checks the scheduled one against, byte for byte.
+    `twin sweep` names no scenario at run time; a standalone `twin run` on each identical scenario
+    is the independent computation this test checks the scheduled one against, byte for byte. Two
+    executions now, not one (build ticket 88 adds the real opportunity scenario beside the fear
+    one) — both real scenarios in this overlay, both unconditionally in the standing library.
     """
     sweep = _body(beat["sweep"])
-    assert len(sweep["executions"]) == 1 and not sweep["failures"]
-    execution = sweep["executions"][0]
-    assert execution["org"] == ORG and execution["scenario"] == SCENARIO
+    assert len(sweep["executions"]) == 2 and not sweep["failures"]
+    by_scenario = {e["scenario"]: e for e in sweep["executions"]}
+    assert set(by_scenario) == {SCENARIO, OPPORTUNITY_SCENARIO}
+    for execution in by_scenario.values():
+        assert execution["org"] == ORG
 
-    assert execution["forecast_bundle"]["sha256"] == digest_of_file(beat["run"])
+    assert by_scenario[SCENARIO]["forecast_bundle"]["sha256"] == digest_of_file(beat["run"])
+    assert (
+        by_scenario[OPPORTUNITY_SCENARIO]["forecast_bundle"]["sha256"]
+        == digest_of_file(beat["opportunity_run"])
+    )
 
 
 def test_the_forecast_is_plural_and_the_ensemble_genuinely_disagrees(beat: dict[str, Path]) -> None:
@@ -226,6 +241,47 @@ def test_the_real_euv_causal_edge_composes_to_a_priced_elasticity(
     assert not primary["directional_only"], (
         "grade 2 is inside the pricing threshold — a real elasticity, not a direction-only claim"
     )
+
+
+# -- decision ticket 13 AC 7: the real opportunity scenario, exercised (build ticket 88) -----------
+
+
+def test_the_opportunity_scenario_is_framed_as_a_win_not_a_threat(beat: dict[str, Path]) -> None:
+    """The same discipline `test_the_m_and_a_class_is_framed_as_an_opportunity_not_a_threat`
+    (`tests/test_scenario_library.py`) checks the standing library against: an opportunity
+    scenario's own question reads as upside, not danger."""
+    question = _body(beat["opportunity_run"])["scenario"]["question"].lower()
+    threat_words = ("fail", "block", "lose", "coerc", "departs", "suffers")
+    assert not any(word in question for word in threat_words), question
+    assert "win" in question or "opportunity" in question
+
+
+def test_the_opportunity_forecast_is_plural_and_the_ensemble_genuinely_disagrees(
+    beat: dict[str, Path],
+) -> None:
+    forecasts = _body(beat["opportunity_run"])["forecasts"]
+    assert len(forecasts) >= 2, "no ensemble to spread across"
+    distinct = {f["probability"] for f in forecasts}
+    assert len(distinct) >= 2, f"all {len(forecasts)} forecasts agree: {distinct}"
+
+
+def test_the_opportunity_scenario_is_built_on_the_real_euv_edge_not_a_toy_one(
+    beat: dict[str, Path],
+) -> None:
+    """Replaces the toy `euv-slip-2026` fixture's `example.invalid`-cited placeholder (decision
+    ticket 13's own prior note on `scenario-engine.yaml` AC 7): the opportunity scenario names
+    `euv-lithography` — build ticket 81's own real, cited causal edge's own origin — as one of its
+    components, and nothing in its own definition cites `example.invalid`."""
+    body = _body(beat["opportunity_run"])
+    assert "euv-lithography" in body["scenario"]["components"]
+    raw = json.dumps(body)
+    assert "example.invalid" not in raw
+
+
+def test_no_outcome_is_authored_for_the_opportunity_scenario_either(beat: dict[str, Path]) -> None:
+    """The same permanent honesty as the fear scenario: this org's story has not happened yet."""
+    overlay = Overlay.load(ModelRepo.open(beat["repo"]), ORG)
+    assert not overlay.outcomes
 
 
 # -- AC 5: extends the invariant suite, and the new guard passes live ------------------------------
