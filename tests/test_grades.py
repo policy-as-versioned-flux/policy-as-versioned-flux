@@ -93,7 +93,7 @@ def test_an_ungraded_capability_cannot_be_used(caps: Capabilities) -> None:
         caps.require("something-nobody-graded")
 
 
-def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_and_causal_layer_have_earned_full(caps: Capabilities) -> None:
+def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_and_twin_inside_twin_have_earned_full(caps: Capabilities) -> None:
     """The walking skeleton must not be able to claim `full` on say-so — but a capability that
     closes every acceptance criterion with a real, live-checked citation may: `domain-model` was
     the first to (build ticket 79), `forecast-book` the second (build ticket 84, the
@@ -105,7 +105,10 @@ def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currenc
     `sense-move` the sixth (build ticket 80, observation propagation wired into `sense()` and
     exercised on a real signal for each co-flagship), `causal-layer` the seventh (build ticket 81:
     the composed abduction/action/prediction chain with structural-only-path behaviour stated for
-    the composition, the intervention-aware scoring gate, and the real Intel EUV causal edge).
+    the composition, the intervention-aware scoring gate, and the real Intel EUV causal edge),
+    `twin-inside-twin` the eighth (build ticket 83: a threat model priced in the same £ currency,
+    a Goodhart position backed by a live classification of build ticket 82's named sensor table,
+    and misuse-of-the-twin-itself cases added to the existing governance catalogue).
     Every other shipped capability stays `partial` or `stub`."""
     grades = {g.capability: g.grade for g in caps}
     assert set(grades) == {
@@ -120,6 +123,7 @@ def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currenc
     assert grades.pop("currency-regimes") == "full"
     assert grades.pop("sense-move") == "full"
     assert grades.pop("causal-layer") == "full"
+    assert grades.pop("twin-inside-twin") == "full"
     assert "full" not in grades.values()
 
 
@@ -145,13 +149,13 @@ def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_
     assert block["capabilities"]["finished"]["unchecked"] == []
 
 
-def test_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_and_causal_layer_are_the_shipped_capabilities_at_full(
+def test_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_and_twin_inside_twin_are_the_shipped_capabilities_at_full(
     caps: Capabilities,
 ) -> None:
     grades = {g.capability: g.grade for g in caps}
     assert {c for c, g in grades.items() if g == "full"} == {
         "domain-model", "forecast-book", "synthetic-substrate", "ethics-gate", "currency-regimes",
-        "sense-move", "causal-layer",
+        "sense-move", "causal-layer", "twin-inside-twin",
     }
 
 

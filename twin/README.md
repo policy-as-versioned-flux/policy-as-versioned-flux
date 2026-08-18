@@ -855,15 +855,74 @@ between the two, checked directly rather than merely asserted
 `twin/constraints.yaml`'s `scope_exclusions`/`positions` sections before this ticket, sourced to
 "decision ticket 15, Q3b finding N" — this file is Q3's table only.
 
-**A judgement call left alone on purpose: `twin-inside-twin` AC 5 stays unticked.** Decision ticket
-10's own resolution carried its identically-worded criterion ("named misuse cases with the
+**A judgement call this ticket left alone, and build ticket 83 confirms it correctly.** Decision
+ticket 10's own resolution carried its identically-worded criterion ("named misuse cases with the
 constraint that blocks each") forward "to the ethics/reflexive-governance workstream", and its
-Question text names the same three worked examples this catalogue covers — a real case could be
-made that this artefact closes it too. But build ticket 83 (blocked by this one, already drafted)
-reads that AC as scoped narrower and differently: misuse *of the twin itself by its own operator*
-(gaming a sensor's metric, selectively citing forecasts), extending build ticket 62's governance
-catalogue rather than this one. Ticking it here would pre-empt a call a ticket built for exactly
-that question should make with the fuller picture; left open rather than guessed.
+Question text names the same three worked examples this catalogue covers — a real case could have
+been made that this artefact closes it too. Build ticket 83 (blocked by this one) reads that AC as
+scoped narrower and differently — misuse *of the twin itself by its own operator* (gaming a
+sensor's metric, selectively citing forecasts), extending build ticket 62's governance catalogue
+rather than this one — and ticks it there, on its own three new entries, not on the eight above.
+See "The threat model, the Goodhart classification, and misuse of the twin itself", below.
+
+## The threat model, the Goodhart classification, and misuse of the twin itself
+
+`twin-inside-twin` moves from `partial` (2/5) to `full` (5/5) at build ticket 83, closing the three
+criteria decision ticket 10 either deferred to a build task or carried forward to this ethics
+workstream — all three built by reusing existing general-purpose machinery, no new subsystem.
+
+**AC 2 — a threat model, in the twin's own £ currency.** Decision ticket 10's own "as a target"
+question names three attack modes: exfiltration, model extraction, sensor poisoning.
+`twin/fixtures.py`'s `TWIN_SELF_ORG` overlay gets a third component,
+`the-twin-analytical-surface` (the graph data, evidence claims, pricing rules and sensor inputs
+this instrument holds and reads from), carrying all three rather than one component per mode — the
+depth-1 bound this ticket inherits is about self-reference, not about how finely one asset's own
+attack surface is sliced. The impact edge is graded honestly: Tramér et al. (2016, USENIX
+Security), "Stealing Machine Learning Models via Prediction APIs", and Biggio & Roli (2018,
+*Pattern Recognition* 84), "Wild Patterns", are real, cited literature establishing that these
+mechanisms are effective against learning/decision systems in general — but neither paper measured
+this instrument, so the edge is grade 3 (literature/domain theory, `evidence-ladder.yaml`), and the
+shock itself stays an honest, unpriced register entry rather than a fabricated number. The two
+controls it names — restricting and logging query access (aimed at the extraction mechanism Tramér
+et al. demonstrate), and attesting provenance on every signal before admission (aimed at the
+poisoning mechanisms Biggio & Roli survey) — still price in the ordinary £ PERT currency every
+other response in this system costs through, via the unmodified `twin/pricing.py` +
+`twin/options.py` path, because a response's own cost is sampled independent of whether the shock
+it addresses ever prices. "Gaming the scores" — decision ticket 10's fourth named threat — is left
+to AC 4, below, where it has a real table to be concrete against.
+
+**AC 4 — the Goodhart/reflexivity position, made concrete.** Decision ticket 10 Q4 already stated
+the position in prose ("accepted as noise for now", a deliberate scope limit): Goodhart on every
+sensor, self-attribution, sensor-disclosure effects, named as known and accepted, covert sensing
+ruled out permanently. What the checklist was missing was a concrete answer to "which sensors are
+most gameable" against a real, named table — which did not exist until build ticket 82's
+`twin/sensors.yaml`, the AC 4 dependency this ticket names as its blocker. `twin/ethics_gate.py`
+gets one new function, `classify_named_sensors()`, that runs the module's own existing
+`classify_gameability()` against every row of that table — no twin-specific classifier, the exact
+reuse decision ticket 10's own resolution called for. Only `bus-factor-structural-aggregate`
+(structural, aggregate) classifies `goodhart-proof`; the other five — every behavioural or
+individual-level sensor in the table — classify `marked`, the safe default, and are therefore the
+most gameable of the named set. A different question from `ethics-gate` AC 3 (decision ticket 15
+Q2's own Goodhart position, about sensors read on *employees*): this one is the twin's own
+reflexive position on sensing *itself*, and nothing here moves `ethics-gate`'s own already-`full`
+grade.
+
+**AC 5 — named misuse of the twin itself, three entries added to the existing catalogue.**
+`twin/misuse-catalogue.yaml` moves from v1 to v2: three entries, scoped — per the judgement call
+above — to misuse of the twin *by its own operator*, decision ticket 10's own worked examples,
+each naming the mechanism that blocks it rather than only the risk:
+`selectively-cites-the-twins-own-forecast-to-win-an-argument-about-it` (blocked by
+`twin/positions.py`'s no-privileged-position deltas, exposing every rival forecast and the
+calibration record together, plus `twin/challenges.py`'s contestability);
+`games-a-sensor-about-the-twins-own-operation-to-look-healthier-than-it-is` (blocked by
+`ethics_gate.py`'s marked-by-default classification above and the fast-improvement backstop, which
+never emits an automatic finding); `treats-the-twins-own-priced-figure-as-a-binding-instruction`
+(blocked by invariant `no_recommended_action_field` and `twin/tradeoff.py`'s marked,
+never-a-verdict default). No id or subject overlaps build ticket 62's original six entries (misuse
+of the twin's machinery against *some other* subject) or build ticket 82's
+`behavioural-misuse-catalogue.yaml` (misuse of sensing against the people an org's twin models) —
+this is the twin as the subject of its own catalogue, closing the last gap decision ticket 10 left
+open.
 
 ## The credibility prior: the world/overlay split earning its keep
 
@@ -2043,18 +2102,26 @@ this table was: real code, cited live.
 | `scenario-engine` | 13 | partial | 4 / 7 |
 | `synthetic-substrate` | 12 | full | 7 / 7 |
 | `forecast-book` | 21 | full | 6 / 6 |
-| `twin-inside-twin` | 10 | partial | 2 / 5 |
+| `twin-inside-twin` | 10 | full | 5 / 5 |
 | `ethics-gate` | 15 | full | 5 / 5 |
 | `enactment` | 18 | partial | 4 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**57 of 73**, across thirteen capabilities, seven of them `full`. An artefact's overall depth is
+**60 of 73**, across thirteen capabilities, eight of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
 where `domain-model`, `causal-layer`, `currency-regimes`, `forecast-book`, `synthetic-substrate`,
-`ethics-gate` or `sense-move` is one of the capabilities they cite. `./bin/twin grade` prints the
+`ethics-gate`, `sense-move` or `twin-inside-twin` is one of the capabilities they cite. `./bin/twin grade` prints the
 denominators, and this table is its output, not a hand-kept count — re-derived here
 rather than trusting a stale total (the same provisional-total drift this file names repeatedly
 below).
+
+**`twin-inside-twin` moved from 2/5 to 5/5, `full`, at build ticket 83.** Three gaps closed
+together, all reusing existing general-purpose machinery per the ticket's own instruction: a
+threat model on `TWIN_SELF_ORG` priced through the unmodified `twin/pricing.py` path (AC 2), a
+Goodhart position made concrete by classifying build ticket 82's real `twin/sensors.yaml` table
+through `ethics_gate.py`'s existing `classify_gameability()` (AC 4), and three misuse-of-the-
+twin-itself entries added to the existing `twin/misuse-catalogue.yaml` (AC 5). See "The threat
+model, the Goodhart classification, and misuse of the twin itself", above, for the full account.
 
 **`causal-layer` moved from 2/5 to 5/5, `full`, at build ticket 81.** Two gaps closed together.
 AC 2 (intervention + counterfactual semantics, incl. structural-only paths) was two thirds

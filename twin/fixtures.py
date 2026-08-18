@@ -3188,6 +3188,18 @@ text: >-
   first years of operation, for reasons other than its forecast accuracy.
 resolves_on: '2028-08-11'
 """,
+    # AC 2, build ticket 83 (decision ticket 10, "as a target"): the twin as a threat-modelled
+    # subject, not only a dependency. Generic, as every world-layer proposition here must be
+    # (check_direction refuses a tenant id in world-layer prose) — the overlay's own scenario
+    # names which instrument and which attack modes.
+    "world/propositions/a-decision-support-instruments-model-or-data-is-compromised.yaml": """\
+id: a-decision-support-instruments-model-or-data-is-compromised
+text: >-
+  A decision-support instrument's own model, priced graph data, or sensor inputs are
+  exfiltrated, extracted, or tampered with by a party outside its ordinary maintenance chain,
+  within its first years of operation.
+resolves_on: '2028-08-11'
+""",
 }
 
 _TWIN_SELF_OVERLAY: dict[str, str] = {
@@ -3418,6 +3430,119 @@ mitigates:
     against this literature directly — a domain judgement, not a repeated co-movement, so it may
     not price (evidence-ladder.yaml grade 3).
 note: Crosses nothing, so it survives the pre-filter and is costed.
+""",
+    # -- the threat model (AC 2, build ticket 83; decision ticket 10, "as a target") ------------
+    #
+    # "A signed, £-ranked vulnerability dossier is a shopping list" — decision ticket 10's own
+    # named threats are exfiltration, model extraction, and sensor poisoning (gaming the scores
+    # is AC 4's territory, priced against build ticket 82's sensors.yaml, not repeated here). One
+    # new component carries the attack surface for all three rather than three, because the
+    # depth-1 bound this ticket inherits is about self-reference, not about how finely a single
+    # asset's own attack surface is sliced. The impact edge is graded 3 (literature/domain
+    # theory) honestly: the two cited papers establish the mechanisms exist and are effective
+    # against learning/decision systems in general, not that they have been observed against
+    # THIS instrument — so the impact itself stays an unpriced register entry
+    # (evidence-ladder.yaml pricing_threshold: 2), while the two controls below still price in
+    # the ordinary £ currency, because a response's own cost is sampled independent of whether
+    # the shock it addresses ever prices (twin/pricing.py's own docstring: "a component that
+    # fails any [gate] is a register entry ... not a zero").
+    "orgs/twin-self/components/the-twin-analytical-surface.yaml": """\
+id: the-twin-analytical-surface
+name: The twin's own queryable graph, evidence store and sensor inputs
+kind: data
+evolution: custom-built
+evolution_position: 0.3
+visibility: 0.15
+description: >-
+  The graph data, evidence claims, pricing rules and sensor inputs this instrument holds and
+  reads from — the asset exfiltration, model extraction (querying the priced output until the
+  underlying model is reconstructed) and sensor poisoning each target directly, distinct from
+  the-twin-model (the engine that reads it) and the-twin-adoption (whether anyone still cites
+  its output).
+""",
+    "orgs/twin-self/edges/compromise-of-the-analytical-surface-damages-adoption.yaml": """\
+id: compromise-of-the-analytical-surface-damages-adoption
+type: influences
+from: the-twin-analytical-surface
+to: the-twin-adoption
+sign: negative
+lag_days: 30
+elasticity:
+  min: 0.05
+  mode: 0.15
+  max: 0.35
+evidence_grade: 3
+confidence: 0.35
+note: >-
+  Established domain theory that these attack modes exist and are effective against
+  ML/decision systems generally — Tramer, Zhang, Juels, Reiter & Ristenpart (2016), "Stealing
+  Machine Learning Models via Prediction APIs", 25th USENIX Security Symposium, demonstrates
+  model extraction through ordinary query access to a prediction API; Biggio & Roli (2018),
+  "Wild Patterns: Ten Years After the Rise of Adversarial Machine Learning", Pattern Recognition
+  84:317-331, surveys poisoning and exfiltration attacks against learning systems. Neither paper
+  measures the effect on THIS instrument's own adoption, so this is grade 3
+  (literature/domain-theory, evidence-ladder.yaml): a real mechanism, applied to an org nobody
+  has measured it in — it may not price on its own.
+""",
+    "orgs/twin-self/world_models/established-attack-literature-on-decision-support-systems.yaml": """\
+id: established-attack-literature-on-decision-support-systems
+name: Published domain theory on attacks against learning and decision-support systems
+credence: 0.5
+note: >-
+  Tramer et al. (2016) and Biggio & Roli (2018) — see the edge's own note for full citations —
+  establish that exfiltration, model extraction and sensor/data poisoning are real, demonstrated
+  mechanisms against learning and decision systems in general. This org's overlay carries the
+  resulting belief because no cross-organisation measurement of THIS instrument exists yet
+  (domain theory, grade 3 — evidence-ladder.yaml).
+beliefs:
+  a-decision-support-instruments-model-or-data-is-compromised: 0.35
+""",
+    "orgs/twin-self/scenarios/threat-to-the-twin-2026.yaml": """\
+id: threat-to-the-twin-2026
+question: >-
+  Does an outside party exfiltrate, extract, or poison the twin's own model, data or sensor
+  inputs within the horizon?
+proposition: a-decision-support-instruments-model-or-data-is-compromised
+at: '2026-08-18'
+horizon: '2028-08-11'
+components:
+  - the-twin-analytical-surface
+world_models:
+  - established-attack-literature-on-decision-support-systems
+affected_parties:
+  - id: downstream-decision-recipients-of-a-compromised-surface
+    who: >-
+      Staff elsewhere in the organisation whose own decisions are informed by outputs derived
+      from the compromised surface, holding no security stake modelled here.
+    consequence: >-
+      A compromise this scenario forecasts corrupts or exposes the inputs to their own
+      decisions with no notice keyed to their own timelines; this model prices the sponsor's
+      and maintainer's exposure, never theirs.
+""",
+    "orgs/twin-self/responses/restrict-and-log-query-access-to-the-priced-output.yaml": """\
+id: restrict-and-log-query-access-to-the-priced-output
+name: Restrict and log who can query the priced output, rate-limited rather than open
+addresses: the-twin-analytical-surface
+cost:
+  min: 8000
+  mode: 25000
+  max: 60000
+note: >-
+  Crosses nothing, so it survives the pre-filter and is costed. Aimed at the mechanism Tramer
+  et al. (2016) demonstrate: model extraction through ordinary, unrestricted query access.
+""",
+    "orgs/twin-self/responses/attest-provenance-on-every-signal-before-admission.yaml": """\
+id: attest-provenance-on-every-signal-before-admission
+name: Require attested provenance on every signal before it is admitted, not only its grade
+addresses: the-twin-analytical-surface
+cost:
+  min: 3000
+  mode: 10000
+  max: 30000
+note: >-
+  Crosses nothing, so it survives the pre-filter and is costed. Aimed at sensor poisoning, the
+  mechanism Biggio & Roli (2018) survey; twin/evidence.py already grades a claim's strength,
+  this is provenance checked at the point of admission rather than trusted after it.
 """,
 }
 

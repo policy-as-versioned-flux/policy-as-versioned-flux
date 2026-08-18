@@ -45,6 +45,14 @@ missing a declared `kind` or `granularity`; `admit()` refuses a payload whose se
 row in that table, before the ladder is even walked. Every id the table names is one a real caller
 already proposes: `labelled_corpus()`'s five and `payroll-record`, the one enactment channel that
 observes people at all.
+
+**Decision ticket 10 AC 4 (`twin-inside-twin`, build ticket 83)** — "which sensors are most
+gameable", the half of the twin's own Goodhart/reflexivity position that decision ticket 10 Q4
+named but left unbacked by a concrete answer — reuses this same table and `classify_gameability()`
+rather than a twin-specific classifier: `classify_named_sensors()` below. A different question
+from decision ticket 15 Q2 (gameability of *employee-facing* sensors, which build ticket 47
+already answers): this one is about the sensor table itself, read as a stand-in for whatever the
+twin would end up sensing about its own operation and adoption.
 """
 
 from __future__ import annotations
@@ -350,6 +358,23 @@ def prefer(candidates: list[dict[str, Any]]) -> dict[str, Any]:
         else "no candidate is goodhart-proof; none preferred on gameability grounds alone"
     )
     return {"candidates": marked, "preferred": preferred, "reason": reason}
+
+
+def classify_named_sensors(path: Path | None = None) -> list[dict[str, Any]]:
+    """Every row of the named sensor table (`sensors.yaml`, build ticket 82), classified — the
+    concrete answer to "which sensors are most gameable" decision ticket 10 AC 4 (twin-inside-
+    twin, build ticket 83) asks for, produced by re-running this module's own `classify_gameability()`
+    against a real table rather than authoring a second, twin-specific one.
+
+    `metric_description` is each sensor's own declared `name` — the human-readable label an
+    operator would actually see and could game, not its id or its longer `observes` prose — so
+    the classification is of the metric as named, the same shape `labelled_corpus()`'s
+    hand-authored examples already use.
+    """
+    return [
+        classify_gameability({"sensor": {"id": row["sensor"]}, "metric_description": row["name"]})
+        for row in load_sensors(path)["sensors"]
+    ]
 
 
 # -- fast improvement: suspicion, never a verdict (decision ticket 15 Q2(c)) ---------------------

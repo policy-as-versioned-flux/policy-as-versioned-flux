@@ -128,14 +128,16 @@ Book), `secure`, `dpia`, `atrs`, `ai-playbook`, `data-model`, `finops`, `roadmap
   **opportunity plays** and the **backtest cases** (ticket 19's roster + the hindsight-resistance
   controls). These double as the **acceptance tests** each workstream satisfies. The *engine* is decided
   (ticket 13); the *contents* are not.
-- **Build-time artefacts carried forward from resolved tickets** — the **twin threat-modelling
-  exercise** (ticket 10, its own misuse-of-the-twin-itself catalogue entries included); the
+- **Build-time artefacts carried forward from resolved tickets** — the
   **misuse-catalogue mechanisms** to formalise (published scope exclusions, constraint-removal logging
   with attractiveness, the affected-parties register, the disparate-impact audit channel,
   role-not-person signatures) (ticket 15); **AI assurance** (ATRS / ai-playbook) for the twin's own
   models. (The enumerated **sensor set** and the behavioural-sensing **misuse catalogue**, ticket 15's
   other two carried-forward items, are closed — build ticket 82, `twin/sensors.yaml` and
-  `twin/behavioural-misuse-catalogue.yaml`.)
+  `twin/behavioural-misuse-catalogue.yaml`. Ticket 10's own **twin threat-modelling exercise** and its
+  **misuse-of-the-twin-itself catalogue entries** are closed too — build ticket 83, the third
+  component on `TWIN_SELF_ORG` priced through the ordinary `twin/pricing.py` path, and three entries
+  added to `twin/misuse-catalogue.yaml`.)
 - **The Flux hypothesis** — Flux is held as an *integral enabler unless proven otherwise*: continuous
   reconciliation from a signed pinned source is what makes "provably in force" verifiable, and its
   reconciliation state is a high-grade enactment-evidence channel (ticket 18). **The falsification test is

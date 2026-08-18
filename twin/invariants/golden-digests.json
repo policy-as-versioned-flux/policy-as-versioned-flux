@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 08 \u2014 build ticket 81 moves causal-layer to full 5/5 (composed abduction/action/prediction, the intervention-aware scoring gate, and the real Intel EUV causal edge), which changes every artefact's depth block and the intel graph/propagation bytes",
-  "capabilities_digest": "3568d85a16f6de3c37c0a3327a691d402c5bfd7e5aa12e58e929dd87ae8ee5e1",
+  "authorised_by": "decision ticket 10 \u2014 build ticket 83 closes twin-inside-twin AC 2, 4, 5 (threat model, Goodhart position, misuse-of-the-twin-itself), moving the capability to full and changing every artefact's capabilities_digest pin",
+  "capabilities_digest": "2612a1b249c9bb63c43b5900e88d56a83d96949a2790d651174701674816e5b6",
   "digests": {
-    "blast-radius": "4b17e561b15d072b32c58b4e01f02b3513dbba71f30ac55714058788107583f9",
-    "bound-signal": "bc124146f8a21c088dde092e5e9c69c98abf16538279bf438a6e5f6783dec756",
-    "forecast-bundle": "a143ce761d7a231886c1ec325f547eb69fe82ad1b81b766dbbdb8810a69c9bd2",
-    "graph": "1aaf66fa2df57161a27a23c6f7d299b73889798d84206af1d0732534c2666806",
-    "intervention": "d359f1e12dd69f856f0cf8ac9977f5ebdbe67febdbfb89e3b5908e98a676782b",
-    "observation": "912e3055a9121ebb447aae26cee3040910c07c71069226c7c47c6d3b2330d27c",
-    "priced-impact": "930479d3c24a7a1dfa7375b54de818c08c7080cb832331c9aff8c5df2288e9dd",
-    "priced-option-set": "0b64b54b4bf10e67617ea9a8a73851a01ff695197655e5613897b90c1eeb8122",
-    "propagation": "414d1ca3e77fc9d42931275076c377028715b7e0355164d7f7568cd47d3cb05e",
-    "rewound-model": "c3ee6ab2234e60b846dc373aedd5e19471b77a9d0176020642287afb513ce1ab",
-    "scenario-exposure": "916277f4fb0bc6ac7b864750ef3853a4541a05c5364954fc97dbab3053a65550",
-    "score-card": "affafeacff85b5c73ce761c169e332453d805653239a089067abe462b8f90d35"
+    "blast-radius": "198efdeede09f7a5d6b3cc71e363867c03d69b19f30b3720076fabe377926706",
+    "bound-signal": "12735a264daa365d18886ea88e45e01d925a2040252b2b2c513fc578ff3fabd7",
+    "forecast-bundle": "8b0b3bcb6d3efde3b788f0ea4a14c865d71372c4b9bd792b97d18159c155ec41",
+    "graph": "b591ed9583f26775764c4e23755057b9eee8166f7c87e66b1c38214863f7fb22",
+    "intervention": "f6b54e14072581f206d4dbe2a0e6f0917d8ffabde27ca0ca0fbaceaf2da4986b",
+    "observation": "7055db6dd8d095a100e82f633feee592bae64c74a86bb20940c321fda6626181",
+    "priced-impact": "9461a0f6e3f753ea8daaa9bfd57812efd58c45537b4fcafac18e5329dc43a74c",
+    "priced-option-set": "a02aa708a8e21684ad812d6fc1236e13380011457810029d2baa4edab8ff2004",
+    "propagation": "9e52439f9bb372bf1630edbb4957f689221f57386a12592a1d1415cd6c27a4b2",
+    "rewound-model": "6985f44de7af9d10a186e0d699d7f58b6a54890361096d1aac5fe9da3d9e2ac6",
+    "scenario-exposure": "2fe7788735e63d14032b76c6d75df592f39d52aea35007e2c0d7fab373f5ea12",
+    "score-card": "392e7ff8a836dd5583a89a2a1dab6e238c1721c0d0ee0074cafb39cdcb32aa69"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

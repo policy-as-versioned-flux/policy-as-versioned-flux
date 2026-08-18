@@ -7,8 +7,15 @@
 # guard or an invariant, its name here is the same name `twin verify` reports.
 #
 # Versioned: bump `version` in the same commit as any change to an entry below.
+#
+# v2 (build ticket 83, decision ticket 10 AC 5) adds the three entries at the end of this file,
+# scoped to misuse of the twin ITSELF by its own operator (selectively citing its forecasts,
+# gaming a sensor about its own operation, treating a priced figure as a mandate) — distinct from
+# every entry above, which is misuse of the twin's governance/pricing/scoring machinery against
+# some other subject, and distinct from `behavioural-misuse-catalogue.yaml` (build ticket 82),
+# which is misuse of behavioural sensing against the people an org's twin models.
 schema: twin.misuse-catalogue/v1
-version: 1
+version: 2
 entries:
   - id: prices-a-forbidden-option-by-raising-the-stakes
     risk: >-
@@ -80,3 +87,46 @@ entries:
       resolves, never from the caller, and `refuse_answering_a_different_claim` is the second
       lock for a resolution ever built by a different path.
     source: build ticket 60
+
+  # -- misuse of the twin ITSELF, by its own operator (decision ticket 10 AC 5, build ticket 83) -
+
+  - id: selectively-cites-the-twins-own-forecast-to-win-an-argument-about-it
+    risk: >-
+      An operator quotes only the twin's own forecast or calibration figure that supports a
+      decision about the twin itself — fund it, cut it, keep using it — already made on other
+      grounds, omitting the rival positions or the calibration record that cuts the other way.
+    mechanism: >-
+      twin/positions.py `deltas()`/`pairwise_deltas()`/`against_revealed()`: every position on a
+      proposition — including rival world models and the twin's own reference — is computed and
+      exposed together, with no privileged position and no field anywhere called `actual`
+      (tests/test_positions.py::test_dropping_any_one_position_changes_nothing_else); twin/
+      challenges.py's contestability lets a reader dispute the selective citation directly
+      against the versioned record rather than merely disagree with it out loud.
+    source: decision ticket 10 Q3; build ticket 16, 60
+
+  - id: games-a-sensor-about-the-twins-own-operation-to-look-healthier-than-it-is
+    risk: >-
+      An operator presents a fast-improving metric about the twin's own adoption or operation as
+      settled proof of success, to strengthen a case for its continued funding or for its
+      removal, rather than as the suspicion a rate that fast is grounds for.
+    mechanism: >-
+      twin/ethics_gate.py `classify_gameability()`/`classify_named_sensors()`: a sensor proposed
+      about the twin's own operation is `marked`, not `goodhart-proof`, by default — the safe
+      default decision ticket 15 Q2(b) names. `flag_fast_improvement()`/
+      `adjudicate_fast_improvement()`: a fast-improving metric raises a flag carrying no
+      verdict-shaped field (checked against invariant `no_recommended_action_field`'s own
+      banned-word scan), and only a human holding a registered role (twin/roles.yaml) can turn it
+      into an actual finding.
+    source: decision ticket 10 Q4; decision ticket 15 Q2; build ticket 47, 83
+
+  - id: treats-the-twins-own-priced-figure-as-a-binding-instruction
+    risk: >-
+      An operator points at the twin's own bus-factor-1 reading or its adoption-risk pricing and
+      treats it as an automatic mandate — "the number says decommission it" — rather than as
+      advisory input to a human decision.
+    mechanism: >-
+      Invariant `no_recommended_action_field` and twin/tradeoff.py's marked default: nothing this
+      instrument emits, on itself or any other subject, carries a recommended-action field or a
+      binding instruction; the trade-off curve's own default is a computed point on the curve,
+      marked and reasoned, never a verdict.
+    source: decision ticket 10 Q3; build ticket 33

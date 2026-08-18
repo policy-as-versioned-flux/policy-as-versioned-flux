@@ -10,7 +10,21 @@ criteria:
     ticked_by: build ticket 63
   - index: 2
     text: "A threat model for the twin, with controls priced in the same currency."
-    checked: false
+    checked: true
+    evidence: >-
+      twin/fixtures.py build_twin_self_org(): a third component, the-twin-analytical-surface
+      (the graph data, evidence claims, pricing rules and sensor inputs), targeted by
+      decision ticket 10's own named threats — exfiltration, model extraction, sensor poisoning
+      — via a causal edge honestly graded 3 (literature/domain theory, cited to Tramer et al.
+      2016 "Stealing Machine Learning Models via Prediction APIs" and Biggio & Roli 2018 "Wild
+      Patterns"), so the impact itself stays an unpriced register entry
+      (evidence-ladder.yaml pricing_threshold: 2) rather than a fabricated number. Two controls
+      (restrict-and-log-query-access-to-the-priced-output,
+      attest-provenance-on-every-signal-before-admission) price through the ordinary
+      twin/pricing.py + twin/options.py path — no bespoke pricing machinery — in the identical £
+      PERT currency every other response in the system costs through
+      (tests/test_twin_inside_twin.py::test_the_threat_controls_are_priced_in_the_ordinary_currency_even_though_the_impact_is_not).
+    ticked_by: build ticket 83
   - index: 3
     text: "A decision-governance model: query rights, citation rules, contestability, advisory-vs-binding."
     checked: true
@@ -18,7 +32,38 @@ criteria:
     ticked_by: build ticket 60
   - index: 4
     text: "A stated position on Goodhart/reflexivity, incl. which sensors are most gameable."
-    checked: false
+    checked: true
+    evidence: >-
+      Decision ticket 10 Q4 already stated the position in prose (accepted as noise for now, a
+      deliberate scope limit — Goodhart on every sensor, self-attribution, sensor-disclosure
+      effects named as known, accepted limitations; covert sensing ruled out permanently). Build
+      ticket 83 closes the concrete half this ticket's own checklist was missing:
+      twin/ethics_gate.py classify_named_sensors() runs the module's own existing
+      classify_gameability() against every row of build ticket 82's real, named
+      twin/sensors.yaml table, reusing the machinery rather than inventing a twin-specific
+      classifier. Result: only bus-factor-structural-aggregate (structural, aggregate) is
+      goodhart-proof by construction; the other five — behavioural or individual-level sensors —
+      are marked, the safe default, and are therefore the most gameable of the named set
+      (tests/test_twin_inside_twin.py::test_the_named_sensor_table_is_classified_and_most_of_it_is_marked_gameable).
+      Distinct from ethics-gate AC 3 (decision ticket 15 Q2's own Goodhart position, about
+      employee-facing sensing) — this is the twin's reflexive position on itself.
+    ticked_by: build ticket 83
   - index: 5
     text: "Named misuse cases with the constraint that blocks each."
-    checked: false
+    checked: true
+    evidence: >-
+      Three cases added to the existing twin/misuse-catalogue.yaml (v1 -> v2), loaded through
+      twin/misuse.py's existing load_catalogue() — no second catalogue file — each scoped to
+      misuse of the twin ITSELF by its own operator, decision ticket 10's own worked examples:
+      selectively-cites-the-twins-own-forecast-to-win-an-argument-about-it (blocked by
+      twin/positions.py's no-privileged-position deltas plus twin/challenges.py contestability),
+      games-a-sensor-about-the-twins-own-operation-to-look-healthier-than-it-is (blocked by
+      ethics_gate.py's marked-by-default classification and the fast-improvement backstop, never
+      an automatic finding), treats-the-twins-own-priced-figure-as-a-binding-instruction (blocked
+      by invariant no_recommended_action_field and twin/tradeoff.py's marked, non-binding
+      default). Distinct in scope from build ticket 62's original six entries (misuse of the
+      twin's machinery against some other subject) and from build ticket 82's
+      behavioural-misuse-catalogue.yaml (misuse of sensing against the people an org's twin
+      models) — no id or subject overlaps with either
+      (tests/test_twin_inside_twin.py::test_misuse_of_the_twin_itself_is_named_with_a_mechanism_each).
+    ticked_by: build ticket 83
