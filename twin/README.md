@@ -58,6 +58,7 @@ bash twin/beat-netflix.sh                  # the whole-engine beat: fear, seize,
 ./bin/twin exposure --repo R --scenario S  # one scenario, valued under every declared perspective
 ./bin/twin price --repo R --origin C       # a shock priced under every eye, responses beside it
 ./bin/twin constraints --out F             # the published constraint set, floor and exclusions
+./bin/twin ontology --out F                # the named core ontology, generated from schema.py's own vocabulary
 ./bin/twin affected-parties --repo R --org O --out F  # who bears a modelled consequence with no perspective, alongside the constraint set
 ./bin/twin propose --repo R --org O --response X --channel policy|record --out F  # propose enacting a response; there is no verb that disposes
 ./bin/twin disparate-impact-audit --finding F --source S --out O      # raise a finding — sealed, never names the protected characteristic
@@ -1904,12 +1905,13 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Nothing
-reaches `full`, and nothing can be typed as `full`.
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. One
+capability now reaches `full` — computed, not typed, and reached the same way every other tick in
+this table was: real code, cited live.
 
 | capability | decision ticket | grade | ticked |
 |---|---|---|---|
-| `domain-model` | 07 | partial | 1 / 7 |
+| `domain-model` | 07 | full | 7 / 7 |
 | `causal-layer` | 08 | partial | 2 / 5 |
 | `currency-regimes` | 09 | partial | 5 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
@@ -1923,12 +1925,21 @@ reaches `full`, and nothing can be typed as `full`.
 | `enactment` | 18 | partial | 4 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**39 of 73**, and every artefact carries an overall depth of `partial`, which is the *worst* of the
-capabilities that produced it. **Read `partial` as "at least one of N", not as "most of the way
-there"** — the strongest capability here stands at six ticks, and one of the thirteen still stands
-at one. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
-count — re-derived here rather than trusting the stale, hand-carried "32" the previous round left
-behind (the same provisional-total drift this file names repeatedly below).
+**45 of 73**, across thirteen capabilities, one of them `full`. An artefact's overall depth is
+still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
+where `domain-model` is one of the capabilities they cite. `./bin/twin grade` prints the
+denominators, and this table is its output, not a hand-kept count — re-derived here rather than
+trusting a stale total (the same provisional-total drift this file names repeatedly below).
+
+**`domain-model` moved from 1/7 to 7/7 at build ticket 79.** A prior research pass found five of
+the six unchecked ACs already satisfied by code built since decision ticket 07 was resolved
+(build tickets 04, 17, 36 and the co-flagship fixtures at 73/75) — the checklist was stale, not
+the implementation, and ticket 79 verified each claim live before ticking it (see
+`twin/capabilities/domain-model.yaml` for the citation on every line). The one genuine gap, AC 1's
+named ontology, is now `twin/ontology.py` — entity types, relationship types and the Wardley
+backbone read straight from `schema.py`'s own vocabulary rather than retyped, published via
+`twin ontology`. AC 6 (where £/risk, people, assets and signals attach) folded into the same
+artefact rather than becoming a second one.
 
 **`demo-slice` is a new row (build ticket 72) against decision ticket 22, which had no capability
 file before it** — the fourth time that gap has been found and filled rather than left empty
@@ -2630,10 +2641,14 @@ Named here so the skeleton cannot quietly become the definition of done.
 - **Cross-machine verification has never run.** The `reproduce-elsewhere` CI job emits a score card
   on x86_64 Linux and recomputes it on arm64 macOS. Declared and wired; unproven. This and the
   two-architecture leg are the two acceptance criteria left unticked across tickets 01–12.
-- **One named entity type is still missing.** Decision ticket 07 names `Asset`/`DataAsset` and
-  `Response`/`Control` in the core ontology. Build ticket 28 gave `Response` a schema — id, name,
-  the component it addresses, a cost triple and the red lines it crosses — and `Asset` has none,
-  which is why domain-model's first criterion stays unticked.
+- **`Asset`/`DataAsset` has no schema of its own — deliberately.** Decision ticket 07 names
+  `Asset`/`DataAsset` beside `Response`/`Control` in the core ontology's prose. Build ticket 28
+  gave `Response` a schema; `Asset` never got one, because decision ticket 07's own Q1 resolution
+  already says why: "not separate models" — a data asset is a `component` of kind `data`, same
+  schema, same evolution axis, same edges as everything else on the spine. Build ticket 79's
+  `twin/ontology.py` (AC 6's attachment table) states this explicitly rather than leaving it
+  implicit, which is what let domain-model's first and sixth criteria tick without a second
+  schema being invented to satisfy a reading of the prose the decision itself already ruled out.
 - **The Wardley positions in a committed model repository are still authored, and the judge is not
   wired to them.** `evolution` and `evolution_position` are whatever the model repository says.
   Which position a component actually holds is a judgement, and the judge — with human override

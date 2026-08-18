@@ -93,22 +93,25 @@ def test_an_ungraded_capability_cannot_be_used(caps: Capabilities) -> None:
         caps.require("something-nobody-graded")
 
 
-def test_the_shipped_capabilities_are_all_partial_or_stub(caps: Capabilities) -> None:
-    """The walking skeleton must not be able to claim `full` anywhere."""
+def test_only_domain_model_has_earned_full(caps: Capabilities) -> None:
+    """The walking skeleton must not be able to claim `full` on say-so — but a capability that
+    closes every acceptance criterion with a real, live-checked citation may, and `domain-model`
+    is the first to (build ticket 79). Every other shipped capability stays `partial` or `stub`."""
     grades = {g.capability: g.grade for g in caps}
     assert set(grades) == {
         "causal-layer", "currency-regimes", "demo-slice", "domain-model", "enactment",
         "ethics-gate", "forecast-book", "honest-build", "provenance", "scenario-engine",
         "sense-move", "synthetic-substrate", "twin-inside-twin",
     }
+    assert grades.pop("domain-model") == "full"
     assert "full" not in grades.values()
 
 
 def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_path: Path) -> None:
     """A `full` capability must not mask a `stub` one — that is the whole point of the block.
 
-    Built from a purpose-made set rather than the shipped one: the shipped capabilities all happen
-    to sit at the same grade today, and a fixture that cannot tell `min` from `max` asserts nothing.
+    Built from a purpose-made set rather than the shipped one: a fixture needs a genuine `stub` in
+    the mix, and a fixture that cannot tell `min` from `max` asserts nothing.
     """
     _capability(tmp_path, "finished", "14", checked=[1, 2, 3, 4])
     _capability(tmp_path, "started", "14", checked=[2])
@@ -126,8 +129,9 @@ def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_
     assert block["capabilities"]["finished"]["unchecked"] == []
 
 
-def test_the_shipped_capabilities_never_reach_full(caps: Capabilities) -> None:
-    assert "full" not in {g.grade for g in caps}
+def test_domain_model_is_the_only_shipped_capability_at_full(caps: Capabilities) -> None:
+    grades = {g.capability: g.grade for g in caps}
+    assert {c for c, g in grades.items() if g == "full"} == {"domain-model"}
 
 
 # -- the aggregate is computed, not hand-summed (build ticket 70) -----------------------------

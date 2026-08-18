@@ -18,7 +18,7 @@ import yaml
 
 from . import (
     TOOL_VERSION, attest, constraints, does_not_do, enact, enforcement, evidence, fixtures,
-    gameplay_lens, index, invariants, retrospective_sweep, schedule, sign, unbound_pool, verbs,
+    gameplay_lens, index, invariants, ontology, retrospective_sweep, schedule, sign, unbound_pool, verbs,
 )
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
@@ -755,6 +755,30 @@ def cmd_does_not_do(args: argparse.Namespace) -> int:
     )
     for entry in body["entries"]:
         print(f"  does-not-do  {entry['id']:<22} {entry['does_not_do']}")
+    return _emit(artefact, args.out)
+
+
+def cmd_ontology(args: argparse.Namespace) -> int:
+    """Publish the named core ontology: every entity type, relationship type and the Wardley
+    backbone `schema.py` declares, plus where £/risk, people, assets and signals attach (decision
+    ticket 07 AC 1 and AC 6, build ticket 79).
+
+    Derived, not authored: `ontology.published()` reads `schema.py`'s and `model.py`'s own
+    vocabulary, so this cannot drift out from under a schema change the way a hand-typed doc could.
+    """
+    caps = Capabilities.load()
+    body = ontology.published()
+    artefact = ontology.artefact(verbs.command_for("ontology"), caps, body)
+    _say(
+        f"ontology: {len(body['entity_types'])} entity types, {len(body['relationship_types'])} "
+        f"relationship types, {len(body['attachment'])} attachment points named"
+    )
+    for entry in body["entity_types"]:
+        print(f"  entity        {entry['kind']:<18} required: {', '.join(entry['required_fields'])}")
+    for entry in body["relationship_types"]:
+        print(f"  relationship  {entry['type']:<18} {entry['family']}")
+    for entry in body["attachment"]:
+        print(f"  attaches      {entry['named']:<10} {entry['attaches_as']}")
     return _emit(artefact, args.out)
 
 
@@ -1837,6 +1861,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     not_done.add_argument("--out", required=True)
     not_done.set_defaults(fn=cmd_does_not_do)
+
+    ontology_p = subs.add_parser(
+        "ontology", help="publish the named core ontology, generated from schema.py's own vocabulary"
+    )
+    ontology_p.add_argument("--out", required=True)
+    ontology_p.set_defaults(fn=cmd_ontology)
 
     parties = with_org(with_repo(subs.add_parser(
         "affected-parties", help="the affected-parties register, published alongside the constraint set"

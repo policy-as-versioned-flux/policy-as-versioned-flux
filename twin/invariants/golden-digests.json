@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 22 \u2014 build ticket 72 adds the demo-slice capability checklist, so every artefact's capabilities_digest pin moves; no scoring rule, serialisation or engine output changed",
-  "capabilities_digest": "cf720f0fd8ae50cece2dfb0fbeadaf0c062bdedf864d6e464a9a999de3638866",
+  "authorised_by": "decision ticket 07 \u2014 build ticket 79 closes domain-model's remaining acceptance criteria (1, 2, 4, 5, 6, 7), so every artefact's capabilities_digest and depth block move; no scoring rule, serialisation or engine output changed",
+  "capabilities_digest": "91882380084c18ec81ec20da89f278c25c2cf3bb60f588a914f541fe701eaee8",
   "digests": {
-    "blast-radius": "b8353431fab05a12bb1a4abe4a7b4f46e7e7fe923e9428f505a233c389c8810a",
-    "bound-signal": "c004c8919f2b989057f28b8beb77d821838ad2bc9516d179c70f76a83c8002bd",
-    "forecast-bundle": "6cd5c16380a66bff3af92641cf0a8614bdb71de2a06d88ffe4eee9afa77bcf71",
-    "graph": "191c78f9eb2887cc5c4ab3049c76309bdbcd8e919557e38fca557e783826977d",
-    "intervention": "8495d369095121336e37d44d3552708760e1d363439fd1e75d87d869ce19e8f4",
-    "observation": "86d1fce8040fc01213e030fe537769553ea3a18b652e1fbbd7540152cdcb7918",
-    "priced-impact": "797034cc88cb173af5b67fea0107888b51ac6643e0e15e0691866c004d6d2f6a",
-    "priced-option-set": "1020bdde639c792d0ed3180a73ad809cb024905b673f44de6abd6ba13ff8b604",
-    "propagation": "1bf39ec3e47baa329f24ba5a61274486aa823af8837cc2a3ac5963f846c8719e",
-    "rewound-model": "fc1162ff710149d0f70e2f652320a782f9d97765cd5d86ff47a77edfb4e2ca32",
-    "scenario-exposure": "945e7fe9ba4981b425af00dd36f07e8840eecca0ae90a4acaf6177dd74ad5bc0",
-    "score-card": "e8a922f47bb5fbbc96861e3e3e3c692218e699bd7b07d245cd075aa51e17e597"
+    "blast-radius": "c0e3684487a347fd2b6d64ea9eca11b5aba27fa14ac49caebe6cb0f1d5dd971a",
+    "bound-signal": "5e6e7e0ee680915ab9a85eec98522e29bd2191398715a25149cf9ce77002b7ea",
+    "forecast-bundle": "2d1d2b4c77a8a9de1771913ce94aafd4deb5ee8d5ef3f7d2510d336f61fbded4",
+    "graph": "ed62b2f6060ffcf90bd32bc019020db4a1138d6a22416d44d795d565b3928f73",
+    "intervention": "a253cf3478ebbde35c004216f7f6c6d6d500292c2d7b5758e2adb25930952a23",
+    "observation": "dbaa43942585230bd6023039e232b3b46d460f8134421fac12e2acdd81d7b202",
+    "priced-impact": "956ff6c313379e0171f5ac50de102d1480da14ebda53a4c4080500316c0e37cd",
+    "priced-option-set": "7f29ad067343d04dd83e61837e7d84f854326845deaa580afe4975336452b60e",
+    "propagation": "584bacd916c96c3916899530c05c45e5576f6841a1317b5305f26e5bd231d4e8",
+    "rewound-model": "dd14e12bf07dd7c914363461328a2c84c72630cc43e1387de0a206a14ab48aa4",
+    "scenario-exposure": "76674ded8548293ee42386c5c161c117bf28ad43a7014bd762d428b90daed78f",
+    "score-card": "92959f8b18963e378660d6286d6490ec4541f123838ea54131728d8a7c105dc3"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

@@ -1,15 +1,21 @@
 # The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
-# Decision ticket 07 is resolved; almost none of it is built. `grade` is absent on purpose —
-# it is computed from the ticks below and cannot be typed.
+# Decision ticket 07 is resolved; build ticket 79 found five of the six unchecked ACs already
+# satisfied by code built since, and closed the remaining gap (the named ontology, folding in the
+# attachment mapping). `grade` is absent on purpose — it is computed from the ticks below and
+# cannot be typed.
 capability: domain-model
 owning_ticket: '07'
 criteria:
   - index: 1
     text: "A named core ontology (entity types + relationship types + the backbone) in ubiquitous language."
-    checked: false
+    checked: true
+    evidence: "twin/ontology.py's entity_types()/relationship_types()/backbone(), generated from schema.py's own SCHEMAS/EDGE_TYPES/COMPONENT_KINDS/EVOLUTION rather than hand-typed — a schema change changes this artefact with no second edit. Published via `twin ontology`. tests/test_ontology.py::test_every_schema_kind_is_a_named_entity_type and test_every_edge_type_is_classified_into_exactly_one_family assert it stays a live read of schema.py rather than a snapshot."
+    ticked_by: build ticket 79
   - index: 2
     text: "The layering decision (one graph vs coupled) with the seam(s) defined."
-    checked: false
+    checked: true
+    evidence: "twin/model.py's World/Overlay split, DirectionError and enforce_direction/check_direction — the world layer may never reference an overlay, citing decision ticket 07 Q1b in the module's own docstring, built by build ticket 04. Exercised live by tests/test_seam2_model.py::test_the_world_layer_may_never_reference_an_overlay (plants a violation and asserts check_direction catches it)."
+    ticked_by: build ticket 04, confirmed by build ticket 79
   - index: 3
     text: "Edge-semantics decision incl. the structural-vs-causal distinction."
     checked: true
@@ -17,13 +23,21 @@ criteria:
     ticked_by: build ticket 17
   - index: 4
     text: "The temporal/versioning model + how scenarios are represented."
-    checked: false
+    checked: true
+    evidence: "twin/repo.py's UnitRef/Pin: the world layer and each overlay are separately versioned, git-commit-pinned units — exercised by tests/test_seam2_model.py::test_an_overlay_stays_pinned_while_the_world_moves. A scenario is its own schema object (schema.py SCHEMAS['scenario']) that deliberately carries no regime; every execution must name one with no default (twin/regimes.py require()) — exercised by tests/test_regimes.py::test_a_scenario_cannot_declare_its_own_regime and test_an_execution_with_no_regime_is_refused_rather_than_defaulted."
+    ticked_by: build tickets 04 and 36, confirmed by build ticket 79
   - index: 5
     text: "The representation/format decision (reuse vs custom) with what's authored vs derived."
-    checked: false
+    checked: true
+    evidence: "twin/artefact.py's AUTHORED/DERIVED marks, enforced at attestation time by twin/attest.py (a derived artefact refuses a human signature; an authored one requires one) — exercised by tests/test_repo_and_envelope.py::test_a_derived_artefact_refuses_a_human_signature and test_an_authored_artefact_carries_the_signature_that_gives_it_accountability. What is authored vs derived is enumerated in decision ticket 07's own RESOLVED section and mirrored per module by every AUTHORED/DERIVED call site (twin/challenges.py, twin/constraints.py, twin/does_not_do.py, twin/ontology.py, ...)."
+    ticked_by: build ticket 01, confirmed by build ticket 79
   - index: 6
     text: "Where the £/risk, people, assets and signals attach to the graph."
-    checked: false
+    checked: true
+    evidence: "twin/ontology.py's ATTACHMENT table names where £/risk (scenario/response/perspective), people (person nodes + maintains/knows/owns edges), assets (a component of kind 'data') and signals (signal + claim) attach, each schema_kinds entry checked against schema.py's real vocabulary by _check_attachment_vocabulary() rather than asserted in prose. tests/test_ontology.py::test_ac6_names_exactly_the_four_things_the_ticket_names and test_ac6_attachment_vocabulary_catches_a_renamed_schema_kind (the guard actually bites)."
+    ticked_by: build ticket 79
   - index: 7
     text: "Exercised against Netflix + Intel (does the model actually hold each subject?)."
-    checked: false
+    checked: true
+    evidence: "twin/fixtures.py's build_netflix_org and build_intel_org: full value chains of typed components (kinds capability/activity/practice/data), structural (`needs`) and causal (`influences`) edges, positioned on the evolution axis. Overlay.load's own _check_references() validates the whole ontology against both on every load — exercised by tests/test_netflix.py's netflix_spine fixture, tests/test_netflix_beat.py::test_the_dated_state_carries_no_layer_that_postdates_it (asserts the causal layer in .graph().edges appears/disappears across a rewind), and tests/test_intel_beat.py (loads the Intel overlay, its scenario and its proposition)."
+    ticked_by: build tickets 73 and 75, confirmed by build ticket 79
