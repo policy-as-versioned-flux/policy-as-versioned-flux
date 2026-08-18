@@ -34,6 +34,10 @@ from . import options as options_mod
 from .canon import digest_of
 
 CATALOGUE_PATH = PACKAGE_DIR / "misuse-catalogue.yaml"
+# The behavioural-sensing misuse catalogue (decision ticket 15's own Q3 table, build ticket 82) —
+# a different scope from CATALOGUE_PATH above (misuse of the twin's own governance/pricing/scoring
+# machinery), loaded through the same `load_catalogue()` below rather than a second loader.
+BEHAVIOURAL_CATALOGUE_PATH = PACKAGE_DIR / "behavioural-misuse-catalogue.yaml"
 REMOVAL_LOG_PATH = PACKAGE_DIR / "removal-log.jsonl"
 CATALOGUE_SCHEMA = "twin.misuse-catalogue/v1"
 

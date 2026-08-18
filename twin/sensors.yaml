@@ -1,0 +1,75 @@
+# The named sensor set (build ticket 82), from decision ticket 15's own resolution: "the enumerated
+# set is a build-time artefact, carried forward, not decided here." This is that artefact.
+#
+# Mirrors `enactment-channels.yaml`'s shape: a versioned, CLOSED table. `twin/ethics_gate.py`
+# refuses a payload whose sensor id is not named here — a sensor id was, before this ticket, any
+# string `admit()` happened to be handed. Every row here is a sensor a real caller already
+# proposes: the five in `ethics_gate.labelled_corpus()` and `payroll-record`, the one sensor
+# `enactment-channels.yaml`'s own admission block names (the only enactment channel that observes
+# people at all). Registering a sensor here does not admit it — that is still `admit()`'s ladder and
+# DPIA gate, walked per proposed *use*. This table only says the sensor is a named, known thing a
+# use can be proposed for, at a declared coarsest-safe granularity.
+#
+# `kind` and `granularity` reuse `ethics_gate.py`'s own necessity-rung vocabulary (`_KIND_RANK`,
+# `_LEVEL_RANK`) rather than inventing a second one: structural/behavioural, and
+# aggregate/cohort/individual, least intrusive first — decision ticket 15 Q1 rung 2's own words.
+# `granularity` here is the sensor's own coarsest-safe reading, independent of what any one
+# admission payload declares for a proposed use (a payload may propose a more intrusive kind/level
+# than the sensor's own coarsest form; that is exactly what the necessity rung exists to catch).
+#
+# Versioned. Bump `version` in the same commit as any change to `sensors`.
+schema: twin.sensors/v1
+version: 1
+
+sensors:
+  - sensor: bus-factor-structural-aggregate
+    name: Commit-structure bus-factor, aggregated
+    kind: structural
+    granularity: aggregate
+    observes: >-
+      Which components would lose their only committer, derived from commit-graph structure
+      and reported per team, never per person.
+
+  - sensor: mood-sensor-no-scenario
+    name: Ambient sentiment sensor
+    kind: behavioural
+    granularity: individual
+    observes: >-
+      Message-content-derived sentiment, per person. Named here as a sensor that exists to be
+      proposed and refused — it is decision ticket 15 Q1's own worked example of a sensor with
+      no named consuming scenario, so no use of it clears the purpose rung.
+
+  - sensor: individual-email-content-when-aggregate-suffices
+    name: Per-person email content scan
+    kind: behavioural
+    granularity: individual
+    observes: >-
+      Email content, read per person, for insider-risk signal that an aggregate structural
+      reading (commit/access-graph shape) already answers less intrusively.
+
+  - sensor: expensive-surveillance-low-value
+    name: Full-team activity dashboard
+    kind: structural
+    granularity: aggregate
+    observes: >-
+      Aggregate team activity levels, at a cost that decision ticket 15 Q1's proportionality
+      rung finds not worth the value it illuminates for attrition-risk monitoring.
+
+  - sensor: keystroke-monitoring-no-dpia
+    name: Keystroke-cadence monitor
+    kind: behavioural
+    granularity: individual
+    observes: >-
+      Per-keystroke cadence and timing, per person — one of the ICO's own DPIA-mandatory
+      monitoring cases (research 05 Part B.2), named here as the sensor `dpia_triage()`'s
+      keystroke trigger is worked against.
+
+  - sensor: payroll-record
+    name: Cohort-level payroll confirmation that a pay lever was enacted
+    kind: structural
+    granularity: aggregate
+    observes: >-
+      That the payroll system recorded a pay award the response proposed, at cohort level —
+      never an individual's pay, and never anybody's pay over time. The one row in
+      `enactment-channels.yaml` that observes people at all, and the reason that table carries
+      an `admission` block walking this same sensor through `ethics_gate.admit()`.

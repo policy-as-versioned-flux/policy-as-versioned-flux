@@ -1,0 +1,126 @@
+# The behavioural-sensing misuse catalogue (build ticket 82), from decision ticket 15's own Q3
+# table: the eight named misuses of PEOPLE-SENSING and what blocks each.
+#
+# NOT `twin/misuse-catalogue.yaml` (build ticket 62). That catalogue names misuse of the twin's
+# own governance/pricing/scoring machinery — laundering a price through severity, hand-editing a
+# forecast, and so on. This one names misuse of the *behavioural overlay itself*: suppressing pay,
+# justifying layoffs, surveillance creep, the rest of decision ticket 15's Q3 table. Different
+# scope, same shape — loaded and validated by the same `twin/misuse.py` `load_catalogue()`, pointed
+# at this file instead, per decision ticket 15's own reading that no bolt-on ethics layer was
+# needed: "the constraints mostly already existed is evidence the design is coherent rather than
+# accreted." Reusing the loader rather than inventing a second one says the same thing about the
+# catalogues.
+#
+# Each entry names a MECHANISM, not just a risk, the same discipline the other catalogue applies:
+# a risk is a sentence anyone could write; a mechanism is code, an invariant, or a constraint id a
+# reader can go and check. `mechanism` cross-references `twin/constraints.yaml`'s universal-floor
+# ids and `twin/ethics_gate.py`'s ladder rungs by name, not by paraphrase.
+#
+# Decision ticket 15's own Q3b adversarial pass (5 findings, the structural blind spot) is NOT
+# repeated here: those are already encoded in `twin/constraints.yaml`'s `scope_exclusions` and
+# `positions` sections, sourced to "decision ticket 15, Q3b finding N". This file is Q3's table
+# only — named misuses paired with what blocks each, which is exactly the shape a catalogue entry
+# already has.
+#
+# Versioned: bump `version` in the same commit as any change to an entry below.
+schema: twin.misuse-catalogue/v1
+version: 1
+entries:
+  - id: suppressing-pay
+    risk: >-
+      Behavioural sensing data about an employee's situation is used to judge what pay they will
+      accept or challenge, suppressing pay below what an honest accounting would set.
+    mechanism: >-
+      Decision ticket 09's perspectival £: an employee-side twin can exist and disagree, and
+      `twin/schema.py`'s claim/response shapes carry no nettable-total field that would let a
+      firm-side price silently cancel the employee-side one. The grievance-to-insider causal path
+      (`twin/fixtures.py`'s modelled mechanisms) prices the externalised cost back into the firm's
+      own ledger, so suppression is not free even on the firm's own terms.
+    source: decision ticket 15, Q3
+
+  - id: justifying-layoffs
+    risk: >-
+      A behavioural sensor's output is cited to justify letting a named individual go, dressing a
+      personnel decision as a data-driven one.
+    mechanism: >-
+      Two of `twin/constraints.yaml`'s universal floor: `no-automatic-enactment` (UK GDPR Art. 22
+      — the twin proposes, a human decides) and `no-individual-level-output` (decision ticket 15
+      Q1's necessity rung prefers cohort/aggregate; an observation has no person field, so there
+      is no individual output to cite in the first place).
+    source: decision ticket 15, Q3
+
+  - id: surveillance-creep
+    risk: >-
+      A sensor admitted for one named purpose is quietly reused for a second, unreviewed one, so
+      the scope of what is watched grows without ever passing admission again.
+    mechanism: >-
+      `twin/ethics_gate.py` `_check_purpose()`, the ladder's first rung: a sensor is bound to a
+      named scenario, and `walk_ladder()` stops before necessity/proportionality are even read if
+      purpose fails. Reuse for an unnamed second purpose fails the same rung the first use passed,
+      because the scenario named in the payload no longer matches. `admit()`'s new sensor-id check
+      (build ticket 82) closes the companion hole: a sensor not named in `twin/sensors.yaml` is
+      refused before the ladder runs at all, so creep cannot route around the table either.
+    source: decision ticket 15, Q3
+
+  - id: performance-management-by-proxy
+    risk: >-
+      A behavioural sensor's output is read as a performance signal about a named person, doing
+      informally what a formal review process would need sign-off for.
+    mechanism: >-
+      `twin/model.py`'s `advisory_only` check (behavioural overlay `meta.yaml` must declare
+      `advisory_only: true` or the overlay is refused to load) plus `no-special-category-representation`
+      (`twin/constraints.yaml` universal floor, `twin/schema.py` `refuse_special_category`): the
+      overlay is gated and detachable (build ticket 07) and structurally cannot carry the
+      special-category inference a proxy performance judgement would need.
+    source: decision ticket 15, Q3
+
+  - id: blame-attribution-after-an-incident
+    risk: >-
+      Person-to-component knowledge edges, legitimately modelled for bus-factor and succession
+      questions, are read backwards after an incident to attribute the outcome to a named
+      individual.
+    mechanism: >-
+      `twin/constraints.yaml` universal floor `no-individual-attribution`: a scenario-level
+      admissibility rule, not a data restriction — the same knowledge edges stay admissible for
+      capability scenarios (bus-factor, succession, resilience) and are inadmissible as inputs to
+      any retrospective individual-attribution scenario.
+    source: decision ticket 15, Q3
+
+  - id: detecting-union-organising
+    risk: >-
+      Behavioural or structural sensing is read for signs of collective organising activity among
+      employees.
+    mechanism: >-
+      `twin/constraints.yaml` universal floor `no-special-category-representation`
+      (trade-union membership is UK GDPR Art. 9 special-category data): `twin/schema.py`
+      `refuse_special_category()` walks every node of a document and refuses one that carries it —
+      there is no schema slot to represent it in, so the data this misuse would need has nowhere
+      to live.
+    source: decision ticket 15, Q3
+
+  - id: decision-laundering
+    risk: >-
+      A scenario is re-run repeatedly, tweaking inputs, until one execution produces the answer
+      an operator wanted, and only that run is kept.
+    mechanism: >-
+      `twin/regimes.py` `require()`: an execution declares its information regime with no default,
+      so a scoring run cannot silently pick the regime a re-run happened to prefer, and
+      `twin/verbs.py` `score()` reads only the `as-consumed` regime a bundle itself declares.
+      `twin/reproduce.py` `replay()`/`reproduce()`: a committed forecast-bundle artefact must
+      recompute byte-identically from its own recorded pins, so every execution that produces a
+      kept artefact is independently replayable from the git history that carries it — cherry-picking
+      is visible as a pattern of discarded runs in that history, not laundered away by keeping only
+      the last one.
+    source: decision ticket 15, Q3
+
+  - id: weaponising-another-orgs-twin
+    risk: >-
+      One organisation's overlay data — knowledge edges, behavioural inferences — is read or
+      reused by a different tenant's twin.
+    mechanism: >-
+      `twin/model.py` `check_direction()` (`world_never_references_overlay`): the world layer, and
+      every world tree any overlay actually pins, is checked for a reference to another org's
+      overlay-scoped id, key, or path — by value, by mapping key, and in prose — and the load is
+      refused if one is found. Per-org overlays live under `orgs/<org>/` and the world layer that
+      every tenant shares has no way to name one.
+    source: decision ticket 15, Q3

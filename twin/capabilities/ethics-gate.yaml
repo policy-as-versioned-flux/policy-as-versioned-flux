@@ -1,15 +1,15 @@
 # The checklist measures the CODE's realisation of a resolved decision, not the decision itself.
 #
-# Decision ticket 15 had no capability file at all until this ticket (build ticket 61 found the
-# gap and declined to create a 0/5 file, which would have claimed a capability existed with
-# nothing behind it). Two of its five acceptance criteria stay unticked here on purpose: AC 2
-# (the sensor set + granularity decision) is explicitly carried forward as a build-time artefact
-# by the decision ticket's own resolution, not this ticket's job; AC 4 (the named misuse
-# catalogue) is NOT the same artefact as build ticket 62's `twin/misuse-catalogue.yaml` — that
-# catalogue names misuses of the twin's own governance machinery (pricing, scoring, derivation),
-# not the behavioural-sensing misuse catalogue (suppressing pay, justifying layoffs, surveillance
-# creep, ...) decision ticket 15's own Q3/Q3b table names. A tick here needs code that realises
-# *that* catalogue, which does not exist yet.
+# Decision ticket 15 had no capability file at all until build ticket 47 (build ticket 61 found
+# the gap and declined to create a 0/5 file, which would have claimed a capability existed with
+# nothing behind it). AC 2 and AC 4 stayed unticked through build ticket 47 on purpose: AC 2 (the
+# sensor set + granularity decision) was explicitly carried forward as a build-time artefact by
+# the decision ticket's own resolution, not that ticket's job; AC 4 (the named misuse catalogue)
+# is NOT the same artefact as build ticket 62's `twin/misuse-catalogue.yaml` — that catalogue
+# names misuses of the twin's own governance machinery (pricing, scoring, derivation), not the
+# behavioural-sensing misuse catalogue (suppressing pay, justifying layoffs, surveillance creep,
+# ...) decision ticket 15's own Q3/Q3b table names. Build ticket 82 closes both: `twin/sensors.yaml`
+# for AC 2, `twin/behavioural-misuse-catalogue.yaml` for AC 4 — `ethics-gate` reaches `full`.
 capability: ethics-gate
 owning_ticket: '15'
 criteria:
@@ -26,7 +26,19 @@ criteria:
     ticked_by: build ticket 47
   - index: 2
     text: "The sensor set + granularity decision."
-    checked: false
+    checked: true
+    evidence: >-
+      twin/sensors.yaml (build ticket 82): a versioned, closed table naming six sensors, what each
+      observes, and its coarsest-safe granularity (structural/behavioural x aggregate/cohort/
+      individual, decision ticket 15 Q1 rung 2's own vocabulary), mirroring
+      enactment-channels.yaml's shape. twin/ethics_gate.py load_sensors() refuses an entry missing
+      a declared kind or granularity (tests/test_ethics_gate.py::test_load_sensors_refuses_an_entry_missing_a_declared_granularity),
+      and admit() now refuses a payload whose sensor id is not a row in that table
+      (test_admit_refuses_an_unnamed_sensor_id) rather than accepting any string — the exact hole
+      this AC named. Every registered id is one a real caller already proposes: the five sensors
+      ethics_gate.labelled_corpus() evaluates against, plus payroll-record, the one enactment
+      channel enactment-channels.yaml declares observes people.
+    ticked_by: build ticket 82
   - index: 3
     text: "A stated Goodhart position with the most-gameable sensors named."
     checked: true
@@ -44,7 +56,21 @@ criteria:
     ticked_by: build ticket 47
   - index: 4
     text: "A named misuse catalogue, each with its blocking constraint."
-    checked: false
+    checked: true
+    evidence: >-
+      twin/behavioural-misuse-catalogue.yaml (build ticket 82): the eight named misuses of
+      decision ticket 15's own Q3 table — suppressing pay, justifying layoffs, surveillance
+      creep, performance management by proxy, blame attribution after an incident, detecting
+      union organising, decision laundering, weaponising another org's twin — each entry naming
+      a mechanism, not just a risk, cross-referenced against twin/constraints.yaml's universal-floor
+      ids (no-automatic-enactment, no-individual-level-output, no-individual-attribution,
+      no-special-category-representation) and twin/ethics_gate.py's ladder rungs
+      (_check_purpose(), admit()'s sensor-table check). Loaded through
+      twin/misuse.py's own load_catalogue(), pointed at BEHAVIOURAL_CATALOGUE_PATH rather than a
+      second loader — tests/test_misuse.py::test_the_behavioural_catalogue_loads_through_the_same_loader_and_names_a_mechanism_each,
+      ::test_the_two_catalogues_do_not_conflate_their_scopes proves no id or subject overlap with
+      build ticket 62's governance-scoped twin/misuse-catalogue.yaml.
+    ticked_by: build ticket 82
   - index: 5
     text: "The operational gate mechanism, incl. what detaching the overlay means."
     checked: true

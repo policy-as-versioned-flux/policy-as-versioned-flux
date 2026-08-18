@@ -20,8 +20,10 @@ from twin.ethics_gate import (
     dpia_triage,
     flag_fast_improvement,
     labelled_corpus,
+    load_sensors,
     prefer,
     scorer,
+    sensor_ids,
     walk_ladder,
 )
 from twin.invariants import NO_ACTION_BANNED_KEYS, NO_ACTION_BANNED_PHRASES
@@ -133,11 +135,14 @@ def test_dpia_triage_is_not_mandatory_when_nothing_triggers_it() -> None:
 # -- admit() --------------------------------------------------------------------------------
 
 
+_KNOWN_SENSOR = "bus-factor-structural-aggregate"  # a real row in twin/sensors.yaml
+
+
 def _payload(**dpia_overrides: object) -> dict:
     dpia = {"channels": [], "profiling": False, "financial_loss_risk": False, "complete": False}
     dpia.update(dpia_overrides)
     return {
-        "sensor": {"id": "s", "name": "A sensor"},
+        "sensor": {"id": _KNOWN_SENSOR, "name": "Commit-structure bus-factor, aggregated"},
         "purpose": _PASSING_PURPOSE,
         "necessity": _PASSING_NECESSITY,
         "proportionality": _PASSING_PROPORTIONALITY,
@@ -174,7 +179,7 @@ def test_admit_produces_a_grade_5_claim_shaped_dict() -> None:
     result = admit(_payload())
     claim = result["claim"]
     assert claim["kind"] == "sensor-admission"
-    assert claim["component"] == "s"
+    assert claim["component"] == _KNOWN_SENSOR
     assert claim["evidence_grade"] == 5
     assert SKILL in claim["claimed_by"]
     assert claim["evidence"]
@@ -185,6 +190,69 @@ def test_admit_has_no_parameter_that_can_set_a_different_grade() -> None:
     assert "grade" not in params
     assert "evidence_grade" not in params
     assert list(params) == ["payload"]
+
+
+# -- the named sensor set (twin/sensors.yaml, build ticket 82, decision ticket 15 AC2) --------
+
+
+def test_sensors_yaml_loads_and_names_every_labelled_corpus_sensor(corpus: list[dict]) -> None:
+    known = sensor_ids()
+    for item in corpus:
+        assert item["input"]["sensor"]["id"] in known
+
+
+def test_load_sensors_refuses_an_entry_missing_a_declared_granularity(tmp_path) -> None:
+    bad = tmp_path / "sensors.yaml"
+    bad.write_text(
+        "schema: twin.sensors/v1\n"
+        "version: 1\n"
+        "sensors:\n"
+        "  - sensor: no-granularity\n"
+        "    name: A sensor with no granularity\n"
+        "    kind: structural\n"
+        "    observes: something\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(EthicsGateError, match="declares no granularity"):
+        load_sensors(bad)
+
+
+def test_load_sensors_refuses_an_unknown_kind_or_granularity(tmp_path) -> None:
+    bad = tmp_path / "sensors.yaml"
+    bad.write_text(
+        "schema: twin.sensors/v1\n"
+        "version: 1\n"
+        "sensors:\n"
+        "  - sensor: weird\n"
+        "    name: A sensor with a made-up kind\n"
+        "    kind: telepathic\n"
+        "    granularity: aggregate\n"
+        "    observes: something\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(EthicsGateError, match="unknown kind"):
+        load_sensors(bad)
+
+
+def test_load_sensors_refuses_a_sensor_declared_twice(tmp_path) -> None:
+    bad = tmp_path / "sensors.yaml"
+    row = (
+        "  - sensor: dup\n"
+        "    name: A duplicate sensor\n"
+        "    kind: structural\n"
+        "    granularity: aggregate\n"
+        "    observes: something\n"
+    )
+    bad.write_text(f"schema: twin.sensors/v1\nversion: 1\nsensors:\n{row}{row}", encoding="utf-8")
+    with pytest.raises(EthicsGateError, match="declared twice"):
+        load_sensors(bad)
+
+
+def test_admit_refuses_an_unnamed_sensor_id() -> None:
+    payload = _payload()
+    payload["sensor"] = {"id": "a-sensor-nobody-registered", "name": "Not in the table"}
+    with pytest.raises(EthicsGateError, match="not a named sensor"):
+        admit(payload)
 
 
 # -- classify_gameability() and prefer() -----------------------------------------------------

@@ -37,12 +37,25 @@ No sensor fixture exists anywhere in `twin/fixtures.py` — decision ticket 15's
 carries the sensor set itself forward as a build-time artefact, not decided here — so
 `labelled_corpus()` below is hand-authored sensor proposals with known ladder outcomes, the same
 shape `twin/skills.py`'s own `TOY_SKILL_CORPUS` is, rather than derived from an existing org.
+
+**AC 2, "the sensor set + granularity decision" (build ticket 82)**: `sensors.yaml` is that
+artefact — a versioned, closed table naming each sensor, what it observes and its coarsest-safe
+granularity, mirroring `enactment-channels.yaml`'s shape. `load_sensors()` refuses an entry
+missing a declared `kind` or `granularity`; `admit()` refuses a payload whose sensor id is not a
+row in that table, before the ladder is even walked. Every id the table names is one a real caller
+already proposes: `labelled_corpus()`'s five and `payroll-record`, the one enactment channel that
+observes people at all.
 """
 
 from __future__ import annotations
 
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
+import yaml
+
+from . import PACKAGE_DIR
 from .sign import role_ids
 
 SKILL = "ethics-gate"
@@ -68,6 +81,57 @@ _GOODHART_PROOF_KEYWORDS = ("bus-factor", "bus factor", "knowledge spread", "spr
 
 class EthicsGateError(RuntimeError):
     """A malformed payload, an out-of-order call, or an adjudication with no flag or role."""
+
+
+# -- the named sensor set (decision ticket 15 AC2, build ticket 82) -----------------------------
+
+SENSOR_TABLE_PATH = PACKAGE_DIR / "sensors.yaml"
+SENSOR_SCHEMA = "twin.sensors/v1"
+SENSOR_REQUIRED = ("sensor", "name", "kind", "granularity", "observes")
+
+
+@lru_cache(maxsize=8)
+def load_sensors(path: Path | None = None) -> dict[str, Any]:
+    """The versioned, closed sensor table, validated on read — the same discipline
+    `corroboration.table()` applies to `enactment-channels.yaml`. A row missing a declared
+    `kind` or `granularity` is refused rather than silently admitted with an assumed one.
+
+    `ponytail:` cached per path, the same ceiling `corroboration.table()` carries and for the
+    same reason — a test rewriting a table file in place sees the first version; write a new
+    temp file instead.
+    """
+    source = path or SENSOR_TABLE_PATH
+    doc = yaml.safe_load(source.read_text(encoding="utf-8"))
+    if not isinstance(doc, dict) or doc.get("schema") != SENSOR_SCHEMA:
+        raise EthicsGateError(f"{source}: not a {SENSOR_SCHEMA} document")
+    sensors = doc.get("sensors")
+    if not isinstance(sensors, list) or not sensors:
+        raise EthicsGateError(f"{source}: names no sensor")
+    seen: set[str] = set()
+    for row in sensors:
+        if not isinstance(row, dict):
+            raise EthicsGateError(f"{source}: a sensor entry is not a mapping")
+        missing = [f for f in SENSOR_REQUIRED if not str(row.get(f, "")).strip()]
+        if missing:
+            raise EthicsGateError(
+                f"{source}: sensor {row.get('sensor')!r} declares no {', '.join(missing)}"
+            )
+        sid = str(row["sensor"])
+        if sid in seen:
+            raise EthicsGateError(f"{source}: sensor {sid!r} is declared twice")
+        seen.add(sid)
+        if row["kind"] not in _KIND_RANK:
+            raise EthicsGateError(f"{source}: sensor {sid!r} declares unknown kind {row['kind']!r}")
+        if row["granularity"] not in _LEVEL_RANK:
+            raise EthicsGateError(
+                f"{source}: sensor {sid!r} declares unknown granularity {row['granularity']!r}"
+            )
+    return doc
+
+
+def sensor_ids(path: Path | None = None) -> tuple[str, ...]:
+    """Every named sensor id, in table order."""
+    return tuple(str(row["sensor"]) for row in load_sensors(path)["sensors"])
 
 
 # -- the admission ladder (decision ticket 15 Q1) -----------------------------------------------
@@ -181,6 +245,10 @@ def admit(payload: dict[str, Any]) -> dict[str, Any]:
     """The skill. `payload` is `{"sensor": {"id", "name"}, "purpose": {...}, "necessity": {...},
     "proportionality": {...}, "dpia": {"channels", "profiling", "financial_loss_risk", "complete"}}`.
 
+    `payload["sensor"]["id"]` must name a row in `sensors.yaml` — decision ticket 15 AC2's closed
+    table, checked here rather than left as any string a caller happens to pass (build ticket 82).
+    An unnamed sensor is refused before the ladder is even walked.
+
     A sensor is admitted only when the ladder is admitted **and** any mandatory DPIA is recorded
     complete — decision ticket 15's own resolution of AC 5: "admission requires passing the ladder
     + a DPIA." Detachment of the behavioural overlay itself (the resolution's other half) is
@@ -196,6 +264,13 @@ def admit(payload: dict[str, Any]) -> dict[str, Any]:
     missing = [f for f in ("sensor", *_RUNGS, "dpia") if f not in payload]
     if missing:
         raise EthicsGateError(f"{SKILL}: payload declares no {', '.join(missing)}")
+    sensor_id = str(payload["sensor"]["id"])
+    known = sensor_ids()
+    if sensor_id not in known:
+        raise EthicsGateError(
+            f"{SKILL}: {sensor_id!r} is not a named sensor (have: {', '.join(known)}) — "
+            f"{SENSOR_TABLE_PATH.name} is the closed table, not any string a payload proposes"
+        )
     ladder = walk_ladder({rung: payload[rung] for rung in _RUNGS})
     triage = dpia_triage(payload["dpia"])
     dpia_complete = bool(payload["dpia"].get("complete"))

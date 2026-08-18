@@ -826,6 +826,45 @@ here would need code realising *that* catalogue, which does not exist yet. `ethi
 gameability") — one module, two capabilities, because gameability is genuinely where sensing and
 its ethics gate overlap; `sense-move` moves from 4/8 to 5/8.
 
+## The named sensor set, and the behavioural-sensing misuse catalogue
+
+Build ticket 82 closes the two criteria build ticket 47 left open, and `ethics-gate` reaches
+`full` at 5/5.
+
+**AC 2 — `twin/sensors.yaml`, mirroring `enactment-channels.yaml`'s shape.** A versioned, closed
+table naming six sensors — the five `ethics_gate.labelled_corpus()` already evaluates against,
+plus `payroll-record`, the one enactment channel that observes people at all — each with what it
+observes and its coarsest-safe `granularity` (`aggregate`/`cohort`/`individual`) and `kind`
+(`structural`/`behavioural`), reusing `_KIND_RANK`/`_LEVEL_RANK`'s own vocabulary rather than a
+second one. `load_sensors()` refuses a row missing a declared `kind` or `granularity`, the same
+discipline `corroboration.table()` applies to enactment channels. `admit()` now refuses a payload
+whose `sensor.id` is not a row in that table, before the ladder is even walked — closing the exact
+hole the AC named: a sensor id used to be any string a caller happened to pass.
+
+**AC 4 — `twin/behavioural-misuse-catalogue.yaml`, loaded through `twin/misuse.py`'s own
+`load_catalogue()`, not a second loader.** Eight named misuses from decision ticket 15's own Q3
+table — suppressing pay, justifying layoffs, surveillance creep, performance management by proxy,
+blame attribution after an incident, detecting union organising, decision laundering, weaponising
+another org's twin — each entry naming a **mechanism**: a `twin/constraints.yaml` universal-floor
+id, an `ethics_gate.py` ladder rung, or a named module/invariant a reader can go and check, not a
+sentence of risk prose. Distinct in scope from build ticket 62's `twin/misuse-catalogue.yaml`
+(misuse of the twin's own governance/pricing/scoring machinery) — no id or subject overlaps
+between the two, checked directly rather than merely asserted
+(`tests/test_misuse.py::test_the_two_catalogues_do_not_conflate_their_scopes`). Decision ticket
+15's own Q3b adversarial-pass findings are not repeated here: they were already encoded in
+`twin/constraints.yaml`'s `scope_exclusions`/`positions` sections before this ticket, sourced to
+"decision ticket 15, Q3b finding N" — this file is Q3's table only.
+
+**A judgement call left alone on purpose: `twin-inside-twin` AC 5 stays unticked.** Decision ticket
+10's own resolution carried its identically-worded criterion ("named misuse cases with the
+constraint that blocks each") forward "to the ethics/reflexive-governance workstream", and its
+Question text names the same three worked examples this catalogue covers — a real case could be
+made that this artefact closes it too. But build ticket 83 (blocked by this one, already drafted)
+reads that AC as scoped narrower and differently: misuse *of the twin itself by its own operator*
+(gaming a sensor's metric, selectively citing forecasts), extending build ticket 62's governance
+catalogue rather than this one. Ticking it here would pre-empt a call a ticket built for exactly
+that question should make with the fuller picture; left open rather than guessed.
+
 ## The credibility prior: the world/overlay split earning its keep
 
 `twin credibility` (build ticket 31) is the blend the world/overlay split existed to enable but had
@@ -1989,7 +2028,7 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Three
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Four
 capabilities now reach `full` — computed, not typed, and reached the same way every other tick in
 this table was: real code, cited live.
 
@@ -2005,15 +2044,15 @@ this table was: real code, cited live.
 | `synthetic-substrate` | 12 | full | 7 / 7 |
 | `forecast-book` | 21 | full | 6 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
-| `ethics-gate` | 15 | partial | 3 / 5 |
+| `ethics-gate` | 15 | full | 5 / 5 |
 | `enactment` | 18 | partial | 4 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**49 of 73**, across thirteen capabilities, three of them `full`. An artefact's overall depth is
+**51 of 73**, across thirteen capabilities, four of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
-where `domain-model`, `forecast-book` or `synthetic-substrate` is one of the capabilities they
-cite. `./bin/twin grade` prints the denominators, and this table is its output, not a hand-kept
-count — re-derived here
+where `domain-model`, `forecast-book`, `synthetic-substrate` or `ethics-gate` is one of the
+capabilities they cite. `./bin/twin grade` prints the denominators, and this table is its output,
+not a hand-kept count — re-derived here
 rather than trusting a stale total (the same provisional-total drift this file names repeatedly
 below).
 
@@ -2254,7 +2293,14 @@ does not exist:
   exit-cost asymmetry and the permanent covert-sensing exclusion — all from that ticket's
   *resolution*, none of them one of its five acceptance criteria — so nothing was ticked, and a
   capability file at 0/5 would have been a slot claiming a capability existed with nothing behind
-  it.
+  it. **Build ticket 82 closes the remaining two, moving `ethics-gate` to `full` at 5/5**:
+  `twin/sensors.yaml` (AC 2, the sensor set + granularity decision, decision ticket 15's own
+  build-time artefact) and `twin/behavioural-misuse-catalogue.yaml` (AC 4, decision ticket 15's Q3
+  table — suppressing pay, justifying layoffs, surveillance creep and five more — loaded through
+  `twin/misuse.py`'s existing loader rather than a second one). `twin-inside-twin` AC 5 reads as
+  arguably the same carried-forward criterion, but is left unticked: build ticket 83 (blocked by
+  this one) already scopes it differently — see "The named sensor set, and the behavioural-sensing
+  misuse catalogue", above.
 - **decision ticket 07 AC 5** (representation/format reuse-vs-custom **and** authored-vs-derived) —
   the authored/derived split is now structural in four places, but the format decision is recorded
   nowhere in code.

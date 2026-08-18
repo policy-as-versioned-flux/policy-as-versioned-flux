@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 
 from twin.misuse import (
+    BEHAVIOURAL_CATALOGUE_PATH,
+    CATALOGUE_PATH,
     MisuseError,
     compute_attractiveness,
     load_catalogue,
@@ -35,6 +37,47 @@ def test_the_catalogue_loads_and_every_entry_names_a_mechanism() -> None:
     for entry in doc["entries"]:
         assert entry["risk"].strip()
         assert entry["mechanism"].strip()
+
+
+# -- the behavioural-sensing misuse catalogue (build ticket 82, decision ticket 15 Q3) --------
+
+
+def test_the_behavioural_catalogue_loads_through_the_same_loader_and_names_a_mechanism_each() -> None:
+    """Reuses `load_catalogue()` with a path override, per build ticket 82's own instruction —
+    there is no second loader function to import."""
+    doc = load_catalogue(BEHAVIOURAL_CATALOGUE_PATH)
+    assert len(doc["entries"]) == 8
+    for entry in doc["entries"]:
+        assert entry["risk"].strip()
+        assert entry["mechanism"].strip()
+
+
+def test_the_behavioural_catalogue_names_decision_ticket_15s_q3_misuses() -> None:
+    ids = {entry["id"] for entry in load_catalogue(BEHAVIOURAL_CATALOGUE_PATH)["entries"]}
+    assert ids == {
+        "suppressing-pay",
+        "justifying-layoffs",
+        "surveillance-creep",
+        "performance-management-by-proxy",
+        "blame-attribution-after-an-incident",
+        "detecting-union-organising",
+        "decision-laundering",
+        "weaponising-another-orgs-twin",
+    }
+
+
+def test_the_two_catalogues_do_not_conflate_their_scopes() -> None:
+    """AC 4's own condition: the behavioural catalogue is not the governance one extended — no id
+    or subject overlaps, and neither catalogue's file is the other's."""
+    assert BEHAVIOURAL_CATALOGUE_PATH != CATALOGUE_PATH
+    governance_ids = {e["id"] for e in load_catalogue(CATALOGUE_PATH)["entries"]}
+    behavioural_ids = {e["id"] for e in load_catalogue(BEHAVIOURAL_CATALOGUE_PATH)["entries"]}
+    assert not (governance_ids & behavioural_ids)
+    for word in ("pay", "layoff", "surveillance"):
+        assert not any(word in gid for gid in governance_ids), (
+            f"{word!r} found in the governance catalogue's own ids — the two catalogues have "
+            "started to overlap in scope"
+        )
 
 
 def test_a_catalogue_entry_with_no_mechanism_is_refused(tmp_path: Path) -> None:
