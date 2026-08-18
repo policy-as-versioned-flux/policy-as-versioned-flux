@@ -4,7 +4,9 @@ owning_ticket: '14'
 criteria:
   - index: 1
     text: "Decided: artefact attestation vs reasoning-chain attestation (or both, with the seam)."
-    checked: false
+    checked: true
+    evidence: "twin/reproduce.py's _replay_subject is the seam, and it is no longer a score-card special case: both the `score` and `reliability` branches of replay() route their subject references through it, so reproducing a score card walks its bundle and reproducing a reliability diagram walks its score cards, each recursively — tests/test_reproduce.py::test_reproducing_a_reliability_diagram_walks_a_three_artefact_chain."
+    ticked_by: build ticket 89
   - index: 2
     text: "An actor-identity model covering humans and agents, and what a signature asserts."
     checked: true
@@ -12,7 +14,9 @@ criteria:
     ticked_by: build ticket 11
   - index: 3
     text: "The chain-depth rule for a recommendation, and materialised-vs-reconstructable."
-    checked: false
+    checked: true
+    evidence: "twin/reproduce.py's replay() walks reliability -> score-card -> forecast-bundle, three artefacts deep, each hop re-opening its own pinned model tree (unbounded but recomputable, decision ticket 14 Q3) — tests/test_reproduce.py::test_reproducing_a_reliability_diagram_walks_a_three_artefact_chain. A subject reference lacking the pins needed to walk it (produced_by) fails loudly with ReproduceError rather than silently reporting an empty chain — tests/test_reproduce.py::test_a_chain_reference_missing_produced_by_fails_loudly_not_silently."
+    ticked_by: build ticket 89
   - index: 4
     text: "A stated purpose for attestation, consistent with the transparency decision."
     checked: true

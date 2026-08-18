@@ -93,7 +93,7 @@ def test_an_ungraded_capability_cannot_be_used(caps: Capabilities) -> None:
         caps.require("something-nobody-graded")
 
 
-def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_twin_inside_twin_enactment_and_scenario_engine_have_earned_full(caps: Capabilities) -> None:
+def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_twin_inside_twin_enactment_scenario_engine_and_provenance_have_earned_full(caps: Capabilities) -> None:
     """The walking skeleton must not be able to claim `full` on say-so — but a capability that
     closes every acceptance criterion with a real, live-checked citation may: `domain-model` was
     the first to (build ticket 79), `forecast-book` the second (build ticket 84, the
@@ -111,9 +111,12 @@ def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currenc
     and misuse-of-the-twin-itself cases added to the existing governance catalogue), `enactment`
     the ninth (build ticket 86: `twin/pricing.py`'s `_credit()` now refuses mitigation credit on
     an option with no corroborated enactment, closing decision ticket 08's action-state loop at
-    the join build ticket 68 left open), and `scenario-engine` the tenth (build ticket 88: the
+    the join build ticket 68 left open), `scenario-engine` the tenth (build ticket 88: the
     map-diff renderer, the four-tier scenario-selection proof, and the real Intel opportunity
-    scenario wrapping build ticket 81's own EUV causal edge).
+    scenario wrapping build ticket 81's own EUV causal edge), and `provenance` the eleventh (build
+    ticket 89: `reproduce.py`'s subject-reference walk generalised beyond the score-card special
+    case to a reliability diagram's pooled score cards, three artefacts deep, with a reference too
+    thin to walk refusing loudly rather than reporting an empty chain).
     Every other shipped capability stays `partial` or `stub`."""
     grades = {g.capability: g.grade for g in caps}
     assert set(grades) == {
@@ -131,6 +134,7 @@ def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currenc
     assert grades.pop("twin-inside-twin") == "full"
     assert grades.pop("enactment") == "full"
     assert grades.pop("scenario-engine") == "full"
+    assert grades.pop("provenance") == "full"
     assert "full" not in grades.values()
 
 
@@ -156,13 +160,14 @@ def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_
     assert block["capabilities"]["finished"]["unchecked"] == []
 
 
-def test_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_twin_inside_twin_enactment_and_scenario_engine_are_the_shipped_capabilities_at_full(
+def test_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_twin_inside_twin_enactment_scenario_engine_and_provenance_are_the_shipped_capabilities_at_full(
     caps: Capabilities,
 ) -> None:
     grades = {g.capability: g.grade for g in caps}
     assert {c for c, g in grades.items() if g == "full"} == {
         "domain-model", "forecast-book", "synthetic-substrate", "ethics-gate", "currency-regimes",
         "sense-move", "causal-layer", "twin-inside-twin", "enactment", "scenario-engine",
+        "provenance",
     }
 
 

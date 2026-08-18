@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 13 \u2014 build ticket 88 moves scenario-engine to full 7/7 (the map-diff renderer, the four-tier scenario-selection proof, and the real Intel opportunity scenario wrapping build ticket 81's own EUV causal edge), which changes every artefact's depth block and capabilities_digest",
-  "capabilities_digest": "bd59ebd4e7a0adbefd7fddce0dd8716e128ac7f3b69440cb4d27cefd8b7102d6",
+  "authorised_by": "decision ticket 14 \u2014 provenance reaches full, AC 1 and AC 3 closed (build ticket 89)",
+  "capabilities_digest": "f68cbd5acac464760ff3dfd7346d1b8bc19a45eb6a2fe4008f15aff4b44b3c1e",
   "digests": {
-    "blast-radius": "df8d6de46dd6a5aff156ee77f57d6bf6573ee1407cefb5e2cfc00f954ec0a7cc",
-    "bound-signal": "4b722e3a425fae09f3394345a6483fb1dcdfd23e2097662f3627ed563aeb847f",
-    "forecast-bundle": "6e1ea248f32cdfc9aa4e0f96fa8c450e768c2aa8bc76d5bf6d56063702f9accd",
-    "graph": "4c6b717306df340abee0f8d4ace1fbae9684a22dc53f5ca6723e0b5c9400c59b",
-    "intervention": "fbdb8d4122e1c11528a4c47d5bc51da77af5834b947adf9b2818e257f9710bf0",
-    "observation": "4d61ffcddda3f1056499bdd22670384b05f5cfeec3c569346edd169e79858270",
-    "priced-impact": "7d9896b203a04971e3b22d4919f0ef887ebc9137830718878a101ff4c24ef1b9",
-    "priced-option-set": "e1f8ebdca95086d0817ee9b42f4589bf2c8e9d1c2ab985fe860b328de6f374af",
-    "propagation": "bd8e1c56144f9069d1908ec06b203fb61dd735d4ad82db2cae702135976b2299",
-    "rewound-model": "4436254dd63632578115d38acef69c5de35d471f44a6fc9eb28d5390fd2b59d7",
-    "scenario-exposure": "b6c7ec8adc210e93e41ec46582de5ae37df30b2ccd425d96c16d0e29d6ccc3fa",
-    "score-card": "9b041da0759729b27b3264d7d0bc2f01134e91fdff1b544316958af4bbd414d0"
+    "blast-radius": "93ca75200f1ad210d71e7c8265f24046f5b53e5d4c71fb392cf0a40e794b81cc",
+    "bound-signal": "52d391f18b24d33251d249de90f7cdda3a84d0b736fedc3d00be7222b78d89b8",
+    "forecast-bundle": "686c1204af755fbd3c756f5e27ddc2d489dda21d6adbcad0f6c7ff6b83b2bebf",
+    "graph": "b08d89e7884d7cb391d0956ceb0effae0b2dabb9a902ea522992a35f8b726cdb",
+    "intervention": "79ead7c47a2b758e72e4a62980410b398b686a9e7d900b401147154b66627233",
+    "observation": "95f67303cda63c130587ac8ab1e82abf1a25928f81c6d6f619c89a60c873d85d",
+    "priced-impact": "b9adab7e54c95b4af15e3ecf21ae9b416d978ded15bb0c67c98e9198ff8afe45",
+    "priced-option-set": "948572cb23da1ec0382ead2a0a6a73774bc1ff92e5080bbc89e925ae2a02a28a",
+    "propagation": "391ff92929a86dd788f802e139ff2f6283aedae6f486967a61e66d9d946ab635",
+    "rewound-model": "886d285d999f56f7230b19a89802ebaac267ee3f40a76156c90729ff413e2523",
+    "scenario-exposure": "bf003d527467b0440535be16d9825e225ad5176adb0505099ae0402984bc3671",
+    "score-card": "52ae0a1fefbca01dcf5950b49dbe004244d0bc52240f2ba2d519277c7d948642"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

@@ -1390,7 +1390,22 @@ def reliability(
         card_bytes = path.read_bytes()
         card, scores = load_score_card(path)
         sources.append(
-            {"sha256": sha256_hex(card_bytes), "pins": card["envelope"]["pins"], "scored": len(scores)}
+            {
+                # `kind` and `produced_by` alongside the digest and pins: the same shape a
+                # score card's own `body["subject"]` names its forecast bundle by (build ticket
+                # 89) — without `produced_by` there is a digest to check but no command to
+                # re-run, so a pooled card could be verified byte-for-byte but never *walked*.
+                # `body.subject` rides along too: replaying a score card needs its own bundle
+                # reference just as much as replaying *this* diagram needs the card, so a subject
+                # reference carries whatever body its own kind's replay reads — recursively, one
+                # kind at a time, never the whole body.
+                "kind": KIND_SCORE_CARD,
+                "sha256": sha256_hex(card_bytes),
+                "produced_by": card["envelope"]["produced_by"],
+                "pins": card["envelope"]["pins"],
+                "body": {"subject": card["body"]["subject"]},
+                "scored": len(scores),
+            }
         )
         pooled.extend(scores)
 

@@ -38,7 +38,7 @@ from .primitives import PrimitiveError
 from . import propagate as propagate_mod
 from .propagate import AttenuationError
 from .regimes import RegimeError
-from .reproduce import ReproduceError
+from .reproduce import Report, ReproduceError
 from .repo import ModelRepo, RepoError
 from .scenario_diff import ScenarioDiffError
 from .schema import REGIMES, SchemaError
@@ -1415,6 +1415,20 @@ def _show_challenges(artefact_path: str, challenge_paths: list[str]) -> None:
     print()
 
 
+def _print_chain(links: list[Report], depth: int) -> None:
+    """Print a reproduction chain at whatever nesting it actually reached (build ticket 89).
+
+    A chain link's own `.chain` is walked too — a reliability diagram's chain reaches a forecast
+    bundle two levels down its pooled score card, and a flat, one-level print would silently hide
+    that hop from a reader even though `report.reproduces` already accounts for it correctly.
+    """
+    for link in links:
+        mark = "ok  " if link.reproduces else "FAIL"
+        indent = "  " * depth
+        print(f"{indent}{mark} {link.kind:<18} {link.actual[:16]} (recorded {link.expected[:16]})")
+        _print_chain(link.chain, depth + 1)
+
+
 def _reproduce(artefact_path: str, repo_path: str | None) -> int:
     """`twin verify <artefact>` — recompute it from its pins and say whether it reproduces."""
     from .reproduce import reproduce
@@ -1428,9 +1442,7 @@ def _reproduce(artefact_path: str, repo_path: str | None) -> int:
         return 2
     report = reproduce(repo_path, artefact_path)
     _say(f"reproducing {artefact_path} from its pins")
-    for link in report.chain:
-        mark = "ok  " if link.reproduces else "FAIL"
-        print(f"  {mark} {link.kind:<18} {link.actual[:16]} (recorded {link.expected[:16]})")
+    _print_chain(report.chain, depth=1)
     mark = "ok  " if report.expected == report.actual else "FAIL"
     print(f"  {mark} {report.kind:<18} {report.actual[:16]} (recorded {report.expected[:16]})")
     print("  tolerance: none — byte identity. Scores carry a declared "

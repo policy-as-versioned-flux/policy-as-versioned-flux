@@ -10,6 +10,17 @@ recomputed **at the bundle's own pin**, and its digest is checked against the di
 claimed. Using the card's pin instead would break every card whose answer key was committed after
 the forecast was made — which is the normal case, since a forecast is made before it resolves.
 
+The chain is not one hop deep by construction. Any artefact whose body or pins names another
+artefact by `{kind, sha256, produced_by, pins}` — a **subject reference** — has that reference
+walked recursively by `_replay_subject`: a reliability diagram pools score cards this way (its
+`pins["score_cards"]` entries are subject references, plural), so reproducing one walks reliability
+-> score-card -> forecast-bundle, three artefacts deep, each hop re-opening its own pinned model
+tree (build ticket 89, decision ticket 14 Q3: "unbounded but recomputable"). A subject reference
+missing the fields needed to re-run it (most likely `produced_by`, the one field a digest-and-pins
+summary does not need for anything *except* walking) fails loudly rather than silently reporting
+an empty chain — an artefact that names something it cannot walk is a gap in what that artefact
+kind declared, not a reason to pretend nothing was named.
+
 **Tolerance is zero.** Comparison is byte equality, never approximate. Where platform maths could
 differ in the last unit in the last place — `log`, in the scoring rules — the *format* declares a
 quantisation (`scoring.SIGNIFICANT_DIGITS`) and the comparison stays exact. Putting the tolerance
@@ -33,7 +44,13 @@ from .grades import Capabilities
 from .repo import ModelRepo, RepoError
 
 VERBS = ("sense", "run", "score", "graph", "propagate", "options", "intervene", "observe", "rewind",
-         "regimes", "price", "backtest")
+         "regimes", "price", "backtest", "reliability")
+
+# The fields a subject reference must carry to be walked, not merely digest-checked (build ticket
+# 89). `kind` and `produced_by` are exactly what `produced_by`-less pooling (the pre-89 shape of
+# `reliability`'s own `score_cards` pin) leaves out — enough to verify a claimed digest, never
+# enough to re-run it.
+_SUBJECT_FIELDS = ("kind", "sha256", "produced_by", "pins")
 
 
 class ReproduceError(RuntimeError):
@@ -94,6 +111,44 @@ def _open_at(worktree: str | Path, pin: dict[str, Any], what: str) -> ModelRepo:
     return repo
 
 
+def _replay_subject(
+    worktree: str | Path, caps: Capabilities, ref: dict[str, Any]
+) -> tuple[Artefact | None, Report]:
+    """Recursively replay one artefact named by digest — a **subject reference**.
+
+    Every reference this module walks shares the one shape `score()`'s own `body["subject"]`
+    invented: `{kind, sha256, produced_by, pins}`, plus an optional `body` — whatever body content
+    *that* kind's own `replay()` branch reads (a score card's own `subject`, say), carried
+    verbatim rather than re-derived, so the recursion below can walk one more kind however deep
+    the reference chain actually goes. `pins` alone is enough to check a claimed digest was ever
+    real; `produced_by["command"]` is the part that turns a check into a *walk* — without it there
+    is a byte string to compare against and nothing left to re-run, so a reference missing it
+    fails loudly here rather than a `KeyError` three frames down or, worse, a chain link silently
+    absent from the report.
+
+    Returns the rebuilt artefact, or `None` (with the report still describing the mismatch) if
+    the reference's own pins no longer produce the digest it claimed.
+    """
+    missing = [name for name in _SUBJECT_FIELDS if name not in ref]
+    if missing:
+        raise ReproduceError(
+            f"a chain reference carries {sorted(ref)} but is missing {missing} — this artefact "
+            "kind was not built with enough declared pins to walk its own chain, only enough to "
+            "check a digest"
+        )
+    envelope = {"kind": ref["kind"], "produced_by": ref["produced_by"], "pins": ref["pins"]}
+    synthetic = {"envelope": envelope, "body": ref.get("body", {})}
+    rebuilt, nested_chain = replay(worktree, caps, synthetic)
+    actual = rebuilt.digest()
+    report = Report(
+        kind=rebuilt.kind, command=list(rebuilt.command), expected=ref["sha256"], actual=actual,
+        chain=nested_chain,
+    )
+    if actual != ref["sha256"]:
+        return None, report
+    return rebuilt, report
+
+
 def replay(worktree: str | Path, caps: Capabilities, doc: dict[str, Any]) -> tuple[Artefact, list[Report]]:
     """Re-run the command an artefact records, rebuilding whatever inputs it needed."""
     envelope = doc["envelope"]
@@ -102,6 +157,34 @@ def replay(worktree: str | Path, caps: Capabilities, doc: dict[str, Any]) -> tup
         raise ReproduceError(f"not a replayable command: {' '.join(command) or '(empty)'}")
 
     verb, flags = command[1], _flags(command)
+
+    if verb == "reliability":
+        # No `org`, no `model_repo` pin — a reliability diagram is standalone, pooled entirely
+        # from named score cards (`verbs.reliability`'s own docstring). Each pooled card carries
+        # its own model-repo pin and is opened at that pin by its own recursive `replay()` call
+        # below, so nothing here needs `worktree` opened directly.
+        sources = envelope["pins"].get("score_cards")
+        if not sources:
+            raise ReproduceError(
+                f"{' '.join(command)}: no score_cards pin to walk a reliability diagram's chain "
+                "from"
+            )
+        chain: list[Report] = []
+        with tempfile.TemporaryDirectory(prefix="twin-replay-") as scratch:
+            paths: list[str | Path] = []
+            for index, ref in enumerate(sources):
+                card, report = _replay_subject(worktree, caps, ref)
+                chain.append(report)
+                if card is None:
+                    # One pooled card no longer reproduces at its own pin — the diagram pooled
+                    # something that no longer exists, so report it rather than pool on.
+                    return _placeholder(doc), chain
+                path = Path(scratch) / f"score-card-{index}.json"
+                path.write_bytes(card.to_bytes())
+                paths.append(path)
+            bins = int(_need(flags, "bins", command))
+            return verbs.reliability(paths, caps, command, bins=bins), chain
+
     org = _need(flags, "org", command)
     repo = _open_at(worktree, envelope["pins"]["model_repo"], f"{envelope['kind']} pin")
 
@@ -142,34 +225,36 @@ def replay(worktree: str | Path, caps: Capabilities, doc: dict[str, Any]) -> tup
         # derivation — and would diverge the moment a commit landed between them.
         return verbs.rewind(repo, caps, org, _need(flags, "at", command), command), []
 
-    if flags.get("discount_sha256"):
-        # A discount (build ticket 40) is measured from other score cards named by path at the
-        # CLI, never recorded in the pinned command (`discount_sha256` is pinned by digest for
-        # the same reason `forecast_sha256` is — see `verbs.command_for`'s docstring), so there
-        # is nothing here to re-derive it from. This is the same honest limit `twin reliability`
-        # already carries: pooling other artefacts' content is not part of the `VERBS` replay
-        # chain, and a discount-carrying score card inherits it rather than reproducing falsely.
-        raise ReproduceError(
-            f"{' '.join(command)}: this score card names --discount-sha256 {flags['discount_sha256']!r}; "
-            "a discount is measured from other score cards named by path at the CLI, not pinned "
-            "in the command, so it cannot be replayed from pins alone — the same limit `twin "
-            "reliability` already carries for its own pooled inputs"
-        )
+    if verb == "score":
+        if flags.get("discount_sha256"):
+            # A discount (build ticket 40) is measured from other score cards named by path at
+            # the CLI, never recorded in the pinned command (`discount_sha256` is pinned by
+            # digest for the same reason `forecast_sha256` is — see `verbs.command_for`'s
+            # docstring), so there is nothing here to re-derive it from. Unlike `reliability`'s
+            # pooling above, a discount's own sources carry no `produced_by` at all — there is no
+            # reference here to walk, honest or otherwise.
+            raise ReproduceError(
+                f"{' '.join(command)}: this score card names --discount-sha256 "
+                f"{flags['discount_sha256']!r}; a discount is measured from other score cards "
+                "named by path at the CLI, not pinned in the command, so it cannot be replayed "
+                "from pins alone"
+            )
 
-    subject = doc["body"]["subject"]
-    bundle, chain = replay(
-        worktree, caps, {"envelope": {**subject, "kind": subject["kind"], "produced_by": subject["produced_by"]}, "body": {}}
-    )
-    rebuilt = bundle.digest()
-    chain.append(Report(kind=bundle.kind, command=list(bundle.command), expected=subject["sha256"], actual=rebuilt))
-    if rebuilt != subject["sha256"]:
-        # The card named a bundle by digest. If the pins no longer produce that bundle, the card
-        # is scoring something that no longer exists — report it rather than score on.
-        return _placeholder(doc), chain
-    with tempfile.TemporaryDirectory(prefix="twin-replay-") as scratch:
-        path = Path(scratch) / "forecast-bundle.json"
-        path.write_bytes(bundle.to_bytes())
-        return verbs.score(repo, caps, org, path, _need(flags, "outcome", command), command), chain
+        bundle, report = _replay_subject(worktree, caps, doc["body"]["subject"])
+        chain = [report]
+        if bundle is None:
+            # The card named a bundle by digest. If the pins no longer produce that bundle, the
+            # card is scoring something that no longer exists — report it rather than score on.
+            return _placeholder(doc), chain
+        with tempfile.TemporaryDirectory(prefix="twin-replay-") as scratch:
+            path = Path(scratch) / "forecast-bundle.json"
+            path.write_bytes(bundle.to_bytes())
+            return verbs.score(repo, caps, org, path, _need(flags, "outcome", command), command), chain
+
+    # Unreachable given `VERBS` enumerates every branch above, but a kind that declines
+    # chain-walking support should say so rather than fall through and guess at a shape it does
+    # not own — the exact failure mode build ticket 89 closes (decision ticket 14 Q3).
+    raise ReproduceError(f"{' '.join(command)}: {verb!r} chain-walking is not implemented")
 
 
 def _placeholder(doc: dict[str, Any]) -> Artefact:

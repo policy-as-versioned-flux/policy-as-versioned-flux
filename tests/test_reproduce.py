@@ -195,6 +195,45 @@ def test_an_unreplayable_command_is_a_sentence_not_a_traceback(
     assert main(["verify", str(broken), "--repo", str(model_repo_dir)]) == 2
 
 
+def test_reproducing_a_reliability_diagram_walks_a_three_artefact_chain(
+    model_repo_dir: Path, artefacts: dict[str, Path], tmp_path: Path
+) -> None:
+    """The chain is not one hop deep by construction (build ticket 89): a reliability diagram
+    pools score cards by digest, so reproducing one walks reliability -> score-card ->
+    forecast-bundle, three artefacts deep, each hop reopening its own pinned model tree."""
+    diagram = tmp_path / "reliability.json"
+    assert main([
+        "reliability", "--score-card", str(artefacts["score-card"]), "--out", str(diagram),
+    ]) == 0
+
+    report = reproduce(model_repo_dir, diagram)
+    assert report.reproduces, report.diff
+    assert [link.kind for link in report.chain] == ["score-card"]
+    assert [link.kind for link in report.chain[0].chain] == ["forecast-bundle"]
+
+
+def test_a_chain_reference_missing_produced_by_fails_loudly_not_silently(
+    model_repo_dir: Path, artefacts: dict[str, Path], tmp_path: Path
+) -> None:
+    """A reference that can only be digest-checked, never walked, must say so rather than crash
+    with a bare `KeyError` or — worse — quietly report an empty (and therefore falsely
+    reproducing) chain. `sha256` and `pins` alone are exactly what a pre-89 `reliability`
+    diagram's `score_cards` entries carried."""
+    diagram = tmp_path / "reliability.json"
+    assert main([
+        "reliability", "--score-card", str(artefacts["score-card"]), "--out", str(diagram),
+    ]) == 0
+    doc = json.loads(diagram.read_bytes())
+    ref = doc["envelope"]["pins"]["score_cards"][0]
+    del ref["kind"]
+    del ref["produced_by"]
+    broken = tmp_path / "broken-reliability.json"
+    broken.write_bytes(canonical_json(doc))
+
+    with pytest.raises(ReproduceError, match="produced_by"):
+        reproduce(model_repo_dir, broken)
+
+
 def test_reproducing_leaves_no_temporary_files_behind(
     model_repo_dir: Path, artefacts: dict[str, Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

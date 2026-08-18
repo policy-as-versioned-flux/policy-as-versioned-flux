@@ -239,8 +239,10 @@ def test_a_discounted_score_card_honestly_refuses_to_replay_from_pins(
 ) -> None:
     """A discount is measured from other score cards named by path at the CLI, never pinned in
     the command (the same reason `--forecast` is pinned by digest, not by path). Rather than
-    silently mis-replaying to a mismatched digest, `reproduce()` refuses honestly — the same
-    limit `twin reliability`'s own pooled inputs already carry."""
+    silently mis-replaying to a mismatched digest, `reproduce()` refuses honestly. `twin
+    reliability`'s own pooled inputs no longer share this limit (build ticket 89 gave them a
+    `produced_by` pin to walk, not just a digest to check) — a discount's sources carry no such
+    pin at all, so there is nothing here to walk even in principle."""
     enron_bundle, enron_card = tmp_path / "enron-bundle.json", tmp_path / "enron-card.json"
     carillion_bundle, carillion_card = tmp_path / "carillion-bundle.json", tmp_path / "carillion-card.json"
     assert main([

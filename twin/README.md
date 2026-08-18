@@ -416,7 +416,10 @@ assert it moves when the underlying scores do. `twin score --discount-enron <car
 `contamination_discount` on the card body is `None` — never a fabricated zero — when no discount
 was supplied. The discount is pinned by digest, never by path, the same reason `--forecast` is
 recorded as `forecast_sha256`; a discount-carrying score card honestly refuses to replay from its
-pins alone, the identical limit `twin reliability`'s own pooled score-card inputs already carry.
+pins alone. `twin reliability`'s own pooled score-card inputs no longer share this limit — build
+ticket 89 gave each pooled reference a `produced_by` pin to walk, not only a digest to check, so
+reproducing a reliability diagram now walks reliability -> score-card -> forecast-bundle. A
+discount's sources carry no such pin at all, so there is nothing there to walk even in principle.
 
 `fixtures.build_astrazeneca_org()` and `build_sanofi_org()` (build ticket 41) are an inverse pair
 of **hindsight-resistance controls**: cases where the contemporaneous record contradicts the
@@ -2145,7 +2148,7 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Ten
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Eleven
 capabilities now reach `full` — computed, not typed, and reached the same way every other tick in
 this table was: real code, cited live.
 
@@ -2154,7 +2157,7 @@ this table was: real code, cited live.
 | `domain-model` | 07 | full | 7 / 7 |
 | `causal-layer` | 08 | full | 5 / 5 |
 | `currency-regimes` | 09 | full | 6 / 6 |
-| `provenance` | 14 | partial | 2 / 4 |
+| `provenance` | 14 | full | 4 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | full | 8 / 8 |
 | `scenario-engine` | 13 | full | 7 / 7 |
@@ -2165,15 +2168,26 @@ this table was: real code, cited live.
 | `enactment` | 18 | full | 5 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**64 of 73**, across thirteen capabilities, ten of them `full`. An artefact's overall depth is
+**66 of 73**, across thirteen capabilities, eleven of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
 where `domain-model`, `causal-layer`, `currency-regimes`, `forecast-book`, `synthetic-substrate`,
-`ethics-gate`, `sense-move`, `twin-inside-twin`, `enactment` or `scenario-engine` is one of the
-capabilities they cite. `./bin/twin grade` prints the denominators, and this table is its output,
-not a hand-kept count — re-derived here rather than trusting a stale total (the same
+`ethics-gate`, `sense-move`, `twin-inside-twin`, `enactment`, `scenario-engine` or `provenance` is
+one of the capabilities they cite. `./bin/twin grade` prints the denominators, and this table is
+its output, not a hand-kept count — re-derived here rather than trusting a stale total (the same
 provisional-total drift this file names repeatedly below). (The "Seven capabilities" figure this
 paragraph carried before build ticket 88 was itself already one behind the table's own nine full
 rows — recomputed here rather than incremented by one on top of a stale base.)
+
+**`provenance` moved from 2/4 to 4/4, `full`, at build ticket 89.** AC 1 and AC 3 both asked for
+the seam decision ticket 14 already decided (signed artefacts + reconstructable derivation) to be
+demonstrated in code rather than only for the one score-card special case `reproduce.py` hardcoded.
+`reproduce.py`'s `_replay_subject` is now the one place that walks an artefact named by digest —
+`{kind, sha256, produced_by, pins}`, plus whatever body content that kind's own replay needs — and
+both `score` and `reliability` route their subject references through it, so reproducing a
+reliability diagram walks reliability -> score-card -> forecast-bundle, three artefacts deep, each
+hop re-opening its own pinned model tree (AC 3's "unbounded but recomputable"). A reference too
+thin to walk (no `produced_by`, the shape every `score_cards` entry carried before this ticket)
+fails loudly with `ReproduceError` rather than reporting an empty chain.
 
 **`enactment` moved from 4/5 to 5/5, `full`, at build ticket 86.** AC 5 asked for the
 action-state feedback path that closes decision ticket 08's conditional-forecast loop. Build
