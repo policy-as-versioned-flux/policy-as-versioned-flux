@@ -4134,6 +4134,10 @@ def build_royal_mail_org(dest: str | Path) -> Path:
 # dated by the filing, not by when somebody wrote about it.
 
 NETFLIX_ORG = "netflix"
+# The one checkpoint `beat-netflix.sh`'s sense step exercises (build ticket 80) — the Q4 2011
+# letter, dated the same day the causal edge into `streaming-service` itself first becomes
+# readable, so observing it walks straight back to the cause (`dvd-by-mail`) the edge names.
+NETFLIX_SENSE_DEMO_SIGNAL = "q4-2011-letter-2012-01-25"
 
 _SEC = "https://www.sec.gov/Archives/edgar/data/1065280"
 
@@ -4274,14 +4278,26 @@ provenance:
     }
 
 
-def _netflix_claim(signal_id: str, component: str) -> dict[str, str]:
+def _netflix_claim(signal_id: str, component: str, binding_grade: int = 1) -> dict[str, str]:
+    """A checkpoint's own binding claim.
+
+    `binding_grade` defaults to 1 here, matching this fixture's own signal-sourcing grade — a
+    reasonable stand-in for "claim strength" as long as nothing reads it against decision ticket
+    11 Q2's separate rule. `verbs.sense()` does exactly that (build ticket 80: "hand-authored
+    binding claims are grade 5 by construction" — a *binding* claim is a classification act, not
+    a magnitude claim, and is graded 5 regardless of how strong the underlying reading is, the way
+    the toy fixture's own `bind-price-separation-to-dvd-by-mail` already is). `build_netflix_org`
+    overrides to 5 for exactly the one signal AC 8 exercises through `sense()`
+    (`q4-2011-letter-2012-01-25`); the other five stay at 1, a real, narrow, named gap this ticket
+    does not close — see the ticket file's "what still isn't true".
+    """
     return {
         f"orgs/netflix/claims/bind-{signal_id}.yaml": f"""\
 id: bind-{signal_id}
 kind: binding
 signal: {signal_id}
 component: {component}
-evidence_grade: 1
+evidence_grade: {binding_grade}
 claimed_by: fixture-author (human)
 evidence: "The signal is the subject's own filed quarterly disclosure; the citation is on the signal itself."
 """
@@ -4654,7 +4670,13 @@ def build_netflix_org(dest: str | Path) -> Path:
             f"checkpoint: {signal_id}",
             {
                 **_netflix_signal(signal_id, date, steep, accession, statement),
-                **_netflix_claim(signal_id, component),
+                # See `_netflix_claim`'s own docstring: every checkpoint but one binds at this
+                # fixture's own signal-sourcing grade; `NETFLIX_SENSE_DEMO_SIGNAL` binds at 5,
+                # the grade `verbs.sense()` actually requires (build ticket 80).
+                **_netflix_claim(
+                    signal_id, component,
+                    binding_grade=5 if signal_id == NETFLIX_SENSE_DEMO_SIGNAL else 1,
+                ),
             },
         )
         for signal_id, date, component, steep, accession, statement in _NETFLIX_SPINE
@@ -4684,6 +4706,8 @@ def build_netflix_org(dest: str | Path) -> Path:
 # that a real Intel spine is this ticket's work, not that one's). This is the real subject.
 
 INTEL_ORG = "intel"
+# The one checkpoint `beat-intel.sh`'s sense step exercises (build ticket 80).
+INTEL_SENSE_DEMO_SIGNAL = "tan-14a-customer-guidance-2026-01-23"
 
 _INTEL_WORLD: dict[str, str] = {
     "world/meta.yaml": """\
@@ -4913,7 +4937,17 @@ provenance:
     }
 
 
-def _intel_claim(signal_id: str, component: str, grade: int) -> dict[str, str]:
+def _intel_claim(signal_id: str, component: str, grade: int, binding_grade: int | None = None) -> dict[str, str]:
+    """A checkpoint's own binding claim, at `grade` unless `binding_grade` overrides it.
+
+    `grade` here is the *signal's* own sourcing grade (1 primary, 2 trade-press) and doubles as
+    the binding claim's grade by default, in every call but one. `verbs.sense()` requires a
+    binding claim to sit at 5 ("grade 5 by construction" — a classification act, not a magnitude
+    claim, build ticket 80) regardless of the signal's own sourcing grade, so
+    `INTEL_SENSE_DEMO_SIGNAL` passes `binding_grade=5` explicitly; the other eight stay coupled to
+    their signal's sourcing grade, a real, narrow, named gap this ticket does not close — see the
+    ticket file's "what still isn't true".
+    """
     evidence = (
         "The signal is the subject's own primary release; the citation is on the signal itself."
         if grade == 1
@@ -4927,7 +4961,7 @@ id: bind-{signal_id}
 kind: binding
 signal: {signal_id}
 component: {component}
-evidence_grade: {grade}
+evidence_grade: {binding_grade if binding_grade is not None else grade}
 claimed_by: fixture-author (human)
 evidence: "{evidence}"
 """
@@ -4971,7 +5005,13 @@ def build_intel_org(dest: str | Path) -> Path:
             root,
             {
                 **_intel_signal(signal_id, date, steep, grade, source, url, statement),
-                **_intel_claim(signal_id, component, grade),
+                # See `_intel_claim`'s own docstring: every checkpoint but one binds at this
+                # signal's own sourcing grade; `INTEL_SENSE_DEMO_SIGNAL` binds at 5, the grade
+                # `verbs.sense()` actually requires (build ticket 80).
+                **_intel_claim(
+                    signal_id, component, grade,
+                    binding_grade=5 if signal_id == INTEL_SENSE_DEMO_SIGNAL else None,
+                ),
             },
         )
         git(root, "add", "-A")

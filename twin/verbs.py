@@ -179,6 +179,11 @@ def sense(repo: ModelRepo, caps: Capabilities, org: str, signal_id: str, command
     lever was pulled and a reconciler's report that it is running are ordinary signals with
     ordinary claims; there is no enactment ingest anywhere, and this function is the reason there
     does not need to be.
+
+    **Build ticket 80 wired the primitives in.** A bound signal is an *observation* (decision
+    ticket 11 Q4) — the same distinction `twin/primitives.py` already drew for `do()` — so a
+    component binding's belief update propagates and the reach is published beside it, rather than
+    stopping at the binding as if nothing followed from it.
     """
     from . import corroboration
 
@@ -187,6 +192,10 @@ def sense(repo: ModelRepo, caps: Capabilities, org: str, signal_id: str, command
     if signal is None:
         known = ", ".join(sorted(overlay.signals)) or "none"
         raise VerbError(f"no signal {signal_id!r} in overlay {org!r} (have: {known})")
+
+    # Built once and reused per binding below: the graph a component-binding's belief update
+    # propagates through. Not needed for response bindings (corroboration), which never reach it.
+    graph = overlay.graph()
 
     bindings = []
     responses: set[str] = set()
@@ -219,12 +228,27 @@ def sense(repo: ModelRepo, caps: Capabilities, org: str, signal_id: str, command
             )
         component_id = str(claim.get("component", ""))
         overlay.component(component_id)  # resolved for the refusal, not for the value
+        # Decision ticket 11 Q4: a bound signal is an observation, not a do() — belief updates
+        # bidirectionally. Downstream is the same causal composition an intervention would also
+        # produce (`twin/propagate.py`, shared with `_query()` below); upstream is what
+        # distinguishes an observation from an intervention at all, so it runs through
+        # `updated_beliefs()` and nowhere else — `severed()` is the intervention's function and
+        # this is never called with a `Do`.
+        downstream = propagate_mod.propagate(graph, component_id)
+        upstream, traversal = primitives_mod.updated_beliefs(
+            graph, primitives_mod.Observe(component_id)
+        )
         bindings.append(
             {
                 **held,
                 "component": component_id,
                 "component_layer": "overlay" if component_id in overlay.components else "world",
                 "confidence": claim.get("confidence"),
+                "propagation": {
+                    "downstream": downstream,
+                    "upstream": upstream,
+                    "upstream_traversal": traversal,
+                },
             }
         )
     if not bindings:

@@ -43,6 +43,26 @@ say "0. the live spine — nine real, dated, cited signals, no outcome, ever"
 "$TWIN" fixture --name "$ORG" --out "$WORK/intel" || fail "could not build the intel fixture"
 git -C "$WORK/intel" log --format='  %cs  %s' --reverse
 
+say "0b. THE SENSE STEP — a bound signal is an observation, and belief updates both ways (build ticket 80)"
+"$TWIN" sense --repo "$WORK/intel" --org "$ORG" --signal tan-14a-customer-guidance-2026-01-23 \
+  --out "$OUT/sense.json" || fail "sense failed"
+python3 - "$OUT/sense.json" <<'SENSE'
+import json, sys
+body = json.load(open(sys.argv[1]))["body"]
+binding = next(b for b in body["bindings"] if b.get("component") == "leading-edge-foundry-node")
+reach = binding["propagation"]
+if reach["upstream_traversal"]["walked"] is not True:
+    raise SystemExit(f"the upstream walk did not run: {reach['upstream_traversal']}")
+upstream = [e["component"] for e in reach["upstream"]]
+downstream = [e["component"] for e in reach["downstream"]["reached"]]
+# Honest, not trivial: this org's two components carry no causal edge between them yet, so the
+# walk that ran reports zero reach rather than a placeholder or a skipped step.
+print(f"  signal tan-14a-customer-guidance-2026-01-23 binds leading-edge-foundry-node; the "
+      f"observation walk ran both ways and found UPSTREAM {upstream or '(none — no causal edge '
+      'into this component yet)'}, DOWNSTREAM {downstream or '(none — no causal edge out of it '
+      'yet)'}")
+SENSE
+
 say "1. the scheduled production line — no --scenario flag exists on this command"
 "$TWIN" sweep --repo "$WORK/intel" --out "$OUT/sweep.json" || fail "sweep failed"
 

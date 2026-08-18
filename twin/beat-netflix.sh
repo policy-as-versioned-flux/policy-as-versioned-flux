@@ -49,6 +49,25 @@ say "0. the subject — six filings, and three layers each dated by its own evid
 "$TWIN" fixture --name "$ORG" --out "$WORK/netflix" || fail "could not build the Netflix spine"
 git -C "$WORK/netflix" log --format='  %cs  %s' --reverse
 
+say "0b. THE SENSE STEP — a bound signal is an observation, and belief updates both ways (build ticket 80)"
+say "    the Q4 2011 letter is the same checkpoint step 6's causal edge itself waits on"
+"$TWIN" sense --repo "$WORK/netflix" --org "$ORG" --signal q4-2011-letter-2012-01-25 \
+  --out "$OUT/sense.json" || fail "sense failed"
+python3 - "$OUT/sense.json" <<'SENSE'
+import json, sys
+body = json.load(open(sys.argv[1]))["body"]
+binding = next(b for b in body["bindings"] if b.get("component") == "streaming-service")
+reach = binding["propagation"]
+upstream = [e["component"] for e in reach["upstream"]]
+downstream = [e["component"] for e in reach["downstream"]["reached"]]
+if "dvd-by-mail" not in upstream:
+    raise SystemExit(f"the bound signal did not update belief about its ancestor: {upstream}")
+print(f"  signal q4-2011-letter-2012-01-25 binds streaming-service; belief updates UPSTREAM "
+      f"about {upstream} (an observation, decision ticket 11 Q4) and DOWNSTREAM about "
+      f"{downstream or '(nothing further downstream of streaming-service)'} — an intervention "
+      "on this same component would reach the same downstream and none of that upstream")
+SENSE
+
 say "1. THE THREAT PATH — rewound to $AT under as-consumed, then projected"
 say "   three world models, none privileged, and nothing collapses them into one number"
 "$TWIN" backtest --repo "$WORK/netflix" --org "$ORG" --scenario "$SCENARIO" \

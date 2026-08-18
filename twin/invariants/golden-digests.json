@@ -1,19 +1,19 @@
 {
-  "authorised_by": "decision ticket 09 \u2014 build ticket 85 wires the ethical-harms incommensurable into currency-regimes AC 4, moving the capability to full and its digest into every artefact's depth block",
-  "capabilities_digest": "c99f13927e0bd703b423867b06a5d383d312b7cdc0b9109b8c9fb957b2565624",
+  "authorised_by": "decision ticket 11 Q4 \u2014 build ticket 80 wires sense() to run updated_beliefs() on each component binding, adding a propagation field to the bound-signal artefact body, and ticks sense-move AC 4/AC 8 to full",
+  "capabilities_digest": "fb0cfc8109a04727440e7c5827efb8a75f2b716540ba37eacde709f407589d5b",
   "digests": {
-    "blast-radius": "7ba85da9eedde774a9633ce59c0f0c6e77418089a05522e6574c7e650fc43731",
-    "bound-signal": "0e4bc15761ffc29a58449d15797206ea19b8ea529ae7e66959cd710e0dd0eb2e",
-    "forecast-bundle": "6b169cc8be2d71a55a0bc0486f58c800a9d58cc8c5b65b5ecdfaa65f924cb9cd",
-    "graph": "907631d2adab363c9a185febf140a9436a0fff47cd15151a5b9f2694b000f65e",
-    "intervention": "4597b59e290030757aca7de04477f57e4406c31d9898cacb7613201b919f12bc",
-    "observation": "5766072164792ae2fb416a139312813b092a425ff3f8436ccb22404bcea11c06",
-    "priced-impact": "2958fed1577e41b47d25533c56113babef5929eaaf8b9df8be9aa21c90dc6145",
-    "priced-option-set": "3088d3e3d6bf6f9a5dbb95582ea43842709334c4a1ae07aa89aa99fb173499fc",
-    "propagation": "65573957fec0b6be57c74fbe454ced9794a1b4a8443e3416e4d328d60d21d5a4",
-    "rewound-model": "f6e007a8564b92a0fdb0e2e32f2415cee0686c631b99281df135a1e804507a38",
-    "scenario-exposure": "22bdc17752792147ea1e6df0dbcfd463e5ecbc1c50a14db4f7c8bd9e056a3330",
-    "score-card": "99631bf13c798eaf962e12f94dc8170ab7d8efa75b16e5ee09461d0cef34e4e0"
+    "blast-radius": "f7df63c4422f4f41298f4d8e60ef6e337fcc76ec1a673f973a9029a181b053fa",
+    "bound-signal": "9c998adc3a2e29efa736d2a2198b5bcf95cb40f29c56e3ee56d3569f836f61ef",
+    "forecast-bundle": "16210951519d958e5270e97979bb40a1ea0825e5ba17720bb5e66cce7cd6afb6",
+    "graph": "36f9114ff7042133e65866635e49d314ceb3eef11992b93832e840d10185611d",
+    "intervention": "3cc2bade218a32e2f9511dbefc3b8c497bcbccaacbc0f5f9e80fa890a0fb63c8",
+    "observation": "699b969d6df3e7802dac0947082ef51106a0afc532b49c0dacc17f4c2c94ae03",
+    "priced-impact": "5d7a48e519533a4b99d155c0592f15cfaba40e0ceea6725552c07fe0794c44ff",
+    "priced-option-set": "2cd4d7d7736c02fdc2df06526b36df6255f3218184939f883bd1baee3ced494c",
+    "propagation": "c62d7b812a898028637a532135635c65fde77e254434012fa4df71b0b5bd9be9",
+    "rewound-model": "c650a8b7fdd37810b1d4bd97ed2bf4afaa31532363014d40b1cb310124ae8bd8",
+    "scenario-exposure": "5b8e81e5da7e3e2dc2577f09c9a408aa449a92ae4bff34344e20c80862c0758c",
+    "score-card": "b23258030457efe18219abf8c098cfaa3c37fecfb96fb8317ad62d5c5c015a48"
   },
   "note": "Artefact digests from the fixture model repository. Byte-identity given the pins is the property; these are what a second architecture must reproduce.",
   "tool_version": "0.1.0"

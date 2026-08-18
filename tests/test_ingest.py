@@ -137,11 +137,16 @@ def test_throughput_report_does_not_divide_by_zero_when_elapsed_is_zero() -> Non
 def test_ingest_declares_its_depth_grade_as_the_computed_sense_move_checklist(
     repo: ModelRepo, caps: Capabilities
 ) -> None:
+    """The declared grade is *read from* the checklist, not asserted by `ingest_run` itself.
+
+    Not pinned to a particular grade (`sense-move` reached `full` at build ticket 80): the
+    property this test exists for is that the depth block never states a grade of its own, only
+    the checklist's, whatever that currently computes to.
+    """
     artefact = ingest.ingest_run(repo, caps, "netflix", _recipe(), 10, COMMAND)
     depth = artefact.depth
     computed = caps.require("sense-move")
     assert depth["capabilities"]["sense-move"]["grade"] == computed.grade
-    assert depth["capabilities"]["sense-move"]["grade"] != "full"  # honestly partial, not asserted
 
 
 # -- candidates ------------------------------------------------------------------------------

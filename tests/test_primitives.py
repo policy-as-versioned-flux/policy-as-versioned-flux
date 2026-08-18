@@ -236,6 +236,39 @@ def test_an_intervention_that_records_no_severed_list_at_all_is_refused() -> Non
         refuse_upstream_under_intervention(body)
 
 
+# -- sense() wires observation propagation in (build ticket 80) -----------------------------
+
+
+def test_sense_reaches_an_ancestor_the_same_component_intervention_would_not(repo, caps) -> None:  # noqa: ANN001
+    """A bound signal is `sense()`'s own observation, not a `do()` — decision ticket 11 Q4, wired
+    into the sense loop itself rather than asserted only against the standalone primitives.
+
+    Netflix's real fixture signal (`price-separation-announced`) binds to `dvd-by-mail`, whose
+    one causal ancestor is `streaming-experience` (`streaming-displaces-dvd`, depth 1) — itself
+    caused by `content-delivery-network` (`cdn-capacity-lifts-streaming`, depth 2) — and whose one
+    causal descendant is `brand-goodwill`. Sensing it must reach both ancestors; intervening on
+    the identical component, over the identical edges, must reach neither.
+    """
+    from twin import verbs
+
+    bound = verbs.sense(repo, caps, "netflix", "price-separation-announced", ["twin", "sense"])
+    binding = next(b for b in bound.body["bindings"] if b["component"] == "dvd-by-mail")
+    reach = binding["propagation"]
+    depths = {e["component"]: e["depth"] for e in reach["upstream"]}
+    assert depths == {"streaming-experience": 1, "content-delivery-network": 2}, (
+        "observing dvd-by-mail is evidence about what moved it; sense() never ran updated_beliefs()"
+    )
+    assert {e["component"] for e in reach["downstream"]["reached"]} == {"brand-goodwill"}
+
+    # Contrast: an intervention on the very same component, over the very same edges, walks the
+    # same downstream and none of the upstream — decision ticket 11 Q4's distinction, made
+    # concrete against real data rather than asserted only against the primitives directly.
+    intervened = verbs.intervene(repo, caps, "netflix", "dvd-by-mail", ["twin", "intervene"])
+    assert intervened.body["upstream"] == []
+    assert [e["edge"] for e in intervened.body["severed"]] == ["streaming-displaces-dvd"]
+    assert {e["component"] for e in intervened.body["downstream"]["reached"]} == {"brand-goodwill"}
+
+
 # -- rewind (build ticket 35) ---------------------------------------------------------------
 
 

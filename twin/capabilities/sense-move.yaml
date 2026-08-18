@@ -19,7 +19,9 @@ criteria:
     ticked_by: build ticket 44
   - index: 4
     text: "Observation-propagation semantics, distinguished from ticket 08's intervention propagation."
-    checked: false
+    checked: true
+    evidence: "twin/verbs.py sense() (build ticket 80) now runs propagate_mod.propagate() (downstream) and primitives_mod.updated_beliefs(graph, Observe(component)) (upstream, ticket 22/35's own primitive) on every component-kind binding, publishing both under a propagation field on the bound-signal artefact's binding. tests/test_primitives.py::test_sense_reaches_an_ancestor_the_same_component_intervention_would_not exercises it against the real fixture data sense() already binds (price-separation-announced -> dvd-by-mail): sensing reaches the causal ancestors streaming-experience and content-delivery-network; intervene() on the identical component, over the identical edges, reaches neither — the distinction from ticket 08's do()/severed() (build ticket 22) made concrete against real data, not asserted only against the bare primitives."
+    ticked_by: build ticket 80
   - index: 5
     text: "Weak-signal retention + promotion rule."
     checked: true
@@ -37,4 +39,6 @@ criteria:
     ticked_by: build ticket 09
   - index: 8
     text: "Exercised on a real signal for each co-flagship."
-    checked: false
+    checked: true
+    evidence: "twin/beat-netflix.sh step 0b runs twin sense against q4-2011-letter-2012-01-25, the real Netflix checkpoint (build ticket 73's own spine) whose late arrival first supplies the causal edge dvd-by-mail -> streaming-service, and prints the observation reaching dvd-by-mail upstream; twin/beat-intel.sh step 0b runs twin sense against tan-14a-customer-guidance-2026-01-23, a real Intel checkpoint (build ticket 75's own spine), and prints the (honestly empty, that org's causal layer does not exist yet) reach. Both binding claims needed a binding_grade override (fixtures.py NETFLIX_SENSE_DEMO_SIGNAL / INTEL_SENSE_DEMO_SIGNAL, build ticket 80) to reach the grade 5 sense() requires — the other Netflix and Intel checkpoints' binding claims stay coupled to their signal's own sourcing grade, a named, out-of-scope gap (ticket 80's own 'what still isn't true'). Both beat scripts run to PASS end to end."
+    ticked_by: build ticket 80

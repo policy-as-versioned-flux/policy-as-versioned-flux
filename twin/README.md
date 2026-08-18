@@ -2028,7 +2028,7 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Five
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Six
 capabilities now reach `full` — computed, not typed, and reached the same way every other tick in
 this table was: real code, cited live.
 
@@ -2039,7 +2039,7 @@ this table was: real code, cited live.
 | `currency-regimes` | 09 | full | 6 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
-| `sense-move` | 11 | partial | 6 / 8 |
+| `sense-move` | 11 | full | 8 / 8 |
 | `scenario-engine` | 13 | partial | 4 / 7 |
 | `synthetic-substrate` | 12 | full | 7 / 7 |
 | `forecast-book` | 21 | full | 6 / 6 |
@@ -2048,13 +2048,27 @@ this table was: real code, cited live.
 | `enactment` | 18 | partial | 4 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**52 of 73**, across thirteen capabilities, five of them `full`. An artefact's overall depth is
+**54 of 73**, across thirteen capabilities, six of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
-where `domain-model`, `currency-regimes`, `forecast-book`, `synthetic-substrate` or `ethics-gate`
-is one of the capabilities they cite. `./bin/twin grade` prints the denominators, and this table is its output,
-not a hand-kept count — re-derived here
+where `domain-model`, `currency-regimes`, `forecast-book`, `synthetic-substrate`, `ethics-gate` or
+`sense-move` is one of the capabilities they cite. `./bin/twin grade` prints the denominators, and
+this table is its output, not a hand-kept count — re-derived here
 rather than trusting a stale total (the same provisional-total drift this file names repeatedly
 below).
+
+**`sense-move` moved from 6/8 to 8/8, `full`, at build ticket 80.** `sense()` never ran
+`updated_beliefs()` on a bound signal — a bound signal stopped at the binding and never
+propagated, and the only caller of `Observe` was the standalone `twin observe` verb, disconnected
+from the sense loop decision ticket 11 is actually about (AC 4). Separately, no beat script ever
+called `twin sense` at all (AC 8). Both are closed now: `sense()` runs the downstream causal
+composition and `updated_beliefs()`'s upstream walk on every component binding and publishes both
+under a `propagation` field; `beat-netflix.sh` and `beat-intel.sh` each gained a step that senses
+a real signal and prints the reach live. Fixing AC 8 for real surfaced a genuine, narrow gap of
+its own — the real Netflix and Intel fixtures' binding claims were graded at their *signal's own
+sourcing grade* (1 or 2) rather than the grade 5 `sense()` requires of a binding claim by
+construction, so `twin sense` had never actually run against either fixture before. One
+checkpoint per co-flagship now overrides to grade 5 to unblock the demonstration; the rest stay
+as they were, a named, out-of-scope residual (see the ticket file's "what still isn't true").
 
 **`domain-model` moved from 1/7 to 7/7 at build ticket 79.** A prior research pass found five of
 the six unchecked ACs already satisfied by code built since decision ticket 07 was resolved
