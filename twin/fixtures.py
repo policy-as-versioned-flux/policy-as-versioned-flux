@@ -4812,6 +4812,57 @@ affected_parties:
       only, no perspective or response — so the government's own exposure to the outcome this
       scenario forecasts is visible here and nowhere else in this overlay.
 """,
+    # The real causal claim decision ticket 08 AC 5 asks for on this co-flagship (build ticket
+    # 81): EUV delay -> process-node slip, on the subject's own dated record rather than the toy
+    # `intel` overlay's `example.invalid` stand-in (`OVERLAY_FILES`, above `build()`) — that one
+    # was the walking skeleton's own demonstration edge and was never this ticket's to widen.
+    "orgs/intel/components/euv-lithography.yaml": """\
+id: euv-lithography
+name: EUV lithography tooling and process readiness for the leading-edge node
+kind: capability
+evolution: custom-built
+visibility: 0.4
+""",
+    "orgs/intel/edges/euv-delay-slips-the-node.yaml": """\
+id: euv-delay-slips-the-node
+type: influences
+from: euv-lithography
+to: leading-edge-foundry-node
+sign: negative
+lag_days: 365
+elasticity:
+  min: 0.2
+  mode: 0.4
+  max: 0.65
+evidence_grade: 2
+confidence: 0.45
+note: >-
+  Repeated historical co-movement on the subject's own dated record — the evidence ladder's own
+  grade-2 example, verbatim ("tooling delivery slipping ahead of a process-node slip, across more
+  than one node", `twin/evidence-ladder.yaml`). On 2014-09-04, at the Citi Global Technology
+  Conference, then-CEO Brian Krzanich stated Intel would "get through 10nm without EUV" and that
+  the industry was "late with EUV and technologies needed for it", choosing self-aligned quad
+  patterning over EUV for the 10nm node
+  (https://www.kitguru.net/components/cpu/anton-shilov/intel-we-will-not-need-euv-for-10nm-process-technology/).
+  On the subject's own Q2 2015 earnings call the following July, Krzanich told investors 10nm
+  (Cannon Lake) would slip from 2016 into the second half of 2017, attributing the slip to
+  lithography difficulty directly — "the number of multi-pattern steps you have to do is
+  increasing" — the multi-patterning path taken because EUV was skipped
+  (https://www.kitguru.net/components/cpu/anton-shilov/intel-confirms-delay-of-10nm-microprocessors-to-2017-blames-difficulties/).
+  10nm then slipped repeatedly again and did not reach real volume for roughly five years past
+  that original schedule (https://www.tomshardware.com/news/intel-cpu-10nm-earnings-amd,36967.html;
+  https://www.top500.org/news/in-intels-arduous-journey-to-10-nm-moores-law-comes-up-short/). The
+  subject's own current bet reads the identical lever the other way: `leading-edge-foundry-node`
+  (this org's own 14A) is reported as the industry's first commercial deployment of High-NA EUV,
+  install and acceptance testing already complete
+  (https://www.techpowerup.com/344132/intel-installs-asml-twinscan-exe-5200b-high-na-euv-machine-for-14a-node),
+  and the subject's own 14A go/no-go decision point, reported for 2026
+  (https://bits-chips.com/article/intel-sees-go-no-go-moment-for-14a-node-in-2026/), is gated on
+  the identical tooling-versus-schedule confidence this edge asserts a direction and lag for.
+  Grade 2, not 1: this is the mechanism repeating on the same subject over time, not a single
+  dated change with a measured effect on both sides of it — the range is wide because nobody has
+  measured this magnitude for 14A itself, only observed the sign hold on the node before it.
+""",
 }
 
 _SEC_INTEL = "https://www.sec.gov/Archives/edgar/data/50863"

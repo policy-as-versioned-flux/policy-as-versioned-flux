@@ -120,6 +120,10 @@ CAPS_SEVERITY = ["currency-regimes"]
 # the model is *loaded through* the regime, so a post-T fact is absent rather than screened.
 SCORING_REGIME = regimes_mod.AS_CONSUMED
 
+# Why a non-event carrying a graded mitigation claim scores unscoreable rather than as a miss
+# (decision ticket 08 Q4, build ticket 81). Named beside the other `unscoreable` reasons above it.
+MITIGATED_NON_EVENT = "mitigated-non-event"
+
 
 class VerbError(RuntimeError):
     pass
@@ -1213,6 +1217,11 @@ def score(
         raise VerbError(f"outcome {outcome_id!r} must record `observed: true|false`")
     proposition_id = str(outcome.get("proposition", ""))
     overlay.proposition(proposition_id)
+    # Decision ticket 08 Q4, build ticket 81: the answer key may itself carry a mitigation claim
+    # — "the event this forecast predicted did not happen because this evidenced intervention
+    # prevented it" — reusing `response.mitigates`'s own schema and validator rather than a second
+    # one, because it is the identical causal claim in a different place.
+    mitigation_claim = outcome.get("mitigation")
 
     # The execution's own declaration is read back, not just the per-forecast tag: a bundle that
     # says `scoring_eligible: false` at the top must not score whatever its forecasts claim.
@@ -1259,6 +1268,35 @@ def score(
             unscoreable.append(
                 {**entry, "reason": "not-a-probability",
                  "detail": f"{probability} is not strictly between 0 and 1"}
+            )
+            continue
+        # The intervention-aware scoring rule (decision ticket 08 Q4, build ticket 81): a
+        # mitigation credit is a causal claim like any other, so it is use-gated on the identical
+        # threshold `pricing.py` already applies to £ credit — reused, not reinvented. Only a
+        # non-event can be "prevented" at all, so this never touches a forecast the outcome
+        # resolved true, and an ungraded or weakly-graded claim (3-5) earns no protection: the
+        # forecast falls through and scores exactly as it would with no claim on record, which is
+        # what "grades 4-5 earn NO calibration credit" means in code rather than in prose.
+        if not observed and mitigation_claim is not None and evidence.may_price(
+            int(mitigation_claim["evidence_grade"])
+        ):
+            unscoreable.append(
+                {**entry, "reason": MITIGATED_NON_EVENT,
+                 "detail": (
+                     f"outcome {outcome_id!r} records observed=false with a mitigation claim at "
+                     f"{mitigation_claim['component']!r}, evidenced at grade "
+                     f"{mitigation_claim['evidence_grade']}. A prevented event counts only when "
+                     "the prevention is evidenced at grade 1-2 (decision ticket 08 Q4), so this "
+                     "forecast is excluded from the calibration record rather than scored as a "
+                     "miss — the twin does not get to excuse a genuine miss with 'our warning "
+                     "prevented it' unless the prevention itself carries the same evidence a "
+                     "£ credit would need"
+                 ),
+                 "mitigation": {
+                     "component": str(mitigation_claim["component"]),
+                     "evidence_grade": int(mitigation_claim["evidence_grade"]),
+                     "basis": str(mitigation_claim["basis"]),
+                 }}
             )
             continue
         raw = scoring.score(probability, observed)

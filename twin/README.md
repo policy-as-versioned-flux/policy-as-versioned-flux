@@ -2028,14 +2028,14 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Six
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Seven
 capabilities now reach `full` — computed, not typed, and reached the same way every other tick in
 this table was: real code, cited live.
 
 | capability | decision ticket | grade | ticked |
 |---|---|---|---|
 | `domain-model` | 07 | full | 7 / 7 |
-| `causal-layer` | 08 | partial | 2 / 5 |
+| `causal-layer` | 08 | full | 5 / 5 |
 | `currency-regimes` | 09 | full | 6 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
@@ -2048,13 +2048,32 @@ this table was: real code, cited live.
 | `enactment` | 18 | partial | 4 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**54 of 73**, across thirteen capabilities, six of them `full`. An artefact's overall depth is
+**57 of 73**, across thirteen capabilities, seven of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
-where `domain-model`, `currency-regimes`, `forecast-book`, `synthetic-substrate`, `ethics-gate` or
-`sense-move` is one of the capabilities they cite. `./bin/twin grade` prints the denominators, and
-this table is its output, not a hand-kept count — re-derived here
+where `domain-model`, `causal-layer`, `currency-regimes`, `forecast-book`, `synthetic-substrate`,
+`ethics-gate` or `sense-move` is one of the capabilities they cite. `./bin/twin grade` prints the
+denominators, and this table is its output, not a hand-kept count — re-derived here
 rather than trusting a stale total (the same provisional-total drift this file names repeatedly
 below).
+
+**`causal-layer` moved from 2/5 to 5/5, `full`, at build ticket 81.** Two gaps closed together.
+AC 2 (intervention + counterfactual semantics, incl. structural-only paths) was two thirds
+composed — abduction (rewind, build ticket 35) with action (`Do`, build ticket 22) tested
+together, and abduction with prediction (`run`, build ticket 37) tested together — but never all
+three off the identical abducted state, and the structural-only-path claim had never been stated
+for the *composed* chain, only for `propagate()` at rest. `tests/test_four_verbs.py::test_the_full_counterfactual_composes_abduction_action_and_prediction`
+closes both at once. AC 3 (intervention-aware scoring) was pure gap: several modules referenced
+`mitigat...` but none tied an intervention to a scored outcome. `twin/schema.py`'s `outcome`
+schema gained an optional `mitigation` field (reusing `response.mitigates`'s own validator) and
+`verbs.score` now gates a non-event's calibration eligibility on it at the identical evidence
+threshold `pricing.py`'s own mitigation credit uses — a worked example
+(`tests/test_intervention_aware_scoring.py`) scores an evidenced mitigated non-event as
+unscoreable, the identical claim with no mitigation as an ordinary scored miss, and a weakly-graded
+mitigation claim (grade 4) byte-identical to the no-claim case. AC 5 added the Intel half of the
+co-flagship pair: `euv-lithography` -> `leading-edge-foundry-node`, a real, dated, grade-2 causal
+edge on the real spine (`fixtures.build_intel_org`), cited to the subject's own 2014 decision to
+forgo EUV at 10nm and the multi-year node slip that followed, exercised live in
+`twin/beat-intel.sh` and asserted in `tests/test_intel_beat.py`.
 
 **`sense-move` moved from 6/8 to 8/8, `full`, at build ticket 80.** `sense()` never ran
 `updated_beliefs()` on a bound signal — a bound signal stopped at the binding and never

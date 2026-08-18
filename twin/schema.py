@@ -754,7 +754,14 @@ SCHEMAS: dict[str, Schema] = {
         # record and the now-canonical story diverge, so a scored forecast that confidently
         # agrees with the canonical story is evidence of memorisation, not skill. Optional and
         # false by omission — every other answer key makes no such claim.
-        optional={"note": text, "hindsight_trap": boolean},
+        #
+        # `mitigation` (build ticket 81, decision ticket 08 Q4): reuses the identical validator
+        # `response.mitigates` already carries rather than authoring a second one — "the incident
+        # did not happen because of our control" is the same causal claim in either place, and it
+        # is use-gated by `verbs.score` on the same evidence-grade threshold `pricing.py` already
+        # gates £ credit on. Absent by default: an outcome that declares no mitigation is scored
+        # exactly as it always was.
+        optional={"note": text, "hindsight_trap": boolean, "mitigation": mitigation},
     ),
     "person": Schema(required={"id": ident}, optional={"role": text}),
     # One schema, two edge families. Which fields are required depends on the type, and

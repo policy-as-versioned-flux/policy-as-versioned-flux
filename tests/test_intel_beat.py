@@ -17,7 +17,7 @@ from typing import Iterator
 
 import pytest
 
-from twin import fixtures, invariants
+from twin import fixtures, invariants, verbs
 from twin.artefact import digest_of_file
 from twin.attest import SUFFIX as ATTEST_SUFFIX
 from twin.cli import main
@@ -201,6 +201,31 @@ def test_the_forecast_carries_a_computed_depth_grade(beat: dict[str, Path]) -> N
     depth = json.loads(beat["run"].read_bytes())["envelope"]["depth"]
     expected = Capabilities.load().depth_block(CAPS_RUN)
     assert depth == expected
+
+
+# -- decision ticket 08 AC 5: the real causal claim, exercised (build ticket 81) -------------------
+
+
+def test_the_real_euv_causal_edge_composes_to_a_priced_elasticity(
+    beat: dict[str, Path], caps: Capabilities
+) -> None:
+    """EUV delay -> process-node slip, on the real spine — the Intel half of decision ticket 08
+    AC 5, exercised the same way as the Netflix co-flagship's Qwikster->churn edge: a real
+    propagation, not a description of one. See `twin/fixtures.py`'s own `_INTEL_BASE` for the
+    dated, cited evidence a grade-2 elasticity rests on."""
+    repo = ModelRepo.open(beat["repo"])
+    artefact = verbs.propagate(
+        repo, caps, ORG, "euv-lithography",
+        verbs.command_for("propagate", org=ORG, origin="euv-lithography"),
+    )
+    reached = {r["component"]: r for r in artefact.body["reached"]}
+    assert "leading-edge-foundry-node" in reached, "the causal edge did not compose at all"
+    primary = next(p for p in reached["leading-edge-foundry-node"]["paths"] if p["primary"])
+    assert primary["sign"] == "negative"
+    assert primary["worst_evidence_grade"] == 2
+    assert not primary["directional_only"], (
+        "grade 2 is inside the pricing threshold — a real elasticity, not a direction-only claim"
+    )
 
 
 # -- AC 5: extends the invariant suite, and the new guard passes live ------------------------------

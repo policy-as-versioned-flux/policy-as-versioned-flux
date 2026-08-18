@@ -55,13 +55,36 @@ if reach["upstream_traversal"]["walked"] is not True:
     raise SystemExit(f"the upstream walk did not run: {reach['upstream_traversal']}")
 upstream = [e["component"] for e in reach["upstream"]]
 downstream = [e["component"] for e in reach["downstream"]["reached"]]
-# Honest, not trivial: this org's two components carry no causal edge between them yet, so the
-# walk that ran reports zero reach rather than a placeholder or a skipped step.
+# The real causal edge build ticket 81 added (decision ticket 08 AC 5) makes this non-trivial:
+# euv-lithography is now a genuine causal ancestor of the bound component, so the observation
+# updates belief about it too, with no magnitude — the same diagnostic-direction discipline
+# `twin/primitives.py` states for every observation.
+if "euv-lithography" not in upstream:
+    raise SystemExit(f"expected euv-lithography upstream of the bound component, got {upstream}")
 print(f"  signal tan-14a-customer-guidance-2026-01-23 binds leading-edge-foundry-node; the "
-      f"observation walk ran both ways and found UPSTREAM {upstream or '(none — no causal edge '
-      'into this component yet)'}, DOWNSTREAM {downstream or '(none — no causal edge out of it '
-      'yet)'}")
+      f"observation walk ran both ways and found UPSTREAM {upstream} (the EUV causal edge, "
+      f"build ticket 81), DOWNSTREAM "
+      f"{downstream or '(none — nothing causal leaves this component yet)'}")
 SENSE
+
+say "0c. THE REAL CAUSAL CLAIM — EUV delay -> process-node slip (build ticket 81, decision ticket 08 AC 5)"
+"$TWIN" propagate --repo "$WORK/intel" --org "$ORG" --origin euv-lithography \
+  --out "$OUT/propagate.json" || fail "propagate failed"
+python3 - "$OUT/propagate.json" <<'CAUSAL'
+import json, sys
+body = json.load(open(sys.argv[1]))["body"]
+reached = next((r for r in body["reached"] if r["component"] == "leading-edge-foundry-node"), None)
+if reached is None:
+    raise SystemExit("euv-lithography's own causal edge did not compose to leading-edge-foundry-node")
+primary = next(p for p in reached["paths"] if p["primary"])
+if primary["directional_only"]:
+    raise SystemExit(f"expected a priceable elasticity, got directional-only: {primary}")
+composed = primary["composed"]
+print(f"  euv-lithography -> leading-edge-foundry-node: grade {primary['worst_evidence_grade']}, "
+      f"{primary['sign']}, composed {composed['min']:.3f}/{composed['mode']:.3f}/{composed['max']:.3f} "
+      "— a real, cited, priceable elasticity, the Netflix co-flagship's own Qwikster->churn edge "
+      "matched rather than left as this org's one remaining gap")
+CAUSAL
 
 say "1. the scheduled production line — no --scenario flag exists on this command"
 "$TWIN" sweep --repo "$WORK/intel" --out "$OUT/sweep.json" || fail "sweep failed"

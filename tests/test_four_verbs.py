@@ -162,6 +162,68 @@ def test_a_backtest_bundle_reproduces_from_its_own_pins(tmp_path: Path, repo: Mo
     assert report.chain[0].reproduces, "the backtest bundle it scored did not reproduce"
 
 
+def test_the_full_counterfactual_composes_abduction_action_and_prediction(
+    repo: ModelRepo, caps: Capabilities
+) -> None:
+    """Decision ticket 08 AC 2, closed. `twin/capabilities/causal-layer.yaml` named the gap
+    precisely: abduction (build ticket 35) and action (build ticket 22) were composed and tested
+    together above (`test_counterfactual_is_rewind_then_intervene`), and prediction/fast-forward
+    (build ticket 37) was composed and tested with abduction alone (`test_backtest_is_rewind_then_run`)
+    — "two thirds of a composition is not the composition". This calls all three off the identical
+    abducted state: `primitives.rewind` (abduction), `verbs.intervene` carrying `Do` (action), and
+    `verbs.run` (prediction/fast-forward).
+
+    It also states and tests structural-only-path behaviour for this composed chain specifically,
+    not only for `propagate()` in isolation (build ticket 20's scope). `cloud-compute` carries no
+    `influences` edge at all — `streaming-experience` only *needs* it — so asking the intervened,
+    abducted state the causal question (`verbs.intervene`'s own `downstream`) finds nothing:
+    `twin/propagate.py` never walks a `needs` edge, and there is no other kind leaving this
+    component. Asking the identical abducted-and-intervened state the structural question
+    (`verbs.blast`) reports `streaming-experience` as real, unpriced exposure regardless. Decision
+    ticket 08 Q3's "one traversal, two outputs" is shown holding under an intervention, not only
+    at rest — and this is the sharper case: an intervention whose causal prediction is empty is
+    not a no-op, because the structural exposure is still there and still real.
+    """
+    rewound = primitives.rewind(repo.model_root, REWIND_AT)
+
+    # Action: do(x) on the abducted state, on a component with a real structural dependent
+    # (`streaming-experience` needs `cloud-compute`) and zero causal edges of its own.
+    intervened = verbs.intervene(
+        rewound, caps, "netflix", "cloud-compute",
+        verbs.command_for("intervene", org="netflix", component="cloud-compute", at=REWIND_AT),
+    )
+    assert intervened.pins["model_repo"]["commit"] == rewound.pin.commit
+
+    # Prediction / fast-forward: run() at the identical abducted time — the third leg, composed
+    # rather than only ever exercised two of three (backtest already covers rewind+run; act-now
+    # already covers do() alone).
+    forecast = verbs.run(
+        repo, caps, "netflix", "dvd-decline-2011", "as-consumed",
+        verbs.command_for("run", org="netflix", scenario="dvd-decline-2011", regime="as-consumed", at=REWIND_AT),
+        at=REWIND_AT,
+    )
+    assert forecast.kind == verbs.KIND_FORECAST_BUNDLE
+    assert forecast.pins["model_repo"]["commit"] == rewound.pin.commit
+
+    # Structural-only path, for this same composed (rewound + intervened) chain.
+    assert intervened.body["severed"] == [], "nothing claims a mechanism into cloud-compute either"
+    assert intervened.body["downstream"]["reached"] == [], (
+        "cloud-compute carries no influences edge, so the priced prediction is empty — not a "
+        "placeholder, an honest zero-length walk"
+    )
+
+    radius = verbs.blast(
+        rewound, caps, "netflix", "cloud-compute",
+        verbs.command_for("blast", org="netflix", origin="cloud-compute", at=REWIND_AT),
+    )
+    unpriced = {r["component"] for r in radius.body["unpriced"]}
+    assert "streaming-experience" in unpriced, (
+        "the structural dependent is real exposure and unpriced, on the identical abducted state "
+        "whose causal prediction just found nothing"
+    )
+    assert radius.body["admitted_to_pricing"] == [], "no causal path leaves cloud-compute to price"
+
+
 def test_a_rewind_before_the_repository_existed_refuses_honestly(repo: ModelRepo) -> None:
     """The scenario's own subject-matter date (2011) predates this synthetic fixture's git
     history — `primitives.rewind` refuses rather than answering with today's model wearing 2011's

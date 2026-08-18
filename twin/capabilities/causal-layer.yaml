@@ -11,18 +11,14 @@ criteria:
     ticked_by: build ticket 17
   - index: 2
     text: "Defined intervention + counterfactual semantics, incl. behaviour on structural-only paths."
-    checked: false
-    # Deliberately still unchecked after build ticket 22. Two of the three legs are built:
-    # **intervention semantics** at build ticket 22 (`twin/primitives.py` — do() cuts the incoming
-    # edges and propagates downstream only, observe() updates belief bidirectionally, and the two
-    # are separate types so a swap is a type error), and **structural-only-path behaviour** at
-    # build ticket 20 (a `needs` edge claims no mechanism, so nothing composes along it). The
-    # **counterfactual** is abduction -> action -> prediction; abduction landed at build ticket 35
-    # and prediction (fast-forward) is build ticket 37. Two thirds of a composition is not the
-    # composition.
+    checked: true
+    evidence: "tests/test_four_verbs.py::test_the_full_counterfactual_composes_abduction_action_and_prediction (build ticket 81). Abduction (`primitives.rewind`, build ticket 35), action (`Do` carried by `verbs.intervene`, build ticket 22) and prediction/fast-forward (`verbs.run`, build ticket 37) are called together off the identical abducted state — the two prior tests each composed only two of the three (`test_counterfactual_is_rewind_then_intervene`: abduction+action; `test_backtest_is_rewind_then_run`: abduction+prediction), which is what the capability file's own prior note meant by 'two thirds of a composition is not the composition'. Structural-only-path behaviour is stated and tested for this same composed (rewound + intervened) chain, not only for `propagate()` at rest: `do(cloud-compute)` — a component with zero `influences` edges of its own — produces an empty priced prediction (`intervened.body['downstream']['reached'] == []`), while `verbs.blast` on the identical abducted-and-intervened state reports `streaming-experience`, a real `needs` dependent, as unpriced exposure. Decision ticket 08 Q3's 'one traversal, two outputs' shown holding under an intervention, not only at rest."
+    ticked_by: build ticket 81
   - index: 3
     text: "The intervention-aware scoring rule, with a worked example of a mitigated non-event."
-    checked: false
+    checked: true
+    evidence: "twin/schema.py's `outcome` schema gains an optional `mitigation` field (build ticket 81), reusing `response.mitigates`'s own validator rather than a second one. `verbs.score` (twin/verbs.py) gates on it with the identical evidence threshold `pricing.py`'s own mitigation credit already uses (`evidence.may_price`): a non-event whose outcome carries a grade-1/2 mitigation claim is excluded from the calibration record (`unscoreable`, reason `MITIGATED_NON_EVENT`) rather than scored as a miss; the identical claim with no mitigation, or a claim graded 3-5, scores exactly as it always did — decision ticket 08 Q4's 'grades 4-5 earn NO calibration credit', made literal. The worked example is the evidence: tests/test_intervention_aware_scoring.py — one forecast bundle, three outcome records, `test_a_well_evidenced_mitigation_excludes_the_non_event_from_the_calibration_record` (grade 1, unscoreable), `test_the_identical_claim_with_no_mitigation_scores_as_an_ordinary_non_event` (scored), and `test_a_weakly_graded_mitigation_claim_earns_no_calibration_credit` (grade 4, byte-identical to the no-claim case)."
+    ticked_by: build ticket 81
   - index: 4
     text: "A stated identification/confounding discipline + its honest limits."
     checked: true
@@ -30,16 +26,6 @@ criteria:
     ticked_by: build ticket 45
   - index: 5
     text: "Exercised on a real claim from each co-flagship (Qwikster→churn; EUV delay→node slip)."
-    checked: false
-    # The Netflix half is real after build ticket 74 and the Intel half is not, so this stays
-    # unchecked. `the-separation-reaches-the-streaming-service` in `fixtures.build_netflix_org` is
-    # a grade-1 causal edge on the real subject — the evidence ladder's own grade-1 example, a
-    # dated price change with subscriber numbers on both sides of it, from the Q2 and Q3 2011
-    # letters — carried through propagation into a price and into a trade-off curve, with three
-    # rival accounts disagreeing about its magnitude. **The real Intel spine now exists (build
-    # ticket 75, `fixtures.build_intel_org`) and still carries no causal edge**: the ticket's own
-    # checklist asked for a pinned, signed, unscoreable forward forecast, not a causal claim, so
-    # none was authored — widening scope beyond what was asked is not this ticket's to do.
-    # `euv-delay-slips-the-node` is still only in the walking-skeleton fixture, whose intel org
-    # cites `example.invalid`. "Each co-flagship" means each of them, and this stays unchecked
-    # until a real, cited causal edge lands on the real spine.
+    checked: true
+    evidence: "Netflix: `the-separation-reaches-the-streaming-service` in `fixtures.build_netflix_org` (build ticket 74), a grade-1 causal edge on the real subject, carried through propagation into a price and a trade-off curve with three rival accounts disagreeing about its magnitude. Intel (build ticket 81, closing the prior gap this file itself named): `euv-delay-slips-the-node` (`euv-lithography` -> `leading-edge-foundry-node`), a grade-2 causal edge on the real spine (`fixtures.build_intel_org`, not the walking-skeleton's `example.invalid` stand-in), dated and cited to the subject's own 2014 decision to forgo EUV at 10nm and the multi-year node slip that followed, contrasted with the subject's own current High-NA EUV bet on the identical component. Exercised live in `twin/beat-intel.sh` step 0c (`twin propagate --origin euv-lithography` composes to a priced, grade-2 elasticity — not directional-only) and asserted in tests/test_intel_beat.py::test_the_real_euv_causal_edge_composes_to_a_priced_elasticity; the sense step (0b) now finds `euv-lithography` upstream of the bound component too, the observation side of the identical edge."
+    ticked_by: build ticket 81
