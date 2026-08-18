@@ -2028,7 +2028,7 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Four
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Five
 capabilities now reach `full` — computed, not typed, and reached the same way every other tick in
 this table was: real code, cited live.
 
@@ -2036,7 +2036,7 @@ this table was: real code, cited live.
 |---|---|---|---|
 | `domain-model` | 07 | full | 7 / 7 |
 | `causal-layer` | 08 | partial | 2 / 5 |
-| `currency-regimes` | 09 | partial | 5 / 6 |
+| `currency-regimes` | 09 | full | 6 / 6 |
 | `provenance` | 14 | partial | 2 / 4 |
 | `honest-build` | 20 | partial | 1 / 4 |
 | `sense-move` | 11 | partial | 6 / 8 |
@@ -2048,10 +2048,10 @@ this table was: real code, cited live.
 | `enactment` | 18 | partial | 4 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**51 of 73**, across thirteen capabilities, four of them `full`. An artefact's overall depth is
+**52 of 73**, across thirteen capabilities, five of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
-where `domain-model`, `forecast-book`, `synthetic-substrate` or `ethics-gate` is one of the
-capabilities they cite. `./bin/twin grade` prints the denominators, and this table is its output,
+where `domain-model`, `currency-regimes`, `forecast-book`, `synthetic-substrate` or `ethics-gate`
+is one of the capabilities they cite. `./bin/twin grade` prints the denominators, and this table is its output,
 not a hand-kept count — re-derived here
 rather than trusting a stale total (the same provisional-total drift this file names repeatedly
 below).
@@ -2098,6 +2098,19 @@ against the committed rule and a pool shaped to satisfy it, it reads `yes`, citi
 21 Q3's own resolved cost (three already-built components layered on ticket 20's scoring harness)
 and value (the only contamination-proof falsification mechanism in the project) verbatim. See
 "The co-registered forecast book" section, below, for the full account.
+
+**`currency-regimes` reaches `full` at build ticket 85**, decision ticket 09's last acceptance
+criterion (each named incommensurable, treated, incl. where we refuse to price). The sixth and
+last of the six named incommensurables, ethical harms, was checked live rather than assumed still
+open:
+`twin/affected_parties.py` (build ticket 61, decision ticket 15's own Q4 mechanism list) already
+existed and already refused to price a non-contracting party's harm — it had just never been
+stated as decision ticket 09's own sixth incommensurable. This ticket makes that connection
+explicit rather than building new machinery: `published()`'s `currency_note` now names "decision
+ticket 09 AC 4's ethical-harms leg" directly, and
+`tests/test_affected_parties.py::test_published_names_ethical_harms_as_the_incommensurable_it_treats`
+exercises the ethical-harms case specifically, the same standard reputation, morale and
+existential/tail risk already met. See "decision ticket 09 AC 4" below for what this corrects.
 
 **`enactment` is a new row (build ticket 66) against a decision ticket — 18 — that had no
 capability file at all before it**, the third time that gap has been found and filled rather than
@@ -2276,17 +2289,18 @@ does not exist:
   identification (do-calculus, back-door analysis) stays out of scope, per Q5's own text rejecting
   it as a blanket requirement — the honest limit is stated in the module docstring: one hop, not
   the full transitive closure. `causal-layer` moves to 2/5.
-- **decision ticket 09 AC 4** (each named incommensurable, incl. where we refuse to price) — the
-  register now carries **five** distinct refusal reasons rather than two (build ticket 30), plus
-  three more for a mitigation claim that earns nothing, so reputation and morale have a real
-  treatment: they price through a modelled path or they stay in the register with a falsifiable
-  reason. Existential and tail risk now have one too (build ticket 24): `twin severity` reports a
-  loss-exceedance curve — VaR beside TVaR, never VaR alone — rather than collapsing the tail into
-  a priced point, and refusing to reduce ruin-adjacent risk to a single figure is itself the
-  treatment. Nothing in the pocket org or the fixtures calls it yet; anchoring it to a real
-  component is build ticket 25. Ethical harms still wait on the affected-parties register at 61.
-  Five of six named incommensurables is not each of them. It is also, as of build ticket 33, the
-  **only** criterion `currency-regimes` still has open — ACs 5 and 6 are ticked; see above.
+- **decision ticket 09 AC 4 is now ticked (build ticket 85), and `currency-regimes` reaches
+  `full`.** It stayed here, unticked, for a long time: the register carries **five** distinct
+  refusal reasons rather than two (build ticket 30), plus three more for a mitigation claim that
+  earns nothing, so reputation and morale have a real treatment — they price through a modelled
+  path or they stay in the register with a falsifiable reason. Existential and tail risk have one
+  too (build ticket 24): `twin severity` reports a loss-exceedance curve — VaR beside TVaR, never
+  VaR alone — rather than collapsing the tail into a priced point, and refusing to reduce
+  ruin-adjacent risk to a single figure is itself the treatment, anchored to named public sources
+  at build ticket 25. That left ethical harms, and build ticket 85 found the checklist stale
+  rather than the code: `twin/affected_parties.py` (build ticket 61) already named non-contracting
+  parties' harm and already refused to price it, unconnected to decision ticket 09 only in name.
+  See "`currency-regimes` reaches `full` at build ticket 85" above for what closed it.
 - **decision ticket 15** now has a capability file (`ethics-gate`, build ticket 47, 3/5) — see "The
   admission ladder, DPIA triage, gameability and the fast-improvement backstop", above. Before that
   ticket it had none: build ticket 27 published the scope exclusions, the power-layer disclaimer,

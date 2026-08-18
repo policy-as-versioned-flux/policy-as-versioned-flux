@@ -110,6 +110,17 @@ def test_published_carries_the_constraint_sets_own_pin(netflix: Overlay) -> None
     assert body["parties"] == register(netflix)
 
 
+def test_published_names_ethical_harms_as_the_incommensurable_it_treats(netflix: Overlay) -> None:
+    """Decision ticket 09 AC 4's sixth and last incommensurable, exercised specifically: this
+    register is where the twin states, concretely, that it refuses to price a non-contracting
+    party's harm — the same standard `twin/pricing.py`'s register and `twin severity` already
+    meet for reputation/morale and existential/tail risk."""
+    note = published(netflix)["currency_note"]
+    assert "ethical" in note.lower()
+    assert "decision ticket 09" in note
+    assert "not priced" in note or "refused a price" in note
+
+
 # -- the artefact and the CLI ------------------------------------------------------------------
 
 

@@ -24,26 +24,9 @@ criteria:
     ticked_by: build ticket 29
   - index: 4
     text: "Treatment of each named incommensurable, incl. where we refuse to price."
-    checked: false
-    # Closer, and still not "each". Build ticket 30 gave the register five distinct refusal
-    # reasons — the path is graded too weakly, the perspective declares no valuation, the
-    # valuation is graded too weakly, no graded path reaches a cash flow, the path carries a
-    # direction and no magnitude — plus three more for a mitigation claim that earns nothing.
-    # Reputation and morale therefore have a real treatment: they price through a modelled path or
-    # they stay in the register with a falsifiable reason. Existential and tail risk now have one
-    # too (build ticket 24): `twin severity` reports a loss-exceedance curve (VaR beside TVaR,
-    # never VaR alone) rather than collapsing the tail into the causal £ chain, which has no
-    # severity slot for it by design — the refusal to price a point figure for ruin-adjacent risk
-    # is itself the treatment. Build ticket 25 anchors it: `twin severity-anchor` fits the curve
-    # from named, dated public sources (twin/severity-anchors.yaml) rather than illustrative
-    # numbers, and names honestly which of its five parameters are defensible (mu, sigma,
-    # threshold — cited or fit from cited quantiles) and which are not (xi, beta — no public
-    # single-source fit exists, so they carry a reason rather than a false anchor) with the
-    # headline TVaR's sensitivity to the unanchored one reported alongside it. Still nothing in
-    # the pocket org or the fixtures calls it — anchoring a real component's own severity to this
-    # subject, rather than exercising the subject standalone, is not this ticket's job either.
-    # Ethical harms still wait on the affected-parties register at 61. Five of the six named
-    # incommensurables is not each of them.
+    checked: true
+    evidence: "Six named incommensurables, six treatments. Reputation and morale price through a modelled path or stay in twin/pricing.py's register with one of five falsifiable refusal reasons (build ticket 30). Existential/tail risk gets `twin severity`'s loss-exceedance curve (VaR beside TVaR, never a point figure — build ticket 24) anchored to named public sources (build ticket 25). Ethical harms — real consequence borne by someone who never held a perspective in any twin, so could never be priced from one — was checked live rather than assumed absent: `twin/affected_parties.py` (build ticket 61, decision ticket 15's Q4 mechanism list) already existed and already refuses to price this, it was simply never stated as decision ticket 09's own sixth incommensurable. Build ticket 85 makes that connection explicit in the artefact itself: `published()`'s `currency_note` now names 'decision ticket 09 AC 4's ethical-harms leg' directly, and tests/test_affected_parties.py::test_published_names_ethical_harms_as_the_incommensurable_it_treats exercises the ethical-harms case specifically, the same standard the other five already meet. A small connection to existing machinery, not new machinery — the register already did the work; it had just never said so."
+    ticked_by: build ticket 85
   - index: 5
     text: "A stated objective function with its qualifications."
     checked: true

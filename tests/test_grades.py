@@ -93,14 +93,16 @@ def test_an_ungraded_capability_cannot_be_used(caps: Capabilities) -> None:
         caps.require("something-nobody-graded")
 
 
-def test_only_domain_model_forecast_book_synthetic_substrate_and_ethics_gate_have_earned_full(caps: Capabilities) -> None:
+def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_and_currency_regimes_have_earned_full(caps: Capabilities) -> None:
     """The walking skeleton must not be able to claim `full` on say-so — but a capability that
     closes every acceptance criterion with a real, live-checked citation may: `domain-model` was
     the first to (build ticket 79), `forecast-book` the second (build ticket 84, the
     proportionality verdict), `synthetic-substrate` the third (build ticket 87, the planting
     protocol's strength and difficulty-distribution clauses plus anti-contamination and ethics),
     `ethics-gate` the fourth (build ticket 82, the named sensor table and the behavioural-sensing
-    misuse catalogue). Every other shipped capability stays `partial` or `stub`."""
+    misuse catalogue), `currency-regimes` the fifth (build ticket 85, the ethical-harms leg of
+    decision ticket 09 AC 4 already answered by the affected-parties register and wired in).
+    Every other shipped capability stays `partial` or `stub`."""
     grades = {g.capability: g.grade for g in caps}
     assert set(grades) == {
         "causal-layer", "currency-regimes", "demo-slice", "domain-model", "enactment",
@@ -111,6 +113,7 @@ def test_only_domain_model_forecast_book_synthetic_substrate_and_ethics_gate_hav
     assert grades.pop("forecast-book") == "full"
     assert grades.pop("synthetic-substrate") == "full"
     assert grades.pop("ethics-gate") == "full"
+    assert grades.pop("currency-regimes") == "full"
     assert "full" not in grades.values()
 
 
@@ -136,12 +139,12 @@ def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_
     assert block["capabilities"]["finished"]["unchecked"] == []
 
 
-def test_domain_model_forecast_book_synthetic_substrate_and_ethics_gate_are_the_shipped_capabilities_at_full(
+def test_domain_model_forecast_book_synthetic_substrate_ethics_gate_and_currency_regimes_are_the_shipped_capabilities_at_full(
     caps: Capabilities,
 ) -> None:
     grades = {g.capability: g.grade for g in caps}
     assert {c for c, g in grades.items() if g == "full"} == {
-        "domain-model", "forecast-book", "synthetic-substrate", "ethics-gate",
+        "domain-model", "forecast-book", "synthetic-substrate", "ethics-gate", "currency-regimes",
     }
 
 

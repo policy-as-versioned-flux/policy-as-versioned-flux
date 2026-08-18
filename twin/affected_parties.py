@@ -19,6 +19,13 @@ No currency claim. `admitted_because`/`exposure_by_basis` exist in `twin/admissi
 £ figure has to say what admitted it; a party in this register carries no such field, because
 nothing here prices anything — visibility is the whole of what this delivers, and the constraint
 set's own `harms-to-non-contracting-parties` exclusion says why nothing more is claimed.
+
+**Also decision ticket 09 AC 4's sixth and last incommensurable (build ticket 85).** Reputation,
+morale and existential/tail risk already have a real treatment (`twin/pricing.py`'s register,
+`twin severity`); ethical harms — real consequence borne by someone who never held a perspective
+in any twin, and so could never be priced from one — is this register. `published()`'s
+`currency_note` says so explicitly, in the same vocabulary as the other five: named, and refused
+a price, never smuggled in as a shadow figure.
 """
 
 from __future__ import annotations
@@ -65,6 +72,8 @@ def published(overlay: Overlay) -> dict[str, Any]:
             "named here, not priced — perspectival £ puts a non-contracting party's harm outside "
             "the currency by construction (twin/constraints.yaml: harms-to-non-contracting-"
             "parties). This register gives them no power; it refuses to let their absence look "
-            "like their non-existence."
+            "like their non-existence. This is decision ticket 09 AC 4's ethical-harms leg, the "
+            "sixth named incommensurable: treated the same way the other five already are — "
+            "named, and refused a price, never smuggled in as a shadow figure."
         ),
     }
