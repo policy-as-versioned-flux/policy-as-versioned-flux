@@ -29,6 +29,34 @@ import yaml
 from . import PACKAGE_DIR
 from .canon import digest_of
 
+# -- AC 1 (build ticket 90): the determinism-split test itself, queryable rather than prose the
+#    capability inventory (`twin/honest_build.py`) would otherwise have to re-derive by hand from
+#    this module's docstring above. Decision ticket 20 Q1's own words: "the test for the whole
+#    inventory: if it must be reproducible from pins -> code; if it is a judgement landing at
+#    grade 5 -> skill." `CODE_KIND`/`SKILL_KIND` are the two values `classify_by_determinism()`
+#    returns; `INHERITED_KIND` (arckit-ported code) is `twin/honest_build.py`'s own concern, not
+#    this module's, since inheritance is a provenance question orthogonal to determinism.
+CODE_KIND = "code"
+SKILL_KIND = "skill"
+
+SKILL_DEFINITION = (
+    "A skill is judgement that is irreducibly interpretive: it cannot be recomputed from pins "
+    "(seeds, model versions, prompts) alone, and what it produces is a grade-5 model assertion "
+    "rather than a derivation. Anything reproducible from pins is code, whatever heuristic "
+    "implementation currently stands in for it (decision ticket 20 Q1). The unit of packaging is "
+    "one module owning a `SKILL` name constant, a fixture corpus, and a threshold entry in "
+    "skill-thresholds.yaml, run through this module's own evaluate()."
+)
+
+
+def classify_by_determinism(reproducible_from_pins: bool) -> str:
+    """Decision ticket 20 Q1's own test, as one function: "if it must be reproducible from pins
+    -> code; if it is a judgement landing at grade 5 -> skill." A caller asserts against this
+    directly (`twin/honest_build.py`'s `CAPABILITY_INVENTORY`) instead of re-deriving the rule
+    from this module's prose by hand, which is what AC 1 asks for."""
+    return CODE_KIND if reproducible_from_pins else SKILL_KIND
+
+
 THRESHOLDS_PATH = PACKAGE_DIR / "skill-thresholds.yaml"
 SCORES_PATH = PACKAGE_DIR / "skill-scores.jsonl"
 THRESHOLDS_SCHEMA = "twin.skill-thresholds/v1"

@@ -681,6 +681,32 @@ def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> 
     )
 
 
+@harness_check("honest_build_inventory_matches_files_and_owning_tickets")
+def _honest_build_inventory_matches_files_and_owning_tickets(ctx: Context) -> str:
+    """`honest-build`'s AC 2 and AC 4 (build ticket 90, decision ticket 20): the capability
+    inventory and the skill-owning-ticket map are computed claims, not typed prose, so this checks
+    them the way every other computed claim in the suite is checked — against real files, not
+    trusted from the module that declares them.
+
+    `twin/honest_build.py`'s own `validate_inventory()`/`validate_owning_tickets()` do the actual
+    work; this guard exists so a `CAPABILITY_INVENTORY` entry that quietly drifted from the files
+    it cites (a renamed module, a threshold dropped from skill-thresholds.yaml, a kind that
+    contradicts its own `reproducible_from_pins` flag) fails the standing suite rather than only a
+    test a future ticket might not think to run.
+    """
+    from .. import honest_build
+
+    honest_build.validate_inventory()
+    honest_build.validate_owning_tickets()
+    kinds = honest_build.inventory_summary()
+    return (
+        f"{len(honest_build.CAPABILITY_INVENTORY)} capabilities classified "
+        f"({len(kinds['code'])} code, {len(kinds['inherited'])} inherited, {len(kinds['skill'])} "
+        f"skill); {len(honest_build.SKILL_OWNING_TICKET)} skill(s) each resolve to a real "
+        "decision ticket under .scratch/twin/issues/"
+    )
+
+
 def _score_log_history(root: Path) -> list[str]:
     """Commits that changed the score-over-time log, newest first — the same shape
     `_manifest_history` gives the invariant manifest."""

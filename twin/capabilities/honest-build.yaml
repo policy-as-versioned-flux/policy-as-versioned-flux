@@ -4,10 +4,37 @@ owning_ticket: '20'
 criteria:
   - index: 1
     text: "A definition of \"skill\" for this project, and the unit of packaging."
-    checked: false
+    checked: true
+    evidence: >-
+      twin/skills.py SKILL_DEFINITION (a real string, not prose only) and
+      classify_by_determinism() — decision ticket 20 Q1's own test ("if it must be reproducible
+      from pins -> code; if it is a judgement landing at grade 5 -> skill"), as a queryable
+      function other code asserts against rather than re-deriving from a docstring by hand.
+      twin/honest_build.py's validate_inventory() calls it directly per entry
+      (tests/test_honest_build.py::test_a_kind_that_contradicts_its_own_determinism_flag_is_refused
+      proves it is load-bearing, not decorative) — the unit of packaging (one module owning a
+      SKILL name, a fixture corpus, and a skill-thresholds.yaml entry, run through evaluate()) is
+      SKILL_DEFINITION's own second half.
+    ticked_by: build ticket 90
   - index: 2
     text: "The inventory: which capabilities are skills, which are code, which are inherited from arckit."
-    checked: false
+    checked: true
+    evidence: >-
+      twin/honest_build.py CAPABILITY_INVENTORY: 18 entries covering every capability decision
+      ticket 20 Q3 named (10 code, 3 inherited-from-arckit, 5 skill), each checked against a real,
+      non-empty module by validate_inventory() (tests/test_honest_build.py::test_the_real_inventory_validates_clean,
+      wired into the standing suite as harness check
+      honest_build_inventory_matches_files_and_owning_tickets). Resolves the ethics-gate tension
+      build ticket 90 named: ethics_gate.scorer() — what skill-thresholds.yaml's ethics-gate entry
+      actually scores — reads only admit()'s ladder-walk + DPIA triage, a deterministic rule
+      engine over an already-quantified payload with exactly one correct answer, unlike the other
+      five skills' heuristics, each of which documents its own "swap the body for a model call"
+      upgrade path that ethics_gate.py's admission machinery does not have. Reclassified `code`
+      here (tests/test_honest_build.py::test_ethics_gate_is_classified_code_not_skill,
+      ::test_ethics_gates_own_scorer_only_reads_the_deterministic_ladder_surface) rather than
+      forced onto the skill side to keep the six-skill count consistent-looking; the existing eval
+      harness (skill-thresholds.yaml, twin/skills.py) is left as-is.
+    ticked_by: build ticket 90
   - index: 3
     text: "A build order with the bootstrap sequence made explicit."
     checked: true
@@ -15,4 +42,13 @@ criteria:
     ticked_by: build ticket 07
   - index: 4
     text: "Each skill's owned decision-record (which resolved ticket defines its contract)."
-    checked: false
+    checked: true
+    evidence: >-
+      twin/honest_build.py SKILL_OWNING_TICKET maps each of the five capabilities the inventory
+      classifies `skill` (signal-classify, causal-claims, evolution-judge, substrate-generator,
+      gameplay-lens — ethics-gate excluded per AC 2's finding) to its owning decision ticket,
+      validated against a real file under .scratch/twin/issues/ by validate_owning_tickets(), the
+      same glob twin.grades.acceptance_criteria() uses
+      (tests/test_honest_build.py::test_owning_tickets_are_exactly_the_skill_classified_capabilities,
+      ::test_an_owning_ticket_that_names_no_real_file_is_refused).
+    ticked_by: build ticket 90

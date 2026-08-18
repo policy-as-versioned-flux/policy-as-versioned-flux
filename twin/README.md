@@ -2148,7 +2148,7 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Eleven
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Twelve
 capabilities now reach `full` — computed, not typed, and reached the same way every other tick in
 this table was: real code, cited live.
 
@@ -2158,7 +2158,7 @@ this table was: real code, cited live.
 | `causal-layer` | 08 | full | 5 / 5 |
 | `currency-regimes` | 09 | full | 6 / 6 |
 | `provenance` | 14 | full | 4 / 4 |
-| `honest-build` | 20 | partial | 1 / 4 |
+| `honest-build` | 20 | full | 4 / 4 |
 | `sense-move` | 11 | full | 8 / 8 |
 | `scenario-engine` | 13 | full | 7 / 7 |
 | `synthetic-substrate` | 12 | full | 7 / 7 |
@@ -2168,15 +2168,36 @@ this table was: real code, cited live.
 | `enactment` | 18 | full | 5 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**66 of 73**, across thirteen capabilities, eleven of them `full`. An artefact's overall depth is
+**69 of 73**, across thirteen capabilities, twelve of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
 where `domain-model`, `causal-layer`, `currency-regimes`, `forecast-book`, `synthetic-substrate`,
 `ethics-gate`, `sense-move`, `twin-inside-twin`, `enactment`, `scenario-engine` or `provenance` is
-one of the capabilities they cite. `./bin/twin grade` prints the denominators, and this table is
-its output, not a hand-kept count — re-derived here rather than trusting a stale total (the same
+one of the capabilities they cite (`honest-build` reaches `full` too, but no artefact's own
+`CAPS_*` list ever names it — it describes the build's own capability inventory, not something an
+artefact is produced by). `./bin/twin grade` prints the denominators, and this table is its
+output, not a hand-kept count — re-derived here rather than trusting a stale total (the same
 provisional-total drift this file names repeatedly below). (The "Seven capabilities" figure this
 paragraph carried before build ticket 88 was itself already one behind the table's own nine full
 rows — recomputed here rather than incremented by one on top of a stale base.)
+
+**`honest-build` moved from 1/4 to 4/4, `full`, at build ticket 90.** AC 1's determinism-split
+test lived only as `twin/skills.py`'s module docstring; `SKILL_DEFINITION` and
+`classify_by_determinism()` make it a queryable predicate (decision ticket 20 Q1: "if it must be
+reproducible from pins -> code; if it is a judgement landing at grade 5 -> skill"). AC 2's
+inventory (`twin/honest_build.py` `CAPABILITY_INVENTORY`) classifies all 18 capabilities decision
+ticket 20 Q3 named — 10 code, 3 inherited from arckit, 5 skill — each checked against a real
+module, wired into the standing suite as harness check
+`honest_build_inventory_matches_files_and_owning_tickets`. Built resolving, rather than papering
+over, the tension this ticket named: decision ticket 20 Q3 lists `ethics-gate` as the sixth skill,
+but `ethics_gate.scorer()` — what `skill-thresholds.yaml`'s own `ethics-gate` entry scores — reads
+only `admit()`'s ladder-walk and DPIA triage, a deterministic rule engine over an
+already-quantified payload with exactly one correct answer, unlike the other five skills' own
+heuristics, each of which documents a "swap the body for a model call" upgrade path
+`ethics_gate.py`'s admission machinery does not have. `ethics-gate` is classified `code` here; the
+existing eval harness (`skill-thresholds.yaml`, `twin/skills.py`) is left as-is. AC 4's
+`SKILL_OWNING_TICKET` map — now five entries, not six — is checked against
+`.scratch/twin/issues/` existing, the way `twin.grades.acceptance_criteria()` already checks a
+decision ticket before trusting its text.
 
 **`provenance` moved from 2/4 to 4/4, `full`, at build ticket 89.** AC 1 and AC 3 both asked for
 the seam decision ticket 14 already decided (signed artefacts + reconstructable derivation) to be
@@ -2597,16 +2618,18 @@ is not a discipline problem.
 
 ## The invariants
 
-`./bin/twin verify` — 69 pass, 2 fail (`drift_window_is_actually_being_sampled`, a live-cluster
+`./bin/twin verify` — 70 pass, 2 fail (`drift_window_is_actually_being_sampled`, a live-cluster
 probe-staleness check that fails whenever build ticket 64's probe has not sampled recently, so it
 is expected to go red between samples and is not a coherence defect; and
 `flux_coverage_floor_is_still_reachable`, red since 2026-08-16 and staying red until the window
 closes — build ticket 70's finding 1, above, not a new defect), 2 skipped and not faked (the
-CI-only cross-architecture leg), 0 pending. `pytest -q` — 1499 tests across seams 1 and 2, 1498 of
-which pass; `test_the_suite_is_green` goes red with the same two failures above. (Build
-ticket 56's coherence audit re-derived these counts from a live run rather than carrying the
-previous round's numbers forward — see "What is honestly built", below, for the same discipline
-applied to the capability table. Build tickets 78, 65, 66, 77 and 86 re-derived them again the same way.)
+CI-only cross-architecture leg), 0 pending. `pytest -q` — 1536 tests, 1535 of which pass;
+`test_the_suite_is_green` goes red with the same two failures above. (Build ticket 56's coherence
+audit re-derived these counts from a live run rather than carrying the previous round's numbers
+forward — see "What is honestly built", below, for the same discipline applied to the capability
+table. Build tickets 78, 65, 66, 77, 86 and 90 re-derived them again the same way — build ticket 90
+adding the 70th `twin verify` check, `honest_build_inventory_matches_files_and_owning_tickets`, and
+the 17 tests of `tests/test_honest_build.py`.)
 
 Three checks read the actual wall clock rather than the model repository, and all three do it
 because the property they guard is about *now*: `drift_window_is_actually_being_sampled` (is the
