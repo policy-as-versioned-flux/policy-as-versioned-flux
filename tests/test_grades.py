@@ -93,10 +93,11 @@ def test_an_ungraded_capability_cannot_be_used(caps: Capabilities) -> None:
         caps.require("something-nobody-graded")
 
 
-def test_only_domain_model_has_earned_full(caps: Capabilities) -> None:
+def test_only_domain_model_and_forecast_book_have_earned_full(caps: Capabilities) -> None:
     """The walking skeleton must not be able to claim `full` on say-so — but a capability that
-    closes every acceptance criterion with a real, live-checked citation may, and `domain-model`
-    is the first to (build ticket 79). Every other shipped capability stays `partial` or `stub`."""
+    closes every acceptance criterion with a real, live-checked citation may: `domain-model` was
+    the first to (build ticket 79), `forecast-book` the second (build ticket 84, the
+    proportionality verdict). Every other shipped capability stays `partial` or `stub`."""
     grades = {g.capability: g.grade for g in caps}
     assert set(grades) == {
         "causal-layer", "currency-regimes", "demo-slice", "domain-model", "enactment",
@@ -104,6 +105,7 @@ def test_only_domain_model_has_earned_full(caps: Capabilities) -> None:
         "sense-move", "synthetic-substrate", "twin-inside-twin",
     }
     assert grades.pop("domain-model") == "full"
+    assert grades.pop("forecast-book") == "full"
     assert "full" not in grades.values()
 
 
@@ -129,9 +131,9 @@ def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_
     assert block["capabilities"]["finished"]["unchecked"] == []
 
 
-def test_domain_model_is_the_only_shipped_capability_at_full(caps: Capabilities) -> None:
+def test_domain_model_and_forecast_book_are_the_shipped_capabilities_at_full(caps: Capabilities) -> None:
     grades = {g.capability: g.grade for g in caps}
-    assert {c for c, g in grades.items() if g == "full"} == {"domain-model"}
+    assert {c for c, g in grades.items() if g == "full"} == {"domain-model", "forecast-book"}
 
 
 # -- the aggregate is computed, not hand-summed (build ticket 70) -----------------------------

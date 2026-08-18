@@ -581,6 +581,44 @@ test's subject from the manifest's live state — a synthetic pending entry for 
 rule checked against a name provably absent from the live set for the other — never by weakening
 either check itself.
 
+## The proportionality verdict
+
+`twin/benchmark.py`'s `proportionality_verdict()` (build ticket 84) closes decision ticket 21's
+last acceptance criterion — "is it worth building at this coverage?" — the one build tickets
+57-59 left as a judgement in the decision ticket's own prose rather than a code artefact. It lives
+beside `SelectionRule`/`BenchmarkSet` rather than in `twin/forecast_book.py`, because that module's
+own public surface is a deliberately closed allow-list (`forecast_book_is_blind_by_construction_and_observe_only`)
+and a fourth function there would need a harness-guard change this ticket found no genuine reason
+to make.
+
+**A derived verdict, not a fresh opinion.** Every number the verdict is checked against is read
+off what is actually delivered: `question_count` and `spans_full_confidence_range` come from the
+real `BenchmarkSet` `select_questions()` draws against the live, committed
+`twin/benchmark-selection-rule.yaml` — never a target this function invents — and
+`capability_share` is computed from `len(list(caps))`, the live count of
+`twin/capabilities/*.yaml`, rather than the "~10%" figure decision ticket 21 cites from research.
+`resolution_cadence` states a real measured figure when resolutions are supplied and honestly
+states "not yet a measured one" against the pre-registered horizon window when none are — this
+suite reaches no live venue, `twin/market_signals.py`'s own admission, so an empty list here
+states the gap rather than inventing a cadence.
+
+**The verdict is exactly one of three words, each earned by a structural fact, the same shape
+`twin/verdict.py`'s `decide()` uses for the Flux falsification question.** `no` when the delivered
+set is empty — no coverage exists to weigh a cost against. `conditional` when the set is
+non-empty but fails the rule's own `spans_full_confidence_range()` bar — the machinery holds, the
+coverage the verdict would be proportionate to has not yet been delivered. `yes` only when both
+hold, and only then does decision ticket 21 Q3's own resolved cost/benefit framing get cited into
+the artefact verbatim: a low marginal cost (`MARGINAL_COST` — three already-built components,
+tickets 57-59, layered on the scoring harness ticket 20 put in the first slice) against a value
+disproportionate to a thin coverage slice (`DISPROPORTIONATE_VALUE` — the only falsification
+mechanism in this project that cannot be contaminated by construction).
+
+**Where this stops.** The cost/value framing is decision ticket 21 Q3's own resolved reasoning,
+cited rather than re-derived from first principles — this artefact makes that reasoning checkable
+against live delivered numbers; it does not re-litigate whether the reasoning itself is correct.
+Against the committed rule and a pool shaped to satisfy it (`tests/test_benchmark.py::test_the_committed_rule_yields_a_yes_verdict_against_a_spanning_pool`),
+the verdict reads `yes`.
+
 ## Believed, rival, revealed — and no privileged map
 
 `twin positions` (build ticket 16) is the other half of "no code path collapses an ensemble": once
@@ -1905,8 +1943,8 @@ state is carried through rather than hidden, and the metric Q3's own resolution 
 
 ## What is honestly built
 
-Depth grades are computed from the acceptance criteria of the owning **decision** ticket. One
-capability now reaches `full` — computed, not typed, and reached the same way every other tick in
+Depth grades are computed from the acceptance criteria of the owning **decision** ticket. Two
+capabilities now reach `full` — computed, not typed, and reached the same way every other tick in
 this table was: real code, cited live.
 
 | capability | decision ticket | grade | ticked |
@@ -1919,17 +1957,18 @@ this table was: real code, cited live.
 | `sense-move` | 11 | partial | 6 / 8 |
 | `scenario-engine` | 13 | partial | 4 / 7 |
 | `synthetic-substrate` | 12 | partial | 4 / 7 |
-| `forecast-book` | 21 | partial | 5 / 6 |
+| `forecast-book` | 21 | full | 6 / 6 |
 | `twin-inside-twin` | 10 | partial | 2 / 5 |
 | `ethics-gate` | 15 | partial | 3 / 5 |
 | `enactment` | 18 | partial | 4 / 5 |
 | `demo-slice` | 22 | stub | 0 / 4 |
 
-**45 of 73**, across thirteen capabilities, one of them `full`. An artefact's overall depth is
+**46 of 73**, across thirteen capabilities, two of them `full`. An artefact's overall depth is
 still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
-where `domain-model` is one of the capabilities they cite. `./bin/twin grade` prints the
-denominators, and this table is its output, not a hand-kept count — re-derived here rather than
-trusting a stale total (the same provisional-total drift this file names repeatedly below).
+where `domain-model` or `forecast-book` is one of the capabilities they cite. `./bin/twin grade`
+prints the denominators, and this table is its output, not a hand-kept count — re-derived here
+rather than trusting a stale total (the same provisional-total drift this file names repeatedly
+below).
 
 **`domain-model` moved from 1/7 to 7/7 at build ticket 79.** A prior research pass found five of
 the six unchecked ACs already satisfied by code built since decision ticket 07 was resolved
@@ -1960,6 +1999,19 @@ paragraph's own figure back out of the file and fails if it drifts from `Capabil
 `forecast-book` moved
 from 1/6 to 4/6 at build ticket 58 (venue + observe-only, the blind-emission protocol, the
 claim-scope statement — narrated above).
+
+**`forecast-book` reaches `full` at build ticket 84**, decision ticket 21's last acceptance
+criterion (the proportionality verdict) closed by `twin/benchmark.py`'s
+`proportionality_verdict()` — a derived artefact, not a fresh opinion, checked against what is
+actually delivered rather than an aspiration: the real committed selection rule and an actually-
+selected `BenchmarkSet` give it a live question count and confidence-bin spread, and
+`len(list(caps))` gives it a live capability-share figure rather than a hardcoded fraction. The
+verdict is exactly one of `yes`/`no`/`conditional`, each earned by a structural fact (empty set,
+a set that fails the rule's own `spans_full_confidence_range()` bar, or a set that clears it) —
+against the committed rule and a pool shaped to satisfy it, it reads `yes`, citing decision ticket
+21 Q3's own resolved cost (three already-built components layered on ticket 20's scoring harness)
+and value (the only contamination-proof falsification mechanism in the project) verbatim. See
+"The co-registered forecast book" section, below, for the full account.
 
 **`enactment` is a new row (build ticket 66) against a decision ticket — 18 — that had no
 capability file at all before it**, the third time that gap has been found and filled rather than
@@ -2676,17 +2728,20 @@ Named here so the skeleton cannot quietly become the definition of done.
   only on fixture data.** Build ticket 61's register aggregates what scenario authoring already
   declares; the disparate-impact channel is sealed and role-gated. Neither reaches a live pipeline
   and neither has run against a real, non-fixture finding.
-- **The co-registered forecast book has a selection rule, a quarantine, blind pinned emission and
-  a price-move signal source now; it still has no live venue connection.** Build ticket 57 built
-  the mechanical selection rule and the ingestion quarantine/audit, build ticket 58 the blind
-  pinned-emission and resolution-scoring protocol, and build ticket 59 price moves as a
-  quarantine-respecting world-layer signal source (see "Blind pinned emission" and "Price moves as
-  world-layer signals", above) — `forecast-book` moved from 1/6 at build ticket 57 to 5/6. What is
-  still missing is the thing all three run against: every one of them reads a caller-supplied
-  fixture price/question series, because no live venue connection to Kalshi, Polymarket or
-  Metaculus is reachable from this offline suite, and only decision ticket 21 AC 6's own
-  proportionality verdict — is it worth building at this coverage — stays open, a judgement rather
-  than a code artefact.
+- **The co-registered forecast book is `full` (build ticket 84) on decision ticket 21's own six
+  criteria; it still has no live venue connection.** Build ticket 57 built the mechanical
+  selection rule and the ingestion quarantine/audit, build ticket 58 the blind pinned-emission and
+  resolution-scoring protocol, build ticket 59 price moves as a quarantine-respecting world-layer
+  signal source, and build ticket 84 the proportionality verdict — a derived artefact checked
+  against the real committed rule and an actually-selected set rather than an aspiration (see
+  "Blind pinned emission", "Price moves as world-layer signals" and "The proportionality verdict",
+  above) — `forecast-book` moved from 1/6 at build ticket 57 to 6/6. `full` here is a grade on the
+  decision ticket's own criteria, not a claim of completeness: what is still missing is the thing
+  all four modules run against — every one of them reads a caller-supplied fixture price/question
+  series, because no live venue connection to Kalshi, Polymarket or Metaculus is reachable from
+  this offline suite. Decision ticket 21 itself already named that residual limit rather than this
+  ticket discovering it: the claim scope every emitted artefact carries states plainly what a clean
+  score does and does not prove, live venue or not.
 - **The action-state loop has a read side and no consumer.** Build ticket 68 grades whether a
   response was actually enacted, from the channels that observed it. Nothing reads that grade to
   change a number: `twin/pricing.py` gates mitigation credit on the *reduction* claim's own

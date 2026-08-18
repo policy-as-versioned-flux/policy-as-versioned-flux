@@ -258,4 +258,6 @@ def test_market_signal_run_declares_its_depth_grade_as_the_computed_forecast_boo
     artefact = ms.market_signal_run(repo, caps, "netflix", _moves(), frozenset(), COMMAND)
     computed = caps.require("forecast-book")
     assert artefact.depth["capabilities"]["forecast-book"]["grade"] == computed.grade
-    assert artefact.depth["capabilities"]["forecast-book"]["grade"] != "full"  # honestly partial
+    # forecast-book closed to full at build ticket 84 (decision ticket 21 AC 6, the
+    # proportionality verdict, was the last of its six criteria left unchecked).
+    assert artefact.depth["capabilities"]["forecast-book"]["grade"] == "full"

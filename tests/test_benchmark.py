@@ -148,7 +148,7 @@ def test_the_top_bin_is_closed_and_admits_a_probability_of_exactly_one() -> None
 # -- the selection, as a derived artefact ---------------------------------------------------------
 
 
-def test_benchmark_set_artefact_is_derived_and_carries_a_computed_partial_grade(caps: Capabilities) -> None:
+def test_benchmark_set_artefact_is_derived_and_carries_a_computed_grade(caps: Capabilities) -> None:
     rule = _rule()
     pool = [_question(id=f"q-{i}", implied_probability=0.1 * i) for i in range(1, 9)]
     artefact = bm.benchmark_set_artefact(caps, rule, pool, COMMAND_SELECT)
@@ -158,7 +158,9 @@ def test_benchmark_set_artefact_is_derived_and_carries_a_computed_partial_grade(
 
     computed = caps.require("forecast-book")
     assert artefact.depth["capabilities"]["forecast-book"]["grade"] == computed.grade
-    assert artefact.depth["capabilities"]["forecast-book"]["grade"] != "full"  # honestly partial
+    # forecast-book closed to full at build ticket 84 (decision ticket 21 AC 6, the
+    # proportionality verdict, was the last of its six criteria left unchecked).
+    assert artefact.depth["capabilities"]["forecast-book"]["grade"] == "full"
 
 
 def test_benchmark_set_artefact_pins_the_rule_version_and_digest(caps: Capabilities) -> None:
@@ -249,3 +251,108 @@ def test_quarantine_audit_artefact_declares_the_same_computed_capability(caps: C
     artefact = bm.quarantine_audit_artefact(caps, benchmark, [], COMMAND_AUDIT)
     computed = caps.require("forecast-book")
     assert artefact.depth["capabilities"]["forecast-book"]["grade"] == computed.grade
+
+
+# -- the proportionality verdict: decision ticket 21 AC 6 (build ticket 84) ----------------------
+
+
+COMMAND_VERDICT = ["twin", "forecast-proportionality"]
+
+
+def test_verdict_is_yes_when_the_delivered_set_spans_every_bin(caps: Capabilities) -> None:
+    rule = _rule(confidence_bins=((0.0, 0.5), (0.5, 1.0)))
+    pool = [_question(id="q-lo", implied_probability=0.1), _question(id="q-hi", implied_probability=0.9)]
+    benchmark = bm.select_questions(rule, pool)
+    artefact = bm.proportionality_verdict(caps, rule, benchmark, [], COMMAND_VERDICT)
+    assert artefact.kind == bm.KIND_PROPORTIONALITY_VERDICT
+    assert artefact.mark == DERIVED
+    assert artefact.body["verdict"] == "yes"
+    assert artefact.body["question_count"] == 2
+    assert artefact.body["spans_full_confidence_range"] is True
+    assert artefact.body["marginal_cost"] == bm.MARGINAL_COST
+    assert artefact.body["disproportionate_value"] == bm.DISPROPORTIONATE_VALUE
+    assert artefact.body["claim_scope"] == bm.CLAIM_SCOPE
+    artefact.digest()  # does not raise: no forbidden key crept into the body
+
+
+def test_verdict_is_conditional_when_the_delivered_set_does_not_span_every_bin(caps: Capabilities) -> None:
+    rule = _rule(confidence_bins=((0.0, 0.3), (0.3, 0.6), (0.6, 1.0)))
+    pool = [_question(id="q-1", implied_probability=0.1)]
+    benchmark = bm.select_questions(rule, pool)
+    assert not benchmark.spans_full_confidence_range()
+    artefact = bm.proportionality_verdict(caps, rule, benchmark, [], COMMAND_VERDICT)
+    assert artefact.body["verdict"] == "conditional"
+    assert "does not span" in artefact.body["reasoning"]
+
+
+def test_verdict_is_no_when_the_delivered_set_is_empty(caps: Capabilities) -> None:
+    rule = _rule()
+    empty = bm.BenchmarkSet(rule_version=rule.version, rule_digest=rule.digest(), questions=(), distribution={})
+    artefact = bm.proportionality_verdict(caps, rule, empty, [], COMMAND_VERDICT)
+    assert artefact.body["verdict"] == "no"
+    assert artefact.body["question_count"] == 0
+
+
+def test_verdict_reports_cadence_as_designed_not_measured_with_no_resolutions(caps: Capabilities) -> None:
+    rule = _rule()
+    pool = [_question(id=f"q-{i}", implied_probability=0.1 * i) for i in range(1, 9)]
+    benchmark = bm.select_questions(rule, pool)
+    artefact = bm.proportionality_verdict(caps, rule, benchmark, [], COMMAND_VERDICT)
+    assert "not yet a measured one" in artefact.body["resolution_cadence"]
+    assert f"{rule.min_horizon_days}-{rule.max_horizon_days} days" in artefact.body["resolution_cadence"]
+
+
+def test_verdict_reports_a_measured_cadence_from_real_resolutions(caps: Capabilities) -> None:
+    rule = _rule()
+    pool = [_question(id=f"q-{i}", implied_probability=0.1 * i) for i in range(1, 9)]
+    benchmark = bm.select_questions(rule, pool)
+    resolved = [
+        {"resolution_window_opens_at": "2026-09-01T00:00:00Z"},
+        {"resolution_window_opens_at": "2026-10-15T00:00:00Z"},
+    ]
+    artefact = bm.proportionality_verdict(caps, rule, benchmark, resolved, COMMAND_VERDICT)
+    cadence = artefact.body["resolution_cadence"]
+    assert "2 resolution(s)" in cadence
+    assert "2026-09-01T00:00:00Z" in cadence and "2026-10-15T00:00:00Z" in cadence
+    assert "measured, not designed" in cadence
+
+
+def test_verdict_declares_the_same_computed_capability(caps: Capabilities) -> None:
+    rule = _rule()
+    pool = [_question(id=f"q-{i}", implied_probability=0.1 * i) for i in range(1, 9)]
+    benchmark = bm.select_questions(rule, pool)
+    artefact = bm.proportionality_verdict(caps, rule, benchmark, [], COMMAND_VERDICT)
+    computed = caps.require("forecast-book")
+    assert artefact.depth["capabilities"]["forecast-book"]["grade"] == computed.grade
+
+
+def test_verdict_capability_share_is_computed_against_the_live_capability_count(caps: Capabilities) -> None:
+    rule = _rule()
+    pool = [_question(id=f"q-{i}", implied_probability=0.1 * i) for i in range(1, 9)]
+    benchmark = bm.select_questions(rule, pool)
+    artefact = bm.proportionality_verdict(caps, rule, benchmark, [], COMMAND_VERDICT)
+    total = len(list(caps))
+    assert artefact.body["capability_share"] == f"1 of {total} capabilities this project declares"
+
+
+def test_the_committed_rule_yields_a_yes_verdict_against_a_spanning_pool(caps: Capabilities) -> None:
+    """The live, committed rule (`bm.SelectionRule.load()`, not a test fixture rule) really does
+    reach "yes" against a pool shaped to satisfy it — the same pool shape
+    `benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach` uses — so this is
+    a fact about the delivered machinery's own bar, not merely a possible outcome of a
+    fixture-only rule."""
+    rule = bm.SelectionRule.load()
+    midpoints = [lo + (hi - lo) / 2 for lo, hi in rule.confidence_bins for _ in range(3)]
+    pool = [
+        {
+            "id": f"real-rule-q-{i:02d}",
+            "category": rule.categories[i % len(rule.categories)],
+            "liquidity": rule.min_liquidity * 2,
+            "horizon_days": (rule.min_horizon_days + rule.max_horizon_days) // 2,
+            "implied_probability": p,
+        }
+        for i, p in enumerate(midpoints)
+    ]
+    benchmark = bm.select_questions(rule, pool)
+    artefact = bm.proportionality_verdict(caps, rule, benchmark, [], COMMAND_VERDICT)
+    assert artefact.body["verdict"] == "yes"

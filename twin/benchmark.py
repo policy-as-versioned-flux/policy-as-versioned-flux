@@ -34,6 +34,12 @@ benchmark was drawn and one audited a year later are scanned identically.
 *no direct ingestion* of a quarantined question id. It cannot prove the twin's priors were
 unshaped by market-adjacent information reaching it some other way — that is the gap temporal
 separation (build ticket 58) exists to narrow, not this ticket's to close.
+
+**`proportionality_verdict()` (build ticket 84) lives here rather than in `twin/forecast_book.py`**
+because that module's own public surface is a deliberately closed allow-list
+(`forecast_book_is_blind_by_construction_and_observe_only`) and a fourth function there would need
+a harness-guard change this ticket found no genuine reason to make. It closes decision ticket 21's
+last acceptance criterion — see its own docstring for the reasoning.
 """
 
 from __future__ import annotations
@@ -49,12 +55,14 @@ import yaml
 from . import PACKAGE_DIR
 from .artefact import DERIVED, Artefact
 from .canon import digest_of
+from .forecast_book import CLAIM_SCOPE
 from .grades import Capabilities
 
 RULE_PATH = PACKAGE_DIR / "benchmark-selection-rule.yaml"
 
 KIND_BENCHMARK_SET = "benchmark-set"
 KIND_QUARANTINE_AUDIT = "quarantine-audit"
+KIND_PROPORTIONALITY_VERDICT = "proportionality-verdict"
 
 # The capability this module's artefacts declare (`twin/capabilities/forecast-book.yaml`, owning
 # decision ticket 21) — a list because `caps.depth_block` takes one, not because a second
@@ -288,5 +296,140 @@ def quarantine_audit_artefact(
             "records_checked": len(ingestion_records),
             "clean": not breaches,
             "breaches": [b.as_dict() for b in breaches],
+        },
+    )
+
+
+# -- decision ticket 21 AC 6: the proportionality verdict (build ticket 84) ----------------------
+#
+# Decision ticket 21 Q3's own resolved cost/benefit framing, cited verbatim rather than re-argued
+# here — the verdict below is checked against the reasoning decision ticket 21 actually gave, not
+# a fresh rationale invented for this artefact.
+MARGINAL_COST = (
+    "a versioned selection rule and a quarantine filter on the ingestion path (build ticket 57), "
+    "plus a blind pinned-emission protocol (build ticket 58) and an observe-only signal connector "
+    "(build ticket 59) — layered onto the scoring harness decision ticket 21 Q3 notes is already "
+    "in the first slice (build ticket 20). Not a new forecasting system: a thin adapter pointing "
+    "an existing one at extra questions"
+)
+DISPROPORTIONATE_VALUE = (
+    "co-registration is the only falsification mechanism in this project that cannot be "
+    "contaminated by construction (forward-dated questions cannot be in any training corpus); "
+    "every other check here — synthetic substrate, historical backtests — has a memorisation "
+    "problem that can be discounted but never eliminated. A narrow clean signal beats a broad "
+    "compromised one (decision ticket 21 Q3)"
+)
+
+
+def proportionality_verdict(
+    caps: Capabilities,
+    rule: SelectionRule,
+    benchmark: BenchmarkSet,
+    resolved: list[dict[str, Any]],
+    command: list[str],
+) -> Artefact:
+    """Decision ticket 21 AC 6, the one criterion build tickets 57-59 left open: given what
+    forecast-book actually delivers, is it worth building at this coverage?
+
+    A derived verdict, not a fresh opinion — every number below is read off what is actually
+    delivered (the committed selection rule, an actually-selected benchmark set, actually-scored
+    resolutions if any exist yet), not an aspiration, and the verdict is a function of them the
+    same way `twin/verdict.py`'s `decide()` makes the Flux falsification question a function of
+    its inputs rather than a declared conclusion. Two runs over the same inputs agree.
+
+    **Coverage is judged on what the rule's own bar demands, not on a target this function
+    invents.** `rule` requires the selected set to span every declared confidence bin
+    (`twin/benchmark-selection-rule.yaml`'s own `confidence_bins`) — that is the "full confidence
+    range" decision ticket 21 Q2 asked for, and it is checked against `benchmark`'s actual emitted
+    distribution here exactly as `BenchmarkSet.spans_full_confidence_range()` already checks it,
+    never asserted in prose.
+
+    **The verdict is exactly one of three words, each earned by a structural fact:**
+    - `no` — the set actually selected is empty. Building this delivers no coverage to weigh
+      against any cost, so there is nothing here to be proportionate to.
+    - `conditional` — questions are selected but the set does not yet span every declared
+      confidence bin. The machinery holds (decision ticket 21 Q3's low marginal cost is real
+      regardless), but the delivered coverage does not yet meet the rule's own bar for what "the
+      boring near-certainties reliability diagrams need at the extremes" requires — a floor not
+      yet held, not a floor rejected.
+    - `yes` — a non-empty set that spans every declared bin. Decision ticket 21 Q3's own
+      reasoning then applies as resolved: a low marginal cost (three already-built components
+      layered on machinery that must exist anyway) against a value that is disproportionate to a
+      thin coverage slice precisely because it is the one contamination-proof mechanism the
+      project has.
+
+    `resolved` is a list of already-scored resolution artefact bodies (`score_resolution`'s own
+    output), never fabricated — this suite reaches no live venue (`twin/market_signals.py`'s own
+    admission), so an empty list here states the cadence has not been measured yet rather than
+    inventing one.
+    """
+    total_capabilities = len(list(caps))
+    question_count = len(benchmark.questions)
+    spans = benchmark.spans_full_confidence_range()
+    resolved_count = len(resolved)
+
+    if resolved_count >= 2:
+        opens = sorted(str(r["resolution_window_opens_at"]) for r in resolved)
+        cadence = (
+            f"{resolved_count} resolution(s) recorded so far, resolution windows opening between "
+            f"{opens[0]} and {opens[-1]} — measured, not designed"
+        )
+    elif resolved_count == 1:
+        cadence = "1 resolution recorded so far — too few to state a cadence from"
+    else:
+        cadence = (
+            f"no resolution recorded yet; the pre-registered horizon window "
+            f"({rule.min_horizon_days}-{rule.max_horizon_days} days, "
+            "twin/benchmark-selection-rule.yaml) is the designed cadence, not yet a measured one"
+        )
+
+    if question_count == 0:
+        verdict = "no"
+        reasoning = (
+            "the selected benchmark set is empty — there is no coverage here to weigh a cost "
+            "against, so building this at this coverage is not worth it: there is no coverage."
+        )
+    elif not spans:
+        verdict = "conditional"
+        reasoning = (
+            f"{question_count} question(s) selected, but the set does not span every declared "
+            f"confidence bin ({dict(benchmark.distribution)}) — the rule's own bar for 'the "
+            "boring near-certainties reliability diagrams need at the extremes' (decision ticket "
+            "21 Q2) is not yet met. The marginal cost stays low regardless (build tickets 57-59 "
+            "are already built), but the coverage this verdict would be proportionate to has not "
+            "yet been delivered."
+        )
+    else:
+        verdict = "yes"
+        reasoning = (
+            f"{question_count} question(s) selected, spanning every declared confidence bin "
+            f"({dict(benchmark.distribution)}) — forecast-book is 1 of {total_capabilities} "
+            "capabilities this project declares, so this coverage is a genuinely thin slice, and "
+            "it is worth building anyway: the marginal cost is low "
+            f"({MARGINAL_COST}) and the value is disproportionate to the coverage "
+            f"({DISPROPORTIONATE_VALUE})."
+        )
+
+    return Artefact(
+        kind=KIND_PROPORTIONALITY_VERDICT,
+        mark=DERIVED,
+        command=command,
+        pins={
+            "rule": {"version": rule.version, "digest": rule.digest()},
+            "benchmark": {"rule_version": benchmark.rule_version, "ids_digest": digest_of(sorted(benchmark.ids))},
+            "tool": {"capabilities_digest": caps.digest},
+        },
+        depth=caps.depth_block(CAPS_BENCHMARK),
+        body={
+            "question_count": question_count,
+            "spans_full_confidence_range": spans,
+            "confidence_distribution": dict(benchmark.distribution),
+            "capability_share": f"1 of {total_capabilities} capabilities this project declares",
+            "resolution_cadence": cadence,
+            "marginal_cost": MARGINAL_COST,
+            "disproportionate_value": DISPROPORTIONATE_VALUE,
+            "verdict": verdict,
+            "reasoning": reasoning,
+            "claim_scope": CLAIM_SCOPE,
         },
     )

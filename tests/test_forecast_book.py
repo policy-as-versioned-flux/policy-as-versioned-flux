@@ -82,11 +82,13 @@ def test_emit_pins_the_question_id_and_digest(caps: Capabilities) -> None:
     assert artefact.pins["world_model"] == "twin-default"
 
 
-def test_emit_carries_a_computed_partial_grade(caps: Capabilities) -> None:
+def test_emit_carries_a_computed_grade(caps: Capabilities) -> None:
     artefact = fb.emit(caps, _question(), "twin-default", 0.35, BEFORE, COMMAND_EMIT)
     computed = caps.require("forecast-book")
     assert artefact.depth["capabilities"]["forecast-book"]["grade"] == computed.grade
-    assert artefact.depth["capabilities"]["forecast-book"]["grade"] != "full"  # honestly partial
+    # forecast-book closed to full at build ticket 84 (decision ticket 21 AC 6, the
+    # proportionality verdict, was the last of its six criteria left unchecked).
+    assert artefact.depth["capabilities"]["forecast-book"]["grade"] == "full"
 
 
 # -- is_blind(): the same check an auditor re-runs against the artefact's own recorded body ------
