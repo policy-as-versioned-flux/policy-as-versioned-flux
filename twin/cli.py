@@ -17,9 +17,9 @@ from pathlib import Path
 import yaml
 
 from . import (
-    TOOL_VERSION, attest, constraints, does_not_do, enact, enforcement, evidence, fixtures,
-    gameplay_lens, index, invariants, ontology, retrospective_sweep, scenario_diff, schedule, sign,
-    unbound_pool, verbs,
+    TOOL_VERSION, attest, constraints, demo_slice, does_not_do, enact, enforcement, evidence,
+    fixtures, gameplay_lens, index, invariants, ontology, retrospective_sweep, scenario_diff,
+    schedule, sign, unbound_pool, verbs,
 )
 from .artefact import AUTHORED, Artefact, ArtefactError
 from .attest import AttestationError
@@ -791,6 +791,34 @@ def cmd_does_not_do(args: argparse.Namespace) -> int:
     for entry in body["entries"]:
         print(f"  does-not-do  {entry['id']:<22} {entry['does_not_do']}")
     return _emit(artefact, args.out)
+
+
+def cmd_demo_slice(args: argparse.Namespace) -> int:
+    """Publish the demo slice's own rendered artefact: the thesis, the subject rationale, the
+    shown/stubbed/absent boundary and the AC-to-ticket mapping decision ticket 22 asks for, in one
+    structured artefact (build ticket 91).
+
+    Derived, not authored: `demo_slice.summary()` reads the same `Capabilities` and
+    `does_not_do.published()` machinery every other derived artefact reads, filtered to the
+    capabilities `twin/beat-*.sh` actually exercise.
+    """
+    caps = Capabilities.load()
+    body = demo_slice.summary(caps)
+    art = demo_slice.artefact(verbs.command_for("demo-slice"), caps, body)
+    _say(f"demo slice: {body['thesis']}")
+    for subject in body["subjects"]:
+        print(f"  subject  {subject['org']:<12} {subject['carries']} — {subject['role']}")
+    boundary = body["boundary"]
+    print(f"  shown    {len(boundary['shown'])} capabilities: {', '.join(boundary['shown'])}")
+    print(f"  stubbed  {len(boundary['stubbed'])} unchecked criteria within them")
+    for entry in boundary["stubbed"]:
+        print(f"    stub    {entry['id']:<22} {entry['does_not_do']}")
+    print(f"  absent   {len(boundary['absent'])} capabilities never touched: "
+          f"{', '.join(boundary['absent']) or '(none)'}")
+    for entry in body["acceptance_criteria"]:
+        print(f"  AC {entry['index']}  {entry['text']}  -> build ticket(s) "
+              f"{', '.join(entry['build_tickets'])}")
+    return _emit(art, args.out)
 
 
 def cmd_ontology(args: argparse.Namespace) -> int:
@@ -1920,6 +1948,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     not_done.add_argument("--out", required=True)
     not_done.set_defaults(fn=cmd_does_not_do)
+
+    slice_p = subs.add_parser(
+        "demo-slice",
+        help="publish the demo slice's own rendered artefact: thesis, subjects, boundary, AC map",
+    )
+    slice_p.add_argument("--out", required=True)
+    slice_p.set_defaults(fn=cmd_demo_slice)
 
     ontology_p = subs.add_parser(
         "ontology", help="publish the named core ontology, generated from schema.py's own vocabulary"

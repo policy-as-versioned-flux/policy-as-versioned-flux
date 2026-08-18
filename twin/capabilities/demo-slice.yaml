@@ -6,22 +6,33 @@
 # without it the one thing on screen carries no depth grade, which is precisely the
 # skeleton-as-ceiling failure the constitution names.
 #
-# Every criterion is unchecked, and that is the honest reading rather than a placeholder. Build
-# ticket 72 runs the first of four beats; AC 2 needs all three subjects (Royal Mail, Netflix,
-# Intel — build tickets 73-76), and ACs 1, 3 and 4 are build ticket 77's own work. A demo whose
-# thesis is that governance tools lie by showing green ticks opens at `stub` and says so.
+# Closed at build ticket 91. Build tickets 71-76 built the three subjects and their beats; build
+# ticket 77 made the honest boundary structural (depth grades, the does-not-do register, thesis
+# sequencing) but deliberately left this capability's own four criteria unticked, because none of
+# them asks for the *machinery* — they ask for the *rendered artefact* decision ticket 22 itself
+# names: one sentence, the subject rationale as data, a boundary block, an AC map. That artefact
+# is `twin/demo_slice.py`, published by `twin demo-slice` and run as `beat-sequence.sh`'s own
+# final step.
 capability: demo-slice
 owning_ticket: '22'
 criteria:
   - index: 1
     text: "A single demonstrable thesis, stated in one sentence."
-    checked: false
+    checked: true
+    evidence: "`twin/demo_slice.py`'s `THESIS` constant — decision ticket 22's own resolved Q1 answer, verbatim, in one place rather than distributed across comments and echo statements. `summary()` composes it into the artefact `twin demo-slice` emits; tests/test_demo_slice.py::test_summary_composes_all_four_pieces asserts the body carries it unchanged."
+    ticked_by: build ticket 91
   - index: 2
     text: "Subject + scenario selection, with rationale."
-    checked: false
+    checked: true
+    evidence: "`twin/demo_slice.py`'s `SUBJECTS` — the Royal Mail / Netflix / Intel rationale (contamination-driven for Royal Mail, whole-engine for Netflix, live-and-unresolved for Intel) collected from decision ticket 22 and build tickets 71/73/75 into the artefact's own data, not left as reference-only prose. tests/test_demo_slice.py::test_summary_composes_all_four_pieces asserts all three subjects carry a non-empty rationale."
+    ticked_by: build ticket 91
   - index: 3
     text: "An explicit shown/stubbed/absent boundary and how it is surfaced."
-    checked: false
+    checked: true
+    evidence: "`twin/demo_slice.boundary()` wires `does_not_do.published()` and `Capabilities.load()` (build ticket 77's own mechanism), filtered to `TOUCHED_CAPABILITIES` — the capabilities the three beat scripts' own artefact-producing verbs actually carry, read from their own `CAPS_*` constants rather than retyped. `shown` names them, `stubbed` is the does-not-do register's entries scoped to them, `absent` is every other loaded capability (`ethics-gate`, `forecast-book`, `honest-build`, `twin-inside-twin` today) — surfaced in the artefact's own body and printed by `twin demo-slice`, not narrated in prose a viewer has to trust. tests/test_demo_slice.py::test_boundary_shown_and_absent_partition_the_loaded_capabilities and ::test_boundary_stubbed_entries_are_scoped_to_touched_capabilities_only."
+    ticked_by: build ticket 91
   - index: 4
     text: "Acceptance criteria for the slice, tied back to the owning tickets' criteria."
-    checked: false
+    checked: true
+    evidence: "`twin/demo_slice.py`'s `ACCEPTANCE_CRITERIA` — a table mapping this decision ticket's own four ACs to the build tickets that realise them (71/73/75 for subject selection, 77 for the boundary mechanism, 91 for the rendered artefact itself), emitted in the artefact body and printed by `twin demo-slice`. tests/test_demo_slice.py::test_summary_composes_all_four_pieces asserts all four indices are present, each naming at least one build ticket."
+    ticked_by: build ticket 91

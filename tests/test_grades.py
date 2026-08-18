@@ -93,7 +93,7 @@ def test_an_ungraded_capability_cannot_be_used(caps: Capabilities) -> None:
         caps.require("something-nobody-graded")
 
 
-def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_twin_inside_twin_enactment_scenario_engine_provenance_and_honest_build_have_earned_full(caps: Capabilities) -> None:
+def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_twin_inside_twin_enactment_scenario_engine_provenance_honest_build_and_demo_slice_have_earned_full(caps: Capabilities) -> None:
     """The walking skeleton must not be able to claim `full` on say-so — but a capability that
     closes every acceptance criterion with a real, live-checked citation may: `domain-model` was
     the first to (build ticket 79), `forecast-book` the second (build ticket 84, the
@@ -116,13 +116,16 @@ def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currenc
     scenario wrapping build ticket 81's own EUV causal edge), `provenance` the eleventh (build
     ticket 89: `reproduce.py`'s subject-reference walk generalised beyond the score-card special
     case to a reliability diagram's pooled score cards, three artefacts deep, with a reference too
-    thin to walk refusing loudly rather than reporting an empty chain), and `honest-build` the
+    thin to walk refusing loudly rather than reporting an empty chain), `honest-build` the
     twelfth (build ticket 90: `twin/skills.py`'s determinism-split test made a queryable function,
     a `CAPABILITY_INVENTORY` classifying every named capability and checked against real files, a
     `SKILL_OWNING_TICKET` map validated against `.scratch/twin/issues/`, and `ethics-gate`
     reclassified `code` rather than forced onto the skill side to keep a stale six-skill count
-    consistent-looking).
-    Every other shipped capability stays `partial` or `stub`."""
+    consistent-looking), and `demo-slice` the thirteenth and last (build ticket 91:
+    `twin/demo_slice.py` composes the one-sentence thesis, the three subjects' rationale, a
+    shown/stubbed/absent boundary scoped to the capabilities the demo sequence actually touches,
+    and the AC-to-ticket map decision ticket 22 itself asks for, published via `twin demo-slice`).
+    No shipped capability remains at `partial` or `stub`."""
     grades = {g.capability: g.grade for g in caps}
     assert set(grades) == {
         "causal-layer", "currency-regimes", "demo-slice", "domain-model", "enactment",
@@ -141,7 +144,8 @@ def test_only_domain_model_forecast_book_synthetic_substrate_ethics_gate_currenc
     assert grades.pop("scenario-engine") == "full"
     assert grades.pop("provenance") == "full"
     assert grades.pop("honest-build") == "full"
-    assert "full" not in grades.values()
+    assert grades.pop("demo-slice") == "full"
+    assert not grades, "every shipped capability is accounted for above — none left unchecked"
 
 
 def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_path: Path) -> None:
@@ -166,14 +170,14 @@ def test_the_depth_block_takes_the_worst_grade_of_the_capabilities_involved(tmp_
     assert block["capabilities"]["finished"]["unchecked"] == []
 
 
-def test_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_twin_inside_twin_enactment_scenario_engine_provenance_and_honest_build_are_the_shipped_capabilities_at_full(
+def test_domain_model_forecast_book_synthetic_substrate_ethics_gate_currency_regimes_sense_move_causal_layer_twin_inside_twin_enactment_scenario_engine_provenance_honest_build_and_demo_slice_are_the_shipped_capabilities_at_full(
     caps: Capabilities,
 ) -> None:
     grades = {g.capability: g.grade for g in caps}
     assert {c for c, g in grades.items() if g == "full"} == {
         "domain-model", "forecast-book", "synthetic-substrate", "ethics-gate", "currency-regimes",
         "sense-move", "causal-layer", "twin-inside-twin", "enactment", "scenario-engine",
-        "provenance", "honest-build",
+        "provenance", "honest-build", "demo-slice",
     }
 
 

@@ -22,7 +22,7 @@ import pytest
 from twin import fixtures
 from twin.artefact import Artefact
 from twin.cli import _say_score, main
-from twin.grades import STUB, Capabilities
+from twin.grades import FULL, STUB, Capabilities
 
 ORG = fixtures.ROYAL_MAIL_ORG
 SCENARIO = "would-the-twin-have-flagged-it"
@@ -202,16 +202,17 @@ def test_every_artefact_the_beat_emits_carries_computed_depth_grades(
 
 
 def test_the_demo_slice_grade_is_computed_from_decision_ticket_22(caps: Capabilities) -> None:
-    """AC 6: the beat's own depth grade is a computed checklist, and it opens at `stub`.
+    """AC 6: the beat's own depth grade is a computed checklist.
 
-    Decision ticket 22 had no capability file before this ticket. Nothing is ticked because
-    nothing honestly is: three of the four beats do not exist, and build ticket 77 owns the other
-    three criteria. `full` is derived from the checklist, so it cannot be typed here at all —
-    `tests/test_grades.py` proves the refusal.
+    Decision ticket 22 had no capability file before build ticket 72. It opened at `stub`: three
+    of the four beats did not exist yet, and build ticket 77 owned the other three criteria as
+    machinery rather than the rendered artefact itself. Build ticket 91 built that artefact
+    (`twin/demo_slice.py`) and closed the last four criteria, so this now reads `full` — still
+    derived from the checklist, never typed: `tests/test_grades.py` proves the refusal.
     """
     graded = caps.require("demo-slice")
     assert graded.owning_ticket == "22"
-    assert graded.grade == STUB
+    assert graded.grade == FULL
     # The criterion *text* is not restated here: `Capabilities.load()` already refuses a checklist
     # that has drifted from its decision ticket (twin/grades.py `_validate_against_ticket`, proved
     # in tests/test_grades.py), so a copy of the four strings could never fail on its own.

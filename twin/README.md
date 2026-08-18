@@ -7,7 +7,7 @@ proper scoring rules; any artefact recomputes from its own pins. Scoring is in t
 rather than retrofitted, because without it we cannot tell whether any later capability helped, and
 because scoring dictates what every other component must record.
 
-**This is 85 of 92 build tickets closed, and one measuring against a clock that runs
+**This is 88 of 92 build tickets closed, and one measuring against a clock that runs
 to 2026-11-06 and will not reach its own pre-registered coverage floor. See "The confirmatory audit
 was not confirmatory", below.** (Recounted directly from `grep -l '\*\*Status:\*\* done' .scratch/twin/build/*.md`
 rather than carried forward by hand — the previous banner, 75 of 78, was already nine tickets
@@ -61,6 +61,7 @@ bash twin/beat-netflix.sh                  # the whole-engine beat: fear, seize,
 ./bin/twin price --repo R --origin C       # a shock priced under every eye, responses beside it
 ./bin/twin constraints --out F             # the published constraint set, floor and exclusions
 ./bin/twin ontology --out F                # the named core ontology, generated from schema.py's own vocabulary
+./bin/twin demo-slice --out F              # the demo's own artefact: thesis, subjects, boundary, AC map
 ./bin/twin affected-parties --repo R --org O --out F  # who bears a modelled consequence with no perspective, alongside the constraint set
 ./bin/twin propose --repo R --org O --response X --channel policy|record --out F  # propose enacting a response; there is no verb that disposes
 ./bin/twin disparate-impact-audit --finding F --source S --out O      # raise a finding — sealed, never names the protected characteristic
@@ -2166,18 +2167,19 @@ this table was: real code, cited live.
 | `twin-inside-twin` | 10 | full | 5 / 5 |
 | `ethics-gate` | 15 | full | 5 / 5 |
 | `enactment` | 18 | full | 5 / 5 |
-| `demo-slice` | 22 | stub | 0 / 4 |
+| `demo-slice` | 22 | full | 4 / 4 |
 
-**69 of 73**, across thirteen capabilities, twelve of them `full`. An artefact's overall depth is
-still the *worst* of the capabilities that produced it, so most artefacts stay `partial` even
-where `domain-model`, `causal-layer`, `currency-regimes`, `forecast-book`, `synthetic-substrate`,
-`ethics-gate`, `sense-move`, `twin-inside-twin`, `enactment`, `scenario-engine` or `provenance` is
-one of the capabilities they cite (`honest-build` reaches `full` too, but no artefact's own
-`CAPS_*` list ever names it — it describes the build's own capability inventory, not something an
-artefact is produced by). `./bin/twin grade` prints the denominators, and this table is its
-output, not a hand-kept count — re-derived here rather than trusting a stale total (the same
-provisional-total drift this file names repeatedly below). (The "Seven capabilities" figure this
-paragraph carried before build ticket 88 was itself already one behind the table's own nine full
+**73 of 73**, across thirteen capabilities, all thirteen of them `full`. An artefact's own depth
+block is still the *worst* grade among the capabilities it actually cites
+(`Capabilities.depth_block`, `twin/grades.py`) — with every checklist complete, no artefact can
+show anything but `full` unless a real capability's checklist regresses first, and a regression is
+exactly what this same computed-checklist discipline exists to catch. `honest-build` reaches
+`full` too, but no artefact's own `CAPS_*` list ever names it — it describes the build's own
+capability inventory, not something an artefact is produced by. `./bin/twin grade` prints the
+denominators, and this table is its output, not a hand-kept count — re-derived here rather than
+trusting a stale total (the same provisional-total drift this file names repeatedly below). (The
+"Seven capabilities" figure this paragraph carried before build ticket 88 was itself already one
+behind the table's own nine full
 rows — recomputed here rather than incremented by one on top of a stale base.)
 
 **`honest-build` moved from 1/4 to 4/4, `full`, at build ticket 90.** AC 1's determinism-split
@@ -2274,11 +2276,27 @@ artefact rather than becoming a second one.
 **`demo-slice` is a new row (build ticket 72) against decision ticket 22, which had no capability
 file before it** — the fourth time that gap has been found and filled rather than left empty
 (build ticket 47 for decision ticket 15, 63 for 10, 66 for 18). It ticked nothing on the day it was
-created, and `stub` is the honest reading: build ticket 72 runs the first of four demo beats, AC 2
-needs all three subjects, and ACs 1, 3 and 4 are build ticket 77's own work. The denominator grew
-by four and the numerator did not move. That is what filling this gap is *for* — the demo was the
-one capability on screen carrying no grade at all, which is the skeleton-as-ceiling failure the
-constitution names, in the one place a viewer would see it.
+created, and `stub` was the honest reading: build ticket 72 ran the first of four demo beats, AC 2
+needed all three subjects, and ACs 1, 3 and 4 were build ticket 77's own work still to come. The
+denominator grew by four and the numerator did not move. That was what filling this gap was *for*
+— the demo was the one capability on screen carrying no grade at all, which is the
+skeleton-as-ceiling failure the constitution names, in the one place a viewer would see it.
+
+**`demo-slice` reaches `full`, 4/4, at build ticket 91.** Ticket 77 built the honesty *machinery*
+(depth grades, the does-not-do register, thesis sequencing) and named its own gap plainly:
+`demo-slice` still meant no rendered artefact existed. `twin/demo_slice.py` is that artefact — a
+pure `summary()` composing the one-sentence thesis (AC 1), the three subjects' rationale collected
+as data rather than left in scattered prose (AC 2), a shown/stubbed/absent boundary wired from
+`does_not_do.published()` and `Capabilities.load()` and scoped to exactly the capabilities the
+three beat scripts touch (AC 3), and a table mapping this decision ticket's own four ACs back to
+the build tickets that realise them (AC 4) — published via `twin demo-slice` and run as
+`beat-sequence.sh`'s own final step. `demo-slice` was the last of the thirteen shipped
+capabilities still short of `full`; closing its own four criteria moves the aggregate to 73/73 and
+changes `Capabilities.load().digest`, which travels in every artefact's own
+`pins.tool.capabilities_digest` — the golden digests (`twin/invariants/golden-digests.json`) were
+re-blessed against it (`--authorise "decision ticket 22 — demo-slice closes its own checklist
+(build ticket 91)..."`), the same re-blessing discipline build ticket 90 used the last time a
+checklist closure moved the digest.
 
 **The aggregate above is now printed by `./bin/twin grade` too, and it was not before build ticket
 70.** That is finding 2 of the confirmatory audit, below. The rows were computed from the day build

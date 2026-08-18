@@ -105,13 +105,14 @@ echo "       the card says so rather than replaying a different number"
 
 say "5. the demo's own depth grade — computed from decision ticket 22, never typed"
 say "   every artefact above printed the grades of the capabilities that produced it; this is the"
-say "   grade of the beat itself, and it opens at stub because three of four beats do not exist"
+say "   grade of the beat itself, full since build ticket 91 rendered the artefact decision"
+say "   ticket 22 asked for (see twin/demo_slice.py, run as beat-sequence.sh's own final step)"
 "$TWIN" grade --capability demo-slice || fail "grade failed"
 
 echo
 echo "PASS: rewound under as-consumed, projected, scored against a low-contamination key with the"
 echo "contamination discount applied. The score is poor, and step 3 printed it before any better one."
 echo "The three-regime gap localises what a failure would be: sensing, interpretation, or model."
-echo "Every capability the beat touched declares a computed depth grade, and none of them is full."
+echo "Every capability the beat touched declares a computed depth grade, and every one is full."
 echo
 echo "artefacts: $OUT"

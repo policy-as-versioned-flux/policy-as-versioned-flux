@@ -14,10 +14,17 @@
 # neither calls a pricing verb. Netflix alone carries (c) and (a), and runs last: £ appears
 # nowhere before this, the third and final beat.
 #
+# The final step publishes `twin demo-slice` (build ticket 91) — the rendered artefact decision
+# ticket 22 itself asks for: the one-sentence thesis, the three subjects' rationale, and the
+# shown/stubbed/absent boundary scoped to exactly the capabilities the three beats above touched,
+# as structured, checkable content rather than only this script's own prose.
+#
 # Exits non-zero if any beat fails. OFFLINE: python3 + PyYAML + git, nothing else (same as every
 # beat this runs).
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$HERE/.." && pwd)"
+TWIN="$ROOT/bin/twin"
 
 # Each beat gets its own subdirectory of one work root, so all three sets of artefacts survive
 # the run for inspection rather than three scripts colliding in one flat directory.
@@ -33,6 +40,9 @@ bash "$HERE/beat-intel.sh" "$WORK/intel"
 
 say "BEAT 3/3 — netflix: versioned governance (c), concluding in the one-currency comparison (a)."
 bash "$HERE/beat-netflix.sh" "$WORK/netflix"
+
+say "SLICE — the rendered artefact decision ticket 22 asks for: thesis, subjects, boundary, ACs."
+"$TWIN" demo-slice --out "$WORK/demo-slice.json"
 
 echo
 echo "PASS: the demo sequence ran b -> b -> c -> a. Royal Mail and Intel both proved the twin can"
