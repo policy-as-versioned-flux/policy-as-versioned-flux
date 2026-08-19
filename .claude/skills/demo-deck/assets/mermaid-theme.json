@@ -1,0 +1,14 @@
+{
+  "theme": "base",
+  "themeVariables": {
+    "background": "#0d0d0f",
+    "primaryColor": "#151519",
+    "primaryTextColor": "#e6e8ea",
+    "primaryBorderColor": "#1c64f2",
+    "lineColor": "#8a8f98",
+    "secondaryColor": "#151519",
+    "tertiaryColor": "#151519",
+    "fontFamily": "-apple-system, Helvetica, Arial, sans-serif",
+    "fontSize": "22px"
+  }
+}
