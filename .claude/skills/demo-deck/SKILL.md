@@ -79,7 +79,9 @@ one-line reason recorded, and every screenshot the plan needs exists as a real P
 ## 3. Plan
 
 Draft a beat list sized to the target length, each beat citing the specific capture(s) that back
-it. Don't force a fixed slide count — let genuinely distinct beats be genuinely distinct slides,
+it. **Budget words at ~3.1 per second** — a 7-minute demo is ~1,300 words, 10 minutes ~1,900 —
+and expect the finished audio to land within about ±13% of that, since pace varies with sentence
+shape. Size the script from this rather than guessing and correcting later. Don't force a fixed slide count — let genuinely distinct beats be genuinely distinct slides,
 and let one beat span two slides (e.g. a setup + a payoff) when that's clearer than cramming. If a
 subject has a mechanism that senses/reasons/acts/learns autonomously (an agent loop, not just a
 static check), that usually deserves to be the weighted centre of the demo, not one beat among
@@ -161,9 +163,18 @@ screenshot referenced actually exists on disk.
 
 ## 7. Generate audio
 
-`python3 assets/gen_acts.py <deck_dir>`. This chunks the script into "acts" (~220 words each by
-default) and generates one continuous TTS take per act — see **TTS pipeline notes** below for why
-it's chunked rather than one giant call, and why acts rather than one clip per segment.
+`python3 assets/gen_acts.py <deck_dir>` — chunks the script into "acts" and generates one
+continuous TTS take per act. Add `--verify` to transcribe each act and confirm its closing words
+survived (worth it on a final build).
+
+The default of **350 words per act** is measured, not guessed: the backend truncates silently at a
+hard 163.8s ceiling, and at the slowest speaking rate seen on real narration (2.70 w/s) 350 words
+lands at ~130s — 79% of the ceiling. See **TTS length limits** below before changing it.
+
+Prefer the default over a smaller one. Every act is a separate generation, so every seam is a
+chance for pace to shift; on a 2,000-word script 350-word acts give 7 seams where 220-word acts
+give 12. The chunker already lands boundaries on topic changes (an `eyebrow` change), so the seams
+that remain coincide with a beat change and read as deliberate.
 
 Check the total against the step-0 target. If it's off by more than about 10%, revise
 `narration.json` (cut or add real content — never pad with filler) and re-run this step; the
@@ -226,10 +237,30 @@ create `.scratch/<subject-slug>/demo-v1/` and start the convention.
   text and getting a 400). `assets/gen_acts.py` calls the API directly
   (`POST /api/qwen3/generate`, `{"text","mode":"clone","voice_name":"andy3"}`) and sidesteps this
   entirely — prefer that over shelling out to `tts.py` in a script.
-- **Generation length cap**: a single call over roughly 550-600 words was observed to truncate
-  silently and reproducibly (identical cutoff point on repeat runs with memory freed in between —
-  a backend generation-length cap, not a resource issue). `gen_acts.py`'s ~220-word default act
-  size leaves a large safety margin.
+- **TTS length limits** — measured directly, by synthesising prose at increasing word counts with
+  a sentinel sentence at the end and checking whether the sentinel survived:
+
+  | words | duration | complete? |
+  |---|---|---|
+  | 160 | 52.2s | yes |
+  | 255 | 76.4s | yes |
+  | 363 | 105.6s | yes |
+  | 458 | 130.6s | yes |
+  | 552 | **163.8s** | **no — tail lost** |
+  | 661 | **163.8s** | **no — tail lost** |
+
+  The ceiling is a **duration**, not a word count: 552, 661 and an earlier 1152-word input all
+  produced exactly 163.8s (≈2048 audio tokens on this 12Hz codec). It fails *silently* — a short
+  file, no error.
+
+  Speaking rate is set by content, so the word budget must assume the slow end:
+  - the same text re-run three times varied only **5.4%** (3.34–3.52 w/s) — regenerating one act
+    is reliable
+  - different real acts varied **27%** (2.70–3.43 w/s) — sentence shape drives pace
+
+  So: 163.8s × 2.70 w/s ≈ **442 words absolute**, and the 350-word default sits at 79% of that.
+  `gen_acts.py` refuses `--max-act-words` above 420, warns per act when the worst-case duration
+  passes 90% of the ceiling, and hard-fails on any act that comes back at ≥163.0s.
 - **`/api/tts/align-words`** (the TTS server's own forced-alignment endpoint) returned 503 on every
   call across two independent full runs. Don't depend on it; `align_acts.py` uses `mw` instead,
   which is a real, separately-verified-working local tool (`mw transcribe --format json` gives
