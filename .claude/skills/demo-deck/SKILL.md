@@ -35,6 +35,9 @@ describe what's live vs narrated/stubbed. Read the subject's own docs first — 
 which claims are safe to demonstrate live already (an `[LIVE]`/`[NARRATED]` tag, a depth-grade
 file, a `does-not-do` register) and often draft a longer-form narrative to compress from.
 
+Note anything with a *visual* surface too — a dashboard, a rendered report, a repo page, a running
+UI — since those become screenshot slides rather than terminal slides.
+
 Done when: you have a concrete list of real, currently-existing commands you could run to
 demonstrate this subject, and you know which ones are honestly narrated-only right now (say so
 plainly in the script later — don't paper over a gap).
@@ -53,8 +56,25 @@ Read the script first if its safety isn't obvious from its name; if it's genuine
 capture what it *would* do (dry-run flag, or just quote the relevant code) and note in the script
 later that it wasn't executed live, and why.
 
-Done when: every safe command from step 1 has a real output file, and every skipped command has a
-one-line reason recorded.
+### Web screenshots
+
+If the subject has a UI, dashboard, repository page, or rendered artefact worth showing, capture it
+now into `captures/shots/`:
+
+- **Public or local URL** (a local Grafana, a docs page, a rendered HTML report, a GitHub page):
+  `node assets/screenshot.js <url> captures/shots/<name>.png --width 1600 --height 1000` — add
+  `--wait <selector>` for a JS-rendered page, `--full` for the whole scrollable page, `--dark` to
+  request the site's dark theme so it sits better on a dark slide.
+- **Behind a login** (an authenticated dashboard, a private console): the headless helper has no
+  session, so drive the user's own logged-in browser with the claude-in-chrome MCP tools instead.
+  Load them in one call — `ToolSearch` with
+  `select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__computer,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__tabs_close_mcp`
+  — then open a new tab, navigate, and screenshot. Ask the user before opening anything that needs
+  their session.
+
+Done when: every safe command from step 1 has a real output file, every skipped command has a
+one-line reason recorded, and every screenshot the plan needs exists as a real PNG under
+`captures/shots/`.
 
 ## 3. Plan
 
@@ -71,10 +91,31 @@ Done when: every planned beat names its evidence source and there is no beat wit
 
 Write `narration.json` — a list of `{i, eyebrow, title, narration, visual}`. `narration` is the
 only field spoken aloud; `title`/`eyebrow` are on-screen text and can carry symbols/digits freely.
-`visual` names the slide type (`title` / `terminal` / `mermaid` / `table` / `mockup` / `meme`) and
-which capture(s) or diagram it renders — see `assets/demo-deck-scaffold.html` for the component
-patterns (dark terminal mock, mermaid-as-image, stat cards, ledger line, checklist, meme as plain
-CSS two-panel, never a fetched image).
+`visual` names the slide type and which capture, screenshot, or diagram it renders — see
+`assets/demo-deck-scaffold.html` for every component's markup:
+
+| type | use it for |
+|---|---|
+| `terminal` | real captured command output — the workhorse; most slides should be this |
+| `screenshot` | a real page captured this run, in a browser frame (or `fullbleed`, unframed) |
+| `mermaid` | a flow/sequence/architecture diagram of a real mechanism |
+| `wardley` | evolution and **movement** of a landscape — read `assets/wardley-reference.md` first |
+| `table` | a comparison where the rows are the argument |
+| `mockup` | stat cards, a ledger line, a checklist — for a number that has no terminal |
+| `news` | the consequence a risk buys, as a headline — see the integrity rule below |
+| `meme` | one reject/prefer contrast, built in plain CSS, never a fetched image |
+| `title` | hook, thesis, close |
+
+Keep the ratio honest: evidence types (`terminal`, `screenshot`, `wardley`, `mermaid`, `table`)
+should dominate; `title`/`mockup`/`meme`/`news` are seasoning.
+
+**Integrity rule for `news` and `meme` slides.** These invent content, so they carry a hard
+constraint: never use a real publication's name, masthead, branding, or byline, and never present
+an invented quote, post, or story as something that happened. Use an obviously invented outlet
+name, and keep the `.hypothetical` banner on the slide. A headline mockup is a legitimate way to
+make a priced risk concrete — *"this is the headline this £ figure is buying insurance against"* —
+and it stays legitimate exactly as long as no frame of it could be screenshotted and mistaken for
+a real report. The same goes for a social-post mockup: invented handle, labelled illustrative.
 
 TTS-clean the `narration` text as you write it, not as a later pass:
 - Spell out every number and currency figure as words. No raw digits, `£`, or `%` in `narration`.
@@ -99,12 +140,24 @@ Done when: no open fact-check finding remains unaddressed.
 
 Copy `assets/demo-deck-scaffold.html` to `<deck_dir>/deck.html` and author one real `.slide` div
 per `narration.json` entry (`data-i` matching `i`), replacing the scaffold's example slides —
-never leave a placeholder in the shipped deck. For a `mermaid` visual, write a `.mmd` file and
-render it with `mmdc -i x.mmd -o mermaid/x.png -b transparent -w 1400 -H 900 -c
-assets/mermaid-theme.json -p assets/mermaid-puppeteer-config.json`, then reference the PNG.
+never leave a placeholder in the shipped deck.
 
-Done when: every segment has a corresponding slide with real content, and every mermaid diagram
-referenced has been rendered.
+For a `mermaid` or `wardley` visual, write a `.mmd` file and render it to PNG:
+
+```sh
+mmdc -i x.mmd -o mermaid/x.png -b transparent -w 1400 -H 900 \
+  -c assets/mermaid-theme.json -p assets/mermaid-puppeteer-config.json
+```
+
+Wardley maps are native in the mermaid version here (`wardley-beta`), but the syntax has real
+traps and several statements that silently fail — **read `assets/wardley-reference.md` before
+writing one**; it carries the verified grammar and the rendering gotchas.
+
+Copy captured screenshots into `<deck_dir>/shots/` and reference them from the browser-frame
+markup, putting the genuine captured URL in the `.urlbar`.
+
+Done when: every segment has a corresponding slide with real content, and every diagram and
+screenshot referenced actually exists on disk.
 
 ## 7. Generate audio
 
@@ -133,7 +186,13 @@ has been spot-checked (see step 10) and found acceptable.
 
 `node assets/render.js <deck_dir>` — screenshots every slide to `<deck_dir>/slides/sNN.png`.
 
-Done when: one PNG exists per segment.
+Then **look at the rendered PNGs** — at minimum every text-heavy terminal slide, every diagram, and
+every screenshot slide. The deck is a fixed 1920×1080 with no scrollbar, so content that overflows
+is silently cropped: a long capture runs off the bottom, a wide one clips at the right, a Wardley
+label collides with the plot edge. None of this is visible in the HTML source, only in the render.
+Trim the pasted output or drop the font size (`.tbody.small`) and re-render until each slide fits.
+
+Done when: one PNG exists per segment, and every one you have inspected fits inside the frame.
 
 ## 10. Assemble
 

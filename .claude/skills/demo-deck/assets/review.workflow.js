@@ -22,9 +22,16 @@ yourself and cross-check every number and claim against them.
 Report: (a) any claim NOT backed by a real capture -- quote the narration line and say what's
 unverifiable or wrong; (b) any number rounded, reframed, or stated in a misleading way even if
 technically traceable (e.g. calling something "live" when its capture says otherwise); (c)
-anything the captures clearly disprove. Be adversarial -- assume the scriptwriter wants to sound
-better than reality and your job is to catch it. Quote exact narration text for every finding. If
-a claim checks out, don't report it. Under 400 words.`
+anything the captures clearly disprove.
+
+Also check the "visual" field of every segment: a "screenshot" visual must name a real file under
+captures/shots/ that exists; a "news" or "meme" visual invents its content, so confirm the
+narration frames it as hypothetical rather than asserting it happened, and flag any use of a real
+publication's name or branding as a hard finding.
+
+Be adversarial -- assume the scriptwriter wants to sound better than reality and your job is to
+catch it. Quote exact narration text for every finding. If a claim checks out, don't report it.
+Under 400 words.`
 
 const QUALITY_PROMPT = `You are a skeptical viewer watching a demo video, hearing only the
 "narration" fields of ${SCRIPT_PATH} read aloud in order (the "title"/"eyebrow" fields are
