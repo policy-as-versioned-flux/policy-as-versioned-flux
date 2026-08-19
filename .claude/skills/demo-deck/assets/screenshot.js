@@ -15,6 +15,10 @@
 //   --delay  extra settle time in ms after load (default 400)
 //   --dark   ask the page for its dark colour scheme, so it sits better on a
 //            dark deck (only works if the site actually supports it)
+//   --hide   comma-separated CSS selectors to remove before capturing --
+//            cookie banners, logged-out marketing nav, sign-up prompts. Use
+//            it to cut chrome that distracts from the thing you're showing.
+//   --clip   capture just one element, by CSS selector, instead of the page
 const puppeteer = require('/Users/cns/.nvm/versions/node/v22.19.0/lib/node_modules/@mermaid-js/mermaid-cli/node_modules/puppeteer');
 
 function arg(name, dflt) {
@@ -47,8 +51,29 @@ if (!url || !out) {
   await pg.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
   const waitSel = arg('--wait', null);
   if (waitSel) await pg.waitForSelector(waitSel, { timeout: 30000 });
+
+  const hide = arg('--hide', null);
+  if (hide) {
+    const removed = await pg.evaluate((sels) => {
+      let n = 0;
+      for (const s of sels.split(',').map((x) => x.trim()).filter(Boolean)) {
+        for (const el of document.querySelectorAll(s)) { el.remove(); n++; }
+      }
+      return n;
+    }, hide);
+    console.log(`  hid ${removed} element(s) matching: ${hide}`);
+  }
+
   await new Promise((r) => setTimeout(r, parseInt(arg('--delay', '400'), 10)));
-  await pg.screenshot({ path: out, fullPage: has('--full') });
+
+  const clipSel = arg('--clip', null);
+  if (clipSel) {
+    const el = await pg.$(clipSel);
+    if (!el) throw new Error(`--clip selector matched nothing: ${clipSel}`);
+    await el.screenshot({ path: out });
+  } else {
+    await pg.screenshot({ path: out, fullPage: has('--full') });
+  }
   await b.close();
   console.log('captured', url, '->', out);
 })().catch((e) => { console.error('SCREENSHOT FAIL', e.message); process.exit(1); });

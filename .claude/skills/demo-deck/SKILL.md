@@ -35,8 +35,13 @@ describe what's live vs narrated/stubbed. Read the subject's own docs first — 
 which claims are safe to demonstrate live already (an `[LIVE]`/`[NARRATED]` tag, a depth-grade
 file, a `does-not-do` register) and often draft a longer-form narrative to compress from.
 
-Note anything with a *visual* surface too — a dashboard, a rendered report, a repo page, a running
-UI — since those become screenshot slides rather than terminal slides.
+Note anything with a *visual* surface too — a dashboard, a rendered report, a running UI — since
+those become screenshot slides rather than terminal slides.
+
+Check GitHub as part of this, not as an afterthought: `gh repo list <org>`, the org page, recent
+PRs, whether commits carry Verified badges, whether Actions are green. This repo is an org of
+repos, so what's on GitHub *is* part of the subject's real state — and it's third-party evidence
+(see **Capture GitHub** below).
 
 Done when: you have a concrete list of real, currently-existing commands you could run to
 demonstrate this subject, and you know which ones are honestly narrated-only right now (say so
@@ -72,6 +77,50 @@ now into `captures/shots/`:
   — then open a new tab, navigate, and screenshot. Ask the user before opening anything that needs
   their session.
 
+### Capture GitHub — it is the strongest evidence available
+
+This project lives as a **GitHub org of repos**, and GitHub pages carry something no terminal
+output can: *third-party* attestation. When GitHub shows a green **Verified** badge on a commit,
+that is GitHub validating the signature, not you asserting it. A wall of Verified commits proves
+the signing chain far better than any local command whose output you produced yourself.
+
+Capture these, and reach for them whenever a beat makes a claim they can back:
+
+| page | the claim it proves |
+|---|---|
+| org page (`github.com/<org>`) | this is an estate of many repos, not one project folder |
+| commit history (`/commits/main`) | real dated work, and every commit **Verified** |
+| a single commit | the signature detail behind one Verified badge |
+| a pull request | propose-never-dispose: a change reviewed and gated, not self-merged |
+| Actions run list | the gates actually run, and pass, on real pushes |
+| releases / tags | semver, signed releases, a pinnable dependency |
+| an issue | the ticket that drove the work, in the open |
+| Insights → dependency graph | what the estate consumes, and from where |
+
+Public repos need no login, so the headless helper is enough. A working recipe, verified:
+
+```sh
+node assets/screenshot.js "https://github.com/<org>" captures/shots/org.png \
+  --width 1600 --height 900 --dark \
+  --hide ".js-header-wrapper, .header-logged-out, dialog"
+```
+
+- `--dark` works on GitHub — logged out, it honours `prefers-color-scheme`, so the page arrives
+  already matching the deck.
+- `--hide` strips the logged-out marketing nav (Platform / Solutions / Pricing / Sign up), which
+  otherwise makes your own estate read as a GitHub advert. Those two class names are stable;
+  GitHub's hashed CSS-module names (`MarketingHeader-module__root__…`) are not — don't target them.
+- A **private** repo returns a 404 to the headless browser. Use claude-in-chrome for those, since
+  it carries the user's session.
+- `--clip "<selector>"` grabs one element (a single commit row, the PR header) when the whole page
+  is too busy for a slide.
+
+`gh` complements this for terminal slides — `gh pr view`, `gh run list`, `gh release list` — so the
+same fact can appear as a page *and* as command output where that's the better fit.
+
+Screenshot the user's own org and repos freely. Don't screenshot a third party's repo, issue, or
+profile in a way that implies they endorse or participate in this work.
+
 Done when: every safe command from step 1 has a real output file, every skipped command has a
 one-line reason recorded, and every screenshot the plan needs exists as a real PNG under
 `captures/shots/`.
@@ -100,6 +149,7 @@ only field spoken aloud; `title`/`eyebrow` are on-screen text and can carry symb
 |---|---|
 | `terminal` | real captured command output — the workhorse; most slides should be this |
 | `screenshot` | a real page captured this run, in a browser frame (or `fullbleed`, unframed) |
+| `github` | a `screenshot` whose page is GitHub — org, commits, PR, Actions, release |
 | `mermaid` | a flow/sequence/architecture diagram of a real mechanism |
 | `wardley` | evolution and **movement** of a landscape — read `assets/wardley-reference.md` first |
 | `table` | a comparison where the rows are the argument |
@@ -108,8 +158,10 @@ only field spoken aloud; `title`/`eyebrow` are on-screen text and can carry symb
 | `meme` | one reject/prefer contrast, built in plain CSS, never a fetched image |
 | `title` | hook, thesis, close |
 
-Keep the ratio honest: evidence types (`terminal`, `screenshot`, `wardley`, `mermaid`, `table`)
-should dominate; `title`/`mockup`/`meme`/`news` are seasoning.
+Keep the ratio honest: evidence types (`terminal`, `screenshot`, `github`, `wardley`, `mermaid`,
+`table`) should dominate; `title`/`mockup`/`meme`/`news` are seasoning. A demo made only of
+terminal output starts to look like one person's laptop — mixing in GitHub pages shows the same
+claims standing up somewhere a viewer can go and check for themselves.
 
 **Integrity rule for `news` and `meme` slides.** These invent content, so they carry a hard
 constraint: never use a real publication's name, masthead, branding, or byline, and never present
