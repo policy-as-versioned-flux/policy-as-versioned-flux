@@ -1,0 +1,14 @@
+# Fixed input for ticket cs-01. Copied verbatim from the old faithful-floor's
+# real, signed release line:
+#   source: policy-as-versioned-flux/policy @ v2.0.0
+#   path:   tests/require-department-label/pod-fail.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-department
+  labels:
+    mycompany.com/policy-version: 0.0.0-unset
+spec:
+  containers:
+    - name: app
+      image: nginx:latest
