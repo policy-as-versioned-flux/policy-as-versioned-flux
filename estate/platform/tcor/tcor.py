@@ -71,10 +71,15 @@ def moves(risk, tolerance):
     """Price every risk-financing move for one risk. Each move -> a TCoR decomposition
     {residual, cost_of_controls, transfer_premium, tcor}. Unavailable move -> tcor=inf.
 
-    risk: {warn:{lef,lm}, deny:{lef,lm}, behind?:{lef,lm}, costs:{fix,deny,transfer:{load,deductible}}}
+    risk: {warn:{lef,lm}, deny:{lef,lm}, behind?:{lef,lm}, costs:{fix,deny,transfer:{load,deductible},cage_discount}}
       warn   = do-nothing exposure (the retained ALE if you act on nothing)
       deny   = loss path closed (residual ~0)
       behind = the residual a cage collapses (defaults to warn)
+      cage_discount = optional multiplier < 1 on the cage's own run-cost (C_cage), applied on top
+                      of ../graded/cage.py's tier table rather than inside it -- cage.py's cost is
+                      a structural, estate-wide constant per tier, and a discount belongs to the
+                      ONE risk a cheaper control makes cheaper, not to every caged workload in the
+                      estate. Defaults to 1.0 (no discount) for every risk that does not set it.
     """
     ale_warn = _ale(fair.state(risk, "warn"))
     ale_deny = _ale(fair.state(risk, "deny"))
@@ -86,6 +91,7 @@ def moves(risk, tolerance):
     xfer = costs.get("transfer", {})
     load = float(xfer.get("load", DEFAULT_LOAD))
     deductible = float(xfer.get("deductible", 0.0))
+    cage_discount = float(costs.get("cage_discount", 1.0))
 
     def line(residual, controls, premium):
         return {"residual": residual, "cost_of_controls": controls,
@@ -100,7 +106,7 @@ def moves(risk, tolerance):
         out["cage"] = {**line(INF, 0.0, 0.0), "tier": "deny (no tier fits the band)"}
     else:
         ct = cage.tcor(ale_behind, tier)
-        out["cage"] = {**line(ct["residual"], ct["cost_of_controls"], 0.0), "tier": tier}
+        out["cage"] = {**line(ct["residual"], ct["cost_of_controls"] * cage_discount, 0.0), "tier": tier}
     # transfer — premium priced off the residual (expected loss + insurer load); keep the deductible.
     premium = ale_warn * (1.0 + load)
     out["transfer"] = line(deductible, 0.0, premium)
@@ -262,6 +268,18 @@ def cmd_selfcheck(_args):
     assert c_caged["chosen"] == "cage", c_caged
     assert c_caged["line"]["cost_of_controls"] > c_retain["line"]["cost_of_controls"], \
         ("a cage kicking in must raise control-spend", c_retain["line"], c_caged["line"])
+
+    # 4c. costs.cage_discount (ticket 19): a commoditising DEFENCE lowers a cage's own run-cost,
+    #     never its residual -- the tier and what it collapses are unchanged, only C_cage shrinks.
+    #     Absent -> 1.0, byte-identical to every risk above that never sets it.
+    discounted = {**caged, "costs": {**caged["costs"], "cage_discount": 0.5}}
+    m_plain = moves(caged, tol)
+    m_half = moves(discounted, tol)
+    assert abs(m_half["cage"]["cost_of_controls"] - m_plain["cage"]["cost_of_controls"] * 0.5) < 1e-6, \
+        (m_plain["cage"], m_half["cage"])
+    assert m_half["cage"]["residual"] == m_plain["cage"]["residual"], \
+        ("a cage discount must not touch the residual it collapses", m_plain["cage"], m_half["cage"])
+    assert m_half["cage"]["tcor"] < m_plain["cage"]["tcor"], (m_plain["cage"], m_half["cage"])
 
     print(
         "ok  balance sheet £%.0f = residual £%.0f + controls £%.0f + premium £%.0f | "

@@ -5,9 +5,11 @@ The fifth, FORWARD feed. The reactive feeds (threat register / CVE / EOL) report
 what has already been seen. This layer maps MARKET intel onto a Wardley map and
 reads the one thing the reactive feeds structurally cannot: components still
 MOVING right. When an attacker-capability commoditises, its cost collapses and
-the linked risk's loss-event-frequency rises BEFORE a single incident lands. That
-becomes a forward signal the war-gamer re-prices ahead of time -- proportionality
-re-tunes before the threat, not after.
+the linked risk's loss-event-frequency rises BEFORE a single incident lands. When
+a DEFENSIVE capability commoditises -- and its enactment is CORROBORATED, not
+merely asserted -- the cost of the control it makes cheaper falls instead
+(ticket 19). Either way this becomes a forward signal the war-gamer re-prices
+ahead of time -- proportionality re-tunes before the threat, not after.
 
 Three jobs (the ticket's three acceptance criteria):
 
@@ -15,14 +17,19 @@ Three jobs (the ticket's three acceptance criteria):
             the intel horizon, and FLAG commoditisation MOVEMENT (a component that
             crosses a stage boundary, or reaches commodity, within the horizon).
   2. FORWARD SIGNAL -- for each commoditising ATTACKER-capability, collapse the
-            attack cost into a forward LEF bump on its linked war-game risk and
-            emit a scenario library in the exact shape the war-gamer already
+            attack cost into a forward LEF bump on its linked war-game risk; for
+            each commoditising DEFENSIVE capability with a CORROBORATED enactment
+            (enactment.json, gated fail-closed by corroborated_enactment() --
+            ticket 19), collapse the cost of the control it makes cheaper
+            (C_fix / C_cage via ../tcor's costs.cage_discount) instead. Either
+            way, emit a scenario library in the exact shape the war-gamer already
             consumes (../wargamer + ../tcor). `forward_into_wargamer()` feeds it
             straight through the war-gamer's own scenario war-game.
   3. ATTESTABLE -- the map + intel are detached-signed (sign-map.sh, feeds key)
             and land as a reviewable, verifiable commit; a tampered map fails.
 
-Pure/offline. Reuses tcor.py + wargamer.py unchanged.
+Pure/offline. Reuses wargamer.py unchanged; ../tcor/tcor.py gained one optional,
+backward-compatible field (costs.cage_discount, default 1.0) for this ticket.
 
 Usage:
     wardley.py map              [--intel <file>]                # the Wardley map + commoditisation flags
@@ -49,6 +56,13 @@ INTEL = os.path.join(HERE, "intel", "market-intel.json")
 # same appetite file tolerance_for() judges against (../risk/appetite.json), so the
 # org set can never drift out of step with the bands it is priced into.
 APPETITE = os.path.join(PLATFORM, "risk", "appetite.json")
+# Independent enactment corroboration (ticket 19) -- deliberately NOT inside
+# market-intel.json. market-intel.json is platform's own commoditisation CLAIM, signed
+# with the feeds key; a claim cannot corroborate itself. This file carries the editorial
+# "which control would this commoditising defence make cheaper" link (the defensive
+# mirror of an attacker-capability's own base_risk) AND the independent "was it actually
+# enacted" channel, gated fail-closed by corroborated_enactment() below.
+ENACTMENT = os.path.join(HERE, "enactment.json")
 
 # Evolution-axis stage boundaries (Wardley's genesis/custom/product/commodity).
 STAGES = [(0.25, "genesis"), (0.50, "custom"), (0.75, "product"), (1.01, "commodity")]
@@ -84,6 +98,44 @@ def _stage_idx(x):
 def load(intel_path=INTEL):
     with open(intel_path) as fh:
         return json.load(fh)
+
+
+def load_enactment(path=ENACTMENT):
+    with open(path) as fh:
+        return json.load(fh)
+
+
+NOT_ENACTED = "no-corroborated-enactment"
+
+
+def corroborated_enactment(component_id, enactment=None):
+    """Fail-closed enactment gate (ticket 19), mirroring the shape of the twin project's
+    declared_by_subject / NOT_ENACTED gate (twin/corroboration.py): a claim about a defence's
+    own commoditisation cannot corroborate whether that defence was actually put in place.
+
+    Three ways to fail closed, all returning NOT_ENACTED: no record at all for this component;
+    a record that is itself self-declared (declared_by_subject is not explicitly False); or a
+    record that names evidence not one of which resolves to a real file on disk. A record with
+    no evidence at all is the self-declared case by construction -- there is nothing independent
+    to point at."""
+    enactment = load_enactment() if enactment is None else enactment
+    entry = enactment.get("components", {}).get(component_id)
+    if entry is None:
+        return {"corroborated": False, "reason": NOT_ENACTED,
+                "detail": "%r carries no enactment record at all" % component_id}
+    if entry.get("declared_by_subject", True) is not False:
+        return {"corroborated": False, "reason": NOT_ENACTED,
+                "detail": "%r's enactment record is self-declared, not independently observed"
+                          % component_id}
+    evidence = entry.get("evidence") or []
+    missing = [e for e in evidence if not os.path.isfile(os.path.join(HERE, e))]
+    if not evidence or missing:
+        return {"corroborated": False, "reason": NOT_ENACTED,
+                "detail": "%r names no evidence that resolves on disk (missing: %s)"
+                          % (component_id, missing or "none named")}
+    return {"corroborated": True, "reason": None,
+            "detail": "independent channel %r, %d evidence path(s) resolve"
+                      % (entry.get("channel"), len(evidence))}
 
 
 def institutions(appetite_path=APPETITE):
@@ -141,24 +193,56 @@ def _forward_risk(component, movement):
     return r
 
 
-def forward_signal(intel, org):
+def _forward_defence(component_id, entry, movement):
+    """Collapse a commoditising DEFENSIVE capability's movement into a forward DISCOUNT on
+    the cost-of-controls (C_fix / C_cage) of the control it makes cheaper -- the mirror
+    image of _forward_risk: same K, opposite direction. LEF is left untouched: a cheaper
+    defence does not change how often an attacker succeeds, only what it costs to build
+    (C_fix) or run (C_cage) the control that stops them. Never called uncorroborated --
+    forward_signal() gates on corroborated_enactment() first."""
+    factor = 1.0 / (1.0 + ATTACK_COST_COLLAPSE_K * movement)
+    r = copy.deepcopy(entry["control_risk"])
+    r["costs"]["fix"] = round(r["costs"]["fix"] * factor, 2)
+    r["costs"]["cage_discount"] = round(factor, 4)
+    r["author"] = "ai-generated"
+    r["forward"] = {"component": component_id, "movement": movement,
+                    "control_cost_collapse_factor": round(factor, 3)}
+    return r
+
+
+def forward_signal(intel, org, enactment=None):
     """The forward scenario library for ONE institution -- war-gamer shape
-    ({org, risks:[...]}). One risk per commoditising attacker-capability that
-    carries a base FAIR posture; the same market movement, labelled for the
-    institution whose band it will be priced against downstream."""
+    ({org, risks:[...]}). One risk per commoditising attacker-capability that carries a
+    base FAIR posture (LEF bumped up), PLUS one per commoditising defensive-capability
+    whose enactment is CORROBORATED (cost-of-controls discounted down) -- the same market
+    movement, labelled for the institution whose band it will be priced against
+    downstream. A commoditising defence with no corroborated enactment emits nothing:
+    fail closed, no corroboration means no credit."""
     mp = {r["id"]: r for r in build_map(intel)["components"]}
+    enact = load_enactment() if enactment is None else enactment
     risks = []
     for c in intel["components"]:
         row = mp[c["id"]]
-        if c["actor"] != "attacker-capability" or not row["commoditising"]:
+        if not row["commoditising"]:
             continue
-        if not c.get("base_risk"):
-            continue
-        risks.append(_forward_risk(c, row["movement"]))
+        if c["actor"] == "attacker-capability":
+            if not c.get("base_risk"):
+                continue
+            risks.append(_forward_risk(c, row["movement"]))
+        elif c["actor"] == "defensive-capability":
+            entry = enact.get("components", {}).get(c["id"])
+            if entry is None or "control_risk" not in entry:
+                continue
+            if not corroborated_enactment(c["id"], enact)["corroborated"]:
+                continue
+            risks.append(_forward_defence(c["id"], entry, row["movement"]))
     return {
         "org": org,
-        "note": ("AI-Wardley forward signal (%s): %d commoditising attacker-capabilit"
-                 "y(ies) re-priced ahead of the reactive feeds." % (org, len(risks))),
+        "note": ("AI-Wardley forward signal (%s): %d commoditising attacker-capability(ies) "
+                 "re-priced, %d commoditising defence(s) credited on corroborated enactment, "
+                 "ahead of the reactive feeds."
+                 % (org, sum(1 for r in risks if "attack_cost_collapse_factor" in r.get("forward", {})),
+                    sum(1 for r in risks if "control_cost_collapse_factor" in r.get("forward", {})))),
         "source": "platform/wardley/wardley.py forward-signal @ intel %s" % intel["intel_version"],
         "risks": risks,
     }
@@ -208,13 +292,20 @@ def selfcheck():
     # movement is monotone in velocity*horizon:
     assert by["phishing-kits-aas"]["movement"] > by["pq-cryptanalysis"]["movement"], mp
 
-    # 2. FORWARD SIGNAL: only commoditising ATTACKER-capabilities become risks;
-    #    the defensive commoditisation does NOT bump any attacker LEF.
+    # 2. FORWARD SIGNAL: commoditising ATTACKER-capabilities raise LEF (attacker risk);
+    #    a commoditising DEFENSIVE capability with corroborated enactment lowers
+    #    cost-of-controls instead (ticket 19) -- neither ever moves the other's number.
     sig = forward_signal(intel, "driftwood")
     ids = {r["forward"]["component"] for r in sig["risks"]}
-    assert "spiffe-workload-identity" not in ids, "defensive commoditisation must not raise attacker risk"
+    attacker_ids = {r["forward"]["component"] for r in sig["risks"]
+                     if "attack_cost_collapse_factor" in r["forward"]}
+    defence_ids = {r["forward"]["component"] for r in sig["risks"]
+                    if "control_cost_collapse_factor" in r["forward"]}
+    assert "spiffe-workload-identity" not in attacker_ids, "a commoditising defence must never raise attacker risk"
+    assert "spiffe-workload-identity" in defence_ids, (
+        "spiffe-workload-identity is the corroborated test case -- it must move a number", ids)
     assert "credential-stuffing-aas" not in ids, "already-commodity (no movement) must not signal"
-    assert {"phishing-kits-aas", "ransomware-aas"} <= ids, ("expected the commoditising attacker "
+    assert {"phishing-kits-aas", "ransomware-aas"} <= attacker_ids, ("expected the commoditising attacker "
                                                             "capabilities in the forward signal", ids)
     # the attack-cost collapse RAISES frequency vs the reactive base (forward > reactive):
     ph_base = next(c for c in intel["components"] if c["id"] == "phishing-kits-aas")["base_risk"]
@@ -239,6 +330,62 @@ def selfcheck():
     assert "credential-stuffing-aas" not in stationary_ids, (
         "an already-commodity, non-moving component must not signal EVEN WITH a real base_risk",
         stationary_ids)
+
+    # 2c. THE DEFENSIVE CREDIT (ticket 19): spiffe-workload-identity is the test case --
+    #     already on the map, already flagged commoditising, previously unable to move a
+    #     number at all. Its forward entry must lower cost-of-controls, never touch LEF.
+    enact = load_enactment()
+    spiffe_entry = enact["components"]["spiffe-workload-identity"]
+    base_control = spiffe_entry["control_risk"]
+    spiffe_fwd = next(r for r in sig["risks"] if r["forward"]["component"] == "spiffe-workload-identity")
+    assert spiffe_fwd["forward"]["control_cost_collapse_factor"] < 1.0, spiffe_fwd
+    assert spiffe_fwd["costs"]["fix"] < base_control["costs"]["fix"], (spiffe_fwd, base_control)
+    assert spiffe_fwd["costs"]["cage_discount"] < 1.0, spiffe_fwd
+    # LEF is byte-identical to the un-discounted control -- a cheaper defence changes what
+    # the control costs, never how often an attacker succeeds:
+    assert spiffe_fwd["warn"]["lef"] == base_control["warn"]["lef"], (spiffe_fwd, base_control)
+    assert spiffe_fwd["behind"]["lef"] == base_control["behind"]["lef"], (spiffe_fwd, base_control)
+    # the number that was previously stuck actually moves: the chosen move's own TCoR falls.
+    import wargamer
+    tol_dw_defence = wargamer.enforce.tolerance_for("driftwood")
+    base_cross = tcor.crossover(base_control, tol_dw_defence)
+    fwd_cross = tcor.crossover(spiffe_fwd, tol_dw_defence)
+    assert fwd_cross["chosen"] == base_control["deployed_move"], (
+        "the deployed move for the linked control must not need to flip for the bill to fall",
+        base_cross, fwd_cross)
+    assert fwd_cross["line"]["tcor"] < base_cross["line"]["tcor"], (
+        "a corroborated commoditising defence must lower the board line", base_cross["line"], fwd_cross["line"])
+
+    # 2d. THE GUARD BITES: plant a violation (an uncorroborated claim) and watch the credit
+    #     disappear -- the way the twin's harness guards prove a gate by breaking it. Three
+    #     ways to fail closed, each planted and each watched: no record, a self-declared
+    #     record, and a record naming evidence that does not exist on disk.
+    def _without_spiffe_credit(tampered):
+        return "spiffe-workload-identity" in {
+            r["forward"]["component"] for r in forward_signal(intel, "driftwood", enactment=tampered)["risks"]
+            if "control_cost_collapse_factor" in r["forward"]
+        }
+
+    no_record = copy.deepcopy(enact)
+    del no_record["components"]["spiffe-workload-identity"]
+    assert _without_spiffe_credit(no_record) is False, "a component with no enactment record must earn no credit"
+
+    self_declared = copy.deepcopy(enact)
+    self_declared["components"]["spiffe-workload-identity"]["declared_by_subject"] = True
+    assert _without_spiffe_credit(self_declared) is False, (
+        "a self-declared enactment claim must earn no credit -- it cannot corroborate itself")
+
+    forged_evidence = copy.deepcopy(enact)
+    forged_evidence["components"]["spiffe-workload-identity"]["evidence"] = ["../does-not-exist.yaml"]
+    assert _without_spiffe_credit(forged_evidence) is False, (
+        "evidence that does not resolve on disk must earn no credit")
+
+    # ...and the CORROBORATED case, replanted here rather than only trusted from `sig` above,
+    # so this same guard proves it does not refuse everything indiscriminately:
+    assert _without_spiffe_credit(enact) is True, "the genuinely corroborated case must still pass"
+    verdict = corroborated_enactment("spiffe-workload-identity", no_record)
+    assert verdict == {"corroborated": False, "reason": NOT_ENACTED,
+                        "detail": verdict["detail"]}, verdict
 
     # 3. the FORWARD VALUE, per institution's OWN band -- not one org standing in
     #    for the estate. At driftwood's loose band the reactive base posture is NOT
@@ -306,10 +453,19 @@ def selfcheck():
     assert nb_base_risk is not None, "non-fire must not be vacuous: needs a real base_risk"
     assert "nb-refining-capacity" not in ids, (
         "a loud, non-attacker commoditisation must still emit nothing", ids)
-    # pqc-transport-migration: the same actor-gate shape as spiffe-workload-identity
-    # (a commoditising DEFENCE, not attack) -- also must not emit (finding F2).
+    # pqc-transport-migration: a commoditising DEFENCE too, same shape as
+    # spiffe-workload-identity -- but ticket 19 does NOT give it a linked control_risk in
+    # enactment.json, on purpose. Its own market-intel.json note explains why: the
+    # commoditised half (transport key agreement) is not what pq-harvest-now-decrypt-later's
+    # costs.fix actually buys (discovery/inventory, WebPKI signatures, boot roots of trust
+    # are the binding cost). A gate that credits any commoditising defence by construction,
+    # whether or not the link is honest, would be exactly the unearned green this ticket
+    # exists to refuse -- so this must still emit nothing, and for the right reason: no
+    # link, not a broken one.
     assert by["pqc-transport-migration"]["commoditising"] is True, by["pqc-transport-migration"]
-    assert "pqc-transport-migration" not in ids, "defensive commoditisation must not raise attacker risk"
+    assert "pqc-transport-migration" not in enact["components"], (
+        "pqc-transport-migration must carry no enactment link -- it is the negative control")
+    assert "pqc-transport-migration" not in ids, "an unlinked commoditising defence must not emit"
 
     # The slate is not tuned the OTHER way either: pkg-registry-worm DOES fire and
     # DOES flip the deployed move (cage -> fix) once the forward bump is applied.
@@ -349,11 +505,13 @@ def selfcheck():
     print(
         "ok  Wardley map: %d components, %d flagged commoditising (movement, not position); "
         "forward signal: %d attacker-capability(ies) re-priced (phishing collapse x%.2f), "
-        "per institution; fed through the war-gamer for %d institution(s) -> %d forward "
+        "%d commoditising defence(s) credited on corroborated enactment (spiffe cost collapse "
+        "x%.2f), per institution; fed through the war-gamer for %d institution(s) -> %d forward "
         "drift(s) -> %d PR(s) proposed, 0 merged, all gated."
         % (len(mp["components"]),
            sum(1 for c in mp["components"] if c["commoditising"]),
-           len(sig["risks"]), ph_fwd["forward"]["attack_cost_collapse_factor"],
+           len(attacker_ids), ph_fwd["forward"]["attack_cost_collapse_factor"],
+           len(defence_ids), spiffe_fwd["forward"]["control_cost_collapse_factor"],
            len(out_all), total_drifts, total_props)
     )
 
