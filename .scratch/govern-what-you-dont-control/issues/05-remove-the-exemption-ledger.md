@@ -60,12 +60,18 @@ the now-deleted `verify-exemption.sh` live at the venue. Grepped the whole tree 
 mentions remain (correctly describing it as removed). Verified:
 `python3 estate/platform/graded/cage.py selfcheck`,
 `bash estate/platform/oscal/verify-upflow.sh`, `bash estate/platform/policy/verify-conditional.sh`,
-`bash estate/platform/graded/verify-graded.sh` all pass. Ran the full offline
-`estate/talk/verify-all.sh` too: 24/26 PASS, the two FAILs (`verify-honesty.sh` — no local
+`bash estate/platform/graded/verify-graded.sh` all pass. Ran the full
+`estate/talk/verify-all.sh` (no `--live`) too: `pass=23 fail=2 skip-live=3`, i.e. 23/25 offline —
+this diff removes one offline beat (`verify-exemption.sh`), so the denominator is 25, not the
+pre-diff 26; an earlier draft of this comment quoted the stale pre-diff `24/26`, corrected here.
+The two FAILs (`verify-honesty.sh` — no local
 `feeds-signing-key.pem`, it's gitignored and never generated in this worktree; `verify-reach-secrets.sh`
 — hangs on an untimeout'd `kubectl --dry-run=client` with no reachable context) are pre-existing
 environment gaps, not caused by this change — neither script mentions `cage`, `ledger`, or
 `render-exemption` anywhere. Left unfixed as out of scope for this ticket.
+`.scratch/multi-org-estate/map.md`'s "28/28 is a moving number" note is updated and closed out per
+the ticket's own consequence 1: the `--live` total stays 28 (25 offline + 3 live, unchanged from
+the map's destination target); only the offline-only count moved, 26→25.
 `legacy-till` is not denied under today's numbers — driftwood's £40k band cages it `baseline`
 (TCoR ≈ £14,952 residual) — so the "some workloads stop running" consequence stays real but
 undemonstrated by this fixture; not this ticket's job to force a Deny case.
