@@ -1,5 +1,6 @@
 {
   "note": "Independent enactment corroboration for the defensive-commoditisation forward signal (ticket 19). Deliberately a SEPARATE file from market-intel.json: market-intel.json is platform's own commoditisation CLAIM (published_by: platform), signed with the feeds key, and a claim cannot corroborate itself -- mirroring the twin project's declared_by_subject / NOT_ENACTED gate (twin/corroboration.py), scaled to what this estate can check offline. No live cluster, no multi-channel evidence ladder: one independent channel, or none. A component missing here, or carrying declared_by_subject: true, or naming an evidence path that does not resolve on disk, all read as NOT corroborated. Fail closed -- no credit.",
+  "ponytail": "this file is unsigned -- tamper-evidence stops at file-exists-on-disk, not detached-signed like market-intel.json / wardley-map.json. Upgrade path: detached-sign it with its own key, not the shared feeds key (reusing that key would tie enactment.json's rotation to every other feed it covers, the same blast radius that ruled out editing market-intel.json in place). Add when this file needs to resist an attacker who can write to the checkout, not just an honest mistake.",
   "components": {
     "spiffe-workload-identity": {
       "links_control": "stolen-laptop-unattested-device",
