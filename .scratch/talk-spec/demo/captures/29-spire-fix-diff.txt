@@ -1,0 +1,19 @@
+commit f7f6732279f1692822b809b8855411befd6295fa
+Author: Chris Nesbitt-Smith <chris@cns.me.uk>
+Date:   Fri Jul 31 18:33:47 2026 +0100
+
+    Fix SPIRE chart 0.24.0 breaking value renames (live bring-up finding)
+    
+    Chart 0.24.0 camelCased its values with hard fail() guards: ca_subject->caSubject
+    and caSubject.common_name->commonName (the chart's own error msg misreports the
+    latter as 'ca_name'). The estate's HelmRelease used the old snake_case names, so
+    SPIRE never installed. Fixed; SPIRE now installs and all four pods run.
+    
+    Found by bringing the estate up live (verify-all --live). 27/28 live beats pass;
+    the last (tuppence reach+secrets) is blocked further down by the istio-csr/SPIRE
+    CA-bundle bootstrap (istiod: 'could not decode pem') — logged separately.
+    
+    Claude-Session: https://claude.ai/code/session_019ahCSLf7afJFJNYM3icdEY
+
+ estate/platform/identity/spire/helmrelease.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)

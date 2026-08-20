@@ -1,0 +1,25 @@
+== offline: structural invariants ==
+  ok   SPIRE HelmRelease present
+  ok   spire-controller-manager enabled (renders ClusterSPIFFEID -> entries)
+  ok   SPIRE OIDC Discovery Provider enabled (JWKS for OpenBao)
+  ok   spiffe-csi-driver enabled (mounts agent socket into meshed pods)
+  ok   trust domain is the one estate root (acme.internal), got 'acme.internal'
+  ok   agent socket exposed for Envoy SDS (/run/spire/agent-sockets/spire-agent.sock)
+  ok   istiod HelmRelease present
+  ok   istiod caName: SPIRE (mesh CA = SPIRE)
+  ok   mesh-wide PeerAuthentication STRICT
+  ok   base ClusterSPIFFEID present
+  ok   SVID template derives a spiffe:// path from pod/ns/sa
+  ok   AuthorizationPolicy present
+  ok   authz admits by SPIFFE principal, not IP (['spiffe://acme.internal/ns/mesh-demo/sa/ping'])
+  ok   OpenBao HelmRelease present
+  ok   OpenBao jwt-auth setup Job present
+  ok   OpenBao jwt auth points at SPIRE's OIDC Discovery Provider JWKS
+  -- all offline invariants hold --
+== offline: kubectl dry-run (core kinds) ==
+  ok   namespaces dry-run
+== live: substrate + mTLS proof ==
+  ok   SPIRE pods present
+  ok   istiod present
+  ok   OpenBao present
+verify-identity: done

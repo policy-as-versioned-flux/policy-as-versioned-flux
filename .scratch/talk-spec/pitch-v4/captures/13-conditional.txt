@@ -1,0 +1,7 @@
+[1;36m==>[0m 1. the conditional matrix: C admits uniformly, non-C fails, unversioned skips
+[1;36m==>[0m    root-attested-hardened ADMITS (met C); root-bare + attested-unhardened FAIL
+[1;36m==>[0m 2. kyverno test — the full pass/fail/skip matrix
+[1;36m==>[0m 3. the residual of the conditional branch is priced in £ (fair.py)
+[1;36m==>[0m    residual ALE with the exemption in place = £21360/yr (the £ it carries)
+[1;36m==>[0m 4. live tail skipped: no reachable cluster at context 'kind-driftwood'
+PASS: one conditional rule admits everyone meeting C, and its residual is priced.

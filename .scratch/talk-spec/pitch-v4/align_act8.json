@@ -1,0 +1,979 @@
+{
+  "segments" : [
+    {
+      "end" : 13120,
+      "id" : "FDB85625-1A7E-49FC-99DE-AA279074A700",
+      "start" : 320,
+      "text" : "Now, the same week, something else, a paper, no press release, no front page, no journalist, it cuts the number of qubits you would need to break real encryption by roughly twenty times.",
+      "words" : [
+        {
+          "end" : 1280,
+          "start" : 320,
+          "text" : " Now,"
+        },
+        {
+          "end" : 1520,
+          "start" : 1280,
+          "text" : " the"
+        },
+        {
+          "end" : 1760,
+          "start" : 1520,
+          "text" : " same"
+        },
+        {
+          "end" : 2400,
+          "start" : 1760,
+          "text" : " week,"
+        },
+        {
+          "end" : 2720,
+          "start" : 2400,
+          "text" : " something"
+        },
+        {
+          "end" : 3120,
+          "start" : 2720,
+          "text" : " else,"
+        },
+        {
+          "end" : 3360,
+          "start" : 3120,
+          "text" : " a"
+        },
+        {
+          "end" : 4320,
+          "start" : 3360,
+          "text" : " paper,"
+        },
+        {
+          "end" : 4640,
+          "start" : 4320,
+          "text" : " no"
+        },
+        {
+          "end" : 5040,
+          "start" : 4640,
+          "text" : " press"
+        },
+        {
+          "end" : 5840,
+          "start" : 5040,
+          "text" : " release,"
+        },
+        {
+          "end" : 6080,
+          "start" : 5840,
+          "text" : " no"
+        },
+        {
+          "end" : 6400,
+          "start" : 6080,
+          "text" : " front"
+        },
+        {
+          "end" : 6800,
+          "start" : 6400,
+          "text" : " page,"
+        },
+        {
+          "end" : 7040,
+          "start" : 6800,
+          "text" : " no"
+        },
+        {
+          "end" : 7760,
+          "start" : 7040,
+          "text" : " journalist,"
+        },
+        {
+          "end" : 7920,
+          "start" : 7760,
+          "text" : " it"
+        },
+        {
+          "end" : 8240,
+          "start" : 7920,
+          "text" : " cuts"
+        },
+        {
+          "end" : 8320,
+          "start" : 8240,
+          "text" : " the"
+        },
+        {
+          "end" : 8480,
+          "start" : 8320,
+          "text" : " number"
+        },
+        {
+          "end" : 8640,
+          "start" : 8480,
+          "text" : " of"
+        },
+        {
+          "end" : 9200,
+          "start" : 8640,
+          "text" : " qubits"
+        },
+        {
+          "end" : 9360,
+          "start" : 9200,
+          "text" : " you"
+        },
+        {
+          "end" : 9440,
+          "start" : 9360,
+          "text" : " would"
+        },
+        {
+          "end" : 9600,
+          "start" : 9440,
+          "text" : " need"
+        },
+        {
+          "end" : 9680,
+          "start" : 9600,
+          "text" : " to"
+        },
+        {
+          "end" : 10000,
+          "start" : 9680,
+          "text" : " break"
+        },
+        {
+          "end" : 10080,
+          "start" : 10000,
+          "text" : " real"
+        },
+        {
+          "end" : 10880,
+          "start" : 10240,
+          "text" : " encryption"
+        },
+        {
+          "end" : 11040,
+          "start" : 10880,
+          "text" : " by"
+        },
+        {
+          "end" : 11520,
+          "start" : 11040,
+          "text" : " roughly"
+        },
+        {
+          "end" : 12160,
+          "start" : 11520,
+          "text" : " twenty"
+        },
+        {
+          "end" : 13120,
+          "start" : 12160,
+          "text" : " times."
+        }
+      ]
+    },
+    {
+      "end" : 17439,
+      "id" : "F2C92061-D318-4A9F-8F75-EF3878A54398",
+      "start" : 12639,
+      "text" : "That isn't a supply story, it's arithmetic, and the arithmetic is already true.",
+      "words" : [
+        {
+          "end" : 12879,
+          "start" : 12639,
+          "text" : " That"
+        },
+        {
+          "end" : 13120,
+          "start" : 12879,
+          "text" : " isn"
+        },
+        {
+          "end" : 13200,
+          "start" : 13120,
+          "text" : "'t"
+        },
+        {
+          "end" : 13360,
+          "start" : 13200,
+          "text" : " a"
+        },
+        {
+          "end" : 13759,
+          "start" : 13360,
+          "text" : " supply"
+        },
+        {
+          "end" : 14240,
+          "start" : 13759,
+          "text" : " story,"
+        },
+        {
+          "end" : 14320,
+          "start" : 14240,
+          "text" : " it"
+        },
+        {
+          "end" : 14480,
+          "start" : 14320,
+          "text" : "'s"
+        },
+        {
+          "end" : 15280,
+          "start" : 14480,
+          "text" : " arithmetic,"
+        },
+        {
+          "end" : 15360,
+          "start" : 15280,
+          "text" : " and"
+        },
+        {
+          "end" : 15519,
+          "start" : 15360,
+          "text" : " the"
+        },
+        {
+          "end" : 16160,
+          "start" : 15519,
+          "text" : " arithmetic"
+        },
+        {
+          "end" : 16400,
+          "start" : 16160,
+          "text" : " is"
+        },
+        {
+          "end" : 16800,
+          "start" : 16400,
+          "text" : " already"
+        },
+        {
+          "end" : 17439,
+          "start" : 16800,
+          "text" : " true."
+        }
+      ]
+    },
+    {
+      "end" : 19279,
+      "id" : "990D1675-3D24-4354-A8C5-60A37D6611BD",
+      "start" : 17439,
+      "text" : "Evolution moves from 0.",
+      "words" : [
+        {
+          "end" : 18000,
+          "start" : 17439,
+          "text" : " Evolution"
+        },
+        {
+          "end" : 18320,
+          "start" : 18000,
+          "text" : " moves"
+        },
+        {
+          "end" : 18560,
+          "start" : 18320,
+          "text" : " from"
+        },
+        {
+          "end" : 19279,
+          "start" : 18560,
+          "text" : " 0."
+        }
+      ]
+    },
+    {
+      "end" : 20480,
+      "id" : "CA6717DE-5185-4715-9F6A-0650CABF097B",
+      "start" : 19279,
+      "text" : "3 to 0.",
+      "words" : [
+        {
+          "end" : 19599,
+          "start" : 19279,
+          "text" : "3"
+        },
+        {
+          "end" : 19840,
+          "start" : 19599,
+          "text" : " to"
+        },
+        {
+          "end" : 20480,
+          "start" : 19840,
+          "text" : " 0."
+        }
+      ]
+    },
+    {
+      "end" : 21279,
+      "id" : "C9AF62EA-6AED-4B32-96F4-DB89AFF76937",
+      "start" : 20480,
+      "text" : "34.",
+      "words" : [
+        {
+          "end" : 21279,
+          "start" : 20480,
+          "text" : "34."
+        }
+      ]
+    },
+    {
+      "end" : 25840,
+      "id" : "AA19EA38-78E1-4E96-85F5-C492E5D393D6",
+      "start" : 21279,
+      "text" : "The headline contributed one hundredth of that, the paper contributed the rest.",
+      "words" : [
+        {
+          "end" : 21439,
+          "start" : 21279,
+          "text" : " The"
+        },
+        {
+          "end" : 21920,
+          "start" : 21439,
+          "text" : " headline"
+        },
+        {
+          "end" : 22400,
+          "start" : 21920,
+          "text" : " contributed"
+        },
+        {
+          "end" : 22480,
+          "start" : 22400,
+          "text" : " one"
+        },
+        {
+          "end" : 23040,
+          "start" : 22640,
+          "text" : " hundredth"
+        },
+        {
+          "end" : 23200,
+          "start" : 23040,
+          "text" : " of"
+        },
+        {
+          "end" : 23520,
+          "start" : 23200,
+          "text" : " that,"
+        },
+        {
+          "end" : 23680,
+          "start" : 23520,
+          "text" : " the"
+        },
+        {
+          "end" : 24080,
+          "start" : 23680,
+          "text" : " paper"
+        },
+        {
+          "end" : 24640,
+          "start" : 24080,
+          "text" : " contributed"
+        },
+        {
+          "end" : 24880,
+          "start" : 24640,
+          "text" : " the"
+        },
+        {
+          "end" : 25840,
+          "start" : 24880,
+          "text" : " rest."
+        }
+      ]
+    },
+    {
+      "end" : 26440,
+      "id" : "815914B5-254A-47DC-BE4C-EC192BB161A1",
+      "start" : 25240,
+      "text" : "Watch what it does.",
+      "words" : [
+        {
+          "end" : 25640,
+          "start" : 25240,
+          "text" : " Watch"
+        },
+        {
+          "end" : 25800,
+          "start" : 25640,
+          "text" : " what"
+        },
+        {
+          "end" : 25960,
+          "start" : 25800,
+          "text" : " it"
+        },
+        {
+          "end" : 26440,
+          "start" : 25960,
+          "text" : " does."
+        }
+      ]
+    },
+    {
+      "end" : 28920,
+      "id" : "89FF898B-FE82-4C32-9BC6-E03F2E3A7470",
+      "start" : 26440,
+      "text" : "Crossing that line reprices everything.",
+      "words" : [
+        {
+          "end" : 26920,
+          "start" : 26440,
+          "text" : " Crossing"
+        },
+        {
+          "end" : 27160,
+          "start" : 26920,
+          "text" : " that"
+        },
+        {
+          "end" : 27480,
+          "start" : 27160,
+          "text" : " line"
+        },
+        {
+          "end" : 28360,
+          "start" : 27480,
+          "text" : " reprices"
+        },
+        {
+          "end" : 28920,
+          "start" : 28360,
+          "text" : " everything."
+        }
+      ]
+    },
+    {
+      "end" : 32439,
+      "id" : "27277245-EFEA-43D4-8C6C-EF62013E2B01",
+      "start" : 28920,
+      "text" : "Insurance on this risk goes from just over a million pounds to 1.",
+      "words" : [
+        {
+          "end" : 29400,
+          "start" : 28920,
+          "text" : " Insurance"
+        },
+        {
+          "end" : 29560,
+          "start" : 29400,
+          "text" : " on"
+        },
+        {
+          "end" : 29720,
+          "start" : 29560,
+          "text" : " this"
+        },
+        {
+          "end" : 30040,
+          "start" : 29720,
+          "text" : " risk"
+        },
+        {
+          "end" : 30280,
+          "start" : 30040,
+          "text" : " goes"
+        },
+        {
+          "end" : 30440,
+          "start" : 30280,
+          "text" : " from"
+        },
+        {
+          "end" : 30680,
+          "start" : 30440,
+          "text" : " just"
+        },
+        {
+          "end" : 30920,
+          "start" : 30680,
+          "text" : " over"
+        },
+        {
+          "end" : 31000,
+          "start" : 30920,
+          "text" : " a"
+        },
+        {
+          "end" : 31400,
+          "start" : 31080,
+          "text" : " million"
+        },
+        {
+          "end" : 31800,
+          "start" : 31400,
+          "text" : " pounds"
+        },
+        {
+          "end" : 31960,
+          "start" : 31800,
+          "text" : " to"
+        },
+        {
+          "end" : 32439,
+          "start" : 31960,
+          "text" : " 1."
+        }
+      ]
+    },
+    {
+      "end" : 33640,
+      "id" : "51A4784A-3B61-4371-BCE7-AE953951B2CA",
+      "start" : 32439,
+      "text" : "7 million.",
+      "words" : [
+        {
+          "end" : 32760,
+          "start" : 32439,
+          "text" : "7"
+        },
+        {
+          "end" : 33640,
+          "start" : 32760,
+          "text" : " million."
+        }
+      ]
+    },
+    {
+      "end" : 35100,
+      "id" : "848935E3-E24D-43A3-9DD0-B74A5D7563A1",
+      "start" : 33260,
+      "text" : "Caging it becomes literally impossible.",
+      "words" : [
+        {
+          "end" : 33660,
+          "start" : 33260,
+          "text" : " Caging"
+        },
+        {
+          "end" : 33899,
+          "start" : 33660,
+          "text" : " it"
+        },
+        {
+          "end" : 34140,
+          "start" : 33899,
+          "text" : " becomes"
+        },
+        {
+          "end" : 34539,
+          "start" : 34140,
+          "text" : " literally"
+        },
+        {
+          "end" : 35100,
+          "start" : 34539,
+          "text" : " impossible."
+        }
+      ]
+    },
+    {
+      "end" : 38699,
+      "id" : "9EB640BD-882F-4048-99A4-1709FE049305",
+      "start" : 35100,
+      "text" : "No cage tight enough exists to bring it inside the risk appetite.",
+      "words" : [
+        {
+          "end" : 35260,
+          "start" : 35100,
+          "text" : " No"
+        },
+        {
+          "end" : 35660,
+          "start" : 35260,
+          "text" : " cage"
+        },
+        {
+          "end" : 35980,
+          "start" : 35660,
+          "text" : " tight"
+        },
+        {
+          "end" : 36300,
+          "start" : 35980,
+          "text" : " enough"
+        },
+        {
+          "end" : 36699,
+          "start" : 36300,
+          "text" : " exists"
+        },
+        {
+          "end" : 36859,
+          "start" : 36699,
+          "text" : " to"
+        },
+        {
+          "end" : 37019,
+          "start" : 36859,
+          "text" : " bring"
+        },
+        {
+          "end" : 37180,
+          "start" : 37019,
+          "text" : " it"
+        },
+        {
+          "end" : 37500,
+          "start" : 37180,
+          "text" : " inside"
+        },
+        {
+          "end" : 37660,
+          "start" : 37500,
+          "text" : " the"
+        },
+        {
+          "end" : 37980,
+          "start" : 37660,
+          "text" : " risk"
+        },
+        {
+          "end" : 38699,
+          "start" : 37980,
+          "text" : " appetite."
+        }
+      ]
+    },
+    {
+      "end" : 44620,
+      "id" : "D014DDB6-CB60-49DC-AE55-8F0CC443633F",
+      "start" : 38699,
+      "text" : "And fixing it, unchanged at £212,000, is suddenly the cheapest survivable move on the board.",
+      "words" : [
+        {
+          "end" : 38860,
+          "start" : 38699,
+          "text" : " And"
+        },
+        {
+          "end" : 39180,
+          "start" : 38860,
+          "text" : " fixing"
+        },
+        {
+          "end" : 39420,
+          "start" : 39180,
+          "text" : " it,"
+        },
+        {
+          "end" : 39899,
+          "start" : 39420,
+          "text" : " unchanged"
+        },
+        {
+          "end" : 40140,
+          "start" : 39980,
+          "text" : " at"
+        },
+        {
+          "end" : 41019,
+          "start" : 40140,
+          "text" : " £212"
+        },
+        {
+          "end" : 41899,
+          "start" : 41019,
+          "text" : ",000,"
+        },
+        {
+          "end" : 42059,
+          "start" : 41899,
+          "text" : " is"
+        },
+        {
+          "end" : 42460,
+          "start" : 42059,
+          "text" : " suddenly"
+        },
+        {
+          "end" : 42620,
+          "start" : 42460,
+          "text" : " the"
+        },
+        {
+          "end" : 43100,
+          "start" : 42620,
+          "text" : " cheapest"
+        },
+        {
+          "end" : 43660,
+          "start" : 43100,
+          "text" : " survivable"
+        },
+        {
+          "end" : 43899,
+          "start" : 43660,
+          "text" : " move"
+        },
+        {
+          "end" : 44059,
+          "start" : 43899,
+          "text" : " on"
+        },
+        {
+          "end" : 44140,
+          "start" : 44059,
+          "text" : " the"
+        },
+        {
+          "end" : 44620,
+          "start" : 44140,
+          "text" : " board."
+        }
+      ]
+    },
+    {
+      "end" : 47500,
+      "id" : "DEDD5B04-AC10-4FC6-81BF-AF8674C6EEF3",
+      "start" : 44620,
+      "text" : "So the Wargamer opens one signed pull request.",
+      "words" : [
+        {
+          "end" : 44780,
+          "start" : 44620,
+          "text" : " So"
+        },
+        {
+          "end" : 44860,
+          "start" : 44780,
+          "text" : " the"
+        },
+        {
+          "end" : 45500,
+          "start" : 44860,
+          "text" : " Wargamer"
+        },
+        {
+          "end" : 45820,
+          "start" : 45500,
+          "text" : " opens"
+        },
+        {
+          "end" : 46059,
+          "start" : 45820,
+          "text" : " one"
+        },
+        {
+          "end" : 46379,
+          "start" : 46059,
+          "text" : " signed"
+        },
+        {
+          "end" : 46699,
+          "start" : 46379,
+          "text" : " pull"
+        },
+        {
+          "end" : 47500,
+          "start" : 46699,
+          "text" : " request."
+        }
+      ]
+    },
+    {
+      "end" : 50859,
+      "id" : "AAECFF6B-6914-4A52-9CDF-10CB58746FDC",
+      "start" : 47340,
+      "text" : "Stop insuring this, start fixing it, which is exactly right.",
+      "words" : [
+        {
+          "end" : 47660,
+          "start" : 47340,
+          "text" : " Stop"
+        },
+        {
+          "end" : 48219,
+          "start" : 47660,
+          "text" : " insuring"
+        },
+        {
+          "end" : 48620,
+          "start" : 48219,
+          "text" : " this,"
+        },
+        {
+          "end" : 48699,
+          "start" : 48620,
+          "text" : " start"
+        },
+        {
+          "end" : 49180,
+          "start" : 48859,
+          "text" : " fixing"
+        },
+        {
+          "end" : 49579,
+          "start" : 49180,
+          "text" : " it,"
+        },
+        {
+          "end" : 49739,
+          "start" : 49579,
+          "text" : " which"
+        },
+        {
+          "end" : 49899,
+          "start" : 49739,
+          "text" : " is"
+        },
+        {
+          "end" : 50379,
+          "start" : 49899,
+          "text" : " exactly"
+        },
+        {
+          "end" : 50859,
+          "start" : 50379,
+          "text" : " right."
+        }
+      ]
+    },
+    {
+      "end" : 53100,
+      "id" : "75A0802C-9FBD-47F5-9F67-1AEFFC0EB50D",
+      "start" : 50859,
+      "text" : "You cannot insure harvest now decrypt later.",
+      "words" : [
+        {
+          "end" : 50940,
+          "start" : 50859,
+          "text" : " You"
+        },
+        {
+          "end" : 51260,
+          "start" : 50940,
+          "text" : " cannot"
+        },
+        {
+          "end" : 51660,
+          "start" : 51260,
+          "text" : " insure"
+        },
+        {
+          "end" : 51899,
+          "start" : 51660,
+          "text" : " harvest"
+        },
+        {
+          "end" : 52219,
+          "start" : 52059,
+          "text" : " now"
+        },
+        {
+          "end" : 52620,
+          "start" : 52300,
+          "text" : " decrypt"
+        },
+        {
+          "end" : 53100,
+          "start" : 52699,
+          "text" : " later."
+        }
+      ]
+    },
+    {
+      "end" : 54620,
+      "id" : "7A002E6D-8330-45FA-9854-FDB3FF98363B",
+      "start" : 53100,
+      "text" : "The data is already stolen.",
+      "words" : [
+        {
+          "end" : 53260,
+          "start" : 53100,
+          "text" : " The"
+        },
+        {
+          "end" : 53500,
+          "start" : 53260,
+          "text" : " data"
+        },
+        {
+          "end" : 53739,
+          "start" : 53500,
+          "text" : " is"
+        },
+        {
+          "end" : 54140,
+          "start" : 53739,
+          "text" : " already"
+        },
+        {
+          "end" : 54620,
+          "start" : 54140,
+          "text" : " stolen."
+        }
+      ]
+    },
+    {
+      "end" : 58620,
+      "id" : "2F0A4C89-4E44-4C73-B8D9-915DDC921591",
+      "start" : 54620,
+      "text" : "It is sitting on somebody's disk right now, encrypted, waiting.",
+      "words" : [
+        {
+          "end" : 54780,
+          "start" : 54620,
+          "text" : " It"
+        },
+        {
+          "end" : 54860,
+          "start" : 54780,
+          "text" : " is"
+        },
+        {
+          "end" : 55100,
+          "start" : 54860,
+          "text" : " sitting"
+        },
+        {
+          "end" : 55260,
+          "start" : 55100,
+          "text" : " on"
+        },
+        {
+          "end" : 55500,
+          "start" : 55260,
+          "text" : " somebody"
+        },
+        {
+          "end" : 55579,
+          "start" : 55500,
+          "text" : "'s"
+        },
+        {
+          "end" : 55980,
+          "start" : 55579,
+          "text" : " disk"
+        },
+        {
+          "end" : 56140,
+          "start" : 55980,
+          "text" : " right"
+        },
+        {
+          "end" : 56460,
+          "start" : 56140,
+          "text" : " now,"
+        },
+        {
+          "end" : 57260,
+          "start" : 56460,
+          "text" : " encrypted,"
+        },
+        {
+          "end" : 58620,
+          "start" : 57260,
+          "text" : " waiting."
+        }
+      ]
+    }
+  ],
+  "text" : "Now, the same week, something else, a paper, no press release, no front page, no journalist, it cuts the number of qubits you would need to break real encryption by roughly twenty times.\nThat isn't a supply story, it's arithmetic, and the arithmetic is already true.\nEvolution moves from 0.\n3 to 0.\n34.\nThe headline contributed one hundredth of that, the paper contributed the rest.\nWatch what it does.\nCrossing that line reprices everything.\nInsurance on this risk goes from just over a million pounds to 1.\n7 million.\nCaging it becomes literally impossible.\nNo cage tight enough exists to bring it inside the risk appetite.\nAnd fixing it, unchanged at £212,000, is suddenly the cheapest survivable move on the board.\nSo the Wargamer opens one signed pull request.\nStop insuring this, start fixing it, which is exactly right.\nYou cannot insure harvest now decrypt later.\nThe data is already stolen.\nIt is sitting on somebody's disk right now, encrypted, waiting."
+}

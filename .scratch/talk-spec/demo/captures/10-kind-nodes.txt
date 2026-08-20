@@ -1,0 +1,6 @@
+# kind-driftwood
+driftwood-control-plane Ready v1.36.1
+# kind-tuppence
+tuppence-control-plane Ready v1.36.1
+# kind-ludlow
+ludlow-control-plane Ready v1.36.1

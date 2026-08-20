@@ -1,0 +1,12 @@
+usage: fair.py [-h] {summary,compare,selfcheck} ...
+
+Deterministic FAIR risk engine.
+
+positional arguments:
+  {summary,compare,selfcheck}
+    summary             ALE/VaR95/TVaR/carried for one control state
+    compare             what flipping Warn->Deny buys
+    selfcheck           run the engine's assertions
+
+options:
+  -h, --help            show this help message and exit

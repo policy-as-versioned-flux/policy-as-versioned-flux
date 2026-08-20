@@ -1,0 +1,2 @@
+NAMESPACE     NAME        AGE   READY   STATUS
+flux-system   driftwood   19d   True    Applied revision: sha1:2fc21df8858b2ee98f07e3c89e32189a919557f4

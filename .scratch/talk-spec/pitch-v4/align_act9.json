@@ -1,0 +1,907 @@
+{
+  "segments" : [
+    {
+      "end" : 8240,
+      "id" : "310A09DC-4DAC-4A31-92F2-3B8794AAACFC",
+      "start" : 320,
+      "text" : "Every actor that touches this, a commit, a workload, a human, a device, is cryptographically attestable to one root.",
+      "words" : [
+        {
+          "end" : 640,
+          "start" : 320,
+          "text" : " Every"
+        },
+        {
+          "end" : 1120,
+          "start" : 640,
+          "text" : " actor"
+        },
+        {
+          "end" : 1360,
+          "start" : 1120,
+          "text" : " that"
+        },
+        {
+          "end" : 2000,
+          "start" : 1360,
+          "text" : " touches"
+        },
+        {
+          "end" : 2480,
+          "start" : 2000,
+          "text" : " this,"
+        },
+        {
+          "end" : 2640,
+          "start" : 2480,
+          "text" : " a"
+        },
+        {
+          "end" : 3120,
+          "start" : 2640,
+          "text" : " commit,"
+        },
+        {
+          "end" : 3280,
+          "start" : 3120,
+          "text" : " a"
+        },
+        {
+          "end" : 4000,
+          "start" : 3280,
+          "text" : " workload,"
+        },
+        {
+          "end" : 4160,
+          "start" : 4000,
+          "text" : " a"
+        },
+        {
+          "end" : 4560,
+          "start" : 4160,
+          "text" : " human,"
+        },
+        {
+          "end" : 4720,
+          "start" : 4560,
+          "text" : " a"
+        },
+        {
+          "end" : 5280,
+          "start" : 4720,
+          "text" : " device,"
+        },
+        {
+          "end" : 5520,
+          "start" : 5280,
+          "text" : " is"
+        },
+        {
+          "end" : 6320,
+          "start" : 5520,
+          "text" : " cryptographically"
+        },
+        {
+          "end" : 6960,
+          "start" : 6320,
+          "text" : " attestable"
+        },
+        {
+          "end" : 7040,
+          "start" : 6960,
+          "text" : " to"
+        },
+        {
+          "end" : 7120,
+          "start" : 7040,
+          "text" : " one"
+        },
+        {
+          "end" : 8240,
+          "start" : 7280,
+          "text" : " root."
+        }
+      ]
+    },
+    {
+      "end" : 10580,
+      "id" : "841854FC-180F-4BA9-BFC7-59A5CD41C6F0",
+      "start" : 7939,
+      "text" : "not to five different tools that don't talk to each other.",
+      "words" : [
+        {
+          "end" : 8019,
+          "start" : 7939,
+          "text" : " not"
+        },
+        {
+          "end" : 8340,
+          "start" : 8179,
+          "text" : " to"
+        },
+        {
+          "end" : 8660,
+          "start" : 8340,
+          "text" : " five"
+        },
+        {
+          "end" : 8820,
+          "start" : 8660,
+          "text" : " different"
+        },
+        {
+          "end" : 9219,
+          "start" : 8820,
+          "text" : " tools"
+        },
+        {
+          "end" : 9380,
+          "start" : 9219,
+          "text" : " that"
+        },
+        {
+          "end" : 9460,
+          "start" : 9380,
+          "text" : " don"
+        },
+        {
+          "end" : 9620,
+          "start" : 9460,
+          "text" : "'t"
+        },
+        {
+          "end" : 9780,
+          "start" : 9620,
+          "text" : " talk"
+        },
+        {
+          "end" : 9860,
+          "start" : 9780,
+          "text" : " to"
+        },
+        {
+          "end" : 10100,
+          "start" : 9860,
+          "text" : " each"
+        },
+        {
+          "end" : 10580,
+          "start" : 10100,
+          "text" : " other."
+        }
+      ]
+    },
+    {
+      "end" : 12500,
+      "id" : "8D9511CA-A87D-4DB9-BD17-EB726AF411AB",
+      "start" : 10580,
+      "text" : "Sign, publish, verify.",
+      "words" : [
+        {
+          "end" : 11059,
+          "start" : 10580,
+          "text" : " Sign,"
+        },
+        {
+          "end" : 11620,
+          "start" : 11059,
+          "text" : " publish,"
+        },
+        {
+          "end" : 12500,
+          "start" : 11620,
+          "text" : " verify."
+        }
+      ]
+    },
+    {
+      "end" : 16660,
+      "id" : "49466047-63A5-46D0-9D76-4CB7B2555E1E",
+      "start" : 12500,
+      "text" : "It converges on one question which version do you currently satisfy?",
+      "words" : [
+        {
+          "end" : 12660,
+          "start" : 12500,
+          "text" : " It"
+        },
+        {
+          "end" : 13219,
+          "start" : 12660,
+          "text" : " converges"
+        },
+        {
+          "end" : 13379,
+          "start" : 13219,
+          "text" : " on"
+        },
+        {
+          "end" : 13620,
+          "start" : 13379,
+          "text" : " one"
+        },
+        {
+          "end" : 13940,
+          "start" : 13620,
+          "text" : " question"
+        },
+        {
+          "end" : 14340,
+          "start" : 14180,
+          "text" : " which"
+        },
+        {
+          "end" : 14900,
+          "start" : 14500,
+          "text" : " version"
+        },
+        {
+          "end" : 15059,
+          "start" : 14900,
+          "text" : " do"
+        },
+        {
+          "end" : 15139,
+          "start" : 15059,
+          "text" : " you"
+        },
+        {
+          "end" : 15540,
+          "start" : 15139,
+          "text" : " currently"
+        },
+        {
+          "end" : 16660,
+          "start" : 15540,
+          "text" : " satisfy?"
+        }
+      ]
+    },
+    {
+      "end" : 21560,
+      "id" : "CB9BAF97-B355-4687-BE4C-24FC3FD98C59",
+      "start" : 16360,
+      "text" : "That answer decides what you can admit, what cage you run in, who you can reach, and what secrets you can hold.",
+      "words" : [
+        {
+          "end" : 16600,
+          "start" : 16360,
+          "text" : " That"
+        },
+        {
+          "end" : 16920,
+          "start" : 16600,
+          "text" : " answer"
+        },
+        {
+          "end" : 17320,
+          "start" : 16920,
+          "text" : " decides"
+        },
+        {
+          "end" : 17480,
+          "start" : 17320,
+          "text" : " what"
+        },
+        {
+          "end" : 17560,
+          "start" : 17480,
+          "text" : " you"
+        },
+        {
+          "end" : 17720,
+          "start" : 17560,
+          "text" : " can"
+        },
+        {
+          "end" : 18280,
+          "start" : 17720,
+          "text" : " admit,"
+        },
+        {
+          "end" : 18440,
+          "start" : 18280,
+          "text" : " what"
+        },
+        {
+          "end" : 18840,
+          "start" : 18440,
+          "text" : " cage"
+        },
+        {
+          "end" : 19000,
+          "start" : 18840,
+          "text" : " you"
+        },
+        {
+          "end" : 19160,
+          "start" : 19000,
+          "text" : " run"
+        },
+        {
+          "end" : 19480,
+          "start" : 19160,
+          "text" : " in,"
+        },
+        {
+          "end" : 19640,
+          "start" : 19480,
+          "text" : " who"
+        },
+        {
+          "end" : 19720,
+          "start" : 19640,
+          "text" : " you"
+        },
+        {
+          "end" : 19880,
+          "start" : 19720,
+          "text" : " can"
+        },
+        {
+          "end" : 20200,
+          "start" : 19880,
+          "text" : " reach,"
+        },
+        {
+          "end" : 20360,
+          "start" : 20200,
+          "text" : " and"
+        },
+        {
+          "end" : 20520,
+          "start" : 20360,
+          "text" : " what"
+        },
+        {
+          "end" : 20920,
+          "start" : 20520,
+          "text" : " secrets"
+        },
+        {
+          "end" : 21000,
+          "start" : 20920,
+          "text" : " you"
+        },
+        {
+          "end" : 21080,
+          "start" : 21000,
+          "text" : " can"
+        },
+        {
+          "end" : 21560,
+          "start" : 21080,
+          "text" : " hold."
+        }
+      ]
+    },
+    {
+      "end" : 24680,
+      "id" : "E5BB93CE-9E33-44E4-99FA-915C3CAC4FDD",
+      "start" : 21560,
+      "text" : "Verify, don't trust, for the humans and for the machines.",
+      "words" : [
+        {
+          "end" : 22280,
+          "start" : 21560,
+          "text" : " Verify,"
+        },
+        {
+          "end" : 22360,
+          "start" : 22280,
+          "text" : " don"
+        },
+        {
+          "end" : 22520,
+          "start" : 22360,
+          "text" : "'t"
+        },
+        {
+          "end" : 23000,
+          "start" : 22520,
+          "text" : " trust,"
+        },
+        {
+          "end" : 23160,
+          "start" : 23000,
+          "text" : " for"
+        },
+        {
+          "end" : 23240,
+          "start" : 23160,
+          "text" : " the"
+        },
+        {
+          "end" : 23720,
+          "start" : 23240,
+          "text" : " humans"
+        },
+        {
+          "end" : 23880,
+          "start" : 23720,
+          "text" : " and"
+        },
+        {
+          "end" : 23960,
+          "start" : 23880,
+          "text" : " for"
+        },
+        {
+          "end" : 24040,
+          "start" : 23960,
+          "text" : " the"
+        },
+        {
+          "end" : 24680,
+          "start" : 24040,
+          "text" : " machines."
+        }
+      ]
+    },
+    {
+      "end" : 25640,
+      "id" : "65A8B20A-09F6-404D-8810-B8D16045A180",
+      "start" : 24680,
+      "text" : "So here's the whole thing.",
+      "words" : [
+        {
+          "end" : 24760,
+          "start" : 24680,
+          "text" : " So"
+        },
+        {
+          "end" : 24920,
+          "start" : 24840,
+          "text" : " here"
+        },
+        {
+          "end" : 25000,
+          "start" : 24920,
+          "text" : "'s"
+        },
+        {
+          "end" : 25080,
+          "start" : 25000,
+          "text" : " the"
+        },
+        {
+          "end" : 25320,
+          "start" : 25080,
+          "text" : " whole"
+        },
+        {
+          "end" : 25640,
+          "start" : 25320,
+          "text" : " thing."
+        }
+      ]
+    },
+    {
+      "end" : 26440,
+      "id" : "F2238C15-CDC6-4A18-AFD6-E49403FE0DA1",
+      "start" : 25640,
+      "text" : "Checked right now.",
+      "words" : [
+        {
+          "end" : 26040,
+          "start" : 25640,
+          "text" : " Checked"
+        },
+        {
+          "end" : 26120,
+          "start" : 26040,
+          "text" : " right"
+        },
+        {
+          "end" : 26440,
+          "start" : 26120,
+          "text" : " now."
+        }
+      ]
+    },
+    {
+      "end" : 29000,
+      "id" : "51589BC0-17E3-42FB-B24C-2A20A942E10E",
+      "start" : 26440,
+      "text" : "27 of 28 green.",
+      "words" : [
+        {
+          "end" : 27080,
+          "start" : 26440,
+          "text" : " 27"
+        },
+        {
+          "end" : 27320,
+          "start" : 27080,
+          "text" : " of"
+        },
+        {
+          "end" : 27880,
+          "start" : 27320,
+          "text" : " 28"
+        },
+        {
+          "end" : 29000,
+          "start" : 28040,
+          "text" : " green."
+        }
+      ]
+    },
+    {
+      "end" : 33540,
+      "id" : "AEB5673A-4C0F-454E-B6F8-91498C894EC9",
+      "start" : 28740,
+      "text" : "And that one read, I'm showing it to you, every offline proof for it passes 8 for 8.",
+      "words" : [
+        {
+          "end" : 28900,
+          "start" : 28740,
+          "text" : " And"
+        },
+        {
+          "end" : 29060,
+          "start" : 28900,
+          "text" : " that"
+        },
+        {
+          "end" : 29300,
+          "start" : 29060,
+          "text" : " one"
+        },
+        {
+          "end" : 29460,
+          "start" : 29300,
+          "text" : " read"
+        },
+        {
+          "end" : 29540,
+          "start" : 29460,
+          "text" : ","
+        },
+        {
+          "end" : 29780,
+          "start" : 29700,
+          "text" : " I"
+        },
+        {
+          "end" : 29940,
+          "start" : 29780,
+          "text" : "'m"
+        },
+        {
+          "end" : 30100,
+          "start" : 29940,
+          "text" : " showing"
+        },
+        {
+          "end" : 30260,
+          "start" : 30100,
+          "text" : " it"
+        },
+        {
+          "end" : 30340,
+          "start" : 30260,
+          "text" : " to"
+        },
+        {
+          "end" : 30660,
+          "start" : 30340,
+          "text" : " you,"
+        },
+        {
+          "end" : 30740,
+          "start" : 30660,
+          "text" : " every"
+        },
+        {
+          "end" : 31300,
+          "start" : 30820,
+          "text" : " offline"
+        },
+        {
+          "end" : 31619,
+          "start" : 31300,
+          "text" : " proof"
+        },
+        {
+          "end" : 31780,
+          "start" : 31700,
+          "text" : " for"
+        },
+        {
+          "end" : 32099,
+          "start" : 31940,
+          "text" : " it"
+        },
+        {
+          "end" : 32500,
+          "start" : 32099,
+          "text" : " passes"
+        },
+        {
+          "end" : 32900,
+          "start" : 32660,
+          "text" : " 8"
+        },
+        {
+          "end" : 33140,
+          "start" : 32900,
+          "text" : " for"
+        },
+        {
+          "end" : 33540,
+          "start" : 33140,
+          "text" : " 8."
+        }
+      ]
+    },
+    {
+      "end" : 36980,
+      "id" : "78FF3C15-6685-44C5-ABD7-772A8FCE4FAF",
+      "start" : 33540,
+      "text" : "The design is correct, what fails is one live wire.",
+      "words" : [
+        {
+          "end" : 33700,
+          "start" : 33540,
+          "text" : " The"
+        },
+        {
+          "end" : 34180,
+          "start" : 33700,
+          "text" : " design"
+        },
+        {
+          "end" : 34340,
+          "start" : 34180,
+          "text" : " is"
+        },
+        {
+          "end" : 34980,
+          "start" : 34340,
+          "text" : " correct,"
+        },
+        {
+          "end" : 35140,
+          "start" : 34980,
+          "text" : " what"
+        },
+        {
+          "end" : 35620,
+          "start" : 35140,
+          "text" : " fails"
+        },
+        {
+          "end" : 35860,
+          "start" : 35620,
+          "text" : " is"
+        },
+        {
+          "end" : 36100,
+          "start" : 35860,
+          "text" : " one"
+        },
+        {
+          "end" : 36420,
+          "start" : 36100,
+          "text" : " live"
+        },
+        {
+          "end" : 36980,
+          "start" : 36420,
+          "text" : " wire."
+        }
+      ]
+    },
+    {
+      "end" : 43220,
+      "id" : "A8B7E00C-AE74-4E40-B6BE-2C5956DCDB6D",
+      "start" : 36980,
+      "text" : "Tuppence's identity mesh isn't finished, so its posture gate can't yet reach the workload it protects.",
+      "words" : [
+        {
+          "end" : 37540,
+          "start" : 36980,
+          "text" : " Tuppence"
+        },
+        {
+          "end" : 37780,
+          "start" : 37620,
+          "text" : "'s"
+        },
+        {
+          "end" : 38260,
+          "start" : 37780,
+          "text" : " identity"
+        },
+        {
+          "end" : 38580,
+          "start" : 38260,
+          "text" : " mesh"
+        },
+        {
+          "end" : 38820,
+          "start" : 38580,
+          "text" : " isn"
+        },
+        {
+          "end" : 38900,
+          "start" : 38820,
+          "text" : "'t"
+        },
+        {
+          "end" : 39380,
+          "start" : 38900,
+          "text" : " finished,"
+        },
+        {
+          "end" : 39540,
+          "start" : 39380,
+          "text" : " so"
+        },
+        {
+          "end" : 39700,
+          "start" : 39540,
+          "text" : " its"
+        },
+        {
+          "end" : 40180,
+          "start" : 39700,
+          "text" : " posture"
+        },
+        {
+          "end" : 40420,
+          "start" : 40180,
+          "text" : " gate"
+        },
+        {
+          "end" : 40500,
+          "start" : 40420,
+          "text" : " can"
+        },
+        {
+          "end" : 40660,
+          "start" : 40500,
+          "text" : "'t"
+        },
+        {
+          "end" : 40900,
+          "start" : 40660,
+          "text" : " yet"
+        },
+        {
+          "end" : 41140,
+          "start" : 40900,
+          "text" : " reach"
+        },
+        {
+          "end" : 41220,
+          "start" : 41140,
+          "text" : " the"
+        },
+        {
+          "end" : 41780,
+          "start" : 41220,
+          "text" : " workload"
+        },
+        {
+          "end" : 41940,
+          "start" : 41780,
+          "text" : " it"
+        },
+        {
+          "end" : 43220,
+          "start" : 41940,
+          "text" : " protects."
+        }
+      ]
+    },
+    {
+      "end" : 44980,
+      "id" : "E622E6E7-81F3-4132-8F37-8C428E56E04C",
+      "start" : 42740,
+      "text" : "That red line isn't a flaw in the model.",
+      "words" : [
+        {
+          "end" : 42980,
+          "start" : 42740,
+          "text" : " That"
+        },
+        {
+          "end" : 43220,
+          "start" : 42980,
+          "text" : " red"
+        },
+        {
+          "end" : 43540,
+          "start" : 43220,
+          "text" : " line"
+        },
+        {
+          "end" : 43780,
+          "start" : 43540,
+          "text" : " isn"
+        },
+        {
+          "end" : 43860,
+          "start" : 43780,
+          "text" : "'t"
+        },
+        {
+          "end" : 43940,
+          "start" : 43860,
+          "text" : " a"
+        },
+        {
+          "end" : 44340,
+          "start" : 43940,
+          "text" : " flaw"
+        },
+        {
+          "end" : 44500,
+          "start" : 44340,
+          "text" : " in"
+        },
+        {
+          "end" : 44580,
+          "start" : 44500,
+          "text" : " the"
+        },
+        {
+          "end" : 44980,
+          "start" : 44580,
+          "text" : " model."
+        }
+      ]
+    },
+    {
+      "end" : 47380,
+      "id" : "E9C628AD-C95A-4555-8479-E9C7E1ACAE02",
+      "start" : 44980,
+      "text" : "It's exactly what's left to close.",
+      "words" : [
+        {
+          "end" : 45060,
+          "start" : 44980,
+          "text" : " It"
+        },
+        {
+          "end" : 45220,
+          "start" : 45060,
+          "text" : "'s"
+        },
+        {
+          "end" : 45620,
+          "start" : 45220,
+          "text" : " exactly"
+        },
+        {
+          "end" : 45780,
+          "start" : 45620,
+          "text" : " what"
+        },
+        {
+          "end" : 45940,
+          "start" : 45780,
+          "text" : "'s"
+        },
+        {
+          "end" : 46180,
+          "start" : 45940,
+          "text" : " left"
+        },
+        {
+          "end" : 46420,
+          "start" : 46180,
+          "text" : " to"
+        },
+        {
+          "end" : 47380,
+          "start" : 46420,
+          "text" : " close."
+        }
+      ]
+    }
+  ],
+  "text" : "Every actor that touches this, a commit, a workload, a human, a device, is cryptographically attestable to one root.\nnot to five different tools that don't talk to each other.\nSign, publish, verify.\nIt converges on one question which version do you currently satisfy?\nThat answer decides what you can admit, what cage you run in, who you can reach, and what secrets you can hold.\nVerify, don't trust, for the humans and for the machines.\nSo here's the whole thing.\nChecked right now.\n27 of 28 green.\nAnd that one read, I'm showing it to you, every offline proof for it passes 8 for 8.\nThe design is correct, what fails is one live wire.\nTuppence's identity mesh isn't finished, so its posture gate can't yet reach the workload it protects.\nThat red line isn't a flaw in the model.\nIt's exactly what's left to close."
+}

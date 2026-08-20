@@ -1,0 +1,938 @@
+{
+  "segments" : [
+    {
+      "end" : 1760,
+      "id" : "F40D32FD-0C29-41D0-945A-5BA9F64457B2",
+      "start" : 320,
+      "text" : "One number to open with.",
+      "words" : [
+        {
+          "end" : 720,
+          "start" : 320,
+          "text" : " One"
+        },
+        {
+          "end" : 960,
+          "start" : 720,
+          "text" : " number"
+        },
+        {
+          "end" : 1120,
+          "start" : 960,
+          "text" : " to"
+        },
+        {
+          "end" : 1360,
+          "start" : 1120,
+          "text" : " open"
+        },
+        {
+          "end" : 1760,
+          "start" : 1360,
+          "text" : " with."
+        }
+      ]
+    },
+    {
+      "end" : 12160,
+      "id" : "197018BD-D7DC-4022-8937-2F8A53BDD522",
+      "start" : 1760,
+      "text" : "This is what a real breech costs priced live right now by our own engine, thirty four thousand nine hundred and fifty eight pounds, not a red or green dot.",
+      "words" : [
+        {
+          "end" : 1920,
+          "start" : 1760,
+          "text" : " This"
+        },
+        {
+          "end" : 2160,
+          "start" : 1920,
+          "text" : " is"
+        },
+        {
+          "end" : 2480,
+          "start" : 2160,
+          "text" : " what"
+        },
+        {
+          "end" : 2800,
+          "start" : 2480,
+          "text" : " a"
+        },
+        {
+          "end" : 3120,
+          "start" : 2800,
+          "text" : " real"
+        },
+        {
+          "end" : 3840,
+          "start" : 3120,
+          "text" : " breech"
+        },
+        {
+          "end" : 4560,
+          "start" : 3840,
+          "text" : " costs"
+        },
+        {
+          "end" : 5200,
+          "start" : 4560,
+          "text" : " priced"
+        },
+        {
+          "end" : 5680,
+          "start" : 5200,
+          "text" : " live"
+        },
+        {
+          "end" : 5920,
+          "start" : 5680,
+          "text" : " right"
+        },
+        {
+          "end" : 6080,
+          "start" : 5920,
+          "text" : " now"
+        },
+        {
+          "end" : 6480,
+          "start" : 6320,
+          "text" : " by"
+        },
+        {
+          "end" : 6800,
+          "start" : 6640,
+          "text" : " our"
+        },
+        {
+          "end" : 6960,
+          "start" : 6800,
+          "text" : " own"
+        },
+        {
+          "end" : 7200,
+          "start" : 6960,
+          "text" : " engine"
+        },
+        {
+          "end" : 7280,
+          "start" : 7200,
+          "text" : ","
+        },
+        {
+          "end" : 7680,
+          "start" : 7440,
+          "text" : " thirty"
+        },
+        {
+          "end" : 8000,
+          "start" : 7760,
+          "text" : " four"
+        },
+        {
+          "end" : 8160,
+          "start" : 8000,
+          "text" : " thousand"
+        },
+        {
+          "end" : 8640,
+          "start" : 8400,
+          "text" : " nine"
+        },
+        {
+          "end" : 8800,
+          "start" : 8640,
+          "text" : " hundred"
+        },
+        {
+          "end" : 8960,
+          "start" : 8880,
+          "text" : " and"
+        },
+        {
+          "end" : 9200,
+          "start" : 8960,
+          "text" : " fifty"
+        },
+        {
+          "end" : 9360,
+          "start" : 9280,
+          "text" : " eight"
+        },
+        {
+          "end" : 10000,
+          "start" : 9440,
+          "text" : " pounds,"
+        },
+        {
+          "end" : 10160,
+          "start" : 10000,
+          "text" : " not"
+        },
+        {
+          "end" : 10320,
+          "start" : 10160,
+          "text" : " a"
+        },
+        {
+          "end" : 10560,
+          "start" : 10320,
+          "text" : " red"
+        },
+        {
+          "end" : 10720,
+          "start" : 10560,
+          "text" : " or"
+        },
+        {
+          "end" : 11200,
+          "start" : 10720,
+          "text" : " green"
+        },
+        {
+          "end" : 12160,
+          "start" : 11200,
+          "text" : " dot."
+        }
+      ]
+    },
+    {
+      "end" : 12900,
+      "id" : "81C3DCB1-96A1-45DA-B94A-1C5969C210D3",
+      "start" : 11540,
+      "text" : "A number you can actually act on.",
+      "words" : [
+        {
+          "end" : 11700,
+          "start" : 11540,
+          "text" : " A"
+        },
+        {
+          "end" : 12020,
+          "start" : 11700,
+          "text" : " number"
+        },
+        {
+          "end" : 12100,
+          "start" : 12020,
+          "text" : " you"
+        },
+        {
+          "end" : 12260,
+          "start" : 12100,
+          "text" : " can"
+        },
+        {
+          "end" : 12420,
+          "start" : 12260,
+          "text" : " actually"
+        },
+        {
+          "end" : 12580,
+          "start" : 12420,
+          "text" : " act"
+        },
+        {
+          "end" : 12900,
+          "start" : 12580,
+          "text" : " on."
+        }
+      ]
+    },
+    {
+      "end" : 14500,
+      "id" : "E4714BB6-351B-4069-AF7C-7AB4C7BAC3AD",
+      "start" : 12900,
+      "text" : "Here's the idea, and it's now built.",
+      "words" : [
+        {
+          "end" : 12980,
+          "start" : 12900,
+          "text" : " Here"
+        },
+        {
+          "end" : 13060,
+          "start" : 12980,
+          "text" : "'s"
+        },
+        {
+          "end" : 13140,
+          "start" : 13060,
+          "text" : " the"
+        },
+        {
+          "end" : 13540,
+          "start" : 13140,
+          "text" : " idea,"
+        },
+        {
+          "end" : 13620,
+          "start" : 13540,
+          "text" : " and"
+        },
+        {
+          "end" : 13700,
+          "start" : 13620,
+          "text" : " it"
+        },
+        {
+          "end" : 13860,
+          "start" : 13700,
+          "text" : "'s"
+        },
+        {
+          "end" : 14020,
+          "start" : 13860,
+          "text" : " now"
+        },
+        {
+          "end" : 14500,
+          "start" : 14020,
+          "text" : " built."
+        }
+      ]
+    },
+    {
+      "end" : 17300,
+      "id" : "E8ADF92A-AF30-4298-BE96-1F8E1701CD72",
+      "start" : 14500,
+      "text" : "Governance isn't a checkbox pass or fail.",
+      "words" : [
+        {
+          "end" : 15060,
+          "start" : 14500,
+          "text" : " Governance"
+        },
+        {
+          "end" : 15300,
+          "start" : 15060,
+          "text" : " isn"
+        },
+        {
+          "end" : 15380,
+          "start" : 15300,
+          "text" : "'t"
+        },
+        {
+          "end" : 15540,
+          "start" : 15380,
+          "text" : " a"
+        },
+        {
+          "end" : 16020,
+          "start" : 15540,
+          "text" : " checkbox"
+        },
+        {
+          "end" : 16580,
+          "start" : 16180,
+          "text" : " pass"
+        },
+        {
+          "end" : 16740,
+          "start" : 16580,
+          "text" : " or"
+        },
+        {
+          "end" : 17300,
+          "start" : 16740,
+          "text" : " fail."
+        }
+      ]
+    },
+    {
+      "end" : 21540,
+      "id" : "87F8CFA3-5F10-4F51-8EE7-23906A9738C1",
+      "start" : 17300,
+      "text" : "It's a priced, versioned, continuously retuned judgment.",
+      "words" : [
+        {
+          "end" : 17380,
+          "start" : 17300,
+          "text" : " It"
+        },
+        {
+          "end" : 17460,
+          "start" : 17380,
+          "text" : "'s"
+        },
+        {
+          "end" : 17620,
+          "start" : 17460,
+          "text" : " a"
+        },
+        {
+          "end" : 18260,
+          "start" : 17620,
+          "text" : " priced,"
+        },
+        {
+          "end" : 18900,
+          "start" : 18260,
+          "text" : " versioned,"
+        },
+        {
+          "end" : 19540,
+          "start" : 18900,
+          "text" : " continuously"
+        },
+        {
+          "end" : 20180,
+          "start" : 19540,
+          "text" : " retuned"
+        },
+        {
+          "end" : 21540,
+          "start" : 20180,
+          "text" : " judgment."
+        }
+      ]
+    },
+    {
+      "end" : 28820,
+      "id" : "A0197D09-93FB-4EF0-AD08-5B2111C9513C",
+      "start" : 20740,
+      "text" : "The whole chain from risk appetite to enforcement to evidence treated like a software dependency, signed, pinned, updated by reviewed pull request.",
+      "words" : [
+        {
+          "end" : 20980,
+          "start" : 20740,
+          "text" : " The"
+        },
+        {
+          "end" : 21140,
+          "start" : 20980,
+          "text" : " whole"
+        },
+        {
+          "end" : 21460,
+          "start" : 21140,
+          "text" : " chain"
+        },
+        {
+          "end" : 21700,
+          "start" : 21540,
+          "text" : " from"
+        },
+        {
+          "end" : 22020,
+          "start" : 21700,
+          "text" : " risk"
+        },
+        {
+          "end" : 22500,
+          "start" : 22020,
+          "text" : " appetite"
+        },
+        {
+          "end" : 22660,
+          "start" : 22500,
+          "text" : " to"
+        },
+        {
+          "end" : 23140,
+          "start" : 22660,
+          "text" : " enforcement"
+        },
+        {
+          "end" : 23300,
+          "start" : 23140,
+          "text" : " to"
+        },
+        {
+          "end" : 23700,
+          "start" : 23300,
+          "text" : " evidence"
+        },
+        {
+          "end" : 24180,
+          "start" : 23860,
+          "text" : " treated"
+        },
+        {
+          "end" : 24340,
+          "start" : 24180,
+          "text" : " like"
+        },
+        {
+          "end" : 24420,
+          "start" : 24340,
+          "text" : " a"
+        },
+        {
+          "end" : 24820,
+          "start" : 24420,
+          "text" : " software"
+        },
+        {
+          "end" : 25540,
+          "start" : 24820,
+          "text" : " dependency,"
+        },
+        {
+          "end" : 26020,
+          "start" : 25540,
+          "text" : " signed,"
+        },
+        {
+          "end" : 26660,
+          "start" : 26020,
+          "text" : " pinned,"
+        },
+        {
+          "end" : 27220,
+          "start" : 26660,
+          "text" : " updated"
+        },
+        {
+          "end" : 27380,
+          "start" : 27220,
+          "text" : " by"
+        },
+        {
+          "end" : 27860,
+          "start" : 27380,
+          "text" : " reviewed"
+        },
+        {
+          "end" : 28100,
+          "start" : 27860,
+          "text" : " pull"
+        },
+        {
+          "end" : 28820,
+          "start" : 28100,
+          "text" : " request."
+        }
+      ]
+    },
+    {
+      "end" : 32020,
+      "id" : "5B63B263-539E-436D-BB1E-893C801E29E5",
+      "start" : 28820,
+      "text" : "Every other team is still arguing about frameworks.",
+      "words" : [
+        {
+          "end" : 29060,
+          "start" : 28820,
+          "text" : " Every"
+        },
+        {
+          "end" : 29300,
+          "start" : 29060,
+          "text" : " other"
+        },
+        {
+          "end" : 29540,
+          "start" : 29300,
+          "text" : " team"
+        },
+        {
+          "end" : 29700,
+          "start" : 29540,
+          "text" : " is"
+        },
+        {
+          "end" : 29939,
+          "start" : 29700,
+          "text" : " still"
+        },
+        {
+          "end" : 30340,
+          "start" : 29939,
+          "text" : " arguing"
+        },
+        {
+          "end" : 30580,
+          "start" : 30340,
+          "text" : " about"
+        },
+        {
+          "end" : 32020,
+          "start" : 30580,
+          "text" : " frameworks."
+        }
+      ]
+    },
+    {
+      "end" : 36220,
+      "id" : "28680A47-AA05-4175-9B1C-8758B94D8AB4",
+      "start" : 31340,
+      "text" : "We just built the thing running and honest about what isn't, and I mean built, not Slidware.",
+      "words" : [
+        {
+          "end" : 31580,
+          "start" : 31340,
+          "text" : " We"
+        },
+        {
+          "end" : 31740,
+          "start" : 31580,
+          "text" : " just"
+        },
+        {
+          "end" : 32060,
+          "start" : 31740,
+          "text" : " built"
+        },
+        {
+          "end" : 32220,
+          "start" : 32060,
+          "text" : " the"
+        },
+        {
+          "end" : 32380,
+          "start" : 32220,
+          "text" : " thing"
+        },
+        {
+          "end" : 32940,
+          "start" : 32619,
+          "text" : " running"
+        },
+        {
+          "end" : 33100,
+          "start" : 32940,
+          "text" : " and"
+        },
+        {
+          "end" : 33420,
+          "start" : 33100,
+          "text" : " honest"
+        },
+        {
+          "end" : 33580,
+          "start" : 33420,
+          "text" : " about"
+        },
+        {
+          "end" : 33740,
+          "start" : 33580,
+          "text" : " what"
+        },
+        {
+          "end" : 33900,
+          "start" : 33740,
+          "text" : " isn"
+        },
+        {
+          "end" : 34220,
+          "start" : 33900,
+          "text" : "'t,"
+        },
+        {
+          "end" : 34380,
+          "start" : 34220,
+          "text" : " and"
+        },
+        {
+          "end" : 34460,
+          "start" : 34380,
+          "text" : " I"
+        },
+        {
+          "end" : 34700,
+          "start" : 34460,
+          "text" : " mean"
+        },
+        {
+          "end" : 35180,
+          "start" : 34700,
+          "text" : " built,"
+        },
+        {
+          "end" : 35340,
+          "start" : 35180,
+          "text" : " not"
+        },
+        {
+          "end" : 36220,
+          "start" : 35340,
+          "text" : " Slidware."
+        }
+      ]
+    },
+    {
+      "end" : 41020,
+      "id" : "8CBB3EFC-9E22-4965-AEBF-6E859072D6A2",
+      "start" : 36220,
+      "text" : "This is the real terminal three Kubernetes clusters live right now.",
+      "words" : [
+        {
+          "end" : 36380,
+          "start" : 36220,
+          "text" : " This"
+        },
+        {
+          "end" : 36460,
+          "start" : 36380,
+          "text" : " is"
+        },
+        {
+          "end" : 36620,
+          "start" : 36460,
+          "text" : " the"
+        },
+        {
+          "end" : 36860,
+          "start" : 36620,
+          "text" : " real"
+        },
+        {
+          "end" : 37340,
+          "start" : 36860,
+          "text" : " terminal"
+        },
+        {
+          "end" : 37580,
+          "start" : 37420,
+          "text" : " three"
+        },
+        {
+          "end" : 38540,
+          "start" : 37740,
+          "text" : " Kubernetes"
+        },
+        {
+          "end" : 39180,
+          "start" : 38540,
+          "text" : " clusters"
+        },
+        {
+          "end" : 39740,
+          "start" : 39180,
+          "text" : " live"
+        },
+        {
+          "end" : 40060,
+          "start" : 39740,
+          "text" : " right"
+        },
+        {
+          "end" : 41020,
+          "start" : 40060,
+          "text" : " now."
+        }
+      ]
+    },
+    {
+      "end" : 54820,
+      "id" : "DBC18AC5-FC5A-4AAD-B584-5F64EDD3CD47",
+      "start" : 40340,
+      "text" : "Driftwood, Ludlow, Tuppence, up nineteen days, each reconciling from a signed Git source on its own with nobody watching, seven hundred and thirty two files, twenty nine independent verify scripts, nothing here stands in for a thing that doesn't work.",
+      "words" : [
+        {
+          "end" : 41059,
+          "start" : 40340,
+          "text" : " Driftwood,"
+        },
+        {
+          "end" : 41699,
+          "start" : 41059,
+          "text" : " Ludlow"
+        },
+        {
+          "end" : 41780,
+          "start" : 41699,
+          "text" : ","
+        },
+        {
+          "end" : 42739,
+          "start" : 41859,
+          "text" : " Tuppence,"
+        },
+        {
+          "end" : 42820,
+          "start" : 42739,
+          "text" : " up"
+        },
+        {
+          "end" : 43539,
+          "start" : 43140,
+          "text" : " nineteen"
+        },
+        {
+          "end" : 43940,
+          "start" : 43539,
+          "text" : " days,"
+        },
+        {
+          "end" : 44260,
+          "start" : 43940,
+          "text" : " each"
+        },
+        {
+          "end" : 44899,
+          "start" : 44260,
+          "text" : " reconciling"
+        },
+        {
+          "end" : 45059,
+          "start" : 44899,
+          "text" : " from"
+        },
+        {
+          "end" : 45140,
+          "start" : 45059,
+          "text" : " a"
+        },
+        {
+          "end" : 45460,
+          "start" : 45140,
+          "text" : " signed"
+        },
+        {
+          "end" : 45699,
+          "start" : 45460,
+          "text" : " Git"
+        },
+        {
+          "end" : 46019,
+          "start" : 45699,
+          "text" : " source"
+        },
+        {
+          "end" : 46180,
+          "start" : 46019,
+          "text" : " on"
+        },
+        {
+          "end" : 46339,
+          "start" : 46180,
+          "text" : " its"
+        },
+        {
+          "end" : 46579,
+          "start" : 46339,
+          "text" : " own"
+        },
+        {
+          "end" : 46980,
+          "start" : 46739,
+          "text" : " with"
+        },
+        {
+          "end" : 47379,
+          "start" : 46980,
+          "text" : " nobody"
+        },
+        {
+          "end" : 48180,
+          "start" : 47379,
+          "text" : " watching,"
+        },
+        {
+          "end" : 48500,
+          "start" : 48180,
+          "text" : " seven"
+        },
+        {
+          "end" : 48660,
+          "start" : 48500,
+          "text" : " hundred"
+        },
+        {
+          "end" : 48820,
+          "start" : 48739,
+          "text" : " and"
+        },
+        {
+          "end" : 49059,
+          "start" : 48820,
+          "text" : " thirty"
+        },
+        {
+          "end" : 49379,
+          "start" : 49140,
+          "text" : " two"
+        },
+        {
+          "end" : 49940,
+          "start" : 49379,
+          "text" : " files,"
+        },
+        {
+          "end" : 50180,
+          "start" : 49940,
+          "text" : " twenty"
+        },
+        {
+          "end" : 50500,
+          "start" : 50260,
+          "text" : " nine"
+        },
+        {
+          "end" : 50980,
+          "start" : 50500,
+          "text" : " independent"
+        },
+        {
+          "end" : 51460,
+          "start" : 50980,
+          "text" : " verify"
+        },
+        {
+          "end" : 51940,
+          "start" : 51460,
+          "text" : " scripts,"
+        },
+        {
+          "end" : 52260,
+          "start" : 51940,
+          "text" : " nothing"
+        },
+        {
+          "end" : 52500,
+          "start" : 52260,
+          "text" : " here"
+        },
+        {
+          "end" : 52899,
+          "start" : 52500,
+          "text" : " stands"
+        },
+        {
+          "end" : 53059,
+          "start" : 52899,
+          "text" : " in"
+        },
+        {
+          "end" : 53300,
+          "start" : 53059,
+          "text" : " for"
+        },
+        {
+          "end" : 53460,
+          "start" : 53300,
+          "text" : " a"
+        },
+        {
+          "end" : 53620,
+          "start" : 53460,
+          "text" : " thing"
+        },
+        {
+          "end" : 53780,
+          "start" : 53620,
+          "text" : " that"
+        },
+        {
+          "end" : 53940,
+          "start" : 53780,
+          "text" : " doesn"
+        },
+        {
+          "end" : 54260,
+          "start" : 53940,
+          "text" : "'t"
+        },
+        {
+          "end" : 54820,
+          "start" : 54260,
+          "text" : " work."
+        }
+      ]
+    }
+  ],
+  "text" : "One number to open with.\nThis is what a real breech costs priced live right now by our own engine, thirty four thousand nine hundred and fifty eight pounds, not a red or green dot.\nA number you can actually act on.\nHere's the idea, and it's now built.\nGovernance isn't a checkbox pass or fail.\nIt's a priced, versioned, continuously retuned judgment.\nThe whole chain from risk appetite to enforcement to evidence treated like a software dependency, signed, pinned, updated by reviewed pull request.\nEvery other team is still arguing about frameworks.\nWe just built the thing running and honest about what isn't, and I mean built, not Slidware.\nThis is the real terminal three Kubernetes clusters live right now.\nDriftwood, Ludlow, Tuppence, up nineteen days, each reconciling from a signed Git source on its own with nobody watching, seven hundred and thirty two files, twenty nine independent verify scripts, nothing here stands in for a thing that doesn't work."
+}

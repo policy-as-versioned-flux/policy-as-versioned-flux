@@ -1,0 +1,20 @@
+        trustDomain: acme.internal
+        # k8s_psat node attestation is the chart default; kept explicit for the talk.
+    spire-server:
+      # spire-controller-manager reconciles ClusterSPIFFEID -> registration entries
+      # (gcInterval ~10s), so posture-label changes drop an entry within ~10s.
+      controllerManager:
+        enabled: true
+      # Short TTLs = snappy revocation for the live "loses reach in minutes" beat.
+      # JWT 5m so an out-of-currency caller loses its OpenBao secret fast (research 16 Q4).
+      caSubject: { country: [UK], organization: [acme], commonName: acme.internal }
+    spire-agent:
+      # Agent socket exposed on-host so Istio's Envoy can pull SVIDs over the
+      # SPIFFE Workload API (SDS). Path must match Istio's caAddress below.
+      socketPath: /run/spire/agent-sockets/spire-agent.sock
+    spiffe-csi-driver:
+      # Mounts the agent socket read-only into meshed pods (the Istio+SPIRE path).
+      enabled: true
+    spiffe-oidc-discovery-provider:
+      # JWKS endpoint OpenBao's jwt auth validates JWT-SVIDs against (research 16 Q4).
+      enabled: true

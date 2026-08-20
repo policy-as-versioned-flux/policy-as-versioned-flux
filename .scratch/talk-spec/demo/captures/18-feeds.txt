@@ -1,0 +1,37 @@
+
+== 1. every feed signature + version verifies offline (v1, v2 x3 feeds) ==
+Signature Verified Successfully
+ok  threat-register/v1 signature verified, feed_version matches
+Signature Verified Successfully
+ok  threat-register/v2 signature verified, feed_version matches
+Signature Verified Successfully
+ok  cve/v1 signature verified, feed_version matches
+Signature Verified Successfully
+ok  cve/v2 signature verified, feed_version matches
+Signature Verified Successfully
+ok  eol/v1 signature verified, feed_version matches
+Signature Verified Successfully
+ok  eol/v2 signature verified, feed_version matches
+
+== 2. a tampered feed fails signature verification ==
+ok  tampered feed correctly rejected
+
+== 3. fair.py consumes all three feeds as pinned deps (unmodified fair.py) ==
+ale(threat-register v1 tuppence) = £222574
+ale(threat-register v2 tuppence) = £326139
+
+== 4. a feed bump (v1 -> v2, a reviewable diff) moves the £ -- no fair.py edit ==
+ok  threat-register £ rose by £103,565 on the v1->v2 tuppence lef bump
+ok  v2's new CVE-2024-8888-istiod prices at £241550 ALE (didn't exist in v1)
+
+== 5. EOL is a time-varying thread: same component, later --as-of => higher £ ==
+ale(istio-1.18, pre-EOL)     = £218337
+ale(istio-1.18, 1yr past)    = £436816
+ale(istio-1.18, 4yr+ past)   = £1087666
+ok  EOL £ ramps monotonically as the component ages past support: £218,337 -> £436,816 -> £1,087,666
+
+== 6. converter selfcheck (every feed entry valid, EOL ramp bounded) ==
+ok  20 feed entries valid (lo<=mode<=hi); EOL ramp monotonic & capped (1yr=2.00x 2yr=3.00x 10yr=5.00x)
+
+PASS: threat-register/CVE/EOL signed+versioned, fair.py consumes them unmodified,
+a feed bump moves the £ via a reviewable diff, EOL prices as a time-varying thread.

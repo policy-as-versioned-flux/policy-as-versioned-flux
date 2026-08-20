@@ -1,0 +1,1052 @@
+{
+  "segments" : [
+    {
+      "end" : 6640,
+      "id" : "0A246D8E-59AC-41F4-A056-0EB613B59543",
+      "start" : 800,
+      "text" : "Now the moment that makes this land, the one I'd show you first, if I only had thirty seconds.",
+      "words" : [
+        {
+          "end" : 1040,
+          "start" : 800,
+          "text" : " Now"
+        },
+        {
+          "end" : 1840,
+          "start" : 1600,
+          "text" : " the"
+        },
+        {
+          "end" : 2240,
+          "start" : 1840,
+          "text" : " moment"
+        },
+        {
+          "end" : 2400,
+          "start" : 2240,
+          "text" : " that"
+        },
+        {
+          "end" : 2640,
+          "start" : 2400,
+          "text" : " makes"
+        },
+        {
+          "end" : 2800,
+          "start" : 2640,
+          "text" : " this"
+        },
+        {
+          "end" : 3360,
+          "start" : 2800,
+          "text" : " land,"
+        },
+        {
+          "end" : 3520,
+          "start" : 3360,
+          "text" : " the"
+        },
+        {
+          "end" : 3680,
+          "start" : 3520,
+          "text" : " one"
+        },
+        {
+          "end" : 3760,
+          "start" : 3680,
+          "text" : " I"
+        },
+        {
+          "end" : 4000,
+          "start" : 3760,
+          "text" : "'d"
+        },
+        {
+          "end" : 4160,
+          "start" : 4000,
+          "text" : " show"
+        },
+        {
+          "end" : 4320,
+          "start" : 4160,
+          "text" : " you"
+        },
+        {
+          "end" : 4720,
+          "start" : 4320,
+          "text" : " first,"
+        },
+        {
+          "end" : 4880,
+          "start" : 4720,
+          "text" : " if"
+        },
+        {
+          "end" : 4960,
+          "start" : 4880,
+          "text" : " I"
+        },
+        {
+          "end" : 5200,
+          "start" : 4960,
+          "text" : " only"
+        },
+        {
+          "end" : 5360,
+          "start" : 5200,
+          "text" : " had"
+        },
+        {
+          "end" : 5760,
+          "start" : 5360,
+          "text" : " thirty"
+        },
+        {
+          "end" : 6640,
+          "start" : 5760,
+          "text" : " seconds."
+        }
+      ]
+    },
+    {
+      "end" : 9920,
+      "id" : "666D7783-9F6E-48B7-AB89-CBB911725121",
+      "start" : 6640,
+      "text" : "Same rule everywhere, encrypt data at rest.",
+      "words" : [
+        {
+          "end" : 6960,
+          "start" : 6640,
+          "text" : " Same"
+        },
+        {
+          "end" : 7360,
+          "start" : 6960,
+          "text" : " rule"
+        },
+        {
+          "end" : 8000,
+          "start" : 7360,
+          "text" : " everywhere,"
+        },
+        {
+          "end" : 8480,
+          "start" : 8000,
+          "text" : " encrypt"
+        },
+        {
+          "end" : 8720,
+          "start" : 8480,
+          "text" : " data"
+        },
+        {
+          "end" : 8960,
+          "start" : 8720,
+          "text" : " at"
+        },
+        {
+          "end" : 9920,
+          "start" : 8960,
+          "text" : " rest."
+        }
+      ]
+    },
+    {
+      "end" : 13520,
+      "id" : "0DB4613E-A268-4B67-A18E-E3B1F5EC8495",
+      "start" : 9519,
+      "text" : "Same real risk number behind it, £21,107.",
+      "words" : [
+        {
+          "end" : 9840,
+          "start" : 9519,
+          "text" : " Same"
+        },
+        {
+          "end" : 10000,
+          "start" : 9840,
+          "text" : " real"
+        },
+        {
+          "end" : 10320,
+          "start" : 10000,
+          "text" : " risk"
+        },
+        {
+          "end" : 10559,
+          "start" : 10320,
+          "text" : " number"
+        },
+        {
+          "end" : 10800,
+          "start" : 10559,
+          "text" : " behind"
+        },
+        {
+          "end" : 11120,
+          "start" : 10800,
+          "text" : " it,"
+        },
+        {
+          "end" : 11519,
+          "start" : 11120,
+          "text" : " £21"
+        },
+        {
+          "end" : 13520,
+          "start" : 11519,
+          "text" : ",107."
+        }
+      ]
+    },
+    {
+      "end" : 15840,
+      "id" : "7D81E168-4891-4991-8285-AAB7A1F176E8",
+      "start" : 13520,
+      "text" : "Computed identically every time.",
+      "words" : [
+        {
+          "end" : 14000,
+          "start" : 13520,
+          "text" : " Computed"
+        },
+        {
+          "end" : 14719,
+          "start" : 14000,
+          "text" : " identically"
+        },
+        {
+          "end" : 15200,
+          "start" : 14879,
+          "text" : " every"
+        },
+        {
+          "end" : 15840,
+          "start" : 15200,
+          "text" : " time."
+        }
+      ]
+    },
+    {
+      "end" : 18480,
+      "id" : "BD08B38E-5D5F-4B29-90FA-3592865A26BF",
+      "start" : 15840,
+      "text" : "Three institutions, one control.",
+      "words" : [
+        {
+          "end" : 16160,
+          "start" : 15840,
+          "text" : " Three"
+        },
+        {
+          "end" : 16960,
+          "start" : 16160,
+          "text" : " institutions,"
+        },
+        {
+          "end" : 17200,
+          "start" : 16960,
+          "text" : " one"
+        },
+        {
+          "end" : 18480,
+          "start" : 17200,
+          "text" : " control."
+        }
+      ]
+    },
+    {
+      "end" : 21060,
+      "id" : "3295F37C-8FF0-49C5-8358-08EC08171770",
+      "start" : 17940,
+      "text" : "Watch what the pounds decide when the tolerance changes underneath it.",
+      "words" : [
+        {
+          "end" : 18180,
+          "start" : 17940,
+          "text" : " Watch"
+        },
+        {
+          "end" : 18340,
+          "start" : 18180,
+          "text" : " what"
+        },
+        {
+          "end" : 18420,
+          "start" : 18340,
+          "text" : " the"
+        },
+        {
+          "end" : 18900,
+          "start" : 18420,
+          "text" : " pounds"
+        },
+        {
+          "end" : 19300,
+          "start" : 18900,
+          "text" : " decide"
+        },
+        {
+          "end" : 19460,
+          "start" : 19300,
+          "text" : " when"
+        },
+        {
+          "end" : 19540,
+          "start" : 19460,
+          "text" : " the"
+        },
+        {
+          "end" : 20020,
+          "start" : 19540,
+          "text" : " tolerance"
+        },
+        {
+          "end" : 20420,
+          "start" : 20020,
+          "text" : " changes"
+        },
+        {
+          "end" : 20740,
+          "start" : 20420,
+          "text" : " underneath"
+        },
+        {
+          "end" : 21060,
+          "start" : 20740,
+          "text" : " it."
+        }
+      ]
+    },
+    {
+      "end" : 24580,
+      "id" : "D7394717-A266-4152-A89E-5F133519709B",
+      "start" : 21060,
+      "text" : "Driftwoods tolerance is forty thousand pounds, twenty one thousand fits.",
+      "words" : [
+        {
+          "end" : 21700,
+          "start" : 21060,
+          "text" : " Driftwoods"
+        },
+        {
+          "end" : 22020,
+          "start" : 21700,
+          "text" : " tolerance"
+        },
+        {
+          "end" : 22180,
+          "start" : 22020,
+          "text" : " is"
+        },
+        {
+          "end" : 22500,
+          "start" : 22180,
+          "text" : " forty"
+        },
+        {
+          "end" : 22820,
+          "start" : 22500,
+          "text" : " thousand"
+        },
+        {
+          "end" : 23220,
+          "start" : 22820,
+          "text" : " pounds,"
+        },
+        {
+          "end" : 23460,
+          "start" : 23220,
+          "text" : " twenty"
+        },
+        {
+          "end" : 23700,
+          "start" : 23540,
+          "text" : " one"
+        },
+        {
+          "end" : 23860,
+          "start" : 23700,
+          "text" : " thousand"
+        },
+        {
+          "end" : 24580,
+          "start" : 23940,
+          "text" : " fits."
+        }
+      ]
+    },
+    {
+      "end" : 25780,
+      "id" : "03F7AAB1-5C6A-49F7-A3F9-89FF625C1F2B",
+      "start" : 24580,
+      "text" : "So the control audits",
+      "words" : [
+        {
+          "end" : 24740,
+          "start" : 24580,
+          "text" : " So"
+        },
+        {
+          "end" : 24820,
+          "start" : 24740,
+          "text" : " the"
+        },
+        {
+          "end" : 25220,
+          "start" : 24820,
+          "text" : " control"
+        },
+        {
+          "end" : 25780,
+          "start" : 25220,
+          "text" : " audits"
+        }
+      ]
+    },
+    {
+      "end" : 30180,
+      "id" : "FCE7EC9A-FEFF-41F6-8CAD-9FBCE9B725AB",
+      "start" : 25860,
+      "text" : "Ludlow holding decades of confidential health data has a 5,000 pound tolerance.",
+      "words" : [
+        {
+          "end" : 26420,
+          "start" : 25860,
+          "text" : " Ludlow"
+        },
+        {
+          "end" : 26740,
+          "start" : 26500,
+          "text" : " holding"
+        },
+        {
+          "end" : 27060,
+          "start" : 26740,
+          "text" : " decades"
+        },
+        {
+          "end" : 27220,
+          "start" : 27060,
+          "text" : " of"
+        },
+        {
+          "end" : 27780,
+          "start" : 27220,
+          "text" : " confidential"
+        },
+        {
+          "end" : 28100,
+          "start" : 27780,
+          "text" : " health"
+        },
+        {
+          "end" : 28340,
+          "start" : 28100,
+          "text" : " data"
+        },
+        {
+          "end" : 28660,
+          "start" : 28500,
+          "text" : " has"
+        },
+        {
+          "end" : 28820,
+          "start" : 28660,
+          "text" : " a"
+        },
+        {
+          "end" : 28900,
+          "start" : 28820,
+          "text" : " 5"
+        },
+        {
+          "end" : 29300,
+          "start" : 29060,
+          "text" : ",000"
+        },
+        {
+          "end" : 29620,
+          "start" : 29380,
+          "text" : " pound"
+        },
+        {
+          "end" : 30180,
+          "start" : 29620,
+          "text" : " tolerance."
+        }
+      ]
+    },
+    {
+      "end" : 33780,
+      "id" : "C6D31E08-2DEB-49C2-A395-4161D4883A1F",
+      "start" : 30180,
+      "text" : "The same 21,000 blows straight through it, so the control denies.",
+      "words" : [
+        {
+          "end" : 30260,
+          "start" : 30180,
+          "text" : " The"
+        },
+        {
+          "end" : 30500,
+          "start" : 30260,
+          "text" : " same"
+        },
+        {
+          "end" : 30980,
+          "start" : 30500,
+          "text" : " 21"
+        },
+        {
+          "end" : 31300,
+          "start" : 30980,
+          "text" : ",000"
+        },
+        {
+          "end" : 31780,
+          "start" : 31380,
+          "text" : " blows"
+        },
+        {
+          "end" : 32020,
+          "start" : 31780,
+          "text" : " straight"
+        },
+        {
+          "end" : 32180,
+          "start" : 32020,
+          "text" : " through"
+        },
+        {
+          "end" : 32420,
+          "start" : 32180,
+          "text" : " it,"
+        },
+        {
+          "end" : 32580,
+          "start" : 32420,
+          "text" : " so"
+        },
+        {
+          "end" : 32660,
+          "start" : 32580,
+          "text" : " the"
+        },
+        {
+          "end" : 33140,
+          "start" : 32660,
+          "text" : " control"
+        },
+        {
+          "end" : 33780,
+          "start" : 33140,
+          "text" : " denies."
+        }
+      ]
+    },
+    {
+      "end" : 36420,
+      "id" : "A72FB231-4351-4D28-8AB8-DE3450E43F6A",
+      "start" : 33780,
+      "text" : "Tuppence at 15,000 denies two.",
+      "words" : [
+        {
+          "end" : 34340,
+          "start" : 33780,
+          "text" : " Tuppence"
+        },
+        {
+          "end" : 34580,
+          "start" : 34420,
+          "text" : " at"
+        },
+        {
+          "end" : 34900,
+          "start" : 34580,
+          "text" : " 15"
+        },
+        {
+          "end" : 35220,
+          "start" : 34900,
+          "text" : ",000"
+        },
+        {
+          "end" : 35860,
+          "start" : 35380,
+          "text" : " denies"
+        },
+        {
+          "end" : 36420,
+          "start" : 35860,
+          "text" : " two."
+        }
+      ]
+    },
+    {
+      "end" : 37860,
+      "id" : "BD1ECABB-FCD0-49E0-8A2A-8444F5918667",
+      "start" : 36420,
+      "text" : "One rule.",
+      "words" : [
+        {
+          "end" : 36740,
+          "start" : 36420,
+          "text" : " One"
+        },
+        {
+          "end" : 37860,
+          "start" : 36740,
+          "text" : " rule."
+        }
+      ]
+    },
+    {
+      "end" : 41739,
+      "id" : "2804828F-1CCE-4808-9C0E-9A450C6D944B",
+      "start" : 37420,
+      "text" : "One number three verdicts, driven entirely by risk appetite, not by opinion.",
+      "words" : [
+        {
+          "end" : 37579,
+          "start" : 37420,
+          "text" : " One"
+        },
+        {
+          "end" : 37820,
+          "start" : 37660,
+          "text" : " number"
+        },
+        {
+          "end" : 38059,
+          "start" : 37980,
+          "text" : " three"
+        },
+        {
+          "end" : 38780,
+          "start" : 38219,
+          "text" : " verdicts,"
+        },
+        {
+          "end" : 39180,
+          "start" : 38780,
+          "text" : " driven"
+        },
+        {
+          "end" : 39500,
+          "start" : 39180,
+          "text" : " entirely"
+        },
+        {
+          "end" : 39739,
+          "start" : 39500,
+          "text" : " by"
+        },
+        {
+          "end" : 40059,
+          "start" : 39739,
+          "text" : " risk"
+        },
+        {
+          "end" : 40620,
+          "start" : 40059,
+          "text" : " appetite,"
+        },
+        {
+          "end" : 40859,
+          "start" : 40620,
+          "text" : " not"
+        },
+        {
+          "end" : 41019,
+          "start" : 40859,
+          "text" : " by"
+        },
+        {
+          "end" : 41739,
+          "start" : 41019,
+          "text" : " opinion."
+        }
+      ]
+    },
+    {
+      "end" : 47019,
+      "id" : "87DF2CFD-BF45-4B12-95D8-7396102C384E",
+      "start" : 41739,
+      "text" : "And it's never just yes or no, fall behind on patching and your workload still runs caged",
+      "words" : [
+        {
+          "end" : 41899,
+          "start" : 41739,
+          "text" : " And"
+        },
+        {
+          "end" : 41980,
+          "start" : 41899,
+          "text" : " it"
+        },
+        {
+          "end" : 42059,
+          "start" : 41980,
+          "text" : "'s"
+        },
+        {
+          "end" : 42300,
+          "start" : 42059,
+          "text" : " never"
+        },
+        {
+          "end" : 42539,
+          "start" : 42300,
+          "text" : " just"
+        },
+        {
+          "end" : 42699,
+          "start" : 42539,
+          "text" : " yes"
+        },
+        {
+          "end" : 42940,
+          "start" : 42780,
+          "text" : " or"
+        },
+        {
+          "end" : 43420,
+          "start" : 42940,
+          "text" : " no,"
+        },
+        {
+          "end" : 43739,
+          "start" : 43420,
+          "text" : " fall"
+        },
+        {
+          "end" : 44059,
+          "start" : 43739,
+          "text" : " behind"
+        },
+        {
+          "end" : 44219,
+          "start" : 44059,
+          "text" : " on"
+        },
+        {
+          "end" : 44620,
+          "start" : 44219,
+          "text" : " patching"
+        },
+        {
+          "end" : 44860,
+          "start" : 44699,
+          "text" : " and"
+        },
+        {
+          "end" : 45019,
+          "start" : 44860,
+          "text" : " your"
+        },
+        {
+          "end" : 45579,
+          "start" : 45019,
+          "text" : " workload"
+        },
+        {
+          "end" : 45820,
+          "start" : 45579,
+          "text" : " still"
+        },
+        {
+          "end" : 46140,
+          "start" : 45820,
+          "text" : " runs"
+        },
+        {
+          "end" : 47019,
+          "start" : 46300,
+          "text" : " caged"
+        }
+      ]
+    },
+    {
+      "end" : 51220,
+      "id" : "421813FB-0570-49DC-9652-0645AF7101C2",
+      "start" : 47140,
+      "text" : "Fewer capabilities, tighter limits, watched harder, more expensive to operate.",
+      "words" : [
+        {
+          "end" : 47460,
+          "start" : 47140,
+          "text" : " Fewer"
+        },
+        {
+          "end" : 48260,
+          "start" : 47460,
+          "text" : " capabilities,"
+        },
+        {
+          "end" : 48660,
+          "start" : 48260,
+          "text" : " tighter"
+        },
+        {
+          "end" : 49220,
+          "start" : 48660,
+          "text" : " limits,"
+        },
+        {
+          "end" : 49620,
+          "start" : 49220,
+          "text" : " watched"
+        },
+        {
+          "end" : 50020,
+          "start" : 49620,
+          "text" : " harder,"
+        },
+        {
+          "end" : 50260,
+          "start" : 50020,
+          "text" : " more"
+        },
+        {
+          "end" : 50660,
+          "start" : 50260,
+          "text" : " expensive"
+        },
+        {
+          "end" : 50820,
+          "start" : 50660,
+          "text" : " to"
+        },
+        {
+          "end" : 51220,
+          "start" : 50820,
+          "text" : " operate."
+        }
+      ]
+    },
+    {
+      "end" : 52660,
+      "id" : "E57D0DDD-7DC4-43D7-BEF7-64440E865BAA",
+      "start" : 51220,
+      "text" : "That's the real borderline.",
+      "words" : [
+        {
+          "end" : 51300,
+          "start" : 51220,
+          "text" : " That"
+        },
+        {
+          "end" : 51460,
+          "start" : 51300,
+          "text" : "'s"
+        },
+        {
+          "end" : 51620,
+          "start" : 51460,
+          "text" : " the"
+        },
+        {
+          "end" : 51860,
+          "start" : 51620,
+          "text" : " real"
+        },
+        {
+          "end" : 52660,
+          "start" : 51860,
+          "text" : " borderline."
+        }
+      ]
+    },
+    {
+      "end" : 53860,
+      "id" : "0468391C-D746-4B62-AA06-75D8C103C385",
+      "start" : 52660,
+      "text" : "Total cost of risk.",
+      "words" : [
+        {
+          "end" : 52980,
+          "start" : 52660,
+          "text" : " Total"
+        },
+        {
+          "end" : 53220,
+          "start" : 52980,
+          "text" : " cost"
+        },
+        {
+          "end" : 53380,
+          "start" : 53220,
+          "text" : " of"
+        },
+        {
+          "end" : 53860,
+          "start" : 53380,
+          "text" : " risk."
+        }
+      ]
+    },
+    {
+      "end" : 57460,
+      "id" : "EDBED636-4AC9-43CE-812A-E16C75F609A8",
+      "start" : 53860,
+      "text" : "It's the risk you're keeping plus the cost of every control.",
+      "words" : [
+        {
+          "end" : 53940,
+          "start" : 53860,
+          "text" : " It"
+        },
+        {
+          "end" : 54020,
+          "start" : 53940,
+          "text" : "'s"
+        },
+        {
+          "end" : 54100,
+          "start" : 54020,
+          "text" : " the"
+        },
+        {
+          "end" : 54340,
+          "start" : 54100,
+          "text" : " risk"
+        },
+        {
+          "end" : 54420,
+          "start" : 54340,
+          "text" : " you"
+        },
+        {
+          "end" : 54580,
+          "start" : 54420,
+          "text" : "'re"
+        },
+        {
+          "end" : 54820,
+          "start" : 54580,
+          "text" : " keeping"
+        },
+        {
+          "end" : 55140,
+          "start" : 54900,
+          "text" : " plus"
+        },
+        {
+          "end" : 55300,
+          "start" : 55140,
+          "text" : " the"
+        },
+        {
+          "end" : 55620,
+          "start" : 55300,
+          "text" : " cost"
+        },
+        {
+          "end" : 55860,
+          "start" : 55620,
+          "text" : " of"
+        },
+        {
+          "end" : 56180,
+          "start" : 55860,
+          "text" : " every"
+        },
+        {
+          "end" : 57460,
+          "start" : 56180,
+          "text" : " control."
+        }
+      ]
+    },
+    {
+      "end" : 65920,
+      "id" : "98A0E806-4C18-4868-836D-C8B959699DC0",
+      "start" : 58719,
+      "text" : "Right now on this book that's £47,921, staying current is provably the cheaper path.",
+      "words" : [
+        {
+          "end" : 59120,
+          "start" : 58719,
+          "text" : " Right"
+        },
+        {
+          "end" : 59280,
+          "start" : 59120,
+          "text" : " now"
+        },
+        {
+          "end" : 59600,
+          "start" : 59440,
+          "text" : " on"
+        },
+        {
+          "end" : 59680,
+          "start" : 59600,
+          "text" : " this"
+        },
+        {
+          "end" : 59920,
+          "start" : 59680,
+          "text" : " book"
+        },
+        {
+          "end" : 60079,
+          "start" : 60000,
+          "text" : " that"
+        },
+        {
+          "end" : 60239,
+          "start" : 60079,
+          "text" : "'s"
+        },
+        {
+          "end" : 60800,
+          "start" : 60239,
+          "text" : " £47"
+        },
+        {
+          "end" : 62640,
+          "start" : 60800,
+          "text" : ",921,"
+        },
+        {
+          "end" : 63039,
+          "start" : 62640,
+          "text" : " staying"
+        },
+        {
+          "end" : 63440,
+          "start" : 63039,
+          "text" : " current"
+        },
+        {
+          "end" : 63680,
+          "start" : 63440,
+          "text" : " is"
+        },
+        {
+          "end" : 64159,
+          "start" : 63680,
+          "text" : " provably"
+        },
+        {
+          "end" : 64320,
+          "start" : 64159,
+          "text" : " the"
+        },
+        {
+          "end" : 64960,
+          "start" : 64320,
+          "text" : " cheaper"
+        },
+        {
+          "end" : 65920,
+          "start" : 64960,
+          "text" : " path."
+        }
+      ]
+    }
+  ],
+  "text" : "Now the moment that makes this land, the one I'd show you first, if I only had thirty seconds.\nSame rule everywhere, encrypt data at rest.\nSame real risk number behind it, £21,107.\nComputed identically every time.\nThree institutions, one control.\nWatch what the pounds decide when the tolerance changes underneath it.\nDriftwoods tolerance is forty thousand pounds, twenty one thousand fits.\nSo the control audits\nLudlow holding decades of confidential health data has a 5,000 pound tolerance.\nThe same 21,000 blows straight through it, so the control denies.\nTuppence at 15,000 denies two.\nOne rule.\nOne number three verdicts, driven entirely by risk appetite, not by opinion.\nAnd it's never just yes or no, fall behind on patching and your workload still runs caged\nFewer capabilities, tighter limits, watched harder, more expensive to operate.\nThat's the real borderline.\nTotal cost of risk.\nIt's the risk you're keeping plus the cost of every control.\nRight now on this book that's £47,921, staying current is provably the cheaper path."
+}

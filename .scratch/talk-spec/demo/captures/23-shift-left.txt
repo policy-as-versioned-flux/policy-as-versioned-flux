@@ -1,0 +1,36 @@
+== a compliant change passes across its ±1 supported window ==
+fixtures/workload-compliant.yaml: targets 2.0.0, checking supported window ['1.0.0', '2.0.0']
+--- kyverno apply @ v1.0.0 ---
+Applying 1 policy rule(s) to 1 resource(s)...
+
+pass: 0, fail: 0, warn: 0, error: 0, skip: 1
+--- kyverno apply @ v2.0.0 ---
+Applying 1 policy rule(s) to 1 resource(s)...
+
+pass: 1, fail: 0, warn: 0, error: 0, skip: 0
+
+shift-left: fixtures/workload-compliant.yaml is compliant across its supported window ['1.0.0', '2.0.0']
+
+== an unversioned workload is out of scope, passes trivially ==
+fixtures/workload-unversioned.yaml: unversioned (no policy-as-versioned.dev/policy-version label) -- out of scope, pass
+
+== an Audit->Deny flip is caught pre-merge (must fail CI) ==
+fixtures/workload-flip.yaml: targets 2.0.0, checking supported window ['1.0.0', '2.0.0']
+--- kyverno apply @ v1.0.0 ---
+Applying 1 policy rule(s) to 1 resource(s)...
+
+pass: 0, fail: 0, warn: 0, error: 0, skip: 1
+--- kyverno apply @ v2.0.0 ---
+Applying 1 policy rule(s) to 1 resource(s)...
+policy require-nonroot-2-0-0 -> resource default/Pod/checkout-svc failed:
+1 -  pods on policy-version 2.0.0 must set readOnlyRootFilesystem=true on every container
+
+pass: 0, fail: 1, warn: 0, error: 0, skip: 0
+FAIL @ v2.0.0
+
+shift-left: fixtures/workload-flip.yaml would be denied somewhere in its supported window ['1.0.0', '2.0.0']
+(non-zero above is expected -- the flip was caught)
+
+== a version the array doesn't declare is refused, not silently skipped ==
+
+shift-left: all offline proofs passed

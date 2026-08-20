@@ -1,0 +1,2 @@
+**Status:** REOPENED — NOT DONE. Substrate installs but Istio↔SPIRE CA bootstrap is broken live (see below). Blocks ticket 17.
+**Status:** REOPENED — NOT DONE. Built + offline/negative-proven, but the **live positive path is blocked**. Do not close until it passes live. (Live bring-up 2026-07-31.)

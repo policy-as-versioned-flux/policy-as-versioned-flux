@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pitch v4</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0d0f;--fg:#e6e8ea;--blue:#1c64f2;--green:#3fb97f;--red:#e5484d;--amber:#e0a53d;--panel:#151519;--muted:#8a8f98}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;overflow:hidden;width:1920px;height:1080px}
+#deck{position:absolute;inset:0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 130px;text-align:center}
+.slide.active{display:flex}
+.eyebrow{color:var(--blue);text-transform:uppercase;letter-spacing:.18em;font-size:24px;font-weight:700;margin-bottom:18px}
+.slide h1{font-size:60px;font-weight:800;line-height:1.08;margin-bottom:28px;max-width:1560px}
+.slide h1.big{font-size:120px}
+.evbody{width:100%;max-width:1650px;display:flex;flex-direction:column;gap:20px;align-items:center}
+
+/* terminal mock */
+.term{width:100%;max-width:1560px;background:var(--panel);border:1px solid #232329;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:left}
+.tbar{display:flex;align-items:center;gap:9px;padding:13px 18px;background:#1b1b21;border-bottom:1px solid #232329}
+.dot{width:14px;height:14px;border-radius:50%}
+.d1{background:var(--red)}.d2{background:var(--amber)}.d3{background:var(--green)}
+.fname{margin-left:16px;color:var(--muted);font-size:17px;font-family:ui-monospace,Menlo,Monaco,monospace}
+.tbody{padding:22px 28px;font-family:ui-monospace,Menlo,Monaco,monospace;font-size:21px;line-height:1.5;white-space:pre-wrap}
+.tbody.small{font-size:18px;line-height:1.42}
+.ok{color:var(--green)}
+.fail{color:var(--red);font-weight:700}
+.drift{color:var(--amber);font-weight:700}
+.dim{color:var(--muted)}
+
+/* table */
+table.demo{width:100%;max-width:1400px;border-collapse:collapse;font-size:30px}
+table.demo th{color:var(--muted);text-transform:uppercase;font-size:18px;letter-spacing:.1em;padding:14px 20px;border-bottom:2px solid #232329;text-align:left}
+table.demo td{padding:20px 20px;border-bottom:1px solid #232329;text-align:left}
+table.demo tr:last-child td{border-bottom:none}
+.verdict-audit{color:var(--amber);font-weight:800}
+.verdict-deny{color:var(--red);font-weight:800}
+
+/* mockup cards */
+.cardrow{display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+.card{background:var(--panel);border:1px solid #232329;border-radius:16px;padding:34px 40px;min-width:280px}
+.card .num{font-size:56px;font-weight:800;color:var(--blue)}
+.card .lbl{color:var(--muted);font-size:20px;margin-top:8px}
+.ledger{width:100%;max-width:1100px;background:var(--panel);border:1px solid #232329;border-radius:14px;padding:40px 50px;font-family:ui-monospace,Menlo,Monaco,monospace;font-size:36px;display:flex;justify-content:space-between}
+.checklist{text-align:left;max-width:1200px;width:100%}
+.checklist li{font-size:32px;padding:16px 0;border-bottom:1px solid #232329;list-style:none;display:flex;gap:20px;align-items:center}
+.checklist li::before{content:"→";color:var(--blue);font-weight:800}
+.clusterrow{display:flex;gap:40px;justify-content:center}
+.clusterbox{background:var(--panel);border:2px solid #232329;border-radius:16px;padding:30px 36px;min-width:260px}
+.clusterbox .name{font-size:30px;font-weight:800;font-family:ui-monospace,Menlo,Monaco,monospace}
+.clusterbox .badge{margin-top:14px;font-size:26px;color:var(--amber);font-weight:700}
+
+/* mermaid image */
+img.diagram{max-height:800px;max-width:1650px;object-fit:contain}
+
+/* meme */
+.meme{width:100%;max-width:1300px;display:flex;flex-direction:column;gap:0;border-radius:16px;overflow:hidden;border:2px solid #232329}
+.meme .panel{padding:44px 50px;font-size:38px;font-weight:700;text-align:left;display:flex;align-items:center;gap:26px}
+.meme .reject{background:#2a1416;color:var(--red)}
+.meme .prefer{background:#0f2418;color:var(--green)}
+.meme .icon{font-size:52px}
+
+img.fullbleed{width:1920px;height:1080px;object-fit:cover}
+.verdict-ok{color:var(--green);font-weight:800}
+.slide.bleed{padding:0}
+.cap{color:var(--muted);font-size:22px;margin-top:14px;max-width:70ch}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<div class="slide active" data-i="0">
+  <div class="eyebrow">The cost</div>
+  <h1 class="big">£34,958</h1>
+  <div class="cap">driftwood · unversioned image ships cart PII · priced live, right now</div>
+</div>
+
+<div class="slide" data-i="1">
+  <div class="eyebrow">The idea</div>
+  <h1>Governance is a priced,<br>versioned judgement</h1>
+  <div class="cap">Not a checkbox. Signed. Pinned. Updated by reviewed pull request.</div>
+</div>
+
+<div class="slide" data-i="2">
+  <div class="eyebrow">Not slideware</div>
+  <h1>Three real clusters, right now</h1>
+  <div class="evbody">
+    <div class="term">
+      <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ kind get clusters</span></div>
+      <div class="tbody">driftwood
+ludlow
+tuppence</div>
+    </div>
+    <div class="term">
+      <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ kubectl get kustomizations -A</span></div>
+      <div class="tbody">NAMESPACE     NAME        AGE   READY   STATUS
+flux-system   driftwood   19d   <span class="ok">True</span>    Applied revision: sha1:2fc21df8858b2ee...</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-i="3">
+  <div class="eyebrow">The shape of it</div>
+  <h1>One hourglass</h1>
+  <img class="diagram" src="mermaid/m3-hourglass.png">
+</div>
+
+<div class="slide" data-i="4">
+  <div class="eyebrow">How it ships</div>
+  <h1>Policy as a versioned dependency</h1>
+  <div class="evbody">
+    <div class="term">
+      <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ verify-coexistence.sh</span></div>
+      <div class="tbody"><span class="ok">PASS</span>: two signed versions coexist; each judges only what claims it.</div>
+    </div>
+    <div class="term">
+      <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ verify-orphan-guard.sh</span></div>
+      <div class="tbody">an undeclared version (3.0.0) is denied; a declared one (1.0.0) admits
+<span class="ok">PASS</span>: only versions the array declares can run; the allow-list is the array.</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-i="5">
+  <div class="eyebrow">Shift left</div>
+  <h1>Caught before merge</h1>
+  <div class="term">
+    <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ verify-shift-left.sh</span></div>
+    <div class="tbody">--- kyverno apply @ v1.0.0 ---
+pass: 0, fail: 0, warn: 0, error: 0, skip: 1
+
+--- kyverno apply @ v2.0.0 ---
+policy require-nonroot-2-0-0 -> checkout-svc <span class="fail">FAILED</span>:
+  must set readOnlyRootFilesystem=true
+
+<span class="ok">shift-left: all offline proofs passed</span> — caught pre-merge, never reaches a cluster</div>
+  </div>
+</div>
+
+<div class="slide" data-i="6">
+  <div class="eyebrow">The money shot</div>
+  <h1>One control, three institutions</h1>
+  <div class="clusterrow">
+    <div class="clusterbox"><div class="name">driftwood</div><div class="badge">£21,107</div></div>
+    <div class="clusterbox"><div class="name">ludlow</div><div class="badge">£21,107</div></div>
+    <div class="clusterbox"><div class="name">tuppence</div><div class="badge">£21,107</div></div>
+  </div>
+  <div class="cap">encrypt-at-rest · identical control · identical scenario · identical £</div>
+</div>
+
+<div class="slide" data-i="7">
+  <div class="eyebrow">The money shot</div>
+  <h1>Audit. Deny. Deny.</h1>
+  <table class="demo">
+    <tr><th>institution</th><th>tolerance</th><th>risk bought</th><th>verdict</th></tr>
+    <tr><td>driftwood</td><td>£40,000</td><td>£21,107</td><td class="verdict-audit">AUDIT</td></tr>
+    <tr><td>ludlow</td><td>£5,000</td><td>£21,107</td><td class="verdict-deny">DENY</td></tr>
+    <tr><td>tuppence</td><td>£15,000</td><td>£21,107</td><td class="verdict-deny">DENY</td></tr>
+  </table>
+</div>
+
+<div class="slide" data-i="8">
+  <div class="eyebrow">Not binary</div>
+  <h1>Caged, not denied — and it moves</h1>
+  <div class="ledger"><span>residual £27,271 + controls £3,500 + premium £17,150</span><span style="color:var(--blue)">= £47,921</span></div>
+  <div class="cap">Total Cost of Risk · caged control-spend: driftwood £500 → ludlow £6,000 (stricter band cages harder)</div>
+</div>
+
+<div class="slide" data-i="9">
+  <div class="eyebrow">Calibrated, not guessed</div>
+  <h1>Monte Carlo. Back-tested. Recalibrated.</h1>
+  <div class="evbody">
+    <div class="term">
+      <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ fair.py summary</span></div>
+      <div class="tbody">"iterations": 10000,
+"ale": 19558.5, "var95": 30947.9, "tvar": 34086.7, "carried": 34958.4</div>
+    </div>
+    <div class="term">
+      <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ verify-honesty.sh — 1. calibration</span></div>
+      <div class="tbody">Bühlmann Z=0.78 k=1 mu=£63,333
+back-test ludlow: model <span class="fail">£1,025,511</span> vs actual £130,000 (0/5 VaR95 breaches)
+<span class="drift">-> over-prices (actuals run cold) — recalibrate down</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-i="10">
+  <div class="eyebrow">It governs itself</div>
+  <h1>The apparatus prices its own risk</h1>
+  <div class="term">
+    <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ verify-honesty.sh — 4. reflexive</span></div>
+    <div class="tbody">apparatus scored by its OWN engine:
+risk_bought <span class="fail">£1,018,853</span> > £10,000 band -> <span class="drift">Deny (controls mandatory)</span>
+residual-with-controls £5,544 within band -> <span class="ok">PASSES OWN TEST</span></div>
+  </div>
+</div>
+
+<div class="slide" data-i="11">
+  <div class="eyebrow">The AI operating system</div>
+  <h1>This is the part that matters</h1>
+  <img class="diagram" src="mermaid/m-ai-os-loop.png">
+</div>
+
+<div class="slide" data-i="12">
+  <div class="eyebrow">It senses</div>
+  <h1>Five signed feeds, continuously</h1>
+  <div class="term">
+    <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ verify-feeds.sh</span></div>
+    <div class="tbody small">threat-register · CVE · EOL · fines · market — all signed, all verified
+tampered feed: <span class="ok">correctly rejected</span>
+
+EOL prices time itself:
+  istio-1.18 pre-EOL      £218,337
+  istio-1.18 1yr past     £436,816
+  istio-1.18 4yr+ past    <span class="fail">£1,087,666</span>
+
+feed bump v1→v2 moved tuppence's £ by <span class="drift">+£103,565</span> — a reviewable diff, no code edit</div>
+  </div>
+</div>
+
+<div class="slide" data-i="13">
+  <div class="eyebrow">It reasons</div>
+  <h1>War-gaming every control, continuously</h1>
+  <div class="term">
+    <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ verify-wargamer.sh — drift report</span></div>
+    <div class="tbody small">[<span class="drift">DRIFT</span>] enforcement driftwood require-nonroot@2.0.0        Audit    -> Deny
+[ <span class="ok">ok</span> ] enforcement tuppence  require-nonroot@2.0.0        Deny     -> Deny
+[<span class="drift">DRIFT</span>] scenario    tuppence  insider-abuse                transfer -> fix
+[<span class="drift">DRIFT</span>] scenario    tuppence  ransomware-workload          deny     -> fix
+[<span class="drift">DRIFT</span>] scenario    tuppence  pq-harvest-now-decrypt-later transfer -> fix
+[ <span class="ok">ok</span> ] scenario    tuppence  phishing-credential-theft    fix      -> fix
+
+4 drift(s): the war-gamer found disproportionate controls to re-tune</div>
+  </div>
+</div>
+
+<div class="slide" data-i="14">
+  <div class="eyebrow">It knows when to shut up</div>
+  <h1>Four signals in. Two proposals out.</h1>
+  <div class="term">
+    <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ verify-honesty.sh — 3. proposer-bounds</span></div>
+    <div class="tbody small">hold-low-confidence        driftwood/require-nonroot@2.0.0    conf=0.027 rej=0
+  <span class="dim">confidence 0.027 &lt; 0.05 — band-edge, surface for human triage</span>
+suppress-learned-rejection tuppence/insider-abuse               conf=0.500 rej=2
+  <span class="dim">human rejected this 2x — the loop learned, stop re-proposing</span>
+<span class="ok">propose</span>                    tuppence/ransomware-workload         conf=0.500 rej=0
+<span class="ok">propose</span>                    tuppence/pq-harvest-now-decrypt-later conf=0.500 rej=1
+
+bounded 4 drift(s): 1 suppressed, 1 held, <span class="ok">2 proposed(gated,unmerged)</span></div>
+  </div>
+</div>
+
+<div class="slide" data-i="15">
+  <div class="eyebrow">It never acts alone</div>
+  <h1>No merge function exists</h1>
+  <div class="term">
+    <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ verify-wargamer.sh</span></div>
+    <div class="tbody"><span class="ok">ok</span>  the flip is proposed on a branch; main is untouched
+<span class="ok">ok</span>  the PR carries the version cross-check gate: ci-check.py
+<span class="ok">ok</span>  gate runs (kyverno): a compliant-under-Audit workload is caught pre-merge
+
+next (human + CI, <span class="drift">NOT this agent</span>): commit --gitsign, push, open PR —
+the gate + a human reviewer dispose. The war-gamer proposes; it never merges.</div>
+  </div>
+</div>
+
+<div class="slide" data-i="16">
+  <img class="fullbleed" src="wardley/headline.png">
+</div>
+
+<div class="slide" data-i="17">
+  <img class="fullbleed" src="wardley/map-quantum-chain.png">
+</div>
+
+<div class="slide" data-i="18">
+  <img class="fullbleed" src="wardley/map-after-niobium.png">
+</div>
+
+<div class="slide" data-i="19">
+  <img class="fullbleed" src="wardley/map-after-algorithmic.png">
+</div>
+
+<div class="slide" data-i="20">
+  <div class="eyebrow">And the money moves</div>
+  <h1>Stop insuring it. Start fixing it.</h1>
+  <table class="demo">
+    <tr><th>move</th><th>before the crossing</th><th>after the crossing</th></tr>
+    <tr><td>transfer <span style="color:var(--muted)">(currently deployed)</span></td><td>£1,017,450</td><td class="verdict-deny">£1,701,257</td></tr>
+    <tr><td>cage</td><td>£39,933</td><td class="verdict-deny">INFINITE — no tier fits the band</td></tr>
+    <tr><td><strong>fix</strong></td><td>£212,338</td><td class="verdict-ok"><strong>£212,338 — unchanged, now cheapest</strong></td></tr>
+    <tr><td>deny</td><td>£312,338</td><td>£312,338</td></tr>
+  </table>
+  <div class="term" style="max-width:1400px;margin-top:26px">
+    <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ wardley.py wargame --intel v3</span></div>
+    <div class="tbody small">[war-gamer] re-tune pq-harvest-now-decrypt-later (driftwood): <span class="drift">transfer -&gt; fix</span>
+  signed: <span class="ok">true</span>  |  merged: <span class="ok">false</span>  |  auto_merge: <span class="ok">false</span>
+  gate  : shift-left version cross-check (target +/-1 window)</div>
+  </div>
+</div>
+
+<div class="slide" data-i="21">
+  <div class="eyebrow">Provenance</div>
+  <h1>Verify, don't trust</h1>
+  <img class="diagram" src="mermaid/m11-provenance.png">
+</div>
+
+<div class="slide" data-i="22">
+  <div class="eyebrow">The honest red</div>
+  <h1>27 of 28. Checked.</h1>
+  <div class="term">
+    <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ estate/talk/verify-all.sh</span></div>
+    <div class="tbody">PROPORTIONALITY: same control, Audit driftwood vs Deny ludlow  <span class="ok">PASS</span>
+LIVING LOOP: war-gamer opens a signed PR, never merges         <span class="ok">PASS</span>
+identity substrate: SPIRE is Istio's CA, mTLS STRICT           <span class="ok">PASS</span>
+posture-as-identity: posture/vN in the SVID path               <span class="ok">PASS</span>
+posture-gated reach + secrets (tuppence flagship)              <span class="fail">FAIL (exit)</span>
+    last: FAIL: current caller did NOT reach (got 'ERR')
+PROVENANCE: every actor attestable to one root                 <span class="ok">PASS</span>
+
+<span class="dim">pass=27 fail=1 skip-live=0</span></div>
+  </div>
+</div>
+
+<div class="slide" data-i="23">
+  <div class="eyebrow">Not a prototype</div>
+  <h1>Six live organisations</h1>
+  <div class="cardrow">
+    <div class="card"><div class="num">6</div><div class="lbl">live orgs</div></div>
+    <div class="card"><div class="num">732</div><div class="lbl">estate files</div></div>
+    <div class="card"><div class="num">29</div><div class="lbl">verify scripts</div></div>
+    <div class="card"><div class="num">3</div><div class="lbl">live clusters</div></div>
+  </div>
+  <div class="cap">platform · driftwood · tuppence · ludlow · nist · ico</div>
+</div>
+
+<div class="slide" data-i="24">
+  <div class="eyebrow">Why now</div>
+  <h1>Boards are panicking about AI</h1>
+  <div class="meme">
+    <div class="panel reject"><span class="icon">✗</span> "trust the AI agent"</div>
+    <div class="panel prefer"><span class="icon">✓</span> verify the AI agent, cryptographically, every time</div>
+  </div>
+</div>
+
+<div class="slide" data-i="25">
+  <div class="eyebrow">The vision</div>
+  <h1>A line on the balance sheet</h1>
+  <div class="ledger"><span>Technological risk</span><span style="color:var(--blue)">£34,958</span></div>
+  <div class="cap">readable · defensible · the number an underwriter already prices</div>
+</div>
+
+<div class="slide" data-i="26">
+  <div class="eyebrow">What's left</div>
+  <h1>Nothing's finished.<br>All of it's real.</h1>
+  <ul class="checklist">
+    <li>Close the red — finish the identity mesh on tuppence and ludlow</li>
+    <li>Widen the loop — more feeds, more institutions, priced automatically</li>
+    <li>Grow the scenario library past one breach and one control</li>
+  </ul>
+</div>
+
+<div class="slide" data-i="27">
+  <div class="eyebrow">The close</div>
+  <h1 class="big">It's real.</h1>
+  <div class="cap">Proven, not asserted.</div>
+</div>
+
+</div>
+<script>
+function show(n){document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));document.querySelector('.slide[data-i="'+n+'"]').classList.add('active')}
+window.__goto=show;
+document.addEventListener('keydown',e=>{
+  const cur=parseInt(document.querySelector('.slide.active').dataset.i);
+  if(e.key==='ArrowRight') show(Math.min(cur+1,27));
+  if(e.key==='ArrowLeft') show(Math.max(cur-1,0));
+});
+</script>
+</body>
+</html>

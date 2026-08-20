@@ -1,0 +1,16 @@
+total 9592
+drwxr-xr-x@ 4 cns  staff      128 31 Jul 14:46 .
+drwxr-xr-x@ 6 cns  staff      192 31 Jul 16:10 ..
+-rw-r--r--@ 1 cns  staff      958 31 Jul 14:46 CATALOG_VERSION.json
+-rw-r--r--@ 1 cns  staff  4906119 31 Jul 14:46 NIST_SP-800-53_rev5.2.0_catalog.json
+
+==> estate/nist/catalog/CATALOG_VERSION.json <==
+{
+  "publishedVersion": "1.0.0",
+  "comment": "This publishedVersion is the git tag institutions pin (v1.0.0). It is a wrapper version around the upstream NIST release below, not a NIST version number of its own.",
+  "file": "NIST_SP-800-53_rev5.2.0_catalog.json",
+  "source": {
+    "upstream": "usnistgov/oscal-content",
+    "url": "https://raw.githubusercontent.com/usnistgov/oscal-content/main/nis
+==> estate/nist/catalog/NIST_SP-800-53_rev5.2.0_catalog.json <==
+{"catalog":{"uuid":"ea7c7688-79c5-463b-a91b-0650f2d98623","metadata":{"title":"Electronic (OSCAL) Version of NIST SP 800-53 Rev 5.2.0 Controls and SP 800-53A Rev 5.2.0 Assessment Procedures","last-modified":"2026-05-11T16:01:09.00000-00:00","version":"5.2.0","oscal-version":"1.2.2","revisions":[{"title":"Electronic Version of NIST SP 800-53 Rev 5 Controls and SP 800-53A Rev 5 Assessment Procedures

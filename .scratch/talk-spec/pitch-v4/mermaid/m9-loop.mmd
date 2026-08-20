@@ -1,0 +1,6 @@
+flowchart LR
+  feeds["5 SIGNED FEEDS<br/>threat · CVE · EOL · fines · market"] --> wargamer["WAR-GAMER<br/>stress-tests controls"]
+  wargamer -- "drift detected" --> pr["SIGNED PULL REQUEST<br/>propose, never dispose"]
+  pr --> gate["VERSION-GATE<br/>+ human review"]
+  gate -- "approved" --> merge["MERGE"]
+  gate -. "rejected: logged,<br/>bounds learn" .-> wargamer

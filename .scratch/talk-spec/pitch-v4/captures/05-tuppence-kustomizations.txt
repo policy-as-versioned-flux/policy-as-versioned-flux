@@ -1,0 +1,2 @@
+NAMESPACE     NAME       AGE   READY   STATUS
+flux-system   tuppence   19d   True    Applied revision: sha1:5504973b25457619c109422d5973f3372c545d45

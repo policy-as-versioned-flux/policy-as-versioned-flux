@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0d0f;--fg:#e6e8ea;--blue:#1c64f2;--green:#3fb97f;--red:#e5484d;--amber:#e0a53d;--panel:#151519;--muted:#8a8f98}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;width:1920px;height:1080px;overflow:hidden}
+#wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 70px}
+h1{font-size:52px;font-weight:800;margin-bottom:6px;text-align:center}
+.sub{color:var(--muted);font-size:22px;margin-bottom:18px;text-align:center;max-width:80ch}
+svg{background:transparent}
+.axis{stroke:#2a2a31;stroke-width:2}
+.grid{stroke:#1c1c22;stroke-width:1;stroke-dasharray:4 6}
+.axlabel{fill:var(--muted);font-size:19px;font-family:-apple-system,Helvetica,Arial,sans-serif}
+.stagelabel{fill:#5a5f68;font-size:17px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.link{stroke:#3a3a44;stroke-width:2}
+.node circle{stroke-width:3}
+.nlabel{fill:var(--fg);font-size:19px;font-weight:600;font-family:-apple-system,Helvetica,Arial,sans-serif}
+.nlabel.small{font-size:17px;font-weight:500}
+.mv{stroke:var(--amber);stroke-width:3.5;marker-end:url(#arrow)}
+.mv.hot{stroke:var(--red);stroke-width:4.5}
+.ghost{opacity:.35}
+.badge{fill:var(--amber);font-size:17px;font-weight:700}
+.badge.hot{fill:var(--red)}
+</style></head>
+<body><div id="wrap">
+<h1 id="title"></h1>
+<div class="sub" id="sub"></div>
+<svg id="map" width="1720" height="800"></svg>
+</div>
+<script>
+const W=1720,H=800,PADL=190,PADR=60,PADT=40,PADB=90;
+const X0=PADL,X1=W-PADR,Y0=PADT,Y1=H-PADB;
+const ev2x=e=>X0+e*(X1-X0);
+const vis2y=v=>Y1-v*(Y1-Y0);   // visibility 1 = top (user-facing)
+
+function draw(spec){
+  document.getElementById('title').textContent=spec.title;
+  document.getElementById('sub').textContent=spec.subtitle||'';
+  const svg=document.getElementById('map');
+  let s=`<defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="`+(spec.arrowColor||'#e0a53d')+`"/>
+    </marker>
+  </defs>`;
+  // stage bands
+  const stages=[[0,.25,'genesis'],[.25,.5,'custom'],[.5,.75,'product'],[.75,1,'commodity']];
+  stages.forEach(([a,b,name],i)=>{
+    if(i>0) s+=`<line class="grid" x1="${ev2x(a)}" y1="${Y0}" x2="${ev2x(a)}" y2="${Y1}"/>`;
+    s+=`<text class="stagelabel" x="${(ev2x(a)+ev2x(b))/2}" y="${Y1+34}" text-anchor="middle">${name}</text>`;
+  });
+  // highlighted stage boundary (the line the story turns on)
+  if(spec.highlightBoundary!=null){
+    const hx=ev2x(spec.highlightBoundary);
+    s+=`<line x1="${hx}" y1="${Y0}" x2="${hx}" y2="${Y1}" stroke="${spec.boundaryColor||'#e5484d'}" stroke-width="3" stroke-dasharray="9 7" opacity="0.85"/>`;
+    if(spec.boundaryLabel){
+      s+=`<text x="${hx+14}" y="${Y0+26}" fill="${spec.boundaryColor||'#e5484d'}" font-size="19" font-weight="700" font-family="-apple-system,Helvetica,Arial,sans-serif">${spec.boundaryLabel}</text>`;
+    }
+  }
+  // axes
+  s+=`<line class="axis" x1="${X0}" y1="${Y1}" x2="${X1}" y2="${Y1}"/>`;
+  s+=`<line class="axis" x1="${X0}" y1="${Y0}" x2="${X0}" y2="${Y1}"/>`;
+  s+=`<text class="axlabel" x="${X1}" y="${Y1+68}" text-anchor="end">evolution →</text>`;
+  s+=`<text class="axlabel" transform="translate(${X0-150},${(Y0+Y1)/2}) rotate(-90)" text-anchor="middle">value chain — visible to the user ↑</text>`;
+
+  const byId={}; (spec.components||[]).forEach(c=>byId[c.id]=c);
+  // links
+  (spec.links||[]).forEach(([a,b])=>{
+    const A=byId[a],B=byId[b]; if(!A||!B) return;
+    s+=`<line class="link" x1="${ev2x(A.evolution)}" y1="${vis2y(A.visibility)}" x2="${ev2x(B.evolution)}" y2="${vis2y(B.visibility)}"/>`;
+  });
+  // movement arrows
+  (spec.components||[]).forEach(c=>{
+    if(c.projected==null||Math.abs(c.projected-c.evolution)<0.005) return;
+    const y=vis2y(c.visibility);
+    const cls = c.hot ? 'mv hot' : 'mv';
+    s+=`<line class="${cls}" x1="${ev2x(c.evolution)+16}" y1="${y}" x2="${ev2x(c.projected)-10}" y2="${y}"/>`;
+    if(c.ghost!==false){
+      s+=`<circle class="ghost" cx="${ev2x(c.projected)}" cy="${y}" r="11" fill="none" stroke="${c.hot?'#e5484d':'#e0a53d'}" stroke-width="3" stroke-dasharray="4 4"/>`;
+    }
+  });
+  // nodes
+  (spec.components||[]).forEach(c=>{
+    const x=ev2x(c.evolution), y=vis2y(c.visibility);
+    const fill = c.fill || (c.actor==='attacker-capability' ? '#2a1416' : c.actor==='defensive-capability' ? '#0f2418' : '#151519');
+    const stroke = c.stroke || (c.hot ? '#e5484d' : c.actor==='attacker-capability' ? '#e5484d' : c.actor==='defensive-capability' ? '#3fb97f' : '#1c64f2');
+    s+=`<g class="node"><circle cx="${x}" cy="${y}" r="${c.hot?15:11}" fill="${fill}" stroke="${stroke}"/></g>`;
+    // label sits ABOVE the node so horizontal movement arrows never strike through it
+    const anchor=c.labelAnchor||'middle';
+    const dx=c.labelDx||0;
+    const dy=c.labelDy==null?-24:c.labelDy;
+    s+=`<text class="nlabel ${c.small?'small':''}" x="${x+dx}" y="${y+dy}" text-anchor="${anchor}">${c.label}</text>`;
+    if(c.badge){
+      s+=`<text class="badge ${c.hot?'hot':''}" x="${x+dx}" y="${y+dy-22}" text-anchor="${anchor}">${c.badge}</text>`;
+    }
+  });
+  svg.innerHTML=s;
+}
+window.__draw=draw;
+</script>
+</body></html>

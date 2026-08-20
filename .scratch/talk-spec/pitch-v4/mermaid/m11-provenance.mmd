@@ -1,0 +1,9 @@
+flowchart TB
+  commit["COMMIT<br/>gitsign to Rekor"] --> root(("ONE ROOT<br/>SPIFFE"))
+  workload["WORKLOAD<br/>SVID"] --> root
+  human["HUMAN<br/>OIDC + WebAuthn"] --> root
+  device["DEVICE<br/>tpm_devid"] --> root
+  root --> admission["ADMISSION"]
+  root --> cage["RUNTIME CAGE"]
+  root --> reach["REACH"]
+  root --> secret["SECRET"]

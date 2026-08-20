@@ -1,0 +1,13 @@
+{
+  "version": "v1",
+  "name": "driftwood: unversioned image ships cart PII",
+  "mode": "warn",
+  "iterations": 10000,
+  "ale": 19558.549772440045,
+  "var95": 30947.91098602646,
+  "tvar": 34086.67350550215,
+  "economic_capital": 14528.123733062104,
+  "risk_load": 871.6874239837263,
+  "carried": 34958.360929485876,
+  "p_gt_0": 1.0
+}

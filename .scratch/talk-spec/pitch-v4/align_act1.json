@@ -1,0 +1,1182 @@
+{
+  "segments" : [
+    {
+      "end" : 2080,
+      "id" : "226CD6F9-7AB5-4A14-A4C4-4F5F94410AFF",
+      "start" : 320,
+      "text" : "Here's the shape of it.",
+      "words" : [
+        {
+          "end" : 640,
+          "start" : 320,
+          "text" : " Here"
+        },
+        {
+          "end" : 800,
+          "start" : 640,
+          "text" : "'s"
+        },
+        {
+          "end" : 960,
+          "start" : 800,
+          "text" : " the"
+        },
+        {
+          "end" : 1280,
+          "start" : 960,
+          "text" : " shape"
+        },
+        {
+          "end" : 1520,
+          "start" : 1280,
+          "text" : " of"
+        },
+        {
+          "end" : 2080,
+          "start" : 1520,
+          "text" : " it."
+        }
+      ]
+    },
+    {
+      "end" : 13120,
+      "id" : "CF24EA83-E34C-4B9F-B7C8-542A8A010BA6",
+      "start" : 2080,
+      "text" : "One diagram Risk appetite in pounds flows down through principles, controls, enforcement versioned, so a bump is proportionality moving as the world moves.",
+      "words" : [
+        {
+          "end" : 2400,
+          "start" : 2080,
+          "text" : " One"
+        },
+        {
+          "end" : 3200,
+          "start" : 2400,
+          "text" : " diagram"
+        },
+        {
+          "end" : 4080,
+          "start" : 3520,
+          "text" : " Risk"
+        },
+        {
+          "end" : 4560,
+          "start" : 4080,
+          "text" : " appetite"
+        },
+        {
+          "end" : 4720,
+          "start" : 4560,
+          "text" : " in"
+        },
+        {
+          "end" : 5280,
+          "start" : 4720,
+          "text" : " pounds"
+        },
+        {
+          "end" : 5680,
+          "start" : 5280,
+          "text" : " flows"
+        },
+        {
+          "end" : 5920,
+          "start" : 5680,
+          "text" : " down"
+        },
+        {
+          "end" : 6160,
+          "start" : 5920,
+          "text" : " through"
+        },
+        {
+          "end" : 7200,
+          "start" : 6160,
+          "text" : " principles,"
+        },
+        {
+          "end" : 8000,
+          "start" : 7200,
+          "text" : " controls,"
+        },
+        {
+          "end" : 8640,
+          "start" : 8000,
+          "text" : " enforcement"
+        },
+        {
+          "end" : 9440,
+          "start" : 8640,
+          "text" : " versioned,"
+        },
+        {
+          "end" : 9600,
+          "start" : 9440,
+          "text" : " so"
+        },
+        {
+          "end" : 9760,
+          "start" : 9600,
+          "text" : " a"
+        },
+        {
+          "end" : 10080,
+          "start" : 9760,
+          "text" : " bump"
+        },
+        {
+          "end" : 10240,
+          "start" : 10080,
+          "text" : " is"
+        },
+        {
+          "end" : 11040,
+          "start" : 10240,
+          "text" : " proportionality"
+        },
+        {
+          "end" : 11440,
+          "start" : 11040,
+          "text" : " moving"
+        },
+        {
+          "end" : 11600,
+          "start" : 11440,
+          "text" : " as"
+        },
+        {
+          "end" : 11840,
+          "start" : 11600,
+          "text" : " the"
+        },
+        {
+          "end" : 12160,
+          "start" : 11840,
+          "text" : " world"
+        },
+        {
+          "end" : 13120,
+          "start" : 12160,
+          "text" : " moves."
+        }
+      ]
+    },
+    {
+      "end" : 18600,
+      "id" : "5CF77837-805E-43B4-8AE6-4B60FF9FC69A",
+      "start" : 12920,
+      "text" : "Evidence flows back up, minus what each permissive choice still leaves exposed, into one number.",
+      "words" : [
+        {
+          "end" : 13480,
+          "start" : 12920,
+          "text" : " Evidence"
+        },
+        {
+          "end" : 13800,
+          "start" : 13480,
+          "text" : " flows"
+        },
+        {
+          "end" : 14040,
+          "start" : 13800,
+          "text" : " back"
+        },
+        {
+          "end" : 14520,
+          "start" : 14040,
+          "text" : " up,"
+        },
+        {
+          "end" : 14920,
+          "start" : 14520,
+          "text" : " minus"
+        },
+        {
+          "end" : 15160,
+          "start" : 14920,
+          "text" : " what"
+        },
+        {
+          "end" : 15320,
+          "start" : 15160,
+          "text" : " each"
+        },
+        {
+          "end" : 15880,
+          "start" : 15320,
+          "text" : " permissive"
+        },
+        {
+          "end" : 16200,
+          "start" : 15880,
+          "text" : " choice"
+        },
+        {
+          "end" : 16440,
+          "start" : 16200,
+          "text" : " still"
+        },
+        {
+          "end" : 16760,
+          "start" : 16440,
+          "text" : " leaves"
+        },
+        {
+          "end" : 17560,
+          "start" : 16760,
+          "text" : " exposed,"
+        },
+        {
+          "end" : 17800,
+          "start" : 17560,
+          "text" : " into"
+        },
+        {
+          "end" : 18120,
+          "start" : 17800,
+          "text" : " one"
+        },
+        {
+          "end" : 18600,
+          "start" : 18120,
+          "text" : " number."
+        }
+      ]
+    },
+    {
+      "end" : 21880,
+      "id" : "95EA7F0D-B0D6-4479-B73D-1860EB0EFBA6",
+      "start" : 18600,
+      "text" : "The balance sheet, flux, distributes it.",
+      "words" : [
+        {
+          "end" : 18760,
+          "start" : 18600,
+          "text" : " The"
+        },
+        {
+          "end" : 19160,
+          "start" : 18760,
+          "text" : " balance"
+        },
+        {
+          "end" : 19560,
+          "start" : 19160,
+          "text" : " sheet,"
+        },
+        {
+          "end" : 20200,
+          "start" : 19560,
+          "text" : " flux,"
+        },
+        {
+          "end" : 21240,
+          "start" : 20200,
+          "text" : " distributes"
+        },
+        {
+          "end" : 21880,
+          "start" : 21240,
+          "text" : " it."
+        }
+      ]
+    },
+    {
+      "end" : 23600,
+      "id" : "C1EA7DAF-E37A-42BA-92B7-CF35CC70C49D",
+      "start" : 21440,
+      "text" : "Kaiveno enforces it.",
+      "words" : [
+        {
+          "end" : 22160,
+          "start" : 21440,
+          "text" : " Kaiveno"
+        },
+        {
+          "end" : 22960,
+          "start" : 22320,
+          "text" : " enforces"
+        },
+        {
+          "end" : 23600,
+          "start" : 22960,
+          "text" : " it."
+        }
+      ]
+    },
+    {
+      "end" : 27760,
+      "id" : "89B14AD2-33B4-44C0-B0C0-ED7FAC48F219",
+      "start" : 23600,
+      "text" : "Every beat I'm about to show you is one piece of this hourglass.",
+      "words" : [
+        {
+          "end" : 24000,
+          "start" : 23600,
+          "text" : " Every"
+        },
+        {
+          "end" : 24400,
+          "start" : 24000,
+          "text" : " beat"
+        },
+        {
+          "end" : 24560,
+          "start" : 24400,
+          "text" : " I"
+        },
+        {
+          "end" : 24720,
+          "start" : 24560,
+          "text" : "'m"
+        },
+        {
+          "end" : 24880,
+          "start" : 24720,
+          "text" : " about"
+        },
+        {
+          "end" : 25040,
+          "start" : 24880,
+          "text" : " to"
+        },
+        {
+          "end" : 25280,
+          "start" : 25040,
+          "text" : " show"
+        },
+        {
+          "end" : 25440,
+          "start" : 25280,
+          "text" : " you"
+        },
+        {
+          "end" : 25760,
+          "start" : 25440,
+          "text" : " is"
+        },
+        {
+          "end" : 26000,
+          "start" : 25760,
+          "text" : " one"
+        },
+        {
+          "end" : 26240,
+          "start" : 26000,
+          "text" : " piece"
+        },
+        {
+          "end" : 26320,
+          "start" : 26240,
+          "text" : " of"
+        },
+        {
+          "end" : 26480,
+          "start" : 26320,
+          "text" : " this"
+        },
+        {
+          "end" : 27760,
+          "start" : 26480,
+          "text" : " hourglass."
+        }
+      ]
+    },
+    {
+      "end" : 29840,
+      "id" : "64B344C4-6C25-4EED-A121-2D63FB3B3F90",
+      "start" : 27760,
+      "text" : "Start with how it ships.",
+      "words" : [
+        {
+          "end" : 28080,
+          "start" : 27760,
+          "text" : " Start"
+        },
+        {
+          "end" : 28320,
+          "start" : 28080,
+          "text" : " with"
+        },
+        {
+          "end" : 28480,
+          "start" : 28320,
+          "text" : " how"
+        },
+        {
+          "end" : 28640,
+          "start" : 28480,
+          "text" : " it"
+        },
+        {
+          "end" : 29840,
+          "start" : 28640,
+          "text" : " ships."
+        }
+      ]
+    },
+    {
+      "end" : 35780,
+      "id" : "6378278E-0A60-492D-BAA9-632C33383C41",
+      "start" : 29619,
+      "text" : "Policy is just a dependency, a lint packupin, sign and a doc by pull request.",
+      "words" : [
+        {
+          "end" : 30420,
+          "start" : 29619,
+          "text" : " Policy"
+        },
+        {
+          "end" : 30580,
+          "start" : 30420,
+          "text" : " is"
+        },
+        {
+          "end" : 30740,
+          "start" : 30580,
+          "text" : " just"
+        },
+        {
+          "end" : 30900,
+          "start" : 30740,
+          "text" : " a"
+        },
+        {
+          "end" : 31859,
+          "start" : 30900,
+          "text" : " dependency,"
+        },
+        {
+          "end" : 32020,
+          "start" : 31859,
+          "text" : " a"
+        },
+        {
+          "end" : 32259,
+          "start" : 32020,
+          "text" : " lint"
+        },
+        {
+          "end" : 33379,
+          "start" : 32340,
+          "text" : " packupin,"
+        },
+        {
+          "end" : 33780,
+          "start" : 33379,
+          "text" : " sign"
+        },
+        {
+          "end" : 34020,
+          "start" : 33860,
+          "text" : " and"
+        },
+        {
+          "end" : 34180,
+          "start" : 34020,
+          "text" : " a"
+        },
+        {
+          "end" : 34340,
+          "start" : 34180,
+          "text" : " doc"
+        },
+        {
+          "end" : 34500,
+          "start" : 34420,
+          "text" : " by"
+        },
+        {
+          "end" : 34899,
+          "start" : 34579,
+          "text" : " pull"
+        },
+        {
+          "end" : 35780,
+          "start" : 34899,
+          "text" : " request."
+        }
+      ]
+    },
+    {
+      "end" : 38900,
+      "id" : "3549E593-11B8-4A9E-9DE9-3619592F8DED",
+      "start" : 35780,
+      "text" : "Right now, two sign policy versions coexisting",
+      "words" : [
+        {
+          "end" : 36020,
+          "start" : 35780,
+          "text" : " Right"
+        },
+        {
+          "end" : 36260,
+          "start" : 36020,
+          "text" : " now,"
+        },
+        {
+          "end" : 36500,
+          "start" : 36260,
+          "text" : " two"
+        },
+        {
+          "end" : 36820,
+          "start" : 36500,
+          "text" : " sign"
+        },
+        {
+          "end" : 37300,
+          "start" : 36899,
+          "text" : " policy"
+        },
+        {
+          "end" : 37699,
+          "start" : 37300,
+          "text" : " versions"
+        },
+        {
+          "end" : 38900,
+          "start" : 37699,
+          "text" : " coexisting"
+        }
+      ]
+    },
+    {
+      "end" : 44980,
+      "id" : "670F4A23-9F30-4C92-9273-40C0FB92549B",
+      "start" : 38740,
+      "text" : "each judging only the workloads that claim it, with no shared webhook and no last right wins race between them.",
+      "words" : [
+        {
+          "end" : 39060,
+          "start" : 38740,
+          "text" : " each"
+        },
+        {
+          "end" : 39540,
+          "start" : 39060,
+          "text" : " judging"
+        },
+        {
+          "end" : 39780,
+          "start" : 39540,
+          "text" : " only"
+        },
+        {
+          "end" : 39940,
+          "start" : 39780,
+          "text" : " the"
+        },
+        {
+          "end" : 40500,
+          "start" : 39940,
+          "text" : " workloads"
+        },
+        {
+          "end" : 40660,
+          "start" : 40500,
+          "text" : " that"
+        },
+        {
+          "end" : 40900,
+          "start" : 40660,
+          "text" : " claim"
+        },
+        {
+          "end" : 41300,
+          "start" : 40900,
+          "text" : " it,"
+        },
+        {
+          "end" : 41460,
+          "start" : 41300,
+          "text" : " with"
+        },
+        {
+          "end" : 41700,
+          "start" : 41460,
+          "text" : " no"
+        },
+        {
+          "end" : 42020,
+          "start" : 41700,
+          "text" : " shared"
+        },
+        {
+          "end" : 42660,
+          "start" : 42020,
+          "text" : " webhook"
+        },
+        {
+          "end" : 42739,
+          "start" : 42660,
+          "text" : " and"
+        },
+        {
+          "end" : 42900,
+          "start" : 42739,
+          "text" : " no"
+        },
+        {
+          "end" : 42980,
+          "start" : 42900,
+          "text" : " last"
+        },
+        {
+          "end" : 43300,
+          "start" : 43220,
+          "text" : " right"
+        },
+        {
+          "end" : 43780,
+          "start" : 43460,
+          "text" : " wins"
+        },
+        {
+          "end" : 44100,
+          "start" : 43780,
+          "text" : " race"
+        },
+        {
+          "end" : 44420,
+          "start" : 44100,
+          "text" : " between"
+        },
+        {
+          "end" : 44980,
+          "start" : 44420,
+          "text" : " them."
+        }
+      ]
+    },
+    {
+      "end" : 47780,
+      "id" : "D41768E5-A441-4968-BFD1-9462FC762985",
+      "start" : 44980,
+      "text" : "One version array controls the lot.",
+      "words" : [
+        {
+          "end" : 45300,
+          "start" : 44980,
+          "text" : " One"
+        },
+        {
+          "end" : 45780,
+          "start" : 45300,
+          "text" : " version"
+        },
+        {
+          "end" : 46100,
+          "start" : 45780,
+          "text" : " array"
+        },
+        {
+          "end" : 46660,
+          "start" : 46180,
+          "text" : " controls"
+        },
+        {
+          "end" : 46980,
+          "start" : 46660,
+          "text" : " the"
+        },
+        {
+          "end" : 47780,
+          "start" : 46980,
+          "text" : " lot."
+        }
+      ]
+    },
+    {
+      "end" : 53360,
+      "id" : "290C6EFA-45A7-4A12-B421-623EF6F8AFE7",
+      "start" : 47440,
+      "text" : "Try to run a version outside that array and the orphan guard refuses it every time proven, not promised.",
+      "words" : [
+        {
+          "end" : 47760,
+          "start" : 47440,
+          "text" : " Try"
+        },
+        {
+          "end" : 47920,
+          "start" : 47760,
+          "text" : " to"
+        },
+        {
+          "end" : 48080,
+          "start" : 47920,
+          "text" : " run"
+        },
+        {
+          "end" : 48240,
+          "start" : 48080,
+          "text" : " a"
+        },
+        {
+          "end" : 48640,
+          "start" : 48240,
+          "text" : " version"
+        },
+        {
+          "end" : 49040,
+          "start" : 48640,
+          "text" : " outside"
+        },
+        {
+          "end" : 49200,
+          "start" : 49040,
+          "text" : " that"
+        },
+        {
+          "end" : 49520,
+          "start" : 49200,
+          "text" : " array"
+        },
+        {
+          "end" : 49680,
+          "start" : 49600,
+          "text" : " and"
+        },
+        {
+          "end" : 49840,
+          "start" : 49680,
+          "text" : " the"
+        },
+        {
+          "end" : 50240,
+          "start" : 49840,
+          "text" : " orphan"
+        },
+        {
+          "end" : 50480,
+          "start" : 50240,
+          "text" : " guard"
+        },
+        {
+          "end" : 51120,
+          "start" : 50560,
+          "text" : " refuses"
+        },
+        {
+          "end" : 51360,
+          "start" : 51120,
+          "text" : " it"
+        },
+        {
+          "end" : 51680,
+          "start" : 51360,
+          "text" : " every"
+        },
+        {
+          "end" : 51840,
+          "start" : 51680,
+          "text" : " time"
+        },
+        {
+          "end" : 52480,
+          "start" : 52000,
+          "text" : " proven,"
+        },
+        {
+          "end" : 52640,
+          "start" : 52480,
+          "text" : " not"
+        },
+        {
+          "end" : 53360,
+          "start" : 52640,
+          "text" : " promised."
+        }
+      ]
+    },
+    {
+      "end" : 56160,
+      "id" : "58842A14-2C98-47FB-A1C2-FEB40C3E0311",
+      "start" : 53360,
+      "text" : "And the compliant path is the easy path.",
+      "words" : [
+        {
+          "end" : 53440,
+          "start" : 53360,
+          "text" : " And"
+        },
+        {
+          "end" : 53600,
+          "start" : 53440,
+          "text" : " the"
+        },
+        {
+          "end" : 54080,
+          "start" : 53600,
+          "text" : " compliant"
+        },
+        {
+          "end" : 54400,
+          "start" : 54080,
+          "text" : " path"
+        },
+        {
+          "end" : 54560,
+          "start" : 54400,
+          "text" : " is"
+        },
+        {
+          "end" : 54720,
+          "start" : 54560,
+          "text" : " the"
+        },
+        {
+          "end" : 55200,
+          "start" : 54720,
+          "text" : " easy"
+        },
+        {
+          "end" : 56160,
+          "start" : 55200,
+          "text" : " path."
+        }
+      ]
+    },
+    {
+      "end" : 61100,
+      "id" : "6D973C05-6FF3-4365-AD43-54C1A85C7460",
+      "start" : 55660,
+      "text" : "Flip a workload from version one to version two, and suddenly it needs a read-only five system.",
+      "words" : [
+        {
+          "end" : 55980,
+          "start" : 55660,
+          "text" : " Flip"
+        },
+        {
+          "end" : 56140,
+          "start" : 55980,
+          "text" : " a"
+        },
+        {
+          "end" : 56620,
+          "start" : 56140,
+          "text" : " workload"
+        },
+        {
+          "end" : 56780,
+          "start" : 56620,
+          "text" : " from"
+        },
+        {
+          "end" : 57100,
+          "start" : 56780,
+          "text" : " version"
+        },
+        {
+          "end" : 57260,
+          "start" : 57100,
+          "text" : " one"
+        },
+        {
+          "end" : 57500,
+          "start" : 57340,
+          "text" : " to"
+        },
+        {
+          "end" : 57900,
+          "start" : 57500,
+          "text" : " version"
+        },
+        {
+          "end" : 58380,
+          "start" : 57900,
+          "text" : " two,"
+        },
+        {
+          "end" : 58620,
+          "start" : 58380,
+          "text" : " and"
+        },
+        {
+          "end" : 58940,
+          "start" : 58620,
+          "text" : " suddenly"
+        },
+        {
+          "end" : 59180,
+          "start" : 59020,
+          "text" : " it"
+        },
+        {
+          "end" : 59340,
+          "start" : 59180,
+          "text" : " needs"
+        },
+        {
+          "end" : 59500,
+          "start" : 59340,
+          "text" : " a"
+        },
+        {
+          "end" : 59660,
+          "start" : 59500,
+          "text" : " read"
+        },
+        {
+          "end" : 60060,
+          "start" : 59739,
+          "text" : "-only"
+        },
+        {
+          "end" : 60460,
+          "start" : 60060,
+          "text" : " five"
+        },
+        {
+          "end" : 61100,
+          "start" : 60460,
+          "text" : " system."
+        }
+      ]
+    },
+    {
+      "end" : 66060,
+      "id" : "7B31CE4D-60E6-4090-9303-25B4D1A93706",
+      "start" : 61100,
+      "text" : "Our CI catches it offline before MergeWatch version one passes.",
+      "words" : [
+        {
+          "end" : 61420,
+          "start" : 61100,
+          "text" : " Our"
+        },
+        {
+          "end" : 61900,
+          "start" : 61420,
+          "text" : " CI"
+        },
+        {
+          "end" : 62220,
+          "start" : 61900,
+          "text" : " catches"
+        },
+        {
+          "end" : 62380,
+          "start" : 62220,
+          "text" : " it"
+        },
+        {
+          "end" : 62860,
+          "start" : 62380,
+          "text" : " offline"
+        },
+        {
+          "end" : 63020,
+          "start" : 62940,
+          "text" : " before"
+        },
+        {
+          "end" : 63980,
+          "start" : 63180,
+          "text" : " MergeWatch"
+        },
+        {
+          "end" : 64540,
+          "start" : 64140,
+          "text" : " version"
+        },
+        {
+          "end" : 64699,
+          "start" : 64540,
+          "text" : " one"
+        },
+        {
+          "end" : 66060,
+          "start" : 64860,
+          "text" : " passes."
+        }
+      ]
+    },
+    {
+      "end" : 68340,
+      "id" : "C12C3A30-A9A2-4DC2-9FFE-B4742DEFC484",
+      "start" : 65540,
+      "text" : "Version 2 fails exactly where it should.",
+      "words" : [
+        {
+          "end" : 65940,
+          "start" : 65540,
+          "text" : " Version"
+        },
+        {
+          "end" : 66340,
+          "start" : 65940,
+          "text" : " 2"
+        },
+        {
+          "end" : 66820,
+          "start" : 66340,
+          "text" : " fails"
+        },
+        {
+          "end" : 67380,
+          "start" : 66820,
+          "text" : " exactly"
+        },
+        {
+          "end" : 67540,
+          "start" : 67380,
+          "text" : " where"
+        },
+        {
+          "end" : 67780,
+          "start" : 67540,
+          "text" : " it"
+        },
+        {
+          "end" : 68340,
+          "start" : 67780,
+          "text" : " should."
+        }
+      ]
+    },
+    {
+      "end" : 70340,
+      "id" : "9BE1BD84-3C1B-4700-AD43-11598E564548",
+      "start" : 68340,
+      "text" : "That failure never reaches a cluster.",
+      "words" : [
+        {
+          "end" : 68500,
+          "start" : 68340,
+          "text" : " That"
+        },
+        {
+          "end" : 69060,
+          "start" : 68500,
+          "text" : " failure"
+        },
+        {
+          "end" : 69220,
+          "start" : 69060,
+          "text" : " never"
+        },
+        {
+          "end" : 69620,
+          "start" : 69220,
+          "text" : " reaches"
+        },
+        {
+          "end" : 69700,
+          "start" : 69620,
+          "text" : " a"
+        },
+        {
+          "end" : 70340,
+          "start" : 69700,
+          "text" : " cluster."
+        }
+      ]
+    },
+    {
+      "end" : 71780,
+      "id" : "A9D970CB-65CB-4CA4-8092-F74010AB5A96",
+      "start" : 70340,
+      "text" : "It never reaches production.",
+      "words" : [
+        {
+          "end" : 70580,
+          "start" : 70340,
+          "text" : " It"
+        },
+        {
+          "end" : 70740,
+          "start" : 70580,
+          "text" : " never"
+        },
+        {
+          "end" : 71140,
+          "start" : 70740,
+          "text" : " reaches"
+        },
+        {
+          "end" : 71780,
+          "start" : 71140,
+          "text" : " production."
+        }
+      ]
+    },
+    {
+      "end" : 76500,
+      "id" : "0A84CE08-B006-4586-9151-E4FE1C5196CF",
+      "start" : 71780,
+      "text" : "No pager goes off at midnight for something CI already caught at lunchtime.",
+      "words" : [
+        {
+          "end" : 71940,
+          "start" : 71780,
+          "text" : " No"
+        },
+        {
+          "end" : 72500,
+          "start" : 71940,
+          "text" : " pager"
+        },
+        {
+          "end" : 72660,
+          "start" : 72500,
+          "text" : " goes"
+        },
+        {
+          "end" : 72820,
+          "start" : 72660,
+          "text" : " off"
+        },
+        {
+          "end" : 72900,
+          "start" : 72820,
+          "text" : " at"
+        },
+        {
+          "end" : 73380,
+          "start" : 72900,
+          "text" : " midnight"
+        },
+        {
+          "end" : 73540,
+          "start" : 73380,
+          "text" : " for"
+        },
+        {
+          "end" : 73780,
+          "start" : 73540,
+          "text" : " something"
+        },
+        {
+          "end" : 74260,
+          "start" : 73780,
+          "text" : " CI"
+        },
+        {
+          "end" : 74580,
+          "start" : 74340,
+          "text" : " already"
+        },
+        {
+          "end" : 74900,
+          "start" : 74580,
+          "text" : " caught"
+        },
+        {
+          "end" : 74980,
+          "start" : 74900,
+          "text" : " at"
+        },
+        {
+          "end" : 76500,
+          "start" : 74980,
+          "text" : " lunchtime."
+        }
+      ]
+    }
+  ],
+  "text" : "Here's the shape of it.\nOne diagram Risk appetite in pounds flows down through principles, controls, enforcement versioned, so a bump is proportionality moving as the world moves.\nEvidence flows back up, minus what each permissive choice still leaves exposed, into one number.\nThe balance sheet, flux, distributes it.\nKaiveno enforces it.\nEvery beat I'm about to show you is one piece of this hourglass.\nStart with how it ships.\nPolicy is just a dependency, a lint packupin, sign and a doc by pull request.\nRight now, two sign policy versions coexisting\neach judging only the workloads that claim it, with no shared webhook and no last right wins race between them.\nOne version array controls the lot.\nTry to run a version outside that array and the orphan guard refuses it every time proven, not promised.\nAnd the compliant path is the easy path.\nFlip a workload from version one to version two, and suddenly it needs a read-only five system.\nOur CI catches it offline before MergeWatch version one passes.\nVersion 2 fails exactly where it should.\nThat failure never reaches a cluster.\nIt never reaches production.\nNo pager goes off at midnight for something CI already caught at lunchtime."
+}

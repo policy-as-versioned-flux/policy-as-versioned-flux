@@ -1,0 +1,874 @@
+{
+  "segments" : [
+    {
+      "end" : 2400,
+      "id" : "8D5D9858-CD8C-4566-B863-B0938048A43E",
+      "start" : 320,
+      "text" : "Here's the part that actually matters.",
+      "words" : [
+        {
+          "end" : 480,
+          "start" : 320,
+          "text" : " Here"
+        },
+        {
+          "end" : 560,
+          "start" : 480,
+          "text" : "'s"
+        },
+        {
+          "end" : 800,
+          "start" : 560,
+          "text" : " the"
+        },
+        {
+          "end" : 960,
+          "start" : 800,
+          "text" : " part"
+        },
+        {
+          "end" : 1200,
+          "start" : 960,
+          "text" : " that"
+        },
+        {
+          "end" : 1520,
+          "start" : 1200,
+          "text" : " actually"
+        },
+        {
+          "end" : 2400,
+          "start" : 1520,
+          "text" : " matters."
+        }
+      ]
+    },
+    {
+      "end" : 5760,
+      "id" : "6F49F100-F846-4A59-B8FF-D58DB022F02C",
+      "start" : 2400,
+      "text" : "This isn't a policy tool that sits still until someone opens it.",
+      "words" : [
+        {
+          "end" : 2560,
+          "start" : 2400,
+          "text" : " This"
+        },
+        {
+          "end" : 2720,
+          "start" : 2560,
+          "text" : " isn"
+        },
+        {
+          "end" : 2800,
+          "start" : 2720,
+          "text" : "'t"
+        },
+        {
+          "end" : 2960,
+          "start" : 2800,
+          "text" : " a"
+        },
+        {
+          "end" : 3360,
+          "start" : 2960,
+          "text" : " policy"
+        },
+        {
+          "end" : 3680,
+          "start" : 3360,
+          "text" : " tool"
+        },
+        {
+          "end" : 3840,
+          "start" : 3680,
+          "text" : " that"
+        },
+        {
+          "end" : 4160,
+          "start" : 3840,
+          "text" : " sits"
+        },
+        {
+          "end" : 4400,
+          "start" : 4160,
+          "text" : " still"
+        },
+        {
+          "end" : 4800,
+          "start" : 4400,
+          "text" : " until"
+        },
+        {
+          "end" : 5120,
+          "start" : 4800,
+          "text" : " someone"
+        },
+        {
+          "end" : 5440,
+          "start" : 5120,
+          "text" : " opens"
+        },
+        {
+          "end" : 5760,
+          "start" : 5440,
+          "text" : " it."
+        }
+      ]
+    },
+    {
+      "end" : 7600,
+      "id" : "6423AD34-088B-480F-9B67-4FB4D85207E1",
+      "start" : 5760,
+      "text" : "It's an operating system for governance.",
+      "words" : [
+        {
+          "end" : 5840,
+          "start" : 5760,
+          "text" : " It"
+        },
+        {
+          "end" : 5920,
+          "start" : 5840,
+          "text" : "'s"
+        },
+        {
+          "end" : 6080,
+          "start" : 5920,
+          "text" : " an"
+        },
+        {
+          "end" : 6560,
+          "start" : 6080,
+          "text" : " operating"
+        },
+        {
+          "end" : 6800,
+          "start" : 6560,
+          "text" : " system"
+        },
+        {
+          "end" : 6960,
+          "start" : 6800,
+          "text" : " for"
+        },
+        {
+          "end" : 7600,
+          "start" : 6960,
+          "text" : " governance."
+        }
+      ]
+    },
+    {
+      "end" : 12160,
+      "id" : "6A9D272C-27B9-49BF-8F9A-D065ABCE436F",
+      "start" : 7600,
+      "text" : "It senses the world changing, reasons about whether your controls still fit.",
+      "words" : [
+        {
+          "end" : 7760,
+          "start" : 7600,
+          "text" : " It"
+        },
+        {
+          "end" : 8240,
+          "start" : 7760,
+          "text" : " senses"
+        },
+        {
+          "end" : 8400,
+          "start" : 8240,
+          "text" : " the"
+        },
+        {
+          "end" : 8640,
+          "start" : 8400,
+          "text" : " world"
+        },
+        {
+          "end" : 9280,
+          "start" : 8640,
+          "text" : " changing,"
+        },
+        {
+          "end" : 9760,
+          "start" : 9280,
+          "text" : " reasons"
+        },
+        {
+          "end" : 10000,
+          "start" : 9760,
+          "text" : " about"
+        },
+        {
+          "end" : 10240,
+          "start" : 10000,
+          "text" : " whether"
+        },
+        {
+          "end" : 10400,
+          "start" : 10240,
+          "text" : " your"
+        },
+        {
+          "end" : 10880,
+          "start" : 10400,
+          "text" : " controls"
+        },
+        {
+          "end" : 11200,
+          "start" : 10880,
+          "text" : " still"
+        },
+        {
+          "end" : 12160,
+          "start" : 11200,
+          "text" : " fit."
+        }
+      ]
+    },
+    {
+      "end" : 16540,
+      "id" : "7F0806DD-09AB-4AE4-B614-5159A71DCBCD",
+      "start" : 11740,
+      "text" : "acts by proposing a fix and learns from what you tell it continuously, autonomously.",
+      "words" : [
+        {
+          "end" : 12060,
+          "start" : 11740,
+          "text" : " acts"
+        },
+        {
+          "end" : 12220,
+          "start" : 12060,
+          "text" : " by"
+        },
+        {
+          "end" : 12700,
+          "start" : 12220,
+          "text" : " proposing"
+        },
+        {
+          "end" : 12860,
+          "start" : 12700,
+          "text" : " a"
+        },
+        {
+          "end" : 13180,
+          "start" : 12860,
+          "text" : " fix"
+        },
+        {
+          "end" : 13500,
+          "start" : 13260,
+          "text" : " and"
+        },
+        {
+          "end" : 13820,
+          "start" : 13500,
+          "text" : " learns"
+        },
+        {
+          "end" : 13980,
+          "start" : 13820,
+          "text" : " from"
+        },
+        {
+          "end" : 14140,
+          "start" : 13980,
+          "text" : " what"
+        },
+        {
+          "end" : 14300,
+          "start" : 14140,
+          "text" : " you"
+        },
+        {
+          "end" : 14460,
+          "start" : 14300,
+          "text" : " tell"
+        },
+        {
+          "end" : 14620,
+          "start" : 14460,
+          "text" : " it"
+        },
+        {
+          "end" : 15500,
+          "start" : 14700,
+          "text" : " continuously,"
+        },
+        {
+          "end" : 16540,
+          "start" : 15500,
+          "text" : " autonomously."
+        }
+      ]
+    },
+    {
+      "end" : 20220,
+      "id" : "E458089B-A16F-40DA-875C-1CFA11DAB3F2",
+      "start" : 16540,
+      "text" : "And because it has to be safely, that loop is the whole point.",
+      "words" : [
+        {
+          "end" : 16700,
+          "start" : 16540,
+          "text" : " And"
+        },
+        {
+          "end" : 16940,
+          "start" : 16700,
+          "text" : " because"
+        },
+        {
+          "end" : 17180,
+          "start" : 16940,
+          "text" : " it"
+        },
+        {
+          "end" : 17340,
+          "start" : 17180,
+          "text" : " has"
+        },
+        {
+          "end" : 17580,
+          "start" : 17340,
+          "text" : " to"
+        },
+        {
+          "end" : 17740,
+          "start" : 17580,
+          "text" : " be"
+        },
+        {
+          "end" : 18860,
+          "start" : 17980,
+          "text" : " safely,"
+        },
+        {
+          "end" : 19100,
+          "start" : 18860,
+          "text" : " that"
+        },
+        {
+          "end" : 19420,
+          "start" : 19100,
+          "text" : " loop"
+        },
+        {
+          "end" : 19500,
+          "start" : 19420,
+          "text" : " is"
+        },
+        {
+          "end" : 19660,
+          "start" : 19500,
+          "text" : " the"
+        },
+        {
+          "end" : 19820,
+          "start" : 19660,
+          "text" : " whole"
+        },
+        {
+          "end" : 20220,
+          "start" : 19820,
+          "text" : " point."
+        }
+      ]
+    },
+    {
+      "end" : 21740,
+      "id" : "FFDC4DEB-2D98-489C-A051-E3B784FEB1FF",
+      "start" : 20220,
+      "text" : "It starts with sensing",
+      "words" : [
+        {
+          "end" : 20380,
+          "start" : 20220,
+          "text" : " It"
+        },
+        {
+          "end" : 20700,
+          "start" : 20380,
+          "text" : " starts"
+        },
+        {
+          "end" : 20939,
+          "start" : 20700,
+          "text" : " with"
+        },
+        {
+          "end" : 21740,
+          "start" : 20939,
+          "text" : " sensing"
+        }
+      ]
+    },
+    {
+      "end" : 30779,
+      "id" : "05C1EB26-9782-403F-A44E-B7A4B2DD632B",
+      "start" : 21740,
+      "text" : "Five signed feeds pour in continuously the threat register, CVE disclosures, end of life dates, regulator fines and market intelligence.",
+      "words" : [
+        {
+          "end" : 22060,
+          "start" : 21740,
+          "text" : " Five"
+        },
+        {
+          "end" : 22460,
+          "start" : 22060,
+          "text" : " signed"
+        },
+        {
+          "end" : 22780,
+          "start" : 22460,
+          "text" : " feeds"
+        },
+        {
+          "end" : 23180,
+          "start" : 22780,
+          "text" : " pour"
+        },
+        {
+          "end" : 23420,
+          "start" : 23180,
+          "text" : " in"
+        },
+        {
+          "end" : 24140,
+          "start" : 23420,
+          "text" : " continuously"
+        },
+        {
+          "end" : 24460,
+          "start" : 24300,
+          "text" : " the"
+        },
+        {
+          "end" : 24860,
+          "start" : 24460,
+          "text" : " threat"
+        },
+        {
+          "end" : 25500,
+          "start" : 24860,
+          "text" : " register,"
+        },
+        {
+          "end" : 26140,
+          "start" : 25500,
+          "text" : " CVE"
+        },
+        {
+          "end" : 26780,
+          "start" : 26140,
+          "text" : " disclosures,"
+        },
+        {
+          "end" : 26940,
+          "start" : 26780,
+          "text" : " end"
+        },
+        {
+          "end" : 27180,
+          "start" : 27020,
+          "text" : " of"
+        },
+        {
+          "end" : 27340,
+          "start" : 27180,
+          "text" : " life"
+        },
+        {
+          "end" : 27820,
+          "start" : 27420,
+          "text" : " dates,"
+        },
+        {
+          "end" : 28380,
+          "start" : 27820,
+          "text" : " regulator"
+        },
+        {
+          "end" : 28780,
+          "start" : 28380,
+          "text" : " fines"
+        },
+        {
+          "end" : 29020,
+          "start" : 28860,
+          "text" : " and"
+        },
+        {
+          "end" : 29420,
+          "start" : 29020,
+          "text" : " market"
+        },
+        {
+          "end" : 30779,
+          "start" : 29420,
+          "text" : " intelligence."
+        }
+      ]
+    },
+    {
+      "end" : 33040,
+      "id" : "FD37B68C-0168-47BF-B241-73AA23328A01",
+      "start" : 30320,
+      "text" : "Every feed is signed and verified before it's trusted.",
+      "words" : [
+        {
+          "end" : 30720,
+          "start" : 30320,
+          "text" : " Every"
+        },
+        {
+          "end" : 30960,
+          "start" : 30720,
+          "text" : " feed"
+        },
+        {
+          "end" : 31120,
+          "start" : 30960,
+          "text" : " is"
+        },
+        {
+          "end" : 31440,
+          "start" : 31120,
+          "text" : " signed"
+        },
+        {
+          "end" : 31600,
+          "start" : 31440,
+          "text" : " and"
+        },
+        {
+          "end" : 32080,
+          "start" : 31600,
+          "text" : " verified"
+        },
+        {
+          "end" : 32320,
+          "start" : 32080,
+          "text" : " before"
+        },
+        {
+          "end" : 32400,
+          "start" : 32320,
+          "text" : " it"
+        },
+        {
+          "end" : 32560,
+          "start" : 32400,
+          "text" : "'s"
+        },
+        {
+          "end" : 33040,
+          "start" : 32560,
+          "text" : " trusted."
+        }
+      ]
+    },
+    {
+      "end" : 35360,
+      "id" : "92FE4F9F-892F-4AE1-8C4D-EDE5386C1AD4",
+      "start" : 33040,
+      "text" : "Forge one, and it's rejected outright.",
+      "words" : [
+        {
+          "end" : 33520,
+          "start" : 33040,
+          "text" : " Forge"
+        },
+        {
+          "end" : 33840,
+          "start" : 33520,
+          "text" : " one,"
+        },
+        {
+          "end" : 33920,
+          "start" : 33840,
+          "text" : " and"
+        },
+        {
+          "end" : 34000,
+          "start" : 33920,
+          "text" : " it"
+        },
+        {
+          "end" : 34160,
+          "start" : 34000,
+          "text" : "'s"
+        },
+        {
+          "end" : 34720,
+          "start" : 34160,
+          "text" : " rejected"
+        },
+        {
+          "end" : 35360,
+          "start" : 34720,
+          "text" : " outright."
+        }
+      ]
+    },
+    {
+      "end" : 40239,
+      "id" : "DEA09C65-55EC-41D8-91D6-58A786F01B68",
+      "start" : 35360,
+      "text" : "And time itself is a signal, the same unpatched component, priced older, prices higher.",
+      "words" : [
+        {
+          "end" : 35520,
+          "start" : 35360,
+          "text" : " And"
+        },
+        {
+          "end" : 35680,
+          "start" : 35520,
+          "text" : " time"
+        },
+        {
+          "end" : 36080,
+          "start" : 35840,
+          "text" : " itself"
+        },
+        {
+          "end" : 36239,
+          "start" : 36080,
+          "text" : " is"
+        },
+        {
+          "end" : 36320,
+          "start" : 36239,
+          "text" : " a"
+        },
+        {
+          "end" : 36800,
+          "start" : 36320,
+          "text" : " signal,"
+        },
+        {
+          "end" : 36960,
+          "start" : 36800,
+          "text" : " the"
+        },
+        {
+          "end" : 37120,
+          "start" : 36960,
+          "text" : " same"
+        },
+        {
+          "end" : 37680,
+          "start" : 37120,
+          "text" : " unpatched"
+        },
+        {
+          "end" : 38160,
+          "start" : 37680,
+          "text" : " component,"
+        },
+        {
+          "end" : 38560,
+          "start" : 38160,
+          "text" : " priced"
+        },
+        {
+          "end" : 38960,
+          "start" : 38560,
+          "text" : " older,"
+        },
+        {
+          "end" : 39360,
+          "start" : 38960,
+          "text" : " prices"
+        },
+        {
+          "end" : 40239,
+          "start" : 39360,
+          "text" : " higher."
+        }
+      ]
+    },
+    {
+      "end" : 45140,
+      "id" : "1CA87CEB-A7CB-4718-8637-9B40ECFF8B3D",
+      "start" : 39940,
+      "text" : "two hundred eighteen thousand pounds pre expiry, climbing past the million four years past end of life.",
+      "words" : [
+        {
+          "end" : 40100,
+          "start" : 39940,
+          "text" : " two"
+        },
+        {
+          "end" : 40340,
+          "start" : 40180,
+          "text" : " hundred"
+        },
+        {
+          "end" : 40820,
+          "start" : 40420,
+          "text" : " eighteen"
+        },
+        {
+          "end" : 41140,
+          "start" : 40820,
+          "text" : " thousand"
+        },
+        {
+          "end" : 41540,
+          "start" : 41140,
+          "text" : " pounds"
+        },
+        {
+          "end" : 41620,
+          "start" : 41540,
+          "text" : " pre"
+        },
+        {
+          "end" : 42420,
+          "start" : 41700,
+          "text" : " expiry,"
+        },
+        {
+          "end" : 42900,
+          "start" : 42420,
+          "text" : " climbing"
+        },
+        {
+          "end" : 43060,
+          "start" : 42900,
+          "text" : " past"
+        },
+        {
+          "end" : 43220,
+          "start" : 43060,
+          "text" : " the"
+        },
+        {
+          "end" : 43460,
+          "start" : 43220,
+          "text" : " million"
+        },
+        {
+          "end" : 43860,
+          "start" : 43700,
+          "text" : " four"
+        },
+        {
+          "end" : 44100,
+          "start" : 43860,
+          "text" : " years"
+        },
+        {
+          "end" : 44420,
+          "start" : 44180,
+          "text" : " past"
+        },
+        {
+          "end" : 44580,
+          "start" : 44420,
+          "text" : " end"
+        },
+        {
+          "end" : 44740,
+          "start" : 44580,
+          "text" : " of"
+        },
+        {
+          "end" : 45140,
+          "start" : 44740,
+          "text" : " life."
+        }
+      ]
+    },
+    {
+      "end" : 49940,
+      "id" : "A8B8A4BF-5855-438D-A514-78E562BEB86E",
+      "start" : 45140,
+      "text" : "The world changes on a Tuesday afternoon, and the estate notices on a Tuesday afternoon.",
+      "words" : [
+        {
+          "end" : 45300,
+          "start" : 45140,
+          "text" : " The"
+        },
+        {
+          "end" : 45540,
+          "start" : 45300,
+          "text" : " world"
+        },
+        {
+          "end" : 45940,
+          "start" : 45540,
+          "text" : " changes"
+        },
+        {
+          "end" : 46100,
+          "start" : 45940,
+          "text" : " on"
+        },
+        {
+          "end" : 46180,
+          "start" : 46100,
+          "text" : " a"
+        },
+        {
+          "end" : 46500,
+          "start" : 46180,
+          "text" : " Tuesday"
+        },
+        {
+          "end" : 46980,
+          "start" : 46500,
+          "text" : " afternoon,"
+        },
+        {
+          "end" : 47060,
+          "start" : 46980,
+          "text" : " and"
+        },
+        {
+          "end" : 47220,
+          "start" : 47060,
+          "text" : " the"
+        },
+        {
+          "end" : 47540,
+          "start" : 47220,
+          "text" : " estate"
+        },
+        {
+          "end" : 48100,
+          "start" : 47540,
+          "text" : " notices"
+        },
+        {
+          "end" : 48260,
+          "start" : 48100,
+          "text" : " on"
+        },
+        {
+          "end" : 48340,
+          "start" : 48260,
+          "text" : " a"
+        },
+        {
+          "end" : 48740,
+          "start" : 48340,
+          "text" : " Tuesday"
+        },
+        {
+          "end" : 49940,
+          "start" : 48740,
+          "text" : " afternoon."
+        }
+      ]
+    }
+  ],
+  "text" : "Here's the part that actually matters.\nThis isn't a policy tool that sits still until someone opens it.\nIt's an operating system for governance.\nIt senses the world changing, reasons about whether your controls still fit.\nacts by proposing a fix and learns from what you tell it continuously, autonomously.\nAnd because it has to be safely, that loop is the whole point.\nIt starts with sensing\nFive signed feeds pour in continuously the threat register, CVE disclosures, end of life dates, regulator fines and market intelligence.\nEvery feed is signed and verified before it's trusted.\nForge one, and it's rejected outright.\nAnd time itself is a signal, the same unpatched component, priced older, prices higher.\ntwo hundred eighteen thousand pounds pre expiry, climbing past the million four years past end of life.\nThe world changes on a Tuesday afternoon, and the estate notices on a Tuesday afternoon."
+}

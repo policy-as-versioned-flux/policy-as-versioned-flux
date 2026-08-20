@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+"""fair.py — lightweight, deterministic FAIR risk engine (pure stdlib, offline).
+
+Turns versioned (min, mode, max) risk triples into an annual-loss distribution and
+reads the board numbers off it: ALE, VaR95, TVaR, and the £ actually carried
+(TVaR + a risk load, so the balance sheet never charges the mean).
+
+This is the load-bearing seam for the whole risk thesis: the "£ moves when you
+tighten a control" beat is two invocations of this CLI differing by one input.
+
+Deps: none. beta-PERT is sampled via random.betavariate (stdlib Mersenne Twister,
+deterministic and portable across platforms given a fixed seed).
+
+Usage:
+    fair.py summary   scenarios/driftwood-cart-pii.json [--mode warn|deny]
+    fair.py compare   scenarios/driftwood-cart-pii.json     # what a Deny buys
+    fair.py selfcheck                                        # runnable asserts
+
+Scenario JSON (versioned triples):
+    { "version": "v1", "name": "...",
+      "warn": {"lef": [min,mode,max], "lm": [min,mode,max]},
+      "deny": {"lef": [min,mode,max], "lm": [min,mode,max]} }
+  or a single unnamed control state:
+    { "version": "v1", "name": "...", "lef": [...], "lm": [...] }
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import random
+import sys
+
+# Defaults. ponytail: PERT lambda fixed at 4 (standard FAIR confidence); cost-of-
+# capital fixed at Solvency-II's 6% risk-margin rate. Expose per-scenario only if
+# an estimator actually needs to widen/narrow either.
+ITERATIONS = 10_000
+SEED = 42
+PERT_LAMBDA = 4.0
+COST_OF_CAPITAL = 0.06  # risk load = COC * economic capital (TVaR - ALE)
+

@@ -1,0 +1,7 @@
+flowchart TB
+  appetite["RISK APPETITE (£)"] --> principles[PRINCIPLES]
+  principles --> controls[CONTROLS]
+  controls --> enforce["ENFORCEMENT<br/>Audit vs Deny, CVE tolerance,<br/>lifecycle pace — versioned"]
+  enforce --> evidence["EVIDENCE (OSCAL)"]
+  evidence -- "minus residual of<br/>each permissive branch" --> balance["BALANCE-SHEET £"]
+  balance -. re-tunes .-> appetite

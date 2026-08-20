@@ -1,0 +1,2 @@
+NAMESPACE     NAME     AGE   READY   STATUS
+flux-system   ludlow   19d   True    Applied revision: sha1:95136c15158005b4f961a211c1f5df84ede953ba

@@ -1,0 +1,972 @@
+{
+  "segments" : [
+    {
+      "end" : 1760,
+      "id" : "9D824B7E-4767-4E8B-9AF5-07DF6CC2215A",
+      "start" : 160,
+      "text" : "So the system maps it.",
+      "words" : [
+        {
+          "end" : 320,
+          "start" : 160,
+          "text" : " So"
+        },
+        {
+          "end" : 640,
+          "start" : 400,
+          "text" : " the"
+        },
+        {
+          "end" : 880,
+          "start" : 640,
+          "text" : " system"
+        },
+        {
+          "end" : 1280,
+          "start" : 880,
+          "text" : " maps"
+        },
+        {
+          "end" : 1760,
+          "start" : 1280,
+          "text" : " it."
+        }
+      ]
+    },
+    {
+      "end" : 8400,
+      "id" : "A4211336-CC31-4468-9117-6FAE017E25C0",
+      "start" : 1760,
+      "text" : "This is the quantum value chain from the thing an attacker actually wants, your plaintaste all the way down to raw ore.",
+      "words" : [
+        {
+          "end" : 1840,
+          "start" : 1760,
+          "text" : " This"
+        },
+        {
+          "end" : 2000,
+          "start" : 1840,
+          "text" : " is"
+        },
+        {
+          "end" : 2080,
+          "start" : 2000,
+          "text" : " the"
+        },
+        {
+          "end" : 2560,
+          "start" : 2080,
+          "text" : " quantum"
+        },
+        {
+          "end" : 2880,
+          "start" : 2560,
+          "text" : " value"
+        },
+        {
+          "end" : 3200,
+          "start" : 2880,
+          "text" : " chain"
+        },
+        {
+          "end" : 3280,
+          "start" : 3200,
+          "text" : " from"
+        },
+        {
+          "end" : 3440,
+          "start" : 3280,
+          "text" : " the"
+        },
+        {
+          "end" : 3600,
+          "start" : 3440,
+          "text" : " thing"
+        },
+        {
+          "end" : 3760,
+          "start" : 3600,
+          "text" : " an"
+        },
+        {
+          "end" : 4160,
+          "start" : 3760,
+          "text" : " attacker"
+        },
+        {
+          "end" : 4400,
+          "start" : 4160,
+          "text" : " actually"
+        },
+        {
+          "end" : 5040,
+          "start" : 4400,
+          "text" : " wants,"
+        },
+        {
+          "end" : 5200,
+          "start" : 5040,
+          "text" : " your"
+        },
+        {
+          "end" : 6080,
+          "start" : 5280,
+          "text" : " plaintaste"
+        },
+        {
+          "end" : 6240,
+          "start" : 6080,
+          "text" : " all"
+        },
+        {
+          "end" : 6320,
+          "start" : 6240,
+          "text" : " the"
+        },
+        {
+          "end" : 6480,
+          "start" : 6320,
+          "text" : " way"
+        },
+        {
+          "end" : 6640,
+          "start" : 6480,
+          "text" : " down"
+        },
+        {
+          "end" : 6880,
+          "start" : 6640,
+          "text" : " to"
+        },
+        {
+          "end" : 7280,
+          "start" : 6880,
+          "text" : " raw"
+        },
+        {
+          "end" : 8400,
+          "start" : 7280,
+          "text" : " ore."
+        }
+      ]
+    },
+    {
+      "end" : 19160,
+      "id" : "2517C6C0-650C-495B-AA72-AF2FBCC408F3",
+      "start" : 7960,
+      "text" : "And the map shows you something the headline can't the two things genuinely holding quantum back, error corrected logical qubits, and the surface chemistry that ruins them sit over here at Genesis, barely understood.",
+      "words" : [
+        {
+          "end" : 8120,
+          "start" : 7960,
+          "text" : " And"
+        },
+        {
+          "end" : 8200,
+          "start" : 8120,
+          "text" : " the"
+        },
+        {
+          "end" : 8520,
+          "start" : 8200,
+          "text" : " map"
+        },
+        {
+          "end" : 8760,
+          "start" : 8520,
+          "text" : " shows"
+        },
+        {
+          "end" : 8920,
+          "start" : 8760,
+          "text" : " you"
+        },
+        {
+          "end" : 9160,
+          "start" : 8920,
+          "text" : " something"
+        },
+        {
+          "end" : 9320,
+          "start" : 9240,
+          "text" : " the"
+        },
+        {
+          "end" : 9720,
+          "start" : 9320,
+          "text" : " headline"
+        },
+        {
+          "end" : 9800,
+          "start" : 9720,
+          "text" : " can"
+        },
+        {
+          "end" : 9960,
+          "start" : 9800,
+          "text" : "'t"
+        },
+        {
+          "end" : 10360,
+          "start" : 10120,
+          "text" : " the"
+        },
+        {
+          "end" : 10600,
+          "start" : 10360,
+          "text" : " two"
+        },
+        {
+          "end" : 10920,
+          "start" : 10600,
+          "text" : " things"
+        },
+        {
+          "end" : 11560,
+          "start" : 10920,
+          "text" : " genuinely"
+        },
+        {
+          "end" : 11880,
+          "start" : 11560,
+          "text" : " holding"
+        },
+        {
+          "end" : 12280,
+          "start" : 11880,
+          "text" : " quantum"
+        },
+        {
+          "end" : 12440,
+          "start" : 12280,
+          "text" : " back"
+        },
+        {
+          "end" : 12520,
+          "start" : 12440,
+          "text" : ","
+        },
+        {
+          "end" : 12920,
+          "start" : 12600,
+          "text" : " error"
+        },
+        {
+          "end" : 13400,
+          "start" : 13000,
+          "text" : " corrected"
+        },
+        {
+          "end" : 13960,
+          "start" : 13480,
+          "text" : " logical"
+        },
+        {
+          "end" : 14760,
+          "start" : 13960,
+          "text" : " qubits,"
+        },
+        {
+          "end" : 14840,
+          "start" : 14760,
+          "text" : " and"
+        },
+        {
+          "end" : 14920,
+          "start" : 14840,
+          "text" : " the"
+        },
+        {
+          "end" : 15320,
+          "start" : 14920,
+          "text" : " surface"
+        },
+        {
+          "end" : 15800,
+          "start" : 15320,
+          "text" : " chemistry"
+        },
+        {
+          "end" : 15960,
+          "start" : 15800,
+          "text" : " that"
+        },
+        {
+          "end" : 16279,
+          "start" : 15960,
+          "text" : " ruins"
+        },
+        {
+          "end" : 16440,
+          "start" : 16279,
+          "text" : " them"
+        },
+        {
+          "end" : 16840,
+          "start" : 16520,
+          "text" : " sit"
+        },
+        {
+          "end" : 17000,
+          "start" : 16840,
+          "text" : " over"
+        },
+        {
+          "end" : 17160,
+          "start" : 17000,
+          "text" : " here"
+        },
+        {
+          "end" : 17400,
+          "start" : 17240,
+          "text" : " at"
+        },
+        {
+          "end" : 18040,
+          "start" : 17400,
+          "text" : " Genesis,"
+        },
+        {
+          "end" : 18440,
+          "start" : 18040,
+          "text" : " barely"
+        },
+        {
+          "end" : 19160,
+          "start" : 18440,
+          "text" : " understood."
+        }
+      ]
+    },
+    {
+      "end" : 22520,
+      "id" : "0E62A917-BC12-42CF-8D4B-01ABA5C7463D",
+      "start" : 19160,
+      "text" : "Niobium sits over there, practically a commodity already.",
+      "words" : [
+        {
+          "end" : 19800,
+          "start" : 19160,
+          "text" : " Niobium"
+        },
+        {
+          "end" : 20119,
+          "start" : 19880,
+          "text" : " sits"
+        },
+        {
+          "end" : 20279,
+          "start" : 20119,
+          "text" : " over"
+        },
+        {
+          "end" : 20600,
+          "start" : 20279,
+          "text" : " there,"
+        },
+        {
+          "end" : 21000,
+          "start" : 20600,
+          "text" : " practically"
+        },
+        {
+          "end" : 21160,
+          "start" : 21000,
+          "text" : " a"
+        },
+        {
+          "end" : 21800,
+          "start" : 21160,
+          "text" : " commodity"
+        },
+        {
+          "end" : 22520,
+          "start" : 21800,
+          "text" : " already."
+        }
+      ]
+    },
+    {
+      "end" : 24200,
+      "id" : "879F7298-4228-4DCC-98FE-3DA1A8FCF924",
+      "start" : 22360,
+      "text" : "And so the honest answer is almost nothing.",
+      "words" : [
+        {
+          "end" : 22520,
+          "start" : 22360,
+          "text" : " And"
+        },
+        {
+          "end" : 22680,
+          "start" : 22520,
+          "text" : " so"
+        },
+        {
+          "end" : 22760,
+          "start" : 22680,
+          "text" : " the"
+        },
+        {
+          "end" : 23080,
+          "start" : 22760,
+          "text" : " honest"
+        },
+        {
+          "end" : 23400,
+          "start" : 23080,
+          "text" : " answer"
+        },
+        {
+          "end" : 23560,
+          "start" : 23400,
+          "text" : " is"
+        },
+        {
+          "end" : 23800,
+          "start" : 23560,
+          "text" : " almost"
+        },
+        {
+          "end" : 24200,
+          "start" : 23800,
+          "text" : " nothing."
+        }
+      ]
+    },
+    {
+      "end" : 32760,
+      "id" : "E3945441-8C4C-495E-8B67-E838FA2758E1",
+      "start" : 24200,
+      "text" : "The purity that actually limits a qubit isn't in the ore, it's an oxide that forms on the chip's own surface from contact with air after the metal is already deposited.",
+      "words" : [
+        {
+          "end" : 24360,
+          "start" : 24200,
+          "text" : " The"
+        },
+        {
+          "end" : 24680,
+          "start" : 24360,
+          "text" : " purity"
+        },
+        {
+          "end" : 24840,
+          "start" : 24680,
+          "text" : " that"
+        },
+        {
+          "end" : 25080,
+          "start" : 24840,
+          "text" : " actually"
+        },
+        {
+          "end" : 25400,
+          "start" : 25080,
+          "text" : " limits"
+        },
+        {
+          "end" : 25560,
+          "start" : 25400,
+          "text" : " a"
+        },
+        {
+          "end" : 26040,
+          "start" : 25560,
+          "text" : " qubit"
+        },
+        {
+          "end" : 26200,
+          "start" : 26040,
+          "text" : " isn"
+        },
+        {
+          "end" : 26200,
+          "start" : 26200,
+          "text" : "'t"
+        },
+        {
+          "end" : 26280,
+          "start" : 26200,
+          "text" : " in"
+        },
+        {
+          "end" : 26360,
+          "start" : 26280,
+          "text" : " the"
+        },
+        {
+          "end" : 26760,
+          "start" : 26360,
+          "text" : " ore,"
+        },
+        {
+          "end" : 26840,
+          "start" : 26760,
+          "text" : " it"
+        },
+        {
+          "end" : 26920,
+          "start" : 26840,
+          "text" : "'s"
+        },
+        {
+          "end" : 27000,
+          "start" : 26920,
+          "text" : " an"
+        },
+        {
+          "end" : 27400,
+          "start" : 27000,
+          "text" : " oxide"
+        },
+        {
+          "end" : 27560,
+          "start" : 27400,
+          "text" : " that"
+        },
+        {
+          "end" : 27880,
+          "start" : 27560,
+          "text" : " forms"
+        },
+        {
+          "end" : 28040,
+          "start" : 27880,
+          "text" : " on"
+        },
+        {
+          "end" : 28120,
+          "start" : 28040,
+          "text" : " the"
+        },
+        {
+          "end" : 28360,
+          "start" : 28120,
+          "text" : " chip"
+        },
+        {
+          "end" : 28520,
+          "start" : 28360,
+          "text" : "'s"
+        },
+        {
+          "end" : 28680,
+          "start" : 28520,
+          "text" : " own"
+        },
+        {
+          "end" : 29080,
+          "start" : 28680,
+          "text" : " surface"
+        },
+        {
+          "end" : 29240,
+          "start" : 29080,
+          "text" : " from"
+        },
+        {
+          "end" : 29560,
+          "start" : 29240,
+          "text" : " contact"
+        },
+        {
+          "end" : 29800,
+          "start" : 29560,
+          "text" : " with"
+        },
+        {
+          "end" : 30200,
+          "start" : 29800,
+          "text" : " air"
+        },
+        {
+          "end" : 30440,
+          "start" : 30200,
+          "text" : " after"
+        },
+        {
+          "end" : 30520,
+          "start" : 30440,
+          "text" : " the"
+        },
+        {
+          "end" : 30840,
+          "start" : 30520,
+          "text" : " metal"
+        },
+        {
+          "end" : 31000,
+          "start" : 30840,
+          "text" : " is"
+        },
+        {
+          "end" : 31320,
+          "start" : 31000,
+          "text" : " already"
+        },
+        {
+          "end" : 32760,
+          "start" : 31320,
+          "text" : " deposited."
+        }
+      ]
+    },
+    {
+      "end" : 36600,
+      "id" : "BA73749B-F003-4C1D-9FDE-0CF47C386DCC",
+      "start" : 32119,
+      "text" : "Pure ore doesn't prevent it, so an analyst nudges quantum's velocity from 0.",
+      "words" : [
+        {
+          "end" : 32599,
+          "start" : 32119,
+          "text" : " Pure"
+        },
+        {
+          "end" : 33000,
+          "start" : 32599,
+          "text" : " ore"
+        },
+        {
+          "end" : 33079,
+          "start" : 33000,
+          "text" : " doesn"
+        },
+        {
+          "end" : 33239,
+          "start" : 33079,
+          "text" : "'t"
+        },
+        {
+          "end" : 33480,
+          "start" : 33239,
+          "text" : " prevent"
+        },
+        {
+          "end" : 33719,
+          "start" : 33480,
+          "text" : " it,"
+        },
+        {
+          "end" : 33960,
+          "start" : 33719,
+          "text" : " so"
+        },
+        {
+          "end" : 34040,
+          "start" : 33960,
+          "text" : " an"
+        },
+        {
+          "end" : 34440,
+          "start" : 34040,
+          "text" : " analyst"
+        },
+        {
+          "end" : 34920,
+          "start" : 34440,
+          "text" : " nudges"
+        },
+        {
+          "end" : 35239,
+          "start" : 34920,
+          "text" : " quantum"
+        },
+        {
+          "end" : 35399,
+          "start" : 35239,
+          "text" : "'s"
+        },
+        {
+          "end" : 35800,
+          "start" : 35399,
+          "text" : " velocity"
+        },
+        {
+          "end" : 35960,
+          "start" : 35800,
+          "text" : " from"
+        },
+        {
+          "end" : 36600,
+          "start" : 35960,
+          "text" : " 0."
+        }
+      ]
+    },
+    {
+      "end" : 37800,
+      "id" : "E2DEDE99-C525-49D2-B012-E9D3028F7BC1",
+      "start" : 36600,
+      "text" : "05 to 0.",
+      "words" : [
+        {
+          "end" : 37160,
+          "start" : 36600,
+          "text" : "05"
+        },
+        {
+          "end" : 37239,
+          "start" : 37160,
+          "text" : " to"
+        },
+        {
+          "end" : 37800,
+          "start" : 37239,
+          "text" : " 0."
+        }
+      ]
+    },
+    {
+      "end" : 38760,
+      "id" : "4EE3B7F4-5615-48A4-A029-539EB71CE06A",
+      "start" : 37800,
+      "text" : "06.",
+      "words" : [
+        {
+          "end" : 38760,
+          "start" : 37800,
+          "text" : "06."
+        }
+      ]
+    },
+    {
+      "end" : 40440,
+      "id" : "98A36F94-BBF8-4E15-B672-0837B3F63CBF",
+      "start" : 38760,
+      "text" : "Projected position, 0.",
+      "words" : [
+        {
+          "end" : 39320,
+          "start" : 38760,
+          "text" : " Projected"
+        },
+        {
+          "end" : 39879,
+          "start" : 39320,
+          "text" : " position,"
+        },
+        {
+          "end" : 40440,
+          "start" : 39879,
+          "text" : " 0."
+        }
+      ]
+    },
+    {
+      "end" : 41079,
+      "id" : "0F9A38D1-E84C-4483-9F48-2FAF65625473",
+      "start" : 40440,
+      "text" : "48.",
+      "words" : [
+        {
+          "end" : 41079,
+          "start" : 40440,
+          "text" : "48."
+        }
+      ]
+    },
+    {
+      "end" : 43960,
+      "id" : "9B39EA38-4927-4709-BD66-4DBB36E308CF",
+      "start" : 41079,
+      "text" : "It stops short of the line, no boundary crossed.",
+      "words" : [
+        {
+          "end" : 41239,
+          "start" : 41079,
+          "text" : " It"
+        },
+        {
+          "end" : 41640,
+          "start" : 41239,
+          "text" : " stops"
+        },
+        {
+          "end" : 41800,
+          "start" : 41640,
+          "text" : " short"
+        },
+        {
+          "end" : 41879,
+          "start" : 41800,
+          "text" : " of"
+        },
+        {
+          "end" : 41960,
+          "start" : 41879,
+          "text" : " the"
+        },
+        {
+          "end" : 42360,
+          "start" : 41960,
+          "text" : " line,"
+        },
+        {
+          "end" : 42520,
+          "start" : 42360,
+          "text" : " no"
+        },
+        {
+          "end" : 42920,
+          "start" : 42520,
+          "text" : " boundary"
+        },
+        {
+          "end" : 43960,
+          "start" : 42920,
+          "text" : " crossed."
+        }
+      ]
+    },
+    {
+      "end" : 45780,
+      "id" : "2B79B294-BE73-422A-950D-E186F8F7D3FA",
+      "start" : 43620,
+      "text" : "No signal emitted, no pull request.",
+      "words" : [
+        {
+          "end" : 43940,
+          "start" : 43620,
+          "text" : " No"
+        },
+        {
+          "end" : 44340,
+          "start" : 43940,
+          "text" : " signal"
+        },
+        {
+          "end" : 44820,
+          "start" : 44340,
+          "text" : " emitted,"
+        },
+        {
+          "end" : 44980,
+          "start" : 44820,
+          "text" : " no"
+        },
+        {
+          "end" : 45300,
+          "start" : 44980,
+          "text" : " pull"
+        },
+        {
+          "end" : 45780,
+          "start" : 45300,
+          "text" : " request."
+        }
+      ]
+    },
+    {
+      "end" : 52100,
+      "id" : "DD6EC077-5EBD-4D44-8873-D30E1F6531C9",
+      "start" : 45780,
+      "text" : "The loudest story of the week changes nothing, and the system says so out loud instead of manufacturing an alarm.",
+      "words" : [
+        {
+          "end" : 45860,
+          "start" : 45780,
+          "text" : " The"
+        },
+        {
+          "end" : 46260,
+          "start" : 45860,
+          "text" : " loudest"
+        },
+        {
+          "end" : 46500,
+          "start" : 46260,
+          "text" : " story"
+        },
+        {
+          "end" : 46579,
+          "start" : 46500,
+          "text" : " of"
+        },
+        {
+          "end" : 46660,
+          "start" : 46579,
+          "text" : " the"
+        },
+        {
+          "end" : 46980,
+          "start" : 46660,
+          "text" : " week"
+        },
+        {
+          "end" : 47379,
+          "start" : 46980,
+          "text" : " changes"
+        },
+        {
+          "end" : 47780,
+          "start" : 47379,
+          "text" : " nothing,"
+        },
+        {
+          "end" : 47940,
+          "start" : 47780,
+          "text" : " and"
+        },
+        {
+          "end" : 48100,
+          "start" : 47940,
+          "text" : " the"
+        },
+        {
+          "end" : 48340,
+          "start" : 48100,
+          "text" : " system"
+        },
+        {
+          "end" : 48660,
+          "start" : 48340,
+          "text" : " says"
+        },
+        {
+          "end" : 48899,
+          "start" : 48660,
+          "text" : " so"
+        },
+        {
+          "end" : 49059,
+          "start" : 48899,
+          "text" : " out"
+        },
+        {
+          "end" : 49540,
+          "start" : 49059,
+          "text" : " loud"
+        },
+        {
+          "end" : 49780,
+          "start" : 49540,
+          "text" : " instead"
+        },
+        {
+          "end" : 49940,
+          "start" : 49780,
+          "text" : " of"
+        },
+        {
+          "end" : 50579,
+          "start" : 49940,
+          "text" : " manufacturing"
+        },
+        {
+          "end" : 50820,
+          "start" : 50579,
+          "text" : " an"
+        },
+        {
+          "end" : 52100,
+          "start" : 50820,
+          "text" : " alarm."
+        }
+      ]
+    }
+  ],
+  "text" : "So the system maps it.\nThis is the quantum value chain from the thing an attacker actually wants, your plaintaste all the way down to raw ore.\nAnd the map shows you something the headline can't the two things genuinely holding quantum back, error corrected logical qubits, and the surface chemistry that ruins them sit over here at Genesis, barely understood.\nNiobium sits over there, practically a commodity already.\nAnd so the honest answer is almost nothing.\nThe purity that actually limits a qubit isn't in the ore, it's an oxide that forms on the chip's own surface from contact with air after the metal is already deposited.\nPure ore doesn't prevent it, so an analyst nudges quantum's velocity from 0.\n05 to 0.\n06.\nProjected position, 0.\n48.\nIt stops short of the line, no boundary crossed.\nNo signal emitted, no pull request.\nThe loudest story of the week changes nothing, and the system says so out loud instead of manufacturing an alarm."
+}

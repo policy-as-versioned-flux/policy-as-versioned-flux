@@ -1,0 +1,35 @@
+BEAT                                                           STATUS
+----------------------------------------------------------------------
+policy is a versioned dependency (coexistence)                 PASS
+a version not in the array cannot run (orphan-guard)           PASS
+retiring a version prunes it                                   PASS
+shift-left CI catches an Audit->Deny flip pre-merge            PASS
+exemptions dissolve into conditional policy                    PASS
+no ledger entry, no exception                                  PASS
+PROPORTIONALITY: same control, Audit driftwood vs Deny ludlow  PASS
+enforcement tuned by the £, not a timer                       PASS
+graded response: caged by degree, not denied                   PASS
+the board line is TCoR and it moves                            PASS
+feeds signed+versioned, a bump moves the £                    PASS
+ico penalty schema signed; a bump moves the £                 PASS
+nist ships a real, pinnable OSCAL catalog                      PASS
+evidence up-flow resolves end to end (OSCAL risk)              PASS
+LIVING LOOP: war-gamer opens a signed PR, never merges         PASS
+AI-Wardley flags commoditisation movement, re-tunes early      PASS
+the number is honest today (calibration+integrity)             PASS
+identity substrate: SPIRE is Istio's CA, mTLS STRICT           PASS
+posture-as-identity: posture/vN in the SVID path               PASS
+currency controller re-evaluates posture post-admission        PASS
+posture-gated reach + secrets (tuppence flagship)              FAIL (exit)
+    last: FAIL: current caller did NOT reach (got 'ERR') — check sidecar injection + posture SVID
+human/device access plane holds (Pomerium+device SVID)         PASS
+break-glass demands step-up by the £                          PASS
+EUD device trust on the same root (vTPM, narrated-virtual)     PASS
+PROVENANCE: every actor attestable to one root                 PASS
+
+driftwood reconciles from a pinned, signed GitRepository       PASS (live)
+tuppence reconciles, carries its toward-strict skin            PASS (live)
+ludlow reconciles, carries its Deny-heavy skin                 PASS (live)
+
+pass=27 fail=1 skip-live=0
+SOME BEATS WOULD FAIL ON STAGE

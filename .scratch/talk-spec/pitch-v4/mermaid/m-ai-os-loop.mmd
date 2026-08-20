@@ -1,0 +1,7 @@
+flowchart LR
+  sense["SENSE<br/>5 signed feeds"] --> reason["REASON<br/>war-game every control"]
+  reason --> know["JUDGE<br/>confidence + rejection memory"]
+  know -- "confident, not over-rejected" --> act["ACT<br/>signed pull request"]
+  know -. "low-confidence: held<br/>learned-reject: suppressed" .-> sense
+  act --> gate["HUMAN + GATE<br/>no merge() exists"]
+  gate -. learn .-> sense

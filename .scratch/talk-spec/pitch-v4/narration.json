@@ -1,0 +1,319 @@
+[
+  {
+    "i": 0,
+    "eyebrow": "THE COST",
+    "title": "£34,958",
+    "narration": "One number to open with. This is what a real breach costs, priced live, right now, by our own engine: thirty-four thousand, nine hundred and fifty-eight pounds. Not a red or green dot. A number you can actually act on.",
+    "visual": {
+      "type": "title",
+      "note": "big bold £ figure, dark background, subdued"
+    }
+  },
+  {
+    "i": 1,
+    "eyebrow": "THE IDEA",
+    "title": "Governance as a priced judgement",
+    "narration": "Here's the idea, and it's now built. Governance isn't a checkbox, pass or fail. It's a priced, versioned, continuously re-tuned judgement — the whole chain, from risk appetite to enforcement to evidence, treated like a software dependency: signed, pinned, updated by reviewed pull request. Every other team is still arguing about frameworks. We just built the thing, running, and honest about what isn't.",
+    "visual": {
+      "type": "title",
+      "note": "statement card"
+    }
+  },
+  {
+    "i": 2,
+    "eyebrow": "NOT SLIDEWARE",
+    "title": "Three real clusters, right now",
+    "narration": "And I mean built, not slideware. This is the real terminal. Three Kubernetes clusters, live right now: driftwood, ludlow, tuppence. Up nineteen days, each reconciling from a signed Git source, on its own, with nobody watching. Seven hundred and thirty-two files. Twenty-nine independent verify scripts. Nothing here stands in for a thing that doesn't work.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "01-kind-clusters.txt",
+        "03-driftwood-kustomizations.txt"
+      ],
+      "note": "kind get clusters + kustomization READY=True"
+    }
+  },
+  {
+    "i": 3,
+    "eyebrow": "THE SHAPE OF IT",
+    "title": "One hourglass",
+    "narration": "Here's the shape of it, one diagram. Risk appetite in pounds flows down through principles, controls, enforcement — versioned, so a bump is proportionality moving as the world moves. Evidence flows back up, minus what each permissive choice still leaves exposed, into one number: the balance sheet. Flux distributes it. Kyverno enforces it. Every beat I'm about to show you is one piece of this hourglass.",
+    "visual": {
+      "type": "mermaid",
+      "note": "appetite -> principles -> controls -> enforcement -> evidence -> balance -.-> appetite"
+    }
+  },
+  {
+    "i": 4,
+    "eyebrow": "HOW IT SHIPS",
+    "title": "Policy as a versioned dependency",
+    "narration": "Start with how it ships. Policy is just a dependency — a lint pack you pin, sign, and adopt by pull request. Right now: two signed policy versions, coexisting, each judging only the workloads that claim it, with no shared webhook and no last-write-wins race between them. One version array controls the lot. Try to run a version outside that array, and the orphan guard refuses it, every time — proven, not promised.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "20-coexistence.txt",
+        "21-orphan-guard.txt"
+      ],
+      "note": "coexistence PASS + orphan-guard PASS, offline proof"
+    }
+  },
+  {
+    "i": 5,
+    "eyebrow": "SHIFT LEFT",
+    "title": "Caught before merge",
+    "narration": "And the compliant path is the easy path. Flip a workload from version one to version two, and suddenly it needs a read-only filesystem. Our CI catches it offline, before merge. Watch: version one passes. Version two fails, exactly where it should. That failure never reaches a cluster. It never reaches production. No pager goes off at midnight for something CI already caught at lunchtime.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "12-shift-left.txt"
+      ],
+      "note": "v1.0.0 pass, v2.0.0 FAIL readOnlyRootFilesystem"
+    }
+  },
+  {
+    "i": 6,
+    "eyebrow": "THE MONEY SHOT",
+    "title": "One control, three institutions",
+    "narration": "Now the moment that makes this land — the one I'd show you first if I only had thirty seconds. Same rule, everywhere: encrypt data at rest. Same real risk number behind it — twenty-one thousand, one hundred and seven pounds, computed identically, every time. Three institutions. One control. Watch what the pounds decide when the tolerance changes underneath it.",
+    "visual": {
+      "type": "mockup",
+      "note": "three cluster icon row: driftwood / ludlow / tuppence, £21,107 badge on each"
+    }
+  },
+  {
+    "i": 7,
+    "eyebrow": "THE MONEY SHOT",
+    "title": "Audit. Deny. Deny.",
+    "narration": "Driftwood's tolerance is forty thousand pounds — twenty-one thousand fits, so the control audits. Ludlow, holding decades of confidential health data, has a five-thousand-pound tolerance — the same twenty-one thousand blows straight through it, so the control denies. Tuppence, at fifteen thousand, denies too. One rule. One number. Three verdicts — driven entirely by risk appetite, not by opinion.",
+    "visual": {
+      "type": "table",
+      "note": "institution | tolerance | risk_bought | verdict, from 08-proportionality.txt + 08b-proportionality-all-three.txt"
+    }
+  },
+  {
+    "i": 8,
+    "eyebrow": "NOT BINARY",
+    "title": "Caged, not denied — and it moves",
+    "narration": "And it's never just yes or no. Fall behind on patching and your workload still runs — caged: fewer capabilities, tighter limits, watched harder, more expensive to operate. That's the real board line: Total Cost of Risk. It's the risk you're keeping, plus the cost of every control. Right now, on this book, that's forty-seven thousand, nine hundred and twenty-one pounds. Staying current is, provably, the cheaper path.",
+    "visual": {
+      "type": "mockup",
+      "note": "balance-sheet card: £47,921 = £27,271 residual + £3,500 controls + £17,150 premium, from 11-tcor.txt"
+    }
+  },
+  {
+    "i": 9,
+    "eyebrow": "CALIBRATED, NOT GUESSED",
+    "title": "Monte Carlo. Back-tested. Recalibrated.",
+    "narration": "But none of those pounds are guesses. Every one comes out of a real Monte Carlo run — ten thousand iterations per estimate, not a single point number. And the model doesn't get to mark its own homework. We back-test it against real incidents, the same credibility maths insurers use to blend a new claim against history. Right now, on ludlow's book: the model called one million pounds. The real losses came in at one hundred and thirty thousand. Verdict: overpriced. Recalibrate down. That's not a slide claiming honesty. That's the engine catching itself being wrong.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "06-fair-summary.txt",
+        "15-honesty.txt"
+      ],
+      "note": "iterations: 10000; Bühlmann Z=0.78; ludlow back-test £1,025,511 model vs £130,000 actual -> recalibrate down"
+    }
+  },
+  {
+    "i": 10,
+    "eyebrow": "IT GOVERNS ITSELF",
+    "title": "The apparatus prices its own risk",
+    "narration": "And it doesn't get a pass either. The same engine prices the platform's own risk — Kyverno, Flux, the platform code, all in scope. Right now, that book comes to over one million pounds, over its own ten-thousand-pound tolerance. So its own rule fires: Deny, controls mandatory. With those controls applied, residual risk drops to fifty-five hundred pounds — inside the band. It passes its own test, on its own terms, or it doesn't get to run.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "15-honesty.txt"
+      ],
+      "note": "reflexive: risk_bought £1,018,853 > £10,000 band -> Deny, residual-with-controls £5,544 within band -> PASSES OWN TEST"
+    }
+  },
+  {
+    "i": 11,
+    "eyebrow": "THE AI OPERATING SYSTEM",
+    "title": "This is the part that matters",
+    "narration": "Here's the part that actually matters. This isn't a policy tool that sits still until someone opens it. It's an operating system for governance — it senses the world changing, reasons about whether your controls still fit, acts by proposing a fix, and learns from what you tell it. Continuously. Autonomously. And, because it has to be, safely. That loop is the whole point.",
+    "visual": {
+      "type": "mermaid",
+      "note": "sense -> reason -> judge -> act -> human+gate -> learn -> sense"
+    }
+  },
+  {
+    "i": 12,
+    "eyebrow": "IT SENSES",
+    "title": "Five signed feeds, continuously",
+    "narration": "It starts with sensing. Five signed feeds pour in, continuously: the threat register, CVE disclosures, end-of-life dates, regulator fines, and market intelligence. Every feed is signed and verified before it's trusted — forge one, and it's rejected outright. And time itself is a signal: the same unpatched component, priced older, prices higher — two hundred and eighteen thousand pounds pre-expiry, climbing past a million four years past end of life. The world changes on a Tuesday afternoon, and the estate notices on a Tuesday afternoon.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "22-feeds.txt"
+      ],
+      "note": "5 signed feeds; EOL ramp £218,337 -> £436,816 -> £1,087,666; feed bump moves £ by £103,565"
+    }
+  },
+  {
+    "i": 13,
+    "eyebrow": "IT REASONS",
+    "title": "War-gaming every control, continuously",
+    "narration": "Then it reasons. An agent takes every current control and war-games it against what just changed — workload risk, human and device risk, even the risk of today's encrypted traffic being harvested now and decrypted later, once quantum computing catches up. It's not asking 'is this compliant.' It's asking 'is this still proportionate, given what the world looks like right now.' When the answer is no, it doesn't file a ticket. It drafts the fix.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "24-wargamer.txt"
+      ],
+      "note": "the full drift report: 4 DRIFT rows + 4 steady [ok] rows, real scenario ids"
+    }
+  },
+  {
+    "i": 14,
+    "eyebrow": "IT KNOWS WHEN TO SHUT UP",
+    "title": "Four signals in. Two proposals out.",
+    "narration": "And here's the part that should scare you less, not more. Watch four real drift signals go through the gate, right now. One: confidence two point seven percent — miles under threshold — held back for a human, not auto-proposed. One: we rejected this exact fix twice before — the loop remembers, and stops asking. Two: confident, never over-rejected, within its rate limit — those, and only those, become pull requests. Four signals in. Two humans would actually see. That ratio is the safety feature, not a bug to fix later.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "15-honesty.txt"
+      ],
+      "note": "the real 4-row disposition table: hold-low-confidence conf=0.027, suppress-learned-rejection rej=2, 2x propose conf=0.500"
+    }
+  },
+  {
+    "i": 15,
+    "eyebrow": "IT NEVER ACTS ALONE",
+    "title": "No merge function exists",
+    "narration": "So two proposals go out — as pull requests, on a branch, signed. Main is untouched. Each one carries the same version cross-check gate your own CI runs, so a human reviewer sees exactly what would break, before they approve anything. Nothing here has a merge function. Not a locked-down one — none at all. The agent physically cannot ship its own change.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "24-wargamer.txt"
+      ],
+      "note": "'the flip is proposed on a branch; main is untouched' + gate confirmation lines"
+    }
+  },
+  {
+    "eyebrow": "THE SIGNAL",
+    "title": "A headline lands on a Tuesday",
+    "narration": "Let me show you what this looks like when something actually happens. This headline lands on a Tuesday. China confirms a major discovery of low-contaminant niobium. And if you know that niobium is the superconductor most quantum computers are built out of, that headline should worry you — because a quantum computer that breaks today's encryption is the single largest tail risk sitting on our books.",
+    "visual": {
+      "type": "image",
+      "src": "wardley/headline.png",
+      "note": "mocked front page — labelled as illustrative on the page itself"
+    },
+    "i": 16
+  },
+  {
+    "eyebrow": "IT MAPS IT",
+    "title": "The quantum value chain",
+    "narration": "So the system maps it. This is the quantum value chain — from the thing an attacker actually wants, your plaintext, all the way down to raw ore. And the map shows you something the headline can't. The two things genuinely holding quantum back — error-corrected logical qubits, and the surface chemistry that ruins them — sit over here, at genesis, barely understood. Niobium sits over there. Practically a commodity already.",
+    "visual": {
+      "type": "image",
+      "src": "wardley/map-quantum-chain.png",
+      "note": "true coordinates from the research analysis"
+    },
+    "i": 17
+  },
+  {
+    "eyebrow": "IT REFUSES TO PANIC",
+    "title": "The loudest signal of the week moves nothing",
+    "narration": "And so the honest answer is: almost nothing. The purity that actually limits a qubit isn't in the ore — it's an oxide that forms on the chip's own surface, from contact with air, after the metal is already deposited. Purer ore doesn't prevent it. So an analyst nudges quantum's velocity from nought point nought five to nought point nought six. Projected position: nought point four eight. It stops short of the line. No boundary crossed. No signal emitted. No pull request. The loudest story of the week changes nothing — and the system says so, out loud, instead of manufacturing an alarm.",
+    "visual": {
+      "type": "image",
+      "src": "wardley/map-after-niobium.png",
+      "note": "arrow stops short of the highlighted boundary"
+    },
+    "i": 18
+  },
+  {
+    "eyebrow": "BUT THEN",
+    "title": "The paper nobody read",
+    "narration": "Now, the same week, something else. A paper. No press release, no front page, no journalist. It cuts the number of qubits you would need to break real encryption by roughly twenty times. That isn't a supply story — it's arithmetic, and the arithmetic is already true. Evolution moves from nought point three to nought point three four. The headline contributed one hundredth of that. The paper contributed the rest. Watch what it does.",
+    "visual": {
+      "type": "image",
+      "src": "wardley/map-after-algorithmic.png",
+      "note": "arrow now crosses the boundary"
+    },
+    "i": 19
+  },
+  {
+    "eyebrow": "AND THE MONEY MOVES",
+    "title": "Stop insuring it. Start fixing it.",
+    "narration": "Crossing that line re-prices everything. Insurance on this risk goes from just over a million pounds to one point seven million. Caging it becomes literally impossible — no cage tight enough exists to bring it inside the risk appetite. And fixing it, unchanged at two hundred and twelve thousand pounds, is suddenly the cheapest survivable move on the board. So the war-gamer opens one signed pull request: stop insuring this, start fixing it. Which is exactly right. You cannot insure harvest-now-decrypt-later. The data is already stolen. It is sitting on somebody's disk right now, encrypted, waiting.",
+    "visual": {
+      "type": "table",
+      "note": "before/after four-move TCoR table + the real PR line"
+    },
+    "i": 20
+  },
+  {
+    "i": 21,
+    "eyebrow": "PROVENANCE",
+    "title": "Verify, don't trust",
+    "narration": "Every actor that touches this — a commit, a workload, a human, a device — is cryptographically attestable to one root, not to five different tools that don't talk to each other. Sign, publish, verify. It converges on one question: which version do you currently satisfy? That answer decides what you can admit, what cage you run in, who you can reach, and what secrets you can hold. Verify, don't trust: for the humans, and for the machines.",
+    "visual": {
+      "type": "mermaid",
+      "note": "commit / workload / human / device -> one SPIFFE root -> admission/cage/reach/secret"
+    }
+  },
+  {
+    "i": 22,
+    "eyebrow": "THE HONEST RED",
+    "title": "27 of 28. Checked.",
+    "narration": "So here's the whole thing, checked, right now: twenty-seven of twenty-eight, green. And that one red? I'm showing it to you. Every offline proof for it passes, eight for eight — the design is correct. What fails is one live wire: tuppence's identity mesh isn't finished, so its posture gate can't yet reach the workload it protects. That red line isn't a flaw in the model. It's exactly what's left to close.",
+    "visual": {
+      "type": "terminal",
+      "captures": [
+        "25-verify-all-offline.txt"
+      ],
+      "note": "the full 27-pass/1-fail table, FAIL row highlighted red"
+    }
+  },
+  {
+    "i": 23,
+    "eyebrow": "NOT A PROTOTYPE",
+    "title": "Six live organisations",
+    "narration": "And this isn't a prototype anymore. Six live organisations — one shared platform, three regulated institutions, two regulators publishing controls and fines as code. Seven hundred and thirty-two files. Twenty-nine independent verify scripts, each one a real gate, not a comment — delete one, and the beat it backs goes red immediately, no silent rot. Every one of them runs in minutes, on a laptop, with no cloud bill. This estate replaced a talk. Now the talk reports on the estate.",
+    "visual": {
+      "type": "mockup",
+      "note": "stat card grid: 6 orgs / 732 files / 29 verify scripts / 3 live clusters"
+    }
+  },
+  {
+    "i": 24,
+    "eyebrow": "WHY NOW",
+    "title": "Boards are panicking about AI",
+    "narration": "Every board in the country is asking the same panicked question right now: how do we govern the AI agents we just gave commit access to? Most answers are a policy document nobody reads, and a document doesn't stop an agent from doing anything. Ours is a cryptographic root nothing gets past unverified, a loop that senses and reasons continuously, and a gate the agent cannot get past on its own. Flux isn't a logo here — it's load-bearing. It's the only reason any of this reconciles, provably, from signed Git, on its own.",
+    "visual": {
+      "type": "meme",
+      "note": "original two-panel reject/prefer graphic: reject 'trust the AI agent' / prefer 'verify the AI agent, cryptographically, every time'"
+    }
+  },
+  {
+    "i": 25,
+    "eyebrow": "THE VISION",
+    "title": "A line on the balance sheet",
+    "narration": "Here's where this goes. Residual risk becomes economic capital — the same maths an underwriter already prices a premium off. Technological risk stops being a slide in an appendix and becomes one line on the balance sheet: readable, defensible, something a board actually acts on. Most tools sell reassurance. This one senses, reasons, and prices — continuously, and shows its own working.",
+    "visual": {
+      "type": "mockup",
+      "note": "balance-sheet line item: 'Technological risk .......... £34,958' in a clean ledger style"
+    }
+  },
+  {
+    "i": 26,
+    "eyebrow": "WHAT'S LEFT",
+    "title": "Nothing's finished. All of it's real.",
+    "narration": "So here's what's left, in the open, same as everything else tonight. Finish the identity mesh on tuppence and ludlow, so that red line goes green for real, not for show. Widen the loop — more feeds, more institutions, more of the risk landscape sensed and reasoned about automatically. Populate the scenario library out further than one breach and one control. Nothing here is finished. All of it is real.",
+    "visual": {
+      "type": "mockup",
+      "note": "3-item checklist card: close the red / widen the loop / grow the scenario library"
+    }
+  },
+  {
+    "i": 27,
+    "eyebrow": "THE CLOSE",
+    "title": "It's real.",
+    "narration": "That's the whole thing — live, honest, and running right now. Every number tonight was real, including the one that's red. This is what governance looks like when you stop asserting it, and start proving it.",
+    "visual": {
+      "type": "title",
+      "note": "closing card, £ figure fades in one last time"
+    }
+  }
+]

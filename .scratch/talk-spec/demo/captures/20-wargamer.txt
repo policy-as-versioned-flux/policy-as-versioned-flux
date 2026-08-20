@@ -1,0 +1,49 @@
+
+== 1. the signed feed-change fixture verifies offline (the war-gamer's drift input) ==
+ok  threat-register v3 (driftwood skimmer uptick) signed + verified
+
+== 2. a tampered feed fixture is rejected (integrity of the war-gamer's input) ==
+ok  tampered feed fixture correctly rejected
+
+== 3. the feed->PR seam: collect -> war-game -> propose-never-dispose ==
+ok  collected v1->v3 signed feed + 5-scenario library (human-seed + AI); war-game: driftwood cart-PII £41095>£40000 band -> Audit->Deny drift, ludlow steady; 3 scenario-path drift(s); proposed 4 signed PR(s), 0 merged, all carry the gate.
+
+== 4. the war-game drift report (enforcement + human/device scenarios) ==
+  [DRIFT] enforcement driftwood require-nonroot@2.0.0            Audit    -> Deny
+  [  ok ] enforcement tuppence  require-nonroot@2.0.0            Deny     -> Deny
+  [  ok ] enforcement ludlow    require-nonroot@2.0.0            Deny     -> Deny
+  [  ok ] scenario    tuppence  phishing-credential-theft        fix      -> fix
+  [  ok ] scenario    tuppence  stolen-laptop-unattested-device  cage     -> cage
+  [DRIFT] scenario    tuppence  insider-abuse                    transfer -> fix
+  [DRIFT] scenario    tuppence  ransomware-workload              deny     -> fix
+  [DRIFT] scenario    tuppence  pq-harvest-now-decrypt-later     transfer -> fix
+ok  4 drift(s): the war-gamer found disproportionate controls to re-tune
+
+== 5. the propose-never-dispose beat (the signed PR, the gate, no merge) ==
+[1;36m==>[0m war-gaming current controls against the signed feed set...
+[1;36m==>[0m drift found -> would open PR on branch 'wargamer/retune-driftwood-require-nonroot-2-0-0'
+
+--- proposed policy diff (this is the PR body a human reviews) ---
+@@ -15,7 +15,7 @@
+     policy-as-versioned.dev/policy: require-nonroot
+     policy-as-versioned.dev/policy-version: "2.0.0"
+ spec:
+-  validationActions: [Audit]
++  validationActions: [Deny]
+   matchConstraints:
+     resourceRules:
+       - apiGroups: [""]
+--- end diff ---
+ok  the flip is proposed on a branch; main is untouched
+
+[1;36m==>[0m the PR carries the version cross-check gate: ci-check.py
+ok  gate runs (kyverno): a workload compliant-under-Audit is caught pre-merge by the +/-1 cross-check
+
+[1;36m==>[0m commit identity: gitsign keyless (OIDC -> Fulcio) -> Rekor  [gitsign version 0.17.1]
+
+[1;36m==>[0m next (human + CI, NOT this agent): git commit --gitsign on 'wargamer/retune-driftwood-require-nonroot-2-0-0', push, open PR,
+[1;36m==>[0m      the gate + a human reviewer dispose. The war-gamer proposes; it never merges.
+
+PASS: signed feeds collected + integrity-checked, current controls war-gamed
+(workload + human/device + PQ), drift detected, a signed policy PR proposed with
+the version cross-check gate -- and never merged. The war-gamer proposes; a human disposes.

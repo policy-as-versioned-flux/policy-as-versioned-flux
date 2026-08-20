@@ -1,0 +1,13 @@
+access dex-7d5f7bd697-6x8vx Running
+flux-system git-server-6f5d5947dc-ptxtw Running
+flux-system helm-controller-77bfb49bb5-xz5lv Running
+flux-system kustomize-controller-5ddcb4c6d4-2lhzt Running
+flux-system notification-controller-5f5d67f758-qczdx Running
+flux-system source-controller-666b89b45c-6dgbm Running
+istio-system istiod-7dbf46dffd-vpfgf Running
+openbao openbao-0 Running
+openbao openbao-agent-injector-794986f8cf-ktmv5 Running
+spire-system spire-agent-tq9zr Running
+spire-system spire-server-0 Running
+spire-system spire-spiffe-csi-driver-gfx8f Running
+spire-system spire-spiffe-oidc-discovery-provider-75d5bc7bb8-c55sl Running

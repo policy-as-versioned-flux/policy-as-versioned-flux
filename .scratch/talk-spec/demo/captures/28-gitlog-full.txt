@@ -1,0 +1,20 @@
+f189955 Reopen tickets 17 + 14: live reach beat NOT done (istio-csr/SPIRE CA blocker)
+f7f6732 Fix SPIRE chart 0.24.0 breaking value renames (live bring-up finding)
+5c7c409 Untrack estate/.work build-scratch (nested git-seed repos)
+26770f8 Estate build: 27 tickets implemented via dependency-wave workflow (waves 2-9)
+ef84d16 Estate build wave 1: tickets 01,02
+1718b6a Add pitch v2 — 6:40 + tight 4:50 Pecha Kucha pitch to the ControlPlane CEO
+e55fa0c Mark caldera→ludlow GitHub org rename done (via browser)
+6ab21fb Extend talk-spec: enforcement gradient + three-actor identity, publish 27 build tickets
+575d5fa Chart the talk-spec wayfinder map to decision-complete
+4ee86e0 Add show-and-tell demo runbook
+a207f24 Wave 5 follow-up: fix a verbatim-breaking doc regression + two overclaims
+2b67683 Ticket 09 follow-up: fully diagnose the retirement-PR path via a live forced test
+790c89c Wave 4 follow-up: fix a systemic broken rationale.md link, restore a missing follow-up section
+70481fc Wave 3 follow-up: correct my own wrong root-cause claim, fix a vacuously-passing self-check, two stale/self-contradicting doc sections, and three precision nits
+d4b8c28 Wave 2 follow-up: a real orphan-guard/Flux interaction explained honestly, a vacuously-passing verify script fixed, a PR misattribution, a self-inflicted regression in my own wave-1 fix, and two dangling references
+df7b484 Wave 1 (combined pass) follow-up: fix live cluster contamination, a second GitOps-wiring gap on cluster2, a false kustomize-build claim, and an unreconciled PR-vs-issue spec contradiction
+45efbaa Wave 1 (faithful-floor): fix 8 precision/staleness issues found live
+b293236 Ticket 23 follow-up: correct the same overclaimed enforcement mechanism here
+0b4b2fa Ticket 19 follow-up: fix and document a real orphan-guard cloud-plane gap
+b2bfe6d Ticket 08 follow-up: fix and document a real OSCAL misattribution bug found live

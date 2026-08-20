@@ -1,0 +1,983 @@
+{
+  "segments" : [
+    {
+      "end" : 2640,
+      "id" : "2705F50B-5109-438B-BBF3-C58F95286F8F",
+      "start" : 320,
+      "text" : "Here's where this goes.",
+      "words" : [
+        {
+          "end" : 720,
+          "start" : 320,
+          "text" : " Here"
+        },
+        {
+          "end" : 960,
+          "start" : 720,
+          "text" : "'s"
+        },
+        {
+          "end" : 1280,
+          "start" : 960,
+          "text" : " where"
+        },
+        {
+          "end" : 1600,
+          "start" : 1280,
+          "text" : " this"
+        },
+        {
+          "end" : 2640,
+          "start" : 1600,
+          "text" : " goes."
+        }
+      ]
+    },
+    {
+      "end" : 5600,
+      "id" : "4E7AD66C-11CF-4061-9DF3-464CE394D0D3",
+      "start" : 2640,
+      "text" : "Residual risk becomes economic capital.",
+      "words" : [
+        {
+          "end" : 3280,
+          "start" : 2640,
+          "text" : " Residual"
+        },
+        {
+          "end" : 3680,
+          "start" : 3280,
+          "text" : " risk"
+        },
+        {
+          "end" : 4080,
+          "start" : 3680,
+          "text" : " becomes"
+        },
+        {
+          "end" : 4640,
+          "start" : 4080,
+          "text" : " economic"
+        },
+        {
+          "end" : 5600,
+          "start" : 4640,
+          "text" : " capital."
+        }
+      ]
+    },
+    {
+      "end" : 9600,
+      "id" : "DE36E81D-A956-4638-9ED5-D4C21A23ACA6",
+      "start" : 5600,
+      "text" : "The same maths and underwriter already prices a premium off.",
+      "words" : [
+        {
+          "end" : 5760,
+          "start" : 5600,
+          "text" : " The"
+        },
+        {
+          "end" : 6000,
+          "start" : 5760,
+          "text" : " same"
+        },
+        {
+          "end" : 6480,
+          "start" : 6000,
+          "text" : " maths"
+        },
+        {
+          "end" : 6640,
+          "start" : 6480,
+          "text" : " and"
+        },
+        {
+          "end" : 7440,
+          "start" : 6640,
+          "text" : " underwriter"
+        },
+        {
+          "end" : 7760,
+          "start" : 7440,
+          "text" : " already"
+        },
+        {
+          "end" : 8160,
+          "start" : 7760,
+          "text" : " prices"
+        },
+        {
+          "end" : 8320,
+          "start" : 8160,
+          "text" : " a"
+        },
+        {
+          "end" : 9040,
+          "start" : 8320,
+          "text" : " premium"
+        },
+        {
+          "end" : 9600,
+          "start" : 9040,
+          "text" : " off."
+        }
+      ]
+    },
+    {
+      "end" : 16020,
+      "id" : "A057FFC2-8709-42A0-8EF1-AB7FB61C9DFF",
+      "start" : 9620,
+      "text" : "Technological risk stops being a slide in an appendix and becomes one line on the balance sheet, readable, defensible.",
+      "words" : [
+        {
+          "end" : 10500,
+          "start" : 9620,
+          "text" : " Technological"
+        },
+        {
+          "end" : 10900,
+          "start" : 10500,
+          "text" : " risk"
+        },
+        {
+          "end" : 11220,
+          "start" : 10900,
+          "text" : " stops"
+        },
+        {
+          "end" : 11380,
+          "start" : 11220,
+          "text" : " being"
+        },
+        {
+          "end" : 11540,
+          "start" : 11380,
+          "text" : " a"
+        },
+        {
+          "end" : 11860,
+          "start" : 11540,
+          "text" : " slide"
+        },
+        {
+          "end" : 11940,
+          "start" : 11860,
+          "text" : " in"
+        },
+        {
+          "end" : 12100,
+          "start" : 11940,
+          "text" : " an"
+        },
+        {
+          "end" : 12580,
+          "start" : 12100,
+          "text" : " appendix"
+        },
+        {
+          "end" : 12740,
+          "start" : 12580,
+          "text" : " and"
+        },
+        {
+          "end" : 13060,
+          "start" : 12740,
+          "text" : " becomes"
+        },
+        {
+          "end" : 13300,
+          "start" : 13060,
+          "text" : " one"
+        },
+        {
+          "end" : 13540,
+          "start" : 13300,
+          "text" : " line"
+        },
+        {
+          "end" : 13700,
+          "start" : 13540,
+          "text" : " on"
+        },
+        {
+          "end" : 13780,
+          "start" : 13700,
+          "text" : " the"
+        },
+        {
+          "end" : 14100,
+          "start" : 13780,
+          "text" : " balance"
+        },
+        {
+          "end" : 14420,
+          "start" : 14100,
+          "text" : " sheet,"
+        },
+        {
+          "end" : 14900,
+          "start" : 14420,
+          "text" : " readable,"
+        },
+        {
+          "end" : 16020,
+          "start" : 14900,
+          "text" : " defensible."
+        }
+      ]
+    },
+    {
+      "end" : 18260,
+      "id" : "CF0A4620-CF0E-4346-8CF1-4B83BB0E63AC",
+      "start" : 16020,
+      "text" : "Something a board actually acts on.",
+      "words" : [
+        {
+          "end" : 16420,
+          "start" : 16020,
+          "text" : " Something"
+        },
+        {
+          "end" : 16580,
+          "start" : 16420,
+          "text" : " a"
+        },
+        {
+          "end" : 16980,
+          "start" : 16580,
+          "text" : " board"
+        },
+        {
+          "end" : 17300,
+          "start" : 16980,
+          "text" : " actually"
+        },
+        {
+          "end" : 17860,
+          "start" : 17300,
+          "text" : " acts"
+        },
+        {
+          "end" : 18260,
+          "start" : 17860,
+          "text" : " on."
+        }
+      ]
+    },
+    {
+      "end" : 19900,
+      "id" : "AE1AAF37-40BE-456A-B1F8-478F2C9B5607",
+      "start" : 18060,
+      "text" : "Most tools sell reassurance.",
+      "words" : [
+        {
+          "end" : 18460,
+          "start" : 18060,
+          "text" : " Most"
+        },
+        {
+          "end" : 18779,
+          "start" : 18460,
+          "text" : " tools"
+        },
+        {
+          "end" : 19020,
+          "start" : 18779,
+          "text" : " sell"
+        },
+        {
+          "end" : 19900,
+          "start" : 19020,
+          "text" : " reassurance."
+        }
+      ]
+    },
+    {
+      "end" : 23660,
+      "id" : "29A625FE-4B3C-4E5C-830B-ADA614EDCAAA",
+      "start" : 19900,
+      "text" : "This one senses reasons and prices continuously and shows its own working.",
+      "words" : [
+        {
+          "end" : 20060,
+          "start" : 19900,
+          "text" : " This"
+        },
+        {
+          "end" : 20300,
+          "start" : 20060,
+          "text" : " one"
+        },
+        {
+          "end" : 20699,
+          "start" : 20300,
+          "text" : " senses"
+        },
+        {
+          "end" : 21100,
+          "start" : 20699,
+          "text" : " reasons"
+        },
+        {
+          "end" : 21260,
+          "start" : 21100,
+          "text" : " and"
+        },
+        {
+          "end" : 21740,
+          "start" : 21260,
+          "text" : " prices"
+        },
+        {
+          "end" : 22380,
+          "start" : 21740,
+          "text" : " continuously"
+        },
+        {
+          "end" : 22539,
+          "start" : 22380,
+          "text" : " and"
+        },
+        {
+          "end" : 22860,
+          "start" : 22539,
+          "text" : " shows"
+        },
+        {
+          "end" : 23020,
+          "start" : 22860,
+          "text" : " its"
+        },
+        {
+          "end" : 23180,
+          "start" : 23020,
+          "text" : " own"
+        },
+        {
+          "end" : 23660,
+          "start" : 23180,
+          "text" : " working."
+        }
+      ]
+    },
+    {
+      "end" : 27020,
+      "id" : "3F7CA150-E3F9-4051-89F2-DEA451C4694A",
+      "start" : 23660,
+      "text" : "So here's what's left in the open, same as everything else tonight.",
+      "words" : [
+        {
+          "end" : 23820,
+          "start" : 23660,
+          "text" : " So"
+        },
+        {
+          "end" : 23900,
+          "start" : 23820,
+          "text" : " here"
+        },
+        {
+          "end" : 24060,
+          "start" : 23900,
+          "text" : "'s"
+        },
+        {
+          "end" : 24140,
+          "start" : 24060,
+          "text" : " what"
+        },
+        {
+          "end" : 24300,
+          "start" : 24140,
+          "text" : "'s"
+        },
+        {
+          "end" : 24539,
+          "start" : 24300,
+          "text" : " left"
+        },
+        {
+          "end" : 24700,
+          "start" : 24539,
+          "text" : " in"
+        },
+        {
+          "end" : 24860,
+          "start" : 24700,
+          "text" : " the"
+        },
+        {
+          "end" : 25420,
+          "start" : 24860,
+          "text" : " open,"
+        },
+        {
+          "end" : 25660,
+          "start" : 25420,
+          "text" : " same"
+        },
+        {
+          "end" : 25820,
+          "start" : 25660,
+          "text" : " as"
+        },
+        {
+          "end" : 26140,
+          "start" : 25820,
+          "text" : " everything"
+        },
+        {
+          "end" : 26380,
+          "start" : 26140,
+          "text" : " else"
+        },
+        {
+          "end" : 27020,
+          "start" : 26380,
+          "text" : " tonight."
+        }
+      ]
+    },
+    {
+      "end" : 32619,
+      "id" : "50E8ED5D-0A92-4BE5-88B5-D52EDBE9B9F1",
+      "start" : 27020,
+      "text" : "Finish the identity mesh on Tuppence and Ludlow so that red line goes green for real, not for show.",
+      "words" : [
+        {
+          "end" : 27340,
+          "start" : 27020,
+          "text" : " Finish"
+        },
+        {
+          "end" : 27500,
+          "start" : 27340,
+          "text" : " the"
+        },
+        {
+          "end" : 27980,
+          "start" : 27500,
+          "text" : " identity"
+        },
+        {
+          "end" : 28300,
+          "start" : 27980,
+          "text" : " mesh"
+        },
+        {
+          "end" : 28380,
+          "start" : 28300,
+          "text" : " on"
+        },
+        {
+          "end" : 28779,
+          "start" : 28380,
+          "text" : " Tuppence"
+        },
+        {
+          "end" : 28939,
+          "start" : 28860,
+          "text" : " and"
+        },
+        {
+          "end" : 29500,
+          "start" : 28939,
+          "text" : " Ludlow"
+        },
+        {
+          "end" : 29660,
+          "start" : 29580,
+          "text" : " so"
+        },
+        {
+          "end" : 29820,
+          "start" : 29660,
+          "text" : " that"
+        },
+        {
+          "end" : 30060,
+          "start" : 29820,
+          "text" : " red"
+        },
+        {
+          "end" : 30300,
+          "start" : 30060,
+          "text" : " line"
+        },
+        {
+          "end" : 30540,
+          "start" : 30300,
+          "text" : " goes"
+        },
+        {
+          "end" : 30939,
+          "start" : 30540,
+          "text" : " green"
+        },
+        {
+          "end" : 31180,
+          "start" : 30939,
+          "text" : " for"
+        },
+        {
+          "end" : 31740,
+          "start" : 31180,
+          "text" : " real,"
+        },
+        {
+          "end" : 31900,
+          "start" : 31740,
+          "text" : " not"
+        },
+        {
+          "end" : 32140,
+          "start" : 31900,
+          "text" : " for"
+        },
+        {
+          "end" : 32619,
+          "start" : 32140,
+          "text" : " show."
+        }
+      ]
+    },
+    {
+      "end" : 38440,
+      "id" : "1E5C8670-2AAD-4F54-87B4-D6CFD11E1BBE",
+      "start" : 32920,
+      "text" : "Widen the loop, more feeds, more institutions, more of the risk landscape sensed and reasoned about automatically.",
+      "words" : [
+        {
+          "end" : 33399,
+          "start" : 32920,
+          "text" : " Widen"
+        },
+        {
+          "end" : 33480,
+          "start" : 33399,
+          "text" : " the"
+        },
+        {
+          "end" : 33960,
+          "start" : 33480,
+          "text" : " loop,"
+        },
+        {
+          "end" : 34120,
+          "start" : 33960,
+          "text" : " more"
+        },
+        {
+          "end" : 34600,
+          "start" : 34120,
+          "text" : " feeds,"
+        },
+        {
+          "end" : 34760,
+          "start" : 34600,
+          "text" : " more"
+        },
+        {
+          "end" : 35399,
+          "start" : 34760,
+          "text" : " institutions,"
+        },
+        {
+          "end" : 35559,
+          "start" : 35399,
+          "text" : " more"
+        },
+        {
+          "end" : 35640,
+          "start" : 35559,
+          "text" : " of"
+        },
+        {
+          "end" : 35719,
+          "start" : 35640,
+          "text" : " the"
+        },
+        {
+          "end" : 36039,
+          "start" : 35719,
+          "text" : " risk"
+        },
+        {
+          "end" : 36519,
+          "start" : 36039,
+          "text" : " landscape"
+        },
+        {
+          "end" : 36839,
+          "start" : 36519,
+          "text" : " sensed"
+        },
+        {
+          "end" : 37000,
+          "start" : 36839,
+          "text" : " and"
+        },
+        {
+          "end" : 37320,
+          "start" : 37000,
+          "text" : " reasoned"
+        },
+        {
+          "end" : 37559,
+          "start" : 37320,
+          "text" : " about"
+        },
+        {
+          "end" : 38440,
+          "start" : 37559,
+          "text" : " automatically."
+        }
+      ]
+    },
+    {
+      "end" : 42280,
+      "id" : "08010C0A-0406-42D1-A249-4A3D1DD2513C",
+      "start" : 38440,
+      "text" : "Populate this scenario library out further than one breach and one control.",
+      "words" : [
+        {
+          "end" : 38920,
+          "start" : 38440,
+          "text" : " Populate"
+        },
+        {
+          "end" : 39079,
+          "start" : 38920,
+          "text" : " this"
+        },
+        {
+          "end" : 39640,
+          "start" : 39079,
+          "text" : " scenario"
+        },
+        {
+          "end" : 39960,
+          "start" : 39640,
+          "text" : " library"
+        },
+        {
+          "end" : 40199,
+          "start" : 39960,
+          "text" : " out"
+        },
+        {
+          "end" : 40519,
+          "start" : 40199,
+          "text" : " further"
+        },
+        {
+          "end" : 40760,
+          "start" : 40519,
+          "text" : " than"
+        },
+        {
+          "end" : 40920,
+          "start" : 40760,
+          "text" : " one"
+        },
+        {
+          "end" : 41320,
+          "start" : 40920,
+          "text" : " breach"
+        },
+        {
+          "end" : 41480,
+          "start" : 41320,
+          "text" : " and"
+        },
+        {
+          "end" : 41640,
+          "start" : 41480,
+          "text" : " one"
+        },
+        {
+          "end" : 42280,
+          "start" : 41640,
+          "text" : " control."
+        }
+      ]
+    },
+    {
+      "end" : 43480,
+      "id" : "DAD0E56E-2C5F-4AA9-BC91-779BB03A7F99",
+      "start" : 42280,
+      "text" : "Nothing here is finished.",
+      "words" : [
+        {
+          "end" : 42600,
+          "start" : 42280,
+          "text" : " Nothing"
+        },
+        {
+          "end" : 42760,
+          "start" : 42600,
+          "text" : " here"
+        },
+        {
+          "end" : 42920,
+          "start" : 42760,
+          "text" : " is"
+        },
+        {
+          "end" : 43480,
+          "start" : 42920,
+          "text" : " finished."
+        }
+      ]
+    },
+    {
+      "end" : 45160,
+      "id" : "D32B169A-3676-4BF1-AD00-C173D9C23551",
+      "start" : 43480,
+      "text" : "All of it is real, that's the whole thing.",
+      "words" : [
+        {
+          "end" : 43640,
+          "start" : 43480,
+          "text" : " All"
+        },
+        {
+          "end" : 43719,
+          "start" : 43640,
+          "text" : " of"
+        },
+        {
+          "end" : 43879,
+          "start" : 43719,
+          "text" : " it"
+        },
+        {
+          "end" : 44039,
+          "start" : 43879,
+          "text" : " is"
+        },
+        {
+          "end" : 44360,
+          "start" : 44039,
+          "text" : " real,"
+        },
+        {
+          "end" : 44440,
+          "start" : 44360,
+          "text" : " that"
+        },
+        {
+          "end" : 44519,
+          "start" : 44440,
+          "text" : "'s"
+        },
+        {
+          "end" : 44680,
+          "start" : 44519,
+          "text" : " the"
+        },
+        {
+          "end" : 44839,
+          "start" : 44680,
+          "text" : " whole"
+        },
+        {
+          "end" : 45160,
+          "start" : 44839,
+          "text" : " thing."
+        }
+      ]
+    },
+    {
+      "end" : 47320,
+      "id" : "223DEB33-252B-44BE-B70D-4BFC9EC874E0",
+      "start" : 45160,
+      "text" : "Live, honest, and running right now.",
+      "words" : [
+        {
+          "end" : 45559,
+          "start" : 45160,
+          "text" : " Live,"
+        },
+        {
+          "end" : 45960,
+          "start" : 45559,
+          "text" : " honest,"
+        },
+        {
+          "end" : 46120,
+          "start" : 45960,
+          "text" : " and"
+        },
+        {
+          "end" : 46360,
+          "start" : 46120,
+          "text" : " running"
+        },
+        {
+          "end" : 46680,
+          "start" : 46360,
+          "text" : " right"
+        },
+        {
+          "end" : 47320,
+          "start" : 46680,
+          "text" : " now."
+        }
+      ]
+    },
+    {
+      "end" : 50199,
+      "id" : "F111AE30-EEE7-4654-BA2D-CEBEE41C2441",
+      "start" : 46680,
+      "text" : "Now, every number tonight was real, including the one that's red.",
+      "words" : [
+        {
+          "end" : 47000,
+          "start" : 46680,
+          "text" : " Now,"
+        },
+        {
+          "end" : 47160,
+          "start" : 47000,
+          "text" : " every"
+        },
+        {
+          "end" : 47559,
+          "start" : 47320,
+          "text" : " number"
+        },
+        {
+          "end" : 47960,
+          "start" : 47559,
+          "text" : " tonight"
+        },
+        {
+          "end" : 48199,
+          "start" : 47960,
+          "text" : " was"
+        },
+        {
+          "end" : 48680,
+          "start" : 48199,
+          "text" : " real,"
+        },
+        {
+          "end" : 49000,
+          "start" : 48680,
+          "text" : " including"
+        },
+        {
+          "end" : 49079,
+          "start" : 49000,
+          "text" : " the"
+        },
+        {
+          "end" : 49239,
+          "start" : 49079,
+          "text" : " one"
+        },
+        {
+          "end" : 49320,
+          "start" : 49239,
+          "text" : " that"
+        },
+        {
+          "end" : 49559,
+          "start" : 49320,
+          "text" : "'s"
+        },
+        {
+          "end" : 50199,
+          "start" : 49559,
+          "text" : " red."
+        }
+      ]
+    },
+    {
+      "end" : 53960,
+      "id" : "38F51CC7-8C41-4D9C-8263-2E9941B18440",
+      "start" : 50199,
+      "text" : "This is what governance looks like when you stop asserting it and start proving it.",
+      "words" : [
+        {
+          "end" : 50359,
+          "start" : 50199,
+          "text" : " This"
+        },
+        {
+          "end" : 50519,
+          "start" : 50359,
+          "text" : " is"
+        },
+        {
+          "end" : 50680,
+          "start" : 50519,
+          "text" : " what"
+        },
+        {
+          "end" : 51160,
+          "start" : 50680,
+          "text" : " governance"
+        },
+        {
+          "end" : 51320,
+          "start" : 51160,
+          "text" : " looks"
+        },
+        {
+          "end" : 51480,
+          "start" : 51320,
+          "text" : " like"
+        },
+        {
+          "end" : 51640,
+          "start" : 51480,
+          "text" : " when"
+        },
+        {
+          "end" : 51719,
+          "start" : 51640,
+          "text" : " you"
+        },
+        {
+          "end" : 51960,
+          "start" : 51719,
+          "text" : " stop"
+        },
+        {
+          "end" : 52440,
+          "start" : 51960,
+          "text" : " asserting"
+        },
+        {
+          "end" : 52600,
+          "start" : 52440,
+          "text" : " it"
+        },
+        {
+          "end" : 52760,
+          "start" : 52600,
+          "text" : " and"
+        },
+        {
+          "end" : 52920,
+          "start" : 52760,
+          "text" : " start"
+        },
+        {
+          "end" : 53399,
+          "start" : 52920,
+          "text" : " proving"
+        },
+        {
+          "end" : 53960,
+          "start" : 53399,
+          "text" : " it."
+        }
+      ]
+    }
+  ],
+  "text" : "Here's where this goes.\nResidual risk becomes economic capital.\nThe same maths and underwriter already prices a premium off.\nTechnological risk stops being a slide in an appendix and becomes one line on the balance sheet, readable, defensible.\nSomething a board actually acts on.\nMost tools sell reassurance.\nThis one senses reasons and prices continuously and shows its own working.\nSo here's what's left in the open, same as everything else tonight.\nFinish the identity mesh on Tuppence and Ludlow so that red line goes green for real, not for show.\nWiden the loop, more feeds, more institutions, more of the risk landscape sensed and reasoned about automatically.\nPopulate this scenario library out further than one breach and one control.\nNothing here is finished.\nAll of it is real, that's the whole thing.\nLive, honest, and running right now.\nNow, every number tonight was real, including the one that's red.\nThis is what governance looks like when you stop asserting it and start proving it."
+}

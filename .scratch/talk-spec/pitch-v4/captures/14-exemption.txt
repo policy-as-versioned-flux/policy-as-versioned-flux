@@ -1,0 +1,8 @@
+[1;36m==>[0m 1. NO ledger entry -> no exception -> the pod is DENIED
+[1;36m==>[0m 2. the ledger entry RENDERS a PolicyException (offline twin of the Flux render)
+[1;36m==>[0m    rendered, scoped to app=legacy-till, TTL backstop = 2026-10-01
+[1;36m==>[0m 3. WITH the rendered exception -> the same pod is admitted (skip)
+[1;36m==>[0m 4. REMOVE the entry (simulate deleting the ledger row) -> re-render is empty -> DENIED (prune)
+[1;36m==>[0m    entry gone -> no exception -> DENIED again
+[1;36m==>[0m 5. live tail skipped: no reachable cluster at context 'kind-driftwood'
+PASS: no ledger entry, no exception; a row renders a TTL-capped PolicyException; removing it prunes.

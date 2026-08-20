@@ -1,0 +1,13 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: stamp-posture
+policies: [mp.yaml]
+resources: [res.yaml]
+results:
+  - policy: stamp-posture
+    rule: stamp-posture
+    kind: Pod
+    resources: [pod-v2]
+    patchedResources: patched.yaml
+    result: pass

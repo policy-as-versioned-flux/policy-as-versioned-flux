@@ -1,0 +1,992 @@
+{
+  "segments" : [
+    {
+      "end" : 2640,
+      "id" : "351F58F4-8885-47FC-B2EA-FA98C652E387",
+      "start" : 240,
+      "text" : "And this isn't a prototype anymore.",
+      "words" : [
+        {
+          "end" : 560,
+          "start" : 240,
+          "text" : " And"
+        },
+        {
+          "end" : 720,
+          "start" : 560,
+          "text" : " this"
+        },
+        {
+          "end" : 880,
+          "start" : 720,
+          "text" : " isn"
+        },
+        {
+          "end" : 1040,
+          "start" : 880,
+          "text" : "'t"
+        },
+        {
+          "end" : 1200,
+          "start" : 1040,
+          "text" : " a"
+        },
+        {
+          "end" : 1840,
+          "start" : 1200,
+          "text" : " prototype"
+        },
+        {
+          "end" : 2640,
+          "start" : 1840,
+          "text" : " anymore."
+        }
+      ]
+    },
+    {
+      "end" : 9920,
+      "id" : "F7435C9F-8525-49D7-B489-B9420E302FA1",
+      "start" : 2640,
+      "text" : "Six live organizations, one shared platform, three regulated institutions, two regulators, publishing controls and finds as code.",
+      "words" : [
+        {
+          "end" : 3040,
+          "start" : 2640,
+          "text" : " Six"
+        },
+        {
+          "end" : 3440,
+          "start" : 3040,
+          "text" : " live"
+        },
+        {
+          "end" : 4240,
+          "start" : 3440,
+          "text" : " organizations,"
+        },
+        {
+          "end" : 4480,
+          "start" : 4240,
+          "text" : " one"
+        },
+        {
+          "end" : 4800,
+          "start" : 4480,
+          "text" : " shared"
+        },
+        {
+          "end" : 5360,
+          "start" : 4800,
+          "text" : " platform,"
+        },
+        {
+          "end" : 5600,
+          "start" : 5360,
+          "text" : " three"
+        },
+        {
+          "end" : 6160,
+          "start" : 5600,
+          "text" : " regulated"
+        },
+        {
+          "end" : 6720,
+          "start" : 6160,
+          "text" : " institutions,"
+        },
+        {
+          "end" : 6960,
+          "start" : 6720,
+          "text" : " two"
+        },
+        {
+          "end" : 7520,
+          "start" : 6960,
+          "text" : " regulators,"
+        },
+        {
+          "end" : 7840,
+          "start" : 7520,
+          "text" : " publishing"
+        },
+        {
+          "end" : 8080,
+          "start" : 7840,
+          "text" : " controls"
+        },
+        {
+          "end" : 8240,
+          "start" : 8160,
+          "text" : " and"
+        },
+        {
+          "end" : 8560,
+          "start" : 8240,
+          "text" : " finds"
+        },
+        {
+          "end" : 8720,
+          "start" : 8560,
+          "text" : " as"
+        },
+        {
+          "end" : 9920,
+          "start" : 8800,
+          "text" : " code."
+        }
+      ]
+    },
+    {
+      "end" : 15000,
+      "id" : "FA59DF14-6E80-46C9-88F9-603E03A6903C",
+      "start" : 9320,
+      "text" : "732 files, 29 independent verify scripts, each one a real gate, not a comment delete one.",
+      "words" : [
+        {
+          "end" : 10360,
+          "start" : 9320,
+          "text" : " 732"
+        },
+        {
+          "end" : 10920,
+          "start" : 10360,
+          "text" : " files,"
+        },
+        {
+          "end" : 11480,
+          "start" : 10920,
+          "text" : " 29"
+        },
+        {
+          "end" : 11960,
+          "start" : 11480,
+          "text" : " independent"
+        },
+        {
+          "end" : 12360,
+          "start" : 11960,
+          "text" : " verify"
+        },
+        {
+          "end" : 12760,
+          "start" : 12360,
+          "text" : " scripts,"
+        },
+        {
+          "end" : 12920,
+          "start" : 12760,
+          "text" : " each"
+        },
+        {
+          "end" : 13080,
+          "start" : 12920,
+          "text" : " one"
+        },
+        {
+          "end" : 13160,
+          "start" : 13080,
+          "text" : " a"
+        },
+        {
+          "end" : 13240,
+          "start" : 13160,
+          "text" : " real"
+        },
+        {
+          "end" : 13719,
+          "start" : 13400,
+          "text" : " gate,"
+        },
+        {
+          "end" : 13880,
+          "start" : 13719,
+          "text" : " not"
+        },
+        {
+          "end" : 13960,
+          "start" : 13880,
+          "text" : " a"
+        },
+        {
+          "end" : 14200,
+          "start" : 13960,
+          "text" : " comment"
+        },
+        {
+          "end" : 14680,
+          "start" : 14280,
+          "text" : " delete"
+        },
+        {
+          "end" : 15000,
+          "start" : 14680,
+          "text" : " one."
+        }
+      ]
+    },
+    {
+      "end" : 17320,
+      "id" : "C8DD6191-5154-409B-AA0F-418D49ECE223",
+      "start" : 15000,
+      "text" : "And the beat it backs goes red immediately.",
+      "words" : [
+        {
+          "end" : 15080,
+          "start" : 15000,
+          "text" : " And"
+        },
+        {
+          "end" : 15240,
+          "start" : 15080,
+          "text" : " the"
+        },
+        {
+          "end" : 15480,
+          "start" : 15240,
+          "text" : " beat"
+        },
+        {
+          "end" : 15559,
+          "start" : 15480,
+          "text" : " it"
+        },
+        {
+          "end" : 15880,
+          "start" : 15639,
+          "text" : " backs"
+        },
+        {
+          "end" : 16200,
+          "start" : 15960,
+          "text" : " goes"
+        },
+        {
+          "end" : 16440,
+          "start" : 16200,
+          "text" : " red"
+        },
+        {
+          "end" : 17320,
+          "start" : 16440,
+          "text" : " immediately."
+        }
+      ]
+    },
+    {
+      "end" : 18360,
+      "id" : "4AA95FBA-18F3-4625-9015-23CA79C93052",
+      "start" : 17240,
+      "text" : "No silent rot.",
+      "words" : [
+        {
+          "end" : 17400,
+          "start" : 17240,
+          "text" : " No"
+        },
+        {
+          "end" : 17800,
+          "start" : 17400,
+          "text" : " silent"
+        },
+        {
+          "end" : 18360,
+          "start" : 17800,
+          "text" : " rot."
+        }
+      ]
+    },
+    {
+      "end" : 21480,
+      "id" : "EDEB3696-B8AC-4531-883F-B3F74BF929AF",
+      "start" : 18360,
+      "text" : "Every one of them runs in minutes on a laptop with no cloud bill.",
+      "words" : [
+        {
+          "end" : 18600,
+          "start" : 18360,
+          "text" : " Every"
+        },
+        {
+          "end" : 18680,
+          "start" : 18600,
+          "text" : " one"
+        },
+        {
+          "end" : 18840,
+          "start" : 18680,
+          "text" : " of"
+        },
+        {
+          "end" : 19000,
+          "start" : 18840,
+          "text" : " them"
+        },
+        {
+          "end" : 19240,
+          "start" : 19000,
+          "text" : " runs"
+        },
+        {
+          "end" : 19400,
+          "start" : 19240,
+          "text" : " in"
+        },
+        {
+          "end" : 19720,
+          "start" : 19400,
+          "text" : " minutes"
+        },
+        {
+          "end" : 19960,
+          "start" : 19800,
+          "text" : " on"
+        },
+        {
+          "end" : 20040,
+          "start" : 19960,
+          "text" : " a"
+        },
+        {
+          "end" : 20440,
+          "start" : 20040,
+          "text" : " laptop"
+        },
+        {
+          "end" : 20600,
+          "start" : 20440,
+          "text" : " with"
+        },
+        {
+          "end" : 20760,
+          "start" : 20600,
+          "text" : " no"
+        },
+        {
+          "end" : 21000,
+          "start" : 20760,
+          "text" : " cloud"
+        },
+        {
+          "end" : 21480,
+          "start" : 21080,
+          "text" : " bill."
+        }
+      ]
+    },
+    {
+      "end" : 22840,
+      "id" : "1EE415C3-FF93-4309-A88E-A4EECA4A7B4D",
+      "start" : 21480,
+      "text" : "This estate replaced the talk.",
+      "words" : [
+        {
+          "end" : 21640,
+          "start" : 21480,
+          "text" : " This"
+        },
+        {
+          "end" : 21960,
+          "start" : 21640,
+          "text" : " estate"
+        },
+        {
+          "end" : 22360,
+          "start" : 21960,
+          "text" : " replaced"
+        },
+        {
+          "end" : 22440,
+          "start" : 22360,
+          "text" : " the"
+        },
+        {
+          "end" : 22840,
+          "start" : 22440,
+          "text" : " talk."
+        }
+      ]
+    },
+    {
+      "end" : 24280,
+      "id" : "C478649B-8253-429B-AABF-3FE82B94CC70",
+      "start" : 22840,
+      "text" : "Now the talk reports on the estate.",
+      "words" : [
+        {
+          "end" : 22920,
+          "start" : 22840,
+          "text" : " Now"
+        },
+        {
+          "end" : 23160,
+          "start" : 23000,
+          "text" : " the"
+        },
+        {
+          "end" : 23240,
+          "start" : 23160,
+          "text" : " talk"
+        },
+        {
+          "end" : 23640,
+          "start" : 23400,
+          "text" : " reports"
+        },
+        {
+          "end" : 23720,
+          "start" : 23640,
+          "text" : " on"
+        },
+        {
+          "end" : 23880,
+          "start" : 23720,
+          "text" : " the"
+        },
+        {
+          "end" : 24280,
+          "start" : 23880,
+          "text" : " estate."
+        }
+      ]
+    },
+    {
+      "end" : 27880,
+      "id" : "F2BFC189-D918-47BF-97CB-0B4D7A82DF3A",
+      "start" : 24280,
+      "text" : "Every board in the country is asking the same panic question right now.",
+      "words" : [
+        {
+          "end" : 24440,
+          "start" : 24280,
+          "text" : " Every"
+        },
+        {
+          "end" : 24680,
+          "start" : 24440,
+          "text" : " board"
+        },
+        {
+          "end" : 24840,
+          "start" : 24680,
+          "text" : " in"
+        },
+        {
+          "end" : 24920,
+          "start" : 24840,
+          "text" : " the"
+        },
+        {
+          "end" : 25160,
+          "start" : 24920,
+          "text" : " country"
+        },
+        {
+          "end" : 25320,
+          "start" : 25160,
+          "text" : " is"
+        },
+        {
+          "end" : 25560,
+          "start" : 25320,
+          "text" : " asking"
+        },
+        {
+          "end" : 25720,
+          "start" : 25560,
+          "text" : " the"
+        },
+        {
+          "end" : 25880,
+          "start" : 25720,
+          "text" : " same"
+        },
+        {
+          "end" : 26279,
+          "start" : 25880,
+          "text" : " panic"
+        },
+        {
+          "end" : 26760,
+          "start" : 26439,
+          "text" : " question"
+        },
+        {
+          "end" : 27080,
+          "start" : 26760,
+          "text" : " right"
+        },
+        {
+          "end" : 27880,
+          "start" : 27080,
+          "text" : " now."
+        }
+      ]
+    },
+    {
+      "end" : 30540,
+      "id" : "7232C7BC-3915-4A83-B2C5-F26ACC77EC1B",
+      "start" : 27260,
+      "text" : "How do we govern the AI agents we just gave commit access to?",
+      "words" : [
+        {
+          "end" : 27580,
+          "start" : 27260,
+          "text" : " How"
+        },
+        {
+          "end" : 27660,
+          "start" : 27580,
+          "text" : " do"
+        },
+        {
+          "end" : 27740,
+          "start" : 27660,
+          "text" : " we"
+        },
+        {
+          "end" : 28060,
+          "start" : 27740,
+          "text" : " govern"
+        },
+        {
+          "end" : 28220,
+          "start" : 28060,
+          "text" : " the"
+        },
+        {
+          "end" : 28540,
+          "start" : 28220,
+          "text" : " AI"
+        },
+        {
+          "end" : 28860,
+          "start" : 28540,
+          "text" : " agents"
+        },
+        {
+          "end" : 29020,
+          "start" : 28860,
+          "text" : " we"
+        },
+        {
+          "end" : 29100,
+          "start" : 29020,
+          "text" : " just"
+        },
+        {
+          "end" : 29340,
+          "start" : 29100,
+          "text" : " gave"
+        },
+        {
+          "end" : 29820,
+          "start" : 29340,
+          "text" : " commit"
+        },
+        {
+          "end" : 30140,
+          "start" : 29820,
+          "text" : " access"
+        },
+        {
+          "end" : 30540,
+          "start" : 30140,
+          "text" : " to?"
+        }
+      ]
+    },
+    {
+      "end" : 36140,
+      "id" : "F86A935B-8A7D-4438-AF25-246DC2999744",
+      "start" : 30540,
+      "text" : "Most answers are a policy document nobody reads, and a document doesn't stop an agent from doing anything.",
+      "words" : [
+        {
+          "end" : 30860,
+          "start" : 30540,
+          "text" : " Most"
+        },
+        {
+          "end" : 31180,
+          "start" : 30860,
+          "text" : " answers"
+        },
+        {
+          "end" : 31340,
+          "start" : 31180,
+          "text" : " are"
+        },
+        {
+          "end" : 31420,
+          "start" : 31340,
+          "text" : " a"
+        },
+        {
+          "end" : 31820,
+          "start" : 31420,
+          "text" : " policy"
+        },
+        {
+          "end" : 32380,
+          "start" : 31820,
+          "text" : " document"
+        },
+        {
+          "end" : 32700,
+          "start" : 32380,
+          "text" : " nobody"
+        },
+        {
+          "end" : 33180,
+          "start" : 32700,
+          "text" : " reads,"
+        },
+        {
+          "end" : 33340,
+          "start" : 33180,
+          "text" : " and"
+        },
+        {
+          "end" : 33420,
+          "start" : 33340,
+          "text" : " a"
+        },
+        {
+          "end" : 33820,
+          "start" : 33420,
+          "text" : " document"
+        },
+        {
+          "end" : 33900,
+          "start" : 33820,
+          "text" : " doesn"
+        },
+        {
+          "end" : 34060,
+          "start" : 33900,
+          "text" : "'t"
+        },
+        {
+          "end" : 34300,
+          "start" : 34060,
+          "text" : " stop"
+        },
+        {
+          "end" : 34380,
+          "start" : 34300,
+          "text" : " an"
+        },
+        {
+          "end" : 34700,
+          "start" : 34380,
+          "text" : " agent"
+        },
+        {
+          "end" : 34940,
+          "start" : 34700,
+          "text" : " from"
+        },
+        {
+          "end" : 35260,
+          "start" : 34940,
+          "text" : " doing"
+        },
+        {
+          "end" : 36140,
+          "start" : 35260,
+          "text" : " anything."
+        }
+      ]
+    },
+    {
+      "end" : 44260,
+      "id" : "2034A8C0-B83B-4213-BBD0-B983962D65A4",
+      "start" : 35620,
+      "text" : "Ours is a cryptographic route, nothing gets passed unverified, a loop that senses and reasons continuously, and a gate the agent cannot get past on its own.",
+      "words" : [
+        {
+          "end" : 36020,
+          "start" : 35620,
+          "text" : " Ours"
+        },
+        {
+          "end" : 36100,
+          "start" : 36020,
+          "text" : " is"
+        },
+        {
+          "end" : 36260,
+          "start" : 36100,
+          "text" : " a"
+        },
+        {
+          "end" : 36899,
+          "start" : 36260,
+          "text" : " cryptographic"
+        },
+        {
+          "end" : 37379,
+          "start" : 36899,
+          "text" : " route,"
+        },
+        {
+          "end" : 37700,
+          "start" : 37379,
+          "text" : " nothing"
+        },
+        {
+          "end" : 37940,
+          "start" : 37700,
+          "text" : " gets"
+        },
+        {
+          "end" : 38260,
+          "start" : 37940,
+          "text" : " passed"
+        },
+        {
+          "end" : 38980,
+          "start" : 38260,
+          "text" : " unverified,"
+        },
+        {
+          "end" : 39059,
+          "start" : 38980,
+          "text" : " a"
+        },
+        {
+          "end" : 39379,
+          "start" : 39059,
+          "text" : " loop"
+        },
+        {
+          "end" : 39540,
+          "start" : 39379,
+          "text" : " that"
+        },
+        {
+          "end" : 39940,
+          "start" : 39540,
+          "text" : " senses"
+        },
+        {
+          "end" : 40100,
+          "start" : 39940,
+          "text" : " and"
+        },
+        {
+          "end" : 40500,
+          "start" : 40100,
+          "text" : " reasons"
+        },
+        {
+          "end" : 41300,
+          "start" : 40500,
+          "text" : " continuously,"
+        },
+        {
+          "end" : 41460,
+          "start" : 41300,
+          "text" : " and"
+        },
+        {
+          "end" : 41540,
+          "start" : 41460,
+          "text" : " a"
+        },
+        {
+          "end" : 41860,
+          "start" : 41540,
+          "text" : " gate"
+        },
+        {
+          "end" : 42020,
+          "start" : 41860,
+          "text" : " the"
+        },
+        {
+          "end" : 42340,
+          "start" : 42020,
+          "text" : " agent"
+        },
+        {
+          "end" : 42579,
+          "start" : 42340,
+          "text" : " cannot"
+        },
+        {
+          "end" : 42739,
+          "start" : 42579,
+          "text" : " get"
+        },
+        {
+          "end" : 43059,
+          "start" : 42739,
+          "text" : " past"
+        },
+        {
+          "end" : 43379,
+          "start" : 43059,
+          "text" : " on"
+        },
+        {
+          "end" : 43699,
+          "start" : 43379,
+          "text" : " its"
+        },
+        {
+          "end" : 44260,
+          "start" : 43699,
+          "text" : " own."
+        }
+      ]
+    },
+    {
+      "end" : 46460,
+      "id" : "13C7D2C9-4E86-45E7-9803-0A4B07AB571A",
+      "start" : 43740,
+      "text" : "Flux isn't a logo here, it's load bearing.",
+      "words" : [
+        {
+          "end" : 44220,
+          "start" : 43740,
+          "text" : " Flux"
+        },
+        {
+          "end" : 44380,
+          "start" : 44220,
+          "text" : " isn"
+        },
+        {
+          "end" : 44460,
+          "start" : 44380,
+          "text" : "'t"
+        },
+        {
+          "end" : 44620,
+          "start" : 44460,
+          "text" : " a"
+        },
+        {
+          "end" : 45020,
+          "start" : 44620,
+          "text" : " logo"
+        },
+        {
+          "end" : 45340,
+          "start" : 45020,
+          "text" : " here,"
+        },
+        {
+          "end" : 45420,
+          "start" : 45340,
+          "text" : " it"
+        },
+        {
+          "end" : 45580,
+          "start" : 45420,
+          "text" : "'s"
+        },
+        {
+          "end" : 45820,
+          "start" : 45580,
+          "text" : " load"
+        },
+        {
+          "end" : 46460,
+          "start" : 45900,
+          "text" : " bearing."
+        }
+      ]
+    },
+    {
+      "end" : 51580,
+      "id" : "19DF3F4B-59B8-4413-A816-A828E2417B4C",
+      "start" : 46460,
+      "text" : "It's the only reason any of this reconciles provably from sign Git on its own.",
+      "words" : [
+        {
+          "end" : 46620,
+          "start" : 46460,
+          "text" : " It"
+        },
+        {
+          "end" : 46700,
+          "start" : 46620,
+          "text" : "'s"
+        },
+        {
+          "end" : 46860,
+          "start" : 46700,
+          "text" : " the"
+        },
+        {
+          "end" : 47100,
+          "start" : 46860,
+          "text" : " only"
+        },
+        {
+          "end" : 47420,
+          "start" : 47100,
+          "text" : " reason"
+        },
+        {
+          "end" : 47660,
+          "start" : 47420,
+          "text" : " any"
+        },
+        {
+          "end" : 47739,
+          "start" : 47660,
+          "text" : " of"
+        },
+        {
+          "end" : 47980,
+          "start" : 47739,
+          "text" : " this"
+        },
+        {
+          "end" : 48620,
+          "start" : 47980,
+          "text" : " reconciles"
+        },
+        {
+          "end" : 49260,
+          "start" : 48620,
+          "text" : " provably"
+        },
+        {
+          "end" : 49500,
+          "start" : 49260,
+          "text" : " from"
+        },
+        {
+          "end" : 49820,
+          "start" : 49500,
+          "text" : " sign"
+        },
+        {
+          "end" : 50220,
+          "start" : 49900,
+          "text" : " Git"
+        },
+        {
+          "end" : 50620,
+          "start" : 50380,
+          "text" : " on"
+        },
+        {
+          "end" : 50940,
+          "start" : 50620,
+          "text" : " its"
+        },
+        {
+          "end" : 51580,
+          "start" : 50940,
+          "text" : " own."
+        }
+      ]
+    }
+  ],
+  "text" : "And this isn't a prototype anymore.\nSix live organizations, one shared platform, three regulated institutions, two regulators, publishing controls and finds as code.\n732 files, 29 independent verify scripts, each one a real gate, not a comment delete one.\nAnd the beat it backs goes red immediately.\nNo silent rot.\nEvery one of them runs in minutes on a laptop with no cloud bill.\nThis estate replaced the talk.\nNow the talk reports on the estate.\nEvery board in the country is asking the same panic question right now.\nHow do we govern the AI agents we just gave commit access to?\nMost answers are a policy document nobody reads, and a document doesn't stop an agent from doing anything.\nOurs is a cryptographic route, nothing gets passed unverified, a loop that senses and reasons continuously, and a gate the agent cannot get past on its own.\nFlux isn't a logo here, it's load bearing.\nIt's the only reason any of this reconciles provably from sign Git on its own."
+}

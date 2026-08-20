@@ -1,0 +1,125 @@
+2026-08-15T13:58:29Z trial configmap-edit-outside-gitops: verifying baseline before starting
+2026-08-15T13:58:29Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T13:59:29Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:00:29Z trial configmap-edit-outside-gitops: applying the forced action
+configmap/driftwood-live-version patched
+2026-08-15T14:00:30Z trial configmap-edit-outside-gitops: sampling every 15s for 30m -> /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/estate/driftwood/drift/forced-campaign-samples.jsonl
+2026-08-15T14:30:39Z trial configmap-edit-outside-gitops: applying the pre-recorded undo
+configmap/driftwood-live-version patched (no change)
+2026-08-15T14:30:39Z trial configmap-edit-outside-gitops: verifying baseline restored
+2026-08-15T14:30:39Z trial configmap-edit-outside-gitops: complete, baseline restored
+2026-08-15T14:30:39Z trial scale-left-unreverted: verifying baseline before starting
+2026-08-15T14:30:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:31:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:32:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:33:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:34:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:35:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:36:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:37:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:38:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:39:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:40:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:41:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:42:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:43:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:44:39Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:45:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:46:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:47:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:48:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:49:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:50:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:51:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:52:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:53:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:54:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:55:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:56:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:57:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:58:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T14:59:40Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:00:40Z trial scale-left-unreverted: applying the forced action
+deployment.apps/git-server scaled
+2026-08-15T15:00:40Z trial scale-left-unreverted: sampling every 15s for 30m -> /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/estate/driftwood/drift/forced-campaign-samples.jsonl
+2026-08-15T15:30:48Z trial scale-left-unreverted: applying the pre-recorded undo
+deployment.apps/git-server scaled
+Waiting for deployment "git-server" rollout to finish: 0 of 1 updated replicas are available...
+deployment "git-server" successfully rolled out
+2026-08-15T15:30:51Z trial scale-left-unreverted: verifying baseline restored
+2026-08-15T15:30:51Z trial scale-left-unreverted: complete, baseline restored
+2026-08-15T15:30:51Z trial kustomization-suspended-left-suspended: verifying baseline before starting
+2026-08-15T15:30:51Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:31:51Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:32:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:33:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:34:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:35:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:36:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:37:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:38:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:39:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:40:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:41:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:42:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:43:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:44:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:45:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:46:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:47:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:48:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:49:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:50:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:51:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:52:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:53:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:54:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:55:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:56:52Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:57:53Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:58:53Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T15:59:53Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:00:53Z trial kustomization-suspended-left-suspended: applying the forced action
+kustomization.kustomize.toolkit.fluxcd.io/driftwood patched
+2026-08-15T16:00:53Z trial kustomization-suspended-left-suspended: sampling every 15s for 30m -> /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/estate/driftwood/drift/forced-campaign-samples.jsonl
+2026-08-15T16:31:06Z trial kustomization-suspended-left-suspended: applying the pre-recorded undo
+kustomization.kustomize.toolkit.fluxcd.io/driftwood patched
+2026-08-15T16:31:06Z trial kustomization-suspended-left-suspended: verifying baseline restored
+2026-08-15T16:31:06Z trial kustomization-suspended-left-suspended: complete, baseline restored
+2026-08-15T16:31:06Z trial resource-deleted-outright: verifying baseline before starting
+2026-08-15T16:31:06Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:32:06Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:33:06Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:34:06Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:35:06Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:36:06Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:37:06Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:38:06Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:39:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:40:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:41:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:42:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:43:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:44:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:45:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:46:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:47:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:48:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:49:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:50:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:51:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:52:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:53:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:54:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:55:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:56:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:57:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:58:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T16:59:07Z waiting for a safe start window (need >= 40m before the next hour)
+2026-08-15T17:00:07Z trial resource-deleted-outright: applying the forced action
+configmap "driftwood-nist-pin" deleted from driftwood namespace
+2026-08-15T17:00:07Z trial resource-deleted-outright: sampling every 15s for 30m -> /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/estate/driftwood/drift/forced-campaign-samples.jsonl
+2026-08-15T17:30:10Z trial resource-deleted-outright: applying the pre-recorded undo
+2026-08-15T17:30:10Z trial resource-deleted-outright: verifying baseline restored
+2026-08-15T17:30:10Z trial resource-deleted-outright: complete, baseline restored
+2026-08-15T17:30:10Z forced-drift latency campaign complete: /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/estate/driftwood/drift/forced-campaign-samples.jsonl

@@ -1,0 +1,114 @@
+[
+  {
+    "act": 0,
+    "segments": [
+      0,
+      1,
+      2
+    ],
+    "words": 158,
+    "duration": 54.4
+  },
+  {
+    "act": 1,
+    "segments": [
+      3,
+      4,
+      5
+    ],
+    "words": 204,
+    "duration": 75.68
+  },
+  {
+    "act": 2,
+    "segments": [
+      6,
+      7,
+      8
+    ],
+    "words": 187,
+    "duration": 65.28
+  },
+  {
+    "act": 3,
+    "segments": [
+      9,
+      10
+    ],
+    "words": 173,
+    "duration": 54.4
+  },
+  {
+    "act": 4,
+    "segments": [
+      11,
+      12
+    ],
+    "words": 149,
+    "duration": 49.2
+  },
+  {
+    "act": 5,
+    "segments": [
+      13,
+      14
+    ],
+    "words": 166,
+    "duration": 50.88
+  },
+  {
+    "act": 6,
+    "segments": [
+      15,
+      16
+    ],
+    "words": 129,
+    "duration": 38.64
+  },
+  {
+    "act": 7,
+    "segments": [
+      17,
+      18
+    ],
+    "words": 174,
+    "duration": 51.04
+  },
+  {
+    "act": 8,
+    "segments": [
+      19,
+      20
+    ],
+    "words": 170,
+    "duration": 57.6
+  },
+  {
+    "act": 9,
+    "segments": [
+      21,
+      22
+    ],
+    "words": 150,
+    "duration": 46.72
+  },
+  {
+    "act": 10,
+    "segments": [
+      23,
+      24
+    ],
+    "words": 175,
+    "duration": 50.96
+  },
+  {
+    "act": 11,
+    "segments": [
+      25,
+      26,
+      27
+    ],
+    "words": 168,
+    "duration": 53.36
+  }
+]

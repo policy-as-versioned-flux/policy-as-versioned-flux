@@ -1,0 +1,738 @@
+{
+  "segments" : [
+    {
+      "end" : 4560,
+      "id" : "035CF218-B342-4CA9-ADCF-B70EB5A2ED89",
+      "start" : 320,
+      "text" : "So two proposals go out as pull requests on a branch signed.",
+      "words" : [
+        {
+          "end" : 560,
+          "start" : 320,
+          "text" : " So"
+        },
+        {
+          "end" : 880,
+          "start" : 640,
+          "text" : " two"
+        },
+        {
+          "end" : 1440,
+          "start" : 880,
+          "text" : " proposals"
+        },
+        {
+          "end" : 1600,
+          "start" : 1440,
+          "text" : " go"
+        },
+        {
+          "end" : 1840,
+          "start" : 1600,
+          "text" : " out"
+        },
+        {
+          "end" : 2080,
+          "start" : 1840,
+          "text" : " as"
+        },
+        {
+          "end" : 2400,
+          "start" : 2080,
+          "text" : " pull"
+        },
+        {
+          "end" : 2960,
+          "start" : 2400,
+          "text" : " requests"
+        },
+        {
+          "end" : 3120,
+          "start" : 2960,
+          "text" : " on"
+        },
+        {
+          "end" : 3280,
+          "start" : 3120,
+          "text" : " a"
+        },
+        {
+          "end" : 3680,
+          "start" : 3280,
+          "text" : " branch"
+        },
+        {
+          "end" : 4560,
+          "start" : 3840,
+          "text" : " signed."
+        }
+      ]
+    },
+    {
+      "end" : 6000,
+      "id" : "46E32BD6-38B6-415C-884B-1725808ACCB9",
+      "start" : 4560,
+      "text" : "Main is untouched.",
+      "words" : [
+        {
+          "end" : 5040,
+          "start" : 4560,
+          "text" : " Main"
+        },
+        {
+          "end" : 5200,
+          "start" : 5040,
+          "text" : " is"
+        },
+        {
+          "end" : 6000,
+          "start" : 5200,
+          "text" : " untouched."
+        }
+      ]
+    },
+    {
+      "end" : 10000,
+      "id" : "24C47B84-10A5-4C58-AB72-81D727DDDDAC",
+      "start" : 6000,
+      "text" : "Each one carries the same version cross-check gate your own CI runs.",
+      "words" : [
+        {
+          "end" : 6240,
+          "start" : 6000,
+          "text" : " Each"
+        },
+        {
+          "end" : 6480,
+          "start" : 6240,
+          "text" : " one"
+        },
+        {
+          "end" : 6880,
+          "start" : 6480,
+          "text" : " carries"
+        },
+        {
+          "end" : 6960,
+          "start" : 6880,
+          "text" : " the"
+        },
+        {
+          "end" : 7200,
+          "start" : 6960,
+          "text" : " same"
+        },
+        {
+          "end" : 7520,
+          "start" : 7200,
+          "text" : " version"
+        },
+        {
+          "end" : 7920,
+          "start" : 7680,
+          "text" : " cross"
+        },
+        {
+          "end" : 8240,
+          "start" : 7920,
+          "text" : "-check"
+        },
+        {
+          "end" : 8640,
+          "start" : 8320,
+          "text" : " gate"
+        },
+        {
+          "end" : 8800,
+          "start" : 8720,
+          "text" : " your"
+        },
+        {
+          "end" : 8960,
+          "start" : 8880,
+          "text" : " own"
+        },
+        {
+          "end" : 9600,
+          "start" : 9120,
+          "text" : " CI"
+        },
+        {
+          "end" : 10000,
+          "start" : 9600,
+          "text" : " runs."
+        }
+      ]
+    },
+    {
+      "end" : 14400,
+      "id" : "8EC8AC34-3169-4D1A-84D2-ED578811F42C",
+      "start" : 10000,
+      "text" : "So a human reviewer sees exactly what would break before they approve anything.",
+      "words" : [
+        {
+          "end" : 10160,
+          "start" : 10000,
+          "text" : " So"
+        },
+        {
+          "end" : 10240,
+          "start" : 10160,
+          "text" : " a"
+        },
+        {
+          "end" : 10560,
+          "start" : 10240,
+          "text" : " human"
+        },
+        {
+          "end" : 10960,
+          "start" : 10560,
+          "text" : " reviewer"
+        },
+        {
+          "end" : 11200,
+          "start" : 10960,
+          "text" : " sees"
+        },
+        {
+          "end" : 11520,
+          "start" : 11200,
+          "text" : " exactly"
+        },
+        {
+          "end" : 11760,
+          "start" : 11520,
+          "text" : " what"
+        },
+        {
+          "end" : 11920,
+          "start" : 11760,
+          "text" : " would"
+        },
+        {
+          "end" : 12240,
+          "start" : 11920,
+          "text" : " break"
+        },
+        {
+          "end" : 12480,
+          "start" : 12240,
+          "text" : " before"
+        },
+        {
+          "end" : 12640,
+          "start" : 12480,
+          "text" : " they"
+        },
+        {
+          "end" : 13200,
+          "start" : 12640,
+          "text" : " approve"
+        },
+        {
+          "end" : 14400,
+          "start" : 13200,
+          "text" : " anything."
+        }
+      ]
+    },
+    {
+      "end" : 17900,
+      "id" : "AB7ED1AC-C462-4083-A6E6-C8918ACA7D64",
+      "start" : 13740,
+      "text" : "Nothing here has a merge function, not a lockdown one, none at all.",
+      "words" : [
+        {
+          "end" : 14220,
+          "start" : 13740,
+          "text" : " Nothing"
+        },
+        {
+          "end" : 14460,
+          "start" : 14220,
+          "text" : " here"
+        },
+        {
+          "end" : 14620,
+          "start" : 14460,
+          "text" : " has"
+        },
+        {
+          "end" : 14700,
+          "start" : 14620,
+          "text" : " a"
+        },
+        {
+          "end" : 15180,
+          "start" : 14700,
+          "text" : " merge"
+        },
+        {
+          "end" : 15660,
+          "start" : 15180,
+          "text" : " function,"
+        },
+        {
+          "end" : 15820,
+          "start" : 15660,
+          "text" : " not"
+        },
+        {
+          "end" : 15900,
+          "start" : 15820,
+          "text" : " a"
+        },
+        {
+          "end" : 16460,
+          "start" : 15900,
+          "text" : " lockdown"
+        },
+        {
+          "end" : 16780,
+          "start" : 16460,
+          "text" : " one,"
+        },
+        {
+          "end" : 17100,
+          "start" : 16780,
+          "text" : " none"
+        },
+        {
+          "end" : 17340,
+          "start" : 17100,
+          "text" : " at"
+        },
+        {
+          "end" : 17900,
+          "start" : 17340,
+          "text" : " all."
+        }
+      ]
+    },
+    {
+      "end" : 20540,
+      "id" : "B6AE83B7-D571-46E2-8E95-2A180BDBB633",
+      "start" : 17900,
+      "text" : "The agent physically cannot ship its own change.",
+      "words" : [
+        {
+          "end" : 18140,
+          "start" : 17900,
+          "text" : " The"
+        },
+        {
+          "end" : 18540,
+          "start" : 18140,
+          "text" : " agent"
+        },
+        {
+          "end" : 18940,
+          "start" : 18540,
+          "text" : " physically"
+        },
+        {
+          "end" : 19260,
+          "start" : 18940,
+          "text" : " cannot"
+        },
+        {
+          "end" : 19500,
+          "start" : 19260,
+          "text" : " ship"
+        },
+        {
+          "end" : 19660,
+          "start" : 19500,
+          "text" : " its"
+        },
+        {
+          "end" : 19900,
+          "start" : 19660,
+          "text" : " own"
+        },
+        {
+          "end" : 20540,
+          "start" : 19900,
+          "text" : " change."
+        }
+      ]
+    },
+    {
+      "end" : 23740,
+      "id" : "2B8A74D1-DDD9-4F3F-A925-24658AFB4003",
+      "start" : 20540,
+      "text" : "Let me show you what this looks like when something actually happens.",
+      "words" : [
+        {
+          "end" : 20700,
+          "start" : 20540,
+          "text" : " Let"
+        },
+        {
+          "end" : 20860,
+          "start" : 20700,
+          "text" : " me"
+        },
+        {
+          "end" : 21020,
+          "start" : 20860,
+          "text" : " show"
+        },
+        {
+          "end" : 21180,
+          "start" : 21020,
+          "text" : " you"
+        },
+        {
+          "end" : 21340,
+          "start" : 21180,
+          "text" : " what"
+        },
+        {
+          "end" : 21500,
+          "start" : 21340,
+          "text" : " this"
+        },
+        {
+          "end" : 21740,
+          "start" : 21500,
+          "text" : " looks"
+        },
+        {
+          "end" : 21900,
+          "start" : 21740,
+          "text" : " like"
+        },
+        {
+          "end" : 22220,
+          "start" : 21900,
+          "text" : " when"
+        },
+        {
+          "end" : 22540,
+          "start" : 22220,
+          "text" : " something"
+        },
+        {
+          "end" : 22860,
+          "start" : 22540,
+          "text" : " actually"
+        },
+        {
+          "end" : 23740,
+          "start" : 22860,
+          "text" : " happens."
+        }
+      ]
+    },
+    {
+      "end" : 24820,
+      "id" : "02E9EF2C-FAA8-4DEB-AC2D-63E5BED42AAF",
+      "start" : 23140,
+      "text" : "This headline lands on a Tuesday.",
+      "words" : [
+        {
+          "end" : 23380,
+          "start" : 23140,
+          "text" : " This"
+        },
+        {
+          "end" : 23779,
+          "start" : 23380,
+          "text" : " headline"
+        },
+        {
+          "end" : 24100,
+          "start" : 23779,
+          "text" : " lands"
+        },
+        {
+          "end" : 24260,
+          "start" : 24100,
+          "text" : " on"
+        },
+        {
+          "end" : 24340,
+          "start" : 24260,
+          "text" : " a"
+        },
+        {
+          "end" : 24820,
+          "start" : 24340,
+          "text" : " Tuesday."
+        }
+      ]
+    },
+    {
+      "end" : 28340,
+      "id" : "A42F9EC3-BC85-4A5C-B0B9-81E4FC1D6AF8",
+      "start" : 24820,
+      "text" : "China confirms a major discovery of low-contaminant niobium.",
+      "words" : [
+        {
+          "end" : 25140,
+          "start" : 24820,
+          "text" : " China"
+        },
+        {
+          "end" : 25619,
+          "start" : 25140,
+          "text" : " confirms"
+        },
+        {
+          "end" : 25699,
+          "start" : 25619,
+          "text" : " a"
+        },
+        {
+          "end" : 26020,
+          "start" : 25699,
+          "text" : " major"
+        },
+        {
+          "end" : 26420,
+          "start" : 26020,
+          "text" : " discovery"
+        },
+        {
+          "end" : 26580,
+          "start" : 26420,
+          "text" : " of"
+        },
+        {
+          "end" : 26900,
+          "start" : 26580,
+          "text" : " low"
+        },
+        {
+          "end" : 27539,
+          "start" : 26900,
+          "text" : "-contaminant"
+        },
+        {
+          "end" : 28340,
+          "start" : 27539,
+          "text" : " niobium."
+        }
+      ]
+    },
+    {
+      "end" : 33140,
+      "id" : "4670E5DF-DF24-497F-965F-0288F8CF56A6",
+      "start" : 28340,
+      "text" : "And if you know that, niobium is the superconductor most quantum computers are built out of.",
+      "words" : [
+        {
+          "end" : 28500,
+          "start" : 28340,
+          "text" : " And"
+        },
+        {
+          "end" : 28580,
+          "start" : 28500,
+          "text" : " if"
+        },
+        {
+          "end" : 28660,
+          "start" : 28580,
+          "text" : " you"
+        },
+        {
+          "end" : 28820,
+          "start" : 28660,
+          "text" : " know"
+        },
+        {
+          "end" : 28980,
+          "start" : 28820,
+          "text" : " that,"
+        },
+        {
+          "end" : 29700,
+          "start" : 28980,
+          "text" : " niobium"
+        },
+        {
+          "end" : 29779,
+          "start" : 29700,
+          "text" : " is"
+        },
+        {
+          "end" : 29860,
+          "start" : 29779,
+          "text" : " the"
+        },
+        {
+          "end" : 30740,
+          "start" : 29860,
+          "text" : " superconductor"
+        },
+        {
+          "end" : 30980,
+          "start" : 30740,
+          "text" : " most"
+        },
+        {
+          "end" : 31380,
+          "start" : 30980,
+          "text" : " quantum"
+        },
+        {
+          "end" : 31779,
+          "start" : 31380,
+          "text" : " computers"
+        },
+        {
+          "end" : 31939,
+          "start" : 31779,
+          "text" : " are"
+        },
+        {
+          "end" : 32259,
+          "start" : 31939,
+          "text" : " built"
+        },
+        {
+          "end" : 32500,
+          "start" : 32259,
+          "text" : " out"
+        },
+        {
+          "end" : 33140,
+          "start" : 32500,
+          "text" : " of."
+        }
+      ]
+    },
+    {
+      "end" : 39220,
+      "id" : "8F310248-5F6A-4AC7-AFD7-A4B677B84302",
+      "start" : 32660,
+      "text" : "That headline should worry you because a quantum computer that breaks today's encryption is the single largest tail risk sitting on our books.",
+      "words" : [
+        {
+          "end" : 32900,
+          "start" : 32660,
+          "text" : " That"
+        },
+        {
+          "end" : 33380,
+          "start" : 32900,
+          "text" : " headline"
+        },
+        {
+          "end" : 33540,
+          "start" : 33380,
+          "text" : " should"
+        },
+        {
+          "end" : 33780,
+          "start" : 33540,
+          "text" : " worry"
+        },
+        {
+          "end" : 33940,
+          "start" : 33780,
+          "text" : " you"
+        },
+        {
+          "end" : 34180,
+          "start" : 33940,
+          "text" : " because"
+        },
+        {
+          "end" : 34260,
+          "start" : 34180,
+          "text" : " a"
+        },
+        {
+          "end" : 34580,
+          "start" : 34260,
+          "text" : " quantum"
+        },
+        {
+          "end" : 34900,
+          "start" : 34580,
+          "text" : " computer"
+        },
+        {
+          "end" : 35060,
+          "start" : 34900,
+          "text" : " that"
+        },
+        {
+          "end" : 35380,
+          "start" : 35060,
+          "text" : " breaks"
+        },
+        {
+          "end" : 35540,
+          "start" : 35380,
+          "text" : " today"
+        },
+        {
+          "end" : 35700,
+          "start" : 35540,
+          "text" : "'s"
+        },
+        {
+          "end" : 36180,
+          "start" : 35700,
+          "text" : " encryption"
+        },
+        {
+          "end" : 36260,
+          "start" : 36180,
+          "text" : " is"
+        },
+        {
+          "end" : 36340,
+          "start" : 36260,
+          "text" : " the"
+        },
+        {
+          "end" : 36739,
+          "start" : 36340,
+          "text" : " single"
+        },
+        {
+          "end" : 37140,
+          "start" : 36739,
+          "text" : " largest"
+        },
+        {
+          "end" : 37300,
+          "start" : 37140,
+          "text" : " tail"
+        },
+        {
+          "end" : 37780,
+          "start" : 37460,
+          "text" : " risk"
+        },
+        {
+          "end" : 38020,
+          "start" : 37780,
+          "text" : " sitting"
+        },
+        {
+          "end" : 38180,
+          "start" : 38020,
+          "text" : " on"
+        },
+        {
+          "end" : 38340,
+          "start" : 38180,
+          "text" : " our"
+        },
+        {
+          "end" : 39220,
+          "start" : 38340,
+          "text" : " books."
+        }
+      ]
+    }
+  ],
+  "text" : "So two proposals go out as pull requests on a branch signed.\nMain is untouched.\nEach one carries the same version cross-check gate your own CI runs.\nSo a human reviewer sees exactly what would break before they approve anything.\nNothing here has a merge function, not a lockdown one, none at all.\nThe agent physically cannot ship its own change.\nLet me show you what this looks like when something actually happens.\nThis headline lands on a Tuesday.\nChina confirms a major discovery of low-contaminant niobium.\nAnd if you know that, niobium is the superconductor most quantum computers are built out of.\nThat headline should worry you because a quantum computer that breaks today's encryption is the single largest tail risk sitting on our books."
+}

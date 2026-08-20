@@ -1,0 +1,265 @@
+[
+  {
+    "title": "The quantum value chain \u2014 where the headline actually lands",
+    "subtitle": "The two binding constraints sit far LEFT, at genesis. Niobium sits far RIGHT, already near-commodity. Easing a deep component only accelerates what is above it if that component is on the binding path.",
+    "components": [
+      {
+        "id": "plaintext",
+        "label": "Plaintext of intercepted traffic",
+        "visibility": 1.0,
+        "evolution": 0.95,
+        "fill": "#151519",
+        "stroke": "#8a8f98",
+        "small": true,
+        "labelAnchor": "end",
+        "labelDx": -18,
+        "labelDy": 6
+      },
+      {
+        "id": "capture",
+        "label": "Bulk ciphertext capture + retention",
+        "visibility": 0.8,
+        "evolution": 0.85,
+        "fill": "#151519",
+        "stroke": "#8a8f98",
+        "small": true,
+        "labelAnchor": "end",
+        "labelDx": -18,
+        "labelDy": 6
+      },
+      {
+        "id": "shor",
+        "label": "Shor + resource-optimised compilation",
+        "visibility": 0.25,
+        "evolution": 0.55,
+        "actor": "attacker-capability",
+        "small": true,
+        "labelDy": -22
+      },
+      {
+        "id": "crqc",
+        "label": "CRQC \u2014 quantum cryptanalysis",
+        "visibility": 0.15,
+        "evolution": 0.3,
+        "actor": "attacker-capability",
+        "labelAnchor": "start",
+        "labelDx": 22,
+        "labelDy": 6
+      },
+      {
+        "id": "logical",
+        "label": "Error-corrected logical qubits",
+        "visibility": 0.22,
+        "evolution": 0.22,
+        "fill": "#2a1f00",
+        "stroke": "#e0a53d",
+        "small": true,
+        "badge": "BINDING",
+        "labelAnchor": "end",
+        "labelDx": -20,
+        "labelDy": -4
+      },
+      {
+        "id": "tls",
+        "label": "Surface chemistry (TLS loss)",
+        "visibility": 0.08,
+        "evolution": 0.2,
+        "fill": "#2a1f00",
+        "stroke": "#e0a53d",
+        "small": true,
+        "badge": "BINDING",
+        "labelAnchor": "end",
+        "labelDx": -20,
+        "labelDy": 6
+      },
+      {
+        "id": "films",
+        "label": "Superconducting Nb thin films",
+        "visibility": 0.1,
+        "evolution": 0.45,
+        "fill": "#151519",
+        "stroke": "#8a8f98",
+        "small": true,
+        "labelDy": -22
+      },
+      {
+        "id": "nbgrade",
+        "label": "Qubit-grade Nb (4N+, high-RRR)",
+        "visibility": 0.05,
+        "evolution": 0.62,
+        "fill": "#151519",
+        "stroke": "#8a8f98",
+        "small": true,
+        "labelDy": 30
+      },
+      {
+        "id": "ore",
+        "label": "Raw niobium ore",
+        "visibility": 0.02,
+        "evolution": 0.88,
+        "fill": "#2a1416",
+        "stroke": "#e5484d",
+        "hot": true,
+        "badge": "\u2190 THE HEADLINE",
+        "labelDy": -22
+      }
+    ],
+    "links": [
+      [
+        "plaintext",
+        "capture"
+      ],
+      [
+        "plaintext",
+        "crqc"
+      ],
+      [
+        "crqc",
+        "shor"
+      ],
+      [
+        "crqc",
+        "logical"
+      ],
+      [
+        "logical",
+        "tls"
+      ],
+      [
+        "logical",
+        "films"
+      ],
+      [
+        "films",
+        "nbgrade"
+      ],
+      [
+        "nbgrade",
+        "ore"
+      ]
+    ],
+    "out": "map-quantum-chain.png"
+  },
+  {
+    "title": "After the headline: the map barely moves",
+    "subtitle": "Velocity 0.05 \u2192 0.06. Projected 0.48 \u2014 it stops short of the line. No boundary crossed, no forward signal emitted, the war-gamer is never handed this risk. The loudest signal of the week changes nothing.",
+    "highlightBoundary": 0.5,
+    "boundaryColor": "#8a8f98",
+    "boundaryLabel": "custom \u2192 product: the line that triggers a re-price",
+    "components": [
+      {
+        "id": "pq",
+        "label": "Quantum cryptanalysis",
+        "visibility": 0.15,
+        "evolution": 0.3,
+        "projected": 0.48,
+        "actor": "attacker-capability",
+        "hot": false,
+        "badge": "stops short \u2014 no signal",
+        "labelDy": -22
+      },
+      {
+        "id": "ph",
+        "label": "AI phishing kits (aaS)",
+        "visibility": 0.55,
+        "evolution": 0.6,
+        "projected": 0.96,
+        "actor": "attacker-capability",
+        "small": true,
+        "labelDy": -22
+      },
+      {
+        "id": "rw",
+        "label": "Ransomware-as-a-service",
+        "visibility": 0.45,
+        "evolution": 0.7,
+        "projected": 0.94,
+        "actor": "attacker-capability",
+        "small": true,
+        "labelDy": -22
+      },
+      {
+        "id": "cs",
+        "label": "Credential stuffing (aaS)",
+        "visibility": 0.5,
+        "evolution": 0.82,
+        "projected": 0.91,
+        "actor": "attacker-capability",
+        "small": true,
+        "labelDy": 30
+      },
+      {
+        "id": "sp",
+        "label": "SPIFFE workload identity",
+        "visibility": 0.35,
+        "evolution": 0.55,
+        "projected": 0.85,
+        "actor": "defensive-capability",
+        "small": true,
+        "labelDy": -22
+      }
+    ],
+    "out": "map-after-niobium.png"
+  },
+  {
+    "title": "The paper nobody read moves it",
+    "subtitle": "A published algorithmic result cuts the qubit requirement ~20\u00d7. Evolution 0.30 \u2192 0.34. Projected 0.52 \u2014 it crosses. NOW it commoditises, and the war-gamer re-prices.",
+    "highlightBoundary": 0.5,
+    "boundaryColor": "#e5484d",
+    "boundaryLabel": "custom \u2192 product: the line that triggers a re-price",
+    "components": [
+      {
+        "id": "pq",
+        "label": "Quantum cryptanalysis",
+        "visibility": 0.15,
+        "evolution": 0.34,
+        "projected": 0.52,
+        "actor": "attacker-capability",
+        "hot": true,
+        "badge": "CROSSES \u2192 commoditising",
+        "labelDy": -22
+      },
+      {
+        "id": "ph",
+        "label": "AI phishing kits (aaS)",
+        "visibility": 0.55,
+        "evolution": 0.6,
+        "projected": 0.96,
+        "actor": "attacker-capability",
+        "small": true,
+        "labelDy": -22
+      },
+      {
+        "id": "rw",
+        "label": "Ransomware-as-a-service",
+        "visibility": 0.45,
+        "evolution": 0.7,
+        "projected": 0.94,
+        "actor": "attacker-capability",
+        "small": true,
+        "labelDy": -22
+      },
+      {
+        "id": "cs",
+        "label": "Credential stuffing (aaS)",
+        "visibility": 0.5,
+        "evolution": 0.82,
+        "projected": 0.91,
+        "actor": "attacker-capability",
+        "small": true,
+        "labelDy": 30
+      },
+      {
+        "id": "sp",
+        "label": "SPIFFE workload identity",
+        "visibility": 0.35,
+        "evolution": 0.55,
+        "projected": 0.85,
+        "actor": "defensive-capability",
+        "small": true,
+        "labelDy": -22
+      }
+    ],
+    "out": "map-after-algorithmic.png"
+  }
+]

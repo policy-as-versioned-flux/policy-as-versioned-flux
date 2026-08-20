@@ -1,0 +1,18 @@
+
+== 1. schema signature + version verify offline (v1, v2) ==
+Signature Verified Successfully
+ok  v1 signature verified, schema_version matches
+Signature Verified Successfully
+ok  v2 signature verified, schema_version matches
+
+== 2. a tampered schema fails signature verification ==
+ok  tampered schema correctly rejected
+
+== 3. fair.py consumes the schema as a loss-magnitude input (unmodified fair.py) ==
+ale(v1 uk-gdpr/lower-tier warn) = £16901472
+ale(v2 uk-gdpr/lower-tier warn) = £9039791
+
+== 4. the schema bump (v1 -> v2) actually moved the £ -- one added real fine, no fair.py edit ==
+ok  £ moved by £-7,861,681 on a version-only schema diff
+
+PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £.

@@ -1,0 +1,4 @@
+spire-agent-tq9zr 1/1 Running
+spire-server-0 2/2 Running
+spire-spiffe-csi-driver-gfx8f 2/2 Running
+spire-spiffe-oidc-discovery-provider-75d5bc7bb8-c55sl 2/2 Running

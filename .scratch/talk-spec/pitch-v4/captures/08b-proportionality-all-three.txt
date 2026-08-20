@@ -1,0 +1,48 @@
+=== driftwood ===
+{
+  "version": "v1",
+  "name": "shared control: PII stored at rest without encryption",
+  "org": "driftwood",
+  "verdict": "Audit",
+  "validationActions": [
+    "Audit"
+  ],
+  "residual_warn": 21359.69577515551,
+  "residual_deny": 252.40742053308617,
+  "risk_bought": 21107.288354622422,
+  "tolerance": 40000.0,
+  "headroom": 18892.711645377578,
+  "reason": "risk_bought \u00a321,107 <= tolerance \u00a340,000 -> Audit (justified by the \u00a3, not a timer)"
+}
+=== ludlow ===
+{
+  "version": "v1",
+  "name": "shared control: PII stored at rest without encryption",
+  "org": "ludlow",
+  "verdict": "Deny",
+  "validationActions": [
+    "Deny"
+  ],
+  "residual_warn": 21359.69577515551,
+  "residual_deny": 252.40742053308617,
+  "risk_bought": 21107.288354622422,
+  "tolerance": 5000.0,
+  "headroom": -16107.288354622422,
+  "reason": "risk_bought \u00a321,107 > tolerance \u00a35,000 -> Deny (justified by the \u00a3, not a timer)"
+}
+=== tuppence ===
+{
+  "version": "v1",
+  "name": "shared control: PII stored at rest without encryption",
+  "org": "tuppence",
+  "verdict": "Deny",
+  "validationActions": [
+    "Deny"
+  ],
+  "residual_warn": 21359.69577515551,
+  "residual_deny": 252.40742053308617,
+  "risk_bought": 21107.288354622422,
+  "tolerance": 15000.0,
+  "headroom": -6107.288354622422,
+  "reason": "risk_bought \u00a321,107 > tolerance \u00a315,000 -> Deny (justified by the \u00a3, not a timer)"
+}

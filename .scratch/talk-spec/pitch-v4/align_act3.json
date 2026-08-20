@@ -1,0 +1,964 @@
+{
+  "segments" : [
+    {
+      "end" : 2800,
+      "id" : "216BC556-F98F-49F2-BE42-42B2FD33F348",
+      "start" : 480,
+      "text" : "But none of those pounds are guesses.",
+      "words" : [
+        {
+          "end" : 800,
+          "start" : 480,
+          "text" : " But"
+        },
+        {
+          "end" : 1120,
+          "start" : 800,
+          "text" : " none"
+        },
+        {
+          "end" : 1280,
+          "start" : 1120,
+          "text" : " of"
+        },
+        {
+          "end" : 1440,
+          "start" : 1280,
+          "text" : " those"
+        },
+        {
+          "end" : 1840,
+          "start" : 1440,
+          "text" : " pounds"
+        },
+        {
+          "end" : 1920,
+          "start" : 1840,
+          "text" : " are"
+        },
+        {
+          "end" : 2800,
+          "start" : 1920,
+          "text" : " guesses."
+        }
+      ]
+    },
+    {
+      "end" : 5520,
+      "id" : "B5DFC61B-28D5-4954-8C1D-E744A05FD760",
+      "start" : 2800,
+      "text" : "Everyone comes out of a real Monte Carlo run.",
+      "words" : [
+        {
+          "end" : 3360,
+          "start" : 2800,
+          "text" : " Everyone"
+        },
+        {
+          "end" : 3600,
+          "start" : 3360,
+          "text" : " comes"
+        },
+        {
+          "end" : 3760,
+          "start" : 3600,
+          "text" : " out"
+        },
+        {
+          "end" : 3920,
+          "start" : 3760,
+          "text" : " of"
+        },
+        {
+          "end" : 4000,
+          "start" : 3920,
+          "text" : " a"
+        },
+        {
+          "end" : 4160,
+          "start" : 4000,
+          "text" : " real"
+        },
+        {
+          "end" : 4560,
+          "start" : 4160,
+          "text" : " Monte"
+        },
+        {
+          "end" : 4960,
+          "start" : 4560,
+          "text" : " Carlo"
+        },
+        {
+          "end" : 5520,
+          "start" : 4960,
+          "text" : " run."
+        }
+      ]
+    },
+    {
+      "end" : 9600,
+      "id" : "4BC4ECA7-EF63-4CDC-AF49-5E63C1CC1681",
+      "start" : 5520,
+      "text" : "Ten thousand iterations per estimate, not a single point number.",
+      "words" : [
+        {
+          "end" : 5840,
+          "start" : 5520,
+          "text" : " Ten"
+        },
+        {
+          "end" : 6160,
+          "start" : 5840,
+          "text" : " thousand"
+        },
+        {
+          "end" : 6880,
+          "start" : 6240,
+          "text" : " iterations"
+        },
+        {
+          "end" : 7040,
+          "start" : 6880,
+          "text" : " per"
+        },
+        {
+          "end" : 7600,
+          "start" : 7040,
+          "text" : " estimate,"
+        },
+        {
+          "end" : 7760,
+          "start" : 7600,
+          "text" : " not"
+        },
+        {
+          "end" : 7840,
+          "start" : 7760,
+          "text" : " a"
+        },
+        {
+          "end" : 8320,
+          "start" : 7840,
+          "text" : " single"
+        },
+        {
+          "end" : 8640,
+          "start" : 8320,
+          "text" : " point"
+        },
+        {
+          "end" : 9600,
+          "start" : 8640,
+          "text" : " number."
+        }
+      ]
+    },
+    {
+      "end" : 11700,
+      "id" : "F739EC0A-D573-4C48-9A70-019038311D53",
+      "start" : 9139,
+      "text" : "And the model doesn't get to mark its own homework.",
+      "words" : [
+        {
+          "end" : 9460,
+          "start" : 9139,
+          "text" : " And"
+        },
+        {
+          "end" : 9620,
+          "start" : 9460,
+          "text" : " the"
+        },
+        {
+          "end" : 9940,
+          "start" : 9620,
+          "text" : " model"
+        },
+        {
+          "end" : 10019,
+          "start" : 9940,
+          "text" : " doesn"
+        },
+        {
+          "end" : 10179,
+          "start" : 10019,
+          "text" : "'t"
+        },
+        {
+          "end" : 10340,
+          "start" : 10179,
+          "text" : " get"
+        },
+        {
+          "end" : 10420,
+          "start" : 10340,
+          "text" : " to"
+        },
+        {
+          "end" : 10740,
+          "start" : 10420,
+          "text" : " mark"
+        },
+        {
+          "end" : 10900,
+          "start" : 10740,
+          "text" : " its"
+        },
+        {
+          "end" : 11059,
+          "start" : 10900,
+          "text" : " own"
+        },
+        {
+          "end" : 11700,
+          "start" : 11059,
+          "text" : " homework."
+        }
+      ]
+    },
+    {
+      "end" : 18500,
+      "id" : "EE84686D-AB8C-4290-9C31-452C0C23DCB7",
+      "start" : 11700,
+      "text" : "We backtest it against real incidents, the same credibility maths insurers use to blend a new claim against history.",
+      "words" : [
+        {
+          "end" : 11780,
+          "start" : 11700,
+          "text" : " We"
+        },
+        {
+          "end" : 12340,
+          "start" : 11860,
+          "text" : " backtest"
+        },
+        {
+          "end" : 12500,
+          "start" : 12340,
+          "text" : " it"
+        },
+        {
+          "end" : 12820,
+          "start" : 12500,
+          "text" : " against"
+        },
+        {
+          "end" : 13059,
+          "start" : 12820,
+          "text" : " real"
+        },
+        {
+          "end" : 13780,
+          "start" : 13059,
+          "text" : " incidents,"
+        },
+        {
+          "end" : 13940,
+          "start" : 13780,
+          "text" : " the"
+        },
+        {
+          "end" : 14180,
+          "start" : 13940,
+          "text" : " same"
+        },
+        {
+          "end" : 14740,
+          "start" : 14180,
+          "text" : " credibility"
+        },
+        {
+          "end" : 15139,
+          "start" : 14740,
+          "text" : " maths"
+        },
+        {
+          "end" : 15700,
+          "start" : 15139,
+          "text" : " insurers"
+        },
+        {
+          "end" : 15860,
+          "start" : 15700,
+          "text" : " use"
+        },
+        {
+          "end" : 15940,
+          "start" : 15860,
+          "text" : " to"
+        },
+        {
+          "end" : 16260,
+          "start" : 15940,
+          "text" : " blend"
+        },
+        {
+          "end" : 16340,
+          "start" : 16260,
+          "text" : " a"
+        },
+        {
+          "end" : 16580,
+          "start" : 16340,
+          "text" : " new"
+        },
+        {
+          "end" : 16900,
+          "start" : 16580,
+          "text" : " claim"
+        },
+        {
+          "end" : 17220,
+          "start" : 16900,
+          "text" : " against"
+        },
+        {
+          "end" : 18500,
+          "start" : 17220,
+          "text" : " history."
+        }
+      ]
+    },
+    {
+      "end" : 23840,
+      "id" : "13B1F066-EBAE-4440-8A00-2D187D84833C",
+      "start" : 17920,
+      "text" : "Right now on Lidlow's book, the model called £1 million, the real losses came in at £130,000.",
+      "words" : [
+        {
+          "end" : 18240,
+          "start" : 17920,
+          "text" : " Right"
+        },
+        {
+          "end" : 18400,
+          "start" : 18240,
+          "text" : " now"
+        },
+        {
+          "end" : 18640,
+          "start" : 18480,
+          "text" : " on"
+        },
+        {
+          "end" : 19120,
+          "start" : 18640,
+          "text" : " Lidlow"
+        },
+        {
+          "end" : 19200,
+          "start" : 19120,
+          "text" : "'s"
+        },
+        {
+          "end" : 19440,
+          "start" : 19200,
+          "text" : " book,"
+        },
+        {
+          "end" : 19520,
+          "start" : 19440,
+          "text" : " the"
+        },
+        {
+          "end" : 19840,
+          "start" : 19520,
+          "text" : " model"
+        },
+        {
+          "end" : 19920,
+          "start" : 19840,
+          "text" : " called"
+        },
+        {
+          "end" : 20240,
+          "start" : 20080,
+          "text" : " £1"
+        },
+        {
+          "end" : 21120,
+          "start" : 20320,
+          "text" : " million,"
+        },
+        {
+          "end" : 21200,
+          "start" : 21120,
+          "text" : " the"
+        },
+        {
+          "end" : 21280,
+          "start" : 21200,
+          "text" : " real"
+        },
+        {
+          "end" : 21840,
+          "start" : 21440,
+          "text" : " losses"
+        },
+        {
+          "end" : 22000,
+          "start" : 21840,
+          "text" : " came"
+        },
+        {
+          "end" : 22160,
+          "start" : 22000,
+          "text" : " in"
+        },
+        {
+          "end" : 22320,
+          "start" : 22160,
+          "text" : " at"
+        },
+        {
+          "end" : 23040,
+          "start" : 22320,
+          "text" : " £130"
+        },
+        {
+          "end" : 23840,
+          "start" : 23040,
+          "text" : ",000."
+        }
+      ]
+    },
+    {
+      "end" : 26240,
+      "id" : "5B32951A-3C69-4636-AA8B-90228460EA4C",
+      "start" : 23840,
+      "text" : "Verdict, overpriced.",
+      "words" : [
+        {
+          "end" : 24560,
+          "start" : 23840,
+          "text" : " Verdict,"
+        },
+        {
+          "end" : 26240,
+          "start" : 24560,
+          "text" : " overpriced."
+        }
+      ]
+    },
+    {
+      "end" : 28940,
+      "id" : "9731E773-E302-4944-99AF-BEB41AC56FE1",
+      "start" : 25740,
+      "text" : "Recalibrate down, that's not a slide claiming honesty.",
+      "words" : [
+        {
+          "end" : 26540,
+          "start" : 25740,
+          "text" : " Recalibrate"
+        },
+        {
+          "end" : 26940,
+          "start" : 26540,
+          "text" : " down,"
+        },
+        {
+          "end" : 27020,
+          "start" : 26940,
+          "text" : " that"
+        },
+        {
+          "end" : 27100,
+          "start" : 27020,
+          "text" : "'s"
+        },
+        {
+          "end" : 27260,
+          "start" : 27100,
+          "text" : " not"
+        },
+        {
+          "end" : 27420,
+          "start" : 27260,
+          "text" : " a"
+        },
+        {
+          "end" : 27820,
+          "start" : 27420,
+          "text" : " slide"
+        },
+        {
+          "end" : 28220,
+          "start" : 27820,
+          "text" : " claiming"
+        },
+        {
+          "end" : 28940,
+          "start" : 28220,
+          "text" : " honesty."
+        }
+      ]
+    },
+    {
+      "end" : 32619,
+      "id" : "7E93B7F8-6F15-4087-95D3-5A6F0DED45D0",
+      "start" : 28940,
+      "text" : "That's the engine catching itself being wrong, and it doesn't get a pass either.",
+      "words" : [
+        {
+          "end" : 29020,
+          "start" : 28940,
+          "text" : " That"
+        },
+        {
+          "end" : 29180,
+          "start" : 29020,
+          "text" : "'s"
+        },
+        {
+          "end" : 29260,
+          "start" : 29180,
+          "text" : " the"
+        },
+        {
+          "end" : 29660,
+          "start" : 29260,
+          "text" : " engine"
+        },
+        {
+          "end" : 30060,
+          "start" : 29660,
+          "text" : " catching"
+        },
+        {
+          "end" : 30380,
+          "start" : 30060,
+          "text" : " itself"
+        },
+        {
+          "end" : 30619,
+          "start" : 30380,
+          "text" : " being"
+        },
+        {
+          "end" : 30940,
+          "start" : 30619,
+          "text" : " wrong,"
+        },
+        {
+          "end" : 31100,
+          "start" : 30940,
+          "text" : " and"
+        },
+        {
+          "end" : 31260,
+          "start" : 31100,
+          "text" : " it"
+        },
+        {
+          "end" : 31340,
+          "start" : 31260,
+          "text" : " doesn"
+        },
+        {
+          "end" : 31500,
+          "start" : 31340,
+          "text" : "'t"
+        },
+        {
+          "end" : 31580,
+          "start" : 31500,
+          "text" : " get"
+        },
+        {
+          "end" : 31740,
+          "start" : 31580,
+          "text" : " a"
+        },
+        {
+          "end" : 31980,
+          "start" : 31740,
+          "text" : " pass"
+        },
+        {
+          "end" : 32619,
+          "start" : 31980,
+          "text" : " either."
+        }
+      ]
+    },
+    {
+      "end" : 38940,
+      "id" : "F30C2ABE-4C8F-438E-BEF0-FC3331831352",
+      "start" : 32619,
+      "text" : "The same engine prices, the platform's own risk, Kyverno, Flux, the platform code, all in scope, right now.",
+      "words" : [
+        {
+          "end" : 32780,
+          "start" : 32619,
+          "text" : " The"
+        },
+        {
+          "end" : 32940,
+          "start" : 32780,
+          "text" : " same"
+        },
+        {
+          "end" : 33340,
+          "start" : 32940,
+          "text" : " engine"
+        },
+        {
+          "end" : 33739,
+          "start" : 33340,
+          "text" : " prices,"
+        },
+        {
+          "end" : 33820,
+          "start" : 33739,
+          "text" : " the"
+        },
+        {
+          "end" : 34140,
+          "start" : 33820,
+          "text" : " platform"
+        },
+        {
+          "end" : 34300,
+          "start" : 34140,
+          "text" : "'s"
+        },
+        {
+          "end" : 34380,
+          "start" : 34300,
+          "text" : " own"
+        },
+        {
+          "end" : 34860,
+          "start" : 34540,
+          "text" : " risk,"
+        },
+        {
+          "end" : 35500,
+          "start" : 34860,
+          "text" : " Kyverno,"
+        },
+        {
+          "end" : 36060,
+          "start" : 35500,
+          "text" : " Flux,"
+        },
+        {
+          "end" : 36220,
+          "start" : 36060,
+          "text" : " the"
+        },
+        {
+          "end" : 36620,
+          "start" : 36220,
+          "text" : " platform"
+        },
+        {
+          "end" : 37020,
+          "start" : 36620,
+          "text" : " code,"
+        },
+        {
+          "end" : 37180,
+          "start" : 37020,
+          "text" : " all"
+        },
+        {
+          "end" : 37340,
+          "start" : 37180,
+          "text" : " in"
+        },
+        {
+          "end" : 37900,
+          "start" : 37340,
+          "text" : " scope,"
+        },
+        {
+          "end" : 38140,
+          "start" : 37900,
+          "text" : " right"
+        },
+        {
+          "end" : 38940,
+          "start" : 38140,
+          "text" : " now."
+        }
+      ]
+    },
+    {
+      "end" : 46240,
+      "id" : "AF437C71-9665-43B8-BB5B-8A3E6F9B8AFF",
+      "start" : 38560,
+      "text" : "That book comes to over £1 million over its own £10,000 tolerance, so its own rule fires deny controls mandatory.",
+      "words" : [
+        {
+          "end" : 38880,
+          "start" : 38560,
+          "text" : " That"
+        },
+        {
+          "end" : 39200,
+          "start" : 38880,
+          "text" : " book"
+        },
+        {
+          "end" : 39440,
+          "start" : 39200,
+          "text" : " comes"
+        },
+        {
+          "end" : 39600,
+          "start" : 39440,
+          "text" : " to"
+        },
+        {
+          "end" : 39840,
+          "start" : 39600,
+          "text" : " over"
+        },
+        {
+          "end" : 40000,
+          "start" : 39840,
+          "text" : " £1"
+        },
+        {
+          "end" : 40400,
+          "start" : 40080,
+          "text" : " million"
+        },
+        {
+          "end" : 41040,
+          "start" : 40800,
+          "text" : " over"
+        },
+        {
+          "end" : 41200,
+          "start" : 41040,
+          "text" : " its"
+        },
+        {
+          "end" : 41360,
+          "start" : 41200,
+          "text" : " own"
+        },
+        {
+          "end" : 41680,
+          "start" : 41360,
+          "text" : " £10"
+        },
+        {
+          "end" : 42000,
+          "start" : 41680,
+          "text" : ",000"
+        },
+        {
+          "end" : 43040,
+          "start" : 42320,
+          "text" : " tolerance,"
+        },
+        {
+          "end" : 43200,
+          "start" : 43040,
+          "text" : " so"
+        },
+        {
+          "end" : 43360,
+          "start" : 43200,
+          "text" : " its"
+        },
+        {
+          "end" : 43520,
+          "start" : 43360,
+          "text" : " own"
+        },
+        {
+          "end" : 43840,
+          "start" : 43520,
+          "text" : " rule"
+        },
+        {
+          "end" : 44320,
+          "start" : 43840,
+          "text" : " fires"
+        },
+        {
+          "end" : 44960,
+          "start" : 44480,
+          "text" : " deny"
+        },
+        {
+          "end" : 45520,
+          "start" : 44960,
+          "text" : " controls"
+        },
+        {
+          "end" : 46240,
+          "start" : 45520,
+          "text" : " mandatory."
+        }
+      ]
+    },
+    {
+      "end" : 48480,
+      "id" : "96BE34E5-CDCA-4F2C-9084-3B2EC4F2BA5D",
+      "start" : 46240,
+      "text" : "With those controls applied, residual risk",
+      "words" : [
+        {
+          "end" : 46480,
+          "start" : 46240,
+          "text" : " With"
+        },
+        {
+          "end" : 46640,
+          "start" : 46480,
+          "text" : " those"
+        },
+        {
+          "end" : 47120,
+          "start" : 46640,
+          "text" : " controls"
+        },
+        {
+          "end" : 47600,
+          "start" : 47120,
+          "text" : " applied,"
+        },
+        {
+          "end" : 48160,
+          "start" : 47600,
+          "text" : " residual"
+        },
+        {
+          "end" : 48480,
+          "start" : 48160,
+          "text" : " risk"
+        }
+      ]
+    },
+    {
+      "end" : 55060,
+      "id" : "D21FB393-F59B-4FCA-8891-2A71753F5BA9",
+      "start" : 48820,
+      "text" : "Drops to £5,500 inside the band, it passes its own test on its own terms, or it doesn't get to run.",
+      "words" : [
+        {
+          "end" : 49060,
+          "start" : 48820,
+          "text" : " Drops"
+        },
+        {
+          "end" : 49220,
+          "start" : 49060,
+          "text" : " to"
+        },
+        {
+          "end" : 49380,
+          "start" : 49220,
+          "text" : " £5"
+        },
+        {
+          "end" : 50020,
+          "start" : 49380,
+          "text" : ",500"
+        },
+        {
+          "end" : 50740,
+          "start" : 50500,
+          "text" : " inside"
+        },
+        {
+          "end" : 50820,
+          "start" : 50740,
+          "text" : " the"
+        },
+        {
+          "end" : 51380,
+          "start" : 50820,
+          "text" : " band,"
+        },
+        {
+          "end" : 51540,
+          "start" : 51380,
+          "text" : " it"
+        },
+        {
+          "end" : 51860,
+          "start" : 51540,
+          "text" : " passes"
+        },
+        {
+          "end" : 52020,
+          "start" : 51860,
+          "text" : " its"
+        },
+        {
+          "end" : 52260,
+          "start" : 52020,
+          "text" : " own"
+        },
+        {
+          "end" : 52580,
+          "start" : 52260,
+          "text" : " test"
+        },
+        {
+          "end" : 52739,
+          "start" : 52580,
+          "text" : " on"
+        },
+        {
+          "end" : 52900,
+          "start" : 52739,
+          "text" : " its"
+        },
+        {
+          "end" : 53060,
+          "start" : 52900,
+          "text" : " own"
+        },
+        {
+          "end" : 53460,
+          "start" : 53060,
+          "text" : " terms,"
+        },
+        {
+          "end" : 53620,
+          "start" : 53460,
+          "text" : " or"
+        },
+        {
+          "end" : 53700,
+          "start" : 53620,
+          "text" : " it"
+        },
+        {
+          "end" : 53780,
+          "start" : 53700,
+          "text" : " doesn"
+        },
+        {
+          "end" : 53940,
+          "start" : 53780,
+          "text" : "'t"
+        },
+        {
+          "end" : 54100,
+          "start" : 53940,
+          "text" : " get"
+        },
+        {
+          "end" : 54420,
+          "start" : 54100,
+          "text" : " to"
+        },
+        {
+          "end" : 55060,
+          "start" : 54420,
+          "text" : " run."
+        }
+      ]
+    }
+  ],
+  "text" : "But none of those pounds are guesses.\nEveryone comes out of a real Monte Carlo run.\nTen thousand iterations per estimate, not a single point number.\nAnd the model doesn't get to mark its own homework.\nWe backtest it against real incidents, the same credibility maths insurers use to blend a new claim against history.\nRight now on Lidlow's book, the model called £1 million, the real losses came in at £130,000.\nVerdict, overpriced.\nRecalibrate down, that's not a slide claiming honesty.\nThat's the engine catching itself being wrong, and it doesn't get a pass either.\nThe same engine prices, the platform's own risk, Kyverno, Flux, the platform code, all in scope, right now.\nThat book comes to over £1 million over its own £10,000 tolerance, so its own rule fires deny controls mandatory.\nWith those controls applied, residual risk\nDrops to £5,500 inside the band, it passes its own test on its own terms, or it doesn't get to run."
+}

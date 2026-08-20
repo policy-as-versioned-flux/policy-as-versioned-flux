@@ -1,0 +1,933 @@
+{
+  "segments" : [
+    {
+      "end" : 1600,
+      "id" : "00153BEF-F706-4508-B92E-558981B833B7",
+      "start" : 320,
+      "text" : "Then it reasons.",
+      "words" : [
+        {
+          "end" : 640,
+          "start" : 320,
+          "text" : " Then"
+        },
+        {
+          "end" : 800,
+          "start" : 640,
+          "text" : " it"
+        },
+        {
+          "end" : 1600,
+          "start" : 800,
+          "text" : " reasons."
+        }
+      ]
+    },
+    {
+      "end" : 8640,
+      "id" : "06795C61-752A-4B36-A742-8B620A5EB0D7",
+      "start" : 1600,
+      "text" : "An agent takes every current control and wargames it against what just changed: workload risk, human and device risk.",
+      "words" : [
+        {
+          "end" : 1840,
+          "start" : 1600,
+          "text" : " An"
+        },
+        {
+          "end" : 2240,
+          "start" : 1840,
+          "text" : " agent"
+        },
+        {
+          "end" : 2560,
+          "start" : 2240,
+          "text" : " takes"
+        },
+        {
+          "end" : 2800,
+          "start" : 2560,
+          "text" : " every"
+        },
+        {
+          "end" : 3280,
+          "start" : 2800,
+          "text" : " current"
+        },
+        {
+          "end" : 3840,
+          "start" : 3280,
+          "text" : " control"
+        },
+        {
+          "end" : 4000,
+          "start" : 3840,
+          "text" : " and"
+        },
+        {
+          "end" : 4640,
+          "start" : 4000,
+          "text" : " wargames"
+        },
+        {
+          "end" : 4800,
+          "start" : 4640,
+          "text" : " it"
+        },
+        {
+          "end" : 5040,
+          "start" : 4800,
+          "text" : " against"
+        },
+        {
+          "end" : 5280,
+          "start" : 5040,
+          "text" : " what"
+        },
+        {
+          "end" : 5440,
+          "start" : 5280,
+          "text" : " just"
+        },
+        {
+          "end" : 6000,
+          "start" : 5440,
+          "text" : " changed:"
+        },
+        {
+          "end" : 6480,
+          "start" : 6000,
+          "text" : " workload"
+        },
+        {
+          "end" : 6880,
+          "start" : 6480,
+          "text" : " risk,"
+        },
+        {
+          "end" : 7120,
+          "start" : 6880,
+          "text" : " human"
+        },
+        {
+          "end" : 7360,
+          "start" : 7200,
+          "text" : " and"
+        },
+        {
+          "end" : 7760,
+          "start" : 7360,
+          "text" : " device"
+        },
+        {
+          "end" : 8640,
+          "start" : 7760,
+          "text" : " risk."
+        }
+      ]
+    },
+    {
+      "end" : 16960,
+      "id" : "7CA553F7-EE95-4C5D-B7E6-80D14CB9C4AA",
+      "start" : 8320,
+      "text" : "even the risk of today's encrypted traffic being harvested now and decrypted later once quantum computing catches up, it's not asking is this compliant.",
+      "words" : [
+        {
+          "end" : 8400,
+          "start" : 8320,
+          "text" : " even"
+        },
+        {
+          "end" : 8640,
+          "start" : 8560,
+          "text" : " the"
+        },
+        {
+          "end" : 8960,
+          "start" : 8640,
+          "text" : " risk"
+        },
+        {
+          "end" : 9120,
+          "start" : 8960,
+          "text" : " of"
+        },
+        {
+          "end" : 9360,
+          "start" : 9120,
+          "text" : " today"
+        },
+        {
+          "end" : 9520,
+          "start" : 9360,
+          "text" : "'s"
+        },
+        {
+          "end" : 10080,
+          "start" : 9520,
+          "text" : " encrypted"
+        },
+        {
+          "end" : 10480,
+          "start" : 10080,
+          "text" : " traffic"
+        },
+        {
+          "end" : 10720,
+          "start" : 10480,
+          "text" : " being"
+        },
+        {
+          "end" : 11360,
+          "start" : 10720,
+          "text" : " harvested"
+        },
+        {
+          "end" : 11600,
+          "start" : 11360,
+          "text" : " now"
+        },
+        {
+          "end" : 11840,
+          "start" : 11600,
+          "text" : " and"
+        },
+        {
+          "end" : 12480,
+          "start" : 11840,
+          "text" : " decrypted"
+        },
+        {
+          "end" : 12719,
+          "start" : 12480,
+          "text" : " later"
+        },
+        {
+          "end" : 13040,
+          "start" : 12800,
+          "text" : " once"
+        },
+        {
+          "end" : 13520,
+          "start" : 13040,
+          "text" : " quantum"
+        },
+        {
+          "end" : 13920,
+          "start" : 13520,
+          "text" : " computing"
+        },
+        {
+          "end" : 14240,
+          "start" : 13920,
+          "text" : " catches"
+        },
+        {
+          "end" : 14559,
+          "start" : 14240,
+          "text" : " up,"
+        },
+        {
+          "end" : 14639,
+          "start" : 14559,
+          "text" : " it"
+        },
+        {
+          "end" : 14800,
+          "start" : 14639,
+          "text" : "'s"
+        },
+        {
+          "end" : 14960,
+          "start" : 14800,
+          "text" : " not"
+        },
+        {
+          "end" : 15200,
+          "start" : 14960,
+          "text" : " asking"
+        },
+        {
+          "end" : 15520,
+          "start" : 15360,
+          "text" : " is"
+        },
+        {
+          "end" : 15680,
+          "start" : 15520,
+          "text" : " this"
+        },
+        {
+          "end" : 16960,
+          "start" : 15680,
+          "text" : " compliant."
+        }
+      ]
+    },
+    {
+      "end" : 19860,
+      "id" : "0D0F9FF6-D325-48C3-B076-C8558DF48261",
+      "start" : 16340,
+      "text" : "It's asking, is this still proportionate given what the world looks like right now?",
+      "words" : [
+        {
+          "end" : 16420,
+          "start" : 16340,
+          "text" : " It"
+        },
+        {
+          "end" : 16580,
+          "start" : 16420,
+          "text" : "'s"
+        },
+        {
+          "end" : 16980,
+          "start" : 16580,
+          "text" : " asking,"
+        },
+        {
+          "end" : 17060,
+          "start" : 16980,
+          "text" : " is"
+        },
+        {
+          "end" : 17300,
+          "start" : 17060,
+          "text" : " this"
+        },
+        {
+          "end" : 17540,
+          "start" : 17300,
+          "text" : " still"
+        },
+        {
+          "end" : 18180,
+          "start" : 17540,
+          "text" : " proportionate"
+        },
+        {
+          "end" : 18420,
+          "start" : 18180,
+          "text" : " given"
+        },
+        {
+          "end" : 18580,
+          "start" : 18420,
+          "text" : " what"
+        },
+        {
+          "end" : 18660,
+          "start" : 18580,
+          "text" : " the"
+        },
+        {
+          "end" : 18900,
+          "start" : 18660,
+          "text" : " world"
+        },
+        {
+          "end" : 19140,
+          "start" : 18900,
+          "text" : " looks"
+        },
+        {
+          "end" : 19300,
+          "start" : 19140,
+          "text" : " like"
+        },
+        {
+          "end" : 19460,
+          "start" : 19300,
+          "text" : " right"
+        },
+        {
+          "end" : 19860,
+          "start" : 19460,
+          "text" : " now?"
+        }
+      ]
+    },
+    {
+      "end" : 25700,
+      "id" : "7442152D-F8CB-4CC4-9844-9574A6197BF5",
+      "start" : 19860,
+      "text" : "When the answer is no, it doesn't file a ticket, it drafts the fix, and here's the part that should scare you less, not more.",
+      "words" : [
+        {
+          "end" : 20020,
+          "start" : 19860,
+          "text" : " When"
+        },
+        {
+          "end" : 20100,
+          "start" : 20020,
+          "text" : " the"
+        },
+        {
+          "end" : 20340,
+          "start" : 20100,
+          "text" : " answer"
+        },
+        {
+          "end" : 20500,
+          "start" : 20340,
+          "text" : " is"
+        },
+        {
+          "end" : 20820,
+          "start" : 20500,
+          "text" : " no,"
+        },
+        {
+          "end" : 20980,
+          "start" : 20820,
+          "text" : " it"
+        },
+        {
+          "end" : 21060,
+          "start" : 20980,
+          "text" : " doesn"
+        },
+        {
+          "end" : 21220,
+          "start" : 21060,
+          "text" : "'t"
+        },
+        {
+          "end" : 21460,
+          "start" : 21220,
+          "text" : " file"
+        },
+        {
+          "end" : 21540,
+          "start" : 21460,
+          "text" : " a"
+        },
+        {
+          "end" : 22020,
+          "start" : 21540,
+          "text" : " ticket,"
+        },
+        {
+          "end" : 22100,
+          "start" : 22020,
+          "text" : " it"
+        },
+        {
+          "end" : 22500,
+          "start" : 22100,
+          "text" : " drafts"
+        },
+        {
+          "end" : 22580,
+          "start" : 22500,
+          "text" : " the"
+        },
+        {
+          "end" : 22900,
+          "start" : 22580,
+          "text" : " fix,"
+        },
+        {
+          "end" : 22980,
+          "start" : 22900,
+          "text" : " and"
+        },
+        {
+          "end" : 23060,
+          "start" : 22980,
+          "text" : " here"
+        },
+        {
+          "end" : 23140,
+          "start" : 23060,
+          "text" : "'s"
+        },
+        {
+          "end" : 23220,
+          "start" : 23140,
+          "text" : " the"
+        },
+        {
+          "end" : 23460,
+          "start" : 23220,
+          "text" : " part"
+        },
+        {
+          "end" : 23540,
+          "start" : 23460,
+          "text" : " that"
+        },
+        {
+          "end" : 23700,
+          "start" : 23540,
+          "text" : " should"
+        },
+        {
+          "end" : 24020,
+          "start" : 23700,
+          "text" : " scare"
+        },
+        {
+          "end" : 24180,
+          "start" : 24020,
+          "text" : " you"
+        },
+        {
+          "end" : 24740,
+          "start" : 24180,
+          "text" : " less,"
+        },
+        {
+          "end" : 25060,
+          "start" : 24740,
+          "text" : " not"
+        },
+        {
+          "end" : 25700,
+          "start" : 25060,
+          "text" : " more."
+        }
+      ]
+    },
+    {
+      "end" : 28419,
+      "id" : "C8C7E0C0-D957-4585-BB49-5D71FAA9BD0C",
+      "start" : 25539,
+      "text" : "Watch four real drift signals go through the gate right now.",
+      "words" : [
+        {
+          "end" : 25859,
+          "start" : 25539,
+          "text" : " Watch"
+        },
+        {
+          "end" : 26099,
+          "start" : 25859,
+          "text" : " four"
+        },
+        {
+          "end" : 26259,
+          "start" : 26099,
+          "text" : " real"
+        },
+        {
+          "end" : 26660,
+          "start" : 26259,
+          "text" : " drift"
+        },
+        {
+          "end" : 27060,
+          "start" : 26660,
+          "text" : " signals"
+        },
+        {
+          "end" : 27220,
+          "start" : 27060,
+          "text" : " go"
+        },
+        {
+          "end" : 27380,
+          "start" : 27220,
+          "text" : " through"
+        },
+        {
+          "end" : 27539,
+          "start" : 27380,
+          "text" : " the"
+        },
+        {
+          "end" : 27859,
+          "start" : 27539,
+          "text" : " gate"
+        },
+        {
+          "end" : 28099,
+          "start" : 27939,
+          "text" : " right"
+        },
+        {
+          "end" : 28419,
+          "start" : 28099,
+          "text" : " now."
+        }
+      ]
+    },
+    {
+      "end" : 35220,
+      "id" : "FF54FDC2-6655-401F-8217-81844F067077",
+      "start" : 28419,
+      "text" : "One, confidence, two point seven percent miles under threshold held back for a human, not auto proposed.",
+      "words" : [
+        {
+          "end" : 28740,
+          "start" : 28419,
+          "text" : " One,"
+        },
+        {
+          "end" : 29300,
+          "start" : 28740,
+          "text" : " confidence,"
+        },
+        {
+          "end" : 29380,
+          "start" : 29300,
+          "text" : " two"
+        },
+        {
+          "end" : 29699,
+          "start" : 29539,
+          "text" : " point"
+        },
+        {
+          "end" : 29939,
+          "start" : 29699,
+          "text" : " seven"
+        },
+        {
+          "end" : 30259,
+          "start" : 29939,
+          "text" : " percent"
+        },
+        {
+          "end" : 30740,
+          "start" : 30340,
+          "text" : " miles"
+        },
+        {
+          "end" : 30900,
+          "start" : 30740,
+          "text" : " under"
+        },
+        {
+          "end" : 31539,
+          "start" : 31060,
+          "text" : " threshold"
+        },
+        {
+          "end" : 32020,
+          "start" : 31779,
+          "text" : " held"
+        },
+        {
+          "end" : 32180,
+          "start" : 32020,
+          "text" : " back"
+        },
+        {
+          "end" : 32340,
+          "start" : 32180,
+          "text" : " for"
+        },
+        {
+          "end" : 32500,
+          "start" : 32340,
+          "text" : " a"
+        },
+        {
+          "end" : 32980,
+          "start" : 32500,
+          "text" : " human,"
+        },
+        {
+          "end" : 33220,
+          "start" : 32980,
+          "text" : " not"
+        },
+        {
+          "end" : 33620,
+          "start" : 33220,
+          "text" : " auto"
+        },
+        {
+          "end" : 35220,
+          "start" : 33699,
+          "text" : " proposed."
+        }
+      ]
+    },
+    {
+      "end" : 38899,
+      "id" : "33E3A9DE-2660-44E2-8EC6-377782022EFE",
+      "start" : 34579,
+      "text" : "One, we rejected this exact fix twice before the loop remembers and stops asking.",
+      "words" : [
+        {
+          "end" : 34980,
+          "start" : 34579,
+          "text" : " One,"
+        },
+        {
+          "end" : 35059,
+          "start" : 34980,
+          "text" : " we"
+        },
+        {
+          "end" : 35539,
+          "start" : 35059,
+          "text" : " rejected"
+        },
+        {
+          "end" : 35699,
+          "start" : 35539,
+          "text" : " this"
+        },
+        {
+          "end" : 36019,
+          "start" : 35699,
+          "text" : " exact"
+        },
+        {
+          "end" : 36420,
+          "start" : 36019,
+          "text" : " fix"
+        },
+        {
+          "end" : 36739,
+          "start" : 36420,
+          "text" : " twice"
+        },
+        {
+          "end" : 36899,
+          "start" : 36739,
+          "text" : " before"
+        },
+        {
+          "end" : 36980,
+          "start" : 36899,
+          "text" : " the"
+        },
+        {
+          "end" : 37379,
+          "start" : 36980,
+          "text" : " loop"
+        },
+        {
+          "end" : 37859,
+          "start" : 37379,
+          "text" : " remembers"
+        },
+        {
+          "end" : 38019,
+          "start" : 37859,
+          "text" : " and"
+        },
+        {
+          "end" : 38339,
+          "start" : 38019,
+          "text" : " stops"
+        },
+        {
+          "end" : 38899,
+          "start" : 38339,
+          "text" : " asking."
+        }
+      ]
+    },
+    {
+      "end" : 44739,
+      "id" : "807ED178-19CE-41B4-BE20-1AB12C850CAA",
+      "start" : 38899,
+      "text" : "Two, confident never over-rejected within its rate limit those and only those become pull requests.",
+      "words" : [
+        {
+          "end" : 39379,
+          "start" : 38899,
+          "text" : " Two,"
+        },
+        {
+          "end" : 39940,
+          "start" : 39379,
+          "text" : " confident"
+        },
+        {
+          "end" : 40100,
+          "start" : 39940,
+          "text" : " never"
+        },
+        {
+          "end" : 40339,
+          "start" : 40100,
+          "text" : " over"
+        },
+        {
+          "end" : 40899,
+          "start" : 40339,
+          "text" : "-rejected"
+        },
+        {
+          "end" : 41219,
+          "start" : 40980,
+          "text" : " within"
+        },
+        {
+          "end" : 41379,
+          "start" : 41219,
+          "text" : " its"
+        },
+        {
+          "end" : 41699,
+          "start" : 41379,
+          "text" : " rate"
+        },
+        {
+          "end" : 41940,
+          "start" : 41699,
+          "text" : " limit"
+        },
+        {
+          "end" : 42339,
+          "start" : 42100,
+          "text" : " those"
+        },
+        {
+          "end" : 42739,
+          "start" : 42500,
+          "text" : " and"
+        },
+        {
+          "end" : 42980,
+          "start" : 42739,
+          "text" : " only"
+        },
+        {
+          "end" : 43140,
+          "start" : 42980,
+          "text" : " those"
+        },
+        {
+          "end" : 43539,
+          "start" : 43219,
+          "text" : " become"
+        },
+        {
+          "end" : 43860,
+          "start" : 43539,
+          "text" : " pull"
+        },
+        {
+          "end" : 44739,
+          "start" : 43860,
+          "text" : " requests."
+        }
+      ]
+    },
+    {
+      "end" : 47860,
+      "id" : "A800AA14-A59D-4B1F-A9F7-678037A340D2",
+      "start" : 44739,
+      "text" : "Four signals in two humans would actually see.",
+      "words" : [
+        {
+          "end" : 45059,
+          "start" : 44739,
+          "text" : " Four"
+        },
+        {
+          "end" : 45539,
+          "start" : 45059,
+          "text" : " signals"
+        },
+        {
+          "end" : 45780,
+          "start" : 45539,
+          "text" : " in"
+        },
+        {
+          "end" : 46019,
+          "start" : 45780,
+          "text" : " two"
+        },
+        {
+          "end" : 46500,
+          "start" : 46019,
+          "text" : " humans"
+        },
+        {
+          "end" : 46739,
+          "start" : 46500,
+          "text" : " would"
+        },
+        {
+          "end" : 47059,
+          "start" : 46739,
+          "text" : " actually"
+        },
+        {
+          "end" : 47860,
+          "start" : 47059,
+          "text" : " see."
+        }
+      ]
+    },
+    {
+      "end" : 51520,
+      "id" : "76AB1617-4C5D-44F2-A91B-EF6AA46AE0EA",
+      "start" : 47680,
+      "text" : "That ratio is the safety feature, not a bug to fix later.",
+      "words" : [
+        {
+          "end" : 48000,
+          "start" : 47680,
+          "text" : " That"
+        },
+        {
+          "end" : 48480,
+          "start" : 48000,
+          "text" : " ratio"
+        },
+        {
+          "end" : 48640,
+          "start" : 48480,
+          "text" : " is"
+        },
+        {
+          "end" : 48720,
+          "start" : 48640,
+          "text" : " the"
+        },
+        {
+          "end" : 49120,
+          "start" : 48720,
+          "text" : " safety"
+        },
+        {
+          "end" : 49600,
+          "start" : 49120,
+          "text" : " feature,"
+        },
+        {
+          "end" : 49760,
+          "start" : 49600,
+          "text" : " not"
+        },
+        {
+          "end" : 49840,
+          "start" : 49760,
+          "text" : " a"
+        },
+        {
+          "end" : 50160,
+          "start" : 49840,
+          "text" : " bug"
+        },
+        {
+          "end" : 50320,
+          "start" : 50160,
+          "text" : " to"
+        },
+        {
+          "end" : 50640,
+          "start" : 50320,
+          "text" : " fix"
+        },
+        {
+          "end" : 51520,
+          "start" : 50640,
+          "text" : " later."
+        }
+      ]
+    }
+  ],
+  "text" : "Then it reasons.\nAn agent takes every current control and wargames it against what just changed: workload risk, human and device risk.\neven the risk of today's encrypted traffic being harvested now and decrypted later once quantum computing catches up, it's not asking is this compliant.\nIt's asking, is this still proportionate given what the world looks like right now?\nWhen the answer is no, it doesn't file a ticket, it drafts the fix, and here's the part that should scare you less, not more.\nWatch four real drift signals go through the gate right now.\nOne, confidence, two point seven percent miles under threshold held back for a human, not auto proposed.\nOne, we rejected this exact fix twice before the loop remembers and stops asking.\nTwo, confident never over-rejected within its rate limit those and only those become pull requests.\nFour signals in two humans would actually see.\nThat ratio is the safety feature, not a bug to fix later."
+}

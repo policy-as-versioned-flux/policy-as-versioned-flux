@@ -1,0 +1,198 @@
+[
+  {
+    "i": 0,
+    "narration": "This is policy as a versioned dependency, and it is real and running right now. Twenty-seven of twenty-eight live checks are green on three real Kubernetes clusters. I'm going to walk you through all of it, including the one that isn't green."
+  },
+  {
+    "i": 1,
+    "narration": "First, it's real. This is a GitHub organisation of repositories, twenty-seven build tickets, and a real commit history. The most recent commit reopens two tickets that are not finished. Let me show you the repository itself."
+  },
+  {
+    "i": 2,
+    "narration": "Here's the actual repository on GitHub. One repo holds a six-organisation governance estate, all under the estate directory. Nothing here is a slide mock-up. This is the source you could clone today."
+  },
+  {
+    "i": 3,
+    "narration": "Inside, six governed orgs: driftwood, ludlow, tuppence, plus the N.I.S.T., I.C.O., and shared platform trees. Each org is a real directory with its own policy posture. One estate, six tenants, one shared discipline."
+  },
+  {
+    "i": 4,
+    "narration": "And the depth is real too. Every capability I'll show you is a directory in the platform tree: access, break-glass, currency controller, distribution, feeds, graded enforcement, honesty, identity, posture, the war-gamer, and more. Shared discipline, spelled out."
+  },
+  {
+    "i": 5,
+    "narration": "The whole estate was built from twenty-seven tickets, one markdown spec per capability, from the F.A.I.R. risk engine through identity, feeds, the war-gamer, and the honesty layer. These are the real specs the work was driven from."
+  },
+  {
+    "i": 6,
+    "narration": "Here's how it was built: thirty-six fresh-context agents across nine dependency waves, with zero errors, producing two hundred seventy-one files and twenty-nine verify scripts. Nineteen tickets fully done, eight still only partial. We're not hiding the partials."
+  },
+  {
+    "i": 7,
+    "narration": "And the honesty is right there in the git history. The very top commit reopens tickets seventeen and fourteen, because the live reach beat is not done. When something breaks live, it goes back into the log, in the open."
+  },
+  {
+    "i": 8,
+    "narration": "Second, it's running. Three real Kubernetes clusters, one per governed org, each reconciled by its own Flux from a pinned, signed git repository. Let me show you they're actually up."
+  },
+  {
+    "i": 9,
+    "narration": "Three clusters, live: driftwood, ludlow, and tuppence. Each one is a separate real Kubernetes cluster standing in for a governed organisation, so the isolation between tenants is genuine, not simulated."
+  },
+  {
+    "i": 10,
+    "narration": "Every cluster's control-plane node reports Ready, on Kubernetes version one point thirty-six. This is a live kubectl against running nodes. If these were down, nothing that follows would be true."
+  },
+  {
+    "i": 11,
+    "narration": "This is driftwood's platform, all pods Running: SPIRE for identity, Istio for the mesh, OpenBao for secrets, Dex for access, and the full set of Flux controllers driving GitOps. The whole substrate is up."
+  },
+  {
+    "i": 12,
+    "narration": "And Flux is reconciling all three. Each org's kustomization is Ready at a specific pinned git revision. This is real GitOps: the cluster state is driven from signed git, live, across all three clusters at once."
+  },
+  {
+    "i": 13,
+    "narration": "Third, the money engine. A small, deterministic F.A.I.R. risk engine turns risk estimates into board-level numbers: expected annual loss, value at risk, and the pounds actually carried on the balance sheet."
+  },
+  {
+    "i": 14,
+    "narration": "The engine checks itself. For this scenario: expected annual loss around nineteen and a half thousand pounds, and about thirty-five thousand pounds carried once you load the tail. Switching that control to Deny buys back nineteen thousand of it."
+  },
+  {
+    "i": 15,
+    "narration": "And this is the actual engine on GitHub. Two hundred and five lines of pure standard-library Python, no dependencies, deterministic given a seed. The entire pounds-move-when-you-tighten-a-control thesis rests on this one small, auditable file."
+  },
+  {
+    "i": 16,
+    "narration": "Here's the same result as machine-readable output. An unversioned image shipping cart personal data carries just under thirty-five thousand pounds of annual risk, with a one hundred percent chance the loss is greater than zero. Concrete pounds, not a red-amber-green sticker."
+  },
+  {
+    "i": 17,
+    "narration": "And here's the top of the source. It samples a beta-pert distribution using only the standard library, and it's the load-bearing seam for the whole thesis. Tightening a control is just two runs of this that differ by one input."
+  },
+  {
+    "i": 18,
+    "narration": "Now the money-shot. Same control, same scenario, same pounds of risk. But two organisations with different risk appetites get two different verdicts, decided by the number, not by opinion. This is proportionality made computable."
+  },
+  {
+    "i": 19,
+    "narration": "Watch this. The risk bought is twenty-one thousand one hundred and seven pounds, identically, for both orgs. Driftwood's appetite is forty thousand, so it renders Audit. Ludlow's is five thousand, so the same control renders Deny. The pounds pick the verdict."
+  },
+  {
+    "i": 20,
+    "narration": "Because policy is a versioned dependency, two signed versions coexist side by side. Each one judges only the workloads that claim it. Version one point zero and version two point zero admit their own callers, with no cross-contamination between them."
+  },
+  {
+    "i": 21,
+    "narration": "And only declared versions can run. An undeclared version three point zero is denied; a declared version one point zero admits. The allow-list isn't a separate document that drifts, it is literally the version array itself."
+  },
+  {
+    "i": 22,
+    "narration": "Enforcement isn't all-or-nothing. Workloads that fall behind aren't just denied, they're caged by degree. And the board line is total cost of risk, which moves exactly as the levers predict."
+  },
+  {
+    "i": 23,
+    "narration": "A behind-posture workload keeps running, but caged. The pounds pick the tier: baseline, restricted, or quarantine. The Kyverno cage mirrors the Python cage dial for dial, on C.P.U., memory, hardening, and web firewall, with no drift between them."
+  },
+  {
+    "i": 24,
+    "narration": "The board sees one line: total cost of risk, about forty-eight thousand pounds, split into residual risk, control spend, and insurance premium. Tighten the appetite and the same book cages harder, control spend rising from five hundred to six thousand pounds."
+  },
+  {
+    "i": 25,
+    "narration": "The inputs are signed, versioned feeds: threat intelligence, C.V.E.s, end-of-life dates, and regulator penalties. They feed the engine unchanged, and a reviewable version bump is all it takes to move the pounds."
+  },
+  {
+    "i": 26,
+    "narration": "Six signed feed versions verify cryptographically; a tampered feed is rejected. Bumping the threat register from version one to version two raises the risk by a hundred and three thousand pounds, with no change to the engine. End-of-life risk ramps as components age."
+  },
+  {
+    "i": 27,
+    "narration": "Even the regulator is a signed feed. The I.C.O. penalty schema is versioned, and adding one real fine to it shifts the modelled annual loss by nearly eight million pounds, again without touching the engine. Policy meets the balance sheet."
+  },
+  {
+    "i": 28,
+    "narration": "And the compliance content is genuine. The estate ships and pins the real N.I.S.T. eight hundred fifty-three revision five OSCAL catalog, nearly five megabytes of it, wrapper-versioned so an institution can pin the exact tag it audited against."
+  },
+  {
+    "i": 29,
+    "narration": "Exemptions don't rot in a spreadsheet. They dissolve into a conditional rule whose residual risk is priced in pounds. And the whole thing shifts left: continuous integration catches a tightening flip before it can ever merge."
+  },
+  {
+    "i": 30,
+    "narration": "One conditional rule replaces a pile of exemptions. Anyone meeting the condition is admitted; anyone who doesn't fails; unversioned workloads are out of scope. And the residual risk of granting that exemption is priced at twenty-one thousand pounds a year."
+  },
+  {
+    "i": 31,
+    "narration": "In the pipeline, a compliant change passes across its supported version window. But a workload that would flip from Audit to Deny somewhere in that window is caught before merge and fails the build. You find out at the pull request, not in production."
+  },
+  {
+    "i": 32,
+    "narration": "Identity. Bringing this up live surfaced a genuine breaking change in the SPIRE chart. We found it, fixed it, and committed the fix. This is the messy reality of running the real thing, not a polished demo."
+  },
+  {
+    "i": 33,
+    "narration": "The idea is posture as identity. Three classes of actor, workload, device, and human, all root to one attestation authority. And a workload's current policy posture rides right inside its identity path, so being out of date changes who you are."
+  },
+  {
+    "i": 34,
+    "narration": "After the fix, SPIRE is healthy: server, agent, the C.S.I. driver, and the OIDC discovery provider, all Running on the live cluster. This is the identity substrate the whole reach-and-secrets story depends on."
+  },
+  {
+    "i": 35,
+    "narration": "Here's the corrected configuration. Chart version zero point twenty-four renamed its values and added hard failure guards, so the old names stopped SPIRE installing entirely. These are the fixed values that got all four pods running again."
+  },
+  {
+    "i": 36,
+    "narration": "And this is the actual fix commit. A one-line rename from the old underscore style to the new camel-case names the chart now demands. Found the only way these things ever are: by bringing the estate up live and watching it fail."
+  },
+  {
+    "i": 37,
+    "narration": "And the posture really does lead the identity path. The version segment comes first, the label is stamped only by Kyverno and can't be self-asserted, and a forged posture is refused. Being out of currency literally strips your credentials."
+  },
+  {
+    "i": 38,
+    "narration": "This closes into a living loop. An A.I. war-gamer reads the signed feeds, war-games the current controls, and proposes signed pull requests, but never merges them. And every actor in the chain is attestable back to a single root."
+  },
+  {
+    "i": 39,
+    "narration": "The loop runs: feed, to scenario, to pull request, to human review, to merge, to release. The A.I. proposes and a human disposes. Machines do the tireless war-gaming; people keep the authority to actually change what enforces."
+  },
+  {
+    "i": 40,
+    "narration": "Here the war-gamer detects drift from a signed feed and proposes four signed pull requests, on branches, zero merged, main untouched. Each one carries the version cross-check gate. The machine surfaces the disproportionate control; the human decides whether to accept it."
+  },
+  {
+    "i": 41,
+    "narration": "And the provenance closes end to end. A six-link chain from feed to release converges on version two point zero, the exact version a running workload carries in its identity. Workload, device, commit, and human all root to one attestation. No trust from network position."
+  },
+  {
+    "i": 42,
+    "narration": "So let's run the whole thing. One command, the entire estate, live against three real clusters. Twenty-eight checks, each one an end-to-end proof of a claim I've just made. This is the centrepiece."
+  },
+  {
+    "i": 43,
+    "narration": "Twenty-seven pass, one fails. Coexistence, proportionality, graded enforcement, signed feeds, the living loop, provenance, all green and live. One beat is red, and notice the harness refuses to round up. It says plainly: some beats would fail on stage."
+  },
+  {
+    "i": 44,
+    "narration": "And here's the one that fails. I'm not going to hide it or fake it. It's reopened in git, with the exact blocker written down, because a demo that rounds everything up to a hundred percent is the one you shouldn't trust."
+  },
+  {
+    "i": 45,
+    "narration": "It's posture-gated reach. The negative half actually works live: stale and de-postured identities are correctly refused both the service and the secret. But the positive half fails: the current caller doesn't reach, blocked by an Istio sidecar-injection T.L.S. error."
+  },
+  {
+    "i": 46,
+    "narration": "And here's ticket seventeen on GitHub, marked reopened, not done, in the open for anyone to read. Built and offline-proven, but the live positive path is blocked, so it stays reopened. That's the standard: it isn't done until it passes live."
+  },
+  {
+    "i": 47,
+    "narration": "The ticket spells out exactly what's met and what isn't. The out-of-currency case is refused both, live; the current caller does not yet reach, live, and that criterion is unmet. The blocker is named. Nothing here is papered over."
+  },
+  {
+    "i": 48,
+    "narration": "So: nothing rounded up to a hundred percent. Built by thirty-six agents from twenty-seven tickets, running on three real clusters today, twenty-seven of twenty-eight checks green, and the one that isn't is reopened in the open, not faked. That's the real thing, running."
+  }
+]

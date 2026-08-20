@@ -1,0 +1,9 @@
+# kind-driftwood
+NAME     	REVISION     	SUSPENDED	READY	MESSAGE                         
+driftwood	sha1:2fc21df8	False    	True 	Applied revision: sha1:2fc21df8	
+# kind-tuppence
+NAME    	REVISION     	SUSPENDED	READY	MESSAGE                         
+tuppence	sha1:5504973b	False    	True 	Applied revision: sha1:5504973b	
+# kind-ludlow
+NAME  	REVISION     	SUSPENDED	READY	MESSAGE                         
+ludlow	sha1:95136c15	False    	True 	Applied revision: sha1:95136c15	

@@ -1,0 +1,146 @@
+{
+  "segments": {
+    "0": {
+      "act": 0,
+      "local_start": 0.32,
+      "global_start": 0.32
+    },
+    "1": {
+      "act": 0,
+      "local_start": 13.06,
+      "global_start": 13.06
+    },
+    "2": {
+      "act": 0,
+      "local_start": 34.22,
+      "global_start": 34.22
+    },
+    "3": {
+      "act": 1,
+      "local_start": 0.8,
+      "global_start": 55.55
+    },
+    "4": {
+      "act": 1,
+      "local_start": 27.76,
+      "global_start": 82.51
+    },
+    "5": {
+      "act": 1,
+      "local_start": 53.36,
+      "global_start": 108.11
+    },
+    "6": {
+      "act": 2,
+      "local_start": 0.8,
+      "global_start": 131.58
+    },
+    "7": {
+      "act": 2,
+      "local_start": 21.7,
+      "global_start": 152.48
+    },
+    "8": {
+      "act": 2,
+      "local_start": 41.739,
+      "global_start": 172.519
+    },
+    "9": {
+      "act": 3,
+      "local_start": 0.48,
+      "global_start": 196.89
+    },
+    "10": {
+      "act": 3,
+      "local_start": 30.94,
+      "global_start": 227.35
+    },
+    "11": {
+      "act": 4,
+      "local_start": 0.56,
+      "global_start": 251.72
+    },
+    "12": {
+      "act": 4,
+      "local_start": 20.22,
+      "global_start": 271.38
+    },
+    "13": {
+      "act": 5,
+      "local_start": 0.32,
+      "global_start": 301.03
+    },
+    "14": {
+      "act": 5,
+      "local_start": 22.9,
+      "global_start": 323.60999999999996
+    },
+    "15": {
+      "act": 6,
+      "local_start": 0.32,
+      "global_start": 352.26
+    },
+    "16": {
+      "act": 6,
+      "local_start": 20.54,
+      "global_start": 372.48
+    },
+    "17": {
+      "act": 7,
+      "local_start": 0.16,
+      "global_start": 391.09000000000003
+    },
+    "18": {
+      "act": 7,
+      "local_start": 22.36,
+      "global_start": 413.29
+    },
+    "19": {
+      "act": 8,
+      "local_start": 0.32,
+      "global_start": 442.64
+    },
+    "20": {
+      "act": 8,
+      "local_start": 26.44,
+      "global_start": 468.76
+    },
+    "21": {
+      "act": 9,
+      "local_start": 0.32,
+      "global_start": 500.59
+    },
+    "22": {
+      "act": 9,
+      "local_start": 24.68,
+      "global_start": 524.9499999999999
+    },
+    "23": {
+      "act": 10,
+      "local_start": 0.24,
+      "global_start": 547.58
+    },
+    "24": {
+      "act": 10,
+      "local_start": 24.28,
+      "global_start": 571.62
+    },
+    "25": {
+      "act": 11,
+      "local_start": 0.96,
+      "global_start": 599.6100000000001
+    },
+    "26": {
+      "act": 11,
+      "local_start": 23.66,
+      "global_start": 622.3100000000001
+    },
+    "27": {
+      "act": 11,
+      "local_start": 44.519,
+      "global_start": 643.1690000000001
+    }
+  },
+  "total_duration": 652.0100000000001,
+  "gap": 0.35
+}

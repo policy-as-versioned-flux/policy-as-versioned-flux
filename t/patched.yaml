@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-v2
+  namespace: default
+  labels:
+    policy-as-versioned.dev/policy-version: "2.0.0"
+    posture.acme.io/version: "2.0.0"
+spec:
+  containers: [{ name: app, image: nginx }]

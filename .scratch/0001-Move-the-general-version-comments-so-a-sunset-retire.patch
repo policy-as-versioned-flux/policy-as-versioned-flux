@@ -1,0 +1,123 @@
+From 91e7069e1e3a744b70133f60c4a0678022486d45 Mon Sep 17 00:00:00 2001
+From: Chris Nesbitt-Smith <chris@cns.me.uk>
+Date: Sat, 15 Aug 2026 17:57:32 +0100
+Subject: [PATCH] Move the general version comments so a sunset retirement
+ cannot delete them
+
+The sunset-escalator retires a version with:
+
+    yq -i 'del(.spec.inputs[0].versions[] | select(.version == "1.0.0"))'
+
+yq treats a comment block at the list-item indent as the head comment of
+the first element. The block therefore belonged to 1.0.0, and the delete
+took it with the element. Fleet PR #67 proves this. It removes 39 comment
+lines to retire one version.
+
+The lost comments are not about 1.0.0. They document the issue 08
+release-pins branch refs that Flux go-git needs, the issue 19 {name,
+plane} policy shape, and the ADR-0010 meaning of `sunset`. All three
+apply to every version in the array. The release-pins note also records
+that those refs are load-bearing, so losing it is a real risk.
+
+This moves that general block up one indent level, above `- versions:`.
+yq then attaches it to the parent, and deleting any element leaves it
+alone. The three lines that really are about 1.0.0 stay on the 1.0.0
+element, so retirement still removes them.
+
+The escalator script needs no change. The parsed YAML is unchanged.
+Verified with yq v4.53.3: after the move, a simulated retirement of
+1.0.0 keeps the general block, drops the 1.0.0-specific lines, drops the
+1.0.0 element, and leaves 2.0.0 and 2.2.0 intact.
+
+Claude-Session: https://claude.ai/code/session_01KGRKU2igH8tkTCcirgFHLe
+---
+ clusters/cluster1/policy-versions.yaml | 72 +++++++++++++-------------
+ 1 file changed, 36 insertions(+), 36 deletions(-)
+
+diff --git a/clusters/cluster1/policy-versions.yaml b/clusters/cluster1/policy-versions.yaml
+index be1d3a7..529d9bf 100644
+--- a/clusters/cluster1/policy-versions.yaml
++++ b/clusters/cluster1/policy-versions.yaml
+@@ -49,43 +49,43 @@ spec:
+       namespace: flux-system
+       ready: true
+   inputs:
++    # issue 08: all three now point at the matchConditions-fixed tags
++    # (v1.0.3/v2.0.3/v2.2.0) -- zero verdict impact, mechanism-only patch
++    # for the two older lines; v2.2.0 is a real content release (also
++    # ships the cloud plane, not yet wired in here -- see issue 19).
++    #
++    # v1.0.2/v2.0.2 (skipped, not v1.0.3/v2.0.3 by coincidence): Flux's
++    # go-git failed to resolve their commits during shallow-fetch-by-tag
++    # ("unable to resolve commit object ... object not found") even
++    # though `git clone --branch` resolved the identical tag fine.
++    # Root-caused live, confirmed by direct test (deleted the fix,
++    # watched it break again, restored it, watched it recover): go-git's
++    # shallow-fetch-by-tag needs the commit reachable from a branch under
++    # refs/heads, not just the tag itself -- a documented Flux/go-git
++    # limitation (fluxcd/source-controller#1166), not specific to these
++    # tags. v1.0.2/v2.0.2's commits, made via `git worktree` from an
++    # older tag's detached HEAD, were never on any branch. Fixed two
++    # ways at once: v1.0.3/v2.0.3 carry the same content with a fresh
++    # unsigned commit (the SSH-signed original was a secondary, now-moot
++    # difference) AND a permanent branch ref
++    # (policy repo: release-pins/v1.0.3, release-pins/v2.0.3) keeps each
++    # commit branch-reachable for Flux's benefit -- deleting either
++    # branch breaks resolution again, confirmed live, so they are
++    # load-bearing infrastructure, not cleanup candidates. Tags
++    # themselves are still fully gitsign-signed. Same
++    # immutable-tag-stays pattern as v1.0.0/v2.0.0.
++    # issue 19: `policies` items are now {name, plane} objects, not bare
++    # strings -- plane picks the fetch path (workloads/kyverno/<name> vs
++    # cloud/<name>) and, for cloud, adds dependsOn: crossplane-providers
++    # (issue 18's CRDs-Established gate) on top of the usual dependsOn:
++    # kyverno. Only v2.2.0 ships cloud policies today; a version with no
++    # cloud content just omits them, same as any other policy.
++    # ticket 09 (real-estate): `sunset` is this FLEET's adoption
++    # decision, not a property of the release (ADR-0010) -- purely
++    # data for tooling (governance-agent's sunset-escalator, the
++    # estate dashboard's countdown) to read; the ResourceSet template
++    # never references it, so it changes nothing about what installs.
+     - versions:
+-        # issue 08: all three now point at the matchConditions-fixed tags
+-        # (v1.0.3/v2.0.3/v2.2.0) -- zero verdict impact, mechanism-only patch
+-        # for the two older lines; v2.2.0 is a real content release (also
+-        # ships the cloud plane, not yet wired in here -- see issue 19).
+-        #
+-        # v1.0.2/v2.0.2 (skipped, not v1.0.3/v2.0.3 by coincidence): Flux's
+-        # go-git failed to resolve their commits during shallow-fetch-by-tag
+-        # ("unable to resolve commit object ... object not found") even
+-        # though `git clone --branch` resolved the identical tag fine.
+-        # Root-caused live, confirmed by direct test (deleted the fix,
+-        # watched it break again, restored it, watched it recover): go-git's
+-        # shallow-fetch-by-tag needs the commit reachable from a branch under
+-        # refs/heads, not just the tag itself -- a documented Flux/go-git
+-        # limitation (fluxcd/source-controller#1166), not specific to these
+-        # tags. v1.0.2/v2.0.2's commits, made via `git worktree` from an
+-        # older tag's detached HEAD, were never on any branch. Fixed two
+-        # ways at once: v1.0.3/v2.0.3 carry the same content with a fresh
+-        # unsigned commit (the SSH-signed original was a secondary, now-moot
+-        # difference) AND a permanent branch ref
+-        # (policy repo: release-pins/v1.0.3, release-pins/v2.0.3) keeps each
+-        # commit branch-reachable for Flux's benefit -- deleting either
+-        # branch breaks resolution again, confirmed live, so they are
+-        # load-bearing infrastructure, not cleanup candidates. Tags
+-        # themselves are still fully gitsign-signed. Same
+-        # immutable-tag-stays pattern as v1.0.0/v2.0.0.
+-        # issue 19: `policies` items are now {name, plane} objects, not bare
+-        # strings -- plane picks the fetch path (workloads/kyverno/<name> vs
+-        # cloud/<name>) and, for cloud, adds dependsOn: crossplane-providers
+-        # (issue 18's CRDs-Established gate) on top of the usual dependsOn:
+-        # kyverno. Only v2.2.0 ships cloud policies today; a version with no
+-        # cloud content just omits them, same as any other policy.
+-        # ticket 09 (real-estate): `sunset` is this FLEET's adoption
+-        # decision, not a property of the release (ADR-0010) -- purely
+-        # data for tooling (governance-agent's sunset-escalator, the
+-        # estate dashboard's countdown) to read; the ResourceSet template
+-        # never references it, so it changes nothing about what installs.
+         # 1.0.0 is the laggard the roster was designed to expose; giving
+         # it a real sunset horizon is the honest version of "we know,
+         # we're on it" rather than leaving it open-ended forever.
+-- 
+2.55.0
+
