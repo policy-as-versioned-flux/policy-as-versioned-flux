@@ -5,41 +5,36 @@
 base** the whole talk stacks on: Flux reconciling a pinned, signed
 `GitRepository` at admission.
 
-## Bring-up (idempotent, offline-safe, resettable — the touring requirement)
+## Bring-up (idempotent, resettable — the touring requirement; needs internet)
 
 ```sh
-scripts/up.sh          # KinD -> Flux -> in-cluster git source -> reconcile healthy
+scripts/up.sh          # KinD -> Flux -> real GitHub git source -> reconcile healthy
 verify-reconcile.sh    # asserts the beat (exits non-zero if it would fail on stage)
-scripts/reset.sh       # delete the cluster (or: reset.sh soft = re-seed only)
+scripts/reset.sh       # delete the cluster (or: reset.sh soft = re-apply sources only)
 ```
 
-`up.sh` is safe to re-run: it skips the cluster/Flux if already up and re-seeds
-the source. Everything after the first controller-image pull is offline.
+`up.sh` is safe to re-run: it skips the cluster/Flux if already up and
+re-applies the sources. It checks for a route to github.com before asking
+Flux to pull from it, so a dead network fails fast with a clear message
+instead of a multi-minute hang.
 
 ## How the source works
 
-For the tour there is no network luck: `up.sh` seeds the [`gitops/`](gitops/)
-tree into a git repo, tags it `v1.0.0`, bakes it into a tiny
-[`git-server/`](git-server/) image (busybox-httpd smart-HTTP CGI over
-`git-http-backend`), `kind load`s it, and points a `GitRepository` **pinned to
-that tag + commit SHA** at the in-cluster service. Git is the only way cluster
-state changes; the revision is immutable.
-
-The committed [`gitops/flux-system/gotk-sync.yaml`](gitops/flux-system/gotk-sync.yaml)
-is the canonical form pointed at the real `policy-as-versioned-driftwood` GitHub
-remote — where the `v1.0.0` tag is **gitsign-signed** (keyless → Rekor) and
-verified in the provenance beat (ticket 24). Flux's `GitRepository.spec.verify`
-only speaks OpenPGP, so the gitsign signature is verified out-of-band by
-`git verify-tag` / Rekor rather than mis-declared as a PGP block; the pin + the
-signed tag are the provenance.
+[`gotk-sync.yaml`](gitops/flux-system/gotk-sync.yaml) is applied as-is by
+`up.sh` and points a `GitRepository` at the real `policy-as-versioned-driftwood`
+GitHub remote, pinned to tag `v1.0.0` — **gitsign-signed** (keyless → Rekor)
+and verified in the provenance beat (ticket 24). Flux's
+`GitRepository.spec.verify` only speaks OpenPGP, so the gitsign signature is
+verified out-of-band by `git verify-tag` / Rekor rather than mis-declared as
+a PGP block; the pin + the signed tag are the provenance. Git is the only way
+cluster state changes.
 
 ## Pinned regulator dependency (`nist`)
 
-`gitops/flux-system/gotk-sync-nist.yaml` pins a specific signed tag+commit of
-the real `nist` 800-53 OSCAL catalog (`estate/nist`) as a Flux `GitRepository`
-— the same in-cluster git server driftwood's own source uses, serving both
-bare repos. `driftwood-nist-pin` (`gitops/apps/nist-pin-configmap.yaml`) is
-the human/audit-readable mirror of that pin. `verify-reconcile.sh` asserts
+`gitops/flux-system/gotk-sync-nist.yaml` pins a specific signed tag of the
+real `nist` 800-53 OSCAL catalog (`policy-as-versioned-nist/nist`) as a Flux
+`GitRepository`. `driftwood-nist-pin` (`gitops/apps/nist-pin-configmap.yaml`)
+is the human/audit-readable mirror of that pin. `verify-reconcile.sh` asserts
 both reconcile Ready and pinned.
 
 A regulator version bump arrives as a reviewable PR:
