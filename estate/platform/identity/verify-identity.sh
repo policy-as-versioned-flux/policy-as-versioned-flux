@@ -10,6 +10,7 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CTX="${CTX:-kind-driftwood}"
+fail() { echo "FAIL: $*" >&2; exit 1; }
 
 echo "== offline: structural invariants =="
 python3 - "$HERE" <<'PY'
@@ -49,11 +50,20 @@ check(td == "acme.internal", f"trust domain is the one estate root (acme.interna
 agent_sock = v.get("spire-agent", {}).get("socketPath", "")
 check(agent_sock.startswith("/run/spire/agent-sockets/"), f"agent socket exposed for Envoy SDS ({agent_sock})")
 
-# Istio consumes SPIRE identity, not its own CA.
+# Istio consumes SPIRE identity, not its own CA. NOTE: global.caName is a no-op
+# on Istio 1.24 (only ever consulted for GkeWorkloadCertificate) — asserting it
+# equals "SPIRE" passed regardless of how the mesh was actually wired. What
+# really makes SPIRE the mesh CA: istiod's own CA server is switched off, and
+# sidecar injection mounts the SPIRE workload socket at Envoy's well-known SDS
+# path (see istio/helmrelease.yaml and https://istio.io/latest/docs/ops/integrations/spire/).
 istiod = find("HelmRelease", "istiod")
 check(bool(istiod), "istiod HelmRelease present")
 iv = istiod[0]["spec"]["values"] if istiod else {}
-check(iv.get("global", {}).get("caName") == "SPIRE", "istiod caName: SPIRE (mesh CA = SPIRE)")
+check(iv.get("pilot", {}).get("env", {}).get("ENABLE_CA_SERVER") == "false",
+      "istiod's own CA server is disabled (ENABLE_CA_SERVER: false) — istiod cannot mint certs itself")
+spire_tmpl = iv.get("sidecarInjectorWebhook", {}).get("templates", {}).get("spire", "")
+check("csi.spiffe.io" in spire_tmpl and "/run/secrets/workload-spiffe-uds" in spire_tmpl,
+      "sidecar injection mounts the SPIRE workload socket at Envoy's SDS default path (this, not caName, makes SPIRE the mesh CA)")
 
 # STRICT mesh mTLS.
 pa = find("PeerAuthentication", "default")
@@ -92,14 +102,14 @@ fi
 # LIVE proof — only if the substrate is already up; strictly bounded, never hangs.
 if command -v kubectl >/dev/null && timeout 10 kubectl --context "$CTX" get ns spire-system >/dev/null 2>&1; then
   echo "== live: substrate + mTLS proof =="
-  timeout 20 kubectl --context "$CTX" -n spire-system get pods 2>/dev/null | grep -q spire && echo "  ok   SPIRE pods present" || echo "  FAIL SPIRE pods"
-  timeout 20 kubectl --context "$CTX" -n istio-system get deploy istiod >/dev/null 2>&1 && echo "  ok   istiod present" || echo "  FAIL istiod"
-  timeout 20 kubectl --context "$CTX" -n openbao get pods 2>/dev/null | grep -q openbao && echo "  ok   OpenBao present" || echo "  FAIL OpenBao"
+  timeout 20 kubectl --context "$CTX" -n spire-system get pods 2>/dev/null | grep -q spire && echo "  ok   SPIRE pods present" || fail "SPIRE pods not present"
+  timeout 20 kubectl --context "$CTX" -n istio-system get deploy istiod >/dev/null 2>&1 && echo "  ok   istiod present" || fail "istiod not present"
+  timeout 20 kubectl --context "$CTX" -n openbao get pods 2>/dev/null | grep -q openbao && echo "  ok   OpenBao present" || fail "OpenBao not present"
   # ping -> pong must succeed over mTLS (ping is the allowed SPIFFE principal).
   P=$(timeout 20 kubectl --context "$CTX" -n mesh-demo get pod -l app=ping -o name 2>/dev/null | head -1)
   if [ -n "$P" ]; then
     timeout 20 kubectl --context "$CTX" -n mesh-demo exec "$P" -c ping -- curl -sS -o /dev/null -w '%{http_code}' pong.mesh-demo/ 2>/dev/null | grep -q 200 \
-      && echo "  ok   ping -> pong over SPIFFE mTLS (200)" || echo "  FAIL ping -> pong"
+      && echo "  ok   ping -> pong over SPIFFE mTLS (200)" || fail "ping -> pong over SPIFFE mTLS did not return 200"
   fi
 else
   echo "== live checks skipped (substrate not up; run up.sh on the driftwood cluster) =="

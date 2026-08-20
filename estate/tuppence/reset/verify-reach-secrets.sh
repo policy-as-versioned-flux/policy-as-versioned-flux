@@ -46,8 +46,14 @@ else
   echo "  (skip: kubectl absent — manifest validity checked live)"
 fi
 
-# ---- live tail: only if the substrate + workloads are actually installed ----
-if have kubectl && timeout 10 kubectl --context "$CTX" get ns "$NS" >/dev/null 2>&1 \
+# ---- live tail: only if the actual prerequisite (the posture layer this beat
+# gates on) is installed, AND the substrate + workloads are up. Gating on ns+
+# deploy alone let this enter the live tail on a cluster that had the workload
+# but not the posture gate — "present but incomplete" produced noise
+# indistinguishable from a real failure, and "absent" always looked the same as
+# "passed". Check stamp-posture first, matching verify-posture-projection.sh.
+if have kubectl && timeout 10 kubectl --context "$CTX" get mutatingpolicy stamp-posture >/dev/null 2>&1 \
+   && timeout 10 kubectl --context "$CTX" get ns "$NS" >/dev/null 2>&1 \
    && timeout 10 kubectl --context "$CTX" -n "$NS" get deploy customer-accounts-reset >/dev/null 2>&1; then
 
   say "3. live: reach — current caller gets 200, stale caller is refused"
@@ -86,7 +92,7 @@ if have kubectl && timeout 10 kubectl --context "$CTX" get ns "$NS" >/dev/null 2
     echo "  (skip: no spire-agent JWT-SVID mint path on the caller pods; offline gate proof stands)"
   fi
 else
-  say "3-4. live checks skipped: $NS workloads not found on context '$CTX'"
+  say "3-4. live checks skipped: posture layer (stamp-posture) or $NS workloads not found on context '$CTX'"
   say "     run estate/platform/identity/up.sh, estate/platform/posture/up.sh, then"
   say "     estate/tuppence/reset/up.sh — the offline gate proof above is the claim."
 fi

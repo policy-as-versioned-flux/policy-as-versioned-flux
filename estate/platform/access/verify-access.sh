@@ -10,6 +10,7 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CTX="${CTX:-kind-driftwood}"
+fail() { echo "FAIL: $*" >&2; exit 1; }
 
 echo "== offline: decision-engine asserts =="
 python3 "$HERE/access.py" selfcheck
@@ -94,8 +95,8 @@ fi
 # LIVE — only if the plane is already up; strictly bounded, never hangs.
 if command -v kubectl >/dev/null && timeout 10 kubectl --context "$CTX" get ns access >/dev/null 2>&1; then
   echo "== live: plane present =="
-  timeout 20 kubectl --context "$CTX" -n access get pods 2>/dev/null | grep -q dex && echo "  ok   Dex present" || echo "  FAIL Dex"
-  timeout 20 kubectl --context "$CTX" -n access get pods 2>/dev/null | grep -q pomerium && echo "  ok   Pomerium present" || echo "  FAIL Pomerium"
+  timeout 20 kubectl --context "$CTX" -n access get pods 2>/dev/null | grep -q dex && echo "  ok   Dex present" || fail "Dex pod not present"
+  timeout 20 kubectl --context "$CTX" -n access get pods 2>/dev/null | grep -q pomerium && echo "  ok   Pomerium present" || fail "Pomerium pod not present"
   echo "  (live WebAuthn + tpm_devid attestation need a human at the Secure Enclave / a (v)TPM — see device/secure-enclave.md)"
 else
   echo "== live checks skipped (plane not up; run up.sh on the driftwood cluster) =="
