@@ -13,6 +13,37 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
 
 ## Core thesis terms
 
+- **Party** — Any of the six units of the estate. Deliberately *not* given a collective noun in
+  prose: name the kind instead ("the platform, two regulators and three institutions"), because the
+  argument depends on these being different kinds of party exchanging signed dependencies across
+  trust boundaries. What is true of all six: each is represented by its own **independent GitHub
+  organisation**.
+
+- **Role** — What a party *does*. Roles **compose**; they are not a partition, and a party may hold
+  several:
+  - **publisher** — ships a signed, versioned artefact others pin (`platform`, `nist`, `ico`);
+  - **risk-bearer** — has a declared risk-appetite band, so the £ engine can price it
+    (`driftwood`, `tuppence`, `ludlow`, **and `platform`** — the apparatus prices its own risk
+    against a strict £10k band, see *reflexive*);
+  - **adopter** — pins and consumes another party's artefact (the three institutions; `platform`
+    itself as it pins `nist`).
+
+- **Institution** — A regulated, risk-bearing adopter: `driftwood` (UK retail), `tuppence` (UK bank),
+  `ludlow` (US health). Kept over "consumer" because it carries the regulatory weight the
+  proportionality argument depends on, even though "consumer" better describes the dependency
+  direction.
+
+- **Regulator** — A publisher that ships controls or penalties as a signed, versioned artefact and
+  bears no risk of its own here (`nist`, `ico`).
+
+- **`org`** — **A deliberately overloaded term, documented rather than renamed.** In code and in
+  emitted artefact fields it means *risk-bearer* — `tolerance_for(org)` resolves an appetite band and
+  exits for a party that has none. In infrastructure it means *GitHub organisation*, which all six
+  parties have. The overload is tolerated because `org` is a field name in emitted artefacts and
+  golden digests, and renaming it would churn the provenance surface for a vocabulary win. Read it as
+  "risk-bearer" in code, "GitHub organisation" in deployment.
+
+
 - **Policy** — A set of rules that mitigates a risk. Comes in two intents: *security-enforcing*
   (e.g. data-at-rest encryption) and *consistency-enforcing* (e.g. required labels). A policy is
   only worth having if it carries its **purpose** ("purposeless policy is potentially practically

@@ -37,7 +37,10 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
 - **`pitch-v5.mp4` is internal-only until the split lands.** It narrates "six live organisations",
   which is six directories and six empty orgs until then. Not a re-cut — just don't put it in front of
   a customer or a conference while that line is false. Cheapest honest fix if it is needed externally
-  sooner: re-record that one segment (~20s, one act), not the deck.
+  sooner: re-record that one segment (~20s, one act), not the deck. The entitled replacement sentence
+  is settled — see the organisation-glossary ticket: "Six independent GitHub organisations — a shared
+  platform that prices its own risk like everyone else, three regulated institutions, two regulators."
+  
 - Skills each session should consult: `/grilling`, `/domain-modeling`; the repo's
   `docs/agents/issue-tracker.md`.
 
@@ -45,6 +48,11 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
 
 <!-- index of closed tickets; one line each, linking the ticket that holds the detail -->
 
+- [Settle what "organisation" means](issues/03-organisation-glossary.md) — no collective noun for the
+  six; name the kind, but all six are independent GitHub organisations. **Roles compose** —
+  publisher / risk-bearer / adopter — and `platform` is already two of them, carrying its own £10k
+  band. `org` stays overloaded but documented (renaming churns the artefact provenance surface).
+  Terms written into `CONTEXT.md`.
 - [Research the full war-gaming scenario slate](issues/05-scenario-slate-research.md) — 4 components
   (2 fire, 2 deliberately inert); **feed carries the trajectory, library carries the posture**; K=4.0
   validated by measurement but its "widen K" comment is unsafe (cage TCoR is non-monotone). Surfaced
