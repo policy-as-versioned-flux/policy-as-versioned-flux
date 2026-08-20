@@ -11,7 +11,7 @@ even the tightest cage leaves a residual over the org's appetite band.
 | Piece | File | Role |
 |---|---|---|
 | The £ engine | `cage.py` | Named tiers → dials (deterministic); the £ picks the tier; emits the TCoR ledger line (residual + cost-of-controls). Reuses `../fair/fair.py` and `../risk/enforce.py`. |
-| Cage (mutate) | `policies/cage-tier.yaml` | `MutatingPolicy`: a pod carrying `posture.acme.io/tier` is mutated into that tier's cage — cpu/mem limits, eviction PriorityClass, and (restricted+) drop-ALL caps, read-only-fs, a WAF sidecar. Never denies. |
+| Cage (mutate) | `policies/cage-tier.yaml` | `MutatingPolicy`: every pod that claims a policy version is mutated into a cage — cpu/mem limits, eviction PriorityClass, and (restricted+) drop-ALL caps, read-only-fs, a WAF sidecar. A pod carrying `posture.acme.io/tier` gets that tier; one with no (or an unrecognized) tier defaults to `baseline`, the loosest tier — no uncaged state within that population. A pod claiming no policy version at all (system/COTS) is out of scope, unmatched. Never denies. |
 | Egress lockdown (generate) | `policies/cage-netpol.yaml` | `GeneratingPolicy`: a caged pod triggers a namespace `NetworkPolicy` that allows egress DNS only — the "reach" cut of the same decision. |
 | Eviction priority | `policies/priorityclasses.yaml` | Three `PriorityClass`es below the default; tighter tier = evicted sooner under pressure. |
 | Tests | `tests/` | `kyverno test` matrices: the cage is a **mutation** (cage present), not a deny; the generate emits the lockdown netpol. |
@@ -68,10 +68,11 @@ flowchart LR
 ```
 
 The tier is set upstream by the £ / the currency controller (ticket 16) — never
-self-asserted for a *loosening*: an unknown tier value falls through the map and
-the mutation no-ops, and `posture.acme.io/caged` is stamped by the policy, not the
-pod. Least-privilege stays the floor for everyone via the versioned `require-*`
-policies; this cage only *tightens* a workload that fell behind.
+self-asserted for a *loosening*: an unknown tier value falls through the map to
+`baseline`, and `posture.acme.io/caged` is stamped by the policy, not the pod.
+Least-privilege stays the floor for everyone via the versioned `require-*`
+policies; this cage only *tightens* a workload that fell behind, and only a
+workload that claims a policy version at all — see ticket 08 below.
 
 ## Run it
 
@@ -83,10 +84,36 @@ estate/platform/graded/verify-graded.sh
 ```
 
 `verify-graded.sh` proves offline (no cluster) that the cage is a mutation not a
-deny, the tier→dials expansion is deterministic and matches `cage.py`, the generate
-emits the egress lockdown, and the eviction ordering holds. If the policies are
-installed live it also server-dry-runs a behind-posture pod and asserts it is
-*caged* (mutated), never denied.
+deny, the tier→dials expansion is deterministic and matches `cage.py`, an
+in-currency pod (claims a version, no tier label) is caged into `baseline`
+rather than left untouched, a pod claiming no version at all is skipped
+outright, the generate emits the egress lockdown, and the eviction ordering
+holds. If the policies are installed live it also server-dry-runs a
+behind-posture pod and asserts it is *caged* (mutated), never denied.
+
+### Every claiming workload is always caged (ticket 08)
+
+There is no uncaged state *within the population that claims a policy version*.
+A pod with a version claim but no `posture.acme.io/tier` label — the in-currency
+population — is not skipped; it is mutated into `baseline`, the loosest tier,
+the permissive default. `baseline` still stamps `cpu: 500m`, `mem: 256Mi` and a
+`cage-baseline` PriorityClass onto every claiming pod that previously went
+untouched, so **this is itself a major bump** under `CONTEXT.md`'s own semver
+rule (verdict impact on currently-compliant workloads): a pod that cannot
+schedule under those new limits is refused, where before it was admitted
+clean. Release this change as a major version, not a patch. A tier value that
+is missing *or* unrecognized both fall through to `baseline` — never to a
+no-op skip, which would be the exemption `CONTEXT.md` bans.
+
+**A pod that claims no policy version at all is a different population, and
+this ticket does not touch it.** `cage-tier.yaml`'s `matchConditions` gate on
+`policy-as-versioned.dev/policy-version` presence (the same convention
+`../posture/policies/stamp-posture.yaml` uses) keeps kube-system, Kyverno's own
+pods, Flux's controllers, cert-manager, and any COTS workload outside this
+policy's reach — they are unmatched, not caged. Whether that permanently
+unversioned population should also default to `baseline` is a real question,
+genuinely left open and spun out to its own effort (ticket 02 answer #5), not
+a decision this policy body has already made.
 
 ## Calibration knobs
 

@@ -2,7 +2,9 @@
 # cage — never denied. baseline is a nudge (limits + eviction PriorityClass, caps
 # intact); restricted/quarantine add drop-ALL caps, read-only-fs, and a WAF
 # sidecar sized by tier. The dials here are the deterministic expansion of the
-# named tier (cage.py holds the same table).
+# named tier (cage.py holds the same table). The in-currency pod (no self-
+# asserted tier) gets the same baseline cage — the permissive default, not a
+# self-asserted label, so `posture.acme.io/tier` stays absent on it.
 apiVersion: v1
 kind: Pod
 metadata:
@@ -103,3 +105,25 @@ spec:
         capabilities:
           drop:
             - ALL
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: in-currency
+  namespace: default
+  labels:
+    policy-as-versioned.dev/policy-version: "2.0.0"
+    posture.acme.io/caged: "true"
+spec:
+  priorityClassName: cage-baseline
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        limits:
+          cpu: 500m
+          memory: 256Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: false
+        runAsNonRoot: false
