@@ -42,6 +42,14 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
 
 <!-- index of closed tickets; one line each, linking the ticket that holds the detail -->
 
+- [What counts as a "verdict", given Audit is not a pass](issues/02-what-counts-as-a-verdict.md) —
+  compliant means *admitted*; refusal is not a class but the **bottom rung** of the cage ladder; and
+  **every workload is always caged — the cage *spec* is what changes**, so the engine compares specs,
+  not verdict enums. The bump is institution-relative (the rung is picked against the consuming org's
+  band), so **tag the strictest band and publish the per-institution matrix as evidence**. Two things
+  fell out: the code contradicts always-caged, and COTS/unversioned workloads are a permanent
+  population needing their own effort.
+
 ## Not yet specified
 
 - **Where the gate runs after the six-org split.** The other effort is splitting the estate into six
@@ -50,6 +58,9 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
 - **Whether the Renovate bump PR should carry the computed evidence.** ADR-0002 makes the reviewed PR
   the non-negotiable gate — a reviewer seeing "this bump is major, here are the three workloads that
   flip" is strictly better than seeing a version number. Shape unclear until the gate exists.
+- **How the shim for unversioned/COTS workloads changes the corpus.** Spun out as its own effort at
+  the owner's instruction — but the corpus ticket cannot be finished without knowing what a verdict
+  means for a workload nobody controls.
 - **Whether the corpus itself needs versioning and signing.** It becomes evidence, and every other
   piece of evidence in this estate is signed and tamper-checked.
 
