@@ -25,3 +25,9 @@ enforcement notices with cited sources: `uk-gdpr` (ICO), `pci-dss` (card-scheme 
 `hipaa` (US HHS OCR), `fca` (UK FCA). Run `./verify-penalty-feed.sh` (offline, no cluster) to see
 a schema-version bump move the £ that `platform/fair/fair.py` reports, with no edit to `fair.py`.
 
+One breach can draw more than one regime's consequence at once (an ICO fine *and* a PCI penalty on
+the same incident, say) — `to_fair_scenario.py build ... --also REGIME:VIOLATION_TYPE` (repeatable)
+folds further obligation sources into one scenario, and `fair.py` prices them additively and
+correlated (one shared frequency, not independent risks), so the £ gets bigger, never diluted.
+Which regimes actually apply to which workload is still open. *(ticket 18)*
+

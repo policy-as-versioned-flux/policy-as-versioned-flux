@@ -50,5 +50,20 @@ assert a != b, f"schema bump did not change the £ (both {a})"
 print(f"ok  £ moved by £{b - a:,.0f} on a version-only schema diff")
 PY
 
+say "5. one breach can draw several obligation sources; the £ is worst case, not one at a time (ticket 18)"
+python3 "$schema_dir/to_fair_scenario.py" build "$schema_dir/v2/penalty-schema.json" uk-gdpr lower-tier \
+    --also pci-dss:non-compliance-escalating -o "$work/combined.json"
+ale_solo=$(python3 "$fair" summary "$work/v2.json" --mode warn | python3 -c "import json,sys; print(json.load(sys.stdin)['ale'])")
+ale_combined=$(python3 "$fair" summary "$work/combined.json" --mode warn | python3 -c "import json,sys; print(json.load(sys.stdin)['ale'])")
+echo "ale(uk-gdpr/lower-tier alone)               = £$(printf '%.0f' "$ale_solo")"
+echo "ale(uk-gdpr/lower-tier + pci-dss, combined)  = £$(printf '%.0f' "$ale_combined")"
+python3 - "$ale_solo" "$ale_combined" <<'PY'
+import sys
+solo, combined = float(sys.argv[1]), float(sys.argv[2])
+assert combined > solo, f"a second obligation source on the same breach did not raise the £ ({combined} <= {solo})"
+print(f"ok  £ rose by £{combined - solo:,.0f} once a second regime can draw on the same breach -- fatter, not thinner")
+PY
+
 echo
-echo "PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £."
+echo "PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £,"
+echo "and a second obligation source on one breach raises it further."

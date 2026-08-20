@@ -22,6 +22,14 @@ Scenario JSON (versioned triples):
       "deny": {"lef": [min,mode,max], "lm": [min,mode,max]} }
   or a single unnamed control state:
     { "version": "v1", "name": "...", "lef": [...], "lm": [...] }
+
+  lm may instead be a LIST of (min,mode,max) triples -- one per obligation
+  source (an ICO fine, a PCI penalty, SLA credits, litigation, ...) that the
+  same breach can draw at once (ticket 18). They are priced additively and
+  correlated: one triggering event draws every applicable consequence, so
+  every source shares the risk's single lef and is summed *within* each
+  simulated event, never sampled as independent risks with their own
+  frequency. See simulate()'s docstring for why.
 """
 from __future__ import annotations
 
@@ -52,15 +60,31 @@ def pert(lo, mode, hi, n, rng, lam=PERT_LAMBDA):
 def simulate(lef, lm, n=ITERATIONS, seed=SEED):
     """Aggregate annual-loss distribution.
 
-    lef, lm are (min, mode, max) triples. Per simulated year: sample how many loss
-    events happen (freq ~ PERT(lef)), then sum a magnitude per event (PERT(lm)).
+    lef is a (min, mode, max) triple. lm is either one such triple, or a list of
+    them -- one per obligation source whose consequence the SAME breach can draw
+    (an ICO fine *and* a PCI penalty *and* SLA credits on one incident, say).
+
+    Per simulated year: sample how many loss events happen (freq ~ PERT(lef)),
+    then for each event, sum a magnitude drawn per obligation source (PERT(lm)
+    each). Multiple sources are priced ADDITIVE (two regulators fining the same
+    breach both land) and CORRELATED through the one shared frequency draw --
+    they are not independent risks each rolling their own dice, because they are
+    not independent events: it is the same breach. Structural, not a bigger
+    triple -- summing separately-simulated regimes would let a bad year for one
+    source land in a quiet year for another, diversifying the tail away, which is
+    not how one breach drawing several consequences behaves. Ticket 18.
+
     Returns a list of annual losses, one per simulated year.
     """
     rng = random.Random(seed)
     freqs = [max(0, round(f)) for f in pert(*lef, n, rng)]
+    lms = lm if lm and isinstance(lm[0], (list, tuple)) else [lm]
     losses = []
     for f in freqs:
-        losses.append(sum(pert(*lm, f, rng)) if f > 0 else 0.0)
+        if f == 0:
+            losses.append(0.0)
+            continue
+        losses.append(sum(sum(pert(*triple, f, rng)) for triple in lms))
     return losses
 
 
@@ -179,6 +203,37 @@ def cmd_selfcheck(_args):
     print("ok  ALE=%.0f VaR95=%.0f TVaR=%.0f carried=%.0f | Deny buys %.0f (%.0f%% effective)" % (
         s["ale"], s["var95"], s["tvar"], s["carried"],
         cv["risk_bought"], 100 * cv["effectiveness"]))
+
+    # Multiple obligation sources on one risk (ticket 18): additive, and
+    # correlated because the same breach draws every applicable consequence --
+    # they share the risk's one lef, never independent risks summed after the
+    # fact. lm_a/lm_b stand in for e.g. an ICO fine and a PCI penalty on the
+    # same incident.
+    lm_a = (1_000, 4_000, 9_000)
+    lm_b = (2_000, 10_000, 30_000)
+    single_a = summarize(simulate((2, 4, 9), lm_a))
+    single_b = summarize(simulate((2, 4, 9), lm_b))
+    combined = summarize(simulate((2, 4, 9), [lm_a, lm_b]))
+
+    # Additive: two sources fining/charging the same breach both land.
+    ale_sum = single_a["ale"] + single_b["ale"]
+    assert abs(combined["ale"] - ale_sum) < 0.01 * ale_sum, (combined, ale_sum)
+
+    # The honest direction: worse than either source alone, never a dilution.
+    assert combined["tvar"] > single_a["tvar"], combined
+    assert combined["tvar"] > single_b["tvar"], combined
+
+    # Correlated, not independently sampled: two SEPARATE simulations (each
+    # drawing its own frequency) let a bad year for one source land in a quiet
+    # year for the other, diversifying the tail away. That is not this breach
+    # -- one event draws every applicable consequence -- so the correlated
+    # combination's tail must sit above that naive independent sum.
+    naive = summarize([a + b for a, b in zip(
+        simulate((2, 4, 9), lm_a, seed=SEED), simulate((2, 4, 9), lm_b, seed=SEED + 1))])
+    assert combined["tvar"] > naive["tvar"], (combined, naive)
+
+    print("ok  multi-source: combined ALE=%.0f (~= %.0f+%.0f) TVaR=%.0f > naive-independent TVaR=%.0f" % (
+        combined["ale"], single_a["ale"], single_b["ale"], combined["tvar"], naive["tvar"]))
 
 
 def main(argv=None):
