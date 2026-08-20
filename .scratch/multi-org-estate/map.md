@@ -48,6 +48,12 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
 
 <!-- index of closed tickets; one line each, linking the ticket that holds the detail -->
 
+- [An institution answers to many masters](issues/17-many-obligation-sources.md) — overlap and
+  duplication are **permanent and expected**, not to be normalised away; obligations scope
+  **per-workload**, not per-institution; one breach can draw **several consequences** and the £ takes
+  the worst case; genuine deadlock gets a **deferred** reconciler (which must resolve between
+  obligations, never waive one — exemptions are banned). Curated bundles are a convenience, never the
+  only path. `ico`'s parallel feed stack is the evidence the shared kind is already wanted.
 - [Split mechanics and cross-org verification](issues/07-split-mechanics-decision.md) — platform ships
   the verify harness as a pinned dependency, `verify/` and `talk/` become **separate repos in the hub
   org**, and tags are **dual-signed** (gitsign + OpenPGP) because Flux's `spec.verify` only speaks

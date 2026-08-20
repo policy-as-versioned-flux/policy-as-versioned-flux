@@ -1,7 +1,7 @@
 # 13 — Should the estate gain a prediction-market signal feed?
 
 Type: grilling
-Status: open
+Status: claimed (this session)
 Blocked by: 05
 
 ## Question

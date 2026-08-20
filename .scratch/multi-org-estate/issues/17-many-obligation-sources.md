@@ -1,7 +1,7 @@
 # 17 — An institution answers to many masters, and the estate models one
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -39,3 +39,48 @@ obligations at once, from sources that are not all regulators.
 large, it is a candidate to spin out rather than to swell this map — but the split's Renovate wiring
 needs at least the shape of the answer, so it is recorded here and the release/Renovate ticket is
 made to wait on it.
+
+## Answer
+
+Resolved by grilling, 2026-08-20. The owner's answer overrode the recommendation on conflict
+handling, and the correction is recorded rather than smoothed over.
+
+**1. Overlap and duplication are permanent and expected — not a defect to normalise away.** Owner:
+*"there will always be duplications and overlap."* So obligation sources are **one kind** in the sense
+that they share machinery (signed, versioned, pinned artefacts an institution consumes), but the
+estate must not try to deduplicate the *obligations themselves*. Two regulators demanding overlapping
+controls is the normal case, not a modelling error.
+
+Evidence the shared kind is already wanted: `ico` runs a **parallel feed stack** —
+`estate/ico/schema/{v1,v2,sign.sh,to_fair_scenario.py}` — a near-duplicate of
+`estate/platform/feeds/`, with its own key and its own beat. Two near-identical loaders is the estate
+telling you it has a general concept it has not named.
+
+**2. Obligations scope per *workload*, not per institution.** Owner: *"they may not all apply to all
+workloads."* Today the scope is institution-wide — `nist-pin-configmap.yaml` is
+`namespace: driftwood`, and the pin covers everything in it. A workload handling card data is subject
+to PCI; one that never touches it is not. **Gap: there is no per-workload obligation scoping.**
+
+**3. A single breach can trigger several consequences, and the £ must take the worst case.** Owner:
+*"the org may be subject to multiple fines or other consequences for a single breach, so you may need
+to consider the worst case scenario."* **Gap, and a significant one:** `fair.py` models **one
+loss-magnitude triple per risk** (`lm: [min, mode, max]`), and `simulate()` sums magnitude *per event
+within one regime*. `ico/schema/to_fair_scenario.py` reads *regime → violation-type → fine
+formula/cap* — one regime at a time. Nothing aggregates an ICO fine plus a PCI penalty plus SLA
+credits plus litigation arising from the *same* incident. Raised as its own ticket.
+
+**4. Conflict: overlap is normal; genuine deadlock gets a deferred reconciler.** The recommendation
+here was *refuse to render*, and it was **not** taken. The owner's position is better: most "conflict"
+is ordinary overlap that should simply be carried, and only genuine deadlock — two obligations
+demanding incompatible things — needs handling. That handling is **explicitly deferred**: *"we may
+later need to consider an overrides or reconciler stage where the org or other providers can manually
+manage conflicts."*
+
+Recorded as deferred rather than designed. Note the shape when it comes: an override is dangerously
+close to an exemption, which is a banned concept — so a reconciler must resolve *between obligations*,
+never waive one.
+
+**5. Curated bundles exist as a convenience, never as the only path.** Platform may publish
+meta-packages bundling upstreams and pinning versions, but an institution can always pin sources
+directly. Mandatory bundles would re-introduce through the back door the intermediation that was
+rejected for regulator pins — platform as a single point of failure for regulatory currency.

@@ -1,7 +1,7 @@
 # 15 — The forward layer can only ever raise the bill
 
 Type: grilling
-Status: open
+Status: claimed (this session)
 Blocked by: none
 
 ## Question
