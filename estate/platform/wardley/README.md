@@ -41,14 +41,19 @@ commodity and near-stationary (`credential-stuffing-aas`) does **not** flag: the
 movement left to anticipate. This is the crucial distinction — commoditisation is read as
 a *trajectory*, not a static position.
 
-**2. Feeds a forward signal into the war-gamer.** For each commoditising
-**attacker-capability**, `forward_signal()` collapses the attack cost into a forward LEF
-bump on its linked risk (`factor = 1 + K × movement`) and emits a scenario library in the
-*exact* shape the war-gamer already consumes. `forward_into_wargamer()` hands it straight
-to `wargamer.wargame_scenarios()` unmodified. The reactive base posture is **proportionate
-today** (a graded `cage`); the commoditisation bump is the *only* reason drift appears —
-so the war-gamer proposes `cage → fix` **before** the campaign lands. A commoditising
-*defensive* capability (`spiffe-workload-identity`) raises **no** attacker risk.
+**2. Feeds a forward signal into the war-gamer, per institution.** For each commoditising
+**attacker-capability**, `forward_signal(intel, org)` collapses the attack cost into a
+forward LEF bump on its linked risk (`factor = 1 + K × movement`) and emits a scenario
+library in the *exact* shape the war-gamer already consumes, labelled for one of the three
+risk-bearing institutions (`driftwood`, `tuppence`, `ludlow` — see `../risk/appetite.json`).
+`forward_into_wargamer(intel, org)` hands it straight to `wargamer.wargame_scenarios()`
+unmodified; `forward_into_wargamer_all()` runs the seam for all three. The same market
+movement, judged against each institution's *own* band, does not always agree: driftwood's
+loose band sees both phishing and ransomware flip `cage → fix`; ludlow's strict band already
+has ransomware over-band at the reactive baseline and does not move on phishing at all — three
+institutions, honestly three (here, different) drift sets, never one org standing in for the
+estate. A commoditising *defensive* capability (`spiffe-workload-identity`) raises **no**
+attacker risk, for any institution.
 
 **3. Map updates are attestable commits.** `sign-map.sh` renders the map from the signed
 intel and detached-signs both with the platform feeds key (offline-verifiable), and the
@@ -58,12 +63,14 @@ actor's. `verify-wardley.sh` proves a tampered map fails verification.
 ## Run it
 
 ```
-python3 wardley.py map              # the map + commoditisation flags
-python3 wardley.py forward-signal   # the forward scenario library
-python3 wardley.py wargame          # feed it THROUGH the war-gamer
-python3 wardley.py selfcheck        # the projection + seam asserts
-bash    verify-wardley.sh           # the whole beat, offline
-bash    sign-map.sh                 # re-render + re-sign after an intel edit
+python3 wardley.py map                       # the map + commoditisation flags
+python3 wardley.py forward-signal             # the forward scenario library, all three institutions
+python3 wardley.py forward-signal --org ludlow  # ...or just one
+python3 wardley.py wargame                    # feed it THROUGH the war-gamer, all three institutions
+python3 wardley.py wargame --org ludlow         # ...or just one
+python3 wardley.py selfcheck                  # the projection + seam asserts
+bash    verify-wardley.sh                     # the whole beat, offline
+bash    sign-map.sh                           # re-render + re-sign after an intel edit
 ```
 
 The `ATTACK_COST_COLLAPSE_K` knob in `wardley.py` is the one editorial calibration dial —

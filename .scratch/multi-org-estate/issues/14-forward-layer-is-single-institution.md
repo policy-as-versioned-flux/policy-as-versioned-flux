@@ -1,7 +1,7 @@
 # 14 — The forward layer speaks for one institution in a six-org estate
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -30,3 +30,26 @@ and still emits nothing, which is the assertion worth making.
 
 Do this **before** the slate lands (ticket 06), or the new components bake the same
 single-institution assumption in behind four more entries.
+
+## Comments
+
+Resolved 2026-08-20. `forward_signal(intel, org)` and `forward_into_wargamer(intel, org)` now
+take the org as a required argument (no more hardcoded `"driftwood"`); `forward_signal_all()`
+and `forward_into_wargamer_all()` run the set, reading the three institutions from
+`../risk/appetite.json` so the org list can't drift from the bands it's priced against.
+`wardley.py forward-signal` / `wargame` run all three institutions by default, `--org <name>`
+for one. `verify-wardley.sh` step 4 now prints and asserts each institution's own drift, plus a
+divergence check (driftwood and ludlow must not drift on the identical set) so the per-org fix
+is machine-checked, not just re-run three times under different labels. Confirmed the exact
+claim in the ticket: at ludlow's band phishing does not drift and ransomware already drifts at
+the reactive base; driftwood ends up with 2 proposals, tuppence and ludlow with 1 each (4 total,
+not "3 × the driftwood count") — the honest proposal-count answer the ticket asked for.
+
+`selfcheck()`'s vacuous `credential-stuffing-aas` assertion is fixed in place, not replaced with
+`nb-refining-capacity` (that's ticket 06's data, and this ticket is meant to land first): a
+synthetic clone of the same stationary component, given a real `base_risk`, still doesn't
+signal — isolating the actual "no commoditising movement" gate instead of relying on the
+component's coincidental `base_risk: null`.
+
+Evidence: `bash estate/platform/wardley/verify-wardley.sh` passes (5/5 sections), including the
+new per-institution divergence assertions in sections 4 and selfcheck's section 3b/4.

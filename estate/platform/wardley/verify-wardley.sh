@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Beat: "the AI-Wardley layer maps market intel, FLAGS commoditisation MOVEMENT
 # (not mere position), collapses a commoditising attacker-capability into a
-# FORWARD signal, and feeds that straight through the war-gamer so proportionality
-# re-tunes BEFORE the threat lands -- and the map update is an attestable,
+# FORWARD signal PER INSTITUTION, and feeds each straight through the war-gamer
+# against its own band so proportionality re-tunes BEFORE the threat lands, three
+# institutions honestly (possibly) apart -- and the map update is an attestable,
 # tamper-evident commit." Offline, no cluster. Needs python3 + openssl.
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -44,22 +45,33 @@ assert not by['credential-stuffing-aas']['commoditising'], 'already-commodity + 
 print('ok  commoditisation is read as MOVEMENT across the horizon, not static position')
 "
 
-say "4. the forward signal + war-gamer seam: forward re-price -> drift -> signed PR"
+say "4. the forward signal + war-gamer seam, PER INSTITUTION: forward re-price -> drift -> signed PR"
 python3 "$here/wardley.py" wargame | python3 -c "
 import json, sys
-out = json.load(sys.stdin)
-for r in out['rows']:
-    mark = 'DRIFT' if r['drift'] else '  ok '
-    print(f\"  [{mark}] {r['control']:34} {r['deployed']:8} -> {r['implied']}\")
-drifts = [r for r in out['rows'] if r['drift']]
-assert drifts, 'the forward signal surfaced no drift'
-props = out['proposals']
-assert props, 'forward drift but no PR proposed'
-for p in props:
-    assert p['merged'] is False and p['auto_merge'] is False, 'war-gamer must never merge'
-    assert 'cross-check' in p['required_gate'], 'PR must ride the version cross-check gate'
-    assert p['signed'] and 'Rekor' in p['identity'], 'PR must carry the attestable identity'
-print(f'ok  {len(drifts)} forward drift(s) -> {len(props)} signed PR(s), 0 merged, all gated')
+out = json.load(sys.stdin)  # {org: {rows, proposals, ...}} -- one result per institution
+total_drifts = total_props = 0
+for org, res in out.items():
+    print(f'  -- {org} --')
+    for r in res['rows']:
+        mark = 'DRIFT' if r['drift'] else '  ok '
+        print(f\"    [{mark}] {r['control']:34} {r['deployed']:8} -> {r['implied']}\")
+    drifts = [r for r in res['rows'] if r['drift']]
+    props = res['proposals']
+    assert drifts, f'{org}: the forward signal surfaced no drift'
+    assert props, f'{org}: forward drift but no PR proposed'
+    for p in props:
+        assert p['merged'] is False and p['auto_merge'] is False, 'war-gamer must never merge'
+        assert 'cross-check' in p['required_gate'], 'PR must ride the version cross-check gate'
+        assert p['signed'] and 'Rekor' in p['identity'], 'PR must carry the attestable identity'
+    total_drifts += len(drifts)
+    total_props += len(props)
+# the band, not the signal, decides -- prove it: driftwood's loose band and ludlow's
+# strict one must NOT drift on the identical control set, or this is one org run
+# three times wearing different labels, not a per-institution forward layer.
+dw_ids = {r['control'] for r in out['driftwood']['rows'] if r['drift']}
+lud_ids = {r['control'] for r in out['ludlow']['rows'] if r['drift']}
+assert dw_ids != lud_ids, ('driftwood and ludlow must diverge on at least one control', dw_ids, lud_ids)
+print(f'ok  {total_drifts} forward drift(s) across {len(out)} institution(s) -> {total_props} signed PR(s), 0 merged, all gated')
 "
 
 say "5. the projection + seam asserts (base does NOT drift; the forward bump does)"
@@ -67,5 +79,6 @@ python3 "$here/wardley.py" selfcheck || fail "wardley selfcheck failed"
 
 echo
 echo "PASS: market intel mapped, commoditisation MOVEMENT flagged, the forward signal"
-echo "re-priced ahead of the reactive feeds and fed through the war-gamer to a signed,"
-echo "gated, never-merged PR -- and the map update is a signed, tamper-evident commit."
+echo "re-priced ahead of the reactive feeds PER INSTITUTION and fed through the war-gamer"
+echo "to a signed, gated, never-merged PR (each institution against its own band) --"
+echo "and the map update is a signed, tamper-evident commit."
