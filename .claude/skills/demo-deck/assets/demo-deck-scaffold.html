@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>demo deck</title>
+<style>
+/* Dark, 1920x1080, one .slide per narration.json entry -- this whole <style>
+   block is reusable as-is. Copy it verbatim into the fresh deck.html. */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0d0f;--fg:#e6e8ea;--blue:#1c64f2;--green:#3fb97f;--red:#e5484d;--amber:#e0a53d;--panel:#151519;--muted:#8a8f98}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;overflow:hidden;width:1920px;height:1080px}
+#deck{position:absolute;inset:0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 130px;text-align:center}
+.slide.active{display:flex}
+.eyebrow{color:var(--blue);text-transform:uppercase;letter-spacing:.18em;font-size:24px;font-weight:700;margin-bottom:18px}
+.slide h1{font-size:60px;font-weight:800;line-height:1.08;margin-bottom:28px;max-width:1560px}
+.slide h1.big{font-size:120px}
+.evbody{width:100%;max-width:1650px;display:flex;flex-direction:column;gap:20px;align-items:center}
+
+/* terminal mock -- for real captured command output. .drift for an
+   attention-amber line (e.g. a detected change) alongside .ok/.fail. */
+.term{width:100%;max-width:1560px;background:var(--panel);border:1px solid #232329;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:left}
+.tbar{display:flex;align-items:center;gap:9px;padding:13px 18px;background:#1b1b21;border-bottom:1px solid #232329}
+.dot{width:14px;height:14px;border-radius:50%}
+.d1{background:var(--red)}.d2{background:var(--amber)}.d3{background:var(--green)}
+.fname{margin-left:16px;color:var(--muted);font-size:17px;font-family:ui-monospace,Menlo,Monaco,monospace}
+.tbody{padding:22px 28px;font-family:ui-monospace,Menlo,Monaco,monospace;font-size:21px;line-height:1.5;white-space:pre-wrap}
+.tbody.small{font-size:18px;line-height:1.42}
+.ok{color:var(--green)}
+.fail{color:var(--red);font-weight:700}
+.drift{color:var(--amber);font-weight:700}
+.dim{color:var(--muted)}
+
+/* comparison table */
+table.demo{width:100%;max-width:1400px;border-collapse:collapse;font-size:30px}
+table.demo th{color:var(--muted);text-transform:uppercase;font-size:18px;letter-spacing:.1em;padding:14px 20px;border-bottom:2px solid #232329;text-align:left}
+table.demo td{padding:20px 20px;border-bottom:1px solid #232329;text-align:left}
+table.demo tr:last-child td{border-bottom:none}
+
+/* mockup cards -- stat grids, ledger lines, checklists, entity rows */
+.cardrow{display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+.card{background:var(--panel);border:1px solid #232329;border-radius:16px;padding:34px 40px;min-width:280px}
+.card .num{font-size:56px;font-weight:800;color:var(--blue)}
+.card .lbl{color:var(--muted);font-size:20px;margin-top:8px}
+.ledger{width:100%;max-width:1100px;background:var(--panel);border:1px solid #232329;border-radius:14px;padding:40px 50px;font-family:ui-monospace,Menlo,Monaco,monospace;font-size:36px;display:flex;justify-content:space-between}
+.checklist{text-align:left;max-width:1200px;width:100%}
+.checklist li{font-size:32px;padding:16px 0;border-bottom:1px solid #232329;list-style:none;display:flex;gap:20px;align-items:center}
+.checklist li::before{content:"→";color:var(--blue);font-weight:800}
+.entityrow{display:flex;gap:40px;justify-content:center}
+.entitybox{background:var(--panel);border:2px solid #232329;border-radius:16px;padding:30px 36px;min-width:260px}
+.entitybox .name{font-size:30px;font-weight:800;font-family:ui-monospace,Menlo,Monaco,monospace}
+.entitybox .badge{margin-top:14px;font-size:26px;color:var(--amber);font-weight:700}
+
+/* mermaid + wardley render as pre-rendered PNGs (via mmdc), embedded as <img> */
+img.diagram{max-height:800px;max-width:1650px;object-fit:contain}
+
+/* browser frame -- wrap a real captured web screenshot so it reads as a page,
+   not a floating rectangle. Put the real URL in .urlbar. */
+.browser{width:100%;max-width:1500px;background:var(--panel);border:1px solid #232329;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.bbar{display:flex;align-items:center;gap:9px;padding:12px 18px;background:#1b1b21;border-bottom:1px solid #232329}
+.urlbar{flex:1;margin-left:14px;background:#0f0f13;border:1px solid #26262d;border-radius:999px;padding:7px 18px;color:var(--muted);font-size:16px;font-family:ui-monospace,Menlo,Monaco,monospace;text-align:left}
+.browser img{display:block;width:100%}
+/* a screenshot with no frame, filling the slide */
+img.fullbleed{width:1920px;height:1080px;object-fit:cover}
+.slide.bleed{padding:0}
+
+/* news headline mockup -- ALWAYS a fictional masthead + a visible
+   .hypothetical banner. Never a real publication's name or branding. */
+.news{width:100%;max-width:1400px;background:#faf8f4;color:#14140f;border-radius:8px;padding:52px 60px;text-align:left;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.news .masthead{display:flex;align-items:baseline;justify-content:space-between;border-bottom:3px solid #14140f;padding-bottom:14px;margin-bottom:26px}
+.news .outlet{font-family:Georgia,"Times New Roman",serif;font-weight:800;font-size:34px;letter-spacing:-.02em}
+.news .dateline{font-size:16px;color:#5c5c52;font-family:Georgia,serif}
+.news h2{font-family:Georgia,"Times New Roman",serif;font-size:56px;line-height:1.12;font-weight:800;margin-bottom:18px}
+.news .standfirst{font-family:Georgia,serif;font-size:26px;line-height:1.4;color:#3d3d36}
+.news .byline{margin-top:24px;font-size:15px;color:#5c5c52;text-transform:uppercase;letter-spacing:.1em}
+.hypothetical{margin-top:18px;display:inline-block;background:var(--amber);color:#14140f;font-size:17px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:7px 16px;border-radius:5px}
+
+/* social post mockup -- same rule: invented handle, labelled illustrative */
+.post{width:100%;max-width:1100px;background:var(--panel);border:1px solid #232329;border-radius:16px;padding:34px 38px;text-align:left}
+.post .who{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.post .avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#7c3aed);flex:none}
+.post .name{font-weight:800;font-size:24px}
+.post .handle{color:var(--muted);font-size:19px}
+.post .body{font-size:30px;line-height:1.4}
+.post .meta{margin-top:20px;color:var(--muted);font-size:18px;display:flex;gap:28px}
+
+/* meme -- build as plain CSS/HTML, never fetch or embed an external image */
+.meme{width:100%;max-width:1300px;display:flex;flex-direction:column;gap:0;border-radius:16px;overflow:hidden;border:2px solid #232329}
+.meme .panel{padding:44px 50px;font-size:38px;font-weight:700;text-align:left;display:flex;align-items:center;gap:26px}
+.meme .reject{background:#2a1416;color:var(--red)}
+.meme .prefer{background:#0f2418;color:var(--green)}
+.meme .icon{font-size:52px}
+
+.cap{color:var(--muted);font-size:22px;margin-top:14px;max-width:70ch}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<!-- EXAMPLE PATTERNS -- delete these and author real .slide divs, one per
+     narration.json entry, data-i matching its "i". Keep the ratio: mostly
+     terminal/mermaid/table slides carrying real evidence; title/mockup/meme
+     only for hook, thesis, vision, and close beats. -->
+
+<div class="slide active" data-i="0">
+  <div class="eyebrow">eyebrow text</div>
+  <h1 class="big">£0,000</h1>
+  <div class="cap">one-line caption naming the real source of this number</div>
+</div>
+
+<div class="slide" data-i="1">
+  <div class="eyebrow">eyebrow text</div>
+  <h1>Slide title</h1>
+  <div class="term">
+    <div class="tbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="fname">~ real-command-that-was-actually-run.sh</span></div>
+    <div class="tbody">paste real captured output here, verbatim
+<span class="ok">PASS</span>: a real pass line
+<span class="fail">FAIL</span>: a real fail line, if there is an honest one to show</div>
+  </div>
+</div>
+
+<div class="slide" data-i="2">
+  <div class="eyebrow">eyebrow text</div>
+  <h1>Slide title</h1>
+  <img class="diagram" src="mermaid/example.png">
+</div>
+
+<!-- web screenshot, framed as a browser (captured this run, real URL shown) -->
+<div class="slide" data-i="3">
+  <div class="eyebrow">eyebrow text</div>
+  <h1>Slide title</h1>
+  <div class="browser">
+    <div class="bbar"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+      <div class="urlbar">https://the-real-url-that-was-captured</div></div>
+    <img src="shots/example.png">
+  </div>
+  <div class="cap">what this shows, and that it was captured live</div>
+</div>
+
+<!-- news headline: fictional masthead + hypothetical banner, both required -->
+<div class="slide" data-i="4">
+  <div class="eyebrow">eyebrow text</div>
+  <h1>Slide title</h1>
+  <div class="news">
+    <div class="masthead"><span class="outlet">The Invented Ledger</span><span class="dateline">Illustrative · not a real publication</span></div>
+    <h2>The headline this risk buys, if the control fails</h2>
+    <div class="standfirst">One sentence of consequence, in the register a real report would use.</div>
+    <div class="byline">Illustrative scenario</div>
+  </div>
+  <div class="hypothetical">Hypothetical — illustrates the priced risk, not a real event</div>
+</div>
+
+</div>
+<script>
+// Reusable nav -- keep verbatim. window.__goto is the headless hook render.js drives.
+function show(n){document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));document.querySelector('.slide[data-i="'+n+'"]').classList.add('active')}
+window.__goto=show;
+document.addEventListener('keydown',e=>{
+  const slides=document.querySelectorAll('.slide');
+  const cur=parseInt(document.querySelector('.slide.active').dataset.i);
+  if(e.key==='ArrowRight') show(Math.min(cur+1,slides.length-1));
+  if(e.key==='ArrowLeft') show(Math.max(cur-1,0));
+});
+</script>
+</body>
+</html>
