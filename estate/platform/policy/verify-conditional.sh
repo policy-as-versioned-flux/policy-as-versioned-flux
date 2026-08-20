@@ -35,7 +35,7 @@ have python3 || fail "python3 required for the £"
 warn_ale="$(python3 "$PLATFORM/fair/fair.py" summary "$HERE/scenarios/driftwood-root-residual.json" --mode warn \
   | python3 -c 'import json,sys; print(round(json.load(sys.stdin)["ale"]))')"
 [ "$warn_ale" -gt 0 ] || fail "residual ALE is not positive — nothing to carry"
-say "   residual ALE with the exemption in place = £${warn_ale}/yr (the £ it carries)"
+say "   residual ALE with condition C unmet = £${warn_ale}/yr (the £ a cage prices and retains)"
 
 # --- live tail: only if a cluster is reachable ---
 CTX="${CTX:-kind-driftwood}"

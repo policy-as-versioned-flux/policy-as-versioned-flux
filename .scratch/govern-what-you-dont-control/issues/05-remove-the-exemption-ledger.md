@@ -1,7 +1,7 @@
 # 05 — Remove the exemption ledger, and let the cage produce its evidence
 
 Type: task
-Status: open
+Status: done
 Blocked by: 04
 
 ## Question
@@ -41,3 +41,31 @@ whatever properties it carries.
    this change its name becomes literally true rather than aspirational.
 2. The OSCAL up-flow beat depends on the ledger's risk objects; sequence the cage producer first.
 4. Check nothing else reads `ledger/` or `render-exemption.py` before deleting.
+
+## Comments
+
+Done 2026-08-20. Sequenced as required: `estate/platform/graded/cage.py` gained the OSCAL risk
+producer (`oscal_risk()` + `observation_uuid()`, plus a `mode=` param on `select()` so it can price
+a conditional-policy root-branch residual, not just posture-drift) *before* deleting
+`estate/platform/policy/ledger/exemptions.yaml`, `render-exemption.py`, `verify-exemption.sh`.
+`status: open` + `remediation type: mitigate`, not `deviation-approved`/`accept` — the check still
+fails, the cage doesn't except it — and no `deadline` (ADR-0006, caging isn't time-boxed).
+`estate/platform/oscal/result2oscal.py` now imports `cage.py` for the shared uuid namespace instead
+of dynamically loading the deleted `render-exemption.py`; every observation uses one formula (the
+old ledger-covered/non-covered branch is gone). `estate/talk/verify-all.sh:25` ("no ledger entry, no
+exception") is removed; line 24 ("exemptions dissolve into conditional policy",
+`verify-conditional.sh`) is untouched. Also fixed `estate/talk/deck.md` and `RUNBOOK.md`, which ran
+the now-deleted `verify-exemption.sh` live at the venue. Grepped the whole tree for
+`render-exemption`, `verify-exemption`, `ledger/exemptions`, `EXC-2026` before deleting; only prose
+mentions remain (correctly describing it as removed). Verified:
+`python3 estate/platform/graded/cage.py selfcheck`,
+`bash estate/platform/oscal/verify-upflow.sh`, `bash estate/platform/policy/verify-conditional.sh`,
+`bash estate/platform/graded/verify-graded.sh` all pass. Ran the full offline
+`estate/talk/verify-all.sh` too: 24/26 PASS, the two FAILs (`verify-honesty.sh` — no local
+`feeds-signing-key.pem`, it's gitignored and never generated in this worktree; `verify-reach-secrets.sh`
+— hangs on an untimeout'd `kubectl --dry-run=client` with no reachable context) are pre-existing
+environment gaps, not caused by this change — neither script mentions `cage`, `ledger`, or
+`render-exemption` anywhere. Left unfixed as out of scope for this ticket.
+`legacy-till` is not denied under today's numbers — driftwood's £40k band cages it `baseline`
+(TCoR ≈ £14,952 residual) — so the "some workloads stop running" consequence stays real but
+undemonstrated by this fixture; not this ticket's job to force a Deny case.

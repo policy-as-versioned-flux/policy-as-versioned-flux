@@ -82,7 +82,7 @@ on stage. Full mapping is in [`verify-all.sh`](verify-all.sh); the deck ordering
 |---|---|---|
 | 1. Breach cost (narrated) | `python3 estate/platform/fair/fair.py summary estate/platform/fair/scenarios/driftwood-cart-pii.json` | fair.py selfcheck |
 | 2. Versioned dependency | `estate/platform/distribution/verify-coexistence.sh` · `…/verify-orphan-guard.sh` · `…/verify-retirement.sh` | kyverno-test |
-| 2b. Shift-left + conditional | `estate/platform/shift-left/verify-shift-left.sh` · `estate/platform/policy/verify-conditional.sh` · `…/verify-exemption.sh` | kyverno CLI |
+| 2b. Shift-left + conditional | `estate/platform/shift-left/verify-shift-left.sh` · `estate/platform/policy/verify-conditional.sh` | kyverno CLI |
 | **3. Proportionality ⭐** | `estate/verify/proportionality/verify-proportionality.sh` · `estate/platform/risk/verify-risk-tuned.sh` | FAIR + kyverno |
 | 3b. Graded / TCoR | `estate/platform/graded/verify-graded.sh` · `estate/platform/tcor/verify-tcor.sh` | cage.py + tcor.py |
 | 4. Living loop | `estate/platform/feeds/verify-feeds.sh` · `…/wardley/verify-wardley.sh` · `…/wargamer/verify-wargamer.sh` | feeds + wargamer |

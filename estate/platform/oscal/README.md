@@ -4,14 +4,15 @@ The one Kyverno engine emits `wgpolicyk8s.io` PolicyReports for both planes.
 This area is the small glue ADR-0009 says we own: it normalises those reports
 into an OSCAL `assessment-results` document — **observations** (the evidence) and
 **findings** (control satisfied / not-satisfied) — and, crucially, makes the chain
-*resolve* into the ledger's `risk` objects (`../policy/render-exemption.py`).
+*resolve* into a cage's `risk` objects (`../graded/cage.py`, ticket 05 — there is
+no ledger; a workload that fails a check gets caged, never exempted).
 
 ```mermaid
 flowchart LR
     pr["PolicyReport<br/>(one engine, both planes)"]
     pr -->|result2oscal| obs["observation<br/>the evidence"]
     obs --> find["finding<br/>satisfied / not-satisfied"]
-    find -.->|not-satisfied| risk["OSCAL risk<br/>deviation-approved · £ facet<br/><i>(../policy ledger)</i>"]
+    find -.->|not-satisfied| risk["OSCAL risk<br/>status: open · £ facet<br/><i>(../graded/cage.py)</i>"]
     risk -->|related-observations| obs
 ```
 
@@ -33,22 +34,23 @@ flowchart LR
 
 ## The join that makes it real
 
-The up-flow is only evidence if the ledger's `risk.related-observations` actually
-points at an observation we emit. `result2oscal` derives the observation uuid for
-a ledger-covered failure from render-exemption's **own** `observation_uuid` (single
-source of truth), so the pointer is byte-identical by construction — the AC-6
-not-satisfied observation for `legacy-till-0` is exactly the one `EXC-2026-001`'s
-priced `risk` links back to. `verify-upflow.sh` asserts that equality, not an
-eyeball match.
+The up-flow is only evidence if a cage's `risk.related-observations` actually
+points at an observation we emit. **Every** observation here uses `cage.py`'s
+`observation_uuid(subject, policy)` — one formula, single source of truth, no
+special-cased "covered" entries — so the pointer is byte-identical by
+construction: the AC-6 not-satisfied observation for `legacy-till-0` is exactly
+the one `cage.py`'s priced `risk` links back to. `verify-upflow.sh` (and
+`result2oscal.py --selfcheck`) assert that equality, not an eyeball match.
 
 ## The £ is not here
 
 The monetary magnitude rides on the **risk**, not the observation: it is an OSCAL
 `facet` (name `annualised-loss-expectancy`) under our own `system` URI
 (`https://pavf.dev/ns/risk/gbp`) — the same idiom CVSS scores use, so it is
-standard OSCAL, not a fork. That facet is emitted by `../policy/render-exemption.py`
-(ticket 05) and sourced from `fair.py`'s residual ALE, so the ledger row's price
-and the balance sheet agree by construction (research 09).
+standard OSCAL, not a fork. That facet is emitted by `../graded/cage.py`
+(ticket 05) and sourced from `fair.py`'s residual ALE via the cage's own tier
+selection, so the caged workload's price and the balance sheet agree by
+construction (research 09).
 
 ## Run
 

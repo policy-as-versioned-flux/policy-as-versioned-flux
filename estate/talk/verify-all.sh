@@ -22,7 +22,6 @@ OFFLINE=(
   "retiring a version prunes it|estate/platform/distribution/verify-retirement.sh"
   "shift-left CI catches an Audit->Deny flip pre-merge|estate/platform/shift-left/verify-shift-left.sh"
   "exemptions dissolve into conditional policy|estate/platform/policy/verify-conditional.sh"
-  "no ledger entry, no exception|estate/platform/policy/verify-exemption.sh"
   "PROPORTIONALITY: same control, Audit driftwood vs Deny ludlow|estate/verify/proportionality/verify-proportionality.sh"
   "enforcement tuned by the £, not a timer|estate/platform/risk/verify-risk-tuned.sh"
   "graded response: caged by degree, not denied|estate/platform/graded/verify-graded.sh"

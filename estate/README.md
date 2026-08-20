@@ -8,7 +8,7 @@ research-only (archived last, ticket 27).
 
 | Dir | Repo | Role |
 |---|---|---|
-| [`platform/`](platform/) | `policy-as-versioned-platform` | The shared discipline (Flux templates, FAIR engine, ledger→PolicyException render, shift-left, OSCAL, war-gamer). Institutions pin it as a signed dependency. |
+| [`platform/`](platform/) | `policy-as-versioned-platform` | The shared discipline (Flux templates, FAIR engine, graded cage→OSCAL risk, shift-left, OSCAL, war-gamer). Institutions pin it as a signed dependency. |
 | [`driftwood/`](driftwood/) | `policy-as-versioned-driftwood` | Institution — e-comm, PCI+GDPR, **teaching default**. Audit-heavy (loosest £). Owns a KinD cluster; the provenance base (this ticket). |
 | [`tuppence/`](tuppence/) | `policy-as-versioned-tuppence` | Institution — fintech, FCA+PCI+GDPR. Toward-strict. |
 | [`ludlow/`](ludlow/) | `policy-as-versioned-ludlow` | Institution — US health, HIPAA. Deny-heavy (strictest £), long-life data. |

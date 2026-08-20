@@ -56,8 +56,8 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   conditions C", so anyone meeting C is treated identically and nobody asks a favour); or let the
   **cage implement the control on the workload's behalf** and price the residual. A workload that can
   satisfy neither does not run — refusal is the bottom rung of the cage ladder, reached by the £,
-  never by a carve-out. Note the estate currently ships an exemptions ledger that contradicts this;
-  its removal is tracked in `.scratch/govern-what-you-dont-control/`.
+  never by a carve-out. (The estate shipped an exemptions ledger that contradicted this; it is
+  removed — see `.scratch/govern-what-you-dont-control/issues/05-remove-the-exemption-ledger.md`.)
 
 - **Policy as a dependency** — The central move: treat a body of policy like a software
   dependency — semantically versioned, stored in version control, distributed to consumers,

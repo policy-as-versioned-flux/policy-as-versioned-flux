@@ -4,7 +4,7 @@
 #   PolicyReport (one engine, both planes)
 #        -> observation  (result2oscal: the evidence)
 #        -> finding       (result2oscal: control satisfied / not-satisfied)
-#        -> risk          (../policy/render-exemption.py: deviation-approved, £ facet)
+#        -> risk          (../graded/cage.py: open, £ facet — ticket 05, no ledger)
 #        -> related-observations  -> BACK to the not-satisfied observation
 #
 # The join is asserted, not asserted-by-eyeball: the risk's related-observation
@@ -34,21 +34,25 @@ PY
 say "2. result2oscal's own asserts (chain resolves by construction)"
 python3 "$HERE/result2oscal.py" --selfcheck | sed 's/^/   /'
 
-say "3. the ledger's risk related-observation resolves to a c2p observation (the join)"
-python3 "$HERE/../policy/render-exemption.py" --oscal > "$WORK/risks.yaml" || fail "render-exemption errored"
-python3 - "$WORK/ar.json" "$WORK/risks.yaml" <<'PY' || fail "up-flow chain does not resolve"
-import json, sys, yaml
+say "3. cage.py's risk related-observation resolves to a c2p observation (the join)"
+python3 - "$HERE" "$WORK/ar.json" <<'PY' || fail "up-flow chain does not resolve"
+import json, sys
+sys.path.insert(0, sys.argv[1] + "/../graded")
+import cage
 emitted = {o["uuid"] for o in
-           json.load(open(sys.argv[1]))["assessment-results"]["results"][0]["observations"]}
-risks = yaml.safe_load(open(sys.argv[2]))["risks"]
-for risk in risks:
-    linked = risk["related-observations"][0]["observation-uuid"]
-    assert linked in emitted, f"risk {risk['uuid'][:8]} points at {linked[:8]}, not emitted"
-    # and the £ is carried as a facet under our own system URI
-    ale = [f for c in risk["characterizations"] for f in c["facets"]
-           if f["name"] == "annualised-loss-expectancy"]
-    assert ale and ale[0]["system"].endswith("/gbp"), "no £ facet under a custom system URI"
-    print(f"   risk {risk['uuid'][:8]} (£{ale[0]['value']}) -> observation {linked[:8]} RESOLVES")
+           json.load(open(sys.argv[2]))["assessment-results"]["results"][0]["observations"]}
+root_sc = cage.fair.load(sys.argv[1] + "/../policy/scenarios/driftwood-root-residual.json")
+till = cage.select(root_sc, "driftwood", cage.enforce.tolerance_for("driftwood"), mode="warn")
+risk = cage.oscal_risk(till, subject="shop/legacy-till-0", policy="may-run-root-if-attested",
+                        control="nist-800-53:AC-6")
+linked = risk["related-observations"][0]["observation-uuid"]
+assert linked in emitted, f"risk {risk['uuid'][:8]} points at {linked[:8]}, not emitted"
+# and the £ is carried as a facet under our own system URI
+ale = [f for c in risk["characterizations"] for f in c["facets"]
+       if f["name"] == "annualised-loss-expectancy"]
+assert ale and ale[0]["system"].endswith("/gbp"), "no £ facet under a custom system URI"
+print(f"   risk {risk['uuid'][:8]} ({till['tier']} cage, £{ale[0]['value']}) "
+      f"-> observation {linked[:8]} RESOLVES")
 PY
 
 # --- live tail: only if the OSCAL schema validator (trestle) happens to be present ---
