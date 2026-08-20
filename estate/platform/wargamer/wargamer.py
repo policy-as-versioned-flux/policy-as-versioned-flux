@@ -218,6 +218,27 @@ def selfcheck():
     assert any(r["drift"] for r in scn), ("a war-gamed human/device scenario must "
                                           "surface drift", scn)
 
+    # 2b. hyperscaler-region-concentration: tcor.py's `applicable` field narrows the
+    #     move to what an org can actually do to a third party (you cannot fix, cage
+    #     or deny a hyperscaler's control plane). Pin down BOTH sides of that: with
+    #     `applicable`, transfer wins and matches deployed_move (no drift); strip
+    #     `applicable` and the engine defaults costs.fix to 0 and nonsensically
+    #     "fixes" the outage for ~£3,726 -- the exact regression research 05 named.
+    hyper = next(r for r in scn if r["control"] == "hyperscaler-region-concentration")
+    assert hyper["deployed"] == "transfer" and hyper["implied"] == "transfer", hyper
+    assert hyper["drift"] is False, ("applicable must keep this risk from drifting", hyper)
+    hyper_org = intel["library"].get("org", "driftwood")
+    hyper_tol = enforce.tolerance_for(hyper_org)
+    hyper_risk = next(r for r in intel["library"]["risks"]
+                       if r["id"] == "hyperscaler-region-concentration")
+    assert tcor.crossover(hyper_risk, hyper_tol)["chosen"] == "transfer", hyper_risk
+    stripped = {k: v for k, v in hyper_risk.items() if k != "applicable"}
+    broken = tcor.crossover(stripped, hyper_tol)
+    assert broken["chosen"] == "fix", ("without `applicable` the engine must default "
+                                       "to the nonsensical free fix", broken)
+    assert abs(broken["line"]["tcor"] - 3726) < 1, ("the free-fix number must be the "
+                                                    "~£3,726 the ticket names", broken)
+
     # 3. PROPOSE, NEVER DISPOSE.
     props = proposals(intel)
     assert props, "drift detected but no PR proposed"
