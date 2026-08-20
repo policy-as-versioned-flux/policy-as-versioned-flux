@@ -1,0 +1,16 @@
+# Fixed input for ticket cs-01. NOT copied verbatim -- the source repo's own
+# tests/require-owner-annotation/pod-fail.yaml carries no department label
+# either, which conflates "missing owner" with "missing department" and can't
+# isolate the owner-annotation-only signal. This fixture sets department but
+# omits owner, so it moves on exactly one axis.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-owner
+  labels:
+    mycompany.com/policy-version: 0.0.0-unset
+    department: platform
+spec:
+  containers:
+    - name: app
+      image: nginx:latest

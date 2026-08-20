@@ -1,7 +1,7 @@
 # 01 — Can the premise be rederived? Reproduce the bumps a human already got right
 
 Type: task
-Status: open
+Status: done
 Blocked by: none
 
 ## Question
@@ -29,3 +29,28 @@ the corpus and verdict-semantics requirements the rest of the map has to satisfy
 is not reachable in its current form** — say so plainly rather than tuning until it agrees.
 
 AFK. Runnable now, and everything else on this map is sharper once it reports.
+
+## Comments
+
+Done. `estate/platform/computed-semver/` — corpus copied verbatim from `policy` @ v1.0.0/v2.0.0/
+v2.0.1/v2.1.1 (two fixtures authored, not copied: no committed `department: legal` fixture exists
+anywhere in that repo's history). `./verify-rederive-bumps.sh` runs the real `kyverno apply`
+offline and rederives all three named bumps exactly, per named policy: major (department-label
+Audit→Deny), patch (known-department-label enum +legal), minor (owner-annotation added,
+Audit-only). Two honest findings past that headline pass:
+
+1. At the WHOLE-BODY level CONTEXT.md actually scopes semver at ("a policy version covers the
+   whole body"), the real v2.0.1→v2.1.1 release bundles the minor addition and the patch widening
+   into one tag; combining rules take the more significant change, so the release-level bump is
+   minor, not the "patch" this ticket's own bullet attaches to "2.1.1" in isolation. The real tag's
+   decimal (minor bumped 0→1, patch held at 1 instead of reset) doesn't follow textbook
+   bump-and-reset semver either — CONTEXT.md defines per-change classification but is silent on
+   reset-on-bump, so this is named as a real gap, not smoothed over.
+2. Minor cannot be rederived from admission-verdict movement alone: a brand-new Audit-only policy
+   produces zero admitted/refused transitions on any fixture by construction, so there is nothing
+   to observe. It needs a structural diff (policy name present in NEW, absent in OLD) plus reading
+   its `validationActions` — proved empirically in `rederive_bumps.py`'s pooled-exit-code demo,
+   where a plain `kyverno apply` exit code across a mixed Audit+Deny policy set disagrees with the
+   real admission outcome.
+
+Evidence: `estate/platform/computed-semver/verify-rederive-bumps.sh` (exit 0).
