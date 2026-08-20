@@ -22,6 +22,10 @@ say "reach gate: Istio AuthorizationPolicy on the current-posture prefix"
 kubectl --context "$CTX" apply -f "$HERE/authorizationpolicy.yaml" \
   || echo "  (Istio CRDs not ready — re-run up.sh once istiod is up)"
 
+say "peer SAN override: expect the real posture-shaped SVID, not Istio's ns/sa default"
+kubectl --context "$CTX" apply -f "$HERE/destinationrule.yaml" \
+  || echo "  (Istio CRDs not ready — re-run up.sh once istiod is up)"
+
 say "secret gate: OpenBao jwt role bound to the current-posture prefix"
 kubectl --context "$CTX" apply -f "$HERE/openbao-role.yaml" \
   || echo "  (openbao namespace not ready — re-run up.sh)"

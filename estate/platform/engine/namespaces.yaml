@@ -1,0 +1,8 @@
+# Namespace for the admission engine. flux-operator installs into the
+# already-existing flux-system namespace (it manages Flux itself); only
+# Kyverno needs a new one.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kyverno
+  labels: { platform.acme.io/plane: engine }

@@ -19,6 +19,32 @@
 # matching pod on Pod/CRD change and every ~10s gcInterval, so when the currency
 # controller (ticket 16) flips a stale pod's label, the entry (and thus the
 # renewing SVID) is gone within ~10s + one JWT TTL.
+#
+# `className` (ticket 11, live-discovered): the spire chart scopes its own
+# controller-manager to `<release-namespace>-<release-name>` — here
+# `spire-system-spire` — and runs with `handle crs without class name:
+# false`. A hand-authored ClusterSPIFFEID with no `className` is never
+# reconciled: not denied, not errored, just silently absent every pass — its
+# `.status.stats` stays completely empty forever. Confirmed live: this object
+# minted zero registration entries from the day it was first applied
+# (2026-07-31) until this field was added, despite every offline proof and
+# every downstream pod carrying exactly the label it selects on. See
+# `estate/platform/identity/spire/clusterspiffeid-mesh.yaml` for the same fix
+# on the base identity (equally silent, equally broken, until now).
+#
+# mesh-base excludes posture-managed pods (a `posture.acme.io/version`
+# DoesNotExist clause — see the comment there), so a pod matches exactly ONE
+# of the two ClusterSPIFFEIDs, never both. This was load-bearing to fix
+# (ticket 11, live-discovered): with both matching the same pod, SPIRE
+# happily creates both entries, but Envoy's SDS "default" request and a
+# hint-less `spire-agent api fetch` each return only ONE — whichever SPIRE
+# lists first for that workload, not something either CRD field controls —
+# and WHICH one flips between restarts of the identical pod spec (confirmed
+# live across repeated recreates: same two entries, base one time, posture
+# the next). A flip to base silently drops posture-gated reach (403) with no
+# error anywhere. Making the two selectors a strict partition removes the
+# non-determinism outright — a pod has exactly one live SPIRE entry, so
+# there's nothing to pick between.
 apiVersion: spire.spiffe.io/v1alpha1
 kind: ClusterSPIFFEID
 metadata:
@@ -27,6 +53,7 @@ metadata:
     app.kubernetes.io/part-of: platform
     policy-as-versioned.dev/policy: posture
 spec:
+  className: spire-system-spire
   spiffeIDTemplate: "spiffe://{{ .TrustDomain }}/posture/{{ index .PodMeta.Labels \"posture.acme.io/version\" }}/ns/{{ .PodMeta.Namespace }}/sa/{{ .PodSpec.ServiceAccountName }}"
   # Meshed pods that carry a posture (stamped by Kyverno). A pod with no posture
   # label matches only mesh-base and keeps its plain, un-postured SVID.
