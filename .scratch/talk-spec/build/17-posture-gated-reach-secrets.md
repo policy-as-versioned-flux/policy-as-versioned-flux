@@ -20,3 +20,7 @@ Estate brought up live (`estate/talk/verify-all.sh --live`): **27/28 beats pass;
 - **Progress made:** fixed the SPIRE chart-0.24.0 breaking value renames (commit `f7f6732`) — SPIRE now installs and all four pods run. The remaining blocker is the **SPIRE → istio-csr → istiod CA wiring**.
 
 **Definition of done (to close):** in `estate/tuppence/reset/verify-reach-secrets.sh` against a real cluster, a current-posture caller gets `200` from `customer-accounts-reset` **and** pulls its OpenBao secret, while an out-of-currency caller is refused both. That requires the istio-csr/SPIRE CA bootstrap (ticket 14) fixed so mesh workloads receive sidecars + SVIDs.
+
+## Comments
+
+- 2026-08-20 (audit mo-02): re-audited. No commit touches `estate/platform/identity/` or `estate/tuppence/reset/` since `f7f6732` (2026-07-31), so ticket 14's blocker is still open and this ticket's live positive path is still unproven — REOPENED status stands. Re-ran `bash estate/tuppence/reset/verify-reach-secrets.sh` offline: still PASSes cleanly (current SVID reaches + gets secret, stale/de-postured/lookalike SVIDs refused both — all *simulated*, not live), matching the ticket's own "offline/negative-proven" framing exactly. No live cluster was available in this audit environment to re-attempt the 2026-07-31 repro. Status and AC ticks left unchanged — this is the other of the two tickets the audit (`.scratch/multi-org-estate/issues/02-tracker-status-audit.md`) already named as honest.
