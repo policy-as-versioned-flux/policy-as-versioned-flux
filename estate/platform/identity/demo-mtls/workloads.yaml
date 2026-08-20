@@ -4,6 +4,15 @@
 #   pong -> spiffe://acme.internal/ns/mesh-demo/sa/pong
 # The AuthorizationPolicy (authorizationpolicy.yaml) then admits pong's callers
 # by SPIFFE *principal*, not IP — the "trust the SVID, not the network" beat.
+#
+# The `spiffe.io/spire-managed-identity` label only drives SPIRE's own
+# ClusterSPIFFEID podSelector (registers the SVID entry). It does NOT tell
+# Istio's injector to apply the custom `spire` volume-mount template — that's
+# a separate opt-in, the `inject.istio.io/templates` annotation below (see
+# istio/helmrelease.yaml and https://istio.io/latest/docs/ops/integrations/spire/).
+# Without it, injection falls back to the base `sidecar` template's own
+# built-in (non-CSI) workload-socket EmptyDir, and the proxy gets its cert
+# from istiod's Citadel CA instead of SPIRE.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -30,6 +39,8 @@ spec:
       labels:
         app: pong
         spiffe.io/spire-managed-identity: "true"   # opt into SPIRE-issued SVID
+      annotations:
+        inject.istio.io/templates: "sidecar,spire"   # opt into the SPIRE CSI mount
     spec:
       serviceAccountName: pong
       containers:
@@ -56,6 +67,8 @@ spec:
       labels:
         app: ping
         spiffe.io/spire-managed-identity: "true"
+      annotations:
+        inject.istio.io/templates: "sidecar,spire"   # opt into the SPIRE CSI mount
     spec:
       serviceAccountName: ping
       containers:

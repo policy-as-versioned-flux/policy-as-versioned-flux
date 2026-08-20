@@ -1,8 +1,11 @@
-# Istio, wired to consume SPIRE identity instead of running its own CA.
-# `global.caName: SPIRE` switches istiod to pull workload certs from the SPIRE
-# agent over Envoy's SDS socket; meshed pods mount that socket via the
-# spiffe-csi-driver (installed by the SPIRE release). So the mesh's mTLS
-# identity IS the SPIFFE SVID signed by the SPIRE CA — one root, not two.
+# Istio, wired to consume SPIRE identity via the documented Workload API
+# socket integration (NOT istio-csr — no cert-manager, no istio-csr anywhere
+# here). What actually makes SPIRE the mesh CA: the `spire` sidecar-injection
+# template below mounts the SPIRE agent's SDS socket (csi.spiffe.io) straight
+# into Envoy, so meshed proxies pull their SPIFFE SVID from SPIRE directly,
+# never from istiod. istiod's OWN CA server stays on regardless — it still
+# has to mint its own control-plane/webhook serving cert, which is what was
+# broken here (see ENABLE_CA_SERVER below).
 # Source: https://istio.io/latest/docs/ops/integrations/spire/
 #
 # Versions/value-schema are a calibration knob — Istio value keys move between
@@ -47,19 +50,23 @@ spec:
       version: "1.24.0"         # keep in lockstep with istio-base
       sourceRef: { kind: HelmRepository, name: istio }
   values:
-    global:
-      # THE integration switch: use SPIRE as the mesh CA over the SDS socket.
-      caName: SPIRE
-    # Istio must trust SVIDs from the SPIRE trust domain, and the socket path
-    # must match the SPIRE agent's socketPath.
-    pilot:
-      env:
-        ENABLE_CA_SERVER: "false"
+    # Istio must trust SVIDs from the SPIRE trust domain — acme.internal, not
+    # the cluster.local default (see estate/platform/identity/spire/helmrelease.yaml).
+    meshConfig:
+      trustDomain: acme.internal
+    # ENABLE_CA_SERVER left at its chart default (true): istiod still needs to
+    # mint its own control-plane/webhook serving cert. `false` here was the
+    # bug — with no istio-csr certs to load instead, istiod never generates a
+    # CA bundle at all, so the sidecar-injection webhook fails closed with
+    # "tls: internal error". (`global.caName: SPIRE` was removed: a no-op on
+    # Istio 1.24 outside GkeWorkloadCertificate — see ticket 01.)
     sidecarInjectorWebhook:
       # Custom injection template that mounts the SPIRE agent socket (CSI) into
       # sidecars that opt in with the `spiffe.io/spire-managed-identity` label.
       templates:
         spire: |
+          labels:
+            spiffe.io/spire-managed-identity: "true"
           spec:
             containers:
             - name: istio-proxy
