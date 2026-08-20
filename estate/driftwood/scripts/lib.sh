@@ -6,10 +6,6 @@ CLUSTER=driftwood
 CTX="kind-${CLUSTER}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # estate/driftwood
 GITOPS_DIR="${HERE}/gitops"
-GITSERVER_DIR="${HERE}/git-server"
-WORK="${HERE}/.work"
-IMAGE=driftwood-git:local
-GIT_URL_IN_CLUSTER="http://git-server.flux-system.svc.cluster.local/cgi-bin/git/driftwood.git"
 
 say() { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
 have() { command -v "$1" >/dev/null 2>&1; }

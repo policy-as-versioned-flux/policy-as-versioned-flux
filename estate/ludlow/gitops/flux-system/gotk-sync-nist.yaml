@@ -5,15 +5,15 @@
 # .spec.ref, exactly like a dependency-bump PR (see driftwood's
 # scripts/bump-nist-pin.sh, same pattern reused for ludlow).
 #
-# On the real `policy-as-versioned-nist` GitHub remote this tag is
-# gitsign-signed (keyless -> Rekor), verified out-of-band via `git verify-tag`
-# / Rekor lookup (Flux's GitRepository.spec.verify only speaks OpenPGP) — same
-# convention as driftwood's own gotk-sync.yaml.
+# The design intent (ADR-0001) is a gitsign-signed (keyless -> Rekor) tag on
+# the real `policy-as-versioned-nist` remote, verified out-of-band via
+# `git verify-tag` / Rekor lookup (Flux's GitRepository.spec.verify only
+# speaks OpenPGP) — same convention as driftwood's own gotk-sync.yaml. v1.0.0
+# (ticket 09) is UNSIGNED for the same reason driftwood's own tag is — see
+# that file's header and ticket 09's Status.
 #
-# For the offline touring demo, scripts/up.sh rewrites .spec.url to the
-# in-cluster git server (same git-server pod ludlow's own source uses —
-# GIT_HTTP_EXPORT_ALL serves both bare repos) and sets the freshly-seeded
-# tag+commit.
+# up.sh applies this file as-is — the URL above is the real GitHub remote,
+# no rewrite, no offline fallback.
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -26,5 +26,5 @@ spec:
   url: https://github.com/policy-as-versioned-nist/nist
   ref:
     tag: v1.0.0
-    # commit pinned at release by the wave-push (belt-and-braces immutability):
-    # commit: <40-char-sha>
+    # commit pinned at release (belt-and-braces immutability, ADR-0001):
+    commit: 01044756b52b8934bf7e6455e56f4fa1132de2ca
