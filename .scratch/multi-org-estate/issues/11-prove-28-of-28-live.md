@@ -2,8 +2,10 @@
 
 Type: task
 Status: partial (2026-08-20) — the full posture-gated chain is built, installed, and proven live
-  end-to-end (talk-spec 15 and 17 both close for real); `verify-all.sh --live` is 25 pass / 3 fail,
-  not 28/28 — the specific unmet part is named in Comments
+  end-to-end. Talk-spec 15 closes for real (done, all 3 ACs live-proven). Talk-spec 17's reach half
+  is now live-proven too, but the ticket itself stays partial — its secret/OpenBao half is still
+  only offline-proven, per ticket 17's own "do not close" instruction. `verify-all.sh --live` is
+  25 pass / 3 fail, not 28/28 — the specific unmet part is named in Comments
 Blocked by: 04
 
 ## Question
@@ -143,7 +145,8 @@ for), so all 28 slots ran (none skipped); three that ran came back red:
   file); explicitly not this ticket's to fix, same as ticket 01 declined to touch the one
   `wardley.py` vacuity delegated to another in-flight ticket.
 
-So: talk-spec 15 and 17 close for real (the thing this ticket's title names), the honest live count is
+So: talk-spec 15 closes for real; talk-spec 17's reach half now closes live too, but the ticket
+itself stays partial, since its secret half is still only offline-proven. The honest live count is
 25/28 not 28/28, and every point of the gap is named and attributed to the ticket that actually owns
 it — which is the more useful number than a false 28/28 would have been.
 
