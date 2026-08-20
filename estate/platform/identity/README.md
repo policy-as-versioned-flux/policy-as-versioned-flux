@@ -12,7 +12,7 @@ posture rides on top of it in later tickets.
 | Namespaces | `namespaces.yaml` | `spire-system`, `istio-system`, `openbao` |
 | SPIRE | `spire/helmrelease.yaml` | server + agent + `spire-controller-manager` + `spiffe-csi-driver` + OIDC Discovery Provider (SPIFFE hardened charts) |
 | Base identity | `spire/clusterspiffeid-mesh.yaml` | one `ClusterSPIFFEID` → every meshed pod gets `spiffe://acme.internal/ns/<ns>/sa/<sa>` |
-| Istio | `istio/helmrelease.yaml` | `base` + `istiod` with `caName: SPIRE` — the mesh CA **is** SPIRE, over Envoy's SDS socket |
+| Istio | `istio/helmrelease.yaml` | `base` + `istiod`, `meshConfig.trustDomain: acme.internal`; sidecars pull their SVID straight from SPIRE over Envoy's SDS socket |
 | STRICT mTLS | `istio/peerauthentication-strict.yaml` | mesh-wide; every accepted conn carries a SPIRE-signed SVID |
 | OpenBao | `openbao/helmrelease.yaml` | dev-mode secret plane |
 | Secret seam | `openbao/jwt-auth.yaml` | enables `jwt` auth against SPIRE's OIDC JWKS |
@@ -28,8 +28,8 @@ flowchart LR
     OIDC[OIDC Discovery<br/>Provider / JWKS]
   end
   SA -->|SDS socket via csi.spiffe.io| ENV[Envoy sidecars]
-  ENV --> IST[istiod caName: SPIRE]
-  IST --> AP[AuthorizationPolicy<br/>source.principals: spiffe://…]
+  ENV --> AP[AuthorizationPolicy<br/>source.principals: spiffe://…]
+  IST[istiod<br/>trustDomain: acme.internal] -.->|admits/authorizes| AP
   OIDC --> OB[OpenBao jwt auth<br/>SPIRE JWT-SVID]
 ```
 

@@ -50,20 +50,29 @@ check(td == "acme.internal", f"trust domain is the one estate root (acme.interna
 agent_sock = v.get("spire-agent", {}).get("socketPath", "")
 check(agent_sock.startswith("/run/spire/agent-sockets/"), f"agent socket exposed for Envoy SDS ({agent_sock})")
 
-# Istio consumes SPIRE identity, not its own CA. NOTE: global.caName is a no-op
-# on Istio 1.24 (only ever consulted for GkeWorkloadCertificate) — asserting it
-# equals "SPIRE" passed regardless of how the mesh was actually wired. What
-# really makes SPIRE the mesh CA: istiod's own CA server is switched off, and
-# sidecar injection mounts the SPIRE workload socket at Envoy's well-known SDS
-# path (see istio/helmrelease.yaml and https://istio.io/latest/docs/ops/integrations/spire/).
+# Istio consumes SPIRE identity for WORKLOADS, but istiod still needs its own
+# CA server to mint its control-plane/webhook serving cert (ticket 04). NOTE:
+# global.caName is a no-op on Istio 1.24 (only ever consulted for
+# GkeWorkloadCertificate) — it must stay deleted, not asserted. What actually
+# makes SPIRE the mesh CA for workloads: sidecar injection mounts the SPIRE
+# workload socket at Envoy's well-known SDS path (see istio/helmrelease.yaml
+# and https://istio.io/latest/docs/ops/integrations/spire/).
 istiod = find("HelmRelease", "istiod")
 check(bool(istiod), "istiod HelmRelease present")
 iv = istiod[0]["spec"]["values"] if istiod else {}
-check(iv.get("pilot", {}).get("env", {}).get("ENABLE_CA_SERVER") == "false",
-      "istiod's own CA server is disabled (ENABLE_CA_SERVER: false) — istiod cannot mint certs itself")
+check("caName" not in iv.get("global", {}),
+      "global.caName is absent (it's a no-op on Istio 1.24 and must not be reintroduced)")
+check(iv.get("pilot", {}).get("env", {}).get("ENABLE_CA_SERVER") != "false",
+      "istiod's own CA server is NOT disabled — it must mint its own webhook serving cert "
+      "(ENABLE_CA_SERVER: false was the ticket-04 bug: no CA bundle ever loads, webhook fails "
+      "\"tls: internal error\")")
+check(iv.get("meshConfig", {}).get("trustDomain") == "acme.internal",
+      "meshConfig.trustDomain matches SPIRE's trust domain (acme.internal, not the cluster.local default)")
 spire_tmpl = iv.get("sidecarInjectorWebhook", {}).get("templates", {}).get("spire", "")
 check("csi.spiffe.io" in spire_tmpl and "/run/secrets/workload-spiffe-uds" in spire_tmpl,
       "sidecar injection mounts the SPIRE workload socket at Envoy's SDS default path (this, not caName, makes SPIRE the mesh CA)")
+check("spiffe.io/spire-managed-identity" in spire_tmpl,
+      "spire injection template carries the spiffe.io/spire-managed-identity label block")
 
 # STRICT mesh mTLS.
 pa = find("PeerAuthentication", "default")
@@ -100,16 +109,58 @@ if command -v kubectl >/dev/null; then
 fi
 
 # LIVE proof — only if the substrate is already up; strictly bounded, never hangs.
+# NOTE: every check below captures kubectl's output into a variable first,
+# THEN greps/heads the variable — never `kubectl ... | grep -q ...` directly.
+# `grep -q`/`head -N` exit as soon as they see a match/line, SIGPIPEing the
+# still-writing kubectl on the other end of the pipe; under `pipefail` that
+# turns a PASSING check into a coin-flip FAIL (found live, debugging this
+# ticket's own new checks — a real, if minor, instance of the ticket-01 bug
+# class: a gate whose failure meant nothing).
 if command -v kubectl >/dev/null && timeout 10 kubectl --context "$CTX" get ns spire-system >/dev/null 2>&1; then
   echo "== live: substrate + mTLS proof =="
-  timeout 20 kubectl --context "$CTX" -n spire-system get pods 2>/dev/null | grep -q spire && echo "  ok   SPIRE pods present" || fail "SPIRE pods not present"
-  timeout 20 kubectl --context "$CTX" -n istio-system get deploy istiod >/dev/null 2>&1 && echo "  ok   istiod present" || fail "istiod not present"
-  timeout 20 kubectl --context "$CTX" -n openbao get pods 2>/dev/null | grep -q openbao && echo "  ok   OpenBao present" || fail "OpenBao not present"
-  # ping -> pong must succeed over mTLS (ping is the allowed SPIFFE principal).
-  P=$(timeout 20 kubectl --context "$CTX" -n mesh-demo get pod -l app=ping -o name 2>/dev/null | head -1)
+  OUT=$(timeout 20 kubectl --context "$CTX" -n spire-system get pods 2>/dev/null)
+  echo "$OUT" | grep -q spire && echo "  ok   SPIRE pods present" || fail "SPIRE pods not present"
+
+  # istiod comes up: not merely present (it ran 1/1 the whole time ticket 04's
+  # bug was live) but with an available replica.
+  AVAIL=$(timeout 20 kubectl --context "$CTX" -n istio-system get deploy istiod \
+    -o jsonpath='{.status.availableReplicas}' 2>/dev/null)
+  echo "$AVAIL" | grep -qE '^[1-9]' && echo "  ok   istiod has an available replica" || fail "istiod has no available replica"
+
+  # the webhook serves: its caBundle must be populated. This is exactly what
+  # ENABLE_CA_SERVER: false left empty ("Failed to load CA bundle: could not
+  # decode pem" -> the webhook patch controller never wrote a caBundle here).
+  CABUNDLE_LEN=$(timeout 20 kubectl --context "$CTX" get mutatingwebhookconfiguration istio-sidecar-injector \
+    -o jsonpath='{.webhooks[0].clientConfig.caBundle}' 2>/dev/null | wc -c | tr -d ' ')
+  [ "${CABUNDLE_LEN:-0}" -gt 100 ] && echo "  ok   sidecar-injector webhook has a populated caBundle (serves)" \
+    || fail "sidecar-injector webhook caBundle is empty — it is not serving"
+
+  OUT=$(timeout 20 kubectl --context "$CTX" -n openbao get pods 2>/dev/null)
+  echo "$OUT" | grep -q openbao && echo "  ok   OpenBao present" || fail "OpenBao not present"
+
+  # a meshed pod schedules with a real SPIFFE SVID: the webhook must actually
+  # have injected istio-proxy (2/2, not admission-only), and that proxy's own
+  # workload cert must carry a spiffe://acme.internal/... SAN.
+  PODS=$(timeout 20 kubectl --context "$CTX" -n mesh-demo get pod -l app=ping -o name 2>/dev/null)
+  P=$(echo "$PODS" | head -1)
   if [ -n "$P" ]; then
-    timeout 20 kubectl --context "$CTX" -n mesh-demo exec "$P" -c ping -- curl -sS -o /dev/null -w '%{http_code}' pong.mesh-demo/ 2>/dev/null | grep -q 200 \
-      && echo "  ok   ping -> pong over SPIFFE mTLS (200)" || fail "ping -> pong over SPIFFE mTLS did not return 200"
+    READY=$(timeout 20 kubectl --context "$CTX" -n mesh-demo get "$P" -o jsonpath='{.status.containerStatuses[?(@.name=="istio-proxy")].ready}' 2>/dev/null)
+    [ "$READY" = "true" ] && echo "  ok   ping's istio-proxy sidecar is injected and Ready" \
+      || fail "ping has no Ready istio-proxy sidecar — webhook did not inject"
+    CERTS=$(timeout 20 kubectl --context "$CTX" -n mesh-demo exec "$P" -c istio-proxy -- pilot-agent request GET certs 2>/dev/null)
+    echo "$CERTS" | grep -q 'spiffe://acme\.internal/ns/mesh-demo/sa/ping' && echo "  ok   ping's proxy holds a real SVID (spiffe://acme.internal/ns/mesh-demo/sa/ping)" \
+      || fail "ping's proxy has no spiffe://acme.internal SVID"
+    # NOTE (ticket 04 finding, not this ticket's to fix — see ticket 11):
+    # authorizationpolicy.yaml's `principals` carries the full "spiffe://..."
+    # URI, but Istio's AuthorizationPolicy schema wants the scheme-less
+    # "<trustDomain>/ns/<ns>/sa/<sa>" form and prepends "spiffe://" itself —
+    # https://istio.io/latest/docs/reference/config/security/authorization-policy/
+    # (example: principals: ["cluster.local/ns/default/sa/sleep"]). As written
+    # the rendered RBAC matcher is the unmatchable "spiffe://spiffe://acme.internal/...",
+    # so this call 403s even though both proxies now hold real SPIRE SVIDs
+    # (confirmed above) over a genuinely STRICT-mTLS connection.
+    CODE=$(timeout 20 kubectl --context "$CTX" -n mesh-demo exec "$P" -c ping -- curl -sS -o /dev/null -w '%{http_code}' pong.mesh-demo/ 2>/dev/null)
+    echo "$CODE" | grep -q 200 && echo "  ok   ping -> pong over SPIFFE mTLS (200)" || fail "ping -> pong over SPIFFE mTLS did not return 200"
   fi
 else
   echo "== live checks skipped (substrate not up; run up.sh on the driftwood cluster) =="

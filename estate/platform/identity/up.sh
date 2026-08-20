@@ -28,7 +28,7 @@ KAPPLY "$HERE/spire/helmrelease.yaml"
 RECON spire-system spire-crds
 RECON spire-system spire
 
-say "Istio, consuming SPIRE identity (caName: SPIRE)"
+say "Istio, consuming SPIRE identity (SPIRE Workload API socket integration)"
 KAPPLY "$HERE/istio/helmrelease.yaml"
 RECON istio-system istio-base
 RECON istio-system istiod
