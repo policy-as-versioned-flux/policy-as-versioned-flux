@@ -17,6 +17,20 @@
 # Own namespace (istio-injection enabled) so the identity substrate injects the
 # Envoy sidecar; part-of tuppence. The posture segment leads the SVID path, so
 # the namespace name is irrelevant to the gate — one version prefix matches.
+#
+# `inject.istio.io/templates: "sidecar,spire"` (ticket 11, live-discovered):
+# every workload below needs this annotation to opt the sidecar injector into
+# the `spire` template (the SPIRE CSI socket mount) — ticket 04 added it to
+# `demo-mtls/workloads.yaml` but explicitly left this file untouched. Without
+# it, injection silently falls back to the base `sidecar` template's built-in
+# (non-CSI) `workload-socket` EmptyDir, and the proxy gets a
+# same-shaped-but-fake `spiffe://acme.internal/ns/.../sa/...` cert from
+# istiod's own Citadel CA instead of SPIRE — same failure mode ticket 04
+# found and fixed for ping/pong, reproduced here: confirmed live by comparing
+# the issuing CA certificate's serial against `spire-bundle`'s (they didn't
+# match — istiod's fallback CA, not SPIRE) and by watching the posture SVID
+# mint correctly server-side (`spire-server entry show`) while the pod's
+# actual mTLS certificate never carried it.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -45,6 +59,8 @@ spec:
         app: customer-accounts-reset
         spiffe.io/spire-managed-identity: "true"          # opt into a SPIRE SVID
         policy-as-versioned.dev/policy-version: "2.0.0"   # current bar; stamps posture
+      annotations:
+        inject.istio.io/templates: "sidecar,spire"        # opt into the SPIRE CSI mount
     spec:
       serviceAccountName: customer-accounts-reset
       containers:
@@ -79,6 +95,8 @@ spec:
         app: teller-current
         spiffe.io/spire-managed-identity: "true"
         policy-as-versioned.dev/policy-version: "2.0.0"   # current
+      annotations:
+        inject.istio.io/templates: "sidecar,spire"        # opt into the SPIRE CSI mount
     spec:
       serviceAccountName: teller-current
       containers:
@@ -105,6 +123,8 @@ spec:
         app: teller-stale
         spiffe.io/spire-managed-identity: "true"
         policy-as-versioned.dev/policy-version: "1.0.0"   # out of currency for this service
+      annotations:
+        inject.istio.io/templates: "sidecar,spire"        # opt into the SPIRE CSI mount
     spec:
       serviceAccountName: teller-stale
       containers:

@@ -62,7 +62,7 @@ Two Kyverno policies + RBAC, defence in depth:
 ```bash
 estate/driftwood/scripts/up.sh          # cluster + Flux
 estate/platform/identity/up.sh          # SPIRE + Istio + OpenBao (ticket 14)
-# Kyverno must be installed (ticket 03/distribution path)
+estate/platform/engine/up.sh            # Kyverno + flux-operator (ticket 11)
 estate/platform/posture/up.sh
 estate/platform/posture/verify-posture-projection.sh
 ```

@@ -79,9 +79,21 @@ def selfcheck() -> None:
         (print if cond else (lambda m: (fails.append(m), print("  FAIL " + m))[0]))(
             "  ok   " + msg if cond else msg)
 
+    # The two surfaces are matched against DIFFERENT wire representations of the
+    # same SVID, so their globs are not literally identical strings: Istio's
+    # AuthorizationPolicy takes a scheme-less "<trustDomain>/..." principal and
+    # prepends "spiffe://" itself when it builds the Envoy RBAC matcher (write
+    # the scheme in the manifest and it double-prefixes to an unmatchable
+    # "spiffe://spiffe://..." — ticket 04/11); OpenBao's `bound_claims` globs the
+    # JWT-SVID's literal `sub` claim, which the SPIRE CA mints as the full
+    # "spiffe://..." URI. Reproduce Istio's own prepend before comparing, so the
+    # invariant checked is "same current-posture prefix", not "same bytes".
+    reach_spiffe = f"spiffe://{reach}"
+
     # 3. the two surfaces pin the same version — reach and secret cannot drift.
-    check(reach == secret,
-          "Istio principal and OpenBao bound_claims glob are identical (one policy, two projections)")
+    check(reach_spiffe == secret,
+          "Istio principal (spiffe://-prefixed, as Istio renders it) and OpenBao "
+          "bound_claims glob are identical (one policy, two projections)")
 
     # extract the gated version from the glob for readable messages
     ver = reach.split("/posture/")[1].split("/")[0]
@@ -91,19 +103,19 @@ def selfcheck() -> None:
     base = svid(None, "tuppence-reset", "teller-current")
 
     # 1. current caller wins BOTH surfaces.
-    check(admits(reach, current), f"current SVID ({ver}) REACHES the service")
+    check(admits(reach_spiffe, current), f"current SVID ({ver}) REACHES the service")
     check(admits(secret, current), f"current SVID ({ver}) GETS the secret")
 
     # 2. stale + de-postured lose BOTH.
-    check(not admits(reach, stale), "stale SVID is refused reach")
+    check(not admits(reach_spiffe, stale), "stale SVID is refused reach")
     check(not admits(secret, stale), "stale SVID is refused the secret")
-    check(not admits(reach, base), "de-postured (base) SVID is refused reach")
+    check(not admits(reach_spiffe, base), "de-postured (base) SVID is refused reach")
     check(not admits(secret, base), "de-postured (base) SVID is refused the secret")
 
     # a forged version-lookalike must not sneak past the prefix boundary:
     # posture segment is a distinct path element, so /posture/2.0.0-evil/… must not match /posture/2.0.0/*
     evil = f"spiffe://{TRUST_DOMAIN}/posture/{ver}-evil/ns/x/sa/y"
-    check(not admits(reach, evil), "a version-lookalike (vN-evil) does not satisfy the prefix")
+    check(not admits(reach_spiffe, evil), "a version-lookalike (vN-evil) does not satisfy the prefix")
 
     if fails:
         sys.exit(f"\n{len(fails)} gate invariant(s) broken")

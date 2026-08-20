@@ -4,8 +4,19 @@
 #
 # This is the base-identity form. Ticket 17's posture-gated variant swaps the
 # exact principal for a posture-path prefix — e.g.
-#   principals: ["spiffe://acme.internal/posture/current/*"]  (glob prefix) —
+#   principals: ["acme.internal/posture/current/*"]  (glob prefix) —
 # so only current-posture callers reach it. Same mechanism, tightened source.
+#
+# NOTE (ticket 11): `principals` is written WITHOUT the "spiffe://" scheme.
+# Istio's AuthorizationPolicy schema takes the scheme-less "<trustDomain>/ns/
+# <ns>/sa/<sa>" form and prepends "spiffe://" itself when it builds the Envoy
+# RBAC matcher (https://istio.io/latest/docs/reference/config/security/authorization-policy/,
+# example: principals: ["cluster.local/ns/default/sa/sleep"]). Writing the
+# scheme here double-prefixes the matcher to the unmatchable
+# "spiffe://spiffe://acme.internal/..." — confirmed live (ticket 04's finding,
+# fixed here): `pilot-agent request GET config_dump` on pong's proxy showed
+# exactly that string, and ping -> pong 403'd despite both proxies holding
+# genuine SPIRE SVIDs over real STRICT mTLS.
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
@@ -18,4 +29,4 @@ spec:
   rules:
     - from:
         - source:
-            principals: ["spiffe://acme.internal/ns/mesh-demo/sa/ping"]
+            principals: ["acme.internal/ns/mesh-demo/sa/ping"]

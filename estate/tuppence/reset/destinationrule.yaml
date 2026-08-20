@@ -1,0 +1,36 @@
+# Ticket 11, live-discovered: without this, the posture-gated reach beat
+# fails at the TLS handshake, before the AuthorizationPolicy is ever
+# evaluated. Istiod auto-generates each outbound mTLS cluster's expected peer
+# SAN from the destination's Kubernetes ServiceAccount, using Istio's OWN
+# standard shape — `spiffe://<trustDomain>/ns/<ns>/sa/<sa>` — regardless of
+# what SPIRE actually issues. `customer-accounts-reset`'s real SVID carries
+# the posture-prefixed path (`spiffe://acme.internal/posture/2.0.0/ns/
+# tuppence-reset/sa/customer-accounts-reset`), so every caller's outbound
+# cluster rejects it outright: `CERTIFICATE_VERIFY_FAILED`, surfaced to the
+# caller as a 503 (not a 403 — the AuthorizationPolicy is never reached).
+# Confirmed live with `pilot-agent request GET config_dump`: the auto-derived
+# cluster carried `match_subject_alt_names: [exact:
+# "spiffe://acme.internal/ns/tuppence-reset/sa/customer-accounts-reset"]` —
+# the un-postured shape.
+#
+# This DestinationRule overrides that expectation to the real, posture-shaped
+# SAN. `mode: ISTIO_MUTUAL` keeps SDS-provisioned SPIRE certs (no static
+# cert/key files); despite older upstream reports that `subjectAltNames`
+# override wasn't honoured for ISTIO_MUTUAL, it works as expected on Istio
+# 1.24 — confirmed live (403→200 for the current caller).
+#
+# Calibration knob: the SAN's `posture/2.0.0` segment must track
+# authorizationpolicy.yaml's and openbao-role.yaml's version glob — all three
+# move together on a currency bump.
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: customer-accounts-reset-posture-san
+  namespace: tuppence-reset
+spec:
+  host: customer-accounts-reset.tuppence-reset.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+      subjectAltNames:
+        - "spiffe://acme.internal/posture/2.0.0/ns/tuppence-reset/sa/customer-accounts-reset"

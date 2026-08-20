@@ -51,8 +51,10 @@ if [ "$MODE" = foreground ]; then foreground "${2:-driftwood}"; exit 0; fi
 step "driftwood: KinD + Flux + signed source + reconcile" "$ROOT/estate/driftwood/scripts/up.sh"
 
 # --- platform layers on the driftwood cluster (dependency order) ---------------
-# identity substrate first (SPIRE/Istio/OpenBao), then everything that rides it.
+# identity substrate first (SPIRE/Istio/OpenBao), then the engine (Kyverno +
+# flux-operator) the posture policies need, then everything that rides both.
 step "platform: identity substrate (SPIRE+Istio+OpenBao)" "$ROOT/estate/platform/identity/up.sh"
+step "platform: engine (Kyverno + flux-operator)"     "$ROOT/estate/platform/engine/up.sh"
 step "platform: posture projection (posture/vN in SVID path)" "$ROOT/estate/platform/posture/up.sh"
 step "platform: currency controller"                 "$ROOT/estate/platform/currency-controller/up.sh"
 step "platform: graded enforcement envelope (cages)" "$ROOT/estate/platform/graded/up.sh"

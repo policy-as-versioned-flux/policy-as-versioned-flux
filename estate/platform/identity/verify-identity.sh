@@ -83,11 +83,27 @@ csid = find("ClusterSPIFFEID", "mesh-base")
 check(bool(csid), "base ClusterSPIFFEID present")
 tmpl = csid[0]["spec"]["spiffeIDTemplate"] if csid else ""
 check("spiffe://" in tmpl and "TrustDomain" in tmpl, "SVID template derives a spiffe:// path from pod/ns/sa")
+# ticket 11 (live-discovered): the spire chart scopes its controller-manager
+# to className "<release-namespace>-<release-name>" and runs with "handle
+# crs without class name: false" — a ClusterSPIFFEID with no className is
+# never reconciled at all (no error, .status.stats stays empty forever).
+# Confirmed live: this object minted zero registration entries since it was
+# first applied; the chart's own same-shaped fallback CSID
+# (<release>-default) was producing the base-identity SVIDs the estate had
+# been crediting to this file.
+check(csid[0]["spec"].get("className") not in (None, ""),
+      "className set, so spire-controller-manager actually reconciles this object")
 ap = find("AuthorizationPolicy", "pong-allow-ping")
 check(bool(ap), "AuthorizationPolicy present")
 prin = ap[0]["spec"]["rules"][0]["from"][0]["source"]["principals"] if ap else []
-check(any(p.startswith("spiffe://acme.internal/") for p in prin),
+# Scheme-less: Istio's AuthorizationPolicy takes "<trustDomain>/ns/<ns>/sa/<sa>"
+# and prepends "spiffe://" itself when building the Envoy RBAC matcher — a
+# "spiffe://"-prefixed value here double-prefixes to an unmatchable principal
+# (ticket 04/11 finding; https://istio.io/latest/docs/reference/config/security/authorization-policy/).
+check(any(p.startswith("acme.internal/") for p in prin),
       f"authz admits by SPIFFE principal, not IP ({prin})")
+check(not any(p.startswith("spiffe://") for p in prin),
+      f"authz principal is scheme-less, not double-prefixed ({prin})")
 
 # OpenBao running + jwt auth wired to SPIRE OIDC (the secret-plane seam).
 check(bool(find("HelmRelease", "openbao")), "OpenBao HelmRelease present")
@@ -150,15 +166,9 @@ if command -v kubectl >/dev/null && timeout 10 kubectl --context "$CTX" get ns s
     CERTS=$(timeout 20 kubectl --context "$CTX" -n mesh-demo exec "$P" -c istio-proxy -- pilot-agent request GET certs 2>/dev/null)
     echo "$CERTS" | grep -q 'spiffe://acme\.internal/ns/mesh-demo/sa/ping' && echo "  ok   ping's proxy holds a real SVID (spiffe://acme.internal/ns/mesh-demo/sa/ping)" \
       || fail "ping's proxy has no spiffe://acme.internal SVID"
-    # NOTE (ticket 04 finding, not this ticket's to fix — see ticket 11):
-    # authorizationpolicy.yaml's `principals` carries the full "spiffe://..."
-    # URI, but Istio's AuthorizationPolicy schema wants the scheme-less
-    # "<trustDomain>/ns/<ns>/sa/<sa>" form and prepends "spiffe://" itself —
-    # https://istio.io/latest/docs/reference/config/security/authorization-policy/
-    # (example: principals: ["cluster.local/ns/default/sa/sleep"]). As written
-    # the rendered RBAC matcher is the unmatchable "spiffe://spiffe://acme.internal/...",
-    # so this call 403s even though both proxies now hold real SPIRE SVIDs
-    # (confirmed above) over a genuinely STRICT-mTLS connection.
+    # ticket 04 found, ticket 11 fixed: authorizationpolicy.yaml's `principals`
+    # is now scheme-less (see the offline check above), so Istio's own
+    # "spiffe://" prepend renders a matchable principal and this call reaches.
     CODE=$(timeout 20 kubectl --context "$CTX" -n mesh-demo exec "$P" -c ping -- curl -sS -o /dev/null -w '%{http_code}' pong.mesh-demo/ 2>/dev/null)
     echo "$CODE" | grep -q 200 && echo "  ok   ping -> pong over SPIFFE mTLS (200)" || fail "ping -> pong over SPIFFE mTLS did not return 200"
   fi

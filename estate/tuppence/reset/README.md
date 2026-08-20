@@ -15,8 +15,8 @@ prefix glob:
 
 | surface | file | mechanism |
 |---|---|---|
-| **reach** | `authorizationpolicy.yaml` | Istio `AuthorizationPolicy` ALLOW, `source.principals: spiffe://…/posture/2.0.0/*` |
-| **secret** | `openbao-role.yaml` | OpenBao jwt role, `bound_claims` glob `sub: spiffe://…/posture/2.0.0/*` |
+| **reach** | `authorizationpolicy.yaml` | Istio `AuthorizationPolicy` ALLOW, `source.principals: acme.internal/posture/2.0.0/*` (scheme-less — Istio prepends `spiffe://` itself) |
+| **secret** | `openbao-role.yaml` | OpenBao jwt role, `bound_claims` glob `sub: spiffe://…/posture/2.0.0/*` (the JWT `sub` claim IS the full URI) |
 
 Posture leads the path, so **one** prefix wildcard matches every current
 identity regardless of ns/sa. ALLOW-only ⇒ Istio default-denies unmatched
@@ -64,6 +64,7 @@ Prereqs, in order (they install what this depends on):
 
 ```bash
 estate/platform/identity/up.sh    # SPIRE + Istio + OpenBao + jwt seam
+estate/platform/engine/up.sh      # Kyverno + flux-operator
 estate/platform/posture/up.sh     # stamp-posture + trust-boundary + posture ClusterSPIFFEID
 estate/tuppence/reset/up.sh       # this: workloads + reach gate + secret gate
 ```

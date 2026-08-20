@@ -74,7 +74,7 @@ in an institution cluster, that cluster needs, once:
 - **Kyverno** (the `ValidatingPolicy` CRDs), and
 - **flux-operator** (the `ResourceSet` CRD),
 
-then the institution applies its pin (e.g.
-`estate/driftwood/gitops/platform/`). Installing those controllers + seeding the
-`platform` git source for the offline tour is live-cluster setup, out of scope
-for the headless build — see the parent runbook (ticket 26).
+both installed by `estate/platform/engine/up.sh` (ticket 11) — then the
+institution applies its pin (e.g. `estate/driftwood/gitops/platform/`).
+Seeding the `platform` git source for the offline tour is separate live-cluster
+setup — see the parent runbook (ticket 26).

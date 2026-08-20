@@ -53,6 +53,16 @@ check(posture["spec"]["podSelector"]["matchExpressions"][0]["key"] == "posture.a
       "podSelector requires the posture label to exist")
 jwt = posture["spec"].get("jwtTtl")
 check(jwt == "5m", f"jwtTtl short (5m) so out-of-currency callers lose secrets fast, got {jwt!r}")
+# ticket 11 (live-discovered): the spire chart scopes its controller-manager
+# to className "<release-namespace>-<release-name>" and runs with "handle
+# crs without class name: false". A hand-authored ClusterSPIFFEID with no
+# className is never reconciled at all — not denied, not errored, just
+# permanently absent from every pass (.status.stats stays empty forever).
+# Confirmed live: this object minted zero registration entries from the day
+# it was first applied until className was added, despite every offline
+# proof and every downstream pod carrying exactly the label it selects on.
+check(posture["spec"].get("className") not in (None, ""),
+      "className set, so spire-controller-manager actually reconciles this object (see comment in the source file)")
 
 # Coexistence with the base mesh SVID (ticket 14) — different name, un-postured base.
 base_path = os.path.normpath(os.path.join(here, "../identity/spire/clusterspiffeid-mesh.yaml"))
@@ -60,6 +70,19 @@ if os.path.exists(base_path):
     base = load(base_path)[0]
     check(base["metadata"]["name"] != posture["metadata"]["name"], "coexists with a distinctly-named base ClusterSPIFFEID")
     check("/posture/" not in base["spec"]["spiffeIDTemplate"], "base SVID stays un-postured (posture rides only on this second ID)")
+    check(base["spec"].get("className") == posture["spec"].get("className"),
+          "base and posture share the same className (both actually reconciled by the same manager)")
+    # ticket 11 (live-discovered): a pod matching BOTH CSIDs gets two SPIRE
+    # entries, but Envoy's SDS "default" request and a hint-less
+    # `spire-agent api fetch` only ever return one of them (SPIRE's own
+    # "first in the list" pick, not something either CRD field controls) —
+    # confirmed live to flip between the base and posture entry across
+    # otherwise-identical pod restarts, silently dropping posture-gated
+    # reach whenever it landed on base. The selectors must be a strict
+    # partition (never both) so there is nothing to pick between.
+    base_expr = base["spec"]["podSelector"].get("matchExpressions", [])
+    check(any(e.get("key") == "posture.acme.io/version" and e.get("operator") == "DoesNotExist" for e in base_expr),
+          "base excludes posture-managed pods (DoesNotExist) — a pod matches exactly one of the two, never both")
 else:
     print("  --   base ClusterSPIFFEID not found (identity area absent); coexistence check skipped")
 

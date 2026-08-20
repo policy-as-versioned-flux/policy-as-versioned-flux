@@ -15,7 +15,17 @@
 # "Current" == 2.0.0, the latest element of platform's version array
 # (distribution/versions.yaml). Retiring 2.0.0 (or bumping to 3.0.0) is the one
 # edit that moves the bar; keep this prefix and OpenBao's bound_claims glob
-# (openbao-role.yaml) on the SAME version — reach.py selfcheck asserts they agree.
+# (openbao-role.yaml) on the SAME version — reach.py selfcheck asserts they agree
+# (allowing for the scheme difference below).
+#
+# NOTE (ticket 11): `principals` is scheme-less ("acme.internal/...", not
+# "spiffe://acme.internal/..."). Istio prepends "spiffe://" itself when it
+# builds the Envoy RBAC matcher; writing the scheme here double-prefixes it to
+# the unmatchable "spiffe://spiffe://acme.internal/...", 403ing every caller
+# regardless of posture (ticket 04's finding on the demo-mtls twin of this bug,
+# fixed here too). OpenBao's `bound_claims` glob (openbao-role.yaml) is
+# DIFFERENT: it matches the JWT-SVID's literal `sub` claim, which the SPIRE
+# CA mints as the full "spiffe://..." URI — that one keeps the scheme.
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
@@ -28,4 +38,4 @@ spec:
   rules:
     - from:
         - source:
-            principals: ["spiffe://acme.internal/posture/2.0.0/*"]
+            principals: ["acme.internal/posture/2.0.0/*"]
