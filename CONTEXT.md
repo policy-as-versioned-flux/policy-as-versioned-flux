@@ -49,6 +49,16 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   only worth having if it carries its **purpose** ("purposeless policy is potentially practically
   pointless policy").
 
+- **Exemption** — **A banned concept. There are none, ever.** An exemption is a carve-out for a named
+  workload, and this project does not have them at any scope, in any file, under any name — the
+  everything-is-codified rule admits no exceptions to itself. The legitimate alternatives, in order
+  of preference: express the allowance as **conditional policy** ("you may do X *if* you meet
+  conditions C", so anyone meeting C is treated identically and nobody asks a favour); or let the
+  **cage implement the control on the workload's behalf** and price the residual. A workload that can
+  satisfy neither does not run — refusal is the bottom rung of the cage ladder, reached by the £,
+  never by a carve-out. Note the estate currently ships an exemptions ledger that contradicts this;
+  its removal is tracked in `.scratch/govern-what-you-dont-control/`.
+
 - **Policy as a dependency** — The central move: treat a body of policy like a software
   dependency — semantically versioned, stored in version control, distributed to consumers,
   unit-tested, and updated via reviewed pull requests. NOT (primarily) a deploy-time gate.

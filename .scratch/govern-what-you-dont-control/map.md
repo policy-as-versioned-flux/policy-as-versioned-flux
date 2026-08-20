@@ -36,6 +36,11 @@ in `estate/platform/distribution/policies/v1.0.0/require-nonroot.yaml`,
   that it is denied for failing to be first-party.
 - **The vendor cannot be asked to change.** Any design requiring the upstream image or chart to carry
   our label is not a solution to this problem.
+- **There are no exemptions, ever.** Owner, 2026-08-20: *"there must never be an exemption ledger
+  EVER, this is a banned concept explicitly, everything is codified."* A carve-out for a named
+  workload is forbidden at any scope, in any file, under any name. The alternatives are conditional
+  policy (uniform, anyone meeting C gets the same treatment) or the cage implementing the control on
+  the workload's behalf with the residual priced. A workload that can satisfy neither does not run.
 - **Whatever assigns a version is making a claim, and claims are evidence.** The estate signs and
   grades its evidence everywhere else; a shim asserting "this COTS thing is effectively 2.0.0" is an
   assertion that needs the same treatment.
@@ -57,6 +62,12 @@ in `estate/platform/distribution/policies/v1.0.0/require-nonroot.yaml`,
   egress lockdown. Conditional policy decides admission, the tier decides tightness, the residual
   lands in the institution's own band **tagged**. Surfaced: COTS partly *outsources* risk via vendor
   recourse, which the £ engine cannot express.
+- [Vendor recourse is a second transfer channel the £ engine cannot express](issues/04-vendor-recourse-as-transfer.md)
+  — **one move, two instruments**: `transfer` gains a *counterparty* (carrier or vendor). Carrier is
+  pre-paid and near-certain; vendor recourse costs nothing up front and recovers uncertainly, slowly
+  and capped. Evidence-graded and **fails closed** — nothing below *reviewed and enforceable* earns a
+  penny, capped at the contract cap, with counterparty solvency a live input. Terms live on the
+  procurement record.
 - [Is "COTS" the boundary, or is it "can we change the pod spec"?](issues/01-what-is-the-real-boundary.md)
   — the axis is *can we change the pod spec*, defined by its remedy: **wrap it or shim it**, never
   exempt and never deny. The population is mostly **us**: five unlabelled third-party charts (SPIRE,

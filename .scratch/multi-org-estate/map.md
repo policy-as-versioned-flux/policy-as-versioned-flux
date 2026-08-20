@@ -71,6 +71,10 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
   component it moves, or by how much; today that is an analyst's judgement. Whether this becomes real
   machinery — and if so, whether it proposes a signed intel diff rather than auto-applying — waits on
   how far the scenario library expansion goes.
+- **The 28/28 target is a moving number.** Exemptions were banned outright on 2026-08-20, so
+  `verify-all.sh:25`'s "no ledger entry, no exception" beat is being removed by
+  [`.scratch/govern-what-you-dont-control/`](../govern-what-you-dont-control/map.md). Do not treat
+  28 as fixed; re-derive the denominator when that lands.
 - **Per-org CI.** Six repos each need their own gate workflow; what runs where, and how the
   cross-org version cross-check works when the checkouts are separate, is not yet clear.
 
