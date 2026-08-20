@@ -79,6 +79,14 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
   validated by measurement but its "widen K" comment is unsafe (cage TCoR is non-monotone). Surfaced
   three defects that outrank the slate: the forward layer is hardcoded to one institution, it is
   monotone-pessimistic, and `pq-cryptanalysis`'s declared `transfer` is never cheapest at any band.
+- [The forward layer spoke for one institution](issues/14-forward-layer-is-single-institution.md) —
+  **fixed: it is per-institution now.** `forward_signal`/`forward_into_wargamer` take `org` as a
+  required argument (no hardcoded `driftwood`, no default); the `_all()` variants read the three
+  institutions from `../risk/appetite.json` so the set can't drift from the bands. Confirmed the
+  ticket's own claim: at ludlow's band phishing does not drift and ransomware already drifts at the
+  reactive base; proposal counts are driftwood=2, tuppence=1, ludlow=1 (4 total, not 3× driftwood).
+  `selfcheck()`'s vacuous `credential-stuffing-aas` assertion is fixed in place, isolated with a
+  synthetic clone carrying a real `base_risk`.
 
 ## Not yet specified
 

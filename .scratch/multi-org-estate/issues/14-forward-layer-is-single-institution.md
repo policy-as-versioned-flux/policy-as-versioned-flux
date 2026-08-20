@@ -31,7 +31,7 @@ and still emits nothing, which is the assertion worth making.
 Do this **before** the slate lands (ticket 06), or the new components bake the same
 single-institution assumption in behind four more entries.
 
-## Comments
+## Answer
 
 Resolved 2026-08-20. `forward_signal(intel, org)` and `forward_into_wargamer(intel, org)` now
 take the org as a required argument (no more hardcoded `"driftwood"`); `forward_signal_all()`
