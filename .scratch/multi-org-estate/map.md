@@ -80,6 +80,17 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
 
 - **Archiving the old `policy-as-versioned-flux` estate** (`talk-spec` ticket 27 and the ~16 old repos
   in the hub org). A separate cleanup, not on the route to a working multi-org estate.
+- **Policy-version inheritance, and computable semver bumps.** Policies are code, so a version could
+  `extends` its predecessor rather than restate it — today `v2.0.0/require-nonroot.yaml` copies
+  `v1.0.0`'s CEL expression byte-identically, hand-edits the version string in three places, and
+  appends one rule. It would have to be *source-level* inheritance rendering down to today's flat,
+  per-version `matchConditions` self-scoping, since the shared-webhook alternative is documented to
+  break coexistence. The strong version of the idea: `CONTEXT.md` already defines semver by
+  **verdict impact on currently-compliant workloads**, and `verify-shift-left.sh` already runs a
+  workload against two versions offline — so the major/minor/patch bump could be *computed* rather
+  than asserted. Genuinely good, genuinely uncaptured, and **not on the route to this destination**:
+  the split concerns version transport, not version authoring. Deserves its own effort.
+
 - **Building out the `twin/` project itself.** Complete at 73/73; its own roadmap is a separate
   effort. Note this is *not* a blanket exclusion of the twin: its `market_signals.py` mechanism and
   the `price_levels_never_probabilities` invariant are live candidates for reuse here — see the
