@@ -34,6 +34,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: driftwood
-  path: ./apps
+  path: ./gitops/apps
   prune: true   # prune-on-retire: remove what git no longer declares
   wait: true    # health-gate the reconcile

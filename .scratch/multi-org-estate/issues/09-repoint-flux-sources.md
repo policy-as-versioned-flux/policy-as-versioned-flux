@@ -103,9 +103,17 @@ for u in driftwood ludlow tuppence nist; do
   cd -
 done
 ```
-No other change is needed afterward — `gotk-sync.yaml`/`gotk-sync-nist.yaml` already pin `ref.tag:
-v1.0.0` and already point at these repos; Flux will pick the tag up on its next 1–5 minute poll, or
-immediately via `flux reconcile source git <name> --context <ctx>`.
+**One other fix was needed, and is now done.** Each unit's `Kustomization.spec.path` in
+`gotk-sync.yaml` read `./apps`, but the real post-split repo layout (confirmed against the live
+GitHub trees for driftwood/ludlow/tuppence) has `apps/` nested under `gitops/`, not at repo root —
+`gitops/apps/kustomization.yaml` etc. `./apps` would not resolve, so the `GitRepository` would go
+`Ready=True` once the tag above lands, but the `Kustomization` would then fail with a path-not-found
+error, silently stalling the handoff. Fixed in this pass: `path: ./gitops/apps` in all three
+`estate/{driftwood,ludlow,tuppence}/gitops/flux-system/gotk-sync.yaml`. `gotk-sync-nist.yaml` has no
+`Kustomization` (source-only), so it needed no equivalent change. After pushing the tag above, both
+the `GitRepository` and the `Kustomization` should go `Ready=True` on Flux's next poll, or immediately
+via `flux reconcile source git <name> --context <ctx>` followed by
+`flux reconcile kustomization <name> --context <ctx>`.
 
 **Also not done, named rather than silently broken:** `estate/driftwood/drift/forced-campaign.yaml`'s
 `scale-left-unreverted` trial targets the in-cluster `git-server` Deployment by design ("the nearest
