@@ -11,7 +11,7 @@ even the tightest cage leaves a residual over the org's appetite band.
 | Piece | File | Role |
 |---|---|---|
 | The £ engine | `cage.py` | Named tiers → dials (deterministic); the £ picks the tier; emits the TCoR ledger line (residual + cost-of-controls). Reuses `../fair/fair.py` and `../risk/enforce.py`. |
-| Cage (mutate) | `policies/cage-tier.yaml` | `MutatingPolicy`: a pod carrying `posture.acme.io/tier` is mutated into that tier's cage — cpu/mem limits, eviction PriorityClass, and (restricted+) drop-ALL caps, read-only-fs, a WAF sidecar. Never denies. |
+| Cage (mutate) | `policies/cage-tier.yaml` | `MutatingPolicy`: every pod is mutated into a cage — cpu/mem limits, eviction PriorityClass, and (restricted+) drop-ALL caps, read-only-fs, a WAF sidecar. A pod carrying `posture.acme.io/tier` gets that tier; one with no (or an unrecognized) tier defaults to `baseline`, the loosest tier — there is no uncaged state. Never denies. |
 | Egress lockdown (generate) | `policies/cage-netpol.yaml` | `GeneratingPolicy`: a caged pod triggers a namespace `NetworkPolicy` that allows egress DNS only — the "reach" cut of the same decision. |
 | Eviction priority | `policies/priorityclasses.yaml` | Three `PriorityClass`es below the default; tighter tier = evicted sooner under pressure. |
 | Tests | `tests/` | `kyverno test` matrices: the cage is a **mutation** (cage present), not a deny; the generate emits the lockdown netpol. |
@@ -83,10 +83,24 @@ estate/platform/graded/verify-graded.sh
 ```
 
 `verify-graded.sh` proves offline (no cluster) that the cage is a mutation not a
-deny, the tier→dials expansion is deterministic and matches `cage.py`, the generate
-emits the egress lockdown, and the eviction ordering holds. If the policies are
-installed live it also server-dry-runs a behind-posture pod and asserts it is
-*caged* (mutated), never denied.
+deny, the tier→dials expansion is deterministic and matches `cage.py`, an
+in-currency pod (no tier label) is caged into `baseline` rather than left
+untouched, the generate emits the egress lockdown, and the eviction ordering
+holds. If the policies are installed live it also server-dry-runs a
+behind-posture pod and asserts it is *caged* (mutated), never denied.
+
+### Every workload is always caged (ticket 08)
+
+There is no uncaged state. A pod with no `posture.acme.io/tier` label — the
+in-currency population — is not skipped; it is mutated into `baseline`, the
+loosest tier, the permissive default. `baseline` still stamps `cpu: 500m`,
+`mem: 256Mi` and a `cage-baseline` PriorityClass onto every pod that previously
+went untouched, so **this is itself a major bump** under `CONTEXT.md`'s own
+semver rule (verdict impact on currently-compliant workloads): a pod that
+cannot schedule under those new limits is refused, where before it was
+admitted clean. Release this change as a major version, not a patch. A tier
+value that is missing *or* unrecognized both fall through to `baseline` — never
+to a no-op skip, which would be the exemption `CONTEXT.md` bans.
 
 ## Calibration knobs
 

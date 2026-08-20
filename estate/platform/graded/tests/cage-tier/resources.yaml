@@ -1,7 +1,8 @@
 # Four pods across the gradient. Each behind-posture pod carries the tier the £
-# (cage.py) picked; the in-currency pod carries no tier. The test asserts every
-# behind pod is MUTATED INTO ITS CAGE (never denied), and the in-currency pod is
-# left untouched (skip).
+# (cage.py) picked; the in-currency pod carries no tier at all. The test asserts
+# every behind pod is MUTATED INTO ITS CAGE (never denied), and the in-currency
+# pod is caged too — into baseline, the loosest tier, the permissive default.
+# There is no untouched state: every workload always carries a cage spec.
 apiVersion: v1
 kind: Pod
 metadata:
@@ -41,7 +42,7 @@ spec:
     - name: app
       image: nginx
 ---
-# In currency: no cage tier. The policy leaves it alone (matchConditions skip).
+# In currency: no self-asserted tier. Defaults to baseline (the permissive floor).
 apiVersion: v1
 kind: Pod
 metadata:

@@ -1,11 +1,14 @@
 # cage-tier — the graded enforcement envelope, at admission.
 #
-# A behind-posture workload is NOT denied. It carries a cage TIER on its pod
-# (`posture.acme.io/tier`, one of baseline|restricted|quarantine — the tier the £
-# picked, see ../cage.py). This MUTATING policy expands that named tier into the
-# concrete DIALS and stamps them onto the pod, so the workload keeps running but
-# caged by degree. Deny is a separate, bottom-rung decision (cage.py emits it only
-# when even quarantine's residual is over-band); this policy never denies.
+# EVERY pod always carries a cage spec — there is no uncaged state (ticket 08).
+# A behind-posture workload carries a cage TIER on its pod (`posture.acme.io/tier`,
+# one of baseline|restricted|quarantine — the tier the £ picked, see ../cage.py);
+# an in-currency workload carries none, and DEFAULTS to `baseline`, the loosest
+# tier — the permissive floor, not an untouched state. This MUTATING policy
+# expands the (possibly defaulted) tier into the concrete DIALS and stamps them
+# onto the pod, so every workload keeps running, caged by degree. Deny is a
+# separate, bottom-rung decision (cage.py emits it only when even quarantine's
+# residual is over-band); this policy never denies.
 #
 # TIERS OVER DIALS. The `dial` variable is the SAME table cage.py holds
 # (verify-graded.sh cross-checks the two never drift). The tier -> dials expansion
@@ -37,17 +40,17 @@ spec:
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["pods"]
-  matchConditions:
-    # Only pods carrying a cage tier get caged. No tier => untouched (a pod in
-    # currency is never caged by this policy). The tier is set upstream by the £
-    # (cage.py) / the currency controller, never self-asserted for a loosening —
-    # an unknown tier value falls through the map lookup and the mutation no-ops.
-    - name: carries-a-cage-tier
-      expression: >-
-        object.metadata.?labels['posture.acme.io/tier'].orValue('') in ['baseline', 'restricted', 'quarantine']
+  # No matchConditions: every pod matched by resourceRules gets caged — there is
+  # no uncaged population. The tier is set upstream by the £ (cage.py) / the
+  # currency controller, never self-asserted for a LOOSENING: a missing label or
+  # an unrecognized value both fall through to `baseline`, the loosest tier —
+  # never to a no-op skip, which would be the exemption this project bans.
   variables:
+    - name: rawTier
+      expression: "object.metadata.?labels['posture.acme.io/tier'].orValue('baseline')"
     - name: tier
-      expression: "object.metadata.labels['posture.acme.io/tier']"
+      expression: >-
+        variables.rawTier in ['baseline', 'restricted', 'quarantine'] ? variables.rawTier : 'baseline'
     # The tier -> dials table. Mirror of cage.py TIERS (cpu/mem/priorityClass, the
     # harden flag = dropAll && readOnlyRootFs, and the WAF sidecar sizing).
     # `harden`/`wafCpu` are the '0'/'false' sentinels that keep the map homogeneous
