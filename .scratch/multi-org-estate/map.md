@@ -48,6 +48,12 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
 
 <!-- index of closed tickets; one line each, linking the ticket that holds the detail -->
 
+- [Split mechanics and cross-org verification](issues/07-split-mechanics-decision.md) — platform ships
+  the verify harness as a pinned dependency, `verify/` and `talk/` become **separate repos in the hub
+  org**, and tags are **dual-signed** (gitsign + OpenPGP) because Flux's `spec.verify` only speaks
+  OpenPGP — a time-boxed bridge until Flux supports gitsign. Only 4 scripts carry a single-tree
+  assumption. Regulator pins stay **direct**, and `README.md:19`'s `nist`/`ico` → `platform` →
+  institutions chain is **false** and must be corrected.
 - [Settle what "organisation" means](issues/03-organisation-glossary.md) — no collective noun for the
   six; name the kind, but all six are independent GitHub organisations. **Roles compose** —
   publisher / risk-bearer / adopter — and `platform` is already two of them, carrying its own £10k
