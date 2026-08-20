@@ -103,17 +103,46 @@ for u in driftwood ludlow tuppence nist; do
   cd -
 done
 ```
-**One other fix was needed, and is now done.** Each unit's `Kustomization.spec.path` in
-`gotk-sync.yaml` read `./apps`, but the real post-split repo layout (confirmed against the live
-GitHub trees for driftwood/ludlow/tuppence) has `apps/` nested under `gitops/`, not at repo root —
-`gitops/apps/kustomization.yaml` etc. `./apps` would not resolve, so the `GitRepository` would go
-`Ready=True` once the tag above lands, but the `Kustomization` would then fail with a path-not-found
-error, silently stalling the handoff. Fixed in this pass: `path: ./gitops/apps` in all three
+**One other fix was needed, and is now done — and re-applied live, not just committed.** Each
+unit's `Kustomization.spec.path` in `gotk-sync.yaml` read `./apps`, but the real post-split repo
+layout (confirmed against the live GitHub trees for driftwood/ludlow/tuppence) has `apps/` nested
+under `gitops/`, not at repo root — `gitops/apps/kustomization.yaml` etc. `./apps` would not
+resolve, so the `Kustomization` would fail with a path-not-found error even once the `GitRepository`
+resolved a tag, silently stalling the handoff. Fixed: `path: ./gitops/apps` in all three
 `estate/{driftwood,ludlow,tuppence}/gitops/flux-system/gotk-sync.yaml`. `gotk-sync-nist.yaml` has no
-`Kustomization` (source-only), so it needed no equivalent change. After pushing the tag above, both
-the `GitRepository` and the `Kustomization` should go `Ready=True` on Flux's next poll, or immediately
-via `flux reconcile source git <name> --context <ctx>` followed by
-`flux reconcile kustomization <name> --context <ctx>`.
+`Kustomization` (source-only), so it needed no equivalent change.
+
+A first pass fixed this only in git; the live `Kustomization` objects on kind-driftwood/kind-ludlow/
+kind-tuppence kept the stale `spec.path: ./apps` because nothing had re-applied the corrected
+manifest, so the claim that pushing the tag alone would be enough was false — pushing a tag changes
+what a `GitRepository` resolves, it does not touch a `Kustomization` CR already sitting in the
+cluster with an old `spec.path`. Fixed for real in this pass: re-ran the same
+`kubectl apply -f gotk-sync.yaml -f gotk-sync-nist.yaml` step `up.sh` itself uses (step 3) against
+all three live clusters. Confirmed live afterward:
+`kubectl --context kind-<unit> -n flux-system get kustomization <unit> -o jsonpath='{.spec.path}'`
+now returns `./gitops/apps` on all three. Also removed the stale "`scripts/up.sh` rewrites
+`.spec.url` to the in-cluster git server" header comments from all six `gotk-sync*.yaml` files —
+that mechanism was retired earlier in this same ticket and the comments were never updated to match.
+
+**Honest live Ready state after the re-apply, including a wrinkle worth naming.** `GitRepository`
+stays `Ready=False` on all three clusters with the same legible reason as before
+(`couldn't find remote ref "refs/tags/v1.0.0"`) — expected, no tag exists yet. `Kustomization`,
+however, already reports `Ready=True` on all three, *before* any tag is pushed. This is not a false
+success: each `GitRepository` still holds an `status.artifact` fetched during the earlier
+rejected/superseded commit-pin attempt (three weeks old per that attempt's own history), and that
+cached commit currently happens to equal each real repo's live `main` HEAD (verified via
+`git ls-remote <repo> HEAD` against `status.artifact.revision` for driftwood, ludlow, tuppence, and
+nist — all four match). Flux keeps serving a source's last-known-good artifact from storage even
+after a refresh attempt fails, so `kustomize-controller` reconciles `./gitops/apps` against that
+still-current cached tree and reports `Ready=True` honestly for what it did — apply real, current
+content — but not through the signed-tag path this ticket requires; it is not proof the tag flow
+works end-to-end. Left as-is and named rather than silently relied on: purging that cached artifact
+to force an all-red honest state wasn't asked for by this ticket and risks discarding the last
+diagnostic evidence of what the previous rejected attempt actually did. Once a human pushes the
+signed tag (see the block above), `flux reconcile source git <name> --context <ctx>` followed by
+`flux reconcile kustomization <name> --context <ctx>` will refresh both through the legitimate path
+and should keep `Ready=True` on both objects — that is now genuinely true, because the live
+`spec.path` is fixed, not just the committed one.
 
 **Also not done, named rather than silently broken:** `estate/driftwood/drift/forced-campaign.yaml`'s
 `scale-left-unreverted` trial targets the in-cluster `git-server` Deployment by design ("the nearest
