@@ -47,13 +47,15 @@ import to_fair_scenario   # noqa: E402  the feed bounds checker
 
 FEEDS = os.path.join(HERE, "..", "feeds")
 SELF_SCENARIO = os.path.join(HERE, "scenarios", "platform-self.json")
-SELF_APPETITE = os.path.join(HERE, "scenarios", "platform-appetite.json")
 
 
 def govern_self():
-    """Score the apparatus with the same engine that scores every institution."""
+    """Score the apparatus with the same engine, and the same shared appetite
+    store (../risk/appetite.json), that scores every institution — platform's
+    strict £10k band lives there now, marked `root_of_trust`, not in a
+    separate file (ticket 16 part 2: no more override-path special case)."""
     sc = enforce.fair.load(SELF_SCENARIO)
-    tol = enforce.tolerance_for("platform", SELF_APPETITE)
+    tol = enforce.tolerance_for("platform")
     d = enforce.decide(sc, "platform", tol)
     # The honesty verdict: does the apparatus pass its own test?
     d["controls_mandatory"] = d["verdict"] == "Deny"        # model makes them required

@@ -48,7 +48,6 @@ rejections.json           the war-gamer's rejection ledger (what humans keep dec
 reflexive.py              the apparatus scored by ../risk/enforce.py against its own band
 scenarios/
   platform-self.json      the apparatus as a workload (controls off = warn, on = deny)
-  platform-appetite.json  the apparatus's own strict band (£10k, root-of-trust)
 verify-honesty.sh         the whole beat, offline
 ```
 
@@ -96,7 +95,10 @@ python3 proposer_bounds.py dispositions   # one line per drift + why
 ## 3 · Governs itself (reflexive.py)
 
 Everything the estate does to a workload, the apparatus does to itself — scored by
-the **same** `../risk/enforce.py`, not a bespoke self-scoring path. `platform-self.json`
+the **same** `../risk/enforce.py` against the **same** `../risk/appetite.json`
+(org `platform`, marked `root_of_trust`), not a bespoke self-scoring path or a
+separate appetite file (ticket 16 part 2 merged the two stores; `tolerance_for`
+no longer takes an override path here). `platform-self.json`
 is the apparatus as a workload: controls **off** (unsigned/unbounded feeds, an
 auto-merging proposer, silent Flux drift) is the warn state; controls **on** (signed
 feeds, bounded proposer, the gate) is the deny state. It **passes its own test** when
