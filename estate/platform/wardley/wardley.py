@@ -54,10 +54,19 @@ APPETITE = os.path.join(PLATFORM, "risk", "appetite.json")
 STAGES = [(0.25, "genesis"), (0.50, "custom"), (0.75, "product"), (1.01, "commodity")]
 
 # How hard a commoditisation MOVEMENT bumps the linked attacker LEF. The movement
-# (proj - evolution) is bounded in [0,1]; K scales it into a frequency multiplier.
-# ponytail: one linear knob, editorial. It's a calibration dial, not a physics law
-# -- widen K if a real trajectory should flip a move sooner. Upgrade path: a
-# per-component collapse curve if any single trajectory needs its own shape.
+# (proj - evolution) is bounded in [0,1]; K scales it into a frequency multiplier
+# (factor = 1 + K*movement; movement = velocity*horizon, so K*horizon is the one
+# quantity that matters -- K and horizon are not independent knobs).
+# ponytail: one linear knob, editorial -- a calibration dial, not a physics law.
+# K=4.0 is MEASURED, not inherited: it sits in a stable plateau (3.0-5.0) for the
+# current slate (full sweep: .scratch/multi-org-estate/research/scenario-slate.md
+# S6). Do NOT "widen K to flip a move sooner" -- that advice is UNSAFE. cage.py's
+# select_tier() returns the LOOSEST tier that still fits the band, and the tier
+# TCoR curves cross, so cage TCoR is NON-MONOTONE in the threat: between K=5 and
+# K=6 phishing-kits-aas STOPS drifting (a worse threat selects a tighter, cheaper
+# tier). Changing K means re-running that sweep, not asserting a bigger number is
+# safer. Upgrade path: a per-component collapse curve if one trajectory needs its
+# own shape.
 ATTACK_COST_COLLAPSE_K = 4.0
 
 
@@ -284,6 +293,58 @@ def selfcheck():
     assert dw_drift_ids != lud_drift_ids, (
         "driftwood and ludlow must not drift on the identical set -- the band, not the "
         "signal, decides", dw_drift_ids, lud_drift_ids)
+
+    # 5. THE SCENARIO SLATE (ticket 06): guard against the obvious failure -- the
+    #    slate must not be tuned so every scenario fires. nb-refining-capacity is
+    #    the LOUDEST new flag on the map (crosses product->commodity) and carries
+    #    a REAL base_risk (so the non-fire below is not vacuous), but the actor
+    #    gate (supply-constraint, not attacker-capability) keeps it off the
+    #    war-gamer entirely -- "this loud thing changes nothing above it".
+    assert by["nb-refining-capacity"]["commoditising"] is True, by["nb-refining-capacity"]
+    nb_base_risk = next(c for c in intel["components"]
+                         if c["id"] == "nb-refining-capacity")["base_risk"]
+    assert nb_base_risk is not None, "non-fire must not be vacuous: needs a real base_risk"
+    assert "nb-refining-capacity" not in ids, (
+        "a loud, non-attacker commoditisation must still emit nothing", ids)
+    # pqc-transport-migration: the same actor-gate shape as spiffe-workload-identity
+    # (a commoditising DEFENCE, not attack) -- also must not emit (finding F2).
+    assert by["pqc-transport-migration"]["commoditising"] is True, by["pqc-transport-migration"]
+    assert "pqc-transport-migration" not in ids, "defensive commoditisation must not raise attacker risk"
+
+    # The slate is not tuned the OTHER way either: pkg-registry-worm DOES fire and
+    # DOES flip the deployed move (cage -> fix) once the forward bump is applied.
+    assert "pkg-registry-worm" in ids, ids
+    worm_row = next(r for r in forward_into_wargamer(intel, "driftwood")["rows"]
+                     if r["control"] == "dependency-worm-exfil")
+    assert worm_row["deployed"] == "cage" and worm_row["implied"] == "fix", worm_row
+    assert worm_row["drift"] is True, worm_row
+
+    # agentic-commit-access fires and IS re-priced -- but the war-gamer proposes
+    # NOTHING, because the deployed move was already `fix`. The reward for fixing
+    # something is that the news stops mattering.
+    assert "agentic-commit-access" in ids, ids
+    agentic_base = next(c for c in intel["components"]
+                         if c["id"] == "agentic-commit-access")["base_risk"]
+    assert agentic_base["deployed_move"] == "fix", agentic_base
+    agentic_fwd = next(r for r in sig["risks"] if r["forward"]["component"] == "agentic-commit-access")
+    assert agentic_fwd["forward"]["attack_cost_collapse_factor"] > 2.0, agentic_fwd
+    assert agentic_fwd["warn"]["lef"][2] > agentic_base["warn"]["lef"][2], (agentic_fwd, agentic_base)
+    agentic_row = next(r for r in forward_into_wargamer(intel, "driftwood")["rows"]
+                        if r["control"] == "agentic-commit-compromise")
+    assert agentic_row["drift"] is False, (
+        "a risk already deployed at fix must be ABSORBED, not proposed again", agentic_row)
+
+    # 5b. THE FIX FIXED-POINT -- free, and nothing asserted it before now. fix and
+    #     deny are computed from the untouched `deny` state; only cage/transfer
+    #     scale with the forward bump. So a risk already deployed at `fix` cannot
+    #     be flipped by ANY K or ANY movement -- proven by sweeping the bump
+    #     factor directly (1 + K*movement), not just today's K=4.0 value.
+    for factor in (1.0, 2.0, 4.0, 8.0, 20.0):
+        bumped = copy.deepcopy(agentic_base)
+        for state in ("warn", "behind"):
+            bumped[state]["lef"] = [v * factor for v in bumped[state]["lef"]]
+        assert tcor.crossover(bumped, tol_dw)["chosen"] == "fix", (
+            "fix is a fixed point of the forward bump for every K/movement", factor)
 
     print(
         "ok  Wardley map: %d components, %d flagged commoditising (movement, not position); "

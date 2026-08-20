@@ -1,5 +1,5 @@
 {
-  "intel_version": "v1",
+  "intel_version": "v2",
   "horizon_years": 3,
   "components": [
     {
@@ -62,6 +62,58 @@
       "evolution": 0.55,
       "stage": "product",
       "projected": 0.85,
+      "projected_stage": "commodity",
+      "movement": 0.3,
+      "commoditising": true,
+      "links_risk": null
+    },
+    {
+      "id": "agentic-commit-access",
+      "label": "Autonomous coding agents holding repository write access",
+      "actor": "attacker-capability",
+      "visibility": 0.4,
+      "evolution": 0.4,
+      "stage": "custom",
+      "projected": 0.67,
+      "projected_stage": "product",
+      "movement": 0.27,
+      "commoditising": true,
+      "links_risk": "agentic-commit-compromise"
+    },
+    {
+      "id": "pkg-registry-worm",
+      "label": "Self-replicating package-registry supply-chain worm",
+      "actor": "attacker-capability",
+      "visibility": 0.3,
+      "evolution": 0.45,
+      "stage": "custom",
+      "projected": 0.72,
+      "projected_stage": "product",
+      "movement": 0.27,
+      "commoditising": true,
+      "links_risk": "dependency-worm-exfil"
+    },
+    {
+      "id": "nb-refining-capacity",
+      "label": "Qubit/SRF-grade niobium refining + target-fab capacity",
+      "actor": "supply-constraint",
+      "visibility": 0.05,
+      "evolution": 0.62,
+      "stage": "product",
+      "projected": 0.77,
+      "projected_stage": "commodity",
+      "movement": 0.15,
+      "commoditising": true,
+      "links_risk": "pq-harvest-now-decrypt-later"
+    },
+    {
+      "id": "pqc-transport-migration",
+      "label": "Post-quantum transport-crypto migration tooling",
+      "actor": "defensive-capability",
+      "visibility": 0.25,
+      "evolution": 0.62,
+      "stage": "product",
+      "projected": 0.92,
       "projected_stage": "commodity",
       "movement": 0.3,
       "commoditising": true,

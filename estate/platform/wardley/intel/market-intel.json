@@ -1,5 +1,5 @@
 {
-  "intel_version": "v1",
+  "intel_version": "v2",
   "published_by": "platform",
   "horizon_years": 3,
   "note": "Market-intelligence Wardley input -- the FIFTH, FORWARD feed (spec stories 28, 32). Each component sits on a Wardley map: `visibility` is the value-chain Y axis (1 = user-facing, 0 = deep infra), `evolution` is the X axis (0 genesis .. 0.25 custom .. 0.5 product .. 0.75 commodity .. 1). `velocity` is per-year rightward drift (commoditisation speed). For an `attacker-capability`, moving right = the attack COMMODITISING = its cost COLLAPSING = the linked war-game risk's loss-event-frequency rising BEFORE the reactive feed reports a single landed incident. `base_risk` is the current (reactive) FAIR posture + deployed move; the layer projects the forward LEF from the commoditisation movement and hands the war-gamer a forward scenario to re-price. Editorial, grounded in named public trajectories (NIST PQC timeline, RaaS/PhaaS marketplace reporting), not a live subscription.",
@@ -84,6 +84,77 @@
       "links_risk": null,
       "source": "SPIFFE graduation + managed-mesh adoption; commoditising DEFENCE (cheaper to run), not attack",
       "base_risk": null
+    },
+    {
+      "id": "agentic-commit-access",
+      "label": "Autonomous coding agents holding repository write access",
+      "actor": "attacker-capability",
+      "visibility": 0.40,
+      "evolution": 0.40,
+      "velocity": 0.09,
+      "links_risk": "agentic-commit-compromise",
+      "source": "Octoverse 2025 (1M+ Copilot coding-agent PRs); Stack Overflow 2025 (~30.9% agent use); CVE-2025-53773/54135/61260/54794/54795 (proof-of-concept only, no observed in-the-wild merge); org 'Actions can create/approve PRs' enabled 2026-08-15 -- research/scenario-slate.md S3.1",
+      "base_risk": {
+        "id": "agentic-commit-compromise",
+        "name": "forward (AI-Wardley): agent-mediated malicious commit into the policy distribution",
+        "deployed_move": "fix",
+        "note": "Agents get no standing write credential, a distinct Fulcio identity, and every agent change rides the existing cross-check gate -- cheap because it was already built for other reasons. No complete in-the-wild chain observed; every case to date is proof-of-concept.",
+        "warn": {"lef": [0, 1, 4], "lm": [40000, 150000, 600000]},
+        "behind": {"lef": [0, 1, 3], "lm": [40000, 150000, 600000]},
+        "deny": {"lef": [0, 0, 1], "lm": [40000, 150000, 600000]},
+        "costs": {"fix": 15000, "deny": 250000, "transfer": {"load": 0.9, "deductible": 40000}}
+      }
+    },
+    {
+      "id": "pkg-registry-worm",
+      "label": "Self-replicating package-registry supply-chain worm",
+      "actor": "attacker-capability",
+      "visibility": 0.30,
+      "evolution": 0.45,
+      "velocity": 0.09,
+      "links_risk": "dependency-worm-exfil",
+      "source": "Shai-Hulud waves 1-3 (GitHub/CISA/CERT-CC VU#534320, Sep 2025 - May 2026); npm classic tokens revoked 9 Dec 2025; npm v12 install-time lifecycle scripts default-off 8 Jul 2026 -- research/scenario-slate.md S3.2",
+      "base_risk": {
+        "id": "dependency-worm-exfil",
+        "name": "forward (AI-Wardley): self-replicating registry worm reaches a build",
+        "deployed_move": "cage",
+        "note": "The cage is signature-matching SCA scanning -- near-useless against a novel self-replicating package on its first wave (Postman took ~11h publish-to-unpublish). behind barely collapses warn, which is why this entry flips under the forward bump rather than absorbing it.",
+        "warn": {"lef": [0, 2, 7], "lm": [25000, 100000, 450000]},
+        "behind": {"lef": [0, 2, 6], "lm": [25000, 100000, 450000]},
+        "deny": {"lef": [0, 0, 1], "lm": [25000, 100000, 450000]},
+        "costs": {"fix": 70000, "deny": 350000, "transfer": {"load": 0.8, "deductible": 50000}}
+      }
+    },
+    {
+      "id": "nb-refining-capacity",
+      "label": "Qubit/SRF-grade niobium refining + target-fab capacity",
+      "actor": "supply-constraint",
+      "visibility": 0.05,
+      "evolution": 0.62,
+      "velocity": 0.05,
+      "links_risk": "pq-harvest-now-decrypt-later",
+      "source": "Ported per ticket 06 from .scratch/talk-spec/pitch-v4/research/quantum-niobium-analysis.md's component table (qubit/SRF-grade Nb, vis 0.05 evo 0.62; CBMM ~77% of world supply). The deliberate LOUD, NON-FIRING entry: crosses product->commodity (the loudest new flag on the map) but the actor gate keeps it off the war-gamer -- the same base_risk as pq-cryptanalysis, so the non-fire is not for lack of a base_risk (see wardley.selfcheck).",
+      "base_risk": {
+        "id": "pq-harvest-now-decrypt-later",
+        "name": "forward (AI-Wardley): harvest-now-decrypt-later against long-life data",
+        "deployed_move": "transfer",
+        "warn": {"lef": [0, 1, 3], "lm": [50000, 250000, 1500000]},
+        "behind": {"lef": [0, 1, 2], "lm": [50000, 250000, 1500000]},
+        "deny": {"lef": [0, 0, 1], "lm": [50000, 250000, 1500000]},
+        "costs": {"fix": 200000, "deny": 300000, "transfer": {"load": 0.9, "deductible": 80000}}
+      }
+    },
+    {
+      "id": "pqc-transport-migration",
+      "label": "Post-quantum transport-crypto migration tooling",
+      "actor": "defensive-capability",
+      "visibility": 0.25,
+      "evolution": 0.62,
+      "velocity": 0.10,
+      "links_risk": null,
+      "source": "FIPS 203/204/205 (13 Aug 2024); OpenSSL 3.5 default X25519MLKEM768 (8 Apr 2025); OpenSSH 10.0 mlkem768x25519 (9 Apr 2025); Cloudflare Radar 71.2% client / 12.4% origin-server PQ-ready (retrieved 2026-08-19) -- research/scenario-slate.md S3.4",
+      "base_risk": null,
+      "note": "KNOWN-INERT (finding F2). Flags commoditising and emits nothing: _forward_risk() fires only for actor == attacker-capability, so a commoditising DEFENCE has no path to lower a cost, an LEF, or TCoR. Carried to make that gap visible on the map rather than buried in the source. Even if F2 were fixed, the commoditised half (transport key agreement) is not what pq-harvest-now-decrypt-later's costs.fix actually buys -- discovery/inventory, WebPKI signatures and boot roots of trust are the binding, stationary cost drivers."
     }
   ]
 }

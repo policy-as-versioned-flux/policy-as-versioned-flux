@@ -75,4 +75,8 @@ bash    sign-map.sh                           # re-render + re-sign after an int
 
 The `ATTACK_COST_COLLAPSE_K` knob in `wardley.py` is the one editorial calibration dial —
 how hard a unit of commoditisation movement bumps frequency. It is a tuning dial, not a
-physical law; widen it if a real trajectory should flip a move sooner.
+physical law, but it is not a free one: `cage.py`'s tier selection makes cage TCoR
+non-monotone in the threat, so widening K does **not** reliably flip a move sooner — between
+K=5 and K=6, `phishing-kits-aas` *stops* drifting. K=4.0 is measured to sit in a stable
+plateau (3.0–5.0); see the comment on `ATTACK_COST_COLLAPSE_K` and
+`.scratch/multi-org-estate/research/scenario-slate.md` §6 before touching it.

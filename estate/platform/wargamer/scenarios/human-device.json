@@ -55,6 +55,17 @@
       "behind": {"lef": [0, 1, 2], "lm": [50000, 250000, 1500000]},
       "deny": {"lef": [0, 0, 1], "lm": [50000, 250000, 1500000]},
       "costs": {"fix": 200000, "deny": 300000, "transfer": {"load": 0.9, "deductible": 80000}}
+    },
+    {
+      "id": "hyperscaler-region-concentration",
+      "name": "third-party: a single-region control-plane failure takes the estate offline",
+      "author": "human-seed",
+      "deployed_move": "transfer",
+      "applicable": ["transfer", "deny"],
+      "note": "tcor.py's `applicable` field narrows the move to what an org actually has for a third-party integration -- you cannot fix, cage or deny a hyperscaler's control plane. Without it the engine defaults costs.fix to 0 and 'recommends' fixing a hyperscaler outage for GBP 3,726, which is the one place in the estate where the difference between the model being silent and being wrong is visible in one number. deny means severing the dependency (multi-region/multi-cloud); CMA: less than 1% of customers switch cloud provider each year, which is what makes deny expensive rather than merely inconvenient. transfer wins on this model's arithmetic; it wins less comfortably in reality -- a systemic cloud outage is a correlated loss, and a carrier facing simultaneous claims across its book is worth less precisely in the scenario you bought it for.",
+      "warn": {"lef": [0, 1, 3], "lm": [20000, 90000, 400000]},
+      "deny": {"lef": [0, 0, 1], "lm": [20000, 90000, 400000]},
+      "costs": {"deny": 420000, "transfer": {"load": 0.6, "deductible": 35000}}
     }
   ]
 }
