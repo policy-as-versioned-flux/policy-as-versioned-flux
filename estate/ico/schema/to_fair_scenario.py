@@ -20,6 +20,13 @@ Loss-event-frequency (lef) is NOT in the schema -- the schema prices "when it
 lands", not "how often". ponytail: a flat editorial per-regime warn-LEF, tune per
 institution if a scenario needs it; deny collapses LEF the same way every other
 scenario in this estate does (deny.lef ~ (0,0,1)).
+
+One breach can draw more than one regime's consequence (an ICO fine *and* a PCI
+penalty on the same incident, say) -- pass `--also REGIME:VIOLATION_TYPE`
+(repeatable) to `build` to fold further obligation sources into the same
+scenario's lm. fair.py prices them additively and correlated, never as separate
+risks (ticket 18). Which regimes actually apply to which workload stays an
+open, separate gap (ticket 17) -- this only combines regimes named explicitly.
 """
 from __future__ import annotations
 
@@ -68,18 +75,40 @@ def lm_triple(regime: dict, vt: dict) -> tuple[float, float, float]:
     sys.exit(f"unknown formula type: {t}")
 
 
-def build_scenario(schema: dict, regime_name: str, vt_name: str,
+def build_scenario(schema: dict, regime_name: str, vt_name: str, also=(),
                     warn_lef=DEFAULT_WARN_LEF, deny_lef=DEFAULT_DENY_LEF) -> dict:
-    regime = schema["regimes"][regime_name]
-    vt = regime["violation_types"][vt_name]
-    lm = lm_triple(regime, vt)
+    """also: further (regime_name, vt_name) pairs whose consequence the SAME
+    breach can also draw -- an ICO fine and a PCI penalty on one incident, say
+    (ticket 18). Emits a single lm triple for one source (unchanged shape), or
+    a list of triples for several; fair.py's simulate() prices the multi-source
+    case additively and correlated (shared lef), never as independent risks.
+    Which regimes actually apply to which workload is not decided here -- that
+    scoping is a separate, still-open gap (ticket 17)."""
+    sources = [(regime_name, vt_name), *also]
+    lms, names, regimes_used = [], [], []
+    for r_name, v_name in sources:
+        regime = schema["regimes"][r_name]
+        vt = regime["violation_types"][v_name]
+        lms.append(lm_triple(regime, vt))
+        names.append(f"{r_name}/{v_name}")
+        regimes_used.append(regime)
+    lm = lms[0] if len(lms) == 1 else [list(t) for t in lms]
+    if len(lms) == 1:
+        r = regimes_used[0]
+        note = (f"lm sourced from {r['authority']} real public fines ({r['statute']}). "
+                f"warn/deny lef are editorial (schema doesn't carry frequency).")
+    else:
+        cites = "; ".join(f"{r['authority']} ({r['statute']})" for r in regimes_used)
+        note = (f"lm sourced from real public fines, cited per source: {cites}. "
+                f"warn/deny lef are editorial (schema doesn't carry frequency). "
+                f"{len(lms)} obligation sources on one breach ({', '.join(names)}), priced "
+                f"additively and correlated (shared lef) -- see fair.py.")
     return {
         "version": schema["schema_version"],
-        "name": f"ico:{schema['schema_version']} {regime_name}/{vt_name}",
-        "note": f"lm sourced from {regime['authority']} real public fines ({regime['statute']}). "
-                f"warn/deny lef are editorial (schema doesn't carry frequency).",
-        "warn": {"lef": list(warn_lef), "lm": list(lm)},
-        "deny": {"lef": list(deny_lef), "lm": list(lm)},
+        "name": f"ico:{schema['schema_version']} " + " + ".join(names),
+        "note": note,
+        "warn": {"lef": list(warn_lef), "lm": lm},
+        "deny": {"lef": list(deny_lef), "lm": lm},
     }
 
 
@@ -101,6 +130,17 @@ def selfcheck():
     assert checked >= 8, f"expected to check every regime x violation-type, only checked {checked}"
     print(f"ok  {checked} (schema-version, regime, violation-type) triples are all lo<=mode<=hi")
 
+    # One breach can draw more than one regime's consequence (ticket 18):
+    # combining two real regimes must yield a list of triples, each still
+    # lo<=mode<=hi, not a single flattened one.
+    v2 = json.load(open(os.path.join(os.path.dirname(__file__), "v2", "penalty-schema.json")))
+    combined = build_scenario(v2, "uk-gdpr", "lower-tier", also=[("pci-dss", "non-compliance-escalating")])
+    lm = combined["warn"]["lm"]
+    assert isinstance(lm, list) and len(lm) == 2 and isinstance(lm[0], list), combined
+    for lo, mode, hi in lm:
+        assert lo <= mode <= hi, (combined, lo, mode, hi)
+    print("ok  combining uk-gdpr + pci-dss on one breach yields 2 lo<=mode<=hi triples, not 1")
+
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -110,6 +150,9 @@ def main(argv=None):
     pc.add_argument("schema", help="path to a penalty-schema.json")
     pc.add_argument("regime")
     pc.add_argument("violation_type")
+    pc.add_argument("--also", action="append", default=[], metavar="REGIME:VIOLATION_TYPE",
+                     help="fold another obligation source's consequence into the same breach "
+                          "(repeatable) -- ticket 18")
     pc.add_argument("-o", "--out", help="write scenario JSON here (default: stdout)")
 
     sub.add_parser("selfcheck", help="assert every schema entry yields a valid lm triple")
@@ -127,7 +170,8 @@ def main(argv=None):
 
     with open(args.schema) as fh:
         schema = json.load(fh)
-    scenario = build_scenario(schema, args.regime, args.violation_type)
+    also = [tuple(a.split(":", 1)) for a in args.also]
+    scenario = build_scenario(schema, args.regime, args.violation_type, also=also)
     out = json.dumps(scenario, indent=2)
     if args.out:
         with open(args.out, "w") as fh:

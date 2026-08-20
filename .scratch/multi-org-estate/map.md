@@ -63,6 +63,14 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
   the worst case; genuine deadlock gets a **deferred** reconciler (which must resolve between
   obligations, never waive one — exemptions are banned). Curated bundles are a convenience, never the
   only path. `ico`'s parallel feed stack is the evidence the shared kind is already wanted.
+- [One breach, several bills](issues/18-aggregate-consequences.md) — **additive, not
+  worst-single-dominates**: two obligation sources firing on the same breach both land. `fair.py`'s
+  `simulate()` now takes `lm` as one triple or a list of them, sharing the risk's single `lef` so
+  consequences are **correlated, not independently sampled** — a structural change, not a bigger
+  triple. Proven with real numbers: `uk-gdpr` + `pci-dss` combined on the ico schema raises warn ALE
+  from £9.04M to £11.01M. No existing demo scenario was retrofitted (that means deciding which regime
+  binds to which institution — still open, per 17), so no figure already in `deck.md`/`RUNBOOK.md`
+  moves.
 - [Split mechanics and cross-org verification](issues/07-split-mechanics-decision.md) — platform ships
   the verify harness as a pinned dependency, `verify/` and `talk/` become **separate repos in the hub
   org**, and tags are **dual-signed** (gitsign + OpenPGP) because Flux's `spec.verify` only speaks
