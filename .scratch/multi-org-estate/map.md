@@ -89,7 +89,10 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
   **verdict impact on currently-compliant workloads**, and `verify-shift-left.sh` already runs a
   workload against two versions offline — so the major/minor/patch bump could be *computed* rather
   than asserted. Genuinely good, genuinely uncaptured, and **not on the route to this destination**:
-  the split concerns version transport, not version authoring. Deserves its own effort.
+  the split concerns version transport, not version authoring. **Now charted as its own effort** —
+  see [`.scratch/computed-semver/map.md`](../computed-semver/map.md), whose destination is a release
+  gate that derives the bump and refuses a tag the evidence contradicts. Inheritance is fenced there
+  to one question (does the delta need it?) rather than a refactor.
 
 - **Building out the `twin/` project itself.** Complete at 73/73; its own roadmap is a separate
   effort. Note this is *not* a blanket exclusion of the twin: its `market_signals.py` mechanism and
