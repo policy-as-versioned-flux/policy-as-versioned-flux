@@ -33,7 +33,11 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
 - Split preserves history (`git filter-repo`), and the hub **loses** `estate/` — the six repos become
   the source of truth, not a mirror of a monorepo.
 - Honesty over green. A check that passes because it could not look is worse than a red one; this
-  effort has already found two.
+  effort has already found three.
+- **`pitch-v5.mp4` is internal-only until the split lands.** It narrates "six live organisations",
+  which is six directories and six empty orgs until then. Not a re-cut — just don't put it in front of
+  a customer or a conference while that line is false. Cheapest honest fix if it is needed externally
+  sooner: re-record that one segment (~20s, one act), not the deck.
 - Skills each session should consult: `/grilling`, `/domain-modeling`; the repo's
   `docs/agents/issue-tracker.md`.
 

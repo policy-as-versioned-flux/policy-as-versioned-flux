@@ -39,7 +39,9 @@ completed: action applied, sampled every 15s for 30m, undo applied, baseline ver
 each one before the next started and before build ticket 64's hourly probe could next fire — the
 `SAFETY_MARGIN_MINUTES=40` guard held throughout a real ~3.5-hour run (13:58–17:30 UTC), never
 needing more than a few minutes' wait since each trial finished well inside its hour. 464 real
-samples in `forced-campaign-samples.jsonl` (untracked, as declared). Post-run baseline check
+samples in `forced-campaign-samples.jsonl` (untracked at the time of this ticket, as declared;
+committed later on 2026-08-20 by the owner's instruction — the file is now tracked, and this
+sentence records that change rather than leaving the original claim standing false). Post-run baseline check
 against the live cluster, independent of the script's own: `driftwood-live-version=1.0.0`,
 `driftwood-nist-pin=1.0.0`, Kustomization not suspended, `git-server` at 1/1 replicas — all four
 match the pre-registered baseline exactly.

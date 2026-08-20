@@ -25,8 +25,11 @@ does the honest pass count become once they are fixed?
    component without a `base_risk` *before* it ever considers movement. The assertion would pass even
    if the component did move. It cannot fail for the reason it claims to test. (Found by the
    scenario-slate research, which supplies a replacement control case carrying a real `base_risk`.)
+   **This one instance is delegated to the per-org forward-layer ticket**, which is already editing
+   `wardley.py` and would otherwise collide with this sweep. Do not touch `wardley.py` or
+   `verify-wardley.sh` here.
 
-**The job:** audit all 29 `verify-*.sh` for this bug class and fix them —
+**The job:** audit the other 28 `verify-*.sh` (all but `verify-wardley.sh` — see above) for this bug class and fix them —
 - a live section whose guard doesn't test its own prerequisite (should SKIP, not silently pass);
 - an assertion on a value that cannot fail, or that the target system ignores;
 - anything where "cluster unreachable" and "check passed" are indistinguishable in the output.

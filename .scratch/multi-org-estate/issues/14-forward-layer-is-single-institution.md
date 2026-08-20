@@ -20,5 +20,13 @@ a parameter and run the set), so `verify-wardley.sh` reports each institution's 
 war-gamer proposes against the right band. Consider what this means for the proposal count the demo
 quotes — three institutions may produce three different sets, and that is the honest answer.
 
+**Also fix `selfcheck()`'s vacuous assertion while you are in this file** (delegated from the
+vacuous-gate sweep, which deliberately does not touch `wardley.py` to avoid colliding with this
+ticket). It asserts `credential-stuffing-aas` "must not signal (no movement)", but that component has
+`base_risk: null` and `forward_signal()` skips any component lacking a `base_risk` *before* it
+considers movement — so the assertion cannot fail for the reason it claims. The scenario-slate
+research supplies a replacement control case (`nb-refining-capacity`) that carries a real `base_risk`
+and still emits nothing, which is the assertion worth making.
+
 Do this **before** the slate lands (ticket 06), or the new components bake the same
 single-institution assumption in behind four more entries.
