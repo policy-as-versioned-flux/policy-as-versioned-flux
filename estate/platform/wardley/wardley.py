@@ -25,10 +25,10 @@ Three jobs (the ticket's three acceptance criteria):
 Pure/offline. Reuses tcor.py + wargamer.py unchanged.
 
 Usage:
-    wardley.py map              [--intel <file>]   # the Wardley map + commoditisation flags
-    wardley.py forward-signal   [--intel <file>]   # the forward scenario library (war-gamer shape)
-    wardley.py wargame          [--intel <file>]   # feed the forward signal THROUGH the war-gamer
-    wardley.py selfcheck                            # the projection + seam asserts
+    wardley.py map              [--intel <file>]                # the Wardley map + commoditisation flags
+    wardley.py forward-signal   [--intel <file>] [--org <org>]   # forward scenario library (one org, or all three institutions)
+    wardley.py wargame          [--intel <file>] [--org <org>]   # feed the forward signal THROUGH the war-gamer (one org, or all three)
+    wardley.py selfcheck                                         # the projection + seam asserts
 """
 from __future__ import annotations
 
@@ -45,6 +45,10 @@ sys.path.insert(0, os.path.join(PLATFORM, "wargamer"))
 import tcor       # noqa: E402  the four-move crossover the war-gamer prices with
 
 INTEL = os.path.join(HERE, "intel", "market-intel.json")
+# The risk-bearing institutions the forward layer must speak for -- read from the
+# same appetite file tolerance_for() judges against (../risk/appetite.json), so the
+# org set can never drift out of step with the bands it is priced into.
+APPETITE = os.path.join(PLATFORM, "risk", "appetite.json")
 
 # Evolution-axis stage boundaries (Wardley's genesis/custom/product/commodity).
 STAGES = [(0.25, "genesis"), (0.50, "custom"), (0.75, "product"), (1.01, "commodity")]
@@ -71,6 +75,13 @@ def _stage_idx(x):
 def load(intel_path=INTEL):
     with open(intel_path) as fh:
         return json.load(fh)
+
+
+def institutions(appetite_path=APPETITE):
+    """The risk-bearing institutions the forward signal runs against, in appetite-file
+    order (driftwood, tuppence, ludlow) -- one band per org, never a single stand-in."""
+    with open(appetite_path) as fh:
+        return list(json.load(fh)["orgs"])
 
 
 # --- 1. the Wardley map + commoditisation flags -------------------------------
@@ -121,9 +132,11 @@ def _forward_risk(component, movement):
     return r
 
 
-def forward_signal(intel):
-    """The forward scenario library -- war-gamer shape ({org, risks:[...]}). One
-    risk per commoditising attacker-capability that carries a base FAIR posture."""
+def forward_signal(intel, org):
+    """The forward scenario library for ONE institution -- war-gamer shape
+    ({org, risks:[...]}). One risk per commoditising attacker-capability that
+    carries a base FAIR posture; the same market movement, labelled for the
+    institution whose band it will be priced against downstream."""
     mp = {r["id"]: r for r in build_map(intel)["components"]}
     risks = []
     for c in intel["components"]:
@@ -134,27 +147,40 @@ def forward_signal(intel):
             continue
         risks.append(_forward_risk(c, row["movement"]))
     return {
-        "org": "driftwood",
-        "note": ("AI-Wardley forward signal: %d commoditising attacker-capabilit"
-                 "y(ies) re-priced ahead of the reactive feeds." % len(risks)),
+        "org": org,
+        "note": ("AI-Wardley forward signal (%s): %d commoditising attacker-capabilit"
+                 "y(ies) re-priced ahead of the reactive feeds." % (org, len(risks))),
         "source": "platform/wardley/wardley.py forward-signal @ intel %s" % intel["intel_version"],
         "risks": risks,
     }
 
 
+def forward_signal_all(intel):
+    """The forward scenario library for every risk-bearing institution -- three
+    different orgs, one call each, never one org standing in for the estate."""
+    return {org: forward_signal(intel, org) for org in institutions()}
+
+
 # --- 3. feed the forward signal THROUGH the war-gamer -------------------------
-def forward_into_wargamer(intel):
-    """Hand the forward library to the war-gamer's OWN scenario war-game, unmodified.
-    This is the seam: the forward signal is consumed exactly like the reactive
-    library, and any re-priced move that no longer matches the deployed posture is
-    drift the war-gamer will propose a PR to re-tune -- before the threat lands."""
+def forward_into_wargamer(intel, org):
+    """Hand ONE institution's forward library to the war-gamer's OWN scenario
+    war-game, unmodified. This is the seam: the forward signal is consumed exactly
+    like the reactive library, and any re-priced move that no longer matches the
+    deployed posture is drift the war-gamer will propose a PR to re-tune -- before
+    the threat lands. The verdict is the org's own band, not a stand-in's."""
     import wargamer  # imported here so `wardley.py map` needs only tcor
-    lib = forward_signal(intel)
+    lib = forward_signal(intel, org)
     tol = wargamer.enforce.tolerance_for(lib["org"])
     rows = wargamer.wargame_scenarios({"library": lib})
     props = [wargamer.propose(r) for r in rows]
     return {"library": lib, "tolerance": tol, "rows": rows,
             "proposals": [p for p in props if p]}
+
+
+def forward_into_wargamer_all(intel):
+    """Run the seam for every risk-bearing institution -- three orgs, three bands,
+    honestly three (possibly different) drift sets and proposal counts."""
+    return {org: forward_into_wargamer(intel, org) for org in institutions()}
 
 
 # --- selfcheck ----------------------------------------------------------------
@@ -175,7 +201,7 @@ def selfcheck():
 
     # 2. FORWARD SIGNAL: only commoditising ATTACKER-capabilities become risks;
     #    the defensive commoditisation does NOT bump any attacker LEF.
-    sig = forward_signal(intel)
+    sig = forward_signal(intel, "driftwood")
     ids = {r["forward"]["component"] for r in sig["risks"]}
     assert "spiffe-workload-identity" not in ids, "defensive commoditisation must not raise attacker risk"
     assert "credential-stuffing-aas" not in ids, "already-commodity (no movement) must not signal"
@@ -187,39 +213,87 @@ def selfcheck():
     assert ph_fwd["warn"]["lef"][2] > ph_base["warn"]["lef"][2], (ph_fwd, ph_base)
     assert ph_fwd["forward"]["attack_cost_collapse_factor"] > 1.0, ph_fwd
 
-    # 3. the FORWARD VALUE: the reactive base posture is NOT drift -- the deployed
-    #    move is proportionate at today's feed. The commoditisation bump is the ONLY
-    #    reason a drift appears -> the war-gamer re-tunes BEFORE the threat lands.
+    # 2b. the "no movement" exclusion above is VACUOUS as a regression test: real
+    #     credential-stuffing-aas ALSO carries base_risk: null, so even if the
+    #     commoditising gate broke, the null-base_risk gate would still mask the
+    #     bug and this same assertion would still pass -- for the wrong reason.
+    #     Isolate the gate under test by giving the same stationary component a
+    #     REAL base_risk; only the movement gate is left to exclude it.
+    stationary_intel = copy.deepcopy(intel)
+    stationary = next(c for c in stationary_intel["components"] if c["id"] == "credential-stuffing-aas")
+    stationary["base_risk"] = copy.deepcopy(ph_base)
+    stationary_row = {r["id"]: r for r in build_map(stationary_intel)["components"]}["credential-stuffing-aas"]
+    assert stationary_row["commoditising"] is False, (
+        "control case must stay stationary -- movement, not a missing base_risk, is under test",
+        stationary_row)
+    stationary_ids = {r["forward"]["component"] for r in forward_signal(stationary_intel, "driftwood")["risks"]}
+    assert "credential-stuffing-aas" not in stationary_ids, (
+        "an already-commodity, non-moving component must not signal EVEN WITH a real base_risk",
+        stationary_ids)
+
+    # 3. the FORWARD VALUE, per institution's OWN band -- not one org standing in
+    #    for the estate. At driftwood's loose band the reactive base posture is NOT
+    #    drift; the commoditisation bump is the ONLY reason a drift appears -> the
+    #    war-gamer re-tunes BEFORE the threat lands.
     import wargamer
-    tol = wargamer.enforce.tolerance_for(sig["org"])
-    base_move = tcor.crossover(ph_base, tol)["chosen"]
-    fwd_move = tcor.crossover(ph_fwd, tol)["chosen"]
+    tol_dw = wargamer.enforce.tolerance_for("driftwood")
+    base_move = tcor.crossover(ph_base, tol_dw)["chosen"]
+    fwd_move = tcor.crossover(ph_fwd, tol_dw)["chosen"]
     assert base_move == ph_base["deployed_move"], (
-        "reactive base must NOT drift -- else it's a misconfig, not a forward discovery",
+        "reactive base must NOT drift at driftwood -- else it's a misconfig, not a forward discovery",
         base_move, ph_base["deployed_move"])
     assert fwd_move != ph_base["deployed_move"], (
         "the forward commoditisation bump must be what flips the move", base_move, fwd_move)
 
-    # 4. the SEAM: the forward signal drives the war-gamer, and the forward re-price
-    #    surfaces drift the reactive posture would have missed -> a proposed PR.
-    out = forward_into_wargamer(intel)
-    drifts = [r for r in out["rows"] if r["drift"]]
-    assert drifts, ("the forward signal must surface at least one drift the war-gamer "
-                    "re-tunes before the threat lands", out["rows"])
-    assert out["proposals"], "forward drift detected but the war-gamer proposed no PR"
-    for p in out["proposals"]:
-        assert p["merged"] is False and p["auto_merge"] is False, p  # propose, never dispose
-        assert "cross-check" in p["required_gate"], p                # rides the existing gate
-        assert p["signed"] is True and "Rekor" in p["identity"], p   # attestable identity
+    # 3b. the SAME forward signal, judged against ludlow's far stricter band, gives a
+    #     DIFFERENT verdict -- proof this is per-institution, not driftwood run thrice.
+    #     At ludlow: phishing does NOT drift (already Deny-leaning); ransomware
+    #     already drifts at the reactive BASE, before any forward bump at all.
+    tol_lud = wargamer.enforce.tolerance_for("ludlow")
+    ph_fwd_lud = next(r for r in forward_signal(intel, "ludlow")["risks"]
+                       if r["forward"]["component"] == "phishing-kits-aas")
+    rw_base = next(c for c in intel["components"] if c["id"] == "ransomware-aas")["base_risk"]
+    assert tcor.crossover(ph_fwd_lud, tol_lud)["chosen"] == ph_base["deployed_move"], (
+        "at ludlow's tighter band the phishing forward signal must NOT drift",
+        tcor.crossover(ph_fwd_lud, tol_lud)["chosen"], ph_base["deployed_move"])
+    assert tcor.crossover(rw_base, tol_lud)["chosen"] != rw_base["deployed_move"], (
+        "at ludlow's band even the reactive ransomware BASE must already drift",
+        tcor.crossover(rw_base, tol_lud)["chosen"], rw_base["deployed_move"])
+
+    # 4. the SEAM, run for the SET: the forward signal drives the war-gamer for every
+    #    institution, and each institution's own band decides its own drift + PRs --
+    #    three institutions, honestly three (here, different) sets, never one count.
+    out_all = forward_into_wargamer_all(intel)
+    assert set(out_all) == set(institutions()), (set(out_all), institutions())
+    total_drifts = total_props = 0
+    for org, out in out_all.items():
+        drifts = [r for r in out["rows"] if r["drift"]]
+        assert drifts, (org, "the forward signal must surface at least one drift the "
+                        "war-gamer re-tunes before the threat lands", out["rows"])
+        assert out["proposals"], (org, "forward drift detected but the war-gamer proposed no PR")
+        for p in out["proposals"]:
+            assert p["merged"] is False and p["auto_merge"] is False, p  # propose, never dispose
+            assert "cross-check" in p["required_gate"], p                # rides the existing gate
+            assert p["signed"] is True and "Rekor" in p["identity"], p   # attestable identity
+        total_drifts += len(drifts)
+        total_props += len(out["proposals"])
+    # the divergence, machine-checked: driftwood and ludlow must NOT drift on the
+    # identical control set, or the "own band" claim above is not actually wired in.
+    dw_drift_ids = {r["control"] for r in out_all["driftwood"]["rows"] if r["drift"]}
+    lud_drift_ids = {r["control"] for r in out_all["ludlow"]["rows"] if r["drift"]}
+    assert dw_drift_ids != lud_drift_ids, (
+        "driftwood and ludlow must not drift on the identical set -- the band, not the "
+        "signal, decides", dw_drift_ids, lud_drift_ids)
 
     print(
         "ok  Wardley map: %d components, %d flagged commoditising (movement, not position); "
-        "forward signal: %d attacker-capability(ies) re-priced (phishing collapse x%.2f); "
-        "fed through the war-gamer -> %d forward drift(s) -> %d PR(s) proposed, 0 merged, all gated."
+        "forward signal: %d attacker-capability(ies) re-priced (phishing collapse x%.2f), "
+        "per institution; fed through the war-gamer for %d institution(s) -> %d forward "
+        "drift(s) -> %d PR(s) proposed, 0 merged, all gated."
         % (len(mp["components"]),
            sum(1 for c in mp["components"] if c["commoditising"]),
            len(sig["risks"]), ph_fwd["forward"]["attack_cost_collapse_factor"],
-           len(drifts), len(out["proposals"]))
+           len(out_all), total_drifts, total_props)
     )
 
 
@@ -227,9 +301,12 @@ def selfcheck():
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = p.add_subparsers(dest="cmd", required=True)
-    for name in ("map", "forward-signal", "wargame"):
+    sub.add_parser("map").add_argument("--intel", default=INTEL)
+    for name in ("forward-signal", "wargame"):
         sp = sub.add_parser(name)
         sp.add_argument("--intel", default=INTEL)
+        sp.add_argument("--org", default=None,
+                         help="one institution; omit to run all three (driftwood, tuppence, ludlow)")
     sub.add_parser("selfcheck")
     args = p.parse_args(argv)
 
@@ -240,9 +317,11 @@ def main(argv=None):
     if args.cmd == "map":
         print(json.dumps(build_map(intel), indent=2))
     elif args.cmd == "forward-signal":
-        print(json.dumps(forward_signal(intel), indent=2))
+        out = forward_signal(intel, args.org) if args.org else forward_signal_all(intel)
+        print(json.dumps(out, indent=2))
     elif args.cmd == "wargame":
-        print(json.dumps(forward_into_wargamer(intel), indent=2))
+        out = forward_into_wargamer(intel, args.org) if args.org else forward_into_wargamer_all(intel)
+        print(json.dumps(out, indent=2))
 
 
 if __name__ == "__main__":
