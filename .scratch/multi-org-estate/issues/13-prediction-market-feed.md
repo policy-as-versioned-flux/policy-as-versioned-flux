@@ -1,7 +1,7 @@
 # 13 — Should the estate gain a prediction-market signal feed?
 
 Type: grilling
-Status: claimed (this session)
+Status: resolved
 Blocked by: 05
 
 ## Question
@@ -39,3 +39,27 @@ not be lost if it is reused here:
 
 Blocked by the scenario slate research, whose "what does the current feed miss" and "feed vs library"
 answers bear directly on whether this is a feed, a benchmark, or neither.
+
+## Answer
+
+Resolved by grilling, 2026-08-20. **Benchmark only — and in practice that means no estate work.**
+
+**The decision:** prediction-market price moves may grade the estate's *forecasts*; they may never
+price a control. A market price tells you what the world expects to happen; it says nothing about
+what a control costs *you*. Wiring price moves into the £ path would cross a line the project drew
+deliberately — the twin's own `CLAIM_SCOPE` states its market work evidences non-overconfidence in
+general world-forecasting and explicitly **not** £ pricing, the causal elasticities, Wardley
+propagation, or the org overlay. Honouring that boundary is worth more than a sixth feed.
+
+**Why this closes with nothing to build here.** The estate *does* emit forecasts — the AI-Wardley
+layer's projections are falsifiable claims ("this attacker capability reaches 0.96 within the
+horizon"). But nothing tradeable corresponds to them: the twin's own research
+(`.scratch/twin/research/prediction-markets.md`) already measured the overlap and found coverage of
+roughly **1 of 10 scenario families and 0% of the per-org overlay** — confirming markets are
+world-layer only. Scoring the estate's forward projections against a venue that trades none of them
+would be arithmetic without an answer.
+
+So the mechanism stays where it is, in `twin/market_signals.py`, under
+`price_levels_never_probabilities`. No sixth feed, no cross-project extraction, no shared library.
+If the estate ever emits forecasts a liquid venue actually trades, reopen this — the twin's connector
+is deliberately venue-agnostic and would accept an adapter without change.

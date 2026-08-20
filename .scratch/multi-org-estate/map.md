@@ -48,6 +48,15 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
 
 <!-- index of closed tickets; one line each, linking the ticket that holds the detail -->
 
+- [Do prediction markets belong in the £?](issues/13-prediction-market-feed.md) — **benchmark only,
+  and therefore no estate work**: markets may grade forecasts, never price a control. The twin's own
+  research measured the overlap at ~1 of 10 scenario families and 0% of the org overlay, so scoring
+  the estate's projections against a venue trading none of them is arithmetic without an answer. The
+  mechanism stays in the twin.
+- [The forward layer can only ever raise the bill](issues/15-monotone-pessimism.md) — **yes, via
+  cost-of-controls, gated on corroborated enactment.** A cheaper defence lowers what a control costs
+  to run, not attack frequency. The estate has no corroboration mechanism today (`deployed_move` is a
+  declared field, not evidence), so the gate must be built rather than borrowed.
 - [An institution answers to many masters](issues/17-many-obligation-sources.md) — overlap and
   duplication are **permanent and expected**, not to be normalised away; obligations scope
   **per-workload**, not per-institution; one breach can draw **several consequences** and the £ takes

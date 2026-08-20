@@ -1,7 +1,7 @@
 # 15 — The forward layer can only ever raise the bill
 
 Type: grilling
-Status: claimed (this session)
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -30,3 +30,29 @@ audience should distrust — and a CFO certainly will.
 
 Note `pqc-transport-migration` in the proposed slate is a defensive component and is inert *by this
 same rule*, so the slate has a worked example either way.
+
+## Answer
+
+Resolved by grilling, 2026-08-20. **Yes — through cost-of-controls, gated on corroborated enactment.**
+
+**1. The term is cost-of-controls, not LEF.** npm shipping default-off lifecycle scripts (Jul 2026)
+and revoking classic tokens (Dec 2025) genuinely lowers what a control *costs* to operate; it does not
+lower attack frequency. Reducing LEF would credit the wrong thing and double-count against the
+attacker-side commoditisation the layer already models. `tcor.py`'s `cost_of_controls` (`C_fix`,
+`C_cage` via `cage.TIERS[...]["cost"]`) is where a cheaper defence belongs.
+
+**2. Gated on corroborated enactment.** Crediting a defensive improvement nobody adopted is the
+unearned green this estate refuses — "this got cheaper in the world" and "we actually adopted it" are
+different claims. Mirror the twin's `pricing._credit()` shape, whose `NOT_ENACTED` constant refuses
+credit for an option with no corroborated enactment.
+
+**Note the estate's own mechanism is thinner than the twin's.** `wargamer.py:138` reads
+`risk.get("deployed_move", chosen)` — a *declared* field, defaulting to whatever the engine would
+have picked. That is an assertion, not corroboration: nothing checks the control is actually running.
+So the gate has to be built, not merely borrowed, and it should be honest about its evidence grade
+rather than treating a declared `deployed_move` as proof of enactment.
+
+**3. The asymmetry was real and is now named.** `forward_signal()` skips any component whose
+`actor != "attacker-capability"`, so `spiffe-workload-identity` sits on the map flagged commoditising
+and structurally incapable of moving any number. A forward layer that can only ever argue for
+spending more is one a CFO will eventually stop believing. Implementation raised as its own ticket.
