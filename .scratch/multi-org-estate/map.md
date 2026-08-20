@@ -95,6 +95,14 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
   reactive base; proposal counts are driftwood=2, tuppence=1, ludlow=1 (4 total, not 3× driftwood).
   `selfcheck()`'s vacuous `credential-stuffing-aas` assertion is fixed in place, isolated with a
   synthetic clone carrying a real `base_risk`.
+- [The researched scenario slate is landed, signed and machine-checked](issues/06-scenario-slate-implement.md) —
+  4 new `market-intel.json` components (2 fire: `agentic-commit-access` absorbed at `fix`,
+  `pkg-registry-worm` flips `cage->fix`; 2 loud-but-inert: `nb-refining-capacity` the ticket's
+  required non-firing entry, `pqc-transport-migration` F2's known-inert twin of
+  `spiffe-workload-identity`) plus `hyperscaler-region-concentration` in the standing library; the
+  unsafe "widen K" doc comment is corrected, K=4.0 unchanged. `verify-wardley.sh` / `verify-wargamer.sh`
+  / `verify-feeds.sh` all pass. F4 (`pq-cryptanalysis`'s never-cheapest `transfer`) stays open —
+  named in the research, not in this ticket's text.
 - [The exemption ledger is gone; the 28/28 denominator is confirmed, not moved](../govern-what-you-dont-control/issues/05-remove-the-exemption-ledger.md) —
   `verify-all.sh` drops `verify-exemption.sh` (offline count 26→**25**); the live beats are
   unchanged at 3, so the full `--live` total stays **28** (25 offline + 3 live). This map's
