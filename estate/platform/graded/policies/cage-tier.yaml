@@ -1,14 +1,24 @@
 # cage-tier — the graded enforcement envelope, at admission.
 #
-# EVERY pod always carries a cage spec — there is no uncaged state (ticket 08).
-# A behind-posture workload carries a cage TIER on its pod (`posture.acme.io/tier`,
-# one of baseline|restricted|quarantine — the tier the £ picked, see ../cage.py);
-# an in-currency workload carries none, and DEFAULTS to `baseline`, the loosest
+# EVERY pod that claims a policy version always carries a cage spec — there is
+# no uncaged state for that population (ticket 08). A behind-posture workload
+# carries a cage TIER on its pod (`posture.acme.io/tier`, one of
+# baseline|restricted|quarantine — the tier the £ picked, see ../cage.py); an
+# in-currency workload carries none, and DEFAULTS to `baseline`, the loosest
 # tier — the permissive floor, not an untouched state. This MUTATING policy
 # expands the (possibly defaulted) tier into the concrete DIALS and stamps them
-# onto the pod, so every workload keeps running, caged by degree. Deny is a
-# separate, bottom-rung decision (cage.py emits it only when even quarantine's
-# residual is over-band); this policy never denies.
+# onto the pod, so every claiming workload keeps running, caged by degree. Deny
+# is a separate, bottom-rung decision (cage.py emits it only when even
+# quarantine's residual is over-band); this policy never denies.
+#
+# SCOPE: only pods that claim a `policy-as-versioned.dev/policy-version` (the
+# matchConditions gate below, same convention as ../../posture/policies/
+# stamp-posture.yaml's `claims-a-policy-version`). A pod with no claim at all —
+# kube-system, Kyverno's own pods, Flux's controllers, cert-manager, any COTS
+# workload — is not matched, and so is not caged. Whether that permanently
+# unversioned population should also default to baseline is a real, separate
+# question, spun out to its own effort (ticket 02 answer #5); this gate is what
+# keeps that question actually open rather than silently decided by omission.
 #
 # TIERS OVER DIALS. The `dial` variable is the SAME table cage.py holds
 # (verify-graded.sh cross-checks the two never drift). The tier -> dials expansion
@@ -40,11 +50,17 @@ spec:
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["pods"]
-  # No matchConditions: every pod matched by resourceRules gets caged — there is
-  # no uncaged population. The tier is set upstream by the £ (cage.py) / the
-  # currency controller, never self-asserted for a LOOSENING: a missing label or
-  # an unrecognized value both fall through to `baseline`, the loosest tier —
-  # never to a no-op skip, which would be the exemption this project bans.
+  matchConditions:
+    # Every pod that claims a version is caged; a claim-less pod is not matched
+    # at all (system/COTS pods stay outside this policy's reach). Within the
+    # claiming population there is no uncaged sub-population and no self-
+    # asserted skip: the tier is set upstream by the £ (cage.py) / the currency
+    # controller, never by the pod itself for a LOOSENING — a missing label or
+    # an unrecognized value both fall through to `baseline`, the loosest tier,
+    # never to a no-op skip, which would be the exemption this project bans.
+    - name: claims-a-policy-version
+      expression: >-
+        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != ''
   variables:
     - name: rawTier
       expression: "object.metadata.?labels['posture.acme.io/tier'].orValue('baseline')"

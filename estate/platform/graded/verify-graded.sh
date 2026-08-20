@@ -9,8 +9,10 @@
 #      booked as residual (R'>0) + cost-of-controls (C_cage>0).
 #   2. cage-tier MUTATE test: a behind-posture pod is MUTATED INTO ITS CAGE (limits +
 #      PriorityClass on every tier; drop-ALL caps + read-only-fs + WAF sidecar on
-#      restricted/quarantine), NOT denied; an in-currency pod (no tier label) is
-#      ALSO caged, into baseline — there is no untouched state (ticket 08).
+#      restricted/quarantine), NOT denied; an in-currency pod (claims a version,
+#      no tier label) is ALSO caged, into baseline — no untouched state within the
+#      claiming population (ticket 08). A pod claiming NO policy version at all
+#      (system/COTS) is out of scope and skipped, not caged.
 #   3. cage-netpol GENERATE test: a caged pod triggers an egress-lockdown NetworkPolicy.
 #   4. drift guard: the Kyverno tier->dials map mirrors cage.py's TIERS table exactly.
 #   5. the eviction PriorityClasses are valid and ordered tighter = lower.
@@ -30,7 +32,7 @@ have kyverno || fail "kyverno CLI required for the offline cage proofs"
 say "1. offline: the £ engine — tiers/dials deterministic, £ picks the tier, TCoR booked"
 python3 "$HERE/cage.py" selfcheck || fail "cage.py selfcheck failed"
 
-say "2. offline: every pod is MUTATED INTO A CAGE (in-currency -> baseline), never denied"
+say "2. offline: every claiming pod is MUTATED INTO A CAGE (in-currency -> baseline), never denied; an unclaimed pod is skipped"
 kyverno test "$HERE/tests/cage-tier" >/dev/null || fail "cage-tier mutate matrix failed"
 
 say "3. offline: a caged pod GENERATES an egress-lockdown NetworkPolicy"

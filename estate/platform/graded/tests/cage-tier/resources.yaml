@@ -1,8 +1,15 @@
-# Four pods across the gradient. Each behind-posture pod carries the tier the £
-# (cage.py) picked; the in-currency pod carries no tier at all. The test asserts
-# every behind pod is MUTATED INTO ITS CAGE (never denied), and the in-currency
-# pod is caged too — into baseline, the loosest tier, the permissive default.
-# There is no untouched state: every workload always carries a cage spec.
+# Five pods across the gradient. Each behind-posture pod carries the tier the £
+# (cage.py) picked; the in-currency pod carries a policy-version claim but no
+# tier. The test asserts every behind pod is MUTATED INTO ITS CAGE (never
+# denied), and the in-currency pod is caged too — into baseline, the loosest
+# tier, the permissive default. There is no untouched state *for the claiming
+# population*: every workload that claims a policy version always carries a
+# cage spec.
+#
+# `unclaimed-system` carries NO `policy-as-versioned.dev/policy-version` label
+# at all — a stand-in for kube-system/Kyverno/Flux/cert-manager/COTS pods. It
+# is genuinely out of scope (matchConditions skip), proving the gate, not just
+# prose, keeps unversioned workloads out of this policy's reach.
 apiVersion: v1
 kind: Pod
 metadata:
@@ -42,7 +49,8 @@ spec:
     - name: app
       image: nginx
 ---
-# In currency: no self-asserted tier. Defaults to baseline (the permissive floor).
+# In currency: claims a policy version but no self-asserted tier. Defaults to
+# baseline (the permissive floor).
 apiVersion: v1
 kind: Pod
 metadata:
@@ -50,6 +58,19 @@ metadata:
   namespace: default
   labels:
     policy-as-versioned.dev/policy-version: "2.0.0"
+spec:
+  containers:
+    - name: app
+      image: nginx
+---
+# Unclaimed: no `policy-as-versioned.dev/policy-version` label at all — a
+# stand-in for a system/COTS pod. The matchConditions gate excludes it; the
+# policy does not match, so it is not mutated.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unclaimed-system
+  namespace: kube-system
 spec:
   containers:
     - name: app

@@ -3,9 +3,13 @@
 # denied. The result is `pass` (a mutation applied) with patchedResources proving
 # the cage is present (limits + eviction PriorityClass on every tier; drop-ALL
 # caps + read-only-fs + WAF sidecar on restricted/quarantine) — there is NO Deny
-# anywhere. A pod in currency (no tier label at all) is ALSO mutated — into
-# baseline, the loosest tier — proving there is no untouched state: every
-# workload always carries a cage spec.
+# anywhere. A pod in currency (claims a version, no tier label) is ALSO mutated —
+# into baseline, the loosest tier — proving there is no untouched state *within
+# the claiming population*: every workload that claims a policy version always
+# carries a cage spec. `unclaimed-system` claims no version at all and is
+# `skip`ped — the matchConditions gate, not prose, is what keeps unversioned/
+# system/COTS pods out of scope (ticket 02 answer #5 stays a real open question,
+# not one the mutation has already answered).
 apiVersion: cli.kyverno.io/v1alpha1
 kind: Test
 metadata:
@@ -21,3 +25,8 @@ results:
     resources: [behind-baseline, behind-restricted, behind-quarantine, in-currency]
     patchedResources: patched.yaml
     result: pass
+  - policy: cage-tier
+    rule: cage-tier
+    kind: Pod
+    resources: [unclaimed-system]
+    result: skip
