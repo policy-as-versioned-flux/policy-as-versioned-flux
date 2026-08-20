@@ -42,6 +42,7 @@ OFFLINE=(
   "break-glass demands step-up by the £|estate/platform/break-glass/verify-break-glass.sh"
   "EUD device trust on the same root (vTPM, narrated-virtual)|estate/platform/eud/verify-eud.sh"
   "PROVENANCE: every actor attestable to one root|estate/verify/provenance/verify-provenance.sh"
+  "roles: is data, machine-checked against the filesystem|estate/verify/party/verify-party.sh"
 )
 # beat | script  (live — need a reconciled cluster; SKIP-live if absent)
 LIVE=(

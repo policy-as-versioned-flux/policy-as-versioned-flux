@@ -1,5 +1,5 @@
 {
-  "note": "Risk appetite = the ground and the scoreboard. Per-institution tolerance limit in GBP/year. Enforcement is binary here (Audit vs Deny): a control's residual risk-bought (ALE_warn - ALE_deny) above the org's tolerance MUST escalate Audit->Deny; below it, Audit is proportionate. This is the number that justifies the flip - never a timer, never a date. Ordering is locked by the-whole-model: ludlow strictest (Deny-heavy, long-life health data), driftwood loosest (Audit-heavy, short-life cart data).",
+  "note": "Risk appetite = the ground and the scoreboard. Per-org tolerance limit in GBP/year. Enforcement is binary here (Audit vs Deny): a control's residual risk-bought (ALE_warn - ALE_deny) above the org's tolerance MUST escalate Audit->Deny; below it, Audit is proportionate. This is the number that justifies the flip - never a timer, never a date. Ordering is locked by the-whole-model: ludlow strictest (Deny-heavy, long-life health data), driftwood loosest (Audit-heavy, short-life cart data). `platform` is marked `root_of_trust` -- it is a risk-bearer (see CONTEXT.md 'Role'), not an institution; ../verify/party/party.py derives the institution count as risk-bearer+adopter-but-not-publisher, so this fourth entry does not move it.",
   "orgs": {
     "driftwood": {
       "tolerance": 40000,
@@ -12,6 +12,11 @@
     "ludlow": {
       "tolerance": 5000,
       "why": "US health, HIPAA, decades-confidential. Strictest appetite: near-zero tolerance, so the same control that Audits in driftwood Denies here."
+    },
+    "platform": {
+      "tolerance": 10000,
+      "root_of_trust": true,
+      "why": "The governance apparatus is the estate's root of trust, priced by the same engine it prices everyone else with (see honesty/reflexive.py). Strict band: a compromise mis-prices/mis-enforces the whole estate, so signed feeds + bounded proposer + the PR gate must be mandatory, not optional -- the model says so."
     }
   }
 }

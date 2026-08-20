@@ -1,9 +1,0 @@
-{
-  "note": "Risk appetite for the apparatus ITSELF, same shape as ../../risk/appetite.json so ../../risk/enforce.py scores the platform with no new engine. Kept local to honesty/ rather than editing the shared appetite store — this ticket owns the reflexive machinery, sibling tickets own that file. The apparatus is a root of trust, so its band is strict (£10k): well under what its own compromise would buy, forcing its integrity controls to be mandatory under its own model.",
-  "orgs": {
-    "platform": {
-      "tolerance": 10000,
-      "why": "The governance apparatus is the estate's root of trust. Strict band: a compromise mis-prices/mis-enforces the whole estate, so signed feeds + bounded proposer + the PR gate must be mandatory, not optional — the model says so."
-    }
-  }
-}
