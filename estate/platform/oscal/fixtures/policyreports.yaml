@@ -8,8 +8,8 @@
 # results[].policy) so one component-definition maps all coexisting versions.
 #
 # Three subjects: a compliant Pod (pass), the legacy-till one-off (FAIL -> the
-# not-satisfied observation the ledger's risk links to), and a Crossplane RDS
-# (pass) to show the keying is plane-agnostic.
+# not-satisfied observation ../graded/cage.py's risk links to), and a Crossplane
+# RDS (pass) to show the keying is plane-agnostic.
 ---
 apiVersion: wgpolicyk8s.io/v1alpha2
 kind: PolicyReport

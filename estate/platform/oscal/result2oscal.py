@@ -14,13 +14,13 @@ It carries the two ADR-0009 shims inline (proven in spikes/c2p-validatingpolicy-
   2. Coexisting versions deploy as `<policy>-<version>` -> strip the version
      suffix off results[].policy so one component-definition maps every version.
 
-The up-flow only means something if the chain RESOLVES: the ledger (05,
-../policy/render-exemption.py) emits a `risk` whose related-observations points at
-"the not-satisfied observation for the failing check". To guarantee that pointer
-lands, this module derives the observation uuid for a ledger-covered failure from
-render-exemption's OWN `observation_uuid` (single source of truth) — so
-`risk.related-observations[].observation-uuid` is byte-identical to an observation
-we emit here. verify-upflow.sh asserts exactly that join.
+The up-flow only means something if the chain RESOLVES: a cage (05, ../graded/
+cage.py) emits a `risk` whose related-observations points at "the not-satisfied
+observation for the failing check". To guarantee that pointer lands, every
+observation here uses cage.py's own `observation_uuid` formula (single source
+of truth) — so `risk.related-observations[].observation-uuid` is byte-identical
+to an observation we emit here. verify-upflow.sh (and this module's own
+selfcheck) assert exactly that join.
 
 Usage:
     result2oscal.py [fixtures/policyreports.yaml ...]   # print assessment-results
@@ -29,7 +29,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
 import re
 import sys
@@ -41,19 +40,13 @@ import yaml
 HERE = Path(__file__).resolve().parent
 COMP_DEF = HERE / "component-definition.json"
 FIXTURES = HERE / "fixtures" / "policyreports.yaml"
-POLICY_DIR = HERE.parent / "policy"
-LEDGER = POLICY_DIR / "ledger" / "exemptions.yaml"
-RENDER = POLICY_DIR / "render-exemption.py"
+
+# cage.py (ticket 05) owns the shared OSCAL uuid namespace + observation_uuid
+# formula — reuse it rather than a second copy that could drift.
+sys.path.insert(0, str(HERE.parent / "graded"))
+import cage  # noqa: E402
 
 _SUFFIX = re.compile(r"-\d+-\d+-\d+$")  # slugified semver suffix, e.g. -1-0-0
-
-
-def _load_render():
-    """Import ../policy/render-exemption.py for the shared uuid namespace + formula."""
-    spec = importlib.util.spec_from_file_location("render_exemption", RENDER)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
 
 
 def check_to_control(comp_def: dict) -> dict[str, str]:
@@ -84,12 +77,9 @@ def _subject(scope: dict) -> tuple[str, str]:
     return (f"{ns}/{name}" if ns else name), scope.get("kind", "")
 
 
-def convert(reports: list[dict], comp_def: dict, entries: list[dict], render) -> dict:
+def convert(reports: list[dict], comp_def: dict) -> dict:
     """PolicyReports -> OSCAL assessment-results (observations + findings)."""
     c2c = check_to_control(comp_def)
-    # ledger index: (policy, namespace) -> entry, so a covered FAIL borrows the
-    # exact observation uuid the ledger's risk will point at.
-    led = {(e["policy"], e["namespace"]): e for e in entries}
 
     observations: list[dict] = []
     # control-id -> {"obs": [uuids], "any_fail": bool}
@@ -104,12 +94,10 @@ def convert(reports: list[dict], comp_def: dict, entries: list[dict], render) ->
             control = c2c.get(base)
             if control is None:
                 continue  # policy not mapped to a control; not our concern
-            entry = led.get((base, scope.get("namespace", ""))) if result == "fail" else None
-            if entry is not None:
-                obs_uuid = render.observation_uuid(entry)  # THE join to the risk
-            else:
-                obs_uuid = str(uuid.uuid5(render.NS, f"obs:{subj_title}:{base}"))
-            subj_uuid = str(uuid.uuid5(render.NS, f"subject:{scope.get('uid', subj_title)}"))
+            # cage.py's formula: the ONE observation id for this subject+check —
+            # a cage's OSCAL risk (../graded/cage.py) points back at exactly this.
+            obs_uuid = cage.observation_uuid(subj_title, base)
+            subj_uuid = str(uuid.uuid5(cage.NS, f"subject:{scope.get('uid', subj_title)}"))
             obs = {
                 "uuid": obs_uuid,
                 "description": f"{r['policy']} {result} on {subj_kind} {subj_title}",
@@ -127,8 +115,6 @@ def convert(reports: list[dict], comp_def: dict, entries: list[dict], render) ->
                     {"name": "result", "value": result},
                 ],
             }
-            if entry is not None:
-                obs["props"].append({"name": "exemption", "value": entry["id"]})
             observations.append(obs)
             slot = by_control.setdefault(control, {"obs": [], "any_fail": False})
             slot["obs"].append(obs_uuid)
@@ -138,7 +124,7 @@ def convert(reports: list[dict], comp_def: dict, entries: list[dict], render) ->
     for control, slot in sorted(by_control.items()):
         state = "not-satisfied" if slot["any_fail"] else "satisfied"
         findings.append({
-            "uuid": str(uuid.uuid5(render.NS, f"finding:{control}")),
+            "uuid": str(uuid.uuid5(cage.NS, f"finding:{control}")),
             "title": f"{control} is {state}",
             "target": {
                 "type": "statement-id",
@@ -150,7 +136,7 @@ def convert(reports: list[dict], comp_def: dict, entries: list[dict], render) ->
 
     return {
         "assessment-results": {
-            "uuid": str(uuid.uuid5(render.NS, "assessment-results:pavf")),
+            "uuid": str(uuid.uuid5(cage.NS, "assessment-results:pavf")),
             "metadata": {
                 "title": "policy-as-versioned-flux — control satisfaction (C2P result2oscal)",
                 "last-modified": "2026-07-31T00:00:00Z",
@@ -160,7 +146,7 @@ def convert(reports: list[dict], comp_def: dict, entries: list[dict], render) ->
             "import-ap": {"href": ""},
             "results": [
                 {
-                    "uuid": str(uuid.uuid5(render.NS, "result:pavf")),
+                    "uuid": str(uuid.uuid5(cage.NS, "result:pavf")),
                     "title": "Kyverno PolicyReport ingest",
                     "description": "Observations + findings normalised from wgpolicyk8s.io PolicyReports.",
                     "start": "2026-07-31T00:00:00Z",
@@ -182,15 +168,12 @@ def load_reports(paths: list[str]) -> list[dict]:
 
 
 def build(paths: list[str] | None = None) -> dict:
-    render = _load_render()
     comp_def = json.loads(COMP_DEF.read_text())
-    entries = render.load_entries(LEDGER) if LEDGER.exists() else []
     reports = load_reports(paths or [str(FIXTURES)])
-    return convert(reports, comp_def, entries, render)
+    return convert(reports, comp_def)
 
 
 def selfcheck() -> None:
-    render = _load_render()
     doc = build()
     res = doc["assessment-results"]["results"][0]
     obs, finds = res["observations"], res["findings"]
@@ -200,26 +183,29 @@ def selfcheck() -> None:
     assert fmap["nist-800-53:AC-6"] == "not-satisfied", fmap   # legacy-till fails
     assert fmap["nist-800-53:CM-6"] == "satisfied", fmap       # RDS passes
 
-    # THE up-flow join: the ledger's risk related-observation resolves to an
+    # THE up-flow join: a cage's risk related-observation resolves to an
     # observation we emit here (identical uuid), by construction not by luck.
-    entry = render.load_entries(LEDGER)[0]
-    risk = render.oscal_risk(entry)
+    # No ledger — legacy-till fails the conditional policy's condition C, so
+    # ../graded/cage.py prices and cages the residual instead of exempting it.
+    root_sc = cage.fair.load(str(HERE.parent / "policy" / "scenarios" / "driftwood-root-residual.json"))
+    till = cage.select(root_sc, "driftwood", cage.enforce.tolerance_for("driftwood"), mode="warn")
+    risk = cage.oscal_risk(till, subject="shop/legacy-till-0", policy="may-run-root-if-attested",
+                            control="nist-800-53:AC-6")
     linked = risk["related-observations"][0]["observation-uuid"]
     emitted = {o["uuid"] for o in obs}
     assert linked in emitted, f"broken chain: risk points at {linked}, not among {emitted}"
 
-    # that resolved observation is the failing one, carries the exemption id, and
-    # its control's finding is not-satisfied (evidence -> verdict -> risk).
+    # that resolved observation is the failing one, and its control's finding
+    # is not-satisfied (evidence -> verdict -> risk).
     linked_obs = next(o for o in obs if o["uuid"] == linked)
     assert {"name": "result", "value": "fail"} in linked_obs["props"], linked_obs
-    assert {"name": "exemption", "value": entry["id"]} in linked_obs["props"], linked_obs
     ac6 = next(f for f in finds if f["target"]["target-id"] == "nist-800-53:AC-6")
     assert {"observation-uuid": linked} in ac6["related-observations"], ac6
 
     # determinism: re-render is byte-identical.
     assert build() == doc, "not deterministic"
     print(f"selfcheck ok: {len(obs)} observations, {len(finds)} findings; "
-          f"AC-6 not-satisfied, CM-6 satisfied; risk->observation {linked[:8]} resolves")
+          f"AC-6 not-satisfied, CM-6 satisfied; cage risk->observation {linked[:8]} resolves")
 
 
 def main(argv: list[str]) -> int:

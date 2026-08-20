@@ -18,8 +18,17 @@ truth for:
      in loose-appetite driftwood, quarantine in strict-appetite ludlow.
 
   3. TCoR EMITTED. Total Cost of Risk of the chosen cage = caged residual +
-     cost-of-controls (the cage's run-cost). Booked to the ledger, same shape the
-     nist OSCAL risk / ico penalty consumers read.
+     cost-of-controls (the cage's run-cost). Booked as a risk line, same shape
+     the nist OSCAL risk / ico penalty consumers read.
+
+  4. OSCAL RISK EMITTED (ticket 05). A workload that fails a conditional
+     policy's condition C used to get a ledger entry and a PolicyException —
+     banned outright (CONTEXT.md). It gets a cage instead, and THIS module
+     produces the OSCAL `risk` object for it, taking over from the deleted
+     render-exemption.py: the cage already knows the tier, the residual and
+     the workload, exactly what the risk object needs, so the evidence comes
+     from the thing actually constraining the workload, not a document
+     asserting an intention. See oscal_risk() below.
 
 Reuses ../fair/fair.py (the £ maths) and ../risk/enforce.py (the appetite band).
 No new risk engine, no new appetite store.
@@ -35,6 +44,7 @@ import argparse
 import json
 import os
 import sys
+import uuid
 
 # Reuse the £ engine and the appetite band — single sources of truth, one dir over.
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -116,9 +126,15 @@ def select_tier(uncaged_ale, tolerance):
     return "deny"
 
 
-def select(scenario, org, tolerance):
-    """Full graded decision for a behind-posture workload + its TCoR ledger line."""
-    st = fair.state(scenario, "behind")
+def select(scenario, org, tolerance, mode="behind"):
+    """Full graded decision for a workload's residual + its TCoR risk line.
+
+    `mode` picks which control-state block of the scenario is the UNCAGED
+    residual: "behind" (default) for posture-drift scenarios, "warn" for a
+    conditional-policy's root branch (the deviation is in place — same
+    convention render-exemption.py used to price a ledger entry's residual).
+    """
+    st = fair.state(scenario, mode)
     uncaged = fair.summarize(fair.simulate(st["lef"], st["lm"]))["ale"]
     tier = select_tier(uncaged, tolerance)
     out = {
@@ -145,6 +161,82 @@ def select(scenario, org, tolerance):
         f"= TCoR £{out['tcor']['tcor']:,.0f} (fits band £{tolerance:,.0f})"
     )
     return out
+
+
+# --- OSCAL risk (ticket 05: the cage is the producer, replacing render-exemption.py) --
+# Deterministic UUIDs so re-rendering an unchanged decision is stable (git-diff
+# clean). Kept beside oscal_risk() so the risk<->observation join is guaranteed
+# by construction: whoever builds an observation for a check result (see
+# ../oscal/result2oscal.py) imports observation_uuid() from HERE, the one place
+# that also builds the risk pointing back at it.
+NS = uuid.UUID("d5f0e0b2-0000-4000-8000-706176662d64")  # constant "pavf" namespace
+RISK_SYS = "https://pavf.dev/ns/risk"
+GBP_SYS = "https://pavf.dev/ns/risk/gbp"
+
+
+def observation_uuid(subject, policy):
+    """Stable id of the "this check failed for this subject" C2P observation."""
+    return str(uuid.uuid5(NS, f"obs:{subject}:{policy}"))
+
+
+def oscal_risk(result, *, subject, policy, control):
+    """A Cage decision -> its OSCAL `risk` object (assessment-results / POA&M shared).
+
+    Only a Cage decision carries a risk: Deny closes the loss path, so there is
+    nothing retained to report. `result` is select()'s return value; `subject` is
+    "namespace/name" (the PolicyReport scope convention), `policy` the unsuffixed
+    check id, `control` the NIST control it evidences.
+
+    Status is "open" (a live OSCAL POA&M status), not "deviation-approved": the
+    cage does not except the workload from the policy — the check still fails —
+    it wraps the workload with compensating controls and prices what survives.
+    No `deadline`: caging is not time-boxed (ADR-0006, no time-conditional
+    verdicts); a cage is re-evaluated by a reviewed PR, not a clock.
+    """
+    if result["action"] != "Cage":
+        raise ValueError(f"no risk object for action={result['action']!r} — nothing is retained")
+    tcor = result["tcor"]
+    org = result["org"]
+    owner_uuid = str(uuid.uuid5(NS, f"party:{org}"))
+    return {
+        "uuid": str(uuid.uuid5(NS, f"risk:cage:{org}:{subject}:{policy}")),
+        "title": f"{subject}: {policy} caged at {result['tier']} in {org}",
+        "description": result["reason"],
+        "statement": f"Conditional control {policy} is not satisfied for {subject}; "
+                     f"a {result['tier']} cage implements the control on its behalf "
+                     f"and the residual is retained, priced, not carved out.",
+        "props": [
+            {"name": "policy", "value": policy},
+            {"name": "control", "value": control},
+            {"name": "cage-tier", "value": result["tier"]},
+        ],
+        "status": "open",
+        "origins": [{"actors": [{"type": "party", "actor-uuid": owner_uuid}]}],
+        "characterizations": [{
+            "origin": {"actors": [{"type": "party", "actor-uuid": owner_uuid}]},
+            "facets": [
+                {"name": "likelihood", "system": RISK_SYS, "value": "likely"},
+                {"name": "impact", "system": RISK_SYS, "value": "high"},
+                {
+                    "name": "annualised-loss-expectancy", "system": GBP_SYS,
+                    "value": str(round(tcor["residual"])),
+                    "props": [
+                        {"name": "currency", "value": "GBP"},
+                        {"name": "basis", "value": "caged-residual"},
+                        {"name": "cost-of-controls", "value": str(round(tcor["cost_of_controls"]))},
+                    ],
+                },
+            ],
+        }],
+        "remediations": [{
+            "uuid": str(uuid.uuid5(NS, f"rem:cage:{org}:{subject}:{policy}")),
+            "lifecycle": "implemented",
+            "title": f"{result['tier']} cage",
+            "description": result["reason"],
+            "props": [{"name": "type", "value": "mitigate"}],
+        }],
+        "related-observations": [{"observation-uuid": observation_uuid(subject, policy)}],
+    }
 
 
 # --- CLI ----------------------------------------------------------------------
@@ -198,12 +290,38 @@ def cmd_selfcheck(_args):
     assert dw["action"] == "Cage" and lud["action"] == "Cage", (dw, lud)
     assert ORDER.index(dw["tier"]) < ORDER.index(lud["tier"]), (dw["tier"], lud["tier"])
 
+    # 6. OSCAL risk (ticket 05): a workload that fails a conditional policy's
+    #    condition C is caged (mode="warn" = the deviation in place, same
+    #    convention render-exemption.py used), and the cage's own decision
+    #    produces a valid, joinable OSCAL risk — no ledger involved.
+    root_sc = fair.load(os.path.join(HERE, "..", "policy", "scenarios", "driftwood-root-residual.json"))
+    till = select(root_sc, "driftwood", enforce.tolerance_for("driftwood"), mode="warn")
+    assert till["action"] == "Cage", till  # this scenario+org fits under a cage, not Deny
+    risk = oscal_risk(till, subject="shop/legacy-till-0", policy="may-run-root-if-attested",
+                       control="nist-800-53:AC-6")
+    assert risk["status"] == "open", risk["status"]
+    assert "deadline" not in risk, "a cage is not time-boxed (ADR-0006)"
+    assert risk["remediations"][0]["props"][0] == {"name": "type", "value": "mitigate"}
+    ale_facets = [f for f in risk["characterizations"][0]["facets"]
+                  if f["name"] == "annualised-loss-expectancy"]
+    assert len(ale_facets) == 1 and int(ale_facets[0]["value"]) == round(till["tcor"]["residual"])
+    assert risk["related-observations"][0]["observation-uuid"] == \
+        observation_uuid("shop/legacy-till-0", "may-run-root-if-attested")
+    assert oscal_risk(till, subject="shop/legacy-till-0", policy="may-run-root-if-attested",
+                       control="nist-800-53:AC-6") == risk, "not deterministic"
+    try:
+        oscal_risk(dict(till, action="Deny"), subject="x", policy="y", control="z")
+        raise AssertionError("oscal_risk must refuse a Deny decision — nothing is retained")
+    except ValueError:
+        pass
+
     print(
         "ok  tiers %s | £ picks: band40k->%s band20k->%s band5k->%s band1k->deny | "
-        "scenario £%.0f: driftwood->%s (TCoR £%.0f), ludlow->%s (TCoR £%.0f)"
+        "scenario £%.0f: driftwood->%s (TCoR £%.0f), ludlow->%s (TCoR £%.0f) | "
+        "legacy-till (warn) -> %s cage, OSCAL risk open £%s -> observation resolves"
         % (ORDER, "baseline", "restricted", "quarantine",
            dw["uncaged_residual"], dw["tier"], dw["tcor"]["tcor"],
-           lud["tier"], lud["tcor"]["tcor"])
+           lud["tier"], lud["tcor"]["tcor"], till["tier"], ale_facets[0]["value"])
     )
 
 

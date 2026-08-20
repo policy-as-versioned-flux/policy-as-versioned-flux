@@ -12,9 +12,10 @@
 # non-root — that residual is what feeds the £ (scenarios/driftwood-root-residual.json).
 #
 # A genuine one-off that CANNOT meet C (legacy firmware needing CAP_NET_RAW) is
-# NOT a branch here — it is a priced, expiring ledger entry -> PolicyException
-# (../ledger, ../render-exemption.py). Conditional policy is the rule; the ledger
-# is the reserved exception.
+# NOT a carve-out (CONTEXT.md bans those outright, at any scope, under any name)
+# — it still fails this check. It is caged instead: ../graded/cage.py prices the
+# residual, picks the tier, and produces the OSCAL risk object for it
+# (ticket 05). Conditional policy is the rule; the cage is what a one-off gets.
 apiVersion: policies.kyverno.io/v1alpha1
 kind: ValidatingPolicy
 metadata:

@@ -104,13 +104,13 @@ personal favour — anyone who meets C gets the same treatment:
 
 ```sh
 estate/platform/policy/verify-conditional.sh   # run root IF attested AND hardened
-estate/platform/policy/verify-exemption.sh     # no ledger entry -> no exception (literal)
 ```
 
 <!--
-The one genuine one-off is a git ledger entry that RENDERS a PolicyException
-(Flux prune + cleanup.kyverno.io/ttl backstop). That same ledger entry generates
-the OSCAL risk object in Beat 5. Exemptions dissolve into policy.
+The one genuine one-off (cannot meet C) is NOT a carve-out — CONTEXT.md bans
+those outright. It is caged: ../graded/cage.py prices the residual and picks
+the tier, and that same cage decision generates the OSCAL risk object in
+Beat 5. Exemptions dissolve into policy; what can't meet a rule gets caged.
 -->
 
 ---

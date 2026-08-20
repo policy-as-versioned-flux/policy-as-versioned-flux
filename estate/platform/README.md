@@ -11,7 +11,8 @@ What lives here (built across later tickets — this is the skeleton):
   notification event spine. *(ticket 03)*
 - **FAIR risk engine** — `(min,mode,max)` → beta-PERT → Monte-Carlo → ALE ·
   VaR₉₅ · TVaR + risk load. *(ticket 01)*
-- **ledger → PolicyException render** and the OSCAL `risk`/POA&M up-flow.
+- **the cage → OSCAL `risk`/POA&M up-flow** — a one-off that fails a check is
+  caged, priced, never exempted (no ledger; banned outright, see `CONTEXT.md`).
 - **shift-left harness** — ±1 version-skew off the `ResourceSet` array.
 - **war-gamer + AI-Wardley** — collect → war-game → signed policy PR
   (propose-never-dispose).
