@@ -1,0 +1,25 @@
+{
+  "note": "Independent enactment corroboration for the defensive-commoditisation forward signal (ticket 19). Deliberately a SEPARATE file from market-intel.json: market-intel.json is platform's own commoditisation CLAIM (published_by: platform), signed with the feeds key, and a claim cannot corroborate itself -- mirroring the twin project's declared_by_subject / NOT_ENACTED gate (twin/corroboration.py), scaled to what this estate can check offline. No live cluster, no multi-channel evidence ladder: one independent channel, or none. A component missing here, or carrying declared_by_subject: true, or naming an evidence path that does not resolve on disk, all read as NOT corroborated. Fail closed -- no credit.",
+  "components": {
+    "spiffe-workload-identity": {
+      "links_control": "stolen-laptop-unattested-device",
+      "control_risk": {
+        "id": "stolen-laptop-unattested-device",
+        "name": "device: stolen/unmanaged laptop reaches a gated op",
+        "note": "the same risk ../wargamer/scenarios/human-device.json deploys at cage via SPIRE tpm_devid / Secure-Enclave device SVID caps -- copied here rather than re-signed into market-intel.json (which would need re-signing every other feed the shared feeds key covers). A commoditising SPIFFE/SPIRE stack makes both the fully-remediating fix and the compensating cage's own run-cost cheaper; neither warn nor behind LEF moves.",
+        "deployed_move": "cage",
+        "warn": {"lef": [1, 3, 7], "lm": [15000, 60000, 200000]},
+        "behind": {"lef": [1, 2, 4], "lm": [15000, 60000, 200000]},
+        "deny": {"lef": [0, 0, 1], "lm": [15000, 60000, 200000]},
+        "costs": {"fix": 55000, "deny": 90000, "transfer": {"load": 0.7, "deductible": 40000}}
+      },
+      "declared_by_subject": false,
+      "channel": "identity-ops-attestation",
+      "observed": "SPIRE (server+agent+controller) ships Ready and mesh PeerAuthentication is STRICT -- every accepted connection already carries a SPIRE-signed SPIFFE identity. This is visible as already-merged, reviewed infrastructure-as-code, independent of the market-intel commoditisation claim that would credit it.",
+      "evidence": [
+        "../identity/spire/helmrelease.yaml",
+        "../identity/istio/peerauthentication-strict.yaml"
+      ]
+    }
+  }
+}

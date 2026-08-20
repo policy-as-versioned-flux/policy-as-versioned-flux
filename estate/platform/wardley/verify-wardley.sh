@@ -3,8 +3,10 @@
 # (not mere position), collapses a commoditising attacker-capability into a
 # FORWARD signal PER INSTITUTION, and feeds each straight through the war-gamer
 # against its own band so proportionality re-tunes BEFORE the threat lands, three
-# institutions honestly (possibly) apart -- and the map update is an attestable,
-# tamper-evident commit." Offline, no cluster. Needs python3 + openssl.
+# institutions honestly (possibly) apart; a commoditising DEFENSIVE capability
+# lowers cost-of-controls instead, gated fail-closed on corroborated enactment
+# (ticket 19) -- and the map update is an attestable, tamper-evident commit."
+# Offline, no cluster. Needs python3 + openssl.
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 pub="$here/../feeds/keys/feeds-signing-key.pub.pem"
@@ -77,8 +79,45 @@ print(f'ok  {total_drifts} forward drift(s) across {len(out)} institution(s) -> 
 say "5. the projection + seam asserts (base does NOT drift; the forward bump does)"
 python3 "$here/wardley.py" selfcheck || fail "wardley selfcheck failed"
 
+say "6. the enactment guard bites: a planted violation earns spiffe-workload-identity NO credit"
+python3 -c "
+import copy, json, sys
+sys.path.insert(0, '$here')
+import wardley
+
+intel = wardley.load()
+enact = wardley.load_enactment()
+
+def credited(doc):
+    risks = wardley.forward_signal(intel, 'driftwood', enactment=doc)['risks']
+    return 'spiffe-workload-identity' in {
+        r['forward']['component'] for r in risks if 'control_cost_collapse_factor' in r['forward']
+    }
+
+# the honest baseline: corroborated, credited.
+assert credited(enact) is True, 'the genuinely corroborated case must be credited'
+print('ok  corroborated enactment -> spiffe-workload-identity IS credited')
+
+# plant a violation: the corroboration entry, self-declared instead of independently observed.
+violation = copy.deepcopy(enact)
+violation['components']['spiffe-workload-identity']['declared_by_subject'] = True
+assert credited(violation) is False, 'a self-declared claim must not corroborate itself'
+print('ok  planted violation (self-declared claim) -> spiffe-workload-identity earns NO credit')
+
+# plant a second violation: evidence that does not resolve on disk.
+violation2 = copy.deepcopy(enact)
+violation2['components']['spiffe-workload-identity']['evidence'] = ['../does-not-exist.yaml']
+assert credited(violation2) is False, 'evidence that does not resolve on disk must not corroborate'
+print('ok  planted violation (forged evidence path) -> spiffe-workload-identity earns NO credit')
+
+verdict = wardley.corroborated_enactment('spiffe-workload-identity', violation)
+assert verdict == {'corroborated': False, 'reason': wardley.NOT_ENACTED, 'detail': verdict['detail']}
+print(f\"ok  named reason: {verdict['reason']} -- {verdict['detail']}\")
+" || fail "the enactment guard did not bite as expected"
+
 echo
 echo "PASS: market intel mapped, commoditisation MOVEMENT flagged, the forward signal"
 echo "re-priced ahead of the reactive feeds PER INSTITUTION and fed through the war-gamer"
-echo "to a signed, gated, never-merged PR (each institution against its own band) --"
-echo "and the map update is a signed, tamper-evident commit."
+echo "to a signed, gated, never-merged PR (each institution against its own band); a"
+echo "commoditising defence lowers cost-of-controls only on corroborated enactment, and a"
+echo "planted violation is refused -- and the map update is a signed, tamper-evident commit."

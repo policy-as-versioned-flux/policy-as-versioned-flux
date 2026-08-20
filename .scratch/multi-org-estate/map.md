@@ -109,6 +109,14 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
   destination already named 28 as the target, so removing the banned ledger lands on the same
   number rather than moving it. Offline-only (`estate/talk/verify-all.sh`, no cluster) is 25 beats,
   not 26.
+- [A commoditising defence lowers the bill, gated on corroborated enactment](issues/19-defensive-commoditisation.md) —
+  `forward_signal()` now discounts C_fix / C_cage (`../tcor/tcor.py`'s new `costs.cage_discount`) for a
+  commoditising DEFENSIVE capability, but only once a new, deliberately-unsigned
+  `wardley/enactment.json` corroborates it independently of `market-intel.json`'s own claim;
+  `spiffe-workload-identity` (the test case) moves from £19,103 to £15,830 TCoR at driftwood, and three
+  planted violations (no record, self-declared, forged evidence) each earn it nothing.
+  `pqc-transport-migration` stays the negative control, unlinked on purpose. `wargamer.py:138`'s own
+  general self-declaration is unchanged — out of scope for this ticket.
 
 ## Not yet specified
 
