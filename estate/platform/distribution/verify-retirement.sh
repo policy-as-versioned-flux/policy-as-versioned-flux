@@ -44,14 +44,16 @@ grep -q "resource default/Pod/still-on-retired failed" <<<"$after" \
 [ -d "$HERE/policies/v${RETIRE}" ] || fail "fixture: policies/v${RETIRE} missing"
 say "   (live: dropping the array element prunes Kustomization policy-v$(echo "$RETIRE" | tr . -))"
 
-# --- live tail: only if a cluster is reachable ---
+# --- live tail: only if a cluster is reachable. This is a passive read (the
+# script does not itself drive a live retire commit), so "still present" and
+# "no cluster" both mean "nothing to assert yet" and must say so plainly rather
+# than print a line that looks like a check but never gates anything.
 CTX="${CTX:-kind-driftwood}"
 slug="$(echo "$RETIRE" | tr . -)"
-if have kubectl && kubectl --context "$CTX" get kustomization -n flux-system >/dev/null 2>&1; then
-  say "4. live: after a retire commit, Kustomization policy-v${slug} must be pruned"
-  if kubectl --context "$CTX" -n flux-system get kustomization "policy-v${slug}" >/dev/null 2>&1; then
-    say "   (still present — retirement PR not yet reconciled; this asserts post-retire)"
-  fi
+if have kubectl && kubectl --context "$CTX" -n flux-system get kustomization "policy-v${slug}" >/dev/null 2>&1; then
+  say "4. live tail skipped: policy-v${slug} still reconciled at context '$CTX' — retirement PR not yet applied there (offline proof above is the demonstrable claim)"
+elif have kubectl && kubectl --context "$CTX" get kustomization -n flux-system >/dev/null 2>&1; then
+  say "4. live: policy-v${slug} Kustomization is gone at context '$CTX' — retirement pruned it live"
 else
   say "4. live tail skipped: no reachable cluster at context '$CTX' (see README)"
 fi
