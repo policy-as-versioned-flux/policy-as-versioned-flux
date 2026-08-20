@@ -45,6 +45,18 @@ in `estate/platform/distribution/policies/v1.0.0/require-nonroot.yaml`,
 
 <!-- index of closed tickets; one line each, linking the ticket that holds the detail -->
 
+- [Where does the shim sit: procurement, build, or admission?](issues/02-where-does-the-shim-sit.md)
+  — **three layered sources: procured → wrapped → identified.** The wrapper makes the product a real
+  pinned signed dependency; the procurement record carries the declared version; SPIFFE identity is
+  checkable at runtime. A platform-side allow-list was **rejected** — it would assert a compliance
+  claim about software nobody inspected. `stamp-posture` already proves trust-bounded stamping works;
+  what was missing was the *source* of the claim.
+- [What does compliance mean when the vendor image cannot comply?](issues/03-what-does-compliance-mean-for-a-vendor-image.md)
+  — **compliance is achieved by the cage, not the image; the composite complies.** Already true in
+  code: `cage-tier` stamps `readOnlyRootFilesystem`, drops caps, adds a WAF sidecar, and generates an
+  egress lockdown. Conditional policy decides admission, the tier decides tightness, the residual
+  lands in the institution's own band **tagged**. Surfaced: COTS partly *outsources* risk via vendor
+  recourse, which the £ engine cannot express.
 - [Is "COTS" the boundary, or is it "can we change the pod spec"?](issues/01-what-is-the-real-boundary.md)
   — the axis is *can we change the pod spec*, defined by its remedy: **wrap it or shim it**, never
   exempt and never deny. The population is mostly **us**: five unlabelled third-party charts (SPIRE,

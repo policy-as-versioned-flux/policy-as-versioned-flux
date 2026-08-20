@@ -1,7 +1,7 @@
 # 02 — Where does the shim sit: procurement, build, or admission?
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 01
 
 ## Question
@@ -33,3 +33,36 @@ or a configuration entry in the platform.
 
 Note the interaction with the always-caged decision on the semver map: whatever the shim does, the
 COTS workload must end up with a cage spec like everything else.
+
+## Answer
+
+Resolved by grilling, 2026-08-20. **Three sources, layered across the lifecycle — and the allow-list
+was explicitly rejected.**
+
+The version for a workload that cannot claim one comes from:
+
+1. **The wrapper, at packaging time.** A chart or overlay we control adds the label, so the COTS
+   product becomes a real pinned, signed dependency — the estate's own thesis applied to bought
+   software. The version is reviewable in a PR rather than asserted by a cluster, and Renovate can
+   bump it.
+2. **The procurement record, at selection time.** The decision to adopt the product carries the
+   declared policy version — the version exists before anything runs.
+3. **The SPIFFE identity, at runtime.** The workload already has a base mesh SVID; the identity it
+   presents is derivable and checkable against what was procured and wrapped.
+
+These reinforce rather than compete: **procured → wrapped → identified**, with each stage able to
+check the one before. A wrapper claiming a version the procurement record never authorised is
+detectable; a running pod whose SVID doesn't match its wrapper is detectable.
+
+**Rejected: a platform-side allow-list mapping workload identity → version at admission.** It was the
+cheapest option and the owner declined it, consistently with the estate's standard elsewhere — an
+allow-list entry is the platform asserting a compliance claim about software nobody inspected, which
+is the unearned green this estate refuses.
+
+**The stamping machinery already exists and is trust-bounded.** `stamp-posture` is an admission-time
+`MutatingPolicy` that stamps `posture.acme.io/version` using server-side-apply, so it *overwrites* any
+user-supplied value; `posture-trust-boundary` then refuses any pod whose posture doesn't match its
+claim ("the SVID path is not forgeable at the label"). So platform-stamps-a-trust-bounded-label is
+proven here. What this ticket supplies is the missing input: today `stamp-posture` derives posture
+*from the version claim* (`matchConditions: claims-a-policy-version`), and a COTS pod has no claim to
+derive from. The wrapper and the procurement record are where the claim comes from instead.
