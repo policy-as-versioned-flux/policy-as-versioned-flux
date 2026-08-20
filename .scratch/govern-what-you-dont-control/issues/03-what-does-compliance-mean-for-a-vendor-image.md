@@ -22,6 +22,16 @@ The estate already has machinery pointed at this shape and it may fit without in
 - **Retain / transfer** — sometimes the honest answer is that this is accepted risk with a number
   against it.
 
+**Narrowed upstream.** The remedy is wrap-or-shim, never exempt and never deny — so option (ii),
+the ledger-and-priced-exception route, is disfavoured before this ticket starts: an exception is
+precisely the thing the owner ruled out. The live question is whether conditional policy can carry
+the whole load.
+
+**The mechanism already exists and is unreachable.** `may-run-root-if-attested` implements exactly
+the right shape — `nonroot || (attested && hardened)` — but its `matchConditions` require
+`policy-version == '1.0.0'`, so it is gated behind the label this population cannot wear. The wrap or
+shim must deliver these workloads *to* that policy rather than around it.
+
 **Decide:** is a non-compliant-by-construction COTS workload (i) a conditional-policy case, (ii) a
 ledger-and-priced-exception case, (iii) a cage-harder case, or (iv) a genuinely new state the estate
 does not yet model? And critically — **does its residual risk land in the institution's £, and whose

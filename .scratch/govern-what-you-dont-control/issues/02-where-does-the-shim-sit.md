@@ -20,6 +20,13 @@ admission. Settle where the version gets attached, because each option is a diff
   Cheapest, but it means the cluster is asserting a compliance claim about a workload nobody
   inspected, which is the kind of unearned green this estate refuses elsewhere.
 
+**Settled upstream and binding here:** the remedy is **wrap it or shim it** — never exempt, never
+deny. Also settled: the platform's own five third-party charts are the *leading case*, so whichever
+option is chosen must be able to govern istiod, not just a well-behaved vendor app. And note the pair
+in the owner's phrasing: a **wrap** (a chart or overlay we control, patching the pod template before
+it is applied) and a **shim** (a layer decorating the workload at the infra decision point) may be
+two mechanisms rather than one — decide whether both exist and when each applies.
+
 **Decide which, or which combination** — and specifically whether the shim is a real, pinned,
 signed artefact in its own right (so a COTS product's governance is itself a versioned dependency)
 or a configuration entry in the platform.

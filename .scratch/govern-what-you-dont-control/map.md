@@ -45,16 +45,25 @@ in `estate/platform/distribution/policies/v1.0.0/require-nonroot.yaml`,
 
 <!-- index of closed tickets; one line each, linking the ticket that holds the detail -->
 
+- [Is "COTS" the boundary, or is it "can we change the pod spec"?](issues/01-what-is-the-real-boundary.md)
+  — the axis is *can we change the pod spec*, defined by its remedy: **wrap it or shim it**, never
+  exempt and never deny. The population is mostly **us**: five unlabelled third-party charts (SPIRE,
+  Istio, OpenBao, Pomerium, Dex) plus `git-server`. The platform's own infrastructure is in scope and
+  is the **leading case**. Institution owns the risk and the £; platform owns the mechanism.
+
 ## Not yet specified
 
 - **Whether the shim is admission-time, build-time, or procurement-time.** "At the infra decision
   point" suggests earlier than admission — possibly where the thing is *chosen*, not where it runs.
+- **Whether "wrap" and "shim" are two mechanisms or one.** The remedy was given as a pair. A *wrap*
+  (a chart or overlay we control, patching the pod template before it is applied) and a *shim* (a
+  layer decorating the workload at the infra decision point) have different owners, different
+  failure modes, and different answers to "who asserted this compliance claim". Sharpens once the
+  shim-location ticket runs.
 - **What a COTS workload's compliance even means** when the policy body assumes it can dictate the
   pod spec. Some rules (`runAsNonRoot`) a vendor image may simply be incapable of satisfying.
 - **How this lands in the £.** An ungovernable-but-necessary product is retained risk; the estate has
   a vocabulary for that (`transfer`, `retain`, the constraint pre-filter) and it may already fit.
-- **Whether "COTS" is even the right boundary** — the real axis may be *can we change the pod spec*,
-  which also catches vendored Helm charts and operator-managed workloads.
 
 ## Out of scope
 
