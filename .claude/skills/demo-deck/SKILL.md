@@ -20,8 +20,10 @@ one. The previous deck's own `assets/*.py`/`.sh`/`.js` pipeline tooling is fair 
 ## 0. Subject and length
 
 Ask the user (do not assume): which subject to demo — this repo has more than one live subsystem
-(check `estate/`, `twin/`, and any other top-level project directories for what currently exists —
-don't hardcode a guess), and what target length. Default to ~7-10 minutes if the user has no
+(check `talk/` + `verify/` (the six-org estate; the units themselves are separate
+`policy-as-versioned-*` GitHub repos, not directories here — see `talk/README.md`), `twin/`, and any
+other top-level project directories for what currently exists — don't hardcode a guess), and what
+target length. Default to ~7-10 minutes if the user has no
 preference; Pecha-Kucha-style pacing (short, punchy segments, slide changes driven by the script's
 own rhythm, not a fixed timer) works well but isn't mandatory — ask if unsure.
 

@@ -1,8 +1,0 @@
-{
-  "version": "v1",
-  "name": "tuppence: write to a customer-accounts record",
-  "org": "tuppence",
-  "note": "A mutating op on bank account state. carried ~= £53k -> step-up band: needs OIDC + phishing-resistant WebAuthn, but not (yet) an attested device. A known human without a passkey is stepped up, not denied.",
-  "lef": [1, 3, 6],
-  "lm": [2000, 8000, 20000]
-}

@@ -1,6 +1,0 @@
-{
-  "note": "Proportional assurance bands, in GBP/year of the operation's carried £ (fair.py's TVaR+risk-load). The op's £ sets the bar: higher £ -> a strictly stronger required set, and it governs whether a stale/unattested device is caged or denied. This replaces access.py's static OP_TIER with the £-crossover it flagged as its upgrade path. Bands are calibrated against the estate's appetite ordering (ludlow strictest); bump them to re-tour.",
-  "step_up_at": 10000,
-  "attest_at": 100000,
-  "no_cage_at": 1000000
-}

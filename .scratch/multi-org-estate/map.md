@@ -118,6 +118,21 @@ a plan for it. So `task` tickets here *do* the work; this map is not planning-on
   `pqc-transport-migration` stays the negative control, unlinked on purpose. `wargamer.py:138`'s own
   general self-declaration is unchanged — out of scope for this ticket.
 
+- [The hub loses estate/, for real](issues/12-hub-loses-estate.md) — `estate/` is deleted from this
+  hub entirely (all six units, and the cross-cutting `verify/`/`talk/`); the six units' content lives
+  only in their real repos now, fetched on demand by a new `clone-estate.sh` (the thing ticket 07
+  asked about by name) into git-ignored `.estate-clone/`. `verify/` and `talk/` stay directories in
+  this hub repo rather than becoming separate hub-org repos — a named, deliberate deviation from
+  ticket 07's literal plan (unauthorized extra infra work, and it would have muddied the count
+  comparison this ticket needed clean). Found a fifth single-tree-assumption script ticket 07's audit
+  missed (`render.py`'s own `sys.path` reach) by actually running each fixed script, not just reading
+  the list. `talk/verify-all.sh --live` is `22/28` today, unchanged by this ticket's own work
+  (measured identically before and after); the gap from ticket 11's `25/28` is fully attributed —
+  ticket 11 predates mo-09's repoint and never saw the now-legitimate "GitRepository commit not
+  pinned" fail on all three reconcile beats. A human completed 09's signed-tag step mid-ticket,
+  exposing that 09's `up.sh` fix never reached the split-off `driftwood`/`tuppence`/`ludlow` repos —
+  addended to ticket 09, not fixed here (out of this ticket's hub-only scope).
+
 ## Not yet specified
 
 <!-- in-scope fog: real, but not yet sharp enough to ticket -->

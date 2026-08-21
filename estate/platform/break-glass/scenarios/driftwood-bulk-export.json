@@ -1,8 +1,0 @@
-{
-  "version": "v1",
-  "name": "driftwood: bulk export of cart PII",
-  "org": "driftwood",
-  "note": "A tier-3 op (needs an attested device) but below the patient-data ceiling. carried ~= £535k. A stale (out-of-currency) device is NOT denied outright here — it is dropped to a read-only/scoped session (caged), proportional to the £. Contrast ludlow-patient-data, where the same stale device is denied.",
-  "lef": [1, 3, 6],
-  "lm": [20000, 80000, 200000]
-}

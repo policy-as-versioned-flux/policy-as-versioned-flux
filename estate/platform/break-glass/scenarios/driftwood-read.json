@@ -1,8 +1,0 @@
-{
-  "version": "v1",
-  "name": "driftwood: read (get/list) a cart object",
-  "org": "driftwood",
-  "note": "Low blast radius. carried ~= £1.9k -> floor band: an authenticated human (OIDC) is enough. Device posture is irrelevant at this £, so a stale device sails through — proportionality means the bar only rises with the £.",
-  "lef": [0, 1, 2],
-  "lm": [100, 500, 2000]
-}

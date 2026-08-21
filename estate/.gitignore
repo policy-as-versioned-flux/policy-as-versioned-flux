@@ -1,5 +1,0 @@
-# Generated demo signing keys — private halves never committed (public .pub.pem kept for verification)
-**/keys/*-signing-key.pem
-**/keys/*.priv
-!**/keys/*.pub.pem
-**/.work/

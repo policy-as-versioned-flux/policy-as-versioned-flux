@@ -18,10 +18,19 @@
 # minute hang, is itself part of what this ticket asked for.
 #
 # Run from the repo root. Requires: kubectl (contexts kind-driftwood,
-# kind-ludlow, kind-tuppence reachable), grep.
+# kind-ludlow, kind-tuppence reachable), grep, git (to clone the units).
+#
+# mo-12 update: estate/ is gone from this hub (the six units are real,
+# separate GitHub repos now). The two file-content checks below used to read
+# the hub's committed estate/$unit/ copy; they now read ../../clone-estate.sh's
+# fresh checkout instead -- the same content ticket 09 actually fixed, just
+# fetched rather than committed. This is a stronger check than before: it
+# reads the real repos' current state, not a possibly-stale hub mirror.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+CLONE="$ROOT/.estate-clone"
+bash "$ROOT/clone-estate.sh" >/dev/null || { echo "FAIL: could not assemble $CLONE (needs network)"; exit 2; }
 fail=0
 ok()   { printf '  OK   %s\n' "$*"; }
 bad()  { printf '  FAIL %s\n' "$*"; fail=1; }
@@ -29,12 +38,12 @@ info() { printf '  INFO %s\n' "$*"; }
 
 echo "== source files declare the real GitHub URLs =="
 for unit in driftwood ludlow tuppence; do
-  f="$ROOT/estate/$unit/gitops/flux-system/gotk-sync.yaml"
+  f="$CLONE/$unit/gitops/flux-system/gotk-sync.yaml"
   grep -q "url: https://github.com/policy-as-versioned-$unit/$unit\$" "$f" \
     && ok "$unit gotk-sync.yaml -> https://github.com/policy-as-versioned-$unit/$unit" \
     || bad "$unit gotk-sync.yaml does not declare the real GitHub URL"
 
-  nf="$ROOT/estate/$unit/gitops/flux-system/gotk-sync-nist.yaml"
+  nf="$CLONE/$unit/gitops/flux-system/gotk-sync-nist.yaml"
   grep -q "url: https://github.com/policy-as-versioned-nist/nist\$" "$nf" \
     && ok "$unit gotk-sync-nist.yaml -> https://github.com/policy-as-versioned-nist/nist" \
     || bad "$unit gotk-sync-nist.yaml does not declare the real nist GitHub URL"
@@ -43,7 +52,7 @@ done
 echo
 echo "== in-cluster git-server removed from each unit's up.sh =="
 for unit in driftwood ludlow tuppence; do
-  up="$ROOT/estate/$unit/scripts/up.sh"
+  up="$CLONE/$unit/scripts/up.sh"
   if grep -qE 'git-server|GIT_URL_IN_CLUSTER|docker build|kind load docker-image' "$up"; then
     bad "$unit/scripts/up.sh still references the in-cluster git-server"
   else
