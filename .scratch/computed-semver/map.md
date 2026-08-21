@@ -49,6 +49,18 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
   band), so **tag the strictest band and publish the per-institution matrix as evidence**. Two things
   fell out: the code contradicts always-caged, and COTS/unversioned workloads are a permanent
   population needing their own effort.
+- [What represents "currently-compliant workloads"](issues/03-what-is-the-corpus.md) — the corpus is a
+  **generated** population of plain pods owned by `platform`, enumerated **per CEL expression**
+  (satisfied/violated/absent) across two more axes: the **version pin** (in/out of the version array)
+  and the **tier label** (absent/baseline/restricted/quarantine). A second **witness** set of real
+  workloads proves the generator, and **a witness shape the generator missed fails the build** — the
+  repair is always the generator, never the fixture. That is what stops curation toward a wanted bump.
+  Generated from **both** subjects and unioned, so a retirement is visible. The corpus is not signed:
+  it is regenerated and diffed in CI, and the **evidence output** is what gets signed. Three findings
+  fell out: `cage-tier` is label-driven so **no residual is ever invented**; the subject is **every**
+  Kyverno policy that reaches a pod, so **five of the eight live policies carry no version and the
+  gate must fail when movement traces to one**; and deny is unobservable at admission, so the bottom
+  rung is proved by function test and said so.
 
 ## Not yet specified
 
@@ -58,11 +70,17 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
 - **Whether the Renovate bump PR should carry the computed evidence.** ADR-0002 makes the reviewed PR
   the non-negotiable gate — a reviewer seeing "this bump is major, here are the three workloads that
   flip" is strictly better than seeing a version number. Shape unclear until the gate exists.
-- **How the shim for unversioned/COTS workloads changes the corpus.** Spun out as its own effort at
-  the owner's instruction — but the corpus ticket cannot be finished without knowing what a verdict
-  means for a workload nobody controls.
-- **Whether the corpus itself needs versioning and signing.** It becomes evidence, and every other
-  piece of evidence in this estate is signed and tamper-checked.
+- **Whether `distribution/policies/` and `policy/policies/` are one version line.** Two trees in the
+  same repo each declare their own `v1.0.0`, and `versions.yaml` reconciles only the first. The corpus
+  ticket makes the gate refuse a same-version-different-content collision, which surfaces the answer
+  rather than deciding it.
+- **Where a priced residual for a real workload comes from.** The tier axis is synthetic by design
+  (ticket 03), and the estate holds two FAIR scenarios in total, both driftwood's. Nothing maps a pod
+  to a scenario. Not blocking this map, but the cage half of the model is proved on synthetic input
+  until it exists.
+
+*Settled since charting: how the COTS/unversioned shim changes the corpus, and whether the corpus
+needs versioning and signing — both in [ticket 03](issues/03-what-is-the-corpus.md).*
 
 ## Out of scope
 
