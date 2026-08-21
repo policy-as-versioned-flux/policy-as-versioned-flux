@@ -154,11 +154,21 @@ tickets next.
 **Addendum, mo-12 (2026-08-21) — a real gap this ticket's own Status did not surface, found while
 completing the split.** Two things changed since the write-up above:
 
-1. **A human completed the signed-tag step this ticket left for them.** `v1.0.0` now exists,
-   gitsign+OpenPGP dual-signed, in `driftwood`/`tuppence`/`ludlow`/`nist`, and `GitRepository` is
-   honestly `Ready=True` on all three clusters at the real tag — the state this ticket predicted
-   ("once a human pushes the signed tag... should keep Ready=True on both objects") is now real, not
-   hypothetical. `spec.ref.commit` is still commented out ("pinned at release" per this ticket's own
+1. **`v1.0.0` now exists, but not the way this addendum first assumed — corrected after re-checking
+   `gh api repos/policy-as-versioned-driftwood/driftwood/git/tags/<sha>` directly.** `v1.0.0` exists
+   in `driftwood`/`tuppence`/`ludlow`/`nist`, and `GitRepository` is honestly `Ready=True` on all
+   three clusters at the real tag — the state this ticket predicted ("once a human pushes the signed
+   tag... should keep Ready=True on both objects") is now real, not hypothetical. But it was not cut
+   by a human running the manual `git tag -s` command this ticket printed, and it carries no OpenPGP
+   signature at all. The tag object's Fulcio certificate (`gh api .../git/tags/<sha>`) names the
+   build trigger as `.github/workflows/cut-release.yml@refs/heads/main` with
+   `workflow_trigger=workflow_dispatch` — the tag was cut by that GitHub Actions workflow, dispatched
+   remotely, not typed by hand at a terminal. There are two independent signatures, not one dual
+   OpenPGP one: the underlying commit is SSH-signed (`ssh-ed25519`, `verification.reason: valid`) and
+   the tag object itself is Sigstore/Fulcio-signed (a CMS/PKCS7 blob under a `sigstore-intermediate`
+   cert; GitHub reports `verification.reason: "no_user"` for it because it cannot map a keyless
+   Fulcio identity to a GitHub account, which is expected and not a failure). Neither mechanism is
+   OpenPGP. `spec.ref.commit` is still commented out ("pinned at release" per this ticket's own
    note), so each unit's own `verify-reconcile.sh` (`GitRepository commit not pinned`) still fails —
    correctly: that is a separate, still-open gap, not this addendum's subject.
 2. **The `up.sh` fix this ticket describes (`no longer seeds a git repo, builds a

@@ -34,10 +34,10 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# Post-split (mo-12): platform is a real, separate GitHub repo, not a sibling
-# directory. PLATFORM points at .estate-clone/platform, the disposable local
-# checkout clone-estate.sh assembles from that repo.
-PLATFORM = os.path.normpath(os.path.join(HERE, "..", "..", ".estate-clone", "platform"))
+sys.path.insert(0, os.path.dirname(HERE))  # verify/, for _estate
+from _estate import ESTATE  # noqa: E402
+
+PLATFORM = os.path.join(ESTATE, "platform")
 WARGAMER = os.path.join(PLATFORM, "wargamer")
 
 # The ONE estate trust domain every workload + device SVID roots to.

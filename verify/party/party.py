@@ -33,11 +33,9 @@ import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# Post-split (mo-12): the six parties are no longer sibling directories of this
-# hub repo, they are six real GitHub repos. ESTATE points at .estate-clone/,
-# the disposable local checkout clone-estate.sh assembles from those repos —
-# same shape this check always walked, fetched instead of committed.
-ESTATE = os.path.normpath(os.path.join(HERE, "..", "..", ".estate-clone"))
+sys.path.insert(0, os.path.dirname(HERE))  # verify/, for _estate
+from _estate import ESTATE  # noqa: E402
+
 ROLES = os.path.join(HERE, "roles.json")
 APPETITE = os.path.join(ESTATE, "platform", "risk", "appetite.json")
 
@@ -101,12 +99,18 @@ def check_party(party, roles, all_parties, estate_dir=ESTATE, appetite_path=APPE
     if unknown:
         problems.append(f"{party}: unknown role(s) {unknown}")
     party_dir = os.path.join(estate_dir, party)
-    if "risk-bearer" in roles and not is_risk_bearer(party, appetite_path):
-        problems.append(f"{party}: declared risk-bearer, no entry in {appetite_path}")
-    if "publisher" in roles and not ships_signed_versioned_artefact(party_dir):
-        problems.append(f"{party}: declared publisher, ships no signed/versioned artefact under {party_dir}")
-    if "adopter" in roles and not pins_another_party(party_dir, [p for p in all_parties if p != party]):
-        problems.append(f"{party}: declared adopter, pins nothing under {party_dir}")
+    others = [p for p in all_parties if p != party]
+    # role -> (zero-arg evidence check, what's missing when it fails). A lambda so a
+    # role that isn't declared never pays for its check (e.g. never opens appetite.json).
+    checks = {
+        "risk-bearer": (lambda: is_risk_bearer(party, appetite_path), f"no entry in {appetite_path}"),
+        "publisher": (lambda: ships_signed_versioned_artefact(party_dir),
+                      f"ships no signed/versioned artefact under {party_dir}"),
+        "adopter": (lambda: pins_another_party(party_dir, others), f"pins nothing under {party_dir}"),
+    }
+    for role, (has_evidence, missing) in checks.items():
+        if role in roles and not has_evidence():
+            problems.append(f"{party}: declared {role}, {missing}")
     return problems
 
 

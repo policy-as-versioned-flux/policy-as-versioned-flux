@@ -58,7 +58,7 @@ from typing import Any
 
 import yaml
 
-from . import REPO_DIR, TOOL_VERSION
+from . import ESTATE_CLONE_DIR, REPO_DIR, TOOL_VERSION
 from .artefact import DERIVED, Artefact
 from .canon import digest_of
 from .constraints import floor_ids
@@ -120,10 +120,7 @@ NARROWED_CLAIM = (
 
 # Where the real pins live. Read rather than described: 'consumed by real separate repositories' is
 # a claim about files that either exist or do not.
-# mo-12 deleted the hub's committed estate/ tree; the six units are real repos now (mo-08), fetched
-# into .estate-clone/ by clone-estate.sh (git-ignored, disposable). Same repoint already applied to
-# verify/party/party.py, verify/proportionality/render.py, verify/provenance/provenance.py.
-ESTATE_DIR = REPO_DIR / ".estate-clone"
+ESTATE_DIR = ESTATE_CLONE_DIR
 _GIT_REPOSITORY = "source.toolkit.fluxcd.io"
 # A commit line that is present but commented out is the shape every pin in this estate currently
 # has, and it is the difference between an immutable pin and a movable one.
