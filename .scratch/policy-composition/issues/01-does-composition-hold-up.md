@@ -18,7 +18,8 @@ down to the flat, per-version, `matchConditions` self-scoping files Kyverno runs
 ## Answer
 
 **Yes, and it is a real and missing layer.** Prototype: `spikes/cs-06b-cross-party-composition/` —
-`./run.sh`, exit 0, self-checking.
+`./run.sh`, exit 0, self-checking. Committed on branch `cs-06-cross-party-composition`
+(`36000ef`), with the narrower spike and this map.
 
 Parents are of **different kinds**, and that is the part a flat pin model cannot express:
 

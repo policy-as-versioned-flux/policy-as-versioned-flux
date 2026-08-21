@@ -49,7 +49,8 @@ publishers can ship the same family name. The claim "inheritance leaves this map
 ## Answer
 
 **No. A rendered-artefact diff is enough. Inheritance leaves this map.** Prototype:
-`spikes/cs-06-inheritance-vs-diff/` — `./run.sh`, exit 0, self-checking.
+`spikes/cs-06-inheritance-vs-diff/` — `./run.sh`, exit 0, self-checking. Committed on branch
+`cs-06-cross-party-composition` (`36000ef`).
 
 Both paths were built and run over the same real material: the `require-nonroot` pair this ticket
 names, and cs-01's own corpus (`department-label` 1.0.0→2.0.0, `known-department-label`
