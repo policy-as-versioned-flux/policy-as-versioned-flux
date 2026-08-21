@@ -144,8 +144,10 @@ All five verified individually post-fix (each script run directly, not just via 
   demo subject corrected to `talk/`+`verify/`, `twin/`.
 - **`twin/*` narrative citations of `estate/README.md`/`estate/verify/provenance/...` left
   untouched, on purpose** — these are prose citations in docstrings/comments illustrating the twin's
-  own reasoning, not runtime path reads (`twin/` never `open()`s an `estate/` path), and `twin/` is
-  explicitly out of scope per the map's "Building out the `twin/` project itself" exclusion.
+  own reasoning, not runtime path reads, and `twin/` is explicitly out of scope per the map's
+  "Building out the `twin/` project itself" exclusion. **Correction (see Addendum below): the
+  claim that `twin/` never `open()`s an `estate/` path was false when this was written — three
+  runtime path constants did exactly that, and were fixed, not left as narrative.**
   `.scratch/**` historical ticket files (07-11, talk-spec, etc.) are historical record, not live docs
   or scripts, and are likewise untouched — rewriting them would falsify what actually happened when.
 
@@ -186,3 +188,77 @@ edited beyond the move: `party/party.py`, `party/README.md`, `party/roles.json`,
 `.scratch/multi-org-estate/issues/09-repoint-flux-sources.md` (addendum),
 `.claude/skills/demo-deck/SKILL.md`. `estate/platform`, `estate/driftwood`, `estate/tuppence`,
 `estate/ludlow`, `estate/nist`, `estate/ico`, `estate/.gitignore` deleted (git history preserves them).
+
+**Addendum, review fix (2026-08-21) — point 6's "`twin/` never `open()`s an `estate/` path" claim
+was false, found by review, fixed here, not just re-asserted.**
+
+Three runtime path constants were left pointing at the just-deleted `estate/` tree:
+`twin/drift.py`'s `WINDOW_PATH`/`SAMPLES_PATH`/`PRECONDITIONS_PATH`/`FORCED_CAMPAIGN_PATH`,
+`twin/verdict.py`'s `PROTOCOL_PATH`, and `twin/enact.py`'s `ESTATE_DIR` (and therefore
+`dependency_pins()`). All four are real `Path.read_text()`/`open()` calls, not narrative
+citations — so the claim above was wrong when it was written, not merely imprecise. Reproduced
+before fixing, not assumed: `python -m pytest tests/test_drift.py tests/test_enact.py
+tests/test_verdict.py -q` failed 9/84 on this branch with `FileNotFoundError` on the deleted
+`estate/driftwood/drift/*` paths — the exact 9 tests, the exact reason, that review named.
+
+**Fix: repointed all four constants at `.estate-clone/`**, the same disposable clone
+`clone-estate.sh` assembles and the same source `verify/party/party.py`,
+`verify/proportionality/render.py` and `verify/provenance/provenance.py` already read (point 5) —
+not a new mechanism, the one this ticket already built. Confirmed real, not assumed: the hub's
+last committed `estate/driftwood/drift/window.yaml` (`git show c9d0f20^:...`) and
+`.estate-clone/driftwood/drift/window.yaml` are byte-identical (`diff` clean), same for
+`samples.jsonl` — mo-08's split carried this instrument data into the real
+`policy-as-versioned-driftwood` repo intact, so reading it from there is the same content,
+fetched rather than mirrored.
+
+**One further, real break this surfaced, not mechanical.** Reading the live clone instead of the
+hub's frozen copy exposed that `tests/test_enact.py::test_the_dependency_pins_are_real_and_report_what_they_do_not_establish`
+hard-coded `not any(commit_pinned)`. True of the frozen snapshot; no longer true of the live
+repos: `.estate-clone/{driftwood,tuppence,ludlow}/gitops/flux-system/gotk-sync-nist.yaml` and
+`.../gitops/platform/platform-pin.yaml` now carry a real, uncommented `commit:` line, each
+file's own comment dated "real as of ticket mo-10" — mo-10's concurrent work (flagged as a
+possible source of overlap when this ticket was dispatched) landed commit-pinning for every
+cross-repository dependency in the three institutions' real repos, while each repo's own
+self-sync `GitRepository` (`gotk-sync.yaml`) is still the commented-out placeholder. Verified
+directly against the live clone (`python3 -c "from twin import enact; ..."`, not assumed): 6 of 9
+pins are commit-pinned (all 6 cross-repository ones), 3 are not (all 3 self-sync ones). The
+test's assertion is corrected to check that split instead of "none are pinned" — a stronger,
+currently-true check, the same kind of upgrade point 5 and ticket 09's addendum already describe
+happening elsewhere when a hub-mirror read becomes a live-repo read.
+
+**Result.** `tests/test_drift.py tests/test_enact.py tests/test_verdict.py` — 84 passed (baseline
+restored). Full suite (`python -m pytest -q`) — 1541 passed, 2 failed; both fails are pre-existing
+and confirmed unrelated to this fix by running the identical two tests against `main` directly:
+`test_using_one_where_the_other_is_meant_is_a_type_error` fails because this sandbox's Python has
+no `mypy` installed (an environment gap, not a code defect, and fails identically on `main`);
+`test_the_suite_is_green` fails on the same 4 pre-existing, already-known `./bin/twin verify`
+guards (`drift_window_was_declared_before_it_was_measured`,
+`drift_window_is_actually_being_sampled`, `flux_coverage_floor_is_still_reachable`,
+`forced_campaign_pre_registered_and_walled_off`) — confirmed byte-identical underlying data
+between the hub's last committed copy and `.estate-clone/`'s live fetch, and
+`flux_coverage_floor_is_still_reachable`'s own message says so explicitly ("This guard staying
+red is the finding, not a defect in it — see build ticket 70's finding 1"). Neither is this
+ticket's to fix, same standard as the pre-existing `verify-all.sh --live` fails in point 7.
+`./bin/twin verify` on its own: 67 passed, 4 failed (the same four), 3 skipped, exit 0.
+
+**CI gap, named — two, related, neither silently absorbed.**
+
+- *Required fix, as specified:* `.github/workflows/twin.yml`'s trigger `paths:` filter —
+  `['twin/**', 'tests/**', 'conftest.py', 'pytest.ini', '.scratch/twin/**',
+  '.github/workflows/twin.yml']` — does not include `estate/**` (moot now; `estate/**` no longer
+  exists) or anywhere `verify/`/`talk/` live. The original mo-12 commit touched none of the listed
+  paths, so this workflow would not have run on it at all — CI would not have caught this
+  regression on that commit, full stop. Not fixed here (widening the retrigger policy is a
+  separate, broader decision than this ticket's fix); named so it is not silently relied on.
+- *Found while fixing, not named in the review:* repointing the three modules at `.estate-clone/`
+  would have traded "regression invisible to CI" for "CI red on every future `twin/**` push, for a
+  reason unrelated to the change" — `twin.yml`'s `suite` job runs `./bin/twin verify` and
+  `python -m pytest -q` against a fresh checkout with no step that assembles `.estate-clone/`, and
+  the invariant suite reads the same paths (`drift.Window.load()` etc. run inside
+  `./bin/twin verify`, confirmed by grepping `twin/invariants/harness.py`). Fixed here, in scope,
+  one step: added `bash clone-estate.sh` to the `suite` job before "the invariant suite".
+
+Files touched, in addition to point 7's list: `twin/drift.py`, `twin/verdict.py`, `twin/enact.py`
+(path constants repointed), `tests/test_enact.py` (one assertion corrected to match live pin
+state), `.github/workflows/twin.yml` (`clone-estate.sh` step added to the `suite` job), this file
+(point 6 correction + this addendum).
