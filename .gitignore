@@ -1,11 +1,10 @@
 research/repos/
-estate/**/.work/
 
-# The Flux drift probe's own output (build ticket 64). Machine-local measurement, appended
-# hourly; the window that governs it is committed, and the guard that checks the window was
-# declared up front reads git history for the *window*, never for these.
-estate/driftwood/drift/samples.jsonl
-estate/driftwood/drift/probe.log
+# mo-12: the six real policy-as-versioned-* repos, fetched fresh by
+# clone-estate.sh so talk/up.sh and talk/verify-all.sh can run against real
+# content. A build artifact of those repos, never a second copy checked in
+# here — estate/ itself is gone from this hub (git history preserves it).
+.estate-clone/
 
 # Added by ggshield
 .cache_ggshield

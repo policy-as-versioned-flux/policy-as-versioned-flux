@@ -150,3 +150,34 @@ real, reachable, reversible Deployment a plausible operator could scale down") �
 Deployment from `up.sh` removes this trial's target. Out of scope to fix here (this ticket is about
 Flux's source, not the drift campaign's instrument choice); flagged for whoever picks up the drift
 tickets next.
+
+**Addendum, mo-12 (2026-08-21) — a real gap this ticket's own Status did not surface, found while
+completing the split.** Two things changed since the write-up above:
+
+1. **A human completed the signed-tag step this ticket left for them.** `v1.0.0` now exists,
+   gitsign+OpenPGP dual-signed, in `driftwood`/`tuppence`/`ludlow`/`nist`, and `GitRepository` is
+   honestly `Ready=True` on all three clusters at the real tag — the state this ticket predicted
+   ("once a human pushes the signed tag... should keep Ready=True on both objects") is now real, not
+   hypothetical. `spec.ref.commit` is still commented out ("pinned at release" per this ticket's own
+   note), so each unit's own `verify-reconcile.sh` (`GitRepository commit not pinned`) still fails —
+   correctly: that is a separate, still-open gap, not this addendum's subject.
+2. **The `up.sh` fix this ticket describes (`no longer seeds a git repo, builds a
+   driftwood-git:local-style image, or kubectl applies git-server/deployment.yaml`) was applied to the
+   hub's `estate/driftwood`/`tuppence`/`ludlow` copies — but mo-08's filter-repo split had already
+   run by the time this ticket's fix landed, and that fix was never pushed to the resulting
+   `policy-as-versioned-{driftwood,tuppence,ludlow}` repos.** Confirmed live: the real
+   `driftwood/scripts/up.sh` (and, by the same mechanism, `tuppence`'s and `ludlow`'s) still `docker
+   build`s a `driftwood-git:local` image, `kind load docker-image`s it, waits on
+   `deploy/git-server`, and points `GitRepository.spec.url` at
+   `${GIT_URL_IN_CLUSTER}`/`http://git-server.flux-system.svc.cluster.local/...` instead of applying
+   `gotk-sync.yaml` as committed. This did not affect the live clusters' `GitRepository`/`Kustomization`
+   objects (those were fixed directly via `kubectl apply`, independent of the repo's own `up.sh`, per
+   this ticket's own account above) — the gap only bites the next time someone actually re-runs
+   `up.sh` from a fresh checkout of the real repo, at which point it would re-deploy the retired
+   git-server and overwrite `.spec.url` right back to the in-cluster address. Found by mo-12's
+   [`verify-09-repoint-flux-sources.sh`](../verify-09-repoint-flux-sources.sh), updated by mo-12 to
+   check the real cloned repos instead of the hub's now-deleted `estate/` mirror — a stronger check
+   than before, and the reason this surfaced now rather than staying silently green. **Not fixed here
+   or by mo-12** — mo-12's scope is the hub (delete `estate/`, fix the hub's own path assumptions);
+   pushing a corrected `up.sh` to three external `policy-as-versioned-*` repos is this ticket's own
+   unfinished work, re-opened by evidence rather than by re-reading old claims.

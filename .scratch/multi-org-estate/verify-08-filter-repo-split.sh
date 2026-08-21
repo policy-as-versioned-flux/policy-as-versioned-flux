@@ -4,6 +4,17 @@
 # matching org, with a README (not the estate/README.md monorepo framing), a
 # licence, and history preserved.
 #
+# mo-12 note: the "file tree matches the hub's estate/<unit>/ tree 1:1" check
+# below is now PERMANENTLY INERT, on purpose, not a bug to fix. Its baseline
+# was the hub's own committed estate/<unit>/ copy -- mo-12 deletes that copy
+# from the hub (the whole point: the six repos are the source of truth, not a
+# mirror of one). Re-deriving the baseline via ../../clone-estate.sh would
+# just diff each repo against a fresh clone of itself -- always true, proves
+# nothing. The comparison this check made is preserved in git history (the
+# commit before mo-12 removed estate/<unit>/) rather than kept live; every
+# other check in this script (visibility, history/attribution, README,
+# LICENSE) is unaffected and still runs for real.
+#
 # Run from the repo root. Requires: gh (authenticated), git.
 set -euo pipefail
 
@@ -50,16 +61,21 @@ for u in $UNITS; do
   lic="$(gh api "repos/$org/$u/contents/LICENSE" --jq '.content' 2>/dev/null | base64 -d || echo '')"
   echo "$lic" | grep -q "Apache License" && ok "LICENSE present (Apache-2.0)" || bad "LICENSE missing/wrong"
 
-  # File tree matches the hub's estate/<unit>/ tree 1:1 (nothing lost, nothing
-  # added besides README.md/LICENSE) -- proves filter-repo moved the whole
-  # subtree, not a partial copy.
-  hub_files="$(cd "$ROOT/estate/$u" && find . -type f -not -path './README.md' | sed 's|^\./||' | LC_ALL=C sort)"
-  tree_json="$(gh api "repos/$org/$u/git/trees/main?recursive=1" --jq '[.tree[] | select(.type=="blob") | .path] | sort | .[]' 2>/dev/null || echo '')"
-  split_files="$(echo "$tree_json" | grep -v '^README.md$' | grep -v '^LICENSE$' || true)"
-  if [ "$hub_files" = "$split_files" ]; then
-    ok "file tree matches hub estate/$u/ 1:1 (excluding README.md/LICENSE)"
+  # File tree matches the hub's estate/<unit>/ tree 1:1 -- RETIRED by mo-12,
+  # see the file header. estate/$u/ no longer exists in this hub by design,
+  # so this is reported as SKIP, not FAIL: there is nothing wrong here, the
+  # baseline was deliberately removed.
+  if [ -d "$ROOT/estate/$u" ]; then
+    hub_files="$(cd "$ROOT/estate/$u" && find . -type f -not -path './README.md' | sed 's|^\./||' | LC_ALL=C sort)"
+    tree_json="$(gh api "repos/$org/$u/git/trees/main?recursive=1" --jq '[.tree[] | select(.type=="blob") | .path] | sort | .[]' 2>/dev/null || echo '')"
+    split_files="$(echo "$tree_json" | grep -v '^README.md$' | grep -v '^LICENSE$' || true)"
+    if [ "$hub_files" = "$split_files" ]; then
+      ok "file tree matches hub estate/$u/ 1:1 (excluding README.md/LICENSE)"
+    else
+      bad "file tree diverges from hub estate/$u/"
+    fi
   else
-    bad "file tree diverges from hub estate/$u/"
+    printf '  SKIP file tree vs. hub estate/%s/ (retired by mo-12 -- see git history)\n' "$u"
   fi
 
   echo

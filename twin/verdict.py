@@ -52,7 +52,10 @@ import yaml
 from . import REPO_DIR
 from .drift import Window, coverage, events
 
-PROTOCOL_PATH = REPO_DIR / "estate" / "driftwood" / "drift" / "verdict.yaml"
+# mo-12: repointed at .estate-clone/ (clone-estate.sh's fetch of the real driftwood repo, mo-08),
+# mirroring the same fix in verify/party/party.py, verify/proportionality/render.py,
+# verify/provenance/provenance.py.
+PROTOCOL_PATH = REPO_DIR / ".estate-clone" / "driftwood" / "drift" / "verdict.yaml"
 PROTOCOL_SCHEMA = "drift.verdict_protocol/v1"
 
 # Named rather than discovered from the file: the whole defect this module exists to prevent is a

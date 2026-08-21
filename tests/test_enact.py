@@ -247,8 +247,14 @@ def test_the_dependency_pins_are_real_and_report_what_they_do_not_establish(prop
     assert dependency["cross_repository_pins"] == 6
     assert dependency["self_sync_pins"] == 3
     assert all(pin["tag"] for pin in dependency["pins"])
-    # Every commit line in this estate is a commented-out placeholder, so every pin is a tag pin.
-    assert not any(pin["commit_pinned"] for pin in dependency["pins"])
+    # mo-12 repointed ESTATE_DIR at the live .estate-clone/ clone of the real repos (was the hub's
+    # own frozen estate/ mirror). Read live, this now shows mo-10's landed work: every
+    # cross-repository pin (nist, platform) carries a real commit line in driftwood/tuppence/
+    # ludlow's gitops manifests; each repo's own self-sync GitRepository is still the
+    # commented-out placeholder ("pinned at release by the wave-push", not yet done). Verified
+    # directly against the clone, not assumed — see mo-12 ticket Comments.
+    assert all(pin["commit_pinned"] for pin in dependency["pins"] if pin["cross_repository"])
+    assert not any(pin["commit_pinned"] for pin in dependency["pins"] if not pin["cross_repository"])
     assert any("movable name" in limit for limit in dependency["limits"])
 
 

@@ -49,10 +49,14 @@ import yaml
 
 from . import REPO_DIR
 
-WINDOW_PATH = REPO_DIR / "estate" / "driftwood" / "drift" / "window.yaml"
-SAMPLES_PATH = REPO_DIR / "estate" / "driftwood" / "drift" / "samples.jsonl"
-PRECONDITIONS_PATH = REPO_DIR / "estate" / "driftwood" / "drift" / "preconditions.yaml"
-FORCED_CAMPAIGN_PATH = REPO_DIR / "estate" / "driftwood" / "drift" / "forced-campaign.yaml"
+# mo-12 deleted the hub's committed estate/ tree; driftwood is a real repo now (mo-08), and
+# clone-estate.sh fetches it into .estate-clone/ (git-ignored, disposable). Same repoint already
+# applied to verify/party/party.py, verify/proportionality/render.py, verify/provenance/provenance.py.
+_DRIFTWOOD = REPO_DIR / ".estate-clone" / "driftwood" / "drift"
+WINDOW_PATH = _DRIFTWOOD / "window.yaml"
+SAMPLES_PATH = _DRIFTWOOD / "samples.jsonl"
+PRECONDITIONS_PATH = _DRIFTWOOD / "preconditions.yaml"
+FORCED_CAMPAIGN_PATH = _DRIFTWOOD / "forced-campaign.yaml"
 
 WINDOW_SCHEMA = "drift.window/v1"
 FORCED_CAMPAIGN_SCHEMA = "drift.forced_campaign/v1"
