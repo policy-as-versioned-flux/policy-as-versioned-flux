@@ -6,9 +6,6 @@
 # `git verify-tag` / Rekor lookup in the provenance beat (ticket 24) — Flux's
 # GitRepository.spec.verify only speaks OpenPGP, so we do NOT fake a PGP block
 # here; the pin + the signed tag are the provenance, not a mis-typed verify.
-#
-# For the offline touring demo, scripts/up.sh rewrites .spec.url to the
-# in-cluster git server and sets the freshly-seeded tag+commit (see up.sh).
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -34,6 +31,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: ludlow
-  path: ./apps
+  path: ./gitops/apps
   prune: true   # prune-on-retire: remove what git no longer declares
   wait: true    # health-gate the reconcile

@@ -9,11 +9,6 @@
 # gitsign-signed (keyless -> Rekor), verified out-of-band via `git verify-tag`
 # / Rekor lookup (Flux's GitRepository.spec.verify only speaks OpenPGP) — same
 # convention as driftwood's own gotk-sync.yaml.
-#
-# For the offline touring demo, scripts/up.sh rewrites .spec.url to the
-# in-cluster git server (same git-server pod tuppence's own source uses —
-# GIT_HTTP_EXPORT_ALL serves both bare repos) and sets the freshly-seeded
-# tag+commit.
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
