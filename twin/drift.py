@@ -47,12 +47,9 @@ from typing import Any
 
 import yaml
 
-from . import REPO_DIR
+from . import ESTATE_CLONE_DIR
 
-# mo-12 deleted the hub's committed estate/ tree; driftwood is a real repo now (mo-08), and
-# clone-estate.sh fetches it into .estate-clone/ (git-ignored, disposable). Same repoint already
-# applied to verify/party/party.py, verify/proportionality/render.py, verify/provenance/provenance.py.
-_DRIFTWOOD = REPO_DIR / ".estate-clone" / "driftwood" / "drift"
+_DRIFTWOOD = ESTATE_CLONE_DIR / "driftwood" / "drift"
 WINDOW_PATH = _DRIFTWOOD / "window.yaml"
 SAMPLES_PATH = _DRIFTWOOD / "samples.jsonl"
 PRECONDITIONS_PATH = _DRIFTWOOD / "preconditions.yaml"

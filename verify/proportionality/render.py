@@ -27,12 +27,11 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# Post-split (mo-12): platform is a real, separate GitHub repo, not a sibling
-# directory. RISK/FAIR point at .estate-clone/platform/..., the disposable
-# local checkout ../../clone-estate.sh assembles from that repo.
-RISK = os.path.join(HERE, "..", "..", ".estate-clone", "platform", "risk")
-sys.path.insert(0, RISK)
-sys.path.insert(0, os.path.join(HERE, "..", "..", ".estate-clone", "platform", "fair"))
+sys.path.insert(0, os.path.dirname(HERE))  # verify/, for _estate
+from _estate import ESTATE  # noqa: E402
+
+sys.path.insert(0, os.path.join(ESTATE, "platform", "risk"))
+sys.path.insert(0, os.path.join(ESTATE, "platform", "fair"))
 import enforce  # noqa: E402  (reuses fair.py under the hood)
 import fair      # noqa: E402
 
