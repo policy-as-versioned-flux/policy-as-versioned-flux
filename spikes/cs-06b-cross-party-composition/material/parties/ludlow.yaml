@@ -1,0 +1,29 @@
+# PROTOTYPE — spike cs-06b. A proposed shape, not a shipped format.
+#
+# ludlow is a US health institution: the strictest appetite in the estate
+# (£5k/yr, platform/risk/appetite.json). Same inheritance edges. It is here to
+# show that the SAME inherited rule and the SAME declared inability produce a
+# different cage, because the band is different. Proportionality, not a favour.
+party: ludlow
+roles: [risk-bearer, adopter]
+
+inherits:
+  - party: platform
+    kind: implementations
+    version: "0.1.0"
+  - party: nist
+    kind: controls
+    version: "1.0.0"
+  - party: ico
+    kind: pricing
+    version: "1.0.0"
+  - party: platform
+    kind: threat
+    version: "v1"
+
+workloads:
+  - { name: ludlow-records, pins: "1.0.0" }
+
+overlay:
+  add: []
+  restate: []

@@ -1,0 +1,17 @@
+# PROTOTYPE — spike cs-06b. A proposed shape, not a shipped format.
+#
+# ico is the other regulator. It ships a signed penalty schema, not rules
+# (estate/ico/schema/v1, v2, each with a .sig). It contributes PRICING to a
+# composition and no rules at all.
+#
+# It is in this prototype to prove one thing: the parents of a composition are
+# not all the same kind. A model that forces every parent into one rule
+# hierarchy cannot hold ico. Roles compose; the hierarchy does not.
+party: ico
+roles: [publisher]
+
+publishes:
+  kind: pricing
+  versions:
+    "1.0.0": { schema: schema/v1/penalty-schema.json, signed: true }
+    "2.0.0": { schema: schema/v2/penalty-schema.json, signed: true }

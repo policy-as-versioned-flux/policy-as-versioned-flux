@@ -1,0 +1,39 @@
+# PROTOTYPE — spike cs-06b. A proposed shape, not a shipped format.
+#
+# driftwood is a UK retail institution: a risk-bearing adopter. In the class
+# analogy it is the SUBCLASS. It authors no policy today. It pins platform and
+# nist and takes what arrives.
+#
+# Both inheritance edges below are REAL, and they are the diamond:
+#   driftwood -> platform -> nist
+#   driftwood -> nist
+# See gitops/platform/platform-pin.yaml and gitops/flux-system/gotk-sync-nist.yaml
+# in the driftwood repo. The versions here are the tags those files really pin.
+party: driftwood
+roles: [risk-bearer, adopter]
+
+inherits:
+  - party: platform
+    kind: implementations
+    version: "0.1.0"        # REAL: platform-pin.yaml, ref.tag v0.1.0
+  - party: nist
+    kind: controls
+    version: "1.0.0"        # REAL: gotk-sync-nist.yaml, ref.tag v1.0.0
+  - party: ico
+    kind: pricing
+    version: "1.0.0"
+  # The threat feed is a parent like any other: signed, versioned, pinned.
+  # It ships no rules. It moves the price, and so the cage tier.
+  - party: platform
+    kind: threat
+    version: "v1"
+
+# The workloads driftwood runs, and the policy version each one pins. REAL:
+# gitops/apps/version-configmap.yaml carries policyVersion "1.0.0".
+workloads:
+  - { name: driftwood-app, pins: "1.0.0" }
+
+overlay:
+  # driftwood adds nothing of its own yet. The scenarios switch this on.
+  add: []
+  restate: []

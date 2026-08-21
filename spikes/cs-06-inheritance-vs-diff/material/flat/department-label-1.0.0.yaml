@@ -1,0 +1,28 @@
+# Fixed input for spike cs-06, copied verbatim from ticket cs-01's own corpus:
+#   source: policy-as-versioned-platform/platform @ main
+#   path:   computed-semver/corpus/department-label-1.0.0.yaml
+# (which in turn copied it from policy-as-versioned-flux/policy @ v1.0.0,
+#  workloads/kyverno/require-department-label/policy.yaml)
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-department-label
+  annotations:
+    policies.kyverno.io/title: Require department label
+    policies.kyverno.io/subject: Pod
+spec:
+  # Lane-keeping, not a gate: nudge + PolicyReport, never blocks admission (ADR-0003).
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+    objectSelector:
+      matchLabels:
+        mycompany.com/policy-version: 0.0.0-unset
+  validations:
+    - expression: "has(object.metadata.labels) && 'department' in object.metadata.labels"
+      message: "Pods must carry a 'department' label for cost and ownership attribution."

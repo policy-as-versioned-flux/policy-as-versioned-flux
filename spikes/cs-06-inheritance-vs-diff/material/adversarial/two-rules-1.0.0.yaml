@@ -1,0 +1,29 @@
+# PROTOTYPE fixture — spike cs-06, adversarial case 2: rule ORDER. This file
+# and two-rules-1.0.1.yaml carry the same two rules in opposite order and are
+# semantically identical. The true delta is empty.
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+metadata:
+  name: two-rules-1-0-0
+  labels:
+    policy-as-versioned.dev/policy: two-rules
+    policy-as-versioned.dev/policy-version: "1.0.0"
+spec:
+  validationActions: [Audit]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: only-this-policy-version
+      expression: >-
+        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '1.0.0'
+  validations:
+    - expression: >-
+        object.spec.?securityContext.?runAsNonRoot.orValue(false) == true
+      message: "runAsNonRoot must be true"
+    - expression: >-
+        has(object.metadata.labels) && 'owner' in object.metadata.labels
+      message: "an owner label is required"

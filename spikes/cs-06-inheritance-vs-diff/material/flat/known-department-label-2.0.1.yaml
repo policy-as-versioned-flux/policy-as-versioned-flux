@@ -1,0 +1,29 @@
+# Fixed input for spike cs-06, copied verbatim from ticket cs-01's own corpus:
+#   source: policy-as-versioned-platform/platform @ main
+#   path:   computed-semver/corpus/known-department-label-2.0.1.yaml
+# (which in turn copied it from policy-as-versioned-flux/policy @ v2.0.1)
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-known-department-label
+  annotations:
+    policies.kyverno.io/title: Require known department label
+    policies.kyverno.io/subject: Pod
+spec:
+  # Gate, not lane-keeping: a locked door, blocks admission (ADR-0003).
+  validationActions:
+    - Deny
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+    objectSelector:
+      matchLabels:
+        mycompany.com/policy-version: 0.0.0-unset
+  validations:
+    - expression: >-
+        !has(object.metadata.labels) || !('department' in object.metadata.labels) ||
+        object.metadata.labels['department'] in ['platform', 'finance', 'security', 'engineering']
+      message: "The 'department' label, if set, must be one of: platform, finance, security, engineering."

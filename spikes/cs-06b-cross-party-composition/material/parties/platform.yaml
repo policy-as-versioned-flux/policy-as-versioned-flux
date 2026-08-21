@@ -1,0 +1,35 @@
+# PROTOTYPE — spike cs-06b. A proposed shape, not a shipped format.
+#
+# platform holds three roles at once (CONTEXT.md: roles compose). It is the
+# CONCRETE CLASS in the analogy: it inherits nist's controls and supplies the
+# implementations they demand.
+#
+# Everything under `publishes` is read from the REAL repo through
+# .estate-clone/platform/. This file declares the inheritance edges, which is
+# the only part that does not exist today.
+party: platform
+roles: [publisher, risk-bearer, adopter]
+
+inherits:
+  # REAL edge. platform's own oscal/component-definition.json cites
+  # "source": "estate/nist/catalog/NIST_SP-800-53_rev5.2.0_catalog.json".
+  - party: nist
+    kind: controls
+    version: "1.0.0"
+
+publishes:
+  # Read live from the clone:
+  #   distribution/versions.yaml           -> the version array that is live
+  #   distribution/policies/v*/            -> the rule bodies
+  #   oscal/component-definition.json      -> which control each policy evidences
+  - kind: implementations
+    source: distribution
+    mapping: oscal/component-definition.json
+
+  # REAL, and the "informed" half of informed caging. feeds/ ships a signed,
+  # versioned institution threat register, a CVE feed and an EOL feed. They are
+  # consumed by fair.py as pinned deps: a feed bump re-tunes the £ with no edit
+  # to fair.py and no edit to any policy.
+  - kind: threat
+    source: feeds
+    versions: ["v1", "v2"]

@@ -62,6 +62,32 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
   gate must fail when movement traces to one**; and deny is unobservable at admission, so the bottom
   rung is proved by function test and said so.
 
+- [Does inheritance earn its place](issues/06-does-inheritance-earn-its-place.md) — **answers a
+  narrower question than the map meant; see the
+  [`policy-composition` map](../policy-composition/map.md).** For
+  a policy version extending *its own predecessor*: **no, a rendered diff is enough.** Not because
+  the diff is clean, but because **the
+  gate never classifies from the delta**: major/patch come from verdict movement, minor from presence
+  plus `validationActions`, and cs-03's generator wants the *list* of CEL expressions, not a
+  comparison. The delta is only evidence prose for the reviewer. Four findings the gate must carry:
+  parse the YAML (19 of the 30 changed lines in the named pair are comments); **the identity label is
+  a family name, not a unique key** — `graded-enforcement` and `posture` each group different
+  unversioned policies, so pair on `(identity, name-with-version-stripped)` and **fail** on an
+  unversioned member; compare rules as a set; and treat a version-literal difference as unproven.
+  Prototype: `spikes/cs-06-inheritance-vs-diff/`. The claim "inheritance leaves this map" is
+  **withdrawn** — that was the narrow reading.
+- **The bump is a property of a composition, not of a file** — from the cross-party composition work,
+  which is now its own map: [`policy-composition`](../policy-composition/map.md). An adopter's
+  effective rule set is inherited from several parties, so **the gate computes the bump after
+  composition**. A regulator's *addition* is a downstream build break. A **retired array element is a
+  downstream major with no policy diff at all**. cs-01's method is **extended, not unchanged**: its
+  verdict-movement half works as-is on composed sets, but a composition also refuses on **coverage**
+  with zero verdict movement, a second structural axis just as cs-01's minor finding was a first. The
+  publisher still tags **one** bump at the strictest band with the per-institution matrix as evidence,
+  exactly as cs-02 settled; composition is the mechanism behind that matrix. Everything else that came
+  out of that work — baselines, OSCAL coverage, caging economics, feed parents, signing — is on the
+  other map, because this map's own preference says a refactor must not take the gate hostage.
+
 ## Not yet specified
 
 - **Where the gate runs after the six-org split.** The other effort is splitting the estate into six
@@ -86,5 +112,6 @@ needs versioning and signing — both in [ticket 03](issues/03-what-is-the-corpu
 
 - **Rewriting the old faithful-floor estate.** It is being archived by the other effort. Read-only
   source of validation fixtures here.
-- **Policy inheritance as a general refactor.** Only the narrow question "does the delta need it?" is
-  in scope; shipping `extends` across every policy file is its own effort if it wins.
+- **Policy inheritance, of either kind.** Shipping `extends` across every policy file for DRY reasons
+  is its own effort. Cross-party composition is a different thing again and has its own map:
+  [`policy-composition`](../policy-composition/map.md). This map takes one fact from it and no more.

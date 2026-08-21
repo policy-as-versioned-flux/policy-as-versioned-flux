@@ -1,0 +1,32 @@
+# PROTOTYPE — spike cs-06b. A proposed shape, not a shipped format.
+#
+# tuppence is a UK bank: a risk-bearing adopter, toward-strict. Same inheritance
+# edges as driftwood. It is here so the SAME declared inability can be priced
+# against a different appetite band. The band itself is not declared here; it is
+# read live from platform/risk/appetite.json, which is the single source of
+# truth for it.
+party: tuppence
+roles: [risk-bearer, adopter]
+
+inherits:
+  - party: platform
+    kind: implementations
+    version: "0.1.0"
+  - party: nist
+    kind: controls
+    version: "1.0.0"
+  - party: ico
+    kind: pricing
+    version: "1.0.0"
+  # The threat feed is a parent like any other: signed, versioned, pinned.
+  # Bumping it re-prices every cage below it with no policy edit at all.
+  - party: platform
+    kind: threat
+    version: "v1"
+
+workloads:
+  - { name: tuppence-ledger, pins: "1.0.0" }
+
+overlay:
+  add: []
+  restate: []

@@ -1,0 +1,29 @@
+# PROTOTYPE — spike cs-06 only. Not a shipped format, not consumed by Flux.
+#
+# Path B: the same two require-nonroot versions expressed once, with v2.0.0
+# declaring its delta instead of restating the body. Source-level inheritance
+# only: render.py flattens this to the per-version files Kyverno actually
+# gets, each still self-scoping via matchConditions (never objectSelector,
+# which Kyverno flattens into one shared webhook — see the flat files' own
+# comments).
+policy: require-nonroot
+partOf: platform
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+
+versions:
+  "1.0.0":
+    actions: [Audit]
+    validations:
+      - id: nonroot
+        expression: >-
+          object.spec.?securityContext.?runAsNonRoot.orValue(false) == true
+        message: "pods on policy-version {{version}} must set spec.securityContext.runAsNonRoot=true"
+
+  "2.0.0":
+    extends: "1.0.0"
+    addValidations:
+      - id: readonly-rootfs
+        expression: >-
+          object.spec.containers.all(c, c.?securityContext.?readOnlyRootFilesystem.orValue(false) == true)
+        message: "pods on policy-version {{version}} must set readOnlyRootFilesystem=true on every container"

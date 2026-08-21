@@ -1,0 +1,39 @@
+# Fixed input for spike cs-06. Copied verbatim from:
+#   source: policy-as-versioned-platform/platform @ main
+#   path:   distribution/policies/v1.0.0/require-nonroot.yaml
+# This is the pair ticket cs-06 names as the duplication: v2.0.0 copies this
+# CEL expression byte-identically, hand-edits the version string in several
+# places, and appends one rule.
+#
+# require-nonroot @ 1.0.0 — the baseline control, Audit (lane-keeper).
+#
+# Self-scopes via matchConditions on the policy-version label — NOT
+# matchConstraints.objectSelector, which Kyverno flattens into one shared
+# ValidatingWebhookConfiguration (last-reconciled-wins) and silently breaks
+# multi-version coexistence. Only pods that CLAIM this exact version are judged
+# here; a pod on 2.0.0 (or unversioned) is out of scope, so both versions
+# admit side by side.
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+metadata:
+  name: require-nonroot-1-0-0
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: require-nonroot
+    policy-as-versioned.dev/policy-version: "1.0.0"
+spec:
+  validationActions: [Audit]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: only-this-policy-version
+      expression: >-
+        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '1.0.0'
+  validations:
+    - expression: >-
+        object.spec.?securityContext.?runAsNonRoot.orValue(false) == true
+      message: "pods on policy-version 1.0.0 must set spec.securityContext.runAsNonRoot=true"

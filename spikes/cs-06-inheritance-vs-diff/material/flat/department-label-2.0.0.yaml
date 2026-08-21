@@ -1,0 +1,31 @@
+# Fixed input for spike cs-06, copied verbatim from ticket cs-01's own corpus:
+#   source: policy-as-versioned-platform/platform @ main
+#   path:   computed-semver/corpus/department-label-2.0.0.yaml
+# (which in turn copied it from policy-as-versioned-flux/policy @ v2.0.0)
+# Same CEL body as department-label-1.0.0.yaml -- the ONLY change at this
+# version is validationActions: Audit -> Deny (the promotion CONTEXT.md
+# itself names as a major example).
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-department-label
+  annotations:
+    policies.kyverno.io/title: Require department label
+    policies.kyverno.io/subject: Pod
+spec:
+  # Promoted Audit -> Deny at v2.0.0 (a major bump per CONTEXT.md's own
+  # example). v1.0.x tags stay frozen at Audit.
+  validationActions:
+    - Deny
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+    objectSelector:
+      matchLabels:
+        mycompany.com/policy-version: 0.0.0-unset
+  validations:
+    - expression: "has(object.metadata.labels) && 'department' in object.metadata.labels"
+      message: "Pods must carry a 'department' label for cost and ownership attribution."

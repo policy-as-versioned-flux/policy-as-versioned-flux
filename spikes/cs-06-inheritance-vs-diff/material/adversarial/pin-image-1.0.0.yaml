@@ -1,0 +1,28 @@
+# PROTOTYPE fixture — spike cs-06, adversarial case 1: a value that HAPPENS to
+# equal the policy version string. The required image tag is app:1.0.0 at both
+# policy versions. Nothing substantive changes between this file and
+# pin-image-2.0.0.yaml. A version-literal normaliser must not read the image
+# pin as a rule change.
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+metadata:
+  name: pin-image-1-0-0
+  labels:
+    policy-as-versioned.dev/policy: pin-image
+    policy-as-versioned.dev/policy-version: "1.0.0"
+spec:
+  validationActions: [Deny]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: only-this-policy-version
+      expression: >-
+        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '1.0.0'
+  validations:
+    - expression: >-
+        object.spec.containers.all(c, c.image.endsWith(':1.0.0'))
+      message: "every container must run the approved image tag 1.0.0"

@@ -1,0 +1,40 @@
+# PROTOTYPE — spike cs-06b. A proposed shape, not a shipped format.
+#
+# nist is a regulator: a publisher that ships controls and bears no risk of its
+# own. In the class analogy it is the ABSTRACT BASE. A control says what must
+# hold. It never says how, and it cannot be enforced by itself.
+#
+# `baseline` is the part that DOES NOT EXIST in the estate today, and this
+# spike's sharpest finding. nist really does publish 1196 controls at v1.0.0
+# (catalog/CATALOG_VERSION.json, controlCount: 1196). Nothing anywhere declares
+# WHICH of them this estate claims. Without that declaration a composition
+# cannot tell an implemented control from an ignored one, so "unimplemented
+# abstract method" is undetectable.
+party: nist
+roles: [publisher]
+
+publishes:
+  kind: controls
+  versions:
+    # REAL. The pinned tag driftwood/gitops/apps/nist-pin-configmap.yaml
+    # carries today: catalogVersion 1.0.0, nistRevision 5.2.0.
+    "1.0.0":
+      catalog: NIST SP 800-53 rev 5.2.0
+      controlCount: 1196
+      baseline:
+        # Both control ids are real and are the two the estate's own OSCAL
+        # component-definition.json actually maps a Kyverno policy to.
+        - nist-800-53:ac-6   # Least Privilege
+        - nist-800-53:cm-6   # Configuration Settings
+
+    # HYPOTHETICAL. Authored here to model what a catalogue bump does. The
+    # control id is real: ac-6.10, "Prohibit Non-privileged Users from
+    # Executing Privileged Functions", already present in the pinned catalogue
+    # but not in the baseline above.
+    "2.0.0":
+      catalog: NIST SP 800-53 rev 5.2.0
+      controlCount: 1196
+      baseline:
+        - nist-800-53:ac-6
+        - nist-800-53:cm-6
+        - nist-800-53:ac-6.10

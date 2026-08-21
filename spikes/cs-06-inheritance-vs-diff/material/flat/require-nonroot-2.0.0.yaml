@@ -1,0 +1,39 @@
+# Fixed input for spike cs-06. Copied verbatim from:
+#   source: policy-as-versioned-platform/platform @ main
+#   path:   distribution/policies/v2.0.0/require-nonroot.yaml
+#
+# require-nonroot @ 2.0.0 — the control tightened one version on: still Audit,
+# but now ALSO requires a read-only root filesystem. This is why versioning the
+# control matters — a workload compliant under 1.0.0 need not satisfy 2.0.0, yet
+# each is judged ONLY by the version it claims (matchConditions self-scoping), so
+# 1.0.0 and 2.0.0 coexist in one cluster with no shared-webhook collision.
+#
+# Audit->Deny promotion is a separate, editorial PR (never a timer, no date logic
+# in the body — ADR-0006); the £ that justifies it is ticket 06/09.
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+metadata:
+  name: require-nonroot-2-0-0
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: require-nonroot
+    policy-as-versioned.dev/policy-version: "2.0.0"
+spec:
+  validationActions: [Audit]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: only-this-policy-version
+      expression: >-
+        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '2.0.0'
+  validations:
+    - expression: >-
+        object.spec.?securityContext.?runAsNonRoot.orValue(false) == true
+      message: "pods on policy-version 2.0.0 must set spec.securityContext.runAsNonRoot=true"
+    - expression: >-
+        object.spec.containers.all(c, c.?securityContext.?readOnlyRootFilesystem.orValue(false) == true)
+      message: "pods on policy-version 2.0.0 must set readOnlyRootFilesystem=true on every container"
