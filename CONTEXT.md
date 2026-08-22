@@ -109,7 +109,12 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   pass into a fail at the gate (a new or tightened `Deny` policy, an `Audit`→`Deny` promotion,
   free-text label → enum); **minor** = an addition that cannot fail an existing compliant workload
   (e.g. a new `Audit` policy); **patch** = fix/widening (the passing set only grows). ("Don't be
-  fooled by the decimal points — 1.20.0 > 1.3.0.")
+  fooled by the decimal points — 1.20.0 > 1.3.0.") **Compliant means admitted** — an `Audit` rule
+  fires and reports without refusing, so a workload carrying `Audit` findings is still compliant for
+  this definition. **Reset on bump** — against the base (the highest existing tag lower than the
+  declared version), the leftmost component that increased must zero every component to its right; a
+  gap is legal, but the historical `2.1.1` release fails this rule, correctly (base `2.0.1`, minor
+  increased, patch should have reset to `0` but stayed `1`).
 
 - **Multi-version coexistence** — A single runtime (cluster) must accept and evaluate **multiple
   policy versions simultaneously** (≥3), so old versions can be retired over a transition window
@@ -133,7 +138,10 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   PR). Because every versioned policy — gates included — matches only workloads that opt in via the
   label, the guard is what makes the gate tier a locked door rather than an opt-in door. Closes the
   original's silent-ungovernance gap where a
-  workload pinned to a retired version was matched by no policy.
+  workload pinned to a retired version was matched by no policy. The guard's own emitted policy
+  carries the `policy-as-versioned.dev/policy: platform-machinery` identity label — a real class for
+  objects the platform's own tag numbers, not a policy version tag, so a reader can tell the guard
+  apart from an actually-unversioned policy.
 
 ---
 
