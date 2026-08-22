@@ -87,6 +87,44 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
   unversioned member; compare rules as a set; and treat a version-literal difference as unproven.
   Prototype: `spikes/cs-06-inheritance-vs-diff/`. The claim "inheritance leaves this map" is
   **withdrawn** — that was the narrow reading.
+- [Where the gate runs, and what happens when it disagrees](issues/05-the-gate-and-disagreement.md) —
+  **two gates asking two different questions, and no override at all.** The publisher gate runs inside
+  `cut-release.yml`, reads the declared bump from the `version` input, and runs **before `git tag`**,
+  because that workflow refuses to move a tag and a late refusal burns a version number. It
+  **refuses a declared bump weaker than the computed one, permits a stronger one, and never rewrites**.
+  The adopter gate runs in each institution's `shift-left.yml` and computes that institution's own
+  **composed** bump rather than recomputing the publisher's. There is **no override**: over-declaring
+  is the only relief valve, and disagreement goes through a reviewed PR to the generator or the policy,
+  exactly as `CONTEXT.md` requires. Comparison is against **every supported version lower than the
+  declared version, in the window as it stood before this release**, so backports narrow correctly and
+  a retirement classifies as major with no policy diff. Version legality follows semver 2.0.0 and adds
+  nothing: reset on bump is enforced, gaps are legal. **Cost is settled by measurement**, roughly
+  3.5 milliseconds per evaluation, so the wall-clock is published and never enforced. Evidence is
+  signed with `cosign sign-blob` keyless and committed in the release commit, which **removes the
+  `feeds/sign.sh` shape ticket 04 chose**. Two live bugs fell out: `shift-left.yml` checks out
+  platform's default branch instead of the pinned tag, and backports break the `@refs/heads/main`
+  identity pin on all six repos. Hands ADR-0011, one `CONTEXT.md` sentence, and the five unversioned
+  policies to ticket 07.
+- [What in `platform` carries a version, and what numbers it](issues/07-platform-version-under-the-same-rule.md) —
+  **"unversioned" was the symptom; the disease is unpinned delivery.** No Flux Kustomization targets
+  `./graded` or `./posture`, so four of the five reach a cluster by `kubectl apply -f` in `up.sh`, and
+  `policy/policies/v1.0.0/` is not in the array at all. cs-03 and cs-05 both assume the installed set
+  comes from the array, and for half the policies it does not. The owner's second reframe: **there is no
+  content gate any more, only cages** — both remaining `Deny` policies are structural, so cage severity
+  *is* the enforcement and it ratchets one way. Settled: **one version mechanism**, so every claim-wide
+  policy becomes a per-version copy self-scoped on the claim, **rendered not hand-written**, with the
+  PriorityClasses included because they are the enforcement dial. The orphan guard is the one member
+  that cannot join and takes the identity **`platform-machinery`**, which settles the ADR-0002 tension:
+  the platform tag numbers both the array and the guard's template. `may-run-root-if-attested` folds
+  into the distribution line at **`1.0.1`**, a widening, so the two-`v1.0.0` question is closed. The
+  repair is **one hand-classified release**: platform `1.0.0` (leaving `0.x`, where the gate has nothing
+  to refuse), plus `1.0.2` and `2.0.1` re-cut with the full set, because cut tags cannot gain files and
+  deleting the shared copies would uncage every pinned pod. **Major is restated at spec level**: the new
+  cage spec must be at least as permissive as the old one, and the gate never estimates viability. Four
+  gate rules fell out, and two limits stayed open: the cage ratchets with no counter-pressure, and the
+  rule can only see the workload's side, so removing enforcement scores as a patch. Implementation in
+  tickets [09](issues/09-repair-release-and-pinned-delivery.md),
+  [10](issues/10-render-mandatory-members.md) and [11](issues/11-gate-rules-from-cs-07.md).
 - **The bump is a property of a composition, not of a file** — from the cross-party composition work,
   which is now its own map: [`policy-composition`](../policy-composition/map.md). An adopter's
   effective rule set is inherited from several parties, so **the gate computes the bump after
@@ -101,23 +139,25 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
 
 ## Not yet specified
 
-- **Where the gate runs after the six-org split.** The other effort is splitting the estate into six
-  repos; whether this gate lives in the policy repo's CI, the platform release pipeline, or a
-  cross-org check depends on decisions not yet taken over there.
-- **Whether `distribution/policies/` and `policy/policies/` are one version line.** Two trees in the
-  same repo each declare their own `v1.0.0`, and `versions.yaml` reconciles only the first. The corpus
-  ticket makes the gate refuse a same-version-different-content collision, which surfaces the answer
-  rather than deciding it.
+- **Whether the cage gets a counter-pressure.** Cage severity is now the only enforcement, and it
+  ratchets one way. Each tightening is correctly labelled major, and many correct majors still end at a
+  platform too expensive to run. `verify/proportionality/render.py` prices a control against a risk
+  band and is the only candidate. Nothing wires it in.
+  [Ticket 07](issues/07-platform-version-under-the-same-rule.md) names this as a standing limit.
 - **Where a priced residual for a real workload comes from.** The tier axis is synthetic by design
   (ticket 03), and the estate holds two FAIR scenarios in total, both driftwood's. Nothing maps a pod
   to a scenario. Not blocking this map, but the cage half of the model is proved on synthetic input
   until it exists. [Ticket 04](issues/04-coverage-stated-not-implied.md) makes this print as a derived
   limit on every release, with its own count, so it cannot rot quietly.
 
-*Settled since charting: how the COTS/unversioned shim changes the corpus, and whether the corpus
+*Settled since charting: whether `distribution/policies/` and `policy/policies/` are one version line —
+yes, one line, and `may-run-root-if-attested` folds in at `1.0.1` as a widening, in
+[ticket 07](issues/07-platform-version-under-the-same-rule.md). How the COTS/unversioned shim changes the corpus, and whether the corpus
 needs versioning and signing — both in [ticket 03](issues/03-what-is-the-corpus.md). Whether the
 Renovate bump PR carries the computed evidence — yes, and its body is the view that gets the design
-effort, in [ticket 04](issues/04-coverage-stated-not-implied.md).*
+effort, in [ticket 04](issues/04-coverage-stated-not-implied.md). Where the gate runs after the
+six-org split, and where the declared bump is read from — both in
+[ticket 05](issues/05-the-gate-and-disagreement.md).*
 
 ## Out of scope
 
