@@ -1,8 +1,14 @@
 # 11 — Four gate rules and two `CONTEXT.md` edits from cs-07
 
 Type: task
-Status: open
+Status: split
 Blocked by: 10
+
+**Split on 2026-08-22 into implementation tickets.** This ticket holds the reasoning. The four rules
+live in [26](26-four-extra-gate-rules.md). The `platform-machinery` class and the spec-level restatement
+of major live in [22](22-pairing-rules-and-platform-machinery.md) and
+[21](21-cage-spec-comparison-and-computed-bump.md). ADR-0011 and the `CONTEXT.md` edits live in
+[30](30-adr-0011-and-context-edits.md).
 
 ## Question
 

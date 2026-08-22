@@ -1,8 +1,11 @@
 # 10 — Render the mandatory members into every version tree
 
 Type: task
-Status: open
+Status: split
 Blocked by: none
+
+**Split on 2026-08-22 into implementation tickets.** This ticket holds the reasoning. The work lives in
+[12](12-render-mandatory-members-into-a-version-tree.md).
 
 ## Question
 

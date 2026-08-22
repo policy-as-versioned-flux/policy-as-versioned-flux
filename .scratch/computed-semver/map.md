@@ -2,6 +2,68 @@
 
 Label: `wayfinder:map`. Charted 2026-08-20.
 
+**Spec: [`spec.md`](spec.md)** — written 2026-08-22 from the seven resolved tickets. It carries the
+whole gate.
+
+**Implementation: tickets 12 to 30**, cut from the spec on 2026-08-22. Tickets
+[09](issues/09-repair-release-and-pinned-delivery.md), [10](issues/10-render-mandatory-members.md) and
+[11](issues/11-gate-rules-from-cs-07.md) are marked `split`. They hold the reasoning, and the newer
+tickets hold the work.
+
+Three lanes run in parallel. Lane A repairs pinned delivery. Lane B builds the gate engine against the
+read-only faithful-floor line, so it needs nothing from Lane A. Lane C joins them and ships.
+
+```mermaid
+flowchart LR
+  subgraph A["Lane A — pinned delivery"]
+    T12["12 render<br/>mandatory members"]
+    T13["13 multi-tag<br/>cut-release"]
+    T14["14 anchored<br/>identity regexp"]
+    T15["15 the repair release<br/>3 tags, 1 commit"]
+    T16["16 backport 1.0.1"]
+    T17["17 demo scripts<br/>as offline twins"]
+    T12 --> T15
+    T13 --> T15
+    T12 --> T17
+    T14 --> T16
+    T15 --> T16
+  end
+  subgraph B["Lane B — the gate engine"]
+    T18["18 seam +<br/>version legality"]
+    T19["19 corpus spine"]
+    T20["20 witness set"]
+    T21["21 cage-spec<br/>comparison"]
+    T22["22 pairing +<br/>platform-machinery"]
+    T23["23 coverage"]
+    T24["24 window +<br/>matrix"]
+    T25["25 generator<br/>standing check"]
+    T18 --> T19 --> T20
+    T19 --> T21 --> T22
+    T19 --> T23
+    T21 --> T23
+    T21 --> T24
+    T21 --> T25
+  end
+  subgraph C["Lane C — join and ship"]
+    T26["26 four extra<br/>gate rules"]
+    T27["27 sign + wire<br/>publisher gate"]
+    T28["28 adopter gate"]
+    T29["29 evidence in<br/>the PR body"]
+    T30["30 ADR-0011 +<br/>CONTEXT.md"]
+    T27 --> T28
+    T27 --> T29
+  end
+  T12 --> T26
+  T22 --> T26
+  T24 --> T26
+  T15 --> T27
+  T20 --> T27
+  T23 --> T27
+  T26 --> T27
+  T22 --> T30
+  T26 --> T30
+```
+
 ## Destination
 
 **A policy release states its bump and is refused if the evidence disagrees.** The release gate

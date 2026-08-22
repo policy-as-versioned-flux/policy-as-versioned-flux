@@ -1,8 +1,14 @@
 # 09 — Cut the repair release: pinned delivery for every policy
 
 Type: task
-Status: open
+Status: split
 Blocked by: 10
+
+**Split on 2026-08-22 into implementation tickets.** This ticket holds the reasoning. The work lives in
+[13](13-cut-release-carries-more-than-one-tag.md) (step 8),
+[15](15-the-repair-release.md) (steps 1, 2, 4, 5, 6),
+[16](16-backport-1-0-1.md) (step 3) and
+[17](17-demo-scripts-as-offline-twins.md) (step 7).
 
 ## Question
 
