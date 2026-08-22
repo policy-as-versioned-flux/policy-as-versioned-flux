@@ -62,6 +62,17 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
   gate must fail when movement traces to one**; and deny is unobservable at admission, so the bottom
   rung is proved by function test and said so.
 
+- [How is incomplete coverage stated rather than implied](issues/04-coverage-stated-not-implied.md) —
+  **no coverage percentage at all**: a percentage invites a threshold, and a threshold invites tuning
+  the corpus until it passes. The gate publishes counts plus a **not-looked-at list**, and every entry
+  on it carries a **stable id** (hash of the normalised expression text) so the reviewer sees which
+  holes are *new*. Three binary gates replace the threshold: an unreached predicate, a missing witness
+  shape, movement on an unversioned policy. The whole-space ratio is never printed, because the space
+  is over four million and the built set is tens; the pairwise gap is one sentence and two counts
+  instead. **Ticket 03's "per CEL expression" wording is corrected**: coverage is over *predicate*
+  expressions only, and a variable counts as covered only when an axis spans its values. The gate
+  **always emits and signs the evidence, including when it refuses**. Limits are **derived by the
+  check that would remove them** and print as *closed* rather than vanishing.
 - [Does inheritance earn its place](issues/06-does-inheritance-earn-its-place.md) — **answers a
   narrower question than the map meant; see the
   [`policy-composition` map](../policy-composition/map.md).** For
@@ -93,9 +104,6 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
 - **Where the gate runs after the six-org split.** The other effort is splitting the estate into six
   repos; whether this gate lives in the policy repo's CI, the platform release pipeline, or a
   cross-org check depends on decisions not yet taken over there.
-- **Whether the Renovate bump PR should carry the computed evidence.** ADR-0002 makes the reviewed PR
-  the non-negotiable gate — a reviewer seeing "this bump is major, here are the three workloads that
-  flip" is strictly better than seeing a version number. Shape unclear until the gate exists.
 - **Whether `distribution/policies/` and `policy/policies/` are one version line.** Two trees in the
   same repo each declare their own `v1.0.0`, and `versions.yaml` reconciles only the first. The corpus
   ticket makes the gate refuse a same-version-different-content collision, which surfaces the answer
@@ -103,10 +111,13 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
 - **Where a priced residual for a real workload comes from.** The tier axis is synthetic by design
   (ticket 03), and the estate holds two FAIR scenarios in total, both driftwood's. Nothing maps a pod
   to a scenario. Not blocking this map, but the cage half of the model is proved on synthetic input
-  until it exists.
+  until it exists. [Ticket 04](issues/04-coverage-stated-not-implied.md) makes this print as a derived
+  limit on every release, with its own count, so it cannot rot quietly.
 
 *Settled since charting: how the COTS/unversioned shim changes the corpus, and whether the corpus
-needs versioning and signing — both in [ticket 03](issues/03-what-is-the-corpus.md).*
+needs versioning and signing — both in [ticket 03](issues/03-what-is-the-corpus.md). Whether the
+Renovate bump PR carries the computed evidence — yes, and its body is the view that gets the design
+effort, in [ticket 04](issues/04-coverage-stated-not-implied.md).*
 
 ## Out of scope
 
