@@ -2,6 +2,23 @@
   "enabledPlugins": {
     "arckit@arc-kit": true
   },
+  "permissions": {
+    "allow": [
+      "Bash(kubectl get *)",
+      "Bash(kubectl logs *)",
+      "Bash(kubectl describe *)",
+      "Bash(kubectl config get-contexts*)",
+      "Bash(git fetch *)",
+      "mcp__claude-in-chrome__find",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "mcp__claude_ai_Gmail__search_threads",
+      "mcp__claude-in-chrome__get_page_text",
+      "mcp__claude_ai_Gmail__get_thread",
+      "mcp__claude-in-chrome__read_page",
+      "mcp__claude_ai_Gmail__get_message",
+      "mcp__plugin_arckit_microsoft-learn__microsoft_docs_search"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
