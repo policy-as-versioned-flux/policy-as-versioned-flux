@@ -42,19 +42,32 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   the estate has one implementations publisher. The pricing and threat parents are wired and the price
   moves; **no real feed bump changes a decision**. Four gaps found, but only one of them needed
   composition to find.
+- [What gets signed?](issues/02-what-gets-signed.md) — **the adopter self-signs, no new mechanism.**
+  A composed set is a real, published, signed artefact: the adopter gitsign-signs it exactly as it
+  signs any artefact today. A parent's "digest" is its resolved commit SHA, the one Renovate already
+  pins, recorded once at the top of the file. Verification stays CI/merge-time only, same floor as
+  today. Recorded as [ADR-0012](../../docs/adr/0012-composed-artefact-self-signed-pinned-sha.md) and
+  a new **Composed artefact** term in `CONTEXT.md`.
+- [Who declares the baseline, and against which catalogue ids](issues/03-baseline-and-catalogue-ids.md)
+  — **the regulator publishes named baselines, the adopter selects one, and both key on the bare
+  catalogue id.** Baselines are OSCAL profiles, the shape NIST already ships. The split keeps a
+  regulator's addition a downstream break, which an adopter-enumerated list would hide, and it keeps
+  coverage from going tautological, which a publisher-declared baseline would cause. The estate
+  selects **MODERATE**: LOW excludes `ac-6`, one of the two controls it implements. That is **285
+  holes on day one**, so a composition refuses on a **new** hole only, against the last signed
+  composed artefact, and records the rest. `ac-6.10` is **already in real MODERATE**, so ticket `01`'s
+  hypothetical `nist` `v2.0.0` is superseded and the hole is live. The id is `ac-6`, never `AC-6` and
+  never `nist-800-53:AC-6`; the resolver never case-folds and never strips. Recorded as
+  [ADR-0013](../../docs/adr/0013-regulator-publishes-baselines-adopter-selects.md) and new
+  **Baseline** and **Control id** terms in `CONTEXT.md`.
 
 ## Not yet specified
 
-- **What gets signed.** Each party signs its own artefact. A composed set is a new artefact. The
-  render must be reproducible from signed parent digests, or a verifier loses the chain.
-- **Who declares the baseline, and against which catalogue ids.** The prototype's `nist-800-53:AC-6`
-  form matches neither the catalogue's case nor its lack of a prefix.
-- **Whether an unlabelled pod is denied.** `CONTEXT.md:129` says the orphan guard denies a *missing*
-  label. The committed guard's `matchConditions` skip unlabelled pods entirely, and nothing else
-  denies them. One of the two is wrong.
-- **The proposer.** Section 9b of the prototype prints a proposed tier. Nothing raises the PR.
-- **Composing the five unversioned live policies.** The prototype composes 3 of the 8 that `cs-03`
-  found.
+None currently. All five fog items graduated to tickets
+[`02`](issues/02-what-gets-signed.md), [`03`](issues/03-baseline-and-catalogue-ids.md),
+[`04`](issues/04-unlabelled-pod-denial.md), [`05`](issues/05-the-proposer.md) and
+[`06`](issues/06-composing-the-remaining-policies.md). Ticket `03` surfaced one more,
+[`07`](issues/07-adopter-added-controls.md), specifiable at once.
 
 ## Out of scope
 

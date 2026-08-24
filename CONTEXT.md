@@ -26,7 +26,8 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
     (`driftwood`, `tuppence`, `ludlow`, **and `platform`** — the apparatus prices its own risk
     against a strict £10k band, see *reflexive*);
   - **adopter** — pins and consumes another party's artefact (the three institutions; `platform`
-    itself as it pins `nist`).
+    itself as it pins `nist`), and becomes a **publisher** of its own **composed artefact** the
+    moment it inherits from more than one parent.
 
 - **Institution** — A regulated, risk-bearing adopter: `driftwood` (UK retail), `tuppence` (UK bank),
   `ludlow` (US health). Kept over "consumer" because it carries the regulatory weight the
@@ -130,6 +131,31 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
 
 - **Consumer** — A repo/workload that depends on a policy version (the original's `app1..3`,
   `infra1..3`). Opts in to a version and is judged against it.
+
+- **Composed artefact** — A party's effective policy set, inherited from its parents' own signed
+  artefacts (the diamond, e.g. `driftwood -> platform -> nist` and `driftwood -> nist`) and rendered
+  down to the flat, per-version files the engine reads. The adopter signs it exactly as any
+  **publisher** signs an artefact — the same gitsign-signed tag, no second mechanism — but the file
+  also carries each parent's resolved commit SHA, once, declaring which parent versions it was
+  rendered from. A verifier re-renders from those pinned SHAs and checks the result byte-for-byte.
+  See [ADR-0012](docs/adr/0012-composed-artefact-self-signed-pinned-sha.md).
+
+- **Baseline** — The named subset of a catalogue's controls that a party claims apply to it. A
+  **regulator** publishes baselines by name, as OSCAL profiles, signed and versioned like any other
+  artefact it publishes (NIST's own are LOW, MODERATE and HIGH, at 149, 287 and 370 controls). An
+  **adopter** selects one by name, in the party artefact it signs, because selection is the
+  risk-bearing act. An adopter may **add** controls to its selected baseline and may **never remove**
+  one: a removal is an **exemption** by another name, and a control the adopter cannot meet is caged
+  and priced, not dropped. A baseline control that nothing implements is a **hole**; a composition
+  refuses on a **new** hole and records a pre-existing one, comparing against the last signed
+  **composed artefact**. See [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md).
+
+- **Control id** — A control's identity is the **bare id the catalogue itself writes**: `ac-6`, never
+  `AC-6` and never `nist-800-53:AC-6`. `AC-6` and `AC-06` are display labels the catalogue also
+  carries, and are never keys. Which catalogue an id belongs to is stated once, by the `source` or
+  `href` on the enclosing block, never repeated as a prefix on the id. Resolution is exact-string:
+  no case-folding, no prefix-stripping, and an id absent from the catalogue is a hard failure. See
+  [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md).
 
 - **Orphan guard** — A deterministic catch-all `ValidatingPolicy` that **denies at admission** any
   workload whose `policy-version` label is **missing or not in** the cluster's currently-installed

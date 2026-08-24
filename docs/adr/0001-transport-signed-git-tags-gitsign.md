@@ -60,3 +60,7 @@ most legible, reviewable expression of "what is the policy and what version is i
   annotations + `rationale.md`), travelling with the tag.
 - The version **pin** lives on `GitRepository.spec.ref` as the `{tag, commit}` pair; the human-legible
   semver tag remains the identity, the commit SHA is the integrity anchor.
+- **A composed artefact reuses this same mechanism, unchanged.** An adopter signing its own
+  multi-parent composition is still one gitsign-signed tag; the parents it composed are declared by
+  their already-pinned commit SHAs, not a second digest scheme. See
+  [ADR-0012](0012-composed-artefact-self-signed-pinned-sha.md).
