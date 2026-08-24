@@ -96,6 +96,16 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   rationale/risk/ethos plus external signals (CVEs, cloud/regulatory change, Wardley climatic
   movement) and surfaces noise-reduced **business decisions** as review PRs/issues. It **prompts**
   editorial review; it **never edits enforcement**. Specified as architecture + a thin demonstrator.
+  Its concrete instance is the **proposer**.
+
+- **Proposer** — The agent governance layer as it actually runs. A proposer war-games the signed
+  feeds against the deployed controls, and it raises every resulting change as a reviewed PR. It is
+  **bounded** by a confidence floor, a rate limit and a rejection ledger, and it exposes no `merge()`
+  and no `approve()`. The bounds cut reviewer noise. They never grant authority. The **adopter** runs
+  the proposer in its own repo, against its own **composed artefact**, because selection is the
+  risk-bearing act. A run starts when a merged version-pin bump lands, or when a human dispatches
+  one. Nothing starts a run on a clock. See
+  [ADR-0015](docs/adr/0015-adopter-runs-the-proposer-and-it-opens-the-pr.md).
 
 - **Advisory metadata** — `created` / `lastReviewed` / rationale / risk / ethos carried on each
   policy version (annotations + `rationale.md`, OSCAL-mappable). Read by humans and the agent layer

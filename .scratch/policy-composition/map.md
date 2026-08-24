@@ -74,6 +74,19 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   [ADR-0014](../../docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md), an amended
   **Orphan guard** entry, and new **Governed namespace** and **De-postured** terms in `CONTEXT.md`.
 
+- [The proposer](issues/05-the-proposer.md) — **a proposer already exists, the adopter runs it, and
+  it now opens the PR.** `platform/wargamer/` is already the bounded proposer, and
+  `propose-policy-pr.sh` already stops one step short on purpose. The missing pieces were the last
+  step and the target line. A cage-tier drift becomes a third drift row on the war-gamer. The
+  **adopter** runs it in its own repo, on its own `GITHUB_TOKEN`, calling the war-gamer through its
+  pinned `platform` dependency, because a cross-org credential is the one ADR-0007 records the estate
+  never built. The PR edits `posture.acme.io/tier` on a workload manifest, which is the label the
+  engine reads. A merged Renovate pin bump starts a run, and **no clock ever does**. A **sixth gap**:
+  `select_tier` returns `deny`, the label cannot carry it, and the policy coerces it to `baseline`,
+  so a merged Deny would invert the proposal in silence. Recorded as
+  [ADR-0015](../../docs/adr/0015-adopter-runs-the-proposer-and-it-opens-the-pr.md) and a new
+  **Proposer** term in `CONTEXT.md`. **A plain read of three files finds all of it.**
+
 ## Not yet specified
 
 The original five fog items all graduated to tickets
@@ -88,13 +101,19 @@ The original five fog items all graduated to tickets
   governed namespaces, which makes the namespace set part of the child's risk-bearing declaration, next
   to the baseline name ticket `03` put there. Not yet sharp enough to ticket. It is unclear whether
   this is composition business or purely `platform` machinery, and ticket
-  [`06`](issues/06-composing-the-remaining-policies.md) may settle it as a side effect.
+  [`06`](issues/06-composing-the-remaining-policies.md) may settle it as a side effect. Ticket
+  [`05`](issues/05-the-proposer.md) made this patch **load-bearing for a second reason**: the
+  proposer scans the adopter's committed workload manifests, and the governed namespace is that
+  scan's boundary. Two things now need the set declared. It is still not sharp enough to ticket.
 
 ## Out of scope
 
 - **Computing the version bump.** That is [`computed-semver`](../computed-semver/map.md). This map
   owes it one fact and no more.
-- **Repairing the named gaps.** Four from ticket [`01`](issues/01-does-composition-hold-up.md), and a
-  fifth from ticket [`04`](issues/04-unlabelled-pod-denial.md): the governed-namespace claim
-  requirement, which nothing builds today. They are defects in the `platform` repo, found from the hub.
-  Naming them, and specifying the fifth, is this map's job. Fixing them is that repo's.
+- **Repairing the named gaps.** Four from ticket [`01`](issues/01-does-composition-hold-up.md), a
+  fifth from ticket [`04`](issues/04-unlabelled-pod-denial.md), and a sixth from ticket
+  [`05`](issues/05-the-proposer.md). The fifth is the governed-namespace claim requirement, which
+  nothing builds today. The sixth is the `cage-tier` policy coercing an unknown tier label to
+  `baseline`, so a merged `deny` label produces the loosest cage instead of the tightest. They are
+  defects in the `platform` repo, found from the hub. Naming them, and specifying the fifth, is this
+  map's job. Fixing them is that repo's.
