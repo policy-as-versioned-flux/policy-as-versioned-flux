@@ -1,7 +1,7 @@
 # 23 — Coverage stated as counts and holes
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 19, 21
 
 Source: [`spec.md`](../spec.md), *Coverage and evidence*.
@@ -45,17 +45,21 @@ count: nothing maps a pod to a priced residual, so the cage half is proved on sy
 
 ## Acceptance criteria
 
-- [ ] No percentage appears anywhere in the document or the output.
-- [ ] Coverage counts cells and pairs as two separate numbers.
-- [ ] The pairwise gap prints as one sentence and two counts.
-- [ ] No whole-space ratio is printed.
-- [ ] Coverage covers predicate expressions only.
-- [ ] A variable counts as covered only when an enumerated axis spans its values.
-- [ ] An unreached predicate fails the build, and the document names the expression.
-- [ ] `not_looked_at[]` lists holes and proved exclusions, each with a stable id.
-- [ ] Each entry is marked new, carried over, or closed.
-- [ ] An unchanged rule keeps its hole id across two versions. A changed rule gets a new one.
-- [ ] The exclusion file lets a human declare a hole and refuses to let a human promote one to proved.
-- [ ] Each limit is emitted by the check that would remove it, with its count.
-- [ ] A limit at zero prints as closed rather than vanishing.
-- [ ] The three named open limits print with their counts.
+- [x] No percentage appears anywhere in the document or the output.
+- [x] Coverage counts cells and pairs as two separate numbers.
+- [x] The pairwise gap prints as one sentence and two counts.
+- [x] No whole-space ratio is printed.
+- [x] Coverage covers predicate expressions only.
+- [x] A variable counts as covered only when an enumerated axis spans its values.
+- [x] An unreached predicate fails the build, and the document names the expression.
+- [x] `not_looked_at[]` lists holes and proved exclusions, each with a stable id.
+- [x] Each entry is marked new, carried over, or closed.
+- [x] An unchanged rule keeps its hole id across two versions. A changed rule gets a new one.
+- [x] The exclusion file lets a human declare a hole and refuses to let a human promote one to proved.
+- [x] Each limit is emitted by the check that would remove it, with its count.
+- [x] A limit at zero prints as closed rather than vanishing.
+- [x] The three named open limits print with their counts.
+
+## Comments
+
+Shipped in `platform` at `ba273d9` (cs-23).

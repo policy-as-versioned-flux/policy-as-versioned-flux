@@ -1,7 +1,7 @@
 # 30 — ADR-0011 and the `CONTEXT.md` edits
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 22, 26
 
 Source: [`spec.md`](../spec.md), *Two documents are owed*, and *What the gate measures*.
@@ -27,11 +27,15 @@ to one gate. `CONTEXT.md` is the thesis glossary. Those terms live in the gate's
 
 ## Acceptance criteria
 
-- [ ] ADR-0011 exists and records the gate.
-- [ ] ADR-0011 states that there is no override, and why.
-- [ ] ADR-0011 cross-references ADR-0002.
-- [ ] `CONTEXT.md` defines reset on bump in one sentence.
-- [ ] `CONTEXT.md` names the `platform-machinery` class.
-- [ ] `CONTEXT.md` records that compliant means admitted.
-- [ ] `CONTEXT.md` gains nothing else.
-- [ ] *Hole*, *proved exclusion* and *predicate expression* appear in the gate's README, not in `CONTEXT.md`.
+- [x] ADR-0011 exists and records the gate.
+- [x] ADR-0011 states that there is no override, and why.
+- [x] ADR-0011 cross-references ADR-0002.
+- [x] `CONTEXT.md` defines reset on bump in one sentence.
+- [x] `CONTEXT.md` names the `platform-machinery` class.
+- [x] `CONTEXT.md` records that compliant means admitted.
+- [x] `CONTEXT.md` gains nothing else.
+- [x] *Hole*, *proved exclusion* and *predicate expression* appear in the gate's README, not in `CONTEXT.md`.
+
+## Comments
+
+Shipped in `hub` (this repo) at `c297835` (cs-30) — `docs/adr/0011-release-gate-computes-the-bump.md` and `CONTEXT.md`.

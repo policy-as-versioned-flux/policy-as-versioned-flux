@@ -1,7 +1,7 @@
 # 17 — Rewrite the two demo scripts as offline twins
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 12
 
 Source: [`spec.md`](../spec.md), *The repair release*, step 7. Split from
@@ -20,9 +20,13 @@ Every comparable check in this estate already has an offline twin. Follow that p
 
 ## Acceptance criteria
 
-- [ ] `graded/up.sh` renders the version trees and applies the rendered output.
-- [ ] `posture/up.sh` does the same.
-- [ ] Neither script applies an unrendered authoring copy.
-- [ ] The demo runs with no Flux in the loop.
-- [ ] The rendered output matches what the ResourceSet produces, and a check proves it.
-- [ ] The scripts are documented as demo paths, not delivery paths.
+- [x] `graded/up.sh` renders the version trees and applies the rendered output.
+- [x] `posture/up.sh` does the same.
+- [x] Neither script applies an unrendered authoring copy.
+- [x] The demo runs with no Flux in the loop.
+- [x] The rendered output matches what the ResourceSet produces, and a check proves it.
+- [x] The scripts are documented as demo paths, not delivery paths.
+
+## Comments
+
+Shipped in `platform` at `7532458` + `2667204` (cs-17).

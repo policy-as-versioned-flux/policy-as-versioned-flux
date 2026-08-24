@@ -1,7 +1,7 @@
 # 22 — Pairing rules and the `platform-machinery` class
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 21
 
 Source: [`spec.md`](../spec.md), *Pairing and structural rules*, and *The subject*.
@@ -39,15 +39,19 @@ downward is major, because a pod that cannot schedule under the new limit is ref
 
 ## Acceptance criteria
 
-- [ ] The engine parses the YAML and never diffs text.
-- [ ] A comment-only change classifies as no movement.
-- [ ] Pairing uses the tuple of identity family and the name with its version stripped.
-- [ ] An unversioned member fails, and the document names the file.
-- [ ] Rules compare as a set.
-- [ ] A version-literal difference is reported as unproven.
-- [ ] The orphan guard carries the `platform-machinery` identity.
-- [ ] The pairing rule treats `platform-machinery` as a class numbered by the platform tag.
-- [ ] A new machinery object with no identity still fails, so the class is not a by-name escape.
-- [ ] Two versioned trees declaring the same version with different content fails.
-- [ ] The version array is part of the subject.
-- [ ] A tightened `baseline` dial classifies as major.
+- [x] The engine parses the YAML and never diffs text.
+- [x] A comment-only change classifies as no movement.
+- [x] Pairing uses the tuple of identity family and the name with its version stripped.
+- [x] An unversioned member fails, and the document names the file.
+- [x] Rules compare as a set.
+- [x] A version-literal difference is reported as unproven.
+- [x] The orphan guard carries the `platform-machinery` identity.
+- [x] The pairing rule treats `platform-machinery` as a class numbered by the platform tag.
+- [x] A new machinery object with no identity still fails, so the class is not a by-name escape.
+- [x] Two versioned trees declaring the same version with different content fails.
+- [x] The version array is part of the subject.
+- [x] A tightened `baseline` dial classifies as major.
+
+## Comments
+
+Shipped in `platform` at `c29869f` + `86ea2ec` (cs-22).

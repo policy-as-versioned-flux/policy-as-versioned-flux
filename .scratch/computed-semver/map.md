@@ -199,6 +199,22 @@ Renovate PR — the review gate is non-negotiable and this must not weaken it), 
   out of that work — baselines, OSCAL coverage, caging economics, feed parents, signing — is on the
   other map, because this map's own preference says a refactor must not take the gate hostage.
 
+- **Shipped.** Tickets 12–30 are all `done`, real and independently reviewed, across `platform` and five
+  downstream repos (`driftwood`, `tuppence`, `ludlow`, `nist`, `ico`), plus this hub's own ADR-0011 and
+  `CONTEXT.md` edits (ticket 30). Two real releases prove the gate live: the **repair release**
+  (ticket 15) — `v1.0.0`, `policy/v2.0.0`, `policy/v3.0.0`, signed and gitsign-verified, renumbered from
+  the originally planned 1.0.2/2.0.1 to an honest major bump after the gate itself proved the smaller
+  numbers would have under-declared a real break — and the **backport** (ticket 16) — `policy/v2.0.1`,
+  cut from a maintenance branch and gated by the publisher gate (ticket 27) for the first time, live.
+  Proving the backport out for real surfaced and fixed **two foundational gate-engine bugs**: a wrong
+  backport-predecessor-selection bug in `gate_one()` (compared against the wrong, higher line instead of
+  the true lower neighbor), and a self-scoped-policy classification bug in `cage_engine.py` that had been
+  silently reading **every** version bump on a self-scoped policy as major regardless of content — both
+  fixed generally, not just for the one case, and independently re-verified. One disclosed gap survives
+  shipment: the six real infrastructure COTS witnesses (SPIRE, Istio, OpenBao, Pomerium, Dex, git-server)
+  were never available as real committed data, per spec.md's own Out-of-Scope section — the missing-shape
+  gate mechanism itself is real and proven regardless.
+
 ## Not yet specified
 
 - **Whether the cage gets a counter-pressure.** Cage severity is now the only enforcement, and it

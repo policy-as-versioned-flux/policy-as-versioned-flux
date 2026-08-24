@@ -1,7 +1,7 @@
 # 24 — The comparison window and the per-institution matrix
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 21
 
 Source: [`spec.md`](../spec.md), *Where the gate runs, and what it compares*, and *What the gate
@@ -37,12 +37,16 @@ start. Three policies against 200 pods cost 2.15 seconds in one invocation.
 
 ## Acceptance criteria
 
-- [ ] The gate compares against every supported version lower than the declared one.
-- [ ] The strictest result decides the computed bump.
-- [ ] The window is the one that stood before this release.
-- [ ] An array-only retirement classifies as major, with no policy diff.
-- [ ] A backport compares against the line below it only.
-- [ ] A first release records `no predecessor` and still runs the coverage checks in full.
-- [ ] `matrix` reports the result for each of the three institutions.
-- [ ] The tagged bump is the strictest band, and the matrix is evidence beneath it.
-- [ ] A version gap in the window does not break the comparison.
+- [x] The gate compares against every supported version lower than the declared one.
+- [x] The strictest result decides the computed bump.
+- [x] The window is the one that stood before this release.
+- [x] An array-only retirement classifies as major, with no policy diff.
+- [x] A backport compares against the line below it only.
+- [x] A first release records `no predecessor` and still runs the coverage checks in full.
+- [x] `matrix` reports the result for each of the three institutions.
+- [x] The tagged bump is the strictest band, and the matrix is evidence beneath it.
+- [x] A version gap in the window does not break the comparison.
+
+## Comments
+
+Shipped in `platform` at `41f3d3e` (cs-24).

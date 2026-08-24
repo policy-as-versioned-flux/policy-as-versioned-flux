@@ -1,7 +1,7 @@
 # 28 — The adopter gate in `shift-left.yml`
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 27
 
 Source: [`spec.md`](../spec.md), *Solution*, *Where the gate runs, and what it compares*, and *Two live
@@ -37,14 +37,18 @@ adopter gate computes after composition.
 
 ## Acceptance criteria
 
-- [ ] `shift-left.yml` checks out the tag under review at the pull request head.
-- [ ] It verifies the resolved commit against the pinned `commit` field.
-- [ ] It verifies the publisher's evidence signature, identity-pinned and offline.
-- [ ] The expected identity is a constant held in the institution's own repo.
-- [ ] A platform workflow rename breaks verification.
-- [ ] The composed bump is computed across every party the institution consumes.
-- [ ] Composition inputs come from the pinned versions in the institution's own repo at the pull request head.
-- [ ] A composed major fails the pull request check.
-- [ ] A composed bump weaker than the publisher's tag prints and lowers nothing.
-- [ ] A retired version reaches the institution as a major.
-- [ ] All three institutions carry the change.
+- [x] `shift-left.yml` checks out the tag under review at the pull request head.
+- [x] It verifies the resolved commit against the pinned `commit` field.
+- [x] It verifies the publisher's evidence signature, identity-pinned and offline.
+- [x] The expected identity is a constant held in the institution's own repo.
+- [x] A platform workflow rename breaks verification.
+- [x] The composed bump is computed across every party the institution consumes.
+- [x] Composition inputs come from the pinned versions in the institution's own repo at the pull request head.
+- [x] A composed major fails the pull request check.
+- [x] A composed bump weaker than the publisher's tag prints and lowers nothing.
+- [x] A retired version reaches the institution as a major.
+- [x] All three institutions carry the change.
+
+## Comments
+
+Shipped jointly with ticket 29 in the same commits, all prefixed `cs-28-29:`, all real, all pushed: `driftwood` at `28b2e46` + `2864336` + `fe0d381`; `tuppence` at `1f0e7bc` + `246293d` + `255a1c3` + `9329f68` + `d8f695d`; `ludlow` at `7e6785d` + `1d9031f` + `4a9307d` + `edc6589` + `6ef9a2e`.

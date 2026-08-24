@@ -1,7 +1,7 @@
 # 25 — The generator standing check
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 21
 
 Source: [`spec.md`](../spec.md), *Testing Decisions*, and *Signing and verification*.
@@ -27,9 +27,13 @@ exists.
 
 ## Acceptance criteria
 
-- [ ] A pull request that changes the generator re-runs the three known-good bumps.
-- [ ] The pull request is refused if any known-good bump stops rederiving.
-- [ ] The same pull request re-runs the previous release under the new generator.
-- [ ] A differing classification prints a line and does not fail the build.
-- [ ] Existing evidence files keep their recorded `generator_version` and are never recomputed.
-- [ ] The check is one standing check, not a per-function test suite.
+- [x] A pull request that changes the generator re-runs the three known-good bumps.
+- [x] The pull request is refused if any known-good bump stops rederiving.
+- [x] The same pull request re-runs the previous release under the new generator.
+- [x] A differing classification prints a line and does not fail the build.
+- [x] Existing evidence files keep their recorded `generator_version` and are never recomputed.
+- [x] The check is one standing check, not a per-function test suite.
+
+## Comments
+
+Shipped in `platform` at `c630f5f` (cs-25).

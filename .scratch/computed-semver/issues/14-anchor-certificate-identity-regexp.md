@@ -1,7 +1,7 @@
 # 14 — Anchor the certificate identity regexp in all six repos
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: none
 
 Source: [`spec.md`](../spec.md), *Signing and verification*, and *One cross-repo change*.
@@ -21,8 +21,12 @@ afterwards.
 
 ## Acceptance criteria
 
-- [ ] All six repos verify with an anchored `--certificate-identity-regexp`.
-- [ ] The regexp matches `main` and the maintenance branch shape, and nothing else.
-- [ ] The regexp pins the organisation, the repository and the workflow path.
-- [ ] A test or a documented check proves that a foreign organisation fails the regexp.
-- [ ] Existing releases signed from `main` still verify.
+- [x] All six repos verify with an anchored `--certificate-identity-regexp`.
+- [x] The regexp matches `main` and the maintenance branch shape, and nothing else.
+- [x] The regexp pins the organisation, the repository and the workflow path.
+- [x] A test or a documented check proves that a foreign organisation fails the regexp.
+- [x] Existing releases signed from `main` still verify.
+
+## Comments
+
+Shipped in `platform` at `379aade` (cs-14). Also rolled out to all five downstream repos, real and pushed to their real GitHub remotes: `driftwood` at `e23be9b` + `325b854`, `tuppence` at `74ceed1`, `ludlow` at `c94f45c`, `nist` at `76cd4cb`, `ico` at `8902b66`.

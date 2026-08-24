@@ -1,7 +1,7 @@
 # 26 — The four extra gate rules
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 12, 22, 24
 
 Source: [`spec.md`](../spec.md), *The four extra gate rules*. Replaces the rules half of
@@ -32,12 +32,16 @@ the next hand-edited element.
 
 ## Acceptance criteria
 
-- [ ] The gate reads every prior version from its tag.
-- [ ] A hand-edited HEAD copy of a released tree refuses under the frozen-tree check.
-- [ ] The gate re-renders the tree being cut, diffs it and refuses on a difference.
-- [ ] The gate never re-renders a released tree.
-- [ ] A renderer defect surfaces as a refusal in the evidence document.
-- [ ] A release that removes a mandatory member from a version refuses.
-- [ ] The enforcement-surface rule is a set comparison against the mandatory-member list.
-- [ ] An array element with an empty `commit` refuses.
-- [ ] Every refusal names what it refused and why.
+- [x] The gate reads every prior version from its tag.
+- [x] A hand-edited HEAD copy of a released tree refuses under the frozen-tree check.
+- [x] The gate re-renders the tree being cut, diffs it and refuses on a difference.
+- [x] The gate never re-renders a released tree.
+- [x] A renderer defect surfaces as a refusal in the evidence document.
+- [x] A release that removes a mandatory member from a version refuses.
+- [x] The enforcement-surface rule is a set comparison against the mandatory-member list.
+- [x] An array element with an empty `commit` refuses.
+- [x] Every refusal names what it refused and why.
+
+## Comments
+
+Shipped in `platform` at `8715610` (cs-26).

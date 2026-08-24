@@ -1,7 +1,7 @@
 # 18 — The seam, the evidence document and version legality
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: none
 
 Source: [`spec.md`](../spec.md), *Testing Decisions*, *Version legality*, and *Module shape*.
@@ -51,12 +51,16 @@ CLI is absent. Keep that convention.
 
 ## Acceptance criteria
 
-- [ ] One entry point takes a repository state and a declared version and returns a dictionary.
-- [ ] The document carries every field in the table above, on pass and on refusal.
-- [ ] A refusal still populates every field the run reached.
-- [ ] The command-line wrapper prints the document and exits non-zero on refusal.
-- [ ] The historical `2.1.1` refuses under the reset-on-bump rule, and the document names the base `2.0.1`.
-- [ ] A version gap passes.
-- [ ] A declared version that already exists refuses.
-- [ ] The corpus directory and the subject directory are separate.
-- [ ] The offline twin SKIPs with exit 0 when the Kyverno CLI is absent.
+- [x] One entry point takes a repository state and a declared version and returns a dictionary.
+- [x] The document carries every field in the table above, on pass and on refusal.
+- [x] A refusal still populates every field the run reached.
+- [x] The command-line wrapper prints the document and exits non-zero on refusal.
+- [x] The historical `2.1.1` refuses under the reset-on-bump rule, and the document names the base `2.0.1`.
+- [x] A version gap passes.
+- [x] A declared version that already exists refuses.
+- [x] The corpus directory and the subject directory are separate.
+- [x] The offline twin SKIPs with exit 0 when the Kyverno CLI is absent.
+
+## Comments
+
+Shipped in `platform` at `9cae333` + `8d33b44` (cs-18).

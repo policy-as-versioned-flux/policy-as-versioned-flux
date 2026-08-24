@@ -1,7 +1,7 @@
 # 29 — Render the evidence into the Renovate pull request body
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 27
 
 Source: [`spec.md`](../spec.md), *The reviewer* user stories.
@@ -26,13 +26,17 @@ names the corpus checksum and the generator version, so the run reproduces.
 
 ## Acceptance criteria
 
-- [ ] The pull request body carries the evidence document, rendered for a human.
-- [ ] The declared bump and the computed bump appear side by side.
-- [ ] Per-policy verdict movement appears, naming entries and expressions.
-- [ ] Counts and the not-looked-at list appear.
-- [ ] Each hole shows its stable id and its state: new, carried over, or closed.
-- [ ] Derived limits appear with their counts, open and closed.
-- [ ] The per-institution matrix appears.
-- [ ] The corpus checksum and the generator version appear.
-- [ ] No percentage appears anywhere.
-- [ ] The body stays diffable between releases.
+- [x] The pull request body carries the evidence document, rendered for a human.
+- [x] The declared bump and the computed bump appear side by side.
+- [x] Per-policy verdict movement appears, naming entries and expressions.
+- [x] Counts and the not-looked-at list appear.
+- [x] Each hole shows its stable id and its state: new, carried over, or closed.
+- [x] Derived limits appear with their counts, open and closed.
+- [x] The per-institution matrix appears.
+- [x] The corpus checksum and the generator version appear.
+- [x] No percentage appears anywhere.
+- [x] The body stays diffable between releases.
+
+## Comments
+
+Implemented jointly with ticket 28 in the same commits — see [ticket 28](28-adopter-gate-in-shift-left.md)'s Comments for the full citation.

@@ -1,7 +1,7 @@
 # 12 — Render the mandatory members into a version tree
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: none
 
 Source: [`spec.md`](../spec.md), *Pinned delivery and rendering*. Replaces
@@ -29,12 +29,16 @@ identity.
 
 ## Acceptance criteria
 
-- [ ] The renderer emits all seven mandatory members for a named version.
-- [ ] Each emitted policy carries a versioned `metadata.name`, following the `require-nonroot-1-0-0` pattern.
-- [ ] Each emitted policy carries the `policy-version` label.
-- [ ] The self-scope lives in `matchConditions` and never in `matchConstraints.objectSelector`.
-- [ ] The priority classes carry versioned names, such as `cage-baseline-1-0-0`, and `cage-tier` names its own.
-- [ ] The renderer renders only the tree being cut. It never re-renders a released tree.
-- [ ] A `--selfcheck` flag runs asserts and fails when the live path and the offline twin disagree.
-- [ ] `verify-graded.sh` still cross-checks `cage-tier.yaml`'s dial table against `cage.py`'s `TIERS`, on the authoring copy.
-- [ ] A comment in the emitted tree records why `objectSelector` is banned. Kyverno flattens it into one shared webhook configuration, and last-reconciled-wins breaks multi-version coexistence.
+- [x] The renderer emits all seven mandatory members for a named version.
+- [x] Each emitted policy carries a versioned `metadata.name`, following the `require-nonroot-1-0-0` pattern.
+- [x] Each emitted policy carries the `policy-version` label.
+- [x] The self-scope lives in `matchConditions` and never in `matchConstraints.objectSelector`.
+- [x] The priority classes carry versioned names, such as `cage-baseline-1-0-0`, and `cage-tier` names its own.
+- [x] The renderer renders only the tree being cut. It never re-renders a released tree.
+- [x] A `--selfcheck` flag runs asserts and fails when the live path and the offline twin disagree.
+- [x] `verify-graded.sh` still cross-checks `cage-tier.yaml`'s dial table against `cage.py`'s `TIERS`, on the authoring copy.
+- [x] A comment in the emitted tree records why `objectSelector` is banned. Kyverno flattens it into one shared webhook configuration, and last-reconciled-wins breaks multi-version coexistence.
+
+## Comments
+
+Shipped in `platform` at `51924e0` (cs-12).

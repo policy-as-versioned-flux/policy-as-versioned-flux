@@ -1,7 +1,7 @@
 # 21 — Cage-spec comparison and the computed bump
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 19
 
 Source: [`spec.md`](../spec.md), *What the gate measures*, and *Testing Decisions*.
@@ -40,16 +40,20 @@ The engine must reproduce a human's correct answer before it is trusted to give 
 
 ## Acceptance criteria
 
-- [ ] The engine compares cage specs, not verdict enums.
-- [ ] Major means the new cage spec is not at least as permissive as the old one.
-- [ ] Minor comes from presence plus `validationActions`.
-- [ ] Patch means the passing set only grows.
-- [ ] The engine reads per-policy outcomes and never a pooled exit code.
-- [ ] The three known-good bumps from the historical release line rederive exactly.
-- [ ] A declared bump weaker than the computed one refuses.
-- [ ] The refusal names the corpus entries that moved.
-- [ ] The refusal names the CEL expression that moved them.
-- [ ] A stronger declared bump passes and prints the discrepancy.
-- [ ] `movement[]` carries per-policy verdict movement, naming entries and expressions.
-- [ ] A ceiling that moves down prints one sentence and no estimate.
-- [ ] Nothing in the engine rewrites the declared number.
+- [x] The engine compares cage specs, not verdict enums.
+- [x] Major means the new cage spec is not at least as permissive as the old one.
+- [x] Minor comes from presence plus `validationActions`.
+- [x] Patch means the passing set only grows.
+- [x] The engine reads per-policy outcomes and never a pooled exit code.
+- [x] The three known-good bumps from the historical release line rederive exactly.
+- [x] A declared bump weaker than the computed one refuses.
+- [x] The refusal names the corpus entries that moved.
+- [x] The refusal names the CEL expression that moved them.
+- [x] A stronger declared bump passes and prints the discrepancy.
+- [x] `movement[]` carries per-policy verdict movement, naming entries and expressions.
+- [x] A ceiling that moves down prints one sentence and no estimate.
+- [x] Nothing in the engine rewrites the declared number.
+
+## Comments
+
+Shipped in `platform` at `290b8c7` + `add3995` (cs-21).

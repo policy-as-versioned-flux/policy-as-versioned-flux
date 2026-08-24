@@ -1,7 +1,7 @@
 # 13 — Cut-release carries more than one tag
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: none
 
 Source: [`spec.md`](../spec.md), *The repair release*, step 8. Split from
@@ -18,9 +18,13 @@ still signs keyless with the run's own Actions identity.
 
 ## Acceptance criteria
 
-- [ ] The workflow accepts more than one tag in one dispatch.
-- [ ] Each tag is a gitsign-signed annotated tag on the same commit.
-- [ ] The existing-tag refusal runs for every tag before any tag is created.
-- [ ] A failure part way through does not leave some tags pushed and others not, or the workflow states plainly that it cannot promise this.
-- [ ] Tags are pushed by `git push` and never by the git-data REST API.
-- [ ] The single-tag dispatch still works.
+- [x] The workflow accepts more than one tag in one dispatch.
+- [x] Each tag is a gitsign-signed annotated tag on the same commit.
+- [x] The existing-tag refusal runs for every tag before any tag is created.
+- [x] A failure part way through does not leave some tags pushed and others not, or the workflow states plainly that it cannot promise this.
+- [x] Tags are pushed by `git push` and never by the git-data REST API.
+- [x] The single-tag dispatch still works.
+
+## Comments
+
+Shipped in `platform` at `f12e6c9` (cs-13).

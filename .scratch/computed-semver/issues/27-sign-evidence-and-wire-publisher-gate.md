@@ -1,7 +1,7 @@
 # 27 — Sign the evidence and wire the publisher gate
 
 Type: task
-Status: ready-for-agent
+Status: done (2026-08-24)
 Blocked by: 15, 20, 23, 26
 
 Source: [`spec.md`](../spec.md), *Where the gate runs, and what it compares*, and *Signing and
@@ -46,14 +46,18 @@ signing identity.
 
 ## Acceptance criteria
 
-- [ ] The gate runs inside `cut-release.yml`, before `git tag`.
-- [ ] It reads the declared bump from the workflow's `version` input.
-- [ ] No override exists at any scope or under any name.
-- [ ] `cosign sign-blob` keyless signs the evidence on pass and on refusal.
-- [ ] On success the evidence and its bundle are committed in the release commit, before the tag.
-- [ ] On refusal there is no commit and no tag, and the signed file goes out as a run artifact and a job summary.
-- [ ] `release.yml` checks that the signed evidence matches the tag.
-- [ ] Verification works offline from the committed bundle.
-- [ ] A publisher can run the same gate on their own machine, through the offline twin.
-- [ ] No workflow in the change carries a schedule trigger.
-- [ ] The `feeds/sign.sh` repo-local ed25519 shape is removed, not duplicated.
+- [x] The gate runs inside `cut-release.yml`, before `git tag`.
+- [x] It reads the declared bump from the workflow's `version` input.
+- [x] No override exists at any scope or under any name.
+- [x] `cosign sign-blob` keyless signs the evidence on pass and on refusal.
+- [x] On success the evidence and its bundle are committed in the release commit, before the tag.
+- [x] On refusal there is no commit and no tag, and the signed file goes out as a run artifact and a job summary.
+- [x] `release.yml` checks that the signed evidence matches the tag.
+- [x] Verification works offline from the committed bundle.
+- [x] A publisher can run the same gate on their own machine, through the offline twin.
+- [x] No workflow in the change carries a schedule trigger.
+- [x] The `feeds/sign.sh` repo-local ed25519 shape is removed, not duplicated.
+
+## Comments
+
+Shipped in `platform` at `1a8b871` + `f5c0461` + `4c67693` (cs-27). This is the mechanism that gated the real cs-16 backport release for the first time, live.
