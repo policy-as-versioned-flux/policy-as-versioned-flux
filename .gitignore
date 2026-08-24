@@ -6,6 +6,13 @@ research/repos/
 # here — estate/ itself is gone from this hub (git history preserves it).
 .estate-clone/
 
+# The pre-mo-12 working tree, left behind when estate/ was deleted from the hub.
+# `.estate-clone/` supersedes it and is the only copy anything should read. This
+# entry exists so the stale one cannot be committed back by accident, which the
+# rule above forbids. Whatever is left in it is local scratch: `.work/` seed
+# repos and `eud/state/*.qcow2` VM disks, both build artifacts.
+estate/
+
 # Added by ggshield
 .cache_ggshield
 

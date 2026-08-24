@@ -158,16 +158,37 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md).
 
 - **Orphan guard** — A deterministic catch-all `ValidatingPolicy` that **denies at admission** any
-  workload whose `policy-version` label is **missing or not in** the cluster's currently-installed
-  version set (derived from the `ResourceSet` version array), with background-scan Audit reports
-  covering pre-existing orphans (a brownfield estate may start it in Audit and promote by editorial
-  PR). Because every versioned policy — gates included — matches only workloads that opt in via the
-  label, the guard is what makes the gate tier a locked door rather than an opt-in door. Closes the
-  original's silent-ungovernance gap where a
-  workload pinned to a retired version was matched by no policy. The guard's own emitted policy
-  carries the `policy-as-versioned.dev/policy: platform-machinery` identity label — a real class for
-  objects the platform's own tag numbers, not a policy version tag, so a reader can tell the guard
-  apart from an actually-unversioned policy.
+  workload whose `policy-version` label is **not in** the cluster's currently-installed version set
+  (derived from the `ResourceSet` version array), with background-scan Audit reports covering
+  pre-existing orphans (a brownfield estate may start it in Audit and promote by editorial PR). It
+  judges a **claim**, and only a claim: a pod carrying no `policy-version` label is **out of scope**,
+  skipped rather than denied, because absence cannot distinguish infrastructure from an evader from a
+  **de-postured** workload. So the guard locks the door against *claiming a version the fleet does not
+  run* — it does **not** lock the door against silence. Closes the original's silent-ungovernance gap
+  where a workload pinned to a retired version was matched by no policy; the sibling gap, where a
+  workload omits the label and is therefore matched by no policy at all, is closed by the **governed
+  namespace** rule instead. The guard's own emitted policy carries the
+  `policy-as-versioned.dev/policy: platform-machinery` identity label — a real class for objects the
+  platform's own tag numbers, not a policy version tag, so a reader can tell the guard apart from an
+  actually-unversioned policy. See
+  [ADR-0014](docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md).
+
+- **Governed namespace** — A namespace inside which a workload **must** claim a policy version,
+  marked by `policy-as-versioned.dev/governed: "true"`. It is the boundary that makes "no claim"
+  meaningful: outside it a pod that claims nothing is infrastructure, and inside it a pod that claims
+  nothing is an evader. A separate `ValidatingPolicy`, sibling to the **orphan guard** and not part of
+  it, denies an unclaimed pod on **`CREATE` only**. `UPDATE` is deliberately excluded, so that
+  **de-posturing** a running workload is still permitted. See
+  [ADR-0014](docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md).
+
+- **De-postured** — The state of a running workload whose claimed policy version has since been
+  retired from the fleet's version array, and from which the currency controller has therefore
+  stripped **both** the posture label and the version claim in one patch. The workload **keeps
+  running** and is **caged**, not denied: it loses its posture-derived identity and the reach and
+  secrets that identity buys, and the residual is priced against its party's appetite band. It cannot
+  return to the fleet in that state, because its controller recreates it and the **governed
+  namespace** rule denies the `CREATE`. This is the **exemption**-free settlement in miniature — deny
+  is the bottom rung, reached by the £, and never a carve-out.
 
 ---
 

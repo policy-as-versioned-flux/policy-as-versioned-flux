@@ -60,18 +60,41 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   never `nist-800-53:AC-6`; the resolver never case-folds and never strips. Recorded as
   [ADR-0013](../../docs/adr/0013-regulator-publishes-baselines-adopter-selects.md) and new
   **Baseline** and **Control id** terms in `CONTEXT.md`.
+- [Whether an unlabelled pod is denied](issues/04-unlabelled-pod-denial.md) — **the committed guard is
+  right, and `CONTEXT.md` was wrong about the guard but right that a hole exists.** Absence of the
+  claim label covers three situations the guard cannot tell apart, so **absence is never the deny
+  trigger**: the guard judges a claim, and only a claim. Two independent facts forbid the prose. The
+  guard is cluster-scoped over every `Pod`, so deny-on-absence bricks the cluster. And `currency.py`'s
+  de-posture patch, its "ONLY durable re-patch", is an `UPDATE` that names "orphan-guard is out of
+  scope" as the reason it works. A de-postured pod is **caged, keeps running, and is priced** — the
+  standing preference in miniature. The **locked-door claim was false, not narrow**: omit the label and
+  no gate matches you. A sibling `ValidatingPolicy` closes that, scoped by
+  `policy-as-versioned.dev/governed: "true"` and matching **`CREATE` only**, so de-posture stays legal.
+  **A plain read of the two files finds this. Composition was not needed.** Recorded as
+  [ADR-0014](../../docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md), an amended
+  **Orphan guard** entry, and new **Governed namespace** and **De-postured** terms in `CONTEXT.md`.
 
 ## Not yet specified
 
-None currently. All five fog items graduated to tickets
+The original five fog items all graduated to tickets
 [`02`](issues/02-what-gets-signed.md), [`03`](issues/03-baseline-and-catalogue-ids.md),
 [`04`](issues/04-unlabelled-pod-denial.md), [`05`](issues/05-the-proposer.md) and
 [`06`](issues/06-composing-the-remaining-policies.md). Ticket `03` surfaced one more,
 [`07`](issues/07-adopter-added-controls.md), specifiable at once.
 
+- **Whether a composed artefact declares its governed namespaces.** Ticket
+  [`04`](issues/04-unlabelled-pod-denial.md) made the **governed namespace** the boundary where an
+  inherited rule actually reaches a workload. So a parent's rules touch a child only inside the child's
+  governed namespaces, which makes the namespace set part of the child's risk-bearing declaration, next
+  to the baseline name ticket `03` put there. Not yet sharp enough to ticket. It is unclear whether
+  this is composition business or purely `platform` machinery, and ticket
+  [`06`](issues/06-composing-the-remaining-policies.md) may settle it as a side effect.
+
 ## Out of scope
 
 - **Computing the version bump.** That is [`computed-semver`](../computed-semver/map.md). This map
   owes it one fact and no more.
-- **Repairing the four gaps.** They are defects in the `platform` repo, found from the hub. Naming
-  them is this map's job. Fixing them is that repo's.
+- **Repairing the named gaps.** Four from ticket [`01`](issues/01-does-composition-hold-up.md), and a
+  fifth from ticket [`04`](issues/04-unlabelled-pod-denial.md): the governed-namespace claim
+  requirement, which nothing builds today. They are defects in the `platform` repo, found from the hub.
+  Naming them, and specifying the fifth, is this map's job. Fixing them is that repo's.
