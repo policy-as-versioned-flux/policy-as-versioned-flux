@@ -216,6 +216,21 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   Ticket 12/13's own prior assertions that the real driftwood/tuppence/ludlow compose cleanly no
   longer hold, correctly, and are updated to expect exactly platform's two known refusals and
   nothing else. No new ADR; implements ADR-0013 and ADR-0017.
+- [The governed namespace lint](issues/15-governed-namespace-lint.md) -- **built, inside the same
+  `compose()`, as the exact hole shape applied to a different signal.** `ungoverned_namespaces()`
+  walks the adopter's own `Namespace` manifests for one that carries `institution` and not
+  `governed: "true"`; a namespace with no `institution` label at all is never a candidate.
+  `compute_ungoverned()` compares that set against the last signed composed artefact's own
+  recorded set (a new `ungoverned-namespaces` header key): new refuses and names it, recorded does
+  not, one that gains the label prints closed, and no committed header at all is the same
+  bootstrap case ticket 14's holes use -- the first composition records every ungoverned namespace
+  and refuses on none. Against the real estate this records **zero**: ticket 11 already landed
+  `governed: "true"` on all three adopters' `Namespace` manifests, so the "first composition
+  records three ungoverned namespaces" case spec.md opens with never actually fires there -- a
+  fixture chain proves every acceptance criterion instead. The document gains `ungoverned[]`, the
+  header gains `ungoverned-namespaces`; the composed artefact still carries no namespace list of
+  its own, and neither namespace set is read by anything composition renders. No new ADR;
+  implements ADR-0014 and ADR-0018.
 
 ## Spec
 
