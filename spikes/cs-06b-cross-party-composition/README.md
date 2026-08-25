@@ -116,9 +116,15 @@ Named here so nobody reads more into it than it earns.
   guard, rendered from the array by the estate's own `render-orphan-guard.py`. Section 7's scenario
   still uses the list-membership check.
 - **The rule-conflict refusal is untested across parties.** One implementations publisher exists.
-- **There is no proposer.** Section 9b prints a proposed tier. Nothing raises the PR.
-- **Nothing is signed.** Each party signs its own artefact. A composed set is a new artefact, and the
-  render must be reproducible from signed parent digests or a verifier loses the chain. Not addressed.
+- ~~**There is no proposer.**~~ **Closed by ticket `17`.** `platform/wargamer/tier_pr.py` reads a real
+  adopter's composed evidence, bounds it, and opens the real PR or issue. See
+  `.scratch/policy-composition/issues/17-the-proposer-opens-the-tier-pr.md`.
+- ~~**Nothing is signed.**~~ **Closed by tickets `12` and `18`.** The composed set is a real artefact,
+  gitsign-signed under the adopter's own release tag exactly as any other artefact in this estate --
+  `platform/compose/composition.py`'s `verify()` re-renders it from the recorded parent SHAs and
+  compares byte-for-byte before every release. Each adopter now carries one such signed tag
+  (`driftwood`, `tuppence`, `ludlow`, each `v1.1.0`). See
+  `.scratch/policy-composition/issues/18-wire-composition-into-adopter-ci-and-sign.md`.
 
 ## Section 11 — the whole live set (ticket `06`)
 

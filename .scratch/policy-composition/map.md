@@ -252,6 +252,53 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   excluded by design -- it legitimately carries the bumped parent's new SHA). No wall clock, no
   scheduler anywhere in the module (verified as an import-statement scan, not a prose match). The
   document gains `prices[]`. No new ADR; implements ADR-0006, ADR-0010 and ADR-0015.
+- [The proposer opens the tier pull request](issues/17-the-proposer-opens-the-tier-pr.md) --
+  **built.** `wargamer.py` gains `wargame_cage_tier(prices, org)`, a third drift row read
+  straight off ticket 16's `prices[]`, carrying `tolerance`/`risk_bought_current` in the same
+  shape an enforcement row does so `proposer_bounds.confidence()` needs no second formula.
+  `propose()` branches a cage-tier row into a label-PR proposal or (for a proposed `deny`) an
+  issue proposal with no label change at all. New module `platform/wargamer/tier_pr.py` is the
+  one script in the estate that does not stop at the diff: it reads the adopter's own committed
+  `composed/evidence.json`, bounds it through `proposer_bounds.py` unchanged, and lands the
+  survivor -- a textual (not re-dumped) edit to the flow-style `labels: {...}` map that already
+  claims a policy version, one fresh commit force-pushed to a per-subject branch (the branch
+  name is the dedupe key), then `gh pr create`/`edit` or `gh issue create`/`edit`. No
+  `merge()`/`approve()`/`dispose()` anywhere in the chain, offline-proved (local bare-git
+  remote + a stub `gh` on PATH) in `tier_pr.py`'s own `selfcheck`. Each adopter gets
+  `.github/workflows/propose-tier.yml`: a merged pin-bump PR or `workflow_dispatch`, no
+  schedule. `propose-policy-pr.sh`/`bump-nist-pin.sh` are unchanged and still stop at the diff;
+  both READMEs now say so and point at `tier_pr.py`. The false "gitsign identity at commit
+  time" claim in `wargamer.py`'s docstring and `propose()` comment is corrected. No new ADR;
+  implements ADR-0015.
+
+- [Wiring composition into adopter CI, and signing](issues/18-wire-composition-into-adopter-ci-and-sign.md)
+  -- **built and landed for real, on all three adopters.** Each of `driftwood`, `tuppence` and
+  `ludlow` gained a `compose-check` job: recomposes on every pull request, fails on a refusal or a
+  byte-diff against the committed `composed/` files, and posts the document as the job summary --
+  proved on real pull requests, not just locally. The release workflow (`cut-release.yml`) now
+  re-renders and verifies before any tag is cut, the same reasoning ADR-0011 already gives the
+  publisher gate. Each adopter carries one real, gitsign-signed tag (`v1.1.0`) covering its first
+  composed artefact: 285 recorded holes, 0 refusals, `tuppence` also recording its one genuine
+  pre-existing ungoverned namespace (`tuppence-reset`).
+
+  Landing this surfaced two real, separate defects, both fixed, not routed around. `platform`'s own
+  `ac-6`/`cm-6` claims (ticket 10's named dangling pair) were genuinely fixed: `ac-6`'s stale
+  duplicate dropped (the same rule already lives under `require-nonroot`), and `cm-6` now claims a
+  real, newly-built `governed-namespace-requires-claim` `ValidatingPolicy` -- ADR-0014's own named
+  fifth gap, closed for real rather than left as a permanent EXPECTED-RED. Separately, three policy
+  versions (`2.0.0`, `2.0.1`, `3.0.0`) had been cut before the publisher gate (ADR-0011) existed and
+  carried no evidence at all; `cut-release.yml` gained a `backfill_evidence_only` mode that computes
+  and signs real evidence for an already-tagged version without moving the tag (tags stay immutable),
+  used once per version, in dependency order, so each backfill's own predecessor comparison is real.
+
+  The adopter gate (ADR-0011, ticket cs-28's own per-adopter scripts -- three genuinely independent
+  implementations, not one shared file) now reads each adopter's own composed artefact as its
+  subject: `versions_from_composed_evidence()` diffs the committed `composed/evidence.json` member
+  set between a pull request's base and head commits, instead of reading `platform`'s raw
+  `distribution/versions.yaml` array directly. A version retired from the composed set classifies
+  major with no separate policy-diff case, fixture-proved end to end for all three adopters.
+
+  No new ADR; implements ADR-0011, ADR-0012 and ADR-0014.
 
 ## Spec
 
@@ -279,13 +326,17 @@ Nothing.
   owes it one fact and no more.
 - **Repairing the named gaps.** Four from ticket [`01`](issues/01-does-composition-hold-up.md), a
   fifth from ticket [`04`](issues/04-unlabelled-pod-denial.md), and a sixth from ticket
-  [`05`](issues/05-the-proposer.md). The fifth is the governed-namespace claim requirement, which
-  nothing builds today. The sixth is the `cage-tier` policy coercing an unknown tier label to
-  `baseline`, so a merged `deny` label produces the loosest cage instead of the tightest. They are
-  defects in the `platform` repo, found from the hub. Naming them, and specifying the fifth, is this
-  map's job. Fixing them is that repo's. Ticket [`06`](issues/06-composing-the-remaining-policies.md)
-  **renamed the second**: `cs-16` deleted `policy/policies/`, so `ac-6` now claims a policy that
-  exists nowhere. The gap did not shrink.
+  [`05`](issues/05-the-proposer.md). They are defects in the `platform` repo, found from the hub.
+  Naming them, and specifying the fifth, was this map's job; fixing them was that repo's -- ticket
+  [`18`](issues/18-wire-composition-into-adopter-ci-and-sign.md) crossed that line on purpose, once
+  landing composition for real meant the gaps were no longer hypothetical. The fifth (the governed-
+  namespace claim requirement) is fixed: `governed-namespace-requires-claim`, a real
+  `ValidatingPolicy`, built and shipped. Ticket [`06`](issues/06-composing-the-remaining-policies.md)
+  **renamed the second**: `cs-16` deleted `policy/policies/`, so `ac-6` claimed a policy that existed
+  nowhere; also fixed by ticket 18, by dropping the stale duplicate claim (the same rule already
+  lives under `require-nonroot`, claimed separately). The sixth -- `cage-tier` coercing an unknown
+  tier label to `baseline`, so a merged `deny` label produces the loosest cage instead of the
+  tightest -- remains open; ticket 18 did not touch it.
 - **Declaring the order the composed members run in.** Ticket
   [`06`](issues/06-composing-the-remaining-policies.md) found that two of the six members mutate:
   `stamp-posture` writes the label `posture-trust-boundary` validates, and `cage-tier` writes the
