@@ -114,16 +114,20 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   [ADR-0017](../../docs/adr/0017-a-control-claim-belongs-to-whoever-ships-the-implementation.md)
   and a new **Control claim** term in `CONTEXT.md`.
 
+- [Does a composed artefact declare its governed namespaces](issues/08-composed-artefact-declares-governed-namespaces.md)
+  — **no. The `governed: "true"` label on the adopter's own Namespace manifest is the declaration.**
+  The manifest already sits in the adopter's signed repo, under the tag ADR-0012 reuses, so a list
+  in the composed artefact would be duplicated state, the thing ADR-0013 rejected. The composed
+  artefact records the set as advisory metadata only. A composition refuses a **new** ungoverned
+  adopter namespace, one with the `institution` label and no `governed` label, and records a
+  pre-existing one. The set narrows the `CREATE` claim rule and nothing else. Only the adopter adds
+  a namespace, by hand. The proposer never proposes one. Recorded as
+  [ADR-0018](../../docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md) and an
+  amended **Governed namespace** entry in `CONTEXT.md`.
+
 ## Not yet specified
 
-Nothing. The original five fog items all graduated to tickets
-[`02`](issues/02-what-gets-signed.md), [`03`](issues/03-baseline-and-catalogue-ids.md),
-[`04`](issues/04-unlabelled-pod-denial.md), [`05`](issues/05-the-proposer.md) and
-[`06`](issues/06-composing-the-remaining-policies.md). Ticket `03` surfaced
-[`07`](issues/07-adopter-added-controls.md), now resolved. The governed-namespace patch
-graduated to [`08`](issues/08-composed-artefact-declares-governed-namespaces.md) after ticket `06`
-settled the doubt that held it back: the composed set **mixes scopes**, so the namespace set is
-composition business rather than `platform` machinery.
+Nothing.
 
 ## Out of scope
 

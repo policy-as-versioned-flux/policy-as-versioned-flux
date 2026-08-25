@@ -213,8 +213,14 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   meaningful: outside it a pod that claims nothing is infrastructure, and inside it a pod that claims
   nothing is an evader. A separate `ValidatingPolicy`, sibling to the **orphan guard** and not part of
   it, denies an unclaimed pod on **`CREATE` only**. `UPDATE` is deliberately excluded, so that
-  **de-posturing** a running workload is still permitted. See
-  [ADR-0014](docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md).
+  **de-posturing** a running workload is still permitted. The label on the adopter's own
+  `Namespace` manifest **is** the declaration: the adopter writes it, signs it under the same tag as
+  its **composed artefact**, and the composed artefact carries no namespace list of its own. An
+  adopter namespace that carries the `institution` label and not the `governed` label is an
+  ungoverned namespace, and a composition refuses on a **new** one exactly as it refuses on a new
+  hole. Only the adopter adds a governed namespace, by hand. The **proposer** never proposes one.
+  See [ADR-0014](docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md) and
+  [ADR-0018](docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md).
 
 - **De-postured** — The state of a running workload whose claimed policy version has since been
   retired from the fleet's version array, and from which the currency controller has therefore

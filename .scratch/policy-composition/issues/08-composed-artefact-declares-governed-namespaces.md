@@ -1,7 +1,7 @@
 # 08 — Does a composed artefact declare its governed namespaces
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: none
 
 Graduated from the map's Not yet specified, 2026-08-25, after ticket
@@ -42,3 +42,31 @@ the declaration and the cluster disagree?
    the declaration cannot narrow the guard, only the rules that self-scope on the claim.
 5. **Who adds a namespace.** Adding one puts workloads under an inherited rule for the first time.
    That is a risk-bearing act, and ADR-0013 already settled that selection is the adopter's.
+
+## Answer
+
+**No. The `governed: "true"` label on the adopter's own Namespace manifest is the declaration, and
+the composed artefact carries no namespace list.** Resolved 2026-08-25 by grilling. All five
+recommendations accepted.
+
+Facts that settled it. Each adopter has exactly one namespace, and it is already a manifest in the
+adopter's signed repo (`driftwood/gitops/apps/namespace.yaml`, and the same for `tuppence` and
+`ludlow`), labelled `policy-as-versioned.dev/institution: <party>`. Nothing carries the `governed`
+label yet. `cage-netpol` generates into `object.metadata.namespace`, so it follows the pod. The guard
+is cluster-scoped. `wargamer.py` scans no manifests today.
+
+1. **Declared, on the manifest.** A list in the composed artefact restates a signed fact in a second
+   place, which is the duplicated state ADR-0013 rejected. A derivation cannot be signed. The composed
+   artefact records the set as advisory metadata only, next to the parent SHAs.
+2. **The split is accepted.** Baseline name in the party artefact, namespace set on the manifest,
+   both under one tag.
+3. **What refuses.** An adopter namespace with the `institution` label and no `governed` label,
+   new against the last signed composed artefact. Pre-existing ones are recorded. Cluster drift is
+   Flux drift.
+4. **The governed set narrows the `CREATE` claim rule and nothing else.** Ticket `04` already proved
+   the guard cannot be narrowed.
+5. **Only the adopter adds a namespace, by hand.** The proposer never proposes one. It is a scope
+   change, not a priced verdict.
+
+Recorded as [ADR-0018](../../../docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md)
+and an amended **Governed namespace** entry in `CONTEXT.md`. No new tickets. No new fog.
