@@ -152,6 +152,23 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   Verified locally; **not yet landed** — same open question as tickets 09 and 10, the `platform` and
   adopter repos' changes are uncommitted there. No new ADR; implements ADR-0012, ADR-0013 and
   ADR-0018.
+- [The seam, and a composed artefact that renders back down faithfully](issues/12-the-seam-and-a-faithful-composed-artefact.md)
+  — **built.** `platform/compose/composition.py` (new), one entry point: `compose(adopter_dir,
+  parent_trees) -> (document, rendered_files)`. Resolves every parent to a commit SHA — the two
+  Flux-pinned kinds read `spec.ref.commit` off the adopter's own pin, the two unpinned kinds
+  (`pricing`, `threat`) resolve by reading the party directly. Loads every admission member of
+  every live policy version keyed on **(identity family, name with its version stripped)** —
+  the prototype's real bug was keying on `(family, version)` alone, silently dropping a second
+  member of one family (`cage-tier`/`cage-netpol`, both `graded-enforcement`). Renders every
+  member back unchanged plus advisory-only additions; `validationActions` now written **only**
+  onto a `ValidatingPolicy`, never invented on a mutate or a generate. One separate advisory
+  header carries the composed marker, every parent SHA once, the baseline and the governed
+  namespace names. `--selfcheck` composes the real `driftwood` against its real pinned parents:
+  all 15 live members plus the orphan guard render back byte-identical; a `verify()` mode
+  re-renders and diffs byte-for-byte against committed files. No diamond, conflict, restatement,
+  hole or namespace refusal yet — those are tickets 13-16's, held out deliberately so their
+  future fields don't inherit a differently-shaped placeholder. Verified locally; **not yet
+  landed** — same open question as tickets 09-11. No new ADR; implements ADR-0012 and ADR-0016.
 
 ## Spec
 
