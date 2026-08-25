@@ -125,6 +125,30 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   [ADR-0018](../../docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md) and an
   amended **Governed namespace** entry in `CONTEXT.md`.
 
+- [`nist` publishes named baselines](issues/09-nist-publishes-named-baselines.md) — **built.** LOW,
+  MODERATE and HIGH ship beside the catalogue in the `nist` repo as OSCAL profiles (bare ids, one
+  `href` each), with a verify beat that resolves every id against the catalogue and a fixture that
+  proves an unknown id fails. MODERATE resolves 287 controls and holds `ac-6`, `cm-6` and `ac-6.10`;
+  LOW excludes `ac-6`. Verified locally; **not yet released** — the `nist` repo's changes are
+  uncommitted there and no gitsign-signed tag has been cut, so the acceptance criterion that
+  Renovate can pin the release is still open. No new ADR; implements ADR-0013.
+
+## Spec
+
+[`spec.md`](spec.md), written 2026-08-25 from the eight resolved tickets. Status `ready-for-agent`.
+Implementation is tickets `09` to `18`, cut from the spec on 2026-08-25.
+
+```mermaid
+flowchart LR
+  09[09 nist baselines] --> 11[11 party artefact + adopters] --> 12[12 seam + faithful render]
+  12 --> 13[13 refusals + caging] --> 16[16 re-price] --> 17[17 proposer PR]
+  12 --> 14[14 holes]
+  12 --> 15[15 governed lint]
+  09 --> 14
+  10[10 platform bare ids] --> 14
+  14 & 15 & 16 --> 18[18 adopter CI + sign + bump]
+```
+
 ## Not yet specified
 
 Nothing.
