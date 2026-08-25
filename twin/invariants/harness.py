@@ -3494,24 +3494,37 @@ def _enactment_is_propose_only_at_both_layers(ctx: Context) -> str:
     # A subagent is deliberately absent from this table. Its calls reach `decide` only if the
     # runtime routes a subagent's tool calls through its hooks, which is the runtime's property and
     # not this repository's to assert — a row here would read as an assertion nothing checks.
-    for path, tool, payload in composed:
-        if enact_guard.decide(tool, payload) is None:
-            raise Violated(
-                f"the tool-call boundary admits a merge through {path} ({tool}: {payload}) — layer 1 "
-                "holds unchanged through that composition, so this is the layer that has to refuse it"
-            )
-    admitted = (
-        ("Bash", {"command": "gh pr create --title 'propose: raise the CDN pin' --body ..."}),
-        ("Bash", {"command": "git commit -m 'propose'"}),
-        ("Read", {"file_path": "twin/enact.py"}),
-    )
-    for tool, payload in admitted:
-        refused = enact_guard.decide(tool, payload)
-        if refused is not None:
-            raise Violated(
-                f"the tool-call boundary refuses {tool} {payload} ({refused}) — proposing is the "
-                "one thing the twin is for, and a guard that refuses it is a wall rather than a gate"
-            )
+    #
+    # `decide` is now MODE-gated (twin/enact_guard.py's "Mode" section, 2026-08-25): the checked-in
+    # default is `development`, permissive, for hands-on building. This invariant tests the
+    # capability itself, not the ambient default, so it forces `operations` for its own calls —
+    # restored in `finally` regardless of how the check exits.
+    _prior_mode = os.environ.get("TWIN_ENACT_MODE")
+    os.environ["TWIN_ENACT_MODE"] = "operations"
+    try:
+        for path, tool, payload in composed:
+            if enact_guard.decide(tool, payload) is None:
+                raise Violated(
+                    f"the tool-call boundary admits a merge through {path} ({tool}: {payload}) — layer 1 "
+                    "holds unchanged through that composition, so this is the layer that has to refuse it"
+                )
+        admitted = (
+            ("Bash", {"command": "gh pr create --title 'propose: raise the CDN pin' --body ..."}),
+            ("Bash", {"command": "git commit -m 'propose'"}),
+            ("Read", {"file_path": "twin/enact.py"}),
+        )
+        for tool, payload in admitted:
+            refused = enact_guard.decide(tool, payload)
+            if refused is not None:
+                raise Violated(
+                    f"the tool-call boundary refuses {tool} {payload} ({refused}) — proposing is the "
+                    "one thing the twin is for, and a guard that refuses it is a wall rather than a gate"
+                )
+    finally:
+        if _prior_mode is None:
+            os.environ.pop("TWIN_ENACT_MODE", None)
+        else:
+            os.environ["TWIN_ENACT_MODE"] = _prior_mode
 
     # -- layer 2's own failure mode: the call site, read back out of the registration ---------
     settings_path = REPO_DIR / ".claude" / "settings.json"

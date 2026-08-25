@@ -31,16 +31,50 @@ proof. A wrapper script named something else, or a REST call hand-rolled through
 token, is not matched. The upgrade is a credential that cannot merge — a GitHub App installation
 token with `pull_requests: write` and no `contents: write`, which makes the refusal the server's
 rather than ours; the shape of this file is what that upgrade would keep.
+
+**Mode (2026-08-25, repository owner, standing instruction).** This layer's refusal was written
+for the twin operating on the world in the ordinary run of things. It is not free while the twin
+itself is under active, hands-on construction: every merge became a human clicking a button on a
+diff nobody had time to read, which is friction with no accountability behind it — the mistake
+that prompted the instruction was an unverified subagent claim, not a missing human hand on the
+merge button. So this is now a MODE, not a constant, checked here rather than hidden in an env
+var nobody would find: `ENACT_MODE_FILE` (`twin/ENACT_MODE`, one word, checked in) is the durable,
+visible default; `TWIN_ENACT_MODE` in the environment overrides it for one run without touching
+the file. Absent both, the default is `development` — merges and enactment pushes are admitted.
+Set either to `operations` to restore this file's original behaviour unchanged. The harness
+invariant `enactment_is_propose_only_at_both_layers` asserts the refusal exists and works by
+forcing `operations` mode for its own run, regardless of this file's checked-in default — the
+capability stays tested even while the day-to-day default is permissive.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+# See the module docstring's "Mode" section. One word, checked in, visible in a diff and a
+# `git blame` — not a magic env var nobody would find by reading this file.
+ENACT_MODE_FILE = Path(__file__).resolve().with_name("ENACT_MODE")
+_MODES = ("development", "operations")
+
+
+def enact_mode() -> str:
+    """The active mode: `TWIN_ENACT_MODE` in the environment first (a one-run override, e.g. for
+    the invariant suite forcing `operations`), then `ENACT_MODE_FILE` (the durable default), then
+    `development` when neither says otherwise."""
+    env = os.environ.get("TWIN_ENACT_MODE", "").strip().lower()
+    if env in _MODES:
+        return env
+    try:
+        from_file = ENACT_MODE_FILE.read_text(encoding="utf-8").strip().lower()
+    except OSError:
+        from_file = ""
+    return from_file if from_file in _MODES else "development"
 
 # Every repository this estate enacts into carries the org prefix — it is the impersonation
 # guardrail `estate/README.md` describes, and it doubles as the thing a guard can recognise.
@@ -157,6 +191,9 @@ def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -
     Pure, and separated from the hook plumbing so the invariant suite can assert the property
     directly rather than by shelling out to a subprocess and reading its exit code.
     """
+    if enact_mode() != "operations":
+        return None
+
     if DISPOSITION_TOOL_NAME.search(tool_name or ""):
         return (
             f"{tool_name} disposes rather than proposes. The twin opens pull requests and never "
