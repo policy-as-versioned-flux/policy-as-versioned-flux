@@ -231,6 +231,27 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   header gains `ungoverned-namespaces`; the composed artefact still carries no namespace list of
   its own, and neither namespace set is read by anything composition renders. No new ADR;
   implements ADR-0014 and ADR-0018.
+- [Pricing and threat parents re-price, and never apply](issues/16-pricing-and-threat-parents-reprice.md)
+  -- **built, inside the same `compose()`.** `compute_prices()` prices every declared
+  `pricing`/`threat` edge twice, every run, through the estate's own machinery only: `ico`'s own
+  converter (the fixed `uk-gdpr`/`lower-tier` entry) for `pricing`, `_threat_scenario()` --
+  already ticket 13's -- for `threat`, both through `graded/cage.py`'s real `select()` against the
+  adopter's own appetite band. "Old" is the version the last signed artefact's own header recorded
+  for that `(party, kind)`; nothing to compare against yet (the first composition, or no prior edge
+  of that kind) prices old and new at the same version -- an honest "no move", proved on real
+  driftwood's very first run. Proved chained across two runs on the real estate: a pricing bump
+  `v1->v2` moves driftwood's uncaged `uk-gdpr/lower-tier` exposure £16.9M->£9.0M through ico's
+  converter, a threat bump moves tuppence's exposure £222,574->£326,139 (the register's own
+  tuppence-only changelog) through the feeds module -- both land on `deny` before and after on the
+  real bands, so the document prints `changed: false`, honestly reproducing the prototype's own
+  finding that the wiring moves and the real outcome does not. No real band anywhere straddles a
+  boundary, so the crossing case (`deny -> quarantine`) is proved directly against `price_parent()`
+  with a £1,000,000 fixture band. A proposed `deny` is marked `proposed_as: "issue"`, every other
+  tier `"label"` -- the mark, not the act; composition opens nothing, ticket 17 wires the proposer
+  that reads it. No rendered file changes on any price move (byte comparison, `HEADER.yaml`
+  excluded by design -- it legitimately carries the bumped parent's new SHA). No wall clock, no
+  scheduler anywhere in the module (verified as an import-statement scan, not a prose match). The
+  document gains `prices[]`. No new ADR; implements ADR-0006, ADR-0010 and ADR-0015.
 
 ## Spec
 
