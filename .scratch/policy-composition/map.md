@@ -141,6 +141,17 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   silencing them; that gap is a separate `platform` defect, already out of scope above. Verified
   locally; **not yet landed** — same open question as ticket 09, the `platform` repo's changes are
   uncommitted there. No new ADR; implements ADR-0013 and ADR-0017.
+- [The party artefact, and the three adopters declare themselves](issues/11-party-artefact-and-adopter-declarations.md)
+  — **built.** `platform/party/schema.json` and `party_artefact.py` (new) check a party artefact's
+  shape, its declared parent versions against the adopter's own Flux pins, and its baseline against
+  the `nist` pin ConfigMap's advisory mirror, naming the two currently-unpinned kinds (`ico/pricing`,
+  `platform/threat`) rather than silently skipping them. Each of `driftwood`, `tuppence` and `ludlow`
+  gained a `party.yaml` selecting MODERATE, the `governed: "true"` label on its `Namespace`, a
+  `baselineName` mirror, and a shift-left step running the check on every pull request. `--selfcheck`
+  passes 15 asserts; the real `check` passes end to end against all three adopters' actual files.
+  Verified locally; **not yet landed** — same open question as tickets 09 and 10, the `platform` and
+  adopter repos' changes are uncommitted there. No new ADR; implements ADR-0012, ADR-0013 and
+  ADR-0018.
 
 ## Spec
 
