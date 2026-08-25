@@ -1,7 +1,8 @@
 # 09 — `nist` publishes named baselines
 
 Type: task
-Status: resolved
+Status: blocked (implementation done locally, needs a human with push+signing access to
+policy-as-versioned-nist/nist to actually cut and ship the release — see Answer)
 Blocked by: none
 
 Source: [`spec.md`](../spec.md), *Baselines, control ids and holes* and *Changes in other repos*.

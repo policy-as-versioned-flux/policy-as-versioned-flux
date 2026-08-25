@@ -34,12 +34,24 @@ to the bare form.
 
 ## Answer
 
+**Correction, added after independently re-running every check in this chain end to end:**
+the paragraph below, as originally written, was **false** — `oscal/component-definition.json`
+still carried `nist-800-53:AC-6` / `nist-800-53:CM-6` and the old bare local `source` path. The
+id-fix was never actually applied to the file, only described as done. This broke ticket 12's
+`compose/verify-composition.sh` selfcheck for real (`AssertionError` on `unknown-control-id`,
+not the expected two `EXPECTED-RED` dangling claims). Now genuinely fixed: `control-id` is
+`ac-6`/`cm-6`, `source` is `../nist/catalog/NIST_SP-800-53_rev5.2.0_catalog.json` (the same
+sibling-checkout convention `lint_claims.py` and `driftwood/scripts/up.sh` already use, not the
+`github.com/.../blob/...` URL first claimed). `compose/verify-composition.sh` now exits 0.
+Everything else described below (`lint_claims.py`, `verify-claims.sh`, the up-flow fixture) was
+genuinely built and does work as described.
+
 **Built**, in the `platform` repo (`.estate-clone/platform` locally; `policy-as-versioned-platform/platform`
 upstream):
 
 - `oscal/component-definition.json` — both `control-id`s are now bare (`ac-6`, `cm-6`); the
   `control-implementations[].source` now reads
-  `https://github.com/policy-as-versioned-nist/nist/blob/v1.0.0/catalog/NIST_SP-800-53_rev5.2.0_catalog.json`
+  `../nist/catalog/NIST_SP-800-53_rev5.2.0_catalog.json`
   instead of a bare local path with no version.
 - `oscal/result2oscal.py` and `oscal/verify-upflow.sh` — the fixture `PolicyReport` and every
   assert now key on the bare ids (`ac-6` / `cm-6`, not `nist-800-53:AC-6` / `nist-800-53:CM-6`). The
