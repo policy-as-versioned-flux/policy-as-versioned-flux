@@ -22,6 +22,7 @@ Run: ./run.sh
 """
 
 import copy
+import importlib.util
 import json
 import pathlib
 import re
@@ -54,11 +55,16 @@ def load_publications():
 
     impls = {}  # (policy, version) -> {"action", "tree", "installed"}
     for tree in ("distribution", "policy"):
+        if not (root / tree / "policies").is_dir():
+            continue   # cs-16 deleted policy/policies/. Section 11 records it.
         for path in sorted((root / tree / "policies").rglob("*.yaml")):
             if path.name == "kustomization.yaml":
                 continue
-            doc = yaml.safe_load(path.read_text())
-            if not isinstance(doc, dict) or doc.get("kind") != "ValidatingPolicy":
+            # safe_load_all: the version trees now ship a multi-document
+            # priorityclasses.yaml, which safe_load refuses outright.
+            docs = [d for d in yaml.safe_load_all(path.read_text()) if isinstance(d, dict)]
+            doc = next((d for d in docs if d.get("kind") == "ValidatingPolicy"), None)
+            if doc is None:
                 continue
             labels = (doc.get("metadata") or {}).get("labels") or {}
             name = labels.get("policy-as-versioned.dev/policy") or \
@@ -99,6 +105,64 @@ def load_publications():
 
     return {"impls": impls, "live": live, "mapping": mapping, "raw_control_ids": raw_ids,
             "cage": load_engine(), "bands": appetite_bands()}
+
+
+ADMISSION_KINDS = ("ValidatingPolicy", "MutatingPolicy", "GeneratingPolicy")
+
+
+def load_live_set(version):
+    """TICKET 06. The WHOLE admission set one claimed version installs — every
+    kind, not just ValidatingPolicy — plus the orphan guard.
+
+    load_publications() above reads ValidatingPolicy only, which is why the
+    first pass composed 3 policies out of 8. cs-03 called the other five
+    "unversioned". Four of them no longer are: cs-12's render-version-tree.py
+    now emits cage-tier, cage-netpol, stamp-posture and posture-trust-boundary
+    into every version tree, self-scoped on the claim. So they compose exactly
+    like require-nonroot does.
+
+    The fifth, the orphan guard, is the aggregate over the version ARRAY and
+    cannot self-scope to one claim. cs-22 gave it the `platform-machinery`
+    identity: numbered by the platform tag, not by a policy version. It is
+    rendered here through the estate's OWN offline twin, never re-modelled.
+
+    Keyed on (family, base name), per cs-22: the identity label is a FAMILY
+    name, not a unique key. `graded-enforcement` alone covers cage-tier,
+    cage-netpol and three PriorityClasses.
+    """
+    root = CLONE / "platform"
+    members, kinds = {}, {}
+    for path in sorted((root / "distribution" / "policies" / f"v{version}").glob("*.yaml")):
+        if path.name == "kustomization.yaml":
+            continue
+        for doc in yaml.safe_load_all(path.read_text()):
+            if not isinstance(doc, dict):
+                continue
+            kinds[doc.get("kind")] = kinds.get(doc.get("kind"), 0) + 1
+            if doc.get("kind") not in ADMISSION_KINDS:
+                continue        # PriorityClasses are dials, not admission.
+            labels = (doc["metadata"].get("labels") or {})
+            family = labels.get("policy-as-versioned.dev/policy", "(none)")
+            base = VERSION_SUFFIX.sub("", doc["metadata"]["name"])
+            members[(family, base)] = {
+                "kind": doc["kind"], "doc": doc,
+                "path": str(path.relative_to(root)),
+                "declared": labels.get("policy-as-versioned.dev/policy-version"),
+            }
+
+    # The estate's own offline twin. Its filename is hyphenated, so it loads by
+    # path rather than by import name.
+    rog = importlib.util.spec_from_file_location(
+        "render_orphan_guard", root / "distribution" / "render-orphan-guard.py")
+    twin = importlib.util.module_from_spec(rog)
+    rog.loader.exec_module(twin)
+    guard = twin.orphan_guard(twin.versions(root / "distribution" / "versions.yaml"))
+    members[("platform-machinery", "policy-version-orphan-guard")] = {
+        "kind": guard["kind"], "doc": guard,
+        "path": "distribution/versions.yaml (rendered from the array)",
+        "declared": None,
+    }
+    return members, kinds
 
 
 def load_engine():
@@ -345,7 +409,11 @@ def render(comp, policy, version):
     """
     meta = comp.effective[(policy, version)]
     doc = copy.deepcopy(meta["doc"])
-    doc["spec"]["validationActions"] = [meta["action"]]
+    # Only a ValidatingPolicy HAS an action. Writing validationActions onto a
+    # MutatingPolicy or a GeneratingPolicy would invent a field the schema does
+    # not have, and section 11 is what caught that.
+    if doc.get("kind") == "ValidatingPolicy":
+        doc["spec"]["validationActions"] = [meta["action"]]
     md = doc.setdefault("metadata", {})
     md.setdefault("labels", {})[COMPOSED_FOR] = comp.party
     md.setdefault("annotations", {}).update({
@@ -472,13 +540,19 @@ def main():
     if not any(c.isupper() for c in "".join(pubs["raw_control_ids"])):
         failures.append("expected the uppercase control ids in the component definition")
 
-    rule("4. SAME VERSION, TWO TREES — the map's own open question, surfaced")
+    rule("4. SAME VERSION, TWO TREES — CLOSED by the estate, not by this spike")
     for version, trees in sorted(comp.collisions.items()):
         print(f"    version {version} is declared by {len(trees)} trees: {trees}")
-    print("\n    Both self-scope on policy-version 1.0.0, so both would judge the")
-    print("    same pod. Only one is installed. Composing forces the question.")
-    if not comp.collisions:
-        failures.append("expected a same-version collision across the two trees")
+    print("    (none)")
+    print("\n    The first pass found v1.0.0 declared by BOTH distribution/ and")
+    print("    policy/, each self-scoping on the same claim, and raised it as the")
+    print("    map's open question. cs-16 then DELETED policy/policies/ and folded")
+    print("    may-run-root-if-attested's widening into require-nonroot@2.0.1.")
+    print("    The collision is gone because the tree is gone. cs-22 kept the gate")
+    print("    rule that refuses it, so a reappearance still fails. Recorded as an")
+    print("    answered question, not a passing check.")
+    if comp.collisions:
+        failures.append("policy/policies/ is deleted, so no collision should remain")
 
     rule("5. SCENARIO — the regulator bumps. A minor upstream, a break downstream")
     s = copy.deepcopy(parties)
@@ -631,8 +705,10 @@ def main():
 
     rule("10. RENDER DOWN — the hard constraint still holds")
     clean = resolve("driftwood", parties, pubs)
+    # may-run-root-if-attested was here on the first pass. cs-16 deleted
+    # policy/policies/ and folded its widening into require-nonroot@2.0.1.
     for policy, version in (("require-nonroot", "1.0.0"), ("require-nonroot", "2.0.0"),
-                            ("may-run-root-if-attested", "1.0.0")):
+                            ("require-nonroot", "2.0.1")):
         faithful, _ = render_is_faithful(clean, policy, version)
         print(f"    {policy}@{version}: strip the composition's additions -> "
               f"equals the committed file: {'YES' if faithful else 'NO'}")
@@ -649,6 +725,86 @@ def main():
     print("    is untouched.")
     if "objectSelector" in yaml.safe_dump(doc):
         failures.append("render leaked an objectSelector")
+
+    rule("11. TICKET 06 — THE OTHER FIVE. The whole live set, not 3 of 8")
+    version = pubs["live"][-1]
+    members, kinds = load_live_set(version)
+    print(f"    the version tree v{version} ships: {kinds}")
+    print(f"\n    {'family':22} {'member':30} {'kind':18} declares")
+    for (family, base), m in sorted(members.items()):
+        print(f"    {family:22} {base:30} {m['kind']:18} "
+              f"{m['declared'] or '— (platform tag)'}")
+
+    live = Composition("driftwood")
+    for (family, base), m in members.items():
+        # The action is read from the member itself. A mutate and a generate
+        # have none at all, which is finding 1 below.
+        actions = m["doc"]["spec"].get("validationActions") or ["Audit"]
+        live.effective[(base, version)] = dict(
+            m, action=actions[0], installed=True, tree="distribution",
+            via=f"platform@{version}")
+    print("\n    render down, every member, every kind:")
+    for (family, base), m in sorted(members.items()):
+        faithful, _ = render_is_faithful(live, base, version)
+        print(f"    {base:30} {'FAITHFUL' if faithful else 'NOT FAITHFUL'}")
+        if not faithful:
+            failures.append(f"render of {base} is not faithful")
+
+    print(f"""
+    FOUR OF THE FIVE ARE NO LONGER UNVERSIONED. cs-03 counted eight live
+    policies, five carrying no version. cs-12's render-version-tree.py now
+    emits cage-tier, cage-netpol, stamp-posture and posture-trust-boundary
+    into EVERY version tree, self-scoped on the claim. They compose exactly
+    as require-nonroot does, and they render back down byte-identical. The
+    ticket's premise was true when it was written and the estate has since
+    overtaken it.
+
+    THE FIFTH CANNOT BE VERSIONED, AND THAT IS CORRECT. The orphan guard is
+    the aggregate OVER the array, so it cannot self-scope to one claim. cs-22
+    gave it the `platform-machinery` identity: numbered by the platform tag.
+    Composition must carry a second numbering axis, not force it onto the
+    first. This section renders it from the array through the estate's own
+    render-orphan-guard.py, so the simulated list-membership check the first
+    pass admitted to is now gone.
+
+    WHAT COMPOSING THEM CHANGED, and it is a real defect in this spike:
+    1. An ACTION IS A VALIDATINGPOLICY CONCEPT. render() wrote
+       spec.validationActions unconditionally, which invents a field on a
+       MutatingPolicy and a GeneratingPolicy. Fixed above. The consequence is
+       bigger than the fix: the Audit < Deny strictness ladder that
+       overlay.restate compares on has NO MEANING for {len([m for m in members.values() if m['kind'] != 'ValidatingPolicy'])} of the
+       {len(members)} members. A subclass cannot tighten a mutate. What it can do to a
+       cage is change the TIER, which is a label the £ sets upstream — so
+       ticket 05's proposer, not the overlay, is the only legal path.
+    2. THE IDENTITY LABEL IS A FAMILY, NOT A KEY. `graded-enforcement` covers
+       cage-tier, cage-netpol and three PriorityClasses; `posture` covers two
+       policies. load_publications() keys on (label, version), so a second
+       member of one family SILENTLY OVERWRITES the first. It has not fired
+       yet only because one ValidatingPolicy per family per version exists.
+       That is luck. cs-22 already settled the cure for the gate — key on
+       identity AND the name with its version stripped — and the resolver
+       needs the same key. This section uses it.
+    3. TWO OF THE EIGHT MUTATE, so composition order is now observable.
+       stamp-posture writes the label posture-trust-boundary validates, and
+       cage-tier writes the label cage-netpol generates from. Rendering flat
+       per version does not express that, and Kyverno's webhook ordering is
+       what makes it work. Composition inherits that dependency without
+       stating it. Not a defect found today, but it is the first thing a
+       second implementations publisher would break.
+
+    ONE HONEST LIMIT ON THE CHECK ABOVE. Five of the six render back down to a
+    COMMITTED file. The orphan guard has no committed rendered form — the repo
+    holds the Go template inside versions.yaml — so its row compares against
+    the estate's own render-orphan-guard.py output. That proves composition
+    carries the guard unchanged. It does NOT prove the twin matches what
+    flux-operator renders in-cluster. verify-orphan-guard.sh covers that, and
+    this spike does not run a cluster.""")
+    if len(members) != 6:
+        failures.append("expected 5 versioned admission members plus the orphan guard")
+    if not any(m["kind"] == "MutatingPolicy" for m in members.values()):
+        failures.append("expected the mutating half of the live set to compose")
+    if members[("platform-machinery", "policy-version-orphan-guard")]["declared"] is not None:
+        failures.append("the orphan guard must carry no policy-version")
 
     rule("VERDICT")
     print(VERDICT)

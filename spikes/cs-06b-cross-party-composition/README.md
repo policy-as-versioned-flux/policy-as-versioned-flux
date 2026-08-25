@@ -110,15 +110,66 @@ pod. Only one installs.
 
 Named here so nobody reads more into it than it earns.
 
-- **The composed set is 3 policies, not the 8 live ones.** `load_publications` scans `distribution/`
-  and `policy/` only. `cs-03` found eight live policies, five unversioned: the orphan guard, `cage-tier`,
-  `cage-netpol` and the posture pair. Those are not composed.
-- **The orphan refusal is simulated.** It is a list-membership check in the resolver, not the real
-  `policy-version-orphan-guard` being composed and evaluated.
+- ~~**The composed set is 3 policies, not the 8 live ones.**~~ **Closed by ticket `06`.** Section 11
+  composes the whole live set. See *Section 11* below.
+- ~~**The orphan refusal is simulated.**~~ **Closed by ticket `06`.** Section 11 composes the real
+  guard, rendered from the array by the estate's own `render-orphan-guard.py`. Section 7's scenario
+  still uses the list-membership check.
 - **The rule-conflict refusal is untested across parties.** One implementations publisher exists.
 - **There is no proposer.** Section 9b prints a proposed tier. Nothing raises the PR.
 - **Nothing is signed.** Each party signs its own artefact. A composed set is a new artefact, and the
   render must be reproducible from signed parent digests or a verifier loses the chain. Not addressed.
+
+## Section 11 — the whole live set (ticket `06`)
+
+Added when [`policy-composition/06`](/.scratch/policy-composition/issues/06-composing-the-remaining-policies.md)
+was resolved. The estate had moved since the first pass, so the spike is re-run against it as it is
+now, not as it was.
+
+**The ticket's premise is out of date, and the estate closed it.** `cs-03` counted five unversioned
+live policies. `cs-12`'s `render-version-tree.py` now emits four of them — `cage-tier`, `cage-netpol`,
+`stamp-posture`, `posture-trust-boundary` — into every version tree, self-scoped on the claim. They
+compose exactly as `require-nonroot` does and render back down byte-identical.
+
+**The fifth cannot be versioned, and that is correct.** The orphan guard is the aggregate over the
+version array, so it cannot self-scope to one claim. `cs-22` gave it the `platform-machinery`
+identity: numbered by the platform tag. Composition carries a second numbering axis rather than
+forcing it onto the first.
+
+| member | family | kind | declares |
+|---|---|---|---|
+| `require-nonroot` | `require-nonroot` | ValidatingPolicy | `3.0.0` |
+| `posture-trust-boundary` | `posture` | ValidatingPolicy | `3.0.0` |
+| `stamp-posture` | `posture` | MutatingPolicy | `3.0.0` |
+| `cage-tier` | `graded-enforcement` | MutatingPolicy | `3.0.0` |
+| `cage-netpol` | `graded-enforcement` | GeneratingPolicy | `3.0.0` |
+| `policy-version-orphan-guard` | `platform-machinery` | ValidatingPolicy | — (platform tag) |
+
+All six render back down faithfully. Three findings came out of composing them.
+
+1. **An action is a `ValidatingPolicy` concept.** `render()` wrote `spec.validationActions`
+   unconditionally, which invents a field on a mutate and a generate. Fixed. The consequence is
+   larger than the fix: the `Audit < Deny` ladder that `overlay.restate` compares on has no meaning
+   for three of the six members. A subclass cannot tighten a mutate.
+2. **The identity label is a family, not a key.** `graded-enforcement` covers five objects and
+   `posture` covers two. `load_publications` keys on `(label, version)`, so a second member of one
+   family overwrites the first in silence. It has not fired only because one `ValidatingPolicy` per
+   family per version exists. `cs-22` settled the cure for the gate; the resolver needs the same key.
+3. **Two of the members mutate, so ordering is now observable.** `stamp-posture` writes the label
+   `posture-trust-boundary` validates. `cage-tier` writes the label `cage-netpol` generates from. A
+   flat per-version render does not express that. Kyverno's webhook ordering is what makes it work.
+
+Two other things the re-run found, both facts about the estate rather than about composition.
+
+- **Gap 2 changed shape.** `cs-16` deleted `policy/policies/` and folded `may-run-root-if-attested`'s
+  widening into `require-nonroot@2.0.1`. `ac-6` still claims `may-run-root-if-attested`, which now
+  exists nowhere. The gap moved from OVERCLAIMED-because-uninstalled to the same shape as gap 1.
+- **The same-version-two-trees question is closed.** The collision is gone because the tree is gone.
+  `cs-22` kept the gate rule that refuses it, so a reappearance still fails.
+
+One honest limit. Five of the six compare against a committed file. The orphan guard has no committed
+rendered form, so its row compares against the estate's own twin's output. That proves composition
+carries it unchanged. It does not prove the twin matches what flux-operator renders in-cluster.
 
 ### One finding outside the four, and it is the largest
 

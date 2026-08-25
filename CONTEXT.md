@@ -148,7 +148,22 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   **publisher** signs an artefact — the same gitsign-signed tag, no second mechanism — but the file
   also carries each parent's resolved commit SHA, once, declaring which parent versions it was
   rendered from. A verifier re-renders from those pinned SHAs and checks the result byte-for-byte.
-  See [ADR-0012](docs/adr/0012-composed-artefact-self-signed-pinned-sha.md).
+  It holds **every kind** the version tree ships — `ValidatingPolicy`, `MutatingPolicy` and
+  `GeneratingPolicy` — keyed on the identity family plus the name with its version stripped, because
+  the `policy-as-versioned.dev/policy` label is a family name and not a unique key. It also carries
+  the **platform-machinery** members under a second numbering axis, the platform tag, because they
+  cannot self-scope to one claim.
+  See [ADR-0012](docs/adr/0012-composed-artefact-self-signed-pinned-sha.md) and
+  [ADR-0016](docs/adr/0016-a-subclass-never-restates-a-mutate.md).
+
+- **Restatement** — A subclass declaring an inherited rule at a different strictness. A restatement
+  is accepted only when it is **stricter**, on the `Audit < Deny` ladder; a weakening is never an
+  override and never an **exemption**, it is a declared inability that is **caged** and priced. The
+  ladder is a `ValidatingPolicy` concept, so a restatement applies to a `ValidatingPolicy` and to
+  nothing else: a `MutatingPolicy` and a `GeneratingPolicy` carry no action, and a composition that
+  restates one is refused. An adopter's only knob on the graded members is the cage **tier**, which
+  is a priced verdict the £ selects and only the **proposer** turns.
+  See [ADR-0016](docs/adr/0016-a-subclass-never-restates-a-mutate.md).
 
 - **Baseline** — The named subset of a catalogue's controls that a party claims apply to it. A
   **regulator** publishes baselines by name, as OSCAL profiles, signed and versioned like any other

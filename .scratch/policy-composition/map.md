@@ -87,24 +87,31 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   [ADR-0015](../../docs/adr/0015-adopter-runs-the-proposer-and-it-opens-the-pr.md) and a new
   **Proposer** term in `CONTEXT.md`. **A plain read of three files finds all of it.**
 
+- [Composing the five unversioned live policies](issues/06-composing-the-remaining-policies.md) —
+  **it holds up, every kind renders back down faithfully, and four of the five are no longer
+  unversioned.** `cs-12`'s renderer now emits `cage-tier`, `cage-netpol`, `stamp-posture` and
+  `posture-trust-boundary` into every version tree. The fifth, the orphan guard, **cannot** be
+  versioned: it is the aggregate over the array, so composition carries a second numbering axis under
+  the `platform-machinery` identity `cs-22` gave it. Three findings. **An action is a
+  `ValidatingPolicy` concept**, so the `Audit < Deny` ladder is meaningless for three of the six
+  members and **a subclass cannot tighten a mutate** — the tier is the only knob and ADR-0015's
+  proposer is the only thing that turns it. **The identity label is a family, not a key**, so the old
+  resolver overwrote in silence and had not fired only by luck. **Mutation ordering is inherited, not
+  declared**, and is ruled `platform` machinery. Two estate facts: `cs-16` deleted `policy/policies/`,
+  so gap 2 **renames rather than shrinks**, and the same-version-two-trees question is **closed**.
+  **The spike would not run at all before this ticket** — it had rotted against the estate it reads.
+  Recorded as [ADR-0016](../../docs/adr/0016-a-subclass-never-restates-a-mutate.md).
+
 ## Not yet specified
 
-The original five fog items all graduated to tickets
+Nothing. The original five fog items all graduated to tickets
 [`02`](issues/02-what-gets-signed.md), [`03`](issues/03-baseline-and-catalogue-ids.md),
 [`04`](issues/04-unlabelled-pod-denial.md), [`05`](issues/05-the-proposer.md) and
-[`06`](issues/06-composing-the-remaining-policies.md). Ticket `03` surfaced one more,
-[`07`](issues/07-adopter-added-controls.md), specifiable at once.
-
-- **Whether a composed artefact declares its governed namespaces.** Ticket
-  [`04`](issues/04-unlabelled-pod-denial.md) made the **governed namespace** the boundary where an
-  inherited rule actually reaches a workload. So a parent's rules touch a child only inside the child's
-  governed namespaces, which makes the namespace set part of the child's risk-bearing declaration, next
-  to the baseline name ticket `03` put there. Not yet sharp enough to ticket. It is unclear whether
-  this is composition business or purely `platform` machinery, and ticket
-  [`06`](issues/06-composing-the-remaining-policies.md) may settle it as a side effect. Ticket
-  [`05`](issues/05-the-proposer.md) made this patch **load-bearing for a second reason**: the
-  proposer scans the adopter's committed workload manifests, and the governed namespace is that
-  scan's boundary. Two things now need the set declared. It is still not sharp enough to ticket.
+[`06`](issues/06-composing-the-remaining-policies.md). Ticket `03` surfaced
+[`07`](issues/07-adopter-added-controls.md), specifiable at once. The governed-namespace patch
+graduated to [`08`](issues/08-composed-artefact-declares-governed-namespaces.md) after ticket `06`
+settled the doubt that held it back: the composed set **mixes scopes**, so the namespace set is
+composition business rather than `platform` machinery.
 
 ## Out of scope
 
@@ -116,4 +123,14 @@ The original five fog items all graduated to tickets
   nothing builds today. The sixth is the `cage-tier` policy coercing an unknown tier label to
   `baseline`, so a merged `deny` label produces the loosest cage instead of the tightest. They are
   defects in the `platform` repo, found from the hub. Naming them, and specifying the fifth, is this
-  map's job. Fixing them is that repo's.
+  map's job. Fixing them is that repo's. Ticket [`06`](issues/06-composing-the-remaining-policies.md)
+  **renamed the second**: `cs-16` deleted `policy/policies/`, so `ac-6` now claims a policy that
+  exists nowhere. The gap did not shrink.
+- **Declaring the order the composed members run in.** Ticket
+  [`06`](issues/06-composing-the-remaining-policies.md) found that two of the six members mutate:
+  `stamp-posture` writes the label `posture-trust-boundary` validates, and `cage-tier` writes the
+  label `cage-netpol` generates from. A flat per-version render states neither dependency. Kyverno
+  runs the mutating webhook before the validating webhook, which is what makes it work.
+  **That is `platform` machinery.** A second implementations publisher is what would expose it, and
+  the estate has one. Ruled out of scope, recorded in
+  [ADR-0016](../../docs/adr/0016-a-subclass-never-restates-a-mutate.md).
