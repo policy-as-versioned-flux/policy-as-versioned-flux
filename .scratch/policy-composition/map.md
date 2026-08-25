@@ -169,6 +169,24 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   hole or namespace refusal yet — those are tickets 13-16's, held out deliberately so their
   future fields don't inherit a differently-shaped placeholder. Verified locally; **not yet
   landed** — same open question as tickets 09-11. No new ADR; implements ADR-0012 and ADR-0016.
+- [Structural refusals, restatement, and caging a declared inability](issues/13-structural-refusals-restatement-and-caging.md)
+  — **built, inside the same `compose()`.** Three structural refusals: a **split diamond**
+  (two of the adopter's own edges reaching one `(party, kind)` at two versions — the real estate
+  has no data source for a further-hop diamond, so a fixture proves it), a **cross-party rule
+  conflict** (two `implementations` parents supplying one `(family, name, version)` with different
+  content — never merged, never last-wins, dropped entirely, proved with a two-publisher fixture),
+  and a **restatement of a mutate or a generate** (ADR-0016, proved against the real `cage-tier`).
+  Restatement collapses the prototype's two parallel lists into one: `overlay.restate`'s weaker
+  action *is* the declared inability. A stricter restatement overwrites the rendered action
+  (proved: driftwood's `require-nonroot` Audit→Deny); a weaker one prices instead, through the
+  real `cage.py`/`appetite.json`, and the render keeps the inherited action — reproducing the
+  prototype's own driftwood/tuppence/ludlow → baseline/baseline/quarantine table exactly, against
+  the real `driftwood-root-residual.json` scenario. The composed artefact carries no tier field
+  itself; `cage-tier.yaml`'s own inherited CEL body reading `posture.acme.io/tier` off the
+  workload is the runtime mechanism, unchanged and distinct from a declared verdict — an
+  exact-key check, not a substring one, is what tells the two apart. The two-publisher limit
+  prints from `len(implementations_parties)` every run: open at driftwood's real one, closed at
+  the fixture's two. No new ADR; implements ADR-0016.
 
 ## Spec
 
