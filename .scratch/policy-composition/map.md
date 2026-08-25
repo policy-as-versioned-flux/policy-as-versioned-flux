@@ -132,6 +132,15 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   LOW excludes `ac-6`. Verified locally; **not yet released** — the `nist` repo's changes are
   uncommitted there and no gitsign-signed tag has been cut, so the acceptance criterion that
   Renovate can pin the release is still open. No new ADR; implements ADR-0013.
+- [`platform`'s control claims use bare ids](issues/10-platform-control-claims-use-bare-ids.md) —
+  **built.** `component-definition.json` now writes `ac-6`/`cm-6`, never `nist-800-53:AC-6`, and its
+  `source` href names the `nist` party and a catalogue path, not a bare local path with no version.
+  A new `lint_claims.py`/`verify-claims.sh` resolves every claim two ways — policy name against the
+  shipped version trees, control id against the pinned catalogue — and names the two dangling claims
+  (`cm-6`→`require-policy-version`, `ac-6`→`may-run-root-if-attested`) as `EXPECTED-RED` rather than
+  silencing them; that gap is a separate `platform` defect, already out of scope above. Verified
+  locally; **not yet landed** — same open question as ticket 09, the `platform` repo's changes are
+  uncommitted there. No new ADR; implements ADR-0013 and ADR-0017.
 
 ## Spec
 
