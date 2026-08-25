@@ -173,7 +173,17 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   one: a removal is an **exemption** by another name, and a control the adopter cannot meet is caged
   and priced, not dropped. A baseline control that nothing implements is a **hole**; a composition
   refuses on a **new** hole and records a pre-existing one, comparing against the last signed
-  **composed artefact**. See [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md).
+  **composed artefact**. A control the adopter adds is an ordinary new hole until a **control
+  claim** fills it, and the adopter may never remove it either.
+  See [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md) and
+  [ADR-0017](docs/adr/0017-a-control-claim-belongs-to-whoever-ships-the-implementation.md).
+
+- **Control claim** — A signed statement, in a party's OSCAL component-definition, that a policy
+  that party ships evidences a **control id**. A control claim belongs to whoever ships the
+  implementation, and a party may never claim against a policy another party ships. Any party's
+  claim fills a **hole**, including the adopter's own. Not the pod's *claim* label, which names a
+  **policy version**. See
+  [ADR-0017](docs/adr/0017-a-control-claim-belongs-to-whoever-ships-the-implementation.md).
 
 - **Control id** — A control's identity is the **bare id the catalogue itself writes**: `ac-6`, never
   `AC-6` and never `nist-800-53:AC-6`. `AC-6` and `AC-06` are display labels the catalogue also

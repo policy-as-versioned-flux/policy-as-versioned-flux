@@ -102,13 +102,25 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   **The spike would not run at all before this ticket** — it had rotted against the estate it reads.
   Recorded as [ADR-0016](../../docs/adr/0016-a-subclass-never-restates-a-mutate.md).
 
+- [What fills a control the adopter adds itself](issues/07-adopter-added-controls.md) — **a signed
+  OSCAL control claim from whoever ships the implementation, and an adopter-added hole is an
+  ordinary new hole.** The prototype let an adopter add a policy but never claim a control, so an
+  added control had no route out. Now any party's claim fills it: an inherited publisher, the
+  adopter's own member, or a third pinned publisher. The self-created hole refuses like any new
+  hole, ticket `03`'s widening edge at size one, and clears in the same reviewed PR. The claim lives
+  in the adopter's own component-definition. Shipping a member adds **no obligation** ADR-0012 did
+  not already impose: no separate axis, no separate pin. An adopter may never claim against another
+  party's policy and may never remove a control it added. Recorded as
+  [ADR-0017](../../docs/adr/0017-a-control-claim-belongs-to-whoever-ships-the-implementation.md)
+  and a new **Control claim** term in `CONTEXT.md`.
+
 ## Not yet specified
 
 Nothing. The original five fog items all graduated to tickets
 [`02`](issues/02-what-gets-signed.md), [`03`](issues/03-baseline-and-catalogue-ids.md),
 [`04`](issues/04-unlabelled-pod-denial.md), [`05`](issues/05-the-proposer.md) and
 [`06`](issues/06-composing-the-remaining-policies.md). Ticket `03` surfaced
-[`07`](issues/07-adopter-added-controls.md), specifiable at once. The governed-namespace patch
+[`07`](issues/07-adopter-added-controls.md), now resolved. The governed-namespace patch
 graduated to [`08`](issues/08-composed-artefact-declares-governed-namespaces.md) after ticket `06`
 settled the doubt that held it back: the composed set **mixes scopes**, so the namespace set is
 composition business rather than `platform` machinery.
