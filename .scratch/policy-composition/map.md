@@ -187,6 +187,35 @@ own `platform/graded/cage.py`, `platform/risk/appetite.json`, `platform/feeds/` 
   exact-key check, not a substring one, is what tells the two apart. The two-publisher limit
   prints from `len(implementations_parties)` every run: open at driftwood's real one, closed at
   the fixture's two. No new ADR; implements ADR-0016.
+- [Baseline coverage, control claims and holes](issues/14-baseline-coverage-and-holes.md) --
+  **built, inside the same `compose()`, and it makes the real estate's first defect visible for
+  real.** The selected baseline resolves against the `controls` parent's real `catalog/
+  BASELINE_VERSIONS.json`, walking nested controls (`ac-6.10` found); a prefixed or upper-case id
+  is a hard failure, not a hole, `needs_composition: false`. Control claims now merge over every
+  party that ships a member, including the adopter's own `component-definition.json` next to its
+  `party.yaml` -- which required wiring `overlay.add` into `compose()` for the first time, since
+  ADR-0017's "an adopter claim... fills it" has no route without it. A control counts as covered
+  the moment *any* claim exists, valid or not, so a **hole is "no claim", not "no valid claim"**;
+  a dangling or cross-party claim is a separate refusal on its own account
+  (`dangling-claim`/`claim-against-another-partys-policy`). Proved against the real estate:
+  driftwood's first composition records exactly **285 holes**, refuses on none of them, and
+  **does** refuse on `platform`'s own two known-dangling claims (`ac-6`->`may-run-root-if-
+  attested`, `cm-6`->`require-policy-version`) -- the first time composition has actually blocked
+  the real estate's own pull request, which is the whole point spec.md opens with. A small
+  synthetic catalogue/baseline/platform fixture, chained across runs by committing the header
+  between them, proves the rest: a new hole refuses and names it; the same addition, claimed by
+  the adopter against its own `overlay.add` member in the same run, is never a hole at all; a hole
+  filled across two runs closes; a control that leaves the selected set refuses, narrowed baseline
+  included for free; a named-baseline widening (MODERATE->HIGH shape) refuses with no override and
+  doesn't double-fire as a removal; an adopter claim against a parent's policy refuses. The header
+  gains `holes` and `selected-controls` -- the durable comparison point every later run reads --
+  and stripping it changes nothing else rendered. One real pre-existing bug found and fixed in
+  passing: an unpinned parent's content-digest SHA (ticket 12) was not stable across two `compose()`
+  calls in one process, because it picked up a `__pycache__` file the orphan-guard's dynamic import
+  writes as a side effect; ticket 14's `verify()` round-trip is what first exercises that path.
+  Ticket 12/13's own prior assertions that the real driftwood/tuppence/ludlow compose cleanly no
+  longer hold, correctly, and are updated to expect exactly platform's two known refusals and
+  nothing else. No new ADR; implements ADR-0013 and ADR-0017.
 
 ## Spec
 
