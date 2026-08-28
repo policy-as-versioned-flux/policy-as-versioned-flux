@@ -20,6 +20,8 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 ## Decisions so far
 
 <!-- one line per closed ticket -->
+- [05 — Research: Cedar for composition](issues/05-research-cedar-for-composition.md) — No-go: `symcc implies` really does decide strictly-stricter, but over 2 of the composed set's 6 members, and on the cage spec it only reproduces `cage_engine.py` Track 2. Its one real edge — catching a *conditional* widening Track 2 is blind to — is unreachable unless ticket 09 lets the tier floor be scoped; that is the trigger to revisit.
+- [06 — Research: ESLint versioning semantics](issues/06-research-eslint-versioning-semantics.md) — copy ESLint's packaging model (every pack self-versions, a mashup is a new package, a severity-only override never touches the rule body, republish and inner-source are ordinary) but not its bump table, because ESLint's minor may break your build and answers that with `~` while ADR-0002 already pins everywhere; supersede, inner source and publisher-declared compatibility have no estate form at all, a regulator's baseline addition is a major nobody classifies, and the tier floor is the one thing ESLint never had to build.
 
 ## Not yet specified
 
