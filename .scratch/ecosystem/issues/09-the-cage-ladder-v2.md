@@ -127,3 +127,11 @@ Drafted AFK on the owner's instruction. Adversarially checked by two reviewers a
 Consequences to record on resolution: one superseding ADR for ADR-0014's CREATE deny, ADR-0015's Deny-to-issue, ADR-0016 §3 and ADR-0018 §4; the pod label becomes an output only, closing H8-03.
 
 Later rounds, blocked on the above: the warn rung (`Audit` findings that move nothing, or drop the word; Q3's value space omits it on purpose); de-posture as a tier move that keeps the claim (H2-12), decidable once Q1 fixes the grain; `access.py` retirement and break-glass bands per org `appetite` (H8-09, H8-12); how a tier move prices against the ticket 08 `prices[]` entry, which Q4 leans on.
+
+
+## Cross-ticket notes (2026-08-28)
+
+- C1 (12, 13, 14, 15, 18): every one of these tickets writes against a Q1/Q3/Q4/Q5 option the owner has not chosen. 12 Q2 and Q5 assume Q1(b) and Q5(a); 18's "already decided" list cites "ticket 09 round 1" for the five-value ladder; 14 Q2 and 15 Q2/Q4 assume `isolated`; 13 Q3 assumes the ladder will enumerate Crossplane CR dials, which no round here asks. Grill this ticket first.
+- C7 (12): Q1(b) and the skeptic pass already have `cage-tier` read `namespaceObject` and clobber the pod label; 12 Q2(b) adds a second MutatingPolicy "mirroring stamp-posture" for the same Namespace-to-pod render. One mechanism or two; decide here, not twice.
+- C8 (12, 18): Q5(a) gives the platform a `party.yaml` that declares infra namespaces; 12 Q5(a) instead renders the `infra` declaration from the pinned implementations package (a namespace list inside a package, the ADR-0018 §1 ground on which this ticket's skeptic pass killed Q3(d)); 18 Q3(a) adds size and appetite to the same file. Ticket 04 A4 already settled that the platform has a `party.yaml` with `roles: [publisher]`; what it carries is being decided in three tickets.
+- C9 (15): Q4(a) recommends an adopter-declared `overlay.floor` tier on `party.yaml`; 15 Q4 rejects an adopter-declared default tier as "a second appetite object ticket 08 ruled out". Same object, opposite verdicts.
