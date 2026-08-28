@@ -1,7 +1,7 @@
 # 19 — Misuse and portability
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 04
 
 ## Question
@@ -74,3 +74,26 @@ Later rounds, blocked on the above: what the portability cage does when it bites
 - C16 (13): Q2(a) prices "a published correction not yet pinned" as a hole growing over time; 13 Q5(a) puts a dated supersede into ADR-0019 `revoked[]` and prices it by the EOL ramp. Two formulas for pinning a superseded version.
 - C19 (11): Q3(a) adds "a rival reads my holes" and Q4(c) "publisher X withdraws" to the adopter twin's standing library; 11 Q4(a) fixes that library at four scenarios. Compose it in one place.
 - C20 (24): Q5(a) vendors feed payloads so a departing adopter re-derives prices offline; 24 Q4(c) has each publisher ship its converter code beside the feed and composition call it. Re-derivation then needs the converter vendored too, not only the JSON. And Q1(b) "widens the triple toward the cap": 24 Q3 shows FCA has no cap and needs a publisher-shipped `widen_to`; the widening mechanism here inherits 24's answer.
+
+## Answer
+
+Resolved 2026-08-28. Owner record: the owner read every held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". A bare agree does not ratify. Each item below is PROVISIONAL, its own reason as rationale, as tickets 04, 07 and 08 were. That instruction overrode the five-per-day rule. Five cross-ticket conflicts then went to the owner with a panel verdict. The owner wrote: "I agree with you're more advanced reasoning". D5 is DECIDED on that line and amends item 2.
+
+1. A publisher's reliability score is a feed (`kind: feed`, `name: publisher-reliability`) from a scorer party that publishes no scored feed. A score below the adopter's declared threshold widens the adopter's triple, the ticket 07 stale-size pattern, until the adopter re-pins or the score recovers. A degraded-tier release (ticket 18) is priced the same way. Rationale: price and cage, not a register; every mechanism exists. C20: the widening target is the publisher-shipped `widen_to` from ticket 24 Q3, since FCA has no cap. C11: the reliability fields on `prices[]` land in ticket 25's one schema pass.
+
+2. Recourse for a mispriced regulator feed is disclosure plus a priced hole. The score is disclosed in `prices[]`. The regulator's number stays authoritative until the adopter re-pins. D5 (decided): a pin behind a newer published version is priced by the existing EOL ramp (`to_fair_scenario.py eol_ramp`) from the newer version's publish date. The draft's "hole growing over time" is replaced by that one formula. `revoked[]` stays withdrawal only. An ensemble of pricing publishers is the later shape, blocked on ticket 21.
+
+3. An adopter's priced exposure is public by design and priced. "A rival reads my holes" is a standing scenario under the adopter's own perspective, priced by `fair.py` as a `source: twin` entry in `prices[]`. The mechanism is the perspective rule plus role-not-person signatures. Rationale: no new repo or mechanism; Rekor and the ADR-0012 re-render stay intact. Sealed payloads are the upgrade path for a real adopter. C19: ticket 11 owns the scenario library and this row joins it.
+
+4. The switching cost is computed by the adopter's composition, never declared. For each publisher in `inherits[]` that has a substitute, or is not the sole source of a declared obligation, re-compose with its edges dropped and record the £ of holes and price moves that open. For a sole-source feed or the `controls` parent, record the refusal, named and unpriced. The figure is annualised over the pin's expected life into `prices[]` as `kind: switching` with perspective and currency. Rationale: the party measured cannot state the number; annualised makes it a Price. Until ticket 15 lands it covers two priced edges; the evidence says so. C11: `kind: switching` lands in ticket 25. C19: "publisher X withdraws" joins ticket 11's library. C17: ticket 21 builds `inherits[]` on any party.
+
+5. The composed artefact vendors every feed payload it priced under `composed/feeds/<party>/<version>/`, signed by the adopter's own tag. Re-derivation reads the local copy and checks its git blob id against the pinned tree entry (ADR-0012 holds). Precondition: ticket 21's `{tag, commit}` pin for pricing and threat. An unreachable publisher with no vendored copy is a priced hole. C20: vendoring includes each publisher's converter code (24 Q4c).
+
+Consequences:
+- D5 supersedes the draft Q2 formula and ticket 13 Q5's dated `revoked[]` supersede. ADR-0019 stands. ADR-0021's `prices[]` shape is amended once, in ticket 25.
+- `exit-cost-asymmetry` stays unsolved for people; adopter exit cost is priced (NORTH-STAR §6).
+- Ticket 25: reliability fields and `kind: switching` on `prices[]`. Ticket 21: `inherits[]` on any party, `{tag, commit}` pins for pricing and threat, vendored payloads and converters. Ticket 11: two new standing scenarios.
+- New tickets carry the catalogue default (third file, harness check, `verify-misuse.sh`), the switching computation with `verify-portability.sh`, and the scorer party.
+- Revisit triggers: the EOL ramp misprices a supersede (add explicit `supersedes: {version, eol_date}`); a real adopter appears (sealed payloads); a second pricing publisher exists (ensemble); ticket 09's ladder lands (what the portability cage does when it bites).
+
+Graduated: Eco-system misuse catalogue graded by the gate; Switching cost computed in composition; The forecast book and the scorer party.

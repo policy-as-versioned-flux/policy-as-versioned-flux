@@ -1,7 +1,7 @@
 # 16 — Flux rescoped and verified at the cluster
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -64,3 +64,21 @@ Later rounds, blocked on the above: the new window's numbers (cadence, coverage 
 - C2 (10, 20): Q3(a) commits `drift/samples.jsonl` from a scheduled workflow; 10 Q3 rejects machine commits to main from a clock and 10's proposed `verify-schedules.sh` asserts no scheduled run merged anything. Ticket 03's `truth.log` commit is the precedent; 10 must rule before this lands. Q3 also defers cadence and coverage floor to 10; 10 Q2(a)'s daily floor already answers it.
 - C6 (12, 18): Q4(a2) signs the tag object with an SSH key, so adopter, platform and nist tags are no longer gitsign-signed (one signature block per tag). 12 and 18 list "one signing mechanism, the gitsign tag, never a second" as settled, and 18 relies on `release.yml` verifying the tag with gitsign. Re-grill 18 said "controller or the bridge"; picking the bridge reverses what 12 and 18 treat as closed. Say so in the question.
 - C12 (20): Q3(a) makes the §4 step-4 live tail observable inside a CI run (ephemeral KinD in Actions). 20 Q2 rejects its option (a) on the ground that step 4 is "permanently could-not-look" in CI and picks a presenter-run local `--live` number instead. If Q3(a) lands, 20 Q2(a) is the honest option and NORTH-STAR §5 (one command in CI is the only citable source) is kept.
+
+## Answer
+
+Resolved 2026-08-28. Owner record: on 2026-08-28 the owner read the held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". Under the map's process rule a bare agree does not ratify. Q1, Q2, Q3 and Q5 are PROVISIONAL, each recommendation's own reason as rationale, as tickets 04, 07 and 08 were. The five-per-day rule was overridden by that instruction; recorded. Five conflicts then went to the owner with a three-lens panel verdict. The owner wrote: "I agree with you're more advanced reasoning". D1, D3 and D4 touch this ticket. They are DECIDED with that line and the panel reasoning as rationale. Q4 is decided and amended.
+
+1. **Q1, provisional.** One sample records five facts. Each publisher's GitRepository is Ready at the pinned `{tag, commit}` and its URL is the publisher's real remote. The tag signature is verified at the source boundary. The Kustomization's `lastAppliedRevision` equals that commit. Every rendered policy object is live and byte-equal to an offline render. Every such object is in the Flux inventory. State continuity only. Rationale: the only shape that makes every word observable. Build cost: an offline renderer for `composed/`, and driftwood PR 11 merged first.
+
+2. **Q2, provisional.** Three falsifiers are declared in the new `window.yaml` before sample one: a verified source Ready but a rendered object absent or unequal and not healed within N intervals; cluster-side verification passing a tag that identity-pinned CI rejects; coverage below the floor at close, recorded unmeasured. N comes from the Kustomization interval.
+
+3. **Q3, provisional, stands under D1.** A scheduled workflow in the adopter's own repo brings up an ephemeral KinD, installs the engine, reconciles from the real remotes with verification on, and appends the sample to `drift/samples.jsonl`. The adopter's verify script grades the latest sample, exit 3 when none is fresh. Rationale: measurement stays inside the consumer org, on its own clock. D1 amendment: the sample is an OBSERVATION, which a clock may append. The lane is caged: a repo ruleset limits the scheduled identity to observation paths, bot commits are signed, and `verify-schedules.sh` asserts no scheduled run changed a signed artefact. Cadence and coverage floor come from ticket 10's schedule rule (10 Q2(a) daily floor).
+
+4. **Q4, decided, D3.** The held recommendation (SSH bridge) is rejected. One signing mechanism exists, the gitsign tag, on every artefact. Cluster-side verification is an identity-pinned gitsign-verifying controller at the Flux source boundary. It gates the Kustomization, time-boxed until fluxcd/source-controller#1068 lands. No SSH or OpenPGP key re-signs any ref. Rationale: the bridge is a second signer under another name. Precondition kept: test Flux mode `Tag` with `spec.ref.commit` set to a non-target commit first (H6-12).
+
+5. **Q5, provisional.** A ResourceSet in the adopter's repo ranges `composed/policies/v<version>` from the adopter's own signed tag, with `composed/orphan-guard.yaml` as the guard. The platform and nist GitRepository objects stay on the cluster as verified sources only. The sample asserts each resolved commit equals the matching parent SHA in `composed/HEADER.yaml`. Rationale: the boundary stays observable with no second policy install. The controller identity-pins adopter, platform and nist; ico, feeds and insurer stay compose-time (tickets 04, 21).
+
+**Consequences:** D3 supersedes mo-07 Answer §3 (bridge, per-org keys) and the bridge wording in this Question. ADR-0001 Consequences gain the controller as the interim; ADR-0005 gains the `{version, path}` array over one source.  D4: ticket 20 Q2 flips to (a); NORTH-STAR §4 step 4 cites only the scheduled CI number and renders could-not-look until Q3 lands. D1: ticket 10 Q3 wording is amended; `verify-schedules.sh` is ticket 10's build. The ico pin at a tag lands in ticket 21. Q1, Q2, Q3 and Q5 land in a new driftwood build ticket; Q4 in a new controller ticket; widening to tuppence and ludlow in a third, after driftwood is green in `verify-all`. Revisit triggers: #1068 closes or `spec.verify` grows a sigstore type (a verify script goes red, controller removed); the mode `Tag` test fails (GAPS 3.27 ancestor-pin design changes); coverage below floor (unmeasured, never a pass).
+
+**Graduated:** Driftwood proves the composed set in force from signed sources in CI; The gitsign-verifying source controller; Widen the Flux slice to tuppence and ludlow.

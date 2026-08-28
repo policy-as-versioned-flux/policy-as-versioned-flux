@@ -2,6 +2,8 @@
 status: accepted
 ---
 
+> **Superseded in part, 2026-08-28.** "a proposed Deny opens an issue" is superseded by [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md). The rest stands.
+
 # The proposer: the adopter runs it, in its own repo, and it opens the PR
 
 A cage tier is a priced verdict. When a feed re-prices a caged workload, the £ selects a different

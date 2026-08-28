@@ -1,8 +1,8 @@
 # 23 — The news feed and the headline skill
 
 Type: grilling (HITL)
-Status: prepared
-Blocked by: 21
+Status: resolved
+Blocked by: 21, 10
 
 ## Question
 
@@ -78,3 +78,29 @@ Later rounds, blocked on the above:
 - C10 (15): Q5(a) adds `claim_scope` and `derived_from` to the forward-intel payload as a major; 15 Q4(a) adds `register[]` as another major. One ADR-0021 amendment in ticket 25, not two.
 - C13 (20): 20 lists "niobium is the first entry of the signed news feed" as already decided; Q1(c) here says it never enters the feed. Tell 20 the line is open.
 - C14 (10, 11): Q3(a) lands the skill's PR on "the adopter's overlay", which assumes 11 Q1(a) (overlay in the adopter repo) and pre-empts 10's open item on where a skill's claim file lands.
+
+## Answer
+
+Resolved 2026-08-28. On 2026-08-28 the owner read every held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". A bare agree does not ratify. Each item below is PROVISIONAL, with that line as the owner record and the recommendation's own reason as the rationale, as tickets 04, 07 and 08 were. The five-per-day rule was overridden by the owner's instruction. Five cross-ticket conflicts were then put to the owner with a three-lens panel verdict. The owner wrote: "I agree with you're more advanced reasoning". D1 to D5 are DECIDED. D2, C4, C10, C13, C14 and C19 apply here.
+
+1. The news feed carries observed entries only. Niobium never enters it. It lives in each org twin's scenario library (ticket 11) as the twin's own dated signal, and step 5 plays it from there. Rationale: the feed stays worthless to fake, the publisher's reliability record stays clean, and no new field is needed. C13 corrects ticket 20's "first entry" line. C19: niobium is one of six standing scenarios per adopter.
+
+2. The news payload is `payload.events[]` with `id, date, source, statement, provenance{url}`. The news `payload_schema` requires `url`. The twin's signal schema makes `steep` optional until bound. Rationale: the feed asserts only that something was said, when, and where it was read. Every judgement is a skill output on the twin side, grade 5 and contestable. D2: the feed defines "changed" in its own versioned rule file beside the feed, under ticket 10's one rule.
+
+3. The headline skill is `signal-classify` plus `evolution-judge` packaged as one Claude Code skill a human runs over the unbound pool. It opens a PR with a grade-5 `binding` claim. If the human judges a move, the same PR carries an `override` by his registered role with an absolute `evolution_position` and the headline in `evidence`. The actor path is a twin `needs` edge. Rationale: it is the twin's decided model with a human at the keyboard. Every record already exists in the schema. The reviewed PR is the unit of adoption. C14: the PR lands on the adopter's overlay in the adopter's repo. C4: classification never runs on the clock; twin 11 Q2's automated binding is superseded for it. Ticket 10 is added to Blocked by. Named cost: the twin has no velocity or horizon, so "plays forward" is ticket 11's territory.
+
+4. Only the human's `override`, or a `regrade` by a registered role, in the same reviewed PR is price-eligible. The grade-5 binding alone informs, ranks and sits in the pool. Rationale: the machine proposes, the role disposes, the role is scored. No schema or ADR change.
+
+5. The forward-intel payload gains `claim_scope` (a judged position by a named role, not an engine finding) and `derived_from` (the claim ids). Rationale: a disclosure the balance sheet cannot see is a deck line. The payload has no consumer yet, so the major bump is free now. `derived_from` is what the gate check reads. This closes H5-04. C10: one ADR-0021 amendment in ticket 25, with `register[]` (15 Q4a), as one major.
+
+Consequences:
+- ADR-0021's payload is amended once, in ticket 25: `claim_scope`, `derived_from`, `register[]`.
+- Ticket 20's niobium line and twin 11 Q2's automated classification are superseded. Lookup binding stays on the clock.
+- Ticket 10's open item on where a skill's claim file lands is closed.
+- GAPS 3.22 closes in the payload, not in a skill card. `author: ai-generated` retires when the skill lands.
+- Ticket 21 builds the news envelope, schema and changed-rule file. Ticket 25 carries the payload amendment and the `derived_from` gate check. A new build ticket carries the skill, the `steep` change and its gate check. Ticket 11 carries the actor path and play-forward.
+- Revisit triggers: a real, dated, URL-bearing headline on the same supply chain arrives (Q1b); the twin's map gains velocity or horizon (actor path, Q3b); a corroboration table for signals exists (Q4b); a forward-intel consumer appears before ticket 25 lands.
+
+Graduated:
+- Build the news feed and the headline skill (task).
+- The supply-constraint actor path and the scored headline forecast (grilling).

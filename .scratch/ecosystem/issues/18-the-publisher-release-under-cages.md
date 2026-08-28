@@ -1,7 +1,7 @@
 # 18 — The publisher release under cages
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 06
 
 ## Question
@@ -76,3 +76,30 @@ Later rounds, blocked on the above: which package a re-price bumps (re-grill 8, 
 - C1 (09): the "already decided" list states the ladder is `baseline, restricted, quarantine, isolated, infra` citing "ticket 09 round 1"; that round is HELD, not answered. Q2 also assumes 09 Q1 (per-namespace tier) and 09 Q4 (adopter-set floor). Corpus sizing (6 tier values) inherits the same assumption.
 - C6 (12, 16): 16 Q4(a2) SSH-signs the tag object for platform and nist, leaving gitsign on the commit. The facts here ("every tag is cut keyless with gitsign and verified identity-pinned in `release.yml`") and the settled "one signing mechanism" line both break if 16 Q4 lands. Sequence 16 Q4 before the first gate-determined release.
 - C8 (09, 12): Q3(a)'s platform `party.yaml` with size and appetite is the same file 09 Q5(a) uses to declare infra namespaces and 12 Q5(a) replaces with a rendered package declaration. Ticket 04 A4 settled that the file exists with `roles: [publisher]`; its contents are decided in three places.
+
+## Answer
+
+Resolved 2026-08-28. Owner record: on 2026-08-28 the owner read every held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". A bare agree does not ratify, so the five items below are PROVISIONAL with that line verbatim and each recommendation's reason as the rationale, as tickets 04, 07 and 08 were. The five-per-day rule was overridden by the owner's instruction. D3 was put to the owner as one of five decisions with a three-lens panel verdict. The owner wrote: "I agree with you're more advanced reasoning". D3 is DECIDED with that line verbatim. C1 and C8 are not decisions of their own: C1 rests on ticket 09's accepted round (PROVISIONAL under the same bare-agree line) and C8 on ticket 04 A4 and ADR-0018 §1 (settled) with 12 Q5(a) amended.
+
+1. A degraded publish carries a prerelease suffix on the declared number, for example `policy/v3.0.1-quarantine.1`. The evidence outcome is `degraded` and names the computed bump. The array element carries `tier: quarantine`. Rationale: the version string is the one thing every consumer reads, so it must say what happened. The base number stays and sorts below the clean number. This narrow rewrite is a superseding note on ADR-0011. Cost: `parse_semver`, `POLICY_TAG_RE`, `TAG_RE`, `existing_versions` and the two sorts become prerelease-aware.
+
+2. At the adopter, the publisher's `tier: quarantine` is a signed fact. It enters the adopter's `prices[]` as a priced hole under the adopter's perspective. Compose skips a degraded element unless the adopter pins it deliberately. The adopter's selection policy then prices it into a tier. Rationale: the publisher signals, the adopter prices. A publisher floor reaches into another participant. A refusal is a gate under another name. Amendment C1: the tier value space is `baseline, restricted, quarantine, isolated, infra`, per Namespace, with an adopter-set tighten-only floor, now decided in ticket 09.
+
+3. Platform gets a signed `party.yaml` with its own size and appetite. A corpus move is priced as a scenario against the platform's own exposure under `perspective: platform`. The £ is evidence only. It does not select the tier. Rationale: a price with no amount is not a price under ADR-0021. A £ that picks the tier re-creates a gate and contradicts item 2. Amendment C8: this is the one platform `party.yaml`. It carries roles, size, appetite and `publishes`. The platform's `infra` declaration is `posture.acme.io/tier: infra` on its own Namespace manifests, entitled by the `platform` role. No namespace list in any artefact.
+
+4. The adopter fills the per-institution matrix. The published `computed-semver` package runs inside `adopter-gate.py` against the adopter's own claimed versions, with its own workloads as extra corpus entries. The row lands in that adopter's composed evidence. The hub's aggregate run collects the rows. The publisher's `matrix` stays empty and says so. Rationale: NORTH-STAR §2 forbids the publisher reading adopter repos. A hub pins file is the catalogue ticket 04 refused. ADR-0011 holds; the row is about the adopter's pin.
+
+5. The bump file is one `bump` field on the `versions.yaml` array element the release PR adds. ico and nist, which have no array, get a one-key `bump.yaml` beside the feed. Rationale: the array element is the reviewed unit and the gate already parses it.
+
+Amendment D3: one signing mechanism, the gitsign tag, on every artefact. Ticket 16 Q4 moves to an identity-pinned gitsign-verifying controller. No SSH or OpenPGP key re-signs any ref. This ticket stands. Precondition: test Flux mode Tag with `spec.ref.commit` first.
+
+Consequences:
+- ADR-0011 gets a superseding note: "never rewrites the number" becomes "never rewrites the base number".
+- 12 Q5(a)'s "rendered from the pinned package" is superseded by C8.
+- Ticket 21 builds: platform `party.yaml`, `bump` field and `bump.yaml`, prerelease-aware parsing, the H6-12 fix (commit E, tag E, then array A on main, with the verify script in `talk/verify-all.sh`), `computed-semver` as a self-versioned package.
+- Ticket 25 builds: the evidence shape (`degraded` outcome, `tier` on the element, platform-perspective price) in the one prices[] pass (C11), and the adopter matrix row.
+- A new ticket cuts the first gate-determined release (H9-04).
+- Revisit triggers: the 2.0.1 orphan on build day (re-cut or record); a degraded prerelease never followed by a clean number (ticket 06 rows 10-11); which package a re-price bumps; whether an un-claimed tier's narrowing is major or a priced hole; Flux #1068 landing (D3).
+
+Graduated:
+- The first gate-determined release (H9-04)

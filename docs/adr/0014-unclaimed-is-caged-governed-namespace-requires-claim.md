@@ -2,6 +2,8 @@
 status: accepted
 ---
 
+> **Superseded in part, 2026-08-28.** the CREATE deny on a governed namespace is superseded by [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md). The rest stands.
+
 # An unclaimed pod is caged, not denied; a governed namespace requires a claim at CREATE
 
 `CONTEXT.md` said the orphan guard denies a workload whose `policy-version` label is "missing or not

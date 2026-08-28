@@ -1,7 +1,7 @@
 # 20 — One demo of the eco system
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 03
 
 ## Question
@@ -67,3 +67,30 @@ Later rounds, blocked on the above: the video by-product, screen recording of a 
 - C2 (10, 16): Q2 has `truth.yml` commit per-script captures on a schedule; 10 Q3 rules out machine commits to main from a clock. Ticket 03's `truth.log` commit is the precedent; 10 must say whether gate evidence is inside the rule.
 - C12 (16): Q2 rejects (a) because step 4 is "permanently could-not-look" in CI; 16 Q3(a) runs an ephemeral KinD inside the adopter's Actions so step 4 is observable in the scheduled run. If 16 lands, (a) is viable and (b)'s presenter-run local number is the second clock NORTH-STAR §5 forbids.
 - C13 (23): "already decided" says the niobium headline is "first entry of the signed news feed (ticket 23)"; 23 Q1(c) recommends it never enters the feeds org's feed and lives only in the twin's scenario library. Not settled; do not narrate it as feed content until 23 closes.
+
+## Answer
+
+Resolved 2026-08-28. The owner read the held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". Under the map's process rule Q1, Q3, Q4 and Q5 are PROVISIONAL, with that line verbatim and each recommendation's reason as the rationale. The five-per-day rule was overridden by the owner's instruction. Q2 was then put to the owner as conflict D4 with a panel verdict. The owner wrote: "I agree with you're more advanced reasoning". Q2 is recorded as DECIDED with that line verbatim and the D4 reasoning as the rationale.
+
+1. **The artefact.** A generator in `talk/`, lifted from pitch-v6's `build_deck.py`, emits `talk/deck.md` as Marp markdown from the gate's captures. `npx @marp-team/marp-cli` renders it to HTML, PDF and PNG in CI. Diagrams are pre-rendered from pitch-v6's `mermaid/*.mmd`. No capture text is retyped. Prose lives in one narration file. Rationale: it keeps the 2026-07-23 Marp constraint and pitch-v6's one real discipline, and Markdown is reviewable in the PR. Hand editing is not an option. Provisional.
+
+2. **The feeding run.** The gate writes one file per script under `talk/captures/` beside the TRUTH line. The deck is built only from the scheduled offline CI run. Step 4's number comes only from that run, using the ephemeral KinD from ticket 16 Q3. Until 16 Q3 lands, step 4 renders could-not-look. That is the honest state. A presenter-run `--live` is rehearsal pre-flight only, never cited. Rationale (D4): a presenter-run local number is the second clock NORTH-STAR §5 forbids. Amendment (D1): the captures are observations. The lane is caged. A repo ruleset limits the scheduled workflow identity to the observation paths, bot commits are signed, and `verify-schedules.sh` asserts no scheduled run ever changed a signed artefact. Decided.
+
+3. **Unbuilt steps.** All seven steps are generated from day one. A script that exited 3 renders as could-not-look with the gate's SKIP reason. A step with no verify script renders as "no check yet, owned by ticket NN". That is a generator-side status, never a gate grade. Rationale: the three-outcome rule applied to slides, and no narrowing to whatever works. Provisional.
+
+4. **What `verify-demo.sh` refuses.** The deck must build. Every cited capture must exist in the run the deck names. Each beat's status tag must equal that run's grade for its script. Any £ amount, percentage or count in a beat's body must appear verbatim in that beat's capture. Headers, dates, tags and step numbers are outside the figure check; the script names that ceiling. Beats are in §4 order. A phrase lint refuses only "exemption", "hourglass", "admission gate" and "deny gate". Every other "gate" is a human review item. Rationale: each clause maps to a recorded defect. Renaming "release gate" is ticket 18's decision. Provisional.
+
+5. **The media.** `pitch-v6.mp4` becomes a GitHub release asset on the hub. The audio is not kept. The by-product video is a screen recording of a human drive. Rationale: findable without loading every clone; the audio is regenerable. Provisional.
+
+Amendment (C13): the "already decided" line is corrected. Niobium never enters the feeds org's news feed. It lives in the twin's scenario library (ticket 11, 23 Q1c). The deck never narrates it as feed content.
+
+Consequences:
+- Q2 supersedes the held round's (b) and cross-ticket note C12. Note C2 closes under D1. Ticket 03's `truth.log` commit is the first instance of the observation lane.
+- `talk/deck.md` (hand-authored Marp) and `talk/RUNBOOK.md`'s beat table are superseded by the generated deck. Dated banners, never rewrites.
+- pitch-v6 is committed as text, captures, mermaid and scripts; `plan.md` gets a dated banner.
+- The generator, the capture lane, `verify-demo.sh` and the release asset land in a new build ticket (graduated below). The ruleset and `verify-schedules.sh` are ticket 10's build. Step 4's capture waits on ticket 16 Q3.
+- Revisit triggers: the size of one run's stdout is measured before captures are committed rather than attached as a workflow artifact; ticket 18 or the vocabulary item renaming "gate" on slides widens the lint; Flux #1068 landing changes what step 4 reads.
+
+Graduated:
+- The generated deck (task).
+- The demo's remaining beats (grilling): video pipeline, Monte Carlo, continuous refresh, twin beat.

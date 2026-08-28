@@ -1,7 +1,7 @@
 # 14 — Insurance and the insurer party
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 01, 07
 
 ## Question
@@ -71,3 +71,29 @@ Later rounds, blocked on the above: aggregate versus per-obligation sub-limits (
 - C1 (09): Q2's recorded consequence ("ORDER becomes fix / cage / `deny` today, `isolated` if 09 Q3 lands") leans on a 09 option not yet chosen. Hold the consequence until 09 closes.
 - C11 (15, 19, 24): Q3(i) books the premium as a cost line beside `prices[]`; 15 Q2(a) adds a per-hole breakdown to the regime entry; 19 adds reliability fields and a `kind: switching` entry; 24 Q2(a) adds `per_customer` to every entry. Five tickets reshape `prices[]`, which ticket 25 builds once. Recommend one schema pass in 25 after these rounds, not five majors.
 - C17 (15): Q5(a) needs a publisher `party.yaml` carrying `inherits[]` (the insurer pins platform and the adopter's exposure); 15 Q1(b) needs the same (ico pins nist as a `controls` parent). Both call it "a schema fact for ticket 21"; neither ticket asks it. Ask once.
+
+## Answer
+
+Resolved 2026-08-28. On 2026-08-28 the owner read every held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". A bare agree does not ratify, so every item below is PROVISIONAL, with the recommendation's reason as the rationale, as in tickets 04, 07 and 08. The five-per-day rule was overridden by that instruction; recorded. Five cross-ticket conflicts then went to the owner with a three-lens panel verdict. The owner wrote: "I agree with you're more advanced reasoning". D1 to D5 are DECIDED and applied below where they touch this ticket.
+
+1. Cover terms. `appetite` on the adopter's `party.yaml` gains `attachment`, `limit` and `exclusions`. Exclusions are keyed on obligation regime names and `(source, id)` control keys: `exclusions: [{kind: obligation|control, source?, id}]`. Attachment and limit are annual aggregate. `attachment` is the retention `tolerance` already names, seen from the other side. Rationale: the composition already prices on those keys. Aggregate is the only grain `fair.simulate()` can slice.
+
+2. Priced exposure. The adopter's composed artefact gains an `exposure` section under `perspective: <adopter>`: the aggregate annual loss summary (`ale, var95, tvar, tail`, the `lm` spec or a loss-exceedance curve), computed by summing per-risk annual loss lists year by year, independent across risks and correlated within a breach. Rationale: one engine, one signed input. Amendment (C1): ticket 09 is accepted, so the per-risk crossover loses `transfer`, and `ORDER` is fix / cage / `isolated`. The war-gamer's `transfer` assertion is rewritten against the layer.
+
+3. The quote and the premium. The payload is `{insured, terms, premium {amount, currency}, valid_from, valid_until, priced_against: {party tag, composed sha, exposure hash, forward-intel version}, conditions: [{source, id, consequence: void|uplift}]}`. The premium is a contract cost booked under `perspective: <adopter>`, beside `costs.fix`. The insurer's TVaR arithmetic stays under `perspective: insurer` and is never summed with the adopter's. Rationale: `priced_against` reuses ADR-0012's pinned sha; conditions are carrier vocabulary (research 07); only a cost-line premium makes TCoR a legal sum. Amendment (C11): the premium cost line lands in ticket 25's one `prices[]` schema pass with 15, 19 and 24, as one major.
+
+4. Layout. One feed name per adopter (`quote-driftwood`, `quote-tuppence`, `quote-ludlow`), each its own `path` and `publishes[]` row, one shared `payload_schema`, one tag line. Rationale: each adopter pins exactly its own cover; a foreign re-price lands as `changed: false`. The composer resolves `name` to `path` through `publishes[]`, which ticket 21 builds.
+
+5. The pricing seat. The insurer repo pins `platform` and the adopter's exposure artefact through `inherits[]`. A scheduled workflow there runs `fair.py`'s layer maths under `perspective: insurer` over the pinned exposure with the insurer's own signed `load` and `conditions` files, opens a PR, and a human merges and tags. Rationale: independence comes from the insurer's own signed inputs, not different arithmetic; one script in one repo to grade. Amendments: C17, any party may carry `inherits[]`, ticket 21 builds it. D1, the clock opens the PR and never commits the quote; the tag is a human declaration. D2, the re-quote is an instance of ticket 10's one rule: a scheduled fetch opens a PR when the computed bump is not `none`; the insurer's "changed" rule sits in a versioned file beside the feed.
+
+Derived, unchallenged: a pin past `valid_until` is lapsed cover, priced as fully retained, never refused.
+
+Consequences:
+- Supersedes `tcor.py`'s ALE-times-load premium and `costs.transfer.{load, deductible}` in `driftwood-portfolio.json`.
+- Extends ADR-0021 (exposure, premium cost line) and ADR-0019 (publisher `inherits[]`, first expiring feed). ADR-0006 untouched.
+- Ticket 21: `inherits[]` on any party, `name` to `path` resolution. Ticket 25: `appetite.{attachment, limit, exclusions}`, the `exposure` aggregate in `fair.py`, the premium line in the one `prices[]` pass, `ORDER` rewrite. Ticket 10: the re-quote clock as a listed instance. A new build ticket carries the insurer repo itself.
+- Revisit triggers: a carrier asks for per-occurrence terms; the independent sum misprices a correlated portfolio; per-obligation sub-limits are needed.
+
+Graduated:
+- Build: the insurer quote slice (insurer `party.yaml`, `quote-driftwood` feed, scheduled pricer, verify script in `verify-all.sh`).
+- Grilling: insurance round 2 (sub-limits, which adopter first, the insurer's own size and risk-bearer status, hole versus exclusion on the sheet).

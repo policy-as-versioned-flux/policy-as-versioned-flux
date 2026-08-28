@@ -1,5 +1,7 @@
 # Grill walk
 
+> **Historical, 2026-08-28.** Every round below was walked the same day. The Answers live in the tickets; the walking order for what remains is in [TO-SPEC-HANDOFF.md](TO-SPEC-HANDOFF.md).
+
 2026-08-28, AFK. Fourteen held rounds, five questions each: 70 questions, one ticket a day. Recommendations stay the assistant's until the owner gives a reason. C1-C20 are appended to each affected ticket under "Cross-ticket notes (2026-08-28)".
 
 ## Walking order

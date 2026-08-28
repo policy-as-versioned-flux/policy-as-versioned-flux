@@ -1,7 +1,7 @@
 # 11 — An org twin each
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 08
 
 ## Question
@@ -71,3 +71,21 @@ Later rounds, blocked on the above: the twin's own cage, spec and price per adop
 - C5 (12): Q1(a) rests on "two identities, one repo: the overlay under the adopter's human tag, the feed under the twin agent". 12's facts show every tag in the estate is cut by a GitHub Actions workflow subject (a machine identity no human can log in with), and 12 Q4(b) roots the twin agent as the workflow OIDC identity of the twin schedule. Both signers are then Actions subjects differing by workflow path; "human tag" is not a real category here.
 - C14 (10, 23): 23 Q3(a) opens the headline skill's PR against "the adopter's overlay", assuming Q1(a) before the owner chooses it; 10's later round still lists the landing place as open.
 - C19 (19): Q4(a) fixes four standing scenarios per adopter; 19 Q3(a) adds "a rival reads my holes" and 19 Q4(c) "publisher X withdraws". The library is being composed in two tickets.
+
+## Answer
+
+Resolved 2026-08-28. On 2026-08-28 the owner read every held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". A bare agree does not ratify, so the five items below are PROVISIONAL, each with its recommendation's own reason as the rationale, as tickets 04, 07 and 08 were. The five-per-day rule was overridden by that instruction; recorded. The cross-ticket conflicts then went to the owner as five decisions with a panel verdict. The owner wrote: "I agree with you're more advanced reasoning". D1 to D5 are DECIDED. None changes a question here. C4, C5, C13, C14 and C19 amend this ticket.
+
+1. **Where the overlay lives.** Each adopter's twin overlay lives inside the adopter's own repo (`driftwood/twin/` and siblings), signed under the adopter's ordinary release tag. The world layer is vendored under `twin/world/`, pinned by the same tag. The loader does not learn a second repo. Rationale: one checkout lets a verifier re-render the feed from the overlay at the pinned commit (ADR-0012). A separate twin repo is a repo nothing pins. Amendment C5: "human tag" means the overlay release workflow identity; the twin agent is the twin schedule's workflow identity. `twin` must self-version with a signed semver tag first; the hub has none.
+
+2. **The overlay floor.** The floor is authored. It holds the caged workload, the pinned policy line and the regulated data as components with Wardley positions. People are roles only. At least one causal edge is graded inside the pricing threshold to a declared cash flow. At least one perspective has `party: employer`. Its valuations carry a `currency` field (schema bump) that the verify script checks equals `party.yaml`'s `reporting_currency`. The payload's `perspective` names that perspective. Appetite is never copied into the overlay. Rationale: below this floor the pricing gates emit no curve, so the feed carries nothing the estate can annualise. A generator cannot derive valuations from turnover. Lands after ticket 25 delivers `reporting_currency`.
+
+3. **A subscribed feed becomes a signal by lookup.** Each new pinned version of a subscribed feed maps to one signal with no judgement. `date` is the payload's event date where its schema carries one. Provenance carries `published_at`, tag and commit. `source` is the signed tag. `steep` comes from a fixed table keyed by feed name. Grade 5, contestable. Headlines are ticket 23's skill. Unpinned feeds cannot fire until ticket 21 pins them. Rationale: nothing here is a reasoning step; mis-tagging is priced downstream. Amendment C4: twin decision 11 Q2 ("automated binding at volume, no human gate") is superseded by the map's Note. Lookup binding stays on the clock because it is mechanical.
+
+4. **The standing scenario library.** This ticket owns it. Each adopter carries six standing scenarios against its own components: niobium headline (`supply-shock`), EOL date passing (new class `eol-date-passes`), fine published (new class `penalty-published`), key-person event (`bus-factor-key-person`), a rival reads my holes, and publisher X withdraws (both from ticket 19). Each new class is the three-place change: enum, library fixture, adopter overlay. The `penalty-published` shock is the consequence on the value chain, never the fine amount. The estate prices the fine; the twin prices what the fine does. Rationale: the thin slice NORTH-STAR §4 step 5 needs, seam kept. Amendments C19 and C13: ticket 19's two scenarios join here; niobium never enters the news feed.
+
+5. **The evals.** One `verify/verify-twin-evals.sh` in the hub, discovered by `verify-all`, runs the six skill evals at existing thresholds, the three real-firm beats and `cross_architecture_determinism`. PASS or FAIL by exit code. Scores print into the gate output; `truth.log` is the record. A fall in any score against the last recorded value is a FAIL. `twin.yml` keeps running on push but is never cited. Rationale: only the truth surface is citable (NORTH-STAR §5).
+
+Consequences: twin decision 11 Q2 is superseded by item 3. Ticket 20's niobium line is corrected. Ticket 10's open item closes: a skill's claim file lands as a PR on the adopter's overlay (C14). Ticket 21 pins ico pricing and platform threat. Ticket 25 lands `reporting_currency` and the perspective `currency` bump. A new build ticket carries items 1, 2, 4 and 5. The substrate generator becomes a Claude Code skill with `authored` output, the deterministic generator kept as its eval, `honest_build.py:173-176` corrected. Revisit triggers: a loader forced to span two repos; a scenario class no subscribed feed can move; the D5 dissent if the EOL ramp misprices.
+
+Graduated: "Build: adopter twin overlay, twin release tag and twin evals" (task). "The twin's cage, spec and price per adopter" (grilling). "Sensor admission for the key-person scenario" (grilling).

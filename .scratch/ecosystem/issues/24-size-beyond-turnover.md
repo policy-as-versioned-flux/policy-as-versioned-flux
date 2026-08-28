@@ -1,7 +1,7 @@
 # 24 — Size beyond turnover
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 07
 
 ## Question
@@ -108,3 +108,27 @@ Later rounds, blocked on the above: who the PCI publisher party is (PCI is acqui
 - C3 (10, 22): Q5(a)'s monthly fx tag is one of three per-feed clock answers (10 Q4(a) PR per fetch, 22 Q5(b) PR on threshold) after 10 Q2(a) rejected a period per step. Let 10 carry the rule; this ticket keeps only the source.
 - C11 (14, 15, 19): Q2(a)'s `per_customer` on every `prices[]` entry is one of five independent reshapes of `prices[]` (14 premium, 15 per-hole, 19 reliability and switching). Ticket 25 builds the shape once.
 - C20 (19): Q4(c) ships converter code with each publisher; 19 Q5(a) vendors only feed payloads for offline re-derivation, so 19's guarantee needs the converter vendored too. Q3's "no cap to widen to" for FCA also lands on 19 Q1(b), which widens "toward the cap".
+
+## Answer
+
+Resolved 2026-08-28.
+
+Owner record. On 2026-08-28 the owner read the held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". A bare agree does not ratify (map process rule). Items 1 to 5 are PROVISIONAL, each with its recommendation's reason as the rationale. The five-per-day rule was overridden by that instruction. One conflict touching this ticket, D2, was then put to the owner with a three-lens panel verdict. The owner wrote: "I agree with you're more advanced reasoning". D2 is DECIDED and amends item 5.
+
+1. A HIPAA violation counts per affected individual, per provision. `hi = min(min_usd × data_subjects, annual_cap_usd × provisions)`. The publisher ships `provisions` on the violation type. It defaults to 1 until shipped. The published fines become a fit check the converter prints and never uses. Rationale: ticket 07's shape plus one publisher-shipped integer; no number is invented; the figure moves when a source ships a count. Stale `data_subjects` widens to `annual_cap × provisions`, a cap, so ADR-0020 applies unchanged. Provisional.
+
+2. Every `prices[]` entry gains `per_customer: {amount, currency}`: the amount divided by the adopter's `customers`, under the entry's perspective and currency, never summed, absent when `customers` is undeclared. Rationale: it reads a decided fact, adds no formula, and the reviewed PR can see it. PCI stays size-blind; no per-card source exists and a converter constant invents a number (ADR-0020). Amendment C11: the field lands in ticket 25's one `prices[]` pass with 14, 15 and 19. Provisional.
+
+3. FCA reads size from relevant revenue. The publisher ships `rate_lo 0.05`, `rate_mode 0.10`, `rate_hi 0.20`. `lo, mode, hi = rate × relevant_revenue`. `relevant_revenue` is an optional fifth size fact and defaults to `turnover`. The published fines are a fit check only. Stale size widens to a publisher-shipped `widen_to` on the formula, sourced to the largest final notice under the framework. Rationale: a single-line fintech's relevant revenue is its turnover; a mandatory fact invites understatement; `widen_to` keeps the widening number sourced. Amends ticket 07 §1 and the CONTEXT.md `Size facts` entry. Amendment C20: `widen_to` is the widening target ticket 19 Q1(b) inherits. Provisional.
+
+4. Each publisher ships its converter beside its feed, as ico does today. Composition calls it with the adopter's signed `size`. A new regime is the publisher's code under the publisher's tag. Platform holds no per-regime arithmetic. Vocabulary: the four ticket 07 facts plus optional `relevant_revenue`; `obligations` stays a list of names; no per-obligation counts. Rationale: it is what exists and keeps ADR-0019 §3 true. Amendment C20: vendoring for departure (19 Q5a) includes each publisher's converter code. Provisional.
+
+5. The feeds org's first `fx` publish uses HMRC monthly exchange rates: GBP base, official, no API key. The payload note says it is not the statutory reporting rate. "No rate for the date" means no rate for the month. Rationale: lowest Renovate churn, GBP base like the adopters. Amendment D2 (decided): the monthly source is an instance of ticket 10's one rule. A scheduled fetch opens a PR when the computed bump is not `none`; "changed" is a versioned rule file beside the feed; sub-threshold observations append to the observation branch. This ticket keeps only the source. Provisional; the D2 amendment is decided.
+
+Consequences:
+- Ticket 07 §1 and CONTEXT.md `Size facts` gain optional `relevant_revenue`. ADR-0020's stale rule gains `widen_to` as the cap for a capless formula. ADR-0019 §3 is confirmed.
+- Ticket 21 builds: ico's converter takes `size`; `provisions`, `rate_*`, `widen_to` and the fit-check line ship in ico's schema under its envelope migration with a publisher-declared bump; composition passes `size` and drops the hard-coded `uk-gdpr / lower-tier`; the feeds org's first `fx` tag with its rule file.
+- Ticket 25 builds `per_customer`. Ticket 10 carries the fetch rule. Ticket 19 inherits `widen_to` and vendors converters. Ticket 11 owns the twin's read of `size`.
+- Revisit triggers: a publisher ships a formula two size facts could serve (item 4); a PCI per-card or merchant-level line ships (PCI size); ticket 21 gives ico a publisher `party.yaml` (one regulator party each, or ico for all); a sum needs daily fx (second `publishes[]` entry).
+
+Graduated: none.

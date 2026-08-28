@@ -1,7 +1,7 @@
 # 12 — Identity as spine
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 09
 
 ## Question
@@ -82,3 +82,21 @@ Later rounds, blocked on the above:
 - C8 (09, 18): Q5(a) renders the `infra` declaration from the pinned implementations package; 09 Q5(a) has the platform's own `party.yaml` declare the namespaces; 18 Q3(a) puts size and appetite on that file. Three tickets decide what platform's (ticket 04-settled) `party.yaml` and package carry. A namespace list in a package is what ADR-0018 §1 forbids and 09's skeptic pass rejected.
 - C15 (10, 13): the later round sends the currency controller to 13; 10 Q2 does too; 13 does not list it.
 - C18 (15): Q3(c) prices a caller that fails the cross-org demand "as a hole in `prices[]`"; 15 Q1 defines a hole as a partition of a regime's exposure keyed `(source, id)` with a regulator weight. A reach hole has no regime, no weight, no formula.
+
+## Answer
+
+Resolved 2026-08-28. On 2026-08-28 the owner read every held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". A bare agree does not ratify, so items 1 to 5 are PROVISIONAL with that line as the record and each recommendation's own reason as the rationale, as tickets 04, 07 and 08 were. The five-per-day rule was overridden by the owner's instruction. The cross-ticket conflicts were then put to the owner as five decisions with a three-lens panel verdict. The owner wrote: "I agree with you're more advanced reasoning". Amendments D3, C5, C7, C8 and C18 below are DECIDED on that line.
+
+1. Trust-domain topology. Every party that runs a cluster gets its own trust domain and its own SPIRE on its own cluster. Domains federate pairwise by `ClusterFederatedTrustDomain`. `trust_domain`, `bundle_endpoint` and `federates_with[]` are signed facts on the org's `party.yaml`. Trust in a counterparty is a line the party removes from its own artefact. Rationale: federation is a subscription, and the party artefact is the only subscription record. A shared root is the tenant relationship NORTH-STAR §2 forbids. Regulators, feeds and the insurer run no workloads and get no domain. C17: any party may carry `inherits[]`.
+
+2. The SVID path. The path becomes `/posture/<platform-version>/cage/<tier>/ns/<ns>/sa/<sa>`. The tier is the one decision a peer would price, so it must cross the boundary. C7: no second MutatingPolicy. Ticket 09's `cage-tier` renders the Namespace tier onto the pod label and the SVID template reads that label. The composed-artefact version stays out of the path until ticket 06 decides what a pod claims. Cost: a tier move re-issues the SVID within one TTL.
+
+3. The cross-org reach demand. A serving org declares per service, in its own composed artefact, `requires: {caller: {trust_domain, min_tier, version_window}}`. Composition renders it into the AuthorizationPolicy and the OpenBao role. `trust_domain` resolves against a pinned counterparty `party` feed, never a literal. Rationale: the demand lives where every other adopter decision lives and gets the Renovate bump path. C18: a caller that fails the demand has no hole. The lost reach is priced as a `source: twin` entry in `prices[]` under the caller's perspective. The caller's tier does not move.
+
+4. Actor-class roots. Five classes, two issuers, distinct subjects. Workloads and devices attest to their org's SPIRE domain. Tags and the proposer stay per-org GitHub Actions workflow subjects. The adopter's twin agent signs as the workflow OIDC identity of the adopter's twin schedule. Humans log in to Pomerium by GitHub-user OAuth. Dex is retired. The ADR says "same issuer, different subjects". C5: every tag is cut by a workflow subject; ticket 11's "human tag" means the overlay's release workflow. D3: the gitsign tag is the one signing mechanism; cluster-side verification is ticket 16's identity-pinned controller, not a second signer.
+
+5. Shipping the substrate. The platform publishes SPIRE, Istio, OpenBao, Pomerium and the two ClusterSPIFFEIDs as one self-versioned, gitsign-tagged `implementations` package with control claims. Each org pins it, Renovate bumps it, Flux reconciles it. This moves the ClusterSPIFFEIDs off kubectl (H8-14). C8: the `infra` declaration is not rendered from the package. It is `posture.acme.io/tier: infra` on the platform's own Namespace manifests, entitled by the `platform` role on its `party.yaml`. No namespace list in any package (ADR-0018 §1).
+
+Consequences: two new ADRs. The carrier ADR (items 1 to 3) supersedes the single-domain literal and the reach-demand literal. The actor-class ADR (item 4) roots the twin agent that ADR-0019 and ADR-0021 left unrooted, and retires the Dex narrative. Q5's "rendered from the pinned package" line is superseded by C8. Ticket 21 builds the `party` feed schema and the three federation fields on `party.yaml`. Ticket 25 takes the lost-reach `source: twin` price. The substrate package, the SVID path change and the repairs (spire-agent bundle, Pomerium 34.0.1 pin, loud currency-controller failure) go to a new build ticket. Ticket 13 decides the currency controller (C15). Revisit triggers: ticket 06 decides what a pod claims; Flux #1068 lands; a party runs more than one cluster; a device attests for the first time.
+
+Graduated: 26 Build the identity substrate package.

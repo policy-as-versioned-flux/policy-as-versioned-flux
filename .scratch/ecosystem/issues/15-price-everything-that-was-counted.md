@@ -1,7 +1,7 @@
 # 15 — Price everything that was counted
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 07
 
 ## Question
@@ -72,3 +72,21 @@ Later rounds, blocked on the above: a baseline control no regime weight names, p
 - C11 (14, 19, 24): Q2(a)'s per-hole breakdown on the regime entry is one of five independent reshapes of `prices[]` (see 14, 19, 24). One schema pass.
 - C17 (14): Q1(b) has ico pin nist as a `controls` parent, i.e. a publisher with `inherits[]`; 14 Q5(a) needs the same for the insurer. Neither asks it.
 - C18 (12): 12 Q3(c) prices a failed cross-org reach demand as "a hole in `prices[]`"; Q1 here keys every hole on a regime weight and `(source, id)`. A reach hole has no regime; 12 needs a price source this ticket does not give.
+
+## Answer
+
+Resolved 2026-08-28. On 2026-08-28 the owner read every held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". A bare agree does not ratify, so each item below is PROVISIONAL, with its own reason as the rationale, as tickets 04, 07 and 08 were. That instruction overrode the five-per-day rule; recorded. The five cross-ticket conflicts were then put to the owner with a panel verdict. The owner wrote: "I agree with you're more advanced reasoning". D1 to D5 are DECIDED with that line verbatim; none of them names this ticket, so every item below is PROVISIONAL. The cross-ticket notes that name this ticket (C1, C9, C10, C11, C17, C18) are applied as amendments below.
+
+1. **Regulator-published weights price a hole, and a hole partitions the regime exposure.** ico lists, per violation type, the control ids it turns on, keyed `(source, id)`, and pins `nist` as a `controls` parent. The weights are a `payload_schema` major under ADR-0019. A hole prices as weight x the adopter's sized triple for that regime. A control two obligations name prices under each, folded correlated as `fair.py --also` does. The regime entry is the sum of its holes, so implementing one reduces it. Rationale: the only option where reversal 10's widening beat and NORTH-STAR step 2 both happen. Amendment C17: any party may carry `inherits[]`; the insurer pins the platform and the adopter's exposure. Ticket 21 builds it.
+
+2. **The hole price lands on the regime `prices[]` entry, and all three refusals go.** The entry gains a per-hole breakdown and a total; the selection policy reads it, so holes move the tier. New hole, widening and new ungoverned namespace print as priced deltas. The Question's "£ refusal threshold" now means the tier band. Rationale: a price that cannot move the tier is a report, not a cage. Amendment C11: the breakdown lands in the one `prices[]` schema pass in ticket 25. Amendment C1: ticket 09's round is accepted, so the `isolated` rung and the ladder value space (baseline, restricted, quarantine, isolated, infra) that items 2 and 4 assumed are now chosen options.
+
+3. **An ungoverned namespace prices as a ramped share of the uncaged residual.** Share is workloads inside over workloads in all institution namespaces in the same repo walk. LEF ramps past `since` by the EOL feed's existing ramp, bounded at the whole residual. `since` is the tag date of the first signed composed artefact naming it and survives a close. Rationale: both factors and the ramp already exist; no new knob.
+
+4. **Every unpriced register entry takes the tier its scenario selected.** The forward-intel payload gains `register[]`. Each entry takes the tier selected for the priced hits in the same scenario and perspective, strictest if nothing priced. Rationale: no new knob, and nothing runs looser than the hit it hangs off. Amendment C9: 09's tighten-only `overlay.floor` is a constraint on selection, not a default tier and not an appetite object; this ticket's rejection of an adopter default tier stands beside it. Amendment C10: `register[]`, `claim_scope` and `derived_from` are one ADR-0021 payload major in ticket 25.
+
+5. **A bespoke control is a small OSCAL catalogue the adopter publishes as a `controls` parent of itself.** Composition resolves `(source, id)` across every `controls` parent. Its price is an adopter-signed scenario through the restate `_load_scenario` path. No scenario is an instrument fault and refuses. Rationale: only the inventing party can price it; regulator weights never name a bespoke id. Amendment C18: a failed cross-org reach demand is not a hole; it is a `source: twin` prices[] entry under the caller's perspective.
+
+**Consequences:** ADR-0013 (bare-id key, new-hole refusal, widening refusal), ADR-0017 (self-created hole refuses) and ADR-0018 point 3 are superseded by a new ADR from this ticket; ADR-0015 deny-to-issue with ticket 09. Ticket 21 builds `inherits[]` on any party and the ico weights major. Ticket 25 builds the `prices[]` pass, the `register[]` major and appetite on `party.yaml`. A new build ticket owns the composition changes: `(source, id)` resolution, refusal deletion, hole and namespace pricing, `overlay.controls` in the party schema. Revisit triggers: a baseline control no weight names; the owner meant a derived `baseline:`; whose appetite the twin runs under for a non-adopter perspective (ticket 11).
+
+**Graduated:** Priced holes in composition. Supersede ADR-0013, 0017 and 0018 point 3.

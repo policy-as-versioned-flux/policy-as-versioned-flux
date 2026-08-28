@@ -2,6 +2,8 @@
 status: accepted
 ---
 
+> **Superseded in part, 2026-08-28.** §3, the artefact carries no tier and no floor is superseded by [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md). The rest stands.
+
 # A subclass never restates a mutate: the tier is the only knob, and only the proposer turns it
 
 Composition lets a subclass tighten an inherited rule. It compares the inherited action against the

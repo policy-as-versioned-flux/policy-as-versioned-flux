@@ -1,7 +1,7 @@
 # 10 — Schedules and skills
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 04
 
 ## Question
@@ -73,3 +73,22 @@ Later rounds, blocked on the above: where a skill's claim file lands in the eco-
 - C14 (11, 23): the later round leaves "where a skill's claim file lands" open; 23 Q3(a) already answers it (a PR to the adopter's overlay) and assumes 11 Q1(a).
 - C15 (12, 13): Q2 hands the currency-controller CronJob to ticket 13; 12's later round does the same; 13's Question does not list it. Nobody owns it.
 - C16 (13): 13 Q5(a) makes the scheduled adopter proposer open retirement PRs; Q3 and Q5 here cover tier proposals only (dedupe branch `wargamer/retune-<slug>`, ledger keyed `<org>/<control>`). A retirement proposal has no dedupe key or half-life under Q5(a).
+
+
+## Answer
+
+Resolved 2026-08-28. On 2026-08-28 the owner read every held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". A bare agree does not ratify. Items 1 to 5 are PROVISIONAL, with each recommendation's own reason as the rationale, as tickets 04, 07 and 08 were. The five-per-day rule was overridden by that instruction. The cross-ticket conflicts were then put to the owner as five decisions with a three-lens panel verdict. The owner wrote: "I agree with you're more advanced reasoning". Amendments D1, D2 and D5 are DECIDED on that line.
+
+1. A scheduled run consumes only committed grade-5 claim files that a reviewed PR landed. A heuristic stand-in runs under the skill eval harness or as a skill a human invokes, nowhere else. Rationale: the twin does this already, and H5-04 closes because `wardley.py`'s editorial layer becomes a committed signed intel file. C4: this stands; twin 11 Q2's "automated binding, no human gate" is superseded. Lookup binding (11 Q3a) stays on the clock. C14: a skill's claim file lands as a PR on the adopter's overlay in the adopter's repo. That open item closes.
+
+2. One daily floor on every unit. The publisher fetch job, Renovate and `propose-tier` in each adopter, and each org twin's sweep gain a `schedule:`. Each org picks its own time. The hub's 05:47 truth run grades the state it finds. No cross-org ordering is promised. Rationale: a daily floor makes "continuous" true on a day nothing is pushed, and the idempotent proposer makes it three lines per repo. C15: the currency-controller CronJob joins ticket 13's mechanism list.
+
+3. The adopter's scheduled run re-composes at today's date first, commits nothing, and proposes from the fresh `prices[]`. A date-driven band crossing with no new tag is a proposal trigger. Rationale: ticket 07 made the price a function of `as_of`, and the PR carries its own priced evidence. D1 (decided): a clock may append observations to main (`truth.log`, `drift/samples.jsonl`, gate captures). It may never commit a declaration (tier, pin, floor, overlay, priced `evidence.json`). Condition: the lane is caged. A repo ruleset limits the scheduled workflow identity to the observation paths, and bot commits are signed. `verify-schedules.sh` asserts no scheduled run ever changed a signed artefact. 16 Q3 and 20 Q2 stand.
+
+4. The scheduled fetch opens a PR in the feeds repo with the payload and a mechanically computed declared bump. A human merges. `cut-release` runs on merge, reads the bump, and tags with the Actions identity it already uses. Rationale: every settled rail holds; the bump computation is the one new piece. D2 (decided): ticket 10 owns the one rule. A fetch opens a PR only when the computed bump is not `none`. Each feed defines "changed" in its own versioned rule file beside the feed, not in `payload_schema`. Sub-threshold observations still append to the feed's observation branch. Ticket 22's threshold and ticket 24's monthly fx source are instances.
+
+5. The rejection ledger is derived at run time from closed-unmerged PRs on the dedupe branch. Suppress while `sum(0.5 ** (age_days / h))` over those closes is at or above `reject_suppress`. A rejected PR whose curve hash or selection-policy version differs from today's does not count. The `DEFAULT_REJECTIONS` fallback is removed. `h` is a versioned calibration knob, not a decision today. Rationale: the PR record is the only record; nothing to build, nothing editable without a PR. D5 (decided): retirement PRs from ticket 13 take this ledger, keyed `<org>/<kind>/<slug>`.
+
+Consequences: ADR-0015 point 5 and its per-adopter `rejections.json` are superseded by a new ADR this ticket owns. Twin 11 Q2 is superseded. The later-rounds line "no scheduled run merged anything" is replaced by D1's wording. Ticket 21 builds the publisher fetch, bump computation, per-feed rule file and observation branch. A new build ticket lands the daily `schedule:` on every unit, the caged observation lane verified live on the six repos, the re-compose-first proposer, the derived ledger and `verify-schedules.sh` in the gate. Revisit triggers: `h` mis-tunes; a rule file cannot express "changed"; GitHub schedule delay breaks the daily period; the ruleset cannot be proven on a rebuilt repo. Still open: skill packaging shape, the runner cage as a credential, the clock under a red truth surface.
+
+Graduated: "Daily clocks, caged observation lane and derived ledger".

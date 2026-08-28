@@ -2,6 +2,8 @@
 status: accepted
 ---
 
+> **Superseded in part, 2026-08-28.** §4, the narrowed CREATE claim rule is superseded by [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md). The rest stands.
+
 # The Namespace manifest is the governed declaration; the composed artefact carries no namespace list
 
 ADR-0014 made the **governed namespace** the boundary where an inherited rule reaches a workload.

@@ -1,7 +1,7 @@
 # 22 — The prediction-market feed
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: 21
 
 ## Question
@@ -75,3 +75,28 @@ Later rounds, blocked on the above:
 ## Cross-ticket notes (2026-08-28)
 
 - C3 (10, 24): Q5(b) opens the publisher PR only on a threshold move; 10 Q4(a) opens one on every scheduled fetch with a computed patch, and 10 Q2(a) rejected "a period per step". 24 Q5(a) sets fx monthly. Three answers to one decision (when a publisher clock opens a PR); 10 should carry it once and 22/24 inherit.
+
+## Answer
+
+Resolved 2026-08-28.
+
+Owner record. On 2026-08-28 the owner read the held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". Under the map's process rule a bare agree does not ratify. The five decisions below are PROVISIONAL, recorded with that line verbatim and each recommendation's own reason as the rationale, as tickets 04, 07 and 08 were. The five-per-day rule was overridden by the owner's instruction. Conflict C3 was then put to the owner as decision D2 with a three-lens panel verdict. The owner wrote: "I agree with you're more advanced reasoning". D2 is DECIDED with that line verbatim.
+
+1. Universe. The feed carries every market the venue lists that passes a versioned, signed, mechanical rule file in the feeds repo. The file has the benchmark-rule shape: category list, liquidity floor, horizon window, seeded volume valve. A rule change is a dated diff and a minor bump. Rationale: twin ticket 21 Q2 chose this discipline because any relevance filter is a selection lever. The feed reproduces from rule plus venue corpus (re-grill 5). The benchmark series is carried by construction. Amendment D2: the same rule file also defines "changed" for this feed (item 5).
+
+2. Venue. Version 1 reads Polymarket only. Every observation carries `venue`. Kalshi lands as a minor bump under the same rule. Rationale: one adapter on a clock is the thin slice. Corroboration is a consumer reading over two series, not a publisher claim. Polymarket's redistribution terms are read before the first tag.
+
+3. Payload. Dated series only. Per market: `{market_id, venue, question, resolution_source, observations[{date, price_level}]}`. No `moves[]` block. No probability-shaped field. Rationale: the smallest schema, with nothing derived to keep in step. The twin derives moves with `price_moves()`. `resolution_source` is the evidence grade the research names.
+
+4. Skill. The market-moves skill is the twin's `signal-classify` body. A human runs it over the moves the twin derived from the pinned feed. Output is the existing `market-signal-run` artefact. Bind, decay and forward-intel follow unchanged. Rationale: the seam, the artefact, the quarantine exclusion and the decay exist on the twin side, and the settled £ path runs through forward-intel. C4 stands: reasoning is a human-run skill. Where the artefact lands is ticket 10.
+
+5. Cadence and trigger. Daily LLM-free fetch. Amended by D2: this is an instance of ticket 10's one rule, not a rule of its own. The scheduled fetch appends observations to the feed's observation branch on every run. It opens the publisher PR only when the computed bump is not `none`. "Changed" for this feed (a selected market moved at least the threshold since the last tag, for example 5 percentage points) lives in the versioned rule file beside the feed, not in `payload_schema`. The PR declares patch for observations, minor for a rule change, major for a schema change. A human merges. The workflow tags on merge. D1 applies: the clock appends observations, never a declaration. Rationale: the feed is named for the move, so the move is the release trigger. The reviewed PR keeps ticket 04's declared bump and re-grill 29's separate identities. The daily cadence and the reviewed-PR shape are PROVISIONAL (Q5(b)); the D2 amendment is DECIDED, rationale: one rule owned by ticket 10, each feed defining "changed" in its own versioned rule file, so sub-threshold observations still append and a series survives.
+
+Consequences:
+- D2 supersedes the first draft's Q5(b) as a standalone threshold rule. Ticket 10 owns the rule. This ticket and ticket 24's fx source inherit it.
+- ADR-0019 holds; no ADR amendment from this ticket. ADR-0021 holds: a move reaches £ only as `source: twin`.
+- Builds: the rule file, the Polymarket adapter, the schedule, the observation branch and the payload schema land in a new build ticket (below), blocked by 21 (contract, feeds clone, verify script home) and 10 (PR-open rule, dedupe ledger). The signal-classify skill body and artefact placement land with ticket 10. The "feed that prices nothing" flag on `publishes[]` lands in ticket 21's build; claim_scope lands in ticket 25 (C10).
+- Revisit triggers: the rule selects too much (add a watchlist narrowing); a consumer needs corroboration (Kalshi minor bump); Polymarket terms bar redistribution (venue or backfill changes); the reversal 22 scorer needs a field the series lacks.
+
+Graduated:
+- Build the market-moves feed.

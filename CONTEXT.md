@@ -72,19 +72,20 @@ that a rewritten entry cites stay as the record of the decision at the time.
   property the system must be able to claim: **visible, communicable, consumable, testable,
   usable, updatable, measurable.**
 
-- **Cage** (supersedes the mea-culpa's lane-keeping vs. gate; rewritten 2026-08-28) — **There is
-  no gate. Everything is always caged.** A workload, a human, a device, a model action and the twin
-  itself each run inside a cage. The **cage spec** is the only variable, and the **£ selects the
-  spec**. The mea-culpa's two ends survive as rungs on one ladder: continuous, corrective guidance
-  (Kyverno `validationActions: Audit`) is the loose end; `Deny` is a tight rung; quarantine sits
-  below it; the **bottom rung** is "too expensive to run or not functional" (reversal 17). A
-  "locked door" is therefore the bottom rung reached by the £, not a separate mechanism. An
-  unknown tier label fails closed to the strictest cage. This *cage-tier* axis is independent of
-  *adoption cadence* (ADR-0002). The tier is declared in the signed **composed artefact** and
-  rendered down to the workload label (reversal 13); the **twin** computes it under the org's
-  perspective and the **proposer** enacts it as a PR (re-grill 21). The cage's dial value space is
-  enumerated, not only its spec compared (re-grill 12). See ADR-0003 for the engine and
-  `.scratch/ecosystem/issues/09-the-cage-ladder-v2.md` for the ladder's next cut.
+- **Cage** (supersedes the mea-culpa's lane-keeping vs. gate; rewritten 2026-08-28, ticket 09) —
+  **There is no gate. Everything is always caged.** A workload, a human, a device, a model action
+  and the twin itself each run inside a cage. The **cage spec** is the only variable, and the **£
+  selects the spec**. The spec is a **tier** on one ladder: **baseline, restricted, quarantine,
+  isolated, infra**. The mea-culpa's two ends survive as rungs: continuous, corrective guidance is
+  the loose end; the **bottom rung is `isolated`** (the quarantine cage plus no ingress, no egress,
+  first eviction) and it replaces every earlier deny or refusal, so nothing is ever refused, only
+  caged. A "locked door" is therefore the bottom rung reached by the £, not a separate mechanism.
+  An unknown or unlabelled tier fails closed to `isolated`. The cage mutation is **tighten-only**: a
+  tightened rule and the default cage never contradict. This *cage-tier* axis is independent of
+  *adoption cadence* (ADR-0002). The tier is declared on the signed **governed namespace**
+  manifest and rendered onto every pod in it; the **twin** computes it under the org's
+  perspective and the **proposer** enacts it as a PR (re-grill 21). See ADR-0003 for the engine and
+  ADR-0022 for the ladder.
 
 - **The "why" / rationale** — Risk/threat-model metadata that travels *with* each policy version,
   so disagreement is resolved by a **pull request to the policy** (informed debate), not by an
@@ -104,21 +105,24 @@ that a rewritten entry cites stay as the record of the decision at the time.
   editorial review; it **never edits enforcement**. Specified as architecture + a thin demonstrator.
   Its concrete instance is the **proposer**.
 
-- **Proposer** (rewritten 2026-08-28) — The agent governance layer as it actually runs. A proposer
-  war-games the signed feeds against the deployed controls, and it raises every resulting change as a
-  reviewed PR. It edits the tier declaration in the signed **composed artefact**, never the label
-  directly (reversal 13), and signs the proposal commit with the workflow's Actions identity
-  (reversal 16). It is **bounded** by a confidence floor, a rate limit and a **flood guard with a half
-  life**: a declined proposal decays and re-raises, and is never a register of accepted risk
-  (re-grill 22). It exposes no `merge()` and no `approve()`. The **adopter** runs the proposer in
-  its own repo, against its own **composed artefact**, because selection is the risk-bearing act.
-  A run starts on a **schedule**, when a merged version-pin bump lands, or when a human dispatches
-  one. Schedules run the LLM-free steps: fetch, re-price, open the proposal. Reasoning over the
-  gathered results is packaged as Claude Code skills a human runs (reversals 7, 14, 15). Nothing timed
-  ever changes a verdict on its own; the reviewed PR is the unit of adoption, and author and merger
-  are different identities for now (re-grill 29). See
+- **Proposer** (rewritten 2026-08-28, tickets 10 and 15) — The agent governance layer as it
+  actually runs. A proposer war-games the signed feeds against the deployed controls, and it raises
+  every resulting change as a reviewed PR. It edits the tier declaration in the signed **composed
+  artefact**, never the label directly (reversal 13), and signs the proposal commit with the
+  workflow's Actions identity (reversal 16). It is **bounded** by a confidence floor, a rate limit
+  and the **rejection ledger**: a declined proposal decays and re-raises, and is never a register of
+  accepted risk (re-grill 22). It exposes no `merge()` and no `approve()`. The **adopter** runs the
+  proposer in its own repo, against its own **composed artefact**, because selection is the
+  risk-bearing act. It may also open a PR that governs an **ungoverned namespace**. A run starts on
+  a daily **schedule** (every unit has one; each org picks its time), when a merged version-pin bump
+  lands, or when a human dispatches one. A scheduled run re-composes at today's date and proposes
+  without committing: it runs the LLM-free steps (fetch, re-price, open the proposal) and may
+  append an **observation**, never a **declaration**. Reasoning over the gathered results is
+  packaged as Claude Code skills a human runs (reversals 7, 14, 15). Nothing timed ever changes a
+  verdict on its own; the reviewed PR is the unit of adoption, and author and merger are different
+  identities for now (re-grill 29). See
   [ADR-0015](docs/adr/0015-adopter-runs-the-proposer-and-it-opens-the-pr.md); its "nothing on a
-  clock" clause is superseded by NORTH-STAR principle 5.
+  clock" clause is superseded by NORTH-STAR principle 5 and ticket 10.
 
 - **Advisory metadata** — `created` / `lastReviewed` / rationale / risk / ethos carried on each
   policy version (annotations + `rationale.md`, OSCAL-mappable). Read by humans and the agent layer
@@ -191,8 +195,8 @@ that a rewritten entry cites stay as the record of the decision at the time.
   risk-bearing act. An adopter may **add** controls to its selected baseline and may **never remove**
   one: a removal is an **exemption** by another name, and a control the adopter cannot meet is caged
   and priced, not dropped. A baseline control that nothing implements is a **hole**; a composition
-  refuses on a **new** hole and records a pre-existing one, comparing against the last signed
-  **composed artefact**. A control the adopter adds is an ordinary new hole until a **control
+  **prices** every hole, new or pre-existing, and a new hole moves the tier, never refuses
+  (rewritten 2026-08-28, ticket 15; ticket 39 supersedes ADR-0013 and ADR-0017 on this point). A control the adopter adds is an ordinary new hole until a **control
   claim** fills it, and the adopter may never remove it either.
   See [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md) and
   [ADR-0017](docs/adr/0017-a-control-claim-belongs-to-whoever-ships-the-implementation.md).
@@ -211,56 +215,58 @@ that a rewritten entry cites stay as the record of the decision at the time.
   no case-folding, no prefix-stripping, and an id absent from the catalogue is a hard failure. See
   [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md).
 
-- **Orphan guard** (rewritten 2026-08-28) — A deterministic catch-all that **cages to the strictest
-  tier** any workload whose `policy-version` label is **not in** the cluster's currently-installed
-  version set (derived from the `ResourceSet` version array). A claim the fleet does not run is an
-  unknown tier, and an unknown tier fails closed to the strictest cage (reversal 17); the workload is
-  not denied. Background-scan Audit reports cover pre-existing orphans. It judges a **claim**, and only
-  a claim. A pod carrying no `policy-version` label is handled by its sibling: a `MutatingPolicy` at
-  `CREATE` defaults the strictest cage onto any pod that claims nothing, and infrastructure claims an
-  infra cage explicitly (re-grill 28, reversals 11 and 12). Together they close the original's
-  silent-ungovernance gap in both forms: a retired claim and no claim each land in the strictest cage,
-  never outside policy. The shipped `Deny` form is the July record; ticket 09 carries the rewrite. The guard's own emitted policy carries the
-  `policy-as-versioned.dev/policy: platform-machinery` identity label — a real class for objects the
-  platform's own tag numbers, not a policy version tag, so a reader can tell the guard apart from an
+- **Orphan guard** (rewritten 2026-08-28, ticket 09) — A deterministic catch-all that cages to
+  **`isolated`** any workload whose `policy-version` label is **not in** the cluster's
+  currently-installed version set. A claim the fleet does not run is an unknown tier, and an
+  unknown tier fails closed to the bottom rung (reversal 17); the workload is not denied. It
+  judges a **claim**, and only a claim. A pod carrying no claim is handled by the cage mutation
+  itself, which renders the **governed namespace**'s declared tier onto every pod at admission and
+  clobbers whatever the pod carried; a governed namespace that declares nothing renders to
+  `isolated`, and infrastructure is declared explicitly at the **infra tier** (re-grill 28,
+  reversals 11 and 12). Together they close the original's silent-ungovernance gap in both forms: a
+  retired claim and no claim each land in the bottom rung, never outside policy. The shipped `Deny`
+  form is the July record, superseded by ADR-0022. The guard's own emitted policy is
+  **platform machinery**, numbered by the platform's own tag, so a reader can tell it apart from an
   actually-unversioned policy. See
-  [ADR-0014](docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md).
+  [ADR-0014](docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md) (superseded in
+  part).
 
-- **Governed namespace** — A namespace inside which a workload **must** claim a policy version,
-  marked by `policy-as-versioned.dev/governed: "true"`. It is the boundary that makes "no claim"
-  meaningful: outside it a pod that claims nothing is infrastructure, and inside it a pod that claims
-  nothing is an evader. A separate `ValidatingPolicy`, sibling to the **orphan guard** and not part of
-  it, denies an unclaimed pod on **`CREATE` only**. `UPDATE` is deliberately excluded, so that
-  **de-posturing** a running workload is still permitted. The label on the adopter's own
-  `Namespace` manifest **is** the declaration: the adopter writes it, signs it under the same tag as
-  its **composed artefact**, and the composed artefact carries no namespace list of its own. An
-  adopter namespace that carries the `institution` label and not the `governed` label is an
-  ungoverned namespace, and a composition prices a **new** one exactly as it prices a new hole
-  (re-grill 27). The **proposer** may open a PR adding `governed: "true"`; a human merges
-  (reversal 18). *Superseded in part 2026-08-28:* the `CREATE` deny is replaced by the strictest-cage
-  `MutatingPolicy` described under **orphan guard**.
-  See [ADR-0014](docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md) and
-  [ADR-0018](docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md).
+- **Governed namespace** (rewritten 2026-08-28, tickets 09 and 15) — A namespace inside which every
+  workload is caged at the **tier** the namespace declares, marked by
+  `policy-as-versioned.dev/governed: "true"`. The label and the tier on the adopter's own
+  `Namespace` manifest **are** the declaration: the adopter writes them, signs them under the same
+  tag as its **composed artefact**, and the composed artefact carries no namespace list of its own.
+  The pod label is an output only, rendered from the namespace at admission. There is no `CREATE`
+  deny any more: a pod that claims nothing gets the namespace's tier, and a namespace that declares
+  no tier renders to `isolated`. Its opposite is an **ungoverned namespace**, which is priced, never
+  refused. See [ADR-0018](docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md)
+  (§1 stands; §4 superseded by ADR-0022).
 
 - **De-postured** — The state of a running workload whose claimed policy version has since been
   retired from the fleet's version array, and from which the currency controller has therefore
   stripped **both** the posture label and the version claim in one patch. The workload **keeps
   running** and is **caged**, not denied: it loses its posture-derived identity and the reach and
   secrets that identity buys, and the residual is priced against its party's appetite band. It cannot
-  return to the fleet in that state, because its controller recreates it and the **governed
-  namespace** rule denies the `CREATE`. This is the **exemption**-free settlement in miniature — the
+  return to the fleet in that state: its controller recreates it, and the recreated pod lands in
+  the **tier** its governed Namespace declares, or in **isolated** when nothing is declared
+  (rewritten 2026-08-28, ticket 09; the `CREATE` deny is gone). Ticket 27 decides de-posture as a
+  tier move that keeps the claim. This is the **exemption**-free settlement in miniature — the
   bottom rung is "too expensive to run or not functional", reached by the £, and never a carve-out.
 
-- **Twin** (added 2026-08-28) — The eco-system's intelligence participant, in `twin/`. It consumes
-  the signed feeds, an adopter's own overlay and history; it publishes **priced forecasts and forward
-  intelligence** under a declared **perspective**, signed by an agent identity and scored against
-  reality under proper scoring rules. Each adopter org (`driftwood`, `tuppence`, `ludlow`) gets a
-  twin of its own; the eleven real firms it models today stay as the backtest corpus and as evals of
-  the model and tooling (re-grills 31, 39). The twin **computes a cage tier** under the org's
-  perspective; the **proposer** enacts it as a PR (re-grill 21). The twin acts inside a priced cage
-  of its own; propose-only is the outermost setting, with an Article 22 floor for significant
-  decisions about people (re-grill 37). One £, many perspectives: no perspective is privileged
-  (re-grill 33). Spec and maps: `.scratch/twin/`, read with their 2026-08-28 banners.
+- **Twin** (rewritten 2026-08-28, ticket 11) — The eco-system's intelligence participant. It
+  consumes the signed feeds, an adopter's own **twin overlay** and history; it publishes **priced
+  forecasts and forward intelligence** under a declared **perspective**, signed by the twin agent
+  (an **actor class** of its own) and scored against reality under proper scoring rules. Each
+  adopter org (`driftwood`, `tuppence`, `ludlow`) has a twin of its own, whose overlay lives in the
+  adopter's own signed repo with the shared world layer vendored and pinned by the same tag; the
+  twin itself is a self-versioned, signed package. The eleven real firms it models today stay as
+  the backtest corpus and as evals of the model and tooling (re-grills 31, 39). A subscribed feed
+  version becomes a **sensed signal** by lookup, with no judgement; anything needing judgement is a
+  skill a human runs. On every sweep it plays its **standing scenarios**. The twin **computes a
+  cage tier** under the org's perspective; the **proposer** enacts it as a PR (re-grill 21). The
+  twin acts inside a priced cage of its own; propose-only is the outermost setting, with an Article
+  22 floor for significant decisions about people (re-grill 37). One £, many perspectives: no
+  perspective is privileged (re-grill 33).
 
 ---
 
@@ -270,9 +276,10 @@ that a rewritten entry cites stay as the record of the decision at the time.
   publisher, a date, a payload schema and the payload. Only the payload differs between feeds. The
   signature is the publisher's tag (ADR-0012, ADR-0019).
 
-- **Size facts** (added 2026-08-28) — What an adopter declares about its own scale so a price is
-  proportionate to it: turnover, customers, data subjects, headcount, and the date they were true.
-  Signed by the adopter alone. Stale facts widen a price; they never refuse one.
+- **Size facts** (rewritten 2026-08-28, ticket 24) — What an adopter declares about its own scale
+  so a price is proportionate to it: turnover, customers, data subjects, headcount, optionally
+  **relevant revenue**, and the date they were true. Signed by the adopter alone. Stale facts widen a
+  price to the publisher's **widening target**; they never refuse one.
 
 - **Obligation** (added 2026-08-28) — A regime an adopter declares it answers to, by name, in its
   party artefact. Only a declared obligation is priced. A declared obligation with no price in any
@@ -291,12 +298,18 @@ that a rewritten entry cites stay as the record of the decision at the time.
 - **Selection policy** (added 2026-08-28) — The adopter's own versioned, signed rule that turns a
   trade-off curve into one cage tier. The curve never picks; the policy does.
 
-- **Price** (added 2026-08-28) — An annualised amount with a currency and a perspective, produced
-  by the estate's engine from a scenario. A price with no perspective is not a price.
+- **Price** (rewritten 2026-08-28, tickets 14, 15 and 24) — An annualised amount with a currency
+  and a perspective, produced by the estate's engine from a scenario. A price with no perspective
+  is not a price. A regime's price is the sum of its **holes**; a **switching cost** is a price; a
+  **premium** is not (it is a cost on the sheet). Size arithmetic belongs to the publisher whose
+  regime is priced, and the adopter only supplies its signed **size facts**. A price may be restated
+  **per customer**.
 
-- **Appetite** (added 2026-08-28) — The annual loss an adopter declares it will carry, as an amount
-  with a currency, signed by the adopter alone on its party artefact. The £ selects the first cage
-  tier whose residual sits under it.
+- **Appetite** (rewritten 2026-08-28, ticket 14) — The annual loss an adopter declares it will
+  carry, as an amount with a currency, signed by the adopter alone on its party artefact. The £
+  selects the first cage tier whose residual sits under it. It also carries the adopter's cover
+  terms, if any: **attachment and limit** with exclusions, so the attachment equals the appetite and
+  the sheet shows retained, transferred and excluded loss summing to the simulated total.
 
 - **Instrument fault** (added 2026-08-28) — The gate cannot read something it needs to price: a
   regime with no penalty schema, a date with no FX rate. It refuses. Contrast a priced hole, which
@@ -316,6 +329,193 @@ that a rewritten entry cites stay as the record of the decision at the time.
 - **Revocation** (added 2026-08-28) — A publisher withdraws a feed version by publishing a newer one
   and listing the old one as revoked. A tag is never deleted. A pin to a revoked version is a priced
   hole: the cage tightens; it is never refused.
+
+- **Tier** (added 2026-08-28, ticket 09) — The rung of the cage ladder a **governed namespace** is
+  declared at: baseline, restricted, quarantine, isolated or infra. Declared on the signed
+  Namespace manifest, rendered onto every pod in it, chosen by the **selection policy** against the
+  price.
+
+- **Isolated** (added 2026-08-28, ticket 09) — The bottom rung of the cage ladder. The workload
+  runs with the quarantine cage, no ingress, no egress, and is evicted first. It replaces every
+  earlier deny or refusal; nothing is ever refused, only caged.
+
+- **Floor** (added 2026-08-28, ticket 09) — A tighten-only lower bound on the tier an adopter
+  declares in its overlay. Selection clamps to the floor in ladder order. Lowering or removing a
+  floor is priced, never refused. It is a constraint on selection, not a default tier and not an
+  **appetite**.
+
+- **Infra tier** (added 2026-08-28, ticket 09) — The cage a platform-role party declares for its
+  own namespaces. Only a party whose signed party artefact carries the platform role may declare
+  it; any other party's infra declaration renders to **isolated**.
+
+- **Observation** (added 2026-08-28, tickets 10 and 16) — A dated record a **schedule** may append
+  to a repo without review: a truth line, a drift sample, a **capture**. It asserts what was seen,
+  never what should be, and never changes a tier, pin, floor, overlay or priced evidence.
+
+- **Declaration** (added 2026-08-28, tickets 10 and 16) — An artefact that states what an org has
+  chosen or signed, and so changes what the estate enforces or prices: a tier, a pin, a floor, an
+  overlay, priced evidence. It reaches main only through a reviewed, signed PR, never from a clock.
+
+- **Rejection ledger** (added 2026-08-28, ticket 10) — The set of closed-unmerged proposal PRs for
+  one key, weighted by age with a half-life. It suppresses re-raising the same proposal for a while
+  and is never a register of accepted risk. A proposal with a different price is a new proposal.
+  Derived, never kept as a file.
+
+- **Declared bump** (added 2026-08-28, tickets 10 and 18) — The versioned, reviewed statement of a
+  release's intended semver step, which the release workflow reads and nothing else declares. For
+  a feed publisher the fetch computes it from the payload change and reviews it in the feed PR;
+  `none` opens no PR, and the observation still lands on the **observation branch**. Also called
+  the bump file.
+
+- **Degraded publish** (added 2026-08-28, ticket 18) — A publisher release whose declared bump the
+  gate computed as weaker than the real change. It is published anyway, with a prerelease suffix on
+  the declared number, a degraded evidence outcome and a quarantine tier on its version entry. The
+  adopter prices it under its own perspective and composes it only by deliberate pin.
+
+- **Twin overlay** (added 2026-08-28, ticket 11) — An adopter's own signed description of its value
+  chain, roles, causal edges, perspective and **standing scenarios**, from which its
+  **forward intel** feed is rendered.
+
+- **Sensed signal** (added 2026-08-28, ticket 11) — A dated, sourced statement the twin plays
+  forward; a new version of a subscribed feed becomes one by lookup, with no judgement applied.
+
+- **Standing scenario** (added 2026-08-28, ticket 11) — A shock the twin keeps ready to play
+  against an adopter's overlay on every sweep; six per adopter.
+
+- **Trust domain** (added 2026-08-28, ticket 12) — The identity boundary owned by one party that
+  runs a cluster. Each such party has exactly one. Trust between two domains is a federation the
+  party records on its own party artefact and can withdraw alone.
+
+- **Reach demand** (added 2026-08-28, ticket 12) — What a serving workload requires of a caller:
+  the caller's trust domain, a minimum cage tier and a version window. Declared by the serving org
+  in its own composed artefact. A caller that fails it loses reach to that service; the loss is
+  priced on the caller's side, and it is never a gate.
+
+- **Actor class** (added 2026-08-28, ticket 12) — One of five kinds of thing that holds an identity
+  in the eco-system: workload, human, device, model action, and the twin agent. Each class has a
+  named issuer and a distinct subject; no class shares another's subject.
+
+- **Platform machinery** (added 2026-08-28, ticket 12) — The identity and access substrate the
+  platform publishes as one versioned package with control claims, pinned and reconciled by each
+  org like any other package, and declared at the **infra tier** on the platform's own namespaces.
+  The **orphan guard** and the cage mutation belong to the same class: objects the platform's own
+  tag numbers, not a policy version.
+
+- **Supersede** (added 2026-08-28, ticket 13) — A publisher retires a version by publishing a newer
+  one. A pin behind a newer published version is priced by the EOL ramp from the newer version's
+  publish date. No consumer-side sunset field exists. Contrast **revocation**, which is withdrawal.
+
+- **Handbook** (added 2026-08-28, ticket 13) — The human-readable render of an adopter's composed
+  policy, produced at compose time and carried under the same signed tag as the artefact, so
+  render-at-tag equals the committed render.
+
+- **Lift** (added 2026-08-28, ticket 13) — Moving a mechanism or application from the original org
+  into an eco-system party by re-label and re-pin, graded green by the truth surface before the
+  original repo is archived.
+
+- **Exposure** (added 2026-08-28, ticket 14) — The aggregate annual loss summary an adopter
+  publishes under its own perspective in its composed artefact, built from its priced risks; the
+  signed input an insurer quotes against. Public by design: the cost of a rival reading it is a
+  priced scenario on the adopter's own sheet.
+
+- **Quote** (added 2026-08-28, ticket 14) — A signed feed from the insurer naming one insured
+  party, the cover terms, a **premium**, a validity window, what **exposure** it was priced against,
+  and the conditions whose breach voids or uplifts it. A lapsed quote prices as fully retained.
+
+- **Attachment and limit** (added 2026-08-28, ticket 14) — The annual aggregate loss band an insurer
+  covers: below attachment the adopter retains (its tolerance), above limit it retains again.
+  Exclusions name obligations or controls kept outside the band.
+
+- **Premium** (added 2026-08-28, ticket 14) — The contract amount an adopter pays for a **quote**. A
+  cost on the adopter's sheet, not a **price**, so it sums with retained loss and control cost.
+
+- **Hole** (added 2026-08-28, ticket 15) — A selected control no **control claim** covers. Priced as
+  the regulator's **control weight** for that control times the adopter's sized **exposure** for
+  the regime, so the regime's price is the sum of its holes and implementing a control reduces it.
+  Never refused, never counted; the earlier new-hole and widening refusals are gone.
+
+- **Control weight** (added 2026-08-28, ticket 15) — A regulator's published statement, keyed on
+  the catalogue and **control id**, of which controls a violation type turns on. Part of the
+  penalty feed; changing it is a major version.
+
+- **Ungoverned namespace** (added 2026-08-28, ticket 15) — A namespace in an adopter's repo
+  without the governed label. Priced as its workload share of the adopter's uncaged residual,
+  growing from the date the first signed composed artefact recorded it. The **proposer** may open a
+  PR to govern it.
+
+- **Bespoke control** (added 2026-08-28, ticket 15) — A control an adopter defines itself,
+  published as a small catalogue of which the adopter is the source. Priced only by a scenario the
+  adopter signs; without one it is an **instrument fault**.
+
+- **Register entry** (added 2026-08-28, ticket 15) — A twin blast-radius hit that cannot be
+  priced. Crosses the pound seam in the **forward intel** payload and takes the cage tier selected
+  for the priced hits in the same scenario, strictest if none priced. Unpriceable never means
+  unenforced.
+
+- **Verified source** (added 2026-08-28, ticket 16) — A publisher's repository fetched by a
+  consumer cluster only so its signed tag can be checked at the source boundary and its resolved
+  commit compared with the composed set's recorded parent. Nothing is installed from it.
+
+- **Switching cost** (added 2026-08-28, ticket 19) — The annual £ an adopter would bear if it
+  dropped one publisher: the holes and price moves that open when that publisher's edges are
+  removed. Computed by the adopter's composition, never stated by the publisher, and carried as a
+  **price** with a perspective and currency.
+
+- **Reliability score** (added 2026-08-28, ticket 19) — A published measure of how well a
+  publisher's past prices matched realised outcomes, issued as a feed by a party that publishes no
+  scored feed. A score below an adopter's declared threshold widens that adopter's price range until
+  it re-pins or the score recovers.
+
+- **Vendored payload** (added 2026-08-28, ticket 19) — The copy of every feed payload and converter
+  an adopter priced, kept inside its own signed composed artefact, so the adopter can re-derive its
+  prices with no publisher reachable.
+
+- **Capture** (added 2026-08-28, ticket 20) — The saved output of one truth-surface verify script
+  from one named gate run. An **observation**, never a **declaration**. The only source a demo beat
+  may quote a figure from.
+
+- **Could-not-look** (added 2026-08-28, ticket 20) — A demo beat's rendering when the gate's script
+  for that step exited SKIP; shows the gate's reason. Distinct from "no check yet", the generator's
+  own status for a step with no verify script, which carries no gate grade.
+
+- **Market-moves feed** (added 2026-08-28, ticket 22) — A signed **feed** of dated price levels per
+  prediction-market question, selected by a versioned mechanical rule. It carries series, never
+  moves or probabilities. The twin derives moves and binds them; the estate never prices a market
+  level directly.
+
+- **Observation branch** (added 2026-08-28, ticket 22) — The branch on a publisher repo where a
+  scheduled fetch appends **observations** every run. A release PR opens from it only when the
+  feed's own rule says the series changed.
+
+- **News feed** (added 2026-08-28, ticket 23) — A signed **feed** of observed, dated events. Each
+  entry says only what was said, when, and where it was read. It carries no classification,
+  coordinate or scope. Planted stimuli never enter it.
+
+- **Headline skill** (added 2026-08-28, ticket 23) — Judgement a human runs over unbound signals.
+  It proposes which component a headline binds to and, if the human judges a move, an attributable
+  position override. Its output enters by reviewed PR and is scored later.
+
+- **Claim scope** (added 2026-08-28, ticket 23) — A statement carried by a **forward intel**
+  scenario naming what it asserts (a judged position by a named role) and what it does not (an
+  independent engine finding), with the claims it derives from.
+
+- **Relevant revenue** (added 2026-08-28, ticket 24) — An optional **size fact** an adopter may
+  declare for a regime priced on the revenue of the business area in breach rather than global
+  turnover. Defaults to turnover when undeclared.
+
+- **Fit check** (added 2026-08-28, ticket 24) — A published fine printed beside a size-derived
+  price so a reviewer can judge whether the price is plausible. It never enters the price.
+
+- **Widening target** (added 2026-08-28, ticket 24) — The sourced amount a publisher ships on a
+  formula that has no statutory cap, used as the widening target when an adopter's **size facts**
+  are stale. Also called widen-to.
+
+- **Per customer** (added 2026-08-28, ticket 24) — A **price** restated as the amount divided by the
+  adopter's declared customers, under the same perspective and currency. Never summed; absent when
+  customers is undeclared.
+
+- **Provisions** (added 2026-08-28, ticket 24) — A publisher-shipped count of the distinct
+  provisions a violation type breaches, multiplying a per-provision annual cap. Defaults to one.
 
 ## Project posture (resolved)
 

@@ -1,7 +1,7 @@
 # 13 — Lift or retire the original mechanisms
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -67,3 +67,30 @@ Later rounds, blocked on the above: round 2 of this ticket decides the vulnerabi
 - C1 (09): Q3(a) says the Crossplane CR's dials "are enumerated under ticket 09"; 09's held round is pod-only and asks nothing about a cloud resource. Either 09 gains a later-round item or Q3(a) carries the work itself.
 - C15 (10, 12): 10 Q2 and 12's later round both assign the currency-controller CronJob (404 every minute) to this ticket; the Question here lists nine mechanisms and not that one. Add it or send it back.
 - C16 (10, 19, closed 04): Q5(a) reuses ADR-0019 `revoked[]` for a dated soft supersede. Ticket 04 A5 fixed `revoked[]` as withdrawal, where a pin to a revoked version is a priced hole now, not at an EOL date; 19 Q2(a) separately prices "a newer version not yet pinned" as a hole growing over time. Two formulas for the same state. And Q5(a) has the adopter's scheduled proposer open retirement PRs, a proposal type 10 Q3 (what the clock proposes) and 10 Q5 (dedupe and half-life) do not cover.
+
+## Answer
+
+Resolved 2026-08-28. The owner read the held round and wrote: "ive already read the recommendations and I can't find fault with a single one. Well done. Get everything ready for me to then to-spec". Under the map's process rule a bare agree does not ratify. Q1 to Q4 are recorded as PROVISIONAL with that line and each recommendation's own reason as the rationale. Q5 was put to the owner as decision D5 with a three-lens panel verdict. The owner wrote: "I agree with you're more advanced reasoning". Q5 is recorded as DECIDED with that line and the D5 reasoning. The five-per-day rule was overridden by the owner's instruction.
+
+1. The three apps with an institutional home move now. ledger goes to tuppence, storefront to driftwood, reports to ludlow. A lift is a re-label to `policy-as-versioned.dev/policy-version`, a re-pin to the adopter's composed artefact, and a renovate.json that enables the stack's manager and the dependency dashboard. api and datastore wait. Reason: §4 step 3 needs a real dependency a feed can move. Provisional.
+
+2. Each original repo is archived on GitHub once its lift or retirement is recorded and graded green by the truth surface. fleet goes last, after ticket 16's fan-out reconciles in an adopter. The hub stays live. The currency-controller CronJob joins the mechanism list (C15) and is retired under this rule now: it 404s and ticket 07's fx feed replaces it. Reason: two live implementations is the finding (H9-11). A fourth adopter is the COTS shim (GAPS 3.14). Provisional.
+
+3. The cloud plane lands in tuppence beside ledger. datastore's claims are the workload. The RDS and S3 policies become versioned members of the platform's published implementations (ADR-0017). The truth surface grades them at admission in KinD. It is built after the Pod slice of §4 runs once. ADR-0004 stays accepted with a dated sequencing note. Amendment (C1): ticket 09's held round is pod-only, so the dials for a Crossplane CR are a later-round item on ticket 09, filed by this ticket. Reason: thinnest slice end to end first, then widen; no §4 step needs a non-Pod resource. Provisional.
+
+4. The handbook is lifted as a compose-time render. A platform-published tool runs in each adopter's compose step over its composed artefact. The render lands in the same PR and under the same gitsign tag as the artefact. verify-fresh.sh becomes the truth-surface script. verify.sh is retired. The `claude -p` summaries become a Claude Code skill a human runs, landing by PR. Reason: a render from the signed tag cannot lie. Provisional.
+
+5. Supersede is publisher-side only, in D5's form. The platform publishes the newer version. A pin behind a newer published version is priced by the existing EOL ramp (to_fair_scenario.py eol_ramp) from the newer version's publish date. `revoked[]` stays withdrawal only, priced now (ticket 04 A5, ADR-0019). The dated `revoked[]` entry is dropped. The adopter's scheduled proposer reads pins against the feed and opens a retirement PR (D1: a proposal, never a declaration). Retirement PRs use ticket 10's dedupe ledger, keyed `<org>/<kind>/<slug>` (D5). Consumer-side `sunset:` is not carried. An adopter drops a version by an ordinary PR. Decided.
+
+Consequences:
+- ADR-0010:5-9 (consumer-side `sunset:`) is superseded by the ADR ticket 10 writes. ADR-0004 gains a dated sequencing note. ADR-0007's last-mile section is confirmed by item 4.
+- Ticket 10 Q3 and Q5 gain the retirement PR as a proposal type under D1 and the dedupe ledger.
+- The map line "placement is fog" closes for three apps and the cloud plane.
+- Tickets 21 and 25 gain nothing; the EOL ramp exists.
+- New build tickets carry items 1, 3 and 4. Round 2 of this ticket carries the scanner, the Flux notification spine, the OSCAL CronJob, api and datastore placement, and per-repo archive sequencing. Ticket 13 does not close before round 2.
+- Revisit triggers: the EOL ramp misprices a supersede (then the panel dissent, an explicit `supersedes: {version, eol_date}` on the newer release); a lifted app cannot run caged under the ladder (then it is priced, never carved out); Flux #1068 lands (D3 changes the verification shape item 2 waits on).
+
+Graduated:
+- Lift ledger, storefront and reports into their adopters
+- Handbook as a compose-time render
+- Ticket 13 round 2: scanner, notification spine, OSCAL CronJob, api and datastore
