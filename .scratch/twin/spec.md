@@ -1,6 +1,15 @@
 # Spec — Organisational digital twin + anticipatory strategic-intelligence engine
 
 Status: ready-for-agent
+
+> **Superseded in part, 2026-08-28.** The ratified [north star](../../NORTH-STAR.md) §7 overrides three
+> framings below. Governance is not "one enactment arm": composition is the eco-system and the twin is one
+> participant in it (re-grill 9). The estate is not "a prior to test": it is the reference implementation
+> the eco-system lifts from or retires, one decision each (NORTH-STAR §6). The KinD clusters and the org
+> repos are not "binned": the six orgs are live and Flux is the distribution arm (reversal 1). The twin's
+> subjects are now driftwood, tuppence and ludlow; the real firms stay as the backtest corpus (re-grill 31).
+> The talk is a read of the truth surface, never the definition of done. Nothing below is rewritten.
+
 Source: `.scratch/twin/map.md` (`wayfinder:map`, decision-complete 2026-08-05) and its 22 resolved tickets.
 Scope: **the whole system.** Each resolved ticket's full acceptance criteria remain the yardstick. The
 walking skeleton is the *route*, not the destination.

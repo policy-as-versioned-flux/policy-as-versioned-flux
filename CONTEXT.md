@@ -9,6 +9,10 @@ This project is a faithful re-implementation of Chris Nesbitt-Smith's (CNS) **Po
 post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-policy-org`,
 `policy-as-versioned-code`). Full research is in `./research/`.
 
+Since 2026-08-27 the destination is the eco-system in [NORTH-STAR.md](NORTH-STAR.md). Entries below
+were rewritten in its cage and schedule vocabulary on 2026-08-28 (eco-system ticket 02). Older ADRs
+that a rewritten entry cites stay as the record of the decision at the time.
+
 ---
 
 ## Core thesis terms
@@ -56,8 +60,8 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   of preference: express the allowance as **conditional policy** ("you may do X *if* you meet
   conditions C", so anyone meeting C is treated identically and nobody asks a favour); or let the
   **cage implement the control on the workload's behalf** and price the residual. A workload that can
-  satisfy neither does not run — refusal is the bottom rung of the cage ladder, reached by the £,
-  never by a carve-out. (The estate shipped an exemptions ledger that contradicted this; it is
+  satisfy neither is caged tighter until the cage is untenable — the bottom rung is "too expensive
+  to run or not functional", reached by the £, never by a carve-out, and never a refusal (reversal 5). (The estate shipped an exemptions ledger that contradicted this; it is
   removed — see `.scratch/govern-what-you-dont-control/issues/05-remove-the-exemption-ledger.md`.)
 
 - **Policy as a dependency** — The central move: treat a body of policy like a software
@@ -68,17 +72,19 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   property the system must be able to claim: **visible, communicable, consumable, testable,
   usable, updatable, measurable.**
 
-- **Lane-keeping vs. gate** (the mea-culpa's load-bearing distinction) —
-  - **Lane-keeping assist** — Continuous, corrective, non-blocking guidance for the *majority*
-    of the policy surface enterprises actually struggle with: labelling, tagging, configuration
-    standards, operational metadata. Delivered as a *versioned dependency* (the ~80% case).
-  - **Gate** ("a locked door") — A hard admission block reserved for the *catastrophic minority*:
-    access control, data classification/protection, cryptographic key management — policies
-    governing *whether a workload may exist at all*.
-  - The system must support BOTH. A gate-only system is the exact mistake the mea-culpa walked back.
-  - **Engine mapping:** Kyverno `ValidatingPolicy` `validationActions: Audit` = lane-keeping;
-    `Deny` = gate. (See ADR-0003.) This *enforcement-action* axis is independent of *adoption
-    cadence* (ADR-0002).
+- **Cage** (supersedes the mea-culpa's lane-keeping vs. gate; rewritten 2026-08-28) — **There is
+  no gate. Everything is always caged.** A workload, a human, a device, a model action and the twin
+  itself each run inside a cage. The **cage spec** is the only variable, and the **£ selects the
+  spec**. The mea-culpa's two ends survive as rungs on one ladder: continuous, corrective guidance
+  (Kyverno `validationActions: Audit`) is the loose end; `Deny` is a tight rung; quarantine sits
+  below it; the **bottom rung** is "too expensive to run or not functional" (reversal 17). A
+  "locked door" is therefore the bottom rung reached by the £, not a separate mechanism. An
+  unknown tier label fails closed to the strictest cage. This *cage-tier* axis is independent of
+  *adoption cadence* (ADR-0002). The tier is declared in the signed **composed artefact** and
+  rendered down to the workload label (reversal 13); the **twin** computes it under the org's
+  perspective and the **proposer** enacts it as a PR (re-grill 21). The cage's dial value space is
+  enumerated, not only its spec compared (re-grill 12). See ADR-0003 for the engine and
+  `.scratch/ecosystem/issues/09-the-cage-ladder-v2.md` for the ladder's next cut.
 
 - **The "why" / rationale** — Risk/threat-model metadata that travels *with* each policy version,
   so disagreement is resolved by a **pull request to the policy** (informed debate), not by an
@@ -98,14 +104,21 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   editorial review; it **never edits enforcement**. Specified as architecture + a thin demonstrator.
   Its concrete instance is the **proposer**.
 
-- **Proposer** — The agent governance layer as it actually runs. A proposer war-games the signed
-  feeds against the deployed controls, and it raises every resulting change as a reviewed PR. It is
-  **bounded** by a confidence floor, a rate limit and a rejection ledger, and it exposes no `merge()`
-  and no `approve()`. The bounds cut reviewer noise. They never grant authority. The **adopter** runs
-  the proposer in its own repo, against its own **composed artefact**, because selection is the
-  risk-bearing act. A run starts when a merged version-pin bump lands, or when a human dispatches
-  one. Nothing starts a run on a clock. See
-  [ADR-0015](docs/adr/0015-adopter-runs-the-proposer-and-it-opens-the-pr.md).
+- **Proposer** (rewritten 2026-08-28) — The agent governance layer as it actually runs. A proposer
+  war-games the signed feeds against the deployed controls, and it raises every resulting change as a
+  reviewed PR. It edits the tier declaration in the signed **composed artefact**, never the label
+  directly (reversal 13), and signs the proposal commit with the workflow's Actions identity
+  (reversal 16). It is **bounded** by a confidence floor, a rate limit and a **flood guard with a half
+  life**: a declined proposal decays and re-raises, and is never a register of accepted risk
+  (re-grill 22). It exposes no `merge()` and no `approve()`. The **adopter** runs the proposer in
+  its own repo, against its own **composed artefact**, because selection is the risk-bearing act.
+  A run starts on a **schedule**, when a merged version-pin bump lands, or when a human dispatches
+  one. Schedules run the LLM-free steps: fetch, re-price, open the proposal. Reasoning over the
+  gathered results is packaged as Claude Code skills a human runs (reversals 7, 14, 15). Nothing timed
+  ever changes a verdict on its own; the reviewed PR is the unit of adoption, and author and merger
+  are different identities for now (re-grill 29). See
+  [ADR-0015](docs/adr/0015-adopter-runs-the-proposer-and-it-opens-the-pr.md); its "nothing on a
+  clock" clause is superseded by NORTH-STAR principle 5.
 
 - **Advisory metadata** — `created` / `lastReviewed` / rationale / risk / ethos carried on each
   policy version (annotations + `rationale.md`, OSCAL-mappable). Read by humans and the agent layer
@@ -115,14 +128,20 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   non-technical ones (the talk's "Cleaner"). An explicitly **acknowledged open problem**, not
   something the system claims to solve.
 
-- **Policy version** — A semantic version of the whole policy body. Semver carries meaning, defined
-  by **verdict impact on currently-compliant workloads**: **major** = any change that can turn a
-  pass into a fail at the gate (a new or tightened `Deny` policy, an `Audit`→`Deny` promotion,
-  free-text label → enum); **minor** = an addition that cannot fail an existing compliant workload
-  (e.g. a new `Audit` policy); **patch** = fix/widening (the passing set only grows). ("Don't be
-  fooled by the decimal points — 1.20.0 > 1.3.0.") **Compliant means admitted** — an `Audit` rule
-  fires and reports without refusing, so a workload carrying `Audit` findings is still compliant for
-  this definition. **Reset on bump** — against the base (the highest existing tag lower than the
+- **Policy version** (rewritten 2026-08-28) — A semantic version of one package: a publisher's
+  policy, a regulator's catalogue or penalty schema, a feed, or an adopter's **composed artefact**.
+  Every package carries its own semver, and a composed set that extends others is a new package with
+  its own version, as ESLint shareable configs do (re-grill 2, ticket 06). Semver is **computed from
+  measured verdict movement, never declared** (ADR-0011): **major** = any change that moves a
+  currently-caged workload to a tighter cage tier or turns a pass into a fail (a new or tightened
+  `Deny`, an `Audit`→`Deny` promotion, free-text label → enum, a baseline addition); **minor** = an
+  addition that moves nothing already caged (e.g. a new `Audit` policy); **patch** = fix/widening
+  (the passing set only grows, and widening is priced, not refused). ("Don't be fooled by the
+  decimal points — 1.20.0 > 1.3.0.") **Compliant means caged at a tier the £ accepts** — an `Audit`
+  finding reports without moving the tier, so a workload carrying `Audit` findings is compliant for
+  this definition. A **re-price is a release**: a feed that moves cages yields a computed bump, a
+  signed tag and a Renovate PR (re-grill 8), and the £ cost of every computed move is attached to the
+  signed evidence (re-grill 15). **Reset on bump** — against the base (the highest existing tag lower than the
   declared version), the leftmost component that increased must zero every component to its right; a
   gap is legal, but the historical `2.1.1` release fails this rule, correctly (base `2.0.1`, minor
   increased, patch should have reset to `0` but stayed `1`).
@@ -192,17 +211,16 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   no case-folding, no prefix-stripping, and an id absent from the catalogue is a hard failure. See
   [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md).
 
-- **Orphan guard** — A deterministic catch-all `ValidatingPolicy` that **denies at admission** any
-  workload whose `policy-version` label is **not in** the cluster's currently-installed version set
-  (derived from the `ResourceSet` version array), with background-scan Audit reports covering
-  pre-existing orphans (a brownfield estate may start it in Audit and promote by editorial PR). It
-  judges a **claim**, and only a claim: a pod carrying no `policy-version` label is **out of scope**,
-  skipped rather than denied, because absence cannot distinguish infrastructure from an evader from a
-  **de-postured** workload. So the guard locks the door against *claiming a version the fleet does not
-  run* — it does **not** lock the door against silence. Closes the original's silent-ungovernance gap
-  where a workload pinned to a retired version was matched by no policy; the sibling gap, where a
-  workload omits the label and is therefore matched by no policy at all, is closed by the **governed
-  namespace** rule instead. The guard's own emitted policy carries the
+- **Orphan guard** (rewritten 2026-08-28) — A deterministic catch-all that **cages to the strictest
+  tier** any workload whose `policy-version` label is **not in** the cluster's currently-installed
+  version set (derived from the `ResourceSet` version array). A claim the fleet does not run is an
+  unknown tier, and an unknown tier fails closed to the strictest cage (reversal 17); the workload is
+  not denied. Background-scan Audit reports cover pre-existing orphans. It judges a **claim**, and only
+  a claim. A pod carrying no `policy-version` label is handled by its sibling: a `MutatingPolicy` at
+  `CREATE` defaults the strictest cage onto any pod that claims nothing, and infrastructure claims an
+  infra cage explicitly (re-grill 28, reversals 11 and 12). Together they close the original's
+  silent-ungovernance gap in both forms: a retired claim and no claim each land in the strictest cage,
+  never outside policy. The shipped `Deny` form is the July record; ticket 09 carries the rewrite. The guard's own emitted policy carries the
   `policy-as-versioned.dev/policy: platform-machinery` identity label — a real class for objects the
   platform's own tag numbers, not a policy version tag, so a reader can tell the guard apart from an
   actually-unversioned policy. See
@@ -217,8 +235,10 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   `Namespace` manifest **is** the declaration: the adopter writes it, signs it under the same tag as
   its **composed artefact**, and the composed artefact carries no namespace list of its own. An
   adopter namespace that carries the `institution` label and not the `governed` label is an
-  ungoverned namespace, and a composition refuses on a **new** one exactly as it refuses on a new
-  hole. Only the adopter adds a governed namespace, by hand. The **proposer** never proposes one.
+  ungoverned namespace, and a composition prices a **new** one exactly as it prices a new hole
+  (re-grill 27). The **proposer** may open a PR adding `governed: "true"`; a human merges
+  (reversal 18). *Superseded in part 2026-08-28:* the `CREATE` deny is replaced by the strictest-cage
+  `MutatingPolicy` described under **orphan guard**.
   See [ADR-0014](docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md) and
   [ADR-0018](docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md).
 
@@ -228,8 +248,19 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   running** and is **caged**, not denied: it loses its posture-derived identity and the reach and
   secrets that identity buys, and the residual is priced against its party's appetite band. It cannot
   return to the fleet in that state, because its controller recreates it and the **governed
-  namespace** rule denies the `CREATE`. This is the **exemption**-free settlement in miniature — deny
-  is the bottom rung, reached by the £, and never a carve-out.
+  namespace** rule denies the `CREATE`. This is the **exemption**-free settlement in miniature — the
+  bottom rung is "too expensive to run or not functional", reached by the £, and never a carve-out.
+
+- **Twin** (added 2026-08-28) — The eco-system's intelligence participant, in `twin/`. It consumes
+  the signed feeds, an adopter's own overlay and history; it publishes **priced forecasts and forward
+  intelligence** under a declared **perspective**, signed by an agent identity and scored against
+  reality under proper scoring rules. Each adopter org (`driftwood`, `tuppence`, `ludlow`) gets a
+  twin of its own; the eleven real firms it models today stay as the backtest corpus and as evals of
+  the model and tooling (re-grills 31, 39). The twin **computes a cage tier** under the org's
+  perspective; the **proposer** enacts it as a PR (re-grill 21). The twin acts inside a priced cage
+  of its own; propose-only is the outermost setting, with an Article 22 floor for significant
+  decisions about people (re-grill 37). One £, many perspectives: no perspective is privileged
+  (re-grill 33). Spec and maps: `.scratch/twin/`, read with their 2026-08-28 banners.
 
 ---
 
@@ -239,7 +270,8 @@ post, the later "mea culpa" blog post, and two reference GitHub orgs (`example-p
   natively what the 2022 implementation had to hack (the scaffolding that only existed because
   GitOps tooling couldn't yet express "versioned policy as a live dependency" is dropped, not
   preserved). The PRD targets this **faithful-to-intent floor**; a separate **modern-reference
-  report** documents the fuller "north star" design.
+  report** (`docs/modern-reference-transport.md`) documents transport upgrades. The north star is
+  [NORTH-STAR.md](NORTH-STAR.md).
 
 - **Transport = signed git tags, keyless (gitsign).** Policy is distributed as semver **git tags**
   (faithful to 2022), signed **keyless** with `sigstore/gitsign` (no long-lived GPG keys). Consumed

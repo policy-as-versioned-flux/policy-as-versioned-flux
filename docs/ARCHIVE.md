@@ -1,5 +1,12 @@
 # Archiving `policy-as-versioned-flux`
 
+> **Superseded in part, 2026-08-28.** The ratified [north star](../NORTH-STAR.md) §7 reverses the
+> "research-only" framing below. This hub is not archived and is not research-only. It is the
+> eco-system's own repository: it holds the north star, the ADRs (0011 to 0018 landed here after this
+> file was written), the truth surface, the twin and the maps. The archive checklist below stays as the
+> record of the July plan and is not to be executed. Lift-or-retire of the working parts is decided one
+> by one under `.scratch/ecosystem/` ticket 13.
+
 Last migration step (ticket 27, blocked by 26; separate from, and later than,
 mo-12's hub-loses-estate work below). The six-org estate is the
 faithful-to-intent rebuild; this top-level repo (`policy-as-versioned-flux` —

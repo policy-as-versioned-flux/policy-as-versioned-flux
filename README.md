@@ -10,7 +10,9 @@ runtime coexistence, ground-truth compliance, and an agent-assisted human-govern
 | Document | What it is |
 |---|---|
 | [docs/PRD.md](docs/PRD.md) | **The product requirements** — the faithful-to-intent build, phased P1→P2→P3 |
-| [docs/north-star-modern-reference.md](docs/north-star-modern-reference.md) | The fuller **modern reference** the floor grows into |
+| [NORTH-STAR.md](NORTH-STAR.md) | **The north star** — the eco-system, ratified 2026-08-27; every map serves a part of it |
+| [twin/](twin/) | **The twin** — the eco-system's intelligence participant: priced forecasts and forward intel under a declared perspective, one twin per adopter org |
+| [docs/modern-reference-transport.md](docs/modern-reference-transport.md) | The **modern reference** for transport and attestation (OCI, cosign, CAF) |
 | [CONTEXT.md](CONTEXT.md) | The **ubiquitous language** (glossary) — read this to speak precisely |
 | [docs/HISTORY.md](docs/HISTORY.md) | **How this got here** — a newcomer-readable narrative, real commits/PRs/tags linked, one sitting |
 | [docs/adr/](docs/adr/) | The **decisions** and why (ADR-0001…0010) |
@@ -21,7 +23,7 @@ runtime coexistence, ground-truth compliance, and an agent-assisted human-govern
 ## The decisions, in one breath
 
 Signed git tags (gitsign, keyless) · pinned everywhere + Renovate PR · Kyverno CEL `ValidatingPolicy`
-(Audit = lane-keeping, Deny = gate) · cloud plane by harvesting ControlPlane **collie** (Crossplane +
+(Audit and Deny are rungs on the cage ladder; there is no gate) · cloud plane by harvesting ControlPlane **collie** (Crossplane +
 OSCAL via C2P) · ControlPlane **Flux Operator** + `ResourceSet` matrix · **deterministic** policy (no
 time conditions) · **editorial** governance + an **AI agent** layer · **layered ground-truth**
 compliance · catch-all **orphan guard** · **no bespoke tooling** · proven **free on KiND**.

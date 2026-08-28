@@ -1,5 +1,12 @@
 # The whole model — one page
 
+> **Redrawn 2026-08-28** under the ratified [north star](../../NORTH-STAR.md) and reversals 1 and 2
+> (REGRILL-ANSWERS.md). The two diagrams below replace the 2026-07-23 hourglass and six-org graph:
+> there is no neck and no exemptions ledger; Flux is the distribution arm; every pin is an explicit
+> crossing edge; two institutions are exploded asymmetrically; the twin, the feeds org and the insurer
+> are participants. The prose sections that follow are the 2026-07-23 record and are not rewritten.
+> Where they say "exemptions" or "gate", read "priced cage" and "cage tier".
+
 Consolidation of the charting grilling (2026-07-23). The map's tickets hold the detail; this is the
 picture they add up to, plus the build order and the talk's spine.
 
@@ -51,131 +58,143 @@ policy artifact with many projections, not N subsystems.
 
 ```mermaid
 flowchart TB
-    wardley["<b>AI-Wardley</b><br/>commoditisation · market-intel<br/><i>(ANTICIPATE)</i>"]
-    feeds["<b>Signed feeds</b><br/>threat · CVE · EOL · penalties<br/><i>(OBSERVE)</i>"]
-
-    appetite[["<b>RISK APPETITE — £ per institution</b><br/>the ground &amp; the scoreboard"]]
-
-    subgraph hourglass["THE HOURGLASS — versioned &amp; signed end to end"]
-      direction TB
-
-      subgraph top["▽ intent — the wide top, tuned by the £"]
-        direction TB
-        principles["<b>PRINCIPLES</b><br/>what this institution cares about"]
-        controls["<b>CONTROLS</b> — Kyverno CEL ValidatingPolicy, versioned<br/>conditional policy: <i>“you may X if C”</i> (no exemptions)"]
-        tuning["<b>proportionality tuning</b><br/>Audit ↔ Deny · CVE tolerance · lifecycle/EOL pace<br/><i>set by the £ — a version bump = proportionality moving</i>"]
-        principles --> controls --> tuning
-      end
-
-      subgraph neck["◇ the neck — one admission decision"]
-        direction TB
-        dist["<b>Flux distributes</b> to the cluster<br/>signed GitRepository · ResourceSet fan-out<br/>prune-on-retire · drift-heal · orphan-guard"]
-        shiftleft["<b>shift-left</b> — ±1 version-skew<br/>same eval runs in CI <i>before</i> admission"]
-        admission["<b>ENFORCEMENT / ADMISSION</b><br/>Audit = observe · Deny = block"]
-        dist --> admission
-        shiftleft -. catches Audit→Deny pre-merge .-> admission
-      end
-
-      subgraph bottom["△ evidence &amp; accounting — the wide bottom, flows up"]
-        direction TB
-        evidence["<b>EVIDENCE</b><br/>PolicyReports → c2p → OSCAL observations / findings"]
-        ledger["<b>− EXEMPTIONS LEDGER</b> (the conditional branches)<br/>each: priced · scoped · expiring · versioned<br/>→ OSCAL risk / POA&amp;M objects"]
-        residual["<b>= RESIDUAL RISK (£)</b><br/>ALE + VaR₉₅ + TVaR + risk-load"]
-        evidence --> ledger --> residual
-      end
-
-      tuning --> dist
-      admission --> evidence
+    subgraph intel["INTELLIGENCE — refreshed on a clock, signed, versioned"]
+      direction LR
+      feeds["<b>Signed feeds</b><br/>threat · CVE · EOL · penalties<br/>market · prediction-market · news"]
+      twin{{"<b>THE TWIN</b> (one per adopter org)<br/>plays signals forward on the value chain<br/>priced forecasts · forward intel · a computed cage tier<br/><i>scored against reality</i>"}}
+      feeds --> twin
     end
 
-    balance[["<b>BALANCE SHEET</b><br/>insurance · valuation · board"]]
+    appetite[["<b>RISK APPETITE — £, proportionate to the org</b><br/>turnover · customers · regulators · declared band"]]
 
-    wargamer{{"<b>WAR-GAMER</b><br/>governance-agent evolved<br/>stress-tests controls"}}
-    drift{"proportionality<br/>drift?"}
-    pr["opens a <b>POLICY PR</b><br/><i>proposes, never disposes</i>"]
-    gate["human review + PR-gate + gitsign"]
+    subgraph policy["THE POLICY — one signed, versioned composed artefact"]
+      direction TB
+      principles["<b>PRINCIPLES</b><br/>what this org cares about"]
+      controls["<b>CONTROLS</b> — Kyverno CEL, versioned<br/>conditional policy: <i>“you may X if C”</i><br/>a control nobody meets is a <b>priced hole</b>"]
+      tier["<b>CAGE TIER, declared</b><br/>the £ selects the spec · tighten-only floor<br/>a re-price is a release: computed bump · signed tag"]
+      principles --> controls --> tier
+    end
 
-    appetite -->|sets proportionality| tuning
-    controls --> wargamer
-    wardley --> wargamer
-    feeds --> wargamer
-    wargamer --> drift
-    drift -->|on drift| pr --> gate
-    gate -->|"signed release → estate re-tunes → £ moves"| controls
-    residual -.->|residual £| balance
+    subgraph cages["EVERYTHING IS ALWAYS CAGED — the spec is the only variable"]
+      direction LR
+      loose["loose<br/><i>Audit</i>"]
+      tight["tight<br/><i>Deny · caged reach · caged secrets</i>"]
+      quarantine["quarantine"]
+      bottom["bottom rung<br/><i>too expensive to run<br/>or not functional</i>"]
+      loose --> tight --> quarantine --> bottom
+    end
+
+    flux["<b>Flux — the distribution arm</b><br/>signed GitRepository · ResourceSet fan-out<br/>prune-on-retire · drift-heal"]
+    kyverno["<b>Kyverno projects the tier</b><br/>Validate · Mutate (strictest cage by default) · Generate"]
+
+    evidence["<b>EVIDENCE</b><br/>PolicyReports → c2p → OSCAL<br/>priced holes · priced moves · cage and procurement risk objects"]
+    residual["<b>= RESIDUAL RISK (£)</b><br/>ALE + VaR₉₅ + TVaR + risk-load<br/>switching cost · insurance transfer"]
+    balance[["<b>BALANCE SHEET</b><br/>insurance quote · valuation · board"]]
+
+    proposer["<b>PROPOSER</b> — on a schedule<br/>re-prices · edits the tier declaration<br/>opens a signed PR · flood guard with a half life"]
+    human["a human merges<br/><i>author ≠ merger · gitsign → Rekor</i>"]
+
+    appetite -->|"sets the band"| tier
+    twin -->|"computed tier under the org's perspective"| proposer
+    proposer --> human -->|"signed release"| tier
+    tier --> flux --> kyverno --> cages
+    cages --> evidence --> residual -.->|"residual £"| balance
+    residual -->|"£ crosses a band"| proposer
+    controls --> twin
 
     classDef ground fill:#fde,stroke:#b48,stroke-width:2px;
     class appetite,balance ground;
-    classDef neckzone fill:#eef,stroke:#66a,stroke-width:2px;
-    class dist,shiftleft,admission neckzone;
+    classDef cage fill:#eef,stroke:#66a,stroke-width:2px;
+    class loose,tight,quarantine,bottom cage;
 ```
 
-> Spanning everything: **every actor &amp; action is attestable** (`gitsign` keyless → Rekor) —
-> verify, don't trust. The whole hourglass — appetite, controls, ledger, evidence — is versioned, so
-> the £ at the bottom always matches the policy at the top.
+> Spanning everything: **every actor and action is attestable** (`gitsign` keyless → Rekor). Agent
+> signatures attest the absence of a human. Forecasts are pre-registered and scored. A green that could
+> not look is a red. Intelligence re-prices on a clock; enactment happens only by reviewed PR.
 
 ## The six-org dependency & provenance graph
 
 ```mermaid
 flowchart TB
-    subgraph upstreams["UPSTREAM DEPENDENCIES — versioned · signed · Renovate-bumpable"]
+    subgraph regulators["REGULATORS — publish, consume nothing"]
       direction LR
-      nist["<b>…-nist</b><br/>800-53 OSCAL controls<br/><i>(real catalog)</i>"]
-      ico["<b>…-ico</b><br/>penalties@vYYYY.N → £<br/><i>(real public fines, repackaged)</i>"]
-      cve["<b>CVE feed</b><br/>trivy / GHSA"]
-      eol["<b>EOL feed</b><br/>endoflife.date"]
-      market["<b>market-intel</b><br/>adoption curves · vendor signals"]
+      nist["<b>…-nist</b><br/>800-53 OSCAL catalogue + baselines"]
+      ico["<b>…-ico</b><br/>penalty schema @vYYYY.N → £"]
     end
 
-    subgraph platform["…-platform — THE SHARED DISCIPLINE (inherited by each institution, pinned + signed)"]
+    subgraph feedsorg["INTELLIGENCE PUBLISHER — …-feeds org"]
       direction LR
-      fluxt["Flux distribution templates<br/>ResourceSet · GitRepository · prune · heal"]
-      fair["FAIR risk engine<br/>£: ALE · VaR₉₅ · TVaR · load"]
-      wargamer["war-gamer + AI-Wardley"]
-      render["ledger → PolicyException render"]
-      shiftleft["shift-left harness (±1 skew)"]
-      oscal["OSCAL / c2p plumbing"]
+      cve["CVE"]
+      eol["EOL"]
+      threat["threat register"]
+      market["market · prediction-market · news"]
     end
 
-    subgraph institutions["INSTITUTIONS — one KinD cluster each · all LIVE"]
+    subgraph platform["…-platform — PLATFORM"]
+      direction LR
+      impl["policy implementations"]
+      ladder["cage ladder + £ engine"]
+      gates["composition + release gates"]
+      fluxt["Flux templates"]
+    end
+
+    subgraph tuppence["…-tuppence · UK bank · FCA + PCI + GDPR — exploded"]
       direction TB
-      subgraph driftwood["…-driftwood · e-comm · PCI+GDPR · teaching default"]
-        direction TB
-        d_skin["<b>risk skin</b> — Audit-heavy (loosest)<br/>pins …-nist controls + …-ico penalties @version"]
-        d_pol["own <b>policies</b> — Kyverno CEL, versioned<br/>conditional 'you may X if C'"]
-        d_apps["own <b>apps</b>"]
-        d_teams["<b>teams → workloads → underlying tech</b><br/>adopt each policy version by PR (±1 skew)"]
-        d_cluster["own <b>KinD cluster</b><br/>Flux + Kyverno enforce at admission"]
-        d_skin --> d_pol --> d_teams
-        d_apps --> d_teams
-        d_pol -. enforced in .-> d_cluster
-      end
-      tuppence["<b>…-tuppence</b> · fintech · FCA+PCI+GDPR<br/>risk skin: toward-strict · scary £<br/><i>(same internal shape as driftwood ▲)</i>"]
-      ludlow["<b>…-ludlow</b> · US health · HIPAA<br/>risk skin: Deny-heavy (strictest) · long-life data<br/><i>(same internal shape ▲)</i>"]
+      t_party["<b>party.yaml</b><br/>parents · baseline · appetite · size · obligations"]
+      t_composed["<b>composed artefact @v</b><br/>tiers declared · holes priced · parents' SHAs"]
+      t_twin{{"<b>tuppence twin</b><br/>forecasts under tuppence's perspective"}}
+      t_proposer["proposer (scheduled)"]
+      t_cluster["KinD cluster<br/>Flux + Kyverno + SPIRE + Istio + OpenBao<br/>posture-as-identity · caged reach · caged secrets"]
+      t_party --> t_composed
+      t_twin --> t_proposer --> t_composed
+      t_composed -->|"Flux reconciles"| t_cluster
+      t_cluster -->|"evidence"| t_twin
     end
 
-    fluxold["<b>…-flux</b> — existing estate<br/><i>research-only → ARCHIVE last</i>"]
+    subgraph driftwood["…-driftwood · UK retail · PCI + GDPR — exploded, thinner"]
+      direction TB
+      d_composed["<b>composed artefact @v</b><br/>Audit-heavy · loosest tiers"]
+      d_twin{{"driftwood twin"}}
+      d_cluster["KinD cluster<br/>Flux + Kyverno"]
+      d_twin --> d_composed -->|"Flux reconciles"| d_cluster
+    end
 
-    nist   -->|controls| oscal
-    ico    -->|loss magnitude| fair
-    cve    --> wargamer
-    eol    --> wargamer
-    market --> wargamer
+    ludlow["<b>…-ludlow</b> · US health · HIPAA<br/>strictest tiers · own twin<br/><i>(same shape, collapsed)</i>"]
 
-    platform ==>|pinned, signed dependency| driftwood
-    platform ==>|pinned, signed dependency| tuppence
-    platform ==>|pinned, signed dependency| ludlow
+    insurer["<b>…-insurer</b><br/>signed quote against declared<br/>attachment · limit · exclusions"]
 
-    classDef archive fill:#eee,stroke:#999,stroke-dasharray:4 3,color:#666;
-    class fluxold archive;
+    hub["<b>…-flux</b> — the hub<br/>north star · ADRs · truth surface · twin code<br/>lift-or-retire, one decision each"]
+
+    nist -->|"pin nist@tag+sha"| platform
+    nist -->|"pin nist@tag+sha"| t_party
+    ico -->|"pin ico@tag+sha"| t_party
+    nist -->|"pin nist@tag+sha"| d_composed
+    ico -->|"pin ico@tag+sha"| d_composed
+    ico -->|"pin ico@tag+sha"| ludlow
+    platform -->|"pin platform@tag+sha"| t_party
+    platform -->|"pin platform@tag+sha"| d_composed
+    platform -->|"pin platform@tag+sha"| ludlow
+    feedsorg -->|"pin feeds@tag+sha"| t_twin
+    feedsorg -->|"pin feeds@tag+sha"| d_twin
+    feedsorg -->|"pin feeds@tag+sha"| ludlow
+    feedsorg -->|"pin feeds@tag+sha"| platform
+    t_twin -->|"forward intel, signed"| platform
+    t_composed -->|"priced exposure"| insurer
+    insurer -->|"signed quote"| t_composed
+    hub -.->|"aggregates one full verify run"| tuppence
+
     classDef reg fill:#efe,stroke:#4a4;
-    class nist,ico,cve,eol,market reg;
+    class nist,ico reg;
+    classDef feed fill:#ffe,stroke:#aa4;
+    class cve,eol,threat,market feed;
+    classDef hubc fill:#eee,stroke:#999,stroke-dasharray:4 3,color:#666;
+    class hub hubc;
 ```
 
-> All orgs are `policy-as-versioned-*` (the prefix is the impersonation guardrail). **Every hop is a
-> signed, versioned dependency** — Renovate opens the bump PR at every level (regulator → platform →
-> institution → team), and `gitsign` → Rekor makes each bump attestable: regulator raises a fine →
-> `…-ico` bumps → the institution's £ re-tunes → proportionate controls tighten, all as reviewable PRs.
+> All orgs are `policy-as-versioned-*`. **Every crossing edge is a pin**: `tag` plus resolved commit
+> SHA, bumped only by a Renovate PR a human merges, `gitsign` → Rekor on every bump. No participant
+> reaches into another; the only shared things are the artefact contracts and the £. The feeds and
+> insurer orgs exist as of 2026-08-28 (ticket 01) and are empty; the twin has no org yet.
 
 ## What's built (nothing is a "nice-to-have")
 

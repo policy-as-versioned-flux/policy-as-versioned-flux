@@ -1,4 +1,8 @@
-# North-Star — The Modern Reference for Policy as Versioned Code on Flux
+# The Modern Reference — transport, attestation and fleet upgrades
+
+> **Renamed 2026-08-28** from `north-star-modern-reference.md`. This is a July 2026 report on OCI
+> transport, cosign attestation, CAF catalogues and engine-agnosticism. It is not the north star. The
+> north star is [NORTH-STAR.md](../NORTH-STAR.md) at the repo root, and only that file.
 
 > **Purpose.** The [PRD](PRD.md) specifies the *faithful-to-intent* build. This report documents the
 > fuller **modern reference** — what the design becomes when we stop being constrained by fidelity
@@ -8,7 +12,7 @@
 
 ## 1. The delta at a glance
 
-| Area | Faithful floor (PRD) | North-star (this report) |
+| Area | Faithful floor (PRD) | Modern reference (this report) |
 |---|---|---|
 | Transport | signed git tags ([gitsign](https://github.com/sigstore/gitsign)), CI-verified | **[OCI artifacts](https://fluxcd.io/flux/cmd/flux_push_artifact/) + [cosign](https://github.com/sigstore/cosign) keyless**, source-controller-verified; OR keyless **git** once [#1068](https://github.com/fluxcd/source-controller/issues/1068) lands |
 | The "why" | carried as advisory metadata | **enforced** via signed cosign attestation + Kyverno `verifyImages` |
@@ -23,7 +27,7 @@
 ## 2. Transport: OCI artifacts (and keyless git, eventually)
 
 The floor stays on git tags because OCI was solving a Flux gap, not a thesis need (ADR-0001). The
-north-star adds OCI as the **distribution plane** while git remains the **authoring plane**:
+modern reference adds OCI as the **distribution plane** while git remains the **authoring plane**:
 
 - `flux push artifact oci://…/policies:2.1.1` on release; immutable, digest-addressed.
 - **cosign keyless** signing (OIDC, no GPG custody) and `OCIRepository.spec.verify` with
@@ -37,7 +41,7 @@ north-star adds OCI as the **distribution plane** while git remains the **author
 
 ## 3. Enforcing the "why" (not just carrying it)
 
-The floor *carries* rationale as advisory metadata (ADR-0007). The north-star **enforces** it:
+The floor *carries* rationale as advisory metadata (ADR-0007). The modern reference **enforces** it:
 
 - `cosign attest --type <threat-model>` attaches a signed risk/threat-model **predicate** to the
   policy artifact's digest.
@@ -56,14 +60,14 @@ chain is not a new problem" point that the floor only gestures at via Rekor.
 ## 5. UK compliance catalogue
 
 collie ships **NIST 800-53r5** (US-federal); the floor keeps it as the worked example (ADR-0004,
-ADR-0008). The north-star authors a **UK NCSC Cyber Assessment Framework / GovAssure** OSCAL
+ADR-0008). The modern reference authors a **UK NCSC Cyber Assessment Framework / GovAssure** OSCAL
 catalogue and maps the cloud policies to it, retaining NIST for portability. OSCAL is
 framework-agnostic, so this is additive — the same C2P `result2oscal` mapping (ADR-0009) attests
 against either.
 
 ## 6. Real-cloud fleet e2e
 
-The floor proves coexistence and cloud-admission on KiND+LocalStack (no spend). The north-star runs
+The floor proves coexistence and cloud-admission on KiND+LocalStack (no spend). The modern reference runs
 a **multi-cluster, multi-account fleet**: clusters subscribing to different policy semver sets via
 `ResourceSet`, real RDS/S3 provisioned by [Crossplane](https://crossplane.io), C2P attesting control satisfaction from
 PolicyReports over live resources, notification-controller posting commit-status compliance back to PRs across the
@@ -72,7 +76,7 @@ fleet. This is the "show the CIO the whole estate" proof at production shape.
 ## 7. The production governance agent
 
 The floor ships a **bounded demonstrator** (one signal source, opens review PRs; ADR-0007). The
-north-star agent:
+modern reference agent:
 
 - Ingests **multiple live signal sources** — CVE feeds, cloud-provider change logs, regulatory
   bulletins, threat intel — and correlates them to each policy's embedded rationale.
@@ -87,7 +91,7 @@ north-star agent:
 
 ## 8. Engine-agnosticism
 
-Kyverno is the reference engine (floor). The north-star documents the **identical shape** on OPA
+Kyverno is the reference engine (floor). The modern reference documents the **identical shape** on OPA
 Gatekeeper, Kubewarden, and Kubernetes-native `ValidatingAdmissionPolicy` — proving the
 *versioned-dependency mechanism* is engine-independent (the talk's "I could have picked any tool").
 The version self-selector, coexistence, and Audit/Deny split map onto each; only the policy body
@@ -103,12 +107,12 @@ PR" loop runnable, not just reviewable.
 
 ## 10. On pin-vs-range (revisited)
 
-The floor rejects live ranges for policy (ADR-0002) and the north-star does **not** reverse this —
-reviewed upgrades are thesis-core. The only north-star nuance: live `ref.semver` ranges remain
+The floor rejects live ranges for policy (ADR-0002) and the modern reference does **not** reverse this —
+reviewed upgrades are thesis-core. The only modern reference nuance: live `ref.semver` ranges remain
 acceptable for **non-policy** sources (e.g. the engine's own minor versions) where no organisational
 risk debate is implicated. Policy stays pinned-and-reviewed at every tier.
 
-## 11. Migration path (floor → north-star)
+## 11. Migration path (floor → modern reference)
 
 Designed so each step is independent and in-place:
 
@@ -124,5 +128,5 @@ Designed so each step is independent and in-place:
 Semver-with-meaning; multi-version coexistence via `nameSuffix` + version self-selector; **reviewed
 upgrades** (PR as the unit of debate); **lane-keeping + gate** proportionality; **carry (then
 enforce) the why**; **deterministic policy** (no time conditions); the **human-governance** loop;
-and the honestly-named **last-mile** residual. The north-star deepens the plumbing; it does not
+and the honestly-named **last-mile** residual. The modern reference deepens the plumbing; it does not
 touch the argument.

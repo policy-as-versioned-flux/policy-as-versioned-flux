@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Draft for review |
 | **Author** | Chris Nesbitt-Smith (CNS) with Claude |
-| **Posture** | Faithful-to-intent build. A separate [north-star report](north-star-modern-reference.md) documents the fuller modern reference. |
+| **Posture** | Faithful-to-intent build. A separate [modern-reference report](modern-reference-transport.md) documents transport and attestation upgrades. The north star is [NORTH-STAR.md](../NORTH-STAR.md). |
 | **Decisions** | [ADR-0001](adr/0001-transport-signed-git-tags-gitsign.md)…[ADR-0010](adr/0010-sunset-scheduled-proposals-not-application.md); ubiquitous language in [CONTEXT.md](../CONTEXT.md) |
 | **Research** | `research/01`–`03` (original work + thesis), `research/10`–`17` (Flux), `research/20`–`22` (synthesis) |
 
@@ -450,7 +450,7 @@ PR state).
 
 OCI+cosign transport, signed attestations + enforced "why", SBOM, Flux-native keyless-git gate (post
 #1068), UK CAF OSCAL catalogue, real-cloud fleet e2e, production risk-intelligence agent,
-engine-agnosticism. See [north-star-modern-reference.md](north-star-modern-reference.md).
+engine-agnosticism. See [modern-reference-transport.md](modern-reference-transport.md).
 
 ---
 
