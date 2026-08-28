@@ -270,6 +270,21 @@ that a rewritten entry cites stay as the record of the decision at the time.
   publisher, a date, a payload schema and the payload. Only the payload differs between feeds. The
   signature is the publisher's tag (ADR-0012, ADR-0019).
 
+- **Size facts** (added 2026-08-28) — What an adopter declares about its own scale so a price is
+  proportionate to it: turnover, customers, data subjects, headcount, and the date they were true.
+  Signed by the adopter alone. Stale facts widen a price; they never refuse one.
+
+- **Obligation** (added 2026-08-28) — A regime an adopter declares it answers to, by name, in its
+  party artefact. Only a declared obligation is priced. A declared obligation with no price in any
+  subscribed feed is an instrument fault.
+
+- **Reporting currency** (added 2026-08-28) — The one currency a party states every sum in. Every
+  amount carries its own currency; a sum converts through a dated, signed FX feed or not at all.
+
+- **Instrument fault** (added 2026-08-28) — The gate cannot read something it needs to price: a
+  regime with no penalty schema, a date with no FX rate. It refuses. Contrast a priced hole, which
+  is a behaviour the gate can read and prices (ADR-0020).
+
 - **Parent kind** (rewritten 2026-08-28) — What a party's parent gives it. Exactly three:
   **controls** (a catalogue plus named baselines), **implementations** (policy bodies plus control
   claims), **feed** (prices, no rules). Closed; a new feed is a new `name`, not a new kind.
