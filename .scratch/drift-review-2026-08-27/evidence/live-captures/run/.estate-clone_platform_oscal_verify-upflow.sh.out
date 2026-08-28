@@ -1,0 +1,8 @@
+[1;36m==>[0m 1. result2oscal: PolicyReports -> OSCAL assessment-results (observations + findings)
+   3 observations, 2 findings; AC-6 not-satisfied, CM-6 satisfied
+[1;36m==>[0m 2. result2oscal's own asserts (chain resolves by construction)
+   selfcheck ok: 3 observations, 2 findings; AC-6 not-satisfied, CM-6 satisfied; cage risk->observation c216d061 resolves
+[1;36m==>[0m 3. cage.py's risk related-observation resolves to a c2p observation (the join)
+   risk 3f95e3ea (baseline cage, £14952) -> observation c216d061 RESOLVES
+[1;36m==>[0m 4. schema-validation tail skipped: compliance-trestle CLI not installed
+PASS: PolicyReport -> observation -> finding -> risk -> related-observation resolves end to end.

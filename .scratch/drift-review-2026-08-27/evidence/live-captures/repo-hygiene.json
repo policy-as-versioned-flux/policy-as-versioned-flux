@@ -1,0 +1,96 @@
+{
+  "probe": "repo-hygiene",
+  "timestamp": "2026-08-27",
+  "repository": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux",
+  "git_status": {
+    "current_branch": "main",
+    "untracked_files": [
+      ".scratch/talk-spec/pitch-v6/"
+    ],
+    "untracked_size_mb": 637,
+    "total_commits": 306,
+    "stashes": [
+      "stash@{0}: On main: pre-merge-mo19-pycache"
+    ],
+    "branches": {
+      "local": [
+        "main",
+        "worktree-wf_f9d3ec8c-4a3-4"
+      ],
+      "remote": [
+        "origin/HEAD -> origin/main",
+        "origin/cs-06-cross-party-composition",
+        "origin/main",
+        "origin/worktree-buzzing-sprouting-thimble"
+      ]
+    },
+    "worktrees": [
+      {
+        "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux",
+        "branch": "main",
+        "commit": "aebbb9e"
+      }
+    ]
+  },
+  "stray_files": [
+    {
+      "file": ".DS_Store",
+      "severity": "low",
+      "reason": "macOS metadata file not in .gitignore - should be added to prevent accidental commits",
+      "action": "Add to .gitignore"
+    }
+  ],
+  "merge_conflict_remnants": [],
+  "directory_sizes": {
+    ".scratch/talk-spec": "637M",
+    ".scratch/twin": "1.4M",
+    ".scratch/policy-composition": "204K",
+    ".scratch/faithful-floor": "148K",
+    ".scratch/real-estate": "148K",
+    ".scratch/multi-org-estate": "292K",
+    ".scratch/govern-what-you-dont-control": "48K",
+    ".scratch/demo-feedback": "16K",
+    ".scratch/computed-semver": "240K",
+    "twin": "6.2M",
+    "tests": "5.6M",
+    "estate": "24M",
+    "spikes": "544M",
+    "research": "300K",
+    "talk": "48K",
+    "verify": "100K",
+    ".estate-clone": "36M"
+  },
+  "expected_development_artifacts": [
+    ".venv/",
+    "__pycache__/",
+    ".mypy_cache/",
+    ".pytest_cache/",
+    ".cache_ggshield",
+    ".claude/",
+    "forged.yaml",
+    "bin/",
+    "t/"
+  ],
+  "critical_issues": [],
+  "warnings": [
+    {
+      "item": ".DS_Store",
+      "severity": "low",
+      "description": "macOS metadata file not in .gitignore - present in repository"
+    },
+    {
+      "item": "worktree-wf_f9d3ec8c-4a3-4",
+      "severity": "info",
+      "description": "Stale worktree branch exists without active worktree - can be cleaned up"
+    }
+  ],
+  "notes": [
+    ".scratch/talk-spec/pitch-v6/ (637M) is expected per project memory - Pitch V6 built artifact",
+    ".estate-clone/ (36M) is a disposable build artifact properly git-ignored",
+    "One stash (pre-merge-mo19-pycache) represents intentional work-in-progress holding area",
+    "CI workflow is well-documented and comprehensive",
+    "No merge conflict remnants found (.orig/.rej files)",
+    "All Python cache directories properly git-ignored"
+  ],
+  "overall_status": "CLEAN - Expected development artifacts only, minor .gitignore addition recommended"
+}

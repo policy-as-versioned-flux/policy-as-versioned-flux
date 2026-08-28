@@ -1,0 +1,280 @@
+{
+  "cluster": "platform/feeds + platform/wardley + platform/wargamer (repo: policy-as-versioned-platform/platform, cloned at /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform, HEAD 58ef9c5 2026-08-25)",
+  "components": [
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/README.md",
+      "what_it_is": "Doc for the three reactive feeds (threat register / CVE / EOL), signed+versioned, consumed by platform/fair/fair.py as pinned deps; documents the EOL time-varying ramp with a mermaid diagram; records that sign.sh was deleted at ticket cs-27 (feeds/README.md:24-31).",
+      "how_it_runs": "doc only",
+      "evidence_of_working": "Claims verified by running feeds/verify-feeds.sh (PASS, exit 0). The 'sign.sh is gone' claim confirmed: no signer exists in the tree and feeds/keys/ holds only feeds-signing-key.pub.pem."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/to_fair_scenario.py",
+      "what_it_is": "207-line offline converter: signed feed entry -> fair.py (min,mode,max) scenario. threat_scenario() (l.42), cve_scenario() (l.56), eol_ramp()/eol_scenario() (l.74/l.92), selfcheck() (l.108). Also imported unchanged by wargamer.py:62 and honesty/reflexive.py:46.",
+      "how_it_runs": "offline python (CLI subcommands threat/cve/eol/selfcheck); also imported as a library by wargamer.py and platform/honesty/reflexive.py, and shelled out to by platform/compose/composition.py:606.",
+      "evidence_of_working": "`python3 to_fair_scenario.py selfcheck` run: 'ok 20 feed entries valid (lo<=mode<=hi); EOL ramp monotonic & capped (1yr=2.00x 2yr=3.00x 10yr=5.00x)'. Asserts at to_fair_scenario.py:143-153."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/verify.sh",
+      "what_it_is": "23-line offline single-feed check: feed_version field matches its directory (l.17) + openssl ed25519 detached-sig verify against feeds/keys/feeds-signing-key.pub.pem (l.20).",
+      "how_it_runs": "shell script (offline, needs python3 + openssl)",
+      "evidence_of_working": "Invoked 6x by verify-feeds.sh:21-26, all pass; also called by platform/honesty/verify-honesty.sh:25."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/verify-feeds.sh",
+      "what_it_is": "88-line six-step beat: signature+version verify (6 files), tamper rejection, fair.py consumes all three feeds, v1->v2 bump moves the money, EOL --as-of ramps monotonically, converter selfcheck.",
+      "how_it_runs": "shell script (offline, no cluster)",
+      "evidence_of_working": "RUN 2026-08-27: exit 0. Prints ale(threat v1 tuppence)=£222574 -> v2 £326139 (+£103,565); istio-1.18 EOL £218,337 -> £436,816 -> £1,087,666."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/threat-register/v1|v2/register.json(.sig)",
+      "what_it_is": "Institution threat register, 3 institutions (driftwood/tuppence/ludlow) with lef triples. v2 changelog: tuppence lef 3,6,14 -> 4,9,20 (v2/register.json:4). Every entry names a `source` (Verizon DBIR sector base rates, editorial midpoints) and the feed note explicitly says 'not a live threat-intel subscription' (v1/register.json:4).",
+      "how_it_runs": "static signed JSON data, consumed offline",
+      "evidence_of_working": "verify.sh threat-register v1/v2 pass; wargamer.py:64 pins v1 as its baseline feed."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/cve/v1|v2/cve-feed.json(.sig)",
+      "what_it_is": "trivy/GHSA-SHAPED CVE feed, 3 entries in v1 + CVE-2024-8888-istiod in v2. Severity->£ bands are declared editorial: 'lm bands are editorial CVSS->impact-£ tiers (not a real breach-cost dataset)' (v1/cve-feed.json:4). Two of three CVE ids are explicitly illustrative ('GHSA-xxxx (illustrative...)', v1:18).",
+      "how_it_runs": "static signed JSON data",
+      "evidence_of_working": "verify.sh cve v1/v2 pass; verify-feeds.sh:63-65 prices the v2-only CVE at £241,550 ALE."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/eol/v1|v2/eol-feed.json(.sig)",
+      "what_it_is": "endoflife.date-SHAPED feed: python-3.9, ubuntu-20.04, istio-1.18 (+kyverno-1.10 in v2), each with eol_date, base_lef, base_lm_gbp and an endoflife.date/<product> source string. Real EOL dates, hand-transcribed, not fetched.",
+      "how_it_runs": "static signed JSON data",
+      "evidence_of_working": "verify.sh eol v1/v2 pass; the ramp property is asserted in to_fair_scenario.selfcheck() and re-proved end to end in verify-feeds.sh step 5."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/keys/feeds-signing-key.pub.pem",
+      "what_it_is": "The only committed key: the ed25519 PUBLIC key. Trust root for every .sig in feeds/, wardley/ and wargamer/fixtures/.",
+      "how_it_runs": "static file",
+      "evidence_of_working": "Private key deliberately absent (confirmed: `ls feeds/keys/` shows only the .pub). honesty/reflexive.py:78-86 documents this and reports signing_key_present off the public key. Consequence: nothing in this checkout can produce a NEW feed signature."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wardley/README.md",
+      "what_it_is": "103-line doc for the 'fifth, forward feed' with mermaid flow, the three acceptance criteria, and the ATTACK_COST_COLLAPSE_K calibration caveat (README.md:97-103: K non-monotone, K=4.0 measured plateau 3.0-5.0).",
+      "how_it_runs": "doc only",
+      "evidence_of_working": "verify-wardley.sh passes. DOC DRIFT: README repeatedly says 'all three institutions (driftwood, tuppence, ludlow)' (README.md:57-65, 88-91) but institutions() reads risk/appetite.json which now has FOUR orgs (driftwood, tuppence, ludlow, platform); the live run prints '11 forward drift(s) across 4 institution(s)'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wardley/wardley.py",
+      "what_it_is": "547-line forward layer. build_map() (l.149) projects evolution+velocity*horizon and flags stage-crossing MOVEMENT; _forward_risk() (l.180) bumps attacker LEF by 1+K*movement; _forward_defence() (l.196) discounts costs.fix and sets costs.cage_discount by 1/(1+K*movement); corroborated_enactment() (l.111) is the fail-closed NOT_ENACTED gate; forward_into_wargamer()/_all() (l.258/273) is the seam into wargamer.wargame_scenarios(); selfcheck() (l.280) is 230 lines of asserts.",
+      "how_it_runs": "offline python (CLI: map / forward-signal / wargame / selfcheck)",
+      "evidence_of_working": "`python3 wardley.py selfcheck` run: 'ok Wardley map: 9 components, 7 flagged commoditising; forward signal: 4 attacker-capability(ies) re-priced (phishing collapse x2.44), 1 commoditising defence credited (spiffe x0.46), per institution; ... 11 forward drift(s) -> 11 PR(s) proposed, 0 merged, all gated.' No network calls anywhere in the file."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wardley/intel/market-intel.json(.sig)",
+      "what_it_is": "160-line SIGNED market-intel input, 9 components with visibility/evolution/velocity and (for attacker-capabilities) an embedded base_risk FAIR posture. Self-described as 'Editorial, grounded in named public trajectories ... not a live subscription' (l.5). Some entries carry genuinely researched, dated sourcing (pkg-registry-worm l.116 cites Shai-Hulud waves 1-3, CERT-CC VU#534320, npm v12 dates; pqc-transport-migration l.155 cites FIPS 203/204/205, Cloudflare Radar 71.2%/12.4% retrieved 2026-08-19; agentic-commit-access l.96 cites Octoverse 2025 + CVE list). `velocity` values are editorial throughout.",
+      "how_it_runs": "static signed JSON data",
+      "evidence_of_working": "verify-wardley.sh step 1 verifies its .sig offline. Two entries are declared negative controls: nb-refining-capacity (l.136, loud flag, actor gate keeps it off the war-gamer) and pqc-transport-migration (l.157 'KNOWN-INERT (finding F2)')."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wardley/enactment.json",
+      "what_it_is": "26-line UNSIGNED corroboration file, one component (spiffe-workload-identity) with links_control, a full control_risk FAIR posture, declared_by_subject:false, channel, observed narrative, and two evidence paths into ../identity/. Its own ponytail note (l.3) states the unsigned limitation and the upgrade path.",
+      "how_it_runs": "static JSON data, read by wardley.load_enactment()",
+      "evidence_of_working": "Both evidence paths resolve (corroborated_enactment returns corroborated:true at runtime); verify-wardley.sh step 6 plants two violations and watches the credit vanish."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wardley/map/wardley-map.json(.sig)",
+      "what_it_is": "123-line rendered+signed map artifact (9 components with stage/projected_stage/movement/commoditising).",
+      "how_it_runs": "generated artifact, committed",
+      "evidence_of_working": "Confirmed byte-equivalent to a fresh `wardley.py map` render (diff on sorted JSON: identical). Signature verifies; verify-wardley.sh step 2 proves a flag-flip forgery fails."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wardley/sign-map.sh",
+      "what_it_is": "29-line re-render + detached-sign script (openssl pkeyutl -sign, l.27) using ../feeds/keys/feeds-signing-key.pem.",
+      "how_it_runs": "shell script - but UNRUNNABLE in any checkout: the private key it names (feeds-signing-key.pem, l.18) is not committed and does not exist.",
+      "evidence_of_working": "None. Cannot execute here. Its gitsign/Rekor half is explicitly narrated as happening elsewhere ('That happens at `git commit` time (the wave-commit step), not here.', l.12)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wardley/verify-wardley.sh",
+      "what_it_is": "123-line six-step beat: sig verify of intel+map, tamper rejection, movement-not-position, per-institution seam into the war-gamer with drift/proposal assertions incl. driftwood!=ludlow divergence (l.73-75), wardley selfcheck, and the enactment guard with two planted violations.",
+      "how_it_runs": "shell script (offline, no cluster; python3 + openssl)",
+      "evidence_of_working": "RUN 2026-08-27: exit 0, full PASS banner."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wargamer/README.md",
+      "what_it_is": "85-line doc with mermaid loop, the propose-never-dispose safety property, and an explicit 'Not stood up here' section (l.80-85) stating the signed PR stops before commit/push/open/merge and gitsign needs OIDC/Rekor network.",
+      "how_it_runs": "doc only",
+      "evidence_of_working": "The 'Run' block's verify-wargamer.sh claim is currently FALSE on a machine with kyverno installed (see capabilities_stubbed_or_thin); the README also predates tier_pr.py, which it does not mention at all."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wargamer/wargamer.py",
+      "what_it_is": "362-line agent. collect() (l.84) loads baseline v1 feed + v3 drift fixture + scenario library; wargame_enforcement() (l.98) runs enforce.decide per institution; wargame_scenarios() (l.129) runs tcor.crossover per risk; wargame_cage_tier() (l.158) shapes ticket-16 prices[] into drift rows; propose()/_propose_tier() (l.183/214) shape proposals with merged:False, auto_merge:False, required_gate, gitsign identity string; selfcheck() (l.253).",
+      "how_it_runs": "offline python (CLI: wargame / propose / selfcheck); imported by wardley.py:264, honesty/proposer_bounds.py:46, wargamer/tier_pr.py:50.",
+      "evidence_of_working": "`wargamer.py selfcheck` run: 'ok collected v1->v3 signed feed + 6-scenario library; driftwood cart-PII £41095>£40000 band -> Audit->Deny drift, ludlow steady; 3 scenario-path drift(s); proposed 4 signed PR(s), 0 merged'. Structural safety asserted at l.319-320 (no merge/dispose attribute)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wargamer/scenarios/human-device.json",
+      "what_it_is": "71-line war-game scenario library, org 'tuppence', 6 risks (phishing / stolen-laptop / insider / ransomware / PQ HNDL / hyperscaler-region-concentration) with author human-seed vs ai-generated and deployed_move. The hyperscaler entry (l.60-69) carries `applicable: [transfer, deny]` and a long note about the £3,726 nonsense-fix regression it exists to pin.",
+      "how_it_runs": "static JSON fixture (unsigned)",
+      "evidence_of_working": "wargamer.selfcheck l.281-300 proves both sides of the `applicable` gate, including asserting the broken TCoR is ~£3,726."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wargamer/fixtures/threat-register/v3/register.json(.sig)",
+      "what_it_is": "26-line SIGNED drift fixture: driftwood lef 2,4,9 -> 5,9,16. Its own changelog (l.4) labels it 'the war-gamer drift fixture'. Source string claims 'driftwood WAF + CSP-report telemetry, 2026 skimmer-campaign uptick' - invented telemetry, not a real feed.",
+      "how_it_runs": "static signed JSON fixture; wargamer.py:67 pins it as the DEFAULT `--current` feed",
+      "evidence_of_working": "verify-wargamer.sh steps 1-2 verify it and prove a tamper fails. It is the sole reason any enforcement drift exists in this cluster."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wargamer/propose-policy-pr.sh",
+      "what_it_is": "69-line demonstrator: asks wargamer.py propose, renders the Audit->Deny sed diff into a tmpdir (l.35), runs ci-check.py if kyverno present, narrates the gitsign identity, and stops. Never commits/pushes/opens/merges (l.4-6, l.68-69).",
+      "how_it_runs": "shell script (offline)",
+      "evidence_of_working": "BROKEN on this machine (kyverno 1.18.2 present): exit 1 at l.53 - 'unexpected: the gate passed a workload that should trip the flip'. shift-left/ci-check.py --resource shift-left/fixtures/workload-flip.yaml reports 'compliant across its supported window [2.0.0, 2.0.1]' (pass:1 fail:0), so the negative assertion the script depends on no longer holds. Passes only where kyverno is absent (the else branch just narrates)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wargamer/verify-wargamer.sh",
+      "what_it_is": "56-line five-step beat: signed fixture verify, tamper rejection, wargamer selfcheck, drift report with assertions, then step 5 shells propose-policy-pr.sh.",
+      "how_it_runs": "shell script (offline, no cluster)",
+      "evidence_of_working": "RUN 2026-08-27: EXIT 1. Steps 1-4 pass; step 5 inherits propose-policy-pr.sh's kyverno-present failure. The README's 'the whole beat end to end' claim does not currently hold on a kyverno-equipped machine."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wargamer/tier_pr.py",
+      "what_it_is": "479-line REAL landing step (ticket 17 / ADR-0015). apply_tier_label() (l.73) does a regex line-edit of the flow-style `labels: {...}` map that already claims a policy-version; _land() (l.187) fetches, force-resets the branch to origin/base, commits, force-pushes, then _open_or_update_pr() (l.130) or _open_or_update_issue() (l.172) via `gh`. A proposed `deny` becomes an ISSUE, never a label PR (l.191-196, rationale l.214-221). Still exposes no merge/approve/dispose (asserted l.380-384).",
+      "how_it_runs": "python invoked from GitHub Actions in the ADOPTER repos (driftwood/ludlow/tuppence .github/workflows/propose-tier.yml), through the pinned platform checkout; also a CLI `run`/`selfcheck`.",
+      "evidence_of_working": "`tier_pr.py selfcheck` run 2026-08-27: exit 0, exercises a real local bare-repo remote plus a stateful stub `gh` on PATH (l.414-444) - proves PR-create, second-run force-push + pr edit (rev-count 2), and deny->issue. NOT proven against live GitHub in this checkout."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/workflows/propose-tier.yml (+ ludlow, tuppence equivalents)",
+      "what_it_is": "The only production runner of anything in this cluster. Triggers on a MERGED pin-bump PR or workflow_dispatch, never schedule (l.17-26). Checks out platform at the pinned tag, verifies the commit against the pin, then runs tier_pr.py run with GH_TOKEN and GITHUB_REPOSITORY. permissions: contents/pull-requests/issues write (l.28-32).",
+      "how_it_runs": "GitHub Actions workflow (adopter repo)",
+      "evidence_of_working": "Wired and plausible, but a run today would produce nothing: driftwood/composed/evidence.json's two `prices[]` entries both have changed:false, so wargame_cage_tier() yields no drift rows and run() lands nothing. ludlow/tuppence carry a skip-guard (ludlow l.110-112) for a pinned tag that predates tier_pr.py. platform tag v1.1.1 (driftwood's current pin) does contain wargamer/tier_pr.py."
+    }
+  ],
+  "capabilities_real": [
+    "Offline ed25519 detached-signature verification of every versioned feed file, with a real tamper-rejection proof: feeds/verify.sh:20, feeds/verify-feeds.sh:28-41, wargamer/verify-wargamer.sh:19-31, wardley/verify-wardley.sh:23-35.",
+    "Feed-version-vs-directory consistency check: feeds/verify.sh:17.",
+    "Feed -> FAIR scenario conversion consumed by an unmodified fair.py, with the money genuinely moving on a version bump (£222,574 -> £326,139 measured): feeds/to_fair_scenario.py:42-104, feeds/verify-feeds.sh:50-59.",
+    "The EOL time-varying ramp: eol_ramp() is real arithmetic, monotone and capped at +4x, asserted at feeds/to_fair_scenario.py:143-151 and end-to-end at feeds/verify-feeds.sh:67-81.",
+    "Wardley projection and MOVEMENT flagging (stage-crossing vs static position), including a non-vacuous negative control: wardley/wardley.py:149-176, selfcheck 2b at wardley/wardley.py:316-332.",
+    "The fail-closed enactment gate with three named failure modes and planted-violation proofs: wardley/wardley.py:111-138, wardley/verify-wardley.sh:82-116.",
+    "Per-institution divergence is machine-checked, not asserted in prose: wardley/wardley.py:436-442 and wardley/verify-wardley.sh:70-75 require driftwood's and ludlow's drift sets to differ.",
+    "The fix-is-a-fixed-point property, swept over bump factors rather than only today's K: wardley/wardley.py:498-503.",
+    "Proportionality drift detection: enforce.decide baseline-vs-current per institution (wargamer/wargamer.py:98-126) and tcor.crossover chosen-vs-deployed (wargamer/wargamer.py:129-150).",
+    "The `applicable` regression pin for hyperscaler concentration, asserting the exact ~£3,726 failure it prevents: wargamer/wargamer.py:281-300.",
+    "Structural propose-never-dispose: no merge/dispose/approve symbol in wargamer.py (asserted l.319-320), proposer_bounds.py, or tier_pr.py (asserted l.380-384).",
+    "Real git+gh mechanics in tier_pr.py: branch force-reset to origin/base, single fresh commit, force-push, PR create-or-edit dedupe by branch name, issue dedupe by HTML-comment marker - all exercised offline against a real local bare repo and a stateful gh stub (tier_pr.py:277-392).",
+    "The deny-never-travels-as-a-label invariant (a merged `tier: deny` would be coerced to baseline by the cage-tier MutatingPolicy, inverting the proposal): tier_pr.py:214-245, wargamer.py:214-221."
+  ],
+  "capabilities_stubbed_or_thin": [
+    "NO FEED IS EVER FETCHED. All six feed files, the v3 fixture and market-intel.json are hand-authored static JSON; there is no HTTP/urllib/requests/curl anywhere in the cluster (grep clean). CVE data is 'trivy/GHSA-style' shape only, two of three ids marked '(illustrative)' at feeds/cve/v1/cve-feed.json:18,33; EOL data is 'endoflife.date-style' transcription; the threat register says outright 'not a live threat-intel subscription' (feeds/threat-register/v1/register.json:4).",
+    "£ bands are editorial by declaration, not derived: THREAT_LM_GBP hardcoded per institution at feeds/to_fair_scenario.py:34-38; severity_lm_gbp declared 'not a real breach-cost dataset' at feeds/cve/v1/cve-feed.json:4; annual_events_if_exploited=(1,2,6) hardcoded as a default arg at feeds/to_fair_scenario.py:56.",
+    "ATTACK_COST_COLLAPSE_K = 4.0 is a single editorial dial (wardley/wardley.py:84), with an unusually honest caveat that widening it is UNSAFE because cage TCoR is non-monotone in the threat.",
+    "wardley/sign-map.sh CANNOT RUN: it needs ../feeds/keys/feeds-signing-key.pem (l.18) and only the .pub is committed. No path in this repo can re-sign a feed or a map. feeds/README.md:24-31 owns the equivalent admission for sign.sh.",
+    "wardley/enactment.json is UNSIGNED (self-documented at l.3): tamper-evidence for the corroboration file stops at file-exists-on-disk, and the evidence check is os.path.isfile only (wardley/wardley.py:131) - it never reads or validates the evidence content.",
+    "gitsign/Rekor is a STRING, not an operation: `\"identity\": \"gitsign keyless (OIDC -> Fulcio) -> Rekor transparency log\"` and `\"signed\": True` are literals in wargamer/wargamer.py:199-200 and :230-231. propose-policy-pr.sh:62-66 narrates gitsign presence/absence and stamps nothing.",
+    "propose-policy-pr.sh renders the Audit->Deny diff with `sed` into a tmpdir (l.35) and never commits, pushes, opens or merges - self-declared at l.4-6 and wargamer/README.md:80-85.",
+    "DEFECT (real, reproduced): verify-wargamer.sh exits 1 and propose-policy-pr.sh exits 1 on a machine with kyverno installed (1.18.2 here). propose-policy-pr.sh:52-54 asserts ci-check.py FAILS on shift-left/fixtures/workload-flip.yaml; it now PASSES ('compliant across its supported window [2.0.0, 2.0.1]', pass:1 fail:0), so the script hits its `exit 1`. The 'whole beat end to end' README claim (wargamer/README.md:70) holds only where kyverno is absent, i.e. the honest-looking path is the one that skips the check.",
+    "DOC/CODE DRIFT: wardley README and wardley.py docstrings say 'all three institutions (driftwood, tuppence, ludlow)' (wardley/README.md:57-65,88-91; wardley/wardley.py:36-37,143,253,528) but institutions() reads risk/appetite.json which has four orgs; live output is '11 forward drift(s) across 4 institution(s)'. The extra org is `platform` scoring itself.",
+    "wargamer/scenarios/human-device.json is hardcoded to org 'tuppence' (l.2) and is unsigned, unlike every feed the same code paths verify.",
+    "wargame_cage_tier() is deliberately NOT wired into wargame() (wargamer/wargamer.py:166-169) - the real-PR path and the demo path are disjoint, and run() explicitly refuses to call the demo path (tier_pr.py:240-247) to stop the fixture leaking into an adopter run.",
+    "tier_pr.py's edit is regex over flow-style `labels: { ... }` maps only (tier_pr.py:63, 80-82); a block-style adopter manifest is out of scope and would silently report 'nothing to land' (l.204-206).",
+    "The only production caller of this cluster would land nothing today: all `prices[]` entries in driftwood/composed/evidence.json have changed:false.",
+    "wardley/map/wardley-map.json is a committed render of a deterministic function - re-derivable, so it carries no information the intel does not (confirmed byte-identical to a fresh render).",
+    "Two map entries exist expressly to fire nothing: nb-refining-capacity (actor gate, market-intel.json:136) and pqc-transport-migration, labelled 'KNOWN-INERT (finding F2)' at market-intel.json:157 - a commoditising defence with no path to move any number."
+  ],
+  "verify_scripts": [
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/verify.sh",
+      "needs_cluster": false,
+      "what_it_proves": "One named feed file's feed_version matches its directory and its committed detached ed25519 signature verifies against the committed public key. Needs python3 + openssl only."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/feeds/verify-feeds.sh",
+      "needs_cluster": false,
+      "what_it_proves": "All six feed files verify; a tampered CVE feed is rejected; an unmodified fair.py prices all three feeds; a v1->v2 bump raises the ALE by a measured amount; EOL ALE ramps monotonically across three --as-of dates; the converter selfcheck passes over every feed entry. RUN: exit 0."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wardley/verify-wardley.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Intel and map signatures verify; a forged commoditising flag fails verification; the map flags movement not position; the forward signal feeds the war-gamer per institution producing drift and gated unmerged proposals with driftwood != ludlow; wardley.selfcheck passes; the enactment guard refuses a self-declared claim and a forged evidence path while still crediting the honest case. RUN: exit 0. Needs python3 + openssl."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wargamer/verify-wargamer.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Intends: the v3 fixture verifies and a tamper is rejected; the feed->PR seam selfcheck passes; the drift report contains both an enforcement and a scenario drift; the propose-never-dispose beat runs. ACTUAL RUN: exit 1 - steps 1-4 pass, step 5 fails via propose-policy-pr.sh because kyverno is installed locally and the workload-flip negative assertion no longer holds. No cluster needed; kyverno CLI (not a cluster) changes the outcome."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/wargamer/propose-policy-pr.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Not a verify-*.sh by name but the beat verify-wargamer.sh delegates to: renders the Audit->Deny policy diff without touching main, optionally runs the cross-check gate, narrates the gitsign identity, stops before commit. RUN: exit 1 (see above)."
+    },
+    {
+      "path": "in-module selfchecks (feeds/to_fair_scenario.py selfcheck, wardley/wardley.py selfcheck, wargamer/wargamer.py selfcheck, wargamer/tier_pr.py selfcheck)",
+      "needs_cluster": false,
+      "what_it_proves": "All four run offline and pass. tier_pr.py's is the heaviest: a real local bare-repo remote plus a stub `gh` on PATH proving PR-vs-issue routing, branch-name dedupe, force-push freshness (1 commit not 2), main untouched, and no merge/approve/dispose symbols."
+    }
+  ],
+  "runtime_dependencies": [
+    "python3 - REAL (every module and script).",
+    "openssl (pkeyutl ed25519 verify) - REAL, actually invoked; signing side unusable (private key absent).",
+    "git - REAL, but only in wargamer/tier_pr.py (fetch/checkout -B/add/commit/push --force) and its offline selfcheck.",
+    "gh CLI - REAL in production (tier_pr.py:115-121, 124-181); SIMULATED in selfcheck via a stateful python stub written to PATH (tier_pr.py:414-444).",
+    "GitHub Actions - REAL: driftwood/ludlow/tuppence .github/workflows/propose-tier.yml is the only production runner; never scheduled, only merged-pin-bump or workflow_dispatch.",
+    "gitsign / Fulcio / Rekor - SIMULATED in this cluster: identity strings and `signed: True` literals (wargamer.py:199-200), plus a `command -v gitsign` narration in propose-policy-pr.sh:62-66. Real gitsign verification lives elsewhere in the repo (platform/.github/workflows/release.yml:99).",
+    "kyverno CLI - REAL when present, and its presence currently BREAKS the beat (propose-policy-pr.sh:49-57). No kyverno admission controller and no cluster is involved.",
+    "Flux - ABSENT from this cluster. Nothing in feeds/, wardley/ or wargamer/ is Flux-reconciled; the adopter Kustomization points at platform's ./distribution path only (driftwood/gitops/platform/platform-pin.yaml).",
+    "Kubernetes cluster / CronJob - ABSENT. Nothing here is a CronJob or any in-cluster resource.",
+    "trivy - SIMULATED (the CVE feed is 'trivy/GHSA-style' shaped data; trivy is never invoked).",
+    "endoflife.date - SIMULATED (shape and dates transcribed by hand).",
+    "SPIRE / Istio - REAL as evidence artifacts only: wardley/enactment.json:20-23 names ../identity/spire/helmrelease.yaml and ../identity/istio/peerauthentication-strict.yaml, and corroborated_enactment() checks only that those files exist on disk.",
+    "Renovate - REAL but OUT of this cluster: it bumps the adopter's platform pin (driftwood/gitops/platform/platform-pin.yaml comment), which is the trigger that can fire propose-tier.yml.",
+    "OpenBao / Pomerium / Crossplane / C2P / OSCAL - not used here; OSCAL and Pomerium appear only as prose references (wargamer/wargamer.py:9, wargamer/scenarios/human-device.json:10).",
+    "platform siblings imported directly - REAL: fair/fair.py, risk/enforce.py, risk/appetite.json, tcor/tcor.py, shift-left/ci-check.py, honesty/proposer_bounds.py."
+  ],
+  "risk_and_pricing_touchpoints": [
+    "feeds/to_fair_scenario.py:34-38 - THREAT_LM_GBP, the hardcoded per-institution loss-magnitude bands (driftwood/tuppence/ludlow).",
+    "feeds/to_fair_scenario.py:56-70 - CVE epss -> lef and severity -> lm £ band lookup.",
+    "feeds/to_fair_scenario.py:74-104 - eol_ramp() and eol_scenario(): the time-varying £, +1x/yr capped at +4x.",
+    "feeds/to_fair_scenario.py:29 - DENY_LEF = (0,0,1), the estate-wide deny convention.",
+    "feeds/cve/v1|v2/cve-feed.json:5-10 - severity_lm_gbp £ tiers (critical 50k/150k/400k ... low 100/1k/5k).",
+    "feeds/verify-feeds.sh:18 - `ale()` shells platform/fair/fair.py summary --mode warn and reads ['ale'] - the only place in this cluster that computes an actual ALE.",
+    "wardley/wardley.py:84 - ATTACK_COST_COLLAPSE_K = 4.0, the frequency-multiplier dial.",
+    "wardley/wardley.py:185-192 - _forward_risk(): warn/behind LEF x (1 + K*movement).",
+    "wardley/wardley.py:203-210 - _forward_defence(): costs.fix x factor and costs.cage_discount = factor, the cost-of-controls side.",
+    "wardley/wardley.py:351-357 - tcor.crossover on base vs forward control, asserting the board line (TCoR) falls.",
+    "wardley/enactment.json:15 - the linked control's costs {fix 55000, deny 90000, transfer load 0.7 deductible 40000}.",
+    "wardley/intel/market-intel.json:16-24, 35-44, 55-64, 97-106, 118-126, 137-145 - six embedded base_risk FAIR postures with warn/behind/deny lef+lm and costs incl. transfer load/deductible.",
+    "wargamer/wargamer.py:105-107 - enforce.decide(threat_scenario(feed, org), org, enforce.tolerance_for(org)): the appetite-band verdict.",
+    "wargamer/wargamer.py:116-118 - risk_bought_deployed / risk_bought_current / tolerance carried on every enforcement row (driftwood measured £41,095 vs a £40,000 band).",
+    "wargamer/wargamer.py:137 - tcor.crossover(risk, tol)['chosen'], the four-move (fix/cage/transfer/deny) TCoR crossover.",
+    "wargamer/wargamer.py:158-179 - wargame_cage_tier(): old_price/new_price carried as tolerance/risk_bought_current so materiality reuses one formula.",
+    "wargamer/scenarios/human-device.json:13,24,35,46,57,68 - per-risk costs blocks incl. transfer load and deductible; l.64 `applicable: [transfer, deny]` is the guard against a £3,726 nonsense fix.",
+    "honesty/proposer_bounds.py:53-63 (consumer) - confidence() = (risk_bought_current - tolerance)/tolerance, CONFIDENCE_MIN 0.05, RATE_LIMIT 3."
+  ],
+  "cage_and_enforcement_touchpoints": [
+    "Graded enforcement Audit/Deny: wargamer/wargamer.py:98-126 computes the £-implied verdict per institution; the drift becomes a proposal flipping validationActions [Audit] -> [Deny] on distribution/policies/v2.0.0/require-nonroot.yaml (wargamer/wargamer.py:74-78, propose-policy-pr.sh:16,35).",
+    "Cage as a priced move: `cage` is one of the four TCoR moves and the deployed_move for stolen-laptop (wargamer/scenarios/human-device.json:19), and for the forward phishing/ransomware/worm postures (market-intel.json:38,58,120). Live wardley run shows cage -> fix drifts for 3 of 5 forward controls.",
+    "Cage cost discount: wardley/wardley.py:206 introduces costs.cage_discount, an optional backward-compatible field tcor.py reads (documented wardley/wardley.py:31-32).",
+    "Cage TIERS: wargamer/wargamer.py:214-245 and tier_pr.py:56-66 - TIER_LABEL 'posture.acme.io/tier', tiers baseline/restricted/quarantine, and the rule that a proposed `deny` must open an ISSUE because the `cage-tier` MutatingPolicy coerces an unrecognised label to baseline (ADR-0015). tier_pr.py:151-181 implements the issue path.",
+    "Cage-tier drift rows: wargamer/wargamer.py:158-179, consumed only by tier_pr.py:261 (never by wargame()).",
+    "The population gate: tier_pr.py:56 CLAIMS_LABEL 'policy-as-versioned.dev/policy-version' - the tier label is only written into a labels map that already claims a policy version, mirroring the cage-tier policy's own matchCondition.",
+    "The hard backstop is the PR gate, not the agent: GATE string at wargamer/wargamer.py:80 ('shift-left version cross-check, target +/-1 window'), asserted present on every proposal (wargamer.py:313, wardley/verify-wardley.sh:66, proposer_bounds.py:104).",
+    "Enforcement-adjacent CI gate execution: propose-policy-pr.sh:49-57 runs shift-left/ci-check.py (kyverno) against a fixture - currently the broken assertion.",
+    "Orphan guard, governed namespace, de-posture, currency controller: NOT in this cluster. They exist as sibling directories (platform/currency-controller, platform/graded, platform/posture) and as composed artifacts in the adopter repos (driftwood/composed/orphan-guard.yaml, governed-namespace-guard.yaml). The only link is that tier_pr.py reads composed/evidence.json, which those mechanisms produce."
+  ],
+  "feeds_wardley_wargamer_touchpoints": [
+    "Feed -> risk: feeds/to_fair_scenario.py consumed by wargamer/wargamer.py:62 (loaded by path, unmodified) and by platform/compose/composition.py:606 and platform/honesty/reflexive.py:46.",
+    "Feed -> war-gamer: wargamer/wargamer.py:64 pins feeds/threat-register/v1 as baseline and :67 pins its own signed v3 fixture as current. Both are FIXTURE FILES on disk - no feed is ever read from a network source anywhere in this cluster (grep for requests/urllib/curl/http: only two example.invalid strings in the gh stub, tier_pr.py:432,440).",
+    "Wardley -> war-gamer seam: wardley/wardley.py:258-276 forward_into_wargamer()/_all() imports wargamer and calls wargamer.wargame_scenarios() + wargamer.propose() unmodified; the org's band comes from wargamer.enforce.tolerance_for (l.266).",
+    "Wardley map artifacts: wardley/map/wardley-map.json is rendered by wardley.py map (sign-map.sh:24) and signed with the feeds key (sign-map.sh:27) - a genuine Wardley evolution/velocity projection, but over hand-authored intel.",
+    "REAL PR OPENING - exactly one path: wargamer/tier_pr.py:130-138 (`gh pr create` / `pr edit`) and :172-181 (`gh issue create` / `issue edit`), preceded by a real `git push --force` at :224. It is invoked in production only by the adopters' propose-tier.yml (driftwood l.68, ludlow l.116, tuppence l.106) on a merged pin-bump or manual dispatch.",
+    "SIMULATED PR opening: wargamer/propose-policy-pr.sh renders a sed diff and stops (l.35-44, l.68-69); wargamer.propose() returns a dict describing a PR that is never created (wargamer.py:194-211). wardley's 'signed PR' output is this same dict shape.",
+    "REAL FEED READING: none. Nothing in this cluster performs any network read.",
+    "Evidence flow into the real path: tier_pr.py:256-261 reads the adopter's committed composed/evidence.json prices[] (produced by platform/compose), bounds it via honesty/proposer_bounds.bound (:262), and lands what survives.",
+    "Bounding layer: platform/honesty/proposer_bounds.py:46 imports wargamer and wraps proposals with confidence/rate-limit/rejection-ledger bounds; platform/honesty/reflexive.py:104-110 runs to_fair_scenario.selfcheck() as the feed-boundedness check; platform/honesty/verify-honesty.sh:25-29 re-uses feeds/verify.sh and the v1 register."
+  ],
+  "original_thesis_mechanisms": [
+    "multi-version coexistence - NOT in this cluster; only referenced as the target of a proposal (require-nonroot@2.0.0, wargamer/wargamer.py:74-78) and as the shift-left +/-1 window in the GATE string (wargamer.py:80).",
+    "ResourceSet matrix - ABSENT here. Lives in platform/distribution (referenced from driftwood/gitops/platform/platform-pin.yaml).",
+    "Renovate bump PR - ABSENT from this cluster's code, but it is the upstream TRIGGER: Renovate bumps the adopter's platform-pin.yaml tag+commit, and the merged pin-bump PR is what fires propose-tier.yml (driftwood/.github/workflows/propose-tier.yml:17-25).",
+    "signed tags - PARTIAL/adjacent. This cluster signs DATA (detached ed25519 over feed/intel/map JSON, verified offline) but never a tag. Tag signing and gitsign verify-tag live in platform/.github/workflows/release.yml:89-129. The war-gamer's own 'signed' is a literal (wargamer/wargamer.py:200). Adopters do verify the pinned platform tag's commit before running tier_pr.py (propose-tier.yml:57-58).",
+    "orphan guard - ABSENT here (platform/graded + adopters' composed/orphan-guard.yaml).",
+    "OSCAL / C2P - ABSENT as code; nist OSCAL named only in prose (wargamer/wargamer.py:9, feeds/README.md:5) as a pinned upstream dep priced elsewhere.",
+    "shift-left - PRESENT as a hard dependency: the version cross-check gate is the required_gate on every proposal (wargamer/wargamer.py:80, asserted at :313; wardley/verify-wardley.sh:66) and is actually executed by propose-policy-pr.sh:52 - which is where the cluster currently fails.",
+    "handbook - ABSENT.",
+    "sunset - PRESENT but deliberately REFRAMED: instead of a bespoke sunset mechanism, an unmaintained policy version is priced as ordinary EOL risk via the time-varying ramp (feeds/README.md:52-54, feeds/to_fair_scenario.py:17, feeds/eol/v1/eol-feed.json:4).",
+    "notifications - ABSENT. No schedule, no alerting; the adopters' workflows state 'Nothing timed, ever -- no `schedule:` anywhere' (propose-tier.yml:18). The only human-facing output is a PR or issue body (tier_pr.py:141-148, 157-169).",
+    "dashboards - ABSENT. No Grafana, no metrics; output is JSON on stdout and coloured shell narration."
+  ],
+  "notes": "Last commit dates in this cluster (repo policy-as-versioned-platform/platform): feeds 2026-08-23 (1a8b871, cs-27 signing rework), wardley 2026-08-23 (f5c0461), wargamer 2026-08-25 (a64b52f, policy-composition tickets 10/17 fixes). All three trace back to 7a36bf7 'Estate build: 27 tickets implemented via dependency-wave workflow' 2026-07-31. Note these directories are NOT tracked by the outer policy-as-versioned-flux repo (.gitignore:7 excludes .estate-clone/); each org directory is its own git clone.\n\nCross-estate references: (1) driftwood, ludlow and tuppence each run platform/wargamer/tier_pr.py from .github/workflows/propose-tier.yml - the only production consumer of this cluster; ludlow and tuppence guard it with a file-exists SKIP because their pinned platform tag may predate tier_pr.py, driftwood does not (it pins v1.1.1, which does contain wargamer/tier_pr.py - verified with git ls-tree). (2) platform/honesty/proposer_bounds.py and reflexive.py import wargamer and to_fair_scenario; verify-honesty.sh calls feeds/verify.sh. (3) platform/compose/composition.py shells out to feeds/to_fair_scenario.py for the threat leg of its pricing. (4) driftwood/README.md:58 links to wargamer/README.md. (5) ico/schema/to_fair_scenario.py is a sibling of the same shape, not an importer. Nothing outside platform imports wardley.py at all - the Wardley layer's only consumer is its own verify script.\n\nTwo live defects worth a drift review: (a) verify-wargamer.sh and propose-policy-pr.sh both exit 1 wherever the kyverno CLI is installed, because the negative assertion at propose-policy-pr.sh:52-54 no longer holds (ci-check.py now reports workload-flip.yaml compliant across [2.0.0, 2.0.1]) - the beat only 'passes' on machines missing the tool it is meant to prove; (b) the wardley docs and docstrings say three institutions while risk/appetite.json now carries four, so the live run scores `platform` against its own band and prints 4.\n\nOverall shape: this cluster is honest, well-asserted offline arithmetic over hand-authored data. Every signature check, ramp, projection, crossover and gate assertion is real code that really runs; every input is a fixture, every £ band is editorial by declaration, and the only thing that ever reaches the outside world is tier_pr.py's gh/git calls in an adopter Actions run - which, given all current prices[] entries carry changed:false, would land nothing today."
+}

@@ -1,0 +1,16 @@
+=== kind-ludlow nodes ===
+NAME                   STATUS   ROLES           AGE   VERSION
+ludlow-control-plane   Ready    control-plane   26d   v1.36.1
+exit=0
+=== kind-ludlow kustomizations ===
+NAMESPACE     NAME     AGE   READY   STATUS
+flux-system   ludlow   26d   True    Applied revision: v1.0.0@sha1:7bd9973be43de0b5d1d13b7eb46a1a60b01516ec
+exit=0
+=== kind-ludlow gitrepositories ===
+NAMESPACE     NAME     URL                                                    AGE   READY   STATUS
+flux-system   ludlow   https://github.com/policy-as-versioned-ludlow/ludlow   26d   True    stored artifact for revision 'v1.0.0@sha1:7bd9973be43de0b5d1d13b7eb46a1a60b01516ec'
+flux-system   nist     https://github.com/policy-as-versioned-nist/nist       26d   True    stored artifact for revision 'v1.0.0@sha1:e5953e1a96018e9a29677c66cd61939ad796d25e'
+exit=0
+=== kind-ludlow non-running pods ===
+NAMESPACE            NAME                                           READY   STATUS    RESTARTS          AGE
+exit=0

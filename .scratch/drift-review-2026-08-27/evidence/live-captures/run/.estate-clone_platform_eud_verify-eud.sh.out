@@ -1,0 +1,29 @@
+== offline: VM specs ==
+  ok   windows11-vtpm.json: TPM 2.0 declared
+  ok   windows11-vtpm.json: swtpm backend (emulated EK, named honestly)
+  ok   windows11-vtpm.json: narrated as virtual
+  ok   windows11-vtpm.json: sane disk/memory sizing
+  ok   linux-vtpm.json: TPM 2.0 declared
+  ok   linux-vtpm.json: swtpm backend (emulated EK, named honestly)
+  ok   linux-vtpm.json: narrated as virtual
+  ok   linux-vtpm.json: sane disk/memory sizing
+  -- VM specs hold --
+== offline: tpm-devid enrolment template renders on the ONE estate root ==
+  ok   windows11-eud: renders a ClusterStaticEntry
+  ok   windows11-eud: device SVID on the ONE estate root (spiffe://acme.internal/device/windows11-eud)
+  ok   windows11-eud: pinned to a tpm_devid selector, same mechanism as ticket 18's operator-macbook-device
+  ok   linux-eud: renders a ClusterStaticEntry
+  ok   linux-eud: device SVID on the ONE estate root (spiffe://acme.internal/device/linux-eud)
+  ok   linux-eud: pinned to a tpm_devid selector, same mechanism as ticket 18's operator-macbook-device
+  -- tpm-devid templates hold --
+== offline: WHfB alone does not buy device trust (access.py reused, not re-implemented) ==
+access selfcheck: all asserts passed
+  ok   a Windows EUD with WHfB but no device SVID is refused break-glass: operation requires an attested device (valid device SVID); laptop is unattested
+== offline: build-vm.sh is idempotent-safe (dry structure check, no boot) ==
+  ok   build-vm.sh creates disks via qemu-img (no boot/install attempted)
+  info qemu-img available
+  info swtpm NOT installed (venue prereq; offline checks above don't need it)
+  info utmctl NOT installed (venue prereq; offline checks above don't need it)
+== live: driftwood device SVIDs (best-effort, bounded) ==
+  (identity substrate not reachable; skipped — offline checks above are the ones that must pass)
+verify-eud: done

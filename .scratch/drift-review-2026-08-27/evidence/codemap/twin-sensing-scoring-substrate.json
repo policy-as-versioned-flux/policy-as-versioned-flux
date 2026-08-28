@@ -1,0 +1,201 @@
+{
+  "cluster": "twin sensing/ingest pipeline, decay+retrospective pool, planter/detector/scorer synthetic-substrate harness, proper scoring rules, market-signal moves, substrate generator+fidelity eval+reporting, skill-eval harness",
+  "modules": [
+    {
+      "file": "twin/ingest.py",
+      "lines": 165,
+      "purpose": "Unattended pipeline that runs signal_classify.classify() over a generated substrate batch at declared volume, with no human gate anywhere in the call graph; every output stays grade 5.",
+      "key_functions": "candidates_of(overlay) merges world+overlay components; ingest_run(repo, caps, org, recipe, count, command) generates substrate via substrate.generate_deterministic, classifies each line, times the loop; throughput_report(declared_count, elapsed_seconds) computes items_per_second from measured wall clock (never hardcoded, returns None if elapsed<=0)",
+      "depends_on": "verbs, artefact.Artefact/DERIVED, blob.BlobRef, grades.Capabilities, model.Overlay, repo.ModelRepo, signal_classify.classify, substrate.SubstrateRecipe/generate_deterministic"
+    },
+    {
+      "file": "twin/detector.py",
+      "lines": 85,
+      "purpose": "The 'blind' half of planter/detector/scorer split (decision ticket 12): a lexical-outlier heuristic that flags the most vocabulary-foreign line per channel, with zero imports from twin.planter and no ability to read ground truth.",
+      "key_functions": "_tokens(text) strips stopwords/focus-prefix; Detection dataclass(channel,index,line,outlier_score); detect(public) iterates public['channels'] only, for each channel>=2 lines computes token-overlap-complement score per line, picks the minimum-overlap line as the detection",
+      "depends_on": "stdlib re, dataclasses only -- deliberately no import of twin.planter"
+    },
+    {
+      "file": "twin/planter.py",
+      "lines": 202,
+      "purpose": "The sealed half of planter/detector/scorer: holds ground truth (Plant objects with actionability horizon + strength) apart from what's exposed to the detector; reads horizons/strengths from plant-horizons.yaml, validated.",
+      "key_functions": "horizons_for(recipe, path) loads+validates plant-horizons.yaml, returns (horizon,reason,strength) dicts per planted signal, refusing missing/out-of-range strength or unusable horizon dates; Plant frozen dataclass(channel,index,signal,actionability_horizon,strength); PlantedWorld(public, ground_truth); plant(recipe, horizons, strengths, lines_per_channel) refuses any planted signal missing a horizon or strength (or strength outside [0,1]), calls substrate_generator.generate(), strips 'plants' key for public, builds sealed ground_truth tuple",
+      "depends_on": "yaml, PACKAGE_DIR, regimes.cutoff/RegimeError, substrate.SubstrateRecipe, substrate_generator.LINES_PER_CHANNEL/generate"
+    },
+    {
+      "file": "twin/plant-horizons.yaml",
+      "lines": 66,
+      "purpose": "Versioned (twin.plant-horizons/v1), authored ground-truth document: per-recipe list of planted signals each with a horizon date, a reason, and a strength (unit interval), for the netflix-2011-operational recipe (4 plants).",
+      "key_functions": "n/a (data)",
+      "depends_on": "read only by twin/planter.py's horizons_for()"
+    },
+    {
+      "file": "twin/signal_classify.py",
+      "lines": 202,
+      "purpose": "The signal-classify skill (grade 5, keyword/word-overlap heuristic stand-in for a real model call): STEEP-tags a statement and binds it to the best-overlap candidate component.",
+      "key_functions": "_steep(statement,source) keyword-matches 'liquidation'/'bafin'/'administrative act' -> political else economic; best_match(statement,source,candidates) returns (best_candidate, token-overlap score); _bind always returns max-overlap candidate even at score 0; classify(payload) returns {'steep':..., 'claim': {kind:binding, component, evidence_grade:5 literal, claimed_by, evidence}}; scorer(actual,expected) requires both steep and component correct; labelled_corpus(tmp_dir) builds the 4 backtest orgs (Carillion/NMC/Wirecard/Enron) via fixtures builders and pulls binding claims as labelled examples",
+      "depends_on": "schema, fixtures (CARILLION_ORG etc, build_*_org), model.Overlay, repo.ModelRepo"
+    },
+    {
+      "file": "twin/sensors.yaml",
+      "lines": 75,
+      "purpose": "Closed, versioned (twin.sensors/v1) named-sensor table build ticket 82; enumerates 6 sensors (bus-factor-structural-aggregate, mood-sensor-no-scenario, individual-email-content-when-aggregate-suffices, expensive-surveillance-low-value, keystroke-monitoring-no-dpia, payroll-record) with kind/granularity/observes, consumed by ethics_gate.admit() (outside this cluster).",
+      "key_functions": "n/a (data)",
+      "depends_on": "consumed by twin/ethics_gate.py (not in this cluster) to refuse unnamed sensor ids"
+    },
+    {
+      "file": "twin/decay.yaml",
+      "lines": 31,
+      "purpose": "Versioned (twin.decay/v1) exponential decay parameters for the unbound-signal pool: half_life_days=180, decayed_out_threshold=0.05.",
+      "key_functions": "n/a (data)",
+      "depends_on": "read by twin/unbound_pool.py's decay_function()"
+    },
+    {
+      "file": "twin/unbound_pool.py",
+      "lines": 224,
+      "purpose": "Retention half of decision ticket 11 Q3: signals with no binding claim are retained (never deleted) and decay exponentially in weight over time; reports pool size, age distribution, decayed state.",
+      "key_functions": "decay_function(path) loads+validates decay.yaml (half_life>0, 0<threshold<1), lru_cache'd; weight(age_days,path) = 0.5**(age_days/half_life); is_decayed(w,path); decayed_on(signal_date,path) computes crossing date via math.log; pin(path) returns version/params/digest; unbound_ids(overlay) = signals minus those bound via SIGNAL_BINDING_KINDS claims; pool(overlay,at,path) returns per-signal entries with age/weight/decayed/decayed_on, raises on negative age; age_distribution(entries,path) bins live pool into 5 half-life-multiple bins (0-1..4+), zero-filled; unbound_pool_artefact(...) builds a DERIVED Artefact",
+      "depends_on": "PACKAGE_DIR/TOOL_VERSION/verbs, artefact.Artefact/DERIVED, canon.digest_of, grades.Capabilities, model.Overlay, repo.ModelRepo, schema.SIGNAL_BINDING_KINDS"
+    },
+    {
+      "file": "twin/retrospective_sweep.py",
+      "lines": 158,
+      "purpose": "Rescue half of decision ticket 11 Q3: re-attempts binding every unbound-pool entry against the *current* candidate set (e.g. after a model change adds a component), reporting rebound vs still-unbound and lead-time-to-recognition, without ever diffing history.",
+      "key_functions": "rebind(overlay,entry,candidates) uses signal_classify.best_match() score to refuse a rubber-stamp bind (returns None if score==0), else calls classify(); sweep(overlay,at) runs unbound_pool.pool() then rebind for every entry, returns {rebound, still_unbound}; lead_time_summary(rebound) computes min/max/mean days per_signal; retrospective_sweep_artefact(...) builds DERIVED Artefact carrying decay pin",
+      "depends_on": "ingest.candidates_of, model.Overlay, repo.ModelRepo, signal_classify.best_match/classify, unbound_pool.pin/pool, verbs, artefact.Artefact/DERIVED, grades.Capabilities"
+    },
+    {
+      "file": "twin/schedule.py",
+      "lines": 137,
+      "purpose": "sweep(): scheduled, unconditional execution of every scenario in every org overlay across a *list* of repositories (adapted from arckit's single-repo refresh model), with deliberately NO hash-staleness skip (to avoid selection bias in the calibration record), and per-scenario failure isolation.",
+      "key_functions": "sweep(repos, caps, command, at=None) iterates repos -> orgs(repo) -> overlay.scenarios, calls verbs.run() per scenario at AS_CONSUMED regime, catches VerbError/ModelError/RegimeError/SchemaError into failures list and continues, aggregates executions with forecast_bundle sha256/pins/forecast_count",
+      "depends_on": "artefact.Artefact/DERIVED, grades.Capabilities, model.ModelError/Overlay/orgs, regimes.AS_CONSUMED/RegimeError, repo.ModelRepo, schema.SchemaError, verbs"
+    },
+    {
+      "file": "twin/scoring.py",
+      "lines": 168,
+      "purpose": "Proper scoring rules (Brier, log-loss) with quantisation for cross-platform reproducibility; reliability-diagram binning over a pooled forecast population; measure_discount() for the Enron-memorisation-leakage discount metric.",
+      "key_functions": "quantise(value) rounds to 12 significant decimal digits; _check(probability) refuses p<=0 or p>=1; brier(p,observed)=(p-outcome)**2; log_loss(p,observed)=-log(p or 1-p); score(p,observed) returns both quantised; measure_discount(enron,obscure,rule,hindsight_memorising=None,hindsight_honest=None) computes mean-loss gap(s) (enron-vs-obscure, optionally folded with hindsight-memorising-vs-honest) averaged across legs; reliability_diagram(scores,bins=10) bins by predicted probability, reports count/mean_forecast/empirical_frequency per bin (None on empty, not 0.0), every bin present including empty",
+      "depends_on": "stdlib math only"
+    },
+    {
+      "file": "twin/scorer.py",
+      "lines": 106,
+      "purpose": "The half that 'reads both' ground truth and detections (decision ticket 12 Q3b): scores each planted signal timely/late/missed against its actionability horizon, using near-zero (not zero) for late detections.",
+      "key_functions": "PlantScore(plant,detected,timely,score,reason) frozen dataclass; ScoreResult(detected_at,plant_scores,limitation) with hit_rate and mean_score properties; score(ground_truth,detections,detected_at) compares each plant's (channel,index) against the detections set, day-string comparison detected_at<=horizon for timely (TIMELY_SCORE=1.0), else LATE_SCORE=0.05, MISSED_SCORE=0.0 if never detected at that location; every ScoreResult carries planter.SHARED_PRIOR_LIMITATION verbatim",
+      "depends_on": "detector.Detection, planter.SHARED_PRIOR_LIMITATION/Plant"
+    },
+    {
+      "file": "twin/substrate.py",
+      "lines": 140,
+      "purpose": "SubstrateRecipe format (twin.substrate-recipe/v1: id, seed, templates, model_version, planted_signals) and the two toy generators demonstrating deterministic-vs-non-reproducible generation, establishing that regenerated substrate content must be marked AUTHORED (not DERIVED) because a real model call cannot guarantee byte-identical reproduction.",
+      "key_functions": "SubstrateRecipe.from_yaml/to_yaml round-trip with schema check; generate_deterministic(recipe,count) uses random.Random(recipe.seed).choice over templates, no external entropy, byte-for-byte reproducible; generate_non_reproducible(recipe,count) seeds from os.urandom(8) so it never reproduces -- an honest stand-in for a live model call, not a claim about real LLM behavior",
+      "depends_on": "stdlib os/random, yaml"
+    },
+    {
+      "file": "twin/substrate_generator.py",
+      "lines": 222,
+      "purpose": "The substrate-generator skill: turns one SubstrateRecipe into a coherent 4-channel (events/communications/hr/telemetry) synthetic corpus with a shared focus entity, mundane-by-default content, and at most one deliberately-camouflaged planted signal per channel inserted at a fixed midpoint index (measurability wins over believability, per decision ticket 12 Q1).",
+      "key_functions": "_channel_recipe derives a per-channel sub-recipe (seed+index) reusing generate_deterministic; mundane_fraction(batch); generate(recipe,lines_per_channel=6) round-robins templates across channels by position, inserts each channel's plant at lines_per_channel//2, refuses if templates<4 channels or planted_signals>4; generate_from_recipe_yaml(text) wraps generate for the skill harness; scorer(actual,expected) checks channel completeness, exact plant set, mundane_fraction floor; labelled_corpus() gives 3 recipes: quiet-week(0 plants)/sparse-plants(2)/dense-plants(4)",
+      "depends_on": "substrate.SubstrateRecipe/generate_deterministic"
+    },
+    {
+      "file": "twin/substrate_report.py",
+      "lines": 161,
+      "purpose": "twin substrate CLI-level artefact ('substrate-report'): runs one recipe against one org's spine at one checkpoint, computing all 7 fidelity dimensions AND the planter/detector/scorer walk in a single artefact so both readings share the identical generated batch.",
+      "key_functions": "report(repo,caps,org,recipe_path,checkpoint,detected_at,command) reads recipe from file (pinned by sha256 of bytes, not path), calls substrate_generator.generate(), substrate_eval.evaluate_fidelity(), spine anchor+diff_against_spine for anchored/free-running split, substrate_eval.refuse_if_contaminated() as a hard pre-commit gate, planter.horizons_for()+plant()+detector.detect()+scorer.score() for the detection walk; _detection(result,reasons) formats per-plant rows with horizon_reason/strength/score",
+      "depends_on": "planter, spine (Spine, anchor, diff_against_spine), substrate_eval, detector.detect, scorer.score/ScoreResult, substrate.SubstrateRecipe, substrate_generator.generate, artefact.Artefact/DERIVED, canon.sha256_hex, grades.Capabilities, model.Overlay, repo.ModelRepo"
+    },
+    {
+      "file": "twin/netflix-substrate-recipe.yaml",
+      "lines": 70,
+      "purpose": "A real, committed twin.substrate-recipe/v1 document: 24 mundane free-running templates (order load-bearing, round-robins across the 4 channels) plus 4 camouflaged planted signals for the Netflix 2011 operational chatter substrate, seed 20111024, deterministic-template-draw/v1 model_version.",
+      "key_functions": "n/a (data)",
+      "depends_on": "read via SubstrateRecipe.from_yaml by substrate_report.report() / tests"
+    },
+    {
+      "file": "twin/market_signals.py",
+      "lines": 258,
+      "purpose": "World-layer connector translating prediction-market price MOVES (never LEVELS-as-probability) into signal-classify inputs, citing a specific empirical bias finding (Bürgi/Deng/Whelan 2026) and structurally refusing any price-to-probability conversion; excludes quarantined question ids before classification (not just after-the-fact audit).",
+      "key_functions": "PriceObservation(question_id,venue,date,price_level) validates [0,1]; PriceMove(...) with delta/direction properties, no field named 'probability'; price_moves(observations) computes consecutive per-question deltas sorted by date, single observation yields no move; as_probability(observation) always raises PriceLevelAsProbabilityError, called by nothing else in the module by design; move_statement(move) formats the dated sentence; market_signal_run(repo,caps,org,moves,quarantined_ids,command) excludes quarantined ids before calling signal_classify.classify() over move statements, no human gate, DERIVED artefact with bias_citation and excluded_quarantined list",
+      "depends_on": "artefact.DERIVED/Artefact, canon.digest_of, grades.Capabilities, ingest.candidates_of, model.Overlay, repo.ModelRepo, signal_classify.SignalClassifyError/classify"
+    },
+    {
+      "file": "twin/skills.py",
+      "lines": 280,
+      "purpose": "Seam-3 skill-eval harness (decision ticket 20's determinism split): runs a skill callable against a fixture corpus using a threshold (not exact match), records scores over time in an append-only JSONL log, and detects per-model-version regressions.",
+      "key_functions": "classify_by_determinism(reproducible_from_pins) -> code|skill; load_thresholds(path) validates skill-thresholds.yaml (0<=threshold<=1); threshold_for(skill,path); EvalResult(skill,corpus_digest,threshold,items) with score (proportion, not count) and passed properties; evaluate(skill,skill_fn,corpus,scorer=_exact_match,threshold_path) runs skill_fn only on 'input', never 'expected'; record_score(result,model_version,recorded_at,path) appends one JSON line (recorded_at supplied by caller, not clock); load_scores(path) tolerant of missing file, raises on malformed line; history_for(skill,path); detect_regression(skill,path) compares latest score of the two most-recent DISTINCT model_versions (dedupe by moving re-evaluated version to end of order); toy_classifier(text) fixture skill (str.upper) with TOY_SKILL_CORPUS of 5 items",
+      "depends_on": "PACKAGE_DIR, canon.digest_of, yaml, json"
+    },
+    {
+      "file": "twin/skill-thresholds.yaml",
+      "lines": 70,
+      "purpose": "Versioned (twin.skill-thresholds/v1) pass thresholds per skill, each set deliberately below the heuristic's own measured 1.0 score on its labelled corpus (never padded up to the achieved score): toy-classifier 0.8, signal-classify 0.8, evolution-judge 0.75, causal-claims 0.8, causal-claims-grade-accuracy 0.8, gameplay-lens 0.65, substrate-generator 0.8, ethics-gate 0.8.",
+      "key_functions": "n/a (data)",
+      "depends_on": "read by twin/skills.py's load_thresholds()"
+    },
+    {
+      "file": "twin/skill-scores.jsonl",
+      "lines": 7,
+      "purpose": "Append-only score-over-time log; 7 committed entries, all model_version=heuristic-0.1.0, recorded_at=2026-08-13, all score=1.0/passed=true, one per real skill (signal-classify, evolution-judge, causal-claims, causal-claims-grade-accuracy, gameplay-lens, substrate-generator, ethics-gate).",
+      "key_functions": "n/a (data)",
+      "depends_on": "written by record_skill_scores.py's run() via twin.skills.record_score(); read by twin/skills.py's load_scores()/detect_regression()"
+    },
+    {
+      "file": "twin/record_skill_scores.py",
+      "lines": 93,
+      "purpose": "Standalone re-runnable script (own main(), no bin/twin subcommand) that actually evaluates all six real skills (plus causal-claims' second grade-accuracy metric = 7 evaluations) against their real labelled corpora and appends genuine score-over-time entries -- built because a coherence audit found the harness was unit-tested but never actually run against real skills into the real committed log.",
+      "key_functions": "_evaluate_all(tmp_dir) calls skills.evaluate() for signal_classify, evolution_judge, causal_claims (x2 scorers), gameplay_lens, substrate_generator, ethics_gate, each against its own labelled_corpus in a fresh tmp fixture repo; run(recorded_at,model_version,path) evaluates then calls record_score() per result; main(argv) CLI entrypoint prints PASS/FAIL per skill, exit code 1 if any failed",
+      "depends_on": "causal_claims, ethics_gate, evolution_judge, gameplay_lens, signal_classify, substrate_generator, skills.EvalResult/evaluate/record_score, TOOL_VERSION"
+    }
+  ],
+  "capabilities_real": [
+    "Exponential decay with a validated half-life/threshold parameter file and computed crossing dates: twin/unbound_pool.py:92-113 (weight/is_decayed/decayed_on), exercised by tests/test_unbound_pool.py:57-95",
+    "Proper scoring rules (Brier, log-loss) with a refusal on certainty claims and fixed-precision quantisation for cross-platform reproducibility: twin/scoring.py:47-64, tested for properness/orientation in tests/test_scoring.py:36-93",
+    "Reliability-diagram binning over a pooled forecast population, every bin (incl. empty) reported with None (not fabricated 0.0) averages: twin/scoring.py:129-167, tests/test_scoring.py:111-159",
+    "Enron-vs-obscure memorisation-leakage discount measured (not hardcoded) as a mean-loss gap, optionally folded with hindsight-resistance legs: twin/scoring.py:74-126, tests/test_scoring.py:172-248",
+    "Structural (not merely documented) planter/detector isolation: detector.py has zero import of planter, ignores a spliced-in ground-truth key, proven by an AST-scan harness guard referenced in module docstrings and exercised by tests/test_detector.py:17-86",
+    "Timely/late/missed scoring against a per-plant actionability horizon with day-string comparison, near-zero (not zero) late score: twin/scorer.py:84-105, tests/test_scorer.py:28-97",
+    "Deterministic, seeded substrate generation (random.Random(seed), no external entropy) proven byte-for-byte reproducible across two calls, vs. a genuinely non-reproducible os.urandom-seeded stand-in, both exercised: twin/substrate.py:118-139, tests/test_substrate.py:69-84,141-155",
+    "Substrate fidelity eval across 7 real, computed dimensions (signal_to_noise, plant_difficulty, plant_difficulty_spread, spine_consistency, reporting_asymmetry, mundanity, contamination) each against a declared target band, with genuine positive/negative control batches per dimension and a real iterative tuning loop (tune()) that measurably raises reporting_asymmetry from a balanced start until it clears its target: twin/substrate_eval.py:151-469, tests/test_substrate_eval.py (24 tests) including a hard contamination refusal (refuse_if_contaminated)",
+    "Token-overlap classification (signal_classify) proven to discriminate between multiple real-world-fixture candidates and pass a labelled corpus pooled from 4 real backtest orgs (Carillion/NMC/Wirecard/Enron): twin/signal_classify.py:77-202, tests/test_signal_classify.py",
+    "Unattended ingest pipeline structurally proven to have no human-gate parameter anywhere in its call graph (checked by test names, not just docstring assertion), with measured (not assumed) throughput from wall-clock timing: twin/ingest.py:83-165, tests/test_ingest.py:93-129",
+    "Retrospective rescue that refuses a rubber-stamp bind (requires nonzero best_match score) and computes real lead-time-to-recognition per rebound signal: twin/retrospective_sweep.py:59-120, tests/test_retrospective_sweep.py (13 tests incl. a worked multi-year quantum-signal-rescued-by-crypto-dependency case)",
+    "Scheduled sweep across a list of repositories with deliberately no staleness/hash-skip (to avoid selection bias) and per-scenario failure isolation, proven to emit identical forecast volume on repeated unchanged runs: twin/schedule.py:61-136, tests/test_schedule.py:47-58",
+    "Skill-eval harness with threshold (not exact-match) scoring, append-only score log, and per-distinct-model-version regression detection that correctly dedupes re-evaluated versions: twin/skills.py:140-263, tests/test_skills.py (14 tests) and tests/test_record_skill_scores.py",
+    "Price-move (derivative) computation from raw price-level observations, structurally forbidding any level-to-probability conversion (as_probability always raises, cited bias evidence embedded in the refusal), quarantine exclusion applied before classification: twin/market_signals.py:119-257, tests/test_market_signals.py (18 tests)"
+  ],
+  "capabilities_stubbed_or_thin": [
+    "signal_classify.classify's STEEP/binding logic is an explicit keyword+word-overlap heuristic standing in for a real model call, proven only against 'political' and 'economic' signals ('makes no claim about social, technological or environmental') -- twin/signal_classify.py:14-21,55",
+    "detector.detect's anomaly heuristic ('shares little vocabulary with its surroundings') has 'no claim to be a good anomaly detector'; it exists to prove structural blindness, not detection quality -- twin/detector.py:15-22",
+    "substrate_eval.classify_polarity is a bare keyword scan ('the same stand-in-for-judgement shape'), not a sentiment model -- twin/substrate_eval.py:24-28,92-100",
+    "substrate.generate_deterministic/generate_non_reproducible are explicitly named 'toy generators'; the real generator (build ticket 49, an actual LLM call) is 'not yet built' per twin/ingest.py's own docstring -- twin/substrate.py:10-31, twin/ingest.py:34-39",
+    "substrate_generator.py is a 'heuristic reference implementation' explicitly because 'no provider is reachable from this suite' -- not a live model call -- twin/substrate_generator.py:11-13",
+    "No CLI verb for ingest_run, market_signal_run, or record_skill_scores.py -- each is a typed function/standalone script only, by explicit design choice recorded as 'ponytail:' notes -- twin/ingest.py:41-47, twin/market_signals.py:34-37, twin/record_skill_scores.py:21-24",
+    "unbound_pool.py's own body field states the rescue mechanism is 'not implemented here' (deferred to retrospective_sweep.py) -- twin/unbound_pool.py:218-221",
+    "planter/detector share the same model family and priors by construction (SHARED_PRIOR_LIMITATION), an acknowledged, unfixed limitation published on every scorer result rather than solved -- twin/planter.py:12-16,57-62, twin/scorer.py:18-19",
+    "schedule.py explicitly does not build 'the actual cron/CI cadence that calls sweep() on a clock' nor the standing-library curation (admissibility, precondition triggers) -- twin/schedule.py:33-38",
+    "market_signals.py is built against 'a caller-supplied fixture price series' only; 'no live venue connection is reachable from this suite' -- a real Polymarket/Kalshi adapter is future work -- twin/market_signals.py:16-20",
+    "substrate_report.py explicitly cannot be replayed by 'twin verify': 'what is not automated is re-running the derivation from the envelope alone' -- twin/substrate_report.py:27-32",
+    "detect() 'always proposes its single best candidate per eligible channel' even with no real plant present -- a forced guess, not a confidence-gated detection -- twin/detector.py:60-64"
+  ],
+  "hardcoded_or_fixture_only": [
+    "twin/netflix-substrate-recipe.yaml: 24 templates + 4 planted signals, all authored fiction about 'free-running' 2011 Netflix operational chatter, seed 20111024 -- exists only as this one committed YAML file",
+    "twin/plant-horizons.yaml: 4 authored horizon dates/reasons/strengths keyed to the netflix-2011-operational recipe id -- fixture-only, explicitly 'not facts about Netflix'",
+    "twin/substrate_eval.py KNOWN_REAL_ORGS blocklist: Carillion, Enron, Wirecard, NMC Health, Kodak, Netflix, Intel, Maersk, AstraZeneca, Sanofi, Royal Mail (lines 231-234); KNOWN_REAL_PEOPLE: Jeffrey Skilling, Markus Braun, Richard Howson (line 240) -- hardcoded contamination blocklist",
+    "twin/signal_classify.py _POLITICAL_KEYWORDS = ('liquidation','bafin','administrative act') fitted specifically to the Carillion/Wirecard fixture text -- line 55",
+    "twin/signal_classify.py's labelled_corpus() and _ORGS dict hardcode component ids/names for Carillion ('carillion-uk-construction'), NMC ('uk-listed-hospital-group'), Wirecard ('third-party-acquiring-business'), Enron ('energy-trading-book') -- lines 144-161",
+    "twin/scoring.py measure_discount() is computed against caller-supplied Enron/obscure score lists but the Enron-as-contamination-control concept itself is fixture-derived from twin/fixtures.py (outside this cluster)",
+    "twin/decay.yaml: half_life_days=180 is a declared starting point, explicitly 'not yet retuned against real backtest lead times'",
+    "twin/skill-scores.jsonl: 7 fixed committed entries, all dated 2026-08-13, all model_version 'heuristic-0.1.0', all score 1.0 -- static snapshot, not live telemetry",
+    "twin/substrate_generator.py FOCUS_POOL (project-atlas, project-kestrel, etc.) and _MUNDANE_TEMPLATES/_PLANTED_SIGNALS in labelled_corpus() are hardcoded fixture text"
+  ],
+  "external_integrations": [
+    "GitHub/Kubernetes/Flux: none touched by this cluster.",
+    "gitsign/arckit: not touched directly; module docstrings reference arckit's refresh-loop design (twin/schedule.py:9-14) as inherited design ancestry only, no code dependency.",
+    "Prediction markets: twin/market_signals.py explicitly does NOT connect to any live venue (Polymarket/Kalshi) -- built entirely against caller-supplied PriceObservation fixture data; 'no live venue connection is reachable from this suite' (line 18-20). Simulated/fixture-only.",
+    "News/model-provider feeds: substrate generation (twin/substrate.py, twin/substrate_generator.py) explicitly does not call any live LLM provider; generate_non_reproducible uses os.urandom purely as an honest stand-in for unpindable model entropy, not a real API call.",
+    "No network I/O, cloud API, or external service call exists anywhere in this cluster's 20 files; all 'external' behavior is either pure computation over local YAML/JSONL fixtures or explicitly-labelled simulation."
+  ],
+  "notes": "This cluster forms a coherent pipeline: substrate.py/substrate_generator.py generate synthetic multi-channel corpora -> planter.py seals ground truth (with strength+horizon) -> detector.py finds candidates blind -> scorer.py grades timely/late/missed -> substrate_eval.py measures 7 fidelity dimensions and tunes the generator -> substrate_report.py packages both readings into one artefact. In parallel, ingest.py/market_signals.py run signal_classify.classify() unattended at volume over substrate lines and market price moves respectively, both explicitly ungated at entry and both grade-5-by-construction; unbound_pool.py/retrospective_sweep.py handle what signal_classify fails to bind (decay + rescue). schedule.py is the volume-forcing scheduler for the *forecast* side (twin run/scenarios), separate from ingest volume. scoring.py provides the proper scoring rules and reliability diagram used to grade forecasts elsewhere in the twin. skills.py/skill-thresholds.yaml/skill-scores.jsonl/record_skill_scores.py form the third evaluation seam that treats every heuristic (signal-classify, substrate-generator, etc.) as a non-deterministic 'skill' scored against a threshold rather than asserted correct by construction. Every heuristic module is candid in its own docstring about being a stand-in for a real model call ('ponytail:' notes), and every such note names an explicit upgrade path (swap the function body, harness/tests unchanged) -- this is a deliberate, well-documented pattern across the cluster rather than a hidden gap."
+}

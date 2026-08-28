@@ -1,0 +1,126 @@
+
+==============================================================================
+0. THE BASELINE — what a plain text diff of the pair looks like
+==============================================================================
+    changed lines, raw text diff : 30
+    of which are comment prose   : 19
+    substantive rule change      : 1 (one appended validation)
+
+    Reading: a raw TEXT diff is mostly prose. Parse the YAML first and
+    every comment disappears for free. That is step one of path A.
+
+==============================================================================
+1. PATH A — parse the rendered artefacts, recover the delta by diff
+==============================================================================
+
+  require-nonroot 1.0.0 -> 2.0.0
+    (the pair cs-06 names: byte-identical CEL copied, version hand-edited in 4 places, one rule appended)
+    paired on identity: 'require-nonroot' == 'require-nonroot'
+    + object.spec.containers.all(c, c.?securityContext.?readOnlyRootFilesystem.orValue(false) == true)
+
+  department-label 1.0.0 -> 2.0.0
+    (cs-01's known-good MAJOR: Audit -> Deny, body untouched)
+    paired on identity: 'require-department-label' == 'require-department-label'
+    actions ['Audit'] -> ['Deny']
+
+  known-department-label 2.0.1 -> 2.1.1
+    (cs-01's known-good PATCH: enum widened +legal)
+    paired on identity: 'require-known-department-label' == 'require-known-department-label'
+    + !has(object.metadata.labels) || !('department' in object.metadata.labels) || object.metadata.labels['department'] in ['platform', 'finance', 'security', 'engineering', 'legal']
+    - !has(object.metadata.labels) || !('department' in object.metadata.labels) || object.metadata.labels['department'] in ['platform', 'finance', 'security', 'engineering']
+
+  owner-annotation, absent at 2.0.1 -> present at 2.1.1
+    (cs-01's known-good MINOR, and the one bump no verdict can show)
+    presence: NEW only; actions ['Audit']
+    Reading: this needs no delta at all. It is a set difference over
+    identities plus that actions field. Inheritance is not involved.
+
+==============================================================================
+2. PATH B — one source, the delta IS the source, rendered down to flat
+==============================================================================
+    render 1.0.0 == committed flat file (parsed): YES
+    render 2.0.0 == committed flat file (parsed): YES
+
+    Constraint held: each rendered version still self-scopes via
+    matchConditions, so 1.0.0 and 2.0.0 coexist exactly as today.
+
+  require-nonroot 1.0.0 -> 2.0.0, delta read off the source:
+    + object.spec.containers.all(c, c.?securityContext.?readOnlyRootFilesystem.orValue(false) == true)
+
+    path A delta == path B delta: YES
+
+==============================================================================
+3. ADVERSARIAL — where path A is wrong, on purpose
+==============================================================================
+
+  1. A value that happens to equal the version string (pin-image).
+     true delta: EMPTY. The approved image tag stayed at 1.0.0.
+     path A says:
+       + object.spec.containers.all(c, c.image.endsWith(':1.0.0'))
+       - object.spec.containers.all(c, c.image.endsWith(':${V}'))
+     FALSE POSITIVE: yes
+
+  2. Two rules, order swapped (two-rules).
+     true delta: EMPTY.
+     positional compare: 2 added, 2 removed  <- wrong
+     set compare       : 0 added, 0 removed  <- right
+
+     Path B is immune to both: rules carry an id, and the version
+     is a {{version}} placeholder rather than a literal to guess at.
+
+==============================================================================
+4. IS THE PAIRING KEY ACTUALLY UNIQUE? — checked against the live estate
+==============================================================================
+    graded-enforcement       8 policy version(s), versions=['2.0.0', '2.0.1', '3.0.0', 'None']
+    platform-machinery       2 policy version(s), versions=['None']  <- SAME identity, DIFFERENT policies, no version label
+    posture                  8 policy version(s), versions=['2.0.0', '2.0.1', '3.0.0', 'None']
+    require-nonroot          4 policy version(s), versions=['1.0.0', '2.0.0', '2.0.1', '3.0.0']
+
+    Reading: the identity label is a FAMILY name, not a unique key.
+    1 family/families group several distinct policies with no
+    version label at all, so (identity) alone cannot pair a predecessor.
+    The gate's key must be (identity, name-with-version-stripped), and it
+    must refuse — not guess — when a member carries no version label.
+
+==============================================================================
+VERDICT
+==============================================================================
+  A rendered-artefact diff is ENOUGH for the gate. Inheritance leaves this map.
+
+  The reason is not that the diff is clean. It is that the gate never
+  classifies from the delta:
+
+    identity   -> a stable label already on every policy that reaches a pod
+                  (policy-as-versioned.dev/policy). Pairing needs no diff.
+                  But section 4: that label is a FAMILY name, not a unique
+                  key. The pairing key is (identity, name-with-version-
+                  stripped), and an unversioned member must fail the gate.
+    major      -> from verdict movement on the corpus (cs-01), plus the
+                  actions field. Not from the delta.
+    minor      -> from PRESENCE of a policy name plus its actions (cs-01
+                  proved verdict movement cannot see it). A set difference,
+                  not a delta.
+    patch      -> from verdict movement on the corpus. Not from the delta.
+    corpus     -> cs-03 enumerates per CEL expression. That wants the LIST
+                  of expressions on each side. A list, not a delta.
+
+  So the delta is only ever evidence prose for the reviewer. Adversarial 1
+  shows the cost of getting it wrong: a noisy line in the evidence, next to a
+  bump that was still computed correctly from the evaluated verdicts.
+
+  What path A does need, and this spike is the reason to write it down:
+    - Parse the YAML. Never text-diff. Comments are 60% of the raw noise.
+    - Pair on (identity label, metadata.name with the version stripped).
+      The label alone is a family name: section 4 finds two families whose
+      members are different policies carrying no version label at all. Those
+      must fail the gate loudly rather than pair by accident.
+    - Compare rules as a SET (adversarial 2).
+    - Treat a normalised-version difference as UNPROVEN, not as a change
+      (adversarial 1).
+
+  If inheritance ships anyway as the DRY win it is, path B renders down to
+  today's flat, self-scoping files with no runtime change, and the minimum
+  shape is three ops: actions, addValidations, replaceValidations. That is
+  the whole of the estate's real release line. It is a follow-on effort.
+self-check: all assertions held
+EXIT:0

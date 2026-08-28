@@ -1,0 +1,96 @@
+[1;36m==>[0m 0. the live spine — nine real, dated, cited signals, no outcome, ever
+intel model repository -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.0rJF61Id/intel
+  deterministic: same content, same commit sha, on every machine
+  2024-07-01  world layer
+  2024-07-15  the overlay and the scenario, before the first checkpoint
+  2024-08-01  checkpoint: q2-2024-results-2024-08-01
+  2024-12-02  checkpoint: gelsinger-retires-2024-12-02
+  2025-01-31  checkpoint: falcon-shores-cancelled-2025-01-31
+  2025-03-12  checkpoint: tan-appointed-ceo-2025-03-12
+  2025-08-22  checkpoint: us-government-equity-stake-2025-08-22
+  2025-09-18  checkpoint: nvidia-5bn-investment-2025-09-18
+  2026-01-23  checkpoint: tan-14a-customer-guidance-2026-01-23
+  2026-07-22  checkpoint: fortinet-foundry-deal-2026-07-22
+  2026-07-23  checkpoint: q2-2026-results-2026-07-23
+[1;36m==>[0m 0b. THE SENSE STEP — a bound signal is an observation, and belief updates both ways (build ticket 80)
+bound-signal -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.0rJF61Id/artefacts/sense.json
+  attestation  sense.json.att.json (agent-signed (origin only))
+  sha256       3e0c39046bfb6d75b5663d8dd1904a1ad98e2242c4cf9a0c2cc72d06022f3d60
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+  signal tan-14a-customer-guidance-2026-01-23 binds leading-edge-foundry-node; the observation walk ran both ways and found UPSTREAM ['euv-lithography'] (the EUV causal edge, build ticket 81), DOWNSTREAM (none — nothing causal leaves this component yet)
+[1;36m==>[0m 0c. THE REAL CAUSAL CLAIM — EUV delay -> process-node slip (build ticket 81, decision ticket 08 AC 5)
+==> intel: a shock at 'euv-lithography' composes to 1 component(s) along 1 causal path(s)
+  * leading-edge-foundry-node  depth 1  composed 0.2000/0.4000/0.6500  x1.0 -> 0.2000/0.4000/0.6500  sampled p50 0.4078
+  a composed influence is scaled by the factor at its depth; past depth 4 it carries a direction and **no magnitude** — the path is still named, graded and dated, because a direction a reader cannot locate in the graph is not a direction
+  several paths out of one shock share ancestry, so summing them double-counts. They are still never summed: a component with at least one path inside the attenuation boundary carries a `joint` figure combined by noisy-OR, with the dependence carried structurally — dependence is structural rather than fitted — a shared edge is drawn once per trial, so paths agree exactly to the extent that they share edges. Assumed: conditional on the shared edges the disjoint remainders are independent. Not modelled: a common cause the graph does not contain, so this corrects the double-counting the graph can see and claims nothing about the rest
+propagation -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.0rJF61Id/artefacts/propagate.json
+  attestation  propagate.json.att.json (agent-signed (origin only))
+  sha256       1dd05d96a14661b7d5a92ffb4214b3e5bfc938f668a19d5eb5f0ce90606af71e
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+  euv-lithography -> leading-edge-foundry-node: grade 2, negative, composed 0.200/0.400/0.650 — a real, cited, priceable elasticity, the Netflix co-flagship's own Qwikster->churn edge matched rather than left as this org's one remaining gap
+[1;36m==>[0m 1. the scheduled production line — no --scenario flag exists on this command
+==> sweep across 1 repo(s): 2 execution(s), 4 forecast(s), 0 failure(s)
+sweep -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.0rJF61Id/artefacts/sweep.json
+  attestation  sweep.json.att.json (agent-signed (origin only))
+  sha256       9dfe5ec7212febd0999f0534de08030f5cb5f86f46215135978f241e63cd9573
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+[1;36m==>[0m 2. pinned and signed: the sweep artefact's attestation
+==> checking sweep.json.att.json against /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-beat.0rJF61Id/artefacts/sweep.json
+  subject      sweep 9dfe5ec7212febd0 (derived)
+  agent        218c7ae320e9d9ef, asserts origin only
+
+HOLDS: the sidecar attests these exact bytes, and no human touched this derived artefact.
+[1;36m==>[0m 3. the same forecast, reproduced independently through the ordinary run verb
+==> reproducing /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-beat.0rJF61Id/artefacts/forecast-bundle.json from its pins
+  ok   forecast-bundle    3c891bc1da4eef0c (recorded 3c891bc1da4eef0c)
+  tolerance: none — byte identity. Scores carry a declared 12-significant-digit quantisation in the format.
+
+REPRODUCES: the pins are sufficient to recompute this artefact exactly.
+[1;36m==>[0m 3a. the opportunity half of decision ticket 13 AC 7 — the same real EUV edge, read upside
+==> reproducing /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-beat.0rJF61Id/artefacts/opportunity-bundle.json from its pins
+  ok   forecast-bundle    45bbf1a716fc3005 (recorded 45bbf1a716fc3005)
+  tolerance: none — byte identity. Scores carry a declared 12-significant-digit quantisation in the format.
+
+REPRODUCES: the pins are sufficient to recompute this artefact exactly.
+[1;36m==>[0m 3b. the sweep and both standalone runs agree byte-for-byte — nothing here was hand-made
+  ok   does-the-14a-bet-land-a-named-customer: 2 forecast(s), 2 distinct: [0.3, 0.55]
+  ok   euv-readiness-wins-the-14a-opportunity: 2 forecast(s), 2 distinct: [0.5, 0.7]
+  ok   sweep-embedded digests == standalone `twin run` digests, both scenarios
+[1;36m==>[0m 4. explicitly unscoreable — published in the artefact's own body, not a placeholder
+  ok   the emitted forecast names its own unscoreability, resolution window and checking procedure
+[1;36m==>[0m 5. the refusal is real, checked live, not narrated
+  ok   twin score: VerbError: no outcome 'any-outcome-at-all' in overlay 'intel' (have: none)
+[1;36m==>[0m 6. the demo's own depth grade — computed, never typed
+==> scenario-engine: full  (7/7 of decision ticket 13)
+  [x] 1. The scenario object defined, incl. its references and its relationship to forecasts.
+        build ticket 06: twin/verbs.py run() — a scenario references {components, graph version, world models, time} and emits forecasts as a list, always, one per named world model.
+  [x] 2. Concrete semantics for fast-forward, rewind and play, each distinguished.
+        build ticket 37: twin/verbs.py run() is fast-forward — projection with no intervention, demonstrated in tests/test_four_verbs.py::test_projection_is_run_with_no_intervention. twin/primitives.py rewind() is the time half of rewind (build ticket 35) and twin/regimes.py the information-gate half (build ticket 36). twin/primitives.py Do is play (build ticket 22). Build ticket 37 composes the two primitives into all four operations — projection alone, do() alone (act-now), rewind+do() (the counterfactual), rewind+run() (the backtest, `twin backtest`) — with no backtest-specific code path: harness guard backtest_is_a_pure_composition asserts an explicit rewind+run computes the identical forecast run() alone computes at the same time, differing only in which command produced it.
+  [x] 3. Where scenarios live + how they are versioned/diffed.
+        build ticket 88: Git already supplied the storage/versioning half (build ticket 06); the gap was the renderer. twin/scenario_diff.py's diff() (build ticket 88) takes a scenario id and two git refs — branch-per-scenario (research 03) or two commits on one branch alike, since ModelRepo.open(path, ref=...) already opens either — and reports a field-level diff of the scenario itself (question, proposition, at, horizon, components, world_models) plus a map-diff of every component either side's overlay places (Graph.wardley(), no separate authoring step). Wired as `twin scenario-diff` (twin/cli.py cmd_scenario_diff). tests/test_scenario_diff.py exercises a real repository with a real `explore` branch: a scalar field change and a component's evolution-stage regression both reported, an unchanged field/component not reported, identical refs diffing to nothing, a scenario authored on only one side reported via `scenario_present` rather than refused (mid-flight branch-per-scenario authoring is a real state), and absence at both sides refused.
+  [x] 4. How opportunity/gameplay moves are proposed, with the negativity counterweight addressed.
+        build ticket 46: twin/gameplay_lens.py propose() checks a two-play catalogue (land-grab, exploit-commoditisation) against the current map's evolution positions, needs-edge dependency structure and ownership, with the reason and the checked preconditions attached per opportunity. gameplay_lens.sweep() runs it unconditionally across every org overlay of every named repository, no human naming a component — the structural pull against the record's push (decision ticket 13 Q3) — and reports opportunity-candidate volume beside each org's bound-signal volume in the same artefact so the counterweight is measurable.
+  [x] 5. Admissibility rule for the scenario library.
+        build ticket 69: twin/schema.py's closed COMMITTED_SCENARIO_CLASSES enum and the optional scenario.class field make "belongs to the standing library" mechanical: a scenario is admissible by carrying one of the nine committed classes (or by being unconditionally swept per build ticket 09 — decision ticket 13's other admissibility arm). fixtures.build_library_org populates all nine; harness guard standing_library_covers_committed_classes (twin/invariants/checks.py) fails CI the moment one is silently dropped, demonstrated in tests/test_scenario_library.py::test_dropping_a_committed_class_from_the_library_fails_the_invariant. The full "preconditions/triggers checkable against the map" reading of admissibility — the precondition-triggered arm — stays for build ticket 46 (gameplay-lens); this ticket closes only the committed-set arm.
+  [x] 6. A selection/prioritisation rule for which scenarios run (the combinatorics answer).
+        build ticket 88: The four tiers decision ticket 13 names — standing library, precondition-triggered, event-triggered, ad-hoc — are proven the complete, non-overlapping set by checking the source directly (build ticket 88), the same discipline harness guard `backtest_is_a_pure_composition` already uses for a structural CLI-command claim. tests/test_scenario_selection_tiers.py: exactly two primitives can produce a scenario execution or an opportunity — verbs.run() and gameplay_lens.propose()/.sweep() — and every call site of either across twin/*.py is one of schedule.py (tier 1, standing library, unconditional loop over every scenario in every overlay — no scenario named), gameplay_lens.py (tier 2, unconditional map scan — no component named), or cli.py's cmd_run/cmd_backtest (tiers 3 and 4, event-triggered and ad-hoc, sharing the identical call because decision ticket 13 distinguishes them only by why a human or automation invoked it, not by a different code path); reproduce.py's replay() also calls verbs.run() but originates nothing — it reads the scenario id out of an already-emitted artefact's own recorded command, never a fresh argument. A fifth caller of either primitive anywhere in twin/*.py would fail the test.
+  [x] 7. Exercised on one fear scenario and one opportunity scenario across the co-flagships.
+        build ticket 88: Netflix already had both (build ticket 74): the fear scenario rewound under `as-consumed` (`twin backtest`) and the opportunity a `land-grab` on `streaming-service` pulled by `twin gameplay-sweep`. Intel had only its fear scenario on the real spine (`does-the-14a-bet-land-a-named-customer`, build ticket 75); its opportunity side existed only as the toy `euv-slip-2026` fixture citing `example.invalid`, unrelated to the real spine. Build ticket 88 adds `euv-readiness-wins-the-14a-opportunity` to `fixtures.build_intel_org` — the real, cited EUV causal edge build ticket 81 added (`euv-lithography` -> `leading-edge-foundry-node`), read the upside way: does the subject's own High-NA EUV tooling readiness hold through its own named 2026 go/no-go, positioning it to win the external customer commitment, the reverse of the historical slip the same edge's own note cites. Named honestly rather than forced into the identical shape Netflix's own opportunity took: `gameplay_lens.propose()` finds nothing to pull on this org's overlay (no person edges, no component near the product/commodity band — checked live, not assumed), so the opportunity is authored as a scenario on the same real edge and world models the fear scenario already uses, not pulled by the sweep. Exercised live in `twin/beat-intel.sh` steps 3a/3b (both scenarios run standalone and inside `twin sweep`, byte-identical, plural distinct forecasts each) and asserted in tests/test_intel_beat.py::test_the_opportunity_scenario_is_framed_as_a_win_not_a_threat, ::test_the_opportunity_scenario_is_built_on_the_real_euv_edge_not_a_toy_one (no `example.invalid` anywhere in the emitted artefact), ::test_the_opportunity_forecast_is_plural_and_the_ensemble_genuinely_disagrees, and ::test_no_outcome_is_authored_for_the_opportunity_scenario_either — the same permanent honesty as the fear scenario, since this org's story has not happened yet either way. The toy `euv-slip-2026` fixture in the walking-skeleton `intel` overlay (`fixtures.build()`, distinct from `build_intel_org`) is left as-is: it was never the real spine and this criterion was never asking for that fixture to change, only for the real spine to stop lacking an opportunity side.
+
+PASS: swept through the scheduled production line, pinned and agent-signed, reproduced
+byte-for-byte through an independent run of the same scenario. The forecast names its own
+unscoreability, its resolution window and its checking procedure in the artefact itself, and
+`twin score` genuinely refuses it today — for a different, stated reason than Royal Mail's
+or Netflix's own refusals: this story has not happened yet.
+
+artefacts: /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-beat.0rJF61Id/artefacts
+EXIT=0

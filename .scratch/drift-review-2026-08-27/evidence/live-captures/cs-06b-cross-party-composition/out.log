@@ -1,0 +1,431 @@
+
+==============================================================================
+0. WHAT PLATFORM REALLY PUBLISHES — read from .estate-clone
+==============================================================================
+    version array declares: ['2.0.0', '2.0.1', '3.0.0']
+    posture                    2.0.0   Deny   distribution  installed
+    posture                    2.0.1   Deny   distribution  installed
+    posture                    3.0.0   Deny   distribution  installed
+    require-nonroot            1.0.0   Audit  distribution  NOT installed by the array
+    require-nonroot            2.0.0   Audit  distribution  installed
+    require-nonroot            2.0.1   Audit  distribution  installed
+    require-nonroot            3.0.0   Audit  distribution  installed
+
+    control -> the policies claimed as its evidence:
+    ac-6                   ['require-nonroot']
+    cm-6                   ['governed-namespace-requires-claim']
+
+==============================================================================
+1. THE INHERITANCE GRAPH — driftwood, as the estate really pins it
+==============================================================================
+    driftwood -> platform              implementations  @0.1.0
+    driftwood -> platform -> nist      controls         @1.0.0
+    driftwood -> nist                  controls         @1.0.0
+    driftwood -> ico                   pricing          @1.0.0
+    driftwood -> platform              threat           @v1
+    driftwood -> platform -> nist      controls         @1.0.0
+
+    nist is reached by 3 routes, at 1 version(s): directly, and through platform
+    (twice, because platform is itself inherited for two different
+    kinds). That is the diamond, and it is live today.
+    ONE version across every route, so there is nothing to refuse.
+    Section 5 splits it and shows what happens then.
+
+==============================================================================
+2. BASELINE COMPOSITION — what driftwood must satisfy
+==============================================================================
+    inherited baseline: ['nist-800-53:ac-6', 'nist-800-53:cm-6']
+
+    A subclass inherits its parent's requirements and may add to them.
+    It may never drop one. That is the abstract-method contract.
+
+==============================================================================
+3. COVERAGE — four real gaps, found by composing, not by review
+==============================================================================
+    REFUSED: 2 control(s) in the baseline have no live implementation
+    REFUSED: 1 workload(s) pin a version the composed array no longer declares
+      uncovered nist-800-53:ac-6: no policy claims this control at all
+      uncovered nist-800-53:cm-6: no policy claims this control at all
+      orphan driftwood-app pins 1.0.0
+
+    All four are facts about the estate as it stands today:
+    1. cm-6's only claimed evidence is 'require-policy-version'. No
+       ValidatingPolicy of that name exists anywhere in the estate.
+       The real guard is named policy-version-orphan-guard. The name
+       appears only in the OSCAL map and in a hand-authored fixture
+       PolicyReport, which is why the up-flow passes today.
+    2. ac-6 claims may-run-root-if-attested, which is real, but it
+       lives in policy/policies/ and the version array only ever
+       reconciles distribution/policies/. Flux never installs it.
+       ac-6 is still covered, by require-nonroot. The CLAIM is wider
+       than the reality, which is why this is OVERCLAIMED, not
+       uncovered. It would become uncovered the moment require-nonroot
+       moved trees.
+    3. LATENT, not live. The component definition writes control ids
+       ['ac-6', 'cm-6'], and the
+       catalogue writes them lowercase and UNPREFIXED ('ac-6').
+       Two mismatches, not one: case AND the 'nist-800-53:' prefix.
+       Nothing in the estate resolves one against the other today, so
+       nothing is broken yet. It breaks the resolver this spike
+       proposes. Be clear about what this spike does NOT do: it folds
+       case against its OWN baseline in material/parties/nist.yaml,
+       which was hand-authored in the prefixed form. The cure is
+       untested against the real catalogue.
+    4. Nothing in the estate declares a baseline. nist ships 1196
+       controls. The estate implements two. The baseline in
+       material/parties/nist.yaml is this spike's proposal, not a
+       reading of an existing file. It is needed for the ac-6.10 case
+       (a required control nothing claims). Gaps 1 and 2 need no
+       baseline: a lint of the component definition against the
+       policy trees finds both. Composition is not the only way.
+
+==============================================================================
+4. SAME VERSION, TWO TREES — CLOSED by the estate, not by this spike
+==============================================================================
+    (none)
+
+    The first pass found v1.0.0 declared by BOTH distribution/ and
+    policy/, each self-scoping on the same claim, and raised it as the
+    map's open question. cs-16 then DELETED policy/policies/ and folded
+    may-run-root-if-attested's widening into require-nonroot@2.0.1.
+    The collision is gone because the tree is gone. cs-22 kept the gate
+    rule that refuses it, so a reappearance still fails. Recorded as an
+    answered question, not a passing check.
+
+==============================================================================
+5. SCENARIO — the regulator bumps. A minor upstream, a break downstream
+==============================================================================
+    driftwood moves its nist pin to 2.0.0. platform stays on 1.0.0.
+    REFUSED: diamond: nist (controls) is inherited at 2 versions -> 1.0.0 via driftwood -> platform -> nist , driftwood -> platform -> nist; 2.0.0 via driftwood -> nist
+    REFUSED: 3 control(s) in the baseline have no live implementation
+    REFUSED: 1 workload(s) pin a version the composed array no longer declares
+      uncovered nist-800-53:ac-6: no policy claims this control at all
+      uncovered nist-800-53:cm-6: no policy claims this control at all
+      uncovered nist-800-53:ac-6.10: no policy claims this control at all
+      orphan driftwood-app pins 1.0.0
+
+    Two refusals at once, and they are different failures. The diamond
+    splits, AND the new control ac-6.10 has no implementation anywhere.
+    At nist this bump only ADDS a control. Nothing existing changed.
+    At driftwood it breaks the build. The bump is institution-relative,
+    which is ticket cs-02's finding seen from the other side.
+
+==============================================================================
+6. SCENARIO — the aligned bump. Both parents move together
+==============================================================================
+    platform and driftwood both move to nist 2.0.0.
+    REFUSED: 3 control(s) in the baseline have no live implementation
+    REFUSED: 1 workload(s) pin a version the composed array no longer declares
+      uncovered nist-800-53:ac-6: no policy claims this control at all
+      uncovered nist-800-53:cm-6: no policy claims this control at all
+      uncovered nist-800-53:ac-6.10: no policy claims this control at all
+      orphan driftwood-app pins 1.0.0
+
+    The diamond closes. The uncovered control does not. Aligning the
+    pins was never the fix; someone has to implement ac-6.10.
+
+==============================================================================
+7. SCENARIO — platform retires a version. Invisible in any policy diff
+==============================================================================
+    platform deletes 1.0.0 from the version array. driftwood's own
+    workload pins 1.0.0 (gitops/apps/version-configmap.yaml).
+    REFUSED: 2 control(s) in the baseline have no live implementation
+    REFUSED: 1 workload(s) pin a version the composed array no longer declares
+      uncovered nist-800-53:ac-6: no policy claims this control at all
+      uncovered nist-800-53:cm-6: no policy claims this control at all
+      orphan driftwood-app pins 1.0.0
+
+    No policy BODY changed. No diff of any rule shows this. The
+    orphan-guard refuses driftwood's workload at admission, so for
+    driftwood this is a major. For platform it is one array element.
+
+==============================================================================
+8. A SUBCLASS CANNOT SATISFY AN INHERITED RULE — it is caged, not excused
+==============================================================================
+    A legacy till needs CAP_NET_RAW. It cannot meet condition C in
+    may-run-root-if-attested. It does not get an override and it does
+    not get an exemption. The £ prices the residual against THIS
+    party's appetite band and picks the loosest cage that fits.
+    Priced from the estate's own scenario for exactly this deviation:
+    policy/scenarios/driftwood-root-residual.json
+
+    party        band £/yr  tier        action  residual  +controls    = TCoR
+    driftwood       40,000  baseline    Cage      14,952        500    15,452
+    tuppence        15,000  baseline    Cage      14,952        500    15,452
+    ludlow           5,000  quarantine  Cage       1,709      6,000     7,709
+
+    The band is compared against the RESIDUAL, not the TCoR: the cage's
+    own run-cost is a booked cost, not retained risk. tuppence's TCoR
+    sits over its band for that reason and is still proportionate.
+
+    Same rule, same inability, three answers. That is proportionality,
+    not a favour. Nobody asked, and nobody was granted anything.
+
+    Two things this scenario does NOT prove, said plainly:
+    * tuppence fits baseline by about £48 on a Monte-Carlo output.
+      One knob twitch flips this table's centrepiece.
+    * The rule it cannot meet is may-run-root-if-attested, which
+      gap 2 above proves the version array NEVER INSTALLS. It cages
+      against a rule not in force. The mechanism is sound; this
+      particular subject is not yet real.
+
+==============================================================================
+9. INFORMED — a bump to a PRICING parent re-prices every cage below it
+==============================================================================
+    ico publishes a signed, versioned penalty schema and no rules at
+    all. Bumping it is a dependency bump like any other. Here the
+    SAME uk-gdpr lower-tier exposure is priced at v1 and at v2,
+    through ico's OWN converter. lower-tier is the entry v2 actually
+    changed, so this is the real diff, not a chosen one.
+
+    ico penalty-schema v1  ->  uncaged £  16,901,472   Deny
+    ico penalty-schema v2  ->  uncaged £   9,039,791   Deny
+    the bump moves the priced exposure by £7,861,681.
+    v2's changelog says why: it adds the Doorstep Dispensaree notice,
+    a smaller real case that pulls the lower-tier mode down.
+
+    Same for the threat register, which raises tuppence's LEF at v2:
+    threat-register v1     ->  uncaged £     222,574   Deny
+    threat-register v2     ->  uncaged £     326,139   Deny
+
+    HONEST RESULT: the pricing parents are genuinely consumed and the
+    numbers genuinely move. THE DECISION DOES NOT. Every subject above
+    sits far over every band in the estate, so both versions land on
+    the same rung. On the estate's real feeds and real bands, NO feed
+    bump changes a cage decision. The wiring is proved; the claim
+    'a feed bump re-tunes every cage below it' is proved for the PRICE
+    and NOT for the outcome. Do not read more into it than that.
+
+==============================================================================
+9b. BUT A FEED MUST NOT APPLY THE CHANGE ITSELF — ADR-0006 / ADR-0010
+==============================================================================
+    The EOL feed is time-varying: to_fair_scenario.py ramps LEF by how
+    far --as-of sits past the eol_date. Nothing is edited at all, and
+    the price still moves:
+
+    as-of 2025-10-31  ->  proposed tier baseline    Cage
+    as-of 2026-08-21  ->  proposed tier restricted  Cage
+    as-of 2027-08-21  ->  proposed tier restricted  Cage
+    as-of 2029-08-21  ->  proposed tier quarantine  Cage
+
+    An earlier draft of this spike called that "the cage tightens on
+    its own" and treated it as a feature. THAT WOULD VIOLATE A DECIDED
+    ADR. ADR-0006's later extension is explicit: timed nudges to humans
+    are fine "as long as nothing timed ever changes an admission
+    verdict on its own, and every resulting change still lands via a
+    reviewed, human-merged PR". ADR-0010 is named for the same rule:
+    sunset is SCHEDULED PROPOSALS, NOT APPLICATION. And cs-02 settled
+    that the cage SPEC is the verdict, so a self-tightening cage is a
+    timed verdict change, not a nudge.
+
+    So the correct output of every row above is a PROPOSED tier that
+    the agent governance layer raises as a reviewed PR. It prompts
+    editorial review; it never edits enforcement. The word 'proposed'
+    above is doing real work, and this spike does not implement the
+    proposer.
+
+==============================================================================
+10. RENDER DOWN — the hard constraint still holds
+==============================================================================
+    require-nonroot@1.0.0: strip the composition's additions -> equals the committed file: YES
+    require-nonroot@2.0.0: strip the composition's additions -> equals the committed file: YES
+    require-nonroot@2.0.1: strip the composition's additions -> equals the committed file: YES
+
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+metadata:
+  name: require-nonroot-2-0-0
+  labels:
+    app.kubernetes.io/part-of: platform
+    policy-as-versioned.dev/policy: require-nonroot
+    policy-as-versioned.dev/policy-version: 2.0.0
+    policy-as-versioned.dev/composed-for: driftwood
+  annotations:
+    policy-as-versioned.dev/inherited-from: platform@0.1.0
+    policy-as-versioned.dev/source-path: distribution/policies/v2.0.0/require-nonroot.yaml
+spec:
+  validationActions:
+  - Audit
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: only-this-policy-version
+    expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '2.0.0'
+  validations:
+  - expression: object.spec.?securityContext.?runAsNonRoot.orValue(false) == true
+    message: pods on policy-version 2.0.0 must set spec.securityContext.runAsNonRoot=true
+
+    The WHOLE body is carried: validations, matchConstraints,
+    matchConditions. The composition adds one label and two
+    annotations, all advisory, none read by the engine. Strip them and
+    the committed file is what is left, which is what the check above
+    asserts. Flat, per version, self-scoping on matchConditions, so
+    runtime inheritance stays ruled out and multi-version coexistence
+    is untouched.
+
+==============================================================================
+11. TICKET 06 — THE OTHER FIVE. The whole live set, not 3 of 8
+==============================================================================
+    the version tree v3.0.0 ships: {'GeneratingPolicy': 1, 'MutatingPolicy': 2, 'ValidatingPolicy': 2, 'PriorityClass': 3}
+
+    family                 member                         kind               declares
+    graded-enforcement     cage-netpol                    GeneratingPolicy   3.0.0
+    graded-enforcement     cage-tier                      MutatingPolicy     3.0.0
+    platform-machinery     policy-version-orphan-guard    ValidatingPolicy   — (platform tag)
+    posture                posture-trust-boundary         ValidatingPolicy   3.0.0
+    posture                stamp-posture                  MutatingPolicy     3.0.0
+    require-nonroot        require-nonroot                ValidatingPolicy   3.0.0
+
+    render down, every member, every kind:
+    cage-netpol                    FAITHFUL
+    cage-tier                      FAITHFUL
+    policy-version-orphan-guard    FAITHFUL
+    posture-trust-boundary         FAITHFUL
+    stamp-posture                  FAITHFUL
+    require-nonroot                FAITHFUL
+
+    FOUR OF THE FIVE ARE NO LONGER UNVERSIONED. cs-03 counted eight live
+    policies, five carrying no version. cs-12's render-version-tree.py now
+    emits cage-tier, cage-netpol, stamp-posture and posture-trust-boundary
+    into EVERY version tree, self-scoped on the claim. They compose exactly
+    as require-nonroot does, and they render back down byte-identical. The
+    ticket's premise was true when it was written and the estate has since
+    overtaken it.
+
+    THE FIFTH CANNOT BE VERSIONED, AND THAT IS CORRECT. The orphan guard is
+    the aggregate OVER the array, so it cannot self-scope to one claim. cs-22
+    gave it the `platform-machinery` identity: numbered by the platform tag.
+    Composition must carry a second numbering axis, not force it onto the
+    first. This section renders it from the array through the estate's own
+    render-orphan-guard.py, so the simulated list-membership check the first
+    pass admitted to is now gone.
+
+    WHAT COMPOSING THEM CHANGED, and it is a real defect in this spike:
+    1. An ACTION IS A VALIDATINGPOLICY CONCEPT. render() wrote
+       spec.validationActions unconditionally, which invents a field on a
+       MutatingPolicy and a GeneratingPolicy. Fixed above. The consequence is
+       bigger than the fix: the Audit < Deny strictness ladder that
+       overlay.restate compares on has NO MEANING for 3 of the
+       6 members. A subclass cannot tighten a mutate. What it can do to a
+       cage is change the TIER, which is a label the £ sets upstream — so
+       ticket 05's proposer, not the overlay, is the only legal path.
+    2. THE IDENTITY LABEL IS A FAMILY, NOT A KEY. `graded-enforcement` covers
+       cage-tier, cage-netpol and three PriorityClasses; `posture` covers two
+       policies. load_publications() keys on (label, version), so a second
+       member of one family SILENTLY OVERWRITES the first. It has not fired
+       yet only because one ValidatingPolicy per family per version exists.
+       That is luck. cs-22 already settled the cure for the gate — key on
+       identity AND the name with its version stripped — and the resolver
+       needs the same key. This section uses it.
+    3. TWO OF THE EIGHT MUTATE, so composition order is now observable.
+       stamp-posture writes the label posture-trust-boundary validates, and
+       cage-tier writes the label cage-netpol generates from. Rendering flat
+       per version does not express that, and Kyverno's webhook ordering is
+       what makes it work. Composition inherits that dependency without
+       stating it. Not a defect found today, but it is the first thing a
+       second implementations publisher would break.
+
+    ONE HONEST LIMIT ON THE CHECK ABOVE. Five of the six render back down to a
+    COMMITTED file. The orphan guard has no committed rendered form — the repo
+    holds the Go template inside versions.yaml — so its row compares against
+    the estate's own render-orphan-guard.py output. That proves composition
+    carries the guard unchanged. It does NOT prove the twin matches what
+    flux-operator renders in-cluster. verify-orphan-guard.sh covers that, and
+    this spike does not run a cluster.
+
+==============================================================================
+VERDICT
+==============================================================================
+  Cross-party inheritance is a REAL and MISSING layer. The earlier spike
+  answered a narrower question and does not settle this one.
+
+  It is now its own map (.scratch/policy-composition/). computed-semver takes
+  exactly one fact from it: the bump is a property of a composition, so the
+  gate computes it after composition.
+
+  What composition is, in this estate. Parents are of DIFFERENT KINDS, and
+  that is the part a flat pin model cannot express:
+    nist       CONTROLS          what must hold. The abstract base.
+    platform   IMPLEMENTATIONS   how. The concrete class.
+    ico        PRICING           prices the consequence. No rules at all.
+    feeds      THREAT            moves the price. No rules at all.
+    driftwood  (adopter)         the subclass, and the diamond.
+
+  Four gaps fell out of composing what is already committed, before any
+  scenario ran. Two of them a plain lint would also find, and saying otherwise
+  would be self-serving:
+    * cm-6's claimed evidence names a policy that does not exist. (A lint
+      finds this. Composition is not required.)
+    * ac-6's second implementation is never installed by the version array.
+      (A lint finds this too.)
+    * the component definition's control ids match neither the catalogue's
+      case nor its lack of a prefix. LATENT: nothing resolves them today.
+    * no baseline is declared anywhere. THIS one needs composition: it is what
+      catches a required control that nothing claims at all.
+
+  What it does to the bump, which is this map's business:
+    * The bump is a property of a COMPOSITION, not of a file. A regulator's
+      addition is a downstream build break. A retired array element is a
+      downstream major with no policy diff at all.
+    * cs-01's method is EXTENDED, not unchanged. Its verdict-movement half
+      works as-is on the composed OLD and NEW sets, because composition is
+      rendering. But a composition also refuses on COVERAGE — an uncovered
+      control, a split diamond — with zero verdict movement. That is a second
+      structural axis, exactly as cs-01's minor finding was a first.
+    * The publisher still tags ONE bump, computed at the strictest band, with
+      the per-institution matrix as evidence. cs-02 settled that and it is not
+      reopened here. What composition adds is the mechanism BEHIND that
+      matrix: the per-adopter computation that the matrix reports.
+
+  What a subclass gets INSTEAD of an override:
+    * Nothing is ever excused. A subclass that cannot meet an inherited rule
+      declares the inability. It does not edit the rule and it does not ask a
+      favour. The estate's own cage.py prices the residual against THAT
+      party's appetite band and picks the loosest cage that fits. Deny is the
+      bottom rung of that ladder, reached by the money.
+    * So the same rule and the same inability give three different answers
+      across driftwood, tuppence and ludlow. That is proportionality, and that
+      case needs no override semantics at all.
+    * BUT THAT IS ONE CASE, NOT THE GENERAL ONE. Caging settles a CHILD that
+      cannot meet a parent. It says nothing about TWO PARENTS whose rules
+      disagree, which is the case override semantics exist for. This spike now
+      REFUSES that instead of picking silently, and it is untested across
+      parties because the estate has only one implementations publisher.
+      Saying "divergence is priced, not merged" would fuse two different
+      mechanisms: the conflict is refused, and what is priced is not it.
+    * INFORMED means the parents that move the price are parents of their own
+      kinds: a signed, versioned penalty schema, a threat register, a CVE
+      feed, an EOL feed. None of them ships a rule. Section 9 proves the
+      wiring: a bump to one moves the priced exposure with no policy edit. It
+      also proves the limit — on the estate's REAL feeds and REAL bands, no
+      bump changes a cage DECISION. Price moved; outcome did not.
+
+  A LINE THIS MODEL MUST NOT CROSS:
+    * A feed may re-price. It may NOT apply. ADR-0006's extension allows timed
+      nudges only "as long as nothing timed ever changes an admission verdict
+      on its own, and every resulting change still lands via a reviewed,
+      human-merged PR". ADR-0010 says the same: scheduled PROPOSALS, not
+      application. cs-02 settled that the cage spec IS the verdict. So a cage
+      that tightens itself as a component ages is a timed verdict change, and
+      it is forbidden. The output is a PROPOSED tier for the agent governance
+      layer to raise as a PR. This spike does not implement the proposer.
+
+  Constraints that held:
+    * Source-level only. The render is flat, per version, self-scoping on
+      matchConditions. Multi-version coexistence is untouched.
+    * The baseline is inherited and cannot be dropped by a subclass.
+    * No exemption exists anywhere in this model, at any scope, under any name.
+
+SELF-CHECK FAILED:
+  - expected ac-6 overclaimed in the live estate
+  - expected the uppercase control ids in the component definition
+EXIT:1

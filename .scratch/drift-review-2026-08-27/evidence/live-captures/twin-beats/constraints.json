@@ -1,0 +1,193 @@
+{
+  "body": {
+    "constraints": {
+      "pin": {
+        "digest": "d3046f047e1a8f751c58fb0264b19397cf9c8486bac4c8fb232b878f21b6f45c",
+        "version": 1
+      },
+      "positions": [
+        {
+          "id": "no-power-layer",
+          "source": "decision ticket 15, Q4",
+          "states": "No power layer is claimed and none exists. Constraining who may act, on whom, and with what recourse belongs to law and governance outside the twin. The epistemic constraints in this file protect nobody on their own, and the design must stop reading as though they do. What the twin can do is refuse to be the alibi and make asymmetry legible.",
+          "status": "stated"
+        },
+        {
+          "id": "exit-cost-asymmetry",
+          "source": "decision ticket 15, Q3b finding 3",
+          "states": "From structural fields this design has already decided are legitimate \u2014 compensation history, working patterns, location, skill specificity \u2014 the twin can identify who cannot afford to leave. That is precisely the population the grievance-to-insider counter-price fails to protect, because the counter-price only bites for people who can credibly go. No structural constraint is proposed. Inventing a reassuring rule here would be worse than the honest gap, so it is carried as a known harm.",
+          "status": "unsolved"
+        },
+        {
+          "id": "reflexivity-and-goodhart-on-the-twin",
+          "source": "decision tickets 10, 11 and 15, Q2",
+          "states": "The twin changes the organisation it measures, and an organisation that knows how it is measured optimises for the measurement. This is a real limitation and it is deferred, not solved. Fast improvement is treated as grounds for suspicion and never as a verdict, which is a backstop rather than an answer.",
+          "status": "deferred"
+        },
+        {
+          "id": "covert-sensing",
+          "source": "decision tickets 10 and 15",
+          "states": "Covert sensors are ruled out permanently. This is not the deferral above and must not be read as one: there is no future ticket that admits a sensor whose subjects were not told it exists.",
+          "status": "permanently-excluded"
+        }
+      ],
+      "scope_exclusions": [
+        {
+          "because": "Every constraint in this design is epistemic \u2014 what may be represented, inferred, produced, traced or exported. Not one constrains power, and a system cannot constrain power it does not hold.",
+          "excluded": "Who may act, on whom, with what asymmetry, and with what recourse.",
+          "id": "power-asymmetry",
+          "source": "decision ticket 15, Q4"
+        },
+        {
+          "because": "A perspectival currency puts them outside the \u00a3 by construction, and \"they can run their own twin\" is not an answer available to a six-person subcontractor. The affected-parties register that at least names them lands at build ticket 61.",
+          "excluded": "Costs borne by suppliers, contractors, applicants and acquisition targets.",
+          "id": "harms-to-non-contracting-parties",
+          "source": "decision ticket 15, Q3b finding 2"
+        },
+        {
+          "because": "Structural unrepresentability of special-category data prevents the **detection** of discrimination, not the discrimination. Disparate impact needs no protected field to occur but does need one to be measured. The sealed audit channel is build ticket 61; until it exists this system cannot be checked for it, which is stated rather than implied.",
+          "excluded": "Whether any output falls differently on a protected group.",
+          "id": "disparate-impact-measurement",
+          "source": "decision ticket 15, Q3b finding 4"
+        },
+        {
+          "because": "Modelling them would give the operator a reason to scope the twin around them, which is the behaviour this section exists to make visible.",
+          "excluded": "The discoverability and liability consequences of running the twin at all.",
+          "id": "the-twins-own-liability",
+          "source": "decision ticket 15, Q3b finding 1"
+        },
+        {
+          "because": "Sensed at cohort level or not at all. Listed here as well as in the floor, because a reader of the output should not have to infer an absence from a constraint.",
+          "excluded": "The behaviour of any identified person.",
+          "id": "individual-behaviour",
+          "source": "decision ticket 15, Q1"
+        }
+      ],
+      "tiers": {
+        "perspective": "a perspective's own red lines; may add to the floor, never remove from it",
+        "universal": "the legal and ethical floor; identical in every twin and not negotiable"
+      },
+      "universal_floor": [
+        {
+          "because": "Compliance here is an impossibility of representation rather than a rule someone could relax: the schemas are closed, so there is no field to put it in.",
+          "class": "forbidden",
+          "forbids": "Representing, inferring or storing special-category data about any person, in any layer of the model, at any depth.",
+          "id": "no-special-category-representation",
+          "source": "decision tickets 07, 09 and 15",
+          "tier": "universal"
+        },
+        {
+          "because": "Permanently excluded rather than deferred. Everyone knows what is measured, so gaming is a certainty to design for rather than a risk to detect.",
+          "class": "forbidden",
+          "forbids": "Any sensor whose subjects have not been told it exists.",
+          "id": "no-covert-sensing",
+          "source": "decision tickets 10 and 15",
+          "tier": "universal"
+        },
+        {
+          "because": "The data is legitimately needed for capability questions \u2014 bus factor, succession, resilience \u2014 and blame attribution after an incident is a different question wearing the same inputs. This is a scenario-level admissibility rule, not a data restriction.",
+          "class": "forbidden",
+          "forbids": "Using person-to-component knowledge edges as an input to any retrospective scenario that attributes an outcome to a named individual.",
+          "id": "no-individual-attribution",
+          "source": "decision ticket 15, Q3",
+          "tier": "universal"
+        },
+        {
+          "because": "Aggregate over individual, cohort over person. An observation has no person field, so the rule is structural rather than a discipline to remember.",
+          "class": "forbidden",
+          "forbids": "Producing any behavioural output about an identified person rather than a cohort.",
+          "id": "no-individual-level-output",
+          "source": "decision ticket 15, Q1",
+          "tier": "universal"
+        },
+        {
+          "because": "The twin proposes only. It is advisory by law and by design, and a trade-off curve has nothing to auto-execute.",
+          "class": "forbidden",
+          "forbids": "Any path by which the twin changes the world without a human deciding to.",
+          "id": "no-automatic-enactment",
+          "source": "decision ticket 09, Q3; UK GDPR Article 22",
+          "tier": "universal"
+        },
+        {
+          "because": "An expected-value average is only meaningful if you survive to keep playing. Ruin is excluded, never priced. The **rule** is universal; the **boundary** is perspective-relative \u2014 insolvency for a firm, loss of livelihood for a person \u2014 and each perspective declares its own. One interaction worth stating rather than discovering: a boundary phrased in special-category terms cannot be declared at all, because the constraint above it refuses the words. The floor binds the perspectives as well as the operator.",
+          "class": "ruin",
+          "forbids": "Any option carrying a real chance of destroying the party that bears it.",
+          "id": "no-ruin-class-option",
+          "source": "decision ticket 09, Q2",
+          "tier": "universal"
+        }
+      ]
+    },
+    "evidence_ladder": {
+      "admission_rule": "an impact enters the \u00a3 only through a causal path to a declared cash flow whose weakest hop is graded 1-2; the boundary is derived from the graph and nobody can declare something priceable",
+      "grades": [
+        {
+          "admits": "A dated change with observable data on both sides of it. The date is what makes it checkable: the change happened at a time, and the effect was measured after that time.",
+          "example": "A dated price change, with subscriber numbers measured before and after it.",
+          "grade": 1,
+          "may_price": true,
+          "name": "dated natural experiment"
+        },
+        {
+          "admits": "The same relationship observed moving together across several instances, periods or organisations. One co-movement is a coincidence; the repetition is the evidence.",
+          "example": "Tooling delivery slipping ahead of a process-node slip, across more than one node.",
+          "grade": 2,
+          "may_price": true,
+          "name": "repeated historical co-movement"
+        },
+        {
+          "admits": "An established mechanism from published work or domain theory, not observed here. The mechanism is real; whether it operates in this organisation is not evidenced.",
+          "example": "A published mechanism relating grievance to insider risk, applied to an org nobody measured.",
+          "grade": 3,
+          "may_price": false,
+          "name": "literature or domain theory"
+        },
+        {
+          "admits": "A judgement from a calibration-trained estimator, recorded explicitly **as** judgement and never as an observation. The estimator is named by role, and the range is theirs.",
+          "example": "A calibrated range for an elasticity nobody has ever measured directly.",
+          "grade": 4,
+          "may_price": false,
+          "name": "calibrated expert judgement"
+        },
+        {
+          "admits": "A model asserted the relationship. Nothing observed it, nothing published it and nobody calibrated it. This grade exists so that the assertion is visible and auditable rather than indistinguishable from evidence.",
+          "example": "A causal edge a language model produced because the relationship is familiar to it.",
+          "grade": 5,
+          "may_price": false,
+          "name": "model assertion"
+        }
+      ],
+      "pin": {
+        "digest": "97f8399a0a5fcbf0ba0ef29a3414c3735ee4fe955bce8f0f8d364a9a7d2824a7",
+        "path_admission_threshold": 2,
+        "pricing_threshold": 2,
+        "version": 2
+      },
+      "rule": "only grades 1-2 may price a scored forecast; a weaker path is reported as an unpriced structural blast radius"
+    },
+    "published_together": "the pricing threshold is published beside the constraint set because changing what may be priced is the same kind of act as changing what may be chosen"
+  },
+  "envelope": {
+    "depth": {
+      "capabilities": {},
+      "grade": null,
+      "note": "declared by a human in a role; no capability produced it"
+    },
+    "kind": "constraint-set",
+    "mark": "authored",
+    "pins": {
+      "constraints_sha256": "5d306b4c69bcb11e1255e40d2768084c0d966037a4028ed605321633111ac3e6",
+      "evidence_ladder_sha256": "1b703670cd52405cc56145546e13e2c0cb8b8360c44c1694fc3eab424f15f7a5",
+      "role": "constraint-owner"
+    },
+    "produced_by": {
+      "command": [
+        "twin",
+        "constraints"
+      ],
+      "tool": "twin",
+      "tool_version": "0.1.0"
+    },
+    "schema": "twin.artefact/v1"
+  }
+}

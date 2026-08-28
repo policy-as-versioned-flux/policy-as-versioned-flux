@@ -1,0 +1,26 @@
+== 1. witness_set.py --selfcheck ==
+selfcheck ok: witness set holds the 5 rederive fixtures and names the 6 real-infra witnesses (committed or missing); shape is the tuple of per-predicate outcomes plus the in-array pin flag, read back correctly for label/spec-bool predicates and absent fields; an unrecognized predicate expression fails loud; no witness entry carries a residual or band; a witness shape absent from the generated spine is reported, removing an axis value (the version-pin 'outside' choice) from the generator makes a previously-covered witness shape fail, both directly and through check_witness_shapes itself; the witness manifest records per-witness provenance including the not-yet-committed real-infra gap
+
+== 2. the missing-shape gate against the committed generated-corpus/ ==
+NOTE: 6 real-infrastructure witness(es) not yet committed, skipped (not faked): spire, istio, openbao, pomerium, dex, git-server
+ok: all 5 available witness shape(s) present in the generated spine (6 real-infrastructure witness(es) not yet committed, skipped)
+
+== 3. regenerating the witness manifest is byte-identical (CI's regenerate-and-diff) ==
+ok  regenerated witness-manifest.yaml matches the committed copy
+
+==========================================================================
+GAP (not a failure): real-infrastructure witnesses not yet committed:
+  spire,istio,openbao,pomerium,dex,git-server
+The COTS effort (.scratch/govern-what-you-dont-control/) was named as the
+source for real captures of these six workloads (spec.md, 'The corpus';
+.scratch/computed-semver/issues/03-what-is-the-corpus.md). None exist as
+committed fixtures anywhere in this repo or the hub repo yet. Drop a real
+Pod manifest at computed-semver/corpus/witnesses/real/<name>.yaml for each
+and this gate picks it up automatically -- no code change needed.
+==========================================================================
+
+== 5. the require-nonroot 'satisfied' probe passes real admission (regression guard for _CONTAINER_BOOL_RE) ==
+ok  the require-nonroot satisfied probe pod passes real admission under kyverno
+
+PASS: witness_set selfcheck ok, missing-shape gate passes against the 
+committed corpus, witness manifest regenerates byte-identical

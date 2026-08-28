@@ -1,0 +1,653 @@
+[
+ {
+  "probe": "repo-hygiene",
+  "commands_run": [
+   "git status --short",
+   "git log --oneline | wc -l",
+   "git log --format='%ad %s' --date=short | head -400 > /private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/repo-hygiene/log.txt",
+   "git branch -a",
+   "git stash list",
+   "git worktree list",
+   "ls -la",
+   "du -sh .scratch/* twin tests estate verify talk spikes research .estate-clone 2>/dev/null",
+   "find . -name '*.orig' -o -name '*.rej' | grep -v node_modules | head",
+   "cat .gitignore",
+   "cat pytest.ini",
+   "cat forged.yaml",
+   "ls t/ bin/ .github/workflows/",
+   "cat .github/workflows/*.yml | head -200"
+  ],
+  "results": [
+   {
+    "command": "git status --short",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "?? .scratch/talk-spec/pitch-v6/"
+   },
+   {
+    "command": "git log --oneline | wc -l",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "306"
+   },
+   {
+    "command": "git log saved to log.txt",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "Log file created successfully"
+   },
+   {
+    "command": "git branch -a",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "* main\n  worktree-wf_f9d3ec8c-4a3-4\n  remotes/origin/HEAD -> origin/main\n  remotes/origin/cs-06-cross-party-composition\n  remotes/origin/main\n  remotes/origin/worktree-buzzing-sprouting-thimble"
+   },
+   {
+    "command": "git stash list",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "stash@{0}: On main: pre-merge-mo19-pycache"
+   },
+   {
+    "command": "git worktree list",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux aebbb9e [main]"
+   },
+   {
+    "command": "ls -la",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "Total 152 files/dirs. Key findings: .DS_Store (10244 bytes), .claude/, .git/, .github/, .gitignore, .mypy_cache/, .pytest_cache/, .venv/, __pycache__/, .scratch/, .estate-clone/, bin/, docs/, estate/, explorations/, fleet/, policy/, research/, spikes/, t/, talk/, tests/, twin/, verify/"
+   },
+   {
+    "command": "du -sh .scratch/* twin tests estate verify talk spikes research .estate-clone 2>/dev/null",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": ".scratch/talk-spec: 637M (Pitch V6 build artifact)\n.scratch/twin: 1.4M\n.scratch/policy-composition: 204K\ntwin: 6.2M\ntests: 5.6M\nestate: 24M (git-ignored)\nspikes: 544M\n.estate-clone: 36M (disposable clone)"
+   },
+   {
+    "command": "find . -name '*.orig' -o -name '*.rej'",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "(no output - no merge conflict remnants found)"
+   },
+   {
+    "command": "cat .gitignore",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "research/repos/, .estate-clone/, estate/, .cache_ggshield, .claude/settings.local.json, .claude/scheduled_tasks.lock, .venv/, __pycache__/, *.pyc, .pytest_cache/"
+   },
+   {
+    "command": "cat pytest.ini",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "[pytest]\ntestpaths = tests\naddopts = -p no:homeassistant -n auto"
+   },
+   {
+    "command": "cat forged.yaml",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "apiVersion: v1, kind: Pod, metadata.name: forger, labels.policy-as-versioned.dev/policy-version: 1.0.0, spec.containers: nginx"
+   },
+   {
+    "command": "ls t/ bin/ .github/workflows/",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": ".github/workflows/: twin.yml\nbin/: twin\nt/: kyverno-test.yaml, patched.yaml, res.yaml"
+   },
+   {
+    "command": "cat .github/workflows/*.yml | head -200",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "name: twin, on: [push, pull_request, workflow_dispatch], permissions: contents read, jobs: suite (runs invariants, tests, typecheck, demo, beat-sequence), determinism (multi-arch), reproduce-elsewhere"
+   }
+  ],
+  "red_items": [
+   ".DS_Store present in repository but NOT listed in .gitignore - should be added to prevent accidental commits on macOS"
+  ],
+  "not_run_and_why": [],
+  "capture_files": [
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/repo-hygiene.json",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/repo-hygiene/log.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/repo-hygiene/summary.txt"
+  ],
+  "summary": "Repository hygiene check completed on policy-as-versioned-flux. Overall status: CLEAN. 306 commits on main branch, no uncommitted code changes. Single untracked directory (.scratch/talk-spec/pitch-v6/ 637M) is expected per project memory (Pitch V6 built artifact). One stashed commit (pre-merge-mo19-pycache) represents intentional work-in-progress. One stale worktree branch exists without active worktree. No merge conflict remnants (.orig/.rej files). All Python cache directories properly git-ignored. Single finding: .DS_Store (macOS metadata) present but not in .gitignore - should be added. All workflows, configs, and expected development artifacts present and accounted for. Large disposable artifacts (.estate-clone 36M, estate 24M, spikes 544M) properly git-ignored."
+ },
+ {
+  "probe": "pytest-mypy",
+  "commands_run": [
+   "source .venv/bin/activate && timeout 1800 python -m pytest -q > pytest.out 2>&1 (started, still running in background at time of forced report)"
+  ],
+  "results": [
+   {
+    "command": "python -m pytest -q",
+    "exit_code": -1,
+    "verdict": "error",
+    "key_lines": "bringing up nodes...\n.............................FFF.........FFF....F....................... [  4%]\n....F...FFFF............................................................ [  9%]\n........................................................................ [ 13%]\n........................................................................ [ 18%]\n........................................................................ [ 23%]\n.............. (progress halted at 23% when forced to report; process still running under xdist, PID 52725/52724)"
+   }
+  ],
+  "red_items": [
+   "Task was forced to terminate before the pytest run (30-minute timeout budget) or the mypy command could complete. At time of forced report, the suite was 23% through and had already logged failing tests (F markers) in the first ~10% of the run \u2014 at minimum 2 clusters of failures visible in the dot output (around 4-5% and 9% progress), but exact test names/assertion messages could not be captured because -q dot output does not print names until the summary at the end, which was never reached.",
+   "mypy was not run at all \u2014 never reached because pytest had not finished.",
+   "This is a genuinely incomplete probe result, not a pass/fail verdict \u2014 do not treat 'error' above as a real test failure count."
+  ],
+  "not_run_and_why": [
+   "mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores: not run, pytest had not finished by the time this response was forced",
+   "Full pytest failure names/assertions: not capturable \u2014 the background process (PID 52725, invoked via PID 52724 timeout wrapper) was still executing at 23% progress with -q dot output; failing test identities only print in the final summary which had not been reached. The raw output so far is saved at /private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/pytest-mypy/pytest.out and the process was left running in the background (not killed) so it may complete on its own; it was NOT re-polled or waited on further because this response was forced before that could happen."
+  ],
+  "capture_files": [
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/pytest-mypy/pytest.out"
+  ],
+  "summary": "INCOMPLETE PROBE: pytest run (via .venv, repo's pytest.ini with -n auto xdist) was started and was 23% through with visible failing tests (F markers) when this response was forced to terminate before completion. mypy was never reached. The dot-progress output already shows failures around the 4-5% and 9% marks, but pytest's -q output does not name failing tests until the final summary, so no test names or assertion messages could be captured. The background process was left running (not killed); raw output captured so far is at the path listed in capture_files. This result should be treated as an aborted/incomplete probe, not a genuine red (or green) verdict for either pytest or mypy \u2014 a re-run with a longer budget is needed to get real pass/fail counts and failing test names."
+ },
+ {
+  "probe": "github-orgs",
+  "commands_run": [
+   "gh auth status",
+   "gh api orgs/<org> (x8, incl. feeds)",
+   "gh repo list <org> --json name,defaultBranchRef,pushedAt,isArchived,isPrivate,description (x7 orgs)",
+   "gh api repos/<org>/<repo> (x22)",
+   "gh api repos/<org>/<repo>/tags (x22)",
+   "gh release list -R <org>/<repo> (x22)",
+   "gh pr list -R <org>/<repo> --state open (x22)",
+   "gh run list -R <org>/<repo> --limit 5 (x22)",
+   "gh api repos/<org>/<repo>/rulesets (x22)",
+   "gh api repos/<org>/<repo>/contents/renovate.json (x22)",
+   "gh api repos/<org>/<repo>/readme (x22)",
+   "gh api repos/<org>/<repo>/git/refs/tags (x22)",
+   "gh api repos/<org>/<repo>/git/tags/<sha> for each tag object (32 tags total)",
+   "gh search code / gh api search/code for cross-repo references",
+   "gh api repos/<org>/<repo>/git/trees/<branch>?recursive=1 for fleet, policy, apps, and each satellite repo",
+   "gh api repos/<org>/<repo>/contents/<workflow>.yml for adopter repos (grep for cross-org refs)",
+   "gh api repos/policy-as-versioned-flux/fleet/contents/clusters/cluster1/policy-versions.yaml and apps.yaml"
+  ],
+  "results": [
+   {
+    "command": "gh auth status",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "Logged in to github.com account chrisns; scopes: delete_repo, gist, read:org, repo, workflow"
+   },
+   {
+    "command": "gh api orgs/policy-as-versioned-feeds ; gh repo list policy-as-versioned-feeds",
+    "exit_code": 1,
+    "verdict": "pass",
+    "key_lines": "{\"message\":\"Not Found\",...,\"status\":\"404\"}; gh: This API operation needs the admin:org scope; the owner handle \"policy-as-versioned-feeds\" was not recognized as either a GitHub user or an organization -> org does not exist"
+   },
+   {
+    "command": "gh repo list <org> for all 7 orgs",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "flux=16 repos, platform=1, driftwood=1, tuppence=1, ludlow=1, nist=1, ico=1 (22 total)"
+   },
+   {
+    "command": "collect.sh full per-repo API sweep (repo,tags,releases,prs,runs,rulesets,renovate,readme,refs/tags) for all 22 repos",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "DONE; only non-trivial .err content was expected 404s (refs/tags 404 = repo has no tags; renovate.json 404 = file absent)"
+   },
+   {
+    "command": "gh api repos/.../git/tags/<sha> for every tag object (32 total across 12 repos with tags)",
+    "exit_code": 0,
+    "verdict": "partial",
+    "key_lines": "flux/policy: only 4/12 tags verified=true (v2.0.0 + others); 8 tags show verified=false reason=bad_cert. flux/api,c2p-collector,handbook-generator,ledger,pr-gate-action,readiness-collector,reports,storefront: all verified=true, tagger=chris@cns.me.uk. driftwood/tuppence/ludlow/nist/ico/platform: all tags verified=false reason=no_user (sigstore/OIDC keyless, bot tagger, expected pattern)"
+   },
+   {
+    "command": "gh search code + gh api search/code for policy-as-versioned-flux/apps|fleet|policy",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "all zero results (code search index did not surface any cross-repo literal references)"
+   },
+   {
+    "command": "gh api .../git/trees/<branch>?recursive=1 for fleet, policy, apps, and 6 satellite repos",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "fleet tree confirms live GitOps structure (clusters/cluster1,2, policy-versions.yaml, apps.yaml); apps repo path only appears as the filename clusters/cluster1/apps.yaml (the manifest that replaced the old apps monorepo), not as a reference to the archived apps repo"
+   },
+   {
+    "command": "gh api contents/<workflow>.yml for driftwood/tuppence/ludlow/nist/ico/platform, grep for policy-as-versioned-* refs",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "adopter workflows reference nist/ico/platform (threat/pricing parents) and their own repo; none reference flux/apps, flux/fleet, or flux/policy directly in workflow YAML"
+   },
+   {
+    "command": "gh api contents/clusters/cluster1/policy-versions.yaml and apps.yaml for fleet",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "policy-versions.yaml ResourceSet templates GitRepository CRs at https://github.com/policy-as-versioned-flux/policy with pinned tags/commits; apps.yaml's own header comment confirms the old apps monorepo (app1/2/3) was replaced by 5 real team repos per ticket 07/08 -- apps repo itself not referenced"
+   }
+  ],
+  "red_items": [
+   "policy-as-versioned-flux/policy: 8 of 12 tags (majority) fail signature verification with reason=bad_cert, not just the expected no_user pattern seen on bot-tagged satellite repos -- worth investigating, not fixed (read-only mandate).",
+   "3 satellite-org repos (ico, nist, platform) each still have an open, unmerged 'Configure Renovate' onboarding PR from 2026-08-21 sitting alongside their content -- onboarding was never completed/closed.",
+   "gh search code / search/code returned zero hits for any cross-org repo reference despite fleet's own file content clearly referencing policy-as-versioned-flux/policy by URL -- GitHub's code search index appears not to have indexed these repos (or query syntax didn't match); cross-reference conclusions were validated by direct tree/content fetch instead, not by search."
+  ],
+  "not_run_and_why": [
+   "Did not run any repo's up.sh or bring up a local KiND cluster -- probe text for github-orgs did not request or authorize it.",
+   "Did not decode/verify the sigstore certificate chain inside each tag's signature blob (would require extra tooling); relied on gh's own verification.verified/reason fields as the read-only signal.",
+   "Did not enumerate full commit history or diff tag content across policy repo versions -- out of scope for this probe."
+  ],
+  "capture_files": [
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/github-orgs.json",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/github-orgs/state.md",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/github-orgs/report_data.json",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/github-orgs/raw/ (per-org repo lists, per-repo raw JSON under raw/repos/<org>__<repo>/, tag-verify/, tag-signing-summary.txt, search/, trees/, collect.log, auth-status.txt)"
+  ],
+  "summary": "Enumerated all 7 orgs read-only via gh. policy-as-versioned-feeds confirmed not to exist (404 / unrecognized owner). 22 repos total across the other 6 orgs (16 in flux, 1 each in platform/driftwood/tuppence/ludlow/nist/ico). Captured per-repo default branch, last push, tags, releases, open PRs, last-5-runs, rulesets, renovate.json presence, and README H1 for every repo into state.md and github-orgs.json. Checked tag-object signature verification for all 32 tags across the 12 repos that have any: flux's own chris@cns.me.uk-tagged repos mostly verify true; the 6 satellite orgs' bot-tagged releases all show verified=false/reason=no_user (expected sigstore-keyless pattern); flux/policy is the outlier -- 8 of its 12 tags show verified=false/reason=bad_cert, a genuine anomaly worth follow-up. Confirmed apps/fleet/policy status: apps is archived and no longer referenced anywhere in fleet's live GitOps tree (superseded by 5 team repos per ticket 07/08); fleet and policy are both live and fleet's policy-versions.yaml actively references the policy repo by URL with pinned tags/commits. No mutating command was run."
+ },
+ {
+  "probe": "talk-verify-offline",
+  "commands_run": [
+   "cat clone-estate.sh",
+   "cat talk/up.sh",
+   "cat talk/verify-all.sh",
+   "timeout 1800 bash talk/verify-all.sh > .../output.txt 2>&1; echo EXIT:$?"
+  ],
+  "results": [
+   {
+    "command": "timeout 1800 bash talk/verify-all.sh (no --live)",
+    "exit_code": 1,
+    "verdict": "fail",
+    "key_lines": "pass=17 fail=8 skip-live=3\nSOME BEATS WOULD FAIL ON STAGE\nEXIT:1\n\nFAILs:\npolicy is a versioned dependency (coexistence)                 FAIL (exit) \u2014 require-nonroot-3-0-0 not installed live (fan-out incomplete)\nshift-left CI catches an Audit->Deny flip pre-merge            FAIL (exit) \u2014 ci-check.py passed a workload that fails its target version's real rule\ngraded response: caged by degree, not denied                   FAIL (exit) \u2014 cage-tier-2-0-1 MutatingPolicy not installed live\nLIVING LOOP: war-gamer opens a signed PR, never merges         FAIL (exit) \u2014 unexpected: the gate passed a workload that should trip the flip\nidentity substrate: SPIRE is Istio's CA, mTLS STRICT           FAIL (exit) \u2014 ping has no Ready istio-proxy sidecar \u2014 webhook did not inject\nposture-as-identity: posture/vN in the SVID path               FAIL (exit) \u2014 stamp-posture-2-0-1 MutatingPolicy not installed live\nposture-gated reach + secrets (tuppence flagship)              FAIL (exit) \u2014 current caller did NOT reach (got '000ERR')\nhuman/device access plane holds (Pomerium+device SVID)         FAIL (exit) \u2014 Pomerium pod not present\n\nPASS (17): orphan-guard, retirement, conditional exemptions, proportionality, risk-tuned, TCoR, feeds, ico penalty feed, nist catalog, OSCAL upflow, AI-Wardley, honesty(calibration+integrity), currency-controller, break-glass, EUD device trust, provenance, party(roles)\n\nSKIP-live (3): driftwood/tuppence/ludlow reconcile beats \u2014 'SKIP-live (run talk/up.sh)', expected since no cluster was brought up."
+   }
+  ],
+  "red_items": [
+   "8 of 25 OFFLINE beats FAIL even with no --live and no cluster: coexistence(fan-out), shift-left CI gate (passed a workload it should have rejected), graded-response cages, LIVING LOOP war-gamer gate (passed a workload that should trip the flip), SPIRE/Istio identity substrate (no sidecar injected), posture-as-identity stamping, tuppence reach+secrets flagship, Pomerium access plane.",
+   "3 LIVE beats (driftwood/tuppence/ludlow reconcile) reported SKIP-live, not run, since no cluster was brought up (in-scope: offline mode only, as instructed).",
+   "Overall script exit code 1, verify-all.sh itself prints 'SOME BEATS WOULD FAIL ON STAGE'."
+  ],
+  "not_run_and_why": [
+   "talk/up.sh was NOT run \u2014 probe scope was explicitly offline verify-all.sh only (no --live), and up.sh brings up real KinD clusters which was out of scope for this probe.",
+   "verify-all.sh --live was not run \u2014 probe explicitly said offline mode, no --live."
+  ],
+  "capture_files": [
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-offline/output.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-offline.json"
+  ],
+  "summary": "Ran `bash talk/verify-all.sh` (offline, no --live) with a 1800s timeout to completion; exit code 1. clone-estate.sh reused an already-present .estate-clone/ (all six units 'already cloned', idempotent skip \u2014 no network re-clone actually occurred this run). Of 28 total beats/scripts covered by this gate (25 offline + 3 live), 17 PASS, 8 FAIL, 3 SKIP-live. The 3 live reconcile beats (driftwood/tuppence/ludlow) correctly report SKIP-live since no cluster was brought up, matching the script's documented behavior for offline mode. Every listed beat in verify-all.sh's own OFFLINE/LIVE tables maps to a real verify-*.sh script \u2014 none is narrated-only inside this script's table; session memory separately notes the whole honesty gate covers 28 of 56 total repo scripts, i.e. roughly half the estate's verify scripts sit outside verify-all.sh entirely, which is a different (out-of-scope-here) gap, not a narrated-only line within this run's output. Full verbatim output and a structured JSON summary were written to the scratchpad files listed above; nothing was fixed, retried, or mutated per the read-only mandate."
+ },
+ {
+  "probe": "spikes-and-verify-dir",
+  "commands_run": [
+   "cat spikes/*/README.md",
+   "cat verify/{party,proportionality,provenance}/README.md",
+   "spikes/renovate-git-refs-customManager/run.sh (timeout 1200)",
+   "spikes/cs-06-inheritance-vs-diff/run.sh (timeout 1200)",
+   "spikes/cs-06b-cross-party-composition/run.sh (timeout 1200)",
+   "spikes/c2p-validatingpolicy-oscal/run.sh (timeout 1200)",
+   "spikes/c2p-real-job/run.sh (timeout 1200)",
+   "verify/party/verify-party.sh (timeout 900)",
+   "verify/proportionality/verify-proportionality.sh (timeout 900)",
+   "verify/provenance/verify-provenance.sh (timeout 900)"
+  ],
+  "results": [
+   {
+    "command": "spikes/renovate-git-refs-customManager/run.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "consumer-pin.yaml: 1.0.0@26dc6a8b -> 1.1.0@7b4ab8d1  OK\nfleet-resourceset-input.yaml: 1.0.0@26dc6a8b -> 1.1.0@7b4ab8d1  OK"
+   },
+   {
+    "command": "spikes/cs-06-inheritance-vs-diff/run.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "self-check: all assertions held"
+   },
+   {
+    "command": "spikes/cs-06b-cross-party-composition/run.sh",
+    "exit_code": 1,
+    "verdict": "fail",
+    "key_lines": "SELF-CHECK FAILED:\n  - expected ac-6 overclaimed in the live estate\n  - expected the uppercase control ids in the component definition"
+   },
+   {
+    "command": "spikes/c2p-validatingpolicy-oscal/run.sh",
+    "exit_code": 1,
+    "verdict": "fail",
+    "key_lines": "Creating cluster \"c2p-spike\" ...\n... Ready after 17s\n== 2. Kyverno (>=1.17 for CEL ValidatingPolicy + reports) ==\n== 3. Policies + compliant/non-compliant pods ==\n   waiting for background-scan PolicyReports...\nEXIT:1 (script's own wait-loop timed out; no teardown ran, cluster 'c2p-spike' left behind, confirmed via `kind get clusters`)"
+   },
+   {
+    "command": "spikes/c2p-real-job/run.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "independent schema-validate (check-jsonschema vs OSCAL v1.1.3): PASS\nsubjects captured: 3 (pass1) / 6 (pass2)\nPASS 1 (compliant):   sc-28 satisfied, cp-10 satisfied, cm-8 satisfied\nPASS 2 (violations):  sc-28 NOT-SATISFIED, cp-10 NOT-SATISFIED, cm-8 NOT-SATISFIED\nOSCAL written and validated two independent ways; cluster torn down (kind-c2p-real-job not present after run)"
+   },
+   {
+    "command": "verify/party/verify-party.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "ok  guard bites: risk-bearer/publisher/adopter violations each refused when planted, cleared once evidence is restored\nok  real estate: 6 parties clean | institutions: driftwood, ludlow, tuppence (still three)\nPASS: roles: is machine-checked data"
+   },
+   {
+    "command": "verify/proportionality/verify-proportionality.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "risk_bought \u00a321,107  |  driftwood band \u00a340,000 -> Audit  |  ludlow band \u00a35,000 -> Deny\nok  committed policies match the \u00a3-derived render for driftwood, ludlow\nPASS: same control, same \u00a3 (risk_bought \u00a321107) \u2014 Audit in driftwood, Deny in ludlow."
+   },
+   {
+    "command": "verify/provenance/verify-provenance.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "PASS: the whole chain walks feed->scenario->PR->review->merge->release; the AI war-gamer PROPOSES (never merges), humans DISPOSE; workload+device+commit+human all root to one attestation, and the chain converges on the exact version a running workload carries in its SVID."
+   }
+  ],
+  "red_items": [
+   "spikes/cs-06b-cross-party-composition/run.sh exited 1: SELF-CHECK FAILED \u2014 expected ac-6 overclaimed in the live estate; expected the uppercase control ids in the component definition (the live .estate-clone has moved since the spike's assumptions were written; genuine red, not touched/fixed)",
+   "spikes/c2p-validatingpolicy-oscal/run.sh exited 1: hung at '== 3. Policies + compliant/non-compliant pods == waiting for background-scan PolicyReports...' until its own internal wait-loop gave up; script did not reach teardown, so the throwaway KiND cluster 'c2p-spike' was left running on the host (confirmed via `kind get clusters`) \u2014 left as-is per rules (no cleanup performed, no retry)"
+  ],
+  "not_run_and_why": [
+   "No spikes were skipped as not-run \u2014 all 5 spikes under spikes/*/ had local-only run.sh scripts (own KiND cluster name where KiND is used, or no KiND at all) matching the probe's eligibility rule, so all 5 were run."
+  ],
+  "capture_files": [
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/renovate-git-refs-customManager/out.log",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/cs-06-inheritance-vs-diff/out.log",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/cs-06b-cross-party-composition/out.log",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/c2p-validatingpolicy-oscal/out.log",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/c2p-real-job/out.log",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/verify-party/out.log",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/verify-proportionality/out.log",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/verify-provenance/out.log"
+  ],
+  "summary": "Read all 5 spikes/*/README.md and the 3 verify/*/README.md. All 5 spike run.sh scripts are local-only (no cloud, no push); the two that create KiND clusters (c2p-real-job, c2p-validatingpolicy-oscal) each use their own distinct cluster name and both READMEs explicitly describe them as self-contained/throwaway, so all 5 were run under `timeout 1200`. .estate-clone/platform already existed on disk (no polling needed) so verify/party, verify/proportionality, verify/provenance ran immediately under `timeout 900`.\\n\\nResults: 6 of 8 runs passed clean (renovate-git-refs-customManager, cs-06-inheritance-vs-diff, c2p-real-job, verify-party, verify-proportionality, verify-provenance \u2014 all exit 0 with their stated verdicts holding). 2 real reds: cs-06b-cross-party-composition's self-check failed against the live (moved-on) estate clone, and c2p-validatingpolicy-oscal's KiND run hung waiting for background-scan PolicyReports and exited 1 without tearing down, leaving a stray 'c2p-spike' KiND cluster on the host. Nothing was fixed, retried, or cleaned up. All commands' full stdout+stderr are saved verbatim under the scratchpad live/ subdirectories listed above."
+ },
+ {
+  "probe": "twin-beats",
+  "commands_run": [
+   "bash twin/demo.sh",
+   "bash twin/beat-sequence.sh",
+   "bash twin/beat-royal-mail.sh",
+   "bash twin/beat-intel.sh",
+   "bash twin/beat-netflix.sh",
+   "./bin/twin verify (x2, different outcomes)",
+   "./bin/twin grade",
+   "./bin/twin drift",
+   "./bin/twin constraints --out .../constraints.json",
+   "./bin/twin demo-slice --out .../demo-slice.json"
+  ],
+  "results": [
+   {
+    "command": "bash twin/demo.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "PASS: sense -> run -> score closes the loop from a clean checkout. Forecasts are a list, scored by pin; the store is rebuildable from git; identical pins give identical bytes; a dirty tree is refused. sweep runs the standing scenario set unconditionally and reliability bins the record it produces. severity is the FAIR engine's tail model, standalone, and reports TVaR beside VaR rather than VaR alone. Every artefact declares which acceptance criteria are still unchecked, so the skeleton cannot quietly become the definition of done."
+   },
+   {
+    "command": "bash twin/beat-sequence.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "PASS: the demo sequence ran b -> b -> c -> a. Royal Mail and Intel both proved the twin can ...\nstep 4: '4. explicitly unscoreable \u2014 published in the artefact's own body, not a placeholder' (deliberate, by design, inside a passing run)"
+   },
+   {
+    "command": "bash twin/beat-royal-mail.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "rules brier, log_loss (lower-is-better) \u2014 1 scored, 0 unscoreable\nPASS: rewound under as-consumed, projected, scored against a low-contamination key with the [scoring rule]"
+   },
+   {
+    "command": "bash twin/beat-intel.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "4. explicitly unscoreable \u2014 published in the artefact's own body, not a placeholder\nPASS: swept through the scheduled production line, pinned and agent-signed, reproduced"
+   },
+   {
+    "command": "bash twin/beat-netflix.sh",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "holds  a disposing tool call is refused before it runs, including a subagent's own\nPASS: a threat path and an opportunity path both ran end to end on the same dated state."
+   },
+   {
+    "command": "./bin/twin verify (run 1, captured to file)",
+    "exit_code": 1,
+    "verdict": "fail",
+    "key_lines": "twin options: VerbError: no perspective 'the-operator' in overlay 'netflix' (have: none)"
+   },
+   {
+    "command": "./bin/twin verify (run 2, standalone, timeout 900)",
+    "exit_code": 124,
+    "verdict": "fail",
+    "key_lines": "verify exit=124 \u2014 process ran ~15 minutes (confirmed alive via `ps`, moving from R to S state, 46s of CPU time accrued) producing zero stdout/stderr before `timeout 900` killed it. Did not reproduce run 1's VerbError; behaviour was inconsistent between the two bare invocations."
+   },
+   {
+    "command": "./bin/twin grade",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "==> aggregate: 73 of 73 across 13 capabilities, 13 at `full`"
+   },
+   {
+    "command": "./bin/twin drift",
+    "exit_code": 0,
+    "verdict": "partial",
+    "key_lines": "window 23% elapsed, 3/493 expected samples (1% coverage)\nfloor 90% UNREACHABLE \u2014 ceiling 77.5%. build ticket 65's continuous-state branch closes `unmeasured` whatever happens next; unsampled hours do not come back\nprecondition org-actions-may-not-create-prs blocks build ticket 66, owner: an organisation administrator \u2014 the twin operator cannot change this\nno verdict: this is the instrument."
+   },
+   {
+    "command": "./bin/twin constraints --out constraints.json",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "position deferred reflexivity-and-goodhart-on-the-twin\nposition permanently-excluded covert-sensing\ngate grades 1-2 may price a scored forecast\nunsigned: set TWIN_SIGNING_KEY, then `twin sign ... --role constraint-owner` (expected \u2014 no signing key configured for this probe)"
+   },
+   {
+    "command": "./bin/twin demo-slice --out demo-slice.json",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "demo-slice full 4/4 of decision ticket 22 unchecked: -\n(all 9 listed capabilities: full, unchecked: -)"
+   }
+  ],
+  "red_items": [
+   "./bin/twin verify, called bare (no --repo, no artefact), is red: run 1 threw an uncaught 'VerbError: no perspective the-operator in overlay netflix (have: none)'; run 2 (independent invocation, same command) instead hung for ~15 minutes actively consuming CPU and was killed by `timeout 900` (exit 124) with zero output. The two bare runs did not fail the same way \u2014 bare `twin verify` is not a stable/supported invocation shape (its own --help shows an optional [artefact] positional and --repo, implying it needs an artefact+repo to behave predictably).",
+   "./bin/twin drift reports its own coverage floor as 90% UNREACHABLE (ceiling 77.5%, only 1% of expected samples observed, a precondition blocked on an org administrator) \u2014 the command itself exits 0 and this is a documented, already-recorded red-by-design result per prior session memory (Flux verdict closes unmeasured), not a new defect, but it is a red result worth flagging distinctly from the exit code."
+  ],
+  "not_run_and_why": [
+   "No up.sh / KiND bring-up was run: none of the requested commands (demo.sh, the four beat scripts, and the bin/twin subcommands) reference a KiND cluster, kubectl, or up.sh \u2014 grepped each script beforehand for push/merge/kind create/up.sh/curl-http/kubectl apply/rm -rf and found only a benign local `rm -rf $WORK/index` (a temp scratch dir the same script rebuilds two lines later) and Netflix-beat prose mentioning 'merges'/'pushed' as narration text, not actual git/gh commands. So no cluster bring-up was needed or attempted."
+  ],
+  "capture_files": [
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats.json",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/demo.sh.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/beat-sequence.sh.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/beat-royal-mail.sh.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/beat-intel.sh.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/beat-netflix.sh.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/twin-verify.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/twin-verify-second-run.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/twin-grade.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/twin-drift.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/twin-constraints.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/twin-demo-slice.out",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/constraints.json",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/demo-slice.json"
+  ],
+  "summary": "All 5 demo/beat scripts (twin/demo.sh, beat-sequence.sh, beat-royal-mail.sh, beat-intel.sh, beat-netflix.sh) passed cleanly, exit 0, ending in their own \"PASS:\" lines; each is local-only (no push/merge/kind/curl \u2014 confirmed by grep before running), so no KiND up.sh bring-up was needed. `bin/twin grade`, `constraints`, and `demo-slice` also exit 0 and are green (grade: 73/73 checks at `full`). `bin/twin drift` exits 0 but its own content is a documented red-by-design result: 90% coverage floor UNREACHABLE (ceiling 77.5%, 1% coverage, blocked on an org-admin precondition) \u2014 matches known prior-session status, not a new defect. `bin/twin verify`, called bare per the probe's literal instruction, is genuinely red: two separate invocations behaved differently \u2014 one threw an uncaught `VerbError: no perspective 'the-operator' in overlay 'netflix' (have: none)`, the other ran for ~15 minutes consuming CPU with zero output and was killed by `timeout 900` (exit 124). twin/ENACT_MODE is set to \"development\" (repository-owner-authorized standing instruction dated 2026-08-25 per enact_guard.py's own docstring): in this mode enact_guard.py's decide() admits merges/enactment pushes; only \"operations\" mode restores the refusal, which the invariant suite forces for its own test run regardless of the checked-in default. No mutating command (push, merge, PR, tag, cluster reset) was executed at any point."
+ },
+ {
+  "probe": "talk-verify-live",
+  "commands_run": [
+   "kind get clusters",
+   "kubectl --context kind-{driftwood,tuppence,ludlow} get nodes / get kustomizations -A / get gitrepositories -A / get pods -A | grep -v Running (before)",
+   "timeout 2400 bash talk/verify-all.sh --live (run 1)",
+   "bash .estate-clone/{driftwood,tuppence,ludlow}/verify-reconcile.sh (individually, before)",
+   "kubectl --context kind-driftwood get validatingpolicies,mutatingpolicies -A",
+   "kubectl --context kind-driftwood logs -n currency-system --tail=20 -l job-name --prefix",
+   "kubectl --context kind-* -n flux-system get gitrepository -o jsonpath='{.spec.ref}'",
+   "timeout 2400 bash talk/up.sh driftwood",
+   "timeout 2400 bash talk/verify-all.sh --live (run 2, after bring-up)",
+   "bash .estate-clone/{driftwood,tuppence,ludlow}/verify-reconcile.sh (individually, after)",
+   "kubectl --context kind-{driftwood,tuppence,ludlow} get nodes / kustomizations / gitrepositories / pods (after)"
+  ],
+  "results": [
+   {
+    "command": "kind get clusters",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "driftwood\nludlow\ntuppence"
+   },
+   {
+    "command": "kubectl get nodes/kustomizations/gitrepositories (all 3 contexts, BEFORE)",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "driftwood-control-plane Ready control-plane 26d v1.36.1\ntuppence-control-plane Ready 26d\nludlow-control-plane Ready 26d\nflux-system driftwood 26d True Applied revision: v1.0.0@sha1:92034b09...\nflux-system tuppence 26d True Applied revision: v1.0.0@sha1:9862d846...\nflux-system ludlow 26d True Applied revision: v1.0.0@sha1:7bd9973b...\ngitrepositories driftwood/nist/tuppence/ludlow all READY=True, URLs github.com/policy-as-versioned-*"
+   },
+   {
+    "command": "kubectl get pods -A | grep -v Running (BEFORE)",
+    "exit_code": 0,
+    "verdict": "fail",
+    "key_lines": "driftwood:\ncurrency-system currency-controller-29797256-fgccn 0/1 Error 0 2m1s\ncurrency-system currency-controller-29797256-vld7p 0/1 Error\ncurrency-system currency-controller-29797257-96j2z 0/1 Error\ncurrency-system currency-controller-29797257-blmbc 0/1 Error\ncurrency-system currency-controller-29797258-lkp9v 0/1 Error\ncurrency-system currency-controller-29797258-ncxxt 0/1 Error\nspire-system spire-spiffe-oidc-discovery-provider-75d5bc7bb8-c55sl 0/2 Unknown 56 (6d21h ago) 26d\ntuppence: (none)\nludlow: (none)"
+   },
+   {
+    "command": "timeout 2400 bash talk/verify-all.sh --live  (run 1, before bring-up)",
+    "exit_code": 1,
+    "verdict": "fail",
+    "key_lines": "policy is a versioned dependency (coexistence)                 FAIL (exit)\n    last: FAIL: require-nonroot-3-0-0 not installed live (fan-out incomplete)\na version not in the array cannot run (orphan-guard)           PASS\nretiring a version prunes it                                   PASS\nshift-left CI catches an Audit->Deny flip pre-merge            FAIL (exit)\n    last: FAIL: ci-check.py passed a workload that fails its target version's real rule\nexemptions dissolve into conditional policy                    PASS\nPROPORTIONALITY: same control, Audit driftwood vs Deny ludlow  PASS\nenforcement tuned by the \u00a3, not a timer                        PASS\ngraded response: caged by degree, not denied                   FAIL (exit)\n    last: FAIL: cage-tier-2-0-1 MutatingPolicy not installed live\nthe board line is TCoR and it moves                            PASS\nfeeds signed+versioned, a bump moves the \u00a3                     PASS\nico penalty schema signed; a bump moves the \u00a3                  PASS\nnist ships a real, pinnable OSCAL catalog                      PASS\nevidence up-flow resolves end to end (OSCAL risk)              PASS\nLIVING LOOP: war-gamer opens a signed PR, never merges         FAIL (exit)\n    last: unexpected: the gate passed a workload that should trip the flip\nAI-Wardley flags commoditisation movement, re-tunes early      PASS\nthe number is honest today (calibration+integrity)             PASS\nidentity substrate: SPIRE is Istio's CA, mTLS STRICT           FAIL (exit)\n    last: FAIL: ping has no Ready istio-proxy sidecar \u2014 webhook did not inject\nposture-as-identity: posture/vN in the SVID path               FAIL (exit)\n    last: FAIL: stamp-posture-2-0-1 MutatingPolicy not installed live\ncurrency controller re-evaluates posture post-admission        FAIL (exit)\n    last: FAIL: rbac.yaml invalid\nposture-gated reach + secrets (tuppence flagship)              FAIL (exit)\n    last: FAIL: current caller did NOT reach (got '000ERR')\nhuman/device access plane holds (Pomerium+device SVID)         FAIL (exit)\n    last: FAIL: Pomerium pod not present\nbreak-glass demands step-up by the \u00a3                           PASS\nEUD device trust on the same root (vTPM, narrated-virtual)     PASS\nPROVENANCE: every actor attestable to one root                 PASS\nroles: is data, machine-checked against the filesystem         PASS\n\ndriftwood reconciles from a pinned, signed GitRepository       FAIL (live)\ntuppence reconciles, carries its toward-strict skin            FAIL (live)\nludlow reconciles, carries its Deny-heavy skin                 FAIL (live)\n\npass=16 fail=12 skip-live=0\nSOME BEATS WOULD FAIL ON STAGE"
+   },
+   {
+    "command": "bash .estate-clone/{driftwood,tuppence,ludlow}/verify-reconcile.sh (BEFORE)",
+    "exit_code": 1,
+    "verdict": "fail",
+    "key_lines": "=== driftwood ===\n==> 1. GitRepository is Ready and pinned to a tag+commit\nFAIL: GitRepository commit not pinned\nexit=1\n=== tuppence ===\nFAIL: GitRepository commit not pinned\nexit=1\n=== ludlow ===\nFAIL: GitRepository commit not pinned\nexit=1\n\n(live spec.ref on all three: {\"tag\":\"v1.0.0\"} \u2014 no commit field)"
+   },
+   {
+    "command": "kubectl --context kind-driftwood get validatingpolicies,mutatingpolicies -A",
+    "exit_code": 0,
+    "verdict": "fail",
+    "key_lines": "validatingpolicy require-nonroot-1-0-0, require-nonroot-2-0-0  (3-0-0 absent \u2014 the beat wants it)\nmutatingpolicy cage-tier-1-0-0, cage-tier-2-0-0  (2-0-1 absent)\nmutatingpolicy stamp-posture, stamp-posture-1-0-0, stamp-posture-2-0-0  (2-0-1 absent)\nAll present ones READY=true, age 4d20h"
+   },
+   {
+    "command": "kubectl --context kind-driftwood logs -n currency-system -l job-name",
+    "exit_code": 0,
+    "verdict": "fail",
+    "key_lines": "urllib.error.HTTPError: HTTP Error 404: Not Found\n  (raised from reconcile container in both currency-controller-* and currency-verify-* pods)"
+   },
+   {
+    "command": "timeout 2400 bash talk/up.sh driftwood",
+    "exit_code": 0,
+    "verdict": "partial",
+    "key_lines": "   ok: driftwood: KinD + Flux + signed source + reconcile\n   ok: platform: identity substrate (SPIRE+Istio+OpenBao)\n   ok: platform: engine (Kyverno + flux-operator)\n  ! platform: posture projection (posture/vN in SVID path) degraded (re-run to converge)\n   ok: platform: currency controller\n  ! platform: graded enforcement envelope (cages) degraded (re-run to converge)\n   ok: platform: human/device access plane (Pomerium)\n   ok: platform: EUD local prep (vTPM, offline)\n   ok: tuppence: workload flagship (reach+secrets)\n==> foregrounded driftwood (kind-driftwood)\nEXIT=0"
+   },
+   {
+    "command": "timeout 2400 bash talk/verify-all.sh --live  (run 2, after bring-up)",
+    "exit_code": 1,
+    "verdict": "fail",
+    "key_lines": "policy is a versioned dependency (coexistence)                 FAIL (exit)\n    last: FAIL: require-nonroot-3-0-0 not installed live (fan-out incomplete)\na version not in the array cannot run (orphan-guard)           PASS\nretiring a version prunes it                                   PASS\nshift-left CI catches an Audit->Deny flip pre-merge            FAIL (exit)\n    last: FAIL: ci-check.py passed a workload that fails its target version's real rule\nexemptions dissolve into conditional policy                    PASS\nPROPORTIONALITY: same control, Audit driftwood vs Deny ludlow  PASS\nenforcement tuned by the \u00a3, not a timer                        PASS\ngraded response: caged by degree, not denied                   FAIL (exit)\n    last: FAIL: cage-tier-2-0-1 MutatingPolicy not installed live\nthe board line is TCoR and it moves                            PASS\nfeeds signed+versioned, a bump moves the \u00a3                     PASS\nico penalty schema signed; a bump moves the \u00a3                  PASS\nnist ships a real, pinnable OSCAL catalog                      PASS\nevidence up-flow resolves end to end (OSCAL risk)              PASS\nLIVING LOOP: war-gamer opens a signed PR, never merges         FAIL (exit)\n    last: unexpected: the gate passed a workload that should trip the flip\nAI-Wardley flags commoditisation movement, re-tunes early      PASS\nthe number is honest today (calibration+integrity)             PASS\nidentity substrate: SPIRE is Istio's CA, mTLS STRICT           FAIL (exit)\n    last: FAIL: ping has no Ready istio-proxy sidecar \u2014 webhook did not inject\nposture-as-identity: posture/vN in the SVID path               FAIL (exit)\n    last: FAIL: stamp-posture-2-0-1 MutatingPolicy not installed live\ncurrency controller re-evaluates posture post-admission        PASS\nposture-gated reach + secrets (tuppence flagship)              FAIL (exit)\n    last: FAIL: current caller did NOT reach (got '000ERR')\nhuman/device access plane holds (Pomerium+device SVID)         FAIL (exit)\n    last: FAIL: Pomerium pod not present\nbreak-glass demands step-up by the \u00a3                           PASS\nEUD device trust on the same root (vTPM, narrated-virtual)     PASS\nPROVENANCE: every actor attestable to one root                 PASS\nroles: is data, machine-checked against the filesystem         PASS\n\ndriftwood reconciles from a pinned, signed GitRepository       FAIL (live)\ntuppence reconciles, carries its toward-strict skin            FAIL (live)\nludlow reconciles, carries its Deny-heavy skin                 FAIL (live)\n\npass=17 fail=11 skip-live=0\nSOME BEATS WOULD FAIL ON STAGE"
+   },
+   {
+    "command": "bash .estate-clone/{driftwood,tuppence,ludlow}/verify-reconcile.sh (AFTER bring-up)",
+    "exit_code": 1,
+    "verdict": "fail",
+    "key_lines": "=== driftwood ===\n==> 1. GitRepository is Ready and pinned to a tag+commit\n==> 2. Kustomization is Ready (reconcile healthy)\n==> 3. the reconciled content actually landed in the cluster\n==> 4. the pinned nist (regulator) dependency reconciled healthy\nFAIL: nist-pin configmap not reconciled (got '1.1.0')\nexit=1\n=== tuppence ===\nFAIL: GitRepository commit not pinned\nexit=1\n=== ludlow ===\nFAIL: GitRepository commit not pinned\nexit=1"
+   },
+   {
+    "command": "kubectl get pods/gitrepositories (AFTER bring-up)",
+    "exit_code": 0,
+    "verdict": "fail",
+    "key_lines": "driftwood gitrepo spec.ref: {\"commit\":\"de9f0f61f0c299a94256dd0e27136f1c45c8467f\",\"tag\":\"v1.0.0\"}  URL now http://git-server.flux-system.svc.cluster.local/cgi-bin/git/driftwood.git\ntuppence/ludlow spec.ref unchanged: {\"tag\":\"v1.0.0\"} \u2014 still github URLs\ndriftwood non-Running:\ncurrency-system currency-controller-29797295-pzgkd 0/1 Error\ncurrency-system currency-controller-29797296-bwfrl 0/1 Error\ncurrency-system currency-verify-7fh2f 0/1 Error\ncurrency-system currency-verify-xq2fl 0/1 Error\nspire-system spire-agent-qh6rf 0/1 CrashLoopBackOff 398 (98s ago) 6d22h\nspire-system spire-spiffe-oidc-discovery-provider-75d5bc7bb8-c55sl 0/2 Unknown 56 (6d22h ago)\ntuppence/ludlow non-Running: none"
+   }
+  ],
+  "red_items": [
+   "talk/verify-all.sh --live exits 1 both runs. Run 1: pass=16 fail=12 skip-live=0. Run 2 (after talk/up.sh driftwood): pass=17 fail=11 skip-live=0. Banner: SOME BEATS WOULD FAIL ON STAGE.",
+   "ALL THREE live reconcile beats FAIL in both runs \u2014 driftwood, tuppence, ludlow. Zero SKIPs, so this is a real red, not an absent-cluster skip.",
+   "tuppence + ludlow live beats fail at step 1: 'FAIL: GitRepository commit not pinned'. Live spec.ref on both is {\"tag\":\"v1.0.0\"} with URL https://github.com/policy-as-versioned-<unit>/<unit> \u2014 no .spec.ref.commit at all. talk/up.sh driftwood cannot touch these clusters, so the failure stands.",
+   "driftwood live beat after bring-up: 'FAIL: nist-pin configmap not reconciled (got '1.1.0')' \u2014 .estate-clone/driftwood/verify-reconcile.sh asserts catalogVersion == 1.0.0 but the driftwood gitops tree now pins nist v1.1.0 (gitops/flux-system/gotk-sync-nist.yaml: tag v1.1.0, commit 33a05df1...). The verify script has drifted behind the content it verifies.",
+   "'policy is a versioned dependency (coexistence)' FAIL: require-nonroot-3-0-0 not installed live (fan-out incomplete). Live cluster carries only require-nonroot-1-0-0 and 2-0-0.",
+   "'graded response: caged by degree, not denied' FAIL: cage-tier-2-0-1 MutatingPolicy not installed live. Live carries cage-tier-1-0-0 and 2-0-0 only. talk/up.sh reported 'platform: graded enforcement envelope (cages) degraded' \u2014 bring-up did not converge it.",
+   "'posture-as-identity: posture/vN in the SVID path' FAIL: stamp-posture-2-0-1 MutatingPolicy not installed live. Live carries stamp-posture, 1-0-0, 2-0-0. talk/up.sh reported 'platform: posture projection degraded'.",
+   "'shift-left CI catches an Audit->Deny flip pre-merge' FAIL: ci-check.py passed a workload that fails its target version's real rule. Offline beat, fails on a laptop with no cluster involved \u2014 a genuine gate defect.",
+   "'LIVING LOOP: war-gamer opens a signed PR, never merges' FAIL: unexpected: the gate passed a workload that should trip the flip. Offline beat, same class as above.",
+   "'identity substrate: SPIRE is Istio's CA, mTLS STRICT' FAIL: ping has no Ready istio-proxy sidecar \u2014 webhook did not inject. Root cause visible in the cluster: spire-agent-qh6rf CrashLoopBackOff with 398 restarts (6d22h), spire-spiffe-oidc-discovery-provider 0/2 Unknown with 56 restarts.",
+   "'posture-gated reach + secrets (tuppence flagship)' FAIL: current caller did NOT reach (got '000ERR') \u2014 downstream of the same broken sidecar injection.",
+   "'human/device access plane holds (Pomerium+device SVID)' FAIL: Pomerium pod not present, even though talk/up.sh reported 'ok: platform: human/device access plane (Pomerium)'. The up.sh reports ok for a layer that did not land.",
+   "driftwood currency-system CronJob pods are in Error continuously, before and after bring-up: currency-controller-* and currency-verify-* both die with 'urllib.error.HTTPError: HTTP Error 404: Not Found' in the reconcile container. Six Error pods before, four plus two currency-verify after.",
+   "'currency controller re-evaluates posture post-admission' flipped FAIL ('rbac.yaml invalid') in run 1 to PASS in run 2 \u2014 the only beat the bring-up fixed. The beat is state-dependent, not stably green.",
+   "The 'OFFLINE' beat list in talk/verify-all.sh is mislabelled: several of its beats query the live cluster and fail with 'not installed live'. The honesty gate's offline/live split does not match what the scripts actually do."
+  ],
+  "not_run_and_why": [
+   "talk/reset.sh \u2014 forbidden by the probe and by the hard rules (deletes/resets cluster state).",
+   "talk/up.sh tuppence and talk/up.sh ludlow \u2014 the probe authorised one idempotent bring-up of driftwood only. The tuppence/ludlow live beats therefore remain FAIL; they would need their own bring-up to re-point their GitRepositories at a commit-pinned in-cluster source.",
+   "clone-estate.sh --refresh \u2014 would re-clone the six unit repos from the network; the existing .estate-clone/ was already present and reused (verify-all reported 'already cloned' for all six).",
+   "No third verify-all run \u2014 the probe allowed exactly one re-run after bring-up, and it was used."
+  ],
+  "capture_files": [
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live.json",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/kind-get-clusters.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/before-kind-driftwood.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/before-kind-tuppence.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/before-kind-ludlow.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/verify-all-live.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/verify-all-live.partial-killed.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/live-driftwood.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/live-tuppence.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/live-ludlow.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/driftwood-policies.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/driftwood-currency-errors.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/gitrepo-specrefs.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/up-driftwood.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/verify-all-live-after-up.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/live-driftwood-after.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/live-tuppence-after.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/live-ludlow-after.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/after-kind-driftwood.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/after-kind-tuppence.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/talk-verify-live/after-kind-ludlow.txt"
+  ],
+  "summary": "Red. All three KinD clusters (driftwood, tuppence, ludlow) exist, nodes Ready, Kustomizations and GitRepositories Ready \u2014 but `bash talk/verify-all.sh --live` exits 1 both before and after the one permitted bring-up: pass=16 fail=12 skip-live=0 first run, pass=17 fail=11 skip-live=0 second. Zero SKIPs, so every live failure is real. All three live reconcile beats FAIL both times. tuppence and ludlow fail at step 1 on \"GitRepository commit not pinned\" \u2014 their live spec.ref is {\"tag\":\"v1.0.0\"} against the public GitHub URL with no commit field, and `talk/up.sh driftwood` cannot reach those clusters. driftwood, after bring-up, re-pointed at the in-cluster git-server with a real {commit,tag} pin and got to step 4, then failed on \"nist-pin configmap not reconciled (got '1.1.0')\": the checked-in gitops tree pins nist v1.1.0 while verify-reconcile.sh still asserts 1.0.0 \u2014 the verifier has drifted behind the content it verifies. Eight offline-labelled beats also fail, several because they query the live cluster (the OFFLINE/LIVE split in verify-all.sh is mislabelled): require-nonroot-3-0-0, cage-tier-2-0-1 and stamp-posture-2-0-1 are absent from the cluster (only 1-0-0/2-0-0 present), and talk/up.sh itself reported the posture and cages layers \"degraded\". Two purely offline gate defects need no cluster at all: shift-left's ci-check.py passes a workload that fails its target version's real rule, and the war-gamer gate passes a workload that should trip the flip. The identity substrate is broken \u2014 spire-agent is in CrashLoopBackOff with 398 restarts, which takes down sidecar injection and with it the mTLS beat and the tuppence reach/secrets flagship. Pomerium reports \"ok\" from up.sh but its pod is not present. driftwood's currency-system CronJobs run continuously into `urllib.error.HTTPError: HTTP Error 404: Not Found`. Nothing was fixed, retried to green, or edited; reset.sh and the tuppence/ludlow bring-ups were not run."
+ },
+ {
+  "probe": "estate-verify-scripts",
+  "commands_run": [
+   "find .estate-clone verify -name 'verify-*.sh'",
+   "grep -oE for verify-all.sh coverage extraction",
+   "timeout 600 bash <each of 54 verify-*.sh scripts individually, output captured>",
+   "grep for mutating patterns (git push/tag -a/kubectl apply|delete|create/cosign sign/kind delete/docker push) across all 54 scripts before running any"
+  ],
+  "results": [
+   {
+    "command": "find .estate-clone verify -name 'verify-*.sh' | wc -l",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "54 verify-*.sh scripts found (51 under .estate-clone/, 3 under verify/)"
+   },
+   {
+    "command": "grep -oE coverage diff against talk/verify-all.sh OFFLINE+LIVE arrays",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "28 of 54 covered by verify-all.sh (25 OFFLINE + 3 LIVE = 28); 26 not covered"
+   },
+   {
+    "command": "38 scripts: timeout 600 bash <script> (each individually)",
+    "exit_code": 0,
+    "verdict": "pass",
+    "key_lines": "38 scripts exited 0 (offline PASS or cluster-needing scripts that gracefully SKIP-live)"
+   },
+   {
+    "command": "14 scripts: timeout 600 bash <script>",
+    "exit_code": 1,
+    "verdict": "fail",
+    "key_lines": "14 scripts exited 1 -- mix of expected no-cluster FAILs (reconcile x3, access, identity, graded, posture, coexistence, reach-secrets) and real defects (verify-governed-namespace-guard.sh: FileNotFoundError on missing distribution/render-governed-namespace-guard.py; verify-coverage.sh: AssertionError; verify-shift-left.sh + verify-wargamer.sh: same root cause, 'ci-check.py passed a workload that fails its target version's real rule'; tuppence/scripts/verify-adopter-gate.sh: cosign identity mismatch)"
+   },
+   {
+    "command": "2 scripts: timeout 600 bash <script> (attempted twice each)",
+    "exit_code": 124,
+    "verdict": "fail",
+    "key_lines": "verify-generator-standing-check.sh and verify-publisher-gate.sh both genuinely exceeded 600s twice each -- both are documented in their own comments as multi-minute, real-kyverno-apply-per-corpus-fixture checks, and both showed live kyverno subprocess activity when polled (not deadlocked, just slow -- worsened by an unrelated concurrent sibling process found already running the same computed-semver scripts)"
+   }
+  ],
+  "red_items": [
+   "verify-governed-namespace-guard.sh (offline-safe, NOT covered by verify-all.sh): FileNotFoundError -- distribution/render-governed-namespace-guard.py does not exist on disk, the verify script's own subject file is missing",
+   "verify-coverage.sh (offline-safe, NOT covered by verify-all.sh): AssertionError on pinned_version 2.0.1 / computed_bump 'patch' -- real logic failure, not an env/dependency issue",
+   "verify-shift-left.sh (covered by verify-all.sh, is one of its OFFLINE beats) FAILS when run standalone: 'ci-check.py passed a workload that fails its target version's real rule' -- contradicts verify-all.sh's OFFLINE array implying this beat currently passes; needs reconciling with when verify-all.sh was last actually run clean",
+   "verify-wargamer.sh (covered by verify-all.sh OFFLINE beat) FAILS with the same root-cause message as verify-shift-left.sh -- 'the gate passed a workload that should trip the flip', suggesting one shared underlying ci-check.py regression breaks two of verify-all.sh's claimed-passing beats",
+   "tuppence/scripts/verify-adopter-gate.sh (not covered by verify-all.sh) FAILS: cosign verify-blob identity mismatch against a real platform sibling clone -- 'none of the expected identities matched what was in the certificate'",
+   "verify-generator-standing-check.sh and verify-publisher-gate.sh both exceeded the 600s timeout on two separate attempts each (never completed, real exit code unknown -- recorded as TIMEOUT/124, not PASS or FAIL)",
+   "owner's memory records '28 of 56' scripts covered; the actual find in this repo state is 54 scripts total (28 covered, 26 not) -- the '56' figure does not match current disk state, flagging a drift between the recorded honesty-gate coverage number and reality worth reconciling",
+   "an unrelated, already-running process was found mid-probe executing the same set of computed-semver verify-*.sh scripts (cwd .estate-clone/platform/computed-semver, logging to /tmp/cs2-*.log) -- concurrent, uncoordinated access to the same repo checkout, contributing real CPU contention to the two timeouts above"
+  ],
+  "not_run_and_why": [
+   "No script was withheld as mutating -- inspection (grep for git push / git tag -a / kubectl apply|delete|create / cosign sign / kind delete / docker push across all 54 scripts before running any) found every one of the apparent mutation sites confined to a script-managed mktemp scratch dir or a `git clone --local`/`git init --bare` throwaway remote that the script itself constructs and tears down via its own EXIT trap; none touch this repo's real git history, a real GitHub remote, or a real signing identity. All 54 were run.",
+   "talk/up.sh (KiND cluster bring-up) was not run -- the probe text authorizes local KiND bring-up 'ONLY where the probe text says so', and this probe's text never said so; cluster-needing scripts were run as-is against whatever cluster context happened to be ambient (mostly none; verify-proportionality.sh found a live but Kyverno-CRD-less context and skipped its live tail gracefully)."
+  ],
+  "capture_files": [
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/estate-verify-scripts.json",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/run/ (55 files: one raw stdout+stderr capture per script, dot-prefixed for .estate-clone-rooted scripts)",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/all_scripts.txt",
+   "/private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/covered.txt"
+  ],
+  "summary": "Found and ran all 54 verify-*.sh scripts under .estate-clone/ and verify/ (the .estate-clone/platform tree already existed at task start, no polling needed). No script mutates shared/remote state -- every git/cosign operation that looked mutating was confirmed confined to a script-owned mktemp scratch dir or --local throwaway clone/bare-repo. talk/verify-all.sh (the honesty gate, not named 'verify-all.sh' but found at that path) covers exactly 28 of the 54 scripts found on disk today (25 OFFLINE-array beats + 3 LIVE-array beats) -- 26 scripts are not covered at all, several of them real per-ticket selfchecks (verify-cage-engine.sh, verify-pairing.sh, verify-witness-set.sh, verify-release-integrity.sh, verify-governed-namespace-guard.sh, verify-render-version-tree.sh, verify-party-artefact.sh, both adopter-gate.sh scripts, the four identity-regexp scripts, etc.). The owner's memory records the coverage as '28 of 56'; actual disk state today is 28 of 54, not 56 -- worth reconciling. Of the 54: 38 passed (exit 0, including cluster-needing scripts whose live tail cleanly reports FAIL/SKIP-live rather than being counted separately), 14 failed with exit 1, and 2 genuinely exceeded the 600s timeout twice each (verify-generator-standing-check.sh, verify-publisher-gate.sh -- both are documented in their own comments as multi-minute real-kyverno-apply-per-fixture checks, worsened by an unrelated concurrent process found already running the same computed-semver scripts mid-probe). Two of the 14 failures are real defects independent of environment: verify-governed-namespace-guard.sh throws FileNotFoundError because distribution/render-governed-namespace-guard.py does not exist on disk, and verify-coverage.sh fails a real AssertionError. Two more failures share one root cause and both are claimed-passing OFFLINE beats in verify-all.sh: verify-shift-left.sh and verify-wargamer.sh both report 'ci-check.py passed a workload that fails its target version's real rule' / 'the gate passed a workload that should trip the flip' -- the same ci-check.py regression breaking two of the honesty gate's own listed-passing beats when run standalone just now. Full per-script table (script, classification, exit code, verdict, decisive output line) is in the JSON result file."
+ }
+]

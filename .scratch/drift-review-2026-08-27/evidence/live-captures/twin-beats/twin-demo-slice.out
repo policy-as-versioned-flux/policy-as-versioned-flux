@@ -1,0 +1,25 @@
+==> demo slice: we can model an organisation's landscape, anticipate its movements, prove when we're wrong, and price the response wherever it lives
+  subject  royal-mail   falsifiability (b), retrospective — proves the twin can be checked
+  subject  netflix      versioned governance (c), concluding in the one-currency comparison (a) — shows the whole engine
+  subject  intel        falsifiability (b), live and forward — shows the twin will be checked next
+  shown    9 capabilities: causal-layer, currency-regimes, demo-slice, domain-model, enactment, provenance, scenario-engine, sense-move, synthetic-substrate
+  stubbed  0 unchecked criteria within them
+  absent   4 capabilities never touched: ethics-gate, forecast-book, honest-build, twin-inside-twin
+  AC 1  A single demonstrable thesis, stated in one sentence.  -> build ticket(s) 77, 91
+  AC 2  Subject + scenario selection, with rationale.  -> build ticket(s) 71, 73, 75, 91
+  AC 3  An explicit shown/stubbed/absent boundary and how it is surfaced.  -> build ticket(s) 77, 91
+  AC 4  Acceptance criteria for the slice, tied back to the owning tickets' criteria.  -> build ticket(s) 91
+demo-slice-summary -> /private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/demo-slice.json
+  attestation  demo-slice.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       6cce25cc454ad92fd0ebcccd42ae4666b323bcf34bd30551ce3fb1c180ee3e35
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    demo-slice         full     4/4 of decision ticket 22  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    enactment          full     5/5 of decision ticket 18  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+    synthetic-substrate full     7/7 of decision ticket 12  unchecked: -
+demo-slice EXIT=0

@@ -1,0 +1,13 @@
+==> Flux drift measurement, 2026-08-07 to 2026-11-06
+  question     Does the state of a deployed control diverge from its declared state **between deploys**? The spec claims continuous reconciliation is required rather than a deploy-time attestation, and drift between deploys is the candidate justification. If controls do not drift, a point-in-time attestation suffices and Flux is a convenience rather than an enabler.
+  owner        Chris Nesbitt-Smith
+  window       23% elapsed, 3/493 expected samples (1% coverage)
+  gap          2026-08-07T00:00:00+00:00 -> 2026-08-10T09:51:24+00:00 (81.86h unobserved)
+  gap          2026-08-10T09:51:24+00:00 -> 2026-08-11T22:42:33+00:00 (36.85h unobserved)
+  gap          2026-08-11T22:42:33+00:00 -> 2026-08-13T02:53:15+00:00 (28.18h unobserved)
+  gap          2026-08-13T02:53:15+00:00 -> 2026-08-27T13:18:43+00:00 (346.42h unobserved)
+  floor        90% UNREACHABLE — ceiling 77.5%. build ticket 65's continuous-state branch closes `unmeasured` whatever happens next; unsampled hours do not come back
+  no drift event observed yet — read that against the coverage above, not instead of it
+  precondition org-actions-may-not-create-prs blocks build ticket 66, owner: an organisation administrator — the twin operator cannot change this
+  no verdict:  this is the instrument. Whether drift between deploys justifies continuous proof-of-force is build ticket 65, and it reads this data — writing the conclusion into the instrument is how a measurement becomes a demonstration.
+drift EXIT=0

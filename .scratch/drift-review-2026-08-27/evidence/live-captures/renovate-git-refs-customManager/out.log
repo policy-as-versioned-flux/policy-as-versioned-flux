@@ -1,0 +1,21 @@
+== 1. Upstream fixture (simulates the policy repo), tagged 1.0.0 ==
+
+No secrets have been found
+
+Warning: A new version of ggshield (v1.54.0) has been released (https://github.com/GitGuardian/ggshield).
+   1.0.0 = 26dc6a8b7017f359c570c7597229e6428a70d3c7
+== 2. Fleet fixture, pinned at 1.0.0 (nested array + flat consumer pin) ==
+
+No secrets have been found
+
+== 3. New upstream tag 1.1.0 lands (fleet/consumer are now behind) ==
+
+No secrets have been found
+
+   1.1.0 = 7b4ab8d1adfdc4c8ba6bd32e008a600c15ae1e02
+== 4. One customManager (git-refs datasource) for both files ==
+== 5. Renovate dry run (platform=local -- preview only, writes nothing) ==
+== 6. Verdict ==
+   consumer-pin.yaml: 1.0.0@26dc6a8b -> 1.1.0@7b4ab8d1  OK
+   fleet-resourceset-input.yaml: 1.0.0@26dc6a8b -> 1.1.0@7b4ab8d1  OK
+EXIT:0

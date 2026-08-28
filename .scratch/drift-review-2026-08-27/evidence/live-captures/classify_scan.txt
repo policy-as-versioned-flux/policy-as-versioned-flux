@@ -1,0 +1,97 @@
+=== .estate-clone/driftwood/scripts/verify-identity-regexp.sh ===
+=== .estate-clone/driftwood/verify-reconcile.sh ===
+  got=$(kubectl --context "$CTX" -n "$3" get "$1" "$2" \
+kubectl --context "$CTX" -n flux-system get gitrepository driftwood \
+kubectl --context "$CTX" -n flux-system get gitrepository driftwood \
+=== .estate-clone/ico/verify-certificate-identity-regexp.sh ===
+# Offline: reads the pattern straight out of release.yml, no cluster, no gitsign.
+=== .estate-clone/ico/verify-penalty-feed.sh ===
+# Offline, no cluster required.
+=== .estate-clone/ludlow/verify-adopter-gate.sh ===
+=== .estate-clone/ludlow/verify-certificate-identity-regexp.sh ===
+# foreign org/repo. Offline, no cluster needed -- pure regexp check against
+=== .estate-clone/ludlow/verify-reconcile.sh ===
+  got=$(kubectl --context "$CTX" -n "$3" get "$1" "$2" \
+kubectl --context "$CTX" -n flux-system get gitrepository ludlow \
+kubectl --context "$CTX" -n flux-system get gitrepository ludlow \
+=== .estate-clone/nist/scripts/verify-catalog.sh ===
+# tag+commit. No network, no cluster.
+=== .estate-clone/nist/scripts/verify-cert-identity-regexp.sh ===
+=== .estate-clone/platform/access/verify-access.sh ===
+=== .estate-clone/platform/break-glass/verify-break-glass.sh ===
+# this is pure decision logic (no cluster resources of its own; it rides on the
+=== .estate-clone/platform/compose/verify-composition.sh ===
+=== .estate-clone/platform/computed-semver/verify-cage-engine.sh ===
+=== .estate-clone/platform/computed-semver/verify-comparison-window.sh ===
+=== .estate-clone/platform/computed-semver/verify-corpus-generator.sh ===
+=== .estate-clone/platform/computed-semver/verify-coverage.sh ===
+# shell out to `kyverno apply`.
+=== .estate-clone/platform/computed-semver/verify-gate.sh ===
+# runs entirely offline (no cluster, no kyverno) since this ticket's scope is
+=== .estate-clone/platform/computed-semver/verify-generator-standing-check.sh ===
+# Needs the real kyverno CLI (offline, no cluster) -- the known-good bumps
+=== .estate-clone/platform/computed-semver/verify-pairing.sh ===
+=== .estate-clone/platform/computed-semver/verify-rederive-bumps.sh ===
+  echo "SKIP: kyverno CLI not found -- rederive-bumps check needs it (offline, no cluster)"
+=== .estate-clone/platform/computed-semver/verify-release-integrity.sh ===
+=== .estate-clone/platform/computed-semver/verify-witness-set.sh ===
+=== .estate-clone/platform/currency-controller/verify-currency.sh ===
+#   4. the manifests are valid (client dry-run) if kubectl is present.
+=== .estate-clone/platform/distribution/verify-coexistence.sh ===
+# cluster with both ValidatingPolicies installed is reachable): proves the two
+=== .estate-clone/platform/distribution/verify-governed-namespace-guard.sh ===
+# `kyverno apply` test a false pass (kyverno/kyverno#13605 is the open
+#      claim" -- proved for real via `kyverno apply`, against a throwaway
+=== .estate-clone/platform/distribution/verify-orphan-guard.sh ===
+=== .estate-clone/platform/distribution/verify-render-version-tree.sh ===
+=== .estate-clone/platform/distribution/verify-retirement.sh ===
+=== .estate-clone/platform/engine/verify-engine.sh ===
+# LIVE (only if the cluster is reachable): both controllers are Running and
+=== .estate-clone/platform/eud/verify-eud.sh ===
+=== .estate-clone/platform/feeds/verify-feeds.sh ===
+# -> £ ramps)." Offline, no cluster required.
+=== .estate-clone/platform/graded/verify-graded.sh ===
+# LIVE tail (only if a cluster with the policies is reachable; bounded):
+=== .estate-clone/platform/honesty/verify-honesty.sh ===
+# No cluster, no network. Needs python3 + openssl (both stdlib-adjacent, always present here).
+=== .estate-clone/platform/identity/verify-identity.sh ===
+=== .estate-clone/platform/oscal/verify-claims.sh ===
+=== .estate-clone/platform/oscal/verify-upflow.sh ===
+=== .estate-clone/platform/party/verify-party-artefact.sh ===
+=== .estate-clone/platform/policy/verify-conditional.sh ===
+# Live tail (only if a cluster is reachable): the same admit/deny live.
+# cs-16: policy/policies/v1.0.0/ is deleted -- this rule folded into
+=== .estate-clone/platform/posture/verify-posture-projection.sh ===
+#      — the "forging is refused" proof, provable without a cluster.
+# LIVE tail (only if a cluster with the policies installed is reachable; bounded):
+=== .estate-clone/platform/risk/verify-risk-tuned.sh ===
+=== .estate-clone/platform/shift-left/verify-shift-left.sh ===
+# needs no cluster. Exits non-zero if the beat would fail on stage.
+  echo "SKIP: kyverno CLI not found -- shift-left check needs it (offline, no cluster)"
+=== .estate-clone/platform/tcor/verify-tcor.sh ===
+# OFFLINE only (this beat needs no cluster — it is pure £ maths over versioned inputs):
+=== .estate-clone/platform/verify-certificate-identity-regexp.sh ===
+# Offline: reads the pattern straight out of release.yml, no cluster, no gitsign.
+=== .estate-clone/platform/verify-cut-release-tags.sh ===
+# cluster, no gitsign binary, no network.
+=== .estate-clone/platform/verify-publisher-gate.sh ===
+=== .estate-clone/platform/wardley/verify-wardley.sh ===
+# Offline, no cluster. Needs python3 + openssl.
+=== .estate-clone/platform/wargamer/verify-wargamer.sh ===
+# Offline, no cluster. Needs python3; kyverno/gitsign used if present.
+=== .estate-clone/tuppence/reset/verify-reach-secrets.sh ===
+# Beat (ticket 17): "customer-accounts-reset accepts ONLY callers whose SVID
+# OFFLINE core (always; python3, + kubectl for dry-run if present):
+#      (=> default-deny for unmatched callers) selecting customer-accounts-reset.
+# LIVE tail (only if the identity substrate + these manifests are on the cluster):
+NS="tuppence-reset"
+=== .estate-clone/tuppence/scripts/verify-adopter-gate.sh ===
+=== .estate-clone/tuppence/scripts/verify-identity-regexp.sh ===
+=== .estate-clone/tuppence/verify-reconcile.sh ===
+  got=$(kubectl --context "$CTX" -n "$3" get "$1" "$2" \
+kubectl --context "$CTX" -n flux-system get gitrepository tuppence \
+kubectl --context "$CTX" -n flux-system get gitrepository tuppence \
+=== verify/party/verify-party.sh ===
+=== verify/proportionality/verify-proportionality.sh ===
+# per-institution kind clusters are reachable.
+=== verify/provenance/verify-provenance.sh ===

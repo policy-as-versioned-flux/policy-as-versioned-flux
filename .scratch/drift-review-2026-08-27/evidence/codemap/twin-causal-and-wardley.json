@@ -1,0 +1,147 @@
+{
+  "cluster": "twin-causal-and-wardley",
+  "modules": [
+    {
+      "file": "twin/propagate.py",
+      "lines": 681,
+      "purpose": "Monte-Carlo propagation of a shock through the causal (`influences`) layer of the graph. For every reachable component reports three parallel figures per path: the exact composed (unattenuated) elasticity product, the depth-attenuated version, and a seeded Monte-Carlo sample, plus a noisy-OR combined figure across paths that share edges (dependence handled structurally).",
+      "key_functions": "schedule()/factor()/pin()/published() load+validate attenuation.yaml; _edge_draws() draws one PERT stream per edge (shared across paths); _path_entry() builds composed/attenuated/sampled triple per path and applies the may_price gate; _expected_product() computes E[prod] analytically incl. raw moments for repeated edges; _joint() combines paths by noisy-OR with exact inclusion-exclusion up to MAX_EXACT_PATHS=10 and reports if_independent vs exact (double_counting_avoided); propagate() is the entry point doing BFS/DFS walk (max_depth=5, max_paths=32) and assembling the closed artefact body; refuse_undeclared_keys()/refuse_directional_magnitudes() are structural closure guards.",
+      "depends_on": "twin/attenuation.yaml (schedule), twin/pert.py (Triple, PERT sampler, quantise, summarise, procedure), twin/evidence.py (pricing threshold/gating), twin/canon.py (digest, walk_keys), twin/schema.py (CAUSAL_EDGE, SIGNS), twin/model.py (Graph/Edge, at runtime), twin/artefact.py (ArtefactError)"
+    },
+    {
+      "file": "twin/attenuation.yaml",
+      "lines": 43,
+      "purpose": "Versioned data file: the depth-decay schedule that scales composed causal influence by hop depth, and the boundary past which a result becomes directional-only (no magnitude).",
+      "key_functions": "n/a (data). schema twin.attenuation/v1, version 1. directional_beyond_depth: 4. factors depth 1-4: 1.0, 0.8, 0.6, 0.4, each with a `because` rationale string.",
+      "depends_on": "read/validated by twin/propagate.py::schedule()"
+    },
+    {
+      "file": "twin/blast.py",
+      "lines": 213,
+      "purpose": "Reverse-dependency blast radius: from an origin, walk both causal (`influences`, forward) and structural (`needs`, backward) edges to find every downstream-affected component, classifying each as priced, below-threshold, or no-mechanism (structural-only, unpriced by design).",
+      "key_functions": "classify() decides priced/BELOW_THRESHOLD/NO_MECHANISM per path; radius() does the DFS walk (max_depth=6) tracking best (Reached) per component by rank, splits results into admitted_to_pricing vs unpriced; Reached.rank orders priced > claimed-but-weak > structural-only, then shorter/better-evidenced/lexicographic; refuse_undeclared_keys() closes the body schema (no price/cost/loss/severity field exists at all).",
+      "depends_on": "twin/evidence.py (threshold, published), twin/schema.py (CAUSAL_EDGE, STRUCTURAL_EDGE), twin/canon.py (walk_keys), twin/artefact.py (ArtefactError), twin/model.py (Graph/Edge). Explicitly inherited algorithm/limits from /arckit:impact plugin."
+    },
+    {
+      "file": "twin/causal_claims.py",
+      "lines": 365,
+      "purpose": "The `causal-claims` skill: given free-text evidence about a claimed relationship between two components, proposes a causal edge (sign, lag, elasticity range, evidence grade) and a mandatory alternative-explanations field, plus a structural one-hop confounder detector. Also defines two separately-thresholded scoring metrics (claim accuracy vs. grade accuracy, asymmetrically penalised) and a labelled corpus.",
+      "key_functions": "shared_ancestors() — the free structural confounder detector, one-hop only; _sign()/_grade()/_lag_days()/_elasticity() — keyword-heuristic classifiers; _alternatives() — always includes reverse-causation plus one entry per flagged confounder; propose() — the skill entry point; scorer()/grade_scorer() — claim-accuracy (sign/lag/elasticity tolerance) vs grade-accuracy with zero tolerance for over-grading and 1-rung tolerance for under-grading; labelled_corpus() builds 4 items from the netflix/intel fixture read back through Overlay.",
+      "depends_on": "twin/fixtures.py (netflix/intel org builders), twin/evidence.py (pricing_threshold), twin/model.py (Graph, Overlay), twin/repo.py (ModelRepo), twin/schema.py (CAUSAL_EDGE)"
+    },
+    {
+      "file": "twin/causal_accounts.py",
+      "lines": 113,
+      "purpose": "Rival causal accounts (alternative graphs of `influences` edges for the same org) treated as unprivileged, like twin/positions.py does for rival world models. Propagates a shock independently under each named account and reports the spread of the primary path's attenuated mean at every reached component.",
+      "key_functions": "_primary_mean() extracts the primary path's attenuated mean (None past attenuation boundary); ensemble_spread() runs propagate.propagate() once per account, unmodified, and computes min/max/range/by_account spread per component; requires >=2 accounts.",
+      "depends_on": "twin/propagate.py (propagate, unmodified), twin/model.py (Overlay, ModelError), twin/pert.py (quantise)"
+    },
+    {
+      "file": "twin/primitives.py",
+      "lines": 267,
+      "purpose": "Pearl's counterfactual algorithm building blocks: Do (intervention, downstream-only propagation, incoming edges reported as severed) and Observe (bidirectional belief update) as two distinct dataclass types (not a boolean flag) plus `rewind()` (abduction: open the model repo at a past commit, a real state not a filtered view).",
+      "key_functions": "severed() — incoming causal edges cut by do(), type-guarded to Do only; _ancestor_paths() — BFS shortest causal ancestor path per node (linear cost, replaces exponential simple-path enumeration), bounded by UPSTREAM_MAX_DEPTH=5; updated_beliefs() — ancestors an Observe updates, directional-only (no magnitude, since inverting an elasticity needs an unauthored prior); refuse_upstream_under_intervention() — structural guard that an intervention never carries upstream updates; rewind() — ModelRepo.open_at_time(), fails explicitly before model existed.",
+      "depends_on": "twin/repo.py (ModelRepo, RepoError), twin/schema.py (CAUSAL_EDGE), twin/model.py (Edge/Graph at type-check time), twin/artefact.py (ArtefactError, lazily imported)"
+    },
+    {
+      "file": "twin/wardley.py",
+      "lines": 210,
+      "purpose": "The Wardley evolution-axis maths: stage banding and the D (differentiation pressure), K (commodity leverage), R (dependency risk) relations, plus a Position dataclass and a text-plot renderer. Explicitly ported (not rebuilt) from the installed arckit plugin, with arckit's action bands and £ prose deliberately excluded.",
+      "key_functions": "stage_of()/band()/midpoint() — banding logic (genesis/custom-built/product/commodity); differentiation_pressure()/commodity_leverage()/dependency_risk() — the three exact float formulas (D, K, R) with no quantisation, bit-identical arithmetic; Position.of()/positions() — build positions only where authored (never guessed); map_of() — builds the whole Wardley map + dependency-risk-per-structural-edge derived from the graph, no separate authoring step, lists unpositioned components/edges rather than dropping them; plot() renders a text grid purely from map_of()'s own output.",
+      "depends_on": "no other twin modules imported at module scope (schema.py imports wardley for band checks, so wardley avoids importing schema back to prevent a cycle)"
+    },
+    {
+      "file": "twin/positions.py",
+      "lines": 145,
+      "purpose": "Believed/rival/revealed world models held as unprivileged named position sets, with computed (not merely displayed) pairwise deltas and proper-scoring-rule comparison against revealed truth.",
+      "key_functions": "_belief() reads one proposition's probability from a world model; revealed() derives ground truth from a resolved outcome (never authored as belief); pairwise_deltas() — |a-b| magnitude for every unordered pair; against_revealed() — delta plus scoring.score() (Brier/log-loss) against revealed truth; deltas() — top-level: gathers named positions, abstains where a model holds no belief, refuses if none hold one.",
+      "depends_on": "twin/scoring.py (score — Brier/log-loss), twin/model.py (ModelError, Overlay), twin/pert.py (quantise)"
+    },
+    {
+      "file": "twin/evolution_judge.py",
+      "lines": 263,
+      "purpose": "The `evolution-judge` skill: infers a component's Wardley evolution position from accumulated evidence (grade-5 model assertion), accepts a human override (grade-4 calibrated judgement, attributable to a registered role), and generates a `pushback()` statement comparing the two (never silent, even on agreement).",
+      "key_functions": "_infer_position() — keyword-lookup heuristic fitted to 4 backtest orgs; judge() — the skill entry point, returns a claim-shaped dict with hardcoded evidence_grade=5; override() — requires the prior inferred claim for the same component, hardcodes grade=4; pushback() — compares inferred vs override position with a 0.1 agreement tolerance and always returns a statement; scorer() — tolerance-based (0.15) position scorer; labelled_corpus() — 4 items, one per backtest org (Carillion/NMC/Wirecard/Enron), each a single hardcoded expected evolution_position.",
+      "depends_on": "twin/wardley.py (stage_of), twin/fixtures.py (4 backtest org builders), twin/model.py (Overlay), twin/repo.py (ModelRepo)"
+    },
+    {
+      "file": "twin/gameplay_lens.py",
+      "lines": 332,
+      "purpose": "The `gameplay-lens` skill: checks two Wardley gameplay-pattern preconditions (land-grab, exploit-commoditisation) against the current map, deterministically, and a scheduled sweep() that scans every org's map on every run (the 'opportunities are pulled' counterweight to signals being pushed).",
+      "key_functions": "_land_grab()/_exploit_commoditisation() — precondition checks over position/needs-edges/ownership-edges; propose() — the skill entry point iterating org_components x PLAYS; sweep() — scheduled scan across repos/orgs producing an Artefact (KIND_OPPORTUNITY_SWEEP), reporting opportunity count beside signal count; labelled_corpus() — 3 fixture orgs (netflix land-grab positive, intel negative, pocket exploit-commoditisation positive).",
+      "depends_on": "twin/wardley.py (band constants via positions), twin/fixtures.py, twin/artefact.py (Artefact, DERIVED), twin/grades.py (Capabilities), twin/model.py (Overlay, orgs), twin/repo.py (ModelRepo), twin/schema.py (PERSON_EDGES, STRUCTURAL_EDGE), twin/TOOL_VERSION"
+    },
+    {
+      "file": "twin/spine.py",
+      "lines": 170,
+      "purpose": "Anchors/reconciles a generated synthetic substrate against the org's own real, dated `signal` documents (the 'spine' of ground truth) to detect over-anchoring (rigged tests) and silent drift (unrecorded contradiction).",
+      "key_functions": "Spine.from_overlay() — builds the spine directly from overlay.signals (no second authored format); Spine.at() — knowability filter reusing regimes.cutoff(); anchor() — additive insertion of knowable facts into a batch channel, non-mutating; reconcile()/reconcile_at_every_checkpoint() — verifies every knowable fact is present verbatim, refuses naming what's missing; diff_against_spine() — splits substrate lines into anchored vs free_running, the named attack surface.",
+      "depends_on": "twin/regimes.py (cutoff — reused, not reimplemented), twin/canon.py (digest_of), twin/model.py (Overlay)"
+    },
+    {
+      "file": "twin/scenario_diff.py",
+      "lines": 134,
+      "purpose": "Diffs one named scenario between two git refs: scalar/list field-level diff of the scenario's own declared fields, plus a map-diff (positions moved/added/removed) computed from Graph.wardley() at each ref.",
+      "key_functions": "_side() opens a ModelRepo at a given ref and loads the scenario (or None if absent); _scenario_fields() diffs scalar (before/after) and list (added/removed) fields; _map_diff() compares wardley() positions dict for stage/evolution changes; diff() — top-level entry building a DERIVED Artefact; refuses only if the scenario is absent at both refs.",
+      "depends_on": "twin/model.py (Overlay), twin/repo.py (ModelRepo, RepoError), twin/artefact.py (Artefact, DERIVED), twin/grades.py (Capabilities), twin/TOOL_VERSION"
+    },
+    {
+      "file": "twin/evidence.py",
+      "lines": 300,
+      "purpose": "Loads/validates the versioned evidence ladder (evidence-ladder.yaml) and implements the pricing use-gate plus the regrade-record mechanism that makes a grade immutable without an audit trail — both an at-load contiguity check and a git-history unrecorded-change check.",
+      "key_functions": "ladder() — loads+validates the YAML (grades match schema enum, may_price agrees with pricing_threshold, thresholds are real grades not bools); threshold()/admission_threshold()/rung()/may_price()/pin()/published(); direction()/record() — regrade event shaping, direction derived never authored; check_chain() — at-load contiguity+termination check; unrecorded_changes()/history_violations()/_graded_at()/_covered() — walks git commit history per graded file to catch the first unrecorded grade move (shared with twin/enforcement.py).",
+      "depends_on": "twin/evidence-ladder.yaml (the data), twin/canon.py (digest_of), twin/schema.py (EVIDENCE_GRADES), twin/repo.py (RepoError, indirectly via repo object passed in)"
+    },
+    {
+      "file": "twin/evidence-ladder.yaml",
+      "lines": 96,
+      "purpose": "Versioned data file: the 5-rung evidence ladder (dated natural experiment ... model assertion) with written admission criteria, the pricing_threshold (=2) and path_admission_threshold (=2) gates, and the two named regrade directions.",
+      "key_functions": "n/a (data). schema twin.evidence-ladder/v1, version 2.",
+      "depends_on": "read/validated by twin/evidence.py::ladder()"
+    },
+    {
+      "file": "twin/challenges.py",
+      "lines": 163,
+      "purpose": "Contestability primitive: a challenge names one specific claim (a dotted-key claim_path) in one specific artefact, frozen at the value it had when raised; a resolution can only answer the exact claim_path the challenge named (structurally, not by convention).",
+      "key_functions": "raise_challenge() — validates claim_path exists in the artefact body via canon.walk_values, builds an AUTHORED (no capability/depth grade) Artefact; resolve() — reads claim_path out of the challenge doc itself, no caller-supplied path parameter; for_artefact() — partitions challenges into open/resolved for one artefact digest; refuse_answering_a_different_claim() — a second, redundant structural guard on top of resolve()'s own design.",
+      "depends_on": "twin/artefact.py (AUTHORED, Artefact, ArtefactError), twin/canon.py (walk_values, canonical_json, sha256_hex)"
+    }
+  ],
+  "capabilities_real": [
+    "twin/propagate.py:239-252 — seeded PERT Monte-Carlo draws per edge (not per path), 2000 draws, deterministic by (seed, origin, edge id) so traversal order cannot affect the sample; verified by tests/test_seam2_propagation.py::test_the_sample_is_reproducible_and_independent_of_traversal_order",
+    "twin/propagate.py:296-332 — genuine composed (exact product) vs attenuated (schedule-scaled) vs sampled (Monte-Carlo) triple computation per path, with an overflow-of-unit-interval guard (line 304-316) that would otherwise silently invert the noisy-OR combination; verified by tests/test_seam2_propagation.py::test_the_composed_triple_is_the_point_wise_product, test_uncertainty_compounds_rather_than_being_averaged_away, test_an_influence_above_one_is_refused_where_it_would_reverse_the_combination",
+    "twin/propagate.py:369-500 — exact shared-ancestry dependence correction via inclusion-exclusion (2^n subsets, capped at MAX_EXACT_PATHS=10) and E[X^n] raw-moment computation for edges appearing multiple times, alongside a sampled joint that also carries dependence; verified by tests/test_seam2_propagation.py::test_shared_ancestry_does_not_double_count, test_the_dependence_correction_is_exactly_the_common_cause_variance, test_the_exact_form_stops_at_its_declared_bound_and_says_so, test_the_sampled_joint_carries_the_dependence_too",
+    "twin/propagate.py:503-579 — full graph walk with simple-path enumeration, depth cap (5), per-component path cap (32) ranked best-evidenced-first before truncation, and closed-body validation (refuse_undeclared_keys, refuse_directional_magnitudes); verified by tests/test_seam2_propagation.py::test_too_many_paths_to_one_component_are_capped_and_the_cap_is_disclosed, test_a_cycle_is_traversed_once_and_the_pruning_is_disclosed, test_the_propagation_body_is_closed",
+    "twin/blast.py:116-202 — reverse dependency traversal (BFS/DFS, simple paths, depth cap 6) that classifies every reached component as priced / below-threshold / no-mechanism, tracking the best-ranked path per component; verified by tests/test_admission.py::test_a_reputation_impact_with_a_churn_path_prices, test_the_same_impact_without_a_path_returns_a_blast_radius, test_the_same_path_too_weakly_evidenced_does_not_price",
+    "twin/wardley.py:83-96 — exact D/K/R Wardley formulas, bit-identical float arithmetic (no quantisation, deliberately, per module docstring); verified by tests/test_wardley.py::test_the_inherited_worked_examples_still_hold, test_differentiation_pressure_over_the_whole_grid, test_commodity_leverage_over_the_whole_grid, test_dependency_risk_over_the_whole_grid",
+    "twin/positions.py:73-93 — pairwise belief-delta computation and proper scoring rule (Brier/log-loss, delegated to twin/scoring.py) against revealed truth; verified by tests/test_positions.py::test_pairwise_deltas_are_computed_for_every_pair, test_against_revealed_matches_the_proper_score",
+    "twin/causal_claims.py:73-85 — shared_ancestors(): a genuine one-hop structural confounder detector over the merged graph's adjacency; verified by tests/test_causal_claims.py::test_shared_ancestors_finds_the_real_confounder_on_the_netflix_co_flagship_edge, test_shared_ancestors_finds_the_real_confounder_on_the_intel_co_flagship_edge",
+    "twin/primitives.py:95-137 — _ancestor_paths(): real breadth-first shortest-path search bounded by depth, deliberately linear-cost rather than exponential simple-path enumeration; verified by tests/test_primitives.py::test_the_upstream_walk_handles_depth_grades_and_cycles, test_the_upstream_walk_says_where_it_stopped",
+    "twin/primitives.py:246-267 — rewind() opens a real git commit as of a given time via ModelRepo.open_at_time, not a filtered view; verified by tests/test_primitives.py::test_rewind_produces_a_model_state_rather_than_a_filtered_view, test_rewind_composes_with_intervention_without_special_casing, test_rewinding_before_the_model_existed_fails_explicitly",
+    "twin/evidence.py:233-262 — unrecorded_changes()/history_violations(): a real git-history walk (repo.commits_touching, read_yaml_at) that detects grade changes not covered by a recorded regrade event; verified by tests/test_evidence_ladder.py::test_an_unrecorded_grade_change_fails_the_gate, test_a_recorded_grade_change_passes_the_gate",
+    "twin/spine.py:125-170 — reconcile()/diff_against_spine(): real presence/absence checking of dated public facts against a generated substrate, with a demonstrated non-trivial anchored/free-running split on the real Carillion fixture; verified by tests/test_spine.py::test_the_diff_attack_does_not_locate_plants, test_over_anchoring_would_have_made_the_plant_the_unique_residual",
+    "twin/challenges.py:44-104 — claim_path validated against canon.walk_values of the real artefact body; resolve() structurally reads claim_path from the challenge doc rather than accepting one as a parameter; verified by tests/test_challenges.py::test_a_challenge_to_an_unknown_claim_is_refused, test_resolve_inherits_the_challenges_own_claim_path"
+  ],
+  "capabilities_stubbed_or_thin": [
+    "twin/causal_claims.py:96-165 — sign/grade/lag/elasticity are all keyword-marker heuristics (_NEGATIVE_MARKERS/_POSITIVE_MARKERS/_GRADE_MARKERS/_LAG_MARKERS), explicitly ponytail-marked at line 35-42; elasticity magnitude is a hardcoded mode (0.375) with a grade-scaled width, not fitted from data at all ('Elasticity magnitude is not even keyword-fitted', line 39); upgrade path stated as 'swap the body for a model call'",
+    "twin/evolution_judge.py:64-98 — _infer_position() is a keyword lookup (_MATURITY_KEYWORDS) fitted to exactly the 4 backtest orgs' own component descriptions, explicitly ponytail-marked at line 18-23; default 0.5 when no keyword hits",
+    "twin/gameplay_lens.py:16-25 — the play catalogue covers only 2 of Wardley's ~100+ named gameplay patterns (land-grab, exploit-commoditisation), explicitly ponytail-marked; the worked-example's incumbency precondition ('no incumbent holds position') is never checked because the map carries no rival-occupancy data — every land-grab reason states 'Incumbency is not checked' (gameplay_lens.py:113-114)",
+    "twin/wardley.py:13-26 — arckit's action bands ('must invest', 'strong candidate for outsourcing') are deliberately excluded (inherited_from note says action_bands_inherited: False at line 177); arckit's £ deltas are prose-only and are explicitly not entered here ('No money enters through this module')",
+    "twin/gameplay_lens.py:33-37 — a proposed opportunity carries a claim-shaped dict but does not round-trip through the real schema.SCHEMAS['claim'] validator; nothing exercises writing it into a model repository"
+  ],
+  "hardcoded_or_fixture_only": [
+    "twin/causal_claims.py:299-331 — the whole causal-claims labelled corpus is 4 hand-authored evidence statements for netflix (streaming-displaces-dvd, cdn-capacity-lifts-streaming, price-separation-erodes-goodwill) and intel (euv-delay-slips-the-node)",
+    "twin/evolution_judge.py:234-239 — labelled_corpus hardcodes one component and one expected evolution_position per backtest org: Carillion 0.62, NMC Health 0.55, Wirecard 0.8, Enron 0.45",
+    "twin/gameplay_lens.py:305-331 — labelled_corpus hardcodes netflix streaming-experience (land-grab positive), intel foundry-services (negative case), pocket-org shared-database (exploit-commoditisation positive)",
+    "twin/attenuation.yaml:26-43 — the depth-decay factors (1.0, 0.8, 0.6, 0.4) and directional_beyond_depth=4 are fixed published constants, not derived from data",
+    "twin/evidence-ladder.yaml:25,40 — pricing_threshold=2 and path_admission_threshold=2 are fixed published constants",
+    "twin/causal_claims.py:158 — _BASE_MODE = 0.375 is stated to be the mean of the module's own 4-item labelled corpus's real elasticity modes, i.e. a constant reverse-derived from the fixture rather than an independent model"
+  ],
+  "external_integrations": [
+    "twin/primitives.py rewind() and twin/evidence.py history_violations()/unrecorded_changes() perform real git I/O (via twin/repo.py's ModelRepo — commits_touching, read_yaml_at, open_at_time), not simulated — the model repository itself is a git repo",
+    "twin/wardley.py is a deliberate one-time port of formulas/bands from an installed arckit plugin (~/.claude/plugins/cache/arc-kit/arckit/6.7.5/); at runtime there is no live call into arckit — the code and constants are copied in, with the three caveats about what was NOT inherited (action bands, impact history, £ formulas) documented in the module docstring",
+    "twin/blast.py explicitly inherits its algorithm and known limits from the /arckit:impact skill (module docstring, line 3) but again as a ported implementation, not a live invocation",
+    "No Flux, Kubernetes, GitHub, gitsign, prediction-market, or news-feed integration appears in any of these 15 files; twin/challenges.py references human signing (twin/sign.py) for challenge/resolution artefacts but does not itself implement signing"
+  ],
+  "notes": "This cluster is the causal/Wardley reasoning core of the twin, sitting above twin/model.py (Graph/Overlay/Edge) and twin/pert.py (PERT sampling primitives), and below twin/skills.py (the seam that runs skill_fn callables like causal_claims.propose, evolution_judge.judge/override, gameplay_lens.propose against labelled corpora with pass/fail thresholds). Three of the fifteen modules (causal_claims.py, evolution_judge.py, gameplay_lens.py) are explicitly self-described 'skills' whose classification logic is a small keyword heuristic standing in for a future model call — each says so in its own module docstring and marks the exact lines with a `ponytail:` comment, and each states the same upgrade path: swap the heuristic body for a model call with no change to the harness, tests, or callers, because the skill contract is a bare callable. The propagation/dependence machinery (propagate.py, blast.py, causal_accounts.py) and the maths/data modules (wardley.py, positions.py, evidence.py, evidence-ladder.yaml, attenuation.yaml) are genuine deterministic algorithms with dedicated, non-trivial test coverage exercising the actual numeric properties claimed (sub-additivity, exact-vs-sampled agreement, reproducibility, gate consistency). Two modules (spine.py, challenges.py) implement structural governance/audit mechanisms (fact reconciliation against a real git-derived spine; claim-path-scoped contestability) rather than statistical/optimisation algorithms, and both are exercised against real fixture data (the Carillion backtest for spine.py) rather than only synthetic inputs."
+}

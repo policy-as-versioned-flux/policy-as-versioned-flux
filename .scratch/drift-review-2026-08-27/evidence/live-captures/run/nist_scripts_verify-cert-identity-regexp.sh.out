@@ -1,0 +1,10 @@
+OK (matches):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/main
+OK (matches):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/release/1.0.x
+OK (matches):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/release/12.34.x
+OK (rejects):     https://github.com/evil-org/nist/.github/workflows/cut-release.yml@refs/heads/main
+OK (rejects):     https://github.com/policy-as-versioned-nist/other-repo/.github/workflows/cut-release.yml@refs/heads/main
+OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/other.yml@refs/heads/main
+OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/maint/1.0
+OK (rejects):     evil.com/https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/main
+OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/main.evil.com
+OK: EXPECTED_IDENTITY_REGEXP anchors org/repo/workflow and allows only main + release/<major>.<minor>.x

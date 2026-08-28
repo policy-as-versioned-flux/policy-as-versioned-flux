@@ -1,0 +1,296 @@
+{
+  "cluster": "estate adopters: driftwood, tuppence, ludlow (the three regulated institutions of the six-org estate, cloned under /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone)",
+  "components": [
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/scripts/up.sh",
+      "what_it_is": "Idempotent offline bring-up: KinD cluster -> flux install -> seeds gitops/ into a throwaway git repo, tags it v1.0.0, bare-clones it plus estate/nist's catalog into a busybox/lighttpd git-http-backend image, kind loads it, applies a GitRepository pinned to tag+commit and a Kustomization on ./apps, plus a second pinned nist GitRepository. Identical shape in tuppence/scripts/up.sh and ludlow/scripts/up.sh (only names/cluster differ).",
+      "how_it_runs": "shell script, run by an operator against local Docker/KinD",
+      "evidence_of_working": "verify-reconcile.sh asserts the resulting cluster state; drift/samples.jsonl and drift/forced-campaign-samples.jsonl are real captured output from a live kind-driftwood cluster (revision sha1:2fc21df8..., 2026-08-10 to 2026-08-15), so at least driftwood's up.sh demonstrably ran for real."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/verify-reconcile.sh",
+      "what_it_is": "Four-step cluster assertion: GitRepository Ready + pinned tag v1.0.0 + 40-hex commit; Kustomization Ready; namespace + <org>-live-version configmap present with policyVersion 1.0.0; nist GitRepository Ready + pinned and <org>-nist-pin catalogVersion 1.0.0. tuppence/ludlow copies add a 5th step comparing the risk-appetite configmap against platform/risk/appetite.json.",
+      "how_it_runs": "shell script, needs a live cluster (kubectl --context kind-<org>)",
+      "evidence_of_working": "Self-evidencing only; no CI runs it. NOTE a real inconsistency: all three scripts assert nist-pin catalogVersion == \"1.0.0\" (driftwood/verify-reconcile.sh:38, tuppence:39, ludlow:39) while the committed gitops/apps/nist-pin-configmap.yaml now carries catalogVersion \"1.1.0\" (all three, line 20) and gotk-sync-nist.yaml pins tag v1.1.0 — the assertion only passes because up.sh re-tags the seeded nist repo v1.0.0 locally; against the committed content it would fail."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/scripts/reset.sh",
+      "what_it_is": "hard reset (kind delete cluster + image rm + rm -rf .work) or `soft` (delete git-server deploy, re-exec up.sh). Same in tuppence/ludlow.",
+      "how_it_runs": "shell script",
+      "evidence_of_working": "no test; trivial wrapper"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/gitops/",
+      "what_it_is": "The reconciled tree: flux-system/gotk-sync.yaml (canonical GitRepository at the real GitHub remote, tag v1.0.0, commit deliberately left commented out at gotk-sync.yaml:22-23), flux-system/gotk-sync-nist.yaml (nist v1.1.0 + commit 33a05df1...), platform/platform-pin.yaml (platform v1.1.1 + commit 58ef9c57..., plus a Kustomization on ./distribution, opt-in, not in apps), apps/{namespace,version-configmap,nist-pin-configmap}.yaml. tuppence/ludlow add apps/risk-appetite-configmap.yaml (toleranceGBP 15000 / 5000).",
+      "how_it_runs": "Flux-reconciled (GitRepository + Kustomization); gitops/platform is opt-in, applied by hand and needs Kyverno + flux-operator",
+      "evidence_of_working": "verify-reconcile.sh; drift samples show apps/ reconciling live on kind-driftwood. gitops/platform (the ResourceSet fan-out) has no evidence of ever being applied in these repos."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/composed/",
+      "what_it_is": "The committed composed artefact (policy-composition tickets 12/18): HEADER.yaml (advisory, parents+SHAs, baseline MODERATE, governed-namespaces, 285 holes), evidence.json (17 members, refusals/restatements/cages/holes/ungoverned/prices/limits), orphan-guard.yaml (Deny), governed-namespace-guard.yaml (Audit), and policies/{v2.0.0,v2.0.1,v3.0.0}/{cage-tier,cage-netpol,stamp-posture,posture-trust-boundary,require-nonroot}.yaml. Byte-identical across the three orgs except the composed-for label, the governed-namespaces list, and evidence.json's prices/ungoverned.",
+      "how_it_runs": "Generated offline by platform/compose/composition.py; regenerated and diff-checked in CI (shift-left.yml compose-check job); the YAML itself is Kyverno policy that nothing in these repos ever applies to a cluster",
+      "evidence_of_working": "shift-left.yml's compose-check job (driftwood:272-357, tuppence:272-, ludlow:266-) fails on any diff against the committed copy; cut-release.yml re-runs `composition.py verify` before cutting a tag; the v1.1.0 signed tags in all three repos are the composed-artefact releases."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/party.yaml",
+      "what_it_is": "The signed party artefact: party, roles [risk-bearer, adopter], baseline MODERATE, inherits platform@1.1.1 implementations, nist@1.1.0 controls, ico@v1 pricing, platform@v1 threat; empty overlay. Same in tuppence and ludlow (identical inherits and baseline).",
+      "how_it_runs": "data file, checked in CI by platform/party/party_artefact.py",
+      "evidence_of_working": "shift-left.yml step 'party artefact check' (driftwood:101-113) calls party_artefact.py against the pinned platform checkout; the file itself documents that pricing and threat are unchecked because no Flux pin exists for them"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/workflows/shift-left.yml",
+      "what_it_is": "Two jobs on every pull_request, no paths filter. Job 1 (shift-left): checkout, read platform pin from PR head and PR base, checkout platform AT the pinned tag, verify resolved commit == pinned commit, party artefact check, install pinned kyverno CLI (1.18.2 + sha256), run platform/shift-left/ci-check.py against deploy/pod.yaml, install pinned cosign 3.1.3, run the adopter gate, splice its evidence into the PR body, build a JSON attestation, cosign sign-blob keyless, post as PR comment. Job 2 (compose-check): checkout platform/nist at the two pins and ico at main, re-run composition.py compose, fail on refusal or on any git diff under composed/.",
+      "how_it_runs": "GitHub Actions workflow (pull_request)",
+      "evidence_of_working": "Cross-org checkouts of real repos at real tags; the commit history (ticket-18 commits 2026-08-25) records live CI round-trips fixing head.sha vs HEAD and the missing deploy/pod.yaml. Offline twins exist for the adopter-gate half (tuppence/scripts/verify-adopter-gate.sh, ludlow/verify-adopter-gate.sh). The keyless cosign sign-blob step is only exercisable inside a real Actions run."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/scripts/adopter-gate.py",
+      "what_it_is": "889-line adopter gate: read_pin (multi-doc YAML), verify_pinned_commit, read_policy_array_at/diff_arrays/fetch_tag, versions_from_composed_evidence (ADR-0011 subject = this repo's own composed/evidence.json member set), verify_evidence (cosign verify-blob, identity-pinned to a literal EXPECTED_PLATFORM_IDENTITY_REGEXP constant), compose (retirement = major, strictest wins, weaker-than-declared prints and never lowers), render_markdown, wrap_section/splice_body, and a large --selfcheck.",
+      "how_it_runs": "offline python, invoked from shift-left.yml and propose-tier.yml",
+      "evidence_of_working": "--selfcheck builds real throwaway git repos, real tags, real clones, and calls the real cosign binary for two genuine refusals (missing bundle, garbage bundle) plus a real key-signed-bundle-refused-under-identity-pinning case. Explicitly cannot prove the cosign ACCEPT path offline (no ambient OIDC) — stated in the module docstring at lines ~543-560."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/tuppence/.github/scripts/adopter-gate.py",
+      "what_it_is": "tuppence's own 482-line adopter gate — a FLAG-based CLI (--platform-dir/--new-pin-yaml/--old-pin-yaml/--identity-regexp/--issuer/--out), no subcommands, with --skip-cosign-verify as a test-only flag. Same conceptual four steps as driftwood's, different CLI shape.",
+      "how_it_runs": "offline python, invoked from tuppence/.github/workflows/shift-left.yml:178",
+      "evidence_of_working": "--selfcheck (pure logic + one real on-disk fixture with cosign skipped) plus tuppence/scripts/verify-adopter-gate.sh (383 lines, six scenarios against a real local platform clone)"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/ludlow/.github/scripts/adopter_gate.py",
+      "what_it_is": "ludlow's own 1021-line gate (underscore filename, --ludlow-dir/--platform-dir/--old-ref/--new-ref/--identity-regexp/--out-comment/--splice-body). Adds offline cosign via a committed Sigstore trust root (.github/scripts/trusted_root.json, 126 lines, real rekor.sigstore.dev/Fulcio material) passed as --trusted-root.",
+      "how_it_runs": "offline python, invoked from ludlow/.github/workflows/shift-left.yml:233",
+      "evidence_of_working": "large selfcheck using unittest.mock for the evidence-verify boundary, plus ludlow/verify-adopter-gate.sh Parts A-E, where Part E proves cosign verify-blob works with egress hard-blocked via HTTPS_PROXY, and refuses with the wrong key"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/scripts/read-two-pins.py",
+      "what_it_is": "37-line standalone reader printing <prefix>_tag/<prefix>_commit for the platform and nist pin files, written because the three adopters' gate CLIs diverged. Identical copy in all three repos.",
+      "how_it_runs": "offline python, called from shift-left.yml compose-check and cut-release.yml",
+      "evidence_of_working": "no test; exercised by both workflows"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/tuppence/.github/scripts/render-evidence-comment.py",
+      "what_it_is": "394-line Markdown renderer for tuppence's adopter-gate summary JSON, with wrap/splice subcommands and an extensive selfcheck (including a poisoned-marker regression and a backslash-in-re.sub regression). driftwood folds the same job into adopter-gate.py; ludlow into adopter_gate.py.",
+      "how_it_runs": "offline python, called from tuppence shift-left.yml:215-219",
+      "evidence_of_working": "its own selfcheck fixtures; also driven against the real summary by verify-adopter-gate.sh scenario A-render"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/workflows/cut-release.yml",
+      "what_it_is": "workflow_dispatch only. Installs pinned gitsign 0.17.1 (+sha256), reads the two pins, checks out platform/nist at those tags and ico at main, runs `composition.py verify . --estate-clone .` (byte-for-byte re-render before any tag is cut), refuses an existing tag, creates a gitsign-signed annotated tag using the run's ambient Actions OIDC identity, pushes it with `git push` (never the REST git-data API).",
+      "how_it_runs": "GitHub Actions workflow (workflow_dispatch)",
+      "evidence_of_working": "REAL: v1.0.0 and v1.1.0 exist in all three repos as annotated tags carrying a BEGIN SIGNED MESSAGE block, tagger 'policy-as-versioned release bot <releases@policy-as-versioned-<org>.invalid>' — i.e. this workflow really ran and really signed"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/workflows/release.yml",
+      "what_it_is": "On `push: tags: v*.*.*` or workflow_dispatch. Installs pinned gitsign + kustomize, `kustomize build gitops/apps` and `gitops/platform` as the release gate, `gitsign verify-tag` with GITSIGN_REKOR_MODE=offline identity-pinned to EXPECTED_IDENTITY_REGEXP (this org's own cut-release.yml identity), checks the tag still resolves to GITHUB_SHA, publishes a GitHub Release.",
+      "how_it_runs": "GitHub Actions workflow",
+      "evidence_of_working": "identity regexp is proved by a dedicated script per org; the gate is `kustomize build`, not a live reconcile — explicitly marked as a `ponytail:` simplification at release.yml:9-13"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/workflows/renovate-run.yml",
+      "what_it_is": "Self-hosted Renovate (npx renovate@44.37.1, node 24) against this repo only, using the run's own GITHUB_TOKEN, workflow_dispatch only. Identical in all three repos apart from RENOVATE_REPOSITORIES.",
+      "how_it_runs": "GitHub Actions workflow (workflow_dispatch)",
+      "evidence_of_working": "no committed run evidence in these repos; the org-level 'Actions may create PRs' precondition is recorded as open in driftwood/drift/preconditions.yaml (user memory records the org toggle was later switched on 2026-08-15)"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/workflows/propose-tier.yml",
+      "what_it_is": "The one workflow in these repos that really opens a PR (or an issue for a proposed `deny`). Triggers on a MERGED pull_request touching party.yaml / platform-pin.yaml / gotk-sync-nist.yaml, or workflow_dispatch — nothing scheduled. Checks out platform at the pin, verifies the commit, then runs platform/wargamer/tier_pr.py against this repo's composed/evidence.json and deploy/pod.yaml. tuppence and ludlow inline python to call their own gate's parse_pin/read_pin because their CLIs never had those subcommands.",
+      "how_it_runs": "GitHub Actions workflow",
+      "evidence_of_working": "The PR-opening logic lives in platform/wargamer/tier_pr.py (outside this cluster). Here, no committed evidence of a run; evidence.json's prices[] show changed:false in all three, so the proposer would find nothing to propose today."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/workflows/verify-identity-regexp.yml",
+      "what_it_is": "Runs scripts/verify-identity-regexp.sh on PRs/pushes touching release.yml or the script. driftwood ONLY — tuppence and ludlow have equivalent scripts but no workflow wiring them.",
+      "how_it_runs": "GitHub Actions workflow (paths-scoped)",
+      "evidence_of_working": "the script it runs uses the real gitsign binary against this repo's real signed tags"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/scripts/bump-nist-pin.sh",
+      "what_it_is": "26-line 'propose only' demonstrator: sed-edits gotk-sync-nist.yaml's tag and prints the diff, then stops. Never commits, pushes, or opens anything. driftwood only — tuppence/ludlow gotk-sync-nist.yaml comments point back at driftwood's copy.",
+      "how_it_runs": "shell script, run by hand",
+      "evidence_of_working": "none; it is a narration of the PR shape, not the PR"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/drift/",
+      "what_it_is": "The Flux drift measurement instruments: window.yaml (build-ticket-64 pre-registration: 91-day window 2026-08-07..2026-11-06, hourly cadence, three subjects, drift-event definition, falsifiers, a state-vs-action scope-limit addendum, an observation-only intervention policy), preconditions.yaml (one open precondition: org Actions-create-PRs toggle off), probe.sh (one sample per run, writes an unreachable sample on failure), samples.jsonl (3 organic samples), forced-campaign.yaml + forced-campaign.sh + forced-campaign.log + forced-campaign-samples.jsonl (build ticket 78: four forced trials, 464 samples), verdict.yaml (build ticket 65: three branches, 0.90 coverage floor, drafted-but-unapplied amendment). driftwood only — tuppence and ludlow have nothing equivalent.",
+      "how_it_runs": "probe.sh is an operator cron job on the machine holding the cluster (explicitly NOT a hosted runner); forced-campaign.sh is a ~3.5h hand-run script; the reduction lives in twin/drift.py + twin/verdict.py outside this cluster",
+      "evidence_of_working": "REAL data: forced-campaign.log records a genuine 2026-08-15 13:58Z-17:30Z run of all four trials against kind-driftwood, and forced-campaign-samples.jsonl holds 464 real samples including 8 carrying policyVersion FORCED-DRIFT-TEST. Organic coverage is 3 samples over a 91-day window (~0.1%), far below verdict.yaml's own 0.90 reading gate — consistent with the user-memory note that the drift floor became unreachable from 2026-08-16."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/tuppence/reset/",
+      "what_it_is": "tuppence's workload-identity flagship: workloads.yaml (customer-accounts-reset + teller-current@2.0.0 + teller-stale@1.0.0, SPIRE-managed identities, istio sidecar+spire templates), authorizationpolicy.yaml (Istio ALLOW on principal glob acme.internal/posture/2.0.0/*), destinationrule.yaml (peer SAN override to the posture-shaped SVID), openbao-role.yaml (Job creating a jwt role with bound_claims sub glob spiffe://acme.internal/posture/2.0.0/*, 5m TTL), reach.py (pure-logic gate parsed out of the real manifests), up.sh, verify-reach-secrets.sh, README.md. No equivalent in driftwood or ludlow.",
+      "how_it_runs": "kubectl apply via reset/up.sh onto an EXISTING cluster (CTX defaults to kind-driftwood) that already runs platform/identity (SPIRE+Istio+OpenBao) and platform/posture",
+      "evidence_of_working": "reach.py selfcheck is real, offline and asserts the two globs agree and admit/refuse correctly; the manifests' comments record live-discovered findings (Istio double-prefix bug, istiod fallback CA vs SPIRE, CERTIFICATE_VERIFY_FAILED 503 fixed by the DestinationRule, confirmed 403->200). The live tail of verify-reach-secrets.sh only runs if the substrate is present and degrades to skips otherwise."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/git-server/",
+      "what_it_is": "debian-slim + git + lighttpd running git-http-backend as CGI with GIT_HTTP_EXPORT_ALL, serving both <org>.git and nist.git; Deployment in flux-system with imagePullPolicy: Never, nonroot, caps dropped, readiness probe on /cgi-bin/git/<org>.git/HEAD. Same in all three.",
+      "how_it_runs": "Kubernetes Deployment applied by up.sh (NOT Flux-reconciled — noted in forced-campaign.yaml:88-94 as the reason the scale trial measures the probe's latency, not Flux's)",
+      "evidence_of_working": "readiness probe; the forced campaign scaled it to 0 and back for real"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/renovate.json",
+      "what_it_is": "custom.regex-only Renovate config with two customManagers (git-refs datasource) maintaining the {tag, commit} PAIR for gotk-sync-nist.yaml and platform/platform-pin.yaml, automerge false, rangeStrategy pin, platformCommit enabled. Byte-identical in all three (49 lines each).",
+      "how_it_runs": "config consumed by renovate-run.yml",
+      "evidence_of_working": "no committed Renovate PR evidence in these repos; the pin values were moved by hand-committed ticket-18 commits (\"bump platform to v1.1.1 (backfilled evidence)\")"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/deploy/pod.yaml",
+      "what_it_is": "The shift-left check's target workload: a single Pod claiming policy-version 2.0.0 with runAsNonRoot + readOnlyRootFilesystem (checkout-svc / payments-svc / patient-records-svc). tuppence's and ludlow's were only added on 2026-08-25 (ticket 18) — before that their shift-left gate died on FileNotFoundError, per the file headers.",
+      "how_it_runs": "fixture read by platform/shift-left/ci-check.py in CI; never deployed to any cluster",
+      "evidence_of_working": "CI step 'version cross-check gate'"
+    }
+  ],
+  "capabilities_real": [
+    "Flux reconciliation from a tag+commit-pinned GitRepository on a local KinD cluster — driftwood/scripts/up.sh:62-102, proven by real drift samples carrying revision sha1:2fc21df8858b2ee98f07e3c89e32189a919557f4",
+    "gitsign-signed annotated release tags cut by an Actions ambient identity — v1.0.0 and v1.1.0 exist with real signature blocks in all three repos (driftwood/.github/workflows/cut-release.yml:103-112)",
+    "Offline, identity-pinned gitsign verify-tag of those tags on every tag push — driftwood/.github/workflows/release.yml:76-86",
+    "Identity-regexp anchoring proved with the REAL gitsign binary against the repo's real tags — driftwood/scripts/verify-identity-regexp.sh:32-47 (positive path), grep -E for the negative shapes",
+    "Cross-org CI: platform, nist and ico checked out in one run at this repo's own pins, with a refusal if the resolved commit disagrees — driftwood/.github/workflows/shift-left.yml:89-99 and 311-331",
+    "Adopter gate composing a bump from the publisher's signed evidence, never recomputing it — driftwood/.github/scripts/adopter-gate.py:284-330 (compose) and :232-270 (verify_evidence)",
+    "Real cosign verify-blob refusals (missing bundle, garbage bundle, key-signed bundle under identity pinning) — driftwood/.github/scripts/adopter-gate.py:~712-780; ludlow/verify-adopter-gate.sh Part C and Part E (offline with egress blocked via HTTPS_PROXY, committed trusted_root.json)",
+    "compose-check: composed artefact regenerated on every PR and byte-diffed against the committed copy, failing on drift — driftwood/.github/workflows/shift-left.yml:332-357",
+    "Pre-tag re-render: cut-release.yml runs composition.py verify before any tag is created — driftwood/.github/workflows/cut-release.yml:85-93",
+    "Forced-drift latency campaign really executed against a real cluster — driftwood/drift/forced-campaign.log (2026-08-15, four trials) + 464 real samples",
+    "Probe writes an unreachable sample rather than nothing, so silence is a coverage hole — driftwood/drift/probe.sh:39-43",
+    "Posture gate logic parsed out of the real shipped Istio/OpenBao manifests and asserted offline — tuppence/reset/reach.py:32-122",
+    "PR-body splice with marker replacement (first run appends, re-run replaces in place) — driftwood/.github/scripts/adopter-gate.py:107-118, proved in selfcheck"
+  ],
+  "capabilities_stubbed_or_thin": [
+    "The composed Kyverno policy set is never applied to any cluster by anything in these repos — composed/policies/** is generated YAML checked into git; gitops/apps/kustomization.yaml (driftwood:1-6) reconciles only namespace + two ConfigMaps",
+    "gitops/platform/platform-pin.yaml (the ResourceSet/multi-version fan-out) is explicitly opt-in and NOT wired into the Phase-0 reconcile — driftwood/gitops/platform/platform-pin.yaml:6-11; no evidence anywhere that it was ever applied",
+    "The whole 'live version' surface is a Phase-0 marker ConfigMap standing in for the real policy set — driftwood/gitops/apps/version-configmap.yaml:8-11 says so in the file",
+    "driftwood/gitops/flux-system/gotk-sync.yaml pins a tag but leaves the commit COMMENTED OUT (lines 22-23), so the canonical committed form does not carry the belt-and-braces pin its own README claims; only the up.sh-generated in-cluster object has one",
+    "verify-reconcile.sh nist assertion is stale in all three repos: asserts catalogVersion 1.0.0 (driftwood:38, tuppence:39, ludlow:39) against a committed ConfigMap that says 1.1.0 (all three, nist-pin-configmap.yaml:20)",
+    "The README risk-skin story (driftwood Audit-heavy, ludlow 'Deny-heavy (strictest)') is NOT visible in the composed artefacts: driftwood, tuppence and ludlow composed policy files are byte-identical apart from the composed-for label — require-nonroot is Audit and posture-trust-boundary is Deny in all three (diff of composed/policies/v3.0.0/*). The only differentiators are the risk-appetite ConfigMap values (15000/5000) and evidence.json's threat price + tier",
+    "evidence.json cages[] is empty and prices[] show changed:false in all three — the pricing/tiering path is present but has never moved anything",
+    "scripts/bump-nist-pin.sh stops at a printed diff; it never opens the PR it narrates (driftwood/scripts/bump-nist-pin.sh:16, :26)",
+    "Renovate is configured and a dispatchable runner exists, but no Renovate-authored bump PR is evidenced in these repos; the platform pin moved by hand-authored ticket-18 commits",
+    "The cosign ACCEPT path (a genuinely valid Fulcio keyless bundle) is unprovable outside a live Actions run and is disclosed as such in all three gates and both offline twins (driftwood/.github/scripts/adopter-gate.py:~545-560; tuppence/scripts/verify-adopter-gate.sh:14-30; ludlow/verify-adopter-gate.sh:28-42)",
+    "ludlow's adopter_gate.py selfcheck mocks verify_evidence/_run/declared_bump in several cases (ludlow/.github/scripts/adopter_gate.py:641-666, 828-846, 906) — the surrounding wiring is real, the evidence boundary is not",
+    "tuppence/reset live proof is conditional: verify-reach-secrets.sh:55-98 skips reach/secret checks unless the SPIRE/Istio/OpenBao substrate is present, and still prints PASS; the offline glob proof is the only unconditional claim",
+    "tuppence and ludlow have identity-regexp verification SCRIPTS but no workflow running them — only driftwood has .github/workflows/verify-identity-regexp.yml",
+    "drift/README.md claims samples.jsonl and forced-campaign-samples.jsonl are untracked; both are in fact committed (git ls-files drift/ lists them)",
+    "Organic drift coverage is ~3 samples against a declared 91-day hourly window — far under verdict.yaml's own 0.90 reading gate, so no branch of the verdict may be read",
+    "propose-tier.yml would find nothing to propose today (evidence.json prices changed:false), and has no committed run evidence",
+    "The .work/ trees committed into all three repos (nist-seed JSON catalogs, bare .git contexts) are build residue from up.sh, not source"
+  ],
+  "verify_scripts": [
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/verify-reconcile.sh",
+      "needs_cluster": true,
+      "what_it_proves": "GitRepository Ready + pinned tag/commit, Kustomization Ready, namespace + live-version ConfigMap reconciled, nist GitRepository Ready + pinned, nist-pin ConfigMap present. Its nist catalogVersion assertion (1.0.0) is stale against the committed 1.1.0."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/tuppence/verify-reconcile.sh",
+      "needs_cluster": true,
+      "what_it_proves": "Same four steps for tuppence plus step 5: the risk-appetite ConfigMap tolerance is 15000 AND matches platform/risk/appetite.json's orgs.tuppence.tolerance (a real cross-repo consistency check, needs a sibling platform clone)"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/ludlow/verify-reconcile.sh",
+      "needs_cluster": true,
+      "what_it_proves": "Same as tuppence's with tolerance 5000 / orgs.ludlow.tolerance"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/scripts/verify-identity-regexp.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Layer 1 (load-bearing): real gitsign verify-tag of every v*.*.* tag against release.yml's real EXPECTED_IDENTITY_REGEXP and issuer. Layer 2: grep -E negative shapes (foreign org/repo/workflow-path/ref, prefix and suffix smuggling, maint/ vs release/). Needs the gitsign binary; silently passes if no tags are present in the clone."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/tuppence/scripts/verify-identity-regexp.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Same anchoring proof for BOTH tuppence's release.yml EXPECTED_IDENTITY_REGEXP and shift-left.yml's EVIDENCE_EXPECTED_IDENTITY_REGEXP, using bash [[ =~ ]] ERE rather than the real gitsign binary (declared as a ponytail simplification at line 16). No CI workflow runs it."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/ludlow/verify-certificate-identity-regexp.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Pure bash-ERE match/reject table for ludlow's release.yml EXPECTED_IDENTITY_REGEXP, including the literal-dot case (githubXcom rejected). No gitsign binary, no CI workflow runs it."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/tuppence/scripts/verify-adopter-gate.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Six scenarios against a real local platform clone (PLATFORM_REPO): D — the real currently-tagged v1.0.0 honestly refuses on missing evidence; C — commit-pin mismatch refused; D2 — real cosign rejects a present-but-malformed bundle; E — parse_pin against the real two-document platform-pin.yaml; F — old_tag == new_tag on an ordinary PR; A/B — real gated releases built with platform's own cut-release-gate.py in CUT_RELEASE_TEST_MODE, composing to a real PASS and a real non-zero-exit FAIL on retirement. Uses --skip-cosign-verify for A/B. Needs a sibling platform clone and the cosign binary."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/ludlow/verify-adopter-gate.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Part A identity regexp match/reject incl. workflow-rename-breaks-it and a cross-check that it is not release.yml's own constant; Part B throwaway platform+ludlow git repos proving resolved-commit refusal, retirement-forces-major, composed-major hard failure, weaker-than-declared informational; Part C real cosign refusing an invalid bundle; Part D splice_body with backslash-bearing evidence across first run and re-run; Part E cosign proven genuinely offline against the committed trusted_root.json with egress blocked, contrasted against the same call without --trusted-root, plus a wrong-key refusal."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/tuppence/reset/verify-reach-secrets.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Offline core (unconditional): reach.py selfcheck — the Istio principal glob and the OpenBao bound_claims glob are the same current-posture prefix, admit a current SVID and refuse stale/de-postured/version-lookalike ones; and the AuthorizationPolicy is ALLOW-only selecting customer-accounts-reset. Live tail (conditional on stamp-posture + the tuppence-reset workloads existing): current caller 200 / stale 403-or-refused, current JWT-SVID logs into OpenBao role posture / stale login refused. Prints PASS even when the live tail is skipped."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood/.github/scripts/adopter-gate.py (--selfcheck)",
+      "needs_cluster": false,
+      "what_it_proves": "read_pin against a real multi-document stream; verify_pinned_commit match+mismatch on a real git repo; read_policy_array_at/diff_arrays/fetch_tag against real tags and a real clone-of-a-clone; versions_from_composed_evidence + run_compose(adopter_dir=...) proving ADR-0011's retirement-with-no-policy-diff path end to end; verify_evidence refusing a missing file, a garbage bundle, and a real key-signed bundle under identity pinning (real cosign subprocesses); compose() acceptance criteria; render_markdown never emitting a percentage; splice_body first-run/re-run/empty-body."
+    }
+  ],
+  "runtime_dependencies": [
+    "Flux (source-controller + kustomize-controller) — REAL, installed by up.sh into KinD, drives the reconcile the drift probe samples",
+    "KinD + Docker — REAL, one control-plane node per org (kind/<org>.yaml)",
+    "Kyverno — REAL binary in CI (kyverno CLI 1.18.2, sha256-pinned, driftwood/.github/workflows/shift-left.yml:115-124) via platform/shift-left/ci-check.py; the Kyverno CRDs the composed policies target are NOT installed on any cluster by these repos",
+    "flux-operator (ResourceSet) — DECLARED as a prerequisite for gitops/platform only; never installed or exercised here",
+    "cosign 3.1.3 — REAL, sha256-pinned binary; used to sign the shift-left attestation keyless (CI only) and to verify platform's evidence; verify path proven offline in ludlow via committed trusted_root.json",
+    "gitsign 0.17.1 — REAL, sha256-pinned; really signed the v1.0.0/v1.1.0 tags and really verifies them (offline Rekor mode)",
+    "Rekor / Fulcio (Sigstore) — REAL in CI (keyless via Actions OIDC); OFFLINE/pinned for verification (GITSIGN_REKOR_MODE=offline; ludlow's committed trusted_root.json)",
+    "GitHub Actions — REAL, five to six workflows per repo, cross-org checkouts of policy-as-versioned-platform/nist/ico",
+    "Renovate 44.37.1 — configured and dispatchable (self-hosted npx run), but no evidenced bump PR in these repos",
+    "kustomize 5.8.1 — REAL, sha256-pinned, used as the release gate (build only, no cluster)",
+    "SPIRE — REAL manifests and live-discovered findings, but the substrate itself lives in platform/identity; tuppence/reset only consumes it and its verify degrades to offline-only when absent",
+    "Istio (AuthorizationPolicy, DestinationRule) — same: real manifests, real live findings recorded, applied onto an externally-provisioned substrate",
+    "OpenBao — REAL Job manifest creating a posture-bound jwt role in dev mode (root token, openbao/openbao:latest unpinned, flagged in-file as a tunable knob); only reachable when the substrate is up",
+    "Pomerium — ABSENT from this cluster",
+    "Crossplane — ABSENT",
+    "trivy / vulnerability scanning — ABSENT",
+    "C2P / OSCAL tooling — ABSENT as code; only referenced as 'future OSCAL/c2p plumbing' in nist-pin-configmap.yaml:12 and consumed as pinned data (nist catalog v1.1.0, oscalVersion 1.2.2)",
+    "platform/compose/composition.py, platform/party/party_artefact.py, platform/shift-left/ci-check.py, platform/wargamer/tier_pr.py — REAL cross-repo library dependencies, always invoked through the pinned platform checkout, never vendored"
+  ],
+  "risk_and_pricing_touchpoints": [
+    "tuppence/gitops/apps/risk-appetite-configmap.yaml:16-18 — toleranceGBP 15000, skin 'toward-strict'; reconciled into the cluster as an audit-readable mirror of platform/risk/appetite.json",
+    "ludlow/gitops/apps/risk-appetite-configmap.yaml:16-18 — toleranceGBP 5000, skin 'Deny-heavy (strictest)'",
+    "driftwood has NO risk-appetite ConfigMap at all (gitops/apps/kustomization.yaml:1-6) despite platform/risk/appetite.json carrying a driftwood entry — an asymmetry the READMEs do not mention",
+    "tuppence/verify-reconcile.sh:41-46 and ludlow/verify-reconcile.sh:41-46 — the only place in this cluster where a £ figure is checked against its source of truth (platform/risk/appetite.json orgs.<org>.tolerance)",
+    "composed/evidence.json prices[] — driftwood: ico pricing £16,901,471.55 tier deny (proposed_as issue) and platform threat £19,558.55 tier baseline (proposed_as label); tuppence: same ico price, threat £222,574.31 tier deny; ludlow: same ico price, threat £318,229.78 tier deny. All changed:false — computed by platform/compose/composition.py, consumed here, never recomputed",
+    "composed/evidence.json cages[] is empty in all three — no cage tier has been priced into an actual enforcement change",
+    ".github/workflows/propose-tier.yml:60-72 — the £-derived tier proposal path: reads composed/evidence.json's prices/tiers and asks platform/wargamer/tier_pr.py to open a PR (tier change) or an issue (proposed deny)",
+    "driftwood/drift/verdict.yaml:34-46 — the risk basis stated in the £ engine's own terms (path_admission_threshold 2, evidence_ladder_version 2); the amendment at :116-129 sends any impact that loses its continuity evidence into the unpriced structural blast radius",
+    "FAIR: no FAIR computation in this cluster; the ico pricing parent (ico/schema/to_fair_scenario.py) sits outside it. No appetite bands, penalties or TCoR are computed here — only mirrored and consumed"
+  ],
+  "cage_and_enforcement_touchpoints": [
+    "composed/policies/v{2.0.0,2.0.1,3.0.0}/cage-tier.yaml — Kyverno MutatingPolicy with the three-tier dial (baseline/restricted/quarantine -> cpu/mem limits, priorityClass, harden flags, a coraza WAF sidecar for restricted+quarantine, capabilities drop ALL when hardened); driftwood/composed/policies/v3.0.0/cage-tier.yaml:30-43",
+    "composed/policies/v*/cage-netpol.yaml — GeneratingPolicy emitting a cage-egress-lockdown NetworkPolicy (egress to kube-system DNS only) for any pod labelled posture.acme.io/caged=true; driftwood/composed/policies/v3.0.0/cage-netpol.yaml:33-34",
+    "Graded enforcement actions: require-nonroot is Audit (driftwood/composed/policies/v3.0.0/require-nonroot.yaml:14-15) and posture-trust-boundary is Deny (same dir, :14-15) — IDENTICAL in tuppence and ludlow, so the README's Audit-here/Deny-there proportionality claim is not realised in the composed artefacts",
+    "Orphan guard: composed/orphan-guard.yaml:12-13 Deny, allow-list hardcoded to ['2.0.0','2.0.1','3.0.0'] at line 30, annotated inherited-from platform@1.1.1, source distribution/versions.yaml — present in all three repos",
+    "Governed namespace guard: composed/governed-namespace-guard.yaml:12-13 Audit, CREATE-only on pods in namespaces labelled policy-as-versioned.dev/governed=true, message 'Silence is not an exemption (ADR-0014)'",
+    "The governed declaration itself: gitops/apps/namespace.yaml:14 (all three) sets policy-as-versioned.dev/governed: \"true\"; HEADER.yaml:24-25 mirrors it as advisory governed-namespaces",
+    "Ungoverned record: tuppence/composed/HEADER.yaml:600-601 and evidence.json ungoverned[] name tuppence-reset as a recorded ungoverned namespace (driftwood and ludlow: empty)",
+    "De-posture / currency controller: NOT in this cluster — referenced from tuppence/reset/README.md:47-48 as ticket 16's controller living in platform; the consequence (drop to base SVID, lose both globs) is asserted offline in tuppence/reset/reach.py:112-113",
+    "posture-trust-boundary (Deny) is the anti-forgery rule: a user-supplied or mismatched posture.acme.io/version label is refused — driftwood/composed/policies/v3.0.0/posture-trust-boundary.yaml:37-39",
+    "Reach/secret enforcement (tuppence only): Istio ALLOW-only on acme.internal/posture/2.0.0/* (tuppence/reset/authorizationpolicy.yaml:35-41) and OpenBao bound_claims glob (tuppence/reset/openbao-role.yaml:45-54); the DestinationRule SAN override at destinationrule.yaml:30-36 is the calibration knob that must move with them",
+    "Nothing in these repos APPLIES any of the composed Kyverno policies to a cluster — enforcement here is committed artefact plus CI gate, not a running admission controller"
+  ],
+  "feeds_wardley_wargamer_touchpoints": [
+    "REAL PR-opening path: .github/workflows/propose-tier.yml (driftwood:60-72, tuppence, ludlow) runs platform/wargamer/tier_pr.py with contents:write / pull-requests:write / issues:write and really commits, pushes and opens a PR (or an issue for a proposed deny). Trigger is a MERGED pin-bump PR or workflow_dispatch — never scheduled (propose-tier.yml:18). No committed evidence of a run, and evidence.json prices[] changed:false means it would currently no-op",
+    "REAL PR-editing path: shift-left.yml's cs-29 step edits the pull request BODY via `gh pr edit --body-file`, splicing the gate's own marked span (driftwood:177-224; tuppence:202-225; ludlow:248-259) — real GitHub API writes, and it also posts a signed attestation comment (driftwood:245-270)",
+    "NARRATION ONLY: driftwood/scripts/bump-nist-pin.sh:16-26 prints the diff and stops — 'next (human/CI, not this script): commit, gitsign, open PR'",
+    "Wardley maps: ABSENT from this cluster — no map, no evolution axis, nothing referencing wardley in driftwood/tuppence/ludlow",
+    "Wargamer: the engine itself is platform/wargamer/* (wargamer.py, tier_pr.py, proposer_bounds.py, scenarios/, fixtures/threat-register/); this cluster is only its caller and its subject. The proposer's no-merge property is asserted in the workflow header (propose-tier.yml:8-10) and enforced by those platform modules' own selfchecks, not here",
+    "Feeds: the only external data these repos ingest are PINNED GIT DEPENDENCIES — nist 800-53 OSCAL catalog v1.1.0 (gotk-sync-nist.yaml:28-29) and platform v1.1.1 (platform-pin.yaml:24-25), plus ico at its default branch in CI (shift-left.yml:325-330, ico ships no tags). Renovate's git-refs datasource is the only live-polling mechanism, and it is dispatch-only. No HTTP feed, no threat-intel feed, no simulated feed generator exists here",
+    "Committed .work/nist-seed/*.json are real NIST SP 800-53 rev5.2.0 catalog and LOW/MODERATE/HIGH baseline profiles — real regulator data, but a checked-in build artefact of up.sh, not a live feed"
+  ],
+  "original_thesis_mechanisms": [
+    "Multi-version coexistence — PRESENT as artefact only: composed/policies/{v2.0.0,v2.0.1,v3.0.0}/ in all three repos, each policy gated on 'only-this-policy-version'; never installed on a cluster from these repos",
+    "ResourceSet matrix — NOT here; consumed by reference: gitops/platform/platform-pin.yaml:44-48 reconciles platform's ./distribution (the ResourceSet), opt-in and unapplied. The version array's contents are mirrored into orphan-guard.yaml:30",
+    "Renovate bump PR — MECHANISM PRESENT, PR UNEVIDENCED: renovate.json's two customManagers maintain the {tag, commit} pair; renovate-run.yml is workflow_dispatch-only; the pin bumps in git history were hand-authored ticket-18 commits",
+    "Signed tags — REAL: v1.0.0 and v1.1.0 in all three repos carry gitsign SIGNED MESSAGE blocks; cut by cut-release.yml, verified by release.yml offline and identity-pinned, anchoring proved by the per-org identity-regexp scripts",
+    "Orphan guard — PRESENT: composed/orphan-guard.yaml (Deny) in all three, allow-list rendered from platform's version array",
+    "OSCAL / C2P — PARTIAL: real NIST OSCAL catalog pinned as a Flux GitRepository and mirrored in nist-pin-configmap.yaml (catalogVersion 1.1.0, nistRevision 5.2.0, oscalVersion 1.2.2, baselineName MODERATE, cross-checked against party.yaml by party_artefact.py). C2P itself is named only as 'future plumbing' (nist-pin-configmap.yaml:12) — no C2P code anywhere in this cluster. 285 controls are recorded as holes in every composed artefact",
+    "Shift-left — REAL: .github/workflows/shift-left.yml in all three runs platform/shift-left/ci-check.py against deploy/pod.yaml on every PR, no paths filter, plus the party-artefact check, the adopter gate and compose-check",
+    "Handbook — ABSENT from this cluster",
+    "Sunset / retirement — PRESENT AS RULE, not as an event: retirement forces a major in every adopter gate (driftwood/.github/scripts/adopter-gate.py:289-295; ludlow docstring step 3; tuppence docstring), prune:true on both Kustomizations, and the orphan guard stops allowing a removed version. No version has actually been retired in these repos",
+    "Notifications — ABSENT: no Slack/Alertmanager/notification-controller anywhere; the closest thing is the PR comment/PR body write from shift-left.yml",
+    "Dashboards — ABSENT: no Grafana, no dashboards; Renovate's dependencyDashboard is explicitly disabled (renovate.json:7 in all three)"
+  ],
+  "notes": "Scope note: the task's 'original-org cluster' clause does not apply here — these three are the adopter orgs, each a separate GitHub org (policy-as-versioned-driftwood/tuppence/ludlow) cloned side by side under .estate-clone. Last commits: driftwood eacae33 2026-08-25 18:06:24 +0100, tuppence 751522b 2026-08-25 18:06:28, ludlow a800a58 2026-08-25 18:06:32 — all three the same ticket-18 'release workflow re-renders and verifies before any tag is cut' change, minutes before the parent repo's aebbb9e. Commit counts 52 / 31 / 29, first commits 2026-07-31. Cross-references from the rest of the estate: platform references all three heavily (risk/appetite.json orgs.{driftwood,tuppence,ludlow}, compose/composition.py selfcheck composes the REAL driftwood at lines 1625-1812 and asserts governed-namespaces == ['driftwood'], wargamer/*, honesty/*, posture/*, identity/*, party/*); nist references them in README.md and scripts/publish.sh; ico in .github/workflows/release.yml and schema/to_fair_scenario.py. Divergence worth a drift review: the three repos were built from driftwood as the template and have since diverged in ways the READMEs do not describe — three mutually incompatible adopter-gate CLIs (subcommands / flags-only / underscore-named), only driftwood wires its identity-regexp check into CI, only driftwood has the drift instruments, only tuppence has the workload-identity flagship, only tuppence/ludlow carry a risk-appetite ConfigMap, and the composed enforcement artefacts are identical across all three despite the stated Audit-vs-Deny proportionality thesis."
+}

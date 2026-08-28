@@ -1,0 +1,6 @@
+github.com
+  ✓ Logged in to github.com account chrisns (keyring)
+  - Active account: true
+  - Git operations protocol: https
+  - Token: gho_************************************
+  - Token scopes: 'delete_repo', 'gist', 'read:org', 'repo', 'workflow'

@@ -1,0 +1,15 @@
+== 1. coverage.py --selfcheck ==
+selfcheck ok: cells/pairs are plain counts, no ratio anywhere; the pairwise gap sentence names pairwise combination with no whole-space ratio; the real committed generated-corpus/ has zero unreached cells for the live subject; a hand-built (non-pairwise-shaped) manifest is simply not applicable, never crashes on a pre-.orValue() legacy predicate; static_proof proves a real tautology and nothing else; stable ids survive a version bump on an unchanged rule and change on a changed one; a human can declare a hole but an attempted 'proved: true'/'tier: proved_exclusion' promotion through the exclusion file is refused (ignored) -- a real constructed attempted-promotion case; new / carried_over / closed status tracks a persisted baseline correctly; an undeclared unreached predicate is a build failure naming the expression; a proved exclusion never appears as a build failure; a bare 'variables.X' predicate never counts toward cells, an axis-spanned one counts as covered silently, an unspanned one is named in not_looked_at without failing the build; compute_limits always names all three limits, the two decision-based ones stay open regardless of count, the third closes at zero real-infra witnesses missing
+
+== 2. gate.py --selfcheck (coverage's two gates wired through the seam) ==
+Traceback (most recent call last):
+  File "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/gate.py", line 1003, in <module>
+    sys.exit(main(sys.argv))
+             ~~~~^^^^^^^^^^
+  File "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/gate.py", line 984, in main
+    selfcheck()
+    ~~~~~~~~~^^
+  File "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/gate.py", line 842, in selfcheck
+    assert doc_c["matrix"]["tuppence"]["computed_bump"] == "none", doc_c["matrix"]["tuppence"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'pinned_version': '2.0.1', 'computed_bump': 'patch', 'movement': [{'policy': 'require-department-label.yaml', 'verdict': 'patch', 'entries': ['fully-compliant'], 'expressions': ["has(object.metadata.labels) && 'department' in object.metadata.labels"], 'detail': 'fully-compliant: refused -> admitted'}, {'policy': 'require-known-department-label.yaml', 'verdict': 'none', 'entries': [], 'expressions': ["!has(object.metadata.labels) || !('department' in object.metadata.labels) || object.metadata.labels['department'] in ['platform', 'finance', 'security', 'engineering']"], 'detail': 'no fixture in the corpus moved'}]}

@@ -1,0 +1,14 @@
+== offline: structural invariants ==
+  ok   Kyverno HelmRelease present
+  ok   Kyverno chart version pinned
+  ok   flux-operator HelmRelease present
+  ok   flux-operator sourced from an OCIRepository (the chart ships OCI-only)
+  ok   no FluxInstance object — the existing vanilla Flux install stays untouched (ADR-0005 guardrail)
+  -- all offline invariants hold --
+== live: engine controllers + CRDs ==
+  ok   Kyverno pods present
+  ok   MutatingPolicy CRD registered
+  ok   ValidatingPolicy CRD registered
+  ok   flux-operator pod present
+  ok   ResourceSet CRD registered
+verify-engine: done

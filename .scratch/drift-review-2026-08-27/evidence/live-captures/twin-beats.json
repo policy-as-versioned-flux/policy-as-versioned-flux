@@ -1,0 +1,90 @@
+{
+  "probe": "twin-beats",
+  "enact_mode": {
+    "file_contents": "development",
+    "file": "twin/ENACT_MODE",
+    "meaning": "enact_guard.py's decide() admits merges and enactment pushes in 'development' mode (the checked-in default); only 'operations' mode (or TWIN_ENACT_MODE=operations for one run) restores the refusal. The invariant suite forces operations mode for its own run regardless of this file. Per the module docstring this is a deliberate, dated (2026-08-25) standing instruction from the repository owner while the twin is under active construction, not a bug."
+  },
+  "commands": [
+    {
+      "command": "bash twin/demo.sh",
+      "exit_code": 0,
+      "verdict": "pass",
+      "decisive_line": "PASS: sense -> run -> score closes the loop from a clean checkout. Forecasts are a list, scored by pin; the store is rebuildable from git; identical pins give identical bytes; a dirty tree is refused. sweep runs the standing scenario set unconditionally and reliability bins the record it produces. severity is the FAIR engine's tail model, standalone, and reports TVaR beside VaR rather than VaR alone. Every artefact declares which acceptance criteria are still unchecked, so the skeleton cannot quietly become the definition of done.",
+      "output_file": "scratchpad/live/twin-beats/demo.sh.out"
+    },
+    {
+      "command": "bash twin/beat-sequence.sh",
+      "exit_code": 0,
+      "verdict": "pass",
+      "decisive_line": "PASS: the demo sequence ran b -> b -> c -> a. Royal Mail and Intel both proved the twin can ... [multiple PASS checkpoints along the way, including step 4 'explicitly unscoreable — published in the artefact's own body, not a placeholder', which is a deliberate red-by-design result inside a passing run]",
+      "output_file": "scratchpad/live/twin-beats/beat-sequence.sh.out"
+    },
+    {
+      "command": "bash twin/beat-royal-mail.sh",
+      "exit_code": 0,
+      "verdict": "pass",
+      "decisive_line": "PASS: rewound under as-consumed, projected, scored against a low-contamination key with the ... (rules brier, log_loss — 1 scored, 0 unscoreable)",
+      "output_file": "scratchpad/live/twin-beats/beat-royal-mail.sh.out"
+    },
+    {
+      "command": "bash twin/beat-intel.sh",
+      "exit_code": 0,
+      "verdict": "pass",
+      "decisive_line": "PASS: swept through the scheduled production line, pinned and agent-signed, reproduced ... (step 4: 'explicitly unscoreable — published in the artefact's own body, not a placeholder' — deliberate, by design)",
+      "output_file": "scratchpad/live/twin-beats/beat-intel.sh.out"
+    },
+    {
+      "command": "bash twin/beat-netflix.sh",
+      "exit_code": 0,
+      "verdict": "pass",
+      "decisive_line": "PASS: a threat path and an opportunity path both ran end to end on the same dated state. The ... (also exercises enact_guard: 'holds — a disposing tool call is refused before it runs, including a subagent's own')",
+      "output_file": "scratchpad/live/twin-beats/beat-netflix.sh.out"
+    },
+    {
+      "command": "./bin/twin verify",
+      "exit_code_run1": "nonzero (VerbError, uncaught exception)",
+      "exit_code_run2": 124,
+      "verdict": "red",
+      "decisive_line": "Run 1 (captured output): 'twin options: VerbError: no perspective '\"'\"'the-operator'\"'\"' in overlay '\"'\"'netflix'\"'\"' (have: none)' — an uncaught exception from calling the bare verb with no arguments. Run 2 (standalone, timeout 900): the process ran for ~15 minutes actively consuming CPU (confirmed via ps) and produced no output at all before `timeout 900` killed it with exit 124. The two runs behaved differently — this command's bare-invocation behaviour is inconsistent, not just slow.",
+      "note": "twin verify's --help shows it wants a positional [artefact] and/or --repo; called bare per the probe's literal instruction, it is not a supported/stable invocation and is genuinely red both times, for different reasons.",
+      "output_files": ["scratchpad/live/twin-beats/twin-verify.out", "scratchpad/live/twin-beats/twin-verify-second-run.out"]
+    },
+    {
+      "command": "./bin/twin grade",
+      "exit_code": 0,
+      "verdict": "pass",
+      "decisive_line": "==> aggregate: 73 of 73 across 13 capabilities, 13 at `full`",
+      "output_file": "scratchpad/live/twin-beats/twin-grade.out"
+    },
+    {
+      "command": "./bin/twin drift",
+      "exit_code": 0,
+      "verdict": "red by design (documented, unmeasured)",
+      "decisive_line": "floor        90% UNREACHABLE — ceiling 77.5%. build ticket 65's continuous-state branch closes `unmeasured` whatever happens next; unsampled hours do not come back / window 23% elapsed, 3/493 expected samples (1% coverage) / precondition org-actions-may-not-create-prs blocks build ticket 66, owner: an organisation administrator — the twin operator cannot change this / no verdict: this is the instrument.",
+      "note": "Exit code 0 — the command itself runs cleanly and reports its own floor as unreachable; matches the known 'Flux verdict closes unmeasured' status from prior sessions.",
+      "output_file": "scratchpad/live/twin-beats/twin-drift.out"
+    },
+    {
+      "command": "./bin/twin constraints --out .../constraints.json",
+      "exit_code": 0,
+      "verdict": "pass",
+      "decisive_line": "position deferred reflexivity-and-goodhart-on-the-twin / position permanently-excluded covert-sensing / gate grades 1-2 may price a scored forecast / unsigned: set TWIN_SIGNING_KEY, then `twin sign ... --role constraint-owner`",
+      "note": "Unsigned attestation is expected — no TWIN_SIGNING_KEY was set (none created for this probe, per 'never print secret values' / no key material handling).",
+      "output_files": ["scratchpad/live/twin-beats/constraints.json", "scratchpad/live/twin-beats/twin-constraints.out"]
+    },
+    {
+      "command": "./bin/twin demo-slice --out .../demo-slice.json",
+      "exit_code": 0,
+      "verdict": "pass",
+      "decisive_line": "demo-slice full 4/4 of decision ticket 22 unchecked: - (all 9 listed capabilities show full with unchecked: -)",
+      "output_files": ["scratchpad/live/twin-beats/demo-slice.json", "scratchpad/live/twin-beats/twin-demo-slice.out"]
+    }
+  ],
+  "summary": {
+    "green": ["twin/demo.sh", "twin/beat-sequence.sh", "twin/beat-royal-mail.sh", "twin/beat-intel.sh", "twin/beat-netflix.sh", "bin/twin grade", "bin/twin drift (exit 0, though it reports its own metric as unreachable)", "bin/twin constraints", "bin/twin demo-slice"],
+    "red": ["bin/twin verify — bare invocation: uncaught VerbError on one run, hung ~15min then timeout-124 on a second run with no output at all"],
+    "red_by_design": ["step 4 in beat-sequence/beat-intel: 'explicitly unscoreable — published in the artefact's own body, not a placeholder' — deliberate", "bin/twin drift: '90% UNREACHABLE' floor, 1% coverage, org-actions-may-not-create-prs precondition blocking build ticket 66 — documented, owner already chose to record rather than restart the probe (per prior-session memory)"]
+  },
+  "not_run": []
+}

@@ -1,0 +1,4 @@
+[1;36m==>[0m 1. offline: both versions self-scope + admit side by side (kyverno test)
+[1;36m==>[0m 2. offline: the orphan-guard allow-list is exactly the version array (no drift)
+[1;36m==>[0m 3. live: both ValidatingPolicies present in the SAME webhook config
+FAIL: require-nonroot-3-0-0 not installed live (fan-out incomplete)

@@ -1,0 +1,390 @@
+[1;36m==>[0m 0. a clean checkout — the deterministic fixture model repository
+default model repository -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/model
+  deterministic: same content, same commit sha, on every machine
+f5eabbd org overlays
+639143f world layer
+[1;36m==>[0m 1. sense — a dated signal binds to a component through a committed grade-5 claim
+bound-signal -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/bound-signal.json
+  attestation  bound-signal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       0bc96a0329809af3a3b9aee7d72fd88e50c0415f7bef2b4adcee184e2cd6c6dd
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+[1;36m==>[0m 2. run — one scenario, three rival world models, three forecasts. Nothing collapses them.
+[1;36m==>[0m    the regime is required and has no default; only as-consumed scores.
+==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 1 fact(s) withheld by date
+  withheld dvd-decline-2011-resolved          outcomes, dated 2012-12-31
+  ingestion history unavailable: the ingestion-history filter did not run: this repository has no commit at or before the execution time, so `as-consumed` here rests on fact dates alone. A fact ingested late but dated early is not detectable from this repository.
+forecast-bundle -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/forecast-bundle.json
+  attestation  forecast-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       c90b827b7e1705fceb8ac1b6822fb54d36c9b2d86f97fa301de96b9aab80447b
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+[1;36m==>[0m 2b. the same scenario under all three regimes — the two gaps, computed not inferred
+==> netflix: dvd-decline-2011 under all three regimes
+  as-consumed      3 fact(s) admitted
+  as-knowable      3 fact(s) admitted
+  with-hindsight   4 fact(s) admitted
+  sensing          as-consumed vs as-knowable: none
+  interpretation   as-knowable vs with-hindsight: outcomes/dvd-decline-2011-resolved
+  model residual not computed: wrong under all three regimes localises to the model, and that comparison needs a forecast that moves when the fact base moves. A forecast here reads a world model's declared belief and nothing infers it from a signal, so the three probabilities are identical by construction and a computed residual of zero would read as 'the model is fine' rather than as 'nothing consumes a signal'.
+regime-gap -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/regime-gap.json
+  attestation  regime-gap.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       f368dd1fecc21639910342bcdee473f1fe553aac76ed38008304ef1a0191b6b9
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+[1;36m==>[0m 2c. an execution with no declared regime is refused, not defaulted
+  ok   refused
+[1;36m==>[0m 3. score — a recorded outcome scores the forecasts, naming them by pin and never by path
+==> dvd-decline-2011-resolved: observed=True, resolved 2012-12-31, contamination low
+  contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+  rules brier, log_loss (lower-is-better) — 3 scored, 0 unscoreable
+    netflix-believed             p=0.25   brier=0.5625   log-loss=1.3863   [as-consumed]
+    twin-default                 p=0.62   brier=0.1444   log-loss=0.4780   [as-consumed]
+    rival-fast-commoditisation   p=0.81   brier=0.0361   log-loss=0.2107   [as-consumed]
+score-card -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/score-card.json
+  attestation  score-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       64e20c70614905eaa7401adbb016a9d0f03c11c027e0723105fd04d3ec569825
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+[1;36m==>[0m 4. the spread is the point — the scores themselves printed by step 3, worst first
+  scoring the bundle sha256:c90b827b7e1705fc... by pin, not by path
+[1;36m==>[0m 5. the graph — components, people, typed edges, and nothing behavioural anywhere in it
+  7 components, 2 people, 9 typed edges
+    bus factor  cloud-compute          alex-rivera
+    bus factor  dvd-by-mail            sam-okafor
+    bus factor  streaming-experience   alex-rivera
+[1;36m==>[0m 6. the map — rendered from that same graph, with no separate authoring step
+==> netflix: 7 components on the map, rendered from the graph
+  visible to the user
+  |                                                                
+  |                                       g                        
+  |                                                       d        
+  |                                                                
+  |                                                                
+  |                                                                
+  |       a                                                        
+  |                                                                
+  |                                       f                        
+  |                                                                
+  |                                       c                        
+  |                                                                
+  |                       e                                        
+  |                                                       b        
+  |                                                                
+  |                                                                
+  |                                                                
+  +----------------------------------------------------------------> evolution
+   genesis         custom-built    product         commodity       
+
+  a  brand-goodwill  (genesis, evo 0.125, vis 0.60, D 0.525, K 0.050)
+  b  cloud-compute  (commodity, evo 0.875, vis 0.15, D 0.019, K 0.744)
+  c  content-delivery-network  (product, evo 0.625, vis 0.35, D 0.131, K 0.406)
+  d  dvd-by-mail  (commodity, evo 0.875, vis 0.85, D 0.106, K 0.131)
+  e  euv-lithography  (custom-built, evo 0.375, vis 0.20, D 0.125, K 0.300)
+  f  leading-edge-process-node  (product, evo 0.625, vis 0.45, D 0.169, K 0.344)
+  g  streaming-experience  (product, evo 0.625, vis 0.90, D 0.338, K 0.062)
+  R(dvd-by-mail -> content-delivery-network) = 0.319
+  R(streaming-experience -> cloud-compute) = 0.113
+  R(streaming-experience -> content-delivery-network) = 0.338
+
+  D, K and R describe a position. They are not forecasts, nothing scores them, and no
+  action band is inherited with them — the reader draws the action, never the artefact.
+[1;36m==>[0m 7. the blast radius — one traversal, two outputs, and the boundary between them visible
+  gate: only grades 1-2 may price a scored forecast; a weaker path is reported as an unpriced structural blast radius
+    price     streaming-experience     depth 1, weakest grade 2
+    unpriced  brand-goodwill           evidence-grade-below-threshold (grade 5)
+    unpriced  dvd-by-mail              evidence-grade-below-threshold (grade 3)
+  the unpriced half is a distinct artefact type, not a price with a null field
+[1;36m==>[0m 8. propagation — composed, attenuated and sampled, all three, so attenuation is falsifiable
+  a composed influence is scaled by the factor at its depth; past depth 4 it carries a direction and **no magnitude** — the path is still named, graded and dated, because a direction a reader cannot locate in the graph is not a direction
+    brand-goodwill           depth 3  composed 0.001/0.034/0.288  x0.6  -> 0.001/0.020/0.173  sampled p50 0.023
+    dvd-by-mail              depth 2  composed 0.020/0.113/0.320  x0.8  -> 0.016/0.090/0.256  sampled p50 0.089
+    streaming-experience     depth 1  composed 0.100/0.250/0.400  x1.0  -> 0.100/0.250/0.400  sampled p50 0.246
+    joint brand-goodwill           0.0251 against 0.0251 if independent; shares nothing
+    joint dvd-by-mail              0.0933 against 0.0933 if independent; shares nothing
+    joint streaming-experience     0.2500 against 0.2500 if independent; shares nothing
+  structural edges do not propagate, and paths are combined by noisy-OR rather than summed
+  a shared edge is drawn once per trial, so a common cause is not counted twice — every
+  component here is reached by one path, so there is nothing to combine and the two figures
+  agree trivially. The diamond that exercises the discount is in the pocket org, step 13
+[1;36m==>[0m 8b. doing versus learning — an intervention does not rewrite its own causes
+  do(streaming-experience): severs cdn-capacity-lifts-streaming, updates nothing upstream
+  observe(streaming-experience): severs nothing, updates belief about content-delivery-network — and carries no magnitude there
+  the downstream halves are byte-identical: the difference lives above the composition
+[1;36m==>[0m 8c. rewind — the refusals. Every fixture commit shares one date, so a later instant
+[1;36m==>[0m     resolves to HEAD; the dated-change case is tests/test_primitives.py
+  ok   a rewind to before the model existed is refused, not answered with an empty model
+[1;36m==>[0m 9. the pre-filter — a constraint is not a very large price, because a price can be outbid
+==> netflix: 3 option(s) considered for 'the-operator', 1 priced, 2 removed before pricing
+  removed  instrument-viewers-without-telling-them forbidden — no-covert-sensing (universal tier), no figure
+  removed  stake-the-quarter-on-one-title ruin — insolvency (perspective tier), no figure
+  priced   expand-the-delivery-network    20000000.0/45000000.0/90000000.0 mean 48333333.3333, sampled p50 47657662.2564
+  a constraint is not a very large price: a removed option carries no number at all
+priced-option-set -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/priced-option-set.json
+  attestation  priced-option-set.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       9744ed5b561ecc8d509ac7a2f12a8377ac66695020352f101d642a3d22309c19
+  depth        full
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+  2 removed before pricing, carrying no figure; 1 priced
+  the removed options cost almost nothing — the pre-filter never reads a cost
+[1;36m==>[0m 10. the same scenario under two perspectives — the £ belongs to whoever pays to run the twin
+==> netflix: scenario 'dvd-decline-2011' under 2 perspective(s)
+  the-operator           employer        declared exposure 160000000.0
+    register  brand-goodwill           grade 5, no figure
+  the-staff-council      employee-body   declared exposure 12000000.0
+    register  brand-goodwill           grade 4, no figure
+    dvd-by-mail              the-operator=40000000.0, the-staff-council=9000000.0   spread 31000000.0
+    streaming-experience     the-operator=120000000.0, the-staff-council=3000000.0   spread 117000000.0
+    brand-goodwill           the-operator=None, the-staff-council=None   spread None
+  spread across perspectives: 148000000.0
+  a spread, never a chosen number — the disagreement is the decision-relevant part
+  gate: only grades 1-2 may price a scored forecast; a weaker path is reported as an unpriced structural blast radius
+  a register entry carries no figure at all — beside the number, never inside it
+scenario-exposure -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/scenario-exposure.json
+  attestation  scenario-exposure.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       a143651a7c3654fbfdb1d3046f210c66bea2fbdb18517a9afcbb3f476e9eb89a
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+[1;36m==>[0m 10b. the price — the causal layer multiplied by the currency, under every declared eye
+[1;36m==>[0m      an HR lever and a technical control in one unit; an unevidenced claim earns nothing
+==> netflix: a shock at 'content-delivery-network', priced under 2 perspective(s)
+  the-operator
+    price    streaming-experience     12,000,000 / 30,000,000 / 48,000,000  grade 2
+    unpriced brand-goodwill           the-causal-path-is-graded-outside-the-pricing-threshold
+    unpriced dvd-by-mail              the-causal-path-is-graded-outside-the-pricing-threshold
+    option   expand-the-delivery-network cost 48,333,333, credit 6,000,000
+  the-staff-council
+    price    streaming-experience     300,000 / 750,000 / 1,200,000  grade 2
+    unpriced brand-goodwill           the-causal-path-is-graded-outside-the-pricing-threshold
+    unpriced dvd-by-mail              the-causal-path-is-graded-outside-the-pricing-threshold
+    option   expand-the-delivery-network cost 48,333,333, credit 150,000
+    option   stake-the-quarter-on-one-title cost 5, this-response-claims-no-mitigation
+  spread   streaming-experience       29,250,000 between the widest and narrowest eye
+  prices, costs and credits in one unit, in the order they were authored. Nothing marks one option best and nothing recommends one
+priced-impact -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/priced-impact.json
+  attestation  priced-impact.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       aa07ceba1f04906f9102b02fbf4bc8c9d48c8eebc7f3720c97bd3e9e6f28c0de
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+[1;36m==>[0m 11. the constraint set, published upfront — paperclip risk disclosed rather than discovered
+==> constraint set -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/constraint-set.json (authored, role 'constraint-owner')
+  floor      forbidden  no-special-category-representation
+  floor      forbidden  no-covert-sensing
+  floor      forbidden  no-individual-attribution
+  floor      forbidden  no-individual-level-output
+  floor      forbidden  no-automatic-enactment
+  floor      ruin       no-ruin-class-option
+  excluded              power-asymmetry
+  excluded              harms-to-non-contracting-parties
+  excluded              disparate-impact-measurement
+  excluded              the-twins-own-liability
+  excluded              individual-behaviour
+  position   stated                no-power-layer
+  position   unsolved              exit-cost-asymmetry
+  position   deferred              reflexivity-and-goodhart-on-the-twin
+  position   permanently-excluded  covert-sensing
+  gate       grades 1-2 may price a scored forecast
+  unsigned: set TWIN_SIGNING_KEY, then `twin sign /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/constraint-set.json --role constraint-owner`
+[1;36m==>[0m 12. the attestation sidecar, read back — a write-only attestation is not tamper-evidence
+==> checking score-card.json.att.json against /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-demo.nmIHCaTP/artefacts/score-card.json
+  subject      score-card 64e20c70614905ea (derived)
+  agent        none (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+
+HOLDS: the sidecar attests these exact bytes, and no human touched this derived artefact.
+  ok   a planted human signature on a derived artefact is a detectable anomaly
+[1;36m==>[0m 13. the pocket org — five components, eight edges, checked against a hand-computed worksheet
+==> pocket-org-worksheet.md against the emitted artefacts of 'pocket'
+  ok    1  rollups.components                                   5.0        got 5.0
+  ok    2  rollups.edges                                        8.0        got 8.0
+  ok    3  rollups.causal_edges                                 4.0        got 4.0
+  ok    4  rollups.causal_edges_with_degenerate_elasticity      3.0        got 3.0
+  ok    5  rollups.components_positioned_on_the_map             5.0        got 5.0
+  ok    6  D(customer-portal)                                   0.36       got 0.36000000000000004
+  ok    7  D(order-service)                                     0.35       got 0.35
+  ok    8  D(payment-gateway)                                   0.1        got 0.09999999999999998
+  ok    9  D(identity-store)                                    0.18       got 0.18
+  ok   10  D(shared-database)                                   0.01       got 0.009999999999999998
+  ok   11  K(customer-portal)                                   0.06       got 0.059999999999999984
+  ok   12  K(order-service)                                     0.15       got 0.15000000000000002
+  ok   13  K(payment-gateway)                                   0.4        got 0.4
+  ok   14  K(identity-store)                                    0.28       got 0.27999999999999997
+  ok   15  K(shared-database)                                   0.81       got 0.81
+  ok   16  R(customer-portal -> order-service)                  0.45       got 0.45
+  ok   17  R(order-service -> payment-gateway)                  0.14       got 0.13999999999999996
+  ok   18  R(order-service -> identity-store)                   0.42       got 0.42
+  ok   19  R(identity-store -> shared-database)                 0.03       got 0.029999999999999992
+  ok   20  elasticity.database-slows-orders.min                 0.3        got 0.3
+  ok   21  elasticity.database-slows-orders.mode                0.5        got 0.5
+  ok   22  elasticity.database-slows-orders.max                 0.7        got 0.7
+  ok   23  elasticity.orders-slow-the-portal.mode               0.4        got 0.4
+  ok   24  propagation.customer-portal.min                      0.12       got 0.12
+  ok   25  propagation.customer-portal.mode                     0.2        got 0.2
+  ok   26  propagation.customer-portal.max                      0.28       got 0.28
+  ok   27  price.order-service.the-operator.customer-portal.mode 160000.0   got 160000.0
+  ok   28  price.order-service.the-staff-council.customer-portal.mode 20000.0    got 20000.0
+  ok   29  price.order-service.spread.customer-portal           140000.0   got 140000.0
+  ok   30  evidence_grade.database-slows-orders                 3.0        got 3.0
+  ok   31  evidence_grade.orders-slow-the-portal                2.0        got 2.0
+  ok   32  rollups.causal_edges_admissible_to_pricing           1.0        got 1.0
+  ok   33  blast.shared-database.reached                        4.0        got 4.0
+  ok   34  blast.shared-database.admitted_to_pricing            0.0        got 0.0
+  ok   35  blast.shared-database.unpriced                       4.0        got 4.0
+  ok   36  exposure.declared.the-operator                       650000.0   got 650000.0
+  ok   37  exposure.declared.the-staff-council                  170000.0   got 170000.0
+  ok   38  exposure.spread                                      480000.0   got 480000.0
+  ok   39  exposure.spread.customer-portal                      350000.0   got 350000.0
+  ok   40  exposure.spread.order-service                        130000.0   got 130000.0
+  ok   41  pert.database-slows-orders.mean                      0.5        got 0.5
+  ok   42  pert.orders-slow-the-portal.mean                     0.4        got 0.4
+  ok   43  propagation.attenuation.order-service                1.0        got 1.0
+  ok   44  propagation.attenuation.customer-portal              0.8        got 0.8
+  ok   45  propagation.attenuated.customer-portal.min           0.096      got 0.096
+  ok   46  propagation.attenuated.customer-portal.mode          0.16       got 0.16
+  ok   47  propagation.attenuated.customer-portal.max           0.224      got 0.224
+  ok   48  options.the-operator.considered                      4.0        got 4.0
+  ok   49  options.the-operator.removed                         2.0        got 2.0
+  ok   50  options.the-operator.priced                          2.0        got 2.0
+  ok   51  option_price.add-a-read-replica.mean                 30000.0    got 30000.0
+  ok   52  admission.the-operator.customer-portal               1.0        got 1.0
+  ok   53  admission.the-operator.order-service                 1.0        got 1.0
+  ok   54  admission.the-operator.identity-store                0.0        got 0.0
+  ok   55  joint.customer-portal.paths                          2.0        got 2.0
+  ok   56  joint.customer-portal.shared_edges                   1.0        got 1.0
+  ok   57  joint.customer-portal.exact                          0.222726   got 0.222725714286
+  ok   58  joint.customer-portal.if_independent                 0.223      got 0.223
+  ok   59  joint.customer-portal.double_counting_avoided        0.000274   got 0.000274285714
+  ok   60  joint.payment-gateway.shared_edges                   0.0        got 0.0
+  ok   61  joint.payment-gateway.double_counting_avoided        0.0        got 0.0
+  ok   62  intervene.order-service.severed                      1.0        got 1.0
+  ok   63  intervene.order-service.upstream                     0.0        got 0.0
+  ok   64  observe.order-service.upstream                       1.0        got 1.0
+  ok   65  observe.order-service.severed                        0.0        got 0.0
+  ok   66  intervene.order-service.reached                      2.0        got 2.0
+  ok   67  observe.order-service.reached                        2.0        got 2.0
+  ok   68  price.order-service.the-operator.customer-portal.min 160000.0   got 160000.0
+  ok   69  price.order-service.the-operator.customer-portal.max 160000.0   got 160000.0
+  ok   70  price.order-service.the-operator.payment-gateway.priced 0.0        got 0.0
+  ok   71  price.shared-database.the-operator.customer-portal.priced 0.0        got 0.0
+  ok   72  option_price.retrain-the-on-call-rota.mean           6000.0     got 6000.0
+  ok   73  credit.order-service.the-operator.retrain-the-on-call-rota.mean 40000.0    got 40000.0
+  ok   74  credit.order-service.the-operator.retrain-the-on-call-rota.mode 40000.0    got 40000.0
+  ok   75  credit.order-service.the-operator.add-a-read-replica.credited 0.0        got 0.0
+  ok   76  credit.order-service.the-staff-council.bet-the-org-on-one-supplier.credited 0.0        got 0.0
+  ok   77  credibility.identity-store-incident-cost.n           3.0        got 3.0
+  ok   78  credibility.identity-store-incident-cost.own_mean    40000.0    got 40000.0
+  ok   79  credibility.identity-store-incident-cost.z           0.932039   got 0.932038834951
+  ok   80  credibility.identity-store-incident-cost.blended_min 10679.61165 got 10679.611650485436
+  ok   81  credibility.identity-store-incident-cost.blended_mode 40679.61165 got 40679.611650485436
+  ok   82  credibility.identity-store-incident-cost.blended_max 130679.61165 got 130679.61165048543
+
+82 match, 0 differ, 0 pending, compared at 6 decimal places
+[1;36m==>[0m 14. reproduce the score card from its pins alone — including the bundle it scored
+==> reproducing /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-demo.nmIHCaTP/artefacts/score-card.json from its pins
+  ok   forecast-bundle    c90b827b7e1705fc (recorded c90b827b7e1705fc)
+  ok   score-card         64e20c70614905ea (recorded 64e20c70614905ea)
+  tolerance: none — byte identity. Scores carry a declared 12-significant-digit quantisation in the format.
+
+REPRODUCES: the pins are sufficient to recompute this artefact exactly.
+[1;36m==>[0m 15. every object validates against its closed schema, and Article 9 data cannot be written
+==> validating /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-demo.nmIHCaTP/model at f5eabbde5669
+  ok   world layer
+  ok   overlay intel: 1 components, 7 signals, 7 claims, 1 scenarios, 1 edges, 1 regrades, 3 responses, 1 enforcement_moves
+       intel: every recorded evidence-grade change carries a regrade event
+       intel: every recorded enforcement-grade change carries a move event
+       intel has no behavioural overlay (the default, and the supported state)
+  ok   overlay netflix: 3 components, 3 signals, 3 claims, 1 scenarios, 1 outcomes, 2 people, 6 edges, 2 perspectives, 1 regrades, 3 responses
+       netflix: every recorded evidence-grade change carries a regrade event
+       netflix: every recorded enforcement-grade change carries a move event
+  ok   netflix behavioural overlay: 1 cohort observations, DPIA DPIA-2026-001, advisory only, 90-day retention
+PASS: every object validates against its closed schema
+[1;36m==>[0m 16. the derived index is derived — drop it, rebuild it from git alone
+derived index -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/index  (df33e237a9f2afee)
+  derived, never authoritative: drop it and rebuild from the repository alone
+derived index -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/index  (df33e237a9f2afee)
+  derived, never authoritative: drop it and rebuild from the repository alone
+[1;36m==>[0m 17. determinism — the same command against the same ref, byte for byte
+  ok   identical bytes
+[1;36m==>[0m 18. a dirty tree is refused — the pin has to describe what you are reading
+  ok   refused
+[1;36m==>[0m 19. sweep — every scenario in every org, unconditionally, with no --scenario flag to set
+==> sweep across 1 repo(s): 2 execution(s), 6 forecast(s), 0 failure(s)
+sweep -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/sweep.json
+  attestation  sweep.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       4074f2989f60458bf34928cb354f39f12b28a69aaeef71e2e0d53d79afe7f4bc
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+  2 scenario(s) across 1 repo(s), 6 forecast(s), no --scenario flag
+[1;36m==>[0m 20. the reliability diagram — a population of score cards, pooled, with empty bins shown
+[1;36m==>[0m     two --score-card flags here, not one: pooling is proved at the seam a caller uses
+==> reliability diagram over 6 scored forecast(s), 10 bin(s)
+  [0.0, 0.1)  n=0    mean=-      observed=-
+  [0.1, 0.2)  n=0    mean=-      observed=-
+  [0.2, 0.3)  n=2    mean=0.25   observed=1.00
+  [0.3, 0.4)  n=0    mean=-      observed=-
+  [0.4, 0.5)  n=0    mean=-      observed=-
+  [0.5, 0.6)  n=0    mean=-      observed=-
+  [0.6, 0.7)  n=2    mean=0.62   observed=1.00
+  [0.7, 0.8)  n=0    mean=-      observed=-
+  [0.8, 0.9)  n=2    mean=0.81   observed=1.00
+  [0.9, 1.0)  n=0    mean=-      observed=-
+reliability-diagram -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/reliability-diagram.json
+  attestation  reliability-diagram.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       65c33177e2c5b30b37baf516e721dec10c155a60d4faf9bf56d6b4061b10edbd
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+  10 bins over 6 scored forecast(s) from 2 named cards; an empty bin carries a zero count, never a gap
+    [0.0, 0.1)  n=0
+    [0.1, 0.2)  n=0
+    [0.2, 0.3)  n=2
+    [0.3, 0.4)  n=0
+    [0.4, 0.5)  n=0
+    [0.5, 0.6)  n=0
+    [0.6, 0.7)  n=2
+    [0.7, 0.8)  n=0
+    [0.8, 0.9)  n=2
+    [0.9, 1.0)  n=0
+[1;36m==>[0m 21. the loss-exceedance curve — VaR beside TVaR, never VaR alone, and the shape boundary refused
+==> loss-exceedance curve, 3 confidence level(s)
+  alpha=0.9     var=138395.91      tvar=269137.02
+  alpha=0.95    var=208909.42      tvar=369870.60
+  alpha=0.99    var=442013.20      tvar=702876.00
+loss-exceedance-curve -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-demo.nmIHCaTP/artefacts/loss-exceedance-curve.json
+  attestation  loss-exceedance-curve.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       6f36a93289efda633b3c04a83635ff61b0b99b2b0e10581d92ce13a12c46ca1a
+  depth        full
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+  3 confidence level(s), a declared threshold, no severity slot on any component
+    alpha=0.9  var=138395.91  tvar=269137.02
+    alpha=0.95  var=208909.42  tvar=369870.60
+    alpha=0.99  var=442013.20  tvar=702876.00
+
+PASS: sense -> run -> score closes the loop from a clean checkout. Forecasts are a list,
+scored by pin; the store is rebuildable from git; identical pins give identical bytes; a
+dirty tree is refused. sweep runs the standing scenario set unconditionally and reliability
+bins the record it produces. severity is the FAIR engine's tail model, standalone, and
+reports TVaR beside VaR rather than VaR alone. Every artefact declares which acceptance
+criteria are still unchecked, so the skeleton cannot quietly become the definition of done.
+
+artefacts: /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-demo.nmIHCaTP/artefacts
+EXIT=0

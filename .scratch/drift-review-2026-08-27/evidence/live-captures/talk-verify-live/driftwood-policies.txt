@@ -1,0 +1,13 @@
+NAME                                                                AGE     READY
+validatingpolicy.policies.kyverno.io/posture-trust-boundary         6d20h   true
+validatingpolicy.policies.kyverno.io/posture-trust-boundary-1-0-0   4d20h   true
+validatingpolicy.policies.kyverno.io/posture-trust-boundary-2-0-0   4d20h   true
+validatingpolicy.policies.kyverno.io/require-nonroot-1-0-0          4d20h   true
+validatingpolicy.policies.kyverno.io/require-nonroot-2-0-0          4d20h   true
+
+NAME                                                     AGE     READY
+mutatingpolicy.policies.kyverno.io/cage-tier-1-0-0       4d20h   true
+mutatingpolicy.policies.kyverno.io/cage-tier-2-0-0       4d20h   true
+mutatingpolicy.policies.kyverno.io/stamp-posture         6d20h   true
+mutatingpolicy.policies.kyverno.io/stamp-posture-1-0-0   4d20h   true
+mutatingpolicy.policies.kyverno.io/stamp-posture-2-0-0   4d20h   true

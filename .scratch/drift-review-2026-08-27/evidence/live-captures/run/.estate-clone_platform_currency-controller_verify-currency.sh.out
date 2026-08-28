@@ -1,0 +1,16 @@
+[1;36m==>[0m 1. offline: currency.py selfcheck
+currency selfcheck: all asserts passed (stale = posture ∉ supported; re-patch drops BOTH labels)
+[1;36m==>[0m 2. offline: plan selects only the retired-version postured pod
+  ok   only reset-retired planned for de-posture
+[1;36m==>[0m 3. offline: the de-posture patch takes the pod out of scope for every posture policy
+  ok   re-patch removes the policy-version CLAIM (so stamp-posture won't re-clobber posture)
+  ok   re-patch removes the posture label (so posture-trust-boundary is out of scope)
+  ok   stamp-posture scopes on the claim we remove -> mutate skips, no re-clobber
+  ok   posture-trust-boundary scopes on the posture we remove -> validate skips, patch allowed
+  ok   posture ClusterSPIFFEID needs the posture label to Exist -> removed => pod drops to base-mesh SVID
+  -- de-posture is out-of-scope for stamp/validate/orphan-guard AND drops the posture SVID --
+[1;36m==>[0m 4. offline: manifests are valid (client dry-run)
+  ok   rbac.yaml + cronjob.yaml apply-clean
+[1;36m==>[0m 5. live: postured pods present (tuppence-reset/customer-accounts-reset-b8fcc6996-kkhwc=2.0.0 tuppence-reset/teller-current-85dfbc7944-sndp7=2.0.0 tuppence-reset/teller-stale-df49ff6bf-8jx99=1.0.0 ) — triggering one bounded reconcile pass
+  ok   reconcile job created (inspect: kubectl -n currency-system logs job/currency-verify)
+PASS: stale posture is re-evaluated post-admission; the re-patch drops BOTH labels so the SVID falls back to base-mesh.

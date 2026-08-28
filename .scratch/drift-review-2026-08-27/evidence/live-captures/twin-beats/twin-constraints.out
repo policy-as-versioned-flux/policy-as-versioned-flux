@@ -1,0 +1,19 @@
+==> constraint set -> /private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/constraints.json (authored, role 'constraint-owner')
+  floor      forbidden  no-special-category-representation
+  floor      forbidden  no-covert-sensing
+  floor      forbidden  no-individual-attribution
+  floor      forbidden  no-individual-level-output
+  floor      forbidden  no-automatic-enactment
+  floor      ruin       no-ruin-class-option
+  excluded              power-asymmetry
+  excluded              harms-to-non-contracting-parties
+  excluded              disparate-impact-measurement
+  excluded              the-twins-own-liability
+  excluded              individual-behaviour
+  position   stated                no-power-layer
+  position   unsolved              exit-cost-asymmetry
+  position   deferred              reflexivity-and-goodhart-on-the-twin
+  position   permanently-excluded  covert-sensing
+  gate       grades 1-2 may price a scored forecast
+  unsigned: set TWIN_SIGNING_KEY, then `twin sign /private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/417e2917-726b-46c9-9117-7b880114f08b/scratchpad/live/twin-beats/constraints.json --role constraint-owner`
+constraints EXIT=0

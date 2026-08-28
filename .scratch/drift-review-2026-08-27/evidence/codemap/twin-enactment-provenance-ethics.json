@@ -1,0 +1,278 @@
+{
+ "capabilities_real": [
+  "Multi-layer propose-only enforcement: twin/enact.py public-surface allow-list ({propose, dependency_pins}) + twin/enact_guard.py PreToolUse regex/command refusal, both asserted live by harness `enactment_is_propose_only_at_both_layers` (twin/invariants/harness.py:3440) and unit tests tests/test_enact.py:45-178",
+  "enact_guard.decide() genuinely parses git-push targets, resolves bare remotes via `git remote get-url`, and applies a real, tested carve-out (own-repo vs sibling-repo vs unresolvable-origin fail-closed) \u2014 twin/enact_guard.py:108-225, tests/test_enact.py:75-140",
+  "HMAC-SHA256 signing with two non-interchangeable typed signatures (human=accountability, agent=origin), role-register binding, personal-field refusal, and derived_never_human_signed enforced at both build() and check() (twin/sign.py, twin/attest.py), tested in tests/test_signing.py (real crypto verification, real tamper detection at attest.check())",
+  "Recursive chain reproduction (reproduce.py `_replay_subject`/`replay`) that walks reliability\u2192score-card\u2192forecast-bundle 3 artefacts deep, re-runs verbs at pinned commits, and does byte-exact (never approximate) comparison \u2014 exercised in tests/test_reproduce.py (chain walk, tampering detection, missing-produced_by loud failure)",
+  "Corroboration arithmetic: `corroborate()` computes evidence grade as max(strongest_rung, alone - step*(independent-1)), with real self-corroboration collapse (subject-declared channels count as 1) \u2014 twin/corroboration.py:306-362, tested tests/test_corroboration.py:145-212 and wired end-to-end into pricing via pricing._credit() (mitigation_credit_is_gated_on_corroborated_enactment... harness check, twin/invariants/harness.py:4444, backed by real Intel/pocket-org fixture data at twin/fixtures.py:569-616,1342-1388)",
+  "Enforcement ladder validated on load with structural refusal of any numeric field anywhere in a rung (walk_values scan) and refusal of a cliff-edge ladder; posture-as-identity computed (never authored) from two facts (changes_the_outcome + stamped_by-not-subject) \u2014 twin/enforcement.py:138-274, tests/test_enforcement.py (28 tests) and harness check at harness.py:3611",
+  "Enforcement move-chain git-history check: `history_violations` reads YAML at every commit that touched a response and detects an unrecorded rung change even before any move record exists \u2014 twin/enforcement.py:346-393, exercised by tests/test_enforcement.py:221-291",
+  "Drift measurement: real coverage arithmetic (elapsed/cadence), gap detection bounded at both window ends, floor_reachable deadline computation with the `int(floor*total)+1` float-rounding guard \u2014 twin/drift.py:335-450, tested tests/test_drift.py (20 tests) plus two harness liveness/pre-registration guards (harness.py:3121-3305) that read wall-clock and git first-commit-date, one of which (`flux_coverage_floor_is_still_reachable`) is documented as currently RED/unreachable per project memory",
+  "ethics_gate admission ladder that structurally stops at the first failing rung (purpose\u2192necessity\u2192proportionality), never evaluating later rungs even when they'd raise on bad input \u2014 twin/ethics_gate.py:194-215, proven by harness check with poison payloads (harness.py:4256-4346) and tests/test_ethics_gate.py",
+  "DPIA triage against the ICO's named mandatory-monitoring triggers, combined with the ladder into admit() as the real gating function (ethics_gate.py:226-309), tested tests/test_ethics_gate.py:116-173",
+  "fast-improvement flag/adjudicate split: flag_fast_improvement() computes a real rate and threshold comparison but never emits a verdict field (checked against the shared NO_ACTION_BANNED_KEYS/PHRASES scan); only adjudicate_fast_improvement(), given a registered role, turns it into a finding \u2014 ethics_gate.py:383-438, tests/test_ethics_gate.py:313-379",
+  "misuse.py compute_attractiveness(): genuinely re-runs options.prefilter() with one constraint stripped to derive a real cost figure rather than accept a caller-supplied number \u2014 twin/misuse.py:86-152, tests/test_misuse.py:98-145",
+  "disparate_impact.py raise_audit()/respond(): real reuse of schema.refuse_special_category to seal the channel, and a structural role check (respondent must equal the one registered role) \u2014 twin/disparate_impact.py, tests/test_disparate_impact.py (13 tests)",
+  "affected_parties.register(): a real flatten-and-sort walk over every scenario's required, non-empty affected_parties field \u2014 twin/affected_parties.py:41-62, tests/test_affected_parties.py",
+  "worksheet.py: a real regex-keyed reader against seven+ different artefact bodies (graph, blast, exposure, propagation, options, intervention/observation, price:*, credibility), checked to 6 decimal places against hand-computed numbers \u2014 twin/worksheet.py, tests/test_pocket_org.py, harness check worksheet_matches_the_pocket_org (harness.py:253)",
+  "demo_slice.py boundary()/summary(): a live composition of does_not_do.published() and Capabilities.load() rather than hand-typed prose \u2014 twin/demo_slice.py:140-172, tests/test_demo_slice.py, harness check does_not_do_register_is_generated_never_typed (harness.py:4349)",
+  "beat-sequence.sh ordering (falsifiability\u2192governance\u2192pricing) is asserted against the literal beat script source text by harness check the_demo_sequence_earns_credibility_before_it_spends_it (harness.py:4396) and by tests/test_beat_sequence.py, not merely narrated"
+ ],
+ "capabilities_stubbed_or_thin": [
+  "twin/enact.py is explicitly propose-only by design (no merge/land/ship function exists at all) \u2014 this is a deliberate structural absence documented at length in the module docstring, not a gap, but it means there is genuinely no PR-merge/dispose capability anywhere in the codebase, ever (twin/enact.py:1-51)",
+  "twin/ENACT_MODE currently reads 'development' (twin/ENACT_MODE:1) \u2014 the enact_guard.py refusal of merges/enactment-pushes is PERMISSIVE by default right now; only 'operations' mode (or TWIN_ENACT_MODE=operations env override) restores the original refusal behaviour. Per project memory this was a deliberate 2026-08-25 owner instruction during active twin construction, but it means the merge-refusal guard is currently a no-op in the checked-in default state (twin/enact_guard.py:35-77, decide() at line 194)",
+  "enact_guard.py's DISPOSITION_TOOL_NAME/DISPOSITION_COMMANDS are explicitly a keyword screen ('ponytail:' comment, twin/enact_guard.py:29-33, 96-101), acknowledged as catching only the shapes named \u2014 a wrapper script or hand-rolled curl+token call to the GitHub REST API is NOT matched; the module docstring names the real upgrade (a merge-incapable credential) as unbuilt",
+  "twin/enact.py's dependency_pins() explicitly does NOT verify any signature, tag, or Rekor entry \u2014 'NOT VERIFIED HERE' (twin/enact.py:184, 198-203); it only reads what committed GitRepository YAML declares. Also every pin in the estate names a tag with a commented-out commit line, so 'pinned' is only pinned-to-a-movable-tag, not commit-immutable (twin/enact.py:125-127, 188-191)",
+  "twin/sign.py is explicitly HMAC-SHA256 with a shared key ('ponytail:' twin/sign.py:19-25) \u2014 proves possession, not identity; anybody holding TWIN_SIGNING_KEY can forge any role's signature. Named upgrade path is sigstore/gitsign, unbuilt",
+  "attest.py sidecars are unsigned entirely when no TWIN_SIGNING_KEY is set \u2014 signature_status carries an explicit UNSIGNED placeholder string rather than a signature (twin/attest.py:31,92-93), and this is the ordinary/common case absent explicit key-setting",
+  "drift.py's own verdict is explicitly None with a stated reason ('this is the instrument... writing the conclusion into the instrument is how a measurement becomes a demonstration', twin/drift.py:479-485) \u2014 no conclusion is ever computed by this module by design; build ticket 65 (not in this file set) is where the verdict lands. Per project memory the coverage floor is currently unreachable (RED), i.e. the drift falsifiability window has already failed its own pre-registered target",
+  "enforcement-grades.yaml's 'warn' rung is explicitly named-but-unrealised: realised_by states 'Nothing in this estate' (twin/enforcement-grades.yaml:44-46) \u2014 one of four rungs on the ladder has zero real controls occupying it, present only to keep the ladder honest about vocabulary",
+  "ethics_gate.py's classify_gameability() keyword match is explicitly fitted to one worked example (bus-factor keywords only: 'bus-factor','bus factor','knowledge spread','spread knowledge', twin/ethics_gate.py:87, 29-34 'ponytail:') \u2014 a placeholder for a real classifier model call; the module docstring states the upgrade path directly (swap for a model call)",
+  "ethics_gate.py's labelled_corpus() is explicitly hand-authored (5 items) because 'No sensor fixture exists anywhere in twin/fixtures.py' for sensors specifically (twin/ethics_gate.py:36-39, 444-447) \u2014 unlike most other capabilities in this cluster, sensor admission has no path through the real org fixtures, only through this synthetic corpus",
+  "misuse.py's constraint-removal logging explicitly covers only a perspective's own declared constraints, not the universal floor \u2014 'removing' the floor is stated as 'a governance-document edit, a different and larger act this module does not cover' (twin/misuse.py:16-20)",
+  "corroboration.py's grade computation is explicitly channel-count-based only, never volume/recency-weighted \u2014 'ponytail:' twin/corroboration.py:48-52 states ten reconciler reports count as one channel, and per-channel recency/volume weighting is named as an unbuilt upgrade if ever needed",
+  "reproduce.py's discount legs (score's --discount-sha256) are explicitly NOT replayable from pins \u2014 raises ReproduceError by design because discount sources carry no produced_by chain (twin/reproduce.py:228-241)",
+  "demo_slice.py's boundary() 'absent' capabilities list is real but by definition names capabilities this demo sequence never exercises at all \u2014 the module docstring states build ticket 91 built only the rendering, not new coverage of anything",
+  "disparate_impact.py and affected_parties.py both carry NO capability/depth grade at all \u2014 both explicitly authored-only artefacts with `depth={'grade': None, ...}` (twin/disparate_impact.py:40-44, and affected_parties.published has no capability path either) \u2014 meaning neither is measured against a decision-ticket checklist the way most other artefacts in this cluster are"
+ ],
+ "hardcoded_or_fixture_only": [
+  "Netflix: DVD-to-streaming scenario (dvd-decline-2011), fear/opportunity paths, price-separation signal, Q4 2011 letter checkpoint, propose('hold-the-bundled-price-for-one-quarter', channel=record) \u2014 all only in twin/fixtures.py build_netflix_org/build_and_corroborate_netflix_org (lines ~4860-5007) and twin/beat-netflix.sh; no other subject exercises the propose/enactment-record channel in this cluster",
+  "Intel: 14A foundry-node scenario, EUV lithography causal edge, tan-14a-customer-guidance signal, pin-the-tooling-image-set / report-node-schedule-variance / raise-the-tooling-team-retention-award responses at specific enforcement grades (constrain/observe/none) \u2014 only in twin/fixtures.py build_intel_org (~5414-5612) and twin/beat-intel.sh; this is the ONLY subject in this cluster carrying real enforcement-ladder occupancy and enactment-channel corroboration data (self-declaration + reconciliation-state -> grade 3, one lever with no rung)",
+  "Royal Mail: automation-shortfall scenario, would-the-twin-have-flagged-it, 2018-05-17/2018-10-01 dates, market-consensus-at-flotation world model reading 0.05 \u2014 only in twin/fixtures.py build_royal_mail_org (~4291-4860) and twin/beat-royal-mail.sh; used purely for the falsifiability/backtest beat, no enactment/enforcement data",
+  "Carillion and Enron: used exclusively as the contamination-discount legs for Royal Mail's score (twin/fixtures.py build_carillion_org ~2086, build_enron_org ~2805) \u2014 no other role in this cluster",
+  "pocket org: five-component toy estate whose numbers are the ONLY ones checked against a hand-computed authored source (twin/pocket-org-worksheet.md, referenced by twin/worksheet.py); its retrain-the-on-call-rota response and two enactment claims (self-declaration + merged-change -> grade 2 corroborated) are the fixture data backing the mitigation_credit_is_gated_on_corroborated_enactment harness check (twin/fixtures.py:1330-1388)",
+  "\u00a3 figures throughout: e.g. pin-the-tooling-image-set cost min/mode/max 400000/900000/2000000 (fixtures.py:484-487), retention-award-raise 1200000/1800000/2600000 (fixtures.py:549-552) \u2014 exist only as fixture YAML, never derived from any real external source",
+  "Enactment repository names in enact_guard.py/enact.py (policy-as-versioned-nist, -platform, -driftwood, -tuppence, -ludlow, -ico, -code) are real org repository names asserted as hardcoded constants (ENACTMENT_REPOSITORY regex + enact.py test expectations tests/test_enact.py:244-258), not fetched from any live registry",
+  "roles.yaml's five roles (model-steward, worksheet-author, constraint-owner, challenger, challenge-resolver, disparate-impact-respondent) are a fixed, hand-authored, versioned register \u2014 every signature in this cluster binds to one of exactly these six names"
+ ],
+ "external_integrations": [
+  "Flux/Kubernetes: twin/drift.py reads ONLY from a jsonl sample log (estate/driftwood/drift/samples.jsonl) and window/campaign YAML files under ESTATE_CLONE_DIR/driftwood/drift/ \u2014 no live Kubernetes or Flux API call exists anywhere in this module; sampling is done by an external probe.sh not in this file set, and the harness explicitly checks wall-clock liveness of that external process's output rather than talking to Flux itself",
+  "GitHub: twin/enact.py reads GitRepository CRD YAML committed inside ESTATE_CLONE_DIR (a local git clone), not the live GitHub API; twin/enact_guard.py refuses `gh pr merge`/`gh api ... merge` command-line invocations by pattern-matching the command string before it runs \u2014 it does not call GitHub itself, it blocks a tool call that would have",
+  "gitsign/keyless signing: named throughout (twin/enact.py:182-184, twin/enforcement.py:45-49) as the real upstream mechanism the estate's own repositories claim to use, but explicitly NOT VERIFIED by this codebase \u2014 twin/sign.py uses HMAC-SHA256 with a shared secret instead, and both enact.py and enforcement.py state plainly that this repository's own commits are not keyless-signed either (citing estate/verify/provenance/verify-provenance.sh, a file outside this file set)",
+  "arckit: no reference found anywhere in this cluster's files",
+  "prediction markets / news feeds: no reference found anywhere in this cluster's files; all 'signals' in fixtures.py (e.g. tan-14a-customer-guidance, fab-cluster-reconciled) are fixture-authored strings with fictional/fixture provenance.url fields (example.invalid), never live feed I/O",
+  "git (local): genuinely real subprocess calls throughout \u2014 enact_guard.py's `git remote get-url`, enforcement.py's/drift.py's git-history reads via ModelRepo, the fixture builder's own commit machinery \u2014 all real local git operations against local repos, not a network integration"
+ ],
+ "tests_covering": [
+  "tests/test_enact.py (280 lines, ~24 tests) \u2014 enact.py layer 1 allow-list, enact_guard.py layer 2 decide() across DISPOSES/PROPOSES tables, push carve-out (own repo/sibling/unresolvable-origin), hook stdin/stdout contract, PreToolUse matcher coverage, proposal derivation/signature-refusal, dependency-pins content, floor-crossing refusal, CLI emission, capability grade",
+  "tests/test_signing.py (159 lines, 17 tests) \u2014 human vs agent signature semantics, type-interchangeability refusal, subject/key binding, role-register binding, personal-field refusal, derived_never_human_signed at build() and detection at check(), tamper/edit detection, unsigned-sidecar honesty, signature never entering canonical artefact bytes",
+  "tests/test_enforcement.py (348 lines, ~29 tests) \u2014 ladder occupancy/spectrum validation, numeric-field refusal at any depth, posture-as-identity computed exclusion (4 named cases), move-chain contiguity, git-history unrecorded-move detection, authored+signed posture publication",
+  "tests/test_corroboration.py (329 lines, ~29 tests) \u2014 channel-table closure/validation, self-corroboration collapse, grade-strengthening arithmetic and floor, ethics-ladder gating of people-observing channels, enactment claim schema validation and role attribution, live sensing path through the ordinary claim pipeline",
+  "tests/test_ethics_gate.py (412 lines, ~37 tests) \u2014 ladder stop-early behaviour (both fail and pass legs), DPIA triage per ICO trigger, admit() gate combination, sensors.yaml table validation, gameability classification and preference rule, fast-improvement flag/adjudicate split, labelled-corpus threshold pass/fail",
+  "tests/test_misuse.py (252 lines, ~21 tests) \u2014 catalogue loading/mechanism requirement for both catalogue files, computed (never caller-supplied) attractiveness, floor-removal refusal, removal log read/write/verify round trip",
+  "tests/test_disparate_impact.py (157 lines, 13 tests) \u2014 sealed special-category refusal (both finding and source fields), respondent role gating, CLI raise/respond flows including signing",
+  "tests/test_affected_parties.py (150 lines, 12 tests) \u2014 schema requiredness, special-category refusal on a party, register flattening, constraints-pin propagation, CLI emission",
+  "tests/test_drift.py (288 lines, 20 tests) \u2014 drift-event detection (deploy vs no-deploy, deleted control, unobserved gap), coverage-window bounding, forced-campaign pre-registration validation, orchestrator-script/resolution consistency checks against real declared files",
+  "tests/test_reproduce.py (248 lines, ~13 tests) \u2014 byte-exact reproduction across every artefact kind, chain walking (score\u2192bundle, reliability\u2192score-card\u2192bundle 3 deep), tampering/pin-mismatch detection, non-deterministic-operation catching, temp-file cleanup",
+  "tests/test_demo_slice.py (61 lines, 7 tests) \u2014 touched-capability subset correctness, shown/stubbed/absent partition, demo-slice's own checklist closure, artefact depth-scoping, precomputed-body reuse",
+  "tests/test_pocket_org.py \u2014 worksheet.check()/bodies_for() against the pocket-org fixture, overdue-line detection, worksheet authored+signed emission",
+  "twin/invariants/harness.py's 6 harness_check functions for this cluster (enactment_is_propose_only_at_both_layers, enforcement_is_a_spectrum_and_never_prices_a_rung, enactment_is_sensed_and_corroboration_sets_the_grade, mitigation_credit_is_gated_on_corroborated_enactment_not_just_claimed_evidence, drift_window_was_declared_before_it_was_measured, drift_window_is_actually_being_sampled, flux_coverage_floor_is_still_reachable, forced_campaign_pre_registered_and_walled_off, worksheet_matches_the_pocket_org, disparate_impact_audit_channel_is_sealed_and_role_gated, ethics_gate_ladder_stops_early_and_fast_improvement_is_never_an_automatic_finding, does_not_do_register_is_generated_never_typed, the_demo_sequence_earns_credibility_before_it_spends_it) \u2014 run live against real fixture-built repos, not mocked, as part of `twin verify`"
+ ],
+ "cluster": "twin-enactment-provenance-ethics",
+ "modules": [
+  {
+   "file": "twin/enact.py",
+   "lines": 328,
+   "purpose": "Layer 1 of propose-only enactment: emits a derived 'enactment-proposal' artefact for one response through one of two narrowed channels (policy | record); exposes no merge/dispose function at all as a structural absence.",
+   "key_functions": "propose(repo,caps,org,response_id,channel,command); dependency_pins(estate_dir); _dependency_block(pins,org); class EnactError",
+   "depends_on": "twin/artefact.py (DERIVED,Artefact), twin/canon.py, twin/constraints.py (floor_ids), twin/grades.py (Capabilities), twin/model.py (Overlay), twin/repo.py (ModelRepo), twin/sign.py (agent/asserts constants)"
+  },
+  {
+   "file": "twin/enact_guard.py",
+   "lines": 256,
+   "purpose": "Layer 2: a PreToolUse hook script that refuses disposing tool calls (gh pr merge, MCP merge/squash tool names, git push to an enactment repo) at the tool-call boundary; mode-gated between development (permissive, current default) and operations (refusing).",
+   "key_functions": "enact_mode(); decide(tool_name,tool_input,cwd); _push_target(); _own_repository(); _normalise(); main() (stdin/stdout hook contract)",
+   "depends_on": "stdlib only (json, os, re, subprocess, sys, pathlib) \u2014 deliberately imports nothing from twin/, runs standalone from a hook command line"
+  },
+  {
+   "file": "twin/ENACT_MODE",
+   "lines": 1,
+   "purpose": "Checked-in, visible one-word mode toggle for enact_guard.py \u2014 currently 'development' (permissive/refusal disabled).",
+   "key_functions": "n/a (data file)",
+   "depends_on": "read by twin/enact_guard.py's enact_mode()"
+  },
+  {
+   "file": "twin/enactment-channels.yaml",
+   "lines": 182,
+   "purpose": "Versioned closed table of six enactment-sensing channels (self-declaration, merged-change, payroll-record, counter-signed-contract, pinned-policy-version, reconciliation-state), each with its own alone-grade, plus the corroboration rule (step_rungs, self-corroboration, absence).",
+   "key_functions": "n/a (data file, loaded/validated by twin/corroboration.py)",
+   "depends_on": "validated against twin/ethics_gate.py's admission ladder for the one people-observing channel (payroll-record)"
+  },
+  {
+   "file": "twin/enforcement.py",
+   "lines": 488,
+   "purpose": "Graded enforcement (4-rung ladder, no rung prices) and posture-as-identity computed from two facts (changes_the_outcome + stamped_by-not-subject); versioned move-record chain plus git-history unrecorded-move detection; publishes an authored enforcement-posture artefact.",
+   "key_functions": "ladder(path); posture_as_identity(response); refuse_untrusted_stamp(); direction()/record() (move records); chain_for()/check_chain(); history_violations(); artefact(repo,org,command)",
+   "depends_on": "twin/enforcement-grades.yaml, twin/canon.py, twin/model.py (Overlay), twin/artefact.py, twin/evidence.py (indirectly via history_violations->unrecorded_changes)"
+  },
+  {
+   "file": "twin/enforcement-grades.yaml",
+   "lines": 70,
+   "purpose": "The 4-rung enforcement ladder itself (observe, warn, constrain, block) with changes_the_outcome flags and admits/does_not/realised_by prose per rung; carries no numeric field anywhere.",
+   "key_functions": "n/a (data file)",
+   "depends_on": "loaded/validated by twin/enforcement.py's ladder()"
+  },
+  {
+   "file": "twin/corroboration.py",
+   "lines": 425,
+   "purpose": "Reads enactment claims (bound via the ordinary sensing path, not a parallel pipeline) and computes the corroborated evidence grade for 'was this response enacted' from which channels observed it, with self-corroboration collapsed.",
+   "key_functions": "table(path) (validated load, incl. ethics-gate admission of people-observing channels); corroborate(claims,path); independent_count(); state(overlay,response_id); refuse_disagreeing_grade()",
+   "depends_on": "twin/enactment-channels.yaml, twin/evidence.py (may_price/threshold/pin), twin/ethics_gate.py (admit, via _check_admission), twin/schema.py (ENACTMENT kind)"
+  },
+  {
+   "file": "twin/drift.py",
+   "lines": 486,
+   "purpose": "Reduces raw Flux drift probe samples (from an external jsonl log) into drift events and coverage figures against a pre-registered window; also validates a separate forced-drift-latency campaign; concludes no verdict itself.",
+   "key_functions": "Window.load(); ForcedCampaign.load(); load_samples(); events(window,samples); coverage(window,samples,now); floor_reachable(window,samples,now,floor); report(now,...)",
+   "depends_on": "reads ESTATE_CLONE_DIR/driftwood/drift/{window.yaml,samples.jsonl,preconditions.yaml,forced-campaign.yaml}; consumed by twin/invariants/harness.py's drift guards and (per project memory) twin/verdict.py (not in this file set)"
+  },
+  {
+   "file": "twin/attest.py",
+   "lines": 168,
+   "purpose": "Attestation sidecar build/write/load/check: pins runtime facts, embeds/refuses signatures per the authored/derived rule, and recomputes+compares the subject digest on read-back for tamper evidence.",
+   "key_functions": "runtime(); build(artefact,human_signatures,material); write(); load(); check(doc,artefact_bytes,material)",
+   "depends_on": "twin/sign.py, twin/artefact.py (AUTHORED/DERIVED/Artefact), twin/canon.py (canonical_json/sha256_hex)"
+  },
+  {
+   "file": "twin/sign.py",
+   "lines": 186,
+   "purpose": "HMAC-SHA256 signing of two non-interchangeable types (human=accountability-to-a-registered-role, agent=reproducible-origin-only), with a versioned role register pin and personal-field refusal.",
+   "key_functions": "roles(path); register_pin(); signing_key(); human(role,subject_sha256,material); agent(subject_sha256,runtime,material); refuse_personal(); check_human_shape(); is_human(); verify()",
+   "depends_on": "twin/roles.yaml, twin/canon.py (canonical_json/digest_of); TWIN_SIGNING_KEY env var"
+  },
+  {
+   "file": "twin/reproduce.py",
+   "lines": 286,
+   "purpose": "Recomputes an artefact from its own recorded pins (byte-exact, never approximate) and recursively walks subject-reference chains (reliability\u2192score-card\u2192forecast-bundle) to reproduce the full derivation.",
+   "key_functions": "replay(worktree,caps,doc); _replay_subject(); _open_at(); reproduce(repo_path,artefact_path); class Report (reproduces property)",
+   "depends_on": "twin/verbs.py (every replayable verb), twin/artefact.py, twin/scoring.py (SIGNIFICANT_DIGITS), twin/repo.py (ModelRepo), twin/canon.py (sha256_hex)"
+  },
+  {
+   "file": "twin/roles.yaml",
+   "lines": 38,
+   "purpose": "Versioned, closed register of five accountability roles (model-steward, worksheet-author, constraint-owner, challenger, challenge-resolver, disparate-impact-respondent) that every human signature and enforcement/disparate-impact respondent binds to.",
+   "key_functions": "n/a (data file)",
+   "depends_on": "loaded by twin/sign.py's roles()"
+  },
+  {
+   "file": "twin/ethics_gate.py",
+   "lines": 513,
+   "purpose": "Sensor admission (purpose\u2192necessity\u2192proportionality ladder, stopping early on failure), DPIA triage per ICO monitoring triggers, gameability classification with a Goodhart-proof preference rule, and a flag-then-human-adjudicate split for fast-improvement suspicion.",
+   "key_functions": "walk_ladder(payload); dpia_triage(payload); admit(payload); classify_gameability(); prefer(candidates); classify_named_sensors(); flag_fast_improvement(); adjudicate_fast_improvement(); labelled_corpus()",
+   "depends_on": "twin/sensors.yaml (closed sensor table), twin/sign.py (role_ids); consumed by twin/corroboration.py's _check_admission and twin/positions/etc via decision ticket 10 AC4 (classify_named_sensors)"
+  },
+  {
+   "file": "twin/misuse.py",
+   "lines": 205,
+   "purpose": "Loads two misuse catalogues (governance-machinery misuse + behavioural-sensing misuse) and implements computed (never caller-typed) constraint-removal logging with attractiveness re-derived from options.prefilter().",
+   "key_functions": "load_catalogue(path); compute_attractiveness(perspective,responses,option_id,constraint_id); log_removal(); load_removal_log(); removed_ids(); verify_removals()",
+   "depends_on": "twin/misuse-catalogue.yaml, twin/behavioural-misuse-catalogue.yaml, twin/options.py (prefilter), twin/canon.py"
+  },
+  {
+   "file": "twin/misuse-catalogue.yaml",
+   "lines": 132,
+   "purpose": "Versioned catalogue of 9 named misuses of the twin's own governance/pricing/scoring machinery, each paired with the code/invariant mechanism that blocks it.",
+   "key_functions": "n/a (data file)",
+   "depends_on": "loaded by twin/misuse.py's load_catalogue()"
+  },
+  {
+   "file": "twin/behavioural-misuse-catalogue.yaml",
+   "lines": 126,
+   "purpose": "Versioned catalogue of 8 named misuses of behavioural/people-sensing itself (suppressing pay, layoffs, surveillance creep, union detection, etc.), each paired with the specific constraint/module that blocks it.",
+   "key_functions": "n/a (data file)",
+   "depends_on": "loaded by the same twin/misuse.py's load_catalogue(), pointed at this path instead"
+  },
+  {
+   "file": "twin/affected_parties.py",
+   "lines": 79,
+   "purpose": "Flattens every scenario's required, non-empty affected_parties declaration across an overlay into one published register \u2014 visibility only, no pricing, no capability grade.",
+   "key_functions": "register(overlay); published(overlay)",
+   "depends_on": "twin/constraints.py (pin), twin/model.py (Overlay)"
+  },
+  {
+   "file": "twin/disparate_impact.py",
+   "lines": 110,
+   "purpose": "A sealed audit/respond channel for disparate-impact findings that cannot itself represent the protected characteristic; the respond role is structurally restricted to one registered role.",
+   "key_functions": "raise_audit(finding,source,command); respond(audit_doc,audit_sha256,response,responded_by_role,command)",
+   "depends_on": "twin/schema.py (refuse_special_category, SpecialCategoryError), twin/artefact.py (AUTHORED,Artefact)"
+  },
+  {
+   "file": "twin/fixtures.py",
+   "lines": 5821,
+   "purpose": "Deterministic fixture model-repository builder: 14 named org fixtures (default/library/pocket/carillion/nmc/wirecard/enron/astrazeneca/sanofi/royal-mail/netflix/intel/kodak/maersk) plus a shared world layer, all built via fixed-date/fixed-author git commits for byte-reproducibility.",
+   "key_functions": "build(dest); build_pocket_org(); build_royal_mail_org(); build_and_corroborate_netflix_org(); build_intel_org(); BUILDERS dict",
+   "depends_on": "stdlib subprocess/git only; consumed by every test file and by twin/invariants/harness.py's guards; is the sole source of all enactment/enforcement fixture data in this cluster"
+  },
+  {
+   "file": "twin/demo_slice.py",
+   "lines": 194,
+   "purpose": "Composes decision ticket 22's four demo-slice acceptance criteria (thesis, subject rationale, shown/stubbed/absent boundary, AC-to-ticket table) into one derived artefact, reading live capability/does-not-do state rather than hand-narrating it.",
+   "key_functions": "boundary(caps); summary(caps); artefact(command,caps,body)",
+   "depends_on": "twin/does_not_do.py, twin/enact.py, twin/gameplay_lens.py, twin/schedule.py, twin/substrate_report.py, twin/verbs.py, twin/grades.py (Capabilities)"
+  },
+  {
+   "file": "twin/worksheet.py",
+   "lines": 474,
+   "purpose": "Regex-keyed reader that resolves a hand-authored worksheet's expected numbers against seven-plus real emitted artefact bodies for the pocket-org fixture, to 6 decimal places, marking unresolvable keys as pending rather than failing.",
+   "key_functions": "load(path); resolve(key,bodies); bodies_for(repo,caps); check(bodies,path); overdue(results)",
+   "depends_on": "twin/pocket-org-worksheet.md (not in this file list but the authored source), twin/verbs.py, twin/invariants/harness.py (build_ticket_status/ticket_is_closed for overdue())"
+  },
+  {
+   "file": "twin/demo.sh",
+   "lines": 288,
+   "purpose": "The 21-step walking-skeleton demo script (fixture\u2192sense\u2192run\u2192score\u2192graph\u2192map\u2192blast\u2192propagate\u2192intervene/observe\u2192rewind\u2192options\u2192exposure\u2192price\u2192constraints\u2192attestation\u2192worksheet\u2192reproduce\u2192validate\u2192index\u2192determinism\u2192dirty-tree-refusal\u2192sweep\u2192reliability\u2192severity), OFFLINE, exits non-zero on any failure.",
+   "key_functions": "n/a (bash script driving bin/twin)",
+   "depends_on": "bin/twin CLI (all verbs); asserts live behaviour of nearly every module in the whole twin/ package, not just this cluster"
+  },
+  {
+   "file": "twin/beat-royal-mail.sh",
+   "lines": 118,
+   "purpose": "THE FALSIFIABILITY BEAT: rewind+backtest under as-consumed for Royal Mail, scores against a contamination-discounted key (Carillion/Enron legs), and demonstrates the result is RED on purpose.",
+   "key_functions": "n/a (bash script)",
+   "depends_on": "bin/twin backtest/run/score/regimes/verify/grade verbs; twin/fixtures.py royal-mail/carillion/enron builders"
+  },
+  {
+   "file": "twin/beat-netflix.sh",
+   "lines": 179,
+   "purpose": "THE WHOLE-ENGINE BEAT: threat path (backtest) + opportunity path (rewind+gameplay-sweep), then versioned governance (propose, channel=record) BEFORE pricing (price+trade-off), demonstrating enactment precedes the one-currency comparison.",
+   "key_functions": "n/a (bash script)",
+   "depends_on": "bin/twin sense/backtest/rewind/gameplay-sweep/options/substrate/propose/price/trade-off/grade verbs; twin/fixtures.py netflix builder; twin/enact.py's propose()"
+  },
+  {
+   "file": "twin/beat-intel.sh",
+   "lines": 168,
+   "purpose": "THE LIVE UNRESOLVED FORECAST: emits an unscored Intel forecast through the scheduled sweep (never hand-built), verifies pinning+agent-signature, and checks the real, live score() refusal for an outcome that does not exist.",
+   "key_functions": "n/a (bash script)",
+   "depends_on": "bin/twin fixture/sense/propagate/sweep/verify/run/score/grade verbs; twin/fixtures.py intel builder"
+  },
+  {
+   "file": "twin/beat-sequence.sh",
+   "lines": 53,
+   "purpose": "Orchestrates the three beats in the declared order (royal-mail\u2192intel\u2192netflix) and publishes twin demo-slice at the end; its own literal source text is read and asserted against by a harness guard so the ordering claim cannot silently drift.",
+   "key_functions": "n/a (bash script)",
+   "depends_on": "beat-royal-mail.sh, beat-intel.sh, beat-netflix.sh, bin/twin demo-slice"
+  },
+  {
+   "file": "twin/invariants/__init__.py",
+   "lines": 136,
+   "purpose": "Registration plumbing for the invariant suite: invariant()/harness_check() decorators, Result dataclass, body_hash() pinning of check source text.",
+   "key_functions": "invariant(name); harness_check(name,may_skip); registry(); harness_registry(); body_hash(fn)",
+   "depends_on": "twin/invariants/checks.py (registration side effect on import), twin/invariants/harness.py (Context/Suite/run)"
+  },
+  {
+   "file": "twin/invariants/checks.py",
+   "lines": 1426,
+   "purpose": "The 20 constitutional invariant checks (not specific to this cluster except tangentially \u2014 e.g. derived_never_human_signed at line 826, no_recommended_action_field at line 758, which this cluster's fast-improvement flag reuses).",
+   "key_functions": "_derived_never_human_signed(); _no_recommended_action_field(); _every_capability_depth_graded(); etc.",
+   "depends_on": "twin/artefact.py, twin/sign.py, twin/attest.py"
+  },
+  {
+   "file": "twin/invariants/harness.py",
+   "lines": 4673,
+   "purpose": "The much larger set of harness_check guards (not fixed-name invariants) including all six/seven of this cluster's own: propose-only-both-layers, enforcement-spectrum, enactment-sensing-corroboration, mitigation-credit-gating, drift pre-registration/liveness/coverage-floor, forced-campaign wall-off, worksheet-matches-pocket-org, disparate-impact sealing, ethics-gate ladder/fast-improvement, does-not-do generation, demo-sequence ordering.",
+   "key_functions": "_enactment_is_propose_only_at_both_layers(); _enforcement_is_a_spectrum_and_never_prices_a_rung(); _enactment_is_sensed_and_corroboration_sets_the_grade(); _mitigation_credit_is_gated_on_corroborated_enactment_not_just_claimed_evidence(); _drift_window_declared_up_front(); _drift_window_is_being_sampled(); _flux_coverage_floor_is_still_reachable(); _forced_campaign_pre_registered_and_walled_off(); _worksheet_matches(); _disparate_impact_audit_channel_is_sealed_and_role_gated(); _ethics_gate_ladder_stops_early_and_fast_improvement_is_never_an_automatic_finding(); _does_not_do_register_is_generated_never_typed(); _the_demo_sequence_earns_credibility_before_it_spends_it()",
+   "depends_on": "virtually every module in this cluster plus twin/fixtures.py, twin/verbs.py, twin/repo.py, twin/model.py, twin/options.py, twin/schema.py"
+  }
+ ],
+ "notes": "This cluster is the most structurally self-checking part of the twin: nearly every module pairs a real algorithm with (a) a unit-test file that exercises it directly and (b) a `harness_check` in twin/invariants/harness.py that re-asserts the same property against live fixture-built repos as part of `twin verify`, so `pytest` and the invariant suite are two independent runs of largely the same assertions rather than one trusting the other. The one place this pattern currently reads as weaker than its own tests suggest is twin/ENACT_MODE, which is checked in as 'development' (permissive) \u2014 the harness check for propose-only-at-both-layers explicitly forces TWIN_ENACT_MODE=operations for its own run (harness.py:3502-3527) so the capability itself stays proven even though the day-to-day default does not enforce it; a caller of enact_guard.py today, absent that env override, gets no refusal at all. Similarly the drift/coverage-floor guard (harness.py:3225) is explicitly documented in its own docstring as expected to stay RED once the window's shortfall becomes irreversible, and per project memory (project_flux_verdict_unmeasured) that is in fact the current live state as of 2026-08-16 \u2014 i.e. one of this cluster's own harness checks is a known, accepted, currently-failing red, not a latent bug. Intel is the single fixture subject carrying real, wired enforcement-ladder + enactment-corroboration data (two enforcement rungs occupied, one lever with none, self-declaration + reconciliation-state channels corroborating to grade 3); Netflix carries the only propose()/enactment-record-channel demonstration; the pocket org carries the only data checked against a hand-authored ground truth (worksheet.py) and is also the fixture backing the mitigation-credit-gated-on-corroboration harness proof. Royal Mail/Carillion/Enron carry no enactment or enforcement data at all \u2014 they exist purely for the falsifiability/backtest beat, outside this cluster's core subject matter. No file in this list makes any live network call (no GitHub API, no Kubernetes API, no gitsign/Rekor lookup, no prediction-market or news-feed integration) \u2014 every 'real I/O' in this cluster is local git subprocess calls or local file reads."
+}

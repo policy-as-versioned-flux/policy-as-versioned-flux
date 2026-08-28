@@ -1,0 +1,12 @@
+pattern: ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+OK (match): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main
+OK (match): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/release/1.0.x
+OK (match): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/release/12.34.x
+OK (reject): https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main
+OK (reject): https://github.com/policy-as-versioned-ludlow/other-repo/.github/workflows/cut-release.yml@refs/heads/main
+OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/other.yml@refs/heads/main
+OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/maint/1.0
+OK (reject): https://evil.example/https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main
+OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main.evil.example
+OK (reject): https://githubXcom/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main
+PASS: EXPECTED_IDENTITY_REGEXP matches only policy-as-versioned-ludlow/ludlow's cut-release.yml on main or release/<major>.<minor>.x.

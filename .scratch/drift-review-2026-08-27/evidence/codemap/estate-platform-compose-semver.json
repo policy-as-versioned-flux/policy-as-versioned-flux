@@ -1,0 +1,284 @@
+{
+  "cluster": "platform/compose + platform/computed-semver (inside .estate-clone/platform, a real GitHub org repo: origin https://github.com/policy-as-versioned-platform/platform)",
+  "components": [
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py",
+      "what_it_is": "2440-line single-seam composer, `compose(adopter_dir, parent_trees) -> (evidence document dict, {path: rendered file})`. Tickets 12-16 of the policy-composition effort. Resolves every declared parent edge to a commit SHA (Flux pin for controls/implementations, git log on a version subdir for pricing/threat), loads every ValidatingPolicy/MutatingPolicy/GeneratingPolicy of every live policy version keyed on (identity family, version-stripped name), renders each back with a composed-for label + inherited-from/source-path annotations, writes an advisory composed/HEADER.yaml, and refuses on: split diamond, cross-party rule conflict, restatement of a non-ValidatingPolicy, unknown control id, dangling claim, claim against another party's policy, new hole, removed control, baseline widening, new ungoverned namespace, missing appetite band, unpriceable inability. Also prices every pricing/threat edge twice (old header pin vs this run's pin).",
+      "how_it_runs": "offline python CLI (`compose` / `verify` / `--selfcheck`), invoked for real from GitHub Actions in all three adopter repos: driftwood/.github/workflows/shift-left.yml:336 (compose + fail on drift/refusal, prints the document as job summary), driftwood/.github/workflows/cut-release.yml:93 (`verify` before any tag is cut); same two lines in tuppence and ludlow. Not Flux-reconciled, no CronJob, no cluster.",
+      "evidence_of_working": "RAN IT: platform/compose/verify-composition.sh exits 0 on this machine, ~40 OK lines including 'the real driftwood composes against its real pinned parents ... zero refusals', 285 holes recorded, 287 selected controls, render faithfulness across every live member, and the three-party caging table {driftwood: baseline, tuppence: baseline, ludlow: quarantine}. Committed real output on disk: driftwood/composed/HEADER.yaml carries 4 real parent SHAs (platform 58ef9c57..., nist 33a05df1..., ico 5d1e76fa..., platform threat 7a36bf73...), driftwood/composed/evidence.json says outcome=composed, 17 members, 285 holes, 2 prices. Same for tuppence and ludlow."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/verify-composition.sh",
+      "what_it_is": "18-line beat script; one step, `composition.py --selfcheck`.",
+      "how_it_runs": "shell script, offline",
+      "evidence_of_working": "ran it here, exit 0"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/README.md",
+      "what_it_is": "149-line README, per-ticket (12/13/14/15/16) account of what compose() does, with ADR links (ADR-0012..0018) and the Run block.",
+      "how_it_runs": "doc only",
+      "evidence_of_working": "claims match the code and the selfcheck output line-for-line; the one stale-looking claim ('the real estate's own composition refuses today') is explicitly superseded later in the same file and in composition.py:1483 (KNOWN_DANGLING_PLATFORM_CLAIMS = 0)"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/gate.py",
+      "what_it_is": "1003-line release-gate seam. `run_gate(RepoState, declared) -> evidence document` with every field present on pass and refusal (outcome, bump, movement, counts, generator_version, corpus_checksum, wall_clock, coverage, not_looked_at, limits, matrix). Rules in order: version legality (5 semver rules), release_integrity's four structural refusals, coverage's unreached-predicate gate, witness_set's missing-shape gate, comparison_window (or single-predecessor) computed bump vs declared bump.",
+      "how_it_runs": "offline python library + CLI; the real caller is platform/.github/scripts/cut-release-gate.py, wired into platform/.github/workflows/cut-release.yml:53 as the publisher gate BEFORE `git tag`",
+      "evidence_of_working": "RAN IT: verify-coverage.sh (which runs `gate.py --selfcheck` in full) exits 0 here, printing the whole cs-18..cs-26 assertion list including the two historical known-good bumps rederiving through the seam with the real kyverno CLI. Three real signed evidence documents committed: computed-semver/evidence/{2.0.0,2.0.1,3.0.0}.json with .bundle cosign signatures."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/cage_engine.py",
+      "what_it_is": "838-line classification engine. Track 1: ValidatingPolicy admission via rederive_bumps.classify_policy (real `kyverno apply` per policy per pod), with cs-16's self-scope neutralisation (cage_engine.py:342 _neutralize_self_scope). Track 2: cage-spec permissiveness lattice over (cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf) with UNCAGED as the top of the lattice, so 'cage-tier newly added' = major and 'cage-tier removed' = patch fall out with no special case.",
+      "how_it_runs": "offline python, shells out to the real kyverno CLI",
+      "evidence_of_working": "verify-cage-engine.sh (kyverno-gated). Reads the REAL committed graded/policies/priorityclasses.yaml (cage_engine.py:156-167) and the REAL cage-tier.yaml dial CEL map (cage_engine.py:219-244) rather than a modelled table. verify-pairing.sh passed here and includes an end-to-end proof: the real graded cage-tier.yaml rendered at two versions with a tightened baseline dial classifies major through cage_engine."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/corpus_generator.py",
+      "what_it_is": "816-line pairwise corpus generator. Enumerates every matchConditions/validations CEL expression in a subject tree, generates a pod per expression per state (satisfied/violated/absent), crossed pairwise with version-pin (inside/outside the real supported array) and tier-label axes. Unions old and new subject spines. Writes generated-corpus/spine/*.yaml + manifest.yaml (checksum, counts, wall_clock, per-entry provenance). GENERATOR_VERSION = '0.1.3', hand-bumped.",
+      "how_it_runs": "offline python CLI, out-of-band (committed artifact); regenerated inside cut-release-gate.py at gate time into a temp dir",
+      "evidence_of_working": "100 committed spine pods + manifest on disk (counts old 83 / new 90 / union 100, checksum sha256:443bbfe8...). verify-corpus-generator.sh regenerates into a scratch dir and diffs byte-for-byte, then kyverno-applies a sample entry against a real policy and asserts a non-zero loaded-rule count (guarding against a prior vacuous pass, verify-corpus-generator.sh:41-60)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/witness_set.py",
+      "what_it_is": "589-line witness set + missing-shape gate. classify_state is the reverse of corpus_generator.probe_for (reads which state a real pod is already in, using the same regex families). check_witness_shapes fails the build when a witness's shape is absent from the generated spine.",
+      "how_it_runs": "offline python CLI; called from gate.py:293 as the second binary coverage gate",
+      "evidence_of_working": "generated-corpus/witness-manifest.yaml committed: 5 rederive-fixture witnesses, 0 real-infrastructure committed, 6 missing. verify-witness-set.sh step 5 is a real regression guard (the _CONTAINER_BOOL_RE bug) that kyverno-applies the generated 'satisfied' probe pod against the real require-nonroot@1.0.0 and requires a clean pass."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/coverage.py",
+      "what_it_is": "955-line coverage module: counts only, never a percentage. cells = predicates x 3 states; pairs = union entry count; pairwise_gap is one sentence. Owns two binary gates (unreached predicate, missing witness shape) and the derived limits[] list. static_proof computes proved exclusions from expression text (a top-level ==/!= with textually identical operands); coverage-exclusions.yaml holds human-declared holes; coverage-baseline.yaml holds the last accepted not_looked_at state.",
+      "how_it_runs": "offline python (pure text/regex reading, no kyverno)",
+      "evidence_of_working": "verify-coverage.sh passed here (exit 0). Real evidence documents carry cells 33/33/36 and pairs 78/100/112 with not_looked_at empty."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/pairing.py",
+      "what_it_is": "504-line pairing layer. Pairs old/new members on (identity family, version-stripped metadata.name), never filename. Three refusals: movement on an unversioned member; two trees declaring the same version with different content; platform-machinery recognised as a class by its identity label, never by name. Version-literal-only differences normalise to 'unproven', never guessed.",
+      "how_it_runs": "offline python, pure YAML parsing",
+      "evidence_of_working": "RAN IT: verify-pairing.sh exit 0, including the deliberate filename-swap case and the real render-orphan-guard.py output carrying the platform-machinery identity."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/comparison_window.py",
+      "what_it_is": "338-line comparison window + per-institution matrix. Compares the new subject against EVERY supported version below declared, using the window as it stood BEFORE this release; strictest per-line wins; a retired version forces major with no cage_engine run; backport narrows to the single highest line; an empty window records NO_PREDECESSOR.",
+      "how_it_runs": "offline python, calls cage_engine per window line (so kyverno per line)",
+      "evidence_of_working": "verify-comparison-window.sh (kyverno-gated; slow — still running after 10+ minutes on this machine, one kyverno apply per pod per policy per window line). Proved through the seam instead by gate.py --selfcheck cases A-E, which verify-coverage.sh ran to completion here."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/release_integrity.py",
+      "what_it_is": "412-line module holding the four extra structural gate rules: frozen_tree_refusal (a prior version's HEAD copy must equal `git show <tag>:<path>`), rerender_refusal (the tree being cut must equal render-version-tree.py's output right now), mandatory_members_refusal (literal set comparison against the renderer's own member list), empty_commit_refusal (every version array element must carry a non-empty commit).",
+      "how_it_runs": "offline python; wired into gate.py:249 via RepoState.release (optional)",
+      "evidence_of_working": "RAN IT: verify-release-integrity.sh exit 0 — builds a real git repo, a real tag, and hand-edits to prove each of the four refusals actually fires."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/rederive_bumps.py",
+      "what_it_is": "257-line cs-01 module: the original premise proof. Evaluates adjacent version pairs of the old faithful-floor's real signed release line offline with the real `kyverno apply` and derives major/minor/patch from observed admission movement. Also demo_pooled_exit_is_not_admission, which proves a pooled kyverno exit code disagrees with real admission.",
+      "how_it_runs": "offline python + real kyverno CLI",
+      "evidence_of_working": "verify-rederive-bumps.sh (kyverno-gated). Reused directly by cage_engine (Track 1) and generator_standing_check; its five fixtures are the witness set's rederive-fixture half."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/generator_standing_check.py",
+      "what_it_is": "376-line standing check: (1) the three known-good bumps must still rederive or the check refuses non-zero; (2) generated-corpus/manifest.yaml's generator_version must match the live generator; (3) the most recent evidence record is re-run under the current generator and PRINTS rather than fails on a differing classification.",
+      "how_it_runs": "offline python + kyverno",
+      "evidence_of_working": "verify-generator-standing-check.sh runs both --selfcheck and the check itself. Its docstring's 'no evidence record on disk yet' caveat is now stale: three records were committed by cs-27 on 2026-08-25."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/README.md",
+      "what_it_is": "55-line README covering ticket cs-01 only (rederive_bumps). Does not describe cs-18..cs-27 (gate, cage_engine, coverage, witness set, comparison window, release integrity, the publisher gate) — those live in per-module docstrings instead.",
+      "how_it_runs": "doc only",
+      "evidence_of_working": "accurate for what it covers, including the honest finding that minor cannot be derived from verdict movement alone"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/evidence/",
+      "what_it_is": "Three signed release-gate evidence documents (2.0.0.json, 2.0.1.json, 3.0.0.json) each with a .bundle cosign keyless signature (real sigstore cert, signed 2026-08-25T16:28Z).",
+      "how_it_runs": "written and committed by platform/.github/workflows/cut-release.yml via cut-release-gate.py + cut-release-commit-evidence.sh; verified again on tag push by release.yml:103-125 with `cosign verify-blob` identity-pinned",
+      "evidence_of_working": "real cosign bundles on disk; release.yml re-verifies them per policy tag. Contents: 2.0.0 passed/'no predecessor'; 2.0.1 passed patch vs computed none; 3.0.0 passed major vs computed none."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/generated-corpus/",
+      "what_it_is": "100 committed generated pods under spine/, manifest.yaml, witness-manifest.yaml — the corpus artifact CI regenerates and diffs.",
+      "how_it_runs": "committed artifact, regenerated out-of-band by corpus_generator.py --out and by verify-corpus-generator.sh",
+      "evidence_of_working": "byte-for-byte regenerate-and-diff in verify-corpus-generator.sh step 2 and verify-witness-set.sh step 3"
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/corpus/",
+      "what_it_is": "cs-01 fixed input: 5 policy bodies copied verbatim from the old policy repo at v1.0.0/v2.0.0/v2.0.1/v2.1.1, plus 5 pod fixtures (2 of which are authored here, headers say so).",
+      "how_it_runs": "static fixture data",
+      "evidence_of_working": "each file's header cites its exact source path and tag"
+    }
+  ],
+  "capabilities_real": [
+    "compose() runs against the real estate and produces committed artefacts with real resolved SHAs — composition.py:1066; driftwood/composed/HEADER.yaml lines 6-22 carry four real 40-char SHAs",
+    "Parent SHA resolution reuses the SHA Renovate already wrote to spec.ref.commit rather than re-deriving it — composition.py:269-283",
+    "Kind-aware render: spec.validationActions written only onto a ValidatingPolicy — composition.py:421-439, asserted at composition.py:1711-1719",
+    "Render faithfulness: strip the three advisory keys and the doc equals the committed source — composition.py:442-465, asserted across every live member at composition.py:1700-1709",
+    "Byte-for-byte verify() of the committed composed tree — composition.py:1328-1352; run in every adopter's cut-release.yml:93",
+    "Baseline resolution against the real nist catalogue, walking nested controls so ac-6.10 is found — composition.py:537-556, 559-591",
+    "OSCAL control-claim merge across every implementations parent plus the adopter's own component-definition.json — composition.py:794-810, 1133-1134, 1175-1176",
+    "Hole / ungoverned-namespace new-recorded-closed diff against the last signed header, with a real bootstrap case — composition.py:880-905 and 516-548",
+    "Restatement strictness ladder Audit<Deny; stricter accepted and rendered, weaker caged — composition.py:236, 712-717",
+    "Weaker restatement priced through the estate's REAL cage engine (platform/graded/cage.py) against the REAL risk/appetite.json band — composition.py:584-597, 612-617, 745",
+    "Pricing/threat re-pricing through the estate's own converters (ico/schema/to_fair_scenario.py, platform/feeds/to_fair_scenario.py) — composition.py:964-973, 602-610, 988-1018",
+    "run_gate produces a complete evidence document on pass and on refusal — gate.py:215-418, asserted gate.py:432-470",
+    "Version legality (5 semver rules, gaps legal, reset-on-bump) — gate.py:139-168",
+    "Computed bump from real kyverno admission movement plus the cage-spec lattice — cage_engine.py:469-489, rederive_bumps.py:46-54",
+    "The gate refuses a declared bump weaker than computed, naming the moved pods and the CEL expression, and passes-with-a-printed-discrepancy on a stronger one — gate.py:337-359, 386-415",
+    "The four structural release-integrity refusals against a real git repo and real tags — release_integrity.py:90-238",
+    "Pairwise corpus generation with a real checksum, real counts and no size ceiling — corpus_generator.py:428-544",
+    "Coverage as counts and named holes with two binary build-failing gates — coverage.py:305-472, wired at gate.py:272-305",
+    "Publisher gate wired into real CI before `git tag`, with cosign keyless evidence signing and no override at any scope — platform/.github/workflows/cut-release.yml:53-72, .github/scripts/cut-release-gate.py:43-52",
+    "Adopter-side composition wired into real CI on every PR with drift detection — driftwood/.github/workflows/shift-left.yml:272-357 (and the tuppence/ludlow equivalents)"
+  ],
+  "capabilities_stubbed_or_thin": [
+    "The per-institution matrix is never populated in production: cut-release-gate.py builds ComparisonWindow WITHOUT institution_pins (.github/scripts/cut-release-gate.py:173-178), so all three committed evidence records carry matrix: {}. The feature is real code (comparison_window.py:108-118, gate.py:323) proved only in gate.py's own selfcheck (gate.py:832-843).",
+    "Six real-infrastructure witnesses (spire, istio, openbao, pomerium, dex, git-server) do not exist — the directory computed-semver/corpus/witnesses/real/ is not present on disk at all. witness_set.py:53-60 names the gap; witness-manifest.yaml records real-infrastructure-committed: 0, missing: 6; verify-witness-set.sh:48-65 prints it loudly but does NOT fail.",
+    "coverage-exclusions.yaml is empty (declared_holes: []) and coverage-baseline.yaml is empty ({}). The declared-hole and baseline-diff machinery is real code exercised only by constructed fixtures in coverage.py's selfcheck; no live data flows through it.",
+    "static_proof (proved exclusions) has zero live hits — coverage.py's own docstring says the real subject carries zero tautologies today (coverage.py:56-63).",
+    "not_looked_at[] is empty in all three real evidence records.",
+    "Two of the three limits[] entries are hardcoded 'open by decision' regardless of count — coverage.py:496-534; the third (cage-not-priced-residual) is open only because the six real witnesses are missing.",
+    "The tier axis in the generated corpus is synthetic: no pod in the corpus maps to a priced residual (coverage.py's cage-not-priced-residual limit text, coverage.py:527-534). Track 2's cage half is proved on synthetic input only.",
+    "MANUAL_PROBES is a two-entry hardcoded dispatch table for expressions no generic regex shape matches — corpus_generator.py:375-380. probe_for raises rather than skipping on an unrecognised expression (corpus_generator.py:400-405), so the generator's reach is bounded by three regex families plus those two.",
+    "The split-diamond and cross-party rule-conflict refusals fire only against fixtures — the real estate pins exactly one implementations publisher, reported honestly every run via limits[] two-publisher-conflict count 1 / status open (composition.py:1178-1184; driftwood/composed/evidence.json).",
+    "No restatement fires in the real estate: driftwood/tuppence/ludlow evidence.json all carry restatements: [] and cages: []; the caging table is proved only by selfcheck fixtures (composition.py:1932-1964).",
+    "No real appetite band anywhere in the estate straddles a tier boundary on either real price bump — the crossing case needs a FIXTURE ico penalty schema (composition.py:1551-1581); the real bumps move the £ but never the tier (composition.py:2269-2320).",
+    "The pricing edge re-prices exactly one hardcoded regime/violation-type pair, uk-gdpr/lower-tier — composition.py:953-954; which regimes actually apply to which workload is an explicitly open gap.",
+    "_resolve_unpinned_sha falls back to a content digest for a non-git party tree (a fixture) — composition.py:298-315; advisory only.",
+    "composition.py's own CLI is the only writer; the composed artefact carries no namespace list and nothing rendered ever reads either namespace set (composition.py:1301-1310) — the governed set is advisory metadata only.",
+    "README.md in computed-semver documents cs-01 only; nine later tickets have no README coverage.",
+    "generator_standing_check.py's docstring still says no evidence record exists on disk (generator_standing_check.py:33-39); three do, committed the same day.",
+    "GENERATOR_VERSION is hand-bumped (corpus_generator.py:64-66) — nothing enforces that a logic change bumps it except check_generator_pinning's manifest match."
+  ],
+  "verify_scripts": [
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/verify-composition.sh",
+      "needs_cluster": false,
+      "what_it_proves": "composition.py --selfcheck: the real driftwood composes against its real pinned parents with zero refusals; render faithfulness across every live member; verify() catches tampering; every ticket-13/14/15/16 refusal fires against fixtures; the caging table for three real parties; no wall clock in the module. Needs the .estate-clone siblings (driftwood/nist/ico) present or it SKIPs with exit 0. RAN HERE: exit 0."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-rederive-bumps.sh",
+      "needs_cluster": false,
+      "what_it_proves": "the three known-good historical bumps rederive from observed kyverno admission movement. Needs the real kyverno CLI (offline); SKIPs exit 0 without it."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-gate.sh",
+      "needs_cluster": false,
+      "what_it_proves": "gate.py --selfcheck — the whole seam: document shape, version legality, computed vs declared bump, coverage gates, comparison window cases A-E, release-integrity through the seam. Gated on kyverno presence by convention even though much of it is pure python."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-cage-engine.sh",
+      "needs_cluster": false,
+      "what_it_proves": "cage_engine --selfcheck: Track 1 admission (needs kyverno, SKIPs otherwise) and Track 2's permissiveness lattice (pure python)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-corpus-generator.sh",
+      "needs_cluster": false,
+      "what_it_proves": "3 steps: generator selfcheck; regenerate the committed spine into a scratch dir and diff byte-for-byte (manifest minus wall_clock); kyverno-evaluate a sample generated pod against the real require-nonroot policy AND assert a non-zero loaded-rule count (step 3 SKIPs without kyverno)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-witness-set.sh",
+      "needs_cluster": false,
+      "what_it_proves": "5 steps: witness selfcheck; the missing-shape gate passes against the committed corpus; the witness manifest regenerates byte-identical; the six missing real-infra witnesses print loudly WITHOUT failing; the _CONTAINER_BOOL_RE regression guard kyverno-applies the generated satisfied probe pod and requires a clean pass (step 5 SKIPs without kyverno)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-pairing.sh",
+      "needs_cluster": false,
+      "what_it_proves": "pairing.py --selfcheck: pairing on (identity, version-stripped name) proved by a filename swap; set comparison of rules; unversioned-member refusal; platform-machinery as a class not a name; two v1.0.0 trees with different content refused; and the real cage-tier.yaml rendered at two versions classifying major end to end. Pure python, no kyverno gate. RAN HERE: exit 0."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-coverage.sh",
+      "needs_cluster": false,
+      "what_it_proves": "coverage.py --selfcheck plus gate.py --selfcheck (the two coverage gates through the seam). No kyverno gate on the script, but gate.py's own selfcheck does shell out to kyverno for the historical rederivations. RAN HERE: exit 0, full gate assertion list printed."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-comparison-window.sh",
+      "needs_cluster": false,
+      "what_it_proves": "comparison_window.py --selfcheck: strictest-of-window, retirement forces major, backport narrowing, the per-institution matrix. Needs kyverno (SKIPs otherwise). SLOW — still running after 10+ minutes here; the same cases are covered faster through gate.py --selfcheck (cases A-E), which did pass."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-release-integrity.sh",
+      "needs_cluster": false,
+      "what_it_proves": "release_integrity.py --selfcheck: builds a real git repo + tag and hand-edits to prove each of the four refusals fires (frozen tree, re-render, mandatory member, empty commit). No kyverno needed. RAN HERE: exit 0."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-generator-standing-check.sh",
+      "needs_cluster": false,
+      "what_it_proves": "the generator's one standing check: the three known-good bumps must still rederive (refuses if any stops), the committed manifest's generator_version must match the live generator, and the most recent evidence record is re-run and any classification difference is PRINTED not failed. Needs kyverno; SKIPs otherwise."
+    }
+  ],
+  "runtime_dependencies": [
+    "kyverno CLI — REAL. `kyverno apply` is shelled out one policy file at a time, offline, no cluster (rederive_bumps.py:49-54, 178). Installed pinned by SHA256 in platform/.github/workflows/cut-release.yml (KYVERNO_VERSION 1.18.2). Present on this machine.",
+    "cosign — REAL. Keyless sign-blob of gate evidence in cut-release-gate.py:202 (sign_evidence), verified with `cosign verify-blob --certificate-identity-regexp` in release.yml:109-113. Real sigstore certs sit in the committed .bundle files.",
+    "gitsign — REAL. Pinned by SHA256 in cut-release.yml; signs release commits/tags.",
+    "GitHub Actions — REAL. platform/.github/workflows/cut-release.yml and release.yml; driftwood/tuppence/ludlow shift-left.yml and cut-release.yml. Cross-repo actions/checkout@v4 at the adopter's own pinned tags.",
+    "git — REAL. `git show <tag>:<path>` for the frozen-tree rule (release_integrity.py:90), `git log -1 --format=%H` for unpinned parent SHAs (composition.py:301-306), `git tag -l policy/v*` for the legal version history (cut-release-gate.py:92-101).",
+    "Flux — INDIRECT, not run by this cluster. composition.py READS the adopter's GitRepository spec.ref.commit off disk (composition.py:269-283) and reads distribution/versions.yaml, which is a flux-operator ResourceSet document. Nothing in either directory is Flux-reconciled and neither directory contains a kustomization.yaml.",
+    "Renovate — INDIRECT. Its written spec.ref.commit is what composition.py reuses; adopter repos carry renovate.json. Nothing in this cluster invokes Renovate or opens a bump PR.",
+    "PyYAML — REAL, the only third-party python dependency (pip install --quiet pyyaml in every workflow step).",
+    "platform/graded/cage.py — REAL, imported live by composition.py:612-617 to price a cage; its TIERS presets are read for real (not modelled) by cage_engine.py:156-167 and 219-244.",
+    "platform/risk/appetite.json — REAL, read directly at composition.py:584-597.",
+    "platform/feeds/to_fair_scenario.py + feeds/threat-register/v{1,2}/register.json — REAL code path, but the feed itself is a hand-authored versioned JSON fixture (feeds/README.md: 'trivy/GHSA-shaped', 'endoflife.date-shaped', repo-local demo signing key). SIMULATED as a data source; real as a subprocess call (composition.py:602-610).",
+    "ico/schema/to_fair_scenario.py + ico/schema/v1/penalty-schema.json — REAL converter, real committed schema, invoked as a subprocess (composition.py:964-973). The crossing-band variant used in tests is a fixture (composition.py:1551-1581).",
+    "platform/distribution/render-orphan-guard.py and render-governed-namespace-guard.py — REAL offline twins, dynamically imported by composition.py:396-410 and corpus_generator.py:88-89.",
+    "platform/distribution/render-version-tree.py — REAL, imported by corpus_generator.py:89 and used by release_integrity for the re-render and mandatory-member rules.",
+    "nist catalogue + BASELINE_VERSIONS.json — REAL committed OSCAL data read by composition.py:537-591.",
+    "SPIRE / Istio / OpenBao / Pomerium / Dex / git-server — NAMED ONLY, absent. Six real-infrastructure witnesses that do not exist on disk (witness_set.py:53-60).",
+    "Kubernetes cluster, Crossplane, C2P, trivy — NOT USED anywhere in this cluster. No verify script in either directory needs a cluster."
+  ],
+  "risk_and_pricing_touchpoints": [
+    "composition.py:584-597 _appetite_tolerance — reads platform/risk/appetite.json directly, returns GBP/year tolerance; a missing band is a composition refusal (composition.py:733-740 no-appetite-band), never sys.exit",
+    "composition.py:602-610 _threat_scenario — subprocess into platform/feeds/to_fair_scenario.py threat <register.json> <party>",
+    "composition.py:612-617 _cage_engine — imports platform/graded/cage.py, the estate's real £ engine, explicitly rather than modelling a second one",
+    "composition.py:745 cage.select(scenario, party, band, mode='warn') — the actual pricing call for a declared inability",
+    "composition.py:747-753 cages[] entry: party, rule, band, residual (tcor.residual or uncaged_residual), tier, action, priced_from, changed",
+    "composition.py:953-954 ICO_REGIME='uk-gdpr', ICO_VIOLATION_TYPE='lower-tier' — the one hardcoded regime/violation pair re-priced",
+    "composition.py:964-973 _ico_scenario — subprocess into ico/schema/to_fair_scenario.py build",
+    "composition.py:988-1018 price_parent — prices old and new versions through cage.select, emits old_price/new_price/old_tier/proposed_tier/changed/proposed_as",
+    "composition.py:1017 proposed_as = 'issue' if tier == 'deny' else 'label' (ADR-0015: a merged tier: deny label would be silently coerced to baseline)",
+    "composition.py:1021-1042 compute_prices — runs every run, unconditionally; returns [] when the party has no appetite band",
+    "composition.py:1260-1261 the compose() call site for pricing",
+    "driftwood/composed/evidence.json — real committed £ figures: ico pricing old/new 16,901,471.55 (tier deny, proposed_as issue), platform threat old/new 19,558.55 (tier baseline, proposed_as label)",
+    "DOWNSTREAM (outside this cluster): platform/wargamer/tier_pr.py:233-261 and wargamer/wargamer.py:158-230 read the adopter's committed composed/evidence.json prices[] and turn them into proposals — that is where a PR/issue would actually be opened",
+    "computed-semver has NO £, NO FAIR, NO appetite band and NO TCoR anywhere. The only pricing-adjacent thing is coverage.py:527-534's 'cage-not-priced-residual' limit, whose whole point is to declare that nothing in the corpus maps a pod to a priced residual."
+  ],
+  "cage_and_enforcement_touchpoints": [
+    "composition.py:236 STRICTNESS = {'Audit': 0, 'Deny': 1} — the whole ladder, a ValidatingPolicy concept and nothing else (ADR-0016)",
+    "composition.py:692-700 restatement-of-non-validating refusal (a MutatingPolicy/GeneratingPolicy has no ladder to compare on)",
+    "composition.py:712-717 stricter restatement accepted and the rendered member carries it; weaker is never applied",
+    "composition.py:718-762 weaker restatement = declared inability, priced and caged; the rendered member KEEPS the inherited action",
+    "composition.py:1966-1990 selfcheck asserts no tier and no tier floor appears anywhere composition itself writes (exact-key check on its own three added metadata keys)",
+    "composition.py:396-410 _load_guards — the ORPHAN GUARD (rendered from the real version array via render-orphan-guard.py) and the GOVERNED-NAMESPACE GUARD (render-governed-namespace-guard.py, ADR-0014's fifth gap), both composed under the platform tag with version: None",
+    "composition.py:473-489 governed_namespaces / 491-514 ungoverned_namespaces — the governed-namespace lint: an institution-labelled Namespace without governed:\"true\" is ungoverned; no institution label means infrastructure and is ignored",
+    "composition.py:516-548 compute_ungoverned — new refuses, recorded does not, closed prints; bootstrap records everything and refuses on none",
+    "composition.py:1253-1255 the compose() call site; composition.py:1308 the header field ungoverned-namespaces",
+    "composition.py:1179-1184 limits[] two-publisher-conflict, count 1 status open in the real estate",
+    "cage_engine.py:29-56 Track 2: the cage-spec permissiveness lattice with UNCAGED at the top, so 'cage-tier added' = major and 'cage-tier removed' = patch need no special case",
+    "cage_engine.py:156-167 _pc_value_table — reads real PriorityClass `value:` fields out of graded/policies/priorityclasses.yaml",
+    "cage_engine.py:194-205 CageSpec / UNCAGED; 219-244 dial_table parses the real cage-tier.yaml `dial` CEL map with ast.literal_eval",
+    "cage_engine.py:250-282 permissive_rank / at_least_as_permissive — a genuine partial order over cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf; one field improving never excuses another regressing",
+    "cage_engine.py:288-297 effective_tier — mirrors cage-tier.yaml's own CEL default-to-baseline, never a skip",
+    "cage_engine.py:394-437 classify_cage_tier; 146 RANK with 'removed' aggregating at patch's rank",
+    "coverage.py:496-534 compute_limits — cage-ratchet-one-way and cage-removal-scores-patch both hardcoded status 'open' by decision; cage-not-priced-residual closes only when the six real witnesses land",
+    "gate.py:337-359 / 386-415 — declared weaker than computed refuses and names the moved pods plus the CEL expression; stronger passes with a printed discrepancy"
+  ],
+  "feeds_wardley_wargamer_touchpoints": [
+    "composition.py:602-610 _threat_scenario — REAL subprocess into platform/feeds/to_fair_scenario.py against feeds/threat-register/v{1,2}/register.json. The converter is real code; the register is a hand-authored, committed, repo-locally-signed JSON fixture (feeds/README.md), not a live feed poll. SIMULATED as an ingestion path.",
+    "composition.py:964-973 _ico_scenario — REAL subprocess into ico/schema/to_fair_scenario.py against a committed penalty schema. Again real converter, fixture data, no live regulator fetch.",
+    "composition.py:1017 proposed_as marks a deny as 'issue' and everything else as 'label' — explicitly THE MARK, NOT THE ACT (composition.py:175-181): composition itself opens nothing.",
+    "NOTHING in platform/compose or platform/computed-semver opens a PR or an issue. The proposer that reads prices[] lives in platform/wargamer (tier_pr.py:233-261, propose-policy-pr.sh) — a different cluster.",
+    "NOTHING in either directory reads a live feed, calls a network endpoint, or fetches a URL at runtime. The only network calls in the surrounding CI are pinned binary downloads (gitsign/cosign/kyverno by SHA256) and actions/checkout.",
+    "NO Wardley map, value chain, evolution axis or gameplay reference anywhere in either directory. platform/wardley/ is a separate cluster.",
+    "NO wargamer scenario, no NPC, no move generation in either directory.",
+    "The only 'simulated adversary' shape present is the corpus generator's forged-posture probe (corpus_generator.py:290-306), which models the posture-trust-boundary policy's own documented threat as a pod fixture — a test input, not a wargame."
+  ],
+  "original_thesis_mechanisms": [
+    "MULTI-VERSION COEXISTENCE — PRESENT and load-bearing in computed-semver. comparison_window.py is entirely about it: compare against every supported version below declared, not just N-1 (comparison_window.py:5-40); gate.py:312-362 wires it; the retirement rule forces major with no body diff (comparison_window.py:93-106). In compose it appears as load_implementations walking every live policy version (composition.py:328-345) and composing per-version trees (composition.py:1273).",
+    "RESOURCESET MATRIX — PRESENT as a READ dependency only. distribution/versions.yaml is a flux-operator ResourceSet whose spec.inputs[0].versions array is read by composition.py:322-326 (_version_array), corpus_generator via render-orphan-guard.versions(), release_integrity.py:203-213 (empty-commit rule) and cut-release-gate.py. Neither directory writes or reconciles a ResourceSet, and the selfcheck fixture writes a minimal one at composition.py:2414-2421.",
+    "RENOVATE BUMP PR — PRESENT only as a consumed artefact. composition.py:269-283 reuses the SHA Renovate wrote to spec.ref.commit; composition.py:1457-1466 _bump_parent_version simulates 'the same edit a real Renovate PR would make to party.yaml'. Nothing here runs Renovate or opens a bump PR.",
+    "SIGNED TAGS — PRESENT and real, at the CI boundary rather than inside these directories. gitsign-signed release commits/tags and cosign keyless sign-blob of the gate evidence (platform/.github/workflows/cut-release.yml:53-72; cut-release-gate.py:202 sign_evidence), re-verified per policy tag at release.yml:103-125. Three real .bundle files sit in computed-semver/evidence/. The gate itself runs BEFORE `git tag` by design.",
+    "ORPHAN GUARD — PRESENT in both halves. compose loads it through the parent's own offline twin and renders it under the platform tag with version None (composition.py:396-410, asserted at composition.py:1721-1729). computed-semver uses the same twin for the version-pin axis (corpus_generator.py:88) and pairing.py proves the emitted guard really carries the platform-machinery identity (pairing.py:50-62). Its sibling, the governed-namespace guard, is loaded the same way (composition.py:404-405).",
+    "OSCAL / C2P — OSCAL PRESENT, C2P ABSENT. Real OSCAL catalogue and profile reads (composition.py:537-591), real component-definition Check_Id claim parsing (composition.py:794-810), claim ownership enforced per ADR-0017 (composition.py:829-877), 285 real holes recorded. No compliance-to-policy (C2P) tooling, no OSCAL assessment-results generation, no result2oscal call anywhere in this cluster (platform/oscal/result2oscal.py exists but is a different cluster).",
+    "SHIFT-LEFT — PRESENT as the calling context, not as code here. Each adopter's shift-left.yml has a compose-check job running composition.py on every PR (driftwood/.github/workflows/shift-left.yml:272-357). rederive_bumps.py:19 explicitly reuses the same offline `kyverno apply` primitive platform/shift-left/verify-shift-left.sh runs.",
+    "HANDBOOK — ABSENT. No handbook, no operator guide, no runbook in either directory. compose/README.md is a per-ticket engineering account; computed-semver/README.md covers ticket cs-01 only.",
+    "SUNSET — PARTIAL. Retirement is modelled: a version leaving new_window forces major (comparison_window.py:23-30, 93-106) and gate.py case D proves it on a byte-identical body. There is no EOL/sunset date, no --as-of, no clock: composition.py:2358-2373 asserts the module cannot even import datetime/time/sched/croniter, and an 'eol' parent kind does not exist in the party artefact schema.",
+    "NOTIFICATIONS — ABSENT as delivery. The nearest thing is a GitHub job summary written by the adopter compose-check step (shift-left.yml:339-346) and gh pr comment in an adjacent job. No Slack, no email, no webhook, no alerting anywhere in either directory.",
+    "DASHBOARDS — ABSENT. No Grafana, no Prometheus, no metrics export, no dashboard JSON. Evidence is JSON documents and printed selfcheck lines only."
+  ],
+  "notes": "ORIGINAL-ORG CLUSTER NOTES. Both directories live inside .estate-clone/platform, which is its own git repo (remote https://github.com/policy-as-versioned-platform/platform) and is NOT tracked by the outer policy-as-versioned-flux repo — `git ls-files platform/compose` from the outer repo returns nothing, and .estate-clone is untracked. Last commits: platform/compose — 2b69a6a 2026-08-25 'policy-composition: fix ac-6/cm-6 dangling claims, build ADR-0014's guard' (only two commits ever touch it; the other is 963872b 2026-08-25 'WIP: uncommitted policy-composition tickets 09-16 work, safety commit'). platform/computed-semver — 58ef9c5 2026-08-25 'cs-27: signed release-gate evidence for policy/v3.0.0', which is also the repo HEAD; preceding: 7cf0d55 and d64e0d5 (same day, evidence for 2.0.1 and 2.0.0), 860e744 and 7a8df7b 2026-08-24 (cs-16 fixes). Everything in this cluster landed 2026-08-24/25.\n\nCROSS-ESTATE REFERENCES (six-org estate). platform/compose is referenced by all three adopter repos: driftwood/.github/workflows/shift-left.yml:336 and cut-release.yml:93, tuppence/.github/workflows/shift-left.yml:336 and cut-release.yml:93, ludlow/.github/workflows/shift-left.yml:330 and cut-release.yml:93; also mentioned in each adopter's adopter-gate.py and read-two-pins.py. All three carry committed composed/ trees (HEADER.yaml, evidence.json, orphan-guard.yaml, governed-namespace-guard.yaml, policies/). platform/computed-semver is referenced by platform/.github/workflows/{cut-release,release}.yml, platform/.github/scripts/{cut-release-gate.py,cut-release-commit-evidence.sh}, platform/verify-publisher-gate.sh, platform/distribution/render-orphan-guard.py, platform/feeds/README.md, and by driftwood/tuppence/ludlow adopter-gate scripts. It in turn reads platform/graded, platform/risk, platform/feeds, platform/distribution and (via compose) the nist and ico org repos.\n\nDRIFT-RELEVANT OBSERVATIONS, neutral: (1) the per-institution matrix is the clearest built-but-not-wired case — real code, real selfcheck, matrix: {} in every committed evidence record because cut-release-gate.py never passes institution_pins. (2) The six real-infrastructure witnesses were named in the spec and never landed; the directory does not exist; the gate prints the gap without failing, which is the disclosed design. (3) coverage-exclusions.yaml and coverage-baseline.yaml are both empty — the two-tier exclusion mechanism is real code with zero live data. (4) The three committed evidence documents all record computed 'no predecessor' or 'none' against a declared major/patch — i.e. no real release in this line has yet had the gate compute a bump that constrained the publisher's number; every pass so far is 'declared stronger than computed'. (5) composition.py's real-estate outcome flipped from 'refuses today' (README ticket-14 section) to 'composes clean' (composition.py:1483 KNOWN_DANGLING_PLATFORM_CLAIMS = 0) within the same commit that fixed ac-6/cm-6; the README's earlier paragraph reads as stale in isolation. (6) generator_standing_check.py's docstring claim that no evidence record exists on disk is stale. (7) Zero restatements and zero cages fire in the real estate; the caging and cage-tier proposal paths are fixture-proved only. (8) I RAN 9 of the 11 verify scripts to completion on this machine (kyverno 1.18.x and cosign both present, no cluster, no network): verify-composition.sh, verify-pairing.sh, verify-release-integrity.sh, verify-coverage.sh, verify-comparison-window.sh, verify-corpus-generator.sh, verify-witness-set.sh, verify-cage-engine.sh and verify-rederive-bumps.sh — ALL exit 0, no SKIPs. verify-gate.sh and verify-generator-standing-check.sh were still running when I finished; note verify-coverage.sh already runs gate.py --selfcheck in full and passed, so the gate seam itself is proved. verify-comparison-window.sh is the slow one (10+ minutes; one kyverno apply per pod per policy per window line)."
+}

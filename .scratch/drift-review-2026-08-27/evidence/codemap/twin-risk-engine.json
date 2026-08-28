@@ -1,0 +1,163 @@
+{
+  "cluster": "twin-risk-engine: PERT/severity distributions, empirical anchoring, response pricing, ensemble trade-off, constraint pre-filter, causal admission, Buhlmann-Straub credibility, information regimes, and the forecast-book benchmark/blind-scoring harness",
+  "modules": [
+    {
+      "file": "twin/pert.py",
+      "lines": 270,
+      "purpose": "PERT triples (min/mode/max), their analytic Beta-distribution moments, seeded Monte-Carlo sampling, and the calibration-procedure pin that every sampled artefact cites by digest.",
+      "key_functions": "Triple (frozen dataclass: mean, variance, shape->(alpha,beta), raw_moment(k), sample(rng), times(), scaled(), moments()); quantise() (12-sig-fig rounding, refuses non-finite); procedure() (reads calibration.md, requires 5 named steps by regex, returns sha256 pin); stream(seed) (named random.Random); sampler() (metadata block); summarise(draws) (nearest-rank p05/p50/p95 over a Monte-Carlo run)",
+      "depends_on": "twin/__init__.py (PACKAGE_DIR), twin/canon.py (sha256_hex); calibration.md as an external required document"
+    },
+    {
+      "file": "twin/severity.py",
+      "lines": 215,
+      "purpose": "Heavy-tailed severity model: lognormal body spliced continuously to a Generalised Pareto Distribution (GPD) tail at an authored peaks-over-threshold cut; VaR and closed-form TVaR (expected shortfall).",
+      "key_functions": "Severity (frozen dataclass: tail_probability [derived from lognormal body, never a second authored number], survival(x), cdf(x), _quantile(p) shared by var/sample, var(alpha), tvar(alpha) [closed-form McNeil&Frey, refuses when VaR falls in the lognormal body or when xi>=1], sample(rng), loss_exceedance_curve(alphas)); module-level _lognormal_survival/_quantile, _gpd_survival/_quantile",
+      "depends_on": "twin/pert.py (quantise); math, random, statistics (stdlib)"
+    },
+    {
+      "file": "twin/severity-anchors.yaml",
+      "lines": 80,
+      "purpose": "Versioned empirical anchoring data for severity.py's model, subject 'data-breach-loss': two cited quantiles (median $600k, p95 $32M from Cyentia IRIS 2025), from which mu/sigma are fit and threshold is cited; xi (0.6) and beta ($15M) are marked anchored:false with a stated reason each.",
+      "key_functions": "n/a (data file)",
+      "depends_on": "consumed by twin/anchoring.py"
+    },
+    {
+      "file": "twin/anchoring.py",
+      "lines": 266,
+      "purpose": "Loads/validates severity-anchors.yaml, fits the lognormal body from two cited quantiles by exact closed-form two-point calibration, builds a Severity per subject, and reports a sensitivity sweep over the unanchored xi.",
+      "key_functions": "fit_lognormal(p1,x1,p2,x2) (closed-form, refuses equal probabilities or non-positive/decreasing quantiles); Anchored (dataclass wrapping Parameter list + Severity); load() (@lru_cache, validates schema/subjects/quantiles/parameters, requires anchored params to name a method and unanchored ones to name a reason); pin(); subject_ids(); anchored(subject_id) (recomputes mu/sigma/threshold from cited quantiles every call rather than trusting stored numbers); sensitivity(subject_id, alpha, grid) (sweeps xi only, holds mu/sigma/threshold/beta fixed, reports min/max TVaR across the grid)",
+      "depends_on": "twin/severity.py (Severity, SeverityError), twin/canon.py (digest_of), twin/__init__.py (PACKAGE_DIR); yaml"
+    },
+    {
+      "file": "twin/pricing.py",
+      "lines": 386,
+      "purpose": "Joins the causal propagation layer to money: prices every impact a shock causes under one perspective's declared valuation x propagated influence, three-gates it (path evidence grade, valuation evidence grade, causal admission to a declared cash flow), and scores mitigation credit for responses gated on both evidence grade and corroborated enactment.",
+      "key_functions": "impacts(graph,perspective,origin) (runs propagate.propagate, admission.admit per component, returns priced/register/traversal); _priced_triple(amount,influence) (exact point-wise scaling, no re-sampling); _credit(option,claim,priced,overlay) (mitigation credit gated on claim evidence grade AND corroboration.state()'s enactment check, else a named refusal); price(graph,perspective,origin,responses,overlay) (top-level: runs options.prefilter().priced() first, attaches mitigation to each admitted response, asserts closed body); refuse_undeclared_keys/refuse_unpriced_figures (structural invariants: a register entry or refused claim never carries a number, not even zero); spread(figures)",
+      "depends_on": "twin/admission.py, twin/corroboration.py, twin/evidence.py, twin/options.py, twin/propagate.py, twin/artefact.py, twin/canon.py, twin/pert.py (Triple, quantise)"
+    },
+    {
+      "file": "twin/tradeoff.py",
+      "lines": 251,
+      "purpose": "Computes net cost of risk (authored cost minus causal-account-dependent credit) for every admitted response, across a named ensemble of rival causal accounts, side by side per account, plus a computed (never asserted) cheapest-by-account agreement check and a mean-based default.",
+      "key_functions": "_net(entry) (cost.mode - credit.mode, point-wise); curve(overlay,perspective,origin,responses,account_ids) (calls pricing.price() once per named account unmodified, needs >=2 accounts); _assemble(...) (pure function: per-option rows with min/max/range across accounts, cheapest_by_account, unanimous flag, default = lowest mean net cost); _own_shape/_blank_account_keyed_maps/refuse_undeclared_keys (closes this module's own vocabulary separately from pricing's, excluding data-keyed maps like by_account)",
+      "depends_on": "twin/pricing.py (price), twin/model.py (Overlay, ModelError), twin/canon.py, twin/artefact.py, twin/pert.py (quantise)"
+    },
+    {
+      "file": "twin/options.py",
+      "lines": 310,
+      "purpose": "The constraint pre-filter and the sole gateway to pricing a response's cost: removes options that cross a constraint in force before any pricing runs (a constraint is not a very large price), structurally locked so pricing can only ever be called as a method on the object the pre-filter produced.",
+      "key_functions": "Option.of(doc); Admitted (frozen dataclass, __post_init__ refuses construction unless made_by is the module-private _FROM_THE_PREFILTER sentinel; _refuse_a_broken_partition() re-derives the filter from the constraint set and refuses if a copy disagrees, defending against dataclasses.replace()); Admitted.priced(seed,draws) (samples each surviving option's cost via PERT, asserts body closure and no priced removals); prefilter(perspective,responses) (reads constraints.resolve() only, holds no list of its own, never inspects cost); refuse_undeclared_keys/refuse_priced_removals (REMOVAL_KEYS closed to 9 string-only fields, plus a numeric-value scan)",
+      "depends_on": "twin/constraints.py (resolve), twin/pert.py (procedure, sampler, stream, summarise, Triple), twin/artefact.py, twin/canon.py"
+    },
+    {
+      "file": "twin/constraints.py",
+      "lines": 291,
+      "purpose": "Loads and validates the two-tier constraint set (universal floor + perspective red lines), scope exclusions, and four named design positions; resolves the set in force for a perspective and refuses any attempt to override a floor id.",
+      "key_functions": "load() (@lru_cache, validates schema, floor non-empty with >=1 ruin-class entry, scope_exclusions non-empty, four REQUIRED_POSITIONS present with exact status); pin(); floor()/floor_ids(); published() (full artefact body: floor+exclusions+positions); declared_by(perspective) (perspective's own forbidden/ruin constraints); resolve(perspective) (floor always first, never filtered by the perspective); refuse_floor_override(perspective) (refuses if perspective declares an id the floor already holds); artefact(command) (AUTHORED-mark Artefact, no capability/depth grade since it's a human declaration)",
+      "depends_on": "twin/__init__.py (PACKAGE_DIR), twin/canon.py (digest_of); twin/artefact.py, twin/evidence.py (lazy import inside artefact()); yaml"
+    },
+    {
+      "file": "twin/constraints.yaml",
+      "lines": 172,
+      "purpose": "The universal floor (5 constraints: no special-category representation, no covert sensing, no individual attribution, no individual-level output, no automatic enactment, no-ruin-class-option), 5 scope exclusions (power-asymmetry, harms to non-contracting parties, disparate-impact measurement, the twin's own liability, individual behaviour), and 4 positions (no-power-layer/stated, exit-cost-asymmetry/unsolved, reflexivity-and-goodhart/deferred, covert-sensing/permanently-excluded).",
+      "key_functions": "n/a (data file)",
+      "depends_on": "consumed by twin/constraints.py"
+    },
+    {
+      "file": "twin/admission.py",
+      "lines": 121,
+      "purpose": "Derives (never authors) whether an impact enters the £: only when a causal path, graded at or inside the admission threshold, reaches a cash flow the perspective itself declared, or the component is itself a declared cash flow.",
+      "key_functions": "cash_flows(perspective); compact(verdict) (drops duplicated gating blocks from a refusal, keeps the blast radius); admit(graph,perspective,component) (checks declared cash-flow membership first, then runs blast.radius() traversal gated at the admission threshold and looks for a declared cash flow among admitted_to_pricing entries; refusal carries the full blast_radius as its own first-class answer)",
+      "depends_on": "twin/blast.py (radius), twin/evidence.py (admission_threshold, pin), twin/model.py (Graph, lazy import for ModelError)"
+    },
+    {
+      "file": "twin/credibility.py",
+      "lines": 141,
+      "purpose": "Buhlmann-Straub credibility blending: Z-weighted combination of an org's own sparse data with the world-layer industry prior triple, where Z rises with own-data volume and world-prior variance, falls with own-data variance; the industry triple's width is never narrowed, only its mode is translated.",
+      "key_functions": "variance(values) (sample variance, n-1 divisor, 0.0 for <2 points); credibility_z(n,own_variance,world_variance) (Z=n/(n+K), K=own/world variance; degenerate-world-variance checked before degenerate-own-variance so a certain industry prior is immovable); Blend (dataclass: as_dict() reports own_component/world_component split); blend(subject,industry,observations) (top-level: computes Z, shifts the whole triple by z*(own_mean-industry.mode), reports k=None when either variance is degenerate/zero)",
+      "depends_on": "twin/pert.py (Triple, quantise)"
+    },
+    {
+      "file": "twin/regimes.py",
+      "lines": 350,
+      "purpose": "The three information regimes (as-consumed / as-knowable / with-hindsight) that gate a scenario's forecast inputs by construction (facts absent from the overlay, not merely flagged), plus the computed sensing/interpretation gap between regimes and a refusal when a redacted fact is bound to the scenario's own subject.",
+      "key_functions": "cutoff(at) (refuses any execution time not YYYY-MM-DD, since dates are compared as strings); require(regime) (no default -- refuses None); ingestion_history(repo,at) (attempts ModelRepo.open_at_time, reports availability rather than silently degrading as-consumed to date-only filtering); read_at(repo,org,regime,at,loaded) (opens a real past repo state for as-consumed via rewind, not a filtered view of HEAD); apply(overlay,regime,at,history) (removes withheld facts from the overlay by dataclasses.replace, drops claims whose signal was withheld, reports withheld/orphaned/admitted); refuse_redacted_subject(report,overlay,components,where) (AC3: refuses to run rather than silently answer a different question when a withheld post-T fact is bound to a component the scenario forecasts); gap(reports) (computes sensing gap [as-knowable minus as-consumed] and interpretation gap [with-hindsight minus as-knowable] as explicit fact-id sets; model_residual explicitly reports computed:False with a stated reason -- nothing yet infers a probability from a signal)",
+      "depends_on": "twin/model.py (Overlay), twin/repo.py (ModelRepo, RepoError), twin/schema.py (DATED_FACTS, REGIMES); dataclasses, re (stdlib)"
+    },
+    {
+      "file": "twin/forecast_book.py",
+      "lines": 209,
+      "purpose": "Blind, pinned, signed forecast emission (before a question's resolution window opens) and proper-scoring-rule resolution scoring against the exact pinned emission; a deliberately closed 3-function public surface (emit/score_resolution/is_blind) so no position-placing function can hide under a different name.",
+      "key_functions": "is_blind(emitted_at,resolution_window_opens_at) (strict string comparison of fixed-width UTC timestamps, recomputable by an auditor from just the artefact body); emit(caps,question,world_model,probability,emitted_at,command) (refuses probability outside open (0,1), refuses malformed timestamps, refuses emission at-or-after the resolution window opens; returns a DERIVED Artefact carrying observe_only:True, position_placed:False, CLAIM_SCOPE); score_resolution(caps,emission_doc,emission_sha256,observed,command) (refuses a non-emission artefact kind, re-checks is_blind against the presented emission's own recorded timestamps, calls scoring.score() -- never reimplements it -- and reads question id/timestamps only from the emission's own pins/body, never fresh parameters)",
+      "depends_on": "twin/artefact.py (Artefact, DERIVED), twin/canon.py (digest_of), twin/grades.py (Capabilities), twin/scoring.py (score, RULES); re (stdlib)"
+    },
+    {
+      "file": "twin/benchmark.py",
+      "lines": 435,
+      "purpose": "Mechanical, versioned, pre-registered benchmark question selection (liquidity/horizon/category filter + deterministic seeded volume-valve sampling), a substring-scan ingestion-quarantine audit proving no benchmarked question id leaked into ingestion provenance, and a proportionality verdict (yes/conditional/no) computed from what has actually been delivered.",
+      "key_functions": "SelectionRule.load()/digest() (validates required keys, non-empty confidence_bins, positive max_questions); eligible(rule,question) (resolvable-terms filter, no interpretation); select_questions(rule,pool) (sorts by id before filtering so arrival order never matters; volume valve draws deterministically from rule.sample_seed only once candidates exceed max_questions); confidence_distribution()/BenchmarkSet.spans_full_confidence_range() (every declared bin present, zero included, spans checked as a structural fact not asserted in prose); benchmark_set_artefact() (DERIVED artefact, pins rule version/digest + pool digest); audit_quarantine(benchmark,ingestion_records) (json.dumps each record whole and substring-scans for every quarantined id, no timestamp read so lag never matters); quarantine_audit_artefact(); proportionality_verdict(caps,rule,benchmark,resolved,command) (three-word verdict -- no/conditional/yes -- each earned by a structural fact: empty set, set not spanning every bin, or set spanning every bin; cadence reported as designed vs measured depending on len(resolved))",
+      "depends_on": "twin/forecast_book.py (CLAIM_SCOPE), twin/artefact.py (DERIVED, Artefact), twin/canon.py (digest_of), twin/grades.py (Capabilities), twin/__init__.py (PACKAGE_DIR); yaml, json, random (stdlib)"
+    },
+    {
+      "file": "twin/benchmark-selection-rule.yaml",
+      "lines": 42,
+      "purpose": "The committed, versioned mechanical selection rule: min_liquidity 50000.0, horizon 7-365 days, categories [macro, geopolitics, technology, corporate-outcome, regulatory], 6 confidence bins spanning [0,1], max_questions 40, sample_seed 20260812.",
+      "key_functions": "n/a (data file)",
+      "depends_on": "consumed by twin/benchmark.py"
+    }
+  ],
+  "capabilities_real": [
+    "twin/pert.py:139-147,149-175 -- exact analytic PERT/Beta moments (mean, variance, raw_moment via binomial expansion of E[B^j]) used as a yardstick against sampled figures; verified in tests/test_pert.py:37,53 (raw moments recover mean/variance and agree with the sampler)",
+    "twin/pert.py:177-182,218-225 -- seeded Monte-Carlo Beta-variate sampling via random.Random(seed) keyed by name not draw order; tests/test_pert.py:71,92,101,111 check convergence, determinism, degenerate no-randomness-consumed, and name- vs order-independence",
+    "twin/severity.py:81-96,128-175 -- lognormal-body/GPD-tail splice with continuity at the threshold, closed-form VaR via shared inverse-CDF, and closed-form TVaR (McNeil & Frey 2000) with a hard refusal at the xi>=1 mean-nonexistence boundary; tests/test_severity.py:39,80,99,105,115,133 cover continuity, TVaR-vs-VaR divergence on a constructed pair, monotonic TVaR>=VaR, both refusal boundaries, and Monte-Carlo convergence to the analytic TVaR",
+    "twin/anchoring.py:41-65 -- exact closed-form two-point lognormal quantile calibration (not a numerical solve); tests/test_anchoring.py:13,21,26,32,38 verify exact recovery and every refusal path",
+    "twin/pricing.py:135-230 -- three-gate impact pricing (path evidence grade, valuation evidence grade, causal admission) with exact point-wise magnitude x influence-triple composition, never re-sampled; tests/test_pricing.py:58,67,75,83,101 exercise all three gates and the composed-vs-attenuated dual reporting",
+    "twin/pricing.py:233-283 -- mitigation credit double-gated on claim evidence grade AND corroborated enactment (twin/corroboration.py), refusing credit for an unenacted control even with a well-evidenced claim; tests/test_pricing.py:152,185 test differential scoring by corroborated enactment",
+    "twin/tradeoff.py:59-74,138-207 -- net-cost-of-risk computed per rival causal account from independent pricing.price() calls, with a computed (not asserted) ranking-agreement check and mean-based default; tests/test_tradeoff.py:46,58,66,75,119,138,158 exercise cross-account credit divergence and disagreement detection",
+    "twin/options.py:100-156,157-205 -- structurally-locked pre-filter-before-pricing invariant (sentinel construction guard + independent partition re-derivation defending against dataclasses.replace); tests/test_prefilter.py:115,190 (test_pricing_cannot_be_reached_without_the_prefilter, test_a_copy_of_an_admitted_set_cannot_price_an_excluded_option)",
+    "twin/constraints.py:63-128 -- schema validation with required-by-name floor/positions checks (not merely 'presumably covered'); exercised implicitly by every prefilter/pricing test that calls constraints.resolve()",
+    "twin/admission.py:65-121 -- derived (not declared) causal admission via a real graph traversal (blast.radius) gated at a distinct admission threshold from the pricing threshold; tests/test_admission.py:48,58,69,78,87,95,106 cover path-based admission, no-path refusal, weak-evidence refusal, cash-flow-as-component, and direction sensitivity",
+    "twin/credibility.py:46-70,123-141 -- real Buhlmann-Straub Z formula with two ordered degenerate-variance special cases, and a triple-translating blend that never narrows the prior's width; tests/test_credibility.py:30,39,46,61,65,70,75,134 cover monotonicity in n/own-variance/world-variance, both degenerate cases in the specified order, and width preservation",
+    "twin/regimes.py:78-92,133-190,193-256 -- real git-repository rewind (ModelRepo.open_at_time) for as-consumed, construction-level fact withholding (dataclasses.replace, not a flag), and a computed two-way sensing/interpretation gap; tests/test_regimes.py:110,121,138,147,175 cover post-T fact absence, monotonic admission across regimes, claim-follows-signal withholding, and gap computation",
+    "twin/forecast_book.py:104-160 -- structural blindness gate (refuses emission at/after resolution-window-open, string-comparison based so an auditor can recompute it from the artefact alone) and a genuinely closed 3-function public surface; tests/test_forecast_book.py:51,59,111 (test_the_module_exposes_no_position_placing_function checks the module's public surface as an allow-list)",
+    "twin/forecast_book.py:163-209 -- proper-scoring-rule delegation, never reimplemented (calls scoring.score()); co-registration enforced by reading question id/timestamps only from the emission's own pins/body; tests/test_forecast_book.py:137,142,151,161 verify bit-for-bit reproduction of scoring.py and refusal of a doctored emission",
+    "twin/benchmark.py:139-146,191-213 -- mechanical resolvable-terms eligibility filter and deterministic sort-then-seeded-sample selection (arrival order never matters); tests/test_benchmark.py:77,85,104 verify reproducibility, sort-not-arrival-order, and the deterministic volume valve",
+    "twin/benchmark.py:253-272 -- whole-record JSON substring scan for quarantine breach detection, catching nested-field leaks and ignoring timestamp/lag entirely; tests/test_benchmark.py:191,207 plant a nested breach and vary check order to confirm order-independence"
+  ],
+  "capabilities_stubbed_or_thin": [
+    "twin/severity-anchors.yaml:55-80 and twin/anchoring.py -- xi and beta (the GPD tail shape and scale) are explicitly marked anchored:false with illustrative_value only (xi=0.6, beta=15000000); no public source fits a GPD shape parameter for cyber-loss severity, self-described in the YAML as 'no defensible single-source fit at all'",
+    "twin/severity.py:40-46 (docstring) and 159-175 -- tvar() is explicitly ponytail-marked as tail-only: it refuses whenever the requested confidence level's VaR falls inside the lognormal body, because the module does not carry the lognormal body's own partial-mean closed form; a real caller need is asserted ('every call this system makes today') rather than demonstrated against a live caller in this cluster",
+    "twin/credibility.py:16-18 -- K is explicitly ponytail-marked as a single-org stand-in (world-layer prior's own variance substituted for a portfolio-estimated between-risk variance), described as the 'honest single-org stand-in' pending a world layer with more than one org's hypothetical means",
+    "twin/regimes.py:340-350 -- gap()'s model_residual is explicitly computed:False; the module states plainly that nothing in the system yet infers a probability from a signal, so a third (model) failure mode cannot currently be measured, only the two structural gaps",
+    "twin/benchmark.py:361-364,371-384 -- proportionality_verdict()'s 'resolved' scored-resolutions list is explicitly stated to be empty in practice ('this suite reaches no live venue') so resolution cadence is reported as designed, not yet measured, in every real run",
+    "twin/pert.py:249-252 -- summarise() explicitly ponytail-marks its nearest-rank quantile as a simplification versus an interpolating estimator, deemed acceptable only because draw counts are large and fixed",
+    "twin/options.py:44-49 -- the _FROM_THE_PREFILTER sentinel is explicitly ponytail-marked as 'a lock, not a proof': Python has no private constructor, so a determined caller could still bypass it by hand; the module relies on the separate _refuse_a_broken_partition() re-derivation as the real defense"
+  ],
+  "tests_covering": [
+    "tests/test_pert.py (185 lines, 16 tests) -- moments, sampler convergence/determinism, composition, calibration procedure pin/refusal, quantise refusal on overflow, summarise",
+    "tests/test_severity.py (213 lines, 18 tests) -- continuity, monotonicity, VaR/TVaR correctness and refusal boundaries, sampling convergence, loss-exceedance curve",
+    "tests/test_anchoring.py (148 lines, 12 tests) -- fit_lognormal exactness/refusals, anchored() subject validation, sensitivity sweep",
+    "tests/test_pricing.py (313 lines, 22 tests, uses fixtures.build_pocket_org) -- all three pricing gates, mitigation credit gating (grade + corroboration), body closure, reproducibility from pins",
+    "tests/test_tradeoff.py (288 lines, 15 tests, uses a netflix fixture) -- per-account net cost, credit divergence, agreement/disagreement, default computation, closed body",
+    "tests/test_prefilter.py (twin/options.py, 24 tests) -- pre-filter-before-pricing invariant, removal record closure/no-figure, universal-floor and perspective-relative ruin behaviour",
+    "tests/test_admission.py (226 lines, 15 tests) -- path-based and cash-flow-declared admission, refusal paths, pocket-org integration",
+    "tests/test_credibility.py (152 lines, 15 tests) -- Z monotonicity, both degenerate-variance special cases in order, width-preservation, blend visibility",
+    "tests/test_regimes.py (240 lines, 20 tests) -- regime refusal-on-no-default, cutoff format refusal, rewind-based as-consumed, gap computation, redacted-subject refusal",
+    "tests/test_forecast_book.py (222 lines, 18 tests) -- blindness gate at and past the boundary, closed public surface, scoring delegation, co-registration, doctored-emission refusal",
+    "tests/test_benchmark.py (358 lines, 24 tests) -- rule loading/validation, eligibility, deterministic selection and volume valve, confidence-bin spanning, quarantine audit (clean/breached/order-independent), all three verdict branches"
+  ],
+  "hardcoded_or_fixture_only": [
+    "twin/severity-anchors.yaml:26-38 -- data-breach-loss subject figures ($600,000 median, $32,000,000 p95) cited from Cyentia Institute IRIS 2025, and illustrative xi=0.6/beta=$15,000,000 justified only by plausibility against Cyentia IRIS Xtreme's largest-100-events figures ($47M median, >1-in-4 exceed $100M) -- real published figures, but the only subject in the file (single-subject anchor set)",
+    "tests/test_pricing.py:34-35 -- fixtures.build_pocket_org() is the only repo used to exercise pricing.py's real gates in this cluster's tests",
+    "tests/test_tradeoff.py -- a 'netflix' fixture (fixtures.build_netflix_org, referenced in twin/tradeoff.py:151-157 docstring) is the only real-subject fixture that produces a genuine cross-account cheapest-response disagreement; the module's own docstring states no other real fixture makes two accounts disagree, and the synthetic unit test (_assemble tests) remains the primary coverage for that case",
+    "twin/constraints.yaml -- all constraint ids, monetary-adjacent language ('ruin', ' insolvency') are structural/generic, no company-specific figures"
+  ],
+  "external_integrations": [
+    "None of these 15 files touch Flux, Kubernetes, GitHub, or gitsign directly.",
+    "twin/regimes.py:145-190 -- real I/O: ModelRepo.open_at_time() is a genuine git-repository rewind against a local model repo on disk (twin/repo.py), not simulated; reported honestly as unavailable when no commit exists at or before the cutoff.",
+    "twin/benchmark.py:361-364 -- explicitly states 'this suite reaches no live venue' (citing twin/market_signals.py's own admission) -- prediction-market/news-feed connectivity is simulated/absent in this cluster; benchmark question pools are supplied as in-memory dicts in tests, not fetched from a real venue.",
+    "twin/forecast_book.py and twin/benchmark.py rely on twin/artefact.py's signing machinery (twin/sign.py/attest.py, not read in this pass) for gitsign-style signing, but that machinery itself lives outside this cluster's file list."
+  ],
+  "notes": "This cluster is the £-engine/risk-quantification core: uncertainty (pert.py) and heavy-tailed severity (severity.py/anchoring.py) feed into pricing (pricing.py) which is reached only through the constraint pre-filter (options.py/constraints.py) and causal admission (admission.py); tradeoff.py composes pricing across rival causal accounts; credibility.py is a separate Bayesian-blending capability not wired into pricing.py in this file set (no cross-reference found between credibility.py and pricing.py/tradeoff.py); regimes.py and forecast_book.py/benchmark.py form a distinct 'epistemic honesty' subsystem (temporal information gating and blind external forecast scoring) that does not touch the £ engine at all -- both subsystems share only the pert.py/canon.py/artefact.py substrate. Every module in this cluster follows the same 'refusal is an answer, never a silent zero/default' discipline, enforced by closed-vocabulary body checks (walk_keys) rather than convention."
+}

@@ -1,0 +1,43 @@
+[1;36m==>[0m 1. the whole chain: feed->scenario->PR->review->merge->release, every actor named
+ok  6-link chain feed->scenario->PR->review->merge->release, all evidence on disk; AI proposed 2 link(s) (never merged), humans disposed 3; workload+device SVIDs share one root (spiffe://acme.internal); chain converges on v3.0.0 == the version the workload SVID carries. Every actor attestable; the whole chain verifies.
+[1;36m==>[0m 2. the head of the chain VERIFIES CRYPTOGRAPHICALLY, right here (the signed feed)
+  ok   feed link attested: v3 threat-register signature verifies (ed25519)
+  ok   a forged feed is refused (the signature actually guards the link)
+[1;36m==>[0m 3. commit/PR attestable in REKOR (the human disposition links)
+  offline: merge+release links carry the Rekor root (verified in step 1);
+  gitsign present [gitsign version 0.17.1] but no rekor-cli/cosign to query the log.
+[1;36m==>[0m 4. workload + device SVIDs verify against SPIRE (one root, distinct actor classes)
+  offline: workload (posture/vN) + device (/device/, tpm_devid) SVIDs share one root — manifests asserted in step 1
+[1;36m==>[0m 5. the walk — who proposed what, when, from which evidence (the auditor reads this)
+CHANGE PATH — who proposed what, when, from which evidence:
+  1. feed      [PUBLISHER] platform-feeds         publish  @ feed v3   :: signed threat-register v3: driftwood skimmer-campaign LEF uptick
+       evidence: ../../.estate-clone/platform/wargamer/fixtures/threat-register/v3/register.json  (present)
+  2. scenario  [AI       ] wargamer-agent         derive   @ feed v3   :: feed LEF x control LM -> FAIR scenario -> £ residual crosses driftwood's band
+       evidence: ../../.estate-clone/platform/feeds/to_fair_scenario.py  (present)
+  3. PR        [AI       ] wargamer-agent         propose  @ feed v3   :: [war-gamer] re-tune require-nonroot@2.0.0 (driftwood): Audit -> Deny
+       evidence: ../../.estate-clone/platform/distribution/policies/v2.0.0/require-nonroot.yaml  (present)
+  4. review    [HUMAN    ] human-reviewer         review   @ feed v3   :: a human reads the £-justified diff + the version cross-check gate result
+       evidence: ../../.estate-clone/platform/distribution/policies/v2.0.0/require-nonroot.yaml  (present)
+  5. merge     [HUMAN    ] human-maintainer       dispose  @ feed v3   :: a human merges — gitsign-keyless commit lands in Rekor; the AGENT never merges
+       evidence: ../../.estate-clone/platform/distribution/policies/v2.0.0/require-nonroot.yaml  (present)
+  6. release   [HUMAN    ] human-release-signer   release  @ feed v3   :: cut signed tag policy/v3.0.0; Flux ResourceSet pins the version to it
+       evidence: ../../.estate-clone/platform/distribution/versions.yaml  (present)
+
+  the chain converges on release v3.0.0 — the same version a
+  compliant workload then carries in its SVID posture path:
+
+RUNTIME IDENTITIES — every actor rooted, no network-position trust:
+  workload      root=spiffe://acme.internal
+                svid=spiffe://acme.internal/posture/3.0.0/ns/<ns>/sa/<sa>
+                by  =SPIRE CA (X.509-SVID URI-SAN, Kyverno-stamped posture label)
+  device        root=spiffe://acme.internal
+                svid=spiffe://acme.internal/device/operator-macbook
+                by  =SPIRE tpm_devid node attestor (TPM/Secure-Enclave residency)
+  commit/human  root=gitsign keyless (OIDC -> Fulcio) -> Rekor transparency log
+                svid=OIDC subject (email) bound in a Fulcio cert, logged in Rekor
+                by  =gitsign keyless — the merge + release links above
+
+PASS: the whole chain walks feed->scenario->PR->review->merge->release; the AI
+war-gamer PROPOSES (never merges), humans DISPOSE; workload+device+commit+human all
+root to one attestation, and the chain converges on the exact version a running
+workload carries in its SVID. Provenance for every actor, end to end.

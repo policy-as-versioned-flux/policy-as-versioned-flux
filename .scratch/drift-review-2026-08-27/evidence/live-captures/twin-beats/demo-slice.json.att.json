@@ -1,0 +1,33 @@
+{
+  "agent_signature": null,
+  "human_involvement": {
+    "present": false,
+    "signatures": []
+  },
+  "mark": "derived",
+  "pins": {
+    "capabilities_digest": "a955d233adb40c7d246378f6e7f4140a600196de43a748f31ef2dd069c8c4a65"
+  },
+  "produced_by": {
+    "command": [
+      "twin",
+      "demo-slice"
+    ],
+    "runtime": {
+      "implementation": "cpython",
+      "machine": "arm64",
+      "platform": "darwin",
+      "python": "3.14.6",
+      "tool_version": "0.1.0"
+    },
+    "tool": "twin",
+    "tool_version": "0.1.0"
+  },
+  "schema": "twin.attestation/v1",
+  "signature_status": "unsigned \u2014 no signing key present (set TWIN_SIGNING_KEY)",
+  "subject": {
+    "bytes": 7529,
+    "kind": "demo-slice-summary",
+    "sha256": "6cce25cc454ad92fd0ebcccd42ae4666b323bcf34bd30551ce3fb1c180ee3e35"
+  }
+}

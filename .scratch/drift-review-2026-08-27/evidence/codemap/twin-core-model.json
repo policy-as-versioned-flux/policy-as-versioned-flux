@@ -1,0 +1,138 @@
+{
+  "cluster": "twin core model/schema/repo/CLI + provenance-and-honesty scaffolding (schema.py, model.py, repo.py, verbs.py, cli.py, __main__.py, artefact.py, canon.py, blob.py, index.py, ontology.py, grades.py, honest_build.py, does_not_do.py)",
+  "modules": [
+    {
+      "file": "twin/schema.py",
+      "lines": 1073,
+      "purpose": "Closed, typed schema for every object kind a model repository can hold (component, claim, edge, perspective, response, scenario, outcome, prior, own-data, causal-account, etc). Validation happens at load time (git blob read), never at write. Also enforces two structural refusals: no Article 9 (UK GDPR special-category) data can be represented anywhere, as key or value, at any depth; and no authored roll-up/aggregate field can exist (aggregates are always derived).",
+      "key_functions": "Schema.validate (closed-field check), validate(kind,doc,where) dispatch table SCHEMAS + REFINEMENTS, refuse_special_category/_article_nine (word-boundary substring match over SPECIAL_CATEGORY denylist), refuse_authored_rollups (ROLLUP_FIELDS denylist), field validators: ident/text/date/boolean/whole/unit_interval/probability/evidence_grade/amount/valuation/mitigation/enforcement/calibration/pert/money_pert, kind-specific refinements _refine_component/_refine_edge/_refine_regrade/_refine_claim/_refine_enforcement_move/_refine_perspective.",
+      "depends_on": "twin.wardley (band/WardleyError for evolution_position check), lazily imports twin.evidence, twin.enforcement, twin.sign, twin.corroboration, twin.constraints to avoid import cycles"
+    },
+    {
+      "file": "twin/model.py",
+      "lines": 795,
+      "purpose": "Loads the World (shared cross-tenant layer) and per-org Overlay (private tenant layer) from a ModelRepo, running schema validation and cross-reference integrity checks (components exist, edges reference real nodes/people, perspectives value real components, scenarios name real components, responses cross declared constraints, enactment claims name real responses/signals, evidence-grade and enforcement-grade immutability chains are contiguous). Builds the typed knowledge Graph (structural 'needs' edges + person edges + causal edges) and computes derived roll-ups (never stored). Enforces the one-directional world->overlay reference rule (world must never reference an overlay/tenant).",
+      "key_functions": "World.load, Overlay.load/_check_references/_check_scenarios/_check_responses/_check_regrades/_check_enforcement_moves/_check_causal_accounts/_check_own_data/_check_enactment_claims, Overlay.graph()/causal_graph(account_id)/pins(), Graph.bus_factor/wardley()/rollups(), BehaviouralOverlay.load (separately gated, advisory_only-only unit), enforce_direction/check_direction (world-never-references-overlay scanner over keys/values/prose).",
+      "depends_on": "twin.repo (ModelRepo, UnitRef, RepoError, load_yaml), twin.schema (COLLECTION_KINDS, validate, CAUSAL_EDGE/STRUCTURAL_EDGE/PERSON_EDGES, degenerate), twin.evidence, twin.wardley; lazily imports twin.constraints, twin.corroboration, twin.enforcement, twin.sign"
+    },
+    {
+      "file": "twin/repo.py",
+      "lines": 400,
+      "purpose": "The pinned, hardened git-reading layer. Opens a model repository at a ref (or at a historical instant via rev-list --before), refuses dirty working trees, refuses gitlinks/submodules, resolves 'units' (world, orgs/<org>) to independent (commit, tree) pins so world and each overlay version independently while sharing one repo. All git invocations run with a hardened environment (scrubbed GIT_* env vars, disabled fsmonitor/hooks/pager, forced UTC/C locale) to keep reads deterministic and untrusted-repo-safe.",
+      "key_functions": "ModelRepo.open/open_at_time (time-travel via git rev-list --before, refuses unparseable/out-of-epoch dates because git silently falls back to 'now'), ModelRepo.unit_ref/unit_ref_at (independent subtree pins, refuses non-object-id refs for stability), read_blob/read_yaml_at/list_tree/exists_at, _refuse_dirty/_refuse_gitlinks, SafeLoader (refuses YAML aliases to stop anchor-bomb expansion), _normalise (dates->ISO strings so YAML auto-typing doesn't break JSON serialisation).",
+      "depends_on": "subprocess (git CLI only, no git library), yaml (PyYAML SafeLoader subclass); no other twin modules"
+    },
+    {
+      "file": "twin/verbs.py",
+      "lines": 1520,
+      "purpose": "The seam-1 verb layer: one function per CLI command (sense, run, graph, blast, propagate, intervene/observe, rewind, options, price, exposure, regime_gap, positions, credibility, causal_accounts, trade_off, score, reliability, severity_curve, anchored_severity_curve), each producing a pinned, deterministic Artefact by orchestrating other twin modules (propagate, pricing, scoring, primitives, admission, regimes, credibility, options, corroboration). Declares which named 'capability' depth-grades each verb's output carries (CAPS_* lists), so an artefact's honesty travels with it.",
+      "key_functions": "sense() (binds a dated signal to a component or response via claims, runs upstream/downstream propagation for a binding, corroboration-state for enactments), run() (executes a scenario at a time under a required information regime, no default regime), score() (scores forecast probabilities against boolean outcomes via scoring.score, gates on regime match, handles mitigated-non-event exclusion), price()/exposure() (perspective-relative £ figures, no collapse to one number), reliability() (pools score cards into bins), severity_curve/anchored_severity_curve (GPD-tail loss-exceedance curves), _pins/_query helper for do()/observe() intervention semantics.",
+      "depends_on": "twin.model (Overlay), twin.repo (ModelRepo), twin.artefact/canon/blob, twin.grades (Capabilities), and by import: admission, affected_parties, blast, constraints, credibility, evidence, options, positions, pricing, primitives, propagate, regimes, scoring, pert, severity (none of these modules were in-scope for this map, so their internal correctness is not independently verified here — only that verbs.py wires and gates them)"
+    },
+    {
+      "file": "twin/cli.py",
+      "lines": 2133,
+      "purpose": "The `twin` argparse entry point (seam 1's primary boundary). One cmd_* function per subcommand, each opening a ModelRepo/Capabilities, calling into verbs.py or another module, and emitting a signed artefact via _emit/attest.write. Also owns non-verb machinery: schema validation gate (cmd_validate), derived-index build (cmd_index), the fixture builder dispatcher (cmd_fixture), depth-grade printing (cmd_grade), the invariant-suite runner and artefact reproduction/attestation verification (cmd_verify, _reproduce, _attestation), human signing of authored artefacts (cmd_sign), and gated re-pinning of check-body hashes / golden digests (_rehash, _bless_goldens, both requiring a 'decision ticket NN' citation string via --authorise).",
+      "key_functions": "main()/build_parser() (argparse wiring for ~50 subcommands), cmd_sense/cmd_run/cmd_score/cmd_price/cmd_exposure/... (thin wrappers around twin.verbs), cmd_validate (schema + regrade/enforcement-move chain checks across every org overlay), cmd_sign (loads twin.sign.human, refuses signing a 'derived' artefact), cmd_verify/_reproduce (byte-identity reproduction from pins), _rehash/_bless_goldens (citation-gated manifest/golden rewriting).",
+      "depends_on": "nearly every twin module: attest, constraints, demo_slice, does_not_do, enact, enforcement, evidence, fixtures, gameplay_lens, index, invariants, ontology, retrospective_sweep, scenario_diff, schedule, sign, unbound_pool, verbs, plus artefact/blob/canon/grades/model/pert/primitives/propagate/regimes/reproduce/repo/scenario_diff/schema/scoring/sign"
+    },
+    {
+      "file": "twin/__main__.py",
+      "lines": 3,
+      "purpose": "`python -m twin` entry point.",
+      "key_functions": "raise SystemExit(main()) calling twin.cli.main",
+      "depends_on": "twin.cli"
+    },
+    {
+      "file": "twin/artefact.py",
+      "lines": 104,
+      "purpose": "The artefact envelope: kind/mark(authored|derived)/produced_by/pins/depth/body, serialised via canonical_json and hashed. Enforces at emission time (refuse_forbidden_keys) that no artefact ever carries a 'recommended_action'-style field or a forecast-collapsing field (consensus/combined_forecast/point_forecast/etc) — a structural refusal of the 'AI recommends X' and 'the forecasts collapse to one number' anti-patterns, checked by walking every key at arbitrary depth.",
+      "key_functions": "Artefact.envelope()/to_bytes()/digest()/write(), refuse_forbidden_keys (walks canon.walk_keys against FORBIDDEN_KEYS dict), load() (kind-checked artefact loader), digest_of_file().",
+      "depends_on": "twin.canon (canonical_json, sha256_hex, walk_keys), twin (TOOL_VERSION)"
+    },
+    {
+      "file": "twin/canon.py",
+      "lines": 75,
+      "purpose": "Canonical JSON serialisation (sorted keys, fixed indent/separators, ASCII, trailing newline, allow_nan=False) that is the whole byte-identity/attestation story: if pins+bytes don't reproduce, the attestation is a claim not a proof.",
+      "key_functions": "canonical_json, sha256_hex, digest_of, walk_values, walk_keys (recursive dict/list walkers used by refusal checks elsewhere).",
+      "depends_on": "hashlib, json only"
+    },
+    {
+      "file": "twin/blob.py",
+      "lines": 48,
+      "purpose": "Content-hash reference form (sha256:<64hex>:<size>) for future bulk substrate (millions of emails/chats/telemetry) that will be addressed by hash rather than held inline in git. Nothing currently produces substrate; only the reference type exists so it round-trips with no substrate present (used as a placeholder 'absent substrate' pin in artefacts).",
+      "key_functions": "BlobRef.of(data)/.parse(text)/.resolves(data) (size-then-hash comparison).",
+      "depends_on": "twin.canon.sha256_hex"
+    },
+    {
+      "file": "twin/index.py",
+      "lines": 101,
+      "purpose": "A derived, explicitly-never-authoritative index of world/overlay id lists, written per-unit to a directory that can always be deleted and rebuilt from git alone. Deliberately excludes the behavioural overlay (would be an ungated copy of the most private object). Refuses to overwrite a directory it doesn't recognise as its own (no .twin-index marker).",
+      "key_functions": "build(repo) (pure function -> {path: bytes}), write(repo, out_dir) (marker-gated rmtree+rebuild), digest()/read_digest().",
+      "depends_on": "twin.canon, twin.model (ORGS, Overlay, World, orgs)"
+    },
+    {
+      "file": "twin/ontology.py",
+      "lines": 177,
+      "purpose": "Publishes the 'named core ontology' artefact (decision ticket 07 AC1/AC6) by deriving entity types and relationship types directly from twin.schema.SCHEMAS/EDGE_TYPES rather than hand-typing a doc that could drift. The one hand-authored part is ATTACHMENT — where £/risk, people, assets and signals attach to the graph — which is checked at generation time against schema.py's real vocabulary (_check_attachment_vocabulary) so a schema rename breaks this loudly.",
+      "key_functions": "entity_types()/relationship_types()/backbone()/published()/artefact(), _check_attachment_vocabulary (guards ATTACHMENT against schema drift).",
+      "depends_on": "twin.model, twin.schema; lazily twin.artefact, twin.canon, twin.grades.Capabilities"
+    },
+    {
+      "file": "twin/grades.py",
+      "lines": 245,
+      "purpose": "Depth grades as computed checklists, never self-declared. Each capability YAML file lists numbered acceptance criteria copied verbatim from its owning decision ticket (.scratch/twin/issues/NN-*.md '## Acceptance criteria' section); grade (stub/partial/full) is a computed property of how many are checked=true, and a file that tries to type `grade:` directly is refused. Every checked item must carry evidence+ticked_by ('a tick with no witness is refused'). Checklists are re-validated against the live ticket text (_validate_against_ticket) so a checklist cannot silently drift from its yardstick.",
+      "key_functions": "acceptance_criteria(ticket) (parses '## Acceptance criteria' markdown checkbox list, refuses nested checkboxes so the denominator can't shrink), DepthGrade.grade/summary, Capabilities.load/require/aggregate/depth_block, worst(grades).",
+      "depends_on": "twin (PACKAGE_DIR, REPO_DIR), twin.canon.digest_of; reads .scratch/twin/issues/*.md and twin/capabilities/*.yaml from disk"
+    },
+    {
+      "file": "twin/honest_build.py",
+      "lines": 282,
+      "purpose": "Encodes decision ticket 20's 'honest-build' skill/capability taxonomy as data: CAPABILITY_INVENTORY classifies every named capability code/skill/inherited and is checked against real, non-empty module files and against twin.skills' determinism-split predicate for self-consistency; SKILL_OWNING_TICKET maps each 'skill'-classified capability to its owning decision ticket file. Documents and enacts a specific self-correction: ethics-gate is reclassified 'code' (not 'skill', contra decision ticket 20 Q3's own listing) because its scored surface (admitted + ladder.stopped_at) is a deterministic rule engine, not an interpretive judgement.",
+      "key_functions": "validate_inventory() (checks kind validity, module existence/non-emptiness, determinism-flag self-consistency, skill-threshold presence), validate_owning_tickets() (checks SKILL_OWNING_TICKET is exactly the skill set and each ticket file exists), inventory_summary().",
+      "depends_on": "twin (PACKAGE_DIR), twin.grades.DECISION_TICKETS_DIR, twin.skills (CODE_KIND/SKILL_KIND/classify_by_determinism/load_thresholds)"
+    },
+    {
+      "file": "twin/does_not_do.py",
+      "lines": 90,
+      "purpose": "Generates a 'does-not-do register' as a pure function of twin.grades.Capabilities — one entry per unchecked acceptance criterion across every loaded capability, with no YAML file and no authoring path, so the register can never drift from the checklists themselves. Explicit application of the same 'published-scope-exclusions' device constraints.py uses, turned on the demo/tool itself rather than only on modelling choices.",
+      "key_functions": "register(caps) (deterministic ordering by capability then criterion index), published(caps) (adds capabilities_surveyed/criteria_checked/criteria_total), artefact() (derived-marked Artefact wrapper).",
+      "depends_on": "twin.grades.Capabilities; lazily twin.artefact"
+    }
+  ],
+  "capabilities_real": [
+    "twin/schema.py:447-465 Schema.validate — real closed-schema validation (unknown/missing field detection), exercised by tests/test_schema.py (undeclared field, missing required field, identifier format tests)",
+    "twin/schema.py:468-501 refuse_special_category / _article_nine — real word-boundary substring matching over a 30+ term Article 9 denylist, applied recursively to keys and values at arbitrary depth; exercised by tests/test_schema.py::test_every_article_nine_category_has_nowhere_to_go (parametrised over all SPECIAL_CATEGORY terms) and test_respelling_the_category_does_not_help (camelCase/kebab/underscore normalisation) and test_it_cannot_be_hidden_inside_a_free_form_container",
+    "twin/schema.py:154-167 probability() — real strict-inequality gate refusing probability 0 or 1 (infinite log-score penalty), exercised by tests/test_schema.py::test_a_belief_of_certainty_is_refused",
+    "twin/repo.py:252-290 ModelRepo.open_at_time / parse_moment — real git-history time-travel (rev-list --before) with explicit epoch-window and unparseable-date refusal to stop git's silent 'falls back to now' behaviour from producing a wrong-but-confident historical answer",
+    "twin/repo.py:57-72 SafeLoader — real YAML-alias refusal to stop anchor-bomb memory expansion",
+    "twin/model.py:399-421 Overlay._check_regrades / twin.evidence.check_chain — real evidence-grade immutability chain verification (a grade cannot move without a contiguous, in-repo regrade record), exercised across tests/test_evidence_ladder.py",
+    "twin/model.py:691-770 check_direction — real recursive scan of every world-tree file (keys, values, and free prose via a compiled org-id regex) refusing any reference from the world layer into an overlay/tenant, run over every world tree an overlay actually pins, not just HEAD",
+    "twin/canon.py:15-29 canonical_json — real deterministic serialisation (sorted keys, allow_nan=False), exercised by tests/test_repo_and_envelope.py::test_canonical_json_refuses_values_that_are_not_portable and test_canonical_json_is_stable_under_key_order",
+    "twin/artefact.py:84-91 refuse_forbidden_keys — real arbitrary-depth key walk refusing 'recommended_action'/'consensus'/'collapsed'/etc, exercised by tests/test_repo_and_envelope.py::test_a_recommended_action_field_is_refused_at_emission and test_the_refusal_reaches_arbitrary_depth",
+    "twin/grades.py:40-75,151-188 acceptance_criteria + DepthGrade.grade + _validate_against_ticket — real markdown-checkbox parser and a genuinely computed (never typeable) grade, cross-checked against the live decision-ticket text on every load so the checklist can't silently drift from its own yardstick; heavily exercised by tests/test_grades.py (typed-grade rejection, drift rejection, nested-checkbox rejection, aggregate arithmetic vs README)",
+    "twin/honest_build.py:199-274 validate_inventory / validate_owning_tickets — real cross-checks tying a hand-written classification table to actual files on disk and to twin.skills' determinism predicate, catching a self-contradictory kind/reproducible_from_pins pairing; exercised by tests/test_honest_build.py including a real assertion that ethics_gate.scorer()'s source never calls classify_gameability (grounds the code/skill reclassification in the actual function body via inspect.getsource)",
+    "twin/does_not_do.py:29-52 register() — real pure derivation from Capabilities with no authored/typed path; exercised by tests/test_does_not_do.py including a live-not-cached test (checking one more AC removes exactly one register entry) and a completeness test against the shipped capability set"
+  ],
+  "capabilities_stubbed_or_thin": [
+    "twin/blob.py:1-8 module docstring: 'Nothing produces substrate yet — the reference *form* exists now because every later ticket writes into it' — the whole substrate-addressing mechanism is a placeholder type with no producer; every artefact currently carries the literal fixtures.ABSENT_SUBSTRATE sentinel (see twin/repo_and_envelope test at line 49 comparing against fixtures.ABSENT_SUBSTRATE, not a real substrate hash)",
+    "twin/model.py:344-364 Overlay.forecast_subject — explicitly documents an un-ticked acceptance criterion: an enactment claim always returns None as the forecast subject ('decision ticket 18's AC 5 ... is unticked today') so a response being enacted can never make a forecast conditional on it yet",
+    "twin/verbs.py:6-9 module docstring: 'Every capability here sits at partial, which means at least one of its owning decision ticket's acceptance criteria, not most of them' — verbs.py's own capability grades (sense-move, scenario-engine, currency-regimes, causal-layer) are explicitly disclosed as partial in places even though tests/test_grades.py shows the shipped set has since moved several of these to full — the disclosure mechanism (does_not_do.py) is what actually reports current gaps, not this docstring, which is now stale relative to the ticked grades",
+    "twin/grades.py itself has no ponytail — but its entire reason to exist (build ticket 03 docstring) names 'premature done' / self-declared grades as the failure it exists to prevent, implying that failure mode was real practice before this module; the guard is real, the thing it guards against is documented as having happened",
+    "twin/honest_build.py:22-43 explicitly documents leaving stale/inconsistent prose in place rather than rewriting it: 'the seam-3 eval harness ... still scores it as one — that existing machinery is untouched by this ticket, on purpose ... rewriting the six-skills prose ... would be a large, unrequested rewrite'; i.e. a known inconsistency between this module's honest classification and five other modules' docstrings/test expectations is left standing by design",
+    "twin/verbs.py:632-656 _price_at / spread machinery reports 'attenuated modal price' only (mode of the propagated triple) — no full distribution is carried through to the price attribution table, only min/mode/max-derived point figures per component per perspective"
+  ],
+  "hardcoded_or_fixture_only": [
+    "twin/fixtures.py build_netflix_org / build_and_corroborate_netflix_org (line ~4860, ~5007) — Netflix exists only as a synthetic fixture org, referenced by id (e.g. component 'streaming-experience', 'dvd-by-mail', person 'alex-rivera'/'sam-okafor') in tests/test_schema.py and elsewhere",
+    "twin/fixtures.py build_intel_org (~5414) — Intel fixture, e.g. signal id 'foundry-segment-loss-disclosed' referenced in tests/test_repo_and_envelope.py",
+    "twin/fixtures.py build_carillion_org (~2086), build_wirecard_org (~2577), build_enron_org (~2805), build_royal_mail_org (~4291), build_kodak_org (~5612), build_maersk_org (~5762), build_nmc_health_org (~2344), build_astrazeneca_org (~3034), build_sanofi_org (~3227), build_pocket_org (~1426), build_twin_self_org (~3656, the twin-inside-twin fixture), build_library_org/build_standing_library (~4009/4038), build_regime_org (~1764) — all named real-world corporate-collapse or industry subjects (Carillion, Wirecard, Enron, Royal Mail, Kodak, Maersk, Intel, Netflix) exist in this codebase only as deterministic synthetic fixture data, never as live-fetched or user-supplied input; the modules in this cluster (schema/model/repo/verbs/cli) treat them as opaque org ids with no special-casing of the subject itself",
+    "No £ amounts, evidence-grade numbers, or PERT triples in the 14 mapped files are themselves hardcoded business figures — those live in fixtures.py/YAML, not in this cluster; this cluster's own hardcoded values are structural constants (evidence ladder 1-5, GIT_EPOCH_YEARS 1970-2099, COMMITTED_SCENARIO_CLASSES, SPECIAL_CATEGORY denylist, FORBIDDEN_KEYS denylist)"
+  ],
+  "external_integrations": [
+    "git (via subprocess in twin/repo.py) — real I/O: every read goes through actual `git` CLI calls (rev-parse, cat-file, ls-tree, rev-list, show) against a real repository on disk, with a hardened/scrubbed environment; not simulated, but scoped to local git only — no network, no GitHub API, no Flux, no Kubernetes anywhere in these 14 files",
+    "No Flux, Kubernetes, gitsign, arckit runtime, prediction-market, or news-feed integration appears anywhere in schema.py/model.py/repo.py/verbs.py/cli.py/artefact.py/canon.py/blob.py/index.py/ontology.py/grades.py/honest_build.py/does_not_do.py or __main__.py — 'arckit' appears only as a provenance label in honest_build.py's CAPABILITY_INVENTORY (INHERITED_KIND entries for wardley.py/blast.py/schedule.py noting they were ported from /arckit:wardley etc.), not as a live dependency or call",
+    "twin/cli.py cmd_sign calls twin.sign.human() (module not in this cluster) which tests/test_repo_and_envelope.py shows takes a raw bytes key material — this is a real signing code path (attestation sidecar gets a signature entry) but the key-material handling and whether it is HMAC or asymmetric was not independently verified in this pass since sign.py is outside the requested file list; cli.py's role is only to load the key via sign.signing_key(), refuse signing a non-authored artefact, and write the sidecar",
+    "twin/repo.py explicitly scrubs GIT_DIR/GIT_WORK_TREE/GIT_INDEX_FILE/etc and disables core.fsmonitor/core.hooksPath — real defensive hardening against a hostile or misconfigured local git config/environment, not a simulation"
+  ],
+  "notes": "This cluster is the spine of the whole `twin` package: schema.py + model.py + repo.py define what a model repository is and how it validates/loads; verbs.py + cli.py are the entire seam-1 command surface, each command producing a byte-reproducible pinned Artefact; artefact.py/canon.py/blob.py define the artefact envelope and its serialisation/hashing primitives; index.py is a rebuildable derived store; ontology.py/grades.py/honest_build.py/does_not_do.py form a self-honesty subsystem — grades.py makes 'depth' a computed fact tied to real decision-ticket checklists rather than a self-declared label, honest_build.py applies the same discipline to the code/skill/inherited classification of every capability (including correcting the project's own prior six-skill count), and does_not_do.py turns any unchecked grade into a disclosed gap with no authoring path of its own. verbs.py itself is mostly an orchestration layer over other twin modules (propagate.py, pricing.py, scoring.py, primitives.py, admission.py, regimes.py, credibility.py, options.py, corroboration.py) that were NOT in the requested file list, so claims about e.g. PERT sampling, TVaR, or Monte-Carlo propagation being 'genuinely implemented' rest on this cluster's evidence that verbs.py calls into and gates on those modules correctly (regime requirement, use-gate thresholds, mitigation-credit gating in score()) rather than on having read those modules' own algorithms in this pass. cli.py is very large (2133 lines) but almost entirely thin per-command wrappers plus argparse wiring; the only non-trivial logic inside cli.py itself is cmd_validate's history-violation printing, cmd_sign's authored-only refusal, and the citation-gated _rehash/_bless_goldens manifest-rewriting helpers."
+}

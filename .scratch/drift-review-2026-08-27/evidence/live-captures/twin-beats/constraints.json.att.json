@@ -1,0 +1,35 @@
+{
+  "agent_signature": null,
+  "human_involvement": {
+    "present": false,
+    "signatures": []
+  },
+  "mark": "authored",
+  "pins": {
+    "constraints_sha256": "5d306b4c69bcb11e1255e40d2768084c0d966037a4028ed605321633111ac3e6",
+    "evidence_ladder_sha256": "1b703670cd52405cc56145546e13e2c0cb8b8360c44c1694fc3eab424f15f7a5",
+    "role": "constraint-owner"
+  },
+  "produced_by": {
+    "command": [
+      "twin",
+      "constraints"
+    ],
+    "runtime": {
+      "implementation": "cpython",
+      "machine": "arm64",
+      "platform": "darwin",
+      "python": "3.14.6",
+      "tool_version": "0.1.0"
+    },
+    "tool": "twin",
+    "tool_version": "0.1.0"
+  },
+  "schema": "twin.attestation/v1",
+  "signature_status": "unsigned \u2014 no signing key present (set TWIN_SIGNING_KEY)",
+  "subject": {
+    "bytes": 11537,
+    "kind": "constraint-set",
+    "sha256": "a7a51fcc41c0ef422b8ef14fd173708d82e71b1a4fe5f77b602b99d963e1a356"
+  }
+}

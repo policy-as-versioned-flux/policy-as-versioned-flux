@@ -1,0 +1,7 @@
+[1;36m==>[0m 0. the engine's own asserts (band selection, tightening raises £, no timer)
+ok  driftwood(£40000 tol): loose buys £19439 -> Audit | tightened buys £54520 -> Deny | same loose under ludlow(£5000 tol) -> Deny
+[1;36m==>[0m 1. driftwood, loose triple: risk_bought below the £40k band -> Audit
+[1;36m==>[0m 2. tighten the triple (LM reassessed upward): £ rises over the band -> Deny
+[1;36m==>[0m 3. the flip is justified by the number, not a date
+[1;36m==>[0m 4. proportionality: the SAME loose control Denies under ludlow's strict band
+PASS: the £ picks Audit vs Deny; tightening a triple flips Audit->Deny by a number.

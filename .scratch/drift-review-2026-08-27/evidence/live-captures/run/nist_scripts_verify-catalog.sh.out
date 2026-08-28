@@ -1,0 +1,24 @@
+OK: 1196 controls across 20 groups, sha256 verified, NIST rev 5.2.0 (OSCAL 1.2.2)
+==> baselines: LOW/MODERATE/HIGH resolve against the catalogue, bare ids only
+OK: LOW resolves 149 controls, all bare, all in the catalogue
+OK: MODERATE resolves 287 controls, all bare, all in the catalogue
+OK: HIGH resolves 370 controls, all bare, all in the catalogue
+OK: fixture profile carrying an unknown id ('zz-999') fails resolution, as required
+OK: 3 baselines verified (LOW=149, MODERATE=287, HIGH=370)
+==> cs-14: EXPECTED_IDENTITY_REGEXP anchors org/repo/workflow, allows main + release/x.y.x
+OK (matches):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/main
+OK (matches):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/release/1.0.x
+OK (matches):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/release/12.34.x
+OK (rejects):     https://github.com/evil-org/nist/.github/workflows/cut-release.yml@refs/heads/main
+OK (rejects):     https://github.com/policy-as-versioned-nist/other-repo/.github/workflows/cut-release.yml@refs/heads/main
+OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/other.yml@refs/heads/main
+OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/maint/1.0
+OK (rejects):     evil.com/https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/main
+OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/main.evil.com
+OK: EXPECTED_IDENTITY_REGEXP anchors org/repo/workflow and allows only main + release/<major>.<minor>.x
+==> dry-run: publish.sh seeds + tags cleanly
+Skipped commit://staged/NIST_SP-800-53_rev5.2.0_catalog.json: content is over 1,048,576 bytes
+
+No secrets have been found
+
+OK: nist catalog verified + publishable

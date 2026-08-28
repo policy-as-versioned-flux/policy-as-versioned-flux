@@ -1,0 +1,203 @@
+[1;36m==>[0m 0. the subject — six filings, and three layers each dated by its own evidence
+netflix model repository -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/netflix
+  deterministic: same content, same commit sha, on every machine
+  2010-12-01  world layer
+  2011-01-01  the overlay and the scenario, before the first checkpoint
+  2011-01-26  checkpoint: q4-2010-letter-2011-01-26
+  2011-04-25  checkpoint: q1-2011-letter-2011-04-25
+  2011-04-26  the value chain the Q1 letter names
+  2011-07-25  checkpoint: q2-2011-letter-2011-07-25
+  2011-07-26  two rival world models, one the subject's own framing
+  2011-09-15  checkpoint: guidance-cut-2011-09-15
+  2011-10-24  checkpoint: q3-2011-letter-2011-10-24
+  2012-01-25  checkpoint: q4-2011-letter-2012-01-25
+  2012-01-26  the causal layer, the eye that pays, and the candidate responses
+  2011-11-01  an enactment record for the price-hold response (build ticket 86)
+  2011-11-03  a second, independent enactment record for the same response
+[1;36m==>[0m 0b. THE SENSE STEP — a bound signal is an observation, and belief updates both ways (build ticket 80)
+[1;36m==>[0m     the Q4 2011 letter is the same checkpoint step 6's causal edge itself waits on
+bound-signal -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/artefacts/sense.json
+  attestation  sense.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       1a22f0e804489a4a285ed8e48891d09d6cd342f65486187716a1dd797bc078a5
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+  signal q4-2011-letter-2012-01-25 binds streaming-service; belief updates UPSTREAM about ['dvd-by-mail'] (an observation, decision ticket 11 Q4) and DOWNSTREAM about (nothing further downstream of streaming-service) — an intervention on this same component would reach the same downstream and none of that upstream
+[1;36m==>[0m 1. THE THREAT PATH — rewound to 2011-08-01 under as-consumed, then projected
+[1;36m==>[0m    three world models, none privileged, and nothing collapses them into one number
+==> netflix: would-the-twin-have-flagged-it rewound to 2011-08-01 — scoring-eligible under as-consumed
+forecast-bundle -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/artefacts/forecast-bundle.json
+  attestation  forecast-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       de508f4550148b82262bbf9f89886d53796e70137281a34f0f86d4e8b3b57776
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+  the-subjects-own-framing-2011-07     p=0.05
+  market-consensus-2011                p=0.15
+  the-cannibalisation-sceptic-2011-07  p=0.55
+  3 forecasts, spread 0.50, and no field anywhere that merges them
+  no score, by construction: this org has no answer key. Netflix's fame makes anticipation
+  indistinguishable from recital, so falsifiability is Royal Mail's beat and lands red there.
+[1;36m==>[0m 2. THE OPPORTUNITY PATH — the same dated state, and opportunities are PULLED not pushed
+==> netflix as at 2011-08-01: commit 3d1fb95e715d, committed 2011-07-26T21:00:00Z
+  3 components, 2 edges, 0 causal
+  a model state, not a filtered view: everything downstream reads it unchanged
+rewound-model -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/artefacts/rewind.json
+  attestation  rewind.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       b204e47519ce3b432a45dee96ccae520affc274e4f23a78a59de6535ae3a4b38
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> gameplay sweep across 1 repo(s), 1 org(s): 1 opportunity candidate(s) pulled, 3 signal(s) pushed
+opportunity-sweep -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/artefacts/opportunity-sweep.json
+  attestation  opportunity-sweep.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       1104a8e18f44087395c05ac7989131633b5cd14495a9cdae13fd1b78c439fcfc
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+  land-grab      streaming-service
+    streaming-service sits at evolution position 0.62 in the product stage, nearing commodity. The org already holds an adjacent capability, personalisation-technology (held by the-personalisation-engineering-group), in the value chain next to it. Incumbency is not checked: this map carries no data on whether a rival already holds the emerging position.
+  1 pulled against 3 pushed — the counterweight to the record's negativity bias, measured rather than claimed
+[1;36m==>[0m 3. the eye that pays, and the pre-filter that runs BEFORE anything prices
+==> netflix: 3 option(s) considered for 'the-operator', 2 priced, 1 removed before pricing
+  removed  rank-domestic-members-by-cancellation-risk forbidden — no-individual-level-output (universal tier), no figure
+  priced   hold-the-bundled-price-for-one-quarter 30000000.0/45000000.0/70000000.0 mean 46666666.6667, sampled p50 46287011.5481
+  priced   ship-one-bill-and-one-sign-in-across-the-two-plans 10000000.0/15000000.0/22000000.0 mean 15333333.3333, sampled p50 15142499.58
+  a constraint is not a very large price: a removed option carries no number at all
+priced-option-set -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/artefacts/options.json
+  attestation  options.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       7b359d9cfe0573089d0863a582b7c384f220be3a96527bb58a0f7fb98a3e85d6
+  depth        full
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+[1;36m==>[0m 4. the synthetic substrate, and the limitation that travels beside every result from it
+[1;36m==>[0m    a method footnote, not a thesis claim — placed before governance and pricing, not after
+==> netflix: substrate fidelity at 2011-10-24, detection scored at 2011-10-24
+  signal_to_noise      0.121  within [0.05, 0.25]
+  plant_difficulty     0.275  within [0.05, 0.5]
+  plant_difficulty_spread 0.600  within [0.05, 1.0]
+  spine_consistency    1.000  within [1.0, 1.0]
+  reporting_asymmetry  0.667  within [0.6, 0.95]
+  mundanity            0.879  within [0.7, 1.0]
+  contamination        0.000  within [0.0, 0.0]
+  free-running         28 line(s) against 5 anchored — the diff-against-the-spine attack has somewhere to hide a plant
+  hit rate             25%, mean score 0.250
+    events           missed  horizon 2011-09-30  not detected: no detection at events[3] ('an unusual incident review opens after hours, examining access to the member billing export')
+    communications   missed  horizon 2011-10-24  not detected: no detection at communications[3] ('a press query is withdrawn abruptly, days after an earlier complaint thread was escalated')
+    hr               timely  horizon 2011-11-15  detected at 2011-10-24, on or before the actionability horizon 2011-11-15 — still actionable
+    telemetry        missed  horizon 2011-09-20  not detected: no detection at telemetry[3] ('an overnight export of the member table runs outside the scheduled batch, with no ticket raised')
+  limitation:  planter and detector are the same model family and share model priors (decision ticket 12 Q2): a synthetic result is never evidence the twin anticipates the world, only evidence that the detection machinery works. The detector may find a plant because it thinks like the planter, not because the signal was findable by an independently-minded reader.
+substrate-report -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/artefacts/substrate-report.json
+  attestation  substrate-report.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       186420ffbed97daf866204328e573c3f9a601155f3a1ec474627fac73d1b1729
+  depth        full
+    synthetic-substrate full     7/7 of decision ticket 12  unchecked: -
+[1;36m==>[0m 5. VERSIONED GOVERNANCE (c) — the twin proposes, and there is no command that disposes
+[1;36m==>[0m    through the 'record' channel, because this lever is not code: a signed versioned record
+[1;36m==>[0m    that it was enacted, without policy enforcing it
+==> netflix: proposes hold-the-bundled-price-for-one-quarter via the 'record' channel
+  means      the verification substrate — a lever that is not code, carrying a versioned signed record that it was enacted without being enforced by policy. Most levers are this one, and the £ engine's cross-domain comparison depends on it
+  disposed   a human, out of band — this tool has no path to it
+  layer      structural absence   twin/enact.py
+    holds      no merge code path exists; the module's public surface is an allow-list
+    fails when the twin is composed with a shell tool, an MCP GitHub server or a subagent with `gh` — the absence still holds and the guarantee is gone, with no diff to twin/ at all
+  layer      tool-call boundary   twin/enact_guard.py, registered as a PreToolUse hook
+    holds      a disposing tool call is refused before it runs, including a subagent's own
+    fails when the registration is deleted, or the twin is driven by a runner that does not honour hooks — a policy check is a call site, and a forgotten call site fails open in silence
+  dependency 6 cross-repository pin(s) (3 self-sync, counted separately): nist, platform consumed by driftwood, ludlow, tuppence
+    limit      3 of 9 pins name a tag and no commit, so the pin is only as immutable as the tag. Every commit line in this estate is a commented-out placeholder; until one is filled in, 'pinned' means 'pinned to a movable name'.
+    limit      3 of 9 pins are a repository syncing itself rather than consuming anybody's policy, and are counted separately: only the 6 cross-repository pins evidence a dependency at all.
+    limit      the signature is the sources' own declaration, checked by nothing here: no tag is verified, no Rekor entry is looked up, and estate/verify/provenance/verify-provenance.sh records that this repository's own commits are not keyless-signed either. 'Signed' is therefore a property of the design, not an observation, and the word does no work until something verifies it.
+    limit      the consumer repositories are separate by URL and not yet by existence: estate/README.md describes a monorepo-style working tree whose top-level directories become their own GitHub repositories *at split*, and each up.sh rewrites the pinned URL to an in-cluster git server for the offline demo. The pins name real separate repositories; whether those repositories are live is a question this code does not ask.
+    limit      read from committed sources, not from a running cluster: this evidences what the repositories declare they consume, never that a control is in force right now. Whether continuous proof of force is required at all is build ticket 65's question and is still open.
+    limit      these pins are read from this tool's own repository (.estate-clone), not from any repository 'netflix' owns. The dependency block above evidences what THIS estate consumes; it names no pin, tag or repository belonging to the subject the proposal is about, and 'netflix' is not assumed to have an estate under Flux at all.
+  narrowed   Policy-as-code is AN enactment arm, not THE definition of governance. Responses are priced by the FAIR factor they modify and most levers are not code, so if versioned policy were the shape of governance the cross-domain comparison the £ engine exists for could not exist.
+enactment-proposal -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/artefacts/enactment-proposal.json
+  attestation  enactment-proposal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       0974a2b121c4ce47f1022a057b44261321400f147a2f73db678d31b916e393ef
+  depth        full
+    enactment          full     5/5 of decision ticket 18  unchecked: -
+  the dependency block's own last limit says whose estate those pins are (not netflix's) —
+  the caveat travels IN the artefact, not only in this terminal.
+  read the narrowed claim beside step 6: most levers are not code, so if versioned policy
+  were the shape of governance, the cross-domain comparison could not exist at all.
+[1;36m==>[0m 6. THE CROSS-DOMAIN COMPARISON (a) — a non-technical lever against a technical control
+[1;36m==>[0m    one shock at 'dvd-by-mail', one unit, and the mitigation claims graded separately
+==> netflix: a shock at 'dvd-by-mail', priced under 1 perspective(s)
+  the-operator
+    price    streaming-service        23,800,000 / 47,600,000 / 95,200,000  grade 1
+    option   hold-the-bundled-price-for-one-quarter cost 46,666,667, credit 19,040,000
+    option   ship-one-bill-and-one-sign-in-across-the-two-plans cost 15,333,333, the-mitigation-claim-is-graded-outside-the-pricing-threshold
+  prices, costs and credits in one unit, in the order they were authored. Nothing marks one option best and nothing recommends one
+priced-impact -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/artefacts/price.json
+  attestation  price.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       737e6c8e9f9094e4323076561cdcaa6e060d92cc10f648de569b4b2eda1c6001
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+  the lever is the one with the evidence. The engineering control's claim is graded 3 and
+  earns no credit at all — a governance tool showing the control winning here would be
+  showing a number nothing behind it supports.
+[1;36m==>[0m 7. THE OUTPUT IS A CURVE (a) — and the accounts disagree about which response is cheapest
+[1;36m==>[0m    three rival readings of the same two filings, none privileged, nothing averaging them away
+[1;36m==>[0m    the beat's last computed claim, by design — decision ticket 22: earn credibility, then spend it
+==> netflix/the-operator: a shock at 'dvd-by-mail', 2 response(s) across 3 account(s)
+  hold-the-bundled-price-for-one-quarter range=57,120,000  (the-damage-was-mostly-the-rebrand=35,480,000, the-shock-crossed-to-the-streaming-side=-21,640,000, the-shock-stayed-on-the-dvd-side=25,960,000)
+  ship-one-bill-and-one-sign-in-across-the-two-plans range=0  (the-damage-was-mostly-the-rebrand=15,000,000, the-shock-crossed-to-the-streaming-side=15,000,000, the-shock-stayed-on-the-dvd-side=15,000,000)
+  agreement  unanimous=False  the named accounts disagree about which response is cheapest — reported here rather than smoothed into the default below, because a credible disagreement about the mechanism is the most decision-relevant fact on the page
+  default    hold-the-bundled-price-for-one-quarter — the option whose mean net cost of risk across the named accounts is lowest — a default point for a reader who wants one, computed rather than declared, and not a recommendation. No account is privileged, so the mean rather than any one account's own figure is what breaks the tie; naming or dropping a rival account can move it
+trade-off-curve -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-netflix.VODqm05p/artefacts/trade-off-curve.json
+  attestation  trade-off-curve.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       6ff548c3f5847bb0a9fbfff5e31a32958ef1d18ee4a6aaf5e37e39401010200e
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+  believe the-damage-was-mostly-the-rebrand        and ship-one-bill-and-one-sign-in-across-the-two-plans is cheapest
+  believe the-shock-crossed-to-the-streaming-side  and hold-the-bundled-price-for-one-quarter is cheapest
+  believe the-shock-stayed-on-the-dvd-side         and ship-one-bill-and-one-sign-in-across-the-two-plans is cheapest
+  the default is hold-the-bundled-price-for-one-quarter, one marked point on the curve — the reader draws the trade-off
+[1;36m==>[0m 8. the demo's own depth grade, and the engine's — computed checklists, never typed
+==> demo-slice: full  (4/4 of decision ticket 22)
+  [x] 1. A single demonstrable thesis, stated in one sentence.
+        build ticket 91: `twin/demo_slice.py`'s `THESIS` constant — decision ticket 22's own resolved Q1 answer, verbatim, in one place rather than distributed across comments and echo statements. `summary()` composes it into the artefact `twin demo-slice` emits; tests/test_demo_slice.py::test_summary_composes_all_four_pieces asserts the body carries it unchanged.
+  [x] 2. Subject + scenario selection, with rationale.
+        build ticket 91: `twin/demo_slice.py`'s `SUBJECTS` — the Royal Mail / Netflix / Intel rationale (contamination-driven for Royal Mail, whole-engine for Netflix, live-and-unresolved for Intel) collected from decision ticket 22 and build tickets 71/73/75 into the artefact's own data, not left as reference-only prose. tests/test_demo_slice.py::test_summary_composes_all_four_pieces asserts all three subjects carry a non-empty rationale.
+  [x] 3. An explicit shown/stubbed/absent boundary and how it is surfaced.
+        build ticket 91: `twin/demo_slice.boundary()` wires `does_not_do.published()` and `Capabilities.load()` (build ticket 77's own mechanism), filtered to `TOUCHED_CAPABILITIES` — the capabilities the three beat scripts' own artefact-producing verbs actually carry, read from their own `CAPS_*` constants rather than retyped. `shown` names them, `stubbed` is the does-not-do register's entries scoped to them, `absent` is every other loaded capability (`ethics-gate`, `forecast-book`, `honest-build`, `twin-inside-twin` today) — surfaced in the artefact's own body and printed by `twin demo-slice`, not narrated in prose a viewer has to trust. tests/test_demo_slice.py::test_boundary_shown_and_absent_partition_the_loaded_capabilities and ::test_boundary_stubbed_entries_are_scoped_to_touched_capabilities_only.
+  [x] 4. Acceptance criteria for the slice, tied back to the owning tickets' criteria.
+        build ticket 91: `twin/demo_slice.py`'s `ACCEPTANCE_CRITERIA` — a table mapping this decision ticket's own four ACs to the build tickets that realise them (71/73/75 for subject selection, 77 for the boundary mechanism, 91 for the rendered artefact itself), emitted in the artefact body and printed by `twin demo-slice`. tests/test_demo_slice.py::test_summary_composes_all_four_pieces asserts all four indices are present, each naming at least one build ticket.
+==> scenario-engine: full  (7/7 of decision ticket 13)
+  [x] 1. The scenario object defined, incl. its references and its relationship to forecasts.
+        build ticket 06: twin/verbs.py run() — a scenario references {components, graph version, world models, time} and emits forecasts as a list, always, one per named world model.
+  [x] 2. Concrete semantics for fast-forward, rewind and play, each distinguished.
+        build ticket 37: twin/verbs.py run() is fast-forward — projection with no intervention, demonstrated in tests/test_four_verbs.py::test_projection_is_run_with_no_intervention. twin/primitives.py rewind() is the time half of rewind (build ticket 35) and twin/regimes.py the information-gate half (build ticket 36). twin/primitives.py Do is play (build ticket 22). Build ticket 37 composes the two primitives into all four operations — projection alone, do() alone (act-now), rewind+do() (the counterfactual), rewind+run() (the backtest, `twin backtest`) — with no backtest-specific code path: harness guard backtest_is_a_pure_composition asserts an explicit rewind+run computes the identical forecast run() alone computes at the same time, differing only in which command produced it.
+  [x] 3. Where scenarios live + how they are versioned/diffed.
+        build ticket 88: Git already supplied the storage/versioning half (build ticket 06); the gap was the renderer. twin/scenario_diff.py's diff() (build ticket 88) takes a scenario id and two git refs — branch-per-scenario (research 03) or two commits on one branch alike, since ModelRepo.open(path, ref=...) already opens either — and reports a field-level diff of the scenario itself (question, proposition, at, horizon, components, world_models) plus a map-diff of every component either side's overlay places (Graph.wardley(), no separate authoring step). Wired as `twin scenario-diff` (twin/cli.py cmd_scenario_diff). tests/test_scenario_diff.py exercises a real repository with a real `explore` branch: a scalar field change and a component's evolution-stage regression both reported, an unchanged field/component not reported, identical refs diffing to nothing, a scenario authored on only one side reported via `scenario_present` rather than refused (mid-flight branch-per-scenario authoring is a real state), and absence at both sides refused.
+  [x] 4. How opportunity/gameplay moves are proposed, with the negativity counterweight addressed.
+        build ticket 46: twin/gameplay_lens.py propose() checks a two-play catalogue (land-grab, exploit-commoditisation) against the current map's evolution positions, needs-edge dependency structure and ownership, with the reason and the checked preconditions attached per opportunity. gameplay_lens.sweep() runs it unconditionally across every org overlay of every named repository, no human naming a component — the structural pull against the record's push (decision ticket 13 Q3) — and reports opportunity-candidate volume beside each org's bound-signal volume in the same artefact so the counterweight is measurable.
+  [x] 5. Admissibility rule for the scenario library.
+        build ticket 69: twin/schema.py's closed COMMITTED_SCENARIO_CLASSES enum and the optional scenario.class field make "belongs to the standing library" mechanical: a scenario is admissible by carrying one of the nine committed classes (or by being unconditionally swept per build ticket 09 — decision ticket 13's other admissibility arm). fixtures.build_library_org populates all nine; harness guard standing_library_covers_committed_classes (twin/invariants/checks.py) fails CI the moment one is silently dropped, demonstrated in tests/test_scenario_library.py::test_dropping_a_committed_class_from_the_library_fails_the_invariant. The full "preconditions/triggers checkable against the map" reading of admissibility — the precondition-triggered arm — stays for build ticket 46 (gameplay-lens); this ticket closes only the committed-set arm.
+  [x] 6. A selection/prioritisation rule for which scenarios run (the combinatorics answer).
+        build ticket 88: The four tiers decision ticket 13 names — standing library, precondition-triggered, event-triggered, ad-hoc — are proven the complete, non-overlapping set by checking the source directly (build ticket 88), the same discipline harness guard `backtest_is_a_pure_composition` already uses for a structural CLI-command claim. tests/test_scenario_selection_tiers.py: exactly two primitives can produce a scenario execution or an opportunity — verbs.run() and gameplay_lens.propose()/.sweep() — and every call site of either across twin/*.py is one of schedule.py (tier 1, standing library, unconditional loop over every scenario in every overlay — no scenario named), gameplay_lens.py (tier 2, unconditional map scan — no component named), or cli.py's cmd_run/cmd_backtest (tiers 3 and 4, event-triggered and ad-hoc, sharing the identical call because decision ticket 13 distinguishes them only by why a human or automation invoked it, not by a different code path); reproduce.py's replay() also calls verbs.run() but originates nothing — it reads the scenario id out of an already-emitted artefact's own recorded command, never a fresh argument. A fifth caller of either primitive anywhere in twin/*.py would fail the test.
+  [x] 7. Exercised on one fear scenario and one opportunity scenario across the co-flagships.
+        build ticket 88: Netflix already had both (build ticket 74): the fear scenario rewound under `as-consumed` (`twin backtest`) and the opportunity a `land-grab` on `streaming-service` pulled by `twin gameplay-sweep`. Intel had only its fear scenario on the real spine (`does-the-14a-bet-land-a-named-customer`, build ticket 75); its opportunity side existed only as the toy `euv-slip-2026` fixture citing `example.invalid`, unrelated to the real spine. Build ticket 88 adds `euv-readiness-wins-the-14a-opportunity` to `fixtures.build_intel_org` — the real, cited EUV causal edge build ticket 81 added (`euv-lithography` -> `leading-edge-foundry-node`), read the upside way: does the subject's own High-NA EUV tooling readiness hold through its own named 2026 go/no-go, positioning it to win the external customer commitment, the reverse of the historical slip the same edge's own note cites. Named honestly rather than forced into the identical shape Netflix's own opportunity took: `gameplay_lens.propose()` finds nothing to pull on this org's overlay (no person edges, no component near the product/commodity band — checked live, not assumed), so the opportunity is authored as a scenario on the same real edge and world models the fear scenario already uses, not pulled by the sweep. Exercised live in `twin/beat-intel.sh` steps 3a/3b (both scenarios run standalone and inside `twin sweep`, byte-identical, plural distinct forecasts each) and asserted in tests/test_intel_beat.py::test_the_opportunity_scenario_is_framed_as_a_win_not_a_threat, ::test_the_opportunity_scenario_is_built_on_the_real_euv_edge_not_a_toy_one (no `example.invalid` anywhere in the emitted artefact), ::test_the_opportunity_forecast_is_plural_and_the_ensemble_genuinely_disagrees, and ::test_no_outcome_is_authored_for_the_opportunity_scenario_either — the same permanent honesty as the fear scenario, since this org's story has not happened yet either way. The toy `euv-slip-2026` fixture in the walking-skeleton `intel` overlay (`fixtures.build()`, distinct from `build_intel_org`) is left as-is: it was never the real spine and this criterion was never asking for that fixture to change, only for the real spine to stop lacking an opportunity side.
+
+PASS: a threat path and an opportunity path both ran end to end on the same dated state. The
+shared-prior limitation travelled with the substrate result before either later claim was
+made. Enactment was proposed and never disposed — versioned governance, spent before the
+beat's concluding claim rather than after it. A non-technical lever and a technical control
+were then priced in one unit, and which of them is cheapest depends on which causal account
+you believe — reported as a curve with the disagreement first, never as a verdict, and the
+last thing this beat computes. No score: this subject carries no answer key, and says so.
+
+artefacts: /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-netflix.VODqm05p/artefacts
+EXIT=0

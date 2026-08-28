@@ -1,0 +1,45 @@
+
+No secrets have been found
+
+
+== 1. single-tag legacy form still works ==
+ok: v1.0.0 does not exist yet
+tagged v1.0.0
+To /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.5fbGDOrgiW/remote.git
+ * [new tag]         v1.0.0 -> v1.0.0
+ok: v1.0.0 pushed
+
+== 2. multi-tag dispatch cuts every tag off the same commit ==
+
+No secrets have been found
+
+ok: v1.0.1 does not exist yet
+ok: v2.0.0 does not exist yet
+tagged v1.0.1
+tagged v2.0.0
+To /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.5fbGDOrgiW/remote.git
+ * [new tag]         v1.0.1 -> v1.0.1
+ * [new tag]         v2.0.0 -> v2.0.0
+ok: v1.0.1 and v2.0.0 both landed on the same commit (76ebe3836449781a5dde85f150cd02c9351ea0c1)
+
+== 3. existing-tag refusal fires for EVERY tag before ANY tag is created ==
+ok: v3.0.0 does not exist yet
+ok: v1.0.0 collision refused, v3.0.0 (listed first) never got created
+
+== 4. a failed push leaves nothing on the remote (atomicity) ==
+tagged v8.0.0
+tagged v9.0.0
+ok: atomic push rejected the whole batch, v8.0.0 did not land alone
+
+== 5. `version`+`tags` together is refused, not silently merged ==
+ok: mixed dispatch refused
+
+== 6. cs-27: every mis-shaped policy tag is refused here, before any tag exists -- not silently ungated ==
+ok: every case/slash/whitespace variant of a policy tag refused before any tag was created
+
+PASS: single-tag legacy form works, multi-tag dispatch cuts every tag
+on the same commit, the existing-tag refusal runs for every tag before
+any tag is created, a failed atomic push leaves nothing on the
+remote, and a mis-shaped policy tag (wrong case, stray slash or
+whitespace) is refused at normalize time -- it can never reach
+cut-release-gate.py's skip branch and get pushed ungated.

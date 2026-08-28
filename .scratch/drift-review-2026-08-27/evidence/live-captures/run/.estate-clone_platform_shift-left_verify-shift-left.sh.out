@@ -1,0 +1,511 @@
+== a compliant change passes across its ±1 supported window ==
+fixtures/workload-compliant.yaml: targets 2.0.0, checking supported window ['2.0.0', '2.0.1']
+--- kyverno apply @ v2.0.0 ---
+Applying 5 policy rule(s) to 1 resource(s)...
+
+policy cage-tier-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  priorityClassName: cage-baseline-2-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-tier-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  priorityClassName: cage-baseline-2-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  priorityClassName: cage-baseline-2-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  priorityClassName: cage-baseline-2-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-netpol-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: egress-lockdown
+  name: cage-egress-lockdown
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+  policyTypes:
+  - Egress
+
+---
+
+
+Generate:
+Generation completed successfully.
+pass: 7, fail: 0, warn: 0, error: 0, skip: 0
+--- kyverno apply @ v2.0.1 ---
+Applying 5 policy rule(s) to 1 resource(s)...
+
+policy cage-tier-2-0-1 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    securityContext:
+      readOnlyRootFilesystem: true
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-tier-2-0-1 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    securityContext:
+      readOnlyRootFilesystem: true
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-2-0-1 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    securityContext:
+      readOnlyRootFilesystem: true
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-2-0-1 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    securityContext:
+      readOnlyRootFilesystem: true
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+skipped mutate policy cage-tier-2-0-1 -> resource default/Pod/checkout-svc
+
+skipped mutate policy stamp-posture-2-0-1 -> resource default/Pod/checkout-svc
+
+pass: 1, fail: 0, warn: 0, error: 0, skip: 6
+
+shift-left: fixtures/workload-compliant.yaml is compliant across its supported window ['2.0.0', '2.0.1']
+
+== an unversioned workload is out of scope, passes trivially ==
+fixtures/workload-unversioned.yaml: unversioned (no policy-as-versioned.dev/policy-version label) -- out of scope, pass
+
+== an Audit->Deny flip is caught pre-merge (must fail CI) ==
+fixtures/workload-flip.yaml: targets 2.0.0, checking supported window ['2.0.0', '2.0.1']
+--- kyverno apply @ v2.0.0 ---
+Applying 5 policy rule(s) to 1 resource(s)...
+
+policy cage-tier-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  priorityClassName: cage-baseline-2-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-tier-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  priorityClassName: cage-baseline-2-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  priorityClassName: cage-baseline-2-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  priorityClassName: cage-baseline-2-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-netpol-2-0-0 applied to default/Pod/checkout-svc:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: egress-lockdown
+  name: cage-egress-lockdown
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+  policyTypes:
+  - Egress
+
+---
+
+
+Generate:
+Generation completed successfully.
+pass: 7, fail: 0, warn: 0, error: 0, skip: 0
+--- kyverno apply @ v2.0.1 ---
+Applying 5 policy rule(s) to 1 resource(s)...
+
+policy cage-tier-2-0-1 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-tier-2-0-1 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-2-0-1 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-2-0-1 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 2.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+skipped mutate policy cage-tier-2-0-1 -> resource default/Pod/checkout-svc
+
+skipped mutate policy stamp-posture-2-0-1 -> resource default/Pod/checkout-svc
+
+pass: 1, fail: 0, warn: 0, error: 0, skip: 6
+
+shift-left: fixtures/workload-flip.yaml is compliant across its supported window ['2.0.0', '2.0.1']
+FAIL: ci-check.py passed a workload that fails its target version's real rule

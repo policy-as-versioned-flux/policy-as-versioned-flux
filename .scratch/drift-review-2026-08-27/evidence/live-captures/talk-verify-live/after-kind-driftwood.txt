@@ -1,0 +1,24 @@
+=== kind-driftwood nodes ===
+NAME                      STATUS   ROLES           AGE   VERSION
+driftwood-control-plane   Ready    control-plane   26d   v1.36.1
+=== kind-driftwood kustomizations ===
+NAMESPACE     NAME        AGE   READY   STATUS
+flux-system   driftwood   26d   True    Applied revision: sha1:de9f0f61f0c299a94256dd0e27136f1c45c8467f
+=== kind-driftwood gitrepositories ===
+NAMESPACE     NAME        URL                                                                         AGE   READY   STATUS
+flux-system   driftwood   http://git-server.flux-system.svc.cluster.local/cgi-bin/git/driftwood.git   26d   True    stored artifact for revision 'sha1:de9f0f61f0c299a94256dd0e27136f1c45c8467f'
+flux-system   nist        http://git-server.flux-system.svc.cluster.local/cgi-bin/git/nist.git        26d   True    stored artifact for revision 'sha1:55a5bfe790fe5a0ca47fb0bb29440b81a111f28d'
+=== kind-driftwood gitrepo spec.ref ===
+driftwood	{"commit":"de9f0f61f0c299a94256dd0e27136f1c45c8467f","tag":"v1.0.0"}
+nist	{"commit":"55a5bfe790fe5a0ca47fb0bb29440b81a111f28d","tag":"v1.0.0"}
+
+=== kind-driftwood non-running pods ===
+NAMESPACE            NAME                                                    READY   STATUS             RESTARTS          AGE
+currency-system      currency-controller-29797295-pzgkd                      0/1     Error              0                 66s
+currency-system      currency-controller-29797295-z422x                      0/1     Error              0                 81s
+currency-system      currency-controller-29797296-bwfrl                      0/1     Error              0                 9s
+currency-system      currency-controller-29797296-f8r7k                      0/1     Error              0                 21s
+currency-system      currency-verify-7fh2f                                   0/1     Error              0                 102s
+currency-system      currency-verify-xq2fl                                   0/1     Error              0                 114s
+spire-system         spire-agent-qh6rf                                       0/1     CrashLoopBackOff   398 (98s ago)     6d22h
+spire-system         spire-spiffe-oidc-discovery-provider-75d5bc7bb8-c55sl   0/2     Unknown            56 (6d22h ago)    26d

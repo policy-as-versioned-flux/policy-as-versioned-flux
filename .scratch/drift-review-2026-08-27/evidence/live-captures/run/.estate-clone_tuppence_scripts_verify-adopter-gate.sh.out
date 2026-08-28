@@ -1,0 +1,23 @@
+
+== Scenario D: against the REAL, currently-tagged v1.0.0 (predates cs-27) -- honest current-state refusal ==
+ok  platform checked out at v1.0.0, resolved commit matches the pinned commit field (e34ae7f5d38feede2c30ef45037ec9af0d3f43b3)
+REFUSED: no signed evidence committed for policy version 2.0.0 at computed-semver/evidence/2.0.0.json -- the institution cannot trust an unverified bump
+ok  D: real refusal against the real repo's own current tags -- no evidence exists yet, correctly refused
+
+== Scenario C: commit-pin mismatch -- ADR-0001's pin made load-bearing ==
+REFUSED: platform-pin.yaml names commit 0000000000000000000000000000000000000c for tag v1.0.0, but the tag actually resolves to e34ae7f5d38feede2c30ef45037ec9af0d3f43b3 -- ADR-0001's pin disagrees with reality
+ok  C: a pin naming the wrong commit for its own tag is refused, naming the real resolved commit
+
+== Scenario D2: a REAL cosign verify-blob rejection of a present-but-malformed bundle (the real binary reaches the trust check itself, not just the file-existence check) ==
+ok  platform checked out at v1.0.0, resolved commit matches the pinned commit field (e34ae7f5d38feede2c30ef45037ec9af0d3f43b3)
+REFUSED: cosign verify-blob failed for policy version 2.0.0 evidence (identity '.*'): Error: bundle does not contain cert for verification, please provide public key
+error during command execution: bundle does not contain cert for verification, please provide public key
+ok  D2: real cosign verify-blob genuinely rejects a present-but-malformed bundle (not just a missing-file check)
+
+== Scenario E: parse_pin() against the REAL, committed platform-pin.yaml shape -- a genuine two-document YAML stream (GitRepository + Kustomization), not a hand-written single-document fixture ==
+ok  platform checked out at v1.1.1, resolved commit matches the pinned commit field (58ef9c57e53543997e5ddbe829a7b7c9a2282c60)
+REFUSED: cosign verify-blob failed for policy version 2.0.0 evidence (identity '.*'): Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+FAIL: E: expected parse_pin() to read tag/commit past the real file's Kustomization document and reach a real checkout+commit-match, got: ok  platform checked out at v1.1.1, resolved commit matches the pinned commit field (58ef9c57e53543997e5ddbe829a7b7c9a2282c60)
+REFUSED: cosign verify-blob failed for policy version 2.0.0 evidence (identity '.*'): Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com

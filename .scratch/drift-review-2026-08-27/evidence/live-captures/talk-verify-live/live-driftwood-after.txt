@@ -1,0 +1,6 @@
+[1;36m==>[0m 1. GitRepository is Ready and pinned to a tag+commit
+[1;36m==>[0m 2. Kustomization is Ready (reconcile healthy)
+[1;36m==>[0m 3. the reconciled content actually landed in the cluster
+[1;36m==>[0m 4. the pinned nist (regulator) dependency reconciled healthy
+FAIL: nist-pin configmap not reconciled (got '1.1.0')
+exit=1

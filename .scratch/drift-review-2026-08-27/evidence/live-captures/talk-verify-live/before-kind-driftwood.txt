@@ -1,0 +1,23 @@
+=== kind-driftwood nodes ===
+NAME                      STATUS   ROLES           AGE   VERSION
+driftwood-control-plane   Ready    control-plane   26d   v1.36.1
+exit=0
+=== kind-driftwood kustomizations ===
+NAMESPACE     NAME        AGE   READY   STATUS
+flux-system   driftwood   26d   True    Applied revision: v1.0.0@sha1:92034b0927eb0c15aa9760deddbe6da2960038f0
+exit=0
+=== kind-driftwood gitrepositories ===
+NAMESPACE     NAME        URL                                                          AGE   READY   STATUS
+flux-system   driftwood   https://github.com/policy-as-versioned-driftwood/driftwood   26d   True    stored artifact for revision 'v1.0.0@sha1:92034b0927eb0c15aa9760deddbe6da2960038f0'
+flux-system   nist        https://github.com/policy-as-versioned-nist/nist             26d   True    stored artifact for revision 'v1.0.0@sha1:e5953e1a96018e9a29677c66cd61939ad796d25e'
+exit=0
+=== kind-driftwood non-running pods ===
+NAMESPACE            NAME                                                    READY   STATUS    RESTARTS          AGE
+currency-system      currency-controller-29797256-fgccn                      0/1     Error     0                 2m1s
+currency-system      currency-controller-29797256-vld7p                      0/1     Error     0                 106s
+currency-system      currency-controller-29797257-96j2z                      0/1     Error     0                 100s
+currency-system      currency-controller-29797257-blmbc                      0/1     Error     0                 85s
+currency-system      currency-controller-29797258-lkp9v                      0/1     Error     0                 40s
+currency-system      currency-controller-29797258-ncxxt                      0/1     Error     0                 56s
+spire-system         spire-spiffe-oidc-discovery-provider-75d5bc7bb8-c55sl   0/2     Unknown   56 (6d21h ago)    26d
+exit=0

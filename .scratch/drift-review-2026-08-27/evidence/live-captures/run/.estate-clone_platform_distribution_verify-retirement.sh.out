@@ -1,0 +1,6 @@
+[1;36m==>[0m 1. before retirement: a pod on 2.0.0 is admitted (version is declared)
+[1;36m==>[0m 2. retire 2.0.0 from the array (one deletion) and re-render
+[1;36m==>[0m 3. after retirement: the same pod is now DENIED (orphaned by the shrunk array)
+[1;36m==>[0m    (live: dropping the array element prunes Kustomization policy-v2-0-0)
+[1;36m==>[0m 4. live: policy-v2-0-0 Kustomization is gone at context 'kind-driftwood' — retirement pruned it live
+PASS: retiring a version (one array deletion) prunes it and denies stragglers.

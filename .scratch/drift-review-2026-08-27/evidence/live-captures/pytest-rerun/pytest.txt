@@ -1,0 +1,480 @@
+bringing up nodes...
+bringing up nodes...
+
+.............................................FFFFFF....F................ [  4%]
+....F...F..FFF.......................................................... [  9%]
+........................................................................ [ 13%]
+........................................................................ [ 18%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 32%]
+........................................................................ [ 37%]
+........................................................................ [ 41%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 60%]
+........................................................................ [ 65%]
+........................................................................ [ 69%]
+........................................................................ [ 74%]
+........................................................................ [ 79%]
+........................................................................ [ 83%]
+........................................................................ [ 88%]
+........................................................................ [ 93%]
+........................................................................ [ 97%]
+.............F.................                                          [100%]
+=================================== FAILURES ===================================
+__ test_layer_2_refuses_a_merge_through_every_composition_path[Bash-payload0] __
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tool = 'Bash', payload = {'command': 'gh pr merge 42 --squash'}
+
+    @pytest.mark.parametrize(("tool", "payload"), DISPOSES)
+    def test_layer_2_refuses_a_merge_through_every_composition_path(tool: str, payload: dict) -> None:
+>       assert enact_guard.decide(tool, payload) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('Bash', {'command': 'gh pr merge 42 --squash'})
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+
+tests/test_enact.py:61: AssertionError
+__ test_layer_2_refuses_a_merge_through_every_composition_path[Bash-payload1] __
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tool = 'Bash'
+payload = {'command': 'gh api --method PUT repos/o/r/pulls/42/merge'}
+
+    @pytest.mark.parametrize(("tool", "payload"), DISPOSES)
+    def test_layer_2_refuses_a_merge_through_every_composition_path(tool: str, payload: dict) -> None:
+>       assert enact_guard.decide(tool, payload) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('Bash', {'command': 'gh api --method PUT repos/o/r/pulls/42/merge'})
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+
+tests/test_enact.py:61: AssertionError
+__ test_layer_2_refuses_a_merge_through_every_composition_path[Bash-payload2] __
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tool = 'Bash', payload = {'command': 'cd /tmp/work && gh pr merge --auto 7'}
+
+    @pytest.mark.parametrize(("tool", "payload"), DISPOSES)
+    def test_layer_2_refuses_a_merge_through_every_composition_path(tool: str, payload: dict) -> None:
+>       assert enact_guard.decide(tool, payload) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('Bash', {'command': 'cd /tmp/work && gh pr merge --auto 7'})
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+
+tests/test_enact.py:61: AssertionError
+_ test_layer_2_refuses_a_merge_through_every_composition_path[mcp__github__merge_pull_request-payload3] _
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tool = 'mcp__github__merge_pull_request', payload = {'pullNumber': 42}
+
+    @pytest.mark.parametrize(("tool", "payload"), DISPOSES)
+    def test_layer_2_refuses_a_merge_through_every_composition_path(tool: str, payload: dict) -> None:
+>       assert enact_guard.decide(tool, payload) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('mcp__github__merge_pull_request', {'pullNumber': 42})
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+
+tests/test_enact.py:61: AssertionError
+_ test_layer_2_refuses_a_merge_through_every_composition_path[merge_pull_request-payload4] _
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tool = 'merge_pull_request', payload = {'pullNumber': 42}
+
+    @pytest.mark.parametrize(("tool", "payload"), DISPOSES)
+    def test_layer_2_refuses_a_merge_through_every_composition_path(tool: str, payload: dict) -> None:
+>       assert enact_guard.decide(tool, payload) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('merge_pull_request', {'pullNumber': 42})
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+
+tests/test_enact.py:61: AssertionError
+_ test_layer_2_refuses_a_merge_through_every_composition_path[mcp__forge__squash_pull_request-payload5] _
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tool = 'mcp__forge__squash_pull_request', payload = {'pullNumber': 42}
+
+    @pytest.mark.parametrize(("tool", "payload"), DISPOSES)
+    def test_layer_2_refuses_a_merge_through_every_composition_path(tool: str, payload: dict) -> None:
+>       assert enact_guard.decide(tool, payload) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('mcp__forge__squash_pull_request', {'pullNumber': 42})
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+
+tests/test_enact.py:61: AssertionError
+________ test_layer_2_refuses_a_direct_push_to_an_enactment_repository _________
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+    def test_layer_2_refuses_a_direct_push_to_an_enactment_repository() -> None:
+        """Pushing to the enactment repository is disposal without even the pull request."""
+        named = "git push https://github.com/policy-as-versioned-platform/platform HEAD:main"
+>       assert enact_guard.decide("Bash", {"command": named}) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('Bash', {'command': 'git push https://github.com/policy-as-versioned-platform/platform HEAD:main'})
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+
+tests/test_enact.py:72: AssertionError
+___ test_layer_2_resolves_a_bare_remote_rather_than_only_reading_the_command ___
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw7/test_layer_2_resolves_a_bare_r0')
+
+    def test_layer_2_resolves_a_bare_remote_rather_than_only_reading_the_command(tmp_path: Path) -> None:
+        """`git push origin main` names no URL, so the remote has to be resolved to decide."""
+        import subprocess
+    
+        work = tmp_path / "consumer"
+        work.mkdir()
+        subprocess.run(["git", "init", "-q"], cwd=work, check=True)
+        subprocess.run(
+            ["git", "remote", "add", "origin", "https://github.com/policy-as-versioned-ludlow/ludlow"],
+            cwd=work, check=True,
+        )
+>       assert enact_guard.decide("Bash", {"command": "git push origin main"}, str(work)) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('Bash', {'command': 'git push origin main'}, '/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw7/test_layer_2_resolves_a_bare_r0/consumer')
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+E        +    and   '/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw7/test_layer_2_resolves_a_bare_r0/consumer' = str(PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw7/test_layer_2_resolves_a_bare_r0/consumer'))
+
+tests/test_enact.py:86: AssertionError
+_____ test_a_push_to_a_sibling_repository_in_the_same_org_is_still_refused _____
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+    def test_a_push_to_a_sibling_repository_in_the_same_org_is_still_refused() -> None:
+        """The sharp edge of the carve-out, and the reason it compares whole repositories rather than
+        the `policy-as-versioned-*` prefix: that prefix is the **org**, and the org holds the enactment
+        repositories beside the twin's own. Matching on it would have opened every one of them."""
+        refused = enact_guard.decide("Bash", {"command": f"git push {SIBLING_IN_THE_SAME_ORG} main"})
+>       assert refused is not None, "the carve-out leaked from the twin's own repository to the org"
+E       AssertionError: the carve-out leaked from the twin's own repository to the org
+E       assert None is not None
+
+tests/test_enact.py:115: AssertionError
+___ test_the_carve_out_is_anchored_to_this_file_not_to_the_callers_directory ___
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw7/test_the_carve_out_is_anchored0')
+
+    def test_the_carve_out_is_anchored_to_this_file_not_to_the_callers_directory(tmp_path: Path) -> None:
+        """A `cd` into an enactment repository must not make that repository "our own". The guard
+        resolves its own origin from `__file__`, so the caller's `cwd` cannot move the boundary."""
+        import subprocess
+    
+        impostor = tmp_path / "impostor"
+        impostor.mkdir()
+        subprocess.run(["git", "init", "-q"], cwd=impostor, check=True)
+        subprocess.run(
+            ["git", "remote", "add", "origin", "https://github.com/policy-as-versioned-nist/nist"],
+            cwd=impostor, check=True,
+        )
+>       assert enact_guard.decide("Bash", {"command": "git push origin main"}, str(impostor)) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('Bash', {'command': 'git push origin main'}, '/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw7/test_the_carve_out_is_anchored0/impostor')
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+E        +    and   '/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw7/test_the_carve_out_is_anchored0/impostor' = str(PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw7/test_the_carve_out_is_anchored0/impostor'))
+
+tests/test_enact.py:131: AssertionError
+__ test_the_refusal_stays_closed_when_the_guard_cannot_resolve_its_own_origin __
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10c33e060>
+
+    def test_the_refusal_stays_closed_when_the_guard_cannot_resolve_its_own_origin(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """An unresolvable origin must not read as "everything is our own". Fail closed: with no
+        known own repository, every enactment target is refused exactly as it was before."""
+        monkeypatch.setattr(enact_guard, "_own_repository", lambda cwd: "")
+>       assert enact_guard.decide("Bash", {"command": f"git push {OWN_REPOSITORY} main"}) is not None
+E       AssertionError: assert None is not None
+E        +  where None = <function decide at 0x10bd36f00>('Bash', {'command': 'git push https://github.com/policy-as-versioned-flux/policy-as-versioned-flux main'})
+E        +    where <function decide at 0x10bd36f00> = enact_guard.decide
+
+tests/test_enact.py:140: AssertionError
+___________ test_the_hook_emits_a_deny_decision_a_runtime_can_act_on ___________
+[gw7] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10c33ce90>
+capsys = <_pytest.capture.CaptureFixture object at 0x10c0daf90>
+
+    def test_the_hook_emits_a_deny_decision_a_runtime_can_act_on(
+        monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
+    ) -> None:
+        _feed(monkeypatch, json.dumps({"tool_name": "Bash", "tool_input": DISPOSES[0][1]}))
+        assert enact_guard.main() == 0
+>       decision = json.loads(capsys.readouterr().out)["hookSpecificOutput"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_enact.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x10a248590>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+___________________________ test_the_suite_is_green ____________________________
+[gw4] darwin -- Python 3.14.6 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+suite_results = ({'a_challenge_to_a_constituent_survives_an_unrelated_resolution': Result(number=11, name='a_challenge_to_a_constituen...88888.89 vs 366666.67); xi>=1 refuses at the shape boundary and xi=0.99 still computes', invariant=False), ...}, False)
+
+    def test_the_suite_is_green(suite_results: tuple[dict[str, Result], bool]) -> None:
+        by_name, ok = suite_results
+        failed = [r for r in by_name.values() if r.status == FAIL]
+>       assert not failed, [f"{r.name}: {r.detail}" for r in failed]
+E       AssertionError: ['drift_window_was_declared_before_it_was_measured: 3 probe sample(s) exist and the window has never been committed, s...le(s) exist and forced-campaign.yaml has never been committed, so nothing establishes it was declared before the data']
+E       assert not [Result(number=42, name='drift_window_was_declared_before_it_was_measured', status='FAIL', detail='3 probe sample(s) e...rced-campaign.yaml has never been committed, so nothing establishes it was declared before the data', invariant=False)]
+
+tests/test_invariant_suite.py:43: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+==> netflix: would-the-twin-have-flagged-it rewound to 2011-08-01 — scoring-eligible under as-consumed
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/netflix-engine-guard/threat.json
+  attestation  threat.json.att.json (agent-signed (origin only))
+  sha256       de508f4550148b82262bbf9f89886d53796e70137281a34f0f86d4e8b3b57776
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix as at 2011-08-01: commit 3d1fb95e715d, committed 2011-07-26T21:00:00Z
+  3 components, 2 edges, 0 causal
+  a model state, not a filtered view: everything downstream reads it unchanged
+rewound-model -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/netflix-engine-guard/rewind.json
+  attestation  rewind.json.att.json (agent-signed (origin only))
+  sha256       b204e47519ce3b432a45dee96ccae520affc274e4f23a78a59de6535ae3a4b38
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> gameplay sweep across 1 repo(s), 1 org(s): 1 opportunity candidate(s) pulled, 3 signal(s) pushed
+opportunity-sweep -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/netflix-engine-guard/sweep.json
+  attestation  sweep.json.att.json (agent-signed (origin only))
+  sha256       1104a8e18f44087395c05ac7989131633b5cd14495a9cdae13fd1b78c439fcfc
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix: 3 option(s) considered for 'the-operator', 2 priced, 1 removed before pricing
+  removed  rank-domestic-members-by-cancellation-risk forbidden — no-individual-level-output (universal tier), no figure
+  priced   hold-the-bundled-price-for-one-quarter 30000000.0/45000000.0/70000000.0 mean 46666666.6667, sampled p50 46287011.5481
+  priced   ship-one-bill-and-one-sign-in-across-the-two-plans 10000000.0/15000000.0/22000000.0 mean 15333333.3333, sampled p50 15142499.58
+  a constraint is not a very large price: a removed option carries no number at all
+priced-option-set -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/netflix-engine-guard/options-head.json
+  attestation  options-head.json.att.json (agent-signed (origin only))
+  sha256       7b359d9cfe0573089d0863a582b7c384f220be3a96527bb58a0f7fb98a3e85d6
+  depth        full
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+==> netflix: a shock at 'dvd-by-mail', priced under 1 perspective(s)
+  the-operator
+    price    streaming-service        23,800,000 / 47,600,000 / 95,200,000  grade 1
+    option   hold-the-bundled-price-for-one-quarter cost 46,666,667, credit 19,040,000
+    option   ship-one-bill-and-one-sign-in-across-the-two-plans cost 15,333,333, the-mitigation-claim-is-graded-outside-the-pricing-threshold
+  prices, costs and credits in one unit, in the order they were authored. Nothing marks one option best and nothing recommends one
+priced-impact -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/netflix-engine-guard/price.json
+  attestation  price.json.att.json (agent-signed (origin only))
+  sha256       737e6c8e9f9094e4323076561cdcaa6e060d92cc10f648de569b4b2eda1c6001
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+==> netflix/the-operator: a shock at 'dvd-by-mail', 2 response(s) across 3 account(s)
+  hold-the-bundled-price-for-one-quarter range=57,120,000  (the-damage-was-mostly-the-rebrand=35,480,000, the-shock-crossed-to-the-streaming-side=-21,640,000, the-shock-stayed-on-the-dvd-side=25,960,000)
+  ship-one-bill-and-one-sign-in-across-the-two-plans range=0  (the-damage-was-mostly-the-rebrand=15,000,000, the-shock-crossed-to-the-streaming-side=15,000,000, the-shock-stayed-on-the-dvd-side=15,000,000)
+  agreement  unanimous=False  the named accounts disagree about which response is cheapest — reported here rather than smoothed into the default below, because a credible disagreement about the mechanism is the most decision-relevant fact on the page
+  default    hold-the-bundled-price-for-one-quarter — the option whose mean net cost of risk across the named accounts is lowest — a default point for a reader who wants one, computed rather than declared, and not a recommendation. No account is privileged, so the mean rather than any one account's own figure is what breaks the tie; naming or dropping a rival account can move it
+trade-off-curve -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/netflix-engine-guard/curve.json
+  attestation  curve.json.att.json (agent-signed (origin only))
+  sha256       6ff548c3f5847bb0a9fbfff5e31a32958ef1d18ee4a6aaf5e37e39401010200e
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+==> netflix: proposes hold-the-bundled-price-for-one-quarter via the 'record' channel
+  means      the verification substrate — a lever that is not code, carrying a versioned signed record that it was enacted without being enforced by policy. Most levers are this one, and the £ engine's cross-domain comparison depends on it
+  disposed   a human, out of band — this tool has no path to it
+  layer      structural absence   twin/enact.py
+    holds      no merge code path exists; the module's public surface is an allow-list
+    fails when the twin is composed with a shell tool, an MCP GitHub server or a subagent with `gh` — the absence still holds and the guarantee is gone, with no diff to twin/ at all
+  layer      tool-call boundary   twin/enact_guard.py, registered as a PreToolUse hook
+    holds      a disposing tool call is refused before it runs, including a subagent's own
+    fails when the registration is deleted, or the twin is driven by a runner that does not honour hooks — a policy check is a call site, and a forgotten call site fails open in silence
+  dependency 6 cross-repository pin(s) (3 self-sync, counted separately): nist, platform consumed by driftwood, ludlow, tuppence
+    limit      3 of 9 pins name a tag and no commit, so the pin is only as immutable as the tag. Every commit line in this estate is a commented-out placeholder; until one is filled in, 'pinned' means 'pinned to a movable name'.
+    limit      3 of 9 pins are a repository syncing itself rather than consuming anybody's policy, and are counted separately: only the 6 cross-repository pins evidence a dependency at all.
+    limit      the signature is the sources' own declaration, checked by nothing here: no tag is verified, no Rekor entry is looked up, and estate/verify/provenance/verify-provenance.sh records that this repository's own commits are not keyless-signed either. 'Signed' is therefore a property of the design, not an observation, and the word does no work until something verifies it.
+    limit      the consumer repositories are separate by URL and not yet by existence: estate/README.md describes a monorepo-style working tree whose top-level directories become their own GitHub repositories *at split*, and each up.sh rewrites the pinned URL to an in-cluster git server for the offline demo. The pins name real separate repositories; whether those repositories are live is a question this code does not ask.
+    limit      read from committed sources, not from a running cluster: this evidences what the repositories declare they consume, never that a control is in force right now. Whether continuous proof of force is required at all is build ticket 65's question and is still open.
+    limit      these pins are read from this tool's own repository (.estate-clone), not from any repository 'netflix' owns. The dependency block above evidences what THIS estate consumes; it names no pin, tag or repository belonging to the subject the proposal is about, and 'netflix' is not assumed to have an estate under Flux at all.
+  narrowed   Policy-as-code is AN enactment arm, not THE definition of governance. Responses are priced by the FAIR factor they modify and most levers are not code, so if versioned policy were the shape of governance the cross-domain comparison the £ engine exists for could not exist.
+enactment-proposal -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/netflix-engine-guard/proposal.json
+  attestation  proposal.json.att.json (agent-signed (origin only))
+  sha256       0974a2b121c4ce47f1022a057b44261321400f147a2f73db678d31b916e393ef
+  depth        full
+    enactment          full     5/5 of decision ticket 18  unchecked: -
+==> netflix: substrate fidelity at 2011-10-24, detection scored at 2011-10-24
+  signal_to_noise      0.121  within [0.05, 0.25]
+  plant_difficulty     0.275  within [0.05, 0.5]
+  plant_difficulty_spread 0.600  within [0.05, 1.0]
+  spine_consistency    1.000  within [1.0, 1.0]
+  reporting_asymmetry  0.667  within [0.6, 0.95]
+  mundanity            0.879  within [0.7, 1.0]
+  contamination        0.000  within [0.0, 0.0]
+  free-running         28 line(s) against 5 anchored — the diff-against-the-spine attack has somewhere to hide a plant
+  hit rate             25%, mean score 0.250
+    events           missed  horizon 2011-09-30  not detected: no detection at events[3] ('an unusual incident review opens after hours, examining access to the member billing export')
+    communications   missed  horizon 2011-10-24  not detected: no detection at communications[3] ('a press query is withdrawn abruptly, days after an earlier complaint thread was escalated')
+    hr               timely  horizon 2011-11-15  detected at 2011-10-24, on or before the actionability horizon 2011-11-15 — still actionable
+    telemetry        missed  horizon 2011-09-20  not detected: no detection at telemetry[3] ('an overnight export of the member table runs outside the scheduled batch, with no ticket raised')
+  limitation:  planter and detector are the same model family and share model priors (decision ticket 12 Q2): a synthetic result is never evidence the twin anticipates the world, only evidence that the detection machinery works. The detector may find a plant because it thinks like the planter, not because the signal was findable by an independently-minded reader.
+substrate-report -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/netflix-engine-guard/substrate.json
+  attestation  substrate.json.att.json (agent-signed (origin only))
+  sha256       186420ffbed97daf866204328e573c3f9a601155f3a1ec474627fac73d1b1729
+  depth        full
+    synthetic-substrate full     7/7 of decision ticket 12  unchecked: -
+==> sweep across 1 repo(s): 2 execution(s), 4 forecast(s), 0 failure(s)
+sweep -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/intel-forecast-guard/sweep.json
+  attestation  sweep.json.att.json (agent-signed (origin only))
+  sha256       9dfe5ec7212febd0999f0534de08030f5cb5f86f46215135978f241e63cd9573
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> intel: does-the-14a-bet-land-a-named-customer under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/intel-forecast-guard/run.json
+  attestation  run.json.att.json (agent-signed (origin only))
+  sha256       3c891bc1da4eef0c1ccc0a6031a1a699297752a8e67b71fc420a342224df6740
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix: dvd-decline-2011 rewound to 2026-01-01 — scoring-eligible under as-consumed
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/guard-backtest.json
+  attestation  guard-backtest.json.att.json (agent-signed (origin only))
+  sha256       5d7231a5720c7c1a8b3ade68f94a1e564cd470b4c9246da46d8ec0bf2ed20de8
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/guard-run.json
+  attestation  guard-run.json.att.json (agent-signed (origin only))
+  sha256       bd21812ad2bafa8bad618651731ab65f3c7b13df22b3340f45347ec7fd58001d
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> royal-mail: would-the-twin-have-flagged-it rewound to 2018-06-01 — scoring-eligible under as-consumed
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/beat/forecast-bundle.json
+  attestation  forecast-bundle.json.att.json (agent-signed (origin only))
+  sha256       a03e55a0e10a54e13e3f6b716863d811cc42d09876d5d765bd429ecab8e73af8
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> carillion: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/beat/carillion-bundle.json
+  attestation  carillion-bundle.json.att.json (agent-signed (origin only))
+  sha256       74725f047f6294fb56d800313ed2db8548597e6dbeedf2baaa54f9513afedd62
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> carillion-collapse-resolved: observed=True, resolved 2018-01-15, contamination low
+  contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+  rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+    market-consensus-2016        p=0.05   brier=0.9025   log-loss=2.9957   [as-consumed]
+score-card -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/beat/carillion-card.json
+  attestation  carillion-card.json.att.json (agent-signed (origin only))
+  sha256       d8f40a7156283f60cb87d15da97533d82433bd3b4d9753921475801fbc2a0938
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+==> enron: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/beat/enron-bundle.json
+  attestation  enron-bundle.json.att.json (agent-signed (origin only))
+  sha256       4e375f00c56348baa430db99564f0af08f244c64e896a9f3ab7898ac0c69600d
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> enron-bankruptcy-resolved: observed=True, resolved 2001-12-02, contamination control
+  contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+  rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+    market-consensus-2001        p=0.03   brier=0.9409   log-loss=3.5066   [as-consumed]
+score-card -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/beat/enron-card.json
+  attestation  enron-card.json.att.json (agent-signed (origin only))
+  sha256       ac0d90d27d6f1d64e9cb2e39893bfb416562c40178c59d42b25a677f1c28d808
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+==> netflix: dvd-decline-2011 under with-hindsight — not scoring-eligible, 0 fact(s) withheld by date
+  ingestion history unavailable: every fact in the repository today was visible to this execution
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/beat/with-hindsight-bundle.json
+  attestation  with-hindsight-bundle.json.att.json (agent-signed (origin only))
+  sha256       082a734b44847c068b1fc4900ed56f6b78e53f41d706471faac16afb6804c4f9
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 1 fact(s) withheld by date
+  withheld dvd-decline-2011-resolved          outcomes, dated 2012-12-31
+  ingestion history unavailable: the ingestion-history filter did not run: this repository has no commit at or before the execution time, so `as-consumed` here rests on fact dates alone. A fact ingested late but dated early is not detectable from this repository.
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-1004/popen-gw4/verify0/beat/as-consumed-bundle.json
+  attestation  as-consumed-bundle.json.att.json (agent-signed (origin only))
+  sha256       c90b827b7e1705fceb8ac1b6822fb54d36c9b2d86f97fa301de96b9aab80447b
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+bound-signal -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-substrate-guard-22cc7uc9/bound-signal.json
+  attestation  bound-signal.json.att.json (agent-signed (origin only))
+  sha256       deecec484590202429548d21ee4596781bf6ee01002dec48b700f892cb211083
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+---------------------------- Captured stderr setup -----------------------------
+twin options: VerbError: no perspective 'the-operator' in overlay 'netflix' (have: none)
+twin score: VerbError: no outcome 'any-outcome-at-all' in overlay 'intel' (have: none)
+=========================== short test summary info ============================
+FAILED tests/test_enact.py::test_layer_2_refuses_a_merge_through_every_composition_path[Bash-payload0]
+FAILED tests/test_enact.py::test_layer_2_refuses_a_merge_through_every_composition_path[Bash-payload1]
+FAILED tests/test_enact.py::test_layer_2_refuses_a_merge_through_every_composition_path[Bash-payload2]
+FAILED tests/test_enact.py::test_layer_2_refuses_a_merge_through_every_composition_path[mcp__github__merge_pull_request-payload3]
+FAILED tests/test_enact.py::test_layer_2_refuses_a_merge_through_every_composition_path[merge_pull_request-payload4]
+FAILED tests/test_enact.py::test_layer_2_refuses_a_merge_through_every_composition_path[mcp__forge__squash_pull_request-payload5]
+FAILED tests/test_enact.py::test_layer_2_refuses_a_direct_push_to_an_enactment_repository
+FAILED tests/test_enact.py::test_layer_2_resolves_a_bare_remote_rather_than_only_reading_the_command
+FAILED tests/test_enact.py::test_a_push_to_a_sibling_repository_in_the_same_org_is_still_refused
+FAILED tests/test_enact.py::test_the_carve_out_is_anchored_to_this_file_not_to_the_callers_directory
+FAILED tests/test_enact.py::test_the_refusal_stays_closed_when_the_guard_cannot_resolve_its_own_origin
+FAILED tests/test_enact.py::test_the_hook_emits_a_deny_decision_a_runtime_can_act_on
+FAILED tests/test_invariant_suite.py::test_the_suite_is_green - AssertionErro...
+13 failed, 1530 passed in 1759.91s (0:29:19)
+EXIT 1

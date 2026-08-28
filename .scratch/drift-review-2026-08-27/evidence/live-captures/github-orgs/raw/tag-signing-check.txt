@@ -1,0 +1,550 @@
+=== policy-as-versioned-driftwood/driftwood tags: v1.1.0
+v1.0.0 ===
+  tag=v1.1.0 sha=1a88c343345616a733b028bdad4dbc271e1a3b4f type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-driftwood.invalid",
+    "date": "2026-08-25T17:08:34Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJMAYJKoZIhvcNAQcCoIIJITCCCR0CAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIH0jCCB84wggdVoAMCAQICFCKa29Lvd1wx4Qem7xYlQJjXOL22MAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyNTE3MDgzNVoXDTI2MDgyNTE3MTgz\nNVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABPfTh9zqk9SkqSe2Tt4isUtg\nrxqQ3NEk95a74t0tqJWBDX99Iygs8szGFcaGprIuhQWP5gyQSKzjsVRfKb09+++j\nggZ0MIIGcDAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFKdpSOQn5aB8qkvJHi0JsdlZlgEmMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHoGA1UdEQEB/wRwMG6GbGh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLWRyaWZ0d29vZC9kcmlmdHdvb2QvLmdpdGh1Yi93\nb3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA5BgorBgEE\nAYO/MAEBBCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQu\nY29tMB8GCisGAQQBg78wAQIEEXdvcmtmbG93X2Rpc3BhdGNoMDYGCisGAQQBg78w\nAQMEKGVhY2FlMzNjYTNhMTY2MjgxOTY1MWQ1NmNkYjU0YTQ3NzFmZTEzZjEwGQYK\nKwYBBAGDvzABBAQLY3V0LXJlbGVhc2UwNQYKKwYBBAGDvzABBQQncG9saWN5LWFz\nLXZlcnNpb25lZC1kcmlmdHdvb2QvZHJpZnR3b29kMB0GCisGAQQBg78wAQYED3Jl\nZnMvaGVhZHMvbWFpbjA7BgorBgEEAYO/MAEIBC0MK2h0dHBzOi8vdG9rZW4uYWN0\naW9ucy5naXRodWJ1c2VyY29udGVudC5jb20wfAYKKwYBBAGDvzABCQRuDGxodHRw\nczovL2dpdGh1Yi5jb20vcG9saWN5LWFzLXZlcnNpb25lZC1kcmlmdHdvb2QvZHJp\nZnR3b29kLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hl\nYWRzL21haW4wOAYKKwYBBAGDvzABCgQqDChlYWNhZTMzY2EzYTE2NjI4MTk2NTFk\nNTZjZGI1NGE0NzcxZmUxM2YxMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3Rl\nZDBKBgorBgEEAYO/MAEMBDwMOmh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMt\ndmVyc2lvbmVkLWRyaWZ0d29vZC9kcmlmdHdvb2QwOAYKKwYBBAGDvzABDQQqDChl\nYWNhZTMzY2EzYTE2NjI4MTk2NTFkNTZjZGI1NGE0NzcxZmUxM2YxMB8GCisGAQQB\ng78wAQ4EEQwPcmVmcy9oZWFkcy9tYWluMBoGCisGAQQBg78wAQ8EDAwKMTM0MDk4\nNDczMTBABgorBgEEAYO/MAEQBDIMMGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3kt\nYXMtdmVyc2lvbmVkLWRyaWZ0d29vZDAZBgorBgEEAYO/MAERBAsMCTMwODQ3OTgx\nMTB8BgorBgEEAYO/MAESBG4MbGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMt\ndmVyc2lvbmVkLWRyaWZ0d29vZC9kcmlmdHdvb2QvLmdpdGh1Yi93b3JrZmxvd3Mv\nY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA4BgorBgEEAYO/MAETBCoM\nKGVhY2FlMzNjYTNhMTY2MjgxOTY1MWQ1NmNkYjU0YTQ3NzFmZTEzZjEwIQYKKwYB\nBAGDvzABFAQTDBF3b3JrZmxvd19kaXNwYXRjaDBuBgorBgEEAYO/MAEVBGAMXmh0\ndHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLWRyaWZ0d29vZC9k\ncmlmdHdvb2QvYWN0aW9ucy9ydW5zLzMyODc2MTEwODY1L2F0dGVtcHRzLzEwFgYK\nKwYBBAGDvzABFgQIDAZwdWJsaWMwZQYKKwYBBAGDvzABGARXDFVyZXBvOnBvbGlj\neS1hcy12ZXJzaW9uZWQtZHJpZnR3b29kQDMwODQ3OTgxMS9kcmlmdHdvb2RAMTM0\nMDk4NDczMTpyZWY6cmVmcy9oZWFkcy9tYWluMIGJBgorBgEEAdZ5AgQCBHsEeQB3\nAHUA3T0wasbHETJjGR4cmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgOeUr1QAABAMA\nRjBEAiBo5saFyne5xf2xAfC8ebVaAEuV949/waHCfmu6YfAcbwIgbCN+UsBtZ5sa\nMP1TOPNHNFtN2uI/W/mtOzKUjckY33owCgYIKoZIzj0EAwMDZwAwZAIwal4Wzusr\nE8cT6kmU60JG4cgZerJO13bIjfJbIvrRdwEafDvNZDwefrNjXY3U6n+7AjBPmP0r\nana4G0wxWXNEyo0SVg8z+dKksc26XS5aB1F1PCmBTLiTex2plcJgN0lfwMAxggEk\nMIIBIAIBATBPMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlAhQimtvS73dcMeEHpu8WJUCY1zi9tjALBglghkgB\nZQMEAgGgaTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP\nFw0yNjA4MjUxNzA4MzVaMC8GCSqGSIb3DQEJBDEiBCCqUZfcghOri3brjBRWdFO0\ntlGQtTdfjBYC3fohBt2MXDAKBggqhkjOPQQDAgRGMEQCIAcDzKRSfBFETGNiKqFR\ndJIcMiqUVAG+sucLXkZ3zOzFAiBKXTcB/QTBAiLjmJ/HAAptgg8IvHCcxvWERtbM\nf28wOQ==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object eacae33ca3a1662819651d56cdb54a4771fe13f1\ntype commit\ntag v1.1.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-driftwood.invalid> 1787677714 +0000\n\npolicy-composition ticket 18: driftwood's first signed composed artefact. MODERATE baseline, 285 recorded holes, 0 refusals, 0 ungoverned namespaces.\n",
+    "verified_at": null
+  }
+}
+  tag=v1.0.0 sha=add8cfa7dcc84b0fb988ba51d761ab0c5aab9453 type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-driftwood.invalid",
+    "date": "2026-08-21T07:47:51Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJMwYJKoZIhvcNAQcCoIIJJDCCCSACAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIH1TCCB9EwggdWoAMCAQICFHPRNPRXJyNNhla8wgBTYw50UxgsMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyMTA3NDc1MVoXDTI2MDgyMTA3NTc1\nMVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJ+vFFjm2+SsSLIy8FFIlaZJ\nEUHVcPZnrHwIqjdSDnJGdtBpLVwIuatgb7UeR6ct2s+qkTfKoGZ+Q4U0utInepWj\nggZ1MIIGcTAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFDT91Kh8rNO8KDA51D7g1BkslgmcMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHoGA1UdEQEB/wRwMG6GbGh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLWRyaWZ0d29vZC9kcmlmdHdvb2QvLmdpdGh1Yi93\nb3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA5BgorBgEE\nAYO/MAEBBCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQu\nY29tMB8GCisGAQQBg78wAQIEEXdvcmtmbG93X2Rpc3BhdGNoMDYGCisGAQQBg78w\nAQMEKDkyMDM0YjA5MjdlYjBjMTVhYTk3NjBkZWRkYmU2ZGEyOTYwMDM4ZjAwGQYK\nKwYBBAGDvzABBAQLY3V0LXJlbGVhc2UwNQYKKwYBBAGDvzABBQQncG9saWN5LWFz\nLXZlcnNpb25lZC1kcmlmdHdvb2QvZHJpZnR3b29kMB0GCisGAQQBg78wAQYED3Jl\nZnMvaGVhZHMvbWFpbjA7BgorBgEEAYO/MAEIBC0MK2h0dHBzOi8vdG9rZW4uYWN0\naW9ucy5naXRodWJ1c2VyY29udGVudC5jb20wfAYKKwYBBAGDvzABCQRuDGxodHRw\nczovL2dpdGh1Yi5jb20vcG9saWN5LWFzLXZlcnNpb25lZC1kcmlmdHdvb2QvZHJp\nZnR3b29kLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hl\nYWRzL21haW4wOAYKKwYBBAGDvzABCgQqDCg5MjAzNGIwOTI3ZWIwYzE1YWE5NzYw\nZGVkZGJlNmRhMjk2MDAzOGYwMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3Rl\nZDBKBgorBgEEAYO/MAEMBDwMOmh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMt\ndmVyc2lvbmVkLWRyaWZ0d29vZC9kcmlmdHdvb2QwOAYKKwYBBAGDvzABDQQqDCg5\nMjAzNGIwOTI3ZWIwYzE1YWE5NzYwZGVkZGJlNmRhMjk2MDAzOGYwMB8GCisGAQQB\ng78wAQ4EEQwPcmVmcy9oZWFkcy9tYWluMBoGCisGAQQBg78wAQ8EDAwKMTM0MDk4\nNDczMTBABgorBgEEAYO/MAEQBDIMMGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3kt\nYXMtdmVyc2lvbmVkLWRyaWZ0d29vZDAZBgorBgEEAYO/MAERBAsMCTMwODQ3OTgx\nMTB8BgorBgEEAYO/MAESBG4MbGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMt\ndmVyc2lvbmVkLWRyaWZ0d29vZC9kcmlmdHdvb2QvLmdpdGh1Yi93b3JrZmxvd3Mv\nY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA4BgorBgEEAYO/MAETBCoM\nKDkyMDM0YjA5MjdlYjBjMTVhYTk3NjBkZWRkYmU2ZGEyOTYwMDM4ZjAwIQYKKwYB\nBAGDvzABFAQTDBF3b3JrZmxvd19kaXNwYXRjaDBuBgorBgEEAYO/MAEVBGAMXmh0\ndHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLWRyaWZ0d29vZC9k\ncmlmdHdvb2QvYWN0aW9ucy9ydW5zLzMyNDYwMjExMTE0L2F0dGVtcHRzLzEwFgYK\nKwYBBAGDvzABFgQIDAZwdWJsaWMwZQYKKwYBBAGDvzABGARXDFVyZXBvOnBvbGlj\neS1hcy12ZXJzaW9uZWQtZHJpZnR3b29kQDMwODQ3OTgxMS9kcmlmdHdvb2RAMTM0\nMDk4NDczMTpyZWY6cmVmcy9oZWFkcy9tYWluMIGKBgorBgEEAdZ5AgQCBHwEegB4\nAHYA3T0wasbHETJjGR4cmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgI0pgPQAABAMA\nRzBFAiA5y0VmGLn0iR5kQtp4KD+CePNvLjat3Vi+6V9bkXhCvAIhAJhibmoUvEKo\nHeebpnUnZJfiYmgAN4aN6Bo6GRAZ9NnwMAoGCCqGSM49BAMDA2kAMGYCMQCwGmxN\nlYPYEFsWPaOXh10wZxbBA3soKbrm3heKrnRiQZMWkSqJX3AjQSVTKRFfY6QCMQD9\nRxG00ivUGoqT+93aYmIHxytkxP19h+hcBgQBP6jS2LN6lkjV3rE43l/142H/GgEx\nggEkMIIBIAIBATBPMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMV\nc2lnc3RvcmUtaW50ZXJtZWRpYXRlAhRz0TT0VycjTYZWvMIAU2MOdFMYLDALBglg\nhkgBZQMEAgGgaTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJ\nBTEPFw0yNjA4MjEwNzQ3NTJaMC8GCSqGSIb3DQEJBDEiBCBUPJy5jU8pqpjjrMg+\nKZEu0MNyZNm4oV5qXxjofV7NDjAKBggqhkjOPQQDAgRGMEQCIBjQhL0Pr7dYxh1a\nJMLGma+3uUNuA+HZTTnf9wgxfih8AiBTTrkCVdvSErYhceKcwsC6Xm7tKPj2+PBi\nORgZzPMhgA==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 92034b0927eb0c15aa9760deddbe6da2960038f0\ntype commit\ntag v1.0.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-driftwood.invalid> 1787298471 +0000\n\ndriftwood institution repo, first signed release: KinD/Flux bring-up, nist+platform pins, shift-left gate, Renovate config\n",
+    "verified_at": null
+  }
+}
+=== policy-as-versioned-flux/api tags: v1.0.0 ===
+  tag=v1.0.0 sha=9dd74b228e4e40bdfa922659fcb98d46151453f8 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-16T13:30:01Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQLvmvCRxxkDpDJLk55HMaMK9kijeyFq+SelbTkaKobjuTd9x4x3FgrLCFGNvm7VyIs\niFrfJoKekynhM6OTESIwI=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object c1d92aa61c21f0363da188dbd3b4f4c81f40cda2\ntype commit\ntag v1.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784208601 +0100\n\nv1.0.0: initial api app\n",
+    "verified_at": "2026-07-16T14:19:09Z"
+  }
+}
+=== policy-as-versioned-flux/c2p-collector tags: v1.0.1
+v1.0.0 ===
+  tag=v1.0.1 sha=f9f379cf51668b2f79926232025403884054bac9 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-18T10:50:59Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQJbpfcTnoqxc/io9W0e4dlrbGPMVQQPTTOnxpptNSZkapmFpkFqR+9get7pwkc7pW6\nuLdILGBzmLhR1TgC8SyA4=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object c7b63e5ba2d1701ecf70c9fcfb4eef07123f8cfb\ntype commit\ntag v1.0.1\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784371859 +0100\n\nTicket 08 follow-up: drop skip results before result2oscal, fixing a live OSCAL misattribution\n",
+    "verified_at": "2026-08-23T21:51:09Z"
+  }
+}
+  tag=v1.0.0 sha=506cb5932e1717e4c24de79bbb1a4dfcce259f56 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-16T12:52:28Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQHmdfWACUkhokeYLWnMJo0iGMi8ELHhWVqygKCNqjfN6ys/nBEttYMhlBVaAbWWhtd\n34NI6dqfrvY/z8wWVXRAU=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object d47d9572f9e0ca439227cec355ce4155fe617c2f\ntype commit\ntag v1.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784206348 +0100\n\nv1.0.0: initial extraction, c2pcli + kyverno-plugin baked in (ticket 04)\n",
+    "verified_at": "2026-08-23T21:51:09Z"
+  }
+}
+=== policy-as-versioned-flux/handbook-generator tags: v1.0.0 ===
+  tag=v1.0.0 sha=dfe4a4e8da983d525f1420707f15361647576d2d type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-16T12:57:27Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQOdUhA82KZidafVGQ6yFtL6FIT0+L23WGNA28KRnXqIGBWV/ifjjc70qpKDuj0mWZn\nU5kkwp7wZeUsvmAzWVSwQ=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object e420cad6855ab4dff81a741497dcb4aff88bebc2\ntype commit\ntag v1.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784206647 +0100\n\nv1.0.0: initial extraction from policy repo (ticket 05)\n",
+    "verified_at": "2026-08-27T13:04:42Z"
+  }
+}
+=== policy-as-versioned-flux/ledger tags: v1.0.0 ===
+  tag=v1.0.0 sha=19349f7d3b539d5f6f14bbd47211f40ea1ae56d3 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-16T13:33:16Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQGyKaWj/duak/ZVlc8Miy3/J/H/rqXU3jOBmuKEwlnoFcMh2cpmRxB2YyJMa9OSdAN\nERXKFK6cv7cgmEOTHhYgw=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object 345e5bfb3af039c0ab61f86b9410505d3e7d9e1a\ntype commit\ntag v1.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784208796 +0100\n\nv1.0.0: initial ledger app\n",
+    "verified_at": "2026-07-17T23:14:41Z"
+  }
+}
+=== policy-as-versioned-flux/policy tags: v2.2.1
+v2.2.0
+v2.1.1
+v2.0.3
+v2.0.2
+v2.0.1
+v2.0.0
+v1.0.3
+v1.0.2
+v1.0.1
+v1.0.0 ===
+  tag=v2.2.1 sha=08607a836c9524690f61460ae8f65fa7c8be4547 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-16T21:59:54Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIII9AYJKoZIhvcNAQcCoIII5TCCCOECAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDKTCCAyUwggKsoAMCAQICFCWCfsdZ6iidByTtF8MfaydCBELIMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNjIyMDAyMloXDTI2MDcxNjIyMTAy\nMlowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDYBraIcaP+YuO7hSILc7I39\niwCuWeIdfKcIkmuU74iwGKkf7PLKFWcPPHBxuMJC9pKeZgnGq/VXZh5WfmpVQwaj\nggHLMIIBxzAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFAMgIfZi6rxsUaLsWmJuEi2GN/9NMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYsGCisGAQQB1nkCBAIE\nfQR7AHkAdwDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9s8e4O\nAAAEAwBIMEYCIQD0Ln1fwoWWJ+nHDwQTeWL0Xjf67ol18EzVl8rauXCSKwIhAPTH\nYXaHw23E+iaWjfBMvKbFe00FgD96eZ0sz0Ua0prYMAoGCCqGSM49BAMDA2cAMGQC\nMCH7V9pDdBzNbMGUzv9i2gjthZJUHp6sOSacWlpWCwJD0mjGRA23wZtp+Y2jvL2R\nFgIwUTecmR0G/GzcZNv+hLUw44hCLJ6+mjSxWNIaFhHLq8j1IcS5MWQLxxqnb3Km\nmo9qMYIFkTCCBY0CAQEwTzA3MRUwEwYDVQQKEwxzaWdzdG9yZS5kZXYxHjAcBgNV\nBAMTFXNpZ3N0b3JlLWludGVybWVkaWF0ZQIUJYJ+x1nqKJ0HJO0Xwx9rJ0IEQsgw\nCwYJYIZIAWUDBAIBoGkwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG\n9w0BCQUxDxcNMjYwNzE2MjIwMDIyWjAvBgkqhkiG9w0BCQQxIgQgP+ceRF16gbZj\nkKE+bpEaquOCsmcFB/A8ue76uiez+iUwCgYIKoZIzj0EAwIESDBGAiEAq7r/N6l/\nnHwO1gZytNT+1EePXdUWgMtCxHVRd3HCqrACIQDyuuAZCmEy3EWDlf1ljE8BYbZb\ntNLqQx1tXih3Y3ywI6GCBGcwggRjBgorBgEEAYO/MAMBMYIEUwSCBE8I+aWekwgS\nIgogwNI9atQGlz+VWfO6LRygH4QUfY/8W4RFwiT5i5WRgB0aFQoMaGFzaGVkcmVr\nb3JkEgUwLjAuMSD2qOXSBipJCkcwRQIhAL1IFtjG4blEi+D9D7k+7Ua+2menwFgI\nR5d5dcfC+yp4AiBfCd+OQgNz40eJTI2E+xAbRUyBR1nbv7kR4TJhJYny0jK6Bwjz\n7I3ZBxIgtWqkyxbNzOzeUMF7/W9SmIZ++YLqNdsX/2WwC2d+bz4Y9uyN2QciIPOP\nRrkAhvLTncABYZFGz3+0MSvrojTTWLW4gN4kNOBzIiBYPRcAXp/UTyhWMV0WkhSf\n6WNULIhnXFBR63oJMSu+tyIgt9mZlR7tuG3b/gpB0Fs0jG6/60Q0te4c1qfK9X9U\ncAMiIAdCHyjAVR+hLW9d2/I9ZxrwrtwjMPtz70R/Rmp+FZJ2IiC42qnBTkO+mg/7\nLk5wpqdm0DkX1DlKXuPcqSxndORdUSIgVqXq1UOK1pZMRWjxiKbw5afVnaW7IUoC\nxw+qyr0fMVgiIKKKxPoTWCF71qfrN3Nw5a2xbQhZwzoPP28bDjWpJPCJIiA4o28/\nKyIaYUpaHQ9H5CyHrWJWOMcYR9+LKNkaHpPywyIg1rb6OfDxgzmlutoZN9y7Am/B\ngIA8UFBePp7ppVEmmrwiIOuhy/wtBXiSazRDo1nyXIGxp94qOnLevACmxamb+IqG\nIiAlyHTON+sr9Q4t3LAwOMy1Xyw1Le5SoS8ihISNwcznxCIg6vaobWgQ/KqzI2TT\nvXAYat9d/3EB3D9UGRKpR1+crKEiIOCwR6pFBN+xsdVvc8knEDYcmF2YShn65/Ge\n00JyscyeIiBJJbFJL344CtsEoKY8Zs3mv2r7J9h+Dhkda0nH5l+54yIgLN4BQlVU\nRhC2M/Xc4OivrIZ9N84ymrzP2D5nh03wLQUiIAOyedx6elI7ZJSWv+gzjsARSAaI\n5zrNCFr4GbXoyhTGIiBGr8DZpML17niV02Nymwnbqtf+HwmU3pkfGDDvIRroLSIg\n+/VZ56MsIPxMiyLAodzKXo5TEWdQp36z89qLhpzloAoiIHWsZmWmo0aWVficR4jm\nGYSQYkijebnKo4dlpxmx4Yq8IiAM4J6hIyi8i8sTGSEi+KyjD0C41eB5azgQKTJH\noRyphSrhAQreAXJla29yLnNpZ3N0b3JlLmRldiAtIDExOTMwNTA5NTk5MTY2NTY1\nMDYKMjA2NTkyMTY1NAp0V3FreXhiTnpPemVVTUY3L1c5U21JWisrWUxxTmRzWC8y\nV3dDMmQrYno0PQoK4oCUIHJla29yLnNpZ3N0b3JlLmRldiB3Tkk5YWpCRkFpQjNt\nMlM0Znd2ak00K25rMjlULzhVa2F3L0o5NWpFRy9RQmU3OTE5bnp6ZndJaEFQNG5X\ndmJlTzFicVcrRFlPckg1VzRaYVZqVHlMaTVLY2YvL0JzeHE0M291Cg==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 89c9825af02f914806f13773856abce77cc36f66\ntype commit\ntag v2.2.1\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784239194 +0100\n\nv2.2.1\n\nCI-only-fix patch, zero verdict impact: adds release evidence assets (rendered\nper-policy bundle + SHA256SUMS, generated in the same signature-verifying CI\nrun -- ticket 14, real-estate epic) to the release workflow, and the handbook\ngenerator's extraction into its own component (ticket 05, real-estate epic).\nNeither touches workloads/kyverno/ or cloud/ -- every policy in this release\nstill declares itself version \"2.2.0\" internally (nameSuffix, cosmetic label,\nmatchConditions), exactly like v1.0.1/v2.0.1 before it: a release with zero\nverdict impact is unversioned-in-substance even though it needed a new tag to\nship.\n",
+    "verified_at": null
+  }
+}
+  tag=v2.2.0 sha=3f7f8d044bd66b4c92374b8d9ed1d4e888e10267 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-15T09:02:29Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIII0gYJKoZIhvcNAQcCoIIIwzCCCL8CAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDKTCCAyUwggKsoAMCAQICFHqZ5soAMWPeKrYyh68aTq7W+z8pMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNTA5MDI0MVoXDTI2MDcxNTA5MTI0\nMVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABG7T7UEikKyz+IfKTcVyk8Kb\n6xr2Lh6ThC04PoFdaCOJUdwc2qfTLyuMG3jCnW6a1AybmDoyGUfyK5hlFWnLMLqj\nggHLMIIBxzAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFJRK407I2c32U2mILKr30CHu34uTMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYsGCisGAQQB1nkCBAIE\nfQR7AHkAdwDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9lA5Vq\nAAAEAwBIMEYCIQCOYXxZwmzqEejy4nkpup9d1Tk4+7f1Vebliumh2ouGVAIhAIDI\ns5PTqUHC/cWZ3RitFIBD7v8bYzICplUpXbMlrpFcMAoGCCqGSM49BAMDA2cAMGQC\nMBruniOEfOE5SmSj0TWOYge3UcW+hZGa7PV0Sd1qxnh2zwqdnw0nb9EiGVjT/3KT\nbQIwXOTLtINqclqwcveRe35mngUbyYDKtN6MU7wm9Fl/luB4bpqQI8IcFUgb4KG4\nE00JMYIFbzCCBWsCAQEwTzA3MRUwEwYDVQQKEwxzaWdzdG9yZS5kZXYxHjAcBgNV\nBAMTFXNpZ3N0b3JlLWludGVybWVkaWF0ZQIUepnmygAxY94qtjKHrxpOrtb7Pykw\nCwYJYIZIAWUDBAIBoGkwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG\n9w0BCQUxDxcNMjYwNzE1MDkwMjM3WjAvBgkqhkiG9w0BCQQxIgQg3QALXd+F4qzl\n3YEbEJvgarlpP6TtqjfQLauCNA/TJOcwCgYIKoZIzj0EAwIERzBFAiAUOaB9gUht\nEUNlxtqSdsBnCMbpcRss/9Okaj9qkoFIDAIhAMlEJUkXp821nsCkpjdZtMdIES5X\nz+PF8zpDH9+zyh9UoYIERjCCBEIGCisGAQQBg78wAwExggQyBIIELgiq5NyLCBIi\nCiDA0j1q1AaXP5VZ87otHKAfhBR9j/xbhEXCJPmLlZGAHRoVCgxoYXNoZWRyZWtv\ncmQSBTAuMC4xILKZ3dIGKkoKSDBGAiEAyW6om7WUutFA8BEPGCpliDZOn0mbf4YR\nch5vKgiNC/ECIQDXR1JL5gnsZMJUUwSP8cv4gCGGwa7/G+4STxsm3BBnxTKYBwik\nq8zRBxIgndDortg4a5HHTkcFJz7VTs1hSiVJt0QuAhULxElTcaUYtKvM0QciIDAc\nMuAkb73dSCQkwlrXmt4wwGA5xY7wemaerqVJZKQ9IiBfsaJ6k7RsqzClpR6A2f9m\nJ5pVeJ3bhvAvbGNifwVldiIgMVoXZgEeyz67Jc7TxqxtHnti5OIsqw6Hgfy3A3+A\nBEciIASJUkoBMzNEX1zEIU9IXAW9x8PpL6jm8lxt2YB80g8lIiDjbmQPWGDMNykI\nk6sqp5Z5WdrkdvAViy++tbj0rrErkiIgZAccbwlKikjvSm1CLWdwT7oVvAJewlqu\n7E+ORIz+y1AiIDpeX9ItbiEegu2kI9VLm4blG7PoLOgvfwdw+tG3iqkuIiA5DGJv\njjvVj+qlJLjpKPzJ8fafjtuSWT9/r1D4reXPjCIgO+k4a4eYasxGcRsNhVkEez7F\nn/Os2CFu1+AX8FMeJPAiIO0q5imY1SaV0U2ynSQpmRcy43VXqPHuo0OF//xz88BI\nIiBkiEEKy1mVK+pe8Hbrsb580QhwnuC1Wt8u2ZIy7LNbLiIgn7HYmUD1HNiic77v\nNXG4VEfRP+iYAGT66u/QKusBuXQiIMHiv8pCRER1lBGJfKfYmancPnFMzM7CmM/S\n7/tvwNVuIiBJZJxKk7QgbfawYci2+No1rMNIWvdRPzKbS3SxSbn2piIgA7J53Hp6\nUjtklJa/6DOOwBFIBojnOs0IWvgZtejKFMYiIEavwNmkwvXueJXTY3KbCduq1/4f\nCZTemR8YMO8hGugtIiD79Vnnoywg/EyLIsCh3MpejlMRZ1CnfrPz2ouGnOWgCiIg\ndaxmZaajRpZV+JxHiOYZhJBiSKN5ucqjh2WnGbHhirwiIAzgnqEjKLyLyxMZISL4\nrKMPQLjV4HlrOBApMkehHKmFKuEBCt4BcmVrb3Iuc2lnc3RvcmUuZGV2IC0gMTE5\nMzA1MDk1OTkxNjY1NjUwNgoyMDUwMTY4MjQ0Cm5kRG9ydGc0YTVISFRrY0ZKejdW\nVHMxaFNpVkp0MFF1QWhVTHhFbFRjYVU9CgrigJQgcmVrb3Iuc2lnc3RvcmUuZGV2\nIHdOSTlhakJGQWlBR1ZoamlUZEdESzQrMkdoa0hJSXE1d29hWHgra3U4d1ZpM0VL\nWFJGSEJkUUloQUxJdEdOdHJJTzFNUHBNdnZzUVp0Z0F2b0U4b0pxUzhOamZ0amIx\nQk9qVzEK\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 6ad22ca85a444b289493725b178666f2156c8b32\ntype commit\ntag v2.2.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784106149 +0100\n\nv2.2.0\n\nMinor: two non-breaking additions bundled together (each alone would be at most a\npatch/minor -- neither can fail an existing compliant workload):\n\n- matchConditions fix (issue 08): replaces the broken matchConstraints.objectSelector\n  version self-scoping with per-policy matchConditions CEL, evaluated inside Kyverno\n  instead of flattened onto the shared ValidatingWebhookConfiguration. Zero verdict\n  impact by construction -- same admission behaviour, correct mechanism. Required for\n  genuine multi-version coexistence (single-version deployments never surfaced the bug).\n- New cloud-plane policies (issue 17): require-s3-bucket-encryption (Deny gate, NIST\n  sc-28) and require-rds-multi-az (Audit lane-keeper, NIST cp-10), targeting Crossplane\n  v2's namespaced AWS provider-family CRDs. New policies cannot fail an existing\n  compliant workload.\n\nAlso ships in this release (non-policy content, doesn't affect version semantics):\nadvisory metadata schema + editorial review process (issue 22), the policy handbook\ngenerator with agent-authored plain-language summaries (issues 25/26), and the\ndemo-removal structural-deletion proof (issue 22).\n\nrequire-department-label, require-known-department-label, require-owner-annotation\nre-versioned alongside (a policy version covers the whole body); no verdict-affecting\ncontent change to any of the three from v2.1.1.\n",
+    "verified_at": null
+  }
+}
+  tag=v2.1.1 sha=60ed6e27a31bcf23b336b87416c9282c294a7bc1 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-14T15:38:32Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIIbAYJKoZIhvcNAQcCoIIIXTCCCFkCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDKTCCAyUwggKroAMCAQICFGZlU32A0ZL0Lmc6MIuCG9h07WIHMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNDE1MzIxMVoXDTI2MDcxNDE1NDIx\nMVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABHhk726d9PcKjQB6QA6XjQWA\nkuZn8mfIwJMzDAbCzcaRkn+tuqjfaFq6YjXlncRF3t1cnlLj708DaNF6V3/1YDuj\nggHKMIIBxjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFB+GZMQhO20T0PgkSnlBMhjgFPsQMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYoGCisGAQQB1nkCBAIE\nfAR6AHgAdgDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9hQdKJ\nAAAEAwBHMEUCIAZ5jKWDjyecSeFiugIVTJT/qKRfTAqmemAnxtrYpoXVAiEAlMqI\naaGcOgcuCalwpumMVwoGzR9EreyjQkZyKaqus0gwCgYIKoZIzj0EAwMDaAAwZQIw\nLH2wkQ2xrCnQC1NYxLxS3Y1mmaYcVcwy6ZWV89T4Fikl61kctofw+X/jvRrqMkH3\nAjEAipZ+Y7jQtA49PpcqpoVUcumS/pdTZkEcqphkuYT0AyeZQ4jcVofcsPe6xnBA\nRZB5MYIFCTCCBQUCAQEwTzA3MRUwEwYDVQQKEwxzaWdzdG9yZS5kZXYxHjAcBgNV\nBAMTFXNpZ3N0b3JlLWludGVybWVkaWF0ZQIUZmVTfYDRkvQuZzowi4Ib2HTtYgcw\nCwYJYIZIAWUDBAIBoGkwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG\n9w0BCQUxDxcNMjYwNzE0MTUzODMyWjAvBgkqhkiG9w0BCQQxIgQgchhB8/HI0as6\n+PvPaE4AxlHqW8h4vtzkYo+uOvhLd28wCgYIKoZIzj0EAwIESDBGAiEA/g1Rd5+i\n+hfvhU3K5F8TQfMDvhnZh8bqLrPJubIOit4CIQCW1U0OnGHaR9lr1WugYJY7HIdY\n74pC2GfiMRhicXQIRaGCA98wggPbBgorBgEEAYO/MAMBMYIDywSCA8cI79WTiggS\nIgogwNI9atQGlz+VWfO6LRygH4QUfY/8W4RFwiT5i5WRgB0aFQoMaGFzaGVkcmVr\nb3JkEgUwLjAuMSD5r9nSBipJCkcwRQIgeLvdEx6d8S4thfWqwSs0KMc2NLNMEudq\nme6ozahMhQ4CIQDTVc8RYi1ZCv/BkO0NrVSmNuhJwkCgI5DUmd7AsaIijzKyBgjp\nnIPQBxIgAVU29PAZC4LoPpg18pkElEcSEAHg12rCFTtEesSxcMQY7pyD0AciIBm+\nyGQdzSs+qYn1+www5sIyMdqoBToFpsy8r1HBlm4HIiDbKZidWtETxhiwDh689dKq\nHffg/D8d/oMlKrhMnXNs7yIgS83evZIFYc1V3s6otcfqXYSY35Puj+OtuCj/ltfM\nBuUiIPFlbcHFKAnzrYdKKkNgCxJYVzbM9OZ8iJ2YX2ltAQRRIiDZc6lSFmSPsQ7B\nyFrsXE2nNhGqJZfbS2m9JPcb8L378CIge5NflKxpaQWiTLan1vk6Nptg0PrKY91d\nc4kw7906xa0iIDdbq218hW4e5vIyqI/5F7EG3zijlAnz37RFd+a6x/9GIiBrIVre\n5WY3J2870/JjuFYbQwARmT9D/G+vXhjXqxGn2yIg3/wkLCTvd3vPpgpAfdJFZ9RP\nOZvF4bIGRRfTXta0HwYiICL0rJBOkNhWM9lLczzJqDvVBW6ZRWnHXbuuw4iSZP7N\nIiBymP4WDtjvpS4sBrdQmWhW2ROxzS2dFtMqpCuTAp8nyiIgA7J53Hp6UjtklJa/\n6DOOwBFIBojnOs0IWvgZtejKFMYiIEavwNmkwvXueJXTY3KbCduq1/4fCZTemR8Y\nMO8hGugtIiD79Vnnoywg/EyLIsCh3MpejlMRZ1CnfrPz2ouGnOWgCiIgdaxmZaaj\nRpZV+JxHiOYZhJBiSKN5ucqjh2WnGbHhirwiIAzgnqEjKLyLyxMZISL4rKMPQLjV\n4HlrOBApMkehHKmFKuEBCt4BcmVrb3Iuc2lnc3RvcmUuZGV2IC0gMTE5MzA1MDk1\nOTkxNjY1NjUwNgoyMDQ2ODczMTk4CkFWVTI5UEFaQzRMb1BwZzE4cGtFbEVjU0VB\nSGcxMnJDRlR0RWVzU3hjTVE9CgrigJQgcmVrb3Iuc2lnc3RvcmUuZGV2IHdOSTlh\nakJFQWlBQjZwVDZYQ3JXODlienE5eWErcjR6aVRCNnc5VGxpaXQ4b0NBdnF1SExp\nQUlnT2Z2aDJ6YlNwdnhUUFVLWGhtRVdKeHlwekF0WTkxYkVBREpoMlFKdzRaOD0K\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 95579dd567b2c0e490ce56aeb0504290085651f6\ntype commit\ntag v2.1.1\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784043512 +0100\n\nv2.1.1\n\nMinor + patch: new require-owner-annotation (Audit, minor -- can only add PolicyReport entries)\nand require-known-department-label's known set widened +legal (patch -- passing set only grows).\nrequire-department-label re-versioned alongside, content unchanged from v2.0.1.\n",
+    "verified_at": null
+  }
+}
+  tag=v2.0.3 sha=aa9e0c98a6597e358a574008e2a0eb0e94a2b484 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-15T11:09:54Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIIagYJKoZIhvcNAQcCoIIIWzCCCFcCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDKDCCAyQwggKqoAMCAQICFHwTUL4xfw+1YjElMCdTa8P7alPVMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNTExMDY0M1oXDTI2MDcxNTExMTY0\nM1owADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDsxp9ciNmI8ROml6C2lQYlX\nM1FCYoH+mHcE+7st2UsRD4JWa9xUualX1eIEIksgtLahZkiGphAQKg9X9Y4ois+j\nggHJMIIBxTAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFLYrI1mLDEvGS8xB0ASZWjFlXrVAMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYkGCisGAQQB1nkCBAIE\newR5AHcAdQDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9ldSJg\nAAAEAwBGMEQCIFGbCBkMniHMgjftxVpq3NPj3UZbCgh5Ba+qC+viK1+qAiBt+QgU\n1ZGrvBTprRIOV7mP3ACyU7P90cSHMfxKtoY23jAKBggqhkjOPQQDAwNoADBlAjBc\nN50cNPZ0ZJeThAg/PTYsrskc9JUYSS10sL0e7R0eMyCqUOvc27ZIyPyvrjgkcmcC\nMQDa+7Kr2kZKoriKgKNy7DGGp+fTnVBnBwZBayoU0ilhZomfJ9o7QmKuc1CVgC1V\n7VoxggUIMIIFBAIBATBPMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UE\nAxMVc2lnc3RvcmUtaW50ZXJtZWRpYXRlAhR8E1C+MX8PtWIxJTAnU2vD+2pT1TAL\nBglghkgBZQMEAgGgaTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3\nDQEJBTEPFw0yNjA3MTUxMTA5NTRaMC8GCSqGSIb3DQEJBDEiBCCq/Kc3fk6MHpKS\nH3eUBar4cjoS1Y/MSrWcZPmCYux/5jAKBggqhkjOPQQDAgRHMEUCIQDLV2Dx3aBq\n8Vfotcas/vfXwJ+zPN0dmbvVoJlKmR8DYwIgaEFKMgdAtUCPa6GAp2okY+p/WGaF\n54NwjInyT/CnuH2hggPfMIID2wYKKwYBBAGDvzADATGCA8sEggPHCKqdgowIEiIK\nIMDSPWrUBpc/lVnzui0coB+EFH2P/FuERcIk+YuVkYAdGhUKDGhhc2hlZHJla29y\nZBIFMC4wLjEghtXd0gYqSQpHMEUCIQCWXGYRGEuAaO6V+VFL8KV0pIdGFkIWT8zl\n4flRMoSyjAIgMQkU1lbVzKKpj2Id+DEm1y0cJoZ6RTzOR59plmGJw7IysgYIpOTx\n0QcSIKsg6A3LubsgTzxVWBL7IEpH8oKHuorhsjCLoOaWSgvQGKbk8dEHIiCdugX8\nqmjC6ee6RZ2TO+L0tZJz0n8IGy9eFqacN3t0jSIgGXd4IO9x9i4J7dCJHJhbCS0D\nAEQ9rAouxUND/LxBhboiIPNOCGVt9BRjkHdIxvEf+BcbfZXaDhH+NTu0bFSraggw\nIiDsKqqsy4y1hK/dOnaQHGYcS0qH9NGfgbam2M+3F3BEtyIgDdmWvaWziFf4wZZf\njQYx9np/KJYuvB9nz41z+TY14v0iIFUOxfUnAb86ll7gK4vMST/Rgo/WiStbj7dF\nYS/YmNLpIiCsamMZPi7vJ6lmpwEkfpuIyf/omTLdiBOFOiI0opM2CyIgTn2R86lJ\nuzWcK1YvH6HFe/1dLLMTzyvLsVbaWKm88yciIAHD5pMQRnZCTiD9/L+c58RSEKvt\nlpnBCCcDK6oEFlziIiDB4r/KQkREdZQRiXyn2Jmp3D5xTMzOwpjP0u/7b8DVbiIg\nSWScSpO0IG32sGHItvjaNazDSFr3UT8ym0t0sUm59qYiIAOyedx6elI7ZJSWv+gz\njsARSAaI5zrNCFr4GbXoyhTGIiBGr8DZpML17niV02Nymwnbqtf+HwmU3pkfGDDv\nIRroLSIg+/VZ56MsIPxMiyLAodzKXo5TEWdQp36z89qLhpzloAoiIHWsZmWmo0aW\nVficR4jmGYSQYkijebnKo4dlpxmx4Yq8IiAM4J6hIyi8i8sTGSEi+KyjD0C41eB5\nazgQKTJHoRyphSrhAQreAXJla29yLnNpZ3N0b3JlLmRldiAtIDExOTMwNTA5NTk5\nMTY2NTY1MDYKMjA1MDc4MTczNApxeURvRGN1NXV5QlBQRlZZRXZzZ1NrZnlnb2U2\naXVHeU1JdWc1cFpLQzlBPQoK4oCUIHJla29yLnNpZ3N0b3JlLmRldiB3Tkk5YWpC\nRkFpRUFtbEpOTWxKaDdWaWlaMmRTNlh5cUgzZTd6cTBTWTlycTlJc1hYY01XeTRr\nQ0lCc0o5QTdjVjRwWjNDNFdmQ0ZnV2xybWFBcEJ2dGxzU21Ud2cyT3VqMnRpCg==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 1c2a3728aa885d07d440d2ac5da981adbb40732c\ntype commit\ntag v2.0.3\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784113794 +0100\n\nv2.0.3\n\nPatch: identical content to v2.0.2 (matchConditions fix, issue 08) --\nv2.0.2's underlying commit was accidentally SSH-signed, which Flux's\ngo-git library fails to resolve during its shallow-fetch-by-tag path.\nSame root cause and fix as v1.0.3 -- see that tag's message.\nv2.0.2 stays as an honest record, tag-immutability ruleset blocks moving\nit. v2.0.3's commit is unsigned; the tag itself is fully gitsign-signed.\n",
+    "verified_at": null
+  }
+}
+  tag=v2.0.2 sha=6a1ee5cb3dc68ecb6d8649f4decb7473f0de18b2 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-15T09:20:18Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJFAYJKoZIhvcNAQcCoIIJBTCCCQECAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDJzCCAyMwggKqoAMCAQICFAoiHOdfTXOG7k92u8wIWaQM2xQdMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNTA5MjAyOVoXDTI2MDcxNTA5MzAy\nOVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABMdyo9Lc5tVWEYfZjwGJsQAf\ncwIpK5OF4iDUP+rdb1rCNy/gn/geBupi/c9V4KdqpszVzG1qj6DDHiSXHZ/gjXWj\nggHJMIIBxTAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFALhacE6vYg/tsilQTP4TdZ/DV76MB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYkGCisGAQQB1nkCBAIE\newR5AHcAdQDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9lE+HB\nAAAEAwBGMEQCIAZC0DMfB8r4uLTXwiku7x9yDVXx3a+iwB3t5TTlYtteAiAm9c9a\nbwEuwM1bUI46niGTXhalLPfgQ4TFsQRxM2S5IjAKBggqhkjOPQQDAwNnADBkAjAr\nXJWjQptYmc9/K0DLMkZKbOsD4aKClRPb0Om91OW8JZG0sRV2Qp6fTv8/XNKS6+QC\nMCzWxnpWeCMb9LnaJPEfJf8RFkEFoJcs5qE8QPgg07429z3nIjNCYjPCw6lcfCdf\nMTGCBbMwggWvAgEBME8wNzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQD\nExVzaWdzdG9yZS1pbnRlcm1lZGlhdGUCFAoiHOdfTXOG7k92u8wIWaQM2xQdMAsG\nCWCGSAFlAwQCAaBpMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN\nAQkFMQ8XDTI2MDcxNTA5MjAyNVowLwYJKoZIhvcNAQkEMSIEIANIcyj5oZLzHGaP\nC3bviozP+/+HGK+WUg+AAr5oYucGMAoGCCqGSM49BAMCBEgwRgIhAOo6UGyy80W0\nJyy1P/2xaB5tdaW1qzFkUD4l43CtwNeAAiEA5k8sztglKKwnnJP7sY3I4ekIOzvL\nxtpIRLGjTJ6UbeWhggSJMIIEhQYKKwYBBAGDvzADATGCBHUEggRxCPzw4osIEiIK\nIMDSPWrUBpc/lVnzui0coB+EFH2P/FuERcIk+YuVkYAdGhUKDGhhc2hlZHJla29y\nZBIFMC4wLjEg3qHd0gYqSQpHMEUCIQDQ5Yd9nu7NHdXhkcRPkTwEtuLKW6JD3A42\nb7CWqKnjNAIgLfY4Mjq74mdo7ejlQTsII+kjAf8As+5aN8xL4+A0ASAy3AcI9rfS\n0QcSIPz1i+CQDM0QMbkyBdiPH7yj6+9tojzrexpxUoyDvAVCGP230tEHIiBPGvFE\n9qFzDfuamRTM3NYFlJjaUy6+sbnPDL5a1A4YPSIgCoAhoBe2CysYrrPX2aQuoaBD\n4S9Q8zy3kJ+eUP3oC1EiICERQhCGkXOuEEALaE8bp4/lPXoiQQb8aMlID4deVSjN\nIiDAtg8g5EW0oFYlo7pkjCKg0T0yISOEBJfjLreR4H5xqSIg9rtrP4JNf63iKz4f\nvcMrcpuHj7/9xbNtVuh/eymO4lkiIPOvpjQPac/6U6YbvwjwwovBHOasRaKxjmmG\n/7me5BlJIiAEHaBIJoAECKQt/+CBCNNTDnwtQ6YGn13VZwNM94nePyIg+zUvV7S0\nsWDTKcy4FIDK1EXvZzDUhZ2ilsstHrLBHQgiIGHb3iON0c7ClCjRUke+7BIPzHBo\n/YDPY47i+XCGSGI0IiCXB+bBokkIZhzlpxMLK8IcLnW63ycSsd6i4+eXiBSYrCIg\ndsDXH6LccDu0IJU0S3E2Z00uAWlYFb96mwqIm3pkKpIiIA/mIGLTxb5C7D4+mkwZ\nZgV9rLdwcMqelbhTGRVImLWOIiDAtJb0BZI1hSZcu6yZ2iNkVWh06K1hZ+6jyx5b\nHEktBSIgJGLKpdE6vGriulEayndU3Ewx+NNIiW60n50GOEp/X/UiIMHiv8pCRER1\nlBGJfKfYmancPnFMzM7CmM/S7/tvwNVuIiBJZJxKk7QgbfawYci2+No1rMNIWvdR\nPzKbS3SxSbn2piIgA7J53Hp6UjtklJa/6DOOwBFIBojnOs0IWvgZtejKFMYiIEav\nwNmkwvXueJXTY3KbCduq1/4fCZTemR8YMO8hGugtIiD79Vnnoywg/EyLIsCh3Mpe\njlMRZ1CnfrPz2ouGnOWgCiIgdaxmZaajRpZV+JxHiOYZhJBiSKN5ucqjh2WnGbHh\nirwiIAzgnqEjKLyLyxMZISL4rKMPQLjV4HlrOBApMkehHKmFKuEBCt4BcmVrb3Iu\nc2lnc3RvcmUuZGV2IC0gMTE5MzA1MDk1OTkxNjY1NjUwNgoyMDUwMjY4MTU3Ci9Q\nV0w0SkFNelJBeHVUSUYySThmdktQcjcyMmlQT3Q3R25GU2pJTzhCVUk9CgrigJQg\ncmVrb3Iuc2lnc3RvcmUuZGV2IHdOSTlhakJGQWlBQ0MzVEY4cnJadWZOdThQc0xz\nU05RMWswSEt3VWNZNlhmZ2tOdTNobnpGUUloQUxDWk5ZT0VjaDBLRnA0ZkpaZi9H\na3ZuNmlyVzdodC9URzdpZEk3MTY4UGcK\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object d56d55f7e0958b8a5ff639081dbfee84b84d28f5\ntype commit\ntag v2.0.2\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784107218 +0100\n\nv2.0.2\n\nPatch: matchConditions fix (issue 08) for the 2.0.0 line, zero verdict\nimpact. Same fix as v1.0.2 and v2.2.0. Content otherwise identical to\nv2.0.0/v2.0.1 -- Deny require-department-label (the Audit->Deny promotion),\nsame known-department set on require-known-department-label. Cut alongside\nv1.0.2 so both older lines coexist correctly with v2.2.0 (issue 08's full\n3-version proof).\n",
+    "verified_at": null
+  }
+}
+  tag=v2.0.1 sha=68214d6b72c4111ba168c80465e3f96625267819 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-14T15:31:57Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIHvwYJKoZIhvcNAQcCoIIHsDCCB6wCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDKTCCAyUwggKroAMCAQICFGZlU32A0ZL0Lmc6MIuCG9h07WIHMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNDE1MzIxMVoXDTI2MDcxNDE1NDIx\nMVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABHhk726d9PcKjQB6QA6XjQWA\nkuZn8mfIwJMzDAbCzcaRkn+tuqjfaFq6YjXlncRF3t1cnlLj708DaNF6V3/1YDuj\nggHKMIIBxjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFB+GZMQhO20T0PgkSnlBMhjgFPsQMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYoGCisGAQQB1nkCBAIE\nfAR6AHgAdgDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9hQdKJ\nAAAEAwBHMEUCIAZ5jKWDjyecSeFiugIVTJT/qKRfTAqmemAnxtrYpoXVAiEAlMqI\naaGcOgcuCalwpumMVwoGzR9EreyjQkZyKaqus0gwCgYIKoZIzj0EAwMDaAAwZQIw\nLH2wkQ2xrCnQC1NYxLxS3Y1mmaYcVcwy6ZWV89T4Fikl61kctofw+X/jvRrqMkH3\nAjEAipZ+Y7jQtA49PpcqpoVUcumS/pdTZkEcqphkuYT0AyeZQ4jcVofcsPe6xnBA\nRZB5MYIEXDCCBFgCAQEwTzA3MRUwEwYDVQQKEwxzaWdzdG9yZS5kZXYxHjAcBgNV\nBAMTFXNpZ3N0b3JlLWludGVybWVkaWF0ZQIUZmVTfYDRkvQuZzowi4Ib2HTtYgcw\nCwYJYIZIAWUDBAIBoGkwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG\n9w0BCQUxDxcNMjYwNzE0MTUzMjExWjAvBgkqhkiG9w0BCQQxIgQgnxO/ggEvu5GB\nkbhq95OjfKkLLvCBv5IEgyE06bedP74wCgYIKoZIzj0EAwIERjBEAiBYVy+PvItf\nWoy0ybZRKBUdppqm4cRsLnftWahodESRggIgXQtmsPjpX6vwN/mV5A8F+x9gk1p7\nj7C0FXe8xO6lDkqhggM0MIIDMAYKKwYBBAGDvzADATGCAyAEggMcCIfOkooIEiIK\nIMDSPWrUBpc/lVnzui0coB+EFH2P/FuERcIk+YuVkYAdGhUKDGhhc2hlZHJla29y\nZBIFMC4wLjEg/KzZ0gYqSApGMEQCICy1mEV6VWu9mq7iWYsXXQrsb4v+B0yob14i\n3QLYWAfWAiBjFRfm2XW+DtipI916nr4ARwzu9KNYj8R6c2vqUcrYPjKIBQiBlYLQ\nBxIg1AuypdzetDI8FoeVzu4AuGKifFmtiecJq49/fbd/jOgYg5WC0AciIH9HcTJb\nCDV4TS3oDJvv4sBc/ZsDn6uwIhvLUPBzykyFIiCHchOpo2UP+3zXJSR8H3CFJvEH\nWLde2jzDoJ3LiELBUSIgEqjsJxWhNqJYJGoPFk49r/+KySRjOvK3V0jUuqOoAYQi\nIL/3naAIQYVCQO7udzcMd1A7VpP54B19LUQqcwDq4ygIIiAFXvBx2ILTrviQb7XR\n3SHWmBphXNXflyd21VRR2nGX1yIgcpj+Fg7Y76UuLAa3UJloVtkTsc0tnRbTKqQr\nkwKfJ8oiIAOyedx6elI7ZJSWv+gzjsARSAaI5zrNCFr4GbXoyhTGIiBGr8DZpML1\n7niV02Nymwnbqtf+HwmU3pkfGDDvIRroLSIg+/VZ56MsIPxMiyLAodzKXo5TEWdQ\np36z89qLhpzloAoiIHWsZmWmo0aWVficR4jmGYSQYkijebnKo4dlpxmx4Yq8IiAM\n4J6hIyi8i8sTGSEi+KyjD0C41eB5azgQKTJHoRyphSrhAQreAXJla29yLnNpZ3N0\nb3JlLmRldiAtIDExOTMwNTA5NTk5MTY2NTY1MDYKMjA0Njg1NTgxMQoxQXV5cGR6\nZXRESThGb2VWenU0QXVHS2lmRm10aWVjSnE0OS9mYmQvak9nPQoK4oCUIHJla29y\nLnNpZ3N0b3JlLmRldiB3Tkk5YWpCRUFpQm4wTWxkZHhjb21JRVZFOXQ3bS9jUFdD\nU2hVWEovNTdiVUpZVTJrMitFZlFJZ1Z1Q3IwMVgwYStlMVJYZHNIOHdVWHg5RDUz\nUnRtcmpPNVhiSHhOb0trSmM9Cg==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object e505587b1f8ab674b6147a8c955f468b49fa9ab4\ntype commit\ntag v2.0.1\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784043117 +0100\n\nv2.0.1\n\nPatch: v2.0.0 was accidentally SSH-signed, not gitsign-signed (a global git config default this\nrepo's local config had lost after a fresh reclone) -- gitsign verify-tag fails on it with\n'unsupported signature type'. No policy content change from v2.0.0. Same pattern as v1.0.0 -> v1.0.1:\nv2.0.0 stays as an honest record of the mistake (the tag-immutability ruleset blocks moving it\nregardless), v2.0.1 is the first properly gitsign-signed major-2 release.\n",
+    "verified_at": null
+  }
+}
+  tag=v2.0.0 sha=37e2cc03a2fa170fe0c3dfd4911f8dbe2286d33b type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-14T15:30:59Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQBJil4YyO0TcRRuP79fK6W4+p3L2zjOHTAnGdRP7IYBEEuve3JNT4VhhAvWJIYsNDL\nVW8CZCnmdf/+goYQOUDgE=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object e505587b1f8ab674b6147a8c955f468b49fa9ab4\ntype commit\ntag v2.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784043059 +0100\n\nv2.0.0\n\nMajor: require-department-label promoted Audit -> Deny (an Audit->Deny promotion can turn a\npreviously-admitted workload into a denied one -- CONTEXT.md's semver-by-verdict-impact rule).\nrequire-known-department-label content unchanged, re-versioned to 2.0.0 alongside it (a policy\nversion covers the whole body).\n",
+    "verified_at": "2026-07-18T10:56:59Z"
+  }
+}
+  tag=v1.0.3 sha=ddd124b8658f024ed85b2221de4ef8af1e4478c5 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-15T11:06:29Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIII9AYJKoZIhvcNAQcCoIII5TCCCOECAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDKDCCAyQwggKqoAMCAQICFHwTUL4xfw+1YjElMCdTa8P7alPVMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNTExMDY0M1oXDTI2MDcxNTExMTY0\nM1owADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDsxp9ciNmI8ROml6C2lQYlX\nM1FCYoH+mHcE+7st2UsRD4JWa9xUualX1eIEIksgtLahZkiGphAQKg9X9Y4ois+j\nggHJMIIBxTAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFLYrI1mLDEvGS8xB0ASZWjFlXrVAMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYkGCisGAQQB1nkCBAIE\newR5AHcAdQDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9ldSJg\nAAAEAwBGMEQCIFGbCBkMniHMgjftxVpq3NPj3UZbCgh5Ba+qC+viK1+qAiBt+QgU\n1ZGrvBTprRIOV7mP3ACyU7P90cSHMfxKtoY23jAKBggqhkjOPQQDAwNoADBlAjBc\nN50cNPZ0ZJeThAg/PTYsrskc9JUYSS10sL0e7R0eMyCqUOvc27ZIyPyvrjgkcmcC\nMQDa+7Kr2kZKoriKgKNy7DGGp+fTnVBnBwZBayoU0ilhZomfJ9o7QmKuc1CVgC1V\n7VoxggWSMIIFjgIBATBPMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UE\nAxMVc2lnc3RvcmUtaW50ZXJtZWRpYXRlAhR8E1C+MX8PtWIxJTAnU2vD+2pT1TAL\nBglghkgBZQMEAgGgaTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3\nDQEJBTEPFw0yNjA3MTUxMTA2MzlaMC8GCSqGSIb3DQEJBDEiBCBvZ2pnDgYLm2hJ\np7LKolCTcPMMSXBflQyHDU0qC+c2DDAKBggqhkjOPQQDAgRIMEYCIQCCMp0XN2Ig\nXeXr42ayxgEH2pRtUpvMwWdKcFSr5INVYAIhAP4VXGm8LrlQQuKHb2WGc787dPXt\nIc+Xusu85ik2pSl1oYIEaDCCBGQGCisGAQQBg78wAwExggRUBIIEUAjV1oGMCBIi\nCiDA0j1q1AaXP5VZ87otHKAfhBR9j/xbhEXCJPmLlZGAHRoVCgxoYXNoZWRyZWtv\ncmQSBTAuMC4xIMPT3dIGKkoKSDBGAiEA0PjUZjsKuZE7Sz0w+kojX3dSh7bvfKLe\nNB7Q4/+DlRYCIQCqeO3tXfO9vYDPsF/lodWivzyC2FkyF35zoA7aDWJ9SjK6BwjP\nnfHRBxIg7U6nNvGNo5CdAurqv6ZBYAdMfW2d4DnNQRfzAmburjoY0p3x0QciIL+6\nph0JZtSfKZ4Nb++2kavWrehb8B7X9ElFb42+E6HTIiB/AMio8BP2yv66ovNpQMiS\nRNwMOUi1Z8gHY1ErGgq6wiIgLkfPBXfD8incfW4XvTx5oWVfLB/eE7sQOHcmpOHn\nH+QiILJV977k/99SkWnXFIsOPZWQ8jEnWuVubsFgLX00SAFZIiA8ObFpp0lrZVKn\nM5ff8APZaxuV/n9DD6ofaSrIgb3O5iIgeud+GSq+yJD6I/GNXccBFPR5wauVTnsS\nLidMwJwvKpEiIA/br/8CaUfSutz+TuQXTW3R7bLF5LCDnI/f89ikmZd7IiBc+n3q\nesvh+eMz9WIhhn9Est+kE+HBLVd4BS11gsyhzyIgziXdlz30/3rnUyDJXJ7mDjBh\n8i/rUwUoSES0YAZxm5wiIGGGhiOTQR8rbqJ1s2Q3NID2fZI1k7GNPUOHwzsI4NzP\nIiCsamMZPi7vJ6lmpwEkfpuIyf/omTLdiBOFOiI0opM2CyIgTn2R86lJuzWcK1Yv\nH6HFe/1dLLMTzyvLsVbaWKm88yciIAHD5pMQRnZCTiD9/L+c58RSEKvtlpnBCCcD\nK6oEFlziIiDB4r/KQkREdZQRiXyn2Jmp3D5xTMzOwpjP0u/7b8DVbiIgSWScSpO0\nIG32sGHItvjaNazDSFr3UT8ym0t0sUm59qYiIAOyedx6elI7ZJSWv+gzjsARSAaI\n5zrNCFr4GbXoyhTGIiBGr8DZpML17niV02Nymwnbqtf+HwmU3pkfGDDvIRroLSIg\n+/VZ56MsIPxMiyLAodzKXo5TEWdQp36z89qLhpzloAoiIHWsZmWmo0aWVficR4jm\nGYSQYkijebnKo4dlpxmx4Yq8IiAM4J6hIyi8i8sTGSEi+KyjD0C41eB5azgQKTJH\noRyphSrhAQreAXJla29yLnNpZ3N0b3JlLmRldiAtIDExOTMwNTA5NTk5MTY2NTY1\nMDYKMjA1MDc3MjY5MAo3VTZuTnZHTm81Q2RBdXJxdjZaQllBZE1mVzJkNERuTlFS\nZnpBbWJ1cmpvPQoK4oCUIHJla29yLnNpZ3N0b3JlLmRldiB3Tkk5YWpCRkFpQnYw\nTEFFaTJmckNXZFFkQ0d4V1pvWGlQalZuNVNPRDB2WENRMzJpNktIdGdJaEFKSkNU\nTE1abFA4YlF6YmZBejN3ZTZZR1NUTFFQQXNvR2tQa1ZrRlM4YzVVCg==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 66730c2415791135ef90b43cf9868e7a26043d08\ntype commit\ntag v1.0.3\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784113589 +0100\n\nv1.0.3\n\nPatch: identical content to v1.0.2 (matchConditions fix, issue 08) --\nv1.0.2's underlying commit was accidentally SSH-signed (this shell's\nglobal commit-signing default), which Flux's go-git library fails to\nresolve during its shallow-fetch-by-tag path (confirmed: plain `git\nclone --branch v1.0.2` works fine, only Flux's source-controller failed\nwith \"unable to resolve commit object ... object not found\").\nv1.0.2 stays as an honest record of the mistake (tag-immutability ruleset\nblocks moving it regardless, same pattern as v1.0.0/v2.0.0 before it).\nv1.0.3's commit is unsigned (avoids the go-git issue); the tag itself is\nfully gitsign-signed, same as every other release.\n",
+    "verified_at": null
+  }
+}
+  tag=v1.0.2 sha=b6e112c326289f51658a0279ac357ce606416c23 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-15T09:14:21Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIIawYJKoZIhvcNAQcCoIIIXDCCCFgCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDKjCCAyYwggKroAMCAQICFEvehuPzQkwHLfqHBsOQSWL8E/x4MAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNTA5MTQzMVoXDTI2MDcxNTA5MjQz\nMVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABKNScXTVj1U66Lo7GkL5ajY2\nllcIieuPQoyjWid7F2FaefkzJEgxojTyR1JmfFnqhngOx2fXbTRjEtjjn5XYMvqj\nggHKMIIBxjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFP4/5fkMrIg6SOjcO4OEUm/5GpOzMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYoGCisGAQQB1nkCBAIE\nfAR6AHgAdgDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9lDmwR\nAAAEAwBHMEUCIQD+kF3lUYeKXVcuMMlemvNr4kPJdyCv4JcwFL79h5ObigIgKzOw\nHSE0rtkmptwff0HTTeDcmH7FzXJyTTu71YAK/mAwCgYIKoZIzj0EAwMDaQAwZgIx\nAJM1L8YXlfYbYn3I27zMrFv/clferM0hywMs2ZkpW7Eisy0BXQUKVWM1BViLzCKd\nOgIxAKXdAlRXFCdjOpt9WXByu4cf5bpEWdf/i7MIOmPy4Zg03S9jIRhmMaXn2QDL\nL+cPWTGCBQcwggUDAgEBME8wNzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYD\nVQQDExVzaWdzdG9yZS1pbnRlcm1lZGlhdGUCFEvehuPzQkwHLfqHBsOQSWL8E/x4\nMAsGCWCGSAFlAwQCAaBpMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI\nhvcNAQkFMQ8XDTI2MDcxNTA5MTQyN1owLwYJKoZIhvcNAQkEMSIEIIzSCLKglKqV\nzuF3IMbltYJZlRNLVD7nSqfGXZZkNm4CMAoGCCqGSM49BAMCBEcwRQIhAPFLz9nb\n47bLx3RxMsu2tlFAXhOn560NEyfeCouJ3SM8AiBekRxHjv/o0YiY66Dl11QobUk9\nIpZ7tRCLXBydLzoh8KGCA94wggPaBgorBgEEAYO/MAMBMYIDygSCA8YIq5niiwgS\nIgogwNI9atQGlz+VWfO6LRygH4QUfY/8W4RFwiT5i5WRgB0aFQoMaGFzaGVkcmVr\nb3JkEgUwLjAuMSD4nt3SBipICkYwRAIga0aGsGMLTYVu4P0N/FNOKbWT71Na8M6P\n0t70bGUXlyUCIGu3UhbRq/QFK2rIm870taeXUmbvb7k3vzPg6wHPbIDWMrIGCKXg\n0dEHEiDAvUKachwfDErpcsyGtVwBBlZ+QTAjftKN1iOdyR8miBiq4NHRByIg4y03\nXhlHr4FMetih0Lp8YC0VZCe7sRIlqt6H1RTt6WkiIMhKohpyDBZ2XH4BPphvBUO3\nFgDMo3HaWkNskSVoX3rlIiBaoDBqEksWtCaSDSWS5C2rLj2M4NRUT4tDTc7Gld+S\nSCIgBr2c0TdpyZDqn6MJ/PhxLaoWLxrNr8/4CrqZruHDAQoiICphqCmEjyiz7jp/\nJgUbioT2iwRqcyf2SUd2h8G1aTxLIiCK2+H0aER44RsTIma/pg9Q0QSH9TDFtlqY\nids63mVphiIgxEsXqvLHlkHefuiWy0y9qdHZo32iW4umRcH3sVnzJ3UiICkXop9f\nFO2Xx2dqZi8eoohSDWAkGdEec4hXEnIIs4unIiAkYsql0Tq8auK6URrKd1TcTDH4\n00iJbrSfnQY4Sn9f9SIgweK/ykJERHWUEYl8p9iZqdw+cUzMzsKYz9Lv+2/A1W4i\nIElknEqTtCBt9rBhyLb42jWsw0ha91E/MptLdLFJufamIiADsnncenpSO2SUlr/o\nM47AEUgGiOc6zQha+Bm16MoUxiIgRq/A2aTC9e54ldNjcpsJ26rX/h8JlN6ZHxgw\n7yEa6C0iIPv1WeejLCD8TIsiwKHcyl6OUxFnUKd+s/Pai4ac5aAKIiB1rGZlpqNG\nllX4nEeI5hmEkGJIo3m5yqOHZacZseGKvCIgDOCeoSMovIvLExkhIvisow9AuNXg\neWs4ECkyR6EcqYUq4QEK3gFyZWtvci5zaWdzdG9yZS5kZXYgLSAxMTkzMDUwOTU5\nOTE2NjU2NTA2CjIwNTAyNTY5MzgKd0wxQ21uSWNId3hLNlhMTWhyVmNBUVpXZmtF\nd0kzN1NqZFlqbmNrZkpvZz0KCuKAlCByZWtvci5zaWdzdG9yZS5kZXYgd05JOWFq\nQkZBaUVBcEVMUzMyS1NJT3QzeWs4elJPQ3J4VVdudDUyeUZhMFdsak5vby94SVVD\na0NJREk2MWpEYkFRRkJJd1BQVUJYRTJYdzkwT0Zyck5rNWZCU2xFd0kzYmNMQwo=\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object d44944a1079d665dc88d1de9d98caf9d127d44e0\ntype commit\ntag v1.0.2\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784106861 +0100\n\nv1.0.2\n\nPatch: matchConditions fix (issue 08) for the 1.0.0 line, zero verdict\nimpact. Replaces matchConstraints.objectSelector (flattened across every\ninstalled ValidatingPolicy into one shared webhook, last-reconciled wins --\nbreaks multi-version coexistence) with a per-policy matchConditions CEL\nexpression. Content otherwise identical to v1.0.0/v1.0.1 -- Audit\nrequire-department-label, Deny require-known-department-label, same\nknown-department set. Cut alongside v2.0.2 so both older lines coexist\ncorrectly with v2.2.0 (issue 08's full 3-version proof).\n",
+    "verified_at": null
+  }
+}
+  tag=v1.0.1 sha=17ecf43674db7c8baa01d76973fbd23e2343fa5a type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-14T14:54:24Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJFwYJKoZIhvcNAQcCoIIJCDCCCQQCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDKjCCAyYwggKsoAMCAQICFAXuqg+2DUN6TVS9IxwDdayNyEd2MAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNDE0NTQzNVoXDTI2MDcxNDE1MDQz\nNVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABIUAbyeNq8mS3vFCPr6Whsgc\n9L+EjPdf6v1+dEGtfAcOcB2+qGj2qgkc66pZjBUJu/F0w8Nyl/1WtfHFD+tQbS+j\nggHLMIIBxzAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFHCZc8hrCSyqdOFMLxKlwywWCm0fMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYsGCisGAQQB1nkCBAIE\nfQR7AHkAdwDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9hH2U2\nAAAEAwBIMEYCIQDyNafQHEcQPukFDatdVKokOsy9t0L1uo+MeKnOi/hzXQIhANiQ\n3ly/naVuoU3/FwNW5G+HuB2dNxlOg02GwYK3jtt3MAoGCCqGSM49BAMDA2gAMGUC\nMGhiyGvQnZP5gCFqZNwF/co6hoU53dXedfb/TmNBHSdQwUdEqJy3vDtHNJP2pYri\nqwIxAPqx7MAnEL6wuclE/E37rENiNED8Wy+09bCRphoj34F2NS8LZS/ZUXN5uo5w\nHXuEIDGCBbMwggWvAgEBME8wNzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYD\nVQQDExVzaWdzdG9yZS1pbnRlcm1lZGlhdGUCFAXuqg+2DUN6TVS9IxwDdayNyEd2\nMAsGCWCGSAFlAwQCAaBpMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI\nhvcNAQkFMQ8XDTI2MDcxNDE0NTQzMVowLwYJKoZIhvcNAQkEMSIEIHJ6q3/ls0Eg\nt17ISFsMK6wMSWGvbZiARx9tKcCB67ChMAoGCCqGSM49BAMCBEcwRQIgNpfkTJTO\nslvqp/JnIA3iw+Io3h9rjJjNJbR0s7g3ZucCIQDegsHhZV6Qos5voJtyWjupSk6T\nVeRAzLuG0h7hRiAIKqGCBIowggSGBgorBgEEAYO/MAMBMYIEdgSCBHII4MqBiggS\nIgogwNI9atQGlz+VWfO6LRygH4QUfY/8W4RFwiT5i5WRgB0aFQoMaGFzaGVkcmVr\nb3JkEgUwLjAuMSCrm9nSBipKCkgwRgIhAMeWG+5IF/XUU5akOJn9sX8VoAqK6FyJ\nUaBMKFW9SyZjAiEA6r8go7qyHr/LhUOhK68G0XLu/1qVjJvngaXvofcH3VEy3AcI\n2pHxzwcSIDh0RRwygYIhzoad0w6Hka+VDh2X/xdejrnORZCkOYSwGO6R8c8HIiDL\ncEpIwXj6MG8S0HejJrxH5mU2ADohieptHOYyiS390yIgrQj7kPTq57pmWRD1R+v4\nSgcSd84GydusT++Zt4WaLrYiIJhKaM39MLOmF0R/dWc8g4pmArkto7/5YCDSBXKp\nhTsJIiCgvZscZot2A3aC5cIqxa54BqiMnyNmxtUdO/TvVmB87yIgZBYgDn9R4shG\nyVIIxDPxsQuh3Z/46iEi1NWkK2gG9FYiICwOwcz4q2REUZtTQes++rLaftQ1ajt3\n4l5aASUN43CjIiDGmSKzmEadMRZCzsE13C0g0Y77AjzwZeJiy/AdE1ShvCIgvNRR\nEwerVZPx6jxE7A5PyQwfhpJ3rcgmmiY7VVjaFOQiIDYhtz9bVrQo67nm86rkNZjI\n6jS7mowvNJX0ae/TcpKuIiC0fUOZh926olkkNpKTNfag+mewFJL4N8N5hs2kUkDg\n8SIgokt1C+cpxtiLsrWNnHQkuTF2uOlQkFJ0WrLUr9rQBoAiICNoMcK/lZVDk9RA\ngs/OHRHRBURFM1cvj4nO/ulGBKO9IiCpAa01ZicXE1DU6ao0FHbL3YQWuCjmXJoo\n1AtoT8OXVyIg/UAkaaq9D8BPMw5qLAxaf+ur4Sfbv3FfLWB2M/py3wMiIOevtcH+\nDoKwWRM31vZ9d4T35tG0bzEYHqz7+EzxPtx6IiCZNKxJl3NWFGCWPL0K8OrcZ+PH\nF45MevCCk5YritGPdCIg5sxNZDoxEj6DMmQATisX9bQXdFmeRHYfC8BjyDIIgeci\nIEavwNmkwvXueJXTY3KbCduq1/4fCZTemR8YMO8hGugtIiD79Vnnoywg/EyLIsCh\n3MpejlMRZ1CnfrPz2ouGnOWgCiIgdaxmZaajRpZV+JxHiOYZhJBiSKN5ucqjh2Wn\nGbHhirwiIAzgnqEjKLyLyxMZISL4rKMPQLjV4HlrOBApMkehHKmFKuEBCt4BcmVr\nb3Iuc2lnc3RvcmUuZGV2IC0gMTE5MzA1MDk1OTkxNjY1NjUwNgoyMDQ2NTc2ODc4\nCk9IUkZIREtCZ2lIT2hwM1REb2VScjVVT0haZi9GMTZPdWM1RmtLUTVoTEE9Cgri\ngJQgcmVrb3Iuc2lnc3RvcmUuZGV2IHdOSTlhakJFQWlCNmNyNHlKS1pKdnMvT1VC\nYkJtVzNkaVU3U0ZHUnpqMVNWa1B1Z1N2bTJmZ0lnT2ZIQStMUkNkVDNmYU0wb0tx\nT2V6Zk5QRWttK2ltU2E3d0JaeGlPZVRPYz0K\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 95a0576f04837b599b5cfbf1fae6908728197fc6\ntype commit\ntag v1.0.1\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784040864 +0100\n\nv1.0.1\n\nPatch: fixes the release pipeline's gitsign verify-tag step (actions/checkout flattens the\nannotated tag ref; re-fetch it before verifying). No policy content change from v1.0.0 --\nrequire-department-label (Audit) + require-known-department-label (Deny) + rationale +\nkyverno test fixtures, unchanged.\n",
+    "verified_at": null
+  }
+}
+  tag=v1.0.0 sha=73edbc9d9024775ca3589e9f89d47749bbe16e61 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-14T14:44:47Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "bad_cert",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIII8QYJKoZIhvcNAQcCoIII4jCCCN4CAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIDJzCCAyMwggKqoAMCAQICFDbLAO2Vy/YuuATCD9eye1KwFBkJMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDcxNDE0NDUxNloXDTI2MDcxNDE0NTUx\nNlowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJGNHwotgx+nxrz6Auqr6Luh\noAl13WhkgHshl6AZQyjNWJAgvnJ8ZbKLDF9ireGB03Q8D70mIJjFR3Ib+ilLUTaj\nggHJMIIBxTAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFGCG1H4T8AsfTT92GaK6RxVuUBFLMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MB0GA1UdEQEB/wQTMBGBD2NocmlzQGNucy5tZS51azApBgor\nBgEEAYO/MAEBBBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wKwYKKwYBBAGD\nvzABCAQdDBtodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20wWwYKKwYBBAGDvzAB\nGARNDEtDaFV4TURnNE16azJNRGM1T0RBM09EY3dPVFl5TURRU0gyaDBkSEJ6T2lV\neVJpVXlSbUZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjAwgYkGCisGAQQB1nkCBAIE\newR5AHcAdQDdPTBqxscRMmMZHhyZZzcCokpeuN48rf+HinKALynujgAAAZ9hFt96\nAAAEAwBGMEQCIGgyQKVBPTeQ16FHSJ45dQukuyCvlIQ98UODpeqAVpwqAiAGf4bD\n+Noeynf4FUTP1rx2JCR6FfI4scleslkMrl/ycDAKBggqhkjOPQQDAwNnADBkAjBs\nq3M64PM5mds+Y0prNyuPbgwC0sIEAnPyA/Eb/S/rq6FxSS1gm22KIINyk1Ez4+gC\nMFiNOACnfkfXy+JinGOGj7sMhFJmTi1SwMhZbLAO7nAKK3fbM8O5hQx+rM8B4vpG\nZDGCBZAwggWMAgEBME8wNzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQD\nExVzaWdzdG9yZS1pbnRlcm1lZGlhdGUCFDbLAO2Vy/YuuATCD9eye1KwFBkJMAsG\nCWCGSAFlAwQCAaBpMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN\nAQkFMQ8XDTI2MDcxNDE0NDUxMlowLwYJKoZIhvcNAQkEMSIEIA51KN4cz31h1eyM\nFv6W946RbZ/I36uJNeNLfjsdYoQrMAoGCCqGSM49BAMCBEcwRQIgIoOGlO1Uminp\nSJolDOXFNMPj2YYV2XT4yB8XGQd7okYCIQDwDtxWklKyNF3RyhJmd0q45Tmc/0NH\nvv5JQMjoAZkU9qGCBGcwggRjBgorBgEEAYO/MAMBMYIEUwSCBE8Ih8D8iQgSIgog\nwNI9atQGlz+VWfO6LRygH4QUfY/8W4RFwiT5i5WRgB0aFQoMaGFzaGVkcmVrb3Jk\nEgUwLjAuMSD9ltnSBipJCkcwRQIhAPVV8gryq67bYLbMK4YYO0RHuKGN8NtDy6ft\ns2zQjkItAiBHmqXyCniVwSDCqeGeRXlr4/nKOipJD1yKgkSSullsTTK6BwiBh+zP\nBxIg7t1Wa/Nq6GJTida5i/G2+4pzNYjotA9qgypLt82w1SgYmofszwciIJ5Ge3zl\nl4ZOFfXtIS8hfh26G6mhy4GqavKPfXDma92TIiDliTWmqQAnrOYrI09D5+LDf9ng\nBcNK++ubqYsPLWqzJCIgUi6/mMfCN38DodJt6vgARCsYHdGFmDzC/4Os5OJ/co8i\nII4C4gFNw1Cj0XflZx0V1dgvLBBer88JjOy5pFzYH2awIiDs2s/fT/N6A6kJdEaL\nSFLv2uc8mV1/Rw6W4by6umjK3yIg4Uapb/TpPucG7cv+lS/YV/41tS3jC/v/DjZQ\nAd6F2d0iIPrPeyjnIDs7mVr+k4qtnaZI9i9v2X8a3ODwAOw+Eo8yIiDKgG4NO9eV\nw9EC+HO/c9sPfQqVYA8anAnltn3M3g/9QyIg/9ED3KK5M6iz2+nkYwWV54TzR7K3\n7dEmsC6USZa7xlkiIFAdMK/lqfL+wGm93eOTxJJh4KDe45Cep7vGGqX/C5ejIiAj\naDHCv5WVQ5PUQILPzh0R0QVERTNXL4+Jzv7pRgSjvSIgqQGtNWYnFxNQ1OmqNBR2\ny92EFrgo5lyaKNQLaE/Dl1ciIP1AJGmqvQ/ATzMOaiwMWn/rq+En279xXy1gdjP6\nct8DIiDnr7XB/g6CsFkTN9b2fXeE9+bRtG8xGB6s+/hM8T7ceiIgmTSsSZdzVhRg\nljy9CvDq3GfjxxeOTHrwgpOWK4rRj3QiIObMTWQ6MRI+gzJkAE4rF/W0F3RZnkR2\nHwvAY8gyCIHnIiBGr8DZpML17niV02Nymwnbqtf+HwmU3pkfGDDvIRroLSIg+/VZ\n56MsIPxMiyLAodzKXo5TEWdQp36z89qLhpzloAoiIHWsZmWmo0aWVficR4jmGYSQ\nYkijebnKo4dlpxmx4Yq8IiAM4J6hIyi8i8sTGSEi+KyjD0C41eB5azgQKTJHoRyp\nhSrhAQreAXJla29yLnNpZ3N0b3JlLmRldiAtIDExOTMwNTA5NTk5MTY2NTY1MDYK\nMjA0NjQ5MzU5NAo3dDFXYS9OcTZHSlRpZGE1aS9HMis0cHpOWWpvdEE5cWd5cEx0\nODJ3MVNnPQoK4oCUIHJla29yLnNpZ3N0b3JlLmRldiB3Tkk5YWpCRkFpRUEyWkJ0\nWUt6cytUUkJhTURxOFd0b1Y3MmI0RmxEcnFDNlZnSW1TbWNXakNJQ0lFK0I0dGZB\nS05kcFV0VS9zNjgxa3ZublZmdEk2T25XY0crZDMwblpMZDNwCg==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 42280cd2998976ea5b45882e28be949ff39b43e9\ntype commit\ntag v1.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784040287 +0100\n\nv1.0.0\n\nrequire-department-label (Audit, lane-keeping) + require-known-department-label (Deny, gate),\neach with rationale.md + kyverno test fixtures, plus the signed release pipeline itself\n(.github/workflows/release.yml). See CONTEXT.md/PRD in the hub repo for the semver-meaning\ndefinition this release satisfies.\n",
+    "verified_at": null
+  }
+}
+=== policy-as-versioned-flux/pr-gate-action tags: v1.0.0 ===
+  tag=v1.0.0 sha=eb12674ddee8756d83fa0553d395f398b6338625 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-16T12:35:28Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQIZOJ5ppK1o7A1nyCTOTyNDrYIskyVD6cIf39Zm7pqahBc3c4h3fLC6W6XMmkidaJU\nAe57MMJjG9Y+/qCvGw6Q4=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object 98939ebd5ea5df7577eee71c21c3a25a4b68f123\ntype commit\ntag v1.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784205328 +0100\n\nv1.0.0: initial extraction from fleet's pr-gate-check.sh (ticket 03)\n",
+    "verified_at": "2026-07-17T15:33:23Z"
+  }
+}
+=== policy-as-versioned-flux/readiness-collector tags: v1.0.0 ===
+  tag=v1.0.0 sha=e95d31b1ffa8b5184bcec1cf9036c0262368c352 type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-16T15:55:17Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQBEeSMH3beJdjhyF9XmWx5bD19Y3rnEQzM0GrxNHpcJ3CT6f0s/IQ6UJprisdoY41L\nxiBhrXREgQgQ/36Q7cUAk=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object d29b63bce5d8a5997b70dc4c68f8fac61f09a371\ntype commit\ntag v1.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784217317 +0100\n\nv1.0.0: initial readiness-collector (fixed: array output shape)\n",
+    "verified_at": "2026-07-17T17:13:48Z"
+  }
+}
+=== policy-as-versioned-flux/reports tags: v1.0.0 ===
+  tag=v1.0.0 sha=a2ab74b9cdadf8da5b45cc8887c15a06d4ad791e type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-16T13:26:57Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQIkIqCoPimQ8F3isbOTD/FOPUpOrIedFj/gSI38HTs3oJxqlhO5qZBL2EdxyMsWBwc\nR6iozumzzL45UQtOYKZQw=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object 84d60bfae8cb8ce72489402524daa744405d1a3b\ntype commit\ntag v1.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784208417 +0100\n\nv1.0.0: initial reports app\n",
+    "verified_at": "2026-08-27T13:04:54Z"
+  }
+}
+=== policy-as-versioned-flux/storefront tags: v1.0.0 ===
+  tag=v1.0.0 sha=faa82ed4894b309ea42d3c3c48496ab89df101eb type=tag
+{
+  "tagger": {
+    "name": "Chris Nesbitt-Smith",
+    "email": "chris@cns.me.uk",
+    "date": "2026-07-17T12:19:39Z"
+  },
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQCJbUx1uf6pR/L+lUMz8Y+VUBj3CFd08C9unwQGpvHzUU0hdOSCyo8ViBTmxjkw5SO\nlEeCUAoH/4ZMwl6i5Vbgk=\n-----END SSH SIGNATURE-----\n",
+    "payload": "object 588cb589b51f924447fb2b27d014c41aa656786c\ntype commit\ntag v1.0.0\ntagger Chris Nesbitt-Smith <chris@cns.me.uk> 1784290779 +0100\n\nv1.0.0: node_modules shipped for trivy image-mode scanner visibility\n",
+    "verified_at": "2026-08-27T13:04:55Z"
+  }
+}
+=== policy-as-versioned-ico/ico tags: v1.0.0 ===
+  tag=v1.0.0 sha=638f4d4288417553d93b910cef8c24ac70ff4b89 type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-ico.invalid",
+    "date": "2026-08-21T07:39:38Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIII2QYJKoZIhvcNAQcCoIIIyjCCCMYCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHejCCB3Ywggb9oAMCAQICFB9wb7P7iFVZFtOH1Vw7ejuzx+r9MAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyMTA3MzkzOVoXDTI2MDgyMTA3NDkz\nOVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLrmS0lhx0G0RQbvw2uGTOVH\nInzpRtXyYAh9vmp3ORE/cdvHgIl66wtv7We6774bXnsb79C65KSjL/7LAfA3CiCj\nggYcMIIGGDAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFF2wXE/8slM3NDlrjR64+aRECH+vMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MG4GA1UdEQEB/wRkMGKGYGh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLWljby9pY28vLmdpdGh1Yi93b3JrZmxvd3MvY3V0\nLXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA5BgorBgEEAYO/MAEBBCtodHRw\nczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tMB8GCisGAQQB\ng78wAQIEEXdvcmtmbG93X2Rpc3BhdGNoMDYGCisGAQQBg78wAQMEKDA5MTg2MjNh\nMmViZGQzZjY0NjIwMGY2OWM1Y2VjNTAzZWJlYzkwYzAwGQYKKwYBBAGDvzABBAQL\nY3V0LXJlbGVhc2UwKQYKKwYBBAGDvzABBQQbcG9saWN5LWFzLXZlcnNpb25lZC1p\nY28vaWNvMB0GCisGAQQBg78wAQYED3JlZnMvaGVhZHMvbWFpbjA7BgorBgEEAYO/\nMAEIBC0MK2h0dHBzOi8vdG9rZW4uYWN0aW9ucy5naXRodWJ1c2VyY29udGVudC5j\nb20wcAYKKwYBBAGDvzABCQRiDGBodHRwczovL2dpdGh1Yi5jb20vcG9saWN5LWFz\nLXZlcnNpb25lZC1pY28vaWNvLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNl\nLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABCgQqDCgwOTE4NjIzYTJl\nYmRkM2Y2NDYyMDBmNjljNWNlYzUwM2ViZWM5MGMwMB0GCisGAQQBg78wAQsEDwwN\nZ2l0aHViLWhvc3RlZDA+BgorBgEEAYO/MAEMBDAMLmh0dHBzOi8vZ2l0aHViLmNv\nbS9wb2xpY3ktYXMtdmVyc2lvbmVkLWljby9pY28wOAYKKwYBBAGDvzABDQQqDCgw\nOTE4NjIzYTJlYmRkM2Y2NDYyMDBmNjljNWNlYzUwM2ViZWM5MGMwMB8GCisGAQQB\ng78wAQ4EEQwPcmVmcy9oZWFkcy9tYWluMBoGCisGAQQBg78wAQ8EDAwKMTM0MDk4\nNTExOTA6BgorBgEEAYO/MAEQBCwMKmh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3kt\nYXMtdmVyc2lvbmVkLWljbzAZBgorBgEEAYO/MAERBAsMCTMwODQ4MDIzMzBwBgor\nBgEEAYO/MAESBGIMYGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLWljby9pY28vLmdpdGh1Yi93b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJl\nZnMvaGVhZHMvbWFpbjA4BgorBgEEAYO/MAETBCoMKDA5MTg2MjNhMmViZGQzZjY0\nNjIwMGY2OWM1Y2VjNTAzZWJlYzkwYzAwIQYKKwYBBAGDvzABFAQTDBF3b3JrZmxv\nd19kaXNwYXRjaDBiBgorBgEEAYO/MAEVBFQMUmh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLWljby9pY28vYWN0aW9ucy9ydW5zLzMyNDU5NTk5\nMDMyL2F0dGVtcHRzLzEwFgYKKwYBBAGDvzABFgQIDAZwdWJsaWMwWQYKKwYBBAGD\nvzABGARLDElyZXBvOnBvbGljeS1hcy12ZXJzaW9uZWQtaWNvQDMwODQ4MDIzMy9p\nY29AMTM0MDk4NTExOTpyZWY6cmVmcy9oZWFkcy9tYWluMIGLBgorBgEEAdZ5AgQC\nBH0EewB5AHcA3T0wasbHETJjGR4cmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgI0Lb\nGQAABAMASDBGAiEAvmLVZliXBmRju0ZioDoxj0m4F/6G2KRdWScXkLPocSACIQDC\nsWDHTcHfbLG58CM12kekCY0SaLVpPrKPfFCB1W6cQDAKBggqhkjOPQQDAwNnADBk\nAjBkH8luenYNILS9vPOch/Xm8esbonTmugYvPez7yiBFllg9bO0CdPE4pNKPNNR5\nVZICMBuXsHK6qZho5yJ806bOZ5UisF2mCouxaCdRuHx/Hahx2wp9hPduAuqR/abG\nEU636TGCASUwggEhAgEBME8wNzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYD\nVQQDExVzaWdzdG9yZS1pbnRlcm1lZGlhdGUCFB9wb7P7iFVZFtOH1Vw7ejuzx+r9\nMAsGCWCGSAFlAwQCAaBpMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI\nhvcNAQkFMQ8XDTI2MDgyMTA3MzkzOVowLwYJKoZIhvcNAQkEMSIEIJNxkXM0YXpZ\n7xpIlim9azi+RzxyEd6W01WKaSpBPQ5YMAoGCCqGSM49BAMCBEcwRQIhAN1mFAD6\nkvzn4RpwNbMgzDdfE9y79bVXq74IrnzUGS7UAiA4Vm1fkL/w3c02EqVJcQCfCBAg\nVEQxe+F8P/vxPtrHxw==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 0918623a2ebdd3f646200f69c5cec503ebec90c0\ntype commit\ntag v1.0.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-ico.invalid> 1787297978 +0000\n\nico UK GDPR penalty schema, first signed release\n",
+    "verified_at": null
+  }
+}
+=== policy-as-versioned-ludlow/ludlow tags: v1.1.0
+v1.0.0 ===
+  tag=v1.1.0 sha=00c9da1a222aaa0d582ff420d5182b398fbe2cbc type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-ludlow.invalid",
+    "date": "2026-08-25T17:10:15Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJBQYJKoZIhvcNAQcCoIII9jCCCPICAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHpjCCB6IwggcooAMCAQICFGN00SEXeZa+P9VlLfVnpDUJgLIDMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyNTE3MTAxNloXDTI2MDgyNTE3MjAx\nNlowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABL5KHs8W6FGxQMGDsTafXQ/H\nqC1g+LmCZGFDOBuzqUO8dq/PpEzFZiFmmPRXHvRpomlq3FpmYJ7PdhoOacylgmej\nggZHMIIGQzAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFIr/lvb9wVFb77uGIicQpo1ldzN+MB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHQGA1UdEQEB/wRqMGiGZmh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLWx1ZGxvdy9sdWRsb3cvLmdpdGh1Yi93b3JrZmxv\nd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA5BgorBgEEAYO/MAEB\nBCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tMB8G\nCisGAQQBg78wAQIEEXdvcmtmbG93X2Rpc3BhdGNoMDYGCisGAQQBg78wAQMEKGE4\nMDBhNThlMjU0N2I0MWY4YzliNzdhOTFiOTNlYjlkODIwZTg1NjkwGQYKKwYBBAGD\nvzABBAQLY3V0LXJlbGVhc2UwLwYKKwYBBAGDvzABBQQhcG9saWN5LWFzLXZlcnNp\nb25lZC1sdWRsb3cvbHVkbG93MB0GCisGAQQBg78wAQYED3JlZnMvaGVhZHMvbWFp\nbjA7BgorBgEEAYO/MAEIBC0MK2h0dHBzOi8vdG9rZW4uYWN0aW9ucy5naXRodWJ1\nc2VyY29udGVudC5jb20wdgYKKwYBBAGDvzABCQRoDGZodHRwczovL2dpdGh1Yi5j\nb20vcG9saWN5LWFzLXZlcnNpb25lZC1sdWRsb3cvbHVkbG93Ly5naXRodWIvd29y\na2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGD\nvzABCgQqDChhODAwYTU4ZTI1NDdiNDFmOGM5Yjc3YTkxYjkzZWI5ZDgyMGU4NTY5\nMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3RlZDBEBgorBgEEAYO/MAEMBDYM\nNGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLWx1ZGxvdy9s\ndWRsb3cwOAYKKwYBBAGDvzABDQQqDChhODAwYTU4ZTI1NDdiNDFmOGM5Yjc3YTkx\nYjkzZWI5ZDgyMGU4NTY5MB8GCisGAQQBg78wAQ4EEQwPcmVmcy9oZWFkcy9tYWlu\nMBoGCisGAQQBg78wAQ8EDAwKMTM0MDk4NDk4OTA9BgorBgEEAYO/MAEQBC8MLWh0\ndHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLWx1ZGxvdzAZBgor\nBgEEAYO/MAERBAsMCTMwODQ4MDA5MTB2BgorBgEEAYO/MAESBGgMZmh0dHBzOi8v\nZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLWx1ZGxvdy9sdWRsb3cvLmdp\ndGh1Yi93b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA4\nBgorBgEEAYO/MAETBCoMKGE4MDBhNThlMjU0N2I0MWY4YzliNzdhOTFiOTNlYjlk\nODIwZTg1NjkwIQYKKwYBBAGDvzABFAQTDBF3b3JrZmxvd19kaXNwYXRjaDBoBgor\nBgEEAYO/MAEVBFoMWGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLWx1ZGxvdy9sdWRsb3cvYWN0aW9ucy9ydW5zLzMyODc2MjYwMzMzL2F0dGVt\ncHRzLzEwFgYKKwYBBAGDvzABFgQIDAZwdWJsaWMwXwYKKwYBBAGDvzABGARRDE9y\nZXBvOnBvbGljeS1hcy12ZXJzaW9uZWQtbHVkbG93QDMwODQ4MDA5MS9sdWRsb3dA\nMTM0MDk4NDk4OTpyZWY6cmVmcy9oZWFkcy9tYWluMIGJBgorBgEEAdZ5AgQCBHsE\neQB3AHUA3T0wasbHETJjGR4cmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgOea1agAA\nBAMARjBEAiB/OKEWeiUGq0su1hZ2WUL8FtWMFjBy0S0AG8lG+IT0eQIgJYhsCbTz\nrnT3bDFMOJvi0vfwHvvIBYBtptp8jB+wD2AwCgYIKoZIzj0EAwMDaAAwZQIwdD8d\nFk8ug7OlP08RVpRqpuiDTT51z7CrBlMMmVdKuRNilZiPqJdWM+tuLNbndBOcAjEA\njCR7SC3PU4uuxKO8WeCfXoh7VXnf8Naj+2alx0MmobhL9N2piwfnWJKqrYcKS1ir\nMYIBJTCCASECAQEwTzA3MRUwEwYDVQQKEwxzaWdzdG9yZS5kZXYxHjAcBgNVBAMT\nFXNpZ3N0b3JlLWludGVybWVkaWF0ZQIUY3TRIRd5lr4/1WUt9WekNQmAsgMwCwYJ\nYIZIAWUDBAIBoGkwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B\nCQUxDxcNMjYwODI1MTcxMDE2WjAvBgkqhkiG9w0BCQQxIgQgAWhBQYuLITT6sU/U\nPOQcW/4OHTeJ4MzZRQDcW6uHA5cwCgYIKoZIzj0EAwIERzBFAiEAp6N3b0bGgNel\ngZ9rDTkf+seNcTIrqtdj6xMZjvVy7yICIEVS8g/OG3jdi0lcTOrv9CK87a+cF5JT\n733InFhInd2Q\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object a800a58e2547b41f8c9b77a91b93eb9d820e8569\ntype commit\ntag v1.1.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-ludlow.invalid> 1787677815 +0000\n\npolicy-composition ticket 18: ludlow's first signed composed artefact. MODERATE baseline, 285 recorded holes, 0 refusals, 0 ungoverned namespaces.\n",
+    "verified_at": null
+  }
+}
+  tag=v1.0.0 sha=161f6dfeb333d7d95e2ef1f78893f41c07a0a67b type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-ludlow.invalid",
+    "date": "2026-08-21T07:48:02Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJBgYJKoZIhvcNAQcCoIII9zCCCPMCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHpzCCB6MwggcqoAMCAQICFAhRD7HFLJr1UpIvOa/qwi6FXAuOMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyMTA3NDgwMloXDTI2MDgyMTA3NTgw\nMlowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABKcHTVe3xnaoDKUgz6uPfUSz\nT+gAO0bblS0fDawvA5esb5EMMBsdSwovhkD0tZsocPPom28b1GF+cdjt4lAj8mGj\nggZJMIIGRTAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFGS92jowXRwMK0OwfhhS8TdQNjRXMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHQGA1UdEQEB/wRqMGiGZmh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLWx1ZGxvdy9sdWRsb3cvLmdpdGh1Yi93b3JrZmxv\nd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA5BgorBgEEAYO/MAEB\nBCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tMB8G\nCisGAQQBg78wAQIEEXdvcmtmbG93X2Rpc3BhdGNoMDYGCisGAQQBg78wAQMEKDdi\nZDk5NzNiZTQzZGUwYjVkMWQxM2I3ZWI0NmExYTYwYjAxNTE2ZWMwGQYKKwYBBAGD\nvzABBAQLY3V0LXJlbGVhc2UwLwYKKwYBBAGDvzABBQQhcG9saWN5LWFzLXZlcnNp\nb25lZC1sdWRsb3cvbHVkbG93MB0GCisGAQQBg78wAQYED3JlZnMvaGVhZHMvbWFp\nbjA7BgorBgEEAYO/MAEIBC0MK2h0dHBzOi8vdG9rZW4uYWN0aW9ucy5naXRodWJ1\nc2VyY29udGVudC5jb20wdgYKKwYBBAGDvzABCQRoDGZodHRwczovL2dpdGh1Yi5j\nb20vcG9saWN5LWFzLXZlcnNpb25lZC1sdWRsb3cvbHVkbG93Ly5naXRodWIvd29y\na2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGD\nvzABCgQqDCg3YmQ5OTczYmU0M2RlMGI1ZDFkMTNiN2ViNDZhMWE2MGIwMTUxNmVj\nMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3RlZDBEBgorBgEEAYO/MAEMBDYM\nNGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLWx1ZGxvdy9s\ndWRsb3cwOAYKKwYBBAGDvzABDQQqDCg3YmQ5OTczYmU0M2RlMGI1ZDFkMTNiN2Vi\nNDZhMWE2MGIwMTUxNmVjMB8GCisGAQQBg78wAQ4EEQwPcmVmcy9oZWFkcy9tYWlu\nMBoGCisGAQQBg78wAQ8EDAwKMTM0MDk4NDk4OTA9BgorBgEEAYO/MAEQBC8MLWh0\ndHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLWx1ZGxvdzAZBgor\nBgEEAYO/MAERBAsMCTMwODQ4MDA5MTB2BgorBgEEAYO/MAESBGgMZmh0dHBzOi8v\nZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLWx1ZGxvdy9sdWRsb3cvLmdp\ndGh1Yi93b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA4\nBgorBgEEAYO/MAETBCoMKDdiZDk5NzNiZTQzZGUwYjVkMWQxM2I3ZWI0NmExYTYw\nYjAxNTE2ZWMwIQYKKwYBBAGDvzABFAQTDBF3b3JrZmxvd19kaXNwYXRjaDBoBgor\nBgEEAYO/MAEVBFoMWGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLWx1ZGxvdy9sdWRsb3cvYWN0aW9ucy9ydW5zLzMyNDYwMjIyMDg0L2F0dGVt\ncHRzLzEwFgYKKwYBBAGDvzABFgQIDAZwdWJsaWMwXwYKKwYBBAGDvzABGARRDE9y\nZXBvOnBvbGljeS1hcy12ZXJzaW9uZWQtbHVkbG93QDMwODQ4MDA5MS9sdWRsb3dA\nMTM0MDk4NDk4OTpyZWY6cmVmcy9oZWFkcy9tYWluMIGLBgorBgEEAdZ5AgQCBH0E\newB5AHcA3T0wasbHETJjGR4cmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgI0qK2wAA\nBAMASDBGAiEAiFcvLJ6SnmAIyV7IFYPQJoOOH5pZUHHHr/K8mvpAN5MCIQCsm3a8\nXjILGpJCSfhlUeKEcuo+TvsGLv7OmmAYhKTKXzAKBggqhkjOPQQDAwNnADBkAjBS\nCCjNTKBusoj1swtgjf7t0YjA5+Wf3R3lsPigXj/QTHoBOqq8Wuc16XeP8gN6xfQC\nMECVxdycam7OKv71k1oRni1+VbX6vW7VWAvjn7B0w4FqOqmbz96mwCyEU7MWXOfV\nczGCASUwggEhAgEBME8wNzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQD\nExVzaWdzdG9yZS1pbnRlcm1lZGlhdGUCFAhRD7HFLJr1UpIvOa/qwi6FXAuOMAsG\nCWCGSAFlAwQCAaBpMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN\nAQkFMQ8XDTI2MDgyMTA3NDgwM1owLwYJKoZIhvcNAQkEMSIEIEiFuA34JrVCCTH1\n9onxvcCPfhuzJzTBDC/PXTNpQrUTMAoGCCqGSM49BAMCBEcwRQIgIkHzchzYc1J4\nciS8nO04GIAXkyjGilA7rLde6q4Mu5ACIQDkKdKyf5HW+QodOeq6B1TFIt/OUBUo\nmhVXLgdUGwij5w==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 7bd9973be43de0b5d1d13b7eb46a1a60b01516ec\ntype commit\ntag v1.0.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-ludlow.invalid> 1787298482 +0000\n\nludlow institution repo, first signed release\n",
+    "verified_at": null
+  }
+}
+=== policy-as-versioned-nist/nist tags: v1.1.0
+v1.0.0 ===
+  tag=v1.1.0 sha=bcfe38813332ca8bea31b9e490c31e004cb92cd4 type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-nist.invalid",
+    "date": "2026-08-25T15:42:55Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIII6QYJKoZIhvcNAQcCoIII2jCCCNYCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHijCCB4YwggcLoAMCAQICFBrteoPoXNXLb6jFTY+jOn0SeisIMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyNTE1NDI1NVoXDTI2MDgyNTE1NTI1\nNVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLhV+/RHSooBqJZAVXIxO/Hc\n3pNisQOdXdm/EPlCGwcG0FUNBjPMSveqb3fDRDDZURpavQDF8vL8BGBNUI6iRm2j\nggYqMIIGJjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFGSIE951q36w5Y7IeWDDunPEB7/LMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHAGA1UdEQEB/wRmMGSGYmh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLW5pc3QvbmlzdC8uZ2l0aHViL3dvcmtmbG93cy9j\ndXQtcmVsZWFzZS55bWxAcmVmcy9oZWFkcy9tYWluMDkGCisGAQQBg78wAQEEK2h0\ndHBzOi8vdG9rZW4uYWN0aW9ucy5naXRodWJ1c2VyY29udGVudC5jb20wHwYKKwYB\nBAGDvzABAgQRd29ya2Zsb3dfZGlzcGF0Y2gwNgYKKwYBBAGDvzABAwQoMzNhMDVk\nZjFmNTI0MWJjYTZmZmJjMWM2OWE3MDA3NWNkYjdhNTgxOTAZBgorBgEEAYO/MAEE\nBAtjdXQtcmVsZWFzZTArBgorBgEEAYO/MAEFBB1wb2xpY3ktYXMtdmVyc2lvbmVk\nLW5pc3QvbmlzdDAdBgorBgEEAYO/MAEGBA9yZWZzL2hlYWRzL21haW4wOwYKKwYB\nBAGDvzABCAQtDCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRl\nbnQuY29tMHIGCisGAQQBg78wAQkEZAxiaHR0cHM6Ly9naXRodWIuY29tL3BvbGlj\neS1hcy12ZXJzaW9uZWQtbmlzdC9uaXN0Ly5naXRodWIvd29ya2Zsb3dzL2N1dC1y\nZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABCgQqDCgzM2Ew\nNWRmMWY1MjQxYmNhNmZmYmMxYzY5YTcwMDc1Y2RiN2E1ODE5MB0GCisGAQQBg78w\nAQsEDwwNZ2l0aHViLWhvc3RlZDBABgorBgEEAYO/MAEMBDIMMGh0dHBzOi8vZ2l0\naHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLW5pc3QvbmlzdDA4BgorBgEEAYO/\nMAENBCoMKDMzYTA1ZGYxZjUyNDFiY2E2ZmZiYzFjNjlhNzAwNzVjZGI3YTU4MTkw\nHwYKKwYBBAGDvzABDgQRDA9yZWZzL2hlYWRzL21haW4wGgYKKwYBBAGDvzABDwQM\nDAoxMzQwOTg1MDU1MDsGCisGAQQBg78wARAELQwraHR0cHM6Ly9naXRodWIuY29t\nL3BvbGljeS1hcy12ZXJzaW9uZWQtbmlzdDAZBgorBgEEAYO/MAERBAsMCTMwODQ4\nMDE2NjByBgorBgEEAYO/MAESBGQMYmh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3kt\nYXMtdmVyc2lvbmVkLW5pc3QvbmlzdC8uZ2l0aHViL3dvcmtmbG93cy9jdXQtcmVs\nZWFzZS55bWxAcmVmcy9oZWFkcy9tYWluMDgGCisGAQQBg78wARMEKgwoMzNhMDVk\nZjFmNTI0MWJjYTZmZmJjMWM2OWE3MDA3NWNkYjdhNTgxOTAhBgorBgEEAYO/MAEU\nBBMMEXdvcmtmbG93X2Rpc3BhdGNoMGQGCisGAQQBg78wARUEVgxUaHR0cHM6Ly9n\naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtbmlzdC9uaXN0L2FjdGlvbnMv\ncnVucy8zMjg2NzQ5MTI5NS9hdHRlbXB0cy8xMBYGCisGAQQBg78wARYECAwGcHVi\nbGljMFsGCisGAQQBg78wARgETQxLcmVwbzpwb2xpY3ktYXMtdmVyc2lvbmVkLW5p\nc3RAMzA4NDgwMTY2L25pc3RAMTM0MDk4NTA1NTpyZWY6cmVmcy9oZWFkcy9tYWlu\nMIGKBgorBgEEAdZ5AgQCBHwEegB4AHYA3T0wasbHETJjGR4cmWc3AqJKXrjePK3/\nh4pygC8p7o4AAAGgOZa/bwAABAMARzBFAiAwntpeTYlR3GKilVwcPzFzHioG1Ykp\ng4royQV8fWhsrQIhAIhNVw3j1VVAZP77pTNTRVNRvdS7BwA9TefvfinAnm2FMAoG\nCCqGSM49BAMDA2kAMGYCMQCd/36efPe+ScWi6LPc7t/C6NbNO8mynNWMHWYCHOXP\n7ymzRS/qW4HqZyv0eW9JNkQCMQDAylf6i7aB7EynkVYZhD6iml7UVz4057Des+Ec\nodRJoEg82vvhhUShiU8pkG2q7UoxggElMIIBIQIBATBPMDcxFTATBgNVBAoTDHNp\nZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2lnc3RvcmUtaW50ZXJtZWRpYXRlAhQa7XqD\n6FzVy2+oxU2Pozp9EnorCDALBglghkgBZQMEAgGgaTAYBgkqhkiG9w0BCQMxCwYJ\nKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNjA4MjUxNTQyNTZaMC8GCSqGSIb3\nDQEJBDEiBCDVQ2CDIjvH2aR6wBfq1naRwxEyjbTopNp7N6zR389SDjAKBggqhkjO\nPQQDAgRHMEUCIE/BiQNimI4QPk+4x0wbMgbyopVmqfmysE25ONmKpRd6AiEA+fcg\n7T7DrELKq7hawIwg6EPqL04vn1bTWeviUGuqDCo=\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 33a05df1f5241bca6ffbc1c69a70075cdb7a5819\ntype commit\ntag v1.1.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-nist.invalid> 1787672575 +0000\n\npolicy-composition ticket 09: LOW/MODERATE/HIGH OSCAL baselines\n",
+    "verified_at": null
+  }
+}
+  tag=v1.0.0 sha=3082edc1ed1886e09bacb004bbe423064cc01a2c type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-nist.invalid",
+    "date": "2026-08-21T07:39:16Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIII5wYJKoZIhvcNAQcCoIII2DCCCNQCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHiDCCB4QwggcKoAMCAQICFEv9XJuo5Cce7PpEXPy9nVklrn2uMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyMTA3MzkxN1oXDTI2MDgyMTA3NDkx\nN1owADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABL1FEm4PlZKNDrqkM6YzXKw+\nalxqkkbTJacAUxOiY0pWXh7T6pIDbfXFqIT0YdRTfmL23vkcM0JsiI81ec5XDTCj\nggYpMIIGJTAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFNPLx8obPnErZPdc1wmYIrl6xTzbMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHAGA1UdEQEB/wRmMGSGYmh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLW5pc3QvbmlzdC8uZ2l0aHViL3dvcmtmbG93cy9j\ndXQtcmVsZWFzZS55bWxAcmVmcy9oZWFkcy9tYWluMDkGCisGAQQBg78wAQEEK2h0\ndHBzOi8vdG9rZW4uYWN0aW9ucy5naXRodWJ1c2VyY29udGVudC5jb20wHwYKKwYB\nBAGDvzABAgQRd29ya2Zsb3dfZGlzcGF0Y2gwNgYKKwYBBAGDvzABAwQoZTU5NTNl\nMWE5NjAxOGU5YTI5Njc3YzY2Y2Q2MTkzOWFkNzk2ZDI1ZTAZBgorBgEEAYO/MAEE\nBAtjdXQtcmVsZWFzZTArBgorBgEEAYO/MAEFBB1wb2xpY3ktYXMtdmVyc2lvbmVk\nLW5pc3QvbmlzdDAdBgorBgEEAYO/MAEGBA9yZWZzL2hlYWRzL21haW4wOwYKKwYB\nBAGDvzABCAQtDCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRl\nbnQuY29tMHIGCisGAQQBg78wAQkEZAxiaHR0cHM6Ly9naXRodWIuY29tL3BvbGlj\neS1hcy12ZXJzaW9uZWQtbmlzdC9uaXN0Ly5naXRodWIvd29ya2Zsb3dzL2N1dC1y\nZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABCgQqDChlNTk1\nM2UxYTk2MDE4ZTlhMjk2NzdjNjZjZDYxOTM5YWQ3OTZkMjVlMB0GCisGAQQBg78w\nAQsEDwwNZ2l0aHViLWhvc3RlZDBABgorBgEEAYO/MAEMBDIMMGh0dHBzOi8vZ2l0\naHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLW5pc3QvbmlzdDA4BgorBgEEAYO/\nMAENBCoMKGU1OTUzZTFhOTYwMThlOWEyOTY3N2M2NmNkNjE5MzlhZDc5NmQyNWUw\nHwYKKwYBBAGDvzABDgQRDA9yZWZzL2hlYWRzL21haW4wGgYKKwYBBAGDvzABDwQM\nDAoxMzQwOTg1MDU1MDsGCisGAQQBg78wARAELQwraHR0cHM6Ly9naXRodWIuY29t\nL3BvbGljeS1hcy12ZXJzaW9uZWQtbmlzdDAZBgorBgEEAYO/MAERBAsMCTMwODQ4\nMDE2NjByBgorBgEEAYO/MAESBGQMYmh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3kt\nYXMtdmVyc2lvbmVkLW5pc3QvbmlzdC8uZ2l0aHViL3dvcmtmbG93cy9jdXQtcmVs\nZWFzZS55bWxAcmVmcy9oZWFkcy9tYWluMDgGCisGAQQBg78wARMEKgwoZTU5NTNl\nMWE5NjAxOGU5YTI5Njc3YzY2Y2Q2MTkzOWFkNzk2ZDI1ZTAhBgorBgEEAYO/MAEU\nBBMMEXdvcmtmbG93X2Rpc3BhdGNoMGQGCisGAQQBg78wARUEVgxUaHR0cHM6Ly9n\naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtbmlzdC9uaXN0L2FjdGlvbnMv\ncnVucy8zMjQ1OTU3Mjg4OS9hdHRlbXB0cy8xMBYGCisGAQQBg78wARYECAwGcHVi\nbGljMFsGCisGAQQBg78wARgETQxLcmVwbzpwb2xpY3ktYXMtdmVyc2lvbmVkLW5p\nc3RAMzA4NDgwMTY2L25pc3RAMTM0MDk4NTA1NTpyZWY6cmVmcy9oZWFkcy9tYWlu\nMIGJBgorBgEEAdZ5AgQCBHsEeQB3AHUA3T0wasbHETJjGR4cmWc3AqJKXrjePK3/\nh4pygC8p7o4AAAGgI0KFEwAABAMARjBEAiAc5hkFcOs5nSG0sEh6+wDvZbFtKrad\nhBmufV+PGcmvbgIgXYNt1ENnjehCk0/FfYcqOHkPTeKeRnNdcLdcmc33ltgwCgYI\nKoZIzj0EAwMDaAAwZQIwIQbh+5bANjkMx7GUM7LsIdZsfkuy5dk17ICCuZwWHuvZ\nHd8G/VgZ+QzjuMWMz8aaAjEA2R8bJuVKSSYtL/bmsPGlTAfone6Q9TIu+87PER+D\n5YBQAcjGem+lNUBKyHXbB5mxMYIBJTCCASECAQEwTzA3MRUwEwYDVQQKEwxzaWdz\ndG9yZS5kZXYxHjAcBgNVBAMTFXNpZ3N0b3JlLWludGVybWVkaWF0ZQIUS/1cm6jk\nJx7s+kRc/L2dWSWufa4wCwYJYIZIAWUDBAIBoGkwGAYJKoZIhvcNAQkDMQsGCSqG\nSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjYwODIxMDczOTE3WjAvBgkqhkiG9w0B\nCQQxIgQg/iScxz7PjqXUkHsHCjHi6aNOYnZGLc+Fxb9XZA9mjj8wCgYIKoZIzj0E\nAwIERzBFAiB4pX1QDEvnH4MPf7GQ3CMjPqmvNLK8XtS9QX9/aBRWEwIhAN9Q89Nz\nQLoRaThNc4s3HFO5fP80TYNahSJUOrMhXtfQ\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object e5953e1a96018e9a29677c66cd61939ad796d25e\ntype commit\ntag v1.0.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-nist.invalid> 1787297956 +0000\n\nnist 800-53 OSCAL catalog, first signed release\n",
+    "verified_at": null
+  }
+}
+=== policy-as-versioned-platform/platform tags: v1.1.1
+v1.1.0
+v1.0.0
+v0.1.1
+v0.1.0
+policy/v3.0.0
+policy/v2.0.1
+policy/v2.0.0 ===
+  tag=v1.1.1 sha=3a401cbc45c7d7c56f26bb7cfe75f3f96f82996e type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-platform.invalid",
+    "date": "2026-08-25T16:39:57Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJJgYJKoZIhvcNAQcCoIIJFzCCCRMCAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHxjCCB8IwggdHoAMCAQICFBTHyqKK+ostJegjLejf1voieUEyMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyNTE2Mzk1N1oXDTI2MDgyNTE2NDk1\nN1owADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABI/v8Zi+gng5O3xXiXXs/lpc\nxHFkERq6FGuwdg7RIJRvp19Ne0iSPZeKGQqt0/AhIyDcTIiF6vzIS5jywxAN18Cj\nggZmMIIGYjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFOYN5s5HN9qqwg6MZKE9GPoWZofDMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHgGA1UdEQEB/wRuMGyGamh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29y\na2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOQYKKwYBBAGD\nvzABAQQraHR0cHM6Ly90b2tlbi5hY3Rpb25zLmdpdGh1YnVzZXJjb250ZW50LmNv\nbTAfBgorBgEEAYO/MAECBBF3b3JrZmxvd19kaXNwYXRjaDA2BgorBgEEAYO/MAED\nBCg1OGVmOWM1N2U1MzU0Mzk5N2U1ZGRiZTgyOWE3YjdjOWEyMjgyYzYwMBkGCisG\nAQQBg78wAQQEC2N1dC1yZWxlYXNlMDMGCisGAQQBg78wAQUEJXBvbGljeS1hcy12\nZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0wHQYKKwYBBAGDvzABBgQPcmVmcy9o\nZWFkcy9tYWluMDsGCisGAQQBg78wAQgELQwraHR0cHM6Ly90b2tlbi5hY3Rpb25z\nLmdpdGh1YnVzZXJjb250ZW50LmNvbTB6BgorBgEEAYO/MAEJBGwMamh0dHBzOi8v\nZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3Jt\nLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21h\naW4wOAYKKwYBBAGDvzABCgQqDCg1OGVmOWM1N2U1MzU0Mzk5N2U1ZGRiZTgyOWE3\nYjdjOWEyMjgyYzYwMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3RlZDBIBgor\nBgEEAYO/MAEMBDoMOGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLXBsYXRmb3JtL3BsYXRmb3JtMDgGCisGAQQBg78wAQ0EKgwoNThlZjljNTdl\nNTM1NDM5OTdlNWRkYmU4MjlhN2I3YzlhMjI4MmM2MDAfBgorBgEEAYO/MAEOBBEM\nD3JlZnMvaGVhZHMvbWFpbjAaBgorBgEEAYO/MAEPBAwMCjEzNDA5ODQ2NDgwPwYK\nKwYBBAGDvzABEAQxDC9odHRwczovL2dpdGh1Yi5jb20vcG9saWN5LWFzLXZlcnNp\nb25lZC1wbGF0Zm9ybTAZBgorBgEEAYO/MAERBAsMCTMwODQ3OTcyNTB6BgorBgEE\nAYO/MAESBGwMamh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVk\nLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNl\nLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABEwQqDCg1OGVmOWM1N2U1\nMzU0Mzk5N2U1ZGRiZTgyOWE3YjdjOWEyMjgyYzYwMCEGCisGAQQBg78wARQEEwwR\nd29ya2Zsb3dfZGlzcGF0Y2gwbAYKKwYBBAGDvzABFQReDFxodHRwczovL2dpdGh1\nYi5jb20vcG9saWN5LWFzLXZlcnNpb25lZC1wbGF0Zm9ybS9wbGF0Zm9ybS9hY3Rp\nb25zL3J1bnMvMzI4NzMyNzk3NTYvYXR0ZW1wdHMvMTAWBgorBgEEAYO/MAEWBAgM\nBnB1YmxpYzBjBgorBgEEAYO/MAEYBFUMU3JlcG86cG9saWN5LWFzLXZlcnNpb25l\nZC1wbGF0Zm9ybUAzMDg0Nzk3MjUvcGxhdGZvcm1AMTM0MDk4NDY0ODpyZWY6cmVm\ncy9oZWFkcy9tYWluMIGKBgorBgEEAdZ5AgQCBHwEegB4AHYA3T0wasbHETJjGR4c\nmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgOcr1RwAABAMARzBFAiB6w0SjKPJUQP4N\nDoONNwYJZ97Ix7wgw8d5p064nllcpAIhANh5LfbJkC/Tzsoohh2HyospCTFCnb6s\nD9Gw+cS6cvLPMAoGCCqGSM49BAMDA2kAMGYCMQCjdKmUp74jCQjCbRtfLfl/NcvD\nZBDn8GwC9d6ZEbexLQaCWCuWsj47hbFYqlwE5PcCMQDoye39NCJs0j61BiqamGi8\n0jglbh3GBSlyr/VKP5BGmQ2mKJiT7sH5+QtUcDezjnkxggEmMIIBIgIBATBPMDcx\nFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2lnc3RvcmUtaW50ZXJt\nZWRpYXRlAhQUx8qiivqLLSXoIy3o39b6InlBMjALBglghkgBZQMEAgGgaTAYBgkq\nhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNjA4MjUxNjM5\nNThaMC8GCSqGSIb3DQEJBDEiBCB7jJXkbSDHVqd9XFDkPdjwnWV8xFOzoEe1GFtN\nuiHCJzAKBggqhkjOPQQDAgRIMEYCIQD7jKtAxbW2Bgmtk1FZ72Xfy72Pt5H6t2g0\nDTg0wlpgggIhAIL4zP+QA5f6bYOocaqJLOuyU/UQmuVPZXG7Mt/cW3rE\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 58ef9c57e53543997e5ddbe829a7b7c9a2282c60\ntype commit\ntag v1.1.1\ntagger policy-as-versioned release bot <releases@policy-as-versioned-platform.invalid> 1787675997 +0000\n\npolicy-composition ticket 18: backfill signed publisher-gate evidence for policy/v2.0.0, v2.0.1, v3.0.0 (cut before the gate existed)\n",
+    "verified_at": null
+  }
+}
+  tag=v1.1.0 sha=ea1cf4630d0c1e79343bfd889d881a66f3c381f1 type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-platform.invalid",
+    "date": "2026-08-25T15:31:25Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJJQYJKoZIhvcNAQcCoIIJFjCCCRICAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHxTCCB8EwggdHoAMCAQICFGwJSpe5vFlw66zuzXvSGccQFd52MAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyNTE1MzEyNVoXDTI2MDgyNTE1NDEy\nNVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABPBpvVusmYOVYLNl4W3k8uQ4\nQEbksEIqXo20k8KVwxcNmAnE0tN4IyxgCYW5Uo5tEA15paC8dR77cuw8CIVxiSij\nggZmMIIGYjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFF01fR0snncA7Bu7QFh+Mkhjg7WjMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHgGA1UdEQEB/wRuMGyGamh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29y\na2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOQYKKwYBBAGD\nvzABAQQraHR0cHM6Ly90b2tlbi5hY3Rpb25zLmdpdGh1YnVzZXJjb250ZW50LmNv\nbTAfBgorBgEEAYO/MAECBBF3b3JrZmxvd19kaXNwYXRjaDA2BgorBgEEAYO/MAED\nBChmY2I0MjhmMGM3YjkyZjNhOTkwMDJjM2M1NmJmOGFiM2JhMGYxYzBiMBkGCisG\nAQQBg78wAQQEC2N1dC1yZWxlYXNlMDMGCisGAQQBg78wAQUEJXBvbGljeS1hcy12\nZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0wHQYKKwYBBAGDvzABBgQPcmVmcy9o\nZWFkcy9tYWluMDsGCisGAQQBg78wAQgELQwraHR0cHM6Ly90b2tlbi5hY3Rpb25z\nLmdpdGh1YnVzZXJjb250ZW50LmNvbTB6BgorBgEEAYO/MAEJBGwMamh0dHBzOi8v\nZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3Jt\nLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21h\naW4wOAYKKwYBBAGDvzABCgQqDChmY2I0MjhmMGM3YjkyZjNhOTkwMDJjM2M1NmJm\nOGFiM2JhMGYxYzBiMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3RlZDBIBgor\nBgEEAYO/MAEMBDoMOGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLXBsYXRmb3JtL3BsYXRmb3JtMDgGCisGAQQBg78wAQ0EKgwoZmNiNDI4ZjBj\nN2I5MmYzYTk5MDAyYzNjNTZiZjhhYjNiYTBmMWMwYjAfBgorBgEEAYO/MAEOBBEM\nD3JlZnMvaGVhZHMvbWFpbjAaBgorBgEEAYO/MAEPBAwMCjEzNDA5ODQ2NDgwPwYK\nKwYBBAGDvzABEAQxDC9odHRwczovL2dpdGh1Yi5jb20vcG9saWN5LWFzLXZlcnNp\nb25lZC1wbGF0Zm9ybTAZBgorBgEEAYO/MAERBAsMCTMwODQ3OTcyNTB6BgorBgEE\nAYO/MAESBGwMamh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVk\nLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNl\nLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABEwQqDChmY2I0MjhmMGM3\nYjkyZjNhOTkwMDJjM2M1NmJmOGFiM2JhMGYxYzBiMCEGCisGAQQBg78wARQEEwwR\nd29ya2Zsb3dfZGlzcGF0Y2gwbAYKKwYBBAGDvzABFQReDFxodHRwczovL2dpdGh1\nYi5jb20vcG9saWN5LWFzLXZlcnNpb25lZC1wbGF0Zm9ybS9wbGF0Zm9ybS9hY3Rp\nb25zL3J1bnMvMzI4NjYyOTM5OTkvYXR0ZW1wdHMvMTAWBgorBgEEAYO/MAEWBAgM\nBnB1YmxpYzBjBgorBgEEAYO/MAEYBFUMU3JlcG86cG9saWN5LWFzLXZlcnNpb25l\nZC1wbGF0Zm9ybUAzMDg0Nzk3MjUvcGxhdGZvcm1AMTM0MDk4NDY0ODpyZWY6cmVm\ncy9oZWFkcy9tYWluMIGKBgorBgEEAdZ5AgQCBHwEegB4AHYA3T0wasbHETJjGR4c\nmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgOYw2FAAABAMARzBFAiBdyd1257eKGcBY\ncTKcnk9TArqlKYG8kBFXknBj2HyHVwIhAItz6BUtDvtu2yHPTViD/sYuZHh67vjs\nPOyzpDawaWsjMAoGCCqGSM49BAMDA2gAMGUCMFvkiRMVWnLgNGiDXOam8HrzUNtE\n5+zcnjL/SKBFEmIEHHH+hHNQ0i9YUguRTn3iKgIxAMJUcBqc5WDEiKRRqV9pV54Q\nAGbow1YPwMaxHF9vNgNc6i0raHlL8669yOlplh0/zjGCASYwggEiAgEBME8wNzEV\nMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQDExVzaWdzdG9yZS1pbnRlcm1l\nZGlhdGUCFGwJSpe5vFlw66zuzXvSGccQFd52MAsGCWCGSAFlAwQCAaBpMBgGCSqG\nSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDgyNTE1MzEy\nNVowLwYJKoZIhvcNAQkEMSIEIFBl3I6vsXmSGS3OUODwl0feC35pFOVZt+Bx00IX\nuM0pMAoGCCqGSM49BAMCBEgwRgIhANsvdYUxCq9iOh8GJRB0sJBjJRJyvS3uNhm5\nB1Rip9ydAiEA46dS8jcLwhOunv2eNvNXltSTqg8fk6ONmWaL9/Kk0SM=\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object fcb428f0c7b92f3a99002c3c56bf8ab3ba0f1c0b\ntype commit\ntag v1.1.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-platform.invalid> 1787671885 +0000\n\npolicy-composition tickets 09-17: composition engine, party artefacts, ADR-0014's governed-namespace guard, ac-6/cm-6 claims fixed\n",
+    "verified_at": null
+  }
+}
+  tag=v1.0.0 sha=c403dacfda8925a615c461b86eab921807fec063 type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-platform.invalid",
+    "date": "2026-08-23T08:52:53Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJJAYJKoZIhvcNAQcCoIIJFTCCCRECAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHxTCCB8EwggdHoAMCAQICFHacTWsrhknN2eGi2I4Q6jU528VvMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyMzA4NTI1M1oXDTI2MDgyMzA5MDI1\nM1owADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABAxfRIhWKs/LfxnjM8T0EMNW\nnuXdmzAv2NYH9s/fGxjPWoy1Y9SVyQ1J007ytp0Fx81DYj1xkgq8siXbqZHl4Lij\nggZmMIIGYjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFFPvjxyqI/FtkH9QRGmdionlnqF3MB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHgGA1UdEQEB/wRuMGyGamh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29y\na2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOQYKKwYBBAGD\nvzABAQQraHR0cHM6Ly90b2tlbi5hY3Rpb25zLmdpdGh1YnVzZXJjb250ZW50LmNv\nbTAfBgorBgEEAYO/MAECBBF3b3JrZmxvd19kaXNwYXRjaDA2BgorBgEEAYO/MAED\nBChlMzRhZTdmNWQzOGZlZWRlMmMzMGVmNDUwMzdlYzlhZjBkM2Y0M2IzMBkGCisG\nAQQBg78wAQQEC2N1dC1yZWxlYXNlMDMGCisGAQQBg78wAQUEJXBvbGljeS1hcy12\nZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0wHQYKKwYBBAGDvzABBgQPcmVmcy9o\nZWFkcy9tYWluMDsGCisGAQQBg78wAQgELQwraHR0cHM6Ly90b2tlbi5hY3Rpb25z\nLmdpdGh1YnVzZXJjb250ZW50LmNvbTB6BgorBgEEAYO/MAEJBGwMamh0dHBzOi8v\nZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3Jt\nLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21h\naW4wOAYKKwYBBAGDvzABCgQqDChlMzRhZTdmNWQzOGZlZWRlMmMzMGVmNDUwMzdl\nYzlhZjBkM2Y0M2IzMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3RlZDBIBgor\nBgEEAYO/MAEMBDoMOGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLXBsYXRmb3JtL3BsYXRmb3JtMDgGCisGAQQBg78wAQ0EKgwoZTM0YWU3ZjVk\nMzhmZWVkZTJjMzBlZjQ1MDM3ZWM5YWYwZDNmNDNiMzAfBgorBgEEAYO/MAEOBBEM\nD3JlZnMvaGVhZHMvbWFpbjAaBgorBgEEAYO/MAEPBAwMCjEzNDA5ODQ2NDgwPwYK\nKwYBBAGDvzABEAQxDC9odHRwczovL2dpdGh1Yi5jb20vcG9saWN5LWFzLXZlcnNp\nb25lZC1wbGF0Zm9ybTAZBgorBgEEAYO/MAERBAsMCTMwODQ3OTcyNTB6BgorBgEE\nAYO/MAESBGwMamh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVk\nLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNl\nLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABEwQqDChlMzRhZTdmNWQz\nOGZlZWRlMmMzMGVmNDUwMzdlYzlhZjBkM2Y0M2IzMCEGCisGAQQBg78wARQEEwwR\nd29ya2Zsb3dfZGlzcGF0Y2gwbAYKKwYBBAGDvzABFQReDFxodHRwczovL2dpdGh1\nYi5jb20vcG9saWN5LWFzLXZlcnNpb25lZC1wbGF0Zm9ybS9wbGF0Zm9ybS9hY3Rp\nb25zL3J1bnMvMzI2Mjk0NDQyMTgvYXR0ZW1wdHMvMTAWBgorBgEEAYO/MAEWBAgM\nBnB1YmxpYzBjBgorBgEEAYO/MAEYBFUMU3JlcG86cG9saWN5LWFzLXZlcnNpb25l\nZC1wbGF0Zm9ybUAzMDg0Nzk3MjUvcGxhdGZvcm1AMTM0MDk4NDY0ODpyZWY6cmVm\ncy9oZWFkcy9tYWluMIGKBgorBgEEAdZ5AgQCBHwEegB4AHYA3T0wasbHETJjGR4c\nmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgLdKiFAAABAMARzBFAiEAyngm7U1nAieT\naiTGtB/0SNsOnwIjO95IehFRf0UbMv8CIGaZzlreWQ8syNew28vnrvylscZW+H1g\niIqRqoxF/fmBMAoGCCqGSM49BAMDA2gAMGUCMEUxcLABiZYsscMnxFoADPcFtAog\nMSpsqp7oyWw4xUwkpYPdMDJxBUKd6R/ElD0fOQIxAMUARfOlzPx3gbkTbCiG76r/\nixqjGzA9WDIxAKq291psVhbsHw7FxNzVrPrYh7fM7DGCASUwggEhAgEBME8wNzEV\nMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQDExVzaWdzdG9yZS1pbnRlcm1l\nZGlhdGUCFHacTWsrhknN2eGi2I4Q6jU528VvMAsGCWCGSAFlAwQCAaBpMBgGCSqG\nSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDgyMzA4NTI1\nNFowLwYJKoZIhvcNAQkEMSIEILWlBckprHJ2eZzsoMlBGDnpbRAN/s09tTkJiqC8\npEK5MAoGCCqGSM49BAMCBEcwRQIhAI085jVZRLP63ylnrI4lrq4tP6xbMCtDmkcM\nG+gKvberAiAwVTY2sCf4ijY9rZjmPghrsy4+rnSj7HZrHMLwhmWIUQ==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object e34ae7f5d38feede2c30ef45037ec9af0d3f43b3\ntype commit\ntag v1.0.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-platform.invalid> 1787475173 +0000\n\nplatform 1.0.0 -- the platform's own distribution mechanism gets a real gate to refuse against for the first time. Cut alongside policy/v2.0.0 and policy/v3.0.0, the repair release (cs-15) that folds graded/posture enforcement into the pinned per-version path.\n",
+    "verified_at": null
+  }
+}
+  tag=v0.1.1 sha=1763b6f9c7ba70f6c5e71acf5fdcd9cd3339c169 type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-platform.invalid",
+    "date": "2026-08-21T07:50:58Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJJQYJKoZIhvcNAQcCoIIJFjCCCRICAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHxjCCB8IwggdIoAMCAQICFArsMYaiWvrdmJH7eSa8BTMWyMKVMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyMTA3NTA1OFoXDTI2MDgyMTA4MDA1\nOFowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABBQwkHLPgsMnBnGdgaidHNSU\nLuusJAFc1SA6uZR2WWt11o9NZgRHTlhnJ/ovHhfco0zfUPkAXFxVbXmlRgZUX0mj\nggZnMIIGYzAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFM1WtRhvrNPUr4PMgYq6pKQKwbUkMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHgGA1UdEQEB/wRuMGyGamh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29y\na2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOQYKKwYBBAGD\nvzABAQQraHR0cHM6Ly90b2tlbi5hY3Rpb25zLmdpdGh1YnVzZXJjb250ZW50LmNv\nbTAfBgorBgEEAYO/MAECBBF3b3JrZmxvd19kaXNwYXRjaDA2BgorBgEEAYO/MAED\nBChjNWU5OTBkNTljOGNlYjUxYWI3NTRmOTEwNzdmMDJhOTRjNDUyYjM4MBkGCisG\nAQQBg78wAQQEC2N1dC1yZWxlYXNlMDMGCisGAQQBg78wAQUEJXBvbGljeS1hcy12\nZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0wHQYKKwYBBAGDvzABBgQPcmVmcy9o\nZWFkcy9tYWluMDsGCisGAQQBg78wAQgELQwraHR0cHM6Ly90b2tlbi5hY3Rpb25z\nLmdpdGh1YnVzZXJjb250ZW50LmNvbTB6BgorBgEEAYO/MAEJBGwMamh0dHBzOi8v\nZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3Jt\nLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21h\naW4wOAYKKwYBBAGDvzABCgQqDChjNWU5OTBkNTljOGNlYjUxYWI3NTRmOTEwNzdm\nMDJhOTRjNDUyYjM4MB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3RlZDBIBgor\nBgEEAYO/MAEMBDoMOGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLXBsYXRmb3JtL3BsYXRmb3JtMDgGCisGAQQBg78wAQ0EKgwoYzVlOTkwZDU5\nYzhjZWI1MWFiNzU0ZjkxMDc3ZjAyYTk0YzQ1MmIzODAfBgorBgEEAYO/MAEOBBEM\nD3JlZnMvaGVhZHMvbWFpbjAaBgorBgEEAYO/MAEPBAwMCjEzNDA5ODQ2NDgwPwYK\nKwYBBAGDvzABEAQxDC9odHRwczovL2dpdGh1Yi5jb20vcG9saWN5LWFzLXZlcnNp\nb25lZC1wbGF0Zm9ybTAZBgorBgEEAYO/MAERBAsMCTMwODQ3OTcyNTB6BgorBgEE\nAYO/MAESBGwMamh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVk\nLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNl\nLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABEwQqDChjNWU5OTBkNTlj\nOGNlYjUxYWI3NTRmOTEwNzdmMDJhOTRjNDUyYjM4MCEGCisGAQQBg78wARQEEwwR\nd29ya2Zsb3dfZGlzcGF0Y2gwbAYKKwYBBAGDvzABFQReDFxodHRwczovL2dpdGh1\nYi5jb20vcG9saWN5LWFzLXZlcnNpb25lZC1wbGF0Zm9ybS9wbGF0Zm9ybS9hY3Rp\nb25zL3J1bnMvMzI0NjA0NDQwODEvYXR0ZW1wdHMvMTAWBgorBgEEAYO/MAEWBAgM\nBnB1YmxpYzBjBgorBgEEAYO/MAEYBFUMU3JlcG86cG9saWN5LWFzLXZlcnNpb25l\nZC1wbGF0Zm9ybUAzMDg0Nzk3MjUvcGxhdGZvcm1AMTM0MDk4NDY0ODpyZWY6cmVm\ncy9oZWFkcy9tYWluMIGLBgorBgEEAdZ5AgQCBH0EewB5AHcA3T0wasbHETJjGR4c\nmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgI0045wAABAMASDBGAiEA6VHExDVBRaGp\nbpnxHX+1Yv4g8df8FAWYOc7/yjDt2kUCIQDVja1CRPvNuRKqdpCRlBpVEItrqMKz\npjfi/K099XK59zAKBggqhkjOPQQDAwNoADBlAjEAgQxfAAb8cbSEammc4oDl+gnj\nhPwfJYP1mck0bcQLt1nacLufDJGixxQjn9aQXeXKAjB6mKWD7WJAm2qoIcsqXE/U\nAzqvQke+AvMyqkCrUA6+SjJ3Cqg71sp4XSOqoATMExAxggElMIIBIQIBATBPMDcx\nFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2lnc3RvcmUtaW50ZXJt\nZWRpYXRlAhQK7DGGolr63ZiR+3kmvAUzFsjClTALBglghkgBZQMEAgGgaTAYBgkq\nhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNjA4MjEwNzUw\nNThaMC8GCSqGSIb3DQEJBDEiBCA2aH+ej0mgimNDQWNadq9xz19r97NM2ykCIzxG\nWPfjbzAKBggqhkjOPQQDAgRHMEUCIQDFDa9LgKfhbjYgn8co4nqxmYQP4+4xt77c\nZGgYFXT4QQIgQEJIQErx+rS4cuASRafVp8pZOME2on1rq/xz06ajySs=\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object c5e990d59c8ceb51ab754f91077f02a94c452b38\ntype commit\ntag v0.1.1\ntagger policy-as-versioned release bot <releases@policy-as-versioned-platform.invalid> 1787298658 +0000\n\nplatform v0.1.1: no code change from v0.1.0 -- cut to prove the release to Renovate bump PR to shift-left gate chain end to end (ticket mo-10)\n",
+    "verified_at": null
+  }
+}
+  tag=v0.1.0 sha=59f6415704163b7e6e09c054d7e3aab4302d2cbe type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-platform.invalid",
+    "date": "2026-08-21T07:39:32Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJJQYJKoZIhvcNAQcCoIIJFjCCCRICAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHxTCCB8EwggdHoAMCAQICFEXH0DXEMHIG1ortEoXXYmYQxpdLMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyMTA3MzkzMloXDTI2MDgyMTA3NDkz\nMlowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABCjQD8B/U8KTifdlJgMXjTV0\nHruMdC85Ou7GBrQ4VdnyKkrmcVTcFUy3LFPnQ9SLd982+Bfg3t2hEguGcGdUtkSj\nggZmMIIGYjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFPSEQGt/A3JerH4tBrWnf2TGdJZ9MB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHgGA1UdEQEB/wRuMGyGamh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29y\na2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOQYKKwYBBAGD\nvzABAQQraHR0cHM6Ly90b2tlbi5hY3Rpb25zLmdpdGh1YnVzZXJjb250ZW50LmNv\nbTAfBgorBgEEAYO/MAECBBF3b3JrZmxvd19kaXNwYXRjaDA2BgorBgEEAYO/MAED\nBCgzMzZhZWYyMTQ3MzQ0YWUzZGJjZmU4NDUwODY1YTg4MDZlY2JlMmFmMBkGCisG\nAQQBg78wAQQEC2N1dC1yZWxlYXNlMDMGCisGAQQBg78wAQUEJXBvbGljeS1hcy12\nZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0wHQYKKwYBBAGDvzABBgQPcmVmcy9o\nZWFkcy9tYWluMDsGCisGAQQBg78wAQgELQwraHR0cHM6Ly90b2tlbi5hY3Rpb25z\nLmdpdGh1YnVzZXJjb250ZW50LmNvbTB6BgorBgEEAYO/MAEJBGwMamh0dHBzOi8v\nZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3Jt\nLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21h\naW4wOAYKKwYBBAGDvzABCgQqDCgzMzZhZWYyMTQ3MzQ0YWUzZGJjZmU4NDUwODY1\nYTg4MDZlY2JlMmFmMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3RlZDBIBgor\nBgEEAYO/MAEMBDoMOGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLXBsYXRmb3JtL3BsYXRmb3JtMDgGCisGAQQBg78wAQ0EKgwoMzM2YWVmMjE0\nNzM0NGFlM2RiY2ZlODQ1MDg2NWE4ODA2ZWNiZTJhZjAfBgorBgEEAYO/MAEOBBEM\nD3JlZnMvaGVhZHMvbWFpbjAaBgorBgEEAYO/MAEPBAwMCjEzNDA5ODQ2NDgwPwYK\nKwYBBAGDvzABEAQxDC9odHRwczovL2dpdGh1Yi5jb20vcG9saWN5LWFzLXZlcnNp\nb25lZC1wbGF0Zm9ybTAZBgorBgEEAYO/MAERBAsMCTMwODQ3OTcyNTB6BgorBgEE\nAYO/MAESBGwMamh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVk\nLXBsYXRmb3JtL3BsYXRmb3JtLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNl\nLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABEwQqDCgzMzZhZWYyMTQ3\nMzQ0YWUzZGJjZmU4NDUwODY1YTg4MDZlY2JlMmFmMCEGCisGAQQBg78wARQEEwwR\nd29ya2Zsb3dfZGlzcGF0Y2gwbAYKKwYBBAGDvzABFQReDFxodHRwczovL2dpdGh1\nYi5jb20vcG9saWN5LWFzLXZlcnNpb25lZC1wbGF0Zm9ybS9wbGF0Zm9ybS9hY3Rp\nb25zL3J1bnMvMzI0NTk1OTIxMDMvYXR0ZW1wdHMvMTAWBgorBgEEAYO/MAEWBAgM\nBnB1YmxpYzBjBgorBgEEAYO/MAEYBFUMU3JlcG86cG9saWN5LWFzLXZlcnNpb25l\nZC1wbGF0Zm9ybUAzMDg0Nzk3MjUvcGxhdGZvcm1AMTM0MDk4NDY0ODpyZWY6cmVm\ncy9oZWFkcy9tYWluMIGKBgorBgEEAdZ5AgQCBHwEegB4AHYA3T0wasbHETJjGR4c\nmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgI0LBvAAABAMARzBFAiB/97MEqh19f+VU\nVb3IC/kWXHQVwXEHafTGa5FPYvs5KwIhAKAX9Q7gbWxh6Y/RE7fTwCpqpodp7pND\nGwXwKakontHFMAoGCCqGSM49BAMDA2gAMGUCMQDgM7LAGa6Ufo8at6n9NOw38Ela\nFCP/X42y8LMfegCLJtvA8lhOcnnIy4EfYrnLcsMCMBM8J2Z++7h8amxSdq8z6EH5\nh7ckY+x+hQaAo7T7KtBB9zewY7k6TPYsKLmnKuwAkzGCASYwggEiAgEBME8wNzEV\nMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQDExVzaWdzdG9yZS1pbnRlcm1l\nZGlhdGUCFEXH0DXEMHIG1ortEoXXYmYQxpdLMAsGCWCGSAFlAwQCAaBpMBgGCSqG\nSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDgyMTA3Mzkz\nMlowLwYJKoZIhvcNAQkEMSIEIOuCzgxVUszVwmOpMTVxBBFz1M+omH+Hvbt3ULiB\ny/zKMAoGCCqGSM49BAMCBEgwRgIhAKVXyjptx1Plb4/meAgQVqo0DWmW42aSEnyn\nELYKcfZvAiEA/uD1xxmex5j65NhNcJ8ciwHFnmLmHZeD0sKGHmOvjZQ=\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 336aef2147344ae3dbcfe8450865a8806ecbe2af\ntype commit\ntag v0.1.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-platform.invalid> 1787297972 +0000\n\nplatform governance apparatus, first signed release: Flux distribution templates, FAIR risk engine, shift-left harness, release infra\n",
+    "verified_at": null
+  }
+}
+  tag=policy/v3.0.0 sha=732b4b3cf50f81ec5b55d00f86e261ce55594519 type=tag
+  tag=policy/v2.0.1 sha=b9f7e9fbd464c76b173235232c89deb66d722215 type=tag
+  tag=policy/v2.0.0 sha=5ebefe94c81bf4ce8a011e6ac6ca8ab6a3e871e3 type=tag
+=== policy-as-versioned-tuppence/tuppence tags: v1.1.0
+v1.0.0 ===
+  tag=v1.1.0 sha=3f616a01b3a52445855decbae136b302a44af5f9 type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-tuppence.invalid",
+    "date": "2026-08-25T17:10:06Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJJAYJKoZIhvcNAQcCoIIJFTCCCRECAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHxTCCB8EwggdHoAMCAQICFBWBtNto1B7C1LUcFgiBsH4gwuRpMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyNTE3MTAwNloXDTI2MDgyNTE3MjAw\nNlowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABM/KJ3iVGN79kT6yVLJapQqE\nSR3MAAhwGBLGtouWdajhebVh66YaYovrsw83JTvfBb3HoFjBh+omsDx3leab+M2j\nggZmMIIGYjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFEu34HIeoJGUG+h93YIHcTmM7Ar1MB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHgGA1UdEQEB/wRuMGyGamh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLXR1cHBlbmNlL3R1cHBlbmNlLy5naXRodWIvd29y\na2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOQYKKwYBBAGD\nvzABAQQraHR0cHM6Ly90b2tlbi5hY3Rpb25zLmdpdGh1YnVzZXJjb250ZW50LmNv\nbTAfBgorBgEEAYO/MAECBBF3b3JrZmxvd19kaXNwYXRjaDA2BgorBgEEAYO/MAED\nBCg3NTE1MjJiM2JjYTk4YzQwMzczYzliY2I4YjcyYWIzNzZhYjNiZTViMBkGCisG\nAQQBg78wAQQEC2N1dC1yZWxlYXNlMDMGCisGAQQBg78wAQUEJXBvbGljeS1hcy12\nZXJzaW9uZWQtdHVwcGVuY2UvdHVwcGVuY2UwHQYKKwYBBAGDvzABBgQPcmVmcy9o\nZWFkcy9tYWluMDsGCisGAQQBg78wAQgELQwraHR0cHM6Ly90b2tlbi5hY3Rpb25z\nLmdpdGh1YnVzZXJjb250ZW50LmNvbTB6BgorBgEEAYO/MAEJBGwMamh0dHBzOi8v\nZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXR1cHBlbmNlL3R1cHBlbmNl\nLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21h\naW4wOAYKKwYBBAGDvzABCgQqDCg3NTE1MjJiM2JjYTk4YzQwMzczYzliY2I4Yjcy\nYWIzNzZhYjNiZTViMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3RlZDBIBgor\nBgEEAYO/MAEMBDoMOGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLXR1cHBlbmNlL3R1cHBlbmNlMDgGCisGAQQBg78wAQ0EKgwoNzUxNTIyYjNi\nY2E5OGM0MDM3M2M5YmNiOGI3MmFiMzc2YWIzYmU1YjAfBgorBgEEAYO/MAEOBBEM\nD3JlZnMvaGVhZHMvbWFpbjAaBgorBgEEAYO/MAEPBAwMCjEzNDA5ODQ5MTYwPwYK\nKwYBBAGDvzABEAQxDC9odHRwczovL2dpdGh1Yi5jb20vcG9saWN5LWFzLXZlcnNp\nb25lZC10dXBwZW5jZTAZBgorBgEEAYO/MAERBAsMCTMwODQ3OTk1MTB6BgorBgEE\nAYO/MAESBGwMamh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVk\nLXR1cHBlbmNlL3R1cHBlbmNlLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNl\nLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABEwQqDCg3NTE1MjJiM2Jj\nYTk4YzQwMzczYzliY2I4YjcyYWIzNzZhYjNiZTViMCEGCisGAQQBg78wARQEEwwR\nd29ya2Zsb3dfZGlzcGF0Y2gwbAYKKwYBBAGDvzABFQReDFxodHRwczovL2dpdGh1\nYi5jb20vcG9saWN5LWFzLXZlcnNpb25lZC10dXBwZW5jZS90dXBwZW5jZS9hY3Rp\nb25zL3J1bnMvMzI4NzYyMjIxMzkvYXR0ZW1wdHMvMTAWBgorBgEEAYO/MAEWBAgM\nBnB1YmxpYzBjBgorBgEEAYO/MAEYBFUMU3JlcG86cG9saWN5LWFzLXZlcnNpb25l\nZC10dXBwZW5jZUAzMDg0Nzk5NTEvdHVwcGVuY2VAMTM0MDk4NDkxNjpyZWY6cmVm\ncy9oZWFkcy9tYWluMIGKBgorBgEEAdZ5AgQCBHwEegB4AHYA3T0wasbHETJjGR4c\nmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgOeaQOQAABAMARzBFAiBCzCJ/NJ4xNeEa\nQIo/3w7Kihh7k27pMbuqpGsY4uGOOwIhAJDYmZi3HUN8n0SiRk4PPuN+NUgC+LAQ\nd7sRQh5kq+78MAoGCCqGSM49BAMDA2gAMGUCMGwqiI18trEgSdIIgLVMFadNlWN/\nqvLGZ/LRsBUJTR1gsdFRI58wruzJjSxPeDqtXQIxALwEalOgeN62SappTa7ZRkTm\nlIWR19bqjoifs6elCpUOEZiGvNbYxT2xmdHS6wGKZDGCASUwggEhAgEBME8wNzEV\nMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQDExVzaWdzdG9yZS1pbnRlcm1l\nZGlhdGUCFBWBtNto1B7C1LUcFgiBsH4gwuRpMAsGCWCGSAFlAwQCAaBpMBgGCSqG\nSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDgyNTE3MTAw\nN1owLwYJKoZIhvcNAQkEMSIEIH4643BZJx0QJUtFv9O9TVwrobD5zfDxVSufNix7\nBRpSMAoGCCqGSM49BAMCBEcwRQIgXhLrTulVprRTGacoTDLaUeRUasECzYKmd9s8\nInxz0v0CIQDOpbtiNBIDRxxVkKVqxjWOJ/4UAy/tXzfvfXeozUE61w==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 751522b3bca98c40373c9bcb8b72ab376ab3be5b\ntype commit\ntag v1.1.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-tuppence.invalid> 1787677806 +0000\n\npolicy-composition ticket 18: tuppence's first signed composed artefact. MODERATE baseline, 285 recorded holes, 0 refusals, 1 recorded ungoverned namespace (tuppence-reset).\n",
+    "verified_at": null
+  }
+}
+  tag=v1.0.0 sha=4f5881729bcca34031994ebe9b83bbae18b8abc7 type=tag
+{
+  "tagger": {
+    "name": "policy-as-versioned release bot",
+    "email": "releases@policy-as-versioned-tuppence.invalid",
+    "date": "2026-08-21T07:47:55Z"
+  },
+  "verification": {
+    "verified": false,
+    "reason": "no_user",
+    "signature": "-----BEGIN SIGNED MESSAGE-----\nMIIJJAYJKoZIhvcNAQcCoIIJFTCCCRECAQExDTALBglghkgBZQMEAgEwCwYJKoZI\nhvcNAQcBoIIHxTCCB8EwggdHoAMCAQICFBkSZbwsMnaFwNnapMxO3jbX5tonMAoG\nCCqGSM49BAMDMDcxFTATBgNVBAoTDHNpZ3N0b3JlLmRldjEeMBwGA1UEAxMVc2ln\nc3RvcmUtaW50ZXJtZWRpYXRlMB4XDTI2MDgyMTA3NDc1NVoXDTI2MDgyMTA3NTc1\nNVowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLblNjhYd7blEwQXs5iHaSxW\nZTkVNROM4izHbZqd/vIY0pzrTapFlCIsN7CkfXl19/ZkgC00qP7nlzXD0mQqqEKj\nggZmMIIGYjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwHQYD\nVR0OBBYEFDbfYpgRniCYA9iPUnpyEbslzvtnMB8GA1UdIwQYMBaAFN/T6c9WJBGW\n+ajY6ShVosYuGGQ/MHgGA1UdEQEB/wRuMGyGamh0dHBzOi8vZ2l0aHViLmNvbS9w\nb2xpY3ktYXMtdmVyc2lvbmVkLXR1cHBlbmNlL3R1cHBlbmNlLy5naXRodWIvd29y\na2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21haW4wOQYKKwYBBAGD\nvzABAQQraHR0cHM6Ly90b2tlbi5hY3Rpb25zLmdpdGh1YnVzZXJjb250ZW50LmNv\nbTAfBgorBgEEAYO/MAECBBF3b3JrZmxvd19kaXNwYXRjaDA2BgorBgEEAYO/MAED\nBCg5ODYyZDg0NjMzMjAzMWQ3Y2I1Y2YzODg5NGQzYjBlZDMyMTkyOGRmMBkGCisG\nAQQBg78wAQQEC2N1dC1yZWxlYXNlMDMGCisGAQQBg78wAQUEJXBvbGljeS1hcy12\nZXJzaW9uZWQtdHVwcGVuY2UvdHVwcGVuY2UwHQYKKwYBBAGDvzABBgQPcmVmcy9o\nZWFkcy9tYWluMDsGCisGAQQBg78wAQgELQwraHR0cHM6Ly90b2tlbi5hY3Rpb25z\nLmdpdGh1YnVzZXJjb250ZW50LmNvbTB6BgorBgEEAYO/MAEJBGwMamh0dHBzOi8v\nZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXR1cHBlbmNlL3R1cHBlbmNl\nLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNlLnltbEByZWZzL2hlYWRzL21h\naW4wOAYKKwYBBAGDvzABCgQqDCg5ODYyZDg0NjMzMjAzMWQ3Y2I1Y2YzODg5NGQz\nYjBlZDMyMTkyOGRmMB0GCisGAQQBg78wAQsEDwwNZ2l0aHViLWhvc3RlZDBIBgor\nBgEEAYO/MAEMBDoMOGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lv\nbmVkLXR1cHBlbmNlL3R1cHBlbmNlMDgGCisGAQQBg78wAQ0EKgwoOTg2MmQ4NDYz\nMzIwMzFkN2NiNWNmMzg4OTRkM2IwZWQzMjE5MjhkZjAfBgorBgEEAYO/MAEOBBEM\nD3JlZnMvaGVhZHMvbWFpbjAaBgorBgEEAYO/MAEPBAwMCjEzNDA5ODQ5MTYwPwYK\nKwYBBAGDvzABEAQxDC9odHRwczovL2dpdGh1Yi5jb20vcG9saWN5LWFzLXZlcnNp\nb25lZC10dXBwZW5jZTAZBgorBgEEAYO/MAERBAsMCTMwODQ3OTk1MTB6BgorBgEE\nAYO/MAESBGwMamh0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVk\nLXR1cHBlbmNlL3R1cHBlbmNlLy5naXRodWIvd29ya2Zsb3dzL2N1dC1yZWxlYXNl\nLnltbEByZWZzL2hlYWRzL21haW4wOAYKKwYBBAGDvzABEwQqDCg5ODYyZDg0NjMz\nMjAzMWQ3Y2I1Y2YzODg5NGQzYjBlZDMyMTkyOGRmMCEGCisGAQQBg78wARQEEwwR\nd29ya2Zsb3dfZGlzcGF0Y2gwbAYKKwYBBAGDvzABFQReDFxodHRwczovL2dpdGh1\nYi5jb20vcG9saWN5LWFzLXZlcnNpb25lZC10dXBwZW5jZS90dXBwZW5jZS9hY3Rp\nb25zL3J1bnMvMzI0NjAyMTcyNjUvYXR0ZW1wdHMvMTAWBgorBgEEAYO/MAEWBAgM\nBnB1YmxpYzBjBgorBgEEAYO/MAEYBFUMU3JlcG86cG9saWN5LWFzLXZlcnNpb25l\nZC10dXBwZW5jZUAzMDg0Nzk5NTEvdHVwcGVuY2VAMTM0MDk4NDkxNjpyZWY6cmVm\ncy9oZWFkcy9tYWluMIGKBgorBgEEAdZ5AgQCBHwEegB4AHYA3T0wasbHETJjGR4c\nmWc3AqJKXrjePK3/h4pygC8p7o4AAAGgI0ptngAABAMARzBFAiA86UOQGmnr/5WP\ndikZYLgUWTJpCH4HvPYl2QYp1rJx7gIhALV0tWLEVRj1X0VbsWR0EsWT1DFG8Lie\ncjpWrhf/NUTdMAoGCCqGSM49BAMDA2gAMGUCMH3SFpSe66TQkifW2U89r7sLz/Ob\n9rI82sHUcPb0O4FMawQn9B2OWs+rm7FW2yscGQIxAIa7ijbdT/M+Sx8Sxs/KjNxU\n89lIgR12ZXJR3oFxnSP4ZC5vziK9MTf0DJSYzvNnqDGCASUwggEhAgEBME8wNzEV\nMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQDExVzaWdzdG9yZS1pbnRlcm1l\nZGlhdGUCFBkSZbwsMnaFwNnapMxO3jbX5tonMAsGCWCGSAFlAwQCAaBpMBgGCSqG\nSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDgyMTA3NDc1\nNVowLwYJKoZIhvcNAQkEMSIEILE1iZulhNNtL6isDsDo2in9gG1uGPvnCOnONKEr\nUqj2MAoGCCqGSM49BAMCBEcwRQIhAIq+R4xbLE18f8pA1NHmz5mIdm7N/MbAGtbH\nVBU4hkjvAiA5rPuVkqcy86q2VoeLpjG6ljWCd01IxrbfkW0CHMzjvg==\n-----END SIGNED MESSAGE-----\n",
+    "payload": "object 9862d846332031d7cb5cf38894d3b0ed321928df\ntype commit\ntag v1.0.0\ntagger policy-as-versioned release bot <releases@policy-as-versioned-tuppence.invalid> 1787298475 +0000\n\ntuppence institution repo, first signed release\n",
+    "verified_at": null
+  }
+}

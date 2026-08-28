@@ -1,0 +1,9 @@
+[1;36m==>[0m 1. render-governed-namespace-guard.py --selfcheck (structural: shape, Audit, CREATE-only, namespaceSelector)
+selfcheck ok: governed-namespace-requires-claim is platform-machinery, Audit, CREATE-only, scoped to governed:true namespaces, denies an unclaimed pod
+[1;36m==>[0m 2. the validations expression itself, functionally, namespaceSelector stripped (kyverno CLI cannot evaluate it offline -- see this script's docstring)
+Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+  File "<frozen importlib._bootstrap_external>", line 755, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 892, in get_code
+  File "<frozen importlib._bootstrap_external>", line 950, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/distribution/render-governed-namespace-guard.py'

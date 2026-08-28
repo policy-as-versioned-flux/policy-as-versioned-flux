@@ -1,0 +1,23 @@
+collecting policy-as-versioned-flux/policy-as-versioned-flux
+collecting policy-as-versioned-flux/c2p-collector
+collecting policy-as-versioned-flux/api
+collecting policy-as-versioned-flux/fleet
+collecting policy-as-versioned-flux/storefront
+collecting policy-as-versioned-flux/reports
+collecting policy-as-versioned-flux/policy
+collecting policy-as-versioned-flux/readiness-collector
+collecting policy-as-versioned-flux/ledger
+collecting policy-as-versioned-flux/governance-agent
+collecting policy-as-versioned-flux/handbook-generator
+collecting policy-as-versioned-flux/apps
+collecting policy-as-versioned-flux/datastore
+collecting policy-as-versioned-flux/pr-gate-action
+collecting policy-as-versioned-flux/renovate-config
+collecting policy-as-versioned-flux/cloud
+collecting policy-as-versioned-platform/platform
+collecting policy-as-versioned-driftwood/driftwood
+collecting policy-as-versioned-tuppence/tuppence
+collecting policy-as-versioned-ludlow/ludlow
+collecting policy-as-versioned-nist/nist
+collecting policy-as-versioned-ico/ico
+DONE

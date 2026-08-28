@@ -1,0 +1,306 @@
+2026-08-25 policy-composition: land ticket 18, close out the map
+2026-08-25 twin: make enact_guard's disposition refusal a mode, default permissive while building
+2026-08-25 policy-composition: correct tracker overclaims on tickets 09/10/17, record real fixes
+2026-08-25 policy-composition: resolve ticket 16, pricing and threat parents re-price but never apply
+2026-08-25 policy-composition: resolve ticket 15, the governed namespace lint
+2026-08-25 policy-composition: resolve ticket 14, baseline coverage and holes
+2026-08-25 policy-composition: resolve ticket 13, structural refusals, restatement and caging
+2026-08-25 policy-composition: resolve ticket 12, the seam and a faithful composed artefact
+2026-08-25 policy-composition: resolve ticket 11, party artefact and adopter declarations
+2026-08-25 policy-composition: resolve ticket 10, platform's control claims use bare ids
+2026-08-25 policy-composition: resolve ticket 09, nist publishes named baselines
+2026-08-25 policy-composition: resolve ticket 08, and record it as ADR-0018
+2026-08-25 policy-composition: resolve ticket 07, and record it as ADR-0017
+2026-08-25 policy-composition: resolve ticket 06, and record it as ADR-0016
+2026-08-24 policy-composition: resolve ticket 05, and record it as ADR-0015
+2026-08-24 policy-composition: resolve ticket 04, and record it as ADR-0014
+2026-08-24 policy-composition: resolve tickets 02 and 03, and record both as ADRs
+2026-08-24 Close out the computed-semver tracker: all 19 tickets shipped and verified
+2026-08-23 Restore the enact_guard.py push hook after the computed-semver release window
+2026-08-22 cs-30: ADR-0011 records the gate, CONTEXT.md gains reset-on-bump, platform-machinery, compliant-means-admitted
+2026-08-22 Cut the computed-semver spec into 19 implementation tickets
+2026-08-22 cs-07: version by entering the pinned path, not by adding a number
+2026-08-22 cs-04: state coverage as counts and a list of holes, never a percentage
+2026-08-21 Point both tickets at the branch that holds their prototype
+2026-08-21 Two spikes on policy inheritance, and a new map for cross-party composition
+2026-08-21 cs-03: resolve the corpus question, and find five unversioned policies
+2026-08-21 Fix code-review findings: correct mo-09's signing claim, clean up three smells
+2026-08-21 Fix a factual error and three code smells from the mo-review
+2026-08-21 mo-10: correct the record, ship a real attestation gate instead
+2026-08-21 Correct the enact_guard.py claim and add the real fix to issue 10
+2026-08-21 Close mo-10 as honest partial
+2026-08-21 Close mo-10 as partial
+2026-08-21 Merge mo-12
+2026-08-21 mo-12: repoint twin/'s remaining estate/ path reads at .estate-clone/
+2026-08-21 Delete estate/ from the hub; verify and talk move to root (mo-12)
+2026-08-21 Merge mo-09
+2026-08-20 Re-apply corrected Kustomization path to live clusters
+2026-08-20 Fix Kustomization path in gotk-sync.yaml for driftwood, ludlow, tuppence
+2026-08-20 Point Flux at real GitHub repos, retire in-cluster git server
+2026-08-20 Merge mo-08
+2026-08-20 Split the six estate/ units into public repos (mo-08)
+2026-08-20 Merge mo-11
+2026-08-20 Fix mo-11's summary lines to match ticket 17's own status
+2026-08-20 Install Kyverno and flux-operator; prove the posture chain live
+2026-08-20 Merge mo-19
+2026-08-20 Add the missing ponytail note to enactment.json
+2026-08-20 A commoditising defence lowers cost-of-controls, gated on evidence
+2026-08-20 Merge mo-04
+2026-08-20 Correct ticket 14's istio-csr diagnosis after the mo-04 fix
+2026-08-20 Fix istiod CA bootstrap so the sidecar webhook serves (mo-04)
+2026-08-20 Merge mo-06
+2026-08-20 Merge mo-18
+2026-08-20 Assert applicable stops the hyperscaler risk from a nonsense fix
+2026-08-20 Price a breach's several obligation consequences, not just one
+2026-08-20 Land the researched scenario slate as real feed and library entries
+2026-08-20 Merge mo-01
+2026-08-20 Fix vacuous gates: guards that pass without looking (mo-01)
+2026-08-20 Merge govern-05
+2026-08-20 Close the 28/28 map note and fix govern-05's stale beat count
+2026-08-20 Remove the exemption ledger; the cage produces its OSCAL risk (govern-05)
+2026-08-20 Merge cs-08
+2026-08-20 Gate cage-tier on the policy-version label (cs-08)
+2026-08-20 Cage every workload; no pod stays uncaged (cs-08)
+2026-08-20 Merge mo-02
+2026-08-20 Audit talk-spec build tickets 01-27 against tree and verify scripts
+2026-08-20 Merge mo-16
+2026-08-20 Merge mo-14
+2026-08-20 Merge cs-01
+2026-08-20 Index ticket 14 in the wayfinder map
+2026-08-20 Add a machine-checked roles: declaration per party
+2026-08-20 Rederive the known-good semver bumps from verdict movement (cs-01)
+2026-08-20 Make the Wardley forward layer speak per institution, not just driftwood
+2026-08-20 Markets grade forecasts, never price controls; a cheaper defence lowers the bill
+2026-08-20 Obligations overlap by nature, and one breach can draw several bills
+2026-08-20 Split mechanics: the refactor is small, two README claims are false
+2026-08-20 Ban exemptions outright, and give the ban somewhere to land
+2026-08-20 Compliance is the cage's job, not the image's — and COTS may outsource risk
+2026-08-20 The ungovernable population is mostly us
+2026-08-20 Verdict is a cage spec, not an enum — and the code disagrees
+2026-08-20 Chart computed semver: the version number computes itself
+2026-08-20 Record policy-version inheritance as out of scope, with the case for it
+2026-08-20 Merge pull request #1 from policy-as-versioned-flux/worktree-buzzing-sprouting-thimble
+2026-08-20 Settle what "organisation" means: roles compose, and platform is already two
+2026-08-20 Correct ticket 78's now-false claim, and split the wardley collision
+2026-08-20 Chart the multi-org estate: 15 tickets, and three defects found while charting
+2026-08-20 Demo v5: the war-gamer at the centre, and a headline that moved nothing
+2026-08-19 demo-deck: encourage GitHub screenshots, add --hide and --clip
+2026-08-19 demo-deck: measure the TTS ceiling, raise act size 220 -> 350 words
+2026-08-19 demo-deck: web screenshots, headline mockups, and verified Wardley support
+2026-08-19 Add demo-deck skill: generalised pipeline for narrated project demos
+2026-08-18 Build ticket 91: demo slice, the artefact decision ticket 22 actually asked for
+2026-08-18 Build ticket 90: honest build, and ethics-gate corrected off the skill side
+2026-08-18 Build ticket 89: one chain-walking hop becomes a seam, and reliability learns to be walked
+2026-08-18 Build ticket 88: the four tiers proven exhaustive, and Intel's own opportunity
+2026-08-18 Build ticket 86: the join build ticket 68 left open, and two shared cache paths that didn't know it yet
+2026-08-18 Build ticket 83: the twin threat-models itself, and states which of its own sensors would lie
+2026-08-18 Build ticket 81: the composition nobody had run, the mitigation that earns nothing free, Intel's own EUV edge
+2026-08-18 Build ticket 80: a bound signal stopped at the binding, and now it doesn't
+2026-08-18 Build ticket 85: currency-regimes' last incommensurable was already answered
+2026-08-18 Build ticket 82: the sensor set gets a name, and behavioural misuse gets its own catalogue
+2026-08-18 Build ticket 87: the strength nobody declared, the spread nobody measured, and the entity nobody was checking for
+2026-08-18 Build ticket 84: forecast-book earns full, and the proportionality question gets a verdict
+2026-08-18 Build ticket 79: the checklist was stale, not the model — domain-model reaches full
+2026-08-18 Build ticket 77: honesty made structural, and the demo sequence had drifted
+2026-08-17 Build ticket 76: Kodak and Maersk, the portfolio at declared stub depth
+2026-08-17 Build ticket 75: the live, unresolved, pinned forecast
+2026-08-17 Build ticket 74 review fixes: the pre-filter hole, the wrong response, the narrow walk
+2026-08-16 Build ticket 74: the whole engine, and the accounts disagree
+2026-08-16 Build ticket 73, part 2: the horizons, the walk, and a hit rate of 25%
+2026-08-16 Build ticket 73, part 1: the Netflix spine, and a substrate that clears every band
+2026-08-16 CI: the determinism step ran `twin run` without the regime it made required
+2026-08-16 Narrow the push refusal to enactment repositories, on the owner's instruction
+2026-08-16 Build ticket 72: the falsifiability beat, and the score is red
+2026-08-15 Build ticket 70: the audit found a deadline nobody had computed
+2026-08-15 Build ticket 68: enactment sensed through channels, corroboration sets the grade
+2026-08-15 Ticket 78: campaign run for real, cluster restored to baseline
+2026-08-15 Build ticket 67: graded enforcement, and posture-as-identity narrowed
+2026-08-15 Build ticket 66: propose-only enactment in two layers
+2026-08-15 Build ticket 65: pre-register the Flux falsification verdict
+2026-08-14 Parallelize the test suite: 20 minutes to 5 with pytest-xdist
+2026-08-14 Ticket 78: fix code-review findings (probe blind spot, weak leak check, stale docs)
+2026-08-14 Build ticket 78: forced-drift latency campaign (mechanism instrument)
+2026-08-13 Fix build-ticket banner: 65 of 77 closed, not 64 (off-by-one in ticket 56's own recount)
+2026-08-13 Run the driftwood probe: fresh sample, cluster reachable
+2026-08-13 Build ticket 56: coherence audit — skills, sensing, forecast, score
+2026-08-13 Build ticket 52: planter/detector/scorer split and actionability horizons
+2026-08-13 Merge branch 'worktree-agent-a17339ef12fb11889'
+2026-08-13 Merge branch 'worktree-agent-a3fb7345afa1af069'
+2026-08-13 Merge branch 'worktree-agent-aceb530ef7a765ca5'
+2026-08-13 Build ticket 55: retrospective sweep and lead-time-to-recognition
+2026-08-13 Build ticket 59: prediction-market price moves as world-layer signals, never levels as probabilities
+2026-08-13 Build ticket 51: the substrate fidelity eval suite
+2026-08-13 Build ticket 58: blind pinned emission, resolution scoring, the narrow claim
+2026-08-12 Build ticket 54: the decaying unbound-signal pool
+2026-08-12 Build ticket 47: ethics-gate — admission ladder, DPIA triage, gameability and the fast-improvement backstop
+2026-08-12 Merge branch 'worktree-wf_f8fae7f3-643-15'
+2026-08-12 Merge branch 'worktree-wf_f8fae7f3-643-13'
+2026-08-12 Build ticket 50: spine anchoring and free-running for the synthetic substrate
+2026-08-12 Build ticket 57: benchmark question selection rule and ingestion quarantine
+2026-08-12 Sync worktree to main tip (tickets 01-46, 48, 60-63, 69, 71 merged) before starting ticket 57
+2026-08-12 Sync worktree to main (tickets 01-49, 53, 60-63, 69, 71 merged) before starting ticket 50
+2026-08-12 Merge branch 'worktree-wf_f8fae7f3-643-11'
+2026-08-12 Merge branch 'worktree-wf_f8fae7f3-643-10'
+2026-08-12 Build ticket 53: ingest pipeline runs signal-classify unattended at throughput against substrate volume, provenanced, no human gate at entry
+2026-08-12 Build ticket 49: substrate-generator skill, multi-channel and mundane by default
+2026-08-12 Sync worktree to main tip (tickets 01-46, 48, 60-63, 69, 71 merged) before starting ticket 53
+2026-08-12 Sync estate/driftwood/drift/ (build ticket 64's instrument) from main
+2026-08-12 Sync worktree to main (tickets 01-48, 60-62, 69, 71): worktree branch was cut from stale origin/main (f189955) missing all twin/ build history; bring working tree in line with local main (24baadb) before starting ticket 49
+2026-08-12 Re-bless golden digests for the final Wave A state (ticket 71)
+2026-08-12 Merge branch 'worktree-wf_f8fae7f3-643-8'
+2026-08-12 Re-bless golden digests for the merged ticket 69 state
+2026-08-12 Merge branch 'worktree-wf_f8fae7f3-643-7'
+2026-08-12 Add affected_parties to twin-self's adoption-risk-2026 scenario
+2026-08-12 Re-bless golden digests for the merged ticket 63 state
+2026-08-12 Merge branch 'worktree-wf_f8fae7f3-643-6'
+2026-08-12 Re-bless golden digests for the merged ticket 61 state; fix the invariant-count narrative
+2026-08-12 Merge branch 'worktree-wf_f8fae7f3-643-5'
+2026-08-12 Re-bless golden digests for the merged ticket 48 state
+2026-08-12 Merge branch 'wf48-twin-base'
+2026-08-12 Re-bless golden digests for the merged ticket 45+46 state
+2026-08-12 Merge branch 'build-ticket-46'
+2026-08-12 Merge branch 'worktree-wf_f8fae7f3-643-1'
+2026-08-12 Build ticket 69: the standing scenario library, nine committed classes
+2026-08-12 Build ticket 71: Royal Mail as the missed-opportunity answer key
+2026-08-12 Build ticket 45: causal-claims skill, graph-based confounder detector, asymmetric grade scoring
+2026-08-12 Restore twin/ (build tickets 01-44, 60, 62) into this worktree
+2026-08-12 Build ticket 61: the affected-parties register, and the sealed disparate-impact channel
+2026-08-11 Sync estate/driftwood/drift/ (ticket 64's instrument) from main too
+2026-08-11 Run the driftwood probe: one fresh sample, cluster genuinely reachable
+2026-08-11 Build ticket 46: gameplay-lens, and the scheduled opportunity sweep
+2026-08-11 Build ticket 63: the twin inside the twin, and adoption as a priced risk
+2026-08-11 Build ticket 48: substrate recipe format, seeded regeneration, and the authored-or-derived spike
+2026-08-11 Sync worktree to main tip (tickets 01-44, 60, 62)
+2026-08-11 Sync worktree base to main tip (be34d0f)
+2026-08-11 Sync worktree to main (tickets 01-44, 60, 62): worktree branch was cut from stale origin/main (f189955) missing all twin/ build history; bring working tree in line with local main (be34d0f) before starting ticket 45
+2026-08-11 Build ticket 44: evolution-judge, and human override with pushback
+2026-08-11 Build ticket 43: signal-classify, the first skill through seam 3
+2026-08-11 Build tickets 40 and 41: Enron as contamination control, and hindsight-resistance cases
+2026-08-11 Build ticket 39: NMC Health and Wirecard, and one honest notoriety finding
+2026-08-11 Build ticket 34: coherence audit, and seven silently-closed tickets
+2026-08-10 Build ticket 33: the trade-off curve across the ensemble
+2026-08-10 Build tickets 25, 32, 37, 38, 42, 60 and 62: anchoring, plurality, backtest, Carillion, seam 3, contestability, misuse logging
+2026-08-10 Build ticket 24: heavy-tailed severity, TVaR, and the loss-exceedance curve
+2026-08-10 Build tickets 16 and 31: position deltas with no privileged map, and the credibility blend
+2026-08-10 Build ticket 09: the reliability diagram, and the sweep that will not skip a day
+2026-08-10 Guard the measurement's liveness
+2026-08-10 Restore estate/driftwood/drift/ (build ticket 64) into this worktree
+2026-08-10 Widen the Flux question to three branches, and correct a probe that never ran
+2026-08-10 Build ticket 23: the calibration record a triple can now carry
+2026-08-07 Build ticket 30: the price, and the mitigation claim that has to earn it
+2026-08-07 Build tickets 36 and 64: the information gate, and the drift clock started
+2026-08-07 Build tickets 21, 22 and 35: shared ancestry, do versus observe, rewind
+2026-08-06 Build tickets 20, 28 and 29: propagation, the pre-filter, the £ boundary
+2026-08-06 Build tickets 18, 19, 26 and 27: the evidence ladder, the use-gate, whose £
+2026-08-06 Build tickets 11, 13, 14, 15 and 17: signing, roll-ups, the spine, the pocket org
+2026-08-06 Build tickets 08, 10 and 12: schema, proper scoring, reproduce from pins
+2026-08-05 Run the typecheck that was never run, and fix what it found
+2026-08-05 Build the twin's walking skeleton (tickets 01-07): sense, run, score
+2026-08-05 Split the twin spec into 77 build tickets with coherence guardrails
+2026-08-05 Collapse the twin map into a buildable spec
+2026-08-05 Resolve the demo slice (ticket 22): earn the claim, then make it
+2026-08-05 Resolve the co-registered forecast book (ticket 21): a floor, not a proof
+2026-08-05 Resolve the skill inventory (ticket 20): split by determinism, build a skeleton
+2026-08-05 Tidy the map's fog: drop what tickets 09/10/13/15/18 resolved, add the co-registered forecast book
+2026-08-05 Resolve the enactment arm (ticket 18): the prior thesis survives, narrowed
+2026-08-05 Land opportunity-case research (ticket 19): the bar cannot be met, structurally
+2026-08-05 Resolve sensing, ethics, Goodhart & misuse (ticket 15): name the power gap
+2026-08-05 Land two research tracks: reject TabFM, adopt prediction markets narrowly
+2026-08-05 Resolve provenance & attestation (ticket 14): sign it, pin it, recompute it
+2026-08-05 Resolve the scenario / gameplay engine (ticket 13): time + intervention
+2026-08-05 Resolve the synthetic org substrate (ticket 12): a world to sense
+2026-08-05 Resolve the sense->move loop (ticket 11): the engine's heart
+2026-08-05 Resolve the twin inside the twin (ticket 10): a thing to argue with
+2026-08-05 Resolve the £ currency regimes (ticket 09): perspectival, bounded, causally gated
+2026-08-04 Resolve the causal layer (ticket 08): the twin is a weather forecast
+2026-08-04 Resolve the twin domain + data model (ticket 07): the spine
+2026-08-04 Resolve flagship OSINT-scoping (ticket 06): Netflix + Intel co-flagships
+2026-08-04 Chart the twin wayfinder to a decision-complete foundation
+2026-07-31 Reopen tickets 17 + 14: live reach beat NOT done (istio-csr/SPIRE CA blocker)
+2026-07-31 Fix SPIRE chart 0.24.0 breaking value renames (live bring-up finding)
+2026-07-31 Untrack estate/.work build-scratch (nested git-seed repos)
+2026-07-31 Estate build: 27 tickets implemented via dependency-wave workflow (waves 2-9)
+2026-07-31 Estate build wave 1: tickets 01,02
+2026-07-31 Add pitch v2 — 6:40 + tight 4:50 Pecha Kucha pitch to the ControlPlane CEO
+2026-07-31 Mark caldera→ludlow GitHub org rename done (via browser)
+2026-07-31 Extend talk-spec: enforcement gradient + three-actor identity, publish 27 build tickets
+2026-07-23 Chart the talk-spec wayfinder map to decision-complete
+2026-07-20 Add show-and-tell demo runbook
+2026-07-20 Wave 5 follow-up: fix a verbatim-breaking doc regression + two overclaims
+2026-07-20 Ticket 09 follow-up: fully diagnose the retirement-PR path via a live forced test
+2026-07-18 Wave 4 follow-up: fix a systemic broken rationale.md link, restore a missing follow-up section
+2026-07-18 Wave 3 follow-up: correct my own wrong root-cause claim, fix a vacuously-passing self-check, two stale/self-contradicting doc sections, and three precision nits
+2026-07-18 Wave 2 follow-up: a real orphan-guard/Flux interaction explained honestly, a vacuously-passing verify script fixed, a PR misattribution, a self-inflicted regression in my own wave-1 fix, and two dangling references
+2026-07-18 Wave 1 (combined pass) follow-up: fix live cluster contamination, a second GitOps-wiring gap on cluster2, a false kustomize-build claim, and an unreconciled PR-vs-issue spec contradiction
+2026-07-18 Wave 1 (faithful-floor): fix 8 precision/staleness issues found live
+2026-07-18 Ticket 23 follow-up: correct the same overclaimed enforcement mechanism here
+2026-07-18 Ticket 19 follow-up: fix and document a real orphan-guard cloud-plane gap
+2026-07-18 Ticket 08 follow-up: fix and document a real OSCAL misattribution bug found live
+2026-07-18 Tenth wave: fix HISTORY.md's own timeline overreach, ticket 16's wrong ADR citation, add a trivy-operator flakiness caveat, and close a real sunset-automation gap a skeptic found
+2026-07-18 Ninth wave: a significant correction to ticket 16's own claim, plus a precision note on ticket 07's admission story
+2026-07-18 Eighth wave: fix a wrong ADR cross-reference, an overstated PolicyReport claim, a "year-old" impossibility in HISTORY.md, and document a real upstream flux-operator flakiness found live
+2026-07-17 Seventh wave: two precision nits in ticket 06 found by continued adversarial re-verification
+2026-07-17 Sixth wave: fix a self-contradiction and a stray reference in ticket 06, a wrong metric-scoping claim in ticket 07, and HISTORY.md repeating a claim its own sibling doc had already corrected
+2026-07-17 Ticket 06: stop pinning an exact, live-drifting Angular package count
+2026-07-17 Fifth wave: ticket 09's own correction repeated a wrong claim, ticket 03's force-moved-tag rejection finally re-proven live, HISTORY.md quote fixed
+2026-07-17 Ticket 08: precise the 'reconcile clean'/'own cadence' checklist wording
+2026-07-17 Fix a third, tiny wave: ticket 09's own correction had a wrong date claim
+2026-07-17 Close a second wave of real gaps found by adversarial re-verification
+2026-07-17 Ticket 12: ledger's vulnerability-count 'worst-in-class' framing was wrong
+2026-07-17 Close tickets 07/09's real gaps: fix live GitOps drift permanently, prove real-merge retirement, and correct ticket 13's own wrong self-correction
+2026-07-17 Close ticket 13's three real gaps: all 3 checkbox paths, policy-repo runs, and a genuinely-implemented skip-if-actioned nag
+2026-07-17 Close out tickets 04/06/07/10's real gaps found by adversarial verification
+2026-07-17 Ticket 11 fully closed: ledger's trivy scan completes, real Log4Shell finding confirmed live
+2026-07-17 Ticket 11 follow-up: root-caused and fixed the trivy scan-lock issue; ticket 06 Renovate seam honestly walked back
+2026-07-16 Fix ticket 05's status header: was never updated to done despite the work shipping
+2026-07-16 Ticket 15 done: curated history narrative
+2026-07-16 Ticket 14 done: release evidence assets, live-proven with real v2.2.1 cut
+2026-07-16 Ticket 13 done: governance checkbox follow-through, live-proven on both repos
+2026-07-16 Tickets 11/12 done: vulnerability scanner + estate dashboard, honest write-up
+2026-07-16 Ticket 10 done: readiness-collector live-proven, two real bugs found and fixed
+2026-07-16 Ticket 09 done: sunset escalator live-proven against real fleet repo
+2026-07-16 Tickets 07/08 done: 5 real team repos live, apps monorepo archived
+2026-07-16 Ticket 04 done: c2p-collector extracted, digest-pinned, live-verified
+2026-07-16 Ticket 03 done: PR gate extracted into pinned pr-gate-action
+2026-07-16 Ticket 06 done: org-level Renovate preset repo, onboarding suppressed
+2026-07-16 ADR-0010: sunset as scheduled proposals, never scheduled application
+2026-07-16 Ticket 01 done: gate version cross-check, PEM strip, Grafana anon, supported-versions stat, admission-only semantics
+2026-07-16 Tickets 06/11: fold in Renovate + trivy-operator fact-check results -- all research resolved
+2026-07-16 Ticket 10: mechanism resolved -- kyverno apply supports ValidatingPolicy, verified live
+2026-07-16 real-estate epic: spec + 15 tickets from grilled demo feedback
+2026-07-16 Capture show+tell demo feedback: raw notes + reasoned conclusions (pre-grilling)
+2026-07-15 Fix stale 'ready-for-agent' status headers on already-completed tickets
+2026-07-15 Close issue 21: CIO dashboard complete, all 4 panels live and query-verified
+2026-07-15 Close issue 10: cluster2 profile, all 4 checklist items proven live
+2026-07-15 Close issues 08, 11, 12, 14, 15, 16, 18, 19 fully; issue 09's last caveat resolved
+2026-07-15 Issue 19: prove 3 of 4 checklist items live on throwaway KiND (Deny refusal, Audit PolicyReport, zero creds); only cross-version coexistence stays genuinely blocked on issue 08
+2026-07-15 Issue 20: real C2P result2oscal job — schema-valid OSCAL for cloud plane
+2026-07-15 Issue 09: correct status to done (checklist was already complete). Issue 10: document why it's genuinely blocked, not just graph-blocked, and close its one independent checklist item
+2026-07-15 Close issue 07: fixed release notes for v1.0.1/v2.0.1/v2.1.1 without a new tag
+2026-07-15 Issue 18: Crossplane CRDs implemented, fleet PR #6 open awaiting review
+2026-07-15 Issue 16: notification Alert implemented, fleet PR #5 open awaiting review
+2026-07-15 Close issues 25, 26: policy handbook generator + agent plain-language summaries
+2026-07-15 Close issue 24: agent demonstrator (live run against real Kyverno GHSA data)
+2026-07-14 Close issue 23: agent governance layer architectural spec
+2026-07-14 Close issue 22: advisory metadata + editorial review
+2026-07-14 Close issue 17: cloud policies (collie harvest)
+2026-07-14 Close issue 15: Flux revision metrics + shared-variable dashboard
+2026-07-14 Close issue 14: Policy Reporter -> Prometheus + Grafana
+2026-07-14 Issue 13: shift-left dev workflow doc (the "usable" -able)
+2026-07-14 Close issue 12: PR CI gate on bump PRs
+2026-07-14 Close issue 11: Renovate customManager maintaining every pin
+2026-07-14 Close issue 09: orphan guard
+2026-07-14 Correct the version self-scoping mechanism: matchConditions, not objectSelector
+2026-07-14 Note issue 07 status: one item blocked on gitsign re-auth
+2026-07-14 Note ticket 06 review-driven fixes
+2026-07-14 Close issue 06: single-version consumption
+2026-07-14 Close issue 04: signed release pipeline
+2026-07-14 Extract policy/ and fleet/ into their own org repos
+2026-07-14 Point cross-repo doc links at the hub repo ahead of the org split
+2026-07-14 Tighten doc precision: semver definition, orphan guard, collie harvest framing
+2026-07-14 Fix verify-live.sh gaps found in code review
+2026-07-14 Implement issue 03: Deny gate ValidatingPolicy + rationale layout
+2026-07-14 Implement issues 01, 02, 05: Renovate git-refs spike, policy scaffold, KiND floor
+2026-07-14 spike: prove C2P result2oscal over CEL ValidatingPolicy reports
+2026-07-14 PRD: harden deliverability from adversarial review
+2026-06-06 Initial commit: PRD, ADRs, research dossiers, and synthesis

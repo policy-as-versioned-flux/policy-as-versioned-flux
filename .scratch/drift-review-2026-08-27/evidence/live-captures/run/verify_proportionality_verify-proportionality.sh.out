@@ -1,0 +1,12 @@
+[1;36m==>[0m 0. the £ engine's own asserts (band selection, tightening raises £, no timer)
+ok  driftwood(£40000 tol): loose buys £19439 -> Audit | tightened buys £54520 -> Deny | same loose under ludlow(£5000 tol) -> Deny
+[1;36m==>[0m 1. the SAME control + SAME scenario -> divergent £-derived verdicts
+[1;36m==>[0m 2. the £ that DRIVES it — same risk_bought, different appetite band
+    risk_bought £21,107  |  driftwood band £40,000 -> Audit  |  ludlow band £5,000 -> Deny
+[1;36m==>[0m 3. the rendered policies carry the £-derived action (not hand-authored)
+ok  committed policies match the £-derived render for driftwood, ludlow
+[1;36m==>[0m 4. the shared control body is a real, self-scoping policy (pass/fail/unversioned)
+[1;36m==>[0m 5. live(driftwood): the rendered policy applies clean (server dry-run)
+Warning: policies.kyverno.io/v1alpha1 ValidatingPolicy is deprecated; use policies.kyverno.io/v1 ValidatingPolicy
+[1;36m==>[0m 5. live(ludlow): cluster reachable but Kyverno CRDs not installed — skipping dry-run (offline proof stands)
+PASS: same control, same £ (risk_bought £21107) — Audit in driftwood, Deny in ludlow. Proportionality by comparison.

@@ -1,0 +1,257 @@
+{
+  "cluster": "platform publisher cluster — .estate-clone/platform: README.md, distribution/, policy/, engine/, shift-left/, party/, top-level verify-*.sh, .github/. Git remote github.com/policy-as-versioned-platform/platform, branch main, HEAD 58ef9c5 2026-08-25 'cs-27: signed release-gate evidence for policy/v3.0.0'. Repo history spans 2026-07-31..2026-08-25. Real tags on disk: policy/v2.0.0, policy/v2.0.1, policy/v3.0.0, v0.1.0, v0.1.1, v1.0.0, v1.1.0, v1.1.1.",
+
+  "components": [
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/README.md",
+      "what_it_is": "Org/role README for the publisher+risk-bearer party; indexes the whole thesis (distribution templates, FAIR engine, cage->OSCAL up-flow, shift-left, war-gamer/Wardley) and documents the release model (multi-tag gitsign dispatch, institutions pin {tag,commit} and bump via Renovate).",
+      "how_it_runs": "doc only",
+      "evidence_of_working": "Most claims resolve to real code in-repo. Two do not, in this cluster: README.md:19 claims a 'notification event spine' for distribution — grep across the whole platform repo finds zero `kind: Alert|Provider|Receiver`; README.md:17-19 also claims `dependsOn`/health and drift-heal in the distribution templates — distribution/versions.yaml has no dependsOn/healthChecks/force/suspend fields at all. README.md:58-60's Renovate/{tag,commit} claim IS real (driftwood/ludlow/tuppence renovate.json each carry two git-refs customManagers)."
+    },
+    {
+      "path": "platform/distribution/versions.yaml",
+      "what_it_is": "flux-operator ResourceSet `policy-versions`. spec.inputs[0].versions[] (lines 30-33) is the version array — currently 2.0.0/2.0.1/3.0.0, each {version,tag,commit}. resourcesTemplate (34-128) fans out, per version, a GitRepository pinned to tag+commit (37-47) and a Kustomization on ./distribution/policies/vN with prune:true (49-65); then, once, the orphan-guard ValidatingPolicy with a CEL allow-list ranged from the same array (67-95) and the governed-namespace-requires-claim ValidatingPolicy (97-128).",
+      "how_it_runs": "Flux-reconciled resource — DECLARED only. It is not reconciled in any reachable cluster: `kubectl --context kind-driftwood -n flux-system get resourceset` returns 'No resources found', and the only Kustomization present is `driftwood`. No policy-vN Kustomizations exist.",
+      "evidence_of_working": "Parsed and ranged for real by the offline twins and by computed-semver/compose (render-orphan-guard.elements() at render-orphan-guard.py:38-44 is the single parse point). The fan-out itself has never been observed live: the cluster instead carries hand-applied require-nonroot-1-0-0 / require-nonroot-2-0-0 / posture-trust-boundary* (ages 4d20h-6d20h), i.e. an older, out-of-array set."
+    },
+    {
+      "path": "platform/distribution/kustomization.yaml",
+      "what_it_is": "Kustomize entry point reconciled by each institution's `platform-distribution` Kustomization; deliberately ships ONLY versions.yaml (line 8-9), excluding tests/ and the renderers as dev/CI tooling.",
+      "how_it_runs": "Flux-reconciled resource (declared)",
+      "evidence_of_working": "Structurally trivial and consistent with the README; no live reconcile observed (see versions.yaml row)."
+    },
+    {
+      "path": "platform/distribution/render-orphan-guard.py",
+      "what_it_is": "Offline twin of the orphan-guard the ResourceSet renders live. `elements()`/`versions()` (38-49) are the estate's single parse point for the array; `orphan_guard()` (52-91) builds the ValidatingPolicy; `--retire` simulates dropping an element.",
+      "how_it_runs": "offline python (CLI + --selfcheck)",
+      "evidence_of_working": "`--selfcheck` RUN AND PASSES: 'allow-list == array; every array version has a policies/ dir; retire drops a version'. Consumed for real by shift-left/ci-check.py:41-49, cut-release-gate.py:264, compose/composition.py, computed-semver/*, and the three adopters' composed/orphan-guard.yaml."
+    },
+    {
+      "path": "platform/distribution/render-governed-namespace-guard.py",
+      "what_it_is": "Offline twin of ADR-0014's governed-namespace guard: Audit, CREATE-only (UPDATE excluded so the currency-controller's de-posture patch stays legal), namespaceSelector governed=true, requires a policy-version claim.",
+      "how_it_runs": "offline python (CLI + --selfcheck)",
+      "evidence_of_working": "`--selfcheck` RUN AND PASSES. Also proved functionally by verify-governed-namespace-guard.sh with the namespaceSelector stripped (the pinned kyverno CLI cannot evaluate it offline — kyverno/kyverno#13605, #9975, named at render-governed-namespace-guard.py:20-29)."
+    },
+    {
+      "path": "platform/distribution/render-version-tree.py",
+      "what_it_is": "Renders the seven mandatory per-version members (cage-tier, cage-netpol, stamp-posture, posture-trust-boundary + 3 PriorityClasses) from the single authoring copies in graded/policies and posture/policies, with versioned names, the policy-version label, an appended matchConditions self-scope, and cage-tier's dial table rewritten to name its own versioned PriorityClasses (135-142). write_tree() refuses to re-render an already-released tree (147-159).",
+      "how_it_runs": "offline python (CLI writes a tree; --selfcheck)",
+      "evidence_of_working": "`--selfcheck` RUN AND PASSES (deterministic, 7 members, live path == offline twin, re-render refused, authoring copies untouched). verify-render-version-tree.sh additionally proves with the REAL kyverno CLI that two rendered versions' cage-tier copies each mutate only their own claimant — RUN, exit 0."
+    },
+    {
+      "path": "platform/distribution/render-and-prove.py",
+      "what_it_is": "Shared render-and-prove step called by graded/up.sh and posture/up.sh (sibling cluster). Copies the REAL committed policies/vN tree into a scratch dir, renders on top, folds the rendered members into the scratch kustomization.yaml, and proves `kubectl kustomize` (the same builder flux's Kustomization controller runs) can build it and delivers every mandatory member.",
+      "how_it_runs": "offline python, invoked by shell up.sh scripts",
+      "evidence_of_working": "Carries an explicit honesty note (lines 22-30) that the committed policies/vN kustomization.yaml did not name the graded/posture members at the time of writing and that the fold-in is simulated in scratch only. That note is now STALE in the good direction: distribution/policies/v3.0.0/kustomization.yaml lines 3-9 DO name all six members. Not run here (invoked from the sibling graded/posture up.sh path)."
+    },
+    {
+      "path": "platform/distribution/policies/v1.0.0, v2.0.0, v2.0.1, v3.0.0",
+      "what_it_is": "The per-version policy trees the ResourceSet Kustomizations reconcile. v1.0.0 is require-nonroot only and is NOT in the array (deliberately retained as a historical tree — render-orphan-guard.py:121-128). v2.0.0/v2.0.1/v3.0.0 each carry require-nonroot + the six rendered members. v2.0.1 is the conditional 'nonroot || (attested && hardened)' patch backport (require-nonroot.yaml:40-60); v3.0.0 tightens with readOnlyRootFilesystem (v3.0.0/require-nonroot.yaml:33-35). All are validationActions:[Audit].",
+      "how_it_runs": "Flux-reconciled resource (declared, via the ResourceSet); exercised offline by kyverno",
+      "evidence_of_working": "distribution/tests/require-nonroot/kyverno-test.yaml is a real 2.0.0-vs-3.0.0 coexistence/skip matrix and passes under `kyverno test` (verify-coexistence.sh step 1, run, passed). diff v2.0.0 vs v3.0.0 cage-tier.yaml shows only name/label/self-scope/PriorityClass-name differences — i.e. the renderer's output, committed."
+    },
+    {
+      "path": "platform/policy/ (README.md, verify-conditional.sh, tests/conditional/, scenarios/driftwood-root-residual.json)",
+      "what_it_is": "The 'exemptions are banned, not dissolved' area. No policy bodies of its own any more — cs-16 deleted policy/policies/ and retargeted everything at distribution/policies/v2.0.1/require-nonroot.yaml (verify-conditional.sh:17-21, tests/conditional/kyverno-test.yaml:4-14). scenarios/driftwood-root-residual.json is a FAIR triple scenario for the caged root residual.",
+      "how_it_runs": "shell script (verify-conditional.sh) + kyverno test + offline python (fair.py)",
+      "evidence_of_working": "fair.py summary on the scenario RUN: ale=21359.7, matching README.md:53's '≈ £21,360/yr' claim exactly. verify-conditional.sh not run here (its step 2 has a `timeout 120 kyverno test`); its steps read real files that all exist."
+    },
+    {
+      "path": "platform/engine/ (kyverno/helmrelease.yaml, flux-operator/helmrelease.yaml, namespaces.yaml, up.sh, verify-engine.sh)",
+      "what_it_is": "The two controllers everything else presupposes: Kyverno chart 3.8.2 / appVersion 1.18.2 via HelmRepository+HelmRelease, and the ControlPlane flux-operator 0.58.1 via OCIRepository+HelmRelease chartRef. Deliberately creates NO FluxInstance so the cluster's vanilla Flux install is untouched (ADR-0005 guardrail).",
+      "how_it_runs": "Flux-reconciled resources, applied by engine/up.sh (shell script, idempotent, never creates/deletes a cluster)",
+      "evidence_of_working": "THE ONLY LIVE-PROVEN COMPONENT IN THIS CLUSTER. verify-engine.sh RUN, exit 0, and its live branch fired: Kyverno pods present, MutatingPolicy + ValidatingPolicy CRDs registered, flux-operator pod present, ResourceSet CRD registered on kind-driftwood. Offline invariants (chart pinned, OCIRepository source, no FluxInstance) also pass."
+    },
+    {
+      "path": "platform/shift-left/ (ci-check.py, verify-shift-left.sh, ci-workflow.example.yml, fixtures/)",
+      "what_it_is": "The pre-merge ±1 version-skew check. Reads a workload's policy-version label, resolves the target ±1 window off the SAME declared array (ci-check.py:68-78, reusing render-orphan-guard.versions), runs the real `kyverno apply` for every policy in the window, and refuses an orphan target rather than skipping it (74-77).",
+      "how_it_runs": "offline python called from GitHub Actions workflows (platform's own release.yml release gate, and each adopter's shift-left.yml)",
+      "evidence_of_working": "BROKEN TODAY. verify-shift-left.sh RUN → exit 1: 'FAIL: ci-check.py passed a workload that fails its target version's real rule'. Root cause is real drift, not a flaky test: fixtures/workload-flip.yaml targets 2.0.0 and was designed when the array was [2.0.0, 3.0.0]; cs-16 inserted 2.0.1, so skew_window('2.0.0') is now ['2.0.0','2.0.1'] and 3.0.0 — the version whose readOnlyRootFilesystem rule the fixture violates — is out of the window. Confirmed by running ci-check.py directly. Blast radius: release.yml:83-87 runs this script as its release gate, so the platform release workflow is currently red for every tag push; wargamer/propose-policy-pr.sh:51-53 asserts the same fixture must fail and so also breaks."
+    },
+    {
+      "path": "platform/party/ (schema.json, party_artefact.py, verify-party-artefact.sh)",
+      "what_it_is": "The party-artefact format and its three checks: schema (enums read from schema.json, never re-declared), tags (a declared parent version must equal the tag the adopter's own Flux pin file carries, for nist/controls and platform/implementations), and baseline mirror (nist pin ConfigMap's baselineName == party.yaml's baseline). pricing/threat are explicitly NAMED as unpinned/unchecked (party_artefact.py:74, 203-208) rather than silently skipped.",
+      "how_it_runs": "offline python, called cross-org from each adopter's shift-left.yml through the pinned platform checkout ('library, not a service')",
+      "evidence_of_working": "verify-party-artefact.sh RUN, exit 0; --selfcheck exercises real temp Flux pin files and a real party.yaml end to end. Real consumers: driftwood/.github/workflows/shift-left.yml has a 'party artefact check (ticket 11)' step calling `platform/party/party_artefact.py check driftwood/party.yaml`; driftwood/ludlow/tuppence each carry a party.yaml."
+    },
+    {
+      "path": "platform/.github/workflows/cut-release.yml",
+      "what_it_is": "workflow_dispatch-only release cutter. Normalizes single-tag or multi-tag input, refuses existing tags for all tags before creating any, runs the cs-27 publisher gate BEFORE `git tag`, uploads signed evidence as an artifact (always), commits the evidence, points versions.yaml's commit field(s) at that evidence commit in a SECOND commit, creates gitsign-signed annotated tags with the run's own ambient Actions identity, and pushes them in one `git push --atomic`. A backfill_evidence_only mode (lines 68-81, 163-165) commits evidence for a pre-gate version without creating a tag.",
+      "how_it_runs": "GitHub Actions workflow",
+      "evidence_of_working": "Real: computed-semver/evidence/{2.0.0,2.0.1,3.0.0}.json each exist with a real cosign bundle carrying a base64 Fulcio certificate — genuine keyless signatures from real runs. HEAD's own commit message is 'cs-27: signed release-gate evidence for policy/v3.0.0'. Offline twin verify-cut-release-tags.sh RUN, exit 0."
+    },
+    {
+      "path": "platform/.github/workflows/release.yml",
+      "what_it_is": "Runs on `v*.*.*` and `policy/v*.*.*` tag pushes (separate patterns because an Actions tag glob does not cross '/'). Runs the shift-left proof as the release gate, verifies the tag's gitsign signature identity-pinned against an offline Rekor bundle, and for policy tags additionally `cosign verify-blob`s the committed evidence bundle and checks the evidence content, then publishes a GitHub Release.",
+      "how_it_runs": "GitHub Actions workflow",
+      "evidence_of_working": "EXPECTED_IDENTITY_REGEXP (line 54) proved by verify-certificate-identity-regexp.sh — RUN, exit 0, accepts main + release/N.N.x, rejects six foreign/unanchored shapes. The release gate step itself (line 87) currently fails — see shift-left row."
+    },
+    {
+      "path": "platform/.github/scripts/ (cut-release-normalize.py, -refuse-existing.sh, -gate.py, -commit-evidence.sh, -update-array-commit.sh, -create-tags.sh, -push.sh, release-verify-evidence.py)",
+      "what_it_is": "The extracted release steps the workflow calls, so the offline twins exercise the shipped code path. cut-release-gate.py is the publisher gate wiring: splits a multi-tag dispatch (only policy/vN enters the gate, bare vN is skipped), gates once per policy tag against the window as it stood BEFORE the dispatch, refuses the whole dispatch if any tag refuses, and signs evidence with cosign keyless.",
+      "how_it_runs": "shell + offline python, called from GitHub Actions and from the two offline twins",
+      "evidence_of_working": "verify-cut-release-tags.sh RUN, exit 0 — exercises all of normalize/refuse/create/push against a real scratch git repo and a real local bare remote, including atomic-push rollback and cs-27's mis-shaped-tag refusal. cut-release-gate.py:213-223 CUT_RELEASE_TEST_MODE writes a clearly-marked non-signature; its docstring claims \"release.yml's own check reads this flag and refuses to treat it as a real bundle\" — release-verify-evidence.py does NOT read test_mode (it only checks outcome and declared version); the protection in practice comes from `cosign verify-blob` failing on the stand-in, not from any flag read."
+    },
+    {
+      "path": "platform/verify-publisher-gate.sh",
+      "what_it_is": "cs-27's offline twin: Part A runs the real gate.run_gate() against the real v2.0.0->v3.0.0 pair (pass) and against v3.0.0 with one disclosed Audit->Deny mutation (refusal); Part B proves cut-release-gate.py's wiring against a real throwaway clone (skip a platform tag, refuse cleanly with no commit/tag, and the evidence-commit-then-array-commit-then-tag ordering); Part C is the cs-16 backport regression guard.",
+      "how_it_runs": "shell script driving offline python + the real kyverno CLI",
+      "evidence_of_working": "NOT completed here. Started and left running for ~28 minutes on this machine without emitting a single line past its Part A header; real `kyverno apply` child processes were confirmed running throughout (corpus spine fixtures). The script's own header says 'several minutes'. Killed rather than waited out. Its assertions are consistent with the committed evidence files (3.0.0.json records exactly the declared major / computed none / all-'none' movement Part A asserts; 2.0.1.json records patch/none with old_subject_dir distribution/policies/v2.0.0, which is Part C's own assertion)."
+    }
+  ],
+
+  "capabilities_real": [
+    "Multi-version coexistence via matchConditions self-scoping, proved offline with the real kyverno CLI: distribution/tests/require-nonroot/kyverno-test.yaml:14-40 asserts pass/fail/skip for 2.0.0 and 3.0.0 against five pods; verify-coexistence.sh:19-21 runs it (step 1 passed on this machine).",
+    "The orphan-guard allow-list is genuinely derived from the array, never hand-maintained: render-orphan-guard.py:47-49 and versions.yaml:87-88 both range the same field; verify-orphan-guard.sh RUN, exit 0 — 9.9.9 denied, the declared version admitted, unversioned skipped, exact verdict spread asserted at verify-orphan-guard.sh:55.",
+    "Retirement-by-deletion proved offline: verify-retirement.sh RUN, exit 0 — the same pod flips admit->deny when 2.0.0 is dropped from the array (steps 1-3).",
+    "Per-version tree rendering from single authoring copies, with the cage-tier PriorityClass rewrite: render-version-tree.py:114-144, --selfcheck passes, and verify-render-version-tree.sh:51-55 proves version isolation with a real `kyverno apply` mutation check (exit 0).",
+    "The governed-namespace claim requirement, functionally: verify-governed-namespace-guard.sh:61-68 RUN, exit 0 — unclaimed pod denied, claimed pod admitted, exact spread asserted.",
+    "Kyverno + flux-operator actually installed and running: engine/verify-engine.sh live branch RUN and passed on kind-driftwood (4 CRD/pod assertions).",
+    "The shift-left check's orphan-target refusal and unversioned pass-through: verify-shift-left.sh:17-18 and :29-34 both hold (only the flip case fails).",
+    "The party artefact check, end to end against real Flux pin files: party_artefact.py:373-441 selfcheck; wired cross-org in driftwood/.github/workflows/shift-left.yml.",
+    "Release cutting: multi-tag dispatch, all-tags-checked-before-any-created refusal, atomic push rollback, and cs-27's mis-shaped-tag refusal — all proved against a real git repo by verify-cut-release-tags.sh (exit 0).",
+    "Real keyless signing happened: computed-semver/evidence/*.json.bundle carry real base64 Fulcio certs and signatures; policy/v2.0.0, policy/v2.0.1, policy/v3.0.0 exist as real tags.",
+    "Identity pinning: verify-certificate-identity-regexp.sh (exit 0) proves release.yml:54's regexp rejects foreign orgs, foreign workflow paths and unanchored variants.",
+    "Real downstream consumption: driftwood/ludlow/tuppence each carry composed/orphan-guard.yaml and composed/governed-namespace-guard.yaml rendered from this cluster's twins, annotated `inherited-from: platform@1.1.1`, with the allow-list literal ['2.0.0','2.0.1','3.0.0'] matching versions.yaml exactly."
+  ],
+
+  "capabilities_stubbed_or_thin": [
+    "THE FAN-OUT HAS NEVER RUN LIVE. `kubectl -n flux-system get resourceset` on kind-driftwood returns 'No resources found'; there are no policy-vN Kustomizations and no policy-vN GitRepositories. The cluster instead carries hand-applied require-nonroot-1-0-0 / require-nonroot-2-0-0 (ages 4d20h) — versions that are not even in the current array. Every distribution claim is offline-only, as distribution/README.md:59-71 and :73-83 honestly say.",
+    "verify-shift-left.sh FAILS TODAY (exit 1). fixtures/workload-flip.yaml (shift-left/fixtures/workload-flip.yaml:8-13) targets 2.0.0 and relies on 3.0.0 being the +1 neighbour; cs-16's insertion of 2.0.1 into versions.yaml:32 moved 3.0.0 out of the ±1 window (ci-check.py:68-78), so the Audit->Deny flip is no longer caught. release.yml:87 runs this as the release gate.",
+    "verify-coexistence.sh FAILS TODAY (exit 1) — not offline, but because its 'optional live tail' is not optional-safe: verify-coexistence.sh:29-34 fires whenever ANY validatingpolicy exists at CTX and then hard-fails on require-nonroot-3-0-0 being absent. A reachable-but-unfanned-out cluster turns an offline-green beat red.",
+    "verify-retirement.sh:55-56 prints 'live: policy-v2-0-0 Kustomization is gone at context kind-driftwood — retirement pruned it live'. FALSE POSITIVE: that Kustomization was never created, so 'gone' proves nothing. The script's own comment at :47-50 says the passive read must 'say so plainly'; the elif branch does the opposite.",
+    "The offline twins DRIFT from the live ResourceSet render, and nothing checks it: render-orphan-guard.py:65 and render-governed-namespace-guard.py:57 both stamp `policy-as-versioned.dev/policy: platform-machinery` (cs-22's pairing-rule identity), while versions.yaml:70-71 and :109-110 render the same two policies with NO labels at all. The twins are claimed byte-equivalent to what flux-operator would render (render-orphan-guard.py:4-11); they are not.",
+    "render-and-prove.py:22-30's honesty note is stale: it says distribution/policies/vN/kustomization.yaml does not name the graded/posture members and that the fold-in is simulated. v2.0.0/v2.0.1/v3.0.0 kustomization.yaml now name all six.",
+    "cut-release-gate.py:218-222 claims release.yml refuses a CUT_RELEASE_TEST_MODE bundle by reading the flag. release-verify-evidence.py:25-30 reads only outcome and declared — no test_mode check.",
+    "README.md:19's 'notification event spine' and README.md:17-19's dependsOn/health/drift-heal are not present anywhere in this cluster (no Alert/Provider/Receiver in the whole platform repo; no dependsOn/healthChecks in distribution/versions.yaml).",
+    "verify-publisher-gate.sh is real but effectively unrunnable at demo speed: ~28 minutes on this machine without finishing Part A, against a documented 'several minutes'.",
+    "distribution/README.md:31's mermaid says the Kustomization path is './policies/vN'; versions.yaml:61 renders './distribution/policies/vN'. Cosmetic, but a reader following the README would look in the wrong place.",
+    "ci-workflow.example.yml is a reference shape only — 'Not run here' (line 2-3). The real wiring lives in each adopter repo.",
+    "distribution/policies/v1.0.0 is on disk but in no array element and covered by no test (the kyverno test matrix uses 2.0.0/3.0.0 only). Deliberate per render-orphan-guard.py:121-128, but it is dead weight a reader can mistake for a shipped version."
+  ],
+
+  "verify_scripts": [
+    {
+      "path": "platform/distribution/verify-coexistence.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Offline core (kyverno test + render-orphan-guard --selfcheck) proves two versions self-scope and admit side by side with no shared-webhook collision. RUN → exit 1: steps 1 and 2 pass, but the live tail at :29-34 fires on any reachable cluster with validatingpolicies and hard-fails because require-nonroot-3-0-0 is not installed. Cluster-optional in intent, cluster-hostile in practice."
+    },
+    {
+      "path": "platform/distribution/verify-orphan-guard.sh",
+      "needs_cluster": false,
+      "what_it_proves": "A version not in the array is denied, a declared version admits, an unversioned pod is out of scope — via a real `kyverno apply` on the rendered guard, with the exact verdict spread asserted (:55). RUN → exit 0."
+    },
+    {
+      "path": "platform/distribution/verify-retirement.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Deleting one array element flips the same pod from admitted to denied (the orphan-guard re-rendered from the shrunk array). RUN → exit 0. Its live tail (:51-59) is passive and currently emits a misleading 'retirement pruned it live' line for a Kustomization that never existed."
+    },
+    {
+      "path": "platform/distribution/verify-render-version-tree.sh",
+      "needs_cluster": false,
+      "what_it_proves": "All 7 mandatory members render with versioned names/labels/matchConditions self-scope and never objectSelector; live path == offline twin; re-render refused; and with the real kyverno CLI, 8.8.8's cage-tier mutates only the 8.8.8 claimant. RUN → exit 0. Skips gracefully if kyverno is absent (:23-26)."
+    },
+    {
+      "path": "platform/distribution/verify-governed-namespace-guard.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Structurally: the guard is platform-machinery, Audit, CREATE-only, namespaceSelector governed=true. Functionally: the claim-requirement expression denies an unclaimed pod and admits a claimed one, with namespaceSelector stripped because the pinned kyverno CLI cannot evaluate it offline (documented at :4-22). RUN → exit 0. The namespace-scoping boundary itself is proved structurally, not functionally — stated openly."
+    },
+    {
+      "path": "platform/policy/verify-conditional.sh",
+      "needs_cluster": false,
+      "what_it_proves": "One conditional CEL rule ('nonroot || (attested && hardened)') admits everyone meeting C with no named team, fails those who don't, skips the unversioned pod, and its residual is priced by fair.py. Not run here (step 2 wraps `kyverno test` in a 120s timeout). Its inputs all exist; the fair.py leg was verified independently — ale 21359.7, matching policy/README.md:53. Live tail at :46-52 is a dry-run only and cannot fail the script."
+    },
+    {
+      "path": "platform/engine/verify-engine.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Offline: both HelmReleases parse, charts are pinned, flux-operator comes from an OCIRepository, and no FluxInstance exists (the ADR-0005 guardrail). Live (opt-in on ns kyverno existing): Kyverno pods, MutatingPolicy/ValidatingPolicy CRDs, flux-operator pod, ResourceSet CRD. RUN → exit 0 WITH the live branch firing — the only live-proven beat in this cluster."
+    },
+    {
+      "path": "platform/shift-left/verify-shift-left.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Intends: a compliant workload passes its ±1 window; an unversioned one passes trivially; an Audit->Deny flip fails CI; an orphan target is refused. RUN → exit 1. Three of four hold; the flip case no longer fails because 2.0.1's insertion pushed 3.0.0 out of 2.0.0's ±1 window. This is release.yml's release gate."
+    },
+    {
+      "path": "platform/party/verify-party-artefact.sh",
+      "needs_cluster": false,
+      "what_it_proves": "party_artefact.py --selfcheck: schema.json is the single enum source; every structural defect is caught; a real agreeing Flux pin passes and a real disagreement refuses; pricing/threat are named as unchecked; the baseline mirror matches/refuses/refuses-on-missing; check() composes all three against a real party.yaml on disk. RUN → exit 0."
+    },
+    {
+      "path": "platform/verify-certificate-identity-regexp.sh",
+      "needs_cluster": false,
+      "what_it_proves": "release.yml's EXPECTED_IDENTITY_REGEXP, read straight out of the workflow file, accepts this repo's main and release/<major>.<minor>.x and rejects six foreign-org/foreign-path/unanchored variants. RUN → exit 0. No gitsign, no network."
+    },
+    {
+      "path": "platform/verify-cut-release-tags.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Against a real scratch git repo and a real local bare remote, running the SAME .github/scripts the workflow runs: the single-tag legacy form works; multi-tag lands every tag on one commit; the existing-tag refusal fires for every tag before any tag is created; a failed atomic push leaves nothing on the remote; version+tags together is refused; and every mis-shaped policy tag is refused at normalize time. RUN → exit 0. gitsign swapped out via CUT_RELEASE_TEST_MODE (signing is CI-only)."
+    },
+    {
+      "path": "platform/verify-publisher-gate.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Intends: a real gate refusal and a real pass computed by gate.run_gate() against the real committed v2.0.0/v3.0.0 trees plus one disclosed Audit->Deny mutation (Part A); cut-release-gate.py's tag-split, clean refusal and evidence-then-array-then-tag ordering against a real clone (Part B); and cs-16's backport-picks-the-lower-neighbour regression (Part C). NOT COMPLETED here — ~28 minutes with real kyverno apply children running and no output past the Part A header; killed. Needs the real kyverno CLI, not a cluster."
+    }
+  ],
+
+  "runtime_dependencies": [
+    "Flux (source/kustomize/helm controllers) — REAL and installed on kind-driftwood (a `driftwood` Kustomization is Ready), but no distribution object of this cluster is reconciled by it.",
+    "flux-operator (ResourceSet CRD) — REAL: HelmRelease at engine/flux-operator/helmrelease.yaml pinned to OCI tag 0.58.1, pod present and CRD registered live. But zero ResourceSet objects exist, so its templating has never been exercised — the versions.yaml render is only ever produced by the python twins.",
+    "Kyverno — REAL, twice over: the admission controller is installed live (chart 3.8.2 / appVersion 1.18.2, both CRDs registered), and the pinned kyverno CLI 1.18.2 is genuinely invoked by verify-orphan-guard.sh, verify-retirement.sh, verify-render-version-tree.sh, verify-governed-namespace-guard.sh, verify-coexistence.sh, shift-left/ci-check.py and the publisher gate.",
+    "kubectl — REAL, used by engine/up.sh, engine/verify-engine.sh, the verify live tails, and by render-and-prove.py as the independent `kubectl kustomize` builder.",
+    "gitsign 0.17.1 — REAL in CI (pinned binary + sha256 in cut-release.yml:88-89, release.yml:48-49; `gitsign verify-tag` identity-pinned with an offline Rekor bundle at release.yml:99-101). SIMULATED in the offline twin: CUT_RELEASE_TEST_MODE=1 swaps it for a plain annotated tag (cut-release-create-tags.sh:18-19). The boundary is stated openly.",
+    "cosign 2.4.1 — REAL in CI (`cosign sign-blob` keyless at cut-release-gate.py:225; `cosign verify-blob` at release.yml:124-128) and the committed evidence bundles carry genuine Fulcio certificates. SIMULATED locally (cut-release-gate.py:213-224 writes a marked non-signature).",
+    "GitHub Actions — REAL: cut-release.yml and release.yml have both demonstrably run (real signed tags, real evidence commits, HEAD is one such commit).",
+    "Renovate — REAL but downstream, not in this cluster: driftwood/ludlow/tuppence renovate.json each define two git-refs customManagers maintaining the {tag, commit} pair for the nist and platform pins, automerge:false.",
+    "jq — REAL, required by four .github/scripts and by verify-cut-release-tags.sh.",
+    "PyYAML — REAL, required by every renderer, ci-check.py, party_artefact.py and cut-release-gate.py.",
+    "SPIRE / Istio / OpenBao / Pomerium / Crossplane / trivy / C2P / OSCAL tooling — NOT PRESENT in this cluster at all (they live in the sibling identity/, access/, oscal/, posture/ areas). This cluster only references OSCAL narratively (policy/README.md:68-81, party/README.md:50).",
+    "A KiND cluster (default CTX kind-driftwood) — REAL and reachable, which is what exposes verify-coexistence.sh's live-tail failure."
+  ],
+
+  "risk_and_pricing_touchpoints": [
+    "platform/policy/verify-conditional.sh:37-42 — step 3 shells out to ../fair/fair.py summary on policy/scenarios/driftwood-root-residual.json --mode warn and asserts the residual ALE is positive. Real computation: verified independently, ale = 21359.7, var95 = 36573.3, tvar = 40913.3, carried = 42086.5.",
+    "platform/policy/scenarios/driftwood-root-residual.json:5-12 — the FAIR (min,mode,max) triples for the caged root residual, warn vs deny branches. Fixture data, real engine.",
+    "platform/policy/README.md:53 — '£21,360/yr' claim, matches the live fair.py output exactly.",
+    "platform/policy/README.md:62-66 — '£ picks the loosest tier whose caged residual fits the org's appetite band (baseline for driftwood, TCoR ≈ £23.7k/yr)' — narrative only in this cluster; the computation lives in ../graded/cage.py and ../tcor/tcor.py.",
+    "platform/README.md:20-21, :31-33 — the FAIR engine and platform's own strict £10k appetite band (risk/appetite.json, root_of_trust: true) are described here but implemented in the sibling fair/ and risk/ areas.",
+    "NOTHING in distribution/, engine/, shift-left/, party/ or .github/ computes or consumes £ at all. The publisher gate is a semver-movement gate, not a priced one: cut-release-gate.py and gate.run_gate() decide on declared-vs-computed bump, with no monetary term anywhere in the evidence document (computed-semver/evidence/3.0.0.json carries outcome/bump/movement/counts only)."
+  ],
+
+  "cage_and_enforcement_touchpoints": [
+    "Graded cage tiers, rendered per version: render-version-tree.py:74-80 pulls graded/policies/cage-tier.yaml, cage-netpol.yaml and priorityclasses.yaml (cage-baseline/-restricted/-quarantine, values -10/-100/-1000) into each distribution/policies/vN tree.",
+    "render-version-tree.py:135-142 rewrites cage-tier's dial table so each version's cage names only its own versioned PriorityClasses — verified live in the committed trees (distribution/policies/v3.0.0/cage-tier.yaml line 36 names cage-baseline-3-0-0 etc.).",
+    "Orphan guard, Deny: versions.yaml:73 validationActions:[Deny]; render-orphan-guard.py:67. Unlabelled pods are deliberately out of scope (matchConditions at versions.yaml:80-83) — absence is not the trigger.",
+    "render-orphan-guard.py:59 refuses to render an orphan-guard with an empty allow-list — a fail-closed guard against retiring the last version.",
+    "Governed-namespace guard, Audit: versions.yaml:112 and render-governed-namespace-guard.py:60. ADR-0014's fifth gap; starts Audit and promotes by editorial PR, never a timer (versions.yaml:104-106).",
+    "De-posture / currency-controller: the governed-namespace guard is CREATE-only precisely so the currency-controller's de-posture UPDATE patch keeps working — render-governed-namespace-guard.py:7-9, :48-51, :86 and versions.yaml:103-104. The currency-controller itself is a sibling area; this cluster only carves the hole for it.",
+    "Audit-only enforcement everywhere in the shipped policy trees: every require-nonroot version (v1.0.0:18, v2.0.1:29, v3.0.0:18) is validationActions:[Audit]. The only Deny in the cluster is the orphan guard. Audit->Deny promotion is stated as editorial (v3.0.0/require-nonroot.yaml:7-8, ADR-0006) and verify-publisher-gate.sh:128-145 uses that promotion as its one disclosed mutation to manufacture a real narrowing.",
+    "Exemptions banned rather than dissolved: policy/README.md:1-15 and :56-66 — the git-ledger/PolicyException mechanism is deleted, and a one-off that cannot meet condition C gets ../graded/cage.py's priced tier or Deny, never a carve-out.",
+    "Shift-left as pre-merge enforcement: shift-left/README.md:16-21 and ci-check.py:14-19 — `kyverno apply` reports the CEL verdict regardless of Audit/Deny, so the flip is catchable pre-merge. (Currently not caught for the shipped fixture — see capabilities_stubbed_or_thin.)",
+    "Publisher gate as release-time enforcement: cut-release.yml:142-147 runs the gate BEFORE `git tag` ('a gate after the tag can only burn the number'), with no override at any scope (cut-release-gate.py:43-52), and a refusal on any policy tag blocks the whole dispatch (cut-release-gate.py:279-284)."
+  ],
+
+  "feeds_wardley_wargamer_touchpoints": [
+    "NOTHING in this cluster reads a feed, builds a Wardley map, or war-games. distribution/, policy/, engine/, shift-left/, party/ and .github/ contain no reference to feeds, wardley or the wargamer.",
+    "The only mention is narrative: platform/README.md:25-26 — 'war-gamer + AI-Wardley — collect → war-game → signed policy PR (propose-never-dispose)'. The implementation is the sibling wargamer/ and feeds/ and wardley/ areas.",
+    "Inbound touchpoint from the sibling wargamer: wargamer/propose-policy-pr.sh reads distribution/policies/v2.0.0/require-nonroot.yaml (line 16) and calls shift-left/ci-check.py (line 17, :51-53) against shift-left/fixtures/workload-flip.yaml. That call is a second casualty of the ±1-window regression — the script asserts ci-check.py must fail on that fixture and exits 1 when it passes.",
+    "DOES ANYTHING OPEN A REAL PR? Not in this cluster, and not in the wargamer either: wargamer/propose-policy-pr.sh:5-6 states plainly 'It NEVER commits, pushes, opens or merges the PR itself'; it renders a diff and stops. It also degrades to narration when kyverno/gitsign are absent ('else narrated', line 12).",
+    "Real PR machinery that DOES exist, downstream of this cluster: each adopter's shift-left.yml edits the pull request BODY for real via `gh pr edit --body-file` and posts a signed attestation comment via `gh pr comment` (driftwood/.github/workflows/shift-left.yml). Those PRs are opened by Renovate, not by anything in platform.",
+    "DOES ANYTHING READ A REAL FEED? Not in this cluster. The threat/pricing parents are explicitly named as having NO Flux pin anywhere in this estate (party_artefact.py:26-35, :74, :203-208); the threat register is a versioned subdirectory of the already-pinned platform checkout, and ico ships no git tags at all."
+  ],
+
+  "original_thesis_mechanisms": [
+    "MULTI-VERSION COEXISTENCE — PRESENT and the strongest thing here. distribution/README.md:40-48 (matchConditions, never objectSelector, with the shared-webhook rationale), every policy body's only-this-policy-version matchCondition, distribution/tests/require-nonroot/kyverno-test.yaml's full pass/fail/skip matrix, verify-coexistence.sh and verify-render-version-tree.sh. Proved offline with the real kyverno CLI; never observed live.",
+    "RESOURCESET MATRIX — PRESENT as a declaration (distribution/versions.yaml:21-128, one array fanning out GitRepository + Kustomization per version plus two singleton guards) and modelled faithfully by the offline twins. NEVER RECONCILED: no ResourceSet exists in the reachable cluster. Also note the twins add a platform-machinery identity label the ResourceSet render does not.",
+    "RENOVATE BUMP PR — NOT in this cluster; documented at README.md:58-60 and implemented in the adopters (driftwood/ludlow/tuppence renovate.json, two git-refs customManagers each, automerge:false, rangeStrategy pin). Real.",
+    "SIGNED TAGS — PRESENT and REAL. cut-release.yml + .github/scripts/cut-release-create-tags.sh (gitsign keyless via the run's ambient Actions identity), release.yml:89-101 (gitsign verify-tag identity-pinned, offline Rekor bundle), verify-certificate-identity-regexp.sh and verify-cut-release-tags.sh as offline twins. Three real policy/v* tags and five real v* tags on disk; real cosign bundles committed under computed-semver/evidence/.",
+    "ORPHAN GUARD — PRESENT and real offline. versions.yaml:67-95 (live render), render-orphan-guard.py (twin), verify-orphan-guard.sh and verify-retirement.sh (both exit 0). Composed into all three adopters' composed/orphan-guard.yaml.",
+    "OSCAL / C2P — ABSENT from this cluster as code. Referenced narratively only: policy/README.md:12-15, :68-81 (cage.oscal_risk, the £ facet under https://pavf.dev/ns/risk/gbp, related-observations joining ../oscal/result2oscal.py) and party/README.md:50. No C2P anywhere.",
+    "SHIFT-LEFT — PRESENT: shift-left/ci-check.py is real, reuses the one array, runs the real kyverno CLI, and is wired cross-org into all three adopters' shift-left.yml plus platform's own release.yml gate. Currently REGRESSED — its own verify fails because the ±1 window no longer reaches the version the flip fixture violates.",
+    "HANDBOOK — ABSENT. No handbook, runbook or narrative guide in this cluster; distribution/README.md:81-83 and policy/README.md:95-100 defer live bring-up to 'the parent runbook (ticket 26)', which is not in this cluster.",
+    "SUNSET / RETIREMENT — PRESENT as retirement (delete the array element -> Flux prunes -> the re-rendered guard denies stragglers): distribution/README.md:36-38, versions.yaml:62-63 (prune: true), verify-retirement.sh. No time-based sunset anywhere, deliberately — ADR-0006's 'editorial, never a timer' is restated at v3.0.0/require-nonroot.yaml:7-8, ci-check.py:17-18 and versions.yaml:104-106.",
+    "NOTIFICATIONS — ABSENT despite being claimed. README.md:19 promises 'the notification event spine'; there is no Alert, Provider or Receiver anywhere in the platform repo. The only notification-shaped behaviour in the estate is the adopters' PR body edits and comments, which are downstream and not Flux notifications.",
+    "DASHBOARDS — ABSENT. No Grafana, no dashboards, no metrics in this cluster. The nearest thing is cut-release-gate.py:229-241's GITHUB_STEP_SUMMARY markdown table for the gate outcome."
+  ],
+
+  "notes": "Scope note: the task's 'original-org cluster' paragraph does not apply to this cluster — this is the platform publisher repo, not the original-org one. Commit dates are reported anyway. Per-path last commits: README.md and shift-left/ 2026-08-23 (e34ae7f, cs-15 repair release); engine/ 2026-08-20 (66a7bf0); verify-certificate-identity-regexp.sh 2026-08-22; verify-cut-release-tags.sh 2026-08-23; policy/ and verify-publisher-gate.sh 2026-08-24 (cs-16); distribution/ 2026-08-25 (2b69a6a, ADR-0014 guard); party/ 2026-08-25 (963872b, a commit self-described as 'WIP: uncommitted policy-composition tickets 09-16 work, safety commit'); .github/ 2026-08-25 (76a5737, backfill mode). Repo HEAD 2026-08-25.\n\nSix-org estate references INTO this cluster are real and load-bearing, not decorative: driftwood, ludlow and tuppence each (a) pin platform by {tag, commit} in gitops/platform/platform-pin.yaml with a Renovate customManager maintaining the pair, (b) run platform/shift-left/ci-check.py cross-org in their own shift-left.yml with platform checked out AT THE PINNED TAG and the resolved commit verified against the pin, (c) run platform/party/party_artefact.py check against their own party.yaml, (d) verify platform's cs-27 signed evidence identity-pinned in their adopter-gate, and (e) carry composed/orphan-guard.yaml and composed/governed-namespace-guard.yaml regenerated from this cluster's offline twins, with allow-lists matching versions.yaml exactly. ico and nist do not reference this cluster (nist is referenced BY it, as the controls parent).\n\nFour findings a drift review should weigh, in severity order. (1) verify-shift-left.sh fails today and it is release.yml's release gate: cs-16 inserted 2.0.1 into the array, which pushed 3.0.0 out of 2.0.0's ±1 window, so the Audit->Deny flip fixture is no longer caught; wargamer/propose-policy-pr.sh breaks on the same cause. (2) The ResourceSet fan-out — the central mechanism of the distribution area — has never been reconciled anywhere; the reachable cluster carries hand-applied policies for versions no longer in the array. (3) The offline twins and the live ResourceSet render disagree on the platform-machinery identity label, with nothing comparing them, despite the twins being documented as byte-equivalent. (4) verify-coexistence.sh's 'optional' live tail turns an offline-green beat red on any reachable cluster, and verify-retirement.sh's live branch prints a pruning claim it cannot support.\n\nHonesty texture worth recording: this cluster is unusually candid where it is thin. render-and-prove.py:22-30, verify-governed-namespace-guard.sh:4-22, verify-publisher-gate.sh:26-43, party_artefact.py:26-35 and cut-release-create-tags.sh:7-11 each name exactly what is simulated and why, in prose, before the code does it. The gaps found above are mostly places where that discipline lapsed (a stale note, a mislabelled twin, a live branch that asserts rather than reports), not places where it was absent.\n\nNot run to completion: verify-publisher-gate.sh (~28 min, killed) and verify-conditional.sh. Everything else in this cluster's verify surface was executed on this machine and its exit code recorded above."
+}

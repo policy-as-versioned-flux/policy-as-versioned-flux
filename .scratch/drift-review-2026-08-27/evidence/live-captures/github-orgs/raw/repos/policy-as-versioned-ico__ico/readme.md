@@ -1,0 +1,42 @@
+# policy-as-versioned-ico
+
+**GitHub org:** [`policy-as-versioned-ico`](https://github.com/policy-as-versioned-ico) ·
+**Role:** regulator — publisher · **Licence:** [Apache-2.0](LICENSE)
+
+Part of the *Policy as Versioned Code* estate: a shared platform, two regulators, three regulated
+institutions, each its own independent GitHub organisation, exchanging signed, versioned
+dependencies. A regulator publishes controls or penalties as a signed, versioned artefact and bears
+no risk of its own here. Full thesis, design decisions (ADRs) and the other five parties:
+[policy-as-versioned-flux](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux).
+
+**Regulator (real magnitudes, repackaged).** A small, signed, versioned penalty
+schema — `regime → violation-type → fine formula/cap` — sourced from real public
+UK fine magnitudes. It feeds the FAIR loss-magnitude directly and is deliberately
+**not** force-fit into OSCAL (which models controls/assessment, not fine
+schedules).
+
+Consumed by: `platform` FAIR engine (loss magnitude). *(ticket 07)*
+
+## What's here
+
+```
+schema/
+  v1/penalty-schema.json(.sig)   versioned schema + detached signature
+  v2/penalty-schema.json(.sig)   a real bump: +1 real fine (Doorstep Dispensaree, £275k, 2019)
+  keys/ico-signing-key(.pub).pem ed25519 keypair (ponytail: repo-local demo key, see sign.sh)
+  sign.sh / verify.sh            offline sign / verify a version dir
+  to_fair_scenario.py            schema entry -> fair.py scenario (unmodified fair.py consumes it)
+verify-penalty-feed.sh           the whole beat: sign+verify, tamper rejection, £ moves on a bump
+```
+
+Four regimes, each `regime -> violation-type -> fine formula/cap`, grounded in real public
+enforcement notices with cited sources: `uk-gdpr` (ICO), `pci-dss` (card-scheme acquiring banks),
+`hipaa` (US HHS OCR), `fca` (UK FCA). Run `./verify-penalty-feed.sh` (offline, no cluster) to see
+a schema-version bump move the £ that `platform/fair/fair.py` reports, with no edit to `fair.py`.
+
+One breach can draw more than one regime's consequence at once (an ICO fine *and* a PCI penalty on
+the same incident, say) — `to_fair_scenario.py build ... --also REGIME:VIOLATION_TYPE` (repeatable)
+folds further obligation sources into one scenario, and `fair.py` prices them additively and
+correlated (one shared frequency, not independent risks), so the £ gets bigger, never diluted.
+Which regimes actually apply to which workload is still open. *(ticket 18)*
+

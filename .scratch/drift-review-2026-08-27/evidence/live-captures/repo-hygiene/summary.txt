@@ -1,0 +1,48 @@
+=== REPO HYGIENE CHECK SUMMARY ===
+
+STATUS CHECK:
+- Git status: 1 untracked directory (.scratch/talk-spec/pitch-v6/)
+- Total commits: 306
+- Current branch: main
+- Worktrees: 1 active (main), 1 stale branch (worktree-wf_f9d3ec8c-4a3-4)
+- Stash: 1 entry (pre-merge-mo19-pycache)
+
+UNTRACKED FILES/DIRECTORIES:
+- .scratch/talk-spec/pitch-v6/ (637M, expected based on memory "Pitch V6 built")
+
+STRAY FILES (not in .gitignore):
+- .DS_Store (macOS metadata file) - NOT in .gitignore but present
+- __pycache__/ (present, in .gitignore)
+- .mypy_cache/ (present, in .gitignore)
+- .pytest_cache/ (present, in .gitignore)
+- .cache_ggshield (present, in .gitignore)
+- .venv/ (present, in .gitignore)
+
+EXPECTED/NORMAL FILES AND DIRECTORIES:
+- forged.yaml (test Kubernetes manifest - OK)
+- pytest.ini (test configuration - OK)
+- .github/workflows/twin.yml (CI workflow - OK)
+- bin/twin (executable - OK)
+- t/ (test fixtures - OK)
+- .scratch/* (issue tracker and spec storage - OK, expected)
+- .estate-clone/ (36M, disposable build artifact, in .gitignore - OK)
+- twin/ (main codebase - 6.2M - OK)
+- tests/ (test suite - 5.6M - OK)
+- estate/ (24M, git-ignored - OK)
+- spikes/ (544M - OK)
+- research/ (300K - OK)
+- talk/ (48K - OK)
+- verify/ (100K - OK)
+
+MERGE CONFLICT REMNANTS:
+- None found (.orig/.rej files)
+
+NOTES:
+- .DS_Store should be added to .gitignore to prevent accidental commits
+- Stale branch "worktree-wf_f9d3ec8c-4a3-4" exists but no worktree - can be cleaned up
+- One stash from pre-merge work - intentional holding area
+- Large .scratch/talk-spec (637M) is expected per memory ("Pitch V6 built")
+- No .mypy.ini or setup.cfg found (not needed, settings in pytest.ini)
+
+OVERALL STATUS: Clean repository with expected development artifacts
+

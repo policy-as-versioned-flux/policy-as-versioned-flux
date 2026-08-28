@@ -1,0 +1,89 @@
+[1;36m==>[0m 0. the answer keys — the subject, plus the two legs of the contamination discount
+royal-mail model repository -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.ZD6KrXNp/royal-mail
+  deterministic: same content, same commit sha, on every machine
+carillion model repository -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.ZD6KrXNp/carillion
+  deterministic: same content, same commit sha, on every machine
+enron model repository -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.ZD6KrXNp/enron
+  deterministic: same content, same commit sha, on every machine
+  2013-08-01  world layer
+  2013-09-01  the overlay and the scenario, before the prospectus
+  2013-09-27  the flotation prospectus
+  2015-09-24  a rival automated hub opens
+  2017-08-17  a second rival automated hub opens
+  2018-01-31  the Four Pillars agreement
+  2018-05-17  the FY2017-18 results, GLS beside UKPIL
+  2018-10-01  the profit warning
+  2019-05-23  the answer key, citing the GBP1.8bn investment concession
+[1;36m==>[0m 1. rewind and project — as-consumed, at 2018-06-01, through the ordinary backtest composition
+[1;36m==>[0m    no backtest-specific code path: this is rewind followed by run (guard: backtest_is_a_pure_composition)
+==> royal-mail: would-the-twin-have-flagged-it rewound to 2018-06-01 — scoring-eligible under as-consumed
+forecast-bundle -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.ZD6KrXNp/artefacts/forecast-bundle.json
+  attestation  forecast-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       a03e55a0e10a54e13e3f6b716863d811cc42d09876d5d765bd429ecab8e73af8
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+[1;36m==>[0m 2. the discount legs — Enron (the contamination control) against Carillion (low-notoriety)
+  ok   two score cards; the discount below is measured from them, never hardcoded
+[1;36m==>[0m 3. score against the key, with the contamination discount applied — worst forecast first
+==> royal-mail-concedes-the-automation-shortfall-2019: observed=True, resolved 2019-05-23, contamination low
+  contamination discount: -0.0384 on brier (enron-vs-obscure -0.0384)
+  rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+    market-consensus-2013        p=0.05   brier=0.9025   log-loss=2.9957   [as-consumed]  adjusted brier 0.8641
+score-card -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.ZD6KrXNp/artefacts/score-card.json
+  attestation  score-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       c9c5d0ae5ac125a004f81c80f4e1ceb69d782bc1072db7bbf73a1ccd172b6b17
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+[1;36m==>[0m 3b. nothing was dropped on the way — every forecast is scored or named unscoreable
+  1 forecast(s) emitted, 1 reported, none dropped
+  the headline: market-consensus-2013 said 0.05, it happened, brier 0.9025 — worse than a coin flip, and step 3 printed it above the rest
+  raw 0.9025 survives beside adjusted 0.8641: the discount is additive and inspectable, not a correction applied in place
+[1;36m==>[0m 4. the three regimes — the gaps localise the failure to sensing, interpretation or model
+==> royal-mail: would-the-twin-have-flagged-it under all three regimes
+  as-consumed      5 fact(s) admitted
+  as-knowable      5 fact(s) admitted
+  with-hindsight   7 fact(s) admitted
+  sensing          as-consumed vs as-knowable: none
+  interpretation   as-knowable vs with-hindsight: outcomes/royal-mail-concedes-the-automation-shortfall-2019, signals/profit-warning-2018-10-01
+  model residual not computed: wrong under all three regimes localises to the model, and that comparison needs a forecast that moves when the fact base moves. A forecast here reads a world model's declared belief and nothing infers it from a signal, so the three probabilities are identical by construction and a computed residual of zero would read as 'the model is fine' rather than as 'nothing consumes a signal'.
+regime-gap -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-beat.ZD6KrXNp/artefacts/regime-gap.json
+  attestation  regime-gap.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       b188e8150b3d427ddcd97bc1c01c1d5b8c211b954a417399aa1100358b26ee98
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+[1;36m==>[0m 4b. the score card reproduces from its own pins — except the discount, which honestly refuses
+==> reproducing /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-beat.ZD6KrXNp/artefacts/forecast-bundle.json from its pins
+  ok   forecast-bundle    a03e55a0e10a54e1 (recorded a03e55a0e10a54e1)
+  tolerance: none — byte identity. Scores carry a declared 12-significant-digit quantisation in the format.
+
+REPRODUCES: the pins are sufficient to recompute this artefact exactly.
+  ok   a discount is measured from cards named by path, so it is pinned by digest and
+       the card says so rather than replaying a different number
+[1;36m==>[0m 5. the demo's own depth grade — computed from decision ticket 22, never typed
+[1;36m==>[0m    every artefact above printed the grades of the capabilities that produced it; this is the
+[1;36m==>[0m    grade of the beat itself, full since build ticket 91 rendered the artefact decision
+[1;36m==>[0m    ticket 22 asked for (see twin/demo_slice.py, run as beat-sequence.sh's own final step)
+==> demo-slice: full  (4/4 of decision ticket 22)
+  [x] 1. A single demonstrable thesis, stated in one sentence.
+        build ticket 91: `twin/demo_slice.py`'s `THESIS` constant — decision ticket 22's own resolved Q1 answer, verbatim, in one place rather than distributed across comments and echo statements. `summary()` composes it into the artefact `twin demo-slice` emits; tests/test_demo_slice.py::test_summary_composes_all_four_pieces asserts the body carries it unchanged.
+  [x] 2. Subject + scenario selection, with rationale.
+        build ticket 91: `twin/demo_slice.py`'s `SUBJECTS` — the Royal Mail / Netflix / Intel rationale (contamination-driven for Royal Mail, whole-engine for Netflix, live-and-unresolved for Intel) collected from decision ticket 22 and build tickets 71/73/75 into the artefact's own data, not left as reference-only prose. tests/test_demo_slice.py::test_summary_composes_all_four_pieces asserts all three subjects carry a non-empty rationale.
+  [x] 3. An explicit shown/stubbed/absent boundary and how it is surfaced.
+        build ticket 91: `twin/demo_slice.boundary()` wires `does_not_do.published()` and `Capabilities.load()` (build ticket 77's own mechanism), filtered to `TOUCHED_CAPABILITIES` — the capabilities the three beat scripts' own artefact-producing verbs actually carry, read from their own `CAPS_*` constants rather than retyped. `shown` names them, `stubbed` is the does-not-do register's entries scoped to them, `absent` is every other loaded capability (`ethics-gate`, `forecast-book`, `honest-build`, `twin-inside-twin` today) — surfaced in the artefact's own body and printed by `twin demo-slice`, not narrated in prose a viewer has to trust. tests/test_demo_slice.py::test_boundary_shown_and_absent_partition_the_loaded_capabilities and ::test_boundary_stubbed_entries_are_scoped_to_touched_capabilities_only.
+  [x] 4. Acceptance criteria for the slice, tied back to the owning tickets' criteria.
+        build ticket 91: `twin/demo_slice.py`'s `ACCEPTANCE_CRITERIA` — a table mapping this decision ticket's own four ACs to the build tickets that realise them (71/73/75 for subject selection, 77 for the boundary mechanism, 91 for the rendered artefact itself), emitted in the artefact body and printed by `twin demo-slice`. tests/test_demo_slice.py::test_summary_composes_all_four_pieces asserts all four indices are present, each naming at least one build ticket.
+
+PASS: rewound under as-consumed, projected, scored against a low-contamination key with the
+contamination discount applied. The score is poor, and step 3 printed it before any better one.
+The three-regime gap localises what a failure would be: sensing, interpretation, or model.
+Every capability the beat touched declares a computed depth grade, and every one is full.
+
+artefacts: /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T//twin-beat.ZD6KrXNp/artefacts
+EXIT=0

@@ -1,0 +1,33 @@
+[1;36m==>[0m 1. offline: the £ engine — tiers/dials deterministic, £ picks the tier, TCoR booked
+ok  tiers ['baseline', 'restricted', 'quarantine'] | £ picks: band40k->baseline band20k->restricted band5k->quarantine band1k->deny | scenario £33073: driftwood->baseline (TCoR £23651), ludlow->quarantine (TCoR £8646) | legacy-till (warn) -> baseline cage, OSCAL risk open £14952 -> observation resolves
+[1;36m==>[0m 2. offline: every claiming pod is MUTATED INTO A CAGE (in-currency -> baseline), never denied; an unclaimed pod is skipped
+[1;36m==>[0m 3. offline: a caged pod GENERATES an egress-lockdown NetworkPolicy
+[1;36m==>[0m 4. offline: the Kyverno tier->dials map mirrors cage.py's TIERS (no drift)
+  ok   baseline: present in the Kyverno dial map
+  ok   baseline: cpu 500m matches cage.py
+  ok   baseline: mem 256Mi matches cage.py
+  ok   baseline: PriorityClass cage-baseline matches cage.py
+  ok   baseline: harden=false matches cage.py dropAll/readOnlyRootFs
+  ok   baseline: WAF presence matches cage.py waf=none
+  ok   restricted: present in the Kyverno dial map
+  ok   restricted: cpu 250m matches cage.py
+  ok   restricted: mem 128Mi matches cage.py
+  ok   restricted: PriorityClass cage-restricted matches cage.py
+  ok   restricted: harden=true matches cage.py dropAll/readOnlyRootFs
+  ok   restricted: WAF presence matches cage.py waf=light
+  ok   quarantine: present in the Kyverno dial map
+  ok   quarantine: cpu 100m matches cage.py
+  ok   quarantine: mem 64Mi matches cage.py
+  ok   quarantine: PriorityClass cage-quarantine matches cage.py
+  ok   quarantine: harden=true matches cage.py dropAll/readOnlyRootFs
+  ok   quarantine: WAF presence matches cage.py waf=heavy
+  -- cage.py and the Kyverno cage are in step --
+[1;36m==>[0m 5. offline: eviction PriorityClasses valid and ordered (tighter tier = lower value)
+  ok   cage-baseline PriorityClass defined
+  ok   cage-restricted PriorityClass defined
+  ok   cage-quarantine PriorityClass defined
+  ok   every cage sits below the default priority (0)
+  ok   tighter tier = lower value (baseline > restricted > quarantine)
+  -- eviction ordering holds --
+[1;36m==>[0m 6. live: cage policies installed; a behind-posture pod is CAGED (mutated), not denied
+FAIL: cage-tier-2-0-1 MutatingPolicy not installed live

@@ -1,0 +1,250 @@
+{
+  "body": {
+    "acceptance_criteria": [
+      {
+        "build_tickets": [
+          "77",
+          "91"
+        ],
+        "index": 1,
+        "note": "77 sequenced the thesis structurally; 91 states it once, here, as data.",
+        "text": "A single demonstrable thesis, stated in one sentence."
+      },
+      {
+        "build_tickets": [
+          "71",
+          "73",
+          "75",
+          "91"
+        ],
+        "index": 2,
+        "note": "71/73/75 built each subject's own answer key or spine; 91 collects the rationale already written for each into this artefact's own data.",
+        "text": "Subject + scenario selection, with rationale."
+      },
+      {
+        "build_tickets": [
+          "77",
+          "91"
+        ],
+        "index": 3,
+        "note": "77 built depth grades and the does-not-do register as structural mechanism; 91 scopes them to the capabilities this demo sequence actually touches.",
+        "text": "An explicit shown/stubbed/absent boundary and how it is surfaced."
+      },
+      {
+        "build_tickets": [
+          "91"
+        ],
+        "index": 4,
+        "note": "this table.",
+        "text": "Acceptance criteria for the slice, tied back to the owning tickets' criteria."
+      }
+    ],
+    "boundary": {
+      "absent": [
+        "ethics-gate",
+        "forecast-book",
+        "honest-build",
+        "twin-inside-twin"
+      ],
+      "depth": {
+        "capabilities": {
+          "causal-layer": {
+            "checked": 5,
+            "grade": "full",
+            "owning_ticket": "08",
+            "total": 5,
+            "unchecked": []
+          },
+          "currency-regimes": {
+            "checked": 6,
+            "grade": "full",
+            "owning_ticket": "09",
+            "total": 6,
+            "unchecked": []
+          },
+          "demo-slice": {
+            "checked": 4,
+            "grade": "full",
+            "owning_ticket": "22",
+            "total": 4,
+            "unchecked": []
+          },
+          "domain-model": {
+            "checked": 7,
+            "grade": "full",
+            "owning_ticket": "07",
+            "total": 7,
+            "unchecked": []
+          },
+          "enactment": {
+            "checked": 5,
+            "grade": "full",
+            "owning_ticket": "18",
+            "total": 5,
+            "unchecked": []
+          },
+          "provenance": {
+            "checked": 4,
+            "grade": "full",
+            "owning_ticket": "14",
+            "total": 4,
+            "unchecked": []
+          },
+          "scenario-engine": {
+            "checked": 7,
+            "grade": "full",
+            "owning_ticket": "13",
+            "total": 7,
+            "unchecked": []
+          },
+          "sense-move": {
+            "checked": 8,
+            "grade": "full",
+            "owning_ticket": "11",
+            "total": 8,
+            "unchecked": []
+          },
+          "synthetic-substrate": {
+            "checked": 7,
+            "grade": "full",
+            "owning_ticket": "12",
+            "total": 7,
+            "unchecked": []
+          }
+        },
+        "grade": "full"
+      },
+      "shown": [
+        "causal-layer",
+        "currency-regimes",
+        "demo-slice",
+        "domain-model",
+        "enactment",
+        "provenance",
+        "scenario-engine",
+        "sense-move",
+        "synthetic-substrate"
+      ],
+      "stubbed": []
+    },
+    "subjects": [
+      {
+        "beat": "royal-mail",
+        "build_tickets": [
+          "71",
+          "72"
+        ],
+        "carries": "falsifiability (b), retrospective",
+        "org": "royal-mail",
+        "rationale": "Netflix cannot carry this beat: its story is famous, so a twin \"anticipating\" it is indistinguishable from reciting it, which would undermine the very thesis the demo leads with. Royal Mail is low-contamination and unusually well-instrumented \u2014 the counterfactual sits inside its own audited filings (GLS reported line-by-line in the same segmental accounts), with six-plus dated checkpoints including a legally-liable IPO prospectus forecasting the very trend it then underinvested against.",
+        "role": "proves the twin can be checked"
+      },
+      {
+        "beat": "netflix",
+        "build_tickets": [
+          "73",
+          "74"
+        ],
+        "carries": "versioned governance (c), concluding in the one-currency comparison (a)",
+        "org": "netflix",
+        "rationale": "Rich, legible, fear and seize both on dated evidence, a deep behavioural substrate to synthesise, quarterly cadence. Carries the versioned-enactment claim and the concluding cross-domain comparison \u2014 deliberately last, because it is the most seductive claim and the least defensible standing alone.",
+        "role": "shows the whole engine"
+      },
+      {
+        "beat": "intel",
+        "build_tickets": [
+          "75"
+        ],
+        "carries": "falsifiability (b), live and forward",
+        "org": "intel",
+        "rationale": "Nearly free, and the most honest thing in the demo: a genuine unresolved forecast, emitted, pinned, signed, where we do not know the answer either. It cannot be scored yet, and saying so on screen is the strongest demonstration of the falsifiability claim \u2014 a dated prediction someone can come back and check beats any retrospective.",
+        "role": "shows the twin will be checked next"
+      }
+    ],
+    "thesis": "we can model an organisation's landscape, anticipate its movements, prove when we're wrong, and price the response wherever it lives"
+  },
+  "envelope": {
+    "depth": {
+      "capabilities": {
+        "causal-layer": {
+          "checked": 5,
+          "grade": "full",
+          "owning_ticket": "08",
+          "total": 5,
+          "unchecked": []
+        },
+        "currency-regimes": {
+          "checked": 6,
+          "grade": "full",
+          "owning_ticket": "09",
+          "total": 6,
+          "unchecked": []
+        },
+        "demo-slice": {
+          "checked": 4,
+          "grade": "full",
+          "owning_ticket": "22",
+          "total": 4,
+          "unchecked": []
+        },
+        "domain-model": {
+          "checked": 7,
+          "grade": "full",
+          "owning_ticket": "07",
+          "total": 7,
+          "unchecked": []
+        },
+        "enactment": {
+          "checked": 5,
+          "grade": "full",
+          "owning_ticket": "18",
+          "total": 5,
+          "unchecked": []
+        },
+        "provenance": {
+          "checked": 4,
+          "grade": "full",
+          "owning_ticket": "14",
+          "total": 4,
+          "unchecked": []
+        },
+        "scenario-engine": {
+          "checked": 7,
+          "grade": "full",
+          "owning_ticket": "13",
+          "total": 7,
+          "unchecked": []
+        },
+        "sense-move": {
+          "checked": 8,
+          "grade": "full",
+          "owning_ticket": "11",
+          "total": 8,
+          "unchecked": []
+        },
+        "synthetic-substrate": {
+          "checked": 7,
+          "grade": "full",
+          "owning_ticket": "12",
+          "total": 7,
+          "unchecked": []
+        }
+      },
+      "grade": "full"
+    },
+    "kind": "demo-slice-summary",
+    "mark": "derived",
+    "pins": {
+      "capabilities_digest": "a955d233adb40c7d246378f6e7f4140a600196de43a748f31ef2dd069c8c4a65"
+    },
+    "produced_by": {
+      "command": [
+        "twin",
+        "demo-slice"
+      ],
+      "tool": "twin",
+      "tool_version": "0.1.0"
+    },
+    "schema": "twin.artefact/v1"
+  }
+}

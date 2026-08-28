@@ -1,0 +1,323 @@
+{
+  "cluster": "platform: fair / risk / graded / tcor / oscal / honesty (the £ engine, the appetite band, the graded cage, the balance sheet, the OSCAL up-flow, the honesty layer). Root: /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform",
+  "components": [
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/fair/fair.py",
+      "what_it_is": "260-line pure-stdlib deterministic FAIR engine. beta-PERT (random.betavariate, SEED=42, ITERATIONS=10_000) over (min,mode,max) LEF/LM triples -> annual loss distribution; summarize() emits ALE, VaR95, TVaR, economic_capital, risk_load (COST_OF_CAPITAL=0.06), carried. control_value() prices what a Deny buys vs Warn. simulate() supports a LIST of lm triples = multiple obligation sources on one breach, additive and correlated through one shared frequency draw (fair.py:60-88).",
+      "how_it_runs": "offline python CLI (summary | compare | selfcheck). No cluster, no network, no deps.",
+      "evidence_of_working": "fair.py:180-236 cmd_selfcheck asserts ALE/VaR95 bands, TVaR>=VaR95>=ALE, seed determinism, Deny buys >0, and the multi-source additive+correlated invariants. Run here: 'ok ALE=19559 VaR95=30948 TVaR=34087 carried=34958 | Deny buys 19439 (99% effective)' and 'combined ALE=73579 TVaR=128447 > naive-independent 118711'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/fair/scenarios/driftwood-cart-pii.json",
+      "what_it_is": "13-line fixture scenario: warn lef[2,4,9] lm[1000,4000,9000]; deny lef[0,0,1]. The canonical 'unversioned image ships cart PII' risk used by risk/, honesty/calibration.py and tcor/.",
+      "how_it_runs": "static JSON fixture, hand-authored.",
+      "evidence_of_working": "consumed by risk/verify-risk-tuned.sh:12 and honesty/incidents.json:6."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/risk/enforce.py",
+      "what_it_is": "146-line risk-tuned enforcement decision. decide() = fair.control_value -> risk_bought (ALE_warn-ALE_deny); verdict Deny if risk_bought > org tolerance else Audit; emits validationActions:[verdict] (enforce.py:46-72). tolerance_for() reads appetite.json.",
+      "how_it_runs": "offline python CLI (decide | action | selfcheck). Imported by graded/cage.py, tcor/tcor.py, honesty/reflexive.py.",
+      "evidence_of_working": "enforce.py:86-121 selfcheck asserts loose->Audit, tightened->Deny, tightening raises the £, same control Denies under ludlow, and (enforce.py:109-115) that no datetime/time import ever leaks in. Run: 'driftwood(£40000 tol): loose buys £19439 -> Audit | tightened buys £54520 -> Deny | same loose under ludlow(£5000 tol) -> Deny'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/risk/appetite.json",
+      "what_it_is": "22-line single appetite store: driftwood £40k, tuppence £15k, ludlow £5k, platform £10k (root_of_trust:true, appetite.json:16-20). The one tolerance store for the whole cluster.",
+      "how_it_runs": "static JSON, read by enforce.tolerance_for().",
+      "evidence_of_working": "used live by every selfcheck in this cluster; honesty/reflexive.py:56-59 reads org 'platform' from this same file (ticket 16 part 2 merged an earlier separate self-appetite file)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/risk/scenarios/driftwood-cart-pii-tightened.json",
+      "what_it_is": "13-line v2 of the cart-PII scenario, LM widened (1k,4k,9k)->(3k,10k,30k) to model an ICO-fine reassessment; this is the input that flips Audit->Deny.",
+      "how_it_runs": "static JSON fixture.",
+      "evidence_of_working": "verify-risk-tuned.sh:23 asserts it yields 'Deny'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/risk/PR.md",
+      "what_it_is": "56-line narrated pull-request document for the Audit->Deny escalation, with a hand-written diff of the scenario file and a hand-written diff of a policy's validationActions field (PR.md:45-49).",
+      "how_it_runs": "doc only. No PR is opened; the second diff is described as 'hand-edited only to match what the number already decided' (PR.md:42-43).",
+      "evidence_of_working": "the £ figures quoted (£54,520 / £19,439) reproduce exactly from enforce.py selfcheck; the policy edit itself is narrative, not applied by any code here."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/cage.py",
+      "what_it_is": "350-line graded enforcement envelope. (1) TIERS table baseline/restricted/quarantine -> dials cpu/mem/priorityClass/dropAll/readOnlyRootFs/waf plus reduce & cost (cage.py:65-84); (2) select_tier() picks the loosest tier whose caged residual fits the band, else 'deny' (cage.py:117-126); (3) tcor() = residual + cost_of_controls (cage.py:101-114); (4) oscal_risk() emits an OSCAL risk object with a GBP ALE facet, status 'open', no deadline, remediation type 'mitigate', related-observations via observation_uuid() (cage.py:166-239).",
+      "how_it_runs": "offline python CLI (dials | select | selfcheck). Imported by tcor/tcor.py and oscal/result2oscal.py.",
+      "evidence_of_working": "cage.py:253-325 selfcheck: dial determinism, monotone reduce/cost, band->tier table, TCoR decomposition, driftwood-vs-ludlow proportionality, and the OSCAL risk join incl. refusal to build a risk for a Deny (cage.py:312-316). Run: 'band40k->baseline band20k->restricted band5k->quarantine band1k->deny | scenario £33073: driftwood->baseline (TCoR £23651), ludlow->quarantine (TCoR £8646) | legacy-till -> baseline cage, OSCAL risk open £14952 -> observation resolves'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/policies/cage-tier.yaml",
+      "what_it_is": "130-line Kyverno MutatingPolicy (policies.kyverno.io/v1alpha1). matchConditions gate on the policy-version label (cage-tier.yaml:61-63); rawTier/tier variables default and sanitize an unknown label to 'baseline' (:64-69); the 'dial' CEL map mirrors cage.py TIERS (:74-78); mutation 1 is an ApplyConfiguration SSA patch stamping posture.acme.io/caged, priorityClassName, per-container limits + securityContext, and a conditional WAF sidecar (:86-114); mutation 2 is a JSONPatch adding capabilities.drop ALL only for hardened tiers (:120-130). Never denies.",
+      "how_it_runs": "Flux-reconciled in versioned form: identical bodies (renamed cage-tier-<v>) ship in platform/distribution/policies/v2.0.0, v2.0.1, v3.0.0 and are delivered by the flux-operator ResourceSet in distribution/versions.yaml; the authoring copy here is applied only through graded/up.sh's rendered versioned copies.",
+      "evidence_of_working": "kyverno test matrix tests/cage-tier (offline) passes; verify-graded.sh step 4 cross-checks the CEL dial map against cage.py's TIERS row by row (verify-graded.sh:42-72) — ran green here for all three tiers."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/policies/cage-netpol.yaml",
+      "what_it_is": "49-line Kyverno GeneratingPolicy: a pod carrying posture.acme.io/caged=true generates a namespace NetworkPolicy 'cage-egress-lockdown' allowing egress only UDP/53 to kube-system (cage-netpol.yaml:36-49).",
+      "how_it_runs": "Flux-reconciled via the same versioned distribution trees (cage-netpol-<v>); applied locally by graded/up.sh.",
+      "evidence_of_working": "tests/cage-netpol kyverno test asserts the generated resource matches generated.yaml for a caged pod and skips a healthy pod."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/policies/priorityclasses.yaml",
+      "what_it_is": "42-line: three PriorityClasses cage-baseline (-10), cage-restricted (-100), cage-quarantine (-1000), all preemptionPolicy Never, globalDefault false.",
+      "how_it_runs": "Flux-reconciled via versioned distribution trees; applied by graded/up.sh.",
+      "evidence_of_working": "verify-graded.sh:75-92 asserts all three exist, all below 0, and ordered tighter=lower. Ran green."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/policies/kustomization.yaml",
+      "what_it_is": "10-line kustomization listing the three graded resources.",
+      "how_it_runs": "kustomize input (authoring copy). The delivered copies are the versioned kustomizations under distribution/policies/v*/.",
+      "evidence_of_working": "graded/up.sh proves the rendered versioned trees build with `kubectl kustomize` via distribution/render-and-prove.py (up.sh:25-26)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/tests/",
+      "what_it_is": "Two kyverno test matrices. cage-tier: five pods (behind-baseline/restricted/quarantine, in-currency with no tier label, unclaimed-system with no version label) expecting pass+patchedResources for the first four and skip for the last (kyverno-test.yaml:21-32). cage-netpol: caged pod -> generated netpol pass, healthy -> skip.",
+      "how_it_runs": "offline `kyverno test` (kyverno CLI required).",
+      "evidence_of_working": "verify-graded.sh:36,39 run both matrices; both passed here (kyverno CLI present at /opt/homebrew/bin/kyverno)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/up.sh",
+      "what_it_is": "44-line bring-up. Explicitly labelled 'DEMO PATH, not delivery (ticket cs-17)' (up.sh:1-14): renders distribution/versions.yaml's declared versions via distribution/render-and-prove.py, then kubectl applies ONLY the rendered versioned copies onto an existing kind-driftwood cluster. No Flux and no live ResourceSet in the loop.",
+      "how_it_runs": "shell script; needs kubectl + a reachable KinD cluster.",
+      "evidence_of_working": "self-describing honesty note; a live cluster here does carry cage-tier-1-0-0 and cage-tier-2-0-0 MutatingPolicies plus cage-netpol-1-0-0/2-0-0 GeneratingPolicies (4d20h old), i.e. it has been run for real at some point."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/scenarios/driftwood-behind-posture.json",
+      "what_it_is": "9-line single-state ('behind') scenario, lef[3,6,12] lm[1500,5000,9000] — the uncaged residual of a workload one policy version behind.",
+      "how_it_runs": "static JSON fixture.",
+      "evidence_of_working": "cage.py:287-291 uses it for the driftwood-vs-ludlow proportionality assertion."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/README.md",
+      "what_it_is": "135-line README with the tier/dial table, two mermaid diagrams, the ticket-08 'every claiming workload is always caged' argument, calibration-knob section, and an explicit boundaries section deferring the currency computation to ticket 16 and the deny path to ../risk.",
+      "how_it_runs": "doc only.",
+      "evidence_of_working": "the quoted numbers (baseline TCoR ~£23.7k driftwood, quarantine ~£8.6k ludlow, README.md:54-55) reproduce exactly from cage.py selfcheck (£23651 / £8646)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/tcor/tcor.py",
+      "what_it_is": "323-line Total-Cost-of-Risk engine. moves() prices four risk-financing moves per risk — fix (ale_deny + C_fix), cage (via cage.select_tier/cage.tcor, with an optional per-risk costs.cage_discount, tcor.py:103-109), transfer (deductible + ale_warn*(1+load), DEFAULT_LOAD 0.40), deny (ale_deny + C_deny) — crossover() picks the cheapest applicable move (tcor.py:121-131), balance_sheet() aggregates residual/controls/premium over a portfolio, and three lever transforms (accept_condition, tighten_control, threat_or_eol) scale LEF/LM across the whole book (tcor.py:161-182).",
+      "how_it_runs": "offline python CLI (moves | sheet | levers | selfcheck). Imported by wargamer/wardley (outside this cluster).",
+      "evidence_of_working": "tcor.py:210-290 selfcheck asserts the TCoR identity per move, the computed crossover (a ruinous fix flips the choice), the aggregate identity, all three lever directions, that a cage kicking in raises control-spend, and cage_discount semantics. Run: 'balance sheet £47921 = residual £27271 + controls £3500 + premium £17150 | accept->£72127 tighten->£27771 threat/EOL->£76801 | cheap-fix->fix, ruinous-fix->cage'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/tcor/scenarios/driftwood-portfolio.json",
+      "what_it_is": "46-line three-risk demo book (cart-pii-unversioned -> fix; legacy-checkout-cve -> cage; third-party-fulfilment with applicable:['transfer']) with hand-set fix/deny/transfer costs.",
+      "how_it_runs": "static JSON fixture.",
+      "evidence_of_working": "verify-tcor.sh:27-39 asserts all three moves are actually chosen and all three £ lines are non-zero; it passed."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/tcor/README.md",
+      "what_it_is": "58-line README: the TCoR formula, four-move table, living-£ mermaid, reuse list, run commands. States plainly 'Offline only — pure £ maths over versioned inputs, no cluster' (README.md:58).",
+      "how_it_runs": "doc only.",
+      "evidence_of_working": "claims match verify-tcor.sh output."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/oscal/result2oscal.py",
+      "what_it_is": "226-line C2P up-flow: Kyverno wgpolicyk8s.io PolicyReports -> OSCAL assessment-results (observations + findings). Carries the two ADR-0009 shims inline — copy .scope into results[].resources and strip the -N-N-N version suffix (result2oscal.py:64-71). Every observation uuid comes from cage.observation_uuid() so a cage's risk pointer is byte-identical by construction (result2oscal.py:99).",
+      "how_it_runs": "offline python CLI; needs PyYAML. Default input is the committed fixture, not a cluster.",
+      "evidence_of_working": "result2oscal.py:176-208 selfcheck: 3 observations, ac-6 not-satisfied, cm-6 satisfied, the cage-risk->observation join resolves, re-render byte-identical. Ran green."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/oscal/component-definition.json",
+      "what_it_is": "45-line OSCAL component-definition, the sole policy<->control map: ac-6 -> Check_Id require-nonroot; cm-6 -> Check_Id governed-namespace-requires-claim.",
+      "how_it_runs": "static JSON, read by result2oscal.py and lint_claims.py.",
+      "evidence_of_working": "lint_claims.py run is green: 'every control claim resolves to a shipped policy and a catalogued control id'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/oscal/lint_claims.py",
+      "what_it_is": "226-line two-direction claim linter: claimed policy names against distribution/policies/v*/*.yaml identities plus two named platform-machinery guards (policy-version-orphan-guard, governed-namespace-requires-claim, lint_claims.py:67-70), and claimed control ids against the pinned nist catalogue walked recursively (lint_claims.py:109-127). KNOWN_DANGLING is deliberately empty (lint_claims.py:62).",
+      "how_it_runs": "offline python CLI; needs PyYAML and a sibling ../nist/catalog checkout (lint_claims.py:54).",
+      "evidence_of_working": "selfcheck (lint_claims.py:168-209) asserts zero dangling, bare lowercase ids, non-local source href, an unknown-id fixture failing, and that the real run returns 0. All green here."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/oscal/fixtures/policyreports.yaml",
+      "what_it_is": "85-line fixture of three hand-authored Kyverno >=1.18-shaped PolicyReports: a passing Pod, the failing legacy-till-0 Pod, and a passing Crossplane RDS Instance (to show plane-agnostic keying).",
+      "how_it_runs": "static fixture — this is the only input result2oscal.py reads by default. No live PolicyReport ingestion exists in this cluster.",
+      "evidence_of_working": "drives the up-flow selfcheck; the RDS row was repointed at a real shipped policy name (governed-namespace-requires-claim) in commit 72c7083, 2026-08-25."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/oscal/README.md",
+      "what_it_is": "64-line README: the up-flow mermaid, the observation-uuid join argument, an explicit 'The £ is not here' section explaining the ALE rides as an OSCAL facet under https://pavf.dev/ns/risk/gbp emitted by cage.py.",
+      "how_it_runs": "doc only.",
+      "evidence_of_working": "matches verify-upflow.sh output."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/honesty/calibration.py",
+      "what_it_is": "269-line falsifiability layer: back-test the FAIR warn-state ALE/VaR95 against an incident log (exceedance counting + a plain-English verdict, calibration.py:99-146) and classic Bühlmann credibility Z=n/(n+k), k=EPV/VHM over the org portfolio, emitting a recalibration_factor = premium/model_ale (calibration.py:68-95, 171-186).",
+      "how_it_runs": "offline python CLI (backtest | recalibrate | selfcheck).",
+      "evidence_of_working": "selfcheck (calibration.py:197-250) asserts credibility shrinkage bounds, direction, Z rising with n, k lower for distinct orgs, back-test invariants, and that at least one org triggers a real 'recalibrate' verdict. Run: 'Bühlmann Z=0.78 k=1 mu=£63333 | ludlow: model £1025511 vs actual £130000 -> over-prices, recalibrate down'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/honesty/incidents.json",
+      "what_it_is": "24-line curated 5-year loss/near-miss log for driftwood, tuppence, ludlow, each pointing at an existing estate scenario. Authored to run driftwood hot and ludlow cold (incidents.json:2).",
+      "how_it_runs": "static fixture. Not wired to any SIEM or loss ledger.",
+      "evidence_of_working": "honesty/README.md:136-139 says so explicitly: 'The incident log is a curated fixture, not a live SIEM feed'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/honesty/proposer_bounds.py",
+      "what_it_is": "209-line wrapper round wargamer.wargame(): three bounds — learned-rejection suppression from rejections.json, confidence (CONFIDENCE_MIN 0.05, computed as (risk_bought-tolerance)/tolerance for enforcement flips, STRUCTURAL_CONFIDENCE 0.5 for scenario move-changes, proposer_bounds.py:54-61), and RATE_LIMIT 3 PRs/run — with the PR gate as the non-negotiable backstop. Exposes no merge/approve/dispose by construction and asserts merged=False on every emitted proposal (proposer_bounds.py:100-102, 177-180).",
+      "how_it_runs": "offline python CLI (bounded | dispositions | selfcheck). Calls wargamer.propose(), which builds a proposal object; it does not open anything.",
+      "evidence_of_working": "selfcheck ran: 'bounded 4 drift(s): 1 suppressed(learned), 1 held(low-conf), 2 proposed(gated,unmerged) | rate-limit opens exactly 3/5 | no merge() by construction'."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/honesty/rejections.json",
+      "what_it_is": "19-line hand-authored rejection ledger with two keys (tuppence/insider-abuse count 2, tuppence/pq-harvest-now-decrypt-later count 1) and dated reason strings.",
+      "how_it_runs": "static fixture; never written to by any code in this cluster.",
+      "evidence_of_working": "drives the suppress/propose-with-history assertions at proposer_bounds.py:147-151."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/honesty/reflexive.py",
+      "what_it_is": "170-line reflexive self-governance: scores platform-self.json with the same enforce.decide against the shared appetite store (org 'platform'), and reports passes_own_test = verdict Deny AND residual_deny <= tolerance (reflexive.py:52-64). feed_integrity() globs ../feeds/*/v*/*.json and reports signed (a .sig file exists next to it — an existence check, not an openssl verification, reflexive.py:94-103), sourced (every entry has a 'source' key) and bounded (to_fair_scenario.selfcheck() passes).",
+      "how_it_runs": "offline python CLI (govern-self | feed-integrity | selfcheck).",
+      "evidence_of_working": "selfcheck ran: 'risk_bought £1018853 > £10000 band -> Deny (controls mandatory), residual-with-controls £5544 within band -> PASSES OWN TEST | feeds: 6 signed+sourced+bounded | proposer bounded, no merge()'. The real cryptographic verification is done separately by verify-honesty.sh step 2 via feeds/verify.sh + openssl."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/honesty/scenarios/platform-self.json",
+      "what_it_is": "14-line scenario modelling the apparatus as a workload: warn lef[2,5,10] lm[50k,150k,500k] (integrity controls off), deny lef[0,0,1] same LM (controls on).",
+      "how_it_runs": "static fixture.",
+      "evidence_of_working": "produces the Deny verdict reflexive.py's pass condition needs."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/honesty/README.md",
+      "what_it_is": "139-line README with a three-subgraph mermaid, the bounds table, and a candid 'Not stood up here' section (README.md:134-139) naming the fixture incident log and the deferred signed-recalibration-PR as unbuilt.",
+      "how_it_runs": "doc only.",
+      "evidence_of_working": "the £41,095-vs-£40,000 = 2.7% band-edge example (README.md:83) reproduces in the live dispositions output (conf=0.027)."
+    }
+  ],
+  "capabilities_real": [
+    "Deterministic Monte-Carlo FAIR pricing with seeded reproducibility and a real tail-risk decomposition (ALE/VaR95/TVaR/economic capital/risk load) — fair.py:60-126, asserted fair.py:180-205.",
+    "Multi-obligation-source pricing that is additive AND correlated through one shared frequency draw, with an assertion that it beats a naive independent sum in the tail — fair.py:81-88, fair.py:226-236.",
+    "Appetite-band-driven Audit/Deny selection that is a pure function of £ with a machine-checked absence of any clock/date import — enforce.py:46-72, enforce.py:109-115.",
+    "Per-org proportionality: the same control Audits in driftwood and Denies in ludlow, from one appetite store — enforce.py:106, verify-risk-tuned.sh:30-32.",
+    "Deterministic tier->dial expansion with a real drift guard between the python table and the Kyverno CEL map, checked field by field — cage.py:65-93 vs cage-tier.yaml:74-78, verify-graded.sh:42-72.",
+    "£-selected cage tier with monotone reduce/cost ordering and a Deny bottom rung — cage.py:117-126, asserted cage.py:262-275.",
+    "A real Kyverno MutatingPolicy that cages by degree without ever denying, including a defaulting path so an unknown/missing tier label falls to baseline rather than a no-op skip — cage-tier.yaml:64-69, proven by the kyverno test matrix tests/cage-tier/kyverno-test.yaml:21-32.",
+    "A real Kyverno GeneratingPolicy producing an egress-lockdown NetworkPolicy, proven against an expected generated resource — cage-netpol.yaml:36-49, tests/cage-netpol/generated.yaml.",
+    "Four-move TCoR crossover computed rather than asserted, with the choice demonstrably flipping when a cost moves — tcor.py:121-131, asserted tcor.py:229-239.",
+    "The living-£ levers moving the portfolio number in the predicted directions — tcor.py:161-182, asserted tcor.py:249-256.",
+    "PolicyReport -> observation -> finding -> risk -> related-observation chain that resolves by shared-uuid construction rather than by eyeball — result2oscal.py:99 + cage.py:177-179, asserted result2oscal.py:188-203 and verify-upflow.sh:38-56.",
+    "Two-direction OSCAL claim linting against real shipped policy trees and the real pinned NIST catalogue, with an unknown-control-id fixture proving hard failure — lint_claims.py:130-165, lint_claims.py:196-201.",
+    "Bühlmann credibility recalibration with correct shrinkage/direction/k-behaviour properties asserted, and an incident log authored to actually produce a 'recalibrate' verdict — calibration.py:68-95, calibration.py:201-235.",
+    "Proposer bounds with a structurally-guaranteed no-merge surface (module-level attribute check for merge/approve/dispose/auto_merge) — proposer_bounds.py:177-180, cross-checked from reflexive.py:144-148.",
+    "Real cryptographic feed verification and tamper rejection in the honesty beat: feeds/verify.sh on a live committed feed plus an openssl pkeyutl check that a forged feed does NOT verify — verify-honesty.sh:24-42.",
+    "The apparatus priced by the same engine and same appetite store it prices everyone else with, with a machine check that no forked scoring path is used — reflexive.py:52-64, reflexive.py:133."
+  ],
+  "capabilities_stubbed_or_thin": [
+    "Every scenario in this cluster is a hand-authored fixture triple; no estimate here comes from an elicitation process or a real actuarial source — fair/scenarios/driftwood-cart-pii.json:5-12, risk/scenarios/driftwood-cart-pii-tightened.json:5-12, graded/scenarios/driftwood-behind-posture.json:5-8, tcor/scenarios/driftwood-portfolio.json:6-45, honesty/scenarios/platform-self.json:6-13.",
+    "The cage tier table's reduce/cost values are explicitly labelled calibration knobs with no telemetry behind them — cage.py:63-64 ('tune to real WAF/eviction telemetry'), graded/README.md:118-126.",
+    "The WAF sidecar image ghcr.io/acme/coraza-waf:cage is a named placeholder that does not exist — cage-tier.yaml:105, graded/README.md:125-126.",
+    "The insurer load 0.40 and DEFAULT_LOAD/premium formula are a documented mid-range guess, not a quoted rate — tcor.py:57-61.",
+    "risk/PR.md is a narrated PR: it shows a validationActions Audit->Deny diff that no code applies; the field is described as hand-edited to match the number — PR.md:39-49. Nothing in this cluster writes a policy body from enforce.py action output.",
+    "platform/risk has no verify-* coverage of an actually-deployed policy: verify-risk-tuned.sh only re-runs the python decision, so the claim 'that verdict IS the Kyverno validationActions value' (enforce.py:10) is unproven against any shipped YAML.",
+    "OSCAL up-flow input is fixture-only: result2oscal.py defaults to fixtures/policyreports.yaml (result2oscal.py:42, 172) and no code in this cluster reads PolicyReports from a live cluster.",
+    "OSCAL schema validation is optional and skipped whenever trestle is absent — verify-upflow.sh:59-66; it skipped on this machine.",
+    "honesty/incidents.json is a curated fixture standing in for a loss ledger, and the recalibration it computes opens no PR — honesty/README.md:134-139.",
+    "honesty/rejections.json is a static ledger; nothing appends to it, so 'learn from rejections' learns only from a hand-edited file — rejections.json:4-18.",
+    "reflexive.feed_integrity()'s 'signed' flag is a .sig file-existence check, not a signature verification — reflexive.py:100; the real verification lives in verify-honesty.sh:24-42 and is a separate step.",
+    "proposer_bounds confidence for scenario-move drifts is a hardcoded STRUCTURAL_CONFIDENCE=0.5 with an explicit upgrade note — proposer_bounds.py:26-30, 50, 61.",
+    "graded/up.sh is self-labelled 'DEMO PATH, not delivery' and takes Flux out of the loop, applying rendered versioned copies with kubectl — up.sh:1-14.",
+    "oscal/verify-claims.sh's header still narrates an EXPECTED-RED state ('cm-6 claims require-policy-version and ac-6 claims may-run-root-if-attested') that no longer exists — verify-claims.sh:6-10 contradicts lint_claims.py:59-62 and the now-green run; stale prose.",
+    "graded/verify-graded.sh's live tail is currently FAILING on this machine (real exit code 1): the kind-driftwood cluster carries cage-tier-1-0-0 and cage-tier-2-0-0, while distribution/versions.yaml declares 2.0.0/2.0.1/3.0.0, so 'FAIL: cage-tier-2-0-1 MutatingPolicy not installed live' (verify-graded.sh:101-107). The offline steps 1-5 all pass.",
+    "The Deny rung is emitted as data only: cage.py:148-154 returns action Deny, and cage.py's own README says enforcement of it belongs to other policies — graded/README.md:133-135. Nothing in this cluster turns a computed Deny into an applied Kyverno validationActions change.",
+    "No time/date-driven behaviour anywhere by design (ADR-0006), which also means no sunset, no expiry, no scheduled re-pricing in this cluster."
+  ],
+  "verify_scripts": [
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/risk/verify-risk-tuned.sh",
+      "needs_cluster": false,
+      "what_it_proves": "enforce.py selfcheck plus four assertions: loose cart-PII Audits in driftwood, the tightened triple Denies, the decision text carries a £ justification, and the same loose control Denies under ludlow's band. Python only. Ran PASS."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/tcor/verify-tcor.sh",
+      "needs_cluster": false,
+      "what_it_proves": "tcor.py selfcheck, that the demo book actually books all three of fix/cage/transfer with all three £ lines non-zero and summing exactly, and that a stricter band raises the caged row's control-spend (driftwood £500 -> ludlow £6,000). Ran PASS."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/verify-graded.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Offline (needs kyverno CLI + python3): cage.py selfcheck; the cage-tier mutate matrix (behind-posture pods mutated not denied, in-currency pod caged to baseline, unclaimed pod skipped); the cage-netpol generate matrix; a field-by-field drift guard between cage.py TIERS and the Kyverno CEL dial map; PriorityClass validity and ordering. A LIVE tail (verify-graded.sh:101-134) additionally requires kubectl and a cluster with the versioned cage policies, and server-dry-runs a behind-posture pod expecting the caged label. That live tail fails here (exit 1) because only versions 1.0.0/2.0.0 are installed against a 2.0.0/2.0.1/3.0.0 declaration."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/oscal/verify-claims.sh",
+      "needs_cluster": false,
+      "what_it_proves": "lint_claims.py --selfcheck plus the real claim check against component-definition.json: every Check_Id resolves to a shipped policy identity and every control-id resolves in the pinned NIST catalogue. Needs a sibling ../nist/catalog checkout. Ran PASS (its own header still describes the older EXPECTED-RED state)."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/oscal/verify-upflow.sh",
+      "needs_cluster": false,
+      "what_it_proves": "result2oscal builds assessment-results from the fixture, ac-6 is not-satisfied and cm-6 satisfied, result2oscal's own selfcheck, and the join: cage.py's risk related-observation uuid is present among emitted observations and the £ rides as a facet under a /gbp system URI. Optional trestle schema-validation tail skipped when trestle is absent (it was). Ran PASS."
+    },
+    {
+      "path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/honesty/verify-honesty.sh",
+      "needs_cluster": false,
+      "what_it_proves": "Four beats, offline, needs python3 + openssl: calibration selfcheck + a real backtest run; a REAL signature verification of feeds/threat-register/v1/register.json via feeds/verify.sh plus a forged-feed rejection via openssl pkeyutl; proposer_bounds selfcheck and a printed disposition table; reflexive selfcheck (apparatus passes its own test, 6 feeds signed+sourced+bounded). Ran ALL OK."
+    }
+  ],
+  "runtime_dependencies": [
+    "python3 stdlib — REAL and the only hard dependency of fair/risk/graded(cage.py)/tcor/honesty.",
+    "PyYAML — REAL, required by result2oscal.py, lint_claims.py, and verify-graded.sh step 5.",
+    "kyverno CLI — REAL, required by verify-graded.sh for the two offline `kyverno test` matrices; present on this machine.",
+    "Kyverno admission controller (MutatingPolicy/GeneratingPolicy CRDs, policies.kyverno.io/v1alpha1) — REAL but only in the live tail; installed on the local kind-driftwood cluster with stale versions (cage-tier-1-0-0, cage-tier-2-0-0).",
+    "kubectl + a KinD cluster (kind-driftwood) — REAL for graded/up.sh and verify-graded.sh step 6 only; every other component in this cluster is cluster-free.",
+    "Flux / flux-operator ResourceSet — REAL but NOT in this cluster's own loop: the graded policies reach a cluster as versioned copies under platform/distribution/policies/v2.0.0|v2.0.1|v3.0.0 delivered by distribution/versions.yaml's ResourceSet. graded/up.sh deliberately bypasses Flux (up.sh:10-14).",
+    "openssl — REAL, used by verify-honesty.sh:38 for the tamper-rejection check against the committed ed25519 public key.",
+    "compliance-trestle (C2P OSCAL validator) — OPTIONAL/absent; verify-upflow.sh skips the schema-validation tail when the trestle CLI is missing, which it is here. The C2P conversion itself is a hand-written offline twin (result2oscal.py:8-9), not the real C2P tooling.",
+    "NIST catalogue — REAL data, read from a sibling ../nist/catalog checkout pinned by CATALOG_VERSION.json (lint_claims.py:54, 125-127).",
+    "platform/feeds — REAL committed signed JSON feeds (threat-register, cve, eol; 6 files), read offline by reflexive.py; SIMULATED as a live source — the feeds are versioned fixtures, no fetch of endoflife.date / trivy / GHSA happens (feeds/README.md:1-30).",
+    "wargamer — REAL python module imported by proposer_bounds.py; its drift rows come from committed scenarios (wargamer/scenarios/human-device.json), so the drift being bounded is SIMULATED.",
+    "SPIRE, Istio, OpenBao, Pomerium, Crossplane, trivy, Renovate, gitsign, GitHub Actions — NOT dependencies of this cluster. Crossplane appears only as a fixture resource kind (oscal/fixtures/policyreports.yaml:70); trivy only as a feed shape name; gitsign/GitHub Actions/Renovate live in platform/.github and other clusters and touch nothing here except via the versioned distribution trees the graded policies ship in."
+  ],
+  "risk_and_pricing_touchpoints": [
+    "fair.py:44-47 — the fixed engine constants: ITERATIONS 10_000, SEED 42, PERT_LAMBDA 4.0, COST_OF_CAPITAL 0.06.",
+    "fair.py:104-126 summarize() — ALE, VaR95, TVaR, economic_capital = TVaR-ALE, risk_load = 0.06*economic_capital, carried = TVaR+risk_load.",
+    "fair.py:129-143 control_value() — risk_bought, capital_released, effectiveness.",
+    "risk/appetite.json:3-21 — the single tolerance store: driftwood 40000, tuppence 15000, ludlow 5000, platform 10000 (root_of_trust).",
+    "risk/enforce.py:37-43 tolerance_for(); enforce.py:46-72 decide() computing risk_bought, verdict, headroom and the £ reason string.",
+    "risk/PR.md:12-14 — the £ figures (£54,520 vs £40,000; £19,439) quoted as the escalation justification.",
+    "graded/cage.py:65-84 TIERS reduce/cost; cage.py:96-114 caged_residual and tcor(); cage.py:117-126 select_tier(); cage.py:129-163 select() emitting uncaged_residual, tier, dials, tcor and a £ reason.",
+    "graded/cage.py:216-228 — the OSCAL annualised-loss-expectancy facet in GBP with basis 'caged-residual' and a cost-of-controls prop.",
+    "tcor/tcor.py:57-61 DEFAULT_LOAD 0.40; tcor.py:70-115 moves() pricing fix/cage/transfer/deny; tcor.py:118-131 ORDER + crossover(); tcor.py:135-154 balance_sheet() summing residual/cost_of_controls/transfer_premium.",
+    "tcor/tcor.py:161-182 — accept_condition (LEF x1.6), tighten_control (LM x0.5), threat_or_eol (LM x2.5).",
+    "tcor/scenarios/driftwood-portfolio.json:13-43 — the per-risk fix/deny costs and transfer load/deductible that decide each crossover.",
+    "honesty/calibration.py:99-146 backtest_org() and _backtest_verdict() (under-prices / over-prices / defensible thresholds at 2x expected exceedances, 1.5x and 0.5x model ALE).",
+    "honesty/calibration.py:68-95 buhlmann(); calibration.py:171-186 run_recalibrate() emitting recalibration_factor = credibility_premium / model_ale.",
+    "honesty/reflexive.py:52-64 govern_self() — the apparatus's own risk_bought vs its £10k band, and residual_within_band.",
+    "honesty/proposer_bounds.py:54-61 confidence() — materiality as (risk_bought_current - tolerance)/tolerance, the £-derived gate on whether a proposal reaches a human."
+  ],
+  "cage_and_enforcement_touchpoints": [
+    "Cage tiers: cage.py:65-86 TIERS + ORDER (baseline/restricted/quarantine); cage.py:89-93 dials().",
+    "Graded enforcement selection: cage.py:117-126 select_tier() walking loosest-to-tightest, falling through to 'deny'.",
+    "Deny as bottom rung: cage.py:148-154 (action Deny, reason 'even quarantine leaves £X > band'); cage.py:196-197 oscal_risk() refuses to build a risk for a Deny because nothing is retained.",
+    "Audit vs Deny: enforce.py:54 verdict; enforce.py:61 validationActions:[verdict] — the value is emitted but never written into any policy YAML by code.",
+    "The mutate that enforces the cage: cage-tier.yaml:79-130 (SSA ApplyConfiguration for label/priorityClass/limits/securityContext/WAF sidecar; JSONPatch for drop-ALL caps on hardened tiers only).",
+    "The generate that cuts reach: cage-netpol.yaml:29-49 (matchCondition on posture.acme.io/caged, generator.Apply of the egress-lockdown NetworkPolicy).",
+    "Eviction dial: priorityclasses.yaml:15,27,39 (-10/-100/-1000, preemptionPolicy Never).",
+    "De-posture / no-uncaged-state: cage-tier.yaml:53-69 — the claims-a-policy-version matchCondition, and the rawTier->tier fallthrough where a missing OR unrecognized label both default to baseline rather than a skip (the exemption the project bans); tests/cage-tier/resources.yaml:65-77 proves an unclaimed system pod is genuinely out of scope.",
+    "Drift guard between the python tier table and the enforced CEL map: verify-graded.sh:42-72.",
+    "Orphan guard: referenced, not defined here — verify-graded.sh:108-118 imports distribution/render-orphan-guard.py's versions() to derive the live version list, and lint_claims.py:67-70 names policy-version-orphan-guard as a shipped platform-machinery policy.",
+    "Governed namespace: oscal/component-definition.json:36 claims cm-6 via governed-namespace-requires-claim; lint_claims.py:67-70 recognises it as shipped platform machinery; the policy body itself lives outside this cluster.",
+    "Currency controller: consumed, not implemented here — graded/README.md:130-132 states ticket 16's currency controller decides when a workload has fallen behind and stamps posture.acme.io/tier; this cluster only consumes that label. The controller itself is platform/currency-controller (a CronJob, manifests/cronjob.yaml).",
+    "The gate as backstop: proposer_bounds.py:100-102 asserting merged/auto_merge False and required_gate present on every emitted proposal; proposer_bounds.py:177-180 and reflexive.py:144-148 asserting no merge/approve/dispose surface exists."
+  ],
+  "feeds_wardley_wargamer_touchpoints": [
+    "Nothing in these six directories opens a pull request, and nothing reads a live feed or network resource. All six are offline.",
+    "Feeds (SIMULATED as live, REAL as signed artefacts): honesty/reflexive.py:68-113 globs ../feeds/*/v*/*.json and reports signed/sourced/bounded over 6 committed feed files; honesty/verify-honesty.sh:24-42 performs a REAL openssl signature verification of feeds/threat-register/v1/register.json and a REAL tamper-rejection. The feeds themselves are versioned committed fixtures — no fetch of endoflife.date, trivy or GHSA occurs (platform/feeds/README.md:1-30).",
+    "Feed bounds: reflexive.py:104-112 runs to_fair_scenario.selfcheck() to assert every feed entry yields a valid lo<=mode<=hi triple.",
+    "Wargamer (SIMULATED drift): honesty/proposer_bounds.py:45-46 imports ../wargamer/wargamer.py and proposer_bounds.py:99 calls wargamer.propose() to build a proposal object in memory. The drift rows come from committed scenarios (wargamer/scenarios/human-device.json). No git, no gh, no network in the honesty path.",
+    "The real PR opener is OUTSIDE this cluster: platform/wargamer/tier_pr.py (subprocess git/gh wrappers, tier_pr.py:43,104-107), driven by the adopter workflows driftwood|ludlow|tuppence/.github/workflows/propose-tier.yml, which run `python3 platform/wargamer/tier_pr.py run` with GH_TOKEN to open a real PR editing posture.acme.io/tier (or an issue for a proposed deny). That workflow consumes this cluster's tier vocabulary but is not code in these six directories.",
+    "Wardley: nothing here. platform/wardley/wardley.py and wardley/README.md:70 reference ../tcor/tcor.py's costs.cage_discount as the consumer of a commoditisation signal — the touchpoint is tcor.py:79-82,94,109 (an optional per-risk multiplier defaulting to 1.0), read from the risk JSON, never computed here.",
+    "risk/PR.md is a narrated PR document, not an opened one (PR.md:1-56)."
+  ],
+  "original_thesis_mechanisms": [
+    "Multi-version coexistence — PRESENT, indirectly. The graded policies ship as cage-tier-<v>/cage-netpol-<v> under platform/distribution/policies/v2.0.0|v2.0.1|v3.0.0 (the distribution copies add a matchConditions self-scoping comment and an only-this-policy-version condition absent from the graded authoring copy). result2oscal.py:49,70 strips the -N-N-N suffix precisely so one component-definition maps every coexisting version. verify-graded.sh:101-118 checks each declared version's policies live.",
+    "ResourceSet matrix — PRESENT by reference only. platform/distribution/versions.yaml is the flux-operator ResourceSet ranging the versions array; nothing in these six directories defines or renders it. graded/up.sh:1-14 explicitly says it is the offline twin and takes the ResourceSet out of the loop.",
+    "Renovate bump PR — ABSENT from this cluster. Renovate workflows exist only in the adopter repos (driftwood|ludlow|tuppence/.github/workflows/renovate-run.yml).",
+    "Signed tags — ABSENT from this cluster's code; present at the platform-repo level (platform/.github/workflows/release.yml gitsign verify-tag identity-pinned + cosign verify-blob of release-gate evidence). The only signing this cluster touches is the ed25519 feed signatures verified by verify-honesty.sh:24-42.",
+    "Orphan guard — PRESENT by reference. verify-graded.sh:108-118 imports distribution/render-orphan-guard.py's versions(); lint_claims.py:67-70 treats policy-version-orphan-guard as a shipped claimable policy. The guard itself is not defined here.",
+    "OSCAL / C2P — PRESENT and the strongest mechanism in this cluster: oscal/result2oscal.py (an offline hand-written twin of C2P result2oscal, not the real C2P tool), oscal/component-definition.json, oscal/lint_claims.py against the pinned NIST catalogue, and cage.py:166-239 emitting the OSCAL risk with a GBP facet. trestle validation is optional and skipped without the CLI.",
+    "Shift-left — ABSENT here. platform/shift-left/verify-shift-left.sh is the release gate in platform/.github/workflows/release.yml; none of these six dirs is exercised in CI.",
+    "Handbook — ABSENT. No handbook, runbook or narrative operator doc in this cluster beyond the four READMEs.",
+    "Sunset — ABSENT by design. ADR-0006 no-time-conditional-verdicts is enforced: enforce.py:109-115 machine-checks that no datetime/time import exists, and cage.py:193-194 + cage.py:303 assert a cage carries no deadline and is never time-boxed.",
+    "Notifications — ABSENT. No alerting, no Slack/email/webhook anywhere in this cluster.",
+    "Dashboards — ABSENT. Output is JSON on stdout and coloured shell 'say' lines; no Grafana, no rendered board view, no served page."
+  ],
+  "notes": "Provenance: .estate-clone is gitignored by the parent repo and each org is its own git checkout. platform's remote is https://github.com/policy-as-versioned-platform/platform, HEAD 58ef9c5 dated 2026-08-25 ('cs-27: signed release-gate evidence for policy/v3.0.0'). Last commit per directory: fair 2532ddc 2026-08-20 (multi-obligation pricing); risk 201beae 2026-08-20; graded 2667204 2026-08-22 (cs-17: gate live tails on versioned resource names); tcor 6d1078c 2026-08-20 (cage_discount); oscal 72c7083 2026-08-25 (repoint the up-flow fixture at real policy names); honesty c4463fa 2026-08-24 (mo-25: check the public signing key, not the private one).\n\nSix-org estate references: driftwood, ludlow and tuppence each carry composed/policies/v2.0.0|v2.0.1|v3.0.0/cage-tier.yaml and cage-netpol.yaml plus composed/evidence.json, so the graded cage policies genuinely propagate into all three adopter repos. All three also have .github/workflows/propose-tier.yml, which checks out platform at the pinned tag and runs platform/wargamer/tier_pr.py to open a real PR editing posture.acme.io/tier — the adopter-side consumer of this cluster's tier vocabulary. ico/verify-penalty-feed.sh:8 and ico/schema/to_fair_scenario.py:6 point at platform/fair/fair.py; nist is referenced only as a catalogue source by lint_claims.py. No org repo references fair/risk/tcor/oscal/honesty python directly beyond those two ico hooks.\n\nExecution results on this machine (2026-08-27): all nine python selfchecks pass; risk/verify-risk-tuned.sh, tcor/verify-tcor.sh, oscal/verify-claims.sh, oscal/verify-upflow.sh and honesty/verify-honesty.sh all PASS. graded/verify-graded.sh passes offline steps 1-5 but exits 1 on the live tail because kind-driftwood has cage-tier-1-0-0 and cage-tier-2-0-0 installed (4d20h old) while distribution/versions.yaml declares 2.0.0/2.0.1/3.0.0 — a real, current red.\n\nTwo prose-vs-code drifts worth a reviewer's eye: oscal/verify-claims.sh:6-10 still narrates an EXPECTED-RED state that lint_claims.py:59-62 and the green run have superseded; and graded/README.md:1-7 presents the cage as the delivered mechanism while up.sh:1-14 concedes the apply path is a demo twin with Flux out of the loop.\n\nShape of the cluster overall: a genuinely tight, single-source-of-truth £ stack (fair -> risk -> graded -> tcor, each importing the previous rather than reimplementing it, asserted at reflexive.py:133 and break-glass/verify-break-glass.sh:32), with real Kyverno policy artefacts and real offline proofs at the graded layer, and a candid honesty layer that names its own fixtures. What is not built anywhere in these six directories: any write-back — no policy YAML is edited from a computed verdict, no PR is opened, no feed is fetched, no PolicyReport is read from a cluster, and no number is displayed anywhere but stdout."
+}

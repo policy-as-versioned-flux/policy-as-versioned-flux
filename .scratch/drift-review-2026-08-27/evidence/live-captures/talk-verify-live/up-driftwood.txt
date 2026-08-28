@@ -1,0 +1,263 @@
+
+==> assembling the six real units into .estate-clone/ (needs network)
+==> platform: already cloned (pass --refresh to re-clone)
+==> driftwood: already cloned (pass --refresh to re-clone)
+==> tuppence: already cloned (pass --refresh to re-clone)
+==> ludlow: already cloned (pass --refresh to re-clone)
+==> nist: already cloned (pass --refresh to re-clone)
+==> ico: already cloned (pass --refresh to re-clone)
+OK: six units in /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone
+
+==> driftwood: KinD + Flux + signed source + reconcile
+[1;36m==>[0m cluster 'driftwood' already exists
+[1;36m==>[0m Flux already installed and healthy
+[1;36m==>[0m seeding driftwood gitops repo + building offline git server
+
+No secrets have been found
+
+[1;36m==>[0m pinned revision: v1.0.0 @ de9f0f61f0c299a94256dd0e27136f1c45c8467f
+[1;36m==>[0m seeding pinned nist catalog dependency
+Skipped commit://staged/NIST_SP-800-53_rev5.2.0_catalog.json: content is over 1,048,576 bytes
+
+No secrets have been found
+
+[1;36m==>[0m pinned nist revision: v1.0.0 @ 55a5bfe790fe5a0ca47fb0bb29440b81a111f28d
+Image: "driftwood-git:local" with ID "sha256:df8401cc69a9a00da8dcf200874d18a1f597b9721caa4eaaaa2c1dc450bcf235" not yet present on node "driftwood-control-plane", loading...
+deployment.apps/git-server created
+service/git-server created
+Waiting for deployment "git-server" rollout to finish: 0 of 1 updated replicas are available...
+deployment "git-server" successfully rolled out
+[1;36m==>[0m applying GitRepository (pinned v1.0.0 @ de9f0f61f0c2) + Kustomization
+gitrepository.source.toolkit.fluxcd.io/driftwood configured
+kustomization.kustomize.toolkit.fluxcd.io/driftwood configured
+[1;36m==>[0m applying pinned nist GitRepository (v1.0.0 @ 55a5bfe790fe)
+gitrepository.source.toolkit.fluxcd.io/nist configured
+[1;36m==>[0m forcing reconcile
+► annotating GitRepository driftwood in flux-system namespace
+✔ GitRepository annotated
+◎ waiting for GitRepository reconciliation
+✔ fetched revision sha1:de9f0f61f0c299a94256dd0e27136f1c45c8467f
+► annotating GitRepository nist in flux-system namespace
+✔ GitRepository annotated
+◎ waiting for GitRepository reconciliation
+✔ fetched revision sha1:55a5bfe790fe5a0ca47fb0bb29440b81a111f28d
+► annotating GitRepository driftwood in flux-system namespace
+✔ GitRepository annotated
+◎ waiting for GitRepository reconciliation
+✔ fetched revision sha1:de9f0f61f0c299a94256dd0e27136f1c45c8467f
+► annotating Kustomization driftwood in flux-system namespace
+✔ Kustomization annotated
+◎ waiting for Kustomization reconciliation
+✔ applied revision sha1:de9f0f61f0c299a94256dd0e27136f1c45c8467f
+[1;36m==>[0m done. status:
+NAME     	REVISION     	SUSPENDED	READY	MESSAGE                                      
+driftwood	sha1:de9f0f61	False    	True 	stored artifact for revision 'sha1:de9f0f61'	
+NAME	REVISION     	SUSPENDED	READY	MESSAGE                                      
+nist	sha1:55a5bfe7	False    	True 	stored artifact for revision 'sha1:55a5bfe7'	
+NAME     	REVISION     	SUSPENDED	READY	MESSAGE                         
+driftwood	sha1:de9f0f61	False    	True 	Applied revision: sha1:de9f0f61	
+
+[1;36m==>[0m run  estate/driftwood/verify-reconcile.sh  to assert the beat
+   ok: driftwood: KinD + Flux + signed source + reconcile
+
+==> platform: identity substrate (SPIRE+Istio+OpenBao)
+[1;36m==>[0m namespaces
+namespace/spire-system unchanged
+namespace/istio-system unchanged
+namespace/openbao unchanged
+[1;36m==>[0m SPIRE (server + agent + controller-manager + csi + oidc)
+helmrepository.source.toolkit.fluxcd.io/spiffe unchanged
+helmrelease.helm.toolkit.fluxcd.io/spire-crds unchanged
+helmrelease.helm.toolkit.fluxcd.io/spire unchanged
+► annotating HelmRelease spire-crds in spire-system namespace
+✔ HelmRelease annotated
+◎ waiting for HelmRelease reconciliation
+✔ applied revision 0.5.0
+► annotating HelmRelease spire in spire-system namespace
+✔ HelmRelease annotated
+◎ waiting for HelmRelease reconciliation
+✔ applied revision 0.24.0
+[1;36m==>[0m Istio, consuming SPIRE identity (SPIRE Workload API socket integration)
+helmrepository.source.toolkit.fluxcd.io/istio unchanged
+helmrelease.helm.toolkit.fluxcd.io/istio-base unchanged
+helmrelease.helm.toolkit.fluxcd.io/istiod unchanged
+► annotating HelmRelease istio-base in istio-system namespace
+✔ HelmRelease annotated
+◎ waiting for HelmRelease reconciliation
+✔ applied revision 1.24.0
+► annotating HelmRelease istiod in istio-system namespace
+✔ HelmRelease annotated
+◎ waiting for HelmRelease reconciliation
+✔ applied revision 1.24.0
+[1;36m==>[0m OpenBao (dev-mode secret plane)
+helmrepository.source.toolkit.fluxcd.io/openbao unchanged
+helmrelease.helm.toolkit.fluxcd.io/openbao unchanged
+► annotating HelmRelease openbao in openbao namespace
+✔ HelmRelease annotated
+◎ waiting for HelmRelease reconciliation
+✔ applied revision 0.16.0
+[1;36m==>[0m identity config: base ClusterSPIFFEID, STRICT mTLS, OpenBao jwt seam
+clusterspiffeid.spire.spiffe.io/mesh-base unchanged
+peerauthentication.security.istio.io/default unchanged
+job.batch/openbao-jwt-setup unchanged
+[1;36m==>[0m mTLS proof workloads (ping -> pong, SPIFFE AuthorizationPolicy)
+namespace/mesh-demo unchanged
+serviceaccount/ping unchanged
+serviceaccount/pong unchanged
+deployment.apps/pong unchanged
+service/pong unchanged
+deployment.apps/ping unchanged
+authorizationpolicy.security.istio.io/pong-allow-ping unchanged
+[1;36m==>[0m done. verify with estate/platform/identity/verify-identity.sh
+   ok: platform: identity substrate (SPIRE+Istio+OpenBao)
+
+==> platform: engine (Kyverno + flux-operator)
+[1;36m==>[0m namespaces
+namespace/kyverno unchanged
+[1;36m==>[0m Kyverno (admission engine — ValidatingPolicy/MutatingPolicy CRDs)
+helmrepository.source.toolkit.fluxcd.io/kyverno unchanged
+helmrelease.helm.toolkit.fluxcd.io/kyverno unchanged
+► annotating HelmRelease kyverno in kyverno namespace
+✔ HelmRelease annotated
+◎ waiting for HelmRelease reconciliation
+✔ applied revision 3.8.2
+[1;36m==>[0m flux-operator (fleet layer — ResourceSet CRD; no FluxInstance, existing Flux install untouched)
+ocirepository.source.toolkit.fluxcd.io/flux-operator unchanged
+helmrelease.helm.toolkit.fluxcd.io/flux-operator unchanged
+► annotating HelmRelease flux-operator in flux-system namespace
+✔ HelmRelease annotated
+◎ waiting for HelmRelease reconciliation
+✔ applied revision 0.58.1+b93eb18c9dfb
+[1;36m==>[0m done. verify with estate/platform/engine/verify-engine.sh
+   ok: platform: engine (Kyverno + flux-operator)
+
+==> platform: posture projection (posture/vN in SVID path)
+[1;36m==>[0m rendering distribution/versions.yaml's declared versions, grounded in the real committed trees, and proving the result with kubectl kustomize
+refusing to render into /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.5UtYdiRIU5/v2.0.0: ['cage-netpol.yaml', 'cage-tier.yaml', 'posture-trust-boundary.yaml', 'priorityclasses.yaml', 'stamp-posture.yaml'] already present. This renders only the tree being cut -- it never re-renders an already-released tree.
+  ! platform: posture projection (posture/vN in SVID path) degraded (re-run to converge)
+
+==> platform: currency controller
+[1;36m==>[0m namespace + SA + RBAC (the one audited grant to patch/evict pods)
+namespace/currency-system unchanged
+serviceaccount/currency-controller unchanged
+clusterrole.rbac.authorization.k8s.io/currency-controller unchanged
+clusterrolebinding.rbac.authorization.k8s.io/currency-controller unchanged
+[1;36m==>[0m currency.py source ConfigMap (ONE source of the code — mounted by the CronJob)
+configmap/currency-controller-src unchanged
+[1;36m==>[0m reconcile CronJob (one bounded pass / minute)
+cronjob.batch/currency-controller configured
+[1;36m==>[0m done. Trigger one pass now:  kubectl --context kind-driftwood -n currency-system create job --from=cronjob/currency-controller currency-once
+[1;36m==>[0m verify with estate/platform/currency-controller/verify-currency.sh
+   ok: platform: currency controller
+
+==> platform: graded enforcement envelope (cages)
+[1;36m==>[0m rendering distribution/versions.yaml's declared versions, grounded in the real committed trees, and proving the result with kubectl kustomize
+refusing to render into /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.cQsajcK1cN/v2.0.0: ['cage-netpol.yaml', 'cage-tier.yaml', 'posture-trust-boundary.yaml', 'priorityclasses.yaml', 'stamp-posture.yaml'] already present. This renders only the tree being cut -- it never re-renders an already-released tree.
+  ! platform: graded enforcement envelope (cages) degraded (re-run to converge)
+
+==> platform: human/device access plane (Pomerium)
+[1;36m==>[0m namespace: access
+namespace/access unchanged
+[1;36m==>[0m Dex — estate OIDC issuer (human login, same root as the gitsign committer)
+helmrepository.source.toolkit.fluxcd.io/dex unchanged
+helmrelease.helm.toolkit.fluxcd.io/dex unchanged
+► annotating HelmRelease dex in access namespace
+✔ HelmRelease annotated
+◎ waiting for HelmRelease reconciliation
+✔ applied revision 0.19.1
+[1;36m==>[0m Pomerium Core — IAP in front of the kube-apiserver (OIDC + WebAuthn + device gate)
+helmrepository.source.toolkit.fluxcd.io/pomerium unchanged
+helmrelease.helm.toolkit.fluxcd.io/pomerium unchanged
+► annotating HelmRelease pomerium in access namespace
+✔ HelmRelease annotated
+◎ waiting for HelmRelease reconciliation
+  (reconcile of pomerium not finished within timeout — safe to re-run up.sh)
+[1;36m==>[0m device SVID on the acme.internal root (spire-controller-manager reconciles it)
+clusterstaticentry.spire.spiffe.io/operator-macbook-device unchanged
+[1;36m==>[0m tpm_devid attestor: MERGE device/spire-tpm-devid-values.yaml into
+    estate/platform/identity/spire/helmrelease.yaml (spec.values), then:
+    flux --context kind-driftwood reconcile helmrelease -n spire-system spire
+    (needs a real/virtual TPM on the EUD — see device/secure-enclave.md)
+[1;36m==>[0m decision engine selfcheck (the graded human/device gate)
+access selfcheck: all asserts passed
+[1;36m==>[0m done. verify with estate/platform/access/verify-access.sh
+   ok: platform: human/device access plane (Pomerium)
+
+==> platform: EUD local prep (vTPM, offline)
+[1;36m==>[0m preparing disks + swtpm state dirs for both EUDs (offline)
+[1;36m==>[0m linux-eud: disk already exists (/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/linux-eud.qcow2) — idempotent, skipping create
+[1;36m==>[0m linux-eud: venue commands (run these, not this script, to boot)
+  # 1. start the emulated TPM (mints its own EK on first run — the emulated-EK caveat)
+  swtpm socket --tpmstate dir=/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/linux-eud-tpm \
+    --ctrl type=unixio,path=/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/linux-eud-tpm/swtpm-sock \
+    --tpm2 --daemon
+
+  # 2. boot the VM with the vTPM attached (UTM's GUI does this under the hood
+  #    when you enable "Trusted Platform Module" in a VM's System settings —
+  #    import /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/linux-eud.qcow2 there for the GUI path)
+  qemu-system-x86_64 -m 4096 \
+    -smp 2 \
+    -drive file=/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/linux-eud.qcow2,if=virtio \
+    -chardev socket,id=chrtpm,path=/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/linux-eud-tpm/swtpm-sock \
+    -tpmdev emulator,id=tpm0,chardev=chrtpm -device tpm-tis,tpmdev=tpm0 \
+    -cdrom "$ISO_PATH" -boot d
+
+[1;36m==>[0m windows11-eud: disk already exists (/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/windows11-eud.qcow2) — idempotent, skipping create
+[1;36m==>[0m windows11-eud: venue commands (run these, not this script, to boot)
+  # 1. start the emulated TPM (mints its own EK on first run — the emulated-EK caveat)
+  swtpm socket --tpmstate dir=/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/windows11-eud-tpm \
+    --ctrl type=unixio,path=/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/windows11-eud-tpm/swtpm-sock \
+    --tpm2 --daemon
+
+  # 2. boot the VM with the vTPM attached (UTM's GUI does this under the hood
+  #    when you enable "Trusted Platform Module" in a VM's System settings —
+  #    import /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/windows11-eud.qcow2 there for the GUI path)
+  qemu-system-x86_64 -m 8192 \
+    -smp 4 \
+    -drive file=/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/windows11-eud.qcow2,if=virtio \
+    -chardev socket,id=chrtpm,path=/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state/windows11-eud-tpm/swtpm-sock \
+    -tpmdev emulator,id=tpm0,chardev=chrtpm -device tpm-tis,tpmdev=tpm0 \
+    -cdrom "$ISO_PATH" -boot d
+
+NOTE: swtpm not installed here (brew install swtpm) — the venue commands above need it; disk/state prep above is unaffected.
+[1;36m==>[0m done — disks + swtpm state dirs prepared under /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/state (offline, idempotent). Actual OS install/enrolment is a venue step (see README.md).
+[1;36m==>[0m device SVID templates (fill in the real tpm_devid fingerprint after live attestation)
+  wrote /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/vms/windows11-eud-device-svid.yaml
+  wrote /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/eud/vms/linux-eud-device-svid.yaml
+[1;36m==>[0m spire-system reachable — applying device SVID templates (fingerprints still placeholders until attested)
+clusterstaticentry.spire.spiffe.io/windows11-eud-device unchanged
+clusterstaticentry.spire.spiffe.io/linux-eud-device unchanged
+[1;36m==>[0m VENUE STEPS (human, hardware-gated — see README.md + windows-hello-for-business.md):
+  1. boot each VM with the command build-vm.sh printed (or import into UTM's GUI, enable TPM)
+  2. install the OS; enrol WHfB (Windows) / confirm the vTPM (Linux, tpm2_getekcertificate)
+  3. run the SPIRE agent on the guest with the tpm_devid attestor; read the fingerprint off the server log
+  4. tpm-devid-enroll.sh <eud> <fingerprint> | kubectl apply -f -   # replaces the placeholder entry
+  5. access.py decide break-glass --oidc --webauthn --device       # now ALLOW
+[1;36m==>[0m done. verify with estate/platform/eud/verify-eud.sh
+   ok: platform: EUD local prep (vTPM, offline)
+
+==> tuppence: workload flagship (reach+secrets)
+[1;36m==>[0m customer-accounts-reset + current/stale callers (meshed, posture-managed)
+namespace/tuppence-reset unchanged
+serviceaccount/customer-accounts-reset unchanged
+deployment.apps/customer-accounts-reset unchanged
+service/customer-accounts-reset unchanged
+serviceaccount/teller-current unchanged
+deployment.apps/teller-current unchanged
+serviceaccount/teller-stale unchanged
+deployment.apps/teller-stale unchanged
+[1;36m==>[0m reach gate: Istio AuthorizationPolicy on the current-posture prefix
+authorizationpolicy.security.istio.io/reset-allow-current-posture unchanged
+[1;36m==>[0m peer SAN override: expect the real posture-shaped SVID, not Istio's ns/sa default
+destinationrule.networking.istio.io/customer-accounts-reset-posture-san unchanged
+[1;36m==>[0m secret gate: OpenBao jwt role bound to the current-posture prefix
+job.batch/openbao-reset-role unchanged
+[1;36m==>[0m done. verify with estate/tuppence/reset/verify-reach-secrets.sh
+   ok: tuppence: workload flagship (reach+secrets)
+
+==> foregrounded driftwood (kind-driftwood)
+   narrate: driftwood — see talk/RUNBOOK.md 'Audience-modular'
+
+==> estate up. Assert every beat:  talk/verify-all.sh
+   (add --live once clusters are reconciled to include the reconcile beats)
+EXIT=0

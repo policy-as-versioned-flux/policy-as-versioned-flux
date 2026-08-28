@@ -1,0 +1,23 @@
+== offline: decision-engine asserts ==
+access selfcheck: all asserts passed
+== offline: structural invariants ==
+  ok   Dex HelmRelease present (estate OIDC issuer)
+  ok   Dex advertises an OIDC issuer URL (http://dex.access.svc:5556/dex)
+  ok   Pomerium Core HelmRelease present (IAP)
+  ok   Pomerium consumes the estate OIDC issuer (Dex) — one human root, not a bolt-on
+  ok   Pomerium has a route to the kube-apiserver (kubectl access)
+  ok   route policy requires an authenticated human
+  ok   route policy requires a WebAuthn-approved device (phishing-resistant)
+  ok   Pomerium dependsOn Dex (issuer up before the proxy)
+  ok   device SVID ClusterStaticEntry present
+  ok   device SVID on the ONE estate root (acme.internal), got 'spiffe://acme.internal/device/operator-macbook'
+  ok   device SVID lives under /device/ (distinct actor class, same root)
+  ok   device entry pinned to a tpm_devid selector (this hardware only)
+  ok   tpm_devid values overlay present
+  ok   tpm_devid verifies endorsement + DevID CA chains (proof-of-residency, not a label)
+  -- all offline invariants hold --
+== offline: kubectl dry-run (namespace) ==
+  ok   namespace dry-run
+== live: plane present ==
+  ok   Dex present
+FAIL: Pomerium pod not present

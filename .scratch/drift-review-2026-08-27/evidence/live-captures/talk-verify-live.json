@@ -1,0 +1,27 @@
+{
+  "probe": "talk-verify-live",
+  "summary": "Three KinD clusters up and Flux-Ready, but talk/verify-all.sh --live fails: 12 of 28 beats FAIL before bring-up, 11 of 28 after the one permitted talk/up.sh driftwood. All 3 live reconcile beats FAIL both times. No SKIPs - fail=11, exit 1.",
+  "before": {
+    "kind_clusters": ["driftwood", "ludlow", "tuppence"],
+    "all_nodes_ready": true,
+    "all_kustomizations_ready": true,
+    "gitrepositories_ready": true,
+    "gitrepo_spec_ref": "tag-only (no commit) on all 3 clusters; URLs pointed at github.com/policy-as-versioned-*",
+    "non_running_pods": {
+      "driftwood": "6x currency-controller CronJob pods in Error; spire-spiffe-oidc-discovery-provider Unknown (56 restarts)",
+      "tuppence": "none",
+      "ludlow": "none"
+    }
+  },
+  "after": {
+    "driftwood": "GitRepository re-pointed at in-cluster git-server, spec.ref now {commit,tag} - live beat advances to step 4 then fails on nist-pin=1.1.0 (script asserts 1.0.0). New red: spire-agent CrashLoopBackOff 398 restarts; currency-verify + currency-controller pods still Error (HTTP 404 from urllib in reconcile).",
+    "tuppence": "unchanged, still tag-only spec.ref",
+    "ludlow": "unchanged, still tag-only spec.ref"
+  },
+  "run1_exit": 1,
+  "run1": "pass=16 fail=12 skip-live=0",
+  "run2_exit": 1,
+  "run2": "pass=17 fail=11 skip-live=0",
+  "up_sh_exit": 0,
+  "up_sh_degraded_layers": ["platform: posture projection", "platform: graded enforcement envelope (cages)"]
+}

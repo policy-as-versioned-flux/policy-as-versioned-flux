@@ -1,0 +1,3 @@
+
+== Part A: gate.run_gate() against the REAL v2.0.0 -> v3.0.0 predecessor (several minutes -- real kyverno apply per corpus fixture) ==
+TIMEOUT (>600s twice; script's own comment: 'Part A ... several minutes -- real kyverno apply per corpus fixture')

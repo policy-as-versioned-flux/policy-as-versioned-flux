@@ -1,0 +1,16 @@
+=== kind-tuppence nodes ===
+NAME                     STATUS   ROLES           AGE   VERSION
+tuppence-control-plane   Ready    control-plane   26d   v1.36.1
+=== kind-tuppence kustomizations ===
+NAMESPACE     NAME       AGE   READY   STATUS
+flux-system   tuppence   26d   True    Applied revision: v1.0.0@sha1:9862d846332031d7cb5cf38894d3b0ed321928df
+=== kind-tuppence gitrepositories ===
+NAMESPACE     NAME       URL                                                        AGE   READY   STATUS
+flux-system   nist       https://github.com/policy-as-versioned-nist/nist           26d   True    stored artifact for revision 'v1.0.0@sha1:e5953e1a96018e9a29677c66cd61939ad796d25e'
+flux-system   tuppence   https://github.com/policy-as-versioned-tuppence/tuppence   26d   True    stored artifact for revision 'v1.0.0@sha1:9862d846332031d7cb5cf38894d3b0ed321928df'
+=== kind-tuppence gitrepo spec.ref ===
+nist	{"tag":"v1.0.0"}
+tuppence	{"tag":"v1.0.0"}
+
+=== kind-tuppence non-running pods ===
+NAMESPACE            NAME                                             READY   STATUS    RESTARTS        AGE
