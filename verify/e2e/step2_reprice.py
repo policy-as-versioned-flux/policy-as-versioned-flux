@@ -46,12 +46,12 @@ def load_yaml(path):
 
 
 def skip(msg):
-    print(f"SKIP: {msg}")
+    print(f"SKIP: {' '.join(str(msg).split())}")  # one line: the verdict is the last line
     sys.exit(3)
 
 
 def fail(msg):
-    print(f"FAIL: {msg}")
+    print(f"FAIL: {' '.join(str(msg).split())}")  # one line: the verdict is the last line
     sys.exit(1)
 
 

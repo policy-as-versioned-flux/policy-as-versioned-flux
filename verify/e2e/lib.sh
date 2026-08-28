@@ -10,9 +10,12 @@ PY="$ROOT/.venv/bin/python"; [ -x "$PY" ] || PY=python3
 CLUSTER=pav-e2e   # ephemeral; never one of driftwood/tuppence/ludlow
 
 say()  { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
-pass() { echo "PASS: $*"; exit 0; }
-fail() { echo "FAIL: $*"; exit 1; }
-skip() { echo "SKIP: $*"; exit 3; }
+# The verdict is the LAST LINE, so it is exactly one line: a reason carrying newlines (a python
+# traceback, a JSON blob) is flattened rather than allowed to push the verdict out of view.
+flat() { printf '%s' "$*" | tr '\n\t' '  ' | tr -s ' '; }
+pass() { echo "PASS: $(flat "$*")"; exit 0; }
+fail() { echo "FAIL: $(flat "$*")"; exit 1; }
+skip() { echo "SKIP: $(flat "$*")"; exit 3; }
 step() { echo "E2E step $1 $2"; }   # step N <name>
 
 cluster_up() {

@@ -50,12 +50,12 @@ def load_yaml(path):
 
 
 def skip(msg):
-    print(f"SKIP: {msg}")
+    print(f"SKIP: {' '.join(str(msg).split())}")  # one line: the verdict is the last line
     sys.exit(3)
 
 
 def fail(msg):
-    print(f"FAIL: {msg}")
+    print(f"FAIL: {' '.join(str(msg).split())}")  # one line: the verdict is the last line
     sys.exit(1)
 
 
@@ -187,7 +187,10 @@ def main():
     try:
         landed = json.loads(r.stdout)
     except ValueError:
-        fail(f"tier_pr.py --dry-run printed no proposal document: {r.stdout.strip()[:200]}")
+        # stdout is the document stream. Anything else on it (a human note, a log line) breaks
+        # every machine reader, so it is named as that rather than as "bad JSON".
+        fail(f"tier_pr.py --dry-run did not print a clean proposal document on stdout -- the "
+             f"document stream carries other text: {r.stdout.strip()[:200]}")
     if not landed:
         fail(f"a residual crossing {org}'s band ({under:,.0f} -> {over:,.0f} {ccy}, tier "
              f"{tier_under} -> {tier_over}) proposed nothing")
