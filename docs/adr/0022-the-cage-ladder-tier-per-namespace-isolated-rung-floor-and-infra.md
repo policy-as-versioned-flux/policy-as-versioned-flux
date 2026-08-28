@@ -27,6 +27,20 @@ without a reason.
 - Only a party with the `platform` role may declare a Namespace at **`infra`**. A declaration
   from any other party renders to `isolated`. The platform's `infra` declaration lands, and the
   truth surface asserts it, before the default for an unlabelled Namespace flips to `isolated`.
+- **Added 2026-08-28 (review):** a Namespace that is not governed at all still renders **`baseline`**
+  for a pod that claims a policy version. That is the other half of the ordering rule above, and it
+  had been a fall-through with no decision behind it: the cage stamped posture labels, a negative
+  eviction class and a resource ceiling on workloads in Namespaces nobody governs. It is now
+  written down and carries a fixture (`graded/tests/cage-tier`, pod `ungoverned-ns`). It flips to
+  `isolated` in the same one-line edit as the rest of the ordering rule.
+- **Added 2026-08-28 (review):** a pod created in a governed Namespace with NO
+  `policy-as-versioned.dev/policy-version` claim is REFUSED by
+  `governed-namespace-requires-claim`, promoted that day from `Audit` to `Deny`. Live, `Audit` let
+  such a pod run completely uncaged -- no tier, no class, no limits, no hardening, no reach cage --
+  inside a Namespace whose declared tier was `isolated`, so the Namespace fell closed and the pod
+  fell open. This is the one refusal the doctrine allows and it is a missing INSTRUMENT (ADR-0020),
+  not a posture judgement: the claim is what selects which served version cages the pod, so without
+  it there is no cage to put the workload in. A pod that claims is caged and priced, never refused.
 
 ## Alternatives
 
