@@ -60,3 +60,26 @@ Tickets 04, 07 and 08 spent today's five-decision budget. This round goes to the
 ➡️ (c). Infra is just another adopter whose composed artefact declares its namespaces at tier `infra`. The same Q3 rendering covers it, so there is one mechanism and no allowlist file. (a) is a second declaration path. (b) makes infra forgeable.
 
 Later rounds, blocked on the above: the warn rung (realise as `Audit` findings that move nothing, or drop the word); de-posture as a tier move that keeps the claim (H2-12); `access.py` retirement and break-glass bands per org appetite (H8-09, H8-12); how a tier move prices against the ticket 08 `prices[]` entry.
+
+## Facts found, second pass (2026-08-28, AFK, owner asked for AFK work)
+
+- The cluster runs Kyverno v1.18.2 (read live, `kubectl get deploy -n kyverno`).
+- `platform/graded/policies/cage-netpol.yaml` is a GeneratingPolicy that already exists. It fires on `posture.acme.io/caged: "true"` and generates one NetworkPolicy per namespace that limits every caged pod to egress DNS only. The cage-tier mutation stamps `caged: "true"` at every tier, so a baseline pod loses reach today the same as a quarantine pod. Reach is not tier-aware. This changes Q2: the bottom rung does not need a new NetworkPolicy mechanism, it needs `cage-netpol` to read the tier and generate per-tier reach (baseline: normal egress; quarantine: DNS only; isolated: none).
+- `platform/distribution/render-governed-namespace-guard.py:20-29`: Kyverno's CEL `namespaceObject` and `matchConstraints.namespaceSelector` work at runtime but do not evaluate in the pinned offline CLI (kyverno/kyverno#9975, #13605, confirmed on 1.18.2). The truth surface grades offline first. So Q3 option (a), "the mutation reads the Namespace label", is not provable by `verify-all.sh` today. New option (d) for Q3: the composition renders the declared tier into the adopter's own copy of `cage-tier` as a CEL map `namespace → tier` baked at compose time. That copy is signed with the composed artefact, reconciled by Flux, and fully testable offline with `kyverno test`. The pod label stays an output. The cost is that a tier move re-renders a policy file, which is already how every other composed policy moves.
+- Offline coverage today: `platform/graded/tests/cage-tier/kyverno-test.yaml` asserts mutation into each tier and that a claiming pod with no tier lands in baseline. The Q1 fix and the Q3 option (d) map both fit this test shape.
+
+Recommendation change: Q3 recommended answer becomes (d). Q2 recommended answer names `cage-netpol` as the reach half of `isolated`. Docs research on the remaining Kyverno facts is in `research/kyverno-1.18-cage-facts.md` when it lands.
+
+## Facts found, third pass: Kyverno docs research (2026-08-28, AFK)
+
+Full findings with citations: [research/kyverno-1.18-cage-facts.md](../research/kyverno-1.18-cage-facts.md).
+
+- The estate's note that `namespaceObject` cannot evaluate offline is stale. kyverno/kyverno#9975 closed in 1.12.1 and #13605 closed in 1.15.0. In the 1.18 CLI, `kyverno test` resolves `namespaceObject` and `namespaceSelector` from the values file (`namespaces:` full objects, or `namespaceSelector:` name plus labels). A `kind: Namespace` in `--resource` does not work. So Q3 option (a) is offline-provable after all, at the cost of one values file per test.
+- `namespaceObject` in MutatingPolicy landed in 1.18.0. It is nil for cluster-scoped requests, so expressions need a null guard.
+- Tighten-only mutation is expressible. ApplyConfiguration that only ever writes `true` is tighten-only by construction. A JSONPatch idiom is filter with `?.`/`orValue(false)` then patch. Q1 option (a) is real. The snippets in the research file are unexecuted.
+- Kubernetes runs every mutating webhook before every validating webhook. So `require-nonroot` always sees the caged pod. Q1 cannot be solved by ordering. Order among MutatingPolicies is not guaranteed.
+- A GeneratingPolicy can branch on a label value in CEL. With `synchronize`, a trigger UPDATE deletes the downstream then regenerates, with a brief gap. Per-tier reach from one `cage-netpol` is possible. The gap is a fact to name in the Q2 answer.
+- No `paramKind`/`params` on MutatingPolicy or ValidatingPolicy in 1.18. Q3 option (b), a ConfigMap parameter, is out. `variables` plus `--context-file` is the substitute.
+- The live cluster serves `policies.kyverno.io/v1`, `v1alpha1` and `v1beta1` (read live 2026-08-28). The estate's 85 `v1alpha1` policies still load. A move to `v1beta1` is a separate housekeeping item, not this ticket.
+
+Round 1 stands with these amendments: Q1 recommendation (a) confirmed expressible. Q2 names `cage-netpol` as the reach half and names the synchronize gap. Q3 options are now (a) Namespace label read via `namespaceObject`, provable offline via the values file, or (d) tier baked into the adopter's rendered policy at compose time; (b) is removed. Recommendation stays (d): it needs no values-file plumbing in 56 verify scripts, and a tier move is already a rendered-policy change. (a) is the fallback if the owner wants one policy file across adopters.
