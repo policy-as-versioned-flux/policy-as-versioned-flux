@@ -1,0 +1,4 @@
+# Scripts talk/verify-all.sh discovers but does not run. Format: path | reason.
+# A path that no longer exists fails the gate; keep this list current.
+.estate-clone/ico/schema/verify.sh | takes a version-dir argument; run twice by .estate-clone/ico/verify-penalty-feed.sh (v1, v2)
+.estate-clone/platform/feeds/verify.sh | takes feed/version/file arguments; run by .estate-clone/platform/honesty/verify-honesty.sh

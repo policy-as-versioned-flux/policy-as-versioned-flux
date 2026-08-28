@@ -44,7 +44,7 @@ cross-party comparison needs:
 ## Touring the talk
 
 ```sh
-talk/verify-all.sh    # the deck's honesty gate: every LIVE beat -> a passing verify
+talk/verify-all.sh    # the truth surface: every verify*.sh in the estate, graded PASS/FAIL/SKIP
 talk/up.sh            # idempotent bring-up; clones the six units first (needs network)
 ```
 

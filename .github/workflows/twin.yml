@@ -9,33 +9,71 @@ on:
   pull_request:
     paths: ['twin/**', 'tests/**', 'conftest.py', 'pytest.ini', '.scratch/twin/**', '.github/workflows/twin.yml']
   workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * *'   # daily: the suite is a clock, not a push hook (GAPS 2.1, 2.2)
 
 permissions:
   contents: read
 
 jobs:
-  suite:
+  # Independent jobs, one per proof (GAPS 2.2): a red invariant no longer hides pytest, mypy
+  # and the demo behind it. `fetch-depth: 0` because hash_changes_are_authorised needs the
+  # manifest's own history and invariant 42 needs the drift window's first-commit date.
+  # mo-12 deleted the committed estate/ tree; twin/drift.py, twin/verdict.py and twin/enact.py
+  # read the six units' real content from .estate-clone/, which clone-estate.sh assembles.
+  invariants:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0          # hash_changes_are_authorised needs the manifest's own history
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'
-      # mo-12 deleted the committed estate/ tree; twin/drift.py, twin/verdict.py and twin/enact.py
-      # now read the six units' real content from .estate-clone/, the disposable clone
-      # clone-estate.sh assembles (same source verify/*.py already reads). Both the invariant
-      # suite and the test suite below need it present before they run.
       - name: fetch the six unit repos this suite reads
         run: bash clone-estate.sh
       - name: the invariant suite
+        env: {TWIN_CHECK_TIMEOUT: '600'}
         run: ./bin/twin verify
-      - name: tests
-        run: python -m pytest -q
-      - name: typecheck
-        run: python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'
+      - name: fetch the six unit repos this suite reads
+        run: bash clone-estate.sh
+      - run: python -m pytest -q
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'
+      - name: fetch the six unit repos this suite reads
+        run: bash clone-estate.sh
+      - run: python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'
+      - name: fetch the six unit repos this suite reads
+        run: bash clone-estate.sh
       - name: the walking skeleton, end to end
         run: bash twin/demo.sh
       # A single step, not three: `beat-sequence.sh` (build ticket 77) is the demo's declared

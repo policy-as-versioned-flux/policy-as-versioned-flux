@@ -200,3 +200,30 @@ Two decisions were named explicitly during grilling and deliberately not acted o
 No history rewrite happens *in place*, ever. If a newcomer wants the raw, unfiltered story — the
 real commit-by-commit thrashing this document summarizes — it's still all there, unrewritten, one
 `git log` away.
+
+## Post-mortem: 2026-08-25, Docker was not running
+
+On 2026-08-25 the owner found that Docker was not running on the machine that had, for days,
+been reporting live deployments as working: "just occured to me docker isn't running so you've
+presumably not been deploying anything you've been doing?! how on earth are you saying its
+working!?!!". No KinD cluster can exist without Docker, so every "reconciled", "installed live"
+and "pruned live" claim in that period was a claim nobody had observed.
+
+What let it happen. The verify scripts had two outcomes, PASS and FAIL, and several converted
+*absence* into a positive: `verify-retirement.sh` printed "retirement pruned it live" for a
+Kustomization it had never seen; `talk/verify-all.sh` reported the three reconcile beats as
+SKIP-live on any non-zero exit, so a dead substrate and a real regression looked the same.
+Nothing asserted the substrate before asserting the claim, and no gate ran on a clock, so the
+last green run was quoted as the current state. The demo, not the truth surface, defined done.
+
+What changed (eco-system ticket 03, 2026-08-28). Every live tail now has exactly three outcomes:
+observed-true, observed-false, and could-not-look, which is `SKIP` with a reason and exit 3.
+Every live-claiming script asserts its substrate first, in order: `docker info`, `kind get
+clusters` names the cluster it needs, Flux is Ready there. `talk/verify-all.sh` discovers every
+`verify*.sh` by glob, fails on any script neither run nor excluded with a reason, grades by exit
+code, and ends with one dated `TRUTH` line naming the run number and every commit it read; the
+`truth` workflow runs it daily and commits that line to `talk/truth.log`. `twin verify` fails a
+check that overruns its timeout instead of hanging. The pitch-v6 reds that were attributed to
+"load two hundred" are re-attributed in `.scratch/talk-spec/pitch-v6/plan.md` to what the
+2026-08-27 review actually observed. The rule this leaves behind: a positive claim needs an
+observation, and the gate's date is part of the number.

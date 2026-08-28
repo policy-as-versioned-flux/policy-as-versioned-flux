@@ -35,7 +35,9 @@ clone the six units — see above; no cluster needed):
 ```sh
 talk/verify-all.sh
 # -> clones the six units into .estate-clone/ (skipped if already present), then
-#    25 offline beats PASS; the 3 live reconcile beats SKIP-live until the estate is up.
+#    runs every verify*.sh it finds there and in verify/. Each ends PASS (observed
+#    true), FAIL (observed false) or SKIP (could not look, exit 3, with a reason).
+#    The last line is the TRUTH stamp: date, run number, commits, counts. Quote that.
 ```
 
 Bring the estate up (idempotent — safe to re-run any time to converge):
@@ -95,7 +97,7 @@ you want their reconcile beat live for that room.
 ## 2. The beat-by-beat live script
 
 Each **[LIVE]** beat is one command; each exits non-zero if the beat would fail
-on stage. Full mapping is in [`verify-all.sh`](verify-all.sh); the deck ordering:
+on stage. The gate runs every script by discovery, so there is no mapping to keep; the deck ordering:
 
 | Beat | Command | Backed by |
 |---|---|---|
@@ -168,10 +170,9 @@ offline verify beats never need a reset — they are pure and stateless.
 ## 5. The honest footer — say it out loud
 
 Nothing is rounded up to 100%. Backed by [`verify-all.sh`](verify-all.sh):
-**25 offline beats pass with no cluster** once `.estate-clone/` is assembled
-(network needed for that clone — see the abandoned-guarantee note above, not
-glossed over); the **3 institution reconcile beats** are the only ones that
-also need a brought-up cluster (`--live`).
+read the counts from the newest `TRUTH` line in [`truth.log`](truth.log), which
+the `truth` workflow writes daily. A script that needs a cluster and cannot see
+one says SKIP, never PASS. `--live` turns those SKIPs into FAILs.
 
 Narrated-not-live (real + grounded, gestured not productionised): the
 breach-cost open and the balance-sheet close; regulator-publishes-penalties-as-

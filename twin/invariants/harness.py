@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import datetime
+import io
 import os
 import re
+import signal
 import subprocess
 import tempfile
-from contextlib import contextmanager
+import threading
+from contextlib import contextmanager, redirect_stderr
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Iterator
@@ -3305,13 +3308,35 @@ def _flux_coverage_floor_is_still_reachable(ctx: Context) -> str:
 
 
 def _first_commit_date(root: Path, path: Path) -> datetime.datetime | None:
-    """When a file first entered git history, or `None` if it never has."""
-    rel = path.relative_to(root).as_posix()
-    out = _git(root, "log", "--diff-filter=A", "--format=%cI", "--", rel)
-    stamps = [line for line in (out or "").splitlines() if line.strip()]
-    if not stamps:
-        return None
-    return datetime.datetime.fromisoformat(stamps[-1].strip().replace("Z", "+00:00"))
+    """When a file first entered git history, or `None` if it never has.
+
+    A file under `.estate-clone/<unit>/` lives in that unit's own repository, not the hub's, so
+    its history is read there. The hub committed the same file at `estate/<unit>/...` before the
+    six-org split (mo-12); that earlier date counts too, so the earliest of the two is returned.
+    Reading only the hub's log made invariants 42 and 45 report "never committed" for files that
+    had been committed for weeks.
+    """
+    candidates: list[tuple[Path, str]] = []
+    try:
+        candidates.append((root, path.relative_to(root).as_posix()))
+    except ValueError:
+        pass
+    from .. import ESTATE_CLONE_DIR
+
+    if path.is_relative_to(ESTATE_CLONE_DIR):
+        inner = path.relative_to(ESTATE_CLONE_DIR)  # <unit>/<rest>
+        unit_root = ESTATE_CLONE_DIR / inner.parts[0]
+        candidates.append((unit_root, Path(*inner.parts[1:]).as_posix()))
+        candidates.append((root, (Path("estate") / inner).as_posix()))
+    found: list[datetime.datetime] = []
+    for repo, rel in candidates:
+        out = _git(repo, "log", "--diff-filter=A", "--format=%cI", "--", rel)
+        stamps = [line for line in (out or "").splitlines() if line.strip()]
+        if stamps:
+            found.append(
+                datetime.datetime.fromisoformat(stamps[-1].strip().replace("Z", "+00:00"))
+            )
+    return min(found) if found else None
 
 
 @harness_check("forced_campaign_pre_registered_and_walled_off")
@@ -4615,15 +4640,55 @@ class Suite:
         fn = registry().get(name) if is_invariant else harness_registry().get(name)
         if fn is None:
             return Result(number, name, FAIL, "no check registered", is_invariant)
+        # A check's own stderr is noise unless the check fails: several guards drive `twin`
+        # verbs that are *meant* to refuse, and their `VerbError:` lines read as an uncaught
+        # crash in a green run (Appendix E of the 2026-08-27 drift review). Keep the tail for the
+        # FAIL detail; drop it on PASS. A check that runs past CHECK_TIMEOUT seconds is a FAIL,
+        # never a silent hang.
+        err = io.StringIO()
         try:
-            detail = fn(ctx)
+            with redirect_stderr(err), _deadline(name):
+                detail = fn(ctx)
         except Skip as exc:
             return Result(number, name, SKIP, str(exc), is_invariant)
         except Violated as exc:
-            return Result(number, name, FAIL, str(exc), is_invariant)
+            return Result(number, name, FAIL, f"{exc}{_stderr_tail(err)}", is_invariant)
         except Exception as exc:  # a check that errors is a check that did not assert
-            return Result(number, name, FAIL, f"{type(exc).__name__}: {exc}", is_invariant)
+            return Result(
+                number, name, FAIL, f"{type(exc).__name__}: {exc}{_stderr_tail(err)}", is_invariant
+            )
         return Result(number, name, PASS, detail, is_invariant)
+
+
+CHECK_TIMEOUT = int(os.environ.get("TWIN_CHECK_TIMEOUT", "600"))
+
+
+class TimedOut(Exception):
+    pass
+
+
+@contextmanager
+def _deadline(name: str) -> Iterator[None]:
+    """Fail a check that overruns CHECK_TIMEOUT. SIGALRM only: main thread, POSIX."""
+    if CHECK_TIMEOUT <= 0 or threading.current_thread() is not threading.main_thread():
+        yield
+        return
+
+    def _fire(signum: int, frame: Any) -> None:
+        raise TimedOut(f"{name} ran past {CHECK_TIMEOUT}s")
+
+    previous = signal.signal(signal.SIGALRM, _fire)
+    signal.alarm(CHECK_TIMEOUT)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
+
+
+def _stderr_tail(buf: io.StringIO, lines: int = 5) -> str:
+    tail = [line for line in buf.getvalue().splitlines() if line.strip()][-lines:]
+    return ("\n    stderr: " + "\n    stderr: ".join(tail)) if tail else ""
 
 
 def context(tmp: Path) -> Context:
