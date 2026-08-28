@@ -1,7 +1,7 @@
 # 09 — The cage ladder v2
 
 Type: grilling (HITL)
-Status: claimed
+Status: prepared
 Blocked by: 08
 
 ## Question
@@ -35,7 +35,7 @@ Source of truth is `.estate-clone/`. Paths below are relative to it.
 
 Already decided, not re-asked: refuse total removal, price loosening short of removal (re-grill 16); attach the £ of every computed move to the evidence (re-grill 15); the overlay carries a tighten-only floor (re-grill 23); strictest cage at CREATE for a pod that claims nothing, infra claims an infra cage (re-grill 28, reversals 11 and 12); the composed artefact declares the tier and the proposer edits the declaration (reversal 13); a bottom rung below quarantine and unknown tier fails closed to strictest (reversal 17).
 
-## Grilling round 1 — drafted 2026-08-28, HELD
+## Grilling round 1, first draft — SUPERSEDED by the revised round below
 
 Tickets 04, 07 and 08 spent today's five-decision budget. This round goes to the owner on the next day the owner opens the map. Five questions. Nothing below has been put to the owner.
 
@@ -83,3 +83,47 @@ Full findings with citations: [research/kyverno-1.18-cage-facts.md](../research/
 - The live cluster serves `policies.kyverno.io/v1`, `v1alpha1` and `v1beta1` (read live 2026-08-28). The estate's 85 `v1alpha1` policies still load. A move to `v1beta1` is a separate housekeeping item, not this ticket.
 
 Round 1 stands with these amendments: Q1 recommendation (a) confirmed expressible. Q2 names `cage-netpol` as the reach half and names the synchronize gap. Q3 options are now (a) Namespace label read via `namespaceObject`, provable offline via the values file, or (d) tier baked into the adopter's rendered policy at compose time; (b) is removed. Recommendation stays (d): it needs no values-file plumbing in 56 verify scripts, and a tier move is already a rendered-policy change. (a) is the fallback if the owner wants one policy file across adopters.
+
+## Skeptic pass (2026-08-28, AFK)
+
+Two reviewers attacked the first draft: a fact-checker against `.estate-clone/` and a consistency reviewer against the ratified decisions and ADRs. Corrections:
+
+- The ticket 03 contradiction is one field, not two. `require-nonroot` 3.0.0 checks `runAsNonRoot` at pod level (`require-nonroot.yaml:31`); the cage writes it at container level (`cage-tier.yaml:100`). Only `readOnlyRootFilesystem` collides (`:34` vs `:99`). No adopter pod claims 3.0.0 today (`*/deploy/pod.yaml:7-9`), so no real pod is refused yet.
+- Three served copies of `cage-tier` (v2.0.0, v2.0.1, v3.0.0) each match every claiming pod regardless of version (`cage-tier.yaml:63`). A fix in one copy leaves the others clobbering. Order among MutatingPolicies is not guaranteed. `cage_engine.py:394-437` compares only the six dial fields, so a tighten-only rewrite classifies as `none`.
+- Tighten-only is not a one-line edit. An `Object{}` literal cannot omit a field conditionally. It needs two mutations gated on `variables.dial.harden`, or a ternary between two whole literals.
+- Q3 option (d) is dead. It breaks `render_is_faithful` (`compose/composition.py:1700-1708`: every composed member renders back byte-identical after the header is stripped) and contradicts ADR-0018 §1 ("the composed artefact carries no namespace list").
+- Q3 option (a) is now proven, not asserted. `kyverno apply` 1.18.2 with a `Values` file carrying a `namespaces:` list evaluated `namespaceObject` offline: Namespace labelled `quarantine`, pod forged to `baseline`, result `cage-quarantine` at 100m. Without the values file the null guard falls to `baseline`. The estate note in `render-governed-namespace-guard.py:20-23` is stale. Throwaway inputs are in the session scratchpad; the truth-surface test is a later build item.
+- `cage-netpol` has no `synchronize` (only the comment says so), a fixed NetworkPolicy name, and `Egress` only. Per-tier reach needs per-tier names or a tier-label podSelector, and `Ingress` for the bottom rung.
+- ADR-0016 §3, ADR-0014's CREATE deny, ADR-0015's "a proposed Deny opens an issue" and ADR-0018 §4 are all reversed by re-grills 23, 28 and reversals 11, 12, 13, 17, and none carries a supersession note. This ticket's answer must produce the superseding ADR.
+- The first draft's Q4 invented a refusal ("compose refuses a looser floor"). Re-grill 16 prices loosening; it never refuses.
+- The first draft's Q5 (c) left `infra` forgeable at compose time and there is no `platform/party.yaml`.
+- The first draft never asked what a tier attaches to. Q3 (d) silently made it per-namespace while Q4 called per-namespace floors fog. That is the missing decision the rest depends on.
+- Minor: 51 `verify-*.sh` in `.estate-clone` (56 is the truth-line denominator); 72 `v1alpha1` policy files; `LIVE_RESULTS.json` lives under the drift review; ticket 08's `appetite` is decided, not landed.
+
+## Grilling round 1 — revised 2026-08-28, HELD
+
+Drafted AFK on the owner's instruction. Adversarially checked by two reviewers and one executed experiment. Nothing below has been put to the owner. Five questions.
+
+❓ **Q1** - **What a tier attaches to**: reversal 13 puts the tier in the composed artefact and renders it to the label. It did not say the grain. Options: (a) per adopter, one tier for all of the adopter's governed namespaces; (b) per governed namespace; (c) per workload, as `tier_pr.py` does today by editing the pod manifest.
+
+➡️ (b). ADR-0018 already makes the Namespace manifest the governed declaration, so the tier joins `governed: "true"` on the same signed object and no new object exists. (a) cannot express de-posture of one workload without moving everything. (c) keeps the forgeable pod label as the declaration, which reversal 13 reversed. De-posture of one workload under (b) is a move of that workload into a namespace at the tighter tier, or a later per-workload override that is fog until an adopter needs it.
+
+❓ **Q2** - **Which wins, the tightened rule or the cage default**: the baseline cage writes `readOnlyRootFilesystem: false` over a pod that set `true`. `require-nonroot` 3.0.0 then fails that one field on any pod that claims 3.0.0. Options: (a) the cage is tighten-only, it never writes a security field looser than the pod declared, in every served copy of `cage-tier`; (b) the cage wins and the field is priced as a hole at baseline; (c) baseline gains `harden: true`.
+
+➡️ (a). A cage is a floor on the workload, not a ceiling. This is two mutations gated on `harden`, landed in all three served copies, and `cage_engine.py` must learn that "writes false over true" is a loosening, or the change classifies as `none`. (c) collapses baseline into restricted.
+
+❓ **Q3** - **The bottom rung, concretely**: reversal 17 adds a rung below quarantine. Options: (a) quarantine dials plus no ingress and no egress, generated by `cage-netpol` per tier, plus first eviction; (b) the same but egress DNS stays open, so the pod can still resolve.
+
+➡️ (a), named `isolated`. "Not functional" is then literally true and every pod still runs. This supersedes ADR-0015's "a proposed Deny opens an issue": `select_tier` returns `isolated` where it returned `deny`. `cage-netpol` gains per-tier NetworkPolicies (baseline: normal reach, quarantine: DNS only, `isolated`: none) with per-tier names and `Ingress` added. Enabling `synchronize` costs a brief delete-then-regenerate gap on a tier move; that gap is named, not hidden. The label value space becomes `baseline, restricted, quarantine, isolated, infra`.
+
+❓ **Q4** - **The floor's shape**: re-grill 23 says the overlay carries a tighten-only floor. Options: (a) `overlay.floor: <tier>` on `party.yaml`, one per adopter; (b) one floor per governed namespace on the Namespace manifest.
+
+➡️ (a) for the thin slice. The selection policy clamps to `max(selected, floor)` in ladder order. A PR that lowers the floor is priced as a delta on `prices[]`, never refused (re-grill 16). Removing the floor key is not removing an enforcement surface, because selection still runs, so it is priced too. (b) waits until an adopter needs two floors.
+
+❓ **Q5** - **Who may declare the `infra` tier**: re-grill 28 says infrastructure claims an infra cage explicitly. Options: (a) any party whose signed `party.yaml` carries a `platform` role (ticket 04 shape) may declare a namespace at `infra`; a declaration from a party without the role renders to `isolated`; (b) a hub-signed allowlist of infra namespaces in `versions.yaml`.
+
+➡️ (a). Entitlement comes from the same signed identity every other claim uses, so there is one mechanism and no allowlist file. The platform gains its own `party.yaml` and declares `kube-system`, `flux-system` and `kyverno`. Order matters: that declaration lands, and the truth surface asserts it, before the default for an unlabelled governed namespace flips from `baseline` to `isolated`. Otherwise CoreDNS lands in `isolated` and the cluster stops.
+
+Consequences to record on resolution: one superseding ADR for ADR-0014's CREATE deny, ADR-0015's Deny-to-issue, ADR-0016 §3 and ADR-0018 §4; the pod label becomes an output only, closing H8-03.
+
+Later rounds, blocked on the above: the warn rung (`Audit` findings that move nothing, or drop the word; Q3's value space omits it on purpose); de-posture as a tier move that keeps the claim (H2-12), decidable once Q1 fixes the grain; `access.py` retirement and break-glass bands per org `appetite` (H8-09, H8-12); how a tier move prices against the ticket 08 `prices[]` entry, which Q4 leans on.
