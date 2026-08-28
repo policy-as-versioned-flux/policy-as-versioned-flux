@@ -281,6 +281,23 @@ that a rewritten entry cites stay as the record of the decision at the time.
 - **Reporting currency** (added 2026-08-28) — The one currency a party states every sum in. Every
   amount carries its own currency; a sum converts through a dated, signed FX feed or not at all.
 
+- **Perspective** (added 2026-08-28) — Who pays and what their red lines are. A price is only
+  meaningful under a named perspective. No perspective is privileged, and no sum crosses two.
+
+- **Forward intel** (added 2026-08-28) — What the twin publishes: a scenario under a perspective,
+  with its trade-off curve, signed by the adopter's twin agent. It never carries a recommended
+  action. The estate prices it like any other feed.
+
+- **Selection policy** (added 2026-08-28) — The adopter's own versioned, signed rule that turns a
+  trade-off curve into one cage tier. The curve never picks; the policy does.
+
+- **Price** (added 2026-08-28) — An annualised amount with a currency and a perspective, produced
+  by the estate's engine from a scenario. A price with no perspective is not a price.
+
+- **Appetite** (added 2026-08-28) — The annual loss an adopter declares it will carry, as an amount
+  with a currency, signed by the adopter alone on its party artefact. The £ selects the first cage
+  tier whose residual sits under it.
+
 - **Instrument fault** (added 2026-08-28) — The gate cannot read something it needs to price: a
   regime with no penalty schema, a date with no FX rate. It refuses. Contrast a priced hole, which
   is a behaviour the gate can read and prices (ADR-0020).

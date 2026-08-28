@@ -29,11 +29,12 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 
 - [07 — Org size obligations and currency](issues/07-org-size-obligations-and-currency.md) — the adopter signs `size` (turnover, customers, data subjects, headcount, `as_of`) and `obligations` (regime names) in its party artefact; `pct_of_global_turnover` gives `hi = min(rate × turnover, cap)` with the examples scaled by `hi / cap`; stale size widens to the cap, never refuses; every amount carries a currency, `reporting_currency` defaults to USD and the adopters declare GBP; FX is a signed `fx` feed; a missing regime price or FX rate is an instrument fault and refuses. Owner agreed; reason given only for the currency default. ADR-0020.
 
+- [08 — The pound seam](issues/08-the-pound-seam.md) — the twin emits a forward-intel feed (a scenario under a perspective, no recommended action) from the adopter's repo; `fair.py` annualises it as a `source: twin` entry in `prices[]`; a versioned, signed `selection-policy` package picks the tier; appetite moves onto `party.yaml`; every price carries `perspective` and `currency`; `fair.py` reports `tail` and accepts a lognormal-GPD spec. Owner answered "Lgtm" with no reason; recorded as such; daily budget exceeded. ADR-0021.
+
 ## Not yet specified
 
-- The thin-slice build tickets themselves: one per NORTH-STAR §4 step, derived once the feed contract, the £ seam and the cage ladder tickets close.
+- The thin-slice build tickets themselves: one per NORTH-STAR §4 step, derived once the cage ladder ticket closes (feed contract and £ seam are done).
 - One test seam per eco-system joint (re-grill 30): composition, publisher release, adopter gate, cage tier move, feed fetch, twin-to-estate handoff. Shape follows the joints above.
-- The Wardley publisher/consumer split: the twin publishes forward intel; the platform consumes it (H5-06). Waits on the £ seam.
 - The forecast book as the marketplace's credibility instrument (reversal 22): continuous scoring, reliability diagrams per publisher, claim scope. Waits on the feed contract.
 - Which mechanisms lifted from the original org land where (ticket 13 decides lift-or-retire; placement is fog).
 - The eco-system re-cut of the misuse catalogue's affected-parties register and DPIA (waits on ticket 19).
