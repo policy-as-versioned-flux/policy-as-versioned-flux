@@ -34,3 +34,13 @@ __pycache__/
 # it in a `finally`. An interrupted run — Ctrl-C, gate timeout — leaves one
 # behind; this keeps `git add -A` from sweeping it into a commit.
 .plant-*/
+
+# Gate captures: one full-output file per verify script, written beside the
+# TRUTH line (ticket 20 Q2). A local run's captures are throwaway scratch, so
+# they stay untracked here. The one exception is the observation lane (D1):
+# the scheduled `truth` workflow force-adds (`git add -Af -- talk/captures`) and
+# commits talk/captures/ next to talk/truth.log, because a clock may append an
+# observation but never a declaration. Wired 2026-08-28 -- until then the lane
+# named a top-level `captures` directory that exists nowhere, so the clock had
+# never committed a capture and the sentence above was a plan, not a fact.
+talk/captures/

@@ -50,6 +50,20 @@ talk/up.sh            # idempotent bring-up; clones the six units first (needs n
 
 See [`talk/deck.md`](deck.md) (Marp) and [`talk/RUNBOOK.md`](RUNBOOK.md).
 
+### Reading a red gate
+
+Three outcomes per script, graded by exit code: **PASS** (0, observed true),
+**SKIP** (3, could not look — offline that's not a failure, but it counts as
+FAIL under `--live`), **FAIL** (anything else, observed false or timed out).
+EXCLUDED is a fourth row for a script the gate found but was told not to run
+(`talk/verify-exclusions.txt`) — not a run outcome. Every script's full
+output is captured to `talk/captures/<slug>.out`, named on a FAIL row;
+local captures are untracked, the scheduled `truth` workflow commits them as
+observations (D1). The slowest five scripts print after the TRUTH line. The
+rule: **a green that could not look is a red** — SKIP is never evidence
+anything passed. See [`talk/RUNBOOK.md`](RUNBOOK.md#6-reading-a-red-gate)
+for the full version.
+
 ## The end-to-end harness
 
 `verify/e2e/` drives the seven NORTH-STAR §4 steps inside the gate (ticket 52). One script per

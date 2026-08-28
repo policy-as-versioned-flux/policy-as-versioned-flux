@@ -180,3 +180,37 @@ code as an *industry* norm; full underwriting/board consumption; Windows/Linux
 device trust on **UTM vTPM VMs (emulated EK), narrated as virtual** — the one
 genuine live hardware root is the **Mac Secure Enclave**. Every one of these is
 named and scoped, which is exactly the honesty the thesis argues for.
+
+---
+
+## 6. Reading a red gate
+
+`talk/verify-all.sh` grades every script it discovers by exit code, exactly
+three outcomes:
+
+- **PASS** (exit 0) — observed true.
+- **SKIP** (exit 3) — could not look; the reason is on the script's last line
+  (`SKIP: ...`). Not a failure offline — no cluster is guaranteed present. It
+  **does** count as FAIL under `--live`: a script that could not observe its
+  target on a run you asked to be live is not honestly green.
+- **FAIL** (any other exit) — observed false, errored, or timed out. The row
+  names the reason and, for anything past the first line, points at that
+  script's capture: `talk/captures/<slug>.out`.
+
+(EXCLUDED is a fourth row, but not a run outcome — it's a script the gate
+found and was told not to run, listed with its reason in
+`talk/verify-exclusions.txt` because another script already runs it, with
+real arguments.)
+
+Every script's full stdout+stderr lands in `talk/captures/<slug>.out`, win or
+lose, alongside the table's truncated last line — that's where to look first
+when a FAIL row's one-liner isn't enough. A local run's captures are
+untracked scratch; the scheduled `truth` workflow is the observation lane
+(D1) that commits them next to `truth.log`. After the TRUTH line, the gate
+also prints the slowest five scripts by wall-clock time — a script creeping
+toward the timeout shows up there before it starts timing out.
+
+The rule to say out loud: **a green that could not look is a red.** SKIP is
+not a soft pass — the check never ran. Read `pass=` in the TRUTH line as the
+only count of things actually observed true; an offline run's `skip=` proves
+nothing either way.
