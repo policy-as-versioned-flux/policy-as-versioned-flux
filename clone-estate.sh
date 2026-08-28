@@ -20,7 +20,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEST="$ROOT/.estate-clone"
-UNITS=(platform driftwood tuppence ludlow nist ico)
+UNITS=(platform driftwood tuppence ludlow nist ico feeds insurer)
 REFRESH=0; [ "${1:-}" = "--refresh" ] && REFRESH=1
 
 mkdir -p "$DEST"
@@ -39,4 +39,4 @@ for u in "${UNITS[@]}"; do
   # (--branch v1.0.0) so the offline harness matches what Flux actually runs.
   git clone --quiet --depth 1 "https://github.com/$org/$u" "$dir"
 done
-echo "OK: six units in $DEST"
+echo "OK: ${#UNITS[@]} units in $DEST"

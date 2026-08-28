@@ -50,6 +50,28 @@ talk/up.sh            # idempotent bring-up; clones the six units first (needs n
 
 See [`talk/deck.md`](deck.md) (Marp) and [`talk/RUNBOOK.md`](RUNBOOK.md).
 
+## The end-to-end harness
+
+`verify/e2e/` drives the seven NORTH-STAR §4 steps inside the gate (ticket 52). One script per
+step, each discovered by `talk/verify-all.sh` as its own graded sub-result:
+
+| step | script | built by |
+|---|---|---|
+| 1 | `verify-e2e-step1-regulator-publishes.sh` | 21 |
+| 2 | `verify-e2e-step2-renovate-pins-and-reprices.sh` | 25 |
+| 3 | `verify-e2e-step3-price-crosses-band-pr-opens.sh` | 26 |
+| 4 | `verify-e2e-step4-flux-reconciles-cage.sh` | 40 |
+| 5 | `verify-e2e-step5-twin-forecasts.sh` | 49 |
+| 6 | `verify-e2e-step6-provenance.sh` | 32 |
+| 7 | `verify-e2e-step7-honesty.sh` | 52 |
+
+Step N prints `E2E step N <name>` and then `PASS:`, `FAIL:` or `SKIP: step N not built yet,
+owned by ticket NN` until its ticket lands. Step 7 runs steps 1 to 6 with a 120s timeout each
+and fails if any does not end on one of those three lines. `lib.sh` gives the steps `say`,
+`pass`, `fail`, `skip`, the estate path and `cluster_up`/`cluster_down` for the ephemeral KinD
+cluster `pav-e2e`, deleted on exit by trap. A step that needs a signed tag not yet cut reads
+SKIP naming the tag; the scheduled truth run is the only number that counts.
+
 ## Quick start (driftwood — the live one)
 
 ```sh

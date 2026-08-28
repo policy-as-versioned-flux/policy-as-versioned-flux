@@ -10,7 +10,11 @@ assertion that cannot fail — this module is the guard that makes it fail
 correctly. It REFUSES a party whose declared role has no filesystem evidence:
 
     risk-bearer  ->  an entry in platform/risk/appetite.json
-    publisher    ->  a *.sig file or a recorded *VERSION*.json under its own dir
+    publisher    ->  a *.sig file, a recorded *VERSION*.json, or a party.yaml that declares
+                     publishes[] (ADR-0019: the tag signs, so an untagged feed.json is not
+                     evidence; a declared feed is delegated to verify/feed-contract, which
+                     SKIPs until the signed tag exists)
+    platform, insurer -> declared only
     adopter      ->  a reference to another party's repo (policy-as-versioned-X)
                      or in-repo path (estate/X/) under its own dir
 
@@ -39,7 +43,7 @@ from _estate import ESTATE  # noqa: E402
 ROLES = os.path.join(HERE, "roles.json")
 APPETITE = os.path.join(ESTATE, "platform", "risk", "appetite.json")
 
-VALID_ROLES = {"publisher", "risk-bearer", "adopter"}
+VALID_ROLES = {"publisher", "risk-bearer", "adopter", "platform", "insurer"}  # ADR-0019/ticket 21: platform, insurer
 
 
 def load_parties(roles_path=ROLES):
@@ -61,7 +65,14 @@ def is_risk_bearer(party, appetite_path=APPETITE):
 
 def ships_signed_versioned_artefact(party_dir):
     """publisher evidence: a signature or a recorded version+checksum manifest
-    lives somewhere under the party's own directory."""
+    lives somewhere under the party's own directory, or the party's own
+    party.yaml declares publishes[] (delegated to verify/feed-contract, which
+    checks the signed tag; an untagged feed.json is not a signature)."""
+    party_yaml = os.path.join(party_dir, "party.yaml")
+    if os.path.isfile(party_yaml):
+        with open(party_yaml, errors="ignore") as fh:  # flat scan, stdlib only
+            if re.search(r"^publishes:\s*\n\s+- ", fh.read(), re.M):
+                return True
     for path in _files(party_dir):
         name = os.path.basename(path)
         if name.endswith(".sig") or "VERSION" in name.upper():

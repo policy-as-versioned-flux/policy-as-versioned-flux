@@ -1,9 +1,11 @@
 {
-  "note": "roles: (CONTEXT.md 'Role') -- publisher ships a signed, versioned artefact others pin; risk-bearer carries a declared appetite band in platform/risk/appetite.json (post-split: fetched into ../../.estate-clone/platform/ by ../../clone-estate.sh); adopter pins and consumes another party's artefact. Roles compose -- a party may hold several -- and party.py checks every entry here against the real filesystem: this file only DECLARES, it never proves.",
+  "note": "roles: (CONTEXT.md 'Role') -- publisher ships a signed, versioned artefact others pin; risk-bearer carries a declared appetite band in platform/risk/appetite.json (post-split: fetched into ../../.estate-clone/platform/ by ../../clone-estate.sh); adopter pins and consumes another party's artefact. Roles compose -- a party may hold several -- and party.py checks every entry here against the real filesystem: this file only DECLARES, it never proves. roles here mirror each unit's signed party.yaml (platform: publisher+platform, no baseline, so not an adopter; insurer: publisher of the quote feed, first version ticket 36). A publisher whose party.yaml declares publishes[] is 'declared and delegated': verify/feed-contract checks what it publishes and SKIPs until the signed tag exists, so a feed.json on a branch is never counted as a signature (ADR-0019: the tag signs).",
   "parties": {
-    "platform":  ["publisher", "risk-bearer", "adopter"],
+    "platform":  ["publisher", "platform"],
     "nist":      ["publisher"],
     "ico":       ["publisher"],
+    "feeds":     ["publisher"],
+    "insurer":   ["publisher", "insurer"],
     "driftwood": ["risk-bearer", "adopter"],
     "tuppence":  ["risk-bearer", "adopter"],
     "ludlow":    ["risk-bearer", "adopter"]

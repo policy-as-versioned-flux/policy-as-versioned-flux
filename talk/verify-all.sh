@@ -59,7 +59,7 @@ done
 rm -f "$log"
 
 units=""
-for u in .estate-clone/*/; do units="$units ${u#.estate-clone/}"; units="${units%/}=$(git -C "$u" rev-parse --short HEAD)"; done
+for u in .estate-clone/*/; do units="$units ${u#.estate-clone/}"; units="${units%/}=$(git -C "$u" rev-parse --short HEAD 2>/dev/null || echo none)"; done
 echo
 echo "TRUTH $(date -u +%Y-%m-%dT%H:%MZ) run=${GITHUB_RUN_NUMBER:-local} hub=$(git rev-parse --short HEAD) units=[${units# }] pass=$pass fail=$fail skip=$skip excluded=$excluded total=${#SCRIPTS[@]}$([ "$REQUIRE_LIVE" = 1 ] && echo " live=1")"
 [ "$fail" -eq 0 ] || exit 1
