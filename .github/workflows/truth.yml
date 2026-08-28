@@ -1,9 +1,21 @@
 name: truth
 
 # The truth surface on a clock (GAPS 2.1). talk/verify-all.sh discovers every verify*.sh in
-# the six unit repos and the hub, runs each, and prints one TRUTH line with the date, the run
+# the unit repos and the hub, runs each, and prints one TRUTH line with the date, the run
 # number and every commit it read. That line is appended to talk/truth.log and committed, so
 # the only citable number lives in git with its date. A red run still records its line.
+#
+# This is the estate's ORIGINAL observation lane, and ticket 28 / ADR-0024 caged it. The commit
+# is now gitsign-signed with this run's own Actions identity -- the same keyless
+# OIDC -> Fulcio -> Rekor chain every cut-release.yml uses for tags -- and the `observation cage`
+# step stages only the paths in OBSERVATION_LANE below, failing the run if the gate left anything
+# else in the tree. A verify script that writes a declaration can no longer push it to main by
+# riding this workflow's `contents: write`. The server-side half is
+# .github/rulesets/observation-lane.json in each unit repo, which the owner applies with `gh api`.
+#
+# 05:47 UTC. The units pick their own times (01:23 platform, 02:41 nist, 03:17 feeds, 04:09 ico,
+# 05:31 insurer, 06:11/06:47/07:05 driftwood, 08:13/08:49 tuppence, 09:07/09:43 ludlow) and no
+# cross-org ordering is promised: this run grades whatever state it finds.
 on:
   schedule:
     - cron: '47 5 * * *'
@@ -13,6 +25,19 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+
+# The observation lane, declared once as data so the cage step and
+# verify/schedules/verify-schedules.sh read the SAME list (ADR-0024, D1). These are the only
+# paths this clock may ever commit.
+env:
+  # `talk/captures`, not `captures`: there is no top-level captures/ anywhere in the
+  # estate, so that entry matched nothing and this clock had never committed a capture
+  # (review, 2026-08-28). talk/verify-all.sh writes them to talk/captures/, which is
+  # gitignored for local runs -- so the cage force-adds (`git add -Af`) below.
+  OBSERVATION_LANE: "talk/truth.log drift/samples.jsonl talk/captures observations"
+  GITSIGN_VERSION: 0.17.1
+  GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
 
 concurrency:
   group: truth
@@ -22,10 +47,25 @@ jobs:
   gate:
     runs-on: ubuntu-latest
     steps:
+      # persist-credentials: false, like twin.yml's six jobs. talk/verify-all.sh runs
+      # every verify*.sh from eight other orgs' repos, cloned unpinned off their default
+      # branches, with the hub root as cwd; a persisted `contents: write` token would sit
+      # in .git/config as an http.extraheader for all of them, and the observation cage
+      # below is a post-hoc tree inspection that cannot see a commit that has already been
+      # pushed. The cage step carries its own credential explicitly instead.
       - uses: actions/checkout@v4
+        with: {persist-credentials: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: pip install 'pyyaml==6.0.3'
+      - name: install pinned gitsign (binary + checksum, no marketplace action)
+        run: |
+          set -euo pipefail
+          curl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"
+          echo "${GITSIGN_SHA256}  gitsign" | sha256sum -c -
+          chmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign
+          rm -f gitsign
+
       - name: kyverno, cosign, flux CLIs the offline proofs call
         run: |
           set -e
@@ -35,13 +75,74 @@ jobs:
       - name: the gate
         id: gate
         continue-on-error: true
-        run: set -o pipefail; bash talk/verify-all.sh | tee gate.out
+        # into RUNNER_TEMP, not the workspace: the cage step below refuses any file the run
+        # leaves in the tree, and the gate's own transcript is not an observation to commit.
+        run: set -o pipefail; bash talk/verify-all.sh | tee "$RUNNER_TEMP/gate.out"
       - name: record the TRUTH line
         run: |
-          grep '^TRUTH ' gate.out | tee -a talk/truth.log >> "$GITHUB_STEP_SUMMARY"
-          git config user.name 'truth surface' && git config user.email 'truth@users.noreply.github.com'
-          git add talk/truth.log && git commit -m "truth: record run ${GITHUB_RUN_NUMBER} [skip ci]"
-          git pull --rebase --autostash origin main && git push
+          set -euo pipefail
+          grep '^TRUTH ' "$RUNNER_TEMP/gate.out" | tee -a talk/truth.log >> "$GITHUB_STEP_SUMMARY"
+
+      # --- the cage (ADR-0024, D1) ------------------------------------------------------------
+      # Only OBSERVATION_LANE paths are staged. `.estate-clone/` is the disposable checkout
+      # clone-estate.sh assembles and is git-ignored here, so it never appears; anything else the
+      # gate left behind is a declaration escaping the lane and fails the run instead of landing.
+      - name: the observation cage -- a clock appends observations, never a declaration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # `git reset` FIRST, so the index the cage commits is built only by the cage.
+          # The old guard filtered `git status --porcelain` with `grep -v '^[AMD] '`,
+          # which strips exactly the staged-and-clean entries -- so anything an earlier
+          # step had left in the index was committed and pushed while the step printed
+          # "this clock declared nothing" (reproduced 2026-08-28).
+          git reset -q
+          for path in ${OBSERVATION_LANE}; do
+            # -f: talk/captures/ is gitignored for local runs; the scheduled clock is
+            # the one caller allowed to commit it.
+            if [ -e "${path}" ]; then git add -Af -- "${path}"; fi
+          done
+          # Assert the STAGED SET against the same OBSERVATION_LANE list, not a second
+          # regex that could drift from it.
+          bad=""
+          for f in $(git diff --cached --name-only); do
+            ok=0
+            for path in ${OBSERVATION_LANE}; do
+              case "${f}" in "${path}"|"${path}"/*) ok=1 ;; esac
+            done
+            [ "${ok}" = 1 ] || bad="${bad} ${f}"
+          done
+          if [ -n "${bad}" ]; then
+            echo "::error::the scheduled truth run staged a declaration outside the observation lane"
+            echo "${bad}"
+            exit 1
+          fi
+          # ...and the tree, unstaged and untracked, must be clean outside the lane too.
+          outside="$(git status --porcelain --untracked-files=all | grep -v '^[AMD] ' || true)"
+          if [ -n "${outside}" ]; then
+            echo "::error::the scheduled truth run left a change outside the observation lane"
+            echo "${outside}"
+            exit 1
+          fi
+          if git diff --cached --quiet; then
+            echo "ok  nothing to observe, and nothing declared"; exit 0
+          fi
+          # The signing config goes in the LOCAL CONFIG, not on the one commit command:
+          # `git pull --rebase` replays the commit, and with no commit.gpgsign in scope
+          # the replay came out UNSIGNED -- exactly in the contended case the pull exists
+          # for (reproduced 2026-08-28, %G? went from a signature to `N`).
+          git config user.name "truth surface"
+          git config user.email "truth@users.noreply.github.com"
+          git config gpg.format x509
+          git config gpg.x509.program gitsign
+          git config commit.gpgsign true
+          git commit -m "truth: record run ${GITHUB_RUN_NUMBER} [skip ci]"
+          git pull --rebase --autostash origin main
+          # The credential is handed to THIS command only; nothing the gate ran could
+          # reach it (see persist-credentials above).
+          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${GH_TOKEN}" | base64 -w0)" \
+            push origin HEAD:"${GITHUB_REF_NAME}"
       - name: fail if the gate failed
         if: steps.gate.outcome == 'failure'
         run: exit 1

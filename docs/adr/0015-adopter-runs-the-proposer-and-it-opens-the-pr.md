@@ -4,6 +4,16 @@ status: accepted
 
 > **Superseded in part, 2026-08-28.** "a proposed Deny opens an issue" is superseded by [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md). The rest stands.
 
+> **Superseded in part, 2026-08-28.** Point 5 ("No schedule runs anywhere"), the consequence "The
+> proposal commit is unsigned", and the consequence "Each adopter keeps its own rejection ledger...
+> the committed `platform/honesty/rejections.json` stays as the war-gamer's own fixture" are
+> superseded by [ADR-0024](0024-the-daily-clock-the-caged-observation-lane-and-the-derived-ledger.md)
+> (ticket 28; decisions D1, D2, D5 of [ADR-0023](0023-a-clock-appends-observations-and-one-signature-verified-by-a-controller.md)).
+> There is now a daily clock on every unit, the scheduled commit is gitsign-signed with the run's
+> own Actions identity, and the ledger is derived from closed-unmerged pull requests -- the fixture
+> is deleted. The rest stands, including the "named blind spot" this ADR recorded about the EOL
+> feed re-pricing with no commit, which ADR-0024 closes.
+
 # The proposer: the adopter runs it, in its own repo, and it opens the PR
 
 A cage tier is a priced verdict. When a feed re-prices a caged workload, the £ selects a different
