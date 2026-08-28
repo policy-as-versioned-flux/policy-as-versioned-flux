@@ -2,6 +2,10 @@
 
 Written 2026-08-28. This is the state of the map after the 2026-08-28 batch. Read this, then `map.md`, then the `## Answer` of each ticket you spec.
 
+## Spec
+
+`spec.md` was written 2026-08-28 from this handoff. Seam: the owner chose an end-to-end harness (ticket 52), placed inside the gate so there is one clock.
+
 ## What is decided
 
 - 22 tickets are resolved (01 to 16, 18 to 20, 22 to 24). Their one-line gists are in `map.md` under Decisions so far. Each ticket's `## Answer` holds the detail. A held round above the Answer is the record of what was recommended; the Answer is what was accepted.
