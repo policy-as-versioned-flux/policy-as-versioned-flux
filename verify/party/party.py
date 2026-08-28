@@ -9,7 +9,7 @@ warned that a `roles:` field nothing checks would be the estate's fourth
 assertion that cannot fail — this module is the guard that makes it fail
 correctly. It REFUSES a party whose declared role has no filesystem evidence:
 
-    risk-bearer  ->  an entry in platform/risk/appetite.json
+    risk-bearer  ->  an `appetite` band on the party's OWN signed party.yaml
     publisher    ->  a *.sig file, a recorded *VERSION*.json, or a party.yaml that declares
                      publishes[] (ADR-0019: the tag signs, so an untagged feed.json is not
                      evidence; a declared feed is delegated to verify/feed-contract, which
@@ -19,9 +19,13 @@ correctly. It REFUSES a party whose declared role has no filesystem evidence:
                      or in-repo path (estate/X/) under its own dir
 
 Institutions (driftwood/tuppence/ludlow) are derived, not hard-coded: risk-bearer
-+ adopter, but NOT publisher. That third role is exactly what keeps `platform` —
-which is also risk-bearer+adopter, see reflexive.py — off the institution count
-when its appetite band moves into the shared store (ticket 16 part 2).
++ adopter, but NOT a `platform`-role party. The exclusion used to read "NOT
+publisher", which worked only while `platform` was the one party that published.
+Eco-system ticket 21 opened `publishes[]` to any party and ticket 25 had driftwood
+publish its own forward-intel feed, so "publisher" stopped discriminating and would
+have silently dropped driftwood off the count. The `platform` role is what actually
+means "the apparatus, not one of the institutions it governs", so that is what the
+derivation now reads.
 
 Usage:
     party.py check       # refuse (non-zero, lists why) any role the filesystem contradicts
@@ -36,12 +40,17 @@ import re
 import sys
 import tempfile
 
+import yaml
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))  # verify/, for _estate
 from _estate import ESTATE  # noqa: E402
 
 ROLES = os.path.join(HERE, "roles.json")
-APPETITE = os.path.join(ESTATE, "platform", "risk", "appetite.json")
+# risk-bearer evidence moved onto each party's OWN signed artefact (eco-system
+# ticket 25 / ADR-0021): platform/risk/appetite.json is retired, and a band no
+# party signs is a missing instrument, not a fixture entry.
+APPETITE = ESTATE
 
 VALID_ROLES = {"publisher", "risk-bearer", "adopter", "platform", "insurer"}  # ADR-0019/ticket 21: platform, insurer
 
@@ -58,9 +67,27 @@ def _files(party_dir):
 
 
 def is_risk_bearer(party, appetite_path=APPETITE):
-    with open(appetite_path) as fh:
-        orgs = json.load(fh).get("orgs", {})
-    return party in orgs
+    """risk-bearer evidence: the party's OWN party.yaml declares an appetite band.
+
+    `appetite_path` is the estate directory the party artefacts live under, kept
+    as the parameter name so check_party()/check_all()'s callers and their
+    planted-violation fixtures do not change.
+
+    The artefact is PARSED, not pattern-matched: `appetite: {tolerance: {...}}`
+    on one line is the same signed fact as the block form, both are valid under
+    platform/party/schema.json, and a party that wrote the flow form would have
+    been reported as a role the filesystem contradicts. This reads the same
+    shape `platform/risk/enforce.py:appetite_money` reads.
+    """
+    path = os.path.join(appetite_path, party, "party.yaml")
+    if not os.path.isfile(path):
+        return False
+    try:
+        with open(path) as fh:
+            doc = yaml.safe_load(fh) or {}
+    except (OSError, yaml.YAMLError):
+        return False
+    return bool(isinstance(doc, dict) and (doc.get("appetite") or {}).get("tolerance"))
 
 
 def ships_signed_versioned_artefact(party_dir):
@@ -134,10 +161,12 @@ def check_all(roles_path=ROLES, estate_dir=ESTATE, appetite_path=APPETITE):
 
 
 def institutions(parties):
-    """risk-bearer + adopter, but NOT publisher — see module docstring."""
+    """risk-bearer + adopter, but NOT a `platform`-role party — see module docstring.
+    An institution that publishes a feed of its own (driftwood's forward-intel, ADR-0021)
+    is still an institution; only the apparatus stands outside the count."""
     return sorted(
         p for p, roles in parties.items()
-        if "risk-bearer" in roles and "adopter" in roles and "publisher" not in roles
+        if "risk-bearer" in roles and "adopter" in roles and "platform" not in roles
     )
 
 
@@ -168,12 +197,12 @@ def cmd_selfcheck(_args):
     # 2. The guard actually bites: plant each violation in isolation (never
     #    touching the real committed files) and watch check_party refuse it.
     with tempfile.TemporaryDirectory() as tmp:
-        # a. risk-bearer with no appetite entry.
-        empty_appetite = os.path.join(tmp, "appetite.json")
-        with open(empty_appetite, "w") as fh:
-            json.dump({"orgs": {}}, fh)
+        # a. risk-bearer whose own party.yaml declares no appetite band.
+        os.makedirs(os.path.join(tmp, "driftwood"))
+        with open(os.path.join(tmp, "driftwood", "party.yaml"), "w") as fh:
+            fh.write("party: driftwood\nroles: [risk-bearer]\n")
         p = check_party("driftwood", ["risk-bearer"], list(parties),
-                         estate_dir=tmp, appetite_path=empty_appetite)
+                         estate_dir=tmp, appetite_path=tmp)
         assert p and "risk-bearer" in p[0], f"risk-bearer violation not caught: {p}"
 
         # b. publisher that ships nothing (no dir at all under the fake estate).
@@ -181,7 +210,6 @@ def cmd_selfcheck(_args):
         assert p and "publisher" in p[0], f"publisher violation not caught: {p}"
 
         # c. adopter that pins nothing (a real dir, but no reference to a peer).
-        os.makedirs(os.path.join(tmp, "driftwood"))
         with open(os.path.join(tmp, "driftwood", "note.txt"), "w") as fh:
             fh.write("nothing here pins anyone")
         p = check_party("driftwood", ["adopter"], list(parties), estate_dir=tmp)
@@ -189,11 +217,12 @@ def cmd_selfcheck(_args):
 
         # d. and the same planted state passes once evidence is added back —
         #    the guard refuses the absence, not the party.
-        with open(empty_appetite, "w") as fh:
-            json.dump({"orgs": {"driftwood": {"tolerance": 1}}}, fh)
+        with open(os.path.join(tmp, "driftwood", "party.yaml"), "w") as fh:
+            fh.write("party: driftwood\nroles: [risk-bearer]\n"
+                     "appetite:\n  tolerance: { amount: 1, currency: GBP }\n")
         p = check_party("driftwood", ["risk-bearer"], list(parties),
-                         estate_dir=tmp, appetite_path=empty_appetite)
-        assert not p, f"risk-bearer with a real entry must pass: {p}"
+                         estate_dir=tmp, appetite_path=tmp)
+        assert not p, f"risk-bearer with a signed band must pass: {p}"
 
     print("ok  guard bites: risk-bearer/publisher/adopter violations each refused when planted, "
           "cleared once evidence is restored")

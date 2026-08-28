@@ -37,7 +37,7 @@ Two cross-cutting areas stay **in this hub repo**, not split out to a
 cross-party comparison needs:
 
 - [`../verify/`](../verify/) — the cross-institution money-shot beats
-  (proportionality, provenance, party/role checking).
+  (proportionality, provenance, party/role checking, the feed contract, the £ seam).
 - `talk/` (this directory) — the Marp deck + demo runbook that tour the whole
   estate.
 
@@ -59,11 +59,27 @@ step, each discovered by `talk/verify-all.sh` as its own graded sub-result:
 |---|---|---|
 | 1 | `verify-e2e-step1-regulator-publishes.sh` | 21 |
 | 2 | `verify-e2e-step2-renovate-pins-and-reprices.sh` | 25 |
-| 3 | `verify-e2e-step3-price-crosses-band-pr-opens.sh` | 26 |
+| 3 | `verify-e2e-step3-price-crosses-band-pr-opens.sh` | 25 (python half), 26 (cluster half) |
 | 4 | `verify-e2e-step4-flux-reconciles-cage.sh` | 40 |
 | 5 | `verify-e2e-step5-twin-forecasts.sh` | 49 |
 | 6 | `verify-e2e-step6-provenance.sh` | 32 |
 | 7 | `verify-e2e-step7-honesty.sh` | 52 |
+
+Steps 2 and 3 became real with ticket 25 and run offline, against the committed estate, in
+about a second each:
+
+- **Step 2** copies an adopter's committed tree to a temp directory, composes it once, bumps one
+  pinned feed version in its own `party.yaml` — the single edit a merged Renovate PR makes — and
+  composes again. It fails if `prices[]` comes back identical, and exits 3 naming what is
+  missing when no adopter pins a priceable feed that has a newer version on disk. No repo is
+  touched: the copy is thrown away.
+- **Step 3** (python half) reads the adopter's OWN signed appetite band off `party.yaml`, finds
+  the residual that crosses it, and shows the tier change, attributed to the version the
+  adopter's `selection-policy` package publishes. It then runs `platform/wargamer/tier_pr.py
+  run --dry-run` and asserts the proposer would open a pull request editing the tier
+  declaration. **Nothing is opened and nothing is written** — the dry run works on a throwaway
+  copy in a directory that is not a git repo, so a real push could not succeed even if the flag
+  were ignored. The tier landing in force is step 4's fact, not this one's.
 
 Step N prints `E2E step N <name>` and then `PASS:`, `FAIL:` or `SKIP: step N not built yet,
 owned by ticket NN` until its ticket lands. Step 7 runs steps 1 to 6 with a 120s timeout each

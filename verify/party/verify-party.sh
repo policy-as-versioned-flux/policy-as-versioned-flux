@@ -5,8 +5,9 @@
 # the estate's fourth assertion that cannot fail; this is the guard that makes
 # it fail correctly, plus the proof that merging platform's strict appetite
 # band into the shared store (ticket 16 part 2) did not sweep it in as a
-# fourth institution. Offline, pure stdlib. Exits non-zero if the beat would
-# fail on stage.
+# fourth institution. Offline; stdlib plus pyyaml, because the risk-bearer
+# evidence is a PARSE of the signed artefact, not a pattern match over it.
+# Exits non-zero if the beat would fail on stage.
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 say()  { printf '\033[1;36m==>\033[0m %s\n' "$*"; }

@@ -1,12 +1,12 @@
 {
-  "note": "roles: (CONTEXT.md 'Role') -- publisher ships a signed, versioned artefact others pin; risk-bearer carries a declared appetite band in platform/risk/appetite.json (post-split: fetched into ../../.estate-clone/platform/ by ../../clone-estate.sh); adopter pins and consumes another party's artefact. Roles compose -- a party may hold several -- and party.py checks every entry here against the real filesystem: this file only DECLARES, it never proves. roles here mirror each unit's signed party.yaml (platform: publisher+platform, no baseline, so not an adopter; insurer: publisher of the quote feed, first version ticket 36). A publisher whose party.yaml declares publishes[] is 'declared and delegated': verify/feed-contract checks what it publishes and SKIPs until the signed tag exists, so a feed.json on a branch is never counted as a signature (ADR-0019: the tag signs).",
+  "note": "roles: (CONTEXT.md 'Role') -- publisher ships a signed, versioned artefact others pin; risk-bearer carries a declared appetite band on its OWN signed party.yaml (eco-system ticket 25 / ADR-0021 retired platform/risk/appetite.json); adopter pins and consumes another party's artefact. Roles compose -- a party may hold several -- and party.py checks every entry here against the real filesystem: this file only DECLARES, it never proves. roles here mirror each unit's signed party.yaml (platform: publisher+platform, no baseline, so not an adopter; insurer: publisher of the quote feed, first version ticket 36; driftwood is a publisher too since its twin started emitting a forward-intel feed, ADR-0021 -- which is why the institution count excludes the `platform` ROLE, not the publisher one). A publisher whose party.yaml declares publishes[] is 'declared and delegated': verify/feed-contract checks what it publishes and SKIPs until the signed tag exists, so a feed.json on a branch is never counted as a signature (ADR-0019: the tag signs).",
   "parties": {
     "platform":  ["publisher", "platform"],
     "nist":      ["publisher"],
     "ico":       ["publisher"],
     "feeds":     ["publisher"],
     "insurer":   ["publisher", "insurer"],
-    "driftwood": ["risk-bearer", "adopter"],
+    "driftwood": ["risk-bearer", "adopter", "publisher"],
     "tuppence":  ["risk-bearer", "adopter"],
     "ludlow":    ["risk-bearer", "adopter"]
   }

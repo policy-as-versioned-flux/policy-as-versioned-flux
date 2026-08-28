@@ -28,3 +28,9 @@ estate/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Refusal-fixture plants. driftwood/verify-twin-overlay.sh copies a twin tree
+# under the hub root (the emitter finds its package by walking up), and removes
+# it in a `finally`. An interrupted run — Ctrl-C, gate timeout — leaves one
+# behind; this keeps `git add -A` from sweeping it into a commit.
+.plant-*/
