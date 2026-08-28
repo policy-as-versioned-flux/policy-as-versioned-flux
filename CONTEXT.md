@@ -264,6 +264,27 @@ that a rewritten entry cites stay as the record of the decision at the time.
 
 ---
 
+- **Feed** (added 2026-08-28) — A signed, versioned artefact that prices and carries no rules: a
+  threat register, a CVE list, an EOL list, market intel, a penalty schema, a prediction-market
+  move, a news event. Every feed is one **envelope**: `kind: feed`, a free `name`, a version, the
+  publisher, a date, a payload schema and the payload. Only the payload differs between feeds. The
+  signature is the publisher's tag (ADR-0012, ADR-0019).
+
+- **Parent kind** (rewritten 2026-08-28) — What a party's parent gives it. Exactly three:
+  **controls** (a catalogue plus named baselines), **implementations** (policy bodies plus control
+  claims), **feed** (prices, no rules). Closed; a new feed is a new `name`, not a new kind.
+
+- **Subscription** (added 2026-08-28) — An adopter's pin of a parent, recorded in its signed party
+  artefact with the date it first pinned. There is no other subscription record.
+
+- **Discovery record** (added 2026-08-28) — A publisher's own declaration, in its signed party
+  artefact, of what it publishes and which versions it has revoked. The set of these records is the
+  only catalogue.
+
+- **Revocation** (added 2026-08-28) — A publisher withdraws a feed version by publishing a newer one
+  and listing the old one as revoked. A tag is never deleted. A pin to a revoked version is a priced
+  hole: the cage tightens; it is never refused.
+
 ## Project posture (resolved)
 
 - **Fidelity = "faithful to intent."** Reproduce the thesis and its ethos 1:1, but let Flux do
