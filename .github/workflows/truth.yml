@@ -14,6 +14,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: truth
+  cancel-in-progress: false
+
 jobs:
   gate:
     runs-on: ubuntu-latest
@@ -31,7 +35,7 @@ jobs:
       - name: the gate
         id: gate
         continue-on-error: true
-        run: bash talk/verify-all.sh | tee gate.out
+        run: set -o pipefail; bash talk/verify-all.sh | tee gate.out
       - name: record the TRUTH line
         run: |
           grep '^TRUTH ' gate.out | tee -a talk/truth.log >> "$GITHUB_STEP_SUMMARY"
