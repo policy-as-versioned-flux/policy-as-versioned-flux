@@ -11,3 +11,7 @@ The cage as the only enforcement, in full. The ladder gains a bottom rung below 
 ## Notes
 
 Re-grills 15, 16, 23, 28; reversals 5, 11, 12, 13, 17; findings H2-01..H2-16, H8-03, H8-09, H8-12. Blocked by the £ seam because the tier's source is decided there.
+
+## Comments
+
+- 2026-08-28, from ticket 03: platform v3.0.0 `require-nonroot` refuses every baseline-tier pod, because `cage-tier` mutates `readOnlyRootFilesystem=false` before validation. A tightened rule and the default cage contradict. The ladder must say which wins, or price it.
