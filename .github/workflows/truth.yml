@@ -25,7 +25,7 @@ jobs:
       - name: kyverno, cosign, flux CLIs the offline proofs call
         run: |
           set -e
-          curl -sSL https://github.com/kyverno/kyverno/releases/latest/download/kyverno-cli_linux_x86_64.tar.gz | sudo tar -xz -C /usr/local/bin kyverno
+          curl -sSL https://github.com/kyverno/kyverno/releases/download/v1.19.0/kyverno-cli_v1.19.0_linux_x86_64.tar.gz | sudo tar -xz -C /usr/local/bin kyverno
           curl -sSL https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64 -o cosign && chmod +x cosign && sudo mv cosign /usr/local/bin/
           curl -s https://fluxcd.io/install.sh | sudo bash
       - name: the gate
