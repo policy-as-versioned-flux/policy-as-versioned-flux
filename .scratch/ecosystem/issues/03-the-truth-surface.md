@@ -44,3 +44,7 @@ Resolved 2026-08-28. Hub commits `ebe1757` and `db47f88` on main. Five PRs open 
 - The 12 `test_enact.py` failures assert a mode the checked-in `ENACT_MODE` does not select. They need an owner decision on which mode the tests assert. Not changed.
 - driftwood `scripts/up.sh` seeds the in-cluster git server at a fresh commit, so the new verifier FAILs the commit comparison on a locally seeded cluster until up.sh seeds the pinned commit.
 - The `docker down` and `Flux not Ready` branches of the substrate helpers were not exercised live. Clusters existed on the host and were not touched.
+
+### CI confirmation
+
+`truth` run 5 (2026-08-28T05:08Z, hub `d4fcdb2`, no cluster): pass=43 fail=11 skip=0 excluded=2 total=56. The line is in `talk/truth.log`, committed by the workflow. The run ends red because the gate is red. Three workflow fixes landed on the way: pinned kyverno download, rebase before push, one run at a time with `pipefail`.
