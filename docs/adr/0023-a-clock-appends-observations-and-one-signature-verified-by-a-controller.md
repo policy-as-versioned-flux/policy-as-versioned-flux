@@ -9,6 +9,34 @@ to `main` (tickets 03, 10, 16, 20) and whether Flux needs a second signature on 
 (tickets 12, 16, 18). Put to the owner on 2026-08-28 with a three-lens panel. The owner wrote
 "I agree with you're more advanced reasoning". Decided in `.scratch/ecosystem/issues/10` and `16`.
 
+## Amendment, 2026-08-29: what "one signature" is true of today
+
+D3 below says the gitsign tag is the only signature. Three verification mechanisms are live in the
+gate, and the two that are not gitsign are inherited, not new. Recorded here rather than left as an
+ADR asserting something the gate contradicts. Nothing in this amendment permits a new signer: hard
+rule 6 stands, no new `.sig`, key or bundle may be added for any artefact.
+
+1. **The cosign evidence bundle.** `platform/computed-semver/evidence/*.json.bundle`, produced by
+   `.github/scripts/cut-release-gate.py` with `cosign sign-blob` and verified by every adopter's
+   `.github/scripts/adopter-gate.py`. It is the only signature a consumer actually verifies today,
+   and it covers a release-gate evidence blob rather than an artefact. **Retires when** the
+   adopter gate reads the release evidence out of the signed tag instead of a detached blob.
+2. **platform's ed25519 feed key**, `feeds/keys/feeds-signing-key.pub.pem` with the `.sig` files
+   beside the threat-register, cve and eol feeds. Its feeds have migrated to the `feeds` party on
+   this branch, and every adopter now pins the migrated versions. **Retires when** the `feeds`
+   party has cut the tags those pins wait for: delete `feeds/keys/`, the `.sig` files and the five
+   openssl blocks that read them (`platform/feeds/verify-feeds.sh`, `wardley/`, `honesty/`,
+   `wargamer/`, and the hub's `verify/provenance/`).
+3. **ico's ed25519 schema key**, `schema/keys/ico-signing-key.pub.pem`, `schema/sign.sh` and the
+   `.sig` files beside `schema/v1` and `schema/v2`. The penalty schema now publishes in the
+   ADR-0019 envelope and all three adopters pin `penalty-schema` v3. **Retires when** ico has cut
+   the `v3.0.0` tag those pins wait for: delete `schema/keys/`, `schema/sign.sh`, the `.sig` files
+   and `verify-penalty-feed.sh`'s openssl block.
+
+Both key-based signers are past the trigger their own migration set and are waiting only on tags
+`cut-release.yml` cuts after a merge, which no agent may cut (hard rule 3). Until those tags exist
+the estate cannot say "one signature" without this paragraph beside it.
+
 ## The decision
 
 - A scheduled run may **append observations** to `main`: the truth log, drift samples, gate

@@ -17,7 +17,11 @@ fi
 "$PY" "$HERE/feed_contract.py" selfcheck >/dev/null || { echo "FAIL: feed_contract.py selfcheck"; exit 1; }
 log="$(mktemp)"; "$PY" "$HERE/feed_contract.py" check | tee "$log"; rc=${PIPESTATUS[0]}
 case $rc in
-  0) echo "PASS: every published feed is one envelope and every subscription resolves to a real tag";;
+  # "resolves to a real tag" was read as a signature check. It is not: `git ls-remote --tags`
+  # proves a tag of that NAME exists on the publisher's real remote and nothing about who signed
+  # it. The gitsign verification of a tag is verify/e2e/verify-e2e-step6-provenance.sh part 3 and
+  # platform/verify-source-verification.sh; this line says only what it looked at.
+  0) echo "PASS: every published feed is one envelope, and every subscription names a tag that exists on the publisher's real remote (existence, not signature -- step 6 checks the signature)";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
   *) echo "FAIL: $(grep -c '^FAIL:' "$log") feed-contract check(s) observed false";;
 esac
