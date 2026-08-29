@@ -105,18 +105,43 @@ else
   esac
 fi
 
-# the workload keeps running, caged tighter: a Running pod wearing the Namespace's tier.
-pod="$(k get pods -n "$NS" --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}')"
-if [ -z "$pod" ]; then
-  missing+=("no Running pod in governed Namespace $NS to carry the cage [ticket 26, live defect 1]")
-elif [ -n "$tier" ]; then
-  ptier="$(k get pod -n "$NS" "$pod" -o jsonpath='{.metadata.labels.posture\.acme\.io/tier}')"
-  caged="$(k get pod -n "$NS" "$pod" -o jsonpath='{.metadata.labels.posture\.acme\.io/caged}')"
-  pc="$(k get pod -n "$NS" "$pod" -o jsonpath='{.spec.priorityClassName}')"
-  if [ "$ptier" = "$tier" ] && [ "$caged" = true ] && [ "${pc#cage-}" != "$pc" ]; then
-    echo "  ok  pod $pod is Running and wears the Namespace's cage: tier=$ptier caged=true priorityClass=$pc"
-  else
-    fail "pod $pod does not wear Namespace tier '$tier' (tier='$ptier' caged='$caged' priorityClass='$pc')"
+# The workload keeps running, caged tighter: THE ADOPTER'S OWN declared
+# workload, wearing the Namespace's tier.
+#
+# 2026-08-29 review: this used to read items[0] of every Running pod in the
+# Namespace, which carries no workload of its own -- so the verdict was
+# whatever pod happened to exist. Three different verdicts were observed on one
+# commit inside twenty minutes, one of them a hard FAIL on another agent's
+# probe pod. The fact is now about a pod this step can name: the one
+# deploy/pod.yaml declares.
+want_pod="$(python3 -c "
+import sys, yaml
+try:
+    docs = [d for d in yaml.safe_load_all(open('$ESTATE/$ADOPTER/deploy/pod.yaml')) if d]
+except Exception:
+    sys.exit(0)
+print(next((d['metadata']['name'] for d in docs if d.get('kind') == 'Pod'), ''))
+" 2>/dev/null)"
+if [ -z "$want_pod" ]; then
+  missing+=("$ADOPTER declares no workload in deploy/pod.yaml, so this step has no pod of its own to read [ticket 26]")
+else
+  phase="$(k get pod -n "$NS" "$want_pod" -o jsonpath='{.status.phase}' 2>/dev/null || true)"
+  pod="$want_pod"
+  if [ "$phase" != "Running" ]; then
+    missing+=("$ADOPTER's own workload $want_pod is not Running in governed Namespace $NS (phase='${phase:-absent}'), so no pod this step owns carries the cage [ticket 26]")
+  elif [ -n "$tier" ]; then
+    ptier="$(k get pod -n "$NS" "$pod" -o jsonpath='{.metadata.labels.posture\.acme\.io/tier}')"
+    caged="$(k get pod -n "$NS" "$pod" -o jsonpath='{.metadata.labels.posture\.acme\.io/caged}')"
+    pc="$(k get pod -n "$NS" "$pod" -o jsonpath='{.spec.priorityClassName}')"
+    if [ "$ptier" = "$tier" ] && [ "$caged" = true ] && [ "${pc#cage-}" != "$pc" ]; then
+      echo "  ok  pod $pod is Running and wears the Namespace's cage: tier=$ptier caged=true priorityClass=$pc"
+    else
+      # Not a FAIL: ADR-0022 names the legitimate case where a pod admitted
+      # BEFORE a tier move still carries the old label (the synchronize gap).
+      # That is observed-stale, not observed-false, and the two are told apart
+      # by a human reading the reason -- so it is a named could-not-look.
+      missing+=("pod $pod does not wear Namespace tier '$tier' (tier='$ptier' caged='$caged' priorityClass='$pc') -- either the cage did not run on it or it was admitted before the tier moved (the synchronize gap, ADR-0022) [ticket 26]")
+    fi
   fi
 fi
 
