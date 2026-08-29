@@ -16,6 +16,19 @@ from twin.cli import main
 from twin.grades import Capabilities
 from twin.repo import ModelRepo
 
+@pytest.fixture(autouse=True)
+def _operations_mode(monkeypatch):
+    """Every test in this module asserts what the guard DOES when it is on, never what the default
+    is. `enact_guard.decide` opens with `if enact_mode() != "operations": return None` (commit
+    9282301, "make enact_guard's disposition refusal a mode, default permissive while building"),
+    and the mode defaults to `development`, so thirteen of these had been returning None and
+    failing since that commit -- a red suite that made a real regression in the guard
+    indistinguishable from the deliberate default. The default itself is asserted by
+    `test_the_mode_defaults_to_development` style coverage in the guard's own tests, not here.
+    """
+    monkeypatch.setenv("TWIN_ENACT_MODE", "operations")
+
+
 NETFLIX = ["--org", "netflix"]
 RESPONSE = "expand-the-delivery-network"
 
@@ -241,10 +254,15 @@ def test_a_response_that_crosses_the_universal_floor_is_refused_not_priced(
 def test_the_dependency_pins_are_real_and_report_what_they_do_not_establish(proposal: Artefact) -> None:
     """Consumed by real separate repositories is a claim about files, so it is read from them."""
     dependency = proposal.body["dependency"]
-    assert {"driftwood", "ludlow", "tuppence"} == set(dependency["consumer_repositories"])
+    # Re-read against the live .estate-clone on 2026-08-29 and updated to what is actually there,
+    # rather than left asserting the estate of an earlier wave: the `insurer` party now carries its
+    # own gitops/platform/platform-pin.yaml (ticket 36 -- a pure consumer pins the platform without
+    # reconciling it), and driftwood's gitops/composed/composed-set.yaml added `driftwood-composed`
+    # as a source (ticket 40). Both are real repositories consuming real pins, so both belong here.
+    assert {"driftwood", "insurer", "ludlow", "tuppence"} == set(dependency["consumer_repositories"])
     # A repository syncing itself consumes nobody's policy, so it never reaches this list.
-    assert {"platform", "nist"} == set(dependency["dependencies"])
-    assert dependency["cross_repository_pins"] == 6
+    assert {"platform", "nist", "driftwood-composed"} == set(dependency["dependencies"])
+    assert dependency["cross_repository_pins"] == 8
     assert dependency["self_sync_pins"] == 3
     assert all(pin["tag"] for pin in dependency["pins"])
     # mo-12 repointed ESTATE_DIR at the live .estate-clone/ clone of the real repos (was the hub's
@@ -254,7 +272,9 @@ def test_the_dependency_pins_are_real_and_report_what_they_do_not_establish(prop
     # commented-out placeholder ("pinned at release by the wave-push", not yet done). Verified
     # directly against the clone, not assumed — see mo-12 ticket Comments.
     assert all(pin["commit_pinned"] for pin in dependency["pins"] if pin["cross_repository"])
-    assert not any(pin["commit_pinned"] for pin in dependency["pins"] if not pin["cross_repository"])
+    # The self-sync placeholders have since been filled in too, so every pin in the live estate
+    # now carries a commit and this is no longer the two-sided assertion it was.
+    assert all(pin["commit_pinned"] for pin in dependency["pins"] if not pin["cross_repository"])
     assert any("movable name" in limit for limit in dependency["limits"])
 
 
