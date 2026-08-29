@@ -55,9 +55,16 @@ CONTAMINATION = ("low", "high", "control")
 # "not yet specified" scenario-library-contents item). Named once here rather than left to grep
 # through fixture ids, so the invariant that enumerates them and a fixture that drops one by typo
 # fail the same way — on the list, not on a reader's memory of it.
+# `eol-date-passes` and `penalty-published` join at ecosystem ticket 29 (decision ticket 11 answer
+# item 4). Each is the same three-place change the nine above were: this enum, an executable
+# scenario in the library fixture, and the adopter overlay that realises it. `penalty-published`
+# forecasts what a published penalty does to the value chain — customer attrition, a lost channel
+# — and never the size of the fine, which the estate prices from the regulator's own schema
+# (ADR-0021: two engines only where each answers a different question).
 COMMITTED_SCENARIO_CLASSES = (
     "quantum-hndl", "bus-factor-key-person", "insider-coercion", "supply-shock", "sanctions",
     "m-and-a", "memory-cost", "ai-model-access", "climate-event",
+    "eol-date-passes", "penalty-published",
 )
 
 # Which collections hold a **dated fact about the world**, and which field carries the date
@@ -203,12 +210,25 @@ def valuation(value: Any, where: str) -> None:
     """
     if not isinstance(value, dict):
         raise SchemaError(f"{where}: expected a valuation mapping, got {value!r}")
-    unknown = sorted((set(value) - {"amount", "evidence_grade", "basis"}), key=str)
+    # `basis` is prose, and prose is where an unreadable derivation hides: "one quarter of checkout
+    # revenue, from the signed management accounts behind party.yaml's size.turnover" was read as
+    # a quarter OF turnover and nobody could check which. The three optional fields below let an
+    # overlay state the arithmetic instead of describing it, so an adopter's verify script can
+    # re-derive the amount from the fact the party artefact actually signs. All optional: an
+    # overlay that carries none is exactly as valid as it was.
+    DERIVATION = {"derived_from_party_fact", "share_of_turnover", "periods_per_year"}
+    unknown = sorted((set(value) - {"amount", "evidence_grade", "basis"} - DERIVATION), key=str)
     if unknown:
         raise SchemaError(
             f"{where}: unknown field(s) {', '.join(str(u) for u in unknown)}; a valuation is "
-            "amount, evidence_grade and basis"
+            "amount, evidence_grade and basis, optionally with the derivation fields "
+            + ", ".join(sorted(DERIVATION))
         )
+    for field in ("share_of_turnover", "periods_per_year"):
+        if field in value:
+            amount(value[field], f"{where}.{field}")
+    if "derived_from_party_fact" in value and not str(value["derived_from_party_fact"]).strip():
+        raise SchemaError(f"{where}.derived_from_party_fact: names no fact")
     missing = sorted({"evidence_grade", "basis"} - set(value))
     if missing:
         raise SchemaError(
@@ -733,7 +753,15 @@ SCHEMAS: dict[str, Schema] = {
         # realises, and only that closed set, so a typo is a load-time refusal rather than a
         # silently uncounted class. A scenario naming no class (every flagship/backtest scenario
         # so far) is simply not part of the committed-set enumeration; nothing about it changes.
-        optional={"horizon": date, "substrate": text, "class": one_of(*COMMITTED_SCENARIO_CLASSES)},
+        # `note` (ecosystem ticket 29): the same optional free-text slot `edge`, `outcome` and
+        # `world-model` already carry, added here because an adopter's standing scenario has to
+        # record why it is scoped as it is — why the penalty scenario prices the consequence and
+        # never the fine, why one scenario carries no class — inside the signed artefact rather
+        # than in a README beside it that nothing loads and nothing validates.
+        optional={
+            "horizon": date, "substrate": text, "note": text,
+            "class": one_of(*COMMITTED_SCENARIO_CLASSES),
+        },
     ),
     # The answer-key format (build ticket 08): the boundary fixture the answer-key track tests
     # against. `contamination` is the slot the Enron control fills at build ticket 40.

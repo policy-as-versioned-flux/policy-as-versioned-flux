@@ -3697,15 +3697,26 @@ def build_twin_self_org(dest: str | Path) -> Path:
 
 LIBRARY_ORG = "library"
 
-_LIBRARY_WORLD: dict[str, str] = {
+# Public, not private, since ecosystem ticket 29: this is the world layer an adopter **vendors**
+# into its own repository (decision ticket 11 answer item 1 — the loader resolves `world_ref` on
+# the same `ModelRepo`, so an overlay in an adopter's repo must carry its world layer beside it).
+# It was already the only tenant-free world layer in the package; making adopters vendor it rather
+# than the Netflix/Intel-flavoured default is what lets the standing library's own scenarios and
+# an adopter's own scenarios name the same propositions.
+LIBRARY_WORLD_FILES: dict[str, str] = {
     "world/meta.yaml": """\
 id: world
 unit: world
 name: Shared world layer
 description: >-
-  The nine committed scenario classes (build ticket 69). Generic by construction — none names a
-  tenant — so any org overlay could reference them; one overlay exists only to run them.
+  The committed scenario classes (build ticket 69; ecosystem ticket 29 added eol-date-passes and
+  penalty-published). Generic by construction — none names a tenant — so any org overlay could
+  reference them; one overlay exists only to run them, and each adopter vendors this layer to
+  author its own standing scenarios against it.
 """,
+    # Vendored adopters need it (driftwood's checkout service `needs: [cloud-compute]`), and it is
+    # the same bytes as the default world layer's rather than a second spelling of one component.
+    "world/components/cloud-compute.yaml": WORLD_FILES["world/components/cloud-compute.yaml"],
     "world/components/cryptographic-key-material.yaml": """\
 id: cryptographic-key-material
 name: Cryptographic key material
@@ -3776,6 +3787,54 @@ kind: activity
 evolution: product
 visibility: 0.3
 """,
+    # -- ecosystem ticket 29: the two new committed classes, and the two scenarios ticket 19 sent
+    #    here. Tenant-free like every component above: a pinned release, a published enforcement
+    #    notice, a published exposure record and a publisher's feed are things any adopter has.
+    "world/components/pinned-dependency-release.yaml": """\
+id: pinned-dependency-release
+name: A pinned release of a published dependency
+kind: activity
+evolution: commodity
+visibility: 0.25
+description: >-
+  The version of a publisher's artefact an organisation currently pins. It has a publisher, a
+  published end-of-life date, and a newer release the organisation has not merged.
+""",
+    "world/components/published-enforcement-record.yaml": """\
+id: published-enforcement-record
+name: A regulator's published enforcement record
+kind: data
+evolution: commodity
+visibility: 0.6
+description: >-
+  A penalty a regulator has published, naming a party and a regime. Public the day it lands, and
+  read by customers and rivals as readily as by the party fined.
+""",
+    # Named "holes and prices" rather than anything with "exposure" in it on purpose: the
+    # signal binder scores token overlap between a component's id/name and a signal's own words
+    # (`signal_classify.best_match`), and "exposure" is common enough in dated technical signals
+    # that this component would quietly become the best match for signals that have nothing to do
+    # with it. A shared world layer's vocabulary is load-bearing.
+    "world/components/published-holes-and-prices.yaml": """\
+id: published-holes-and-prices
+name: The organisation's own published holes and prices
+kind: data
+evolution: product
+visibility: 0.7
+description: >-
+  The holes, prices and forecasts an organisation publishes about itself. Legible by design
+  (NORTH-STAR §2), which means legible to a rival on the same terms as to a regulator.
+""",
+    "world/components/sole-source-publisher-feed.yaml": """\
+id: sole-source-publisher-feed
+name: A publisher's feed the organisation pins
+kind: activity
+evolution: product
+visibility: 0.3
+description: >-
+  A feed inherited under the ADR-0019 envelope. Withdrawing it is the publisher's own decision;
+  the consumer finds out from a `revoked[]` entry or from a pin that stops moving.
+""",
     "world/propositions/harvest-now-decrypt-later-breaks-current-encryption-by-2035.yaml": """\
 id: harvest-now-decrypt-later-breaks-current-encryption-by-2035
 text: >-
@@ -3828,6 +3887,32 @@ text: >-
   A primary operating site suffers a declared climate event — flood, wildfire, extreme-heat
   closure — within the scenario horizon.
 """,
+    "world/propositions/a-pinned-dependency-passes-its-published-end-of-life-date.yaml": """\
+id: a-pinned-dependency-passes-its-published-end-of-life-date
+text: >-
+  A release the organisation currently pins passes the end-of-life date its own publisher
+  published, within the scenario horizon, with no newer pin merged.
+""",
+    "world/propositions/a-regulator-publishes-a-penalty-under-a-regime-in-force.yaml": """\
+id: a-regulator-publishes-a-penalty-under-a-regime-in-force
+text: >-
+  A regulator publishes an enforcement penalty under a regime the organisation is subject to,
+  within the scenario horizon. The proposition is about the publication, not about its size: what
+  the fine costs is priced from the regulator's own published schema, and what the publication
+  does to the value chain is what a scenario off this proposition forecasts.
+""",
+    "world/propositions/a-rival-reads-the-published-exposure-and-acts-on-it.yaml": """\
+id: a-rival-reads-the-published-exposure-and-acts-on-it
+text: >-
+  A competitor reads the exposure the organisation publishes about itself — its holes, its prices,
+  its forecasts — and acts on it commercially within the scenario horizon.
+""",
+    "world/propositions/a-publisher-withdraws-a-feed-the-organisation-pins.yaml": """\
+id: a-publisher-withdraws-a-feed-the-organisation-pins
+text: >-
+  A publisher withdraws a feed or catalogue the organisation pins, within the scenario horizon,
+  leaving the pin in force and unreplaced.
+""",
     "world/world_models/reference-map.yaml": """\
 id: reference-map
 name: The reference map for the committed scenario classes
@@ -3836,6 +3921,10 @@ note: >-
   One shared reference. It carries no privileged status — build ticket 16 already refuses one —
   and sits alongside whatever rival forecast an org's own overlay adds on top of it.
 beliefs:
+  a-pinned-dependency-passes-its-published-end-of-life-date: 0.45
+  a-regulator-publishes-a-penalty-under-a-regime-in-force: 0.5
+  a-rival-reads-the-published-exposure-and-acts-on-it: 0.25
+  a-publisher-withdraws-a-feed-the-organisation-pins: 0.1
   harvest-now-decrypt-later-breaks-current-encryption-by-2035: 0.15
   a-bus-factor-one-holder-departs-within-the-horizon: 0.35
   a-privileged-insider-acts-within-the-horizon: 0.08
@@ -3848,7 +3937,7 @@ beliefs:
 """,
 }
 
-_LIBRARY_OVERLAY: dict[str, str] = {
+LIBRARY_OVERLAY_FILES: dict[str, str] = {
     "orgs/library/scenarios/quantum-hndl-2026.yaml": """\
 id: quantum-hndl-2026
 question: Does harvest-now-decrypt-later exposure become live before today's encryption is retired?
@@ -3987,6 +4076,47 @@ affected_parties:
     who: Smaller vendors and integrators who must adapt their own tooling to a consolidating standard, not represented in this model.
     consequence: A consolidation this scenario forecasts is priced as the organisation's own adoption cost; the twin carries no perspective for the smaller parties adapting around it.
 """,
+    # -- ecosystem ticket 29's two new classes. The library carries one executable scenario per
+    #    committed class (invariant `standing_library_covers_committed_classes`), so these two are
+    #    the second of the three places each new class lands.
+    "orgs/library/scenarios/eol-date-passes-2026.yaml": """\
+id: eol-date-passes-2026
+question: Does a release the organisation pins pass its published end-of-life date within the horizon?
+proposition: a-pinned-dependency-passes-its-published-end-of-life-date
+at: '2026-08-28'
+horizon: '2027-08-28'
+components:
+  - pinned-dependency-release
+world_models:
+  - reference-map
+class: eol-date-passes
+affected_parties:
+  - id: users-of-the-unpatched-release
+    who: Everyone served by the software running on the end-of-life release, not represented in this model.
+    consequence: A date this scenario forecasts leaves them on an unpatched release chosen by someone else; the twin prices the organisation's exposure, never theirs.
+""",
+    # The seam, made structural: the shock is what the publication does to the value chain, and
+    # the amount of the fine is not in this scenario, its proposition, or anything downstream of
+    # it. The estate prices the fine from the regulator's own published schema.
+    "orgs/library/scenarios/penalty-published-2026.yaml": """\
+id: penalty-published-2026
+question: >-
+  When a regulator publishes a penalty under a regime in force, what does the publication itself
+  do to the value chain — customers lost, channel damaged — leaving the size of the fine to the
+  party that publishes the schedule?
+proposition: a-regulator-publishes-a-penalty-under-a-regime-in-force
+at: '2026-08-28'
+horizon: '2027-08-28'
+components:
+  - published-enforcement-record
+world_models:
+  - reference-map
+class: penalty-published
+affected_parties:
+  - id: the-data-subjects-the-penalty-is-for
+    who: The people whose records the penalty was imposed over, not represented in this model.
+    consequence: A publication this scenario forecasts is priced as the organisation's lost custom; the twin carries no perspective for those the regulator fined it on behalf of.
+""",
     "orgs/library/scenarios/climate-event-2026.yaml": """\
 id: climate-event-2026
 question: Does a primary operating site suffer a declared climate event within the horizon?
@@ -4016,12 +4146,12 @@ def build_library_org(dest: str | Path) -> Path:
     root.mkdir(parents=True, exist_ok=True)
     git(root, "init", "-q", "-b", "main", "--object-format=sha1")
 
-    _write(root, _LIBRARY_WORLD)
+    _write(root, LIBRARY_WORLD_FILES)
     git(root, "add", "-A")
     git(root, "commit", "-q", "-m", "world layer", dated="2026-08-01T00:00:00+00:00")
     world_commit = git(root, "rev-parse", "HEAD").strip()
 
-    _write(root, _LIBRARY_OVERLAY)
+    _write(root, LIBRARY_OVERLAY_FILES)
     _write(
         root,
         {

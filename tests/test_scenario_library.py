@@ -1,9 +1,9 @@
 """The standing scenario library (build ticket 69; decision ticket 13, spec story 43).
 
 One executable scenario per committed class — quantum/HNDL, bus-factor/key-person,
-insider/coercion, supply-shock, sanctions, M&A, memory cost, AI-model access, climate event —
-plus the opportunity leg and the backtest cases, all swept by the identical schedule ticket 09
-built. Assertions are on emitted artefacts and the invariant's own `Result`, never on internals.
+insider/coercion, supply-shock, sanctions, M&A, memory cost, AI-model access, climate event, and
+from ecosystem ticket 29 an EOL date passing and a penalty published — plus the opportunity leg
+and the backtest cases, all swept by the identical schedule ticket 09 built. Assertions are on emitted artefacts and the invariant's own `Result`, never on internals.
 """
 
 from __future__ import annotations
@@ -31,10 +31,13 @@ def library_overlay(library_repo_dir: Path) -> Overlay:
     return Overlay.load(ModelRepo.open(library_repo_dir), fixtures.LIBRARY_ORG)
 
 
-def test_nine_committed_classes_are_named_and_the_library_covers_all_of_them(
+def test_the_committed_classes_are_named_and_the_library_covers_all_of_them(
     library_overlay: Overlay,
 ) -> None:
-    assert len(COMMITTED_SCENARIO_CLASSES) == 9
+    # Counted from the enum, not typed here: ecosystem ticket 29 added the tenth and eleventh
+    # classes, and a hand-typed count is a second list that has to be remembered rather than a
+    # property of the one list.
+    assert len(COMMITTED_SCENARIO_CLASSES) == len(set(COMMITTED_SCENARIO_CLASSES)) >= 9
     present = {s["class"] for s in library_overlay.scenarios.values() if s.get("class")}
     assert present == set(COMMITTED_SCENARIO_CLASSES)
 
@@ -42,7 +45,7 @@ def test_nine_committed_classes_are_named_and_the_library_covers_all_of_them(
 def test_every_committed_class_scenario_actually_runs(
     library_repo_dir: Path, caps: Capabilities
 ) -> None:
-    """Executable, not just declared: each of the nine scenarios emits a real forecast."""
+    """Executable, not just declared: each committed class's scenario emits a real forecast."""
     repo = ModelRepo.open(library_repo_dir)
     overlay = Overlay.load(repo, fixtures.LIBRARY_ORG)
     seen_classes = set()
@@ -91,7 +94,8 @@ def test_the_standing_library_sweeps_with_no_separate_harness(tmp_path: Path, ca
         for e in artefact.body["executions"]
         if e["org"] == fixtures.LIBRARY_ORG
     }
-    assert len(classes_run) == 9, "every committed-class scenario ran inside the one sweep"
+    assert len(classes_run) == len(COMMITTED_SCENARIO_CLASSES), \
+        "every committed-class scenario ran inside the one sweep"
     # The backtest answer keys sit in the identical executions list — no second code path. Derived
     # from `BUILDERS` rather than listed by hand: a hand-kept copy of this set is exactly what let
     # build ticket 71's Royal Mail key sit outside the sweep unnoticed. The three excluded names

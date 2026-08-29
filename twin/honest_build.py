@@ -172,7 +172,13 @@ CAPABILITY_INVENTORY: tuple[CapabilityEntry, ...] = (
     ),
     CapabilityEntry(
         "substrate-generator", SKILL_KIND, "substrate_generator.py", False,
-        "Generate the world + plant signals against the eval targets (decision ticket 12).",
+        "Generate the world + plant signals against the eval targets (decision ticket 12). The "
+        "skill is a Claude Code skill a human runs, and its output is `authored`, never `derived` "
+        "(decision ticket 14; reversals 7, 14, 15: a model call is never a clock step). "
+        "`substrate_generator.py` is not that skill — it is the deterministic reference "
+        "implementation kept as the skill's eval, which is why this row's `reproducible` is "
+        "False: the skill it names is not reproducible from pins, whatever its eval is "
+        "(ecosystem ticket 29, decision ticket 11).",
     ),
     CapabilityEntry(
         "gameplay-lens", SKILL_KIND, "gameplay_lens.py", False,
