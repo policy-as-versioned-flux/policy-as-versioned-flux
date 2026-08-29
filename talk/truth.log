@@ -2,3 +2,4 @@ TRUTH 2026-08-28T04:00Z run=local hub=2326f31 units=[driftwood=eacae33 ico=8902b
 TRUTH 2026-08-28T04:50Z run=4 hub=d25e0e6 units=[driftwood=eacae33 ico=8902b66 ludlow=a800a58 nist=33a05df platform=58ef9c5 tuppence=751522b] pass=43 fail=11 skip=0 excluded=2 total=56
 TRUTH 2026-08-28T05:08Z run=5 hub=d4fcdb2 units=[driftwood=eacae33 ico=8902b66 ludlow=a800a58 nist=33a05df platform=58ef9c5 tuppence=751522b] pass=43 fail=11 skip=0 excluded=2 total=56
 TRUTH 2026-08-28T18:01Z run=6 hub=291a21d units=[driftwood=eacae33 ico=8902b66 ludlow=a800a58 nist=33a05df platform=58ef9c5 tuppence=751522b] pass=43 fail=11 skip=0 excluded=2 total=56
+TRUTH 2026-08-29T12:03Z run=7 hub=918022b units=[driftwood=eacae33 ico=8902b66 ludlow=a800a58 nist=33a05df platform=58ef9c5 tuppence=751522b] pass=43 fail=11 skip=0 excluded=2 total=56
