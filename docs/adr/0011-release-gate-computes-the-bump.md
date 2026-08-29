@@ -4,6 +4,25 @@ status: accepted
 
 # Release gate: compute the bump, refuse a weaker declaration, no override
 
+> **Superseding note, 2026-08-29 (ticket 43, ticket 18 Answer 1).** Two sentences below are
+> narrowed, nothing else changes.
+> 1. "Neither ever rewrites the declared number" becomes **never rewrites the declared BASE
+>    number**. A publish whose declared bump is weaker than the computed one is published
+>    DEGRADED: the base number is untouched and a prerelease suffix is appended
+>    (`policy/v4.0.1-quarantine.1`), which sorts below the clean number. The version string is
+>    the one thing every consumer reads, so it says what happened.
+> 2. "Both gates refuse a declared bump weaker than the computed one" becomes **publish it
+>    degraded**. Weaker-than-computed is a read-and-priced behaviour, not an instrument fault
+>    (ADR-0020): the gate read everything it needed. The array element carries
+>    `tier: quarantine` as a signed fact and the ADOPTER prices it under its own perspective;
+>    the publisher sets no floor in anyone else's repository (NORTH-STAR §2). Nothing is
+>    refused, everything is caged.
+>
+> Unchanged: the declared bump is now DECLARED, in the reviewed `versions.yaml` array element
+> (`bump:`) or ico/nist's `bump.yaml`, not derived from the tag arithmetic — and a declaration
+> that disagrees with the step the number takes still refuses, because the gate then has two
+> declarations of one fact and no rule for choosing between them.
+
 Two gates evaluate every policy bump against a corpus of workloads and derive **major / minor /
 patch** from observed verdict movement, rather than trusting the number a human typed into the
 release workflow. The **publisher gate** runs inside `cut-release.yml`, before `git tag`: it
