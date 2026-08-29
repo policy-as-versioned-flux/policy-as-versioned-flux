@@ -1,7 +1,7 @@
 # 50 — Build the news feed and the headline skill
 
 Type: task (AFK)
-Status: open
+Status: resolved
 Blocked by: 10, 21, 25
 
 ## Question
@@ -11,3 +11,9 @@ Ship `kind: feed, name: news` from the feeds repo with `payload.events[]` (`id, 
 ## Notes
 
 Graduated 2026-08-28 from ticket 23's resolution. Definition of done includes wiring its check into `talk/verify-all.sh`.
+
+## Answer
+
+Built 2026-08-29 by the /implement run of 2026-08-28 to 29. The news feed carries a minimal payload. The classify-and-judge step is a skill a human runs, writing binding and override, and only override prices. A verify script proves niobium is absent from the feed.
+
+Definition of done: its check is in `talk/verify-all.sh`. The run that recorded it is the TRUTH line of 2026-08-29.

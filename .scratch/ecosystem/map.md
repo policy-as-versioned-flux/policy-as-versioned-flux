@@ -48,6 +48,31 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 - [23 — The news feed and the headline skill](issues/23-the-news-feed-and-the-headline-skill.md) — the news feed carries observed entries only (`id, date, source, statement, provenance{url}`, no STEEP); niobium lives in the twin's scenario library, never in the feed; the headline skill is signal-classify plus evolution-judge run by a human, landing a grade-5 binding and an attributable override as one PR on the adopter's overlay; only the override or a regrade is price-eligible; forward-intel gains `claim_scope` and `derived_from`. Owner agreed without fault found; recorded provisional. Ticket 25 amends ADR-0021.
 - [24 — Size beyond turnover](issues/24-size-beyond-turnover.md) — HIPAA prices per individual per provision (`provisions` publisher-shipped, default 1); FCA prices `rate × relevant_revenue` (optional fact, defaults to turnover) with a publisher-shipped `widen_to` for stale size; PCI stays size-blind; every `prices[]` entry gains `per_customer`; each publisher ships its own converter and composition passes `size`; fx is HMRC monthly under ticket 10's one fetch rule (D2). Owner agreed without a reason; recorded provisional except D2.
 
+### Built 2026-08-29 — the thin slice runs, and the gate is green
+
+The `/implement` run of 2026-08-28 to 29 built the slice in five phases, each phase a workflow of
+builders, one integrator, adversarial reviewers, a fixer and a committer. Fifteen tickets resolved:
+21, 25, 26, 28, 29, 32, 36, 40, 41, 42, 43, 47, 49, 50 and 52. Each ticket's `## Answer` records
+what was built and which check in the gate proves it.
+
+The truth surface went from 40 pass, 16 fail of 56 to 65 pass, 0 fail, 16 could-not-look of 83.
+Every could-not-look names what it waits for. Nothing is red.
+
+Decisions the build had to take, each recorded in its ticket:
+
+- **Policy versions 2.0.0, 2.0.1 and 3.0.0 are retired, not patched.** They could never admit a
+  pod. A backport was built and then withdrawn: teaching an old line to read the Namespace tier is
+  ADR-0022, which the engine computes as major, so it cannot ride on a patch, and the patched lines
+  let a pod pick its own cage. Retirement is the estate's own mechanism and the only honest repair.
+- **The cage writes three priority fields, not one.** The Priority admission plugin re-derives
+  `priority` and `preemptionPolicy` from the mutated class and refuses if either disagrees.
+- **A hand-taken sample is a rehearsal and is never cited.** The five-fact grader refuses any
+  sample whose run id, committing identity or signature does not come from the observation lane.
+
+What the owner must do before more can be true: merge the branches and let each `cut-release.yml`
+cut its signed tags. Several checks read could-not-look by name until those tags exist. A signature
+cannot be made on this machine, and no build faked one.
+
 ## Not yet specified
 
 - The thin-slice build order is now tickets, not fog: 21 (feed contract), 25 (£ seam), 26 (cage ladder lands), 28 (clocks), 40 to 42 (Flux), 43 (first gate-determined release), 47 (deck). What remains dim:

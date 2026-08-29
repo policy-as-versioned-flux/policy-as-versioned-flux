@@ -1,7 +1,7 @@
 # 26 — The cage ladder lands
 
 Type: task (AFK)
-Status: open
+Status: resolved
 Blocked by: 09, 21
 
 ## Question
@@ -38,3 +38,9 @@ Found while greening the truth surface. Each is observed on the live driftwood K
    secret half of the beat is proved offline only, and the script now says so.
 4. `verify-posture-projection.sh` step 6 cannot assert its clobber case: the dry-run returns empty
    without a live Kyverno mutating webhook for that version.
+
+## Answer
+
+Built 2026-08-29 by the /implement run of 2026-08-28 to 29. The cage ladder is live on kind-driftwood at policy version 4.0.0. The tier is read from the governed Namespace through namespaceObject and written onto the pod as an output; a governed Namespace with no tier falls closed to isolated; the cage is tighten-only; the isolated rung has no reach; per-tier reach is generated. THE BLOCKER: the mutation had to write all three fields the Priority admission plugin derives (priorityClassName, priority, preemptionPolicy) or the API server refused every pod. Versions 2.0.0, 2.0.1 and 3.0.0 could never admit a pod and were RETIRED, not patched: teaching them the Namespace tier source is ADR-0022, which the engine computes as major, so it cannot ride on a patch. cage_engine.py now classifies a write of false over a workload true as a loosening.
+
+Definition of done: its check is in `talk/verify-all.sh`. The run that recorded it is the TRUTH line of 2026-08-29.
