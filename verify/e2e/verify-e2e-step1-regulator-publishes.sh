@@ -7,7 +7,11 @@ step 1 "regulator publishes"
 "$PY" -c 'import jsonschema, yaml' 2>/dev/null || skip "python lacks jsonschema/pyyaml"
 [ -d "$ESTATE/ico" ] || skip "no .estate-clone/ico (run clone-estate.sh)"
 log="$(mktemp)"; trap 'rm -f "$log"' EXIT
-"$PY" "$ROOT/verify/feed-contract/feed_contract.py" newest ico penalty-schema | tee "$log"; rc=${PIPESTATUS[0]}
+# Not `| tee`: the SKIP line below is printed by `skip`, and teeing it too put it
+# on the capture twice -- which let the deck's excerpt drop one copy and still
+# look complete while quoting only the green lines above it (review 2026-08-29).
+"$PY" "$ROOT/verify/feed-contract/feed_contract.py" newest ico penalty-schema >"$log" 2>&1; rc=$?
+grep -v '^SKIP:' "$log" || true
 case $rc in
   0) pass "ico's newest penalty-schema envelope validates and its tag is on the real remote";;
   3) skip "$(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;

@@ -129,6 +129,39 @@ def pins_another_party(party_dir, other_parties):
     return False
 
 
+def signed_roles(party, estate_dir=ESTATE):
+    """The roles the party itself SIGNS, off its own party.yaml. `None` when the
+    party has no artefact to read (a fixture, or a unit not cloned)."""
+    path = os.path.join(estate_dir, party, "party.yaml")
+    if not os.path.exists(path):
+        return None
+    doc = yaml.safe_load(open(path).read()) or {}
+    roles = doc.get("roles")
+    return sorted(roles) if isinstance(roles, list) else None
+
+
+def ships_platform_apparatus(party_dir):
+    """platform evidence: the version fan-out and the served cage it publishes.
+
+    ADR-0022 makes `platform` the entitlement to declare the top rung of the
+    cage ladder (verify-infra-declaration.sh proof 2 reads roles[] for exactly
+    this), so before 2026-08-29 the strongest entitlement in the estate was the
+    one role with no evidence function at all."""
+    return (os.path.isfile(os.path.join(party_dir, "distribution", "versions.yaml"))
+            and os.path.isdir(os.path.join(party_dir, "graded", "policies")))
+
+
+def publishes_quote_feed(party_dir):
+    """insurer evidence: at least one quote/<adopter>/v*/feed.json it publishes."""
+    quote = os.path.join(party_dir, "quote")
+    if not os.path.isdir(quote):
+        return False
+    for root, _dirs, files in os.walk(quote):
+        if "feed.json" in files and re.search(r"[/\\]v[0-9]", root):
+            return True
+    return False
+
+
 def check_party(party, roles, all_parties, estate_dir=ESTATE, appetite_path=APPETITE):
     """Return the list of ways `party`'s declared roles contradict the
     filesystem. Empty means every declared role has real evidence."""
@@ -145,10 +178,23 @@ def check_party(party, roles, all_parties, estate_dir=ESTATE, appetite_path=APPE
         "publisher": (lambda: ships_signed_versioned_artefact(party_dir),
                       f"ships no signed/versioned artefact under {party_dir}"),
         "adopter": (lambda: pins_another_party(party_dir, others), f"pins nothing under {party_dir}"),
+        "platform": (lambda: ships_platform_apparatus(party_dir),
+                     f"ships no distribution/versions.yaml and graded/policies/ under {party_dir}"),
+        "insurer": (lambda: publishes_quote_feed(party_dir),
+                    f"publishes no quote/<adopter>/v*/feed.json under {party_dir}"),
     }
+    assert set(checks) == VALID_ROLES, sorted(VALID_ROLES - set(checks))
     for role, (has_evidence, missing) in checks.items():
         if role in roles and not has_evidence():
             problems.append(f"{party}: declared {role}, {missing}")
+    # roles.json only DECLARES; the party SIGNS. Its own artefact is the source
+    # of truth and this file is a mirror, so a mirror that has drifted is a
+    # problem in itself -- on 2026-08-29 it said tuppence and ludlow were
+    # [risk-bearer, adopter] while both signed [risk-bearer, adopter, publisher].
+    signed = signed_roles(party, estate_dir)
+    if signed is not None and signed != sorted(roles):
+        problems.append(f"{party}: roles.json declares {sorted(roles)}, but {party}'s own signed "
+                        f"party.yaml declares {signed}")
     return problems
 
 

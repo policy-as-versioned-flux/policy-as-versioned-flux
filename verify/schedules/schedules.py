@@ -275,8 +275,7 @@ def cage_faults(doc: dict, job: dict) -> list[str]:
     faults = []
     writes_default = False
     can_write = _job_can_write(doc, job)
-    has_cage = any("observation cage" in str(s.get("name") or "")
-                   for s in (job.get("steps") or []))
+    has_cage = any(_is_cage_step(s) for s in (job.get("steps") or []))
     if can_write and not has_cage:
         faults.append("is a scheduled job with `contents: write` and no `observation cage` "
                       "step -- whatever it writes (including from inside a `uses:` action or "
@@ -335,11 +334,46 @@ def cage_faults(doc: dict, job: dict) -> list[str]:
             if not _allowed(path):
                 faults.append(f"declares {path!r} in OBSERVATION_LANE, which is not an "
                               f"observation path")
-    names = [str(s.get("name") or "") for s in (job.get("steps") or [])]
-    if not any("observation cage" in n for n in names):
-        faults.append("pushes the default branch with no `observation cage` step to fail the "
-                      "run when the tree carries a declaration")
+    if not any(_is_cage_step(s) for s in (job.get("steps") or [])):
+        faults.append("pushes the default branch with no `observation cage` step (one whose "
+                      "shell actually resets the index, stages only OBSERVATION_LANE and fails "
+                      "the run on anything else) to fail the run when the tree carries a "
+                      "declaration")
     return faults
+
+
+# The shell a real observation cage runs, as five substrings its `run:` must
+# carry. 2026-08-29 review: this used to be satisfied by the step's NAME alone
+# -- `any("observation cage" in step.name)` -- so a scheduled job with
+# `contents: write` whose real writing happens inside a called script passed by
+# carrying a step merely CALLED "the observation cage". That matters more than
+# it would otherwise, because the server-side leg of ADR-0024 cannot be applied
+# at all here (GitHub allows a push ruleset, the only kind carrying
+# file_path_restriction, on private or internal repositories only, and these are
+# public), so this checker plus the client-side step ARE the whole cage. A cage
+# that is the whole cage is graded on what it does, not on what it is called.
+# Two real shapes, both graded on what the shell does.
+#   LANE  -- the job appends to OBSERVATION_LANE: reset the index first, stage
+#            only the declared lane, judge the STAGED set against that same
+#            list, and fail the run on anything else.
+#   CLEAN -- the job declares nothing on the default branch at all (it opens a
+#            pull request instead): assert the tree is clean and fail if it is
+#            not.
+# Either way the step must be able to FAIL the run; a cage that cannot fail is
+# a print statement.
+CAGE_SHELL_LANE = ("git reset", "OBSERVATION_LANE", "git add",
+                   "git diff --cached --name-only", "exit 1")
+CAGE_SHELL_CLEAN = ("git status --porcelain", "exit 1")
+
+
+def _is_cage_step(step: dict) -> bool:
+    """A step is the observation cage when its shell does the cage's work. The
+    name is a label; this reads the `run:`."""
+    if "observation cage" not in str(step.get("name") or ""):
+        return False
+    script = str(step.get("run") or "")
+    return (all(f in script for f in CAGE_SHELL_LANE)
+            or all(f in script for f in CAGE_SHELL_CLEAN))
 
 
 def signed_artefact_faults(job: dict) -> list[str]:
@@ -600,13 +634,34 @@ jobs:
           echo hi >> observations/x.jsonl
       - name: the observation cage -- never a declaration
         run: |
+          git reset -q
           for p in ${OBSERVATION_LANE}; do git add -A -- "$p"; done
+          for f in $(git diff --cached --name-only); do
+            case "$f" in observations/*) ;; *) exit 1 ;; esac
+          done
           git commit -S -m x
           git push origin "HEAD:${GITHUB_REF_NAME}"
 """)
     assert cage_faults(caged, caged["jobs"]["sweep"]) == [], \
         cage_faults(caged, caged["jobs"]["sweep"])
     assert signed_artefact_faults(caged["jobs"]["sweep"]) == []
+
+    # (0) a step NAMED the observation cage whose shell does none of the cage's
+    # work. Until 2026-08-29 the name alone satisfied the check, so this passed.
+    named_only = wf("""
+env: {OBSERVATION_LANE: "observations"}
+on:
+  schedule: [{cron: "5 7 * * *"}]
+jobs:
+  sweep:
+    steps:
+      - name: the observation cage
+        run: |
+          echo "trust me"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+""")
+    faults = cage_faults(named_only, named_only["jobs"]["sweep"])
+    assert any("observation cage" in f for f in faults), faults
 
     # --- the five shapes that read as "caged" until 2026-08-28 ----------------
     def sweep_faults(text):

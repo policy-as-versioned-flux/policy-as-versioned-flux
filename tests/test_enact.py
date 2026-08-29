@@ -17,16 +17,24 @@ from twin.grades import Capabilities
 from twin.repo import ModelRepo
 
 @pytest.fixture(autouse=True)
-def _operations_mode(monkeypatch):
-    """Every test in this module asserts what the guard DOES when it is on, never what the default
-    is. `enact_guard.decide` opens with `if enact_mode() != "operations": return None` (commit
-    9282301, "make enact_guard's disposition refusal a mode, default permissive while building"),
-    and the mode defaults to `development`, so thirteen of these had been returning None and
-    failing since that commit -- a red suite that made a real regression in the guard
-    indistinguishable from the deliberate default. The default itself is asserted by
-    `test_the_mode_defaults_to_development` style coverage in the guard's own tests, not here.
+def _as_shipped(monkeypatch):
+    """Run the guard AS SHIPPED, not as monkeypatched.
+
+    History, because it is the whole point of this fixture. Commit 9282301 made the refusal a mode
+    defaulting to `development`, under which `decide` returns `None` for everything; thirteen tests
+    in this module went red and stayed red. They were then made green by this fixture setting
+    `TWIN_ENACT_MODE=operations` for the test process -- which asserted a guard nobody ships and
+    left the shipped default asserted by nothing at all. The docstring even cited a
+    `test_the_mode_defaults_to_development` that did not exist.
+
+    The fix was on the other side (2026-08-29): `enact_guard.DEFAULT_MODE` is now `operations` and
+    `twin/ENACT_MODE` says so, so the tests and the guard agree on the SAFE reading. All this
+    fixture does now is clear an ambient `TWIN_ENACT_MODE` out of the way, so a shell that happens
+    to export one cannot decide what the suite observed. Flip the checked-in mode back to
+    `development` and thirteen of these go red again -- deliberately, because that flip is a real
+    weakening and a weakening that shows in a test is the only kind anybody notices.
     """
-    monkeypatch.setenv("TWIN_ENACT_MODE", "operations")
+    monkeypatch.delenv("TWIN_ENACT_MODE", raising=False)
 
 
 NETFLIX = ["--org", "netflix"]
@@ -64,6 +72,47 @@ def test_layer_1_exposes_propose_and_nothing_that_disposes() -> None:
         and getattr(value, "__module__", "") == enact.__name__
     }
     assert public == {"propose", "dependency_pins"}
+
+
+# -- the mode itself: which way it falls when nobody has said anything -------------------------
+# The 2026-08-25 instruction made the refusal a mode. Nothing then asserted the mode, so the guard
+# shipped permissive and the suite could not tell that from a deleted refusal. These three assert
+# the mode as a fact of the repository, so the flip back is a red test rather than a quiet one.
+
+
+def test_the_shipped_default_refuses(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """No env, no readable mode file: the guard refuses. Failing closed is the whole property --
+    a lost or misspelt ENACT_MODE is nobody having said the twin may dispose."""
+    monkeypatch.delenv("TWIN_ENACT_MODE", raising=False)
+    monkeypatch.setattr(enact_guard, "ENACT_MODE_FILE", tmp_path / "absent")
+    assert enact_guard.enact_mode() == "operations"
+    assert enact_guard.decide("Bash", {"command": "gh pr merge 42 --squash"}) is not None
+
+    (tmp_path / "typo").write_text("operatoins\n", encoding="utf-8")
+    monkeypatch.setattr(enact_guard, "ENACT_MODE_FILE", tmp_path / "typo")
+    assert enact_guard.enact_mode() == "operations"
+
+
+def test_the_checked_in_mode_is_the_refusing_one() -> None:
+    """The durable default a checkout actually gets, read off disk rather than off the constant."""
+    assert enact_guard.ENACT_MODE_FILE.read_text(encoding="utf-8").strip() == "operations"
+    assert enact_guard.enact_mode() == "operations"
+
+
+@pytest.mark.parametrize("where", ["env", "file"])
+def test_development_is_still_the_one_word_escape_hatch(
+    where: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """The 2026-08-25 instruction's hatch is untouched: one word, either place, and the guard is
+    off. Asserted so that "we flipped the default" never quietly becomes "we removed the mode"."""
+    monkeypatch.delenv("TWIN_ENACT_MODE", raising=False)
+    if where == "env":
+        monkeypatch.setenv("TWIN_ENACT_MODE", "development")
+    else:
+        (tmp_path / "ENACT_MODE").write_text("development\n", encoding="utf-8")
+        monkeypatch.setattr(enact_guard, "ENACT_MODE_FILE", tmp_path / "ENACT_MODE")
+    assert enact_guard.enact_mode() == "development"
+    assert enact_guard.decide("Bash", {"command": "gh pr merge 42 --squash"}) is None
 
 
 # -- layer 2: the tool-call boundary -----------------------------------------------------------
@@ -254,16 +303,32 @@ def test_a_response_that_crosses_the_universal_floor_is_refused_not_priced(
 def test_the_dependency_pins_are_real_and_report_what_they_do_not_establish(proposal: Artefact) -> None:
     """Consumed by real separate repositories is a claim about files, so it is read from them."""
     dependency = proposal.body["dependency"]
-    # Re-read against the live .estate-clone on 2026-08-29 and updated to what is actually there,
-    # rather than left asserting the estate of an earlier wave: the `insurer` party now carries its
-    # own gitops/platform/platform-pin.yaml (ticket 36 -- a pure consumer pins the platform without
-    # reconciling it), and driftwood's gitops/composed/composed-set.yaml added `driftwood-composed`
-    # as a source (ticket 40). Both are real repositories consuming real pins, so both belong here.
-    assert {"driftwood", "insurer", "ludlow", "tuppence"} == set(dependency["consumer_repositories"])
+    # NOT a frozen census of the estate any more (2026-08-29). This assertion has been re-pinned
+    # by hand at least three times -- insurer's platform pin, driftwood's composed source, then
+    # tuppence's and ludlow's -- and each re-pin was a test being dragged along behind a wider
+    # estate rather than a test catching anything. Widening the slice to a fourth adopter is the
+    # eco-system working; it is not a regression in `dependency_pins`, and a test that goes red on
+    # it teaches everyone to re-pin the number without reading why. What is asserted instead is
+    # what the docstring above actually claims -- that these are FILES, read, not described:
+    # every reported figure is re-derived from the pins themselves, every name resolves to a real
+    # directory or a composed source belonging to one, and the floors say the estate did not
+    # quietly empty out.
+    pins = dependency["pins"]
+    consumed = [p for p in pins if p["cross_repository"]]
+    assert dependency["cross_repository_pins"] == len(consumed) >= 8
+    assert dependency["self_sync_pins"] == len(pins) - len(consumed) >= 3
+    assert set(dependency["consumer_repositories"]) == {p["consumer"] for p in consumed}
+    assert set(dependency["dependencies"]) == {p["dependency"] for p in consumed}
+    # The three adopters and the insurer consume policy they did not write; that is the claim.
+    assert {"driftwood", "tuppence", "ludlow", "insurer"} <= set(dependency["consumer_repositories"])
+    estate = {p.name for p in enact.ESTATE_DIR.iterdir() if p.is_dir()}
+    for name in dependency["consumer_repositories"]:
+        assert name in estate, f"{name} is reported as a consumer and is not a repository"
+    for name in dependency["dependencies"]:
+        # `<adopter>-composed` is that adopter's own rendered set consumed as a source (ticket 40).
+        assert name in estate or name.rsplit("-", 1)[0] in estate, name
     # A repository syncing itself consumes nobody's policy, so it never reaches this list.
-    assert {"platform", "nist", "driftwood-composed"} == set(dependency["dependencies"])
-    assert dependency["cross_repository_pins"] == 8
-    assert dependency["self_sync_pins"] == 3
+    assert not [p for p in consumed if p["consumer"] == p["dependency"]]
     assert all(pin["tag"] for pin in dependency["pins"])
     # mo-12 repointed ESTATE_DIR at the live .estate-clone/ clone of the real repos (was the hub's
     # own frozen estate/ mirror). Read live, this now shows mo-10's landed work: every

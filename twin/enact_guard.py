@@ -45,6 +45,28 @@ Set either to `operations` to restore this file's original behaviour unchanged. 
 invariant `enactment_is_propose_only_at_both_layers` asserts the refusal exists and works by
 forcing `operations` mode for its own run, regardless of this file's checked-in default — the
 capability stays tested even while the day-to-day default is permissive.
+
+**Mode, amended 2026-08-29 (the eco-system thin slice).** The permissive default is withdrawn
+and the fallback flips: absent both `TWIN_ENACT_MODE` and `ENACT_MODE_FILE`, the mode is
+`operations` and the refusals bite. Two reasons, neither of them a re-argument of the 2026-08-25
+instruction:
+
+1. *The default was failing open in silence.* `decide` returns `None` for everything under
+   `development`, so a deleted refusal and the deliberate default were the same observation. The
+   thirteen tests that assert what the guard DOES had been red since commit 9282301 and were then
+   made green by an autouse fixture that forced `operations` for the test process only — which is
+   the tests agreeing with a guard nobody ships. Nothing asserted the shipped default at all.
+   Now the tests run the guard as shipped, and `test_the_shipped_default_refuses` asserts the
+   fallback itself, so flipping this back to permissive turns the suite red rather than quiet.
+2. *The construction window the instruction was written for is the one thing that is now
+   forbidden outright.* The thin-slice build brief's first hard rule is "never push, never merge
+   a PR, never create a tag" — the owner pushes and merges. So `operations` is not friction
+   against the current way of working; it is that way of working, in code.
+
+The escape hatch the 2026-08-25 instruction asked for is untouched and still one word: write
+`development` into `twin/ENACT_MODE` (durable, visible in a diff and a `git blame`) or export
+`TWIN_ENACT_MODE=development` for one run. What changed is only which way it falls when nobody
+has said anything.
 """
 
 from __future__ import annotations
@@ -63,10 +85,17 @@ ENACT_MODE_FILE = Path(__file__).resolve().with_name("ENACT_MODE")
 _MODES = ("development", "operations")
 
 
+DEFAULT_MODE = "operations"
+
+
 def enact_mode() -> str:
-    """The active mode: `TWIN_ENACT_MODE` in the environment first (a one-run override, e.g. for
-    the invariant suite forcing `operations`), then `ENACT_MODE_FILE` (the durable default), then
-    `development` when neither says otherwise."""
+    """The active mode: `TWIN_ENACT_MODE` in the environment first (a one-run override), then
+    `ENACT_MODE_FILE` (the durable default), then `DEFAULT_MODE` when neither says otherwise.
+
+    The fallback is the refusing mode (amended 2026-08-29, see the docstring): an unreadable file,
+    a typo in it, and a checkout that lost it are all cases where nobody has said the twin may
+    dispose, and a guard that cannot tell must not admit.
+    """
     env = os.environ.get("TWIN_ENACT_MODE", "").strip().lower()
     if env in _MODES:
         return env
@@ -74,7 +103,7 @@ def enact_mode() -> str:
         from_file = ENACT_MODE_FILE.read_text(encoding="utf-8").strip().lower()
     except OSError:
         from_file = ""
-    return from_file if from_file in _MODES else "development"
+    return from_file if from_file in _MODES else DEFAULT_MODE
 
 # Every repository this estate enacts into carries the org prefix — it is the impersonation
 # guardrail `estate/README.md` describes, and it doubles as the thing a guard can recognise.

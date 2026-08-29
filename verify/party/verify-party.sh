@@ -25,5 +25,7 @@ say "3. platform's appetite band moved into the shared store, still three instit
 python3 "$HERE/party.py" selfcheck || fail "party role guard selfcheck failed"
 
 echo
-echo "PASS: roles: is machine-checked data — platform, nist, ico, driftwood, tuppence"
-echo "and ludlow each declare roles the filesystem actually backs up."
+echo "PASS: roles: is machine-checked data — all eight parties (platform, nist, ico, feeds,"
+echo "insurer, driftwood, tuppence, ludlow) declare roles the filesystem actually backs up,"
+echo "all five roles carry an evidence check, and verify/party/roles.json is asserted to"
+echo "mirror each party's OWN signed party.yaml rather than standing in for it."

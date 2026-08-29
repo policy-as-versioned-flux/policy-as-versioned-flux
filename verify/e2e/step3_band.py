@@ -273,7 +273,17 @@ def main():
     print(f"    proposal: branch {p['branch']}, {p['proposal_kind']}, landed={p['landed']}")
     print(f"    would declare {TIER_LABEL}: {tier_over} on {rel_declaration} (the governed "
           f"Namespace); the pod manifest is untouched; nothing opened, nothing written")
-    print(f"PASS: a residual crossing {org}'s own appetite band selects {tier_under} -> "
+    # 2026-08-29 review: this used to read "a residual crossing {org}'s own
+    # appetite band", which a deck reader takes as "{org}'s actual priced
+    # position crossed its band". It did not: the two residuals are placed
+    # either side of the band by construction (`under = band * 0.5`, then
+    # stepped up until the tier moves), so the probe crosses whatever band it
+    # reads. The property under test is real -- the selection is band-sensitive
+    # and the proposer edits the Namespace declaration -- and the wording now
+    # says which one it is.
+    print(f"PASS: a SYNTHETIC residual placed either side of {org}'s own signed appetite band of "
+          f"{band:,.0f} {ccy} ({under:,.2f} -> {over:,.2f} {ccy}, not {org}'s real priced "
+          f"position) selects {tier_under} -> "
           f"{tier_over} through {org}'s own selection-policy package {policy_version} (which "
           f"platform/graded/cage.py agrees with), and the proposer would open a pull request "
           f"editing {TIER_LABEL} on {rel_declaration}, {org}'s governed Namespace declaration "
