@@ -1,0 +1,107 @@
+# A worked claim file from the classify-and-judge skill, and the fixture the gate validates
+# (feeds/verify-news-headline-skill.sh). It is a WORKED EXAMPLE, not a committed claim: a real
+# run writes this file into the adopter's own repo at twin/claims/<date>-<slug>.claim.yaml and
+# opens a pull request there. Nothing here is merged anywhere.
+#
+# Three claims, three of the twin's four existing kinds, in the order the skill produces them:
+# the machine binds (grade 5), the machine infers a position (grade 5), the human overrules it by
+# role (grade 4). Only the last one prices.
+schema: twin.headline-claim/v1
+org: driftwood
+
+run:
+  skill: classify-and-judge
+  run_at: '2026-08-29'
+  # The human at the keyboard, by ROLE. A signature binds to a role, never to a named individual
+  # (twin/roles.yaml). This is who is answerable for the overrides below.
+  operator_role: model-steward
+  statements_read: 7
+  statements_bound: 2
+  no_model_ran_on_a_clock: true
+
+# Every pinned input these claims were derived from, in inherits[] shape -- the same shape
+# ADR-0021's forward-intel `derived_from` uses, so provenance reads the same way on both sides of
+# the seam. Every pin a claim cites below appears here, and every pin here is cited by a claim.
+derived_from:
+  - { party: feeds, kind: feed, name: news, version: '1.0.0' }
+  - { party: feeds, kind: feed, name: market-moves, version: '1.0.0' }
+
+claims:
+  # 1. signal-classify's own output. Grade 5, the ladder's weakest rung: a claim with no
+  #    independent corroboration. It informs and ranks. It does not price.
+  - id: driftwood-binding-platform-policy-3-0-0
+    kind: binding
+    component: cage-policy-line
+    evidence_grade: 5
+    claimed_by: signal-classify (skill)
+    evidence: >-
+      The statement names the publisher of the policy line this organisation pins, and the pinned
+      release is what the cage-policy-line component IS. Bound by the operator after reading the
+      heuristic's proposal, which agreed.
+    price_eligible: false
+    signal:
+      id: platform-policy-3-0-0-tagged
+      date: '2026-08-23'
+      steep: technological
+      source: policy-as-versioned-platform
+      statement: >-
+        platform published the signed tag policy/v3.0.0, described by its own release commit as a
+        major repair release.
+      provenance:
+        url: https://github.com/policy-as-versioned-platform/platform/releases/tag/policy%2Fv3.0.0
+      from: { party: feeds, kind: feed, name: news, version: '1.0.0' }
+
+  # 2. A binding off the market SERIES -- derived as a MOVE, never read as a level. The statement
+  #    is twin/market_signals.py's own move_statement() output, verbatim.
+  - id: driftwood-binding-eu-minerals-move
+    kind: binding
+    component: cross-border-trade-lane
+    evidence_grade: 5
+    claimed_by: signal-classify (skill)
+    evidence: >-
+      A dated, externally authored change in what a liquid market will pay on a trade-restriction
+      question. Consumed as a derivative: the level itself is a biased estimator of unknown scale
+      (twin research 17 S3.1) and is never read as a probability.
+    price_eligible: false
+    signal:
+      id: market-moves-0x9ad402-2026-08-28
+      date: '2026-08-28'
+      steep: political
+      source: polymarket
+      statement: >-
+        polymarket price for '0x9ad402' moved from 0.58 to 0.61 (up) between 2026-08-27 and
+        2026-08-28
+      provenance:
+        url: https://gamma-api.polymarket.com/markets
+      from: { party: feeds, kind: feed, name: market-moves, version: '1.0.0' }
+
+  # 3. evolution-judge's own inference. Grade 5, the twin's estimate, retained on the record even
+  #    when the human overrules it.
+  - id: driftwood-position-cage-policy-line
+    kind: position
+    component: cage-policy-line
+    evolution_position: 0.62
+    evidence_grade: 5
+    claimed_by: evolution-judge (skill)
+    evidence: >-
+      Inferred from the accumulated evidence in the overlay: a pinned, versioned, externally
+      published policy line consumed as a product.
+    price_eligible: false
+
+  # 4. The human's override. Grade 4, calibrated expert judgement named by role. ABSOLUTE, not a
+  #    delta. `answers` keeps the twin's own estimate beside it so the disagreement is on the
+  #    record and both are scored later. The headline itself is the evidence.
+  - id: driftwood-override-cage-policy-line
+    kind: override
+    component: cage-policy-line
+    evolution_position: 0.75
+    evidence_grade: 4
+    claimed_by: model-steward
+    answers: driftwood-position-cage-policy-line
+    evidence: >-
+      "platform published the signed tag policy/v3.0.0, described by its own release commit as a
+      major repair release" (policy-as-versioned-platform, 2026-08-23,
+      https://github.com/policy-as-versioned-platform/platform/releases/tag/policy%2Fv3.0.0). A
+      third major line in a fortnight, each one a repair, is a component further into commodity
+      consumption than the twin reads it: the adopter is taking whatever the publisher ships.
+    price_eligible: true

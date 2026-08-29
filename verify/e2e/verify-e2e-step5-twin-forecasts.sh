@@ -33,7 +33,14 @@ n=$(ls "$SC"/*.yaml 2>/dev/null | wc -l | tr -d ' ')
 if [ "$n" -ge 6 ]; then echo "  ok  $n standing scenarios in ${SC#"$ESTATE"/}"
 else missing+=("${SC#"$ESTATE"/} holds $n of the six standing scenarios, and the eol-date-passes and penalty-published classes"); fi
 # 4. the lookup that binds a pinned feed VERSION to one dated signal, no judgement on the clock.
-want "$ADOPTER/twin/signals.yaml (the pinned-feed-version -> dated-signal lookup)" "$T/signals.yaml" "$T/signal-lookup.yaml"
+# TWO halves, because it is two things and checking one of them was checking half a seam: the
+# adopter's own table binds a PIN to a standing scenario (it lives in the adopter's repo because
+# the scenario library does), and twin/feed_signal.py turns the pinned VERSION into the dated
+# signal itself -- steep from a fixed table keyed by feed name, provenance carrying published_at,
+# tag and commit, grade 5. verify-twin-evals.sh below is what runs the second one against every
+# feed envelope the estate publishes (added 2026-08-29; the module was the piece ticket 29 left).
+want "$ADOPTER/twin/signals.yaml (the pin -> standing-scenario table)" "$T/signals.yaml" "$T/signal-lookup.yaml"
+want "twin/feed_signal.py (the pinned-feed-version -> dated-signal lookup)" "$ROOT/twin/feed_signal.py"
 # 5. the twin's evals in the gate, with truth.log as the record.
 want "verify/twin-evals/verify-twin-evals.sh (the twin's evals graded by the gate)" "$ROOT/verify/twin-evals/verify-twin-evals.sh"
 

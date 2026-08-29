@@ -5,12 +5,14 @@
 # gate is the only citable source (NORTH-STAR §5). `.github/workflows/twin.yml` keeps running the
 # same suite on push and is never cited by any document.
 #
-# Four things, in one script, all offline:
+# Five things, in one script, all offline:
 #   1. the twin self-versions, and its two spellings of the version agree
 #   2. the six real skills at their existing thresholds -- seven metrics, since causal-claims
 #      carries a second, separately-registered grade-accuracy metric
 #   3. the three real-firm beats, in their declared order (twin/beat-sequence.sh)
 #   4. cross_architecture_determinism, on this machine's architecture
+#   5. the pinned-feed-version -> dated-signal lookup, and its table's coverage of every feed
+#      envelope this estate actually publishes (ticket 11 resolution 3; spec user story 45)
 #
 # A FALL IN ANY SCORE against the last value recorded for that skill in twin/skill-scores.jsonl is
 # a FAIL, even when the fallen score is still above its threshold. That file is the committed
@@ -155,8 +157,69 @@ else
 fi
 rm -f "$det"
 
+# -- 5: the pinned-feed-version -> dated-signal lookup ------------------------------------------
+# Ticket 11 resolution 3 / spec user story 45. Two observations, both offline and neither needing
+# a tag: the lookup's own self-check (one signal per envelope, steep from the fixed table,
+# provenance carrying published_at + tag + commit, a hole named rather than guessed), and the
+# COVERAGE of that table against every feed the estate actually publishes. The second is the one
+# that rots: a publisher ships a new feed, nobody adds a row, and the clock meets a version it
+# cannot bind. That is a red gate here rather than a 06:20 surprise.
+lookup="$(mktemp)"
+if ROOT="$ROOT" "$PY" - >"$lookup" 2>&1 <<'PY'
+import os, sys
+from pathlib import Path
+
+ROOT = Path(os.environ["ROOT"])
+sys.path.insert(0, str(ROOT))
+from twin import feed_signal
+from twin.feed_signal import EXCLUDED_FROM_LOOKUP, FeedSignalError, signal_for, steep_for
+
+feed_signal.demo()
+
+estate = ROOT / ".estate-clone"
+if not estate.is_dir():
+    print("note: no .estate-clone, so table coverage was not checked against published feeds")
+    sys.exit(0)
+
+import json
+holes, bound = [], []
+for path in sorted(estate.glob("*/**/feed.json")):
+    envelope = json.loads(path.read_text(encoding="utf-8"))
+    if envelope.get("kind") != "feed":
+        continue
+    name = envelope["name"]
+    try:
+        steep_for(name)
+    except FeedSignalError as exc:
+        holes.append(f"{name} ({path.relative_to(estate)}): {exc}")
+        continue
+    # A published envelope really does map to exactly one signal, not just to a STEEP letter.
+    # The tag and commit here are PLACEHOLDERS and the output says so: the real ones are the
+    # caller's, handed in by whatever verified the signature, and no tag for these feeds exists
+    # locally (they are cut by cut-release.yml in Actions). What is observed is the mapping.
+    doc = signal_for(envelope, tag="placeholder-tag", commit="0" * 40)
+    bound.append((name, doc["steep"], doc["date"]))
+
+holes = [h for h in holes if not any(x in h for x in EXCLUDED_FROM_LOOKUP)]
+if holes:
+    print("the lookup has no row for a feed this estate publishes:")
+    for h in holes:
+        print("  " + h)
+    sys.exit(1)
+print("ok  every one of %d published feed envelope(s) maps to exactly one dated signal, shape "
+      "checked with a placeholder tag/commit (%d feed(s) excluded by name, with a reason)"
+      % (len(bound), len(EXCLUDED_FROM_LOOKUP)))
+PY
+then
+  echo "PASS: the pinned-feed-version -> dated-signal lookup: $(tail -1 "$lookup")"
+else
+  echo "FAIL: the feed-version -> signal lookup observed false: $(tail -2 "$lookup" | tr '\n' ' ')"
+  fail=1
+fi
+rm -f "$lookup"
+
 if [ "$fail" -eq 0 ]; then
-  echo "PASS: $(sed -n 's/^METRICS: //p' "$log" | tail -1) skill metrics, exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, and identical bytes on this architecture"
+  echo "PASS: $(sed -n 's/^METRICS: //p' "$log" | tail -1) skill metrics, exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal"
   exit 0
 fi
 echo "FAIL: the twin's evals observed false; see the lines above"
