@@ -3,7 +3,9 @@
 # ticket 26 owns the cluster half). Real, and offline: a residual that crosses the adopter's OWN
 # signed appetite band selects a different tier through the estate's one selection engine, at the
 # version the adopter's selection-policy package publishes, and the proposer -- in --dry-run --
-# would open a pull request editing the tier declaration. NOTHING IS OPENED and nothing is
+# would open a pull request editing the tier DECLARATION: `posture.acme.io/tier` on the
+# adopter's governed Namespace manifest (ADR-0022), found by its governed label, never the pod
+# label, which is that declaration's output. NOTHING IS OPENED and nothing is
 # written: the dry run works on a throwaway copy in a directory that is not a git repo at all.
 # What this step does NOT observe: the proposed tier landing in force in a cluster. That is
 # step 4's fact, and step 4 says so itself.

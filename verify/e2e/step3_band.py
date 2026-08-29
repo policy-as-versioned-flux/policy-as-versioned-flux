@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """step3_band.py — NORTH-STAR §4 step 3, the python half, offline: a priced residual that
 crosses the adopter's OWN signed appetite band selects a different tier, and the proposer would
-open a pull request editing the tier declaration.
+open a pull request editing the tier DECLARATION — `posture.acme.io/tier` on the adopter's
+governed Namespace manifest (ADR-0022), never the pod label, which is that declaration's output
+and is clobbered at every admission.
+
+The manifest is found here the same way the proposer finds it and by a second implementation:
+the one manifest in the adopter's repo whose Namespace document carries
+`policy-as-versioned.dev/governed: "true"`. The pod manifest is carried into the throwaway copy
+too, so this step can observe that the proposer leaves it alone.
 
 Nothing is opened. `tier_pr.py run --dry-run` returns before it ever calls git or gh, and it is
-run against a throwaway copy of the adopter's workload manifest in a temp directory that is not
-a git repository at all — so a real push or a real `gh` call could not succeed even if the
-dry-run flag were ignored.
+run against a throwaway copy of the adopter's manifests in a temp directory that is not a git
+repository at all — so a real push or a real `gh` call could not succeed even if the dry-run
+flag were ignored.
 
 The band is read from the adopter's own party.yaml (appetite.tolerance), never from a platform
 fixture (ADR-0021). A party with no appetite is a MISSING INSTRUMENT and refuses (ADR-0020).
@@ -42,6 +49,34 @@ if "--estate" in sys.argv:
 PLATFORM = os.path.join(ESTATE, "platform")
 TIER_PR = os.path.join(PLATFORM, "wargamer", "tier_pr.py")
 TIER_LABEL = "posture.acme.io/tier"
+GOVERNED_LABEL = "policy-as-versioned.dev/governed"
+
+
+def governed_namespace_manifests(repo_dir):
+    """Every COMMITTED manifest in the adopter's repo declaring a governed Namespace, read as
+    YAML — deliberately a SECOND implementation of the proposer's own line-based search, so the
+    two have to agree on which file carries the declaration. Committed only: an ignored scratch
+    tree (`.work/`) is not a signed declaration and a merged PR could not carry it."""
+    listed = subprocess.run(["git", "-C", repo_dir, "ls-files", "-z", "--", "*.yaml", "*.yml"],
+                            capture_output=True, text=True)
+    if listed.returncode != 0:
+        skip(f"{repo_dir} is not a git clone, so which manifests are committed cannot be read")
+    found = []
+    for rel in sorted(x for x in listed.stdout.split("\0") if x):
+        path = os.path.join(repo_dir, rel)
+        try:
+            with open(path) as fh:
+                docs = list(yaml.safe_load_all(fh))
+        except (yaml.YAMLError, OSError, UnicodeDecodeError):
+            continue
+        for doc in docs:
+            if not isinstance(doc, dict) or doc.get("kind") != "Namespace":
+                continue
+            labels = ((doc.get("metadata") or {}).get("labels") or {})
+            if str(labels.get(GOVERNED_LABEL, "")).lower() == "true":
+                found.append(path)
+                break
+    return found
 
 
 def load_yaml(path):
@@ -158,31 +193,48 @@ def main():
         fail(f"{org}'s composed evidence carries no prices[] to cross a band with")
     entry = copy.deepcopy(evidence["prices"][0])
     entry.update({"old_price": under, "new_price": over, "old_tier": tier_under,
-                  "proposed_tier": tier_over, "changed": True,
-                  "proposed_as": "issue" if tier_over == "deny" else "label",
+                  "proposed_tier": tier_over, "changed": True, "proposed_as": "label",
                   "policy_version": policy_version})
+
+    # The declaration this crossing must move: the adopter's governed Namespace manifest.
+    declarations = governed_namespace_manifests(os.path.join(ESTATE, org))
+    if not declarations:
+        fail(f"{org} declares no Namespace carrying {GOVERNED_LABEL}: \"true\", so there is no "
+             f"tier declaration for a band crossing to move (ADR-0022)")
+    if len(declarations) > 1:
+        fail(f"{org} carries {len(declarations)} governed Namespace manifests "
+             f"({', '.join(os.path.relpath(d, ESTATE) for d in declarations)}) -- which one a "
+             f"proposal moves is then not decidable")
+    declaration = declarations[0]
+    rel_declaration = os.path.relpath(declaration, os.path.join(ESTATE, org))
+    pod_manifest = os.path.join(ESTATE, org, "deploy", "pod.yaml")
 
     with tempfile.TemporaryDirectory() as tmp:
         work = os.path.join(tmp, org)
-        os.makedirs(os.path.join(work, "deploy"))
-        shutil.copy(os.path.join(ESTATE, org, "deploy", "pod.yaml"),
-                    os.path.join(work, "deploy", "pod.yaml"))
-        before = open(os.path.join(work, "deploy", "pod.yaml")).read()
+        os.makedirs(os.path.dirname(os.path.join(work, rel_declaration)), exist_ok=True)
+        shutil.copy(declaration, os.path.join(work, rel_declaration))
+        before = open(os.path.join(work, rel_declaration)).read()
+        pod_before = None
+        if os.path.exists(pod_manifest):
+            os.makedirs(os.path.join(work, "deploy"), exist_ok=True)
+            shutil.copy(pod_manifest, os.path.join(work, "deploy", "pod.yaml"))
+            pod_before = open(os.path.join(work, "deploy", "pod.yaml")).read()
         ev_path = os.path.join(tmp, "evidence.json")
         with open(ev_path, "w") as fh:
             json.dump({**evidence, "prices": [entry]}, fh)
 
         env = {k: v for k, v in os.environ.items() if k != "GITHUB_REPOSITORY"}
         r = subprocess.run([sys.executable, TIER_PR, "run", "--adopter-dir", work,
-                            "--evidence", ev_path, "--workload",
-                            os.path.join(work, "deploy", "pod.yaml"), "--org", org,
+                            "--evidence", ev_path, "--org", org,
                             "--dry-run"], capture_output=True, text=True, env=env)
         if r.returncode != 0:
             # The proposer EXISTS (asserted above); one that will not run is the estate
             # failing to propose, which this step observed. Not a could-not-look.
             fail(f"tier_pr.py exited {r.returncode}, so the estate cannot propose the tier it "
                  f"selected: {(r.stderr or r.stdout).strip().splitlines()[-1:]}")
-        after = open(os.path.join(work, "deploy", "pod.yaml")).read()
+        after = open(os.path.join(work, rel_declaration)).read()
+        pod_after = (open(os.path.join(work, "deploy", "pod.yaml")).read()
+                     if pod_before is not None else None)
 
     try:
         landed = json.loads(r.stdout)
@@ -199,23 +251,33 @@ def main():
         fail(f"the proposer did not stop at the dry run: {json.dumps(p)[:300]}")
     if p.get("proposal_kind") != "pull_request":
         fail(f"the crossing proposed a {p.get('proposal_kind')!r}, not a pull request editing "
-             f"the pod tier label")
+             f"the tier declaration -- every proposal is a PR (ADR-0022 retired the issue "
+             f"branch: the bottom rung is a running cage, so nothing is refused)")
+    if p.get("manifest") != rel_declaration:
+        fail(f"the proposal moves {p.get('manifest')!r}, not {org}'s governed Namespace "
+             f"declaration {rel_declaration!r} -- a merged edit to anything else is overwritten "
+             f"at the next admission and changes nothing (ADR-0022)")
     diff = p.get("diff", "")
-    if f'"{TIER_LABEL}": "{tier_over}"' not in diff:
-        fail(f"the proposed pull request does not set {TIER_LABEL} to {tier_over}: "
-             f"{diff.strip()[:300]}")
+    declared = [line for line in diff.splitlines() if line.strip().startswith(f"{TIER_LABEL}:")]
+    if not any(line.strip() == f'{TIER_LABEL}: "{tier_over}"' for line in declared):
+        fail(f"the proposed pull request does not declare {TIER_LABEL}: {tier_over} on "
+             f"{rel_declaration}: {declared or diff.strip()[:300]}")
+    if GOVERNED_LABEL not in diff:
+        fail(f"the proposed edit dropped {GOVERNED_LABEL} from {rel_declaration} -- the tier "
+             f"must be declared next to it, on the same signed object")
     if after != before:
-        fail("the dry run edited the adopter's workload manifest on disk")
+        fail(f"the dry run edited {rel_declaration} on disk")
+    if pod_after is not None and pod_after != pod_before:
+        fail("the dry run edited the adopter's pod manifest -- the pod label is cage-tier's "
+             "OUTPUT and never a thing a proposal moves (ADR-0022)")
     print(f"    proposal: branch {p['branch']}, {p['proposal_kind']}, landed={p['landed']}")
-    print(f"    would set {TIER_LABEL}: {tier_over} on deploy/pod.yaml; nothing opened, "
-          f"nothing written")
-    # The pod label, NOT the governed Namespace declaration: ADR-0022 makes the Namespace the
-    # declaration and the pod label an output of it, and rewiring the proposer onto the
-    # Namespace is ticket 26's half. The sentence names what this run actually observed.
+    print(f"    would declare {TIER_LABEL}: {tier_over} on {rel_declaration} (the governed "
+          f"Namespace); the pod manifest is untouched; nothing opened, nothing written")
     print(f"PASS: a residual crossing {org}'s own appetite band selects {tier_under} -> "
           f"{tier_over} through {org}'s own selection-policy package {policy_version} (which "
           f"platform/graded/cage.py agrees with), and the proposer would open a pull request "
-          f"editing the pod tier label")
+          f"editing {TIER_LABEL} on {rel_declaration}, {org}'s governed Namespace declaration "
+          f"-- the pod label is that declaration's output and is left alone")
     return 0
 
 
