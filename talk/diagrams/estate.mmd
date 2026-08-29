@@ -1,0 +1,17 @@
+flowchart LR
+  NIST["<b>nist</b> — regulator<br/>800-53 catalogue<br/>LOW · MODERATE · HIGH"]
+  ICO["<b>ico</b> — regulator<br/>penalty schema"]
+  P["<b>platform</b><br/>publisher + risk-bearer<br/>the shared discipline<br/><i>prices its own risk</i>"]
+  subgraph I["three institutions — risk-bearer · adopter · publisher"]
+    direction TB
+    D["<b>driftwood</b> · e-comm · PCI+GDPR"]
+    T["<b>tuppence</b> · fintech · FCA+PCI+GDPR"]
+    L["<b>ludlow</b> · US health · HIPAA"]
+  end
+  A["each signs its own<br/><b>composed artefact</b><br/>v1.1.0"]
+  NIST -->|"controls · pinned direct"| I
+  NIST -->|"controls"| P
+  P -->|"implementations · tag + commit"| I
+  ICO -.->|"pricing · signed feed"| I
+  P -.->|"threat register"| I
+  I ==> A

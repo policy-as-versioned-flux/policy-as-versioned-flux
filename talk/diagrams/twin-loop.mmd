@@ -1,0 +1,18 @@
+flowchart TB
+  subgraph A1[" "]
+    direction LR
+    S["<b>twin sense</b><br/>a dated signal binds<br/>to a component"]
+    R["<b>twin run</b><br/>one scenario,<br/>at a declared time"]
+    F["<b>forecast-bundle</b><br/><i>always plural</i><br/>one per rival world model"]
+    S --> R
+    R -->|"regime required,<br/>no default"| F
+  end
+  subgraph A2[" "]
+    direction LR
+    SC["<b>twin score</b><br/>proper scoring rules<br/><i>as-consumed only</i>"]
+    C["<b>score-card</b><br/>scored, or named<br/>unscoreable with a reason"]
+    AT["<b>attestation sidecar</b><br/>agent-signed<br/><i>origin, not endorsement</i>"]
+    V["<b>twin verify</b><br/>recompute the chain<br/>from its own pins"]
+    SC --> C --> AT --> V
+  end
+  F -->|"named by digest,<br/>never by path"| SC

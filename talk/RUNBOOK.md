@@ -96,6 +96,16 @@ you want their reconcile beat live for that room.
 
 ## 2. The beat-by-beat live script
 
+> **SUPERSEDED 2026-08-29 (eco-system ticket 47).** The beat table below is kept
+> as the record and is not rewritten. The deck's beats are no longer hand-kept
+> here: they are the seven NORTH-STAR §4 steps, generated into
+> [`deck.md`](deck.md) by [`build_deck.py`](build_deck.py) from the capture the
+> truth surface wrote for each step's check, carrying that run's own grade.
+> [`verify-demo.sh`](verify-demo.sh) refuses the deck if a beat's status, a
+> cited capture or a figure disagrees with the run. Read the beat list there;
+> read this table only for what the July tour did.
+
+
 Each **[LIVE]** beat is one command; each exits non-zero if the beat would fail
 on stage. The gate runs every script by discovery, so there is no mapping to keep; the deck ordering:
 

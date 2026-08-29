@@ -1,0 +1,1 @@
+../../talk/verify-demo.sh

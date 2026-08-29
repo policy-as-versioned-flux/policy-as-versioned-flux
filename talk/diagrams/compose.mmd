@@ -1,0 +1,22 @@
+flowchart TB
+  A["party.yaml<br/><i>driftwood declares itself</i><br/>roles · parents · baseline · overlay"]
+  P1["platform<br/>implementations 1.1.1"]
+  P2["nist<br/>controls 1.1.0"]
+  P3["ico<br/>pricing v1"]
+  P4["platform<br/>threat v1"]
+  C{{"compose()<br/><i>one seam</i>"}}
+  A --> C
+  P1 -->|"resolved commit sha"| C
+  P2 --> C
+  P3 --> C
+  P4 --> C
+  C --> R["rendered files<br/><i>byte-identical to what the engine reads</i>"]
+  C --> H["advisory HEADER.yaml<br/>parents · baseline · holes<br/>governed namespaces"]
+  C --> X["<b>refusals</b>"]
+  X --> X1["split diamond"]
+  X --> X2["cross-party rule conflict"]
+  X --> X3["restatement of a mutate"]
+  X --> X4["a new hole"]
+  X --> X5["a new ungoverned namespace"]
+  X --> X6["a dangling or cross-party claim"]
+  C --> PR["prices[]<br/><i>re-priced every run</i><br/>never applied"]

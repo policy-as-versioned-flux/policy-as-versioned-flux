@@ -44,3 +44,9 @@ __pycache__/
 # named a top-level `captures` directory that exists nowhere, so the clock had
 # never committed a capture and the sentence above was a plan, not a fact.
 talk/captures/
+
+# talk/deck.html: the rendered Marp output. talk/deck.md IS committed -- it is
+# generated from the captures and the gate reads it (verify-demo.sh) -- but the
+# HTML is a build artefact of `marp deck.md`, regenerable from the committed
+# markdown, and 140KB of it per run. Added 2026-08-29 (ticket 47).
+talk/deck.html

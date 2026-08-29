@@ -44,11 +44,27 @@ cross-party comparison needs:
 ## Touring the talk
 
 ```sh
-talk/verify-all.sh    # the truth surface: every verify*.sh in the estate, graded PASS/FAIL/SKIP
-talk/up.sh            # idempotent bring-up; clones the six units first (needs network)
+talk/verify-all.sh          # the truth surface: every verify*.sh in the estate, graded PASS/FAIL/SKIP
+talk/up.sh                  # idempotent bring-up; clones the six units first (needs network)
+python3 talk/build_deck.py  # rebuild deck.md from the captures that run just wrote
+talk/verify-demo.sh         # refuse the deck if it disagrees with the run (in the gate)
 ```
 
-See [`talk/deck.md`](deck.md) (Marp) and [`talk/RUNBOOK.md`](RUNBOOK.md).
+The deck is **generated, not authored** (2026-08-29, eco-system ticket 47).
+[`build_deck.py`](build_deck.py) writes [`deck.md`](deck.md) as Marp markdown
+from one capture per script under `talk/captures/`, which `verify-all.sh` writes
+beside the TRUTH line. All seven NORTH-STAR §4 steps appear from day one, each
+carrying that run's own grade: observed true, could not look (with the check's
+own reason), or observed false. A step with no capture says *no check yet, owned
+by ticket NN* — that is the generator, never a grade. Prose lives in exactly one
+file, [`narration.json`](narration.json); diagrams are pre-rendered under
+[`diagrams/`](diagrams/). Hand editing `deck.md` is not an option: the next build
+overwrites it and [`verify-demo.sh`](verify-demo.sh) grades the deck it rebuilds.
+Render it with `npx @marp-team/marp-cli --html talk/deck.md -o talk/deck.html`.
+
+The July hand-authored deck is kept, superseded, at
+[`deck-2026-07-31-superseded.md`](deck-2026-07-31-superseded.md), as is the
+hand-kept beat table in [`RUNBOOK.md`](RUNBOOK.md).
 
 ### Reading a red gate
 
