@@ -116,8 +116,14 @@ def required_clocks(unit: str, root: str) -> dict[str, str]:
     roles = party.get("roles") or []
     # forward-intel is the twin's own feed; the twin-sweep clock publishes it, so
     # a party whose only publication is forward-intel needs no separate fetch.
+    #
+    # Neither does a record that declares NO payload schema. That is a section of the party's own
+    # signed artefact rather than an envelope it fetches from anywhere -- the adopter's `exposure`,
+    # which composition renders into composed/HEADER.yaml and the adopter's own tag signs. Its
+    # clock is propose-tier.yml's daily recompose, required below because the party is an adopter;
+    # a fetch.yml would be a scheduled job with nothing to fetch.
     publishes = [p for p in (party.get("publishes") or [])
-                 if p.get("name") != "forward-intel"]
+                 if p.get("name") != "forward-intel" and p.get("payload_schema", "") is not None]
     if publishes:
         need["fetch.yml"] = f"{unit} publishes {', '.join(p['name'] for p in publishes)}"
     if "adopter" in roles:

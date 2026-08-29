@@ -171,6 +171,20 @@ def check_publisher(estate, party, doc, envelope_schema, party_schema):
         if entry.get("kind") != "feed":
             out("PASS" if os.path.exists(path) else "FAIL", f"{party}: publishes {entry.get('kind')} at {entry.get('path')}")
             continue
+        if entry.get("payload_schema", "") is None:
+            # A feed record that declares NO payload schema is a section of this party's own
+            # signed artefact rather than an ADR-0019 envelope -- the adopter's `exposure`, which
+            # composition renders into composed/HEADER.yaml and the party's own tag signs. There
+            # is no v*/feed.json to validate; what is checkable is that the section is really
+            # there, which is what a consumer pinning it is pinning.
+            section = os.path.join(path, "HEADER.yaml")
+            present = os.path.isfile(section) and \
+                isinstance((load_yaml(section) or {}).get(entry.get("name")), (dict, list))
+            out("PASS" if present else "FAIL",
+                f"{party}: publishes {entry.get('name')} as a section of {entry.get('path')}/"
+                f"HEADER.yaml, signed by this party's own tag and not an envelope of its own"
+                + ("" if present else " -- and HEADER.yaml carries no such section"))
+            continue
         files = sorted(glob.glob(os.path.join(path, "v*", "feed.json")))
         if not files:
             # a declared feed with nothing published yet (insurer/quote until ticket 36): could not look, never PASS
@@ -219,6 +233,13 @@ def run(estate):
     for name, doc in all_parties.items():
         if "adopter" in (doc.get("roles") or []):
             SEEN["adopters"] += 1
+    # Every party that pins anything, not only the ones whose roles say "adopter". The insurer's
+    # roles are [publisher, insurer], so its four pins were never resolved by anything: it pinned
+    # an `exposure` feed at a version no adopter had ever published, and 65 PASS/SKIP lines went
+    # by without one of them naming an insurer pin (found 2026-08-29). A pin nobody resolves is
+    # not a pass, it is an unvisited line.
+    for name, doc in all_parties.items():
+        if doc.get("inherits"):
             check_adopter(estate, name, doc, all_parties)
     for k, n in SEEN.items():
         if not n:

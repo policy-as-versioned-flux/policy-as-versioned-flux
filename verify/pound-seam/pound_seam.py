@@ -428,6 +428,78 @@ def check_curve_agreement(estate, parties):
                         f"no drift")
 
 
+def check_residual_basis(estate, parties):
+    """WHOSE reduction set priced the twin entry, and do the two disagree about the rung?
+
+    The residuals on a `source: twin` entry are `ale * (1 - reduce)` off `platform/graded/cage.py`,
+    a table that flags itself as calibration knobs evidenced by nothing. The adopter publishes its
+    OWN graded response curve, and driftwood's is materially different -- mode reductions of
+    0.05/0.30/0.65/0.90 against the table's 0.30/0.70/0.92/0.98. The rung came out the same, but
+    the sentence the entry carried about WHY was only true of a table the adopter did not author.
+
+    Two things, both observations:
+      1. the entry NAMES the reduction set that priced it (`residual_basis`);
+      2. the table and the adopter's own published curve still agree about which rung is cheapest.
+         That is what the selection actually turns on, and it is checkable from the published
+         payload -- the per-rung reduction is not, because the curve publishes one figure per rung
+         (`net_cost_of_risk = impact * (1 - reduction) + cost`) and two unknowns behind it.
+         When they stop agreeing, this goes red instead of the divergence staying silent.
+    """
+    sys.path.insert(0, os.path.join(estate, "platform", "graded"))
+    try:
+        import cage                                              # noqa: PLC0415
+    except ImportError as exc:                                   # noqa: BLE001
+        out("SKIP", f"platform/graded/cage.py could not be imported ({exc}), so the reduction set "
+                    f"the twin entries were priced with cannot be read")
+        return
+    for name, doc in sorted(parties.items()):
+        feed = _forward_intel_feed(estate, name, doc)
+        ev = os.path.join(estate, name, "composed", "evidence.json")
+        if not (feed and os.path.exists(ev)):
+            continue
+        try:
+            with open(feed) as fh:
+                payload = json.load(fh)["payload"]
+            with open(ev) as fh:
+                twins = [e for e in (json.load(fh).get("prices") or []) if e.get("source") == "twin"]
+        except (OSError, ValueError, KeyError) as exc:           # noqa: BLE001
+            out("FAIL", f"{name}: could not read its published curve or its twin entry: {exc}")
+            continue
+        if not twins:
+            continue                     # check 3 already graded the missing twin edge
+        unnamed = [e for e in twins if not e.get("residual_basis")]
+        out("FAIL" if unnamed else "PASS",
+            f"{name}: the twin entry names the reduction set its residuals came from"
+            + (" -- it does not, so a reader attributes them to the adopter's own published curve"
+               if unnamed else f" ({twins[0]['residual_basis']})"))
+
+        curve = {str(c.get("account")): c.get("net_cost_of_risk") for c in payload.get("curve") or []}
+        lm = payload.get("lm") or []
+        if len(lm) != 3 or not curve:
+            out("SKIP", f"{name}: its feed carries no lm triple or no curve, so the table and the "
+                        f"curve cannot be compared on the same shock")
+            continue
+        impact = float(lm[1])            # the mode, the same figure the emitter builds the curve from
+        table = {t: impact * (1 - cage.TIERS[t]["reduce"]) + cage.TIERS[t]["cost"]
+                 for t in curve if t in cage.TIERS}
+        if len(table) != len(curve):
+            out("FAIL", f"{name}: its curve prices rungs the table does not: "
+                        f"{sorted(set(curve) - set(table))}")
+            continue
+        cheapest_table = min(table, key=lambda t: table[t])
+        cheapest_curve = min(curve, key=lambda t: float(curve[t]))
+        spread = max(abs(float(curve[t]) - table[t]) for t in table)
+        out("FAIL" if cheapest_table != cheapest_curve else "PASS",
+            f"{name}: platform's tier table and {name}'s own graded curve still pick the same "
+            f"rung as cheapest on the same shock ({cheapest_table}); they differ by up to "
+            f"{spread:,.0f} on the rungs themselves, which is why the entry names which set "
+            f"priced it"
+            + ("" if cheapest_table == cheapest_curve else
+               f" -- the table says {cheapest_table} and the adopter's own evidence says "
+               f"{cheapest_curve}, so the tier the entry attributes to the curve is not the tier "
+               f"the curve would pick"))
+
+
 def check_engine_agreement(estate, parties):
     """The two engines must pick the SAME rung, to the boundary.
 
@@ -615,6 +687,7 @@ def run(estate):
         return
     check_appetite(estate, parties)
     check_curve_agreement(estate, parties)
+    check_residual_basis(estate, parties)
     check_engine_agreement(estate, parties)
     check_fx_bridge(estate)
     customers = {n: ((d.get("size") or {}).get("customers")) for n, d in parties.items()}
