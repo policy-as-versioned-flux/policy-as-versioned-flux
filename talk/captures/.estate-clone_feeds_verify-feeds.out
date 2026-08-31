@@ -1,2 +1,74 @@
-no platform checkout with feeds/schema.json next to this repo
-SKIP: cannot look -- the envelope schema lives at platform/feeds/schema.json (ADR-0019) and no platform checkout was found; set PLATFORM_DIR
+== envelope schema: /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/feeds/../platform/feeds/schema.json ==
+ok  cve/v1/feed.json -> envelope + cve/payload.schema.json
+ok  cve/v2/feed.json -> envelope + cve/payload.schema.json
+ok  eol/v1/feed.json -> envelope + eol/payload.schema.json
+ok  eol/v2/feed.json -> envelope + eol/payload.schema.json
+ok  fx/v1/feed.json -> envelope + fx/payload.schema.json
+ok  market-moves/v1/feed.json -> envelope + market-moves/payload.schema.json
+ok  news/v1/feed.json -> envelope + news/payload.schema.json
+ok  threat-register/v1/feed.json -> envelope + threat-register/payload.schema.json
+ok  threat-register/v2/feed.json -> envelope + threat-register/payload.schema.json
+ok  9 published feed versions validated
+ok  party.yaml publishes threat-register
+ok  party.yaml publishes threat-register/payload.schema.json
+ok  party.yaml publishes cve
+ok  party.yaml publishes cve/payload.schema.json
+ok  party.yaml publishes eol
+ok  party.yaml publishes eol/payload.schema.json
+ok  party.yaml publishes fx
+ok  party.yaml publishes fx/payload.schema.json
+ok  party.yaml publishes market-moves
+ok  party.yaml publishes market-moves/payload.schema.json
+ok  party.yaml publishes news
+ok  party.yaml publishes news/payload.schema.json
+ok  a twin scenario validates against /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/feeds/../platform/feeds/forward-intel.payload.schema.json
+ok  the same schema takes an lm triple as well as a lognormal-GPD severity spec
+ok  a 1.0.0-shaped payload fails on all three C10 keys: 'claim_scope'; 'derived_from'; 'register' -- which is why C10 is one major
+ok  a register entry takes a tier off the ladder ['baseline', 'restricted', 'quarantine', 'isolated', 'infra']
+
+== bump ladder (ADR-0023, D2) ==
+ok  unchanged -> none
+ok  entry added -> minor
+ok  entry removed -> major
+ok  payload schema changed -> major
+ok  numeric move inside tolerance -> none
+ok  numeric move outside tolerance -> patch
+ok  non-numeric field changed -> patch
+ok  fx new month -> minor
+ok  fx corrected rate -> patch
+ok  fx currency added -> minor
+ok  fx currency withdrawn -> major
+ok  market-moves sub-threshold reading -> none
+ok  market-moves reading at the threshold -> patch
+ok  market-moves downward move over the threshold -> patch
+ok  market-moves rule version changed -> minor
+ok  market-moves market admitted -> minor
+ok  market-moves question restated -> patch
+ok  news re-read of the same pool -> none
+ok  news event added -> minor
+ok  news event withdrawn -> major
+ok  news statement restated -> patch
+ok  bump.py selfcheck: 21 cases
+
+== the rule each feed publishes is the rule bump.py reads ==
+ok  threat-register v1 -> v2 computes patch
+ok  cve v1 -> v2 computes minor
+ok  eol v1 -> v2 computes minor
+
+== fx: the rule computes a new month as a minor and a corrected rate as a patch ==
+ok  fx new-month computes minor
+ok  fx corrected-rate computes patch
+
+== fx: a rate lookup for a published date, and a refusal for one with no rate (ADR-0020) ==
+ok  1000 GBP -> 1284.00 USD at the 2026-08 HMRC rate 1.284
+ok  1284.00 USD -> 1000.00 GBP, the same month's rate both ways
+ok  100 EUR -> 109.42 USD, crossed through the GBP base
+ok  a same-currency amount needs no rate and no date
+ok  2026-05-14 refuses (a month the feed does not publish): no fx rate published for 2026-05-14: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
+ok  2027-01-31 refuses (a month the feed has not reached): no fx rate published for 2027-01-31: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
+ok  an unquoted currency refuses: the fx feed for 2026-08 quotes no rate for XYZ (it quotes AUD, CAD, CHF, DKK, EUR, GBP, INR, JPY, NOK, NZD, PLN, SEK, SGD, USD, ZAR); ADR-0020, refusing
+ok  converters/fx.py selfcheck: 7 cases
+ok  1000 GBP -> 1284.0 USD on 2026-08-14, at the published HMRC rate
+ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
+
+PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed; the bump ladder holds; publishes[] names only real paths; a twin scenario validates against the 2.0.0 forward-intel payload schema; fx prices a date it publishes and refuses one it does not.

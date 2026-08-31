@@ -1,13 +1,10 @@
 [1;36m==>[0m 1. every party's declared roles: match real filesystem evidence
 [1;36m==>[0m 2. the guard actually bites (planted risk-bearer/publisher/adopter violations)
 [1;36m==>[0m 3. platform's appetite band moved into the shared store, still three institutions
-Traceback (most recent call last):
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/party/party.py", line 288, in <module>
-    main()
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/party/party.py", line 284, in main
-    args.func(args)
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/party/party.py", line 238, in cmd_selfcheck
-    assert not problems, problems
-           ^^^^^^^^^^^^
-AssertionError: ['driftwood: declared risk-bearer, no entry in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone', "driftwood: roles.json declares ['adopter', 'publisher', 'risk-bearer'], but driftwood's own signed party.yaml declares ['adopter', 'risk-bearer']", 'tuppence: declared risk-bearer, no entry in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone', "tuppence: roles.json declares ['adopter', 'publisher', 'risk-bearer'], but tuppence's own signed party.yaml declares ['adopter', 'risk-bearer']", 'ludlow: declared risk-bearer, no entry in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone', "ludlow: roles.json declares ['adopter', 'publisher', 'risk-bearer'], but ludlow's own signed party.yaml declares ['adopter', 'risk-bearer']"]
-FAIL: party role guard selfcheck failed
+ok  guard bites: risk-bearer/publisher/adopter violations each refused when planted, cleared once evidence is restored
+ok  real estate: 8 parties clean | institutions: driftwood, ludlow, tuppence (still three)
+
+PASS: roles: is machine-checked data — all eight parties (platform, nist, ico, feeds,
+insurer, driftwood, tuppence, ludlow) declare roles the filesystem actually backs up,
+all five roles carry an evidence check, and verify/party/roles.json is asserted to
+mirror each party's OWN signed party.yaml rather than standing in for it.

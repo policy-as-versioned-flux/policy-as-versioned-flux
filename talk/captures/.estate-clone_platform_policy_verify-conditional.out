@@ -3,5 +3,5 @@
 [1;36m==>[0m 2. kyverno test — the full pass/fail/skip matrix
 [1;36m==>[0m 3. the residual of the conditional branch is priced in £ (fair.py)
 [1;36m==>[0m    residual ALE with condition C unmet = £21360/yr (the £ a cage prices and retains)
-[1;36m==>[0m 4. live tail skipped: no reachable cluster at context 'kind-driftwood'
-PASS: one conditional rule admits everyone meeting C, and its residual is priced.
+SKIP (live tail): the root-attested conditional branch this beat proves lives only in require-nonroot-2-0-1, and 2.0.1 is retired (not in distribution/versions.yaml, 2026-08-29); the only currently-declared version (4.0.0) replaced it with a flat non-root+read-only-fs rule that has no root-if-attested branch, so no currently-declared version's live install can observe this claim
+SKIP: offline proof holds; live tail could not look: the root-attested conditional branch this beat proves lives only in require-nonroot-2-0-1, and 2.0.1 is retired (not in distribution/versions.yaml, 2026-08-29); the only currently-declared version (4.0.0) replaced it with a flat non-root+read-only-fs rule that has no root-if-attested branch, so no currently-declared version's live install can observe this claim — one conditional rule admits everyone meeting C, and its residual is priced

@@ -1,0 +1,14 @@
+== the bump ladder, on fixtures ==
+ok  unchanged -> none
+ok  regime added -> minor
+ok  regime removed -> major
+ok  payload schema changed -> major
+ok  a cap moved -> patch
+ok  the real penalty-schema/bump.yaml and rule.yaml parse with the standard library
+
+== the real declaration against the real tree ==
+OK: declared bump 'major' == computed bump 'major' (v2 -> v3)
+
+PASS: the bump ladder holds on fixtures, and ico's own declared bump agrees with the
+bump computed from its published tree under its own rule.yaml -- so a release cut
+today would publish the number the reviewed file declares.

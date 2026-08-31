@@ -1,5 +1,5 @@
 [1;36m==>[0m 1. the whole chain: feed->scenario->PR->review->merge->release, every actor named
-ok  6-link chain feed->scenario->PR->review->merge->release, all evidence on disk; AI proposed 2 link(s) (never merged), humans disposed 3; workload+device SVIDs share one root (spiffe://acme.internal); chain converges on v3.0.0 == the version the workload SVID carries. Every actor attestable; the whole chain verifies.
+ok  6-link chain feed->scenario->PR->review->merge->release, all evidence on disk; AI proposed 2 link(s) (never merged), humans disposed 3; workload+device SVIDs share one root (spiffe://acme.internal); chain converges on v4.0.0 == the version the workload SVID carries. Every actor attestable; the whole chain verifies.
 [1;36m==>[0m 2. the head of the chain VERIFIES CRYPTOGRAPHICALLY, right here (the signed feed)
   ok   feed link attested: v3 threat-register signature verifies (ed25519)
   ok   a forged feed is refused (the signature actually guards the link)
@@ -20,15 +20,15 @@ CHANGE PATH — who proposed what, when, from which evidence:
        evidence: ../../.estate-clone/platform/distribution/policies/v2.0.0/require-nonroot.yaml  (present)
   5. merge     [HUMAN    ] human-maintainer       dispose  @ feed v3   :: a human merges — gitsign-keyless commit lands in Rekor; the AGENT never merges
        evidence: ../../.estate-clone/platform/distribution/policies/v2.0.0/require-nonroot.yaml  (present)
-  6. release   [HUMAN    ] human-release-signer   release  @ feed v3   :: cut signed tag policy/v3.0.0; Flux ResourceSet pins the version to it
+  6. release   [HUMAN    ] human-release-signer   release  @ feed v3   :: cut signed tag policy/v4.0.0; Flux ResourceSet pins the version to it
        evidence: ../../.estate-clone/platform/distribution/versions.yaml  (present)
 
-  the chain converges on release v3.0.0 — the same version a
+  the chain converges on release v4.0.0 — the same version a
   compliant workload then carries in its SVID posture path:
 
 RUNTIME IDENTITIES — every actor rooted, no network-position trust:
   workload      root=spiffe://acme.internal
-                svid=spiffe://acme.internal/posture/3.0.0/ns/<ns>/sa/<sa>
+                svid=spiffe://acme.internal/posture/4.0.0/ns/<ns>/sa/<sa>
                 by  =SPIRE CA (X.509-SVID URI-SAN, Kyverno-stamped posture label)
   device        root=spiffe://acme.internal
                 svid=spiffe://acme.internal/device/operator-macbook

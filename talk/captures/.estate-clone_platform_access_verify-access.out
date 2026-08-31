@@ -5,6 +5,7 @@ access selfcheck: all asserts passed
   ok   Dex advertises an OIDC issuer URL (http://dex.access.svc:5556/dex)
   ok   Pomerium Core HelmRelease present (IAP)
   ok   Pomerium consumes the estate OIDC issuer (Dex) — one human root, not a bolt-on
+  ok   no inert config.idp copy shadowing the real one
   ok   Pomerium has a route to the kube-apiserver (kubectl access)
   ok   route policy requires an authenticated human
   ok   route policy requires a WebAuthn-approved device (phishing-resistant)
@@ -18,5 +19,5 @@ access selfcheck: all asserts passed
   -- all offline invariants hold --
 == offline: kubectl dry-run (namespace) ==
   (dry-run needs a reachable cluster; skipped)
-== live checks skipped (plane not up; run up.sh on the driftwood cluster) ==
-verify-access: done
+SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the access plane wiring holds (Pomerium+Dex+WebAuthn device on the one SPIFFE root)

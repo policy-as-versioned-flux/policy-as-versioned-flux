@@ -1,0 +1,17 @@
+[1;36m==>[0m 0. selfcheck: the parser and the ordering rule bite (and a COMMENT declares nothing)
+1. infra declaration: {'kyverno': 'infra', 'flux-system': 'infra', 'kube-system': 'infra'}
+  ok   kube-system, flux-system and kyverno each carry posture.acme.io/tier: infra
+2. entitlement: platform/party.yaml roles[] includes 'platform'
+  ok   platform/party.yaml carries the platform role
+3. ordering rule: unlabelled-tier defaults across 9 served cage-tier.yaml bodies:
+     platform/distribution/policies/v2.0.0/cage-tier.yaml: 'baseline'
+     platform/distribution/policies/v2.0.1/cage-tier.yaml: 'baseline'
+     platform/distribution/policies/v3.0.0/cage-tier.yaml: 'baseline'
+     platform/distribution/policies/v4.0.0/cage-tier.yaml: 'baseline'
+     platform/distribution/policies/vselfcheck/cage-tier.yaml: 'baseline'
+     platform/graded/policies/cage-tier.yaml: 'baseline'
+     driftwood/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
+     ludlow/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
+     tuppence/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
+  ok   no served body defaults an unlabelled tier to isolated while infra is undeclared (currently: infra is fully declared, so this is a live tripwire, not a historical fact)
+PASS: the platform's infra declaration covers kube-system, flux-system and kyverno, entitled by the platform role on party.yaml, and no served policy body's unlabelled default can flip them to isolated before that declaration lands.

@@ -19,4 +19,7 @@ ok  no adopter repo carries a claim file yet -- the skill has not been run for r
 ok  twin/market_signals.price_moves derives 6 dated moves from market-moves 1.0.0, 9 readings over 3 markets
 ok  the largest is +0.03: polymarket price for '0x9ad402' moved from 0.58 to 0.61 (up) between 2026-08-27 and 2026-08-28
 ok  and a LEVEL still refuses to be read as a probability: 0x7f3c9a (polymarket, 2026-08-26): a price LEVEL (0.41) may never be read as a probability — pri...
-SKIP: no driftwood checkout beside this one to bind a derived move against
+ok  signal-classify binds that move to 'brand-trust' in driftwood's overlay at grade 5, steep 'economic' -- a PROPOSAL the human reviews
+ok  niobium is a scenario in driftwood's library, declared unbound by any pinned feed version: it reaches the twin only through the human-run skill
+
+PASS: classify-and-judge is a human-run skill (disable-model-invocation) whose claim file carries only claim kinds the twin has and a derived_from that names exactly the pins its claims cite, with only the override price-eligible and every rule proved to bite; the twin derives dated moves from the pinned market-moves series and still refuses to read a level as a probability; niobium is a scenario in the adopter's library, unbound by any clock.

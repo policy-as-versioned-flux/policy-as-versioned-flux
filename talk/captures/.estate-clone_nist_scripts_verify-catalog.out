@@ -17,4 +17,6 @@ OK (rejects):     evil.com/https://github.com/policy-as-versioned-nist/nist/.git
 OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/main.evil.com
 OK: EXPECTED_IDENTITY_REGEXP anchors org/repo/workflow and allows only main + release/<major>.<minor>.x
 ==> dry-run: publish.sh seeds + tags cleanly
-OK: nist catalog verified + publishable
+==> party.yaml: parses, every publishes[] path exists, catalog/{rule,bump}.yaml beside it (ticket 21, ADR-0019)
+OK: publishes[0] controls/sp-800-53 at catalog, next bump declared none
+PASS: nist catalog verified + publishable

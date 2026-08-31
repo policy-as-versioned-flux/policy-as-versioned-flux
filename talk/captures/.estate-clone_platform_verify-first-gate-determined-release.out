@@ -1,0 +1,13 @@
+== 1. the workflow is wired: the gate runs BEFORE the tag, and the evidence commit lands first ==
+ok  gate -> commit evidence -> correct the array -> tag -> push, in that order
+
+== 2. every declared bump agrees with the gate's own evidence ==
+ok  policy/v4.0.0: declared 'major' == evidence 'major', computed 'major', outcome passed
+
+== 3. the signature: only cut-release.yml, in Actions, can produce it ==
+== 4. the tag exists: it must resolve to the array-update commit, one ahead of the array ==
+ok  policy/v4.0.0 -> 1d8cec2977f3ce0120f319c93e5032f960c5164c, array names its parent 64635dfdff3a835e7b0c2e51eae0650951ef2607
+
+PASS: the release's number was determined by the gate before the tag -- the declared bump on
+the reviewed array element, the computed bump in the signed evidence and the outcome all
+agree, and the signed tag resolves one commit ahead of the commit the array names.

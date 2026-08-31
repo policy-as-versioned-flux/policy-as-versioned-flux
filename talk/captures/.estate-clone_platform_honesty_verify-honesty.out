@@ -5,16 +5,18 @@ ok  Bühlmann Z=0.78 k=1 mu=£63333 | back-test ludlow: model £1025511 vs actua
 == 2. feed-integrity — signed (real openssl verify) + sourced + bounded ==
 ok  live feed signature verifies; a forged feed is rejected
 
-== 3. proposer-bounds — confidence + rate-limit + learn-from-rejections; gate is the backstop ==
+== 3. proposer-bounds — confidence + rate-limit + a DERIVED rejection ledger; gate is the backstop ==
 ok  bounded 4 drift(s): 1 suppressed(learned), 1 held(low-conf), 2 proposed(gated,unmerged) | rate-limit opens exactly 3/5 | no merge() by construction
--- live dispositions --
-hold-low-confidence        driftwood/require-nonroot@2.0.0               conf=0.027 rej=0  confidence 0.027 < 0.05 — band-edge, surface for human triage not auto-PR
-suppress-learned-rejection tuppence/insider-abuse                        conf=0.500 rej=2  human rejected this 2x (>= 2) — the loop learned, stop re-proposing
-propose                    tuppence/ransomware-workload                  conf=0.500 rej=0  confidence 0.500 >= 0.05, not over-rejected, within rate limit — opened (gated, unmerged)
-propose                    tuppence/pq-harvest-now-decrypt-later         conf=0.500 rej=1  confidence 0.500 >= 0.05, not over-rejected, within rate limit — opened (gated, unmerged)
+ok  the ledger is a decay curve derived from closed-unmerged PRs, keyed <org>/<kind>/<slug>: one rejection suppresses for just under a half-life then re-raises, a second holds it longer, a pair four half-lives old re-raises, a moved curve hash or bumped selection-policy version does not count, a merged or off-branch PR is not a rejection, and an unreachable GitHub gives an EMPTY ledger with the reason attached (h=30, suppress_at=0.5, rejection-decay.yaml 1.0.0)
+ledger UNAVAILABLE: could not read closed pull requests for this repo (    GH_TOKEN: ${{ github.token }}). Proposing with an EMPTY ledger -- nothing was suppressed, and that is a stated fact, not a silence.
+-- live dispositions (against the derived ledger above) --
+hold-low-confidence        driftwood/enforcement/require-nonroot@2.0.0   conf=0.027 rej=0  confidence 0.027 < 0.05 — band-edge, surface for human triage not auto-PR
+propose                    tuppence/scenario/insider-abuse               conf=0.500 rej=0  confidence 0.500 >= 0.05, not over-rejected, within rate limit — opened (gated, unmerged)
+propose                    tuppence/scenario/ransomware-workload         conf=0.500 rej=0  confidence 0.500 >= 0.05, not over-rejected, within rate limit — opened (gated, unmerged)
+propose                    tuppence/scenario/pq-harvest-now-decrypt-later conf=0.500 rej=0  confidence 0.500 >= 0.05, not over-rejected, within rate limit — opened (gated, unmerged)
 
 == 4. reflexive — the apparatus governs itself under the same engine, and passes ==
-ok  apparatus scored by its OWN engine: risk_bought £1018853 > £10000 band -> Deny (controls mandatory), residual-with-controls £5544 within band -> PASSES OWN TEST | feeds: 6 signed+sourced+bounded | proposer bounded, no merge()
+ok  apparatus scored by its OWN engine + its OWN signed party.yaml band: risk_bought £1018853 > £10000 band -> Deny (controls mandatory), residual-with-controls £5544 within band -> PASSES OWN TEST | feeds: 6 signed+sourced+bounded | proposer bounded, no merge()
 
 ALL OK — the £ is falsifiable (back-tested + recalibrated), the feeds are
 signed/sourced/bounded, the AI proposer is bounded with the gate as the hard

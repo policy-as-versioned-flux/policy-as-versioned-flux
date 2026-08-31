@@ -1,2 +1,9 @@
 E2E step 5 twin forecasts
-SKIP: no .estate-clone/driftwood/twin (run clone-estate.sh)
+  ok  driftwood/twin/orgs/driftwood/meta.yaml (the adopter's own overlay)
+  ok  driftwood/twin/world/ (the world layer, vendored)
+  ok  driftwood/twin/forward-intel/v1/feed.json (the feed the estate consumes)
+  ok  6 standing scenarios in driftwood/twin/orgs/driftwood/scenarios
+  ok  driftwood/twin/signals.yaml (the pin -> standing-scenario table)
+  ok  twin/feed_signal.py (the pinned-feed-version -> dated-signal lookup)
+  ok  verify/twin-evals/verify-twin-evals.sh (the twin's evals graded by the gate)
+PASS: the twin's overlay, feed, 6 scenarios and signal lookup are all present, and its own evals scored them: PASS: 7 skill metrics, exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal

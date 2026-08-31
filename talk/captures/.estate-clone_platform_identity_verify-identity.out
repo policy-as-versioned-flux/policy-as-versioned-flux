@@ -21,9 +21,28 @@
   ok   OpenBao HelmRelease present
   ok   OpenBao jwt-auth setup Job present
   ok   OpenBao jwt auth points at SPIRE's OIDC Discovery Provider JWKS
+  ok   the discovery URL is https (the provider serves TLS on :8443; the Service publishes 443 only)
+  ok   the discovery host is <svc>.spire-system -- the ONLY name in both the provider's `domains` list and its serving cert's DNS SANs
+  ok   the SPIRE trust bundle is pinned as the CA (its cert chains to no public root)
+  ok   the Job mounts the spire-bundle ConfigMap (which is why it runs in spire-system)
+  ok   the package carries its own VERSION
+  ok   the package carries OSCAL control claims (component-definition.json)
+  ok   claims and bits carry the SAME version ('1.1.0') -- a package that versions its claims separately is two packages wearing one name
+  ok   the package declares its membership (kustomization.yaml)
+  ok   package membership includes namespaces.yaml
+  ok   package membership includes spire/helmrelease.yaml
+  ok   package membership includes spire/clusterspiffeid-mesh.yaml
+  ok   package membership includes istio/helmrelease.yaml
+  ok   package membership includes openbao/helmrelease.yaml
+  ok   package membership includes openbao/jwt-auth.yaml
+  ok   the ping->pong mTLS PROOF is not shipped as substrate
+  ok   federation/ is not shipped wholesale -- each org applies its own file, not all four
+  ok   SVID path is /posture/<version>/cage/<tier>/ns/<ns>/sa/<sa>
+  ok   the tier segment reads the label cage-tier renders from the governed Namespace (one render, no second policy)
+  ok   a pod with no tier label falls closed to `isolated`, never to an empty segment and never to baseline
   -- all offline invariants hold --
 == offline: kubectl dry-run (core kinds) ==
 error: error validating "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/identity/namespaces.yaml": error validating data: failed to download openapi: Get "http://localhost:8080/openapi/v2?timeout=32s": dial tcp [::1]:8080: connect: connection refused; if you choose to ignore these errors, turn validation off with --validate=false
   (dry-run needs a reachable cluster; skipped)
-== live checks skipped (substrate not up; run up.sh on the driftwood cluster) ==
-verify-identity: done
+SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — SPIRE is Istio's CA, mTLS STRICT, authz by SPIFFE principal, the SVID path carries posture/<version>/cage/<tier>, and OpenBao's jwt auth is enabled against SPIRE's OIDC discovery over TLS

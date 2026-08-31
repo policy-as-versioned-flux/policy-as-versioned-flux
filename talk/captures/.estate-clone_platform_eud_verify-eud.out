@@ -25,5 +25,5 @@ access selfcheck: all asserts passed
   info swtpm NOT installed (venue prereq; offline checks above don't need it)
   info utmctl NOT installed (venue prereq; offline checks above don't need it)
 == live: driftwood device SVIDs (best-effort, bounded) ==
-  (identity substrate not reachable; skipped — offline checks above are the ones that must pass)
-verify-eud: done
+SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — EUD vTPM specs and tpm-devid entries sit on the one estate root; WHfB alone is refused

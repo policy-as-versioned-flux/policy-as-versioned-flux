@@ -1,0 +1,15 @@
+== the bump ladder, on fixtures ==
+ok  unchanged -> none
+ok  control added -> minor
+ok  control removed -> major
+ok  control renamed -> major
+ok  prose edited -> patch
+ok  nested control enhancements are counted as ids
+ok  the real catalog/bump.yaml and rule.yaml parse with the standard library
+
+== the real declaration against the real tree ==
+OK: declared bump 'none' == computed bump 'none' (v1.1.0 -> v1.1.1)
+
+PASS: the bump ladder holds on fixtures, and nist's own declared bump agrees with the
+bump computed from its published tree under its own rule.yaml -- so a release cut
+today would publish the number the reviewed file declares.

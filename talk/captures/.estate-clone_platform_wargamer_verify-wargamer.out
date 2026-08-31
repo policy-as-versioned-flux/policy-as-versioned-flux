@@ -14,9 +14,9 @@ ok  collected v1->v3 signed feed + 6-scenario library (human-seed + AI); war-gam
   [  ok ] enforcement ludlow    require-nonroot@2.0.0            Deny     -> Deny
   [  ok ] scenario    tuppence  phishing-credential-theft        fix      -> fix
   [  ok ] scenario    tuppence  stolen-laptop-unattested-device  cage     -> cage
-  [DRIFT] scenario    tuppence  insider-abuse                    transfer -> fix
-  [DRIFT] scenario    tuppence  ransomware-workload              deny     -> fix
-  [DRIFT] scenario    tuppence  pq-harvest-now-decrypt-later     transfer -> fix
+  [DRIFT] scenario    tuppence  insider-abuse                    transfer -> cage
+  [DRIFT] scenario    tuppence  ransomware-workload              deny     -> cage
+  [DRIFT] scenario    tuppence  pq-harvest-now-decrypt-later     transfer -> cage
   [  ok ] scenario    tuppence  hyperscaler-region-concentration transfer -> transfer
 ok  4 drift(s): the war-gamer found disproportionate controls to re-tune
 
@@ -38,4 +38,14 @@ ok  4 drift(s): the war-gamer found disproportionate controls to re-tune
 ok  the flip is proposed on a branch; main is untouched
 
 [1;36m==>[0m the PR carries the version cross-check gate: ci-check.py
-unexpected: the gate passed a workload that should trip the flip
+ok  gate runs (kyverno): a workload compliant-under-Audit is caught pre-merge by the +/-1 cross-check
+
+[1;36m==>[0m commit identity: gitsign keyless (OIDC -> Fulcio) -> Rekor  [gitsign version v0.17.1
+gitsign]
+
+[1;36m==>[0m next (human + CI, NOT this agent): git commit --gitsign on 'wargamer/retune-driftwood-require-nonroot-2-0-0', push, open PR,
+[1;36m==>[0m      the gate + a human reviewer dispose. The war-gamer proposes; it never merges.
+
+PASS: signed feeds collected + integrity-checked, current controls war-gamed
+(workload + human/device + PQ), drift detected, a signed policy PR proposed with
+the version cross-check gate -- and never merged. The war-gamer proposes; a human disposes.

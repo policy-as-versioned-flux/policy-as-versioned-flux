@@ -1,25 +1,27 @@
-FAIL: platform/risk/appetite.json still exists — appetite is a signed fact on each party's own party.yaml (ticket 08 answer 5, ADR-0021)
-FAIL: driftwood: party.yaml declares no appetite.tolerance (amount, currency) — a party with no appetite is a MISSING INSTRUMENT and refuses (ADR-0020)
-FAIL: ludlow: party.yaml declares no appetite.tolerance (amount, currency) — a party with no appetite is a MISSING INSTRUMENT and refuses (ADR-0020)
-FAIL: tuppence: party.yaml declares no appetite.tolerance (amount, currency) — a party with no appetite is a MISSING INSTRUMENT and refuses (ADR-0020)
-SKIP: no party in this estate was compared across the two selection engines, so nothing here observed that they agree
-FAIL: the FX bridge does not resolve a rate the fx feed publishes: module '_composition_fx' has no attribute '_fx_rate'
-FAIL: driftwood prices[0] (ico/pricing) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
-FAIL: driftwood prices[1] (platform/threat) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
-PASS: driftwood: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
-SKIP: driftwood regime entry (penalty-schema): pinned at None, which publishes no control_weights, so the hole partition could not be looked at (the weights ship in ico penalty-schema v3)
+PASS: platform/risk/appetite.json is retired
+PASS: no python or shell line in the estate both names the retired appetite fixture and opens it (a path held in a constant and opened elsewhere is outside this grep's reach -- see the ceiling note above)
+PASS: driftwood: appetite 40,000 GBP, signed on its own party.yaml
+PASS: ludlow: appetite 5,000 GBP, signed on its own party.yaml
+PASS: tuppence: appetite 15,000 GBP, signed on its own party.yaml
+PASS: driftwood: the estate and driftwood's own selection-policy package agree on the curve hash (sha256:70e5e9f6dee9) — one curve, two implementations, no drift
+PASS: driftwood: the twin entry names the reduction set its residuals came from (platform-cage-tiers@1.0.0)
+PASS: driftwood: platform's tier table and driftwood's own graded curve still pick the same rung as cheapest on the same shock (isolated); they differ by up to 171,600 on the rungs themselves, which is why the entry names which set priced it
+PASS: driftwood: platform/graded/cage.py and driftwood's own selection-policy package pick the same rung in all 60 cases, band boundaries and every rung tried as a floor (it declares None)
+PASS: ludlow selects no tier through a selection-policy package and its evidence attributes none, so there is no second engine to drift from (named absence, not a silent skip)
+PASS: platform selects no tier through a selection-policy package and its evidence attributes none, so there is no second engine to drift from (named absence, not a silent skip)
+PASS: tuppence selects no tier through a selection-policy package and its evidence attributes none, so there is no second engine to drift from (named absence, not a silent skip)
+PASS: the FX bridge reads the publisher's own converter: GBP->AUD on 2026-08-15 is 1.936, the rate the signed fx feed publishes, recorded against feeds's fx feed 1.0.0
+PASS: a date the fx feed does not publish (2025-08-15) refuses as a missing instrument, and prices nothing (ADR-0020)
+PASS: driftwood: one twin edge, policy 1.0.0, curve sha256:70e5e, tail bounded-pert, perspective driftwood in GBP
+PASS: driftwood regime entry (penalty-schema): 4 priced hole(s) sum to its total 1,787,177.08 GBP
 PASS: driftwood: every list of amounts in the document is one perspective in one currency
-PASS: driftwood: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
-FAIL: ludlow prices[0] (ico/pricing) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
-FAIL: ludlow prices[1] (platform/threat) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
+PASS: driftwood: selection policy 1.0.0 matches driftwood/selection-policy/VERSION
 PASS: ludlow: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
-SKIP: ludlow regime entry (penalty-schema): pinned at None, which publishes no control_weights, so the hole partition could not be looked at (the weights ship in ico penalty-schema v3)
+PASS: ludlow regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP
 PASS: ludlow: every list of amounts in the document is one perspective in one currency
 PASS: ludlow: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
-FAIL: tuppence prices[0] (ico/pricing) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
-FAIL: tuppence prices[1] (platform/threat) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
 PASS: tuppence: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
-SKIP: tuppence regime entry (penalty-schema): pinned at None, which publishes no control_weights, so the hole partition could not be looked at (the weights ship in ico penalty-schema v3)
+PASS: tuppence regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP
 PASS: tuppence: every list of amounts in the document is one perspective in one currency
 PASS: tuppence: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
-FAIL: 11 £-seam check(s) observed false
+PASS: every price names its perspective, currency, source and per-customer share; no sum crosses either; and wherever a party publishes both a selection-policy package and composed evidence, the two selection engines agree

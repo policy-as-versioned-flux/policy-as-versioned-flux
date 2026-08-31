@@ -1,19 +1,39 @@
-[1;36m==>[0m 1. party_artefact.py's own asserts (schema.json + the tag/baseline checks)
-OK schema.json: the four parent kinds and three roles are exactly what this module expects
+[1;36m==>[0m 1. party_artefact.py's own asserts (schema.json + the tag/baseline/publish checks)
+OK schema.json: the three parent kinds, five roles and four floor tiers are exactly what this module expects
 OK validate_schema: a well-formed party artefact has no errors
 OK validate_schema: a missing required field is caught
-OK validate_schema: a parent kind outside the four is caught
-OK validate_schema: a role outside the three is caught
+OK validate_schema: a parent kind outside the three is caught
+OK validate_schema: a role outside the five is caught
 OK validate_schema: an unknown top-level field is caught
 OK validate_schema: a non-mapping document is refused, not crashed on
-OK check_tags: agreeing pins pass; pricing/threat are named as unchecked, not silenced
+OK validate_schema: a feed parent with no name is caught (ADR-0019: kind closed, name free)
+OK validate_schema: a 'since' that is not a real calendar date is caught
+OK validate_schema: a publisher with no baseline is valid; publishes[] validates
+OK validate_schema: an ADOPTER with no baseline is still refused
+OK validate_schema: a publishes[] kind outside the three is caught
+OK validate_schema: signed size, appetite, reporting currency and a cage floor validate
+OK validate_schema: a turnover with no currency is refused -- every amount carries one
+OK validate_schema: a half-declared size is refused, not defaulted
+OK validate_schema: an adopter cannot floor itself at 'infra'
+OK check_tags: agreeing pins pass; each feed parent is named as unchecked, not silenced
 OK check_tags: a declared version that disagrees with the pinned tag is refused
 OK check_tags: a missing pin file that ticket 11 expects is refused, not skipped
 OK check_baseline_mirror: an agreeing baselineName passes
 OK check_baseline_mirror: a disagreeing baselineName is refused
 OK check_baseline_mirror: a missing baselineName key is refused
+OK publish_capability: a party advertising publishes[] with no cut-release.yml is refused
+OK publish_capability: a release.yml that pins NO identity is not verification
+OK publish_capability: an identity-pinned release.yml + cut-release.yml -> both true
+OK publish_capability: the workflow alone is not the capability -- the role is read too
 OK check(): a real party.yaml with agreeing pins and baseline mirror passes end to end
+OK check(): a publisher with no baseline passes; the baseline mirror is named, not run
 OK check(): a structurally invalid party artefact refuses before touching any pin file
 
-selfcheck ok: schema.json is the single source of truth for the allowed roles and parent kinds; validate_schema catches every structural defect ticket 11 names (a missing field, a kind outside the four, an unknown field); check_tags matches a real Flux pin and refuses a real disagreement, naming pricing/threat as unchecked rather than silencing them; check_baseline_mirror matches, refuses a disagreement, and refuses a missing key; check() composes all three end to end against a real party.yaml on disk.
-[1;36m==>[0m PASS: the party artefact schema and its check both hold
+selfcheck ok: schema.json is the single source of truth for the allowed roles, parent kinds and floor tiers; validate_schema catches every structural defect ticket 11 names and every one ticket 21 adds (a feed parent with no name, a bad 'since', an adopter with no baseline, a publishes[] kind outside the three, a half-declared size, an amount with no currency, a floor at 'infra'); check_tags matches a real Flux pin and refuses a real disagreement, naming each feed parent as unchecked rather than silencing it; publish_capability reads two facts off real workflow files and refuses a publishes[] with no release path; check_baseline_mirror matches, refuses a disagreement, and refuses a missing key; check() composes them end to end against a real party.yaml on disk, for an adopter and for a publisher.
+[1;36m==>[0m 2. the platform's own party artefact checks out
+NOTE: baseline mirror not checked: this party does not adopt, so it selects no baseline and has no nist pin ConfigMap
+FACT: can_publish=true
+FACT: verification_key_present=true
+OK: /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/party.yaml is a valid party artefact; every check that could run agrees (any it could not is a NOTE above)
+[1;36m==>[0m 3. the platform can actually publish what it advertises
+[1;36m==>[0m PASS: the party artefact schema, its check, and the platform's own artefact all hold

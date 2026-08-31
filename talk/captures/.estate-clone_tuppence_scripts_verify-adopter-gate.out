@@ -1,9 +1,93 @@
 
 == Scenario D: against the REAL, currently-tagged v1.0.0 (predates cs-27) -- honest current-state refusal ==
-warning: source repository is shallow, ignoring --local
-warning: --local is ignored
-fatal: ambiguous argument 'v1.0.0^{commit}': unknown revision or path not in the working tree.
-Use '--' to separate paths from revisions, like this:
-'git <command> [<revision>...] -- [<file>...]'
-REFUSED: could not find or fetch platform tag 'v1.0.0'
-FAIL: D: expected the missing-evidence reason naming 2.0.0, got: REFUSED: could not find or fetch platform tag 'v1.0.0'
+ok  platform checked out at v1.0.0, resolved commit matches the pinned commit field (e34ae7f5d38feede2c30ef45037ec9af0d3f43b3)
+REFUSED: no signed evidence committed for policy version 2.0.0 at computed-semver/evidence/2.0.0.json -- the institution cannot trust an unverified bump
+ok  D: real refusal against the real repo's own current tags -- no evidence exists yet, correctly refused
+
+== Scenario C: commit-pin mismatch -- ADR-0001's pin made load-bearing ==
+REFUSED: platform-pin.yaml names commit 0000000000000000000000000000000000000c for tag v1.0.0, but the tag actually resolves to e34ae7f5d38feede2c30ef45037ec9af0d3f43b3 -- ADR-0001's pin disagrees with reality
+ok  C: a pin naming the wrong commit for its own tag is refused, naming the real resolved commit
+
+== Scenario D2: a REAL cosign verify-blob rejection of a present-but-malformed bundle (the real binary reaches the trust check itself, not just the file-existence check) ==
+ok  platform checked out at v1.0.0, resolved commit matches the pinned commit field (e34ae7f5d38feede2c30ef45037ec9af0d3f43b3)
+REFUSED: cosign verify-blob failed for policy version 2.0.0 evidence (identity '.*'): Error: bundle does not contain cert for verification, please provide public key
+error during command execution: bundle does not contain cert for verification, please provide public key
+ok  D2: real cosign verify-blob genuinely rejects a present-but-malformed bundle (not just a missing-file check)
+
+== Scenario E: the REAL, unmodified, currently-committed platform-pin.yaml -- a genuine two-document YAML stream (GitRepository + Kustomization) -- verified end to end with REAL cosign against platform's REAL committed evidence bundles ==
+FAIL: composed bump is major -- refusing to adopt v2.0.1 without human review
+ok  platform checked out at v2.0.1, resolved commit matches the pinned commit field (533dccb0a823001b396fd60ab08014bf75065a37)
+declared (platform tag (none) -> v2.0.1): no predecessor
+composed (this institution, across ['4.0.0'] and retired []): major
+   E: the real state composes a major, so the gate refuses for human review -- that is the designed answer, and every element below still had to verify
+ok  E: real cosign verify-blob ACCEPTED platform's real committed evidence for 4.0.0
+ok  E: the gate PASSES against the real, currently-committed platform-pin.yaml -- real checkout at v2.0.1, commit verification, real identity constants, real cosign signature verification
+ok  E-multi: parse_pin() reads tag/commit past a second (Kustomization) document with no ComposerError, and the gate reaches the identical verdict
+
+== Scenario E2: the SAME real bundles, refused by REAL cosign when the identity constant names a foreign publisher -- the identity pin is load-bearing against a real Fulcio certificate, not only against a string ==
+ok  platform checked out at v2.0.1, resolved commit matches the pinned commit field (533dccb0a823001b396fd60ab08014bf75065a37)
+REFUSED: cosign verify-blob failed for policy version 4.0.0 evidence (identity '^https://github\\.com/evil-org/platform/\\.github/workflows/cut-release\\.yml@refs/heads/main$'): Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+ok  E2: the same real bundle that just verified is refused by the real binary when the identity constant names a different publisher
+
+== Scenario F: old_tag == new_tag -- the ordinary PR that never touches gitops/platform/platform-pin.yaml at all ==
+ok  platform checked out at v1.0.0, resolved commit matches the pinned commit field (e34ae7f5d38feede2c30ef45037ec9af0d3f43b3)
+REFUSED: no signed evidence committed for policy version 2.0.0 at computed-semver/evidence/2.0.0.json -- the institution cannot trust an unverified bump
+ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none'), never refuses as 'does not move forward'; the real refusal that does fire is the genuine missing-evidence one, unrelated to the same-tag bug
+
+== Scenario A/B setup: one real gated release, plus two real array-level releases (unchanged, then retired) ==
+  setup: tagged policy/v1.0.0 in the throwaway clone (the real repo waits on CI to sign it)
+  setup: tagged policy/v2.0.0 in the throwaway clone (the real repo waits on CI to sign it)
+  setup: tagged policy/v2.0.1 in the throwaway clone (the real repo waits on CI to sign it)
+  setup: tagged policy/v3.0.0 in the throwaway clone (the real repo waits on CI to sign it)
+  setup: tagged policy/v4.0.0 in the throwaway clone (the real repo waits on CI to sign it)
+ok  'v2.0.0' is not a policy tag -- not this gate's subject, skipped
+signed: /tmp/tmp.ZZE6yihwen/clone/computed-semver/evidence/9.0.0.json.bundle
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v9.0.0` | major | patch | passed | declared bump 'major' is stronger than the computed bump 'patch' (window: 4.0.0) -- no movement required it |
+
+GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
+GATE: passed for policy/v9.0.0
+committed: signed release-gate evidence for v2.0.0, policy/v9.0.0
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit e31c971e8bdb11bad21434e2c23fc9ebd3d0d897
+tagged v2.0.0
+tagged policy/v9.0.0
+ok  'v3.0.0' is not a policy tag -- not this gate's subject, skipped
+no policy tags in this dispatch -- the gate's subject is distribution/versions.yaml's policy line; nothing to check, nothing to sign, nothing to commit
+no evidence changes to commit (no policy tags in this dispatch)
+no policy tags in this dispatch -- no versions.yaml element to point at the evidence commit
+tagged v3.0.0
+ok  one real gated release (9.0.0, real evidence), plus two real array-level releases (unchanged, then retired), real tags v2.0.0/v2.1.0/v3.0.0
+
+== Scenario A: real PASS -- array unchanged (v2.0.0 -> v2.1.0), composed re-reads 9.0.0's real committed evidence, weaker-than-declared note fires ==
+ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (9ecdfb7dd1905923d7c5495121a3ba996e8e5913)
+declared (platform tag v2.0.0 -> v2.1.0): minor
+composed (this institution, across ['9.0.0'] and retired []): patch
+NOTE: composed bump ('patch') is weaker than the publisher's tag ('minor') -- informational only, this institution's obligation is never lowered by a local view
+PASS: composed bump 'patch' does not exceed major; v2.1.0 may be adopted
+ok  A: composed by RE-READING 9.0.0's real committed evidence (never recomputed), no retirement, real PASS
+  A-render: render-evidence-comment.py against this REAL summary (not the fixture its own selfcheck uses)
+ok  A-render: rendered a real evidence summary to markdown, no percentage anywhere
+
+== Scenario B: real FAIL -- 9.0.0 retires with nothing replacing it, composed forced major ==
+FAIL: composed bump is major -- refusing to adopt v3.0.0 without human review
+ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (33db494263f6aefe603e57d6f703e1e47a7c4e90)
+declared (platform tag v2.1.0 -> v3.0.0): major
+composed (this institution, across [] and retired ['9.0.0']): major
+RETIRED, reaching this institution as major: 9.0.0
+ok  B: real refusal -- a composed major fails the required check for real (non-zero exit), retirement named, nothing silent
+
+PASS: adopter-gate.py checks out the tag under review (never the default branch), refuses a
+resolved-commit disagreement with the pinned commit field, and refuses -- with the real cosign
+binary, real subprocess, real exit code -- when signed evidence is entirely missing (the real,
+currently-tagged v1.0.0, which honestly predates cs-27), when a present bundle is malformed,
+and when a real bundle's real certificate identity is not the publisher this institution pins.
+Against the REAL committed platform-pin.yaml, and against the two-document stream it forms with
+cosign really ACCEPTS platform's real committed evidence: the gate passes unskipped. On real
+committed evidence it composes across real multi-version content with no
+retirement to a real PASS (printing, never downgrading, when composed is weaker than the
+publisher's own tag), and forces a real non-zero-exit FAIL, naming the version, when a composed
+bump goes major on a real retirement.

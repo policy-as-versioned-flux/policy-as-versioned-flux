@@ -1,0 +1,14 @@
+
+== 1. the verifier never signs, re-signs or writes a ref ==
+  ok   no signing or ref-writing verb in verify_gitsign.py, by AST over its own subprocess argv
+  ok   it fetches refs/tags read-only into a bare cache and reads the tag object
+
+== 2. the pins are release.yml's, not literals ==
+  ok   identity regexp matches release.yml: ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+  ok   issuer matches release.yml: https://token.actions.githubusercontent.com
+
+== 3. the fixture is this repo's own signed tag, byte for byte ==
+  ok   fixture == git cat-file tag policy/v3.0.0 (3642 bytes)
+
+== 4. it ACCEPTS the real signed tag under the release.yml pins ==
+FAIL: the real tag was rejected: REJECTED: signature or certificate chain did not verify at tagger time 1787475175: 80AB918C797F0000:error:17000064:CMS routines:cms_signerinfo_verify_cert:certificate verify error:../crypto/cms/cms_smime.c:289:Verify error: unable to get local issuer certificate

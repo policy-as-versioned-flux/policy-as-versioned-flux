@@ -1,5 +1,5 @@
 [1;36m==>[0m 0. the engine's own asserts (band selection, tightening raises £, no timer)
-ok  driftwood(£40000 tol): loose buys £19439 -> Audit | tightened buys £54520 -> Deny | same loose under ludlow(£5000 tol) -> Deny
+ok  driftwood(£40000 tol, from its OWN party.yaml): loose buys £19439 -> Audit | tightened buys £54520 -> Deny | same loose under ludlow(£5000 tol) -> Deny | a party with no declared appetite refuses as a missing instrument
 [1;36m==>[0m 1. driftwood, loose triple: risk_bought below the £40k band -> Audit
 [1;36m==>[0m 2. tighten the triple (LM reassessed upward): £ rises over the band -> Deny
 [1;36m==>[0m 3. the flip is justified by the number, not a date

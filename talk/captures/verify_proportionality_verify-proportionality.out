@@ -1,5 +1,5 @@
 [1;36m==>[0m 0. the £ engine's own asserts (band selection, tightening raises £, no timer)
-ok  driftwood(£40000 tol): loose buys £19439 -> Audit | tightened buys £54520 -> Deny | same loose under ludlow(£5000 tol) -> Deny
+ok  driftwood(£40000 tol, from its OWN party.yaml): loose buys £19439 -> Audit | tightened buys £54520 -> Deny | same loose under ludlow(£5000 tol) -> Deny | a party with no declared appetite refuses as a missing instrument
 [1;36m==>[0m 1. the SAME control + SAME scenario -> divergent £-derived verdicts
 [1;36m==>[0m 2. the £ that DRIVES it — same risk_bought, different appetite band
     risk_bought £21,107  |  driftwood band £40,000 -> Audit  |  ludlow band £5,000 -> Deny

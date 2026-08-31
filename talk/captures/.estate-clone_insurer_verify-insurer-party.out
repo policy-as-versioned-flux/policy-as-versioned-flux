@@ -1,5 +1,9 @@
 OK: party.yaml parses, roles include insurer, 3 publishes[] entry(ies) each with a real path and a valid-JSON payload_schema
-REFUSED: missing required field 'baseline'
-REFUSED: unknown top-level field 'reporting_currency'
-REFUSED: unknown top-level field 'publishes'
-FAIL: party.yaml does not validate against platform/party/schema.json
+NOTE: driftwood/feed:exposure@v1.1.0: no Flux/Renovate pin exists for this kind in this estate today -- declared version not checked here; the signed tag it names is checked against the real remote by verify-feed-contract.sh
+NOTE: tuppence/feed:exposure@v1.1.0: no Flux/Renovate pin exists for this kind in this estate today -- declared version not checked here; the signed tag it names is checked against the real remote by verify-feed-contract.sh
+NOTE: ludlow/feed:exposure@v1.1.0: no Flux/Renovate pin exists for this kind in this estate today -- declared version not checked here; the signed tag it names is checked against the real remote by verify-feed-contract.sh
+NOTE: baseline mirror not checked: this party does not adopt, so it selects no baseline and has no nist pin ConfigMap
+FACT: can_publish=true
+FACT: verification_key_present=true
+OK: party.yaml is a valid party artefact; every check that could run agrees (any it could not is a NOTE above)
+PASS: insurer party artefact

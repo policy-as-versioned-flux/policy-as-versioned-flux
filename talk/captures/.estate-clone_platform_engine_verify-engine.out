@@ -5,5 +5,5 @@
   ok   flux-operator sourced from an OCIRepository (the chart ships OCI-only)
   ok   no FluxInstance object — the existing vanilla Flux install stays untouched (ADR-0005 guardrail)
   -- all offline invariants hold --
-== live checks skipped (engine not up; run estate/platform/engine/up.sh) ==
-verify-engine: done
+SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — Kyverno and flux-operator are pinned Flux HelmReleases with no FluxInstance

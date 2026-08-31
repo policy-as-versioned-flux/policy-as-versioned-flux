@@ -1,0 +1,77 @@
+== offline: the federation set is complete and symmetric ==
+  ok   one federation file per cluster-running party (['driftwood', 'ludlow', 'platform', 'tuppence']) and no others
+  ok   driftwood: every object is a ClusterFederatedTrustDomain (['ClusterFederatedTrustDomain'])
+  ok   driftwood/platform.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   driftwood/platform.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   driftwood/platform.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   driftwood/platform.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   driftwood/tuppence.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   driftwood/tuppence.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   driftwood/tuppence.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   driftwood/tuppence.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   driftwood/ludlow.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   driftwood/ludlow.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   driftwood/ludlow.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   driftwood/ludlow.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   ludlow: every object is a ClusterFederatedTrustDomain (['ClusterFederatedTrustDomain'])
+  ok   ludlow/platform.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   ludlow/platform.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   ludlow/platform.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   ludlow/platform.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   ludlow/driftwood.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   ludlow/driftwood.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   ludlow/driftwood.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   ludlow/driftwood.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   ludlow/tuppence.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   ludlow/tuppence.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   ludlow/tuppence.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   ludlow/tuppence.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   platform: every object is a ClusterFederatedTrustDomain (['ClusterFederatedTrustDomain'])
+  ok   platform/driftwood.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   platform/driftwood.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   platform/driftwood.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   platform/driftwood.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   platform/tuppence.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   platform/tuppence.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   platform/tuppence.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   platform/tuppence.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   platform/ludlow.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   platform/ludlow.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   platform/ludlow.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   platform/ludlow.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   tuppence: every object is a ClusterFederatedTrustDomain (['ClusterFederatedTrustDomain'])
+  ok   tuppence/platform.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   tuppence/platform.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   tuppence/platform.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   tuppence/platform.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   tuppence/driftwood.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   tuppence/driftwood.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   tuppence/driftwood.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   tuppence/driftwood.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   tuppence/ludlow.acme.internal: className set, so spire-controller-manager reconciles it
+  ok   tuppence/ludlow.acme.internal: bundle endpoint is https (SPIRE refuses anything else)
+  ok   tuppence/ludlow.acme.internal: https_spiffe profile (the peer's own SPIRE authenticates itself)
+  ok   tuppence/ludlow.acme.internal: endpoint SPIFFE ID is inside the peer's own trust domain
+  ok   driftwood does not federate with itself
+  ok   driftwood declares exactly its three peers, got ['ludlow.acme.internal', 'platform.acme.internal', 'tuppence.acme.internal']
+  ok   ludlow does not federate with itself
+  ok   ludlow declares exactly its three peers, got ['driftwood.acme.internal', 'platform.acme.internal', 'tuppence.acme.internal']
+  ok   platform does not federate with itself
+  ok   platform declares exactly its three peers, got ['driftwood.acme.internal', 'ludlow.acme.internal', 'tuppence.acme.internal']
+  ok   tuppence does not federate with itself
+  ok   tuppence declares exactly its three peers, got ['driftwood.acme.internal', 'ludlow.acme.internal', 'platform.acme.internal']
+  ok   pair driftwood<->ludlow is declared on both sides
+  ok   pair driftwood<->platform is declared on both sides
+  ok   pair driftwood<->tuppence is declared on both sides
+  ok   pair ludlow<->driftwood is declared on both sides
+  ok   pair ludlow<->platform is declared on both sides
+  ok   pair ludlow<->tuppence is declared on both sides
+  ok   pair platform<->driftwood is declared on both sides
+  ok   pair platform<->ludlow is declared on both sides
+  ok   pair platform<->tuppence is declared on both sides
+  ok   pair tuppence<->driftwood is declared on both sides
+  ok   pair tuppence<->ludlow is declared on both sides
+  ok   pair tuppence<->platform is declared on both sides
+  -- the declared federation set is complete and symmetric --
+SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — each cluster-running party has its own trust domain and the four domains federate pairwise

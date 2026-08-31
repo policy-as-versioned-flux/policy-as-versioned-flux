@@ -4,4 +4,4 @@ selfcheck ok: the three known-good bumps rederive exactly, and a deliberately wr
 == the standing check itself ==
 ok  the three known-good bumps rederive exactly
 ok  generated-corpus/manifest.yaml matches the live generator version
-ok  3.0.0: recomputes identically under the current generator
+ok  4.0.0: recomputes identically under the current generator

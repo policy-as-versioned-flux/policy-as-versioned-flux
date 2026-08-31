@@ -1,0 +1,13 @@
+==> 1. the engine's own assertions (tail names, heavy > bounded, sums refuse)
+ok  ALE=19559 VaR95=30948 TVaR=34087 carried=34958 | Deny buys 19439 (99% effective)
+ok  multi-source: combined ALE=73579 (~= 19559+54139) TVaR=128447 > naive-independent TVaR=118711
+ok  tail: lognormal-gpd VaR95=58953 vs bounded-pert VaR95=38910 at the same ALE (24186); malformed specs refuse
+ok  sum_prices: one perspective and one currency sums, every mix refuses
+==> 2. the CLI reports the tail, and a spliced tail out-prices a bounded one
+  ok   driftwood: unversioned image ships cart  tail=bounded-pert VaR95=30948
+  ok   driftwood: cart PII with the twin's heav tail=lognormal-gpd VaR95=58953
+  ok   same shock, heavier tail: VaR95 58953 > 30948
+==> 3. a malformed severity spec refuses, it does not price
+  ok   refused: refused: severity spec lognormal-gpd: missing beta
+PASS: fair.py names its tail, the lognormal-GPD splice prices heavier than the
+bounded PERT at the same shock, and a malformed severity spec refuses.

@@ -2,11 +2,21 @@
 OK compose(): the real driftwood composes against its real pinned parents; platform's two formerly-dangling claims are fixed, zero refusals
 OK document: carries outcome, parents[], members[], refusals[], restatements[], cages[], holes[], ungoverned[], prices[], limits[]
 OK prices[]: computed on the real driftwood's very first composition too, with no prior signed artefact to compare a bump against -- old and new both price at this run's own pin, an honest 'no move'
+OK prices[]: every entry names its perspective, currency, source and kind, and restates its own amount per customer against driftwood's OWN signed size (240000 customers)
+OK prices[]: the insurer's signed quote books as one `premium` cost line under driftwood's own perspective (113403.30 GBP), and the insurer's layer arithmetic stays under its own
+OK prices[]: a quote insuring another party, or booking its premium on another party's sheet, refuses as a missing instrument and prices nothing
+OK exposure: driftwood's composed artefact signs its total priced exposure (3704381.74 GBP), its appetite as the attachment and the 3 breakdown by regime name and control id; the premium it buys is a cost and is not counted in it
+OK prices[]: the one summing helper refuses a list that crosses a perspective or a currency -- no number in this estate is a lie by addition
+OK prices[]: driftwood's own forward-intel feed prices as one source:twin entry -- perspective driftwood, GBP, tail bounded-pert, curve sha256:70e5e, policy version 1.0.0
+OK prices[]: an adopter with no forward-intel feed simply has no twin entry -- a missing twin feed is never a refusal (ticket 25)
+OK prices[]: an ico pin at v3 carries the published control weights as a per-hole breakdown -- 4 holes, weights sum to 1.0, and the entry amount IS the sum of the hole amounts (a hole partitions the regime, it never adds to it)
+OK prices[]: an adopter with no signed appetite refuses as a missing instrument (ADR-0020), naming the artefact that declares none -- and prices nothing
+OK prices[]: driftwood's own overlay.floor clamps the selection UP -- the threat-register price that picks baseline unclamped is held at the declared quarantine floor, tighten-only (ADR-0022)
 OK limits[]: the two-publisher-conflict limit prints open at driftwood's one pinned implementations publisher
-OK parents[]: all four declared parent kinds resolve to a non-empty SHA
+OK parents[]: all five declared parent kinds resolve to a non-empty SHA
 OK load_implementations: cage-tier and cage-netpol, one family, one version, both survive (ADR-0016's fix for the prototype's (family, version) key)
 OK load_implementations: a dedicated fixture, two members of one family at one version, both keys present
-OK render_is_faithful: every member of every live version (15 total) renders back byte-identical after the header is stripped
+OK render_is_faithful: every member of every live version (5 total) renders back byte-identical after the header is stripped
 OK render_member: no validationActions field written onto cage-tier (Mutating) or cage-netpol (Generating)
 OK guards: orphan guard and governed-namespace-requires-claim both compose under the platform tag (no policy-version), rendering back to their offline twins' output
 OK HEADER.yaml/holes[]: the real estate's first composition records 285 holes, all recorded (none new, none refused), ac-6.10 found by walking nested controls, and ac-6/cm-6 are covered (a claim exists, even the dangling one)
@@ -27,7 +37,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "party": "fixture-platform",
       "kind": "implementations",
       "version": "1.0.0",
-      "sha": "cb5c12c2030082f1db0790b756a2ba489b3830c7ae87edd98ab5c9bc40753b08"
+      "sha": "208f45b0908885fabd218cbe821f2a10081f4373393e39f9744210e80d0a4e55"
     }
   ],
   "members": [
@@ -37,7 +47,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "ValidatingPolicy",
       "version": "1.0.0",
       "source_party": "fixture-platform",
-      "source_sha": "cb5c12c2030082f1db0790b756a2ba489b3830c7ae87edd98ab5c9bc40753b08",
+      "source_sha": "208f45b0908885fabd218cbe821f2a10081f4373393e39f9744210e80d0a4e55",
       "action": "Audit"
     },
     {
@@ -46,7 +56,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "ValidatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "cb5c12c2030082f1db0790b756a2ba489b3830c7ae87edd98ab5c9bc40753b08",
+      "source_sha": "208f45b0908885fabd218cbe821f2a10081f4373393e39f9744210e80d0a4e55",
       "action": null
     },
     {
@@ -55,7 +65,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "ValidatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "cb5c12c2030082f1db0790b756a2ba489b3830c7ae87edd98ab5c9bc40753b08",
+      "source_sha": "208f45b0908885fabd218cbe821f2a10081f4373393e39f9744210e80d0a4e55",
       "action": null
     }
   ],
@@ -80,6 +90,13 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "detail": "the cross-party rule-conflict path above is only exercised in the real estate once a second implementations publisher is pinned",
       "count": 1,
       "status": "open"
+    },
+    {
+      "name": "pinned-parent-lacks-rendered-versions",
+      "detail": "the composed set renders policy versions the pinned parent commit does not contain; the header names a parent release that holds none of these trees. every rendered version is present at the pinned commit",
+      "count": 0,
+      "checked": 0,
+      "status": "closed"
     }
   ]
 }
@@ -91,8 +108,8 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
     {
       "party": "platform",
       "kind": "implementations",
-      "version": "1.1.1",
-      "sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60"
+      "version": "2.0.1",
+      "sha": "533dccb0a823001b396fd60ab08014bf75065a37"
     },
     {
       "party": "nist",
@@ -102,15 +119,24 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
     },
     {
       "party": "ico",
-      "kind": "pricing",
-      "version": "v1",
-      "sha": "8902b661f34fe48702e09d0bb3139aa7a5e7e7fd"
+      "kind": "feed",
+      "name": "penalty-schema",
+      "version": "v3",
+      "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e"
     },
     {
-      "party": "platform",
-      "kind": "threat",
+      "party": "feeds",
+      "kind": "feed",
+      "name": "threat-register",
       "version": "v1",
-      "sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60"
+      "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268"
+    },
+    {
+      "party": "insurer",
+      "kind": "feed",
+      "name": "quote-driftwood",
+      "version": "v1",
+      "sha": "db767055119292e400edd63ed260785ce605eb4e"
     }
   ],
   "members": [
@@ -118,135 +144,45 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "family": "graded-enforcement",
       "name": "cage-netpol",
       "kind": "GeneratingPolicy",
-      "version": "2.0.0",
+      "version": "4.0.0",
       "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
       "action": null
     },
     {
       "family": "graded-enforcement",
       "name": "cage-tier",
       "kind": "MutatingPolicy",
-      "version": "2.0.0",
+      "version": "4.0.0",
       "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
       "action": null
     },
     {
       "family": "posture",
       "name": "posture-trust-boundary",
       "kind": "ValidatingPolicy",
-      "version": "2.0.0",
+      "version": "4.0.0",
       "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
       "action": "Deny"
     },
     {
       "family": "posture",
       "name": "stamp-posture",
       "kind": "MutatingPolicy",
-      "version": "2.0.0",
+      "version": "4.0.0",
       "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
       "action": null
     },
     {
       "family": "require-nonroot",
       "name": "require-nonroot",
       "kind": "ValidatingPolicy",
-      "version": "2.0.0",
+      "version": "4.0.0",
       "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": "Audit"
-    },
-    {
-      "family": "graded-enforcement",
-      "name": "cage-netpol",
-      "kind": "GeneratingPolicy",
-      "version": "2.0.1",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": null
-    },
-    {
-      "family": "graded-enforcement",
-      "name": "cage-tier",
-      "kind": "MutatingPolicy",
-      "version": "2.0.1",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": null
-    },
-    {
-      "family": "posture",
-      "name": "posture-trust-boundary",
-      "kind": "ValidatingPolicy",
-      "version": "2.0.1",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": "Deny"
-    },
-    {
-      "family": "posture",
-      "name": "stamp-posture",
-      "kind": "MutatingPolicy",
-      "version": "2.0.1",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": null
-    },
-    {
-      "family": "require-nonroot",
-      "name": "require-nonroot",
-      "kind": "ValidatingPolicy",
-      "version": "2.0.1",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": "Audit"
-    },
-    {
-      "family": "graded-enforcement",
-      "name": "cage-netpol",
-      "kind": "GeneratingPolicy",
-      "version": "3.0.0",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": null
-    },
-    {
-      "family": "graded-enforcement",
-      "name": "cage-tier",
-      "kind": "MutatingPolicy",
-      "version": "3.0.0",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": null
-    },
-    {
-      "family": "posture",
-      "name": "posture-trust-boundary",
-      "kind": "ValidatingPolicy",
-      "version": "3.0.0",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": "Deny"
-    },
-    {
-      "family": "posture",
-      "name": "stamp-posture",
-      "kind": "MutatingPolicy",
-      "version": "3.0.0",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
-      "action": null
-    },
-    {
-      "family": "require-nonroot",
-      "name": "require-nonroot",
-      "kind": "ValidatingPolicy",
-      "version": "3.0.0",
-      "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
       "action": "Audit"
     },
     {
@@ -255,7 +191,7 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "kind": "ValidatingPolicy",
       "version": null,
       "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
       "action": null
     },
     {
@@ -264,7 +200,7 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "kind": "ValidatingPolicy",
       "version": null,
       "source_party": "platform",
-      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
       "action": null
     }
   ],
@@ -1417,19 +1353,68 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
   "prices": [
     {
       "source": "ico",
-      "kind": "pricing",
-      "old_version": "v1",
-      "new_version": "v1",
-      "old_price": 16901471.55226278,
-      "new_price": 16901471.55226278,
-      "old_tier": "deny",
-      "proposed_tier": "deny",
+      "kind": "feed",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 1787177.0751717847,
+      "per_customer": {
+        "amount": 7.446571146549103,
+        "currency": "GBP"
+      },
+      "name": "penalty-schema",
+      "old_version": "v3",
+      "new_version": "v3",
+      "old_price": 1787177.0751717845,
+      "new_price": 1787177.0751717847,
+      "old_tier": "isolated",
+      "proposed_tier": "isolated",
       "changed": false,
-      "proposed_as": "issue"
+      "lef": [
+        1,
+        2,
+        4
+      ],
+      "lef_basis": "lm sourced from ICO (Information Commissioner's Office) real public fines (UK GDPR / Data Protection Act 2018 s157). warn/deny lef are editorial (schema doesn't carry frequency). Scaled to a subscriber turnover of 86,000,000.00 GBP.",
+      "proposed_as": "label",
+      "holes": [
+        {
+          "source": "nist",
+          "id": "pl-2",
+          "weight": 0.3,
+          "amount": 536153.1225515354
+        },
+        {
+          "source": "nist",
+          "id": "ra-3",
+          "weight": 0.3,
+          "amount": 536153.1225515354
+        },
+        {
+          "source": "nist",
+          "id": "ca-2",
+          "weight": 0.2,
+          "amount": 357435.41503435693
+        },
+        {
+          "source": "nist",
+          "id": "ir-8",
+          "weight": 0.2,
+          "amount": 357435.41503435693
+        }
+      ],
+      "total": 1787177.0751717847
     },
     {
-      "source": "platform",
-      "kind": "threat",
+      "source": "feeds",
+      "kind": "feed",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 19558.549772440045,
+      "per_customer": {
+        "amount": 0.08149395738516685,
+        "currency": "GBP"
+      },
+      "name": "threat-register",
       "old_version": "v1",
       "new_version": "v1",
       "old_price": 19558.549772440045,
@@ -1437,7 +1422,82 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "old_tier": "baseline",
       "proposed_tier": "baseline",
       "changed": false,
-      "proposed_as": "label"
+      "lef": [
+        2,
+        4,
+        9
+      ],
+      "lef_basis": "cart/checkout PII exfiltration (e-commerce, short-life cart data, high traffic/low sensitivity per-record). lef sourced from DBIR retail-sector web-app-attack base rate, editorial midpoint.",
+      "proposed_as": "label",
+      "holes": [],
+      "total": null
+    },
+    {
+      "source": "insurer",
+      "kind": "premium",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 113403.3,
+      "per_customer": {
+        "amount": 0.47251375,
+        "currency": "GBP"
+      },
+      "name": "quote-driftwood",
+      "old_version": "v1",
+      "new_version": "v1",
+      "quote_version": "1.0.0",
+      "attachment": {
+        "amount": 40000.0,
+        "currency": "GBP"
+      },
+      "limit": {
+        "amount": 3000000,
+        "currency": "GBP"
+      },
+      "exclusions": [
+        {
+          "regime": "uk-gdpr",
+          "control_ids": [
+            "pl-2",
+            "ra-3"
+          ],
+          "why": "Governance-of-record failures. The share of the uk-gdpr lower-tier exposure that ico's published control weights put on the system security plan (pl-2) and the risk assessment (ra-3) is retained by the insured: this cover attaches to breach consequence, not to the insured's own documentation of its programme."
+        }
+      ],
+      "conditions": [
+        {
+          "source": "nist",
+          "id": "ac-6",
+          "consequence": "void",
+          "why": "Least privilege enforced on the governed namespace. This estate implements ac-6; cover is written on the assumption it stays implemented."
+        },
+        {
+          "source": "nist",
+          "id": "cm-6",
+          "consequence": "uplift",
+          "uplift": {
+            "amount": 25000,
+            "currency": "GBP"
+          },
+          "why": "Configuration settings enforced. A lapse is survivable but re-rates the account by the stated amount at the next re-quote."
+        }
+      ],
+      "valid_from": "2026-08-28",
+      "valid_until": "2027-08-28",
+      "priced_against": [
+        {
+          "party": "platform",
+          "kind": "implementations",
+          "version": "1.1.1"
+        },
+        {
+          "party": "driftwood",
+          "kind": "feed",
+          "name": "exposure",
+          "version": "v1.1.0",
+          "exposure_sha256": "sha256:397abe81d6cbdbd7b27a5d2516dd9c35417e9922f995b8b6af7d1fca34829820"
+        }
+      ]
     }
   ],
   "limits": [
@@ -1446,6 +1506,13 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "detail": "the cross-party rule-conflict path above is only exercised in the real estate once a second implementations publisher is pinned",
       "count": 1,
       "status": "open"
+    },
+    {
+      "name": "pinned-parent-lacks-rendered-versions",
+      "detail": "the composed set renders policy versions the pinned parent commit does not contain; the header names a parent release that holds none of these trees. every rendered version is present at the pinned commit",
+      "count": 0,
+      "checked": 1,
+      "status": "closed"
     }
   ]
 }
@@ -1466,7 +1533,7 @@ OK cmd_compose: against the real estate, exits 0 -- platform's two formerly-dang
   "limits": []
 }
 OK compose()/cmd_compose: a party artefact that doesn't check out refuses, renders nothing, and the CLI exits non-zero
-OK check_diamonds: two edges to ico/pricing at two versions refuse, naming both
+OK check_diamonds: two edges to ico/penalty-schema at two versions refuse, naming both
 OK rule-conflict: two implementations publishers on one key with different content refuse, naming both sources and both contents, never merged; the two-publisher limit prints closed at two
 OK restatement-of-non-validating: restating cage-tier (a MutatingPolicy) refuses
 OK restatement accepted: Audit -> Deny is stricter, and the rendered file carries the restated Deny
@@ -1490,10 +1557,12 @@ OK compute_ungoverned: a recorded ungoverned namespace records and does not refu
 OK compute_ungoverned: a namespace that gains the label prints as closed
 OK compute_ungoverned: a new ungoverned namespace (absent from the last signed artefact) refuses and names it
 OK HEADER.yaml: carries the recorded ungoverned namespaces, and stripping it leaves every other rendered file unchanged -- nothing composition renders reads either namespace set
-OK prices[]: an ico penalty-schema bump (v1 -> v2) moves the uncaged uk-gdpr/lower-tier exposure through ico's own converter; on driftwood's real band both versions land on deny, so the document prints no tier change, marked as an issue subject never a label; no rendered file changes -- a byte comparison proves it
-OK prices[]: a threat-register bump (v1 -> v2) moves tuppence's exposure through the feeds module; on the real band both versions land on deny, no tier change; no rendered file changes
-OK prices[]: a fixture ico band (v1->v2) that crosses driftwood's real GBP40,000 tolerance prints a proposed tier through compose() (deny -> quarantine, changed=True), marked as a label; no rendered file changes
+OK prices[]: an ico penalty-schema bump (v1 -> v2) moves the uncaged uk-gdpr/lower-tier exposure through ico's own converter; on driftwood's real band both versions land on isolated, the bottom rung, so the document prints no tier change and it travels as a label; no rendered file changes -- a byte comparison proves it
+OK prices[]: a threat-register bump (v1 -> v2) moves tuppence's exposure through the feeds module; on the real band both versions land on isolated, no tier change; no rendered file changes
+OK prices[]: a fixture ico band (v1->v2) that crosses driftwood's real GBP40,000 tolerance prints a proposed tier through compose() (isolated -> quarantine, changed=True), marked as a label; no rendered file changes
 OK composition.py itself calls no scheduler and reads no wall clock of its own
 
-selfcheck ok: one seam composes the real driftwood against its real pinned parents; every member of every live version renders back byte-identical after the header is stripped; two members of one family at one version both survive (real estate and a dedicated fixture); no validationActions leaks onto a mutate or a generate; the orphan guard composes under the platform tag and matches its own offline twin; the header carries the composed marker, every parent SHA once, the baseline and the governed namespace names; verify() catches a byte-for-byte drift; the CLI writes files and exits non-zero on a refusal; a split diamond and a cross-party rule conflict refuse, naming both edges/sources/contents; a restatement of a mutate refuses; a stricter restatement is accepted and rendered; a weaker restatement is caged against the estate's real cage engine and appetite bands, rendering the inherited action and pricing driftwood/tuppence/ludlow to the prototype's own baseline/baseline/quarantine table; no tier ever appears in the rendered artefact; the two-publisher limit prints open at one and closed at two; every refusal carries needs_composition. TICKET 14: the baseline resolves by name exact-string, walking nested controls (ac-6.10 found); a prefixed or upper-case id is a hard failure, not a hole; the real estate's first composition records 285 holes and refuses on none -- platform's own two formerly-dangling claims (ac-6, cm-6) are now fixed, so a real first composition composes clean; a new hole refuses and names it; a closed hole is marked so; an adopter-added control refuses unfilled and is filled by the adopter's own claim against its own overlay.add member; a removed control and a widened baseline both refuse with no override; a claim against a parent's policy refuses; and the header carries the recorded hole ids and the selected control set, in a file that strips away clean. TICKET 15: a Namespace with no institution label is ignored entirely; the first composition records a pre-existing ungoverned namespace and refuses on none; a recorded one records and does not refuse; one that gains the governed label prints as closed; a genuinely new one refuses and names it; and the header carries the recorded ungoverned set, in a file that strips away clean, with neither namespace set ever read by anything composition renders. TICKET 16: an ico penalty-schema bump and a threat-register bump each move the priced exposure through the estate's own converters, printing old/new price and old/proposed tier every run; on the real bands neither changes a tier; a fixture band that a bump crosses prints a proposed tier; a proposed deny is marked as an issue subject and never a label value; no rendered file ever changes on a price move; and composition itself reads no wall clock and calls no scheduler.
+selfcheck ok: one seam composes the real driftwood against its real pinned parents; every member of every live version renders back byte-identical after the header is stripped; two members of one family at one version both survive (real estate and a dedicated fixture); no validationActions leaks onto a mutate or a generate; the orphan guard composes under the platform tag and matches its own offline twin; the header carries the composed marker, every parent SHA once, the baseline and the governed namespace names; verify() catches a byte-for-byte drift; the CLI writes files and exits non-zero on a refusal; a split diamond and a cross-party rule conflict refuse, naming both edges/sources/contents; a restatement of a mutate refuses; a stricter restatement is accepted and rendered; a weaker restatement is caged against the estate's real cage engine and appetite bands, rendering the inherited action and pricing driftwood/tuppence/ludlow to the prototype's own baseline/baseline/quarantine table; no tier ever appears in the rendered artefact; the two-publisher limit prints open at one and closed at two; every refusal carries needs_composition. TICKET 14: the baseline resolves by name exact-string, walking nested controls (ac-6.10 found); a prefixed or upper-case id is a hard failure, not a hole; the real estate's first composition records 285 holes and refuses on none -- platform's own two formerly-dangling claims (ac-6, cm-6) are now fixed, so a real first composition composes clean; a new hole refuses and names it; a closed hole is marked so; an adopter-added control refuses unfilled and is filled by the adopter's own claim against its own overlay.add member; a removed control and a widened baseline both refuse with no override; a claim against a parent's policy refuses; and the header carries the recorded hole ids and the selected control set, in a file that strips away clean. TICKET 15: a Namespace with no institution label is ignored entirely; the first composition records a pre-existing ungoverned namespace and refuses on none; a recorded one records and does not refuse; one that gains the governed label prints as closed; a genuinely new one refuses and names it; and the header carries the recorded ungoverned set, in a file that strips away clean, with neither namespace set ever read by anything composition renders. TICKET 16: an ico penalty-schema bump and a threat-register bump each move the priced exposure through the estate's own converters, printing old/new price and old/proposed tier every run; on the real bands neither changes a tier; a fixture band that a bump crosses prints a proposed tier; every selected tier is a real label value now that ADR-0022 retired the deny rung and made the bottom rung a running, unreachable `isolated` cage; no rendered file ever changes on a price move; and composition itself reads no wall clock and calls no scheduler. TICKET 25 (the £ seam, ADR-0020/ADR-0021): every prices[] entry names its perspective, currency, source and kind and restates its own amount per customer against the perspective party's OWN signed size; the one summing helper (fair.sum_prices) refuses any list crossing a perspective or a currency; a regime entry pinned at an ico version that publishes control weights carries a per-hole breakdown whose amounts sum to the entry amount; the adopter's own forward-intel feed prices as ONE source:twin entry naming its selection-policy version, curve hash and fair.py's tail, and a missing forward-intel feed is silence, not a refusal; an adopter with no signed appetite refuses as a missing instrument and prices nothing; and the adopter's own overlay.floor clamps the selection UP and never down. TICKET 36 (the insurer quote slice): the composed artefact signs an `exposure` section -- the adopter's total priced exposure under its own perspective and currency, its appetite as the attachment, and the breakdown by regime name and control id -- and the insurer's signed quote books as ONE `premium` contract cost line under the adopter's perspective, is left out of the exposure it was priced from, and refuses as a missing instrument if it insures another party or books its premium on another party's sheet.
+[1;36m==>[0m 2. the header's pinned parent contains the policy versions the set renders
+[1;36m==>[0m    every rendered policy version is present at the pinned parent commit
 [1;36m==>[0m PASS: the composition seam holds

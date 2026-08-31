@@ -13,7 +13,5 @@
   ok   base and posture share the same className (both actually reconciled by the same manager)
   ok   base excludes posture-managed pods (DoesNotExist) — a pod matches exactly one of the two, never both
   -- SVID path invariants hold --
-[1;36m==>[0m 4-6. live checks skipped: no cluster with the posture policies at context 'kind-driftwood'
-[1;36m==>[0m      (offline proofs above are the demonstrable claim; live needs Kyverno +
-[1;36m==>[0m       SPIRE installed and estate/platform/posture/up.sh applied)
-PASS: posture rides in the SVID path; the label is Kyverno-only; forging is refused.
+SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — posture rides in the SVID path; the label is Kyverno-only; forging is refused

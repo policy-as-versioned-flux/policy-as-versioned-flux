@@ -20,5 +20,23 @@ ale(uk-gdpr/lower-tier alone)               = £9039791
 ale(uk-gdpr/lower-tier + pci-dss, combined)  = £11006429
 ok  £ rose by £1,966,638 once a second regime can draw on the same breach -- fatter, not thinner
 
-PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £,
-and a second obligation source on one breach raises it further.
+== 6. the three published feed envelopes match the one feed contract (ADR-0019) ==
+ok  penalty-schema/v1/feed.json  penalty-schema v1.0.0 by ico at 2026-07-31T16:22:39+01:00, payload validates against penalty-schema/payload.schema.v2.json
+ok  penalty-schema/v2/feed.json  penalty-schema v2.0.0 by ico at 2026-07-31T16:22:39+01:00, payload validates against penalty-schema/payload.schema.v2.json
+ok  penalty-schema/v3/feed.json  penalty-schema v3.0.0 by ico at 2026-08-28T10:00:00+01:00, payload validates against penalty-schema/payload.schema.json
+ok  v1 and v2 envelopes carry the schema/ regimes payloads unchanged
+ok  major 3 adds control_weights and leaves the regimes payload alone
+ok  party.yaml publishes[] resolves: penalty-schema -> penalty-schema, schema penalty-schema/payload.schema.json
+
+== 7. major 3's control weights partition each regime, never add to it ==
+ok  uk-gdpr  higher-tier                 5 controls, sum 1.0 (sc-28, ac-3, ac-6, au-2, ir-4)
+ok  uk-gdpr  lower-tier                  4 controls, sum 1.0 (pl-2, ra-3, ca-2, ir-8)
+ok  pci-dss  non-compliance-escalating   5 controls, sum 1.0 (sc-7, sc-8, ia-2, cm-6, au-6)
+ok  hipaa    willful-neglect-uncorrected 5 controls, sum 1.0 (ac-3, sc-28, au-2, cp-9, ir-4)
+ok  fca      systems-and-controls-failure 4 controls, sum 1.0 (si-4, ca-7, cm-3, au-6)
+
+== 8. the controls parent ico pins is a real tag on the real nist remote ==
+ico pins nist controls at 1.1.0
+ok  nist tag v1.1.0 is on the remote -- major 3's control ids key on a real catalogue version
+
+PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the three published feeds match the one envelope, major 3 partitions each regime into weighted controls, and the nist pin is a real tag

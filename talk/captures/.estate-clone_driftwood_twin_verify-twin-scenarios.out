@@ -1,0 +1,18 @@
+PASS: the overlay carries 6 standing scenarios (the six of decision ticket 11 answer item 4)
+PASS: every scenario declares a question, a proposition, a date, components, a world model and an affected-parties register
+PASS: 4 scenario(s) name a committed class (bus-factor-key-person, eol-date-passes, penalty-published, supply-shock); 2 name none, by decision
+PASS: the four classed subjects are present: niobium (supply-shock), an EOL date passing, a fine published, a key-person event
+PASS: class 'eol-date-passes' lands in all three places: enum=True library=True overlay=True
+PASS: class 'penalty-published' lands in all three places: enum=True library=True overlay=True
+PASS: penalty-published-2026.yaml prices no fine: no currency symbol and no figure anywhere in it (the estate prices the fine, the twin prices what the publication does)
+PASS: penalty-published-2026.yaml says which half of the seam it carries: the consequence is declared and, until a second graded cash-flow edge exists, its note says in its own words that it is not yet priced
+PASS: the niobium headline lives in this overlay as niobium-supply-shock-2026, not in a news feed
+PASS: every scenario's proposition and world model exist in the vendored world layer
+PASS: every scenario's proposition carries a prior belief in the reference map
+PASS: the overlay with its six scenarios still loads and re-renders the feed byte-identically
+PASS: every one of the 5 pins on party.yaml resolves to exactly one dated signal
+PASS: every signal is dated and names a scenario that exists, and every scenario is either bound by a pin or declared unbound with a reason
+PASS: the lookup carries no price: binding a pin to a signal is not pricing it
+PASS: every priced valuation names a fact resolvable in party.yaml and re-derives from it
+TOTAL: 16 pass, 0 fail, 0 could-not-look
+PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin

@@ -2,7 +2,7 @@
 == 1. single-tag legacy form still works ==
 ok: v1.0.0 does not exist yet
 tagged v1.0.0
-To /tmp/tmp.M5NOPMJD6L/remote.git
+To /tmp/tmp.WvRds4fwk1/remote.git
  * [new tag]         v1.0.0 -> v1.0.0
 ok: v1.0.0 pushed
 
@@ -11,10 +11,11 @@ ok: v1.0.1 does not exist yet
 ok: v2.0.0 does not exist yet
 tagged v1.0.1
 tagged v2.0.0
-To /tmp/tmp.M5NOPMJD6L/remote.git
+To /tmp/tmp.WvRds4fwk1/remote.git
+   5349c0a..6508f4b  HEAD -> main
  * [new tag]         v1.0.1 -> v1.0.1
  * [new tag]         v2.0.0 -> v2.0.0
-ok: v1.0.1 and v2.0.0 both landed on the same commit (d38124d3efd849890501f3d505ba7e1afc6afa6d)
+ok: v1.0.1 and v2.0.0 both landed on the same commit (6508f4be2e226cd1fc084e68338d07227f39bf25)
 
 == 3. existing-tag refusal fires for EVERY tag before ANY tag is created ==
 ok: v3.0.0 does not exist yet
@@ -31,9 +32,15 @@ ok: mixed dispatch refused
 == 6. cs-27: every mis-shaped policy tag is refused here, before any tag exists -- not silently ungated ==
 ok: every case/slash/whitespace variant of a policy tag refused before any tag was created
 
+== 7. ticket 43: a DEGRADED publish's prerelease tag is a legal shape, and sorts below the clean number ==
+ok: 4.0.0 < 4.0.1-quarantine.1 < 4.0.1-quarantine.2 < 4.0.1
+ok: policy/v4.0.1-quarantine.1 accepted and ordered below policy/v4.0.1; a suffix on the platform's own line refused
+
 PASS: single-tag legacy form works, multi-tag dispatch cuts every tag
 on the same commit, the existing-tag refusal runs for every tag before
 any tag is created, a failed atomic push leaves nothing on the
 remote, and a mis-shaped policy tag (wrong case, stray slash or
 whitespace) is refused at normalize time -- it can never reach
-cut-release-gate.py's skip branch and get pushed ungated.
+cut-release-gate.py's skip branch and get pushed ungated; and a degraded
+publish's prerelease tag (ticket 43) normalizes cleanly and sorts BELOW
+the clean number through the one shared parser.
