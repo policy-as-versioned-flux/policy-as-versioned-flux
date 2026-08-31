@@ -1,8 +1,18 @@
 selfcheck ok
-/tmp/tmp.20AeSd7qGV/deck.md: 225 lines, 81 captures on disk
-ok  the deck builds: 225 lines from 81 captures
-checked 7 beats in /tmp/tmp.20AeSd7qGV/deck.md
-ok  the committed talk/deck.md is the generated file, with the same beats as a rebuild
-checked 7 beats in talk/deck.md
-ok  the committed talk/deck.md survives the figure, status, headline and phrase checks
-PASS: the deck is generated from this run's captures, every section 4 step check that exists on disk produced one, the committed file and a rebuild both survive the checks, its seven beats are the section 4 steps in order carrying this run's own grades, every figure on a beat is a figure in that beat's capture and no figure sits off a beat, any quoted TRUTH line is this commit's own, and the phrase lint is clean
+/tmp/tmp.j1CvqWe4UZ/deck.md: 253 lines, 81 captures on disk
+ok  the deck builds: 253 lines from 81 captures
+review, not a lint failure: the word gate appears on 1 lines; every use outside the four refused phrases is a human review item:
+  line 185: ok  verify/twin-evals/verify-twin-evals.sh (the twin's evals graded by the gate)
+checked 7 beats in /tmp/tmp.j1CvqWe4UZ/deck.md
+  the committed deck's beats differ from a rebuild:
+    2,3c2,3
+    < beat step=2 status=SKIP
+    < beat step=3 status=SKIP
+    ---
+    > beat step=2 status=PASS
+    > beat step=3 status=PASS
+    5c5
+    < beat step=5 status=SKIP
+    ---
+    > beat step=5 status=PASS
+FAIL: talk/deck.md has been hand edited or is stale; run python3 talk/build_deck.py

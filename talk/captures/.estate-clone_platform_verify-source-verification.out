@@ -11,4 +11,4 @@
   ok   fixture == git cat-file tag policy/v3.0.0 (3642 bytes)
 
 == 4. it ACCEPTS the real signed tag under the release.yml pins ==
-FAIL: the real tag was rejected: REJECTED: signature or certificate chain did not verify at tagger time 1787475175: 80AB918C797F0000:error:17000064:CMS routines:cms_signerinfo_verify_cert:certificate verify error:../crypto/cms/cms_smime.c:289:Verify error: unable to get local issuer certificate
+FAIL: the real tag was rejected: REJECTED: signature or certificate chain did not verify at tagger time 1787475175: 807BAA56B87F0000:error:17000064:CMS routines:cms_signerinfo_verify_cert:certificate verify error:../crypto/cms/cms_smime.c:289:Verify error: unable to get local issuer certificate
