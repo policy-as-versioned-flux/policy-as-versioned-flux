@@ -2,9 +2,167 @@
 fixtures/workload-compliant.yaml: targets 4.0.0, checking supported window ['4.0.0']
 --- kyverno apply @ v4.0.0 ---
 Applying 5 policy rule(s) to 1 resource(s)...
-Error: failed to apply policies on resource checkout-svc (failed to compile policy cage-tier-4-0-0 (spec.mutations[0].applyConfiguration.expression: Invalid value: "Object{\n  metadata: Object.metadata{ labels: {\n    \"posture.acme.io/caged\": \"true\",\n    \"posture.acme.io/tier\": variables.tier\n  } },\n  spec: Object.spec{\n    hostNetwork: false,\n    hostPID: false,\n    hostIPC: false,\n    priorityClassName: variables.dial.pc,\n    priority: int(variables.dial.prio),\n    preemptionPolicy: \"Never\",\n    containers: object.spec.containers.filter(c, c.name != \"waf-sidecar\").map(c, Object.spec.containers{\n      name: c.name,\n      resources: Object.spec.containers.resources{\n        limits: {\n          \"cpu\": (has(c.resources) && c.resources.?limits[\"cpu\"].hasValue() &&\n                  quantity(string(c.resources.limits[\"cpu\"])).isLessThan(quantity(variables.dial.cpu)))\n                   ? string(c.resources.limits[\"cpu\"]) : variables.dial.cpu,\n          \"memory\": (has(c.resources) && c.resources.?limits[\"memory\"].hasValue() &&\n                  quantity(string(c.resources.limits[\"memory\"])).isLessThan(quantity(variables.dial.mem)))\n                   ? string(c.resources.limits[\"memory\"]) : variables.dial.mem\n        }\n      },\n      securityContext: Object.spec.containers.securityContext{\n        readOnlyRootFilesystem: variables.dial.harden == 'true' ||\n          (has(c.securityContext) && c.securityContext.?readOnlyRootFilesystem.orValue(false)),\n        runAsNonRoot: variables.dial.harden == 'true' ||\n          (has(c.securityContext) && c.securityContext.?runAsNonRoot.orValue(false)),\n        allowPrivilegeEscalation: false,\n        privileged: false\n      }\n    }) + (variables.dial.wafCpu != '0' ? [Object.spec.containers{\n      name: \"waf-sidecar\",\n      image: \"ghcr.io/acme/coraza-waf:cage\",\n      resources: Object.spec.containers.resources{\n        limits: {\"cpu\": variables.dial.wafCpu, \"memory\": variables.dial.wafMem}\n      },\n      securityContext: Object.spec.containers.securityContext{\n        readOnlyRootFilesystem: true, runAsNonRoot: true,\n        allowPrivilegeEscalation: false, privileged: false\n      }\n    }] : [])\n  }\n}": ERROR: <input>:4:38: expected type 'string' but found 'dyn'
- |     "posture.acme.io/tier": variables.tier
- | .....................................^))
-FAIL @ v4.0.0
 
-shift-left: fixtures/workload-compliant.yaml would be denied somewhere in its supported window ['4.0.0']
+policy cage-tier-4-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 4.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 4.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: false
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10
+  priorityClassName: cage-baseline-4-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-tier-4-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 4.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 4.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: false
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10
+  priorityClassName: cage-baseline-4-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-4-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 4.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 4.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: false
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10
+  priorityClassName: cage-baseline-4-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-4-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 4.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 4.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: false
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10
+  priorityClassName: cage-baseline-4-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+pass: 7, fail: 0, warn: 0, error: 0, skip: 0
+
+shift-left: fixtures/workload-compliant.yaml is compliant across its supported window ['4.0.0']
+
+== an unversioned workload is out of scope, passes trivially ==
+fixtures/workload-unversioned.yaml: unversioned (no policy-as-versioned.dev/policy-version label) -- out of scope, pass
+
+== a version the array doesn't declare is refused, not silently skipped ==
+
+== an Audit->Deny flip is caught pre-merge ==
+SKIP: distribution/versions.yaml declares one major line (4.0.0), so a target has no ±1 neighbour and there is no tightened rule for the window to catch a workload against; the flip beat has nothing to observe until a second major is declared again

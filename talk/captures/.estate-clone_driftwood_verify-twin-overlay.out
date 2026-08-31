@@ -1,1 +1,24 @@
-SKIP: no /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.venv and python3 lacks jsonschema/pyyaml
+PASS: the overlay loads and re-renders twin/forward-intel/v1/feed.json byte-identically
+PASS: payload vs twin/forward-intel/payload.schema.json
+PASS: vendored payload schema is byte-identical to platform/feeds/forward-intel.payload.schema.json
+PASS: perspective 'driftwood' is party='employer' (the overlay floor needs one employer seat)
+PASS: perspective currency 'GBP', payload currency 'GBP', party.yaml reporting_currency 'GBP'
+PASS: payload perspective 'driftwood' names the party whose balance sheet this is ('driftwood')
+PASS: overlay floor: 4 positioned components
+PASS: overlay floor: 2 role(s) declared as people
+PASS: overlay floor: 1 graded causal edge(s) reaching the declared cash flow 'checkout-revenue' at or inside the admission threshold (2)
+PASS: no action-shaped key anywhere in the payload
+PASS: no recommended-action field in the emitted bytes
+PASS: the twin carries no frequency it does not have: lef=None, and derived_from pins 1 subscribed feed(s) to supply it
+PASS: register carries 0 entry/entries and no amount on any of them
+PASS: claim_scope states what is covered (['uk-gdpr']) and what is carved out (['pci-dss'])
+PASS: curve accounts ['baseline', 'restricted', 'quarantine', 'isolated'] are the selection policy's ladder ['baseline', 'restricted', 'quarantine', 'isolated']
+PASS: selection-policy version: VERSION=1.0.0 PIN.yaml=1.0.0 selection_policy.py=1.0.0
+PASS: selection-policy self-check: ok  selection-policy v1.0.0: 13 asserts
+PASS: publishes[] feed/forward-intel at twin/forward-intel
+PASS: planted a perspective valuing in a currency the party does not report in -> REFUSED: perspective 'driftwood' values in USD and party.yaml reports in GBP. Restating one in the other needs an FX rat
+PASS: planted a world_ref that no longer describes the vendored bytes -> REFUSED: orgs/driftwood/meta.yaml pins world_ref c2d07330a778ed547b60cfbb87217bcf9813181f, and the vendored world layer 
+PASS: planted a ladder rung the overlay prices no response for -> REFUSED: the ladder has a 'quarantine' rung and this overlay prices no response for it. A curve missing a rung reads as 
+PASS: planted a selection-policy version PIN.yaml does not pin -> REFUSED: selection-policy/PIN.yaml pins 9.9.9 and selection_policy.py is 1.0.0. A pin that does not describe the code be
+TOTAL: 22 pass, 0 fail, 0 could-not-look
+PASS: driftwood's twin emits one forward-intel feed from its own overlay, labelled and unpicked

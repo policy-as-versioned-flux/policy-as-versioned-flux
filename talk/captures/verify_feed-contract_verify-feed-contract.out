@@ -1,1 +1,81 @@
-SKIP: no .venv and python3 lacks jsonschema/pyyaml
+PASS: driftwood/party.yaml vs party schema
+PASS: driftwood: publishes exposure as a section of composed/HEADER.yaml, signed by this party's own tag and not an envelope of its own
+PASS: driftwood/twin/forward-intel/v1/feed.json: envelope valid (feed/forward-intel 1.0.0)
+PASS: driftwood/twin/forward-intel/v1/feed.json: payload vs twin/forward-intel/payload.schema.json
+PASS: driftwood/twin/forward-intel/v1/feed.json: bump.yaml bump=none
+PASS: feeds/party.yaml vs party schema
+PASS: feeds/threat-register/v1/feed.json: envelope valid (feed/threat-register 1.0.0)
+PASS: feeds/threat-register/v1/feed.json: payload vs threat-register/payload.schema.json
+PASS: feeds/threat-register/v1/feed.json: bump.yaml bump=none
+PASS: feeds/threat-register/v2/feed.json: envelope valid (feed/threat-register 2.0.0)
+PASS: feeds/threat-register/v2/feed.json: payload vs threat-register/payload.schema.json
+PASS: feeds/threat-register/v2/feed.json: bump.yaml bump=none
+PASS: feeds/cve/v1/feed.json: envelope valid (feed/cve 1.0.0)
+PASS: feeds/cve/v1/feed.json: payload vs cve/payload.schema.json
+PASS: feeds/cve/v1/feed.json: bump.yaml bump=none
+PASS: feeds/cve/v2/feed.json: envelope valid (feed/cve 2.0.0)
+PASS: feeds/cve/v2/feed.json: payload vs cve/payload.schema.json
+PASS: feeds/cve/v2/feed.json: bump.yaml bump=none
+PASS: feeds/eol/v1/feed.json: envelope valid (feed/eol 1.0.0)
+PASS: feeds/eol/v1/feed.json: payload vs eol/payload.schema.json
+PASS: feeds/eol/v1/feed.json: bump.yaml bump=none
+PASS: feeds/eol/v2/feed.json: envelope valid (feed/eol 2.0.0)
+PASS: feeds/eol/v2/feed.json: payload vs eol/payload.schema.json
+PASS: feeds/eol/v2/feed.json: bump.yaml bump=none
+PASS: feeds/fx/v1/feed.json: envelope valid (feed/fx 1.0.0)
+PASS: feeds/fx/v1/feed.json: payload vs fx/payload.schema.json
+PASS: feeds/fx/v1/feed.json: bump.yaml bump=none
+PASS: feeds/market-moves/v1/feed.json: envelope valid (feed/market-moves 1.0.0)
+PASS: feeds/market-moves/v1/feed.json: payload vs market-moves/payload.schema.json
+PASS: feeds/market-moves/v1/feed.json: bump.yaml bump=none
+PASS: feeds/news/v1/feed.json: envelope valid (feed/news 1.0.0)
+PASS: feeds/news/v1/feed.json: payload vs news/payload.schema.json
+PASS: feeds/news/v1/feed.json: bump.yaml bump=none
+PASS: ico/party.yaml vs party schema
+PASS: ico/penalty-schema/v1/feed.json: envelope valid (feed/penalty-schema 1.0.0)
+PASS: ico/penalty-schema/v1/feed.json: payload vs penalty-schema/payload.schema.v2.json
+PASS: ico/penalty-schema/v1/feed.json: bump.yaml bump=major
+PASS: ico/penalty-schema/v2/feed.json: envelope valid (feed/penalty-schema 2.0.0)
+PASS: ico/penalty-schema/v2/feed.json: payload vs penalty-schema/payload.schema.v2.json
+PASS: ico/penalty-schema/v2/feed.json: bump.yaml bump=major
+PASS: ico/penalty-schema/v3/feed.json: envelope valid (feed/penalty-schema 3.0.0)
+PASS: ico/penalty-schema/v3/feed.json: payload vs penalty-schema/payload.schema.json
+PASS: ico/penalty-schema/v3/feed.json: bump.yaml bump=major
+PASS: insurer/party.yaml vs party schema
+PASS: insurer/quote/driftwood/v1/feed.json: envelope valid (feed/quote-driftwood 1.0.0)
+PASS: insurer/quote/driftwood/v1/feed.json: payload vs quote/payload.schema.json
+PASS: insurer/quote/driftwood/v1/feed.json: bump.yaml bump=none
+PASS: insurer/quote/tuppence/v1/feed.json: envelope valid (feed/quote-tuppence 1.0.0)
+PASS: insurer/quote/tuppence/v1/feed.json: payload vs quote/payload.schema.json
+PASS: insurer/quote/tuppence/v1/feed.json: bump.yaml bump=none
+PASS: insurer/quote/ludlow/v1/feed.json: envelope valid (feed/quote-ludlow 1.0.0)
+PASS: insurer/quote/ludlow/v1/feed.json: payload vs quote/payload.schema.json
+PASS: insurer/quote/ludlow/v1/feed.json: bump.yaml bump=none
+PASS: ludlow/party.yaml vs party schema
+PASS: ludlow: publishes exposure as a section of composed/HEADER.yaml, signed by this party's own tag and not an envelope of its own
+PASS: nist/party.yaml vs party schema
+PASS: nist: publishes controls at catalog
+PASS: platform/party.yaml vs party schema
+PASS: platform: publishes implementations at distribution/policies
+PASS: platform: publishes implementations at identity
+PASS: tuppence/party.yaml vs party schema
+PASS: tuppence: publishes exposure as a section of composed/HEADER.yaml, signed by this party's own tag and not an envelope of its own
+PASS: driftwood pins platform/implementations@2.0.1: tag policy/v2.0.1 on platform
+PASS: driftwood pins nist/controls@1.1.0: tag v1.1.0 on nist
+PASS: driftwood pins ico/feed/penalty-schema@v3: tag v3.0.0 on ico
+SKIP: driftwood pins feeds/feed/threat-register@v1: waiting for tag threat-register/v1.0.0 on feeds (cut by cut-release.yml after merge)
+SKIP: driftwood pins insurer/feed/quote-driftwood@v1: waiting for tag quote-driftwood/v1.0.0 on insurer (cut by cut-release.yml after merge)
+PASS: ico pins nist/controls@1.1.0: tag v1.1.0 on nist
+PASS: insurer pins platform/implementations@1.1.1: tag v1.1.1 on platform
+PASS: insurer pins driftwood/feed/exposure@v1.1.0: tag v1.1.0 on driftwood
+PASS: insurer pins tuppence/feed/exposure@v1.1.0: tag v1.1.0 on tuppence
+PASS: insurer pins ludlow/feed/exposure@v1.1.0: tag v1.1.0 on ludlow
+PASS: ludlow pins platform/implementations@2.0.1: tag policy/v2.0.1 on platform
+PASS: ludlow pins nist/controls@1.1.0: tag v1.1.0 on nist
+PASS: ludlow pins ico/feed/penalty-schema@v3: tag v3.0.0 on ico
+SKIP: ludlow pins feeds/feed/threat-register@v1: waiting for tag threat-register/v1.0.0 on feeds (cut by cut-release.yml after merge)
+PASS: tuppence pins platform/implementations@2.0.1: tag policy/v2.0.1 on platform
+PASS: tuppence pins nist/controls@1.1.0: tag v1.1.0 on nist
+PASS: tuppence pins ico/feed/penalty-schema@v3: tag v3.0.0 on ico
+SKIP: tuppence pins feeds/feed/threat-register@v1: waiting for tag threat-register/v1.0.0 on feeds (cut by cut-release.yml after merge)
+SKIP: driftwood pins feeds/feed/threat-register@v1: waiting for tag threat-register/v1.0.0 on feeds (cut by cut-release.yml after merge)

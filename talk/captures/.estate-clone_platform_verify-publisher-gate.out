@@ -1,3 +1,130 @@
 
 == Part A: gate.run_gate() against the REAL v2.0.0 -> v3.0.0 predecessor (minutes of real kyverno CPU, one real apply per corpus fixture -- spent concurrently with Parts B and C) ==
 (Parts A, B, C and D all start now, one process each -- every part's output is printed, in order, below.)
+-- declared 3.0.0 (the real tag's own number), against the REAL, unmodified v3.0.0 tree --
+{
+  "outcome": {
+    "result": "passed",
+    "reason": "declared bump 'major' is stronger than the computed bump 'none' (window: 2.0.0) -- no movement required it"
+  },
+  "bump": {
+    "declared": "major",
+    "computed": "none"
+  },
+  "movement": [
+    [
+      "cage-tier.yaml",
+      "none"
+    ],
+    [
+      "posture-trust-boundary.yaml",
+      "none"
+    ],
+    [
+      "require-nonroot.yaml",
+      "none"
+    ]
+  ]
+}
+ok  PASS proved for real: declared major (over-declared) >= computed none, against the real, UNMODIFIED v2.0.0->v3.0.0 predecessor -- honestly no real content movement there
+-- declared 2.1.0, against v3.0.0 with ONE disclosed real mutation: require-nonroot promoted Audit->Deny --
+{
+  "outcome": {
+    "result": "degraded",
+    "reason": "declared bump 'minor' is weaker than the computed bump 'major' (window: 2.0.0) -- require-nonroot.yaml: expr-pin-0422c0e0f9fd4cc2, expr-pin-0fce08151acf8b53, expr-pin-136d698bb3addf03, expr-pin-1758ef5eb6469652, expr-pin-1b8f43722a903593, expr-pin-301fec190744c568, expr-pin-332c30d431a5c416, expr-pin-376f0f6a74bb1d2c, expr-pin-45f96c8693717852, expr-pin-4ca8567bbf308b31, expr-pin-563ea4da753f59a0, expr-pin-6ef0e329737d12e8, expr-pin-7aca316ef546686a, expr-pin-7b14b5c478f3d1d7, expr-pin-7fb450b5ae63cc94, expr-pin-891789a8bdcba46f, expr-pin-895298f6f6a185b7, expr-pin-9166c945d8ea3be5, expr-pin-94f04385bd4600ec, expr-pin-9c9eed51f2fb928e, expr-pin-a1532184a1e5078d, expr-pin-a6a057869e4f0547, expr-pin-c0ffd9e84d05a086, expr-pin-c92fcd7a8db7118b, expr-pin-cca3436510bb7a6a, expr-pin-d727d8867ab4d760, expr-pin-e9fca9277336611c, expr-pin-eae4ea797c2744ee, expr-tier-0649bf9fd62586e9, expr-tier-0a4cf06010826dd6, expr-tier-0ca75f40137ec639, expr-tier-121ce805c5dcff71, expr-tier-136d698bb3addf03, expr-tier-14121fa060f577fb, expr-tier-15e08bfaf7339451, expr-tier-1b8f43722a903593, expr-tier-1bb8354e230e176b, expr-tier-1e11dd2d659fe8ba, expr-tier-1ed04ab680b2aaed, expr-tier-215ec241db5b75c7, expr-tier-2494d74c06412e33, expr-tier-26c06338d37ec551, expr-tier-277c030ab11aa90e, expr-tier-2ad9fdb962d819d4, expr-tier-301fec190744c568, expr-tier-3114f72fbb247fe4, expr-tier-332c30d431a5c416, expr-tier-376087b2f2d52370, expr-tier-376f0f6a74bb1d2c, expr-tier-3aad182a174e276c, expr-tier-3c0935bbb98b4004, expr-tier-3d11ef694f3bb5bc, expr-tier-4268fbc94b14a7dd, expr-tier-43fdbe06246393ba, expr-tier-46007c07a1005f0c, expr-tier-4895a97546cb97ca, expr-tier-519170eed6ede596, expr-tier-5bcf04da67cca15c, expr-tier-5c10277a11d96882, expr-tier-6252028feb75354c, expr-tier-63b83503df9e775f, expr-tier-6518bf7b94488a1d, expr-tier-699941efd0604cbe, expr-tier-6ef0e329737d12e8, expr-tier-6f39ba6c2925dd2c, expr-tier-708ef8e220830c30, expr-tier-7127e4d6f07e4647, expr-tier-7353148d3b56dfd8, expr-tier-740764e586cf5d3e, expr-tier-7aca316ef546686a, expr-tier-7b14b5c478f3d1d7, expr-tier-7f956a35662584c5, expr-tier-7fae5b1639d332c5, expr-tier-7fb450b5ae63cc94, expr-tier-83006c177b2e8e17, expr-tier-94f04385bd4600ec, expr-tier-95b06fbe1aa0df3d, expr-tier-980f825ce24a0b85, expr-tier-9b6a35891bba4031, expr-tier-9c9eed51f2fb928e, expr-tier-9efa4da6b10aad7a, expr-tier-a14b2c880709ba63, expr-tier-a25ba7e7c87a898f, expr-tier-a4fd911b8b16171c, expr-tier-a6a057869e4f0547, expr-tier-aae856630d651302, expr-tier-ad23a4ba76460f10, expr-tier-b0ab449e67c5eb42, expr-tier-b60cb6a803aea8ca, expr-tier-bddc24ad6e6136c5, expr-tier-c08a539a6fd2667a, expr-tier-c0ffd9e84d05a086, expr-tier-c6c53de037528078, expr-tier-c82a662d631166f3, expr-tier-cca3436510bb7a6a, expr-tier-d1464a36f42bc53b, expr-tier-d56e21a84007a2b8, expr-tier-d727d8867ab4d760, expr-tier-dde1317ade093d01, expr-tier-e0dd77fb31e27bc5, expr-tier-eae4ea797c2744ee, expr-tier-efc1347ff78340a6, expr-tier-f01dc1a97a289762, expr-tier-f0b554633435149b, expr-tier-f155cce4ccf52dbb, expr-tier-f3c954619655c676, expr-tier-f556cef5e8efbf54, expr-tier-f7280ab150f49d5c, ns-declares-3f0407a46f5f5631, ns-declares-64089a89eb858f79, ns-declares-c0ffd9e84d05a086, ns-declares-c9742a4aae45106e, ns-declares-c9ab19bbfe2a89e3, ns-declares-ca8e59d509a1efcc, pin-declares-41c910233cb036c8, pin-declares-9166c945d8ea3be5, pin-declares-c0ffd9e84d05a086, pin-declares-c9ab19bbfe2a89e3, pin-ns-3f0407a46f5f5631, pin-ns-79aa1292efa90bce, pin-ns-9166c945d8ea3be5, pin-ns-c0ffd9e84d05a086, pin-ns-c9742a4aae45106e, pin-ns-dda0208d2fbdc19d, pin-tier-0649bf9fd62586e9, pin-tier-4bb4c61b9a7bd9fb, pin-tier-687fae293b0c35c5, pin-tier-7127e4d6f07e4647, pin-tier-785272f5d9bf053a, pin-tier-9166c945d8ea3be5, pin-tier-c0ffd9e84d05a086, pin-tier-dde1317ade093d01, pin-tier-e0dd77fb31e27bc5, pin-tier-fb2074f3d3df5444, tier-declares-0649bf9fd62586e9, tier-declares-4cabb41151c24fba, tier-declares-7127e4d6f07e4647, tier-declares-88b57d33136a1819, tier-declares-ae60400a367da9b2, tier-declares-c0ffd9e84d05a086, tier-declares-c9ab19bbfe2a89e3, tier-declares-dde1317ade093d01, tier-declares-e0dd77fb31e27bc5, tier-declares-fabc0af99d3c12ef, tier-ns-0649bf9fd62586e9, tier-ns-0d965b8377c3d343, tier-ns-3f0407a46f5f5631, tier-ns-4f2914d88fc22da9, tier-ns-5cbfde8b3204356f, tier-ns-6c8a0c1fea6d0576, tier-ns-7127e4d6f07e4647, tier-ns-9c051bb02715b336, tier-ns-a643fafed8a3d6d7, tier-ns-c0ffd9e84d05a086, tier-ns-c1eadf31e6113293, tier-ns-c9742a4aae45106e, tier-ns-dde1317ade093d01, tier-ns-e0dd77fb31e27bc5, tier-ns-ec8de93b30b0fc33 via `object.spec.?securityContext.?runAsNonRoot.orValue(false) == true; object.spec.containers.all(c, c.?securityContext.?readOnlyRootFilesystem.orValue(false) == true)`. Published DEGRADED at tier 'quarantine' with a prerelease suffix on the declared number; the adopter prices the tier, nothing is refused"
+  },
+  "bump": {
+    "declared": "minor",
+    "computed": "major"
+  },
+  "degraded": {
+    "tier": "quarantine",
+    "computed_bump": "major",
+    "declared_bump": "minor",
+    "suffix": "quarantine"
+  },
+  "published_as": "2.1.0-quarantine.1"
+}
+ok  DEGRADED proved for real: declared minor < computed major, real v2.0.0 predecessor plus the one disclosed require-nonroot Audit->Deny mutation, reason names require-nonroot.yaml, published as 2.1.0-quarantine.1 (tier quarantine), which sorts below the clean 2.1.0
+
+== Part B: cut-release-gate.py's own wiring, against a real (throwaway) clone of this repo ==
+B1. a policy tag with no real tree yet is refused cleanly (release_integrity, no kyverno needed) -- no commit, no tag
+REFUSED policy/v9.0.0: re-render check refused: the tree being cut for 9.0.0 does not match ticket 12's renderer output, in ['priorityclasses.yaml (missing)', 'cage-tier.yaml (missing)', 'cage-netpol.yaml (missing)', 'stamp-posture.yaml (missing)', 'posture-trust-boundary.yaml (missing)'] -- the tree being cut is regenerated and diffed, never hand-edited
+GATE: refused -- no commit, no tag. Signed evidence uploaded as a run artifact.
+signed: /tmp/tmp.zZuuiUqgw8/clone/computed-semver/evidence/9.0.0.json.bundle
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v9.0.0` | major | None | refused | re-render check refused: the tree being cut for 9.0.0 does not match ticket 12's renderer output, in ['priorityclasses.yaml (missing)', 'cage-tier.yaml (missing)', 'cage-netpol.yaml (missing)', 'stamp-posture.yaml (missing)', 'posture-trust-boundary.yaml (missing)'] -- the tree being cut is regenerated and diffed, never hand-edited |
+
+ok  B1: refused, HEAD unmoved, no tag, signed evidence still on disk for the artifact/summary steps
+
+B2. a bare platform tag (no policy/ prefix) is not this gate's subject -- skipped, exit 0, nothing written
+ok  B2: platform's own tag skipped outright, no evidence, no error
+
+B3. a real, legal, first-release (empty predecessor window) policy tag passes end to end -- gate, then TWO real commits BEFORE a real tag
+signed: /tmp/tmp.zZuuiUqgw8/clone/computed-semver/evidence/9.0.0.json.bundle
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v9.0.0` | major | none | passed | declared bump 'major' is stronger than the computed bump 'none' (window: 4.0.0) -- no movement required it |
+
+GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
+GATE: passed for policy/v9.0.0
+  B3 computed bump against the real tag history: none | basis: distribution/policies/v4.0.0
+committed: signed release-gate evidence for policy/v9.0.0
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 1c5ba866a2683d0160df69371737d8ee8ef95708
+tagged policy/v9.0.0
+ok  B3: gate passed for real; evidence committed (A), then versions.yaml's commit field corrected to A in a second commit (B); the tag resolves to B, and versions.yaml's commit field for 9.0.0 equals A -- B's direct parent, one commit behind the tag, on purpose
+
+== Part C: cs-16 regression -- a BACKPORT's corpus/classification basis is the LOWER neighbor, never the higher one ==
+Read from distribution/versions.yaml's REAL array, whatever it holds today: cutting the MIDDLE
+element with a higher version already sitting above it in the array. Before the fix,
+gate_one()'s old_for_corpus picked max(old_window) -- the highest version ANYWHERE in the
+array, unrelated -- instead of the real, lower predecessor. (Named versions were pinned here
+until 2026-08-29, when the array's real contents changed under it and the guard failed on its
+own premise rather than on the bug it guards; the shape is the premise, not the numbers.)
+SKIP (part C): cs-16's cut-in-the-middle shape needs at least three declared versions and distribution/versions.yaml declares ['4.0.0']; there is no middle to cut, so the backport comparison-basis regression cannot be exercised against the real array today
+
+== Part D: ticket 43 -- the DECLARED bump (versions.yaml's array element) and the degraded publish's wiring ==
+D1. an array element whose declared bump disagrees with the number the tag steps is REFUSED
+    -- before this ticket the 'declared' bump was derived from the tag arithmetic, so it
+    could never disagree with itself. No commit, no tag.
+REFUSED policy/v9.0.0: the release declares bump 'minor' but version 9.0.0 steps 'major' from base 4.0.0 -- the declared bump and the declared number disagree, and the gate has no rule for choosing one
+GATE: refused -- no commit, no tag. Signed evidence uploaded as a run artifact.
+signed: /tmp/tmp.zZuuiUqgw8/clone-d/computed-semver/evidence/9.0.0.json.bundle
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v9.0.0` | minor | None | refused | the release declares bump 'minor' but version 9.0.0 steps 'major' from base 4.0.0 -- the declared bump and the declared number disagree, and the gate has no rule for choosing one |
+
+ok  D1: the declared bump and the declared number disagreed, and the gate refused before any tag
+
+D2. correcting the element to the truthful bump lets the same release through
+ok  D2: declared major == the step the number takes; the gate passed, and the publisher's
+    matrix is empty AND says the adopter fills it (ticket 18 Answer 4)
+
+D3. a DEGRADED publish: the tag gains a prerelease suffix, the evidence is filed under the
+    number actually published, and versions.yaml's element gains tier: quarantine
+DEGRADED policy/v9.0.0: declared bump 'minor' is weaker than the computed bump 'major' (window: 8.0.0) -- cage-tier.yaml: (stubbed classification). Published DEGRADED at tier 'quarantine' with a prerelease suffix on the declared number; the adopter prices the tier, nothing is refused
+         publishing as policy/v9.0.0-quarantine.1 (tier quarantine), array element carries tier: quarantine
+signed: /tmp/tmp.zZuuiUqgw8/clone-d/computed-semver/evidence/9.0.0-quarantine.1.json.bundle
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v9.0.0-quarantine.1` | minor | major | degraded | declared bump 'minor' is weaker than the computed bump 'major' (window: 8.0.0) -- cage-tier.yaml: (stubbed classification). Published DEGRADED at tier 'quarantine' with a prerelease suffix on the declared number; the adopter prices the tier, nothing is refused |
+
+GATE: cut-release.yml must cut policy/v9.0.0-quarantine.1 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
+GATE: passed for policy/v9.0.0-quarantine.1 (some DEGRADED -- see above)
+ok  the gate rewrote the TAG (suffix only, base number untouched) and filed the evidence under it
+committed: versions.yaml array element(s) for policy/v9.0.0-quarantine.1 now point at evidence commit 3f58100b82839965bfe81ff23e9e3145d97f2595
+ok  the array element is now {'version': '9.0.0', 'tag': 'policy/v9.0.0-quarantine.1', 'commit': '3f58100b82839965bfe81ff23e9e3145d97f2595', 'bump': 'major', 'tier': 'quarantine'}
+ok  D3: a degraded publish carries the suffix on the tag, the evidence names the computed
+    bump it failed to reach, and the array element carries tier: quarantine -- a signed fact
+    the ADOPTER prices (18 Answer 2), never a floor the publisher sets in someone else's repo
+
+SKIP: part(s) c could not look -- the reason is on their own SKIP line above; every other part of the publisher gate was observed true

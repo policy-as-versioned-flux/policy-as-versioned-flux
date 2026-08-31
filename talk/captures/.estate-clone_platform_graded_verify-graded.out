@@ -1,7 +1,113 @@
 [1;36m==>[0m 1. offline: the £ engine — the whole ladder, £ picks the tier, floor clamps, TCoR booked
 ok  tiers ['baseline', 'restricted', 'quarantine', 'isolated'] | £ picks: band40k->baseline band20k->restricted band5k->quarantine band1k->isolated | scenario £33073: driftwood->baseline (TCoR £23651), ludlow->quarantine (TCoR £8646) | legacy-till (warn) -> baseline cage, OSCAL risk open £14952 -> observation resolves
 [1;36m==>[0m 2. offline: the NAMESPACE declares the tier; a governed ns with no tier falls closed to isolated; a forged pod label is clobbered; a declared 'true' survives
-Error: failed to run test (failed to apply policies on resource privileged-pod (failed to compile policy cage-tier (spec.mutations[0].applyConfiguration.expression: Invalid value: "Object{\n  metadata: Object.metadata{ labels: {\n    \"posture.acme.io/caged\": \"true\",\n    \"posture.acme.io/tier\": variables.tier\n  } },\n  spec: Object.spec{\n    hostNetwork: false,\n    hostPID: false,\n    hostIPC: false,\n    priorityClassName: variables.dial.pc,\n    priority: int(variables.dial.prio),\n    preemptionPolicy: \"Never\",\n    containers: object.spec.containers.filter(c, c.name != \"waf-sidecar\").map(c, Object.spec.containers{\n      name: c.name,\n      resources: Object.spec.containers.resources{\n        limits: {\n          \"cpu\": (has(c.resources) && c.resources.?limits[\"cpu\"].hasValue() &&\n                  quantity(string(c.resources.limits[\"cpu\"])).isLessThan(quantity(variables.dial.cpu)))\n                   ? string(c.resources.limits[\"cpu\"]) : variables.dial.cpu,\n          \"memory\": (has(c.resources) && c.resources.?limits[\"memory\"].hasValue() &&\n                  quantity(string(c.resources.limits[\"memory\"])).isLessThan(quantity(variables.dial.mem)))\n                   ? string(c.resources.limits[\"memory\"]) : variables.dial.mem\n        }\n      },\n      securityContext: Object.spec.containers.securityContext{\n        readOnlyRootFilesystem: variables.dial.harden == 'true' ||\n          (has(c.securityContext) && c.securityContext.?readOnlyRootFilesystem.orValue(false)),\n        runAsNonRoot: variables.dial.harden == 'true' ||\n          (has(c.securityContext) && c.securityContext.?runAsNonRoot.orValue(false)),\n        allowPrivilegeEscalation: false,\n        privileged: false\n      }\n    }) + (variables.dial.wafCpu != '0' ? [Object.spec.containers{\n      name: \"waf-sidecar\",\n      image: \"ghcr.io/acme/coraza-waf:cage\",\n      resources: Object.spec.containers.resources{\n        limits: {\"cpu\": variables.dial.wafCpu, \"memory\": variables.dial.wafMem}\n      },\n      securityContext: Object.spec.containers.securityContext{\n        readOnlyRootFilesystem: true, runAsNonRoot: true,\n        allowPrivilegeEscalation: false, privileged: false\n      }\n    }] : [])\n  }\n}": ERROR: <input>:4:38: expected type 'string' but found 'dyn'
- |     "posture.acme.io/tier": variables.tier
- | .....................................^)))
-FAIL: cage-tier mutate matrix failed
+[1;36m==>[0m 3. offline: reach is generated PER TIER (baseline normal, restricted/quarantine DNS-only, isolated nothing)
+[1;36m==>[0m 4. offline: the Kyverno tier->dials map mirrors cage.py's TIERS (no drift), priority pair included
+  ok   baseline: present in the Kyverno dial map
+  ok   baseline: cpu 500m matches cage.py
+  ok   baseline: mem 256Mi matches cage.py
+  ok   baseline: PriorityClass cage-baseline matches cage.py
+  ok   baseline: harden=false matches cage.py dropAll/readOnlyRootFs
+  ok   baseline: WAF presence matches cage.py waf=none
+  ok   baseline: dial map carries a 'prio' (the priority pair's other half)
+  ok   baseline: PriorityClass cage-baseline is defined in priorityclasses.yaml
+  ok   baseline: prio -10 == PriorityClass cage-baseline value -10
+  ok   restricted: present in the Kyverno dial map
+  ok   restricted: cpu 250m matches cage.py
+  ok   restricted: mem 128Mi matches cage.py
+  ok   restricted: PriorityClass cage-restricted matches cage.py
+  ok   restricted: harden=true matches cage.py dropAll/readOnlyRootFs
+  ok   restricted: WAF presence matches cage.py waf=light
+  ok   restricted: dial map carries a 'prio' (the priority pair's other half)
+  ok   restricted: PriorityClass cage-restricted is defined in priorityclasses.yaml
+  ok   restricted: prio -100 == PriorityClass cage-restricted value -100
+  ok   quarantine: present in the Kyverno dial map
+  ok   quarantine: cpu 100m matches cage.py
+  ok   quarantine: mem 64Mi matches cage.py
+  ok   quarantine: PriorityClass cage-quarantine matches cage.py
+  ok   quarantine: harden=true matches cage.py dropAll/readOnlyRootFs
+  ok   quarantine: WAF presence matches cage.py waf=heavy
+  ok   quarantine: dial map carries a 'prio' (the priority pair's other half)
+  ok   quarantine: PriorityClass cage-quarantine is defined in priorityclasses.yaml
+  ok   quarantine: prio -1000 == PriorityClass cage-quarantine value -1000
+  ok   isolated: present in the Kyverno dial map
+  ok   isolated: cpu 100m matches cage.py
+  ok   isolated: mem 64Mi matches cage.py
+  ok   isolated: PriorityClass cage-isolated matches cage.py
+  ok   isolated: harden=true matches cage.py dropAll/readOnlyRootFs
+  ok   isolated: WAF presence matches cage.py waf=heavy
+  ok   isolated: dial map carries a 'prio' (the priority pair's other half)
+  ok   isolated: PriorityClass cage-isolated is defined in priorityclasses.yaml
+  ok   isolated: prio -10000 == PriorityClass cage-isolated value -10000
+  ok   the mutation writes preemptionPolicy: Never (the plugin derives it from the class too)
+  ok   cage.py: isolated reaches nothing and is evicted first
+  ok   the dial map names the isolated rung's PriorityClass
+  -- cage.py and the Kyverno cage are in step, priority pair included --
+[1;36m==>[0m 5. offline: eviction PriorityClasses valid, ordered (tighter tier = lower value), never preempting
+  ok   cage-baseline PriorityClass defined
+  ok   cage-restricted PriorityClass defined
+  ok   cage-quarantine PriorityClass defined
+  ok   cage-isolated PriorityClass defined
+  ok   every cage sits below the default priority (0)
+  ok   tighter tier = lower value (baseline > restricted > quarantine > isolated)
+  ok   every cage PriorityClass is preemptionPolicy: Never (what the mutation writes)
+  -- eviction ordering holds: cage-baseline(-10) > cage-restricted(-100) > cage-quarantine(-1000) > cage-isolated(-10000) --
+[1;36m==>[0m 6. offline: TIGHTEN-ONLY at every rung — a pod that declared readOnlyRootFilesystem/runAsNonRoot true keeps them
+  ok   baseline: the declared-strict pod was mutated (not refused)
+  ok   baseline: readOnlyRootFilesystem stayed true (declared true, cage did not loosen it)
+  ok   baseline: runAsNonRoot stayed true (declared true, cage did not loosen it)
+  ok   baseline: allowPrivilegeEscalation written false (the tight end of that field)
+  ok   baseline: privileged written false in the SAME securityContext (the pair the API server validates)
+  ok   baseline: the pod's own 5m/8Mi ceiling survived (the dials are a MIN, not an overwrite); got {'cpu': '5m', 'memory': '8Mi'}
+  ok   baseline: hostNetwork/hostPID/hostIPC are all clobbered shut
+  ok   restricted: the declared-strict pod was mutated (not refused)
+  ok   restricted: readOnlyRootFilesystem stayed true (declared true, cage did not loosen it)
+  ok   restricted: runAsNonRoot stayed true (declared true, cage did not loosen it)
+  ok   restricted: allowPrivilegeEscalation written false (the tight end of that field)
+  ok   restricted: privileged written false in the SAME securityContext (the pair the API server validates)
+  ok   restricted: the pod's own 5m/8Mi ceiling survived (the dials are a MIN, not an overwrite); got {'cpu': '5m', 'memory': '8Mi'}
+  ok   restricted: hostNetwork/hostPID/hostIPC are all clobbered shut
+  ok   quarantine: the declared-strict pod was mutated (not refused)
+  ok   quarantine: readOnlyRootFilesystem stayed true (declared true, cage did not loosen it)
+  ok   quarantine: runAsNonRoot stayed true (declared true, cage did not loosen it)
+  ok   quarantine: allowPrivilegeEscalation written false (the tight end of that field)
+  ok   quarantine: privileged written false in the SAME securityContext (the pair the API server validates)
+  ok   quarantine: the pod's own 5m/8Mi ceiling survived (the dials are a MIN, not an overwrite); got {'cpu': '5m', 'memory': '8Mi'}
+  ok   quarantine: hostNetwork/hostPID/hostIPC are all clobbered shut
+  ok   isolated: the declared-strict pod was mutated (not refused)
+  ok   isolated: readOnlyRootFilesystem stayed true (declared true, cage did not loosen it)
+  ok   isolated: runAsNonRoot stayed true (declared true, cage did not loosen it)
+  ok   isolated: allowPrivilegeEscalation written false (the tight end of that field)
+  ok   isolated: privileged written false in the SAME securityContext (the pair the API server validates)
+  ok   isolated: the pod's own 5m/8Mi ceiling survived (the dials are a MIN, not an overwrite); got {'cpu': '5m', 'memory': '8Mi'}
+  ok   isolated: hostNetwork/hostPID/hostIPC are all clobbered shut
+  -- the cage is tighten-only at every rung --
+[1;36m==>[0m 7. offline: per-tier reach agrees with cage.py's own reach column
+  ok   cage.py: baseline reaches the cluster normally
+  ok   the reach gate excludes one named tier (a probeable != predicate)
+  ok   the ONLY rung excluded from reach generation is the one cage.py gives full cluster reach: ['baseline']
+  ok   an absent tier label defaults to that same rung, so a label-less pod is not silently given a cage it was never assigned
+  ok   cage.py: isolated reaches nothing
+  ok   isolated generates EMPTY ingress and EMPTY egress rule lists (deny-all both ways)
+  ok   both policyTypes are set, so empty rule lists really are a deny-all
+  ok   cage.py: restricted reach is namespace-scoped
+  ok   cage.py: quarantine reach is namespace-scoped
+  ok   the non-isolated rungs egress to DNS (UDP/53, kube-system) and nothing else
+  ok   synchronize is OFF: all three restricting rungs are generated up front, so a tier move creates and deletes nothing (leaving it on deleted OTHER namespaces' reach cages)
+  ok   every rung cage.py says does NOT reach the cluster is generated on every trigger, so a tier move is a label change with no create and no delete in its path
+  -- reach is generated from the tier and matches cage.py --
+  CLOSED 2026-08-28 (was: the synchronize delete-then-regenerate gap). All three
+  restricting rungs are now generated into the namespace at once and synchronize
+  is off, so a TIER MOVE is a label change on the pod: the NetworkPolicy for the
+  rung it moves to is already there, and nothing is deleted. That also closes the
+  much worse bug the review found live -- Kyverno 1.18's GeneratingPolicy watcher
+  deleted every cage-reach-* NetworkPolicy in EVERY namespace whenever one caged
+  pod was created anywhere, and regenerated only the trigger's own.
+  WHAT IS LEFT, named not closed: generation is a BACKGROUND controller, so the
+  reach cage lands one round-trip AFTER the pod is admitted (about 10s on KinD).
+  A brand-new governed namespace's first caged pod therefore has full reach for
+  that window. Upgrade path: render the three NetworkPolicies per governed
+  Namespace from the composed artefact, so Flux has them in place before any pod
+  is admitted (tickets 40/42).
+SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the Namespace declares the tier and the pod wears it; the cage only tightens; the bottom rung runs and reaches nothing; TCoR booked
