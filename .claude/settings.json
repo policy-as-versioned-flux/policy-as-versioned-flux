@@ -16,7 +16,16 @@
       "mcp__claude_ai_Gmail__get_thread",
       "mcp__claude-in-chrome__read_page",
       "mcp__claude_ai_Gmail__get_message",
-      "mcp__plugin_arckit_microsoft-learn__microsoft_docs_search"
+      "mcp__plugin_arckit_microsoft-learn__microsoft_docs_search",
+      "mcp__plugin_playwright_playwright__browser_find",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_playwright_playwright__browser_network_requests",
+      "mcp__plugin_playwright_playwright__browser_console_messages",
+      "mcp__claude-in-chrome__read_console_messages",
+      "mcp__Read_and_Send_iMessages__read_imessages",
+      "mcp__deepwiki__ask_question",
+      "mcp__deepwiki__read_wiki_contents",
+      "Bash(trufflehog *)"
     ]
   },
   "hooks": {
