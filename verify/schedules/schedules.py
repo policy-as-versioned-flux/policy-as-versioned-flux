@@ -428,6 +428,40 @@ def _gh(*args: str) -> str:
     return done.stdout
 
 
+def landed_hours_ago(unit: str, workflow: str) -> float | None:
+    """How long the workflow file has existed on the branch GitHub actually runs.
+
+    `--first-parent` on the branch GitHub runs, NOT the file's own commit date.
+    A change written on a branch keeps its authoring date through the landing, so
+    asking when the file last changed answers the wrong question: on 2026-08-31
+    these clocks were written 64 hours earlier and reached `main` that afternoon,
+    and the file date would have called them overdue on the day they arrived.
+    Walking first-parent attributes a landed branch to the commit that landed it.
+
+    A clock that landed an hour ago and has not fired is not a stopped clock --
+    GitHub has not reached a scheduled slot yet. Grading that as observed-false
+    says the estate is broken when it is merely new, which is the same
+    turn-absence-into-a-verdict mistake this file exists to refuse in the other
+    direction. Observed live on 2026-08-31: ten clocks landed on `main` with the
+    thin slice and every one read FAIL within the hour.
+
+    None when the date cannot be read, and the caller then keeps the strict
+    reading: an unknown age must not buy a clock a free pass.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "-C", os.path.join(ESTATE, unit), "log", "--first-parent", "-1",
+             "--format=%cI", f"origin/{DEFAULT_BRANCH}", "--",
+             f".github/workflows/{workflow}"],
+            capture_output=True, text=True, timeout=30, check=False).stdout.strip()
+        if not out:
+            return None
+        landed = dt.datetime.fromisoformat(out)
+        return (dt.datetime.now(landed.tzinfo) - landed).total_seconds() / 3600
+    except (subprocess.SubprocessError, OSError, ValueError):
+        return None
+
+
 def last_run(remote: str, workflow: str) -> dict | None:
     raw = _gh("run", "list", "--repo", remote, "--workflow", workflow,
               "--event", "schedule", "--limit", "1",
@@ -581,8 +615,20 @@ def check(offline: bool = False) -> int:
                             f"({str(e).splitlines()[0]})")
                 continue
             if run is None:
+                landed = landed_hours_ago(unit, workflow)
+                if landed is not None and landed < PERIOD_HOURS:
+                    out("SKIP", f"{unit}/{workflow}: on {remote}@{DEFAULT_BRANCH} with a "
+                                f"`schedule:` that landed {landed:.0f}h ago, inside the "
+                                f"{PERIOD_HOURS}h window -- GitHub has not reached a scheduled "
+                                f"slot yet, so there is nothing to observe rather than a clock "
+                                f"observed stopped")
+                    continue
                 out("FAIL", f"{unit}/{workflow}: on {remote}@{DEFAULT_BRANCH} with a "
-                            f"`schedule:` but GitHub has never run it on that schedule")
+                            f"`schedule:` but GitHub has never run it on that schedule"
+                            + (f", and it landed {landed:.0f}h ago, past the {PERIOD_HOURS}h "
+                               f"window -- it has had its chance" if landed is not None else
+                               ", and how long it has been there could not be read, so the "
+                               "strict reading stands"))
                 continue
             age = (now - dt.datetime.fromisoformat(
                 run["createdAt"].replace("Z", "+00:00"))).total_seconds() / 3600
