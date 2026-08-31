@@ -6,3 +6,4 @@ TRUTH 2026-08-29T12:03Z run=7 hub=918022b units=[driftwood=eacae33 ico=8902b66 l
 TRUTH 2026-08-30T10:57Z run=8 hub=6e495ec units=[driftwood=eacae33 ico=8902b66 ludlow=a800a58 nist=33a05df platform=58ef9c5 tuppence=751522b] pass=43 fail=11 skip=0 excluded=2 total=56
 TRUTH 2026-08-31T08:09Z run=9 hub=27d7d5c units=[driftwood=eacae33 feeds=none ico=8902b66 insurer=none ludlow=a800a58 nist=33a05df platform=58ef9c5 tuppence=751522b] pass=45 fail=14 skip=7 excluded=2 total=68
 TRUTH 2026-08-31T10:06Z run=10 hub=dc3db41 units=[driftwood=eacae33 feeds=b630044 ico=8902b66 insurer=3e25a8e ludlow=a800a58 nist=33a05df platform=58ef9c5 tuppence=751522b] pass=47 fail=16 skip=8 excluded=2 total=73
+TRUTH 2026-08-31T12:07Z run=11 hub=4ef791e units=[driftwood=eacae33 feeds=b630044 ico=8902b66 insurer=3e25a8e ludlow=a800a58 nist=33a05df platform=58ef9c5 tuppence=751522b] pass=47 fail=16 skip=8 excluded=2 total=73

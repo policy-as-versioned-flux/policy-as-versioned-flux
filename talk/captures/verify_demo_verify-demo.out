@@ -1,7 +1,7 @@
 selfcheck ok
-/tmp/tmp.S6bp9OriQD/deck.md: 225 lines, 71 captures on disk
+/tmp/tmp.IZ9FXy34Hy/deck.md: 225 lines, 71 captures on disk
 ok  the deck builds: 225 lines from 71 captures
-checked 7 beats in /tmp/tmp.S6bp9OriQD/deck.md
+checked 7 beats in /tmp/tmp.IZ9FXy34Hy/deck.md
 ok  the committed talk/deck.md is the generated file, with the same beats as a rebuild
 checked 7 beats in talk/deck.md
 ok  the committed talk/deck.md survives the figure, status, headline and phrase checks
