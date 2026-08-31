@@ -2,6 +2,13 @@ FAIL: driftwood/propose-tier.yml: no `schedule:` -- driftwood is an adopter, and
 FAIL: driftwood/renovate-run.yml: no `schedule:` -- driftwood is an adopter, and Renovate's PR starts every re-price
 SKIP: driftwood/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 SKIP: driftwood/renovate-run.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+PASS: feeds/fetch.yml: daily clock at 17 3 * * * -- feeds publishes threat-register, cve, eol, fx, market-moves, news
+PASS: feeds/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: feeds/fetch.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+PASS: insurer/fetch.yml: daily clock at 31 5 * * * -- insurer publishes quote-driftwood, quote-tuppence, quote-ludlow
+PASS: insurer/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+PASS: insurer/fetch.yml job requote: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: insurer/fetch.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 FAIL: ludlow/propose-tier.yml: no `schedule:` -- ludlow is an adopter, and the price moves with the date
 FAIL: ludlow/renovate-run.yml: no `schedule:` -- ludlow is an adopter, and Renovate's PR starts every re-price
 SKIP: ludlow/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period

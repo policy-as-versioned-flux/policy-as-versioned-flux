@@ -1,0 +1,38 @@
+== market-moves: a series, and nothing shaped like a probability ==
+ok  3 markets, 9 dated readings, every price_level in [0,1]
+ok  no probability-shaped and no moves[] field in the payload schema: a consumer derives the move (twin/market_signals.py), the publisher never asserts one
+ok  the payload names its own versioned selection rule: market-moves/rule.yaml@1
+
+== market-moves: the selection is mechanical -- the rule admits and refuses by name ==
+market-moves: rule.yaml@1 admits 3 of 7 markets; refused 0x11ee80 (min_liquidity), 0x44c1a5 (categories), 0x63b7de (min_horizon_days), 0x8cf209 (max_horizon_days)
+ok  one refusal per rule field: liquidity floor, category list, and both horizon bounds
+
+== the feed's OWN threshold is what opens a PR (D2), through the real clock ==
+ok  the committed corpus computes none
+ok  the moved corpus computes patch
+ok  a sub-threshold reading proposes nothing; a move of at least the declared threshold does
+
+== the observation branch path: every run writes a line, and it carries the reading ==
+ok  observations/market-moves.jsonl <- {"price_levels": {"0x2b1974": 0.2, "0x7f3c9a": 0.46, "0x9ad402": 0.63}, "venue": "polymarket"}
+ok  observations/news.jsonl <- {"events": 4, "newest": "platform-implementations-1-1-1-tagged", "newest_date": "2026-08-25"}
+ok  the clock's cage lets it write only: talk/truth.log drift/samples.jsonl talk/captures observations
+ok  both feeds are on the daily clock's matrix
+
+== news: the minimal payload, admitted only with a provenance URL ==
+news: rule.yaml@1 admits 4 of 5 pool entries; refused an-unsourced-statement (requires_provenance_url)
+ok  4 events, each with exactly id, date, source, statement and a provenance url -- no steep, no severity, no relevance
+
+== news: the threshold fires on a new event and not on a re-read ==
+ok  the committed pool computes none
+ok  the moved pool computes minor
+
+== niobium is a SCENARIO and is absent from this feed (ticket 23 answer 1) ==
+ok  10 published payloads and the news pool carry no niobium anywhere in their data: it is a SCENARIO in the adopter's twin library (ticket 29), not an observation
+
+== no clock in this repository invokes a model (ADR-0024) ==
+scheduled workflows: .github/workflows/fetch.yml
+ok  no fetch adapter names a model endpoint or key
+ok  no scheduled workflow calls a model or invokes classify-and-judge: the clock gathers,
+ok  and reasoning is a skill a human runs (the skill is marked disable-model-invocation)
+
+PASS: market-moves publishes a dated series from one mechanical rule over one venue with no probability-shaped field, and its own threshold is what opens a PR; news carries the five decided fields and admits nothing without a provenance URL; sub-threshold readings land on the observation branch carrying the reading; niobium is absent from the feed; no clock here invokes a model.

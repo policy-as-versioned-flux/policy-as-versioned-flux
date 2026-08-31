@@ -1,0 +1,5 @@
+OK: party.yaml parses, roles include insurer, 3 publishes[] entry(ies) each with a real path and a valid-JSON payload_schema
+REFUSED: missing required field 'baseline'
+REFUSED: unknown top-level field 'reporting_currency'
+REFUSED: unknown top-level field 'publishes'
+FAIL: party.yaml does not validate against platform/party/schema.json

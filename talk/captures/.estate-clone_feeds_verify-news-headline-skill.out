@@ -1,0 +1,22 @@
+== the skill is a skill a human runs, never a clock ==
+ok  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.claude/skills/classify-and-judge/SKILL.md: disable-model-invocation, no clock, opens a PR it never merges
+
+== the claim file: only existing claim kinds, and derived_from names them ==
+ok  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.claude/skills/classify-and-judge/assets/example-claim.yaml: 4 claims, kinds ['binding', 'override', 'position'], all in the twin's own CLAIM_KINDS; every pin derived_from names is cited by a claim and every pin a claim cites is named (2 pins); only the override prices
+
+== and the check bites: each rule, mutated, is caught ==
+ok  caught: a claim invents a kind
+ok  caught: a grade-5 binding claims to price
+ok  caught: an override is claimed by free text instead of a role
+ok  caught: an override answers no retained estimate
+ok  caught: a claim cites a pin derived_from does not name
+ok  caught: derived_from names a pin no claim cites
+
+== every claim file a real run has landed in an adopter repo, by the same rules ==
+ok  no adopter repo carries a claim file yet -- the skill has not been run for real; the worked example above is what the gate holds to the rules
+
+== the twin binds the pinned series ==
+ok  twin/market_signals.price_moves derives 6 dated moves from market-moves 1.0.0, 9 readings over 3 markets
+ok  the largest is +0.03: polymarket price for '0x9ad402' moved from 0.58 to 0.61 (up) between 2026-08-27 and 2026-08-28
+ok  and a LEVEL still refuses to be read as a probability: 0x7f3c9a (polymarket, 2026-08-26): a price LEVEL (0.41) may never be read as a probability — pri...
+SKIP: no driftwood checkout beside this one to bind a derived move against
