@@ -144,6 +144,49 @@ def _remote_url(remote: str, cwd: str | None) -> str:
         return ""
 
 
+_GIT_C = re.compile(r"\bgit\b(?P<flags>(?:\s+-[^\s]+(?:\s+[^\s]+)?)*?)\s+-C\s+(?P<dir>[^\s;&|]+)")
+_LEADING_CD = re.compile(r"(?:^|[;&|]\s*)cd\s+(?P<dir>[^\s;&|]+)\s*(?:&&|;)")
+
+
+def _effective_cwd(command: str, cwd: str | None) -> str | None:
+    """The directory the `git push` in this command actually acts on.
+
+    A push names a remote, not a URL, so the remote has to be resolved -- and it
+    resolves in whichever repository git is pointed at, which is NOT always the
+    shell's own directory. Two ways it moves, both observed for real:
+
+      git -C .estate-clone/platform push origin ecosystem/thin-slice
+      cd .estate-clone/platform && git push origin ecosystem/thin-slice
+
+    Resolved against `cwd` alone, both read the CALLER's `origin` instead. On
+    2026-08-31 that was this repository, whose own push is carved out, so the
+    guard admitted a push to all six enactment repositories while reporting
+    nothing -- a refusal that silently did not fire. The `cd` half was named as
+    a known ceiling in `_push_target`'s docstring and never closed; `-C` is the
+    same hole wearing a flag.
+
+    A relative directory is resolved against `cwd`, because that is what the
+    shell would do. An unreadable or absent directory returns it anyway: the
+    resolution below then finds no remote, `url` is empty, and the refusal
+    stays closed rather than falling open.
+    """
+    moved = None
+    found = _GIT_C.search(command)
+    if found:
+        moved = found.group("dir")
+    else:
+        found = _LEADING_CD.search(command)
+        if found:
+            moved = found.group("dir")
+    if moved is None:
+        return cwd
+    moved = moved.strip("\"'")
+    path = Path(moved)
+    if not path.is_absolute():
+        path = Path(cwd or ".") / path
+    return str(path)
+
+
 def _normalise(url: str) -> str:
     """`host/org/repo`, lowercased, so an ssh remote and an https one compare equal.
 
@@ -175,8 +218,11 @@ def _push_target(command: str, cwd: str | None) -> str | None:
     """What a `git push` in this command would write to, or `None` if the twin may write there.
 
     The URL is usually not on the command line — `git push origin main` names a remote, and the
-    remote is what has to be resolved. `ponytail:` resolved against `cwd`, so a `cd elsewhere &&
-    git push` inside one command reads the wrong repository; the URL leg still catches the case
+    remote is what has to be resolved, in whichever repository git is pointed at. `git -C <dir>`
+    and a leading `cd <dir> &&` both move that repository, and resolving against the caller's own
+    `cwd` regardless made the guard read the WRONG remote: on 2026-08-31 it read this repository's
+    own origin, matched the self-push carve-out below, and admitted a push to all six enactment
+    repositories without a word. `_effective_cwd` closes both; the URL leg still catches the case
     where the target is named outright.
 
     **The carve-out (2026-08-16, repository owner, standing instruction).** A push to *this*
@@ -201,7 +247,10 @@ def _push_target(command: str, cwd: str | None) -> str | None:
     # is not one.
     arguments = [t for t in found.group("rest").split() if not t.startswith("-")]
     target = arguments[0] if arguments else "origin"
-    url = target if ("://" in target or "@" in target or "/" in target) else _remote_url(target, cwd)
+    # Resolved in the repository git is actually pointed at (`git -C`, a leading
+    # `cd`), never blindly in the caller's own directory -- see _effective_cwd.
+    url = (target if ("://" in target or "@" in target or "/" in target)
+           else _remote_url(target, _effective_cwd(command, cwd)))
 
     resolved = ENACTMENT_REPOSITORY.search(url)
     if not resolved:

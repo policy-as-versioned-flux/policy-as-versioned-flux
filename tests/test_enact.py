@@ -149,6 +149,76 @@ def test_layer_2_resolves_a_bare_remote_rather_than_only_reading_the_command(tmp
     assert enact_guard.decide("Bash", {"command": "git push origin main"}, str(tmp_path)) is None
 
 
+def _consumer_checkout(root: Path, name: str, org: str) -> Path:
+    """A real git checkout whose `origin` is an enactment repository."""
+    import subprocess
+
+    work = root / name
+    work.mkdir(parents=True)
+    subprocess.run(["git", "init", "-q"], cwd=work, check=True)
+    subprocess.run(
+        ["git", "remote", "add", "origin", f"https://github.com/{org}/{name}"],
+        cwd=work, check=True,
+    )
+    return work
+
+
+def test_layer_2_resolves_the_remote_where_git_c_points_not_where_the_shell_stands(
+    tmp_path: Path,
+) -> None:
+    """`git -C <dir> push origin <branch>` pushes <dir>'s remote, not the caller's.
+
+    Regression, 2026-08-31, observed for real. The remote was resolved against the
+    shell's own directory regardless of `-C`, so running this guard's own repository
+    root resolved `origin` to THAT repository -- which the carve-out admits -- and the
+    guard passed a push to every enactment repository without printing a word. A
+    refusal that silently does not fire is worse than no refusal, because the estate
+    was told it had one.
+    """
+    work = _consumer_checkout(tmp_path, "platform", "policy-as-versioned-platform")
+    caller = tmp_path / "caller"
+    caller.mkdir()
+
+    command = f"git -C {work} push -u origin ecosystem/thin-slice"
+    assert enact_guard.decide("Bash", {"command": command}, str(caller)) is not None
+
+
+def test_layer_2_resolves_the_remote_after_a_leading_cd(tmp_path: Path) -> None:
+    """`cd <dir> && git push origin <branch>` is the same hole without the flag.
+
+    `_push_target`'s docstring named this one as an accepted ceiling and left it open;
+    it is closed with the `-C` case, because they are one bug.
+    """
+    work = _consumer_checkout(tmp_path, "ludlow", "policy-as-versioned-ludlow")
+    caller = tmp_path / "caller"
+    caller.mkdir()
+
+    command = f"cd {work} && git push origin ecosystem/thin-slice"
+    assert enact_guard.decide("Bash", {"command": command}, str(caller)) is not None
+
+
+def test_a_relative_git_c_resolves_against_the_callers_directory(tmp_path: Path) -> None:
+    """A relative `-C` path means what the shell would mean by it."""
+    _consumer_checkout(tmp_path / "estate", "ico", "policy-as-versioned-ico")
+
+    command = "git -C estate/ico push origin main"
+    assert enact_guard.decide("Bash", {"command": command}, str(tmp_path)) is not None
+
+
+def test_git_c_into_a_directory_with_no_remote_stays_refused_or_silent_but_never_open(
+    tmp_path: Path,
+) -> None:
+    """An unreadable or remote-less directory must not fall open on a NAMED enactment URL.
+
+    The directory leg only decides where a BARE remote resolves. A URL on the command
+    line is still read directly, so a missing directory can never turn a named
+    enactment push into an admitted one.
+    """
+    command = ("git -C " + str(tmp_path / "does-not-exist")
+               + " push https://github.com/policy-as-versioned-nist/nist HEAD:main")
+    assert enact_guard.decide("Bash", {"command": command}, str(tmp_path)) is not None
+
+
 # -- the carve-out: the twin's own model, and only that ----------------------------------------
 #
 # 2026-08-16, on the repository owner's standing instruction. Decision ticket 18 Q1 reads "the twin
