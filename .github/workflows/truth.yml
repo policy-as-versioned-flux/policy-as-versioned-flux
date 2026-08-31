@@ -84,7 +84,7 @@ jobs:
           curl -sSL -o kyverno.tgz "https://github.com/kyverno/kyverno/releases/download/v${KYVERNO_VERSION}/kyverno-cli_v${KYVERNO_VERSION}_linux_x86_64.tar.gz"
           echo "${KYVERNO_SHA256}  kyverno.tgz" | sha256sum -c -
           sudo tar -xzf kyverno.tgz -C /usr/local/bin kyverno && rm -f kyverno.tgz
-          kyverno version | head -1
+          kyverno version
           curl -sSL -o cosign "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64"
           echo "${COSIGN_SHA256}  cosign" | sha256sum -c -
           chmod +x cosign && sudo mv cosign /usr/local/bin/
