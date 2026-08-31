@@ -2,29 +2,44 @@
 # NORTH-STAR §4 step 4: "Flux reconciles the new cage spec onto the adopter's cluster. The
 # workload keeps running, caged tighter."
 #
-# Real as far as it honestly goes today, on the standing driftwood KinD cluster. Three facts
-# are asserted hard (a wrong answer is a FAIL, never a skip):
+# Real as far as it honestly goes today, on the standing driftwood KinD cluster. Seven facts are
+# asserted HARD -- a wrong answer is a FAIL, never a skip, because every one of them is something
+# this estate has actually built and stands up right now, not something still owed to a future
+# ticket:
 #
 #   A. the adopter's GitRepository is Ready and serving the COMMIT its ref pins -- a pin, not
 #      a moving branch;
 #   B. the adopter's Kustomization is Ready and its lastAppliedRevision is that same revision;
 #   C. the governed Namespace is real, carries `governed: "true"`, and is in the Kustomization's
-#      own inventory -- so Flux owns the object the cage attaches to.
-#
-# Then four facts are looked for and, when a piece is not there yet, NAMED with the ticket that
-# owns it and the step exits 3. It never asserts the pre-ladder shape to get a green:
-#
+#      own inventory -- so Flux owns the object the cage attaches to;
 #   D. the served cage policy for a version the adopter's composed tree publishes is installed
-#      live                                                        -> ticket 26
-#   E. the live cage-tier reads the Namespace (namespaceObject) and knows the isolated rung
-#                                                                   -> ticket 26
-#   F. the governed Namespace declares posture.acme.io/tier         -> ticket 26
-#   G. a pod in the governed Namespace is Running and carries that Namespace's tier, the caged
-#      label and the tier's PriorityClass                           -> ticket 26 (its live
-#      defect 1: the priority admission collision means no pod can be created in a caged
-#      Namespace at all today)
+#      live;
+#   E. the live cage-tier reads the Namespace (namespaceObject) and knows the isolated rung;
+#   F. the governed Namespace declares posture.acme.io/tier, on the ladder;
+#   G. the adopter's OWN declared workload (deploy/pod.yaml, reconciled onto the cluster by Flux
+#      via gitops/apps/pod.yaml -- ticket 40 answer item 2, 2026-08-31) is Running and wears the
+#      Namespace's tier: the caged label, the tier's PriorityClass.
+#
+# D..G used to be a named "not built yet" could-not-look pointing at ticket 26. Ticket 26's cage
+# and this ticket's workload wiring are both landed and standing on kind-driftwood now, so a wrong
+# answer on any of them is an observed defect on a running system, not an honest gap -- graded
+# accordingly (see the "prove it fails" drill in the ticket 40 answer: delete either one and this
+# step goes red).
+#
+# One fact remains a genuinely could-not-look, named with the ticket that owns it:
+#
 #   H. the source is the adopter's signed tag on the REAL remote, not the offline git server
 #                                                                   -> ticket 40
+#
+# And one is a legitimate could-not-look distinct from H, kept apart from a hard G failure because
+# collapsing it into FAIL would misreport an eventually-consistent state as broken:
+#
+#   G'. a pod admitted BEFORE a tier moved still carrying the old label -- ADR-0022's named
+#       "synchronize gap". Observed-stale, not observed-false.
+#
+# The step is split into named sub-results (the `ok` / `FAIL:` / the SKIP reason list) precisely
+# because it is honestly partly real: everything the estate has built is asserted hard, and only
+# what still needs the real signed remote is reported as could-not-look.
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 step 4 "flux reconciles the new cage spec onto the cluster"
 
@@ -53,7 +68,7 @@ tag="$(kfs get gitrepository "$ADOPTER" -o jsonpath='{.spec.ref.tag}')"
 url="$(kfs get gitrepository "$ADOPTER" -o jsonpath='{.spec.url}')"
 [ -n "$pin" ] || fail "GitRepository $ADOPTER pins no commit -- a moving ref is not a pin"
 case "$rev" in
-  *"$pin") echo "  ok  source Ready at the pinned commit: tag=${tag:-<none>} $rev";;
+  *"$pin") echo "  ok  A. source Ready at the pinned commit: tag=${tag:-<none>} $rev";;
   *) fail "GitRepository $ADOPTER serves '$rev', not its pinned commit $pin";;
 esac
 
@@ -61,20 +76,18 @@ esac
 [ "$(ready kustomization "$ADOPTER")" = True ] || fail "Kustomization $ADOPTER is not Ready on $CTX"
 applied="$(kfs get kustomization "$ADOPTER" -o jsonpath='{.status.lastAppliedRevision}')"
 [ "$applied" = "$rev" ] || fail "Kustomization $ADOPTER applied '$applied' but the source is at '$rev'"
-echo "  ok  Kustomization Ready, lastAppliedRevision == the source revision"
+echo "  ok  B. Kustomization Ready, lastAppliedRevision == the source revision"
 
 # --- C. the governed Namespace is Flux's own object -------------------------------------
 [ "$(k get ns "$NS" -o jsonpath='{.metadata.labels.policy-as-versioned\.dev/governed}')" = true ] \
   || fail "Namespace $NS does not carry policy-as-versioned.dev/governed=true (ADR-0018)"
 inv="$(kfs get kustomization "$ADOPTER" -o jsonpath='{.status.inventory.entries[*].id}')"
 case " $inv " in
-  *" _${NS}__Namespace "*) echo "  ok  governed Namespace $NS is in the Kustomization's inventory";;
+  *" _${NS}__Namespace "*) echo "  ok  C. governed Namespace $NS is in the Kustomization's inventory";;
   *) fail "governed Namespace $NS is not in Kustomization $ADOPTER's inventory -- Flux does not own it";;
 esac
 
-# --- D..H. what is not in force yet, each named with its ticket --------------------------
-missing=()
-
+# --- D. the served cage policy is installed live -----------------------------------------
 # versions the adopter's own composed tree publishes a cage for, as policy object suffixes
 served=()
 for d in "$ESTATE/$ADOPTER"/composed/policies/v*/; do
@@ -86,34 +99,35 @@ done
 live="$(k get mutatingpolicies.policies.kyverno.io -o jsonpath='{.items[*].metadata.name}')"
 hit=""
 for want in "${served[@]}"; do case " $live " in *" $want "*) hit="$want";; esac; done
-if [ -z "$hit" ]; then
-  missing+=("no served cage-tier is installed live (composed tree serves ${served[*]}; cluster has ${live:-none}) [ticket 26]")
-else
-  echo "  ok  served cage policy in force live: $hit"
-  body="$(k get mutatingpolicies.policies.kyverno.io "$hit" -o yaml)"
-  case "$body" in *namespaceObject*) ;; *) missing+=("live $hit does not read namespaceObject -- the tier is still the forgeable pod label [ticket 26]");; esac
-  case "$body" in *isolated*) ;; *) missing+=("live $hit does not know the isolated rung [ticket 26]");; esac
-fi
+[ -n "$hit" ] || fail "no served cage-tier is installed live (composed tree serves ${served[*]}; cluster has ${live:-none})"
+echo "  ok  D. served cage policy in force live: $hit"
 
+# --- E. that cage reads the Namespace and knows the isolated rung ------------------------
+body="$(k get mutatingpolicies.policies.kyverno.io "$hit" -o yaml)"
+case "$body" in
+  *namespaceObject*) ;;
+  *) fail "live $hit does not read namespaceObject -- the tier would be the forgeable pod label";;
+esac
+case "$body" in
+  *isolated*) ;;
+  *) fail "live $hit does not know the isolated rung";;
+esac
+echo "  ok  E. $hit reads namespaceObject and knows the isolated rung"
+
+# --- F. the governed Namespace declares a tier on the ladder ------------------------------
 tier="$(k get ns "$NS" -o jsonpath='{.metadata.labels.posture\.acme\.io/tier}')"
-if [ -z "$tier" ]; then
-  missing+=("governed Namespace $NS declares no posture.acme.io/tier [ticket 26]")
-else
-  case " baseline restricted quarantine isolated infra " in
-    *" $tier "*) echo "  ok  governed Namespace $NS declares tier '$tier'";;
-    *) fail "Namespace $NS declares tier '$tier', which is not on the ladder";;
-  esac
-fi
+[ -n "$tier" ] || fail "governed Namespace $NS declares no posture.acme.io/tier"
+case " baseline restricted quarantine isolated infra " in
+  *" $tier "*) echo "  ok  F. governed Namespace $NS declares tier '$tier'";;
+  *) fail "Namespace $NS declares tier '$tier', which is not on the ladder";;
+esac
 
-# The workload keeps running, caged tighter: THE ADOPTER'S OWN declared
-# workload, wearing the Namespace's tier.
-#
-# 2026-08-29 review: this used to read items[0] of every Running pod in the
-# Namespace, which carries no workload of its own -- so the verdict was
-# whatever pod happened to exist. Three different verdicts were observed on one
-# commit inside twenty minutes, one of them a hard FAIL on another agent's
-# probe pod. The fact is now about a pod this step can name: the one
-# deploy/pod.yaml declares.
+# --- G. the adopter's own declared workload runs, caged -----------------------------------
+# THE ADOPTER'S OWN declared workload, wearing the Namespace's tier -- never "items[0] of
+# whatever's Running in the Namespace" (2026-08-29 review: that version gave three different
+# verdicts on one commit inside twenty minutes, once a hard FAIL on another agent's probe pod).
+# The fact is about a pod this step can name: the one deploy/pod.yaml declares, reconciled onto
+# the cluster by Flux from gitops/apps/pod.yaml (ticket 40 answer item 2) -- not kubectl.
 want_pod="$(python3 -c "
 import sys, yaml
 try:
@@ -122,36 +136,44 @@ except Exception:
     sys.exit(0)
 print(next((d['metadata']['name'] for d in docs if d.get('kind') == 'Pod'), ''))
 " 2>/dev/null)"
-if [ -z "$want_pod" ]; then
-  missing+=("$ADOPTER declares no workload in deploy/pod.yaml, so this step has no pod of its own to read [ticket 26]")
+[ -n "$want_pod" ] || fail "$ADOPTER declares no workload in deploy/pod.yaml, so this step has no pod of its own to read"
+pod="$want_pod"
+phase="$(k get pod -n "$NS" "$pod" -o jsonpath='{.status.phase}' 2>/dev/null || true)"
+[ "$phase" = "Running" ] \
+  || fail "$ADOPTER's own workload $pod is not Running in governed Namespace $NS (phase='${phase:-absent}') -- gitops/apps/pod.yaml is not reconciling, or the pod cannot be admitted"
+
+ptier="$(k get pod -n "$NS" "$pod" -o jsonpath='{.metadata.labels.posture\.acme\.io/tier}')"
+caged="$(k get pod -n "$NS" "$pod" -o jsonpath='{.metadata.labels.posture\.acme\.io/caged}')"
+pc="$(k get pod -n "$NS" "$pod" -o jsonpath='{.spec.priorityClassName}')"
+sync_gap=""
+if [ "$ptier" = "$tier" ] && [ "$caged" = true ] && [ "${pc#cage-}" != "$pc" ]; then
+  echo "  ok  G. pod $pod is Running and wears the Namespace's cage: tier=$ptier caged=true priorityClass=$pc"
 else
-  phase="$(k get pod -n "$NS" "$want_pod" -o jsonpath='{.status.phase}' 2>/dev/null || true)"
-  pod="$want_pod"
-  if [ "$phase" != "Running" ]; then
-    missing+=("$ADOPTER's own workload $want_pod is not Running in governed Namespace $NS (phase='${phase:-absent}'), so no pod this step owns carries the cage [ticket 26]")
-  elif [ -n "$tier" ]; then
-    ptier="$(k get pod -n "$NS" "$pod" -o jsonpath='{.metadata.labels.posture\.acme\.io/tier}')"
-    caged="$(k get pod -n "$NS" "$pod" -o jsonpath='{.metadata.labels.posture\.acme\.io/caged}')"
-    pc="$(k get pod -n "$NS" "$pod" -o jsonpath='{.spec.priorityClassName}')"
-    if [ "$ptier" = "$tier" ] && [ "$caged" = true ] && [ "${pc#cage-}" != "$pc" ]; then
-      echo "  ok  pod $pod is Running and wears the Namespace's cage: tier=$ptier caged=true priorityClass=$pc"
-    else
-      # Not a FAIL: ADR-0022 names the legitimate case where a pod admitted
-      # BEFORE a tier move still carries the old label (the synchronize gap).
-      # That is observed-stale, not observed-false, and the two are told apart
-      # by a human reading the reason -- so it is a named could-not-look.
-      missing+=("pod $pod does not wear Namespace tier '$tier' (tier='$ptier' caged='$caged' priorityClass='$pc') -- either the cage did not run on it or it was admitted before the tier moved (the synchronize gap, ADR-0022) [ticket 26]")
-    fi
-  fi
+  # Not a FAIL: ADR-0022 names the legitimate case where a pod admitted BEFORE a tier move
+  # still carries the old label (the synchronize gap). That is observed-stale, not
+  # observed-false, and the two are told apart by a human reading the reason -- so THIS ONE
+  # sub-result stays a named could-not-look even though G itself is otherwise hard-asserted.
+  sync_gap="pod $pod does not wear Namespace tier '$tier' (tier='$ptier' caged='$caged' priorityClass='$pc') -- either the cage did not run on it or it was admitted before the tier moved (the synchronize gap, ADR-0022)"
+  echo "  ?   G. $sync_gap"
 fi
 
+# --- H. the source is the real signed remote, not the offline seed ------------------------
+h_missing=""
 case "$url" in
-  https://github.com/*) echo "  ok  source is the real remote: $url";;
-  *) missing+=("source is $url, not the adopter's signed tag on the real remote [ticket 40]");;
+  https://github.com/*) echo "  ok  H. source is the real remote: $url";;
+  *) h_missing="source is $url, not the adopter's signed tag on the real remote [ticket 40]"
+     echo "  ?   H. $h_missing";;
 esac
+
+# --- verdict --------------------------------------------------------------------------------
+# Everything hard-assertable (A-G's Running-and-caged fact) has already exited on the spot if
+# false. What's left here are the two named could-not-looks, reported together when both apply.
+missing=()
+[ -n "$sync_gap" ] && missing+=("$sync_gap [ADR-0022]")
+[ -n "$h_missing" ] && missing+=("$h_missing")
 
 if [ ${#missing[@]} -gt 0 ]; then
   msg="$(printf '; %s' "${missing[@]}")"
-  skip "Flux reconciles $ADOPTER at its pinned revision, but the cage is not in force:${msg#;}"
+  skip "Flux reconciles $ADOPTER at its pinned revision with the cage in force and the workload running; only:${msg#;}"
 fi
 pass "$ADOPTER reconciles ${tag:-$rev} from $url; $hit is in force; Namespace $NS declares tier $tier and pod $pod runs wearing it"
