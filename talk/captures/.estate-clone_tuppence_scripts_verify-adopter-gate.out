@@ -1,0 +1,9 @@
+
+== Scenario D: against the REAL, currently-tagged v1.0.0 (predates cs-27) -- honest current-state refusal ==
+warning: source repository is shallow, ignoring --local
+warning: --local is ignored
+fatal: ambiguous argument 'v1.0.0^{commit}': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+REFUSED: could not find or fetch platform tag 'v1.0.0'
+FAIL: D: expected the missing-evidence reason naming 2.0.0, got: REFUSED: could not find or fetch platform tag 'v1.0.0'

@@ -1,0 +1,17 @@
+pattern: ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+
+== 1. this repo's own identities match ==
+ok  matched: https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main
+ok  matched: https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/release/1.0.x
+ok  matched: https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/release/2.0.x
+
+== 2. foreign org/repo, foreign workflow path, and unanchored ref shapes are rejected ==
+ok  rejected: https://github.com/policy-as-versioned-ico/ico/.github/workflows/cut-release.yml@refs/heads/main
+ok  rejected: https://github.com/policy-as-versioned-platform/platform/.github/workflows/other.yml@refs/heads/main
+ok  rejected: https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/maint/1.0
+ok  rejected: https://evil.example/https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main
+ok  rejected: https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/mainX
+ok  rejected: https://githubXcom/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main
+
+PASS: EXPECTED_IDENTITY_REGEXP accepts this repo's main and release/<major>.<minor>.x,
+and rejects every foreign org/repo/path and unanchored variant tried.

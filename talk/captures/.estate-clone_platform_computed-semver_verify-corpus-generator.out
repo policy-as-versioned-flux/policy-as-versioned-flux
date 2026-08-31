@@ -1,0 +1,10 @@
+== 1. corpus_generator.py --selfcheck ==
+selfcheck ok: predicate expressions extracted from matchConditions and validations; each gets satisfied/violated/absent; axes combine pairwise (expr x pin, expr x tier, pin x tier -- never a full 3-way cross); pin covers inside/outside the array; tier covers absent/baseline/restricted/quarantine; a rule only the retired policy can distinguish survives the union; generation is deterministic; the manifest carries checksum/counts/generator_version/wall_clock/per-population provenance; no band or residual anywhere; claim source lives only in the manifest; an unrecognized predicate shape fails loud
+
+== 2. regenerating the committed spine is byte-identical (CI's regenerate-and-diff) ==
+ok  regenerated spine/ and manifest.yaml (minus wall_clock) match the committed tree
+
+== 3. a sample generated entry is a real Pod kyverno can evaluate ==
+ok  kyverno loaded 1 real policy rule(s) and evaluated generated-corpus/spine/expr-pin-0422c0e0f9fd4cc2.yaml without erroring
+
+PASS: corpus generator selfcheck ok, spine regenerates byte-identical, sample entry is a real Pod

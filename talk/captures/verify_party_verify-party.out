@@ -1,0 +1,13 @@
+[1;36m==>[0m 1. every party's declared roles: match real filesystem evidence
+[1;36m==>[0m 2. the guard actually bites (planted risk-bearer/publisher/adopter violations)
+[1;36m==>[0m 3. platform's appetite band moved into the shared store, still three institutions
+Traceback (most recent call last):
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/party/party.py", line 288, in <module>
+    main()
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/party/party.py", line 284, in main
+    args.func(args)
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/party/party.py", line 238, in cmd_selfcheck
+    assert not problems, problems
+           ^^^^^^^^^^^^
+AssertionError: ['feeds: declared publisher, ships no signed/versioned artefact under /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/feeds', 'insurer: declared publisher, ships no signed/versioned artefact under /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/insurer', 'insurer: declared insurer, publishes no quote/<adopter>/v*/feed.json under /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/insurer', 'driftwood: declared risk-bearer, no entry in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone', "driftwood: roles.json declares ['adopter', 'publisher', 'risk-bearer'], but driftwood's own signed party.yaml declares ['adopter', 'risk-bearer']", 'tuppence: declared risk-bearer, no entry in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone', "tuppence: roles.json declares ['adopter', 'publisher', 'risk-bearer'], but tuppence's own signed party.yaml declares ['adopter', 'risk-bearer']", 'ludlow: declared risk-bearer, no entry in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone', "ludlow: roles.json declares ['adopter', 'publisher', 'risk-bearer'], but ludlow's own signed party.yaml declares ['adopter', 'risk-bearer']"]
+FAIL: party role guard selfcheck failed

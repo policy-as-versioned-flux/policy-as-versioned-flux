@@ -1,0 +1,2 @@
+E2E step 6 provenance
+SKIP: python lacks jsonschema/pyyaml (cannot resolve the slice's artefacts)

@@ -1,0 +1,19 @@
+[1;36m==>[0m 1. party_artefact.py's own asserts (schema.json + the tag/baseline checks)
+OK schema.json: the four parent kinds and three roles are exactly what this module expects
+OK validate_schema: a well-formed party artefact has no errors
+OK validate_schema: a missing required field is caught
+OK validate_schema: a parent kind outside the four is caught
+OK validate_schema: a role outside the three is caught
+OK validate_schema: an unknown top-level field is caught
+OK validate_schema: a non-mapping document is refused, not crashed on
+OK check_tags: agreeing pins pass; pricing/threat are named as unchecked, not silenced
+OK check_tags: a declared version that disagrees with the pinned tag is refused
+OK check_tags: a missing pin file that ticket 11 expects is refused, not skipped
+OK check_baseline_mirror: an agreeing baselineName passes
+OK check_baseline_mirror: a disagreeing baselineName is refused
+OK check_baseline_mirror: a missing baselineName key is refused
+OK check(): a real party.yaml with agreeing pins and baseline mirror passes end to end
+OK check(): a structurally invalid party artefact refuses before touching any pin file
+
+selfcheck ok: schema.json is the single source of truth for the allowed roles and parent kinds; validate_schema catches every structural defect ticket 11 names (a missing field, a kind outside the four, an unknown field); check_tags matches a real Flux pin and refuses a real disagreement, naming pricing/threat as unchecked rather than silencing them; check_baseline_mirror matches, refuses a disagreement, and refuses a missing key; check() composes all three end to end against a real party.yaml on disk.
+[1;36m==>[0m PASS: the party artefact schema and its check both hold

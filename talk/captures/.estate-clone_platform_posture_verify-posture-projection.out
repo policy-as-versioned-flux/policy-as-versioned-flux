@@ -1,0 +1,19 @@
+[1;36m==>[0m 1. offline: stamp-posture stamps from the claim + clobbers a forged posture
+[1;36m==>[0m 2. offline: posture-trust-boundary DENIES a forged/mismatched posture
+[1;36m==>[0m 3. offline: ClusterSPIFFEID bakes posture/<vN> into the SVID path (leading segment)
+  ok   posture object is a ClusterSPIFFEID
+  ok   template carries a /posture/ path segment
+  ok   posture segment LEADS the path (before /ns/) — one-wildcard Istio match
+  ok   posture path is derived from the Kyverno-stamped label, not free text
+  ok   podSelector requires the posture label to exist
+  ok   jwtTtl short (5m) so out-of-currency callers lose secrets fast, got '5m'
+  ok   className set, so spire-controller-manager actually reconciles this object (see comment in the source file)
+  ok   coexists with a distinctly-named base ClusterSPIFFEID
+  ok   base SVID stays un-postured (posture rides only on this second ID)
+  ok   base and posture share the same className (both actually reconciled by the same manager)
+  ok   base excludes posture-managed pods (DoesNotExist) — a pod matches exactly one of the two, never both
+  -- SVID path invariants hold --
+[1;36m==>[0m 4-6. live checks skipped: no cluster with the posture policies at context 'kind-driftwood'
+[1;36m==>[0m      (offline proofs above are the demonstrable claim; live needs Kyverno +
+[1;36m==>[0m       SPIRE installed and estate/platform/posture/up.sh applied)
+PASS: posture rides in the SVID path; the label is Kyverno-only; forging is refused.

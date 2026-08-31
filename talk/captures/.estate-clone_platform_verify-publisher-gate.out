@@ -1,0 +1,61 @@
+
+== Part A: gate.run_gate() against the REAL v2.0.0 -> v3.0.0 predecessor (several minutes -- real kyverno apply per corpus fixture) ==
+-- declared 3.0.0 (the real tag's own number), against the REAL, unmodified v3.0.0 tree --
+{
+  "outcome": {
+    "result": "passed",
+    "reason": "declared bump 'major' is stronger than the computed bump 'none' (window: 2.0.0) -- no movement required it"
+  },
+  "bump": {
+    "declared": "major",
+    "computed": "none"
+  },
+  "movement": [
+    [
+      "cage-tier.yaml",
+      "none"
+    ],
+    [
+      "posture-trust-boundary.yaml",
+      "none"
+    ],
+    [
+      "require-nonroot.yaml",
+      "none"
+    ]
+  ]
+}
+ok  PASS proved for real: declared major (over-declared) >= computed none, against the real, UNMODIFIED v2.0.0->v3.0.0 predecessor -- honestly no real content movement there
+
+-- declared 2.1.0, against v3.0.0 with ONE disclosed real mutation: require-nonroot promoted Audit->Deny --
+{
+  "outcome": {
+    "result": "refused",
+    "reason": "declared bump 'minor' is weaker than the computed bump 'major' (window: 2.0.0) -- require-nonroot.yaml: expr-pin-0422c0e0f9fd4cc2, expr-pin-0fce08151acf8b53, expr-pin-136d698bb3addf03, expr-pin-1758ef5eb6469652, expr-pin-1b8f43722a903593, expr-pin-301fec190744c568, expr-pin-332c30d431a5c416, expr-pin-376f0f6a74bb1d2c, expr-pin-45f96c8693717852, expr-pin-4ca8567bbf308b31, expr-pin-563ea4da753f59a0, expr-pin-6ef0e329737d12e8, expr-pin-7aca316ef546686a, expr-pin-7b14b5c478f3d1d7, expr-pin-7fb450b5ae63cc94, expr-pin-891789a8bdcba46f, expr-pin-895298f6f6a185b7, expr-pin-9166c945d8ea3be5, expr-pin-94f04385bd4600ec, expr-pin-9c9eed51f2fb928e, expr-pin-a1532184a1e5078d, expr-pin-a6a057869e4f0547, expr-pin-c0ffd9e84d05a086, expr-pin-c92fcd7a8db7118b, expr-pin-cca3436510bb7a6a, expr-pin-d727d8867ab4d760, expr-pin-e9fca9277336611c, expr-pin-eae4ea797c2744ee, expr-tier-0649bf9fd62586e9, expr-tier-0a4cf06010826dd6, expr-tier-121ce805c5dcff71, expr-tier-136d698bb3addf03, expr-tier-15e08bfaf7339451, expr-tier-1b8f43722a903593, expr-tier-1e11dd2d659fe8ba, expr-tier-1ed04ab680b2aaed, expr-tier-215ec241db5b75c7, expr-tier-2494d74c06412e33, expr-tier-277c030ab11aa90e, expr-tier-301fec190744c568, expr-tier-3114f72fbb247fe4, expr-tier-332c30d431a5c416, expr-tier-376087b2f2d52370, expr-tier-376f0f6a74bb1d2c, expr-tier-3aad182a174e276c, expr-tier-3c0935bbb98b4004, expr-tier-43fdbe06246393ba, expr-tier-46007c07a1005f0c, expr-tier-519170eed6ede596, expr-tier-5bcf04da67cca15c, expr-tier-5c10277a11d96882, expr-tier-6252028feb75354c, expr-tier-63b83503df9e775f, expr-tier-6518bf7b94488a1d, expr-tier-699941efd0604cbe, expr-tier-6ef0e329737d12e8, expr-tier-708ef8e220830c30, expr-tier-7127e4d6f07e4647, expr-tier-7353148d3b56dfd8, expr-tier-740764e586cf5d3e, expr-tier-7aca316ef546686a, expr-tier-7b14b5c478f3d1d7, expr-tier-7f956a35662584c5, expr-tier-7fae5b1639d332c5, expr-tier-7fb450b5ae63cc94, expr-tier-94f04385bd4600ec, expr-tier-95b06fbe1aa0df3d, expr-tier-980f825ce24a0b85, expr-tier-9b6a35891bba4031, expr-tier-9c9eed51f2fb928e, expr-tier-9efa4da6b10aad7a, expr-tier-a25ba7e7c87a898f, expr-tier-a4fd911b8b16171c, expr-tier-a6a057869e4f0547, expr-tier-aae856630d651302, expr-tier-b0ab449e67c5eb42, expr-tier-b60cb6a803aea8ca, expr-tier-bddc24ad6e6136c5, expr-tier-c08a539a6fd2667a, expr-tier-c0ffd9e84d05a086, expr-tier-c6c53de037528078, expr-tier-cca3436510bb7a6a, expr-tier-d1464a36f42bc53b, expr-tier-d56e21a84007a2b8, expr-tier-d727d8867ab4d760, expr-tier-e0dd77fb31e27bc5, expr-tier-eae4ea797c2744ee, expr-tier-f01dc1a97a289762, expr-tier-f0b554633435149b, expr-tier-f155cce4ccf52dbb, expr-tier-f556cef5e8efbf54, expr-tier-f7280ab150f49d5c, pin-tier-0649bf9fd62586e9, pin-tier-4bb4c61b9a7bd9fb, pin-tier-687fae293b0c35c5, pin-tier-7127e4d6f07e4647, pin-tier-785272f5d9bf053a, pin-tier-9166c945d8ea3be5, pin-tier-c0ffd9e84d05a086, pin-tier-e0dd77fb31e27bc5 via `object.spec.?securityContext.?runAsNonRoot.orValue(false) == true; object.spec.containers.all(c, c.?securityContext.?readOnlyRootFilesystem.orValue(false) == true)`"
+  },
+  "bump": {
+    "declared": "minor",
+    "computed": "major"
+  }
+}
+ok  REFUSAL proved for real: declared minor < computed major, real v2.0.0 predecessor plus the one disclosed require-nonroot Audit->Deny mutation, reason names require-nonroot.yaml
+
+== Part B: cut-release-gate.py's own wiring, against a real (throwaway) clone of this repo ==
+B1. a policy tag with no real tree yet is refused cleanly (release_integrity, no kyverno needed) -- no commit, no tag
+REFUSED policy/v9.0.0: frozen-tree check refused: could not read tag 'policy/v2.0.0' for released version 2.0.0 (fatal: Not a valid object name policy/v2.0.0) -- prior versions are read from their tag, never from a HEAD copy
+GATE: refused -- no commit, no tag. Signed evidence uploaded as a run artifact.
+signed: /tmp/tmp.JluA28zXsF/clone/computed-semver/evidence/9.0.0.json.bundle
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v9.0.0` | major | None | refused | frozen-tree check refused: could not read tag 'policy/v2.0.0' for released version 2.0.0 (fatal: Not a valid object name policy/v2.0.0) -- prior versions are read from their tag, never from a HEAD copy |
+
+FAIL: B1: expected a re-render (missing tree) refusal, got: REFUSED policy/v9.0.0: frozen-tree check refused: could not read tag 'policy/v2.0.0' for released version 2.0.0 (fatal: Not a valid object name policy/v2.0.0) -- prior versions are read from their tag, never from a HEAD copy
+GATE: refused -- no commit, no tag. Signed evidence uploaded as a run artifact.
+signed: /tmp/tmp.JluA28zXsF/clone/computed-semver/evidence/9.0.0.json.bundle
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v9.0.0` | major | None | refused | frozen-tree check refused: could not read tag 'policy/v2.0.0' for released version 2.0.0 (fatal: Not a valid object name policy/v2.0.0) -- prior versions are read from their tag, never from a HEAD copy |

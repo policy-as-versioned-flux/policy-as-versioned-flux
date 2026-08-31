@@ -1,0 +1,22 @@
+FAIL: driftwood/propose-tier.yml: no `schedule:` -- driftwood is an adopter, and the price moves with the date
+FAIL: driftwood/renovate-run.yml: no `schedule:` -- driftwood is an adopter, and Renovate's PR starts every re-price
+SKIP: driftwood/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+SKIP: driftwood/renovate-run.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+FAIL: ludlow/propose-tier.yml: no `schedule:` -- ludlow is an adopter, and the price moves with the date
+FAIL: ludlow/renovate-run.yml: no `schedule:` -- ludlow is an adopter, and Renovate's PR starts every re-price
+SKIP: ludlow/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+SKIP: ludlow/renovate-run.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+FAIL: tuppence/propose-tier.yml: no `schedule:` -- tuppence is an adopter, and the price moves with the date
+FAIL: tuppence/renovate-run.yml: no `schedule:` -- tuppence is an adopter, and Renovate's PR starts every re-price
+SKIP: tuppence/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+SKIP: tuppence/renovate-run.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+PASS: hub/truth.yml: daily clock at 47 5 * * * -- the hub owns the daily truth surface (ticket 03)
+PASS: hub/truth.yml job gate: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+PASS: hub/twin.yml job invariants: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+PASS: hub/twin.yml job tests: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+PASS: hub/twin.yml job typecheck: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+PASS: hub/twin.yml job demo: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+PASS: hub/twin.yml job determinism: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+PASS: hub/twin.yml job reproduce-elsewhere: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: hub/truth.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+FAIL: 6 schedule/cage check(s) observed false

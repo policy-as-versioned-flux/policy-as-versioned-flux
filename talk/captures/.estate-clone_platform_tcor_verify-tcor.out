@@ -1,0 +1,7 @@
+[1;36m==>[0m 1. offline: the balance sheet is TCoR, the crossover is computed, the £ moves
+ok  balance sheet £47921 = residual £27271 + controls £3500 + premium £17150 | levers: accept->£72127  tighten->£27771  threat/EOL->£76801 | crossover: cheap-fix->fix, ruinous-fix->cage
+[1;36m==>[0m 2. offline: the demo book prices out to fix + cage + transfer (all three lines real)
+  ok   TCoR £47,921 = residual £27,271 + controls £3,500 + premium £17,150  moves=['cage', 'fix', 'transfer']
+[1;36m==>[0m 3. offline: proportionality — the same book cages harder under a stricter band
+  ok   caged row control-spend: driftwood £500 -> ludlow £6,000 (stricter band cages harder)
+PASS: the board line is TCoR, it moves as the levers predict, and the four-move crossover is computed.

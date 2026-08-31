@@ -1,0 +1,17 @@
+== offline: decision-engine asserts ==
+break-glass selfcheck: all asserts passed (read £1,868 T1 | write £53,469 T2 | export £534,694 T3-cage | patient £2,409,490 T3-deny)
+== offline: structural invariants ==
+  ok   reuses ../fair/fair.py for the £ (no second risk engine)
+  ok   reuses access.py's decision vocabulary, adds only the CAGE rung
+  ok   assurance bands strictly ordered (step_up < attest < no_cage)
+  ok   driftwood-read -> tier 1 (OIDC floor)
+  ok   tuppence-write -> tier 2 (+WebAuthn)
+  ok   driftwood-bulk-export -> tier 3 (+attested device)
+  ok   ludlow-patient-data -> tier 3 (+attested device)
+  ok   AC1: risky op ALLOWED with fresh attested device + step-up passkey
+  ok   AC1: same op, no passkey -> STEP_UP (proportionate)
+  ok   AC2: stale device on a tier-3 op -> dropped to read-only/scoped (CAGE)
+  ok   AC2: stale device on patient data -> DENY (proportional to the higher £)
+  ok   AC2: unattested/unmanaged laptop -> DENY
+  -- all offline invariants hold --
+verify-break-glass: done (offline; rides on the access plane — see ../access/verify-access.sh for the live IAP checks)

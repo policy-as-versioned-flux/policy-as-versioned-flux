@@ -1,0 +1,2 @@
+E2E step 4 flux reconciles the new cage spec onto the cluster
+SKIP: KinD cluster 'driftwood' absent

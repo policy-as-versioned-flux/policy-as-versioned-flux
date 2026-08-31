@@ -1,0 +1,1499 @@
+[1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, refusal)
+OK compose(): the real driftwood composes against its real pinned parents; platform's two formerly-dangling claims are fixed, zero refusals
+OK document: carries outcome, parents[], members[], refusals[], restatements[], cages[], holes[], ungoverned[], prices[], limits[]
+OK prices[]: computed on the real driftwood's very first composition too, with no prior signed artefact to compare a bump against -- old and new both price at this run's own pin, an honest 'no move'
+OK limits[]: the two-publisher-conflict limit prints open at driftwood's one pinned implementations publisher
+OK parents[]: all four declared parent kinds resolve to a non-empty SHA
+OK load_implementations: cage-tier and cage-netpol, one family, one version, both survive (ADR-0016's fix for the prototype's (family, version) key)
+OK load_implementations: a dedicated fixture, two members of one family at one version, both keys present
+OK render_is_faithful: every member of every live version (15 total) renders back byte-identical after the header is stripped
+OK render_member: no validationActions field written onto cage-tier (Mutating) or cage-netpol (Generating)
+OK guards: orphan guard and governed-namespace-requires-claim both compose under the platform tag (no policy-version), rendering back to their offline twins' output
+OK HEADER.yaml/holes[]: the real estate's first composition records 285 holes, all recorded (none new, none refused), ac-6.10 found by walking nested controls, and ac-6/cm-6 are covered (a claim exists, even the dangling one)
+OK ungoverned[]: real driftwood's own namespace already carries governed: "true", so composition records zero ungoverned namespaces
+OK verify(): a freshly composed and committed tree re-renders clean
+OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
+{
+  "outcome": "composed",
+  "party_artefact_errors": [],
+  "parents": [
+    {
+      "party": "fixture-nist",
+      "kind": "controls",
+      "version": "1.0.0",
+      "sha": "866bae8a84eb90a78eff1ff6945167e3de27317950a428f8c7bea6bdc3cc35d5"
+    },
+    {
+      "party": "fixture-platform",
+      "kind": "implementations",
+      "version": "1.0.0",
+      "sha": "cb5c12c2030082f1db0790b756a2ba489b3830c7ae87edd98ab5c9bc40753b08"
+    }
+  ],
+  "members": [
+    {
+      "family": "fam-a",
+      "name": "member-a",
+      "kind": "ValidatingPolicy",
+      "version": "1.0.0",
+      "source_party": "fixture-platform",
+      "source_sha": "cb5c12c2030082f1db0790b756a2ba489b3830c7ae87edd98ab5c9bc40753b08",
+      "action": "Audit"
+    },
+    {
+      "family": "platform-machinery",
+      "name": "policy-version-orphan-guard",
+      "kind": "ValidatingPolicy",
+      "version": null,
+      "source_party": "fixture-platform",
+      "source_sha": "cb5c12c2030082f1db0790b756a2ba489b3830c7ae87edd98ab5c9bc40753b08",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "governed-namespace-requires-claim",
+      "kind": "ValidatingPolicy",
+      "version": null,
+      "source_party": "fixture-platform",
+      "source_sha": "cb5c12c2030082f1db0790b756a2ba489b3830c7ae87edd98ab5c9bc40753b08",
+      "action": null
+    }
+  ],
+  "refusals": [],
+  "restatements": [],
+  "cages": [],
+  "holes": [
+    {
+      "control_id": "aa-1.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "aa-2",
+      "status": "recorded"
+    }
+  ],
+  "ungoverned": [],
+  "prices": [],
+  "limits": [
+    {
+      "name": "two-publisher-conflict",
+      "detail": "the cross-party rule-conflict path above is only exercised in the real estate once a second implementations publisher is pinned",
+      "count": 1,
+      "status": "open"
+    }
+  ]
+}
+OK cmd_compose: writes the rendered files and the evidence document, exits 0 on success
+{
+  "outcome": "composed",
+  "party_artefact_errors": [],
+  "parents": [
+    {
+      "party": "platform",
+      "kind": "implementations",
+      "version": "1.1.1",
+      "sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60"
+    },
+    {
+      "party": "nist",
+      "kind": "controls",
+      "version": "1.1.0",
+      "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819"
+    },
+    {
+      "party": "ico",
+      "kind": "pricing",
+      "version": "v1",
+      "sha": "8902b661f34fe48702e09d0bb3139aa7a5e7e7fd"
+    },
+    {
+      "party": "platform",
+      "kind": "threat",
+      "version": "v1",
+      "sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60"
+    }
+  ],
+  "members": [
+    {
+      "family": "graded-enforcement",
+      "name": "cage-netpol",
+      "kind": "GeneratingPolicy",
+      "version": "2.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-tier",
+      "kind": "MutatingPolicy",
+      "version": "2.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "posture",
+      "name": "posture-trust-boundary",
+      "kind": "ValidatingPolicy",
+      "version": "2.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": "Deny"
+    },
+    {
+      "family": "posture",
+      "name": "stamp-posture",
+      "kind": "MutatingPolicy",
+      "version": "2.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "require-nonroot",
+      "name": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "version": "2.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": "Audit"
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-netpol",
+      "kind": "GeneratingPolicy",
+      "version": "2.0.1",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-tier",
+      "kind": "MutatingPolicy",
+      "version": "2.0.1",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "posture",
+      "name": "posture-trust-boundary",
+      "kind": "ValidatingPolicy",
+      "version": "2.0.1",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": "Deny"
+    },
+    {
+      "family": "posture",
+      "name": "stamp-posture",
+      "kind": "MutatingPolicy",
+      "version": "2.0.1",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "require-nonroot",
+      "name": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "version": "2.0.1",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": "Audit"
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-netpol",
+      "kind": "GeneratingPolicy",
+      "version": "3.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-tier",
+      "kind": "MutatingPolicy",
+      "version": "3.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "posture",
+      "name": "posture-trust-boundary",
+      "kind": "ValidatingPolicy",
+      "version": "3.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": "Deny"
+    },
+    {
+      "family": "posture",
+      "name": "stamp-posture",
+      "kind": "MutatingPolicy",
+      "version": "3.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "require-nonroot",
+      "name": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "version": "3.0.0",
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": "Audit"
+    },
+    {
+      "family": "platform-machinery",
+      "name": "policy-version-orphan-guard",
+      "kind": "ValidatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "governed-namespace-requires-claim",
+      "kind": "ValidatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "58ef9c57e53543997e5ddbe829a7b7c9a2282c60",
+      "action": null
+    }
+  ],
+  "refusals": [],
+  "restatements": [],
+  "cages": [],
+  "holes": [
+    {
+      "control_id": "ac-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-11.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-12",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-14",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-17",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-17.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-17.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-17.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-17.4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-18",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-18.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-18.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-19",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-19.5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-2.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-2.13",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-2.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-2.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-2.4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-2.5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-20",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-20.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-20.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-21",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-22",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-6.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-6.10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-6.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-6.5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-6.7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-6.9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ac-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "at-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "at-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "at-2.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "at-2.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "at-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "at-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-12",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-3.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-6.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-6.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-7.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "au-9.4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-2.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-7.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-7.4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ca-9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-12",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-12.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-2.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-2.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-2.7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-3.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-3.4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-4.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-7.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-7.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-7.5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-8.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-8.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cm-9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-10.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-2.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-2.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-2.8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-4.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-6.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-6.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-7.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-7.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-7.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-8.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-8.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-9.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "cp-9.8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-12",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-12.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-12.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-12.5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-2.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-2.12",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-2.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-2.8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-4.4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-5.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-5.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-5.6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-8.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-8.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ia-8.4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-3.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-4.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-6.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-6.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-7.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ir-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ma-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ma-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ma-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ma-3.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ma-3.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ma-3.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ma-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ma-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ma-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "mp-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "mp-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "mp-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "mp-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "mp-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "mp-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "mp-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-12",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-13",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-13.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-14",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-15",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-16",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-17",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-6.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pe-9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pl-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pl-10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pl-11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pl-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pl-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pl-4.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "pl-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ps-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ps-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ps-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ps-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ps-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ps-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ps-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ps-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ps-9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-3.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-5.11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-5.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-5.5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "ra-9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-15",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-15.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-22",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-4.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-4.10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-4.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-4.9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-9",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sa-9.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-12",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-13",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-15",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-17",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-18",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-20",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-21",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-22",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-23",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-28",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-28.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-39",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-7.3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-7.4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-7.5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-7.7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-7.8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sc-8.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-12",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-16",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-2.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-4.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-4.4",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-4.5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-7.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-7.7",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-8",
+      "status": "recorded"
+    },
+    {
+      "control_id": "si-8.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-10",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-11",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-11.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-11.2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-12",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-2",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-2.1",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-3",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-5",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-6",
+      "status": "recorded"
+    },
+    {
+      "control_id": "sr-8",
+      "status": "recorded"
+    }
+  ],
+  "ungoverned": [],
+  "prices": [
+    {
+      "source": "ico",
+      "kind": "pricing",
+      "old_version": "v1",
+      "new_version": "v1",
+      "old_price": 16901471.55226278,
+      "new_price": 16901471.55226278,
+      "old_tier": "deny",
+      "proposed_tier": "deny",
+      "changed": false,
+      "proposed_as": "issue"
+    },
+    {
+      "source": "platform",
+      "kind": "threat",
+      "old_version": "v1",
+      "new_version": "v1",
+      "old_price": 19558.549772440045,
+      "new_price": 19558.549772440045,
+      "old_tier": "baseline",
+      "proposed_tier": "baseline",
+      "changed": false,
+      "proposed_as": "label"
+    }
+  ],
+  "limits": [
+    {
+      "name": "two-publisher-conflict",
+      "detail": "the cross-party rule-conflict path above is only exercised in the real estate once a second implementations publisher is pinned",
+      "count": 1,
+      "status": "open"
+    }
+  ]
+}
+OK cmd_compose: against the real estate, exits 0 -- platform's two formerly-dangling claims are fixed, and the real driftwood's first pull request composes and writes for real
+{
+  "outcome": "refused",
+  "party_artefact_errors": [
+    "missing required field 'roles'"
+  ],
+  "parents": [],
+  "members": [],
+  "refusals": [],
+  "restatements": [],
+  "cages": [],
+  "holes": [],
+  "ungoverned": [],
+  "prices": [],
+  "limits": []
+}
+OK compose()/cmd_compose: a party artefact that doesn't check out refuses, renders nothing, and the CLI exits non-zero
+OK check_diamonds: two edges to ico/pricing at two versions refuse, naming both
+OK rule-conflict: two implementations publishers on one key with different content refuse, naming both sources and both contents, never merged; the two-publisher limit prints closed at two
+OK restatement-of-non-validating: restating cage-tier (a MutatingPolicy) refuses
+OK restatement accepted: Audit -> Deny is stricter, and the rendered file carries the restated Deny
+OK cages[]: a weaker restatement is caged against each party's own appetite band, the rendered file keeps the inherited Deny, and the same declared inability prices three parties to the prototype's table: {'driftwood': 'baseline', 'tuppence': 'baseline', 'ludlow': 'quarantine'}
+OK no tier and no tier floor appears anywhere in what composition itself writes -- only the proposer (ADR-0015) ever turns one, later, in its own PR
+OK refusals[]: needs_composition is present on every entry (split-diamond, rule-conflict, restatement-of-non-validating)
+OK _catalog_ids/_baseline_ids: SMALL resolves by name, exact-string, and the nested enhancement aa-1.1 is found by walking; an unpublished name resolves None
+OK unknown-control-id: an upper-case id and a prefixed id both refuse as hard failures (needs_composition False), and are never counted as a hole
+OK compute_holes: a first composition (nothing committed yet) records every hole and refuses on none
+OK compute_holes: a second composition with one new hole refuses and names it (aa-3, added via overlay.controls, an adopter-added control with no claim yet)
+OK resolve_claims: an adopter-added control refuses as a new hole when unfilled (above), and an adopter claim in its own component-definition -- against its own overlay.add member -- fills it in the same run, so it is never even a hole
+OK compute_holes: a second composition with a hole filled (aa-1.1, by an adopter claim added since the last signed artefact) marks it closed
+OK check_selected_set: TINY drops aa-1.1 and aa-2 from SMALL's selected set, and a removed control refuses, naming both
+OK check_baseline_widening: SMALL -> BIG refuses with no override, and does not also fire as a removal (nothing left the selected set)
+OK resolve_claims: an adopter claim against fixture-platform's own member-a refuses (ADR-0017) -- 'fixture-adopter14 claims aa-2 is evidenced by "member-a", which fixture-platform ships, not fixture-adopter14' -- and still counts as coverage (a claim exists), orthogonal to the claim's own validity
+OK resolve_claims: the real platform component-definition's two formerly-dangling claims (ac-6, cm-6) are fixed -- zero dangling-claim refusals against the real estate
+OK HEADER.yaml: 'holes' and 'selected-controls' live only in the advisory header -- stripping it leaves every other rendered file unchanged
+OK ungoverned_namespaces: a Namespace with no institution label is ignored entirely, never entering the ungoverned set
+OK compute_ungoverned: a first composition (nothing committed yet) records a pre-existing ungoverned namespace and refuses on none
+OK compute_ungoverned: a recorded ungoverned namespace records and does not refuse
+OK compute_ungoverned: a namespace that gains the label prints as closed
+OK compute_ungoverned: a new ungoverned namespace (absent from the last signed artefact) refuses and names it
+OK HEADER.yaml: carries the recorded ungoverned namespaces, and stripping it leaves every other rendered file unchanged -- nothing composition renders reads either namespace set
+OK prices[]: an ico penalty-schema bump (v1 -> v2) moves the uncaged uk-gdpr/lower-tier exposure through ico's own converter; on driftwood's real band both versions land on deny, so the document prints no tier change, marked as an issue subject never a label; no rendered file changes -- a byte comparison proves it
+OK prices[]: a threat-register bump (v1 -> v2) moves tuppence's exposure through the feeds module; on the real band both versions land on deny, no tier change; no rendered file changes
+OK prices[]: a fixture ico band (v1->v2) that crosses driftwood's real GBP40,000 tolerance prints a proposed tier through compose() (deny -> quarantine, changed=True), marked as a label; no rendered file changes
+OK composition.py itself calls no scheduler and reads no wall clock of its own
+
+selfcheck ok: one seam composes the real driftwood against its real pinned parents; every member of every live version renders back byte-identical after the header is stripped; two members of one family at one version both survive (real estate and a dedicated fixture); no validationActions leaks onto a mutate or a generate; the orphan guard composes under the platform tag and matches its own offline twin; the header carries the composed marker, every parent SHA once, the baseline and the governed namespace names; verify() catches a byte-for-byte drift; the CLI writes files and exits non-zero on a refusal; a split diamond and a cross-party rule conflict refuse, naming both edges/sources/contents; a restatement of a mutate refuses; a stricter restatement is accepted and rendered; a weaker restatement is caged against the estate's real cage engine and appetite bands, rendering the inherited action and pricing driftwood/tuppence/ludlow to the prototype's own baseline/baseline/quarantine table; no tier ever appears in the rendered artefact; the two-publisher limit prints open at one and closed at two; every refusal carries needs_composition. TICKET 14: the baseline resolves by name exact-string, walking nested controls (ac-6.10 found); a prefixed or upper-case id is a hard failure, not a hole; the real estate's first composition records 285 holes and refuses on none -- platform's own two formerly-dangling claims (ac-6, cm-6) are now fixed, so a real first composition composes clean; a new hole refuses and names it; a closed hole is marked so; an adopter-added control refuses unfilled and is filled by the adopter's own claim against its own overlay.add member; a removed control and a widened baseline both refuse with no override; a claim against a parent's policy refuses; and the header carries the recorded hole ids and the selected control set, in a file that strips away clean. TICKET 15: a Namespace with no institution label is ignored entirely; the first composition records a pre-existing ungoverned namespace and refuses on none; a recorded one records and does not refuse; one that gains the governed label prints as closed; a genuinely new one refuses and names it; and the header carries the recorded ungoverned set, in a file that strips away clean, with neither namespace set ever read by anything composition renders. TICKET 16: an ico penalty-schema bump and a threat-register bump each move the priced exposure through the estate's own converters, printing old/new price and old/proposed tier every run; on the real bands neither changes a tier; a fixture band that a bump crosses prints a proposed tier; a proposed deny is marked as an issue subject and never a label value; no rendered file ever changes on a price move; and composition itself reads no wall clock and calls no scheduler.
+[1;36m==>[0m PASS: the composition seam holds

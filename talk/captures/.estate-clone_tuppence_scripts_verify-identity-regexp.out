@@ -1,0 +1,24 @@
+ok    matches:     https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main
+ok    matches:     https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/release/1.0.x
+ok    rejected:    https://github.com/evil-org/tuppence/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/evil-repo/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://evil.com/https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main/../evil
+ok    rejected:    https://githubXcom/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/maint/1.0.x
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/release/1.0.x-rc1
+OK: EXPECTED_IDENTITY_REGEXP anchors org, repo and workflow path; allows only main or release/<major>.<minor>.x
+
+== EVIDENCE_EXPECTED_IDENTITY_REGEXP (shift-left.yml -- verifies PLATFORM's evidence, cs-28) ==
+ok    matches:     https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main
+ok    matches:     https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/release/1.0.x
+ok    rejected:    https://github.com/policy-as-versioned-platform/platform/.github/workflows/publish-release.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut_release.yml@refs/heads/main
+ok    rejected:    https://github.com/evil-org/platform/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-platform/evil-repo/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://evil.com/https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://githubXcom/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/maint/1.0.x
+OK: EVIDENCE_EXPECTED_IDENTITY_REGEXP anchors platform's org/repo/workflow path, distinct from
+    tuppence's own identity above, and a workflow rename genuinely breaks the match

@@ -1,0 +1,29 @@
+== offline: structural invariants ==
+  ok   SPIRE HelmRelease present
+  ok   spire-controller-manager enabled (renders ClusterSPIFFEID -> entries)
+  ok   SPIRE OIDC Discovery Provider enabled (JWKS for OpenBao)
+  ok   spiffe-csi-driver enabled (mounts agent socket into meshed pods)
+  ok   trust domain is the one estate root (acme.internal), got 'acme.internal'
+  ok   agent socket exposed for Envoy SDS (/run/spire/agent-sockets/spire-agent.sock)
+  ok   istiod HelmRelease present
+  ok   global.caName is absent (it's a no-op on Istio 1.24 and must not be reintroduced)
+  ok   istiod's own CA server is NOT disabled — it must mint its own webhook serving cert (ENABLE_CA_SERVER: false was the ticket-04 bug: no CA bundle ever loads, webhook fails "tls: internal error")
+  ok   meshConfig.trustDomain matches SPIRE's trust domain (acme.internal, not the cluster.local default)
+  ok   sidecar injection mounts the SPIRE workload socket at Envoy's SDS default path (this, not caName, makes SPIRE the mesh CA)
+  ok   spire injection template carries the spiffe.io/spire-managed-identity label block
+  ok   mesh-wide PeerAuthentication STRICT
+  ok   base ClusterSPIFFEID present
+  ok   SVID template derives a spiffe:// path from pod/ns/sa
+  ok   className set, so spire-controller-manager actually reconciles this object
+  ok   AuthorizationPolicy present
+  ok   authz admits by SPIFFE principal, not IP (['acme.internal/ns/mesh-demo/sa/ping'])
+  ok   authz principal is scheme-less, not double-prefixed (['acme.internal/ns/mesh-demo/sa/ping'])
+  ok   OpenBao HelmRelease present
+  ok   OpenBao jwt-auth setup Job present
+  ok   OpenBao jwt auth points at SPIRE's OIDC Discovery Provider JWKS
+  -- all offline invariants hold --
+== offline: kubectl dry-run (core kinds) ==
+error: error validating "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/identity/namespaces.yaml": error validating data: failed to download openapi: Get "http://localhost:8080/openapi/v2?timeout=32s": dial tcp [::1]:8080: connect: connection refused; if you choose to ignore these errors, turn validation off with --validate=false
+  (dry-run needs a reachable cluster; skipped)
+== live checks skipped (substrate not up; run up.sh on the driftwood cluster) ==
+verify-identity: done

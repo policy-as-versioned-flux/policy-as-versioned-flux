@@ -1,0 +1,13 @@
+E2E step 7 honesty
+
+  #   step (NORTH-STAR 4)        verdict   why
+  --- -------------------------- --------- ---
+  1   regulator publishes        SKIP      python lacks jsonschema/pyyaml
+  2   renovate pins and reprices SKIP      no adopter pins a priceable feed with a newer version present locally: no adopter declares a ...
+  3   price crosses band pr open SKIP      no adopter publishes a selection-policy package with a VERSION yet — the versioned package ti...
+  4   flux reconciles cage       SKIP      KinD cluster 'driftwood' absent
+  5   twin forecasts             SKIP      no .estate-clone/driftwood/twin (run clone-estate.sh)
+  6   provenance                 SKIP      python lacks jsonschema/pyyaml (cannot resolve the slice's artefacts)
+  7   honesty                    PASS      steps 1-6 each report one honest verdict
+
+PASS: steps 1-6 each report one honest verdict (verdicts: SKIP SKIP SKIP SKIP SKIP SKIP PASS)

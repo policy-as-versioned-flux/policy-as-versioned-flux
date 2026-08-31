@@ -1,0 +1,25 @@
+FAIL: platform/risk/appetite.json still exists — appetite is a signed fact on each party's own party.yaml (ticket 08 answer 5, ADR-0021)
+FAIL: driftwood: party.yaml declares no appetite.tolerance (amount, currency) — a party with no appetite is a MISSING INSTRUMENT and refuses (ADR-0020)
+FAIL: ludlow: party.yaml declares no appetite.tolerance (amount, currency) — a party with no appetite is a MISSING INSTRUMENT and refuses (ADR-0020)
+FAIL: tuppence: party.yaml declares no appetite.tolerance (amount, currency) — a party with no appetite is a MISSING INSTRUMENT and refuses (ADR-0020)
+SKIP: no party in this estate was compared across the two selection engines, so nothing here observed that they agree
+SKIP: no fx feed, converter or composition.py in the estate: no FX bridge to look at
+FAIL: driftwood prices[0] (ico/pricing) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
+FAIL: driftwood prices[1] (platform/threat) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
+PASS: driftwood: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
+SKIP: driftwood regime entry (penalty-schema): pinned at None, which publishes no control_weights, so the hole partition could not be looked at (the weights ship in ico penalty-schema v3)
+PASS: driftwood: every list of amounts in the document is one perspective in one currency
+PASS: driftwood: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
+FAIL: ludlow prices[0] (ico/pricing) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
+FAIL: ludlow prices[1] (platform/threat) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
+PASS: ludlow: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
+SKIP: ludlow regime entry (penalty-schema): pinned at None, which publishes no control_weights, so the hole partition could not be looked at (the weights ship in ico penalty-schema v3)
+PASS: ludlow: every list of amounts in the document is one perspective in one currency
+PASS: ludlow: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
+FAIL: tuppence prices[0] (ico/pricing) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
+FAIL: tuppence prices[1] (platform/threat) is missing perspective, currency, per_customer (ADR-0021: every price carries perspective and currency)
+PASS: tuppence: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
+SKIP: tuppence regime entry (penalty-schema): pinned at None, which publishes no control_weights, so the hole partition could not be looked at (the weights ship in ico penalty-schema v3)
+PASS: tuppence: every list of amounts in the document is one perspective in one currency
+PASS: tuppence: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
+FAIL: 10 £-seam check(s) observed false

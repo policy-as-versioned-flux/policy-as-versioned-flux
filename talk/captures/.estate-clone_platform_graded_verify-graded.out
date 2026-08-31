@@ -1,0 +1,6 @@
+[1;36m==>[0m 1. offline: the £ engine — tiers/dials deterministic, £ picks the tier, TCoR booked
+ok  tiers ['baseline', 'restricted', 'quarantine'] | £ picks: band40k->baseline band20k->restricted band5k->quarantine band1k->deny | scenario £33073: driftwood->baseline (TCoR £23651), ludlow->quarantine (TCoR £8646) | legacy-till (warn) -> baseline cage, OSCAL risk open £14952 -> observation resolves
+[1;36m==>[0m 2. offline: every claiming pod is MUTATED INTO A CAGE (in-currency -> baseline), never denied; an unclaimed pod is skipped
+[1;36m==>[0m 3. offline: a caged pod GENERATES an egress-lockdown NetworkPolicy
+Error: 1 tests failed
+FAIL: cage-netpol generate matrix failed

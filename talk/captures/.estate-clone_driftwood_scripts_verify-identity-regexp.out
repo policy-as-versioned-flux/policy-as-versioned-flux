@@ -1,0 +1,32 @@
+== 1. real signed tags verify with gitsign itself ==
+tlog index: 2545578646
+gitsign: Signature made using certificate ID 0xa1c1e824cf84b9110bd3edce488391523d2c737e | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true
+OK gitsign verified: v1.0.0
+tlog index: 2585920387
+gitsign: Signature made using certificate ID 0x54f435753b49e0b18726409b0e5bee3d3aaabca5 | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true
+OK gitsign verified: v1.1.0
+
+== 2. synthetic RE2-equivalent shapes (identities we can't/shouldn't real-sign) ==
+regexp under test: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+
+OK match:     https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main
+OK match:     https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/release/1.0.x
+OK match:     https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/release/2.10.x
+OK no-match:  https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main
+OK no-match:  https://github.com/evil/driftwood/.github/workflows/cut-release.yml@refs/heads/main
+OK no-match:  https://github.com/policy-as-versioned-driftwood/other-repo/.github/workflows/cut-release.yml@refs/heads/main
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/other.yml@refs/heads/main
+OK no-match:  https://evil.com/https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main.evil.com
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/maint/1.0.x
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/release/x.y.x
+
+PASS: EXPECTED_IDENTITY_REGEXP matches main + release/<major>.<minor>.x only, anchored to this repo.
