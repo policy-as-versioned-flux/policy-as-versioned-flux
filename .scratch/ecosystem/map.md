@@ -90,6 +90,13 @@ reds follow from it, and the citable gate has never once been green. The honest 
 beside it: the signature spine, the £ seam, the hub clock and the honesty machinery are real and
 proven.
 
+**Worked 2026-08-31.** Ticket 54 is resolved: the gate's kyverno pin was an accident, and the
+estate is authored against 1.18.2, so the gate now pins 1.18.2 and cosign by version and checksum,
+installs jsonschema, and allows 900s. Ticket 55's four repairs are built and proved against the CI
+runner's own OpenSSL 3.0.13 but sit on a local branch: `enact_guard` refused the push to platform,
+correctly, and the owner pushes. Ticket 71 graduates the real kyverno question (the composed 4.0.0
+does not load on a 1.19 cluster). Ticket 58 is resolved provisional; tickets 68, 69, 70 graduated.
+
 Tickets [54](issues/54-the-gate-observes-with-the-estate-s-own-toolchain.md) to
 [67](issues/67-the-record-matches-the-surface.md) chart the remediation. Order of attack:
 54 (the gate can go green) → 55 (every red real or explained) → 57 (feeds/insurer runnable) →

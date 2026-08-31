@@ -1,0 +1,186 @@
+From 04184df08c5865e324546f69451b9642afb7c3ae Mon Sep 17 00:00:00 2001
+From: Chris Nesbitt-Smith <chris@cns.me.uk>
+Date: Mon, 31 Aug 2026 21:31:28 +0100
+Subject: [PATCH] Every red on the clock is real, explained, and finishable
+ (ticket 55)
+
+Three of run 13's reds were the instrument, not the estate.
+
+The gitsign verifier rejected this repo's own genuine signed tag on the CI
+runner while accepting it locally. The cause is not the signature: the Fulcio
+leaf embeds no intermediate, and `openssl cms -verify -certfile` feeds the
+chain builder on OpenSSL 3.6 but not on 3.0.13, which the runner ships. The
+check is now two explicit steps, which is portable and more auditable: verify
+the chain with the ROOT as the only anchor and the intermediate as untrusted
+material, then verify the signature over the content. Reproduced and proved in
+an ubuntu:24.04 container running the runner's own OpenSSL 3.0.13: the genuine
+tag verifies, and a tampered payload, a tampered signature, a wrong identity, a
+wrong issuer and anchoring on the intermediate alone are all still refused.
+Absent trust material is now COULD-NOT-LOOK (exit 3), never REJECTED: a missing
+root is the observer's own gap, not the estate's fault.
+
+verify-corpus-generator died of SIGPIPE under pipefail because `ls | head -1`
+closes the pipe on the first line. A glob sorts the same way and cannot break.
+
+verify-render-version-tree exited 0 when kyverno was absent, so verify-all.sh
+graded a could-not-look as PASS. It exits 3 now. A check that passes on absence
+is the class the 2026-08-25 incident came from.
+
+verify-publisher-gate buffers each part to its own log and prints nothing until
+wait returns, so a timeout left a two-line capture and an undiagnosable red. A
+TERM/INT trap now prints what every part had written when it was cut short.
+---
+ computed-semver/verify-corpus-generator.sh  |  8 +++-
+ distribution/verify-render-version-tree.sh  |  5 ++-
+ identity/gitsign-verifier/verify_gitsign.py | 49 +++++++++++++++++----
+ verify-publisher-gate.sh                    | 17 +++++++
+ 4 files changed, 68 insertions(+), 11 deletions(-)
+
+diff --git a/computed-semver/verify-corpus-generator.sh b/computed-semver/verify-corpus-generator.sh
+index 7b0596f..cf89421 100755
+--- a/computed-semver/verify-corpus-generator.sh
++++ b/computed-semver/verify-corpus-generator.sh
+@@ -37,7 +37,13 @@ if ! command -v kyverno >/dev/null; then
+ fi
+ 
+ echo "== 3. a sample generated entry is a real Pod kyverno can evaluate =="
+-sample=$(ls generated-corpus/spine/*.yaml | head -1)
++# A glob, not `ls | head -1`: under `set -o pipefail` head closes the pipe on the first
++# line, ls dies of SIGPIPE, and the script exited 2 with "ls: write error: Broken pipe" on
++# the CI runner for two recorded runs while the generator itself was healthy. The shell
++# sorts a glob, so the sample is the same file the pipeline picked.
++set -- generated-corpus/spine/*.yaml
++sample="$1"
++[ -e "$sample" ] || { echo "FAIL: the generator produced no spine entries to sample"; exit 1; }
+ # ../distribution, not distribution -- computed-semver/ and distribution/ are
+ # siblings under the repo root, not parent/child. A wrong path here still
+ # exits 0 with "Applying 0 policy rule(s)" and no "Error:" line, which is why
+diff --git a/distribution/verify-render-version-tree.sh b/distribution/verify-render-version-tree.sh
+index ae754b1..f7013b9 100755
+--- a/distribution/verify-render-version-tree.sh
++++ b/distribution/verify-render-version-tree.sh
+@@ -21,8 +21,11 @@ say "1. offline: render-version-tree.py --selfcheck"
+ python3 "$HERE/render-version-tree.py" --selfcheck || fail "render-version-tree.py --selfcheck failed"
+ 
+ if ! command -v kyverno >/dev/null 2>&1; then
++  # exit 3, not 0. verify-all.sh grades 0 as PASS, so exiting 0 here reported "the
++  # coexistence proof holds" on any runner without the CLI -- a check that passes on
++  # absence, the exact class the 2026-08-25 incident came from.
+   echo "SKIP: kyverno CLI not found -- the coexistence proof needs it (offline, no cluster)"
+-  exit 0
++  exit 3
+ fi
+ 
+ say "2. offline: two rendered versions' cage-tier copies coexist -- each judges only its own claim"
+diff --git a/identity/gitsign-verifier/verify_gitsign.py b/identity/gitsign-verifier/verify_gitsign.py
+index ebda68a..d1d1808 100644
+--- a/identity/gitsign-verifier/verify_gitsign.py
++++ b/identity/gitsign-verifier/verify_gitsign.py
+@@ -84,6 +84,12 @@ class Rejected(Exception):
+     reason is what the controller records on the object."""
+ 
+ 
++class CouldNotLook(Exception):
++    """The instrument is missing, not the signature. Raised when the pinned trust material
++    is absent, so no verdict is possible. A could-not-look is never a rejection: grading an
++    absent root as "the tag is bad" reports the observer's own gap as the estate's fault."""
++
++
+ def _run(cmd: list[str], **kw) -> subprocess.CompletedProcess:
+     return subprocess.run(cmd, capture_output=True, text=kw.pop("text", True), **kw)
+ 
+@@ -168,22 +174,44 @@ def verify_tag_object(raw: bytes, identity_regexp: str, issuer: str,
+     at = tagger_epoch(payload)
+     der = signature_der(block)
+     if not roots.exists():
+-        raise Rejected(f"no pinned Fulcio root at {roots}; refusing to verify against nothing")
++        raise CouldNotLook(f"no pinned Fulcio root at {roots}; refusing to verify against nothing")
++    if not intermediates.exists():
++        # The Fulcio leaf embeds no intermediate, so without this file no chain can be built
++        # to the root at all. That is the instrument missing, not a bad signature.
++        raise CouldNotLook(f"no pinned Fulcio intermediate at {intermediates}; the signing "
++                           f"certificate chains to the root only through it")
+ 
+     with tempfile.TemporaryDirectory() as td:
+         td = Path(td)
+         (td / "payload").write_bytes(payload)
+         (td / "sig.der").write_bytes(der)
+-        cmd = ["openssl", "cms", "-verify", "-inform", "DER", "-in", str(td / "sig.der"),
+-               "-content", str(td / "payload"), "-binary", "-purpose", "any",
+-               "-CAfile", str(roots), "-attime", str(at), "-out", os.devnull]
+-        if intermediates.exists():
+-            cmd += ["-certfile", str(intermediates)]
+-        p = _run(cmd)
++        # Two explicit steps, not one. `openssl cms -verify -certfile` feeds the chain
++        # builder on OpenSSL 3.6 but NOT on 3.0, which the CI runner ships: the same genuine
++        # tag verified locally and was reported REJECTED on the clock for two recorded runs
++        # ("unable to get local issuer certificate"). The Fulcio leaf embeds no intermediate,
++        # so the chain can only be built from the pinned file. Splitting the check makes it
++        # portable AND more auditable, and it keeps the ROOT as the only trust anchor:
++        # `openssl verify` takes the intermediate as UNTRUSTED chain material, so a leaf that
++        # chains only to the intermediate is still refused. Proved against 3.0.13 and 3.6.3:
++        # a tampered payload exits 4, a chain outside the certificate's validity window exits
++        # 2, and anchoring on the intermediate alone exits 2.
++        leaf_pem = signer_certificate(td / "sig.der")
++        (td / "leaf.pem").write_text(leaf_pem)
++        chain = _run(["openssl", "verify", "-CAfile", str(roots),
++                      "-untrusted", str(intermediates), "-purpose", "any",
++                      "-attime", str(at), str(td / "leaf.pem")])
++        if chain.returncode != 0:
++            why = (chain.stderr.strip() or chain.stdout.strip() or "openssl gave no reason").splitlines()[-1]
++            raise Rejected(f"certificate chain did not verify at tagger time {at}: {why}")
++        # -noverify skips the certificate chain (step one above did it) but still verifies the
++        # signature OVER THE CONTENT. Never add -no_content_verify here: that would drop the
++        # payload binding and accept any content under a valid signature.
++        p = _run(["openssl", "cms", "-verify", "-inform", "DER", "-in", str(td / "sig.der"),
++                  "-content", str(td / "payload"), "-binary", "-noverify", "-out", os.devnull])
+         if p.returncode != 0:
+             why = (p.stderr.strip().splitlines() or ["openssl gave no reason"])[-1]
+-            raise Rejected(f"signature or certificate chain did not verify at tagger time {at}: {why}")
+-        claims = certificate_claims(signer_certificate(td / "sig.der"))
++            raise Rejected(f"signature did not verify over the tag payload: {why}")
++        claims = certificate_claims(leaf_pem)
+ 
+     # An unanchored pattern matches a SUBSTRING of any identity, so `.*` and
+     # `platform` both "pin" everything. The regexp arrives on the object, so a
+@@ -375,6 +403,9 @@ def main(argv: list[str] | None = None) -> int:
+             raw = read_tag_object(repo, args.tag)
+         facts = verify_tag_object(raw, args.identity_regexp, args.issuer,
+                                   args.roots, args.intermediates)
++    except CouldNotLook as e:
++        print(f"COULD-NOT-LOOK: {e}")
++        return 3
+     except Rejected as e:
+         print(f"REJECTED: {e}")
+         return 1
+diff --git a/verify-publisher-gate.sh b/verify-publisher-gate.sh
+index b09ae9b..6124e22 100755
+--- a/verify-publisher-gate.sh
++++ b/verify-publisher-gate.sh
+@@ -562,6 +562,23 @@ part_b         > "$scratch/b.log"         2>&1 & b_pid=$!
+ part_c         > "$scratch/c.log"         2>&1 & c_pid=$!
+ part_d         > "$scratch/d.log"         2>&1 & d_pid=$!
+ 
++# A timeout must still leave evidence. Every part writes to its own log and nothing is
++# printed until `wait` returns, so when verify-all.sh's `timeout` sent SIGTERM at 300s the
++# committed capture held two header lines and the red could not be diagnosed from the truth
++# surface at all. On TERM/INT, print whatever each part has written so far and say plainly
++# that the run was cut short -- a truncated observation is still an observation.
++_dump_partial() {
++  echo
++  echo "TIMED OUT or interrupted -- the parts had written this much when the run was cut short:"
++  for part in a-pass a-refused b c d; do
++    echo "---- part $part ----"
++    if [ -s "$scratch/$part.log" ]; then cat "$scratch/$part.log"; else echo "(no output yet)"; fi
++  done
++  echo "FAIL: verify-publisher-gate was cut short before its parts finished; the partial output above is what it saw"
++  exit 1
++}
++trap _dump_partial TERM INT
++
+ rc=0; skipped=""
+ for spec in "a-pass:$a_pass" "a-refused:$a_refused" "b:$b_pid" "c:$c_pid" "d:$d_pid"; do
+   part="${spec%%:*}"
+-- 
+2.55.0
+
