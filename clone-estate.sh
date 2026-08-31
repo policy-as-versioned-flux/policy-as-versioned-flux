@@ -37,6 +37,23 @@ for u in "${UNITS[@]}"; do
   # No signed tag exists yet (ticket 09/12: known, accepted partial state) so
   # this clones the default branch. Once a signed v1.0.0 lands, pin it here
   # (--branch v1.0.0) so the offline harness matches what Flux actually runs.
-  git clone --quiet --depth 1 "https://github.com/$org/$u" "$dir"
+  # A FULL clone. Neither shortcut works here, and both were tried:
+  #
+  #   --depth 1          leaves the tag objects out, and several checks need tag
+  #                      history. release_integrity rule 1 reads a released tree
+  #                      from its own tag; tuppence's adopter-gate scenario D
+  #                      resolves `v1.0.0^{commit}`. Under a shallow clone that
+  #                      scenario failed with "could not find or fetch platform
+  #                      tag 'v1.0.0'" while passing on a deep one, so the gate's
+  #                      answer depended on how this script happened to fetch.
+  #   --filter=blob:none keeps every ref but no file contents, and several
+  #                      scenarios `git clone --local` from this copy. A clone of
+  #                      a partial clone cannot reach the promisor remote, so it
+  #                      comes out missing files that are plainly committed.
+  #
+  # These repositories are small -- the whole estate is tens of megabytes -- so
+  # the honest fetch is the cheap one. A gate that grades differently depending
+  # on how its inputs were fetched is not a gate.
+  git clone --quiet "https://github.com/$org/$u" "$dir"
 done
 echo "OK: ${#UNITS[@]} units in $DEST"
