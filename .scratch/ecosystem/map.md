@@ -58,6 +58,12 @@ what was built and which check in the gate proves it.
 The truth surface went from 40 pass, 16 fail of 56 to 65 pass, 0 fail, 16 could-not-look of 83.
 Every could-not-look names what it waits for. Nothing is red.
 
+> **Correction, 2026-08-31 (ambition review).** The 65/0/16 figure was a local rehearsal. No TRUTH
+> line records it, and the paragraph above broke the never-cite-a-rehearsal rule below it. The
+> newest citable line is `TRUTH 2026-08-31T17:22Z run=13 hub=eba3569 pass=53 fail=7 skip=21
+> excluded=2 total=83`. Seven checks are red and the review found five of them are unowned
+> instrument faults. See [REVIEW-2026-08-31.md](REVIEW-2026-08-31.md).
+
 Decisions the build had to take, each recorded in its ticket:
 
 - **Policy versions 2.0.0, 2.0.1 and 3.0.0 are retired, not patched.** They could never admit a
@@ -73,13 +79,32 @@ What the owner must do before more can be true: merge the branches and let each 
 cut its signed tags. Several checks read could-not-look by name until those tags exist. A signature
 cannot be made on this machine, and no build faked one.
 
+### Reviewed 2026-08-31 — everything graded against the ambition
+
+An ultracode review (six auditors, one adversarial skeptic per finding, 55 agents) graded the
+estate against NORTH-STAR §2 to §7: 38 shortfalls confirmed, 10 claims refuted. Full record:
+[REVIEW-2026-08-31.md](REVIEW-2026-08-31.md). The one critical: the gate's kyverno 1.19.0 pin was a URL
+fix, not a version decision; under it the cage-tier CEL does not compile, three of run 13's seven
+reds follow from it, and the citable gate has never once been green. The honest headline stands
+beside it: the signature spine, the £ seam, the hub clock and the honesty machinery are real and
+proven.
+
+Tickets [54](issues/54-the-gate-observes-with-the-estate-s-own-toolchain.md) to
+[67](issues/67-the-record-matches-the-surface.md) chart the remediation. Order of attack:
+54 (the gate can go green) → 55 (every red real or explained) → 57 (feeds/insurer runnable) →
+61 (step 2 by Renovate once) → 60 (steps 3–4 observed on the clock) → 56 (the surface sees its
+clocks) → 58 (owner decides the four architectural gaps and the untagged pin) → 62, 63 →
+59, 64, 65, 66, 67. Dated update comments were appended to tickets 53, 17, 38, 48, 20 and 37;
+53 is repaired in code and ready to close, 38 and 48 are unblocked and ready to run.
+
 ## Not yet specified
 
-- The thin-slice build order is now tickets, not fog: 21 (feed contract), 25 (£ seam), 26 (cage ladder lands), 28 (clocks), 40 to 42 (Flux), 43 (first gate-determined release), 47 (deck). What remains dim:
-- Placement of the currency controller, scanner, notification spine and OSCAL CronJob after ticket 35 decides lift-or-retire for them.
+- The thin slice is built (2026-08-29 section above). What remains dim:
+- Placement of the scanner, notification spine and OSCAL CronJob after ticket 35 decides lift-or-retire for them. The currency controller is retired (ticket 13).
 - The eco-system re-cut of the affected-parties register and DPIA, once ticket 44 grades the misuse catalogue.
 - Per-workload de-posture inside a Namespace tier, if an adopter ever needs it (ticket 27 decides the de-posture move first).
 - A `v1beta1` move for the 72 Kyverno `v1alpha1` policies. Housekeeping, not on the route, until a Kyverno upgrade forces it.
+- The build tickets that graduate from ticket 58's four decisions (a second declared policy version, a living conditional-rule instance, a federation peer, observation-lane enforcement).
 
 ## Out of scope
 

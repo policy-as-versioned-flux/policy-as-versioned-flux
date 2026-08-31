@@ -11,3 +11,7 @@ Rebuild composition.py so a hole is priced, not counted: resolve claims on (sour
 ## Notes
 
 Graduated 2026-08-28 from ticket 15's resolution. Definition of done includes wiring its check into `talk/verify-all.sh`.
+
+## Comments
+
+- 2026-08-31 (ambition review): Trim scope: ticket 25 already built per-hole pricing from ico weights. What remains is the refusal deletion (new-hole, widening, new-ungoverned in composition.py) and the ungoverned ramp. All blockers (09, 21, 25) are resolved — this ticket is ready to run and is the owner of principle 3's surviving refusals.

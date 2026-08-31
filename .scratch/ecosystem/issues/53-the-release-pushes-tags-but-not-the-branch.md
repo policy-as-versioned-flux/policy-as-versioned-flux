@@ -62,3 +62,7 @@ Found while completing the merges on 2026-08-31. Everything else in the chain is
 publisher pull requests are merged, `policy/v4.0.0`, ico `v3.0.0` and platform `v2.0.0` are cut and
 signed by CI, and the three adopters' pin bumps are committed and pushed. This is the only thing
 between here and the last three merges.
+
+## Comments
+
+- 2026-08-31 (ambition review): The defect is repaired in code and the record should say so: cut-release-push.sh pushes HEAD:branch atomically with the tags (b83eba1, on platform main), all four evidence bundles are on main, v2.0.0/v2.0.1 are cut and every adopter pins v2.0.1. Close with an Answer naming the check that proves it. Add one clarifying line: this ticket does NOT own the platform CEL/toolchain reds — new ticket 54 does.

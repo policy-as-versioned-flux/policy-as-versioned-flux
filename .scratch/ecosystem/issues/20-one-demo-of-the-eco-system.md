@@ -94,3 +94,7 @@ Consequences:
 Graduated:
 - The generated deck (task).
 - The demo's remaining beats (grilling): video pipeline, Monte Carlo, continuous refresh, twin beat.
+
+## Comments
+
+- 2026-08-31 (ambition review): The verify-demo race fix (2ade57f) is unproven by any run and its on-clock premise is still false — new ticket 66 owns the repair (grade the committed deck against the run its own TRUTH line names). If run 14 reds verify-demo after 66 lands, it returns here.

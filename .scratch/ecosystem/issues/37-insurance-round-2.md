@@ -11,3 +11,7 @@ Aggregate versus per-obligation sub-limits; which adopter carries the first quot
 ## Notes
 
 Graduated 2026-08-28 from ticket 14's resolution. Definition of done includes wiring its check into `talk/verify-all.sh`.
+
+## Comments
+
+- 2026-08-31 (ambition review): Note a new blocker: the first insurer quote tag cannot be cut until the insurer repo's workflows register with Actions (zero registered today) — new ticket 57 owns that. Add the ticket-58 question (may an adopter pin an untagged feed) as an input to this ticket's first-quote decision.
