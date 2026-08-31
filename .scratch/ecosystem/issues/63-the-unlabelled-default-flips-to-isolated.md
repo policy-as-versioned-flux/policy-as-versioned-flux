@@ -12,3 +12,7 @@ ADR-0022's ordering precondition is fully met (infra declared, entitled, asserte
 
 Charted by the ambition review of 2026-08-31. Closes review findings: M12 (unlabelled default still baseline).
 Record: [REVIEW-2026-08-31.md](../REVIEW-2026-08-31.md).
+
+## Comments
+
+- 2026-08-31 (ticket 58, provisional): the flip cut IS the second declared line (the engine computes a major, so 5.0.0) and it re-carries the root-if-attested conditional branch (Q1a, Q2a). Blocker 58 is resolved; this ticket is ready to run.

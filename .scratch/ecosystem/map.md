@@ -47,6 +47,7 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 - [22 — The prediction-market feed](issues/22-the-prediction-market-feed.md) — `kind: feed`, `name: market-moves`: universe is a versioned, signed, mechanical rule file (benchmark-rule shape) in the feeds repo; Polymarket only in v1 with `venue` on every observation; payload is dated series only (`market_id`, `venue`, `question`, `resolution_source`, `observations[{date, price_level}]`), no moves, no probability field; the skill is the twin's `signal-classify` body; daily LLM-free fetch appends to an observation branch and opens the publisher PR under ticket 10's one rule (D2). Owner agreed without a reason except D2; recorded as such.
 - [23 — The news feed and the headline skill](issues/23-the-news-feed-and-the-headline-skill.md) — the news feed carries observed entries only (`id, date, source, statement, provenance{url}`, no STEEP); niobium lives in the twin's scenario library, never in the feed; the headline skill is signal-classify plus evolution-judge run by a human, landing a grade-5 binding and an attributable override as one PR on the adopter's overlay; only the override or a regrade is price-eligible; forward-intel gains `claim_scope` and `derived_from`. Owner agreed without fault found; recorded provisional. Ticket 25 amends ADR-0021.
 - [24 — Size beyond turnover](issues/24-size-beyond-turnover.md) — HIPAA prices per individual per provision (`provisions` publisher-shipped, default 1); FCA prices `rate × relevant_revenue` (optional fact, defaults to turnover) with a publisher-shipped `widen_to` for stale size; PCI stays size-blind; every `prices[]` entry gains `per_customer`; each publisher ships its own converter and composition passes `size`; fx is HMRC monthly under ticket 10's one fetch rule (D2). Owner agreed without a reason; recorded provisional except D2.
+- [58 — Grilling: the four architectural gaps and the untagged pin](issues/58-grilling-the-four-architectural-gaps-and-the-untagged-p.md) — five decisions, all provisional on a bare "Agree": the isolated flip is the second declared line (5.0.0) and re-carries root-if-attested; driftwood becomes the federation peer; the lane stays public and is enforced detectively with ADR-0023 amended; an untagged pin is a priced hole. Graduated: 63 updated, 68, 69, 70.
 
 ### Built 2026-08-29 — the thin slice runs, and the gate is green
 
@@ -104,7 +105,6 @@ clocks) → 58 (owner decides the four architectural gaps and the untagged pin) 
 - The eco-system re-cut of the affected-parties register and DPIA, once ticket 44 grades the misuse catalogue.
 - Per-workload de-posture inside a Namespace tier, if an adopter ever needs it (ticket 27 decides the de-posture move first).
 - A `v1beta1` move for the 72 Kyverno `v1alpha1` policies. Housekeeping, not on the route, until a Kyverno upgrade forces it.
-- The build tickets that graduate from ticket 58's four decisions (a second declared policy version, a living conditional-rule instance, a federation peer, observation-lane enforcement).
 
 ## Out of scope
 
