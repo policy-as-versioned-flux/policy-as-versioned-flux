@@ -1,3 +1,19 @@
 E2E step 4 flux reconciles the new cage spec onto the cluster
-   SKIP: drift/samples.jsonl carries no five-fact sample yet -- .github/workflows/drift-sample.yml has not run on the remote, and a sample taken by hand is a rehearsal that is never appended or cited (ADR-0023, D4)
-SKIP: no cluster on this runner, and the lane sample cannot stand in: drift/samples.jsonl carries no five-fact sample yet -- .github/workflows/drift-sample.yml has not run on the remote, and a sample taken by hand is a rehearsal that is never appended or cited (ADR-0023, D4)
+   five-fact sample 2026-09-01T20:46:00Z on cluster dsample-33556795181 (run 33556795181), 3 sources
+     driftwood-composed   true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
+     driftwood-composed   FALSE fact_2_tag_signature_verified_at_the_source_boundary: the controller's verdict is 'false': v1.1.0: signature or certificate chain did not verify at tagger time 1787677714: 285BED407E7F0000:error:17000064:CMS routines:cms_signerinfo_verify_cert:certificate verify error:crypto/cms/cms_smime.c:329:Verify error: certificate is not yet valid
+     driftwood-composed   true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming driftwood-composed applied eacae33ca3a1
+     driftwood-composed   true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
+     driftwood-composed   true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
+     nist                 true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
+     nist                 true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+     nist                 true  fact_3_last_applied_revision_equals_the_pinned_commit: nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524
+     nist                 true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
+     nist                 true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
+     platform             true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
+     platform             true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v2.0.1 was verified at the source boundary against platform's own pinned identity ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+     platform             true  fact_3_last_applied_revision_equals_the_pinned_commit: platform is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 533dccb0a823 vs pin 533dccb0a823
+     platform             true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
+     platform             true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
+   FAIL: a fact of the five-fact sample was observed false
+FAIL: the scheduled lane sample observes a step-4 fact false: FAIL: a fact of the five-fact sample was observed false
