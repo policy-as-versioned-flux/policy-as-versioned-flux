@@ -56,4 +56,13 @@ for u in "${UNITS[@]}"; do
   # on how its inputs were fetched is not a gate.
   git clone --quiet "https://github.com/$org/$u" "$dir"
 done
+
+# Every clone (fresh or kept) verifies x509 signatures with gitsign, where gitsign is installed.
+# five-facts.py's sample_provenance reads `git log --format=%G?` on the observation-lane commit;
+# without this config git hands the x509 signature to gpgsm and the grade honestly SKIPs as
+# unattributable (its own ponytail note: "configure gitsign on the truth runner to close it").
+# The truth runner installs pinned gitsign; a machine without it still gets the honest SKIP.
+for u in "${UNITS[@]}"; do
+  git -C "$DEST/$u" config gpg.x509.program gitsign
+done
 echo "OK: ${#UNITS[@]} units in $DEST"

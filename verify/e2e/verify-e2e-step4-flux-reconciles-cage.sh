@@ -47,13 +47,32 @@ ADOPTER="${E2E_ADOPTER:-driftwood}"      # the thin slice is driftwood; ticket 4
 NS="$ADOPTER"
 CTX="${E2E_CTX:-kind-$ADOPTER}"
 
-# --- substrate first, or could-not-look -------------------------------------------------
-command -v kubectl >/dev/null || skip "kubectl absent"
-command -v kind >/dev/null && docker info >/dev/null 2>&1 || skip "substrate absent (kind/docker)"
-kind get clusters 2>/dev/null | grep -qx "$ADOPTER" || skip "KinD cluster '$ADOPTER' absent"
-kubectl --context "$CTX" version >/dev/null 2>&1 || skip "cluster $CTX unreachable"
+# --- substrate first; without one, grade the lane's five-fact sample (ecosystem ticket 60) ---
+# The scheduled observation lane (.github/workflows/drift-sample.yml in the adopter's own repo)
+# reconciles an EPHEMERAL cluster from the REAL remotes and appends one five-fact record per
+# source to drift/samples.jsonl -- exactly the facts A/B/D/H above ask about, plus the signature
+# at the source boundary, on the clock ADR-0023 D1 allows. Where this runner has no cluster at
+# all -- the citable run in CI -- this step used to exit could-not-look without ever reading the
+# lane (REVIEW-2026-08-31, M7). Now it grades that lane-committed sample instead: five-facts.py
+# refuses a hand-typed or unsigned sample, so the grade stays an observation, not a rehearsal.
+grade_lane_sample() {
+  local drift="$ESTATE/$ADOPTER/drift/five-facts.py" out rc
+  [ -f "$drift" ] || skip "no cluster on this runner, and $ADOPTER carries no drift/five-facts.py to grade a lane sample with"
+  "$PY" -c 'import yaml' 2>/dev/null || skip "no cluster on this runner, and this python has no pyyaml to grade the lane sample with"
+  out="$("$PY" "$drift" grade --max-age-hours "${FIVE_FACT_MAX_AGE_HOURS:-48}" 2>&1)"; rc=$?
+  printf '%s\n' "$out" | sed 's/^/   /'
+  case "$rc" in
+    0) pass "no cluster on this runner; step 4 graded from the scheduled lane sample instead: the composed set is in force from signed sources on a cluster that reconciled the real remotes (drift/samples.jsonl)";;
+    3) skip "no cluster on this runner, and the lane sample cannot stand in: $(printf '%s\n' "$out" | sed -n 's/^SKIP: //p' | tail -1)";;
+    *) fail "the scheduled lane sample observes a step-4 fact false: $(printf '%s\n' "$out" | tail -1)";;
+  esac
+}
+command -v kubectl >/dev/null || grade_lane_sample
+command -v kind >/dev/null && docker info >/dev/null 2>&1 || grade_lane_sample
+kind get clusters 2>/dev/null | grep -qx "$ADOPTER" || grade_lane_sample
+kubectl --context "$CTX" version >/dev/null 2>&1 || grade_lane_sample
 kubectl --context "$CTX" get crd kustomizations.kustomize.toolkit.fluxcd.io >/dev/null 2>&1 \
-  || skip "Flux CRDs absent on $CTX (nothing reconciles there)"
+  || grade_lane_sample
 [ -d "$ESTATE/$ADOPTER/composed/policies" ] || skip "no .estate-clone/$ADOPTER/composed (run clone-estate.sh)"
 
 k()  { kubectl --context "$CTX" "$@" 2>/dev/null; }
