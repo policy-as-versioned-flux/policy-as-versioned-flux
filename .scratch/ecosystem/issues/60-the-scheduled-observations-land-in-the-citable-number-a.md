@@ -81,3 +81,17 @@ verify-reconcile.sh + the drift-sample RUNNER_TEMP fix). After merging the three
 wait for the next 06:20Z-cron firing (expect ~5h delay) or fire drift-sample.yml once by hand
 from the Actions tab — the grader accepts any lane commit with an Actions run id and the
 sampler's signed identity, and the workflow declares workflow_dispatch itself.
+
+**2026-09-01, 12:01Z: propose-tier's first SCHEDULED firing.** Success. It re-composed at
+today's date through the pinned platform and returned `[]` — no residual crosses a band, no
+proposal PR, ledger derived from 0 closed-unmerged proposal PRs. Same verdict as the 08:57Z
+pull_request firing. The proposer is on its clock and composes; the first real step 3 now waits
+only on a residual actually crossing a band (a feed bump, an EOL ramp date, or a size change).
+The hub's scheduled truth run also fired (run 19, 10:41Z, delayed from 05:47Z cron): same
+figures as run 18.
+
+**2026-09-01, 12:31Z: twin-sweep's first scheduled firing failed** — on the ticket 72 defect
+(the stale forward-intel feed), not on this ticket's machinery, plus a `bash -e` bug that makes
+its own re-render branch unreachable. Both recorded on ticket 72. All four driftwood clocks
+have now had their first scheduled firing today: renovate-run green, propose-tier green (no
+crossing), drift-sample red (fixed on the branch), twin-sweep red (ticket 72).

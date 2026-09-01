@@ -26,3 +26,15 @@ on a citable run whose driftwood commit contains a Renovate feed bump.
 Surfaced by ecosystem ticket 60 while watching the first post-61 truth run. The reds are real
 estate defects (ticket 55's rule: every red real, explained, finishable), not instrument faults.
 The fix lands in driftwood; the enact guard means the owner pushes and merges it.
+
+**2026-09-01, 12:31Z: the same defect killed twin-sweep's first scheduled firing.** The sweep
+step runs `python3 twin/emit-forward-intel.py --check`, which exits 1 on the stale feed, and the
+run fails. Two findings:
+
+1. The sweep exists precisely to re-render a moved feed, but it cannot: the job step executes
+   under GitHub's default `bash -e`, so the `rc=$?` branch that maps exit 1 to `moved=true` is
+   unreachable — any real move aborts the step before the branch runs. The step needs `set +e`
+   around the check (the same pattern verify-reconcile.sh uses), or `|| rc=$?`.
+2. Even with that fixed, the sweep re-renders the feed but does not touch the signal-lookup
+   rows, so the second red (`no row for feeds/feed/threat-register/v2`) needs the completer (or
+   the sweep) to re-derive the lookup too.
