@@ -117,3 +117,13 @@ branches (checklist above); the next drift-sample firing after that lands the fi
 the TRUTH run that reads it grades step 4 and the three verify-reconcile checks from it. The
 proposal-PR-merged half waits on a residual actually crossing a band. Re-run this ticket after
 the merges to verify the first graded sample and then resolve.
+
+**2026-09-01, ~14:30Z: the three PRs are open.** The owner chose the guard's one-run flip
+(`development` written to twin/ENACT_MODE for the pushes, restored to `operations` at once, no
+diff left). The branches are published and each carries the two commits:
+
+- driftwood: https://github.com/policy-as-versioned-driftwood/driftwood/pull/21
+- tuppence: https://github.com/policy-as-versioned-tuppence/tuppence/pull/13
+- ludlow: https://github.com/policy-as-versioned-ludlow/ludlow/pull/11
+
+The merge stays the owner's click.
