@@ -150,3 +150,9 @@ Two defects, both real, both named, neither this ticket's machinery:
 The citable grading run is dispatched (truth run 33557360933). Its TRUTH line grades step 4
 and the three verify-reconcile checks from these real samples — FAIL where a fact is false,
 which is the design.
+
+**2026-09-01, ~20:55Z: round 2 published (owner approved a second one-run guard flip).**
+
+- driftwood: https://github.com/policy-as-versioned-driftwood/driftwood/pull/22
+- tuppence: https://github.com/policy-as-versioned-tuppence/tuppence/pull/14
+- ludlow: https://github.com/policy-as-versioned-ludlow/ludlow/pull/12
