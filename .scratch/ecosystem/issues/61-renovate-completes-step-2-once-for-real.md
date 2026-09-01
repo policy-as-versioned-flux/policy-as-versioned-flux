@@ -1,7 +1,7 @@
 # 61 — Renovate completes step 2 once, for real
 
 Type: task (AFK)
-Status: prepared
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -77,3 +77,55 @@ What was built, and how each piece was verified:
    event, and it fires propose-tier for real (ticket 60 watches that trigger).
 5. The next citable TRUTH run flips `verify-renovate-merged-feed-pr` from SKIP to PASS. Then
    this ticket resolves on that line.
+
+## Answer — 2026-09-01, step 2 happened for real
+
+The owner said "Do all that", so the checklist ran the same day, through the sanctioned
+routes (`twin/ENACT_MODE` development for the enactment acts, restored to operations after,
+recorded on the hub). The event, as the grader reads it from git:
+
+> PASS: driftwood #20: Renovate raised threat-register v1 -> v2, Chris Nesbitt-Smith merged
+> it, and party.yaml and composed/ moved together -- step 2 happened for real
+
+That line is this session's local read. The citable record is the next scheduled TRUTH run,
+which flips `verify-renovate-merged-feed-pr` from SKIP to PASS.
+
+What the live walk added to the built mechanism (see Progress above):
+
+1. **feeds `threat-register/v2.0.0` is cut and published.** cut-release run 33486753913,
+   release run 33487519188, both green. The v2 payload had sat unreleased since the
+   thin-slice build.
+2. **Driftwood PR #16** (config, completer, ref repairs) went red once, honestly:
+   compose-check caught the completer's `--depth 1` clones. Composition resolves an unpinned
+   parent's sha with `git log` on the version-scoped subdirectory, and a shallow clone
+   flattens every such lookup to the tip. Full clones fixed it; #16 merged green.
+3. **Renovate's first live run refused the completer.** Renovate 44 matches
+   `allowedCommands` with its regex-or-glob matcher: a plain `^...$` string is read as a
+   glob and matches nothing. **PR #18** allows the command in glob-exact and slashed-regex
+   forms; merged green.
+4. **Two Renovates fought over one branch.** The hosted Mend app (installed org-wide by
+   ticket 01) reacted to the same config, rebased the bump branch, consumed the retry
+   checkbox, and can never run postUpgradeTasks; the self-hosted run then refused the branch
+   ("Branch has been edited but found no PR - skipping") because it only adopts PRs it
+   created itself. **PR #19** settles it: `renovate.json` says `enabled: false`, which the
+   hosted app obeys, and `renovate-run.yml` force-enables itself with `RENOVATE_FORCE`,
+   which only a global config can set. Exactly one Renovate acts on driftwood now, and it is
+   the one that can complete a bump. The hosted app's PR #17 was closed with the reason in a
+   comment. Candidate ADR when the pattern spreads to tuppence and ludlow.
+5. **The self-hosted run then did the whole job**: customManager detected v2, the completer
+   ran on the branch, and one bot commit (`ea1c8db`) moved `party.yaml`,
+   `composed/HEADER.yaml` and `composed/evidence.json` together. Its PR-creation API call
+   errored (`prBlockedBy: "Error"`), so **PR #20** was opened manually from the unmodified
+   branch head. shift-left and compose-check passed; the owner's credential merged it on the
+   owner's word (merge commit `27f1cf2`).
+6. **The merge triggered propose-tier for real** (run 33489735149, success, no proposal PR).
+   Driftwood's tier stays `baseline`, which matches the offline step-2 capture: v2 re-prices
+   tuppence, not driftwood. Ticket 60 owns observing that path on the clock.
+
+Open residue, owned elsewhere:
+- Cron has never fired on driftwood (tickets 60 and 56). The whole walk ran on
+  `workflow_dispatch`.
+- The feed parents are consumed at `ref: main`, not pinned (ticket 62).
+- Tuppence and ludlow still carry twelve dead `ecosystem/thin-slice` refs and both
+  Renovates (ticket 57 comment; ticket 62 or a follow-up).
+- The next citable TRUTH run converts the grader's SKIP history to PASS.
