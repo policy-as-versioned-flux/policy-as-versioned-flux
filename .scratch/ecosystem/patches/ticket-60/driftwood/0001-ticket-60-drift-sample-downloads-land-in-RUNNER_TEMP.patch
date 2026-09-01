@@ -1,0 +1,46 @@
+From 9efa3074b9a32aae4c7a06d2353a0cc227600a62 Mon Sep 17 00:00:00 2001
+From: Chris Nesbitt-Smith <chris@cns.me.uk>
+Date: Tue, 1 Sep 2026 12:44:01 +0100
+Subject: [PATCH] ticket 60: drift-sample downloads land in RUNNER_TEMP, not
+ the checkout
+
+The first scheduled firing (2026-09-01 11:41Z) failed with curl exit 23:
+this repo carries a kind/ directory, so 'curl -o kind' in the checkout
+cwd cannot write. The two downloaded manifests would also have sat
+untracked in the tree for the observation cage to refuse. Download and
+apply from RUNNER_TEMP instead.
+---
+ .github/workflows/drift-sample.yml | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/.github/workflows/drift-sample.yml b/.github/workflows/drift-sample.yml
+index 81438d6..4e3da03 100644
+--- a/.github/workflows/drift-sample.yml
++++ b/.github/workflows/drift-sample.yml
+@@ -90,6 +90,12 @@ jobs:
+       - name: install the pinned tools (binary + checksum, no marketplace action)
+         run: |
+           set -euo pipefail
++          # Into RUNNER_TEMP, never the checkout cwd. Two real failures live there: this repo's
++          # own kind/ directory makes `curl -o kind` unwritable (curl exit 23 -- the first
++          # scheduled firing, 2026-09-01 11:41Z, died here), and the two downloaded manifests
++          # would sit untracked in the tree for the observation cage to refuse as a declaration
++          # outside the lane.
++          cd "${RUNNER_TEMP}"
+           curl -sSL -o kind "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64"
+           echo "${KIND_SHA256}  kind" | sha256sum -c -
+           chmod +x kind && sudo mv kind /usr/local/bin/kind
+@@ -132,8 +138,8 @@ jobs:
+           # last-applied-configuration. A plain `kubectl apply` fails on exactly those two with
+           # "Too long: may not be more than 262144 bytes" and the policy CRDs never land (found by
+           # running it, 2026-08-28).
+-          kubectl --context "${CTX}" apply --server-side --force-conflicts -f kyverno.yaml
+-          kubectl --context "${CTX}" apply --server-side --force-conflicts -f flux-operator.yaml
++          kubectl --context "${CTX}" apply --server-side --force-conflicts -f "${RUNNER_TEMP}/kyverno.yaml"
++          kubectl --context "${CTX}" apply --server-side --force-conflicts -f "${RUNNER_TEMP}/flux-operator.yaml"
+           flux --context "${CTX}" install --components=source-controller,kustomize-controller
+ 
+           # Ticket 41's controller, from platform's own tree at the pinned tag. Without it
+-- 
+2.55.0
+

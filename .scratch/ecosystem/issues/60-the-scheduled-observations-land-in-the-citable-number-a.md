@@ -63,3 +63,21 @@ substrate-first SKIP because the unit merges are the owner's. The three fails ar
 deck (pre-existing, ticket 66's ground) and two new driftwood twin reds that are ticket 61
 fallout (party.yaml pins threat-register/v2; the twin's lookup and rendered feed still carry
 v1) — graduated as [72 — A feed bump re-renders the twin's derived artefacts](72-a-feed-bump-re-renders-the-twin-s-derived-artefacts.md).
+
+**2026-09-01, the clocks fired (11:34Z–11:41Z).** The driftwood schedules did fire today, ~5.5h
+after cron: renovate-run 11:34Z (success, no new bump — v2 is already consumed) and
+drift-sample 11:41Z — which FAILED on its first firing ever: `curl: (23) Failure writing output
+to destination` on `curl -o kind`. Root cause: the install step downloads into the checkout
+cwd, and this repo's own `kind/` directory makes that filename unwritable. A second latent bug
+sat in the same shape: `kyverno.yaml` and `flux-operator.yaml` would have been left untracked
+in the tree, and the observation cage would then have failed the run as a declaration outside
+the lane. One fix covers both: download and apply from `RUNNER_TEMP`. All three adopters carry
+the same `kind/` directory and the same workflow, so the fix is committed to all three
+`ticket-60-grade-the-lane-sample` branches (second commit; patches updated). Until it merges,
+every drift-sample firing dies the same way and no sample can land.
+
+**Owner checklist, sharpened:** each unit branch now carries TWO commits (grade-first
+verify-reconcile.sh + the drift-sample RUNNER_TEMP fix). After merging the three PRs, either
+wait for the next 06:20Z-cron firing (expect ~5h delay) or fire drift-sample.yml once by hand
+from the Actions tab — the grader accepts any lane commit with an Actions run id and the
+sampler's signed identity, and the workflow declares workflow_dispatch itself.
