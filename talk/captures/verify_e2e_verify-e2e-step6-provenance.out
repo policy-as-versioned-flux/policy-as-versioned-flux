@@ -1,11 +1,12 @@
 E2E step 6 provenance
-  ok   76 published artefacts resolve to a tag on the publisher's real remote; 4 honestly queued for cut-release.yml
+  ok   80 published artefacts resolve to a tag on the publisher's real remote; 0 honestly queued for cut-release.yml
   ok   8 release workflows pin an anchored, own-repo identity regexp at the Actions OIDC issuer
   ok   driftwood v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   ico v3.0.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   insurer v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   ludlow v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   nist v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform v2.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   no signed tag yet, honestly queued for cut-release.yml: feeds insurer
-PASS: every artefact the slice publishes reaches a signed tag or is honestly queued, and 6 of 8 anchored identity regexps matched a real Fulcio cert subject with its Rekor entry validated, and feeds insurer have no signed tag yet
+  ok   no signed tag yet, honestly queued for cut-release.yml: feeds
+PASS: every artefact the slice publishes reaches a signed tag or is honestly queued, and 7 of 8 anchored identity regexps matched a real Fulcio cert subject with its Rekor entry validated, and feeds have no signed tag yet
