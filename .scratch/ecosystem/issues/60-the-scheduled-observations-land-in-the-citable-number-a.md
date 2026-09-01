@@ -191,3 +191,16 @@ round-2 re-dispatches are already running with the race-fixed sampler.
 
 Definition of done wiring: the checks were already in `talk/verify-all.sh`'s glob; this ticket
 made them grade. The citable record is run 20's TRUTH line above.
+
+**2026-09-01, ~21:15Z (post-resolution): round 2's fix was itself mis-ordered — round 3 corrects it.**
+The round-2 samples came from the fixed workflow, yet tuppence and ludlow still read 16-of-16
+absent. Cause: the round-2 edit's second string replace hit the first occurrence of the kyverno
+wait line — the one the edit had just inserted — so the executed order kept the kyverno wait
+BELOW the composed apply and left an empty ResourceSet wait above it. Driftwood's clean round-2
+sample was luck: its Kustomization wait timed out for 3 minutes, which gave flux-operator time
+to retry (`composed-set 3m6s True`), so its sample is a genuine in-force observation all the
+same. Round 3 (branch `ticket-60-wait-order`, one commit per unit, order mechanically asserted:
+kyverno wait → flux-operator wait → composed apply → Kustomization waits → ResourceSet waits →
+sample) is committed and patched. Also carried by the round-2 samples: ludlow-composed fact 3
+reads "3 of 3 consuming Kustomizations applied a revision that is not the pinned commit
+a800a58e" — watch whether it survives round 3 before charting it; it may be race-downstream.

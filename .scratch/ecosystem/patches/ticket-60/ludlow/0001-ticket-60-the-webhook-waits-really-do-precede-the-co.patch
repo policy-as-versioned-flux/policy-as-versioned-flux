@@ -1,0 +1,48 @@
+From 6dcba87ab65a812e151678f3566249cf98bac3b7 Mon Sep 17 00:00:00 2001
+From: Chris Nesbitt-Smith <chris@cns.me.uk>
+Date: Tue, 1 Sep 2026 22:13:41 +0100
+Subject: [PATCH] ticket 60: the webhook waits really do precede the composed
+ apply
+
+The previous fix (merged 2026-09-01) mis-ordered itself: a
+first-occurrence string replace moved the kyverno rollout wait back
+BELOW the composed apply and left an empty ResourceSet wait above it,
+so the race survived (tuppence run 33558854558, ludlow 33558858820:
+still 16-of-16 absent; driftwood passed only because an unrelated
+3-minute wait timeout gave flux-operator time to retry). Now the order
+is mechanically asserted: kyverno wait, flux-operator wait, composed
+apply, kustomization waits, ResourceSet waits, sample.
+---
+ .github/workflows/drift-sample.yml | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/.github/workflows/drift-sample.yml b/.github/workflows/drift-sample.yml
+index bd3d5ac..0491a8a 100644
+--- a/.github/workflows/drift-sample.yml
++++ b/.github/workflows/drift-sample.yml
+@@ -174,18 +174,18 @@ jobs:
+           # heals it -- the instrument, not the estate (observed 2026-09-01: tuppence run
+           # 33556798230 and ludlow run 33556801679, both 16-of-16 absent on exactly this). So
+           # both controllers are waited for BEFORE the composed set is applied.
+-          for r in $(kubectl --context "${CTX}" -n flux-system get resourcesets.fluxcd.controlplane.io -o name 2>/dev/null); do
+-            kubectl --context "${CTX}" -n flux-system wait "${r}" --for=condition=Ready --timeout=180s || true
+-          done
++          kubectl --context "${CTX}" -n kyverno rollout status deploy/kyverno-admission-controller --timeout=180s || true
+           kubectl --context "${CTX}" -n flux-system rollout status deploy/flux-operator --timeout=180s || true
+           kubectl --context "${CTX}" apply -k gitops/composed/
+ 
+           # Bounded, best-effort. Whatever has or has not converged when this returns is the state
+           # the sample records.
+-          kubectl --context "${CTX}" -n kyverno rollout status deploy/kyverno-admission-controller --timeout=180s || true
+           for k in $(kubectl --context "${CTX}" -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io -o name 2>/dev/null); do
+             kubectl --context "${CTX}" -n flux-system wait "${k}" --for=condition=Ready --timeout=180s || true
+           done
++          for r in $(kubectl --context "${CTX}" -n flux-system get resourcesets.fluxcd.controlplane.io -o name 2>/dev/null); do
++            kubectl --context "${CTX}" -n flux-system wait "${r}" --for=condition=Ready --timeout=180s || true
++          done
+           kubectl --context "${CTX}" -n flux-system get gitrepositories,kustomizations,resourcesets -o wide || true
+ 
+       - name: take the five-fact sample and append it to the observation log
+-- 
+2.55.0
+
