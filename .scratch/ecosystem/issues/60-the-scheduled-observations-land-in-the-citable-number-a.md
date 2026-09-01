@@ -1,7 +1,7 @@
 # 60 — The scheduled observations land in the citable number, and steps 3–4 happen once for real
 
 Type: task (AFK)
-Status: prepared
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -156,3 +156,38 @@ which is the design.
 - driftwood: https://github.com/policy-as-versioned-driftwood/driftwood/pull/22
 - tuppence: https://github.com/policy-as-versioned-tuppence/tuppence/pull/14
 - ludlow: https://github.com/policy-as-versioned-ludlow/ludlow/pull/12
+
+## Answer
+
+Resolved 2026-09-01. The grading half of Done is achieved on a citable line; the step-3 half
+did not occur and is graduated to ticket 74 rather than held open here.
+
+**What is now true, and the line that proves it:**
+
+    TRUTH 2026-09-01T21:07Z run=20 hub=ad0f6f2 units=[driftwood=f4d240e ... tuppence=6c5435c] pass=57 fail=7 skip=18 excluded=2 total=84
+
+- verify-e2e-step4 and all three verify-reconcile checks GRADE from a real lane sample (skip
+  22 -> 18): the gate converts the machinery, closing M7. Each FAIL names a fact observed
+  false in a signed, run-id-attributed lane record — the provenance chain (Actions run id,
+  sampler identity, gitsign signature via clone-estate.sh's gpg.x509.program config) held.
+- The first samples observed the estate's central claim true for the first time: on
+  driftwood's ephemeral cluster, nist and platform grade ALL FIVE FACTS TRUE — composed set
+  in force, from gitsign-verified signed sources, on a cluster reconciling the real remotes.
+- The reds are real and owned: fact 2 false on driftwood/ludlow composed tags ("certificate
+  is not yet valid" at tagger time — ticket 73); the tuppence/ludlow 16-absent reds were the
+  sampler's own webhook race, fixed and merged same day (round 2, PRs driftwood #22,
+  tuppence #14, ludlow #12).
+- propose-tier runs on its clock, composes at today's date, and proposes nothing while no
+  band is crossed — correct. Step 3's first real merge is ticket 74. M9 stays owned there.
+- All ten first scheduled firings were watched and diagnosed (table above); the schedule
+  delay in this estate is ~5 to 5.5 hours.
+- Ticket 40's Answer carries its dated correction. Tickets 72, 73 and 74 are graduated.
+
+**Honesty note:** today's graded samples came from workflow_dispatch firings of the lane
+workflow (owner-triggered after the merges), not from the cron event. The grader accepts them
+because the lane rules judge the commit, not the trigger, and the ticket's own checklist
+offered the dispatch. The 06:20Z cron lands a scheduled sample tomorrow with no action needed;
+round-2 re-dispatches are already running with the race-fixed sampler.
+
+Definition of done wiring: the checks were already in `talk/verify-all.sh`'s glob; this ticket
+made them grade. The citable record is run 20's TRUTH line above.
