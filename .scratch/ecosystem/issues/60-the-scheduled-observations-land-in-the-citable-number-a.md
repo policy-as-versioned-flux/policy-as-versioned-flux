@@ -127,3 +127,26 @@ diff left). The branches are published and each carries the two commits:
 - ludlow: https://github.com/policy-as-versioned-ludlow/ludlow/pull/11
 
 The merge stays the owner's click.
+
+**2026-09-01, ~20:45Z: the first real samples landed.** The owner merged the three PRs
+(driftwood #21, tuppence #13, ludlow #11) and the three drift-sample dispatches ran (queued
+~6h, the day's Actions delay). Every run committed a signed lane record. The headline: on
+driftwood's ephemeral cluster, nist and platform grade ALL FIVE FACTS TRUE — the composed set
+in force, from gitsign-verified signed sources, on a cluster reconciling the real remotes.
+That is the estate's central claim, observed for the first time.
+
+Two defects, both real, both named, neither this ticket's machinery:
+
+1. **Verifier skew (ticket 73).** driftwood-composed and ludlow-composed fail fact 2:
+   "certificate is not yet valid" — the controller verifies at tagger time and the Fulcio
+   cert's notBefore postdates it by seconds. Tuppence's tag verified true.
+2. **Sampler webhook race (fix on branch `ticket-60-sampler-waits`, all three units).**
+   tuppence and ludlow read 16-of-16 composed objects absent because the ResourceSet was
+   applied before Kyverno's admission webhook served (dry-run: connection refused) and the
+   run sampled before the retry healed. Instrument fault by ticket 54's rule. The fix waits
+   for both controllers before applying the composed set, and waits on ResourceSets before
+   sampling.
+
+The citable grading run is dispatched (truth run 33557360933). Its TRUTH line grades step 4
+and the three verify-reconcile checks from these real samples — FAIL where a fact is false,
+which is the design.

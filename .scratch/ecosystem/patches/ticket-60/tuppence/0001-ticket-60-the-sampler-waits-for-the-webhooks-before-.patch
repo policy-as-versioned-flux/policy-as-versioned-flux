@@ -1,0 +1,41 @@
+From 0d2bdfc5cdd2679b440e906ad26f24dd74845f93 Mon Sep 17 00:00:00 2001
+From: Chris Nesbitt-Smith <chris@cns.me.uk>
+Date: Tue, 1 Sep 2026 21:49:06 +0100
+Subject: [PATCH] ticket 60: the sampler waits for the webhooks before applying
+ the composed set
+
+The first dispatch samples (2026-09-01) read 16-of-16 objects absent on
+tuppence and ludlow because the composed ResourceSet was applied before
+Kyverno's admission webhook served: flux-operator's dry-run failed with
+'connection refused' and the run sampled before the retry healed it.
+That red reports the instrument, not the estate. Wait for the kyverno
+admission controller and flux-operator before applying gitops/composed/,
+and wait for ResourceSets alongside Kustomizations before sampling.
+---
+ .github/workflows/drift-sample.yml | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/.github/workflows/drift-sample.yml b/.github/workflows/drift-sample.yml
+index 8247294..4473698 100644
+--- a/.github/workflows/drift-sample.yml
++++ b/.github/workflows/drift-sample.yml
+@@ -168,6 +168,16 @@ jobs:
+           # policy-version-orphan-guard, so installing both puts two owners on one name and the
+           # live guard stops being tuppence's (ticket 16 Q5: "no second policy install").
+           kubectl --context "${CTX}" apply -f gitops/platform/platform-pin.yaml
++          # The composed ResourceSet's objects are Kyverno policies; flux-operator dry-runs them
++          # against Kyverno's admission webhook. Applied before that webhook serves, the first
++          # reconcile fails with 'connection refused' and the sample reads red before the retry
++          # heals it -- the instrument, not the estate (observed 2026-09-01: tuppence run
++          # 33556798230 and ludlow run 33556801679, both 16-of-16 absent on exactly this). So
++          # both controllers are waited for BEFORE the composed set is applied.
++          for r in $(kubectl --context "${CTX}" -n flux-system get resourcesets.fluxcd.controlplane.io -o name 2>/dev/null); do
++            kubectl --context "${CTX}" -n flux-system wait "${r}" --for=condition=Ready --timeout=180s || true
++          done
++          kubectl --context "${CTX}" -n flux-system rollout status deploy/flux-operator --timeout=180s || true
+           kubectl --context "${CTX}" apply -k gitops/composed/
+ 
+           # Bounded, best-effort. Whatever has or has not converged when this returns is the state
+-- 
+2.55.0
+
