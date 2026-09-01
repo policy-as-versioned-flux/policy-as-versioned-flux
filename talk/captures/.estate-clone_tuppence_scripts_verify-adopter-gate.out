@@ -42,7 +42,7 @@ ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none')
   setup: tagged policy/v3.0.0 in the throwaway clone (the real repo waits on CI to sign it)
   setup: tagged policy/v4.0.0 in the throwaway clone (the real repo waits on CI to sign it)
 ok  'v2.0.0' is not a policy tag -- not this gate's subject, skipped
-signed: /tmp/tmp.XjfKpCHzCm/clone/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.GSmd67RSaN/clone/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -52,7 +52,7 @@ signed: /tmp/tmp.XjfKpCHzCm/clone/computed-semver/evidence/9.0.0.json.bundle
 GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
 GATE: passed for policy/v9.0.0
 committed: signed release-gate evidence for v2.0.0, policy/v9.0.0
-committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 733d6c1e04bcbc427b4ccc3a63541682094f82c1
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 5595337fcecbe58c43e823705aebf5c77866ea93
 tagged v2.0.0
 tagged policy/v9.0.0
 ok  'v3.0.0' is not a policy tag -- not this gate's subject, skipped
@@ -63,7 +63,7 @@ tagged v3.0.0
 ok  one real gated release (9.0.0, real evidence), plus two real array-level releases (unchanged, then retired), real tags v2.0.0/v2.1.0/v3.0.0
 
 == Scenario A: real PASS -- array unchanged (v2.0.0 -> v2.1.0), composed re-reads 9.0.0's real committed evidence, weaker-than-declared note fires ==
-ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (be4affb7e854a391cf9c316bf698793f0213a2d1)
+ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (858cb20dad85b820af2ee9218b5ed7b6d11fe778)
 declared (platform tag v2.0.0 -> v2.1.0): minor
 composed (this institution, across ['9.0.0'] and retired []): patch
 NOTE: composed bump ('patch') is weaker than the publisher's tag ('minor') -- informational only, this institution's obligation is never lowered by a local view
@@ -74,7 +74,7 @@ ok  A-render: rendered a real evidence summary to markdown, no percentage anywhe
 
 == Scenario B: real FAIL -- 9.0.0 retires with nothing replacing it, composed forced major ==
 FAIL: composed bump is major -- refusing to adopt v3.0.0 without human review
-ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (7ecc78ee6b2d57c00fb5e99a4ad7f368f72f7b76)
+ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (cb35918b0ee97711186964c8d1ac581a394df8e7)
 declared (platform tag v2.1.0 -> v3.0.0): major
 composed (this institution, across [] and retired ['9.0.0']): major
 RETIRED, reaching this institution as major: 9.0.0
