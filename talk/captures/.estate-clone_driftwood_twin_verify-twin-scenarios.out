@@ -9,10 +9,10 @@ PASS: penalty-published-2026.yaml says which half of the seam it carries: the co
 PASS: the niobium headline lives in this overlay as niobium-supply-shock-2026, not in a news feed
 PASS: every scenario's proposition and world model exist in the vendored world layer
 PASS: every scenario's proposition carries a prior belief in the reference map
-PASS: the overlay with its six scenarios still loads and re-renders the feed byte-identically
-PASS: every one of the 5 pins on party.yaml resolves to exactly one dated signal
+FAIL: the overlay with its six scenarios still loads and re-renders the feed byte-identically: FAIL: twin/forward-intel/v1/feed.json is not what the overlay renders
+FAIL: every one of the 5 pins on party.yaml resolves to exactly one dated signal; no row for: feeds/feed/threat-register/v2; rows for pins this party does not carry: feeds/feed/threat-register/v1
 PASS: every signal is dated and names a scenario that exists, and every scenario is either bound by a pin or declared unbound with a reason
 PASS: the lookup carries no price: binding a pin to a signal is not pricing it
 PASS: every priced valuation names a fact resolvable in party.yaml and re-derives from it
-TOTAL: 16 pass, 0 fail, 0 could-not-look
-PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
+TOTAL: 14 pass, 2 fail, 0 could-not-look
+FAIL: 2 standing-scenario check(s) observed false

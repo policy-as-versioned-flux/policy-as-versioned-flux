@@ -2,10 +2,7 @@ PASS: quote-driftwood 1.0.0: one ADR-0019 envelope, payload valid against quote/
 PASS: quote-driftwood: attachment 40,000.00 GBP equals driftwood's own signed appetite
 PASS: quote-driftwood: every exclusion names a regime driftwood actually prices (forward-intel, threat-register, uk-gdpr)
 PASS: quote-driftwood: all 4 exclusion/condition control id(s) exist in nist's published catalogue (NIST_SP-800-53_rev5.2.0_catalog.json)
-PASS: quote-driftwood: premium 113,403.30 GBP reproduces exactly from formula 1.0.0 over driftwood's signed exposure (3,704,381.74 less 1,072,306.25 excluded, less the 40,000.00 attachment, capped at the 3,000,000.00 limit)
-PASS: quote-driftwood: the layer is priced under perspective insurer and the premium is booked under driftwood -- two perspectives, never one sum
-PASS: quote-driftwood: the estate's own summing helper refuses to add this quote's layer to its premium -- the two perspectives cannot be totalled
-PASS: quote-driftwood: driftwood books it as one contract cost line, 113,403.30 GBP under perspective driftwood, 0.47 per customer
+SKIP: quote-driftwood: priced against exposure sha256:397abe81d6cb but ../driftwood/composed/HEADER.yaml now signs sha256:5822260bab86 -- the insured re-signed its exposure and a re-quote PR is due (the clock opens one; a human merges it)
 PASS: quote-tuppence 1.0.0: one ADR-0019 envelope, payload valid against quote/payload.schema.json (jsonschema)
 PASS: quote-tuppence: attachment 15,000.00 GBP equals tuppence's own signed appetite
 PASS: quote-tuppence: every exclusion names a regime tuppence actually prices (threat-register, uk-gdpr)
@@ -22,4 +19,4 @@ PASS: quote-ludlow: premium 128,862.17 GBP reproduces exactly from formula 1.0.0
 PASS: quote-ludlow: the layer is priced under perspective insurer and the premium is booked under ludlow -- two perspectives, never one sum
 PASS: quote-ludlow: the estate's own summing helper refuses to add this quote's layer to its premium -- the two perspectives cannot be totalled
 PASS: quote-ludlow: ludlow does not pin this quote yet, so no premium line is expected on its sheet (named absence: a quote is published, not imposed)
-PASS: 24 checks -- every published quote validates, attaches at the insured's own signed appetite, keys on real control ids, reproduces its premium from signed inputs, and crosses no perspective
+SKIP: 1 of 21 checks could not be looked at (reasons above)

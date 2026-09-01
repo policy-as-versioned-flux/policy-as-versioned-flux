@@ -1,2 +1,3 @@
 E2E step 4 flux reconciles the new cage spec onto the cluster
-SKIP: KinD cluster 'driftwood' absent
+   SKIP: drift/samples.jsonl carries no five-fact sample yet -- .github/workflows/drift-sample.yml has not run on the remote, and a sample taken by hand is a rehearsal that is never appended or cited (ADR-0023, D4)
+SKIP: no cluster on this runner, and the lane sample cannot stand in: drift/samples.jsonl carries no five-fact sample yet -- .github/workflows/drift-sample.yml has not run on the remote, and a sample taken by hand is a rehearsal that is never appended or cited (ADR-0023, D4)

@@ -60,21 +60,21 @@ PASS: platform: publishes implementations at distribution/policies
 PASS: platform: publishes implementations at identity
 PASS: tuppence/party.yaml vs party schema
 PASS: tuppence: publishes exposure as a section of composed/HEADER.yaml, signed by this party's own tag and not an envelope of its own
-PASS: driftwood pins platform/implementations@2.0.1: tag policy/v2.0.1 on platform
+PASS: driftwood pins platform/implementations@2.0.1: tag v2.0.1 on platform
 PASS: driftwood pins nist/controls@1.1.0: tag v1.1.0 on nist
 PASS: driftwood pins ico/feed/penalty-schema@v3: tag v3.0.0 on ico
-PASS: driftwood pins feeds/feed/threat-register@v1: tag threat-register/v1.0.0 on feeds
+PASS: driftwood pins feeds/feed/threat-register@v2: tag threat-register/v2.0.0 on feeds
 PASS: driftwood pins insurer/feed/quote-driftwood@v1: tag v1.0.0 on insurer
 PASS: ico pins nist/controls@1.1.0: tag v1.1.0 on nist
 PASS: insurer pins platform/implementations@1.1.1: tag v1.1.1 on platform
 PASS: insurer pins driftwood/feed/exposure@v1.1.0: tag v1.1.0 on driftwood
 PASS: insurer pins tuppence/feed/exposure@v1.1.0: tag v1.1.0 on tuppence
 PASS: insurer pins ludlow/feed/exposure@v1.1.0: tag v1.1.0 on ludlow
-PASS: ludlow pins platform/implementations@2.0.1: tag policy/v2.0.1 on platform
+PASS: ludlow pins platform/implementations@2.0.1: tag v2.0.1 on platform
 PASS: ludlow pins nist/controls@1.1.0: tag v1.1.0 on nist
 PASS: ludlow pins ico/feed/penalty-schema@v3: tag v3.0.0 on ico
 PASS: ludlow pins feeds/feed/threat-register@v1: tag threat-register/v1.0.0 on feeds
-PASS: tuppence pins platform/implementations@2.0.1: tag policy/v2.0.1 on platform
+PASS: tuppence pins platform/implementations@2.0.1: tag v2.0.1 on platform
 PASS: tuppence pins nist/controls@1.1.0: tag v1.1.0 on nist
 PASS: tuppence pins ico/feed/penalty-schema@v3: tag v3.0.0 on ico
 PASS: tuppence pins feeds/feed/threat-register@v1: tag threat-register/v1.0.0 on feeds

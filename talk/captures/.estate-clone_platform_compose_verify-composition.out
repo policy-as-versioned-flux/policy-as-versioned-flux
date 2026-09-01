@@ -128,7 +128,7 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "party": "feeds",
       "kind": "feed",
       "name": "threat-register",
-      "version": "v1",
+      "version": "v2",
       "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268"
     },
     {
@@ -1415,8 +1415,8 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
         "currency": "GBP"
       },
       "name": "threat-register",
-      "old_version": "v1",
-      "new_version": "v1",
+      "old_version": "v2",
+      "new_version": "v2",
       "old_price": 19558.549772440045,
       "new_price": 19558.549772440045,
       "old_tier": "baseline",
