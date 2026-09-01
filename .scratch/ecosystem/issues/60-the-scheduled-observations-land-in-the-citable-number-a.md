@@ -1,7 +1,7 @@
 # 60 — The scheduled observations land in the citable number, and steps 3–4 happen once for real
 
 Type: task (AFK)
-Status: claimed
+Status: prepared
 Blocked by: none
 
 ## Question
@@ -95,3 +95,25 @@ figures as run 18.
 its own re-render branch unreachable. Both recorded on ticket 72. All four driftwood clocks
 have now had their first scheduled firing today: renovate-run green, propose-tier green (no
 crossing), drift-sample red (fixed on the branch), twin-sweep red (ticket 72).
+
+**2026-09-01, 14:20Z: the day's watch is complete — Status moves to prepared.** All ten first
+scheduled firings across the three adopters are observed and diagnosed:
+
+| clock | driftwood | tuppence | ludlow |
+|---|---|---|---|
+| renovate-run | green (11:34Z) | green (13:29Z) | green (14:05Z) |
+| drift-sample | red, curl 23 (11:41Z) | red, curl 23 (13:32Z) | red, curl 23 (14:07Z) |
+| propose-tier | green, no crossing (12:01Z) | red, deleted feeds branch (13:42Z) | red, deleted feeds branch (14:17Z) |
+| twin-sweep | red, ticket 72 (12:31Z) | — (none) | — (none) |
+
+Every red is diagnosed and owned: curl 23 is fixed on the three `ticket-60-grade-the-lane-sample`
+branches; the deleted-branch reds are ticket 62 (comment added there); twin-sweep is ticket 72.
+The AFK half of this ticket is done: both gate rewires are live on the hub (TRUTH run 18 grades
+step 4 through the lane path), the three unit rewires plus the drift-sample fix are committed and
+patched, propose-tier is confirmed composing on schedule, and ticket 40 carries its correction.
+
+What Done still needs, and cannot happen from this seat: the owner merges the three unit
+branches (checklist above); the next drift-sample firing after that lands the first real sample;
+the TRUTH run that reads it grades step 4 and the three verify-reconcile checks from it. The
+proposal-PR-merged half waits on a residual actually crossing a band. Re-run this ticket after
+the merges to verify the first graded sample and then resolve.
