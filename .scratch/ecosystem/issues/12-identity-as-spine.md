@@ -100,3 +100,7 @@ Resolved 2026-08-28. On 2026-08-28 the owner read every held round and wrote: "i
 Consequences: two new ADRs. The carrier ADR (items 1 to 3) supersedes the single-domain literal and the reach-demand literal. The actor-class ADR (item 4) roots the twin agent that ADR-0019 and ADR-0021 left unrooted, and retires the Dex narrative. Q5's "rendered from the pinned package" line is superseded by C8. Ticket 21 builds the `party` feed schema and the three federation fields on `party.yaml`. Ticket 25 takes the lost-reach `source: twin` price. The substrate package, the SVID path change and the repairs (spire-agent bundle, Pomerium 34.0.1 pin, loud currency-controller failure) go to a new build ticket. Ticket 13 decides the currency controller (C15). Revisit triggers: ticket 06 decides what a pod claims; Flux #1068 lands; a party runs more than one cluster; a device attests for the first time.
 
 Graduated: 26 Build the identity substrate package.
+
+## Comments
+
+**2026-09-02, ticket 75 resolved.** Q12 is (b), delegated: the substrate is designed and shelved for this build. NORTH-STAR §1 reads "every artefact is attestable"; the six identity scripts move to the exclusions file with a reason (ticket 90); the identity lane that grades the actor half is the first thing after this map. The design in this Answer stands unchanged.

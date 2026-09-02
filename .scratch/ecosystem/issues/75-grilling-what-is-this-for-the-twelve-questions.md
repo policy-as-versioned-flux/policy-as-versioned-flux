@@ -1,7 +1,7 @@
 # 75 — Grilling: what is this for — the twelve questions about the underlying goals
 
 Type: grilling (HITL)
-Status: prepared
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -65,3 +65,71 @@ Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) §7. The purpose anal
 ❓ **Q13** - **Was the currency controller the mechanism you meant to retire?** Ticket 13 retired it because "the fx feed replaces it". The controller re-caged a running pod after its version was retired; the fx feed is money. The module still ships and is graded every run. Options: (a) withdraw the retirement and give it an owner; (b) retire it with a reason that names what it does.
 
 ➡️ My call: (a). It is the estate's only post-admission re-caging mechanism.
+
+## Round 1 answers (2026-09-02, the owner, verbatim)
+
+The owner answered all thirteen in one message, in chat. Quoted exactly, spelling as sent.
+
+| Q | Owner's words |
+|---|---|
+| Q1 | "all of them a leading to b, making c available because its open source underwritten by d" |
+| Q2 | "not mine" |
+| Q3 | "a agree but you can get the talk from ../../talks and /claude-in-chrome or /firecrawl:firecrawl-cli to pull anything you're blocked by" |
+| Q4 | "yes" |
+| Q5 | "The evolution that we've come to whilst building this implementation and more modern technologies is that proportionality can be managed and run with a better cage and better protections and mitigations. Fundamentally, something could find itself unable to run, but that's only because it doesn't fit the cage, not because we deliberately deny it. So, in Kubernetes Parlance, we've built a Mutating admission controller more than a Approving admission and control" |
+| Q6 | "I agree, though, for you to develop and build this. It's going to be a bit of theatre because I'm going to be making you approve and merge everything. But the narrative and talk should be that it's a human doing it, but that doesn't really work in development." |
+| Q7 | "They should be plausible firms if it's not able to make them plausible. Should just use them as nicknames for well known studied existing firms that we can base it on" |
+| Q8 | "yes" |
+| Q9 | "by product / marketting tools" |
+| Q10 | "I don't mind you using an AI model, but I'll need to use within clawed code for now because we've not got tokens anywhere else. So you'll need to set up your own schedules or shell scripts with some run instructions that we can run from this machine that would be Simulating what the CROM then the real word might do." |
+| Q11 | "ask fable to decide then record" |
+| Q12 | "b" |
+| Q13 | "a" |
+
+### Facts fetched after round 1 (the assistant, 2026-09-02)
+
+- **The Medium post is the owner's, and "at least three" is the owner's own phrase.** Read through the owner's Chrome session (automation is blocked by Medium's anti-bot). "What is Policy As [versioned] Code?", 2022-03-11, in the section "Your runtime needs to support multiple policy versions": the transition period for old versions to be retired runs "forwards and backward by one version", so the runtime "needs to support at least three significant versions". PURPOSE.md C6 said the owner had never been asked; the phrase is the owner's, so the transcription was faithful.
+- **The talk shows four coexisting lines.** `../../talks/PolicyAsVersionedCode.md:1581` has app3 on 2.1.1 with 1.0.0, 2.0.0, 2.1.0 also live; `:1675` says cluster1 "accepts all the versions we've described so far"; `:1683` says cluster2 "only accepts 2.0.0 and greater". The talk gives no number in words. The number is in the post.
+- **One GitHub identity exists.** `gh auth status`: chrisns, scopes `repo, workflow, read:org, delete_repo, gist`. The only installed app on the org is `renovate`. There is no second identity for a required review.
+- **The guard refuses every merge shape today.** `twin/ENACT_MODE` reads `operations`; `twin/enact_guard.py` (amended 2026-08-29) falls back to `operations` and refuses the merge subcommand, the REST merge call and auto-merge. The docstring records the 2026-08-25 owner instruction that made the refusal a mode, and the 2026-08-29 build brief "never push, never merge a PR, never create a tag". The Q6 answer changes that standing instruction for the development window. Round 2 asks the owner to confirm the mechanics before any file flips.
+
+## Round 2 (2026-09-02)
+
+Three questions, put after the facts above. Q14: who is the second identity and does the guard flip, (a) a machine identity for the assistant plus a dated flip, (b) merge with the owner's token and record theatre, (c) keep the guard. Q15: a date, venue or recipient, (a) none yet, (b) name it. Q16: the Q1 and Q9 reading, (a) the estate is the deliverable and the talk markets it, (b) the talk sets the schedule.
+
+Owner, verbatim: "14 a / 15 none yet, when we've got something good, we'll tour it, but you can see the sorts of conferences i took the last talk to / 16 a".
+
+Fact fetched after round 2: `../../talks/schedule.md` lists the last talk at about twenty venues between 2022-06-01 and 2023-09-21: Cloud Native London and Wales, Open Source Summit Latin America and Europe, SREday, GitOpsCon, Spinnaker Summit, Kubernetes Community Days UK, DevSecCon (three editions), WeAreDevelopers, OSCONF, Conf42, and several online meetups. That circuit is the audience of purpose (a).
+
+## Answer
+
+Resolved 2026-09-02. Sixteen decisions. Each carries its status: **owner-reasoned** (the owner gave a letter and a reason, binding), **owner-instructed** (the owner gave an instruction rather than a letter, binding), or **delegated** (the owner gave a bare letter or "yes", and under Q11 the assistant's call is recorded as the decision, with the assistant's reason). The word "provisional" is not used from here on; see Q11.
+
+1. **Q1, purpose. Owner-reasoned.** All four purposes hold, in a chain: (a) the touring talk leads to (b) the reference implementation ControlPlane lifts into client work; (b) makes (c) adoption by a fourth organisation available, because the estate is open source; the whole is underwritten by (d) the written, checkable argument. Consequences: the LICENSE work in ticket 82 is on the route, because open source is the mechanism that makes (c) available; no onboarding is built for (c) in this map, availability is the promise, not a fourth adopter (see Out of scope); the truth surface is the instrument of (d).
+2. **Q2, §4. Owner-instructed ("not mine").** NORTH-STAR §4 is the assistant's build order, not the owner's definition of done. The definition of done is: fit for purpose (a) as the truth surface defines it under Q8, with (d) true on every citable run. Folded question, decided by the assistant: step 2 counts as done mechanically, because Renovate raised the pin and a human merged it (ticket 61); that the price did not move is a £-inputs defect owned by tickets 77 and 79, not a step-2 failure. Ticket 95 writes this into NORTH-STAR.
+3. **Q3, three coexisting versions. Owner-reasoned, with the owner's 2022 reason recovered.** (a) binds: the runtime supports at least three significant versions, because retirement runs forward and back by one version (the owner's Medium post, 2022-03-11, quoted above). Scoped as three declared lines and a priced supersede. CONTEXT.md:153 already says ≥3 and stands. Ticket 63 gives the second line; ticket 84 gains the third line and sets the coexistence threshold to three.
+4. **Q4, the £. Delegated ("yes").** (a): the £ is an ordinal, auditable comparison instrument under one perspective, and every artefact that shows a total says so. The two stale fines are corrected and a litigation-status field is added. Folded, decided by the assistant: `appetite.tolerance` is one quantity, an annual aggregate under the adopter's perspective, because the ladder selects on one number and three tolerances would need a rule for combining them that nobody has asked for; the insurer is an illustrative counterparty, said so on its quote, because its premium is priced from the same editorial inputs and cannot be a second opinion until those inputs are sourced. Ticket 79 carries the work.
+5. **Q5, "there is no gate". Owner-reasoned.** Cages all the way down. The owner's words: proportionality is managed with a better cage and better mitigations; something can find itself unable to run only because it does not fit the cage, never because it is deliberately denied; the estate is a mutating admission controller more than a validating one. Consequences: the "locked door" for access control, data protection and key management does not survive as a separate mechanism; the two shipped Deny policies are re-expressed as cage constraints or retired; `verify/proportionality` loses its Audit-versus-Deny subject; the three disagreeing documents reconcile to this. The assistant's call (b) is overruled. Ticket 89. ADR-0022 gains a dated note with the owner's reason.
+6. **Q6, a human merges. Owner-reasoned, mechanics delegated.** Principle 5 binds for the demonstration: main and `release/*.x` are protected with a required review from a different identity. For the development window the owner will have the assistant approve and merge, as theatre, while the narrative says a human merges. Round 2 Q14 (a): the owner creates one machine identity for the assistant (ticket 88, HITL); the assistant reviews and merges as that identity; `twin/ENACT_MODE` flips to `development` only after the identity exists, with a dated docstring line citing this ticket. Until then the guard stands and the owner merges by hand. The end state, AI disposal, is recorded in NORTH-STAR §6 by ticket 95. Ticket 87 is blocked by 88.
+7. **Q7, the three adopters. Owner-instructed.** Plausible firms. Where the estate cannot make a fictitious firm plausible, the firm becomes a nickname for a well-known, studied, existing firm that its numbers are based on. Ticket 94 (research) finds the candidate firms and their public numbers. Folded, decided by the assistant: the three adopters stay three independent forks for this build, because three independent consumers is what §4 demonstrates and a shared package is a packaging decision that waits on the first real divergence; a fourth adopter is out of scope for this map (Q1: availability, not onboarding).
+8. **Q8, the truth surface. Delegated ("yes").** (b): green means the offline half passes and every adopter's sampled lane facts are true, with the ceiling published on the TRUTH line, and the cage graded through two more lane facts. Reason: the lane is already real and signed; an ephemeral cluster on the hub clock would grade the same thing a second way. Ticket 86 takes the lane branch; ticket 83 publishes the ceiling.
+9. **Q9, the talk. Owner-reasoned ("by product / marketting tools").** The talk is a byproduct and a marketing tool. Round 2 Q16 (a): the running estate is the deliverable; the talk markets it; the deck, the three unfired beats and the runbook line do not outrank estate work and are rebuilt from the truth surface when the estate is fit. The 2026-07-23 instruction "work backwards from the talk" is superseded by this later, reasoned answer. NORTH-STAR §6's byproduct line is now the owner's, not the assistant's; ticket 95 re-attributes it.
+10. **Q10, the twin forecasts. Owner-reasoned, with a constraint.** (a): the twin may derive a probability from signals with a model call. Constraint: the model runs inside Claude Code on this machine, because no tokens exist anywhere else. So the estate gains a local clock: schedules or shell scripts with run instructions, run from this machine, that simulate what the cron and then the real world would do. Ticket 92 builds the local clock; ticket 93 builds the derived probability and re-opens the ordinal-arithmetic and grade-5 rulings as far as it must. Folded, decided by the assistant: the forward-intel feed is not price-eligible outside a signed tag; a clock's emission is an observation under the caged lane (ADR-0023 D1), and only a human-merged, tagged entry prices, consistent with ticket 23.
+11. **Q11, how to be asked. Owner-instructed ("ask fable to decide then record").** The assistant decides architecture and records the decision with its reason. The owner's reasoned answer, where given, overrides. A bare letter from the owner is a delegation, not a ratification, and is recorded as the assistant's decision. The "provisional" vocabulary retires; the 84 items marked provisional are re-labelled delegated by ticket 80, without re-asking. Mid-run: when a build discovers a fact that forces an architectural call, the assistant decides, records and continues; it does not interrupt the owner. What still goes to the owner: purpose, dates, identities, money, authorisations, and anything that names a real person. The five-per-day rule stays for those. ADR-0025.
+12. **Q12, identity. Delegated ("b").** Shelved for this build: NORTH-STAR §1 reads "every artefact is attestable"; the six identity scripts move to the exclusions file with a reason; the claim becomes true. Reason: 24 of 24 tags verify against Rekor and no actor attestation has ever been observed on a citable run; claiming the unobserved is the failure the Docker post-mortem exists to prevent. The identity lane is the next thing after this map, in the fog. Ticket 90. The map's note "identity is spine, not cut" is amended.
+13. **Q13, the currency controller. Delegated ("a").** The retirement is withdrawn and the controller gets an owner. Reason: it is the estate's only post-admission re-caging mechanism, and "the fx feed replaces it" was a homonym. Ticket 13 item 2 is amended; ticket 91 carries the work; ticket 80 item 6 changes direction.
+14. **Q14, the second identity. Delegated ("a").** As in item 6. Ticket 88.
+15. **Q15, a date. Owner-reasoned.** None yet. "When we've got something good, we'll tour it." The audience is the circuit the last talk toured (about twenty conferences and meetups, 2022 to 2023, listed above). No ticket carries a deadline.
+16. **Q16, Q1 and Q9 together. Delegated ("a").** As in item 9.
+
+Consequences for the map: tickets 79, 84, 86 and 87 are unblocked or re-blocked as recorded in each; ticket 63 loses its Q3 wait; tickets 88 to 95 are created; the Notes' process rule, the "no gate" line and the identity line are rewritten; the fog that waited on this ticket graduates or is ruled out; a fourth adopter and onboarding for purpose (c) are out of scope.
+
+Graduated:
+- 88 The second identity (HITL task)
+- 89 Deny is not a rung: the mutating controller
+- 90 Identity is shelved for this build
+- 91 The currency controller is un-retired and owned
+- 92 The local clock
+- 93 The twin derives a probability
+- 94 Research: the studied firms behind the adopters
+- 95 The record states the purpose

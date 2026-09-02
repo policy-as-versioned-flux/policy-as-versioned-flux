@@ -2,7 +2,7 @@
 
 Type: task (HITL)
 Status: open
-Blocked by: 75
+Blocked by: 88
 
 ## Question
 
@@ -19,3 +19,7 @@ Done = `gh api repos/<org>/<repo>/rulesets` is non-empty on nine repos and the v
 ## Notes
 
 Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R9. Findings: security/SS-04, SS-05, scope/F8, engineering/EQ-08. Ticket 65 (the `--git-dir` hole) is the guard's own half. Ticket 74's definition of done cannot be written until Q6 is answered.
+
+## Comments
+
+**2026-09-02, ticket 75 resolved.** Q6 is (a), owner-reasoned: principle 5 binds for the demonstration. Item 1 applies. The second identity is the machine identity ticket 88 creates for the assistant, which reviews and merges during the development window while the owner authors and pushes (the owner's word: theatre). Item 3: `twin/ENACT_MODE` flips to `development` only after ticket 88 lands, with a dated docstring line; the declaration the agent cannot write is the ruleset itself, which requires the second identity's review. Blocked by 88 now, not 75.

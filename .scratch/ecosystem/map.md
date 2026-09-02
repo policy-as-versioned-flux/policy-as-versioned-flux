@@ -10,14 +10,17 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 
 - The north star is ratified. The owner's answers to 41 re-grills and 22 reversals are binding: [REGRILL-ANSWERS.md](../drift-review-2026-08-27/REGRILL-ANSWERS.md). The ranked gaps are [GAPS.md](../drift-review-2026-08-27/GAPS.md).
 - Build order: the seven steps in NORTH-STAR §4, thinnest slice end to end first (one regulator, one adopter, one feed, one cage move, one twin forecast, all real), before widening. The truth surface is built in parallel because it grades the slice.
-- Vocabulary: there is no gate. Everything is caged; the spec of the cage is the only variable; the £ picks the spec; the bottom rung is "too expensive to run or not functional". Never an exemption, never an exemption ledger. Price and cage; never count, refuse or file.
+- Purpose (ticket 75, 2026-09-02, the owner's chain): a touring talk that proves the corrected thesis as running code, leading to a reference implementation ControlPlane lifts into client work, which makes adoption by a fourth organisation available because the estate is open source, underwritten by the written, checkable argument. No date: "when we've got something good, we'll tour it". The talk is a byproduct and a marketing tool; the running estate is the deliverable. NORTH-STAR §4 is the assistant's build order; done is fitness for the talk as the truth surface defines green (ticket 75 Q8).
+- Vocabulary: there is no gate, in the owner's words (ticket 75 Q5): a mutating admission controller more than a validating one; a workload can be unable to run only because it does not fit the cage, never because it is deliberately denied. Everything is caged; the spec of the cage is the only variable; the £ picks the spec; the bottom rung is "too expensive to run or not functional". Never an exemption, never an exemption ledger. Price and cage; never count, refuse, deny or file.
 - Versioning follows ESLint shareable configs: every package its own semver; a composed set is a new package; republish and inner-source are normal.
 - Schedules run the LLM-free data gathering. Reasoning is packaged as Claude Code skills a human runs over the gathered results. The reviewed PR is the unit of adoption.
-- Process rules (from the drift review): at most five decisions put to the owner per day, none inside an implementation run; a bare "agree" or letter does not ratify architecture, so a decision is recorded with the owner's reason or it stays open; a spec does not advance to tickets without a recorded owner confirmation; done is defined by the truth surface, never by the demo; every ticket's definition of done includes wiring its check into the gate.
+- Process rules (from the drift review, amended by ticket 75 Q11 and ADR-0025 on 2026-09-02): the assistant decides architecture and records each decision with its reason; the owner's reasoned answer overrides; a bare letter or "yes" from the owner is a delegation and is recorded as the assistant's decision, labelled delegated; the word "provisional" retires; mid-run, the assistant decides, records and continues. Only purpose, dates, identities, money, authorisations and anything naming a real person go to the owner, at most five per day, none inside an implementation run. Done is defined by the truth surface, never by the demo; every ticket's definition of done includes wiring its check into the gate.
 - Skills to consult: `/mattpocock-skills:grilling` and `domain-modeling` for every grilling ticket; `/mattpocock-skills:research` for research tickets; `/arckit:wardley` and `/arckit:impact` for the twin; CONTEXT.md and docs/adr/ before any work.
 - Batch record, 2026-08-28: the owner read all 14 held rounds and wrote "ive already read the recommendations and I can't find fault with a single one". Every accepted recommendation is recorded as provisional with that line. Five cross-ticket conflicts went to the owner with a three-lens panel verdict; the owner wrote "I agree with you're more advanced reasoning"; those five are decided (D1 to D5 in each ticket's Answer, ADR-0023). The five-per-day rule was overridden by the owner's instruction for this batch. Held rounds stay in each ticket above the Answer as the record of what was recommended.
 - A `Status: prepared` ticket holds a drafted HITL round the owner has not answered. See `docs/agents/issue-tracker.md`.
-- Identity is spine, not cut (charting Q2). The feeds and insurer parties are real orgs the owner creates (charting Q4).
+- Identity is designed and shelved for this build (ticket 75 Q12 amends charting Q2): every artefact is attestable; the actor half waits for an identity lane after this map. The feeds and insurer parties are real orgs the owner creates (charting Q4).
+- Merging, development window (ticket 75 Q6, Q14): the owner authors and pushes; the assistant reviews and merges as a second machine identity once ticket 88 creates it; the guard's `operations` mode stands until then. The narrative says a human merges; AI disposal is the recorded end state.
+- The twin's model call runs inside Claude Code on the owner's machine, on a local clock (ticket 92), because no tokens exist elsewhere (ticket 75 Q10).
 
 ## Decisions so far
 
@@ -49,6 +52,7 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 - [24 — Size beyond turnover](issues/24-size-beyond-turnover.md) — HIPAA prices per individual per provision (`provisions` publisher-shipped, default 1); FCA prices `rate × relevant_revenue` (optional fact, defaults to turnover) with a publisher-shipped `widen_to` for stale size; PCI stays size-blind; every `prices[]` entry gains `per_customer`; each publisher ships its own converter and composition passes `size`; fx is HMRC monthly under ticket 10's one fetch rule (D2). Owner agreed without a reason; recorded provisional except D2.
 - [61 — Renovate completes step 2 once, for real](issues/61-renovate-completes-step-2-once-for-real.md) — the inherits[] customManagers and a postUpgradeTasks completer land on driftwood; feeds cuts threat-register/v2.0.0; Renovate raises the bump with party.yaml and composed/ in one bot commit and the owner merges it (PR #20, 27f1cf2), firing propose-tier for real; exactly one Renovate acts per repo now (hosted Mend app disabled, self-hosted force-enabled); graded by verify-renovate-merged-feed-pr, citable on the next TRUTH run.
 - [58 — Grilling: the four architectural gaps and the untagged pin](issues/58-grilling-the-four-architectural-gaps-and-the-untagged-p.md) — five decisions, all provisional on a bare "Agree": the isolated flip is the second declared line (5.0.0) and re-carries root-if-attested; driftwood becomes the federation peer; the lane stays public and is enforced detectively with ADR-0023 amended; an untagged pin is a priced hole. Graduated: 63 updated, 68, 69, 70.
+- [75 — Grilling: what is this for, the twelve questions](issues/75-grilling-what-is-this-for-the-twelve-questions.md) — sixteen decisions, each labelled owner-reasoned, owner-instructed or delegated: the purpose is a chain (talk → reference implementation → adoption available because open source, underwritten by the written argument), no date; §4 is the assistant's build order; at least three coexisting versions binds in the owner's 2022 words; the £ is an ordinal instrument, said on the artefact; there is no gate, in the owner's words (mutating, never a deliberate deny); a human merges binds, with a second identity as development-window theatre; the adopters are plausible firms, based on studied real firms where needed; green is the offline half plus the lane facts with the ceiling published; the talk is a byproduct and marketing tool; the twin derives a probability with a model run locally; the assistant decides and records (ADR-0025); identity is shelved for this build; the currency controller is un-retired. Graduated 88 to 95; ticket 68 ruled out of scope.
 - [60 — The scheduled observations land in the citable number, and steps 3–4 happen once for real](issues/60-the-scheduled-observations-land-in-the-citable-number-a.md) — the gate converts: step 4 and the three verify-reconcile checks grade from real, signed lane samples on TRUTH run 20 (2026-09-01T21:07Z, 57/7/18 of 84); first-ever all-five-facts-true observation (nist and platform on driftwood's sample); all ten first clock firings watched (~5.5h cron delay); reds owned by tickets 72 (twin re-render), 73 (verifier cert skew) and 62 (deleted thin-slice refs); step 3's first real merge graduates to ticket 74; ticket 40 corrected. M7 closed; M9 moves to 74.
 
 ### Built 2026-08-29 — the thin slice runs, and the gate is green
@@ -139,12 +143,23 @@ Process note. GAPS rule 1, "no recommendation attached to an architectural quest
 dropped when the rules were copied into this map. Ticket 75 states each trade first and the
 assistant's call after it, labelled as such. Ticket 80 restores or retires the rule with a reason.
 
+**Worked 2026-09-02, ticket 75.** The owner answered all thirteen questions and three follow-ups
+in two rounds, in chat. The Medium post was read through the owner's browser and "at least three"
+is the owner's phrase. Tickets 88 to 95 are graduated: 88 (the second identity, HITL, blocks 87
+and 74), 89 (Deny is not a rung), 90 (identity shelved), 91 (currency controller un-retired), 92
+(the local clock), 93 (the twin derives a probability, blocked by 92), 94 (research: the studied
+firms), 95 (the record states the purpose). Ticket 68 is closed out of scope. Order of attack now:
+95 → 76 → 78 → 81 → 85 → 89 → 77 (with 62) → 79 (after 94) → 80 (with 67) → 90 → 91 → 83 → 84 →
+86 → 92 → 93 → 82. Ticket 88 waits on the owner and gates 87 and 74.
+
 ## Not yet specified
 
-- After the 2026-09-02 review, the fog that waits on ticket 75:
-- A shared, pinned adopter package instead of three divergent forks (Q7); a fourth adopter.
-- A twin that derives a probability from a signal, if Q10 says it must; the eleven real firms' and four named executives' place in a public corpus.
-- £ beats on the deck, so a non-engineer learns that a control, a cage tier and an insurance transfer are comparable; the estate's own running cost on driftwood's balance sheet.
+- After ticket 75 (2026-09-02):
+- The identity lane that grades the actor half of attestation, and a federation peer with it. First thing after this map (ticket 75 Q12).
+- A shared, pinned adopter package instead of three forks, once a real divergence shows what the package must hold (ticket 75 Q7).
+- The eleven real firms' and four named executives' place in a public corpus, once ticket 94 shows which studied firms the adopters rest on and ticket 82 rules on named individuals.
+- £ beats on the deck, so a non-engineer learns that a control, a cage tier and an insurance transfer are comparable; the estate's own running cost on driftwood's balance sheet. Rebuilt from the truth surface when the estate is fit (Q9, Q16).
+- Which ordinal-arithmetic and grade-5 rulings ticket 93's derivation must reopen.
 - A supported-engine-version matrix per published policy line (ticket 71's widening).
 - The thin slice is built (2026-08-29 section above). What remains dim:
 - Placement of the scanner, notification spine and OSCAL CronJob after ticket 35 decides lift-or-retire for them. The currency controller is retired (ticket 13).
@@ -159,3 +174,6 @@ assistant's call after it, labelled as such. Ticket 80 restores or retires the r
 - Covert sensing; real surveillance data (permanently excluded).
 - Rewriting history in place. Superseded documents get banners.
 - Reopening the 114 re-ratified decisions.
+- A fourth adopter, and onboarding for one. Purpose (c) is "available because open source", not a demonstrated adoption (ticket 75 Q1, Q7).
+- [68 — Federation gets its peer](issues/68-federation-gets-its-peer.md): closed 2026-09-02. Identity is shelved for this build (ticket 75 Q12); a peer returns with the identity lane as a fresh effort.
+- A date or venue for the talk. None exists; none is invented (ticket 75 Q15).

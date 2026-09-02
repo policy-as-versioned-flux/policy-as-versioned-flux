@@ -2,7 +2,7 @@
 
 Type: task (AFK)
 Status: open
-Blocked by: 75
+Blocked by: 75 (resolved)
 
 ## Question
 
@@ -20,3 +20,7 @@ Done = a real adopter pin behind a real newer tag prices a non-zero supersede li
 ## Notes
 
 Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R6. Findings: thesis/TF-02, scope/F3, legacy/L2, L3, L7. Ticket 63 supplies the second declared line. Ticket 35's converter ordering (converters before the app lift) follows from item 1.
+
+## Comments
+
+**2026-09-02, ticket 75 resolved.** Q3 is (a), owner-reasoned: at least three significant versions, because retirement runs forward and back by one version (the owner's Medium post, 2022-03-11, read through the owner's browser). Item 4 becomes: CONTEXT.md:153 stands at ≥3; set `verify-coexistence.sh`'s threshold to three declared lines. New item 5: the third declared line. Ticket 63 cuts the second (5.0.0); the third is the next bump the engine computes on a real change, and until it exists the coexistence check reads could-not-look with that reason, never green on two. Unblocked.

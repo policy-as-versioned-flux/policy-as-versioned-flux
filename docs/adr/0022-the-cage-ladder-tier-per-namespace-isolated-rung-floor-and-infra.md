@@ -57,3 +57,14 @@ Supersedes ADR-0014's CREATE deny, ADR-0015's "a proposed Deny opens an issue", 
 artefact carries no tier and no floor) and ADR-0018 §4. The offline test needs a `Values` file
 carrying the Namespace; `kyverno apply` 1.18.2 evaluates `namespaceObject` from it (proven
 2026-08-28). H8-03 closes when the pod label is an output.
+
+## Note, 2026-09-02 (ticket 75 Q5, the owner's reason)
+
+The isolated rung replacing Deny was recorded on 2026-08-28 as the assistant's reading of the
+owner's words. On 2026-09-02 the owner gave the reason in their own words: proportionality is
+managed and run with a better cage and better protections and mitigations; a workload can find
+itself unable to run only because it does not fit the cage, never because it is deliberately denied;
+in Kubernetes terms the estate is a mutating admission controller more than a validating one. The
+assistant's narrower alternative, a surviving locked door for access control, data protection and
+key management, was put and overruled. Consequence: no Deny-shaped rule ships that is not a cage
+constraint (ticket 89).

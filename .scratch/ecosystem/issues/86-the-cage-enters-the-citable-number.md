@@ -2,7 +2,7 @@
 
 Type: task (AFK)
 Status: open
-Blocked by: 75
+Blocked by: 75 (resolved)
 
 ## Question
 
@@ -20,3 +20,7 @@ Done = "the bottom rung runs and reaches nothing" is a PASS on a citable TRUTH l
 ## Notes
 
 Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R5. Findings: thesis/TF-05, principles/P2-6, security/SS-02, engineering/EQ-06, truth-surface/TS-C2 (ceiling). The adopters' lane already samples an ephemeral cluster per run with pinned tools.
+
+## Comments
+
+**2026-09-02, ticket 75 resolved.** Q8 is (b), delegated: the lane branch (item 1), with the ceiling published on the TRUTH line by ticket 83. Item 2 (an ephemeral cluster on the hub clock) is not taken; record it as the road not taken in the ADR-form note item 5 asks for. Q12 is (b): item 3 now belongs to ticket 90 (the six scripts move to the exclusions file with a reason). Unblocked.

@@ -2,7 +2,7 @@
 
 Type: task (AFK)
 Status: open
-Blocked by: 75
+Blocked by: 75 (resolved)
 
 ## Question
 
@@ -24,3 +24,7 @@ Done = driftwood's, tuppence's and ludlow's `composed/evidence.json` re-render f
 ## Notes
 
 Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R1. Findings: pound-engine/PE-01, PE-02, PE-05, PE-06, PE-07, PE-08, PE-10, PE-12, principles/P3-1, scope/F2, completeness C1. The completeness critic's re-run of the production path with corrected fines is at [review-2026-09-02/evidence/completeness/](../review-2026-09-02/evidence/completeness/).
+
+## Comments
+
+**2026-09-02, ticket 75 resolved.** Q4 is (a), delegated: the £ is an ordinal, auditable comparison instrument under one perspective, and every artefact that shows a total says so (item 10 applies). `appetite.tolerance` is one annual-aggregate quantity. The insurer is an illustrative counterparty, and its quote says so. Add a litigation-status field beside `status` and `final_as_of` in item 1. Q7: the adopters are plausible firms, based on studied existing firms where needed; ticket 94 (research) supplies the candidates and item 2 picks under that record. Unblocked.

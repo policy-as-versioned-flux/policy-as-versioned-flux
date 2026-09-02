@@ -80,6 +80,9 @@ that a rewritten entry cites stay as the record of the decision at the time.
   the loose end; the **bottom rung is `isolated`** (the quarantine cage plus no ingress, no egress,
   first eviction) and it replaces every earlier deny or refusal, so nothing is ever refused, only
   caged. A "locked door" is therefore the bottom rung reached by the £, not a separate mechanism.
+  In the owner's words (2026-09-02, ticket 75): the estate is a **mutating admission controller**
+  more than a validating one; a workload can be unable to run only because it does not fit its
+  cage, never because it is deliberately denied.
   An unknown or unlabelled tier fails closed to `isolated`. The cage mutation is **tighten-only**: a
   tightened rule and the default cage never contradict. This *cage-tier* axis is independent of
   *adoption cadence* (ADR-0002). The tier is declared on the signed **governed namespace**
@@ -152,7 +155,10 @@ that a rewritten entry cites stay as the record of the decision at the time.
 
 - **Multi-version coexistence** — A single runtime (cluster) must accept and evaluate **multiple
   policy versions simultaneously** (≥3), so old versions can be retired over a transition window
-  rather than via a flag-day breaking change. *The crux of the original implementation.*
+  rather than via a flag-day breaking change. *The crux of the original implementation.* The number
+  is the owner's own (2022-03-11 post: retirement runs forward and back by one version, so at
+  least three significant versions), re-affirmed 2026-09-02 (ticket 75 Q3) as three declared lines
+  and a priced supersede.
 
 - **Version pin** — The single declaration by which a consumer (workload / cluster) states which
   policy version applies to it. The original's signature elegance: **one string** served as both
