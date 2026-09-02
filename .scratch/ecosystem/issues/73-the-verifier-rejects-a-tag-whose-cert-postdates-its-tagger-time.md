@@ -29,3 +29,7 @@ Surfaced by ecosystem ticket 60's first dispatch samples. The verifier is platfo
 identity/gitsign-verifier (ticket 41); the fix lands in platform, so the owner pushes and
 merges. Related: ticket 55 fixed the gate-side OpenSSL 3.0 chain handling; this is the
 cluster-side twin of that family.
+
+## Comments
+
+**2026-09-02, review.** Sharper than this ticket says. Across the seven newest signed tags the certificate's notBefore is never earlier than the tagger time and is one second later in three (driftwood v1.1.0, ludlow v1.1.0, ico v3.0.0). Git writes the tag before Fulcio issues the certificate, so chaining at tagger time rejects about half of correctly signed tags by construction. Not clock skew between machines: a design fault in the verifier's trust instant. The skeptic proposes the Rekor signed-entry timestamp as the correct instant. It is the sole cause of two of run 21's seven reds and contributory to a third. The security decision is ticket 75's Q12 neighbourhood; the fix is platform-side and the owner pushes. Record: REVIEW-2026-09-02.md §4 item 2.

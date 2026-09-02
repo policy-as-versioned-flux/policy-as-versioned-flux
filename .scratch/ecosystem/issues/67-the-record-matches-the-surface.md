@@ -12,3 +12,7 @@ One hygiene pass, every item dated, nothing rewritten in place. The map's false 
 
 Charted by the ambition review of 2026-08-31. Closes review findings: M13 (map cites uncited number / Nothing-is-red, 2 confirmed findings), minors: stale fog, NORTH-STAR copies disagree, stale ico bump, hub-only lane paths.
 Record: [REVIEW-2026-08-31.md](../REVIEW-2026-08-31.md).
+
+## Comments
+
+**2026-09-02, review.** Sibling ticket 80 carries the ADR, ticket and glossary corrections the review found: fifteen build tickets cite run 7 as proof; ADR-0010 and ADR-0008 lack banners; ADRs 0019 to 0021 and 0023 do not mark their provisionality; CONTEXT.md contradicts ADR-0022's Deny addendum. Widen (d) so any TRUTH figure quoted in issues/*.md must resolve to a real line whose tree contains the named check. Record: REVIEW-2026-09-02.md R10.

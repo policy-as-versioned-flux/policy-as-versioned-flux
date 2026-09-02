@@ -12,3 +12,7 @@ verify-schedules' live half SKIPs on every CI run because the gate step delibera
 
 Charted by the ambition review of 2026-08-31. Closes review findings: M6 (verify-schedules blind, 3 confirmed findings).
 Record: [REVIEW-2026-08-31.md](../REVIEW-2026-08-31.md).
+
+## Comments
+
+**2026-09-02, review.** Two additions. verify-schedules can never PASS on the clock for a second reason: ico, nist and platform fetch.yml carry no `gh pr create`, so schedules.py emits three unconditional D2 SKIPs even with a token. And its ruleset half emits no line at all when it cannot look (`if live and ...`), so eight server-side questions vanish, a fourth outcome against §5's three; ticket 83 item 4 fixes the silence. Five real clocks were red on 2026-09-02 and this surface showed one SKIP. Record: REVIEW-2026-09-02.md R8, security/SS-07 for the write-credential half.

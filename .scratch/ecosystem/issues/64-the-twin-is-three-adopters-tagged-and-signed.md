@@ -12,3 +12,7 @@ REGRILL answer 39 promises a twin each for driftwood, tuppence and ludlow; only 
 
 Charted by the ambition review of 2026-08-31. Closes review findings: M15 (twin driftwood-only), M16 (untagged twin and forward-intel), minor step-5-presence-only.
 Record: [REVIEW-2026-08-31.md](../REVIEW-2026-08-31.md).
+
+## Comments
+
+**2026-09-02, review.** The review adds four facts. Step 5 grades six path-existence checks and passes in the same run in which twin-overlay and twin-scenarios fail on the same file (ticket 76 item 4 hardens it). All seven twin-evals metrics sit at 1.000 against a baseline recorded once on 2026-08-13, and evolution-judge's eval scores a lookup table against its own values (76 item 7). Every probability the twin scores is a YAML constant, and the world-model schema forbids a source or evidence grade; whether the twin must derive one is ticket 75 Q10. The forward-intel feed that produces driftwood's largest price line sits outside every signed tag; this ticket's tag cut is what closes it. Record: REVIEW-2026-09-02.md R7.

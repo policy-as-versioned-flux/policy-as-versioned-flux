@@ -1,0 +1,48 @@
+gate	UNKNOWN STEP	2026-09-02T09:55:40.4827880Z .estate-clone/platform/access/verify-access.sh                         SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the access plane wiring holds (Pomerium+Dex
+gate	UNKNOWN STEP	2026-09-02T09:55:43.6400089Z .estate-clone/platform/break-glass/verify-break-glass.sh               PASS
+gate	UNKNOWN STEP	2026-09-02T09:55:57.2075182Z .estate-clone/platform/compose/verify-composition.sh                   PASS
+gate	UNKNOWN STEP	2026-09-02T09:57:13.3199424Z .estate-clone/platform/computed-semver/verify-cage-engine.sh           PASS
+gate	UNKNOWN STEP	2026-09-02T09:57:34.4488865Z .estate-clone/platform/computed-semver/verify-comparison-window.sh     PASS
+gate	UNKNOWN STEP	2026-09-02T09:57:35.8999009Z .estate-clone/platform/computed-semver/verify-corpus-generator.sh      PASS
+gate	UNKNOWN STEP	2026-09-02T09:58:06.4136759Z .estate-clone/platform/computed-semver/verify-coverage.sh              PASS
+gate	UNKNOWN STEP	2026-09-02T09:58:36.9982961Z .estate-clone/platform/computed-semver/verify-gate.sh                  PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:34.2579824Z .estate-clone/platform/computed-semver/verify-generator-standing-check.sh PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:34.4483923Z .estate-clone/platform/computed-semver/verify-pairing.sh               PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:39.8762491Z .estate-clone/platform/computed-semver/verify-rederive-bumps.sh        PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:41.2212619Z .estate-clone/platform/computed-semver/verify-release-integrity.sh     PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:43.1591661Z .estate-clone/platform/computed-semver/verify-witness-set.sh           PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:43.4550676Z .estate-clone/platform/currency-controller/verify-currency.sh          SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — stale posture is re-evaluated post-admissio
+gate	UNKNOWN STEP	2026-09-02T10:01:44.0035040Z .estate-clone/platform/distribution/verify-coexistence.sh              SKIP  SKIP: offline proof holds; live tail could not look: distribution/versions.yaml declares one version (4.0.0); coexistence needs two declared versions to show si
+gate	UNKNOWN STEP	2026-09-02T10:01:44.1467835Z .estate-clone/platform/distribution/verify-declared-versions-admit.sh  SKIP  SKIP: kind cluster 'driftwood' is not listed by kind get clusters
+gate	UNKNOWN STEP	2026-09-02T10:01:44.5086822Z .estate-clone/platform/distribution/verify-governed-namespace-guard.sh PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:44.5605761Z .estate-clone/platform/distribution/verify-infra-declaration.sh        PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:44.9671711Z .estate-clone/platform/distribution/verify-orphan-guard.sh             PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:45.7389115Z .estate-clone/platform/distribution/verify-render-version-tree.sh      PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:45.8263994Z .estate-clone/platform/distribution/verify-retirement.sh               SKIP  SKIP: distribution/versions.yaml declares one version (4.0.0), so a retirement would leave an empty allow-list, which render-orphan-guard.py refuses to render; 
+gate	UNKNOWN STEP	2026-09-02T10:01:46.0156820Z .estate-clone/platform/engine/verify-engine.sh                         SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — Kyverno and flux-operator are pinned Flux H
+gate	UNKNOWN STEP	2026-09-02T10:01:46.2098069Z .estate-clone/platform/eud/verify-eud.sh                               SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — EUD vTPM specs and tpm-devid entries sit on
+gate	UNKNOWN STEP	2026-09-02T10:01:47.7091106Z .estate-clone/platform/fair/verify-fair-tail.sh                        PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:49.5812432Z .estate-clone/platform/feeds/verify-feeds.sh                           PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:49.5813531Z .estate-clone/platform/feeds/verify.sh                                 EXCLUDED  takes feed/version/file arguments; run by .estate-clone/platform/honesty/verify-honesty.sh
+gate	UNKNOWN STEP	2026-09-02T10:01:52.0750956Z .estate-clone/platform/graded/verify-graded.sh                         SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the Namespace declares the tier and the pod
+gate	UNKNOWN STEP	2026-09-02T10:01:56.6817085Z .estate-clone/platform/honesty/verify-honesty.sh                       PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:56.8008143Z .estate-clone/platform/identity/verify-federation.sh                   SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — each cluster-running party has its own trus
+gate	UNKNOWN STEP	2026-09-02T10:01:57.0580334Z .estate-clone/platform/identity/verify-identity.sh                     SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — SPIRE is Istio's CA, mTLS STRICT, authz by 
+gate	UNKNOWN STEP	2026-09-02T10:01:57.5004240Z .estate-clone/platform/oscal/verify-claims.sh                          PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:57.8247038Z .estate-clone/platform/oscal/verify-upflow.sh                          PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:58.0092166Z .estate-clone/platform/party/verify-party-artefact.sh                  PASS
+gate	UNKNOWN STEP	2026-09-02T10:01:58.8593895Z .estate-clone/platform/policy/verify-conditional.sh                    SKIP  SKIP: offline proof holds; live tail could not look: the root-attested conditional branch this beat proves lives only in require-nonroot-2-0-1, and 2.0.1 is ret
+gate	UNKNOWN STEP	2026-09-02T10:01:59.6757911Z .estate-clone/platform/posture/verify-posture-projection.sh            SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — posture rides in the SVID path; the label i
+gate	UNKNOWN STEP	2026-09-02T10:02:00.7009181Z .estate-clone/platform/risk/verify-risk-tuned.sh                       PASS
+gate	UNKNOWN STEP	2026-09-02T10:02:01.3078997Z .estate-clone/platform/shift-left/verify-shift-left.sh                 SKIP  SKIP: distribution/versions.yaml declares one major line (4.0.0), so a target has no ±1 neighbour and there is no tightened rule for the window to catch a work
+gate	UNKNOWN STEP	2026-09-02T10:02:07.2830841Z .estate-clone/platform/tcor/verify-tcor.sh                             PASS
+gate	UNKNOWN STEP	2026-09-02T10:02:07.2927825Z .estate-clone/platform/verify-certificate-identity-regexp.sh           PASS
+gate	UNKNOWN STEP	2026-09-02T10:02:07.9373130Z .estate-clone/platform/verify-cut-release-tags.sh                      PASS
+gate	UNKNOWN STEP	2026-09-02T10:02:08.1572288Z .estate-clone/platform/verify-first-gate-determined-release.sh         PASS
+gate	UNKNOWN STEP	2026-09-02T10:08:06.5593101Z .estate-clone/platform/verify-publisher-gate.sh                        SKIP  SKIP: part(s) c could not look -- the reason is on their own SKIP line above; every other part of the publisher gate was observed true
+gate	UNKNOWN STEP	2026-09-02T10:08:08.4564729Z .estate-clone/platform/verify-source-verification.sh                   SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the gitsign verifier accepts this repo's ow
+gate	UNKNOWN STEP	2026-09-02T10:08:19.5099217Z .estate-clone/platform/wardley/verify-wardley.sh                       PASS
+gate	UNKNOWN STEP	2026-09-02T10:08:27.0169059Z .estate-clone/platform/wargamer/verify-wargamer.sh                     PASS
+gate	UNKNOWN STEP	2026-09-02T10:11:05.5610467Z    358s  .estate-clone/platform/verify-publisher-gate.sh
+gate	UNKNOWN STEP	2026-09-02T10:11:05.5611106Z    177s  .estate-clone/platform/computed-semver/verify-generator-standing-check.sh
+gate	UNKNOWN STEP	2026-09-02T10:11:05.5611767Z     76s  .estate-clone/platform/computed-semver/verify-cage-engine.sh

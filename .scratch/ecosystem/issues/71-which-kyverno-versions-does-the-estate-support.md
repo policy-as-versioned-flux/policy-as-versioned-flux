@@ -29,3 +29,7 @@ composition reads, so an unsupported pairing is a priced hole rather than a surp
 
 Raised by the ambition review of 2026-08-31 and split out of ticket 54, which fixed the instrument
 only. Evidence and the A/B table are in ticket 54's Answer.
+
+## Comments
+
+**2026-09-02, review.** One fact to add: every shipped policy is `policies.kyverno.io/v1alpha1` (69 files estate-wide), and no participant publishes a supported-engine-version matrix. A policy-as-a-versioned-dependency thesis owes its consumers a substrate compatibility window. Grade (a) whether the API is GA, (b) whether any artefact declares its substrate range, (c) whether a Kyverno bump goes through the computed-semver gate. Record: REVIEW-2026-09-02.md, completeness C4.

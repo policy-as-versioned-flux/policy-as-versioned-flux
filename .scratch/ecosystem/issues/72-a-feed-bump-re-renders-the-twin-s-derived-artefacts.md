@@ -38,3 +38,7 @@ run fails. Two findings:
 2. Even with that fixed, the sweep re-renders the feed but does not touch the signal-lookup
    rows, so the second red (`no row for feeds/feed/threat-register/v2`) needs the completer (or
    the sweep) to re-derive the lookup too.
+
+## Comments
+
+**2026-09-02, review.** Confirmed live on run 33627910027 (2026-09-02T12:04Z): the step runs under `shell: /usr/bin/bash -e {0}` while the body sets only `set -uo pipefail`, so `emit-forward-intel.py --check` exiting 1 aborts before `rc=$?`. The moved branch has never executed. Add a check that the moved path has fired at least once; a branch that has never run is not proven. Record: REVIEW-2026-09-02.md R7, participants/P7.

@@ -16,3 +16,5 @@ Record: [REVIEW-2026-08-31.md](../REVIEW-2026-08-31.md).
 ## Comments
 
 - 2026-08-31 (ticket 58, provisional): the flip cut IS the second declared line (the engine computes a major, so 5.0.0) and it re-carries the root-if-attested conditional branch (Q1a, Q2a). Blocker 58 is resolved; this ticket is ready to run.
+
+**2026-09-02, review.** Header still says Blocked by 58; 58 is resolved provisional, so this ticket is on the frontier. Two things from the review: whether the estate needs a third declared line is ticket 75 Q3, because the thesis's 'at least three' is the transcriber's phrase and the Medium post could not be read; and the offline coexistence proof already passes over the retired trees, so what this cut restores is the live tail, the retirement subject, the ±1 window and the conditional arm. Ticket 84 carries the supersede pricing that makes an older line cost something. Record: REVIEW-2026-09-02.md R6.

@@ -1,0 +1,1 @@
+L7 re-derivation, 2026-09-02. See StructuredOutput. Primary artefacts kept: fleet-policy-versions.yaml (decoded from gh api, default branch).

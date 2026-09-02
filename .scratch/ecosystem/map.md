@@ -107,8 +107,45 @@ clocks) → 58 (owner decides the four architectural gaps and the untagged pin) 
 59, 64, 65, 66, 67. Dated update comments were appended to tickets 53, 17, 38, 48, 20 and 37;
 53 is repaired in code and ready to close, 38 and 48 are unblocked and ready to run.
 
+### Reviewed 2026-09-02 — fit for which purpose
+
+A second ultracode review (407 agents: 13 readers, 13 auditors, three skeptics per finding, four
+critics) graded everything against the thesis and NORTH-STAR §2 to §7. Record:
+[REVIEW-2026-09-02.md](REVIEW-2026-09-02.md); evidence under `review-2026-09-02/evidence/`.
+88 findings survived adversarial verification, 35 were refuted, and they cluster into twelve root
+causes. The verdict: nearly fit as a touring talk and fit as a research artefact; not fit against
+§4 as a definition of done; not close for adoption by a fourth organisation. The record never
+states which purpose counts.
+
+The three findings the 2026-08-31 review missed and that decide the demonstration:
+
+- **The £ inputs are editorial and two anchor fines are legally stale.** Frequency, the reduction
+  table, the threat magnitudes and the control weights are authored constants. Doorstep
+  Dispensaree is £92,000 (not £275,000) and Clearview AI has never been collected. Corrected,
+  driftwood's largest line falls 63 percent and the insurer's premium 44 percent. All three
+  adopters sit at `isolated` on their own signed numbers; two fit no rung at all.
+- **Step 3 has never fired, and when it fires it will loosen the cage.** The proposer has no
+  tighten-only clamp and fires per price line. Ticket 74 is blocked by ticket 78.
+- **The cage has never been graded on a citable run.** The clock creates no cluster; twelve of
+  eighteen skips name a cluster the runner never has.
+
+Charted: [75](issues/75-grilling-what-is-this-for-the-twelve-questions.md) (prepared, the twelve
+questions about the underlying goals; tickets 79, 84, 86, 87 and part of 63 wait on it), 76 to 87.
+Order of attack for work that needs no decision: 76 → 78 → 81 → 85 → 77 (with 62) → 80 (with 67)
+→ 82 → 83. Dated comments were appended to 74, 73, 62, 64, 63, 67, 13, 66, 59, 56, 57, 72, 71
+and 35. Ticket 57 is ready to close on its registration and tags.
+
+Process note. GAPS rule 1, "no recommendation attached to an architectural question", was
+dropped when the rules were copied into this map. Ticket 75 states each trade first and the
+assistant's call after it, labelled as such. Ticket 80 restores or retires the rule with a reason.
+
 ## Not yet specified
 
+- After the 2026-09-02 review, the fog that waits on ticket 75:
+- A shared, pinned adopter package instead of three divergent forks (Q7); a fourth adopter.
+- A twin that derives a probability from a signal, if Q10 says it must; the eleven real firms' and four named executives' place in a public corpus.
+- £ beats on the deck, so a non-engineer learns that a control, a cage tier and an insurance transfer are comparable; the estate's own running cost on driftwood's balance sheet.
+- A supported-engine-version matrix per published policy line (ticket 71's widening).
 - The thin slice is built (2026-08-29 section above). What remains dim:
 - Placement of the scanner, notification spine and OSCAL CronJob after ticket 35 decides lift-or-retire for them. The currency controller is retired (ticket 13).
 - The eco-system re-cut of the affected-parties register and DPIA, once ticket 44 grades the misuse catalogue.

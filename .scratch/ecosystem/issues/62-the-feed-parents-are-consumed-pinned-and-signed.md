@@ -25,3 +25,5 @@ propose, shift-left or cut a release — their step-3 path is dead on the clock,
 unsigned. Driftwood was re-pinned by ticket 61 and is unaffected. Note for the fix: feeds now
 carries real tags (threat-register/v1.0.0, v2.0.0), so the feeds half no longer waits on
 ticket 57; the insurer half still does.
+
+**2026-09-02, review.** Confirmed live 2026-09-02: twelve `ecosystem/thin-slice` refs across tuppence and ludlow ({propose-tier, shift-left, cut-release} × {feeds, insurer}); both adopters' scheduled propose-tier runs died at checkout on 2026-09-01 and 2026-09-02. Two additions from the review: driftwood consumes ico, feeds and insurer at `ref: main` in nine places with no Flux source, and ico, insurer and feeds `release.yml` check platform out with no ref. Ticket 77 carries those with the shared content-of-pin check; land the twelve refs together with it. Record: REVIEW-2026-09-02.md R4.

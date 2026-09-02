@@ -94,3 +94,7 @@ Graduated:
 - Lift ledger, storefront and reports into their adopters
 - Handbook as a compose-time render
 - Ticket 13 round 2: scanner, notification spine, OSCAL CronJob, api and datastore
+
+## Comments
+
+**2026-09-02, review.** Item 2, the currency controller, was retired because 'ticket 07's fx feed replaces it'. The controller re-cages a running pod after its admitted version is retired; the fx feed is money. A homonym, not a reason. The module still ships at platform 46cd775, its CronJob is the eco-system's only one, and the gate grades it every run. Ticket 75 Q13 puts the re-decision to the owner; ticket 80 item 6 executes whichever way. Also: the three ADR notes this ticket assigned itself (0004, 0007, 0010) are unwritten; 80 item 7. Record: REVIEW-2026-09-02.md R10, legacy/L5, scope/F10.

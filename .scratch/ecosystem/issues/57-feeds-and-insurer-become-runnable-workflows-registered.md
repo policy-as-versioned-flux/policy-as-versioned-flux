@@ -118,3 +118,5 @@ rename. Driftwood's six are fixed on ticket 61's branch
 (`ticket-61-renovate-completes-step-2`, local, waiting on the owner's push).
 Tuppence and ludlow still carry theirs: repair them with ticket 62's re-pin,
 or as a small follow-up PR per repo before any other PR there can go green.
+
+**2026-09-02, review.** Claimed and mostly done: workflows registered, first signed tags cut on feeds and insurer. Both clocks are red for new reasons: feeds' fetch dies in its own cage on stray __pycache__ files (ticket 85 item 1); the insurer's requote refuses because the adopter tag it pins has no exposure section (ticket 77 item 2). Close this ticket on the registration and tags; the reds are owned elsewhere. Record: REVIEW-2026-09-02.md R8.

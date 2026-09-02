@@ -24,3 +24,7 @@ Graduated from ticket 60, whose grading half completed on TRUTH run 20 (2026-09-
 Tuppence and ludlow's proposers also need ticket 62 (their feeds/insurer checkouts still name
 the deleted `ecosystem/thin-slice` branch and fail before composing); driftwood's proposer is
 fully operational today.
+
+## Comments
+
+**2026-09-02, review.** Blocked by ticket 78 from today. The proposer has no tighten-only clamp: `tier_pr.apply_tier_declaration()` writes the proposed tier unconditionally, and the proposer fires per price line. The one reachable crossing, driftwood's threat-register line at an uncaged £57,143, would stamp `restricted` over a namespace declared `isolated`. The first real step 3 would therefore be a loosening, unsigned, self-certified as signed. Do not let it fire before 78 lands. Whether a crossing on driftwood's numbers is a demonstration at all is ticket 75 Q7. Record: REVIEW-2026-09-02.md R2.

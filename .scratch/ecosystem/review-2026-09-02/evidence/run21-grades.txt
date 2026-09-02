@@ -1,0 +1,84 @@
+.estate-clone/driftwood/scripts/verify-identity-regexp.sh              PASS
+.estate-clone/driftwood/twin/verify-twin-scenarios.sh                  FAIL (exit 1)  FAIL: 2 standing-scenario check(s) observed false  capture: talk/captures/.estate-clone_driftwood_twin_verify-twin-scenarios.out
+.estate-clone/driftwood/verify-reconcile.sh                            FAIL (exit 1)  FAIL: FAIL: a fact of the five-fact sample was observed false  capture: talk/captures/.estate-clone_driftwood_verify-reconcile.out
+.estate-clone/driftwood/verify-twin-overlay.sh                         FAIL (exit 1)  FAIL: 1 twin-overlay check(s) observed false  capture: talk/captures/.estate-clone_driftwood_verify-twin-overlay.out
+.estate-clone/feeds/verify-feeds.sh                                    PASS
+.estate-clone/feeds/verify-market-and-news.sh                          PASS
+.estate-clone/feeds/verify-news-headline-skill.sh                      PASS
+.estate-clone/ico/.github/scripts/verify-declared-bump.sh              PASS
+.estate-clone/ico/schema/verify.sh                                     EXCLUDED  takes a version-dir argument; run twice by .estate-clone/ico/verify-penalty-feed.sh (v1, v2)
+.estate-clone/ico/verify-certificate-identity-regexp.sh                PASS
+.estate-clone/ico/verify-penalty-feed.sh                               PASS
+.estate-clone/insurer/verify-insurer-party.sh                          PASS
+.estate-clone/insurer/verify-insurer-quote.sh                          SKIP  SKIP: 1 of 21 checks could not be looked at (reasons above)
+.estate-clone/ludlow/verify-adopter-gate.sh                            PASS
+.estate-clone/ludlow/verify-certificate-identity-regexp.sh             PASS
+.estate-clone/ludlow/verify-reconcile.sh                               FAIL (exit 1)  FAIL: FAIL: a fact of the five-fact sample was observed false  capture: talk/captures/.estate-clone_ludlow_verify-reconcile.out
+.estate-clone/nist/.github/scripts/verify-declared-bump.sh             PASS
+.estate-clone/nist/scripts/verify-catalog.sh                           PASS
+.estate-clone/nist/scripts/verify-cert-identity-regexp.sh              PASS
+.estate-clone/platform/access/verify-access.sh                         SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the access plane wiring holds (Pomerium+Dex
+.estate-clone/platform/break-glass/verify-break-glass.sh               PASS
+.estate-clone/platform/compose/verify-composition.sh                   PASS
+.estate-clone/platform/computed-semver/verify-cage-engine.sh           PASS
+.estate-clone/platform/computed-semver/verify-comparison-window.sh     PASS
+.estate-clone/platform/computed-semver/verify-corpus-generator.sh      PASS
+.estate-clone/platform/computed-semver/verify-coverage.sh              PASS
+.estate-clone/platform/computed-semver/verify-gate.sh                  PASS
+.estate-clone/platform/computed-semver/verify-generator-standing-check.sh PASS
+.estate-clone/platform/computed-semver/verify-pairing.sh               PASS
+.estate-clone/platform/computed-semver/verify-rederive-bumps.sh        PASS
+.estate-clone/platform/computed-semver/verify-release-integrity.sh     PASS
+.estate-clone/platform/computed-semver/verify-witness-set.sh           PASS
+.estate-clone/platform/currency-controller/verify-currency.sh          SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — stale posture is re-evaluated post-admissio
+.estate-clone/platform/distribution/verify-coexistence.sh              SKIP  SKIP: offline proof holds; live tail could not look: distribution/versions.yaml declares one version (4.0.0); coexistence needs two declared versions to show si
+.estate-clone/platform/distribution/verify-declared-versions-admit.sh  SKIP  SKIP: kind cluster 'driftwood' is not listed by kind get clusters
+.estate-clone/platform/distribution/verify-governed-namespace-guard.sh PASS
+.estate-clone/platform/distribution/verify-infra-declaration.sh        PASS
+.estate-clone/platform/distribution/verify-orphan-guard.sh             PASS
+.estate-clone/platform/distribution/verify-render-version-tree.sh      PASS
+.estate-clone/platform/distribution/verify-retirement.sh               SKIP  SKIP: distribution/versions.yaml declares one version (4.0.0), so a retirement would leave an empty allow-list, which render-orphan-guard.py refuses to render; 
+.estate-clone/platform/engine/verify-engine.sh                         SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — Kyverno and flux-operator are pinned Flux H
+.estate-clone/platform/eud/verify-eud.sh                               SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — EUD vTPM specs and tpm-devid entries sit on
+.estate-clone/platform/fair/verify-fair-tail.sh                        PASS
+.estate-clone/platform/feeds/verify-feeds.sh                           PASS
+.estate-clone/platform/feeds/verify.sh                                 EXCLUDED  takes feed/version/file arguments; run by .estate-clone/platform/honesty/verify-honesty.sh
+.estate-clone/platform/graded/verify-graded.sh                         SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the Namespace declares the tier and the pod
+.estate-clone/platform/honesty/verify-honesty.sh                       PASS
+.estate-clone/platform/identity/verify-federation.sh                   SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — each cluster-running party has its own trus
+.estate-clone/platform/identity/verify-identity.sh                     SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — SPIRE is Istio's CA, mTLS STRICT, authz by 
+.estate-clone/platform/oscal/verify-claims.sh                          PASS
+.estate-clone/platform/oscal/verify-upflow.sh                          PASS
+.estate-clone/platform/party/verify-party-artefact.sh                  PASS
+.estate-clone/platform/policy/verify-conditional.sh                    SKIP  SKIP: offline proof holds; live tail could not look: the root-attested conditional branch this beat proves lives only in require-nonroot-2-0-1, and 2.0.1 is ret
+.estate-clone/platform/posture/verify-posture-projection.sh            SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — posture rides in the SVID path; the label i
+.estate-clone/platform/risk/verify-risk-tuned.sh                       PASS
+.estate-clone/platform/shift-left/verify-shift-left.sh                 SKIP  SKIP: distribution/versions.yaml declares one major line (4.0.0), so a target has no ±1 neighbour and there is no tightened rule for the window to catch a work
+.estate-clone/platform/tcor/verify-tcor.sh                             PASS
+.estate-clone/platform/verify-certificate-identity-regexp.sh           PASS
+.estate-clone/platform/verify-cut-release-tags.sh                      PASS
+.estate-clone/platform/verify-first-gate-determined-release.sh         PASS
+.estate-clone/platform/verify-publisher-gate.sh                        SKIP  SKIP: part(s) c could not look -- the reason is on their own SKIP line above; every other part of the publisher gate was observed true
+.estate-clone/platform/verify-source-verification.sh                   SKIP  SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the gitsign verifier accepts this repo's ow
+.estate-clone/platform/wardley/verify-wardley.sh                       PASS
+.estate-clone/platform/wargamer/verify-wargamer.sh                     PASS
+.estate-clone/tuppence/reset/verify-reach-secrets.sh                   SKIP  SKIP: kind cluster 'driftwood' does not exist
+.estate-clone/tuppence/scripts/verify-adopter-gate.sh                  PASS
+.estate-clone/tuppence/scripts/verify-identity-regexp.sh               PASS
+.estate-clone/tuppence/verify-reconcile.sh                             FAIL (exit 1)  FAIL: FAIL: a fact of the five-fact sample was observed false  capture: talk/captures/.estate-clone_tuppence_verify-reconcile.out
+verify/demo/verify-demo.sh                                             FAIL (exit 1)  FAIL: talk/deck.md has been hand edited or is stale; run python3 talk/build_deck.py  capture: talk/captures/verify_demo_verify-demo.out
+verify/e2e/verify-e2e-step1-regulator-publishes.sh                     PASS
+verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh              PASS
+verify/e2e/verify-e2e-step3-price-crosses-band-pr-opens.sh             PASS
+verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh                    FAIL (exit 1)  FAIL: the scheduled lane sample observes a step-4 fact false: FAIL: a fact of the five-fact sample was observed false  capture: talk/captures/verify_e2e_verify-e2e-step4-flux-reconciles-cage.out
+verify/e2e/verify-e2e-step5-twin-forecasts.sh                          PASS
+verify/e2e/verify-e2e-step6-provenance.sh                              PASS
+verify/e2e/verify-e2e-step7-honesty.sh                                 PASS
+verify/feed-contract/verify-feed-contract.sh                           PASS
+verify/party/verify-party.sh                                           PASS
+verify/pound-seam/verify-pound-seam.sh                                 PASS
+verify/proportionality/verify-proportionality.sh                       PASS
+verify/provenance/verify-provenance.sh                                 PASS
+verify/renovate/verify-renovate-merged-feed-pr.sh                      PASS
+verify/schedules/verify-schedules.sh                                   SKIP  SKIP: driftwood/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock 
+verify/twin-evals/verify-twin-evals.sh                                 PASS

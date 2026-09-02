@@ -1,0 +1,29 @@
+{
+ "version": "3.0.0",
+ "name": "ico:3.0.0 uk-gdpr/lower-tier",
+ "note": "lm sourced from ICO (Information Commissioner's Office) real public fines (UK GDPR / Data Protection Act 2018 s157). warn/deny lef are editorial (schema doesn't carry frequency). Scaled to a subscriber turnover of 86,000,000.00 GBP.",
+ "warn": {
+  "lef": [
+   1,
+   2,
+   4
+  ],
+  "lm": [
+   18188.505747126437,
+   18188.505747126437,
+   1720000.0
+  ]
+ },
+ "deny": {
+  "lef": [
+   0,
+   0,
+   1
+  ],
+  "lm": [
+   18188.505747126437,
+   18188.505747126437,
+   1720000.0
+  ]
+ }
+}

@@ -12,3 +12,7 @@ Blocked by: none
 
 Charted by the ambition review of 2026-08-31. Closes review findings: M14 (fall-is-blocking and derived-Status, 2 confirmed findings), minor pass-to-skip-goes-green.
 Record: [REVIEW-2026-08-31.md](../REVIEW-2026-08-31.md).
+
+## Comments
+
+**2026-09-02, review.** Still unbuilt. Run 17 to 18 fell from 59 pass to 57 and nothing fired; 17 of 21 truth runs fail at the same step so the signal is saturated. Ticket 83 puts a class manifest and a published ceiling on the TRUTH line; build the fall-checker over that manifest so a fall is compared class by class. Record: REVIEW-2026-09-02.md R3, truth-surface/TS-M4.
