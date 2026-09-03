@@ -93,10 +93,76 @@ def test_the_shipped_default_refuses(monkeypatch: pytest.MonkeyPatch, tmp_path: 
     assert enact_guard.enact_mode() == "operations"
 
 
-def test_the_checked_in_mode_is_the_refusing_one() -> None:
-    """The durable default a checkout actually gets, read off disk rather than off the constant."""
-    assert enact_guard.ENACT_MODE_FILE.read_text(encoding="utf-8").strip() == "operations"
-    assert enact_guard.enact_mode() == "operations"
+def test_the_checked_in_mode_is_other_hand_and_still_refuses_pushes_and_bare_merges() -> None:
+    """The durable default a checkout actually gets, read off disk rather than off the constant.
+
+    Since 2026-09-03 (ticket 88, ticket 75 Q6/Q14) it is `other-hand`: the owner authors and
+    pushes, the assistant merges as the GitHub App `pavc-other-hand`. Everything `operations`
+    refused is still refused except one shape, a merge that mints the app's token in the same
+    command. Flipping this file back to `operations` or forward to `development` is a red test."""
+    assert enact_guard.ENACT_MODE_FILE.read_text(encoding="utf-8").strip() == "other-hand"
+    assert enact_guard.enact_mode() == "other-hand"
+    assert enact_guard.decide("Bash", {"command": "gh pr merge 42 --squash"}) is not None
+    assert enact_guard.decide("Bash", {
+        "command": "git push https://github.com/policy-as-versioned-driftwood/driftwood main",
+    }) is not None
+
+
+def _other_hand_mode(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.delenv("TWIN_ENACT_MODE", raising=False)
+    (tmp_path / "ENACT_MODE").write_text("other-hand\n", encoding="utf-8")
+    monkeypatch.setattr(enact_guard, "ENACT_MODE_FILE", tmp_path / "ENACT_MODE")
+
+
+def test_other_hand_mode_admits_a_merge_only_when_it_is_made_as_the_other_hand(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A merge that mints the app's installation token in the same command is the second identity
+    merging, and that is the whole point of the mode. A bare merge would go out under the owner's
+    own token, author equal to merger, which is the state ticket 87 exists to end."""
+    _other_hand_mode(monkeypatch, tmp_path)
+    as_other_hand = (
+        'GH_TOKEN="$(.venv/bin/python -m twin.other_hand token --org policy-as-versioned-flux)" '
+        "gh pr merge 42 --squash"
+    )
+    assert enact_guard.decide("Bash", {"command": as_other_hand}) is None
+    as_other_hand_api = (
+        'GH_TOKEN="$(python3 twin/other_hand.py token --org policy-as-versioned-flux)" '
+        "gh api -X PUT /repos/o/r/pulls/42/merge"
+    )
+    assert enact_guard.decide("Bash", {"command": as_other_hand_api}) is None
+
+    bare = enact_guard.decide("Bash", {"command": "gh pr merge 42 --squash"})
+    assert bare is not None and "other hand" in bare
+
+
+def test_other_hand_mode_keeps_every_other_refusal(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """The mode opens one shape. A merge-shaped MCP tool cannot carry the app's credential, and a
+    push to an enactment repository is the owner's act, not the assistant's (ticket 75 Q14)."""
+    _other_hand_mode(monkeypatch, tmp_path)
+    assert enact_guard.decide("mcp__github__merge_pull_request", {"owner": "o"}) is not None
+    assert enact_guard.decide("Bash", {
+        "command": "git push https://github.com/policy-as-versioned-nist/nist main",
+    }) is not None
+    # Naming the token minter does not launder a push: the shape is still a push.
+    assert enact_guard.decide("Bash", {
+        "command": 'GH_TOKEN="$(python -m twin.other_hand token --org x)" '
+                   "git push https://github.com/policy-as-versioned-nist/nist main",
+    }) is not None
+
+
+def test_operations_mode_refuses_even_the_other_hand_merge(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """`operations` is unchanged: the harness invariant forces it and expects every merge refused."""
+    monkeypatch.delenv("TWIN_ENACT_MODE", raising=False)
+    (tmp_path / "ENACT_MODE").write_text("operations\n", encoding="utf-8")
+    monkeypatch.setattr(enact_guard, "ENACT_MODE_FILE", tmp_path / "ENACT_MODE")
+    assert enact_guard.decide("Bash", {
+        "command": 'GH_TOKEN="$(python -m twin.other_hand token --org x)" gh pr merge 42',
+    }) is not None
 
 
 @pytest.mark.parametrize("where", ["env", "file"])
@@ -283,7 +349,10 @@ def test_the_hook_emits_a_deny_decision_a_runtime_can_act_on(
     assert enact_guard.main() == 0
     decision = json.loads(capsys.readouterr().out)["hookSpecificOutput"]
     assert decision["permissionDecision"] == enact_guard.DENY
-    assert "disposes rather than proposes" in decision["permissionDecisionReason"]
+    # The reason text depends on the shipped mode: `operations` says the twin only proposes,
+    # `other-hand` says the merge must be made as the other hand. Either is a deny with a reason.
+    reason = decision["permissionDecisionReason"]
+    assert "disposes rather than proposes" in reason or "other hand" in reason
 
 
 def test_an_unreadable_payload_identifies_no_tool_call(

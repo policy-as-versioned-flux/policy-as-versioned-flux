@@ -67,6 +67,22 @@ The escape hatch the 2026-08-25 instruction asked for is untouched and still one
 `development` into `twin/ENACT_MODE` (durable, visible in a diff and a `git blame`) or export
 `TWIN_ENACT_MODE=development` for one run. What changed is only which way it falls when nobody
 has said anything.
+
+**Mode, amended 2026-09-03 (ticket 88; ticket 75 Q6 and Q14, the owner, reasoned).** A third
+mode, `other-hand`, and it is the checked-in one. The owner decided that principle 5, "a human
+merges", binds for the demonstration, and that for the development window the owner authors and
+pushes while the assistant reviews and merges as a second machine identity: the GitHub App
+`pavc-other-hand` (App ID 4819564, installed on all nine estate orgs; `twin/other_hand.py` mints
+its tokens). The owner's word for it was theatre, and the narrative still says a human merges.
+
+`other-hand` is `operations` with exactly one shape admitted: a disposition command that mints
+the app's token in the same command string (`twin.other_hand token`), because that merge goes out
+as `pavc-other-hand[bot]` and not under the owner's own token. Every push to an enactment
+repository is still refused (the owner pushes), a merge-shaped MCP tool is still refused (it
+cannot carry the app's credential), and a bare merge is still refused with a reason that names
+this mode. `development` was not chosen: it would have admitted the pushes too, and the owner's
+instruction split the two hands on purpose. As with everything in this file, the screen is a net
+over the shapes a merge takes here, not a proof; ticket 87's ruleset is the server-side half.
 """
 
 from __future__ import annotations
@@ -82,7 +98,7 @@ from typing import Any
 # See the module docstring's "Mode" section. One word, checked in, visible in a diff and a
 # `git blame` — not a magic env var nobody would find by reading this file.
 ENACT_MODE_FILE = Path(__file__).resolve().with_name("ENACT_MODE")
-_MODES = ("development", "operations")
+_MODES = ("development", "operations", "other-hand")
 
 
 DEFAULT_MODE = "operations"
@@ -130,6 +146,11 @@ DISPOSITION_COMMANDS: tuple[tuple[re.Pattern[str], str], ...] = (
 DISPOSITION_TOOL_NAME = re.compile(r"merge|squash|rebase_and_|dispose|land_|ship_", re.I)
 
 _PUSH = re.compile(r"\bgit\b[^\n;&|]*?\bpush\b(?P<rest>[^\n;&|]*)")
+
+# The one shape `other-hand` mode admits: the command mints the app's own installation token
+# (`python -m twin.other_hand token ...` or `twin/other_hand.py token ...`). A merge made with
+# that token is attributed to `pavc-other-hand[bot]`, the second identity ticket 88 created.
+OTHER_HAND_TOKEN = re.compile(r"\btwin[./]other_hand(?:\.py)?\s+token\b")
 
 DENY = "deny"
 
@@ -269,7 +290,8 @@ def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -
     Pure, and separated from the hook plumbing so the invariant suite can assert the property
     directly rather than by shelling out to a subprocess and reading its exit code.
     """
-    if enact_mode() != "operations":
+    mode = enact_mode()
+    if mode == "development":
         return None
 
     if DISPOSITION_TOOL_NAME.search(tool_name or ""):
@@ -287,6 +309,16 @@ def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -
 
     for pattern, shape in DISPOSITION_COMMANDS:
         if pattern.search(command):
+            if mode == "other-hand":
+                if OTHER_HAND_TOKEN.search(command):
+                    break
+                return (
+                    f"`{shape}` under the owner's own token is author-equals-merger. In "
+                    "`other-hand` mode a merge is admitted only as the other hand: mint the "
+                    "app's token in the same command (`GH_TOKEN=\"$(python -m twin.other_hand "
+                    "token --org <org>)\"`), so the merge is attributed to pavc-other-hand[bot] "
+                    "(ticket 88; ticket 75 Q6, Q14)."
+                )
             return (
                 f"`{shape}` disposes rather than proposes, and the twin only proposes (decision "
                 "ticket 18 Q1). Open the pull request and leave it open: a human merges it, and "
