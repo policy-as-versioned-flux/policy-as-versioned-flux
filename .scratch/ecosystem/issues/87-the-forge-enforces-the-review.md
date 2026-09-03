@@ -23,3 +23,5 @@ Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R9. Findings: securit
 ## Comments
 
 **2026-09-02, ticket 75 resolved.** Q6 is (a), owner-reasoned: principle 5 binds for the demonstration. Item 1 applies. The second identity is the machine identity ticket 88 creates for the assistant, which reviews and merges during the development window while the owner authors and pushes (the owner's word: theatre). Item 3: `twin/ENACT_MODE` flips to `development` only after ticket 88 lands, with a dated docstring line; the declaration the agent cannot write is the ruleset itself, which requires the second identity's review. Blocked by 88 now, not 75.
+
+**2026-09-03, ticket 88 resolved.** The second identity is the GitHub App `pavc-other-hand` (App ID 4819564), installed on all nine orgs. Item 1's ruleset requires one approving review from an identity other than the author; the app's review counts as that identity. Item 3: `twin/ENACT_MODE` reads `other-hand`, and the admitted merge shape is one that mints the app's token inline; the declaration the agent cannot write is the ruleset itself. Unblocked.

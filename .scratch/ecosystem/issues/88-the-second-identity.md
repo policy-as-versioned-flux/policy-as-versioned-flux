@@ -1,7 +1,7 @@
 # 88 — The second identity
 
 Type: task (HITL)
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -34,3 +34,16 @@ Done = a PR authored by chrisns is approved and merged by the second identity on
 ## Notes
 
 Charted by ticket 75 (Q6, Q14). Blocks 87 and 74. The guard's own docstring already names this shape: "a credential that cannot merge" was the upgrade path; the owner chose the reverse for the development window, and the narrative still says a human merges. Ticket 95 records the theatre in NORTH-STAR §6.
+
+## Answer
+
+Resolved 2026-09-03. The second identity exists and has merged.
+
+- **Identity:** GitHub App `pavc-other-hand`, App ID 4819564, owned by `@policy-as-versioned-flux`, installed on all nine estate orgs (installation ids in Progress). The owner chose the name in chat after rejecting two of the assistant's. Permissions: Contents read and write, Pull requests read and write, Metadata read. No webhook.
+- **Credential:** private key at `~/.config/pavc-other-hand/app.pem`, mode 600, outside every repository. Fingerprint `SHA256:V5cL15DaLS+DBw504YaDho2c0YA+kKDKlz07qDAC9fA=`. Downloaded once through the owner's browser with the owner's approval in chat.
+- **Verification:** `python -m twin.other_hand whoami` prints `pavc-other-hand`; `installations` lists nine; `token --org` reaches the one repository in each org tested.
+- **Guard:** `twin/ENACT_MODE` is `other-hand` (a third mode, not `development`, because the owner pushes and the assistant merges; see Progress step 4 and the dated docstring paragraph). A merge is admitted only when the disposing shell segment sets `GH_TOKEN` inline from `twin.other_hand token`. Pushes to enactment repositories, merge-shaped MCP tools and bare merges stay refused.
+- **Done criterion met:** https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/2, authored by `chrisns`, reviewed `APPROVED` by `pavc-other-hand[bot]`, merged by `app/pavc-other-hand` as merge commit `c1c87fd`. The PR carried this ticket's own code, so the first merge by the other hand is the change that lets it merge.
+- **Review:** standards axis clean with two smells fixed; spec axis found the per-command match hole, fixed before the merge (commit 77da842). Full suite 1546 passed, one standing red (invariant 43, the drift window, unrelated).
+
+Consequences: ticket 87 is unblocked and applies the ruleset that requires this identity's review; ticket 74's definition of done can now be written; the memory note on merge authorisation is updated; NORTH-STAR §6 gets the theatre line from ticket 95.
