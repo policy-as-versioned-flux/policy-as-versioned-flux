@@ -1,7 +1,7 @@
 # 38 — Priced holes in composition
 
 Type: task (AFK)
-Status: open
+Status: resolved
 Blocked by: 09, 21, 25
 
 ## Question
@@ -15,3 +15,40 @@ Graduated 2026-08-28 from ticket 15's resolution. Definition of done includes wi
 ## Comments
 
 - 2026-08-31 (ambition review): Trim scope: ticket 25 already built per-hole pricing from ico weights. What remains is the refusal deletion (new-hole, widening, new-ungoverned in composition.py) and the ungoverned ramp. All blockers (09, 21, 25) are resolved — this ticket is ready to run and is the owner of principle 3's surviving refusals.
+
+- 2026-09-03 (build, wave 1): built on platform branch `ticket-38-priced-holes-in-composition` (from `ecosystem/build-2026-09-03`, unpushed) and hub branch of the same name. The three refusals are deleted from `compose/composition.py`; a hole is `(source, id)`; the ungoverned ramp is live on `tuppence-reset`; the bespoke self-catalogue path exists with its one refusal; `verify/priced-holes/` grades it. Answer below.
+
+## Answer
+
+**What was built** (platform `compose/composition.py`, `compose/verify-composition.sh`, `compose/README.md`, `party/schema.json`; hub `verify/priced-holes/{verify-priced-holes.sh,priced_holes.py,README.md}`, `tests/test_priced_holes.py`, `CONTEXT.md`, dated notes on ADR-0013/0017/0018):
+
+1. `compute_holes`, `compute_ungoverned` and the deleted `check_baseline_widening` no longer refuse. A new hole, a closed hole, a baseline widening and a new or closed ungoverned namespace print as `deltas[]` on the evidence document, each under the adopter's own perspective and currency, with the amount a pinned instrument gives it or `amount: null` and `priced_by: null` where none does. `holes[]` entries carry `source`, `control_id`, `status`, `perspective`, `currency`, `amount`, `priced_by`. The regime entry's weighted `holes[]` partition (ticket 25) is untouched and each line gains the adopter's `status` (`new`/`recorded`/`closed`/`covered`/`unselected`).
+2. Claims and holes resolve on `(source, id)` across every `controls` parent: a claim's source is its component-definition's `source` href (`../nist/...` -> `nist`; an href naming no pinned party is the claiming party's own catalogue where it pins itself, else the baseline's); a bare `overlay.controls` id is the baseline's catalogue's and `party:id` names another controls parent's. The header writes bare ids for the baseline's catalogue and `source:id` otherwise, so the three real adopters' `HEADER.yaml` shape is byte-stable and old headers decode.
+3. An ungoverned namespace is priced on its `ungoverned[]` entry: workloads inside (Deployment/StatefulSet/DaemonSet/Job/CronJob in the repo walk) over workloads across every institution-labelled namespace, times the header's signed exposure total (the adopter's whole uncaged priced residual), times `eol_ramp(since, as_of)` from `platform/feeds/to_fair_scenario.py`, bounded at the whole residual. `since` is read off the first signed tag whose header names it; `as_of` is the newest `published_at` among the pinned feeds. Live: `tuppence-reset` = 3 of 3 workloads, since 2026-08-25 (gitsign tag v1.1.0), as of 2026-08-28, ramp 1.0082, bounded at the whole 9,262,365.33 GBP residual.
+4. A bespoke control: the adopter pins itself as a `controls` parent, ships `catalog/` (OSCAL, `publishes[]` path honoured when declared), names the control `self:id` in `overlay.controls`, and the control's `props[name=scenario]` points at an adopter-signed scenario priced through `graded/cage.py` against the adopter's own band. No scenario is a `missing-instrument` refusal naming the control, the one hole-shaped refusal left.
+5. `party/schema.json` `overlay.controls` description admits both forms and says an addition is priced, never refused.
+6. `verify/priced-holes/verify-priced-holes.sh` (discovered by `talk/verify-all.sh`'s find over `verify/`): grades the platform source for refusal absence, the schema, and per adopter the delta/hole/ungoverned/regime-status shape, re-deriving share (from the adopter's manifests), ramp (its own `expected_ramp`), bound, base (from the header) and `since` (from the clone's signed tags). Evidence composed under the refusal shape is a `SKIP` naming the owner's re-composition.
+
+**Which check grades it:** `verify/priced-holes/verify-priced-holes.sh` (new), `.estate-clone/platform/compose/verify-composition.sh` (selfcheck rewritten plus step 1b, refusal-literal absence), `verify/pound-seam/verify-pound-seam.sh` (unchanged, stays green: the partition is untouched).
+
+**Decisions** (all delegated, ADR-0025):
+
+- D1 delta shape: a document-level `deltas[]` of five kinds, each with perspective/currency/amount, plus `status` on the regime entry's weighted holes; the partition stays as ticket 25 built it. Reason: pound-seam grades the weights summing to 1.0 and the amounts to the entry, so pricing only open holes would break a graded invariant; a fixture adopter with no regime feed still needs a home for its deltas; and "what moved" is readable without walking `prices[]`. The widening beat where an adopter already sits on the top rung prints as a delta with `added: 83, priced: 0, amount: null` (driftwood MODERATE -> HIGH today: none of the 83 added controls is named by ico v3's weights), which is the honest statement that the pound does not move until a regulator prices those controls.
+- D2 denominator and base: workloads are the five pod-owning kinds in the repo walk, over namespaces carrying the institution label (governed and ungoverned; infrastructure namespaces are excluded), and the base is the header's `exposure.total` (sum of feed and twin entries under the adopter's perspective). Reason: both are things composition already reads; the exposure total is the one number the insurer already prices against. An adopter pinning no feed that prices its residual gets `amount: null` with the limit named, not a refusal: a missing feed is silence under ticket 25's convention, and ADR-0020's instrument refusal is for a declared obligation with no price.
+- D3 `as_of`: the newest `published_at` among the pinned feed envelopes. Reason: composition may not read a clock (D1 of ticket 16, enforced by its own selfcheck) and a re-composition from the same parents must land on the same number. Consequence, named: the ramp advances when a feed bumps, not daily; the daily clock's observation lane is where a day-by-day growth would be read.
+- D4 `since`: the creator date of the first annotated tag carrying a signature block whose `composed/HEADER.yaml` lists the namespace; whether the signature verifies is verify-provenance's claim, not this module's. No such tag: `since: null`, ramp 1.0, limit named (the ticket's own fallback). tuppence-reset resolves for real, so no could-not-look is recorded on the live estate.
+- D5 bespoke: a self-pin (`{party: <self>, kind: controls, version: ...}`) always resolves to the tree under composition (so composing a copy prices that copy's catalogue) through the unpinned-SHA path (git HEAD, or a content digest for a fixture); the version string on the edge is informational because the catalogue is signed by the same tag as the composed artefact (ADR-0017's "no separate pin"). The scenario is named on the OSCAL control's props, not on party.yaml (the schema forbids unknown keys and ADR-0017 rejected a second format). The bespoke price lands on the hole and its delta, not in `prices[]`: a new `PRICE_KINDS` value is a £-seam major pound-seam grades, so the control is priced but not yet tiered, a named limit in the README.
+- D6 removal still refuses (`removed-control`): outside this ticket's three, and CONTEXT.md keeps "may never remove one".
+- D7 verifier location: a new `verify/priced-holes/`, as recommended; pound-seam grades sums, this grades refusal absence and the ramp arithmetic.
+- D8 the superseding ADR is ticket 39's (ADR-0026 reserved); this ticket adds a dated supersession note to ADR-0013, ADR-0017 and ADR-0018 pointing at it.
+- D9 `PAVC_ESTATE_CLONE` env override on composition.py: a nested worktree (`platform/.work/<ticket>`) resolves `PLATFORM_DIR.parent` to `.work`, not the estate; the override names the estate, and verify-composition.sh exports it from its own location.
+
+**Verified:** `bash .estate-clone/platform/compose/verify-composition.sh` (PASS), `PAVC_ESTATE_CLONE=$PWD/.estate-clone python3 .estate-clone/platform/compose/composition.py --selfcheck` (selfcheck ok), `python3 .estate-clone/platform/party/party_artefact.py --selfcheck` (ok), `bash verify/priced-holes/verify-priced-holes.sh` (SKIP: the adopters' evidence predates the shape; the platform source and schema lines PASS against this branch's tree), `bash verify/pound-seam/verify-pound-seam.sh`, `.venv/bin/python -m pytest tests/test_priced_holes.py -n0 -q`, `.venv/bin/python -m mypy verify/priced-holes/priced_holes.py tests/test_priced_holes.py`. Outputs in the PR body.
+
+**Map line:** Ticket 38: the three composition refusals are priced deltas; holes key on (source, id) across every controls parent; tuppence-reset ramps from its signed 2026-08-25 tag, bounded at the whole residual; a bespoke control with no scenario is the one refusal left.
+
+## Waits on the owner
+
+- Push of the platform branch `ticket-38-priced-holes-in-composition` (on `ecosystem/build-2026-09-03`) and its merge as `pavc-other-hand`; the guard refuses an enactment push.
+- A platform signed tag (cut-release.yml in Actions) so the new composition shape is citable by the adopters' pins.
+- Re-composing and pushing driftwood, tuppence and ludlow so their `composed/evidence.json` carries `deltas[]` and the priced `ungoverned[]` entry; until then `verify-priced-holes.sh` reads `SKIP` for each adopter. Their `HEADER.yaml` re-renders byte-identical on this branch (the header shape did not change), so no tag date moves.
