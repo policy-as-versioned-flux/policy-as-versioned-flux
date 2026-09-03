@@ -147,10 +147,26 @@ DISPOSITION_TOOL_NAME = re.compile(r"merge|squash|rebase_and_|dispose|land_|ship
 
 _PUSH = re.compile(r"\bgit\b[^\n;&|]*?\bpush\b(?P<rest>[^\n;&|]*)")
 
-# The one shape `other-hand` mode admits: the command mints the app's own installation token
-# (`python -m twin.other_hand token ...` or `twin/other_hand.py token ...`). A merge made with
-# that token is attributed to `pavc-other-hand[bot]`, the second identity ticket 88 created.
-OTHER_HAND_TOKEN = re.compile(r"\btwin[./]other_hand(?:\.py)?\s+token\b")
+# The one shape `other-hand` mode admits: the merge runs with `GH_TOKEN` set, in the SAME shell
+# segment, from the app's own token minter (`python -m twin.other_hand token ...` or
+# `twin/other_hand.py token ...`). A merge made with that token is attributed to
+# `pavc-other-hand[bot]`, the second identity ticket 88 created. Per segment, not per command:
+# `echo "twin/other_hand.py token"; gh pr merge 42` mints nothing and would merge under the
+# owner's own token, and so would `T=$(... token); GH_TOKEN=$T gh pr merge 42`, where the guard
+# cannot see what `$T` holds. The admitted shape is one segment, token minted inline.
+OTHER_HAND_TOKEN = re.compile(r"\bGH_TOKEN=[\"']?\$\([^)]*\btwin[./]other_hand(?:\.py)?\s+token\b")
+_SHELL_SEGMENT = re.compile(r"\n|;|&&|\|\||\|")
+
+
+def _merge_is_made_as_the_other_hand(command: str) -> bool:
+    """True only if every segment that disposes also mints the app's token inline for that
+    segment's `GH_TOKEN`. A command with no disposing segment returns True vacuously; the
+    caller only asks after a disposition pattern has already matched somewhere."""
+    for segment in _SHELL_SEGMENT.split(command):
+        if any(pattern.search(segment) for pattern, _ in DISPOSITION_COMMANDS):
+            if not OTHER_HAND_TOKEN.search(segment):
+                return False
+    return True
 
 DENY = "deny"
 
@@ -310,7 +326,7 @@ def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -
     for pattern, shape in DISPOSITION_COMMANDS:
         if pattern.search(command):
             if mode == "other-hand":
-                if OTHER_HAND_TOKEN.search(command):
+                if _merge_is_made_as_the_other_hand(command):
                     break
                 return (
                     f"`{shape}` under the owner's own token is author-equals-merger. In "

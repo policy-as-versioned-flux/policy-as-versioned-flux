@@ -108,10 +108,15 @@ def test_the_checked_in_mode_is_other_hand_and_still_refuses_pushes_and_bare_mer
     }) is not None
 
 
-def _other_hand_mode(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def _set_mode(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mode: str) -> None:
+    """Point the guard at a temp mode file holding `mode`, with no ambient env override."""
     monkeypatch.delenv("TWIN_ENACT_MODE", raising=False)
-    (tmp_path / "ENACT_MODE").write_text("other-hand\n", encoding="utf-8")
+    (tmp_path / "ENACT_MODE").write_text(f"{mode}\n", encoding="utf-8")
     monkeypatch.setattr(enact_guard, "ENACT_MODE_FILE", tmp_path / "ENACT_MODE")
+
+
+def _other_hand_mode(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _set_mode(monkeypatch, tmp_path, "other-hand")
 
 
 def test_other_hand_mode_admits_a_merge_only_when_it_is_made_as_the_other_hand(
@@ -136,6 +141,28 @@ def test_other_hand_mode_admits_a_merge_only_when_it_is_made_as_the_other_hand(
     assert bare is not None and "other hand" in bare
 
 
+def test_other_hand_mode_needs_the_token_minted_in_the_disposing_segment(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Naming the minter somewhere in the command is not minting for the merge. The spec review of
+    2026-09-03 found the first cut matched the whole string; these are its counter-examples."""
+    _other_hand_mode(monkeypatch, tmp_path)
+    smuggled = [
+        'echo "reminder: twin/other_hand.py token later"; gh pr merge 42 --squash',
+        'T=$(python -m twin.other_hand token --org x); GH_TOKEN=$T gh pr merge 42 --squash',
+        'python -m twin.other_hand token --org x && gh pr merge 42 --squash',
+        'GH_TOKEN="$(python -m twin.other_hand token --org x)" gh pr view 42; gh pr merge 42',
+    ]
+    for command in smuggled:
+        assert enact_guard.decide("Bash", {"command": command}) is not None, command
+    # Two disposing segments, both made as the other hand, are admitted.
+    both = (
+        'GH_TOKEN="$(python -m twin.other_hand token --org x)" gh pr merge 41 --squash && '
+        'GH_TOKEN="$(python -m twin.other_hand token --org x)" gh pr merge 42 --squash'
+    )
+    assert enact_guard.decide("Bash", {"command": both}) is None
+
+
 def test_other_hand_mode_keeps_every_other_refusal(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -157,9 +184,7 @@ def test_operations_mode_refuses_even_the_other_hand_merge(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     """`operations` is unchanged: the harness invariant forces it and expects every merge refused."""
-    monkeypatch.delenv("TWIN_ENACT_MODE", raising=False)
-    (tmp_path / "ENACT_MODE").write_text("operations\n", encoding="utf-8")
-    monkeypatch.setattr(enact_guard, "ENACT_MODE_FILE", tmp_path / "ENACT_MODE")
+    _set_mode(monkeypatch, tmp_path, "operations")
     assert enact_guard.decide("Bash", {
         "command": 'GH_TOKEN="$(python -m twin.other_hand token --org x)" gh pr merge 42',
     }) is not None

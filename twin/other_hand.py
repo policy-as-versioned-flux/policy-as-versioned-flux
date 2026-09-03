@@ -145,6 +145,8 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("whoami", help="print the app slug the key authenticates as")
     sub.add_parser("installations", help="print org -> installation id")
+    # The subcommand name `token` is load-bearing: `enact_guard.OTHER_HAND_TOKEN` recognises a
+    # merge made as the other hand by this exact invocation shape. Rename both or neither.
     token = sub.add_parser("token", help="print an installation token for one org")
     token.add_argument("--org", required=True)
     args = parser.parse_args(argv)
