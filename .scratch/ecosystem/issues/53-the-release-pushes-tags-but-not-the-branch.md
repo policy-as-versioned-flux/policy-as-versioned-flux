@@ -106,17 +106,24 @@ two checks that prove it, so the record is graded and not merely stated.
   platform push needed, so it is green on the gate today, and it grades the outcome the three
   adopters refused on. It exits 3 when the platform clone cannot be read, 1 on any finding. Its
   `selfcheck` (run first on every invocation) proves the graders bite: a bundle-less tree fails, the
-  pre-repair tags-only push line fails (a comment carrying the right line does not count), an empty
-  tree fails, and the real, immutable platform `v2.0.0` fails the pairing exactly as it did for the
-  adopters. Discovered by `talk/verify-all.sh`'s `find verify -name 'verify*.sh'`.
+  pre-repair tags-only push line fails (a comment carrying the right line does not count), a split
+  push (branch in one `git push`, tags in another, each `--atomic`) fails, a `--dry-run` fails, an
+  empty tree fails, and the real, immutable platform `v2.0.0` fails the pairing exactly as it did
+  for the adopters. The push-line grader requires exactly one non-comment `git push` line and grades
+  the branch ref, the tags and `--atomic` on that one line (review fix, 2026-09-04: the first cut
+  grepped the tokens across every push line, so a split push passed). Discovered by
+  `talk/verify-all.sh`'s `find verify -name 'verify*.sh'`.
 - **Platform's own offline twin grades the mechanism.** `verify-cut-release-tags.sh` case 8 (on the
   platform branch `ticket-53-the-release-pushes-tags-but-not-the-branch`, commit `951f5a8`) commits a
   stand-in evidence file on the branch, runs the real `cut-release-push.sh` against the script's
   scratch bare remote, and requires the remote's `refs/heads/main` to be the tagged commit; then a
   rejected push (a tag already on the remote at a different object) must move neither the tags nor
-  the branch; then a detached HEAD must be refused. Written first and watched fail against the
-  pre-repair push line (`remote refs/heads/main is 59721a3..., not the tagged commit f262f6a...`),
-  then green against `b83eba1`. It reaches the gate only when the owner pushes platform.
+  the branch; then a detached HEAD must be refused, and the remote is read back to prove neither a
+  tag nor `refs/heads/main` moved (review fix, 2026-09-04: the first cut graded only the refusal
+  message). Written first and watched fail against the pre-repair push line (`remote
+  refs/heads/main is 59721a3..., not the tagged commit f262f6a...`), then green against `b83eba1`.
+  It reaches the gate on the integration branch once the integrator merges the platform branch
+  (`verify-all.sh` reads the checkout), and reaches the published platform when the owner pushes.
 - **The orphaned commits stay orphaned.** `64635df`, `1d8cec2` and the `policy/v4.0.0` tag commit
   are not to be cherry-picked, rebased or merged onto `main` later: the evidence is on `main` as
   `533dccb`, the tag is immutable, and a second copy would be a second signature. Recorded as the
@@ -141,6 +148,20 @@ Map line: [53 — The release pushes tags but not the branch](issues/53-the-rele
 
 ## Waits on the owner
 
-- Pushing platform branch `ticket-53-the-release-pushes-tags-but-not-the-branch` (commit `951f5a8`,
-  case 8 in `verify-cut-release-tags.sh`) once the integrator has merged it into
-  `ecosystem/build-2026-09-03`. The guard refuses enactment pushes. Nothing else waits.
+- Pushing platform branch `ticket-53-the-release-pushes-tags-but-not-the-branch` (commit `951f5a8`
+  plus the 2026-09-04 review fix, case 8 in `verify-cut-release-tags.sh`) once the integrator has
+  merged it into `ecosystem/build-2026-09-03`. The guard refuses enactment pushes. Nothing else waits.
+
+## Review fixes, 2026-09-04
+
+Two reviews. One blocking finding: `grade_push_line` in the hub check joined every `git push` line
+and grepped the three tokens across the set, so a split push (branch in one push, tags in another)
+and a `--dry-run` were graded "one --atomic push". Fixed: exactly one non-comment push line, all
+three tokens on it, `--dry-run`/`-n` refused; selfcheck legs for the split and dry-run shapes added
+first and watched fail. Minor: the detached-HEAD leg of platform case 8 now reads the remote back
+(no `v11.0.0`, `refs/heads/main` unmoved), watched fail against a fixture that pushes a tag before
+refusing; the dead `grep -v '^#'` after the `^git push` grep is gone. Minor, not fixed: three commit
+subjects on the pushed hub branch and the platform branch run to 75, 77 and 91 characters, over the
+brief's 72. They are already pushed (hub) or reviewed at their hash (platform `951f5a8`, cited in
+this file and ADR-0011); rewriting them would break those citations and the open PR. Left as they
+are; the fix commits keep under 72.

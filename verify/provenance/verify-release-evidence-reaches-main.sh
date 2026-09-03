@@ -54,12 +54,17 @@ grade_pairing() {   # <repo> <ref> <label>
   ok "$label: $pairs evidence document(s) at $ref, each with its cosign bundle"
 }
 
-# the push line at <ref> carries the branch and the tags in one --atomic push
+# the push line at <ref> carries the branch and the tags in one --atomic push: exactly one
+# non-comment push line, and that one line carries all three tokens. Two pushes are two
+# transactions (one can land without the other, the 2026-08-31 shape), whatever flags each has.
 grade_push_line() {   # <repo> <ref> <label>
-  local repo="$1" ref="$2" label="$3" src line
+  local repo="$1" ref="$2" label="$3" src line n
   src="$(git -C "$repo" show "$ref:$PUSH_SCRIPT" 2>/dev/null)" || { fail "$label: no $PUSH_SCRIPT at $ref"; return 1; }
-  line="$(printf '%s\n' "$src" | grep -E '^[[:space:]]*git push ' | grep -v '^[[:space:]]*#')"
+  line="$(printf '%s\n' "$src" | grep -E '^[[:space:]]*git push ')"   # a comment line starts with #, so it never matches
   [ -n "$line" ] || { fail "$label: $PUSH_SCRIPT at $ref has no git push line"; return 1; }
+  n="$(printf '%s\n' "$line" | grep -c .)"
+  [ "$n" -eq 1 ] || { fail "$label: $PUSH_SCRIPT at $ref has $n git push lines; the branch and the tags must go in one push, not one each: $(printf '%s' "$line" | tr '\n' ';')"; return 1; }
+  printf '%s\n' "$line" | grep -Eq -- '(^|[[:space:]])(--dry-run|-n)([[:space:]]|$)' && { fail "$label: the push at $ref is a dry run, it lands nothing: $line"; return 1; }
   printf '%s\n' "$line" | grep -q -- '--atomic' || { fail "$label: the push at $ref is not --atomic: $line"; return 1; }
   printf '%s\n' "$line" | grep -qF 'HEAD:refs/heads/${branch}' || { fail "$label: the push at $ref carries the tags but not the branch: $line"; return 1; }
   printf '%s\n' "$line" | grep -qF '"${tags[@]}"' || { fail "$label: the push at $ref carries the branch but not the tags: $line"; return 1; }
@@ -79,6 +84,16 @@ selfcheck() {
   git -C "$t/r" add -A && git -C "$t/r" commit -q -m hole
   (grade_pairing "$t/r" main selfcheck) >/dev/null 2>&1 && { echo "selfcheck: a bundle-less 2.0.0.json passed the pairing"; good=0; }
   (grade_push_line "$t/r" main selfcheck) >/dev/null 2>&1 && { echo "selfcheck: the pre-repair tags-only push line passed (a comment carrying the right line must not count)"; good=0; }
+  # ...a split push (branch in one push, tags in another) is the 2026-08-31 shape with extra
+  # steps: the tags can land and the branch be rejected, or the reverse. Both lines carry
+  # --atomic and between them every token; only the same line carrying all three counts
+  printf '#!/usr/bin/env bash\ngit push --atomic "$remote" "HEAD:refs/heads/${branch}"\ngit push --atomic "$remote" "${tags[@]}"\n' >"$t/r/$PUSH_SCRIPT"
+  git -C "$t/r" add -A && git -C "$t/r" commit -q -m split
+  (grade_push_line "$t/r" main selfcheck) >/dev/null 2>&1 && { echo "selfcheck: a split push (branch and tags in two pushes) passed as one atomic push"; good=0; }
+  # ...and a --dry-run pushes nothing, however complete its ref list
+  printf '#!/usr/bin/env bash\ngit push --atomic --dry-run "$remote" "HEAD:refs/heads/${branch}" "${tags[@]}"\n' >"$t/r/$PUSH_SCRIPT"
+  git -C "$t/r" add -A && git -C "$t/r" commit -q -m dry-run
+  (grade_push_line "$t/r" main selfcheck) >/dev/null 2>&1 && { echo "selfcheck: a --dry-run push line passed"; good=0; }
   # ...and the repaired shapes pass, so the graders are not merely always-red
   echo 'b' >"$t/r/$EVIDENCE_DIR/2.0.0.json.bundle"
   printf '#!/usr/bin/env bash\ngit push --atomic "$remote" "HEAD:refs/heads/${branch}" "${tags[@]}"\n' >"$t/r/$PUSH_SCRIPT"
@@ -99,7 +114,7 @@ selfcheck() {
   else
     note "selfcheck: platform tag v2.0.0 not in the clone; real-history leg of the selfcheck not run"
   fi
-  if [ "$good" = 1 ]; then ok "selfcheck: a bundle-less evidence tree fails, a tags-only push line fails, an empty tree fails; the repaired shapes pass"; return 0; fi
+  if [ "$good" = 1 ]; then ok "selfcheck: a bundle-less evidence tree fails, a tags-only push line fails, a split push fails, a --dry-run fails, an empty tree fails; the repaired shapes pass"; return 0; fi
   echo "FAIL: selfcheck: the grader does not grade"; return 1
 }
 
