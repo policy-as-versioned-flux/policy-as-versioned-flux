@@ -37,6 +37,40 @@ Both key-based signers are past the trigger their own migration set and are wait
 `cut-release.yml` cuts after a merge, which no agent may cut (hard rule 3). Until those tags exist
 the estate cannot say "one signature" without this paragraph beside it.
 
+## Amendment, 2026-09-03: the cage is preventive in the workflow and detective in the gate; push-time prevention is unavailable on a public repository
+
+D1 below says "The lane is caged. A repo ruleset limits the scheduled identity to the observation
+paths". No such ruleset has ever been in force on any of the nine repositories, and none can be
+while they are public: GitHub applies a push ruleset -- the only kind that carries
+`file_path_restriction` -- on private and internal repositories only, and `required_signatures`
+would refuse every gitsign commit these clocks make (ADR-0024 point 4, amended 2026-08-28). The
+repositories stay public: ticket 58 Q4(b), 2026-08-31, delegated under ADR-0025 and recorded in
+ticket 70 with the reason (the repositories are the demonstration and its audience reads them;
+the licence work of ticket 82 assumes it). So nothing on the server refuses a declaration at push
+time. What holds instead, in two places:
+
+- **preventive, in the workflow**: the cage step in every scheduled job stages `OBSERVATION_LANE`
+  only and fails the run on anything else; `verify/schedules/verify-schedules.sh` grades that
+  step from the workflow YAML (ADR-0024 point 3, the ceiling named there stands);
+- **detective, in the gate**: `verify/schedules/verify-lane.sh` (ticket 70) walks the
+  first-parent history of every observation ref -- each unit's `main`, the orphan `observations`
+  branch wherever a publisher clock has created one, and the hub's own `main` -- and fails the
+  citable run on any commit a scheduled identity landed there that touched a path outside the
+  lane, or that is a merge. A declaration that slips past the step is a red on the next run with
+  the commit named. A scheduled identity is the `user.email` a scheduled job configures, read
+  from the ref's own workflow copy and the checkout's, plus `github-actions[bot]`; a human's
+  commit is never graded, and a clock-authored commit a human merged, squashed or rebased is a
+  reviewed proposal. The gitsign signature on those commits is not verified here: `%G?` reads N
+  or U for every one because gitsign is outside git's verify chain, and the Rekor-backed identity
+  check is ticket 73's verifier.
+
+**Revisit trigger:** the repositories go private or internal -- an owner authorisation, recorded
+in ticket 70 under "Waits on the owner" and not acted on -- at which point the prepared
+`.github/rulesets/observation-lane.json` in each unit applies as-is and the ruleset leg becomes
+real; or a required status check on the default branch running the same path assertion. Until
+one of those happens, "a repo ruleset limits the scheduled identity" in D1 reads as "a workflow
+step limits it, and the gate reads the history to see that it did".
+
 ## The decision
 
 - A scheduled run may **append observations** to `main`: the truth log, drift samples, gate
