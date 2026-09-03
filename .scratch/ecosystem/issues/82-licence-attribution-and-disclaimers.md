@@ -78,14 +78,45 @@ Decisions, each delegated (ADR-0025):
   is below with both options laid out; whichever the owner picks lands in §8 as an
   owner-reasoned line with the owner's words.
 
-Verified (from the hub worktree root):
+**2026-09-04, review fixes.** Two reviews, both request-changes on the same sentence, both fixed:
+
+- **ico/DISCLAIMER.md asserted a data property the schema does not have** (blocking, both
+  reviews). It said a fine reduced on appeal or never collected is recorded "as data" by the
+  schema. Checked against `ico/schema/v1`, `v2`, `penalty-schema/v1..v3/feed.json` and both
+  payload schemas: each real example records `org`, `year`, `fine_gbp`/`fine_usd` (a `note` for
+  pci-dss), an optional `proposed_gbp` and `source`, and nothing else; no version carries a
+  status, appeal, collection, litigation or final-as-of field. The text now says exactly what is
+  recorded, that no version records a later reduction or non-collection, and that ticket 79
+  (still open) *plans* to add `status` and `final_as_of` and correct the stale figures in a new
+  major. The clause existed in that one file only; the other seven units and the hub never
+  copied it. Unit commit ico a525889.
+- **`notice_problems` passed a NOTICE whose baseline manifest could not be read** (minor). It
+  refused only when the catalogue manifest yielded no facts, so a missing
+  `BASELINE_VERSIONS.json` was a pass for the half of the attribution the NOTICE makes about the
+  three baselines. It now refuses when no baseline sha256 can be cited, test first
+  (`test_notice_is_refused_when_the_baseline_manifest_cannot_be_read`, red then green).
+- **Where the verification was taken** (minor, both reviews). The hub worktree's
+  `.estate-clone/` is not the brief's single symlink to the real clone: it is a directory of
+  eight symlinks, one per unit, each into that unit's `.work/ticket-82` worktree, so the check
+  and the eight parametrised real-estate tests read the ticket commits. The real
+  `.estate-clone/<unit>` checkouts are on `ecosystem/build-2026-09-03` without them.
+  **Integrator: merge the eight unit branches into `ecosystem/build-2026-09-03` and check them
+  out before, or in the same step as, merging PR 8**; otherwise `verify-disclaimer.sh` and eight
+  tests go red on main until the units catch up.
+- **feeds does not gitignore `.work/`** (minor, pre-existing, not this ticket's edit): its
+  `.gitignore` lists `__pycache__/` and `.fetch/` only, so `git status` in the feeds checkout
+  shows `?? .work/` and a `git add -A` there would try to embed the ticket worktree. Left for
+  the integrator; adding the line is a one-line feeds commit on the integration branch.
+
+Verified (from the hub worktree root, re-run 2026-09-04 after the fixes):
 
 - `bash verify/disclaimer/verify-disclaimer.sh` exits 0, last line `PASS: all eight parties say
   they are a demonstration ...`.
-- `.venv/bin/python -m pytest tests/test_disclaimer.py -n0 -q`: 15 passed.
+- `.venv/bin/python -m pytest tests/test_disclaimer.py -n0 -q`: 16 passed.
 - `MYPYPATH=verify .venv/bin/python -m mypy verify/disclaimer/disclaimer.py
   tests/test_disclaimer.py`: no issues.
-- `bash verify/party/verify-party.sh` still passes with the comment line in place.
+- `bash verify/party/verify-party.sh` still passes with the comment line in place (2026-09-03
+  run; nothing it reads changed on 2026-09-04).
 
 Map line: 82 built: hub LICENSE Apache-2.0, nist NOTICE from its manifests, one demonstration line on all 8 party.yaml (comment) and READMEs, DISCLAIMER.md on ico and nist, verify/disclaimer/ grades it; named-individuals ruling drafted, waits on the owner.
 
@@ -94,8 +125,8 @@ Map line: 82 built: hub LICENSE Apache-2.0, nist NOTICE from its manifests, one 
 1. **Push the eight unit branches** `ticket-82-licence-attribution-and-disclaimers` (via
    `ecosystem/build-2026-09-03` once the integrator merges them) to the enactment orgs; the
    guard refuses agent pushes there. Commits: platform 2b86446, driftwood 18c6416, tuppence
-   b078731, ludlow b966eb9, feeds 113a2cb, insurer 8a308f1, ico d6ed440, nist ea84ef8 and
-   683784f.
+   b078731, ludlow b966eb9, feeds 113a2cb, insurer 8a308f1, ico d6ed440 and a525889 (the
+   2026-09-04 disclaimer correction), nist ea84ef8 and 683784f.
 2. **Cut new signed tags** for each unit through cut-release.yml, since party.yaml is signed
    under the unit's tag and its bytes changed. Nothing here fakes a signature; the comment line
    is unsigned until the owner tags.

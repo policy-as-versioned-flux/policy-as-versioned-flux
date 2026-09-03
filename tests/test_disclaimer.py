@@ -84,6 +84,15 @@ def test_notice_must_cite_the_catalogue_it_attributes(tmp_path: Path):
     assert any("NOTICE" in p and "missing" in p for p in disclaimer.notice_problems(nist))
 
 
+def test_notice_is_refused_when_the_baseline_manifest_cannot_be_read(tmp_path: Path):
+    # The NOTICE attributes the three baselines; a missing BASELINE_VERSIONS.json must not turn
+    # into a pass for that half of the attribution.
+    nist = _nist(tmp_path)
+    (nist / "catalog" / "BASELINE_VERSIONS.json").unlink()
+    problems = disclaimer.notice_problems(nist)
+    assert problems and any("BASELINE_VERSIONS.json" in p for p in problems), problems
+
+
 def test_disclaimer_md_required_of_the_regulators_only(tmp_path: Path):
     nist = _nist(tmp_path)
     assert disclaimer.disclaimer_md_problems(nist) == []

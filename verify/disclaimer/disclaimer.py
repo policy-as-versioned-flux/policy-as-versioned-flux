@@ -140,8 +140,13 @@ def notice_problems(unit_dir: str | os.PathLike[str]) -> list[str]:
         return [f"{rel}: missing"]
     problems = []
     facts = notice_facts(unit_dir)
-    if not facts:
+    if not any("catalogue" in label for label, _ in facts):
         problems.append(f"{rel}: catalog/CATALOG_VERSION.json records no url or sha256 to cite")
+    if not any("baseline sha256" in label for label, _ in facts):
+        # The NOTICE attributes the three baselines; an unreadable manifest must not become a
+        # pass for that half of the attribution.
+        problems.append(f"{rel}: catalog/BASELINE_VERSIONS.json records no baseline sha256 to "
+                        "cite (missing, unreadable or empty)")
     for label, value in facts:
         if value not in text:
             problems.append(f"{rel}: does not cite the {label} the manifest records: {value}")
