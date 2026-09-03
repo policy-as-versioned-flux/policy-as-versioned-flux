@@ -5,6 +5,12 @@ on Flux CD — policy as a semver, signed, versioned dependency, governed by one
 a Kubernetes workload plane and a Crossplane cloud plane, with reviewed upgrades, multi-version
 runtime coexistence, ground-truth compliance, and an agent-assisted human-governance layer.
 
+**Licence:** [Apache-2.0](LICENSE), the same licence as the eight unit repositories. Third-party
+material this repository quotes and cites — press releases, filings, regulator notices, the NIST
+catalogue — stays under its authors' own terms; it is cited, not relicensed. The eight parties in
+the estate are demonstration parties, not affiliated with any real authority they name (ticket 82,
+checked by [`verify/disclaimer/`](verify/disclaimer/)).
+
 ## Start here
 
 | Document | What it is |
