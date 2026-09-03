@@ -1,0 +1,48 @@
+0. the grader can fail
+  ok   selfcheck: a record missing §0 fails; a principle 2 in the assistant's words fails
+1. NORTH-STAR §0 answers: what is this for, who receives it, by when
+  ok   §0: \(a\).*touring talk
+  ok   §0: \(b\).*reference implementation.*ControlPlane
+  ok   §0: \(c\).*fourth organisation.*open source
+  ok   §0: \(d\).*written, checkable
+  ok   §0: when we've got something good, we'll tour it
+  ok   §0: circuit
+  ok   §0: ticket 75
+  ok   §0: 2026-09-02
+2. NORTH-STAR §4 is the assistant's build order; done is defined
+  ok   §4 heading says build order
+  ok   §4: not mine
+  ok   §4: definition of done
+  ok   §4: ticket 75 Q8
+  ok   §4: ceiling
+  ok   §4: lane fact
+  ok   §4: 2026-09-02
+3. NORTH-STAR §6 records the talk, the theatre and the shelved identity, with dates
+  ok   §6: byproduct.*marketing tool
+  ok   §6: 2026-07-23
+  ok   §6: theatre
+  ok   §6: second identity
+  ok   §6: AI disposal
+  ok   §6: shelved
+  ok   §6: ticket 90
+  ok   §6: 2026-09-02
+4. NORTH-STAR §3 principle 2 carries the owner's words, not the assistant's reading
+  ok   principle 2 no longer says: is my reading, not your words
+  ok   principle 2: [Mm]utating admission controller
+  ok   principle 2: ticket 75 Q5
+  ok   principle 2: 2026-09-02
+5. NORTH-STAR §8 points at the sixteen decisions by number
+  ok   §8: ticket 75
+  ok   §8: [Ss]ixteen decisions
+  ok   §8 lists decisions 1 to 16
+6. every line that attributes something to the owner carries a date
+  ok   every owner attribution carries a date
+7. CONTEXT.md's Cage and Multi-version coexistence entries agree with NORTH-STAR
+  ok   Cage: ticket 75
+  ok   Cage: [Mm]utating admission controller
+  ok   Cage: never because it is deliberately denied
+  ok   Multi-version: ticket 75 Q3
+  ok   Multi-version: three declared lines
+  ok   Multi-version: 2022-03-11
+
+PASS: NORTH-STAR states the purpose, the audience, the (absent) date and what done is, every owner line dated; CONTEXT.md agrees
