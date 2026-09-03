@@ -83,3 +83,32 @@ policy, exactly as `CONTEXT.md` already requires for changing what gets enforced
   no tie-breaker against the publisher's.
 - **A coverage hole is grounds for a reviewed PR, never for an override.** The gate states what it
   didn't reach; it does not let an unreached case become a reason to bypass the rule.
+
+## Note, 2026-09-03 (ticket 53: the signed evidence reaches the branch, or nothing lands)
+
+The consequence above says the publisher gate runs before `git tag`. It also commits its signed
+evidence (`computed-semver/evidence/N.json` and the cosign `N.json.bundle`) onto the checked-out
+branch before the tag is cut. On 2026-08-31 the push carried the tags alone, so those commits were
+reachable only from the tag; `main` kept `4.0.0.json` without its bundle, platform `v2.0.0` was cut
+from that `main` minutes later, and every adopter pinned to it refused, correctly.
+
+Decided and enacted by the owner on 2026-08-31 (platform `b83eba1`, owner-instructed): the branch
+is pushed in the same `--atomic` push as the tags, `HEAD:refs/heads/<branch>` beside `"${tags[@]}"`,
+so either the evidence and every tag land or none of them do. The alternative, landing the evidence
+by a reviewed pull request while the release pushes tags only, was not taken: the evidence is the
+gate's own output for a tag that already exists, there is nothing for a reviewer to dispose of, and
+a window in which a tag exists whose evidence `main` lacks is exactly the defect. A detached HEAD is
+refused before anything is pushed.
+
+Recovery of the orphaned commits (`64635df`, `1d8cec2`, signed on the `policy/v4.0.0` tag) was not
+by cherry-pick, which would have put a second signature under a different identity on the same
+content. The release bot re-committed the evidence onto `main` (`533dccb`, 2026-08-31T16:18Z), and
+the `policy/v4.0.0` tag commit remains unreachable from `main` by design. That is the accepted state
+and is not a hole to repair (delegated, ADR-0025). `v2.0.0` is immutable and keeps its hole; `v2.0.1`
+is the first tag cut from a `main` that carries every bundle, and it is what the adopters pin.
+
+Graded by platform `verify-cut-release-tags.sh` case 8 (the mechanism: branch and tags land together
+or not at all, against a scratch remote) and by the hub's
+`verify/provenance/verify-release-evidence-reaches-main.sh` (the outcome: every evidence document on
+platform `origin/main` and on each adopter's pinned tag has its bundle, and the push line is the
+atomic one).
