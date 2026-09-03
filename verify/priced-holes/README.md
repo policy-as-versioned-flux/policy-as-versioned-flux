@@ -23,3 +23,7 @@ evidence composed under the refusal shape, a clone with no signed tag), 1 false 
 
 The three adopters' evidence is re-composed and pushed by the owner (enactment pushes); until
 then this check reads `SKIP` for each adopter and `PASS`/`FAIL` for the platform source and schema.
+`PAVC_ESTATE_CLONE=<dir>` (the override `composition.py` takes) points both the script and the
+grader at another estate, so a scratch estate of freshly composed adopter copies can be graded
+before the push; the gate never sets it. Composed that way on 2026-09-04 against the ticket-38
+platform branch, all three adopters graded `PASS` (exit 0).

@@ -17,7 +17,10 @@ if [ ! -x "$PY" ]; then
   PY=python3
   "$PY" -c 'import yaml' 2>/dev/null || { echo "SKIP: no .venv and python3 lacks pyyaml"; exit 3; }
 fi
-[ -d "$ROOT/.estate-clone/platform" ] || { echo "SKIP: no .estate-clone/ -- run ./clone-estate.sh first"; exit 3; }
+# PAVC_ESTATE_CLONE names another estate to grade (the override composition.py takes), so a
+# scratch estate of freshly composed adopter copies can be graded before the owner pushes them.
+ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
+[ -d "$ESTATE/platform" ] || { echo "SKIP: no $ESTATE/ -- run ./clone-estate.sh first"; exit 3; }
 
 "$PY" "$HERE/priced_holes.py" selfcheck >/dev/null || { echo "FAIL: priced_holes.py selfcheck -- the planted defects no longer bite"; exit 1; }
 log="$(mktemp)"; "$PY" "$HERE/priced_holes.py" check | tee "$log"; rc=${PIPESTATUS[0]}

@@ -31,6 +31,10 @@ Grading, per the gate contract: any FAIL -> 1; else any SKIP -> 3; else 0.
 Usage:
     priced_holes.py check        # every adopter in .estate-clone/
     priced_holes.py selfcheck    # planted defects: proves each refusal bites
+
+PAVC_ESTATE_CLONE=<dir> names another estate to grade -- the same override composition.py
+takes -- so a scratch estate holding freshly composed adopter copies can be graded before the
+owner pushes the real ones. The gate never sets it.
 """
 from __future__ import annotations
 
@@ -661,8 +665,9 @@ if __name__ == "__main__":
     if cmd != "check":
         print(__doc__)
         sys.exit(2)
-    if not os.path.isdir(ESTATE):
-        print(f"SKIP: {ESTATE} absent — run ./clone-estate.sh first")
+    estate = os.environ.get("PAVC_ESTATE_CLONE") or ESTATE
+    if not os.path.isdir(estate):
+        print(f"SKIP: {estate} absent — run ./clone-estate.sh first")
         sys.exit(3)
-    run(ESTATE)
+    run(estate)
     sys.exit(exit_code())
