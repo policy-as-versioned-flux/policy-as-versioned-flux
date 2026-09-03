@@ -1,4 +1,4 @@
-From a396c3ba88ab4e2112ab5779b76ab2485b300683 Mon Sep 17 00:00:00 2001
+From 41b09c99afb67572bdc7d3ce10d5d6d41dd9d167 Mon Sep 17 00:00:00 2001
 From: Chris Nesbitt-Smith <chris@cns.me.uk>
 Date: Tue, 1 Sep 2026 22:13:39 +0100
 Subject: [PATCH] ticket 60: the webhook waits really do precede the composed

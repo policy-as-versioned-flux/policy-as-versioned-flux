@@ -204,3 +204,9 @@ kyverno wait → flux-operator wait → composed apply → Kustomization waits �
 sample) is committed and patched. Also carried by the round-2 samples: ludlow-composed fact 3
 reads "3 of 3 consuming Kustomizations applied a revision that is not the pinned commit
 a800a58e" — watch whether it survives round 3 before charting it; it may be race-downstream.
+
+**2026-09-03 (ticket 81): round 3 brought forward.** `ticket-60-wait-order` had fallen nine sample
+lines behind `main`; its commit was cherry-picked onto today's `main` in each unit (driftwood
+41b09c9, tuppence 10fcf41, ludlow 9d14e39), the patches regenerated (same diff, new `From` sha), and
+the executed order is now graded by `verify/sampler-wait-order/verify-sampler-wait-order.sh`. The
+push, the other-hand merge and the scheduled proof are listed under ticket 81's Waits on the owner.

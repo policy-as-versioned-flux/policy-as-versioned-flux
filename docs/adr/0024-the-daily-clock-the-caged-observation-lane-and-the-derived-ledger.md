@@ -158,3 +158,17 @@ declaration -- prose from `narration.json` rendered as a signed commit to `main`
 which is exactly what D1 exists to stop. The lane stays an observation lane. If the lag becomes
 annoying, that is the decision to reopen, and it is the owner's: it changes what the clock's
 signature vouches for.
+
+## Note, 2026-09-03 (ticket 81): the sampler's own order is graded, not assumed
+
+The lane's sampler (`drift-sample.yml` on driftwood, tuppence and ludlow) applies the composed set
+on an ephemeral cluster and records what it sees. Twice (ticket 60 rounds 1 and 2) it recorded 16
+of 16 rendered objects absent because it applied before the admission webhooks were up, and the
+second fix mis-ordered itself by a first-occurrence string replace that nothing checked. The lane
+faithfully appended an observation of the instrument's own race, and the estate's number carried it
+as a red. From ticket 81 the executed order (kyverno wait, flux-operator wait, composed apply,
+Kustomization waits, ResourceSet waits, sample) is graded by
+`verify/sampler-wait-order/verify-sampler-wait-order.sh` in the hub gate, against the checkout,
+before any merge. A clock still appends only observations; this note records that the instrument
+taking them is itself a graded artefact, so a red that is the sampler's fault is caught in the
+truth surface rather than read off the lane five hours later.
