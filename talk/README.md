@@ -46,8 +46,8 @@ cross-party comparison needs:
 ```sh
 talk/verify-all.sh          # the truth surface: every verify*.sh in the estate, graded PASS/FAIL/SKIP
 talk/up.sh                  # idempotent bring-up; clones the six units first (needs network)
-python3 talk/build_deck.py  # rebuild deck.md from the captures that run just wrote
-talk/verify-demo.sh         # refuse the deck if it disagrees with the run (in the gate)
+python3 talk/build_deck.py  # rebuild deck.md from the newest RECORDED run's committed captures
+talk/verify-demo.sh         # refuse the deck if it disagrees with the run it names (in the gate)
 ```
 
 The deck is **generated, not authored** (2026-08-29, eco-system ticket 47).
@@ -59,8 +59,21 @@ own reason), or observed false. A step with no capture says *no check yet, owned
 by ticket NN* — that is the generator, never a grade. Prose lives in exactly one
 file, [`narration.json`](narration.json); diagrams are pre-rendered under
 [`diagrams/`](diagrams/). Hand editing `deck.md` is not an option: the next build
-overwrites it and [`verify-demo.sh`](verify-demo.sh) grades the deck it rebuilds.
-Render it with `npx @marp-team/marp-cli --html talk/deck.md -o talk/deck.html`.
+overwrites it and [`verify-demo.sh`](verify-demo.sh) grades it against the run it
+names. Render it with `npx @marp-team/marp-cli --html talk/deck.md -o talk/deck.html`.
+
+**The deck names the run it describes** (2026-09-03, ticket 66). The scheduled
+`truth` clock commits each run's captures and TRUTH line and never the deck
+(`talk/deck.md` is outside its observation lane, ADR-0024). So `deck.md` carries
+`<!-- deck run=N hub=H source=recorded -->`, quotes run N's TRUTH line, and is
+built from run N's captures **read out of the commit that recorded them**, not
+from whatever a local gate run last left in `talk/captures/`. `verify-demo.sh`
+grades the committed deck against that same run, everywhere, so a laptop run
+cannot call it stale and a scheduled run whose grades moved cannot either. The
+deck therefore lags the log until someone reruns `python3 talk/build_deck.py`
+(newest run) or `--run N` and commits; the check prints that lag as a note, not
+a failure. `--out PATH` without `--run` builds a deck of the captures on disk,
+which names `source=disk` and quotes no TRUTH line — that run is not recorded yet.
 
 The July hand-authored deck is kept, superseded, at
 [`deck-2026-07-31-superseded.md`](deck-2026-07-31-superseded.md), as is the
