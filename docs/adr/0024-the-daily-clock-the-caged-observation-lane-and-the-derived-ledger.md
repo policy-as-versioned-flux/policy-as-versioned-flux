@@ -138,3 +138,23 @@ write, and what it may never write.
 - **The twin sweep's package is unpinned.** `twin-sweep.yml` reads the hub's default branch because
   the `twin` package does not self-version yet (ticket 11 answer item 1). The observation line
   records that fact on every run. Ticket 29 closes it.
+
+## Note, 2026-09-03 (ticket 66, delegated under ADR-0025)
+
+The lane is unchanged: `talk/deck.md` stays outside `OBSERVATION_LANE`. The clock writes the
+captures and the TRUTH line of a run and never the deck, so the committed deck always lags the log
+by however many runs since someone last ran `python3 talk/build_deck.py` and committed.
+`talk/verify-demo.sh` used to grade the committed deck against "this run", on the false premise
+that `truth.yml` rebuilt the deck after the gate; every scheduled run whose grades moved (runs 14
+to 22) was therefore called a hand edit. The fix taken is on the deck's side: a deck names the
+recorded run it describes (`<!-- deck run=N hub=H source=recorded -->`, quoting that run's TRUTH
+line), and its checks read that run's captures out of the lane commit that recorded them, never off
+the disk. Drift-by-a-run is printed as a note, not graded.
+
+Rejected, and left as an option for the owner: **widen the lane so the clock commits a generated
+deck** (`OBSERVATION_LANE` gains `talk/deck.md`, and `truth.yml` gains a `build_deck.py` step after
+the gate). It would keep the deck one run behind at most, but it makes the clock write a
+declaration -- prose from `narration.json` rendered as a signed commit to `main` with no reviewer --
+which is exactly what D1 exists to stop. The lane stays an observation lane. If the lag becomes
+annoying, that is the decision to reopen, and it is the owner's: it changes what the clock's
+signature vouches for.

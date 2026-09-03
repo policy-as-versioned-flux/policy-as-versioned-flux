@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-# The demo check (ticket 47, ticket 20 Q4). Discovered by talk/verify-all.sh
-# through the symlink verify/demo/verify-demo.sh, because the gate globs
-# .estate-clone/ and verify/ only.
+# The demo check (ticket 47, ticket 20 Q4, ticket 66). Discovered by
+# talk/verify-all.sh through the symlink verify/demo/verify-demo.sh, because the
+# gate globs .estate-clone/ and verify/ only.
 #
-# It refuses the deck when:
-#   - talk/build_deck.py cannot build it from this run's captures;
-#   - a beat cites a capture that is not in this run;
-#   - a beat's status tag is not the grade this run gave that script, or
+# Two decks are graded. A REBUILD from the captures on disk (this run's), and
+# the COMMITTED talk/deck.md, which names the recorded run it describes and is
+# graded against THAT run's captures, read out of the commit that recorded them.
+#
+# It refuses when:
+#   - talk/build_deck.py cannot build a deck from this run's captures;
+#   - a beat cites a capture that is not in the run the deck names;
+#   - a beat's status tag is not the grade that run gave that script, or
 #     disagrees with the verdict step 7's own capture recorded for that step;
 #   - a money amount, percentage or count in a beat body is not in that beat's
 #     capture, verbatim, or sits on a beat with no capture behind it;
@@ -14,34 +18,38 @@
 #   - the phrase lint hits one of exactly four refused phrases: exemption,
 #     hourglass, admission gate, deny gate. Every OTHER use of the word gate is
 #     printed as a human review item and is not a failure;
-#   - the committed talk/deck.md is not the generated file (hand edited) -- every
-#     check above is run over the committed file as well as over the rebuild;
+#   - the committed talk/deck.md is not the generated file, names no recorded
+#     run, or is not what a rebuild from the run it names produces (hand edited
+#     or stale) -- every check above is run over the committed file as well;
 #   - a section 4 step check exists on disk but this run wrote no capture for it;
-#   - a TRUTH line is quoted that was not recorded at this deck's own commit.
+#   - a quoted TRUTH line is not the line that recorded the run the deck names.
 #
 # Named ceilings, so nobody mistakes what this observes:
-#   - headers, dates, tags, step numbers, ticket and ADR references and the
-#     "$ bash <script>" command line are OUTSIDE the figure check;
+#   - headers, dates, tags, step numbers, ticket and ADR references, the deck's
+#     own run/hub stamp and the "$ bash <script>" command line are OUTSIDE the
+#     figure check;
 #   - the grade comes from the capture's last line, because the gate keeps the
 #     capture and not the exit code. Step 7's table is read as a second,
 #     independently produced opinion of the same verdicts;
 #   - build order: this script sorts before verify/e2e/ in the gate's glob, so
-#     inside a gate run the e2e captures it reads are the ones on disk, which may
-#     be the previous run's. It grades the deck against the captures it can see.
-#     The committed deck is built by the scheduled workflow AFTER verify-all.sh
-#     finishes, which is where "the live run id is the scheduled one" is kept;
-#   - two checks are graded on the SCHEDULED run only: whether the committed
-#     deck's beats match a rebuild, and whether the committed deck survives the
-#     figure checks. Both read a beat's numbers back out of that beat's capture,
-#     and a local gate run overwrites talk/captures/ with its own results, so off
-#     the clock they compare the committed deck against a run it never claimed to
-#     describe -- which called the deck stale within an hour of each rebuild on
-#     2026-08-31. Everything else, including the rebuild's own figure, status,
-#     headline and phrase checks and the generated-file marker, is graded
-#     everywhere, so a hand-edited or unbuildable deck still fails off the clock;
+#     inside a gate run the e2e captures the REBUILD reads are the ones on disk,
+#     which may be the previous run's. The rebuild is graded against the
+#     captures it can see and quotes no TRUTH line, because this run has none yet;
+#   - the committed deck is NOT rebuilt by the clock. truth.yml's observation
+#     lane (ADR-0024) is talk/truth.log, talk/captures, drift/samples.jsonl and
+#     observations; talk/deck.md is a generated declaration outside it. So the
+#     committed deck lags the log by however many runs since someone last ran
+#     `python3 talk/build_deck.py` and committed. That lag is not a defect here:
+#     the deck is graded against the run it names, not the newest. Before
+#     ticket 66 it was graded against "this run", which called every scheduled
+#     run whose grades moved a hand edit (runs 14 to 22 all red);
+#   - the named run's captures come out of git. If the commit that recorded
+#     that run is not reachable (a shallow clone whose history stops after it),
+#     this script deepens the clone once, bounded, and otherwise says SKIP with
+#     the reason. It never grades the committed deck against the disk;
 #   - the marp render is opt-in (DECK_RENDER=1). The gate runs offline and
 #     npx @marp-team/marp-cli fetches from the network. Ticket 47 renders it by
-#     hand and CI renders it on the scheduled run.
+#     hand.
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)" || {
   echo "SKIP: not inside a git work tree, cannot locate the hub root"; exit 3; }
@@ -79,55 +87,54 @@ python3 talk/build_deck.py --check "$TMP/deck.md" || { echo "FAIL: the built dec
 
 grep -q "GENERATED FILE" talk/deck.md 2>/dev/null || {
   echo "FAIL: talk/deck.md is not the generated file; run python3 talk/build_deck.py"; exit 1; }
-# The committed deck is a read of the SCHEDULED run (D4, ADR-0023): that run
-# writes the captures and commits the deck rebuilt from them, in one lane. Any
-# LOCAL gate run overwrites talk/captures/ with its own results, so comparing
-# the committed deck against a rebuild here compares two different runs and
-# calls the difference a hand edit. It did, every time: the deck was rebuilt and
-# committed three times on 2026-08-31 and was "stale" again within the hour.
-#
-# So this one comparison is graded only where it means something. Everything
-# else above still runs everywhere: the deck must build, survive its own figure,
-# status, headline and phrase checks, and carry the generated-file marker, so a
-# hand-edited deck is still caught off the clock. What waits for the scheduled
-# run is only the question "is the committed file the one THIS run's captures
-# produce", which off the clock has no honest answer.
-if [ -z "${GITHUB_RUN_NUMBER:-}" ]; then
-  echo "  could not look: this is a local run, and it has just overwritten talk/captures/ with"
-  echo "  its own results. The committed deck reads the scheduled run, so a rebuild here would"
-  echo "  be a different run's deck. The scheduled truth workflow grades this comparison."
-  beats_compared=0
-elif ! diff <(grep -o 'beat step=[0-9]* status=[A-Z]*' talk/deck.md) \
-          <(grep -o 'beat step=[0-9]* status=[A-Z]*' "$TMP/deck.md") >"$TMP/d" 2>&1; then
-  echo "  the committed deck's beats differ from a rebuild:"; sed 's/^/    /' "$TMP/d"
-  echo "FAIL: talk/deck.md has been hand edited or is stale; run python3 talk/build_deck.py"; exit 1
+
+# The committed deck names the run it describes. Read that name, and find the
+# commit that recorded the run: the lane commit whose newest TRUTH line is that
+# run's, which also carries that run's captures.
+name_out="$(python3 talk/build_deck.py --name talk/deck.md)"; rc=$?
+if [ "$rc" = 3 ] && [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+  # A shallow checkout (actions/checkout defaults to depth 1) can reach only
+  # HEAD's newest run. Deepen once, bounded; a failure to fetch is a SKIP below.
+  git fetch -q --deepen=100 origin 2>/dev/null || true
+  name_out="$(python3 talk/build_deck.py --name talk/deck.md)"; rc=$?
 fi
-if [ "${beats_compared:-1}" = 1 ]; then
-  echo "ok  the committed talk/deck.md is the generated file, with the same beats as a rebuild"
-else
-  echo "ok  the committed talk/deck.md is the generated file (the beat comparison waits for the clock)"
+case "$rc" in
+  0) echo "ok  the committed talk/deck.md describes recorded $name_out" ;;
+  3) echo "  $name_out"
+     echo "SKIP: the committed talk/deck.md names a recorded run whose recording commit this checkout cannot reach; run python3 talk/build_deck.py at a full clone and commit the deck"
+     exit 3 ;;
+  *) echo "  $name_out"
+     echo "FAIL: the committed talk/deck.md describes no recorded run; run python3 talk/build_deck.py and commit it"
+     exit 1 ;;
+esac
+named="${name_out#run=}"; named="${named%% *}"
+
+# Is the committed file what a rebuild from the run IT NAMES produces? Read from
+# that run's commit, so a local gate run that has just overwritten talk/captures/
+# with its own results cannot make the committed deck look stale (it did, every
+# time, from 2026-08-31 until ticket 66). The "built HH:MMZ" stamp makes a
+# whole-file diff flaky, so the beat markers are compared and the deck's own
+# checks are run over the committed file instead.
+python3 talk/build_deck.py --run "$named" --out "$TMP/named.md" >/dev/null || {
+  echo "FAIL: the deck does not rebuild from run $named's committed captures"; exit 1; }
+if ! diff <(grep -o 'beat step=[0-9]* status=[A-Z]*' talk/deck.md) \
+          <(grep -o 'beat step=[0-9]* status=[A-Z]*' "$TMP/named.md") >"$TMP/d" 2>&1; then
+  echo "  the committed deck's beats differ from a rebuild of run $named:"; sed 's/^/    /' "$TMP/d"
+  echo "FAIL: talk/deck.md has been hand edited; run python3 talk/build_deck.py"; exit 1
 fi
+echo "ok  the committed talk/deck.md is the generated file, with the same beats as a rebuild of run $named"
 
 # The one that mattered: every check above ran against the REBUILD. Nothing ran
 # against the file a reader actually opens, so a hand-edited figure, a forged
 # TRUTH headline and a rewritten could-not-look reason all passed (review
-# 2026-08-29). A whole-file diff is not the fix -- the rebuild's "built HH:MMZ"
-# stamp makes that flaky -- so the deck's own checks are run over the committed
-# file as well.
-# Graded on the clock only, for the same reason as the beat comparison above:
-# these checks read every figure on a beat back out of that beat's CAPTURE, and
-# a local gate run has just overwritten the captures with its own numbers. Off
-# the clock the committed deck is being read against a run it never claimed to
-# describe. The rebuild above is checked everywhere, so a deck that cannot be
-# generated, or whose generated form lies, still fails here.
-if [ -n "${GITHUB_RUN_NUMBER:-}" ]; then
-  python3 talk/build_deck.py --check talk/deck.md || {
-    echo "FAIL: the committed talk/deck.md does not survive its own checks"; exit 1; }
-  echo "ok  the committed talk/deck.md survives the figure, status, headline and phrase checks"
-else
-  echo "  could not look: the committed deck's figures belong to the scheduled run's captures,"
-  echo "  and this local run has replaced them. The scheduled truth workflow grades this."
-fi
+# 2026-08-29). So the deck's own checks are run over the committed file as
+# well, against the captures of the run it names.
+python3 talk/build_deck.py --check talk/deck.md; rc=$?
+case "$rc" in
+  0) echo "ok  the committed talk/deck.md survives the figure, status, headline and phrase checks against run $named" ;;
+  3) echo "SKIP: run $named's recording commit became unreachable between two reads; run this check again"; exit 3 ;;
+  *) echo "FAIL: the committed talk/deck.md does not survive its own checks against run $named"; exit 1 ;;
+esac
 
 if [ "${DECK_RENDER:-0}" = 1 ]; then
   cp -R talk/diagrams "$TMP/diagrams"   # the deck's images, so marp resolves them
@@ -136,12 +143,11 @@ if [ "${DECK_RENDER:-0}" = 1 ]; then
   echo "ok  marp-cli rendered the deck: $(wc -c <"$TMP/deck.html" | tr -d ' ') bytes"
 fi
 
-# The PASS line says what was actually observed on THIS run, and no more. Off
-# the clock two of these checks could not look, and a summary that claimed them
-# anyway would be the exact defect this script exists to catch, committed by the
-# script itself.
-if [ "${beats_compared:-1}" = 1 ]; then
-  echo "PASS: the deck is generated from this run's captures, every section 4 step check that exists on disk produced one, the committed file and a rebuild both survive the checks, its seven beats are the section 4 steps in order carrying this run's own grades, every figure on a beat is a figure in that beat's capture and no figure sits off a beat, any quoted TRUTH line is this commit's own, and the phrase lint is clean"
-else
-  echo "PASS: the deck is generated from this run's captures, every section 4 step check that exists on disk produced one, the REBUILD survives the checks, its seven beats are the section 4 steps in order carrying this run's own grades, every figure on a beat is a figure in that beat's capture and no figure sits off a beat, any quoted TRUTH line is this commit's own, and the phrase lint is clean. The committed file is the generated one; whether it matches THIS run could not be looked at, because a local run replaces the captures it would be read against, and the scheduled run grades that."
+# The PASS line says what was actually observed, and no more. The committed
+# deck is graded against the run it names; whether that is the NEWEST run is
+# printed, not graded, because the clock does not rebuild the deck.
+newest="$(grep '^TRUTH ' talk/truth.log | grep -o 'run=[0-9]*' | tail -1)"; newest="${newest#run=}"
+if [ -n "$newest" ] && [ "$newest" != "$named" ]; then
+  echo "  note: the newest recorded run is $newest and the committed deck describes run $named; run python3 talk/build_deck.py and commit it to move the deck on (not a failure)"
 fi
+echo "PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck.md is the generated file describing recorded run $named, matches a rebuild from that run's committed captures, and survives the figure, status, headline and phrase checks against that run: its seven beats are the section 4 steps in order carrying run $named's own grades, every figure on a beat is a figure in that beat's capture and no figure sits off a beat, its quoted TRUTH line is the line that recorded run $named, and the phrase lint is clean"

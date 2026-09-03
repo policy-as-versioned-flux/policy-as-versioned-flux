@@ -104,6 +104,14 @@ you want their reconcile beat live for that room.
 > [`verify-demo.sh`](verify-demo.sh) refuses the deck if a beat's status, a
 > cited capture or a figure disagrees with the run. Read the beat list there;
 > read this table only for what the July tour did.
+>
+> **Rebuild cadence (2026-09-03, ticket 66).** The deck describes one recorded
+> run, named in its own header (`run=N`) and quoted TRUTH line, and the check
+> grades it against that run's committed captures. The clock never rebuilds it.
+> Before a talk: `python3 talk/build_deck.py` (the newest recorded run; `--run N`
+> for a chosen one), read the beats, commit `talk/deck.md`. `verify-demo.sh`
+> prints a note when a newer run has been recorded since; that is a prompt to
+> rebuild, not a red.
 
 
 Each **[LIVE]** beat is one command; each exits non-zero if the beat would fail
