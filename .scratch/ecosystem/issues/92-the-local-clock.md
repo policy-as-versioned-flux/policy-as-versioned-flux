@@ -1,7 +1,7 @@
 # 92 — The local clock
 
 Type: task (AFK)
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -21,3 +21,41 @@ Done = the owner runs one command on this machine and a model-backed step lands 
 ## Notes
 
 Charted by ticket 75 (Q10). Consistent with the map's note that reasoning is packaged as Claude Code skills a human runs; this ticket adds a schedule on the human's machine. Ticket 93 depends on it for the model call.
+
+## Answer (2026-09-03, built on hub branch `ticket-92-the-local-clock`)
+
+**What was built.** All five items, in the hub only; no unit changed.
+
+1. `talk/local-clock.sh` -- the entry point. A steps table (`name|skill|allowed paths|what`) run in order per adopter; each step is `claude -p "/<skill> <adopter>" --max-turns N --permission-mode acceptEdits --allowedTools ... --append-system-prompt "$(cat talk/local-clock.headless.md rendered)"`, with `TWIN_ENACT_MODE=operations` in the child's environment and `gh`, `curl`, `Task` outside its tools. The script makes the adopter worktree (`.estate-clone/<a>/.work/local-clock/<stamp>-<step>` on `local-clock/<step>-<stamp>` from `main`) before the model runs, and afterwards reads what it committed: uncommitted work is `fail`, no commit is `skip: nothing to propose` (worktree removed), any file outside the step's allowed paths is `fail` (branch kept, never pushed), every `*.claim.yaml` is run through the skill's own `validate_claim.py`. `--push` then pushes the branch and opens the PR under the owner's `gh`; without it the exact command is printed. Two rows today: `classify` (`/classify-and-judge`, exists) and `derive` (`/derive-probability`, ticket 93; recorded `skip: skill derive-probability not shipped` by name until it lands).
+2. `talk/local-clock.README.md` -- prerequisites, the one command, the flags, what it writes, how to read the result, schedule/run-once/stop, the world simulator, how to add a step.
+3. `talk/local-clock.plist` -- launchd template with `__HUB__`, `__HOME__`, `__HOUR__`, `__MINUTE__`; `verify/local-clock/local_clock.py plist --hour H --minute M` renders it with integers. No credential; logs under `.local-clock/logs/`; `LOCAL_CLOCK_LAUNCHD=1` so the marker says scheduled; run once by hand with `launchctl kickstart`.
+4. `--inject FILE` -- the world simulator. `local_clock.py stamp` writes the signal back as `injected: true` + `injected_at/by/from` + `citable: false`, and refuses any output path outside `.local-clock/`. The run is a rehearsal: branch `local-clock/rehearsal/...`, the claim file must carry `injected: true` (checked by the script), `--push` refused, marker `mode: rehearsal`. `twin/feed_signal.signal_for` refuses an injected envelope; `validate_claim.py` refuses an injected claim file or claim.
+5. `verify/local-clock/verify-local-clock.sh` (discovered by the gate: it is under `verify/`, not `talk/`). Offline half, no token: runs the whole script end to end against a fixture adopter with `verify/local-clock/stub-claude.sh` standing in for `claude` (live run commits one validated claim on a branch and leaves the marker; rehearsal is stamped, marked, unpushable and refused by the validator; a commit carrying `composed/x.yaml` is refused; uncommitted work is refused; the derive row is present). Then `local_clock.py check`: script exists and README's `## Flags` equals `--help`; marker fresh / stale / absent (absent = SKIP: the runner is not the owner's machine); every committed `.json/.jsonl/.yaml/.yml` in the hub and eight units scanned for `injected: true`; no `run=local` TRUTH line in `talk/truth.log` dated 2026-09-03 or later; plist has no credential-shaped word and logs under `.local-clock/`. Selfcheck fixtures for each refusal. `tests/test_local_clock.py` (18 tests) covers the same seams from pytest.
+
+**Which check grades it.** `verify/local-clock/verify-local-clock.sh`. Today on this machine: PASS on the offline half and four static checks, SKIP on the marker (the clock has not run here yet), exit 3.
+
+**Decisions, all delegated (ADR-0025) unless marked.**
+
+- *Ticket 75 Q10 is owner-reasoned*: the model runs inside Claude Code on the owner's machine from a schedule or script he runs. Everything below serves that.
+- **Location `talk/local-clock.sh`.** `talk/` is where the human-run entry points live (`up.sh`, `verify-all.sh`); the gate check sits under `verify/` because `verify-all.sh` discovers only `.estate-clone` and `verify/`.
+- **Headless invocation is a user invocation, and the skill's "never on a clock" is amended to "never on a GitHub clock".** Confirmed live: `claude -p "/classify-and-judge driftwood" --max-turns 1` expands the skill despite `disable-model-invocation: true` (that flag forbids the model choosing the skill and Claude Code's own scheduled-task preload; both stay forbidden). What made "a human runs it" load-bearing was that the output is a claim somebody merges and no override is fabricated. Both survive: the run proposes on a branch and stops. Recorded as a dated note in `SKILL.md`, ADR-0024 point 6.
+- **A headless run writes no override.** An override is grade-4 calibrated judgement claimed by a role; nobody is at the keyboard. Bindings and positions only, grade 5, `price_eligible: false`; where the skill says stop-and-ask the item is left unbound with its reason. `validate_claim.py` refuses an override from a claim file whose `run.headless` is true. `run.operator_role: model-steward` (the role that answers for what is committed against the model; the owner holds it and his schedule ran it).
+- **Where the PR lands.** Branch in a worktree of the adopter's clone plus PR title/body files under the run dir; `--push` pushes and opens it under the owner's own `gh` session, and is refused inside any Claude Code session (`CLAUDECODE` set) and on a rehearsal. Reason: the guard refuses every agent push to an enactment repo, the child cannot run `gh` at all, and the standing rule is that the owner pushes. A PR on the hub was rejected: the claim belongs to the adopter's overlay (skill step 4).
+- **Marker and log path `.local-clock/` at the hub root, gitignored.** Not `talk/captures/` (the truth workflow force-adds it, so a marker there would be one `git add -Af` away from a citable path) and not `.scratch/` (committed). Marker shape: `ran_at, scheduled, period_hours, mode live|rehearsal, injected, injected_signal, hub_commit, run_dir, steps[], citable: false`.
+- **Injected flag: `injected: true` plus `injected_at`, `injected_by`, `injected_from`, `citable: false`** at the top level of the envelope and, on a claim file, at its top level and on each claim. Marked, not hidden: the mark is what every refusal keys on.
+- **"Reached a citable run", mechanically:** a committed `.json/.jsonl/.yaml/.yml` in the hub or any unit checkout carrying the flag (`git ls-files` is the line: uncommitted rehearsal worktrees are where a rehearsal is allowed to be), or a `run=local` TRUTH line in `talk/truth.log` dated on or after 2026-09-03. The one `run=local` line of 2026-08-28 predates the local clock and is a presenter run the record already knows.
+- **Steps beyond the model: none.** The local clock does not run `verify-graded.sh` or the platform live tails. Ticket 86 took the lane branch for the cluster-needing facts, and a local run's evidence is not citable (NORTH-STAR §5), so running them here would make evidence nobody may quote. The steps table is the seam if that changes.
+- **`verify-schedules.sh` does not grade this clock.** It parses workflow YAML; this clock is a launchd job with no YAML and a different lane. Dated note in `schedules.py`'s docstring; ADR-0024 point 6 says the same. No new ADR: 0026-0028 are reserved and the decision belongs beside the other clocks.
+- **Marker staleness: declared period + 24h slack, scheduled runs only.** A run by hand is dated and reported, never graded stale: nobody promised it would recur. Cadence itself is the owner's (below).
+- **Enact guard in the headless child.** Claude Code's docs say project hooks run in `-p` mode (async ones are killed at teardown, which implies the sync ones run). A direct live probe of the guard from inside this session was blocked by the session's own permission classifier (it looked like circumventing the guard), so the hook's firing in the child is documented behaviour, not this build's observation. What IS enforced by this build regardless: `TWIN_ENACT_MODE=operations` in the child's environment, no `gh` in its tools, no `--dangerously-skip-permissions` (asserted by a test), and the script's own read of the branch afterwards.
+
+**Cost note.** Two one-turn probes of the real `claude -p` were made to confirm the invocation shape (USD 0.013 and USD 0.29). No full skill run was made: that is the owner's token spend and identity.
+
+Map line: 92 -- the local clock: `talk/local-clock.sh` runs the model steps from the owner's machine as `claude -p "/<skill> <adopter>"` under the guard, lands a branch + PR body (owner pushes), `--inject` rehearsals are marked `injected: true` and refused everywhere citable; `verify-local-clock.sh` grades the marker; headless runs write no override; ADR-0024 point 6.
+
+## Waits on the owner
+
+- **The first real run** (identity, money): `talk/local-clock.sh --adopter driftwood`, then `--push` from a terminal. Until it runs, `verify-local-clock.sh` says SKIP on the marker.
+- **The cadence** (a date-shaped decision): `local_clock.py plist --hour H --minute M > ~/Library/LaunchAgents/uk.me.cns.pavc.local-clock.plist` and `launchctl bootstrap` (an authorisation on this machine). If a scheduled run fails to authenticate, `claude setup-token` once.
+- **Rehearsal signals naming a real firm, regulator or person** beyond the adopters' own scenario libraries.
+- Ticket 93 ships `.claude/skills/derive-probability/SKILL.md`; the `derive` row is waiting for it.
