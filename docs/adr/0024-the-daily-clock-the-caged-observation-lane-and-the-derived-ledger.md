@@ -172,3 +172,19 @@ Kustomization waits, ResourceSet waits, sample) is graded by
 before any merge. A clock still appends only observations; this note records that the instrument
 taking them is itself a graded artefact, so a red that is the sampler's fault is caught in the
 truth surface rather than read off the lane five hours later.
+
+- **2026-09-03 (ticket 72, delegated under ADR-0025): a bump commit carries the twin's derived
+  artefacts, and the sweep's moved path had never run.** The first real feed bump (driftwood PR
+  #20) moved `party.yaml` and `composed/` together and left `twin/forward-intel/v1/feed.json` and
+  `twin/signals.yaml` at the old pin, two reds on every truth run after. Both are derived from
+  `inherits[]`, so Renovate's completer now re-derives them and `fileFilters` folds them into the
+  same bot commit. That commit touches declaration paths, and D1 is untouched by it: Renovate is a
+  proposer, its commit sits on a pull request a human merges, and the cage step in
+  `renovate-run.yml` still asserts the job checkout stays clean. The sweep stays as the day-after
+  safety net -- and its moved branch, `rc=$?` after a check that exits 1, had been dead under
+  GitHub's `bash -e` since it was written (run 33627910027). It now lifts `-e` around the checks,
+  proposes feed and lookup together, and appends its observation line on **both** paths, with
+  `moved` and the proposal branch: a moved=true line on `main` is an observation, not a
+  declaration, and it is the only offline proof the branch has fired.
+  `driftwood/twin/verify-twin-sweep-moved.sh` runs the step's own shell under `bash -e` on planted
+  copies and reads the series for that line, could-not-look until the clock supplies it.
