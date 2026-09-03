@@ -40,7 +40,8 @@ ok  the flip is proposed on a branch; main is untouched
 [1;36m==>[0m the PR carries the version cross-check gate: ci-check.py
 ok  gate runs (kyverno): a workload compliant-under-Audit is caught pre-merge by the +/-1 cross-check
 
-[1;36m==>[0m commit identity: gitsign keyless (OIDC -> Fulcio) -> Rekor  [gitsign version v0.17.1]
+[1;36m==>[0m commit identity: gitsign keyless (OIDC -> Fulcio) -> Rekor  [gitsign version v0.17.1
+gitsign]
 
 [1;36m==>[0m next (human + CI, NOT this agent): git commit --gitsign on 'wargamer/retune-driftwood-require-nonroot-2-0-0', push, open PR,
 [1;36m==>[0m      the gate + a human reviewer dispose. The war-gamer proposes; it never merges.

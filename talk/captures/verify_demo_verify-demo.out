@@ -1,9 +1,9 @@
 selfcheck ok
-/tmp/tmp.1CIvXof9w8/deck.md: 304 lines, 82 captures on disk
+/tmp/tmp.cHkdScFU22/deck.md: 304 lines, 82 captures on disk
 ok  the deck builds: 304 lines from 82 captures
 review, not a lint failure: the word gate appears on 1 lines; every use outside the four refused phrases is a human review item:
   line 223: ok  verify/twin-evals/verify-twin-evals.sh (the twin's evals graded by the gate)
-checked 7 beats in /tmp/tmp.1CIvXof9w8/deck.md
+checked 7 beats in /tmp/tmp.cHkdScFU22/deck.md
   the committed deck's beats differ from a rebuild:
     1,6c1,6
     < beat step=1 status=SKIP
