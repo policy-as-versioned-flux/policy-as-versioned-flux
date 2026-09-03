@@ -435,22 +435,42 @@ that a rewritten entry cites stay as the record of the decision at the time.
 - **Premium** (added 2026-08-28, ticket 14) — The contract amount an adopter pays for a **quote**. A
   cost on the adopter's sheet, not a **price**, so it sums with retained loss and control cost.
 
-- **Hole** (added 2026-08-28, ticket 15) — A selected control no **control claim** covers. Priced as
-  the regulator's **control weight** for that control times the adopter's sized **exposure** for
-  the regime, so the regime's price is the sum of its holes and implementing a control reduces it.
-  Never refused, never counted; the earlier new-hole and widening refusals are gone.
+- **Hole** (added 2026-08-28, ticket 15; built 2026-09-03, ticket 38) — A selected control no
+  **control claim** covers, keyed `(source, id)`: the catalogue that defines it and its bare id
+  there. Priced as the regulator's **control weight** for that control times the adopter's sized
+  **exposure** for the regime, so the regime's price is the sum of its holes and implementing a
+  control reduces it; a hole no pinned weight names carries no amount, a named absence rather
+  than a zero. Never refused, never counted; the new-hole and widening refusals are gone and
+  each new, closed or widened hole prints as a **delta** on the evidence document under the
+  adopter's own perspective and currency. A removal still refuses: it is an exemption by another
+  name.
+
+- **Delta** (added 2026-09-03, ticket 38) — What changed since the adopter's last signed composed
+  artefact and what a pinned instrument prices it at: a new or closed **hole**, a baseline
+  widening, a new or closed **ungoverned namespace**. Each carries the adopter's perspective and
+  currency and an amount or a named absence. A delta is a report of a priced move, never a wall;
+  it replaced the three composition refusals ADR-0013, ADR-0017 and ADR-0018 point 3 carried.
 
 - **Control weight** (added 2026-08-28, ticket 15) — A regulator's published statement, keyed on
   the catalogue and **control id**, of which controls a violation type turns on. Part of the
   penalty feed; changing it is a major version.
 
-- **Ungoverned namespace** (added 2026-08-28, ticket 15) — A namespace in an adopter's repo
-  without the governed label. Priced as its workload share of the adopter's uncaged residual,
-  growing from the date the first signed composed artefact recorded it. The **proposer** may open a
-  PR to govern it.
+- **Ungoverned namespace** (added 2026-08-28, ticket 15; built 2026-09-03, ticket 38) — A
+  namespace in an adopter's repo carrying the institution label without the governed label.
+  Priced as its workload share (pod-owning kinds in the repo walk, over the same across every
+  institution namespace) of the adopter's whole uncaged residual, LEF-ramped by the EOL feed's
+  own ramp from `since` — the date of the first signed tag whose composed header recorded it,
+  read off tag history so it survives a close and a reopen — as of the newest pinned feed's
+  publish date, and bounded at the whole residual. What cannot be read (no signed tag names it,
+  no feed prices the residual) is a named limit on the price, never an invented date or a zero.
+  Never refused. The **proposer** may open a PR to govern it. The live case is tuppence's
+  `tuppence-reset`, recorded since 2026-08-25.
 
-- **Bespoke control** (added 2026-08-28, ticket 15) — A control an adopter defines itself,
-  published as a small catalogue of which the adopter is the source. Priced only by a scenario the
+- **Bespoke control** (added 2026-08-28, ticket 15; built 2026-09-03, ticket 38) — A control an
+  adopter defines itself, published as a small OSCAL catalogue of which the adopter is the source
+  and pinned as a `controls` parent of itself (the self-pin resolves to the adopter's own tree,
+  signed by the same tag as its composed artefact); named in `overlay.controls` as `party:id`
+  and priced by the scenario the control's `scenario` prop names. Priced only by a scenario the
   adopter signs; without one it is an **instrument fault**.
 
 - **Register entry** (added 2026-08-28, ticket 15) — A twin blast-radius hit that cannot be
