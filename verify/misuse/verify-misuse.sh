@@ -11,7 +11,9 @@
 # Three things, all offline:
 #   1. this script's own instrument, on planted fixtures: a blanked mechanism is refused, a
 #      missing anchor fails, a row waiting on a resolved ticket fails, a row waiting on an open
-#      ticket is could-not-look BY NAME, a resolved row passes
+#      ticket is could-not-look BY NAME, a resolved row passes; and this script's own exit
+#      contract, run end to end in a scratch hub whose `twin verify` fails and which has no
+#      estate clone: the run must end FAIL, never SKIP
 #   2. the harness check `misuse_catalogues_load_and_every_row_names_a_mechanism`, exactly as
 #      `twin verify` reports it: three files, one loader, ticket 19's four ids, the refusal bites
 #   3. the four eco-system rows graded against THIS checkout: every path anchor resolves in the
@@ -23,7 +25,10 @@
 # Three outcomes only:
 #   PASS (exit 0)  every assertion observed true; the could-not-look rows are named on the line
 #   FAIL (exit 1)  an assertion observed false
-#   SKIP (exit 3)  could not look, with the reason on the last line
+#   SKIP (exit 3)  could not look, with the reason on the last line -- and only when nothing
+#                  was observed false: a FAIL from an earlier leg always wins over a later leg's
+#                  could-not-look (the 2026-09-03 review found leg 3's substrate check masking a
+#                  leg-2 FAIL as SKIP; `skip` now consults $fail, and leg 1 proves it)
 #
 # `bash verify/misuse/verify-misuse.sh selfcheck` runs leg 1 alone.
 set -uo pipefail
@@ -31,7 +36,15 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
 CHECK=misuse_catalogues_load_and_every_row_names_a_mechanism
 
-skip() { echo "SKIP: $*"; exit 3; }
+# Exit 3 only while nothing has been observed false. Once $fail is set, a could-not-look is
+# reported as the FAIL it sits behind, so the gate never reads an observed-false run as SKIP.
+skip() {
+  if [ "${fail:-0}" -ne 0 ]; then
+    echo "FAIL: an assertion above was observed false, and a later leg could not look: $*"
+    exit 1
+  fi
+  echo "SKIP: $*"; exit 3
+}
 
 PY="$ROOT/.venv/bin/python"
 if [ ! -x "$PY" ]; then
@@ -132,8 +145,31 @@ expect bare     1 'neither a path nor the ticket' 'a row naming neither a path n
 expect open     3 'could-not-look by name (x)'   'a row waiting on an open ticket is could-not-look by name'
 expect resolves 0 '1 of 1 row(s) resolve'        'a row whose anchors all resolve passes'
 
+# The script's own exit contract, end to end. A scratch hub: this script copied in, twin/ linked,
+# a bin/twin that reports the harness check FAIL, and no .estate-clone or issues dir. Leg 2
+# observes false; leg 3 cannot look. The run must end on a FAIL line with an exit that is neither
+# 0 nor 3. The inner run is told not to plant this again, so it cannot recurse.
+if [ -z "${VERIFY_MISUSE_INNER:-}" ]; then
+  hub="$work/hub"
+  mkdir -p "$hub/bin" "$hub/verify/misuse"
+  ln -s "$ROOT/twin" "$hub/twin"
+  [ -e "$ROOT/.venv" ] && ln -s "$ROOT/.venv" "$hub/.venv"
+  cp "$HERE/verify-misuse.sh" "$hub/verify/misuse/verify-misuse.sh"
+  printf '#!/usr/bin/env bash\necho "  11  FAIL  %s  Violated: planted by selfcheck"\nexit 1\n' "$CHECK" >"$hub/bin/twin"
+  chmod +x "$hub/bin/twin"
+  out="$(VERIFY_MISUSE_INNER=1 bash "$hub/verify/misuse/verify-misuse.sh" 2>&1)"; rc=$?
+  last="$(printf '%s\n' "$out" | tail -1)"
+  if [ "$rc" -ne 0 ] && [ "$rc" -ne 3 ] && printf '%s' "$last" | grep -q '^FAIL: ' \
+     && printf '%s\n' "$out" | grep -q "^FAIL: $CHECK"; then
+    echo "PASS: selfcheck: a leg-2 FAIL wins over leg 3's could-not-look (exit $rc: $(printf '%s' "$last" | cut -c1-110))"
+  else
+    echo "FAIL: selfcheck: a leg-2 FAIL must win over leg 3's could-not-look; expected an exit that is not 0 or 3 and a FAIL last line, got exit $rc: $(printf '%s' "$last" | cut -c1-140)"
+    fail=1
+  fi
+fi
+
 if [ "${1:-}" = "selfcheck" ]; then
-  [ "$fail" -eq 0 ] && { echo "PASS: selfcheck: eight planted rows graded as their plants require"; exit 0; }
+  [ "$fail" -eq 0 ] && { echo "PASS: selfcheck: eight planted rows graded as their plants require, and a FAIL wins over a SKIP"; exit 0; }
   echo "FAIL: selfcheck: the grader did not grade a plant as required; see above"; exit 1
 fi
 [ "$fail" -eq 0 ] || { echo "FAIL: this script's own instrument is wrong; nothing below can be trusted"; exit 1; }

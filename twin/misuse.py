@@ -126,9 +126,9 @@ def pin(path: Path | None = None) -> dict[str, Any]:
 # graded every time the suite runs. An eco-system row names estate code the twin never imports,
 # so the gate has to go and look. Each row therefore carries, beside the prose `mechanism`:
 #
-#   anchors:  ["<path>", "<path>::<token>", ...]  files, hub-relative or estate-relative, that
-#             must exist (and contain the token), so "names a mechanism by path" is checked
-#             rather than read;
+#   anchors:  ["<path>", "<path>::<token>", ...]  files that must exist (and contain the token),
+#             so "names a mechanism by path" is checked rather than read; a path starting with a
+#             unit name (ESTATE_UNITS) is `.estate-clone`-relative, any other is hub-relative;
 #   waits_on: [{ticket: "45", for: "..."}]        the cage price that is decided but not built,
 #             by the number of the ticket building it — graded could-not-look BY NAME while that
 #             ticket is open, and a FAIL once it is resolved and the row still says it waits.
@@ -157,16 +157,27 @@ def ticket_is_closed(status: str | None) -> bool:
     return bool(status) and str(status).split()[0].strip(":;,.") in CLOSED_TICKET_STATUSES
 
 
+# The eight units an estate-relative anchor starts with. Any other first segment (twin/, docs/,
+# verify/) is hub-relative and is graded against the hub alone, so a typo in a hub anchor FAILs
+# even on a checkout with no clone assembled (CI; a fresh clone before clone-estate.sh). Without
+# this rule the grammar could not tell the two apart and excused a missing hub file as could-not-look.
+ESTATE_UNITS: frozenset[str] = frozenset(
+    {"platform", "ico", "nist", "driftwood", "tuppence", "ludlow", "feeds", "insurer"}
+)
+
+
 def _resolve_anchor(anchor: str, root: Path, estate: Path | None) -> str | None:
     """None when the anchor resolves; otherwise why it did not. `path::token` requires the token
     to appear in the file's text, so "composition.py exists" cannot stand in for "composition.py
     still has PRICE_KINDS"."""
     path_part, _, token = anchor.partition("::")
-    candidates = [root / path_part] + ([estate / path_part] if estate is not None else [])
-    found = next((c for c in candidates if c.is_file()), None)
-    if found is None:
-        if estate is None and not (root / path_part).exists():
-            return f"{path_part}: not in the hub and no estate clone to look in"
+    if path_part.split("/", 1)[0] in ESTATE_UNITS:
+        if estate is None:
+            return f"{path_part}: no estate clone to look in"
+        found = estate / path_part
+    else:
+        found = root / path_part
+    if not found.is_file():
         return f"{path_part}: no such file"
     if token and token not in found.read_text(encoding="utf-8", errors="replace"):
         return f"{path_part}: does not mention {token!r}"
@@ -181,7 +192,8 @@ def grade_entry(
     COULD_NOT_LOOK (by ticket number and what it builds) when the row waits on an open ticket,
     FAIL when an anchor is missing, a waited-on ticket is resolved or unknown, or the row names
     neither. Anchors are graded first: a waiting ticket excuses what is not built, never a path
-    that is claimed and absent."""
+    that is claimed and absent. A FAIL always wins over could-not-look: an estate anchor that
+    cannot be looked at (no clone) does not shield a resolved or unknown waited-on ticket."""
     eid = str(entry.get("id", "?"))
     anchors = [str(a) for a in (entry.get("anchors") or [])]
     waits = list(entry.get("waits_on") or [])
@@ -192,8 +204,6 @@ def grade_entry(
     hard = [m for m in missing if "no estate clone" not in m]
     if hard:
         return Grade(FAIL, f"{eid}: " + "; ".join(hard))
-    if missing:
-        return Grade(COULD_NOT_LOOK, f"{eid}: " + "; ".join(missing))
 
     open_waits, closed_waits, unknown_waits = [], [], []
     for wait in waits:
@@ -213,6 +223,8 @@ def grade_entry(
             f"{eid}: still says it waits on {', '.join(closed_waits)}, which is resolved — name the "
             "built mechanism by path",
         )
+    if missing:
+        return Grade(COULD_NOT_LOOK, f"{eid}: " + "; ".join(missing + [f"waits on {w}" for w in open_waits]))
     if open_waits:
         return Grade(COULD_NOT_LOOK, f"{eid}: {len(anchors)} anchor(s) resolve; waits on " + "; ".join(open_waits))
     return Grade(PASS, f"{eid}: {len(anchors)} anchor(s) resolve")

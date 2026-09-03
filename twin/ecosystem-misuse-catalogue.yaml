@@ -14,19 +14,25 @@
 # check. Because these mechanisms are estate code the twin never imports, each row also carries
 # what the gate checks rather than reads:
 #
-#   anchors:  files, hub-relative or `.estate-clone`-relative, that must exist, optionally with a
-#             `::token` the file must still contain -- "names a mechanism by path", graded;
+#   anchors:  files that must exist, optionally with a `::token` the file must still contain --
+#             "names a mechanism by path", graded. A path whose first segment is a unit name
+#             (platform, ico, nist, driftwood, tuppence, ludlow, feeds, insurer) is
+#             `.estate-clone`-relative; any other is hub-relative and graded against the hub
+#             alone. Prefer an identifier as the token (a def, a constant, an id): a prose word
+#             would survive the mechanism being removed.
 #   waits_on: the part of the mechanism that is decided but not built, by the number of the
 #             ticket building it. `verify/misuse/verify-misuse.sh` grades such a row could-not-look
 #             BY NAME while that ticket is open, and FAILS it once the ticket is resolved and the
-#             row still says it waits (the escape hatch closes itself).
+#             row still says it waits (the escape hatch closes itself). So the integration step
+#             that merges ticket 45, 46 or 84 must, in the same step, re-anchor the row waiting on
+#             it by path, or this check goes red in the gate -- by design.
 #
 # Under NORTH-STAR's no-gate rule nothing here refuses, counts or denies: a misuse is priced and
 # caged, and the one refusal is a missing instrument (ADR-0020).
 #
 # Versioned: bump `version` in the same commit as any change to an entry below.
 schema: twin.misuse-catalogue/v1
-version: 1
+version: 2
 entries:
   - id: publisher-games-own-feed-price
     risk: >-
@@ -46,7 +52,7 @@ entries:
       platform/computed-semver/gate.py sorts the degraded prerelease where semver puts it.
     anchors:
       - platform/compose/composition.py::PRICE_KINDS
-      - platform/computed-semver/gate.py::degraded
+      - platform/computed-semver/gate.py::DEGRADED_TIER
     waits_on:
       - ticket: "45"
         for: the switching price in prices[], the adopter's £ reason to switch
@@ -97,7 +103,7 @@ entries:
       own prices[]. Legibility is a priced behaviour on the adopter's own balance sheet, never a
       private carve-out; sealed payloads are the recorded upgrade path for a real adopter.
     anchors:
-      - twin/pricing.py::declared valuation
+      - twin/pricing.py::NO_VALUATION
       - driftwood/twin/orgs/driftwood/scenarios/rival-reads-my-holes-2026.yaml
       - driftwood/twin/signals.yaml::rival-reads-my-holes-2026
     source: ticket 19 Q3/item 3; ticket 11 item 4; ADR-0012; ADR-0021
@@ -121,6 +127,6 @@ entries:
       - twin/roles.yaml
       - platform/compose/composition.py::_sum_prices
       - platform/fair/fair.py::sum_prices
-      - docs/adr/0021-the-twin-emits-a-scenario-the-estate-selects-the-tier.md::perspective
+      - "docs/adr/0021-the-twin-emits-a-scenario-the-estate-selects-the-tier.md::Every price carries `perspective` and"
       - twin/invariants/checks.py::no_recommended_action_field
     source: ticket 19 Q3/item 3; ADR-0021; twin decision ticket 09

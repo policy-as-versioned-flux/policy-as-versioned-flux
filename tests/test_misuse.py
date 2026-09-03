@@ -272,6 +272,25 @@ def test_an_estate_anchor_with_no_estate_is_could_not_look(tmp_path: Path) -> No
     assert "estate" in grade.reason
 
 
+def test_a_hub_anchor_missing_from_the_hub_fails_even_with_no_estate(tmp_path: Path) -> None:
+    """A path that does not start with a unit name is the hub's alone: a typo in `twin/...` is a
+    FAIL on every checkout, not could-not-look wherever the clone is not assembled."""
+    grade = grade_entry(_row(anchors=["twin/pricng.py"]), root=tmp_path, estate=None, ticket_status=_open)
+    assert grade.outcome == FAIL
+    assert "no such file" in grade.reason
+
+
+def test_a_resolved_waited_on_ticket_fails_even_when_the_estate_is_absent(tmp_path: Path) -> None:
+    """A FAIL always wins over could-not-look: an estate anchor nobody can look at does not
+    shield a row that still says it waits on a ticket that has shipped."""
+    grade = grade_entry(
+        _row(anchors=["platform/c.py"], waits_on=[{"ticket": "45", "for": "x"}]),
+        root=tmp_path, estate=None, ticket_status=_resolved,
+    )
+    assert grade.outcome == FAIL
+    assert "45" in grade.reason
+
+
 def test_ecosystem_ticket_status_reads_the_status_line(tmp_path: Path) -> None:
     (tmp_path / "45-switching.md").write_text("# 45\n\nType: task\nStatus: open\n")
     (tmp_path / "19-misuse.md").write_text("# 19\n\nStatus: resolved\n")
