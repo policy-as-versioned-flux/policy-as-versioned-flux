@@ -18,3 +18,11 @@ Done = the six scripts are excluded with reasons on the next citable run, the §
 ## Notes
 
 Charted by ticket 75 (Q12). Overlaps ticket 86 item 3, which this ticket now owns. The identity lane is fog: it is the first thing after this map.
+
+## Comments
+
+**2026-09-03, ticket 73.** ADR-0027 item 6 hands the identity lane one more instant: the source
+verifier now chains at the later of the tagger time and the certificate's notBefore within a
+declared 60s bound, and records the Rekor integrated time (the signed entry timestamp, verified
+against a pinned Rekor key) as the instant it would ideally use. That is the transparency check the
+verifier's docstring names as its ceiling, so it belongs here, with the actor half, not to 73.
