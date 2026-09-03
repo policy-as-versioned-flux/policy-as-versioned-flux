@@ -310,6 +310,94 @@ def test_git_c_into_a_directory_with_no_remote_stays_refused_or_silent_but_never
     assert enact_guard.decide("Bash", {"command": command}, str(tmp_path)) is not None
 
 
+# -- the --git-dir family (ticket 65, review finding M17) --------------------------------------
+#
+# `git --git-dir=<enactment>/.git push origin main` is the `-C` hole wearing a different flag:
+# the remote resolves in the repository the option names, not in the shell's directory. So do
+# `--git-dir <dir>`, `--work-tree` beside it, and `GIT_DIR=<dir>` in the environment. Observed
+# with git 2.55 on 2026-09-03: from a directory that is no repository at all, each of those
+# resolves `origin` to the named checkout's remote, and `--work-tree` ALONE does not move
+# discovery (git still walks up from the cwd). These four mirror the four `-C` tests above.
+
+
+@pytest.mark.parametrize("spelling", ["--git-dir={git_dir}", "--git-dir {git_dir}"])
+def test_layer_2_resolves_the_remote_where_git_dir_points_not_where_the_shell_stands(
+    spelling: str, tmp_path: Path,
+) -> None:
+    """`git --git-dir=<dir> push origin <branch>` pushes <dir>'s remote, not the caller's.
+
+    Review finding M17 (2026-08-31): this shape resolved against the caller's cwd, matched
+    the self-push carve-out when the caller stood in this repository, and was ADMITTED. The
+    same class as the `-C` regression, closed the same way.
+    """
+    work = _consumer_checkout(tmp_path, "platform", "policy-as-versioned-platform")
+    caller = tmp_path / "caller"
+    caller.mkdir()
+
+    command = f"git {spelling.format(git_dir=work / '.git')} push -u origin ecosystem/thin-slice"
+    assert enact_guard.decide("Bash", {"command": command}, str(caller)) is not None
+
+
+def test_layer_2_resolves_the_remote_where_an_inline_git_dir_env_points(tmp_path: Path) -> None:
+    """`GIT_DIR=<dir> git push origin <branch>` is the option spelt as an environment prefix, and
+    `--git-dir=<dir> --work-tree=<tree>` is the pair git documents for a detached work tree.
+    Both resolve in <dir>; both must be refused."""
+    work = _consumer_checkout(tmp_path, "ludlow", "policy-as-versioned-ludlow")
+    caller = tmp_path / "caller"
+    caller.mkdir()
+
+    prefixed = f"GIT_DIR={work / '.git'} git push origin ecosystem/thin-slice"
+    assert enact_guard.decide("Bash", {"command": prefixed}, str(caller)) is not None
+    paired = f"git --git-dir={work / '.git'} --work-tree={work} push origin ecosystem/thin-slice"
+    assert enact_guard.decide("Bash", {"command": paired}, str(caller)) is not None
+    with_env = f"env GIT_DIR={work / '.git'} GIT_WORK_TREE={work} git push origin main"
+    assert enact_guard.decide("Bash", {"command": with_env}, str(caller)) is not None
+
+
+def test_a_relative_git_dir_resolves_against_the_callers_directory(tmp_path: Path) -> None:
+    """A relative `--git-dir` means what the shell would mean by it, and after `-C` it means
+    what git means by it: relative to the directory `-C` moved to."""
+    _consumer_checkout(tmp_path / "estate", "ico", "policy-as-versioned-ico")
+
+    command = "git --git-dir=estate/ico/.git push origin main"
+    assert enact_guard.decide("Bash", {"command": command}, str(tmp_path)) is not None
+    after_c = "git -C estate --git-dir=ico/.git push origin main"
+    assert enact_guard.decide("Bash", {"command": after_c}, str(tmp_path)) is not None
+
+
+def test_git_dir_into_a_directory_with_no_repository_stays_refused_or_silent_but_never_open(
+    tmp_path: Path,
+) -> None:
+    """An absent `--git-dir` is fatal to git and resolves nothing; a NAMED enactment URL on the
+    same command line is still read directly, so it can never turn into an admitted push."""
+    absent = tmp_path / "does-not-exist"
+    command = (f"git --git-dir={absent} push "
+               "https://github.com/policy-as-versioned-nist/nist HEAD:main")
+    assert enact_guard.decide("Bash", {"command": command}, str(tmp_path)) is not None
+    prefixed = (f"GIT_DIR={absent} git push "
+                "https://github.com/policy-as-versioned-nist/nist HEAD:main")
+    assert enact_guard.decide("Bash", {"command": prefixed}, str(tmp_path)) is not None
+
+
+def test_the_hook_processs_own_git_dir_cannot_move_the_resolution(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    """`GIT_DIR` in the guard's OWN environment is not the shell's environment, and it must not
+    decide anything. Left unscrubbed it reaches both resolutions: a `GIT_DIR` pointing at a
+    checkout of this repository makes every bare push in every enactment checkout read as a
+    self-push, and one pointing at an enactment checkout makes that checkout "our own". The
+    guard resolves from the command string and the cwd it was handed, and nothing else."""
+    own = _consumer_checkout(tmp_path, "policy-as-versioned-flux", "policy-as-versioned-flux")
+    work = _consumer_checkout(tmp_path, "nist", "policy-as-versioned-nist")
+
+    monkeypatch.setenv("GIT_DIR", str(own / ".git"))
+    assert enact_guard.decide("Bash", {"command": "git push origin main"}, str(work)) is not None
+
+    monkeypatch.setenv("GIT_DIR", str(work / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(work))
+    assert enact_guard.decide("Bash", {"command": "git push origin main"}, str(work)) is not None
+
+
 # -- the carve-out: the twin's own model, and only that ----------------------------------------
 #
 # 2026-08-16, on the repository owner's standing instruction. Decision ticket 18 Q1 reads "the twin
