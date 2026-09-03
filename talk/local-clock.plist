@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  talk/local-clock.plist: the launchd TEMPLATE for the local clock (ecosystem ticket 92).
+
+  Four placeholders, filled in by `verify/local-clock/local_clock.py plist` with an hour and a
+  minute (talk/local-clock.README.md, "Schedule it"), which also turns the hour and minute into
+  the integers launchd wants:
+    __HUB__     the absolute path of this checkout
+    __HOME__    the owner's home directory (PATH and HOME for a launchd job are not the shell's)
+    __HOUR__    the hour, 0-23, local time; the cadence is the owner's to pick
+    __MINUTE__  the minute, 0-59
+  Nothing in here authenticates anything: Claude Code and gh read the owner's own login from
+  the keychain at run time. Logs go under the repository's ignored .local-clock/ path.
+  Remove the push flag's line below to keep every result local (the run then prints the push
+  command instead of running it).
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>uk.me.cns.pavc.local-clock</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>__HUB__/talk/local-clock.sh</string>
+    <string>--adopter</string>
+    <string>driftwood</string>
+    <string>--push</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__HUB__</string>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <string>__HOUR__</string>
+    <key>Minute</key>
+    <string>__MINUTE__</string>
+  </dict>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>LOCAL_CLOCK_LAUNCHD</key>
+    <string>1</string>
+    <key>LOCAL_CLOCK_PERIOD_HOURS</key>
+    <string>24</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:__HOME__/.local/bin</string>
+    <key>HOME</key>
+    <string>__HOME__</string>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>__HUB__/.local-clock/logs/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>__HUB__/.local-clock/logs/launchd.err.log</string>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
