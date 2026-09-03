@@ -493,6 +493,66 @@ def _a_constraint_removal_with_no_computed_attractiveness_is_rejected(ctx: Conte
     )
 
 
+@harness_check("misuse_catalogues_load_and_every_row_names_a_mechanism")
+def _misuse_catalogues_load_and_every_row_names_a_mechanism(ctx: Context) -> str:
+    """All three misuse catalogues load through the one `load_catalogue()`, and no row in any of
+    them is a risk without a mechanism (eco-system ticket 44, from ticket 19's resolution).
+
+    A guard on the suite rather than an invariant, the same shape
+    `a_constraint_removal_with_no_computed_attractiveness_is_rejected` is: until this check the
+    two existing catalogues were graded by nothing at all — the loader refuses a row without a
+    mechanism, but nothing in the suite ever called it, so a mechanism quietly blanked would have
+    stayed "named" until some test happened to load that file.
+
+    Four legs. First, the three files are three distinct paths and all load through
+    `load_all_catalogues()`, which also refuses an id declared in two scopes. Second, the four
+    rows ticket 19 named are present in the eco-system catalogue, by id. Third, every eco-system
+    row names what the gate can check — a path anchor or the ticket that builds its cage price —
+    since its mechanisms are estate code this suite never imports (the estate-side grading is
+    `verify/misuse/verify-misuse.sh`'s, which needs the clone). Fourth, the refusal is proven to
+    bite, not assumed: a copy of the eco-system catalogue with one mechanism blanked is refused
+    with the loader's own "no mechanism" reason.
+    """
+    from .. import misuse as misuse_mod
+
+    try:
+        loaded = misuse_mod.load_all_catalogues()
+    except misuse_mod.MisuseError as exc:
+        raise Violated(str(exc)) from None
+    if len({path for path, _ in loaded}) != 3:
+        raise Violated(f"expected three distinct catalogue files, got {[str(p) for p, _ in loaded]}")
+    rows = sum(len(doc["entries"]) for _, doc in loaded)
+
+    eco = next(doc for path, doc in loaded if path == misuse_mod.ECOSYSTEM_CATALOGUE_PATH)
+    ids = [str(e["id"]) for e in eco["entries"]]
+    absent = [i for i in misuse_mod.ECOSYSTEM_ROW_IDS if i not in ids]
+    if absent:
+        raise Violated(f"the eco-system catalogue lacks ticket 19's row(s): {', '.join(absent)}")
+    unanchored = [str(e["id"]) for e in eco["entries"] if not (e.get("anchors") or e.get("waits_on"))]
+    if unanchored:
+        raise Violated(
+            "eco-system row(s) name neither a path anchor nor the ticket building their price: "
+            + ", ".join(unanchored)
+        )
+
+    tampered = {**eco, "entries": [{**eco["entries"][0], "mechanism": "  "}] + list(eco["entries"][1:])}
+    planted = ctx.tmp / "guard-misuse-catalogue-no-mechanism.yaml"
+    planted.write_text(yaml.safe_dump(tampered), encoding="utf-8")
+    try:
+        misuse_mod.load_catalogue(planted)
+    except misuse_mod.MisuseError as exc:
+        if "no mechanism" not in str(exc):
+            raise Violated(f"the blanked mechanism was refused, but not for being missing: {exc}") from None
+    else:
+        raise Violated("a catalogue row with its mechanism blanked loaded as though it were named")
+
+    return (
+        f"3 catalogues, {rows} rows, one loader; {len(ids)} eco-system rows carrying ticket 19's "
+        f"four ids, each anchored by path or by the ticket building its price; a row with its "
+        "mechanism blanked is refused"
+    )
+
+
 @harness_check("a_challenge_to_a_constituent_survives_an_unrelated_resolution")
 def _a_challenge_to_a_constituent_survives_an_unrelated_resolution(ctx: Context) -> str:
     """Contestability is a primary workflow, and a challenge to one claim cannot be closed by a

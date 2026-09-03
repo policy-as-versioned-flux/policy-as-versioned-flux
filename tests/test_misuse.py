@@ -9,8 +9,16 @@ import pytest
 from twin.misuse import (
     BEHAVIOURAL_CATALOGUE_PATH,
     CATALOGUE_PATH,
+    COULD_NOT_LOOK,
+    ECOSYSTEM_CATALOGUE_PATH,
+    ECOSYSTEM_ROW_IDS,
+    FAIL,
+    PASS,
     MisuseError,
     compute_attractiveness,
+    ecosystem_ticket_status,
+    grade_entry,
+    load_all_catalogues,
     load_catalogue,
     load_removal_log,
     log_removal,
@@ -90,6 +98,197 @@ def test_a_catalogue_entry_with_no_mechanism_is_refused(tmp_path: Path) -> None:
     }))
     with pytest.raises(MisuseError, match="no mechanism"):
         load_catalogue(bad)
+
+
+# -- the eco-system misuse catalogue (ticket 44, from ticket 19's resolution) -----------------
+
+
+def test_the_ecosystem_catalogue_loads_through_the_same_loader_and_names_a_mechanism_each() -> None:
+    """Third file, same `load_catalogue()` — ticket 19's default: no third loader."""
+    doc = load_catalogue(ECOSYSTEM_CATALOGUE_PATH)
+    assert len(doc["entries"]) == 4
+    for entry in doc["entries"]:
+        assert entry["risk"].strip()
+        assert entry["mechanism"].strip()
+
+
+def test_the_ecosystem_catalogue_names_ticket_19s_four_rows() -> None:
+    ids = {entry["id"] for entry in load_catalogue(ECOSYSTEM_CATALOGUE_PATH)["entries"]}
+    assert ids == set(ECOSYSTEM_ROW_IDS) == {
+        "publisher-games-own-feed-price",
+        "regulator-data-mispriced-downstream",
+        "adopter-buys-intel-on-rival",
+        "twin-valuation-used-in-negotiation",
+    }
+
+
+def test_the_three_catalogues_do_not_conflate_their_scopes() -> None:
+    """Three files, three scopes: no path is another's, no id appears twice across them, and the
+    eco-system rows each name a marketplace party the twin-scoped catalogues never mention."""
+    paths = {CATALOGUE_PATH, BEHAVIOURAL_CATALOGUE_PATH, ECOSYSTEM_CATALOGUE_PATH}
+    assert len(paths) == 3
+    loaded = load_all_catalogues()
+    assert [path for path, _ in loaded] == [CATALOGUE_PATH, BEHAVIOURAL_CATALOGUE_PATH, ECOSYSTEM_CATALOGUE_PATH]
+    seen: set[str] = set()
+    for _, doc in loaded:
+        ids = {e["id"] for e in doc["entries"]}
+        assert not (ids & seen)
+        seen |= ids
+    twin_scoped = {e["id"] for _, doc in loaded[:2] for e in doc["entries"]}
+    for word in ("publisher", "regulator", "rival", "negotiation"):
+        assert not any(word in tid for tid in twin_scoped), (
+            f"{word!r} found in a twin-scoped catalogue's own ids — the eco-system scope has leaked"
+        )
+    for entry in loaded[2][1]["entries"]:
+        assert any(w in entry["id"] for w in ("publisher", "regulator", "adopter", "twin-valuation"))
+
+
+def test_load_all_catalogues_refuses_an_id_declared_in_two_catalogues(tmp_path: Path) -> None:
+    import yaml
+
+    dup = tmp_path / "dup.yaml"
+    dup.write_text(yaml.safe_dump({
+        "schema": "twin.misuse-catalogue/v1", "version": 1,
+        "entries": [{"id": "suppressing-pay", "risk": "r", "mechanism": "m"}],
+    }))
+    with pytest.raises(MisuseError, match="declared in two catalogues"):
+        load_all_catalogues([BEHAVIOURAL_CATALOGUE_PATH, dup])
+
+
+def test_every_ecosystem_row_names_a_path_or_a_waiting_ticket() -> None:
+    """Ticket 19's default: every entry names an estate mechanism by path or a cage price. A row
+    whose price is not built yet says which ticket builds it, by number, rather than naming a
+    path that does not exist."""
+    for entry in load_catalogue(ECOSYSTEM_CATALOGUE_PATH)["entries"]:
+        assert entry.get("anchors") or entry.get("waits_on"), entry["id"]
+        for anchor in entry.get("anchors") or []:
+            assert isinstance(anchor, str) and anchor.strip()
+        for wait in entry.get("waits_on") or []:
+            assert str(wait["ticket"]).strip() and str(wait["for"]).strip()
+
+
+def test_the_harness_check_loads_all_three_catalogues_and_proves_the_refusal(tmp_path: Path) -> None:
+    """The check `twin verify` reports and `verify/misuse/verify-misuse.sh` grades: three files,
+    one loader, four ticket-19 ids, and a planted row with no mechanism refused."""
+    from twin.invariants import harness_registry
+    from twin.invariants.harness import context
+
+    check = harness_registry()["misuse_catalogues_load_and_every_row_names_a_mechanism"]
+    claim = check(context(tmp_path))
+    assert "3 catalogues" in claim and "4 eco-system rows" in claim and "refused" in claim
+
+
+# -- grading one row against a checkout ------------------------------------------------------
+
+
+def _open(number: str) -> str | None:
+    return "open"
+
+
+def _resolved(number: str) -> str | None:
+    return "resolved"
+
+
+def _unknown(number: str) -> str | None:
+    return None
+
+
+def _row(**fields: object) -> dict[str, object]:
+    return {"id": "x", "risk": "r", "mechanism": "m", **fields}
+
+
+def test_a_row_whose_anchors_all_resolve_passes(tmp_path: Path) -> None:
+    (tmp_path / "hub.py").write_text("def price(): ...\n")
+    estate = tmp_path / "estate"
+    (estate / "platform").mkdir(parents=True)
+    (estate / "platform" / "c.py").write_text("PRICE_KINDS = ()\n")
+    grade = grade_entry(
+        _row(anchors=["hub.py::price", "platform/c.py::PRICE_KINDS", "platform/c.py"]),
+        root=tmp_path, estate=estate, ticket_status=_open,
+    )
+    assert grade.outcome == PASS
+    assert "3 anchor" in grade.reason
+
+
+def test_a_row_anchored_to_a_missing_file_fails(tmp_path: Path) -> None:
+    grade = grade_entry(_row(anchors=["nowhere.py"]), root=tmp_path, estate=tmp_path, ticket_status=_open)
+    assert grade.outcome == FAIL
+    assert "nowhere.py" in grade.reason
+
+
+def test_a_row_anchored_to_a_token_the_file_lacks_fails(tmp_path: Path) -> None:
+    (tmp_path / "hub.py").write_text("def price(): ...\n")
+    grade = grade_entry(_row(anchors=["hub.py::widen_to"]), root=tmp_path, estate=tmp_path, ticket_status=_open)
+    assert grade.outcome == FAIL
+    assert "widen_to" in grade.reason
+
+
+def test_a_row_waiting_on_an_open_ticket_is_could_not_look_by_name(tmp_path: Path) -> None:
+    grade = grade_entry(
+        _row(waits_on=[{"ticket": "45", "for": "the switching price"}]),
+        root=tmp_path, estate=tmp_path, ticket_status=_open,
+    )
+    assert grade.outcome == COULD_NOT_LOOK
+    assert "ticket 45" in grade.reason and "the switching price" in grade.reason
+
+
+def test_a_row_still_waiting_on_a_resolved_ticket_fails(tmp_path: Path) -> None:
+    """The escape hatch closes itself: once the ticket a row waits on is resolved, the row must
+    name the built mechanism, or the gate says so."""
+    grade = grade_entry(
+        _row(waits_on=[{"ticket": "45", "for": "the switching price"}]),
+        root=tmp_path, estate=tmp_path, ticket_status=_resolved,
+    )
+    assert grade.outcome == FAIL
+    assert "resolved" in grade.reason and "45" in grade.reason
+
+
+def test_a_row_waiting_on_a_ticket_that_does_not_exist_fails(tmp_path: Path) -> None:
+    grade = grade_entry(
+        _row(waits_on=[{"ticket": "999", "for": "nothing"}]),
+        root=tmp_path, estate=tmp_path, ticket_status=_unknown,
+    )
+    assert grade.outcome == FAIL
+    assert "999" in grade.reason
+
+
+def test_a_row_with_neither_anchor_nor_waiting_ticket_fails(tmp_path: Path) -> None:
+    grade = grade_entry(_row(), root=tmp_path, estate=tmp_path, ticket_status=_open)
+    assert grade.outcome == FAIL
+
+
+def test_anchors_are_checked_before_a_waiting_ticket_can_excuse_them(tmp_path: Path) -> None:
+    """A row may name what exists today AND what it waits on; the missing path still fails."""
+    grade = grade_entry(
+        _row(anchors=["gone.py"], waits_on=[{"ticket": "45", "for": "x"}]),
+        root=tmp_path, estate=tmp_path, ticket_status=_open,
+    )
+    assert grade.outcome == FAIL
+
+
+def test_an_estate_anchor_with_no_estate_is_could_not_look(tmp_path: Path) -> None:
+    grade = grade_entry(_row(anchors=["platform/c.py"]), root=tmp_path, estate=None, ticket_status=_open)
+    assert grade.outcome == COULD_NOT_LOOK
+    assert "estate" in grade.reason
+
+
+def test_ecosystem_ticket_status_reads_the_status_line(tmp_path: Path) -> None:
+    (tmp_path / "45-switching.md").write_text("# 45\n\nType: task\nStatus: open\n")
+    (tmp_path / "19-misuse.md").write_text("# 19\n\nStatus: resolved\n")
+    assert ecosystem_ticket_status("45", tmp_path) == "open"
+    assert ecosystem_ticket_status("19", tmp_path) == "resolved"
+    assert ecosystem_ticket_status("7", tmp_path) is None
+
+
+def test_the_four_rows_grade_against_this_checkout() -> None:
+    """Every anchor the real rows name resolves in this checkout (hub, or the estate clone when
+    it is assembled), and the rows that wait on a ticket name one that is still open."""
+    from twin import ESTATE_CLONE_DIR, REPO_DIR
+
+    estate = ESTATE_CLONE_DIR if ESTATE_CLONE_DIR.is_dir() else None
+    for entry in load_catalogue(ECOSYSTEM_CATALOGUE_PATH)["entries"]:
+        grade = grade_entry(entry, root=REPO_DIR, estate=estate, ticket_status=ecosystem_ticket_status)
+        assert grade.outcome != FAIL, (entry["id"], grade.reason)
 
 
 # -- computed attractiveness ------------------------------------------------------------------
