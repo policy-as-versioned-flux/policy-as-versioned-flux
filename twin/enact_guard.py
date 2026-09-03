@@ -90,6 +90,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -172,32 +173,44 @@ DENY = "deny"
 
 
 class _Locus(NamedTuple):
-    """Where a `git` in a command string actually looks for its repository: the directory it
-    runs in, and the `--git-dir` / `--work-tree` it was handed, if any. The three things git
-    itself reads before it discovers a repository, carried as one value so the resolution below
-    hands git exactly what the command hands it and guesses at none of git's discovery rules."""
+    """Where the `git push` in a command string actually looks for its repository, and how it
+    would reach its remote: the directory it runs in, the `--git-dir` / `--work-tree` it was
+    handed, its `-c key=value` overrides, and the `GIT_*` assignments prefixed to it. Everything
+    git itself reads before it names a remote, carried as one value so the resolution below hands
+    git exactly what the command hands it and guesses at none of git's discovery rules."""
 
     cwd: str | None
     git_dir: str | None = None
     work_tree: str | None = None
+    configs: tuple[str, ...] = ()
+    env: tuple[tuple[str, str], ...] = ()
 
 
-# The hook process's own environment is not the shell's environment, and it must not decide
-# anything: a `GIT_DIR` inherited by the hook reaches BOTH resolutions below, so one pointing at
-# a checkout of this repository turns every bare push in every enactment checkout into a
-# self-push, and one pointing at an enactment checkout makes that checkout "our own". Scrubbed at
-# the boundary (ticket 65): the guard resolves from the command string and the cwd it was handed.
+# The hook process's own `GIT_DIR` reaches BOTH resolutions below if it is left alone: one
+# pointing at a checkout of this repository turns every bare push in every enactment checkout
+# into a self-push, and one pointing at an enactment checkout makes that checkout "our own". So
+# it is scrubbed for the first reading of the target and always for the own-repository reading
+# (ticket 65). It is NOT ignored: in Claude Code the hook and the Bash tool inherit the same
+# process environment (review of 2026-09-03), so a `GIT_DIR` the hook sees is one the push sees
+# too, and `_push_target` reads the target a second time with it honoured when the command names
+# none of its own. Either reading naming an enactment repository is a refusal.
 _SCRUBBED_ENV = ("GIT_DIR", "GIT_WORK_TREE")
 
 
-def _remote_url(remote: str, at: _Locus) -> str:
+def _remote_url(remote: str, at: _Locus, honour_own_env: bool = False) -> str:
     argv = ["git"]
     if at.git_dir is not None:
         argv += ["--git-dir", at.git_dir]
     if at.work_tree is not None:
         argv += ["--work-tree", at.work_tree]
+    for config in at.configs:
+        argv += ["-c", config]
     argv += ["remote", "get-url", "--push", remote]
-    env = {key: value for key, value in os.environ.items() if key not in _SCRUBBED_ENV}
+    env = {
+        key: value for key, value in os.environ.items()
+        if honour_own_env or key not in _SCRUBBED_ENV
+    }
+    env.update(at.env)
     try:
         return subprocess.run(
             argv, cwd=at.cwd or None, env=env,
@@ -207,80 +220,127 @@ def _remote_url(remote: str, at: _Locus) -> str:
         return ""
 
 
-_GIT_C = re.compile(r"\bgit\b(?P<flags>(?:\s+-[^\s]+(?:\s+[^\s]+)?)*?)\s+-C\s+(?P<dir>[^\s;&|]+)")
-_LEADING_CD = re.compile(r"(?:^|[;&|]\s*)cd\s+(?P<dir>[^\s;&|]+)\s*(?:&&|;)")
-# `git --git-dir=<d>`, `git --git-dir <d>`, `--work-tree` likewise, and the same two spelt as an
-# environment prefix (`GIT_DIR=<d> git push ...`, `env GIT_DIR=<d> ...`, `export GIT_DIR=<d>;`).
-# The option wins over the prefix when both are present, as it does in git.
-_GIT_DIR_OPTION = re.compile(r"--git-dir(?:=|\s+)(?P<dir>[^\s;&|]+)")
-_WORK_TREE_OPTION = re.compile(r"--work-tree(?:=|\s+)(?P<dir>[^\s;&|]+)")
-_GIT_DIR_ENV = re.compile(r"\bGIT_DIR=(?P<dir>[^\s;&|]+)")
-_WORK_TREE_ENV = re.compile(r"\bGIT_WORK_TREE=(?P<dir>[^\s;&|]+)")
+_ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 
 
-def _effective_cwd(command: str, cwd: str | None) -> str | None:
-    """The directory the `git push` in this command actually acts on.
+def _words(segment: str) -> list[str]:
+    """One shell segment split as the shell would split it: quotes removed, a quoted space kept
+    inside its word. A segment shlex cannot parse (an unbalanced quote) falls back to whitespace,
+    which is what the first cut always did."""
+    try:
+        return shlex.split(segment, posix=True)
+    except ValueError:
+        return segment.split()
 
-    A push names a remote, not a URL, so the remote has to be resolved -- and it
-    resolves in whichever repository git is pointed at, which is NOT always the
-    shell's own directory. Two ways it moves, both observed for real:
 
-      git -C .estate-clone/platform push origin ecosystem/thin-slice
-      cd .estate-clone/platform && git push origin ecosystem/thin-slice
-
-    Resolved against `cwd` alone, both read the CALLER's `origin` instead. On
-    2026-08-31 that was this repository, whose own push is carved out, so the
-    guard admitted a push to all six enactment repositories while reporting
-    nothing -- a refusal that silently did not fire. The `cd` half was named as
-    a known ceiling in `_push_target`'s docstring and never closed; `-C` is the
-    same hole wearing a flag.
-
-    A relative directory is resolved against `cwd`, because that is what the
-    shell would do. An unreadable or absent directory returns it anyway: the
-    resolution below then finds no remote, `url` is empty, and the refusal
-    stays closed rather than falling open.
-    """
-    moved = None
-    found = _GIT_C.search(command)
-    if found:
-        moved = found.group("dir")
-    else:
-        found = _LEADING_CD.search(command)
-        if found:
-            moved = found.group("dir")
-    if moved is None:
-        return cwd
-    moved = moved.strip("\"'")
-    path = Path(moved)
+def _directory(word: str, relative_to: str | None) -> str:
+    """A directory word as the shell would hand it on: tilde expanded, relative to where the
+    command stands by then. The tilde is expanded after the quotes are gone, so `"~/x"` is read
+    as `~/x` though the shell would not expand it; and `--git-dir=~/x` is expanded though the
+    shell would not (git then says fatal and pushes nothing). Both mismatches point the same way,
+    a refusal of a push that would not have happened, which is the safe way round -- an empty
+    resolution ADMITS, so the guard expands wherever the shell might."""
+    path = Path(os.path.expanduser(word))
     if not path.is_absolute():
-        path = Path(cwd or ".") / path
+        path = Path(relative_to or ".") / path
     return str(path)
 
 
+def _is_git(word: str) -> bool:
+    return word == "git" or word.endswith("/git")
+
+
 def _effective_locus(command: str, cwd: str | None) -> _Locus:
-    """`_effective_cwd`, extended to the `--git-dir` family (ticket 65, review finding M17).
+    """The locus of the `git push` in this command: what git would read to find its remote.
 
-    `git --git-dir=<enactment>/.git push origin main` reads <enactment>'s remote from
-    wherever the shell stands, and so do `--git-dir <dir>`, `--git-dir`+`--work-tree`,
-    and `GIT_DIR=<dir>` as a prefix to the command. Resolved against `cwd` alone, every
-    one of them read the caller's `origin` instead -- the `-C` hole wearing another
-    flag, and admitted the same way when the caller stood in this repository.
+    A push names a remote, not a URL, so the remote has to be resolved -- and it resolves in
+    whichever repository git is pointed at, which is NOT always the shell's own directory.
+    The ways it moves, each observed for real:
 
-    Observed with git 2.55 on 2026-09-03 rather than assumed: `--work-tree` ALONE does
-    not move discovery (git still walks up from the cwd), and an absent `--git-dir` is
-    fatal, so nothing resolves and `url` is empty. Neither rule is re-implemented
-    here. The parsed values are handed to git as the same options, relative paths
-    included, in the directory `-C` or `cd` moved to -- so what the guard resolves is
-    what git would, including the cases git refuses.
+      git -C .estate-clone/platform push origin ecosystem/thin-slice        (2026-08-31)
+      cd .estate-clone/platform && git push origin ecosystem/thin-slice     (2026-08-31)
+      git --git-dir=<enactment>/.git push origin main                       (M17, ticket 65)
+      GIT_DIR=<enactment>/.git git push origin main                         (M17, ticket 65)
+      git -c remote.origin.pushurl=<enactment> push origin main             (review 2026-09-03)
+
+    Resolved against `cwd` alone, every one of them read the CALLER's `origin` instead; when
+    the caller stood in this repository, whose own push is carved out, the guard admitted a
+    push to the enactment repositories while reporting nothing.
+
+    **Per segment, not per command** (review of 2026-09-03, blocking). The first cut searched
+    the whole string, so `git --git-dir=<hub>/.git log; git push origin main` made in an
+    enactment checkout resolved the hub's origin and was admitted. The option, the `-C`, the
+    `-c` and the `GIT_*=` prefix are read from the segment that holds the `push` and no other.
+    From the segments before it, only what the shell itself carries forward: a `cd` (folded in
+    order, each relative to the last, as the shell does) and an `export GIT_*=...`. A bare
+    `GIT_DIR=x;` in an earlier segment is a shell variable, not an exported one, and is not
+    carried: carrying it would resolve where the push does not go.
+
+    Observed with git 2.55 on 2026-09-03 rather than assumed: `--work-tree` ALONE does not
+    move discovery (git still walks up from the cwd), an absent `--git-dir` is fatal so nothing
+    resolves and `url` is empty, and a relative `--git-dir` after `-C` is relative to the `-C`
+    directory. None of that is re-implemented here: the parsed values are handed to git as the
+    same options, in the same environment, in the directory the command moved to -- so what
+    the guard resolves is what git would, including the cases git refuses.
     """
-    at = _effective_cwd(command, cwd)
-    option = _GIT_DIR_OPTION.search(command) or _GIT_DIR_ENV.search(command)
-    tree = _WORK_TREE_OPTION.search(command) or _WORK_TREE_ENV.search(command)
-    return _Locus(
-        at,
-        option.group("dir").strip("\"'") if option else None,
-        tree.group("dir").strip("\"'") if tree else None,
-    )
+    segments = _SHELL_SEGMENT.split(command)
+    pushing = next((i for i, s in enumerate(segments) if _PUSH.search(s)), None)
+    if pushing is None:
+        return _Locus(cwd)
+
+    at = cwd
+    env: dict[str, str] = {}
+    for before in segments[:pushing]:
+        words = _words(before)
+        if not words:
+            continue
+        if words[0] == "cd":
+            at = _directory(words[1] if len(words) > 1 else "~", at)
+        elif words[0] == "export":
+            for word in words[1:]:
+                if _ASSIGNMENT.match(word) and word.startswith("GIT_"):
+                    name, value = word.split("=", 1)
+                    env[name] = os.path.expanduser(value)
+
+    words = _words(segments[pushing])
+    git_dir: str | None = None
+    work_tree: str | None = None
+    configs: list[str] = []
+    i = 0
+    # Before the `git` word: `env`, a wrapper, and the assignment prefix the shell would hand
+    # git as its environment.
+    while i < len(words) and not _is_git(words[i]):
+        if _ASSIGNMENT.match(words[i]) and words[i].startswith("GIT_"):
+            name, value = words[i].split("=", 1)
+            env[name] = os.path.expanduser(value)
+        i += 1
+    i += 1
+    # Between `git` and `push`: git's own global options, the ones that move the repository or
+    # rewrite the remote. `-C` folds like `cd` does, because git makes each relative to the last.
+    while i < len(words) and words[i] != "push":
+        word, following = words[i], (words[i + 1] if i + 1 < len(words) else "")
+        if word == "-C":
+            at = _directory(following, at)
+            i += 2
+            continue
+        if word in ("--git-dir", "--work-tree", "-c"):
+            value, i = following, i + 2
+        elif word.startswith(("--git-dir=", "--work-tree=")):
+            word, value = word.split("=", 1)
+            i += 1
+        elif word.startswith("-c") and not word.startswith("--"):
+            word, value = "-c", word[2:]
+            i += 1
+        else:
+            i += 1
+            continue
+        if word == "--git-dir":
+            git_dir = os.path.expanduser(value)
+        elif word == "--work-tree":
+            work_tree = os.path.expanduser(value)
+        else:
+            configs.append(value)
+    return _Locus(at, git_dir, work_tree, tuple(configs), tuple(env.items()))
 
 
 def _normalise(url: str) -> str:
@@ -343,21 +403,32 @@ def _push_target(command: str, cwd: str | None) -> str | None:
     # is not one.
     arguments = [t for t in found.group("rest").split() if not t.startswith("-")]
     target = arguments[0] if arguments else "origin"
-    # Resolved in the repository git is actually pointed at (`git -C`, a leading `cd`,
-    # `--git-dir`, `GIT_DIR=`), never blindly in the caller's own directory -- see
-    # _effective_cwd and _effective_locus.
-    url = (target if ("://" in target or "@" in target or "/" in target)
-           else _remote_url(target, _effective_locus(command, cwd)))
+    if "://" in target or "@" in target or "/" in target:
+        urls = [target]
+    else:
+        # Resolved in the repository git is actually pointed at (`-C`, a `cd` before the push,
+        # `--git-dir`, `GIT_DIR=`, `-c remote.*`), never blindly in the caller's own directory
+        # -- see _effective_locus. And read a second time with the hook's own `GIT_DIR` honoured
+        # when the command names none, because the push inherits that environment too (see
+        # _SCRUBBED_ENV): a refusal if either reading names an enactment repository.
+        locus = _effective_locus(command, cwd)
+        urls = [_remote_url(target, locus)]
+        named = locus.git_dir is not None or any(key in dict(locus.env) for key in _SCRUBBED_ENV)
+        if not named and any(key in os.environ for key in _SCRUBBED_ENV):
+            urls.append(_remote_url(target, locus, honour_own_env=True))
 
-    resolved = ENACTMENT_REPOSITORY.search(url)
-    if not resolved:
-        return None
-
-    # Equality, not a suffix test: `endswith` would admit `evil-github.com/…/policy-as-versioned-flux`.
-    own = _own_repository(cwd)
-    if own and _normalise(url) == own:
-        return None
-    return resolved.group(0)
+    own: str | None = None
+    for url in urls:
+        resolved = ENACTMENT_REPOSITORY.search(url)
+        if not resolved:
+            continue
+        # Equality, not a suffix test: `endswith` would admit `evil-github.com/…/policy-as-versioned-flux`.
+        if own is None:
+            own = _own_repository(cwd)
+        if own and _normalise(url) == own:
+            continue
+        return resolved.group(0)
+    return None
 
 
 def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -> str | None:
