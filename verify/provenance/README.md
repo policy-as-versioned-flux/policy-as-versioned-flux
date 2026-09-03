@@ -46,6 +46,7 @@ release → merge → PR → scenario → feed. End to end, not asserted.
 |------|------|
 | `provenance.py` | walks + asserts the chain; reuses `wargamer.py` (feed→scenario→PR) and reads the committed SPIRE manifests (workload + device SVID). `chain` / `walk` / `selfcheck`. |
 | `verify-provenance.sh` | the beat — the chain asserts, the **one link that verifies cryptographically right here** (the ed25519 feed signature + a forgery refused), and optional Rekor / SPIRE live tails. |
+| `verify-release-evidence-reaches-main.sh` | ticket 53 — the signed release-gate evidence **reaches what the adopters read**: every `computed-semver/evidence/N.json` on platform `origin/main` and on each adopter's pinned tag has its cosign `N.json.bundle` beside it, and `cut-release-push.sh` pushes the branch and the tags in one `--atomic` push. `selfcheck` proves the graders bite on the 2026-08-31 shapes (and on the real, immutable `v2.0.0`). Exit 3 when the platform clone cannot be read. |
 
 ## Run it
 
