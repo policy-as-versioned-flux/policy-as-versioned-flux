@@ -50,7 +50,13 @@ def validate(doc, kinds, roles):
 
     need(doc.get("schema") == SCHEMA, f"schema is {doc.get('schema')!r}, not {SCHEMA!r}")
     need(bool(doc.get("org")), "no org: a claim file belongs to one adopter's overlay")
+    # Ticket 92: a rehearsal run of the local clock (--inject) marks its claim file injected on
+    # its face, and that mark is exactly what stops it here. A rehearsal is never cited.
+    need(not doc.get("injected"),
+         "injected: true -- this is a world-simulator rehearsal claim (talk/local-clock.sh "
+         "--inject) and it is refused wherever it is presented")
     run = doc.get("run") or {}
+    headless = bool(run.get("headless"))
     need(run.get("skill") == "classify-and-judge",
          f"run.skill is {run.get('skill')!r}: this file names no skill that produced it")
     need(str(run.get("operator_role", "")) in roles,
@@ -81,6 +87,11 @@ def validate(doc, kinds, roles):
              f"never invents a claim kind")
         need(bool(claim.get("component")), f"{where}: names no component")
         need(bool(claim.get("evidence")), f"{where}: carries no evidence")
+        need(not claim.get("injected"), f"{where}: injected: true -- a rehearsal claim is refused")
+        # A headless run (the local clock, ticket 92) has nobody at the keyboard, and an override
+        # is a human's calibrated judgement claimed by a role. Bindings and positions only.
+        need(not (headless and kind == "override"),
+             f"{where}: an override from a headless run -- no human judged it, so no role can claim it")
         price_eligible = claim.get("price_eligible")
         need(isinstance(price_eligible, bool), f"{where}: price_eligible is not stated")
 
