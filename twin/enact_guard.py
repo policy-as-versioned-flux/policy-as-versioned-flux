@@ -93,7 +93,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 # See the module docstring's "Mode" section. One word, checked in, visible in a diff and a
 # `git blame` — not a magic env var nobody would find by reading this file.
@@ -171,11 +171,37 @@ def _merge_is_made_as_the_other_hand(command: str) -> bool:
 DENY = "deny"
 
 
-def _remote_url(remote: str, cwd: str | None) -> str:
+class _Locus(NamedTuple):
+    """Where a `git` in a command string actually looks for its repository: the directory it
+    runs in, and the `--git-dir` / `--work-tree` it was handed, if any. The three things git
+    itself reads before it discovers a repository, carried as one value so the resolution below
+    hands git exactly what the command hands it and guesses at none of git's discovery rules."""
+
+    cwd: str | None
+    git_dir: str | None = None
+    work_tree: str | None = None
+
+
+# The hook process's own environment is not the shell's environment, and it must not decide
+# anything: a `GIT_DIR` inherited by the hook reaches BOTH resolutions below, so one pointing at
+# a checkout of this repository turns every bare push in every enactment checkout into a
+# self-push, and one pointing at an enactment checkout makes that checkout "our own". Scrubbed at
+# the boundary (ticket 65): the guard resolves from the command string and the cwd it was handed.
+_SCRUBBED_ENV = ("GIT_DIR", "GIT_WORK_TREE")
+
+
+def _remote_url(remote: str, at: _Locus) -> str:
+    argv = ["git"]
+    if at.git_dir is not None:
+        argv += ["--git-dir", at.git_dir]
+    if at.work_tree is not None:
+        argv += ["--work-tree", at.work_tree]
+    argv += ["remote", "get-url", "--push", remote]
+    env = {key: value for key, value in os.environ.items() if key not in _SCRUBBED_ENV}
     try:
         return subprocess.run(
-            ["git", "remote", "get-url", "--push", remote],
-            cwd=cwd or None, capture_output=True, text=True, timeout=5, check=False,
+            argv, cwd=at.cwd or None, env=env,
+            capture_output=True, text=True, timeout=5, check=False,
         ).stdout
     except (OSError, subprocess.SubprocessError):
         return ""
@@ -183,6 +209,13 @@ def _remote_url(remote: str, cwd: str | None) -> str:
 
 _GIT_C = re.compile(r"\bgit\b(?P<flags>(?:\s+-[^\s]+(?:\s+[^\s]+)?)*?)\s+-C\s+(?P<dir>[^\s;&|]+)")
 _LEADING_CD = re.compile(r"(?:^|[;&|]\s*)cd\s+(?P<dir>[^\s;&|]+)\s*(?:&&|;)")
+# `git --git-dir=<d>`, `git --git-dir <d>`, `--work-tree` likewise, and the same two spelt as an
+# environment prefix (`GIT_DIR=<d> git push ...`, `env GIT_DIR=<d> ...`, `export GIT_DIR=<d>;`).
+# The option wins over the prefix when both are present, as it does in git.
+_GIT_DIR_OPTION = re.compile(r"--git-dir(?:=|\s+)(?P<dir>[^\s;&|]+)")
+_WORK_TREE_OPTION = re.compile(r"--work-tree(?:=|\s+)(?P<dir>[^\s;&|]+)")
+_GIT_DIR_ENV = re.compile(r"\bGIT_DIR=(?P<dir>[^\s;&|]+)")
+_WORK_TREE_ENV = re.compile(r"\bGIT_WORK_TREE=(?P<dir>[^\s;&|]+)")
 
 
 def _effective_cwd(command: str, cwd: str | None) -> str | None:
@@ -224,6 +257,32 @@ def _effective_cwd(command: str, cwd: str | None) -> str | None:
     return str(path)
 
 
+def _effective_locus(command: str, cwd: str | None) -> _Locus:
+    """`_effective_cwd`, extended to the `--git-dir` family (ticket 65, review finding M17).
+
+    `git --git-dir=<enactment>/.git push origin main` reads <enactment>'s remote from
+    wherever the shell stands, and so do `--git-dir <dir>`, `--git-dir`+`--work-tree`,
+    and `GIT_DIR=<dir>` as a prefix to the command. Resolved against `cwd` alone, every
+    one of them read the caller's `origin` instead -- the `-C` hole wearing another
+    flag, and admitted the same way when the caller stood in this repository.
+
+    Observed with git 2.55 on 2026-09-03 rather than assumed: `--work-tree` ALONE does
+    not move discovery (git still walks up from the cwd), and an absent `--git-dir` is
+    fatal, so nothing resolves and `url` is empty. Neither rule is re-implemented
+    here. The parsed values are handed to git as the same options, relative paths
+    included, in the directory `-C` or `cd` moved to -- so what the guard resolves is
+    what git would, including the cases git refuses.
+    """
+    at = _effective_cwd(command, cwd)
+    option = _GIT_DIR_OPTION.search(command) or _GIT_DIR_ENV.search(command)
+    tree = _WORK_TREE_OPTION.search(command) or _WORK_TREE_ENV.search(command)
+    return _Locus(
+        at,
+        option.group("dir").strip("\"'") if option else None,
+        tree.group("dir").strip("\"'") if tree else None,
+    )
+
+
 def _normalise(url: str) -> str:
     """`host/org/repo`, lowercased, so an ssh remote and an https one compare equal.
 
@@ -248,7 +307,7 @@ def _own_repository(cwd: str | None) -> str:
     an empty string matches no target, so the refusal stays closed when it cannot tell.
     """
     del cwd
-    return _normalise(_remote_url("origin", str(Path(__file__).resolve().parents[1])))
+    return _normalise(_remote_url("origin", _Locus(str(Path(__file__).resolve().parents[1]))))
 
 
 def _push_target(command: str, cwd: str | None) -> str | None:
@@ -284,10 +343,11 @@ def _push_target(command: str, cwd: str | None) -> str | None:
     # is not one.
     arguments = [t for t in found.group("rest").split() if not t.startswith("-")]
     target = arguments[0] if arguments else "origin"
-    # Resolved in the repository git is actually pointed at (`git -C`, a leading
-    # `cd`), never blindly in the caller's own directory -- see _effective_cwd.
+    # Resolved in the repository git is actually pointed at (`git -C`, a leading `cd`,
+    # `--git-dir`, `GIT_DIR=`), never blindly in the caller's own directory -- see
+    # _effective_cwd and _effective_locus.
     url = (target if ("://" in target or "@" in target or "/" in target)
-           else _remote_url(target, _effective_cwd(command, cwd)))
+           else _remote_url(target, _effective_locus(command, cwd)))
 
     resolved = ENACTMENT_REPOSITORY.search(url)
     if not resolved:
