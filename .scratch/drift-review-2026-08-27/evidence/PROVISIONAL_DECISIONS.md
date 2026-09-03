@@ -1,12 +1,22 @@
 # Provisional decisions (bare agree / bare letter / deferred; architectural or scope) — 211
 
-> **Annotated 2026-09-03 (eco-system ticket 17).** Entries are never deleted or renumbered, because
-> `REVERSALS.json`, `DECISION_AUDIT.json`, appendix C and `REGRILL-ANSWERS.md` cite them by id. A
-> duplicate capture carries a `Status` line pointing at its original and counts once. Known
-> duplicates: P012 and P034 are second and third captures of P010; P013 and P035 are second and
-> third captures of P011. The 211 in the title is captures, not decisions; distinct decisions are
-> 207. P010 is marked **rejected** (reversal verdict `reverse`; the owner confirmed full depth in
-> `REGRILL-ANSWERS.md` row 3-4 on 2026-08-28).
+> **Annotated 2026-09-03, recounted 2026-09-04 (eco-system ticket 17).** Entries are never deleted
+> or renumbered, because `REVERSALS.json`, `DECISION_AUDIT.json`, appendix C and `REGRILL-ANSWERS.md`
+> cite them by id. A duplicate capture carries a `Status` or `Duplicate of` line pointing at its
+> original and counts once. The 211 in the title is captures, not decisions. Distinct decisions by
+> the method below: **206**.
+>
+> Method: group the 211 `## Pnnn [transcript question-time]` headings by question-time; where a
+> group spans more than one transcript id, read its captures and mark the same-question ones as
+> duplicates of the earliest. Four groups span transcripts: 2026-08-18T02:20 (P010, P012, P034: one
+> question), 2026-08-19T17:13 (P011, P013, P035: one question), 2026-08-20T10:50 (P037 and P042:
+> one question; P043 is a second question from P042's transcript), 2026-08-20T19:30 (P040 and P044:
+> two different questions). Five duplicate captures: P012, P034, P013, P035, P042; 211 − 5 = 206.
+> Same-minute captures from one transcript are multi-question prompts and were not treated as
+> duplicates. The method finds only duplicates whose captures share a question-time, so 206 is the
+> count by that method, not proof that no other duplicate exists. P010 is marked **rejected**
+> (reversal verdict `reverse`; the owner confirmed full depth in `REGRILL-ANSWERS.md` row 3-4 on
+> 2026-08-28).
 
 ## P001 [2026-07-23T1958_a3a17a79 2026-07-24T15:13] Where Flux distribution sits in the exploded hourglass
 - Q: Assistant placed Flux distribution at the hourglass neck (the single admission decision) with shift-left as a dashed pre-admission catch, and flagged: if the user thinks Flux belongs in the top bulb (authoring/distribution) instead, it's a one-line change.
@@ -272,6 +282,7 @@
 - Recommended then: No option explicitly labeled recommended; framed by ascending risk/reversibility.
 - Reply: `[no free-text reply captured; answered via AskUserQuestion UI. Subsequent narrative implies Tier 1 approved immediately,` (bare_letter, accepted=True)
 - Recorded in: .scratch/multi-org-estate/, .scratch/computed-semver/, .scratch/govern-what-you-dont-control/
+- **De-duplicated 2026-09-04 (eco-system ticket 17):** P042 is a second capture of this same AskUserQuestion (2026-08-20T10:50) from a second transcript. Counts once, here. Its verdict is untouched by ticket 17.
 
 ## P038 [2026-08-20T1046_68fb0689 2026-08-20T17:32] Visibility of the six new GitHub org repos created for mo-08
 - Q: mo-08 creates real repos in six existing empty GitHub orgs and pushes filtered history. What visibility should those repos have?
@@ -307,6 +318,7 @@
 - Recommended then: No option marked recommended; presented neutrally
 - Reply: `[not captured as text in digest; inferred all three tiers approved from subsequent sequential execution]` (bare_letter, accepted=False)
 - Recorded in: .scratch/multi-org-estate/ and .scratch/computed-semver/ maps
+- **Duplicate of P037 (2026-09-04, eco-system ticket 17):** same AskUserQuestion at 2026-08-20T10:50, second transcript. Counts once, under P037.
 
 ## P043 [2026-08-21T1210_08208ccc 2026-08-20T10:50] Include grilling/prototype tickets in this pass?
 - Q: computed-semver/03,04,05 are grilling tickets, 06 a prototype ticket. Include them?

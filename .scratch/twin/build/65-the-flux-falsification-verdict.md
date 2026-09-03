@@ -293,13 +293,18 @@ The section above computed the expiry and recorded the owner's choice on 2026-08
 in this file then said in so many words is the consequence for the Status: from 2026-08-16T05:00Z
 the verdict is **settled**, and it is settled *unmeasured*. Nothing here is weakened to say so. The
 floor stands at 0.90, the window stands as declared, the elimination path stays shut, and the
-harness guards `flux_coverage_floor_is_still_reachable` and `drift_window_is_actually_being_sampled`
-stay red as the finding rather than as a defect (the memory of it is
-`project_flux_verdict_unmeasured`; twin/README.md's "Found later" account is the long form).
+harness guard `flux_coverage_floor_is_still_reachable` stays red as the finding rather than as a
+defect (build ticket 70's finding 1; twin/README.md's "Found later" account is the long form). Read
+on 2026-09-04 with `python -m twin verify --only flux_coverage_floor_is_still_reachable`: `FAIL
+... 3/1966 sample(s), only 63 days ... a ceiling of 69.4%`. The other guard,
+`drift_window_is_actually_being_sampled`, red at the 2026-08-15 audit above, is green on the same
+day: `PASS ... 15 sample(s) in an open window, newest 2026-09-03, 63 day(s) left`. Samples now land
+in the window; they cannot land enough of it. Only the first guard is the finding.
 
 What follows from a settled-unmeasured verdict:
 
-- `66 ← 65` is relaxed (the note at line ~139 and the constitution's dated correction). The
+- `66 ← 65` is relaxed (the dated bracket under "The blocking chain is unchanged" above, and the
+  constitution's dated correction). The
   propose-only PR channel never needed a verdict, and the policy-pinning half of 66 (its criterion
   4, "signed, pinned dependency consumed by real separate repositories") now takes *unmeasured* as
   its input: Flux is the distribution arm on the evidence of the pins alone, and no claim that

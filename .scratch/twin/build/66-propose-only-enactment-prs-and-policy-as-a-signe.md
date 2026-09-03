@@ -42,11 +42,15 @@ the pinned platform and opens a pull request only when a residual crosses a band
 schedule for the first time on 2026-09-01 12:01Z on driftwood and returned `[]`, so **no proposal
 PR has yet opened** (eco-system tickets 60 and 74; 78 adds the tighten-only clamp it lacks). The
 2026-08-31 thin-slice pull requests are sometimes cited as this channel working; they are not.
-The assistant opened them with `gh pr create` under the owner's account (platform #5,
-2026-08-31T08:54Z, is the first), `gh pr merge` was declined by Claude Code's permission
-classifier rather than by `enact_guard.py`, and the same day found the guard's bare-remote hole
-(a push to an enactment repo admitted as a self-push; fixed with four tests, hub `d81f202`). So those PRs evidence the *discipline* (pull requests opened, nothing merged) and neither
-layer here nor `twin propose`. Since eco-system ticket 88 (2026-09-03) the guard's checked-in mode
+The assistant opened them with `gh pr create` under the owner's account at 2026-08-31T08:54Z
+(platform #5, driftwood #12, tuppence #9, ludlow #8); the assistant's `gh pr merge` was declined
+by Claude Code's permission classifier rather than by `enact_guard.py`; and the owner merged
+every one of them by hand the same day, platform #3, #4 and #5 at 13:52Z and the three adopters'
+at 16:23Z (`gh pr list --state all --json mergedAt,mergedBy` on each repo, read 2026-09-04: all
+`mergedBy: chrisns`). The same day also found the guard's bare-remote hole (a push to an
+enactment repo admitted as a self-push; fixed with four tests, hub `d81f202`). So those PRs
+evidence that the assistant did not merge and a human did, which is criterion 1's second half
+holding; they evidence neither its first half, nor either layer here, nor `twin propose`. Since eco-system ticket 88 (2026-09-03) the guard's checked-in mode
 is `other-hand`: a merge is admitted only as the app `pavc-other-hand`, never as the owner's
 token; `twin/` itself still has no merge surface. Criterion 1 stays half, and its other half is
 owned by eco-system ticket 74 (the first real proposal PR, merged by a human), not by this file.
