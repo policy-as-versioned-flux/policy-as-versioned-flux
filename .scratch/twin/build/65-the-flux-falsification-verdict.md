@@ -30,8 +30,18 @@ the amendment either way; a test whose negative result changes nothing was not a
 
 **Blocked by:** 64, 29, 11
 
-**Status:** pre-registered, **VERDICT PENDING** — 2026-08-15. The same honest split build tickets
-64 and 78 drew for themselves. Everything that must be fixed *before* the result is known is built,
+**Status:** pre-registered, **CLOSED UNMEASURED** — 2026-09-03 (eco-system ticket 17). Read
+`VERDICT PENDING` from 2026-08-15. From 2026-08-16T05:00Z the pre-registered 90% coverage floor is
+unreachable by any probing schedule (the "Found later" section below, build ticket 70), and the
+owner chose to record that rather than restart the probe. So `continuous-state` settles
+`unmeasured`, never `falsified`; `amendment_if_falsified` does not fire and spec story 81 stands
+unamended; `point-in-time` cannot be concluded, because it is entailed only when both continuous
+branches are falsified; `continuous-action` was `unmeasured` from the start. The window still
+closes 2026-11-06 in `window.yaml` and `verdict.decide` still reads it then, but the reading is
+settled and nothing that happens between now and then can change it. The checklist below is left
+as the 2026-08-15 record: 7/9 met, the two open items close as *unmeasured*, not as met.
+
+*As written on 2026-08-15:* everything that must be fixed *before* the result is known is built,
 tested and committed: the risk basis, the three branches, the coverage floor, the decision rule and
 the spec amendment for the failing case. What is not done is the verdict, because the data cannot
 carry one — build ticket 64's window is 9% elapsed at **1% coverage** and closes 2026-11-06.
@@ -139,6 +149,11 @@ committed, the half that reads the data is open and named. Nothing here reads a 
 verdict, which waits on the window. The constitution's own note stands: relaxing `66 ← 65` is the
 next largest available cut, because the propose-only PR channel needs no verdict — only the
 policy-pinning half does.
+
+> **Relaxed 2026-09-03 (eco-system ticket 17).** `66 ← 65` is gone: build ticket 66 reads
+> `Blocked by: none`, and the constitution carries a dated correction under "The critical path".
+> The chain was never cut while it mattered; instead this ticket closed *unmeasured*, so the chain
+> was gating the enactment arm on a question with no answer. See the closing section below.
 
 ## What is honestly not yet true
 
@@ -267,3 +282,34 @@ rather than `falsified`, `amendment_if_falsified` above does **not** fire, spec 
 amended, and the residual `point-in-time` branch cannot be concluded either. The elimination path
 staying closed on this outcome is this ticket's own protection working as designed. Nothing here is
 weakened to accommodate that: the floor stands at 0.90 and the window stands as declared.
+
+## Closed unmeasured — 2026-09-03
+
+Added by eco-system ticket 17 (the follow-ups from the 2026-08-05 itemisation, AUG-05-CUT §2.2),
+following the precedent above of amending the ticket that holds the finding rather than only
+naming it elsewhere.
+
+The section above computed the expiry and recorded the owner's choice on 2026-08-15. What no line
+in this file then said in so many words is the consequence for the Status: from 2026-08-16T05:00Z
+the verdict is **settled**, and it is settled *unmeasured*. Nothing here is weakened to say so. The
+floor stands at 0.90, the window stands as declared, the elimination path stays shut, and the
+harness guards `flux_coverage_floor_is_still_reachable` and `drift_window_is_actually_being_sampled`
+stay red as the finding rather than as a defect (the memory of it is
+`project_flux_verdict_unmeasured`; twin/README.md's "Found later" account is the long form).
+
+What follows from a settled-unmeasured verdict:
+
+- `66 ← 65` is relaxed (the note at line ~139 and the constitution's dated correction). The
+  propose-only PR channel never needed a verdict, and the policy-pinning half of 66 (its criterion
+  4, "signed, pinned dependency consumed by real separate repositories") now takes *unmeasured* as
+  its input: Flux is the distribution arm on the evidence of the pins alone, and no claim that
+  continuous reconciliation is *required* for a priced impact rests on this ticket. Reversal 1 in
+  `REGRILL-ANSWERS.md` (2026-08-28) already says Flux is the distribution arm; this is the twin
+  record catching up.
+- Spec story 81's "verification substrate" half is neither amended nor confirmed. A reader who
+  needs the interval-shaped hop graded (the risk basis above) has no measured basis for it from this
+  window; the £ engine grades it at the evidence-ladder rung the pins earn, which is the point the
+  risk basis makes.
+- A second window is the only route to a measured answer, and opening one is a real instrument
+  against a real cluster with its own pre-registration and its own reachability guard. No ticket
+  opens it today, and this note does not.

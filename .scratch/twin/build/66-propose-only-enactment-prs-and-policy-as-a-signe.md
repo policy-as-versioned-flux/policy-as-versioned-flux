@@ -28,13 +28,34 @@ site, and a forgotten call site fails open. An absence has no call site to forge
 **Do not adopt AWS Dogwood for this.** The evaluated verdict is in the ticket-27 note. Use plain
 Cedar if a policy layer is wanted, and treat action-boundary monitoring as the *class* it is.
 
-**Blocked by:** 65
+**Blocked by:** none — was 65, relaxed 2026-09-03 (eco-system ticket 17). The constitution
+named this cut on 2026-08-05 and it was never taken; instead 65 closed *unmeasured* from
+2026-08-16, so the block was gating the enactment arm on a question with no answer. The
+policy-pinning half (criterion 4) takes *unmeasured* as its input rather than waiting on a verdict.
 
-**Status:** refusal built, **PR CHANNEL NOT WIRED** — 2026-08-15. The same honest split build
-tickets 64 and 78 carry. Criterion 1 is conjunctive and only its second half exists: nothing in
-`twin/` opens a pull request, so the ticket does not close on a criterion it has half-built. The
-precedent is build ticket 54, which built the retention half of a conjunctive criterion on purpose
-and left the tick to 55 once the promotion half genuinely existed beside it.
+**Status:** refusal built, **PR CHANNEL IS THE ESTATE'S, NOT `twin/`'S** — 2026-09-03. Read
+`PR CHANNEL NOT WIRED` from 2026-08-15, and criterion 1's first half is still not built here:
+nothing in `twin/` opens a pull request, and `twin propose` still emits an artefact and stops.
+What changed is where the channel lives. The eco-system's proposer is each adopter's
+`propose-tier.yml` workflow (NORTH-STAR §4 step 3): it re-composes on the adopter's clock through
+the pinned platform and opens a pull request only when a residual crosses a band. It fired on
+schedule for the first time on 2026-09-01 12:01Z on driftwood and returned `[]`, so **no proposal
+PR has yet opened** (eco-system tickets 60 and 74; 78 adds the tighten-only clamp it lacks). The
+2026-08-31 thin-slice pull requests are sometimes cited as this channel working; they are not.
+The assistant opened them with `gh pr create` under the owner's account (platform #5,
+2026-08-31T08:54Z, is the first), `gh pr merge` was declined by Claude Code's permission
+classifier rather than by `enact_guard.py`, and the same day found the guard's bare-remote hole
+(a push to an enactment repo admitted as a self-push; fixed with four tests, hub `d81f202`). So those PRs evidence the *discipline* (pull requests opened, nothing merged) and neither
+layer here nor `twin propose`. Since eco-system ticket 88 (2026-09-03) the guard's checked-in mode
+is `other-hand`: a merge is admitted only as the app `pavc-other-hand`, never as the owner's
+token; `twin/` itself still has no merge surface. Criterion 1 stays half, and its other half is
+owned by eco-system ticket 74 (the first real proposal PR, merged by a human), not by this file.
+
+*As written on 2026-08-15:* the same honest split build tickets 64 and 78 carry. Criterion 1 is
+conjunctive and only its second half exists: nothing in `twin/` opens a pull request, so the
+ticket does not close on a criterion it has half-built. The precedent is build ticket 54, which
+built the retention half of a conjunctive criterion on purpose and left the tick to 55 once the
+promotion half genuinely existed beside it.
 
 **Reading list:** Decision ticket 18 (enactment arm). Spec stories 80, 81, 82.
 

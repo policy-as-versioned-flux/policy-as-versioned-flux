@@ -94,6 +94,16 @@ Two consequences worth acting on rather than noting:
   relaxing `66 ← 65`: the propose-only PR channel does not need the Flux verdict, only the
   policy-pinning half does. Split it if the calendar matters.
 
+**Correction, 2026-09-03 (eco-system ticket 17, from AUG-05-CUT §2.2).** `66 ← 65` is relaxed.
+The cut above was written on 2026-08-05 and never taken while it mattered; instead the Flux
+verdict closed *unmeasured* from 2026-08-16T05:00Z (build ticket 70's finding, the section below
+on reachability), so the chain `65 → 66 → 67 → 68 → 70` was gating the enactment arm on a
+question with no answer. Build ticket 66 now reads `Blocked by: none`. The propose-only PR channel
+is the estate's `propose-tier` workflow (NORTH-STAR §4 step 3; eco-system tickets 74 and 78), not
+code in `twin/`, and the policy-pinning half of 66 takes 65's *unmeasured* closure as its input.
+The path above is left as written, as the 2026-08-05 record; it is no longer the calendar. The
+eco-system map is.
+
 Only one ticket starts immediately (01). After 04 the openable set is 05, 10, 42 and 64 — provenance,
 skills and Flux drift measurement run genuinely parallel from there, and 64 is deliberately early
 because it needs elapsed calendar time and nothing from the twin.
