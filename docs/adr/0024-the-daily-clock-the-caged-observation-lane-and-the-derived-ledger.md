@@ -217,3 +217,46 @@ truth surface rather than read off the lane five hours later.
   declaration, and it is the only offline proof the branch has fired.
   `driftwood/twin/verify-twin-sweep-moved.sh` runs the step's own shell under `bash -e` on planted
   copies and reads the series for that line, could-not-look until the clock supplies it.
+
+- **2026-09-04 (tickets 56 and 85, delegated under ADR-0025): the clocks are read by a job that
+  holds a credential, and graded by one that does not.** Point 3's third leg -- "in the gate:
+  `verify/schedules/verify-schedules.sh`" -- was written as though the gate could ask GitHub
+  anything. It cannot, and for a good reason: the gate step runs 84 `verify*.sh` cloned unpinned
+  off eight other organisations' default branches, so `truth.yml` gives it `persist-credentials:
+  false` and no `GH_TOKEN`. The consequence went unrecorded for five weeks: question 4, "did each
+  clock run inside its own period", SKIPped on every citable run, and on 2026-09-04 five of
+  thirteen clocks were red while the surface showed one SKIP.
+
+  The credential is not widened; the work is split. `truth.yml` gains a **`clocks` job** with
+  `permissions: {contents: read, actions: read}` that runs no third-party code and writes the raw
+  facts -- per unit the ruleset state, per clock the remote `schedule:` and the newest scheduled
+  run -- to a JSON file (`clock-verdict/v1`). The gate job takes it as an artifact and grades from
+  it through `CLOCK_VERDICT`, holding nothing. The file carries observations and no verdict, so a
+  verify script that reads it learns dates and conclusions it could have read from the public API
+  itself. A file that is missing, stale (over six hours) or of the wrong schema is a named
+  could-not-look; it never falls back to a credential the gate is not supposed to have. Locally,
+  an authenticated `gh` is still used directly.
+
+  Three smaller calls came with it, each because the surface was reporting something it had not
+  observed:
+  - *the documented non-zero exit is one conclusion, not "anything but success".* `truth.yml`
+    re-raises the gate's red verdict, so its `failure` is excused. Every other non-success --
+    `cancelled`, `timed_out`, a run still going -- is a clock that recorded nothing, and is now a
+    red. The scheduled run of 09:55:43Z that day was cancelled by the single `truth` concurrency
+    group when a push queued behind it, and graded PASS under the old rule. The group is now per
+    event, so a clock queues only behind other clock runs.
+  - *"this clock opens no pull request" is a PASS, not a SKIP.* SKIP means could-not-look, and the
+    checker looked: it parsed the workflow. platform, nist and ico publish their own artefacts and
+    have nothing upstream to diff, which the Consequences above already settle in as many words.
+    Three unconditional SKIPs had held `verify-schedules.sh` at exit 3 whatever any credential
+    could see. The PASS line names exactly what is not built there.
+  - *a red clock names the ticket that owns it.* `verify/schedules/clock-owners.yaml` maps a
+    clock to the open ticket that owns its red, and the FAIL line prints it. This is not a fourth
+    outcome (ticket 83): a red stays red and stays in the count. An entry naming a ticket file or
+    a workflow that does not exist is itself a FAIL, so the map cannot rot.
+
+  What this does **not** change: nothing about the lane, D1 or D2. And the write half of SS-07 is
+  untouched -- the cage step's `GH_TOKEN` is still handed to a step in the same job the gate ran
+  in, step-scoped. Splitting the commit-and-push into a third job means handing the whole tree
+  between runners with `id-token: write` for gitsign, which is a bigger change than either of
+  these tickets, and it is recorded here rather than done quietly.

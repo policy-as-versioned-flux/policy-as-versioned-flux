@@ -21,3 +21,22 @@ Done = a gate check resolves every declared pin in every party artefact against 
 ## Notes
 
 Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R4. Findings: participants/P1, P3, P4, P5, pound-engine/PE-11, principles/P4-2, security/SS-06, SS-03 (federation literals, ticket 68). Ticket 62 owns the tuppence and ludlow refs. Ticket 64 owns the twin tag. The insurer already recorded one fabricated version on 2026-08-29; this is the third artefact of that class.
+
+## Answer
+
+**Item 6 only, 2026-09-04 (delegated, ADR-0025), built by the 56+85 builder** so that two builders
+did not edit `.github/workflows/truth.yml` at once. Everything else in this ticket belongs to the
+62+77 builder working in parallel; nothing of theirs was touched.
+
+`truth.yml` installed Flux with `curl -s https://fluxcd.io/install.sh | sudo bash`, under a comment
+claiming every tool the gate observes with is pinned by version and checksum. It was the one
+unpinned tool in the instrument, and it ran as root. It now uses the pinned tarball form copied
+verbatim from the adopters' `drift-sample.yml` -- `FLUX_VERSION: 2.9.3` and `FLUX_SHA256:
+eae4e860…` in the workflow `env:`, `curl -fsSL` to a tarball, `sha256sum -c -`, `tar xzf`,
+`flux --version` -- so the gate and the adopters' sampler run the same Flux, and a difference
+between them is a version bump somebody made on purpose. `--fail` (the `-f` in `-fsSL`) is on all
+four curls in the file, not only this one: without it a 404 writes an HTML error page into the
+target and the failure surfaces as a confusing checksum mismatch three lines later. `actionlint`
+clean.
+
+Map line: Ticket 77 item 6 -- the hub gate's Flux install is pinned to 2.9.3 by tarball and sha256 like the adopters' sampler, and every curl in truth.yml carries `--fail`.

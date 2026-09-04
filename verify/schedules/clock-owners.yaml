@@ -1,0 +1,56 @@
+# Which ticket owns a clock that is red (eco-system ticket 85, 2026-09-04).
+#
+# "Every clock is green, or red for an estate reason." A red with no name beside it is a
+# shrug the citable surface cannot act on, so this file maps a clock to the ticket that owns
+# its red and schedules.py prints that ticket in the FAIL line itself.
+#
+#   <unit>/<workflow>:
+#     ticket: NN        a file under .scratch/ecosystem/issues/NN-*.md; the checker reads its
+#                       Status and says so
+#     owns:  one line   what that ticket owns about THIS clock, not the whole ticket
+#
+# This is NOT a fourth outcome (ticket 83). A red stays a FAIL and reddens the gate; this only
+# says whose it is. Two rules keep the map from rotting, both graded by schedules.py:
+#   * an entry naming a ticket file that does not exist is a FAIL;
+#   * an entry naming a workflow that is not a clock this checker grades is a FAIL.
+# An entry whose ticket reads `resolved` is not an error -- a fix lands hours before the clock
+# next ticks -- and the line says which of the two it is rather than guessing.
+#
+# Delete an entry when its clock has been green for a scheduled run; the entry is not evidence
+# of anything, and a clock that is green never reads this file.
+
+driftwood/twin-sweep.yml:
+  ticket: 72
+  owns: >-
+    the sweep runs under `bash -e` and dies before it records; the twin's re-render on a feed
+    bump is ticket 72's
+
+tuppence/propose-tier.yml:
+  ticket: 62
+  owns: >-
+    propose-tier checks platform out at a ref that has been deleted, so the run dies in
+    checkout and proposes nothing
+
+ludlow/propose-tier.yml:
+  ticket: 62
+  owns: >-
+    the same deleted platform ref as tuppence's; ticket 62 lands both adopters' refs together
+
+insurer/fetch.yml:
+  ticket: 77
+  owns: >-
+    the requote job prices against `<adopter> exposure v1.1.0`, and no adopter's v1.1.0 tree
+    carries an exposure section, so the job refuses; ticket 77 item 2 cuts the releases
+
+feeds/fetch.yml:
+  ticket: 85
+  owns: >-
+    the cage read the `__pycache__` its own python wrote, because the pre-switch clean carried
+    no -x; fixed here 2026-09-04, and the red stands until the clock next ticks
+
+hub/truth.yml:
+  ticket: 85
+  owns: >-
+    the scheduled run was cancelled by the single `truth` concurrency group when a push queued
+    behind it, so it recorded nothing; the group is split per event here 2026-09-04, and the
+    red stands until the clock next ticks

@@ -41,8 +41,9 @@
 # so the day it re-enters the gate its class is already decided, not re-argued. The runner's
 # substrate reason today is
 # "kind cluster 'driftwood' is not listed by kind get clusters" (platform/lib.sh) or "does not
-# exist" (tuppence). Ticket 86 (lane branch) and ticket 56 (schedules credential) edit the
-# `never:` lines they lift; ticket 91 un-retires the currency controller and edits its line.
+# exist" (tuppence). Ticket 86 (lane branch) edits the `never:` line it lifts;
+# ticket 91 un-retires the currency controller and edits its line. Ticket 56 lifted its own
+# (2026-09-04): the schedules credential is no longer the ceiling, the ruleset is.
 
 # --- driftwood (adopter) -----------------------------------------------------------------
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh | self-proof | -
@@ -154,7 +155,7 @@ verify/record/verify-record-states-the-purpose.sh | meta | -
 verify/renovate/verify-renovate-merged-feed-pr.sh | estate-observation | waits: no merged Renovate feed-pin PR exists yet
 verify/sampler-wait-order/verify-sampler-wait-order.sh | estate-observation | -   # reads the three adopters' checked-out workflows
 verify/schedules/verify-lane.sh | estate-observation | -
-verify/schedules/verify-schedules.sh | estate-observation | never: GitHub unreachable   # the gate step carries no credential (ADR-0024); ticket 56 owns this line
+verify/schedules/verify-schedules.sh | estate-observation | never: no observation-lane ruleset|github unreachable   # ticket 56 (2026-09-04) lifted the old `never: GitHub unreachable`. The gate step still carries no credential and now does not need one: truth.yml's `clocks` job hands the live facts in through CLOCK_VERDICT, so "did each clock run inside its period" grades for real on a citable run. What can NEVER pass is the other live question -- a push ruleset is private/internal-only and all nine repos are public (ADR-0024 point 3, amended) -- so the ruleset reason is the new ceiling. The unreachable alternative stays for a local run with neither a verdict file nor `gh`.
 verify/tier-binding/verify-tier-binding.sh | estate-observation | waits: tier_binding\.py is not in this platform checkout|no party in this estate has both a composed|run \./clone-estate\.sh first   # ticket 78: reads every party's own committed Namespace and evidence
 verify/truth-line/verify-truth-line.sh | meta | -   # ticket 83: grades this manifest and the arithmetic behind the split, never the estate
 verify/twin-evals/verify-twin-evals.sh | self-proof | -

@@ -13,6 +13,12 @@ name: truth
 # riding this workflow's `contents: write`. The server-side half is
 # .github/rulesets/observation-lane.json in each unit repo, which the owner applies with `gh api`.
 #
+# TWO JOBS, on purpose (ticket 56, 2026-09-04). `clocks` holds a read-scoped credential and runs
+# no third-party code; `gate` runs the eight orgs' scripts and holds none. The first hands the
+# second a file of facts. Splitting them is what lets the citable run see whether the clocks ran
+# at all, without ever putting a token where an unpinned script from another organisation can
+# read it.
+#
 # 05:47 UTC. The units pick their own times (01:23 platform, 02:41 nist, 03:17 feeds, 04:09 ico,
 # 05:31 insurer, 06:11/06:47/07:05 driftwood, 08:13/08:49 tuppence, 09:07/09:43 ludlow) and no
 # cross-org ordering is promised: this run grades whatever state it finds.
@@ -47,14 +53,72 @@ env:
   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
   COSIGN_VERSION: 3.1.3
   COSIGN_SHA256: 4629c757b7618056f8ddd7e2625ae9fdd94c0372a65049520bc7d9df9efc7f71
+  # Ticket 77 item 6, 2026-09-04. This used to be `curl -s https://fluxcd.io/install.sh | sudo
+  # bash` under the comment above, which is the one unpinned tool in a gate whose whole claim is
+  # that it observes with the estate's own toolchain: whatever fluxcd.io served that morning ran
+  # as root. Same version and the same tarball form the adopters' drift-sample.yml already uses.
+  FLUX_VERSION: 2.9.3
+  FLUX_SHA256: eae4e8608c0ade2bf4e8dec1669dbb6b0c28b5822b252d97feccfb4fb1181fd2
 
+# Per EVENT, not one group for the whole workflow (ticket 56, 2026-09-04). With a single `truth`
+# group and `cancel-in-progress: false`, GitHub keeps the running job and the newest QUEUED one
+# and cancels the rest -- so a scheduled run that queued behind a push was cancelled before it
+# recorded anything. Observed 2026-09-04: the 09:55:43Z scheduled run read `cancelled`, and
+# because the old checker excused truth.yml every non-success alike it graded PASS. The clock now
+# queues only behind other clock runs; pushes and dispatches keep their own lanes. Two truth runs
+# can therefore overlap, which the cage step's `git pull --rebase --autostash` already exists for.
 concurrency:
-  group: truth
+  group: truth-${{ github.event_name }}
   cancel-in-progress: false
 
 jobs:
+  # --- the clocks, read where a credential is allowed to be (ticket 56) ----------------------
+  # The gate below runs 84 verify scripts cloned unpinned off eight other organisations' default
+  # branches and deliberately holds no GitHub credential, so its live half -- "did each clock run
+  # inside its own period" -- SKIPped on every citable run since it was written. The estate could
+  # not see whether a single clock had ticked, and five of thirteen were red.
+  #
+  # This job is the credentialled half, kept apart from the untrusted half rather than merged
+  # into it: `actions: read` and `contents: read`, no third-party code, no `run:` that executes
+  # anything from .estate-clone. It writes the raw facts -- the ruleset state per unit, the
+  # remote `schedule:` and newest scheduled run per clock -- to a JSON file with no verdict in
+  # it, and hands it to the gate as an artifact. The gate grades from that file holding nothing.
+  # `github.token` reads the runs of the other eight organisations because their repositories are
+  # public; where it cannot, the collector records the reason per organisation and the gate SKIPs
+  # that one by name (it never guesses, and it never falls back to a credential).
+  clocks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install 'pyyaml==6.0.3'
+      - name: assemble the estate checkout the collector reads its clock list from
+        run: bash clone-estate.sh
+      - name: read every clock's newest scheduled run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 verify/schedules/schedules.py clocks --out "$RUNNER_TEMP/clocks.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clock-verdict
+          path: ${{ runner.temp }}/clocks.json
+          retention-days: 7
+          if-no-files-found: error
+
   gate:
     runs-on: ubuntu-latest
+    # The gate waits for the clocks so it can grade them, and runs even when the collector could
+    # not: a missing artifact is a could-not-look verify-schedules.sh names, never a red gate and
+    # never a silent green.
+    needs: clocks
+    if: always()
     steps:
       # persist-credentials: false, like twin.yml's six jobs. talk/verify-all.sh runs
       # every verify*.sh from eight other orgs' repos, cloned unpinned off their default
@@ -67,10 +131,18 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: pip install 'pyyaml==6.0.3' 'jsonschema==4.23.0'
+      # The clocks job's facts, into RUNNER_TEMP. `continue-on-error`, because the whole point is
+      # that the gate does not depend on a credential: if the collector could not run, the file is
+      # absent and verify-schedules.sh SKIPs the liveness half by name.
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: clock-verdict
+          path: ${{ runner.temp }}/clock-verdict
       - name: install pinned gitsign (binary + checksum, no marketplace action)
         run: |
           set -euo pipefail
-          curl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"
+          curl -fsSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"
           echo "${GITSIGN_SHA256}  gitsign" | sha256sum -c -
           chmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign
           rm -f gitsign
@@ -81,20 +153,34 @@ jobs:
         # differently on two days for a reason no TRUTH line records.
         run: |
           set -euo pipefail
-          curl -sSL -o kyverno.tgz "https://github.com/kyverno/kyverno/releases/download/v${KYVERNO_VERSION}/kyverno-cli_v${KYVERNO_VERSION}_linux_x86_64.tar.gz"
+          curl -fsSL -o kyverno.tgz "https://github.com/kyverno/kyverno/releases/download/v${KYVERNO_VERSION}/kyverno-cli_v${KYVERNO_VERSION}_linux_x86_64.tar.gz"
           echo "${KYVERNO_SHA256}  kyverno.tgz" | sha256sum -c -
           sudo tar -xzf kyverno.tgz -C /usr/local/bin kyverno && rm -f kyverno.tgz
           kyverno version
-          curl -sSL -o cosign "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64"
+          curl -fsSL -o cosign "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64"
           echo "${COSIGN_SHA256}  cosign" | sha256sum -c -
           chmod +x cosign && sudo mv cosign /usr/local/bin/
-          curl -s https://fluxcd.io/install.sh | sudo bash
+          # Ticket 77 item 6: the tarball form the adopters' drift-sample.yml already uses, so
+          # every tool this gate observes with is pinned by version AND checksum. `--fail` on
+          # every curl above too: without it a 404 writes an HTML error page into the target and
+          # the failure surfaces as a confusing checksum mismatch three lines later.
+          curl -fsSL -o flux.tar.gz "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_linux_amd64.tar.gz"
+          echo "${FLUX_SHA256}  flux.tar.gz" | sha256sum -c -
+          tar xzf flux.tar.gz flux && chmod +x flux && sudo mv flux /usr/local/bin/flux
+          rm -f flux.tar.gz
+          flux --version
       - name: the gate
         id: gate
         continue-on-error: true
         # into RUNNER_TEMP, not the workspace: the cage step below refuses any file the run
         # leaves in the tree, and the gate's own transcript is not an observation to commit.
-        env: {VERIFY_TIMEOUT: '900'}
+        #
+        # CLOCK_VERDICT is the clocks job's facts, not a credential: a JSON file of dates,
+        # conclusions and cron strings that every verify script can read and none can misuse.
+        # verify/schedules/verify-schedules.sh grades the clocks from it (ticket 56).
+        env:
+          VERIFY_TIMEOUT: '900'
+          CLOCK_VERDICT: ${{ runner.temp }}/clock-verdict/clocks.json
         run: set -o pipefail; bash talk/verify-all.sh | tee "$RUNNER_TEMP/gate.out"
       - name: record the TRUTH line
         run: |
