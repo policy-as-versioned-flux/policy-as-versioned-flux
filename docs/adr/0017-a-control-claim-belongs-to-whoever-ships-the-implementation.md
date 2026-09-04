@@ -2,6 +2,8 @@
 status: accepted
 ---
 
+> **Superseded in part, 2026-09-03 (ticket 38, built).** The new-hole refusal, the widening refusal and the self-created-hole refusal are gone: a hole is priced and printed as a delta, keyed (source, id) across every controls parent. The bare catalogue id, the exact-string rule and the removal refusal stand. The supersession is recorded by ticket 39's superseding ADR, which takes its number when it is written.
+
 # A control claim belongs to whoever ships the implementation, and an adopter's own addition is an ordinary hole
 
 [ADR-0013](0013-regulator-publishes-baselines-adopter-selects.md) lets an adopter **add** a control

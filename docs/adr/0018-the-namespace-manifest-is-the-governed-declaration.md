@@ -2,6 +2,8 @@
 status: accepted
 ---
 
+> **Superseded in part, 2026-09-03 (ticket 38, built).** Point 3's refusal of a new ungoverned namespace is gone: every ungoverned namespace is priced as a ramped workload share of the uncaged residual from the first signed tag naming it, and a new one prints as a delta. The rest of point 3 (repo-only walk, cluster drift owned elsewhere) stands. The supersession is recorded by ticket 39's superseding ADR, which takes its number when it is written.
+
 > **Superseded in part, 2026-08-28.** §4, the narrowed CREATE claim rule is superseded by [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md). The rest stands.
 
 # The Namespace manifest is the governed declaration; the composed artefact carries no namespace list
