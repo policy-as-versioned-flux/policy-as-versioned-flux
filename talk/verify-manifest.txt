@@ -33,6 +33,20 @@
 # line here must name a script that exists. The TRUTH line prints the split of passes by class,
 # the split of skips by kind, and ceiling = total - excluded - never.
 #
+# THE SUBSTRATE THIS FILE IS DERIVED FROM (delegated, ADR-0025, 2026-09-04). Every row is
+# derived from what the script prints ON THE SCHEDULED RUNNER: no cluster, no docker daemon
+# worth the name, no cross-org credential. A machine with live KinD clusters is a DIFFERENT
+# substrate, and six `never:` rows pass there instead of skipping, which the gate grades
+# `FAIL manifest: ... passed but the manifest says it can never pass`. Those are artefacts of
+# the substrate, not of the estate, and they are named in .scratch/ecosystem/REPAIR-2026-09-04.md.
+# A runner qualifier that turns a stale-never judgement into a NOTE when the run is off the
+# runner was considered and NOT built here: it changes what `ceiling` means, which is the one
+# number NORTH-STAR publishes, so it is its own ticket, not a line in a repair.
+# The kind rule that follows from this: when a script's could-not-look ON THE RUNNER is a
+# missing substrate, its row is `never:`, and the pattern also names the reasons the same tail
+# prints where the substrate IS there, so the row is true in both places and a new reason still
+# cannot hide. When the runner's reason is the estate's own state, the row is `waits:`.
+#
 # The classification rule (delegated, ADR-0025, 2026-09-04): a pass is an observation of the
 # estate only when its verdict turns on another party's artefact or live external state; a
 # script whose live tail needs a cluster is classed by what its PASS would rest on, so the
@@ -48,7 +62,7 @@
 # --- driftwood (adopter) -----------------------------------------------------------------
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh | self-proof | -
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh | self-proof | -
-.estate-clone/driftwood/twin/verify-twin-sweep-moved.sh | self-proof | -
+.estate-clone/driftwood/twin/verify-twin-sweep-moved.sh | self-proof | waits: no observations/twin-sweep\.jsonl exists yet   # ticket 72 landed this script with `-`, which says "no could-not-look is expected"; it has one, and always has: the offline half is proven in the run, and the live half is a firing only the clock can supply once the overlay or a pin moves under it
 .estate-clone/driftwood/verify-reconcile.sh | self-proof | waits: no local kind cluster .* and the lane sample cannot stand in   # decision 13: on the runner the only PASS it can reach grades the adopter's OWN committed drift/samples.jsonl, so it is self-proof there. The estate-observation path is the live one below need_substrate, where facts 1-3 read the publishers' real remotes; it needs a kind cluster and never runs on the scheduled runner
 .estate-clone/driftwood/verify-twin-overlay.sh | self-proof | -
 
@@ -91,13 +105,13 @@
 .estate-clone/platform/computed-semver/verify-release-integrity.sh | self-proof | -
 .estate-clone/platform/computed-semver/verify-witness-set.sh | self-proof | -
 .estate-clone/platform/currency-controller/verify-currency.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # ticket 91 un-retires the controller and owns this line
-.estate-clone/platform/distribution/verify-coexistence.sh | self-proof | waits: declares one version   # ticket 84 lifts it with a second declared line
+.estate-clone/platform/distribution/verify-coexistence.sh | self-proof | waits: coexistence needs two RELEASED versions to show side by side|docker is not reachable|is not listed by kind get clusters|cannot list Flux kustomizations|Flux has no Kustomization|Flux not Ready on kind-|policy-versions ResourceSet not reconciled on   # re-derived 2026-09-04: ticket 63 added 5.0.0 to versions.yaml, so "declares one version" stopped being what this script says. Two are declared now and only 4.0.0 is CUT, so the reason moved from declaration to release; that branch runs before any substrate check, so it is the line on the runner today. CORRECTED 2026-09-04 (second pass): cutting the second tag does NOT lift this row, and ticket 84 is not what cuts it -- ticket 63 declared 5.0.0 and the signed tag is the owner's cut-release.yml dispatch. Ticket 84's own obligation is separate: it supplies the THIRD declared line and raises this script's threshold from two to three, which rewrites this reason string and keeps the row `waits`, because the `n_versions -lt` branch fires again on an estate-state reason. With two CUT versions the `n_versions -lt 2` branch stops firing and the script falls straight through to `substrate_ok`, so on the runner the reason becomes a missing substrate and the live tail can print its own two as well -- which is why the pattern names all of them now, and is true before and after the cut. So long as the threshold is two, what the signed cut of 5.0.0 must ALSO do, in the same commit as the tag, is flip this row to `estate-observation | never:`, because from that day the runner's reason is substrate, not the estate's own state, and the kind rule above then makes it a `never` outside the ceiling. It is not flipped today: today's reason IS the estate's own state, so `never` would be false now and would shrink the published ceiling on a false ground
 .estate-clone/platform/distribution/verify-declared-versions-admit.sh | estate-observation | never: kind cluster 'driftwood' is not listed
 .estate-clone/platform/distribution/verify-governed-namespace-guard.sh | self-proof | -
 .estate-clone/platform/distribution/verify-infra-declaration.sh | estate-observation | -   # reads driftwood's, ludlow's and tuppence's composed policies
 .estate-clone/platform/distribution/verify-orphan-guard.sh | self-proof | -
 .estate-clone/platform/distribution/verify-render-version-tree.sh | self-proof | -
-.estate-clone/platform/distribution/verify-retirement.sh | self-proof | waits: declares one version   # ticket 84 lifts it with a second declared line
+.estate-clone/platform/distribution/verify-retirement.sh | estate-observation | never: docker is not reachable|is not listed by kind get clusters|cannot list Flux kustomizations|Flux has no Kustomization|Flux not Ready on kind-|absence is not evidence of pruning|retirement not applied there   # re-derived 2026-09-04: ticket 63's second declared version retired the offline refusal ("a retirement would leave an empty allow-list") that used to fire first, so this script now falls through to its LIVE tail, which reads Flux Kustomizations on a cluster. That makes it estate-observation (live state outside the repo). The alternation names each reason the tail can actually print -- the five substrate reasons platform/lib.sh sets, and the two the tail itself writes when the substrate IS there -- so the row is true on the runner and on a machine with clusters, and a NEW reason still cannot hide in it. STRONGER REASON for `never`, found 2026-09-04 (second pass): it is not that the scheduled runner has no cluster. EVERY branch of this script's live tail calls live_tail_skip -- substrate missing, policy-vN present, policy-vN absent -- and pass_line() exits 3 whenever any tail skipped, so this script CANNOT reach exit 0 on any machine, cluster or no cluster, until it grows a branch that observes a pruning it watched happen. That also dates the arithmetic: the old `waits: declares one version` row was never true either, because a `waits` says the script passes the day the estate's state arrives and this one would not have. The ceiling has been one too generous since ticket 83 first classified this script (2026-09-04, commit 0406a5d), not since ticket 63 pushed it past its offline refusal
 .estate-clone/platform/engine/verify-engine.sh | estate-observation | never: kind cluster 'driftwood' is not listed
 .estate-clone/platform/eud/verify-eud.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/platform/fair/verify-fair-tail.sh | self-proof | -
@@ -109,10 +123,10 @@
 .estate-clone/platform/oscal/verify-claims.sh | estate-observation | -   # every claimed control id resolves in nist's real pinned catalogue
 .estate-clone/platform/oscal/verify-upflow.sh | simulation | -   # self-generated PolicyReports
 .estate-clone/platform/party/verify-party-artefact.sh | self-proof | -
-.estate-clone/platform/policy/verify-conditional.sh | self-proof | waits: lives only in require-nonroot-2-0-1   # shortened when the gate still judged a SKIP line cut at 160 characters; since 2026-09-04 the cut is display only and a pattern may sit anywhere in the line
+.estate-clone/platform/policy/verify-conditional.sh | estate-observation | never: docker is not reachable|is not listed by kind get clusters|cannot list Flux kustomizations|Flux has no Kustomization|Flux not Ready on kind-|still claim policy-version 2\.0\.1|ValidatingPolicy not installed on   # re-derived 2026-09-04: the old reason (the conditional branch "lives only in require-nonroot-2-0-1", a retired line) stopped being true when ticket 63 declared 5.0.0, which carries the branch. That branch was the FIRST test in the script, and with it gone the script falls through to the substrate check and then to its live admit/deny tail -- so it is estate-observation and `never` on a runner with no cluster. The alternation names the five substrate reasons platform/lib.sh sets and the two the tail writes once the substrate is there (fixtures still labelled 2.0.1; the policy not installed). Relabelling tests/conditional/resources.yaml to 5.0.0 is a platform enactment push, not this repair's
 .estate-clone/platform/posture/verify-posture-projection.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/platform/risk/verify-risk-tuned.sh | self-proof | -
-.estate-clone/platform/shift-left/verify-shift-left.sh | self-proof | waits: declares one major line   # ticket 84 lifts it with a second declared line
+.estate-clone/platform/shift-left/verify-shift-left.sh | self-proof | waits: declares one major line   # the owner's dispatch of the 5.0.0 tag lifts it with a second declared line
 .estate-clone/platform/shift-left/verify-tier-binding.sh | self-proof | -   # platform planting cases against its own rule; the hub's verify/tier-binding runs it over the real adopters
 .estate-clone/platform/tcor/verify-tcor.sh | self-proof | -
 .estate-clone/platform/verify-certificate-identity-regexp.sh | self-proof | -
@@ -147,7 +161,7 @@ verify/local-clock/verify-local-clock.sh | meta | never: no \.local-clock/last-r
 verify/misuse/verify-misuse.sh | estate-observation | waits: could-not-look by name
 verify/party/verify-party.sh | estate-observation | -
 verify/pound-seam/verify-pound-seam.sh | estate-observation | -
-verify/priced-holes/verify-priced-holes.sh | estate-observation | -
+verify/priced-holes/verify-priced-holes.sh | estate-observation | waits: composed/evidence\.json carries no deltas\[\]   # its honest could-not-look, declared 2026-09-04: no adopter's composed evidence carries deltas[] until it is re-composed, and re-composing an adopter is an enactment push the owner makes. `-` said none was expected, which was never true
 verify/proportionality/verify-proportionality.sh | estate-observation | never: kind-driftwood is not reachable   # each institution's own signed band; the live tail wants the adopter's rendered cage on a cluster
 verify/provenance/verify-provenance.sh | simulation | never: no rekor-cli here|kind-driftwood is not reachable   # a narrative chain over committed fixtures; the live tails want rekor-cli and a cluster, neither of which the runner is built with
 verify/provenance/verify-release-evidence-reaches-main.sh | estate-observation | waits: adopter pin\(s\) could not be graded

@@ -10,41 +10,41 @@ ok  collected v1->v3 signed feed + 6-scenario library (human-seed + AI); war-gam
 
 == 3b. the proposer can only tighten (ticket 78): party fold, floor, current declaration ==
 note: ledger derived from 0 closed-unmerged proposal PR(s) on policy-as-versioned-flux/policy-as-versioned-flux; 0 key(s) carry weight; half-life 30d, suppress at 0.5 (rejection-decay.yaml 1.0.0).
-From /tmp/tmp47g2hdor/remote
+From /tmp/tmpqnxyuw0c/remote
  * branch            main       -> FETCH_HEAD
-To /tmp/tmp47g2hdor/remote.git
+To /tmp/tmpqnxyuw0c/remote.git
  * [new branch]      HEAD -> wargamer/retune-tier-driftwood-cage-tier-ico-pricing
 note: ledger derived from 0 closed-unmerged proposal PR(s) on policy-as-versioned-flux/policy-as-versioned-flux; 0 key(s) carry weight; half-life 30d, suppress at 0.5 (rejection-decay.yaml 1.0.0).
-From /tmp/tmp47g2hdor/remote
+From /tmp/tmpqnxyuw0c/remote
  * branch            main       -> FETCH_HEAD
 Everything up-to-date
 note: ledger derived from 0 closed-unmerged proposal PR(s) on policy-as-versioned-flux/policy-as-versioned-flux; 0 key(s) carry weight; half-life 30d, suppress at 0.5 (rejection-decay.yaml 1.0.0).
-From /tmp/tmp47g2hdor/remote
+From /tmp/tmpqnxyuw0c/remote
  * branch            main       -> FETCH_HEAD
-To /tmp/tmp47g2hdor/remote.git
+To /tmp/tmpqnxyuw0c/remote.git
  * [new branch]      HEAD -> wargamer/retune-tier-driftwood-cage-tier-platform-threat
 note: ledger derived from 1 closed-unmerged proposal PR(s) on policy-as-versioned-flux/policy-as-versioned-flux; 1 key(s) carry weight; half-life 30d, suppress at 0.5 (rejection-decay.yaml 1.0.0).
 note: ledger derived from 1 closed-unmerged proposal PR(s) on policy-as-versioned-flux/policy-as-versioned-flux; 0 key(s) carry weight; half-life 30d, suppress at 0.5 (rejection-decay.yaml 1.0.0).
-From /tmp/tmp47g2hdor/remote
+From /tmp/tmpqnxyuw0c/remote
  * branch            main       -> FETCH_HEAD
 Everything up-to-date
 note: proposer holds -- strictest priced line is 'isolated' across ['feeds/feed', 'ico/feed', 'twin/twin']; the Namespace declares 'isolated'; held -- the proposer only tightens
 note: ledger derived from 0 closed-unmerged proposal PR(s) on policy-as-versioned-flux/policy-as-versioned-flux; 0 key(s) carry weight; half-life 30d, suppress at 0.5 (rejection-decay.yaml 1.0.0).
-From /tmp/tmp47g2hdor/remote
+From /tmp/tmpqnxyuw0c/remote
  * branch            main       -> FETCH_HEAD
-To /tmp/tmp47g2hdor/remote.git
+To /tmp/tmpqnxyuw0c/remote.git
  * [new branch]      HEAD -> wargamer/retune-tier-driftwood-cage-tier-feeds-feed
 note: ledger derived from 0 closed-unmerged proposal PR(s) on policy-as-versioned-flux/policy-as-versioned-flux; 0 key(s) carry weight; half-life 30d, suppress at 0.5 (rejection-decay.yaml 1.0.0).
-From /tmp/tmp47g2hdor/remote
+From /tmp/tmpqnxyuw0c/remote
  * branch            main       -> FETCH_HEAD
-To /tmp/tmp47g2hdor/remote.git
- + 16a86b2...9b0a74f HEAD -> wargamer/retune-tier-driftwood-cage-tier-feeds-feed (forced update)
+To /tmp/tmpqnxyuw0c/remote.git
+ + f07bf32...54404ff HEAD -> wargamer/retune-tier-driftwood-cage-tier-feeds-feed (forced update)
 note: proposer holds -- strictest priced line is 'restricted' across ['feeds/feed']; the Namespace declares 'quarantine'; held -- the proposer only tightens
 note: ledger derived from 0 closed-unmerged proposal PR(s) on policy-as-versioned-flux/policy-as-versioned-flux; 0 key(s) carry weight; half-life 30d, suppress at 0.5 (rejection-decay.yaml 1.0.0).
-From /tmp/tmp47g2hdor/remote
+From /tmp/tmpqnxyuw0c/remote
  * branch            main       -> FETCH_HEAD
-To /tmp/tmp47g2hdor/remote.git
- + 9b0a74f...91fcf40 HEAD -> wargamer/retune-tier-driftwood-cage-tier-feeds-feed (forced update)
+To /tmp/tmpqnxyuw0c/remote.git
+ + 54404ff...4b06471 HEAD -> wargamer/retune-tier-driftwood-cage-tier-feeds-feed (forced update)
 note: ledger derived from 0 closed-unmerged proposal PR(s) on policy-as-versioned-flux/policy-as-versioned-flux; 0 key(s) carry weight; half-life 30d, suppress at 0.5 (rejection-decay.yaml 1.0.0).
 ok  a proposal opens a PR editing posture.acme.io/tier on the GOVERNED NAMESPACE manifest found by its governed label (comments and the governed label survive; the pod label, an output, is untouched; main untouched; everything else byte-identical), and its body names the manifest, the move, the price that moved it, the selection-policy version and the curve hash; a second run force-pushes the SAME branch (1 fresh commit, not 2) and UPDATES the open PR, never opens a second one; a price still flagged proposed_as=issue opens a PULL REQUEST -- no issue path exists any more (ADR-0022); yesterday's closed-unmerged PR SUPPRESSES the identical proposal while one priced under another curve does not (the ledger is derived, nothing records the no); the proposer can only TIGHTEN (ticket 78): a per-line crossing on a party declared isolated lands nothing (no branch, no PR), the party's strictest priced line is what gets written and the body says so, the declared overlay.floor clamps the write up (read only as a direct child of `overlay:`, so a decoy nested deeper is not a floor), and the current tier is read off the Namespace (a line landing looser than the declaration is held); TWO governed Namespace DOCUMENTS in one manifest is counted as two and lands nothing, and apply_tier_declaration refuses to rewrite the first and leave the second; no merge()/approve()/dispose() anywhere in this module, and no DISPOSING GH CALL either -- the argv this module builds is read, a planted `_gh("pr", "merge", "--squash", "--admin", ...)` and a planted /merge REST path are both caught, and a `gh pr create` is not.
 ok  strictest line wins, the floor clamps up, and nothing looser than the Namespace declares is written

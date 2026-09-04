@@ -1,10 +1,10 @@
 [1;36m==>[0m 1. the manifest loader refuses what it should: bad class, bad skip kind, uncompilable pattern, duplicate
 selfcheck ok
 [1;36m==>[0m 2. the gate's own instrument grades a planted pass, skip, fail, undeclared skip, unlisted script, exclusion and stale never as documented
-PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, and a unit line this checkout does not carry is a note
+PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, an exclusion reason containing an apostrophe survives the trim whole, and a unit line this checkout does not carry is a note
 [1;36m==>[0m 3. the manifest covers every script the gate discovers right now, in both directions
 [1;36m==>[0m 4. the last TRUTH line talk/truth.log recorded still adds up
-  run 72: 61 passes split {'observed': 13, 'self': 37, 'simulated': 6, 'meta': 5}, ceiling 80 of 97, skips {'never': 9, 'waits': 7}
+  run 77: 65 passes split {'observed': 15, 'self': 39, 'simulated': 5, 'meta': 6}, ceiling 82 of 99, skips {'never': 7, 'waits': 4}
 [1;36m==>[0m 5. the sentence the deck publishes counts the same 'can never pass' population the ceiling does
-  measured: 61 passes are observed 13 + self 37 + simulated 6 + meta 5, against a ceiling of 80 of 97 (8 excluded, 9 can never pass on this runner); fail 12, skip 16 (never 9, waits 7)
+  measured: 65 passes are observed 15 + self 39 + simulated 5 + meta 6, against a ceiling of 82 of 99 (8 excluded, 9 can never pass on this runner); fail 15, skip 11 (never 7, waits 4)
 PASS: talk/verify-manifest.txt places every one of the 99 verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all.sh turns an undeclared could-not-look and a stale ceiling red, the last TRUTH line talk/truth.log recorded adds up, and the published 'can never pass' count is the population the ceiling was cut from

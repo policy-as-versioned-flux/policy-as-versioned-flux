@@ -107,7 +107,12 @@ def change_chain():
         {"seq": 3, "link": "PR", "actor": pr["actor"], "actor_class": "ai",
          "act": "propose", "when": when, "identity": pr["identity"],
          "evidence": policy_path, "evidence_present": policy_ok,
-         "signed": pr["signed"], "merged": pr["merged"], "auto_merge": pr["auto_merge"],
+         # No `signed` field. Ticket 78 deleted it from every proposal the
+         # war-gamer emits: a signature is a property of the commit, put there
+         # by propose-tier.yml's gitsign step and read back out of Rekor -- never
+         # a literal a proposal may claim about itself. The chain claims the
+         # identity MECHANISM (`identity`, below) and no signature at all.
+         "merged": pr["merged"], "auto_merge": pr["auto_merge"],
          "from_evidence": pr["from_evidence"], "required_gate": pr["required_gate"],
          "detail": pr["title"]},
 
@@ -214,7 +219,10 @@ def selfcheck():
     pr = next(l for l in chain if l["link"] == "PR")
     assert pr["actor_class"] == "ai" and pr["act"] == "propose", pr
     assert pr["merged"] is False and pr["auto_merge"] is False, pr
-    assert pr["signed"] is True and "Rekor" in pr["identity"], pr
+    # The proposal names the identity mechanism and claims NO signature of its
+    # own -- mirrors wargamer.py's own assertion since ticket 78.
+    assert "signed" not in pr, ("a proposal must not claim to be signed", pr)
+    assert "Rekor" in pr["identity"], pr
     assert pr["from_evidence"], pr  # the AI names the evidence it proposed FROM
     for link in ("merge", "release"):
         d = next(l for l in chain if l["link"] == link)
