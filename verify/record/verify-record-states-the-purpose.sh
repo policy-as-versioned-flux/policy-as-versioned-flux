@@ -34,16 +34,23 @@ selfcheck() {
   awk '/^## 0\. / {skip=1; next} /^## / {skip=0} !skip' "$ROOT/NORTH-STAR.md" >"$t/no-section-0.md"
   sed 's/In the owner.s words (2026-09-02, ticket 75 Q5)/That a refusal is therefore the bottom rung is my reading, not your words./' \
     "$ROOT/NORTH-STAR.md" >"$t/assistant-reading.md"
+  # ticket 90: §1 back to the actor claim, and principle 6 with the shelving marker struck out
+  sed 's/and every artefact is attestable\. The orgs/and every actor is attestable. The orgs/' \
+    "$ROOT/NORTH-STAR.md" >"$t/actor-claim.md"
+  sed 's/\*\*The actor half of this principle is SHELVED for this build\*\*/The actor half is fine./' \
+    "$ROOT/NORTH-STAR.md" >"$t/unshelved.md"
   RECORD_NORTH_STAR="$t/no-section-0.md" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: a record with no §0 passed"; good=0; }
   RECORD_NORTH_STAR="$t/assistant-reading.md" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: a principle 2 in the assistant's words passed"; good=0; }
+  RECORD_NORTH_STAR="$t/actor-claim.md" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: a §1 claiming actor attestation passed"; good=0; }
+  RECORD_NORTH_STAR="$t/unshelved.md" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: a principle 6 with no shelving marker passed"; good=0; }
   rm -rf "$t"
-  if [ "$good" = 1 ]; then echo "  ok   selfcheck: a record missing §0 fails; a principle 2 in the assistant's words fails"; return 0; fi
+  if [ "$good" = 1 ]; then echo "  ok   selfcheck: a record missing §0 fails; a principle 2 in the assistant's words fails; a §1 that claims actor attestation fails; a principle 6 that drops the shelving marker fails"; return 0; fi
   echo "FAIL: selfcheck: the grader does not grade"; return 1
 }
 
 if [ "${1:-}" = selfcheck ]; then
   selfcheck || exit 1
-  echo "PASS: selfcheck: a record missing §0 fails, a principle 2 in the assistant's words fails"; exit 0
+  echo "PASS: selfcheck: a record missing §0 fails, a principle 2 in the assistant's words fails, a §1 claiming actor attestation fails, and a principle 6 with no shelving marker fails"; exit 0
 fi
 if [ -z "${RECORD_NORTH_STAR:-}" ]; then
   echo "0. the grader can fail"
@@ -112,6 +119,31 @@ want 'principle 2' "$p2" '[Mm]utating admission controller'
 want 'principle 2' "$p2" 'ticket 75 Q5'
 want 'principle 2' "$p2" '2026-09-02'
 
+echo "4b. NORTH-STAR §1 claims the artefact half, and principle 6 keeps the actor half, shelved"
+# Eco-system ticket 90. §1 is the one sentence the whole estate is measured against, so it may
+# claim only what a citable run can be observed doing: artefact attestation is graded on every
+# run, actor attestation has never been observed. Principle 6 keeps the design and says it is
+# shelved, with the date and the ticket, so the shelving is a record and not a deletion.
+s1="$(section 1)"
+[ -n "$s1" ] || fail "there is no '## 1.' section"
+want '§1' "$s1" 'every artefact is attestable'
+refuse '§1' "$s1" 'and every actor is attestable\. The orgs'
+want '§1' "$s1" 'ticket 90'
+want '§1' "$s1" '2026-09-02'
+p6="$(section 3 | grep -E '^6\. ' || true)"
+[ -n "$p6" ] || fail "§3 has no principle 6"
+want 'principle 6' "$p6" 'Every actor is attestable'
+want 'principle 6' "$p6" 'SHELVED for this build'
+want 'principle 6' "$p6" 'ticket 90'
+want 'principle 6' "$p6" '2026-09-0[24]'
+want 'principle 6' "$p6" 'verify-exclusions\.txt'
+# ...and the exclusions file must actually carry the six, or principle 6 states a shelving the
+# gate does not perform. The record and the instrument have to agree.
+EXCL="$ROOT/talk/verify-exclusions.txt"
+shelved="$(grep -cE '^\S+ \| shelved with the identity plane \(ticket 90\)' "$EXCL" 2>/dev/null || echo 0)"
+if [ "$shelved" -ge 6 ]; then ok "talk/verify-exclusions.txt shelves $shelved identity-plane scripts with reasons"
+else fail "talk/verify-exclusions.txt shelves $shelved identity-plane scripts; principle 6 says six are"; fi
+
 echo "5. NORTH-STAR §8 points at the sixteen decisions by number"
 s8="$(section 8)"
 want '§8' "$s8" 'ticket 75'
@@ -142,7 +174,7 @@ want 'Multi-version' "$mv" '2022-03-11'
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: NORTH-STAR states the purpose, the audience, the (absent) date and what done is, every owner line dated; CONTEXT.md agrees"
+  echo "PASS: NORTH-STAR states the purpose, the audience, the (absent) date and what done is, claims the artefact half of attestation and records the actor half as shelved with its six scripts excluded by name, every owner line dated; CONTEXT.md agrees"
   exit 0
 fi
 echo "FAIL: $bad fact(s) the record must state are missing or undated (ticket 95)"

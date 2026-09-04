@@ -8,7 +8,11 @@ stands in for a thing that doesn't work.
 
 > Thesis in one line: **governance is a proportionate, informed, continuously
 > re-tuned response to quantified risk — and versioning the whole chain, with
-> every actor attestable, is how proportionality stays honest.**
+> every artefact attestable, is how proportionality stays honest.**
+
+> The thesis line said *every actor attestable* until 2026-09-04. The actor half
+> is designed and shelved for this build (ticket 90; NORTH-STAR principle 6), so
+> the sentence you say on stage claims the half this estate can be watched doing.
 
 **No venue-Wi-Fi independence — abandoned, mo-12 (2026-08-21).** This runbook
 used to claim *"there is no venue-Wi-Fi dependency in any [LIVE] beat"* and
@@ -134,10 +138,24 @@ on stage. The gate runs every script by discovery, so there is no mapping to kee
 | 3b. Graded / TCoR | `.estate-clone/platform/graded/verify-graded.sh` · `.estate-clone/platform/tcor/verify-tcor.sh` | cage.py + tcor.py |
 | 4. Living loop | `.estate-clone/platform/feeds/verify-feeds.sh` · `…/wardley/verify-wardley.sh` · `…/wargamer/verify-wargamer.sh` | feeds + wargamer |
 | 4b. Honest today | `.estate-clone/platform/honesty/verify-honesty.sh` | calibration+integrity |
-| **5. Provenance** | `verify/provenance/verify-provenance.sh` · `…/identity/verify-identity.sh` · `…/posture/verify-posture-projection.sh` | SPIFFE chain |
-| 5b. Reach + secrets | `.estate-clone/tuppence/reset/verify-reach-secrets.sh` | Istio+OpenBao glob |
-| 5c. Human/device | `.estate-clone/platform/access/verify-access.sh` · `…/break-glass/verify-break-glass.sh` · `…/eud/verify-eud.sh` | Pomerium+tpm_devid |
+| **5. Provenance** | `verify/provenance/verify-provenance.sh` | Rekor + SPIFFE chain |
+| 5 (shelved). Actor attestation | `…/identity/verify-identity.sh` · `…/identity/verify-federation.sh` · `…/posture/verify-posture-projection.sh` | SPIFFE chain |
+| 5b (shelved). Reach + secrets | `.estate-clone/tuppence/reset/verify-reach-secrets.sh` | Istio+OpenBao glob |
+| 5c (shelved). Human/device | `.estate-clone/platform/access/verify-access.sh` · `…/eud/verify-eud.sh` | Pomerium+tpm_devid |
+| 5c. Break-glass | `.estate-clone/platform/break-glass/verify-break-glass.sh` | offline, still graded |
 | — Reconcile (live) | `.estate-clone/{driftwood,tuppence,ludlow}/verify-reconcile.sh` | live cluster |
+
+**The rows marked (shelved) are not graded by the gate.** The identity plane —
+the actor half of NORTH-STAR principle 6 — is designed and shelved for this
+build (owner, ticket 75 Q12, 2026-09-02; ticket 90). Those six scripts are
+listed in `talk/verify-exclusions.txt` with what each waits for, so the gate
+neither runs them nor counts them; they show as `EXCLUDED`, not as six
+could-not-looks repeated on every run. **Narrate them as design, never as
+observed**, and if you demonstrate one live, say plainly that the gate did not
+grade what the room just watched. The artefact half of attestation *is* graded
+and is Beat 5 proper: signed tags verified against Rekor, anchored certificate
+identity regexps, and the gitsign source verifier — all of which stay in the
+gate. Break-glass also stays in: it is graded offline and passes.
 
 Balance-sheet (Beat 6) is **narrated** — no command; it reads the £ the live
 beats already moved.
@@ -240,3 +258,40 @@ The rule to say out loud: **a green that could not look is a red.** SKIP is
 not a soft pass — the check never ran. Read `pass=` in the TRUTH line as the
 only count of things actually observed true; an offline run's `skip=` proves
 nothing either way.
+
+### What the number is made of
+
+A bare `pass=57 fail=7 skip=18 total=84` cannot tell a loosely coupled
+eco-system from one party testing itself, so the line carries its own
+composition (ticket 83):
+
+```text
+pass=P [observed=a self=b simulated=c meta=d] fail=F skip=S [never=x waits=y]
+  excluded=E total=T ceiling=C
+```
+
+- **observed** — the verdict turned on another party's artefact or on live
+  state outside the script's own repository. This is the number that says the
+  eco-system is loosely coupled rather than self-graded.
+- **self** — a party grading its own code, fixtures or artefacts. Using
+  another party's schema or engine as the *ruler* is still self-proof.
+- **simulated** — the material was synthetic or throwaway, and the script says
+  so in its own verdict.
+- **meta** — the script grades other checks or the record, not the estate.
+- **never / waits** — every could-not-look is declared in advance in
+  `talk/verify-manifest.txt`: `never` is one the runner cannot do as it is
+  built (no cluster, no cross-org credential), `waits` is one the estate's own
+  state has not reached yet. A skip for a reason the manifest does not declare
+  is a **FAIL**, not a shrug, and so is a script the manifest does not place.
+- **ceiling** — `total − excluded − never`: how many of the scripts could ever
+  pass on that runner. `pass=` against `ceiling=`, not against `total=`, is
+  the honest fraction. The `never` subtracted here is every non-excluded script
+  the manifest classes `never`, whatever it exited — not `x` in the skip split,
+  which counts only the ones that skipped. Read the population back off the line
+  as `total − excluded − ceiling`; the two agree only when every `never` script
+  skipped.
+
+The manifest is the record of what each script measures, one line per script;
+`verify/truth-line/verify-truth-line.sh` grades it on every run, and
+`talk/build_deck.py` reads the split off the line so the deck cannot quote a
+composition the run did not carry.

@@ -2,3 +2,27 @@
 # A path that no longer exists fails the gate; keep this list current.
 .estate-clone/ico/schema/verify.sh | takes a version-dir argument; run twice by .estate-clone/ico/verify-penalty-feed.sh (v1, v2)
 .estate-clone/platform/feeds/verify.sh | takes feed/version/file arguments; run by .estate-clone/platform/honesty/verify-honesty.sh
+
+# The identity plane, shelved for this build (ticket 90; owner, ticket 75 Q12, 2026-09-02).
+# NORTH-STAR principle 6 keeps "every actor is attestable" as the design; §1 now claims only the
+# artefact half, which is real and stays in the gate (verify-source-verification.sh, the
+# certificate-identity regexps and the signed-tag checks are all artefact-side and are NOT here).
+# These six are the actor half. Each has an offline proof that holds and a live tail that has
+# never once looked: they want a persistent cluster running SPIRE, Istio, Pomerium/Dex and the
+# secret store, and no ticket on this map builds one. Six could-not-looks repeated on every run
+# say nothing new; what each waits for is named instead. They return with the identity lane, the
+# first thing after this map, which is what will grade the actor half.
+#
+# THE PRICE OF THIS EXCLUSION, recorded because it is not free (ticket 90, 2026-09-04). Five of
+# the six printed "offline proof holds; live tail could not look: ..." on run 65 -- identity,
+# federation, access, eud and posture-projection. Excluding them retires those five offline
+# proofs too: they were reached on every run and are no longer graded anywhere. Only
+# reach-secrets had no offline half. So the gate loses five standing proofs to stop repeating six
+# could-not-looks, and the identity lane owes them back. A re-entry that restores the six must
+# restore those five greens before the actor half is claimed to be new work.
+.estate-clone/platform/identity/verify-identity.sh | shelved with the identity plane (ticket 90): waits for an identity lane that grades the actor half -- a persistent cluster where SPIRE is Istio's CA and mTLS is STRICT, so the workload identity can be observed rather than read out of config
+.estate-clone/platform/identity/verify-federation.sh | shelved with the identity plane (ticket 90): waits for an identity lane with a SECOND trust domain -- there is one domain and no peer today, so federation has nothing to federate with (ticket 68, closed out of scope until the lane exists)
+.estate-clone/platform/access/verify-access.sh | shelved with the identity plane (ticket 90): waits for an identity lane that grades the actor half -- the access plane (Pomerium and Dex) has to be reachable before an authorisation decision can be observed
+.estate-clone/platform/eud/verify-eud.sh | shelved with the identity plane (ticket 90): waits for an identity lane that grades the actor half -- end-user-device identity needs the vTPM-backed nodes attesting into a running cluster
+.estate-clone/platform/posture/verify-posture-projection.sh | shelved with the identity plane (ticket 90): waits for an identity lane that grades the actor half -- posture rides in the SVID path, so it cannot be observed without SVIDs being issued
+.estate-clone/tuppence/reset/verify-reach-secrets.sh | shelved with the identity plane (ticket 90): waits for an identity lane that grades the actor half -- an adopter's reach to its secrets is an actor authorisation, observable only where the workload identity is live

@@ -76,7 +76,7 @@
       "title": "The twin's loop",
       "image": "diagrams/twin-loop.png",
       "caption": "Pre-rendered from `talk/diagrams/twin-loop.mmd`, drawn on the twenty-fifth of August.",
-      "narration": "A dated signal binds to a component. One scenario runs, at a declared time, under a regime that has to be named because there is no default. Out comes a bundle of forecasts, always plural, one per rival world model. They are scored under proper scoring rules against what actually happened, and the score card is signed by an agent identity that attests the absence of a human."
+      "narration": "A dated signal binds to a component. One scenario runs, at a declared time, under a regime that has to be named because there is no default. Out comes a bundle of forecasts, always plural, one per rival world model. They are scored under proper scoring rules against what actually happened. The design signs that score card with an agent identity attesting the absence of a human; that is the actor half of attestation, and it is shelved for this build (ticket 90), so nothing on this run observed it. What this run observed is the artefact half: the signature on the artefact, and what it says it does and does not assert."
     },
     {
       "kind": "beat",

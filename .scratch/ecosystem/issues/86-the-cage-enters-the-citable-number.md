@@ -24,3 +24,13 @@ Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R5. Findings: thesis/
 ## Comments
 
 **2026-09-02, ticket 75 resolved.** Q8 is (b), delegated: the lane branch (item 1), with the ceiling published on the TRUTH line by ticket 83. Item 2 (an ephemeral cluster on the hub clock) is not taken; record it as the road not taken in the ADR-form note item 5 asks for. Q12 is (b): item 3 now belongs to ticket 90 (the six scripts move to the exclusions file with a reason). Unblocked.
+
+**2026-09-04, ticket 90 built.** Item 3 is done, in its exclusions form: the six identity-plane
+scripts (`platform/identity/verify-identity.sh`, `.../verify-federation.sh`,
+`platform/access/verify-access.sh`, `platform/eud/verify-eud.sh`,
+`platform/posture/verify-posture-projection.sh`, `tuppence/reset/verify-reach-secrets.sh`) are in
+`talk/verify-exclusions.txt`, each with what it waits for, and NORTH-STAR §1 now reads "every
+artefact is attestable" with principle 6 keeping the actor half as shelved design. Item 4 (sharpen
+the SKIP reason lines in the estate repos) is NOT done for those six and no longer needs to be:
+they are not run, so they print no reason. It stands for whatever the lane of item 1 brings back.
+Items 1, 2 and 5 remain this ticket's.

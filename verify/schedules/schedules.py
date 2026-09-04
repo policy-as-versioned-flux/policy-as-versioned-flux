@@ -420,6 +420,39 @@ def ruleset_state(remote: str) -> tuple[str, str]:
     return ("missing", f"the repository is {visibility} and carries no observation-lane ruleset")
 
 
+def ruleset_line(unit: str, remote: str, live: bool, unreachable: str,
+                 declared: bool) -> tuple[str, str]:
+    """The 3b question -- is the server-side half of the cage in force? -- as exactly one
+    verdict, always (eco-system ticket 83).
+
+    This used to be an `if live and <rulesets dir exists>` with no else, so on every offline run
+    the eight units' server-side questions emitted nothing at all: not PASS, not FAIL, not SKIP.
+    A question that emits nothing is a fourth outcome. The gate cannot count it, the TRUTH line
+    cannot carry it, and a reader sees eight questions that were never asked as eight that were
+    not there. Both silences are could-not-looks and now say so.
+    """
+    if not live:
+        return ("SKIP", f"{unit}: GitHub unreachable ({unreachable}) -- cannot look at whether "
+                        f"the observation-lane ruleset is applied on {remote}, which is the "
+                        f"server-side half of the cage (ADR-0024 point 3)")
+    if not declared:
+        return ("SKIP", f"{unit}: no .github/rulesets/ in this checkout, so there is no "
+                        f"observation-lane ruleset declared for {remote} to be asked about; "
+                        f"the client-side cage step and this checker are the whole cage here")
+    verdict, reason = ruleset_state(remote)
+    if verdict == "in-force":
+        return ("PASS", f"{unit}: the observation-lane ruleset is applied on {remote} -- "
+                        f"the cage has its server-side half")
+    if verdict == "unavailable":
+        return ("SKIP", f"{unit}: no observation-lane ruleset on {remote}: {reason}. The "
+                        f"client-side cage step and this checker are the whole cage today "
+                        f"(ADR-0024 point 3, amended 2026-08-28)")
+    if verdict == "missing":
+        return ("FAIL", f"{unit}: {reason}, and it could be applied -- ADR-0024 point 3 "
+                        f"claims a server-side leg this repository does not have")
+    return ("SKIP", f"{unit}: could not read the rulesets on {remote} ({reason})")
+
+
 def scheduled_jobs(doc: dict):
     if not crons(doc):
         return
@@ -564,20 +597,12 @@ def check(offline: bool = False) -> int:
                                 f"nothing it runs is opaque to this checker")
 
         # 3b. live: the server-side half of the cage, observed on the remote.
-        if live and os.path.isdir(os.path.join(root, ".github", "rulesets")):
-            verdict, reason = ruleset_state(remote)
-            if verdict == "in-force":
-                out("PASS", f"{unit}: the observation-lane ruleset is applied on {remote} -- "
-                            f"the cage has its server-side half")
-            elif verdict == "unavailable":
-                out("SKIP", f"{unit}: no observation-lane ruleset on {remote}: {reason}. The "
-                            f"client-side cage step and this checker are the whole cage today "
-                            f"(ADR-0024 point 3, amended 2026-08-28)")
-            elif verdict == "missing":
-                out("FAIL", f"{unit}: {reason}, and it could be applied -- ADR-0024 point 3 "
-                            f"claims a server-side leg this repository does not have")
-            else:
-                out("SKIP", f"{unit}: could not read the rulesets on {remote} ({reason})")
+        # Every unit gets a line here (eco-system ticket 83). This block used to emit nothing
+        # when it could not look -- neither PASS nor FAIL nor SKIP -- and a question that emits
+        # nothing is a fourth outcome the gate cannot count: eight server-side questions simply
+        # vanished from the offline run. A could-not-look is a SKIP, said out loud, per unit.
+        declared = os.path.isdir(os.path.join(root, ".github", "rulesets"))
+        out(*ruleset_line(unit, remote, live, unreachable, declared))
 
         # 4. live: did each clock run inside its period?
         for workflow in sorted(need):
@@ -872,6 +897,13 @@ jobs:
 """)
     assert list(scheduled_jobs(dispatch)) == [], "only scheduled jobs are caged"
 
+    # 3b: the server-side question always answers, and a could-not-look says which one it is
+    # (eco-system ticket 83). No branch of it may return nothing.
+    st, msg = ruleset_line("driftwood", "org/driftwood", False, "gh auth status failed", True)
+    assert st == "SKIP" and "GitHub unreachable" in msg and "server-side half" in msg, msg
+    st, msg = ruleset_line("feeds", "org/feeds", True, "", False)
+    assert st == "SKIP" and "no .github/rulesets/" in msg, msg
+
     # the allow-list itself
     assert _allowed("observations/twin-sweep.jsonl") and _allowed("talk/truth.log")
     assert not _allowed("composed/evidence.json") and not _allowed("party.yaml")
@@ -880,8 +912,9 @@ jobs:
     print("ok  the cage bites: a declaration staged beside a push to main fails, a push to "
           "main with no declared OBSERVATION_LANE or no cage step fails, a declaration pushed "
           "to any branch without opening a pull request fails, a proposer that pushes its own "
-          "branch behind a PR passes, a scheduled job that can tag/release/merge fails, and an "
-          "unscheduled cut-release is not judged at all")
+          "branch behind a PR passes, a scheduled job that can tag/release/merge fails, an "
+          "unscheduled cut-release is not judged at all, and the server-side ruleset question "
+          "answers with a named could-not-look rather than with silence")
 
 
 def main(argv: list[str]) -> int:
