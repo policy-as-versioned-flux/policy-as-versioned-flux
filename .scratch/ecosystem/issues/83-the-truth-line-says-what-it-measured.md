@@ -261,3 +261,13 @@ minors closed here. `measured()` had gained arithmetic over `total` and `exclude
 TypeError inside `build_deck.py --check` instead of reporting a bad row. It now says the line does
 not state the population rather than crashing or printing `None`. Two stale figures were corrected:
 the selfcheck fixture is nine scripts, and `tests/test_truth_manifest.py` is 17 tests.
+
+**Observation, 2026-09-04 (the assistant), for whoever next touches the TRUTH line.** `truth.yml`
+runs on push as well as on the clock, and its cage pushes to `HEAD:${GITHUB_REF_NAME}`, so a push
+to a feature branch records a full TRUTH line and its captures on that branch. Nothing is dishonest
+about it: captures are observations, and the line carries its own `hub=` commit so a reader can tell
+which tree it graded. But the run counter advances on branch runs, so run numbers are not a count of
+scheduled runs, and a branch's line would enter `main`'s `talk/truth.log` if that branch merged
+without a rebase. Checked on 2026-09-04: every `hub=` commit in `main`'s log is an ancestor of
+`main`, so the citable record is clean today. Worth a rule (record only on the default branch, or
+mark a branch run in the line) before it is not.
