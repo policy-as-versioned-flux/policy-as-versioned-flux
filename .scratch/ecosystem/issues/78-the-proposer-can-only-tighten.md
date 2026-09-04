@@ -442,3 +442,11 @@ rather than per branch, because `proposer_bounds.bound()` counts rows. Two drift
 publisher of one kind therefore burn two slots writing the same branch twice. Nothing is lost: every
 cage-tier row in a run writes the same party tier to the same manifest, so a deferred duplicate
 carries no content the first did not.
+
+**Final check fix, 2026-09-04 (the assistant, delegated).** The estate walk's PASS sentence said
+"every party in this estate" while a party it could not look at (two governed Namespace documents,
+or nothing composed) was aggregated into the same exit 0 and named nowhere the gate table could
+show. The sentence now says "every party this run could look at", counts the parties it could not,
+and names them, in the shape `verify/misuse` already uses. No cage is loosened by the old wording,
+and the adopters' own shift-left step treats exit 3 as a failure, so the shape could never land in
+an adopter repository.

@@ -53,7 +53,13 @@ if ! "$PY" "$HERE/tier_binding_estate.py" selfcheck --estate-clone "$ESTATE" >/d
 fi
 
 case $rc in
-  0) echo "PASS: every party in this estate that declares a governed Namespace declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform's";;
+  0) skipped="$(grep -c '^SKIP:' "$log" | tr -d ' ')"
+     if [ "$skipped" -gt 0 ]; then
+       named="$(grep '^SKIP:' "$log" | sed -E 's/^SKIP: ([^:]+):.*/\1/' | paste -sd, - )"
+       echo "PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform's; $skipped party/parties could not be looked at by name ($named) and are graded by nothing here"
+     else
+       echo "PASS: every party in this estate that declares a governed Namespace declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform's"
+     fi;;
   *) echo "FAIL: $(grep -c '^FAIL:' "$log") party/parties declare a cage looser than they price, or fold the party differently from platform";;
 esac
 rm -f "$log"
