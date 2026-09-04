@@ -3584,6 +3584,16 @@ def _enactment_is_propose_only_at_both_layers(ctx: Context) -> str:
     # default is `development`, permissive, for hands-on building. This invariant tests the
     # capability itself, not the ambient default, so it forces `operations` for its own calls —
     # restored in `finally` regardless of how the check exits.
+    #
+    # The AMBIENT mode is read here, before it is forced, and reported on this check's detail
+    # line. It is not graded: which mode the estate runs in is the owner's authorisation and not
+    # this check's to refuse. It is REPORTED because nothing else reports it. `decide` prints only
+    # when it denies, so a permissive mode is silent by construction, and until 2026-09-04 the
+    # only signal that the switch had moved was thirty-five red tests in tests/test_enact.py --
+    # a signal that hid two unrelated defects in the same CI run and was replaced by an armed
+    # fixture there. That left the ambient mode observable only by opening the file. One clause on
+    # the one line `./bin/twin verify` prints puts it back in front of a reader.
+    _ambient_mode = enact_guard.enact_mode()
     _prior_mode = os.environ.get("TWIN_ENACT_MODE")
     os.environ["TWIN_ENACT_MODE"] = "operations"
     try:
@@ -3689,7 +3699,10 @@ def _enactment_is_propose_only_at_both_layers(ctx: Context) -> str:
         f"refuses a human signature; {dependency['cross_repository_pins']} cross-repository pin(s) "
         f"across {len(dependency['consumer_repositories'])} consumers "
         f"({dependency['self_sync_pins']} self-sync, counted apart), {len(dependency['limits'])} "
-        "limit(s) stated"
+        f"limit(s) stated. This check FORCED `operations` to test the capability; the estate is "
+        f"running at `{_ambient_mode}`"
+        + (", which admits every merge and every enactment push"
+           if _ambient_mode == "development" else "")
     )
 
 

@@ -19,7 +19,7 @@ from twin.repo import ModelRepo
 # The real, checked-in mode file, captured before the autouse fixture repoints the module's
 # handle at a temp one. `test_the_checked_in_mode_is_read_off_disk_and_the_suite_states_what_it_
 # admits` is the one test that reads this, and it is what keeps the shipped state asserted.
-SHIPPED_MODE_FILE = Path(enact_guard.__file__).resolve().with_name("ENACT_MODE")
+SHIPPED_MODE_FILE = enact_guard.ENACT_MODE_FILE
 
 # The mode the capability tests below run under. `other-hand` rather than `operations`, because it
 # is the strictest mode that still admits the one shape the estate needs: every push to an
