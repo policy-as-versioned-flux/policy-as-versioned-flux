@@ -266,3 +266,30 @@ against the branch, not assumed.
   `verify-branch-refs` is green (53 PASS, 1 declared SKIP); `verify-feed-contract` is NOT, and
   cannot be until the three adopter releases in ticket 77's Waits item 1 exist. This ticket's
   done clause waits on that dispatch and on nothing this build can do.
+
+## Correction, 2026-09-04 (eco-system ticket 64)
+
+Item 2 of "Landed 2026-09-04" above says tuppence's `shift-left` red is one "the branch is what
+made it able to fail", and that composing against the signed tag rather than platform's default
+branch is what produced the major. **Both halves are wrong, and the runs say so.**
+
+The identical failure, with the identical numbers, is in Actions run `33884942977` on branch
+`ecosystem/build-2026-09-03`, which ran at 14:38 on 2026-09-04 — before this branch pinned the
+checkout:
+
+    FAIL: composed bump is major -- refusing to adopt v2.0.1 without human review
+    declared (platform tag v2.0.1 -> v2.0.1): none
+    composed (this institution, across ['4.0.0'] and retired []): major
+
+and the same four lines are in run `33915621021` on `ticket-62-and-77` afterwards. The `ref:` on
+the workflow's platform checkout could not have changed the outcome either way, because
+`adopter-gate.py:checkout_tag()` re-checks that same directory out at the pinned tag before it
+reads a single evidence file. The pin is a real improvement; it is not the cause of this red.
+
+What the red actually is: tuppence's `compose()` folds `bump.computed` for **every version in the
+institution's current supported window**, which has been exactly `['4.0.0']` since 2026-08-29, and
+platform's own signed evidence for policy 4.0.0 records `major`. driftwood and ludlow fold only
+the versions a pull request **adds or retires**, so both are green the same day on the same tag
+against the same evidence. tuppence's last green `shift-left` is 2026-08-28. Nothing was changed
+to make it green; the diagnosis is recorded in the file itself and in ticket 64's Answer, and what
+it waits on is in ticket 64's `## Waits on the owner`.
