@@ -198,6 +198,27 @@ manifest rows carry the two adopters' own checks.
 * **tuppence's and ludlow's `selection-policy` packages.** Ticket 25's shape; `ladder.yaml`
   carries the rungs in the meantime and is checked against platform's own published ladder.
 
+### The gate graded this branch for real, in CI
+
+`truth.yml` fired on the push of `b51260e` and appended run 86 to `talk/truth.log`. It is on this
+branch (the clock's own commit, restored after a force-push briefly dropped it):
+
+    TRUTH 2026-09-04T22:22Z run=86 hub=b51260e units=[driftwood=cd63472@main feeds=b6eaa0a@main
+    ico=6217c3a@main insurer=9e90e1b@main ludlow=64492d3@main nist=b9f5fff@main
+    platform=bbda376@main tuppence=e44ad89@main] pass=66 [observed=14 self=40 simulated=6 meta=6]
+    fail=7 skip=20 [never=10 waits=10] excluded=8 total=101 ceiling=82
+
+Against run 85: `total` 100 -> 101 and `ceiling` 81 -> 82 (the new check), `waits` 8 -> 10 (its
+declared could-not-look and step 5's widened one), `fail` 8 -> 7. The new check's own capture,
+committed by that run at
+`talk/captures/verify_twin-per-adopter_verify-twin-per-adopter.out`, is the line this ticket
+exists to make the gate print:
+
+    SKIP: 2 of 3 adopters carry no twin overlay and are named rather than omitted: ludlow,
+    tuppence.
+
+So the manifest rows are not a claim about how the gate would grade it; the gate graded it.
+
 ### Two measurements, and one finding that is not this ticket's
 
 * **Step 5's wall-clock with all three overlays present: 1:52.61**, against `talk/verify-all.sh`'s
@@ -206,6 +227,7 @@ manifest rows carry the two adopters' own checks.
   one adopter and no `.venv`, 1:52 with three and a `.venv`), because the cost is dominated by the
   twin evals and driftwood's four planted refusals rather than by the loop. There is headroom, and
   it is worth watching: a fourth adopter is the next thing that moves it.
+* **The full suite on this branch: `2 failed, 1775 passed in 2019.25s`** (`.venv/bin/python -m pytest tests/ -n0 -q`). The two are `test_invariant_suite.py::test_the_suite_is_green`, which is the standing red `flux_coverage_floor_is_still_reachable` (invariant 45, build ticket 70 finding 1), and the serial-only leak below. Note for the record: the 35 `tests/test_enact.py` failures the 2026-09-03 brief warned about did NOT occur on this branch's base.
 * **`tests/test_seam1_cli.py::test_an_attestation_sidecar_accompanies_every_artefact` fails under
   `-n0` and passes under the default `-n auto`, and it does so on untouched `main`.** Running
   `tests/test_intel_beat.py tests/test_invariant_suite.py tests/test_seam1_cli.py -n0` in the
