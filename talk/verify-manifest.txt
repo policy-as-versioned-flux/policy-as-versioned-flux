@@ -22,8 +22,11 @@
 #
 # The classification rule (delegated, ADR-0025, 2026-09-04): a pass is an observation of the
 # estate only when its verdict turns on another party's artefact or live external state; a
-# script whose live tail needs a cluster is classed by what its PASS would rest on, so the six
-# cluster tails are estate-observation with `never:`. The runner's substrate reason today is
+# script whose live tail needs a cluster is classed by what its PASS would rest on, so the
+# cluster tails are estate-observation with `never:`. A line for a script listed in
+# talk/verify-exclusions.txt is kept and inert: it records what that script would have measured,
+# so the day it re-enters the gate its class is already decided, not re-argued. The runner's
+# substrate reason today is
 # "kind cluster 'driftwood' is not listed by kind get clusters" (platform/lib.sh) or "does not
 # exist" (tuppence). Ticket 86 (lane branch) and ticket 56 (schedules credential) edit the
 # `never:` lines they lift; ticket 91 un-retires the currency controller and edits its line.
@@ -60,7 +63,7 @@
 .estate-clone/nist/scripts/verify-cert-identity-regexp.sh | self-proof | -
 
 # --- platform ----------------------------------------------------------------------------
-.estate-clone/platform/access/verify-access.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
+.estate-clone/platform/access/verify-access.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/platform/break-glass/verify-break-glass.sh | self-proof | -
 .estate-clone/platform/compose/verify-composition.sh | estate-observation | waits: not on the real remote until cut-release.yml cuts   # composes real driftwood against its five real pinned parents
 .estate-clone/platform/computed-semver/verify-cage-engine.sh | self-proof | -
@@ -82,18 +85,18 @@
 .estate-clone/platform/distribution/verify-render-version-tree.sh | self-proof | -
 .estate-clone/platform/distribution/verify-retirement.sh | self-proof | waits: declares one version   # ticket 84 lifts it with a second declared line
 .estate-clone/platform/engine/verify-engine.sh | estate-observation | never: kind cluster 'driftwood' is not listed
-.estate-clone/platform/eud/verify-eud.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
+.estate-clone/platform/eud/verify-eud.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/platform/fair/verify-fair-tail.sh | self-proof | -
 .estate-clone/platform/feeds/verify-feeds.sh | self-proof | -
 .estate-clone/platform/graded/verify-graded.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # ticket 86's lane branch owns this line
 .estate-clone/platform/honesty/verify-honesty.sh | self-proof | -
-.estate-clone/platform/identity/verify-federation.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
-.estate-clone/platform/identity/verify-identity.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
+.estate-clone/platform/identity/verify-federation.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
+.estate-clone/platform/identity/verify-identity.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/platform/oscal/verify-claims.sh | estate-observation | -   # every claimed control id resolves in nist's real pinned catalogue
 .estate-clone/platform/oscal/verify-upflow.sh | simulation | -   # self-generated PolicyReports
 .estate-clone/platform/party/verify-party-artefact.sh | self-proof | -
 .estate-clone/platform/policy/verify-conditional.sh | self-proof | waits: lives only in require-nonroot-2-0-1   # the gate cuts a SKIP line at 160 characters, so a pattern must sit inside that
-.estate-clone/platform/posture/verify-posture-projection.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
+.estate-clone/platform/posture/verify-posture-projection.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/platform/risk/verify-risk-tuned.sh | self-proof | -
 .estate-clone/platform/shift-left/verify-shift-left.sh | self-proof | waits: declares one major line   # ticket 84 lifts it with a second declared line
 .estate-clone/platform/shift-left/verify-tier-binding.sh | self-proof | -   # platform planting cases against its own rule; the hub's verify/tier-binding runs it over the real adopters
@@ -107,7 +110,7 @@
 .estate-clone/platform/wargamer/verify-wargamer.sh | self-proof | -
 
 # --- tuppence (adopter) ------------------------------------------------------------------
-.estate-clone/tuppence/reset/verify-reach-secrets.sh | estate-observation | never: kind cluster 'driftwood' does not exist   # identity plane; ticket 90 excludes it
+.estate-clone/tuppence/reset/verify-reach-secrets.sh | estate-observation | never: kind cluster 'driftwood' does not exist   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/tuppence/scripts/verify-adopter-gate.sh | simulation | -   # throwaway repositories built in the run
 .estate-clone/tuppence/scripts/verify-identity-regexp.sh | self-proof | -
 .estate-clone/tuppence/verify-reconcile.sh | estate-observation | waits: no local kind cluster .* and the lane sample cannot stand in
