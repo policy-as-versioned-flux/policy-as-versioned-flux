@@ -1,7 +1,7 @@
 # 53 — cut-release.yml pushes the tag but never the branch, so signed evidence never reaches main
 
 Type: task (HITL)
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -66,3 +66,102 @@ between here and the last three merges.
 ## Comments
 
 - 2026-08-31 (ambition review): The defect is repaired in code and the record should say so: cut-release-push.sh pushes HEAD:branch atomically with the tags (b83eba1, on platform main), all four evidence bundles are on main, v2.0.0/v2.0.1 are cut and every adopter pins v2.0.1. Close with an Answer naming the check that proves it. Add one clarifying line: this ticket does NOT own the platform CEL/toolchain reds — new ticket 54 does.
+
+## Answer (2026-09-03)
+
+The defect was repaired and enacted by the owner on 2026-08-31; this ticket records it and adds the
+two checks that prove it, so the record is graded and not merely stated.
+
+**What is true now, read live from `.estate-clone/platform` on 2026-09-03:**
+
+- `.github/scripts/cut-release-push.sh` line 34 on platform `origin/main` is
+  `git push --atomic "$remote" "HEAD:refs/heads/${branch}" "${tags[@]}"` (repairing commit
+  `b83eba1`, merged as platform PR 6). A detached HEAD is refused before anything is pushed.
+- `git ls-tree origin/main computed-semver/evidence/` shows `2.0.0`, `2.0.1`, `3.0.0` and `4.0.0`,
+  each with its `.json` and its `.json.bundle`.
+- The evidence for `policy/v4.0.0` was re-committed onto `main` by the release bot as `533dccb`
+  (2026-08-31T16:18Z). The orphaned signed commits `64635df` and `1d8cec2`, and the `policy/v4.0.0`
+  tag commit, remain unreachable from `main` (`git merge-base --is-ancestor` says no for all three).
+- Tags `v2.0.0` and `v2.0.1` exist. `v2.0.0` is immutable and still carries `4.0.0.json` with no
+  bundle. `v2.0.1` carries all four pairs.
+- driftwood, tuppence and ludlow `gitops/platform/platform-pin.yaml` all pin `tag: v2.0.1`.
+
+**The three decisions posed above (owner-instructed, 2026-08-31, enacted as `b83eba1`):**
+
+1. The branch is pushed with the tags, atomically. A workflow now writes to `main` by atomic push;
+   the alternative of landing evidence by pull request was not taken.
+2. Not by pull request. The evidence is the gate's own signed output for a tag that already exists;
+   a reviewer has nothing to dispose of, and the window between "tag exists" and "main carries its
+   evidence" is the defect itself.
+3. The orphaned commits were not cherry-picked (that would put a second signature under a different
+   identity on the same content). The release bot re-committed the evidence (`533dccb`) and `v2.0.1`
+   was cut from a `main` that carries every bundle.
+
+**Decisions taken here (delegated, ADR-0025):**
+
+- **The citable check is the hub-side one.** `verify/provenance/verify-release-evidence-reaches-main.sh`
+  grades what the adopters actually read: every evidence document on platform `origin/main` and on
+  each adopter's pinned tag has its bundle beside it, and the push line on `origin/main` is the
+  atomic branch-plus-tags one. Reason: it runs from the hub against the published ref with no
+  platform push needed, so it is green on the gate today, and it grades the outcome the three
+  adopters refused on. It exits 3 when the platform clone cannot be read, 1 on any finding. Its
+  `selfcheck` (run first on every invocation) proves the graders bite: a bundle-less tree fails, the
+  pre-repair tags-only push line fails (a comment carrying the right line does not count), a split
+  push (branch in one `git push`, tags in another, each `--atomic`) fails, a `--dry-run` fails, an
+  empty tree fails, and the real, immutable platform `v2.0.0` fails the pairing exactly as it did
+  for the adopters. The push-line grader requires exactly one non-comment `git push` line and grades
+  the branch ref, the tags and `--atomic` on that one line (review fix, 2026-09-04: the first cut
+  grepped the tokens across every push line, so a split push passed). Discovered by
+  `talk/verify-all.sh`'s `find verify -name 'verify*.sh'`.
+- **Platform's own offline twin grades the mechanism.** `verify-cut-release-tags.sh` case 8 (on the
+  platform branch `ticket-53-the-release-pushes-tags-but-not-the-branch`, commit `951f5a8`) commits a
+  stand-in evidence file on the branch, runs the real `cut-release-push.sh` against the script's
+  scratch bare remote, and requires the remote's `refs/heads/main` to be the tagged commit; then a
+  rejected push (a tag already on the remote at a different object) must move neither the tags nor
+  the branch; then a detached HEAD must be refused, and the remote is read back to prove neither a
+  tag nor `refs/heads/main` moved (review fix, 2026-09-04: the first cut graded only the refusal
+  message). Written first and watched fail against the pre-repair push line (`remote
+  refs/heads/main is 59721a3..., not the tagged commit f262f6a...`), then green against `b83eba1`.
+  It reaches the gate on the integration branch once the integrator merges the platform branch
+  (`verify-all.sh` reads the checkout), and reaches the published platform when the owner pushes.
+- **The orphaned commits stay orphaned.** `64635df`, `1d8cec2` and the `policy/v4.0.0` tag commit
+  are not to be cherry-picked, rebased or merged onto `main` later: the evidence is on `main` as
+  `533dccb`, the tag is immutable, and a second copy would be a second signature. Recorded as the
+  accepted state so nobody later "repairs" it.
+- **The hub check reads `origin/main`, not the working checkout**, so a local branch in the clone
+  (the integration branch, a ticket worktree) can neither fake nor spoil the grade; the published
+  ref is what adopters pin from.
+- **The ADR note goes on ADR-0011** (release gate computes the bump), whose consequence "the
+  publisher gate runs before `git tag`" is the step that commits the evidence. Dated note added,
+  no new ADR number.
+
+**Clarifying line:** this ticket does not own the platform CEL/toolchain reds. Ticket 54 does.
+
+**How verified (from the hub worktree root):**
+
+    bash verify/provenance/verify-release-evidence-reaches-main.sh selfcheck   # exit 0
+    bash verify/provenance/verify-release-evidence-reaches-main.sh             # exit 0, PASS
+    RELEASE_EVIDENCE_PLATFORM=/nonexistent bash verify/provenance/verify-release-evidence-reaches-main.sh   # exit 3, SKIP
+    bash .estate-clone/platform/verify-cut-release-tags.sh                     # exit 0, PASS (case 8 included)
+
+Map line: [53 — The release pushes tags but not the branch](issues/53-the-release-pushes-tags-but-not-the-branch.md) — owner-instructed 2026-08-31 (platform `b83eba1`): the branch goes in the same atomic push as the tags, never by PR; orphaned signed commits stay unreachable, the release bot re-committed the evidence (`533dccb`), `v2.0.1` carries every bundle and all three adopters pin it; graded by the hub's `verify-release-evidence-reaches-main.sh` (outcome, green now) and platform `verify-cut-release-tags.sh` case 8 (mechanism, waits on the owner's push); ADR-0011 dated note; ticket 54 owns the CEL/toolchain reds.
+
+## Waits on the owner
+
+- Pushing platform branch `ticket-53-the-release-pushes-tags-but-not-the-branch` (commit `951f5a8`
+  plus the 2026-09-04 review fix, case 8 in `verify-cut-release-tags.sh`) once the integrator has
+  merged it into `ecosystem/build-2026-09-03`. The guard refuses enactment pushes. Nothing else waits.
+
+## Review fixes, 2026-09-04
+
+Two reviews. One blocking finding: `grade_push_line` in the hub check joined every `git push` line
+and grepped the three tokens across the set, so a split push (branch in one push, tags in another)
+and a `--dry-run` were graded "one --atomic push". Fixed: exactly one non-comment push line, all
+three tokens on it, `--dry-run`/`-n` refused; selfcheck legs for the split and dry-run shapes added
+first and watched fail. Minor: the detached-HEAD leg of platform case 8 now reads the remote back
+(no `v11.0.0`, `refs/heads/main` unmoved), watched fail against a fixture that pushes a tag before
+refusing; the dead `grep -v '^#'` after the `^git push` grep is gone. Minor, not fixed: three commit
+subjects on the pushed hub branch and the platform branch run to 75, 77 and 91 characters, over the
+brief's 72. They are already pushed (hub) or reviewed at their hash (platform `951f5a8`, cited in
+this file and ADR-0011); rewriting them would break those citations and the open PR. Left as they
+are; the fix commits keep under 72.
