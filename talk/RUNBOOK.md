@@ -8,7 +8,11 @@ stands in for a thing that doesn't work.
 
 > Thesis in one line: **governance is a proportionate, informed, continuously
 > re-tuned response to quantified risk — and versioning the whole chain, with
-> every actor attestable, is how proportionality stays honest.**
+> every artefact attestable, is how proportionality stays honest.**
+
+> The thesis line said *every actor attestable* until 2026-09-04. The actor half
+> is designed and shelved for this build (ticket 90; NORTH-STAR principle 6), so
+> the sentence you say on stage claims the half this estate can be watched doing.
 
 **No venue-Wi-Fi independence — abandoned, mo-12 (2026-08-21).** This runbook
 used to claim *"there is no venue-Wi-Fi dependency in any [LIVE] beat"* and
@@ -134,10 +138,24 @@ on stage. The gate runs every script by discovery, so there is no mapping to kee
 | 3b. Graded / TCoR | `.estate-clone/platform/graded/verify-graded.sh` · `.estate-clone/platform/tcor/verify-tcor.sh` | cage.py + tcor.py |
 | 4. Living loop | `.estate-clone/platform/feeds/verify-feeds.sh` · `…/wardley/verify-wardley.sh` · `…/wargamer/verify-wargamer.sh` | feeds + wargamer |
 | 4b. Honest today | `.estate-clone/platform/honesty/verify-honesty.sh` | calibration+integrity |
-| **5. Provenance** | `verify/provenance/verify-provenance.sh` · `…/identity/verify-identity.sh` · `…/posture/verify-posture-projection.sh` | SPIFFE chain |
-| 5b. Reach + secrets | `.estate-clone/tuppence/reset/verify-reach-secrets.sh` | Istio+OpenBao glob |
-| 5c. Human/device | `.estate-clone/platform/access/verify-access.sh` · `…/break-glass/verify-break-glass.sh` · `…/eud/verify-eud.sh` | Pomerium+tpm_devid |
+| **5. Provenance** | `verify/provenance/verify-provenance.sh` | Rekor + SPIFFE chain |
+| 5 (shelved). Actor attestation | `…/identity/verify-identity.sh` · `…/identity/verify-federation.sh` · `…/posture/verify-posture-projection.sh` | SPIFFE chain |
+| 5b (shelved). Reach + secrets | `.estate-clone/tuppence/reset/verify-reach-secrets.sh` | Istio+OpenBao glob |
+| 5c (shelved). Human/device | `.estate-clone/platform/access/verify-access.sh` · `…/eud/verify-eud.sh` | Pomerium+tpm_devid |
+| 5c. Break-glass | `.estate-clone/platform/break-glass/verify-break-glass.sh` | offline, still graded |
 | — Reconcile (live) | `.estate-clone/{driftwood,tuppence,ludlow}/verify-reconcile.sh` | live cluster |
+
+**The rows marked (shelved) are not graded by the gate.** The identity plane —
+the actor half of NORTH-STAR principle 6 — is designed and shelved for this
+build (owner, ticket 75 Q12, 2026-09-02; ticket 90). Those six scripts are
+listed in `talk/verify-exclusions.txt` with what each waits for, so the gate
+neither runs them nor counts them; they show as `EXCLUDED`, not as six
+could-not-looks repeated on every run. **Narrate them as design, never as
+observed**, and if you demonstrate one live, say plainly that the gate did not
+grade what the room just watched. The artefact half of attestation *is* graded
+and is Beat 5 proper: signed tags verified against Rekor, anchored certificate
+identity regexps, and the gitsign source verifier — all of which stay in the
+gate. Break-glass also stays in: it is graded offline and passes.
 
 Balance-sheet (Beat 6) is **narrated** — no command; it reads the £ the live
 beats already moved.
