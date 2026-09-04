@@ -428,3 +428,17 @@ all three.
   differ only in which price their body names -- and fixing it renames every proposal branch and
   orphans the derived rejection ledger's keys (ADR-0024). Named, decided (decision 13), not fixed
   here.
+
+**Re-review round 2 fix, 2026-09-04 (the assistant, delegated).** `governed_namespace_spans()`
+split documents on a bare `---` only, so a legal `--- # second app` separator merged two governed
+Namespaces into one span: the ambiguity guard never fired, the binding check printed a green over a
+second Namespace declared looser than the strictest priced line, and `apply_tier_declaration`
+did the partial write its own docstring forbids. The separator is now `---` alone or `---`
+followed by whitespace and anything else, and `----` and `---foo` are still not separators
+(checked against both shapes). No adopter uses a commented separator today, so this was latent.
+
+Recorded and not changed: decision 13's collapse also spends one rate-limit slot per collapsed row
+rather than per branch, because `proposer_bounds.bound()` counts rows. Two drifting lines from one
+publisher of one kind therefore burn two slots writing the same branch twice. Nothing is lost: every
+cage-tier row in a run writes the same party tier to the same manifest, so a deferred duplicate
+carries no content the first did not.
