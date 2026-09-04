@@ -14,10 +14,11 @@
 # scripts in this estate that print a prose skip, two of which were false greens (fixed by this
 # ticket) and two of which narrow their closing sentence honestly. The prose kind is caught by
 # execution, not text, but only where a script carries the leg: `selfcheck_absent` re-runs a
-# script with the instrument hidden and requires exit 3 with a `SKIP:` last line, and 9 of the 95
-# discovered scripts carry it. This run counts both figures rather than quoting them, and prints
-# how many prose sites sit in scripts that carry no leg: those are graded by nothing. Today they
-# are in verify-currency.sh, verify-upflow.sh, verify-reach-secrets.sh and verify-access.sh;
+# script with the instrument hidden and requires exit 3 with a `SKIP:` last line. How many
+# discovered scripts call it is counted on each run and printed, never quoted here. How many prose
+# sites there are is not counted at all: a text scan cannot tell a false green from an honest
+# narrowing. Today the prose sites sit in verify-currency.sh, verify-upflow.sh,
+# verify-reach-secrets.sh and verify-access.sh, none of which calls the leg;
 # ticket 76's Answer records giving them the leg as its own ticket.
 #
 #   PASS (exit 0)  no discovered script prints the SKIP verdict token and then reaches exit 0
@@ -44,7 +45,7 @@ python3 "$HERE/every_green.py" scan "$ROOT/verify" "$ROOT/.estate-clone" | tee "
 # narrowing, which is the whole reason this net grades the verdict token instead.
 discovered="$(find -L "$ROOT/verify" "$ROOT/.estate-clone" -name 'verify*.sh' -not -path '*/.work/*' -not -path '*/.git/*' 2>/dev/null)"
 n="$(printf '%s\n' "$discovered" | grep -c . | tr -d ' ')"
-legged="$(printf '%s\n' "$discovered" | while IFS= read -r f; do [ -n "$f" ] && grep -q '^[^#]*selfcheck_absent' "$f" 2>/dev/null && echo "$f"; done | grep -c . | tr -d ' ')"
+legged="$(printf '%s\n' "$discovered" | while IFS= read -r f; do [ -n "$f" ] && grep -qE '^[[:space:]]*(if .*; then )?selfcheck_absent[[:space:]]' "$f" 2>/dev/null && echo "$f"; done | grep -c . | tr -d ' ')"
 unread="$(grep -c '^  ??   could not read ' "$scan_log" | tr -d ' ')"
 case "$rc" in
   0) echo "PASS: none of the $n discovered verify scripts prints the SKIP verdict token and then reaches exit 0; the prose-worded could-not-look is not graded here (see the header), and is graded only where a script carries a selfcheck_absent leg, which $legged of them do; a prose could-not-look in any of the rest is graded by nothing"
