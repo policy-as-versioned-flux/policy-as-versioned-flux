@@ -80,7 +80,12 @@ $t/fx/verify-g-never-passes.sh | estate-observation | never: kind cluster \w+ is
 $t/fx/verify-h-waits.sh | simulation | waits: not cut yet
 $t/fx/verify-i-long-skip.sh | estate-observation | waits: is not in this fixture checkout
 EOF
-  echo "$t/fx/verify-f-excluded.sh | a helper the others call" >"$t/exclusions.txt"
+  # The reason carries an APOSTROPHE on purpose. Two real exclusion reasons do (SPIRE is
+  # Istio's CA; an adopter's reach to its secrets) and the trim below used to be bare `xargs`,
+  # which quote-processes its input: BSD xargs printed nothing at all, so the reason came back
+  # empty, the exclusion was dropped and the run went on; GNU xargs printed the reason
+  # truncated at the apostrophe. Neither is a trim.
+  echo "$t/fx/verify-f-excluded.sh | a helper the others call, and SPIRE is Istio's CA" >"$t/exclusions.txt"
   out="$(env -u GITHUB_RUN_NUMBER VERIFY_SCRIPTS_FROM="$t/scripts.txt" VERIFY_MANIFEST="$t/manifest.txt" \
            VERIFY_EXCLUSIONS="$t/exclusions.txt" VERIFY_CAPDIR="$t/captures" \
            bash "$ROOT/talk/verify-all.sh")"; rc=$?
@@ -100,7 +105,8 @@ EOF
   chk 'verify-d-undeclared-skip.sh +FAIL \(undeclared skip\).*talk/verify-manifest.txt'
   chk 'verify-e-unlisted.sh +FAIL \(no line in talk/verify-manifest.txt; the script passed\)'
   chk '^FAIL manifest\[row\]: .*verify-e-unlisted.sh is discovered but has no line'
-  chk 'verify-f-excluded.sh +EXCLUDED  a helper'
+  # ...and the WHOLE reason has to survive the trim, apostrophe and all.
+  chk "verify-f-excluded.sh +EXCLUDED  a helper the others call, and SPIRE is Istio's CA$"
   chk 'verify-g-never-passes.sh +PASS \(manifest says never\)'
   chk '^FAIL manifest: .*verify-g-never-passes.sh passed, but talk/verify-manifest.txt says it can never pass'
   chk '^TRUTH .* run=local hub=[0-9a-f]+ units=\[fixture\] pass=1 \[observed=0 self=1 simulated=0 meta=0\] fail=4 skip=3 \[never=1 waits=2\] excluded=1 total=9 ceiling=6 fixture=1$'
@@ -126,7 +132,7 @@ EOF
   chk '^NOTE manifest: \.estate-clone/nowhere/verify-nowhere.sh is listed .* not in this checkout'
   chk '^TRUTH .* fail=6 .* fixture=1$'
   if [ "$good" = 1 ]; then
-    echo "PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, and a unit line this checkout does not carry is a note"
+    echo "PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, an exclusion reason containing an apostrophe survives the trim whole, and a unit line this checkout does not carry is a note"
     exit 0
   fi
   echo "FAIL: selfcheck: the instrument does not grade as documented (see above)"; exit 1
@@ -140,9 +146,16 @@ fi
 # excluded: "path | reason" lines, '#' comments allowed
 declare -A reason
 prefail=0
+# Trim leading and trailing whitespace, and NOTHING else. This used to be `echo ... | xargs`,
+# which is a word-splitter, not a trimmer: it quote-processes what it reads. Two exclusion
+# reasons contain an apostrophe, and on that input BSD xargs prints nothing at all (the reason
+# read back empty, the exclusion was silently dropped and the run carried on) while GNU xargs
+# prints the reason truncated at the apostrophe. Parameter expansion touches neither quotes nor
+# backslashes and needs no subprocess. Covered by the selfcheck fixture above.
+trim() { local s=$1; s="${s#"${s%%[![:space:]]*}"}"; printf '%s' "${s%"${s##*[![:space:]]}"}"; }
 while IFS= read -r line; do
   line="${line%%#*}"; [ -z "${line// }" ] && continue
-  p="$(echo "${line%%|*}" | xargs)"; r="$(echo "${line#*|}" | xargs)"
+  p="$(trim "${line%%|*}")"; r="$(trim "${line#*|}")"
   [ -n "$r" ] || { echo "FAIL exclusions: '$p' has no reason"; prefail=$((prefail+1)); }
   [ -e "$p" ] || { echo "FAIL exclusions: '$p' no longer exists, remove it"; prefail=$((prefail+1)); }
   reason["$p"]="$r"
