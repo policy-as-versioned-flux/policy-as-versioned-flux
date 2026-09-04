@@ -68,3 +68,64 @@ in Kubernetes terms the estate is a mutating admission controller more than a va
 assistant's narrower alternative, a surviving locked door for access control, data protection and
 key management, was put and overruled. Consequence: no Deny-shaped rule ships that is not a cage
 constraint (ticket 89).
+
+## Note, 2026-09-04 (ticket 78, delegated): the proposer only tightens, and the selection is over the party
+
+The cage was recorded as tighten-only above. The **proposer** was not. `tier_pr.py` ran
+`wargame_cage_tier()` once per `prices[]` line and `apply_tier_declaration()` wrote that line's
+`proposed_tier` onto the governed Namespace unconditionally, so driftwood's only reachable band
+crossing today -- the threat-register line moving `baseline` to `restricted`, beside two lines
+that already select `isolated` -- would have stamped `restricted` over a Namespace declared
+`isolated`. Tighten-only was a property of the mutating webhook and of nothing that wrote the
+declaration the webhook reads.
+
+Three things now hold, and each carries a check:
+
+- **The selection is over the party, not the price line.** One Namespace carries one tier for
+  every pod in it, so the declaration cannot be looser than the party's worst-priced regime. The
+  tier written is the **strictest `proposed_tier` across `prices[]`**, clamped up to the declared
+  `overlay.floor`, and never looser than what the Namespace declares today. A line whose fold does
+  not tighten the declaration is **held**: no branch, no commit, no pull request.
+  (`wargamer.select_party_tier`, and driftwood's own `selection-policy` v1.1.0 `select_party`.)
+- **The declaration is bound to the price, on every pull request.** A proposer that only tightens
+  does not stop a hand edit or a merge that races a re-price, so
+  `platform/shift-left/tier_binding.py` reads `proposed_tier` off the composed evidence and
+  `posture.acme.io/tier` off the governed Namespace and refuses the looser label. It runs in each
+  adopter's `shift-left.yml` and, across the estate, in the hub's `verify/tier-binding/`.
+- **The proposal commit is signed and its identity is checked.** `propose-tier.yml` installs
+  gitsign by checksum, signs the commit with the workflow's own keyless Actions identity, and
+  verifies it against a second constant, `EXPECTED_PROPOSAL_IDENTITY_REGEXP`, anchored to
+  `propose-tier.yml@refs/heads/main`. It is deliberately not an alternation widened into
+  `release.yml`'s `EXPECTED_IDENTITY_REGEXP`: proposing a tighter cage and publishing a signed
+  release are different powers, and each adopter's identity-regexp check now proves the two do not
+  overlap in either direction.
+
+**Strictest line, not summed residual, is the rule this note records** -- the interim the ticket
+states, pending PE-05 / ticket 75 Q4. A summed rule would slot into exactly one place,
+`select_party_tier()`'s fold of `lines` to `strictest`, mirrored in the adopter package. The
+version bump is what makes that swap reviewable: driftwood's selection-policy is now 1.1.0.
+
+**`infra` is a declaration, not a selection** (added on review the same day). The ladder these
+folds select from is `baseline, restricted, quarantine, isolated`: no price proposes `infra` and no
+floor declares it. But this ADR gives a platform-role party the right to declare a Namespace at
+`infra`, and the first build graded such a declaration as a **missing instrument** -- a refusal --
+because it was not on the selection ladder. That was wrong: it is a legitimate declaration, and it
+is *tighter* than every rung a price can reach. Both readings of an `infra` label agree on the two
+questions these folds ask: from a platform-role party it stands and nothing priced can tighten it;
+from any other party it renders `isolated`, this ladder's own tightest rung, and nothing priced is
+looser than that either. So the verdict needs no role lookup, and `rank()` -- one rung longer than
+`LADDER` -- is what both folds and the binding check now compare with.
+
+**Two governed Namespace documents is a question, not a first answer** (added on review the same
+day). The ambiguity guard counted manifest FILES, so a second governed Namespace declared in the
+*same* file was invisible: the proposer wrote the first and left the second, and the binding check
+read the first and passed. Declarations are now counted per **document**. Two of them, in one file
+or two, is could-not-look: which one carries the party's tier is not the proposer's or the check's
+guess to make (ADR-0020), and `apply_tier_declaration()` refuses rather than rewriting one of them.
+
+**Loosening is not implemented, and that is the decision, not an omission.** ADR-0022 prices a
+lowered floor rather than refusing it, so a party's aggregate residual should one day be able to
+argue a looser declaration. Doing that needs a residual the proposer does not yet compute and a
+pull-request body that carries the argument, so this ticket writes nothing looser at all and the
+looser path stays a later ticket. Until then a loosening is a human edit to the Namespace, in the
+open, under the binding check -- which is where an unargued loosening belongs.
