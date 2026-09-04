@@ -187,6 +187,14 @@ repository pins, and a pinned tree is checked for the section the pin is used fo
   a runner that has lost its venv or its clone should go red, not shrug.
 * **The head-of-SKIP-list convention in both wrappers is untouched.** It is an inherited estate
   convention and the manifest's known-limit note (ticket 83 decision 3) already covers it.
+* **The branch is NOT rebased on `origin/main`, deliberately** (delegated, ADR-0025). `main`
+  moved to `13234b5` while this round ran, and the rebase itself was clean -- but the clock had
+  meanwhile committed `7f61920 truth: record run 79` to this branch, an observation of
+  `hub=5ee9e44` that `main` does not carry. Replaying it onto `main` conflicts in `talk/truth.log`
+  and eleven capture files, and resolving that by hand would mean choosing which run's captures
+  survive: a truth-record decision, not a builder's. Force-pushing over it would delete an
+  observation, which a clock's record is never for. So round 3 was replayed on top of the clock's
+  commit and pushed fast-forward -- nothing discarded, nothing rewritten. The integrator merges.
 * `verify-branch-refs.sh` now grades **53 PASS and 1 SKIP** (the SKIP is unchanged: driftwood's
   `twin-sweep.yml` consuming the hub, which has cut no tag). The three new PASSes are the
   insurer's three adopter checkouts, which nothing graded before.
