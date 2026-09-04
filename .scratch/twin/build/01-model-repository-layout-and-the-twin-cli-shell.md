@@ -12,7 +12,7 @@ establish the *hook* for that here even though nothing uses it until the substra
 
 **Status:** done (2026-08-05)
 
-**Reading list:** Decision tickets 07 (domain data model), 14 (provenance and attestation). Constitution: `00-constitution.md`.
+**Reading list:** Decision tickets 07 (domain data model), 14 (provenance and attestation). Spec story 2 — cited 2026-09-03 (eco-system ticket 17, AUG-05-CUT §2.5): this ticket owns it; the criterion `store_rebuildable_from_git` below and the live constitution invariant of the same name are its test. Constitution: `00-constitution.md`.
 
 - [x] `twin` loads a model repository at a named git ref and refuses to run against a dirty tree.
 - [x] The artefact envelope carries: input pins, the producing command, a depth grade slot, and an authored/derived mark.
