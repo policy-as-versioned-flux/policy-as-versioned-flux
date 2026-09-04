@@ -73,6 +73,7 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 - [92 — The local clock](issues/92-the-local-clock.md) — the local clock: `talk/local-clock.sh` runs the model steps from the owner's machine as `claude -p "/<skill> <adopter>"` under the guard, lands a branch + PR body (owner pushes), `--inject` rehearsals are marked `injected: true` and refused everywhere citable; `verify-local-clock.sh` grades the marker; headless runs write no override; ADR-0024 point 6.
 - [39 — Supersede ADR-0013, ADR-0017 and ADR-0018 point 3](issues/39-supersede-adr-0013-adr-0017-and-adr-0018-point-3.md) — ADR-0026 records that a hole is priced, never refused, and the claim keys on (source, id); dated banners on ADR-0013, ADR-0017 and ADR-0018 point 3; CONTEXT.md agrees; removal is priced as a removed-control delta (the platform build named in Consequences); every refusal kind composition emits is classified; verify/adr-supersession grades the record offline
 - [69 — An untagged pin is a priced hole](issues/69-an-untagged-pin-is-a-priced-hole.md) — An untagged feed pin composes as a priced hole of its own premium and is graded live against the publisher's real remote — 7 of 7 estate pins signed, so the rule runs on a fixture and a scratch estate, not on a live hole.
+- [76 — Every green rests on an observation](issues/76-every-green-rests-on-an-observation.md) — every green rests on an observation — a missing instrument now exits 3 in fourteen
 
 ### Built 2026-08-29 — the thin slice runs, and the gate is green
 
