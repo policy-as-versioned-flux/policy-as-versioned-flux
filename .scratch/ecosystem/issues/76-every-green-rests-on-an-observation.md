@@ -203,9 +203,10 @@ bare or quoted, behind a colour escape or an `==>` prefix — measured over the 
 both spellings match the same 26 statements, so it costs nothing today and catches
 `say "SKIP: …"` tomorrow. **What catches the prose kind** is execution, not text: the per-script
 `selfcheck_absent` leg, which re-runs the script with the instrument hidden and requires exit 3
-with a `SKIP:` last line. That is a per-script obligation this net cannot impose; the four scripts
-above do not carry one, and a ticket that gives every live-tail script that leg would close the
-half this net cannot see.
+with a `SKIP:` last line. That is a per-script obligation this net cannot impose; the scripts
+that print a prose could-not-look do not carry one, and a ticket that gives every live-tail script
+that leg would close the half this net cannot see. How many such scripts there are is deliberately
+not recorded: every attempt at that count was wrong.
 
 Net after the fix: pre-fix tree — the same seven named, exit 1; current tree — 95 scripts, none
 named, exit 0.
@@ -259,11 +260,14 @@ the leg behind a flag the gate sets once per wave.
   test. Worth its own ticket.
 - **`verify-twin-overlay.sh`'s own SKIP** (`platform/feeds/forward-intel.payload.schema.json` is
   not in the estate) is driftwood's, surfaced by step 5 consuming it, and not fixed here.
-- **(2026-09-04) A `selfcheck_absent` leg for the four scripts that print a prose could-not-look**
-  — `platform/currency-controller/verify-currency.sh`, `platform/oscal/verify-upflow.sh`,
-  `tuppence/reset/verify-reach-secrets.sh` (two sites). None of them is a false green today (each
-  narrows its closing sentence to what it observed), and none of them is graded by the class-level
-  net, which reads the verdict token and not prose. Giving every live-tail script that leg is what
+- **(2026-09-04) A `selfcheck_absent` leg for every live-tail script that prints a prose
+  could-not-look**, among them `platform/currency-controller/verify-currency.sh`,
+  `platform/oscal/verify-upflow.sh`, `tuppence/reset/verify-reach-secrets.sh`,
+  `platform/access/verify-access.sh` and `platform/identity/verify-identity.sh`. That is a list of
+  examples, not a count: four rounds of review each found the count wrong, which is the same
+  lesson as the net's own. None of them is a false green today (each narrows its closing sentence
+  to what it observed), and none is graded by the class-level net, which reads the verdict token
+  and not prose. Giving every live-tail script that leg is what
   would close the half this net cannot see; it touches three scripts in two units and is its own
   ticket, not a review fix.
 

@@ -29,8 +29,9 @@ prose skip and then asserted the whole claim including the half they had not loo
 greens, fixed by this ticket. tuppence/reset/verify-reach-secrets.sh and platform/oscal/
 verify-upflow.sh print one too and then narrow the closing sentence to what they did observe:
 not false greens. A vocabulary net (skip-word + absence-word) was measured against all 95
-discovered scripts on 2026-09-04 and named all four the same, so it would have to be believed
-about the two it is wrong about. What catches the prose kind is not text but execution: the
+discovered scripts on 2026-09-04 and named the two kinds alike, so it would have to be believed
+about the ones it is wrong about. These are examples, not an inventory: no count of the prose
+sites is kept anywhere, because three attempts at one were each wrong. What catches the prose kind is not text but execution: the
 per-script `selfcheck_absent` leg (verify/lib-observation.sh, .estate-clone/platform/lib.sh),
 which re-runs the script with the instrument hidden and requires exit 3 with a `SKIP:` last line.
 That is a per-script obligation and this net cannot impose it. The shell counts, on each run, how many
@@ -195,8 +196,9 @@ def selfcheck() -> None:
     assert offences(coloured) == [(1, "exit 0")], offences(coloured)
     # The boundary this net does not cross: a could-not-look worded as prose is not the verdict
     # token and is not named, because whether the PASS after it overclaims is a question about
-    # the sentence, not the shape. A script's own selfcheck_absent leg grades those, where the script calls one; where none
-    # is called, nothing grades them, and the PASS line says so after counting the callers.
+    # the sentence, not the shape. A script's own selfcheck_absent leg grades those where a script
+    # calls one; where none is called nothing grades them, which the PASS line says after
+    # counting the callers.
     assert offences(prose) == [], offences(prose)
     with tempfile.TemporaryDirectory() as tmp:
         os.makedirs(os.path.join(tmp, "u", ".work", "x"))

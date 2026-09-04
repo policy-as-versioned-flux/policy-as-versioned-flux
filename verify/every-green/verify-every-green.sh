@@ -10,9 +10,9 @@
 # estate's `SKIP` verdict word, reaching exit 0 (or no exit at all, and so the script's own PASS
 # line). It does NOT grade a could-not-look worded as prose -- `(skipped: kyverno CLI not found)`
 # -- because whether the PASS after one of those is false depends on what that PASS sentence
-# claims, and this net reads shapes, not sentences. See every_green.py's docstring for the four
-# scripts in this estate that print a prose skip, two of which were false greens (fixed by this
-# ticket) and two of which narrow their closing sentence honestly. The prose kind is caught by
+# claims, and this net reads shapes, not sentences. See every_green.py's docstring for examples of
+# both kinds: scripts that printed a prose skip and then overclaimed (false greens, fixed by this
+# ticket), and scripts that print one and narrow honestly. The prose kind is caught by
 # execution, not text, but only where a script carries the leg: `selfcheck_absent` re-runs a
 # script with the instrument hidden and requires exit 3 with a `SKIP:` last line. How many
 # discovered scripts call it is counted on each run and printed, never quoted here. How many prose
