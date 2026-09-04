@@ -91,8 +91,10 @@ for ADOPTER in "${ADOPTERS[@]}"; do
   # "ON ITS SCHEDULE". The half only the clock can supply, and the half this script asserted by
   # implication until 2026-09-04. A dated observation, appended by the scheduled sweep, or a
   # could-not-look naming the series and the cron. Note what is NOT asserted: that the sweep found
-  # a change. `moved` is twin/verify-twin-sweep-moved.sh's subject and is graded above; this is
-  # the weaker, prior claim that the sweep RAN and wrote down when.
+  # a change. `moved` is ticket 72's subject and twin/verify-twin-sweep-moved.sh's, graded above;
+  # this is the weaker, PRIOR claim on the same series ticket 72 built -- that the sweep RAN at
+  # all and wrote down when. driftwood's sweep had fired four times by 2026-09-04 and appended
+  # nothing, because every firing failed; step 5 used to say nothing about that either way.
   "$PY" - "$ESTATE/$ADOPTER" "$ADOPTER" >"$log" 2>&1 <<'PY'
 import json, re, sys
 from pathlib import Path

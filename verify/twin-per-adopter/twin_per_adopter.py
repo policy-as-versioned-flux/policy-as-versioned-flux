@@ -110,7 +110,8 @@ def grade(surveys: list[dict]) -> tuple[str, list[tuple[str, str]]]:
         org = s["org"]
         problems = []
         if s["scenarios"] != STANDING_SCENARIOS:
-            problems.append("carries %d of the six standing scenarios" % s["scenarios"])
+            problems.append("carries %d scenario files, not the six standing scenarios "
+                            "decision ticket 11 answer item 4 asks for" % s["scenarios"])
         if not s["has_emitter"]:
             problems.append("has no twin/emit-forward-intel.py emitter")
         if not s["world_files"]:

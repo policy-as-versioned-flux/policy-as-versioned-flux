@@ -36,7 +36,12 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 
 log="$(mktemp)"; "$PY" "$HERE/twin_per_adopter.py" "$ESTATE" | tee "$log"; rc=${PIPESTATUS[0]}
 case $rc in
-  0) echo "PASS: every party claiming the adopter role carries its own twin overlay, with the six standing scenarios, an emitter, and the same vendored world layer at the same world_ref";;
+  # Counted, not judged: this check observed six scenario FILES, an emitter file and a
+  # vendored world layer at one shared ref. Whether those six files are the six standing
+  # scenarios of decision ticket 11 answer item 4, naming committed classes that land in
+  # the enum and the library, is each adopter's own twin/verify-twin-scenarios.sh, and
+  # step 5 consumes that verdict. The PASS line says what this run looked at.
+  0) echo "PASS: every party claiming the adopter role carries a twin overlay of its own, each with six scenario files, an emitter, and the same vendored world layer pinned at one shared content-addressed world_ref";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
   *) echo "FAIL: $(grep -c '^FAIL:' "$log") twin-per-adopter check(s) observed false";;
 esac
