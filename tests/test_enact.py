@@ -148,8 +148,10 @@ def test_the_checked_in_mode_is_read_off_disk_and_the_suite_states_what_it_admit
     nobody can read. Flip the word and this test asserts the other branch; the flip itself is one
     word in a checked-in file, visible in a diff and a `git blame`, which is where it belongs.
 
-    `SHIPPED_MODE_FILE`, not `enact_guard.ENACT_MODE_FILE`: the autouse fixture below repoints the
-    latter at a temp file so the capability tests run armed. This test is about the real file.
+    `SHIPPED_MODE_FILE`, not `enact_guard.ENACT_MODE_FILE`: the `_armed` fixture at the top of this
+    module repoints the latter at a temp file so the capability tests run armed, and it is autouse,
+    so it applies to this test too. This test is about the real file, so it reads the handle
+    captured at import and puts it back for the length of the three calls that need it.
     """
     shipped = SHIPPED_MODE_FILE.read_text(encoding="utf-8").strip()
     assert shipped in enact_guard._MODES, f"{SHIPPED_MODE_FILE} holds {shipped!r}, not a mode"
