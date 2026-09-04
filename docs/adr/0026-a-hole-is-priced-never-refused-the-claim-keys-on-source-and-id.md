@@ -70,8 +70,7 @@ partition on the regime entry does not depend on the adopter's selection: a weig
 adopter has not selected carries status `unselected` and keeps its amount, because the weights
 must still sum to one and the amounts to the entry (ticket 25; `verify/pound-seam/pound_seam.py`
 check 4 grades the partition, and `_decorate_regime_holes` in `composition.py` sets the status).
-So a removal cannot lower the pound the regulator prices. Second, the only price a removal can
-withdraw
+So a removal cannot lower the pound the regulator prices. Second, the only price a removal can withdraw
 is a bespoke control's own scenario, which the adopter itself declared, signed and priced against
 its own band (ticket 38 D5).
 
@@ -116,8 +115,8 @@ its own band (ticket 38 D5).
    estate's drift tooling.
 5. **A removal is priced, never refused.** ADR-0013's "never remove", ADR-0017's "Never
    (chosen)" under "Removing a self-added control", ticket 15's standing line and ticket 38's D6
-   are superseded. A control that leaves the
-   adopter's selected set prints as a `removed-control` delta carrying the amount the hole
+   are superseded. A control that leaves the adopter's selected set
+   prints as a `removed-control` delta carrying the amount the hole
    carried (the regulator's weight times the triple, a bespoke scenario's residual, or a named
    absence), and its line on the regime partition takes status `unselected` with its amount
    unchanged. A named-baseline change that drops controls prints one `baseline-narrowing`
