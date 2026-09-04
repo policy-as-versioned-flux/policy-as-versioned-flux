@@ -1,5 +1,5 @@
 E2E step 6 provenance
-  ok   80 published artefacts resolve to a tag on the publisher's real remote; 0 honestly queued for cut-release.yml
+  ok   77 published artefacts resolve to a tag on the publisher's real remote; 3 honestly queued for cut-release.yml
   ok   8 release workflows pin an anchored, own-repo identity regexp at the Actions OIDC issuer
   ok   driftwood/exposure newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   driftwood/forward-intel newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated

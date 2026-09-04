@@ -1,0 +1,57 @@
+PASS: driftwood/cut-release.yml checks out policy-as-versioned-platform/platform at the tag driftwood pins it to (v2.0.1)
+PASS: driftwood/cut-release.yml checks out policy-as-versioned-nist/nist at the tag driftwood pins it to (v1.1.0)
+FAIL: driftwood/cut-release.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency
+FAIL: driftwood/cut-release.yml checks out policy-as-versioned-feeds/feeds at 'main', which is not a tag feeds has signed -- a branch is not a pinned, signed dependency
+FAIL: driftwood/cut-release.yml checks out policy-as-versioned-insurer/insurer at 'main', which is not a tag insurer has signed -- a branch is not a pinned, signed dependency
+PASS: driftwood/drift-sample.yml checks out policy-as-versioned-platform/platform at the tag driftwood pins it to (v2.0.1)
+PASS: driftwood/propose-tier.yml checks out policy-as-versioned-platform/platform at the tag driftwood pins it to (v2.0.1)
+PASS: driftwood/propose-tier.yml checks out policy-as-versioned-nist/nist at the tag driftwood pins it to (v1.1.0)
+FAIL: driftwood/propose-tier.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency
+FAIL: driftwood/propose-tier.yml checks out policy-as-versioned-feeds/feeds at 'main', which is not a tag feeds has signed -- a branch is not a pinned, signed dependency
+FAIL: driftwood/propose-tier.yml checks out policy-as-versioned-insurer/insurer at 'main', which is not a tag insurer has signed -- a branch is not a pinned, signed dependency
+PASS: driftwood/shift-left.yml checks out policy-as-versioned-platform/platform at the tag driftwood pins it to (v2.0.1)
+PASS: driftwood/shift-left.yml checks out policy-as-versioned-platform/platform at the tag driftwood pins it to (v2.0.1)
+PASS: driftwood/shift-left.yml checks out policy-as-versioned-nist/nist at the tag driftwood pins it to (v1.1.0)
+FAIL: driftwood/shift-left.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency
+FAIL: driftwood/shift-left.yml checks out policy-as-versioned-feeds/feeds at 'main', which is not a tag feeds has signed -- a branch is not a pinned, signed dependency
+FAIL: driftwood/shift-left.yml checks out policy-as-versioned-insurer/insurer at 'main', which is not a tag insurer has signed -- a branch is not a pinned, signed dependency
+SKIP: driftwood/twin-sweep.yml checks out policy-as-versioned-flux/policy-as-versioned-flux: flux has cut no tag at all, so there is no signed version to pin to -- the consumer is not at fault and this is not a pass
+PASS: feeds/cut-release.yml checks out policy-as-versioned-platform/platform at the literal tag v2.0.1
+FAIL: feeds/release.yml checks out policy-as-versioned-platform/platform with no `ref:` -- that is platform's default branch, which carries no signature and can move under this consumer
+FAIL: ico/release.yml checks out policy-as-versioned-platform/platform with no `ref:` -- that is platform's default branch, which carries no signature and can move under this consumer
+FAIL: insurer/release.yml checks out policy-as-versioned-platform/platform with no `ref:` -- that is platform's default branch, which carries no signature and can move under this consumer
+PASS: ludlow/cut-release.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
+PASS: ludlow/cut-release.yml checks out policy-as-versioned-nist/nist at the tag ludlow pins it to (v1.1.0)
+FAIL: ludlow/cut-release.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency
+FAIL: ludlow/cut-release.yml checks out policy-as-versioned-feeds/feeds at 'ecosystem/thin-slice', which is not a tag feeds has signed -- a branch is not a pinned, signed dependency
+FAIL: ludlow/cut-release.yml checks out policy-as-versioned-insurer/insurer at 'ecosystem/thin-slice', which is not a tag insurer has signed -- a branch is not a pinned, signed dependency
+PASS: ludlow/drift-sample.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
+PASS: ludlow/propose-tier.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
+PASS: ludlow/propose-tier.yml checks out policy-as-versioned-nist/nist at the tag ludlow pins it to (v1.1.0)
+FAIL: ludlow/propose-tier.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency
+FAIL: ludlow/propose-tier.yml checks out policy-as-versioned-feeds/feeds at 'ecosystem/thin-slice', which is not a tag feeds has signed -- a branch is not a pinned, signed dependency
+FAIL: ludlow/propose-tier.yml checks out policy-as-versioned-insurer/insurer at 'ecosystem/thin-slice', which is not a tag insurer has signed -- a branch is not a pinned, signed dependency
+PASS: ludlow/shift-left.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
+PASS: ludlow/shift-left.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
+PASS: ludlow/shift-left.yml checks out policy-as-versioned-nist/nist at the tag ludlow pins it to (v1.1.0)
+FAIL: ludlow/shift-left.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency
+FAIL: ludlow/shift-left.yml checks out policy-as-versioned-feeds/feeds at 'ecosystem/thin-slice', which is not a tag feeds has signed -- a branch is not a pinned, signed dependency
+FAIL: ludlow/shift-left.yml checks out policy-as-versioned-insurer/insurer at 'ecosystem/thin-slice', which is not a tag insurer has signed -- a branch is not a pinned, signed dependency
+PASS: tuppence/cut-release.yml checks out policy-as-versioned-platform/platform at the tag tuppence pins it to (v2.0.1)
+PASS: tuppence/cut-release.yml checks out policy-as-versioned-nist/nist at the tag tuppence pins it to (v1.1.0)
+FAIL: tuppence/cut-release.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency
+FAIL: tuppence/cut-release.yml checks out policy-as-versioned-feeds/feeds at 'ecosystem/thin-slice', which is not a tag feeds has signed -- a branch is not a pinned, signed dependency
+FAIL: tuppence/cut-release.yml checks out policy-as-versioned-insurer/insurer at 'ecosystem/thin-slice', which is not a tag insurer has signed -- a branch is not a pinned, signed dependency
+PASS: tuppence/drift-sample.yml checks out policy-as-versioned-platform/platform at the tag tuppence pins it to (v2.0.1)
+PASS: tuppence/propose-tier.yml checks out policy-as-versioned-platform/platform at the tag tuppence pins it to (v2.0.1)
+PASS: tuppence/propose-tier.yml checks out policy-as-versioned-nist/nist at the tag tuppence pins it to (v1.1.0)
+FAIL: tuppence/propose-tier.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency
+FAIL: tuppence/propose-tier.yml checks out policy-as-versioned-feeds/feeds at 'ecosystem/thin-slice', which is not a tag feeds has signed -- a branch is not a pinned, signed dependency
+FAIL: tuppence/propose-tier.yml checks out policy-as-versioned-insurer/insurer at 'ecosystem/thin-slice', which is not a tag insurer has signed -- a branch is not a pinned, signed dependency
+FAIL: tuppence/shift-left.yml checks out policy-as-versioned-platform/platform with no `ref:` -- that is platform's default branch, which carries no signature and can move under this consumer
+PASS: tuppence/shift-left.yml checks out policy-as-versioned-platform/platform at the tag tuppence pins it to (v2.0.1)
+PASS: tuppence/shift-left.yml checks out policy-as-versioned-nist/nist at the tag tuppence pins it to (v1.1.0)
+FAIL: tuppence/shift-left.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency
+FAIL: tuppence/shift-left.yml checks out policy-as-versioned-feeds/feeds at 'ecosystem/thin-slice', which is not a tag feeds has signed -- a branch is not a pinned, signed dependency
+FAIL: tuppence/shift-left.yml checks out policy-as-versioned-insurer/insurer at 'ecosystem/thin-slice', which is not a tag insurer has signed -- a branch is not a pinned, signed dependency
+FAIL: 31 cross-organisation checkout(s) are not pinned to a signed tag: driftwood/cut-release.yml checks out policy-as-versioned-ico/ico at 'main', which is not a tag ico has signed -- a branch is not a pinned, signed dependency

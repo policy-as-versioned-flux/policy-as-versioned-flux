@@ -2,5 +2,5 @@ E2E step 1 regulator publishes
 PASS: ico/penalty-schema/v3/feed.json: envelope valid (feed/penalty-schema 3.0.0)
 PASS: ico/penalty-schema/v3/feed.json: payload vs penalty-schema/payload.schema.json
 PASS: ico/penalty-schema/v3/feed.json: bump.yaml bump=major
-PASS: ico/penalty-schema@3.0.0: tag v3.0.0 on ico
+PASS: ico/penalty-schema@3.0.0: tag v3.0.0 on ico, and its tree carries the penalty-schema this pin is used for
 PASS: ico's newest penalty-schema envelope validates and its tag is on the real remote
