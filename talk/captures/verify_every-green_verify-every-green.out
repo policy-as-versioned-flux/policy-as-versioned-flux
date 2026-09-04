@@ -1,0 +1,11 @@
+[1;36m==>[0m 1. the scanner grades planted good and bad scripts as planted
+ok  selfcheck: a SKIP that exits 0, and a SKIP that exits nothing at all and lets the script reach its own PASS, are both named by line, in every print form; an exit 3 (on its own line or the SKIP's), a comment, a wrapped reason, a prose skip and a .work/ copy are not; a script that cannot be read is reported as unlooked, not as clean
+[1;36m==>[0m 2. every verify script the gate discovers, hub and estate
+  bad  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-cage-engine.sh:13: exit 0: a SKIP that verify-all.sh would grade PASS
+  bad  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-comparison-window.sh:12: exit 0: a SKIP that verify-all.sh would grade PASS
+  bad  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-corpus-generator.sh:35: exit 0: a SKIP that verify-all.sh would grade PASS
+  bad  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-gate.sh:12: exit 0: a SKIP that verify-all.sh would grade PASS
+  bad  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-generator-standing-check.sh:19: exit 0: a SKIP that verify-all.sh would grade PASS
+  bad  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-rederive-bumps.sh:10: exit 0: a SKIP that verify-all.sh would grade PASS
+  bad  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/computed-semver/verify-witness-set.sh:69: falls through: a SKIP that verify-all.sh would grade PASS
+FAIL: a verify script prints the SKIP verdict token and then reaches exit 0, which the gate would grade PASS (named above)

@@ -1,13 +1,13 @@
+  ok   selfcheck: with rekor-cli cosign gitsign kubectl openssl unreachable this script exits 3 and its last line is SKIP:
 [1;36m==>[0m 1. the whole chain: feed->scenario->PR->review->merge->release, every actor named
 ok  6-link chain feed->scenario->PR->review->merge->release, all evidence on disk; AI proposed 2 link(s) (never merged), humans disposed 3; workload+device SVIDs share one root (spiffe://acme.internal); chain converges on v4.0.0 == the version the workload SVID carries. Every actor attestable; the whole chain verifies.
 [1;36m==>[0m 2. the head of the chain VERIFIES CRYPTOGRAPHICALLY, right here (the signed feed)
   ok   feed link attested: v3 threat-register signature verifies (ed25519)
   ok   a forged feed is refused (the signature actually guards the link)
 [1;36m==>[0m 3. commit/PR attestable in REKOR (the human disposition links)
-  offline: merge+release links carry the Rekor root (verified in step 1);
-  gitsign present [gitsign version v0.17.1] but no rekor-cli/cosign to query the log.
+  ??   could not look: no rekor-cli here to query the transparency log, so the commit link was read from the committed chain only, never confirmed against Rekor (gitsign is installed [gitsign version v0.17.1], but it signs, it does not query)
 [1;36m==>[0m 4. workload + device SVIDs verify against SPIRE (one root, distinct actor classes)
-  offline: workload (posture/vN) + device (/device/, tpm_devid) SVIDs share one root — manifests asserted in step 1
+  ??   could not look: no SPIRE server on kind-driftwood, so no live SVID was seen (the committed manifests are asserted offline in step 1)
 [1;36m==>[0m 5. the walk — who proposed what, when, from which evidence (the auditor reads this)
 CHANGE PATH — who proposed what, when, from which evidence:
   1. feed      [PUBLISHER] platform-feeds         publish  @ feed v3   :: signed threat-register v3: driftwood skimmer-campaign LEF uptick
@@ -37,7 +37,5 @@ RUNTIME IDENTITIES — every actor rooted, no network-position trust:
                 svid=OIDC subject (email) bound in a Fulcio cert, logged in Rekor
                 by  =gitsign keyless — the merge + release links above
 
-PASS: the whole chain walks feed->scenario->PR->review->merge->release; the AI
-war-gamer PROPOSES (never merges), humans DISPOSE; workload+device+commit+human all
-root to one attestation, and the chain converges on the exact version a running
-workload carries in its SVID. Provenance for every actor, end to end.
+  the claim this run did NOT observe in full: the whole chain walks feed->scenario->PR->review->merge->release; the AI war-gamer PROPOSES (never merges), humans DISPOSE; workload+device+commit+human all root to one attestation, and the chain converges on the exact version a running workload carries in its SVID. Provenance for every actor, end to end.
+SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- no rekor-cli here to query the transparency log, so the commit link was read from the committed chain only, never confirmed against Rekor (gitsign is installed [gitsign version v0.17.1], but it signs, it does not query); no SPIRE server on kind-driftwood, so no live SVID was seen (the committed manifests are asserted offline in step 1)

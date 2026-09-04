@@ -6,4 +6,5 @@ E2E step 5 twin forecasts
   ok  driftwood/twin/signals.yaml (the pin -> standing-scenario table)
   ok  twin/feed_signal.py (the pinned-feed-version -> dated-signal lookup)
   ok  verify/twin-evals/verify-twin-evals.sh (the twin's evals graded by the gate)
-PASS: the twin's overlay, feed, 6 scenarios and signal lookup are all present, and its own evals scored them: PASS: 7 skill metrics, exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal
+  ok  the twin's own evals scored the artefacts: PASS: 7 harness-mechanism metrics (the label twin/evolution_judge.py declares for the corpus behind these scores, and the one this run asserted the harness spent; harness-mechanism means each heuristic is scored against the corpus it was fitted on, so the number grades the harness, not the twin's judgement -- a held-out corpus is not built yet), exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal
+FAIL: step 5 is false where the adopter's own checks are: driftwood/verify-twin-overlay.sh observed false: FAIL: 1 twin-overlay check(s) observed false

@@ -1,3 +1,4 @@
+  ok   selfcheck: with kyverno kubectl unreachable this script exits 3 and its last line is SKIP:
 [1;36m==>[0m 0. the £ engine's own asserts (band selection, tightening raises £, no timer)
 ok  driftwood(£40000 tol, from its OWN party.yaml): loose buys £19439 -> Audit | tightened buys £54520 -> Deny | same loose under ludlow(£5000 tol) -> Deny | a party with no declared appetite refuses as a missing instrument
 [1;36m==>[0m 1. the SAME control + SAME scenario -> divergent £-derived verdicts
@@ -6,5 +7,7 @@ ok  driftwood(£40000 tol, from its OWN party.yaml): loose buys £19439 -> Audit
 [1;36m==>[0m 3. the rendered policies carry the £-derived action (not hand-authored)
 ok  committed policies match the £-derived render for driftwood, ludlow
 [1;36m==>[0m 4. the shared control body is a real, self-scoping policy (pass/fail/unversioned)
-[1;36m==>[0m 5. live dry-run tail skipped (no cluster with Kyverno CRDs reachable) — offline proof stands
-PASS: same control, same £ (risk_bought £21107) — Audit in driftwood, Deny in ludlow. Proportionality by comparison.
+  ??   could not look: kind-driftwood is not reachable, so driftwood's rendered policy was never dry-run there
+  ??   could not look: kind-ludlow is not reachable, so ludlow's rendered policy was never dry-run there
+  the claim this run did NOT observe in full: same control, same £ (risk_bought £21107) — Audit in driftwood, Deny in ludlow. Proportionality by comparison.
+SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- kind-driftwood is not reachable, so driftwood's rendered policy was never dry-run there; kind-ludlow is not reachable, so ludlow's rendered policy was never dry-run there

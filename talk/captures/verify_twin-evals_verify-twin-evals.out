@@ -1,15 +1,16 @@
 PASS: twin self-versions: twin/VERSION=0.1.0, twin.TOOL_VERSION=0.1.0 (an adopter pins one number, not two)
 PASS: the metrics evaluated are exactly the ones twin/skill-thresholds.yaml declares (7): missing none, unexpected none
-PASS: signal-classify              score=1.000  threshold=0.800  last=1.000
-PASS: evolution-judge              score=1.000  threshold=0.750  last=1.000
-PASS: causal-claims                score=1.000  threshold=0.800  last=1.000
-PASS: causal-claims-grade-accuracy score=1.000  threshold=0.800  last=1.000
-PASS: gameplay-lens                score=1.000  threshold=0.650  last=1.000
-PASS: substrate-generator          score=1.000  threshold=0.800  last=1.000
-PASS: ethics-gate                  score=1.000  threshold=0.800  last=1.000
+PASS: signal-classify              score=1.000  threshold=0.800  last=1.000  [harness-mechanism: scored on the corpus it was fitted on]
+PASS: evolution-judge              score=1.000  threshold=0.750  last=1.000  [harness-mechanism: scored on the corpus it was fitted on]
+PASS: causal-claims                score=1.000  threshold=0.800  last=1.000  [harness-mechanism: scored on the corpus it was fitted on]
+PASS: causal-claims-grade-accuracy score=1.000  threshold=0.800  last=1.000  [harness-mechanism: scored on the corpus it was fitted on]
+PASS: gameplay-lens                score=1.000  threshold=0.650  last=1.000  [harness-mechanism: scored on the corpus it was fitted on]
+PASS: substrate-generator          score=1.000  threshold=0.800  last=1.000  [harness-mechanism: scored on the corpus it was fitted on]
+PASS: ethics-gate                  score=1.000  threshold=0.800  last=1.000  [harness-mechanism: scored on the corpus it was fitted on]
+PASS: the label these 7 scores are reported under ('harness-mechanism') is the one twin.evolution_judge declares ('harness-mechanism'); today that reads: the keyword table is scored against the four items it was fitted to, so its 1.000 grades the harness, not the twin's judgement
 METRICS: 7
 SUBTOTAL: 7 skill metric(s), 0 observed false
 PASS: the three real-firm beats ran in their declared order (royal-mail, intel, netflix)
 PASS: cross_architecture_determinism -- 12 artefacts byte-identical on x86_64
 PASS: the pinned-feed-version -> dated-signal lookup: ok  every one of 15 published feed envelope(s) maps to exactly one dated signal, shape checked with a placeholder tag/commit (1 feed(s) excluded by name, with a reason)
-PASS: 7 skill metrics, exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal
+PASS: 7 harness-mechanism metrics (the label twin/evolution_judge.py declares for the corpus behind these scores, and the one this run asserted the harness spent; harness-mechanism means each heuristic is scored against the corpus it was fitted on, so the number grades the harness, not the twin's judgement -- a held-out corpus is not built yet), exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal

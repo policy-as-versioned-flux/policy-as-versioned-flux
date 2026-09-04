@@ -2,7 +2,7 @@
 == 1. single-tag legacy form still works ==
 ok: v1.0.0 does not exist yet
 tagged v1.0.0
-To /tmp/tmp.vMNq4olo9H/remote.git
+To /tmp/tmp.LH5zRrsktV/remote.git
  * [new tag]         v1.0.0 -> v1.0.0
 ok: v1.0.0 pushed
 
@@ -11,11 +11,11 @@ ok: v1.0.1 does not exist yet
 ok: v2.0.0 does not exist yet
 tagged v1.0.1
 tagged v2.0.0
-To /tmp/tmp.vMNq4olo9H/remote.git
-   c10fe40..920e983  HEAD -> main
+To /tmp/tmp.LH5zRrsktV/remote.git
+   d04a551..8eac2f6  HEAD -> main
  * [new tag]         v1.0.1 -> v1.0.1
  * [new tag]         v2.0.0 -> v2.0.0
-ok: v1.0.1 and v2.0.0 both landed on the same commit (920e98365eb3d69d332149a5947bad8b8864fe88)
+ok: v1.0.1 and v2.0.0 both landed on the same commit (8eac2f6f591562db4391c99161e16e863070d59b)
 
 == 3. existing-tag refusal fires for EVERY tag before ANY tag is created ==
 ok: v3.0.0 does not exist yet
