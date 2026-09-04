@@ -26,8 +26,9 @@ Record: [REVIEW-2026-08-31.md](../REVIEW-2026-08-31.md).
 **2026-09-04. The flip shipped in the platform's source and as the second declared line, 5.0.0.
 The signed cut, the adopter pins and the recompose are the owner's and ticket 64's.**
 
-Map line: the unlabelled default is `isolated` in graded and in the new 5.0.0 line; the gating
-check that held it back grades it honestly again after two real blind spots were closed.
+Map line: the unlabelled default is `isolated` in graded and in the new 5.0.0 line; the check that
+grades it now counts the cages the CLUSTER carries, so a second live cage is a could-not-look and
+not a green.
 
 ### What was built
 
@@ -130,16 +131,45 @@ Namespace that DECLARES `baseline`, so the fixture says which rung it is about.
     verify-pairing / -coverage / -corpus-generator / -witness-set / -generator-standing-check
                                                 0  PASS
     verify-posture-projection.sh                0  PASS
-    verify-composition.sh                       3  the adopter pin does not carry v5.0.0 yet
-                                                   (ticket 64); was 0 on main
+    verify-composition.sh                       INVOCATION-DEPENDENT, all three recorded (the same
+                                                   real-path/symlink distinction this Answer already
+                                                   draws for verify-publisher-gate.sh):
+                                                1  from the platform worktree's REAL path
+                                                   (.estate-clone/platform/.work/ticket-63/compose/
+                                                   verify-composition.sh) --
+                                                   `composition.DEFAULT_ESTATE_CLONE` is derived from
+                                                   the module's own resolved path, so it lands on
+                                                   .../platform/.work, which has no driftwood /
+                                                   tuppence / ludlow siblings and no party artefacts:
+                                                   `assert document["party_artefact_errors"] == []`
+                                                   fires, `FAIL: composition.py --selfcheck`. An
+                                                   artefact of the nested worktree, not of the change.
+                                                3  through the hub worktree's .estate-clone/platform
+                                                   SYMLINK -- the adopter pin does not carry v5.0.0
+                                                   yet (ticket 64). This is the grade the Answer means.
+                                                0  from the integration checkout's real path
+                                                   (.estate-clone/platform on
+                                                   ecosystem/build-2026-09-03) -- PASS, the state
+                                                   before this ticket.
     verify-first-gate-determined-release.sh     3  waiting for cut-release.yml to cut policy/v5.0.0
     verify-first-gate-determined-release.sh --selfcheck
                                                 0  PASS
-    graded/verify-graded.sh                     0  PASS, after the fix of 2026-09-04 below. It was
-                                                   0 on ecosystem/build-2026-09-03 and this ticket
-                                                   turned it to 1 ("FAIL: cage-tier-5-0-0
-                                                   MutatingPolicy not installed live"). A real
-                                                   regression this ticket caused, and fixed.
+    graded/verify-graded.sh                     0  PASS on this branch with today's cluster (one cage
+                                                   installed), after the round-2 fix of 2026-09-04
+                                                   below. It was 0 on ecosystem/build-2026-09-03 and
+                                                   this ticket first turned it to 1 ("FAIL:
+                                                   cage-tier-5-0-0 MutatingPolicy not installed
+                                                   live"), then, in round 1's fix, to a PASS that was
+                                                   not earned. Both are fixed; the grade is now a
+                                                   fact about the cluster and moves with it:
+                                                0  only cage-tier-4-0-0 installed (today)
+                                                3  both cages installed, after one graded/up.sh run
+                                                   from this branch -- SKIP (live tail), the honest
+                                                   could-not-look
+                                                1  a CUT version whose cage is genuinely missing --
+                                                   "FAIL: cage-tier-6-0-0 MutatingPolicy not
+                                                   installed live", by name
+    graded/verify-graded.sh --selfcheck         0  PASS (new; build brief item 2)
     shift-left/verify-shift-left.sh             0  PASS -- and it was 3 on
                                                    ecosystem/build-2026-09-03 ("declares one major
                                                    line (4.0.0), so a target has no +/-1
@@ -190,7 +220,10 @@ the array element's `commit` field:
 - `DECLARED_COUNT` -- the pre-existing guard that skips the behavioural probes when more than one
   version is installed and selectable -- counts CUT elements too. Counting the uncut one would have
   tripped that guard and turned 4.0.0's real behavioural green into a blanket live-tail SKIP, which
-  is the same fault in the other direction;
+  is the same fault in the other direction; **[SUPERSEDED the same day -- this leg was wrong. The
+  premise "the uncut version is not on the cluster" is false on the up.sh path, and it bought an
+  unearned PASS. The count asks the cluster now: see "2026-09-04, round 2" below and decisions 10
+  and 13.]**
 - `NEWEST` is the newest CUT version, because that is the copy the cluster actually carries. The
   probe banner says so: `the live copy under test is cage-tier-4-0-0 (newest CUT version)`.
 
@@ -381,6 +414,196 @@ invocation artefact described above (`AssertionError: corpus_generator resolved 
     ok   OpenBao present
     FAIL: OpenBao has no jwt auth method enabled — run identity/up.sh (dev-mode OpenBao is in-memory: a pod restart wipes it)
 
+### 2026-09-04, round 2: the re-review's one blocking defect and three minors
+
+The re-review of this branch found ONE blocking defect and three minors. All four are fixed here.
+
+**BLOCKING -- round 1's fix bought a PASS where a could-not-look is the honest grade.**
+`graded/verify-graded.sh` keyed `DECLARED_COUNT` (the two-version skip) and `NEWEST` on the array
+element's `commit`. Decision 10's premise for that -- "an uncut element has no tag, so nothing is
+on the cluster to exercise" -- **is false on this path**. `distribution/render-and-prove.py` writes
+EVERY declared element to `versions.txt` (4.0.0 and 5.0.0), and `graded/up.sh` lines 46-57 applies
+each one's `cage-tier.yaml` and `cage-netpol.yaml`: Flux is not in the loop and the signed tag is
+not what gates the apply. So after one `graded/up.sh` run from this branch, `cage-tier-5-0-0` IS
+installed and selectable by any pod -- ungraded -- and the deliberate two-version `live_tail_skip`
+did not fire. The run was green only because today's cluster carried one cage.
+
+Proved live rather than argued. One `graded/up.sh` from this branch, on the EXISTING kind-driftwood
+(not deleted, and restored afterwards):
+
+    ==> cluster-wide guards: the orphan guard ... and the governed-namespace claim guard
+    --- installed:
+    mutatingpolicy.policies.kyverno.io/cage-tier-4-0-0
+    mutatingpolicy.policies.kyverno.io/cage-tier-5-0-0
+    mutatingpolicy.policies.kyverno.io/stamp-posture-4-0-0
+
+and in that state the ROUND-1 script (`git show HEAD:graded/verify-graded.sh`, run from the same
+tree) still printed **exit 0**:
+
+    ok   a pod with no claim at all is refused live in a governed Namespace — silence is not an exemption
+    ok   all three rungs' reach cages are still present at the end of the run (nothing deleted them)
+    PASS: the Namespace declares the tier and the pod wears it; the cage only tightens; the bottom rung runs and reaches nothing; TCoR booked
+
+The fix (decision 13): **the count asks the cluster.** `kubectl get mutatingpolicy -o name`, the
+versioned `cage-tier-<v>` names read off it, and the skip fires whenever two cages are live -- for
+whatever reason they are live. The existence loop is unchanged and still runs FIRST, so a CUT
+version whose cage is genuinely missing is a FAIL by name and no count can swallow it. The
+alternative (range the fan-out over CUT elements in `render-and-prove.py` and `up.sh`) was
+considered and not taken; decision 13 records why, and the fan-out gap is named in the check's own
+output, in decision 11 and under "Not done".
+
+**Minor 1 -- no selfcheck leg.** `graded/verify-graded.sh` was the only one of the five checks this
+ticket touched without one (build brief item 2). It has one now, and the live tail's four
+duplicated version-reading heredocs were folded into the single reader the selfcheck exercises.
+Decision 14 lists what it pins.
+
+**Minor 2 -- the check table recorded `verify-composition.sh` as a single grade.** It is
+invocation-dependent in exactly the way `verify-publisher-gate.sh` is, and all three are now in the
+table above: **1** from the platform worktree's real path (`composition.DEFAULT_ESTATE_CLONE`
+resolves to `.../platform/.work`, which has no adopter siblings, so
+`assert document["party_artefact_errors"] == []` fires), **3** through the hub symlink (the adopter
+pin does not carry v5.0.0 yet), **0** on the integration checkout's real path.
+
+**Minor 3 -- step 3 of `verify-first-gate-determined-release.sh` swallowed the uncut line.** The
+`unseen` branch exited 3 before the `uncut` branch, so on a shallow checkout that also held an
+uncut declared element the "waiting for the owner to cut policy/vX" line disappeared. Both are
+reported now, and one SKIP line carries both (decision 15).
+
+### The 2026-09-04 round-2 runs, from the hub worktree root
+
+Hub worktree root is
+`/private/tmp/.../scratchpad/wt/ticket-63`; `.estate-clone/platform` is the symlink to the platform
+worktree `.estate-clone/platform/.work/ticket-63`. Last five lines each, ANSI stripped.
+
+**State A -- only `cage-tier-4-0-0` installed (the cluster as found, and as left).**
+
+`bash .estate-clone/platform/graded/verify-graded.sh` (this branch), **run 1, exit 0**; run 2 was
+byte-identical, exit 0:
+
+    ok   a running isolated pod accepts an UPDATE (kubectl label) — the mutation is idempotent
+    ok   a pod claiming an undeclared version is refused live by the orphan guard
+    ok   a pod with no claim at all is refused live in a governed Namespace — silence is not an exemption
+    ok   all three rungs' reach cages are still present at the end of the run (nothing deleted them)
+    PASS: the Namespace declares the tier and the pod wears it; the cage only tightens; the bottom rung runs and reaches nothing; TCoR booked
+
+Its two new lines, from the same run:
+
+    ==> 0. selfcheck: the cut/uncut partition and the installed-cage count bite
+    ok   selfcheck: cut/uncut partition; installed cages read off the CLUSTER, not the array, so two live cages skip the tail, one lets it speak, and a cut version with no cage still fails by name
+    ==>    uncut tail, not looked for BY NAME: 5.0.0 (declared with no commit, so no signed tag and nothing for Flux to deliver)
+    ==>    cage-tier copies installed on kind-driftwood: 4.0.0 (1)
+      -- the live copy under test is cage-tier-4-0-0 (newest CUT version), applied by graded/up.sh from
+
+`bash /Users/.../.estate-clone/platform/graded/verify-graded.sh` (**`ecosystem/build-2026-09-03`**,
+its own checkout), **run 1, exit 0**; run 2 byte-identical, exit 0:
+
+    ok   a running isolated pod accepts an UPDATE (kubectl label) — the mutation is idempotent
+    ok   a pod claiming an undeclared version is refused live by the orphan guard
+    ok   a pod with no claim at all is refused live in a governed Namespace — silence is not an exemption
+    ok   all three rungs' reach cages are still present at the end of the run (nothing deleted them)
+    PASS: the Namespace declares the tier and the pod wears it; the cage only tightens; the bottom rung runs and reaches nothing; TCoR booked
+
+**State B -- both cages installed, after one `graded/up.sh` from this branch.** This branch,
+**exit 3** (run 2 shown; run 1 was the same grade and the same reason, with a cosmetic trailing
+space in the version list that was tidied between them):
+
+    ok   a running isolated pod accepts an UPDATE (kubectl label) — the mutation is idempotent
+    ok   a pod claiming an undeclared version is refused live by the orphan guard
+    ok   a pod with no claim at all is refused live in a governed Namespace — silence is not an exemption
+    ok   all three rungs' reach cages are still present at the end of the run (nothing deleted them)
+    SKIP: offline proof holds; live tail could not look: kind-driftwood carries 2 installed cage-tier MutatingPolicies (4.0.0 5.0.0) and the behavioural probes below only exercise the newest CUT one; every installed cage is selectable by any pod, so the others are ungraded here and this tail may not claim the cage holds for them — the Namespace declares the tier and the pod wears it; the cage only tightens; the bottom rung runs and reaches nothing; TCoR booked
+
+`ecosystem/build-2026-09-03`'s own script cannot be put in state B -- its array declares one version
+and `graded/up.sh` from that checkout prunes the second back off the cluster, which is how state A
+was restored. The round-1 script IS the like-for-like control, and it is the PASS quoted above.
+
+**State C -- a CUT version whose policy is genuinely missing.** A scratch copy of this branch's
+platform tree (`scratchpad/state-c-estate/platform`, sibling symlinks to the real adopter clones so
+`cage.py` can price), with `{ version: "6.0.0", tag: "policy/v6.0.0", commit: "000...0", bump:
+"major" }` planted in `distribution/versions.yaml`. Both runs **exit 1**:
+
+    uncut version's cage IS installed here -- ungraded, and counted live below.
+    The honest repair for both is to range the allow-list AND the fan-out over CUT
+    elements only, which is a change to the ResourceSet, render-orphan-guard.py,
+    render-and-prove.py and up.sh, not to this beat.
+    FAIL: cage-tier-6-0-0 MutatingPolicy not installed live
+
+The reviewer's planted-6.0.0 refusal is preserved, by name, and it fires BEFORE the count -- a
+missing release is a FAIL, never a skip.
+
+**The new selfcheck**, `bash .estate-clone/platform/graded/verify-graded.sh --selfcheck`, **exit 0**:
+
+    ok   selfcheck: cut/uncut partition; installed cages read off the CLUSTER, not the array, so two live cages skip the tail, one lets it speak, and a cut version with no cage still fails by name
+
+**`verify-first-gate-determined-release.sh`**, **exit 3**:
+
+    has not run for it either -- it runs inside the same dispatch, before the tag.
+    A gitsign tag can only be cut by .github/workflows/
+    cut-release.yml inside GitHub Actions, with that run's own ambient OIDC identity.
+    Nothing here may fake one, so this check cannot look at the last step of the release.
+    SKIP: waiting for the owner to let cut-release.yml cut policy/v5.0.0 in Actions
+
+**`verify-first-gate-determined-release.sh --selfcheck`**, **exit 0**:
+
+    ok  selfcheck: evidence+no tag is a could-not-look; NO evidence with a RELEASED element (commit on the array, or a tag) is still a refusal, tagless checkout included; the gate-determines-the-number claim is not weakened
+
+**Minor 3, red then green, on a real shallow clone.** `git clone --no-tags --depth 1
+--single-branch -b ticket-63-... file:///.../.estate-clone/platform` (0 tags, HEAD 772037b): 4.0.0
+is `unseen` (commit on the element, no local tag) and 5.0.0 is `uncut`. The round-1 script, same
+clone, **exit 3, one reason, the owner's wait gone**:
+
+    and not about the release. Step 2 has already checked their gate evidence by name.
+    SKIP: this checkout cannot see the signed tag(s) policy/v4.0.0; fetch tags and re-run
+
+The fixed script, same clone, **exit 3, both reasons**:
+
+    cut-release.yml inside GitHub Actions, with that run's own ambient OIDC identity.
+    Nothing here may fake one, so this check cannot look at the last step of the release.
+    SKIP: this checkout cannot see the signed tag(s) policy/v4.0.0; fetch tags and re-run; AND waiting for the owner to let cut-release.yml cut policy/v5.0.0 in Actions
+
+**`verify-composition.sh`, all three invocations** (minor 2). Real path of the platform worktree,
+**exit 1**:
+
+      File ".../platform/.work/ticket-63/compose/composition.py", line 3411, in selfcheck
+        assert document["party_artefact_errors"] == []
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    AssertionError
+    FAIL: composition.py --selfcheck
+
+Through the hub worktree's `.estate-clone/platform` symlink, **exit 3**:
+
+    SKIP: the composed set renders policy versions the pinned parent commit does not contain; the header names a parent release that holds none of these trees. platform@2.0.1 (533dccb0) does not contain distribution/policies/v5.0.0 -- the commit that carries these trees is not on the real remote until cut-release.yml cuts the corresponding policy/v<version> tag in Actions and the adopter's platform-pin.yaml moves with it (ticket 64 moves the pin and recomposes)
+
+On the integration checkout's real path (`ecosystem/build-2026-09-03`), **exit 0**:
+
+    ==> 2. the header's pinned parent contains the policy versions the set renders
+    ==>    every rendered policy version is present at the pinned parent commit
+    ==> PASS: the composition seam holds
+
+**The distribution checks**, all run from the hub worktree root against this branch (last line each):
+
+    verify-coexistence.sh                 3  SKIP: ... declares [4.0.0 5.0.0] but only [4.0.0] has
+                                             been cut (uncut, no signed tag yet: 5.0.0) ...
+    verify-declared-versions-admit.sh     0  PASS: every CUT version ... admits a real pod on every
+                                             rung ... (not looked at, uncut and unreleasable: 5.0.0)
+    verify-governed-namespace-guard.sh    0  PASS: a governed namespace requires a claim at CREATE ...
+    verify-infra-declaration.sh           0  PASS: the platform's infra declaration covers
+                                             kube-system, flux-system and kyverno ...
+    verify-orphan-guard.sh                0  PASS: only versions the array declares can run; the
+                                             allow-list is the array.
+    verify-render-version-tree.sh         0  PASS: every mandatory member renders with a versioned
+                                             name ... and two rendered versions coexist.
+    verify-retirement.sh                  3  SKIP: ... policy-v4-0-0 ABSENT on kind-driftwood but
+                                             never observed present by this script ...
+    verify-declared-versions-admit.sh --selfcheck  0  ok
+    verify-coexistence.sh --selfcheck              0  ok
+
+**The cluster was left as it was found.** `graded/up.sh` from the integration checkout pruned
+5.0.0 back off (`pruned 6 object(s) of undeclared version(s) ['5.0.0']; declared now ['4.0.0']`),
+and `kubectl get mutatingpolicy -o name` afterwards is `cage-tier-4-0-0`, `stamp-posture`,
+`stamp-posture-4-0-0` -- byte-identical to the listing before round 2 began. driftwood, tuppence and
+ludlow all still exist; nothing was deleted.
+
 ### Decisions (all `delegated`, ADR-0025)
 
 1. **The ternary collapsed to a single literal, and `nsGoverned` was deleted** rather than left as
@@ -428,13 +651,21 @@ invocation artefact described above (`AssertionError: corpus_generator resolved 
    governed. The flip reaches an adopter only when that adopter pins 5.0.0 (ticket 64), so no
    running adopter workload moves today.
 
-10. **`graded/verify-graded.sh`'s `DECLARED_COUNT` and `NEWEST` count CUT versions, not declared
-    ones** (2026-09-04). The sentence that guard defends is "every declared version is INSTALLED
-    and SELECTABLE by any pod", and an uncut element is neither: no tag, so Flux delivers nothing
-    and there is no `cage-tier-<v>` on the cluster to exercise. Counting it would have made the
-    count two, tripped the skip, and thrown away 4.0.0's real behavioural green over a version that
-    does not run -- a blanket skip standing in for a real result, which is the fault the cut/uncut
-    rule exists to avoid. The guard still trips the day a second version is really cut.
+10. **~~`graded/verify-graded.sh`'s `DECLARED_COUNT` and `NEWEST` count CUT versions, not declared
+    ones.`~~ SUPERSEDED, and its premise was FALSE** (written 2026-09-04, corrected the same day in
+    round 2). What it said: the guard defends "every declared version is INSTALLED and SELECTABLE
+    by any pod", an uncut element is neither, so counting the cut list is the honest count. **The
+    premise does not hold on this path.** `distribution/render-and-prove.py` writes EVERY declared
+    element to `versions.txt` (4.0.0 and 5.0.0), and `graded/up.sh` lines 46-57 applies each one's
+    `cage-tier.yaml` and `cage-netpol.yaml` -- Flux is not in this loop and the tag is not what
+    gates it. So after one `graded/up.sh` run from this branch `cage-tier-5-0-0` IS installed and
+    selectable by any pod; it is simply ungraded, and the deliberate two-version skip did not fire.
+    Proved live, not argued: one `graded/up.sh` run from this branch put `cage-tier-5-0-0` on
+    kind-driftwood, and the round-1 script still printed `PASS` there. The correct subject is
+    **what the cluster carries**, and the count now asks it -- see decision 13. `NEWEST` stays the
+    newest CUT version, because it is the copy a release can be attributed to, and it is provably
+    the only installed cage whenever the count is one (the existence loop has already required
+    every cut version to be installed).
 11. **The orphan-guard/uncut-tail window is NAMED in `verify-graded.sh`'s output, not fixed here**
     (2026-09-04). The allow-list ranges the whole array; a cage exists only for a cut version; so a
     pod claiming a declared-but-uncut version passes the guard and matches no cage. It is not
@@ -448,6 +679,41 @@ invocation artefact described above (`AssertionError: corpus_generator resolved 
     that leg to "key it the same way as the others" would have narrowed the refusal. Both are
     pinned in the selfcheck. Step 3 got the matching guard so a cut release whose tag this clone
     cannot see is reported as a fact about the clone, never as a wait on the owner.
+13. **The two-version skip in `graded/verify-graded.sh` counts the cages the CLUSTER carries, and
+    the fan-out is left ranging the whole array** (2026-09-04, round 2). Two repairs were open. (a)
+    Count what is INSTALLED, by asking `kubectl get mutatingpolicy` and reading the versioned
+    `cage-tier-<v>` names off it. (b) Range the fan-out over CUT elements in `render-and-prove.py`
+    and `up.sh`, which would make decision 10's premise true. **(a) was chosen.** Three reasons.
+    The count's subject is a fact about the cluster -- "how many cages can a pod select right now"
+    -- and no file can answer it; a check that asks a file for a cluster fact is the shape of this
+    whole defect, in both directions (the cut list said one where the cluster said two; the whole
+    array would say two on a cluster that has not been `up.sh`'d since the array grew). (b) fixes
+    only the demo half: the reviewer's own note is that the ResourceSet and
+    `render-orphan-guard.py` are the remaining half, so the check would still be trusting a
+    premise rather than an observation, and it would be a change to the DELIVERY path inside a
+    ticket about a policy default -- three other checks read `versions.txt`. And (a) grades
+    honestly whichever way (b) later goes: the day the fan-out does range over cut elements, the
+    cluster carries one cage and this check goes green on its own, with no edit. (b) stays named,
+    unclosed, in the check's own output and in "Not done" below, now with `render-and-prove.py`
+    and `up.sh` named beside the ResourceSet and the orphan guard.
+14. **`graded/verify-graded.sh` grew a `--selfcheck` leg** (2026-09-04, round 2; build brief item
+    2). It was the only one of the five checks this ticket touched without one. It pins the
+    cut/uncut partition in the same words as its four siblings, the installed-cage reader (only
+    versioned `cage-tier-<v>` names count -- not `stamp-posture-4-0-0`, not the unversioned
+    authoring name `cage-tier`; versions sort numerically so the newest is last), and all three
+    states: two cages live skips, one cage live lets the tail speak, and a cut version with no cage
+    is named rather than counted. It runs from the no-argument path BEFORE the `kyverno` and
+    substrate checks, so the partition cannot rot behind a machine with no cluster. The four
+    version-reading heredocs in the live tail were folded into the one reader the selfcheck
+    exercises, so there is no second copy of the rule to drift.
+15. **Step 3 of `verify-first-gate-determined-release.sh` reports BOTH reasons** (2026-09-04, round
+    2). The round-1 `unseen` branch exited 3 before the `uncut` branch, so on a shallow or tagless
+    checkout that also held an uncut declared element the "waiting for the owner to cut policy/vX"
+    line vanished: the reader was told to fetch tags and never told a release was still uncut. They
+    are different facts about different versions, both true at once, and neither may silence the
+    other. Both blocks now print and one SKIP line carries both reasons. Red-proved on a real
+    `git clone --no-tags --depth 1` of this branch (runs below).
+
 ## Waits on the owner
 
 - **Push of the platform branch** `ticket-63-the-unlabelled-default-flips-to-isolated` to
@@ -473,14 +739,24 @@ invocation artefact described above (`AssertionError: corpus_generator resolved 
   driftwood, tuppence or ludlow, and no `composed/` tree regenerated anywhere. The three adopters
   stay pinned to 4.0.0 and their served cage-tier bodies still read `baseline`, which
   `verify-infra-declaration.sh` prints truthfully.
-- **The orphan guard still allows an UNCUT declared version** (found 2026-09-04 while fixing
-  `graded/verify-graded.sh`, named there in the check's own output and in decision 11). Its
-  allow-list ranges the whole array; a `cage-tier-<v>` exists only for a version whose tag was cut.
-  So once this branch is pushed and before `cut-release.yml` cuts `policy/v5.0.0`, a pod could
-  claim 5.0.0, pass the guard, and match no cage. Not reachable today -- nothing is pushed and the
-  live guard is still rendered from the one-version array. The repair is in the ResourceSet
-  template and `render-orphan-guard.py` (range the allow-list over CUT elements), which is a change
-  to the fan-out and belongs with ticket 64 or its own ticket, not inside a verify script.
+- **The whole fan-out still ranges the WHOLE array, cut or not** (found 2026-09-04 while fixing
+  `graded/verify-graded.sh`, sharpened the same day in round 2; named in the check's own output and
+  in decisions 11 and 13). Four places range it: the ResourceSet in `distribution/versions.yaml`,
+  `distribution/render-orphan-guard.py` (the allow-list), `distribution/render-and-prove.py` (which
+  writes `versions.txt`) and `graded/up.sh` (which applies each line). Two different consequences,
+  and round 1 named only the first:
+  - on the DELIVERY path, Flux delivers a `cage-tier-<v>` only for a version whose tag was cut,
+    while the orphan guard's allow-list admits the claim as soon as the array declares it. So
+    between the push of this branch and the `cut-release.yml` dispatch, a pod could claim 5.0.0,
+    pass the guard, and match no cage -- admitted, uncaged. Not reachable today: nothing is pushed
+    and the live guard is still rendered from a one-version array.
+  - on the DEMO path (`graded/up.sh`), the opposite, and it is not a comfort: the uncut version's
+    cage IS installed, ungraded and selectable. Observed live on kind-driftwood on 2026-09-04, and
+    it is what made round 1's fix buy an unearned PASS. `graded/verify-graded.sh` now grades that
+    state as a could-not-look (decision 13); the fan-out itself is untouched.
+
+  The repair is one change across those four places (range on `commit`), and it belongs with
+  ticket 64 or its own ticket, not inside a verify script.
 - `policy/verify-conditional.sh`'s live fixtures still claim `2.0.1`. Its skip reason IMPROVED
   today (from "the branch lives only in retired 2.0.1" to "5.0.0 carries it, relabel the fixtures
   to 5.0.0 before trusting this tail") and it names its own next step. Relabelling belongs with the
