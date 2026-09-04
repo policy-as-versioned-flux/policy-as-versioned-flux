@@ -19,6 +19,9 @@ SKIP: driftwood/twin-sweep.yml checks out policy-as-versioned-flux/policy-as-ver
 PASS: feeds/cut-release.yml checks out policy-as-versioned-platform/platform at the literal tag v2.0.1
 FAIL: feeds/release.yml checks out policy-as-versioned-platform/platform with no `ref:` -- that is platform's default branch, which carries no signature and can move under this consumer
 FAIL: ico/release.yml checks out policy-as-versioned-platform/platform with no `ref:` -- that is platform's default branch, which carries no signature and can move under this consumer
+PASS: insurer/fetch.yml checks out policy-as-versioned-driftwood/driftwood at the tag insurer pins it to (v1.1.0)
+PASS: insurer/fetch.yml checks out policy-as-versioned-tuppence/tuppence at the tag insurer pins it to (v1.1.0)
+PASS: insurer/fetch.yml checks out policy-as-versioned-ludlow/ludlow at the tag insurer pins it to (v1.1.0)
 FAIL: insurer/release.yml checks out policy-as-versioned-platform/platform with no `ref:` -- that is platform's default branch, which carries no signature and can move under this consumer
 PASS: ludlow/cut-release.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
 PASS: ludlow/cut-release.yml checks out policy-as-versioned-nist/nist at the tag ludlow pins it to (v1.1.0)
