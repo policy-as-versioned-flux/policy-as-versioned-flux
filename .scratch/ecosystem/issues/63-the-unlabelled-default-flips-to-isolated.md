@@ -58,13 +58,15 @@ v5.0.0 trees with a 178-entry generated corpus built by the real `corpus_generat
 
     generated corpus pods: 178
     COMPUTED BUMP: major
-      cage-tier.yaml: major
-        expr-pin-031548608dd6f60e (tier baseline->isolated): cpu, mem, priorityClass, dropAll,
-        readOnlyRootFs, waf narrowed; [...150+ further entries...]
-      posture-trust-boundary.yaml: none
-      require-nonroot.yaml: none    <- the re-carried arm WIDENS, so it contributes no bump
+      cage-tier.yaml: major  entries=148
+        first entry: expr-pin-031548608dd6f60e
+      posture-trust-boundary.yaml: none  entries=0
+      require-nonroot.yaml: none  entries=0    <- the re-carried arm WIDENS, so no bump
 
-### What this exposed (three real defects, all fixed here)
+(148 moved entries, not the "150+" an earlier draft of this Answer rounded to; the number is
+`len(movement.entries)` for the cage-tier pair and it was re-counted on 2026-09-04.)
+
+### What this exposed (four real defects, all fixed here)
 
 1. **`verify-infra-declaration.sh` read PROSE as a declaration.** Its `unlabelled_default()`
    matched the raw file, so the flip's own changelog comment -- which quotes the shape it
@@ -76,7 +78,7 @@ v5.0.0 trees with a 178-entry generated corpus built by the real `corpus_generat
    now, with selfcheck legs for both the authoring block scalar and the rendered one-line `\n`
    form, plus a leg proving a body whose only match is a comment declares nothing.
 3. **An UNCUT TAIL turned green beats red or blank.** A declared element with no `commit` has no
-   signed tag, so Flux cannot deliver it and no cluster can carry it. Three checks treated that as
+   signed tag, so Flux cannot deliver it and no cluster can carry it. FOUR checks treated that as
    a defect or let it suppress a real signal:
    - `verify-declared-versions-admit.sh` skipped ALL versions because 5.0.0's cage was not
      installed, hiding 4.0.0's genuine green. It now partitions cut/uncut, probes the cut lines
@@ -85,9 +87,14 @@ v5.0.0 trees with a 178-entry generated corpus built by the real `corpus_generat
      rule applied; it names the tail instead.
    - `verify-first-gate-determined-release.sh` FAILED because there is no `evidence/5.0.0.json`.
      The gate that writes evidence runs inside `cut-release.yml`, so that state is pre-dispatch,
-     not a fault. It is now a could-not-look ONLY when the tag is also absent; evidence missing
-     with a tag that EXISTS still FAILS by name, which is the defect the beat is for. Selfcheck
-     leg added pinning that three-way decision.
+     not a fault. It is now a could-not-look ONLY when the element records no `commit` AND no tag
+     is present; evidence missing on a RELEASED element still FAILS by name, which is the defect
+     the beat is for. Selfcheck leg added pinning that decision. (The first cut of this fix keyed
+     on the local tag alone; the 2026-09-04 review fixes below moved the key onto `commit`, where
+     the other four checks have it, and red-proved the tagless-checkout case.)
+   - a FOURTH check had the same fault and was missed on the first pass:
+     `graded/verify-graded.sh` step 8 hard-failed on `cage-tier-5-0-0`. Same rule applied on
+     2026-09-04; see the review-fixes section below, which also records both branches' runs.
 
 **`verify-coexistence.sh` was passing about nothing.** Its offline matrix loaded
 `policies/v2.0.0` and `v3.0.0` -- both RETIRED on 2026-08-29, frozen behind their tags, delivered
@@ -126,14 +133,253 @@ Namespace that DECLARES `baseline`, so the fixture says which rung it is about.
     verify-composition.sh                       3  the adopter pin does not carry v5.0.0 yet
                                                    (ticket 64); was 0 on main
     verify-first-gate-determined-release.sh     3  waiting for cut-release.yml to cut policy/v5.0.0
+    verify-first-gate-determined-release.sh --selfcheck
+                                                0  PASS
+    graded/verify-graded.sh                     0  PASS, after the fix of 2026-09-04 below. It was
+                                                   0 on ecosystem/build-2026-09-03 and this ticket
+                                                   turned it to 1 ("FAIL: cage-tier-5-0-0
+                                                   MutatingPolicy not installed live"). A real
+                                                   regression this ticket caused, and fixed.
+    shift-left/verify-shift-left.sh             0  PASS -- and it was 3 on
+                                                   ecosystem/build-2026-09-03 ("declares one major
+                                                   line (4.0.0), so a target has no +/-1
+                                                   neighbour"). The second declared line gives the
+                                                   flip beat its first live subject: this change
+                                                   moves that check from could-not-look to green.
+    verify-governed-namespace-guard.sh          0  PASS
     kyverno test graded/tests/cage-tier         13 passed / 0 failed
     kyverno test distribution/tests/require-nonroot  14 passed / 0 failed
 
-Two platform checks are RED on this machine and were red identically on `main` before this branch,
-with the same last line: `graded/verify-graded.sh` (a live-cluster leg, flaky between the netpol
-generate and the reach probe) and `verify-publisher-gate.sh` (`corpus_generator resolved the wrong
-repo` -- it cannot run from a nested `.work/` worktree). `identity/verify-identity.sh` is red for a
-stopped OpenBao. None of the three is this ticket's.
+`identity/verify-identity.sh` is red on this machine, and not for this ticket: it prints `ok
+OpenBao present` and then `FAIL: OpenBao has no jwt auth method enabled -- run identity/up.sh
+(dev-mode OpenBao is in-memory: a pod restart wipes it)`. OpenBao is running; the auth method it
+lost on restart is what is missing. Identity is shelved (ticket 90) and nothing here touches it.
+
+`verify-publisher-gate.sh` is **exit 3, could-not-look, on BOTH branches** when run from its real
+path, and the reason is the same on both: `SKIP (part C): cs-16's cut-in-the-middle shape needs at
+least three declared versions and distribution/versions.yaml declares [...]; there is no middle to
+cut`. On `ecosystem/build-2026-09-03` that list is `['4.0.0']`; on this branch it is `['4.0.0',
+'5.0.0']` -- still two, still no middle, so the grade does not move. It FAILs only when it is
+invoked through the hub worktree's `.estate-clone/platform` symlink, and that is an artefact of the
+invocation, not of the repo: the script's `here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"` is
+the LOGICAL path (`.../wt/ticket-63/.estate-clone/platform`) while `corpus_generator.DISTRIBUTION`
+is built from `Path(__file__).resolve()` (`.../platform/.work/ticket-63/distribution`), so its own
+`assert DIST == repo / "distribution"` fires: `AssertionError: corpus_generator resolved the wrong
+repo`. An earlier draft of this Answer said this check was red on `main` for the same reason "it
+cannot run from a nested .work/ worktree". That comparison was not like-for-like -- the two runs
+were not the same invocation -- and the claim was wrong on all three counts: it is not a FAIL from
+its real path, it is not the same grade being compared, and the cause is the symlink, not the
+nesting. Both runs are recorded below.
+
+### 2026-09-04, review fixes
+
+The spec review of this branch found two blocking defects and four smaller ones. All six are fixed
+here; the two blocking ones were both about this Answer's honesty, and one of them was a real
+regression this ticket had caused and then misattributed.
+
+**BLOCKING 1 -- this ticket broke `graded/verify-graded.sh`, and the Answer blamed a flaky live
+leg.** It was not flaky and it was not red on the integration branch. Step 8's live loop
+(`graded/verify-graded.sh`, the `cage-tier-$v` / `cage-netpol-$v` existence loop) ranged
+`mod.versions(versions.yaml)`, which this ticket had grown to `['4.0.0','5.0.0']`, and hard-failed
+on the uncut 5.0.0 whose signed tag does not exist. Three of the four version-ranging checks got
+the cut/uncut partition in this ticket; this one was missed. It has it now, keyed the same way, on
+the array element's `commit` field:
+
+- the existence loop ranges CUT elements only, and PRINTS the uncut tail by name (`uncut tail, not
+  looked for: 5.0.0 (declared with no commit, so no signed tag and nothing for Flux to deliver)`);
+- `DECLARED_COUNT` -- the pre-existing guard that skips the behavioural probes when more than one
+  version is installed and selectable -- counts CUT elements too. Counting the uncut one would have
+  tripped that guard and turned 4.0.0's real behavioural green into a blanket live-tail SKIP, which
+  is the same fault in the other direction;
+- `NEWEST` is the newest CUT version, because that is the copy the cluster actually carries. The
+  probe banner says so: `the live copy under test is cage-tier-4-0-0 (newest CUT version)`.
+
+Named, not closed, and printed by the check itself when an uncut tail exists: the orphan guard's
+allow-list is ranged over the WHOLE array while a `cage-tier-<v>` only exists for a version whose
+tag was cut. Between declaring a version and cutting its tag, a pod may claim it, pass the orphan
+guard, and match no cage. Not reachable today (the live guard is still rendered from the
+one-version array, and nothing is pushed). The repair is to range the allow-list over cut elements
+in the ResourceSet and `render-orphan-guard.py`, which is a change to the fan-out, not to this beat.
+
+**BLOCKING 2 -- the `verify-publisher-gate.sh` claim was false on all three counts.** Corrected in
+the check section above: exit 3 on both branches from its real path, FAIL only through the hub
+worktree's `.estate-clone/platform` symlink, and the earlier comparison was not like-for-like.
+
+**Minor 1 -- `verify-first-gate-determined-release.sh` keyed the uncut-tail rule on a LOCAL TAG.**
+Alone among the checks this ticket touched: the other four key on the array element's `commit`,
+this one asked `git rev-parse --verify refs/tags/<tag>` with no observed/unobserved guard. On a
+tagless or shallow checkout (`--depth`, `--no-tags`, an archive export) `refs/tags` is empty, so a
+version RELEASED WITH NO GATE EVIDENCE read as "not yet gated" and skipped -- the one direction
+this beat must never be wrong in. It is keyed on `commit` now, with the local tag kept as a second
+signal so a tag appearing without a commit still refuses. The selfcheck's table grew the third
+argument and pins the shallow case by name. Red-proved for real, not only in the selfcheck: a
+`git clone --no-tags --depth 1` of this branch with `computed-semver/evidence/4.0.0.json` moved
+aside gives `FAIL: policy/v4.0.0 is recorded as released by the array element's commit
+64635dfd... (this checkout carries no refs/tags/policy/v4.0.0, so the tag itself was not observed
+here) but there is no computed-semver/evidence/4.0.0.json`, exit 1 -- where the pre-fix script,
+same clone, same missing evidence, printed `SKIP: waiting for the owner to let cut-release.yml cut
+policy/v4.0.0 policy/v5.0.0 in Actions`, exit 3. Step 3 got the same guard: an element with a
+commit whose tag this checkout cannot see is now reported as a fact about the CLONE (`SKIP: this
+checkout cannot see the signed tag(s)...; fetch tags and re-run`), never as a wait on the owner for
+a release that already happened.
+
+**Minor 2 -- `identity/verify-identity.sh` is not "a stopped OpenBao".** Corrected above: OpenBao
+is present; the jwt auth method is not enabled.
+
+**Minor 3 -- "150+ further entries" was a rounding of a number that was to hand.** It is 148, and
+the corpus block above now carries the re-counted figure.
+
+**Minor 4 -- the check table omitted two lines.** `shift-left/verify-shift-left.sh` moves 3 -> 0 on
+this change (a real improvement this ticket had not claimed) and `graded/verify-graded.sh` had no
+grade line at all. Both are in the table now, with what they graded on the integration branch.
+
+### The 2026-09-04 runs, from the hub worktree root
+
+`graded/verify-graded.sh` on `ecosystem/build-2026-09-03` (its real checkout,
+`.estate-clone/platform/graded/verify-graded.sh`) -- **exit 0**:
+
+    ok   a running isolated pod accepts an UPDATE (kubectl label) — the mutation is idempotent
+    ok   a pod claiming an undeclared version is refused live by the orphan guard
+    ok   a pod with no claim at all is refused live in a governed Namespace — silence is not an exemption
+    ok   all three rungs' reach cages are still present at the end of the run (nothing deleted them)
+    PASS: the Namespace declares the tier and the pod wears it; the cage only tightens; the bottom rung runs and reaches nothing; TCoR booked
+
+`graded/verify-graded.sh` on `ticket-63-...`, BEFORE the fix -- **exit 1**:
+
+    that window. Upgrade path: render the three NetworkPolicies per governed
+    Namespace from the composed artefact, so Flux has them in place before any pod
+    is admitted (tickets 40/42).
+    ==> 8. live: a REAL pod in a caged Namespace is admitted, RUNS, and wears its Namespace's cage
+    FAIL: cage-tier-5-0-0 MutatingPolicy not installed live
+
+`graded/verify-graded.sh` on `ticket-63-...`, AFTER the fix -- **exit 0**, and the uncut tail is
+named at step 8 (`uncut tail, not looked for: 5.0.0`):
+
+    ok   a running isolated pod accepts an UPDATE (kubectl label) — the mutation is idempotent
+    ok   a pod claiming an undeclared version is refused live by the orphan guard
+    ok   a pod with no claim at all is refused live in a governed Namespace — silence is not an exemption
+    ok   all three rungs' reach cages are still present at the end of the run (nothing deleted them)
+    PASS: the Namespace declares the tier and the pod wears it; the cage only tightens; the bottom rung runs and reaches nothing; TCoR booked
+
+`verify-first-gate-determined-release.sh --selfcheck` -- **exit 0**:
+
+    ok  selfcheck: evidence+no tag is a could-not-look; NO evidence with a RELEASED element (commit
+    on the array, or a tag) is still a refusal, tagless checkout included; the
+    gate-determines-the-number claim is not weakened
+
+`verify-first-gate-determined-release.sh` -- **exit 3**:
+
+    has not run for it either -- it runs inside the same dispatch, before the tag.
+    A gitsign tag can only be cut by .github/workflows/
+    cut-release.yml inside GitHub Actions, with that run's own ambient OIDC identity.
+    Nothing here may fake one, so this check cannot look at the last step of the release.
+    SKIP: waiting for the owner to let cut-release.yml cut policy/v5.0.0 in Actions
+
+`distribution/verify-coexistence.sh` -- **exit 3**:
+
+    ==> 1b. offline: the matrix's subjects are exactly the DECLARED array (4.0.0 5.0.0)
+    ==>    the fixture and the array agree
+    ==> 2. offline: the orphan-guard allow-list is exactly the version array (no drift)
+    SKIP (live tail): distribution/versions.yaml declares [4.0.0 5.0.0] but only [4.0.0] has been cut (uncut, no signed tag yet: 5.0.0); coexistence needs two RELEASED versions to show side by side, and there is no second one on any cluster to prove against
+    SKIP: offline proof holds; live tail could not look: ... — two signed versions coexist; each judges only what claims it
+
+`distribution/verify-declared-versions-admit.sh` -- **exit 0**:
+
+    ok   4.0.0 baseline: ADMITTED and caged — pc=cage-baseline-4-0-0 prio=-10 preempt=Never tier=baseline
+    ok   4.0.0 restricted: ADMITTED and caged — pc=cage-restricted-4-0-0 prio=-100 preempt=Never tier=restricted
+    ok   4.0.0 quarantine: ADMITTED and caged — pc=cage-quarantine-4-0-0 prio=-1000 preempt=Never tier=quarantine
+    ok   4.0.0 isolated: ADMITTED and caged — pc=cage-isolated-4-0-0 prio=-10000 preempt=Never tier=isolated
+    PASS: every CUT version distribution/versions.yaml declares admits a real pod on every rung of the ladder on kind-driftwood, and every pod came back wearing that rung's own cage (not looked at, uncut and unreleasable: 5.0.0)
+
+`distribution/verify-governed-namespace-guard.sh` -- **exit 0**:
+
+    ==> 1. render-governed-namespace-guard.py --selfcheck (structural: shape, Deny, CREATE-only, namespaceSelector)
+    selfcheck ok: governed-namespace-requires-claim is platform-machinery, Deny, CREATE-only, scoped to governed:true namespaces, denies an unclaimed pod
+    ==> 2. the validations expression itself, functionally, namespaceSelector stripped (kyverno CLI cannot evaluate it offline -- see this script's docstring)
+    PASS: a governed namespace requires a claim at CREATE; the claim check itself is proved, and the namespace-scoping shape is proved structurally (kyverno CLI cannot evaluate namespaceSelector offline).
+
+`distribution/verify-infra-declaration.sh` -- **exit 0**:
+
+    driftwood/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
+    ludlow/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
+    tuppence/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
+    ok   no served body defaults an unlabelled tier to isolated while infra is undeclared (currently: infra is fully declared, so this is a live tripwire, not a historical fact)
+    PASS: the platform's infra declaration covers kube-system, flux-system and kyverno, entitled by the platform role on party.yaml, and no served policy body's unlabelled default can flip them to isolated before that declaration lands.
+
+`distribution/verify-orphan-guard.sh` -- **exit 0**:
+
+    ==> 1. render the orphan-guard from the version array (declares 4.0.0, ...)
+    ==> 2. an undeclared version (9.9.9) is denied; a declared one (4.0.0) admits
+    PASS: only versions the array declares can run; the allow-list is the array.
+
+`distribution/verify-render-version-tree.sh` -- **exit 0**:
+
+    ok   12 (tree, rung) dial entries match their own PriorityClass value and preemptionPolicy
+    PASS: every mandatory member renders with a versioned name, the policy-version label, a
+          matchConditions self-scope (never objectSelector); cage-tier names its own
+          PriorityClasses and agrees with their value and preemptionPolicy; and two rendered
+          versions coexist, each judging only its own claim.
+
+`distribution/verify-retirement.sh` -- **exit 3** (unchanged from the integration branch):
+
+    ==> 2. retire 4.0.0 from the array (one deletion) and re-render
+    ==> 3. after retirement: the same pod is now DENIED (orphaned by the shrunk array)
+    ==>    (live: dropping the array element prunes Kustomization policy-v4-0-0)
+    SKIP (live tail): policy-v4-0-0 ABSENT on kind-driftwood but never observed present by this script; absence is not evidence of pruning
+    SKIP: offline proof holds; live tail could not look: ... — retiring a version (one array deletion) prunes it and denies stragglers
+
+`shift-left/verify-shift-left.sh` on `ticket-63-...` -- **exit 0**:
+
+    shift-left: fixtures/workload-flip.yaml would be denied somewhere in its supported window ['4.0.0', '5.0.0']
+    (non-zero above is expected -- the flip was caught)
+
+    shift-left: all offline proofs passed
+
+`shift-left/verify-shift-left.sh` on `ecosystem/build-2026-09-03` -- **exit 3**, for contrast:
+
+    == a version the array doesn't declare is refused, not silently skipped ==
+
+    == an Audit->Deny flip is caught pre-merge ==
+    SKIP: distribution/versions.yaml declares one major line (4.0.0), so a target has no ±1 neighbour and there is no tightened rule for the window to catch a workload against; the flip beat has nothing to observe until a second major is declared again
+
+`verify-publisher-gate.sh` from its REAL path on `ticket-63-...` -- **exit 3**:
+
+    ok  D3: a degraded publish carries the suffix on the tag, the evidence names the computed
+        bump it failed to reach, and the array element carries tier: quarantine -- a signed fact
+        the ADOPTER prices (18 Answer 2), never a floor the publisher sets in someone else's repo
+
+    SKIP: part(s) c could not look -- the reason is on their own SKIP line above; every other part of the publisher gate was observed true
+
+(its part C line: `SKIP (part C): cs-16's cut-in-the-middle shape needs at least three declared
+versions and distribution/versions.yaml declares ['4.0.0', '5.0.0']; there is no middle to cut`)
+
+`verify-publisher-gate.sh` from its REAL path on `ecosystem/build-2026-09-03` -- **exit 3**, the
+same grade, the same part, the only difference being the array it names (`['4.0.0']`):
+
+    ok  D3: a degraded publish carries the suffix on the tag, the evidence names the computed
+        bump it failed to reach, and the array element carries tier: quarantine -- a signed fact
+        the ADOPTER prices (18 Answer 2), never a floor the publisher sets in someone else's repo
+
+    SKIP: part(s) c could not look -- the reason is on their own SKIP line above; every other part of the publisher gate was observed true
+
+`verify-publisher-gate.sh` THROUGH the `.estate-clone/platform` symlink -- **exit 1**, the
+invocation artefact described above (`AssertionError: corpus_generator resolved the wrong repo:
+.../platform/.work/ticket-63/distribution`):
+
+    ok  the array element is now {'version': '9.0.0', 'tag': 'policy/v9.0.0-quarantine.1', 'commit': '21ec43c7...', 'bump': 'major', 'tier': 'quarantine'}
+    ok  D3: a degraded publish carries the suffix on the tag, the evidence names the computed
+        bump it failed to reach, and the array element carries tier: quarantine -- a signed fact
+        the ADOPTER prices (18 Answer 2), never a floor the publisher sets in someone else's repo
+    FAIL: a part above failed -- its own FAIL/assert line names which
+
+`identity/verify-identity.sh` -- **exit 1**, not this ticket's and not a stopped OpenBao:
+
+    ok   SPIRE pods present
+    ok   spire-agent DaemonSet fully Ready (1/1)
+    ok   istiod has an available replica
+    ok   sidecar-injector webhook has a populated caBundle (serves)
+    ok   OpenBao present
+    FAIL: OpenBao has no jwt auth method enabled — run identity/up.sh (dev-mode OpenBao is in-memory: a pod restart wipes it)
 
 ### Decisions (all `delegated`, ADR-0025)
 
@@ -182,6 +428,26 @@ stopped OpenBao. None of the three is this ticket's.
    governed. The flip reaches an adopter only when that adopter pins 5.0.0 (ticket 64), so no
    running adopter workload moves today.
 
+10. **`graded/verify-graded.sh`'s `DECLARED_COUNT` and `NEWEST` count CUT versions, not declared
+    ones** (2026-09-04). The sentence that guard defends is "every declared version is INSTALLED
+    and SELECTABLE by any pod", and an uncut element is neither: no tag, so Flux delivers nothing
+    and there is no `cage-tier-<v>` on the cluster to exercise. Counting it would have made the
+    count two, tripped the skip, and thrown away 4.0.0's real behavioural green over a version that
+    does not run -- a blanket skip standing in for a real result, which is the fault the cut/uncut
+    rule exists to avoid. The guard still trips the day a second version is really cut.
+11. **The orphan-guard/uncut-tail window is NAMED in `verify-graded.sh`'s output, not fixed here**
+    (2026-09-04). The allow-list ranges the whole array; a cage exists only for a cut version; so a
+    pod claiming a declared-but-uncut version passes the guard and matches no cage. It is not
+    reachable today and the repair belongs in the ResourceSet and `render-orphan-guard.py` (the
+    fan-out), not in a verify script. Naming it in the check's own output is what keeps the beat's
+    green honest; silently passing over it would not be.
+12. **`verify-first-gate-determined-release.sh` keys "released" on `commit`, and keeps the local
+    tag as a second signal rather than replacing it** (2026-09-04). `commit` is committed content
+    and survives every fetch depth, so it is the observable that cannot go missing; but a tag that
+    appears with no `commit` on its element is also a release with no gate evidence, and dropping
+    that leg to "key it the same way as the others" would have narrowed the refusal. Both are
+    pinned in the selfcheck. Step 3 got the matching guard so a cut release whose tag this clone
+    cannot see is reported as a fact about the clone, never as a wait on the owner.
 ## Waits on the owner
 
 - **Push of the platform branch** `ticket-63-the-unlabelled-default-flips-to-isolated` to
@@ -207,6 +473,14 @@ stopped OpenBao. None of the three is this ticket's.
   driftwood, tuppence or ludlow, and no `composed/` tree regenerated anywhere. The three adopters
   stay pinned to 4.0.0 and their served cage-tier bodies still read `baseline`, which
   `verify-infra-declaration.sh` prints truthfully.
+- **The orphan guard still allows an UNCUT declared version** (found 2026-09-04 while fixing
+  `graded/verify-graded.sh`, named there in the check's own output and in decision 11). Its
+  allow-list ranges the whole array; a `cage-tier-<v>` exists only for a version whose tag was cut.
+  So once this branch is pushed and before `cut-release.yml` cuts `policy/v5.0.0`, a pod could
+  claim 5.0.0, pass the guard, and match no cage. Not reachable today -- nothing is pushed and the
+  live guard is still rendered from the one-version array. The repair is in the ResourceSet
+  template and `render-orphan-guard.py` (range the allow-list over CUT elements), which is a change
+  to the fan-out and belongs with ticket 64 or its own ticket, not inside a verify script.
 - `policy/verify-conditional.sh`'s live fixtures still claim `2.0.1`. Its skip reason IMPROVED
   today (from "the branch lives only in retired 2.0.1" to "5.0.0 carries it, relabel the fixtures
   to 5.0.0 before trusting this tail") and it names its own next step. Relabelling belongs with the
