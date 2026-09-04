@@ -18,6 +18,16 @@
 #       neighbours stay reachable (python3, with pyyaml, lives beside cosign under homebrew).
 #       Callers pass an absolute path to themselves. A no-op inside the child re-run.
 #
+#       CEILING (measured 2026-09-04, ticket 76 review). The leg re-runs the WHOLE script, so
+#       every script that calls it does its work twice, plus the cost of building the PATH
+#       symlink farm: verify-provenance.sh takes 19.5s with the leg and 5.5s with it disabled
+#       (PAV_SELFCHECK_CHILD=1), a 3.5x. The same doubling applies to verify-proportionality.sh
+#       here and to each of the seven computed-semver scripts through .estate-clone/platform/
+#       lib.sh. It is paid on every gate run, not only in CI.
+#       ponytail: let a script expose its could-not-look branch as one function and re-run only
+#       that, or gate the leg behind a flag the gate sets once per wave rather than per script,
+#       once the gate's wall-clock is the thing that hurts.
+#
 # The estate's own copy of this contract is .estate-clone/platform/lib.sh; this is the hub's,
 # kept separate because the hub venv, not python3, is the interpreter here.
 

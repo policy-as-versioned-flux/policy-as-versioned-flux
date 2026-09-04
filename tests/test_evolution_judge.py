@@ -250,14 +250,23 @@ def test_override_accuracy_is_scored_on_the_same_footing_as_the_twins_own_infere
 # -- what the 1.000 is, and is not (ecosystem ticket 76) ------------------------------------
 
 
-def test_the_corpus_is_declared_as_the_one_the_heuristic_was_fitted_on() -> None:
+def test_the_declared_corpus_kind_is_the_one_the_corpus_earns(corpus: list[dict]) -> None:
     """REVIEW-2026-09-02 R3: the eval scores a keyword lookup table against its own values, and
     the gate reported the result as "7 skill metrics ... at their thresholds". The score is real
     but it grades the harness, not the twin's judgement, and the module says which it is so the
-    surface (verify-twin-evals.sh) can read the label rather than type it."""
-    from twin.evolution_judge import CORPUS_KIND
+    surface (verify-twin-evals.sh) can read the label rather than type it.
 
-    assert CORPUS_KIND == "harness-mechanism"
+    The label is not pinned to today's word: what is asserted is that it follows the corpus. Hold
+    an item out and this requires `held-out`; flip the word without holding anything out and this
+    turns red, because the label would then be a claim the corpus does not support."""
+    from twin.evolution_judge import CORPUS_KIND, _TOLERANCE, _infer_position
+
+    unfitted = [item["id"] for item in corpus
+                if abs(_infer_position(item["input"]["component"]["name"])
+                       - item["expected"]["evolution_position"]) > _TOLERANCE]
+    assert CORPUS_KIND == ("held-out" if unfitted else "harness-mechanism"), (
+        f"{len(unfitted)} corpus item(s) the table was not fitted to ({unfitted}), "
+        f"but the declared corpus kind is {CORPUS_KIND!r}")
 
 
 def test_every_corpus_item_is_one_the_keyword_table_already_answers(corpus: list[dict]) -> None:

@@ -49,8 +49,12 @@ SKILL = "evolution-judge"
 # that component's name already sits inside `scorer`'s tolerance of the expected position
 # (`tests/test_evolution_judge.py` asserts exactly that). So a perfect score is available by
 # construction, and what it observes is the harness -- corpus loads, scorer runs, threshold
-# compares -- not the twin's judgement. The gate reads this constant rather than typing the word,
-# so holding out an unfitted corpus later is one edit here and the surface follows.
+# compares -- not the twin's judgement. verify-twin-evals.sh reads this constant into both
+# of the lines it prints and asserts only that the two agree, and the unit test below requires
+# the value to match what the corpus actually is, so holding out an unfitted corpus later is one
+# edit to the corpus and one to this word, and every surface follows without turning a check red.
+# Two values are defined: "harness-mechanism" while every corpus item is one the heuristic was
+# fitted to, "held-out" once any item is not.
 CORPUS_KIND = "harness-mechanism"
 
 # The twin's own inference is a model assertion (grade 5, evidence-ladder.yaml); a human override

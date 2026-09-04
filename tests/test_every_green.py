@@ -99,6 +99,38 @@ def test_scan_walks_verify_scripts_and_skips_work_and_git(tmp_path: Path) -> Non
         str(tmp_path / "u" / "verify-bad.sh") + ":1: exit 0"]
 
 
+def test_the_skip_verdict_token_is_named_in_every_print_form() -> None:
+    # widened 2026-09-04: the wrappers and flags the estate's scripts actually use
+    assert every_green.offenders('say "SKIP: no kyverno"\nexit 0\n') == [1]
+    assert every_green.offenders('echo -e "SKIP: no kyverno"\nexit 0\n') == [1]
+    assert every_green.offenders("printf -- '\\033[1;36mSKIP: %s\\n' \"no kyverno\"\nexit 0\n") == [1]
+    assert every_green.offenders('echo SKIP: no kyverno\nexit 0\n') == [1]
+    assert every_green.offenders('say "SKIPPED nothing here"\nexit 0\n') == []
+
+
+def test_a_prose_could_not_look_is_not_graded_by_this_net() -> None:
+    """The boundary the PASS line states. `echo "(skipped: kyverno not found)"` then a PASS is
+    sometimes a false green (verify-proportionality.sh:75 on main) and sometimes an honest
+    narrowing (tuppence/reset/verify-reach-secrets.sh), and the difference is in the PASS
+    sentence, which no regex reads. Execution -- each script's selfcheck_absent leg -- is what
+    grades those; this net grades the verdict token."""
+    prose = ('echo "    (skipped: kyverno CLI not found -- offline body proof unavailable here)"\n'
+             'echo "PASS: the shared control body is a real policy"\n')
+    assert every_green.offenders(prose) == []
+
+
+def test_a_script_that_cannot_be_read_is_reported_unlooked_not_clean(tmp_path: Path) -> None:
+    """A dangling symlink (verify/demo/verify-demo.sh is one when talk/ is not beside it) used to
+    raise FileNotFoundError out of scan() and the shell printed a FAIL that named nothing."""
+    (tmp_path / "verify-good.sh").write_text('echo "SKIP: x"\nexit 3\n')
+    (tmp_path / "verify-dangling.sh").symlink_to(tmp_path / "gone.sh")
+    hits, unread = every_green.read_tree(str(tmp_path))
+    assert hits == []
+    assert len(unread) == 1 and unread[0].startswith(str(tmp_path / "verify-dangling.sh"))
+    assert every_green.main(["scan", str(tmp_path)]) == 3
+    assert every_green.main(["scan", str(tmp_path / "no-such-dir")]) == 3
+
+
 def test_the_scanner_selfcheck_holds() -> None:
     every_green.selfcheck()
 
@@ -139,12 +171,22 @@ def test_step5_consumes_the_overlay_verdicts_and_names_ticket_72() -> None:
     assert "twin-sweep.jsonl" in text, "the dated sweep observation is what ticket 72 supplies"
 
 
-def test_twin_evals_labels_the_seven_fitted_scores_as_harness_mechanism() -> None:
+def test_twin_evals_reads_the_label_it_spends_from_the_twin() -> None:
+    """Ticket 76 review, 2026-09-04: the Answer claimed the label was read from
+    twin.evolution_judge.CORPUS_KIND and not typed into the shell, and it was typed in twice. Both
+    surfaces -- the per-metric line inside the harness and the closing PASS line -- now carry the
+    constant, and the only assertion made about the word is that the two agree."""
     text = _text("verify", "twin-evals", "verify-twin-evals.sh")
-    assert "harness-mechanism" in text
-    # the closing line no longer reads as a measure of skill
+    assert "from twin.evolution_judge import CORPUS_KIND; print(CORPUS_KIND)" in text, \
+        "the shell does not read the label from the twin"
     closing = [l for l in text.splitlines() if l.strip().startswith('echo "PASS: $(sed')]
-    assert closing and "harness-mechanism" in closing[0], closing
+    assert closing and "$CORPUS_KIND metrics" in closing[0], closing
+    # the word may still appear as a definition of what that label means; what it may not be is
+    # the label the line spends about this run's seven scores
+    assert "harness-mechanism metrics" not in closing[0], "the closing line types the label"
+    assert 'out(LABEL == CORPUS_KIND,' in text, "the label and the surface are not asserted to agree"
+    assert 'CORPUS_KIND == "harness-mechanism"' not in text, \
+        "a typed label in the assertion turns the check red when the corpus is held out"
 
 
 # -- the tag resolution step 6 uses --------------------------------------------------------------

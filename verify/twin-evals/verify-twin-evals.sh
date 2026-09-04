@@ -53,13 +53,26 @@ command -v git >/dev/null 2>&1 || skip "git is needed: every skill corpus is bui
 
 log="$(mktemp)"; trap 'rm -f "$log"' EXIT
 
+# The word this script spends about the seven scores comes from the twin, not from this shell:
+# twin/evolution_judge.py declares what its own corpus is and every surface line below is built
+# from that constant. Holding a corpus out later is one edit to CORPUS_KIND and both surfaces --
+# the per-metric line inside the harness and this script's closing PASS line -- follow it. The
+# only assertion made about the word is that the two agree; nothing here requires it to be any
+# particular word, so flipping the constant does not turn this check red.
+CORPUS_KIND="$(cd "$ROOT" && "$PY" -c 'from twin.evolution_judge import CORPUS_KIND; print(CORPUS_KIND)' 2>/dev/null)"
+[ -n "$CORPUS_KIND" ] || skip "twin.evolution_judge does not import here, so the label the seven scores are reported under could not be read"
+
 # -- 1 and 2: the version, and the seven skill metrics ----------------------------------------
-ROOT="$ROOT" "$PY" - >"$log" 2>&1 <<'PY'
+ROOT="$ROOT" CORPUS_KIND="$CORPUS_KIND" "$PY" - >"$log" 2>&1 <<'PY'
 import os, sys, tempfile
 from pathlib import Path
 
 ROOT = Path(os.environ["ROOT"])
 sys.path.insert(0, str(ROOT))
+
+# The label the surface spends, handed in by the shell that read it from the twin. Compared
+# against the module's own constant below rather than against any typed word.
+LABEL = os.environ["CORPUS_KIND"]
 
 from twin import TOOL_VERSION
 from twin import record_skill_scores as rss
@@ -126,17 +139,21 @@ for entry in entries:
     why = {"below": "  -- below its threshold",
            "fell": "  -- FELL against the last recorded value in twin/skill-scores.jsonl",
            "pass": ""}[said]
-    out(said == "pass", "%-28s score=%.3f  threshold=%.3f  last=%s  [harness-mechanism: scored "
+    out(said == "pass", "%-28s score=%.3f  threshold=%.3f  last=%s  [%s: scored "
                         "on the corpus it was fitted on]%s"
-                        % (skill, score, threshold, shown, why))
+                        % (skill, score, threshold, shown, LABEL, why))
 
 # The label is read from the skill module, not typed here: evolution_judge declares what its own
-# corpus is, so if someone later holds a corpus out and flips the constant, this line follows.
+# corpus is, and both this harness's per-metric line above and the shell's closing PASS line are
+# built from it. The assertion is only that the two agree -- the label the surface spends is the
+# label the module declares -- so holding a corpus out later is one edit to CORPUS_KIND and the
+# surface follows without this check turning red.
 from twin.evolution_judge import CORPUS_KIND
-out(CORPUS_KIND == "harness-mechanism",
-    "evolution-judge declares its corpus kind as %r -- the keyword table is scored against the "
-    "four items it was fitted to, so its 1.000 grades the harness, not the twin's judgement"
-    % CORPUS_KIND)
+out(LABEL == CORPUS_KIND,
+    "the label these %d scores are reported under (%r) is the one twin.evolution_judge declares "
+    "(%r); today that reads: the keyword table is scored against the four items it was fitted "
+    "to, so its 1.000 grades the harness, not the twin's judgement"
+    % (len(entries), LABEL, CORPUS_KIND))
 
 print("METRICS: %d" % len(entries))
 print("SUBTOTAL: %d skill metric(s), %d observed false" % (len(entries), fails))
@@ -240,7 +257,7 @@ fi
 rm -f "$lookup"
 
 if [ "$fail" -eq 0 ]; then
-  echo "PASS: $(sed -n 's/^METRICS: //p' "$log" | tail -1) harness-mechanism metrics (each heuristic scored against the corpus it was fitted on, so this grades the harness, not the twin's judgement -- a held-out corpus is not built yet), exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal"
+  echo "PASS: $(sed -n 's/^METRICS: //p' "$log" | tail -1) $CORPUS_KIND metrics (the label twin/evolution_judge.py declares for the corpus behind these scores, and the one this run asserted the harness spent; harness-mechanism means each heuristic is scored against the corpus it was fitted on, so the number grades the harness, not the twin's judgement -- a held-out corpus is not built yet), exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal"
   exit 0
 fi
 echo "FAIL: the twin's evals observed false; see the lines above"

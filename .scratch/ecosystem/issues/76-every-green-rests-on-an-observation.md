@@ -62,6 +62,13 @@ yet"* — false; feeds' `threat-register/v2.0.0` is in Rekor and the typed glob 
 it, and platform's `policy/v4.0.0` was never reached either. After: 12 of 17 published lines
 verified against Rekor, 5 genuinely untagged and said so.
 
+*Caveat on the figure (reviewer, 2026-09-04).* **12 of 17 is true of the integrator's real
+checkout, not of a builder's.** In a linked worktree only 8 of the 12 verify: gitsign cannot open
+a tag reference through a `.work/` worktree's git layer, so the other 4 come back as
+could-not-look and the script exits 3 (decision 6 below is why that is a SKIP and not a FAIL).
+The reviewer confirmed those four by hand against real checkouts. Anyone reading 12 of 17 off a
+builder's run will not see it; the number belongs to the integrator's wave run.
+
 **4. Step 5 consumes the adopter's verdicts.** It runs driftwood's own `verify-twin-overlay.sh`,
 `twin/verify-twin-scenarios.sh` and ticket 72's `twin/verify-twin-sweep-moved.sh` and cannot
 disagree with them. It exits 3 today, naming ticket 72 and the missing dated
@@ -77,13 +84,22 @@ composed source's own fact 3 already observed, not a second proof; the graded ca
 
 **7. The twin's evals are relabelled.** The seven scores are `harness-mechanism` observations, on
 the per-metric lines and on the final PASS line that reaches `talk/deck.md`. The label is read
-from `twin.evolution_judge.CORPUS_KIND`, not typed into the shell, so holding a corpus out later
-is one edit and the surface follows.
+once from `twin.evolution_judge.CORPUS_KIND` into a shell variable and spent by both surface
+strings; the only assertion made about the word is that the label the harness spent equals the one
+the module declares. Flipping the constant changes both sentences and turns nothing red (proved by
+flipping it to `held-out` and re-running: the closing line read *"7 held-out metrics"*, exit 0).
+The unit test requires the constant to match what the corpus actually is — `harness-mechanism`
+while every item is one the keyword table was fitted to, `held-out` once any is not — so the word
+cannot be flipped without the corpus following it. *(Corrected 2026-09-04: the first version of
+this paragraph claimed the label was read rather than typed, and both surface strings typed it.)*
 
 **The class-level net.** `verify/every-green/every_green.py` + `verify-every-green.sh` read every
-verify script the gate discovers and name any `SKIP` statement that ends in `exit 0` or in no exit
-at all. Run against the estate as it stands on `main` it names exactly the seven the ticket lists
-and nothing else — no false positives across 95 scripts.
+verify script the gate discovers and name any statement that **prints the `SKIP` verdict token**
+and then ends in `exit 0` or in no exit at all. Run against the estate as it stands on `main` it
+names exactly the seven the ticket lists and nothing else — no false positives across 95 scripts.
+What it does **not** grade is a could-not-look worded as prose (`echo "(skipped: kyverno CLI not
+found)"`, `say "4. skipped: kubectl absent"`), and the PASS line says so; see the 2026-09-04 note
+below for the measurement behind that boundary and for what catches the prose kind instead.
 
 ### Which check grades what
 
@@ -131,6 +147,15 @@ and nothing else — no false positives across 95 scripts.
    runs the branch. Neither subsumes the other.
 8. **No new entries in `talk/verify-exclusions.txt`.** The TRUTH line is supposed to move by the
    honest amount; excluding the scripts that now SKIP would undo the ticket.
+9. **(2026-09-04) The net grades the `SKIP` verdict token and says so, rather than widening to a
+   skip-word vocabulary.** Measured over all 95 discovered scripts: the wider rule cannot tell a
+   false green from an honestly narrowed PASS, because the difference is in the PASS sentence. The
+   print form was widened instead (same 26 statements matched, so no behaviour change today), and
+   the boundary is stated on the PASS line, in the header and in the docstring. See the dated note.
+10. **(2026-09-04) The corpus label is read into both surfaces and only agreement is asserted.**
+    Not "the surface may type the word as long as a test pins it": a test that pins the word is
+    the same red-on-flip the Answer denied. The word now lives in one constant, the test requires
+    that constant to match what the corpus is, and no check asks it to be any particular word.
 
 ### The TRUTH line moves
 
@@ -142,6 +167,78 @@ clusters and kyverno were reachable and every tail was observed — which is the
 now depends on the instruments, and says so when they are absent. On a runner without kyverno the
 seven platform scripts move from PASS to SKIP as well. `talk/verify-all.sh` was not run (builders
 do not run it); the moved counts belong to the integrator's wave run.
+
+### 2026-09-04 (later) — the spec review's two blocking defects, fixed
+
+Both were the same fault the ticket exists to close, one level up: **a claim wider than what was
+observed**, this time in the check's own PASS sentence and in this Answer.
+
+**(1) The PASS line claimed the whole class and graded one shape.** It read *"a could-not-look is
+exit 3 everywhere"*, while `every_green.py` read only a literal `echo "SKIP…"` / `printf 'SKIP…'`.
+Re-scanning the pre-fix tree (hub `verify/` at `main` beside the eight unit checkouts, 95 scripts)
+confirmed the reviewer: the net names the seven computed-semver scripts and does **not** name
+`verify-proportionality.sh:75` (`echo "    (skipped: kyverno CLI not found — offline body proof
+unavailable here)"`, then an unconditional PASS) or `verify-provenance.sh:48` (`echo "  (openssl
+absent — …skipped)"`, then PASS), which were members of the same class.
+
+*Widening was tried first and measured, not assumed.* A vocabulary rule — a print pairing a skip
+word with an absence word — was run over all 95 discovered scripts. It named nine sites: the two
+above (real false greens, fixed here) **and** `platform/currency-controller/verify-currency.sh:103,
+105`, `platform/oscal/verify-upflow.sh:65`, `tuppence/reset/verify-reach-secrets.sh:49,125`
+(which print a prose skip and then **narrow the closing sentence to what they did observe** — not
+false greens; `verify-reach-secrets.sh` has three closing sentences precisely so it can), plus
+`verify/sampler-wait-order/verify-sampler-wait-order.sh:99`, a `PASS:` line describing planted
+selfcheck behaviour. So the vocabulary rule cannot separate a false green from an honest
+narrowing: the difference lives in the PASS **sentence**, which no regex reads. Widening it would
+have made this check red about two scripts that are not wrong, or forced a doctrinal edit to two
+other units' scripts to keep it green.
+
+**Decided (delegated, ADR-0025): narrow the claim, widen only the print form.** The graded shape
+is now stated on the PASS line, in the script header and in `every_green.py`'s docstring: *a print
+statement whose first printed token is the `SKIP` verdict word, reaching exit 0 or no exit at
+all.* That token is the estate's verdict word (`verify-all.sh` reads the last line), so spending
+it and then reaching exit 0 is a contradiction no reading of the script can excuse. The print form
+was widened from `echo|printf` + quote to `echo`/`printf`/`say`/`note`/`warn`/`log`, with flags,
+bare or quoted, behind a colour escape or an `==>` prefix — measured over the same 95 scripts,
+both spellings match the same 26 statements, so it costs nothing today and catches
+`say "SKIP: …"` tomorrow. **What catches the prose kind** is execution, not text: the per-script
+`selfcheck_absent` leg, which re-runs the script with the instrument hidden and requires exit 3
+with a `SKIP:` last line. That is a per-script obligation this net cannot impose; the four scripts
+above do not carry one, and a ticket that gives every live-tail script that leg would close the
+half this net cannot see.
+
+Net after the fix: pre-fix tree — the same seven named, exit 1; current tree — 95 scripts, none
+named, exit 0.
+
+**(2) §7 claimed the label was read and it was typed, twice.** `verify-twin-evals.sh:129` and
+`:243` typed `harness-mechanism` into the surface strings and `:136` asserted
+`CORPUS_KIND == "harness-mechanism"`, so flipping the constant turned the check **red** — the
+opposite of what the Answer, the source comment at `:133-134` and the commit message all claimed.
+Fixed: the shell reads the label once (`CORPUS_KIND="$($PY -c 'from twin.evolution_judge import
+CORPUS_KIND; print(CORPUS_KIND)')"`, and exits 3 if the twin will not import), hands it to the
+harness, and both surface strings spend it; the assertion is now `LABEL == CORPUS_KIND` — the
+label and the surface agree. `tests/test_evolution_judge.py` no longer pins the word either: it
+requires the constant to be the one the corpus earns. §7, the source comment and this note say the
+same thing, and the flip was run to prove it.
+
+**Minors, also fixed.**
+
+- **A dangling symlink crashed the scan.** `verify/demo/verify-demo.sh` is a symlink into `talk/`;
+  where its target is absent, `open()` raised `FileNotFoundError` out of `scan()` and the shell
+  printed a `FAIL` naming nothing. A could-not-read is a could-not-look: `read_tree()` now returns
+  `(offences, could-not-read)`, `scripts_under()` reports an unwalkable root or directory instead
+  of walking it as empty, and `every_green.py scan` exits **3** with `?? could not read <path>`
+  when nothing worse was found. The script's SKIP line says the rest of the surface was not
+  observed to be whole. Proved by planting a dangling symlink in `verify/every-green/`: the check
+  printed the `??` line and exited 3, where before it exited 1 naming nothing.
+
+**Ceiling recorded (`ponytail:` in `verify/lib-observation.sh` and `.estate-clone/platform/
+lib.sh`): `selfcheck_absent` doubles the work.** The leg re-runs the *whole* script, so each of
+the seven computed-semver scripts and both hub tails now do their work twice, plus the cost of
+building the PATH symlink farm. Measured 2026-09-04: `verify-provenance.sh` 19.5s with the leg,
+5.5s with it disabled (`PAV_SELFCHECK_CHILD=1`) — 3.5x, paid on every gate run. The ponytail names
+the two ways out: expose the could-not-look branch as one function and re-run only that, or gate
+the leg behind a flag the gate sets once per wave.
 
 ## Waits on the owner
 
@@ -162,3 +259,10 @@ do not run it); the moved counts belong to the integrator's wave run.
   test. Worth its own ticket.
 - **`verify-twin-overlay.sh`'s own SKIP** (`platform/feeds/forward-intel.payload.schema.json` is
   not in the estate) is driftwood's, surfaced by step 5 consuming it, and not fixed here.
+- **(2026-09-04) A `selfcheck_absent` leg for the four scripts that print a prose could-not-look**
+  — `platform/currency-controller/verify-currency.sh`, `platform/oscal/verify-upflow.sh`,
+  `tuppence/reset/verify-reach-secrets.sh` (two sites). None of them is a false green today (each
+  narrows its closing sentence to what it observed), and none of them is graded by the class-level
+  net, which reads the verdict token and not prose. Giving every live-tail script that leg is what
+  would close the half this net cannot see; it touches three scripts in two units and is its own
+  ticket, not a review fix.
