@@ -1,0 +1,79 @@
+0. the grader can fail
+  ok   selfcheck: a missing banner fails; a missing section fails; a stale CONTEXT citation fails; an unclassified refusal kind fails; a missing classification fails
+1. ADR-0026 exists, is accepted, and carries the four required sections
+  ok   0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md
+  ok   ADR-0026: ^status: accepted$
+  ok   ADR-0026: ^## Context$
+  ok   ADR-0026: ^## Decision$
+  ok   ADR-0026: ^## Options considered$
+  ok   ADR-0026: ^## Consequences$
+  ok   ADR-0026: ^Decided 2026-09-04 .*ADR-0025.*delegated
+2. ADR-0026 names the three superseded rules, the four reasons and the removal decision
+  ok   ADR-0026: ADR-0013
+  ok   ADR-0026: ADR-0017
+  ok   ADR-0026: ADR-0018.*point 3
+  ok   ADR-0026: new-hole refusal|refuses on a \*\*new\*\* hole|new hole refus
+  ok   ADR-0026: widening
+  ok   ADR-0026: self-created hole
+  ok   ADR-0026: ungoverned .*namespace
+  ok   ADR-0026: \(source, id\)
+  ok   ADR-0026: bare catalogue id
+  ok   ADR-0026: ticket 15
+  ok   ADR-0026: ADR-0020
+  ok   ADR-0026: ADR-0022
+  ok   ADR-0026: ticket 38
+  ok   ADR-0026: removed-control
+  ok   ADR-0026: removal is priced
+  ok   ADR-0026: missing instrument
+  ok   ADR-0026 consequences: check_selected_set.*still refuses
+  ok   ADR-0026 consequences: code kind `unknown-control-id`, not `missing-instrument`
+2b. ADR-0026 point 6 classifies every refusal kind composition emitted on 2026-09-04 (fixture of 11)
+  ok   ADR-0026: Every refusal kind composition emits today, classified
+  ok   ADR-0026 classification: ^ *- `claim-against-another-partys-policy`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `dangling-claim`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `missing-baseline-file`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `missing-instrument`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `no-controls-parent`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `removed-control`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `restatement-of-non-validating`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `rule-conflict`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `split-diamond`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `unknown-control-id`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `unpriceable-inability`: (instrument fault|behaviour)
+  ok   ADR-0026 classification: ^ *- `removed-control`: behaviour
+  ok   ADR-0026 classification: ^ *- `unknown-control-id`: instrument fault
+3. ADR-0013, ADR-0017 and ADR-0018 carry a dated Superseded in part banner naming ADR-0026
+  ok   ADR-0013 banner dated 2026-09-04 links ADR-0026
+  ok   ADR-0013 banner target 0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md exists
+  ok   ADR-0013 banner precedes the title
+  ok   ADR-0013 banner: new-hole|new hole
+  ok   ADR-0013 banner: widening
+  ok   ADR-0013 banner: removal
+  ok   ADR-0013 banner: \(source, id\)
+  ok   ADR-0017 banner dated 2026-09-04 links ADR-0026
+  ok   ADR-0017 banner target 0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md exists
+  ok   ADR-0017 banner precedes the title
+  ok   ADR-0017 banner: self-created hole
+  ok   ADR-0017 banner: remov
+  ok   ADR-0018 banner dated 2026-09-04 links ADR-0026
+  ok   ADR-0018 banner target 0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md exists
+  ok   ADR-0018 banner precedes the title
+  ok   ADR-0018 banner: [Pp]oint 3
+  ok   ADR-0018 banner: ungoverned
+  ok   ADR-0018 keeps its ADR-0022 banner for §4
+4. no ADR still points at an unwritten superseding ADR
+  ok   no forward reference to an unnumbered ADR survives
+5. CONTEXT.md's Baseline, Control id, Hole and Delta entries cite ADR-0026 and no longer carry the refusals
+  ok   Baseline: ADR-0026
+  ok   Baseline no longer says: ticket 39 supersedes
+  ok   Baseline no longer says: never remove
+  ok   Baseline: removal is priced
+  ok   Control id: ADR-0026
+  ok   Control id: \(source, id\)
+  ok   Control id: missing instrument
+  ok   Hole: ADR-0026
+  ok   Hole no longer says: removal still refuses
+  ok   Hole: removed-control
+  ok   Delta: ADR-0026
+
+PASS: ADR-0026 records the priced-hole decision; ADR-0013, ADR-0017 and ADR-0018 point 3 carry dated banners naming it; CONTEXT.md cites it and no entry still refuses
