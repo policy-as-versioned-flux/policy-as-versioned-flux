@@ -1,3 +1,4 @@
+  ok   selfcheck: with kyverno unreachable this script exits 3 and its last line is SKIP:
 == generator_standing_check.py --selfcheck ==
 selfcheck ok: the three known-good bumps rederive exactly, and a deliberately wrong expectation is caught, not passed silently; generator pinning matches the committed corpus today, and a stale recorded generator_version is caught by name while an ungenerated corpus is not a failure; evidence loading degrades gracefully with no evidence directory yet; most-recent picks the highest declared version; a first release has no predecessor to re-derive against; a real old/new subject pair re-derives identically under an unchanged generator with the record left byte-for-byte untouched, and a real generator regression that erases the violated state is caught as a differing line -- never a failure -- with the record still left untouched
 

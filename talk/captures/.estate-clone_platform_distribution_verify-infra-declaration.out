@@ -3,13 +3,14 @@
   ok   kube-system, flux-system and kyverno each carry posture.acme.io/tier: infra
 2. entitlement: platform/party.yaml roles[] includes 'platform'
   ok   platform/party.yaml carries the platform role
-3. ordering rule: unlabelled-tier defaults across 9 served cage-tier.yaml bodies:
+3. ordering rule: unlabelled-tier defaults across 10 served cage-tier.yaml bodies:
      platform/distribution/policies/v2.0.0/cage-tier.yaml: 'baseline'
      platform/distribution/policies/v2.0.1/cage-tier.yaml: 'baseline'
      platform/distribution/policies/v3.0.0/cage-tier.yaml: 'baseline'
      platform/distribution/policies/v4.0.0/cage-tier.yaml: 'baseline'
+     platform/distribution/policies/v5.0.0/cage-tier.yaml: 'isolated'
      platform/distribution/policies/vselfcheck/cage-tier.yaml: 'baseline'
-     platform/graded/policies/cage-tier.yaml: 'baseline'
+     platform/graded/policies/cage-tier.yaml: 'isolated'
      driftwood/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
      ludlow/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
      tuppence/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'

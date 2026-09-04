@@ -13,13 +13,23 @@
 == 4. it ACCEPTS the real signed tag under the release.yml pins ==
   VERIFIED: signed by https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main (issuer https://token.actions.githubusercontent.com) at 1787475175
 
+== 4b. the trust instant: a certificate issued AFTER the tagger time, within the declared bound ==
+  ok   deployment.yaml declares GITSIGN_TAGGER_SKEW_SECONDS=60
+  ok   fixture: certificate notBefore is 1s after the tagger time, the race the verifier must survive
+  VERIFIED: signed by https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main (issuer https://token.actions.githubusercontent.com) at 1787677714 (certificate issued 1s later; chained at 1787677715)
+  ok   accepted at the later instant, both instants reported
+  ok   rejected when the gap exceeds the bound, naming the gap and the knob
+         certificate notBefore is 1s after the tagger time 1787677714, over the declared tolerance of 0s (GITSIGN_TAGGER_SKEW_SECONDS); the tag claims to predate the certificate that signs it by more than the bound allows
+  ok   rejected a tampered racy payload under the same bound
+  ok   gitsign verify-tag agrees: the racy tag is good under the same pins
+
 == 5. it REJECTS everything that is not that ==
   ok   rejected a tampered payload
-         signature did not verify over the tag payload: 80FBF7995F7F0000:error:1700006D:CMS routines:CMS_verify:content verify error:../crypto/cms/cms_smime.c:457:
+         signature did not verify over the tag payload: 803B8CF8187F0000:error:1700006D:CMS routines:CMS_verify:content verify error:../crypto/cms/cms_smime.c:457:
   ok   rejected a tampered signature
-         signature carries no signer certificate (openssl pkcs7: 801B81E4F77F0000:error:0688010A:asn1 encoding routines:asn1_template_ex_d2i:nested asn1 error:../crypto/asn1/tasn_dec.c:537:Field=d.sign, Type=PKCS7)
-  ok   rejected a self-signed forgery wearing the right identity
-         certificate chain did not verify at tagger time 1787475175: error /tmp/tmpfspy7o9h/leaf.pem: verification failed
+         signature carries no signer certificate (openssl pkcs7: 803B59CC147F0000:error:0688010A:asn1 encoding routines:asn1_template_ex_d2i:nested asn1 error:../crypto/asn1/tasn_dec.c:537:Field=d.sign, Type=PKCS7)
+  ok   rejected a self-signed forgery wearing the right identity, by the chain not the bound
+         certificate chain did not verify at 1788539361 (tagger time 1787475175, certificate notBefore 1788539361): error /tmp/tmpmay840ms/leaf.pem: verification failed
   ok   rejected a wrong identity
          signer identity 'https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main' does not match the pinned regexp '^https://github\\.com/policy-as-versioned-ico/ico/.*$'
   ok   rejected a wrong issuer
@@ -33,8 +43,14 @@
   ok   gitsign verify-tag agrees: policy/v3.0.0 is good under the same pins
 
 == 7. the controller's verdict reaches the objects it is supposed to gate ==
+  ok   trust_instant: later-of within the bound, refused past it, a bad declaration is could-not-look
   ok   verified source: annotates gitsign-verified=true, leaves the gate alone
-  gate flux-system/platform-policy: SUSPENDED -- policy/v3.0.0: signature did not verify over the tag payload: 80DBBE1A007F0000:error:1700006D:CMS routines:CMS_verify:content verify error:../crypto/cms/cms_smime.c:457:
+  ok   racy source: verified under the declared bound, reason carries both instants
+  gate flux-system/platform-policy: SUSPENDED -- v1.1.0: certificate notBefore is 1s after the tagger time 1787677714, over the declared tolerance of 0s (GITSIGN_TAGGER_SKEW_SECONDS); the tag claims to predate the certificate that signs it by more than the bound allows
+  ok   racy source with no bound declared: rejected, gate suspended, reason names the knob
+  gate flux-system/platform-policy: left as it is -- could not look at v1.1.0: GITSIGN_TAGGER_SKEW_SECONDS='sixty' is not a whole number of seconds
+  ok   a mis-declared tolerance: records unknown and moves no gate
+  gate flux-system/platform-policy: SUSPENDED -- policy/v3.0.0: signature did not verify over the tag payload: 80FB14CD237F0000:error:1700006D:CMS routines:CMS_verify:content verify error:../crypto/cms/cms_smime.c:457:
   ok   rejected source: suspends flux-system/platform-policy and marks it its own
   gate flux-system/platform-policy: released -- policy/v3.0.0 signed by https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main at 1787475175
   ok   released: a gate this controller suspended is released when the tag verifies again
@@ -43,11 +59,11 @@
   ok   could not look: records unknown, never true, and moves no gate either way
 
 == 8. the package builds, and the pod mounts the program proved above ==
-  ok   one program, one copy: gitsign-verifier-22mh288546 carries the proved bytes
+  ok   one program, one copy: gitsign-verifier-9hhb8bbtc2 carries the proved bytes
 
 == 9. the time-box is written where the remover will look ==
   ok   the manifests and both READMEs name #1068 and this script
 
 == 10. live: does a cluster carry the controller, and has the trigger fired? ==
 SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
-SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the gitsign verifier accepts this repo's own signed tag under release.yml's pins and rejects a tampered payload, a tampered signature, a self-signed forgery, a wrong identity and a wrong issuer; the controller's time-box names fluxcd/source-controller#1068
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the gitsign verifier accepts this repo's own signed tag under release.yml's pins, and a real racy tag whose certificate postdates its tagger time within the declared 60s bound; it rejects that tag past the bound, a tampered payload, a tampered signature, a self-signed forgery, a wrong identity and a wrong issuer; the controller's time-box names fluxcd/source-controller#1068

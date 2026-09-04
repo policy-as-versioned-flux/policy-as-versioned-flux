@@ -1,13 +1,19 @@
+== 0. selfcheck: the evidence/tag decision bites ==
+ok  selfcheck: evidence+no tag is a could-not-look; NO evidence with a RELEASED element (commit on the array, or a tag) is still a refusal, tagless checkout included; the gate-determines-the-number claim is not weakened
+
 == 1. the workflow is wired: the gate runs BEFORE the tag, and the evidence commit lands first ==
 ok  gate -> commit evidence -> correct the array -> tag -> push, in that order
 
 == 2. every declared bump agrees with the gate's own evidence ==
 ok  policy/v4.0.0: declared 'major' == evidence 'major', computed 'major', outcome passed
+..  policy/v5.0.0: declared 'major'; no evidence, no commit on the array element and no tag -- the gate runs inside cut-release.yml, so this element has not been dispatched
 
 == 3. the signature: only cut-release.yml, in Actions, can produce it ==
-== 4. the tag exists: it must resolve to the array-update commit, one ahead of the array ==
-ok  policy/v4.0.0 -> 1d8cec2977f3ce0120f319c93e5032f960c5164c, array names its parent 64635dfdff3a835e7b0c2e51eae0650951ef2607
-
-PASS: the release's number was determined by the gate before the tag -- the declared bump on
-the reviewed array element, the computed bump in the signed evidence and the outcome all
-agree, and the signed tag resolves one commit ahead of the commit the array names.
+No signed tag exists for: policy/v5.0.0
+Where evidence is already written, the gate has run and the array element is correct,
+and only the signature is outstanding. Where step 2 printed '..' for a tag, the gate
+has not run for it either -- it runs inside the same dispatch, before the tag.
+A gitsign tag can only be cut by .github/workflows/
+cut-release.yml inside GitHub Actions, with that run's own ambient OIDC identity.
+Nothing here may fake one, so this check cannot look at the last step of the release.
+SKIP: waiting for the owner to let cut-release.yml cut policy/v5.0.0 in Actions

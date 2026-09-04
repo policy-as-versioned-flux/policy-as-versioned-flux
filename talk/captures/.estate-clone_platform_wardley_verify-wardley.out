@@ -19,44 +19,12 @@ ok  tampered map correctly rejected
 ok  commoditisation is read as MOVEMENT across the horizon, not static position
 
 == 4. the forward signal + war-gamer seam, PER INSTITUTION: forward re-price -> drift -> signed PR ==
+Traceback (most recent call last):
+  File "<string>", line 23, in <module>
+KeyError: 'signed'
   -- driftwood --
     [DRIFT] phishing-credential-theft-forward  cage     -> fix
     [  ok ] ransomware-workload-forward        cage     -> cage
     [  ok ] stolen-laptop-unattested-device    cage     -> cage
     [  ok ] agentic-commit-compromise          fix      -> fix
     [  ok ] dependency-worm-exfil              cage     -> cage
-  -- ludlow --
-    [  ok ] phishing-credential-theft-forward  cage     -> cage
-    [DRIFT] ransomware-workload-forward        cage     -> fix
-    [  ok ] stolen-laptop-unattested-device    cage     -> cage
-    [  ok ] agentic-commit-compromise          fix      -> fix
-    [DRIFT] dependency-worm-exfil              cage     -> fix
-  -- platform --
-    [  ok ] phishing-credential-theft-forward  cage     -> cage
-    [DRIFT] ransomware-workload-forward        cage     -> fix
-    [  ok ] stolen-laptop-unattested-device    cage     -> cage
-    [  ok ] agentic-commit-compromise          fix      -> fix
-    [DRIFT] dependency-worm-exfil              cage     -> fix
-  -- tuppence --
-    [  ok ] phishing-credential-theft-forward  cage     -> cage
-    [  ok ] ransomware-workload-forward        cage     -> cage
-    [  ok ] stolen-laptop-unattested-device    cage     -> cage
-    [  ok ] agentic-commit-compromise          fix      -> fix
-    [  ok ] dependency-worm-exfil              cage     -> cage
-    (no drift at tuppence: its own band is already satisfied by the deployed cage)
-ok  5 forward drift(s) across 4 institution(s) -> 5 signed PR(s), 0 merged, all gated
-
-== 5. the projection + seam asserts (base does NOT drift; the forward bump does) ==
-ok  Wardley map: 9 components, 7 flagged commoditising (movement, not position); forward signal: 4 attacker-capability(ies) re-priced (phishing collapse x2.44), 1 commoditising defence(s) credited on corroborated enactment (spiffe cost collapse x0.46), per institution; fed through the war-gamer for 4 institution(s) -> 5 forward drift(s) -> 5 PR(s) proposed, 0 merged, all gated.
-
-== 6. the enactment guard bites: a planted violation earns spiffe-workload-identity NO credit ==
-ok  corroborated enactment -> spiffe-workload-identity IS credited
-ok  planted violation (self-declared claim) -> spiffe-workload-identity earns NO credit
-ok  planted violation (forged evidence path) -> spiffe-workload-identity earns NO credit
-ok  named reason: no-corroborated-enactment -- 'spiffe-workload-identity''s enactment record is self-declared, not independently observed
-
-PASS: market intel mapped, commoditisation MOVEMENT flagged, the forward signal
-re-priced ahead of the reactive feeds PER INSTITUTION and fed through the war-gamer
-to a signed, gated, never-merged PR (each institution against its own band); a
-commoditising defence lowers cost-of-controls only on corroborated enactment, and a
-planted violation is refused -- and the map update is a signed, tamper-evident commit.

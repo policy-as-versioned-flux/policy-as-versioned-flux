@@ -2,31 +2,7 @@
 [1;36m==>[0m 2. ico and nist carry DISCLAIMER.md; nist/NOTICE cites the catalogue it attributes
 [1;36m==>[0m 3. the hub LICENSE is Apache-2.0 and its README says so
 [1;36m==>[0m 4. the guard bites: each violation planted in a copy is refused, the restored copy passes
-Traceback (most recent call last):
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/disclaimer/disclaimer.py", line 366, in <module>
-    main()
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/disclaimer/disclaimer.py", line 362, in main
-    args.func(args)
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/disclaimer/disclaimer.py", line 279, in cmd_selfcheck
-    assert not problems, "\n".join(problems)
-           ^^^^^^^^^^^^
-AssertionError: driftwood/party.yaml: no disclaimer comment line; expected `# A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.`
-driftwood/README.md: does not carry the disclaimer line
-feeds/party.yaml: no disclaimer comment line; expected `# A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.`
-feeds/README.md: does not carry the disclaimer line
-ico/party.yaml: no disclaimer comment line; expected `# A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.`
-ico/README.md: does not carry the disclaimer line
-ico/DISCLAIMER.md: missing
-insurer/party.yaml: no disclaimer comment line; expected `# A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.`
-insurer/README.md: does not carry the disclaimer line
-ludlow/party.yaml: no disclaimer comment line; expected `# A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.`
-ludlow/README.md: does not carry the disclaimer line
-nist/party.yaml: no disclaimer comment line; expected `# A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.`
-nist/README.md: does not carry the disclaimer line
-nist/DISCLAIMER.md: missing
-nist/NOTICE: missing
-platform/party.yaml: no disclaimer comment line; expected `# A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.`
-platform/README.md: does not carry the disclaimer line
-tuppence/party.yaml: no disclaimer comment line; expected `# A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.`
-tuppence/README.md: does not carry the disclaimer line
-FAIL: disclaimer.py selfcheck observed false (exit 1)
+ok  guard bites: a party.yaml without the comment, the line as a key, a bare README, a drifted NOTICE sha256, a missing DISCLAIMER.md and a hub without LICENSE are each refused when planted, cleared once restored
+ok  real estate: 8 parties carry the line on party.yaml and README | DISCLAIMER.md on ico, nist | nist/NOTICE cites 5 provenance facts | hub LICENSE Apache-2.0
+
+PASS: all eight parties say they are a demonstration on their signed artefact and their README, the two regulators carry the long form, nist attributes NIST's public-domain work by URL and sha256, and the hub is licensed Apache-2.0 like the units

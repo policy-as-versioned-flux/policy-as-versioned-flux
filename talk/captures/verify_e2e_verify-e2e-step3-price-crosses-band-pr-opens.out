@@ -1,6 +1,4 @@
 E2E step 3 price crosses band and PR opens
-    driftwood band 40,000 GBP (its own party.yaml), selection policy 1.0.0 (driftwood/selection-policy/VERSION)
+    driftwood band 40,000 GBP (its own party.yaml), selection policy 1.1.0 (driftwood/selection-policy/VERSION)
     residual 20,000.00 -> tier baseline; 58,269.23 (crosses the band) -> tier restricted
-    proposal: branch wargamer/retune-tier-driftwood-cage-tier-ico-feed, pull_request, landed=dry-run
-    would declare posture.acme.io/tier: restricted on gitops/apps/namespace.yaml (the governed Namespace); the pod manifest is untouched; nothing opened, nothing written
-PASS: a SYNTHETIC residual placed either side of driftwood's own signed appetite band of 40,000 GBP (20,000.00 -> 58,269.23 GBP, not driftwood's real priced position) selects baseline -> restricted through driftwood's own selection-policy package 1.0.0 (which platform/graded/cage.py agrees with), and the proposer would open a pull request editing posture.acme.io/tier on gitops/apps/namespace.yaml, driftwood's governed Namespace declaration -- the pod label is that declaration's output and is left alone (python half; the tier landing in force is step 4)
+FAIL: the proposer did not stop at the dry run: {"branch": "wargamer/retune-tier-driftwood-cage-tier-ico-feed", "proposal_kind": "pull_request", "held": "tighten-only", "line": "ico-feed", "line_tier": "restricted", "party_tier": "restricted", "current_tier": "isolated", "why": "strictest priced line is 'restricted' across ['ico/feed/penalty-sche

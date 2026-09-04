@@ -1,5 +1,5 @@
 == a compliant change passes across its ±1 supported window ==
-fixtures/workload-compliant.yaml: targets 4.0.0, checking supported window ['4.0.0']
+fixtures/workload-compliant.yaml: targets 4.0.0, checking supported window ['4.0.0', '5.0.0']
 --- kyverno apply @ v4.0.0 ---
 Applying 5 policy rule(s) to 1 resource(s)...
 
@@ -156,13 +156,817 @@ spec:
 Mutation:
 Mutation has been applied successfully.
 pass: 7, fail: 0, warn: 0, error: 0, skip: 0
+--- kyverno apply @ v5.0.0 ---
+Applying 5 policy rule(s) to 1 resource(s)...
 
-shift-left: fixtures/workload-compliant.yaml is compliant across its supported window ['4.0.0']
+policy cage-tier-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: isolated
+    posture.acme.io/version: 5.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10000
+  priorityClassName: cage-isolated-5-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-tier-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: isolated
+    posture.acme.io/version: 5.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10000
+  priorityClassName: cage-isolated-5-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: isolated
+    posture.acme.io/version: 5.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10000
+  priorityClassName: cage-isolated-5-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: isolated
+    posture.acme.io/version: 5.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10000
+  priorityClassName: cage-isolated-5-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-netpol-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: restricted
+  name: cage-reach-restricted
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: restricted
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+
+Generate:
+Generation completed successfully.
+policy cage-netpol-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: quarantine
+  name: cage-reach-quarantine
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: quarantine
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+
+Generate:
+Generation completed successfully.
+policy cage-netpol-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: isolated
+  name: cage-reach-isolated
+  namespace: default
+spec:
+  egress: []
+  ingress: []
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: isolated
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+
+Generate:
+Generation completed successfully.
+pass: 7, fail: 0, warn: 0, error: 0, skip: 0
+
+shift-left: fixtures/workload-compliant.yaml is compliant across its supported window ['4.0.0', '5.0.0']
 
 == an unversioned workload is out of scope, passes trivially ==
 fixtures/workload-unversioned.yaml: unversioned (no policy-as-versioned.dev/policy-version label) -- out of scope, pass
 
 == a version the array doesn't declare is refused, not silently skipped ==
 
-== an Audit->Deny flip is caught pre-merge ==
-SKIP: distribution/versions.yaml declares one major line (4.0.0), so a target has no ±1 neighbour and there is no tightened rule for the window to catch a workload against; the flip beat has nothing to observe until a second major is declared again
+== an Audit->Deny flip is caught pre-merge (must fail CI) ==
+fixtures/workload-flip.yaml: targets 4.0.0, checking supported window ['4.0.0', '5.0.0']
+--- kyverno apply @ v4.0.0 ---
+Applying 5 policy rule(s) to 1 resource(s)...
+
+policy cage-tier-4-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 4.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 4.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10
+  priorityClassName: cage-baseline-4-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-tier-4-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 4.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 4.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10
+  priorityClassName: cage-baseline-4-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-4-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 4.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 4.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10
+  priorityClassName: cage-baseline-4-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-4-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 4.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 4.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10
+  priorityClassName: cage-baseline-4-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.policy require-nonroot-4-0-0 -> resource default/Pod/checkout-svc failed:
+1 -  pods on policy-version 4.0.0 must set readOnlyRootFilesystem=true on every container
+
+pass: 6, fail: 1, warn: 0, error: 0, skip: 0
+FAIL @ v4.0.0
+--- kyverno apply @ v5.0.0 ---
+Applying 5 policy rule(s) to 1 resource(s)...
+
+policy cage-tier-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: isolated
+    posture.acme.io/version: 5.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10000
+  priorityClassName: cage-isolated-5-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-tier-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: isolated
+    posture.acme.io/version: 5.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10000
+  priorityClassName: cage-isolated-5-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: isolated
+    posture.acme.io/version: 5.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10000
+  priorityClassName: cage-isolated-5-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/caged: "true"
+    posture.acme.io/tier: isolated
+    posture.acme.io/version: 5.0.0
+  name: checkout-svc
+  namespace: default
+spec:
+  containers:
+  - image: nginx
+    name: c
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  preemptionPolicy: Never
+  priority: -10000
+  priorityClassName: cage-isolated-5-0-0
+  securityContext:
+    runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy cage-netpol-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: restricted
+  name: cage-reach-restricted
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: restricted
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+
+Generate:
+Generation completed successfully.
+policy cage-netpol-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: quarantine
+  name: cage-reach-quarantine
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: quarantine
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+
+Generate:
+Generation completed successfully.
+policy cage-netpol-5-0-0 applied to default/Pod/checkout-svc:
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: isolated
+  name: cage-reach-isolated
+  namespace: default
+spec:
+  egress: []
+  ingress: []
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: isolated
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+
+Generate:
+Generation completed successfully.
+pass: 7, fail: 0, warn: 0, error: 0, skip: 0
+
+shift-left: fixtures/workload-flip.yaml would be denied somewhere in its supported window ['4.0.0', '5.0.0']
+(non-zero above is expected -- the flip was caught)
+
+shift-left: all offline proofs passed

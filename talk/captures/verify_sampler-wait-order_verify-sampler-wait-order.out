@@ -1,11 +1,8 @@
 0. the grader can fail
   ok   selfcheck: round 3 passes; round 2, a duplicate and a missing wait fail; no clone skips
 1. each adopter's drift-sample.yml waits for kyverno and flux-operator, applies, then waits for the applied set
-  FAIL driftwood: flux-operator wait (line 177) sits above the kyverno wait (line 182)
-  FAIL driftwood: ResourceSet waits (line 174) sits above the Kustomization waits (line 183)
-  FAIL tuppence: flux-operator wait (line 180) sits above the kyverno wait (line 185)
-  FAIL tuppence: ResourceSet waits (line 177) sits above the Kustomization waits (line 186)
-  FAIL ludlow: flux-operator wait (line 180) sits above the kyverno wait (line 185)
-  FAIL ludlow: ResourceSet waits (line 177) sits above the Kustomization waits (line 186)
+  ok   driftwood: kyverno wait@174 flux-operator wait@175 composed apply@176 Kustomization waits@180 ResourceSet waits@183 five-fact sample@188
+  ok   tuppence: kyverno wait@177 flux-operator wait@178 composed apply@179 Kustomization waits@183 ResourceSet waits@186 five-fact sample@191
+  ok   ludlow: kyverno wait@177 flux-operator wait@178 composed apply@179 Kustomization waits@183 ResourceSet waits@186 five-fact sample@191
 
-FAIL: 6 wait-order fact(s) false in a checked-out drift-sample.yml (ticket 81): the sampler would race the webhooks again
+PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for what they applied (round 3 order)

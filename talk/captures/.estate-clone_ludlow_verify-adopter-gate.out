@@ -24,7 +24,7 @@ REFUSE: composed bump is major -- ['2.0.0']
 OK: retirement of 2.0.0 correctly refused the pull request check, comment names it
 
 B2. resolved-commit mismatch -> refuse (ADR-0001's pin made load-bearing, bug #2)
-REFUSE: platform tag 'v1.0.0' resolves to '5610ccd826ce930277e4f1b1562d57a79ca63eb7', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
+REFUSE: platform tag 'v1.0.0' resolves to '0f8e0aa659ae09c17fe500b334dd6e9ef96c78a6', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
 OK: a pin naming the wrong commit for a real tag is refused, real git rev-parse caught it
 
 B3. composed weaker than the publisher's tag (unchanged array, major tag jump) -> informational, exit 0, never lowers
@@ -40,7 +40,7 @@ error during command execution: --trusted-root only supported with --new-bundle-
 OK: cosign (the real binary) was invoked against the invalid bundle and refused it; the gate propagated that as a hard refusal
 
 -- a CHANGED version with no committed evidence file at all --
-REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit dde7540c837a83a3d56301282081e4fa3898a314
+REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit d12753b30cd0ed83f3b77c09e654ffb58e80dbc9
 OK: a changed version with no committed evidence file is refused before cosign is even invoked
 
 == Part D: splice_body via the REAL CLI, with backslash-bearing evidence -- the exact re.sub() hazard ==

@@ -2,7 +2,7 @@
   ok   selfcheck: the real, immutable platform v2.0.0 fails the pairing (4.0.0.json without its bundle), as it did for three adopters on 2026-08-31
   ok   selfcheck: a bundle-less evidence tree fails, a tags-only push line fails, a split push fails, a --dry-run fails, an empty tree fails; the repaired shapes pass
 ==> 1. can this check look? (platform clone with an origin/main)
-  ok   platform origin/main is 46cd775
+  ok   platform origin/main is cdca567
 ==> 2. every evidence document on platform origin/main has its cosign bundle beside it
   ok   origin/main: 4 evidence document(s) at origin/main, each with its cosign bundle
 ==> 3. the release pushes the branch with the tags, atomically (platform b83eba1)

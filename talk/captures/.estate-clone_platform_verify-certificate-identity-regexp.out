@@ -12,6 +12,7 @@ ok  rejected: https://github.com/policy-as-versioned-platform/platform/.github/w
 ok  rejected: https://evil.example/https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main
 ok  rejected: https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/mainX
 ok  rejected: https://githubXcom/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main
+ok  rejected: https://github.com/policy-as-versioned-platform/platform/.github/workflows/propose-tier.yml@refs/heads/main
 
 PASS: EXPECTED_IDENTITY_REGEXP accepts this repo's main and release/<major>.<minor>.x,
 and rejects every foreign org/repo/path and unanchored variant tried.

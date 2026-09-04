@@ -15,5 +15,6 @@
      platform             true  fact_3_last_applied_revision_equals_the_pinned_commit: platform is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 533dccb0a823 vs pin 533dccb0a823
      platform             true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
      platform             true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
+     fact 3 is ONE CHAIN, not 3 independent proofs: 1 applied revision(s) observed on the cluster, and nist, platform (2 verified-source-only publisher(s)) read back through composed/HEADER.yaml to that same composed set
    FAIL: a fact of the five-fact sample was observed false
 FAIL: FAIL: a fact of the five-fact sample was observed false

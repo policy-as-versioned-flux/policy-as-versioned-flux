@@ -9,4 +9,18 @@ OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workfl
 OK (reject): https://evil.example/https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main
 OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main.evil.example
 OK (reject): https://githubXcom/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main
+OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/propose-tier.yml@refs/heads/main
 PASS: EXPECTED_IDENTITY_REGEXP matches only policy-as-versioned-ludlow/ludlow's cut-release.yml on main or release/<major>.<minor>.x.
+
+== EXPECTED_PROPOSAL_IDENTITY_REGEXP (propose-tier.yml -- the cage-tier proposal commit, ticket 78) ==
+pattern: ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/propose-tier\.yml@refs/heads/main$
+OK (match): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/propose-tier.yml@refs/heads/main
+OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main
+OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/propose-tier.yml@refs/heads/release/1.0.x
+OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/propose-tier.yml@refs/heads/wargamer/retune-tier-ludlow-cage-tier-feeds-feed
+OK (reject): https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/propose-tier.yml@refs/heads/main
+OK (reject): https://github.com/policy-as-versioned-ludlow/other-repo/.github/workflows/propose-tier.yml@refs/heads/main
+OK (reject): https://evil.example/https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/propose-tier.yml@refs/heads/main
+OK (reject): https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/propose-tier.yml@refs/heads/main.evil.example
+OK (reject): https://githubXcom/policy-as-versioned-ludlow/ludlow/.github/workflows/propose-tier.yml@refs/heads/main
+PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only policy-as-versioned-ludlow/ludlow's propose-tier.yml on main; the release and proposal identities do not overlap.
