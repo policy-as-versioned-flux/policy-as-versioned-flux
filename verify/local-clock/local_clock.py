@@ -195,15 +195,17 @@ def marker_verdict(marker: dict | None, now: dt.datetime) -> tuple[str, str]:
 
 
 # --- no injected signal reaches a citable path --------------------------------------------------
-def injected_leaks(repo: str) -> list[str]:
-    """Committed .json/.jsonl/.yaml/.yml files carrying an `injected: true` flag. Committed is
-    the line: an uncommitted rehearsal file in a worktree is where a rehearsal is allowed to be,
-    a committed one is on its way to being cited."""
+def injected_leaks(repo: str) -> list[str] | None:
+    """Committed .json/.jsonl/.yaml/.yml files carrying an `injected: true` flag, or None when
+    the repository could not be listed (then it was not scanned, and not-scanned is never
+    clean). Committed is the line: `git ls-files` sees the checked-out branch, so a rehearsal
+    branch that was never merged or checked out is invisible to it, and a rehearsal file that is
+    not committed at all is where a rehearsal is allowed to be."""
     try:
         listed = subprocess.run(["git", "-C", repo, "ls-files", "-z"], capture_output=True,
                                 text=True, timeout=60, check=True).stdout
     except (OSError, subprocess.SubprocessError):
-        return []
+        return None
     hits = []
     for rel in listed.split("\0"):
         if not rel.endswith(_SCANNED):
@@ -218,10 +220,11 @@ def injected_leaks(repo: str) -> list[str]:
     return sorted(hits)
 
 
-def local_truth_lines(log: str) -> list[str]:
-    """`run=local` TRUTH lines dated on or after the local clock existed."""
+def local_truth_lines(log: str) -> list[str] | None:
+    """`run=local` TRUTH lines dated on or after the local clock existed; None when there is no
+    log to read (could not look, not clean)."""
     if not os.path.exists(log):
-        return []
+        return None
     with open(log, encoding="utf-8", errors="replace") as fh:
         text = fh.read()
     return [m.group(0) for m in _TRUTH_LOCAL.finditer(text) if m.group(1) >= LOCAL_CLOCK_BORN]
@@ -279,6 +282,7 @@ def out(status: str, msg: str) -> None:
 
 
 def check(hub: str, root: str, estate: str, now: dt.datetime | None = None) -> int:
+    LINES.clear()
     now = now or dt.datetime.now(dt.timezone.utc)
     script = os.path.join(hub, SCRIPT)
     readme = os.path.join(hub, README)
@@ -311,20 +315,27 @@ def check(hub: str, root: str, estate: str, now: dt.datetime | None = None) -> i
         for entry in sorted(os.listdir(estate)):
             if os.path.isdir(os.path.join(estate, entry, ".git")):
                 repos.append((entry, os.path.join(estate, entry)))
-    leaked = False
+    leaked, scanned = False, 0
     for name, repo in repos:
         hits = injected_leaks(repo)
-        if hits:
+        if hits is None:
+            out("SKIP", f"{name}: git ls-files failed at {repo}, so it was not scanned for an "
+                        f"injected signal -- not scanned is not clean")
+        elif hits:
             leaked = True
             out("FAIL", f"{name}: an injected (rehearsal) signal is committed at "
                         f"{', '.join(hits)} -- a rehearsal reached a citable path")
-    if not leaked:
-        out("PASS", f"no committed envelope, claim, observation or capture in {len(repos)} "
+        else:
+            scanned += 1
+    if not leaked and scanned:
+        out("PASS", f"no committed envelope, claim, observation or capture in {scanned} "
                     f"repositories carries injected: true")
 
     # 4. the local clock never appends the truth log
     local_lines = local_truth_lines(os.path.join(hub, "talk", "truth.log"))
-    if local_lines:
+    if local_lines is None:
+        out("SKIP", "talk/truth.log is absent, so it could not be read for a run=local line")
+    elif local_lines:
         out("FAIL", f"talk/truth.log carries {len(local_lines)} run=local TRUTH line(s) dated "
                     f"{LOCAL_CLOCK_BORN} or later: {local_lines[0][:80]} -- a local run is not citable")
     else:
@@ -389,16 +400,21 @@ def selfcheck() -> None:
         subprocess.run(["git", "-C", repo, "-c", "user.name=s", "-c", "user.email=s@s",
                         "commit", "-q", "-m", "x"], check=True)
         assert injected_leaks(repo) == ["observations/twin-sweep.jsonl"], injected_leaks(repo)
+        # a repository that cannot be listed is unscanned, never clean
+        assert injected_leaks(os.path.join(tmp, "no-such-repo")) is None
 
-        # the truth log: the 2026-08-28 presenter line is known; a later run=local is a fault
+        # the truth log: absent is unread; the 2026-08-28 presenter line is known; a later
+        # run=local is a fault
         log = os.path.join(tmp, "truth.log")
+        assert local_truth_lines(log) is None
         with open(log, "w") as fh:
             fh.write("TRUTH 2026-08-28T04:00Z run=local hub=2326f31 pass=40\n"
                      "TRUTH 2026-09-03T10:24Z run=22 hub=14cc731 pass=57\n")
         assert local_truth_lines(log) == []
         with open(log, "a") as fh:
             fh.write("TRUTH 2026-09-04T01:00Z run=local hub=deadbee pass=1\n")
-        assert len(local_truth_lines(log)) == 1
+        later = local_truth_lines(log)
+        assert later is not None and len(later) == 1, later
 
         # the template: a credential-shaped word is refused
         bad = os.path.join(tmp, "bad.plist")
@@ -414,7 +430,8 @@ def selfcheck() -> None:
 
     print("ok  the local clock's checks bite: the stamp refuses every citable path, a stale "
           "scheduled marker fails while a hand run is only dated, a committed injected envelope "
-          "is found and an uncommitted one is not, a run=local TRUTH line since "
+          "is found and an uncommitted one is not, an unlistable repository or absent truth "
+          "log is unscanned rather than clean, a run=local TRUTH line since "
           f"{LOCAL_CLOCK_BORN} fails, a credential in the plist fails, and the README's flags "
           "are read from its Flags section only")
 

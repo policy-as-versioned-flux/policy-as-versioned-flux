@@ -50,24 +50,29 @@ classify step is many turns. `LOCAL_CLOCK_MAX_TURNS` (default 80) is the cap.
   pull request with `gh`. Refused inside a Claude Code session; refused on a rehearsal.
 - `--dry-run` -- make the worktrees and render the prompts, call no model, record every step as
   skipped. Use it to read exactly what the model would be told
-  (`.local-clock/runs/<stamp>/<step>-<adopter>.system.md`).
+  (`.local-clock/runs/<run>/<step>-<adopter>.system.md`); the worktree it made is removed
+  again before it exits.
 - `--list-steps` -- print the steps table and exit.
 - `--help` -- the usage text.
 
 ## What it writes
 
-Everything under `.local-clock/` at the hub root, which is gitignored:
+Everything under `.local-clock/` at the hub root, which is gitignored. `<run>` is the run id:
+the UTC stamp plus a random suffix, `20260904T101500Z-a1b2c3`, unique on the filesystem even
+when two runs start in the same second (the first line of every run prints it).
 
 | path | what |
 |---|---|
-| `.local-clock/runs/<stamp>/` | one directory per run: the rendered headless prompt per step, the child's JSON transcript (`*.claude.json`) and stderr, the PR title and body per step, `steps.jsonl`, `marker.json`, and on a rehearsal `injected-signal.json` |
+| `.local-clock/runs/<run>/` | one directory per run: the rendered headless prompt per step, the child's JSON transcript (`*.claude.json`) and stderr, the PR title and body per step, `steps.jsonl`, `marker.json`, and on a rehearsal `injected-signal.json` |
 | `.local-clock/last-run.json` | the dated marker the gate grades: when, scheduled or by hand, live or rehearsal, hub commit, each step's status and branch |
 | `.local-clock/logs/` | launchd's stdout and stderr when the plist runs it |
 
-And in the adopter's clone: a worktree at `.estate-clone/<adopter>/.work/local-clock/<stamp>-<step>`
-on the branch `local-clock/<step>-<stamp>` (or `local-clock/rehearsal/<step>-<stamp>`), carrying
-the one commit the model made. It is kept until pushed (`--push` removes it after the PR opens)
-so you can read the diff first. Nothing is written to the adopter's `main`, ever.
+And in the adopter's clone: a worktree at `.estate-clone/<adopter>/.work/local-clock/<run>-<step>`
+on the branch `local-clock/<step>-<run>` (or `local-clock/rehearsal/<step>-<run>`), carrying
+the one commit the model made. It is kept until pushed (`--push` removes it and the local
+branch after the PR opens) so you can read the diff first. A step that proposes nothing, and a
+dry run, remove their worktree and branch before the run ends, and the run records `fail` if
+that removal did not happen. Nothing is written to the adopter's `main`, ever.
 
 ## How to read the result
 
@@ -78,9 +83,9 @@ marker. Then:
 
 ```
 cat .local-clock/last-run.json                      # the marker
-git -C .estate-clone/driftwood log --oneline main..local-clock/classify-<stamp>
-git -C .estate-clone/driftwood/.work/local-clock/<stamp>-classify diff main   # the claim file
-cat .local-clock/runs/<stamp>/classify-driftwood.pr-body.md                    # the PR body
+git -C .estate-clone/driftwood log --oneline main..local-clock/classify-<run>
+git -C .estate-clone/driftwood/.work/local-clock/<run>-classify diff main   # the claim file
+cat .local-clock/runs/<run>/classify-driftwood.pr-body.md                    # the PR body
 verify/local-clock/verify-local-clock.sh            # the gate's view of it
 ```
 
@@ -126,8 +131,8 @@ rm ~/Library/LaunchAgents/uk.me.cns.pavc.local-clock.plist
 
 A run in progress is a `claude` process; `pkill -f 'claude -p /classify'` ends it, the clock
 then reads the worktree as unfinished and records `fail`. Remove leftover worktrees with
-`git -C .estate-clone/<adopter> worktree remove --force .estate-clone/<adopter>/.work/local-clock/<stamp>-<step>`
-and the branch with `git -C .estate-clone/<adopter> branch -D local-clock/<step>-<stamp>`.
+`git -C .estate-clone/<adopter> worktree remove --force .estate-clone/<adopter>/.work/local-clock/<run>-<step>`
+and the branch with `git -C .estate-clone/<adopter> branch -D local-clock/<step>-<run>`.
 
 ## The world simulator (`--inject`)
 

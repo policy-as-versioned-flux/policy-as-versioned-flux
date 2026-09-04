@@ -21,6 +21,7 @@ import os
 import plistlib
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -179,6 +180,81 @@ def test_truth_log_carries_no_local_run_since_the_local_clock_existed(lc, tmp_pa
     assert lc.local_truth_lines(str(log)) == []
     log.write_text(log.read_text() + "TRUTH 2026-09-04T01:00Z run=local hub=deadbee pass=1 fail=0\n")
     assert len(lc.local_truth_lines(str(log))) == 1
+
+
+def test_a_repo_that_cannot_be_listed_is_not_clean_it_is_unscanned(lc, tmp_path: Path) -> None:
+    # absence is never a pass: git ls-files failing means could-not-look, not "no leak"
+    assert lc.injected_leaks(str(tmp_path / "no-such-repo")) is None
+    broken = tmp_path / "broken"
+    (broken / ".git").mkdir(parents=True)          # looks like a checkout, is not one
+    assert lc.injected_leaks(str(broken)) is None
+
+
+def test_an_absent_truth_log_is_not_clean_it_is_unread(lc, tmp_path: Path) -> None:
+    assert lc.local_truth_lines(str(tmp_path / "truth.log")) is None
+
+
+def test_check_surfaces_an_unscannable_unit_as_skip(lc, tmp_path: Path, capsys) -> None:
+    estate = tmp_path / "estate"
+    (estate / "broken" / ".git").mkdir(parents=True)
+    rc = lc.check(str(HUB), str(tmp_path / ".local-clock"), str(estate))
+    lines = capsys.readouterr().out.splitlines()
+    assert rc == 3
+    assert any(l.startswith("SKIP:") and "broken" in l and "not scanned" in l for l in lines), lines
+    assert not any(l.startswith("FAIL:") for l in lines), lines
+
+
+# --- the script: two runs in one second do not collide, and a run that proposes nothing leaves nothing
+STUB = HUB / "verify" / "local-clock" / "stub-claude.sh"
+
+
+def _fixture_adopter(unit: Path) -> None:
+    (unit / "twin").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", "-b", "main", str(unit)], check=True)
+    (unit / "twin" / "signals.yaml").write_text("org: driftwood\n")
+    subprocess.run(["git", "-C", str(unit), "add", "-A"], check=True)
+    subprocess.run(["git", "-C", str(unit), "-c", "user.name=f", "-c", "user.email=f@f",
+                    "commit", "-q", "-m", "fixture"], check=True)
+
+
+def test_two_runs_in_the_same_second_get_distinct_ids_and_clean_up_after_themselves(tmp_path: Path) -> None:
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    # a `date` shim pins the stamp, so the two runs collide on the second by construction
+    shim = tmp_path / "bin"
+    shim.mkdir()
+    (shim / "date").write_text('#!/bin/sh\ncase "$*" in *%Y%m%dT%H%M%SZ*) echo 20260904T101500Z;; *) exec /bin/date "$@";; esac\n')
+    (shim / "date").chmod(0o755)
+    home = tmp_path / ".local-clock"
+    env = {**os.environ, "PATH": f"{shim}:{os.environ['PATH']}",
+           "LOCAL_CLOCK_CLAUDE": str(STUB), "LOCAL_CLOCK_HOME": str(home),
+           "LOCAL_CLOCK_ESTATE": str(tmp_path / "estate"), "LOCAL_CLOCK_PYTHON": sys.executable,
+           "LOCAL_CLOCK_STUB": "nothing"}
+    env.pop("LOCAL_CLOCK_LAUNCHD", None)
+
+    def clock(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify", *args],
+                              env=env, capture_output=True, text=True, timeout=120)
+
+    runs = [clock(), clock(), clock("--dry-run")]
+    for done in runs:
+        assert done.returncode == 0, done.stdout + done.stderr
+    ids = [re.search(r"^local clock: run (\S+) ", d.stdout, re.M).group(1) for d in runs]  # type: ignore[union-attr]
+    assert len(set(ids)) == 3 and all(i.startswith("20260904T101500Z") for i in ids), ids
+    assert sorted(p.name for p in (home / "runs").iterdir()) == sorted(ids)
+    for rid in ids:                                  # one step per run: nothing appended across runs
+        assert len((home / "runs" / rid / "steps.jsonl").read_text().splitlines()) == 1, rid
+    for done in runs:
+        assert "worktree and branch removed" in done.stdout, done.stdout
+    # and the removal is a fact, not a sentence: no worktree, no branch, no directory left
+    listed = subprocess.run(["git", "-C", str(unit), "worktree", "list", "--porcelain"],
+                            capture_output=True, text=True, check=True).stdout
+    assert listed.count("worktree ") == 1, listed
+    refs = subprocess.run(["git", "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],
+                          capture_output=True, text=True, check=True).stdout
+    assert refs == "", refs
+    work = unit / ".work" / "local-clock"
+    assert not work.exists() or not any(work.iterdir()), list(work.iterdir())
 
 
 # --- the template and the README -------------------------------------------------------------

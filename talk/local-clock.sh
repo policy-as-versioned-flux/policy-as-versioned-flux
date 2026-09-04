@@ -27,14 +27,17 @@
 # rehearsal, its claim files must carry `injected: true` (the claim validator refuses them, so
 # they can never pass a gate), --push is refused, and the marker says rehearsal. Never cite one.
 #
-# What it writes (all under .local-clock/, gitignored):
-#   .local-clock/runs/<stamp>/     one directory per run: the rendered headless prompts, the
+# What it writes (all under .local-clock/, gitignored). <run> is the run id: the UTC stamp plus
+# a random suffix from mktemp (20260904T101500Z-a1b2c3), so two runs started in the same second
+# never share a directory or a branch:
+#   .local-clock/runs/<run>/       one directory per run: the rendered headless prompts, the
 #                                  child's JSON transcript and stderr, PR title and body per
 #                                  step, steps.jsonl, marker.json, injected-signal.json
 #   .local-clock/last-run.json     the dated marker verify/local-clock/verify-local-clock.sh grades
 #   .local-clock/logs/             launchd's stdout/stderr (from the plist)
-#   .estate-clone/<adopter>/.work/local-clock/<stamp>-<step>/   the adopter worktree on the
-#                                  branch local-clock/<step>-<stamp>, kept until pushed
+#   .estate-clone/<adopter>/.work/local-clock/<run>-<step>/   the adopter worktree on the
+#                                  branch local-clock/<step>-<run>, kept until pushed; a step
+#                                  that proposes nothing, and a dry run, remove theirs
 #
 # This script never appends talk/truth.log. A local run is not citable (NORTH-STAR S5).
 set -uo pipefail
@@ -123,8 +126,12 @@ if [ "$PUSH" = 1 ] && [ -n "$INJECT" ]; then
 fi
 
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-RUN_DIR="$ROOT/runs/$STAMP"
-mkdir -p "$RUN_DIR" "$ROOT/logs"
+mkdir -p "$ROOT/runs" "$ROOT/logs"
+# mktemp makes the run id unique on the filesystem: two runs in one second (a launchd fire
+# beside a run by hand, or a test running the clock back to back) get distinct directories and
+# distinct branch names, and steps.jsonl is never appended across runs.
+RUN_DIR="$(mktemp -d "$ROOT/runs/$STAMP-XXXXXX")" || { echo "FAIL: could not make a run directory under $ROOT/runs"; exit 2; }
+RUN_ID="$(basename "$RUN_DIR")"
 MODE=live; BRANCH_PREFIX="local-clock"
 INJECTED_FILE=""
 if [ -n "$INJECT" ]; then
@@ -133,9 +140,27 @@ if [ -n "$INJECT" ]; then
   "$PY" "$HELPER" stamp --signal "$INJECT" --out "$INJECTED_FILE" --root "$ROOT" --by "talk/local-clock.sh --inject" \
     || { echo "FAIL: the injected signal was refused (see above)"; exit 2; }
 fi
-echo "local clock: run $STAMP mode=$MODE scheduled=$SCHEDULED adopters=[${ADOPTERS[*]}] run_dir=$RUN_DIR"
+echo "local clock: run $RUN_ID mode=$MODE scheduled=$SCHEDULED adopters=[${ADOPTERS[*]}] run_dir=$RUN_DIR"
 
-record() { "$PY" "$HELPER" record --run-dir "$RUN_DIR" "$@"; }
+record() { "$PY" "$HELPER" record --run-dir "$RUN_DIR" "$@" </dev/null; }
+
+drop_worktree() {  # unit wt branch -- remove a step's worktree and its branch; true only when both are gone
+  local unit="$1" wt="$2" branch="$3" err="$RUN_DIR/cleanup.err"
+  git -C "$unit" worktree remove --force "$wt" 2>>"$err" \
+    && git -C "$unit" branch -q -D "$branch" 2>>"$err" \
+    && [ ! -e "$wt" ] \
+    && ! git -C "$unit" show-ref -q --verify "refs/heads/$branch"
+}
+
+cleanup_or_fail() {  # step adopter unit wt branch status reason -- drop the worktree, record, and say what is true
+  local step="$1" adopter="$2" unit="$3" wt="$4" branch="$5" status="$6" reason="$7" tag="$1-$2"
+  if drop_worktree "$unit" "$wt" "$branch"; then
+    echo "        $tag: worktree and branch removed"
+    record --step "$step" --adopter "$adopter" --status "$status" --reason "$reason"; return 0
+  fi
+  echo "fail  $tag: $reason, but the worktree $wt or the branch $branch could not be removed ($(tail -1 "$RUN_DIR/cleanup.err" 2>/dev/null | cut -c1-120)); remove them by hand"
+  record --step "$step" --adopter "$adopter" --status fail --reason "$reason; cleanup of $wt / $branch failed" --branch "$branch"; return 1
+}
 
 render_prompt() {  # step skill adopter unit_wt branch paths out
   STEP="$1" SKILL="$2" ADOPTER="$3" UNIT_WT="$4" BRANCH="$5" PATHS="$6" OUT="$7" \
@@ -176,7 +201,7 @@ run_step() {  # step skill paths adopter
     echo "skip  $tag: no checkout at $unit (run clone-estate.sh)"
     record --step "$step" --adopter "$adopter" --status skip --reason "no checkout at $unit"; return 0
   fi
-  local branch="$BRANCH_PREFIX/$step-$STAMP" wt="$unit/.work/local-clock/$STAMP-$step"
+  local branch="$BRANCH_PREFIX/$step-$RUN_ID" wt="$unit/.work/local-clock/$RUN_ID-$step"
   mkdir -p "$unit/.work/local-clock"
   if ! git -C "$unit" worktree add -q "$wt" -b "$branch" main 2>"$RUN_DIR/$tag.worktree.err"; then
     echo "fail  $tag: could not make a worktree on $branch from main ($(tail -1 "$RUN_DIR/$tag.worktree.err"))"
@@ -186,9 +211,8 @@ run_step() {  # step skill paths adopter
   render_prompt "$step" "$skill" "$adopter" "$wt" "$branch" "$paths" "$prompt"
 
   if [ "$DRY" = 1 ]; then
-    echo "dry   $tag: would run  $CLAUDE -p \"/$skill $adopter\" --max-turns $MAX_TURNS --append-system-prompt \"\$(cat $prompt)\"  (worktree $wt on $branch)"
-    record --step "$step" --adopter "$adopter" --status skip --reason "dry run" --branch "$branch"
-    git -C "$unit" worktree remove -q --force "$wt"; git -C "$unit" branch -q -D "$branch"; return 0
+    echo "dry   $tag: would run  $CLAUDE -p \"/$skill $adopter\" --max-turns $MAX_TURNS --append-system-prompt \"\$(cat $prompt)\"  (worktree $wt on $branch; prompt kept at $prompt)"
+    cleanup_or_fail "$step" "$adopter" "$unit" "$wt" "$branch" skip "dry run"; return $?
   fi
 
   echo "run   $tag: /$skill $adopter on $branch (worktree $wt, max $MAX_TURNS turns)"
@@ -219,40 +243,54 @@ run_step() {  # step skill paths adopter
   fi
   changed="$(git -C "$wt" diff --name-only "main...HEAD")"
   if [ -z "$changed" ]; then
-    echo "skip  $tag: nothing to propose (no commit on $branch); worktree and branch removed"
-    record --step "$step" --adopter "$adopter" --status skip --reason "nothing to propose"
-    git -C "$unit" worktree remove -q --force "$wt"; git -C "$unit" branch -q -D "$branch"; return 0
+    echo "skip  $tag: nothing to propose (no commit on $branch)"
+    cleanup_or_fail "$step" "$adopter" "$unit" "$wt" "$branch" skip "nothing to propose"; return $?
   fi
   local f ok bad=""
-  for f in $changed; do
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
     ok=0; for p in $paths; do case "$f" in "$p"/*) ok=1;; esac; done
     [ "$ok" = 1 ] || bad="$bad $f"
-  done
+  done <<<"$changed"
   if [ -n "$bad" ]; then
     echo "fail  $tag: the commit touches$bad -- outside this step's allowed paths ($paths). A claim is a claim; a declaration is a different review. Branch kept for inspection, never pushed."
     record --step "$step" --adopter "$adopter" --status fail --reason "commit outside $paths:$bad" --branch "$branch"; return 1
   fi
-  # Every claim file the commit carries must be one the twin can read, and on a rehearsal it
-  # must say injected on its face (which is exactly what makes the validator refuse it later).
-  local validator="$HUB/.claude/skills/$skill/assets/validate_claim.py"
-  for f in $changed; do
+  # Every claim file the commit carries is run through the skill's own validator. Live: it must
+  # pass. Rehearsal: it must say injected on its face AND the validator must refuse it for that
+  # reason -- the refusal is what keeps a rehearsal out of every gate, so the clock proves it
+  # here rather than trusting it. A skill that ships no validator cannot propose a claim file.
+  local validator="$HUB/.claude/skills/$skill/assets/validate_claim.py" vout="$RUN_DIR/$tag.validate.out"
+  while IFS= read -r f; do
     case "$f" in *.claim.yaml) ;; *) continue;; esac
+    if [ ! -f "$validator" ]; then
+      echo "fail  $tag: $f is a claim file and /$skill ships no assets/validate_claim.py -- a claim nobody can check is not proposed. Branch kept at $wt, never pushed."
+      record --step "$step" --adopter "$adopter" --status fail --reason "no validator for $skill; $f unchecked" --branch "$branch"; return 1
+    fi
     if [ "$MODE" = rehearsal ]; then
       if ! grep -Eq '^injected: true' "$wt/$f"; then
         echo "fail  $tag: rehearsal claim $f does not carry injected: true at its top level"
         record --step "$step" --adopter "$adopter" --status fail --reason "rehearsal claim $f not marked injected" --branch "$branch"; return 1
       fi
-      echo "ok    $tag: $f is marked injected (a validator will refuse it, by design)"
-    elif [ -f "$validator" ]; then
-      if ! "$PY" "$validator" "$wt/$f" --twin "$HUB" >"$RUN_DIR/$tag.validate.out" 2>&1; then
-        echo "fail  $tag: $f is not a claim file the twin can read ($(tail -1 "$RUN_DIR/$tag.validate.out" | cut -c1-120))"
+      if "$PY" "$validator" "$wt/$f" --twin "$HUB" >"$vout" 2>&1 </dev/null; then
+        echo "fail  $tag: the validator ACCEPTED rehearsal claim $f -- an injected claim must be refused, and this one would pass a gate. Branch kept at $wt, never pushed."
+        record --step "$step" --adopter "$adopter" --status fail --reason "validator accepted rehearsal claim $f" --branch "$branch"; return 1
+      fi
+      if ! grep -Eqi 'injected|rehearsal' "$vout"; then
+        echo "fail  $tag: the validator refused rehearsal claim $f for a reason other than the injected mark ($(tail -1 "$vout" | cut -c1-120))"
+        record --step "$step" --adopter "$adopter" --status fail --reason "rehearsal claim $f refused for the wrong reason" --branch "$branch"; return 1
+      fi
+      echo "ok    $tag: $f is marked injected and the validator refused it, by design ($(grep -Ei 'injected|rehearsal' "$vout" | head -1 | sed "s#$wt/##" | cut -c1-120))"
+    else
+      if ! "$PY" "$validator" "$wt/$f" --twin "$HUB" >"$vout" 2>&1 </dev/null; then
+        echo "fail  $tag: $f is not a claim file the twin can read ($(tail -1 "$vout" | cut -c1-120))"
         record --step "$step" --adopter "$adopter" --status fail --reason "claim file invalid: $f" --branch "$branch"; return 1
       fi
-      echo "ok    $tag: $(tail -1 "$RUN_DIR/$tag.validate.out" | sed "s#$wt/##" | cut -c1-160)"
+      echo "ok    $tag: $(tail -1 "$vout" | sed "s#$wt/##" | cut -c1-160)"
     fi
-  done
+  done <<<"$changed"
   [ -s "$title" ] || git -C "$wt" log -1 --format=%s >"$title"
-  [ -s "$body" ] || { git -C "$wt" log -1 --format=%b >"$body"; printf '\n%s\n' "Made by the local clock (talk/local-clock.sh, ticket 92), run $STAMP. A model ran on the owner's local clock, not on a GitHub clock. No override is claimed. Never merged by the clock." >>"$body"; }
+  [ -s "$body" ] || { git -C "$wt" log -1 --format=%b >"$body"; printf '\n%s\n' "Made by the local clock (talk/local-clock.sh, ticket 92), run $RUN_ID. A model ran on the owner's local clock, not on a GitHub clock. No override is claimed. Never merged by the clock." >>"$body"; }
 
   if [ "$PUSH" = 1 ]; then
     local repo="policy-as-versioned-$adopter/$adopter" url
@@ -260,7 +298,12 @@ run_step() {  # step skill paths adopter
        && url="$(gh pr create --repo "$repo" --base main --head "$branch" --title "$(cat "$title")" --body-file "$body" 2>"$RUN_DIR/$tag.pr.err")"; then
       echo "ok    $tag: pushed $branch and opened $url"
       record --step "$step" --adopter "$adopter" --status ok --branch "$branch" --pr "$url"
-      git -C "$unit" worktree remove -q --force "$wt"
+      # the branch lives on origin now; the local worktree and branch have done their work
+      if drop_worktree "$unit" "$wt" "$branch"; then
+        echo "        $tag: worktree and local branch removed"
+      else
+        echo "warn  $tag: the PR is open but $wt or the local branch $branch could not be removed ($(tail -1 "$RUN_DIR/cleanup.err" 2>/dev/null | cut -c1-120)); remove them by hand"
+      fi
     else
       echo "fail  $tag: push or gh pr create failed ($(tail -1 "$RUN_DIR/$tag.push.err" "$RUN_DIR/$tag.pr.err" 2>/dev/null | tail -1 | cut -c1-120)); branch kept at $wt"
       record --step "$step" --adopter "$adopter" --status fail --reason "push or pr create failed" --branch "$branch"; return 1

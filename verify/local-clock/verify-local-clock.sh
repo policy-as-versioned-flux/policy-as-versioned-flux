@@ -75,7 +75,7 @@ source: twin/orgs/driftwood/scenarios/niobium-supply-shock-2026.yaml
 EOF
 LOCAL_CLOCK_STUB=claim bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify --inject "$TMP/signal.yaml" >"$TMP/rehearsal.out" 2>&1 \
   || fail "a rehearsal run did not exit 0: $(tail -1 "$TMP/rehearsal.out")"
-grep -q 'is marked injected' "$TMP/rehearsal.out" || fail "the rehearsal claim was not checked for injected: true"
+grep -q 'is marked injected and the validator refused it' "$TMP/rehearsal.out" || fail "the clock did not prove the validator refuses its rehearsal claim: $(grep -E '^(fail|ok)' "$TMP/rehearsal.out" | head -1)"
 grep -q '"mode": "rehearsal"' "$TMP/.local-clock/last-run.json" || fail "the rehearsal marker does not say rehearsal"
 inj="$(ls "$TMP"/.local-clock/runs/*/injected-signal.json | tail -1)"
 grep -q '"injected": true' "$inj" || fail "the injected envelope is not stamped"
@@ -99,19 +99,40 @@ LOCAL_CLOCK_STUB=leak bash "$ROOT/talk/local-clock.sh" --adopter driftwood --ste
 grep -q 'outside this step' "$TMP/leak.out" || fail "the declaration was refused for the wrong reason: $(grep '^fail' "$TMP/leak.out" | head -1)"
 LOCAL_CLOCK_STUB=dirty bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/dirty.out" 2>&1 && fail "uncommitted work was admitted"
 grep -q 'uncommitted changes' "$TMP/dirty.out" || fail "uncommitted work was refused for the wrong reason"
-LOCAL_CLOCK_STUB=nothing bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/nothing.out" 2>&1 || fail "a run with nothing to propose did not exit 0"
+
+# 4. a run that proposes nothing, and a dry run, leave no worktree and no branch behind -- as a
+# fact in the fixture, not as a sentence in the output. Runs are told apart by run id, which is
+# unique even when two start in the same second (the runs above are back to back).
+left_nothing() {  # out-file what -- the run's worktree, branch and directory are gone
+  local rid
+  rid="$(sed -n 's/^local clock: run \([^ ]*\) .*/\1/p' "$1" | head -1)"
+  [ -n "$rid" ] || fail "the $2 run printed no run id: $(head -1 "$1")"
+  grep -q 'worktree and branch removed' "$1" || fail "the $2 run did not report its cleanup: $(grep -E '^(fail|warn)' "$1" | head -1)"
+  git -C "$TMP/estate/driftwood" worktree list --porcelain | grep -q -- "$rid" && fail "the $2 run left its worktree registered ($rid)"
+  git -C "$TMP/estate/driftwood" for-each-ref 'refs/heads/local-clock/' | grep -q -- "$rid" && fail "the $2 run left its branch ($rid)"
+  [ -z "$(ls -d "$TMP/estate/driftwood/.work/local-clock/$rid-"* 2>/dev/null)" ] || fail "the $2 run left a directory under .work/local-clock ($rid)"
+  [ "$(wc -l <"$TMP/.local-clock/runs/$rid/steps.jsonl")" -eq 1 ] || fail "the $2 run's steps.jsonl holds another run's steps"
+}
+LOCAL_CLOCK_STUB=nothing bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/nothing.out" 2>&1 || fail "a run with nothing to propose did not exit 0: $(grep -E '^fail' "$TMP/nothing.out" | head -1)"
 grep -q 'nothing to propose' "$TMP/nothing.out" || fail "nothing-to-propose was not recorded"
+left_nothing "$TMP/nothing.out" nothing-to-propose
+bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify --dry-run >"$TMP/dry.out" 2>&1 || fail "a dry run did not exit 0: $(grep -E '^fail' "$TMP/dry.out" | head -1)"
+grep -q '^dry .*would run' "$TMP/dry.out" || fail "the dry run did not print the command it would run"
+left_nothing "$TMP/dry.out" dry
+n_runs="$(ls -d "$TMP"/.local-clock/runs/*/ | wc -l | tr -d ' ')"
+[ "$n_runs" -eq 6 ] || fail "6 runs were started (live, rehearsal, leak, dirty, nothing, dry) and $n_runs run directories exist: run ids collided"
 # the derive step (ticket 93's seam) is recorded as skipped by name until its skill ships
 LOCAL_CLOCK_STUB=nothing bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step derive >"$TMP/derive.out" 2>&1
 grep -q 'derive-driftwood' "$TMP/derive.out" || fail "the derive step is not in the steps table"
-echo "PASS: offline -- with a stub model the clock commits one claim on a branch and leaves the marker, a rehearsal is stamped, marked and unpushable, and a declaration or unfinished work is refused"
+echo "PASS: offline -- with a stub model the clock commits one claim on a branch and leaves the marker, a rehearsal is stamped, marked and refused by the validator, a declaration or unfinished work is refused, and a nothing run or a dry run leaves no worktree or branch"
 
 # --- the real machine: the script, README, marker, leak scan, truth log, template --------------
 unset LOCAL_CLOCK_CLAUDE LOCAL_CLOCK_HOME LOCAL_CLOCK_ESTATE
 [ -d "$ROOT/.estate-clone/platform" ] || bash "$ROOT/clone-estate.sh" >/dev/null \
   || { echo "FAIL: could not assemble .estate-clone/"; exit 1; }
 log="$(mktemp)"; trap 'rm -rf "$TMP" "$log"' EXIT
-"$PY" "$HERE/local_clock.py" check --hub "$ROOT" | tee "$log"
+# the helper's per-check lines are indented: the verdict below is the one last line
+"$PY" "$HERE/local_clock.py" check --hub "$ROOT" | tee "$log" | sed 's/^/    /'
 rc=${PIPESTATUS[0]}
 case $rc in
   0) echo "PASS: the local clock exists with its README, its last run left a dated marker inside its window, no injected signal is on any citable path, and the launchd template holds no credential";;
