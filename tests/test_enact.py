@@ -16,25 +16,62 @@ from twin.cli import main
 from twin.grades import Capabilities
 from twin.repo import ModelRepo
 
+# The real, checked-in mode file, captured before the autouse fixture repoints the module's
+# handle at a temp one. `test_the_checked_in_mode_is_read_off_disk_and_the_suite_states_what_it_
+# admits` is the one test that reads this, and it is what keeps the shipped state asserted.
+SHIPPED_MODE_FILE = enact_guard.ENACT_MODE_FILE
+
+# The mode the capability tests below run under. `other-hand` rather than `operations`, because it
+# is the strictest mode that still admits the one shape the estate needs: every push to an
+# enactment repository refused, every merge refused unless it mints the app's token inline.
+ARMED = "other-hand"
+
+
 @pytest.fixture(autouse=True)
-def _as_shipped(monkeypatch):
-    """Run the guard AS SHIPPED, not as monkeypatched.
+def _armed(monkeypatch, tmp_path_factory):
+    """Run the guard ARMED, at a mode this module names, not at whatever mode the checkout ships.
 
-    History, because it is the whole point of this fixture. Commit 9282301 made the refusal a mode
-    defaulting to `development`, under which `decide` returns `None` for everything; thirteen tests
-    in this module went red and stayed red. They were then made green by this fixture setting
-    `TWIN_ENACT_MODE=operations` for the test process -- which asserted a guard nobody ships and
-    left the shipped default asserted by nothing at all. The docstring even cited a
-    `test_the_mode_defaults_to_development` that did not exist.
+    History, because it is the whole point of this fixture, and it has now been wrong in both
+    directions. Commit 9282301 made the refusal a mode defaulting to `development`, under which
+    `decide` returns `None` for everything; thirteen tests here went red and stayed red. They were
+    made green by this fixture exporting `TWIN_ENACT_MODE=operations` -- which asserted a guard
+    nobody ships and left the shipped default asserted by nothing at all. On 2026-08-29 that was
+    undone: `DEFAULT_MODE` became `operations`, the fixture was cut back to clearing an ambient
+    env var, and the note here said that flipping the checked-in mode to `development` SHOULD turn
+    thirteen tests red, "because a weakening that shows in a test is the only kind anybody
+    notices".
 
-    The fix was on the other side (2026-08-29): `enact_guard.DEFAULT_MODE` is now `operations` and
-    `twin/ENACT_MODE` says so, so the tests and the guard agree on the SAFE reading. All this
-    fixture does now is clear an ambient `TWIN_ENACT_MODE` out of the way, so a shell that happens
-    to export one cannot decide what the suite observed. Flip the checked-in mode back to
-    `development` and thirteen of these go red again -- deliberately, because that flip is a real
-    weakening and a weakening that shows in a test is the only kind anybody notices.
+    On 2026-09-04 the owner flipped it, standing (commit f959187), and the prediction came true at
+    triple the size: thirty-five red, in a CI run whose other two real defects -- a missing
+    `jsonschema` pin and an unused `type: ignore` -- were invisible behind them. A signal that
+    fires for a fortnight is not a signal, and one that fires on the same line as everything else
+    is not a diagnosis. So the third position (delegated, ADR-0025):
+
+      the guard's mode is a DEPLOYMENT STATE, and the tests below are about a CAPABILITY.
+
+    A capability test that reads the deployment state reports "the code is broken" when the truth
+    is "the switch is off", which is what happened. These arm the switch and ask what the code
+    does -- exactly as the harness invariant `enactment_is_propose_only_at_both_layers` already
+    does, forcing `operations` for its own run "so the capability stays tested even while the
+    day-to-day default is permissive" (`enact_guard`'s own docstring). This is that same settled
+    answer, applied to the unit tests that were left behind by it.
+
+    The 2026-08-29 objection -- a fixture asserting a guard nobody ships -- is answered, and not
+    by ignoring it: `test_the_shipped_default_refuses` asserts the fallback when nobody has said
+    anything, and `test_the_checked_in_mode_is_read_off_disk_and_the_suite_states_what_it_admits`
+    reads the real file and asserts what that mode really admits, including that `development`
+    admits the merge and the push. The shipped state is asserted by a test that names it, instead
+    of by thirty-five that do not.
+
+    The mode file is repointed rather than `TWIN_ENACT_MODE` exported, because the env var wins
+    over the file inside `enact_mode()`: exporting it would silently defeat every test below that
+    sets its own mode through `_set_mode`. The ambient var is still cleared, so a shell that
+    happens to export one cannot decide what the suite observed.
     """
     monkeypatch.delenv("TWIN_ENACT_MODE", raising=False)
+    armed = tmp_path_factory.mktemp("enact-mode") / "ENACT_MODE"
+    armed.write_text(f"{ARMED}\n", encoding="utf-8")
+    monkeypatch.setattr(enact_guard, "ENACT_MODE_FILE", armed)
 
 
 NETFLIX = ["--org", "netflix"]
@@ -93,19 +130,50 @@ def test_the_shipped_default_refuses(monkeypatch: pytest.MonkeyPatch, tmp_path: 
     assert enact_guard.enact_mode() == "operations"
 
 
-def test_the_checked_in_mode_is_other_hand_and_still_refuses_pushes_and_bare_merges() -> None:
-    """The durable default a checkout actually gets, read off disk rather than off the constant.
+def test_the_checked_in_mode_is_read_off_disk_and_the_suite_states_what_it_admits() -> None:
+    """The durable mode a checkout actually gets, read off disk rather than off the constant, and
+    what that mode really does — asserted, not described.
 
-    Since 2026-09-03 (ticket 88, ticket 75 Q6/Q14) it is `other-hand`: the owner authors and
-    pushes, the assistant merges as the GitHub App `pavc-other-hand`. Everything `operations`
-    refused is still refused except one shape, a merge that mints the app's token in the same
-    command. Flipping this file back to `operations` or forward to `development` is a red test."""
-    assert enact_guard.ENACT_MODE_FILE.read_text(encoding="utf-8").strip() == "other-hand"
-    assert enact_guard.enact_mode() == "other-hand"
-    assert enact_guard.decide("Bash", {"command": "gh pr merge 42 --squash"}) is not None
-    assert enact_guard.decide("Bash", {
-        "command": "git push https://github.com/policy-as-versioned-driftwood/driftwood main",
-    }) is not None
+    This test replaces `test_the_checked_in_mode_is_other_hand_and_still_refuses_pushes_and_bare_
+    merges` (2026-09-04, CI repair; delegated, ADR-0025). That test hard-coded `other-hand` and
+    went red the moment commit f959187 wrote `development` into the file "standing, by the owner's
+    instruction of 2026-09-04". Its red was correct and its shape was not: it said *the guard is
+    broken* when the truth was *the owner opened a window*, and it was one of thirty-six reds that
+    between them hid the jsonschema breakage and the unused-ignore in the same run.
+
+    So the assertion is turned around. The shipped word is read off disk and the suite asserts,
+    per mode, what `decide` does with the two calls that matter. Under `development` that is an
+    assertion that the twin MAY merge and MAY push to an enactment repository — the weakening
+    written down as a passing test that says so out loud, rather than as thirty-five failures
+    nobody can read. Flip the word and this test asserts the other branch; the flip itself is one
+    word in a checked-in file, visible in a diff and a `git blame`, which is where it belongs.
+
+    `SHIPPED_MODE_FILE`, not `enact_guard.ENACT_MODE_FILE`: the `_armed` fixture at the top of this
+    module repoints the latter at a temp file so the capability tests run armed, and it is autouse,
+    so it applies to this test too. This test is about the real file, so it reads the handle
+    captured at import and puts it back for the length of the three calls that need it.
+    """
+    shipped = SHIPPED_MODE_FILE.read_text(encoding="utf-8").strip()
+    assert shipped in enact_guard._MODES, f"{SHIPPED_MODE_FILE} holds {shipped!r}, not a mode"
+
+    merge = {"command": "gh pr merge 42 --squash"}
+    push = {"command": "git push https://github.com/policy-as-versioned-driftwood/driftwood main"}
+    with pytest.MonkeyPatch.context() as as_shipped:
+        as_shipped.delenv("TWIN_ENACT_MODE", raising=False)
+        as_shipped.setattr(enact_guard, "ENACT_MODE_FILE", SHIPPED_MODE_FILE)
+        assert enact_guard.enact_mode() == shipped
+        merge_refused = enact_guard.decide("Bash", merge)
+        push_refused = enact_guard.decide("Bash", push)
+
+    if shipped == "development":
+        # The window the owner opened. Both are admitted, and that is the whole cost of it.
+        assert merge_refused is None
+        assert push_refused is None
+    else:
+        # `operations` refuses every merge; `other-hand` refuses this one because it mints no
+        # token. Either way the push to an enactment repository is refused, in both modes.
+        assert merge_refused is not None
+        assert push_refused is not None
 
 
 def _set_mode(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mode: str) -> None:

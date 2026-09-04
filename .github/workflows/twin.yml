@@ -45,7 +45,16 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'
+      # `jsonschema` because the suite loads two gate scripts as modules and one of them imports
+      # it: tests/test_every_green.py loads verify/feed-contract/feed_contract.py directly, and
+      # tests/test_untagged_pin.py loads untagged_pin.py, which imports it in turn. The import
+      # itself dates from 3e83a16 (ticket 21, 2026-08-28); what changed on 2026-09-04 is that
+      # tests began to REACH it. Ticket 69 (PR 18, merge 7c019a8, 08:08Z) added the first path
+      # and 24 errors with it; ticket 76 (PR 19, 10:18Z) added the 25th through
+      # tests/test_every_green.py. This line was not widened, so 25 tests errored with
+      # ModuleNotFoundError: one at collection, twenty-four at setup. Same pin as truth.yml,
+      # which already installs it for the same scripts.
+      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516' 'jsonschema==4.23.0'
       - name: fetch the six unit repos this suite reads
         run: bash clone-estate.sh
       - run: python -m pytest -q

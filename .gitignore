@@ -4,7 +4,13 @@ research/repos/
 # clone-estate.sh so talk/up.sh and talk/verify-all.sh can run against real
 # content. A build artifact of those repos, never a second copy checked in
 # here — estate/ itself is gone from this hub (git history preserves it).
-.estate-clone/
+#
+# No trailing slash, since 2026-09-04. With one, the rule matched a DIRECTORY only, and the build
+# brief tells a builder working in a worktree to make `.estate-clone` a SYMLINK to the real clone.
+# A symlink is not a directory, so it showed as untracked and a `git add -A` swept it into a
+# commit. That happened twice in one day, once to a builder and once to the integrator amending
+# this very branch. Without the slash the rule matches both.
+.estate-clone
 
 # The pre-mo-12 working tree, left behind when estate/ was deleted from the hub.
 # `.estate-clone/` supersedes it and is the only copy anything should read. This
