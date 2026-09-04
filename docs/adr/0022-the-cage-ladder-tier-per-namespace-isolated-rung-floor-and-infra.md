@@ -68,3 +68,46 @@ in Kubernetes terms the estate is a mutating admission controller more than a va
 assistant's narrower alternative, a surviving locked door for access control, data protection and
 key management, was put and overruled. Consequence: no Deny-shaped rule ships that is not a cage
 constraint (ticket 89).
+
+## Note, 2026-09-04 (ticket 78, delegated): the proposer only tightens, and the selection is over the party
+
+The cage was recorded as tighten-only above. The **proposer** was not. `tier_pr.py` ran
+`wargame_cage_tier()` once per `prices[]` line and `apply_tier_declaration()` wrote that line's
+`proposed_tier` onto the governed Namespace unconditionally, so driftwood's only reachable band
+crossing today -- the threat-register line moving `baseline` to `restricted`, beside two lines
+that already select `isolated` -- would have stamped `restricted` over a Namespace declared
+`isolated`. Tighten-only was a property of the mutating webhook and of nothing that wrote the
+declaration the webhook reads.
+
+Three things now hold, and each carries a check:
+
+- **The selection is over the party, not the price line.** One Namespace carries one tier for
+  every pod in it, so the declaration cannot be looser than the party's worst-priced regime. The
+  tier written is the **strictest `proposed_tier` across `prices[]`**, clamped up to the declared
+  `overlay.floor`, and never looser than what the Namespace declares today. A line whose fold does
+  not tighten the declaration is **held**: no branch, no commit, no pull request.
+  (`wargamer.select_party_tier`, and driftwood's own `selection-policy` v1.1.0 `select_party`.)
+- **The declaration is bound to the price, on every pull request.** A proposer that only tightens
+  does not stop a hand edit or a merge that races a re-price, so
+  `platform/shift-left/tier_binding.py` reads `proposed_tier` off the composed evidence and
+  `posture.acme.io/tier` off the governed Namespace and refuses the looser label. It runs in each
+  adopter's `shift-left.yml` and, across the estate, in the hub's `verify/tier-binding/`.
+- **The proposal commit is signed and its identity is checked.** `propose-tier.yml` installs
+  gitsign by checksum, signs the commit with the workflow's own keyless Actions identity, and
+  verifies it against a second constant, `EXPECTED_PROPOSAL_IDENTITY_REGEXP`, anchored to
+  `propose-tier.yml@refs/heads/main`. It is deliberately not an alternation widened into
+  `release.yml`'s `EXPECTED_IDENTITY_REGEXP`: proposing a tighter cage and publishing a signed
+  release are different powers, and each adopter's identity-regexp check now proves the two do not
+  overlap in either direction.
+
+**Strictest line, not summed residual, is the rule this note records** -- the interim the ticket
+states, pending PE-05 / ticket 75 Q4. A summed rule would slot into exactly one place,
+`select_party_tier()`'s fold of `lines` to `strictest`, mirrored in the adopter package. The
+version bump is what makes that swap reviewable: driftwood's selection-policy is now 1.1.0.
+
+**Loosening is not implemented, and that is the decision, not an omission.** ADR-0022 prices a
+lowered floor rather than refusing it, so a party's aggregate residual should one day be able to
+argue a looser declaration. Doing that needs a residual the proposer does not yet compute and a
+pull-request body that carries the argument, so this ticket writes nothing looser at all and the
+looser path stays a later ticket. Until then a loosening is a human edit to the Namespace, in the
+open, under the binding check -- which is where an unargued loosening belongs.
