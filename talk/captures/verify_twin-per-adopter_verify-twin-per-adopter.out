@@ -1,0 +1,4 @@
+PASS: driftwood: an overlay with 6 scenarios, 30 vendored world files and world_ref c2d07330a778ed547b60cfbb87217bcf9813181f
+SKIP: 2 of 3 adopters carry no twin overlay and are named rather than omitted: ludlow, tuppence. REGRILL answer 39 promises one each; until they exist this check cannot look at them, and it does not pass over the ones that are there
+TOTAL: 1 pass, 0 fail, 1 could-not-look
+SKIP: 2 of 3 adopters carry no twin overlay and are named rather than omitted: ludlow, tuppence. REGRILL answer 39 promises one each; until they exist this check cannot look at them, and it does not pass over the ones that are there

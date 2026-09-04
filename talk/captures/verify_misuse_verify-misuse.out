@@ -1,4 +1,4 @@
-PASS: selfcheck: a row with its mechanism blanked is refused by the loader (exit 1: FAIL: /tmp/tmp.iWnq3r7OgO/blank.yaml: entry 'x' names no mechanism — a risk with no mechanism is a concern, )
+PASS: selfcheck: a row with its mechanism blanked is refused by the loader (exit 1: FAIL: /tmp/tmp.ChuHcSDMie/blank.yaml: entry 'x' names no mechanism — a risk with no mechanism is a concern, )
 PASS: selfcheck: a row anchored to a file that does not exist fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: twin/no-such-file.py: no such file; 0 could-not-look by name (none))
 PASS: selfcheck: a row anchored to a token the file lacks fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: platform/c.py: does not mention 'widen_to'; 0 could-not-look by name (n)
 PASS: selfcheck: a row still waiting on a resolved ticket fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: still says it waits on ticket 19 (resolved), which is resolved — name)
