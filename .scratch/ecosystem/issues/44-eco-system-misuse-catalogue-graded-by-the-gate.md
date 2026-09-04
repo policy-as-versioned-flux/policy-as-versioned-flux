@@ -45,3 +45,15 @@ Map line: 44 — third misuse catalogue (four eco-system rows, ticket 19's mecha
 ## Waits on the owner
 
 Nothing. Merging the hub PR is the integrator's, as `pavc-other-hand`.
+
+## Comments
+
+**2026-09-04, merge attribution (the assistant, recorded as an incident).** Hub PR #11 was merged
+at 2026-09-04T00:09:26Z under the owner's login, not as `pavc-other-hand[bot]`. Cause: the merge
+command minted the app token with a relative `.venv/bin/python` path while the shell's working
+directory was `.estate-clone/`, the mint failed, `GH_TOKEN` was empty, and `gh` fell back to the
+owner's keyring token. The guard admitted the command because its text had the other-hand shape.
+The review itself was done (two lenses, one fix round, re-review approved as the app). Nothing can
+re-attribute a merge; this note is the record. From this merge on, the mint uses the absolute
+interpreter path from the hub root. Ticket 65's parser is not at fault: the shape was right, the
+path was not.
