@@ -210,10 +210,49 @@ repository pins, and a pinned tree is checked for the section the pin is used fo
   `twin-sweep.yml` consuming the hub, which has cut no tag). The three new PASSes are the
   insurer's three adopter checkouts, which nothing graded before.
 
+## Landed 2026-09-04
+
+Hub pull request 24 merged as `pavc-other-hand`, merge commit `e127209`, a true merge commit and
+not a squash. `5ee9e44` and `7f61920` are ancestors of `main`, so run 79's TRUTH line stays
+citable and every `hub=` in `main`'s `talk/truth.log` is still reachable from `main`. The log
+keeps runs 79, 80 and 81 in timestamp order; nothing was deleted. The eleven conflicting capture
+files took `main`'s side, because those were the newer observations, and the next clock run
+re-captures against the merged tree.
+
+Six of the seven unit pull requests merged as `pavc-other-hand`: platform 11 (`bbda376`),
+driftwood 24 (`cd63472`), tuppence 16 (`e44ad89`), ludlow 14 (`64492d3`), ico 4 (`6217c3a`),
+feeds 3 (`b6eaa0a`).
+
+**Two unit checks are red, and both are true statements about the estate rather than defects in
+this change.** Neither is caused by this branch, and both were established by comparing `main`
+against the branch, not assumed.
+
+1. **driftwood `compose-check` fails, and it fails on `main` too.** `selection-policy/
+   selection_policy.py` reads `VERSION = "1.1.0"` on both `main` and the branch, while
+   `composed/HEADER.yaml` records `selection-policy: 1.0.0` on both. The composed artefact is
+   stale against driftwood's own package. The branch changes neither file. This belongs to the
+   re-compose pass in ticket 64.
+2. **tuppence `shift-left` fails, and the branch is what made it able to fail.** On `main`,
+   `shift-left.yml`'s first platform checkout carried NO `ref:`, so tuppence composed against
+   platform's default branch. The branch pins it to the declared tag. Composing against the
+   signed `v2.0.1` instead of platform's `main` produces a MAJOR bump for this institution, and
+   the adopter gate refuses to adopt a major without human review, which is what it is for. So
+   the pin did not break the gate. It revealed that tuppence's adopted composition had been built
+   from an unpinned, unsigned default branch, and that the signed tag composes to something a
+   major apart. That is the exact defect tickets 62 and 77 exist to find, found by the fix.
+   Ticket 64 moves the pins and re-composes; the major bump needs the owner's review by design.
+
 ## Waits on the owner
 
-* Pushing the three adopter branches (`ticket-62-and-77` on driftwood, tuppence, ludlow) and
-  merging their pull requests as `pavc-other-hand`. The guard refuses enactment pushes.
+* **insurer pull request 3 cannot be merged by the assistant.** GitHub refuses the merge API call:
+  "refusing to allow a GitHub App to create or update workflow `.github/workflows/fetch.yml`
+  without `workflows` permission". The `pavc-other-hand` installation carries
+  `contents:write, metadata:read, pull_requests:write` on every organisation and `workflows` on
+  none. Six other units merged the same day with workflow changes in them, so the refusal is not
+  uniform and the reason for the difference is not established. The fix is one owner action:
+  grant the app the `workflows` permission. Merging with the owner's own token instead would
+  defeat the point of the second identity, so it was not done. The pull request is open, mergeable
+  and clean.
 * The citable run: `verify-feed-contract` and `verify-branch-refs` green on a TRUTH line the
   owner or the clock produces. Both were run locally and their output is in the pull request.
   `verify-branch-refs` is green (53 PASS, 1 declared SKIP); `verify-feed-contract` is NOT, and
