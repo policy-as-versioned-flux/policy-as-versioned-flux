@@ -96,7 +96,8 @@ runs. `parse_truth` needed no change (ticket 83 left the value as text). `clone-
 keeps cloning default branches, and now says why: a gate pinned to the last tag could never go
 red on work in flight, which is the opposite of what it is for.
 
-**Which checks grade it.** `verify/branch-refs/verify-branch-refs.sh` (new, 50 PASS / 1 SKIP);
+**Which checks grade it.** `verify/branch-refs/verify-branch-refs.sh` (new, 53 PASS / 1 SKIP
+since the round-3 fix below; 50 / 1 before it);
 `verify/feed-contract/verify-feed-contract.sh`, whose PASS lines now say the tree carries the
 section and whose three insurer `exposure v1.1.0` lines went from PASS to could-not-look;
 `platform/compose/verify-composition.sh` step 1a (`pin_content.py --selfcheck`);
@@ -228,6 +229,26 @@ would serve:
   ticket 62 removed it), including a refusal line for a parent neither party declares.
 * The false half of `party.yaml`'s own comment is corrected: it said v1.1.0 is "the one whose
   tree carries the exposure section". No v1.1.0 tree does. That is the whole of item 2.
+
+### Round 3, 2026-09-04 -- review fixes recorded here
+
+* **`verify-branch-refs.sh` graded 51 of the estate's 52 cross-organisation checkouts.** The
+  52nd, insurer/fetch.yml's `repository: policy-as-versioned-${{ matrix.adopter }}/...`, was
+  invisible: neither passed, refused nor skipped, so moving it to a branch was free. It is
+  expanded from the job's own matrix and graded now -- 53 PASS / 1 SKIP, all 52 lines covered.
+  The reasoning, the counted number and the corrected claims are in ticket 62's round-3 note.
+* **`verify-insurer-quote.sh` selfcheck leg 3 is wrapped.** Legs 1 and 2 caught `quote.Refused`;
+  leg 3 -- the tree that DOES carry the exposure section, which proves the refusal is not a
+  blanket one -- did not, so a rule that OVER-refuses ended the run on a raw traceback instead
+  of the `FAIL:` line the gate reads. Measured both ways with a stub `pin_content.py` that
+  refuses whatever the tree holds: before, `quote.Refused: missing instrument: ...` and a
+  traceback; after, `FAIL: quote.py pin-content seam: a pinned tree that DOES carry the exposure
+  section was refused (...); the refusal is a blanket one and would stop every re-quote in the
+  estate`. With the real rule (`PLATFORM_DIR=.estate-clone/platform`) the leg passes.
+* **`verify-feed-contract.sh --selfcheck` runs the selfcheck alone**, as this Answer already
+  said it did; it accepted the flag and ran the full estate check instead. Its manifest row
+  declared two of the six could-not-look reasons `feed_contract.py` can print, so a network blip
+  or an offline payload schema read as red; all six are declared now.
 
 ## Waits on the owner
 

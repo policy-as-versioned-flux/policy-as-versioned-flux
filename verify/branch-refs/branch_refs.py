@@ -21,9 +21,21 @@ estate clone whose `repository:` names a DIFFERENT policy-as-versioned organisat
   a ${{ }} expression        the consuming repository must DECLARE which version of that
                              publisher it is on, in a GitRepository pin file under gitops/
                              whose spec.url is the publisher's, or in a `<PUBLISHER>_TAG:`
-                             env constant in the same workflow. PASS when the declared tag
-                             exists on the publisher's clone; FAIL when nothing declares it,
-                             or when what is declared is not a tag the publisher has cut.
+                             env constant in the same workflow, or -- only where neither of
+                             those says anything about that publisher -- in its own party.yaml
+                             `inherits[]`. PASS when the declared tag exists on the publisher's
+                             clone; FAIL when nothing declares it, or when what is declared is
+                             not a tag the publisher has cut.
+
+The `repository:` may itself be a workflow expression: insurer/fetch.yml checks out
+`policy-as-versioned-${{ matrix.adopter }}/${{ matrix.adopter }}` over a matrix of the three
+adopters. Until 2026-09-04 such a step matched no organisation, was not counted and was not
+graded -- invisible, so moving it to a branch was free, which is the exact regression this check
+exists to catch. It is expanded now from the job's OWN `strategy.matrix` (the values are written
+in the file; GitHub evaluates the expression but does not decide them) and each expansion graded
+like any other checkout. Where no literal matrix decides it -- a step output, an env var, an
+`include:` block, a matrix built from JSON -- the checkout is COUNTED and SKIPped by name, never
+passed and never silent.
 
   a publisher with NO tags   SKIP. There is no tag to pin to, so the consumer cannot be asked
                              for one; the reason names the publisher. Today that is the hub
@@ -38,8 +50,8 @@ from -- a pin, in this repository, naming a tag that exists -- and that is what 
 commit half of each {tag, commit} pair is asserted on the runner by each unit's own
 .github/scripts/verify-pinned-checkouts.py, which is where the runner's real HEAD can be read.
 
-WHAT THIS DOES NOT SEE, stated so a green line is not read as more than it is. Two limits, both
-deliberate and both narrow enough to check by eye today:
+WHAT THIS DOES NOT SEE, stated so a green line is not read as more than it is. Three limits, all
+deliberate and all narrow enough to check by eye today:
 
   * the glob is `.github/workflows/*.yml` only. A workflow written `.yaml`, a composite action
     under `.github/actions/`, or a reusable workflow called from another repository is not read.
@@ -50,9 +62,19 @@ deliberate and both narrow enough to check by eye today:
     tarball or an archive URL in a `run:` block fetches another organisation's code without ever
     being seen here. Grep says there are none in the estate today (`truth.yml`'s Flux install is
     fluxcd.io, not a policy-as-versioned repository, and ticket 56 pins it).
+  * a `repository:` no literal matrix decides is a SKIP and not a grade. The organisation is
+    chosen on the runner, so which of this repository's pin records ought to declare it cannot be
+    read here. There is none in the estate on 2026-09-04 -- insurer/fetch.yml's is the only
+    templated `repository:` and its matrix is a literal list -- but the day one is added the
+    check says could-not-look about it out loud, which is why this limit is a named line in the
+    output and not, as it was until round 3, silence.
 
-Both are the same shape of hole: this check grades the form the estate uses, not every form
+All three are the same shape of hole: this check grades the form the estate uses, not every form
 GitHub allows. Widening it belongs with the first unit that needs another form.
+
+COUNTED 2026-09-04: 52 `repository: policy-as-versioned` lines across the eight units, every one
+of them cross-organisation and every one of them now graded. 54 grade lines come out of them,
+because insurer/fetch.yml's templated line is graded once per adopter in its matrix.
 
 Prints one line per check. Exit precedence: any FAIL -> 1; else any SKIP -> 3; else 0.
 
@@ -63,6 +85,7 @@ Usage:
 from __future__ import annotations
 
 import glob
+import itertools
 import os
 import re
 import subprocess
@@ -79,6 +102,7 @@ LINES: list[str] = []
 MSGS: list[str] = []
 ORG = re.compile(r"^policy-as-versioned-([a-z-]+)/([A-Za-z0-9._-]+)$")
 EXPR = re.compile(r"\$\{\{.*\}\}")
+MATRIX = re.compile(r"\$\{\{\s*matrix\.([A-Za-z0-9_-]+)\s*\}\}")
 SEEN = {"workflows": 0, "cross-org checkouts": 0}
 
 
@@ -109,6 +133,27 @@ def pinned_tags(unit_dir: str) -> dict[str, set[str]]:
             m = ORG.match(str((doc.get("spec") or {}).get("url", "")).removeprefix("https://github.com/"))
             if m and ref.get("tag"):
                 found.setdefault(m.group(1), set()).add(str(ref["tag"]))
+    return found
+
+
+def party_pins(unit_dir: str) -> dict[str, set[str]]:
+    """{publisher: versions} from this repository's OWN party.yaml `inherits[]`. Read only as a
+    LAST resort, where neither gitops/ nor the workflow env declares anything about that
+    publisher, because most inherits[] versions are ADR-0019 feed MAJORs (`v3`, `v2`, `2.0.1`)
+    and not git tags -- reading them as tags everywhere would invent refusals. The one place they
+    ARE tags is the insurer's `<adopter>/feed:exposure` edges, whose version names the adopter's
+    own signed tag (insurer/party.yaml says so in as many words), and whose fetch.yml builds its
+    ref by reading exactly this file. So where nothing else declares the publisher, this is the
+    declaration the workflow itself uses, and grading it is grading the real pin."""
+    found: dict[str, set[str]] = {}
+    try:
+        with open(os.path.join(unit_dir, "party.yaml")) as fh:
+            doc = yaml.safe_load(fh)
+    except (OSError, yaml.YAMLError):
+        return found
+    for entry in (doc or {}).get("inherits") or []:
+        if isinstance(entry, dict) and entry.get("party") and entry.get("version"):
+            found.setdefault(str(entry["party"]), set()).add(str(entry["version"]))
     return found
 
 
@@ -150,21 +195,69 @@ def clone_tags(estate: str, party: str) -> set[str] | None:
 # --------------------------------------------------------------------------
 # reading the checkouts out of a workflow
 # --------------------------------------------------------------------------
-def checkouts(doc: dict) -> list[dict]:
-    """Every actions/checkout step's `with:` mapping in a parsed workflow."""
+def checkouts(doc: dict) -> list[tuple[dict, dict]]:
+    """Every actions/checkout step's `with:` mapping in a parsed workflow, paired with the
+    `strategy.matrix` of the job it sits in -- which is what makes a templated `repository:`
+    readable offline."""
     steps = []
     for job in (doc.get("jobs") or {}).values():
         if not isinstance(job, dict):
             continue
+        matrix = ((job.get("strategy") or {}).get("matrix") if isinstance(job.get("strategy"), dict)
+                  else None)
         for step in job.get("steps") or []:
             if isinstance(step, dict) and str(step.get("uses", "")).startswith("actions/checkout@"):
-                steps.append(step.get("with") or {})
+                steps.append((step.get("with") or {}, matrix if isinstance(matrix, dict) else {}))
     return steps
 
 
+def expand_matrix(repo: str, matrix: dict) -> list[str] | None:
+    """The concrete repository names a templated `repository:` can take, read off the job's own
+    `strategy.matrix`; None when this file does not decide them (a step output, an env var, a
+    matrix built by `include:` or from JSON). GitHub evaluates the expression, but the VALUES of
+    a literal matrix list are written down here, so expanding them is reading and not guessing."""
+    keys = sorted(set(MATRIX.findall(repo)))
+    if not keys:
+        return None
+    values = []
+    for key in keys:
+        got = matrix.get(key)
+        if not isinstance(got, list) or not got or not all(isinstance(v, str) for v in got):
+            return None
+        values.append(got)
+    out_: list[str] = []
+    for combo in itertools.product(*values):
+        one = repo
+        for key, value in zip(keys, combo):
+            one = re.sub(r"\$\{\{\s*matrix\." + re.escape(key) + r"\s*\}\}", value, one)
+        if EXPR.search(one):
+            return None  # something in it is still not decided here
+        out_.append(one)
+    return out_
+
+
 def grade(estate: str, unit: str, wf_name: str, with_: dict, declared: dict[str, set[str]],
-          env: dict[str, str]) -> None:
+          env: dict[str, str], party_declared: dict[str, set[str]],
+          matrix: dict | None = None) -> None:
     repo = str(with_.get("repository", ""))
+    if EXPR.search(repo):
+        # A `repository:` that is ITSELF an expression. Until 2026-09-04 this matched ORG,
+        # matched nothing, and returned before the counter moved: invisible, so moving such a
+        # checkout to a branch cost nothing. It is graded now, or named as a could-not-look.
+        if "policy-as-versioned" not in repo:
+            return  # not this estate's shape at all
+        expanded = expand_matrix(repo, matrix or {})
+        if expanded is None:
+            SEEN["cross-org checkouts"] += 1
+            out("SKIP", f"{unit}/{wf_name} checks out {repo}: which organisation that is, is "
+                        f"decided on the runner and not written in this file, so what it pins "
+                        f"cannot be looked at here -- never a pass. The runner's own "
+                        f".github/scripts/verify-pinned-checkouts.py asserts the pair there")
+            return
+        for one in expanded:
+            grade(estate, unit, wf_name, {**with_, "repository": one}, declared, env,
+                  party_declared, None)
+        return
     m = ORG.match(repo)
     if not m or m.group(1) == unit:
         return  # this repository's own checkout, or a third-party action's
@@ -193,9 +286,12 @@ def grade(estate: str, unit: str, wf_name: str, with_: dict, declared: dict[str,
         return
     names = declared.get(party, set()) | ({env[party]} if party in env else set())
     if not names:
+        names = party_declared.get(party, set())
+    if not names:
         out("FAIL", f"{label} at a computed ref, and nothing in {unit} declares which version of "
-                    f"{party} it is on -- no GitRepository pin under gitops/ and no "
-                    f"{party.upper()}_TAG in this workflow"); return
+                    f"{party} it is on -- no GitRepository pin under gitops/, no "
+                    f"{party.upper()}_TAG in this workflow and no {party} entry in its "
+                    f"party.yaml inherits[]"); return
     unsigned = sorted(n for n in names if n not in tags)
     if unsigned:
         out("FAIL", f"{label} at a computed ref, and {unit} pins {party} at "
@@ -214,6 +310,7 @@ def run(estate: str) -> None:
         out("FAIL", f"no unit under {estate}: absence is not a pass"); return
     for unit in units:
         declared = pinned_tags(os.path.join(estate, unit))
+        party_declared = party_pins(os.path.join(estate, unit))
         for wf in sorted(glob.glob(os.path.join(estate, unit, ".github", "workflows", "*.yml"))):
             try:
                 with open(wf) as fh:
@@ -225,8 +322,9 @@ def run(estate: str) -> None:
                 continue
             SEEN["workflows"] += 1
             env = env_tags(text)
-            for with_ in checkouts(doc):
-                grade(estate, unit, os.path.basename(wf), with_, declared, env)
+            for with_, matrix in checkouts(doc):
+                grade(estate, unit, os.path.basename(wf), with_, declared, env, party_declared,
+                      matrix)
     for k, n in SEEN.items():
         if not n:
             out("FAIL", f"no {k} observed under {estate}: absence is not a pass")
@@ -258,7 +356,13 @@ def selfcheck() -> None:
 
         ico = unit("ico", ["v3.0.0"])
         hub = unit("hub", [])
+        unit("nist", ["v1.1.0"])
         adopter = unit("driftwood", ["v1.1.0"])
+        # party.yaml is the THIRD declared shape, read only where gitops/ and the workflow env
+        # say nothing about that publisher -- the insurer's exposure edges, which its fetch.yml
+        # literally reads to build the ref.
+        open(os.path.join(adopter, "party.yaml"), "w").write(
+            "party: driftwood\ninherits:\n- {party: nist, kind: controls, version: v1.1.0}\n")
         os.makedirs(os.path.join(adopter, "gitops", "flux-system"))
         open(os.path.join(adopter, "gitops", "flux-system", "gotk-sync-ico.yaml"), "w").write(
             "apiVersion: source.toolkit.fluxcd.io/v1\nkind: GitRepository\n"
@@ -270,6 +374,16 @@ def selfcheck() -> None:
         def w(name, body):
             open(os.path.join(adopter, ".github", "workflows", name), "w").write(wf(body))
 
+        # A `repository:` that is ITSELF a workflow expression over the job's own matrix. Until
+        # 2026-09-04 (round 3) these matched nothing and returned before the counter moved: not a
+        # pass, not a refusal, invisible -- so moving such a checkout to a branch was free.
+        def wm(name, values, repo, ref):
+            open(os.path.join(adopter, ".github", "workflows", name), "w").write(
+                "name: x\non: push\njobs:\n  j:\n    strategy:\n      matrix:\n"
+                f"        p: [{', '.join(values)}]\n    steps:\n"
+                "      - uses: actions/checkout@v4\n        with:\n"
+                f"          repository: {repo}\n" + (f"          ref: {ref}\n" if ref else ""))
+
         w("a-pinned-expression.yml", step.format(
             p="ico", ref="          ref: ${{ steps.pins.outputs.ico_tag }}\n"))
         w("b-branch.yml", step.format(p="ico", ref="          ref: main\n"))
@@ -278,6 +392,15 @@ def selfcheck() -> None:
         w("e-untagged-publisher.yml", step.format(p="hub", ref="          ref: main\n"))
         w("f-own-repo.yml", step.format(p="driftwood", ref="          ref: main\n"))
         w("g-no-clone.yml", step.format(p="nowhere", ref="          ref: main\n"))
+        tmpl = "policy-as-versioned-${{ matrix.p }}/${{ matrix.p }}"
+        wm("j-matrix-branch.yml", ["ico"], tmpl, "main")
+        wm("k-matrix-tag.yml", ["ico"], tmpl, "v3.0.0")
+        wm("l-matrix-no-ref.yml", ["ico"], tmpl, None)
+        wm("m-matrix-expression-ref.yml", ["ico"], tmpl, "${{ steps.pins.outputs.t }}")
+        wm("n-unresolvable-repo.yml", ["ico"],
+           "policy-as-versioned-${{ steps.pick.outputs.party }}/x", "v3.0.0")
+        w("o-party-pin.yml", step.format(
+            p="nist", ref="          ref: ${{ steps.pins.outputs.nist_tag }}\n"))
 
         LINES.clear(); MSGS.clear()
         run(tmp)
@@ -288,11 +411,21 @@ def selfcheck() -> None:
                 by_file[m.group(1)] = line
         want = {"a-pinned-expression.yml": "PASS", "b-branch.yml": "FAIL", "c-no-ref.yml": "FAIL",
                 "d-literal-tag.yml": "PASS", "e-untagged-publisher.yml": "SKIP",
-                "g-no-clone.yml": "SKIP"}
+                "g-no-clone.yml": "SKIP",
+                # a templated `repository:` is expanded from the job's own matrix and graded
+                "j-matrix-branch.yml": "FAIL", "k-matrix-tag.yml": "PASS",
+                "l-matrix-no-ref.yml": "FAIL", "m-matrix-expression-ref.yml": "PASS",
+                # ... and one that no matrix resolves is a named could-not-look, never silence
+                "n-unresolvable-repo.yml": "SKIP",
+                # party.yaml declares the pin where nothing under gitops/ does
+                "o-party-pin.yml": "PASS"}
         for name, status in want.items():
             assert name in by_file, f"{name} was never graded: {MSGS}"
             assert by_file[name].startswith(status), f"{name}: {by_file[name]}"
         assert "f-own-repo.yml" not in by_file, "a repository's own checkout is not cross-org"
+        # Every planted cross-organisation checkout is COUNTED as well as graded: the round-3
+        # defect was one that was neither, so the counter is what proves nothing fell through.
+        assert SEEN["cross-org checkouts"] == len(want), (SEEN, sorted(by_file))
         assert "no `ref:`" in by_file["c-no-ref.yml"]
         assert "not a tag" in by_file["b-branch.yml"]
         assert "cut no tag at all" in by_file["e-untagged-publisher.yml"]
@@ -329,7 +462,10 @@ def selfcheck() -> None:
     LINES.clear(); MSGS.clear()
     print("ok  selfcheck: a computed ref backed by a pin and a literal tag pass; a branch, a "
           "missing ref, an undeclared computed ref and a pin naming an unsigned tag all refuse; "
-          "an untagged publisher, a missing clone and an empty estate are never a pass")
+          "an untagged publisher, a missing clone and an empty estate are never a pass; a "
+          "templated `repository:` is expanded from its job's matrix and graded like any other "
+          "-- a branch behind one still refuses -- and one no matrix decides is a named "
+          "could-not-look, counted, never silence")
 
 
 if __name__ == "__main__":

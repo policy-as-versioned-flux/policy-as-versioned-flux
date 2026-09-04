@@ -68,3 +68,15 @@ worse than two implementations of one rule.
 Point 4 also implies what ticket 62 landed: a subscription consumed at a BRANCH is not a pin at
 all. Every cross-organisation checkout in the eight units now names a tag one of the consuming
 repository's own `{tag, commit}` pin records declares, and `verify/branch-refs/` grades it.
+
+Corrected 2026-09-04 (round 3). "Every" was 51 of the 52 checkout lines. The 52nd was
+insurer/fetch.yml's `repository: policy-as-versioned-${{ matrix.adopter }}/${{ matrix.adopter }}`,
+whose organisation is a workflow expression: it matched nothing, was not counted, and was
+neither passed nor refused. `verify/branch-refs/` expands such a `repository:` from the job's own
+`strategy.matrix` and grades each expansion, so all 52 are graded; where no literal matrix
+decides the name, the checkout is counted and named as a could-not-look rather than passing in
+silence. The declaration a computed ref is checked against may also be the consuming
+repository's own `party.yaml` `inherits[]`, but only where nothing under `gitops/` and no
+`<PUBLISHER>_TAG` env constant names that publisher: most `inherits[]` versions are the feed
+MAJORs point 5 resolves and not git tags, and the insurer's `exposure` edges -- which its
+`fetch.yml` literally reads to build that ref -- are the case where they are.
