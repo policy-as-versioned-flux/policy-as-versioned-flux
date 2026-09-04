@@ -23,13 +23,15 @@ than silently narrowed.
 from __future__ import annotations
 
 import json
+import re
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Sequence
 
 import yaml
 
-from . import PACKAGE_DIR
+from . import PACKAGE_DIR, REPO_DIR
 from . import options as options_mod
 from .canon import digest_of
 
@@ -38,8 +40,27 @@ CATALOGUE_PATH = PACKAGE_DIR / "misuse-catalogue.yaml"
 # a different scope from CATALOGUE_PATH above (misuse of the twin's own governance/pricing/scoring
 # machinery), loaded through the same `load_catalogue()` below rather than a second loader.
 BEHAVIOURAL_CATALOGUE_PATH = PACKAGE_DIR / "behavioural-misuse-catalogue.yaml"
+# The eco-system misuse catalogue (eco-system ticket 19's resolution, built by ticket 44): misuse
+# BETWEEN the marketplace's parties — a publisher, a regulator, an adopter, a rival — rather than
+# of the twin or of the people it models. Same schema, same loader, third scope.
+ECOSYSTEM_CATALOGUE_PATH = PACKAGE_DIR / "ecosystem-misuse-catalogue.yaml"
+ALL_CATALOGUE_PATHS: tuple[Path, ...] = (CATALOGUE_PATH, BEHAVIOURAL_CATALOGUE_PATH, ECOSYSTEM_CATALOGUE_PATH)
+# The four rows ticket 19 named (re-grill 36). Asserted by name so a row cannot quietly vanish.
+ECOSYSTEM_ROW_IDS: tuple[str, ...] = (
+    "publisher-games-own-feed-price",
+    "regulator-data-mispriced-downstream",
+    "adopter-buys-intel-on-rival",
+    "twin-valuation-used-in-negotiation",
+)
+ECOSYSTEM_ISSUES_DIR = REPO_DIR / ".scratch" / "ecosystem" / "issues"
 REMOVAL_LOG_PATH = PACKAGE_DIR / "removal-log.jsonl"
 CATALOGUE_SCHEMA = "twin.misuse-catalogue/v1"
+
+# The gate's three outcomes, for one graded row (talk/verify-all.sh's contract, ticket 03).
+PASS, FAIL, COULD_NOT_LOOK = "pass", "fail", "could-not-look"
+# Ticket statuses that mean "built": the same leading-word rule twin/invariants/harness.py applies
+# to the twin's own build tickets, on `.scratch/ecosystem/issues/NN-*.md`'s `Status:` line.
+CLOSED_TICKET_STATUSES = frozenset({"done", "closed", "resolved", "complete", "completed"})
 
 
 class MisuseError(RuntimeError):
@@ -75,9 +96,138 @@ def load_catalogue(path: Path | None = None) -> dict[str, Any]:
     return doc
 
 
+def load_all_catalogues(paths: Sequence[Path] | None = None) -> list[tuple[Path, dict[str, Any]]]:
+    """Every catalogue, through the one loader, with one cross-file rule the per-file loader
+    cannot see: an id belongs to exactly one scope. Two catalogues naming the same id is how a
+    scope leaks — the behavioural table re-typed into the eco-system one, say — and a reader
+    citing "the catalogue entry" could then mean either."""
+    loaded: list[tuple[Path, dict[str, Any]]] = []
+    owner: dict[str, Path] = {}
+    for path in paths or ALL_CATALOGUE_PATHS:
+        doc = load_catalogue(path)
+        for entry in doc["entries"]:
+            eid = str(entry["id"])
+            if eid in owner:
+                raise MisuseError(f"entry {eid!r} declared in two catalogues: {owner[eid]} and {path}")
+            owner[eid] = path
+        loaded.append((path, doc))
+    return loaded
+
+
 def pin(path: Path | None = None) -> dict[str, Any]:
     doc = load_catalogue(path)
     return {"version": int(doc["version"]), "digest": digest_of(doc)}
+
+
+# -- grading an eco-system row against a checkout -------------------------------------------
+#
+# Ticket 19's default for the third catalogue: "every entry naming an estate mechanism by path or
+# a cage price". A twin-scoped row names an invariant `twin verify` runs, so its mechanism is
+# graded every time the suite runs. An eco-system row names estate code the twin never imports,
+# so the gate has to go and look. Each row therefore carries, beside the prose `mechanism`:
+#
+#   anchors:  ["<path>", "<path>::<token>", ...]  files that must exist (and contain the token),
+#             so "names a mechanism by path" is checked rather than read; a path starting with a
+#             unit name (ESTATE_UNITS) is `.estate-clone`-relative, any other is hub-relative;
+#   waits_on: [{ticket: "45", for: "..."}]        the cage price that is decided but not built,
+#             by the number of the ticket building it — graded could-not-look BY NAME while that
+#             ticket is open, and a FAIL once it is resolved and the row still says it waits.
+#
+# The second is the escape hatch, and it closes itself: a row cannot hide behind a ticket that
+# has shipped.
+
+
+@dataclass(frozen=True)
+class Grade:
+    outcome: str  # PASS, FAIL or COULD_NOT_LOOK
+    reason: str
+
+
+def ecosystem_ticket_status(number: str, issues_dir: Path | None = None) -> str | None:
+    """The `Status:` line of `.scratch/ecosystem/issues/<number>-*.md`, lower-cased; None when
+    no such ticket exists (which grades as a FAIL upstream, never as a quiet skip)."""
+    matches = sorted((issues_dir or ECOSYSTEM_ISSUES_DIR).glob(f"{number}-*.md"))
+    if not matches:
+        return None
+    found = re.search(r"^Status:\s*(.+)$", matches[0].read_text(encoding="utf-8"), re.M)
+    return found.group(1).strip().lower() if found else None
+
+
+def ticket_is_closed(status: str | None) -> bool:
+    return bool(status) and str(status).split()[0].strip(":;,.") in CLOSED_TICKET_STATUSES
+
+
+# The eight units an estate-relative anchor starts with. Any other first segment (twin/, docs/,
+# verify/) is hub-relative and is graded against the hub alone, so a typo in a hub anchor FAILs
+# even on a checkout with no clone assembled (CI; a fresh clone before clone-estate.sh). Without
+# this rule the grammar could not tell the two apart and excused a missing hub file as could-not-look.
+ESTATE_UNITS: frozenset[str] = frozenset(
+    {"platform", "ico", "nist", "driftwood", "tuppence", "ludlow", "feeds", "insurer"}
+)
+
+
+def _resolve_anchor(anchor: str, root: Path, estate: Path | None) -> str | None:
+    """None when the anchor resolves; otherwise why it did not. `path::token` requires the token
+    to appear in the file's text, so "composition.py exists" cannot stand in for "composition.py
+    still has PRICE_KINDS"."""
+    path_part, _, token = anchor.partition("::")
+    if path_part.split("/", 1)[0] in ESTATE_UNITS:
+        if estate is None:
+            return f"{path_part}: no estate clone to look in"
+        found = estate / path_part
+    else:
+        found = root / path_part
+    if not found.is_file():
+        return f"{path_part}: no such file"
+    if token and token not in found.read_text(encoding="utf-8", errors="replace"):
+        return f"{path_part}: does not mention {token!r}"
+    return None
+
+
+def grade_entry(
+    entry: dict[str, Any], *, root: Path, estate: Path | None,
+    ticket_status: Callable[[str], str | None],
+) -> Grade:
+    """Grade one eco-system row: PASS when every anchor resolves and nothing is waited on,
+    COULD_NOT_LOOK (by ticket number and what it builds) when the row waits on an open ticket,
+    FAIL when an anchor is missing, a waited-on ticket is resolved or unknown, or the row names
+    neither. Anchors are graded first: a waiting ticket excuses what is not built, never a path
+    that is claimed and absent. A FAIL always wins over could-not-look: an estate anchor that
+    cannot be looked at (no clone) does not shield a resolved or unknown waited-on ticket."""
+    eid = str(entry.get("id", "?"))
+    anchors = [str(a) for a in (entry.get("anchors") or [])]
+    waits = list(entry.get("waits_on") or [])
+    if not anchors and not waits:
+        return Grade(FAIL, f"{eid}: names neither a path nor the ticket that builds its price")
+
+    missing = [why for a in anchors for why in [_resolve_anchor(a, root, estate)] if why]
+    hard = [m for m in missing if "no estate clone" not in m]
+    if hard:
+        return Grade(FAIL, f"{eid}: " + "; ".join(hard))
+
+    open_waits, closed_waits, unknown_waits = [], [], []
+    for wait in waits:
+        number, purpose = str(wait.get("ticket", "")).strip(), str(wait.get("for", "")).strip()
+        status = ticket_status(number)
+        if status is None:
+            unknown_waits.append(number)
+        elif ticket_is_closed(status):
+            closed_waits.append(f"ticket {number} ({status})")
+        else:
+            open_waits.append(f"ticket {number} ({status}) for {purpose}")
+    if unknown_waits:
+        return Grade(FAIL, f"{eid}: waits on a ticket that does not exist: {', '.join(unknown_waits)}")
+    if closed_waits:
+        return Grade(
+            FAIL,
+            f"{eid}: still says it waits on {', '.join(closed_waits)}, which is resolved — name the "
+            "built mechanism by path",
+        )
+    if missing:
+        return Grade(COULD_NOT_LOOK, f"{eid}: " + "; ".join(missing + [f"waits on {w}" for w in open_waits]))
+    if open_waits:
+        return Grade(COULD_NOT_LOOK, f"{eid}: {len(anchors)} anchor(s) resolve; waits on " + "; ".join(open_waits))
+    return Grade(PASS, f"{eid}: {len(anchors)} anchor(s) resolve")
 
 
 # -- constraint-removal logging --------------------------------------------------------------

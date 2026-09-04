@@ -1,0 +1,132 @@
+# The eco-system misuse catalogue (eco-system ticket 19's resolution, re-grill 36; built by
+# ticket 44): the four named misuses BETWEEN the marketplace's parties, and what prices or cages
+# each.
+#
+# NOT `twin/misuse-catalogue.yaml` (misuse of the twin's own governance/pricing/scoring machinery,
+# and of the twin by its own operator) and NOT `behavioural-misuse-catalogue.yaml` (misuse of
+# people-sensing against the people an org's twin models). This file names a publisher, a
+# regulator, an adopter and a rival: parties the other two catalogues never mention. Same
+# schema, same `twin/misuse.py` `load_catalogue()`, third scope. Per-party rows in a `party.yaml`
+# were not the shape: a regulator mispricing an adopter is in nobody's file, so it is in the hub's.
+#
+# Each entry names a MECHANISM, not just a risk, the same discipline as the other two: a risk is a
+# sentence anyone could write; a mechanism is code, a cage price or a decision a reader can go and
+# check. Because these mechanisms are estate code the twin never imports, each row also carries
+# what the gate checks rather than reads:
+#
+#   anchors:  files that must exist, optionally with a `::token` the file must still contain --
+#             "names a mechanism by path", graded. A path whose first segment is a unit name
+#             (platform, ico, nist, driftwood, tuppence, ludlow, feeds, insurer) is
+#             `.estate-clone`-relative; any other is hub-relative and graded against the hub
+#             alone. Prefer an identifier as the token (a def, a constant, an id): a prose word
+#             would survive the mechanism being removed.
+#   waits_on: the part of the mechanism that is decided but not built, by the number of the
+#             ticket building it. `verify/misuse/verify-misuse.sh` grades such a row could-not-look
+#             BY NAME while that ticket is open, and FAILS it once the ticket is resolved and the
+#             row still says it waits (the escape hatch closes itself). So the integration step
+#             that merges ticket 45, 46 or 84 must, in the same step, re-anchor the row waiting on
+#             it by path, or this check goes red in the gate -- by design.
+#
+# Under NORTH-STAR's no-gate rule nothing here refuses, counts or denies: a misuse is priced and
+# caged, and the one refusal is a missing instrument (ADR-0020).
+#
+# Versioned: bump `version` in the same commit as any change to an entry below.
+schema: twin.misuse-catalogue/v1
+version: 2
+entries:
+  - id: publisher-games-own-feed-price
+    risk: >-
+      A publisher inflates or games its own feed's number (a larger real example, a wider triple,
+      a bump declared weaker than computed) so that every subscriber's price moves the way the
+      publisher wants, and nothing the subscriber holds pushes back.
+    mechanism: >-
+      Price and cage, never a register (ticket 19 item 1). Composition widens the adopter's triple
+      to the publisher-shipped `widen_to` when the publisher's reliability score -- a
+      `publisher-reliability` feed from a scorer party that publishes no scored feed -- falls
+      below the adopter's declared appetite, the ticket 07 stale-size pattern, until the adopter
+      re-pins or the score recovers. A release the publisher's own gate would block publishes at
+      a degraded tier (`policy/vX.Y.Z-quarantine.N`, ticket 18) and enters the adopter's prices[]
+      as a priced hole under the adopter's perspective. The adopter's £ reason to switch is the
+      switching cost composition computes (ticket 19 item 4). Today: platform/compose/
+      composition.py reserves `reliability` and `switching` in PRICE_KINDS and emits neither;
+      platform/computed-semver/gate.py sorts the degraded prerelease where semver puts it.
+    anchors:
+      - platform/compose/composition.py::PRICE_KINDS
+      - platform/computed-semver/gate.py::DEGRADED_TIER
+    waits_on:
+      - ticket: "45"
+        for: the switching price in prices[], the adopter's £ reason to switch
+      - ticket: "46"
+        for: the publisher-reliability feed and the scorer party whose score widens the triple
+    source: ticket 19 Q1/item 1 and item 4; ticket 18 item 1; ticket 24 item 3 (widen_to)
+
+  - id: regulator-data-mispriced-downstream
+    risk: >-
+      A regulator publishes a wrong or inflated example, cap or rate; every adopter that pins the
+      penalty schema prices its exposure from it, the regime is the only price for a declared
+      obligation, and un-pinning it is an instrument fault, so the adopter has no recourse.
+    mechanism: >-
+      Disclosure plus a priced hole (ticket 19 item 2); the regulator's number stays authoritative
+      for its own regime until the adopter re-pins. ico/schema/to_fair_scenario.py `lm_triple`:
+      lo = min(examples), mode = median, hi = max(cap, 1.2 × largest example, mode), so a single
+      inflated example lifts the ceiling and is visible as such; rate × turnover scales the triple
+      to the subscriber's own size (ticket 07), so a wrong rate is priced in proportion, not at
+      the cap. A pin behind a newer published version is priced by the existing EOL ramp
+      (platform/feeds/to_fair_scenario.py `eol_ramp`) from the newer version's publish date
+      (ticket 19 D5, ticket 13 item 5). The publisher's reliability score is disclosed in
+      prices[]. Un-pinning the sole price for a declared obligation refuses (ADR-0020): the
+      refusal is named in the evidence, never hidden.
+    anchors:
+      - ico/schema/to_fair_scenario.py::lm_triple
+      - ico/schema/to_fair_scenario.py::turnover
+      - platform/feeds/to_fair_scenario.py::eol_ramp
+      - docs/adr/0020-a-missing-instrument-refuses-a-missing-behaviour-is-priced.md
+    waits_on:
+      - ticket: "84"
+        for: the D5 formula applied to a pricing pin behind a newer version
+      - ticket: "46"
+        for: the reliability score disclosed on the prices[] entry
+    source: ticket 19 Q2/item 2 and D5; ticket 07 item 1; ticket 13 item 5
+
+  - id: adopter-buys-intel-on-rival
+    risk: >-
+      An adopter reads a rival's published holes, prices and forward-intel curve and acts on
+      them, or a broker sells that reading as intelligence.
+    mechanism: >-
+      No purchase exists: every org repo is public and an adopter's own signed numbers are one
+      `git clone` away by design (ticket 19 item 3), so there is nothing to sell and the ADR-0012
+      re-render and Rekor stay intact. A rival's reading is a price under the RIVAL's own
+      perspective: twin/pricing.py's rule (price = the perspective's declared valuation ×
+      propagated influence) never values an org from outside its own perspective. The adopter
+      prices the read itself, as a standing scenario under its own perspective
+      (`rival-reads-my-holes-2026`, ticket 11 item 4), emitted as a `source: twin` entry in its
+      own prices[]. Legibility is a priced behaviour on the adopter's own balance sheet, never a
+      private carve-out; sealed payloads are the recorded upgrade path for a real adopter.
+    anchors:
+      - twin/pricing.py::NO_VALUATION
+      - driftwood/twin/orgs/driftwood/scenarios/rival-reads-my-holes-2026.yaml
+      - driftwood/twin/signals.yaml::rival-reads-my-holes-2026
+    source: ticket 19 Q3/item 3; ticket 11 item 4; ADR-0012; ADR-0021
+
+  - id: twin-valuation-used-in-negotiation
+    risk: >-
+      A counterparty -- a publisher setting a price, an insurer quoting, an acquirer bargaining --
+      quotes the twin's valuation of an org back at it as if it were the org's own number, or sums
+      it with figures under another perspective.
+    mechanism: >-
+      The twin values only under its own perspective (twin/pricing.py): the number an org
+      publishes is the org's own, signed by role and never by person (twin/roles.yaml; the gitsign
+      tag), and a counterparty's figure about the org is that counterparty's perspective's price,
+      never the org's. No sum crosses perspectives or currencies: platform/compose/composition.py
+      `_sum_prices` is the ONE summing helper and platform/fair/fair.py `sum_prices` refuses a
+      mixed list by raising (ADR-0021). Nothing the twin emits carries a recommended action
+      (invariant `no_recommended_action_field`), so a valuation cannot be read as an instruction
+      to settle.
+    anchors:
+      - twin/pricing.py
+      - twin/roles.yaml
+      - platform/compose/composition.py::_sum_prices
+      - platform/fair/fair.py::sum_prices
+      - "docs/adr/0021-the-twin-emits-a-scenario-the-estate-selects-the-tier.md::Every price carries `perspective` and"
+      - twin/invariants/checks.py::no_recommended_action_field
+    source: ticket 19 Q3/item 3; ADR-0021; twin decision ticket 09
