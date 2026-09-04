@@ -280,3 +280,13 @@ Four minors from the same review, fixed:
 
 5. Optional: **a reason on ticket 58 Q5(b)**, if the owner wants the rule ratified in their own
    words rather than recorded as delegated. It changes nothing built.
+
+**Re-review, 2026-09-04 (the assistant, delegated).** Approved after one fix round; both blocking
+defects were reproduced red and then green by the re-reviewer on an estate of their own. Four
+residual limits are recorded, none reachable while every live pin is signed: `grade()` SKIPs an
+entry with no `pin_signature` key but FAILs one whose state is `unobserved`, which is what every
+adopter's CI composes until the nine workflow blocks get `fetch-tags: true`; the guard that admits
+`untagged` asks only that the checkout carry at least one tag, not the publisher's own namespace;
+the shell ignores a `--selfcheck` argument and runs the live check; and deleting the
+`pin_signature` key by hand turns a FAIL into a SKIP. The first is the one to close with the
+workflow change.
