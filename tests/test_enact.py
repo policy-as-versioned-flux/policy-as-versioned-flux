@@ -449,6 +449,124 @@ def test_a_git_dir_in_another_segment_does_not_move_the_push(tmp_path: Path) -> 
         assert enact_guard.decide("Bash", {"command": command}, str(work)) is not None, command
 
 
+def test_every_pushing_segment_is_resolved_not_only_the_first(tmp_path: Path) -> None:
+    """Re-review of 2026-09-04, blocking: the per-segment cut resolved only the FIRST segment
+    holding a `push`, so a self-push in front laundered an enactment push behind it -- and `main`
+    had denied every one of these. Each pushing segment is now resolved with its own target and
+    its own locus (the `cd`s and exports folded from the segments before it), and one enactment
+    target among them is a refusal."""
+    own = _consumer_checkout(tmp_path, "policy-as-versioned-flux", "policy-as-versioned-flux")
+    work = _consumer_checkout(tmp_path, "ludlow", "policy-as-versioned-ludlow")
+
+    # Control: two self-pushes are still two self-pushes.
+    twice = "git push origin main; git push origin main"
+    assert enact_guard.decide("Bash", {"command": twice}, str(own)) is None
+
+    behind_a_self_push = [
+        f"git push origin main; git -C {work} push origin main",
+        f"git push origin main && cd {work} && git push origin main",
+        f"echo 'git push origin main later'; git -C {work} push origin main",
+        f"git push origin main; git --git-dir={work / '.git'} push origin main",
+        f"git push origin main; GIT_DIR={work / '.git'} git push origin main",
+        "git push origin main; git push https://github.com/policy-as-versioned-nist/nist main",
+        f"git push origin main; export GIT_DIR={work / '.git'}; git push origin main",
+    ]
+    for command in behind_a_self_push:
+        assert enact_guard.decide("Bash", {"command": command}, str(own)) is not None, command
+
+
+def test_a_cd_that_would_fail_leaves_the_push_where_the_shell_stood(tmp_path: Path) -> None:
+    """`cd <absent>; git push origin main`: the shell's `cd` fails and the push runs where it
+    stood. Folded as if it had succeeded, the guard resolved in a directory that is no
+    repository, read nothing, and admitted. Both readings are taken now, and either naming an
+    enactment repository refuses."""
+    own = _consumer_checkout(tmp_path, "policy-as-versioned-flux", "policy-as-versioned-flux")
+    work = _consumer_checkout(tmp_path, "ludlow", "policy-as-versioned-ludlow")
+    absent = tmp_path / "does-not-exist"
+
+    command = f"cd {absent}; git push origin main"
+    assert enact_guard.decide("Bash", {"command": command}, str(work)) is not None
+    assert enact_guard.decide("Bash", {"command": command}, str(own)) is None
+    # A failing `cd` followed by a `-C` is still relative to where the shell stayed.
+    relative = f"cd {absent}; git -C ludlow push origin main"
+    assert enact_guard.decide("Bash", {"command": relative}, str(tmp_path)) is not None
+
+
+# -- the sibling shapes the re-review of 2026-09-04 listed -------------------------------------
+#
+# Four ways to move a push that the per-segment parse did not read. Each is the same class as
+# the family this ticket closes: a knob git honours that the guard did not hand to git.
+
+
+def test_a_config_env_that_redirects_the_remote_is_resolved(tmp_path: Path) -> None:
+    """`--config-env=<key>=<VAR>` is `-c <key>=$VAR` with the value taken from the environment;
+    the VAR is the assignment prefix on the same segment, an export before it, or the hook's
+    own environment (which the push inherits too)."""
+    own = _consumer_checkout(tmp_path, "policy-as-versioned-flux", "policy-as-versioned-flux")
+    nist = "https://github.com/policy-as-versioned-nist/nist"
+
+    for command in (
+        f"PUSHURL={nist} git --config-env=remote.origin.pushurl=PUSHURL push origin main",
+        f"PUSHURL={nist} git --config-env remote.origin.pushurl=PUSHURL push origin main",
+        f"export PUSHURL={nist}; git --config-env=remote.origin.pushurl=PUSHURL push origin main",
+    ):
+        assert enact_guard.decide("Bash", {"command": command}, str(own)) is not None, command
+
+
+def test_an_assignment_exported_by_name_in_a_later_segment_carries(tmp_path: Path) -> None:
+    """`GIT_DIR=<d>; export GIT_DIR; git push origin main`: the assignment is a shell variable
+    until the export names it, and from then on the push sees it."""
+    work = _consumer_checkout(tmp_path, "ludlow", "policy-as-versioned-ludlow")
+    caller = tmp_path / "caller"
+    caller.mkdir()
+
+    command = f"GIT_DIR={work / '.git'}; export GIT_DIR; git push origin main"
+    assert enact_guard.decide("Bash", {"command": command}, str(caller)) is not None
+    # Never exported, never carried (the shell does not carry it either).
+    unexported = f"GIT_DIR={work / '.git'}; git push origin main"
+    assert enact_guard.decide("Bash", {"command": unexported}, str(caller)) is None
+
+
+def test_a_push_with_no_target_reads_gits_own_push_default(tmp_path: Path) -> None:
+    """`git push` with no remote pushes where `branch.<b>.pushRemote`, `remote.pushDefault`
+    or `branch.<b>.remote` says, and only then `origin`. `-c` can set any of those."""
+    import subprocess
+
+    own = _consumer_checkout(tmp_path, "policy-as-versioned-flux", "policy-as-versioned-flux")
+    nist = "https://github.com/policy-as-versioned-nist/nist"
+    branch = subprocess.run(
+        ["git", "symbolic-ref", "--short", "HEAD"], cwd=own, capture_output=True, text=True,
+    ).stdout.strip()
+
+    assert enact_guard.decide("Bash", {"command": "git push"}, str(own)) is None
+    for command in (
+        f"git -c remote.x.url={nist} -c remote.pushdefault=x push",
+        f"git -c remote.x.url={nist} -c branch.{branch}.pushremote=x push",
+        f"git -c remote.x.url={nist} -c branch.{branch}.remote=x push",
+        f"git -c remote.x.url={nist} -c remote.pushdefault=x push --force",
+    ):
+        assert enact_guard.decide("Bash", {"command": command}, str(own)) is not None, command
+
+
+def test_a_script_handed_to_a_subshell_is_read_as_a_command(tmp_path: Path) -> None:
+    """`bash -c '<script>'` runs the script; the guard reads the script as a command of its own,
+    at the same cwd. The subshell's `cd` does not leak into the segments after it."""
+    own = _consumer_checkout(tmp_path, "policy-as-versioned-flux", "policy-as-versioned-flux")
+    work = _consumer_checkout(tmp_path, "ludlow", "policy-as-versioned-ludlow")
+
+    for command in (
+        f"bash -c 'cd {work} && git push origin main'",
+        f'sh -c "git -C {work} push origin main"',
+        f"bash -lc 'cd {work}; git push origin main'",
+        f"git status && zsh -c 'cd {work} && git push origin main'",
+    ):
+        assert enact_guard.decide("Bash", {"command": command}, str(own)) is not None, command
+    assert enact_guard.decide("Bash", {"command": f"bash -c 'cd {own}'; git push origin main"},
+                              str(work)) is not None
+    assert enact_guard.decide("Bash", {"command": f"bash -c 'cd {own} && git push origin main'"},
+                              str(work)) is None
+
+
 def test_an_exported_git_dir_carries_into_the_pushing_segment(tmp_path: Path) -> None:
     """`export GIT_DIR=<enactment>/.git; git push origin main` pushes to the enactment repository
     from wherever the shell stands, because the shell carries the export. So does a `cd` before

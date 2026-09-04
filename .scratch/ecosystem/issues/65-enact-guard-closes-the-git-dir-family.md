@@ -129,9 +129,71 @@ to the `git` word but their own option parsing is not modelled; a `GIT_DIR` that
 2026-09-03 (76 and 75 chars) exceed the brief's 72; history is not rewritten on a pushed branch,
 and the two 2026-09-04 lines are 69 and 62.
 
-Map line: 65 — enact_guard closes the `--git-dir`/`GIT_DIR` family (M17): locus read per
-shell segment, tilde and quotes as the shell reads them, `-c`/`GIT_*` handed to git, hook env
-read both ways; twelve tests red-then-green, graded by twin.yml pytest.
+**2026-09-04, review fixes round 2 (re-review of the same day, `request_changes`).** One guard
+commit, alone: `91b62dd`. Six more tests in `tests/test_enact.py`, red against the round-1 cut
+(6 failed, 55 passed) and green after (61 passed); `mypy twin/enact_guard.py` clean; `twin
+verify --only enactment_is_propose_only_at_both_layers` → 1 passed; fourteen hook end-to-end
+probes through `python twin/enact_guard.py` from the hub's own directory against the real
+`.estate-clone/ludlow` give the expected verdict, mismatches 0.
+
+Blocking, *only the first pushing segment was resolved.* The round-1 cut found the first segment
+matching `_PUSH` and stopped, so a self-push in front laundered an enactment push behind it:
+`git push origin main; git -C <ludlow> push origin main` from the hub was admitted, and so were
+`... && cd <ludlow> && git push origin main`, `echo 'git push origin main later'; git -C <ludlow>
+push origin main` and the ticket's own family `git push origin main; git --git-dir=<enactment>/.git
+push origin main`. The re-reviewer reports `main` denied them; its `_effective_cwd` searched the
+whole string for the first `-C` or a leading `cd`, so the `-C` and `cd` shapes were caught by
+the over-reach round 1 removed, and round 1 put nothing in its place. `_push_target`
+now walks every segment that matches `_PUSH`; each is resolved with its own target argument and
+its own loci through `_effective_loci(segments, index, cwd)`, with the `cd`s and exports folded
+from the segments before that index; one enactment target among them is the refusal. Test:
+`test_every_pushing_segment_is_resolved_not_only_the_first`, seven shapes, with the two-self-push
+control admitted.
+
+Minor, *a failing `cd` was folded as a success.* `cd <absent>; git push origin main` from an
+enactment checkout resolved in a directory that is no repository, read nothing, and admitted; the
+shell's `cd` fails and the push runs where it stood. A `cd` (or `-C`) to something that is not a
+directory now yields both loci, folded and unfolded, and either naming an enactment repository
+refuses. Test: `test_a_cd_that_would_fail_leaves_the_push_where_the_shell_stood`.
+
+The four sibling shapes the re-reviewer listed, each closed because each cost a few lines, all
+**delegated (ADR-0025)**:
+
+1. `PUSHURL=<url> git --config-env=remote.origin.pushurl=PUSHURL push origin main` — read as
+   `-c remote.origin.pushurl=<value>`, the value taken from the assignment prefix on the same
+   segment, an `export` before it, or the hook's own environment (which the push inherits). An
+   unset variable adds no config, as git would add none.
+2. `GIT_DIR=<enactment>/.git; export GIT_DIR; git push origin main` — a segment that is only
+   assignments is kept as shell variables; `export NAME` promotes one by name; only the exported
+   `GIT_*` reach the resolution's environment, as before. The unexported form stays uncarried.
+3. `git -c remote.x.url=<url> -c remote.pushdefault=x push` with no target — the target is no
+   longer assumed to be `origin`: `_default_remote` reads git's own order, `branch.<b>.pushRemote`,
+   `remote.pushDefault`, `branch.<b>.remote`, then `origin`, through the same locus. Observed with
+   git 2.55 on 2026-09-04: `git push x` honours a remote that exists only through `-c`, while
+   `git remote get-url x` says "No such remote", so `_remote_url` falls back to the config keys the
+   push reads (`remote.<x>.pushurl`, then `.url`) when `get-url` names nothing.
+4. `bash -c 'cd <enactment> && git push origin main'` — `_commands` lifts the quoted script of a
+   `bash|sh|zsh|dash -c` out and reads it as a command of its own at the same cwd; the outer
+   command is read with the subshell replaced by `true`, so the script's `cd` does not leak into
+   the segments after it. `bash -lc` and the like are matched (`-[A-Za-z]*c[A-Za-z]*`).
+
+Stated limits, the net's edge after round 2: a `cd` in the outer command before `bash -c '...'`
+is not folded into the script (the script is read at the caller's cwd; a `cd` inside it is);
+`bash -c "$SCRIPT"`, `eval`, a heredoc and a sourced file are invisible, as any `$VAR` is;
+`--config-env` reads a variable only from the prefix, an export, or the hook's environment;
+`branch.<b>.*` in the push default is read for the branch git reports at the locus, so a
+`git checkout` earlier in the same command is not modelled; a `cd` with a trailing `&&` after a
+failing target is still read both ways (the `&&` would have stopped the push, refusal direction);
+the round-1 limits (`GIT_CONFIG_*` inherited unscrubbed, `env -u`, `;` inside quotes, wrappers
+unmodelled) stand. Observed live this round while probing, pre-existing and in the safe
+direction: `git -C .estate-clone/ludlow remote get-url --push origin` is refused by the hub's
+checked-in hook because `_PUSH`'s `\bpush\b` matches the `--push` flag; a read-only command
+refused, not a push admitted, so left as it is.
+
+Map line: 65 — enact_guard closes the `--git-dir`/`GIT_DIR` family (M17): every pushing segment
+resolved at its own locus, tilde and quotes as the shell reads them, `-c`/`--config-env`/`GIT_*`
+handed to git, push default read from git, `bash -c` scripts read, hook env read both ways;
+eighteen tests red-then-green, graded by twin.yml pytest.
 
 ## Waits on the owner
 
