@@ -240,3 +240,36 @@ The rule to say out loud: **a green that could not look is a red.** SKIP is
 not a soft pass — the check never ran. Read `pass=` in the TRUTH line as the
 only count of things actually observed true; an offline run's `skip=` proves
 nothing either way.
+
+### What the number is made of
+
+A bare `pass=57 fail=7 skip=18 total=84` cannot tell a loosely coupled
+eco-system from one party testing itself, so the line carries its own
+composition (ticket 83):
+
+```text
+pass=P [observed=a self=b simulated=c meta=d] fail=F skip=S [never=x waits=y]
+  excluded=E total=T ceiling=C
+```
+
+- **observed** — the verdict turned on another party's artefact or on live
+  state outside the script's own repository. This is the number that says the
+  eco-system is loosely coupled rather than self-graded.
+- **self** — a party grading its own code, fixtures or artefacts. Using
+  another party's schema or engine as the *ruler* is still self-proof.
+- **simulated** — the material was synthetic or throwaway, and the script says
+  so in its own verdict.
+- **meta** — the script grades other checks or the record, not the estate.
+- **never / waits** — every could-not-look is declared in advance in
+  `talk/verify-manifest.txt`: `never` is one the runner cannot do as it is
+  built (no cluster, no cross-org credential), `waits` is one the estate's own
+  state has not reached yet. A skip for a reason the manifest does not declare
+  is a **FAIL**, not a shrug, and so is a script the manifest does not place.
+- **ceiling** — `total − excluded − never`: how many of the scripts could ever
+  pass on that runner. `pass=` against `ceiling=`, not against `total=`, is
+  the honest fraction.
+
+The manifest is the record of what each script measures, one line per script;
+`verify/truth-line/verify-truth-line.sh` grades it on every run, and
+`talk/build_deck.py` reads the split off the line so the deck cannot quote a
+composition the run did not carry.

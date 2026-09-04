@@ -52,6 +52,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
 
+# The split and the ceiling are read off the quoted line, never re-derived here: one counter,
+# in talk/truth_manifest.py, for the gate and the deck alike (eco-system ticket 83). Imported by
+# path because talk/ is not a package and this file is run as a script from anywhere.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from truth_manifest import measured                                          # noqa: E402
+
 # The gate's grade word, keyed by the prefix its scripts put on their last line.
 WORD = {"PASS": "observed true", "SKIP": "could not look", "FAIL": "observed false"}
 
@@ -361,7 +367,12 @@ def _render(narr, name, scheduled, tail, capdir, built):
                f"a scheduled run recorded {when} at hub `{hub}`. Each beat quotes that run's "
                "capture for its own check, and carries the grade that capture gave.", "",
                "the run this deck describes, as the truth surface recorded it in `talk/truth.log`:", "",
-               "```text", tail, "```", ""]
+               "```text", tail, "```", "",
+               # The bare count cannot tell a loosely coupled eco-system from one party testing
+               # itself, so the deck says what the passes rest on and how many of the scripts
+               # could ever pass on that runner. Computed from the quoted line, so the deck
+               # cannot state a split the line does not carry (eco-system ticket 83).
+               measured(tail), ""]
     else:
         md += [f"built {built} during run **{run}** "
                f"({'a scheduled CI run' if scheduled else 'a local run, not the scheduled one'}) · hub `{hub}`. "
@@ -415,6 +426,11 @@ def _body(sl):
                      and not l.startswith("#")
                      and not l.strip().startswith("```") and not l.startswith("$ ")
                      and not l.strip().startswith("TRUTH ")
+                     # `measured: ...` is the quoted TRUTH line read back through
+                     # truth_manifest.measured(); check() requires it to equal that line's own
+                     # split and ceiling exactly, which is a stronger rule than the figure
+                     # check, and its figures come from the line, not from a presenter.
+                     and not l.strip().startswith("measured: ")
                      # markdown image directives: `![w:900](path)` is layout, not a figure
                      and not l.strip().startswith("!["))
 
@@ -487,6 +503,12 @@ def check(path, root=ROOT):
                 if quoted != [line]:
                     bad.append(f"the quoted TRUTH line is not the line that recorded run {n}, the run "
                                "this deck describes: a number from another run is not this deck's number")
+                elif measured(line) not in md:
+                    # Ticket 83: quoting the bare count is the thing the manifest exists to stop.
+                    # The sentence is computed from the quoted line, so a deck that states a
+                    # split the line does not carry, or states none at all, is caught here.
+                    bad.append("the deck quotes the TRUTH line but not what it measured; the "
+                               f"line's own split and ceiling read: {measured(line)}")
                 sha = run_commit(n, root)
                 if sha is None:
                     raise CouldNotLook(named_run_reason(line))
@@ -621,6 +643,14 @@ def selfcheck():
     assert deck_name("x\n<!-- deck run=22 hub=ccccccc source=recorded -->\ny") == {
         "run": "22", "hub": "ccccccc", "source": "recorded"}
     assert deck_name("no marker") == {}
+
+    # what the line measured (ticket 83): the sentence comes from the line, and its figures are
+    # outside the figure check because check() pins them to the line exactly
+    split = ("TRUTH 2026-09-05T00:00Z run=25 hub=ddddddd units=[] pass=2 [observed=1 self=1 "
+             "simulated=0 meta=0] fail=0 skip=1 [never=1 waits=0] excluded=0 total=3 ceiling=2")
+    assert "observed 1 + self 1" in measured(split) and "ceiling of 2 of 3" in measured(split)
+    assert "carries no split" in measured(tl[2])
+    assert figures(_body("measured: " + measured(split))) == []
     print("selfcheck ok")
 
 
