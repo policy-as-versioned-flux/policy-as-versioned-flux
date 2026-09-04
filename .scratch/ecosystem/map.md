@@ -78,6 +78,8 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 - [83 — The TRUTH line says what it measured](issues/83-the-truth-line-says-what-it-measured.md) — The TRUTH line carries the split by class and the ceiling; an undeclared could-not-look
 - [90 — Identity is shelved for this build](issues/90-identity-is-shelved-for-this-build.md) — Identity is shelved and the record says so — §1 claims the artefact half, principle 6
 - [63 — The unlabelled default flips to isolated](issues/63-the-unlabelled-default-flips-to-isolated.md) — the unlabelled default is `isolated` in graded and in the new 5.0.0 line; the check that
+- [56 — The citable run can see whether the clocks ran](issues/56-the-citable-run-can-see-whether-the-clocks-ran.md) — truth.yml's `clocks` job holds `actions: read` and hands the gate a facts-only clock verdict file, so "did each clock run inside its period" grades on the citable run with no credential in the job that runs eight orgs' scripts; a cancelled run is no longer excused, and the three D2 SKIPs become PASSes with a named limit.
+- [85 — Every clock is green, or red for an estate reason](issues/85-every-clock-is-green-or-red-for-an-estate-reason.md) — the two unowned red clocks are fixed at the source (feeds' cage read the `__pycache__` its own python wrote; nist's reader globbed a feed envelope at a controls catalogue and wrote null every day), the fix is shared verbatim with insurer and nist, and every red clock now names the open ticket that owns it in the gate's own output.
 
 ### Built 2026-08-29 — the thin slice runs, and the gate is green
 
