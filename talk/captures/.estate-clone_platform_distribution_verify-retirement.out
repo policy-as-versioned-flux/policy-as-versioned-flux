@@ -1,1 +1,6 @@
-SKIP: distribution/versions.yaml declares one version (4.0.0), so a retirement would leave an empty allow-list, which render-orphan-guard.py refuses to render; the beat needs a second declared version to show one retiring while the other keeps running
+[1;36m==>[0m 1. before retirement: a pod on 4.0.0 is admitted (version is declared)
+[1;36m==>[0m 2. retire 4.0.0 from the array (one deletion) and re-render
+[1;36m==>[0m 3. after retirement: the same pod is now DENIED (orphaned by the shrunk array)
+[1;36m==>[0m    (live: dropping the array element prunes Kustomization policy-v4-0-0)
+SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — retiring a version (one array deletion) prunes it and denies stragglers

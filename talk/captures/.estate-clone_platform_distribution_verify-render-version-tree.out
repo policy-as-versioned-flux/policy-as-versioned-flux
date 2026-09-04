@@ -2,7 +2,7 @@
 selfcheck ok: 8 mandatory members rendered for a named version; versioned names/labels/self-scope; cage-tier names its own PriorityClasses; live path == offline twin; re-rendering an identical tree is a no-op; re-rendering over a DIFFERING released file refused; authoring copies untouched
 [1;36m==>[0m 2. offline: two rendered versions' cage-tier copies coexist -- each judges only its own claim
 [1;36m==>[0m 3. offline: every tree's cage-tier dial agrees with that tree's own PriorityClasses
-  ok   8 (tree, rung) dial entries match their own PriorityClass value and preemptionPolicy
+  ok   12 (tree, rung) dial entries match their own PriorityClass value and preemptionPolicy
 PASS: every mandatory member renders with a versioned name, the policy-version label, a
       matchConditions self-scope (never objectSelector); cage-tier names its own
       PriorityClasses and agrees with their value and preemptionPolicy; and two rendered

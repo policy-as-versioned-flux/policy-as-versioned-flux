@@ -1,4 +1,8 @@
+[1;36m==>[0m 0. selfcheck: the array reader and the fixture reader bite
+ok   selfcheck: cut/uncut partition, and the fixture's loaded versions read off its own policies list so drift onto retired trees is visible
 [1;36m==>[0m 1. offline: both versions self-scope + admit side by side (kyverno test)
+[1;36m==>[0m 1b. offline: the matrix's subjects are exactly the DECLARED array (4.0.0 5.0.0)
+[1;36m==>[0m    the fixture and the array agree
 [1;36m==>[0m 2. offline: the orphan-guard allow-list is exactly the version array (no drift)
-SKIP (live tail): distribution/versions.yaml declares one version (4.0.0); coexistence needs two declared versions to show side by side, and retirement left one -- there is no second version for this beat to prove against
-SKIP: offline proof holds; live tail could not look: distribution/versions.yaml declares one version (4.0.0); coexistence needs two declared versions to show side by side, and retirement left one -- there is no second version for this beat to prove against — two signed versions coexist; each judges only what claims it
+SKIP (live tail): distribution/versions.yaml declares [4.0.0 5.0.0] but only [4.0.0] has been cut (uncut, no signed tag yet: 5.0.0); coexistence needs two RELEASED versions to show side by side, and there is no second one on any cluster to prove against
+SKIP: offline proof holds; live tail could not look: distribution/versions.yaml declares [4.0.0 5.0.0] but only [4.0.0] has been cut (uncut, no signed tag yet: 5.0.0); coexistence needs two RELEASED versions to show side by side, and there is no second one on any cluster to prove against — two signed versions coexist; each judges only what claims it

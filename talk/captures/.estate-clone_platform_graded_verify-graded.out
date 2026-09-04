@@ -1,3 +1,5 @@
+[1;36m==>[0m 0. selfcheck: the cut/uncut partition and the installed-cage count bite
+ok   selfcheck: cut/uncut partition; installed cages read off the CLUSTER, not the array, so two live cages skip the tail, one lets it speak, and a cut version with no cage still fails by name
 [1;36m==>[0m 1. offline: the £ engine — the whole ladder, £ picks the tier, floor clamps, TCoR booked
 ok  tiers ['baseline', 'restricted', 'quarantine', 'isolated'] | £ picks: band40k->baseline band20k->restricted band5k->quarantine band1k->isolated | scenario £33073: driftwood->baseline (TCoR £23651), ludlow->quarantine (TCoR £8646) | legacy-till (warn) -> baseline cage, OSCAL risk open £14952 -> observation resolves
 [1;36m==>[0m 2. offline: the NAMESPACE declares the tier; a governed ns with no tier falls closed to isolated; a forged pod label is clobbered; a declared 'true' survives

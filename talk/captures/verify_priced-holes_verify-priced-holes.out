@@ -1,8 +1,6 @@
-FAIL: composition.py still emits ['baseline-widening', 'new-hole', 'new-ungoverned-namespace'] — a new hole, a widened baseline and a new ungoverned namespace are priced deltas, never refusals (ticket 38, ADR-0020)
-FAIL: composition.py builds no deltas[] — the refusals were deleted with nothing priced in their place
-FAIL: composition.py carries no ungoverned ramp reusing the feeds module's eol_ramp
-FAIL: overlay.controls description does not admit the `party:id` form a bespoke control needs (ticket 38)
+PASS: composition.py emits none of new-hole, baseline-widening, new-ungoverned-namespace
+PASS: party schema.json admits overlay.controls as bare ids and `party:id`, and says an addition is priced, never refused
 SKIP: driftwood: composed/evidence.json carries no deltas[] — it was composed under the refusal shape; re-composing an adopter is an enactment push the owner makes
 SKIP: ludlow: composed/evidence.json carries no deltas[] — it was composed under the refusal shape; re-composing an adopter is an enactment push the owner makes
 SKIP: tuppence: composed/evidence.json carries no deltas[] — it was composed under the refusal shape; re-composing an adopter is an enactment push the owner makes
-FAIL: 4 priced-holes check(s) observed false
+SKIP: driftwood: composed/evidence.json carries no deltas[] — it was composed under the refusal shape; re-composing an adopter is an enactment push the owner makes

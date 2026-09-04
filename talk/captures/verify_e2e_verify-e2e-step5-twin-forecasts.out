@@ -6,5 +6,7 @@ E2E step 5 twin forecasts
   ok  driftwood/twin/signals.yaml (the pin -> standing-scenario table)
   ok  twin/feed_signal.py (the pinned-feed-version -> dated-signal lookup)
   ok  verify/twin-evals/verify-twin-evals.sh (the twin's evals graded by the gate)
+  ok  driftwood/verify-twin-overlay.sh: PASS: driftwood's twin emits one forward-intel feed from its own overlay, labelled and unpicked
+  ok  driftwood/twin/verify-twin-scenarios.sh: PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
   ok  the twin's own evals scored the artefacts: PASS: 7 harness-mechanism metrics (the label twin/evolution_judge.py declares for the corpus behind these scores, and the one this run asserted the harness spent; harness-mechanism means each heuristic is scored against the corpus it was fitted on, so the number grades the harness, not the twin's judgement -- a held-out corpus is not built yet), exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal
-FAIL: step 5 is false where the adopter's own checks are: driftwood/verify-twin-overlay.sh observed false: FAIL: 1 twin-overlay check(s) observed false
+SKIP: the twin's artefacts are present and driftwood's own checks did not all look [ticket 72 supplies the dated observations/twin-sweep.jsonl firing]: driftwood/twin/verify-twin-sweep-moved.sh could not look: SKIP: the moved path has not fired live yet: no observations/twin-sweep.jsonl exists yet (the step is proven offline above; the live firing is the half only the clock can supply, once the overlay or a pin moves under it)

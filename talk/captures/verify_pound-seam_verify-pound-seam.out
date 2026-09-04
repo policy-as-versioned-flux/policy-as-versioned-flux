@@ -15,7 +15,7 @@ PASS: a date the fx feed does not publish (2025-08-15) refuses as a missing inst
 PASS: driftwood: one twin edge, policy 1.0.0, curve sha256:70e5e, tail bounded-pert, perspective driftwood in GBP
 PASS: driftwood regime entry (penalty-schema): 4 priced hole(s) sum to its total 1,787,177.08 GBP
 PASS: driftwood: every list of amounts in the document is one perspective in one currency
-PASS: driftwood: selection policy 1.0.0 matches driftwood/selection-policy/VERSION
+FAIL: driftwood: names selection policy ['1.0.0'], but driftwood/selection-policy/VERSION says '1.1.0'
 PASS: ludlow: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
 PASS: ludlow regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP
 PASS: ludlow: every list of amounts in the document is one perspective in one currency
@@ -24,4 +24,4 @@ PASS: tuppence: publishes no forward-intel feed yet, so no twin entry is expecte
 PASS: tuppence regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP
 PASS: tuppence: every list of amounts in the document is one perspective in one currency
 PASS: tuppence: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
-PASS: every price names its perspective, currency, source and per-customer share; no sum crosses either; and wherever a party publishes both a selection-policy package and composed evidence, the two selection engines agree
+FAIL: 1 £-seam check(s) observed false

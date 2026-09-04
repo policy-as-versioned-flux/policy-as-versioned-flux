@@ -51,7 +51,7 @@ ok  DEGRADED proved for real: declared minor < computed major, real v2.0.0 prede
 B1. a policy tag with no real tree yet is refused cleanly (release_integrity, no kyverno needed) -- no commit, no tag
 REFUSED policy/v9.0.0: re-render check refused: the tree being cut for 9.0.0 does not match ticket 12's renderer output, in ['priorityclasses.yaml (missing)', 'cage-tier.yaml (missing)', 'cage-netpol.yaml (missing)', 'stamp-posture.yaml (missing)', 'posture-trust-boundary.yaml (missing)'] -- the tree being cut is regenerated and diffed, never hand-edited
 GATE: refused -- no commit, no tag. Signed evidence uploaded as a run artifact.
-signed: /tmp/tmp.4qy7UefGe1/clone/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.GqEBF0VDTx/clone/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -64,18 +64,18 @@ B2. a bare platform tag (no policy/ prefix) is not this gate's subject -- skippe
 ok  B2: platform's own tag skipped outright, no evidence, no error
 
 B3. a real, legal, first-release (empty predecessor window) policy tag passes end to end -- gate, then TWO real commits BEFORE a real tag
-signed: /tmp/tmp.4qy7UefGe1/clone/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.GqEBF0VDTx/clone/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
 | --- | --- | --- | --- | --- |
-| `policy/v9.0.0` | major | none | passed | declared bump 'major' is stronger than the computed bump 'none' (window: 4.0.0) -- no movement required it |
+| `policy/v9.0.0` | major | major | passed |  |
 
 GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
 GATE: passed for policy/v9.0.0
-  B3 computed bump against the real tag history: none | basis: distribution/policies/v4.0.0
+  B3 computed bump against the real tag history: major | basis: distribution/policies/v4.0.0
 committed: signed release-gate evidence for policy/v9.0.0
-committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 0611d5a232feb68a879e4afa70bf3a4123aeff20
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 3d125c5c3baf27baaef38c8c03ac47edd7bf65bb
 tagged policy/v9.0.0
 ok  B3: gate passed for real; evidence committed (A), then versions.yaml's commit field corrected to A in a second commit (B); the tag resolves to B, and versions.yaml's commit field for 9.0.0 equals A -- B's direct parent, one commit behind the tag, on purpose
 
@@ -86,7 +86,7 @@ gate_one()'s old_for_corpus picked max(old_window) -- the highest version ANYWHE
 array, unrelated -- instead of the real, lower predecessor. (Named versions were pinned here
 until 2026-08-29, when the array's real contents changed under it and the guard failed on its
 own premise rather than on the bug it guards; the shape is the premise, not the numbers.)
-SKIP (part C): cs-16's cut-in-the-middle shape needs at least three declared versions and distribution/versions.yaml declares ['4.0.0']; there is no middle to cut, so the backport comparison-basis regression cannot be exercised against the real array today
+SKIP (part C): cs-16's cut-in-the-middle shape needs at least three declared versions and distribution/versions.yaml declares ['4.0.0', '5.0.0']; there is no middle to cut, so the backport comparison-basis regression cannot be exercised against the real array today
 
 == Part D: ticket 43 -- the DECLARED bump (versions.yaml's array element) and the degraded publish's wiring ==
 D1. an array element whose declared bump disagrees with the number the tag steps is REFUSED
@@ -94,7 +94,7 @@ D1. an array element whose declared bump disagrees with the number the tag steps
     could never disagree with itself. No commit, no tag.
 REFUSED policy/v9.0.0: the release declares bump 'minor' but version 9.0.0 steps 'major' from base 4.0.0 -- the declared bump and the declared number disagree, and the gate has no rule for choosing one
 GATE: refused -- no commit, no tag. Signed evidence uploaded as a run artifact.
-signed: /tmp/tmp.4qy7UefGe1/clone-d/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.GqEBF0VDTx/clone-d/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -111,7 +111,7 @@ D3. a DEGRADED publish: the tag gains a prerelease suffix, the evidence is filed
     number actually published, and versions.yaml's element gains tier: quarantine
 DEGRADED policy/v9.0.0: declared bump 'minor' is weaker than the computed bump 'major' (window: 8.0.0) -- cage-tier.yaml: (stubbed classification). Published DEGRADED at tier 'quarantine' with a prerelease suffix on the declared number; the adopter prices the tier, nothing is refused
          publishing as policy/v9.0.0-quarantine.1 (tier quarantine), array element carries tier: quarantine
-signed: /tmp/tmp.4qy7UefGe1/clone-d/computed-semver/evidence/9.0.0-quarantine.1.json.bundle
+signed: /tmp/tmp.GqEBF0VDTx/clone-d/computed-semver/evidence/9.0.0-quarantine.1.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -121,8 +121,8 @@ signed: /tmp/tmp.4qy7UefGe1/clone-d/computed-semver/evidence/9.0.0-quarantine.1.
 GATE: cut-release.yml must cut policy/v9.0.0-quarantine.1 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
 GATE: passed for policy/v9.0.0-quarantine.1 (some DEGRADED -- see above)
 ok  the gate rewrote the TAG (suffix only, base number untouched) and filed the evidence under it
-committed: versions.yaml array element(s) for policy/v9.0.0-quarantine.1 now point at evidence commit b10c722dd5f7346414079046eb8dd4c511684b1b
-ok  the array element is now {'version': '9.0.0', 'tag': 'policy/v9.0.0-quarantine.1', 'commit': 'b10c722dd5f7346414079046eb8dd4c511684b1b', 'bump': 'major', 'tier': 'quarantine'}
+committed: versions.yaml array element(s) for policy/v9.0.0-quarantine.1 now point at evidence commit 4568d222aa92525f86462f10030354965e7fea92
+ok  the array element is now {'version': '9.0.0', 'tag': 'policy/v9.0.0-quarantine.1', 'commit': '4568d222aa92525f86462f10030354965e7fea92', 'bump': 'major', 'tier': 'quarantine'}
 ok  D3: a degraded publish carries the suffix on the tag, the evidence names the computed
     bump it failed to reach, and the array element carries tier: quarantine -- a signed fact
     the ADOPTER prices (18 Answer 2), never a floor the publisher sets in someone else's repo

@@ -28,5 +28,21 @@ OK no-match:  https://evil.com/https://github.com/policy-as-versioned-driftwood/
 OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main.evil.com
 OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/maint/1.0.x
 OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/release/x.y.x
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/propose-tier.yml@refs/heads/main
 
 PASS: EXPECTED_IDENTITY_REGEXP matches main + release/<major>.<minor>.x only, anchored to this repo.
+
+== 3. EXPECTED_PROPOSAL_IDENTITY_REGEXP (propose-tier.yml -- the cage-tier proposal commit, ticket 78) ==
+regexp under test: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/propose-tier\.yml@refs/heads/main$
+OK match:     https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/propose-tier.yml@refs/heads/main
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/twin-sweep.yml@refs/heads/main
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/propose-tier.yml@refs/heads/release/1.0.x
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/propose-tier.yml@refs/heads/wargamer/retune-tier-driftwood-cage-tier-feeds-feed
+OK no-match:  https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/propose-tier.yml@refs/heads/main
+OK no-match:  https://github.com/policy-as-versioned-driftwood/other-repo/.github/workflows/propose-tier.yml@refs/heads/main
+OK no-match:  https://evil.com/https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/propose-tier.yml@refs/heads/main
+OK no-match:  https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/propose-tier.yml@refs/heads/main.evil.com
+OK no-match:  https://githubXcom/policy-as-versioned-driftwood/driftwood/.github/workflows/propose-tier.yml@refs/heads/main
+
+PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.

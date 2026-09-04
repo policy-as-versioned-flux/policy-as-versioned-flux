@@ -1,3 +1,4 @@
+  ok   selfcheck: with kyverno unreachable this script exits 3 and its last line is SKIP:
 -- pooled kyverno apply is not the admission verdict --
    pooled exit code across all 3 policies: 1 (FAIL)
    real admission outcome (Audit never refuses): admitted

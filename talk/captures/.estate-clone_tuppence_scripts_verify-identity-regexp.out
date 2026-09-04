@@ -7,6 +7,7 @@ ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.git
 ok    rejected:    https://githubXcom/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main
 ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/maint/1.0.x
 ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/release/1.0.x-rc1
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/propose-tier.yml@refs/heads/main
 OK: EXPECTED_IDENTITY_REGEXP anchors org, repo and workflow path; allows only main or release/<major>.<minor>.x
 
 == EVIDENCE_EXPECTED_IDENTITY_REGEXP (shift-left.yml -- verifies PLATFORM's evidence, cs-28) ==
@@ -22,3 +23,16 @@ ok    rejected:    https://githubXcom/policy-as-versioned-platform/platform/.git
 ok    rejected:    https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/maint/1.0.x
 OK: EVIDENCE_EXPECTED_IDENTITY_REGEXP anchors platform's org/repo/workflow path, distinct from
     tuppence's own identity above, and a workflow rename genuinely breaks the match
+
+== EXPECTED_PROPOSAL_IDENTITY_REGEXP (propose-tier.yml -- the cage-tier proposal commit, ticket 78) ==
+ok    matches:     https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/propose-tier.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/propose-tier.yml@refs/heads/release/1.0.x
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/propose-tier.yml@refs/heads/wargamer/retune-tier-tuppence-cage-tier-feeds-feed
+ok    rejected:    https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/propose-tier.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/evil-repo/.github/workflows/propose-tier.yml@refs/heads/main
+ok    rejected:    https://evil.com/https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/propose-tier.yml@refs/heads/main
+ok    rejected:    https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/propose-tier.yml@refs/heads/main.evil.com
+ok    rejected:    https://githubXcom/policy-as-versioned-tuppence/tuppence/.github/workflows/propose-tier.yml@refs/heads/main
+OK: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main;
+    the release and proposal identities do not overlap in either direction

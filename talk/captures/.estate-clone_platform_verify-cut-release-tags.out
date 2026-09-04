@@ -2,7 +2,7 @@
 == 1. single-tag legacy form still works ==
 ok: v1.0.0 does not exist yet
 tagged v1.0.0
-To /tmp/tmp.urKU0FHEj0/remote.git
+To /tmp/tmp.EmSvnA8srR/remote.git
  * [new tag]         v1.0.0 -> v1.0.0
 ok: v1.0.0 pushed
 
@@ -11,11 +11,11 @@ ok: v1.0.1 does not exist yet
 ok: v2.0.0 does not exist yet
 tagged v1.0.1
 tagged v2.0.0
-To /tmp/tmp.urKU0FHEj0/remote.git
-   36b74ba..93192bd  HEAD -> main
+To /tmp/tmp.EmSvnA8srR/remote.git
+   3f094a8..83fd1d6  HEAD -> main
  * [new tag]         v1.0.1 -> v1.0.1
  * [new tag]         v2.0.0 -> v2.0.0
-ok: v1.0.1 and v2.0.0 both landed on the same commit (93192bdd795d92d8e97a60043da71a5287d8fad3)
+ok: v1.0.1 and v2.0.0 both landed on the same commit (83fd1d606b0477d7186ffe1517d016822af8b844)
 
 == 3. existing-tag refusal fires for EVERY tag before ANY tag is created ==
 ok: v3.0.0 does not exist yet
@@ -36,6 +36,18 @@ ok: every case/slash/whitespace variant of a policy tag refused before any tag w
 ok: 4.0.0 < 4.0.1-quarantine.1 < 4.0.1-quarantine.2 < 4.0.1
 ok: policy/v4.0.1-quarantine.1 accepted and ordered below policy/v4.0.1; a suffix on the platform's own line refused
 
+== 8. ticket 53: the branch lands with the tags, in the same atomic push -- or neither does ==
+ok: v10.0.0 does not exist yet
+tagged v10.0.0
+To /tmp/tmp.EmSvnA8srR/remote.git
+   83fd1d6..c83bd6b  HEAD -> main
+ * [new tag]         v10.0.0 -> v10.0.0
+ok: refs/heads/main on the remote moved to c83bd6bc02bf883a51a9f3022e33eb6dd82992f7, the same commit v10.0.0 points at
+tagged v11.0.0
+tagged v12.0.0
+ok: rejected push moved neither the tags nor refs/heads/main (still c83bd6bc02bf883a51a9f3022e33eb6dd82992f7)
+ok: a detached HEAD is refused; the remote holds neither v11.0.0 nor a moved refs/heads/main (still c83bd6bc02bf883a51a9f3022e33eb6dd82992f7)
+
 PASS: single-tag legacy form works, multi-tag dispatch cuts every tag
 on the same commit, the existing-tag refusal runs for every tag before
 any tag is created, a failed atomic push leaves nothing on the
@@ -43,4 +55,6 @@ remote, and a mis-shaped policy tag (wrong case, stray slash or
 whitespace) is refused at normalize time -- it can never reach
 cut-release-gate.py's skip branch and get pushed ungated; and a degraded
 publish's prerelease tag (ticket 43) normalizes cleanly and sorts BELOW
-the clean number through the one shared parser.
+the clean number through the one shared parser; and the branch carrying
+the signed evidence lands in the same atomic push as the tags, or not at
+all (ticket 53).

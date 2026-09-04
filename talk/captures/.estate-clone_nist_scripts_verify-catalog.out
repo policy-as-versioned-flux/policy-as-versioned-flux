@@ -15,6 +15,7 @@ OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workf
 OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/maint/1.0
 OK (rejects):     evil.com/https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/main
 OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/cut-release.yml@refs/heads/main.evil.com
+OK (rejects):     https://github.com/policy-as-versioned-nist/nist/.github/workflows/propose-tier.yml@refs/heads/main
 OK: EXPECTED_IDENTITY_REGEXP anchors org/repo/workflow and allows only main + release/<major>.<minor>.x
 ==> dry-run: publish.sh seeds + tags cleanly
 ==> party.yaml: parses, every publishes[] path exists, catalog/{rule,bump}.yaml beside it (ticket 21, ADR-0019)

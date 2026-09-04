@@ -19,6 +19,7 @@ Pod manifest at computed-semver/corpus/witnesses/real/<name>.yaml for each
 and this gate picks it up automatically -- no code change needed.
 ==========================================================================
 
+  ok   selfcheck: with kyverno unreachable this script exits 3 and its last line is SKIP:
 == 5. the require-nonroot 'satisfied' probe passes real admission (regression guard for _CONTAINER_BOOL_RE) ==
 ok  the require-nonroot satisfied probe pod passes real admission under kyverno
 
