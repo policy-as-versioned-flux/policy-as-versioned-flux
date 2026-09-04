@@ -15,6 +15,7 @@ import datetime as dt
 import importlib.util
 import json
 import os
+import re
 import sys
 
 import pytest
@@ -35,6 +36,15 @@ def _load():
 sch = _load()
 
 
+@pytest.fixture(autouse=True)
+def _no_ambient_workflow_run(monkeypatch):
+    """These are pure tests and they also run inside Actions, where GITHUB_RUN_ID is set for
+    real. A verdict file is bound to the run that wrote it, so an ambient run id would change
+    what the unbound fixtures below assert. Every test that cares sets its own."""
+    monkeypatch.delenv("GITHUB_RUN_ID", raising=False)
+    monkeypatch.delenv("GITHUB_REPOSITORY", raising=False)
+
+
 def _write(tmp_path, *, collected_ago_hours=0.05, schema=None, units=None):
     when = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=collected_ago_hours)
     doc = {"schema": schema or sch.VERDICT_SCHEMA,
@@ -51,10 +61,14 @@ def _unit(**workflows):
                       "workflows": workflows}}
 
 
-def _run(hours_ago, conclusion):
+def _run(hours_ago, conclusion, *, database_id=None, status=None):
     when = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=hours_ago)
-    return {"createdAt": when.isoformat(timespec="seconds").replace("+00:00", "Z"),
-            "conclusion": conclusion}
+    run = {"createdAt": when.isoformat(timespec="seconds").replace("+00:00", "Z"),
+           "conclusion": conclusion,
+           "status": status or ("completed" if conclusion else "in_progress")}
+    if database_id is not None:
+        run["databaseId"] = database_id
+    return run
 
 
 def _timed(run):
@@ -128,6 +142,116 @@ def test_only_failure_is_excused_for_the_clock_that_re_raises_the_gates_verdict(
     assert sch.RED_GATE_EXITS_NONZERO.get("truth.yml") == "failure"
     for not_a_tick in ("cancelled", "timed_out", "startup_failure", "in_progress", None):
         assert sch.RED_GATE_EXITS_NONZERO.get("truth.yml") != not_a_tick
+
+
+# --- a run never grades ITSELF, and a run in flight has concluded nothing (ticket 56, round 2) --
+# `gh run list --event schedule --limit 1` carries no status filter, so on a SCHEDULED truth.yml
+# run the newest scheduled run of truth.yml IS the run doing the grading: conclusion "", status
+# in_progress. With `failure` the only excused conclusion, that graded FAIL "in_progress" on every
+# scheduled run for ever, blamed ticket 85 for it, and no estate fix could clear it. The same
+# false red hits any clock whose newest scheduled run happens to be in flight when the collector
+# looks.
+def test_the_grading_run_never_grades_itself():
+    runs = [_run(0, "", database_id=99), _run(24, "success", database_id=98)]
+    assert sch.newest_gradable(runs, "99")["databaseId"] == 98
+
+
+def test_the_newest_completed_run_is_preferred_over_one_still_in_flight():
+    runs = [_run(0, "", database_id=99), _run(24, "success", database_id=98)]
+    assert sch.newest_gradable(runs, None)["databaseId"] == 98
+
+
+def test_an_in_flight_run_with_nothing_completed_behind_it_is_still_returned():
+    only = sch.newest_gradable([_run(0, "", database_id=99)], None)
+    assert only is not None and not only.get("conclusion")
+
+
+def test_no_scheduled_run_at_all_is_still_none():
+    assert sch.newest_gradable([], None) is None
+    assert sch.newest_gradable([_run(0, "", database_id=99)], "99") is None
+
+
+NOW = dt.datetime.now(dt.timezone.utc)
+
+
+def test_a_run_still_in_flight_is_a_named_skip_and_never_a_fail():
+    status, message = sch.run_line("hub", "truth.yml", _run(0, ""), NOW, " (ticket 85 owns it)")
+    assert status == "SKIP", message
+    assert "in_progress" in message and "concluded nothing" in message
+    assert "ticket 85" not in message, "a could-not-look must not blame a ticket for a red"
+
+
+def test_a_finished_run_still_grades_exactly_as_before():
+    assert sch.run_line("feeds", "fetch.yml", _run(6, "success"), NOW)[0] == "PASS"
+    assert sch.run_line("feeds", "fetch.yml", _run(6, "failure"), NOW)[0] == "FAIL"
+    assert sch.run_line("hub", "truth.yml", _run(6, "failure"), NOW)[0] == "PASS"
+    assert sch.run_line("hub", "truth.yml", _run(6, "cancelled"), NOW)[0] == "FAIL"
+    assert sch.run_line("feeds", "fetch.yml",
+                        _run(sch.PERIOD_HOURS + 5, "success"), NOW)[0] == "FAIL"
+
+
+# --- the verdict file is bound to the run and the repository that wrote it (ticket 56, round 2) -
+def _bound(tmp_path, **overrides):
+    doc = {"schema": sch.VERDICT_SCHEMA,
+           "collected_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+           "collector": "tests", "run_id": "1234", "repository": "org/hub",
+           "units": _unit(**{"fetch.yml": _timed(_run(6, "success"))})}
+    doc.update(overrides)
+    path = tmp_path / "bound.json"
+    path.write_text(json.dumps(doc))
+    return str(path)
+
+
+def test_a_verdict_file_from_this_run_and_this_repository_is_accepted(tmp_path, monkeypatch):
+    monkeypatch.setenv("GITHUB_RUN_ID", "1234")
+    monkeypatch.setenv("GITHUB_REPOSITORY", "org/hub")
+    assert sch.Verdict(_bound(tmp_path)).live
+
+
+@pytest.mark.parametrize("overrides, expected", [
+    ({"run_id": "999"}, "run 999"),
+    ({"repository": "org/somewhere-else"}, "org/somewhere-else"),
+    ({"run_id": ""}, "(none)"),
+])
+def test_a_verdict_file_from_another_run_or_repository_is_refused(tmp_path, monkeypatch,
+                                                                  overrides, expected):
+    monkeypatch.setenv("GITHUB_RUN_ID", "1234")
+    monkeypatch.setenv("GITHUB_REPOSITORY", "org/hub")
+    with pytest.raises(ValueError, match="not this run"):
+        sch.Verdict(_bound(tmp_path, **overrides))
+    with pytest.raises(ValueError, match=re.escape(expected)):
+        sch.Verdict(_bound(tmp_path, **overrides))
+
+
+def test_an_unbound_verdict_file_is_refused_inside_a_workflow_run(tmp_path, monkeypatch):
+    monkeypatch.setenv("GITHUB_RUN_ID", "1234")
+    monkeypatch.setenv("GITHUB_REPOSITORY", "org/hub")
+    path = _write(tmp_path, units=_unit(**{"fetch.yml": _timed(_run(6, "success"))}))
+    with pytest.raises(ValueError, match="not this run"):
+        sch.Verdict(path)
+
+
+def test_a_forged_verdict_file_does_not_reach_for_gh(tmp_path, monkeypatch):
+    monkeypatch.setenv("GITHUB_RUN_ID", "1234")
+    monkeypatch.setenv("GITHUB_REPOSITORY", "org/hub")
+    monkeypatch.setenv("CLOCK_VERDICT", _bound(tmp_path, run_id="999"))
+    monkeypatch.setattr(sch, "_gh", lambda *a: pytest.fail("the gate must not call gh"))
+    source = sch.observer()
+    assert not source.live and "does not fall back" in source.unreachable
+
+
+def test_outside_a_workflow_run_there_is_nothing_to_bind_to(tmp_path, monkeypatch):
+    monkeypatch.delenv("GITHUB_RUN_ID", raising=False)
+    monkeypatch.delenv("GITHUB_REPOSITORY", raising=False)
+    assert sch.Verdict(_bound(tmp_path, run_id="", repository="")).live
+
+
+def test_the_collector_stamps_the_run_and_the_repository(monkeypatch):
+    monkeypatch.setenv("GITHUB_RUN_ID", "4321")
+    monkeypatch.setenv("GITHUB_REPOSITORY", "org/hub")
+    monkeypatch.setattr(sch, "units", lambda: [])
+    doc = sch.collect()
+    assert doc["run_id"] == "4321" and doc["repository"] == "org/hub"
 
 
 # --- a red clock names the open ticket that owns it (ticket 85) --------------------------------

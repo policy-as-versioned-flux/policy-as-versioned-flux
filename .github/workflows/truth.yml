@@ -76,7 +76,7 @@ jobs:
   # The gate below runs 84 verify scripts cloned unpinned off eight other organisations' default
   # branches and deliberately holds no GitHub credential, so its live half -- "did each clock run
   # inside its own period" -- SKIPped on every citable run since it was written. The estate could
-  # not see whether a single clock had ticked, and five of thirteen were red.
+  # not see whether a single clock had ticked, and six of the thirteen were red.
   #
   # This job is the credentialled half, kept apart from the untrusted half rather than merged
   # into it: `actions: read` and `contents: read`, no third-party code, no `run:` that executes
@@ -117,8 +117,15 @@ jobs:
     # The gate waits for the clocks so it can grade them, and runs even when the collector could
     # not: a missing artifact is a could-not-look verify-schedules.sh names, never a red gate and
     # never a silent green.
+    #
+    # `!cancelled()`, not `always()` (2026-09-04, round 2). `always()` includes CANCELLED, so a
+    # cancelled run still ran the gate, recorded a TRUTH line and pushed it through the cage --
+    # while `run_line` grades a cancelled run of this same workflow as a clock that recorded no
+    # observation. The workflow and the checker have to tell one story. `!cancelled()` still
+    # covers the case this guard exists for, which is the clocks job failing or being skipped.
+    # The `${{ }}` is required: a bare `!` starts a YAML tag.
     needs: clocks
-    if: always()
+    if: ${{ !cancelled() }}
     steps:
       # persist-credentials: false, like twin.yml's six jobs. talk/verify-all.sh runs
       # every verify*.sh from eight other orgs' repos, cloned unpinned off their default

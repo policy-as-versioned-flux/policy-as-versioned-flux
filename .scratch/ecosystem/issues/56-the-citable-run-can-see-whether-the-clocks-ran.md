@@ -86,9 +86,15 @@ holds the same seam under pytest (16 tests).
    `git pull --rebase --autostash` is already written for exactly that contention.
 7. *`units()` finds a unit by `os.path.exists(root/.git)`, not `isdir`.* In a git worktree `.git`
    is a file, and the build brief has every builder edit a unit inside a nested worktree -- under
-   which this checker silently graded eight clocks instead of thirteen and reported no
-   could-not-look for the five it dropped. A checker that can be blinded by how its input was
-   checked out is not a checker.
+   which this checker silently graded **ten** clocks instead of thirteen and reported no
+   could-not-look for the **three** it dropped. A checker that can be blinded by how its input
+   was checked out is not a checker.
+
+   (Counted again 2026-09-04, round 2: the first write of this decision said "eight instead of
+   thirteen ... the five it dropped" and neither number reproduces. Three units are symlinked at
+   nested worktrees in this build -- feeds, insurer, nist -- so `.git` is a file in exactly
+   three, and each of those carries one clock: `fetch.yml`. Ten graded, three dropped. The defect
+   and the fix are unchanged; only the size of the hole was wrong.)
 8. *SS-07's write half is not taken here, and is recorded rather than done quietly.* The cage
    step's `GH_TOKEN` is still handed to a step in the job the gate ran in. Moving the
    commit-and-push to a third job means handing the whole tree between runners with
@@ -110,6 +116,55 @@ those clocks tick green, which is the point of the ticket: the surface can now s
 Ticket 28's over-claiming done-line carries its correcting note, dated 2026-09-04. ADR-0024
 carries the read-credential leg and the three smaller corrections.
 
+### Round 2, 2026-09-04 — the checker was grading itself
+
+Review found one blocking defect and four smaller ones. All fixed on this branch; every call below
+is **delegated** (ADR-0025).
+
+**Blocking: the newest scheduled run of `truth.yml` was this run.** `last_run` asked
+`gh run list --event schedule --limit 1` with no status filter, and on a scheduled `truth.yml` run
+the newest scheduled run of `truth.yml` is the run doing the grading: `conclusion` "", `status`
+`in_progress`. Round 1 narrowed the excuse to exactly `failure`, so the two together gave
+`FAIL: hub/truth.yml: last scheduled run 0h ago concluded 'in_progress'` on **every scheduled run
+for ever**, blaming ticket 85 for it, and no fix in any estate repository could clear it. The same
+false red hits any clock whose newest scheduled run happens to be in flight when the collector
+looks. Reproduced before the fix: a verdict file in which every clock is green and `hub/truth.yml`
+is the in-flight self-run graded FAIL.
+
+Fixed at both ends, and the seam made pure so the fix is testable without a network:
+`newest_gradable(runs, this_run_id)` drops the run doing the grading by `databaseId`
+(`GITHUB_RUN_ID`), then prefers the newest **completed** run over a newer one still in flight
+(`--limit 10`, and `databaseId` added to the `--json` fields). `run_line(unit, workflow, run, now,
+owns)` — the old inline grading block, lifted out whole — grades an unfinished run as a **named
+SKIP** and never a FAIL: a run in flight has concluded nothing, so it is a could-not-look, and the
+SKIP line carries no owner clause because a could-not-look must not blame a ticket. Six new tests
+in `tests/test_schedules_clock.py`, written red first, plus the same fixtures in `selfcheck`.
+
+1. **The verdict file was bound to nothing.** No run id, no repository, no sha, and its only
+   freshness was its own `collected_at`. Proved: rewriting every conclusion in it to `success`
+   gave 0 FAIL and 50 PASS. `collect()` now stamps `run_id` and `repository` from the GitHub
+   context, and `binding_fault(doc, env)` refuses a file whose run id or repository is not the run
+   reading it — the reader falls back to Offline with the reason, never to a credential. Recorded
+   plainly, because it matters: this **narrows the window, it does not close a trust boundary**.
+   The gate job runs 84 unpinned third-party scripts over the whole workspace and one of them
+   could rewrite `schedules.py` itself, verdict check included. What it stops is the cheap
+   version — a stale, stray or hand-written `clocks.json` on the `CLOCK_VERDICT` path being graded
+   from as if it were this run's own observation. Outside Actions (`GITHUB_RUN_ID` unset) there is
+   nothing to bind to and the check says so rather than pretending.
+2. **Decision 7's numbers did not reproduce**; corrected in place above (ten graded, three
+   dropped, three symlinked worktrees carrying one clock each).
+3. **`truth.yml`'s gate job was `if: always()`**, which includes cancelled — so a cancelled run
+   still ran the gate, recorded a TRUTH line and pushed it through the cage, while round 1's own
+   new rule grades a cancelled run of that same workflow as recording no observation. Now
+   `if: ${{ !cancelled() }}` (the `${{ }}` is required; a bare `!` starts a YAML tag), which still
+   covers the case the guard exists for: the clocks job failing or being skipped.
+4. **The count of red clocks disagreed with itself.** ADR-0024's note and ticket 28's correction
+   said "five of thirteen" where the same day's run says six. Both now say six and name them; the
+   2026-09-02 review's five is left as the review's own dated reading, with the reason for the
+   difference (`hub/truth.yml` had not yet had its cancelled run) written where the counts are.
+5. **Ticket 85's "waits on the owner"** still asked the owner to push the three unit branches;
+   they were already pushed. Corrected there with who pushed, when, and the SHAs.
+
 Map line: Ticket 56 -- truth.yml's `clocks` job holds `actions: read` and hands the gate a facts-only clock verdict file, so "did each clock run inside its period" grades on the citable run with no credential in the job that runs eight orgs' scripts; a cancelled run is no longer excused, and the three D2 SKIPs become PASSes with a named limit.
 
 ## Waits on the owner
@@ -117,7 +172,9 @@ Map line: Ticket 56 -- truth.yml's `clocks` job holds `actions: read` and hands 
 1. **The first citable grade.** It is observed only when `truth.yml` next fires on its cron
    (47 5 UTC) or the owner dispatches it. An agent must not fake a TRUTH line. The evidence to
    look for on that run: the skip count drops by the clock lines, and `verify-schedules.sh` grades
-   FAIL naming the six red clocks rather than SKIP.
+   FAIL naming the red clocks rather than SKIP. After round 2 that run must **not** name
+   `hub/truth.yml` for being `in_progress`: it grades the newest run that is neither this one nor
+   still in flight, so the expected list is the reds that are really red on the day.
 2. **Whether `github.token` really reads the eight foreign orgs' runs from inside Actions.** It
    does from a local token; the collector degrades to a per-organisation named SKIP if it does
    not. Only a real run settles it. No secret needs minting unless it turns out otherwise, and

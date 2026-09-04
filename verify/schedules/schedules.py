@@ -40,8 +40,9 @@ the newest scheduled run) into a JSON file. That file is an OBSERVATION -- dates
 cron strings -- and carries no verdict and no credential. The gate job takes it as an artifact
 and this file grades from it with `CLOCK_VERDICT` set, holding nothing a verify script could
 steal. Precedence: `CLOCK_VERDICT` if set, else `gh` if authenticated, else offline. A verdict
-file that is missing, malformed or stale is a could-not-look that says so by name -- never a
-silent fall back to a credential the gate is not supposed to have.
+file that is missing, malformed, stale, or written by a different run or repository (round 2:
+`binding_fault`) is a could-not-look that says so by name -- never a silent fall back to a
+credential the gate is not supposed to have.
 
 Not graded here, on purpose (2026-09-03, ticket 92): the LOCAL clock, `talk/local-clock.sh`,
 the third clock ADR-0024 point 6 adds. It is a launchd job on the owner's machine, not a
@@ -103,6 +104,12 @@ PERIOD_HOURS = 48
 # cancelled run is a clock that did not tick. The excuse is now the exact conclusion the exit is
 # documented for and nothing else.
 RED_GATE_EXITS_NONZERO = {"truth.yml": "failure"}
+
+# How many scheduled runs of a clock the collector reads before deciding which one it may grade.
+# One was too few: the newest scheduled run of `truth.yml`, seen from a scheduled run of
+# `truth.yml`, is the run doing the looking (`newest_gradable`). Ten is deep enough to look past
+# this run and past a second one still in flight without paging the API.
+RUN_SCAN_LIMIT = 10
 
 # The clock verdict file (ticket 56). Written by `clocks`, read by `check` when CLOCK_VERDICT
 # names it. Facts only: no verdict, no credential.
@@ -552,12 +559,39 @@ def landed_hours_ago(unit: str, workflow: str) -> float | None:
         return None
 
 
+def newest_gradable(runs: list[dict], this_run_id: str | None) -> dict | None:
+    """The newest scheduled run this process may grade -- never the run doing the grading.
+
+    `gh run list --event schedule --limit 1` carries no status filter, and the run that reads it
+    is itself a scheduled run of the workflow it is reading. So on every SCHEDULED truth.yml run
+    the newest scheduled run of `truth.yml` was THIS run: `conclusion` "", `status`
+    `in_progress`. With the excused conclusion narrowed to exactly `failure` (round 1 of this
+    ticket), that graded `FAIL: hub/truth.yml: last scheduled run 0h ago concluded 'in_progress'`
+    on every scheduled run for ever, named ticket 85 as its owner, and no fix in any estate
+    repository could ever clear it -- a checker grading its own liveness by looking at itself.
+
+    Two things, therefore. The run doing the grading is dropped by `databaseId` (GITHUB_RUN_ID is
+    the run's `databaseId`; in Actions it is always set, and locally there is no self to drop).
+    Then the newest COMPLETED run wins over a newer one still in flight: a run that has not
+    finished has concluded nothing, and the last thing this clock actually did is the reading.
+    Only when the window holds no completed run at all is an in-flight one returned, and
+    `run_line` names it as a could-not-look rather than grading it.
+    """
+    others = [r for r in runs
+              if not this_run_id or str(r.get("databaseId") or "") != str(this_run_id)]
+    completed = [r for r in others if r.get("conclusion")]
+    if completed:
+        return completed[0]
+    return others[0] if others else None
+
+
 def last_run(remote: str, workflow: str) -> dict | None:
+    # RUN_SCAN_LIMIT, not 1: the window has to be deep enough to hold a completed run behind this
+    # run and behind any other still in flight. `databaseId` is what makes "not myself" decidable.
     raw = _gh("run", "list", "--repo", remote, "--workflow", workflow,
-              "--event", "schedule", "--limit", "1",
-              "--json", "createdAt,conclusion,status")
-    runs = json.loads(raw or "[]")
-    return runs[0] if runs else None
+              "--event", "schedule", "--limit", str(RUN_SCAN_LIMIT),
+              "--json", "createdAt,conclusion,status,databaseId")
+    return newest_gradable(json.loads(raw or "[]"), os.environ.get("GITHUB_RUN_ID"))
 
 
 def remote_crons(remote: str, workflow: str) -> tuple[str, list[str]]:
@@ -627,6 +661,36 @@ class Gh(Offline):
         return last_run(remote, workflow)
 
 
+def binding_fault(doc: dict, env: dict) -> str:
+    """Why this run may not grade from this verdict file, or "" when it may.
+
+    Round 1 of ticket 56 bound the file to NOTHING: no run id, no repository, no sha, and its
+    only freshness was its own `collected_at`. A well-formed file with every conclusion rewritten
+    to "success" turned every red green and the gate said PASS (proved on this branch: 0 FAIL,
+    50 PASS). The file now carries the run and the repository that wrote it, from the GitHub
+    context, and a reader inside a workflow run refuses any file not written by that same run.
+
+    This NARROWS the window; it does not close a trust boundary. The gate job runs 84 verify
+    scripts from eight other organisations in the same job, as root over the whole workspace, and
+    one of them could rewrite `schedules.py` itself -- or the verdict file and this check with
+    it. What it stops is the cheap version: a stray, stale or hand-written clocks.json on the
+    path `CLOCK_VERDICT` names being graded from as if it were this run's own observation.
+    Outside a workflow run (`GITHUB_RUN_ID` unset) there is no run to bind to and the check does
+    not pretend otherwise: local grading is only as trustworthy as the local checkout.
+    """
+    run_id = str(env.get("GITHUB_RUN_ID") or "")
+    if not run_id:
+        return ""
+    if str(doc.get("run_id") or "") != run_id:
+        return (f"it was written by run {doc.get('run_id') or '(none)'} and this is run "
+                f"{run_id} -- not this run's observation")
+    repository = str(env.get("GITHUB_REPOSITORY") or "")
+    if repository and str(doc.get("repository") or "") != repository:
+        return (f"it was written in {doc.get('repository') or '(none)'} and this is "
+                f"{repository} -- not this run's observation")
+    return ""
+
+
 class Verdict(Offline):
     """The facts a credentialled step already observed, read out of a JSON file.
 
@@ -645,6 +709,9 @@ class Verdict(Offline):
             doc = json.load(fh)
         if not isinstance(doc, dict) or doc.get("schema") != VERDICT_SCHEMA:
             raise ValueError(f"not a {VERDICT_SCHEMA} document")
+        fault = binding_fault(doc, dict(os.environ))
+        if fault:
+            raise ValueError(fault)
         collected = dt.datetime.fromisoformat(doc["collected_at"])
         self.age_hours = (dt.datetime.now(collected.tzinfo) - collected).total_seconds() / 3600
         if self.age_hours > VERDICT_MAX_AGE_HOURS:
@@ -764,6 +831,48 @@ def owners_faults(owned: dict[str, dict], clocks_seen: set[str]) -> list[str]:
 
 
 # --- the check ----------------------------------------------------------------
+def run_line(unit: str, workflow: str, run: dict, now: dt.datetime,
+             owns: str = "") -> tuple[str, str]:
+    """Grade ONE scheduled run: (status, sentence). Pure -- a dict, a clock and the time.
+
+    Age first, then the run's OUTCOME. A run that dies in checkout, in the gitsign install or in
+    the cage step records nothing and used to read as a healthy clock (live, 2026-08-28:
+    "hub/truth.yml: last scheduled run 2h ago (failure)" graded PASS). truth.yml is the one
+    documented exception: it ends `exit 1` whenever the gate is red, which is its normal state,
+    and its observation lands before that.
+
+    ponytail: the exception is by workflow name; the stronger check is to read the newest line of
+    the lane itself (talk/truth.log, observations/<feed>.jsonl) off the remote and date it -- do
+    that when a second clock needs an exception.
+    """
+    age = (now - dt.datetime.fromisoformat(
+        run["createdAt"].replace("Z", "+00:00"))).total_seconds() / 3600
+    # In flight FIRST, and a SKIP: a run that has not finished has concluded nothing, so there is
+    # nothing to grade. Grading it as a red said "concluded 'in_progress'" -- a sentence that
+    # blames a ticket for the clock still being at work (round 2 of ticket 56). `newest_gradable`
+    # already prefers a completed run behind it, so reaching here means the window held none.
+    if not run.get("conclusion"):
+        return ("SKIP", f"{unit}/{workflow}: the newest scheduled run started {age:.0f}h ago and "
+                        f"is still {run.get('status') or 'unfinished'} -- a run in flight has "
+                        f"concluded nothing, and no completed scheduled run sits behind it in "
+                        f"the last {RUN_SCAN_LIMIT}, so this clock is not observed either way")
+    if age > PERIOD_HOURS:
+        return ("FAIL", f"{unit}/{workflow}: last scheduled run was {age:.0f}h ago, past "
+                        f"the {PERIOD_HOURS}h window (a daily period plus a day of slack "
+                        f"for GitHub's own scheduling delay) -- the clock has stopped" + owns)
+    conclusion = run["conclusion"]
+    excused = RED_GATE_EXITS_NONZERO.get(workflow)
+    if conclusion == "success":
+        return ("PASS", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago (success)")
+    if conclusion == excused:
+        return ("PASS", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago "
+                        f"({conclusion}), which is this clock's documented exit -- it records "
+                        f"its observation and then re-raises the gate's own red verdict")
+    return ("FAIL", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago concluded "
+                    f"{conclusion!r} -- a clock whose run dies or is cancelled records no "
+                    f"observation" + owns)
+
+
 def check(offline: bool = False) -> int:
     source = observer(offline)
     live = source.live
@@ -896,35 +1005,7 @@ def check(offline: bool = False) -> int:
                                ", and how long it has been there could not be read, so the "
                                "strict reading stands") + owns)
                 continue
-            age = (now - dt.datetime.fromisoformat(
-                run["createdAt"].replace("Z", "+00:00"))).total_seconds() / 3600
-            if age > PERIOD_HOURS:
-                out("FAIL", f"{unit}/{workflow}: last scheduled run was {age:.0f}h ago, past "
-                            f"the {PERIOD_HOURS}h window (a daily period plus a day of slack "
-                            f"for GitHub's own scheduling delay) -- the clock has stopped" + owns)
-                continue
-            # The run's OUTCOME, not only its age. A run that dies in checkout,
-            # in the gitsign install or in the cage step records nothing and used
-            # to read as a healthy clock (live, 2026-08-28: "hub/truth.yml: last
-            # scheduled run 2h ago (failure)" graded PASS). truth.yml is the one
-            # documented exception: it ends `exit 1` whenever the gate is red,
-            # which is its normal state, and its observation lands before that.
-            # ponytail: the exception is by workflow name; the stronger check is
-            # to read the newest line of the lane itself (talk/truth.log,
-            # observations/<feed>.jsonl) off the remote and date it -- do that
-            # when a second clock needs an exception.
-            conclusion = run.get("conclusion") or run.get("status")
-            excused = RED_GATE_EXITS_NONZERO.get(workflow)
-            if conclusion == "success":
-                out("PASS", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago (success)")
-            elif conclusion == excused:
-                out("PASS", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago "
-                            f"({conclusion}), which is this clock's documented exit -- it records "
-                            f"its observation and then re-raises the gate's own red verdict")
-            else:
-                out("FAIL", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago concluded "
-                            f"{conclusion!r} -- a clock whose run dies, is cancelled or is still "
-                            f"unfinished records no observation" + owns)
+            out(*run_line(unit, workflow, run, now, owns))
 
     for fault in owners_faults(owned, clocks_seen):
         out("FAIL", fault)
@@ -949,6 +1030,10 @@ def collect() -> dict:
         "schema": VERDICT_SCHEMA,
         "collected_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
         "collector": "verify/schedules/schedules.py clocks",
+        # What binds the file to a run instead of to nobody (`binding_fault`). Straight from the
+        # GitHub context, empty outside Actions, and never anything the file's reader supplies.
+        "run_id": os.environ.get("GITHUB_RUN_ID", ""),
+        "repository": os.environ.get("GITHUB_REPOSITORY", ""),
         "units": {},
     }
     for unit, root, remote in units():
@@ -1209,10 +1294,15 @@ jobs:
     import tempfile
     now = dt.datetime.now(dt.timezone.utc)
 
-    def verdict_file(collected_at, units_doc, schema=VERDICT_SCHEMA):
+    def verdict_file(collected_at, units_doc, schema=VERDICT_SCHEMA, run_id=None):
+        # Stamped with THIS run, because that is what a real verdict file carries: inside Actions
+        # the fixtures must bind like the article, and outside it (GITHUB_RUN_ID unset) both are
+        # unbound alike.
         fh = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
-        json.dump({"schema": schema, "collected_at": collected_at,
-                   "collector": "selfcheck", "units": units_doc}, fh)
+        json.dump({"schema": schema, "collected_at": collected_at, "collector": "selfcheck",
+                   "run_id": os.environ.get("GITHUB_RUN_ID", "") if run_id is None else run_id,
+                   "repository": os.environ.get("GITHUB_REPOSITORY", ""),
+                   "units": units_doc}, fh)
         fh.close()
         return fh.name
 
@@ -1278,10 +1368,55 @@ jobs:
     # ...and no CLOCK_VERDICT at all, with --offline, is the plain offline source
     assert not observer(offline=True).live
 
+    # a verdict file is bound to the run that wrote it: one from another run, or from another
+    # repository, is refused and falls back to offline rather than being graded from (round 2).
+    # It narrows the window on a forged file; it is not a trust boundary (see `binding_fault`).
+    assert binding_fault({"run_id": "7", "repository": "org/hub"}, {}) == ""
+    assert binding_fault({"run_id": "7", "repository": "org/hub"},
+                         {"GITHUB_RUN_ID": "7", "GITHUB_REPOSITORY": "org/hub"}) == ""
+    for planted, env, why in (
+            ({"run_id": "9"}, {"GITHUB_RUN_ID": "7"}, "run 9"),
+            ({}, {"GITHUB_RUN_ID": "7"}, "(none)"),
+            ({"run_id": "7", "repository": "org/elsewhere"},
+             {"GITHUB_RUN_ID": "7", "GITHUB_REPOSITORY": "org/hub"}, "org/elsewhere")):
+        fault = binding_fault(planted, env)
+        assert why in fault and "not this run's observation" in fault, (planted, fault)
+    if os.environ.get("GITHUB_RUN_ID"):
+        foreign = verdict_file(fresh, body, run_id="not-this-run")
+        try:
+            Verdict(foreign)
+            raise AssertionError("a verdict file from another run must be refused")
+        except ValueError as e:
+            assert "not this run's observation" in str(e), e
+
     # the documented non-zero exit is ONE conclusion, not "anything but success". A cancelled
     # truth.yml run recorded nothing and graded PASS until 2026-09-04.
     assert RED_GATE_EXITS_NONZERO.get("truth.yml") == "failure"
     assert RED_GATE_EXITS_NONZERO.get("fetch.yml") is None
+
+    # --- a run never grades itself, and a run in flight is a SKIP (round 2 of ticket 56) -------
+    # The newest SCHEDULED run of truth.yml, read from a scheduled run of truth.yml, was this
+    # run: conclusion "", status in_progress. Graded against `failure` that was a permanent FAIL
+    # blaming ticket 85, unclearable by any estate fix.
+    def planted_run(hours, conclusion, ident, status=None):
+        when = (now - dt.timedelta(hours=hours)).isoformat(timespec="seconds")
+        return {"createdAt": when.replace("+00:00", "Z"), "conclusion": conclusion,
+                "status": status or ("completed" if conclusion else "in_progress"),
+                "databaseId": ident}
+
+    mine, yesterday = planted_run(0, "", 99), planted_run(24, "success", 98)
+    assert newest_gradable([mine, yesterday], "99")["databaseId"] == 98
+    assert newest_gradable([mine, yesterday], None)["databaseId"] == 98
+    assert newest_gradable([mine], "99") is None
+    assert newest_gradable([], None) is None
+    status, msg = run_line("hub", "truth.yml", mine, now, " (ticket 85 owns it)")
+    assert status == "SKIP" and "in_progress" in msg and "concluded nothing" in msg, msg
+    assert "ticket 85" not in msg, msg
+    assert run_line("hub", "truth.yml", planted_run(2, "failure", 97), now)[0] == "PASS"
+    assert run_line("hub", "truth.yml", planted_run(2, "cancelled", 97), now)[0] == "FAIL"
+    assert run_line("feeds", "fetch.yml", planted_run(2, "success", 97), now)[0] == "PASS"
+    assert run_line("feeds", "fetch.yml",
+                    planted_run(PERIOD_HOURS + 5, "success", 97), now)[0] == "FAIL"
 
     # --- a red clock names the open ticket that owns it (ticket 85) -----------
     owned = {"driftwood/twin-sweep.yml": {"ticket": 72, "owns": "the sweep dies under bash -e"},
@@ -1312,7 +1447,9 @@ jobs:
           "answers with a named could-not-look rather than with silence, a clock verdict file "
           "lets the liveness half grade with no credential and every gap in it is a named "
           "could-not-look, a stale or wrong-schema one falls back to offline rather than to a "
-          "token, a cancelled run of the one clock excused for exiting non-zero is still a red, "
+          "token, a verdict file written by another run or in another repository is refused, a "
+          "cancelled run of the one clock excused for exiting non-zero is still a red, a run "
+          "still in flight -- this run included -- is a named could-not-look and never a red, "
           "and a red clock names the ticket that owns it")
 
 

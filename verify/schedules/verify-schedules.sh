@@ -23,7 +23,14 @@
 # `schedule:` and the newest scheduled run) to a JSON file the gate job reads through
 # `CLOCK_VERDICT`. Grading happens here, holding nothing. Locally, an authenticated `gh` is used
 # directly. A CLOCK_VERDICT that is missing, malformed or stale is a could-not-look that says so;
-# it never falls back to a credential this job is not supposed to have.
+# it never falls back to a credential this job is not supposed to have. The file carries the run
+# id and repository that wrote it and a reader inside a workflow run refuses any other run's file
+# -- which narrows the window on a forged clocks.json rather than closing a trust boundary, since
+# the scripts beside this one could rewrite schedules.py itself (ticket 56, round 2).
+#
+# A clock's newest scheduled run that is still IN FLIGHT -- including the very run doing the
+# grading, which is what a scheduled truth.yml run sees when it reads truth.yml -- is a named SKIP
+# and never a red: a run that has not finished has concluded nothing.
 #
 # This script grades the PROMISE: what the workflow says its next run may stage. The server-side
 # ruleset ADR-0024 named cannot exist on a public repository (ADR-0023, amended 2026-09-03), so

@@ -1,7 +1,7 @@
 # 85 — Every clock is green, or red for an estate reason
 
 Type: task (AFK)
-Status: resolved for what an agent can build (both unowned reds fixed and every red now names its ticket; "green on the newest run" waits on the owner's pushes and the next scheduled runs)
+Status: resolved for what an agent can build (both unowned reds fixed and every red now names its ticket; "green on the newest run" waits on the merges of the three pushed unit branches and the next scheduled runs)
 Blocked by: none
 
 ## Question
@@ -98,17 +98,40 @@ under pytest. Ticket 56 is what lets any of this be seen on a citable run at all
 **Where the done-line stands.** "Red with an open ticket named in `verify-schedules`' output" is
 true today: the live run names all six with their tickets. "Every scheduled workflow green on its
 newest run" is not, and cannot be made so by an agent -- three of the six reds are owned by
-tickets 62, 72 and 77, and the two this ticket fixes only go green when the owner pushes the
-branches and the clocks next tick. "Feeds' observation branch carries a dated observation for
+tickets 62, 72 and 77, and the two this ticket fixes only go green when the three pushed unit
+branches are merged (only `pavc-other-hand` may) and the clocks next tick. "Feeds' observation branch carries a dated observation for
 every declared feed" likewise waits on six real runs of a fixed clock. Nothing here fakes one.
+
+### Round 2, 2026-09-04 — the red this ticket was being blamed for was the checker's
+
+Review found that `hub/truth.yml` would have been reported red **for ever**, with ticket 85 named
+as its owner, for a reason no fix here could ever touch: `last_run` read the newest scheduled run
+with no status filter, so on a scheduled `truth.yml` run it read the run doing the grading
+(`conclusion` "", `status` `in_progress`), and round 1's narrowed excuse graded that FAIL. A clock
+grading its own liveness by looking at itself. Fixed in ticket 56's round 2 —
+`newest_gradable()` drops the grading run and prefers the newest completed one, and `run_line()`
+makes a run still in flight a **named SKIP with no owner clause**, because a could-not-look must
+never blame a ticket for a red. `hub/truth.yml` stays in `clock-owners.yaml`: its real red, the
+`cancelled` run of 09:55:43Z, is real and still owned here.
+
+Also corrected here: the three unit branches this ticket's fixes live on were listed under "waits
+on the owner" as un-pushed. They were pushed on 2026-09-04 (see that section for who and the
+SHAs); what waits is the merge, which only `pavc-other-hand` may do. And the count of red clocks
+now reads six wherever the 2026-09-04 run is cited, matching that run rather than the 2026-09-02
+review's five.
 
 Map line: Ticket 85 -- the two unowned red clocks are fixed at the source (feeds' cage read the `__pycache__` its own python wrote; nist's reader globbed a feed envelope at a controls catalogue and wrote null every day), the fix is shared verbatim with insurer and nist, and every red clock now names the open ticket that owns it in the gate's own output.
 
 ## Waits on the owner
 
-1. **Push `ticket-56-and-85` in policy-as-versioned-feeds, -nist and -insurer** (via the
-   integrator's `ecosystem/build-2026-09-03`), and merge as `pavc-other-hand`. The guard refuses
-   every enactment push from an agent.
+1. ~~Push `ticket-56-and-85` in policy-as-versioned-feeds, -nist and -insurer.~~ **Done
+   2026-09-04: the three branches are already pushed.** The owner's standing instruction of
+   2026-09-04 sets `twin/ENACT_MODE` to `development`, under which `enact_guard` admits a unit
+   push, so the builder pushed them itself on 2026-09-04 as the owner's git identity (Chris
+   Nesbitt-Smith <chris@cns.me.uk>) -- not the owner by hand. Verified from the remotes on
+   2026-09-04 with `git ls-remote origin ticket-56-and-85`: feeds `5276280`, nist `78b5397`,
+   insurer `49e3fed`. What is left of this item is not a push but a **merge**: these are branches,
+   not `main`, and only `pavc-other-hand` may merge them (the standing guard mode `other-hand`).
 2. **The next scheduled run of each fixed clock**, or a dispatch of it: feeds (03:17), nist
    (02:41), insurer (05:31), and the hub's truth run (05:47). Only then does feeds' `observations`
    branch gain a line per declared feed and do these clocks read green. An agent cannot make an

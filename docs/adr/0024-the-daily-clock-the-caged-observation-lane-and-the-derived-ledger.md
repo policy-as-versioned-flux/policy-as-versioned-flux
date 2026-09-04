@@ -224,8 +224,12 @@ truth surface rather than read off the lane five hours later.
   anything. It cannot, and for a good reason: the gate step runs 84 `verify*.sh` cloned unpinned
   off eight other organisations' default branches, so `truth.yml` gives it `persist-credentials:
   false` and no `GH_TOKEN`. The consequence went unrecorded for five weeks: question 4, "did each
-  clock run inside its own period", SKIPped on every citable run, and on 2026-09-04 five of
-  thirteen clocks were red while the surface showed one SKIP.
+  clock run inside its own period", SKIPped on every citable run, and on 2026-09-04 six of
+  thirteen clocks were red while the surface showed one SKIP. Six, not the five the 2026-09-02
+  review counted: that review read the clocks before `hub/truth.yml` had its own cancelled run,
+  and the first real grade of 2026-09-04 named all six -- driftwood twin-sweep (ticket 72),
+  feeds fetch (85), insurer fetch (77), ludlow and tuppence propose-tier (62), hub truth (85).
+  The count in this ADR, in ticket 28's correction and in `truth.yml`'s comment is that one.
 
   The credential is not widened; the work is split. `truth.yml` gains a **`clocks` job** with
   `permissions: {contents: read, actions: read}` that runs no third-party code and writes the raw
