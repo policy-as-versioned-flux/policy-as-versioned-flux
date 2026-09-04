@@ -52,11 +52,45 @@ fi
 # re-implemented here. This used to be an unconditional `skip`, which made step 5 structurally
 # incapable of two of its three verdicts: it read could-not-look on the deck even with every
 # artefact present and verify-twin-evals.sh green (found 2026-08-29).
-EVALS="$ROOT/verify/twin-evals/verify-twin-evals.sh"
+#
+# And the presence of those paths is not the step's claim. Step 5 once passed in the same run in
+# which driftwood's own verify-twin-overlay.sh and twin/verify-twin-scenarios.sh observed FALSE on
+# the very files it had just ticked off (review 2026-09-02): it graded existence, and existence is
+# not a forecast. So the ADOPTER'S OWN verdicts are consumed here rather than re-derived --
+# running each script is what makes step 5 incapable of disagreeing with the repo that owns the
+# artefact. (emit-forward-intel.py --check would re-implement half of that seam in the hub and
+# could pass while the adopter's own check failed; that is the shape this ticket exists to end.)
+# Ticket 64 loops this list over three adopters; it is a list for that reason.
+# Ticket 72's twin/verify-twin-sweep-moved.sh is the third, and it is the one that holds step 5
+# at could-not-look until observations/twin-sweep.jsonl carries a dated live firing: the sweep is
+# the "on its schedule" half of step 5's own sentence, and only the clock can supply it.
 log="$(mktemp)"; trap 'rm -f "$log"' EXIT
+verdicts=()
+for check in verify-twin-overlay.sh twin/verify-twin-scenarios.sh twin/verify-twin-sweep-moved.sh; do
+  [ -f "$ESTATE/$ADOPTER/$check" ] || { verdicts+=("skip|$ADOPTER/$check is not in this estate"); continue; }
+  (cd "$ESTATE/$ADOPTER" && timeout 300 bash "$check") >"$log" 2>&1
+  case $? in
+    0) echo "  ok  $ADOPTER/$check: $(tail -1 "$log")" ;;
+    3) verdicts+=("skip|$ADOPTER/$check could not look: $(tail -1 "$log")") ;;
+    *) verdicts+=("fail|$ADOPTER/$check observed false: $(tail -1 "$log")") ;;
+  esac
+done
+
+EVALS="$ROOT/verify/twin-evals/verify-twin-evals.sh"
 bash "$EVALS" >"$log" 2>&1
 case $? in
-  0) pass "the twin's overlay, feed, $n scenarios and signal lookup are all present, and its own evals scored them: $(tail -1 "$log")" ;;
-  3) skip "the twin's artefacts are present but its evals could not look: $(tail -1 "$log")" ;;
-  *) fail "the twin's evals observed false: $(tail -1 "$log")" ;;
+  0) echo "  ok  the twin's own evals scored the artefacts: $(tail -1 "$log")" ;;
+  3) verdicts+=("skip|the twin's evals could not look: $(tail -1 "$log")") ;;
+  *) verdicts+=("fail|the twin's evals observed false: $(tail -1 "$log")") ;;
 esac
+
+# An observed-false anywhere is step 5's answer; a could-not-look anywhere means step 5 did not
+# see the forecast played forward, whatever the paths on disk say.
+for v in "${verdicts[@]:-}"; do
+  case "$v" in fail\|*) fail "step 5 is false where the adopter's own checks are: ${v#fail|}" ;; esac
+done
+if [ -n "${verdicts[0]:-}" ]; then
+  msg="$(printf '; %s' "${verdicts[@]#skip|}")"
+  skip "the twin's artefacts are present and $ADOPTER's own checks did not all look [ticket 72 supplies the dated observations/twin-sweep.jsonl firing]:${msg#;}"
+fi
+pass "the twin's overlay, feed, $n scenarios and signal lookup are all present; $ADOPTER's own twin-overlay, twin-scenarios and twin-sweep-moved checks each observed true, including a dated live firing in observations/twin-sweep.jsonl; and the twin's own evals scored them: $(tail -1 "$log")"

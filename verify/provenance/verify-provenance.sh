@@ -9,12 +9,22 @@
 # Exits non-zero if the beat would fail on stage. OFFLINE core (python3 [+PyYAML];
 # openssl for the one link that verifies cryptographically right here). Optional
 # LIVE tail: Rekor (rekor-cli/cosign) for the commit/PR, SPIRE (spire-server) for
-# the workload + device SVIDs — skipped, not faked, when that infra is absent.
+# the workload + device SVIDs — not faked when that infra is absent: what was not looked at is
+# named and the script exits 3 (ecosystem ticket 76; this used to print a note and then PASS).
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 say()  { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
 fail() { echo "FAIL: $*" >&2; exit 1; }
 have() { command -v "$1" >/dev/null 2>&1; }
+
+# could_not_look / pass_or_skip / selfcheck_absent: a live tail's third outcome.
+. "$HERE/../lib-observation.sh"
+SELF="$HERE/${BASH_SOURCE##*/}"
+# The live tails: Rekor for the commit link, SPIRE (through kubectl) for the SVIDs, openssl for
+# the one signature this script verifies itself. --selfcheck runs the could-not-look branch alone.
+TAILS="rekor-cli cosign gitsign kubectl openssl"
+# shellcheck disable=SC2086
+if [ "${1:-}" = "--selfcheck" ]; then selfcheck_absent "$SELF" $TAILS; exit 0; fi
 
 have python3 || fail "python3 required"
 # Post-split (mo-12): platform is a real, separate GitHub repo, not a sibling
@@ -23,6 +33,11 @@ have python3 || fail "python3 required"
   || fail "could not assemble .estate-clone/ (needs network — see clone-estate.sh)"
 PLATFORM="$(cd "$HERE/../../.estate-clone/platform" && pwd)"
 WG="$PLATFORM/wargamer"
+
+# Run this script's own could-not-look branch before looking at anything, so it is exercised on
+# a machine that HAS the instruments rather than only on one that lacks them.
+# shellcheck disable=SC2086
+selfcheck_absent "$SELF" $TAILS
 
 say "1. the whole chain: feed->scenario->PR->review->merge->release, every actor named"
 timeout 90 python3 "$HERE/provenance.py" selfcheck || fail "provenance chain selfcheck failed"
@@ -45,30 +60,28 @@ if have openssl; then
   fi
   echo "  ok   a forged feed is refused (the signature actually guards the link)"
 else
-  echo "  (openssl absent — offline crypto proof of the feed link skipped)"
+  could_not_look "openssl absent: the v3 feed's ed25519 signature, the one link this script can verify offline, was not verified"
 fi
 
 say "3. commit/PR attestable in REKOR (the human disposition links)"
 # OFFLINE: the merge + release links carry the gitsign-keyless->Rekor root
 # (asserted in step 1). LIVE: if rekor-cli/cosign is here AND the repo has a
 # keyless-signed commit, verify it in the transparency log. Absent -> skip.
-if have rekor-cli; then
-  say "3-live. rekor-cli present — searching the transparency log for the HEAD commit"
-  if have git && git -C "$HERE" rev-parse HEAD >/dev/null 2>&1; then
-    sha="$(git -C "$HERE" rev-parse HEAD)"
-    if timeout 30 rekor-cli search --sha "$sha" >/dev/null 2>&1; then
-      echo "  ok   HEAD commit $sha found in Rekor"
-    else
-      echo "  note: HEAD commit not in Rekor (this repo's commits aren't keyless-signed here;"
-      echo "        the war-gamer's PRs are, once opened via propose-policy-pr.sh -> git commit --gitsign)"
-    fi
-  fi
-elif have gitsign; then
-  echo "  offline: merge+release links carry the Rekor root (verified in step 1);"
-  echo "  gitsign present [$(gitsign --version 2>&1 | head -1)] but no rekor-cli/cosign to query the log."
+if ! have rekor-cli; then
+  could_not_look "no rekor-cli here to query the transparency log, so the commit link was read from the committed chain only, never confirmed against Rekor$(have gitsign && echo " (gitsign is installed [$(gitsign --version 2>&1 | head -1)], but it signs, it does not query)")"
+elif ! have git || ! git -C "$HERE" rev-parse HEAD >/dev/null 2>&1; then
+  could_not_look "rekor-cli is here but this is not a git work tree, so there was no commit to look up"
 else
-  echo "  offline: merge+release links carry the Rekor root (verified in step 1);"
-  echo "  no rekor-cli/cosign/gitsign here to query the live transparency log."
+  say "3-live. rekor-cli present — searching the transparency log for the HEAD commit"
+  sha="$(git -C "$HERE" rev-parse HEAD)"
+  if timeout 30 rekor-cli search --sha "$sha" >/dev/null 2>&1; then
+    echo "  ok   HEAD commit $sha found in Rekor"
+  else
+    # Not a failure and not a pass: this repo's own commits are not keyless-signed, so there is
+    # no entry to find. The war-gamer's PRs are, once opened via propose-policy-pr.sh. Either
+    # way this run did not observe a commit in Rekor, and must not report that it did.
+    could_not_look "HEAD ($sha) has no Rekor entry -- this repo's commits are not keyless-signed here, so the live commit-in-log link had nothing to verify"
+  fi
 fi
 
 say "4. workload + device SVIDs verify against SPIRE (one root, distinct actor classes)"
@@ -76,24 +89,29 @@ say "4. workload + device SVIDs verify against SPIRE (one root, distinct actor c
 # workload carries posture/<vN> and the device is tpm_devid-pinned (asserted in
 # step 1). LIVE: if a SPIRE server is reachable, show the real registration entries.
 CTX="${CTX:-kind-driftwood}"
-live_spire=0
-if have kubectl && timeout 10 kubectl --context "$CTX" -n spire-server get statefulset spire-server >/dev/null 2>&1; then
+if ! have kubectl; then
+  could_not_look "no kubectl here, so no SPIRE server was reached and no live SVID was seen (the committed manifests are asserted offline in step 1)"
+elif ! timeout 10 kubectl --context "$CTX" -n spire-server get statefulset spire-server >/dev/null 2>&1; then
+  could_not_look "no SPIRE server on $CTX, so no live SVID was seen (the committed manifests are asserted offline in step 1)"
+else
   say "4-live. SPIRE server reachable on $CTX — listing registration entries"
-  if timeout 30 kubectl --context "$CTX" -n spire-server exec statefulset/spire-server -- \
-       /opt/spire/bin/spire-server entry show 2>/dev/null | tee /dev/stderr | grep -q "spiffe://acme.internal"; then
+  entries="$(timeout 30 kubectl --context "$CTX" -n spire-server exec statefulset/spire-server -- \
+      /opt/spire/bin/spire-server entry show 2>/dev/null || true)"
+  if [ -z "$(printf '%s' "$entries" | tr -d '[:space:]')" ]; then
+    # Nothing registered is nothing to look at, not a false root: could-not-look, not FAIL.
+    could_not_look "SPIRE on $CTX has no registration entries at all (apply posture/ + access/ up.sh), so no live SVID's trust domain was read"
+  elif printf '%s\n' "$entries" | grep -q "spiffe://acme.internal"; then
+    echo "$entries"
     echo "  ok   live SPIRE entries root to spiffe://acme.internal"
-    live_spire=1
   else
-    echo "  note: SPIRE reachable but no acme.internal entries yet (apply posture/ + access/ up.sh)"
+    # Entries exist and none root to the domain: that IS an observation, and it is false.
+    echo "$entries"
+    fail "SPIRE on $CTX has registration entries and none root to spiffe://acme.internal -- the actors do not share one root"
   fi
 fi
-[ "$live_spire" = 1 ] || echo "  offline: workload (posture/vN) + device (/device/, tpm_devid) SVIDs share one root — manifests asserted in step 1"
 
 say "5. the walk — who proposed what, when, from which evidence (the auditor reads this)"
 timeout 90 python3 "$HERE/provenance.py" walk
 
 echo
-echo "PASS: the whole chain walks feed->scenario->PR->review->merge->release; the AI"
-echo "war-gamer PROPOSES (never merges), humans DISPOSE; workload+device+commit+human all"
-echo "root to one attestation, and the chain converges on the exact version a running"
-echo "workload carries in its SVID. Provenance for every actor, end to end."
+pass_or_skip "the whole chain walks feed->scenario->PR->review->merge->release; the AI war-gamer PROPOSES (never merges), humans DISPOSE; workload+device+commit+human all root to one attestation, and the chain converges on the exact version a running workload carries in its SVID. Provenance for every actor, end to end."

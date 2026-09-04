@@ -70,3 +70,26 @@ consequence of the rule above.
 - **The hole heals itself.** The first signed tag that carries the pin closes it on the next
   composition with no edit, printed as a `closed-untagged-pin` delta, the way `new-untagged-pin`
   printed it when it opened.
+
+## Note, 2026-09-04 (ecosystem ticket 76): the rule binds the gate's own scripts too
+
+The rule above was written about the £. The 2026-09-02 review found fourteen places where the
+gate itself broke it: a check whose instrument was absent — the kyverno CLI, `rekor-cli`, a SPIRE
+server, a reachable cluster — printed a note or a `SKIP:` line and then exited 0, which
+`talk/verify-all.sh` grades PASS. A green on the absence of the instrument is the same invention
+of a number this ADR refused, one layer up.
+
+- A **verify script** whose instrument is missing exits 3 with its reason on the last line. It
+  never exits 0, and it never FAILs for want of an instrument. Where a script has an offline core
+  and a live tail, one unlooked tail makes the whole script SKIP: the claim is what the last line
+  says, and half of it was not observed. `lib.sh` (platform) and `verify/lib-observation.sh`
+  (hub) carry the helpers.
+- That branch must itself be **run** on a machine that has the instrument. `selfcheck_absent`
+  re-executes the script with the named tools unreachable and requires exit 3 with a `SKIP:` last
+  line; a script's normal run does this before it looks. A branch nobody runs rots back.
+- The same rule applies to a recorded verdict, not only to an exit code: a falsifier that was
+  never run records `null`, never `false`.
+
+`verify/every-green/verify-every-green.sh` reads every verify script the gate discovers and names
+any `SKIP` that ends in `exit 0`, or in no exit at all, by file and line. Decided delegated
+(ADR-0025) in `.scratch/ecosystem/issues/76`.

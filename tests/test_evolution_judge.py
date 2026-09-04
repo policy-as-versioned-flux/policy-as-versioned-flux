@@ -245,3 +245,44 @@ def test_override_accuracy_is_scored_on_the_same_footing_as_the_twins_own_infere
 
     bad = evaluate(SKILL, careless_human_override, corpus, scorer=scorer)
     assert not bad.passed
+
+
+# -- what the 1.000 is, and is not (ecosystem ticket 76) ------------------------------------
+
+
+def test_the_corpus_is_declared_as_the_one_the_heuristic_was_fitted_on() -> None:
+    """REVIEW-2026-09-02 R3: the eval scores a keyword lookup table against its own values, and
+    the gate reported the result as "7 skill metrics ... at their thresholds". The score is real
+    but it grades the harness, not the twin's judgement, and the module says which it is so the
+    surface (verify-twin-evals.sh) can read the label rather than type it."""
+    from twin.evolution_judge import CORPUS_KIND
+
+    assert CORPUS_KIND == "harness-mechanism"
+
+
+def test_every_corpus_item_is_one_the_keyword_table_already_answers(corpus: list[dict]) -> None:
+    """Why the label is `harness-mechanism` and not an opinion: for every item, the table's own
+    answer for that component's name is within the scorer's tolerance of the expected position.
+    Nothing in the corpus is held out, so a perfect score was available by construction."""
+    from twin.evolution_judge import _infer_position, _TOLERANCE
+
+    for item in corpus:
+        name = item["input"]["component"]["name"]
+        table_says = _infer_position(name)
+        assert abs(table_says - item["expected"]["evolution_position"]) <= _TOLERANCE, (
+            f"{item['id']}: the table says {table_says}, the corpus expects "
+            f"{item['expected']['evolution_position']}"
+        )
+
+
+def test_an_item_outside_the_table_falls_to_the_default_and_is_not_judged() -> None:
+    """And what the score would be worth on an item the table was NOT fitted to: the default,
+    every time, whatever the evidence says. A held-out corpus is what would make the number a
+    measure of judgement; building one is a later ticket, and until it exists the label stands."""
+    from twin.evolution_judge import _DEFAULT_POSITION, judge
+
+    result = judge({
+        "component": {"id": "unfitted", "name": "A satellite ground-station leasing business"},
+        "evidence": [{"statement": "the market standardised on three vendors", "date": "2026-01-01"}],
+    })
+    assert result["evolution_position"] == _DEFAULT_POSITION

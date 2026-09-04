@@ -14,6 +14,18 @@
 #   5. the pinned-feed-version -> dated-signal lookup, and its table's coverage of every feed
 #      envelope this estate actually publishes (ticket 11 resolution 3; spec user story 45)
 #
+# WHAT THE SEVEN SCORES ARE (ecosystem ticket 76). Every one of the seven heuristics is scored
+# against the corpus it was FITTED ON -- evolution-judge's keyword table returns, for each of the
+# four backtest components' own names, the position that component's corpus item expects, and
+# signal-classify, causal-claims, gameplay-lens, substrate-generator and ethics-gate each say the
+# same of themselves in twin/skill-thresholds.yaml's notes. So a 1.000 here is a HARNESS-MECHANISM
+# observation -- the corpus loads, the scorer runs, the declared metric set is the set evaluated,
+# the threshold compares, and no score fell against the last recorded value -- and it is NOT a
+# measure of the twin's judgement. The lines below say so, because a reader of talk/deck.md was
+# being handed "7 skill metrics ... at their thresholds" and could only read it as skill.
+# Holding out a corpus the heuristics were not fitted on is a later ticket; until one exists this
+# script must not spend the word "skill" unqualified.
+#
 # A FALL IN ANY SCORE against the last value recorded for that skill in twin/skill-scores.jsonl is
 # a FAIL, even when the fallen score is still above its threshold. That file is the committed
 # record of the last values; this script never writes to it (it is append-only, guarded by
@@ -114,8 +126,17 @@ for entry in entries:
     why = {"below": "  -- below its threshold",
            "fell": "  -- FELL against the last recorded value in twin/skill-scores.jsonl",
            "pass": ""}[said]
-    out(said == "pass", "%-28s score=%.3f  threshold=%.3f  last=%s%s"
+    out(said == "pass", "%-28s score=%.3f  threshold=%.3f  last=%s  [harness-mechanism: scored "
+                        "on the corpus it was fitted on]%s"
                         % (skill, score, threshold, shown, why))
+
+# The label is read from the skill module, not typed here: evolution_judge declares what its own
+# corpus is, so if someone later holds a corpus out and flips the constant, this line follows.
+from twin.evolution_judge import CORPUS_KIND
+out(CORPUS_KIND == "harness-mechanism",
+    "evolution-judge declares its corpus kind as %r -- the keyword table is scored against the "
+    "four items it was fitted to, so its 1.000 grades the harness, not the twin's judgement"
+    % CORPUS_KIND)
 
 print("METRICS: %d" % len(entries))
 print("SUBTOTAL: %d skill metric(s), %d observed false" % (len(entries), fails))
@@ -219,7 +240,7 @@ fi
 rm -f "$lookup"
 
 if [ "$fail" -eq 0 ]; then
-  echo "PASS: $(sed -n 's/^METRICS: //p' "$log" | tail -1) skill metrics, exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal"
+  echo "PASS: $(sed -n 's/^METRICS: //p' "$log" | tail -1) harness-mechanism metrics (each heuristic scored against the corpus it was fitted on, so this grades the harness, not the twin's judgement -- a held-out corpus is not built yet), exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal"
   exit 0
 fi
 echo "FAIL: the twin's evals observed false; see the lines above"

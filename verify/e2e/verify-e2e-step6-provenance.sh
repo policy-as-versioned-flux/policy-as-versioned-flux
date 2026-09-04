@@ -79,33 +79,75 @@ done
 note "ok   $units release workflows pin an anchored, own-repo identity regexp at the Actions OIDC issuer"
 
 # --- 3. the regexp matches the REAL cert subject, and the entry is in Rekor -----------------
+#
+# The tag shape is each unit's OWN. A bare three-number glob was typed into `git tag -l` here,
+# and feeds tags `threat-register/v2.0.0`, so feeds matched nothing and this step said feeds had
+# no signed tag
+# about a publisher whose tag is in Rekor -- an absence inferred from a lookup that could not
+# have succeeded. Every line in a unit's party.yaml publishes[] now resolves its own newest tag
+# through feed_contract.newest_tag_per_line (`<line>/vX.Y.Z` or bare `vX.Y.Z`, the same two forms
+# the feed contract admits), and a line with no tag says what shapes were looked for among how
+# many real tags. Ticket 76.
+lines="$(mktemp)"; trap 'rm -f "$fc" "$lines"' EXIT
+"$PY" - "$ESTATE" "$ROOT/verify/feed-contract/feed_contract.py" >"$lines" <<'PY' || bad "could not resolve published lines to tags"
+import importlib.util, pathlib, subprocess, sys
+import yaml
+
+estate, fc_path = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+spec = importlib.util.spec_from_file_location("feed_contract", fc_path)
+fc = importlib.util.module_from_spec(spec); spec.loader.exec_module(fc)
+
+for party in sorted(estate.glob("*/party.yaml")):
+    unit = party.parent.name
+    if not (party.parent / ".github/workflows/release.yml").exists():
+        continue
+    doc = yaml.safe_load(party.read_text()) or {}
+    tags = set(subprocess.run(["git", "-C", str(party.parent), "tag", "-l"],
+                              capture_output=True, text=True).stdout.split())
+    for name, tag in sorted(fc.newest_tag_per_line(doc, tags).items()):
+        # "|", not a tab: tab is IFS whitespace, so `read` collapses two of them and an
+        # untagged line's empty field would silently shift the columns along.
+        print(f"{unit}|{name}|{tag or ''}|{len(tags)}")
+PY
 if ! command -v gitsign >/dev/null; then
   unlooked+=("gitsign absent: the anchored regexps were never run against a real Fulcio cert")
 else
-  verified=0; queued=()
-  for wf in "$ESTATE"/*/.github/workflows/release.yml; do
-    u="$(basename "$(dirname "$(dirname "$(dirname "$wf")")")")"
-    tag="$(git -C "$ESTATE/$u" tag -l 'v*.*.*' 2>/dev/null | sort -V | tail -1)"
-    [ -n "$tag" ] || { queued+=("$u"); continue; }
+  verified=0; untagged=0
+  while IFS='|' read -r u name tag ntags; do
+    [ -n "$u" ] || continue
+    wf="$ESTATE/$u/.github/workflows/release.yml"
+    if [ -z "$tag" ]; then
+      # Observed, not inferred: the unit's real tag list was read and neither of this line's
+      # own two shapes is in it. Queued for cut-release.yml, and said so with what was looked for.
+      note "ok   $u/$name has no tag yet: looked for '$name/vX.Y.Z' and 'vX.Y.Z' among $ntags real tags -- queued for cut-release.yml"
+      untagged=$((untagged+1))
+      continue
+    fi
     re="$(sed -nE 's/^ *EXPECTED_IDENTITY_REGEXP: *//p' "$wf" | head -1)"
     iss="$(sed -nE 's/^ *EXPECTED_ISSUER: *//p' "$wf" | head -1)"
     out="$(cd "$ESTATE/$u" && timeout 90 gitsign verify-tag "$tag" \
              --certificate-identity-regexp="$re" --certificate-oidc-issuer="$iss" 2>&1)"
     if printf '%s' "$out" | grep -q 'Validated Rekor entry: true' \
        && printf '%s' "$out" | grep -q 'Good signature from'; then
-      note "ok   $u $tag: real cert subject matches the anchored regexp, Rekor entry validated"
+      note "ok   $u/$name newest tag $tag: real cert subject matches the anchored regexp, Rekor entry validated"
       verified=$((verified+1))
     elif printf '%s' "$out" | grep -qiE 'connection refused|no such host|timeout|context deadline|i/o timeout|dial tcp'; then
-      unlooked+=("Rekor/Fulcio unreachable while verifying $u $tag")
+      unlooked+=("Rekor/Fulcio unreachable while verifying $u/$name's newest tag $tag")
+    elif printf '%s' "$out" | grep -qi 'error resolving tag reference'; then
+      # `git tag -l` in this checkout listed the tag, so it exists; gitsign's own git layer
+      # could not open it. That is what a LINKED WORKTREE looks like to gitsign (`.git` is a
+      # file, not a directory): a builder running against .work/ trees sees this, the
+      # integrator's real checkout does not. Could-not-look, never a false claim either way.
+      unlooked+=("gitsign could not resolve $u/$name's newest tag $tag in this checkout (a linked worktree is opaque to it), so the cert subject was not read")
     else
-      bad "$u $tag: gitsign verify-tag failed against release.yml's own regexp -- $(printf '%s' "$out" | tail -1)"
+      bad "$u/$name newest tag $tag: gitsign verify-tag failed against release.yml's own regexp -- $(printf '%s' "$out" | tail -1)"
     fi
-  done
-  [ ${#queued[@]} -eq 0 ] || note "ok   no signed tag yet, honestly queued for cut-release.yml: ${queued[*]}"
-  [ "$verified" -gt 0 ] || unlooked+=("no unit had a signed tag to check against Rekor")
+  done <"$lines"
+  [ "$verified" -gt 0 ] || unlooked+=("no published line had a tag to check against Rekor")
 fi
 
-verified="${verified:-0}"; queued=("${queued[@]:-}"); [ -n "${queued[0]:-}" ] || queued=()
+verified="${verified:-0}"; untagged="${untagged:-0}"
+nlines="$(grep -c . "$lines" || true)"
 [ "$bad" -eq 0 ] || fail "$bad provenance claim(s) are false (see BAD lines above)"
 if [ ${#unlooked[@]} -gt 0 ]; then
   msg="$(printf '; %s' "${unlooked[@]}")"
@@ -113,7 +155,7 @@ if [ ${#unlooked[@]} -gt 0 ]; then
 fi
 # $verified, not $units: $units counts release.yml FILES (part 2), and using it here
 # claimed a Rekor check for every one of them the moment the last unrelated SKIP
-# cleared -- 8 asserted against 6 actually verified (review, 2026-08-28).
-queued_txt=""
-[ ${#queued[@]} -eq 0 ] || queued_txt=", and ${queued[*]} have no signed tag yet"
-pass "every artefact the slice publishes reaches a signed tag or is honestly queued, and $verified of $units anchored identity regexps matched a real Fulcio cert subject with its Rekor entry validated${queued_txt}"
+# cleared -- 8 asserted against 6 actually verified (review, 2026-08-28). $nlines counts
+# PUBLISHED LINES, which is what a tag signs, and every one of them was resolved in its own
+# shape: $verified verified against Rekor, $untagged read as genuinely untagged (ticket 76).
+pass "every artefact the slice publishes reaches a signed tag or is honestly queued; of the $nlines lines the $units release-shipping units declare in their own party.yaml publishes[], $verified newest tags matched a real Fulcio cert subject with its Rekor entry validated and $untagged lines have no tag of their own shape yet"
