@@ -45,7 +45,13 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'
+      # `jsonschema` because the suite loads two gate scripts as modules and one of them imports
+      # it: tests/test_every_green.py loads verify/feed-contract/feed_contract.py directly, and
+      # tests/test_untagged_pin.py loads untagged_pin.py, which imports it in turn. Ticket 69
+      # (PR 18, merge 7c019a8, 2026-09-04 08:08Z) added that import and this line was not
+      # widened, so twenty-five tests errored at collection with ModuleNotFoundError. Same pin
+      # as truth.yml, which already installs it for the same scripts.
+      - run: pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516' 'jsonschema==4.23.0'
       - name: fetch the six unit repos this suite reads
         run: bash clone-estate.sh
       - run: python -m pytest -q

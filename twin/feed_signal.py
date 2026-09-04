@@ -236,7 +236,11 @@ def demo() -> None:
     # No tag, no commit, no signal: the provenance is the whole value of the lookup.
     for missing in ({"tag": "", "commit": "c" * 40}, {"tag": "v1.0.0", "commit": ""}):
         try:
-            signal_for(quote, **missing)  # type: ignore[arg-type]
+            # No `type: ignore` here: both mappings are `dict[str, str]` and `signal_for` takes
+            # `tag: str, commit: str`, so the unpack checks. The ignore that used to sit here was
+            # unused, which `--warn-unused-ignores` (the typecheck job's flags, not the bare
+            # `mypy twin` a builder runs) reported as an error on 2026-09-04.
+            signal_for(quote, **missing)
         except FeedSignalError:
             pass
         else:  # pragma: no cover
