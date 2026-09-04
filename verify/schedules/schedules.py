@@ -673,8 +673,10 @@ def binding_fault(doc: dict, env: dict) -> str:
     This NARROWS the window; it does not close a trust boundary. The gate job runs 84 verify
     scripts from eight other organisations in the same job, as root over the whole workspace, and
     one of them could rewrite `schedules.py` itself -- or the verdict file and this check with
-    it. What it stops is the cheap version: a stray, stale or hand-written clocks.json on the
-    path `CLOCK_VERDICT` names being graded from as if it were this run's own observation.
+    it. What it stops is the cheap version: a stray or stale clocks.json on the path
+    `CLOCK_VERDICT` names being graded from as if it were this run's own observation. It does NOT
+    stop a file written inside this job and stamped with this run's own id, because every script
+    in the job can read `GITHUB_RUN_ID` from the environment.
     Outside a workflow run (`GITHUB_RUN_ID` unset) there is no run to bind to and the check does
     not pretend otherwise: local grading is only as trustworthy as the local checkout.
     """
@@ -835,7 +837,7 @@ def run_line(unit: str, workflow: str, run: dict, now: dt.datetime,
              owns: str = "") -> tuple[str, str]:
     """Grade ONE scheduled run: (status, sentence). Pure -- a dict, a clock and the time.
 
-    Age first, then the run's OUTCOME. A run that dies in checkout, in the gitsign install or in
+    In flight first, then age, then the run's OUTCOME. A run that dies in checkout, in the gitsign install or in
     the cage step records nothing and used to read as a healthy clock (live, 2026-08-28:
     "hub/truth.yml: last scheduled run 2h ago (failure)" graded PASS). truth.yml is the one
     documented exception: it ends `exit 1` whenever the gate is red, which is its normal state,
@@ -852,6 +854,15 @@ def run_line(unit: str, workflow: str, run: dict, now: dt.datetime,
     # blames a ticket for the clock still being at work (round 2 of ticket 56). `newest_gradable`
     # already prefers a completed run behind it, so reaching here means the window held none.
     if not run.get("conclusion"):
+        # A run in flight has concluded nothing, so it is a could-not-look -- but only while it
+        # could still finish. Past the same window a stopped clock fails on, a run that has not
+        # finished IS a stopped clock, and calling it a could-not-look for ever would be the
+        # unbounded green this ticket exists to stop.
+        if age > PERIOD_HOURS:
+            return ("FAIL", f"{unit}/{workflow}: the newest scheduled run started {age:.0f}h ago "
+                            f"and is still {run.get('status') or 'unfinished'}, past the "
+                            f"{PERIOD_HOURS}h window -- a run that never finishes records no "
+                            f"observation, so the clock has stopped" + owns)
         return ("SKIP", f"{unit}/{workflow}: the newest scheduled run started {age:.0f}h ago and "
                         f"is still {run.get('status') or 'unfinished'} -- a run in flight has "
                         f"concluded nothing, and no completed scheduled run sits behind it in "
@@ -951,7 +962,11 @@ def check(offline: bool = False) -> int:
             if not live:
                 # Named per unit, on purpose: "GitHub is unreachable" is a
                 # could-not-look about THIS clock, not a blanket excuse.
-                out("SKIP", f"{unit}/{workflow}: GitHub unreachable ({unreachable}) -- "
+                # A refused verdict file is not an unreachable GitHub: the run declined to grade
+                # from it. Both are could-not-looks, and each says which it was.
+                why = ("this run declined to grade from the clock verdict"
+                       if "cannot grade from" in unreachable else "GitHub unreachable")
+                out("SKIP", f"{unit}/{workflow}: {why} ({unreachable}) -- "
                             f"cannot look at whether this clock ran inside its period")
                 continue
             try:

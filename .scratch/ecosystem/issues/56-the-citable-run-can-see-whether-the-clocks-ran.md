@@ -179,3 +179,13 @@ Map line: Ticket 56 -- truth.yml's `clocks` job holds `actions: read` and hands 
    does from a local token; the collector degrades to a per-organisation named SKIP if it does
    not. Only a real run settles it. No secret needs minting unless it turns out otherwise, and
    minting one would be the owner's (authorisation).
+
+**Re-review fix, 2026-09-04 (the assistant, delegated).** Approved after one fix round, with four
+minors closed here. `run_line`'s docstring said "age first" where the code checks in flight first.
+The in-flight could-not-look had no upper bound, so a run stuck for ever read as a could-not-look
+for ever; past the same window a stopped clock fails on, an unfinished run is now a FAIL saying the
+clock has stopped, which is what it is. `binding_fault`'s docstring claimed it stopped a
+hand-written verdict file; it does not, because every script in the job can read `GITHUB_RUN_ID`
+from the environment, so it now says it stops a stray or stale one and names what it does not stop.
+And a refused verdict file was announced as "GitHub unreachable", which is not what happened; the
+line now says the run declined to grade from the verdict, with the reason after it.
