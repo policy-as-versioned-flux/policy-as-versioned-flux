@@ -15,11 +15,11 @@
 
 == 5. it REJECTS everything that is not that ==
   ok   rejected a tampered payload
-         signature did not verify over the tag payload: 80DB9FDE8C7F0000:error:1700006D:CMS routines:CMS_verify:content verify error:../crypto/cms/cms_smime.c:457:
+         signature did not verify over the tag payload: 80FBED69DE7F0000:error:1700006D:CMS routines:CMS_verify:content verify error:../crypto/cms/cms_smime.c:457:
   ok   rejected a tampered signature
-         signature carries no signer certificate (openssl pkcs7: 80AB2F1C957F0000:error:0688010A:asn1 encoding routines:asn1_template_ex_d2i:nested asn1 error:../crypto/asn1/tasn_dec.c:537:Field=d.sign, Type=PKCS7)
+         signature carries no signer certificate (openssl pkcs7: 800B1A4B727F0000:error:0688010A:asn1 encoding routines:asn1_template_ex_d2i:nested asn1 error:../crypto/asn1/tasn_dec.c:537:Field=d.sign, Type=PKCS7)
   ok   rejected a self-signed forgery wearing the right identity
-         certificate chain did not verify at tagger time 1787475175: error /tmp/tmpec1r34b8/leaf.pem: verification failed
+         certificate chain did not verify at tagger time 1787475175: error /tmp/tmppnnu3p8u/leaf.pem: verification failed
   ok   rejected a wrong identity
          signer identity 'https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main' does not match the pinned regexp '^https://github\\.com/policy-as-versioned-ico/ico/.*$'
   ok   rejected a wrong issuer
@@ -34,7 +34,7 @@
 
 == 7. the controller's verdict reaches the objects it is supposed to gate ==
   ok   verified source: annotates gitsign-verified=true, leaves the gate alone
-  gate flux-system/platform-policy: SUSPENDED -- policy/v3.0.0: signature did not verify over the tag payload: 803B5804617F0000:error:1700006D:CMS routines:CMS_verify:content verify error:../crypto/cms/cms_smime.c:457:
+  gate flux-system/platform-policy: SUSPENDED -- policy/v3.0.0: signature did not verify over the tag payload: 80EB51B4807F0000:error:1700006D:CMS routines:CMS_verify:content verify error:../crypto/cms/cms_smime.c:457:
   ok   rejected source: suspends flux-system/platform-policy and marks it its own
   gate flux-system/platform-policy: released -- policy/v3.0.0 signed by https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main at 1787475175
   ok   released: a gate this controller suspended is released when the tag verifies again
