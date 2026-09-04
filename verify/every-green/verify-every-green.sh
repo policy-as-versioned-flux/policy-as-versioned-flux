@@ -21,6 +21,14 @@
 # wrong, which is the same lesson. Giving the scripts that print a prose could-not-look their own
 # leg is ticket 76's Answer's own follow-on ticket.
 #
+# NOT THE SAME QUESTION AS verify/truth-line/ (ticket 83). This script asks whether a green was
+# honestly REACHED -- a shape, read out of the source of every discovered script. That one asks
+# what a green RESTS ON (its class in talk/verify-manifest.txt: another party's artefact, the
+# party's own fixtures, synthetic material, or another check) and whether a could-not-look was
+# DECLARED in advance. A script can be honest in shape and unplaced in the manifest, or placed and
+# dishonest. Neither net catches the other's fish and neither re-runs the other's question. This
+# one deliberately reads no manifest, so the two cannot drift into grading the same thing twice.
+#
 #   PASS (exit 0)  no discovered script prints the SKIP verdict token and then reaches exit 0
 #   FAIL (exit 1)  one does, named by file and line
 #   SKIP (exit 3)  no .estate-clone to read (the hub alone is half the surface), or a discovered
