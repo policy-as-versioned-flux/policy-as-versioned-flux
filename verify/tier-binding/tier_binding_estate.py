@@ -91,30 +91,63 @@ def _agree(wargamer, package_path: Path, name: str, out) -> int:
     # fold, so an agreement over every shape is copy fidelity -- that the pinned package has
     # not drifted from the rule it mirrors -- not two implementations reaching one answer.
     declarable = list(getattr(wargamer, "DECLARABLE", wargamer.LADDER))
+
+    def shapes(tiers):
+        """The SAME list of priced tiers, laid out as `prices[]` in each way the
+        estate's own model admits. Until 2026-09-04 only the first was generated,
+        every line carrying its own synthetic source `s0..sn` -- so the guard could
+        not see that platform's fold folded the party out of a dict keyed
+        `source/kind` and lost every line but the last from a publisher. ADR-0019
+        made `feed` one kind carrying a `name`, composition's `_parent_key`
+        identifies a feed by that name, and party/schema.json puts no uniqueness
+        constraint on `inherits[]`: one publisher, one kind, several named feeds is
+        a shape this estate composes, and it must fold to the strictest line like
+        any other.
+
+        BOTH orders of the same publisher's lines, because the fold must not depend
+        on the order a document composes them in -- and because
+        `combinations_with_replacement` emits tiers loosest-first, so a fold that
+        collapsed the lines and kept the LAST would keep the strictest one and agree
+        by accident. Strictest-first is the layout that catches it."""
+        yield ("one publisher per line",
+               [{"source": f"s{i}", "kind": "feed", "name": f"f{i}", "proposed_tier": t}
+                for i, t in enumerate(tiers)])
+        if len(tiers) > 1:
+            orders = [("loosest first", tiers)]
+            if tuple(reversed(tiers)) != tiers:
+                orders.append(("strictest first", tuple(reversed(tiers))))
+            for order, seq in orders:
+                yield (f"one publisher, one kind, several named feeds, {order}",
+                       [{"source": "ico", "kind": "feed", "name": f"f{i}", "proposed_tier": t}
+                        for i, t in enumerate(seq)])
+
     cases = 0
     for n in (0, 1, 2, 3):
         for lines in itertools.combinations_with_replacement(ladder, n):
             for current in [None] + declarable:
                 for floor in [None] + ladder:
-                    cases += 1
-                    prices = [{"source": f"s{i}", "kind": "feed", "proposed_tier": t}
-                              for i, t in enumerate(lines)]
-                    ours = wargamer.select_party_tier(prices, current=current, floor=floor)
-                    mine = theirs.select_party(list(lines), current=current, floor=floor)
-                    if (ours["tier"], ours["held"]) != (mine["tier"], mine["held"]):
-                        out("FAIL", f"{name}: the two party folds disagree -- lines {list(lines)}, "
-                                    f"declared {current!r}, floor {floor!r}: "
-                                    f"platform/wargamer picks {ours['tier']!r} (held="
-                                    f"{ours['held']}) and {name}'s own {POLICY_PACKAGE} "
-                                    f"v{theirs.VERSION} picks {mine['tier']!r} (held="
-                                    f"{mine['held']}) (ADR-0021)")
-                        return 1
+                    for shape, prices in shapes(lines):
+                        cases += 1
+                        ours = wargamer.select_party_tier(prices, current=current, floor=floor)
+                        mine = theirs.select_party(list(lines), current=current, floor=floor)
+                        if (ours["tier"], ours["held"]) != (mine["tier"], mine["held"]):
+                            out("FAIL",
+                                f"{name}: the two party folds disagree -- lines {list(lines)} "
+                                f"laid out as {shape}, declared {current!r}, floor {floor!r}: "
+                                f"platform/wargamer picks {ours['tier']!r} (held="
+                                f"{ours['held']}) and {name}'s own {POLICY_PACKAGE} "
+                                f"v{theirs.VERSION} picks {mine['tier']!r} (held="
+                                f"{mine['held']}) (ADR-0021)")
+                            return 1
     out("PASS", f"{name}: platform/wargamer's select_party_tier and {name}'s own "
                 f"{POLICY_PACKAGE} v{theirs.VERSION} select_party fold the party the same way "
-                f"in all {cases} cases -- every line combination up to three, every declared "
-                f"tier (including ADR-0022's `infra`) and every floor on the ladder. This is "
-                f"copy fidelity, not independence: the package's fold is a transliteration of "
-                f"platform's")
+                f"in all {cases} cases -- every combination of up to three priced lines, against "
+                f"every declared tier (including ADR-0022's `infra`) and every floor on the "
+                f"ladder, and each such combination laid out BOTH as one publisher per line AND "
+                f"(wherever there is more than one line) as that many named feeds from ONE "
+                f"publisher of ONE kind, in each order the lines can be composed in (ADR-0019). "
+                f"This is copy fidelity, not independence: the package's fold is a "
+                f"transliteration of platform's")
     return 0
 
 

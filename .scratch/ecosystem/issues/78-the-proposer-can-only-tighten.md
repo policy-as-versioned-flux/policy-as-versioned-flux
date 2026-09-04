@@ -22,7 +22,7 @@ Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R2. Findings: scope/F
 
 ## Answer
 
-Built 2026-09-04; three blocking review defects and five minors fixed the same day (see the dated note below). Map line: The proposer folds the party to its strictest priced tier and lands nothing looser, one check binds the enacted tier to the priced tier in the gate and in three shift-lefts that say SKIP with the reason until platform tags the rule and each adopter bumps its pin, and the proposal commit is gitsign-signed against a second, proposer-only identity regexp.
+Built 2026-09-04; three blocking review defects and five minors fixed the same day, then a second review's one blocking defect -- the party fold collapsed two named feeds from one publisher and could grade a loose Namespace bound -- and one minor, fixed the same day too (see the dated notes below). Map line: The proposer folds the party to its strictest priced tier and lands nothing looser, one check binds the enacted tier to the priced tier in the gate and in three shift-lefts that say SKIP with the reason until platform tags the rule and each adopter bumps its pin, and the proposal commit is gitsign-signed against a second, proposer-only identity regexp.
 
 ### 1. Selection over the party, not the price line
 
@@ -45,12 +45,13 @@ no branch, no commit and no pull request, and says why on stderr and in the retu
 driftwood's own package records the same rule: `selection-policy/selection_policy.py:select_party()`
 at **VERSION 1.1.0** (PIN.yaml bumped with it, as its own comment requires). The hub's
 `verify/tier-binding/` folds every combination of up to three line tiers x every declared tier x
-every floor -- **1,050 cases** -- through both and refuses a disagreement (ADR-0021's
+every floor, each laid out both as one publisher per line and as several named feeds from one
+publisher of one kind in each order -- **2,610 cases** -- through both and refuses a disagreement (ADR-0021's
 two-implementations guard, the same one `verify/pound-seam/` applies to the per-line `select()`).
 
 Be exact about what that guard buys here, because it is weaker than the one on `select()`.
 driftwood's `select_party` is a **transliteration** of `platform/wargamer`'s fold -- written from
-it, line by line, not derived independently from the rule -- so 1,050 agreements prove **copy
+it, line by line, not derived independently from the rule -- so 2,610 agreements prove **copy
 fidelity**: the pinned package has not drifted from the rule it mirrors, and a change to either
 that is not made to the other is caught. They are not two implementations reaching the same answer,
 and this check would not catch a mistake made once in platform's fold and copied faithfully. The
@@ -239,7 +240,7 @@ cases added at both seams, red first against the pre-fix code:
   `baseline`, a looser floor than the party declared. The read now matches only a **direct child**
   of `overlay:` -- the indent of the block's own first key -- and a planted case covers both the
   decoy and an overlay with no floor of its own.
-- **The 875 (now 1,050) agreements.** Said plainly above and in the check's own PASS line: they
+- **The 875 (now 2,610) agreements.** Said plainly above and in the check's own PASS line: they
   prove copy fidelity, not independence.
 
 ### Decisions added on review (delegated, ADR-0025)
@@ -267,6 +268,89 @@ cases added at both seams, red first against the pre-fix code:
     printed `SKIP:` with the pinned tag in it, in the log and in the job summary, is a
     could-not-look a reader can see. It costs one `[ -f ]` test and it deletes itself the day the
     pin moves.
+
+### Note, 2026-09-04 (second review): the party fold collapsed two feeds from one publisher
+
+The re-review found one blocking defect, and it was real. It is fixed, red first.
+
+**What was wrong.** `platform/wargamer/wargamer.py:select_party_tier()` built a dict keyed
+`f"{source}/{kind}"` and then folded the party out of *that dict's values*. ADR-0019 made `feed`
+one kind carrying a `name`, composition's `_parent_key` identifies a feed by its NAME, and
+`party/schema.json` puts no uniqueness constraint on `inherits[]` -- so two priced lines from one
+publisher of one kind is a shape this estate's own model admits. Those two collapsed onto one key
+and the LAST one won, not the strictest. `tier_binding.bind()` then computed `required` off the
+collapsed set, so the binding check would grade a Namespace `bound` that is **looser than a real
+priced line**: a false PASS on this ticket's central property.
+
+**Red, before the fix.** Prices `[{ico,feed,penalty-schema,isolated}, {ico,feed,breach-register,
+baseline}]` with `current='baseline'`:
+
+    platform  select_party_tier: baseline True {'ico/feed': 'baseline'}
+    driftwood select_party    : isolated False
+    DISAGREE
+    tier_binding.bind: {'bound': True, 'required': 'baseline', 'strictest_line': 'baseline'}
+
+`bound: True` over a line that priced `isolated`. driftwood's package folds the tier VALUES, so the
+two implementations already disagreed on this shape -- and the 1,050-case guard could not see it,
+because `tier_binding_estate.py` synthesised a unique source `s0..sn` for every line.
+
+**Green, after.** Same input: platform picks `isolated`, `held=False`, lines
+`{'ico/feed/penalty-schema': 'isolated', 'ico/feed/breach-register': 'baseline'}`; the two folds
+AGREE; `bind` returns `bound: False, required: 'isolated'`.
+
+**The fix.**
+
+- `select_party_tier()` now folds over the priced tiers **themselves** (a list built in the same
+  loop), never over `lines`, which is only a display of them. A fold that reads a dict's values can
+  always be made to drop a line; a fold over the values it was given cannot.
+- `lines` is keyed by a new `_line_key()`: `source/kind/name` where the line carries a name, with a
+  `#n` suffix as belt and braces for a document that repeats even that -- so no priced line can be
+  silently missing from the sentence the check prints about what it folded.
+- `tier_binding.py:bind()` needed no separate fix: it calls `select_party_tier()`, so the same
+  correction reaches the gate, the three shift-lefts and the PR body.
+- The guard now generates each combination in **both** layouts: one publisher per line (as before)
+  and, wherever there is more than one line, that many named feeds from ONE publisher of one kind,
+  in each order the lines can be composed in. Both orders matter:
+  `combinations_with_replacement` emits tiers loosest-first, so a collapsing fold that keeps the
+  LAST line keeps the strictest one and agrees **by accident** -- the first attempt at this guard
+  passed against the broken fold for exactly that reason. Strictest-first is the layout that
+  catches it. 1,050 cases -> 2,610.
+- The PASS line now claims what the guard actually generates, in those words.
+- Planted regression cases in both selfchecks (`wargamer.py` case 4 and `tier_binding.py` case 14):
+  two named feeds from one publisher fold to the stricter of them in either order, every line
+  survives into `lines`, and a document that repeats `source/kind/name` drops no line.
+
+**Verified against the old fold.** With `wargamer.py` stashed back to the collapsing version, the
+new guard prints `FAIL: driftwood: the two party folds disagree -- lines ['baseline',
+'restricted'] laid out as one publisher, one kind, several named feeds, strictest first ...
+platform/wargamer picks 'baseline' ... driftwood's own selection-policy v1.1.0 picks 'restricted'`.
+With the fix restored it is `PASS ... in all 2610 cases`.
+
+**Minor, fixed while here.** The signature-verification step's branch extractor in the three
+adopters' `propose-tier.yml` (driftwood:242, tuppence:280, ludlow:290) did
+`p.get("landed",{}).get("action")`. `_land()` sets `landed` to the STRING `"dry-run"` in dry-run
+mode, and `.get` on a `str` raises `AttributeError` -- the step died instead of reporting there was
+nothing to verify. It now tests `isinstance(p.get("landed"), dict)` first. `actionlint` clean on
+all three.
+
+### Decisions added on the second review (delegated, ADR-0025)
+
+12. **The fold reads the tiers, and `lines` is only a display.** Reason: keying `lines` better
+    (`source/kind/name`) fixes today's collapse, but any fold that reads a dict's values is one
+    unmodelled field away from the same bug. Folding the list the caller passed in cannot lose a
+    line whatever the key turns out to be, and the key is then free to be the most readable
+    identity rather than a load-bearing one. Both were done: the fold is over the list, and the key
+    identifies the line properly anyway, because the PR body and the gate's PASS sentence quote it
+    to a human.
+13. **`wargame_cage_tier()`'s `control` field, and so the proposal branch name, still collapses two
+    lines from one publisher of one kind -- and is deliberately left alone.** `control` is
+    `f"{source}-{kind}"`, the branch slug is built from it, and `tier_pr.py`'s dedupe key IS the
+    branch name, so two drifting lines from one publisher would share a branch. Reason for leaving
+    it: what such a proposal WRITES is the party's tier, which is party-level and identical for
+    both rows, so the collision cannot loosen anything -- the two proposals differ only in which
+    price their body names. Changing `control` would change every existing proposal branch name and
+    orphan the derived rejection ledger's keys (ADR-0024), which is a migration with a cost and a
+    reason of its own. Recorded under **Not done** rather than fixed silently.
 
 ## Waits on the owner
 
@@ -337,3 +421,10 @@ cases added at both seams, red first against the pre-fix code:
   laid out beside the worktree. Sibling symlinks were made under the gitignored
   `.estate-clone/platform/.work/` to run them; on `.estate-clone/platform` itself, which is what
   the gate reads, the siblings are real and nothing is needed. Not a change to any repository.
+- **`wargame_cage_tier()`'s `control` collapses two lines from one publisher of one kind**, and so
+  do the proposal branch slug built from it and `tier_pr.py`'s dedupe key, which IS that branch
+  name. Two drifting `ico/feed` lines would share one branch and one dedupe key. It cannot loosen
+  anything -- the tier such a proposal writes is party-level and the same for both rows, so the two
+  differ only in which price their body names -- and fixing it renames every proposal branch and
+  orphans the derived rejection ledger's keys (ADR-0024). Named, decided (decision 13), not fixed
+  here.
