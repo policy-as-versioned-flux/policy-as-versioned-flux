@@ -1,0 +1,16 @@
+==> 0. selfcheck: the graders grade
+  ok   selfcheck: the real, immutable platform v2.0.0 fails the pairing (4.0.0.json without its bundle), as it did for three adopters on 2026-08-31
+  ok   selfcheck: a bundle-less evidence tree fails, a tags-only push line fails, a split push fails, a --dry-run fails, an empty tree fails; the repaired shapes pass
+==> 1. can this check look? (platform clone with an origin/main)
+  ok   platform origin/main is 46cd775
+==> 2. every evidence document on platform origin/main has its cosign bundle beside it
+  ok   origin/main: 4 evidence document(s) at origin/main, each with its cosign bundle
+==> 3. the release pushes the branch with the tags, atomically (platform b83eba1)
+  ok   origin/main: .github/scripts/cut-release-push.sh at origin/main pushes HEAD:refs/heads/${branch} and the tags in one --atomic push
+==> 4. the platform tag each adopter pins carries every bundle
+  ok   driftwood pins v2.0.1: 4 evidence document(s) at v2.0.1, each with its cosign bundle
+  ok   tuppence pins v2.0.1: 4 evidence document(s) at v2.0.1, each with its cosign bundle
+  ok   ludlow pins v2.0.1: 4 evidence document(s) at v2.0.1, each with its cosign bundle
+
+PASS: every evidence document on platform origin/main has its cosign bundle, the release pushes
+the branch and the tags in one atomic push, and the tag each adopter pins carries every bundle (ticket 53).

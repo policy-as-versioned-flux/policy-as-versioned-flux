@@ -1,0 +1,17 @@
+PASS: selfcheck: a row with its mechanism blanked is refused by the loader (exit 1: FAIL: /tmp/tmp.8om167D7BB/blank.yaml: entry 'x' names no mechanism — a risk with no mechanism is a concern, )
+PASS: selfcheck: a row anchored to a file that does not exist fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: twin/no-such-file.py: no such file; 0 could-not-look by name (none))
+PASS: selfcheck: a row anchored to a token the file lacks fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: platform/c.py: does not mention 'widen_to'; 0 could-not-look by name (n)
+PASS: selfcheck: a row still waiting on a resolved ticket fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: still says it waits on ticket 19 (resolved), which is resolved — name)
+PASS: selfcheck: a row waiting on a ticket that does not exist fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: waits on a ticket that does not exist: 999; 0 could-not-look by name (n)
+PASS: selfcheck: a row naming neither a path nor a ticket fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: names neither a path nor the ticket that builds its price; 0 could-not-)
+PASS: selfcheck: a row waiting on an open ticket is could-not-look by name (exit 3: SKIP: no row could be looked at; 1 could-not-look by name (x))
+PASS: selfcheck: a row whose anchors all resolve passes (exit 0: PASS: 1 of 1 row(s) resolve by path; 0 could-not-look by name (none))
+PASS: selfcheck: a leg-2 FAIL wins over leg 3's could-not-look (exit 1: FAIL: an assertion above was observed false, and a later leg could not look: no assembled .estate-clone under )
+PASS: misuse_catalogues_load_and_every_row_names_a_mechanism -- 3 catalogues, 22 rows, one loader; 4 eco-system rows carrying ticket 19's four ids, each anchored by path or by the ticket building its price; a row with its mechanism blanked is refused
+  SKIP publisher-games-own-feed-price: 2 anchor(s) resolve; waits on ticket 45 (open) for the switching price in prices[], the adopter's £ reason to switch; ticket 46 (open) for the publisher-reliability feed and the scorer party whose score widens the triple
+  SKIP regulator-data-mispriced-downstream: 4 anchor(s) resolve; waits on ticket 84 (open) for the D5 formula applied to a pricing pin behind a newer version; ticket 46 (open) for the reliability score disclosed on the prices[] entry
+  PASS adopter-buys-intel-on-rival: 3 anchor(s) resolve
+  PASS twin-valuation-used-in-negotiation: 6 anchor(s) resolve
+  PASS: 2 of 4 row(s) resolve by path; 2 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream)
+PASS: eco-system rows: 2 of 4 row(s) resolve by path; 2 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream)
+PASS: three misuse catalogues load through one loader and every row names a mechanism (misuse_catalogues_load_and_every_row_names_a_mechanism); eco-system rows: 2 of 4 row(s) resolve by path; 2 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream)
