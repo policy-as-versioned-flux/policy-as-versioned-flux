@@ -131,6 +131,7 @@
 
 # --- hub: the cross-party proofs under verify/ -------------------------------------------
 verify/adr-supersession/verify-adr-supersession.sh | meta | -   # ticket 39: grades the record, deliberately reads no Python
+verify/branch-refs/verify-branch-refs.sh | estate-observation | waits: has cut no tag at all, so there is no signed version to pin to   # tickets 62 and 77: reads every unit's own workflows and every publisher's real tags. The declared could-not-look is driftwood's twin-sweep.yml consuming the HUB, which has cut no tag for it to pin to; ticket 64 cuts it, and the day it exists this line's skip goes away
 verify/demo/verify-demo.sh | meta | waits: recording commit this checkout cannot reach   # grades the deck against the run it names
 verify/disclaimer/verify-disclaimer.sh | estate-observation | -   # reads nine repositories' party.yaml, README and NOTICE
 verify/e2e/verify-e2e-step1-regulator-publishes.sh | estate-observation | waits: waiting for tag|queued for cut-release|not yet a tag
