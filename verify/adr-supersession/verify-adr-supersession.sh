@@ -25,7 +25,14 @@
 #   verify-adr-supersession.sh selfcheck  selfcheck only: strip ADR-0013's banner from a copy and
 #                                         require FAIL; drop ADR-0026's Options considered section
 #                                         and require FAIL; point CONTEXT.md's citations back at
-#                                         ADR-0013 and require FAIL
+#                                         ADR-0013 and require FAIL; drop the removed-control line
+#                                         from ADR-0026's refusal-kind classification and require
+#                                         FAIL; drop the classification's lead sentence and
+#                                         require FAIL
+#
+# ADR-0026 point 6 must classify every refusal kind composition.py emitted on 2026-09-04 as an
+# instrument fault or a behaviour. The list is a fixture in this file (REFUSAL_KINDS), not a read
+# of the platform clone, so the check stays offline and never SKIPs.
 #
 # The no-argument path runs the selfcheck first (as verify-record-states-the-purpose.sh does), so
 # a grader that stops grading fails the gate instead of shipping a quiet PASS.
@@ -35,6 +42,14 @@ ADR_DIR="${ADR_SUPERSESSION_ADR_DIR:-$ROOT/docs/adr}"     # overridden only by t
 CONTEXT="${ADR_SUPERSESSION_CONTEXT:-$ROOT/CONTEXT.md}"   # overridden only by the selfcheck
 NEW=0026
 DATE=2026-09-04
+# The refusal kinds compose/composition.py emitted on the platform integration branch on
+# 2026-09-04 (every "kind" whose dict carries needs_composition; verify-composition.sh step 1b
+# prints nine of these, its 400-character scan window missing the two with the longest detail).
+# A FIXTURE, on purpose: this grader reads no platform source, so it can never SKIP, and ADR-0026
+# point 6 must classify each of these as an instrument fault or a behaviour. A kind the source
+# gains later is a fact for the next ADR and for whoever extends this list.
+REFUSAL_KINDS="claim-against-another-partys-policy dangling-claim missing-baseline-file missing-instrument no-controls-parent removed-control restatement-of-non-validating rule-conflict split-diamond unknown-control-id unpriceable-inability"
+CLASSIFY_MARKER='Every refusal kind composition emits today, classified'
 bad=0
 ok()   { printf '  ok   %s\n' "$*"; }
 fail() { printf '  FAIL %s\n' "$*"; bad=$((bad+1)); }
@@ -53,17 +68,25 @@ selfcheck() {
   awk '/^## Options considered/ {skip=1; next} /^## / {skip=0} !skip' "$new" >"$t/no-section/$(basename "$new")"
   # leg 3: CONTEXT.md whose ADR-0026 citations point back at ADR-0013
   sed "s/ADR-$NEW/ADR-0013/g" "$ROOT/CONTEXT.md" >"$t/stale-context.md"
+  # leg 4: ADR-0026 whose classification no longer names removed-control (the one behaviour)
+  mkdir -p "$t/no-kind"; cp "$ROOT"/docs/adr/*.md "$t/no-kind/"
+  grep -vE '^ *- `removed-control`: ' "$new" >"$t/no-kind/$(basename "$new")"
+  # leg 5: ADR-0026 with the classification lead sentence gone
+  mkdir -p "$t/no-classify"; cp "$ROOT"/docs/adr/*.md "$t/no-classify/"
+  grep -v "$CLASSIFY_MARKER" "$new" >"$t/no-classify/$(basename "$new")"
   ADR_SUPERSESSION_ADR_DIR="$t/no-banner" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: an ADR-0013 with no ADR-$NEW banner passed"; good=0; }
   ADR_SUPERSESSION_ADR_DIR="$t/no-section" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: an ADR-$NEW with no Options considered passed"; good=0; }
   ADR_SUPERSESSION_CONTEXT="$t/stale-context.md" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: a CONTEXT.md citing ADR-0013 for the refusals passed"; good=0; }
+  ADR_SUPERSESSION_ADR_DIR="$t/no-kind" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: an ADR-$NEW that stops classifying removed-control passed"; good=0; }
+  ADR_SUPERSESSION_ADR_DIR="$t/no-classify" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: an ADR-$NEW with no refusal-kind classification passed"; good=0; }
   rm -rf "$t"
-  if [ "$good" = 1 ]; then echo "  ok   selfcheck: a missing banner fails; a missing section fails; a stale CONTEXT citation fails"; return 0; fi
+  if [ "$good" = 1 ]; then echo "  ok   selfcheck: a missing banner fails; a missing section fails; a stale CONTEXT citation fails; an unclassified refusal kind fails; a missing classification fails"; return 0; fi
   echo "FAIL: selfcheck: the grader does not grade"; return 1
 }
 
 if [ "${1:-}" = selfcheck ]; then
   selfcheck || exit 1
-  echo "PASS: selfcheck: a missing banner fails, a missing section fails, a stale CONTEXT citation fails"; exit 0
+  echo "PASS: selfcheck: a missing banner fails, a missing section fails, a stale CONTEXT citation fails, an unclassified refusal kind fails, a missing classification fails"; exit 0
 fi
 if [ -z "${ADR_SUPERSESSION_ADR_DIR:-}${ADR_SUPERSESSION_CONTEXT:-}" ]; then
   echo "0. the grader can fail"
@@ -124,6 +147,18 @@ if [ -n "$newtext" ]; then
   want "ADR-$NEW" "$newtext" 'missing instrument'
   # the one known record/code gap is named, with the function that still refuses
   want "ADR-$NEW consequences" "$newtext" 'check_selected_set.*still refuses'
+  # the unknown-id refusal keeps its code kind; the record says which
+  want "ADR-$NEW consequences" "$newtext" 'code kind `unknown-control-id`, not `missing-instrument`'
+fi
+
+echo "2b. ADR-$NEW point 6 classifies every refusal kind composition emitted on $DATE (fixture of $(echo $REFUSAL_KINDS | wc -w | tr -d ' '))"
+if [ -n "$newtext" ]; then
+  want "ADR-$NEW" "$newtext" "$CLASSIFY_MARKER"
+  for k in $REFUSAL_KINDS; do
+    want "ADR-$NEW classification" "$newtext" "^ *- \`$k\`: (instrument fault|behaviour)"
+  done
+  want "ADR-$NEW classification" "$newtext" '^ *- `removed-control`: behaviour'
+  want "ADR-$NEW classification" "$newtext" '^ *- `unknown-control-id`: instrument fault'
 fi
 
 echo "3. ADR-0013, ADR-0017 and ADR-0018 carry a dated Superseded in part banner naming ADR-$NEW"

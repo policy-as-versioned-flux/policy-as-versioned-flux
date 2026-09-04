@@ -19,9 +19,22 @@ only signal the composition had:
   override, and said an adopter may add a control and **never remove** one, "because a removal is
   an exemption by another name".
 - **ADR-0017** made an adopter's own addition an ordinary new hole: "Refuse, same as any new hole
-  (chosen)", the **self-created hole refusal**; and "Removing a self-added control: never".
+  (chosen)", the **self-created hole refusal**; and, under its heading "Removing a self-added
+  control", chose "Never (chosen)": "Adding was a claim. Withdrawing it is an exemption by another
+  name."
 - **ADR-0018 point 3**: "Composition refuses an ungoverned adopter namespace, and only a new
   one", the **new-ungoverned refusal**.
+
+One standing line in the ticket record carries the removal rule too, and this ADR retires it:
+ticket 15's "Already decided, not re-asked" paragraph (2026-08-28, line 38) says "an adopter may
+add a control and never remove one, a claim belongs to whoever ships the implementation (ADR-0013,
+ADR-0017)". That line restates the two ADRs; it quotes no owner's words on removal, and no owner
+answer on removal exists anywhere in the record, so under ADR-0025 the rule is the assistant's to
+decide and record (ADR-0025 point 1; point 2 would bind only if the owner had answered). Ticket
+38 then handed exactly this question to this ADR (below). Retiring the line is consistent with
+NORTH-STAR §3 principle 1, "everything is policy": a removal is a signed, party-wide change of a
+declared selection that anyone can make and the cage prices, which is "a conditional rule anyone
+can meet, or a cage with a price", not a carve-out for a named workload.
 
 The decisions that reversed them came in order. Ticket 15 (resolved 2026-08-28, re-grills 19, 20,
 25, 27, reversals 9, 10, 18) decided, in its Answer items 1 to 3 and 5: regulator-published
@@ -71,11 +84,14 @@ its own band (ticket 38 D5).
    implicitly and assumed one catalogue; the key names it so that a second `controls` parent, an
    adopter's own catalogue under ticket 15 item 5, cannot collide with the regulator's ids. On
    the wire a bare id belongs to the baseline's catalogue and `source:id` names any other
-   controls parent (ticket 38 D2), so the three real adopters' headers are byte-stable. The
-   exact-string rule stands: no case-folding, no prefix-stripping. The hard failure on an id no
-   pinned catalogue carries stands and is classified: it is a **missing instrument** in
-   ADR-0020's sense, because nothing pinned defines the id and so nothing can price it; it is not
-   a judgement on behaviour.
+   controls parent (ticket 38, Answer item 2; its D11 makes the baseline's catalogue the first
+   `controls` parent that is not the adopter), so the three real adopters' headers are
+   byte-stable. The exact-string rule stands: no case-folding, no prefix-stripping. The hard
+   failure on an id no pinned catalogue carries stands and is classified: it is a **missing
+   instrument** in ADR-0020's sense, because nothing pinned defines the id and so nothing can
+   price it; it is not a judgement on behaviour. The code emits it under its own kind,
+   `unknown-control-id`, not `missing-instrument`; the classification is this record's, and the
+   code keeps its name.
 2. **A hole is priced, never refused.** Each hole prices as the regulator's published control
    weight for that `(source, id)` times the adopter's sized triple for the regime, a partition of
    the regime exposure, so implementing a control reduces the regime's price (ticket 15 item 1).
@@ -98,8 +114,9 @@ its own band (ticket 38 D5).
    `closed-ungoverned` (ticket 15 item 3, ticket 38 D2 to D4). The rest of ADR-0018 point 3
    stands: the walk is repo-only, and cluster drift on the label is Flux drift owned by the
    estate's drift tooling.
-5. **A removal is priced, never refused.** ADR-0013's "never remove", ADR-0017's "removing a
-   self-added control: never" and ticket 38's D6 are superseded. A control that leaves the
+5. **A removal is priced, never refused.** ADR-0013's "never remove", ADR-0017's "Never
+   (chosen)" under "Removing a self-added control", ticket 15's standing line and ticket 38's D6
+   are superseded. A control that leaves the
    adopter's selected set prints as a `removed-control` delta carrying the amount the hole
    carried (the regulator's weight times the triple, a bespoke scenario's residual, or a named
    absence), and its line on the regime partition takes status `unselected` with its amount
@@ -119,11 +136,46 @@ its own band (ticket 38 D5).
    (ticket 14, Answer 3), that carry the consequence, not a composition wall.
    The word **exemption** does not apply: CONTEXT.md defines it as a carve-out for a named
    workload, and a selection change names no workload and hides no price.
-6. **The refusals composition keeps are all instrument faults.** No price for a declared regime
-   and no FX rate for the date (ADR-0020); a bespoke control with no signed scenario (ticket 38
-   D5); a band declared in a currency other than the adopter's reporting currency on the bespoke
-   path (ticket 38 D12); an id no pinned catalogue defines (point 1). Nothing composition does
-   refuses a behaviour.
+6. **Every refusal kind composition emits today, classified.** On the platform integration
+   branch `compose/composition.py` emits eleven refusal kinds (each a `"kind"` whose dict carries
+   `needs_composition`; `compose/verify-composition.sh` step 1b prints nine of them on
+   2026-09-04 because its scan window is 400 characters and `claim-against-another-partys-policy`
+   and `rule-conflict` carry a longer `detail`). Each is an **instrument fault**, ADR-0020's
+   line, where nothing pinned can resolve or price the thing named, or a **behaviour**, something
+   the adopter does or omits, which the doctrine says to price. One line each:
+   - `claim-against-another-partys-policy`: instrument fault. A claim is only evidence when the
+     claimant ships the policy (ADR-0017, which stands on this); a claim citing another party's
+     policy evidences nothing, so the hole it names is simply not closed.
+   - `dangling-claim`: instrument fault. The policy the claim cites is in no composed member; the
+     claim resolves to nothing.
+   - `missing-baseline-file`: instrument fault. The controls parent publishes no baseline of that
+     name, so there is no selected set to price.
+   - `missing-instrument`: instrument fault by name. No appetite band, no price for a declared
+     regime, no FX rate for the date (ADR-0020); a bespoke control with no signed scenario
+     (ticket 38 D5); a bespoke band in a currency other than the reporting currency (ticket 38
+     D12).
+   - `no-controls-parent`: instrument fault. There is no catalogue to resolve the baseline
+     against.
+   - `removed-control`: behaviour. The one behaviour-shaped refusal in the code; point 5 retires
+     it and the platform build named in Consequences must price it.
+   - `restatement-of-non-validating`: instrument fault. A restatement compares on the strictness
+     ladder only a `ValidatingPolicy` carries (ADR-0016); against any other kind there is nothing
+     to compare, so the declaration is unmeasurable, not looser.
+   - `rule-conflict`: instrument fault. Two parents supply the same rule at the same version with
+     different content; two instruments disagree and nothing pinned says which to read.
+   - `split-diamond`: instrument fault. One parent is inherited at two versions through
+     different edges; the pin is ambiguous, so there is no single instrument.
+   - `unknown-control-id`: instrument fault (point 1). No pinned catalogue defines the id.
+   - `unpriceable-inability`: instrument fault, and the kind nearest the line. The inability is a
+     declared behaviour; what is missing is its price instrument (no scenario of the adopter's
+     own and no threat parent to price from), and ADR-0020 refuses on that. A later build may
+     price it from a default the way the twin prices an unpriced register entry (ticket 15,
+     re-grills 32 and 35: a cage consequence defaulted from appetite); until one exists it is
+     recorded here as the instrument fault it is.
+   So the only refusal that judges a behaviour is `removed-control`, and its retirement is
+   point 5. `verify-adr-supersession.sh` carries this list of eleven as a fixture and fails if
+   this ADR stops naming and classifying any of them; a kind the source gains later is a fact for
+   the next ADR, not a silent widening of this one.
 
 ## Options considered
 
@@ -198,7 +250,9 @@ its own band (ticket 38 D5).
   says "May only grow: a composition still refuses on any id that leaves the last signed composed
   artefact's selected set, because a removal is an exemption by another name"; and
   `verify/priced-holes/priced_holes.py`'s `check_source` does not grade its absence, its own
-  selfcheck planting `removed-control` in the source it must pass. A platform build ticket deletes
+  selfcheck planting `removed-control` in the source it must pass. The unknown-id refusal of
+  point 1 is emitted under the code kind `unknown-control-id`, not `missing-instrument`; this ADR
+  classifies it as an instrument fault and renames nothing. A platform build ticket deletes
   the refusal, adds the `removed-control` and `baseline-narrowing` delta kinds to
   `compute_deltas`, rewrites the `run2-removed` case to expect `outcome: composed` with two
   `removed-control` deltas and one `baseline-narrowing` delta, rewrites the schema sentence, and
@@ -213,8 +267,9 @@ its own band (ticket 38 D5).
 - **A control the regulator withdraws from its catalogue** is not an adopter removal: it leaves
   the selected set with the catalogue bump; a weights feed that still names it is that feed's own
   fact to fix in its next version (ticket 15 item 1 puts the weights under a `payload_schema`
-  major, and ADR-0019 makes any `payload_schema` change major); and an adopter still naming it in
-  `overlay.controls` meets the unknown-id instrument fault of point 1. Revisit trigger: the first
-  such bump.
+  major, and ticket 04's Answer item 3 rules that "a `payload_schema` change is always major";
+  ADR-0019 records the envelope and the signed tag, not that rule); and an adopter still naming
+  it in `overlay.controls` meets the unknown-id instrument fault of point 1, code kind
+  `unknown-control-id`. Revisit trigger: the first such bump.
 - **Terms.** `CONTEXT.md`'s **Exemption** entry is unchanged; a priced, signed, party-wide
   selection change is not one.
