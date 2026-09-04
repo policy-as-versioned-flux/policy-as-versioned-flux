@@ -198,4 +198,22 @@ manifest rows carry the two adopters' own checks.
 * **tuppence's and ludlow's `selection-policy` packages.** Ticket 25's shape; `ladder.yaml`
   carries the rungs in the meantime and is checked against platform's own published ladder.
 
+### Two measurements, and one finding that is not this ticket's
+
+* **Step 5's wall-clock with all three overlays present: 1:52.61**, against `talk/verify-all.sh`'s
+  300-second per-script timeout — measured on a scratch estate inside the hub carrying the three
+  built branches, not estimated. Tripling the adopters roughly doubled the step (it was 2:06 with
+  one adopter and no `.venv`, 1:52 with three and a `.venv`), because the cost is dominated by the
+  twin evals and driftwood's four planted refusals rather than by the loop. There is headroom, and
+  it is worth watching: a fourth adopter is the next thing that moves it.
+* **`tests/test_seam1_cli.py::test_an_attestation_sidecar_accompanies_every_artefact` fails under
+  `-n0` and passes under the default `-n auto`, and it does so on untouched `main`.** Running
+  `tests/test_intel_beat.py tests/test_invariant_suite.py tests/test_seam1_cli.py -n0` in the
+  main checkout, with no change of this branch's in it, reproduces it: 2 failed, 80 passed. The
+  sidecar arrives agent-signed because `TWIN_SIGNING_KEY` is still set in the process when that
+  test runs. `twin/invariants/harness.py` sets it at line 2104 and restores it in a `finally` at
+  2196, so the leak is somewhere else and is not chased here. Under `-n auto` each worker is its
+  own process and nothing leaks, which is why the default suite is green. **Not this ticket's, not
+  caused by it, and named so that the next serial run does not read it as new.**
+
 Map line: `Ticket 64 (2026-09-04): the twin is three adopters — tuppence and ludlow overlays authored complete and unpriced (no signed size, one grade-3 edge, emitters refuse by name), verify/twin-per-adopter names an adopter without one, step 5 derives its adopter list and asserts a dated swept_at, driftwood re-composed to selection-policy 1.1.0, and tuppence's permanent shift-left refusal is diagnosed as platform policy 4.0.0's major awaiting the owner.`
