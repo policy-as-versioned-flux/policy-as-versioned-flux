@@ -129,3 +129,41 @@ argue a looser declaration. Doing that needs a residual the proposer does not ye
 pull-request body that carries the argument, so this ticket writes nothing looser at all and the
 looser path stays a later ticket. Until then a loosening is a human edit to the Namespace, in the
 open, under the binding check -- which is where an unargued loosening belongs.
+
+**The unlabelled default flipped to `isolated` on 2026-09-04** (ticket 63). The ordering rule
+above is discharged, so the sentence it guarded is now a fact rather than a promise: an
+UNGOVERNED Namespace renders `isolated`, the same rung a governed Namespace with no tier and an
+unknown tier value already rendered. Silence buys nothing anywhere.
+
+The precondition was met and observed, not assumed. `kube-system`, `flux-system` and `kyverno`
+each carry `posture.acme.io/tier: infra` on the platform's own `namespaces.yaml` manifests;
+`platform/party.yaml` carries the `platform` role that entitles the declaration; and
+`distribution/verify-infra-declaration.sh` asserts both on every gate run. That check is not
+retired by the flip -- it becomes the tripwire it was always described as. Pull an infra
+declaration while any served default reads `isolated` and it FAILS by name, because that is the
+configuration in which CoreDNS lands in `isolated` and the cluster stops.
+
+Two things the flip changed about the check itself, both real defects it exposed rather than
+design:
+
+- The check read the tier default off the raw file, so PROSE counted. The flip's own changelog
+  comment quotes the shape it replaced, and the already-flipped body was reported as still
+  `baseline` -- the tripwire wrong in the one direction it must never be wrong in. Comments are
+  stripped now, the same repair `parse_namespace_docs` had on 2026-08-28, one function down.
+- Collapsing `nsGoverned ? 'isolated' : 'baseline'` to a single literal left no ternary for the
+  regex to find, so a flipped body read as an unknown shape (`None`) and `None` is not an
+  offender. A third served shape is read, with selfcheck legs for the authoring block scalar and
+  the rendered one-line form, and the `nsGoverned` variable -- whose only reader was that
+  ternary -- is gone from the body.
+
+The edit ships as **5.0.0**, a major the engine computes on its own (`cage_engine.classify_repo`
+over the real v4.0.0 and v5.0.0 trees and a 178-entry generated corpus: `tier baseline->isolated`
+on 150+ entries). It is also the SECOND declared line since the 2026-08-29 retirement, which gives
+coexistence, retirement and the +/-1 window a live subject again, and it re-carries the
+root-if-attested conditional arm that had lived only in the retired 2.0.1 -- folded into
+`require-nonroot` itself, because Kyverno ANDs policies and a widening cannot live outside the
+body it widens. The retired 2.0.0/2.0.1/3.0.0 trees stay unedited behind their signed tags and
+still read `baseline`; a released tree is frozen, and their defaults are a fact about what those
+tags contain, not a live default. Ticket 84 supplies the third line and the supersede pricing;
+ticket 64 moves the three adopters' pins and recomposes their served copies, which is when the
+flip reaches an adopter cluster.
