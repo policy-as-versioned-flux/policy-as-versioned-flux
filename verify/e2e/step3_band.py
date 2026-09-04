@@ -101,7 +101,95 @@ def adopters():
             yield os.path.basename(os.path.dirname(p)), doc
 
 
+def selfcheck():
+    """The judgement above, exercised on documents this step cannot make the real estate
+    produce on demand. Pure: no estate, no proposer, no temp dir."""
+    order = ["baseline", "restricted", "quarantine", "isolated"]
+    held = {"branch": "wargamer/retune-tier-driftwood-cage-tier-ico-feed",
+            "proposal_kind": "pull_request", "held": "tighten-only", "line": "ico-feed",
+            "line_tier": "restricted", "party_tier": "restricted", "current_tier": "isolated",
+            "why": "strictest priced line is 'restricted'; the declaration says 'isolated'"}
+    cases = [
+        ("the real held document is accepted", [held], None),
+        ("nothing proposed at all is caught", [], "proposed nothing"),
+        ("a LANDED document is caught -- the clamp did not hold",
+         [{**held, "landed": "dry-run"}], "LANDED"),
+        ("an errored document is caught", [{k: v for k, v in held.items() if k != "why"} |
+                                           {"error": "no governed Namespace"}], "error"),
+        ("a document that is not held is caught",
+         [{k: v for k, v in held.items() if k != "held"}], "held"),
+        ("a hold that is not the tighten-only clamp is caught",
+         [{**held, "held": "some-other-reason"}], "tighten-only"),
+        ("a hold whose party tier TIGHTENS the declaration is caught -- that one should have "
+         "landed", [{**held, "party_tier": "isolated", "current_tier": "restricted"}],
+         "tightens"),
+        ("a hold that names no basis is caught",
+         [{k: v for k, v in held.items() if k != "why"}], "why"),
+    ]
+    ok = True
+    for name, landed, want in cases:
+        got = judge_held(landed, "driftwood", "restricted", order)
+        if want is None and got is not None:
+            print(f"  selfcheck: {name}: unexpectedly rejected: {got}")
+            ok = False
+        elif want is not None and (got is None or want not in got):
+            print(f"  selfcheck: {name}: wanted {want!r} in the reason, got {got!r}")
+            ok = False
+    if not ok:
+        print("FAIL: step3 selfcheck: the held-document judgement does not bite")
+        return 1
+    print(f"PASS: selfcheck: {len(cases)} held-document judgements bite -- the tighten-only "
+          f"hold is accepted; nothing proposed, a landed document, an error, a missing or "
+          f"wrong hold, a hold that should have tightened and a hold with no basis are each "
+          f"caught")
+    return 0
+
+
+def judge_held(landed, org, line_tier, order):
+    """The observable fact NORTH-STAR §4 step 3 has to grade since ticket 78's tighten-only
+    clamp: the proposer produced a HELD document of the right shape, and nothing landed.
+    Returns None if the documents are what a held proposal looks like, else the reason.
+
+    Pure so the selfcheck can drive it: the estate can only make the proposer emit ONE of
+    these shapes today, and a judgement only ever exercised on the shape it happens to see is
+    not a judgement."""
+    if not landed:
+        return (f"a residual crossing {org}'s band proposed nothing at all -- the proposer "
+                f"must still emit the held document that says why it wrote nothing")
+    p = landed[0]
+    if "landed" in p:
+        return (f"the proposer LANDED a proposal the tighten-only clamp should have held: "
+                f"{json.dumps(p)[:300]}")
+    if "error" in p:
+        return f"the proposer errored instead of holding: {p['error']}"
+    if p.get("held") != "tighten-only":
+        return (f"the proposal is not held by the tighten-only clamp (held="
+                f"{p.get('held')!r}): {json.dumps(p)[:300]}")
+    if p.get("proposal_kind") != "pull_request":
+        return (f"the held proposal is a {p.get('proposal_kind')!r}, not a pull request -- "
+                f"every proposal is a PR (ADR-0022)")
+    current, party = p.get("current_tier"), p.get("party_tier")
+    if current not in order or party not in order:
+        return (f"the held document names tiers this estate does not rank "
+                f"(current={current!r}, party={party!r}); the ladder is {order}")
+    if order.index(party) > order.index(current):
+        return (f"the proposer HELD a proposal that tightens {current!r} to {party!r} -- a "
+                f"tightening is the one thing the clamp must let through")
+    if p.get("line_tier") != line_tier:
+        return (f"the held document says the priced line selected {p.get('line_tier')!r}, but "
+                f"this step priced it to {line_tier!r}")
+    if not str(p.get("why") or "").strip():
+        return "the held document carries no `why` -- a hold with no basis is not auditable"
+    return None
+
+
 def main():
+    if "--selfcheck" in sys.argv or "selfcheck" in sys.argv[1:]:
+        return selfcheck()
+    return observe()
+
+
+def observe():
     if not os.path.isdir(ESTATE):
         skip(f"{ESTATE} absent — run ./clone-estate.sh first")
     if not os.path.exists(TIER_PR):
@@ -235,6 +323,11 @@ def main():
         after = open(os.path.join(work, rel_declaration)).read()
         pod_after = (open(os.path.join(work, "deploy", "pod.yaml")).read()
                      if pod_before is not None else None)
+        # A held proposal creates NO branch. The throwaway copy is not a git repo, so `git
+        # branch` there refuses -- and that refusal is the observation: a proposer that had
+        # branched would have had to make one first.
+        branched = subprocess.run(["git", "-C", work, "branch", "--format=%(refname:short)"],
+                                  capture_output=True, text=True)
 
     try:
         landed = json.loads(r.stdout)
@@ -243,51 +336,57 @@ def main():
         # every machine reader, so it is named as that rather than as "bad JSON".
         fail(f"tier_pr.py --dry-run did not print a clean proposal document on stdout -- the "
              f"document stream carries other text: {r.stdout.strip()[:200]}")
-    if not landed:
-        fail(f"a residual crossing {org}'s band ({under:,.0f} -> {over:,.0f} {ccy}, tier "
-             f"{tier_under} -> {tier_over}) proposed nothing")
+    # --- what this step grades, and why it changed (2026-09-04, delegated, ADR-0025) ------
+    # Until ticket 78 this asserted a LANDED dry-run PR. Ticket 78 gave the proposer a
+    # tighten-only clamp: the party's folded tier is never written when it does not tighten
+    # what the governed Namespace declares today. driftwood has declared `isolated` -- the top
+    # rung of cage.ORDER -- since ticket 26, so no priced line can ever tighten it and this
+    # fixture can never produce a landed PR again. tier_pr.py's own selfcheck asserts exactly
+    # that (a per-line crossing on a party declared isolated is HELD, not landed).
+    #
+    # The two ways out were (a) drive the step with a different party, or (b) keep driftwood
+    # and grade the tighten-only outcome. (a) is not available: driftwood is the ONLY adopter
+    # that publishes a versioned selection-policy package, which is what MAKES the selection
+    # here (ADR-0021), and the alternative -- loosening driftwood's real declaration off
+    # `isolated` so a probe can tighten it -- would weaken the estate's own posture to keep a
+    # test green, which is the one thing this gate exists to refuse. So (b): the observable
+    # NORTH-STAR §4 fact this step now grades is that a priced line crossing the band selects
+    # a different tier through the adopter's own package, and the proposer HOLDS rather than
+    # proposing a loosening -- and writes nothing, branches nothing, opens nothing.
+    reason = judge_held(landed, org, tier_over, cage.ORDER)
+    if reason:
+        fail(reason)
     p = landed[0]
-    if p.get("landed") != "dry-run":
-        fail(f"the proposer did not stop at the dry run: {json.dumps(p)[:300]}")
-    if p.get("proposal_kind") != "pull_request":
-        fail(f"the crossing proposed a {p.get('proposal_kind')!r}, not a pull request editing "
-             f"the tier declaration -- every proposal is a PR (ADR-0022 retired the issue "
-             f"branch: the bottom rung is a running cage, so nothing is refused)")
-    if p.get("manifest") != rel_declaration:
-        fail(f"the proposal moves {p.get('manifest')!r}, not {org}'s governed Namespace "
-             f"declaration {rel_declaration!r} -- a merged edit to anything else is overwritten "
-             f"at the next admission and changes nothing (ADR-0022)")
-    diff = p.get("diff", "")
-    declared = [line for line in diff.splitlines() if line.strip().startswith(f"{TIER_LABEL}:")]
-    if not any(line.strip() == f'{TIER_LABEL}: "{tier_over}"' for line in declared):
-        fail(f"the proposed pull request does not declare {TIER_LABEL}: {tier_over} on "
-             f"{rel_declaration}: {declared or diff.strip()[:300]}")
-    if GOVERNED_LABEL not in diff:
-        fail(f"the proposed edit dropped {GOVERNED_LABEL} from {rel_declaration} -- the tier "
-             f"must be declared next to it, on the same signed object")
     if after != before:
-        fail(f"the dry run edited {rel_declaration} on disk")
+        fail(f"the held run edited {rel_declaration} on disk")
     if pod_after is not None and pod_after != pod_before:
-        fail("the dry run edited the adopter's pod manifest -- the pod label is cage-tier's "
+        fail("the held run edited the adopter's pod manifest -- the pod label is cage-tier's "
              "OUTPUT and never a thing a proposal moves (ADR-0022)")
-    print(f"    proposal: branch {p['branch']}, {p['proposal_kind']}, landed={p['landed']}")
-    print(f"    would declare {TIER_LABEL}: {tier_over} on {rel_declaration} (the governed "
-          f"Namespace); the pod manifest is untouched; nothing opened, nothing written")
+    if branched.returncode == 0 and branched.stdout.strip():
+        fail(f"the held run created branch(es) {branched.stdout.split()} in the throwaway copy "
+             f"-- a held proposal branches nothing")
+    print(f"    proposal: {p['proposal_kind']}, held={p['held']} on line {p['line']}")
+    print(f"    {org} declares {TIER_LABEL}: {p['current_tier']} on {rel_declaration}; the priced line "
+          f"selects {p['line_tier']} and the party folds to {p['party_tier']}, which does not "
+          f"tighten it, so nothing is written: {p['why']}")
+    print(f"    no branch created, {rel_declaration} unchanged on disk, the pod manifest "
+          f"untouched, nothing opened")
     # 2026-08-29 review: this used to read "a residual crossing {org}'s own
     # appetite band", which a deck reader takes as "{org}'s actual priced
     # position crossed its band". It did not: the two residuals are placed
     # either side of the band by construction (`under = band * 0.5`, then
     # stepped up until the tier moves), so the probe crosses whatever band it
     # reads. The property under test is real -- the selection is band-sensitive
-    # and the proposer edits the Namespace declaration -- and the wording now
-    # says which one it is.
+    # and the proposer holds rather than loosening -- and the wording now says
+    # which one it is.
     print(f"PASS: a SYNTHETIC residual placed either side of {org}'s own signed appetite band of "
           f"{band:,.0f} {ccy} ({under:,.2f} -> {over:,.2f} {ccy}, not {org}'s real priced "
           f"position) selects {tier_under} -> "
           f"{tier_over} through {org}'s own selection-policy package {policy_version} (which "
-          f"platform/graded/cage.py agrees with), and the proposer would open a pull request "
-          f"editing {TIER_LABEL} on {rel_declaration}, {org}'s governed Namespace declaration "
-          f"-- the pod label is that declaration's output and is left alone")
+          f"platform/graded/cage.py agrees with), and because {tier_over} does not tighten the "
+          f"{p['current_tier']} that {org} declares on {rel_declaration}, its governed "
+          f"Namespace, the proposer HOLDS (tighten-only, ADR-0022): no branch, no edit on "
+          f"disk, nothing opened -- the estate does not loosen a declaration to match a price")
     return 0
 
 
