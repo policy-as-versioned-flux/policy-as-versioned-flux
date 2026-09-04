@@ -12,6 +12,17 @@ if [ ! -x "$PY" ]; then
   PY=python3
   "$PY" -c 'import jsonschema, yaml' 2>/dev/null || { echo "SKIP: no .venv and python3 lacks jsonschema/pyyaml"; exit 3; }
 fi
+
+# `--selfcheck` runs the planted fixtures ALONE -- no estate, no network. Until 2026-09-04 the
+# flag was accepted and silently ignored, and the full estate check ran instead.
+if [ "${1:-}" = "--selfcheck" ]; then
+  if "$PY" "$HERE/feed_contract.py" selfcheck; then
+    echo "PASS: feed_contract.py selfcheck: every planted refusal bites"
+    exit 0
+  fi
+  echo "FAIL: feed_contract.py selfcheck"; exit 1
+fi
+
 [ -d "$ROOT/.estate-clone/platform" ] || bash "$ROOT/clone-estate.sh" >/dev/null || { echo "FAIL: could not assemble .estate-clone/"; exit 1; }
 
 "$PY" "$HERE/feed_contract.py" selfcheck >/dev/null || { echo "FAIL: feed_contract.py selfcheck"; exit 1; }

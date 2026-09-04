@@ -120,13 +120,97 @@ def local_version(estate, party, entry, version):
     return env_v if (env_v == v if "." in v else env_v.split(".")[0] == major) else None
 
 
+def _section_on_branch(estate, party, entry):
+    """Whether the publisher's WORKING TREE carries the section a payload_schema-less feed
+    record names (the `exposure` case). The queued half of the queued/nowhere pair that
+    local_version() answers for envelope feeds."""
+    header = os.path.join(estate, party, entry.get("path", ""), "HEADER.yaml")
+    if not os.path.isfile(header):
+        return False
+    return isinstance((load_yaml(header) or {}).get(entry.get("name")), (dict, list))
+
+
+def _git(repo, *args):
+    return subprocess.run(["git", "-C", repo, *args], capture_output=True, text=True, timeout=60)
+
+
+def tag_tree_carries(estate, party, tag, entry, version):
+    """Ticket 77 item 1, the hub's statement of the ONE rule: a pinned tree must contain the
+    section the pin is used for. Returns None when it does, a string reason when it does not,
+    and False when this checkout cannot look (the tag object is not in the clone).
+
+    This is deliberately a SECOND implementation of platform/party/pin_content.py's rule. The hub
+    is not a party, pins no platform release and must not import a party's code to grade that
+    party; what it can do is read the publisher's real tag out of the clone with git plumbing.
+    The three cases below are written in the same order and the same words as pin_content's so a
+    reader can see they are one rule:
+
+      kind controls / implementations   <path> is in the tag's tree
+      kind feed, payload_schema set     <path>/v<MAJOR>/feed.json is in it (an ADR-0019 envelope)
+      kind feed, payload_schema null    <path>/HEADER.yaml is in it AND carries a section keyed
+                                        by the feed's `name` -- the adopter's `exposure`
+
+    Why it matters: the insurer's three quotes assert `<adopter> exposure v1.1.0`, that tag
+    resolves on every adopter's real remote, and not one of those trees has an exposure section
+    in it. Tag existence alone graded that PASS for months.
+    """
+    repo = os.path.join(estate, party)
+    if not os.path.isdir(repo) or _git(repo, "rev-parse", "--verify", "--quiet", f"{tag}^{{commit}}").returncode:
+        return False
+    path = entry.get("path")
+    if not path:
+        return f"the publishes[] record names no path"
+    if entry.get("kind") != "feed":
+        return None if _git(repo, "ls-tree", "-d", tag, "--", path).stdout.strip() \
+                       or _git(repo, "cat-file", "-e", f"{tag}:{path}").returncode == 0 \
+            else f"the tree of {tag} has no {path} for the {entry['kind']} this pin names"
+    if entry.get("payload_schema") is None:
+        header = f"{path}/HEADER.yaml"
+        shown = _git(repo, "show", f"{tag}:{header}")
+        if shown.returncode:
+            return f"the tree of {tag} has no {header}, so the {entry['name']} section this " \
+                   f"pin names cannot be in it"
+        try:
+            section = (yaml.safe_load(shown.stdout) or {}).get(entry["name"])
+        except yaml.YAMLError as e:
+            return f"the tree of {tag} has a {header} that does not parse ({e})"
+        return None if isinstance(section, (dict, list)) else \
+            f"the tree of {tag} carries no {entry['name']} section in {header} -- the tag " \
+            f"resolves, but not to the content this pin is used for"
+    major = str(version).lstrip("v").split(".")[0]
+    feed = f"{path}/v{major}/feed.json"
+    return None if _git(repo, "cat-file", "-e", f"{tag}:{feed}").returncode == 0 else \
+        f"the tree of {tag} has no {feed}, so the {entry['name']} this pin names at {version} " \
+        f"is not in it"
+
+
 def check_tag(estate, party, publisher, entry, version, label):
     tags = remote_tags(party)
     if tags is None:
         out("SKIP", f"{label}: could not reach {REMOTE.format(p=party)}"); return
     hit = match_tag(entry, version, tags)
     if hit:
-        out("PASS", f"{label}: tag {hit} on {party}"); return
+        lacks = tag_tree_carries(estate, party, hit, entry, version)
+        if lacks is False:
+            out("SKIP", f"{label}: tag {hit} exists on {party}'s remote, but this checkout of "
+                        f"{party} does not carry the tag object, so its tree could not be looked at")
+        elif lacks:
+            # The publisher's BRANCH may already carry the section: then the pin is waiting for a
+            # tag that signs it, which is the same queued state a missing tag is, and the fix is a
+            # release and not a code change. Where the branch does not carry it either, nothing is
+            # coming and the pin is observed false.
+            branch_has = local_version(estate, party, entry, version) if entry.get("payload_schema") \
+                else _section_on_branch(estate, party, entry)
+            if branch_has:
+                out("SKIP", f"{label}: {lacks}; the section is on {party}'s branch, so this is "
+                            f"waiting for tag: the next {party} release signs it (cut by "
+                            f"cut-release.yml after merge)")
+            else:
+                out("FAIL", f"{label}: {lacks}, and {party}'s branch does not carry it either")
+        else:
+            out("PASS", f"{label}: tag {hit} on {party}, and its tree carries the "
+                        f"{entry.get('name') or entry.get('kind')} this pin is used for")
+        return
     queued = local_version(estate, party, entry, version)
     if queued:
         want = f"{entry['name']}/v{queued}" if len(publisher.get("publishes", [])) > 1 else f"v{queued}"
@@ -347,8 +431,44 @@ def selfcheck():
         LINES.clear(); _TAGS = {"ico": None}
         check_tag(tmp, "ico", load_yaml(os.path.join(tmp, "ico/party.yaml")), {"kind": "feed", "name": "penalty-schema", "path": "penalty-schema"}, "v1", "x")
         assert LINES == ["SKIP"], LINES
+
+        # ---- ticket 77 item 1: the tag resolves, but does its TREE carry the section? -------
+        # A real git repository, because the rule is stated in git plumbing here.
+        est = os.path.join(tmp, "trees"); repo = os.path.join(est, "driftwood")
+        os.makedirs(os.path.join(repo, "composed"))
+        def git(*a):
+            subprocess.run(["git", "-C", repo, "-c", "tag.gpgSign=false", *a], check=True,
+                           capture_output=True)
+        subprocess.run(["git", "init", "-q", "-b", "main", repo], check=True)
+        git("config", "user.email", "s@e"); git("config", "user.name", "s")
+        with open(os.path.join(repo, "composed", "HEADER.yaml"), "w") as fh:
+            yaml.safe_dump({"perspective": "driftwood"}, fh)
+        git("add", "-A"); git("commit", "-qm", "no exposure yet")
+        git("tag", "-a", "-m", "t", "v1.1.0")
+        rec = {"kind": "feed", "name": "exposure", "path": "composed", "payload_schema": None}
+        pub = {"publishes": [rec]}
+        why = tag_tree_carries(est, "driftwood", "v1.1.0", rec, "v1.1.0")
+        assert why and "carries no exposure section" in why, why
+        # the branch does not carry it either -> observed false
+        LINES.clear(); _TAGS = {"driftwood": {"v1.1.0"}}
+        check_tag(est, "driftwood", pub, rec, "v1.1.0", "insurer pins driftwood exposure")
+        assert LINES == ["FAIL"], LINES
+        # the section lands on the branch: now the pin is waiting for a tag that signs it
+        with open(os.path.join(repo, "composed", "HEADER.yaml"), "w") as fh:
+            yaml.safe_dump({"perspective": "driftwood", "exposure": {"total": 1}}, fh)
+        LINES.clear()
+        check_tag(est, "driftwood", pub, rec, "v1.1.0", "insurer pins driftwood exposure")
+        assert LINES == ["SKIP"], LINES
+        # ... and the next tag signs it
+        git("add", "-A"); git("commit", "-qm", "exposure"); git("tag", "-a", "-m", "t", "v1.2.0")
+        LINES.clear(); _TAGS = {"driftwood": {"v1.1.0", "v1.2.0"}}
+        check_tag(est, "driftwood", pub, rec, "v1.2.0", "insurer pins driftwood exposure")
+        assert LINES == ["PASS"], LINES
+        # a checkout that does not carry the tag object cannot look, and never passes
+        assert tag_tree_carries(est, "driftwood", "v9.9.9", rec, "v9.9.9") is False
+        assert tag_tree_carries(os.path.join(tmp, "nowhere"), "x", "v1", rec, "v1") is False
     LINES.clear()
-    print("ok  selfcheck: envelope, payload, sidecars, unresolved record, missing tag, bare-major and policy/ tags, queued tag, unreachable remote, empty estate all graded")
+    print("ok  selfcheck: envelope, payload, sidecars, unresolved record, missing tag, bare-major and policy/ tags, queued tag, unreachable remote, empty estate all graded, and a tag whose TREE lacks the section the pin is used for is a could-not-look while its publisher's branch carries it, observed false when it does not, and a pass once a tag signs it")
 
 
 if __name__ == "__main__":

@@ -37,6 +37,15 @@ for u in "${UNITS[@]}"; do
   # No signed tag exists yet (ticket 09/12: known, accepted partial state) so
   # this clones the default branch. Once a signed v1.0.0 lands, pin it here
   # (--branch v1.0.0) so the offline harness matches what Flux actually runs.
+  #
+  # 2026-09-04 (ticket 77 item 7). Signed tags DO exist now on most units, and this still
+  # clones default branches -- deliberately, because the gate grades what the estate is
+  # about to release and not only what it has released; a run pinned to the last tag could
+  # never go red on work in flight, which is the opposite of what this gate is for. What was
+  # missing was that a READER could not tell which of the two a green rested on. The TRUTH
+  # line now says it per unit: talk/verify-all.sh prints `unit=<sha>@<tag-or-branch>`, so
+  # `driftwood=4b28aa3@main` and `driftwood=4b28aa3@v1.2.0` are visibly different runs. The
+  # promise above stands as the day this becomes a release harness rather than a gate.
   # A FULL clone. Neither shortcut works here, and both were tried:
   #
   #   --depth 1          leaves the tag objects out, and several checks need tag

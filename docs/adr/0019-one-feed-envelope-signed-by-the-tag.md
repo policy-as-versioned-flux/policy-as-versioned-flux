@@ -36,3 +36,47 @@ nobody could publish a feed version. Decided 2026-08-28 in `.scratch/ecosystem/i
 
 The five live feeds and the ico schema migrate (ticket 21). What a feed costs is undecided; that is
 the £ seam.
+
+## Note, 2026-09-04 (eco-system tickets 62 and 77; delegated, ADR-0025)
+
+Point 4, "the subscription is the pin", was read for a year as *the tag resolves*. It is not
+enough, and the gap was not theoretical: the insurer's three signed quotes named
+`<adopter> exposure v1.1.0`, that tag existed on every adopter's real remote, and not one of
+those trees carried an `exposure` section. A pin resolved, a number was priced from a working
+copy, and the tag was recorded as its provenance.
+
+A pin resolves to CONTENT, not to a name. The publisher's own `publishes[]` record (point 5)
+says where the thing lives; the pinned tree must actually carry it:
+
+- `controls` / `implementations` -- `<path>` is in the tree;
+- `feed` with a `payload_schema` -- `<path>/v<MAJOR>/feed.json` is in it;
+- `feed` with `payload_schema: null` -- `<path>/HEADER.yaml` is in it AND carries a section
+  keyed by the feed's `name`. This is the adopter's `exposure`: a section of that party's own
+  signed artefact, never an envelope of its own.
+
+A pin whose tree lacks its section is a missing instrument (ADR-0020) and refuses. Where the
+publisher's BRANCH carries the section, nothing is wrong with the code and what is missing is a
+release, so a checker says could-not-look rather than observed-false -- the same queued state
+this ADR already gives a feed whose envelope is on the branch and not yet tagged.
+
+The rule is written once, in `platform/party/pin_content.py`, and applied by composition and by
+the insurer's pricer through their pinned platform dependency. The hub's
+`verify/feed-contract/` states it a second time in git plumbing, on purpose: the hub is not a
+party and pins no platform release, and importing a party's code to grade that party would be
+worse than two implementations of one rule.
+
+Point 4 also implies what ticket 62 landed: a subscription consumed at a BRANCH is not a pin at
+all. Every cross-organisation checkout in the eight units now names a tag one of the consuming
+repository's own `{tag, commit}` pin records declares, and `verify/branch-refs/` grades it.
+
+Corrected 2026-09-04 (round 3). "Every" was 51 of the 52 checkout lines. The 52nd was
+insurer/fetch.yml's `repository: policy-as-versioned-${{ matrix.adopter }}/${{ matrix.adopter }}`,
+whose organisation is a workflow expression: it matched nothing, was not counted, and was
+neither passed nor refused. `verify/branch-refs/` expands such a `repository:` from the job's own
+`strategy.matrix` and grades each expansion, so all 52 are graded; where no literal matrix
+decides the name, the checkout is counted and named as a could-not-look rather than passing in
+silence. The declaration a computed ref is checked against may also be the consuming
+repository's own `party.yaml` `inherits[]`, but only where nothing under `gitops/` and no
+`<PUBLISHER>_TAG` env constant names that publisher: most `inherits[]` versions are the feed
+MAJORs point 5 resolves and not git tags, and the insurer's `exposure` edges -- which its
+`fetch.yml` literally reads to build that ref -- are the case where they are.

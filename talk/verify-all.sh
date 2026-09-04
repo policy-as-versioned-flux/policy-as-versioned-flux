@@ -240,13 +240,24 @@ counts="$(printf '%s\n' "$summary" | tail -1)"
 rows="$(printf '%s\n' "$summary" | sed '$d')"
 [ -z "$rows" ] || printf '%s\n' "$rows"
 
-# units=[unit=sha ...]. Ticket 77 puts the tag beside each sha here (unit=sha@tag);
-# talk/truth_manifest.py's parse_truth keeps each unit's value as text for that.
+# units=[unit=sha@what ...]. Ticket 77 item 7: clone-estate.sh clones DEFAULT BRANCHES,
+# against its own comment promising to pin once a signed tag lands, so a reader of a TRUTH
+# line could not tell whether a green rested on a signed release of a unit or on whatever
+# was on somebody's branch that morning. The sha alone never said. `@what` says it: the tag
+# when HEAD is exactly a tag the publisher signed, otherwise the branch name this checkout
+# is on, otherwise `detached`. It is a RECORD of what was graded and not a claim that it
+# was pinned -- reading `@main` is the point. talk/truth_manifest.py's parse_truth keeps
+# each unit's value as text, so the `@` needs no parser change.
 units=""
 if [ -n "$FIXTURE" ]; then
   units="fixture"
 else
-  for u in .estate-clone/*/; do units="$units ${u#.estate-clone/}"; units="${units%/}=$(git -C "$u" rev-parse --short HEAD 2>/dev/null || echo none)"; done
+  for u in .estate-clone/*/; do
+    sha="$(git -C "$u" rev-parse --short HEAD 2>/dev/null || echo none)"
+    what="$(git -C "$u" describe --exact-match --tags HEAD 2>/dev/null \
+            || git -C "$u" symbolic-ref --short -q HEAD 2>/dev/null || echo detached)"
+    units="$units ${u#.estate-clone/}"; units="${units%/}=${sha}@${what}"
+  done
 fi
 echo
 echo "TRUTH $(date -u +%Y-%m-%dT%H:%MZ) run=${GITHUB_RUN_NUMBER:-local} hub=$(git rev-parse --short HEAD) units=[${units# }] ${counts}$([ "$REQUIRE_LIVE" = 1 ] && echo " live=1")$([ -n "$FIXTURE" ] && echo " fixture=1")"
