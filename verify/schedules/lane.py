@@ -38,7 +38,8 @@ of them because gitsign is not in git's verify chain; the Rekor-backed identity 
 ticket 73's verifier. Absence of a signature check is named, not hidden.
 
 Exit precedence: any FAIL -> 1; else any SKIP -> 3; else 0. Offline in full: it reads the refs the
-clone already holds after one best-effort fetch, and says in its own lines which it graded.
+clone already holds after a best-effort fetch of each observation ref origin actually has, and
+its INFO line says per ref whether that fetch happened, was not needed, or failed.
 
 Usage:
     lane.py check
@@ -121,28 +122,32 @@ def workflows_on_ref(root: str, ref: str) -> dict[str, dict]:
     return found
 
 
-def scheduled_identities(unit: str, docs: dict[str, dict]) -> set[str]:
-    """Every user.email a scheduled job configures, with the owner variable resolved."""
+def scheduled_identities(unit: str, *docsets: dict[str, dict]) -> set[str]:
+    """Every user.email a scheduled job configures, with the owner variable resolved. Several
+    document sets (the checkout's workflows and the graded ref's own copy) are read as one
+    union: a filename present in both is graded on BOTH copies, never on one of them."""
     emails: set[str] = set(ALWAYS_SCHEDULED)
-    for doc in docs.values():
-        for _name, job in S.scheduled_jobs(doc):
-            for step in job.get("steps") or []:
-                for email in _USER_EMAIL.findall(str(step.get("run") or "")):
-                    emails.add(_OWNER_VAR.sub(_owner(unit), email))
+    for docs in docsets:
+        for doc in docs.values():
+            for _name, job in S.scheduled_jobs(doc):
+                for step in job.get("steps") or []:
+                    for email in _USER_EMAIL.findall(str(step.get("run") or "")):
+                        emails.add(_OWNER_VAR.sub(_owner(unit), email))
     return emails
 
 
-def declared_lane(docs: dict[str, dict]) -> tuple[str, ...]:
-    """The union of OBSERVATION_LANE across scheduled jobs, kept inside ADR-0024's list (a path
-    declared outside it is schedules.py's FAIL, not this file's allowance). The ADR list when
-    nothing is declared."""
+def declared_lane(*docsets: dict[str, dict]) -> tuple[str, ...]:
+    """The union of OBSERVATION_LANE across scheduled jobs in every document set given, kept
+    inside ADR-0024's list (a path declared outside it is schedules.py's FAIL, not this file's
+    allowance). The ADR list when nothing is declared anywhere."""
     lane: list[str] = []
-    for doc in docs.values():
-        for _name, job in S.scheduled_jobs(doc):
-            for path in str(S._env(doc, job).get("OBSERVATION_LANE") or "").split():
-                path = S._bare(path)
-                if S._allowed(path) and path not in lane:
-                    lane.append(path)
+    for docs in docsets:
+        for doc in docs.values():
+            for _name, job in S.scheduled_jobs(doc):
+                for path in str(S._env(doc, job).get("OBSERVATION_LANE") or "").split():
+                    path = S._bare(path)
+                    if S._allowed(path) and path not in lane:
+                        lane.append(path)
     return tuple(lane) if lane else tuple(S.ALLOW_LIST)
 
 
@@ -250,35 +255,84 @@ def is_shallow(root: str) -> bool:
                           capture_output=True, text=True, check=False).stdout.strip() == "true"
 
 
+def _first(text: str, fallback: str) -> str:
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    return lines[0] if lines else fallback
+
+
+def remote_heads(root: str) -> tuple[bool, set[str], str]:
+    """(origin reachable, which of REFS exist on it, error). One `ls-remote` asked for the
+    observation refs by name: it is the fact of which refs origin has, so an absent
+    `observations` branch is never mistaken for an unreachable origin or the other way round."""
+    try:
+        done = subprocess.run(["git", "-C", root, "ls-remote", "--heads", "origin",
+                               *[f"refs/heads/{r}" for r in REFS]],
+                              capture_output=True, text=True, check=False, timeout=_FETCH_TIMEOUT)
+    except (subprocess.SubprocessError, OSError) as e:
+        return False, set(), _first(str(e), "ls-remote failed")
+    if done.returncode != 0:
+        return False, set(), _first(done.stderr, f"ls-remote exit {done.returncode}")
+    heads = {line.split("\t", 1)[1].removeprefix("refs/heads/")
+             for line in done.stdout.splitlines() if "\t" in line}
+    return True, heads, ""
+
+
 def refresh(root: str, network: bool) -> tuple[bool, str, bool]:
     """(network still usable, what was graded, still shallow).
 
-    Two fetches, both best-effort. The observation refs first, so a kept clone grades today's
-    tip rather than the day it was cloned. Then `--unshallow` where the checkout is shallow:
-    actions/checkout's default depth is 1, so on the citable run the hub's own `main` would
-    otherwise be one commit deep and the lane graded on nothing while reading as PASS. A
-    history that stays shallow is a could-not-look, never a pass."""
-    how = "as cloned"
-    if network:
-        try:
-            subprocess.run(["git", "-C", root, "fetch", "--quiet", "origin",
-                            *[f"+refs/heads/{r}:refs/remotes/origin/{r}" for r in REFS]],
-                           capture_output=True, text=True, check=False, timeout=_FETCH_TIMEOUT)
-            how = "fetched now"
-        except (subprocess.SubprocessError, OSError) as e:
+    Best-effort, and honest about the result: `how` names each ref that was fetched, each that
+    origin does not have, and any fetch that failed. A failed fetch or an unreachable origin
+    turns `network` off for the rest of the run, so the unshallow step is not attempted and
+    the SKIP text does not claim a fetch that never happened.
+
+    The observation refs first, each on its own (a single two-refspec fetch fails as a whole
+    when one ref is absent, and `observations` is absent on every adopter and on the hub), so a
+    kept clone grades today's tip rather than the day it was cloned. Then `--unshallow` where
+    the checkout is shallow: actions/checkout's default depth is 1, so on the citable run the
+    hub's own `main` would otherwise be one commit deep and the lane graded on nothing while
+    reading as PASS. A history that stays shallow is a could-not-look, never a pass."""
+    parts: list[str] = []
+    if not network:
+        parts.append("as cloned (no fetch attempted: origin was unreachable earlier in this run)")
+    else:
+        reachable, heads, err = remote_heads(root)
+        if not reachable:
             network = False
-            how = f"as cloned; fetch failed: {str(e).splitlines()[0]}"
+            parts.append(f"as cloned; origin unreachable ({err})")
+        for ref in REFS if reachable else ():
+            if ref not in heads:
+                parts.append(f"{ref} absent on origin")
+                continue
+            try:
+                done = subprocess.run(
+                    ["git", "-C", root, "fetch", "--quiet", "origin",
+                     f"+refs/heads/{ref}:refs/remotes/origin/{ref}"],
+                    capture_output=True, text=True, check=False, timeout=_FETCH_TIMEOUT)
+                failed = "" if done.returncode == 0 else \
+                    _first(done.stderr, f"fetch exit {done.returncode}")
+            except (subprocess.SubprocessError, OSError) as e:
+                failed = _first(str(e), "fetch failed")
+            if failed:
+                network = False
+                parts.append(f"{ref} as cloned, fetch FAILED ({failed})")
+            else:
+                parts.append(f"{ref} fetched now")
     was_shallow = is_shallow(root)
     if was_shallow and network:
         try:
-            subprocess.run(["git", "-C", root, "fetch", "--quiet", "--unshallow", "origin"],
-                           capture_output=True, text=True, check=False, timeout=3 * _FETCH_TIMEOUT)
-        except (subprocess.SubprocessError, OSError):
-            pass
+            done = subprocess.run(["git", "-C", root, "fetch", "--quiet", "--unshallow", "origin"],
+                                  capture_output=True, text=True, check=False,
+                                  timeout=3 * _FETCH_TIMEOUT)
+            if done.returncode != 0:
+                parts.append(f"unshallow FAILED ({_first(done.stderr, f'exit {done.returncode}')})")
+        except (subprocess.SubprocessError, OSError) as e:
+            parts.append(f"unshallow FAILED ({_first(str(e), 'fetch failed')})")
     shallow = is_shallow(root)
     if was_shallow and not shallow:
-        how += ", shallow checkout deepened to full history"
-    return network, how, shallow
+        parts.append("shallow checkout deepened to full history")
+    elif was_shallow and not network:
+        parts.append("shallow checkout left shallow: no fetch could be made")
+    return network, "; ".join(parts), shallow
 
 
 # --- the check ------------------------------------------------------------------------
@@ -294,15 +348,18 @@ def check() -> int:
             continue
         local, _broken = S.workflows(root)
         main_ref = f"origin/{S.DEFAULT_BRANCH}"
-        docs = {**workflows_on_ref(root, main_ref), **local}
-        identities = scheduled_identities(unit, docs)
-        lane = declared_lane(docs)
+        on_ref = workflows_on_ref(root, main_ref)
+        # The union of the two copies, not a merge by filename: a clock whose checkout copy has
+        # moved on is still graded by the identity and lane the ref's own copy configured.
+        identities = scheduled_identities(unit, on_ref, local)
+        lane = declared_lane(on_ref, local)
         print(f"INFO: {unit}: scheduled identities {sorted(identities - ALWAYS_SCHEDULED)}, "
               f"lane {list(lane)}, refs {refreshed}")
         for ref in REFS:
             full = f"origin/{ref}"
             if not _has_ref(root, full):
-                if ref == OBSERVATIONS_BRANCH and not pushes_observations(docs):
+                if ref == OBSERVATIONS_BRANCH and not (pushes_observations(on_ref)
+                                                       or pushes_observations(local)):
                     continue                       # this unit has no observation series
                 out("SKIP", f"{unit}@{ref}: the ref does not exist on {remote} yet -- the clock "
                             f"that creates it has not landed a commit, so there is nothing to "
@@ -432,6 +489,82 @@ def selfcheck() -> None:
             assert ("deepened" in how) is network, (name, how)
         assert len(commits(os.path.join(tmp, "deep"), "origin/main")) > 1
         assert len(commits(os.path.join(tmp, "thin"), "origin/main")) == 1
+        _net, how, _sh = refresh(os.path.join(tmp, "deep"), True)
+        assert "main fetched now" in how and "observations fetched now" in how, how
+
+        # a remote WITHOUT an observations branch (every adopter, and the hub): main is still
+        # refreshed, the absence is named, and nothing claims a fetch of a ref that is not there
+        plain = os.path.join(tmp, "plain")
+        os.makedirs(plain)
+        run(plain, "init", "-q", "-b", "main")
+        commit(plain, "party.yaml", "roles: [adopter]")
+        noobs = os.path.join(tmp, "noobs")
+        subprocess.run(["git", "clone", "-q", f"file://{plain}", noobs],
+                       check=True, capture_output=True)
+        commit(plain, "drift/samples.jsonl", '{"sample": 1}', who=bot)   # after the clone
+        net, how, shallow = refresh(noobs, True)
+        assert net and not shallow, (net, how, shallow)
+        assert "main fetched now" in how and "observations absent on origin" in how, how
+        assert "FAILED" not in how and "observations fetched" not in how, how
+        assert len(commits(noobs, "origin/main")) == 2, "origin/main was not refreshed"
+
+        # an UNREACHABLE origin: no line claims freshness, network is given up, and a shallow
+        # checkout is left shallow (a could-not-look for the caller), not reported deepened
+        dead = os.path.join(tmp, "dead")
+        subprocess.run(["git", "clone", "-q", "--depth", "1", f"file://{plain}", dead],
+                       check=True, capture_output=True)
+        run(dead, "remote", "set-url", "origin", f"file://{tmp}/no-such-remote")
+        net, how, shallow = refresh(dead, True)
+        assert not net and shallow, (net, how, shallow)
+        assert "origin unreachable" in how and "fetched now" not in how, how
+        assert "deepened" not in how and "left shallow" in how, how
+        net, how, _sh = refresh(noobs, net)          # the next unit inherits the given-up network
+        assert not net and "no fetch attempted" in how and "fetched now" not in how, how
+
+        # the ref's copy of a workflow and the checkout's DIFFER under the same filename: both
+        # identities and both lanes are graded (a union), so a clock the checkout copy no longer
+        # names is still caught by what the ref's copy configured
+        wf = os.path.join(tmp, "wf")
+        os.makedirs(wf)
+        run(wf, "init", "-q", "-b", "main")
+        commit(wf, ".github/workflows/clock.yml", """\
+on: {schedule: [{cron: "5 7 * * *"}]}
+env: {OBSERVATION_LANE: "observations"}
+jobs:
+  observe:
+    steps:
+      - run: git config user.email "ref-bot@policy-as-versioned-x.invalid"
+""")
+        wfclone = os.path.join(tmp, "wfclone")
+        subprocess.run(["git", "clone", "-q", f"file://{wf}", wfclone],
+                       check=True, capture_output=True)
+        commit(wf, "deploy/tier.yaml", "tier: gold", who="ref-bot@policy-as-versioned-x.invalid")
+        refresh(wfclone, True)
+        with open(os.path.join(wfclone, ".github/workflows/clock.yml"), "w") as fh:
+            fh.write("""\
+on: {schedule: [{cron: "5 7 * * *"}]}
+env: {OBSERVATION_LANE: "drift/samples.jsonl"}
+jobs:
+  observe:
+    steps:
+      - run: git config user.email "local-bot@policy-as-versioned-x.invalid"
+""")
+        on_ref = workflows_on_ref(wfclone, "origin/main")
+        local, _broken = S.workflows(wfclone)
+        assert set(on_ref) == set(local) == {"clock.yml"}, (on_ref.keys(), local.keys())
+        both = scheduled_identities("x", on_ref, local)
+        assert both == ALWAYS_SCHEDULED | {"ref-bot@policy-as-versioned-x.invalid",
+                                           "local-bot@policy-as-versioned-x.invalid"}, both
+        assert declared_lane(on_ref, local) == ("observations", "drift/samples.jsonl"), \
+            declared_lane(on_ref, local)
+        only_local = scheduled_identities("x", local)
+        assert "ref-bot@policy-as-versioned-x.invalid" not in only_local
+        # the checkout copy alone would miss it: ref-bot reads as an unscheduled automation
+        # identity there -- named in a NOTE, a merge-by-filename would have graded PASS
+        alone = grade_ref(wfclone, "x", "origin/main", only_local, lane)
+        assert [s for s, _ in alone] == ["PASS", "NOTE"], alone
+        hit = [m for s, m in grade_ref(wfclone, "x", "origin/main", both, lane) if s == "FAIL"]
+        assert len(hit) == 1 and "deploy/tier.yaml" in hit[0] and "ref-bot@" in hit[0], hit
 
     # the identity and lane parsers, on the shapes the estate's workflows actually use
     docs = {
@@ -482,7 +615,9 @@ jobs:
           "pass, an orphan root commit is graded, a human's declaration and a clock-authored "
           "commit a human merged or squashed are not graded, an unscheduled automation "
           "identity is named not graded, a shallow checkout is deepened or is a could-not-look, "
-          "and identities and lanes parse from the workflows")
+          "a fetch is reported per ref as done, absent on origin or failed and an unreachable "
+          "origin never reads as fetched, the ref's and the checkout's copies of one workflow "
+          "are graded as a union, and identities and lanes parse from the workflows")
 
 
 def main(argv: list[str]) -> int:

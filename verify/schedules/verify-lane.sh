@@ -48,13 +48,21 @@ fi
   || { echo "FAIL: lane.py selfcheck -- the lane grader does not bite its own fixtures"; exit 1; }
 
 log="$(mktemp)"; trap 'rm -f "$log"' EXIT
-"$PY" "$HERE/lane.py" check | tee "$log"
+"$PY" "$HERE/lane.py" check 2>&1 | tee "$log"
 rc=${PIPESTATUS[0]}
+fails=$(grep -c '^FAIL:' "$log")
 
+# A checker that crashed (a traceback, no FAIL: line of its own) is not a lane verdict: it is
+# a could-not-look that exits 1 on Python's account, and it must not read as "0 outside the lane".
 case $rc in
   0) echo "PASS: every commit a scheduled identity has landed on an observation ref touched only"
      echo "PASS: the observation lane, and none of them is a merge";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
-  *) echo "FAIL: $(grep -c '^FAIL:' "$log") landed commit(s) or ref(s) observed outside the lane";;
+  *) if [ "$fails" -gt 0 ]; then
+       echo "FAIL: $fails landed commit(s) or ref(s) observed outside the lane"
+     else
+       echo "FAIL: lane.py did not grade -- it exited $rc without a verdict ($(tail -1 "$log"))"
+       rc=1
+     fi;;
 esac
 exit "$rc"
