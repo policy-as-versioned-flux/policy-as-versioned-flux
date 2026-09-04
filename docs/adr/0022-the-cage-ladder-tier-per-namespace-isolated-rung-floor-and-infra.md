@@ -105,6 +105,24 @@ states, pending PE-05 / ticket 75 Q4. A summed rule would slot into exactly one 
 `select_party_tier()`'s fold of `lines` to `strictest`, mirrored in the adopter package. The
 version bump is what makes that swap reviewable: driftwood's selection-policy is now 1.1.0.
 
+**`infra` is a declaration, not a selection** (added on review the same day). The ladder these
+folds select from is `baseline, restricted, quarantine, isolated`: no price proposes `infra` and no
+floor declares it. But this ADR gives a platform-role party the right to declare a Namespace at
+`infra`, and the first build graded such a declaration as a **missing instrument** -- a refusal --
+because it was not on the selection ladder. That was wrong: it is a legitimate declaration, and it
+is *tighter* than every rung a price can reach. Both readings of an `infra` label agree on the two
+questions these folds ask: from a platform-role party it stands and nothing priced can tighten it;
+from any other party it renders `isolated`, this ladder's own tightest rung, and nothing priced is
+looser than that either. So the verdict needs no role lookup, and `rank()` -- one rung longer than
+`LADDER` -- is what both folds and the binding check now compare with.
+
+**Two governed Namespace documents is a question, not a first answer** (added on review the same
+day). The ambiguity guard counted manifest FILES, so a second governed Namespace declared in the
+*same* file was invisible: the proposer wrote the first and left the second, and the binding check
+read the first and passed. Declarations are now counted per **document**. Two of them, in one file
+or two, is could-not-look: which one carries the party's tier is not the proposer's or the check's
+guess to make (ADR-0020), and `apply_tier_declaration()` refuses rather than rewriting one of them.
+
 **Loosening is not implemented, and that is the decision, not an omission.** ADR-0022 prices a
 lowered floor rather than refusing it, so a party's aggregate residual should one day be able to
 argue a looser declaration. Doing that needs a residual the proposer does not yet compute and a

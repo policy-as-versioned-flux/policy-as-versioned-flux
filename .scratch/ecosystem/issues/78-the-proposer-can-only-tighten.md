@@ -22,7 +22,7 @@ Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R2. Findings: scope/F
 
 ## Answer
 
-Built 2026-09-04. Map line: The proposer folds the party to its strictest priced tier and lands nothing looser, one check binds the enacted tier to the priced tier in three shift-lefts and the gate, and the proposal commit is gitsign-signed against a second, proposer-only identity regexp.
+Built 2026-09-04; three blocking review defects and five minors fixed the same day (see the dated note below). Map line: The proposer folds the party to its strictest priced tier and lands nothing looser, one check binds the enacted tier to the priced tier in the gate and in three shift-lefts that say SKIP with the reason until platform tags the rule and each adopter bumps its pin, and the proposal commit is gitsign-signed against a second, proposer-only identity regexp.
 
 ### 1. Selection over the party, not the price line
 
@@ -45,8 +45,17 @@ no branch, no commit and no pull request, and says why on stderr and in the retu
 driftwood's own package records the same rule: `selection-policy/selection_policy.py:select_party()`
 at **VERSION 1.1.0** (PIN.yaml bumped with it, as its own comment requires). The hub's
 `verify/tier-binding/` folds every combination of up to three line tiers x every declared tier x
-every floor -- **875 cases** -- through both implementations and refuses a disagreement (ADR-0021's
+every floor -- **1,050 cases** -- through both and refuses a disagreement (ADR-0021's
 two-implementations guard, the same one `verify/pound-seam/` applies to the per-line `select()`).
+
+Be exact about what that guard buys here, because it is weaker than the one on `select()`.
+driftwood's `select_party` is a **transliteration** of `platform/wargamer`'s fold -- written from
+it, line by line, not derived independently from the rule -- so 1,050 agreements prove **copy
+fidelity**: the pinned package has not drifted from the rule it mirrors, and a change to either
+that is not made to the other is caught. They are not two implementations reaching the same answer,
+and this check would not catch a mistake made once in platform's fold and copied faithfully. The
+per-line `select()` the pound-seam check compares *is* independent; this one is not, and the check
+now says so in its own PASS line rather than letting the case count imply otherwise.
 
 ### 2. One check binds the enacted tier to the priced tier
 
@@ -151,6 +160,114 @@ another repo, a smuggled prefix or suffix, and `githubXcom`.
    certificate is what is verified; the git author line is not a security claim, and changing it
    would move the dedupe/ledger shape for nothing.
 
+### Note, 2026-09-04: three blocking review defects and five minors, fixed
+
+The spec review of PR 20 found three defects that would each have put a red or a false green on
+something real. All three are fixed on this branch, red demonstrated first in every case.
+
+**1. The hub check graded a could-not-look as observed-false.**
+`verify/tier-binding/verify-tier-binding.sh` ran `tier_binding_estate.py selfcheck` *before*
+establishing that this estate's platform checkout carries the rule, and that selfcheck asserted
+unconditionally that `platform/shift-left/tier_binding.py` exists (it plants its estate around the
+real platform tree, so it needs one). On the real `.estate-clone/` -- where platform still predates
+this ticket until the owner pushes -- it therefore raised `AssertionError: the selfcheck needs a
+platform checkout to copy the published rule from` and the wrapper printed `FAIL: ... no longer
+bites` and **exited 1**. That is an unnamed red on the gate the moment this merges, and it says a
+false thing: the planted case bites fine, the rule is simply not here yet. The `check` subcommand
+already got this right and exited 3.
+
+Fixed both ways the review offered. `check` runs **first** and its `SKIP` wins and returns
+immediately; the selfcheck runs only where `check` could look, which is exactly where the rule
+exists to plant against. And `selfcheck` no longer asserts: it takes `--estate-clone` and returns 3
+with its own `SKIP:` line where the platform checkout carries no rule. The script also honours
+`ESTATE_CLONE`, so it can be pointed at a tree of ticket worktrees.
+
+- red, pre-fix script against the real estate clone: `AssertionError` + `FAIL: ...` + `EXIT=1`
+- green, fixed script against the real estate clone: `SKIP: /Users/.../\.estate-clone/platform/shift-left/tier_binding.py is not in this platform checkout -- the binding rule is platform's to publish`, `EXIT=3`
+- green, fixed script against the ticket-78 worktrees: `PASS: ...`, `EXIT=0`
+
+**2. The adopters' new compose-check step would have failed file-not-found on the first PR.**
+The step ran `python3 platform/shift-left/tier_binding.py`, but that job checks platform out at the
+adopter's **pinned tag** (`ref: ${{ steps.pins.outputs.platform_tag }}`), and all three pin
+`v2.0.1`, which does not carry the module. Every first pull request in driftwood, tuppence and
+ludlow would have gone red on a missing file.
+
+Fixed by making the step honest about the ordering rather than by hiding it: it tests for the
+module, and where the pinned checkout does not carry it, prints `SKIP:` **with the reason and the
+pinned tag** to the log and to the job summary and exits 0. The ordering it waits on -- platform
+cuts a tag carrying the module, then each adopter bumps its pin -- is named in `## Waits on the
+owner` above and in the workflow comment itself. Nothing is silent: a reader of the run sees the
+step and sees why it could not look.
+
+**3. The check read only the FIRST governed Namespace document in a manifest.**
+`find_governed_namespaces()` guarded ambiguity across FILES; `governed_namespace_span()` stopped at
+the first matching document. So a second governed Namespace in the *same* file, declared looser,
+was invisible: the binding check read the first and passed, and `apply_tier_declaration()` rewrote
+the first and left the second exactly as it was.
+
+Fixed by counting **spans, not files**. `governed_namespace_spans()` (new) returns every governed
+Namespace document; `find_governed_namespaces()` lists one entry per document, so `len(hits) > 1`
+now means what all four call sites already read it to mean; `governed_namespace_span()`,
+`declared_tier()` and `apply_tier_declaration()` raise `AmbiguousDeclaration` rather than answering
+about the first of two. `tier_binding.check()` grades that **SKIP (exit 3)** with the file named and
+`(N documents in it)` in the reason, and `tier_pr.run()` lands nothing and says the same. Planted
+cases added at both seams, red first against the pre-fix code:
+
+- `RED 3a two governed docs in one file -> (0, "OK: gitops/apps/namespace.yaml declares 'isolated'; ... bound")` -- a silent pass over a `baseline` second document
+- `RED 3b apply_tier_declaration rewrote -> 1 of 2 documents`
+- green: `tier_binding.py selfcheck` case 11 requires exit 3, `"2 governed Namespace declarations"` and `"2 documents in it"` in the reason; `tier_pr.py selfcheck` case 4f requires no branch, no PR, the same reason on the returned row, and `apply_tier_declaration` raising rather than half-writing
+
+**Minors, same day.**
+
+- **`set -uo pipefail` under `bash -e {0}`.** All three new steps read `status=${PIPESTATUS[0]}`
+  after a pipeline, but GitHub runs a `run:` block as `bash -e {0}` and `set -uo pipefail` does not
+  lift `-e`, so a non-zero exit aborted the step at the pipeline and the summary block and both
+  `::error::` annotations were dead code. This is the identical defect driftwood's `twin-sweep.yml`
+  documents from ticket 72 (run 33627910027). Fixed with `set +e` around the check and `set -e`
+  after it, and the comment says why, pointing at the run that proved it.
+- **`infra`.** Excluded from `LADDER`, but ADR-0022 gives a platform-role party the right to
+  declare it -- so it graded as a missing instrument, a refusal of a legitimate declaration
+  (`FAIL: missing instrument -- the Namespace declares tier 'infra', which is not on the ladder`).
+  Decision below; recorded in the ADR note too.
+- **The Answer's claim about `compose-check`.** It said the pound-seam red closes when the
+  `compose-check` job recomposes on the pull request. It does not: that job recomposes into the
+  checkout and exits 1 on drift, so the PR is refused, not fixed. Corrected in `## Waits on the
+  owner` with what actually closes it.
+- **`read_overlay_floor()`.** Its docstring said "the top-level `overlay:` block ->
+  `  floor:`" but the regexp matched `floor:` at any depth under `overlay:`, so a nested decoy above
+  the real floor won: `overlay: {restate: {defaults: {floor: baseline}}, floor: quarantine}` read as
+  `baseline`, a looser floor than the party declared. The read now matches only a **direct child**
+  of `overlay:` -- the indent of the block's own first key -- and a planted case covers both the
+  decoy and an overlay with no floor of its own.
+- **The 875 (now 1,050) agreements.** Said plainly above and in the check's own PASS line: they
+  prove copy fidelity, not independence.
+
+### Decisions added on review (delegated, ADR-0025)
+
+9. **`infra` is a declaration this fold ranks, not a selection it can make, and it needs no role
+   lookup.** `rank()` (new, in `wargamer.py` and mirrored in driftwood's package) is defined over
+   `LADDER + ("infra",)`; a price naming `infra` and a floor declaring it are still refused.
+   Reason: both readings of an `infra` label answer the two questions asked here identically. From
+   a platform-role party the declaration stands and is tighter than any rung a price can select;
+   from any other party ADR-0022 renders it `isolated`, which is `LADDER`'s own tightest rung. So
+   nothing priced tightens it and nothing priced is looser than it either way, and reading
+   `party.yaml`'s `roles:` to tell the two apart would buy no different verdict while adding a file
+   read that can fail. If a future rule ever needs the two apart -- a *loosening* path would --
+   that is the ticket that should add the role lookup, with a reason.
+10. **Two governed Namespace documents is could-not-look (exit 3), not a refusal (exit 1).**
+    Reason: it is a question about which document carries the party's tier, not an observation that
+    either one is loose. The check has not seen a loosening; it has failed to read. ADR-0020's
+    shape for that is SKIP with a named reason, and it matches what the check already did for two
+    governed manifests in two files -- counting per document rather than per file makes the two
+    cases one case instead of two different verdicts for the same ambiguity. The proposer's side is
+    the same call it already made: land nothing, name the files.
+11. **The adopter step skips loudly rather than being gated on the pin in YAML.** Reason: an
+    `if:` condition on the pin would need the tag list at workflow-parse time and would make the
+    step **disappear** from the run -- a check that is not there reads as a check that passed. A
+    printed `SKIP:` with the pinned tag in it, in the log and in the job summary, is a
+    could-not-look a reader can see. It costs one `[ -f ]` test and it deletes itself the day the
+    pin moves.
+
 ## Waits on the owner
 
 - **The eight enactment pushes.** Every change under `.estate-clone/` is committed on
@@ -169,9 +286,33 @@ another repo, a smuggled prefix or suffix, and `githubXcom`.
   `verify/pound-seam/` say, truthfully, `driftwood: names selection policy ['1.0.0'], but
   driftwood/selection-policy/VERSION says '1.1.0'` -- the committed `composed/evidence.json` was
   made by 1.0.0. Regenerating `composed/` here would have dragged ~2,900 lines of unrelated drift
-  from tickets 38 and 69 into this branch, so it was not done. It closes when driftwood recomposes,
-  which its own `compose-check` job does on the pull request that lands this, and which tickets 38
-  and 69 already require. Named here rather than hidden.
+  from tickets 38 and 69 into this branch, so it was not done. Named here rather than hidden.
+
+  **Corrected 2026-09-04.** An earlier draft of this bullet said the red "closes when driftwood
+  recomposes, which its own `compose-check` job does on the pull request that lands this". That is
+  wrong, and it mattered: `compose-check` recomposes **into the runner's checkout** and then exits
+  1 if the regenerated `composed/` differs from the committed copy. It does not commit anything.
+  So the pull request carrying this change is **refused** by that job, not repaired by it. What
+  actually closes the red is a commit: someone runs `python3 platform/compose/composition.py
+  compose driftwood --estate-clone . --out driftwood` and commits the regenerated
+  `composed/evidence.json` -- either on this branch before it merges, or as part of tickets 38 and
+  69, which regenerate the same tree for their own reasons. Until one of those commits exists,
+  driftwood's `shift-left.yml` fails on this change.
+
+- **The ordering the tier-binding step depends on: a platform tag, then three pin bumps.** The new
+  step in each adopter's `shift-left.yml` runs `tier_binding.py` out of the platform checkout **at
+  that adopter's own pinned tag**. All three pin `v2.0.1` today, and `v2.0.1` does not carry
+  `shift-left/tier_binding.py` (`git show v2.0.1:shift-left/` lists `ci-check.py`, `fixtures/`,
+  `README.md`, `verify-shift-left.sh` and nothing else). Two things must happen, in this order,
+  before the step can be a real check:
+  1. platform cuts a release tag carrying `shift-left/tier_binding.py`;
+  2. driftwood, tuppence and ludlow each bump `gitops/platform/platform-pin.yaml` to that tag.
+
+  Both are the owner's: they are enactment pushes and a release. Until then the step prints
+  `SKIP:` with that reason, in the log and in the job summary, and exits 0 -- it does not fail
+  a pull request for a rule its own pin does not publish, and it does not pass silently as though
+  it had looked. The hub's `verify/tier-binding/` is what grades the rule across the estate in the
+  meantime, and it says `SKIP` for the same reason until the platform branch is pushed.
 
 ## Not done
 
@@ -184,3 +325,15 @@ another repo, a smuggled prefix or suffix, and `githubXcom`.
   found` -- and fails there with this change **and** with it stashed. It is green on
   `.estate-clone/driftwood` itself, which is what the gate reads. Pre-existing, named, not
   introduced here.
+- The **`compose-check` step immediately above** the new one in all three `shift-left.yml` files
+  has the same `set -uo pipefail`-under-`bash -e` defect the new steps had: its
+  `status=${PIPESTATUS[0]}`, its summary block and its two `::error::` lines are dead code, so a
+  composition refusal or a drift fails the step with no summary and no annotation. It is
+  pre-existing (ticket 21 wrote it, ticket 18 wired it) and belongs to whichever ticket owns that
+  job; fixing it here would widen this diff into a step this ticket does not otherwise touch.
+  Named, not fixed.
+- `platform/wargamer/verify-wargamer.sh` and `wargamer.py selfcheck` read sibling party
+  directories (`platform/../driftwood/party.yaml`), so from a linked worktree they need the estate
+  laid out beside the worktree. Sibling symlinks were made under the gitignored
+  `.estate-clone/platform/.work/` to run them; on `.estate-clone/platform` itself, which is what
+  the gate reads, the siblings are real and nothing is needed. Not a change to any repository.

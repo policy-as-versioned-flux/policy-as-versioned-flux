@@ -13,25 +13,47 @@
 #
 # Exit 0 observed true; 3 could not look (no estate, no platform checkout with
 # the rule in it, nothing composed anywhere); 1 observed false.
+#
+# ESTATE_CLONE points this at another estate layout (a tree of ticket worktrees,
+# say); it defaults to the hub's own .estate-clone/.
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$HERE/../.."
 PY="$ROOT/.venv/bin/python"
 [ -x "$PY" ] || PY=python3
 
-[ -d "$ROOT/.estate-clone/platform" ] || { echo "SKIP: no .estate-clone/ -- run ./clone-estate.sh first"; exit 3; }
+ESTATE="${ESTATE_CLONE:-$ROOT/.estate-clone}"
+[ -d "$ESTATE/platform" ] || { echo "SKIP: no $ESTATE/ -- run ./clone-estate.sh first"; exit 3; }
 
-"$PY" "$HERE/tier_binding_estate.py" selfcheck >/dev/null || {
+# ORDER MATTERS (fixed 2026-09-04, ticket 78 review). The selfcheck plants its
+# estate around the REAL platform tree, because the rule under test is the one
+# platform publishes and wargamer.py imports its own siblings. So it can only run
+# where this estate's platform checkout already carries the rule -- and until the
+# owner pushes ticket 78's platform branch, it does not. Running the selfcheck
+# first turned that could-not-look into a FAIL: an unnamed red on the gate that
+# said the planted case "no longer bites" when the truth was that the rule is not
+# here yet. `check` is asked first and its SKIP wins; the selfcheck runs only
+# where check could look, which is exactly where the rule exists to be planted
+# against.
+log="$(mktemp)"
+"$PY" "$HERE/tier_binding_estate.py" check --estate-clone "$ESTATE" | tee "$log"
+rc=${PIPESTATUS[0]}
+if [ "$rc" -eq 3 ]; then
+  echo "SKIP: $(grep '^SKIP:' "$log" | tail -1 | cut -c7-)"
+  rm -f "$log"
+  exit 3
+fi
+
+# check could look, so platform's rule is in this estate: now prove the walk still
+# bites before believing the verdict it just printed.
+if ! "$PY" "$HERE/tier_binding_estate.py" selfcheck --estate-clone "$ESTATE" >/dev/null; then
+  rm -f "$log"
   echo "FAIL: tier_binding_estate.py selfcheck -- the planted loose declaration or the planted disagreeing selection package no longer bites"
   exit 1
-}
+fi
 
-log="$(mktemp)"
-"$PY" "$HERE/tier_binding_estate.py" check --estate-clone "$ROOT/.estate-clone" | tee "$log"
-rc=${PIPESTATUS[0]}
 case $rc in
   0) echo "PASS: every party in this estate that declares a governed Namespace declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform's";;
-  3) echo "SKIP: $(grep '^SKIP:' "$log" | tail -1 | cut -c7-)";;
   *) echo "FAIL: $(grep -c '^FAIL:' "$log") party/parties declare a cage looser than they price, or fold the party differently from platform";;
 esac
 rm -f "$log"

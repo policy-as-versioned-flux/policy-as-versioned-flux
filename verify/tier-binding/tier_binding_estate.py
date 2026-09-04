@@ -9,12 +9,14 @@ hub's side of the same question, asked of what is COMMITTED in `.estate-clone/` 
      manifest: is the declared `posture.acme.io/tier` at least as tight as the strictest
      `proposed_tier` any priced line selected, clamped to that party's own `overlay.floor`?
 
-  2. Where a party also publishes a selection-policy package, do the two implementations of
-     the party-level fold agree? `platform/wargamer/wargamer.py:select_party_tier` and the
-     adopter's own `selection-policy/selection_policy.py:select_party` are written
-     independently and pinned separately (ADR-0021, the two-implementations guard the
-     pound-seam check already applies to the per-line `select()`); this applies it to the
-     party fold, over every combination of line tiers, declared tier and floor on the ladder.
+  2. Where a party also publishes a selection-policy package, do its fold and platform's agree?
+     `platform/wargamer/wargamer.py:select_party_tier` and the adopter's own
+     `selection-policy/selection_policy.py:select_party` are pinned separately (ADR-0021, the
+     two-implementations guard the pound-seam check already applies to the per-line `select()`);
+     this applies it to the party fold, over every combination of line tiers, declared tier and
+     floor. Be honest about what that buys: unlike `select()`, the adopter's `select_party` is a
+     TRANSLITERATION of platform's fold, so agreement over every shape proves the pinned copy has
+     not drifted from the rule it mirrors -- copy fidelity, not two minds agreeing.
 
 Neither reads a cluster and neither writes anything. A party with nothing composed yet, or no
 governed Namespace, is could-not-look for that party, not a failure -- but if NO party could be
@@ -83,10 +85,16 @@ def _agree(wargamer, package_path: Path, name: str, out) -> int:
                     f"publishes no select_party() yet, so there is no party fold to compare")
         return 0
     ladder = list(wargamer.LADDER)
+    # A price selects only from LADDER and so does a floor; a DECLARATION may also be
+    # ADR-0022's `infra`, so the declared tier is drawn from the longer list. Nothing here
+    # proves independence: the adopter's select_party is a transliteration of platform's
+    # fold, so an agreement over every shape is copy fidelity -- that the pinned package has
+    # not drifted from the rule it mirrors -- not two implementations reaching one answer.
+    declarable = list(getattr(wargamer, "DECLARABLE", wargamer.LADDER))
     cases = 0
     for n in (0, 1, 2, 3):
         for lines in itertools.combinations_with_replacement(ladder, n):
-            for current in [None] + ladder:
+            for current in [None] + declarable:
                 for floor in [None] + ladder:
                     cases += 1
                     prices = [{"source": f"s{i}", "kind": "feed", "proposed_tier": t}
@@ -104,7 +112,9 @@ def _agree(wargamer, package_path: Path, name: str, out) -> int:
     out("PASS", f"{name}: platform/wargamer's select_party_tier and {name}'s own "
                 f"{POLICY_PACKAGE} v{theirs.VERSION} select_party fold the party the same way "
                 f"in all {cases} cases -- every line combination up to three, every declared "
-                f"tier and every floor on the ladder")
+                f"tier (including ADR-0022's `infra`) and every floor on the ladder. This is "
+                f"copy fidelity, not independence: the package's fold is a transliteration of "
+                f"platform's")
     return 0
 
 
@@ -151,17 +161,25 @@ def check(estate: Path) -> int:
 
 
 # --------------------------------------------------------------------------
-def selfcheck() -> None:
+def selfcheck(estate: Path = DEFAULT_ESTATE) -> int:
     """The estate walk itself, over a planted estate: a bound party, a loose one, a party
     with nothing composed, and a selection package that disagrees. Each must grade as it must
-    -- otherwise this script could pass over a real estate for the wrong reason."""
+    -- otherwise this script could pass over a real estate for the wrong reason.
+
+    The plant is built around the REAL platform tree (symlinked in below), so this can only run
+    where `estate`'s platform checkout already carries the published rule. Where it does not,
+    that is a could-not-look and this returns 3: asserting instead graded "the rule is not here
+    yet" as "the planted case no longer bites", which is a different and untrue sentence
+    (fixed 2026-09-04)."""
     import json
     import shutil
     import tempfile
 
-    real = DEFAULT_ESTATE
-    assert (real / "platform" / "shift-left" / "tier_binding.py").exists(), \
-        "the selfcheck needs a platform checkout to copy the published rule from"
+    real = estate
+    if not (real / "platform" / "shift-left" / "tier_binding.py").exists():
+        print(f"SKIP: {real}/platform/shift-left/tier_binding.py is not in this platform "
+              f"checkout -- there is no published rule to plant the selfcheck's estate around")
+        return 3
 
     def party(root: Path, name: str, declared: str, priced: list[str]) -> None:
         d = root / name / "gitops" / "apps"
@@ -216,19 +234,20 @@ def selfcheck() -> None:
           "strictest priced line FAIL, a selection package that folds the party differently "
           "FAIL, a package with no party fold yet SKIP, and an estate with nothing composed "
           "could-not-look rather than a PASS about no one")
+    return 0
 
 
 def main(argv: list[str]) -> int:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = p.add_subparsers(dest="cmd", required=True)
+    default_estate = Path(os.environ.get("ESTATE_CLONE", DEFAULT_ESTATE))
     c = sub.add_parser("check")
-    c.add_argument("--estate-clone", type=Path, default=Path(
-        os.environ.get("ESTATE_CLONE", DEFAULT_ESTATE)))
-    sub.add_parser("selfcheck")
+    c.add_argument("--estate-clone", type=Path, default=default_estate)
+    s = sub.add_parser("selfcheck")
+    s.add_argument("--estate-clone", type=Path, default=default_estate)
     args = p.parse_args(argv[1:])
     if args.cmd == "selfcheck":
-        selfcheck()
-        return 0
+        return selfcheck(args.estate_clone)
     return check(args.estate_clone)
 
 
