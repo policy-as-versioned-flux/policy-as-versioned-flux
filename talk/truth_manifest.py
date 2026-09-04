@@ -376,12 +376,20 @@ def measured(line: str) -> str:
     # every non-excluded never-classed script, however it exited. A never-classed script that
     # fails instead of skipping makes the two diverge, and the published sentence then stops
     # adding up. total - excluded - ceiling recovers the ceiling's own population from the line.
-    never_pop = t["total"] - t["excluded"] - t["ceiling"]
+    # A line carrying a ceiling but no total or no excluded= cannot state the population it was
+    # cut from, and saying nothing is better than saying None or crashing the deck check.
+    if t["total"] is None or t["excluded"] is None:
+        never_pop = None
+    else:
+        never_pop = t["total"] - t["excluded"] - t["ceiling"]
     never_skipped = k.get("never", 0)
     parts = " + ".join(f"{key} {s.get(key, 0)}" for key in SPLIT_KEYS)
     return (f"measured: {t['pass']} passes are {parts}, against a ceiling of {t['ceiling']} "
-            f"of {t['total']} ({t['excluded']} excluded, {never_pop} can never pass on this "
-            f"runner); fail {t['fail']}, skip {t['skip']} (never {never_skipped}, "
+            f"of {t['total']} ({t['excluded'] if t['excluded'] is not None else 'an unstated number of'} excluded, "
+            + (f"{never_pop} can never pass on this runner"
+               if never_pop is not None
+               else "and the line does not say how many can never pass on this runner")
+            + f"); fail {t['fail']}, skip {t['skip']} (never {never_skipped}, "
             f"waits {k.get('waits', 0)})")
 
 

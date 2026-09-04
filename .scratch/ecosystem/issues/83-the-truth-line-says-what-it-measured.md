@@ -49,7 +49,7 @@ and an unplaced script are now reds, and the deck quotes what the run measured.
   pattern is a FAIL; a `never` script that passes is a FAIL (the ceiling was stale). The TRUTH line
   now reads
   `pass=P [observed=a self=b simulated=c meta=d] fail=F skip=S [never=x waits=y] excluded=E total=T ceiling=C`.
-  New `--selfcheck` proves the instrument over a fixture of eight tiny scripts without touching the
+  New `--selfcheck` proves the instrument over a fixture of nine tiny scripts without touching the
   estate; a fixture run stamps `fixture=1` and is never citable.
 - **`verify/truth-line/verify-truth-line.sh`** (new, discovered, `meta`) — the gate's own check on
   all of this: the loader bites, `verify-all.sh --selfcheck` bites, the manifest covers what is
@@ -185,7 +185,7 @@ none of the comparison.
 
 ### Verified
 
-- `.venv/bin/python -m pytest tests/test_truth_manifest.py -n0 -q` → 16 passed.
+- `.venv/bin/python -m pytest tests/test_truth_manifest.py -n0 -q` → 17 passed.
 - `.venv/bin/python -m pytest tests/test_build_deck.py -n0 -q` → 10 passed.
 - `bash talk/verify-all.sh --selfcheck` → PASS (red first: the fixture caught a broken
   `never`-detection in the draft, which is why `truth_manifest.py isnever` exists).
@@ -254,3 +254,10 @@ same branch. Verified by the commands in `### Verified`, re-run.
 Also: `talk/verify-exclusions.txt`'s header now records what excluding the six identity scripts
 costs (five offline proofs that were reaching green on every run), and ticket 59 has a pointer to
 the fall-checker contract, which lives only in `talk/truth_manifest.py`'s module docstring.
+
+**Re-review fix, 2026-09-04 (the assistant, delegated).** Approved after one fix round, with three
+minors closed here. `measured()` had gained arithmetic over `total` and `excluded`, which
+`parse_truth` may return as `None`, so a TRUTH line carrying a ceiling but no `excluded=` raised a
+TypeError inside `build_deck.py --check` instead of reporting a bad row. It now says the line does
+not state the population rather than crashing or printing `None`. Two stale figures were corrected:
+the selfcheck fixture is nine scripts, and `tests/test_truth_manifest.py` is 17 tests.
