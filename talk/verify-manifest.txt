@@ -1,0 +1,144 @@
+# What each script in the gate measures (eco-system ticket 83). Read by talk/verify-all.sh
+# through talk/truth_manifest.py, which documents the format; the short form:
+#
+#   path | class | skip        # a trailing comment is the place for a borderline note
+#
+#   class  estate-observation  the verdict turns on the CONTENT of another party's artefact or
+#                              on live state outside the script's own repository
+#          self-proof          a party grading its own code, fixtures or artefacts (using another
+#                              party's schema or engine as the RULER is still self-proof)
+#          simulation          synthetic or throwaway material, said so in the verdict
+#          meta                grades other checks or the record, not the estate
+#   skip   -                   no could-not-look expected; one that happens FAILS the gate
+#          never: <regex>      cannot pass on the scheduled runner as built (no cluster, no
+#                              cross-org credential); outside the CEILING
+#          waits: <regex>      the estate's own state has not arrived; inside the ceiling
+#          the regex is matched case-insensitively against the script's last line on exit 3;
+#          it runs to the end of the line, so alternation with '|' is fine, and '#' cannot appear
+#
+# Every script talk/verify-all.sh discovers must be here or in talk/verify-exclusions.txt; every
+# line here must name a script that exists. The TRUTH line prints the split of passes by class,
+# the split of skips by kind, and ceiling = total - excluded - never.
+#
+# The classification rule (delegated, ADR-0025, 2026-09-04): a pass is an observation of the
+# estate only when its verdict turns on another party's artefact or live external state; a
+# script whose live tail needs a cluster is classed by what its PASS would rest on, so the six
+# cluster tails are estate-observation with `never:`. The runner's substrate reason today is
+# "kind cluster 'driftwood' is not listed by kind get clusters" (platform/lib.sh) or "does not
+# exist" (tuppence). Ticket 86 (lane branch) and ticket 56 (schedules credential) edit the
+# `never:` lines they lift; ticket 91 un-retires the currency controller and edits its line.
+
+# --- driftwood (adopter) -----------------------------------------------------------------
+.estate-clone/driftwood/scripts/verify-identity-regexp.sh | self-proof | -
+.estate-clone/driftwood/twin/verify-twin-scenarios.sh | self-proof | -
+.estate-clone/driftwood/twin/verify-twin-sweep-moved.sh | self-proof | -
+.estate-clone/driftwood/verify-reconcile.sh | estate-observation | waits: no local kind cluster .* and the lane sample cannot stand in   # on the runner it grades the adopter's own committed lane sample (drift/samples.jsonl), which the adopter's clock observed on a cluster
+.estate-clone/driftwood/verify-twin-overlay.sh | self-proof | -
+
+# --- feeds (intelligence provider) -------------------------------------------------------
+.estate-clone/feeds/verify-feeds.sh | self-proof | -   # validates its own feeds against platform's envelope schema: the schema is the ruler
+.estate-clone/feeds/verify-market-and-news.sh | self-proof | -
+.estate-clone/feeds/verify-news-headline-skill.sh | self-proof | -
+
+# --- ico (regulator) ---------------------------------------------------------------------
+.estate-clone/ico/.github/scripts/verify-declared-bump.sh | self-proof | -
+.estate-clone/ico/verify-certificate-identity-regexp.sh | self-proof | -
+.estate-clone/ico/verify-penalty-feed.sh | estate-observation | -   # part 8 resolves the nist pin as a real tag on nist's real remote
+
+# --- insurer (risk carrier) --------------------------------------------------------------
+.estate-clone/insurer/verify-insurer-party.sh | self-proof | -
+.estate-clone/insurer/verify-insurer-quote.sh | self-proof | waits: [0-9]+ of [0-9]+ checks could not be looked at   # prices its own quotes through platform's fair.py: the engine is the ruler
+
+# --- ludlow (adopter) --------------------------------------------------------------------
+.estate-clone/ludlow/verify-adopter-gate.sh | simulation | -   # throwaway platform and ludlow repositories built in the run
+.estate-clone/ludlow/verify-certificate-identity-regexp.sh | self-proof | -
+.estate-clone/ludlow/verify-reconcile.sh | estate-observation | waits: no local kind cluster .* and the lane sample cannot stand in
+
+# --- nist (regulator) --------------------------------------------------------------------
+.estate-clone/nist/.github/scripts/verify-declared-bump.sh | self-proof | -
+.estate-clone/nist/scripts/verify-catalog.sh | self-proof | -
+.estate-clone/nist/scripts/verify-cert-identity-regexp.sh | self-proof | -
+
+# --- platform ----------------------------------------------------------------------------
+.estate-clone/platform/access/verify-access.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
+.estate-clone/platform/break-glass/verify-break-glass.sh | self-proof | -
+.estate-clone/platform/compose/verify-composition.sh | estate-observation | waits: not on the real remote until cut-release.yml cuts   # composes real driftwood against its five real pinned parents
+.estate-clone/platform/computed-semver/verify-cage-engine.sh | self-proof | -
+.estate-clone/platform/computed-semver/verify-comparison-window.sh | self-proof | -
+.estate-clone/platform/computed-semver/verify-corpus-generator.sh | self-proof | -
+.estate-clone/platform/computed-semver/verify-coverage.sh | self-proof | -
+.estate-clone/platform/computed-semver/verify-gate.sh | self-proof | -
+.estate-clone/platform/computed-semver/verify-generator-standing-check.sh | self-proof | -
+.estate-clone/platform/computed-semver/verify-pairing.sh | self-proof | -
+.estate-clone/platform/computed-semver/verify-rederive-bumps.sh | self-proof | -
+.estate-clone/platform/computed-semver/verify-release-integrity.sh | self-proof | -
+.estate-clone/platform/computed-semver/verify-witness-set.sh | self-proof | -
+.estate-clone/platform/currency-controller/verify-currency.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # ticket 91 un-retires the controller and owns this line
+.estate-clone/platform/distribution/verify-coexistence.sh | self-proof | waits: declares one version   # ticket 84 lifts it with a second declared line
+.estate-clone/platform/distribution/verify-declared-versions-admit.sh | estate-observation | never: kind cluster 'driftwood' is not listed
+.estate-clone/platform/distribution/verify-governed-namespace-guard.sh | self-proof | -
+.estate-clone/platform/distribution/verify-infra-declaration.sh | estate-observation | -   # reads driftwood's, ludlow's and tuppence's composed policies
+.estate-clone/platform/distribution/verify-orphan-guard.sh | self-proof | -
+.estate-clone/platform/distribution/verify-render-version-tree.sh | self-proof | -
+.estate-clone/platform/distribution/verify-retirement.sh | self-proof | waits: declares one version   # ticket 84 lifts it with a second declared line
+.estate-clone/platform/engine/verify-engine.sh | estate-observation | never: kind cluster 'driftwood' is not listed
+.estate-clone/platform/eud/verify-eud.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
+.estate-clone/platform/fair/verify-fair-tail.sh | self-proof | -
+.estate-clone/platform/feeds/verify-feeds.sh | self-proof | -
+.estate-clone/platform/graded/verify-graded.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # ticket 86's lane branch owns this line
+.estate-clone/platform/honesty/verify-honesty.sh | self-proof | -
+.estate-clone/platform/identity/verify-federation.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
+.estate-clone/platform/identity/verify-identity.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
+.estate-clone/platform/oscal/verify-claims.sh | estate-observation | -   # every claimed control id resolves in nist's real pinned catalogue
+.estate-clone/platform/oscal/verify-upflow.sh | simulation | -   # self-generated PolicyReports
+.estate-clone/platform/party/verify-party-artefact.sh | self-proof | -
+.estate-clone/platform/policy/verify-conditional.sh | self-proof | waits: lives only in require-nonroot-2-0-1   # the gate cuts a SKIP line at 160 characters, so a pattern must sit inside that
+.estate-clone/platform/posture/verify-posture-projection.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane; ticket 90 excludes it
+.estate-clone/platform/risk/verify-risk-tuned.sh | self-proof | -
+.estate-clone/platform/shift-left/verify-shift-left.sh | self-proof | waits: declares one major line   # ticket 84 lifts it with a second declared line
+.estate-clone/platform/shift-left/verify-tier-binding.sh | self-proof | -   # platform planting cases against its own rule; the hub's verify/tier-binding runs it over the real adopters
+.estate-clone/platform/tcor/verify-tcor.sh | self-proof | -
+.estate-clone/platform/verify-certificate-identity-regexp.sh | self-proof | -
+.estate-clone/platform/verify-cut-release-tags.sh | simulation | -   # throwaway repositories and a local remote
+.estate-clone/platform/verify-first-gate-determined-release.sh | self-proof | waits: waiting for the owner to let cut-release\.yml cut
+.estate-clone/platform/verify-publisher-gate.sh | self-proof | waits: part\(s\).* could not look
+.estate-clone/platform/verify-source-verification.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # artefact side (the gitsign source controller, ticket 41): stays in the gate under ticket 90
+.estate-clone/platform/wardley/verify-wardley.sh | self-proof | -
+.estate-clone/platform/wargamer/verify-wargamer.sh | self-proof | -
+
+# --- tuppence (adopter) ------------------------------------------------------------------
+.estate-clone/tuppence/reset/verify-reach-secrets.sh | estate-observation | never: kind cluster 'driftwood' does not exist   # identity plane; ticket 90 excludes it
+.estate-clone/tuppence/scripts/verify-adopter-gate.sh | simulation | -   # throwaway repositories built in the run
+.estate-clone/tuppence/scripts/verify-identity-regexp.sh | self-proof | -
+.estate-clone/tuppence/verify-reconcile.sh | estate-observation | waits: no local kind cluster .* and the lane sample cannot stand in
+
+# --- hub: the cross-party proofs under verify/ -------------------------------------------
+verify/adr-supersession/verify-adr-supersession.sh | meta | -   # ticket 39: grades the record, deliberately reads no Python
+verify/demo/verify-demo.sh | meta | waits: recording commit this checkout cannot reach   # grades the deck against the run it names
+verify/disclaimer/verify-disclaimer.sh | estate-observation | -   # reads nine repositories' party.yaml, README and NOTICE
+verify/e2e/verify-e2e-step1-regulator-publishes.sh | estate-observation | waits: waiting for tag|queued for cut-release|not yet a tag
+verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh | simulation | waits: no pin bump available on disk moves|no adopter pins a priceable feed   # a SYNTHETIC bump on a throwaway copy of an adopter; the real merged bump is verify/renovate
+verify/e2e/verify-e2e-step3-price-crosses-band-pr-opens.sh | simulation | waits: no adopter publishes a selection-policy package   # a SYNTHETIC residual either side of the adopter's real band
+verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh | estate-observation | waits: no cluster on this runner, and the lane sample cannot stand in|reconciles .* at its pinned revision .* only:
+verify/e2e/verify-e2e-step5-twin-forecasts.sh | estate-observation | waits: cannot play a dated signal forward yet|evals could not look   # reads driftwood's twin artefacts
+verify/e2e/verify-e2e-step6-provenance.sh | estate-observation | waits: waiting for tag|could not (be )?look   # real Fulcio certificates and Rekor entries
+verify/e2e/verify-e2e-step7-honesty.sh | meta | -
+verify/every-green/verify-every-green.sh | meta | -   # ticket 76: grades the SHAPE of every discovered script's greens; this manifest grades what each green RESTS ON and whether a could-not-look was expected. Neither reruns the other's question
+verify/feed-contract/verify-feed-contract.sh | estate-observation | waits: waiting for tag   # every adopter pin resolves on the publisher's real remote
+verify/feed-contract/verify-untagged-pin-is-priced.sh | estate-observation | waits: could not reach|could not look at the signature|no publishes\[\] record|untagged \(   # ticket 69: pin state read from the publisher's real remote. A missing interpreter is deliberately NOT declared here: if the runner loses its venv the gate should go red, not shrug
+verify/local-clock/verify-local-clock.sh | meta | never: no \.local-clock/last-run\.json on this machine   # ticket 92: grades the owner's local clock; the marker only exists on the owner's machine, never on the runner
+verify/misuse/verify-misuse.sh | estate-observation | waits: could-not-look by name
+verify/party/verify-party.sh | estate-observation | -
+verify/pound-seam/verify-pound-seam.sh | estate-observation | -
+verify/priced-holes/verify-priced-holes.sh | estate-observation | -
+verify/proportionality/verify-proportionality.sh | estate-observation | never: kind-driftwood is not reachable   # each institution's own signed band; the live tail wants the adopter's rendered cage on a cluster
+verify/provenance/verify-provenance.sh | simulation | never: no rekor-cli here|kind-driftwood is not reachable   # a narrative chain over committed fixtures; the live tails want rekor-cli and a cluster, neither of which the runner is built with
+verify/provenance/verify-release-evidence-reaches-main.sh | estate-observation | waits: adopter pin\(s\) could not be graded
+verify/record/verify-record-states-the-purpose.sh | meta | -
+verify/renovate/verify-renovate-merged-feed-pr.sh | estate-observation | waits: no merged Renovate feed-pin PR exists yet
+verify/sampler-wait-order/verify-sampler-wait-order.sh | estate-observation | -   # reads the three adopters' checked-out workflows
+verify/schedules/verify-lane.sh | estate-observation | -
+verify/schedules/verify-schedules.sh | estate-observation | never: GitHub unreachable   # the gate step carries no credential (ADR-0024); ticket 56 owns this line
+verify/tier-binding/verify-tier-binding.sh | estate-observation | waits: tier_binding\.py is not in this platform checkout|no party in this estate has both a composed|run \./clone-estate\.sh first   # ticket 78: reads every party's own committed Namespace and evidence
+verify/truth-line/verify-truth-line.sh | meta | -   # ticket 83: grades this manifest and the arithmetic behind the split, never the estate
+verify/twin-evals/verify-twin-evals.sh | self-proof | -
