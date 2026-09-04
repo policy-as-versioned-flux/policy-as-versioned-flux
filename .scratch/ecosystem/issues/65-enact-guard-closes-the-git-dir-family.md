@@ -198,3 +198,11 @@ eighteen tests red-then-green, graded by twin.yml pytest.
 ## Waits on the owner
 
 Nothing. The PR merge is the integrator's, as `pavc-other-hand` (ticket 88).
+
+**2026-09-04, after the second re-review (the assistant).** Three shapes stay admitted, all
+pre-existing on `main` before this ticket, recorded here as limits and not as a claim of closure:
+`git push --repo=<enactment-url>` with no positional target (the `--repo=` word is dropped as a
+flag; the space form `--repo <url>` is refused); a `cd` inside a parenthesised subshell or a brace
+group (`(cd <enactment> && git push origin main)`); and the over-refusal of `git remote get-url
+--push` in an enactment checkout, which the `_PUSH` regex reads as a push. The `--repo=` shape is
+the one worth a follow-up ticket: a one-word push option that lands in an enactment repository.
