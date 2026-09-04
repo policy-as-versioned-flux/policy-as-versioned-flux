@@ -198,14 +198,19 @@ that a rewritten entry cites stay as the record of the decision at the time.
   **regulator** publishes baselines by name, as OSCAL profiles, signed and versioned like any other
   artefact it publishes (NIST's own are LOW, MODERATE and HIGH, at 149, 287 and 370 controls). An
   **adopter** selects one by name, in the party artefact it signs, because selection is the
-  risk-bearing act. An adopter may **add** controls to its selected baseline and may **never remove**
-  one: a removal is an **exemption** by another name, and a control the adopter cannot meet is caged
-  and priced, not dropped. A baseline control that nothing implements is a **hole**; a composition
-  **prices** every hole, new or pre-existing, and a new hole moves the tier, never refuses
-  (rewritten 2026-08-28, ticket 15; ticket 39 supersedes ADR-0013 and ADR-0017 on this point). A control the adopter adds is an ordinary new hole until a **control
-  claim** fills it, and the adopter may never remove it either.
+  risk-bearing act. An adopter may **add** controls to its selected baseline and may remove one;
+  a removal is priced, never refused (ADR-0026, 2026-09-04): the regulator's **control weight**
+  prices a control whether or not the adopter selected it, so a removal hides nothing from the
+  pound, and it prints as a **delta** under the adopter's own signature. A control the adopter
+  cannot meet is caged and priced, not dropped. A baseline control that nothing implements is a
+  **hole**; a composition **prices** every hole, new or pre-existing, and a new hole moves the
+  tier, never refuses (rewritten 2026-08-28, ticket 15; ADR-0026 supersedes ADR-0013 and ADR-0017
+  on this point, ticket 39, 2026-09-04). A control the adopter adds is an ordinary new hole until
+  a **control claim** fills it, and its removal prints as a delta like any other.
   See [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md) and
-  [ADR-0017](docs/adr/0017-a-control-claim-belongs-to-whoever-ships-the-implementation.md).
+  [ADR-0017](docs/adr/0017-a-control-claim-belongs-to-whoever-ships-the-implementation.md) (both
+  superseded in part) and
+  [ADR-0026](docs/adr/0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md).
 
 - **Control claim** — A signed statement, in a party's OSCAL component-definition, that a policy
   that party ships evidences a **control id**. A control claim belongs to whoever ships the
@@ -218,8 +223,14 @@ that a rewritten entry cites stay as the record of the decision at the time.
   `AC-6` and never `nist-800-53:AC-6`. `AC-6` and `AC-06` are display labels the catalogue also
   carries, and are never keys. Which catalogue an id belongs to is stated once, by the `source` or
   `href` on the enclosing block, never repeated as a prefix on the id. Resolution is exact-string:
-  no case-folding, no prefix-stripping, and an id absent from the catalogue is a hard failure. See
-  [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md).
+  no case-folding, no prefix-stripping, and an id absent from every pinned catalogue is a hard
+  failure, a **missing instrument** (ADR-0020), because nothing pinned defines it. A **control
+  claim** and a **hole** key on `(source, id)`: the catalogue the enclosing `href` names and the
+  bare id there, so a second `controls` parent (an adopter's own catalogue) cannot collide with
+  the regulator's ids; on the wire a bare id is the baseline catalogue's and `source:id` names any
+  other parent (ADR-0026, 2026-09-04, refining ADR-0013). See
+  [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md) and
+  [ADR-0026](docs/adr/0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md).
 
 - **Orphan guard** (rewritten 2026-08-28, ticket 09) — A deterministic catch-all that cages to
   **`isolated`** any workload whose `policy-version` label is **not in** the cluster's
@@ -442,14 +453,17 @@ that a rewritten entry cites stay as the record of the decision at the time.
   control reduces it; a hole no pinned weight names carries no amount, a named absence rather
   than a zero. Never refused, never counted; the new-hole and widening refusals are gone and
   each new, closed or widened hole prints as a **delta** on the evidence document under the
-  adopter's own perspective and currency. A removal still refuses: it is an exemption by another
-  name.
+  adopter's own perspective and currency. A removal prints as a `removed-control` delta carrying
+  the amount the hole carried, and the regime's price does not move (ADR-0026, 2026-09-04; its
+  platform build waits).
 
 - **Delta** (added 2026-09-03, ticket 38) — What changed since the adopter's last signed composed
   artefact and what a pinned instrument prices it at: a new or closed **hole**, a baseline
   widening, a new or closed **ungoverned namespace**. Each carries the adopter's perspective and
   currency and an amount or a named absence. A delta is a report of a priced move, never a wall;
-  it replaced the three composition refusals ADR-0013, ADR-0017 and ADR-0018 point 3 carried.
+  it replaced the three composition refusals ADR-0013, ADR-0017 and ADR-0018 point 3 carried
+  (recorded by ADR-0026, 2026-09-04), which also makes a removed control and a baseline narrowing
+  deltas once their platform build lands.
 
 - **Control weight** (added 2026-08-28, ticket 15) — A regulator's published statement, keyed on
   the catalogue and **control id**, of which controls a violation type turns on. Part of the
