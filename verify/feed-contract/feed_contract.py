@@ -77,6 +77,21 @@ def match_tag(entry, version, tags):
     return max(hits, key=lambda t: [int(x) for x in t.rsplit("v", 1)[1].split(".")]) if hits else None
 
 
+def newest_tag_per_line(publisher, tags):
+    """Ticket 76 item 3: the newest tag on each line a publisher's own publishes[] declares,
+    in that line's own shape (`<name>/vX.Y.Z` or bare `vX.Y.Z`, the same two forms tag_forms
+    admits) -- never a shape typed by the caller. `{name: tag or None}`; None means no tag of
+    either shape exists in `tags`, which the caller reports as what was looked for and not found,
+    not as an absence inferred from a pattern that could not match."""
+    out = {}
+    for entry in publisher.get("publishes") or []:
+        shape = re.compile(rf"^(?:{re.escape(entry['name'])}/)?v\d+\.\d+\.\d+$")
+        hits = [t for t in tags if shape.match(t)]
+        out[entry["name"]] = (max(hits, key=lambda t: [int(x) for x in t.rsplit("v", 1)[1].split(".")])
+                              if hits else None)
+    return out
+
+
 _TAGS: dict[str, set | None] = {}
 
 
@@ -306,6 +321,16 @@ def selfcheck():
         run(tmp)
         assert LINES.count("FAIL") == 3 and "SKIP" in LINES, LINES
         assert match_tag({"name": "penalty-schema"}, "v1", {"v1.0.0", "v1.2.0", "v2.0.0"}) == "v1.2.0"
+        # ticket 76 item 3: each published line's newest tag, in that line's own shape. feeds'
+        # threat-register/v2.0.0 is what `git tag -l 'v*.*.*'` could never match.
+        feeds = {"publishes": [{"name": "threat-register"}, {"name": "cve"}]}
+        assert newest_tag_per_line(feeds, {"threat-register/v1.0.0", "threat-register/v2.0.0"}) \
+            == {"threat-register": "threat-register/v2.0.0", "cve": None}
+        assert newest_tag_per_line({"publishes": [{"name": "policy"}, {"name": "identity-substrate"}]},
+                                   {"v1.0.0", "v2.0.1", "v2.0.0"}) \
+            == {"policy": "v2.0.1", "identity-substrate": "v2.0.1"}, "a bare tag signs every line"
+        assert newest_tag_per_line({"publishes": [{"name": "x"}]}, {"x/v1.0.0", "y/v9.9.9", "v1"}) \
+            == {"x": "x/v1.0.0"}, "another line's tag and a bare major are not this line's"
         # an empty estate is not a pass
         LINES.clear()
         os.makedirs(os.path.join(tmp, "empty", "platform"))

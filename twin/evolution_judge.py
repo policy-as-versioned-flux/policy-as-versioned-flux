@@ -44,6 +44,19 @@ from .repo import ModelRepo
 
 SKILL = "evolution-judge"
 
+# What the eval's 1.000 IS (ecosystem ticket 76, REVIEW-2026-09-02 R3). `labelled_corpus()` below
+# is the corpus `_MATURITY_KEYWORDS` was fitted to: for every item, the table's own answer for
+# that component's name already sits inside `scorer`'s tolerance of the expected position
+# (`tests/test_evolution_judge.py` asserts exactly that). So a perfect score is available by
+# construction, and what it observes is the harness -- corpus loads, scorer runs, threshold
+# compares -- not the twin's judgement. verify-twin-evals.sh reads this constant into both
+# of the lines it prints and asserts only that the two agree, and the unit test below requires
+# the value to match what the corpus actually is, so holding out an unfitted corpus later is one
+# edit to the corpus and one to this word, and every surface follows without turning a check red.
+# Two values are defined: "harness-mechanism" while every corpus item is one the heuristic was
+# fitted to, "held-out" once any item is not.
+CORPUS_KIND = "harness-mechanism"
+
 # The twin's own inference is a model assertion (grade 5, evidence-ladder.yaml); a human override
 # is calibrated expert judgement (grade 4) — neither is a parameter either function accepts, so
 # neither can be called into asserting a stronger grade than its own kind is (harness guard

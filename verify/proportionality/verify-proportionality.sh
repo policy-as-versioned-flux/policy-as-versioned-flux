@@ -7,7 +7,8 @@
 #
 # Exits non-zero if the beat would fail on stage. OFFLINE core (python3; kyverno
 # for the body proof). Optional LIVE tail dry-runs the rendered policies if the
-# per-institution kind clusters are reachable.
+# per-institution kind clusters are reachable — and when a tail could not look, this script
+# exits 3 rather than asserting PASS after a parenthetical note (ecosystem ticket 76).
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Post-split (mo-12): platform is a real, separate GitHub repo, not a sibling
@@ -19,7 +20,19 @@ say()  { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
 fail() { echo "FAIL: $*" >&2; exit 1; }
 have() { command -v "$1" >/dev/null 2>&1; }
 
+# could_not_look / pass_or_skip / selfcheck_absent: a live tail's third outcome.
+. "$HERE/../lib-observation.sh"
+SELF="$HERE/${BASH_SOURCE##*/}"
+# The two tails that can fail to look: the kyverno body proof and the per-cluster dry-run.
+TAILS="kyverno kubectl"
+# shellcheck disable=SC2086
+if [ "${1:-}" = "--selfcheck" ]; then selfcheck_absent "$SELF" $TAILS; exit 0; fi
+
 have python3 || fail "python3 required"
+# Run this script's own could-not-look branch before looking at anything, so it is exercised on
+# a machine that HAS the instruments rather than only on one that lacks them.
+# shellcheck disable=SC2086
+selfcheck_absent "$SELF" $TAILS
 [ -d "$RISK" ] || bash "$HERE/../../clone-estate.sh" || fail "could not assemble .estate-clone/ (needs network — see clone-estate.sh)"
 
 # decide <org> -> prints the enforce.py decision JSON for the shared scenario.
@@ -72,25 +85,28 @@ if have kyverno; then
   timeout 120 kyverno test "$HERE/tests/encrypt-at-rest" >/dev/null \
     || fail "encrypt-at-rest kyverno test failed"
 else
-  echo "    (skipped: kyverno CLI not found — offline body proof unavailable here)"
+  could_not_look "no kyverno CLI here, so the shared control body was never evaluated against its own pass/fail/unversioned cases -- step 3 read the rendered YAML, it did not run it"
 fi
 
 # --- optional LIVE tail: dry-run the rendered policies on their clusters --------
-live=0
+# Each institution is its own tail: proportionality is a claim about BOTH, so one reachable
+# cluster does not let the other's absence pass unnamed.
 for org in driftwood ludlow; do
   ctx="kind-$org"
-  have kubectl && kubectl --context "$ctx" version >/dev/null 2>&1 || continue
-  # Needs Kyverno's ValidatingPolicy CRD present to validate server-side.
-  if ! kubectl --context "$ctx" get crd validatingpolicies.policies.kyverno.io >/dev/null 2>&1; then
-    say "5. live($org): cluster reachable but Kyverno CRDs not installed — skipping dry-run (offline proof stands)"
-    continue
+  if ! have kubectl; then
+    could_not_look "no kubectl here, so $org's rendered policy was never dry-run on $ctx"
+  elif ! kubectl --context "$ctx" version >/dev/null 2>&1; then
+    could_not_look "$ctx is not reachable, so $org's rendered policy was never dry-run there"
+  elif ! kubectl --context "$ctx" get crd validatingpolicies.policies.kyverno.io >/dev/null 2>&1; then
+    # Needs Kyverno's ValidatingPolicy CRD present to validate server-side.
+    could_not_look "$ctx is reachable but has no Kyverno ValidatingPolicy CRD, so $org's rendered policy was never dry-run there"
+  else
+    say "5. live($org): the rendered policy applies clean (server dry-run)"
+    timeout 60 kubectl --context "$ctx" apply --dry-run=server \
+      -f "$HERE/policies/encrypt-at-rest-$org.yaml" >/dev/null \
+      || fail "$org rendered policy failed server dry-run on $ctx"
+    echo "  ok   $org's rendered policy applies clean on $ctx"
   fi
-  say "5. live($org): the rendered policy applies clean (server dry-run)"
-  timeout 60 kubectl --context "$ctx" apply --dry-run=server \
-    -f "$HERE/policies/encrypt-at-rest-$org.yaml" >/dev/null \
-    || fail "$org rendered policy failed server dry-run on $ctx"
-  live=1
 done
-[ "$live" = 1 ] || say "5. live dry-run tail skipped (no cluster with Kyverno CRDs reachable) — offline proof stands"
 
-echo "PASS: same control, same £ (risk_bought £${dw_rb%.*}) — Audit in driftwood, Deny in ludlow. Proportionality by comparison."
+pass_or_skip "same control, same £ (risk_bought £${dw_rb%.*}) — Audit in driftwood, Deny in ludlow. Proportionality by comparison."
