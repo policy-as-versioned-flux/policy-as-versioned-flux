@@ -11,7 +11,26 @@
 #     that fails the run on anything else. The workflow YAML is PARSED, not grepped;
 #   * no scheduled job can mint or merge a signed artefact -- no `git tag`, no `gh release
 #     create`, no `gh pr merge`. A release stays a human act;
-#   * live, where GitHub is reachable: each clock ran inside its own period.
+#   * live: each clock ran inside its own period, and a clock that did not names the open
+#     ticket that owns its red (verify/schedules/clock-owners.yaml, eco-system ticket 85).
+#
+# WHERE THE LIVE HALF GETS ITS FACTS (ticket 56, 2026-09-04). This script runs inside the gate,
+# beside 84 verify scripts cloned unpinned off eight other organisations' default branches, and
+# the gate step holds no GitHub credential on purpose -- so until now the live half SKIPped on
+# every citable run and the surface was permanently blind to whether any clock had ticked.
+# `truth.yml` now runs a separate `clocks` job first: it holds `actions: read`, runs no
+# third-party code, and writes the raw facts (per unit the ruleset state, per clock the remote
+# `schedule:` and the newest scheduled run) to a JSON file the gate job reads through
+# `CLOCK_VERDICT`. Grading happens here, holding nothing. Locally, an authenticated `gh` is used
+# directly. A CLOCK_VERDICT that is missing, malformed or stale is a could-not-look that says so;
+# it never falls back to a credential this job is not supposed to have. The file carries the run
+# id and repository that wrote it and a reader inside a workflow run refuses any other run's file
+# -- which narrows the window on a forged clocks.json rather than closing a trust boundary, since
+# the scripts beside this one could rewrite schedules.py itself (ticket 56, round 2).
+#
+# A clock's newest scheduled run that is still IN FLIGHT -- including the very run doing the
+# grading, which is what a scheduled truth.yml run sees when it reads truth.yml -- is a named SKIP
+# and never a red: a run that has not finished has concluded nothing.
 #
 # This script grades the PROMISE: what the workflow says its next run may stage. The server-side
 # ruleset ADR-0024 named cannot exist on a public repository (ADR-0023, amended 2026-09-03), so
@@ -37,10 +56,12 @@ fi
 "$PY" "$HERE/schedules.py" selfcheck >/dev/null \
   || { echo "FAIL: schedules.py selfcheck -- the cage does not bite its own fixtures"; exit 1; }
 
-# The live half needs `gh` AND an authenticated session. Without either, schedules.py itself
-# records one SKIP line and still runs everything that does not need the network.
+# The live half reads CLOCK_VERDICT if the workflow handed one in, else an authenticated `gh`.
+# With neither, schedules.py records one named SKIP per unit and still runs everything that does
+# not need the network. `--offline` is only for the case where `gh` is not installed at all and
+# no verdict file was handed in; schedules.py decides the rest and says which source it used.
 offline=""
-command -v gh >/dev/null 2>&1 || offline="--offline"
+if [ -z "${CLOCK_VERDICT:-}" ] && ! command -v gh >/dev/null 2>&1; then offline="--offline"; fi
 
 log="$(mktemp)"; trap 'rm -f "$log"' EXIT
 "$PY" "$HERE/schedules.py" check $offline | tee "$log"
@@ -50,6 +71,10 @@ case $rc in
   0) echo "PASS: every clock is declared, timed, caged to the observation lane, unable to mint a"
      echo "PASS: signed artefact, and running inside its period";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
-  *) echo "FAIL: $(grep -c '^FAIL:' "$log") schedule/cage check(s) observed false";;
+  # The FAIL line names the reds themselves, not just how many: "5 clocks are red" sends a reader
+  # to the capture, and every one of these lines already carries the ticket that owns it
+  # (clock-owners.yaml). One line, so the grade table can hold it.
+  *) echo "FAIL: $(grep -c '^FAIL:' "$log") schedule/cage check(s) observed false:$(
+       grep '^FAIL:' "$log" | sed 's/^FAIL: \([^:]*\):.*/ \1/' | tr -d '\n')";;
 esac
 exit "$rc"

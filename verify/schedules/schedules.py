@@ -26,6 +26,24 @@ Four questions, in this order:
      period? A `schedule:` that GitHub silently stopped honouring is a clock
      that reports nothing while looking present in the file.
 
+WHERE THE LIVE FACTS COME FROM (ticket 56, 2026-09-04). Questions 3b and 4 need a GitHub
+credential, and the gate step that runs this file deliberately holds none: `talk/verify-all.sh`
+runs 84 verify scripts cloned unpinned off eight other organisations' default branches, and a
+token in that job's environment is a token those scripts can read. So on every CI run the whole
+live half SKIPped, and the citable surface could not see whether a single clock had run --
+permanent blindness recorded nowhere.
+
+The fix is a SEPARATE JOB, not a wider gate. `schedules.py clocks --out FILE` runs in
+truth.yml's `clocks` job, which holds `actions: read` and runs no third-party code, and writes
+the four live facts (per unit: the ruleset state; per clock: the remote's `schedule:` state and
+the newest scheduled run) into a JSON file. That file is an OBSERVATION -- dates, conclusions,
+cron strings -- and carries no verdict and no credential. The gate job takes it as an artifact
+and this file grades from it with `CLOCK_VERDICT` set, holding nothing a verify script could
+steal. Precedence: `CLOCK_VERDICT` if set, else `gh` if authenticated, else offline. A verdict
+file that is missing, malformed, stale, or written by a different run or repository (round 2:
+`binding_fault`) is a could-not-look that says so by name -- never a silent fall back to a
+credential the gate is not supposed to have.
+
 Not graded here, on purpose (2026-09-03, ticket 92): the LOCAL clock, `talk/local-clock.sh`,
 the third clock ADR-0024 point 6 adds. It is a launchd job on the owner's machine, not a
 workflow, so there is no YAML for questions 2 to 4 to parse, and its lane is a gitignored run
@@ -38,12 +56,14 @@ reason to skip the static half.
 
 Usage:
     schedules.py check      [--offline]
+    schedules.py clocks     --out FILE
     schedules.py selfcheck
 """
 from __future__ import annotations
 
 import base64
 import datetime as dt
+import glob
 import json
 import os
 import re
@@ -73,10 +93,39 @@ ALLOW_LIST = ("talk/truth.log", "drift/samples.jsonl", "talk/captures", "observa
 # names that as the reason rather than pretending the period is 48 hours.
 PERIOD_HOURS = 48
 
-# The clocks documented to exit non-zero on purpose. truth.yml re-raises the
-# gate's own verdict (truth.yml's "fail if the gate failed" step), so a red gate
+# The clocks documented to exit non-zero on purpose, and the ONE conclusion each is excused for.
+# truth.yml re-raises the gate's own verdict (its "fail if the gate failed" step), so a red gate
 # is a failed run AND a recorded observation.
-RED_GATE_EXITS_NONZERO = {"truth.yml"}
+#
+# 2026-09-04, ticket 56: the exception used to be by workflow name alone -- `conclusion !=
+# "success" and workflow not in RED_GATE_EXITS_NONZERO` -- so EVERY non-success excused truth.yml,
+# `cancelled` included. Observed that day: the scheduled run of 09:55:43Z was cancelled by the
+# `truth` concurrency group when a push queued behind it, recorded nothing, and graded PASS. A
+# cancelled run is a clock that did not tick. The excuse is now the exact conclusion the exit is
+# documented for and nothing else.
+RED_GATE_EXITS_NONZERO = {"truth.yml": "failure"}
+
+# How many scheduled runs of a clock the collector reads before deciding which one it may grade.
+# One was too few: the newest scheduled run of `truth.yml`, seen from a scheduled run of
+# `truth.yml`, is the run doing the looking (`newest_gradable`). Ten is deep enough to look past
+# this run and past a second one still in flight without paging the API.
+RUN_SCAN_LIMIT = 10
+
+# The clock verdict file (ticket 56). Written by `clocks`, read by `check` when CLOCK_VERDICT
+# names it. Facts only: no verdict, no credential.
+VERDICT_SCHEMA = "clock-verdict/v1"
+# A verdict file older than this describes yesterday's clocks. The gate reads one minutes old
+# (truth.yml's `clocks` job runs immediately before the gate job); six hours is slack for a slow
+# gate, not a licence to grade from a stale file.
+VERDICT_MAX_AGE_HOURS = 6
+
+# Which open ticket owns a clock that is red today (ticket 85). Data, beside this file, so a red
+# names its owner in the gate's own output instead of in someone's head.
+OWNERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "clock-owners.yaml")
+
+
+class CouldNotLook(Exception):
+    """A live fact this run has no way to reach. Never a FAIL: it is a SKIP with a reason."""
 
 # `uses:` actions that provably do not write to the repository: they fetch the
 # checkout, install a toolchain, or move artefacts. Anything else under
@@ -145,7 +194,12 @@ def units() -> list[tuple[str, str, str]]:
     found = []
     for entry in sorted(os.listdir(ESTATE)):
         root = os.path.join(ESTATE, entry)
-        if os.path.isdir(os.path.join(root, ".git")):
+        # `exists`, not `isdir` (2026-09-04): in a git WORKTREE `.git` is a file holding a
+        # gitdir: pointer, and the build brief has every builder edit a unit inside a nested
+        # worktree. With isdir, such a unit was not a unit at all -- the checker silently
+        # dropped it and graded eight clocks instead of thirteen while reporting no could-not-
+        # look. A checker that can be blinded by how its input was checked out is not a checker.
+        if os.path.exists(os.path.join(root, ".git")):
             found.append((entry, root, REMOTE.format(unit=entry)))
     found.append(("hub", HUB, HUB_REMOTE))
     return found
@@ -421,7 +475,7 @@ def ruleset_state(remote: str) -> tuple[str, str]:
 
 
 def ruleset_line(unit: str, remote: str, live: bool, unreachable: str,
-                 declared: bool) -> tuple[str, str]:
+                 declared: bool, source=None) -> tuple[str, str]:
     """The 3b question -- is the server-side half of the cage in force? -- as exactly one
     verdict, always (eco-system ticket 83).
 
@@ -439,7 +493,11 @@ def ruleset_line(unit: str, remote: str, live: bool, unreachable: str,
         return ("SKIP", f"{unit}: no .github/rulesets/ in this checkout, so there is no "
                         f"observation-lane ruleset declared for {remote} to be asked about; "
                         f"the client-side cage step and this checker are the whole cage here")
-    verdict, reason = ruleset_state(remote)
+    try:
+        verdict, reason = (source or Gh()).ruleset_state(remote)
+    except CouldNotLook as e:
+        return ("SKIP", f"{unit}: cannot look at whether the observation-lane ruleset is applied "
+                        f"on {remote}, the server-side half of the cage (ADR-0024 point 3): {e}")
     if verdict == "in-force":
         return ("PASS", f"{unit}: the observation-lane ruleset is applied on {remote} -- "
                         f"the cage has its server-side half")
@@ -501,12 +559,39 @@ def landed_hours_ago(unit: str, workflow: str) -> float | None:
         return None
 
 
+def newest_gradable(runs: list[dict], this_run_id: str | None) -> dict | None:
+    """The newest scheduled run this process may grade -- never the run doing the grading.
+
+    `gh run list --event schedule --limit 1` carries no status filter, and the run that reads it
+    is itself a scheduled run of the workflow it is reading. So on every SCHEDULED truth.yml run
+    the newest scheduled run of `truth.yml` was THIS run: `conclusion` "", `status`
+    `in_progress`. With the excused conclusion narrowed to exactly `failure` (round 1 of this
+    ticket), that graded `FAIL: hub/truth.yml: last scheduled run 0h ago concluded 'in_progress'`
+    on every scheduled run for ever, named ticket 85 as its owner, and no fix in any estate
+    repository could ever clear it -- a checker grading its own liveness by looking at itself.
+
+    Two things, therefore. The run doing the grading is dropped by `databaseId` (GITHUB_RUN_ID is
+    the run's `databaseId`; in Actions it is always set, and locally there is no self to drop).
+    Then the newest COMPLETED run wins over a newer one still in flight: a run that has not
+    finished has concluded nothing, and the last thing this clock actually did is the reading.
+    Only when the window holds no completed run at all is an in-flight one returned, and
+    `run_line` names it as a could-not-look rather than grading it.
+    """
+    others = [r for r in runs
+              if not this_run_id or str(r.get("databaseId") or "") != str(this_run_id)]
+    completed = [r for r in others if r.get("conclusion")]
+    if completed:
+        return completed[0]
+    return others[0] if others else None
+
+
 def last_run(remote: str, workflow: str) -> dict | None:
+    # RUN_SCAN_LIMIT, not 1: the window has to be deep enough to hold a completed run behind this
+    # run and behind any other still in flight. `databaseId` is what makes "not myself" decidable.
     raw = _gh("run", "list", "--repo", remote, "--workflow", workflow,
-              "--event", "schedule", "--limit", "1",
-              "--json", "createdAt,conclusion,status")
-    runs = json.loads(raw or "[]")
-    return runs[0] if runs else None
+              "--event", "schedule", "--limit", str(RUN_SCAN_LIMIT),
+              "--json", "createdAt,conclusion,status,databaseId")
+    return newest_gradable(json.loads(raw or "[]"), os.environ.get("GITHUB_RUN_ID"))
 
 
 def remote_crons(remote: str, workflow: str) -> tuple[str, list[str]]:
@@ -539,16 +624,272 @@ def remote_crons(remote: str, workflow: str) -> tuple[str, list[str]]:
     return ("timed", found) if found else ("untimed", [])
 
 
-# --- the check ----------------------------------------------------------------
-def check(offline: bool = False) -> int:
-    live = not offline
-    unreachable = "--offline was asked for"
-    if live:
+# --- where the live facts come from (ticket 56) --------------------------------
+class Offline:
+    """No live facts at all, and the reason said out loud once per question."""
+
+    live = False
+
+    def __init__(self, reason: str) -> None:
+        self.unreachable = reason
+
+    def ruleset_state(self, remote: str) -> tuple[str, str]:
+        raise CouldNotLook(self.unreachable)
+
+    def remote_crons(self, remote: str, workflow: str) -> tuple[str, list[str]]:
+        raise CouldNotLook(self.unreachable)
+
+    def last_run(self, remote: str, workflow: str) -> dict | None:
+        raise CouldNotLook(self.unreachable)
+
+
+class Gh(Offline):
+    """`gh`, in a process that holds a credential. Never the gate job (ticket 56)."""
+
+    live = True
+
+    def __init__(self) -> None:
+        super().__init__("gh is authenticated")
+
+    def ruleset_state(self, remote: str) -> tuple[str, str]:
+        return ruleset_state(remote)
+
+    def remote_crons(self, remote: str, workflow: str) -> tuple[str, list[str]]:
+        return remote_crons(remote, workflow)
+
+    def last_run(self, remote: str, workflow: str) -> dict | None:
+        return last_run(remote, workflow)
+
+
+def binding_fault(doc: dict, env: dict) -> str:
+    """Why this run may not grade from this verdict file, or "" when it may.
+
+    Round 1 of ticket 56 bound the file to NOTHING: no run id, no repository, no sha, and its
+    only freshness was its own `collected_at`. A well-formed file with every conclusion rewritten
+    to "success" turned every red green and the gate said PASS (proved on this branch: 0 FAIL,
+    50 PASS). The file now carries the run and the repository that wrote it, from the GitHub
+    context, and a reader inside a workflow run refuses any file not written by that same run.
+
+    This NARROWS the window; it does not close a trust boundary. The gate job runs 84 verify
+    scripts from eight other organisations in the same job, as root over the whole workspace, and
+    one of them could rewrite `schedules.py` itself -- or the verdict file and this check with
+    it. What it stops is the cheap version: a stray or stale clocks.json on the path
+    `CLOCK_VERDICT` names being graded from as if it were this run's own observation. It does NOT
+    stop a file written inside this job and stamped with this run's own id, because every script
+    in the job can read `GITHUB_RUN_ID` from the environment.
+    Outside a workflow run (`GITHUB_RUN_ID` unset) there is no run to bind to and the check does
+    not pretend otherwise: local grading is only as trustworthy as the local checkout.
+    """
+    run_id = str(env.get("GITHUB_RUN_ID") or "")
+    if not run_id:
+        return ""
+    if str(doc.get("run_id") or "") != run_id:
+        return (f"it was written by run {doc.get('run_id') or '(none)'} and this is run "
+                f"{run_id} -- not this run's observation")
+    repository = str(env.get("GITHUB_REPOSITORY") or "")
+    if repository and str(doc.get("repository") or "") != repository:
+        return (f"it was written in {doc.get('repository') or '(none)'} and this is "
+                f"{repository} -- not this run's observation")
+    return ""
+
+
+class Verdict(Offline):
+    """The facts a credentialled step already observed, read out of a JSON file.
+
+    This is what lets the gate grade a clock while holding nothing: truth.yml's `clocks` job
+    writes the file, the gate job reads it. Every absence is a NAMED could-not-look -- a unit the
+    collector could not reach, a clock it did not collect, a file that is stale -- because a
+    verdict file that quietly answers "no" would be worse than no file at all.
+    """
+
+    live = True
+
+    def __init__(self, path: str) -> None:
+        super().__init__(f"the clock verdict file {path} was read")
+        self.path = path
+        with open(path) as fh:
+            doc = json.load(fh)
+        if not isinstance(doc, dict) or doc.get("schema") != VERDICT_SCHEMA:
+            raise ValueError(f"not a {VERDICT_SCHEMA} document")
+        fault = binding_fault(doc, dict(os.environ))
+        if fault:
+            raise ValueError(fault)
+        collected = dt.datetime.fromisoformat(doc["collected_at"])
+        self.age_hours = (dt.datetime.now(collected.tzinfo) - collected).total_seconds() / 3600
+        if self.age_hours > VERDICT_MAX_AGE_HOURS:
+            raise ValueError(f"collected {self.age_hours:.0f}h ago, past the "
+                             f"{VERDICT_MAX_AGE_HOURS}h freshness window")
+        self.units = doc.get("units") or {}
+        self.collected_at = doc["collected_at"]
+
+    def _unit(self, remote: str) -> dict:
+        for entry in self.units.values():
+            if entry.get("remote") == remote:
+                if not entry.get("reachable", False):
+                    raise CouldNotLook(f"the clock verdict file collected at {self.collected_at} "
+                                       f"could not reach {remote} "
+                                       f"({entry.get('unreachable_reason') or 'no reason given'})")
+                return entry
+        raise CouldNotLook(f"the clock verdict file collected at {self.collected_at} carries no "
+                           f"entry for {remote} -- it was not collected, so nothing here observed "
+                           f"it")
+
+    def ruleset_state(self, remote: str) -> tuple[str, str]:
+        rule = self._unit(remote).get("ruleset") or {}
+        if "verdict" not in rule:
+            raise CouldNotLook(f"the clock verdict file carries no ruleset reading for {remote}")
+        return (str(rule["verdict"]), str(rule.get("reason") or ""))
+
+    def _workflow(self, remote: str, workflow: str) -> dict:
+        found = (self._unit(remote).get("workflows") or {}).get(workflow)
+        if found is None:
+            raise CouldNotLook(f"the clock verdict file carries no reading for "
+                               f"{remote}/{workflow}")
+        if found.get("error"):
+            raise CouldNotLook(f"the clock verdict file records that {remote}/{workflow} could "
+                               f"not be read ({found['error']})")
+        return found
+
+    def remote_crons(self, remote: str, workflow: str) -> tuple[str, list[str]]:
+        found = self._workflow(remote, workflow)
+        return (str(found["remote_state"]), list(found.get("remote_crons") or []))
+
+    def last_run(self, remote: str, workflow: str) -> dict | None:
+        return self._workflow(remote, workflow).get("run")
+
+
+def observer(offline: bool = False) -> Offline:
+    """CLOCK_VERDICT first, then `gh`, then nothing -- and each fallback names itself."""
+    path = os.environ.get("CLOCK_VERDICT")
+    if path:
         try:
-            _gh("auth", "status")
-        except (subprocess.SubprocessError, OSError) as e:
-            live = False
-            unreachable = str(e).splitlines()[0]
+            return Verdict(path)
+        except (OSError, ValueError, KeyError) as e:
+            return Offline(f"CLOCK_VERDICT names {path}, which this run cannot grade from: "
+                           f"{str(e).splitlines()[0]}. This job holds no GitHub credential on "
+                           f"purpose (ticket 56), so it does not fall back to one")
+    if offline:
+        return Offline("--offline was asked for")
+    try:
+        _gh("auth", "status")
+    except (subprocess.SubprocessError, OSError) as e:
+        return Offline(str(e).splitlines()[0])
+    return Gh()
+
+
+# --- which open ticket owns a red clock (ticket 85) ----------------------------
+def owners() -> dict[str, dict]:
+    if not os.path.exists(OWNERS_PATH):
+        return {}
+    with open(OWNERS_PATH) as fh:
+        return yaml.safe_load(fh) or {}
+
+
+def ticket_status(number) -> str | None:
+    """`open`, `resolved`, ... or None when no such ticket file exists at all."""
+    found = glob.glob(os.path.join(HUB, ".scratch", "ecosystem", "issues", f"{number}-*.md"))
+    if not found:
+        return None
+    with open(found[0]) as fh:
+        for line in fh:
+            if line.startswith("Status:"):
+                return line.partition(":")[2].strip()
+    return "unstated"
+
+
+def owner_clause(unit: str, workflow: str, owned: dict[str, dict]) -> str:
+    """What to append to a red clock's line so the red names its estate reason.
+
+    Never a fourth outcome (ticket 83): a red stays a FAIL. This only says WHOSE it is.
+    """
+    entry = owned.get(f"{unit}/{workflow}")
+    if not entry:
+        return (" -- and no ticket in .scratch/ecosystem/issues names this clock in "
+                "verify/schedules/clock-owners.yaml, so this red is unowned")
+    number, why = entry.get("ticket"), entry.get("owns") or "no reason recorded"
+    status = ticket_status(number)
+    if status == "open":
+        return f" -- ticket {number} owns it: {why}"
+    if status is None:
+        return (f" -- clock-owners.yaml names ticket {number}, and no such ticket file exists; "
+                f"the map is stale")
+    return (f" -- ticket {number} owns it ({why}), and that ticket reads {status!r}: either the "
+            f"fix has not reached a scheduled run yet, or this red is a new one wearing an old "
+            f"ticket's name")
+
+
+def owners_faults(owned: dict[str, dict], clocks_seen: set[str]) -> list[str]:
+    """The map cannot rot: every entry names a ticket that exists and a clock that exists."""
+    faults = []
+    for key, entry in sorted(owned.items()):
+        number = (entry or {}).get("ticket")
+        if ticket_status(number) is None:
+            faults.append(f"clock-owners.yaml maps {key} to ticket {number}, and "
+                          f".scratch/ecosystem/issues has no such ticket")
+        if key not in clocks_seen:
+            faults.append(f"clock-owners.yaml maps {key}, which is not a clock this checker "
+                          f"grades -- the map names a workflow the estate does not require")
+    return faults
+
+
+# --- the check ----------------------------------------------------------------
+def run_line(unit: str, workflow: str, run: dict, now: dt.datetime,
+             owns: str = "") -> tuple[str, str]:
+    """Grade ONE scheduled run: (status, sentence). Pure -- a dict, a clock and the time.
+
+    In flight first, then age, then the run's OUTCOME. A run that dies in checkout, in the gitsign install or in
+    the cage step records nothing and used to read as a healthy clock (live, 2026-08-28:
+    "hub/truth.yml: last scheduled run 2h ago (failure)" graded PASS). truth.yml is the one
+    documented exception: it ends `exit 1` whenever the gate is red, which is its normal state,
+    and its observation lands before that.
+
+    ponytail: the exception is by workflow name; the stronger check is to read the newest line of
+    the lane itself (talk/truth.log, observations/<feed>.jsonl) off the remote and date it -- do
+    that when a second clock needs an exception.
+    """
+    age = (now - dt.datetime.fromisoformat(
+        run["createdAt"].replace("Z", "+00:00"))).total_seconds() / 3600
+    # In flight FIRST, and a SKIP: a run that has not finished has concluded nothing, so there is
+    # nothing to grade. Grading it as a red said "concluded 'in_progress'" -- a sentence that
+    # blames a ticket for the clock still being at work (round 2 of ticket 56). `newest_gradable`
+    # already prefers a completed run behind it, so reaching here means the window held none.
+    if not run.get("conclusion"):
+        # A run in flight has concluded nothing, so it is a could-not-look -- but only while it
+        # could still finish. Past the same window a stopped clock fails on, a run that has not
+        # finished IS a stopped clock, and calling it a could-not-look for ever would be the
+        # unbounded green this ticket exists to stop.
+        if age > PERIOD_HOURS:
+            return ("FAIL", f"{unit}/{workflow}: the newest scheduled run started {age:.0f}h ago "
+                            f"and is still {run.get('status') or 'unfinished'}, past the "
+                            f"{PERIOD_HOURS}h window -- a run that never finishes records no "
+                            f"observation, so the clock has stopped" + owns)
+        return ("SKIP", f"{unit}/{workflow}: the newest scheduled run started {age:.0f}h ago and "
+                        f"is still {run.get('status') or 'unfinished'} -- a run in flight has "
+                        f"concluded nothing, and no completed scheduled run sits behind it in "
+                        f"the last {RUN_SCAN_LIMIT}, so this clock is not observed either way")
+    if age > PERIOD_HOURS:
+        return ("FAIL", f"{unit}/{workflow}: last scheduled run was {age:.0f}h ago, past "
+                        f"the {PERIOD_HOURS}h window (a daily period plus a day of slack "
+                        f"for GitHub's own scheduling delay) -- the clock has stopped" + owns)
+    conclusion = run["conclusion"]
+    excused = RED_GATE_EXITS_NONZERO.get(workflow)
+    if conclusion == "success":
+        return ("PASS", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago (success)")
+    if conclusion == excused:
+        return ("PASS", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago "
+                        f"({conclusion}), which is this clock's documented exit -- it records "
+                        f"its observation and then re-raises the gate's own red verdict")
+    return ("FAIL", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago concluded "
+                    f"{conclusion!r} -- a clock whose run dies or is cancelled records no "
+                    f"observation" + owns)
+
+
+def check(offline: bool = False) -> int:
+    source = observer(offline)
+    live = source.live
+    unreachable = source.unreachable
+    owned = owners()
+    clocks_seen: set[str] = set()
 
     now = dt.datetime.now(dt.timezone.utc)
     for unit, root, remote in units():
@@ -568,22 +909,30 @@ def check(offline: bool = False) -> int:
             if not crons(doc):
                 out("FAIL", f"{unit}/{workflow}: no `schedule:` -- {why}")
                 continue
-            # D2 is "open a PR only when the computed bump is not none". A fetch
-            # clock with no `gh pr create` anywhere cannot do that: it observes what
-            # its own repository already publishes and compares it against nothing.
-            # Four of the five publisher clocks are that shape today and their own
-            # headers say so, but this check graded them PASS on the presence of a
-            # `schedule:` alone, which overstated them (review, 2026-08-28).
-            if workflow == "fetch.yml" and not any(
-                    "gh pr create" in (s.get("run") or "")
-                    for j in (doc.get("jobs") or {}).values()
-                    for s in (j.get("steps") or [])):
-                out("SKIP", f"{unit}/{workflow}: daily clock at {', '.join(crons(doc))}, but it "
-                            f"opens no pull request anywhere -- it observes what {unit} already "
-                            f"publishes rather than reading upstream and computing a bump, so "
-                            f"story 9 / D2 is not implemented here ({why})")
-                continue
-            out("PASS", f"{unit}/{workflow}: daily clock at {', '.join(crons(doc))} -- {why}")
+            # D2 is "open a PR only when the computed bump is not none". A fetch clock with no
+            # `gh pr create` anywhere cannot do that: it observes what its own repository already
+            # publishes and compares it against nothing. platform, nist and ico are that shape.
+            #
+            # 2026-09-04, ticket 56. That used to be a SKIP, which was wrong twice over. SKIP
+            # means COULD NOT LOOK, and this checker looked: it parsed the workflow and saw no
+            # `gh pr create`. And it is not a shortfall the estate has failed to decide -- ADR-0024
+            # Consequences settles it in as many words ("platform, nist, ico and insurer observe
+            # rather than fetch. None ships an upstream fetcher yet, so their clock records what
+            # they have published and the sha256 of its payload each day. That is a real series").
+            # So the observed truth is a PASS whose sentence says exactly what it does and does
+            # not cover: three unconditional SKIPs used to hold verify-schedules.sh at exit 3
+            # forever, whatever any credential could see.
+            observes_only = workflow == "fetch.yml" and not any(
+                "gh pr create" in (s.get("run") or "")
+                for j in (doc.get("jobs") or {}).values()
+                for s in (j.get("steps") or []))
+            note = ("" if not observes_only else
+                    f"; it opens no pull request anywhere, so it records what {unit} has already "
+                    f"published and the hash of it rather than reading upstream and computing a "
+                    f"bump -- D2's proposal half is vacuous for a party whose feed is its own "
+                    f"artefact (ADR-0024 Consequences), and the upstream-reading half of story 9 "
+                    f"is not built here and is not graded by this line")
+            out("PASS", f"{unit}/{workflow}: daily clock at {', '.join(crons(doc))} -- {why}{note}")
 
         # 2 and 3. every scheduled job in the repository, required or not
         for workflow, doc in sorted(found.items()):
@@ -602,20 +951,26 @@ def check(offline: bool = False) -> int:
         # nothing is a fourth outcome the gate cannot count: eight server-side questions simply
         # vanished from the offline run. A could-not-look is a SKIP, said out loud, per unit.
         declared = os.path.isdir(os.path.join(root, ".github", "rulesets"))
-        out(*ruleset_line(unit, remote, live, unreachable, declared))
+        out(*ruleset_line(unit, remote, live, unreachable, declared, source))
 
         # 4. live: did each clock run inside its period?
         for workflow in sorted(need):
             if workflow not in found:
                 continue
+            clocks_seen.add(f"{unit}/{workflow}")
+            owns = owner_clause(unit, workflow, owned)
             if not live:
                 # Named per unit, on purpose: "GitHub is unreachable" is a
                 # could-not-look about THIS clock, not a blanket excuse.
-                out("SKIP", f"{unit}/{workflow}: GitHub unreachable ({unreachable}) -- "
+                # A refused verdict file is not an unreachable GitHub: the run declined to grade
+                # from it. Both are could-not-looks, and each says which it was.
+                why = ("this run declined to grade from the clock verdict"
+                       if "cannot grade from" in unreachable else "GitHub unreachable")
+                out("SKIP", f"{unit}/{workflow}: {why} ({unreachable}) -- "
                             f"cannot look at whether this clock ran inside its period")
                 continue
             try:
-                state, _remote_schedule = remote_crons(remote, workflow)
+                state, _remote_schedule = source.remote_crons(remote, workflow)
                 if state == "absent":
                     out("SKIP", f"{unit}/{workflow}: not on {remote}@{DEFAULT_BRANCH} yet -- "
                                 f"it lives on the local ecosystem/thin-slice branch until the "
@@ -623,7 +978,7 @@ def check(offline: bool = False) -> int:
                     continue
                 if state == "unparsed":
                     out("FAIL", f"{unit}/{workflow}: the copy on {remote}@{DEFAULT_BRANCH} "
-                                f"does not parse, so GitHub runs no clock from it at all")
+                                f"does not parse, so GitHub runs no clock from it at all" + owns)
                     continue
                 if state == "untimed":
                     # Two very different worlds, and the old code called both SKIP
@@ -638,9 +993,13 @@ def check(offline: bool = False) -> int:
                     else:
                         out("FAIL", f"{unit}/{workflow}: neither {remote}@{DEFAULT_BRANCH} nor "
                                     f"the local copy carries a `schedule:` -- the clock was "
-                                    f"removed from the branch GitHub actually runs")
+                                    f"removed from the branch GitHub actually runs" + owns)
                     continue
-                run = last_run(remote, workflow)
+                run = source.last_run(remote, workflow)
+            except CouldNotLook as e:
+                out("SKIP", f"{unit}/{workflow}: cannot look at whether this clock ran inside its "
+                            f"period ({e})")
+                continue
             except (subprocess.SubprocessError, OSError) as e:
                 out("SKIP", f"{unit}/{workflow}: GitHub unreachable for {remote} "
                             f"({str(e).splitlines()[0]})")
@@ -659,37 +1018,79 @@ def check(offline: bool = False) -> int:
                             + (f", and it landed {landed:.0f}h ago, past the {PERIOD_HOURS}h "
                                f"window -- it has had its chance" if landed is not None else
                                ", and how long it has been there could not be read, so the "
-                               "strict reading stands"))
+                               "strict reading stands") + owns)
                 continue
-            age = (now - dt.datetime.fromisoformat(
-                run["createdAt"].replace("Z", "+00:00"))).total_seconds() / 3600
-            if age > PERIOD_HOURS:
-                out("FAIL", f"{unit}/{workflow}: last scheduled run was {age:.0f}h ago, past "
-                            f"the {PERIOD_HOURS}h window (a daily period plus a day of slack "
-                            f"for GitHub's own scheduling delay) -- the clock has stopped")
-                continue
-            # The run's OUTCOME, not only its age. A run that dies in checkout,
-            # in the gitsign install or in the cage step records nothing and used
-            # to read as a healthy clock (live, 2026-08-28: "hub/truth.yml: last
-            # scheduled run 2h ago (failure)" graded PASS). truth.yml is the one
-            # documented exception: it ends `exit 1` whenever the gate is red,
-            # which is its normal state, and its observation lands before that.
-            # ponytail: the exception is by workflow name; the stronger check is
-            # to read the newest line of the lane itself (talk/truth.log,
-            # observations/<feed>.jsonl) off the remote and date it -- do that
-            # when a second clock needs an exception.
-            conclusion = run.get("conclusion") or run.get("status")
-            if conclusion != "success" and workflow not in RED_GATE_EXITS_NONZERO:
-                out("FAIL", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago concluded "
-                            f"{conclusion!r} -- a clock whose run dies records no observation")
-            else:
-                out("PASS", f"{unit}/{workflow}: last scheduled run {age:.0f}h ago "
-                            f"({conclusion})")
+            out(*run_line(unit, workflow, run, now, owns))
+
+    for fault in owners_faults(owned, clocks_seen):
+        out("FAIL", fault)
 
     if "FAIL" in LINES:
         return 1
     if "SKIP" in LINES:
         return 3
+    return 0
+
+
+# --- the collector: the credentialled half, in a job of its own (ticket 56) ---
+def collect() -> dict:
+    """The four live facts, as facts. No verdict, no grade, no credential in the output.
+
+    Runs where a credential is allowed to be -- truth.yml's `clocks` job, which holds
+    `actions: read` and runs no third-party code -- so that `check` can grade the clocks from a
+    job that holds nothing. Every failure is recorded as a reason in the document rather than
+    raised, so one unreachable organisation does not blind the other eight.
+    """
+    doc = {
+        "schema": VERDICT_SCHEMA,
+        "collected_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        "collector": "verify/schedules/schedules.py clocks",
+        # What binds the file to a run instead of to nobody (`binding_fault`). Straight from the
+        # GitHub context, empty outside Actions, and never anything the file's reader supplies.
+        "run_id": os.environ.get("GITHUB_RUN_ID", ""),
+        "repository": os.environ.get("GITHUB_REPOSITORY", ""),
+        "units": {},
+    }
+    for unit, root, remote in units():
+        entry: dict = {"remote": remote, "reachable": True, "unreachable_reason": "",
+                       "ruleset": {}, "workflows": {}}
+        doc["units"][unit] = entry
+        try:
+            verdict, reason = ruleset_state(remote)
+            entry["ruleset"] = {"verdict": verdict, "reason": reason}
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
+            entry["reachable"] = False
+            entry["unreachable_reason"] = str(e).splitlines()[0]
+            continue
+        need = required_clocks(unit, root) if unit != "hub" else {"truth.yml": ""}
+        found, _broken = workflows(root)
+        for workflow in sorted(need):
+            if workflow not in found:
+                continue
+            seen: dict = {}
+            entry["workflows"][workflow] = seen
+            try:
+                state, remote_schedule = remote_crons(remote, workflow)
+                seen["remote_state"] = state
+                seen["remote_crons"] = remote_schedule
+                seen["run"] = last_run(remote, workflow) if state == "timed" else None
+            except (subprocess.SubprocessError, OSError, ValueError) as e:
+                seen["error"] = str(e).splitlines()[0]
+    return doc
+
+
+def clocks(out_path: str) -> int:
+    doc = collect()
+    with open(out_path, "w") as fh:
+        json.dump(doc, fh, indent=2, sort_keys=True)
+        fh.write("\n")
+    reached = sum(1 for u in doc["units"].values() if u["reachable"])
+    runs = sum(len(u["workflows"]) for u in doc["units"].values())
+    print(f"ok  clock verdict written to {out_path}: {reached} of {len(doc['units'])} "
+          f"organisations reached, {runs} clock(s) read")
+    for unit, u in sorted(doc["units"].items()):
+        if not u["reachable"]:
+            print(f"    {unit}: NOT reached -- {u['unreachable_reason']}")
     return 0
 
 
@@ -904,6 +1305,150 @@ jobs:
     st, msg = ruleset_line("feeds", "org/feeds", True, "", False)
     assert st == "SKIP" and "no .github/rulesets/" in msg, msg
 
+    # --- the clock verdict file: the gate grades liveness holding no credential (ticket 56) ---
+    import tempfile
+    now = dt.datetime.now(dt.timezone.utc)
+
+    def verdict_file(collected_at, units_doc, schema=VERDICT_SCHEMA, run_id=None):
+        # Stamped with THIS run, because that is what a real verdict file carries: inside Actions
+        # the fixtures must bind like the article, and outside it (GITHUB_RUN_ID unset) both are
+        # unbound alike.
+        fh = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
+        json.dump({"schema": schema, "collected_at": collected_at, "collector": "selfcheck",
+                   "run_id": os.environ.get("GITHUB_RUN_ID", "") if run_id is None else run_id,
+                   "repository": os.environ.get("GITHUB_REPOSITORY", ""),
+                   "units": units_doc}, fh)
+        fh.close()
+        return fh.name
+
+    fresh = (now - dt.timedelta(minutes=3)).isoformat(timespec="seconds")
+    inside = (now - dt.timedelta(hours=6)).isoformat(timespec="seconds").replace("+00:00", "Z")
+    stale_run = (now - dt.timedelta(hours=PERIOD_HOURS + 5)).isoformat(
+        timespec="seconds").replace("+00:00", "Z")
+    body = {"feeds": {
+        "remote": "org/feeds", "reachable": True,
+        "ruleset": {"verdict": "unavailable", "reason": "the repository is public"},
+        "workflows": {
+            "ok.yml": {"remote_state": "timed", "remote_crons": ["17 3 * * *"],
+                       "run": {"createdAt": inside, "conclusion": "success"}},
+            "red.yml": {"remote_state": "timed", "remote_crons": ["17 3 * * *"],
+                        "run": {"createdAt": inside, "conclusion": "failure"}},
+            "cancelled.yml": {"remote_state": "timed", "remote_crons": ["17 3 * * *"],
+                              "run": {"createdAt": inside, "conclusion": "cancelled"}},
+            "stopped.yml": {"remote_state": "timed", "remote_crons": ["17 3 * * *"],
+                            "run": {"createdAt": stale_run, "conclusion": "success"}},
+            "broken.yml": {"error": "HTTP 404"},
+        }}}
+    path = verdict_file(fresh, body)
+    v = Verdict(path)
+    assert v.live
+    assert v.ruleset_state("org/feeds")[0] == "unavailable"
+    assert v.remote_crons("org/feeds", "ok.yml") == ("timed", ["17 3 * * *"])
+    assert v.last_run("org/feeds", "ok.yml")["conclusion"] == "success"
+    # every absence is a NAMED could-not-look, never a quiet "no"
+    for call, want in (
+            (lambda: v.last_run("org/nowhere", "ok.yml"), "carries no entry for"),
+            (lambda: v.last_run("org/feeds", "missing.yml"), "carries no reading for"),
+            (lambda: v.last_run("org/feeds", "broken.yml"), "could not be read")):
+        try:
+            call()
+            raise AssertionError("a missing fact must be a could-not-look, not a None")
+        except CouldNotLook as e:
+            assert want in str(e), e
+    # an unreachable ORGANISATION blinds only itself
+    one_down = verdict_file(fresh, {"ico": {"remote": "org/ico", "reachable": False,
+                                            "unreachable_reason": "HTTP 403"}})
+    try:
+        Verdict(one_down).last_run("org/ico", "fetch.yml")
+        raise AssertionError("an unreachable org must be a could-not-look")
+    except CouldNotLook as e:
+        assert "HTTP 403" in str(e), e
+    # a stale file, and a file that is not a verdict at all: refused at construction, and the
+    # caller falls back to Offline with the reason -- never to a credential the gate lacks
+    for bad, why in ((verdict_file((now - dt.timedelta(hours=VERDICT_MAX_AGE_HOURS + 2))
+                                   .isoformat(timespec="seconds"), body), "freshness window"),
+                     (verdict_file(fresh, body, schema="something-else/v9"), "clock-verdict/v1")):
+        try:
+            Verdict(bad)
+            raise AssertionError(f"a verdict file that is {why} must be refused")
+        except ValueError as e:
+            assert why in str(e), e
+        os.environ["CLOCK_VERDICT"] = bad
+        try:
+            fell_back = observer()
+        finally:
+            del os.environ["CLOCK_VERDICT"]
+        assert not fell_back.live and "does not fall back" in fell_back.unreachable, \
+            fell_back.unreachable
+    # ...and no CLOCK_VERDICT at all, with --offline, is the plain offline source
+    assert not observer(offline=True).live
+
+    # a verdict file is bound to the run that wrote it: one from another run, or from another
+    # repository, is refused and falls back to offline rather than being graded from (round 2).
+    # It narrows the window on a forged file; it is not a trust boundary (see `binding_fault`).
+    assert binding_fault({"run_id": "7", "repository": "org/hub"}, {}) == ""
+    assert binding_fault({"run_id": "7", "repository": "org/hub"},
+                         {"GITHUB_RUN_ID": "7", "GITHUB_REPOSITORY": "org/hub"}) == ""
+    for planted, env, why in (
+            ({"run_id": "9"}, {"GITHUB_RUN_ID": "7"}, "run 9"),
+            ({}, {"GITHUB_RUN_ID": "7"}, "(none)"),
+            ({"run_id": "7", "repository": "org/elsewhere"},
+             {"GITHUB_RUN_ID": "7", "GITHUB_REPOSITORY": "org/hub"}, "org/elsewhere")):
+        fault = binding_fault(planted, env)
+        assert why in fault and "not this run's observation" in fault, (planted, fault)
+    if os.environ.get("GITHUB_RUN_ID"):
+        foreign = verdict_file(fresh, body, run_id="not-this-run")
+        try:
+            Verdict(foreign)
+            raise AssertionError("a verdict file from another run must be refused")
+        except ValueError as e:
+            assert "not this run's observation" in str(e), e
+
+    # the documented non-zero exit is ONE conclusion, not "anything but success". A cancelled
+    # truth.yml run recorded nothing and graded PASS until 2026-09-04.
+    assert RED_GATE_EXITS_NONZERO.get("truth.yml") == "failure"
+    assert RED_GATE_EXITS_NONZERO.get("fetch.yml") is None
+
+    # --- a run never grades itself, and a run in flight is a SKIP (round 2 of ticket 56) -------
+    # The newest SCHEDULED run of truth.yml, read from a scheduled run of truth.yml, was this
+    # run: conclusion "", status in_progress. Graded against `failure` that was a permanent FAIL
+    # blaming ticket 85, unclearable by any estate fix.
+    def planted_run(hours, conclusion, ident, status=None):
+        when = (now - dt.timedelta(hours=hours)).isoformat(timespec="seconds")
+        return {"createdAt": when.replace("+00:00", "Z"), "conclusion": conclusion,
+                "status": status or ("completed" if conclusion else "in_progress"),
+                "databaseId": ident}
+
+    mine, yesterday = planted_run(0, "", 99), planted_run(24, "success", 98)
+    assert newest_gradable([mine, yesterday], "99")["databaseId"] == 98
+    assert newest_gradable([mine, yesterday], None)["databaseId"] == 98
+    assert newest_gradable([mine], "99") is None
+    assert newest_gradable([], None) is None
+    status, msg = run_line("hub", "truth.yml", mine, now, " (ticket 85 owns it)")
+    assert status == "SKIP" and "in_progress" in msg and "concluded nothing" in msg, msg
+    assert "ticket 85" not in msg, msg
+    assert run_line("hub", "truth.yml", planted_run(2, "failure", 97), now)[0] == "PASS"
+    assert run_line("hub", "truth.yml", planted_run(2, "cancelled", 97), now)[0] == "FAIL"
+    assert run_line("feeds", "fetch.yml", planted_run(2, "success", 97), now)[0] == "PASS"
+    assert run_line("feeds", "fetch.yml",
+                    planted_run(PERIOD_HOURS + 5, "success", 97), now)[0] == "FAIL"
+
+    # --- a red clock names the open ticket that owns it (ticket 85) -----------
+    owned = {"driftwood/twin-sweep.yml": {"ticket": 72, "owns": "the sweep dies under bash -e"},
+             "feeds/fetch.yml": {"ticket": 85, "owns": "the cage reads its own .pyc"},
+             "nowhere/none.yml": {"ticket": 999999, "owns": "no such ticket"}}
+    assert "ticket 72 owns it" in owner_clause("driftwood", "twin-sweep.yml", owned)
+    assert "unowned" in owner_clause("ludlow", "propose-tier.yml", {})
+    assert "the map is stale" in owner_clause("nowhere", "none.yml", owned)
+    faults = owners_faults(owned, {"driftwood/twin-sweep.yml", "feeds/fetch.yml"})
+    assert any("no such ticket" in f for f in faults), faults
+    assert any("not a clock this checker grades" in f for f in faults), faults
+    assert owners_faults({"driftwood/twin-sweep.yml": owned["driftwood/twin-sweep.yml"]},
+                         {"driftwood/twin-sweep.yml"}) == []
+    # the map that ships must itself be clean of the first fault: every ticket it names exists
+    for key, entry in owners().items():
+        assert ticket_status(entry.get("ticket")) is not None, key
+
     # the allow-list itself
     assert _allowed("observations/twin-sweep.jsonl") and _allowed("talk/truth.log")
     assert not _allowed("composed/evidence.json") and not _allowed("party.yaml")
@@ -913,14 +1458,25 @@ jobs:
           "main with no declared OBSERVATION_LANE or no cage step fails, a declaration pushed "
           "to any branch without opening a pull request fails, a proposer that pushes its own "
           "branch behind a PR passes, a scheduled job that can tag/release/merge fails, an "
-          "unscheduled cut-release is not judged at all, and the server-side ruleset question "
-          "answers with a named could-not-look rather than with silence")
+          "unscheduled cut-release is not judged at all, the server-side ruleset question "
+          "answers with a named could-not-look rather than with silence, a clock verdict file "
+          "lets the liveness half grade with no credential and every gap in it is a named "
+          "could-not-look, a stale or wrong-schema one falls back to offline rather than to a "
+          "token, a verdict file written by another run or in another repository is refused, a "
+          "cancelled run of the one clock excused for exiting non-zero is still a red, a run "
+          "still in flight -- this run included -- is a named could-not-look and never a red, "
+          "and a red clock names the ticket that owns it")
 
 
 def main(argv: list[str]) -> int:
     if len(argv) > 1 and argv[1] == "selfcheck":
         selfcheck()
         return 0
+    if len(argv) > 1 and argv[1] == "clocks":
+        if "--out" not in argv:
+            print("usage: schedules.py clocks --out FILE", file=sys.stderr)
+            return 2
+        return clocks(argv[argv.index("--out") + 1])
     offline = "--offline" in argv or os.environ.get("SCHEDULES_OFFLINE") == "1"
     return check(offline=offline)
 
