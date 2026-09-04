@@ -75,6 +75,8 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 - [69 — An untagged pin is a priced hole](issues/69-an-untagged-pin-is-a-priced-hole.md) — An untagged feed pin composes as a priced hole of its own premium and is graded live against the publisher's real remote — 7 of 7 estate pins signed, so the rule runs on a fixture and a scratch estate, not on a live hole.
 - [76 — Every green rests on an observation](issues/76-every-green-rests-on-an-observation.md) — every green rests on an observation — a missing instrument now exits 3 in fourteen
 - [78 — The proposer can only tighten, the enacted tier is bound to the priced tier, and the proposal is signed](issues/78-the-proposer-can-only-tighten.md) — the proposer folds the whole party to its strictest priced line, clamps to overlay.floor, reads the declaration off the governed Namespace and lands nothing looser; two governed Namespace documents is an ambiguity it refuses; the proposal is gitsign-signed; a binding check in each adopter's shift-left and a hub estate walk grade the enacted tier against the priced one (ADR-0022 note)
+- [83 — The TRUTH line says what it measured](issues/83-the-truth-line-says-what-it-measured.md) — The TRUTH line carries the split by class and the ceiling; an undeclared could-not-look
+- [90 — Identity is shelved for this build](issues/90-identity-is-shelved-for-this-build.md) — Identity is shelved and the record says so — §1 claims the artefact half, principle 6
 
 ### Built 2026-08-29 — the thin slice runs, and the gate is green
 
