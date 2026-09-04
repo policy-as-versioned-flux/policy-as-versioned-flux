@@ -58,8 +58,21 @@ if [ "${1:-}" = selfcheck ]; then
   done
   printf '%s' "$out" | grep -qE '^  5 .*SKIP' || { echo "selfcheck: an honest SKIP was not graded SKIP"; ok=0; }
   printf '%s' "$out" | grep -qE '^  6 .*FAIL' || { echo "selfcheck: an honest FAIL was not graded FAIL"; ok=0; }
+  # ...and the probe rule (ticket 83), on its own planted estate so the counts above stand:
+  # step 2 PASSing without SYNTHETIC is caught; the same PASS with the word is not.
+  u="$(mktemp -d)"; trap 'rm -rf "$t" "$u"' EXIT
+  for n in 1 4 5 6; do printf 'echo "PASS: observed"\nexit 0\n' >"$u/verify-e2e-step$n-x.sh"; done
+  printf 'echo "SKIP: honest reason"\nexit 3\n' >"$u/verify-e2e-step3-x.sh"
+  printf 'echo "PASS: a merged pin bump re-prices the adopter"\nexit 0\n' >"$u/verify-e2e-step2-x.sh"
+  out2="$(E2E_STEPS_DIR="$u" bash "$E2E_DIR/$(basename "${BASH_SOURCE[0]}")" 2>&1)"
+  printf '%s' "$out2" | grep -qF -- "its PASS must say SYNTHETIC" \
+    || { echo "selfcheck: a step-2 PASS with no SYNTHETIC was not caught"; ok=0; }
+  printf 'echo "PASS: a SYNTHETIC pin bump re-prices a throwaway copy"\nexit 0\n' >"$u/verify-e2e-step2-x.sh"
+  out2="$(E2E_STEPS_DIR="$u" bash "$E2E_DIR/$(basename "${BASH_SOURCE[0]}")" 2>&1)"
+  printf '%s' "$out2" | grep -qF -- "its PASS must say SYNTHETIC" \
+    && { echo "selfcheck: a step-2 PASS that says SYNTHETIC was caught anyway"; ok=0; }
   [ "$ok" -eq 1 ] || { printf '%s\n' "$out"; fail "step 7's own grading is broken"; }
-  pass "selfcheck: a hedged PASS, an exit/last-line mismatch, a non-conforming step and a green whose own transcript confesses mid-run are each caught; an honest SKIP and an honest FAIL are not"
+  pass "selfcheck: a hedged PASS, an exit/last-line mismatch, a non-conforming step, a green whose own transcript confesses mid-run and a probe step whose PASS does not say SYNTHETIC are each caught; an honest SKIP, an honest FAIL and a PASS that does say SYNTHETIC are not"
 fi
 
 # The selfcheck is what proves this script's grading still bites. Nothing ran it: the gate calls
@@ -89,6 +102,14 @@ for n in 1 2 3 4 5 6; do
         # The structural net: the confession is in the transcript, not on the verdict line.
         verdicts+=("UNGRADED")
         reasons+=("exit 0 with a 'could not look' line in its own output: $(printf '%s' "$out" | grep -E "$NOT_OBSERVED" | head -1)")
+        bad=$((bad+1))
+      elif { [ "$n" = 2 ] || [ "$n" = 3 ]; } && ! printf '%s' "$last" | grep -q 'SYNTHETIC'; then
+        # Eco-system ticket 83. Steps 2 and 3 are probes: each makes its own material (a bump on
+        # a throwaway copy, a residual placed either side of a real band) and then observes it.
+        # A PASS that does not say so reads as an event that happened in the estate. Step 3 has
+        # worded it this way since ticket 53; this is the rule that keeps both of them honest.
+        verdicts+=("UNGRADED")
+        reasons+=("step $n probes material it made itself; its PASS must say SYNTHETIC: ${last#PASS: }")
         bad=$((bad+1))
       else
         verdicts+=("PASS"); reasons+=("${last#PASS: }")

@@ -186,9 +186,18 @@ def try_bump(adopter, edge, pinned, newer):
         print(f"    note: {newer}'s payload prices {adopter} exactly as {pinned} did; what "
               f"moved is the recorded pin, not the number — not a re-price, looking on")
         return None
-    print(f"PASS: a merged pin bump ({name} {pinned} -> {newer}) re-prices {adopter}'s "
-          f"prices[] through composition ({old_p:,.2f} -> {new_p:,.2f}), offline, with no "
-          f"repo touched")
+    # The wording says which bump this is (eco-system ticket 83). It is not the merged one: it
+    # is a SYNTHETIC bump made here, on a throwaway copy, from whatever newer version happens to
+    # be on disk. Step 3 already words its own probe this way. The REAL merged Renovate feed-pin
+    # bump in this estate is driftwood #20 (feeds/threat-register v1 -> v2, merged 2026-09-01,
+    # graded by verify/renovate/verify-renovate-merged-feed-pr.sh); its diff to driftwood's
+    # composed/evidence.json moved `new_version` and nothing else -- no amount changed, so no
+    # money moved. Tickets 77 and 79 own the pound-inputs defect behind that (ticket 75 D2).
+    print(f"PASS: a SYNTHETIC pin bump ({name} {pinned} -> {newer}, made here on a throwaway "
+          f"copy of {adopter}, not {adopter}'s own merged history) re-prices {adopter}'s "
+          f"prices[] through composition ({old_p:,.2f} -> {new_p:,.2f}), offline, with no repo "
+          f"touched; the one bump that really was merged (driftwood #20, threat-register "
+          f"v1 -> v2) moved the recorded pin and no money")
     return 0
 
 
