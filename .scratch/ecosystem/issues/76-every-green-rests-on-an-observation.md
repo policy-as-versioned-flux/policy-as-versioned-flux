@@ -267,9 +267,18 @@ the leg behind a flag the gate sets once per wave.
   would close the half this net cannot see; it touches three scripts in two units and is its own
   ticket, not a review fix.
 
-**Re-review fix, 2026-09-04 (the assistant, delegated).** The narrowed PASS line still carried a
-claim wider than the estate: it told the reader the ungraded prose kind "is graded by each
-script's own selfcheck_absent leg", when 9 of the 95 discovered scripts carry that leg and none of
-the four prose sites does. The PASS line, the script header and `every_green.py`'s docstring now
-say so, and name the four sites as their own ticket. The SKIP line's count was off by one: it said
-"the other $n" while `$n` counted the unreadable script too; it now says `$((n - 1))`.
+**Re-review fixes, 2026-09-04 (the assistant, delegated).** Round 1 of the re-review found the
+narrowed PASS line still carried a claim wider than the estate: it told the reader the ungraded
+prose kind "is graded by each script's own selfcheck_absent leg", when only some scripts carry that
+leg and no prose site does. Round 2 found the replacement traded that for a wrong count (four prose
+sites, when the estate has five across three scripts, and a sixth in verify-access.sh), and that
+both figures were typed rather than measured.
+
+Both are closed by measuring instead of quoting. The run now counts how many discovered scripts
+carry a `selfcheck_absent` leg and prints that figure, so the sentence follows the estate and the
+ticket that gives a prose site its leg cannot falsify it. The number of prose sites is deliberately
+**not** counted: a text scan cannot tell a false green from an honest narrowing, which is the whole
+reason this net grades the verdict token, so the sentence says only that a prose could-not-look in
+a script carrying no leg is graded by nothing. The SKIP line now subtracts the scripts that could
+not be read, however many, instead of assuming one. The same boundary is stated in the script
+header, in `every_green.py`'s docstring and in the test docstring that documents it.

@@ -15,9 +15,10 @@
 # ticket) and two of which narrow their closing sentence honestly. The prose kind is caught by
 # execution, not text, but only where a script carries the leg: `selfcheck_absent` re-runs a
 # script with the instrument hidden and requires exit 3 with a `SKIP:` last line, and 9 of the 95
-# discovered scripts carry it today. The four prose sites in this estate (verify-currency.sh,
-# verify-upflow.sh and verify-reach-secrets.sh twice) carry none, so nothing grades them; ticket
-# 76's Answer records that as its own ticket.
+# discovered scripts carry it. This run counts both figures rather than quoting them, and prints
+# how many prose sites sit in scripts that carry no leg: those are graded by nothing. Today they
+# are in verify-currency.sh, verify-upflow.sh, verify-reach-secrets.sh and verify-access.sh;
+# ticket 76's Answer records giving them the leg as its own ticket.
 #
 #   PASS (exit 0)  no discovered script prints the SKIP verdict token and then reaches exit 0
 #   FAIL (exit 1)  one does, named by file and line
@@ -33,13 +34,22 @@ python3 "$HERE/every_green.py" selfcheck || { echo "FAIL: every_green.py selfche
 
 [ -d "$ROOT/.estate-clone" ] || { echo "SKIP: no .estate-clone (run clone-estate.sh); only the hub's own verify/ could be read"; exit 3; }
 
+scan_log="$(mktemp)"; trap 'rm -f "$scan_log"' EXIT
 say "2. every verify script the gate discovers, hub and estate"
-python3 "$HERE/every_green.py" scan "$ROOT/verify" "$ROOT/.estate-clone"; rc=$?
-n="$(find -L "$ROOT/verify" "$ROOT/.estate-clone" -name 'verify*.sh' -not -path '*/.work/*' -not -path '*/.git/*' 2>/dev/null | wc -l | tr -d ' ')"
+python3 "$HERE/every_green.py" scan "$ROOT/verify" "$ROOT/.estate-clone" | tee "$scan_log"; rc="${PIPESTATUS[0]}"
+
+# The figure below is measured on this run, never typed: a later ticket that gives a prose site its
+# own selfcheck_absent leg moves it, and the sentence stays true without anyone editing it. How many
+# prose sites there are is not counted here -- a text scan cannot tell a false green from an honest
+# narrowing, which is the whole reason this net grades the verdict token instead.
+discovered="$(find -L "$ROOT/verify" "$ROOT/.estate-clone" -name 'verify*.sh' -not -path '*/.work/*' -not -path '*/.git/*' 2>/dev/null)"
+n="$(printf '%s\n' "$discovered" | grep -c . | tr -d ' ')"
+legged="$(printf '%s\n' "$discovered" | while IFS= read -r f; do [ -n "$f" ] && grep -q '^[^#]*selfcheck_absent' "$f" 2>/dev/null && echo "$f"; done | grep -c . | tr -d ' ')"
+unread="$(grep -c '^  ??   could not read ' "$scan_log" | tr -d ' ')"
 case "$rc" in
-  0) echo "PASS: none of the $n discovered verify scripts prints the SKIP verdict token and then reaches exit 0; the prose-worded could-not-look is not graded here (see the header), and is graded only where a script carries a selfcheck_absent leg, which 9 of them do and the four prose sites do not"
+  0) echo "PASS: none of the $n discovered verify scripts prints the SKIP verdict token and then reaches exit 0; the prose-worded could-not-look is not graded here (see the header), and is graded only where a script carries a selfcheck_absent leg, which $legged of them do; a prose could-not-look in any of the rest is graded by nothing"
      exit 0 ;;
-  3) echo "SKIP: a discovered verify script could not be read (named above), so this run did not observe the other $((n - 1)) to be the whole surface"
+  3) echo "SKIP: $unread discovered verify script(s) could not be read (named above), so this run did not observe the other $((n - unread)) to be the whole surface"
      exit 3 ;;
   1) echo "FAIL: a verify script prints the SKIP verdict token and then reaches exit 0, which the gate would grade PASS (named above)"
      exit 1 ;;
