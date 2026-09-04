@@ -13,6 +13,11 @@
 #     create`, no `gh pr merge`. A release stays a human act;
 #   * live, where GitHub is reachable: each clock ran inside its own period.
 #
+# This script grades the PROMISE: what the workflow says its next run may stage. The server-side
+# ruleset ADR-0024 named cannot exist on a public repository (ADR-0023, amended 2026-09-03), so
+# the other half of the cage is detective: verify-lane.sh, beside this one, walks the history of
+# every observation ref and fails on any commit a scheduled identity landed outside the lane.
+#
 # Exit 0 observed true; 3 could not look, with the reason on the last line; 1 observed false.
 # Offline the first three checks still run in full: absence of a network is never a pass, and
 # never an excuse to skip the half that does not need one.
