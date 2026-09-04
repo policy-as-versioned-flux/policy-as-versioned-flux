@@ -175,6 +175,17 @@ repository pins, and a pinned tree is checked for the section the pin is used fo
   ticket's decision 3, the manifest line and ADR-0019's note all said the check grades every
   cross-organisation checkout. They now say what it does and name the third limit: a
   `repository:` no literal matrix decides is a named could-not-look and not a grade.
+* **Round 4: a matrix carrying `include:` was expanded anyway, and that was the round-3 defect
+  wearing a new hat.** `expand_matrix()` read the literal lists and ignored `include:`, so a job
+  written `adopter: [driftwood, tuppence]` plus `include: [- adopter: ludlow]` graded two legs
+  and passed over the third in silence -- not graded, not counted, not skipped. The docstring
+  already promised the opposite, so the promise was false as well. One guard fixes it: a matrix
+  with `include:` or `exclude:` decides nothing here, because `include:` adds combinations and
+  `exclude:` removes them. The step is counted and SKIPped by name instead. Proved red first --
+  with the guard disabled the planted `p-matrix-include.yml` grades `PASS` and the selfcheck
+  fails on it; with the guard it is a named could-not-look and the selfcheck passes. No workflow
+  in the eight units carries `include:` or `exclude:` today (0 hits across 35 files), so no real
+  checkout was ungraded. The estate count is unchanged at 53 PASS, 0 FAIL, 1 SKIP, exit 3.
 * **`verify-branch-refs.sh --selfcheck` and `verify-feed-contract.sh --selfcheck` now do what
   their Answers say.** Both accepted the flag and silently ran the full estate check instead.
   Each runs its python selfcheck alone and prints one PASS or FAIL line.

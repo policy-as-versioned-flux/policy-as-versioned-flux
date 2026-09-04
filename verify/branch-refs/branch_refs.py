@@ -64,10 +64,13 @@ deliberate and all narrow enough to check by eye today:
     fluxcd.io, not a policy-as-versioned repository, and ticket 56 pins it).
   * a `repository:` no literal matrix decides is a SKIP and not a grade. The organisation is
     chosen on the runner, so which of this repository's pin records ought to declare it cannot be
-    read here. There is none in the estate on 2026-09-04 -- insurer/fetch.yml's is the only
-    templated `repository:` and its matrix is a literal list -- but the day one is added the
-    check says could-not-look about it out loud, which is why this limit is a named line in the
-    output and not, as it was until round 3, silence.
+    read here. A matrix carrying `include:` or `exclude:` counts as undecided here even where its
+    lists are literal: `include:` adds combinations and `exclude:` removes them, so expanding the
+    lists alone would grade some legs and pass over the rest in silence. There is none of either
+    in the estate on 2026-09-04 -- insurer/fetch.yml's is the only templated `repository:`, its
+    matrix is a literal list and no workflow in the eight units carries `include:` or `exclude:`
+    -- but the day one is added the check says could-not-look about it out loud, which is why
+    this limit is a named line in the output and not, as it was until round 3, silence.
 
 All three are the same shape of hole: this check grades the form the estate uses, not every form
 GitHub allows. Widening it belongs with the first unit that needs another form.
@@ -218,6 +221,11 @@ def expand_matrix(repo: str, matrix: dict) -> list[str] | None:
     a literal matrix list are written down here, so expanding them is reading and not guessing."""
     keys = sorted(set(MATRIX.findall(repo)))
     if not keys:
+        return None
+    if "include" in matrix or "exclude" in matrix:
+        # `include:` ADDS combinations and `exclude:` removes them, so the literal lists below are
+        # no longer the value set. Expanding them anyway would grade some combinations and pass
+        # over the rest in silence -- the exact shape this check exists to catch. Read nothing.
         return None
     values = []
     for key in keys:
@@ -377,10 +385,13 @@ def selfcheck() -> None:
         # A `repository:` that is ITSELF a workflow expression over the job's own matrix. Until
         # 2026-09-04 (round 3) these matched nothing and returned before the counter moved: not a
         # pass, not a refusal, invisible -- so moving such a checkout to a branch was free.
-        def wm(name, values, repo, ref):
+        def wm(name, values, repo, ref, include=None):
             open(os.path.join(adopter, ".github", "workflows", name), "w").write(
                 "name: x\non: push\njobs:\n  j:\n    strategy:\n      matrix:\n"
-                f"        p: [{', '.join(values)}]\n    steps:\n"
+                f"        p: [{', '.join(values)}]\n"
+                + ("".join(f"        include:\n          - p: {v}\n" for v in [include])
+                   if include else "")
+                + "    steps:\n"
                 "      - uses: actions/checkout@v4\n        with:\n"
                 f"          repository: {repo}\n" + (f"          ref: {ref}\n" if ref else ""))
 
@@ -399,6 +410,9 @@ def selfcheck() -> None:
         wm("m-matrix-expression-ref.yml", ["ico"], tmpl, "${{ steps.pins.outputs.t }}")
         wm("n-unresolvable-repo.yml", ["ico"],
            "policy-as-versioned-${{ steps.pick.outputs.party }}/x", "v3.0.0")
+        # A literal list PLUS an `include:` that adds a party the list does not carry. Before
+        # this guard the ico leg graded PASS and the hub leg was neither graded nor counted.
+        wm("p-matrix-include.yml", ["ico"], tmpl, "v3.0.0", include="hub")
         w("o-party-pin.yml", step.format(
             p="nist", ref="          ref: ${{ steps.pins.outputs.nist_tag }}\n"))
 
@@ -416,7 +430,7 @@ def selfcheck() -> None:
                 "j-matrix-branch.yml": "FAIL", "k-matrix-tag.yml": "PASS",
                 "l-matrix-no-ref.yml": "FAIL", "m-matrix-expression-ref.yml": "PASS",
                 # ... and one that no matrix resolves is a named could-not-look, never silence
-                "n-unresolvable-repo.yml": "SKIP",
+                "n-unresolvable-repo.yml": "SKIP", "p-matrix-include.yml": "SKIP",
                 # party.yaml declares the pin where nothing under gitops/ does
                 "o-party-pin.yml": "PASS"}
         for name, status in want.items():
@@ -464,8 +478,8 @@ def selfcheck() -> None:
           "missing ref, an undeclared computed ref and a pin naming an unsigned tag all refuse; "
           "an untagged publisher, a missing clone and an empty estate are never a pass; a "
           "templated `repository:` is expanded from its job's matrix and graded like any other "
-          "-- a branch behind one still refuses -- and one no matrix decides is a named "
-          "could-not-look, counted, never silence")
+          "-- a branch behind one still refuses -- and one no LITERAL matrix decides, including "
+          "one whose matrix carries `include:`, is a named could-not-look, counted, never silence")
 
 
 if __name__ == "__main__":
