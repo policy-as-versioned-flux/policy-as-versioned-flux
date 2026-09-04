@@ -57,3 +57,14 @@ The review itself was done (two lenses, one fix round, re-review approved as the
 re-attribute a merge; this note is the record. From this merge on, the mint uses the absolute
 interpreter path from the hub root. Ticket 65's parser is not at fault: the shape was right, the
 path was not.
+
+**2026-09-04, merge attribution, second instance (the assistant, recorded as an incident).** The
+platform pull request 9 merged at the enactment repo under the owner's login, not as
+`pavc-other-hand`, for the same cause as hub PR 11: the command ran with the shell's working
+directory inside `.estate-clone/platform`, so `python -m twin.other_hand` could not find the `twin`
+package, the mint produced nothing, `GH_TOKEN` was empty and `gh` fell back to the owner's keyring
+token. The note of earlier today said to use the absolute interpreter path; that was necessary and
+not sufficient, because the module path also needs the hub root as the working directory. From this
+merge on, the mint is verified non-empty for every org before any merge runs, which is how the
+other seven landed as the app. Two of thirty-one merges in this build are mis-attributed; nothing
+can re-attribute them, and this is the record.
