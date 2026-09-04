@@ -77,6 +77,7 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 - [78 — The proposer can only tighten, the enacted tier is bound to the priced tier, and the proposal is signed](issues/78-the-proposer-can-only-tighten.md) — the proposer folds the whole party to its strictest priced line, clamps to overlay.floor, reads the declaration off the governed Namespace and lands nothing looser; two governed Namespace documents is an ambiguity it refuses; the proposal is gitsign-signed; a binding check in each adopter's shift-left and a hub estate walk grade the enacted tier against the priced one (ADR-0022 note)
 - [83 — The TRUTH line says what it measured](issues/83-the-truth-line-says-what-it-measured.md) — The TRUTH line carries the split by class and the ceiling; an undeclared could-not-look
 - [90 — Identity is shelved for this build](issues/90-identity-is-shelved-for-this-build.md) — Identity is shelved and the record says so — §1 claims the artefact half, principle 6
+- [63 — The unlabelled default flips to isolated](issues/63-the-unlabelled-default-flips-to-isolated.md) — the unlabelled default is `isolated` in graded and in the new 5.0.0 line; the check that
 
 ### Built 2026-08-29 — the thin slice runs, and the gate is green
 
