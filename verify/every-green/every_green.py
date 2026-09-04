@@ -33,7 +33,9 @@ discovered scripts on 2026-09-04 and named all four the same, so it would have t
 about the two it is wrong about. What catches the prose kind is not text but execution: the
 per-script `selfcheck_absent` leg (verify/lib-observation.sh, .estate-clone/platform/lib.sh),
 which re-runs the script with the instrument hidden and requires exit 3 with a `SKIP:` last line.
-That is a per-script obligation and this net cannot impose it; ticket 76's Answer names it.
+That is a per-script obligation and this net cannot impose it. Nine of the 95 discovered scripts
+carry the leg today, and none of the four prose sites does, so nothing grades those four; ticket
+76's Answer names that as its own ticket.
 
 Text, not execution: a script's absent-instrument branch cannot be exercised here without
 removing the instrument, which each script's own --selfcheck does for itself. What this reads is

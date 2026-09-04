@@ -266,3 +266,10 @@ the leg behind a flag the gate sets once per wave.
   net, which reads the verdict token and not prose. Giving every live-tail script that leg is what
   would close the half this net cannot see; it touches three scripts in two units and is its own
   ticket, not a review fix.
+
+**Re-review fix, 2026-09-04 (the assistant, delegated).** The narrowed PASS line still carried a
+claim wider than the estate: it told the reader the ungraded prose kind "is graded by each
+script's own selfcheck_absent leg", when 9 of the 95 discovered scripts carry that leg and none of
+the four prose sites does. The PASS line, the script header and `every_green.py`'s docstring now
+say so, and name the four sites as their own ticket. The SKIP line's count was off by one: it said
+"the other $n" while `$n` counted the unreadable script too; it now says `$((n - 1))`.
