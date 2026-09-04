@@ -1,7 +1,7 @@
 # 77 — Every pin is checked for content, and the estate consumes itself the way it tells adopters to
 
 Type: task (AFK build, HITL tag dispatch)
-Status: resolved (items 2 and 3 wait on the owner's dispatch; item 6 is the 56+85 builder's)
+Status: resolved (items 2 and 3 wait on the owner's dispatch; the insurer's half of item 1 is armed but inert until a platform release carries the rule -- Waits item 3; item 6 is the 56+85 builder's)
 Blocked by: none
 
 ## Question
@@ -25,7 +25,11 @@ Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R4. Findings: partici
 ## Answer
 
 Built 2026-09-04 on one hub branch with ticket 62. Item 6 (truth.yml's Flux install and
-`--fail`) was handed to the ticket 56+85 builder and is not touched here.
+`--fail`) was handed to the ticket 56+85 builder and is not touched here; their note for it is
+kept below, in item order, exactly as they wrote it. A round-2 review on 2026-09-04 found two
+ways this branch broke a working clock and seven smaller faults; both fixes and all seven are
+recorded under **Round 2** at the end of this Answer, and the numbers and claims above were
+corrected in place rather than left to contradict it.
 
 **Item 1 -- one rule, three statements of it, and the third is deliberate.**
 `platform/party/pin_content.py` is the rule, written once:
@@ -58,7 +62,8 @@ pull request or the Kustomization reconciles a path that does not exist. That co
 and this build left it alone.
 
 **Item 4 -- the three `release.yml` platform checkouts are pinned.** The insurer reads its own
-`gitops/platform/platform-pin.yaml` (v1.1.1 at 58ef9c5, checked); ico and feeds pin
+`gitops/platform/platform-pin.yaml` (v2.0.1 at 533dccb, moved there by the round-2 fix
+below -- it read v1.1.1 and that broke the release gate); ico and feeds pin
 `PLATFORM_TAG`/`PLATFORM_COMMIT` (v2.0.1 at 533dccb) in the workflow's own `env:`, beside
 `GITSIGN_VERSION`. Each gains a step asserting the checked-out HEAD is the pinned commit. The
 insurer's `fetch.yml` also gains the pinned platform checkout, because its pricer now reads the
@@ -91,11 +96,13 @@ runs. `parse_truth` needed no change (ticket 83 left the value as text). `clone-
 keeps cloning default branches, and now says why: a gate pinned to the last tag could never go
 red on work in flight, which is the opposite of what it is for.
 
-**Which checks grade it.** `verify/branch-refs/verify-branch-refs.sh` (new, 49 PASS / 1 SKIP);
+**Which checks grade it.** `verify/branch-refs/verify-branch-refs.sh` (new, 50 PASS / 1 SKIP);
 `verify/feed-contract/verify-feed-contract.sh`, whose PASS lines now say the tree carries the
 section and whose three insurer `exposure v1.1.0` lines went from PASS to could-not-look;
 `platform/compose/verify-composition.sh` step 1a (`pin_content.py --selfcheck`);
-`insurer/verify-insurer-quote.sh`.
+`insurer/verify-insurer-quote.sh --selfcheck`, a leg added by the round-2 fix below -- until it
+existed the insurer's whole half of item 1 was graded by no check anywhere, and the sentence
+that said otherwise was wrong.
 
 ### Decisions (all delegated, ADR-0025, 2026-09-04)
 
@@ -131,9 +138,96 @@ section and whose three insurer `exposure v1.1.0` lines went from PASS to could-
    `ref: <the pin>` and nowhere else, and the hub's feed-contract resolves the same pin against
    the adopter's real remote. Making the pricer refuse a working tree would have broken
    `verify-insurer-quote.sh`'s offline re-price, which is a real check of a real number.
+8. **A pinned platform release that does not carry the rule is a COULD-NOT-LOOK, not a refusal**
+   (round 2, 2026-09-04). `pin_content()` returns `None` and the pricer prints a NOTE on stderr
+   naming what was not checked and who does check it, then prices on. Reason: no platform tag
+   carries `party/pin_content.py` -- checked tag by tag, v0.1.0 through v2.0.1 and policy/v2.0.0
+   through policy/v4.0.0, none has it -- so the refusal as first built would have stopped the
+   insurer's scheduled re-quote on every adopter for want of a rule the estate has not released.
+   A check must not break the thing it grades. The refusal arms itself with no further change on
+   the day the insurer's platform pin moves to a release that carries the file.
+9. **The insurer's platform pin moves to v2.0.1** (round 2, 2026-09-04), and `party.yaml`'s
+   `platform/implementations` edge with it, because `party_artefact.py` grades that edge against
+   this file's tag. Reason: item 4 pinned `release.yml`'s platform checkout to a pin file that
+   said v1.1.1, a value nothing had ever exercised because the checkout had carried no `ref:` at
+   all. v1.1.1's `party/schema.json` predates `reporting_currency` and `publishes`, both of which
+   the insurer's own `party.yaml` carries, so the release gate refused
+   (`REFUSED: unknown top-level field 'reporting_currency'`). v2.0.1 is the tag the three
+   adopters already pin and the oldest whose schema this party validates against. The quotes did
+   not re-render: `quote.py` takes no arithmetic from `fair.py`.
 
 Map line: Tickets 62 and 77: every cross-org checkout in the eight units names a tag its own
 repository pins, and a pinned tree is checked for the section the pin is used for.
+
+### Round 2, 2026-09-04 -- the review found two ways this branch broke a clock
+
+Both were the same mistake in two places: a pin file is the right shape, and the VALUE in it had
+never been exercised, so pinning a checkout to it moved a stale value onto a live path.
+
+1. **The re-quote clock would have refused on every adopter, for ever.** `payload()` calls
+   `pin_content()`, which loads `platform/party/pin_content.py` out of `PLATFORM_DIR`;
+   `fetch.yml` checks platform out at the tag the pin file names; and NO platform tag carries
+   that file -- it is new on `ecosystem/build-2026-09-03` and unreleased. Every scheduled
+   re-quote would have died `REFUSED: missing instrument: no .../party/pin_content.py`, exit 1
+   under `set -euo pipefail`, which contradicts this ticket's own done clause. Fixed as decision
+   8 above: absent rule = could-not-look, announced on stderr, price on.
+
+   Measured while fixing it, and worth writing down because it changes what "the clock works
+   today" means: the clock is ALREADY refusing, and was before this branch. `fetch.yml` checks
+   each adopter out at the pinned tag `v1.1.0`, and no `v1.1.0` tree carries an `exposure`
+   section, so `exposure_of()` refuses first -- the pre-branch `quote.py` refuses identically on
+   all three adopters when handed the real pinned trees. The two refusals have one cause (no
+   released tag carries the exposure section) and one fix (Waits item 1). What this branch would
+   have added is a refusal that the owner's dispatch could NOT clear, because no adopter release
+   puts `pin_content.py` into a platform tag.
+
+2. **The release gate would have refused.** Item 4 pinned `release.yml`'s platform checkout to
+   `gitops/platform/platform-pin.yaml`, which said v1.1.1; `verify-insurer-party.sh` validates
+   `party.yaml` through `<PLATFORM_DIR>/party/party_artefact.py`, and v1.1.1's schema predates
+   `reporting_currency` and `publishes`. Run against the real v1.1.1 tree the gate refused three
+   fields and exited 1; today's unpinned step gets the default branch and passes. Fixed as
+   decision 9 above: the pin, and the `inherits[]` edge that must move with it, are v2.0.1.
+   Checked both ways against real trees: `PLATFORM_DIR=<v1.1.1> ./verify-insurer-party.sh` exits
+   1, `PLATFORM_DIR=<v2.0.1>` exits 0.
+
+Which platform tags carry what, checked tag by tag on 2026-09-04 and the reason no other pin
+would serve:
+
+| tag | `party/schema.json` has `reporting_currency` + `publishes` | `party/pin_content.py` |
+|---|---|---|
+| v0.1.0, v0.1.1, v1.0.0, v1.1.0, v1.1.1 | no | no |
+| v2.0.0, v2.0.1, policy/v4.0.0 | yes | no |
+
+**Seven smaller corrections in the same round.**
+
+* `verify-branch-refs.sh` grades **50 PASS / 1 SKIP**, not 49; both Answers said 49.
+* **This ticket claimed `verify-insurer-quote.sh` grades the new rule. It did not** -- that
+  script never calls `payload()` or `envelope()`, so the refusal path was exercised by nothing.
+  The seam asked for is now built: `verify-insurer-quote.sh --selfcheck` drives
+  `refuse_unless_tree_carries_exposure` over synthetic driftwood trees and proves three things --
+  rule absent = could-not-look and price on, rule present + tree without the section = refused as
+  a missing instrument, rule present + tree with the section = graded. The main run executes it
+  first and records its verdict into its own aggregate, so the gate grades it too (22 checks now,
+  not 21).
+* **`branch_refs.py`'s limits are stated**, in its docstring and in its manifest line: it globs
+  `.github/workflows/*.yml` and grades `actions/checkout@` steps only, so a `.yaml` workflow, a
+  composite action or a `git clone` in a `run:` block is invisible to it. Checked 2026-09-04:
+  none of the three exists anywhere in the eight units, so the glob misses nothing that is there
+  -- it would miss the first one added.
+* **`talk/verify-manifest.txt` rows 133 and 144 were too narrow.** Each script can print a
+  could-not-look reason its declared pattern did not carry (`carries no clone of <party>`;
+  `does not carry the tag object`), so an honest skip would have been graded FAIL. Both patterns
+  widened, with the reason on the line.
+* **The `gotk-sync-feeds.yaml` Renovate manager could never have bumped anything** in any of the
+  three adopters: it captured `threat-register/v2.0.0` whole as `currentValue` and handed it to
+  `semver` versioning, which cannot parse it. Rewritten in the shape the repositories' existing
+  feed manager already uses -- the feed prefix outside the capture group, an
+  `extractVersionTemplate` mapping the publisher's per-feed tags back onto the captured semver.
+* **Stale comments removed** from tuppence's and ludlow's `propose-tier.yml` and `shift-left.yml`:
+  they still described fetching an insurer parent those jobs no longer fetch (decision 5 in
+  ticket 62 removed it), including a refusal line for a parent neither party declares.
+* The false half of `party.yaml`'s own comment is corrected: it said v1.1.0 is "the one whose
+  tree carries the exposure section". No v1.1.0 tree does. That is the whole of item 2.
 
 ## Waits on the owner
 
@@ -148,5 +242,14 @@ repository pins, and a pinned tree is checked for the section the pin is used fo
 2. **After those tags exist:** bump `insurer/party.yaml`'s three exposure pins to them, let
    `fetch.yml` (cron 31 5) re-quote for real, then dispatch the insurer's `cut-release` so the
    re-quote tag exists for Renovate to bump the adopters' `quote-<adopter>` pins.
-3. **Push and merge** the seven unit branches (`ticket-62-and-77` on platform, driftwood,
+3. **A platform release that carries `party/pin_content.py`** (round 2, 2026-09-04).
+   Who: the owner, dispatching `cut-release.yml` on `policy-as-versioned-platform/platform`
+   after this run's `ticket-62-and-77` branch is merged there. What it unblocks: until that tag
+   exists, `insurer/pricing/quote.py` says could-not-look on the tree-carries-the-section rule
+   and prices on, and `verify-insurer-quote.sh --selfcheck` grades only the could-not-look half
+   of the seam (it exits 3 on any runner whose platform checkout lacks the file). After it
+   exists, bump `insurer/gitops/platform/platform-pin.yaml` and the matching `inherits[]` edge
+   to it in one reviewed pull request, and the refusal arms itself with no code change. Nothing
+   here can be pre-staged: writing a tag that does not exist is fabrication.
+4. **Push and merge** the seven unit branches (`ticket-62-and-77` on platform, driftwood,
    tuppence, ludlow, ico, feeds, insurer), as `pavc-other-hand`.

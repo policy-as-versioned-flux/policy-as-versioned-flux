@@ -38,6 +38,22 @@ from -- a pin, in this repository, naming a tag that exists -- and that is what 
 commit half of each {tag, commit} pair is asserted on the runner by each unit's own
 .github/scripts/verify-pinned-checkouts.py, which is where the runner's real HEAD can be read.
 
+WHAT THIS DOES NOT SEE, stated so a green line is not read as more than it is. Two limits, both
+deliberate and both narrow enough to check by eye today:
+
+  * the glob is `.github/workflows/*.yml` only. A workflow written `.yaml`, a composite action
+    under `.github/actions/`, or a reusable workflow called from another repository is not read.
+    Checked 2026-09-04 across the eight units: every workflow file in the estate is `.yml`, there
+    are no composite actions and no cross-repository `uses:` of a reusable workflow, so the glob
+    misses nothing that exists. It would silently miss the first one added.
+  * only `actions/checkout@` steps are graded. A `git clone`, a `gh repo clone`, a `curl` of a
+    tarball or an archive URL in a `run:` block fetches another organisation's code without ever
+    being seen here. Grep says there are none in the estate today (`truth.yml`'s Flux install is
+    fluxcd.io, not a policy-as-versioned repository, and ticket 56 pins it).
+
+Both are the same shape of hole: this check grades the form the estate uses, not every form
+GitHub allows. Widening it belongs with the first unit that needs another form.
+
 Prints one line per check. Exit precedence: any FAIL -> 1; else any SKIP -> 3; else 0.
 
 Usage:

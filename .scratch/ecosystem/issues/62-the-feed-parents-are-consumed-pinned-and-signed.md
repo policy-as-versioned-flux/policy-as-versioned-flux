@@ -1,7 +1,7 @@
 # 62 — The feed parents are consumed pinned and signed
 
 Type: task (AFK)
-Status: resolved
+Status: resolved (the done clause's citable green run waits on the owner's three adopter releases -- see ticket 77's Waits item 1)
 Blocked by: 57
 
 ## Question
@@ -56,10 +56,21 @@ refs went with them, as the 2026-09-02 review asked.
 * Hub: `verify/branch-refs/verify-branch-refs.sh` + `branch_refs.py` (selfcheck first, then
   the code), discovered by `talk/verify-all.sh`, with its line in `talk/verify-manifest.txt`.
 
-**Which check grades it.** `verify/branch-refs/verify-branch-refs.sh` -- 49 PASS, 1 SKIP,
+**Which check grades it.** `verify/branch-refs/verify-branch-refs.sh` -- 50 PASS, 1 SKIP,
 exit 3. The one could-not-look is driftwood's `twin-sweep.yml` consuming the HUB, which has
-cut no tag for it to pin to; ticket 64 cuts it. `verify/feed-contract/verify-feed-contract.sh`
-passes every ico and feeds pin by name and tree.
+cut no tag for it to pin to; ticket 64 cuts it. It grades `.github/workflows/*.yml` and
+`actions/checkout@` steps only; that limit is stated in `branch_refs.py`'s docstring and on its
+manifest line, and nothing else exists in the eight units today (checked 2026-09-04).
+`verify/feed-contract/verify-feed-contract.sh` passes every ico and feeds pin by name and tree.
+
+**This ticket's done clause is NOT met, and cannot be until the owner releases.** It reads
+"verify-feed-contract passes on a citable run". It does not pass: it exits 3, on the three
+insurer `<adopter> exposure v1.1.0` pins, because ticket 77's content rule reads those trees and
+none carries an `exposure` section. That is a could-not-look and the honest reading -- the code
+is right, a release is missing -- but it is not a pass, and saying otherwise would be the exact
+fabrication ticket 77 exists to stop. The three adopter releases in ticket 77's Waits item 1 are
+what closes it. Every ico, feeds, nist and platform pin this ticket moved does pass by name and
+by tree.
 
 ### Decisions (all delegated, ADR-0025, 2026-09-04)
 
@@ -91,9 +102,37 @@ passes every ico and feeds pin by name and tree.
    lacks the exposure the insurer priced from. Whether a tag's TREE carries its section is
    ticket 77's content rule and is now graded by feed-contract; this ticket's job was to stop
    consuming a branch.
+7. **The `gotk-sync-feeds.yaml` Renovate manager captures the semver, not the whole tag**
+   (round 2, 2026-09-04). As first built it captured `threat-register/v2.0.0` as `currentValue`
+   and gave it to `semver` versioning, which cannot parse it, so the one pin this ticket added
+   that a per-feed publisher signs could never have been bumped -- a pin nothing maintains is
+   how the estate got here. Rewritten in the shape each adopter's existing `party.yaml` feeds
+   manager already uses: the feed prefix outside the capture group, so Renovate rewrites only
+   the semver and the prefix survives, plus an `extractVersionTemplate` mapping the publisher's
+   per-feed tags back onto it. Same fix in all three adopters, not only driftwood.
 
 Map line: Tickets 62 and 77: every cross-org checkout in the eight units names a tag its own
 repository pins, and a pinned tree is checked for the section the pin is used for.
+
+
+### Round 2, 2026-09-04 -- review fixes recorded here
+
+* `verify-branch-refs.sh` grades **50 PASS**, not the 49 this Answer and ticket 77's both
+  claimed. Corrected above.
+* The done clause is stated honestly above: `verify-feed-contract` exits 3 today and this ticket
+  cannot close on its own terms until the owner's three adopter releases land.
+* `branch_refs.py`'s two limits (the `*.yml` glob and the `actions/checkout@`-only rule) are
+  written into its docstring and its manifest line, so a green run is not read as more than it
+  is.
+* The `gotk-sync-feeds.yaml` Renovate manager is fixed in driftwood, tuppence and ludlow
+  (decision 7 above).
+* Tuppence's and ludlow's `propose-tier.yml` and `shift-left.yml` still carried comments about
+  fetching an insurer parent that decision 5 removed, quoting a refusal for a parent neither
+  party declares. Rewritten to say what those jobs now do and why the insurer checkout is gone
+  rather than pinned.
+* Two blocking faults on the insurer -- a re-quote clock that would have refused for ever on an
+  unreleased rule, and a release gate pinned to a platform tag whose party schema this party
+  fails -- are recorded in ticket 77's Answer under **Round 2**, with the measurements.
 
 ## Waits on the owner
 
@@ -101,3 +140,6 @@ repository pins, and a pinned tree is checked for the section the pin is used fo
   merging their pull requests as `pavc-other-hand`. The guard refuses enactment pushes.
 * The citable run: `verify-feed-contract` and `verify-branch-refs` green on a TRUTH line the
   owner or the clock produces. Both were run locally and their output is in the pull request.
+  `verify-branch-refs` is green (50 PASS, 1 declared SKIP); `verify-feed-contract` is NOT, and
+  cannot be until the three adopter releases in ticket 77's Waits item 1 exist. This ticket's
+  done clause waits on that dispatch and on nothing this build can do.
