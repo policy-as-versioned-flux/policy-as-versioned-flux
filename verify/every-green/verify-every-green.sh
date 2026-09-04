@@ -17,9 +17,9 @@
 # script with the instrument hidden and requires exit 3 with a `SKIP:` last line. How many
 # discovered scripts call it is counted on each run and printed, never quoted here. How many prose
 # sites there are is not counted at all: a text scan cannot tell a false green from an honest
-# narrowing. Today the prose sites sit in verify-currency.sh, verify-upflow.sh,
-# verify-reach-secrets.sh and verify-access.sh, none of which calls the leg;
-# ticket 76's Answer records giving them the leg as its own ticket.
+# narrowing. No inventory of those sites is kept here either: three attempts at one were each
+# wrong, which is the same lesson. Giving the scripts that print a prose could-not-look their own
+# leg is ticket 76's Answer's own follow-on ticket.
 #
 #   PASS (exit 0)  no discovered script prints the SKIP verdict token and then reaches exit 0
 #   FAIL (exit 1)  one does, named by file and line

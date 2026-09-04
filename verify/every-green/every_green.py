@@ -195,7 +195,8 @@ def selfcheck() -> None:
     assert offences(coloured) == [(1, "exit 0")], offences(coloured)
     # The boundary this net does not cross: a could-not-look worded as prose is not the verdict
     # token and is not named, because whether the PASS after it overclaims is a question about
-    # the sentence, not the shape. The script's own selfcheck_absent leg is what grades those.
+    # the sentence, not the shape. A script's own selfcheck_absent leg grades those, where the script calls one; where none
+    # is called, nothing grades them, and the PASS line says so after counting the callers.
     assert offences(prose) == [], offences(prose)
     with tempfile.TemporaryDirectory() as tmp:
         os.makedirs(os.path.join(tmp, "u", ".work", "x"))

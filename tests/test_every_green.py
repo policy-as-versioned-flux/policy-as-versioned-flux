@@ -112,8 +112,9 @@ def test_a_prose_could_not_look_is_not_graded_by_this_net() -> None:
     """The boundary the PASS line states. `echo "(skipped: kyverno not found)"` then a PASS is
     sometimes a false green (verify-proportionality.sh:75 on main) and sometimes an honest
     narrowing (tuppence/reset/verify-reach-secrets.sh), and the difference is in the PASS
-    sentence, which no regex reads. Execution -- each script's selfcheck_absent leg -- is what
-    grades those; this net grades the verdict token."""
+    sentence, which no regex reads. Execution grades those only where a script calls a
+    selfcheck_absent leg; where none is called, nothing grades them, which the PASS line says
+    after counting the callers. This net grades the verdict token."""
     prose = ('echo "    (skipped: kyverno CLI not found -- offline body proof unavailable here)"\n'
              'echo "PASS: the shared control body is a real policy"\n')
     assert every_green.offenders(prose) == []

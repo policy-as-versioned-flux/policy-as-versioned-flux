@@ -281,4 +281,13 @@ ticket that gives a prose site its leg cannot falsify it. The number of prose si
 reason this net grades the verdict token, so the sentence says only that a prose could-not-look in
 a script carrying no leg is graded by nothing. The SKIP line now subtracts the scripts that could
 not be read, however many, instead of assuming one. The same boundary is stated in the script
-header, in `every_green.py`'s docstring and in the test docstring that documents it.
+header, in `every_green.py`'s docstring, in its selfcheck comment and in the test docstring that
+documents it.
+
+Rounds 3 and 4 both found the same shape again: a typed inventory of the prose sites, wrong each
+time (a fourth script, then a fifth site, then `verify-identity.sh`, which the last list missed).
+The inventory is gone. Nothing here counts or names the prose sites, because a text scan cannot
+tell a false green from an honest narrowing; the run counts only what it can observe, which is how
+many discovered scripts call a `selfcheck_absent` leg, and it counts call sites so the sentence
+naming the leg cannot count itself. Giving the prose-printing scripts their own leg stays the
+follow-on ticket.
