@@ -24,10 +24,20 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 [ -d "$ESTATE/platform" ] || { echo "SKIP: no $ESTATE/platform -- run ./clone-estate.sh first"; exit 3; }
 
 "$PY" "$HERE/untagged_pin.py" selfcheck >/dev/null || { echo "FAIL: untagged_pin.py selfcheck -- the planted grades no longer bite"; exit 1; }
-log="$(mktemp)"; "$PY" "$HERE/untagged_pin.py" check | tee "$log"; rc=${PIPESTATUS[0]}
+log="$(mktemp)"; err="$(mktemp)"
+"$PY" "$HERE/untagged_pin.py" check >"$log" 2>"$err"; rc=$?
+cat "$log"; [ -s "$err" ] && cat "$err" >&2
+# A grade and a crash are different facts. untagged_pin.py exits 1 only after PRINTING the
+# FAIL lines it graded; an exit with no FAIL line at all is the script falling over, and
+# saying "0 checks observed false" would report a silence as a clean count.
+graded_fails=$(grep -c '^FAIL:' "$log")
 case $rc in
   0) echo "PASS: every adopter feed pin resolves to a tag that verifies under its publisher's own identity pins, or is priced as a hole under the adopter's own perspective and currency ($(grep -c 'untagged (' "$log") untagged pin(s) priced)";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
-  *) echo "FAIL: $(grep -c '^FAIL:' "$log") untagged-pin check(s) observed false";;
+  *) if [ "$graded_fails" -gt 0 ]; then
+       echo "FAIL: $graded_fails untagged-pin check(s) observed false"
+     else
+       echo "FAIL: untagged_pin.py exited $rc having graded nothing -- it crashed rather than observed anything: $(tail -1 "$err" 2>/dev/null || echo 'no output')"
+     fi;;
 esac
-rm -f "$log"; exit "$rc"
+rm -f "$log" "$err"; exit "$rc"

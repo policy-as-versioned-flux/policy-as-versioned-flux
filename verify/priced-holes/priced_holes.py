@@ -23,8 +23,10 @@ What it observes, on the estate's committed files only:
         the namespace (re-read here from the adopter clone's tags) or null with a named limit;
      e. the regime entry's `holes[]` lines each carry the adopter's status for that control, and
         the open ones agree with `holes[]`;
-     f. every `deltas[]` entry is one of the five kinds, under the adopter's perspective and
-        currency, and the new/closed hole and namespace deltas match the entries they report.
+     f. every `deltas[]` entry is one of the seven kinds `DELTA_KINDS` names (the five hole,
+        baseline and namespace kinds, plus ticket 69's two untagged-pin kinds), under the
+        adopter's perspective and currency, and the new/closed hole and namespace deltas match
+        the entries they report.
 
 Grading, per the gate contract: any FAIL -> 1; else any SKIP -> 3; else 0.
 
@@ -56,8 +58,13 @@ from _estate import ESTATE  # type: ignore[import-not-found]  # noqa: E402
 LINES: list[str] = []
 
 GONE = {"new-hole", "baseline-widening", "new-ungoverned-namespace"}
+# The kinds compute_deltas may print. `new-untagged-pin` and `closed-untagged-pin` are
+# ticket 69's: an untagged feed pin is a priced hole on the premium entry, and its moves are
+# reported as deltas like every other hole's. This set is a whitelist, so a kind missing from
+# it fails the adopter that reports it -- adding a kind here is how a new delta is admitted.
 DELTA_KINDS = {"new-hole", "closed-hole", "baseline-widening",
-               "new-ungoverned-namespace", "closed-ungoverned-namespace"}
+               "new-ungoverned-namespace", "closed-ungoverned-namespace",
+               "new-untagged-pin", "closed-untagged-pin"}
 HOLE_STATUS = {"new", "recorded", "closed"}
 REGIME_STATUS = HOLE_STATUS | {"covered", "unselected"}
 HOLE_FIELDS = {"source", "control_id", "status", "perspective", "currency", "amount", "priced_by"}
@@ -314,7 +321,7 @@ def check_doc(doc: dict, ctx: dict) -> None:
     if problems:
         out("FAIL", f"{who}: deltas[] observed false: {problems[:3]}")
     else:
-        out("PASS", f"{who}: {len(deltas)} delta(s), each one of the five kinds under "
+        out("PASS", f"{who}: {len(deltas)} delta(s), each one of the {len(DELTA_KINDS)} kinds under "
                     f"{who}/{ctx['currency']}, matching the holes and namespaces they report")
 
 
@@ -617,6 +624,22 @@ def selfcheck() -> None:
     doc, ctx = _good()
     doc["deltas"][0]["kind"] = "refusal"
     _grade(doc, ctx, "a delta of an unknown kind fails", True)
+
+    # Ticket 69's two kinds are admitted -- an untagged feed pin is a priced hole on the
+    # premium entry and its moves are deltas -- while a kind DELTA_KINDS does not name still
+    # fails, so the whitelist is a whitelist and not a hole in this check.
+    for kind in ("new-untagged-pin", "closed-untagged-pin"):
+        doc, ctx = _good()
+        doc["deltas"].append({"kind": kind, "source": "insurer", "name": "quote-driftwood",
+                              "version": "v2", "perspective": "driftwood", "currency": "GBP",
+                              "amount": 113403.3, "priced_by": "the premium the pin books",
+                              "detail": "x"})
+        _grade(doc, ctx, f"a {kind} delta (ticket 69) passes", False)
+
+    doc, ctx = _good()
+    doc["deltas"].append({"kind": "reopened-untagged-pin", "source": "insurer", "perspective": "driftwood",
+                          "currency": "GBP", "amount": 1.0, "detail": "x"})
+    _grade(doc, ctx, "a delta whose kind merely looks like ticket 69's still fails", True)
 
     doc, ctx = _good()
     doc["deltas"] = []

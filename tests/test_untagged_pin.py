@@ -42,9 +42,16 @@ def hole(**over: Any) -> dict:
     return h
 
 
-def evidence(h: dict | None) -> dict:
-    return {"prices": [{"source": "insurer", "kind": "premium", "name": "quote-driftwood",
-                        "perspective": "driftwood", "currency": "GBP", "amount": 113403.3, "hole": h}]}
+def evidence(h: dict | None, *, graded: bool = True) -> dict:
+    """An adopter's composed evidence carrying one premium entry. `graded` is
+    whether the entry carries the `pin_signature` key ticket 69's composer
+    writes; without it the entry predates that composer entirely."""
+    price: dict[str, Any] = {"source": "insurer", "kind": "premium", "name": "quote-driftwood",
+                             "perspective": "driftwood", "currency": "GBP", "amount": 113403.3,
+                             "hole": h}
+    if graded:
+        price["pin_signature"] = {"state": "untagged", "tag": None, "detail": "no tag"}
+    return {"prices": [price]}
 
 
 # -- the grade ---------------------------------------------------------------------------------
@@ -77,6 +84,17 @@ def test_untagged_pin_with_nothing_pricing_it_fails(grader: ModuleType, ev: dict
 ])
 def test_a_malformed_hole_fails(grader: ModuleType, bad: dict) -> None:
     assert grader.grade(UNTAGGED, evidence(hole(**bad)), **KW)[0] == "FAIL"
+
+
+@pytest.mark.parametrize("h", [None, hole(status="closed")])
+def test_an_entry_from_a_composer_that_reads_no_signature_state_skips(
+        grader: ModuleType, h: dict | None) -> None:
+    """A premium entry with no `pin_signature` key at all was composed before
+    ticket 69's composer existed. Whether it prices the hole cannot be read off
+    it, and no adopter could clear a FAIL here until the owner pushes that
+    composer -- so it is a could-not-look, never a violation."""
+    status, msg = grader.grade(UNTAGGED, evidence(h, graded=False), **KW)
+    assert status == "SKIP" and "pin_signature" in msg
 
 
 def test_a_hole_missing_a_field_fails(grader: ModuleType) -> None:

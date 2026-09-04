@@ -112,3 +112,24 @@ def test_the_deleted_refusals_are_observed_false_and_the_old_shape_is_a_skip(gra
     doc.pop("deltas")
     lines = _lines(grader, doc, ctx)
     assert "SKIP" in lines and "FAIL" not in lines
+
+
+@pytest.mark.parametrize("kind", ["new-untagged-pin", "closed-untagged-pin"])
+def test_an_untagged_pin_delta_is_a_kind_this_check_admits(grader: ModuleType, kind: str) -> None:
+    """Ticket 69's own deltas. DELTA_KINDS is a whitelist, so the moment an
+    adopter composed an untagged pin this check failed on the delta reporting
+    it -- the gate going red on the rule it was built to grade."""
+    doc, ctx = grader._good()
+    doc["deltas"].append({"kind": kind, "source": "insurer", "name": "quote-driftwood",
+                          "version": "v2", "perspective": "driftwood", "currency": "GBP",
+                          "amount": 113403.3, "priced_by": "the premium the pin books",
+                          "detail": ""})
+    assert "FAIL" not in _lines(grader, doc, ctx)
+
+
+def test_a_kind_the_whitelist_does_not_name_is_still_observed_false(grader: ModuleType) -> None:
+    doc, ctx = grader._good()
+    doc["deltas"].append({"kind": "reopened-untagged-pin", "source": "insurer",
+                          "perspective": "driftwood", "currency": "GBP", "amount": 1.0,
+                          "detail": ""})
+    assert "FAIL" in _lines(grader, doc, ctx)

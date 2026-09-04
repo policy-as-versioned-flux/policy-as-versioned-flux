@@ -42,14 +42,22 @@ consequence of the rule above.
   cost the adopter has already committed to and is deliberately left out of the exposure it was
   priced from (ticket 36), so the covered exposure is the wrong quantity: nothing about the cover
   is unproven, the *purchase* is — money paid against a quote no signature carries. A zero-amount
-  hole was rejected: it would move nothing and would read as free, which is the thing the rule
-  exists to prevent. This is the whole edge's amount, not a partition of it, so the hole sits as a
+  hole was rejected, and honestly: the hole built here moves no total either — it sits beside the
+  premium entry, is not summed into `prices[]` and is deliberately not in the exposure. The
+  difference is the quantity reported. A zero says the pin costs nothing to leave unsigned; the
+  premium says how much money is committed against a quote no signature carries, which is the one
+  number a reader can act on. This is the whole edge's amount, not a partition of it, so the hole sits as a
   singular `hole` object on the `premium` entry and never as a `holes[]` member — `holes[]` still
   means "these partition their entry" (pound-seam check 4), and this hole does not partition.
 - **Signature state is read twice, at two seams, and the two are not the same claim.**
   `composition.py` runs offline in the adopter's CI and reads the pinned parent's *checkout* tags:
-  `signed` (a tag of the pinned form carries a signature block), `untagged` (no such tag, or one
-  with no block), `unobserved` (no git metadata to read). It never claims a signature *verifies*.
+  `signed` (a tag of the pinned form is an annotated tag object carrying a signature block),
+  `untagged` (the checkout shows the publisher's tags and none of them signs the pin), `unobserved`
+  (this checkout is in no position to say: no git metadata, no tag at all, or a matched tag that is
+  not an annotated object). Only a checkout that can show the publisher's tag namespace may say
+  `untagged`, because from inside a checkout an absent tag and an unfetched one look identical, and
+  a fabricated hole of the whole premium is worse than a missed one. It never claims a signature
+  *verifies*.
   The hub check `verify/feed-contract/verify-untagged-pin-is-priced.sh` reads the publisher's real
   remote — `ls-remote` for existence, then the platform's own identity-pinned gitsign verifier over
   the tag fetched read-only, under the publisher's own `release.yml` regexp and issuer — and grades
