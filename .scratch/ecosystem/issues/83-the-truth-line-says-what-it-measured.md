@@ -31,10 +31,13 @@ and an unplaced script are now reds, and the deck quotes what the run measured.
 ### What was built
 
 - **`talk/verify-manifest.txt`** — one line per script the gate discovers,
-  `path | class | skip`, with a trailing comment for every borderline call. 97 lines place the
-  97 discovered scripts that are run (99 are discovered; two are excluded and declared in
-  `talk/verify-exclusions.txt`). Five of the 97 live on unit build branches the owner has not
-  pushed, so the runner sees 94 today. Classes: `estate-observation`, `self-proof`,
+  `path | class | skip`, with a trailing comment for every borderline call. 99 scripts are
+  discovered at HEAD; 8 are excluded and declared in `talk/verify-exclusions.txt` (the six
+  identity scripts ticket 90 shelved on this same branch, plus two argument-taking helpers), so
+  91 are run. The manifest carries 97 lines: the 91 run, plus a kept-and-inert line for each of
+  the six identity scripts recording what it would have measured. Two of the 97 name scripts that
+  live on unit build branches the owner has not pushed, so run 70 printed two NOTE lines and
+  graded 97 rows. Classes: `estate-observation`, `self-proof`,
   `simulation`, `meta`. The skip column is `-` (no could-not-look expected), `never: <regex>` (the
   runner cannot do it as built) or `waits: <regex>` (the estate's state has not arrived).
 - **`talk/truth_manifest.py`** — the only counter. Parses the manifest, judges a SKIP against its
@@ -57,8 +60,10 @@ and an unplaced script are now reds, and the deck quotes what the run measured.
   regenerated at the same run 22 it already named.
 - **`verify/e2e/step2_reprice.py`** — the PASS now says SYNTHETIC, names the throwaway copy, and
   records the fact: the one Renovate feed-pin bump that really was merged is driftwood #20
-  (`feeds/threat-register` v1 → v2); its diff to driftwood's `composed/evidence.json` moved
-  `new_version` and nothing else, so no money moved. Verified by
+  (`feeds/threat-register` v1 → v2); its diff to driftwood's `composed/evidence.json` moved three
+  version fields over three lines — the source pin's `version`, and the repricing record's
+  `old_version` and `new_version`, all v1 → v2 — and no money: `old_price` and `new_price` are
+  both 19558.549772440045, unchanged either side of the bump. Verified by
   `git diff 27f1cf2^1 27f1cf2 -- composed/evidence.json` in the driftwood clone.
 - **`verify/e2e/verify-e2e-step7-honesty.sh`** — steps 2 and 3 are probes over material they make
   themselves, so a PASS from either that does not say SYNTHETIC is now UNGRADED. Selfcheck extended
@@ -96,9 +101,23 @@ none of the comparison.
    cluster tails are `estate-observation` with `never:`.
 3. **A declared skip matches on the REASON, not the path.** The pattern is a case-insensitive
    `re.search` against the script's last line. A script may not skip for a new reason under an old
-   declaration — that is precisely the hiding place the ticket names. One consequence, recorded
-   because it bit during the build: `verify-all.sh` truncates a last line at 160 characters, so a
-   pattern must sit inside that; `verify-conditional.sh`'s was shortened for it.
+   declaration — that is precisely the hiding place the ticket names. Two limits belong here.
+   - **The 160-character cut (fixed 2026-09-04).** `verify-all.sh` used to judge the same string it
+     printed, cut at 160 characters. On this branch's own run 70 the runner's absolute path pushed
+     `verify/tier-binding`'s declared phrase past the cut and a correctly declared could-not-look
+     was graded `FAIL (undeclared skip)`; the citable line said `fail=13 skip=15 [never=9 waits=6]`
+     where the honest figures are `fail=12 skip=16 [never=9 waits=7]`. The judge now sees the whole
+     last line and the cut is display only, with a selfcheck leg whose declared reason only matches
+     past character 160. A pattern may sit anywhere in the line.
+   - **An aggregate reason still hides a new one (open).** Four declared patterns match a sentence
+     that COUNTS could-not-looks rather than naming one, so a new underlying reason still passes
+     under the old declaration: `insurer/verify-insurer-quote.sh` (`[0-9]+ of [0-9]+ checks could
+     not be looked at`), `platform/verify-publisher-gate.sh` (`part(s).* could not look`),
+     `verify/e2e/verify-e2e-step6-provenance.sh` (`could not (be )?look`) and
+     `verify/feed-contract/verify-untagged-pin-is-priced.sh` (`could not look at the signature`).
+     Narrowing them means each of those four scripts naming its own reason on its last line —
+     four scripts in four repositories — so it is recorded as a known limit in
+     `talk/verify-manifest.txt`'s header, not silently carried.
 4. **The ceiling counts the five version-line-dark scripts as `waits`, not `never`, so the ceiling
    is the larger number.** They are dark because `distribution/versions.yaml` declares one major
    line — the estate's own state, which ticket 84/86 changes without touching the runner. `never`
@@ -113,8 +132,16 @@ none of the comparison.
    is rot. A unit is an independently versioned repository the hub only clones, and a script that
    exists on its build branch but not yet on its main is the normal state of this eco-system
    between a builder's commit and the owner's push. Failing for that would make the hub's record
-   hostage to another party's release train, which is the coupling NORTH-STAR §2 refuses. Five
-   lines are in that state today. The note prints on every run, so the rot stays loud.
+   hostage to another party's release train, which is the coupling NORTH-STAR §2 refuses. **Two**
+   lines are in that state today, not five: run 70 (hub `b2e87fc`) printed exactly two NOTE lines,
+   for `.estate-clone/driftwood/twin/verify-twin-sweep-moved.sh` and
+   `.estate-clone/platform/shift-left/verify-tier-binding.sh`. The earlier count of five came from
+   comparing the manifest against run 65, whose hub commit (`824959d`) predates three hub scripts
+   this branch adds — `verify/truth-line/verify-truth-line.sh`,
+   `verify/tier-binding/verify-tier-binding.sh` and
+   `verify/feed-contract/verify-untagged-pin-is-priced.sh`. Those three are hub scripts committed
+   with their lines, present at HEAD, and were never in this state. The note prints on every run,
+   so the rot stays loud.
 7. **A separate `verify/truth-line/verify-truth-line.sh` rather than living only inside
    `verify-all.sh`.** The discoverer is not discovered, so nothing would ever have run the
    instrument's own selfcheck on the clock — the same gap ticket 55 found in step 7. The script
@@ -136,6 +163,25 @@ none of the comparison.
 12. **A clean seam is left for ticket 77.** `parse_truth` keeps each unit's value as text
     (`units=[driftwood=4b28aa3@v1.2.0]` parses today), so adding the tag beside the SHA needs no
     change here.
+13. **The three adopters' `verify-reconcile.sh` are `self-proof`, not `estate-observation`
+    (2026-09-04).** Decision 2 classes a script by what the PASS it can actually reach rests on.
+    On the scheduled runner there is no cluster, so the only PASS these three can reach grades the
+    adopter's OWN committed `drift/samples.jsonl` — the adopter's file, in the adopter's
+    repository. That is self-proof by decision 2's own words, and the line's own comment had said
+    as much while the class said otherwise. The estate-observation path is the live one below
+    `need_substrate`, where facts 1 to 3 read the publishers' real remotes; it needs a kind
+    cluster and never runs on the runner. Each line now names that path. The re-class moves no
+    count on either recorded run — all three FAIL on runs 65 and 70 — but the day the lane sample
+    grades green it moves up to three passes from `observed` to `self`, which is the point: the
+    number would otherwise have credited the estate with an observation of a committed file.
+14. **`measured()` counts the ceiling's `never` population, not the skip split's (2026-09-04).**
+    Two different numbers can be called `never`: the skip split counts the never-classed scripts
+    that SKIPPED, while the ceiling subtracts every non-excluded never-classed row whatever it
+    exited. They diverge the moment a never-classed script fails instead of skipping, and the
+    published sentence then stopped adding up. `measured()` now states `total - excluded -
+    ceiling`, recovered from the line itself, and keeps the skip split's number inside the skip
+    clause where it belongs. `verify-truth-line.sh` step 5 grades this against a planted divergent
+    line and against the last recorded line.
 
 ### Verified
 
@@ -150,10 +196,17 @@ none of the comparison.
   nine server-side ruleset lines where it printed none.
 - `.venv/bin/python talk/build_deck.py --check talk/deck.md` → no bad rows; breaking the
   `measured:` line by hand produces one.
-- **The replay.** Run 65's real grade table (94 scripts, fetched with `gh run view --log`) was
-  replayed against the committed manifest: 22 skips, 0 undeclared, 0 stale `never`, and the
-  arithmetic gives `pass=59 [observed=13 self=37 simulated=6 meta=3] fail=11 skip=22 [never=15
-  waits=7] excluded=2 total=94 ceiling=77`.
+- **The replay (re-run 2026-09-04 against the fixed files).** Two real grade tables, fetched with
+  `gh run view --log` and replayed row by row through `truth_manifest.summarise`:
+  - run 65 (94 rows, hub `824959d`) → `pass=59 [observed=13 self=37 simulated=6 meta=3] fail=11
+    skip=16 [never=9 waits=7] excluded=8 total=94 ceiling=77`; 0 undeclared, 0 stale `never`.
+  - run 70 (97 rows, hub `b2e87fc`, this branch's own run) → `pass=61 [observed=13 self=37
+    simulated=6 meta=5] fail=12 skip=16 [never=9 waits=7] excluded=8 total=97 ceiling=80`;
+    0 undeclared, 0 stale `never`. Run 70's own printed line said `fail=13 skip=15 [never=9
+    waits=6]`: that one row is the truncation bug, and it is the whole difference.
+  The earlier figures in this Answer (`skip=22 ... excluded=2`) were replayed before ticket 90's
+  commits on this same branch excluded the six identity scripts; six declared `never` skips became
+  exclusions, which is where `skip 22 → 16`, `never 15 → 9` and `excluded 2 → 8` come from.
 
 **The citable split comes from the next clock run, not from here.** The figures above are a replay
 of a recorded run and a fixture proof of the instrument; no hand-run line was appended to
@@ -167,3 +220,37 @@ of a recorded run and a fixture proof of the instrument; no hand-run line was ap
   looser reading, one column changes.
 - Item 3's second half is recorded in step 2's PASS wording, not fixed: the pound-inputs defect
   that made the real bump move no money is tickets 77 and 79 (ticket 75 D2).
+- The four aggregate `waits:` patterns named in decision 3 still let a new underlying reason hide
+  under an old declaration. Fixing that means four scripts in four repositories naming their own
+  reason; it is recorded in `talk/verify-manifest.txt`'s header, not built here.
+
+## Comments
+
+**2026-09-04, review fixes.** Seven findings against this ticket's own build, all fixed on the
+same branch. Verified by the commands in `### Verified`, re-run.
+
+1. **BLOCKING, fixed.** `talk/verify-all.sh` judged the same 160-character-cut string it printed.
+   On run 70 the runner's absolute path pushed `verify/tier-binding`'s declared phrase past the
+   cut and a correctly declared could-not-look was graded `FAIL (undeclared skip)`, so the citable
+   line read `fail=13 skip=15 [never=9 waits=6]` where the honest figures are `fail=12 skip=16
+   [never=9 waits=7]`. The judge now sees the whole last line (`lastfull`); the cut is display
+   only. `--selfcheck` gained a ninth fixture script whose declared reason only matches past
+   character 160, plus an assertion that the printed row is still cut. Red first: the new leg
+   failed on the unfixed script with exactly the run-70 symptom.
+2. **`measured()` and the ceiling now count the same population** — see decision 14 — with a new
+   step 5 in `verify/truth-line/verify-truth-line.sh` that grades the published sentence against
+   `total - excluded - ceiling` on a planted divergent line and on the last recorded line. Red
+   first against the old `measured()`.
+3. **The figures in this Answer were re-derived**, not adjusted: 91 run and 8 excluded of 99
+   discovered at HEAD, and both replays re-run. Ticket 90's commits on this same branch moved six
+   scripts from declared `never` skips to exclusions, which is the whole of the change.
+4. **Decision 6's "five" was wrong**: two, named, with run 70's two NOTE lines as the citation.
+5. **The three `verify-reconcile.sh` lines were re-classed** to `self-proof` — decision 13.
+6. **Decision 3 now records the aggregate-pattern limit** beside the truncation one, naming the
+   four lines, and `talk/verify-manifest.txt`'s header carries the same note.
+7. **The merged bump's diff is described correctly**: three version fields over three lines, with
+   `old_price == new_price` unchanged. The substantive claim — no money moved — stands.
+
+Also: `talk/verify-exclusions.txt`'s header now records what excluding the six identity scripts
+costs (five offline proofs that were reaching green on every run), and ticket 59 has a pointer to
+the fall-checker contract, which lives only in `talk/truth_manifest.py`'s module docstring.

@@ -9,9 +9,10 @@
 #
 # WHAT THIS GRADES, and what it does not. It grades the RECORD-KEEPING: that the manifest covers
 # the surface in both directions, that the loader still refuses a bad line, that verify-all.sh
-# still turns an undeclared skip red and a stale `never` red, and that the arithmetic on the
-# last recorded TRUTH line adds up. It does not grade whether any class assignment is the right
-# one -- a judgement no script can make -- and it does not re-run the estate.
+# still turns an undeclared skip red and a stale `never` red, that the arithmetic on the last
+# recorded TRUTH line adds up, and that the sentence the deck publishes under that line counts
+# the same population the ceiling was cut from. It does not grade whether any class assignment is
+# the right one -- a judgement no script can make -- and it does not re-run the estate.
 #
 # It is deliberately NOT the same question as verify/every-green/ (ticket 76). That one reads
 # the SHAPE of every discovered script and refuses a printed SKIP that reaches exit 0: whether a
@@ -87,8 +88,63 @@ EOF
 printf '  %s\n' "$arith"
 [ "$arc" -eq 0 ] || note "the last recorded TRUTH line does not add up"
 
+say "5. the sentence the deck publishes counts the same 'can never pass' population the ceiling does"
+# Two different never numbers exist and only one of them is the ceiling's. The skip split's
+# `never` counts the never-classed scripts that SKIPPED; the ceiling subtracts every non-excluded
+# never-classed script, whatever it exited. A never-classed script that FAILS makes them diverge,
+# and a sentence quoting the skip split then stops adding up. Graded on a fixture line built to
+# diverge (this leg fails on any measured() that reads the skip split) and on the real last line.
+pop="$("$PY" - <<'EOF'
+import re
+import sys
+sys.path.insert(0, "talk")
+from truth_manifest import measured, parse_truth
+
+STATED = re.compile(r"\((\d+) excluded, (\d+) can never pass on this runner\)")
+
+
+def check(label, line):
+    t = parse_truth(line)
+    if t["ceiling"] is None:
+        return [f"{label}: carries no ceiling, nothing to add up"]
+    m = STATED.search(measured(line))
+    if not m:
+        return [f"{label}: measured() does not state the excluded and never-pass counts"]
+    excluded, stated = int(m.group(1)), int(m.group(2))
+    want = t["total"] - t["excluded"] - t["ceiling"]
+    out = []
+    if excluded != t["excluded"]:
+        out.append(f"{label}: the sentence says {excluded} excluded, the line says {t['excluded']}")
+    if stated != want:
+        out.append(f"{label}: the sentence says {stated} can never pass, but the ceiling was cut "
+                   f"from a population of total {t['total']} - excluded {t['excluded']} - ceiling "
+                   f"{t['ceiling']} = {want}; measured() is counting the skip split's never "
+                   f"({(t['skip_split'] or {}).get('never')}), not the ceiling's")
+    return out
+
+
+problems = []
+# a planted line where a never-classed script failed instead of skipping: never-classed
+# population is 11 - 1 - 7 = 3, the skip split's never is 1
+problems += check("the planted divergent line",
+                  "TRUTH 2026-09-04T12:00Z run=fixture hub=0000000 units=[platform=46cd775] "
+                  "pass=5 [observed=2 self=2 simulated=1 meta=0] fail=3 skip=2 [never=1 waits=1] "
+                  "excluded=1 total=11 ceiling=7")
+lines = [l for l in open("talk/truth.log", encoding="utf-8") if l.startswith("TRUTH ")]
+if lines and parse_truth(lines[-1])["ceiling"] is not None:
+    problems += check(f"run {parse_truth(lines[-1])['run']}", lines[-1])
+    print(measured(lines[-1]))
+else:
+    print("the last recorded TRUTH line carries no ceiling; only the planted line is graded here")
+print("\n".join(problems), end="" if not problems else "\n")
+raise SystemExit(1 if problems else 0)
+EOF
+)"; prc=$?
+printf '  %s\n' "$pop"
+[ "$prc" -eq 0 ] || note "the published 'can never pass' count is not the ceiling's population"
+
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: talk/verify-manifest.txt places every one of the $n verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all.sh turns an undeclared could-not-look and a stale ceiling red, and the last TRUTH line talk/truth.log recorded adds up"
+  echo "PASS: talk/verify-manifest.txt places every one of the $n verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all.sh turns an undeclared could-not-look and a stale ceiling red, the last TRUTH line talk/truth.log recorded adds up, and the published 'can never pass' count is the population the ceiling was cut from"
   exit 0
 fi
 echo "FAIL: $bad truth-line check(s) observed false (named above): the split, the ceiling or the manifest behind them cannot be trusted"

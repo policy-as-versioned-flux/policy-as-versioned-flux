@@ -50,6 +50,10 @@ THE TRUTH LINE  what talk/verify-all.sh prints, and what parse_truth reads back:
   a+b+c+d == P (the split is of PASSES, by manifest class)
   x+y == S     (the split is of SKIPS, by the manifest's skip kind; both declared)
   C == T - E - (number of run scripts whose manifest line says never)
+  T - E - C is therefore the never-classed POPULATION, and it equals x only when every
+  never-classed script skipped. One that fails instead makes x smaller. measured() states
+  T - E - C when it says how many can never pass, and x only inside the skip split, so the
+  published sentence adds up whatever the never-classed scripts did.
   A `never` script that passes is a FAIL (the ceiling it was excluded from is stale; fix the
   manifest). A script that passes with no manifest line is a FAIL (the split cannot place it).
   `fixture=1` marks a run over a fixture list (the selfcheck) and is never citable.
@@ -367,11 +371,18 @@ def measured(line: str) -> str:
                 f"{MANIFEST_NAME} landed after it (ticket 83), so the bare count "
                 f"pass={t['pass']} of total={t['total']} is all that run says about itself")
     s, k = t["split"], t["skip_split"] or {}
-    never = k.get("never", 0)
+    # Two different `never` numbers, and the sentence has to use the ceiling's one. The skip
+    # split's `never` counts only the never-classed scripts that SKIPPED; the ceiling subtracts
+    # every non-excluded never-classed script, however it exited. A never-classed script that
+    # fails instead of skipping makes the two diverge, and the published sentence then stops
+    # adding up. total - excluded - ceiling recovers the ceiling's own population from the line.
+    never_pop = t["total"] - t["excluded"] - t["ceiling"]
+    never_skipped = k.get("never", 0)
     parts = " + ".join(f"{key} {s.get(key, 0)}" for key in SPLIT_KEYS)
     return (f"measured: {t['pass']} passes are {parts}, against a ceiling of {t['ceiling']} "
-            f"of {t['total']} ({t['excluded']} excluded, {never} can never pass on this runner); "
-            f"fail {t['fail']}, skip {t['skip']} (never {never}, waits {k.get('waits', 0)})")
+            f"of {t['total']} ({t['excluded']} excluded, {never_pop} can never pass on this "
+            f"runner); fail {t['fail']}, skip {t['skip']} (never {never_skipped}, "
+            f"waits {k.get('waits', 0)})")
 
 
 # ------------------------------------------------------------------ selfcheck
@@ -454,6 +465,16 @@ def selfcheck() -> None:
     m = measured(new)
     assert m.startswith("measured: 57 passes are observed 20 + self 31 + simulated 5 + meta 1")
     assert "ceiling of 70 of 84 (2 excluded, 12 can never pass on this runner)" in m
+    assert "skip 18 (never 12, waits 6)" in m
+
+    # a never-classed script that FAILED instead of skipping: the skip split's never (1) is
+    # smaller than the ceiling's population (11 - 1 - 7 = 3). The sentence must state 3.
+    diverged = ("TRUTH 2026-09-04T12:00Z run=71 hub=abc1234 units=[platform=46cd775] "
+                "pass=5 [observed=2 self=2 simulated=1 meta=0] fail=3 skip=2 [never=1 waits=1] "
+                "excluded=1 total=11 ceiling=7")
+    m = measured(diverged)
+    assert "ceiling of 7 of 11 (1 excluded, 3 can never pass on this runner)" in m, m
+    assert "skip 2 (never 1, waits 1)" in m, m
     print("selfcheck ok")
 
 

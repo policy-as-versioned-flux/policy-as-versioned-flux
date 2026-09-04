@@ -162,5 +162,21 @@ def test_measured_states_the_split_and_ceiling_or_says_the_line_has_none() -> No
                                 "count pass=58 of total=85 is all that run says about itself")
 
 
+def test_measured_counts_the_ceilings_never_population_not_the_skip_splits() -> None:
+    """A never-classed script that FAILS instead of skipping makes the two numbers diverge.
+
+    The ceiling subtracts every non-excluded never-classed row; the skip split's `never` counts
+    only the ones that skipped. The sentence has to state the ceiling's population, or it stops
+    adding up on exactly the run where a never-classed script went red.
+    """
+    line = ("TRUTH 2026-09-04T12:00Z run=71 hub=abc1234 units=[] pass=5 [observed=2 self=2 "
+            "simulated=1 meta=0] fail=3 skip=2 [never=1 waits=1] excluded=1 total=11 ceiling=7")
+    m = tm.measured(line)
+    assert "ceiling of 7 of 11 (1 excluded, 3 can never pass on this runner)" in m, m
+    assert "skip 2 (never 1, waits 1)" in m, m
+    t = tm.parse_truth(line)
+    assert t["total"] - t["excluded"] - t["ceiling"] == 3
+
+
 def test_the_selfcheck_passes() -> None:
     tm.selfcheck()

@@ -28,7 +28,8 @@
 #   talk/verify-all.sh --selfcheck
 #       prove the instrument over a fixture of tiny scripts (a pass, a declared
 #       skip, a fail, an undeclared skip, a script with no manifest line, an
-#       exclusion, a `never` that passes) and assert the TRUTH line's counts.
+#       exclusion, a `never` that passes, a declared reason that sits past the
+#       display cut) and assert the TRUTH line's counts.
 #       Never runs the estate; its TRUTH line says fixture=1 and is not citable.
 #
 # Every run ends with one TRUTH line carrying the date, the run number, the
@@ -63,6 +64,12 @@ if [ "$SELFCHECK" = 1 ]; then
   printf 'echo "helper"\nexit 0\n'                                  >"$t/fx/verify-f-excluded.sh"
   printf 'echo "PASS: the cluster was here after all"\nexit 0\n'    >"$t/fx/verify-g-never-passes.sh"
   printf 'echo "SKIP: a tag is not cut yet"\nexit 3\n'              >"$t/fx/verify-h-waits.sh"
+  # the declared reason sits past character 160, where the display cut used to hide it: the
+  # runner's absolute path pushed verify/tier-binding's reason out of the judged string on run 70
+  # and a correctly declared could-not-look was graded FAIL (undeclared skip).
+  pad="$(printf 'p%.0s' $(seq 1 170))"
+  printf 'echo "SKIP: /%s/tier_binding.py is not in this fixture checkout"\nexit 3\n' "$pad" \
+                                                                    >"$t/fx/verify-i-long-skip.sh"
   ls "$t"/fx/verify-*.sh | sort >"$t/scripts.txt"
   cat >"$t/manifest.txt" <<EOF
 $t/fx/verify-a-pass.sh | self-proof | -
@@ -71,6 +78,7 @@ $t/fx/verify-c-fail.sh | estate-observation | -
 $t/fx/verify-d-undeclared-skip.sh | meta | waits: an old reason
 $t/fx/verify-g-never-passes.sh | estate-observation | never: kind cluster \w+ is not listed
 $t/fx/verify-h-waits.sh | simulation | waits: not cut yet
+$t/fx/verify-i-long-skip.sh | estate-observation | waits: is not in this fixture checkout
 EOF
   echo "$t/fx/verify-f-excluded.sh | a helper the others call" >"$t/exclusions.txt"
   out="$(env -u GITHUB_RUN_NUMBER VERIFY_SCRIPTS_FROM="$t/scripts.txt" VERIFY_MANIFEST="$t/manifest.txt" \
@@ -82,6 +90,12 @@ EOF
   chk 'verify-a-pass.sh +PASS$'
   chk 'verify-b-declared-skip.sh +SKIP \(never\)  SKIP: kind cluster'
   chk 'verify-h-waits.sh +SKIP \(waits\)  SKIP: a tag'
+  # judged whole, displayed cut: the row grades SKIP (waits) and the printed row still stops
+  # before the reason, so the 160-character cut is display only and never reaches the judge
+  chk 'verify-i-long-skip.sh +SKIP \(waits\)'
+  printf '%s\n' "$out" | grep -E 'verify-i-long-skip\.sh +SKIP' \
+    | grep -q 'is not in this fixture checkout' \
+    && { echo "selfcheck: the printed row no longer cuts a long last line at 160 characters"; good=0; }
   chk 'verify-c-fail.sh +FAIL \(exit 1\)'
   chk 'verify-d-undeclared-skip.sh +FAIL \(undeclared skip\).*talk/verify-manifest.txt'
   chk 'verify-e-unlisted.sh +FAIL \(no line in talk/verify-manifest.txt; the script passed\)'
@@ -89,20 +103,20 @@ EOF
   chk 'verify-f-excluded.sh +EXCLUDED  a helper'
   chk 'verify-g-never-passes.sh +PASS \(manifest says never\)'
   chk '^FAIL manifest: .*verify-g-never-passes.sh passed, but talk/verify-manifest.txt says it can never pass'
-  chk '^TRUTH .* run=local hub=[0-9a-f]+ units=\[fixture\] pass=1 \[observed=0 self=1 simulated=0 meta=0\] fail=4 skip=2 \[never=1 waits=1\] excluded=1 total=8 ceiling=5 fixture=1$'
+  chk '^TRUTH .* run=local hub=[0-9a-f]+ units=\[fixture\] pass=1 \[observed=0 self=1 simulated=0 meta=0\] fail=4 skip=3 \[never=1 waits=2\] excluded=1 total=9 ceiling=6 fixture=1$'
   # the same fixture, --live: both declared skips become fails, nothing else moves
   out="$(env -u GITHUB_RUN_NUMBER VERIFY_SCRIPTS_FROM="$t/scripts.txt" VERIFY_MANIFEST="$t/manifest.txt" \
            VERIFY_EXCLUSIONS="$t/exclusions.txt" VERIFY_CAPDIR="$t/captures" \
            bash "$ROOT/talk/verify-all.sh" --live)"
   chk 'verify-b-declared-skip.sh +FAIL \(live required\)'
-  chk '^TRUTH .* pass=1 \[observed=0 self=1 simulated=0 meta=0\] fail=6 skip=0 \[never=0 waits=0\] excluded=1 total=8 ceiling=5 live=1 fixture=1$'
+  chk '^TRUTH .* pass=1 \[observed=0 self=1 simulated=0 meta=0\] fail=7 skip=0 \[never=0 waits=0\] excluded=1 total=9 ceiling=6 live=1 fixture=1$'
   # a manifest line naming a script that is gone, and a bad class: both reported, both fails
   printf '%s\n' "$t/fx/verify-gone.sh | meta | -" "$t/fx/verify-a-pass.sh | unit-test | -" >>"$t/manifest.txt"
   out="$(env -u GITHUB_RUN_NUMBER VERIFY_SCRIPTS_FROM="$t/scripts.txt" VERIFY_MANIFEST="$t/manifest.txt" \
            VERIFY_EXCLUSIONS="$t/exclusions.txt" VERIFY_CAPDIR="$t/captures" \
            bash "$ROOT/talk/verify-all.sh")"
   chk '^FAIL manifest: .*verify-gone.sh is listed in talk/verify-manifest.txt but no longer exists'
-  chk "^FAIL manifest: line 8: .*verify-a-pass.sh is listed twice"
+  chk "^FAIL manifest: line 9: .*verify-a-pass.sh is listed twice"
   chk '^TRUTH .* fail=6 .* fixture=1$'
   # a unit line whose script this checkout of the unit does not carry: a NOTE, not a fail
   printf '%s\n' ".estate-clone/nowhere/verify-nowhere.sh | meta | -" >>"$t/manifest.txt"
@@ -112,7 +126,7 @@ EOF
   chk '^NOTE manifest: \.estate-clone/nowhere/verify-nowhere.sh is listed .* not in this checkout'
   chk '^TRUTH .* fail=6 .* fixture=1$'
   if [ "$good" = 1 ]; then
-    echo "PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a stale or malformed manifest line is a fail, and a unit line this checkout does not carry is a note"
+    echo "PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, and a unit line this checkout does not carry is a note"
     exit 0
   fi
   echo "FAIL: selfcheck: the instrument does not grade as documented (see above)"; exit 1
@@ -173,7 +187,11 @@ for s in "${SCRIPTS[@]}"; do
   SECONDS=0
   timeout "$TIMEOUT" bash "$s" >"$cap" 2>&1; rc=$?
   durs+=("$SECONDS $s")
-  last="$(tail -1 "$cap" | cut -c1-160)"
+  # judged whole, displayed cut. The 160-character cut keeps the grade table readable; it must
+  # never reach truth_manifest.py judge, because a declared reason that sits past character 160
+  # (a long absolute path on the runner, run 70) would then read as a new, undeclared reason.
+  lastfull="$(tail -1 "$cap")"
+  last="$(printf '%s' "$lastfull" | cut -c1-160)"
   status=FAIL
   case $rc in
     0) if [ -z "${listed[$s]:-}" ]; then
@@ -189,7 +207,7 @@ for s in "${SCRIPTS[@]}"; do
        elif [ "$REQUIRE_LIVE" = 1 ]; then
          printf '%-70s FAIL (live required)  %s  capture: %s\n' "$s" "$last" "$caprel"
        else
-         verdict="$(python3 "$TM" judge "$MANIFEST" "$s" "$last")"; jrc=$?
+         verdict="$(python3 "$TM" judge "$MANIFEST" "$s" "$lastfull")"; jrc=$?
          if [ "$jrc" -eq 0 ]; then
            printf '%-70s SKIP (%s)  %s\n' "$s" "${verdict#declared }" "$last"; status=SKIP
          else

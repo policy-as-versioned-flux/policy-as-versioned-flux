@@ -16,6 +16,19 @@
 #          the regex is matched case-insensitively against the script's last line on exit 3;
 #          it runs to the end of the line, so alternation with '|' is fine, and '#' cannot appear
 #
+# The judge sees the WHOLE last line. talk/verify-all.sh cuts it at 160 characters for the grade
+# table only (fixed 2026-09-04: run 70 graded a correctly declared could-not-look FAIL because the
+# runner's absolute path pushed the declared phrase past the cut). A pattern may therefore sit
+# anywhere in the line.
+#
+# KNOWN LIMIT, ticket 83 decision 3. A pattern that matches an AGGREGATE could-not-look line
+# ("3 of 9 checks could not be looked at") declares the shape of the sentence and not the reason
+# for it, so a NEW underlying reason still hides under the old declaration. Four lines are in that
+# state: insurer/verify-insurer-quote.sh, platform/verify-publisher-gate.sh,
+# verify/e2e/verify-e2e-step6-provenance.sh and verify/feed-contract/verify-untagged-pin-is-priced.sh.
+# Narrowing them needs each script to name its own reason on its last line, which is a change to
+# four scripts in four repositories and is not this ticket's.
+#
 # Every script talk/verify-all.sh discovers must be here or in talk/verify-exclusions.txt; every
 # line here must name a script that exists. The TRUTH line prints the split of passes by class,
 # the split of skips by kind, and ceiling = total - excluded - never.
@@ -35,7 +48,7 @@
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh | self-proof | -
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh | self-proof | -
 .estate-clone/driftwood/twin/verify-twin-sweep-moved.sh | self-proof | -
-.estate-clone/driftwood/verify-reconcile.sh | estate-observation | waits: no local kind cluster .* and the lane sample cannot stand in   # on the runner it grades the adopter's own committed lane sample (drift/samples.jsonl), which the adopter's clock observed on a cluster
+.estate-clone/driftwood/verify-reconcile.sh | self-proof | waits: no local kind cluster .* and the lane sample cannot stand in   # decision 13: on the runner the only PASS it can reach grades the adopter's OWN committed drift/samples.jsonl, so it is self-proof there. The estate-observation path is the live one below need_substrate, where facts 1-3 read the publishers' real remotes; it needs a kind cluster and never runs on the scheduled runner
 .estate-clone/driftwood/verify-twin-overlay.sh | self-proof | -
 
 # --- feeds (intelligence provider) -------------------------------------------------------
@@ -55,7 +68,7 @@
 # --- ludlow (adopter) --------------------------------------------------------------------
 .estate-clone/ludlow/verify-adopter-gate.sh | simulation | -   # throwaway platform and ludlow repositories built in the run
 .estate-clone/ludlow/verify-certificate-identity-regexp.sh | self-proof | -
-.estate-clone/ludlow/verify-reconcile.sh | estate-observation | waits: no local kind cluster .* and the lane sample cannot stand in
+.estate-clone/ludlow/verify-reconcile.sh | self-proof | waits: no local kind cluster .* and the lane sample cannot stand in   # decision 13, as driftwood's: the runner path grades ludlow's own committed lane sample; the live cluster path is the estate observation and does not run here
 
 # --- nist (regulator) --------------------------------------------------------------------
 .estate-clone/nist/.github/scripts/verify-declared-bump.sh | self-proof | -
@@ -95,7 +108,7 @@
 .estate-clone/platform/oscal/verify-claims.sh | estate-observation | -   # every claimed control id resolves in nist's real pinned catalogue
 .estate-clone/platform/oscal/verify-upflow.sh | simulation | -   # self-generated PolicyReports
 .estate-clone/platform/party/verify-party-artefact.sh | self-proof | -
-.estate-clone/platform/policy/verify-conditional.sh | self-proof | waits: lives only in require-nonroot-2-0-1   # the gate cuts a SKIP line at 160 characters, so a pattern must sit inside that
+.estate-clone/platform/policy/verify-conditional.sh | self-proof | waits: lives only in require-nonroot-2-0-1   # shortened when the gate still judged a SKIP line cut at 160 characters; since 2026-09-04 the cut is display only and a pattern may sit anywhere in the line
 .estate-clone/platform/posture/verify-posture-projection.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/platform/risk/verify-risk-tuned.sh | self-proof | -
 .estate-clone/platform/shift-left/verify-shift-left.sh | self-proof | waits: declares one major line   # ticket 84 lifts it with a second declared line
@@ -113,7 +126,7 @@
 .estate-clone/tuppence/reset/verify-reach-secrets.sh | estate-observation | never: kind cluster 'driftwood' does not exist   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/tuppence/scripts/verify-adopter-gate.sh | simulation | -   # throwaway repositories built in the run
 .estate-clone/tuppence/scripts/verify-identity-regexp.sh | self-proof | -
-.estate-clone/tuppence/verify-reconcile.sh | estate-observation | waits: no local kind cluster .* and the lane sample cannot stand in
+.estate-clone/tuppence/verify-reconcile.sh | self-proof | waits: no local kind cluster .* and the lane sample cannot stand in   # decision 13, as driftwood's: the runner path grades tuppence's own committed lane sample; the live cluster path is the estate observation and does not run here
 
 # --- hub: the cross-party proofs under verify/ -------------------------------------------
 verify/adr-supersession/verify-adr-supersession.sh | meta | -   # ticket 39: grades the record, deliberately reads no Python

@@ -12,6 +12,14 @@
 # secret store, and no ticket on this map builds one. Six could-not-looks repeated on every run
 # say nothing new; what each waits for is named instead. They return with the identity lane, the
 # first thing after this map, which is what will grade the actor half.
+#
+# THE PRICE OF THIS EXCLUSION, recorded because it is not free (ticket 90, 2026-09-04). Five of
+# the six printed "offline proof holds; live tail could not look: ..." on run 65 -- identity,
+# federation, access, eud and posture-projection. Excluding them retires those five offline
+# proofs too: they were reached on every run and are no longer graded anywhere. Only
+# reach-secrets had no offline half. So the gate loses five standing proofs to stop repeating six
+# could-not-looks, and the identity lane owes them back. A re-entry that restores the six must
+# restore those five greens before the actor half is claimed to be new work.
 .estate-clone/platform/identity/verify-identity.sh | shelved with the identity plane (ticket 90): waits for an identity lane that grades the actor half -- a persistent cluster where SPIRE is Istio's CA and mTLS is STRICT, so the workload identity can be observed rather than read out of config
 .estate-clone/platform/identity/verify-federation.sh | shelved with the identity plane (ticket 90): waits for an identity lane with a SECOND trust domain -- there is one domain and no peer today, so federation has nothing to federate with (ticket 68, closed out of scope until the lane exists)
 .estate-clone/platform/access/verify-access.sh | shelved with the identity plane (ticket 90): waits for an identity lane that grades the actor half -- the access plane (Pomerium and Dex) has to be reachable before an authorisation decision can be observed

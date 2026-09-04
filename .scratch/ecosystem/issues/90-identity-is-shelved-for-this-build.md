@@ -132,3 +132,22 @@ local runs of the two scripts; nothing was appended to `talk/truth.log` by hand.
   `policy-as-versioned-platform` and `-tuppence`, which is the owner's.
 - Ticket 90's own done condition ("the six are excluded on the next citable run, the §1 sentence is
   true on that run") is observed after the clock runs, not asserted here.
+- **Excluding the six also retires five offline proofs that were passing every run.** Five of the
+  six printed `SKIP: offline proof holds; live tail could not look: ...` on run 65 — identity,
+  federation, access, eud and posture-projection. Their offline halves were reached and true on
+  every run; only `tuppence/reset/verify-reach-secrets.sh` had no offline half (it prints the bare
+  cluster reason). So the exclusion is not free: the gate stops repeating six could-not-looks and
+  loses five standing proofs with them, and nothing else grades those five today. The identity
+  lane owes them back — a re-entry that restores the six must restore those five greens before
+  the actor half is claimed to be new work. Recorded in `talk/verify-exclusions.txt`'s header so
+  the price is visible where the exclusion is.
+
+## Comments
+
+**2026-09-04, review fixes.** Two findings, both fixed on this branch.
+
+1. The consequence above was unrecorded. It is now in `talk/verify-exclusions.txt`'s header and in
+   `## Not done`, with run 65's five `offline proof holds` SKIP lines as the citation.
+2. Ticket 83's Answer stated pre-shelving figures on the same branch (`skip=22 ... excluded=2`).
+   Corrected there; this ticket's replay (`skip=16 [never=9 waits=7] excluded=8`) was already
+   right and is what run 70 confirms.

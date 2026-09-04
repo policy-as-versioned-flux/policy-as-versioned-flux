@@ -285,7 +285,11 @@ pass=P [observed=a self=b simulated=c meta=d] fail=F skip=S [never=x waits=y]
   is a **FAIL**, not a shrug, and so is a script the manifest does not place.
 - **ceiling** — `total − excluded − never`: how many of the scripts could ever
   pass on that runner. `pass=` against `ceiling=`, not against `total=`, is
-  the honest fraction.
+  the honest fraction. The `never` subtracted here is every non-excluded script
+  the manifest classes `never`, whatever it exited — not `x` in the skip split,
+  which counts only the ones that skipped. Read the population back off the line
+  as `total − excluded − ceiling`; the two agree only when every `never` script
+  skipped.
 
 The manifest is the record of what each script measures, one line per script;
 `verify/truth-line/verify-truth-line.sh` grades it on every run, and
