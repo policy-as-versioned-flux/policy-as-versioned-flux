@@ -248,11 +248,19 @@ against the branch, not assumed.
   "refusing to allow a GitHub App to create or update workflow `.github/workflows/fetch.yml`
   without `workflows` permission". The `pavc-other-hand` installation carries
   `contents:write, metadata:read, pull_requests:write` on every organisation and `workflows` on
-  none. Six other units merged the same day with workflow changes in them, so the refusal is not
-  uniform and the reason for the difference is not established. The fix is one owner action:
-  grant the app the `workflows` permission. Merging with the owner's own token instead would
-  defeat the point of the second identity, so it was not done. The pull request is open, mergeable
-  and clean.
+  none, on all nine. The refusal is NOT uniform, and the counts are exact rather than impressions.
+  Five merges by the same app on the same day carried workflow changes and were admitted:
+  driftwood `cd63472` (3 files), tuppence `e44ad89` (3), ludlow `64492d3` (3), ico `6217c3a` (1)
+  and feeds `b6eaa0a` (1). Platform's `bbda376` carried none, so it proves nothing either way. The
+  hub's own `fbdbc6d` also changed `.github/workflows/twin.yml` and was admitted. Insurer's
+  installation is not older or differently configured: same three permissions, created within two
+  minutes of feeds' on 2026-09-03. The REST merge endpoint refuses with the same message as the
+  GraphQL one, so it is not an API-surface difference either. Why insurer alone refuses is not
+  established, and no guess is recorded here.
+
+  The fix is one owner action: grant the app the `workflows` permission. Merging with the owner's
+  own token instead would defeat the point of the second identity, so it was not done, and neither
+  was a local merge pushed straight to `main`. The pull request is open, mergeable and clean.
 * The citable run: `verify-feed-contract` and `verify-branch-refs` green on a TRUTH line the
   owner or the clock produces. Both were run locally and their output is in the pull request.
   `verify-branch-refs` is green (53 PASS, 1 declared SKIP); `verify-feed-contract` is NOT, and
