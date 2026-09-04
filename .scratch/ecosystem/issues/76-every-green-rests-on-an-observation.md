@@ -264,12 +264,14 @@ the leg behind a flag the gate sets once per wave.
   could-not-look**, among them `platform/currency-controller/verify-currency.sh`,
   `platform/oscal/verify-upflow.sh`, `tuppence/reset/verify-reach-secrets.sh`,
   `platform/access/verify-access.sh` and `platform/identity/verify-identity.sh`. That is a list of
-  examples, not a count: four rounds of review each found the count wrong, which is the same
-  lesson as the net's own. None of them is a false green today (each narrows its closing sentence
-  to what it observed), and none is graded by the class-level net, which reads the verdict token
-  and not prose. Giving every live-tail script that leg is what
-  would close the half this net cannot see; it touches three scripts in two units and is its own
-  ticket, not a review fix.
+  examples, not a count: three rounds of review each found the count wrong, which is the same
+  lesson as the net's own. None of them is a false green today, though for two different reasons:
+  `verify-currency.sh`, `verify-upflow.sh` and `verify-reach-secrets.sh` narrow their closing
+  sentence to what they observed, while `verify-access.sh` and `verify-identity.sh` print a bare
+  note that leaves `LIVE_TAIL_SKIPPED` empty and their closing claim never covered the dry-run in
+  the first place. None is graded by the class-level net, which reads the verdict token and not
+  prose. Giving every live-tail script that leg is what would close the half this net cannot see,
+  and it is its own ticket, not a review fix.
 
 **Re-review fixes, 2026-09-04 (the assistant, delegated).** Round 1 of the re-review found the
 narrowed PASS line still carried a claim wider than the estate: it told the reader the ungraded

@@ -52,8 +52,9 @@ import tempfile
 # A statement whose first printed token is the SKIP verdict word, in any print form the estate
 # uses: `echo`/`printf`, the `say`/`note`/`warn`/`log` wrappers, `echo -e`, a leading colour
 # escape or the `==>` prefix, quoted or bare. Widened on 2026-09-04 from `echo|printf` + quote:
-# over the 95 scripts the gate discovers both spellings match the same 26 statements, so the
-# widening costs nothing today and catches `say "SKIP: ..."` tomorrow.
+# measured over the 95 scripts the gate discovered that day, both spellings matched the same 26
+# statements, and they still match the same set (fewer of them now, since this ticket turned seven
+# into exit 3). The widening costs nothing and catches `say "SKIP: ..."` tomorrow.
 SKIP_STATEMENT = re.compile(r"""
     ^\s*
     (?:echo|printf|say|note|warn|log)
