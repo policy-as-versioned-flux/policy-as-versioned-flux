@@ -72,3 +72,10 @@ Map line: 92 -- the local clock: `talk/local-clock.sh` runs the model steps from
 - **The cadence** (a date-shaped decision): `local_clock.py plist --hour H --minute M > ~/Library/LaunchAgents/uk.me.cns.pavc.local-clock.plist` and `launchctl bootstrap` (an authorisation on this machine). If a scheduled run fails to authenticate, `claude setup-token` once.
 - **Rehearsal signals naming a real firm, regulator or person** beyond the adopters' own scenario libraries.
 - Ticket 93 ships `.claude/skills/derive-probability/SKILL.md`; the `derive` row is waiting for it.
+
+**Review round 3, 2026-09-04 (the assistant, delegated).** A committed file under `twin/claims`
+that is not named `*.claim.yaml` had been admitted with no check. Now any such file fails the step
+(branch kept), every `*.claim.yaml` is validated with `--headless`, and on any refusal the clock
+deletes the PR title and body the model wrote, so nothing the clock leaves in the run directory
+says a proposal was clean. Stub case `misnamed`, verify case 3c and a pytest pin it (commit
+b90a780). Approved after this round; merged as `pavc-other-hand`.
