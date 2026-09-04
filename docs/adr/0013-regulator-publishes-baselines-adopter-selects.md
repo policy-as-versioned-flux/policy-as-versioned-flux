@@ -2,7 +2,7 @@
 status: accepted
 ---
 
-> **Superseded in part, 2026-09-03 (ticket 38, built).** The new-hole refusal, the widening refusal and the self-created-hole refusal are gone: a hole is priced and printed as a delta, keyed (source, id) across every controls parent. The bare catalogue id, the exact-string rule and the removal refusal stand. The supersession is recorded by ticket 39's superseding ADR, which takes its number when it is written.
+> **Superseded in part, 2026-09-04.** The new-hole refusal, the widening refusal, the removal refusal and the one-catalogue key are superseded by [ADR-0026](0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md): a hole is priced and printed as a delta, keyed (source, id) across every controls parent, a widening is a priced delta, and a removal prints as a priced delta too. The bare catalogue id as the wire value, the exact-string rule and the unknown-id hard failure (classified a missing instrument) stand. The new-hole and widening halves were built 2026-09-03 by ticket 38; the removal half waits on a platform build.
 
 # The regulator publishes named baselines, the adopter selects one, and both key on the bare catalogue id
 

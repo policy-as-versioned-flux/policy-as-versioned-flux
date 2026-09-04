@@ -2,7 +2,7 @@
 status: accepted
 ---
 
-> **Superseded in part, 2026-09-03 (ticket 38, built).** The new-hole refusal, the widening refusal and the self-created-hole refusal are gone: a hole is priced and printed as a delta, keyed (source, id) across every controls parent. The bare catalogue id, the exact-string rule and the removal refusal stand. The supersession is recorded by ticket 39's superseding ADR, which takes its number when it is written.
+> **Superseded in part, 2026-09-04.** "Refuse, same as any new hole (chosen)", the self-created hole refusal, and "Removing a self-added control: never" are superseded by [ADR-0026](0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md): an adopter's own addition is a priced new hole and its removal a priced delta, keyed (source, id) across every controls parent. The rest stands: a claim belongs to whoever ships the implementation, it lives in that party's component-definition, and nobody claims against an inherited policy. The self-created hole half was built 2026-09-03 by ticket 38; the removal half waits on a platform build.
 
 # A control claim belongs to whoever ships the implementation, and an adopter's own addition is an ordinary hole
 
