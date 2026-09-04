@@ -14,11 +14,12 @@
 # (the refusing mode: no merge, no enactment push, no tag), and with `gh` kept out of the child's
 # allowed tools altogether. What the model may do is read, write the adopter's worktree, commit
 # on the branch this script made for it, and stop. This script then reads what it committed,
-# refuses anything outside the step's allowed paths, validates the claim file with the
-# validator told --headless (the file must say run.headless: true and carry no override; the
-# model's own say-so is not what the no-override invariant rests on), and either pushes
-# and opens the PR (--push, the owner's hand, never from inside a Claude Code session) or prints
-# the command for the owner to run.
+# refuses anything outside the step's allowed paths, refuses any file under them that is not a
+# *.claim.yaml, validates every claim file with the validator told --headless (the file must
+# say run.headless: true and carry no override; the model's own say-so is not what the
+# no-override invariant rests on), and either pushes and opens the PR (--push, the owner's
+# hand, never from inside a Claude Code session) or prints the command for the owner to run.
+# A refused step keeps its branch and deletes the PR title and body the model may have written.
 #
 # The steps table below is the seam ticket 93 stacks on: add a row, ship the skill, and the
 # clock runs it. A row whose skill is not in .claude/skills yet is recorded as skipped, by name.
@@ -164,6 +165,17 @@ cleanup_or_fail() {  # step adopter unit wt branch status reason -- drop the wor
   record --step "$step" --adopter "$adopter" --status fail --reason "$reason; cleanup of $wt / $branch failed" --branch "$branch"; return 1
 }
 
+refuse() {  # step adopter branch title body reason -- a live step the clock will not propose
+  # The branch is kept for inspection, never pushed. Whatever PR title or body the model wrote
+  # before the refusal is deleted, so nothing in the run directory reads as a proposal or says
+  # "no override is claimed" about a commit the clock refused; the child's transcript
+  # (<step>-<adopter>.claude.json) still holds the model's words.
+  local step="$1" adopter="$2" branch="$3" title="$4" body="$5" reason="$6"
+  rm -f "$title" "$body"
+  record --step "$step" --adopter "$adopter" --status fail --reason "$reason" --branch "$branch"
+  return 1
+}
+
 render_prompt() {  # step skill adopter unit_wt branch paths out
   STEP="$1" SKILL="$2" ADOPTER="$3" UNIT_WT="$4" BRANCH="$5" PATHS="$6" OUT="$7" \
   RUN_DIR="$RUN_DIR" HUB="$HUB" ESTATE="$ESTATE" INJECTED_FILE="$INJECTED_FILE" TEMPLATE="$TEMPLATE" \
@@ -241,7 +253,7 @@ run_step() {  # step skill paths adopter
   dirty="$(git -C "$wt" status --porcelain --untracked-files=all)"
   if [ -n "$dirty" ]; then
     echo "fail  $tag: the model left uncommitted changes in $wt:"; echo "$dirty" | sed 's/^/        /'
-    record --step "$step" --adopter "$adopter" --status fail --reason "uncommitted changes left in the worktree" --branch "$branch"; return 1
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "uncommitted changes left in the worktree"; return 1
   fi
   changed="$(git -C "$wt" diff --name-only "main...HEAD")"
   if [ -z "$changed" ]; then
@@ -256,45 +268,53 @@ run_step() {  # step skill paths adopter
   done <<<"$changed"
   if [ -n "$bad" ]; then
     echo "fail  $tag: the commit touches$bad -- outside this step's allowed paths ($paths). A claim is a claim; a declaration is a different review. Branch kept for inspection, never pushed."
-    record --step "$step" --adopter "$adopter" --status fail --reason "commit outside $paths:$bad" --branch "$branch"; return 1
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "commit outside $paths:$bad"; return 1
   fi
-  # Every claim file the commit carries is run through the skill's own validator, told
-  # --headless: THIS script knows nobody was at the keyboard, so the validator requires
-  # run.headless: true on the file and refuses an override whatever the file declares about
-  # itself. Live: the file must say headless on its face and the validator must pass. Rehearsal:
-  # it must say injected on its face AND the validator must refuse it for that reason -- the
-  # refusal is what keeps a rehearsal out of every gate, so the clock proves it here rather than
-  # trusting it. A skill that ships no validator cannot propose a claim file. Nothing below
-  # this loop (the PR body and its "no override is claimed") is written unless every file passed.
+  # Every file the commit carries must be a claim file (*.claim.yaml), and every claim file is
+  # run through the skill's own validator, told --headless: THIS script knows nobody was at the
+  # keyboard, so the validator requires run.headless: true on the file and refuses an override
+  # whatever the file declares about itself. A file under the step's paths with any other name
+  # is refused outright: the clock has no check for it, and a file nobody can check is not
+  # proposed (the worked example saved as twin/claims/<date>-probe.yaml would otherwise pass
+  # with zero checks). Live: the file must say headless on its face and the validator must
+  # pass. Rehearsal: it must say injected on its face AND the validator must refuse it for that
+  # reason -- the refusal is what keeps a rehearsal out of every gate, so the clock proves it
+  # here rather than trusting it. A skill that ships no validator cannot propose a claim file.
+  # Nothing below this loop (the PR body and its "no override is claimed") is written unless
+  # every file passed, and a refusal deletes what the model wrote to the title and body files.
   local validator="$HUB/.claude/skills/$skill/assets/validate_claim.py" vout="$RUN_DIR/$tag.validate.out"
   while IFS= read -r f; do
-    case "$f" in *.claim.yaml) ;; *) continue;; esac
+    case "$f" in
+      *.claim.yaml) ;;
+      *) echo "fail  $tag: $f is under $paths but is not a *.claim.yaml -- the clock has no check for a file with that name, and a file nobody can check is not proposed. Branch kept at $wt, never pushed."
+         refuse "$step" "$adopter" "$branch" "$title" "$body" "$f is not a *.claim.yaml; unchecked"; return 1;;
+    esac
     if [ ! -f "$validator" ]; then
       echo "fail  $tag: $f is a claim file and /$skill ships no assets/validate_claim.py -- a claim nobody can check is not proposed. Branch kept at $wt, never pushed."
-      record --step "$step" --adopter "$adopter" --status fail --reason "no validator for $skill; $f unchecked" --branch "$branch"; return 1
+      refuse "$step" "$adopter" "$branch" "$title" "$body" "no validator for $skill; $f unchecked"; return 1
     fi
     if [ "$MODE" = rehearsal ]; then
       if ! grep -Eq '^injected: true' "$wt/$f"; then
         echo "fail  $tag: rehearsal claim $f does not carry injected: true at its top level"
-        record --step "$step" --adopter "$adopter" --status fail --reason "rehearsal claim $f not marked injected" --branch "$branch"; return 1
+        refuse "$step" "$adopter" "$branch" "$title" "$body" "rehearsal claim $f not marked injected"; return 1
       fi
       if "$PY" "$validator" "$wt/$f" --twin "$HUB" --headless >"$vout" 2>&1 </dev/null; then
         echo "fail  $tag: the validator ACCEPTED rehearsal claim $f -- an injected claim must be refused, and this one would pass a gate. Branch kept at $wt, never pushed."
-        record --step "$step" --adopter "$adopter" --status fail --reason "validator accepted rehearsal claim $f" --branch "$branch"; return 1
+        refuse "$step" "$adopter" "$branch" "$title" "$body" "validator accepted rehearsal claim $f"; return 1
       fi
       if ! grep -Eqi 'injected|rehearsal' "$vout"; then
         echo "fail  $tag: the validator refused rehearsal claim $f for a reason other than the injected mark ($(tail -1 "$vout" | cut -c1-120))"
-        record --step "$step" --adopter "$adopter" --status fail --reason "rehearsal claim $f refused for the wrong reason" --branch "$branch"; return 1
+        refuse "$step" "$adopter" "$branch" "$title" "$body" "rehearsal claim $f refused for the wrong reason"; return 1
       fi
       echo "ok    $tag: $f is marked injected and the validator refused it, by design ($(grep -Ei 'injected|rehearsal' "$vout" | head -1 | sed "s#$wt/##" | cut -c1-120))"
     else
       if ! grep -Eq '^[[:space:]]+headless: true[[:space:]]*$' "$wt/$f"; then
         echo "fail  $tag: live claim $f does not carry headless: true in its run block -- a claim this clock made says so on its face, or it is not this clock's claim. Branch kept at $wt, never pushed."
-        record --step "$step" --adopter "$adopter" --status fail --reason "live claim $f not marked headless" --branch "$branch"; return 1
+        refuse "$step" "$adopter" "$branch" "$title" "$body" "live claim $f not marked headless"; return 1
       fi
       if ! "$PY" "$validator" "$wt/$f" --twin "$HUB" --headless >"$vout" 2>&1 </dev/null; then
         echo "fail  $tag: the validator refused live claim $f ($(grep -c '^not ok' "$vout") reason(s); first: $(grep -m1 '^not ok' "$vout" | cut -c9-160)). Branch kept at $wt, never pushed."
-        record --step "$step" --adopter "$adopter" --status fail --reason "claim file refused: $f: $(grep -m1 '^not ok' "$vout" | cut -c9-160)" --branch "$branch"; return 1
+        refuse "$step" "$adopter" "$branch" "$title" "$body" "claim file refused: $f: $(grep -m1 '^not ok' "$vout" | cut -c9-160)"; return 1
       fi
       echo "ok    $tag: $(tail -1 "$vout" | sed "s#$wt/##" | cut -c1-160)"
     fi

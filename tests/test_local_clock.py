@@ -271,6 +271,36 @@ def test_a_live_claim_without_the_headless_mark_fails_the_step_and_no_body_is_wr
     assert rid in refs, "the refused claim's branch is kept for inspection"
 
 
+def test_a_file_under_the_claims_path_that_is_not_a_claim_fails_the_step_unchecked(tmp_path: Path) -> None:
+    # the stub commits the same worked example as twin/claims/<date>-probe-classify.yaml (not a
+    # *.claim.yaml) and writes its own PR title and body saying no override is claimed. The
+    # validator never sees a file with that name, so the clock must refuse it outright rather
+    # than let it through with zero checks; and the model's own title and body must not survive
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "misnamed"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 1, done.stdout + done.stderr
+    fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+    assert fail_lines and "is not a *.claim.yaml" in fail_lines[0] and "probe-classify.yaml" in fail_lines[0], done.stdout
+    rid = re.search(r"^local clock: run (\S+) ", done.stdout, re.M).group(1)  # type: ignore[union-attr]
+    run_dir = tmp_path / ".local-clock" / "runs" / rid
+    assert not (run_dir / "classify-driftwood.pr-body.md").exists(), "the model's body survived the refusal"
+    assert not (run_dir / "classify-driftwood.pr-title").exists(), "the model's title survived the refusal"
+    # the rendered prompt carries the phrase as the instruction to the model, and the transcript
+    # is the model's words; every other file in the run directory is the clock's, and none may say it
+    for p in run_dir.rglob("*"):
+        if p.is_file() and not p.name.endswith((".system.md", ".claude.json", ".claude.err")):
+            assert "no override is claimed" not in p.read_text(errors="replace").lower(), p
+    steps = [json.loads(l) for l in (run_dir / "steps.jsonl").read_text().splitlines()]
+    assert [s["status"] for s in steps] == ["fail"] and "not a *.claim.yaml" in steps[0]["reason"], steps
+    refs = subprocess.run(["git", "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],
+                          capture_output=True, text=True, check=True).stdout
+    assert rid in refs, "the refused file's branch is kept for inspection"
+    # and a well-formed claim beside it is still validated: the whole step fails, not just the file
+    assert not any("all in the twin" in l for l in done.stdout.splitlines()), done.stdout
+
+
 def test_two_runs_in_the_same_second_get_distinct_ids_and_clean_up_after_themselves(tmp_path: Path) -> None:
     unit = tmp_path / "estate" / "driftwood"
     _fixture_adopter(unit)

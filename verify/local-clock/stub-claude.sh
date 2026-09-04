@@ -9,6 +9,10 @@
 #   example  commit the skill's own worked example (example-claim.yaml: a human-run file that
 #            carries an OVERRIDE and no run.headless key) and write no PR title or body -- the
 #            clock must refuse it, keep the branch, and never write its "no override" body
+#   misnamed commit the same worked example under a name that is not *.claim.yaml
+#            (twin/claims/<date>-probe-<step>.yaml) AND write a PR title and body claiming no
+#            override -- the clock must refuse the file unchecked, keep the branch, and delete
+#            the title and body the stub wrote
 # LOCAL_CLOCK_INJECTED (set by the clock on a rehearsal) makes the claim say injected: true.
 set -euo pipefail
 wt="${LOCAL_CLOCK_UNIT_WT:?}"; run="${LOCAL_CLOCK_RUN_DIR:?}"
@@ -19,10 +23,15 @@ case "$what" in
 esac
 mkdir -p "$wt/twin/claims"
 claim="$wt/twin/claims/$(date -u +%Y-%m-%d)-stub-$step.claim.yaml"
-if [ "$what" = example ]; then
+if [ "$what" = example ] || [ "$what" = misnamed ]; then
+  [ "$what" = misnamed ] && claim="$wt/twin/claims/$(date -u +%Y-%m-%d)-probe-$step.yaml"
   cp "$(dirname "${BASH_SOURCE[0]}")/../../.claude/skills/classify-and-judge/assets/example-claim.yaml" "$claim"
   git -C "$wt" add -- "twin/claims"
   git -C "$wt" -c user.name=stub -c user.email=stub@local-clock.invalid commit -q -m "twin: the worked example, as if a model had written it ($step, $adopter)"
+  if [ "$what" = misnamed ]; then
+    echo "twin: the worked example under a probe name ($step, $adopter)" >"$run/$step-$adopter.pr-title"
+    printf '%s\n' "The worked example, saved as a probe. No override is claimed." >"$run/$step-$adopter.pr-body.md"
+  fi
   echo '{"type":"result","result":"LOCAL-CLOCK: ok committed the worked example with its override"}'; exit 0
 fi
 {

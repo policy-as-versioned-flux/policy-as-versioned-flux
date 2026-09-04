@@ -78,8 +78,9 @@ that removal did not happen. Nothing is written to the adopter's `main`, ever.
 
 The run prints one line per step: `ok`, `skip` (with why: the skill is not shipped yet, nothing
 to propose, dry run), or `fail` (the model left uncommitted work, touched a path outside the
-step's allowed paths, wrote a claim file that does not say `headless: true` or claims an
-override, or wrote one the twin cannot read). The last line names the marker. Then:
+step's allowed paths, committed a file under those paths that is not a `*.claim.yaml`, wrote a
+claim file that does not say `headless: true` or claims an override, or wrote one the twin
+cannot read). The last line names the marker. Then:
 
 ```
 cat .local-clock/last-run.json                      # the marker
@@ -92,11 +93,16 @@ verify/local-clock/verify-local-clock.sh            # the gate's view of it
 A headless claim file says `run.headless: true` and `run.clock: local-clock`, carries bindings
 and positions only (grade 5, `price_eligible: false`) and **no override**: an override is a
 human's judgement claimed by a role, and nobody was at the keyboard. The clock does not take
-the file's word for it: it requires `headless: true` in the run block and runs the skill's
-`validate_claim.py --headless`, which refuses a file that omits the mark and refuses an
-override whatever the file declares. A file that fails either is a `fail` with the branch kept
-and no PR body written. Where the skill would have asked you, the item is left unbound with
-the reason in its `evidence`.
+the file's word for it: every file the commit carries must be named `*.claim.yaml` (any other
+name under `twin/claims` is refused unchecked, because nothing can check it), it requires
+`headless: true` in the run block of each, and it runs the skill's `validate_claim.py
+--headless` on each, which refuses a file that omits the mark and refuses an override whatever
+the file declares. A step that fails any of these is a `fail` with the branch kept; the clock
+writes no PR title or body for it, and deletes any title or body the model had already written
+to `.local-clock/runs/<run>/<step>-<adopter>.pr-title` and `.pr-body.md`, so nothing in the
+run directory reads as a proposal (the transcript `<step>-<adopter>.claude.json` still holds
+the model's words). Where the skill would have asked you, the item is left unbound with the
+reason in its `evidence`.
 
 Without `--push` the `ok` line prints the exact push-and-PR command for you to run.
 
