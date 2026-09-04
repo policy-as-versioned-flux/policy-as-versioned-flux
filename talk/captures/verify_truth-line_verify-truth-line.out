@@ -1,0 +1,12 @@
+[1;36m==>[0m 1. the manifest loader refuses what it should: bad class, bad skip kind, uncompilable pattern, duplicate
+selfcheck ok
+[1;36m==>[0m 2. the gate's own instrument grades a planted pass, skip, fail, undeclared skip, unlisted script, exclusion and stale never as documented
+PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, and a unit line this checkout does not carry is a note
+[1;36m==>[0m 3. the manifest covers every script the gate discovers right now, in both directions
+NOTE manifest: .estate-clone/driftwood/twin/verify-twin-sweep-moved.sh is listed in talk/verify-manifest.txt but is not in this checkout of the unit; it is graded on the run where the unit publishes it
+NOTE manifest: .estate-clone/platform/shift-left/verify-tier-binding.sh is listed in talk/verify-manifest.txt but is not in this checkout of the unit; it is graded on the run where the unit publishes it
+[1;36m==>[0m 4. the last TRUTH line talk/truth.log recorded still adds up
+  run 67 predates the manifest: it carries no split and no ceiling, so there is no arithmetic to check yet -- the first line with one comes from the next scheduled run
+[1;36m==>[0m 5. the sentence the deck publishes counts the same 'can never pass' population the ceiling does
+  the last recorded TRUTH line carries no ceiling; only the planted line is graded here
+PASS: talk/verify-manifest.txt places every one of the 97 verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all.sh turns an undeclared could-not-look and a stale ceiling red, the last TRUTH line talk/truth.log recorded adds up, and the published 'can never pass' count is the population the ceiling was cut from

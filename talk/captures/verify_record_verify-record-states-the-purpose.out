@@ -1,5 +1,5 @@
 0. the grader can fail
-  ok   selfcheck: a record missing §0 fails; a principle 2 in the assistant's words fails
+  ok   selfcheck: a record missing §0 fails; a principle 2 in the assistant's words fails; a §1 that claims actor attestation fails; a principle 6 that drops the shelving marker fails
 1. NORTH-STAR §0 answers: what is this for, who receives it, by when
   ok   §0: \(a\).*touring talk
   ok   §0: \(b\).*reference implementation.*ControlPlane
@@ -31,6 +31,17 @@
   ok   principle 2: [Mm]utating admission controller
   ok   principle 2: ticket 75 Q5
   ok   principle 2: 2026-09-02
+4b. NORTH-STAR §1 claims the artefact half, and principle 6 keeps the actor half, shelved
+  ok   §1: every artefact is attestable
+  ok   §1 no longer says: and every actor is attestable\. The orgs
+  ok   §1: ticket 90
+  ok   §1: 2026-09-02
+  ok   principle 6: Every actor is attestable
+  ok   principle 6: SHELVED for this build
+  ok   principle 6: ticket 90
+  ok   principle 6: 2026-09-0[24]
+  ok   principle 6: verify-exclusions\.txt
+  ok   talk/verify-exclusions.txt shelves 6 identity-plane scripts with reasons
 5. NORTH-STAR §8 points at the sixteen decisions by number
   ok   §8: ticket 75
   ok   §8: [Ss]ixteen decisions
@@ -45,4 +56,4 @@
   ok   Multi-version: three declared lines
   ok   Multi-version: 2022-03-11
 
-PASS: NORTH-STAR states the purpose, the audience, the (absent) date and what done is, every owner line dated; CONTEXT.md agrees
+PASS: NORTH-STAR states the purpose, the audience, the (absent) date and what done is, claims the artefact half of attestation and records the actor half as shelved with its six scripts excluded by name, every owner line dated; CONTEXT.md agrees

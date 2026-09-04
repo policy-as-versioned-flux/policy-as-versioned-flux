@@ -1,7 +1,7 @@
 E2E step 4 flux reconciles the new cage spec onto the cluster
-   five-fact sample 2026-09-03T11:21:17Z on cluster dsample-33748825756 (run 33748825756), 3 sources
+   five-fact sample 2026-09-04T11:24:20Z on cluster dsample-33867429571 (run 33867429571), 3 sources
      driftwood-composed   true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
-     driftwood-composed   FALSE fact_2_tag_signature_verified_at_the_source_boundary: the controller's verdict is 'false': v1.1.0: signature or certificate chain did not verify at tagger time 1787677714: 284B2748287F0000:error:17000064:CMS routines:cms_signerinfo_verify_cert:certificate verify error:crypto/cms/cms_smime.c:329:Verify error: certificate is not yet valid
+     driftwood-composed   FALSE fact_2_tag_signature_verified_at_the_source_boundary: the controller's verdict is 'false': v1.1.0: signature or certificate chain did not verify at tagger time 1787677714: 28EB530C947F0000:error:17000064:CMS routines:cms_signerinfo_verify_cert:certificate verify error:crypto/cms/cms_smime.c:329:Verify error: certificate is not yet valid
      driftwood-composed   true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming driftwood-composed applied eacae33ca3a1
      driftwood-composed   true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
      driftwood-composed   true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory

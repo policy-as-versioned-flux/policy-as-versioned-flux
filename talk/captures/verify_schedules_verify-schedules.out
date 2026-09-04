@@ -5,37 +5,45 @@ PASS: driftwood/drift-sample.yml job sample: caged -- no shell step in this job 
 PASS: driftwood/propose-tier.yml job propose-tier: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: driftwood/renovate-run.yml job renovate: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: driftwood/twin-sweep.yml job sweep: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: driftwood: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-driftwood/driftwood, which is the server-side half of the cage (ADR-0024 point 3)
 SKIP: driftwood/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 SKIP: driftwood/renovate-run.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 SKIP: driftwood/twin-sweep.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 PASS: feeds/fetch.yml: daily clock at 17 3 * * * -- feeds publishes threat-register, cve, eol, fx, market-moves, news
 PASS: feeds/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: feeds: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-feeds/feeds, which is the server-side half of the cage (ADR-0024 point 3)
 SKIP: feeds/fetch.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 SKIP: ico/fetch.yml: daily clock at 09 4 * * *, but it opens no pull request anywhere -- it observes what ico already publishes rather than reading upstream and computing a bump, so story 9 / D2 is not implemented here (ico publishes penalty-schema)
 PASS: ico/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: ico: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-ico/ico, which is the server-side half of the cage (ADR-0024 point 3)
 SKIP: ico/fetch.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 PASS: insurer/fetch.yml: daily clock at 31 5 * * * -- insurer publishes quote-driftwood, quote-tuppence, quote-ludlow
 PASS: insurer/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: insurer/fetch.yml job requote: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: insurer: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-insurer/insurer, which is the server-side half of the cage (ADR-0024 point 3)
 SKIP: insurer/fetch.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 PASS: ludlow/propose-tier.yml: daily clock at 43 9 * * * -- ludlow is an adopter, and the price moves with the date
 PASS: ludlow/renovate-run.yml: daily clock at 07 9 * * * -- ludlow is an adopter, and Renovate's PR starts every re-price
 PASS: ludlow/drift-sample.yml job sample: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: ludlow/propose-tier.yml job propose-tier: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: ludlow/renovate-run.yml job renovate: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: ludlow: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-ludlow/ludlow, which is the server-side half of the cage (ADR-0024 point 3)
 SKIP: ludlow/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 SKIP: ludlow/renovate-run.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 SKIP: nist/fetch.yml: daily clock at 41 2 * * *, but it opens no pull request anywhere -- it observes what nist already publishes rather than reading upstream and computing a bump, so story 9 / D2 is not implemented here (nist publishes sp-800-53)
 PASS: nist/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: nist: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-nist/nist, which is the server-side half of the cage (ADR-0024 point 3)
 SKIP: nist/fetch.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 SKIP: platform/fetch.yml: daily clock at 23 1 * * *, but it opens no pull request anywhere -- it observes what platform already publishes rather than reading upstream and computing a bump, so story 9 / D2 is not implemented here (platform publishes policy, identity-substrate)
 PASS: platform/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: platform: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-platform/platform, which is the server-side half of the cage (ADR-0024 point 3)
 SKIP: platform/fetch.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 PASS: tuppence/propose-tier.yml: daily clock at 49 8 * * * -- tuppence is an adopter, and the price moves with the date
 PASS: tuppence/renovate-run.yml: daily clock at 13 8 * * * -- tuppence is an adopter, and Renovate's PR starts every re-price
 PASS: tuppence/drift-sample.yml job sample: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: tuppence/propose-tier.yml job propose-tier: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: tuppence/renovate-run.yml job renovate: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: tuppence: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-tuppence/tuppence, which is the server-side half of the cage (ADR-0024 point 3)
 SKIP: tuppence/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 SKIP: tuppence/renovate-run.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
 PASS: hub/truth.yml: daily clock at 47 5 * * * -- the hub owns the daily truth surface (ticket 03)
@@ -46,5 +54,6 @@ PASS: hub/twin.yml job typecheck: caged -- no shell step in this job stages a de
 PASS: hub/twin.yml job demo: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: hub/twin.yml job determinism: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: hub/twin.yml job reproduce-elsewhere: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
+SKIP: hub: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-flux/policy-as-versioned-flux, which is the server-side half of the cage (ADR-0024 point 3)
 SKIP: hub/truth.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
-SKIP: driftwood/propose-tier.yml: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether this clock ran inside its period
+SKIP: driftwood: GitHub unreachable (Command '['gh', 'auth', 'status']' returned non-zero exit status 1.) -- cannot look at whether the observation-lane ruleset is applied on policy-as-versioned-driftwood/driftwood, which is the server-side half of the cage (ADR-0024 point 3)
