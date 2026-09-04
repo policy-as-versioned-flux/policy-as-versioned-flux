@@ -6,6 +6,9 @@
 #   nothing  do nothing (the pool was fully bound)
 #   leak     as claim, but also commit a declaration (composed/x.yaml) -- the clock must refuse
 #   dirty    write the claim but do not commit it -- the clock must refuse
+#   example  commit the skill's own worked example (example-claim.yaml: a human-run file that
+#            carries an OVERRIDE and no run.headless key) and write no PR title or body -- the
+#            clock must refuse it, keep the branch, and never write its "no override" body
 # LOCAL_CLOCK_INJECTED (set by the clock on a rehearsal) makes the claim say injected: true.
 set -euo pipefail
 wt="${LOCAL_CLOCK_UNIT_WT:?}"; run="${LOCAL_CLOCK_RUN_DIR:?}"
@@ -16,6 +19,12 @@ case "$what" in
 esac
 mkdir -p "$wt/twin/claims"
 claim="$wt/twin/claims/$(date -u +%Y-%m-%d)-stub-$step.claim.yaml"
+if [ "$what" = example ]; then
+  cp "$(dirname "${BASH_SOURCE[0]}")/../../.claude/skills/classify-and-judge/assets/example-claim.yaml" "$claim"
+  git -C "$wt" add -- "twin/claims"
+  git -C "$wt" -c user.name=stub -c user.email=stub@local-clock.invalid commit -q -m "twin: the worked example, as if a model had written it ($step, $adopter)"
+  echo '{"type":"result","result":"LOCAL-CLOCK: ok committed the worked example with its override"}'; exit 0
+fi
 {
   [ -n "${LOCAL_CLOCK_INJECTED:-}" ] && echo "injected: true"
   cat <<EOF

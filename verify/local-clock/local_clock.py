@@ -10,8 +10,9 @@ on the owner's machine, because the model-backed steps can only run inside Claud
   2. the last run left a dated marker (`.local-clock/last-run.json`), and a scheduled run that
      is older than its declared period plus a day of slack is a clock that has stopped;
   3. no injected signal reached a citable path: every committed .json/.jsonl/.yaml/.yml file in
-     the hub and in every unit checkout is scanned for an `injected: true` flag, and one hit is
-     a FAIL. A world-simulator rehearsal is never cited;
+     the hub and in every unit checkout (a clone or a linked worktree) is scanned for an
+     `injected: true` flag, and one hit is a FAIL; a checkout that cannot be listed is SKIP,
+     never clean. A world-simulator rehearsal is never cited;
   4. the local clock never appends talk/truth.log: no `run=local` TRUTH line dated on or after
      2026-09-03 (the one on 2026-08-28 predates the local clock and is a presenter run the
      record already knows about);
@@ -220,6 +221,17 @@ def injected_leaks(repo: str) -> list[str] | None:
     return sorted(hits)
 
 
+def estate_repos(estate: str) -> list[tuple[str, str]]:
+    """Every entry of the estate that is a checkout: `.git` a directory (a clone) or a file (a
+    linked worktree, whose `.git` names its gitdir; `git ls-files` works there too). An entry
+    with neither is not a repository and is not listed; one whose `.git` is present but broken
+    is listed, so the scan reports it SKIP rather than passing it over in silence."""
+    if not os.path.isdir(estate):
+        return []
+    return [(entry, os.path.join(estate, entry)) for entry in sorted(os.listdir(estate))
+            if os.path.exists(os.path.join(estate, entry, ".git"))]
+
+
 def local_truth_lines(log: str) -> list[str] | None:
     """`run=local` TRUTH lines dated on or after the local clock existed; None when there is no
     log to read (could not look, not clean)."""
@@ -310,11 +322,7 @@ def check(hub: str, root: str, estate: str, now: dt.datetime | None = None) -> i
     out(status, reason)
 
     # 3. no injected signal on a citable path, hub and every unit
-    repos = [("hub", hub)]
-    if os.path.isdir(estate):
-        for entry in sorted(os.listdir(estate)):
-            if os.path.isdir(os.path.join(estate, entry, ".git")):
-                repos.append((entry, os.path.join(estate, entry)))
+    repos = [("hub", hub)] + estate_repos(estate)
     leaked, scanned = False, 0
     for name, repo in repos:
         hits = injected_leaks(repo)
@@ -402,6 +410,22 @@ def selfcheck() -> None:
         assert injected_leaks(repo) == ["observations/twin-sweep.jsonl"], injected_leaks(repo)
         # a repository that cannot be listed is unscanned, never clean
         assert injected_leaks(os.path.join(tmp, "no-such-repo")) is None
+        # the estate walk: a clone (.git a directory) and a linked worktree (.git a file) are
+        # both checkouts and both scanned; a .git file that names nothing is listed so the scan
+        # says SKIP; a directory with no .git at all is not a repository
+        estate = os.path.join(tmp, "estate")
+        os.makedirs(os.path.join(estate, "plain"))
+        os.makedirs(os.path.join(estate, "broken"))
+        with open(os.path.join(estate, "broken", ".git"), "w") as fh:
+            fh.write("gitdir: /nowhere\n")
+        subprocess.run(["git", "-C", repo, "worktree", "add", "-q", os.path.join(estate, "linked"),
+                        "-b", "linked"], check=True, capture_output=True)
+        os.symlink(repo, os.path.join(estate, "clone"))
+        names = [name for name, _ in estate_repos(estate)]
+        assert names == ["broken", "clone", "linked"], names
+        assert os.path.isfile(os.path.join(estate, "linked", ".git"))
+        assert injected_leaks(os.path.join(estate, "linked")) == ["observations/twin-sweep.jsonl"]
+        assert injected_leaks(os.path.join(estate, "broken")) is None
 
         # the truth log: absent is unread; the 2026-08-28 presenter line is known; a later
         # run=local is a fault
@@ -431,7 +455,8 @@ def selfcheck() -> None:
     print("ok  the local clock's checks bite: the stamp refuses every citable path, a stale "
           "scheduled marker fails while a hand run is only dated, a committed injected envelope "
           "is found and an uncommitted one is not, an unlistable repository or absent truth "
-          "log is unscanned rather than clean, a run=local TRUTH line since "
+          "log is unscanned rather than clean, a linked worktree (.git a file) is scanned like "
+          "a clone, a run=local TRUTH line since "
           f"{LOCAL_CLOCK_BORN} fails, a credential in the plist fails, and the README's flags "
           "are read from its Flags section only")
 

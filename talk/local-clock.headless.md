@@ -38,7 +38,9 @@ differs from a human-run one. Where they conflict, this note wins.
 6. If there is nothing to propose (every pool entry is already bound, or nothing fits), commit
    nothing and say so. Leave the worktree clean.
 7. Validate before you commit: `python3 .claude/skills/{{SKILL}}/assets/validate_claim.py
-   <claim file> --twin .` where that validator exists.
+   <claim file> --twin . --headless` where that validator exists. The clock runs the same
+   command after you stop; a file that does not say `headless: true` or carries an override
+   fails the step, whatever this note was answered with.
 8. End with one line: `LOCAL-CLOCK: <ok|nothing|failed> <one sentence>`.
 
 {{INJECTED_BLOCK}}

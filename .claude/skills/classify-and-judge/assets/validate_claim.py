@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """Validate a claim file written by the classify-and-judge skill.
 
-    validate_claim.py <claim file> --twin <hub root>
+    validate_claim.py <claim file> --twin <hub root> [--headless]
 
 This is the check ecosystem ticket 50 asks the gate to run over the skill's PR:
 **only existing claim kinds, and `derived_from` names them.** The claim kinds and
 the role register are read from the twin ITSELF (`twin/schema.py::CLAIM_KINDS`,
 `twin/roles.yaml`), never copied here -- a copy is how a check goes on passing
 after the thing it checks has moved.
+
+`--headless` is the local clock's word (ticket 92): the caller KNOWS nobody was at
+the keyboard, so the file must say `run.headless: true` and may carry no override,
+whatever the file itself declares. Without the flag the file's own `run.headless`
+is what is believed.
 
 Exit 0 valid, 1 invalid (every reason printed), 2 could not read the twin.
 
@@ -41,7 +46,10 @@ def pin_key(pin):
     return tuple(str(pin.get(field, "")) for field in PIN_FIELDS)
 
 
-def validate(doc, kinds, roles):
+def validate(doc, kinds, roles, headless=False):
+    """Every reason the file is not a claim file the twin can read; [] when it is. `headless`
+    is the caller's fact (the local clock passes --headless): then the file must say so and
+    the override rule applies even if the file forgot to declare it."""
     bad = []
 
     def need(condition, message):
@@ -56,7 +64,14 @@ def validate(doc, kinds, roles):
          "injected: true -- this is a world-simulator rehearsal claim (talk/local-clock.sh "
          "--inject) and it is refused wherever it is presented")
     run = doc.get("run") or {}
-    headless = bool(run.get("headless"))
+    # Ticket 92: the local clock says --headless because it knows; the file must agree. A file
+    # that omits the mark under a headless caller is not believed -- the no-override rule below
+    # would otherwise rest on the model declaring itself headless.
+    if headless:
+        need(run.get("headless") is True,
+             f"run.headless is {run.get('headless')!r}: this file was written by a headless run "
+             f"(the local clock, nobody at the keyboard) and does not say so")
+    headless = bool(headless or run.get("headless"))
     need(run.get("skill") == "classify-and-judge",
          f"run.skill is {run.get('skill')!r}: this file names no skill that produced it")
     need(str(run.get("operator_role", "")) in roles,
@@ -154,11 +169,14 @@ def main(argv=None):
     parser.add_argument("claim")
     parser.add_argument("--twin", default=".",
                         help="the hub checkout holding the twin package and roles.yaml")
+    parser.add_argument("--headless", action="store_true",
+                        help="the caller knows nobody was at the keyboard (the local clock, "
+                             "ticket 92): the file must say run.headless: true and carry no override")
     args = parser.parse_args(argv)
 
     kinds, roles = twin_facts(args.twin)
     doc = yaml.safe_load(open(args.claim))
-    bad = validate(doc, kinds, roles)
+    bad = validate(doc, kinds, roles, headless=args.headless)
     if bad:
         for line in bad:
             print(f"not ok  {line}")

@@ -197,11 +197,37 @@ def test_an_absent_truth_log_is_not_clean_it_is_unread(lc, tmp_path: Path) -> No
 def test_check_surfaces_an_unscannable_unit_as_skip(lc, tmp_path: Path, capsys) -> None:
     estate = tmp_path / "estate"
     (estate / "broken" / ".git").mkdir(parents=True)
+    # a .git FILE (a linked worktree's shape) that names nothing is a checkout too: SKIP, not silence
+    (estate / "torn").mkdir()
+    (estate / "torn" / ".git").write_text("gitdir: /nowhere\n")
     rc = lc.check(str(HUB), str(tmp_path / ".local-clock"), str(estate))
     lines = capsys.readouterr().out.splitlines()
     assert rc == 3
-    assert any(l.startswith("SKIP:") and "broken" in l and "not scanned" in l for l in lines), lines
+    for name in ("broken", "torn"):
+        assert any(l.startswith("SKIP:") and name in l and "not scanned" in l for l in lines), (name, lines)
     assert not any(l.startswith("FAIL:") for l in lines), lines
+
+
+def test_a_linked_worktree_in_the_estate_is_scanned_like_a_clone(lc, tmp_path: Path, capsys) -> None:
+    # .git is a file in a linked worktree; git ls-files works there, so the scan must look
+    repo = tmp_path / "unit"
+    (repo / "observations").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    (repo / "observations" / "twin-sweep.jsonl").write_text('{"injected": true}\n')
+    subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
+    subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
+                    "commit", "-q", "-m", "x"], check=True)
+    estate = tmp_path / "estate"
+    estate.mkdir()
+    (estate / "plain").mkdir()                       # no .git at all: not a repository
+    subprocess.run(["git", "-C", str(repo), "worktree", "add", "-q", str(estate / "linked"), "-b", "w"],
+                   check=True, capture_output=True)
+    assert (estate / "linked" / ".git").is_file()
+    assert [n for n, _ in lc.estate_repos(str(estate))] == ["linked"]
+    rc = lc.check(str(HUB), str(tmp_path / ".local-clock"), str(estate))
+    lines = capsys.readouterr().out.splitlines()
+    assert rc == 1
+    assert any(l.startswith("FAIL:") and "linked" in l and "twin-sweep.jsonl" in l for l in lines), lines
 
 
 # --- the script: two runs in one second do not collide, and a run that proposes nothing leaves nothing
@@ -215,6 +241,34 @@ def _fixture_adopter(unit: Path) -> None:
     subprocess.run(["git", "-C", str(unit), "add", "-A"], check=True)
     subprocess.run(["git", "-C", str(unit), "-c", "user.name=f", "-c", "user.email=f@f",
                     "commit", "-q", "-m", "fixture"], check=True)
+
+
+def _clock_env(tmp_path: Path, stub: str) -> dict[str, str]:
+    env = {**os.environ, "LOCAL_CLOCK_CLAUDE": str(STUB), "LOCAL_CLOCK_HOME": str(tmp_path / ".local-clock"),
+           "LOCAL_CLOCK_ESTATE": str(tmp_path / "estate"), "LOCAL_CLOCK_PYTHON": sys.executable,
+           "LOCAL_CLOCK_STUB": stub}
+    env.pop("LOCAL_CLOCK_LAUNCHD", None)
+    return env
+
+
+def test_a_live_claim_without_the_headless_mark_fails_the_step_and_no_body_is_written(tmp_path: Path) -> None:
+    # the stub commits the skill's own worked example: an override, no run.headless key. The
+    # clock's own read must refuse it; the model's silence about being headless is not consent.
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "example"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 1, done.stdout + done.stderr
+    fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+    assert fail_lines and "headless" in fail_lines[0], done.stdout
+    rid = re.search(r"^local clock: run (\S+) ", done.stdout, re.M).group(1)  # type: ignore[union-attr]
+    run_dir = tmp_path / ".local-clock" / "runs" / rid
+    assert not (run_dir / "classify-driftwood.pr-body.md").exists(), "a body was written for a refused claim"
+    steps = [json.loads(l) for l in (run_dir / "steps.jsonl").read_text().splitlines()]
+    assert [s["status"] for s in steps] == ["fail"] and "headless" in steps[0]["reason"], steps
+    refs = subprocess.run(["git", "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],
+                          capture_output=True, text=True, check=True).stdout
+    assert rid in refs, "the refused claim's branch is kept for inspection"
 
 
 def test_two_runs_in_the_same_second_get_distinct_ids_and_clean_up_after_themselves(tmp_path: Path) -> None:
@@ -320,3 +374,34 @@ def test_validator_refuses_an_override_from_a_headless_run(validator) -> None:
     assert any("override" in line and "headless" in line for line in bad), bad
     doc["claims"] = [c for c in doc["claims"] if c["kind"] != "override"]
     assert validator.validate(doc, kinds, roles) == []
+
+
+def test_validator_told_headless_does_not_trust_the_files_own_word(validator) -> None:
+    # the worked example: a human-run file, an override, no run.headless key. Believed on its
+    # own terms it passes; told by the clock that the run was headless, it fails for both reasons
+    kinds, roles = validator.twin_facts(str(HUB))
+    doc = _claim()
+    assert "headless" not in doc["run"]
+    assert validator.validate(doc, kinds, roles) == []
+    bad = validator.validate(doc, kinds, roles, headless=True)
+    assert any("run.headless" in line for line in bad), bad
+    assert any("override from a headless run" in line for line in bad), bad
+    # headless: false written by the model is still not the clock's fact
+    doc["run"]["headless"] = False
+    bad = validator.validate(doc, kinds, roles, headless=True)
+    assert any("run.headless is False" in line for line in bad), bad
+    # a file that says headless and claims no override passes under --headless
+    doc["run"]["headless"] = True
+    doc["claims"] = [c for c in doc["claims"] if c["kind"] != "override"]
+    assert validator.validate(doc, kinds, roles, headless=True) == []
+
+
+def test_validator_cli_headless_flag_refuses_the_worked_example(tmp_path: Path) -> None:
+    example = VALIDATOR.parent / "example-claim.yaml"
+    plain = subprocess.run([sys.executable, str(VALIDATOR), str(example), "--twin", str(HUB)],
+                           capture_output=True, text=True, cwd=str(HUB))
+    assert plain.returncode == 0, plain.stdout + plain.stderr
+    headless = subprocess.run([sys.executable, str(VALIDATOR), str(example), "--twin", str(HUB), "--headless"],
+                              capture_output=True, text=True, cwd=str(HUB))
+    assert headless.returncode == 1, headless.stdout + headless.stderr
+    assert "run.headless" in headless.stdout and "override from a headless run" in headless.stdout, headless.stdout

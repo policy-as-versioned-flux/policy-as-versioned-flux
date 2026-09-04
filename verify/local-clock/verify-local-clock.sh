@@ -15,7 +15,9 @@
 #   * and, offline and with no token, does the clock itself behave: run end to end against a
 #     fixture adopter with a stub `claude`, a live run commits one claim on a branch and leaves
 #     the marker, a rehearsal (--inject) stamps the signal and marks the claim, a commit outside
-#     the step's paths is refused, and the validator refuses a rehearsal claim.
+#     the step's paths is refused, a live claim that omits run.headless or carries an override
+#     is refused by the clock itself (the validator is told --headless), and the validator
+#     refuses a rehearsal claim.
 #
 # Exit 0 observed true; 3 could not look, with the reason on the last line; 1 observed false.
 set -uo pipefail
@@ -99,6 +101,22 @@ LOCAL_CLOCK_STUB=leak bash "$ROOT/talk/local-clock.sh" --adopter driftwood --ste
 grep -q 'outside this step' "$TMP/leak.out" || fail "the declaration was refused for the wrong reason: $(grep '^fail' "$TMP/leak.out" | head -1)"
 LOCAL_CLOCK_STUB=dirty bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/dirty.out" 2>&1 && fail "uncommitted work was admitted"
 grep -q 'uncommitted changes' "$TMP/dirty.out" || fail "uncommitted work was refused for the wrong reason"
+# 3b. a live claim that omits run.headless and carries an override -- the skill's own worked
+# example, committed as if a model had written it -- fails the step: the no-override invariant
+# is checked by the clock (--headless to the validator), not declared by the model. The branch
+# is kept and the clock's "no override is claimed" PR body is never written.
+LOCAL_CLOCK_STUB=example bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/example.out" 2>&1 && fail "a live claim with an override and no headless mark was admitted"
+grep -Eq '^fail .*headless' "$TMP/example.out" || fail "the unmarked claim was refused for the wrong reason: $(grep '^fail' "$TMP/example.out" | head -1)"
+erid="$(sed -n 's/^local clock: run \([^ ]*\) .*/\1/p' "$TMP/example.out" | head -1)"
+[ -n "$erid" ] || fail "the example run printed no run id"
+[ ! -e "$TMP/.local-clock/runs/$erid/classify-driftwood.pr-body.md" ] || fail "the clock wrote a PR body for a claim it refused"
+git -C "$TMP/estate/driftwood" for-each-ref 'refs/heads/local-clock/' | grep -q -- "$erid" || fail "the refused claim's branch was not kept for inspection"
+grep -q '"status": "fail"' "$TMP/.local-clock/runs/$erid/steps.jsonl" || fail "the refused claim was not recorded as fail"
+# and the validator, told --headless, refuses the same file by itself, for both reasons
+"$PY" "$ROOT/.claude/skills/classify-and-judge/assets/validate_claim.py" "$ROOT/.claude/skills/classify-and-judge/assets/example-claim.yaml" --twin "$ROOT" --headless >"$TMP/headless.out" 2>&1 \
+  && fail "validate_claim.py --headless ACCEPTED the worked example, which carries an override and no headless mark"
+grep -q 'run.headless' "$TMP/headless.out" || fail "validate_claim.py --headless did not name the missing headless mark"
+grep -q 'override from a headless run' "$TMP/headless.out" || fail "validate_claim.py --headless did not refuse the override"
 
 # 4. a run that proposes nothing, and a dry run, leave no worktree and no branch behind -- as a
 # fact in the fixture, not as a sentence in the output. Runs are told apart by run id, which is
@@ -120,11 +138,11 @@ bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify --dry-run >
 grep -q '^dry .*would run' "$TMP/dry.out" || fail "the dry run did not print the command it would run"
 left_nothing "$TMP/dry.out" dry
 n_runs="$(ls -d "$TMP"/.local-clock/runs/*/ | wc -l | tr -d ' ')"
-[ "$n_runs" -eq 6 ] || fail "6 runs were started (live, rehearsal, leak, dirty, nothing, dry) and $n_runs run directories exist: run ids collided"
+[ "$n_runs" -eq 7 ] || fail "7 runs were started (live, rehearsal, leak, dirty, example, nothing, dry) and $n_runs run directories exist: run ids collided"
 # the derive step (ticket 93's seam) is recorded as skipped by name until its skill ships
 LOCAL_CLOCK_STUB=nothing bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step derive >"$TMP/derive.out" 2>&1
 grep -q 'derive-driftwood' "$TMP/derive.out" || fail "the derive step is not in the steps table"
-echo "PASS: offline -- with a stub model the clock commits one claim on a branch and leaves the marker, a rehearsal is stamped, marked and refused by the validator, a declaration or unfinished work is refused, and a nothing run or a dry run leaves no worktree or branch"
+echo "PASS: offline -- with a stub model the clock commits one claim on a branch and leaves the marker, a rehearsal is stamped, marked and refused by the validator, a declaration, unfinished work or a claim without the headless mark is refused, and a nothing run or a dry run leaves no worktree or branch"
 
 # --- the real machine: the script, README, marker, leak scan, truth log, template --------------
 unset LOCAL_CLOCK_CLAUDE LOCAL_CLOCK_HOME LOCAL_CLOCK_ESTATE

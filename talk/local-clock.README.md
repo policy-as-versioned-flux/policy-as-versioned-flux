@@ -78,8 +78,8 @@ that removal did not happen. Nothing is written to the adopter's `main`, ever.
 
 The run prints one line per step: `ok`, `skip` (with why: the skill is not shipped yet, nothing
 to propose, dry run), or `fail` (the model left uncommitted work, touched a path outside the
-step's allowed paths, or wrote a claim file the twin cannot read). The last line names the
-marker. Then:
+step's allowed paths, wrote a claim file that does not say `headless: true` or claims an
+override, or wrote one the twin cannot read). The last line names the marker. Then:
 
 ```
 cat .local-clock/last-run.json                      # the marker
@@ -91,8 +91,12 @@ verify/local-clock/verify-local-clock.sh            # the gate's view of it
 
 A headless claim file says `run.headless: true` and `run.clock: local-clock`, carries bindings
 and positions only (grade 5, `price_eligible: false`) and **no override**: an override is a
-human's judgement claimed by a role, and nobody was at the keyboard. Where the skill would have
-asked you, the item is left unbound with the reason in its `evidence`.
+human's judgement claimed by a role, and nobody was at the keyboard. The clock does not take
+the file's word for it: it requires `headless: true` in the run block and runs the skill's
+`validate_claim.py --headless`, which refuses a file that omits the mark and refuses an
+override whatever the file declares. A file that fails either is a `fail` with the branch kept
+and no PR body written. Where the skill would have asked you, the item is left unbound with
+the reason in its `evidence`.
 
 Without `--push` the `ok` line prints the exact push-and-PR command for you to run.
 
@@ -129,8 +133,11 @@ launchctl bootout gui/$(id -u)/uk.me.cns.pavc.local-clock
 rm ~/Library/LaunchAgents/uk.me.cns.pavc.local-clock.plist
 ```
 
-A run in progress is a `claude` process; `pkill -f 'claude -p /classify'` ends it, the clock
-then reads the worktree as unfinished and records `fail`. Remove leftover worktrees with
+A run in progress is a `claude` process; `pkill -f 'claude -p /classify'` ends it, and the clock
+then reads whatever the model had left, exactly as it does after a normal exit: uncommitted
+work is `fail` (worktree kept), nothing written is `skip: nothing to propose` (worktree and
+branch removed), and a commit already made is judged on its own terms, as if the model had
+finished. Remove leftover worktrees with
 `git -C .estate-clone/<adopter> worktree remove --force .estate-clone/<adopter>/.work/local-clock/<run>-<step>`
 and the branch with `git -C .estate-clone/<adopter> branch -D local-clock/<step>-<run>`.
 
