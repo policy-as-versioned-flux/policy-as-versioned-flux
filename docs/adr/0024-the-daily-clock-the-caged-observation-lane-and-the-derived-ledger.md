@@ -94,6 +94,35 @@ write, and what it may never write.
    not a literal. **Where the pull request list cannot be read, the ledger is empty and the proposer
    says so** -- it never suppresses in silence and never proposes in silence.
 
+6. **A third clock runs on the owner's machine, and a rehearsal is never citable (added
+   2026-09-03, ticket 92; ticket 75 Q10 owner-reasoned, the rest delegated under ADR-0025).**
+   Point 1's clocks never call a model. The owner permitted one, on the condition that it runs
+   inside Claude Code on his machine because no tokens exist anywhere else. So the model-backed
+   steps run from `talk/local-clock.sh`, by hand or from launchd (`talk/local-clock.plist`), each
+   as `claude -p "/<skill> <adopter>"` under the hub's own PreToolUse guard in `operations` mode,
+   with `gh` outside the child's tools. What it writes: a branch on the adopter's clone plus a
+   pull-request body, and a dated marker under the gitignored `.local-clock/`. What it never
+   writes: `main`, a merge, a tag, `talk/truth.log`. A local run is not citable (NORTH-STAR S5),
+   and `verify/local-clock/verify-local-clock.sh` grades only that the clock ran and that nothing
+   leaked. Three calls made under this point:
+   - *a headless run writes no override.* An override is a human's judgement claimed by a role;
+     nobody is at the keyboard, so the run binds and positions at grade 5 and stops. The claim
+     validator refuses an override from a run marked `headless`. That keeps this clock inside
+     ADR-0023 D1: it proposes, it never prices.
+   - *the world simulator stamps, and the stamp refuses.* `--inject FILE` reads one dated external
+     signal for a rehearsal. The envelope is written `injected: true` (with when, by what and from
+     which file) only under `.local-clock/`; the branch is named `rehearsal`; the claim file must
+     carry the flag, which is what makes the validator refuse it; `twin/feed_signal.py` refuses
+     the envelope; `--push` is refused; the gate scans every committed envelope, claim,
+     observation and capture in nine repositories for the flag and fails on one. Marked, not
+     hidden: the mark is the mechanism.
+   - *the push is the owner's hand.* The guard refuses every enactment push from an agent and
+     the clock's child cannot push either. `--push` runs after the model has stopped, under the
+     owner's own `gh` login, and is refused inside any Claude Code session. Merging stays the
+     other hand's (ticket 88). `verify-schedules.sh` does not grade this clock: it parses
+     workflow YAML and this clock is not a workflow; its own check is the fifth script under
+     `verify/`.
+
 ## Alternatives
 
 - **Keep "no schedule anywhere".** Rejected. It leaves NORTH-STAR principle 5 false in the one

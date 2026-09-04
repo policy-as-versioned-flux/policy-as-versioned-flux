@@ -143,6 +143,13 @@ def signal_for(envelope: dict[str, Any], tag: str, commit: str) -> dict[str, Any
             raise FeedSignalError(f"not a feed envelope: {field} is missing or empty")
     if envelope["kind"] != "feed":
         raise FeedSignalError(f"kind is {envelope['kind']!r}, and only a feed is looked up here")
+    # Ticket 92: the local clock's world simulator stamps a rehearsal signal `injected: true`.
+    # A rehearsal is never cited, so it never becomes a signal here -- not even a grade-5 one.
+    if envelope.get("injected"):
+        raise FeedSignalError(
+            "this envelope is marked injected: it is a world-simulator rehearsal signal "
+            "(talk/local-clock.sh --inject) and never becomes a signal by lookup"
+        )
     if not str(tag).strip() or not str(commit).strip():
         raise FeedSignalError(
             "a signal needs the signed tag it came from and the commit that tag points at; "

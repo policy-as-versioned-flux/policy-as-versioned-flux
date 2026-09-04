@@ -65,6 +65,14 @@ dependency itself, not the handling of a slow network, that changed.
 
 ---
 
+**The local clock (ticket 92).** The model-backed steps of the eco-system's clock
+run from this machine, not from GitHub: `talk/local-clock.sh --adopter driftwood`
+runs them once by hand, `--inject signal.yaml` rehearses with a made-up dated
+signal that is marked injected everywhere it lands, and `talk/local-clock.plist`
+schedules it with launchd. Prerequisites, what it writes, how to read it and how
+to stop it are in [`local-clock.README.md`](local-clock.README.md). Nothing it
+does is citable; the gate reads only its marker.
+
 ## 1. Bring-up order (what `up.sh` does for you)
 
 `up.sh` is a thin orchestrator over the per-area `up.sh` scripts each ticket

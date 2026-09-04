@@ -26,6 +26,12 @@ Four questions, in this order:
      period? A `schedule:` that GitHub silently stopped honouring is a clock
      that reports nothing while looking present in the file.
 
+Not graded here, on purpose (2026-09-03, ticket 92): the LOCAL clock, `talk/local-clock.sh`,
+the third clock ADR-0024 point 6 adds. It is a launchd job on the owner's machine, not a
+workflow, so there is no YAML for questions 2 to 4 to parse, and its lane is a gitignored run
+root plus a pull request rather than the observation lane. `verify/local-clock/` grades it:
+the marker it leaves, and that no injected rehearsal signal reached a citable path.
+
 Exit precedence: any FAIL -> 1; else any SKIP -> 3; else 0. Offline, questions
 1 to 3 still run in full -- absence of a network is never a pass and never a
 reason to skip the static half.

@@ -11,12 +11,28 @@ The twin's `signal-classify` and `evolution-judge`, packaged as **one skill a hu
 binding and an evolution position for each entry, takes the human's judgement where he has one,
 and writes **one claim file** that lands as a **pull request on the adopter's own overlay**.
 
-**Nothing here ever runs on a clock.** `disable-model-invocation: true` in the frontmatter above is
-not decoration: it is the mechanism. The daily publisher fetch
+**Nothing here ever runs on a GitHub clock.** `disable-model-invocation: true` in the frontmatter
+above is not decoration: it is the mechanism. The daily publisher fetch
 (`feeds/.github/workflows/fetch.yml`) gathers readings and computes a bump with a rule file; the
 adopter's daily sweep reads a committed lookup table (`twin/signals.yaml`). Neither calls a model,
 and neither may invoke this skill. Reasoning is a human at a keyboard, and its output is a claim
 somebody merges.
+
+**Amended 2026-09-03 (ticket 92; ticket 75 Q10, the owner, reasoned).** The sentence above used
+to read "Nothing here ever runs on a clock." The owner permitted a model in the twin on one
+condition: it runs inside Claude Code on his machine, from a schedule or shell script he runs,
+because no tokens exist anywhere else. So there is now a third clock, `talk/local-clock.sh`, and
+it invokes this skill headlessly as `claude -p "/classify-and-judge <adopter>"`. That is a *user*
+invocation from the owner's own machine under the owner's own login -- the thing
+`disable-model-invocation: true` still forbids is the model deciding to run this skill, and
+Claude Code's own scheduled-task preload; both stay forbidden. What changes in a headless run,
+and why it is still "a claim somebody merges": there is nobody at the keyboard, so the run writes
+**no override** (an override is a human's judgement claimed by a role; the validator refuses one
+from a run marked `headless`), leaves every "stop and ask" item unbound with its reason, and
+still commits on a branch and stops. The PR body sentence in step 5 is now "no model ran on a
+GitHub clock to produce this; it ran on the owner's local clock" for such a run.
+`talk/local-clock.headless.md` is the note the clock appends to the system prompt and is the
+authority on what a headless run may do.
 
 **Two things this skill may never do:** merge its own PR, and invent an entry. If a statement is
 not in the published pool with a URL, it does not become a signal here — it is a **scenario**, and
@@ -140,7 +156,9 @@ Done when: the validator exits 0 and prints the claim count.
 
 Branch in the **adopter's** repo, commit the claim file only, open a pull request, and stop. The
 PR body carries: the two feed versions read, the count of statements classified, each override with
-its role and its headline, and the sentence "no model ran on a clock to produce this".
+its role and its headline, and the sentence "no model ran on a clock to produce this" -- or, from
+the local clock (amendment above), "no model ran on a GitHub clock to produce this; it ran on the
+owner's local clock (ticket 92); no override is claimed".
 
 **Never** merge it. **Never** tag. **Never** touch `signals.yaml`, `composed/`, `deploy/`,
 `gitops/` or any other declaration in the same PR — a claim is a claim, and one of those is a
