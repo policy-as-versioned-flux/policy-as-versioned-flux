@@ -56,6 +56,8 @@ Every joint in [NORTH-STAR.md](../drift-review-2026-08-27/NORTH-STAR.md) §4 (re
 - [88 — The second identity](issues/88-the-second-identity.md) — the GitHub App `pavc-other-hand` (App ID 4819564, owner-named) is installed on all nine estate orgs; `twin/other_hand.py` mints its tokens from a key outside every repo; the guard gains a third mode `other-hand`, now checked in, that keeps every refusal and admits one shape, a merge whose disposing shell segment mints the app's token inline; PR #2, authored by the owner, was approved and merged by `pavc-other-hand[bot]` (c1c87fd). Tickets 87 and 74 are unblocked.
 - [94 — Research: the studied firms behind the adopters](issues/94-research-the-studied-firms-behind-the-adopters.md) — one candidate per adopter from primary sources: driftwood → DSG Retail (ICO £500,000 notice of 2020, still in litigation after the Court of Appeal 2026-02-19, no collected figure); tuppence → Starling Bank (FCA Final Notice £28,959,426, 2024-09-27, final and collected, with a board-approved risk appetite); ludlow → Anthem (three final settlements on the 2015 breach of 78.8m people). No bare turnover swap makes a priced rung reachable; the regulator record as a share of turnover spans three orders of magnitude across the three, which ticket 79 must weigh. Findings: [research/94-studied-firms.md](research/94-studied-firms.md). Ticket 79 chooses.
 - [95 — The record states the purpose](issues/95-the-record-states-the-purpose.md) — NORTH-STAR gains §0 (the owner's purpose chain, the toured circuit as the audience, no date, done defined by §4's preamble, the licence and the truth surface as consequences); §4 is re-headed as the assistant's build order with the definition of done under Q8 (b) and a dated standing line for the steps; principle 2 carries the owner's Q5 words verbatim; §6 records the talk as byproduct and marketing tool (2026-07-23 superseded, line re-attributed), the development-window theatre with `pavc-other-hand` and AI disposal as the end state, and identity shelved; §8 lists the sixteen decisions by number with status and date. CONTEXT.md's Cage and Multi-version entries already agree. `verify/record/verify-record-states-the-purpose.sh` greps all of it, requires a date on every owner attribution, and self-checks.
+- [96 — The citable line says whether the twin may write to the world](issues/96-the-citable-line-says-whether-the-twin-may-write.md) — open. Carry `enact=<mode>` on the TRUTH line, so a reader of `talk/truth.log` can tell whether the run they cite happened with the enactment refusal on or off. Twelve files parse that line and two of `verify-all.sh`'s own selfcheck patterns are `$`-anchored, so it is a pass across the record surface rather than a two-line change. Reports the mode; does not grade it.
+- [97 — A flip nobody recorded goes red](issues/97-a-flip-nobody-recorded-goes-red.md) — open, HITL. Pair `twin/ENACT_MODE` with a record naming the mode, the authorising commit and the date, and assert the two agree, so a recorded flip like `f959187` stays green and an unrecorded one goes red. HITL because it invents an authorisation shape and ADR-0025 keeps those with the owner. Three questions wait on the owner: the shape, whether it carries an expiry, and whether the assistant may write it.
 - [60 — The scheduled observations land in the citable number, and steps 3–4 happen once for real](issues/60-the-scheduled-observations-land-in-the-citable-number-a.md) — the gate converts: step 4 and the three verify-reconcile checks grade from real, signed lane samples on TRUTH run 20 (2026-09-01T21:07Z, 57/7/18 of 84); first-ever all-five-facts-true observation (nist and platform on driftwood's sample); all ten first clock firings watched (~5.5h cron delay); reds owned by tickets 72 (twin re-render), 73 (verifier cert skew) and 62 (deleted thin-slice refs); step 3's first real merge graduates to ticket 74; ticket 40 corrected. M7 closed; M9 moves to 74.
 - [57 — feeds and insurer become runnable: workflows registered, first signed tags cut](issues/57-feeds-and-insurer-become-runnable-workflows-registered.md) — feeds and insurer runnable: default branches `main`, six workflows active, signed tags feeds threat-register/v1.0.0 (and v2.0.0 via 61) and insurer v1.0.0 verified by identity-pinned gitsign, daily fetch crons firing since 2026-09-01, three adopter feed-contract SKIPs converted to PASS on TRUTH runs 21 and 22; clock reds owned by 85 (feeds `__pycache__` in cage) and 77 (insurer pin lacks exposure); other five feeds untagged until an adopter pins one (delegated).
 - [55 — Every red on the clock is real, explained, and finishable](issues/55-every-red-on-the-clock-is-real-explained-and-finishable.md) — PR #8 merged as platform 46cd775 on 2026-09-01; run 22 grades corpus-generator PASS, render-version-tree PASS, publisher-gate and source-verification SKIP with the reason named; the patch file is deleted.
@@ -183,6 +185,27 @@ firms), 95 (the record states the purpose). Ticket 68 is closed out of scope. Or
 keyed and installed through the owner's browser with the owner confirming sudo mode, the name and
 the one download in chat. The guard's mode is `other-hand`, not `development`. Ticket 87 (the
 ruleset) and ticket 74 (step 3 for real) are unblocked.
+
+**Worked 2026-09-04, the hub's own CI.** The hub's `twin` workflow had been red for a day with
+three unrelated causes, and the largest of them was hiding the other two. Thirty-five failures in
+`tests/test_enact.py` were not a broken guard: `twin/ENACT_MODE` reads `development` by the
+owner's standing instruction (`f959187`), and `decide()` admits everything under that mode before
+it looks at a command. The tests were reading a DEPLOYMENT STATE while asserting a CAPABILITY.
+The fixture now arms the guard at a named mode, which an adversarial review proved is a stronger
+test and not a weaker one: mutating `decide()` to admit everything moves the armed count from 0
+failures to 39, where the old arrangement moved 35 to 40. Behind that wall sat a missing
+`jsonschema` pin (24 errors from ticket 69's test path, a 25th from ticket 76's; the import itself
+dates from `3e83a16`, ticket 21) and one dead `type: ignore`. `twin/enact_guard.py` is byte-
+identical to `main` and no refusal was touched.
+
+The review's blocking finding was that the repair removed the estate's only automatic alarm on
+the switch that decides whether the twin may write to the world, and that nothing else reported
+the mode at all. Half of that is fixed here: invariant 48 reads the ambient mode before it forces
+`operations` and names it on the line `./bin/twin verify` already prints. The other half is
+tickets 96 (carry `enact=<mode>` on the TRUTH line; twelve parsers) and 97 (HITL: pair the switch
+with a record of who authorised it, so an unrecorded flip goes red while a recorded one stays
+green). The estate's one standing red is unchanged: invariant 45,
+`flux_coverage_floor_is_still_reachable`.
 
 ## Not yet specified
 
