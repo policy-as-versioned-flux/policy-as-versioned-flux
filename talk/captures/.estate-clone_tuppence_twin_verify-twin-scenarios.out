@@ -1,0 +1,18 @@
+PASS: the overlay carries 6 standing scenarios (the six of decision ticket 11 answer item 4)
+PASS: every scenario declares a question, a proposition, a date, components, a world model and an affected-parties register
+PASS: 4 scenario(s) name a committed class (bus-factor-key-person, eol-date-passes, penalty-published, supply-shock); 2 name none, by decision
+PASS: the four classed subjects are present: a tier-one supplier failing (supply-shock), an EOL date passing, a penalty published, a key-person event
+PASS: class 'eol-date-passes' lands in all three places: enum=True library=True overlay=True
+PASS: class 'penalty-published' lands in all three places: enum=True library=True overlay=True
+PASS: penalty-published-2026.yaml prices no fine: no currency symbol and no figure anywhere in it (the estate prices the fine, the twin prices what the publication does)
+PASS: penalty-published-2026.yaml says which half of the seam it carries: the consequence is declared and its note says in its own words that it is not priced
+PASS: the supply-shock headline lives in this overlay as card-scheme-supply-shock-2026, not in a news feed
+PASS: every scenario's proposition and world model exist in the vendored world layer
+PASS: every scenario's proposition carries a prior belief in the reference map
+SKIP: the overlay with its six scenarios loads, and the emitter could not price it: CANNOT LOOK: tuppence's twin cannot price a forward-intel payload today, and the instruments it is missing are named rather than defaulted (ADR-0020): perspective 'tuppence' declares 'payment-fee-income' as its cash flow and puts no priced valuation on it (grade 3, outside the pricing threshold of 2), because party.yaml publishes no signed size: for the amount to derive from; the one causal edge t
+PASS: every one of the 4 pins on party.yaml resolves to exactly one dated signal
+PASS: every signal is dated and names a scenario that exists, and every scenario is either bound by a pin or declared unbound with a reason
+PASS: the lookup carries no price: binding a pin to a signal is not pricing it
+SKIP: no valuation in this overlay carries an amount, so there was no priced figure to re-derive from the signed party artefact: party.yaml for this party publishes no `size:` block and every valuation here is graded outside the pricing threshold
+TOTAL: 14 pass, 0 fail, 2 could-not-look
+SKIP: the overlay with its six scenarios loads, and the emitter could not price it: CANNOT LOOK: tuppence's twin cannot price a forward-intel payload today, and the instruments it is missing are named rather than defaulted (ADR-0020): perspective 'tuppence' declares 'payment-fee-income' as its cash flow and puts no priced valuation on it (grade 3, outside the pricing threshold of 2), because party.yaml publishes no signed size: for the amount to derive from; the one causal edge t

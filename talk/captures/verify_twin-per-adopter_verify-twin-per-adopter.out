@@ -1,4 +1,7 @@
 PASS: driftwood: an overlay with 6 scenarios, 30 vendored world files and world_ref c2d07330a778ed547b60cfbb87217bcf9813181f
-SKIP: 2 of 3 adopters carry no twin overlay and are named rather than omitted: ludlow, tuppence. REGRILL answer 39 promises one each; until they exist this check cannot look at them, and it does not pass over the ones that are there
-TOTAL: 1 pass, 0 fail, 1 could-not-look
-SKIP: 2 of 3 adopters carry no twin overlay and are named rather than omitted: ludlow, tuppence. REGRILL answer 39 promises one each; until they exist this check cannot look at them, and it does not pass over the ones that are there
+PASS: ludlow: an overlay with 6 scenarios, 30 vendored world files and world_ref c2d07330a778ed547b60cfbb87217bcf9813181f
+PASS: tuppence: an overlay with 6 scenarios, 30 vendored world files and world_ref c2d07330a778ed547b60cfbb87217bcf9813181f
+PASS: every one of the 3 overlays vendors the same world layer: the same content-addressed world_ref c2d07330a778ed547b60cfbb87217bcf9813181f, over 30 files whose bytes this run hashed and found identical (sha256 4a0f01d33a13)
+PASS: 3 of 3 parties claiming the adopter role carry a twin overlay of their own
+TOTAL: 5 pass, 0 fail, 0 could-not-look
+PASS: every party claiming the adopter role carries a twin overlay of its own, each with six scenario files, an emitter, and the same vendored world layer pinned at one shared content-addressed world_ref

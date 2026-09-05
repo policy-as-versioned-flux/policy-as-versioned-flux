@@ -40,10 +40,24 @@ Units (`.estate-clone/<unit>/`, gitignored clones of the real repos, local `main
 - A builder that touches a unit works in a nested worktree of that unit:
   `git -C .estate-clone/<unit> worktree add .estate-clone/<unit>/.work/ticket-NN -b ticket-NN-<slug> ecosystem/build-2026-09-03`.
   `.work/` is gitignored in every unit and excluded from the gate's glob. Edit and commit there.
-- Never push a unit. Never `git checkout` a different branch in `.estate-clone/<unit>` itself:
-  the gate reads that checkout and the integrator owns it.
+- Never `git checkout` a different branch in `.estate-clone/<unit>` itself: the gate reads that
+  checkout and the integrator owns it.
 - The integrator merges each reviewed ticket branch into `ecosystem/build-2026-09-03`, checks that
-  branch out in `.estate-clone/<unit>`, and runs the gate. The owner pushes the eight branches.
+  branch out in `.estate-clone/<unit>`, and runs the gate.
+
+**Amended 2026-09-05.** Two lines above are out of date and one hazard is new.
+
+- `twin/ENACT_MODE` reads `development` by the owner's standing instruction, so a builder MAY push
+  a unit branch. The owner no longer pushes the eight branches; the integrator does, and merges as
+  `pavc-other-hand`. Cut unit branches from that unit's `origin/main`, NOT from
+  `ecosystem/build-2026-09-03`: many unit pull requests merged on 2026-09-04 and 09-05, so that
+  integration branch is behind and branching from it re-proposes merged work.
+- **`bash clone-estate.sh --refresh` used to delete `<unit>/.work/` along with the clone.** The
+  integrator did that on 2026-09-05 while a builder was working and destroyed three worktrees, one
+  of them in use. Nothing was lost only because the branch was already pushed. The script now
+  KEEPS any unit carrying `.work/` and says so; `--refresh-force` is the way to delete them on
+  purpose. Push your unit branch as soon as it is coherent, and do not rely on a worktree
+  surviving: the clone is shared with every other builder and with the integrator.
 
 ## Definition of done, per ticket
 

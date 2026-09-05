@@ -21,13 +21,33 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEST="$ROOT/.estate-clone"
 UNITS=(platform driftwood tuppence ludlow nist ico feeds insurer)
-REFRESH=0; [ "${1:-}" = "--refresh" ] && REFRESH=1
+REFRESH=0; FORCE=0
+case "${1:-}" in
+  --refresh)       REFRESH=1 ;;
+  --refresh-force) REFRESH=1; FORCE=1 ;;
+  "")              ;;
+  *) echo "usage: clone-estate.sh [--refresh | --refresh-force]" >&2; exit 2 ;;
+esac
 
 mkdir -p "$DEST"
 for u in "${UNITS[@]}"; do
   org="policy-as-versioned-$u"
   dir="$DEST/$u"
-  if [ "$REFRESH" = 1 ]; then rm -rf "$dir"; fi
+  # --refresh re-clones, which means DELETING the directory. A builder's nested worktrees live
+  # under <unit>/.work/, so a refresh takes those with it. That happened for real on 2026-09-05:
+  # the integrator refreshed the clone to see freshly merged branches while a builder was working,
+  # and destroyed three .work/ worktrees, one of them in use. Nothing was lost because the branch
+  # was already pushed; unpushed work would have gone. So a unit carrying .work/ is not refreshed,
+  # and the reason is printed. Remove the worktrees first, or pass --refresh-force.
+  if [ "$REFRESH" = 1 ]; then
+    if [ -d "$dir/.work" ] && [ "$FORCE" = 0 ]; then
+      echo "==> $u: KEPT. $dir/.work/ carries $(ls -1 "$dir/.work" 2>/dev/null | wc -l | xargs)" \
+           "worktree(s) a builder may be using, and --refresh would delete them." \
+           "Remove them first, or pass --refresh-force to delete them with the clone."
+      continue
+    fi
+    rm -rf "$dir"
+  fi
   if [ -d "$dir/.git" ]; then
     echo "==> $u: already cloned (pass --refresh to re-clone)"
     continue
