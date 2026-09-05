@@ -253,12 +253,15 @@ def grade(findings: list[Finding], register: dict, source_text: dict[str, str]) 
             failures.append(f"{name}: a copy still carries it and the row does not name what it "
                             f"waits for")
         sources = rule.get("source_clean") or []
+        # A register that names a file nobody can open is a register that cannot be checked,
+        # in EITHER state: renaming a renderer would otherwise freeze a `waiting` row for good.
+        for src in sources:
+            if src not in source_text:
+                failures.append(f"{name}: source {src} could not be read, so what it emits is "
+                                f"unproved -- the register names a file that is not there")
         if state == "converted-at-source":
             for src in sources:
-                if src not in source_text:
-                    failures.append(f"{name}: source {src} could not be read, so 'converted at "
-                                    f"source' is unproved")
-                elif scan_text(source_text[src], src):
+                if src in source_text and scan_text(source_text[src], src):
                     failures.append(f"{name}: {src} still emits a Deny, so the row may not say "
                                     f"converted-at-source")
         elif state == "waiting" and sources:

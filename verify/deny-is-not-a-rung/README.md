@@ -31,6 +31,8 @@ the register, and the join is graded in both directions:
 * a row that says a copy survives when **none does** is a FAIL — the record is behind the code;
 * a row still marked `waiting` whose **source no longer emits** the Deny is a FAIL — move it on;
 * a row with **no reason**, no `awaits`, or a choice that is not one of the ticket's two is a FAIL;
+* a row naming a `source_clean` path that **cannot be read** is a FAIL in either state — a
+  register that names a file nobody can open is a register nothing can check;
 * an outstanding copy is a **could-not-look (exit 3) that names the tag it waits for**, never a
   pass. It goes green when the estate does, and not before.
 

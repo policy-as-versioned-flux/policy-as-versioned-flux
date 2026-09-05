@@ -210,6 +210,18 @@ def test_a_waiting_row_whose_source_is_already_clean_must_move_on() -> None:
     assert any("no longer emits it" in f for f in v.failures), v.failures
 
 
+def test_a_row_naming_a_source_that_cannot_be_read_fails_whatever_its_state() -> None:
+    """A register that names a file nobody can open is a register that cannot be checked. It
+    fails in both states, or renaming the renderer would quietly freeze the row."""
+    for state in ("waiting", "converted-at-source"):
+        reg = _register()
+        reg["rules"][0]["state"] = state
+        v = deny_register.grade([_finding("driftwood/composed/orphan-guard.yaml")], reg,
+                                source_text={})
+        assert v.verdict == "FAIL", state
+        assert any("could not be read" in f for f in v.failures), (state, v.failures)
+
+
 def test_a_waiting_row_whose_source_still_emits_the_deny_is_a_skip() -> None:
     reg = _register()
     reg["rules"][0]["state"] = "waiting"
