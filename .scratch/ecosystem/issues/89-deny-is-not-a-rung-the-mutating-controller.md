@@ -223,7 +223,7 @@ reads the template; the drift is fixed and cannot come back unobserved.
   directly instead: the kind change flows through, and the composed governed-namespace member
   carries no `validationActions` and no `Deny`.
 
-Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; the two machinery guards become six documents that refuse nothing (orphan guard Audit + orphan cage, governed-namespace cage + unclaimed report, bottom-rung netpol, and the unsuffixed cage-isolated PriorityClass without which the Priority plugin would refuse every pod they cage); posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck. Round 1 shipped a real regression — the demotion alone left an orphan claim uncaged, because every served cage-tier is version-scoped — and the review caught it; the fix, the four other blocking findings, and three defects found by RUNNING the beats are in the ticket -- the sharpest being that every served PriorityClass is version-suffixed, so the machinery's own cage named a class no cluster has and would have made every pod it caged inadmissible: a refusal by another name, inside the ticket about refusals by another name, invisible to every static check here and now named in deny_register.BLIND_SPOTS as wanting a ticket of its own. Disjointness is proved from the array. One clock observation (run 92) was lost to origin/main moving under the run, quoted in the ticket from the Actions log and deliberately not written into truth.log. The 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
+Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; the two machinery guards become six documents that refuse nothing (orphan guard Audit + orphan cage, governed-namespace cage + unclaimed report, bottom-rung netpol, and the unsuffixed cage-isolated PriorityClass without which the Priority plugin would refuse every pod they cage); posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck. Round 1 shipped a real regression — the demotion alone left an orphan claim uncaged, because every served cage-tier is version-scoped — and the review caught it; the fix, the four other blocking findings, and three defects found by RUNNING the beats are in the ticket -- the sharpest being that every served PriorityClass is version-suffixed, so the machinery's own cage named a class no cluster has and would have made every pod it caged inadmissible: a refusal by another name, inside the ticket about refusals by another name, invisible to every static check here and now named in deny_register.BLIND_SPOTS as wanting a ticket of its own. Disjointness is proved from the array. Two clock observations were lost -- run 92 to origin/main moving under the run, run 95 to the builder pushing while it was in flight -- both quoted in the ticket from the Actions logs and deliberately not written into truth.log. The 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
 
 ### Round 2, 2026-09-05 — the review found five blocking findings and the central one was real
 
@@ -319,23 +319,23 @@ run (review finding P2-6). Naming the two together is what makes the case; the t
 written here because charting is not this ticket's, but nothing else in the record puts the two
 instances side by side.
 
-### One observation was lost, and it was not the push I got wrong
+### Two observations were lost, and I caused the second one
 
-I pushed while two `truth` runs were in flight, having read the first rows of `gh run list`
-instead of the `status` column. That was a real rule violation and I own it. It is not, on the
-evidence, what cost an observation, and the record should say which is which.
+I pushed while `truth` runs were in flight, having read the first rows of `gh run list` instead
+of the `status` column. Two observations never reached `talk/truth.log`. I first wrote here that
+neither was my doing; that was wrong, and I found it out by going back through the logs a second
+time rather than by being told. One was `origin/main` moving under a run. **The other was my
+push.** Both lines are quoted below from the Actions logs, and neither is written into
+`talk/truth.log`: a builder does not author a clock's observation, and a line hand-copied into
+that file would be indistinguishable from one the clock landed.
 
-**An observation WAS lost.** Run 92, on hub commit `c28541e`
+**The first: `origin/main` moved.** Run 92, on hub commit `c28541e`
 ([Actions run 33936905680](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/33936905680)),
 produced this line at 2026-09-05T02:03:57Z and it never reached `talk/truth.log`:
 
 ```
 TRUTH 2026-09-05T02:03Z run=92 hub=c28541e units=[driftwood=a1a2a78@main feeds=b6eaa0a@main ico=6217c3a@main insurer=9e90e1b@main ludlow=d092400@main nist=b9f5fff@main platform=bbda376@main tuppence=fca6a58@main] pass=65 [observed=15 self=40 simulated=6 meta=4] fail=13 skip=19 [never=10 waits=9] excluded=8 total=105 ceiling=86
 ```
-
-It is quoted here from the Actions log and is deliberately NOT written into `talk/truth.log`: a
-builder does not author a clock's observation, and a line hand-copied into that file would be
-indistinguishable from one the clock landed.
 
 **Why it did not land.** The workflow committed it as `5c75197` and then ran
 `git pull --rebase --autostash origin main`. It rebases onto **origin/main**, not onto the branch
@@ -344,15 +344,32 @@ it is running on. `origin/main` had moved while the run was in flight — ticket
 it conflicted in `talk/truth.log` and in three `talk/captures/*.out` files, and the rebase stopped
 at `error: could not apply 5c75197... truth: record run 92 [skip ci]`.
 
-**So the cause was `origin/main` moving, not my push.** The rebase failed at 02:04:28Z; my next
-push to the branch (`d961091`, the merge of `origin/main`) is 41 minutes later. The two runs my
-pushes DID cancel — on `26eb5ac` and `602cda3` — were cancelled before reaching a TRUTH line, so
-neither produced an observation to lose; their logs contain no `TRUTH` line at all. Checked, not
-assumed.
+**That one was not my push.** The rebase failed at 02:04:28Z; my next push to the branch
+(`d961091`, the merge of `origin/main`) is 41 minutes later. Two other runs my pushes DID cancel
+— on `26eb5ac` and `602cda3` — were cancelled before reaching a TRUTH line, so neither produced
+an observation to lose; their logs carry no `TRUTH` line at all. Checked, not assumed. The remedy
+is in this branch by accident: merging `origin/main` in (F10) is what stops a branch's rebase
+conflicting with main's `truth.log`, and a branch that sits behind main will keep losing
+observations this way. That is a property of `truth.yml`, not of this ticket.
 
-The remedy is already in this branch by accident: merging `origin/main` in (F10) is what stops a
-branch's rebase conflicting with main's `truth.log`. A branch that sits behind main will keep
-losing observations this way, and that is a property of `truth.yml`, not of this ticket.
+**The second: I pushed while it was running.** Run 95, on hub commit `f91c0f6`
+([Actions run 33941571076](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/33941571076)),
+produced this line at 2026-09-05T03:44:07Z:
+
+```
+TRUTH 2026-09-05T03:44Z run=95 hub=f91c0f6 units=[driftwood=a1a2a78@main feeds=b6eaa0a@main ico=6217c3a@main insurer=9e90e1b@main ludlow=d092400@main nist=b9f5fff@main platform=bbda376@main tuppence=fca6a58@main] pass=68 [observed=16 self=40 simulated=6 meta=6] fail=6 skip=24 [never=10 waits=14] excluded=8 total=106 ceiling=87
+```
+
+It committed as `10a495c` and the push came back
+`! [rejected] HEAD -> ticket-89-deny-is-not-a-rung (non-fast-forward)`, because the tip had moved
+to `91bd500` — which I pushed at 03:21Z, about a minute after that run started at 03:20:18Z. This
+is exactly the failure the build brief warns about, in the exact shape it warns about it, and the
+warning was in front of me. The observation is gone and cannot be recovered: the next run measures
+a different tree.
+
+It is worth saying what was lost, because it was the best number this branch has produced:
+`pass=68 fail=6 skip=24 of 106, ceiling 87`. It is quoted here so the work is not invisible, and
+it is NOT a citable line — no run recorded it in `talk/truth.log`, so nothing may cite it.
 
 **Composition** carries the three new policy members and the PriorityClass, read defensively so an
 adopter pinned to a parent tag from before this ticket composes exactly what it composed then.
