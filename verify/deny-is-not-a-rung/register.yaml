@@ -82,7 +82,7 @@ rules:
       principle 1 bans. The measurement behind that reasoning was taken against
       `graded/policies/cage-tier.yaml`, which `graded/up.sh` says in its own header it never
       applies. Re-measured against the served bodies, the same version scoping makes the pair
-      SAFE: the served cage matches claims IN the array, this one claims NOT in it, so the two
+      SAFE: the served cage matches claims IN the array, this one matches claims NOT in it, so the two
       mutations are disjoint and never contend for a field.
       The bottom rung needs no version to select it, so the "missing instrument" defence
       (ADR-0020) does not reach here: a missing instrument refuses to emit a PRICE, it never
@@ -95,9 +95,10 @@ rules:
       - .estate-clone/*/composed/orphan-guard.yaml
       - .estate-clone/*/gitops/composed/composed-set.yaml
     awaits: >-
-      platform branch ticket-89-deny-is-not-a-rung merged to platform main (the two renderers
-      and the ResourceSet template), then a signed platform tag cut by cut-release.yml, then
-      each adopter's Renovate pin bump off platform v2.0.1 and the re-compose it triggers
+      platform branch ticket-89-deny-is-not-a-rung merged to platform main (three renderers,
+      cage_body.py, the ResourceSet template and composition's machinery members), then a
+      signed platform tag cut by cut-release.yml, then each adopter's Renovate pin bump off
+      platform v2.0.1 and the re-compose it triggers
 
   # ---------------------------------------------------------------------------------------
   - rule: governed-namespace-requires-claim
@@ -133,9 +134,10 @@ rules:
       - .estate-clone/platform/distribution/versions.yaml
       - .estate-clone/*/composed/governed-namespace-guard.yaml
     awaits: >-
-      platform branch ticket-89-deny-is-not-a-rung merged to platform main (the two renderers
-      and the ResourceSet template), then a signed platform tag cut by cut-release.yml, then
-      each adopter's Renovate pin bump off platform v2.0.1 and the re-compose it triggers
+      platform branch ticket-89-deny-is-not-a-rung merged to platform main (three renderers,
+      cage_body.py, the ResourceSet template and composition's machinery members), then a
+      signed platform tag cut by cut-release.yml, then each adopter's Renovate pin bump off
+      platform v2.0.1 and the re-compose it triggers
 
   # ---------------------------------------------------------------------------------------
   - rule: posture-trust-boundary
