@@ -33,7 +33,8 @@ Audit-versus-Deny, and four documents carry one sentence between them.
 ### The check that grades it
 
 `verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh`, discovered by `talk/verify-all.sh`
-(101 scripts now, was 100), row in `talk/verify-manifest.txt` as `estate-observation | waits:`
+(106 discovered on this branch, measured by `verify-truth-line.sh` and never typed into a
+check), row in `talk/verify-manifest.txt` as `estate-observation | waits:`
 with both could-not-look reasons declared. It scans the hub and all eight units for Deny-shaped
 rules — `spec.validationActions` carrying `Deny`, and the 2022 `validationFailureAction: enforce`
 — and joins them to `verify/deny-is-not-a-rung/register.yaml`, which records the choice and the
@@ -51,9 +52,11 @@ never a pass.
 The scan is line-based, and that is load-bearing: three of the estate's Denys live inside a
 `ResourceSet`'s `resourcesTemplate` STRING (one per adopter, `gitops/composed/composed-set.yaml`),
 where a `yaml.safe_load_all` walk sees a ResourceSet and no policy at all. A document scan would
-have reported the estate three refusals cleaner than it is. Measured on the day: 29 Deny-shaped rules
-across the hub and the eight units, 8 of them in the two trees the register excludes with a
-reason, 21 on the register -- and all 21 still outstanding.
+have reported the estate three refusals cleaner than it is. Measured 2026-09-05 after the scan was
+widened: 36 Deny-shaped rules across the hub and the eight units, 15 of them inside the four trees
+the register excludes with a reason, 21 on the register -- and all 21 still outstanding. Run
+`--inventory` for the figure on the day you read this rather than trusting these; the register is
+the record of choices, and the scan is what keeps it honest.
 
 ### Item 1 — the inventory, and the choice per rule
 
