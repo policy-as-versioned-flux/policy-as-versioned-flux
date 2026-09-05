@@ -223,7 +223,7 @@ reads the template; the drift is fixed and cannot come back unobserved.
   directly instead: the kind change flows through, and the composed governed-namespace member
   carries no `validationActions` and no `Deny`.
 
-Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; the two machinery guards become six documents that refuse nothing (orphan guard Audit + orphan cage, governed-namespace cage + unclaimed report, bottom-rung netpol, and the unsuffixed cage-isolated PriorityClass without which the Priority plugin would refuse every pod they cage); posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck. Round 1 shipped a real regression — the demotion alone left an orphan claim uncaged, because every served cage-tier is version-scoped — and the review caught it; the fix, the four other blocking findings, three defects found by running the beats, and the scanner's declared blind spots are in the ticket. The 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
+Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; the two machinery guards become six documents that refuse nothing (orphan guard Audit + orphan cage, governed-namespace cage + unclaimed report, bottom-rung netpol, and the unsuffixed cage-isolated PriorityClass without which the Priority plugin would refuse every pod they cage); posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck. Round 1 shipped a real regression — the demotion alone left an orphan claim uncaged, because every served cage-tier is version-scoped — and the review caught it; the fix, the four other blocking findings, and three defects found by RUNNING the beats are in the ticket -- the sharpest being that every served PriorityClass is version-suffixed, so the machinery's own cage named a class no cluster has and would have made every pod it caged inadmissible: a refusal by another name, inside the ticket about refusals by another name, invisible to every static check here and now named in deny_register.BLIND_SPOTS as wanting a ticket of its own. Disjointness is proved from the array. One clock observation (run 92) was lost to origin/main moving under the run, quoted in the ticket from the Actions log and deliberately not written into truth.log. The 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
 
 ### Round 2, 2026-09-05 — the review found five blocking findings and the central one was real
 
@@ -287,14 +287,72 @@ as accounted for. Attribution is bounded to its own document now, backwards then
 stays unseeable is stated: a YAML anchor, a template engine's conditional arm, an action computed
 at admission, and a refusal by another name.
 
-**A fifth defect the review did not name, found by running the beat.** Every served PriorityClass
-is version-suffixed (`cage-isolated-4-0-0`), and these machinery cages belong to no version, so
-the `cage-isolated` they name exists on no cluster — and the Priority admission plugin refuses a
-pod naming a class that does not exist. This ticket's own cage would have made every pod it caged
-inadmissible: a refusal by another name, which is the one thing `verify-deny-is-not-a-rung.sh`
-cannot see. The machinery renders the unsuffixed class, both selfchecks tie the dial's `pc` and
-`prio` to it, and the blind-spot list says plainly that this class of defect is graded by nothing
-and has now bitten the estate twice.
+**A sixth defect the review did not name, found by RUNNING the policy rather than reading it —
+and it is the strongest evidence this build produced.** `distribution/policies/v4.0.0/
+priorityclasses.yaml` ships `cage-baseline-4-0-0`, `cage-restricted-4-0-0`,
+`cage-quarantine-4-0-0` and `cage-isolated-4-0-0`: every one version-suffixed, because the
+version tree is the only thing applied. These machinery cages belong to no version and have no
+suffix to borrow, so the plain `cage-isolated` they named exists on no cluster — and the Priority
+admission plugin rejects a pod naming a PriorityClass that does not exist.
+
+**This ticket's own cage would have made every pod it caged inadmissible. That is a refusal by
+another name, inside the ticket whose whole subject is refusals by another name.** It would have
+passed every check here: `verify-deny-is-not-a-rung.sh` sees no Deny-shaped text in a
+MutatingPolicy, because there is none; the selfchecks compared the body to `cage-tier`'s and it
+matched, because the authoring copy is exactly where the unsuffixed name comes from. Nothing in
+the estate's static surface could have caught it. It surfaced only because the beat ran the two
+bodies together and asserted the served pod's PriorityClass, which came out `cage-quarantine-4-0-0`
+where the assertion expected `cage-quarantine`.
+
+The fix: the machinery renders the unsuffixed class as a sixth document and a composed member,
+and `cage_body.assert_priorityclass_is_rendered()` ties the pinned tier's `pc` and `prio` to it in
+both renderers' selfchecks, so unpinning the tier or renaming the class fails offline instead of
+on a cluster.
+
+**This needs to become someone's ticket.** `deny_register.BLIND_SPOTS` now says a refusal by
+another name is graded by nothing, and names the two instances the estate has produced: ticket 26
+on 2026-08-28 (a `waf-sidecar` appended twice, so every `UPDATE` to a caged pod was rejected) and
+this one on 2026-09-05. Both were found by running a policy; neither was findable by reading one.
+A check that grades it would have to admit a pod through a real API server and observe that it was
+admitted — which is `verify-graded.sh`'s live tail, and that has never had a cluster on a citable
+run (review finding P2-6). Naming the two together is what makes the case; the ticket is not
+written here because charting is not this ticket's, but nothing else in the record puts the two
+instances side by side.
+
+### One observation was lost, and it was not the push I got wrong
+
+I pushed while two `truth` runs were in flight, having read the first rows of `gh run list`
+instead of the `status` column. That was a real rule violation and I own it. It is not, on the
+evidence, what cost an observation, and the record should say which is which.
+
+**An observation WAS lost.** Run 92, on hub commit `c28541e`
+([Actions run 33936905680](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/33936905680)),
+produced this line at 2026-09-05T02:03:57Z and it never reached `talk/truth.log`:
+
+```
+TRUTH 2026-09-05T02:03Z run=92 hub=c28541e units=[driftwood=a1a2a78@main feeds=b6eaa0a@main ico=6217c3a@main insurer=9e90e1b@main ludlow=d092400@main nist=b9f5fff@main platform=bbda376@main tuppence=fca6a58@main] pass=65 [observed=15 self=40 simulated=6 meta=4] fail=13 skip=19 [never=10 waits=9] excluded=8 total=105 ceiling=86
+```
+
+It is quoted here from the Actions log and is deliberately NOT written into `talk/truth.log`: a
+builder does not author a clock's observation, and a line hand-copied into that file would be
+indistinguishable from one the clock landed.
+
+**Why it did not land.** The workflow committed it as `5c75197` and then ran
+`git pull --rebase --autostash origin main`. It rebases onto **origin/main**, not onto the branch
+it is running on. `origin/main` had moved while the run was in flight — ticket 64's merge, the
+`--refresh` fix, and run 94's own `talk/truth.log` entry — so replaying eight branch commits onto
+it conflicted in `talk/truth.log` and in three `talk/captures/*.out` files, and the rebase stopped
+at `error: could not apply 5c75197... truth: record run 92 [skip ci]`.
+
+**So the cause was `origin/main` moving, not my push.** The rebase failed at 02:04:28Z; my next
+push to the branch (`d961091`, the merge of `origin/main`) is 41 minutes later. The two runs my
+pushes DID cancel — on `26eb5ac` and `602cda3` — were cancelled before reaching a TRUTH line, so
+neither produced an observation to lose; their logs contain no `TRUTH` line at all. Checked, not
+assumed.
+
+The remedy is already in this branch by accident: merging `origin/main` in (F10) is what stops a
+branch's rebase conflicting with main's `truth.log`. A branch that sits behind main will keep
+losing observations this way, and that is a property of `truth.yml`, not of this ticket.
 
 **Composition** carries the three new policy members and the PriorityClass, read defensively so an
 adopter pinned to a parent tag from before this ticket composes exactly what it composed then.
@@ -329,9 +387,11 @@ the owner.
 * The hostPath escape (F7) is not closed: an isolated pod can still mount the node filesystem,
   bounded only by the forced `runAsNonRoot`. ADR-0022's own ponytail already carries this for
   `cage-tier`'s population; it needs a price or a volume-level mutation.
-* A refusal by another name is graded by nothing. `deny_register.BLIND_SPOTS` says so on every
-  run. Both instances the estate has produced were found by running a policy, never by reading
-  one, and nothing in this ticket changes that.
+* A refusal by another name is graded by nothing, and this ticket produced the second instance
+  itself. `deny_register.BLIND_SPOTS` says so on every run and names both. **This wants a ticket
+  of its own**, and it is not written here because charting is not this ticket's: the check would
+  have to admit a pod through a real API server and observe that it was admitted, which is
+  `verify-graded.sh`'s live tail, and that has never had a cluster on a citable run (P2-6).
 * No cluster ran the converted policies. `verify-graded.sh`'s live tail is where that is observed,
   and it has never had a cluster on a citable run (review finding P2-6, still open). One thing WAS
   observed on a real API server: `kubectl --context kind-driftwood apply --dry-run=server` accepts
