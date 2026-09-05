@@ -231,7 +231,11 @@ Nothing. Everything here is architecture and is decided under ADR-0025.
 `origin/ticket-64-the-twin-is-three-adopters` (`2545d1a`). The repair is PR 37's: cherry-pick the
 clock's own commit, author preserved, line byte-identical, inserted in date order rather than
 appended, so that the log's last line stays the newest run. `verify-can-record.sh` part 1b turns
-green when all three are in main's log. Also worth folding into `BUILD-BRIEF`: "never push while a
+green when all three are in main's log. **The window closes when the branch is deleted**: the check
+can only see the refs the checkout carries, so deleting any of those three branches destroys the
+commit, turns this red green with the lines still lost, and leaves nothing to rescue. That is the
+one hole this ticket does not close, and it is the reason the fix is to stop the landing rather
+than to detect the loss. Also worth folding into `BUILD-BRIEF`: "never push while a
 `truth` run is `in_progress` on your branch" is no longer needed for the branch case, because a
 branch run now pushes nothing at all.
 

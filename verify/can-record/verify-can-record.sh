@@ -1,22 +1,34 @@
 #!/usr/bin/env bash
 # Beat (eco-system ticket 100): "a run that cannot record its line says so before it measures."
 #
-# `.github/workflows/truth.yml` runs on every push that touches the gate, on whatever branch. On
-# a ticket branch the cage's `git pull --rebase --autostash origin main` replays the branch's own
-# commits onto origin/main with new SHAs, HEAD stops being a descendant of origin/<branch>, and
-# `push origin HEAD:"${GITHUB_REF_NAME}"` is refused non-fast-forward. Run 98 on
-# ticket-89-deny-is-not-a-rung is the recorded negative control -- nobody else pushing, the remote
-# tip unmoved, `Rebasing (12/12)`, `Successfully rebased`, `! [rejected] (non-fast-forward)`. Run
-# 100 on the same branch is the positive one: it landed, because that branch had been REBASED onto
-# main rather than merged, so the rebase replayed nothing. The line was produced, committed and
-# thrown away, and nothing anywhere said so.
+# `.github/workflows/truth.yml` runs on every push that touches the gate, on whatever branch, and
+# until 2026-09-05 it committed and pushed its TRUTH line on all of them. Three ways that went
+# wrong, all observed on ticket-89-deny-is-not-a-rung:
 #
-# WHAT THIS GRADES, in three parts and one instrument.
+#   MODE 1  the cage's `git pull --rebase --autostash origin main` replays the branch's own commits
+#           onto origin/main with new SHAs, HEAD stops being a descendant of origin/<branch>, and
+#           the push is refused. Run 98: nobody else pushing, the remote tip unmoved,
+#           `Rebasing (12/12)`, `Successfully rebased`, `! [rejected] (non-fast-forward)`.
+#   MODE 2  the branch had been REBASED onto main rather than merged, so nothing was replayed and
+#           the push LANDED on the branch (runs 100, 101).
+#   MODE 3  ...and the line was orphaned anyway. Run 101 landed at 14:45Z on a branch merged at
+#           14:42Z, so main's log skipped it although the tree it measured was already on main.
+#           Runs 76, 84 and 88 went the same way and nobody had noticed.
+#
+# So the clock now records on the DEFAULT BRANCH and nowhere else, and says which before it
+# measures. Mode 2 was never a success; it is the precondition for mode 3.
+#
+# WHAT THIS GRADES, in four parts and one instrument.
 #
 #   1. THE RECORD. Every TRUTH line in talk/truth.log is blamed to the commit that introduced it,
 #      and a line naming a run number must come from the clock's own commit whose message names
 #      the SAME run. A hand-written line is named. One historical `run=local` line is
 #      grandfathered by count (see can_record.py); a second fails.
+#  1b. THE STRANDED LINE (mode 3). Every clock commit in this checkout that is not on the default
+#      branch is graded by its LINE, not by its commit: a line whose `hub=` tree is reachable from
+#      the default branch was a citable observation, so its absence from that log is a FAIL; a
+#      line whose tree never reached it describes a state the citable history never had, so its
+#      absence is correct and it is a note.
 #   2. THE SHAPE. truth.yml still carries the guard, before the measurement, with the record step
 #      and the cage consulting it, still pushing the one refspec it is allowed to push and no
 #      force push anywhere.
@@ -26,14 +38,24 @@
 #      and runs it over two throwaway git repositories in five states: on main at the tip, on main
 #      behind the tip, on a branch rebased onto main, on a branch carrying a merge of main, and on
 #      a branch behind main. In each state it runs the cage TWICE: once with CAN_RECORD forced to
-#      `yes`, to observe what the push actually does to the remote ref, and once for real. The
-#      test is that the guard's verdict EQUALS that observation, every time. The served artefact
-#      is the remote branch ref; the operation that reaches it is the push; nothing here is
-#      inferred from a file existing or from what the YAML looks like it means.
+#      `yes`, to observe what the push actually does to the remote ref, and once for real. A run
+#      that says it CAN record is never wrong about the push; a run that says it cannot has its
+#      state classified by what the forced run did -- mode 1 if the push was refused, mode 2 if it
+#      landed, and then mode 3 by merging the tip an integrator would have reviewed and reading
+#      main's own talk/truth.log, which does not carry the line. The served artefact is the remote
+#      branch ref and main's log; the operation that reaches them is the push and the merge;
+#      nothing here is inferred from a file existing or from what the YAML looks like it means.
 #
 #      Everything the fixture writes lives under a mktemp directory and is deleted. It never
 #      touches this repository's talk/truth.log, and the TRUTH-shaped line it plants is dated
 #      1970 with a zero hub sha so that no reader could mistake one for an observation.
+#
+#      TWO LIMITS OF THE FIXTURE, named rather than left to be discovered. It does not grade the
+#      SIGNATURE: `commit.gpgsign` is substituted to false because there is no Fulcio to reach off
+#      the runner, and a stub signer would be a faked signature inside a check about not faking
+#      observations. Signing is unchanged by ticket 100 and is ADR-0024 point 4's. And it grades
+#      the shell of three named steps, not the whole job: a change made in a fourth step, or in
+#      the job's `if:`, is invisible here and is part 2's business.
 #
 #   PASS (exit 0)  the log, the shape and the mechanism all hold
 #   FAIL (exit 1)  one of them does not, named
@@ -215,7 +237,7 @@ grade_case() {
   build_case "$d/real"  "$kase" || return 1
 
   # The control: force the guard's answer to `yes` and watch what the push does to the remote ref.
-  read -r _ prc pb pa phb _ _ _ _ < <(run_steps "$d/probe" "$ref" yes)
+  read -r _ _ pb pa phb _ _ _ _ < <(run_steps "$d/probe" "$ref" yes)
   local landed=no; [ "$pb" != "$pa" ] && landed=yes
 
   # The real run: the guard decides.
@@ -304,7 +326,7 @@ else
   grep -q 'shallow' "$d/shallow.out" && ok "a shallow checkout: refused, and named as shallow" \
     || { note "the guard failed in a shallow checkout without naming shallowness"; cat "$d/shallow.out"; }
 fi
-if ( cd "$d/work" && GITHUB_REF_NAME=main GITHUB_ENV="$d/env2" DEFAULT_BRANCH= \
+if ( cd "$d/work" && GITHUB_REF_NAME=main GITHUB_ENV="$d/env2" DEFAULT_BRANCH='' \
      bash "$T/guard.sh" ) >"$d/nodefault.out" 2>&1; then
   note "the guard answered with no default branch name, which means it guessed one"
 else

@@ -187,7 +187,7 @@ jobs:
                  "that guesses is worse than no guard."
             exit 1
           fi
-          if [ -z "${DEFAULT_BRANCH}" ]; then
+          if [ -z "${DEFAULT_BRANCH:-}" ]; then
             echo "::error::github.event.repository.default_branch is empty, so this step cannot"\
                  "tell whether it is on the branch whose log is citable. It does not guess 'main'."
             exit 1

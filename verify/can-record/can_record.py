@@ -314,10 +314,13 @@ def stranded_entries(root: Path) -> tuple[list[Stranded], list[str]]:
         ref = next((r for r in containing if r != main_ref), "(no ref)")
         for line in added:
             hub = re.search(r"\bhub=([0-9a-f]+)", line)
-            on_main = bool(hub) and subprocess.run(
-                ["git", "-C", str(root), "merge-base", "--is-ancestor",
-                 hub.group(1), main_ref] if hub else ["false"],
-                capture_output=True).returncode == 0
+            # A line with no readable `hub=` measured a tree nobody can locate, so it is treated
+            # as not on the default branch and reported as a note rather than a loss.
+            on_main = False
+            if hub:
+                on_main = subprocess.run(
+                    ["git", "-C", str(root), "merge-base", "--is-ancestor",
+                     hub.group(1), main_ref], capture_output=True).returncode == 0
             entries.append(Stranded(commit=commit[:7], ref=ref, line=line,
                                     in_main_log=line in main_log, tree_on_main=on_main))
     return entries, refs
