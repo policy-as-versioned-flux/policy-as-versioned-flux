@@ -232,8 +232,8 @@ def grade(findings: list[Finding], register: dict, source_text: dict[str, str]) 
         if state == "converted":
             if mine:
                 failures.append(
-                    f"{name}: the register says converted, but {len(mine)} copy(ies) still carry "
-                    f"it -- first at {mine[0].path}:{mine[0].line}")
+                    f"{name}: the register says converted, but {len(mine)} copy/copies still "
+                    f"carry it -- first at {mine[0].path}:{mine[0].line}")
             continue
 
         # waiting or converted-at-source: copies may remain, and the row must say what they
@@ -279,9 +279,11 @@ def grade(findings: list[Finding], register: dict, source_text: dict[str, str]) 
             outstanding.append((rule, mine))
 
     if failures:
+        # The count is of PROBLEMS, not of rules: one row can raise several, and a line that
+        # said "N rules" would be a miscount of exactly the kind this check exists to catch.
         return Verdict("FAIL",
-                       f"FAIL: {len(failures)} Deny-shaped rule(s) the register does not "
-                       f"honestly account for (eco-system ticket 89)",
+                       f"FAIL: {len(failures)} problem(s) -- the register does not honestly "
+                       f"account for the Deny-shaped rules this estate carries (ticket 89)",
                        failures, len(outstanding))
     if outstanding:
         def plural(n: int) -> str:
