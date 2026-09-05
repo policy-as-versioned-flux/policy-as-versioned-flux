@@ -277,10 +277,29 @@ that a rewritten entry cites stay as the record of the decision at the time.
   (ADR-0020): the pass refuses and re-cages nothing, because an empty supported set would read the
   whole estate as stale. Ticket 13 item 2 retired it on a homonym — "ticket 07's fx feed replaces
   it", where that **currency** is money and this one is version currency — and ticket 75 Q13
-  withdrew the retirement. Graded by
-  `.estate-clone/platform/currency-controller/verify-currency.sh`, whose offline half derives the
-  seam from the shipped policy bodies and whose live half is a named could-not-look until a cluster
-  carries both the instrument and a stale pod.
+  withdrew the retirement.
+
+  **Its precondition, which is part of the term.** The re-cage patch removes the pod's **claim**,
+  and every *served* copy of the reach-generating policy is gated on that claim. So a re-caged pod
+  **cannot generate its own reach cage**: it can only be *selected* by a `cage-reach-isolated` the
+  namespace **already carries**, generated when some pod claiming a currently-served version was
+  admitted there above `baseline`. **In a namespace with none, the re-cage writes `isolated` as a
+  label and changes nothing the pod can reach** — which is the state of `tuppence-reset` on the
+  demo cluster today. Closing that is a separate question this mechanism does not own.
+
+  **What it costs.** Tighten-only holds, and two things are softer afterwards. `infra` is a
+  platform *role declaration* on a Namespace, not a rung, so a pod carrying it reads as unknown and
+  is **overwritten** with the bottom rung rather than moved along the ladder. And the re-caged pod
+  is outside the scope of the cage mutation, the **orphan guard** and the served reach policy
+  alike, so its rung is held by a label no admission will ever re-assert; a claiming pod's rung is
+  re-clobbered from its Namespace on every update, this one's is not, and what still holds it is
+  RBAC — a workload cannot patch its own pod.
+
+  Graded by `.estate-clone/platform/currency-controller/verify-currency.sh`, whose offline half
+  derives the seam from the bodies the estate actually **serves** (never from the authoring copies
+  under `graded/`, which no Kustomization serves and which lack the version gate that decides this)
+  and whose live half is a named could-not-look until a cluster carries the instrument, a stale pod
+  and a reach cage in that pod's namespace.
 
 - **De-postured** (superseded 2026-09-05 by the **Currency controller** entry above; kept because
   ADR-0014 and the shipped `posture-trust-boundary` policy still use the word) — The state of a
