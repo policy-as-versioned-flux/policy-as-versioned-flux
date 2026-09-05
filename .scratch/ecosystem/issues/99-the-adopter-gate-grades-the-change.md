@@ -1,7 +1,7 @@
 # 99 — The adopter gate grades the change, not the window
 
 Type: task (AFK)
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -90,3 +90,125 @@ found the same way: by one of them going red for a fortnight.
 **2026-09-05.** An earlier record of mine said the pin revealed the major and that the fix "found
 the defect". That was wrong in both halves and is corrected in ticket 62. The pin is a real
 improvement and it is not the cause of this red.
+
+## Answer
+
+Built 2026-09-05. Three things, in the order the ticket asks for them.
+
+**1. tuppence's fold is the delta.** `.github/scripts/adopter-gate.py`'s `compose()` now folds
+`added = new_window - old_window` and `retired = old_window - new_window`, exactly the shape
+driftwood (`compose(added, retired, ...)`) and ludlow (`compose(retired, changed, ...)`) already
+had. The summary it writes carries `added` beside `retired`, and the composed line names what the
+pull request moves as well as the window at the head. `render-evidence-comment.py` renders a
+bump that moves nothing as moving nothing instead of an empty section.
+
+*Not an override (ADR-0011's "No override").* Nothing is exempted and no refusal is weakened for
+any named subject: a composed major still refuses (`adopter-gate.py:593` is untouched in that
+respect), a retirement is still a forced major, and an added version's evidence is still verified
+against tuppence's own identity constant with real cosign and re-read rather than recomputed. The
+gate answers the question ADR-0011 asks it. ADR-0011 carries a dated note recording the reading.
+
+**2. The property becomes a standing report.** `verify/unreviewed-major/verify-unreviewed-major-in-window.sh`
+(+ `unreviewed_major.py`) names every major standing in an adopter's composed window, on every
+truth-surface run, on a day nobody opens a pull request. It records no review and invents none: it
+says what is CARRIED, which it observed, and never what was or was not reviewed, which it cannot
+see. Its first real run names all THREE adopters carrying policy 4.0.0 -- a fact the estate had
+nowhere before, because driftwood and ludlow were green and silent about it.
+
+**3. A check that the three folds agree.** `verify/fold-agreement/verify-fold-agreement.sh`
+(+ `fold_agreement.py`) plants four movements of a composed window (standing, arrival, quiet
+arrival, retirement) and runs all three adopters' own committed gate scripts over them, each
+through the flag shape its own `shift-left.yml` spells -- the flags are read out of that workflow's
+`adopter gate` step and only the values are substituted, so an argument the workflow grows that the
+grader has no planted value for stops the run rather than being dropped.
+
+### What was measured against what
+
+| | served artefact | operation that reaches it |
+|---|---|---|
+| the fold | each adopter's committed `.github/scripts/adopter-gate.py` (`adopter_gate.py` in ludlow) | that repository's own `shift-left.yml` `adopter gate` step, its flags read from the workflow |
+| the window | each adopter's `composed/evidence.json` at the commit it SERVES (`git show HEAD:`) | the same read its own gate makes with `--head-ref` |
+| the bump | platform's `computed-semver/evidence/<v>.json` + bundle AT THE TAG THAT ADOPTER PINS | real `cosign verify-blob`, offline, under the identity constant that repository itself holds |
+
+No proxy is used anywhere: not platform's `main` (the pin's tag is read per adopter), not a
+working-tree copy (every read is `git show` of a served commit or tag), not a file's existence (a
+bump is reported only from evidence that really verified in this run), and not a record's prose.
+
+### Decisions
+
+1. **The delta fold is the estate's reading; tuppence changes** -- `owner-instructed` in effect,
+   since the ticket records it under "The decision" before the build began, and the build executed
+   it rather than re-arguing it. The reasons stand in the ticket and are now in ADR-0011.
+2. **The standing report is a verify script in the hub gate, not a field in anyone's evidence**
+   (`delegated`, ADR-0025). A field would have to be written by something, and the only honest
+   writer of "this major is accepted" is the owner; a check that READS is not the same object as a
+   record that CLAIMS. A hub check also sees all three adopters at once, which is where the
+   comparison lives.
+3. **The report grades what is CARRIED, not what is "unreviewed"** (`delegated`). Claiming a review
+   is absent would require a place where one would be recorded, and inventing that place is exactly
+   what the ticket forbids. So the sentence graded is "no adopter carries a policy version whose
+   publisher-signed evidence computes major", which this run can and does observe, and the line says
+   who can dispose of it (the owner, ADR-0025). Named limit: if the owner later authorises a
+   carried major, this check gains an input; until such a record exists it has none.
+4. **The agreement check compares a gate that refused without stating a composed bump, rather than
+   excusing it** (`delegated`). Its exit code is what its own required check grades, so it has
+   answered; only a gate that could not be invoked at all is unknown. This is what surfaced the
+   ludlow finding below.
+5. **The agreement check is classed `estate-observation`, not `simulation`** (`delegated`). Its
+   material is planted, but its verdict turns entirely on the content of three other parties'
+   committed gates and workflows and changes the day one of them changes.
+6. **ludlow's cosign defect is reported, not fixed here** (`delegated`). Choosing how ludlow
+   verifies a legacy-format bundle offline without falling back to a live TUF fetch is an
+   architectural call in ludlow's repository, exactly the kind ticket 64 correctly declined to make
+   in tuppence. It gets its own ticket.
+
+### What this found that nobody had
+
+`verify-fold-agreement.sh`'s first run named a second, previously invisible divergence.
+**ludlow's gate cannot verify platform's real published evidence with the cosign version it pins.**
+Its `verify_evidence()` passes `--trusted-root` with `--new-bundle-format=true`, and cosign v3.1.3
+-- the version ludlow's own `shift-left.yml` installs by checksum -- answers
+`Error: --trusted-root only supported with --new-bundle-format` and exits 1; platform's committed
+bundles are the legacy shape (`base64Signature`/`cert`/`rekorBundle`), not the new Sigstore bundle
+that flag declares. Observed directly against the real binary and the real bundle, not read out of
+the code.
+
+It is LATENT, not currently firing: `diff_versions()` only classifies a version "changed" when the
+composed member set changes, so ludlow's gate reaches `verify_evidence()` for the first time on the
+next real policy adoption -- and refuses it. Its own `verify-adopter-gate.sh` never caught this
+because it fabricates bundles and stubs cosign; nothing in the estate had run ludlow's gate against
+a real signature until this check did.
+
+### How it is graded
+
+* `verify/fold-agreement/verify-fold-agreement.sh` -- the three folds, on four planted movements.
+* `verify/unreviewed-major/verify-unreviewed-major-in-window.sh` -- the standing report.
+* `tuppence/.github/scripts/adopter-gate.py --selfcheck` -- the three delta cases, red first.
+* `tuppence/scripts/verify-adopter-gate.sh` -- Scenario A (a bump that moves nothing composes none
+  and passes), new Scenario A2 (an arrival composes by re-reading the publisher's own real signed
+  evidence), Scenario B (a retirement still refuses), Scenario F (an untouched pin reads no
+  standing version's evidence at all).
+* `tests/test_fold_agreement.py`, `tests/test_unreviewed_major.py` -- the pure seams, red first.
+
+Both new hub checks are RED in the estate as it stands, and both reds are real: three adopters
+carry an unauthorised major, and ludlow's gate answers two planted movements differently from the
+other two. Neither red is cleared by anything this ticket could honestly write.
+
+## Waits on the owner
+
+1. **Whether platform policy 4.0.0's major is accepted for driftwood, for ludlow and for tuppence.**
+   An authorisation, ADR-0025, one per institution. Until it is made (or the version leaves a
+   window), `verify-unreviewed-major-in-window.sh` names that institution on every run. This ticket
+   deliberately records no review and invents no place to record one; if the owner wants the
+   acceptance to be recordable, the shape of that record is the owner's call and this check gains
+   an input from it.
+2. Nothing else. The hub branch and the tuppence branch are pushed, and `twin/ENACT_MODE` is
+   `development`, so no push waits on the owner.
+
+Map line: Ticket 99 (2026-09-05): the adopter gate grades what a pull request MOVES, not the window
+it leaves standing -- tuppence's fold now matches driftwood's and ludlow's, ADR-0011 records the
+reading, the property it was protecting is a standing truth-surface report
+(`verify-unreviewed-major-in-window.sh`, naming all three adopters' carried 4.0.0 major), and
+`verify-fold-agreement.sh` runs all three real gates over four planted movements and refuses the
+day two of them diverge -- which it did on its first run, finding that ludlow's gate cannot verify a
+real bundle with the cosign it pins.
