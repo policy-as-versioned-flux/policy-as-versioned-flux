@@ -1,0 +1,31 @@
+# The governed Namespace manifest -- the SHARED declaration, one artefact.
+#
+# Rendered ONCE PER INSTITUTION (render.py). Every line is identical across
+# driftwood and ludlow EXCEPT `posture.acme.io/tier` and the org name, and the
+# tier is NOT hand-authored: render.py stamps it from
+# platform/graded/cage.py's `select_tier`, which reads the FAIR uncaged residual
+# for the shared scenario against the institution's OWN SIGNED appetite band
+# (`appetite.tolerance` on its party.yaml, ADR-0021).
+#
+# ADR-0022 moved the declaration here: the tier is declared on the governed
+# Namespace and the shared `cage-tier` MutatingPolicy renders it onto every pod
+# in the namespace at admission. The pod label is an OUTPUT, clobbered every
+# time. So this file is the whole of what differs between the two institutions --
+# there is no per-institution policy body at all.
+#
+# Eco-system ticket 89: until 2026-09-05 this directory rendered a per-institution
+# ValidatingPolicy whose `validationActions` was Audit for driftwood and Deny for
+# ludlow. Deny is not a rung. The £ selects a rung, and the rung is declared here.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: proportionality-driftwood
+  labels:
+    app.kubernetes.io/part-of: driftwood
+    # The governance boundary: every pod created in here is caged at the tier
+    # below, and a pod that claims nothing is caged too (eco-system ticket 89).
+    policy-as-versioned.dev/governed: "true"
+    # The proportionality lever. Stamped from the £ by render.py, never by hand.
+    posture.acme.io/tier: baseline
+    # Provenance of the rung: which institution's signed band selected it.
+    policy-as-versioned.dev/proportionality-org: driftwood
