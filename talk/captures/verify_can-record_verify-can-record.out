@@ -1,0 +1,69 @@
+[1;36m==>[0m 0. the pure half grades planted data as documented
+  ok   selfcheck: a hand-written line, a line whose run number disagrees with its commit, a second run=local line, a run that is neither a number nor `local`, a citable line stranded off the default branch, and an unknown step name each fail as documented; a rescued line and one whose measured tree never reached the default branch are notes, not faults
+[1;36m==>[0m 1. every TRUTH line in talk/truth.log was ADDED by a run that could record it
+  ok   40 recorded TRUTH line(s), each ADDED by the clock commit whose message names the same run; 1 declared run=local line(s)
+[1;36m==>[0m 1b. no citable TRUTH line is stranded on a branch that merged without it
+  --   TRUTH 2026-09-05T14:45Z run=101: committed on origin/ticket-89-deny-is-not-a-rung and its line is in the default branch's log (commit f8968f6 was rescued, or the branch merged with it)
+  --   TRUTH 2026-09-05T01:20Z run=88: committed on origin/ticket-64-the-twin-is-three-adopters and its line is in the default branch's log (commit 2545d1a was rescued, or the branch merged with it)
+  --   TRUTH 2026-09-04T20:35Z run=84: committed on origin/ticket-62-and-77-pins-are-checked-for-content and its line is in the default branch's log (commit fd0722f was rescued, or the branch merged with it)
+  --   TRUTH 2026-09-04T16:34Z run=76: committed on origin/ticket-56-and-85-the-clocks-are-graded and its line is in the default branch's log (commit 7335de8 was rescued, or the branch merged with it)
+  ok   no clock line is stranded off the default branch, among the 41 other ref(s) this checkout carries (a branch already deleted cannot be looked at from here)
+[1;36m==>[0m 2. truth.yml still has the shape ticket 100 decided
+  ok   the guard runs before the gate, the record step and the cage both consult it, and the one push is HEAD:${GITHUB_REF_NAME} with no force anywhere
+[1;36m==>[0m 3. the workflow's own shell, over two throwaway repositories, in six states
+  (cage) note: git config commit.gpgsign true -> git config commit.gpgsign false
+  (cage) note: base64 -w0 -> base64 | tr -d '\n'
+  ok   lifted the guard, the record step and the cage verbatim out of truth.yml
+  main-at-tip        guard=yes  forced-push-landed=yes  real: pushed=yes appended=yes head-moved=yes
+  ok   main-at-tip: the guard said 'yes'
+  ok   main-at-tip: the run printed its TRUTH line for a reader to quote
+  ok   main-at-tip: the line was appended to talk/truth.log
+  ok   main-at-tip: the remote ref main carries the run's commit
+  ok   main-at-tip: the line is readable on the remote ref, which is the artefact a reader cites
+  ok   main-at-tip: the guard said so before the gate ran
+  main-behind        guard=yes  forced-push-landed=yes  real: pushed=yes appended=yes head-moved=yes
+  ok   main-behind: the guard said 'yes'
+  ok   main-behind: the run printed its TRUTH line for a reader to quote
+  ok   main-behind: the line was appended to talk/truth.log
+  ok   main-behind: the remote ref main carries the run's commit
+  ok   main-behind: the line is readable on the remote ref, which is the artefact a reader cites
+  ok   main-behind: the guard said so before the gate ran
+  branch-rebased     guard=no   forced-push-landed=yes  real: pushed=no appended=no head-moved=no
+  ok   branch-rebased: the guard said 'no'
+  ok   branch-rebased: the run printed its TRUTH line for a reader to quote
+  ok   branch-rebased: nothing was appended to talk/truth.log
+  ok   branch-rebased: no commit was made and thrown away (HEAD is where it was)
+  ok   branch-rebased: the cage exited 0 -- a run that cannot record is not a red
+  ok   branch-rebased: the guard said so in as many words, before the gate ran
+  ok   branch-rebased: mode 2 reproduced -- a forced run's push LANDED on feature (run 100's shape)
+  ok   branch-rebased: mode 3 reproduced -- after the branch merged without that commit, main's talk/truth.log does NOT carry the line, and the observation is stranded on feature (run 101's shape)
+  branch-with-merge  guard=no   forced-push-landed=no  real: pushed=no appended=no head-moved=no
+  ok   branch-with-merge: the guard said 'no'
+  ok   branch-with-merge: the run printed its TRUTH line for a reader to quote
+  ok   branch-with-merge: nothing was appended to talk/truth.log
+  ok   branch-with-merge: no commit was made and thrown away (HEAD is where it was)
+  ok   branch-with-merge: the cage exited 0 -- a run that cannot record is not a red
+  ok   branch-with-merge: the guard said so in as many words, before the gate ran
+  ok   branch-with-merge: mode 1 reproduced -- a forced run committed, rebased, and had its push refused non-fast-forward (run 98's shape)
+  branch-behind      guard=no   forced-push-landed=no  real: pushed=no appended=no head-moved=no
+  ok   branch-behind: the guard said 'no'
+  ok   branch-behind: the run printed its TRUTH line for a reader to quote
+  ok   branch-behind: nothing was appended to talk/truth.log
+  ok   branch-behind: no commit was made and thrown away (HEAD is where it was)
+  ok   branch-behind: the cage exited 0 -- a run that cannot record is not a red
+  ok   branch-behind: the guard said so in as many words, before the gate ran
+  ok   branch-behind: mode 1 reproduced -- a forced run committed, rebased, and had its push refused non-fast-forward (run 98's shape)
+branch 'trunk' set up to track 'origin/trunk'.
+branch 'trunk' set up to track 'origin/trunk'.
+  renamed-default    guard=yes  forced-push-landed=yes  real: pushed=yes appended=yes head-moved=yes
+  ok   renamed-default: the guard said 'yes'
+  ok   renamed-default: the run printed its TRUTH line for a reader to quote
+  ok   renamed-default: the line was appended to talk/truth.log
+  ok   renamed-default: the remote ref trunk carries the run's commit
+  ok   renamed-default: the line is readable on the remote ref, which is the artefact a reader cites
+  ok   renamed-default: the guard said so before the gate ran
+[1;36m==>[0m 4. the guard refuses where it cannot know, rather than guessing
+  ok   a shallow checkout: refused, and named as shallow
+  ok   an empty default branch name: refused, rather than assuming 'main'
+
+PASS: every recorded TRUTH line was ADDED by a clock commit naming the same run; truth.yml's guard runs before the gate, the record step and the cage consult it, and the one push is HEAD:${GITHUB_REF_NAME} with no force anywhere; and the workflow's own shell, run over two throwaway repositories in six states, records exactly when its guard said it could and commits nothing when it said it could not

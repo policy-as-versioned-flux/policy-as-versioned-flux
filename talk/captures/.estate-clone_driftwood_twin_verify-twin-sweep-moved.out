@@ -1,6 +1,6 @@
-PASS: the sweep step under `bash -e` on a fresh copy exits 0 and writes moved=false, swept_at=2026-09-05T17:30:40Z
-PASS: the sweep step under `bash -e` on a stale feed exits 0 and writes moved=true, swept_at=2026-09-05T17:30:41Z
-PASS: the sweep step under `bash -e` on a stale signal lookup exits 0 and writes moved=true, swept_at=2026-09-05T17:30:41Z
+PASS: the sweep step under `bash -e` on a fresh copy exits 0 and writes moved=false, swept_at=2026-09-05T19:49:10Z
+PASS: the sweep step under `bash -e` on a stale feed exits 0 and writes moved=true, swept_at=2026-09-05T19:49:10Z
+PASS: the sweep step under `bash -e` on a stale signal lookup exits 0 and writes moved=true, swept_at=2026-09-05T19:49:11Z
 SKIP: the moved path has not fired live yet: observations/twin-sweep.jsonl carries no line with "moved": true (the step is proven offline above; the live firing is the half only the clock can supply, once the overlay or a pin moves under it)
 TOTAL: 3 pass, 0 fail, 1 could-not-look
 SKIP: the moved path has not fired live yet: observations/twin-sweep.jsonl carries no line with "moved": true (the step is proven offline above; the live firing is the half only the clock can supply, once the overlay or a pin moves under it)

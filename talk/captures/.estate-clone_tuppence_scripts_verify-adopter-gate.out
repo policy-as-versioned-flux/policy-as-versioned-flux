@@ -18,7 +18,7 @@ ok  D2: real cosign verify-blob genuinely rejects a present-but-malformed bundle
 FAIL: composed bump is major -- refusing to adopt v2.0.1 without human review
 ok  platform checked out at v2.0.1, resolved commit matches the pinned commit field (533dccb0a823001b396fd60ab08014bf75065a37)
 declared (platform tag (none) -> v2.0.1): no predecessor
-composed (this institution, across ['4.0.0'] and retired []): major
+composed (this institution, over what this pull request moves -- added ['4.0.0'], retired []; window at the head is ['4.0.0']): major
    E: the real state composes a major, so the gate refuses for human review -- that is the designed answer, and every element below still had to verify
 ok  E: real cosign verify-blob ACCEPTED platform's real committed evidence for 4.0.0
 ok  E: the gate PASSES against the real, currently-committed platform-pin.yaml -- real checkout at v2.0.1, commit verification, real identity constants, real cosign signature verification
@@ -32,8 +32,11 @@ ok  E2: the same real bundle that just verified is refused by the real binary wh
 
 == Scenario F: old_tag == new_tag -- the ordinary PR that never touches gitops/platform/platform-pin.yaml at all ==
 ok  platform checked out at v1.0.0, resolved commit matches the pinned commit field (e34ae7f5d38feede2c30ef45037ec9af0d3f43b3)
-REFUSED: no signed evidence committed for policy version 2.0.0 at computed-semver/evidence/2.0.0.json -- the institution cannot trust an unverified bump
-ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none'), never refuses as 'does not move forward'; the real refusal that does fire is the genuine missing-evidence one, unrelated to the same-tag bug
+declared (platform tag v1.0.0 -> v1.0.0): none
+composed (this institution, over what this pull request moves -- added [], retired []; window at the head is ['2.0.0', '3.0.0']): none
+this pull request adds and retires no policy version, so it composes 'none' -- whether a major already stands in the window is reported continuously by the hub's verify-unreviewed-major-in-window.sh, not by this gate (eco-system ticket 99)
+PASS: composed bump 'none' does not exceed major; v1.0.0 may be adopted
+ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none'), never refuses as 'does not move forward', and composes 'none' without reading evidence for a version it does not move
 
 == Scenario A/B setup: one real gated release, plus two real array-level releases (unchanged, then retired) ==
   setup: tagged policy/v1.0.0 in the throwaway clone (the real repo waits on CI to sign it)
@@ -43,7 +46,7 @@ ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none')
   setup: tagged policy/v4.0.0 in the throwaway clone (the real repo waits on CI to sign it)
   setup: tagged policy/v5.0.0 in the throwaway clone (the real repo waits on CI to sign it)
 ok  'v2.0.0' is not a policy tag -- not this gate's subject, skipped
-signed: /tmp/tmp.1NNtFwVVww/clone/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.CdLkyxhaSf/clone/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -53,7 +56,7 @@ signed: /tmp/tmp.1NNtFwVVww/clone/computed-semver/evidence/9.0.0.json.bundle
 GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
 GATE: passed for policy/v9.0.0
 committed: signed release-gate evidence for v2.0.0, policy/v9.0.0
-committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit e5940837a9e129b21f432e6ea2fc0e5385cd2a82
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 42a654374833c892888ee698d82fa0321063bccb
 tagged v2.0.0
 tagged policy/v9.0.0
 ok  'v3.0.0' is not a policy tag -- not this gate's subject, skipped
@@ -61,23 +64,34 @@ no policy tags in this dispatch -- the gate's subject is distribution/versions.y
 no evidence changes to commit (no policy tags in this dispatch)
 no policy tags in this dispatch -- no versions.yaml element to point at the evidence commit
 tagged v3.0.0
-ok  one real gated release (9.0.0, real evidence), plus two real array-level releases (unchanged, then retired), real tags v2.0.0/v2.1.0/v3.0.0
+ok  one real gated release (9.0.0, real evidence), plus three real array-level releases (unchanged, retired, returned), real tags v2.0.0/v2.1.0/v3.0.0/v4.0.0
 
-== Scenario A: real PASS -- array unchanged (v2.0.0 -> v2.1.0), composed re-reads 9.0.0's real committed evidence, weaker-than-declared note fires ==
-ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (f479ac5b5637a0319a8679523ebc09aa1585b016)
+== Scenario A: real PASS -- the pin moves (v2.0.0 -> v2.1.0) and the array does not, so this bump adds and retires nothing and composes 'none' (eco-system ticket 99) ==
+ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (405426544e0210abcf24462d7fab4a7aa42b29ce)
 declared (platform tag v2.0.0 -> v2.1.0): minor
-composed (this institution, across ['9.0.0'] and retired []): patch
-NOTE: composed bump ('patch') is weaker than the publisher's tag ('minor') -- informational only, this institution's obligation is never lowered by a local view
-PASS: composed bump 'patch' does not exceed major; v2.1.0 may be adopted
-ok  A: composed by RE-READING 9.0.0's real committed evidence (never recomputed), no retirement, real PASS
-  A-render: render-evidence-comment.py against this REAL summary (not the fixture its own selfcheck uses)
-ok  A-render: rendered a real evidence summary to markdown, no percentage anywhere
+composed (this institution, over what this pull request moves -- added [], retired []; window at the head is ['9.0.0']): none
+this pull request adds and retires no policy version, so it composes 'none' -- whether a major already stands in the window is reported continuously by the hub's verify-unreviewed-major-in-window.sh, not by this gate (eco-system ticket 99)
+NOTE: composed bump ('none') is weaker than the publisher's tag ('minor') -- informational only, this institution's obligation is never lowered by a local view
+PASS: composed bump 'none' does not exceed major; v2.1.0 may be adopted
+ok  A: a bump that adds and retires nothing composes none and passes, folding no standing version
+
+== Scenario A2: real PASS -- 9.0.0 ARRIVES in the array (v3.0.0 -> v4.0.0), and the arrival's bump is RE-READ out of the publisher's own real committed evidence, never recomputed ==
+ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (6f7b62a5c68ffc5478f360230bbc9f9cda66893f)
+declared (platform tag v3.0.0 -> v4.0.0): major
+composed (this institution, over what this pull request moves -- added ['9.0.0'], retired []; window at the head is ['9.0.0']): patch
+NOTE: composed bump ('patch') is weaker than the publisher's tag ('major') -- informational only, this institution's obligation is never lowered by a local view
+PASS: composed bump 'patch' does not exceed major; v4.0.0 may be adopted
+ok  A2: composed by RE-READING 9.0.0's real committed evidence (never recomputed) on the bump that adds it, real PASS
+  A2-render: render-evidence-comment.py against this REAL summary (not the fixture its own selfcheck uses)
+ok  A2-render: rendered a real evidence summary to markdown, no percentage anywhere
+  A-render: the no-movement summary renders as no movement, with no empty element list left silent
+ok  A-render: a no-movement bump renders as no movement, no percentage anywhere
 
 == Scenario B: real FAIL -- 9.0.0 retires with nothing replacing it, composed forced major ==
 FAIL: composed bump is major -- refusing to adopt v3.0.0 without human review
-ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (c3f48ca378bb3aaa4682c64048b43c3d6748dcdd)
+ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (ea1ae9f64da29a96621027154767771ffb931586)
 declared (platform tag v2.1.0 -> v3.0.0): major
-composed (this institution, across [] and retired ['9.0.0']): major
+composed (this institution, over what this pull request moves -- added [], retired ['9.0.0']; window at the head is []): major
 RETIRED, reaching this institution as major: 9.0.0
 ok  B: real refusal -- a composed major fails the required check for real (non-zero exit), retirement named, nothing silent
 
@@ -87,8 +101,9 @@ binary, real subprocess, real exit code -- when signed evidence is entirely miss
 currently-tagged v1.0.0, which honestly predates cs-27), when a present bundle is malformed,
 and when a real bundle's real certificate identity is not the publisher this institution pins.
 Against the REAL committed platform-pin.yaml, and against the two-document stream it forms with
-cosign really ACCEPTS platform's real committed evidence: the gate passes unskipped. On real
-committed evidence it composes across real multi-version content with no
-retirement to a real PASS (printing, never downgrading, when composed is weaker than the
-publisher's own tag), and forces a real non-zero-exit FAIL, naming the version, when a composed
-bump goes major on a real retirement.
+cosign really ACCEPTS platform's real committed evidence: the gate passes unskipped. It grades
+what the bump MOVES (eco-system ticket 99): a bump that adds and retires no policy version
+composes 'none' and passes without reading a standing version's evidence at all, an arrival
+composes by RE-READING that version's own real committed evidence (never recomputed), and a
+retirement still forces a real non-zero-exit FAIL naming the version. The weaker-than-declared
+note prints and never downgrades.
