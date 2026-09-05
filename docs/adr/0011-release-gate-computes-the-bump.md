@@ -107,6 +107,16 @@ any subject: a composed major still refuses, a retirement is still a forced majo
 version's own signed evidence is still verified against the institution's own held identity and
 re-read rather than recomputed. The gate is pointed at the question this ADR asks it.
 
+**What the reading gives up, named.** A version standing at both ends of a pull request is not
+folded, so on that pull request nothing re-verifies its signature. Measured, not argued: with
+platform's `4.0.0.json.bundle` corrupted at a fresh tag and both folds run over identical inputs,
+the window fold refuses on a real cosign failure and the delta fold adopts. driftwood and ludlow
+have always had this property; tuppence now shares it. The class is not dropped, it is moved off the
+pull request and onto the clock: `verify/unreviewed-major/verify-unreviewed-major-in-window.sh`
+verifies every version in every adopter's composed window, with real cosign, at the tag that adopter
+pins, on every truth-surface run, and reports one that does not verify as observed false. A window
+verified only when somebody opens a pull request is verified less often than one verified daily.
+
 The property the window fold was protecting — an institution should not quietly carry a major
 nobody reviewed — is real, and survives as a report rather than a refusal, because the fact does not
 depend on anyone opening a pull request. `verify/unreviewed-major/verify-unreviewed-major-in-window.sh`

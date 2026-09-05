@@ -102,6 +102,22 @@ had. The summary it writes carries `added` beside `retired`, and the composed li
 pull request moves as well as the window at the head. `render-evidence-comment.py` renders a
 bump that moves nothing as moving nothing instead of an empty section.
 
+*The class this reading gives up, and where it is caught now.* A version standing at BOTH ends of a
+pull request is not folded, so its signed evidence is read by nothing on that pull request. Proved
+here, not reasoned: platform's `4.0.0.json.bundle` was corrupted on a throwaway clone, tagged
+`v2.0.2`, and both gates were run over identical planted inputs (window `['4.0.0']` at both ends,
+pin `v2.0.1` -> `v2.0.2`). The window fold refuses -- `REFUSED: cosign verify-blob failed for policy
+version 4.0.0 evidence ... bundle does not contain cert for verification` -- and the delta fold
+prints `PASS: composed bump 'none' does not exceed major; v2.0.2 may be adopted`, exit 0.
+That is a consequence of the reading this ticket was told to adopt, and driftwood and ludlow have
+always had it. It is caught on the clock instead of on the pull request:
+`verify-unreviewed-major-in-window.sh` verifies EVERY version in every adopter's composed window,
+with real cosign, at the tag that adopter pins, on every truth-surface run. Proved on the SAME
+corrupted artefact: pointed at an estate whose adopter pins `v2.0.2`, it reports `FAIL: driftwood
+carries policy version 4.0.0, and platform's evidence for it at v2.0.2 did NOT verify under the
+identity constant driftwood itself holds: ... bundle does not contain cert for verification`. The
+window is no longer verified when a pull request happens to open; it is verified every day.
+
 *Not an override (ADR-0011's "No override").* Nothing is exempted and no refusal is weakened for
 any named subject: a composed major still refuses (`adopter-gate.py:593` is untouched in that
 respect), a retirement is still a forced major, and an added version's evidence is still verified
@@ -119,8 +135,14 @@ nowhere before, because driftwood and ludlow were green and silent about it.
 (+ `fold_agreement.py`) plants four movements of a composed window (standing, arrival, quiet
 arrival, retirement) and runs all three adopters' own committed gate scripts over them, each
 through the flag shape its own `shift-left.yml` spells -- the flags are read out of that workflow's
-`adopter gate` step and only the values are substituted, so an argument the workflow grows that the
-grader has no planted value for stops the run rather than being dropped.
+`adopter gate` step and only the values are substituted. Every token past the interpreter must be a
+long flag the grader has a role for or a token it planted a value for; anything else -- a new flag,
+its value, a new positional, templated or plain literal alike -- stops the run with a named refusal.
+(Narrowed 2026-09-05 after review, which added `--corpus-dir corpus/generated` to tuppence's step
+and got the literal passed straight through: the run went red only because argparse happens to
+reject an unknown flag, and a gate using `parse_known_args`, or a flag the gate accepts, would have
+carried it into the planted run in silence. The published guarantee was false and the code, not the
+sentence, was changed. Proved both ways: the grown flag now stops the run naming `--corpus-dir`.)
 
 ### What was measured against what
 
@@ -160,7 +182,13 @@ bump is reported only from evidence that really verified in this run), and not a
 6. **ludlow's cosign defect is reported, not fixed here** (`delegated`). Choosing how ludlow
    verifies a legacy-format bundle offline without falling back to a live TUF fetch is an
    architectural call in ludlow's repository, exactly the kind ticket 64 correctly declined to make
-   in tuppence. It gets its own ticket.
+   in tuppence. It is charted as **ticket 101**
+   (`.scratch/ecosystem/issues/101-no-adopter-gate-has-verified-a-real-signature.md`), with the
+   three candidate remedies and their trade-offs written out -- drop the flags and accept a network
+   dependency, re-sign platform's evidence in the new bundle format, or pin a cosign version whose
+   `--trusted-root` accepts a legacy bundle -- and with the review's two related findings beside it
+   (driftwood has no adopter-gate harness at all; tuppence's harness claims a pass over a refusal).
+   A finding that points at no ticket anyone can pick up is not reported, it is mentioned.
 
 ### What this found that nobody had
 
@@ -175,9 +203,30 @@ the code.
 
 It is LATENT, not currently firing: `diff_versions()` only classifies a version "changed" when the
 composed member set changes, so ludlow's gate reaches `verify_evidence()` for the first time on the
-next real policy adoption -- and refuses it. Its own `verify-adopter-gate.sh` never caught this
-because it fabricates bundles and stubs cosign; nothing in the estate had run ludlow's gate against
-a real signature until this check did.
+next real policy adoption -- and refuses it.
+
+*Why ludlow's own harness missed it -- corrected 2026-09-05 after review.* An earlier draft of this
+Answer said the harness "fabricates bundles and stubs cosign". **It never stubs cosign**: there is
+no shim, no skip flag and no mock anywhere in `ludlow/verify-adopter-gate.sh`, and Parts C and E run
+the real binary. What actually hid the defect is sharper. Part E proves the offline property against
+a bundle it signs locally with a generated key pair -- which is in the NEW Sigstore bundle format,
+the very shape `--new-bundle-format` describes -- so the fixture's shape happens to match the flag
+that the served artefact's shape does not. And E1/E2/E3 invoke `cosign` DIRECTLY rather than through
+`adopter_gate.py`, so the gate's own invocation is never exercised against anything platform
+published. Measured both ways here: platform's real bundle plus those flags errors on the flag; a
+locally key-signed new-format bundle plus the identical flags returns `Verified OK`.
+
+On top of that the harness header discloses two limits that have stopped being true -- that it
+"cannot" prove cosign ACCEPTS a genuinely valid bundle offline (tuppence's Scenario E does exactly
+that, in about a second) and that "the accept-path here is exercised in real GitHub Actions runs"
+(it has never run in CI either, for the same latency reason). **A disclosed limit is an assertion
+and goes stale like any other**, and this estate grades its PASS lines and none of its "cannot"
+lines. That is the transferable lesson, and it is recorded in ticket 101 along with two related
+holes the review found: **driftwood has no `verify-adopter-gate.sh` at all**, so until this
+ticket's fold-agreement check nothing in the estate had ever run driftwood's gate; and tuppence's
+own harness prints `ok E: the gate PASSES against the real, currently-committed platform-pin.yaml`
+two lines after that gate returned exit 1 on the designed refusal, which reads as a pass claim over
+a refusal.
 
 Pull requests: hub policy-as-versioned-flux/policy-as-versioned-flux#39, tuppence
 policy-as-versioned-tuppence/tuppence#19. Neither merged.
@@ -205,8 +254,9 @@ other two. Neither red is cleared by anything this ticket could honestly write.
    deliberately records no review and invents no place to record one; if the owner wants the
    acceptance to be recordable, the shape of that record is the owner's call and this check gains
    an input from it.
-2. Nothing else. The hub branch and the tuppence branch are pushed, and `twin/ENACT_MODE` is
-   `development`, so no push waits on the owner.
+2. No push and no merge: the hub branch and the tuppence branch are pushed and `twin/ENACT_MODE` is
+   `development`. Nothing else in this ticket is the owner's. The work this build found and did not
+   do is ticket 101, which is a build ticket, not an authorisation.
 
 Map line: Ticket 99 (2026-09-05): the adopter gate grades what a pull request MOVES, not the window
 it leaves standing -- tuppence's fold now matches driftwood's and ludlow's, ADR-0011 records the
@@ -214,4 +264,5 @@ reading, the property it was protecting is a standing truth-surface report
 (`verify-unreviewed-major-in-window.sh`, naming all three adopters' carried 4.0.0 major), and
 `verify-fold-agreement.sh` runs all three real gates over four planted movements and refuses the
 day two of them diverge -- which it did on its first run, finding that ludlow's gate cannot verify a
-real bundle with the cosign it pins.
+real bundle with the cosign it pins, and that no adopter gate in the estate had ever been observed
+verifying a real published signature at all (charted as ticket 101).

@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# Eco-system ticket 99. Which majors are standing in an institution's composed window, unaccepted?
+# Eco-system ticket 99. Which majors is an institution carrying in its composed window?
+#
+# THE NAME OF THIS SCRIPT AND ITS DIRECTORY IS HISTORICAL: they are named for the fact the ticket
+# was about, and this check cannot see a review and never asserts one is absent. It looks for no
+# acceptance record and says nothing about whether one exists. It grades what is CARRIED.
 #
 # This is the property tuppence's adopter gate was protecting when it folded its whole supported
 # window instead of what a pull request moves. That reading broke -- a major in the window refused
@@ -43,6 +47,14 @@ log="$(mktemp)"; "$PY" "$HERE/unreviewed_major.py" "$ESTATE" | tee "$log"; rc=${
 case $rc in
   0) echo "PASS: no party claiming the adopter role carries a policy version whose publisher-signed evidence, verified in this run under that party's own identity constant at the tag it pins, records a major";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
-  *) echo "FAIL: $(grep -c '^FAIL:' "$log") major(s) stand in an adopter's composed window with no owner authorisation disposing of them";;
+  # The FAIL line says what was observed -- a major is carried -- and never that an authorisation
+  # is absent, which this check does not look for and cannot see (review, 2026-09-05). A non-zero
+  # exit with no FAIL line means the grader stopped, not that nothing was found.
+  *) n=$(grep -c '^FAIL:' "$log")
+     if [ "$n" -eq 0 ]; then
+       echo "FAIL: unreviewed_major.py exited $rc without reporting on a single adopter: $(tail -1 "$log")"
+     else
+       echo "FAIL: $n line(s) observed false: a major carried in an adopter's composed window, or evidence at an adopter's own pin that did not verify -- each named above"
+     fi;;
 esac
 rm -f "$log"; exit "$rc"

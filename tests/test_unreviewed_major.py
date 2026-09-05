@@ -57,6 +57,16 @@ def test_the_pinned_tag_is_read_off_the_gitrepository_document_of_a_multi_docume
     assert grader.pin_from_pin_yaml("kind: Kustomization\nspec:\n  path: x\n") is None
 
 
+def test_the_commit_the_pin_names_beside_the_tag_is_checked_not_discarded(grader: ModuleType) -> None:
+    # ADR-0001's commit pin is load-bearing, and every adopter gate checks it before reading
+    # anything. This report reads evidence AT the tag, so it makes the same check first.
+    assert grader.pin_disagreement("v2.0.1", "a" * 40, "a" * 40) is None
+    message = grader.pin_disagreement("v2.0.1", "a" * 40, "b" * 40)
+    assert message is not None and "v2.0.1" in message and "a" * 40 in message and "b" * 40 in message
+    unresolvable = grader.pin_disagreement("v2.0.1", "a" * 40, None)
+    assert unresolvable is not None and "could not resolve" in unresolvable
+
+
 # -- the identity constant, read where the adopter's own operation reads it ----------------------
 
 

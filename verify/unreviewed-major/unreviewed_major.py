@@ -1,4 +1,15 @@
-"""Which majors are standing in an institution's composed window, unaccepted?
+"""Which majors is an institution carrying in its composed window?
+
+THE NAME OF THIS DIRECTORY AND SCRIPT IS HISTORICAL, and narrower than what they grade. They are
+named for the fact eco-system ticket 99 was about -- a major nobody reviewed -- but this check
+CANNOT see a review and never asserts that one is absent. It looks for no acceptance record and
+therefore says nothing about whether one exists: inventing a place to look would be inventing the
+record, which is exactly what the ticket forbids. What it grades is what is CARRIED, which it
+observes directly. Read "unreviewed" in the paths below as the ticket's
+subject, never as this check's claim (delegated, ADR-0025, 2026-09-05, after review; renaming the
+files would break the manifest row and the capture filenames the truth surface has already
+published, and the sentence is cheaper to fix than the path).
+
 
 Eco-system ticket 99. "An institution should not quietly carry a major nobody reviewed" is a real
 property. tuppence's adopter gate held it as a per-pull-request refusal, by folding its whole
@@ -61,6 +72,23 @@ def window_from_evidence(doc: dict) -> list[str]:
     `version` and is not one, exactly as every adopter's own gate already reads it."""
     return sorted({m["version"] for m in (doc.get("members") or [])
                    if isinstance(m, dict) and m.get("version") is not None})
+
+
+def pin_disagreement(tag: str, pinned: str, resolved: str | None) -> str | None:
+    """ADR-0001's commit pin is load-bearing, not decorative, and every adopter gate checks it
+    before it reads anything. This report reads evidence AT that tag, so it makes the same check
+    first: a tag that resolves to a commit the pin does not name means the two documents this
+    check reads disagree about which platform is being talked about, and the bump read out of it
+    would be a bump for something else. Added 2026-09-05 after review, which caught this check
+    reading the tag and discarding the commit beside it."""
+    if resolved is None:
+        return (f"pins platform tag {tag}, which this checkout of platform could not resolve to a "
+                f"commit at all")
+    if resolved != pinned:
+        return (f"pins platform tag {tag} at commit {pinned}, but that tag resolves to {resolved} "
+                f"in this checkout -- the pin and the tag name different platforms, so any bump "
+                f"read at that tag would be a bump for something this institution does not pin")
+    return None
 
 
 def pin_from_pin_yaml(text: str) -> tuple[str, str] | None:
@@ -210,7 +238,7 @@ def look(estate: Path, unit: str, platform_dir: Path) -> dict:
         finding["skip"] = ("serves a platform pin with no GitRepository document naming a tag and "
                             "a commit")
         return finding
-    tag, _commit = pin
+    tag, pinned_commit = pin
     finding["tag"] = tag
 
     composed = _git(unit_dir, "show", "HEAD:composed/evidence.json")
@@ -223,9 +251,14 @@ def look(estate: Path, unit: str, platform_dir: Path) -> dict:
         finding["skip"] = "serves a composed/evidence.json at HEAD that is not a readable member set"
         return finding
 
-    if _git(platform_dir, "rev-parse", "-q", "--verify", f"refs/tags/{tag}^{{commit}}").returncode != 0:
+    resolve = _git(platform_dir, "rev-parse", "-q", "--verify", f"refs/tags/{tag}^{{commit}}")
+    if resolve.returncode != 0:
         finding["skip"] = (f"pins platform tag {tag}, which this checkout of platform has no tag "
                             f"object for, so its evidence could not be read at the pin")
+        return finding
+    disagreement = pin_disagreement(tag, pinned_commit, resolve.stdout.strip())
+    if disagreement:
+        finding["fail"] = disagreement
         return finding
 
     script = next((unit_dir / ".github" / "scripts" / b
@@ -314,6 +347,13 @@ def selfcheck() -> int:
     check("the pinned tag comes off the GitRepository document of a real stream",
           pin_from_pin_yaml(pin), ("v2.0.1", "d" * 40))
     check("a stream with no GitRepository names no tag", pin_from_pin_yaml("kind: Kustomization\n"), None)
+    check("a tag resolving to the commit the pin names is no disagreement",
+          pin_disagreement("v2.0.1", "a" * 40, "a" * 40), None)
+    check("a tag resolving to a different commit than the pin names is observed false, and both are named",
+          all(s in (pin_disagreement("v2.0.1", "a" * 40, "b" * 40) or "")
+              for s in ("v2.0.1", "a" * 40, "b" * 40)), True)
+    check("a tag that resolves to nothing at all is named too",
+          "could not resolve" in (pin_disagreement("v2.0.1", "a" * 40, None) or ""), True)
     check("an identity constant in a workflow env block is read",
           identity_from_workflow("env:\n  X_IDENTITY_REGEXP: ^a$\n  X_ISSUER: https://i\n"),
           ("^a$", "https://i"))

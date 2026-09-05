@@ -93,10 +93,13 @@ def test_resolve_substitutes_only_what_it_was_given(grader: ModuleType) -> None:
          "--base-ref", "${{ github.event.pull_request.base.sha }}", "--head-ref", "HEAD"],
         {"unit/.github/scripts/adopter-gate.py": "/plant/gate.py",
          "platform": "/plant/platform",
-         "${{ github.event.pull_request.base.sha }}": "abc123"},
+         "${{ github.event.pull_request.base.sha }}": "abc123",
+         # `HEAD` is a value like any other: planted explicitly, never waved through because it
+         # happens to be a literal that would have worked.
+         "HEAD": "def456"},
     )
     assert argv == ["python3", "/plant/gate.py", "--platform-dir", "/plant/platform",
-                    "--base-ref", "abc123", "--head-ref", "HEAD"]
+                    "--base-ref", "abc123", "--head-ref", "def456"]
 
 
 def test_an_unmapped_expression_refuses_rather_than_running_a_literal_dollar_sign(grader: ModuleType) -> None:
@@ -107,6 +110,34 @@ def test_an_unmapped_expression_refuses_rather_than_running_a_literal_dollar_sig
                             {"g.py": "/plant/gate.py"})
     with pytest.raises(grader.Unresolved):
         grader.resolve_argv(["python3", "g.py", "--old-pin-yaml", "$old_pin"], {"g.py": "/plant/gate.py"})
+
+
+def test_a_new_long_flag_with_a_plain_literal_value_refuses_too(grader: ModuleType) -> None:
+    # The narrowing, 2026-09-05. Templating was never the thing that made an argument dangerous:
+    # `--corpus-dir corpus/generated` carries no `${{ }}` at all, and before this it went straight
+    # to the real gate. The run only went red because argparse happens to reject an unknown flag --
+    # a gate parsing with parse_known_args, or one that accepts the flag (`--skip-cosign-verify` is
+    # in tuppence's gate), would have carried it into the planted run in silence.
+    mapping = {"g.py": "/plant/gate.py", "platform": "/plant/platform",
+               "corpus/generated": "/plant/corpus"}
+    with pytest.raises(grader.Unresolved) as caught:
+        grader.resolve_argv(
+            ["python3", "g.py", "--platform-dir", "platform", "--corpus-dir", "corpus/generated"],
+            mapping)
+    assert "--corpus-dir" in str(caught.value)
+
+
+def test_the_value_of_a_known_flag_that_was_not_planted_refuses(grader: ModuleType) -> None:
+    with pytest.raises(grader.Unresolved) as caught:
+        grader.resolve_argv(["python3", "g.py", "--platform-dir", "somewhere-else"],
+                            {"g.py": "/plant/gate.py"})
+    assert "somewhere-else" in str(caught.value)
+
+
+def test_a_positional_nobody_planted_refuses(grader: ModuleType) -> None:
+    with pytest.raises(grader.Unresolved) as caught:
+        grader.resolve_argv(["python3", "g.py", "compose", "platform"], {"g.py": "/plant/gate.py"})
+    assert "compose" in str(caught.value)
 
 
 # -- reading a verdict back ---------------------------------------------------------------------
@@ -175,6 +206,12 @@ def test_a_gate_that_could_not_be_run_at_all_is_a_could_not_look_never_an_agreem
                                                "tuppence": _r("adopt", "none")}})
     assert status == "SKIP"
     assert any("ludlow" in message for _, message in lines)
+
+
+def test_one_gate_agreeing_with_itself_is_not_agreement(grader: ModuleType) -> None:
+    status, lines = grader.grade({"standing": {"driftwood": _r("adopt", "none")}})
+    assert status == "SKIP"
+    assert any("fewer than two" in message for _, message in lines)
 
 
 def test_agreement_on_every_case_is_the_only_pass(grader: ModuleType) -> None:

@@ -17,9 +17,11 @@ WHAT IS MEASURED, AND AGAINST WHAT.
   The OPERATION that reaches it is that repository's own `shift-left.yml` step named `adopter
   gate ...`: this grader reads that step's command line out of the workflow, keeps its flags
   exactly as the workflow spells them, and substitutes only the VALUES (a planted repository, a
-  planted commit, a temporary output path). An argument the workflow grows that this grader has no
-  role for stops the run with a named refusal rather than being quietly dropped -- a planted case
-  that no longer resembles the served operation would prove nothing about the estate.
+  planted commit, a temporary output path). Every token past the interpreter must be either a long
+  flag this grader has a role for or a token it planted a value for; anything else -- a new flag,
+  its value, a new positional, templated or plain literal alike -- stops the run with a named
+  refusal (`resolve_argv`, narrowed 2026-09-05 after review). A planted case that no longer
+  resembles the served operation would prove nothing about the estate.
 
   Nothing is faked. The evidence the gates verify is platform's own real committed evidence at a
   real tag, and `cosign verify-blob` really runs, really verifies a real Fulcio certificate, and is
@@ -124,19 +126,57 @@ def long_flags(tokens: list[str]) -> set[str]:
     return {t for t in tokens if t.startswith("--")}
 
 
-def resolve_argv(tokens: list[str], mapping: dict[str, str]) -> list[str]:
-    """The same tokens with planted values substituted. A token the workflow templates
-    (`${{ ... }}`) or expands from a shell variable (`$old_pin`) and this grader has no value for
-    raises, rather than being handed to a real gate as a literal: a case nobody planted is not a
-    case."""
-    out = []
-    for token in tokens:
-        if token in mapping:
-            out.append(str(mapping[token]))
+def resolve_argv(tokens: list[str], mapping: dict[str, str],
+                  value_flags: set[str] = None) -> list[str]:  # type: ignore[assignment]
+    """The served operation's own tokens with planted values substituted, and NOTHING else
+    reaching the real gate.
+
+    Every token past the interpreter must be one of two things: a long flag this grader has a role
+    for (`VALUE_FLAGS`), or a token it planted a value for. Anything else raises `Unresolved`.
+
+    Narrowed 2026-09-05 after review. The first version raised only on a token the workflow
+    templated (`${{ ... }}`) or expanded from a shell variable (`$old_pin`), which left the
+    published guarantee false: a new long flag with a plain LITERAL value -- `--corpus-dir
+    corpus/generated` -- was handed straight through to the real gate, and the run only went red
+    because argparse happens to reject an unknown flag. A gate parsing with `parse_known_args`, or
+    a flag the gate does accept (`--skip-cosign-verify` is in tuppence's gate and is not in
+    `NOT_THE_GATE`), would have been carried silently into the planted run and the comparison would
+    have graded something nobody planted. The flag list is the whitelist now, not the templating
+    syntax.
+    """
+    flags = VALUE_FLAGS if value_flags is None else value_flags
+    out: list[str] = []
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+        if i == 0:  # the interpreter the workflow names
+            out.append(token)
+            i += 1
             continue
-        if "${{" in token or token.startswith("$"):
-            raise Unresolved(token)
-        out.append(token)
+        if token.startswith("--"):
+            if token not in flags:
+                raise Unresolved(
+                    f"{token} -- the served operation carries a long argument this grader has no "
+                    f"role for, so it cannot plant a value for it; a planted case that is not the "
+                    f"served operation grades nothing")
+            out.append(token)
+            if i + 1 < len(tokens) and not tokens[i + 1].startswith("--"):
+                value = tokens[i + 1]
+                if value not in mapping:
+                    raise Unresolved(
+                        f"{value} -- the value of {token} in the served operation, for which this "
+                        f"grader planted nothing")
+                out.append(str(mapping[value]))
+                i += 2
+                continue
+            i += 1
+            continue
+        if token not in mapping:
+            raise Unresolved(
+                f"{token} -- a positional argument of the served operation for which this grader "
+                f"planted nothing")
+        out.append(str(mapping[token]))
+        i += 1
     return out
 
 
@@ -220,10 +260,19 @@ def grade(cases: dict[str, dict[str, dict | None]]) -> tuple[str, list[tuple[str
         for line in found:
             lines.append(("FAIL", line))
         bad += len(found)
-        if not found and not missing:
+        if len(ran) < 2:
+            # One gate agreeing with itself is not agreement. Before this guard an estate carrying
+            # a single adopter -- or two whose gates could not be run -- reached a PASS line that
+            # said "the three adopters' gates".
+            unlooked += 1
+            lines.append(("SKIP", f"case {case!r}: only {len(ran)} gate(s) answered "
+                                   f"({', '.join(sorted(ran)) or 'none'}), and agreement between "
+                                   f"fewer than two gates is not a thing this check can observe"))
+        elif not found and not missing:
             answer = next(iter(ran.values()))
-            lines.append(("PASS", f"case {case!r}: {', '.join(sorted(ran))} each answered "
-                                   f"{answer['verdict']} with composed bump {answer['composed']!r}"))
+            lines.append(("PASS", f"case {case!r}: {len(ran)} gates ({', '.join(sorted(ran))}) each "
+                                   f"answered {answer['verdict']} with composed bump "
+                                   f"{answer['composed']!r}"))
     if bad:
         return "FAIL", lines
     if unlooked:
@@ -387,8 +436,12 @@ def build_mapping(tokens: list[str], script: Path, planted: dict, platform_dir: 
         elif i == 1:
             pass
         i += 1
-    # driftwood: `compose <platform_dir> <old_tag> <new_tag>`; the subcommand word is first.
+    # driftwood: `compose <platform_dir> <old_tag> <new_tag>`; the subcommand word is first. The
+    # subcommand maps to itself -- a planted value, deliberately identical -- so that resolve_argv
+    # can require EVERY token past the interpreter to be planted and still let it through. A
+    # positional this grader has no role for stays unmapped and stops the run there.
     if positionals and positionals[0] == "compose":
+        mapping[positionals[0]] = positionals[0]
         roles = [str(platform_dir), planted["base_tag"], planted["head_tag"]]
         for value, planted_value in zip(positionals[1:], roles):
             mapping[value] = planted_value
@@ -422,7 +475,14 @@ def run_gate(unit: str, unit_dir: Path, planted: dict, platform_dir: Path, adopt
     mapping = build_mapping(tokens, script, planted, platform_dir, adopter_repo, out_json,
                              out_markdown, identity)
     argv = resolve_argv(tokens, mapping)
-    proc = subprocess.run(argv, capture_output=True, text=True, cwd=str(workdir))
+    try:
+        proc = subprocess.run(argv, capture_output=True, text=True, cwd=str(workdir))
+    except OSError as exc:
+        # The interpreter the workflow names is not on this runner (`python3` on a machine that has
+        # only `python`, say). Nothing was observed, so nothing is claimed: this is a could-not-look
+        # naming the command, not a crash that leaves the wrapper reporting "0 movements differed".
+        return None, (f"{unit}'s gate could not be started at all on this runner: {argv[0]!r} "
+                       f"({type(exc).__name__}: {exc})")
     composed = None
     if out_json.is_file():
         try:
@@ -495,9 +555,8 @@ def run(estate: Path) -> tuple[str, list[tuple[str, str]]]:
                                                adopter_repo, workdir)
                 except (NoGateStep, Unresolved) as exc:
                     lines.append(("FAIL", f"{unit}: this grader could not reproduce the operation "
-                                           f"its own shift-left.yml runs ({type(exc).__name__}: "
-                                           f"{exc}) -- a planted case that is not the served "
-                                           f"operation grades nothing"))
+                                           f"its own shift-left.yml runs -- {type(exc).__name__}: "
+                                           f"{exc}"))
                     cases[name][unit] = None
                     continue
                 cases[name][unit] = result
@@ -524,6 +583,16 @@ def run(estate: Path) -> tuple[str, list[tuple[str, str]]]:
             status = "FAIL"
     if any(kind == "FAIL" for kind, _ in lines):
         status = "FAIL"
+    if status == "PASS":
+        # The wrapper quotes this rather than hard-coding "the three adopters": however many gates
+        # answered is what the PASS line is allowed to say.
+        answered = sorted({u for case in cases.values() for u, r in case.items() if r is not None})
+        lines.append(("SUMMARY", (
+            f"on {len(CASES)} planted movements of a composed window ({', '.join(sorted(CASES))}), "
+            f"the {len(answered)} adopter gates that answered ({', '.join(answered)}) -- each run "
+            f"through the flag shape its own shift-left.yml uses, against platform's real signed "
+            f"evidence with real cosign -- returned the same verdict and the same composed bump, "
+            f"and each was the verdict ADR-0011's reading gives that movement")))
     return status, lines
 
 
@@ -571,6 +640,35 @@ def selfcheck() -> int:
     except Unresolved:
         check("an unmapped templated argument refuses", "raised", "raised")
 
+    # The narrowing this check exists for (review, 2026-09-05): a NEW long flag carrying a plain
+    # literal value must stop the run too. Before this, `--corpus-dir corpus/generated` was handed
+    # straight to the real gate and the run only went red because argparse happens to refuse an
+    # unknown flag -- a gate using parse_known_args, or a flag the gate accepts, would have carried
+    # it into the planted run in silence.
+    planted = {"g.py": "/plant/gate.py", "platform": "/plant/platform", "HEAD": "abc123"}
+    grown = ["python3", "g.py", "--platform-dir", "platform", "--corpus-dir", "corpus/generated"]
+    try:
+        resolve_argv(grown, dict(planted, **{"corpus/generated": "/plant/corpus"}))
+        check("a new long flag with a plain literal value refuses", "returned", "raised Unresolved")
+    except Unresolved as exc:
+        check("a new long flag with a plain literal value refuses, naming it",
+              "--corpus-dir" in str(exc), True)
+    try:
+        resolve_argv(["python3", "g.py", "--platform-dir", "somewhere-else"], planted)
+        check("a known flag whose value was not planted refuses", "returned", "raised Unresolved")
+    except Unresolved as exc:
+        check("a known flag whose value was not planted refuses, naming it",
+              "somewhere-else" in str(exc), True)
+    try:
+        resolve_argv(["python3", "g.py", "compose", "platform"], planted)
+        check("a positional nobody planted refuses", "returned", "raised Unresolved")
+    except Unresolved as exc:
+        check("a positional nobody planted refuses, naming it", "compose" in str(exc), True)
+    check("and the whole served shape resolves when every token is planted",
+          resolve_argv(["python3", "g.py", "--platform-dir", "platform", "--head-ref", "HEAD"],
+                        planted),
+          ["python3", "/plant/gate.py", "--platform-dir", "/plant/platform", "--head-ref", "abc123"])
+
     check("the composed bump is read out of a rendered comment table",
           composed_from_markdown("| bump | **patch** | **none** |\n"), "none")
     check("and out of either machine-readable summary shape",
@@ -595,6 +693,10 @@ def selfcheck() -> int:
     check("a gate that could not be run is a could-not-look, never an agreement",
           grade({"standing": dict(agree, ludlow=None)})[0], "SKIP")
     check("agreement on every case is the pass", grade({"standing": agree})[0], "PASS")
+    only_one = {"driftwood": {"verdict": "adopt", "composed": "none"}}
+    status_one, lines_one = grade({"standing": only_one})
+    check("one gate agreeing with itself is not agreement",
+          (status_one, any("fewer than two" in m for _, m in lines_one)), ("SKIP", True))
 
     if bad:
         print(f"FAIL: {bad} selfcheck case(s) did not grade as written")

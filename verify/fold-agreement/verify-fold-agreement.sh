@@ -9,9 +9,10 @@
 # WHAT IT MEASURES, AND AGAINST WHAT. The served artefact is each adopter's own committed gate
 # script in the estate checkout. The operation is that repository's own shift-left.yml step named
 # `adopter gate ...`: fold_agreement.py reads that step's command line out of the workflow, keeps
-# its flags exactly as the workflow spells them, and substitutes only the values. An argument the
-# workflow grows that this grader has no planted value for stops the run with a named refusal
-# rather than being dropped. Nothing is faked: platform's real committed evidence at a real tag,
+# its flags exactly as the workflow spells them, and substitutes only the values. Every token past
+# the interpreter must be a long flag the grader has a role for or a token it planted a value for;
+# anything else -- a new flag, its value, a new positional, templated or plain literal alike --
+# stops the run with a named refusal. Nothing is faked: platform's real committed evidence at a tag,
 # real cosign, real exit codes, and only the subject -- a throwaway adopter repository whose
 # composed window and pin move in a stated way -- is planted.
 #
@@ -38,11 +39,18 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 
 log="$(mktemp)"; "$PY" "$HERE/fold_agreement.py" "$ESTATE" | tee "$log"; rc=${PIPESTATUS[0]}
 case $rc in
-  # The PASS line says what was compared and nothing more: four planted movements, each answered by
-  # three real gates run through their own workflows' own flags. It does not say the gates are
-  # right about anything else; each repository's own verify-adopter-gate.sh grades its own gate.
-  0) echo "PASS: on four planted movements of a composed window, the three adopters' gates -- each run through the flag shape its own shift-left.yml uses, against platform's real signed evidence with real cosign -- returned the same verdict and the same composed bump, and each was the verdict ADR-0011's reading gives that movement";;
+  # The PASS line is the module's own SUMMARY, quoted rather than restated, so it names HOW MANY
+  # gates answered instead of hard-coding "the three adopters" over however many did. It says what
+  # was compared and nothing more; each repository's own harness grades its own gate in depth.
+  0) echo "PASS: $(grep '^SUMMARY:' "$log" | head -1 | cut -c10-)";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
-  *) echo "FAIL: $(grep -c '^FAIL:' "$log") planted movement(s) were answered differently by two adopter gates, or answered differently from ADR-0011's own reading";;
+  *) n=$(grep -c '^FAIL:' "$log")
+     if [ "$n" -eq 0 ]; then
+       # A non-zero exit with no FAIL line means the grader itself stopped -- never "nothing was
+       # found", which is what a bare count printed here before review.
+       echo "FAIL: fold_agreement.py exited $rc without grading a single planted movement: $(tail -1 "$log")"
+     else
+       echo "FAIL: $n planted movement(s) were answered differently by two adopter gates, or answered differently from ADR-0011's own reading"
+     fi;;
 esac
 rm -f "$log"; exit "$rc"
