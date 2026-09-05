@@ -51,8 +51,9 @@ never a pass.
 The scan is line-based, and that is load-bearing: three of the estate's Denys live inside a
 `ResourceSet`'s `resourcesTemplate` STRING (one per adopter, `gitops/composed/composed-set.yaml`),
 where a `yaml.safe_load_all` walk sees a ResourceSet and no policy at all. A document scan would
-have reported the estate three refusals cleaner than it is. Today: 30 findings, 8 excluded with
-reasons, 22 on the register, 21 outstanding.
+have reported the estate three refusals cleaner than it is. Measured on the day: 29 Deny-shaped rules
+across the hub and the eight units, 8 of them in the two trees the register excludes with a
+reason, 21 on the register -- and all 21 still outstanding.
 
 ### Item 1 — the inventory, and the choice per rule
 
@@ -61,7 +62,7 @@ reasons, 22 on the register, 21 outstanding.
 | `governed-namespace-requires-claim` | 4 | re-expressed as a cage constraint | source converted on the platform branch |
 | `policy-version-orphan-guard` | 7 | re-expressed as a cage constraint | source converted on the platform branch |
 | `posture-trust-boundary` | 10 | retired at the next declared line | waiting |
-| `encrypt-at-rest` (hub, `verify/proportionality`) | 1 | retired | converted, gone |
+| `encrypt-at-rest` (hub, `verify/proportionality`) | 0, was 1 | retired | converted, gone |
 
 **`governed-namespace-requires-claim` — a MutatingPolicy that puts the pod on the bottom rung.**
 ADR-0022's 2026-08-28 addendum promoted this to `Deny` and called it "the one refusal the doctrine

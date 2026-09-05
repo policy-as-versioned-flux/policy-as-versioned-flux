@@ -37,6 +37,10 @@ the register, and the join is graded in both directions:
 Two shapes count as Deny-shaped: the CEL `ValidatingPolicy`'s `spec.validationActions` carrying
 `Deny` (ADR-0003) and the 2022 `ClusterPolicy`'s `validationFailureAction: enforce`.
 
+Measured 2026-09-05: 29 Deny-shaped rules across the hub and the eight units, 8 of them inside the
+two trees `register.yaml` excludes with a reason, 21 on the register — and all 21 still
+outstanding, across three rules. Run `--inventory` for today's figure rather than trusting this one.
+
 ## The scan is line-based, and that is load-bearing
 
 Three of the estate's Denys live inside a `ResourceSet`'s `resourcesTemplate` **string** — one per
