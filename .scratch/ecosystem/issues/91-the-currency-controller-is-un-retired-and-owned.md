@@ -126,6 +126,15 @@ removed the workload would FAIL, not pass.
   The first declared alternative also matches the pre-ticket-91 script, so the row is true on both
   sides of the platform merge.
 
+**The old script's PASS claimed more than it observed, and that is fixed too.** Its live branch
+created a Job from the CronJob and printed `ok reconcile job created`, then fell through to
+`pass_line`. It never waited for the Job, never re-read the pod and never checked anything had
+changed — so an exit 0 said "stale posture is re-evaluated post-admission" on the strength of one
+`kubectl create job` succeeding. That PASS is recorded, on a machine with clusters, in
+`REPAIR-2026-09-04.md:425`. The rewritten tail waits for the Job to complete, re-reads the pod, and
+asserts four things on it: `tier=isolated`, the claim gone, the retired claim recorded in the
+annotation, and `phase=Running` — a re-cage that removed the workload FAILs rather than passes.
+
 **What the estate looked like while this was built, and it is not comfortable.** `kind-driftwood`
 today carries `tuppence-reset/teller-stale`, a pod claiming `1.0.0` while the array declares
 `4.0.0`, with **no tier and no caged label at all** — admitted before `cage-tier-4-0-0` was
