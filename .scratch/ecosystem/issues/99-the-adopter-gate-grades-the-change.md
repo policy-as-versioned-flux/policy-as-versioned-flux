@@ -179,6 +179,9 @@ next real policy adoption -- and refuses it. Its own `verify-adopter-gate.sh` ne
 because it fabricates bundles and stubs cosign; nothing in the estate had run ludlow's gate against
 a real signature until this check did.
 
+Pull requests: hub policy-as-versioned-flux/policy-as-versioned-flux#39, tuppence
+policy-as-versioned-tuppence/tuppence#19. Neither merged.
+
 ### How it is graded
 
 * `verify/fold-agreement/verify-fold-agreement.sh` -- the three folds, on four planted movements.
