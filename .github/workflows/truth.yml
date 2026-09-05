@@ -133,8 +133,87 @@ jobs:
       # in .git/config as an http.extraheader for all of them, and the observation cage
       # below is a post-hoc tree inspection that cannot see a commit that has already been
       # pushed. The cage step carries its own credential explicitly instead.
+      #
+      # fetch-depth: 0 (ticket 100), for three things a depth-1, single-ref checkout cannot do:
+      # count how many of this ref's commits the rebase would replay (the sentence the guard step
+      # below prints for a builder); `git blame` talk/truth.log, which is how
+      # verify/can-record/verify-can-record.sh grades that every recorded line came from the
+      # clock commit naming the same run; and see the other branches at all, which is how the
+      # same script finds a clock line stranded on a branch that merged without it.
       - uses: actions/checkout@v4
-        with: {persist-credentials: false}
+        with: {persist-credentials: false, fetch-depth: 0}
+
+      # --- the clock says what it can record, before it measures (ticket 100) -------------------
+      # Until 2026-09-05 this workflow wrote its TRUTH line, committed it, rebased and pushed on
+      # EVERY branch it ran on, and nothing anywhere said what became of the line. Three failure
+      # modes were observed in two days, all on ticket-89-deny-is-not-a-rung:
+      #
+      #   1. THE PUSH IS REFUSED. `git pull --rebase --autostash origin main` replays the branch's
+      #      own commits onto origin/main with new SHAs, so HEAD stops being a descendant of
+      #      origin/<branch>. Run 98: nobody else pushing, the remote tip unmoved,
+      #      `Rebasing (12/12)`, `Successfully rebased`, `! [rejected] (non-fast-forward)`. The
+      #      line was produced, committed and thrown away (runs 92, 95, 98).
+      #   2. THE PUSH LANDS ON THE BRANCH, where the branch had been rebased onto main rather than
+      #      merged, so there was nothing to replay (runs 100 and 101).
+      #   3. ...AND THE LINE IS ORPHANED ANYWAY. Run 101 landed on that branch at 14:45Z, three
+      #      minutes after the branch was merged to main at 14:42Z, so main's log went from run
+      #      100 straight to run 102. The tree it measured (6bca5a3) was already on main, so the
+      #      observation was perfectly citable; only the LINE was stranded. Three older ones were
+      #      stranded the same way and nobody had noticed: runs 76, 84 and 88.
+      #
+      # Mode 3 is what settles it (ticket 100, delegated under ADR-0025). Mode 2 is not a success
+      # -- it is the precondition for mode 3, and it puts a commit nobody reviewed on a builder's
+      # branch. And no check made at merge time could have saved run 101, because the line landed
+      # AFTER the merge. So: THE CLOCK RECORDS ON THE DEFAULT BRANCH AND NOWHERE ELSE. Its log is
+      # the citable record (NORTH-STAR S5); a line anywhere else is a line waiting to be lost.
+      #
+      # A branch run still MEASURES, and still prints its TRUTH line: the run's log is where a
+      # builder reads what their branch does to the gate, three tickets quoted exactly that on
+      # 2026-09-05, and the `paths:` filter above already means a branch run happens only when the
+      # push changed the gate itself. What it stops doing is pretending -- and writing.
+      #
+      # The verdict is graded, not asserted: verify/can-record/verify-can-record.sh lifts this
+      # step's own shell out of this file and runs it over two throwaway repositories in five
+      # states, reproduces modes 1, 2 and 3 by measuring what the push does to the remote ref and
+      # what survives a merge, and fails if this step's verdict disagrees with any of it.
+      - name: does this run record? -- the clock says so before it measures
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+            echo "::error::this checkout is shallow. fetch-depth: 0 is what lets this step count"\
+                 "what the rebase would replay and lets the gate blame talk/truth.log; a guard"\
+                 "that guesses is worse than no guard."
+            exit 1
+          fi
+          if [ -z "${DEFAULT_BRANCH}" ]; then
+            echo "::error::github.event.repository.default_branch is empty, so this step cannot"\
+                 "tell whether it is on the branch whose log is citable. It does not guess 'main'."
+            exit 1
+          fi
+          # Explicit refspecs: a missing refs/remotes/origin/main would make the counts below
+          # silently wrong, and they are the evidence a builder reads out of this log.
+          git fetch --no-tags --quiet origin \
+            "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
+          base="$(git rev-parse "origin/${DEFAULT_BRANCH}")"
+          own="$(git rev-list --count "origin/${DEFAULT_BRANCH}..HEAD")"
+          merges="$(git rev-list --count --merges "origin/${DEFAULT_BRANCH}..HEAD")"
+          if [ "${GITHUB_REF_NAME}" = "${DEFAULT_BRANCH}" ]; then
+            can=yes
+            why="this run is on ${DEFAULT_BRANCH}, whose talk/truth.log is the citable record"
+          else
+            can=no
+            why="this run is on ${GITHUB_REF_NAME}, not ${DEFAULT_BRANCH}, and only ${DEFAULT_BRANCH}'s talk/truth.log is citable. This ref carries ${own} commit(s) ${DEFAULT_BRANCH} does not, ${merges} of them merges: with anything to replay, git pull --rebase --autostash origin ${DEFAULT_BRANCH} rewrites them and the push is refused non-fast-forward (run 98); with nothing to replay the push LANDS on the branch, and the line is then lost anyway the moment the branch merges without that commit (run 101, 2026-09-05)"
+          fi
+          echo "CAN_RECORD=${can}" >> "$GITHUB_ENV"
+          echo "CANNOT_REASON=${why}" >> "$GITHUB_ENV"
+          if [ "${can}" = yes ]; then
+            echo "THIS RUN CAN RECORD. Its TRUTH line will be appended to talk/truth.log, committed and pushed to ${GITHUB_REF_NAME}. Why: ${why} (origin/${DEFAULT_BRANCH}=${base})."
+          else
+            echo "THIS RUN CANNOT RECORD ITS TRUTH LINE, and will not pretend to. It still runs the whole gate and still prints its TRUTH line below for a reader to quote; it appends nothing to talk/truth.log, makes no commit, and pushes nothing to your branch. Why: ${why} (origin/${DEFAULT_BRANCH}=${base})."
+          fi
+
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: pip install 'pyyaml==6.0.3' 'jsonschema==4.23.0'
@@ -189,10 +268,23 @@ jobs:
           VERIFY_TIMEOUT: '900'
           CLOCK_VERDICT: ${{ runner.temp }}/clock-verdict/clocks.json
         run: set -o pipefail; bash talk/verify-all.sh | tee "$RUNNER_TEMP/gate.out"
+      # The line is PRINTED whatever the guard said, into the log and the step summary, because a
+      # measurement a run cannot record is still a measurement a reader can quote (ticket 100).
+      # What the guard gates is the WRITE: a line appended to talk/truth.log on a run whose push
+      # will be refused is a commit made and thrown away, which is noise in every builder's
+      # `git log` and is what made two days of lost lines look like a builder's fault.
       - name: record the TRUTH line
         run: |
           set -euo pipefail
-          grep '^TRUTH ' "$RUNNER_TEMP/gate.out" | tee -a talk/truth.log >> "$GITHUB_STEP_SUMMARY"
+          line="$(grep '^TRUTH ' "$RUNNER_TEMP/gate.out")"
+          printf '%s\n' "${line}"
+          printf '%s\n' "${line}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${CAN_RECORD}" = "yes" ]; then
+            printf '%s\n' "${line}" >> talk/truth.log
+          else
+            printf '%s\n' "the line above is NOT being written to talk/truth.log: ${CANNOT_REASON}" \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
 
       # --- the cage (ADR-0024, D1) ------------------------------------------------------------
       # Only OBSERVATION_LANE paths are staged. `.estate-clone/` is the disposable checkout
@@ -236,6 +328,17 @@ jobs:
             echo "${outside}"
             exit 1
           fi
+          # The lane is staged and judged above WHATEVER the guard said, so a verify script that
+          # left a declaration in the tree still fails this run on a branch. What the guard stops
+          # is the COMMIT (ticket 100): a run whose push will be refused makes no commit at all,
+          # rather than making one, rebasing it, and having the push throw it away.
+          if [ "${CAN_RECORD}" != "yes" ]; then
+            echo "this run cannot record, so it commits nothing. Reason: ${CANNOT_REASON}"
+            echo "the lane paths it would have committed, unstaged and left in the tree:"
+            git diff --cached --name-only | sed 's/^/  /'
+            git reset -q
+            exit 0
+          fi
           if git diff --cached --quiet; then
             echo "ok  nothing to observe, and nothing declared"; exit 0
           fi
@@ -252,8 +355,18 @@ jobs:
           git pull --rebase --autostash origin main
           # The credential is handed to THIS command only; nothing the gate ran could
           # reach it (see persist-credentials above).
+          # No --force, ever, and no `+` refspec (ticket 100): a clock that rewrote a builder's
+          # branch to land its own observation would be worse than one that records nothing.
+          # If the push is refused here, origin/main or origin/<ref> moved between the guard step
+          # and this one -- a race the guard cannot close -- and the run says so and goes red
+          # rather than reporting a line it did not record.
           git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${GH_TOKEN}" | base64 -w0)" \
-            push origin HEAD:"${GITHUB_REF_NAME}"
+            push origin HEAD:"${GITHUB_REF_NAME}" || {
+              echo "::error::this run said it could record and the push was refused: origin/main"\
+                   "or origin/${GITHUB_REF_NAME} moved after the guard looked. The TRUTH line"\
+                   "above was NOT recorded."
+              exit 1
+            }
       - name: fail if the gate failed
         if: steps.gate.outcome == 'failure'
         run: exit 1
