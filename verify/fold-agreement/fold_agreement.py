@@ -52,7 +52,6 @@ line below is an exit code and an output file from a real subprocess.
 from __future__ import annotations
 
 import json
-import os
 import re
 import shlex
 import shutil
