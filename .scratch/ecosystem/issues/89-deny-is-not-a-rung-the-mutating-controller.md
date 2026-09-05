@@ -371,6 +371,25 @@ It is worth saying what was lost, because it was the best number this branch has
 `pass=68 fail=6 skip=24 of 106, ceiling 87`. It is quoted here so the work is not invisible, and
 it is NOT a citable line — no run recorded it in `talk/truth.log`, so nothing may cite it.
 
+**The general lesson, which is the clock's and not any builder's.** `truth` serialises across the
+whole repository: one run at a time for every branch at once. So a builder's run can sit `pending`
+behind another branch's for a long while, the newest row of `gh run list` is often somebody else's,
+and one builder's push can displace another branch's queued run. That makes "check before you
+push" mean something mechanical: **never push while a run on YOUR branch is `in_progress`** — the
+state in which a TRUTH line exists and is waiting to be committed. A `pending` run has started
+nothing and can be superseded safely; that is why the two runs cancelled here (`26eb5ac`,
+`602cda3`) cost nothing, checked in their logs rather than assumed. Read the `status` column:
+
+```sh
+gh run list --branch <yours> --json status --jq '[.[]|select(.status!="completed")]|length'
+```
+
+And the second cause is not about branches at all: `truth.yml` rebases onto `origin/main` after
+committing, so a branch sitting behind main loses its observation to a `talk/truth.log` conflict.
+Merging `origin/main` in before pushing removes it. Both are written into
+`.scratch/ecosystem/BUILD-BRIEF-2026-09-03.md` under the rules that do not bend, which is where the
+next builder will look.
+
 **Composition** carries the three new policy members and the PriorityClass, read defensively so an
 adopter pinned to a parent tag from before this ticket composes exactly what it composed then.
 
