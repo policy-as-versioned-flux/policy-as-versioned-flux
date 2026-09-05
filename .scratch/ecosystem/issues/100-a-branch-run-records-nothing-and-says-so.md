@@ -240,3 +240,81 @@ than to detect the loss. Also worth folding into `BUILD-BRIEF`: "never push whil
 branch run now pushes nothing at all.
 
 Map line: `- [100 — A branch run records nothing, and nothing says so](issues/100-a-branch-run-records-nothing-and-says-so.md) — the clock now records on the default branch and nowhere else, and every run prints whether it can record before it measures. Three failure modes, not one: the push refused non-fast-forward after the rebase rewrote the branch (runs 92, 95, 98); the push landing on a branch that had been rebased rather than merged (runs 100, 101); and that landed line orphaned three minutes later when the branch merged without it (run 101, and runs 76, 84 and 88 before it, which nobody had noticed). Mode 3 is what settles it — mode 2 is not a success but the precondition for mode 3, and no check made at merge time could have saved run 101 because the line landed after the merge — so the fix removes the landing rather than policing the merge. A branch run still measures and still prints its TRUTH line, because the paths: filter means it only fires when the push changed the gate itself and that log is where a builder reads what their branch does (the open question, decided, kept). It commits nothing: the cage still stages and judges the observation lane on a branch, then resets rather than making a commit that the push would throw away. verify/can-record/verify-can-record.sh grades all of it by lifting truth.yml's own guard, record and cage shell out of the file, with two declared substitutions, and running it over two throwaway repositories in five states, twice each — once with the guard forced to yes to observe what the push does to the remote ref — so the claim is measured against the served ref and the operation that reaches it, not read off the YAML; it also blames every line of talk/truth.log to the clock commit naming the same run, and grades a stranded line by whether the tree it measured is on main. It has no could-not-look by decision, and it is RED on arrival naming runs 76, 84 and 88, whose repair is the integrator's cherry-pick, not a line typed by hand.`
+
+## Round 2, 2026-09-05 — the review, and a false red on main this check would have raised
+
+**The instrument was wrong about main, and the integrator's repair was right.** The rescue of
+runs 76, 84 and 88 was first hand-authored, which part 1 correctly faulted; it was then reverted
+and redone as cherry-picks of the clock's own commits (PR 41). Graded on that branch it was
+clean. Graded on `main` after the merge it was **three faults** — measured, not argued:
+
+```
+main: recorded lines = 39  faults = 3
+  - run=76 ... the commit that wrote it (a769e06) is by chris@cns.me.uk, not the clock
+```
+
+`git blame` answers "which commit does git attribute this line to", and at a merge it prefers
+the parent where identical content already existed — so after a revert and a re-add of the same
+bytes it still named the hand's commit. The rule wants a different question: **which commit put
+the line where it now is.** `git log --full-history -S<line>` answers that, newest first,
+including both sides of a merge that history simplification otherwise hides; the newest commit
+in which the line is present is the one that added it. Under that, main is clean:
+
+```
+main: recorded lines = 39  faults = 0
+  rescued: 54522c7 truth@users.noreply.github.com :: truth: record run 76 [skip ci]
+  rescued: 7ea0b59 truth@users.noreply.github.com :: truth: record run 84 [skip ci]
+  rescued: 3c28612 truth@users.noreply.github.com :: truth: record run 88 [skip ci]
+```
+
+Two tests hold it: a hand-authored line still faults, and a reverted-then-clock-re-added line
+attributes to the clock. `blame_rows` keeps its name for its callers and no longer uses blame.
+
+**This is the fifth instance of the estate's proxy pattern** (ticket 89's round-4 answer): I
+reasoned from `git blame`'s attribution as a proxy for authorship, and the two differ exactly
+where a legitimate repair happened. It would have put a false red on the citable branch, and
+grading the branch rather than main is what hid it — the proxy again, one level up.
+
+**F2. Rename-safety existed in only half the path.** The guard takes `DEFAULT_BRANCH` from the
+event; the cage still ran `git pull --rebase --autostash origin main`, and `stranded_entries`
+picked `origin/main` else a literal. On a rename the guard says can=yes, the commit is made, the
+pull fails, the push never runs — loudly lost is still lost. The cage now pulls
+`"${DEFAULT_BRANCH}"` and refuses to guess when it is empty, `default_ref()` derives the ref from
+`origin/HEAD` and raises rather than guessing, and a **sixth fixture state** runs the whole path
+with the default branch called `trunk`. It is not a state that passes by doing nothing: with the
+literal `main` restored the fixture reports four faults — "the guard promised a record and a
+forced push was refused", "the push did not move origin/trunk", "origin/trunk does not carry the
+recorded line". A shape fault catches the literal in the workflow text as well, and it is red on
+the old line and green on the new.
+
+**F3. The guard did network work before the measurement, on the recording path.** The `git fetch`
+and two `rev-list --count` ran unconditionally under `set -euo pipefail`, feeding only the prose
+of the cannot-record message and a parenthetical, while the verdict itself is a string
+comparison. A transient failure to reach origin would have killed the daily citable observation
+before it measured — and this ticket would have introduced that, since before it the first
+network operation on the recording path was the post-gate `git pull`. Both moved into the `else`
+branch; the can=yes parenthetical is `git rev-parse HEAD`. The recording path now needs no
+network to answer a question about two strings.
+
+**F4. Part 1b degraded to comfortable notes in a check that declares no could-not-look.** `_git`
+discarded every exit status and stderr, `main_ref` fell back to a literal and was never asserted
+to resolve, and zero other refs printed "ok ... among the 0 other ref(s)". A `git clone -s` with
+a stale `origin/main` was enough to make it report runs 100 and 101 as correctly absent when both
+were present. There is a `_git_checked` now, an unresolvable default ref raises with its own
+sentence, and a checkout carrying no other ref is a fault — part 2 asserts `fetch-depth: 0`, so a
+zero-ref checkout contradicts the shape the same script just passed.
+
+**F5, F6, F8.** The force-push detector allows an optional quote before the `+`, so
+`push origin "+HEAD:main"` is caught; the docstring no longer claims comments are read when the
+code skips them, and says why skipping is right. An empty `talk/truth.log` is a fault in the gate
+script, not just in the pytest. The manifest row states that `meta` is a decision and names the
+tension with `simulation`, and what would move it.
+
+**F7. The measured cost of decision 1, and it is larger than the review's figure.** Of **38**
+clock commits reachable from `main`, **29** are on main's first-parent chain and **9** are not:
+runs 17, 76, 79, 80, 84, 86, 88, 100 and 101. The review counted 35 and 6; the difference is the
+three rescued lines themselves, which arrived as cherry-picks after that count was taken and are
+by construction off the first-parent chain. So about one recorded line in four came from a branch
+run that merged cleanly, not one in six. Every one measured a tree that later reached main, so
+nothing about the estate's state is lost — but the record's density changed on 2026-09-05, and a
+reader comparing run numbers to first-parent history should know why.

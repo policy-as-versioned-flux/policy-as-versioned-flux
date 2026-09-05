@@ -22,9 +22,12 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import os
+import subprocess
 from pathlib import Path
 from typing import Any
 
+import pytest
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,6 +54,24 @@ def _text() -> str:
 
 
 # -- 1. the shape of the workflow this ticket decided ---------------------------------------------
+
+
+def _repo(tmp_path: Path) -> Path:
+    """A throwaway git repository with a talk/truth.log carrying one clock-written line."""
+    repo = tmp_path / "repo"
+    (repo / "talk").mkdir(parents=True)
+    env = dict(os.environ, GIT_AUTHOR_NAME="truth", GIT_AUTHOR_EMAIL=cr.CLOCK_EMAIL,
+               GIT_COMMITTER_NAME="truth", GIT_COMMITTER_EMAIL=cr.CLOCK_EMAIL)
+    subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(repo), "config", "user.email", "chris@cns.me.uk"], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "user.name", "Chris Nesbitt-Smith"], check=True)
+    (repo / "talk" / "truth.log").write_text(
+        "TRUTH 2026-01-01T00:00Z run=1 hub=0000000 pass=1 fail=0\n")
+    subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(repo), "commit", "-m", "truth: record run 1 [skip ci]"],
+                   check=True, capture_output=True, env=env)
+    return repo
+
 
 def test_the_committed_workflow_carries_the_shape() -> None:
     assert cr.shape_faults(_doc(), _text()) == []
@@ -273,3 +294,60 @@ def test_every_substitution_the_fixture_makes_is_declared() -> None:
 def test_the_substitutions_leave_the_push_line_alone() -> None:
     shell, _ = cr.portable(cr.step_shell(_doc(), "gate", cr.CAGE_STEP))
     assert 'push origin HEAD:"${GITHUB_REF_NAME}"' in shell
+
+
+# -- 4. a legitimate repair grades clean; a hand-authored line still does not ---------------------
+#
+# Measured on main on 2026-09-05, after the rescue of runs 76, 84 and 88 was reverted and redone
+# as cherry-picks of the clock's own commits: `git blame` STILL named the hand's commit, because
+# at the merge it prefers the parent where identical content already existed. This check reported
+# three faults on a log that had been put right -- a false red on the citable branch, and the
+# reviewer's grading of the branch before the merge could not see it. The rule wants the commit
+# that put the line where it now is, which `git blame` does not answer.
+
+
+def _clock_commit(repo, message, env_extra=None):
+    env = dict(os.environ, GIT_AUTHOR_NAME="truth", GIT_AUTHOR_EMAIL=cr.CLOCK_EMAIL,
+               GIT_COMMITTER_NAME="truth", GIT_COMMITTER_EMAIL=cr.CLOCK_EMAIL)
+    env.update(env_extra or {})
+    subprocess.run(["git", "-C", str(repo), "commit", "-am", message], check=True, env=env,
+                   capture_output=True)
+
+
+def test_a_reverted_then_clock_readded_line_attributes_to_the_clock(tmp_path) -> None:
+    repo = _repo(tmp_path)                      # helper already used by this module
+    log = repo / "talk" / "truth.log"
+    line = "TRUTH 2026-09-04T16:34Z run=76 hub=7d9b6a0 pass=1 fail=0"
+
+    # a hand adds it -- the fault this check exists for
+    log.write_text(log.read_text() + line + "\n")
+    subprocess.run(["git", "-C", str(repo), "commit", "-am", "hand-authored rescue"],
+                   check=True, capture_output=True)
+    rows = cr.blame_rows(repo)
+    assert any(r.line == line and r.email != cr.CLOCK_EMAIL for r in rows), \
+        "a hand-authored line must still fault"
+    assert cr.truth_log_faults(rows), "a hand-authored line must still fault"
+
+    # reverted, then re-added by the clock: the legitimate repair
+    log.write_text(log.read_text().replace(line + "\n", ""))
+    subprocess.run(["git", "-C", str(repo), "commit", "-am", "Revert the hand-authored rescue"],
+                   check=True, capture_output=True)
+    log.write_text(log.read_text() + line + "\n")
+    _clock_commit(repo, "truth: record run 76 [skip ci]")
+
+    rows = cr.blame_rows(repo)
+    row = next(r for r in rows if r.line == line)
+    assert row.email == cr.CLOCK_EMAIL, (
+        f"after a revert and a clock re-add the line attributed to {row.email}; git blame names "
+        f"the hand here, which is why this uses the adding commit instead")
+    assert cr.truth_log_faults(rows) == [], cr.truth_log_faults(rows)
+
+
+def test_a_line_no_commit_adds_is_a_fault_not_a_shrug(tmp_path) -> None:
+    repo = _repo(tmp_path)
+    (repo / "talk" / "truth.log").write_text(
+        (repo / "talk" / "truth.log").read_text() + "TRUTH 2026-01-01T00:00Z run=999 pass=1\n")
+    # deliberately NOT committed: no commit in history adds this line
+    with pytest.raises(cr.GitFailed) as e:
+        cr.blame_rows(repo)
+    assert "no commit in this history adds the line" in str(e.value)

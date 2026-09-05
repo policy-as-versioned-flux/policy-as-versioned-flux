@@ -192,24 +192,35 @@ jobs:
                  "tell whether it is on the branch whose log is citable. It does not guess 'main'."
             exit 1
           fi
-          # Explicit refspecs: a missing refs/remotes/origin/main would make the counts below
-          # silently wrong, and they are the evidence a builder reads out of this log.
-          git fetch --no-tags --quiet origin \
-            "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
-          base="$(git rev-parse "origin/${DEFAULT_BRANCH}")"
-          own="$(git rev-list --count "origin/${DEFAULT_BRANCH}..HEAD")"
-          merges="$(git rev-list --count --merges "origin/${DEFAULT_BRANCH}..HEAD")"
+          # THE VERDICT IS A STRING COMPARISON AND NEEDS NO NETWORK (review F3, 2026-09-05).
+          # `git fetch` and the two counts used to run here, unconditionally, under `set -e` --
+          # on the RECORDING path as well as the other one, where their only consumers are the
+          # prose of the cannot-record message and a parenthetical. So a transient failure to
+          # reach origin killed the daily citable observation before it measured anything, and
+          # this ticket would have introduced that: before it, the first network git operation
+          # on this path was the post-gate `git pull`. Whether this ref is the default branch is
+          # two strings. Everything that needs the remote now happens only where it is read.
           if [ "${GITHUB_REF_NAME}" = "${DEFAULT_BRANCH}" ]; then
             can=yes
+            base="$(git rev-parse HEAD)"
             why="this run is on ${DEFAULT_BRANCH}, whose talk/truth.log is the citable record"
           else
             can=no
+            # Explicit refspec: a missing refs/remotes/origin/<default> would make the counts
+            # silently wrong, and they are the evidence a builder reads out of this log. Only
+            # this branch needs them, and this branch is the one that records nothing, so a
+            # network failure here costs a sentence rather than an observation.
+            git fetch --no-tags --quiet origin \
+              "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
+            base="$(git rev-parse "origin/${DEFAULT_BRANCH}")"
+            own="$(git rev-list --count "origin/${DEFAULT_BRANCH}..HEAD")"
+            merges="$(git rev-list --count --merges "origin/${DEFAULT_BRANCH}..HEAD")"
             why="this run is on ${GITHUB_REF_NAME}, not ${DEFAULT_BRANCH}, and only ${DEFAULT_BRANCH}'s talk/truth.log is citable. This ref carries ${own} commit(s) ${DEFAULT_BRANCH} does not, ${merges} of them merges: with anything to replay, git pull --rebase --autostash origin ${DEFAULT_BRANCH} rewrites them and the push is refused non-fast-forward (run 98); with nothing to replay the push LANDS on the branch, and the line is then lost anyway the moment the branch merges without that commit (run 101, 2026-09-05)"
           fi
           echo "CAN_RECORD=${can}" >> "$GITHUB_ENV"
           echo "CANNOT_REASON=${why}" >> "$GITHUB_ENV"
           if [ "${can}" = yes ]; then
-            echo "THIS RUN CAN RECORD. Its TRUTH line will be appended to talk/truth.log, committed and pushed to ${GITHUB_REF_NAME}. Why: ${why} (origin/${DEFAULT_BRANCH}=${base})."
+            echo "THIS RUN CAN RECORD. Its TRUTH line will be appended to talk/truth.log, committed and pushed to ${GITHUB_REF_NAME}. Why: ${why} (HEAD=${base}; this verdict read no remote)."
           else
             echo "THIS RUN CANNOT RECORD ITS TRUTH LINE, and will not pretend to. It still runs the whole gate and still prints its TRUTH line below for a reader to quote; it appends nothing to talk/truth.log, makes no commit, and pushes nothing to your branch. Why: ${why} (origin/${DEFAULT_BRANCH}=${base})."
           fi
@@ -293,8 +304,18 @@ jobs:
       - name: the observation cage -- a clock appends observations, never a declaration
         env:
           GH_TOKEN: ${{ github.token }}
+          # The same source the guard reads (review F2): the rebase target below must be the
+          # branch the repository actually calls default, or a rename makes the guard say
+          # can=yes and this step lose the line it just committed.
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           set -euo pipefail
+          if [ -z "${DEFAULT_BRANCH:-}" ]; then
+            echo "::error::the cage has no default branch to rebase onto. It does not guess"\
+                 "'main': the guard already refused to, and a cage that guesses would push the"\
+                 "clock's commit at a branch nobody named."
+            exit 1
+          fi
           # `git reset` FIRST, so the index the cage commits is built only by the cage.
           # The old guard filtered `git status --porcelain` with `grep -v '^[AMD] '`,
           # which strips exactly the staged-and-clean entries -- so anything an earlier
@@ -352,7 +373,12 @@ jobs:
           git config gpg.x509.program gitsign
           git config commit.gpgsign true
           git commit -m "truth: record run ${GITHUB_RUN_NUMBER} [skip ci]"
-          git pull --rebase --autostash origin main
+          # The DEFAULT branch, never a literal (review F2, 2026-09-05). The guard takes
+          # the name from the event so a rename cannot silently stop the clock; this line
+          # kept a hardcoded `main`, so on a rename the guard would say can=yes, the commit
+          # would be made, this pull would fail and the push would never run. Loudly lost is
+          # still lost, and the rename-safety was only ever half a path.
+          git pull --rebase --autostash origin "${DEFAULT_BRANCH}"
           # The credential is handed to THIS command only; nothing the gate ran could
           # reach it (see persist-credentials above).
           # No --force, ever, and no `+` refspec (ticket 100): a clock that rewrote a builder's

@@ -93,7 +93,11 @@ def step_shell(doc: dict, job: str, fragment: str) -> str:
 def shape_faults(doc: dict, text: str) -> list[str]:
     """The workflow still has the shape ticket 100 decided, or the reasons it does not.
 
-    `text` is the raw YAML, read for the two things a parsed document flattens away: a force
+    `text` is the raw YAML, read for the two things a parsed document flattens away -- but read
+    line by line with comment lines skipped, so a force push written in a COMMENT is not a fault
+    (the docstring claimed otherwise until 2026-09-05; the code has always skipped them, and the
+    code is right: a comment describing what the cage must never do is not the cage doing it).
+    The two things are: a force
     push written anywhere at all, including in a comment or a step this checker does not name."""
     faults: list[str] = []
     steps = _steps(doc, "gate")
@@ -162,13 +166,30 @@ def shape_faults(doc: dict, text: str) -> list[str]:
             faults.append("the cage no longer pushes the one refspec it is allowed to push, "
                           'push origin HEAD:"${GITHUB_REF_NAME}"')
 
+    # F2: the cage must rebase onto the branch it was TOLD is default, never a literal. The
+    # guard takes the name from the event so a rename cannot silently stop the clock, and this
+    # half kept a hardcoded `main` -- so on a rename the guard says can=yes, the commit is made,
+    # the pull fails and the push never runs. Loudly lost is still lost. Its own scan, because
+    # the push scan below only visits lines carrying `git ... push` and a pull carries neither.
+    for line in re.sub(r"\\\n\s*", " ", text).splitlines():
+        if line.strip().startswith("#"):
+            continue
+        if re.search(r"\bgit\b[^\n]*\bpull\b[^\n]*\brebase\b[^\n]*\borigin\s+[\"']?(main|master)\b",
+                     line):
+            faults.append("the cage rebases onto a literal branch name rather than the default "
+                          "branch it was given, so a rename stops the clock after the commit is "
+                          "already made: " + line.strip())
+
     # Continuations first: the one real push in this workflow is written `git -c http.extraheader=
     # ... \` then `push origin HEAD:...` on the next line, so a per-line scan would read the push
     # and the `git` as two different statements and see neither.
     for line in re.sub(r"\\\n\s*", " ", text).splitlines():
         if line.strip().startswith("#") or not re.search(r"\bgit\b.*\bpush\b", line):
             continue
-        if "--force" in line or "-f " in line or re.search(r"push[^\n]*\s\+\S+:", line):
+        # An optional quote between the whitespace and the `+`: `git push origin "+HEAD:main"`
+        # and `'+HEAD:${GITHUB_REF_NAME}'` both slipped through, because the old pattern needed
+        # whitespace IMMEDIATELY before the plus and a quote intervenes (review F5).
+        if "--force" in line or "-f " in line or re.search(r"""push[^\n]*\s["']?\+\S+:""", line):
             faults.append(f"the workflow can force push, which would rewrite a builder's branch "
                           f"to land an observation: {line.strip()}")
     return faults
@@ -206,7 +227,7 @@ def truth_log_faults(rows: list[TruthRow]) -> list[str]:
             faults.append(f"{stamp}: run={run or '(absent)'} is neither a run number nor `local`, "
                           f"so nothing says which run could record it")
         elif row.email == CLOCK_EMAIL:
-            faults.append(f"{stamp}: a run=local line is blamed to the clock ({row.commit}); the "
+            faults.append(f"{stamp}: a run=local line was ADDED by the clock ({row.commit}); the "
                           f"clock records a run number or it records nothing")
         else:
             local += 1
@@ -217,33 +238,52 @@ def truth_log_faults(rows: list[TruthRow]) -> list[str]:
     return faults
 
 
-def blame_rows(root: Path) -> list[TruthRow]:
-    """`git blame` every TRUTH line of talk/truth.log, with each commit's author and subject.
+def adding_commit(root: Path, line: str, log_path: str = "talk/truth.log") -> tuple[str, str, str]:
+    """(sha, author email, subject) of the commit that LAST ADDED `line` to `log_path`.
 
-    A shallow checkout blames every line past the graft to the boundary commit, which would read
-    as a clean log for the wrong reason, so this raises rather than returning a comfortable
-    answer."""
+    Not `git blame`, and the difference is load-bearing (measured 2026-09-05). Blame answers
+    "which commit does git attribute this line to", which at a merge prefers the parent where
+    identical content already existed. So after a hand-authored line was REVERTED and re-added
+    by the clock's own cherry-picked commits -- the correct repair -- blame still named the
+    hand's commit on `main`, and this check reported three faults on a log that had been put
+    right. The rule wants the commit that put the line where it now is, which is a different
+    question, and `git log --full-history -S` answers it: every commit that changed the line's
+    presence, newest first, including both sides of a merge that history simplification would
+    otherwise hide. The newest one in which the line is PRESENT is the one that added it.
+
+    Raises GitFailed rather than guessing: an unattributable line is the thing this check exists
+    to notice."""
+    out = _git_checked(root, "log", "--full-history", "--format=%H\x1f%ae\x1f%s",
+                       "-S", line, "--", log_path)
+    for record in [r for r in out.splitlines() if r.strip()]:
+        sha, email, subject = record.split("\x1f", 2)
+        if line in _git_checked(root, "show", f"{sha}:{log_path}"):
+            return sha[:7], email, subject
+    raise GitFailed(
+        f"no commit in this history adds the line {line[:60]!r}... to {log_path}. A recorded "
+        f"line nothing can be shown to have written is exactly what this check exists to catch")
+
+
+def blame_rows(root: Path) -> list[TruthRow]:
+    """Every TRUTH line of talk/truth.log with the commit that LAST ADDED it, its author and
+    subject. Named `blame_rows` for its callers; it no longer uses `git blame` -- see
+    `adding_commit` for the measurement that forced the change.
+
+    A shallow checkout cannot answer the question at all (the history past the graft is not
+    there), so this raises rather than returning a comfortable answer."""
     root = Path(root)
     shallow = subprocess.run(["git", "-C", str(root), "rev-parse", "--is-shallow-repository"],
                              capture_output=True, text=True, check=True).stdout.strip()
     if shallow != "false":
-        raise RuntimeError("this checkout is shallow: git blame would attribute every line past "
-                           "the graft to the boundary commit")
-    out = subprocess.run(["git", "-C", str(root), "blame", "--line-porcelain", "talk/truth.log"],
-                         capture_output=True, text=True, check=True).stdout
-    rows: list[TruthRow] = []
-    commit = email = summary = ""
-    for line in out.splitlines():
-        if re.match(r"^[0-9a-f]{40} ", line):
-            commit, email, summary = line.split(" ")[0][:7], "", ""
-        elif line.startswith("author-mail "):
-            email = line[len("author-mail "):].strip().strip("<>")
-        elif line.startswith("summary "):
-            summary = line[len("summary "):].strip()
-        elif line.startswith("\t"):
-            content = line[1:]
-            if content.startswith("TRUTH "):
-                rows.append(TruthRow(line=content, email=email, subject=summary, commit=commit))
+        raise RuntimeError("this checkout is shallow: the commit that added a line is not in "
+                           "this history, so every line would attribute to the graft boundary "
+                           "and the log would read clean for the wrong reason")
+    rows = []
+    for content in (root / "talk" / "truth.log").read_text().splitlines():
+        if not content.startswith("TRUTH "):
+            continue
+        commit, email, subject = adding_commit(root, content)
+        rows.append(TruthRow(line=content, email=email, subject=subject, commit=commit))
     return rows
 
 
@@ -287,8 +327,49 @@ def stranded_faults(entries: list[Stranded]) -> tuple[list[str], list[str]]:
 
 
 def _git(root: Path, *args: str) -> str:
+    """git, best effort. Use ONLY where an empty answer is a legitimate result and not a fault."""
     return subprocess.run(["git", "-C", str(root), *args],
                           capture_output=True, text=True).stdout
+
+
+class GitFailed(Exception):
+    """A git command whose failure changes a verdict (review F4, 2026-09-05).
+
+    `_git` discards the exit status and stderr, which is right where an empty answer means
+    something and wrong everywhere else. Part 1b degraded to a comfortable note because of it:
+    in a `git clone -s` whose `origin/main` pointed at a stale local main, it reported runs 100
+    and 101 as "the tree it measured never reached the default branch, so the line is correctly
+    absent" -- when both lines were in fact present. A check that declares no could-not-look may
+    not answer a question it could not look at."""
+
+
+def _git_checked(root: Path, *args: str) -> str:
+    r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+    if r.returncode != 0:
+        raise GitFailed(f"git {' '.join(args)} failed (rc={r.returncode}): "
+                        f"{r.stderr.strip() or 'no stderr'}")
+    return r.stdout
+
+
+def default_ref(root: Path) -> str:
+    """The ref this checkout's default branch actually lives at.
+
+    Derived, never assumed (review F2): the guard step takes the branch name from the event so a
+    rename cannot silently stop the clock, and this half hardcoded `origin/main` with a literal
+    `main` fallback -- so the rename-safety existed in only half the path. `origin/HEAD` is what
+    the remote itself says its default is; a plain `origin/<name>` and then a local branch are
+    the fallbacks, and if none resolves this raises rather than guessing."""
+    head = _git(root, "symbolic-ref", "-q", "--short", "refs/remotes/origin/HEAD").strip()
+    candidates = [head] if head else []
+    candidates += ["origin/main", "origin/master", "main", "master"]
+    for ref in candidates:
+        if _git(root, "rev-parse", "-q", "--verify", f"{ref}^{{commit}}").strip():
+            return ref
+    raise GitFailed(
+        "no default branch ref resolves in this checkout: tried "
+        + ", ".join(candidates)
+        + ". Without one, 'is this line on the default branch' has no answer, and reporting "
+          "every line as correctly absent would be a false green")
 
 
 def stranded_entries(root: Path) -> tuple[list[Stranded], list[str]]:
@@ -296,12 +377,17 @@ def stranded_entries(root: Path) -> tuple[list[Stranded], list[str]]:
     at. It can only see the refs the checkout carries: a branch already deleted is gone, and this
     reports what it examined rather than claiming to have examined everything."""
     root = Path(root)
-    main_ref = "origin/main" if _git(root, "rev-parse", "-q", "--verify",
-                                    "refs/remotes/origin/main").strip() else "main"
+    main_ref = default_ref(root)
     refs = [r for r in _git(root, "for-each-ref", "--format=%(refname:short)",
                             "refs/heads", "refs/remotes").split() if r != main_ref]
     if not refs:
-        return [], refs
+        # Part 2 asserts the workflow checks out with `fetch-depth: 0`, so a checkout carrying no
+        # ref other than the default contradicts the shape this same script just passed. Before
+        # this it printed "ok ... among the 0 other ref(s)" and passed (review F4).
+        raise GitFailed(
+            f"this checkout carries no ref other than {main_ref}, so nothing could be stranded "
+            f"on one and this check has measured nothing. Part 2 asserts fetch-depth: 0, which "
+            f"is what makes that a contradiction rather than a quiet pass")
     commits = _git(root, "rev-list", f"--author={CLOCK_EMAIL}", *refs, "--not", main_ref).split()
     main_log = _git(root, "show", f"{main_ref}:talk/truth.log")
     entries: list[Stranded] = []
@@ -415,7 +501,14 @@ def main(argv: list[str]) -> int:
             print(f"  !! {f}")
         if not faults:
             n_local = sum(1 for r in rows if "run=local" in r.line)
-            print(f"  ok   {len(rows) - n_local} recorded TRUTH line(s), each blamed to the clock "
+            # F6: an empty log is not a clean log. Zero recorded lines used to print
+            # "ok 0 recorded TRUTH line(s)" and pass -- the pytest guarded it, the gate
+            # script did not, so the one place a reader looks would have called an empty
+            # record spotless.
+            if not rows:
+                print("FAIL: talk/truth.log carries no TRUTH line at all. An empty record is not a clean record")
+                return 1
+            print(f"  ok   {len(rows) - n_local} recorded TRUTH line(s), each ADDED by the clock "
                   f"commit whose message names the same run; {n_local} declared run=local line(s)")
         return 1 if faults else 0
     if cmd == "stranded":

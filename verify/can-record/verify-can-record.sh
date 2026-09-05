@@ -87,9 +87,9 @@ say "0. the pure half grades planted data as documented"
 "$PY" "$HERE/can_record.py" selfcheck || note "can_record.py selfcheck did not pass"
 
 # ---------------------------------------------------------------- 1. the record
-say "1. every TRUTH line in talk/truth.log came from a run that could record it"
+say "1. every TRUTH line in talk/truth.log was ADDED by a run that could record it"
 if [ "$(git -C "$ROOT" rev-parse --is-shallow-repository 2>/dev/null)" != false ]; then
-  note "this checkout is shallow (or is not a git repository), so git blame would attribute every truth.log line past the graft to the boundary commit and the log would read clean for the wrong reason"
+  note "this checkout is shallow (or is not a git repository), so the commit that added a line is not in this history, every line would attribute to the graft boundary and the log would read clean for the wrong reason"
 else
   "$PY" "$HERE/can_record.py" log "$ROOT" || note "talk/truth.log carries a line no run recorded (above)"
 fi
@@ -107,7 +107,7 @@ else
 fi
 
 # ---------------------------------------------------------------- 3. the mechanism
-say "3. the workflow's own shell, over two throwaway repositories, in five states"
+say "3. the workflow's own shell, over two throwaway repositories, in six states"
 
 T="$(mktemp -d)"
 trap 'rm -rf "$T"' EXIT
@@ -179,6 +179,22 @@ build_case() {
       advance_main "$d" a
       ( cd "$d/work" && git fetch -q origin main && git merge -q --no-edit FETCH_HEAD )
       ;;
+    renamed-default)                                 # the default branch is NOT called main
+      # Decision 1 says the branch name comes from the event so a rename cannot silently stop
+      # the clock. Every other state here passes DEFAULT_BRANCH=main, so the fixture could not
+      # see that the cage's `git pull` still named a literal `main` -- a PASS over a rule it did
+      # not test (review F2). This state renames the default branch everywhere: the remote's
+      # HEAD, the local branch and DEFBRANCH. If anything in the recording path still says
+      # `main`, the cage fails and grade_case sees it.
+      ( cd "$d/work" && git branch -m main trunk && git push -q origin trunk )
+      # The remote's HEAD moves BEFORE main is deleted: a bare repository refuses to delete the
+      # branch its HEAD points at, and leaving that failure in the output would be noise a
+      # reader has to learn to ignore.
+      ( cd "$d/remote.git" && git symbolic-ref HEAD refs/heads/trunk )
+      ( cd "$d/work" && git push -q origin --delete main \
+          && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/trunk \
+          && git branch -u origin/trunk trunk && git remote set-head origin trunk )
+      ;;
     branch-behind)                                   # own commits, main moved, no merge
       ( cd "$d/work" && git checkout -q -b feature )
       work_commit "$d" own1
@@ -202,7 +218,7 @@ run_steps() {
   : >"$env"; : >"$d/summary"; mkdir -p "$d/temp"
   { echo "some gate output"; printf 'TRUTH 1970-01-01T00:00Z run=%s hub=0000000 pass=1 fail=0\n' 7; echo "more"; } >"$d/temp/gate.out"
 
-  ( cd "$w" && GITHUB_REF_NAME="$ref" GITHUB_ENV="$env" DEFAULT_BRANCH=main \
+  ( cd "$w" && GITHUB_REF_NAME="$ref" GITHUB_ENV="$env" DEFAULT_BRANCH="${DEFBRANCH:-main}" \
       bash "$T/guard.sh" ) >"$d/guard.out" 2>&1
   local grc=$?
   can="$(sed -n 's/^CAN_RECORD=//p' "$env" | tail -1)"
@@ -221,7 +237,7 @@ run_steps() {
   [ "$(wc -l <"$w/talk/truth.log")" -gt "$before_len" ] && appended=yes
 
   ( cd "$w" && CAN_RECORD="$can" CANNOT_REASON="$reason" GITHUB_REF_NAME="$ref" \
-      GITHUB_RUN_NUMBER=7 GH_TOKEN=not-a-token \
+      GITHUB_RUN_NUMBER=7 GH_TOKEN=not-a-token DEFAULT_BRANCH="${DEFBRANCH:-main}" \
       OBSERVATION_LANE="talk/truth.log drift/samples.jsonl talk/captures observations" \
       bash "$T/cage.sh" ) >"$d/cage.out" 2>&1
   rc=$?
@@ -313,6 +329,10 @@ grade_case main-behind       main    yes
 grade_case branch-rebased    feature no
 grade_case branch-with-merge feature no
 grade_case branch-behind     feature no
+# The sixth state (review F2): the default branch is called `trunk`, and the run is ON it, so the
+# guard must say yes and the whole recording path -- including the cage's rebase target -- must
+# use the name it was given rather than a literal.
+DEFBRANCH=trunk grade_case renamed-default trunk yes
 
 # Two states in which the guard cannot answer at all. It refuses rather than guessing: a wrong
 # `yes` commits a line that is thrown away, and a wrong `no` loses a citable observation.
@@ -337,7 +357,7 @@ fi
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: every recorded TRUTH line is blamed to the clock commit naming the same run; truth.yml's guard runs before the gate, the record step and the cage consult it, and the one push is HEAD:\${GITHUB_REF_NAME} with no force anywhere; and the workflow's own shell, run over two throwaway repositories in five states, records exactly when its guard said it could and commits nothing when it said it could not"
+  echo "PASS: every recorded TRUTH line was ADDED by a clock commit naming the same run; truth.yml's guard runs before the gate, the record step and the cage consult it, and the one push is HEAD:\${GITHUB_REF_NAME} with no force anywhere; and the workflow's own shell, run over two throwaway repositories in six states, records exactly when its guard said it could and commits nothing when it said it could not"
   exit 0
 fi
 echo "FAIL: $bad fault(s) -- the clock's account of what it can record does not match what it does (ticket 100)"
