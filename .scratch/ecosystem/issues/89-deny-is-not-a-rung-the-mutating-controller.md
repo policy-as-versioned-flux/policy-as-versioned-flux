@@ -566,6 +566,16 @@ and was then refused: `! [rejected] HEAD -> ticket-89-deny-is-not-a-rung (non-fa
 remote tip was `11f156f` throughout and I pushed nothing after it. Twelve commits rebased onto
 `origin/main` cannot fast-forward a ref that still points at the un-rebased twelfth.
 
+**Confirmed by the fix working.** Run 100 LANDED on this branch — the first observation it has
+ever recorded — and it landed because the branch had been REBASED onto `origin/main` (round 3,
+R4) rather than carrying a merge commit, so the workflow's `git pull --rebase origin main` was a
+no-op and its push fast-forwarded. That is the rule the brief now carries, verified by an
+observation arriving rather than by argument:
+
+```
+TRUTH 2026-09-05T13:51Z run=100 hub=e40852c units=[driftwood=96f4d0d@main feeds=b6eaa0a@main ico=6217c3a@main insurer=9e90e1b@main ludlow=d40b3fb@main nist=b9f5fff@main platform=ea9b2ee@main tuppence=c0e37e0@main] pass=68 [observed=16 self=40 simulated=6 meta=6] fail=6 skip=24 [never=10 waits=14] excluded=8 total=106 ceiling=87
+```
+
 **So the finding is about the clock, and one piece of my own advice was backwards.** I had written
 into the build brief that merging `origin/main` into a ticket branch removes the loss. It does the
 opposite: the merge commit (`d961091`) is what guarantees the rebase rewrites history, and so
