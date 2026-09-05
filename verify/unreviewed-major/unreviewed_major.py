@@ -169,12 +169,18 @@ def grade(findings: list[dict]) -> tuple[str, list[tuple[str, str]]]:
                     f"institution carries is an authorisation the owner makes (ADR-0025); no gate "
                     f"can, and this line stands until the owner does or the version leaves the "
                     f"window")))
+        elif not finding["window"]:
+            # Nothing was verified, because there was nothing to verify. Saying so is not the same
+            # sentence as "every version verified", and a vacuous claim is still a claim.
+            lines.append(("PASS", (
+                f"{adopter}: the composed window it serves carries no policy version at all, so "
+                f"there is no bump to read and no evidence was verified for it")))
         else:
             lines.append(("PASS", (
                 f"{adopter}: no major in the {len(finding['window'])} version(s) its composed "
-                f"window carries ({', '.join(finding['window']) or 'none'}), each read from "
-                f"platform's signed evidence at {finding['tag']} and verified under {adopter}'s "
-                f"own identity constant")))
+                f"window carries ({', '.join(finding['window'])}), each read from platform's "
+                f"signed evidence at {finding['tag']} and verified under {adopter}'s own identity "
+                f"constant")))
     if majors:
         return "FAIL", lines
     if unlooked:
@@ -324,6 +330,10 @@ def selfcheck() -> int:
     unlooked = {"adopter": "ludlow", "tag": None, "window": [], "computed": {},
                 "skip": "pins platform tag v9.9.9, which this checkout of platform has no tag object for"}
     check("a window with no major is the pass", grade([clean])[0], "PASS")
+    empty = {"adopter": "nist", "tag": "v2.0.1", "window": [], "computed": {}, "skip": None}
+    status_empty, lines_empty = grade([empty])
+    check("an empty window passes without claiming anything was verified for it",
+          (status_empty, "no evidence was verified" in lines_empty[0][1]), ("PASS", True))
     status, lines = grade([carried])
     check("a major standing in a window is named, with its adopter and the tag it was read at",
           (status, all(s in " ".join(m for _, m in lines) for s in ("tuppence", "4.0.0", "v2.0.1"))),
