@@ -90,21 +90,26 @@ Units (`.estate-clone/<unit>/`, gitignored clones of the real repos, local `main
 - KinD clusters `driftwood`, `tuppence`, `ludlow` exist locally. Do not delete them. An ephemeral
   cluster uses a fresh name and deletes itself.
 - Do not run `talk/verify-all.sh` as a builder. Run your own script and the ones you changed.
-- **`truth` serialises across the whole repository, so read the `status` column before you push.**
-  The clock's workflow runs one at a time for every branch at once, so your branch's run can sit
-  `pending` for a long while behind somebody else's branch, and the newest row in `gh run list` is
-  often not yours. The rule is narrower than "wait for the run to finish": **never push while a run
-  on YOUR branch is `in_progress`.** That is the state in which a run has produced a TRUTH line it
-  has still to commit, and your push makes that commit non-fast-forward, so the observation is gone
-  and cannot be recovered — the next run measures a different tree. A `pending` run has started
-  nothing and produced nothing; superseding it costs no observation. Check with
-  `gh run list --branch <yours> --json status --jq '[.[]|select(.status!="completed")]|length'`,
-  not by eye.
-  There is a second way to lose one that has nothing to do with your branch: `truth.yml` commits
-  its line and then runs `git pull --rebase --autostash origin main`. If `origin/main` moved while
-  the run was in flight, the replay can conflict in `talk/truth.log` and the observation is lost
-  the same way. Merging `origin/main` into your branch before you push removes that cause.
-  Both happened on 2026-09-05 during ticket 89: run 92 to `origin/main` moving, run 95 to a push
-  one minute after the run started. With several builders pushing at once this is a property of the
-  clock's concurrency, not of anyone's carelessness — which is exactly why it needs a mechanical
-  check rather than care.
+- **`truth.yml` cannot land an observation on a branch that has DIVERGED from main, and a push
+  is not what breaks it.** After writing its TRUTH line the workflow commits and runs
+  `git pull --rebase --autostash origin main`, then pushes to the BRANCH. On `main` that rebase is
+  a no-op and the push fast-forwards. On a ticket branch it rewrites every commit, so the result is
+  not a descendant of the branch's own remote ref and the push comes back
+  `! [rejected] ... (non-fast-forward)`. The observation is gone; the next run measures a different
+  tree.
+  Measured on 2026-09-05 during ticket 89, three times, including a controlled case: run 98 was
+  rejected while the remote tip had not moved and nobody had pushed at all. Runs 92 and 95 went the
+  same way. So **do not conclude from a lost observation that somebody pushed at the wrong moment**;
+  on a branch it happens anyway.
+  What follows for a builder:
+  * **Do not merge `origin/main` into your ticket branch. Rebase onto it.** A merge commit
+    guarantees the rebase rewrites history and guarantees the loss. A branch whose commits already
+    sit linearly on current `origin/main` rebases to a no-op and its runs can land.
+  * Still do not push while a run on YOUR branch is `in_progress`: it is a separate way to lose the
+    same thing, and reading the top rows of `gh run list` is not enough because `truth` serialises
+    across every branch at once, so the newest row is often somebody else's. Check with
+    `gh run list --branch <yours> --json status --jq '[.[]|select(.status=="in_progress")]|length'`.
+    A `pending` run has started nothing and can be superseded safely.
+  * A branch TRUTH line is therefore usually only in the Actions log. Quote it from there if you
+    need it, mark it as not citable, and never hand-write it into `talk/truth.log`: a builder does
+    not author a clock's observation.

@@ -223,7 +223,7 @@ reads the template; the drift is fixed and cannot come back unobserved.
   directly instead: the kind change flows through, and the composed governed-namespace member
   carries no `validationActions` and no `Deny`.
 
-Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; the two machinery guards become six documents that refuse nothing (orphan guard Audit + orphan cage, governed-namespace cage + unclaimed report, bottom-rung netpol, and the unsuffixed cage-isolated PriorityClass without which the Priority plugin would refuse every pod they cage); posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck. Round 1 shipped a real regression — the demotion alone left an orphan claim uncaged, because every served cage-tier is version-scoped — and the review caught it; the fix, the four other blocking findings, and three defects found by RUNNING the beats are in the ticket -- the sharpest being that every served PriorityClass is version-suffixed, so the machinery's own cage named a class no cluster has and would have made every pod it caged inadmissible: a refusal by another name, inside the ticket about refusals by another name, invisible to every static check here and now named in deny_register.BLIND_SPOTS as wanting a ticket of its own. Disjointness is proved from the array. Two clock observations were lost -- run 92 to origin/main moving under the run, run 95 to the builder pushing while it was in flight -- both quoted in the ticket from the Actions logs and deliberately not written into truth.log. The 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
+Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; the two machinery guards become six documents that refuse nothing (orphan guard Audit + orphan cage, governed-namespace cage + unclaimed report, bottom-rung netpol, and the unsuffixed cage-isolated PriorityClass without which the Priority plugin would refuse every pod they cage); posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck. Round 1 shipped a real regression — the demotion alone left an orphan claim uncaged, because every served cage-tier is version-scoped — and the review caught it; the fix, the four other blocking findings, and three defects found by RUNNING the beats are in the ticket -- the sharpest being that every served PriorityClass is version-suffixed, so the machinery's own cage named a class no cluster has and would have made every pod it caged inadmissible: a refusal by another name, inside the ticket about refusals by another name, invisible to every static check here and now named in deny_register.BLIND_SPOTS as wanting a ticket of its own. Disjointness is proved from the array. Three clock observations were lost, and the cause is the clock: truth.yml rebases a branch onto main and then pushes to the branch, which can never fast-forward once the branch has diverged -- run 98 was rejected with the tip unmoved and nobody pushing. So a TRUTH line produced on a ticket branch normally never lands, and the brief now says rebase onto main rather than merge it, which is the opposite of what this build first wrote. All three lines are quoted in the ticket from the Actions logs and none is written into truth.log. The 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
 
 ### Round 2, 2026-09-05 — the review found five blocking findings and the central one was real
 
@@ -319,15 +319,28 @@ run (review finding P2-6). Naming the two together is what makes the case; the t
 written here because charting is not this ticket's, but nothing else in the record puts the two
 instances side by side.
 
-### Two observations were lost, and I caused the second one
+### Three observations were lost, and the clock is why, not the pushes
 
-I pushed while `truth` runs were in flight, having read the first rows of `gh run list` instead
-of the `status` column. Two observations never reached `talk/truth.log`. I first wrote here that
-neither was my doing; that was wrong, and I found it out by going back through the logs a second
-time rather than by being told. One was `origin/main` moving under a run. **The other was my
-push.** Both lines are quoted below from the Actions logs, and neither is written into
-`talk/truth.log`: a builder does not author a clock's observation, and a line hand-copied into
-that file would be indistinguishable from one the clock landed.
+Three `truth` runs on this branch produced a TRUTH line and none of the three reached
+`talk/truth.log`. I got the reason wrong twice on the way to it, and both wrong answers are left
+here because the second one nearly shipped as advice to the next builder.
+
+First I wrote that no observation was lost. Then, re-reading the logs, that one was lost to
+`origin/main` moving and a second to my own push — I had pushed while runs were in flight, reading
+the top rows of `gh run list` instead of the `status` column, which is a real rule violation and
+mine. Then run 98 settled it: **it was rejected with the remote tip unmoved and nobody pushing at
+all.** That is the controlled case, and it says the cause is structural.
+
+**`truth.yml` cannot land an observation on a branch that has diverged from main.** After writing
+its line it commits and runs `git pull --rebase --autostash origin main`, then pushes to the
+BRANCH. On `main` the rebase is a no-op and the push fast-forwards. On a ticket branch it rewrites
+every commit, so the result is not a descendant of the branch's own remote ref and the push is
+refused non-fast-forward. My push made run 95's tip move as well, but run 98 shows the rejection
+arrives without it.
+
+All three lines are quoted below from the Actions logs. None is written into `talk/truth.log`: a
+builder does not author a clock's observation, and a line hand-copied there would be
+indistinguishable from one the clock landed.
 
 **The first: `origin/main` moved.** Run 92, on hub commit `c28541e`
 ([Actions run 33936905680](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/33936905680)),
@@ -352,7 +365,7 @@ is in this branch by accident: merging `origin/main` in (F10) is what stops a br
 conflicting with main's `truth.log`, and a branch that sits behind main will keep losing
 observations this way. That is a property of `truth.yml`, not of this ticket.
 
-**The second: I pushed while it was running.** Run 95, on hub commit `f91c0f6`
+**The second: rejected, and I had also pushed.** Run 95, on hub commit `f91c0f6`
 ([Actions run 33941571076](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/33941571076)),
 produced this line at 2026-09-05T03:44:07Z:
 
@@ -361,34 +374,38 @@ TRUTH 2026-09-05T03:44Z run=95 hub=f91c0f6 units=[driftwood=a1a2a78@main feeds=b
 ```
 
 It committed as `10a495c` and the push came back
-`! [rejected] HEAD -> ticket-89-deny-is-not-a-rung (non-fast-forward)`, because the tip had moved
-to `91bd500` — which I pushed at 03:21Z, about a minute after that run started at 03:20:18Z. This
-is exactly the failure the build brief warns about, in the exact shape it warns about it, and the
-warning was in front of me. The observation is gone and cannot be recovered: the next run measures
-a different tree.
+`! [rejected] HEAD -> ticket-89-deny-is-not-a-rung (non-fast-forward)`. The tip HAD moved to
+`91bd500`, which I pushed at 03:21Z about a minute after that run started at 03:20:18Z — the
+failure the build brief warns about, in the shape it warns about it, with the warning in front of
+me. I recorded it as my fault, and the rule violation was mine. Run 98 then showed the rejection
+happens with no push at all, so the push was not what cost this line. The observation is gone
+either way: the next run measures a different tree.
 
 It is worth saying what was lost, because it was the best number this branch has produced:
 `pass=68 fail=6 skip=24 of 106, ceiling 87`. It is quoted here so the work is not invisible, and
 it is NOT a citable line — no run recorded it in `talk/truth.log`, so nothing may cite it.
 
-**The general lesson, which is the clock's and not any builder's.** `truth` serialises across the
-whole repository: one run at a time for every branch at once. So a builder's run can sit `pending`
-behind another branch's for a long while, the newest row of `gh run list` is often somebody else's,
-and one builder's push can displace another branch's queued run. That makes "check before you
-push" mean something mechanical: **never push while a run on YOUR branch is `in_progress`** — the
-state in which a TRUTH line exists and is waiting to be committed. A `pending` run has started
-nothing and can be superseded safely; that is why the two runs cancelled here (`26eb5ac`,
-`602cda3`) cost nothing, checked in their logs rather than assumed. Read the `status` column:
+**The third, and the controlled case: nobody pushed.** Run 98, on hub commit `11f156f`
+([Actions run 33942739871](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/33942739871)),
+produced `TRUTH 2026-09-05T04:29Z run=98 hub=11f156f ...`, committed it as `3c6a442`, logged
+`Rebasing (12/12)` and `Successfully rebased and updated refs/heads/ticket-89-deny-is-not-a-rung`,
+and was then refused: `! [rejected] HEAD -> ticket-89-deny-is-not-a-rung (non-fast-forward)`. The
+remote tip was `11f156f` throughout and I pushed nothing after it. Twelve commits rebased onto
+`origin/main` cannot fast-forward a ref that still points at the un-rebased twelfth.
 
-```sh
-gh run list --branch <yours> --json status --jq '[.[]|select(.status!="completed")]|length'
-```
+**So the finding is about the clock, and one piece of my own advice was backwards.** I had written
+into the build brief that merging `origin/main` into a ticket branch removes the loss. It does the
+opposite: the merge commit (`d961091`) is what guarantees the rebase rewrites history, and so
+guarantees the rejection. The brief now says **rebase onto `origin/main`, do not merge it** — a
+branch whose commits already sit linearly on current main rebases to a no-op and its runs can
+land. Not pushing during an `in_progress` run stays a rule, as a separate way to lose the same
+thing.
 
-And the second cause is not about branches at all: `truth.yml` rebases onto `origin/main` after
-committing, so a branch sitting behind main loses its observation to a `talk/truth.log` conflict.
-Merging `origin/main` in before pushing removes it. Both are written into
-`.scratch/ecosystem/BUILD-BRIEF-2026-09-03.md` under the rules that do not bend, which is where the
-next builder will look.
+The consequence worth someone's attention: **a TRUTH line produced on a ticket branch normally
+never lands, so branch runs are not a record of anything.** Only `main` accumulates observations.
+Nothing in the estate says so, and three lines were lost here before it was visible. Both halves
+are in `.scratch/ecosystem/BUILD-BRIEF-2026-09-03.md` under the rules that do not bend, which is
+where the next builder looks.
 
 **Composition** carries the three new policy members and the PriorityClass, read defensively so an
 adopter pinned to a parent tag from before this ticket composes exactly what it composed then.
