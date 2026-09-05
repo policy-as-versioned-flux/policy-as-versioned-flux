@@ -84,6 +84,48 @@ policy, exactly as `CONTEXT.md` already requires for changing what gets enforced
 - **A coverage hole is grounds for a reviewed PR, never for an override.** The gate states what it
   didn't reach; it does not let an unreached case become a reason to bypass the rule.
 
+## Note, 2026-09-05 (eco-system ticket 99: the adopter gate grades the change, not the window)
+
+"Computes that institution's own composed bump" was read two ways by three adopters, and only one
+can be the estate's. **The fold's subject is the DELTA the pull request makes to the institution's
+composed window — the versions it adds and the versions it retires — never the whole window it
+leaves standing** (delegated, ADR-0025). driftwood and ludlow already read it that way; tuppence
+folded its whole supported window and was changed to match.
+
+Four reasons, in order of weight. This gate runs "on the Renovate bump pull request" and computes
+that institution's own *bump*, and a bump is a movement — tuppence reported `major` for a pull
+request whose declared bump was `none`, because its pin did not move, so it was answering a question
+about the window rather than about the change in front of it. The refusal it raised named a remedy
+the gate has no input for: no flag records a review and no other path exists past the composed-major
+line, and a refusal that cannot be satisfied is not strict, it is non-terminating. A check that
+fails on every pull request has stopped discriminating — tuppence's last green `shift-left` was
+2026-08-28 and it then failed twelve consecutive times. And two of three adopters were green on the
+same platform tag and the same signed evidence.
+
+**This is not the override "No override" bans.** Nothing is exempted and no refusal is weakened for
+any subject: a composed major still refuses, a retirement is still a forced major, and an added
+version's own signed evidence is still verified against the institution's own held identity and
+re-read rather than recomputed. The gate is pointed at the question this ADR asks it.
+
+**What the reading gives up, named.** A version standing at both ends of a pull request is not
+folded, so on that pull request nothing re-verifies its signature. Measured, not argued: with
+platform's `4.0.0.json.bundle` corrupted at a fresh tag and both folds run over identical inputs,
+the window fold refuses on a real cosign failure and the delta fold adopts. driftwood and ludlow
+have always had this property; tuppence now shares it. The class is not dropped, it is moved off the
+pull request and onto the clock: `verify/unreviewed-major/verify-unreviewed-major-in-window.sh`
+verifies every version in every adopter's composed window, with real cosign, at the tag that adopter
+pins, on every truth-surface run, and reports one that does not verify as observed false. A window
+verified only when somebody opens a pull request is verified less often than one verified daily.
+
+The property the window fold was protecting — an institution should not quietly carry a major
+nobody reviewed — is real, and survives as a report rather than a refusal, because the fact does not
+depend on anyone opening a pull request. `verify/unreviewed-major/verify-unreviewed-major-in-window.sh`
+names every major standing in an adopter's composed window on every truth-surface run, read from
+that adopter's own composed artefact and from platform's signed evidence at the tag that adopter
+pins. It records no review and invents none: disposing of a carried major is an owner authorisation
+under ADR-0025. That the three adopters answer this ADR alike is itself graded, on planted
+movements, by `verify/fold-agreement/verify-fold-agreement.sh`.
+
 ## Note, 2026-09-03 (ticket 53: the signed evidence reaches the branch, or nothing lands)
 
 The consequence above says the publisher gate runs before `git tag`. It also commits its signed
