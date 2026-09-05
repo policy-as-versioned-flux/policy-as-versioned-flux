@@ -16,8 +16,13 @@
 # document-based, because three of the estate's Denys live inside a ResourceSet's
 # `resourcesTemplate` STRING, where a YAML-document walk sees a ResourceSet and no policy at all.
 #
-#   PASS (exit 0)  every Deny-shaped rule is recorded with a choice and a reason, and none is
-#                  left in a served copy
+#   PASS (exit 0)  every Deny-shaped rule THIS SCAN CAN SEE is recorded with a choice and a
+#                  reason, and none is left in a served copy. What it cannot see is printed on
+#                  every run from deny_register.BLIND_SPOTS -- a YAML anchor, a template
+#                  engine's conditional arm, an action computed at admission, and a refusal by
+#                  another name (a mutation that makes a pod inadmissible), which is graded by
+#                  nothing here and has bitten this estate twice, both times found by running
+#                  the policy rather than reading it
 #   FAIL (exit 1)  a Deny no register row claims; a row that says converted while a copy
 #                  survives; a row that says a copy survives when none does; a row whose source
 #                  no longer emits the Deny while the row still says `waiting`; a row with no
@@ -83,6 +88,15 @@ if [ ! -d "$ROOT/.estate-clone" ]; then
   echo "SKIP: no .estate-clone (run clone-estate.sh), so only the hub's own tree was read and the served policy copies -- platform's version directories and the three adopters' composed artefacts -- were never looked at"
   exit 3
 fi
+
+say "0b. what this scan cannot see"
+python3 - "$HERE" <<'BS'
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("dr", sys.argv[1] + "/deny_register.py")
+dr = importlib.util.module_from_spec(spec); sys.modules["dr"] = dr; spec.loader.exec_module(dr)
+for b in dr.BLIND_SPOTS:
+    print(f"  ??   blind spot: {b}")
+BS
 
 say "1. every Deny-shaped rule in the hub and the estate, against the recorded choices"
 python3 "$HERE/deny_register.py" --root "$ROOT" --register "$REG" --inventory | sed 's/^/  /'

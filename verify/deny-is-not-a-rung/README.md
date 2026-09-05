@@ -53,6 +53,24 @@ which is true inside a template string as well as inside a document.
 
 ## Escaping the register
 
+## What this scan CANNOT see
+
+`deny_register.BLIND_SPOTS`, printed on every run and held non-empty by a test: a YAML anchor or
+alias; a template engine's conditional arm; an action computed at admission; and the one that
+matters most, **a refusal by another name** — a mutation that makes a pod inadmissible refuses the
+workload with no Deny-shaped text anywhere in it. The estate has produced that failure twice, both
+times found by RUNNING the policy and never by reading it: ticket 26 on 2026-08-28 (a sidecar
+appended twice, so every update to a caged pod was rejected) and this ticket's own first cut on
+2026-09-05 (the machinery cage named a PriorityClass that no cluster has, because every served one
+is version-suffixed). Read the register for what was decided; read the beats for what runs.
+
+Four other blind spots a reviewer planted on 2026-09-05 are now closed, each with a test that was
+red first: a `.json` policy, a one-line flow mapping, a multi-line flow sequence, and
+`validationFailureActionOverrides`. The exploitable one is closed too — name attribution was
+positional and unbounded, so a document whose `metadata:` follows its `spec:` inherited the
+previous document's name and a second Deny appended to an already-covered file read as accounted
+for. Attribution is bounded to its own document now.
+
 Only `register.yaml`'s `excluded:` list, and every entry carries the reason it is not a served
 policy copy. There are two today: the hub's `spikes/` material, and platform's `computed-semver`
 corpus — whose Denys are the ENGINE'S INPUT, the pairs it computes an `Audit -> Deny` bump across.

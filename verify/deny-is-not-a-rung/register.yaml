@@ -9,10 +9,20 @@
 # a copy survives fails. A row that says a copy survives when none does fails. A row whose
 # source is clean while it still says `waiting` fails, so the record cannot lag the code.
 #
-# Written 2026-09-05. Decisions are the assistant's under ADR-0025, labelled `delegated`; the
-# doctrine they implement is the owner's, reasoned, 2026-09-02 (ticket 75 Q5): "something could
-# find itself unable to run, but that's only because it doesn't fit the cage, not because we
-# deliberately deny it."
+# Written 2026-09-05, rewritten the same day after review. Decisions are the assistant's under
+# ADR-0025, labelled `delegated`; the doctrine they implement is the owner's, reasoned,
+# 2026-09-02 (ticket 75 Q5): "something could find itself unable to run, but that's only because
+# it doesn't fit the cage, not because we deliberately deny it."
+#
+# THIS FILE IS NOT EXHAUSTIVE, and `deny_register.py` BLIND_SPOTS says what it cannot see: a
+# YAML anchor or alias, a template engine's conditional arm, an action computed at admission,
+# and -- the one that matters most -- a REFUSAL BY ANOTHER NAME. A mutation that makes a pod
+# inadmissible refuses the workload with no Deny-shaped text anywhere in it, and nothing here
+# grades that. The estate has produced exactly that failure twice, both times found by RUNNING
+# the policy and never by reading it: ticket 26 on 2026-08-28 (a sidecar appended twice, so
+# every update to a caged pod was rejected), and this ticket's own first cut on 2026-09-05 (the
+# machinery cage named a PriorityClass that no cluster has, because every served one is
+# version-suffixed). Read the register for what was decided; read the beats for what runs.
 version: 1
 
 # Trees the scan does not walk, each with the reason it is not a served policy copy. This list
@@ -23,6 +33,18 @@ excluded:
       throwaway spike material in the hub (cs-06's inheritance corpus and its adversarial
       pin-image pair). Nothing here is installed on a cluster, pinned by an adopter or
       rendered into a composed artefact; it exists to be diffed by the semver spike.
+  - path: .scratch/
+    reason: >-
+      the issue tracker, the review records and the codemap dumps under them. Nothing here is
+      installed on a cluster, pinned by an adopter or rendered into a composed artefact: the
+      hits are review evidence QUOTING the policies this register grades, and a codemap of the
+      estate's own source. Rewriting a superseded record in place is banned outright (the map's
+      Out of scope), so these could not be edited even if they were wrong.
+  - path: verify/deny-is-not-a-rung/register.yaml
+    reason: >-
+      this file. It names both Deny-shapes in its own header, by necessity, because it is the
+      record of what they are and what was decided about each. A register that reported itself
+      would be the only entry that could never be resolved.
   - path: .estate-clone/platform/computed-semver/corpus/
     reason: >-
       the computed-semver engine's own corpus. These documents are the ENGINE'S INPUT -- the
@@ -38,16 +60,33 @@ rules:
     choice: re-expressed
     state: waiting
     reason: >-
-      Re-expressed as a cage constraint. The rule judges a claim: a pod claiming a
-      policy-version the platform's declared array does not carry. Under the shipped Deny that
-      pod could not run. Under the cage it runs on the bottom rung: a `MutatingPolicy` beside
-      the guard clobbers the pod to `posture.acme.io/tier: isolated` with the isolated dials,
-      which is a running cage with no ingress and no egress and first eviction (ADR-0022), and
-      the guard itself drops to `Audit` so the orphan claim is still observed. This is what
-      CONTEXT.md's Orphan guard entry has claimed since 2026-08-28 -- "cages to `isolated` ...
-      the workload is not denied" -- and what the code did not do. The bottom rung needs no
-      version to select it, so the "missing instrument" defence (ADR-0020) does not reach
-      here: a missing instrument refuses to emit a PRICE, it never refuses a workload.
+      Re-expressed as a cage constraint, and it took two attempts. The rule judges a claim: a
+      pod claiming a policy-version the platform's declared array does not carry. Under the
+      shipped Deny that pod could not run.
+      WHAT IS BUILT (platform branch ticket-89-deny-is-not-a-rung, commit bd9e919): a PAIR.
+      `policy-version-orphan-guard` drops to `Audit` and reports the claim by name, and a new
+      `MutatingPolicy` `policy-version-orphan-cage`, ranged from the SAME array, puts that pod
+      on the bottom rung -- `posture.acme.io/tier: isolated`, the caged marker, the isolated
+      dials, the `cage-isolated` PriorityClass with its integer priority, host namespaces shut,
+      all capabilities dropped on containers AND initContainers. Beside them
+      `cage-netpol-bottom-rung` generates the deny-all NetworkPolicy the version-scoped
+      `cage-netpol` cannot, and the machinery renders the unsuffixed `cage-isolated`
+      PriorityClass, without which the Priority admission plugin would refuse every pod the
+      cage touches.
+      THE FIRST ATTEMPT SHIPPED THE DEMOTION ALONE, on the reasoning that "every claiming pod
+      is already caged by cage-tier". That is false of the served estate and the review caught
+      it: every served `cage-tier` carries `only-this-policy-version`, and an orphan claim is
+      by definition a version no served line carries, so it matched no cage at all. The pod ran
+      with no tier, no limits, no hardening and no reach cage, and any pod could opt out of
+      every versioned rule by claiming a bogus version -- a self-service exemption, which
+      principle 1 bans. The measurement behind that reasoning was taken against
+      `graded/policies/cage-tier.yaml`, which `graded/up.sh` says in its own header it never
+      applies. Re-measured against the served bodies, the same version scoping makes the pair
+      SAFE: the served cage matches claims IN the array, this one claims NOT in it, so the two
+      mutations are disjoint and never contend for a field.
+      The bottom rung needs no version to select it, so the "missing instrument" defence
+      (ADR-0020) does not reach here: a missing instrument refuses to emit a PRICE, it never
+      refuses a workload.
     source_clean:
       - .estate-clone/platform/distribution/render-orphan-guard.py
       - .estate-clone/platform/distribution/versions.yaml
@@ -69,13 +108,24 @@ rules:
       Re-expressed as a cage constraint. ADR-0022's 2026-08-28 addendum promoted this from
       Audit to Deny and called it "the one refusal the doctrine allows", for a real reason
       observed live: under Audit a claim-less pod ran COMPLETELY UNCAGED inside a Namespace
-      whose declared tier was `isolated`. The cage answers the reason without the refusal --
-      a `MutatingPolicy` scoped to `policy-as-versioned.dev/governed: "true"` namespaces puts
-      an unclaimed pod on the bottom rung, so the Namespace falls closed AND the pod falls
-      closed -- and the guard drops to `Audit` so silence is still observed. `cage-tier` cannot
-      do this itself: it matches only pods that CLAIM a version, and widening it would cage
-      kube-system, Flux and Kyverno's own pods, which ADR-0014 rejected for two independent
-      reasons that both still hold.
+      whose declared tier was `isolated`.
+      WHAT IS BUILT (platform branch ticket-89-deny-is-not-a-rung, commit bd9e919): the
+      ValidatingPolicy is REPLACED by a `MutatingPolicy` of the same name, scoped to
+      `policy-as-versioned.dev/governed: "true"` namespaces, which puts an unclaimed pod on the
+      bottom rung -- so the Namespace falls closed AND the pod falls closed. Because replacing
+      it dropped the observation the Deny used to make, a SEPARATE `Audit` ValidatingPolicy
+      `governed-namespace-unclaimed-report` is rendered beside it and names the cage in its
+      message. A mutation and a report do not contend for a field, which is why this pair is
+      safe where two mutations would not be; an earlier draft of this row claimed "the guard
+      drops to Audit", which was never true of the code and is corrected here.
+      `CREATE` plus `UPDATE`, the `UPDATE` arm gated on the pod already carrying
+      `posture.acme.io/caged: "true"`: without `UPDATE` a caged pod could relabel its way out
+      of `cage-reach-isolated` for good, and without the gate the mutation would inject a
+      sidecar into the de-posture patch's immutable container list and the API server would
+      refuse it.
+      `cage-tier` cannot do any of this itself: it matches only pods that CLAIM a version, and
+      widening it would cage kube-system, Flux and Kyverno's own pods, which ADR-0014 rejected
+      for two independent reasons that both still hold.
     source_clean:
       - .estate-clone/platform/distribution/render-governed-namespace-guard.py
       - .estate-clone/platform/distribution/versions.yaml

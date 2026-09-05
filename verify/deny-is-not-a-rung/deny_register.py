@@ -62,18 +62,44 @@ CHOICES = ("re-expressed", "retired")
 #: copies composed under a pinned, signed tag still carry it. `waiting` -- not converted yet.
 STATES = ("converted", "converted-at-source", "waiting")
 
-# The key may carry quotes: the same line shape appears in YAML and in the python renderers
-# that emit it (`"validationActions": ["Deny"],`), and a source that still emits the refusal is
-# exactly what `converted-at-source` has to be able to see.
-_DENY_ACTIONS = re.compile(r"^\s*[\"']?validationActions[\"']?:\s*\[([^]]*)\]")
-_ACTIONS_KEY = re.compile(r"^(\s*)[\"']?validationActions[\"']?:\s*$")
+# The key may carry quotes and may sit anywhere on the line, not only at its start: the same
+# shape appears in block YAML, in a one-line flow mapping (`spec: {validationActions: [Deny]}`),
+# in JSON, and in the python renderers that emit it (`"validationActions": ["Deny"]`). A source
+# that still emits the refusal is exactly what `converted-at-source` has to be able to see.
+_DENY_ACTIONS = re.compile(r"""["']?validationActions["']?:\s*\[([^]]*)\]""")
+#: A flow sequence the author wrapped over several lines: `validationActions: [` ... `]`.
+_ACTIONS_OPEN = re.compile(r"""["']?validationActions["']?:\s*\[\s*$""")
+_ACTIONS_KEY = re.compile(r"""^(\s*)["']?validationActions["']?:\s*$""")
 _LIST_ITEM = re.compile(r"^(\s*)-\s*(\S+)\s*$")
-_ENFORCE = re.compile(r"^\s*[\"']?validationFailureAction[\"']?:\s*[\"']?(\w+)")
-_NAME = re.compile(r"^\s*name:\s*([^\s#]+)")
-_KIND = re.compile(r"^\s*kind:\s*([^\s#]+)")
+_ENFORCE = re.compile(r"""["']?validationFailureAction["']?:\s*["']?(\w+)""")
+#: A real Kyverno field. It turns an Audit policy into Enforce for named namespaces, so a
+#: policy whose top line reads `audit` can still refuse in production.
+_OVERRIDES = re.compile(r"""["']?validationFailureActionOverrides["']?:""")
+_ACTION_ENFORCE = re.compile(r"""["']?action["']?:\s*["']?[Ee]nforce""")
+_NAME = re.compile(r"""["']?name["']?:\s*["']?([^\s,}#"']+)""")
+_KIND = re.compile(r"""["']?kind["']?:\s*["']?([^\s,}#"']+)""")
+#: A YAML document break. Name and kind are never read across one -- see `_document_bounds`.
+_DOC_BREAK = re.compile(r"^---\s*$")
 
 SHAPE_ACTIONS = "validationActions: Deny"
 SHAPE_ENFORCE = "validationFailureAction: Enforce"
+SHAPE_OVERRIDES = "validationFailureActionOverrides: Enforce"
+
+#: What this scanner CANNOT see, stated so nobody reads the register as exhaustive. Every entry
+#: here was planted by a reviewer and confirmed missed. The gate script and the README carry the
+#: same list, and `tests/test_deny_register.py` holds it non-empty.
+BLIND_SPOTS = (
+    "a YAML anchor or alias: `x: &deny [Deny]` ... `validationActions: *deny` reads as neither "
+    "a list nor a literal here, so an aliased refusal is not found",
+    "a templating engine's own conditionals: a `<< if >>` arm that emits Deny only under some "
+    "input is read as the text it is, never as the documents it can produce",
+    "a policy whose action is computed at admission rather than written in the manifest",
+    "a REFUSAL BY ANOTHER NAME: a mutation that makes a pod inadmissible -- naming a "
+    "PriorityClass that does not exist, or injecting a container into a running pod -- refuses "
+    "the workload without any Deny-shaped text in it, and is graded by nothing here. The "
+    "estate has produced that failure twice for real (2026-08-28, ticket 26; 2026-09-05, "
+    "ticket 89's own first cut), and both times it was found by RUNNING the policy",
+)
 
 #: Directories never walked. `.estate-clone` is walked explicitly by root, not by recursion,
 #: so a symlinked clone is not visited twice.
@@ -101,29 +127,78 @@ class Verdict:
 
 # -- the scanner ---------------------------------------------------------------------------------
 
-def _nearest(pattern: re.Pattern, lines: list[str], idx: int) -> str | None:
-    """The value of the nearest `pattern` match at or above `idx`. YAML nests, so the closest
-    `name:` above a `validationActions:` is that policy's own metadata name and the closest
-    `kind:` above it is its own kind -- true inside a ResourceSet template string too, where
-    there is no document to parse."""
+def _document_bounds(lines: list[str], idx: int) -> tuple[int, int]:
+    """The half-open line range of the YAML document containing `idx`.
+
+    Attribution never crosses a `---`. It used to: the search ran backwards to the top of the
+    file, so a document whose `metadata:` follows its `spec:` inherited the PREVIOUS document's
+    name -- and a second, unrecorded Deny appended to a file a register row's globs already
+    covered was reported as accounted for. A reviewer planted exactly that on 2026-09-05 and it
+    passed. Bounding the search is what closes it.
+    """
+    start = 0
     for i in range(idx, -1, -1):
-        m = pattern.match(lines[i])
+        if _DOC_BREAK.match(lines[i]):
+            start = i + 1
+            break
+    end = len(lines)
+    for i in range(idx + 1, len(lines)):
+        if _DOC_BREAK.match(lines[i]):
+            end = i
+            break
+    return start, end
+
+
+def _nearest(pattern: re.Pattern, lines: list[str], idx: int) -> str | None:
+    """The value `pattern` gives for the document containing `idx`.
+
+    Backwards first -- YAML nests, so the closest `name:` above a `validationActions:` is that
+    policy's own metadata name -- then forwards, because `metadata:` may legally follow `spec:`
+    and a name that follows the finding is still that document's name. Both halves stop at the
+    document boundary.
+    """
+    start, end = _document_bounds(lines, idx)
+    for i in range(idx, start - 1, -1):
+        m = pattern.search(lines[i])
+        if m:
+            return m.group(1)
+    for i in range(idx + 1, end):
+        m = pattern.search(lines[i])
         if m:
             return m.group(1)
     return None
 
 
+def _is_deny(values: str) -> bool:
+    return any(v.strip().strip("'\"") == "Deny" for v in values.split(","))
+
+
 def scan_text(text: str, path: str) -> list[Finding]:
-    """Every Deny-shaped rule in one file's text, in file order."""
+    """Every Deny-shaped rule in one file's text, in file order.
+
+    Line-based, not document-based, and that is load-bearing: three of the estate's Denys live
+    inside a ResourceSet's `resourcesTemplate` STRING, where a `yaml.safe_load_all` walk sees a
+    ResourceSet and no policy at all. What it cannot see is `BLIND_SPOTS`.
+    """
     lines = text.splitlines()
     out: list[Finding] = []
     for i, line in enumerate(lines):
         shape = None
-        flow = _DENY_ACTIONS.match(line)
-        if flow and any(v.strip().strip("'\"") == "Deny" for v in flow.group(1).split(",")):
+        flow = _DENY_ACTIONS.search(line)
+        if flow and _is_deny(flow.group(1)):
             shape = SHAPE_ACTIONS
+        if shape is None and _ACTIONS_OPEN.search(line):
+            # A flow sequence wrapped over several lines: read to the closing bracket.
+            buf = []
+            for item in lines[i + 1:]:
+                if "]" in item:
+                    buf.append(item.split("]")[0])
+                    break
+                buf.append(item)
+            if _is_deny(",".join(buf)):
+                shape = SHAPE_ACTIONS
         key = _ACTIONS_KEY.match(line)
-        if key:
+        if shape is None and key:
             # A block sequence under `validationActions:`. Read the items that follow at a
             # deeper-or-equal indent and stop at the first line that is not one.
             for item in lines[i + 1:]:
@@ -133,9 +208,17 @@ def scan_text(text: str, path: str) -> list[Finding]:
                 if m.group(2).strip("'\"") == "Deny":
                     shape = SHAPE_ACTIONS
                     break
-        enforce = _ENFORCE.match(line)
-        if enforce and enforce.group(1).lower() == "enforce":
+        enforce = _ENFORCE.search(line)
+        if shape is None and enforce and enforce.group(1).lower() == "enforce":
             shape = SHAPE_ENFORCE
+        if shape is None and _OVERRIDES.search(line):
+            # The override list turns an Audit policy into Enforce for named namespaces. Read
+            # forward to the end of this document for an `action: Enforce` entry.
+            _, end = _document_bounds(lines, i)
+            for item in lines[i + 1:end]:
+                if _ACTION_ENFORCE.search(item):
+                    shape = SHAPE_OVERRIDES
+                    break
         if shape:
             out.append(Finding(path=path, line=i + 1,
                                name=_nearest(_NAME, lines, i),
@@ -152,6 +235,8 @@ def _excluded(rel: str, excluded: list[dict]) -> bool:
 def scan_tree(root: Path, excluded: list[dict]) -> list[Finding]:
     """Every Deny-shaped rule under `root`, paths relative to `root`, excluded trees skipped.
 
+    YAML and JSON. What no scan here can see is `BLIND_SPOTS`, which the gate script prints.
+
     `.estate-clone` is a symlink to the assembled units in the real checkout; it is walked as
     a root of its own so a nested worktree cannot be visited twice under two names."""
     roots = [root]
@@ -164,7 +249,9 @@ def scan_tree(root: Path, excluded: list[dict]) -> list[Finding]:
         for dirpath, dirnames, filenames in os.walk(base, followlinks=False):
             dirnames[:] = sorted(d for d in dirnames if d not in SKIP_DIRS)
             for fn in sorted(filenames):
-                if not fn.endswith((".yaml", ".yml")):
+                # `.json` too: a Kyverno policy is as valid in JSON as in YAML, and a
+                # reviewer planted one on 2026-09-05 that a yaml-only walk missed.
+                if not fn.endswith((".yaml", ".yml", ".json")):
                     continue
                 p = Path(dirpath) / fn
                 rel = os.path.relpath(p, root)

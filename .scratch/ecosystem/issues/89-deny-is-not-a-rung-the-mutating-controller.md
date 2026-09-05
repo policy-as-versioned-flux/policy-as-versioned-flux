@@ -151,21 +151,37 @@ container list, and the API server would reject the patch. That is the cage beco
 another name, the exact failure ticket 26 observed live on 2026-08-28. A de-postured pod is caged
 when its controller recreates it, which CONTEXT.md's **De-postured** entry already says.
 
-**D5 (delegated). The orphan guard is demoted to `Audit` rather than paired with a second mutating
-policy.** Measured, not assumed: with `cage-tier` and a second MutatingPolicy writing
-`posture.acme.io/tier: isolated` both matching one pod, `kyverno apply` 1.18.2 produced a pod
-labelled `isolated` carrying `cage-baseline`'s PriorityClass — the label-and-dials incoherence
-H8-03 exists to prevent, arrived at from the other direction. One writer per field, or none.
-Selecting the bottom rung for an undeclared claim therefore belongs inside `cage-tier`'s own
-`tier` expression with the allow-list ranged in from the version array, which is a versioned
-policy body and so a new declared line with the engine's computed bump — ticket 84's. Until then
-an orphan claim is caged at its Namespace's tier, which for a `baseline` Namespace is looser than
-the Deny was. That is named here rather than left to be discovered.
+**D5 — WITHDRAWN 2026-09-05, it was wrong, and the review caught it.** It read: "the orphan guard
+is demoted to `Audit` rather than paired with a second mutating policy", on a measurement showing
+two mutating policies producing a pod labelled `isolated` carrying `cage-baseline`'s PriorityClass.
+The measurement was taken against `graded/policies/cage-tier.yaml`, which matches ANY claim and
+which `graded/up.sh` says in its own header it never applies — "applies ONLY the rendered,
+versioned copies". It measured a configuration that exists nowhere. Every SERVED `cage-tier`
+carries `only-this-policy-version`, so it never sees an orphan pod and the contention cannot
+arise. The consequence of the error was not academic: demoted alone, an orphan claim ran with no
+tier, no caged marker, no PriorityClass, no limits, no hardening and no NetworkPolicy — the
+"Namespace fell closed, pod fell open" hole ADR-0022 promoted the other guard to `Deny` to close,
+re-opened through this one, and selectable by any pod that claimed a bogus version, which is a
+self-service exemption principle 1 bans.
 
-**D6 (delegated). The `Audit` report stays.** "Never count" bans the exemption ledger, not
-measurement; `require-nonroot` has shipped `Audit` in every version line throughout. The report is
-the observation an orphan claim's priced hole rests on, and `require-nonroot`'s precedent settles
-that the shape is sanctioned.
+**D5b (delegated, replaces D5). The demotion ships WITH a cage that reaches an orphan claim.**
+`policy-version-orphan-cage`, a MutatingPolicy ranged from the same array, matching claims NOT in
+it. The same version scoping that made D5 wrong makes the pair safe: the served cage takes claims
+in the array, this one takes claims not in it, disjoint by construction, so the two mutations
+never contend for a field. `verify-orphan-guard.sh` proves the disjointness by running both bodies
+over the same three pods and asserting each pod's label agrees with its dials. Folding the
+bottom-rung selection into `cage-tier`'s own `tier` expression is still tidier and is still ticket
+84's, because that is a versioned policy body.
+
+**D6 (delegated). The `Audit` report stays, and for the governed-namespace rule it had to be
+BUILT.** "Never count" bans the exemption ledger, not measurement; `require-nonroot` has shipped
+`Audit` in every version line throughout, which settles that the shape is sanctioned. The report
+is the observation an orphan claim's priced hole rests on. The first cut claimed the same of the
+governed-namespace rule — "the guard drops to `Audit` so silence is still observed" — and that was
+never true of the code: the ValidatingPolicy was REPLACED by the mutation, so nothing observed an
+unclaimed pod at all. `governed-namespace-unclaimed-report` is rendered beside the cage now. A
+mutation and a report do not contend for a field, which is why this pair is safe where two
+mutations would not be.
 
 **D7 (delegated). The adopters' composed copies are NOT hand-edited.** They are composed against
 platform's pinned, signed tag `v2.0.1`. Editing them by hand would forge a composition against a
@@ -204,18 +220,99 @@ reads the template; the drift is fixed and cannot come back unobserved.
   directly instead: the kind change flows through, and the composed governed-namespace member
   carries no `validationActions` and no `Deny`.
 
-Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; governed-namespace-requires-claim is a MutatingPolicy putting an unclaimed pod on the bottom rung with cage-tier's own body, policy-version-orphan-guard is Audit with cage-tier as the cage and the escaped rules as a priced hole, posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck; a second mutating writer was measured incoherent (kyverno 1.18.2) so the orphan's bottom rung waits on 84; the 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
+Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; the two machinery guards become six documents that refuse nothing (orphan guard Audit + orphan cage, governed-namespace cage + unclaimed report, bottom-rung netpol, and the unsuffixed cage-isolated PriorityClass without which the Priority plugin would refuse every pod they cage); posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck. Round 1 shipped a real regression — the demotion alone left an orphan claim uncaged, because every served cage-tier is version-scoped — and the review caught it; the fix, the four other blocking findings, three defects found by running the beats, and the scanner's declared blind spots are in the ticket. The 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
+
+### Round 2, 2026-09-05 — the review found five blocking findings and the central one was real
+
+The first cut of this ticket shipped a safety regression. It is recorded here rather than quietly
+fixed, because the register's whole purpose is that the record cannot drift from the code.
+
+**F1 (central).** The orphan-guard demotion rested on "every claiming pod is already caged by
+`cage-tier`". False of the served estate: every served copy carries `only-this-policy-version`,
+and an orphan claim is by definition a version no served line carries. Fixed by D5b above: the
+demotion now ships with `policy-version-orphan-cage`. Every document that said an orphan claim is
+caged by `cage-tier` — the register row, the renderer docstring, CONTEXT.md's Orphan guard entry
+and ADR-0022's amendment — says what is true instead.
+
+**F2.** `verify-orphan-guard.sh` step 3 proved the cage with `graded/policies/cage-tier.yaml`, an
+unserved authoring artefact that matches any claim, so the beat passed while proving nothing about
+what runs. It reads the SERVED body now, and the step it proves is inverted: the served cage does
+NOT reach the orphan pod, which is the fact the new cage exists for.
+
+**F3.** Two of three live register rows misstated the code on the day they were written. Both are
+rewritten to describe what was built, and the governed-namespace row's missing observation is now
+a real object.
+
+**F4, F9.** CONTEXT.md's Orphan guard entry replaced one untrue sentence with another; it now
+states what the served policies do, and records both errors. The Governed namespace entry
+distinguishes source from served, as the four ADRs already did.
+
+**F5.** `verify-retirement.sh`, untouched by round 1, still made a denial its subject and its pass
+line, and went green anyway because the pinned CLI reports a rule failure identically for `Audit`
+and `Deny`. Its subject is now "retiring a version moves a straggler out of every served policy
+version onto the bottom rung", and it proves the cage. `verify-declared-versions-admit.sh`'s
+header carried the same stale premise and is corrected.
+
+**F6.** `CREATE`-only left a caged pod permanently relabelable out of `cage-reach-isolated`. Both
+cages match `UPDATE` now, gated on the pod already carrying `posture.acme.io/caged: "true"`, which
+keeps the de-posture patch legal at the same time.
+
+**F7.** `cage-tier` maps `object.spec.containers` only, so a privileged `runAsUser: 0`
+initContainer rode in with the newly admitted pod. `cage_body.py` extends the same tighten-only
+hardening to `initContainers`; `runAsUser: 0` survives beside `runAsNonRoot: true`, so the kubelet
+refuses to start that container and the pod is admitted, caged and does not run — the doctrine's
+own permitted outcome, named in the module rather than left to be found. The hostPath escape is
+NOT closed and is named: ADR-0022's own ponytail already carries it for `cage-tier`'s population,
+and it needs a price or a volume-level mutation, neither of which is this ticket's.
+
+**F8.** `cage-netpol` is version-scoped in every served copy, so neither population got a
+NetworkPolicy and "a running cage with no ingress and no egress" was untrue of exactly the pods
+this ticket creates. `render-bottom-rung-netpol.py` renders `cage-netpol-bottom-rung` from
+`cage-netpol`'s own body with the version scoping replaced by "claims no served version".
+
+**F10, F11, F12.** `origin/main` merged in (the branch was six commits behind and
+`verify-truth-line.sh` was red on ticket 64's four new manifest rows); the script count is read
+from the run, not typed; the dead `want_absent()` is gone.
+
+**The scan's blind spots** are now a declared constant, `deny_register.BLIND_SPOTS`, printed on
+every run and held non-empty by a test. Four of the reviewer's plants are fixed with tests that
+were red first — a `.json` policy, a one-line flow mapping, a multi-line flow sequence, and
+`validationFailureActionOverrides` — and the exploitable one is closed: name attribution was
+positional and unbounded, so a document whose `metadata:` follows its `spec:` inherited the
+previous document's name, and a second Deny appended to a file a row's globs already covered read
+as accounted for. Attribution is bounded to its own document now, backwards then forwards. What
+stays unseeable is stated: a YAML anchor, a template engine's conditional arm, an action computed
+at admission, and a refusal by another name.
+
+**A fifth defect the review did not name, found by running the beat.** Every served PriorityClass
+is version-suffixed (`cage-isolated-4-0-0`), and these machinery cages belong to no version, so
+the `cage-isolated` they name exists on no cluster — and the Priority admission plugin refuses a
+pod naming a class that does not exist. This ticket's own cage would have made every pod it caged
+inadmissible: a refusal by another name, which is the one thing `verify-deny-is-not-a-rung.sh`
+cannot see. The machinery renders the unsuffixed class, both selfchecks tie the dial's `pc` and
+`prio` to it, and the blind-spot list says plainly that this class of defect is graded by nothing
+and has now bitten the estate twice.
+
+**Composition** carries the three new policy members and the PriorityClass, read defensively so an
+adopter pinned to a parent tag from before this ticket composes exactly what it composed then.
 
 ## Waits on the owner
 
-1. **Merge platform branch `ticket-89-deny-is-not-a-rung`** (commit `af7d87d`, six files under
-   `distribution/`). Nothing in this ticket reaches a cluster until it is on platform `main`.
+1. **Merge platform branch `ticket-89-deny-is-not-a-rung`** (commits `af7d87d` and `bd9e919`;
+   eleven files under `distribution/` and `compose/`). Nothing in this ticket reaches a cluster
+   until it is on platform `main`.
 2. **Dispatch `cut-release.yml`** to cut the next signed platform tag. Only the owner dispatches
    it, and no agent fakes a tag. Until that tag exists the three adopters keep composing the old
    Deny from `v2.0.1`, and `verify-deny-is-not-a-rung.sh` exits 3 naming it.
 3. **Let each adopter's Renovate pin bump land** (driftwood, tuppence, ludlow), which re-composes
    `composed/orphan-guard.yaml`, `composed/governed-namespace-guard.yaml` and
-   `gitops/composed/composed-set.yaml`. That is 11 of the 21 outstanding copies.
+   `gitops/composed/composed-set.yaml`, and writes four NEW files per adopter
+   (`orphan-cage.yaml`, `governed-namespace-report.yaml`, `bottom-rung-netpol.yaml`,
+   `bottom-rung-priorityclass.yaml`). That is 11 of the 21 outstanding copies.
+4. **Each adopter's `scripts/render_composed.py` needs the new machinery files added to its
+   object list.** It hardcodes `paths = ["composed/orphan-guard.yaml"]` and does not list the
+   governed-namespace guard either, so fact 4 of the five-fact sample would compare a set that
+   omits them. That is an adopter-repo edit, and adopter repos are the owner's to push.
 
 The remaining 10 are `posture-trust-boundary` and wait on ticket 84's next declared line, not on
 the owner.
@@ -223,7 +320,21 @@ the owner.
 ## Not done
 
 * `posture-trust-boundary` is recorded, not removed. See D2 and the item-1 table above, and ticket 84.
-* An orphan claim does not select the bottom rung specifically; it takes its Namespace's tier.
-  D5 says why and names ticket 84 as the owner of the fix.
+* An orphan claim gets the bottom rung from a policy BESIDE `cage-tier` rather than from
+  `cage-tier`'s own `tier` expression. D5b says why and names ticket 84 as the owner of the
+  tidier form.
+* The hostPath escape (F7) is not closed: an isolated pod can still mount the node filesystem,
+  bounded only by the forced `runAsNonRoot`. ADR-0022's own ponytail already carries this for
+  `cage-tier`'s population; it needs a price or a volume-level mutation.
+* A refusal by another name is graded by nothing. `deny_register.BLIND_SPOTS` says so on every
+  run. Both instances the estate has produced were found by running a policy, never by reading
+  one, and nothing in this ticket changes that.
 * No cluster ran the converted policies. `verify-graded.sh`'s live tail is where that is observed,
-  and it has never had a cluster on a citable run (review finding P2-6, still open).
+  and it has never had a cluster on a citable run (review finding P2-6, still open). One thing WAS
+  observed on a real API server: `kubectl --context kind-driftwood apply --dry-run=server` accepts
+  a pod carrying `initContainers: null`, which is what the initContainer mutation writes on a pod
+  that declares none.
+* `verify-graded.sh` itself is not extended to the two new populations. It grades `cage-tier`'s
+  claiming population on a cluster; nothing yet drives an unclaimed or orphan pod through a real
+  API server, which is the only place the PriorityClass and NetworkPolicy facts above become
+  observations rather than renders.

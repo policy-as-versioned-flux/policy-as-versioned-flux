@@ -276,6 +276,81 @@ def test_an_unknown_choice_is_a_failure() -> None:
     assert any("choice" in f for f in v.failures), v.failures
 
 
+# -- 6. the blind spots the reviewer planted (all of these were misses) ---------------------------
+
+def test_a_second_document_never_inherits_the_first_documents_name() -> None:
+    """THE EXPLOITABLE ONE. Name attribution was positional and unbounded, so a document whose
+    `metadata:` follows its `spec:` picked up the PREVIOUS document's name -- and a second Deny
+    appended to a file a register row's globs already cover was reported as accounted for."""
+    text = (
+        "apiVersion: policies.kyverno.io/v1alpha1\n"
+        "kind: ValidatingPolicy\n"
+        "metadata:\n"
+        "  name: policy-version-orphan-guard\n"
+        "spec:\n"
+        "  validationActions: [Audit]\n"
+        "---\n"
+        "apiVersion: policies.kyverno.io/v1alpha1\n"
+        "kind: ValidatingPolicy\n"
+        "spec:\n"
+        "  validationActions: [Deny]\n"
+        "metadata:\n"
+        "  name: a-refusal-nobody-recorded\n"
+    )
+    found = deny_register.scan_text(text, "composed/orphan-guard.yaml")
+    assert [f.name for f in found] == ["a-refusal-nobody-recorded"], [f.name for f in found]
+
+
+def test_a_name_is_never_taken_from_a_different_document_even_looking_backwards() -> None:
+    text = ("metadata:\n  name: first\nspec:\n  validationActions: [Audit]\n"
+            "---\n"
+            "spec:\n  validationActions: [Deny]\n")
+    found = deny_register.scan_text(text, "p.yaml")
+    assert [f.name for f in found] == [None], [f.name for f in found]
+
+
+def test_a_one_line_flow_mapping_is_found() -> None:
+    text = "metadata: {name: sneaky}\nspec: {validationActions: [Deny]}\n"
+    assert [(f.name, f.shape) for f in deny_register.scan_text(text, "p.yaml")] == [
+        ("sneaky", "validationActions: Deny")]
+
+
+def test_a_multi_line_flow_sequence_is_found() -> None:
+    text = "metadata:\n  name: sneaky\nspec:\n  validationActions: [\n    Deny\n  ]\n"
+    assert [f.shape for f in deny_register.scan_text(text, "p.yaml")] == ["validationActions: Deny"]
+
+
+def test_validation_failure_action_overrides_to_enforce_is_a_deny_shape() -> None:
+    """A real Kyverno field: it turns an Audit policy into Enforce for named namespaces, so a
+    policy that reads Audit at the top can refuse in production."""
+    text = ("metadata:\n  name: sneaky\nspec:\n  validationFailureAction: audit\n"
+            "  validationFailureActionOverrides:\n    - action: Enforce\n"
+            "      namespaces: [prod]\n")
+    shapes = [f.shape for f in deny_register.scan_text(text, "p.yaml")]
+    assert "validationFailureActionOverrides: Enforce" in shapes, shapes
+
+
+def test_a_json_policy_is_scanned_too() -> None:
+    body = ('{"kind": "ValidatingPolicy", "metadata": {"name": "json-deny"},'
+            ' "spec": {"validationActions": ["Deny"]}}')
+    assert [(f.name, f.shape) for f in deny_register.scan_text(body, "p.json")] == [
+        ("json-deny", "validationActions: Deny")]
+
+
+def test_the_yaml_anchor_blind_spot_is_declared_rather_than_silently_missed() -> None:
+    """An anchored action (`validationActions: *deny`) is NOT found, and the module says so.
+    A scanner that cannot see something must name what it cannot see; the register's README and
+    the gate script carry the same list."""
+    text = "x: &deny [Deny]\nmetadata:\n  name: anchored\nspec:\n  validationActions: *deny\n"
+    assert deny_register.scan_text(text, "p.yaml") == []
+    assert any("anchor" in b.lower() for b in deny_register.BLIND_SPOTS), deny_register.BLIND_SPOTS
+
+
+def test_the_blind_spots_are_a_non_empty_declared_list() -> None:
+    assert len(deny_register.BLIND_SPOTS) >= 2
+    assert all(isinstance(b, str) and b.strip() for b in deny_register.BLIND_SPOTS)
+
+
 # -- the committed register is a real one over the real trees -------------------------------------
 
 def test_the_committed_register_covers_every_deny_the_real_trees_carry() -> None:

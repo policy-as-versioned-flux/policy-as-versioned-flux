@@ -15,6 +15,16 @@ status: accepted
 > closed AND the pod falls closed. ADR-0020's missing-instrument refusal is unchanged in its own
 > domain and does not reach admission: a missing instrument refuses to emit a PRICE, never a
 > workload; the bottom rung needs no version claim to select it.
+>
+> **Corrected the same day.** The first cut of ticket 89 demoted `policy-version-orphan-guard`
+> to `Audit` on the reasoning that `cage-tier` already caged every claiming pod. It does not:
+> every SERVED copy of `cage-tier` carries `only-this-policy-version`, so an orphan claim -- a
+> version no served line carries -- matches none of them, and the demotion alone left that pod
+> running uncaged and let any pod opt out of every versioned rule by claiming a bogus version.
+> The demotion now ships with `policy-version-orphan-cage`, a MutatingPolicy ranged from the
+> same array that puts the pod on the bottom rung, disjoint from the served cage by
+> construction. Nothing in this ADR's ladder changes; what changed is that the machinery
+> reaches the population no version reaches.
 
 # The cage ladder: tier per Namespace, tighten-only cage, an `isolated` rung, one floor, `infra` by role
 

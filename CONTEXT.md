@@ -238,21 +238,28 @@ that a rewritten entry cites stay as the record of the decision at the time.
   [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md) and
   [ADR-0026](docs/adr/0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md).
 
-- **Orphan guard** (rewritten 2026-08-28, ticket 09; corrected 2026-09-05, ticket 89) — A
-  deterministic catch-all that **reports** any workload whose `policy-version` label is **not in**
-  the cluster's currently-installed version set, and **never denies one**. It judges a **claim**,
-  and only a claim. This entry claimed from 2026-08-28 that the guard "cages to `isolated`"; it
-  did not — it shipped `validationActions: [Deny]` for another eight days, and the estate's own
-  gate graded the denial as correct. What is true, and what the platform's renderer now ships, is
-  the pair: the guard is `Audit`, and the workload is caged by **cage-tier**, which matches every
-  claiming pod and renders its **governed namespace**'s declared tier onto it, falling closed to
-  `isolated` for a namespace that declares nothing. So an orphan claim is never admitted uncaged.
-  What it is not yet given is the bottom rung *specifically*: selecting `isolated` for an
-  undeclared claim belongs inside cage-tier's own tier expression and is a new declared policy
-  line (ticket 84), because two mutating policies writing the cage produce a pod labelled
-  `isolated` carrying baseline's PriorityClass (measured, kyverno 1.18.2, 2026-09-05). The
-  versioned rules an orphan claim escapes meanwhile are a **priced hole** (ADR-0026), and the
-  guard's report is the observation that price rests on. A pod carrying no claim is handled by the cage mutation
+- **Orphan guard** (rewritten 2026-08-28, ticket 09; corrected twice on 2026-09-05, ticket 89) —
+  A **pair**, both rendered from the platform's declared version array. The guard is an `Audit`
+  `ValidatingPolicy` that **reports** any workload whose `policy-version` label is **not in** the
+  array and **never denies one**; the **orphan cage** is a `MutatingPolicy` that puts that same
+  workload on the **bottom rung** — `isolated`, the caged marker, the isolated dials, the
+  `cage-isolated` PriorityClass, host namespaces shut, all capabilities dropped on containers and
+  initContainers — and `cage-netpol-bottom-rung` generates its deny-all NetworkPolicy. It judges
+  a **claim**, and only a claim.
+  This entry has been wrong twice and both are recorded rather than quietly fixed. From
+  2026-08-28 it said the guard "cages to `isolated`": it did not, it shipped
+  `validationActions: [Deny]` for another eight days and the gate graded the denial as correct.
+  Its first correction said the workload is caged by **cage-tier**: that is also false, because
+  **every served copy of cage-tier is scoped to its own version** (`only-this-policy-version`)
+  and an orphan claim is by definition a version no served line carries — so cage-tier does not
+  match such a pod at all, and the guard demoted alone left it running with no tier, no limits,
+  no hardening and no reach cage. The cage above is what makes the demotion safe, and the two
+  are disjoint by construction: cage-tier takes claims **in** the array, the orphan cage takes
+  claims **not** in it.
+  The versioned rules an orphan claim escapes are still a **priced hole** (ADR-0026), and the
+  guard's report is the observation that price rests on. Folding the bottom-rung selection into
+  cage-tier's own tier expression remains tidier and remains ticket 84's, because that is a
+  versioned policy body and so a new declared line. A pod carrying no claim is handled by the cage mutation
   itself, which renders the **governed namespace**'s declared tier onto every pod at admission and
   clobbers whatever the pod carried; a governed namespace that declares nothing renders to
   `isolated`, and infrastructure is declared explicitly at the **infra tier** (re-grill 28,
@@ -271,12 +278,18 @@ that a rewritten entry cites stay as the record of the decision at the time.
   `Namespace` manifest **are** the declaration: the adopter writes them, signs them under the same
   tag as its **composed artefact**, and the composed artefact carries no namespace list of its own.
   The pod label is an output only, rendered from the namespace at admission. There is no `CREATE`
-  deny any more (true since 2026-09-05, ticket 89; between 2026-08-28 and that date this sentence
-  was false and the estate shipped one): a pod that claims nothing is admitted by a
-  `MutatingPolicy` onto the **bottom rung**, and a namespace that declares no tier renders to
-  `isolated`. The scope is still `CREATE` only — on an `UPDATE` the mutation would inject a WAF
-  sidecar into an immutable container list and the API server would reject the de-posture patch,
-  which is the cage becoming a refusal by another name. Its opposite is an **ungoverned namespace**, which is priced, never
+  deny **in what the platform renders** (ticket 89, 2026-09-05; between 2026-08-28 and that date
+  this sentence was false and the estate shipped one): a pod that claims nothing is admitted by a
+  `MutatingPolicy` onto the **bottom rung** and observed by a paired `Audit` report, and a
+  namespace that declares no tier renders to `isolated`. **All three adopters still SERVE the
+  `Deny`**, in what they composed under platform `v2.0.1`, and will until the owner merges that
+  branch, `cut-release.yml` cuts the next signed tag and each adopter's pin bump re-composes;
+  `verify/deny-is-not-a-rung/` grades exactly that gap and names the tag, and does not read green
+  while a copy survives. The scope is `CREATE`, plus `UPDATE` for a pod the policy already caged
+  — without `UPDATE` a caged pod could relabel its way out of its reach cage for good, and
+  without the gate the mutation would inject a WAF sidecar into the de-posture patch's immutable
+  container list and the API server would reject it, which is the cage becoming a refusal by
+  another name. Its opposite is an **ungoverned namespace**, which is priced, never
   refused. See [ADR-0018](docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md)
   (§1 stands; §4 superseded by ADR-0022).
 
