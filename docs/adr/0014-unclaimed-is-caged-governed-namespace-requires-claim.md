@@ -1,7 +1,6 @@
 ---
 status: accepted
 ---
-
 > **Superseded in part, 2026-08-28.** the CREATE deny on a governed namespace is superseded by [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md). The rest stands.
 >
 > **Amended 2026-09-05 (eco-system ticket 91, delegated under [ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md)).** Two things this ADR says about the currency controller are now wrong, and the `CREATE`-only decision they were used to justify is still right for a better reason.
@@ -15,6 +14,37 @@ status: accepted
 >
 > 3. *"de-posturing is the estate's own cage"* is true only where a reach cage already exists. Every **served** copy of the reach-generating policy is gated on the claim (`only-this-policy-version`), and the patch removes the claim — so the re-caged pod cannot **generate** its own `cage-reach-isolated`; it can only be **selected** by one its namespace already carries. In a namespace with none, "caged" is a label and not a cage. The check derives that from the served bodies and confirms the NetworkPolicy exists **before** running a pass, because the pass strips a live pod's claim and there is no undo.
 > 4. The skip this ADR grants the patch has a price, and it is the mirror of the reason it was granted. A pod outside the guard's scope is also outside the cage mutation's and the orphan guard's, so its rung is held by a label **no admission will ever re-assert** — a claiming pod's rung is re-clobbered from its Namespace on every update, a re-caged pod's is not. What holds it instead is RBAC: a workload cannot patch its own pod. Relatedly, `infra` is a role declaration and not a rung, so a pod carrying it is **overwritten** with the bottom rung rather than moved along the ladder.
+
+> **Amended 2026-09-05 (eco-system ticket 89), after ticket 91 and agreeing with it.** The
+> `Deny` this ADR's title argues against is gone from what the platform RENDERS: the rule is a
+> `MutatingPolicy` (`distribution/render-governed-namespace-guard.py`) and an unclaimed pod is
+> admitted onto the bottom rung, with a paired `Audit` report keeping the observation the `Deny`
+> used to make. The 2026-08-28 banner above was not true of the shipped policy when it was
+> written -- ADR-0022's addendum of the same day promoted this rule to `Deny`, so the record said
+> the deny was gone while the code shipped it, for another eight days. It is gone from the source
+> now; the copies the three adopters composed under platform `v2.0.1` still carry it until the
+> owner cuts the next signed tag and each re-pins, which `verify/deny-is-not-a-rung/` grades and
+> names rather than reading green over.
+>
+> Two consequences below are void with it. "Every governed namespace must be labelled before that
+> policy goes to Deny" -- it never goes to Deny. "A brownfield estate should start the policy in
+> Audit and promote by editorial PR" -- there is nothing to promote to. What replaces both: a
+> brownfield estate declares `overlay.floor` and prices the move, because lowering a floor is
+> priced and never refused (ADR-0022). `verify-orphan-guard.sh` did NOT stay as it was either:
+> it made the denial its pass condition, and it grades the cage now.
+>
+> **The `CREATE`-only match is unchanged, and ticket 91's reason for it is the operative one.**
+> Ticket 89 round 2 briefly put `UPDATE` on this policy, gated on `posture.acme.io/caged`, and
+> that was wrong twice over: the marker is written by `cage-tier` for its whole population at
+> every rung, so the gate matched a pod caged at `baseline`; and applying the bottom-rung body to
+> a running pod appends a `waf-sidecar` and rewrites `priorityClassName` and `priority`, all
+> immutable, which the API server refuses. It would have refused `recage_patch()` precisely --
+> the patch this ADR's amendment above exists to protect. The `UPDATE` half is now a separate
+> labels-only policy (`governed-namespace-cage-holds`) that re-asserts `tier` and `caged` and
+> touches nothing else, so a caged pod cannot relabel its way out of its reach cage and the
+> re-cage patch stays admissible. Measured, not argued: `verify-governed-namespace-guard.sh`
+> step 5 runs `recage_patch()`'s own object through it.
+
 
 # An unclaimed pod is caged, not denied; a governed namespace requires a claim at CREATE
 

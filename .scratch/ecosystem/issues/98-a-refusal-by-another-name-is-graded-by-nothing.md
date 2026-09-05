@@ -58,3 +58,38 @@ the exact defect this estate keeps finding. What cannot be looked at offline is 
 document and wrong as an effect. Reading it proved nothing. Every check in this estate that has
 caught one did so by executing the policy against a resource, which is why `verify-orphan-guard.sh`
 and `verify-graded.sh` are the places this belongs rather than a new scanner.
+
+## Appended 2026-09-05 (ticket 89 rounds 3 and 4) — two more instances, and one that is LIVE
+
+3. **2026-09-05, ticket 89 round 2.** The `UPDATE` arm on the bottom-rung cages, gated on
+   `posture.acme.io/caged: "true"` in the belief that the marker meant "caged by this policy".
+   `cage-tier` writes it for its whole population at every rung, so the cage matched a pod caged
+   at `baseline` and applied the full body to a RUNNING pod: a `waf-sidecar` appended to an
+   immutable container list, `priorityClassName` and `priority` rewritten. It would have refused
+   the currency controller's `recage_patch()` — the only mechanism a pod on a retired version
+   has. Fixed by splitting a labels-only hold onto `UPDATE`.
+
+4. **LIVE, decided not fixed.** A pod the bottom-rung cage admitted can be labelled with a served
+   policy version, at which point `cage-tier` takes it over and writes its Namespace's tier.
+   Measured: `tier: isolated -> baseline`, `priorityClassName: cage-isolated ->
+   cage-baseline-4-0-0`, `priority: -10000 -> -10`. Both spec fields are immutable on a running
+   pod, so the API server refuses the edit. Ticket 89 decided this is the correct outcome —
+   letting it through would be a workload moving itself off the bottom rung by asserting a label,
+   the self-service exemption principle 1 bans — and recorded in `CONTEXT.md` that the
+   remediation is a **recreate**, not a label edit.
+
+   **This is the one to build the check against.** The first three are gone from the code and
+   have to be replayed as fixtures; this one is in the estate right now, reachable with two
+   `kubectl label` calls, and no check in the repository can see it. A check that goes red on it
+   would have caught all three of the others.
+
+**What the four have in common** (ticket 89's round-4 answer, in the reviewer's words): each
+reasons from a PROXY for the served thing instead of the served thing — an authoring artefact
+that is never applied; a label whose name implies a provenance it does not carry; a file's
+existence standing in for a cage's service; and the register's prose standing in for the code.
+Each proxy is cheap to read and each is checkable by something already in the repository, so the
+reasoning never has to leave the repository. The rule that would have caught all four: **every
+safety claim must name the SERVED artefact and the OPERATION that reaches it, and be measured
+against both.** The estate cannot currently do the second half — `kyverno apply` has no `UPDATE`
+mode, and no cluster has run these policies on a citable run — so three of the four were only
+catchable by reading, and the fourth only by running.

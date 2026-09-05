@@ -6,6 +6,8 @@ status: accepted
 
 > **Superseded in part, 2026-08-28.** §4, the narrowed CREATE claim rule is superseded by [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md). The rest stands.
 
+> **Amended 2026-09-05 (eco-system ticket 89).** §4 describes a guard that refuses; the rule that renders it does not any more. It is gone from the SOURCE that renders it -- platform's `ResourceSet` template and its offline twin, on platform branch `ticket-89-deny-is-not-a-rung`. The copies the three adopters composed under platform `v2.0.1` still carry it, and can only stop carrying it when the owner merges that branch, `cut-release.yml` cuts the next signed tag and each adopter's pin bump re-composes. The hub's `verify/deny-is-not-a-rung/` grades exactly that and names the tag it waits for; it does not read green while a copy survives. The `CREATE` scope and the governed-set narrowing both stand, and what happens inside that scope is a mutation onto the bottom rung, not a refusal. **Nothing is denied; a workload that does not fit its cage does not run.** The rest stands.
+
 # The Namespace manifest is the governed declaration; the composed artefact carries no namespace list
 
 ADR-0014 made the **governed namespace** the boundary where an inherited rule reaches a workload.

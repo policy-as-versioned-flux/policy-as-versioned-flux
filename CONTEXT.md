@@ -83,6 +83,12 @@ that a rewritten entry cites stay as the record of the decision at the time.
   In the owner's words (2026-09-02, ticket 75): the estate is a **mutating admission controller**
   more than a validating one; a workload can be unable to run only because it does not fit its
   cage, never because it is deliberately denied.
+  **The one sentence (2026-09-05, ticket 89): nothing is denied; a workload that does not fit its
+  cage does not run.** It is the sentence ADR-0014, ADR-0018 §4 and ADR-0022's 2026-08-28 addendum
+  now all carry, replacing "the one refusal the doctrine allows". Which Deny-shaped rules the
+  estate still SERVES, what was decided about each and what each waits for is the register at
+  `verify/deny-is-not-a-rung/register.yaml`, graded on every run: this entry is doctrine, that
+  register is the state of the code, and the check refuses to let them disagree.
   An unknown or unlabelled tier fails closed to `isolated`. The cage mutation is **tighten-only**: a
   tightened rule and the default cage never contradict. This *cage-tier* axis is independent of
   *adoption cadence* (ADR-0002). The tier is declared on the signed **governed namespace**
@@ -232,17 +238,35 @@ that a rewritten entry cites stay as the record of the decision at the time.
   [ADR-0013](docs/adr/0013-regulator-publishes-baselines-adopter-selects.md) and
   [ADR-0026](docs/adr/0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md).
 
-- **Orphan guard** (rewritten 2026-08-28, ticket 09) — A deterministic catch-all that cages to
-  **`isolated`** any workload whose `policy-version` label is **not in** the cluster's
-  currently-installed version set. A claim the fleet does not run is an unknown tier, and an
-  unknown tier fails closed to the bottom rung (reversal 17); the workload is not denied. It
-  judges a **claim**, and only a claim. A pod carrying no claim is handled by the cage mutation
+- **Orphan guard** (rewritten 2026-08-28, ticket 09; corrected twice on 2026-09-05, ticket 89) —
+  A **pair**, both rendered from the platform's declared version array. The guard is an `Audit`
+  `ValidatingPolicy` that **reports** any workload whose `policy-version` label is **not in** the
+  array and **never denies one**; the **orphan cage** is a `MutatingPolicy` that puts that same
+  workload on the **bottom rung** — `isolated`, the caged marker, the isolated dials, the
+  `cage-isolated` PriorityClass, host namespaces shut, all capabilities dropped on containers and
+  initContainers — and `cage-netpol-bottom-rung` generates its deny-all NetworkPolicy. It judges
+  a **claim**, and only a claim.
+  This entry has been wrong twice and both are recorded rather than quietly fixed. From
+  2026-08-28 it said the guard "cages to `isolated`": it did not, it shipped
+  `validationActions: [Deny]` for another eight days and the gate graded the denial as correct.
+  Its first correction said the workload is caged by **cage-tier**: that is also false, because
+  **every served copy of cage-tier is scoped to its own version** (`only-this-policy-version`)
+  and an orphan claim is by definition a version no served line carries — so cage-tier does not
+  match such a pod at all, and the guard demoted alone left it running with no tier, no limits,
+  no hardening and no reach cage. The cage above is what makes the demotion safe, and the two
+  are disjoint by construction: cage-tier takes claims **in** the array, the orphan cage takes
+  claims **not** in it.
+  The versioned rules an orphan claim escapes are still a **priced hole** (ADR-0026), and the
+  guard's report is the observation that price rests on. Folding the bottom-rung selection into
+  cage-tier's own tier expression remains tidier and remains ticket 84's, because that is a
+  versioned policy body and so a new declared line. A pod carrying no claim is handled by the cage mutation
   itself, which renders the **governed namespace**'s declared tier onto every pod at admission and
   clobbers whatever the pod carried; a governed namespace that declares nothing renders to
   `isolated`, and infrastructure is declared explicitly at the **infra tier** (re-grill 28,
   reversals 11 and 12). Together they close the original's silent-ungovernance gap in both forms: a
-  retired claim and no claim each land in the bottom rung, never outside policy. The shipped `Deny`
-  form is the July record, superseded by ADR-0022. The guard's own emitted policy is
+  retired claim and no claim each land in a cage, never outside policy. The `Deny` form was not
+  "the July record" when this said so: it shipped until 2026-09-05 and ticket 89 removed it. The
+  guard's own emitted policy is
   **platform machinery**, numbered by the platform's own tag, so a reader can tell it apart from an
   actually-unversioned policy. See
   [ADR-0014](docs/adr/0014-unclaimed-is-caged-governed-namespace-requires-claim.md) (superseded in
@@ -254,8 +278,36 @@ that a rewritten entry cites stay as the record of the decision at the time.
   `Namespace` manifest **are** the declaration: the adopter writes them, signs them under the same
   tag as its **composed artefact**, and the composed artefact carries no namespace list of its own.
   The pod label is an output only, rendered from the namespace at admission. There is no `CREATE`
-  deny any more: a pod that claims nothing gets the namespace's tier, and a namespace that declares
-  no tier renders to `isolated`. Its opposite is an **ungoverned namespace**, which is priced, never
+  deny **in what the platform renders** (ticket 89, 2026-09-05; between 2026-08-28 and that date
+  this sentence was false and the estate shipped one): a pod that claims nothing is admitted by a
+  `MutatingPolicy` onto the **bottom rung** and observed by a paired `Audit` report, and a
+  namespace that declares no tier renders to `isolated`. **All three adopters still SERVE the
+  `Deny`**, in what they composed under platform `v2.0.1`, and will until the owner merges that
+  branch, `cut-release.yml` cuts the next signed tag and each adopter's pin bump re-composes;
+  `verify/deny-is-not-a-rung/` grades exactly that gap and names the tag, and does not read green
+  while a copy survives. The scope is `CREATE` for the cage and `UPDATE` for a separate
+  labels-only **hold**, and the split is the whole point: the cage's body appends a WAF sidecar
+  and rewrites `priorityClassName` and `priority`, all immutable on a running pod, so putting it
+  on `UPDATE` makes the API server refuse the patch — including the currency controller's
+  **re-cage** patch, which is the only way a pod on a retired version reaches the bottom rung.
+  The hold writes `posture.acme.io/tier` and `posture.acme.io/caged` and nothing else, and only
+  for a pod already on the bottom rung, so it re-asserts the labels a relabel would strip without
+  ever promising dials a pod does not carry.
+  **Adding a claim to a running pod is not a remediation** (decided 2026-09-05, ticket 89 S3,
+  delegated under ADR-0025). A pod the cage put on the bottom rung can be labelled with a served
+  version, at which point `cage-tier` takes it over and writes its Namespace's tier — measured,
+  `isolated` → `baseline` moves `priorityClassName` `cage-isolated` → `cage-baseline-4-0-0` and
+  `priority` `-10000` → `-10`, and both are immutable on a running pod, so the API server refuses
+  the edit. The refusal is the honest outcome and it is deliberately not worked around: the
+  alternative — letting the edit through — would be a workload moving itself off the bottom rung
+  by asserting a label, which is the self-service exemption principle 1 bans. **The remediation
+  is a recreate.** A pod's cage is written at admission from what it declared then; the way into
+  governance is to declare the claim and let the controller recreate the pod, which is the same
+  route the **De-postured** entry already describes. The refusal is a *refusal by another name*
+  — the API server refuses, no policy denies — and it is recorded as a live instance in
+  `verify/deny-is-not-a-rung/deny_register.py`'s `BLIND_SPOTS` and in ticket 98, which owns
+  grading that class.
+  Its opposite is an **ungoverned namespace**, which is priced, never
   refused. See [ADR-0018](docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md)
   (§1 stands; §4 superseded by ADR-0022).
 

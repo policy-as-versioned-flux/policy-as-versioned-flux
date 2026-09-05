@@ -1,14 +1,10 @@
 {
-  "version": "v1",
+  "version": "v2",
   "name": "shared control: PII stored at rest without encryption",
   "control": "encrypt-at-rest",
-  "note": "The SAME control, the SAME triples, run against BOTH institutions. warn = an unencrypted-at-rest volume still admits (full LEF); deny = admission blocks it (LEF collapses toward zero). Triples are (min, mode, max); LEF = loss events/year, LM = £/event. Nothing here is institution-specific — the ONLY thing that differs across driftwood and ludlow is the risk-appetite tolerance band in platform/risk/appetite.json (post-split: fetched by ../../../clone-estate.sh into ../../../.estate-clone/platform/risk/appetite.json). That band alone flips the £-derived verdict Audit->Deny. That is proportionality: identical control, opposite enforcement, because the £ each institution can carry differs.",
-  "warn": {
+  "note": "The SAME workload, the SAME FAIR triples, priced against BOTH institutions. `behind` is the UNCAGED state: the workload stores PII on a volume that is not encrypted at rest and it is running. Triples are (min, mode, max); LEF = loss events/year, LM = GBP/event. Nothing here is institution-specific -- the only thing that differs across driftwood and ludlow is the risk-appetite tolerance band each party SIGNS on its own party.yaml (`appetite.tolerance`, ADR-0021). That band alone selects a different RUNG on the cage ladder for the same number. Eco-system ticket 89 replaced the v1 `warn`/`deny` pair with this single `behind` block: `deny` was a state of the world in which admission blocked the workload, and there is no such state any more -- nothing is denied, and a workload that does not fit its cage does not run (owner, 2026-09-02, ticket 75 Q5).",
+  "behind": {
     "lef": [1, 2, 5],
-    "lm": [3000, 8000, 20000]
-  },
-  "deny": {
-    "lef": [0, 0, 1],
     "lm": [3000, 8000, 20000]
   }
 }

@@ -1,13 +1,14 @@
   ok   selfcheck: with kyverno kubectl unreachable this script exits 3 and its last line is SKIP:
-[1;36m==>[0m 0. the £ engine's own asserts (band selection, tightening raises £, no timer)
-ok  driftwood(£40000 tol, from its OWN party.yaml): loose buys £19439 -> Audit | tightened buys £54520 -> Deny | same loose under ludlow(£5000 tol) -> Deny | a party with no declared appetite refuses as a missing instrument
-[1;36m==>[0m 1. the SAME control + SAME scenario -> divergent £-derived verdicts
-[1;36m==>[0m 2. the £ that DRIVES it — same risk_bought, different appetite band
-    risk_bought £21,107  |  driftwood band £40,000 -> Audit  |  ludlow band £5,000 -> Deny
-[1;36m==>[0m 3. the rendered policies carry the £-derived action (not hand-authored)
-ok  committed policies match the £-derived render for driftwood, ludlow
-[1;36m==>[0m 4. the shared control body is a real, self-scoping policy (pass/fail/unversioned)
-  ??   could not look: kind-driftwood is not reachable, so driftwood's rendered policy was never dry-run there
-  ??   could not look: kind-ludlow is not reachable, so ludlow's rendered policy was never dry-run there
-  the claim this run did NOT observe in full: same control, same £ (risk_bought £21107) — Audit in driftwood, Deny in ludlow. Proportionality by comparison.
-SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- kind-driftwood is not reachable, so driftwood's rendered policy was never dry-run there; kind-ludlow is not reachable, so ludlow's rendered policy was never dry-run there
+[1;36m==>[0m 0. the cage engine's own asserts (tier table, selection, clamp, TCoR)
+[1;36m==>[0m 0b. the £ engine's own asserts (band reading, no timer)
+[1;36m==>[0m 1. the SAME workload + SAME scenario -> divergent £-selected RUNGS
+[1;36m==>[0m 2. the £ that DRIVES it — same uncaged residual, different signed bands
+    uncaged £21,360  |  driftwood band £40,000: baseline leaves £14,952 -> baseline  |  ludlow band £5,000: baseline leaves £14,952, quarantine leaves £1,709 -> quarantine
+[1;36m==>[0m 3. the rendered governed Namespaces carry the £-selected rung (not hand-authored)
+ok  committed namespaces match the £-derived render for driftwood, ludlow
+[1;36m==>[0m 4. the SHARED cage body puts the same pod in two different cages
+    same pod, same cage body: baseline dials in driftwood, quarantine dials in ludlow, nothing denied
+  ??   could not look: kind-driftwood is not reachable, so driftwood's rendered namespace was never dry-run there
+  ??   could not look: kind-ludlow is not reachable, so ludlow's rendered namespace was never dry-run there
+  the claim this run did NOT observe in full: same workload, same uncaged £21359 — baseline in driftwood, quarantine in ludlow, because their signed bands differ. Neither is a refusal: the bottom of the ladder is a running cage. Proportionality by comparison.
+SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- kind-driftwood is not reachable, so driftwood's rendered namespace was never dry-run there; kind-ludlow is not reachable, so ludlow's rendered namespace was never dry-run there
