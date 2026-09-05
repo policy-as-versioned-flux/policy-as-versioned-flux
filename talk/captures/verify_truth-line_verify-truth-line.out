@@ -8,7 +8,7 @@ NOTE manifest: .estate-clone/ludlow/verify-twin-overlay.sh is listed in talk/ver
 NOTE manifest: .estate-clone/tuppence/twin/verify-twin-scenarios.sh is listed in talk/verify-manifest.txt but is not in this checkout of the unit; it is graded on the run where the unit publishes it
 NOTE manifest: .estate-clone/tuppence/verify-twin-overlay.sh is listed in talk/verify-manifest.txt but is not in this checkout of the unit; it is graded on the run where the unit publishes it
 [1;36m==>[0m 4. the last TRUTH line talk/truth.log recorded still adds up
-  run 85: 66 passes split {'observed': 14, 'self': 40, 'simulated': 6, 'meta': 6}, ceiling 81 of 100, skips {'never': 10, 'waits': 8}
+  run 86: 66 passes split {'observed': 14, 'self': 40, 'simulated': 6, 'meta': 6}, ceiling 82 of 101, skips {'never': 10, 'waits': 10}
 [1;36m==>[0m 5. the sentence the deck publishes counts the same 'can never pass' population the ceiling does
-  measured: 66 passes are observed 14 + self 40 + simulated 6 + meta 6, against a ceiling of 81 of 100 (8 excluded, 11 can never pass on this runner); fail 8, skip 18 (never 10, waits 8)
+  measured: 66 passes are observed 14 + self 40 + simulated 6 + meta 6, against a ceiling of 82 of 101 (8 excluded, 11 can never pass on this runner); fail 7, skip 20 (never 10, waits 10)
 PASS: talk/verify-manifest.txt places every one of the 101 verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all.sh turns an undeclared could-not-look and a stale ceiling red, the last TRUTH line talk/truth.log recorded adds up, and the published 'can never pass' count is the population the ceiling was cut from
