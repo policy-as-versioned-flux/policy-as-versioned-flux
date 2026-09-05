@@ -141,6 +141,11 @@ Q13 settled it on **own**, and this ticket executed it. `map.md`'s two retiremen
 ticket-13 line and "The currency controller is retired (ticket 13)" under *Not yet specified*) are
 corrected in the same change. Nothing is left for ticket 80 there.
 
+### Pull requests
+
+- hub: https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/32
+- platform: https://github.com/policy-as-versioned-platform/platform/pull/12
+
 ### Files changed
 
 - **platform** (`ticket-91-the-currency-controller-is-owned`, one commit): `currency-controller/currency.py`,
