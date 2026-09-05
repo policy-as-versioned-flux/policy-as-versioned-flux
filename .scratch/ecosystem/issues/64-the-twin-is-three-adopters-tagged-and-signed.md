@@ -219,6 +219,22 @@ exists to make the gate print:
 
 So the manifest rows are not a claim about how the gate would grade it; the gate graded it.
 
+**And one observation this build cost the clock, recorded rather than repaired.** `truth.yml`
+fired again on `c6a417b` and produced run 87 --
+
+    TRUTH 2026-09-04T23:46Z run=87 hub=c6a417b units=[driftwood=cd63472@main feeds=b6eaa0a@main
+    ico=6217c3a@main insurer=9e90e1b@main ludlow=64492d3@main nist=b9f5fff@main
+    platform=bbda376@main tuppence=e44ad89@main] pass=66 [observed=14 self=40 simulated=6 meta=6]
+    fail=7 skip=20 [never=10 waits=10] excluded=8 total=101 ceiling=82
+
+-- and its commit was **rejected, non-fast-forward**, because this build pushed `bdef688` while
+that run was still going (Actions run 33929323700, job 101204621340). So `talk/truth.log` on this
+branch carries run 86 and not run 87. The line above is quoted from the Actions log and is NOT
+written into `talk/truth.log` by hand: a clock appends observations and a builder does not get to
+author one. It agrees with run 86 in every count. Earlier in the same sequence a force-push
+briefly dropped run 86's own commit; that one was recovered by cherry-picking the clock's commit
+back onto the branch, which is why `5fcb8ff` sits between two of this ticket's commits.
+
 ### Two measurements, and one finding that is not this ticket's
 
 * **Step 5's wall-clock with all three overlays present: 1:52.61**, against `talk/verify-all.sh`'s
