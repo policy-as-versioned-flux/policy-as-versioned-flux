@@ -285,11 +285,29 @@ that a rewritten entry cites stay as the record of the decision at the time.
   `Deny`**, in what they composed under platform `v2.0.1`, and will until the owner merges that
   branch, `cut-release.yml` cuts the next signed tag and each adopter's pin bump re-composes;
   `verify/deny-is-not-a-rung/` grades exactly that gap and names the tag, and does not read green
-  while a copy survives. The scope is `CREATE`, plus `UPDATE` for a pod the policy already caged
-  — without `UPDATE` a caged pod could relabel its way out of its reach cage for good, and
-  without the gate the mutation would inject a WAF sidecar into the de-posture patch's immutable
-  container list and the API server would reject it, which is the cage becoming a refusal by
-  another name. Its opposite is an **ungoverned namespace**, which is priced, never
+  while a copy survives. The scope is `CREATE` for the cage and `UPDATE` for a separate
+  labels-only **hold**, and the split is the whole point: the cage's body appends a WAF sidecar
+  and rewrites `priorityClassName` and `priority`, all immutable on a running pod, so putting it
+  on `UPDATE` makes the API server refuse the patch — including the currency controller's
+  **re-cage** patch, which is the only way a pod on a retired version reaches the bottom rung.
+  The hold writes `posture.acme.io/tier` and `posture.acme.io/caged` and nothing else, and only
+  for a pod already on the bottom rung, so it re-asserts the labels a relabel would strip without
+  ever promising dials a pod does not carry.
+  **Adding a claim to a running pod is not a remediation** (decided 2026-09-05, ticket 89 S3,
+  delegated under ADR-0025). A pod the cage put on the bottom rung can be labelled with a served
+  version, at which point `cage-tier` takes it over and writes its Namespace's tier — measured,
+  `isolated` → `baseline` moves `priorityClassName` `cage-isolated` → `cage-baseline-4-0-0` and
+  `priority` `-10000` → `-10`, and both are immutable on a running pod, so the API server refuses
+  the edit. The refusal is the honest outcome and it is deliberately not worked around: the
+  alternative — letting the edit through — would be a workload moving itself off the bottom rung
+  by asserting a label, which is the self-service exemption principle 1 bans. **The remediation
+  is a recreate.** A pod's cage is written at admission from what it declared then; the way into
+  governance is to declare the claim and let the controller recreate the pod, which is the same
+  route the **De-postured** entry already describes. The refusal is a *refusal by another name*
+  — the API server refuses, no policy denies — and it is recorded as a live instance in
+  `verify/deny-is-not-a-rung/deny_register.py`'s `BLIND_SPOTS` and in ticket 98, which owns
+  grading that class.
+  Its opposite is an **ungoverned namespace**, which is priced, never
   refused. See [ADR-0018](docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md)
   (§1 stands; §4 superseded by ADR-0022).
 

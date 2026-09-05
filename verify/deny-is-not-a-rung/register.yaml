@@ -63,16 +63,26 @@ rules:
       Re-expressed as a cage constraint, and it took two attempts. The rule judges a claim: a
       pod claiming a policy-version the platform's declared array does not carry. Under the
       shipped Deny that pod could not run.
-      WHAT IS BUILT (platform branch ticket-89-deny-is-not-a-rung, commit bd9e919): a PAIR.
-      `policy-version-orphan-guard` drops to `Audit` and reports the claim by name, and a new
-      `MutatingPolicy` `policy-version-orphan-cage`, ranged from the SAME array, puts that pod
-      on the bottom rung -- `posture.acme.io/tier: isolated`, the caged marker, the isolated
-      dials, the `cage-isolated` PriorityClass with its integer priority, host namespaces shut,
-      all capabilities dropped on containers AND initContainers. Beside them
-      `cage-netpol-bottom-rung` generates the deny-all NetworkPolicy the version-scoped
-      `cage-netpol` cannot, and the machinery renders the unsuffixed `cage-isolated`
-      PriorityClass, without which the Priority admission plugin would refuse every pod the
-      cage touches.
+      WHAT IS BUILT (platform branch ticket-89-deny-is-not-a-rung, commit 8062791): a THREE.
+      `policy-version-orphan-guard` drops to `Audit` and reports the claim by name.
+      `policy-version-orphan-cage`, a `MutatingPolicy` ranged from the SAME array, matches
+      `CREATE` only and puts that pod on the bottom rung -- `posture.acme.io/tier: isolated`,
+      the caged marker, the isolated dials, the `cage-isolated` PriorityClass with its integer
+      priority, host namespaces shut, all capabilities dropped on containers AND initContainers.
+      `policy-version-orphan-cage-holds` matches `UPDATE` and writes the two LABELS and nothing
+      else, gated on `oldObject` already carrying the bottom rung so it RE-asserts rather than
+      asserts. Beside them `cage-netpol-bottom-rung` generates the deny-all NetworkPolicy the
+      version-scoped `cage-netpol` cannot, and the machinery renders the unsuffixed
+      `cage-isolated` PriorityClass, without which the Priority admission plugin would refuse
+      every pod the cage touches.
+      WHY THE SPLIT, since an earlier draft of this row got it backwards: the full body appends
+      a `waf-sidecar` and rewrites `priorityClassName` and `priority`, all immutable on a running
+      pod, so putting it on `UPDATE` makes the API server refuse the patch -- a refusal by
+      another name. The gate that was supposed to prevent that, `posture.acme.io/caged`, does
+      not: `cage-tier` writes that marker for its whole population at every rung. `UPDATE` needs
+      the labels re-asserted, not the cage re-applied.
+      The allow-list ranges over CUT elements only. A declared version with no `commit` has no
+      tag and no served cage, so allowing it left a pod claiming it caged by nothing.
       THE FIRST ATTEMPT SHIPPED THE DEMOTION ALONE, on the reasoning that "every claiming pod
       is already caged by cage-tier". That is false of the served estate and the review caught
       it: every served `cage-tier` carries `only-this-policy-version`, and an orphan claim is
@@ -110,20 +120,27 @@ rules:
       Audit to Deny and called it "the one refusal the doctrine allows", for a real reason
       observed live: under Audit a claim-less pod ran COMPLETELY UNCAGED inside a Namespace
       whose declared tier was `isolated`.
-      WHAT IS BUILT (platform branch ticket-89-deny-is-not-a-rung, commit bd9e919): the
-      ValidatingPolicy is REPLACED by a `MutatingPolicy` of the same name, scoped to
-      `policy-as-versioned.dev/governed: "true"` namespaces, which puts an unclaimed pod on the
-      bottom rung -- so the Namespace falls closed AND the pod falls closed. Because replacing
-      it dropped the observation the Deny used to make, a SEPARATE `Audit` ValidatingPolicy
-      `governed-namespace-unclaimed-report` is rendered beside it and names the cage in its
-      message. A mutation and a report do not contend for a field, which is why this pair is
-      safe where two mutations would not be; an earlier draft of this row claimed "the guard
-      drops to Audit", which was never true of the code and is corrected here.
-      `CREATE` plus `UPDATE`, the `UPDATE` arm gated on the pod already carrying
-      `posture.acme.io/caged: "true"`: without `UPDATE` a caged pod could relabel its way out
-      of `cage-reach-isolated` for good, and without the gate the mutation would inject a
-      sidecar into the de-posture patch's immutable container list and the API server would
-      refuse it.
+      WHAT IS BUILT (platform branch ticket-89-deny-is-not-a-rung, commit 8062791): the
+      ValidatingPolicy is REPLACED by a `MutatingPolicy` of the same name, `CREATE` only, scoped
+      to `policy-as-versioned.dev/governed: "true"` namespaces, which puts an unclaimed pod on
+      the bottom rung -- so the Namespace falls closed AND the pod falls closed. Because
+      replacing it dropped the observation the Deny used to make, a SEPARATE `Audit`
+      ValidatingPolicy `governed-namespace-unclaimed-report` is rendered beside it and names the
+      cage in its message; it is `CREATE` only too, because its subject is ARRIVAL.
+      `governed-namespace-cage-holds` takes `UPDATE` and writes the two LABELS and nothing else,
+      gated on `oldObject` already carrying the bottom rung so it RE-asserts rather than asserts.
+      TWO DRAFTS OF THIS ROW WERE WRONG AND BOTH ARE CORRECTED HERE. The first said "the guard
+      drops to Audit", which was never true of the code -- the ValidatingPolicy was replaced, and
+      nothing observed an unclaimed pod until the report was built. The second said `CREATE` plus
+      `UPDATE` gated on `posture.acme.io/caged: "true"`, and gave as its reason that without the
+      gate a sidecar would be injected into the de-posture patch's immutable container list. That
+      is the reason the gate was REMOVED: the marker is written by `cage-tier` for its whole
+      population at every rung, so the gate did not prevent the injection, it caused it -- the
+      cage matched a pod caged at `baseline` and would have refused the currency controller's
+      `recage_patch()`, ticket 91's, the only way a pod on a retired version reaches the bottom
+      rung. Splitting the labels onto their own `UPDATE` policy is what delivers the relabel
+      protection without the refusal, and `verify-governed-namespace-guard.sh` step 5 measures
+      the real patched object coming through it untouched.
       `cage-tier` cannot do any of this itself: it matches only pods that CLAIM a version, and
       widening it would cage kube-system, Flux and Kyverno's own pods, which ADR-0014 rejected
       for two independent reasons that both still hold.

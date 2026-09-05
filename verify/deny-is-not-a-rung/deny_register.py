@@ -110,10 +110,16 @@ BLIND_SPOTS = (
     "everything the webhook matches -- the broadest refusal in a cluster, and written nowhere "
     "near a policy body",
     "a REFUSAL BY ANOTHER NAME: a mutation that makes a pod inadmissible -- naming a "
-    "PriorityClass that does not exist, or injecting a container into a running pod -- refuses "
-    "the workload without any Deny-shaped text in it, and is graded by nothing here. The "
-    "estate has produced that failure twice for real (2026-08-28, ticket 26; 2026-09-05, "
-    "ticket 89's own first cut), and both times it was found by RUNNING the policy",
+    "PriorityClass that does not exist, or injecting a container into a running pod, or "
+    "rewriting an immutable field on one -- refuses the workload without any Deny-shaped text "
+    "in it, and is graded by nothing here. Ticket 98 owns grading it. Four instances so far, "
+    "every one found by RUNNING a policy and none by reading one: 2026-08-28 ticket 26 (a "
+    "sidecar appended twice); 2026-09-05 ticket 89's first cut (a PriorityClass no cluster "
+    "has); 2026-09-05 ticket 89's second (the full cage body on UPDATE, which would have "
+    "refused the currency controller's re-cage patch); and one that is LIVE and decided rather "
+    "than fixed -- labelling a bottom-rung pod with a served version makes cage-tier rewrite "
+    "priorityClassName and priority, which the API server refuses on a running pod, so adding a "
+    "claim is not a remediation and the remediation is a recreate (ticket 89 S3, CONTEXT.md)",
 )
 
 #: Directories never walked. `.estate-clone` is walked explicitly by root, not by recursion,
