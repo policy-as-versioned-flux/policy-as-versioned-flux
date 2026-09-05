@@ -3,6 +3,13 @@ status: accepted
 ---
 
 > **Superseded in part, 2026-08-28.** the CREATE deny on a governed namespace is superseded by [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md). The rest stands.
+>
+> **Amended 2026-09-05 (eco-system ticket 91, delegated under [ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md)).** Two things this ADR says about the currency controller are now wrong, and the `CREATE`-only decision they were used to justify is still right for a better reason.
+>
+> 1. *"the de-posture patch ... removing **both** the posture label and the version claim"* describes a patch that, under [ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md)'s ladder, **cages nothing**. Removing the claim takes the pod permanently out of the cage mutation's scope, so a patch that names no tier leaves the pod at whatever rung admitted it, for the rest of its life. The controller now writes `posture.acme.io/tier: isolated` and asserts the caged label in the same update, so the workload actually reaches the bottom rung. It is a **re-cage**, not a de-posture; `CONTEXT.md`'s **Currency controller** entry is the term.
+> 2. *"the same lever `currency.py` already uses for its `--action evict` path"* names a lever that no longer exists. Eviction is gone, and the grant carries no `delete` on pods: the estate never removes a workload (ticket 75 Q5, the owner's own reason). A recreated pod is handled by admission alone.
+>
+> The `CREATE`-only match on `governed-namespace-requires-claim` is unchanged and still load-bearing: the re-cage patch is an `UPDATE` that strips the claim, and a guard matching `UPDATE` would refuse it. What changed is only what the patch does afterwards.
 
 # An unclaimed pod is caged, not denied; a governed namespace requires a claim at CREATE
 

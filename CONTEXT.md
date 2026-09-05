@@ -259,16 +259,41 @@ that a rewritten entry cites stay as the record of the decision at the time.
   refused. See [ADR-0018](docs/adr/0018-the-namespace-manifest-is-the-governed-declaration.md)
   (§1 stands; §4 superseded by ADR-0022).
 
-- **De-postured** — The state of a running workload whose claimed policy version has since been
-  retired from the fleet's version array, and from which the currency controller has therefore
-  stripped **both** the posture label and the version claim in one patch. The workload **keeps
-  running** and is **caged**, not denied: it loses its posture-derived identity and the reach and
-  secrets that identity buys, and the residual is priced against its party's appetite band. It cannot
-  return to the fleet in that state: its controller recreates it, and the recreated pod lands in
-  the **tier** its governed Namespace declares, or in **isolated** when nothing is declared
-  (rewritten 2026-08-28, ticket 09; the `CREATE` deny is gone). Ticket 27 decides de-posture as a
-  tier move that keeps the claim. This is the **exemption**-free settlement in miniature — the
-  bottom rung is "too expensive to run or not functional", reached by the £, and never a carve-out.
+- **Currency controller** (the term, written 2026-09-05, ticket 91; it was an aside inside the
+  retired **De-postured** entry below) — The estate's **only post-admission re-caging mechanism**,
+  published by **platform** as a versioned member of its `implementations` package and numbered by
+  the platform's own tag. Admission is a snapshot: the **cage** mutation and the **orphan guard**
+  judge a pod once, when it is created, and never again. The controller is the second look. One
+  bounded pass per minute, as a CronJob on the adopter's cluster, it reads the same version array
+  the orphan guard allow-lists and, for every running pod whose **claim** the array no longer
+  declares, does the one thing that sentence names:
+
+  > a pod admitted under a version that is later retired is **re-caged to `isolated`** on the next
+  > controller pass.
+
+  It may only **tighten**. It writes the bottom rung and nothing else, it holds a pod it would not
+  tighten, and its grant carries no `delete` on pods — a workload is never removed, only caged
+  (ADR-0022; ticket 75 Q5). A version array it cannot read is a **missing instrument**
+  (ADR-0020): the pass refuses and re-cages nothing, because an empty supported set would read the
+  whole estate as stale. Ticket 13 item 2 retired it on a homonym — "ticket 07's fx feed replaces
+  it", where that **currency** is money and this one is version currency — and ticket 75 Q13
+  withdrew the retirement. Graded by
+  `.estate-clone/platform/currency-controller/verify-currency.sh`, whose offline half derives the
+  seam from the shipped policy bodies and whose live half is a named could-not-look until a cluster
+  carries both the instrument and a stale pod.
+
+- **De-postured** (superseded 2026-09-05 by the **Currency controller** entry above; kept because
+  ADR-0014 and the shipped `posture-trust-boundary` policy still use the word) — The state of a
+  running workload whose claimed policy version has since been retired from the version array, and
+  from which the currency controller has therefore stripped **both** the identity posture label and
+  the version claim in one patch. The workload **keeps running** and is **caged**, not denied: it
+  loses its posture-derived identity and the reach and secrets that identity buys, and the residual
+  is priced against its party's appetite band. What the word never covered, and what ticket 91
+  added, is the **rung**: stripping the claim takes the pod permanently out of the cage mutation's
+  scope, so a patch that named no tier froze the pod at whatever rung admitted it and the
+  retirement changed nothing. The patch now writes `isolated` in the same update. This is the
+  **exemption**-free settlement in miniature — the bottom rung is "too expensive to run or not
+  functional", reached by the £, and never a carve-out.
 
 - **Twin** (rewritten 2026-08-28, ticket 11) — The eco-system's intelligence participant. It
   consumes the signed feeds, an adopter's own **twin overlay** and history; it publishes **priced

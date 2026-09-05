@@ -65,8 +65,12 @@ step "driftwood: KinD + Flux + signed source + reconcile" "$CLONE/driftwood/scri
 step "platform: identity substrate (SPIRE+Istio+OpenBao)" "$CLONE/platform/identity/up.sh"
 step "platform: engine (Kyverno + flux-operator)"     "$CLONE/platform/engine/up.sh"
 step "platform: posture projection (posture/vN in SVID path)" "$CLONE/platform/posture/up.sh"
-step "platform: currency controller"                 "$CLONE/platform/currency-controller/up.sh"
 step "platform: graded enforcement envelope (cages)" "$CLONE/platform/graded/up.sh"
+# after graded, not before it (eco-system ticket 91): the controller re-cages a
+# stale pod into the `isolated` rung, so without cage-tier and cage-netpol on
+# the cluster there is no ladder to re-cage into and no NetworkPolicy to hold
+# the result -- the patch would land and mean nothing.
+step "platform: currency controller (post-admission re-cage)" "$CLONE/platform/currency-controller/up.sh"
 step "platform: human/device access plane (Pomerium)" "$CLONE/platform/access/up.sh"
 step "platform: EUD local prep (vTPM, offline)"      "$CLONE/platform/eud/up.sh"
 # tuppence workload flagship (customer-accounts-reset) rides the driftwood substrate
