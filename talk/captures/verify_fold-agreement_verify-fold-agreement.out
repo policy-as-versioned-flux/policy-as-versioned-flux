@@ -13,6 +13,6 @@ ok: case 'retirement' ludlow: exit 1, composed 'major' -- REFUSE: composed bump 
 ok: case 'retirement' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1 without human review
 FAIL: case 'arrival': ludlow's gate answered refuse (stating no composed bump at all: error during command execution: --trusted-root only supported with --new-bundle-format)) where driftwood, tuppence answered refuse (composed 'major') -- one movement, more than one answer, and only one of them can be the estate's
 FAIL: case 'quiet': ludlow's gate answered refuse (stating no composed bump at all: error during command execution: --trusted-root only supported with --new-bundle-format)) where driftwood, tuppence answered adopt (composed 'none') -- one movement, more than one answer, and only one of them can be the estate's
-PASS: case 'retirement': driftwood, ludlow, tuppence each answered refuse with composed bump 'major'
+PASS: case 'retirement': 3 gates (driftwood, ludlow, tuppence) each answered refuse with composed bump 'major'
 FAIL: case 'standing': tuppence's gate answered refuse (composed 'major') where driftwood, ludlow answered adopt (composed 'none') -- one movement, more than one answer, and only one of them can be the estate's
 FAIL: 3 planted movement(s) were answered differently by two adopter gates, or answered differently from ADR-0011's own reading
