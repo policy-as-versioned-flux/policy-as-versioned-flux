@@ -105,10 +105,10 @@ diff_lines="$(diff "$HERE/namespaces/proportionality-driftwood.yaml" "$HERE/name
 # Only the tier + name + part-of + proportionality-org lines differ: 4 lines each side.
 [ "$diff_lines" -le 8 ] || fail "the namespaces differ in more than the tier+org lines ($diff_lines) — not the same declaration"
 # And this directory ships no policy artefact at all any more (eco-system ticket 89, item 2):
-# the template and the rendered files are Namespace declarations. Prose about the retirement is
-# expected in this script and in the README, so only the ARTEFACTS are read here.
-# The KEY, at the start of a line -- the artefacts carry a dated note about the retirement in
-# their own comments, and a note is not a policy.
+# the template and the rendered files are Namespace declarations. Matched as the KEY at the
+# start of a line, because the artefacts carry a dated note about the retirement in their own
+# comments, and a note is not a policy. Only the ARTEFACTS are read: prose about the retirement
+# is expected in this script and in the README.
 if grep -rlnE '^[[:space:]]*validationActions:' "$HERE/namespaces" "$HERE/control" >/dev/null 2>&1; then
   fail "verify/proportionality still renders an enforcement action; the beat grades tier selection now"
 fi
