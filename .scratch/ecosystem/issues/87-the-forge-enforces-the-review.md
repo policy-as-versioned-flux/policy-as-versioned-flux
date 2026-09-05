@@ -20,6 +20,18 @@ Done = `gh api repos/<org>/<repo>/rulesets` is non-empty on nine repos and the v
 
 Charted by [REVIEW-2026-09-02.md](../REVIEW-2026-09-02.md) R9. Findings: security/SS-04, SS-05, scope/F8, engineering/EQ-08. Ticket 65 (the `--git-dir` hole) is the guard's own half. Ticket 74's definition of done cannot be written until Q6 is answered.
 
+**2026-09-05.** Item 3 gained a narrower sibling, ticket 97, charted a day earlier without
+noticing this item. 97 keeps the declaration where it is and pairs it with a record of the commit
+that authorised it, so an unrecorded flip goes red. This item is the stronger answer and 97 says
+so. Answer them together; if item 3 lands, 97 closes as covered.
+
+**Live state as of 2026-09-04, for item 1.** The `pavc-other-hand` installation carries
+`contents:write, metadata:read, pull_requests:write` on all nine organisations and no `workflows`
+permission. That already bites: insurer pull request 3 could not be merged by the app because it
+changes `.github/workflows/fetch.yml`, while five sibling merges carrying workflow changes were
+admitted the same day. Whatever ruleset item 1 applies has to be reachable by the second identity,
+or the identity stops being able to merge at all. Record: ticket 62, "Waits on the owner".
+
 ## Comments
 
 **2026-09-02, ticket 75 resolved.** Q6 is (a), owner-reasoned: principle 5 binds for the demonstration. Item 1 applies. The second identity is the machine identity ticket 88 creates for the assistant, which reviews and merges during the development window while the owner authors and pushes (the owner's word: theatre). Item 3: `twin/ENACT_MODE` flips to `development` only after ticket 88 lands, with a dated docstring line; the declaration the agent cannot write is the ruleset itself, which requires the second identity's review. Blocked by 88 now, not 75.
