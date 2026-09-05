@@ -223,7 +223,7 @@ reads the template; the drift is fixed and cannot come back unobserved.
   directly instead: the kind change flows through, and the composed governed-namespace member
   carries no `validationActions` and no `Deny`.
 
-Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; the two machinery guards become six documents that refuse nothing (orphan guard Audit + orphan cage, governed-namespace cage + unclaimed report, bottom-rung netpol, and the unsuffixed cage-isolated PriorityClass without which the Priority plugin would refuse every pod they cage); posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck. Round 1 shipped a real regression — the demotion alone left an orphan claim uncaged, because every served cage-tier is version-scoped — and the review caught it; the fix, the four other blocking findings, and three defects found by RUNNING the beats are in the ticket -- the sharpest being that every served PriorityClass is version-suffixed, so the machinery's own cage named a class no cluster has and would have made every pod it caged inadmissible: a refusal by another name, inside the ticket about refusals by another name, invisible to every static check here and now named in deny_register.BLIND_SPOTS as wanting a ticket of its own. Disjointness is proved from the array. Three clock observations were lost, and the cause is the clock: truth.yml rebases a branch onto main and then pushes to the branch, which can never fast-forward once the branch has diverged -- run 98 was rejected with the tip unmoved and nobody pushing. So a TRUTH line produced on a ticket branch normally never lands, and the brief now says rebase onto main rather than merge it, which is the opposite of what this build first wrote. All three lines are quoted in the ticket from the Actions logs and none is written into truth.log. The 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
+Map line: `- [89 — Deny is not a rung: the mutating controller](issues/89-deny-is-not-a-rung-the-mutating-controller.md) — three Deny-shaped rules, not two, each with a recorded choice in verify/deny-is-not-a-rung/register.yaml that the gate joins to the trees on every run and refuses to let drift; the two machinery guards become six documents that refuse nothing (orphan guard Audit + orphan cage, governed-namespace cage + unclaimed report, bottom-rung netpol, and the unsuffixed cage-isolated PriorityClass without which the Priority plugin would refuse every pod they cage); posture-trust-boundary retires at ticket 84's next declared line because stamp-posture already is the boundary; verify/proportionality grades tier selection (£21,360 uncaged: baseline in driftwood, quarantine in ludlow) and ships no policy body; CONTEXT.md, ADR-0014, ADR-0018 §4, ADR-0022 and NORTH-STAR carry one dated sentence and ADR-0022's "one refusal the doctrine allows" is struck. Three rounds, each fixing a defect of the same shape found only by running the thing: round 1 shipped a real regression — the demotion alone left an orphan claim uncaged, because every served cage-tier is version-scoped — and the review caught it; round 2's UPDATE arm was itself a third refusal by another name that would have broken ticket 91's recage patch (split into labels-only hold policies, measured against the real patched object), and round 2's allow-list allowed an UNCUT version no cage serves (now cut elements only); the fixes, the blocking findings and the defects found by RUNNING the beats are in the ticket -- the sharpest being that every served PriorityClass is version-suffixed, so the machinery's own cage named a class no cluster has and would have made every pod it caged inadmissible: a refusal by another name, inside the ticket about refusals by another name, invisible to every static check here and now named in deny_register.BLIND_SPOTS as wanting a ticket of its own. Disjointness is proved from the array. Three clock observations were lost, and the cause is the clock: truth.yml rebases a branch onto main and then pushes to the branch, which can never fast-forward once the branch has diverged -- run 98 was rejected with the tip unmoved and nobody pushing. So a TRUTH line produced on a ticket branch normally never lands, and the brief now says rebase onto main rather than merge it, which is the opposite of what this build first wrote. All three lines are quoted in the ticket from the Actions logs and none is written into truth.log. The 21 served copies wait on the platform branch, a signed tag and three pin bumps, named by the check.`
 
 ### Round 2, 2026-09-05 — the review found five blocking findings and the central one was real
 
@@ -318,6 +318,95 @@ admitted — which is `verify-graded.sh`'s live tail, and that has never had a c
 run (review finding P2-6). Naming the two together is what makes the case; the ticket is not
 written here because charting is not this ticket's, but nothing else in the record puts the two
 instances side by side.
+
+### Round 3, 2026-09-05 — the UPDATE arm was a third refusal by another name
+
+Round 2's fix introduced its own defect, of exactly the class this ticket is about, and the
+review caught it before it merged.
+
+**R1 (central). The `UPDATE` gate was not what I thought it was.** I matched `UPDATE` on
+`posture.acme.io/caged == "true"`, reading that marker as "caged by this policy". It is not:
+`cage-tier` writes it for its whole population at every rung. So the bottom-rung cage matched a
+pod `cage-tier` had caged at `baseline`, and applying the full body to a RUNNING pod appends a
+`waf-sidecar` to an immutable container list and rewrites `priorityClassName` and `priority`.
+The API server refuses that. **A refusal by another name, in the ticket about refusals by
+another name, and the third instance in this estate.**
+
+It was not theoretical. Ticket 91's `recage_patch()` is an `UPDATE` that strips the claim and
+writes `tier: isolated` + `caged: "true"` in one merge patch — the estate's only mechanism for
+moving a running pod off a retired version — and its patched object matches both my gates
+exactly. Ticket 91 merged to platform `main` while this branch sat behind it, and its own words
+in the file I was editing say `UPDATE is excluded on purpose, so the currency-controller's
+re-cage patch keeps working`. I had never read them, because the branch had not merged them, and
+the conflict lands in precisely those lines. The collision was invisible from inside either
+branch.
+
+**The fix, and why the obvious narrowing does not work.** Gating on
+`tier == 'isolated' && caged == 'true'` fails too: that is exactly what `recage_patch()` writes.
+`UPDATE` needed the LABELS re-asserted, not the cage re-applied — which is all `UPDATE` was ever
+wanted for (stopping a post-creation relabel escaping the reach cage). So the two jobs are split:
+the cages keep `CREATE` and the full body, and two labels-only `MutatingPolicy`s
+(`governed-namespace-cage-holds`, `policy-version-orphan-cage-holds`) take `UPDATE` and write
+`tier` and `caged` and nothing else. They append no container, rewrite no immutable field, are
+byte-identical for an already-correct pod, and are admissible on top of `recage_patch()`, which
+writes the same two values.
+
+**Measured, and now graded.** `verify-governed-namespace-guard.sh` step 5 builds the object
+`currency.recage_patch()` actually produces, on a pod admitted at `baseline`, and runs it through
+the `UPDATE`-scoped policies: container list unchanged, `priorityClassName` still
+`cage-baseline-4-0-0`, `priority` still `-10`, both labels held. The step names its own ceiling:
+`kyverno apply` has no `UPDATE` mode, so operation scoping is proved structurally and the
+mutation content functionally — feeding it the `CREATE`-scoped cages would measure a
+configuration the API server never produces, which is the round-1 mistake in a new place.
+
+**R2. The name-attribution fix closed one route and opened an easier one.** Widening the name
+regex from a `match` to a `search` made a `- name:` inside `matchConditions`, `variables` or
+`validations` readable as the document's own name. The reviewer planted a Deny called
+`block-all-images-from-anywhere` whose only camouflage was
+`matchConditions: [{name: posture-trust-boundary}]` sitting between the real metadata name and
+the `validationActions` line, appended to a path the register's globs already declare: the
+inventory called it an accounted-for copy of `posture-trust-boundary` and the check returned its
+normal SKIP. Attribution now prefers the parsed `metadata.name`, and only where the parsed
+document ITSELF carries the shape — a ResourceSet parses cleanly and would otherwise lend its own
+name, `composed`, to the three Denys inside its template string. Where nothing parses, the
+shallowest non-list `name:` in the region wins, and the region is bounded to the enclosing block
+scalar and its nearest `---`, indented separators included. Five tests, red first, including both
+plants end to end.
+
+**R3. The completeness leg tested that a FILE exists, not that a cage is SERVED.** `5.0.0` is
+declared with no `commit`, so it sat in the allow-list — the orphan cage skipped it, the report
+did not report it — while no `cage-tier-5-0-0` is installed anywhere. A pod claiming it ran
+caged by nothing, selectable by anyone who read `versions.yaml`: **round 1's defect in a new
+place, and I had written the completeness leg that was supposed to catch it.** The allow-list
+ranges over CUT elements only now, reusing `verify-declared-versions-admit.sh`'s own
+`partition()`, and the selfcheck asserts every uncut declared version is in the orphan
+population. One honest consequence, not hidden: with a single cut version, `verify-retirement.sh`
+is back to the offline refusal ticket 63's second declared version had retired, and the manifest
+row says so and says it lifts when a second TAG is cut, not when a second version is declared.
+
+**R5.** `cage-netpol-bottom-rung` wrote the served generator's downstream names. Two owners for
+one downstream name is what `DeleteDownstreams` wiped across namespaces on 2026-08-28. It has its
+own names now (`cage-reach-bottom-rung-*`) with the same podSelector, so the reach is identical
+and neither generator can delete the other's objects.
+
+**R6, R7.** The withdrawn round-1 premise is gone from `render-orphan-guard.py`'s `ACTION`
+comment. The report stays `CREATE`-only and says why: its subject is ARRIVAL, and an
+`UPDATE`-scoped report would fire on every relabel and loudest of all on `recage_patch()` — the
+estate working correctly — while PolicyReports are what the priced hole is computed from, so
+repeating one event would double-count it. `BLIND_SPOTS` gains Gatekeeper's
+`enforcementAction: deny`, the 2022 `rules[].validate.deny{}` block, and a webhook's
+`failurePolicy: Fail`.
+
+**R4.** Both branches are REBASED onto their mains, not merged — this ticket's own new brief rule.
+ADR-0014's conflict is resolved on the merits: ticket 91's amendment is kept whole and ticket 89's
+is added dated beside it, agreeing with it, and saying in terms why the `UPDATE` arm was wrong.
+
+**Three defects of mine, three rounds, all the same shape.** Round 1 reasoned from an artefact
+that is never applied. Round 2 reasoned from a label that does not mean what its name suggests,
+and tested a file's existence instead of a cage's service. Each was invisible to every static
+check here and each was found by running the thing. That is the case for
+`deny_register.BLIND_SPOTS`'s first entry becoming somebody's ticket, and it is now three
+instances, not two.
 
 ### Three observations were lost, and the clock is why, not the pushes
 

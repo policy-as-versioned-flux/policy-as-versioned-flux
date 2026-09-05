@@ -76,10 +76,17 @@ _ENFORCE = re.compile(r"""["']?validationFailureAction["']?:\s*["']?(\w+)""")
 #: policy whose top line reads `audit` can still refuse in production.
 _OVERRIDES = re.compile(r"""["']?validationFailureActionOverrides["']?:""")
 _ACTION_ENFORCE = re.compile(r"""["']?action["']?:\s*["']?[Ee]nforce""")
-_NAME = re.compile(r"""["']?name["']?:\s*["']?([^\s,}#"']+)""")
-_KIND = re.compile(r"""["']?kind["']?:\s*["']?([^\s,}#"']+)""")
+_NAME = re.compile(r"""^(\s*)["']?name["']?:\s*["']?([^\s,}#"']+)""")
+_KIND = re.compile(r"""^(\s*)["']?kind["']?:\s*["']?([^\s,}#"']+)""")
+#: A `- name:` under matchConditions, variables or validations is NOT the policy's name.
+_LIST_NAME = re.compile(r"""^\s*-\s*["']?name["']?:""")
+#: `metadata: {name: x}` and `spec: {validationActions: [Deny]}` on one line each.
+_FLOW_NAME = re.compile(r"""["']?metadata["']?:\s*\{[^}]*["']?name["']?:\s*["']?([^\s,}#"']+)""")
 #: A YAML document break. Name and kind are never read across one -- see `_document_bounds`.
-_DOC_BREAK = re.compile(r"^---\s*$")
+#: A YAML document break. Indented, because inside a ResourceSet's `resourcesTemplate`
+#: the embedded documents are separated by an indented `---` -- and those separators are
+#: the only thing that tells one embedded policy from the next.
+_DOC_BREAK = re.compile(r"^\s*---\s*$")
 
 SHAPE_ACTIONS = "validationActions: Deny"
 SHAPE_ENFORCE = "validationFailureAction: Enforce"
@@ -94,6 +101,14 @@ BLIND_SPOTS = (
     "a templating engine's own conditionals: a `<< if >>` arm that emits Deny only under some "
     "input is read as the text it is, never as the documents it can produce",
     "a policy whose action is computed at admission rather than written in the manifest",
+    "OPA Gatekeeper's `enforcementAction: deny` on a Constraint -- a different engine's word for "
+    "the same thing. None ships in this estate today; the line costs nothing and the day one "
+    "does, nothing here would have said so",
+    "the 2022 Kyverno ClusterPolicy's `rules[].validate.deny{}` block, which refuses without the "
+    "word appearing as an action value anywhere",
+    "a webhook's own `failurePolicy: Fail`, which turns every engine outage into a refusal of "
+    "everything the webhook matches -- the broadest refusal in a cluster, and written nowhere "
+    "near a policy body",
     "a REFUSAL BY ANOTHER NAME: a mutation that makes a pod inadmissible -- naming a "
     "PriorityClass that does not exist, or injecting a container into a running pod -- refuses "
     "the workload without any Deny-shaped text in it, and is graded by nothing here. The "
@@ -127,6 +142,40 @@ class Verdict:
 
 # -- the scanner ---------------------------------------------------------------------------------
 
+#: `resourcesTemplate: |` and friends -- a key whose value is a block scalar.
+_BLOCK_KEY = re.compile(r"^(\s*)[\w.\-\"']+:\s*[|>][-+0-9]*\s*$")
+
+
+def _block_scalar_bounds(lines: list[str], idx: int) -> tuple[int, int] | None:
+    """The block scalar containing `idx`, if it is inside one.
+
+    A ResourceSet parses cleanly and carries its own `metadata.name` -- `composed` -- at a
+    SHALLOWER indent than anything inside its `resourcesTemplate` string. So neither the parsed
+    name nor the shallowest name in the file belongs to the policy the finding is actually in;
+    both are the wrapper's. Three of the estate's Denys live in exactly that position, one per
+    adopter. Narrowing the region to the block scalar is what makes the embedded policy's own
+    `metadata:` the shallowest thing in view.
+    """
+    for i in range(idx, -1, -1):
+        m = _BLOCK_KEY.match(lines[i])
+        if not m:
+            continue
+        key_indent = len(m.group(1))
+        # `idx` is inside this block only if every line between is blank or deeper-indented.
+        body_start = i + 1
+        end = len(lines)
+        for j in range(body_start, len(lines)):
+            if not lines[j].strip():
+                continue
+            if len(lines[j]) - len(lines[j].lstrip()) <= key_indent:
+                end = j
+                break
+        if body_start <= idx < end:
+            return body_start, end
+        return None
+    return None
+
+
 def _document_bounds(lines: list[str], idx: int) -> tuple[int, int]:
     """The half-open line range of the YAML document containing `idx`.
 
@@ -136,37 +185,116 @@ def _document_bounds(lines: list[str], idx: int) -> tuple[int, int]:
     covered was reported as accounted for. A reviewer planted exactly that on 2026-09-05 and it
     passed. Bounding the search is what closes it.
     """
-    start = 0
-    for i in range(idx, -1, -1):
+    lo, hi = 0, len(lines)
+    block = _block_scalar_bounds(lines, idx)
+    if block is not None:
+        lo, hi = block
+    start = lo
+    for i in range(idx, lo - 1, -1):
         if _DOC_BREAK.match(lines[i]):
             start = i + 1
             break
-    end = len(lines)
-    for i in range(idx + 1, len(lines)):
+    end = hi
+    for i in range(idx + 1, hi):
         if _DOC_BREAK.match(lines[i]):
             end = i
             break
     return start, end
 
 
-def _nearest(pattern: re.Pattern, lines: list[str], idx: int) -> str | None:
-    """The value `pattern` gives for the document containing `idx`.
+def _shallowest(pattern: re.Pattern, lines: list[str], idx: int,
+                skip: re.Pattern | None = None) -> str | None:
+    """The SHALLOWEST match of `pattern` in the document containing `idx`, skipping list items.
 
-    Backwards first -- YAML nests, so the closest `name:` above a `validationActions:` is that
-    policy's own metadata name -- then forwards, because `metadata:` may legally follow `spec:`
-    and a name that follows the finding is still that document's name. Both halves stop at the
-    document boundary.
+    Nearest-first was the bug. Round 2 widened the name regex from a `match` to a `search`, so a
+    `- name:` inside `matchConditions`, `variables` or `validations` became readable as the
+    document's own name -- and a reviewer planted a Deny called `block-all-images-from-anywhere`
+    whose only camouflage was `matchConditions: [{name: posture-trust-boundary}]` sitting
+    between the real metadata name and the `validationActions` line. The backwards search landed
+    on the decoy, the register's globs already covered the file, and the whole thing reported as
+    an accounted-for copy of `posture-trust-boundary` while the check stayed green.
+
+    A policy's `metadata.name` is at the shallowest indentation any `name:` reaches in its
+    document; everything nested under `spec:` is deeper, and a list item is excluded outright.
+    Ties go to the first, which is document order. `scan_text` only falls back here when the
+    document does not parse -- inside a ResourceSet's `resourcesTemplate` string, where there is
+    no document to load.
     """
     start, end = _document_bounds(lines, idx)
-    for i in range(idx, start - 1, -1):
-        m = pattern.search(lines[i])
+    best: tuple[int, str] | None = None
+    for i in range(start, end):
+        if skip is not None and skip.match(lines[i]):
+            continue
+        m = pattern.match(lines[i])
+        if not m:
+            continue
+        indent = len(m.group(1))
+        if best is None or indent < best[0]:
+            best = (indent, m.group(2))
+    return best[1] if best is not None else None
+
+
+def _doc_carries_the_shape(doc: object) -> bool:
+    """Does this PARSED document itself carry a Deny shape?
+
+    The question decides whose name a finding belongs to. A ResourceSet parses cleanly and has
+    a `metadata.name` of its own -- `composed` -- while the Deny it carries is text inside its
+    `resourcesTemplate` string, belonging to an embedded policy the parser never sees. Trusting
+    the parsed name there would file three of the estate's Denys under the wrapper. So the
+    parsed name is used only when the parsed document is the thing that carries the shape;
+    otherwise the finding came out of a string and the shallowest non-list `name:` in that
+    region is the best available answer.
+    """
+    if not isinstance(doc, dict):
+        return False
+    spec = doc.get("spec")
+    if not isinstance(spec, dict):
+        return False
+    va = spec.get("validationActions")
+    if isinstance(va, list) and any(str(v) == "Deny" for v in va):
+        return True
+    vfa = spec.get("validationFailureAction")
+    if isinstance(vfa, str) and vfa.lower() == "enforce":
+        return True
+    overrides = spec.get("validationFailureActionOverrides")
+    if isinstance(overrides, list):
+        return any(isinstance(o, dict) and str(o.get("action", "")).lower() == "enforce"
+                   for o in overrides)
+    return False
+
+
+def _document_name(lines: list[str], idx: int) -> str | None:
+    """The policy's own name: `metadata.name` where the document parses, else the shallowest
+    non-list `name:` in it. Never a list item's, and never another document's."""
+    start, end = _document_bounds(lines, idx)
+    chunk = "\n".join(lines[start:end])
+    try:
+        doc = yaml.safe_load(chunk)
+    except Exception:
+        doc = None
+    if _doc_carries_the_shape(doc):
+        name = (doc.get("metadata") or {}).get("name")
+        if isinstance(name, str):
+            return name
+    # A one-line flow mapping (`metadata: {name: x}`) survives a parse only when the whole
+    # document parses; when it does not, read it directly rather than falling through.
+    for i in range(start, end):
+        m = _FLOW_NAME.search(lines[i])
         if m:
             return m.group(1)
-    for i in range(idx + 1, end):
-        m = pattern.search(lines[i])
-        if m:
-            return m.group(1)
-    return None
+    return _shallowest(_NAME, lines, idx, skip=_LIST_NAME)
+
+
+def _document_kind(lines: list[str], idx: int) -> str | None:
+    start, end = _document_bounds(lines, idx)
+    chunk = "\n".join(lines[start:end])
+    try:
+        doc = yaml.safe_load(chunk)
+    except Exception:
+        doc = None
+    if _doc_carries_the_shape(doc) and isinstance(doc.get("kind"), str):
+        return doc["kind"]
+    return _shallowest(_KIND, lines, idx, skip=_LIST_NAME)
 
 
 def _is_deny(values: str) -> bool:
@@ -221,8 +349,8 @@ def scan_text(text: str, path: str) -> list[Finding]:
                     break
         if shape:
             out.append(Finding(path=path, line=i + 1,
-                               name=_nearest(_NAME, lines, i),
-                               kind=_nearest(_KIND, lines, i),
+                               name=_document_name(lines, i),
+                               kind=_document_kind(lines, i),
                                shape=shape))
     return out
 

@@ -351,6 +351,81 @@ def test_the_blind_spots_are_a_non_empty_declared_list() -> None:
     assert all(isinstance(b, str) and b.strip() for b in deny_register.BLIND_SPOTS)
 
 
+# -- 7. the reviewer's second plant: a `- name:` in a list is not the policy's name ---------------
+
+#: The decoy sits BETWEEN the real metadata name and the Deny, which is what makes the
+#: backwards search land on it. Order is the whole exploit.
+PLANTED_LIST_NAME = """\
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+metadata:
+  name: block-all-images-from-anywhere
+spec:
+  matchConditions:
+    - name: posture-trust-boundary
+      expression: "true"
+  validationActions: [Deny]
+"""
+
+
+def test_a_list_item_name_is_never_read_as_the_policys_name() -> None:
+    """THE SECOND PLANT. Round 2 widened the name regex from `^\\s*name:` (a match, which
+    skipped list items) to a search, so a `- name:` inside matchConditions, variables or
+    validations became readable as the document's own name. The reviewer used that to camouflage
+    an unrecorded Deny as a copy of `posture-trust-boundary`: the register's globs already cover
+    the file, so the inventory reported it accounted-for and the check stayed on its normal SKIP.
+    """
+    found = deny_register.scan_text(PLANTED_LIST_NAME, "composed/policies/v4.0.0/posture-trust-boundary.yaml")
+    assert [f.name for f in found] == ["block-all-images-from-anywhere"], [f.name for f in found]
+
+
+def test_the_planted_camouflage_is_graded_as_an_undeclared_deny() -> None:
+    """End to end: the plant must FAIL the grade, not ride in on another rule's globs."""
+    register = deny_register.load_register(
+        ROOT / "verify" / "deny-is-not-a-rung" / "register.yaml")
+    findings = deny_register.scan_text(
+        PLANTED_LIST_NAME, ".estate-clone/driftwood/composed/policies/v4.0.0/posture-trust-boundary.yaml")
+    verdict = deny_register.grade(findings, register, source_text={})
+    assert verdict.verdict == "FAIL", verdict.line
+    assert any("no register row" in f for f in verdict.failures), verdict.failures
+
+
+def test_a_list_item_name_does_not_mask_a_missing_metadata_name() -> None:
+    """No `metadata.name` at all, only a list-item one: the finding is unnamed, so it belongs to
+    no row and fails, rather than borrowing the list item's."""
+    text = ("spec:\n  validationActions: [Deny]\n  matchConditions:\n"
+            "    - name: posture-trust-boundary\n      expression: \"true\"\n")
+    found = deny_register.scan_text(text, "p.yaml")
+    assert [f.name for f in found] == [None], [f.name for f in found]
+
+
+def test_a_deeper_metadata_name_loses_to_the_shallowest_one_in_a_template_string() -> None:
+    """Inside a ResourceSet's template string there is no document to parse, so the shallowest
+    non-list `name:` wins -- which is the policy's own metadata, not anything nested under it."""
+    text = ("    apiVersion: policies.kyverno.io/v1alpha1\n"
+            "    kind: ValidatingPolicy\n"
+            "    metadata:\n"
+            "      name: real-policy-name\n"
+            "    spec:\n"
+            "      validationActions: [Deny]\n"
+            "      variables:\n"
+            "        - name: decoy\n"
+            "          expression: \"1\"\n")
+    found = deny_register.scan_text(text, "gitops/composed/composed-set.yaml")
+    assert [f.name for f in found] == ["real-policy-name"], [f.name for f in found]
+
+
+def test_round_ones_plant_still_attributes_correctly() -> None:
+    """The first plant must not regress while the second is fixed."""
+    found = deny_register.scan_text(
+        "apiVersion: v1\nkind: ValidatingPolicy\nmetadata:\n  name: first\n"
+        "spec:\n  validationActions: [Audit]\n"
+        "---\n"
+        "apiVersion: v1\nkind: ValidatingPolicy\nspec:\n  validationActions: [Deny]\n"
+        "metadata:\n  name: second-unrecorded\n", "p.yaml")
+    assert [f.name for f in found] == ["second-unrecorded"], [f.name for f in found]
+
+
 # -- the committed register is a real one over the real trees -------------------------------------
 
 def test_the_committed_register_covers_every_deny_the_real_trees_carry() -> None:

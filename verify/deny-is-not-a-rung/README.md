@@ -57,13 +57,19 @@ which is true inside a template string as well as inside a document.
 ## What this scan CANNOT see
 
 `deny_register.BLIND_SPOTS`, printed on every run and held non-empty by a test: a YAML anchor or
-alias; a template engine's conditional arm; an action computed at admission; and the one that
-matters most, **a refusal by another name** — a mutation that makes a pod inadmissible refuses the
-workload with no Deny-shaped text anywhere in it. The estate has produced that failure twice, both
-times found by RUNNING the policy and never by reading it: ticket 26 on 2026-08-28 (a sidecar
-appended twice, so every update to a caged pod was rejected) and this ticket's own first cut on
-2026-09-05 (the machinery cage named a PriorityClass that no cluster has, because every served one
-is version-suffixed). Read the register for what was decided; read the beats for what runs.
+alias; a template engine's conditional arm; an action computed at admission; Gatekeeper's
+`enforcementAction: deny`; the 2022 `rules[].validate.deny{}` block; a webhook's own
+`failurePolicy: Fail`; and the one that matters most, **a refusal by another name** — a mutation
+that makes a pod inadmissible refuses the workload with no Deny-shaped text anywhere in it.
+
+The estate has produced that failure three times, every one found by RUNNING the policy and never
+by reading it: ticket 26 on 2026-08-28 (a sidecar appended twice, so every update to a caged pod
+was rejected); this ticket's first cut on 2026-09-05 (the machinery cage named a PriorityClass no
+cluster has, because every served one is version-suffixed); and its second, the same day (an
+`UPDATE` arm that applied the full cage body to a running pod, which would have refused the
+currency controller's re-cage patch — ticket 91's, and the only way a pod on a retired version
+reaches the bottom rung). Two of the three were this ticket's own. Read the register for what was
+decided; read the beats for what runs.
 
 Four other blind spots a reviewer planted on 2026-09-05 are now closed, each with a test that was
 red first: a `.json` policy, a one-line flow mapping, a multi-line flow sequence, and
