@@ -1,12 +1,12 @@
 selfcheck ok
-/tmp/tmp.ozv8pyvPFt/deck.md: 351 lines from 103 captures on disk
-ok  the deck builds: 351 lines from 103 captures
-checked 7 beats in /tmp/tmp.ozv8pyvPFt/deck.md
+/tmp/tmp.MfSjXimUr7/deck.md: 361 lines from 103 captures on disk
+ok  the deck builds: 361 lines from 103 captures
+checked 7 beats in /tmp/tmp.MfSjXimUr7/deck.md
 ok  the committed talk/deck.md describes recorded run=22 hub=14cc731 commit=0dbdb32
 ok  the committed talk/deck.md is the generated file, with the same beats as a rebuild of run 22
 review, not a lint failure: the word gate appears on 1 lines; every use outside the four refused phrases is a human review item:
   line 230: ok  verify/twin-evals/verify-twin-evals.sh (the twin's evals graded by the gate)
 checked 7 beats in talk/deck.md
 ok  the committed talk/deck.md survives the figure, status, headline and phrase checks against run 22
-  note: the newest recorded run is 86 and the committed deck describes run 22; run python3 talk/build_deck.py and commit it to move the deck on (not a failure)
+  note: the newest recorded run is 90 and the committed deck describes run 22; run python3 talk/build_deck.py and commit it to move the deck on (not a failure)
 PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck.md is the generated file describing recorded run 22, matches a rebuild from that run's committed captures, and survives the figure, status, headline and phrase checks against that run: its seven beats are the section 4 steps in order carrying run 22's own grades, every figure on a beat is a figure in that beat's capture and no figure sits off a beat, its quoted TRUTH line is the line that recorded run 22, and the phrase lint is clean
