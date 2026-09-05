@@ -96,8 +96,9 @@ the runs rather than from reading the code:
 * The reason it is *permanent* is a divergence between the three adopters. tuppence's `compose()`
   folds `bump.computed` for every version in the institution's whole current supported window;
   driftwood's and ludlow's fold only the versions the pull request adds or retires. That window
-  has been exactly `['4.0.0']` since 2026-08-29 (`f7b4501` retired 2.0.0/2.0.1/3.0.0, `6e9aab6`
-  added 4.0.0), so every pull request since has been refused. tuppence's last green `shift-left`
+  has been exactly `['4.0.0']` since 2026-08-29 (`6e9aab6` added 4.0.0 first, then `f7b4501`
+  retired 2.0.0, 2.0.1 and 3.0.0; an earlier draft of this line had the two the wrong way round),
+  so every pull request since has been refused. tuppence's last green `shift-left`
   is 2026-08-28; ludlow's `shift-left` was green on 2026-09-04, twice, on the same platform tag
   and the same evidence.
 * **ludlow is NOT in the same state**, checked rather than assumed: runs `33915624899` and
@@ -136,11 +137,22 @@ the runs rather than from reading the code:
    loaded document, at any depth, by blunt substring match. Three documents were refused at load
    while authoring: the data component, an affected-parties line, and the perspective's own
    trading name. The response is not a rename to get past the check — the overlay models the
-   store, its dependency and its cage, and models no category, cohort or attribute of any person,
-   which is what the refusal exists to secure. The limit is stated in
-   `orgs/ludlow/components/member-record-store.yaml` and written up in `twin/VENDORED.md`. **The
-   residue named for the owner: an adopter whose own trading name contains one of those words
-   cannot be described by name in a loaded document.** That is a fact about the model, not a
+   store, its dependency and its cage, and its 22 loaded documents model no category, cohort or
+   attribute of any person, which is what the refusal exists to secure. A reviewer checked that
+   by planting the word back into ludlow's own component document: the emitter dies with
+   `SpecialCategoryError` naming the file and the field, so the refusal is live and not
+   circumvented. The limit is stated in `orgs/ludlow/components/member-record-store.yaml` and
+   written up in `twin/VENDORED.md`.
+
+   **Scoped to LOADED documents, 2026-09-05 after review.** The word survives one hop outside
+   them, in `emit-forward-intel.py`'s `CLAIM_NOTE` constant, which reaches the emitted payload's
+   `claim_scope.note`. An emitted feed is not a loaded model document, so the refusal never sees
+   it, and describing the nature of a record store is not Article 9 data about any person. It is
+   recorded because it shows what the check is: a load-time spelling net, which `twin/schema.py`'s
+   own comment already admits.
+
+   **The residue named for the owner: an adopter whose own trading name contains one of those
+   words cannot be described by name in a loaded document.** That is a fact about the model, not a
    defect this ticket may fix by loosening the check.
 7. **tuppence's adopter gate was not changed** — *delegated*, and it is the brief's own
    instruction. Narrowing its fold to the added set would loosen this institution's gate, and
@@ -155,9 +167,32 @@ the runs rather than from reading the code:
 `verify/twin-per-adopter/verify-twin-per-adopter.sh`, discovered by `talk/verify-all.sh` and
 listed in `talk/verify-manifest.txt` as `estate-observation | waits: carry no twin overlay and are
 named rather than omitted`. Its rules are tested at the seam in `tests/test_twin_per_adopter.py`
-(12 tests, written first and proven red against a missing module) and re-proved on planted
-directories by `twin_per_adopter.py --selfcheck` on every run before the estate is read. Four new
-manifest rows carry the two adopters' own checks.
+(12 tests) and re-proved on planted directories by `twin_per_adopter.py --selfcheck` on every run
+before the estate is read. The builder recorded those tests as written first and proven red
+against a missing module; that is not checkable from the history, because the tests and the module
+land in one commit, so read it as a claim rather than a record. Four new manifest rows carry the
+two adopters' own checks.
+
+**Round 2, 2026-09-05, after review.** The check said in its PASS line that the overlays "vendor
+the same world layer", and it had never looked at the layer. `survey()` read the `world_ref`
+STRING out of each overlay's `meta.yaml` and `grade()` compared the strings, so an adopter that
+edited its vendored copy without re-pinning passed green: the reviewer appended one line to
+ludlow's vendored `world/meta.yaml` and got the identical PASS and exit 0. The estate was not
+blind — that adopter's own emitter re-derives the ref from the bytes and refuses, exit 1, proven —
+but a hub check that advertises parity has to derive it, and a sentence wider than its run is the
+defect this build has found more often than any other. `world_digest()` now hashes the sorted
+(relative path, bytes) of every file in each vendored tree and the grader compares those digests
+between adopters, so the same ref pinned over different bytes is a named FAIL. It is compared
+adopter to adopter and never against a stored constant, so it cannot rot when the world layer
+legitimately changes. Proved red first: with the digest comparison disabled, the planted case
+"the same world_ref pinned over different vendored bytes" grades PASS and the selfcheck fails on
+it; with it, the case grades FAIL and the selfcheck passes six of six.
+
+The manifest row also declared one of the module's two reachable could-not-look reasons. "No party
+in this estate claims the adopter role" is declared now too. The wrapper's own two, a missing
+interpreter and a missing estate clone, stay undeclared on purpose: that is the call
+`verify-branch-refs.sh` and `verify-untagged-pin-is-priced.sh` already record, and a runner that
+has lost its venv or its clone should go red rather than shrug.
 
 ## Waits on the owner
 
@@ -241,8 +276,22 @@ back onto the branch, which is why `5fcb8ff` sits between two of this ticket's c
   300-second per-script timeout — measured on a scratch estate inside the hub carrying the three
   built branches, not estimated. Tripling the adopters roughly doubled the step (it was 2:06 with
   one adopter and no `.venv`, 1:52 with three and a `.venv`), because the cost is dominated by the
-  twin evals and driftwood's four planted refusals rather than by the loop. There is headroom, and
-  it is worth watching: a fourth adopter is the next thing that moves it.
+  twin evals and driftwood's four planted refusals rather than by the loop. **Corrected 2026-09-05
+  after review: that figure is machine-specific and the margin is thinner than it reads.** The
+  reviewer measured the same command on the same staged estate at **2:40.31**, leaving about 60
+  seconds under the timeout rather than 108. Both numbers are real; neither is the runner's. What
+  the record should carry is the shape, not the second: tripling the adopters roughly doubles the
+  step, and a fourth adopter is the next thing that moves it toward the timeout. Related, and
+  named rather than fixed: `verify/e2e/lib.sh` hardcodes `ESTATE="$ROOT/.estate-clone"`, so step 5
+  cannot be pointed at a scratch estate the way `twin_per_adopter.py` can with
+  `PAVC_ESTATE_CLONE`. Measuring the two against one staged estate needs that, and it is a
+  one-line change in a shared library that belongs with whoever next touches step 5.
+* **Step 5 left the fail column, and part of why is this ticket's own manifest edit.** At run 85
+  step 5 graded `FAIL (undeclared skip)`: its skip line did not match its declared waits pattern.
+  This ticket re-words both the skip and the pattern, so at run 86 it grades a declared `waits`.
+  That is legitimate — step 5 could not pass either way and the estate's state did not move — but
+  the `fail 8 -> 7` in the arithmetic below is that conversion, not a check that started passing.
+  Step 5 has not passed and does not pass here.
 * **The full suite on this branch: `2 failed, 1775 passed in 2019.25s`** (`.venv/bin/python -m pytest tests/ -n0 -q`). The two are `test_invariant_suite.py::test_the_suite_is_green`, which is the standing red `flux_coverage_floor_is_still_reachable` (invariant 45, build ticket 70 finding 1), and the serial-only leak below. Note for the record: the 35 `tests/test_enact.py` failures the 2026-09-03 brief warned about did NOT occur on this branch's base.
 * **`tests/test_seam1_cli.py::test_an_attestation_sidecar_accompanies_every_artefact` fails under
   `-n0` and passes under the default `-n auto`, and it does so on untouched `main`.** Running

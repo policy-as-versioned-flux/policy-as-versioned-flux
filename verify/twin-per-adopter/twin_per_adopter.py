@@ -36,6 +36,7 @@ and the estate is graded by `verify-twin-per-adopter.sh` beside this file.
 """
 from __future__ import annotations
 
+import hashlib
 import sys
 from pathlib import Path
 
@@ -87,8 +88,37 @@ def survey(estate: Path, org: str) -> dict:
         "scenarios": len(list((overlay / "scenarios").glob("*.yaml"))) if overlay.is_dir() else 0,
         "world_files": len([p for p in world.rglob("*.yaml")]) if world.is_dir() else 0,
         "world_ref": str(world_ref) if world_ref else None,
+        "world_digest": world_digest(world),
         "has_emitter": (twin / "emit-forward-intel.py").is_file(),
     }
+
+
+def world_digest(world: Path) -> str | None:
+    """A digest of the vendored world layer's BYTES, or None where there is no layer to read.
+
+    Added 2026-09-05 after review. Until then this check compared the `world_ref` STRING each
+    overlay declares and said, in its PASS line, that the overlays vendor the same world layer.
+    It had never looked at the layer: appending one line to an adopter's vendored copy left the
+    declared ref untouched and the check green. Each adopter's own emitter DOES catch that, by
+    re-deriving the ref from the bytes and refusing, so the estate was not blind -- but a hub
+    check that advertises parity has to derive it, and a sentence wider than its run is the
+    defect this build has found most often.
+
+    Not the same function as `world_ref`. That is a git commit id, and reproducing it needs a
+    git repository. This is a plain digest over the sorted (relative path, bytes) of every file
+    in the tree, which is enough to answer the only question asked here: do two adopters carry
+    the same bytes. It is compared BETWEEN adopters and never against a stored constant, so it
+    cannot rot when the world layer legitimately changes.
+    """
+    if not world.is_dir():
+        return None
+    h = hashlib.sha256()
+    for path in sorted(p for p in world.rglob("*") if p.is_file()):
+        h.update(str(path.relative_to(world)).encode())
+        h.update(b"\0")
+        h.update(path.read_bytes())
+        h.update(b"\0")
+    return h.hexdigest()
 
 
 def grade(surveys: list[dict]) -> tuple[str, list[tuple[str, str]]]:
@@ -124,16 +154,35 @@ def grade(surveys: list[dict]) -> tuple[str, list[tuple[str, str]]]:
                       + ("; " + "; ".join(problems) if problems else "")))
 
     refs = {s["world_ref"] for s in present if s["world_ref"]}
+    digests = {s["world_digest"] for s in present if s["world_digest"]}
     if len(refs) > 1:
         lines.append(("FAIL",
-                      "the adopters that carry an overlay pin %d different world_ref values (%s). "
-                      "The vendored bytes are identical by construction and stage to one "
-                      "content-addressed commit, so more than one means one of them vendored "
-                      "something else" % (len(refs), ", ".join(sorted(refs)))))
+                      "the adopters that carry an overlay pin %d different world_ref values (%s), "
+                      "so at least one of them vendored a different world layer"
+                      % (len(refs), ", ".join(sorted(refs)))))
+    elif len(digests) > 1:
+        # The case the declared ref cannot see: the same ref pinned over different bytes. One
+        # adopter has edited its vendored copy without re-pinning, so its own emitter will refuse
+        # and this check would have called it parity.
+        by_digest: dict[str, list[str]] = {}
+        for s in present:
+            if s["world_digest"]:
+                by_digest.setdefault(s["world_digest"], []).append(s["org"])
+        split = "; ".join("%s: %s" % (d[:12], ", ".join(sorted(o)))
+                          for d, o in sorted(by_digest.items()))
+        lines.append(("FAIL",
+                      "the %d overlays all pin world_ref %s, but their vendored bytes fall into "
+                      "%d different trees (%s). A ref pinned over bytes it does not describe is "
+                      "the drift this check exists to catch, and the declared ref cannot see it"
+                      % (len(present), refs.pop() if len(refs) == 1 else "(various)",
+                         len(digests), split)))
     elif len(refs) == 1 and len(present) > 1:
         lines.append(("PASS",
-                      "every one of the %d overlays vendors the same world layer, pinned at the "
-                      "same content-addressed world_ref %s" % (len(present), refs.pop())))
+                      "every one of the %d overlays vendors the same world layer: the same "
+                      "content-addressed world_ref %s, over %d files whose bytes this run hashed "
+                      "and found identical (sha256 %s)"
+                      % (len(present), refs.pop(), present[0]["world_files"],
+                         (digests.pop() if digests else "none")[:12])))
 
     if absent:
         lines.append(("SKIP",
@@ -197,6 +246,16 @@ def selfcheck() -> int:
         _plant(split, "driftwood", ["adopter"], ref="c2d0733")
         _plant(split, "tuppence", ["adopter"], ref="deadbee")
         cases.append(("two overlays vendoring different world layers", split, "FAIL", "world_ref"))
+
+        # The case the declared ref cannot see, and the one this check was green on until
+        # 2026-09-05: the SAME world_ref pinned over different bytes. One adopter edited its
+        # vendored copy and did not re-pin.
+        drift = root / "drift"
+        _plant(drift, "driftwood", ["adopter"], ref="c2d0733")
+        _plant(drift, "tuppence", ["adopter"], ref="c2d0733")
+        (drift / "tuppence" / "twin" / "world" / "w0.yaml").write_text("id: w0\n# drifted\n")
+        cases.append(("the same world_ref pinned over different vendored bytes",
+                      drift, "FAIL", "different trees"))
 
         thin = root / "thin"
         _plant(thin, "ludlow", ["adopter"], scenarios=4)
