@@ -82,6 +82,8 @@
 
 # --- ludlow (adopter) --------------------------------------------------------------------
 .estate-clone/ludlow/verify-adopter-gate.sh | simulation | -   # throwaway platform and ludlow repositories built in the run
+.estate-clone/ludlow/twin/verify-twin-scenarios.sh | self-proof | waits: the emitter could not price it   # ticket 64. Six standing scenarios, four committed classes and the signal lookup all grade offline; the declared could-not-look is check 9, which has no priced valuation to re-derive because this party publishes no signed `size:`
+.estate-clone/ludlow/verify-twin-overlay.sh | self-proof | waits: cannot price a forward-intel payload today   # ticket 64. The overlay, the vendored world layer, the ladder checked against platform's own published one and four planted refusals all grade offline; the declared could-not-look is the emitter refusing, by name, for the two instruments this party does not have (no signed `size:`, and one grade-3 edge to the declared cash flow). It goes away when the owner signs a size and a grade-1-or-2 edge replaces the anchor
 .estate-clone/ludlow/verify-certificate-identity-regexp.sh | self-proof | -
 .estate-clone/ludlow/verify-reconcile.sh | self-proof | waits: no local kind cluster .* and the lane sample cannot stand in   # decision 13, as driftwood's: the runner path grades ludlow's own committed lane sample; the live cluster path is the estate observation and does not run here
 
@@ -141,6 +143,8 @@
 .estate-clone/tuppence/reset/verify-reach-secrets.sh | estate-observation | never: kind cluster 'driftwood' does not exist   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
 .estate-clone/tuppence/scripts/verify-adopter-gate.sh | simulation | -   # throwaway repositories built in the run
 .estate-clone/tuppence/scripts/verify-identity-regexp.sh | self-proof | -
+.estate-clone/tuppence/twin/verify-twin-scenarios.sh | self-proof | waits: the emitter could not price it   # ticket 64, the same shape as ludlow's line above
+.estate-clone/tuppence/verify-twin-overlay.sh | self-proof | waits: cannot price a forward-intel payload today   # ticket 64, the same shape as ludlow's line above
 .estate-clone/tuppence/verify-reconcile.sh | self-proof | waits: no local kind cluster .* and the lane sample cannot stand in   # decision 13, as driftwood's: the runner path grades tuppence's own committed lane sample; the live cluster path is the estate observation and does not run here
 
 # --- hub: the cross-party proofs under verify/ -------------------------------------------
@@ -152,7 +156,7 @@ verify/e2e/verify-e2e-step1-regulator-publishes.sh | estate-observation | waits:
 verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh | simulation | waits: no pin bump available on disk moves|no adopter pins a priceable feed   # a SYNTHETIC bump on a throwaway copy of an adopter; the real merged bump is verify/renovate
 verify/e2e/verify-e2e-step3-price-crosses-band-pr-opens.sh | simulation | waits: no adopter publishes a selection-policy package   # a SYNTHETIC residual either side of the adopter's real band
 verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh | estate-observation | waits: no cluster on this runner, and the lane sample cannot stand in|reconciles .* at its pinned revision .* only:
-verify/e2e/verify-e2e-step5-twin-forecasts.sh | estate-observation | waits: cannot play a dated signal forward yet|evals could not look   # reads driftwood's twin artefacts
+verify/e2e/verify-e2e-step5-twin-forecasts.sh | estate-observation | waits: did not play a dated signal forward for every adopter|evals could not look   # ticket 64: the adopter list is derived from the party artefacts claiming the adopter role, not hardcoded to driftwood, and the step now requires a dated `swept_at` in each adopter's own observations/twin-sweep.jsonl. Both halves of the widened skip are the estate's own state -- two overlays waiting on the owner's push, and a scheduled sweep that has fired four times and never yet appended an observation -- so it stays `waits:`
 verify/e2e/verify-e2e-step6-provenance.sh | estate-observation | waits: waiting for tag|could not (be )?look   # real Fulcio certificates and Rekor entries
 verify/e2e/verify-e2e-step7-honesty.sh | meta | -
 verify/every-green/verify-every-green.sh | meta | -   # ticket 76: grades the SHAPE of every discovered script's greens; this manifest grades what each green RESTS ON and whether a could-not-look was expected. Neither reruns the other's question
@@ -174,3 +178,4 @@ verify/schedules/verify-schedules.sh | estate-observation | never: no observatio
 verify/tier-binding/verify-tier-binding.sh | estate-observation | waits: tier_binding\.py is not in this platform checkout|no party in this estate has both a composed|run \./clone-estate\.sh first   # ticket 78: reads every party's own committed Namespace and evidence
 verify/truth-line/verify-truth-line.sh | meta | -   # ticket 83: grades this manifest and the arithmetic behind the split, never the estate
 verify/twin-evals/verify-twin-evals.sh | self-proof | -
+verify/twin-per-adopter/verify-twin-per-adopter.sh | estate-observation | waits: carry no twin overlay and are named rather than omitted|claims the adopter role, so there is no adopter   # ticket 64: reads every party artefact in the estate for the adopter role, then each adopter's own overlay tree. estate-observation because the verdict turns on other parties' artefacts. The first declared could-not-look is the state this check was built to make visible -- an adopter that claims the role and carries no overlay -- and it closes the day the tuppence and ludlow branches merge. The second, added 2026-09-05 after review, is the module's other reachable reason: an estate in which no party claims the adopter role at all. The wrapper's own two (no interpreter, no estate clone) are deliberately UNDECLARED, the same call verify-branch-refs.sh and verify-untagged-pin-is-priced.sh already record: a runner that has lost its venv or its clone should go red, not shrug
