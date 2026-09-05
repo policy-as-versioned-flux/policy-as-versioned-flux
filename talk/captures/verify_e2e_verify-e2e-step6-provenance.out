@@ -1,5 +1,5 @@
 E2E step 6 provenance
-  ok   77 published artefacts resolve to a tag on the publisher's real remote; 3 honestly queued for cut-release.yml
+  ok   78 published artefacts resolve to a tag on the publisher's real remote; 3 honestly queued for cut-release.yml
   ok   8 release workflows pin an anchored, own-repo identity regexp at the Actions OIDC issuer
   ok   driftwood/exposure newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   driftwood/forward-intel newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
@@ -15,7 +15,8 @@ E2E step 6 provenance
   ok   insurer/quote-tuppence newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   ludlow/exposure newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   nist/sp-800-53 newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/currency-controller newest tag v2.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/identity-substrate newest tag v2.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/policy newest tag policy/v4.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/exposure newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
-PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 17 lines the 8 release-shipping units declare in their own party.yaml publishes[], 12 newest tags matched a real Fulcio cert subject with its Rekor entry validated and 5 lines have no tag of their own shape yet
+PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 18 lines the 8 release-shipping units declare in their own party.yaml publishes[], 13 newest tags matched a real Fulcio cert subject with its Rekor entry validated and 5 lines have no tag of their own shape yet

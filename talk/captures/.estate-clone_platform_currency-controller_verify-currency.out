@@ -1,14 +1,82 @@
-[1;36m==>[0m 1. offline: currency.py selfcheck
-currency selfcheck: all asserts passed (stale = posture ∉ supported; re-patch drops BOTH labels)
-[1;36m==>[0m 2. offline: plan selects only the retired-version postured pod
-  ok   only reset-retired planned for de-posture
-[1;36m==>[0m 3. offline: the de-posture patch takes the pod out of scope for every posture policy
-  ok   re-patch removes the policy-version CLAIM (so stamp-posture won't re-clobber posture)
-  ok   re-patch removes the posture label (so posture-trust-boundary is out of scope)
-  ok   stamp-posture scopes on the claim we remove -> mutate skips, no re-clobber
-  ok   posture-trust-boundary scopes on the posture we remove -> validate skips, patch allowed
-  ok   posture ClusterSPIFFEID needs the posture label to Exist -> removed => pod drops to base-mesh SVID
-  -- de-posture is out-of-scope for stamp/validate/orphan-guard AND drops the posture SVID --
-[1;36m==>[0m 4. skipped: kind-driftwood not reachable -- a client dry-run validates against the API server's own OpenAPI schema, so there is nothing to validate against
+[1;36m==>[0m 1. offline: currency.py selfcheck (the pure core's own asserts)
+currency selfcheck: all asserts passed (stale = claim not in the array; one patch drops the claim, keeps it as an annotation and writes `isolated`; a missing instrument re-cages nothing)
+[1;36m==>[0m 2. offline: the plan selects the retired-claim pod, and holds only what is already caged at the bottom
+  ok   the pod whose CLAIM is no longer in the array is planned for re-cage
+  ok   a pod whose claim is still in the array is not touched
+  ok   a pod that claims no version at all is not touched (COTS/system population)
+  ok   a stale pod already at the bottom rung AND already caged is HELD, not patched again
+  ok   a stale pod at the bottom rung with NO caged label is re-caged, not held: every reach policy selects on caged AND tier, so holding on the rung alone leaves it selected by nothing
+  ok   ...and the patch asserts the caged label rather than assuming the pod already carries it
+  ok   the planned patch writes the bottom rung onto the pod
+  ok   the planned patch removes the version claim (JSON-merge null deletes the key)
+  ok   the retired claim survives as an annotation, so the record of what it was admitted under is kept
+[1;36m==>[0m 3. offline: TIGHTEN-ONLY at the seam, derived from graded/cage.py's own ladder
+  ok   the controller's ladder IS graded/cage.py's ORDER ['baseline', 'restricted', 'quarantine', 'isolated']
+  ok   the rung the controller writes IS the last (tightest) element of that ORDER: isolated
+  ok   the rung it writes is a selectable rung, never the platform-only `infra` role declaration
+  ok   re-caging a pod at `baseline` to `isolated` is a tighten
+  ok   re-caging a pod at `restricted` to `isolated` is a tighten
+  ok   re-caging a pod at `quarantine` to `isolated` is a tighten
+  ok   re-caging a pod at `isolated` to `isolated` is a tighten
+  ok   an absent or unrecognised tier fails closed to the bottom rung, which is still a tighten
+  ok   is_tighten REFUSES a loosening move, so the property above is measured and not assumed
+  ok   the patch is a function of the retired claim alone -- it cannot read, and so cannot echo, a looser current tier
+  ok   every patch it can emit writes exactly one tier, isolated
+[1;36m==>[0m 4. offline: the patch survives admission, and what it lands in -- read off the SERVED bodies
+  ok   served policy bodies to grade against, derived from the declared array ['4.0.0', '5.0.0']: 5 cage-tier, 5 cage-netpol
+  --   trees present on disk but NOT in the array, so served on no cluster and not graded: ['2.0.0', '2.0.1', '3.0.0', 'selfcheck'] (2.x/3.x are the retired pre-ADR-0022 shapes; vselfcheck is a fixture)
+  --   3 of them are an adopter's own composed copy
+  ok   ../distribution/policies/v4.0.0/cage-tier.yaml: fires on UPDATE and clobbers the tier from the Namespace, and scopes on the CLAIM this patch removes -- so the rung the patch writes is not clobbered back
+  ok   ../distribution/policies/v5.0.0/cage-tier.yaml: fires on UPDATE and clobbers the tier from the Namespace, and scopes on the CLAIM this patch removes -- so the rung the patch writes is not clobbered back
+  ok   ../../driftwood/composed/policies/v4.0.0/cage-tier.yaml: fires on UPDATE and clobbers the tier from the Namespace, and scopes on the CLAIM this patch removes -- so the rung the patch writes is not clobbered back
+  ok   ../../ludlow/composed/policies/v4.0.0/cage-tier.yaml: fires on UPDATE and clobbers the tier from the Namespace, and scopes on the CLAIM this patch removes -- so the rung the patch writes is not clobbered back
+  ok   ../../tuppence/composed/policies/v4.0.0/cage-tier.yaml: fires on UPDATE and clobbers the tier from the Namespace, and scopes on the CLAIM this patch removes -- so the rung the patch writes is not clobbered back
+  ok   the orphan guard scopes on the same claim, so this UPDATE is out of its scope and is not refused
+  ok   governed-namespace-requires-claim is CREATE-only (['CREATE']); it Denies a claimless pod and this patch makes one -- promote it to UPDATE and every re-cage in the estate is refused
+  ok   the UNVERSIONED posture-trust-boundary -- the copy installed on the demo cluster -- Denies a posture that does not equal its claim and is NOT gated on a version, so a patch that removed the claim and left the posture label would be refused there; both go in one patch
+  ok   ../distribution/policies/v4.0.0/posture-trust-boundary.yaml: the SERVED copy IS gated on the claim, so for an adopter running only the composed set a claimless pod is out of its scope -- the reason the posture label is removed is the unversioned copy, not this one
+  ok   ../distribution/policies/v5.0.0/posture-trust-boundary.yaml: the SERVED copy IS gated on the claim, so for an adopter running only the composed set a claimless pod is out of its scope -- the reason the posture label is removed is the unversioned copy, not this one
+  ok   ../distribution/policies/v4.0.0/cage-netpol.yaml: generates one cage-reach-<rung> per rung, each selecting exactly caged+tier, and the `isolated` one has EMPTY ingress and EMPTY egress under both policyTypes
+  ok   ../distribution/policies/v4.0.0/cage-netpol.yaml: the served copy is gated on the claim, so a re-caged pod (claim removed) does NOT fire it -- the patch cannot GENERATE cage-reach-isolated, only be selected by one already in the namespace. That is this mechanism's precondition, not a detail
+  ok   ../distribution/policies/v5.0.0/cage-netpol.yaml: generates one cage-reach-<rung> per rung, each selecting exactly caged+tier, and the `isolated` one has EMPTY ingress and EMPTY egress under both policyTypes
+  ok   ../distribution/policies/v5.0.0/cage-netpol.yaml: the served copy is gated on the claim, so a re-caged pod (claim removed) does NOT fire it -- the patch cannot GENERATE cage-reach-isolated, only be selected by one already in the namespace. That is this mechanism's precondition, not a detail
+  ok   ../../driftwood/composed/policies/v4.0.0/cage-netpol.yaml: generates one cage-reach-<rung> per rung, each selecting exactly caged+tier, and the `isolated` one has EMPTY ingress and EMPTY egress under both policyTypes
+  ok   ../../driftwood/composed/policies/v4.0.0/cage-netpol.yaml: the served copy is gated on the claim, so a re-caged pod (claim removed) does NOT fire it -- the patch cannot GENERATE cage-reach-isolated, only be selected by one already in the namespace. That is this mechanism's precondition, not a detail
+  ok   ../../ludlow/composed/policies/v4.0.0/cage-netpol.yaml: generates one cage-reach-<rung> per rung, each selecting exactly caged+tier, and the `isolated` one has EMPTY ingress and EMPTY egress under both policyTypes
+  ok   ../../ludlow/composed/policies/v4.0.0/cage-netpol.yaml: the served copy is gated on the claim, so a re-caged pod (claim removed) does NOT fire it -- the patch cannot GENERATE cage-reach-isolated, only be selected by one already in the namespace. That is this mechanism's precondition, not a detail
+  ok   ../../tuppence/composed/policies/v4.0.0/cage-netpol.yaml: generates one cage-reach-<rung> per rung, each selecting exactly caged+tier, and the `isolated` one has EMPTY ingress and EMPTY egress under both policyTypes
+  ok   ../../tuppence/composed/policies/v4.0.0/cage-netpol.yaml: the served copy is gated on the claim, so a re-caged pod (claim removed) does NOT fire it -- the patch cannot GENERATE cage-reach-isolated, only be selected by one already in the namespace. That is this mechanism's precondition, not a detail
+  --   graded/policies/cage-netpol.yaml is the AUTHORING copy: no Kustomization serves it and it is installed on no cluster. It is NOT gated on the claim, unlike every served copy -- which is exactly why the verdict above is taken from the served bodies and never from it
+  ok   on a PLANTED pod labelled as cage-tier leaves one at `restricted`, the SERVED selectors pick cage-reach-restricted
+  ok   apply the patch to that planted label set and the SERVED selectors pick cage-reach-isolated, and nothing else: ['isolated'] -- IF the namespace already carries that NetworkPolicy, which the patch cannot create
+  ok   ...and the retired version is still readable off the patched label set, as an annotation
+  ok   the claim is gone from the labels, which is what stops cage-tier clobbering the rung back
+  ok   on the same planted label set, a claim-removing patch that names no rung still selects cage-reach-restricted -- and with the claim gone nothing can ever move it again, so the retirement would change nothing. That is the defect this repair closes
+  ok   the re-cage patch names the rung, so a bottom-rung reach cage already in the namespace selects the pod
+  ok   AFTER the patch the pod is outside every served cage-tier's scope, so its rung is held by a label no admission will re-assert: a re-caged pod's cage is softer against a hand edit than a claiming pod's, and only RBAC -- workloads cannot patch pods -- still holds it
+  ok   `infra` is not a rung on this ladder (ADR-0022: a platform role declaration), so a pod that somehow carries it reads as UNKNOWN and is OVERWRITTEN with the bottom rung -- fail-closed, and an overwrite of a declaration rather than a move along the ladder
+[1;36m==>[0m 6. offline: a missing instrument re-cages nothing (ADR-0020)
+  ok   an unreadable version array is a NAMED missing instrument, not an empty set: cannot read the version array at /apis/fluxcd.controlplane.io/v1/namespaces/flux-system/resourcesets/policy-versions: HTTP Error 404: Not Found. The ResourceSet `policy-versions` is the one source of truth for what is supported; without it this pass knows nothing and re-cages nothing.
+  ok   an EMPTY supported set is refused rather than re-caging the whole estate
+[1;36m==>[0m 7. offline: the grant holds no verb that can loosen or remove a workload
+  ok   exactly one ClusterRole: the single audited grant
+  ok   on pods the grant is get/list/patch and nothing else: ['get', 'list', 'patch']
+  ok   it CANNOT delete a pod: eviction was the blunt lever, and a workload is never removed, only caged
+  ok   it cannot create or wholesale-replace a pod either
+  ok   it reads the version array and nothing else: ['get']
+  ok   and it touches no other resource: ['pods', 'resourcesets']
+[1;36m==>[0m 8. offline: the module is owned -- party.yaml declares it, its objects carry the platform identity
+  ok   platform's party.yaml declares the currency controller in publishes[]
+  ok   it is declared as an implementations member, like the policy line: implementations
+  ok   the path it declares is this directory: currency-controller
+  ok   nothing published from it is withdrawn
+  ok   the declaring party holds the publisher and platform roles
+  ok   manifests/rbac.yaml: Namespace/currency-system is labelled platform-machinery, platform machinery numbered by the platform's own tag
+  ok   manifests/rbac.yaml: ServiceAccount/currency-controller is labelled platform-machinery, platform machinery numbered by the platform's own tag
+  ok   manifests/rbac.yaml: ClusterRole/currency-controller is labelled platform-machinery, platform machinery numbered by the platform's own tag
+  ok   manifests/rbac.yaml: ClusterRoleBinding/currency-controller is labelled platform-machinery, platform machinery numbered by the platform's own tag
+  ok   manifests/cronjob.yaml: CronJob/currency-controller is labelled platform-machinery, platform machinery numbered by the platform's own tag
+[1;36m==>[0m 9. offline: the could-not-look branch is run, not assumed
+  ok   selfcheck: with kind unreachable this script exits 3 and its last line is SKIP:
 SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
-SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — stale posture is re-evaluated post-admission; the re-patch drops BOTH labels so the SVID falls back to base-mesh
+SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — a pod admitted under a version that is later retired is re-caged to isolated on the next controller pass -- observed: none

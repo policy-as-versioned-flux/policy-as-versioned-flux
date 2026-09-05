@@ -58,6 +58,7 @@ PASS: nist: publishes controls at catalog
 PASS: platform/party.yaml vs party schema
 PASS: platform: publishes implementations at distribution/policies
 PASS: platform: publishes implementations at identity
+PASS: platform: publishes implementations at currency-controller
 PASS: tuppence/party.yaml vs party schema
 PASS: tuppence: publishes exposure as a section of composed/HEADER.yaml, signed by this party's own tag and not an envelope of its own
 PASS: driftwood pins platform/implementations@2.0.1: tag policy/v2.0.1 on platform, and its tree carries the policy this pin is used for

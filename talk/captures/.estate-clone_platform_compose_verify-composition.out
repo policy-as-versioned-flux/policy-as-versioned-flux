@@ -45,7 +45,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "party": "fixture-platform",
       "kind": "implementations",
       "version": "1.0.0",
-      "sha": "6c49e8ae4298a0c843f44cf8d1a10de2f16a63e6a6b67ee921708de761c398e9"
+      "sha": "3386b4c8b5ec44a8317ae0309eea19fec810328b6252b73237abfda4318bd9e8"
     }
   ],
   "members": [
@@ -55,7 +55,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "ValidatingPolicy",
       "version": "1.0.0",
       "source_party": "fixture-platform",
-      "source_sha": "6c49e8ae4298a0c843f44cf8d1a10de2f16a63e6a6b67ee921708de761c398e9",
+      "source_sha": "3386b4c8b5ec44a8317ae0309eea19fec810328b6252b73237abfda4318bd9e8",
       "action": "Audit"
     },
     {
@@ -64,7 +64,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "ValidatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "6c49e8ae4298a0c843f44cf8d1a10de2f16a63e6a6b67ee921708de761c398e9",
+      "source_sha": "3386b4c8b5ec44a8317ae0309eea19fec810328b6252b73237abfda4318bd9e8",
       "action": null
     },
     {
@@ -73,7 +73,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "ValidatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "6c49e8ae4298a0c843f44cf8d1a10de2f16a63e6a6b67ee921708de761c398e9",
+      "source_sha": "3386b4c8b5ec44a8317ae0309eea19fec810328b6252b73237abfda4318bd9e8",
       "action": null
     }
   ],
