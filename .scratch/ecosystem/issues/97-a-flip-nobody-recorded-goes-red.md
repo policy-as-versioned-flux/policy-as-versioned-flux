@@ -19,6 +19,13 @@ red.
 Charted 2026-09-04 from the round-2 review of the hub CI repair; the record is
 `.scratch/ecosystem/CI-2026-09-04.md`.
 
+**This is ticket 87's item 3, narrowed, and it should be answered with it.** Ticket 87 already
+says: "`twin/ENACT_MODE` is a file the agent writes. Replace it with a declaration in a repo the
+agent cannot push to, with a price attached, or record why not." I charted this ticket on
+2026-09-04 without noticing that, so read the two together. 87 item 3 is the stronger answer,
+because it moves the declaration out of the agent's reach; this ticket is the weaker one that
+works where the declaration stays put. If the owner takes 87 item 3, close this as covered.
+
 **Why this is HITL and not delegated.** It invents an authorisation shape: a file whose content is
 "the owner said so, here". ADR-0025 delegates architecture and keeps authorisations with the
 owner. The assistant should not design the form in which the owner's permission is recorded.
