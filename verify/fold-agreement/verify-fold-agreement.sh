@@ -12,7 +12,16 @@
 # its flags exactly as the workflow spells them, and substitutes only the values. Every token past
 # the interpreter must be a long flag the grader has a role for or a token it planted a value for;
 # anything else -- a new flag, its value, a new positional, templated or plain literal alike --
-# stops the run with a named refusal. Nothing is faked: platform's real committed evidence at a tag,
+# stops the run with a named refusal.
+#
+# THE WHITELIST IS DELIBERATELY NARROWER THAN BASH. It knows `--flag value` and nothing else, so a
+# working invocation respelled `--flag=value`, with a short flag, with `python3 -u`, or behind an
+# `env FOO=1` prefix is refused too. That is on purpose -- silently guessing at a spelling is how a
+# grader ends up grading something nobody planted -- but it means such a red says "teach this
+# grader the new spelling", NOT "the estate is broken". The FAIL line counts and names that kind
+# separately from a real divergence, so the two are never read as each other.
+#
+# Nothing is faked: platform's real committed evidence at a tag,
 # real cosign, real exit codes, and only the subject -- a throwaway adopter repository whose
 # composed window and pin move in a stated way -- is planted.
 #
@@ -44,13 +53,22 @@ case $rc in
   # was compared and nothing more; each repository's own harness grades its own gate in depth.
   0) echo "PASS: $(grep '^SUMMARY:' "$log" | head -1 | cut -c10-)";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
+  # Two kinds of red, counted apart and named apart (R5-2): a movement two gates answered
+  # differently, and a gate whose own served operation this grader could not reproduce. Reporting
+  # the second as the first would say the estate diverged when it did not.
   *) n=$(grep -c '^FAIL:' "$log")
+     d=$(grep -c '^FAIL: case ' "$log")
+     r=$(grep -c 'could not reproduce the operation' "$log")
      if [ "$n" -eq 0 ]; then
        # A non-zero exit with no FAIL line means the grader itself stopped -- never "nothing was
        # found", which is what a bare count printed here before review.
        echo "FAIL: fold_agreement.py exited $rc without grading a single planted movement: $(tail -1 "$log")"
+     elif [ "$d" -eq 0 ]; then
+       echo "FAIL: $r adopter gate invocation(s) could not be reproduced from the repository's own shift-left.yml, so no planted movement was graded against them -- a red about THIS GRADER needing to learn a new argument spelling, not about the estate diverging"
+     elif [ "$r" -eq 0 ]; then
+       echo "FAIL: $d planted movement(s) were answered differently by two adopter gates, or answered differently from ADR-0011's own reading"
      else
-       echo "FAIL: $n planted movement(s) were answered differently by two adopter gates, or answered differently from ADR-0011's own reading"
+       echo "FAIL: $d planted movement(s) were answered differently by two adopter gates or from ADR-0011's own reading, and $r gate invocation(s) could not be reproduced from their own shift-left.yml (which is a red about this grader, not about the estate)"
      fi;;
 esac
 rm -f "$log"; exit "$rc"

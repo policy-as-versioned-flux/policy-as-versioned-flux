@@ -140,6 +140,30 @@ def test_a_positional_nobody_planted_refuses(grader: ModuleType) -> None:
     assert "compose" in str(caught.value)
 
 
+def test_one_literal_claimed_by_two_roles_refuses_instead_of_collapsing(grader: ModuleType,
+                                                                        tmp_path) -> None:
+    # R5-4. The plant is keyed by token TEXT. A workflow spelling two different arguments with the
+    # same literal -- `--base-ref HEAD --head-ref HEAD` -- would collapse to one mapping entry and
+    # hand base-ref the head commit, running a case nobody planted. It refuses instead.
+    planted = {"base_sha": "aaa", "head_sha": "bbb", "base_tag": "v1", "head_tag": "v2"}
+    with pytest.raises(grader.Unresolved) as caught:
+        grader.build_mapping(
+            ["python3", "g.py", "--base-ref", "HEAD", "--head-ref", "HEAD"],
+            tmp_path / "gate.py", planted, tmp_path / "platform", tmp_path / "repo",
+            tmp_path / "out.json", tmp_path / "out.md", ("regexp", "issuer"))
+    assert "HEAD" in str(caught.value)
+
+
+def test_two_roles_planting_the_same_value_for_one_literal_is_fine(grader: ModuleType,
+                                                                   tmp_path) -> None:
+    planted = {"base_sha": "aaa", "head_sha": "aaa", "base_tag": "v1", "head_tag": "v2"}
+    mapping = grader.build_mapping(
+        ["python3", "g.py", "--base-ref", "HEAD", "--head-ref", "HEAD"],
+        tmp_path / "gate.py", planted, tmp_path / "platform", tmp_path / "repo",
+        tmp_path / "out.json", tmp_path / "out.md", ("regexp", "issuer"))
+    assert mapping["HEAD"] == "aaa"
+
+
 # -- reading a verdict back ---------------------------------------------------------------------
 
 

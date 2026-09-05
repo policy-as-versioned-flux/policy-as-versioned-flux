@@ -84,7 +84,15 @@ def pin_disagreement(tag: str, pinned: str, resolved: str | None) -> str | None:
     if resolved is None:
         return (f"pins platform tag {tag}, which this checkout of platform could not resolve to a "
                 f"commit at all")
-    if resolved != pinned:
+    # An abbreviated sha and an upper-case one are both valid git and both name the same commit;
+    # reading either as a disagreement would be this check inventing a red out of a formatting
+    # choice (R5-5, 2026-09-05). A prefix is accepted only when it is long enough to identify a
+    # commit -- git's own shortest useful abbreviation -- so a stray fragment is still a mismatch.
+    shortest = 7
+    a, b = pinned.strip().lower(), resolved.strip().lower()
+    same = a == b or (min(len(a), len(b)) >= shortest
+                      and (a.startswith(b) or b.startswith(a)))
+    if not same:
         return (f"pins platform tag {tag} at commit {pinned}, but that tag resolves to {resolved} "
                 f"in this checkout -- the pin and the tag name different platforms, so any bump "
                 f"read at that tag would be a bump for something this institution does not pin")
@@ -169,7 +177,19 @@ def identity_constants(unit_dir: Path, script: Path | None) -> tuple[str, str] |
 
 def grade(findings: list[dict]) -> tuple[str, list[tuple[str, str]]]:
     """FAIL beats SKIP: a major that was actually observed standing in a window is not softened by
-    a second adopter that could not be looked at."""
+    something that could not be looked at -- neither by another adopter, NOR by another version in
+    the same adopter's own window.
+
+    The second half of that sentence was not true until 2026-09-05 (review finding R5-1). `look()`
+    returned on the first version whose evidence the pinned tag does not carry, and this function
+    read `skip` before `computed`, so appending one unrelated member to an adopter's
+    composed/evidence.json turned an observed FAIL into a SKIP and the major disappeared from the
+    report -- and `carries no signed evidence for policy version` is a DECLARED could-not-look, so
+    the truth surface would have scored the masking as an expected skip. The state is reachable and
+    has happened: ADR-0011's own 2026-09-03 note records platform's main carrying `4.0.0.json`
+    without its bundle. Per-version could-not-looks now collect in `unread` and are named beside
+    every major the run did observe.
+    """
     if not findings:
         return "SKIP", [("SKIP", "no party in this estate claims the adopter role, so there is no "
                                   "composed window a major could be standing in")]
@@ -187,6 +207,11 @@ def grade(findings: list[dict]) -> tuple[str, list[tuple[str, str]]]:
             lines.append(("FAIL", f"{adopter} {finding['fail']}"))
             continue
         standing = [v for v in finding["window"] if finding["computed"].get(v) == MAJOR]
+        unread = list(finding.get("unread") or [])
+        for version, reason in unread:
+            # Named on its own line, never as a reason to stop reading the rest of the window.
+            unlooked += 1
+            lines.append(("SKIP", f"{adopter} {reason}"))
         if standing:
             majors += 1
             for version in standing:
@@ -197,6 +222,15 @@ def grade(findings: list[dict]) -> tuple[str, list[tuple[str, str]]]:
                     f"institution carries is an authorisation the owner makes (ADR-0025); no gate "
                     f"can, and this line stands until the owner does or the version leaves the "
                     f"window")))
+        elif unread:
+            # No major among what could be read. The adopter's own status is a could-not-look, and
+            # the line says what WAS verified rather than going quiet about the rest of the window.
+            read = [v for v in finding["window"] if v in finding["computed"]]
+            lines.append(("ok", (
+                f"{adopter}: no major in the {len(read)} version(s) of its composed window that "
+                f"could be read ({', '.join(read) or 'none'}), each verified at {finding['tag']} "
+                f"under {adopter}'s own identity constant; {len(unread)} could not be read, named "
+                f"above")))
         elif not finding["window"]:
             # Nothing was verified, because there was nothing to verify. Saying so is not the same
             # sentence as "every version verified", and a vacuous claim is still a claim.
@@ -225,7 +259,8 @@ def _git(repo: Path, *args: str) -> subprocess.CompletedProcess:
 def look(estate: Path, unit: str, platform_dir: Path) -> dict:
     """One adopter, measured. Every read below is of a served document: the adopter's composed
     evidence at the commit it serves, and platform's evidence at the tag that adopter pins."""
-    finding: dict = {"adopter": unit, "tag": None, "window": [], "computed": {}, "skip": None}
+    finding: dict = {"adopter": unit, "tag": None, "window": [], "computed": {}, "skip": None,
+                      "unread": []}
     unit_dir = estate / unit
 
     pin_text = _git(unit_dir, "show", "HEAD:gitops/platform/platform-pin.yaml")
@@ -279,9 +314,12 @@ def look(estate: Path, unit: str, platform_dir: Path) -> dict:
             doc_text = _git(platform_dir, "show", f"{tag}:{base}")
             bundle_text = _git(platform_dir, "show", f"{tag}:{base}.bundle")
             if doc_text.returncode != 0 or bundle_text.returncode != 0:
-                finding["skip"] = (f"pins platform {tag}, whose tree carries no signed evidence for "
-                                    f"policy version {version} that it declares in its window")
-                return finding
+                # R5-1: named and carried, never a reason to stop reading the rest of the window.
+                # Returning here let one unreadable version silence a major already observed.
+                finding["unread"].append((version, (
+                    f"pins platform {tag}, whose tree carries no signed evidence for policy "
+                    f"version {version} that it declares in its window")))
+                continue
             doc_path, bundle_path = work / f"{version}.json", work / f"{version}.json.bundle"
             doc_path.write_text(doc_text.stdout)
             bundle_path.write_text(bundle_text.stdout)
@@ -299,9 +337,10 @@ def look(estate: Path, unit: str, platform_dir: Path) -> dict:
             try:
                 finding["computed"][version] = json.loads(doc_text.stdout)["bump"]["computed"]
             except (json.JSONDecodeError, KeyError, TypeError):
-                finding["skip"] = (f"pins platform {tag}, whose verified evidence for {version} "
-                                    f"records no bump.computed to read")
-                return finding
+                finding["unread"].append((version, (
+                    f"pins platform {tag}, whose verified evidence for {version} records no "
+                    f"bump.computed to read")))
+                continue
     return finding
 
 
@@ -354,6 +393,11 @@ def selfcheck() -> int:
               for s in ("v2.0.1", "a" * 40, "b" * 40)), True)
     check("a tag that resolves to nothing at all is named too",
           "could not resolve" in (pin_disagreement("v2.0.1", "a" * 40, None) or ""), True)
+    check("an abbreviated or upper-case sha in the pin is not a disagreement",
+          (pin_disagreement("v2.0.1", ("a" * 40).upper(), "a" * 40),
+           pin_disagreement("v2.0.1", "a" * 12, "a" * 40)), (None, None))
+    check("a fragment too short to name a commit still is one",
+          pin_disagreement("v2.0.1", "aaa", "a" * 40) is not None, True)
     check("an identity constant in a workflow env block is read",
           identity_from_workflow("env:\n  X_IDENTITY_REGEXP: ^a$\n  X_ISSUER: https://i\n"),
           ("^a$", "https://i"))
@@ -382,6 +426,24 @@ def selfcheck() -> int:
           grade([clean, unlooked])[0], "SKIP")
     check("a major that WAS observed outranks an adopter that was not",
           grade([carried, unlooked])[0], "FAIL")
+    # R5-1: and it outranks an unreadable version in its OWN window, which used to silence it.
+    masked = dict(carried, window=["1.9.9", "4.0.0"],
+                  unread=[("1.9.9", "pins platform v2.0.1, whose tree carries no signed evidence "
+                                     "for policy version 1.9.9 that it declares in its window")])
+    status_masked, lines_masked = grade([masked])
+    check("one unreadable version does not silence a major already observed in the same window",
+          (status_masked,
+           any(k == "FAIL" and "4.0.0" in m for k, m in lines_masked),
+           any(k == "SKIP" and "1.9.9" in m for k, m in lines_masked)),
+          ("FAIL", True, True))
+    only_unread = {"adopter": "ludlow", "tag": "v2.0.1", "window": ["1.9.9", "2.0.1"],
+                   "computed": {"2.0.1": "none"}, "skip": None,
+                   "unread": [("1.9.9", "pins platform v2.0.1, whose tree carries no signed "
+                                         "evidence for policy version 1.9.9")]}
+    status_unread, lines_unread = grade([only_unread])
+    check("a window with an unreadable version and no major is a could-not-look that still says "
+          "what it read",
+          (status_unread, any("2.0.1" in m for _, m in lines_unread)), ("SKIP", True))
     check("no adopter at all is a could-not-look", grade([])[0], "SKIP")
     check("evidence that does not verify is observed false, never a shrug",
           grade([{"adopter": "driftwood", "tag": "v2.0.1", "window": ["4.0.0"], "computed": {},

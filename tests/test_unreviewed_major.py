@@ -67,6 +67,17 @@ def test_the_commit_the_pin_names_beside_the_tag_is_checked_not_discarded(grader
     assert unresolvable is not None and "could not resolve" in unresolvable
 
 
+def test_an_abbreviated_or_upper_case_sha_in_the_pin_is_not_a_disagreement(grader: ModuleType) -> None:
+    # R5-5. Both spellings are valid git, and reading either as "the pin and the tag name different
+    # platforms" would be this check inventing a red out of a formatting choice.
+    assert grader.pin_disagreement("v2.0.1", ("a" * 40).upper(), "a" * 40) is None
+    assert grader.pin_disagreement("v2.0.1", "a" * 12, "a" * 40) is None
+    assert grader.pin_disagreement("v2.0.1", "a" * 40, ("a" * 12)) is None
+    # a prefix too short to identify a commit is not accepted as one
+    assert grader.pin_disagreement("v2.0.1", "aaa", "a" * 40) is not None
+    assert grader.pin_disagreement("v2.0.1", "a" * 12, "b" * 40) is not None
+
+
 # -- the identity constant, read where the adopter's own operation reads it ----------------------
 
 
@@ -134,6 +145,42 @@ def test_an_adopter_that_could_not_be_looked_at_makes_the_whole_report_a_could_n
     ])
     assert status == "SKIP"
     assert any("v9.9.9" in m for _, m in lines)
+
+
+def test_one_unreadable_version_does_not_silence_a_major_already_observed_in_the_same_window(
+        grader: ModuleType) -> None:
+    # R5-1. The rule "a major that was actually observed is not softened by something that could
+    # not be looked at" held ACROSS adopters and not WITHIN one: look() returned on the first
+    # version whose evidence the pinned tag does not carry, and grade() read `skip` before
+    # `computed`, so appending one unrelated member to composed/evidence.json turned an observed
+    # FAIL into a SKIP and the major vanished from the report. The state is reachable: ADR-0011's
+    # own 2026-09-03 note records platform's main carrying 4.0.0.json without its bundle.
+    status, lines = grader.grade([
+        {"adopter": "driftwood", "tag": "v2.0.1", "window": ["1.9.9", "4.0.0"],
+         "computed": {"4.0.0": "major"}, "skip": None,
+         "unread": [("1.9.9", "pins platform v2.0.1, whose tree carries no signed evidence for "
+                              "policy version 1.9.9 that it declares in its window")]},
+    ])
+    assert status == "FAIL"
+    body = " ".join(m for _, m in lines)
+    assert "4.0.0" in body and "major" in body
+    assert "1.9.9" in body  # the thing that could not be read is named too, not swallowed
+    assert any(kind == "FAIL" and "4.0.0" in m for kind, m in lines)
+    assert any(kind == "SKIP" and "1.9.9" in m for kind, m in lines)
+
+
+def test_a_window_with_nothing_readable_and_no_major_is_a_could_not_look_naming_the_version(
+        grader: ModuleType) -> None:
+    status, lines = grader.grade([
+        {"adopter": "ludlow", "tag": "v2.0.1", "window": ["1.9.9", "2.0.1"],
+         "computed": {"2.0.1": "none"}, "skip": None,
+         "unread": [("1.9.9", "pins platform v2.0.1, whose tree carries no signed evidence for "
+                              "policy version 1.9.9 that it declares in its window")]},
+    ])
+    assert status == "SKIP"
+    assert any(kind == "SKIP" and "1.9.9" in m for kind, m in lines)
+    # and it still says what it DID verify, rather than going silent on the rest of the window
+    assert any("2.0.1" in m for _, m in lines)
 
 
 def test_a_major_outranks_a_could_not_look_because_it_was_actually_observed(grader: ModuleType) -> None:

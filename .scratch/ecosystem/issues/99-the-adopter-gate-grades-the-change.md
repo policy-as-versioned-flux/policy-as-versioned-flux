@@ -242,9 +242,36 @@ policy-as-versioned-tuppence/tuppence#19. Neither merged.
   standing version's evidence at all).
 * `tests/test_fold_agreement.py`, `tests/test_unreviewed_major.py` -- the pure seams, red first.
 
+Two rounds of review findings are folded in above. Round 2's blocking one: the standing report could
+be silenced by a single unreadable version, which took an already-observed major down with it --
+`look()` returned on the first version whose evidence the pinned tag does not carry and `grade()`
+read that skip before the majors, so appending one unrelated member to an adopter's composed
+evidence turned FAIL into a declared SKIP. That falsified the very sentence this ticket publishes in
+four places, including tuppence's shipped docstring: "verifies EVERY version in this institution's
+composed window ... on every truth-surface run". Per-version could-not-looks now collect and are
+named beside every major the run did observe. Proved on a real estate: driftwood reporting the 4.0.0
+major, then one member `1.9.9` appended -- before, rc 3 with the major gone; after, rc 1 with the
+major named and `1.9.9` named as unread.
+
 Both new hub checks are RED in the estate as it stands, and both reds are real: three adopters
-carry an unauthorised major, and ludlow's gate answers two planted movements differently from the
-other two. Neither red is cleared by anything this ticket could honestly write.
+carry a major no authorisation has disposed of, and ludlow's gate answers two planted movements
+differently from the other two. Neither red is cleared by anything this ticket could honestly write.
+
+**Two OTHER checks are captured red on this branch and neither is caused by it.** CI run 105 on this
+branch recorded `.estate-clone/platform/compose/verify-composition.sh` FAIL (exit 1,
+`composition.py --selfcheck`) and `verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh` FAIL
+(exit 1, "the register does not honestly account for the Deny-shaped rules this estate carries"),
+where main's capture set has both as SKIP. Re-run here on 2026-09-05 both exit 3 again. So the
+branch's captures caught a transient state of the estate clone rather than a change this ticket
+made -- said here because a merge carries those captures into main's set and a reader would
+otherwise have to work out whose reds they are.
+
+**The standing pytest reds are substrate-dependent, and no fixed number of them should be
+expected.** `test_the_suite_is_green` is red while EITHER invariant 44
+`drift_window_is_actually_being_sampled` or invariant 45 `flux_coverage_floor_is_still_reachable` is
+red. On this machine both fail (measured twice, and independently by the reviewer); on the CI run
+44 passed and 45 failed, because 44 is sample-and-date sensitive. A brief that names a fixed count
+invites the next builder to read a differing run as a regression it is not.
 
 ## Waits on the owner
 

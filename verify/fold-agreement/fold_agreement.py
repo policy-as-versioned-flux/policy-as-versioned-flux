@@ -397,9 +397,24 @@ def build_mapping(tokens: list[str], script: Path, planted: dict, platform_dir: 
     that introduces them. Positional arguments (driftwood's `compose <platform> <old> <new>`) are
     mapped by position after the subcommand."""
     mapping: dict[str, str] = {}
+
+    def claim(token: str, planted_value: str, role: str) -> None:
+        """One token, one planted value. Two flags carrying the SAME literal in the workflow --
+        `--base-ref HEAD --head-ref HEAD` -- would otherwise collapse into one mapping entry and
+        the second role would silently take the first's value, running a case nobody planted
+        (R5-4, 2026-09-05). Identical claims are fine; disagreeing ones stop the run."""
+        previous = mapping.get(token)
+        if previous is not None and previous != str(planted_value):
+            raise Unresolved(
+                f"{token} -- the served operation uses one literal for two different roles, and "
+                f"this grader plants a different value for each ({previous!r} and "
+                f"{str(planted_value)!r}, the latter for {role}); it cannot tell them apart by "
+                f"text, so it refuses rather than guessing")
+        mapping[token] = str(planted_value)
+
     for token in tokens:
         if token.endswith(GATE_BASENAMES[0]) or token.endswith(GATE_BASENAMES[1]):
-            mapping[token] = str(script)
+            claim(token, str(script), "the gate script")
     positionals: list[str] = []
     i = 1  # token 0 is the interpreter
     while i < len(tokens):
@@ -408,25 +423,25 @@ def build_mapping(tokens: list[str], script: Path, planted: dict, platform_dir: 
             if token in VALUE_FLAGS and i + 1 < len(tokens):
                 value = tokens[i + 1]
                 if token in PLATFORM_DIR_FLAGS:
-                    mapping[value] = str(platform_dir)
+                    claim(value, str(platform_dir), token)
                 elif token in ADOPTER_DIR_FLAGS:
-                    mapping[value] = str(adopter_repo)
+                    claim(value, str(adopter_repo), token)
                 elif token in BASE_REF_FLAGS:
-                    mapping[value] = planted["base_sha"]
+                    claim(value, planted["base_sha"], token)
                 elif token in HEAD_REF_FLAGS:
-                    mapping[value] = planted["head_sha"]
+                    claim(value, planted["head_sha"], token)
                 elif token in NEW_PIN_FLAGS:
-                    mapping[value] = str(adopter_repo / "gitops" / "platform" / "platform-pin.yaml")
+                    claim(value, str(adopter_repo / "gitops" / "platform" / "platform-pin.yaml"), token)
                 elif token in OLD_PIN_FLAGS:
-                    mapping[value] = str(out_json.parent / "old-platform-pin.yaml")
+                    claim(value, str(out_json.parent / "old-platform-pin.yaml"), token)
                 elif token in OUT_JSON_FLAGS:
-                    mapping[value] = str(out_json)
+                    claim(value, str(out_json), token)
                 elif token in OUT_MARKDOWN_FLAGS:
-                    mapping[value] = str(out_markdown)
+                    claim(value, str(out_markdown), token)
                 elif token in IDENTITY_FLAGS:
-                    mapping[value] = identity[0]
+                    claim(value, identity[0], token)
                 elif token in ISSUER_FLAGS:
-                    mapping[value] = identity[1]
+                    claim(value, identity[1], token)
                 i += 2
                 continue
             i += 1
@@ -441,10 +456,10 @@ def build_mapping(tokens: list[str], script: Path, planted: dict, platform_dir: 
     # can require EVERY token past the interpreter to be planted and still let it through. A
     # positional this grader has no role for stays unmapped and stops the run there.
     if positionals and positionals[0] == "compose":
-        mapping[positionals[0]] = positionals[0]
+        claim(positionals[0], positionals[0], "the subcommand")
         roles = [str(platform_dir), planted["base_tag"], planted["head_tag"]]
         for value, planted_value in zip(positionals[1:], roles):
-            mapping[value] = planted_value
+            claim(value, planted_value, "a positional of the compose subcommand")
     return mapping
 
 
@@ -668,6 +683,23 @@ def selfcheck() -> int:
           resolve_argv(["python3", "g.py", "--platform-dir", "platform", "--head-ref", "HEAD"],
                         planted),
           ["python3", "/plant/gate.py", "--platform-dir", "/plant/platform", "--head-ref", "abc123"])
+
+    # R5-4: one literal, two roles, two different planted values -- refuse rather than collapse.
+    import tempfile as _tempfile
+    with _tempfile.TemporaryDirectory() as _td:
+        _p = Path(_td)
+        two_roles = ["python3", "g.py", "--base-ref", "HEAD", "--head-ref", "HEAD"]
+        try:
+            build_mapping(two_roles, _p / "gate.py",
+                           {"base_sha": "aaa", "head_sha": "bbb", "base_tag": "v1", "head_tag": "v2"},
+                           _p / "platform", _p / "repo", _p / "out.json", _p / "out.md", ("r", "i"))
+            check("one literal claimed by two roles refuses", "returned", "raised Unresolved")
+        except Unresolved as exc:
+            check("one literal claimed by two roles refuses, naming it", "HEAD" in str(exc), True)
+        same = build_mapping(two_roles, _p / "gate.py",
+                              {"base_sha": "aaa", "head_sha": "aaa", "base_tag": "v1", "head_tag": "v2"},
+                              _p / "platform", _p / "repo", _p / "out.json", _p / "out.md", ("r", "i"))
+        check("two roles planting the same value for one literal is fine", same["HEAD"], "aaa")
 
     check("the composed bump is read out of a rendered comment table",
           composed_from_markdown("| bump | **patch** | **none** |\n"), "none")
