@@ -2,6 +2,20 @@
 status: accepted
 ---
 
+> **Amended 2026-09-05 (eco-system ticket 89).** The 2026-08-28 addendum below called
+> `governed-namespace-requires-claim` "the one refusal the doctrine allows". There is no such
+> refusal. The owner, 2026-09-02 (ticket 75 Q5): "something could find itself unable to run, but
+> that's only because it doesn't fit the cage, not because we deliberately deny it. So, in
+> Kubernetes Parlance, we've built a Mutating admission controller more than a Approving
+> admission and control." One sentence now stands in every document that used to say otherwise --
+> `CONTEXT.md`'s Cage entry, [ADR-0014](0014-unclaimed-is-caged-governed-namespace-requires-claim.md),
+> [ADR-0018](0018-the-namespace-manifest-is-the-governed-declaration.md) §4 and this addendum:
+> **Nothing is denied; a workload that does not fit its cage does not run.** The REASON the addendum gave stands and is answered a different way: the rule is a
+> `MutatingPolicy`, and an unclaimed pod is admitted onto the bottom rung, so the Namespace falls
+> closed AND the pod falls closed. ADR-0020's missing-instrument refusal is unchanged in its own
+> domain and does not reach admission: a missing instrument refuses to emit a PRICE, never a
+> workload; the bottom rung needs no version claim to select it.
+
 # The cage ladder: tier per Namespace, tighten-only cage, an `isolated` rung, one floor, `infra` by role
 
 The cage was the only enforcement in vocabulary but not in code (findings H2-01, H2-03, H2-12,
@@ -33,14 +47,24 @@ without a reason.
   eviction class and a resource ceiling on workloads in Namespaces nobody governs. It is now
   written down and carries a fixture (`graded/tests/cage-tier`, pod `ungoverned-ns`). It flips to
   `isolated` in the same one-line edit as the rest of the ordering rule.
-- **Added 2026-08-28 (review):** a pod created in a governed Namespace with NO
-  `policy-as-versioned.dev/policy-version` claim is REFUSED by
-  `governed-namespace-requires-claim`, promoted that day from `Audit` to `Deny`. Live, `Audit` let
-  such a pod run completely uncaged -- no tier, no class, no limits, no hardening, no reach cage --
-  inside a Namespace whose declared tier was `isolated`, so the Namespace fell closed and the pod
-  fell open. This is the one refusal the doctrine allows and it is a missing INSTRUMENT (ADR-0020),
-  not a posture judgement: the claim is what selects which served version cages the pod, so without
-  it there is no cage to put the workload in. A pod that claims is caged and priced, never refused.
+- **Added 2026-08-28 (review), amended 2026-09-05 (eco-system ticket 89):** a pod created in a
+  governed Namespace with NO `policy-as-versioned.dev/policy-version` claim lands on the BOTTOM
+  RUNG. It was refused between 2026-08-28 and 2026-09-05, by `governed-namespace-requires-claim`
+  promoted that day from `Audit` to `Deny`; the observation that forced the promotion was real
+  and still holds -- live, `Audit` let such a pod run completely uncaged, no tier, no class, no
+  limits, no hardening, no reach cage, inside a Namespace whose declared tier was `isolated`, so
+  the Namespace fell closed and the pod fell open. What was wrong was the shape, not the reason.
+  The rule the platform renders is a `MutatingPolicy` now: the pod is admitted carrying
+  `isolated`, its dials, its first-eviction PriorityClass, host namespaces shut and all
+  capabilities dropped, so the pod falls closed with the Namespace. Three adopters still
+  carry the Deny in what they composed under platform `v2.0.1`, until the owner cuts the
+  next signed tag and each re-pins. Silence is not an exemption and it is not a refusal either;
+  silence is the bottom rung. The rung is the bottom one rather than the Namespace's declared
+  tier because no served policy version reaches a pod that claims none, and what the ladder
+  cannot place goes to the bottom -- the same fail-closed rule that gives an untiered Namespace
+  `isolated`. A pod that CLAIMS is `cage-tier`'s, and stays `cage-tier`'s: two mutating policies
+  writing the cage produce a pod labelled `isolated` carrying `cage-baseline`'s PriorityClass
+  (measured, kyverno 1.18.2, 2026-09-05), which is H8-03's incoherence from the other direction.
 
 ## Alternatives
 
