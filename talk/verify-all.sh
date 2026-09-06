@@ -299,7 +299,13 @@ fi
 # RUN was, units= onward says what it MEASURED, so the field reads with its own kind. It is also
 # unconditional, unlike live=1 and fixture=1, which are flags that appear only when set -- putting
 # an always-present field after the sometimes-present ones would have read as another flag.
-enact="$(python3 -c "import sys; sys.path.insert(0, '$ROOT/twin'); import enact_guard; print(enact_guard.enact_mode())" 2>/dev/null)" || enact=""
+#
+# The root goes through the ENVIRONMENT, not through the -c string. Interpolating a path into a
+# quoted literal is how this repository has been bitten before (the exclusion reasons carrying an
+# apostrophe, above): a checkout under a path with a quote in it would not error here, it would
+# quietly write `enact=unknown` on every line, which is a wrong answer that looks like an honest
+# one. os.path.join of an env var cannot be quote-confused.
+enact="$(ENACT_HUB_ROOT="$ROOT" python3 -c 'import os, sys; sys.path.insert(0, os.path.join(os.environ["ENACT_HUB_ROOT"], "twin")); import enact_guard; print(enact_guard.enact_mode())' 2>/dev/null)" || enact=""
 [ -n "$enact" ] || enact=unknown
 
 echo
