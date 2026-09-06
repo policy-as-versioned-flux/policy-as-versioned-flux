@@ -30,10 +30,16 @@
 #     check existed in the tree that was measured: necessary, never sufficient.
 #   * anything outside issues/*.md. A figure in map.md, an ADR or the deck is ticket 67(d)'s and
 #     verify-demo.sh's question.
-#   * a figure with no run citation beside it, and a line that says of itself that it is a
-#     fixture, planted, a rehearsal, hypothetical, from the Actions log or not citable. Both
-#     populations are COUNTED and printed on every run, so the size of what is not graded is on
-#     the record instead of being a sentence somebody wrote once.
+#   * a figure with no run citation beside it; a line that says of itself, in those words, that
+#     it is `not citable` (or quotes a line carrying the runner's own `fixture=1`); and a
+#     citation in a paragraph that is no gate-proof. All three populations are COUNTED and
+#     printed on every run, and every exempted line is NAMED by path and line, so what is not
+#     graded is on the record instead of being a sentence somebody wrote once.
+#   * A NAMED CHECK is a `verify*.sh` matched by path suffix, or a directory the CITED tree
+#     carries one under, read from the section the claim is made in with correction paragraphs
+#     stripped. A bare `verify/` names nothing. What no text analysis can catch, and what makes
+#     rule 1 necessary rather than sufficient: a ticket naming, in its own Answer, a check it
+#     does not own that the cited tree happens to carry.
 #
 # NO COULD-NOT-LOOK, by decision (delegated, ADR-0025, 2026-09-06), following
 # verify/can-record/'s call. Everything it reads is in this repository and everything it runs is
@@ -82,10 +88,20 @@ fi
 [ "$bad" -eq 0 ] && echo "  ok   git, talk/truth.log and .scratch/ecosystem/issues are all readable, and the checkout is not shallow"
 
 say "2. every TRUTH line the tickets cite is real, and its tree carries the check it is offered as proof of"
-"$PY" "$GRADER" grade "$ROOT" || bad=$((bad + 1))
+if [ "$bad" -eq 0 ]; then
+  "$PY" "$GRADER" grade "$ROOT" || bad=$((bad + 1))
+else
+  # what step 1 named is what steps 2 and 3 read; running them would print the same fact twice
+  # and, before this guard, follow it with a traceback (review F9)
+  echo "  not run: step 1 named what is missing"
+fi
 
 say "3. ticket 80's other nine corrections are still in the record, and what they removed has not come back"
-"$PY" "$GRADER" record "$ROOT" || bad=$((bad + 1))
+if [ "$bad" -eq 0 ] || [ -d "$ROOT/docs/adr" ]; then
+  "$PY" "$GRADER" record "$ROOT" || bad=$((bad + 1))
+else
+  echo "  not run: step 1 named what is missing"
+fi
 
 echo
 if [ "$bad" -eq 0 ]; then

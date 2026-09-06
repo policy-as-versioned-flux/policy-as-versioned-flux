@@ -77,7 +77,8 @@ a dated comment on ticket 86.
    cited beats 5/5b/5c (identity, posture-projection, reach-secrets, access, break-glass, eud);
    ticket 75 Q12 and the run grades point at identity, federation, access, eud, posture-projection
    and reach-secrets. I took the second, for two reasons. **Break-glass passes** — it is graded
-   offline and green on run 65, and excluding a green removes an observation the estate really
+   offline and green on run 65 -- a branch run, quoted from the Actions log and not citable
+   (ticket 80 item 1, 2026-09-06) -- and excluding a green removes an observation the estate really
    has; the honest reason to exclude a script is that it never looks, not that it sits under an
    identity heading. **Federation belongs in** — one trust domain with no peer is the clearest case
    of the actor half being unbuilt, and it is exactly what ticket 68 was closed for. Six, not seven

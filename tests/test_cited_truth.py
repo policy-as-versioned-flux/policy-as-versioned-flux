@@ -201,7 +201,11 @@ def test_a_line_marked_fixture_or_not_citable_is_declared_not_graded() -> None:
             "Run 7 shows pass=99, quoted from the Actions log and not citable.\n")
     report = ct.report({"d.md": text}, ct.recorded(LOG), trees())
     assert report.findings == []
-    assert report.declared_uncitable == 2
+    # only the second line spends the hatch: `run=fixture` is no run number, so the first line
+    # carries no citation and nothing was going to be graded on it
+    assert report.declared_uncitable == 1
+    assert report.unattributed == 1
+    assert report.exempted == [("d.md", 2, "not citable")]
 
 
 # -- the other nine items' facts, as a table of greps ----------------------------------------------
@@ -236,3 +240,153 @@ def test_a_sentence_the_correction_had_to_remove_is_named_when_it_comes_back() -
     dirty = dict(clean, **{banned.file: banned.example})
     assert [f for f in ct.record_facts(dirty) if "still says" in f.detail]
     assert not [f for f in ct.record_facts(clean) if "still says" in f.detail]
+
+
+# -- F1: a named check must RESOLVE to a script, and a correction may not supply it ----------------
+
+def test_a_bare_verify_directory_is_not_a_named_check() -> None:
+    # `verify/` is a prefix of every hub check path, so under a startswith test it satisfied
+    # every tree that has ever existed. It names no check.
+    assert ct.named_checks("its check lives under `verify/`") == []
+    assert ct.named_checks("see `verify`") == []
+
+
+def test_a_directory_token_counts_only_where_the_cited_tree_carries_a_script_under_it() -> None:
+    assert ct.tree_carries({"verify/party/verify-party.sh"}, ["verify/party/"]) == ["verify/party/"]
+    assert ct.tree_carries({"verify/party/README.md", "verify/party/party.py"},
+                           ["verify/party/"]) == []
+
+
+def test_a_script_token_matches_by_path_suffix_not_by_prefix() -> None:
+    # tickets name `verify-demo.sh`; the tree carries `talk/verify-demo.sh`
+    assert ct.tree_carries({"talk/verify-demo.sh"}, ["verify-demo.sh"]) == ["verify-demo.sh"]
+    assert ct.tree_carries({"talk/verify-demonstrate.sh"}, ["verify-demo.sh"]) == []
+
+
+def test_a_check_named_only_inside_a_correction_cannot_prove_the_citation() -> None:
+    # the defect the reviewer measured: ticket 80's own correction names run 7's three
+    # directories, which run 7's tree of course carries, so the citation passed on the
+    # correction's own words and the dated correction never did any work
+    corrected = CLAIM + (
+        "\n> **Correction, 2026-09-06 (ticket 80).** The TRUTH line of 2026-08-29 is run 7, "
+        "whose tree carries `verify/party/`, `verify/proportionality/` and "
+        "`verify/provenance/` and none of the checks this ticket names.\n"
+    )
+    tree = trees(**{"918022b": {"verify/party/verify-party.sh",
+                                "verify/proportionality/verify-proportionality.sh",
+                                "verify/provenance/verify-provenance.sh"}})
+    # it is disposed of by the dated correction, and by nothing else
+    assert ct.grade({"21.md": corrected}, ct.recorded(LOG), tree) == []
+    undated = corrected.replace("**Correction, 2026-09-06 (ticket 80).**",
+                                "**Correction (ticket 80).**")
+    assert [f.kind for f in ct.grade({"21.md": undated}, ct.recorded(LOG), tree)] == \
+        ["tree-lacks-the-check"]
+
+
+# -- F2: the escape hatch is a phrase, and a negated one is not one --------------------------------
+
+def test_a_negated_marker_word_does_not_exempt_a_line() -> None:
+    for line in ("Run 7 shows pass=99, and no fixture was used.\n",
+                 "Run 7 shows pass=99; this is not a rehearsal.\n",
+                 "Run 7 shows pass=99, as the Actions log confirms.\n"):
+        rep = ct.report({"g.md": line}, ct.recorded(LOG), trees())
+        assert [f.kind for f in rep.findings] == ["figure-disagrees"], line
+        assert rep.declared_uncitable == 0, line
+
+
+def test_the_exempted_lines_are_printed_and_not_only_counted() -> None:
+    rep = ct.report({"h.md": "Run 7 shows pass=99 -- not citable, a branch run.\n"},
+                    ct.recorded(LOG), trees())
+    assert rep.findings == []
+    assert rep.exempted == [("h.md", 1, "not citable")]
+
+
+# -- F3: the gate-proof trigger reads a paragraph, not a physical line ------------------------------
+
+def test_a_gate_proof_wrapped_across_lines_is_still_matched() -> None:
+    wrapped = ("Definition of done: its check is in `talk/verify-all.sh`. The run that\n"
+               "recorded it is the TRUTH line of 2026-08-29.\n")
+    assert [f.kind for f in ct.grade({"a.md": wrapped}, ct.recorded(LOG),
+                                     trees(**{"918022b": set()}))] == ["tree-lacks-the-check"]
+
+
+def test_in_the_gate_beside_a_citation_is_a_gate_proof_too() -> None:
+    for phrase in ("wired into the gate", "its check is in the gate"):
+        text = f"{phrase}, proven by run 7.\n"
+        assert [f.kind for f in ct.grade({"a.md": text}, ct.recorded(LOG),
+                                         trees(**{"918022b": set()}))] == ["tree-lacks-the-check"]
+
+
+def test_a_run_written_with_a_hash_is_a_citation() -> None:
+    assert [c.value for c in ct.citations("as Run #7 recorded")] == ["7"]
+
+
+def test_a_citation_that_is_no_gate_proof_is_counted_as_outside_the_rule() -> None:
+    rep = ct.report({"a.md": "Run 7 was the last one before the build.\n"},
+                    ct.recorded(LOG), trees())
+    assert rep.findings == []
+    assert rep.outside_the_rule == 1
+
+
+# -- F4: a correction's date must follow the word, and it must name the citation --------------------
+
+def test_an_undated_correction_that_merely_mentions_the_cited_date_does_not_dispose() -> None:
+    text = CLAIM + ("\n> **Correction (ticket 80).** The TRUTH line of 2026-08-29 was a "
+                    "rehearsal.\n")
+    assert [f.kind for f in ct.grade({"a.md": text}, ct.recorded(LOG),
+                                     trees(**{"918022b": set()}))] == ["tree-lacks-the-check"]
+
+
+def test_a_dated_correction_naming_the_date_only_in_passing_does_not_dispose() -> None:
+    # a bare date is not a citation; the correction has to name the LINE
+    text = CLAIM + "\n> **Correction, 2026-09-07.** Something else happened on 2026-08-29.\n"
+    assert [f.kind for f in ct.grade({"a.md": text}, ct.recorded(LOG),
+                                     trees(**{"918022b": set()}))] == ["tree-lacks-the-check"]
+
+
+# -- F5: a record fact is matched with whitespace normalised ---------------------------------------
+
+def test_a_record_fact_matches_across_a_line_wrap() -> None:
+    fact = next(f for f in ct.RECORD_FACTS if f.want and " " in f.pattern)
+    wrapped = fact.example.replace(" ", "\n", 1)
+    files = {name: "" for name in ct.RECORD_FILES}
+    files[fact.file] = wrapped
+    assert not [f for f in ct.record_facts(files)
+                if f.path == fact.file and fact.pattern in f.detail]
+
+
+def test_a_banned_sentence_restored_on_one_line_is_still_named() -> None:
+    banned = next(f for f in ct.RECORD_FACTS if not f.want and "\n" in f.example)
+    files = {name: "" for name in ct.RECORD_FILES}
+    files[banned.file] = " ".join(banned.example.split())
+    assert [f for f in ct.record_facts(files) if "still says" in f.detail]
+
+
+def test_a_check_named_in_another_section_does_not_prove_the_citation() -> None:
+    # narrowing beyond "somewhere in the file": the proof must be named where the claim is made
+    text = ("## Notes\n\n`verify/party/` is somebody else's check.\n\n"
+            "## Answer\n\nDefinition of done: its check is in `talk/verify-all.sh`. "
+            "The run that recorded it is the TRUTH line of 2026-08-29.\n")
+    tree = trees(**{"918022b": {"verify/party/verify-party.sh"}})
+    assert [f.kind for f in ct.grade({"a.md": text}, ct.recorded(LOG), tree)] == \
+        ["tree-lacks-the-check"]
+
+
+def test_a_check_named_in_the_same_section_does_prove_it() -> None:
+    text = ("## Answer\n\n`verify/party/` grades it.\n\n"
+            "Definition of done: its check is in `talk/verify-all.sh`. "
+            "The run that recorded it is the TRUTH line of 2026-08-29.\n")
+    tree = trees(**{"918022b": {"verify/party/verify-party.sh"}})
+    assert ct.grade({"a.md": text}, ct.recorded(LOG), tree) == []
+
+
+def test_the_hatch_is_only_spent_where_it_actually_suppresses_a_grade() -> None:
+    # measured on ticket 75 line 45: "not citable" appeared in a neighbouring clause about
+    # something else, on a line whose figure had no run citation and so was never graded. An
+    # exemption that suppresses nothing must not be reported as one, or the printed list of
+    # exemptions stops meaning what it says.
+    text = "No line has ever had fail=0. Option (c) is a private alarm, not citable evidence.\n"
+    rep = ct.report({"i.md": text}, ct.recorded(LOG), trees())
+    assert rep.exempted == []
+    assert rep.declared_uncitable == 0
+    assert rep.unattributed == 1

@@ -35,3 +35,12 @@ owner dispatches of `cut-release.yml` and are listed under ticket 64's `## Waits
 Ticket 64 authored the tuppence and ludlow overlays, made the gate name an adopter that has none
 (`verify/twin-per-adopter/`), and widened step 5 to derive its adopter list from the party
 artefacts instead of naming one.
+
+> **Correction, 2026-09-06 (eco-system ticket 80 item 1).** The done-line above cites "the TRUTH
+> line of 2026-08-29" as proof this ticket's check is in the gate. That citation is withdrawn.
+> The line is run 7, `hub=918022b`, recorded at 2026-08-29T12:03Z, and `git ls-tree -r 918022b`
+> carries three verify directories -- `verify/party/`, `verify/proportionality/` and
+> `verify/provenance/` -- and none of the checks this ticket names. It was graded BEFORE the
+> build it is offered as proof of, so it recorded nothing at all about this check. The 2026-09-04
+> correction above withdrew what this Answer CLAIMED; this one withdraws what it cited as proof.
+> `verify/cited-truth/` grades this rule from today.
