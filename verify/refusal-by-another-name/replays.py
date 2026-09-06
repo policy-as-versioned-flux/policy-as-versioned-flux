@@ -47,6 +47,21 @@ ROOT = HERE.parents[1]
 CLONE = ROOT / ".estate-clone"
 
 
+def _apply_expression(doc: dict) -> str | None:
+    """The body's first ApplyConfiguration expression, or None if it has none.
+
+    REVIEW, 2026-09-06 (F6). Every replay reached into `mutations[0]` and crashed with an
+    IndexError when the served body's `mutations` was emptied -- a traceback instead of the
+    replay's own "the estate's body changed, rewrite this replay" sentence, which is the whole
+    point of a replay saying it can no longer put the defect back.
+    """
+    for mut in ((doc.get("spec") or {}).get("mutations") or []):
+        expr = (mut.get("applyConfiguration") or {}).get("expression")
+        if expr:
+            return str(expr)
+    return None
+
+
 def _served_cage() -> tuple[dict, str]:
     """The cage body the estate SERVES today: declared, cut, and reconciled by a Kustomization."""
     mutations, _, _ = rs.scan_tree(ROOT)
@@ -63,14 +78,20 @@ def _served_cage() -> tuple[dict, str]:
 
 def replay_1a() -> bool:
     body = CLONE / "platform/distribution/policies/v2.0.0/cage-tier.yaml"
-    if body.is_file():
-        doc = [d for d in rs.read_documents(body.read_text())
-               if d.get("kind") in rs.MUTATING_KINDS][0]
+    docs = ([d for d in rs.read_documents(body.read_text()) if d.get("kind") in rs.MUTATING_KINDS]
+            if body.is_file() else [])
+    if docs and _apply_expression(docs[0]):
+        doc = docs[0]
         where = "platform/distribution/policies/v2.0.0/cage-tier.yaml, the real retired body"
     else:
         doc, path = _served_cage()
         doc = copy.deepcopy(doc)
-        expr = doc["spec"]["mutations"][0]["applyConfiguration"]["expression"]
+        expr = _apply_expression(doc)
+        if expr is None:
+            print("  FAIL replay 1a: neither the retired v2.0.0 body nor the served cage carries "
+                  "an ApplyConfiguration expression any more, so this replay cannot put the "
+                  "2026-08-28 priority trio back -- rewrite it")
+            return False
         for drop in ("priority: int(variables.dial.prio),", 'preemptionPolicy: "Never",'):
             expr = expr.replace(drop, "")
         doc["spec"]["mutations"][0]["applyConfiguration"]["expression"] = expr
@@ -84,7 +105,11 @@ def replay_1a() -> bool:
 def replay_1b(kyverno: str) -> bool:
     doc, path = _served_cage()
     broken = copy.deepcopy(doc)
-    expr = broken["spec"]["mutations"][0]["applyConfiguration"]["expression"]
+    expr = _apply_expression(broken)
+    if expr is None:
+        print("  FAIL replay 1b: the served cage carries no ApplyConfiguration expression any "
+              "more, so the 2026-08-28 sidecar cannot be put back -- rewrite this replay")
+        return False
     if '.filter(c, c.name != "waf-sidecar")' not in expr:
         print("  FAIL replay 1b: the served cage no longer carries the 2026-08-28 sidecar "
               "filter, so this replay cannot put the defect back -- rewrite it")
@@ -99,15 +124,21 @@ def replay_1b(kyverno: str) -> bool:
 
 def replay_2() -> bool:
     authoring = CLONE / "platform/graded/policies/cage-tier.yaml"
-    if authoring.is_file():
-        doc = [d for d in rs.read_documents(authoring.read_text())
-               if d.get("kind") in rs.MUTATING_KINDS][0]
+    authored = ([d for d in rs.read_documents(authoring.read_text())
+                 if d.get("kind") in rs.MUTATING_KINDS] if authoring.is_file() else [])
+    if authored and rs.reference_names(authored[0]):
+        doc = authored[0]
         where = "platform/graded/policies/cage-tier.yaml, the authoring body it was copied from"
     else:
         doc, path = _served_cage()
         doc = copy.deepcopy(doc)
-        for var in doc["spec"]["variables"]:
-            var["expression"] = var["expression"].replace("-4-0-0", "").replace("-5-0-0", "")
+        for var in (doc.get("spec") or {}).get("variables") or []:
+            var["expression"] = str(var.get("expression", "")).replace("-4-0-0", "").replace(
+                "-5-0-0", "")
+        if not rs.reference_names(doc):
+            print("  FAIL replay 2: no served cage writes a reference field any more, so the "
+                  "unsuffixed PriorityClass cannot be replayed -- rewrite this replay")
+            return False
         where = f"derived from {path} (the authoring body is no longer on disk)"
     m = rs.mutation(doc, path=where, surface="served-cut", group="platform:v4.0.0")
     _, groups, _ = rs.scan_tree(ROOT)
@@ -122,6 +153,10 @@ def replay_2() -> bool:
 def replay_3(register: dict) -> bool:
     doc, path = _served_cage()
     doc = copy.deepcopy(doc)
+    if _apply_expression(doc) is None:
+        print("  FAIL replay 3: the served cage writes nothing, so the full-body-on-UPDATE shape "
+              "cannot be replayed -- rewrite this replay")
+        return False
     # ticket 89 round 2's shape: the bottom-rung cage, full body, matching UPDATE. The register
     # covers `cage-tier*` and nothing else, so this must be an unrecorded hazard.
     doc["metadata"]["name"] = "governed-namespace-cage"

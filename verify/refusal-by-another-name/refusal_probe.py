@@ -257,6 +257,17 @@ def probe(kyverno: str, doc: dict, path: str) -> Probe:
                          "no candidate pod on any rung made this mutation apply at all (pass "
                          "count 0 on every one), so nothing was measured -- a step that passes "
                          "because nothing applied is the defect this ticket exists to catch")
+        # REVIEW, 2026-09-06 (F3b). A policy whose `mutations` are emptied still comes back
+        # `pass: 2` from the CLI, and 'identical applied to its own output' is then true and
+        # vacuous. The mutation must actually WRITE something to the pod it was handed, or this
+        # leg passed on a policy that does nothing -- the same defect one level in.
+        wrote = any(_canonical(r.obj) != _canonical(_pod("probe", c))
+                    for c, _, r in reached if r.obj)
+        if not wrote:
+            return Probe(name, path, False,
+                         "the mutation applied and changed NOTHING on any rung: the object came "
+                         "back exactly as it went in, so byte-identity on its own output is "
+                         "vacuously true and this leg measured a policy that writes nothing")
         for claim, tier, first in reached:
             assert first.obj is not None
             tag = f"{claims.index(claim)}-{TIERS.index(tier)}"
@@ -282,9 +293,35 @@ def probe(kyverno: str, doc: dict, path: str) -> Probe:
                              f"server refuses that. First difference: {_first_difference(a, b)}")
         note = "; ".join(changed) or "no change needed"
         rungs = ", ".join(sorted({t2 or "unlabelled" for _, t2, _ in reached}))
+        # REVIEW, 2026-09-06 (F5). The sentence above used to name the rungs ATTEMPTED, not the
+        # rungs OBSERVED: dropping the tier label from _values() left it byte-identical while
+        # all five probes landed on the same fail-closed rung. A body that reads its Namespace's
+        # tier must produce at least two DIFFERENT objects across the ladder, or the values file
+        # is not reaching it and this leg is measuring one rung five times.
+        seen = {t2 or "unlabelled": _canonical(r.obj) for _, t2, r in reached if r.obj}
+        distinct = len(set(seen.values()))
+        if _rung_dependent(doc) and distinct < 2:
+            return Probe(name, path, False,
+                         f"this body reads its Namespace's tier and yet every rung it reached "
+                         f"({rungs}) produced the SAME object: the values file is not reaching "
+                         f"it, so the rungs are attempted and not observed, and the identity "
+                         f"above is one rung measured {len(seen)} times")
         return Probe(name, path, True,
-                     f"identical applied to its own output on every rung it reaches ({rungs}); "
-                     f"throwaway copy: {note}")
+                     f"identical applied to its own output on every rung it reaches ({rungs}), "
+                     f"which produced {distinct} distinct object(s)"
+                     + ("" if _rung_dependent(doc) else " -- this body does not read the tier")
+                     + f"; throwaway copy: {note}")
+
+
+def _rung_dependent(doc: dict) -> bool:
+    """Does this body's output depend on the Namespace's declared tier?
+
+    If it does, the ladder is observable and leg B must prove it walked it. If it does not
+    (`stamp-posture` writes one label whatever the rung), one object across five rungs is the
+    correct result and saying so is the honest report.
+    """
+    text = yaml.safe_dump(doc.get("spec") or {})
+    return "namespaceObject" in text and "posture.acme.io/tier" in text
 
 
 def _first_difference(a: str, b: str) -> str:

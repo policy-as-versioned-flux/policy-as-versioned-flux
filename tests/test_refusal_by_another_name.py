@@ -243,7 +243,7 @@ def test_a_mutation_that_names_no_priority_class_owes_no_trio() -> None:
 # ----------------------------------------------------------------- the join to the register
 
 def _reg(**over):
-    row = {"policy": "cage-tier*", "operation": "UPDATE",
+    row = {"policy": "cage-tier*", "policies": ["cage-tier-4-0-0"], "operation": "UPDATE",
            "fields": ["spec.priorityClassName", "spec.priority", "spec.preemptionPolicy",
                       "spec.hostNetwork", "spec.containers[*].name",
                       "spec.containers[*].resources.limits"],
@@ -401,3 +401,201 @@ def test_only_a_mutating_policy_is_a_candidate(kind: str) -> None:
     doc = cage()
     doc["kind"] = kind
     assert rs.mutation(doc) is None
+
+
+# ======================================================================================
+# Review, 2026-09-06. Every test below is a defect the reviewer PLANTED and the check let
+# through. Each one is a served thing that was never measured while the run's sentence
+# claimed it was -- the ticket's own subject, one level up.
+# ======================================================================================
+
+# ------------------------------------------------- F1: `operations: ["*"]` is not a gap
+
+def test_a_wildcard_operation_reaches_update() -> None:
+    """`operations: ["*"]` is legal in a resourceRule and means every operation, UPDATE
+    among them. Gating on the literal string dropped the policy out of the register join
+    AND out of the execution probe, while the verdict still said every write on UPDATE was
+    recorded. One field edit voided the central join."""
+    m = rs.mutation(cage(operations=("*",)))
+    assert m is not None
+    assert "UPDATE" in m.operations
+    assert "CREATE" in m.operations
+    assert "spec.priorityClassName" in {h.path for h in rs.hazards(m)}
+
+
+def test_a_wildcard_is_expanded_in_the_recorded_operations() -> None:
+    m = rs.mutation(cage(operations=("*",)))
+    assert m is not None
+    assert set(m.operations) == {"CREATE", "UPDATE", "DELETE", "CONNECT"}
+    assert "*" not in m.operations
+
+
+# --------------------------- F2: a mutation on an unrecognised path is not invisible
+
+def _plant(tmp_path: Path, rel: str, text: str) -> Path:
+    f = tmp_path / ".estate-clone" / rel
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(text)
+    return f
+
+
+SNEAKY = """apiVersion: policies.kyverno.io/v1alpha1
+kind: MutatingPolicy
+metadata:
+  name: apps-sneaky-cage
+spec:
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: >-
+          Object{spec: Object.spec{priorityClassName: "cage-does-not-exist",
+                                   priority: -10, preemptionPolicy: "Never"}}
+"""
+
+
+def test_a_mutation_on_a_path_the_scan_does_not_know_is_not_dropped(tmp_path: Path) -> None:
+    """It used to be. `scan_tree` skipped an unrecognised path BEFORE reading the file, so a
+    MutatingPolicy under an adopter's gitops/apps/ -- a tree its root Kustomization really
+    reconciles, with prune: true -- was neither graded, nor excluded with a reason, nor
+    counted, and the verdict still read `every mutation the estate SERVES was graded`."""
+    _plant(tmp_path, "driftwood/gitops/apps/sneaky.yaml", SNEAKY)
+    mutations, _, _ = rs.scan_tree(tmp_path)
+    found = [m for m in mutations if m.name == "apps-sneaky-cage"]
+    assert found, "a mutating policy on an unrecognised path vanished from the scan"
+    assert found[0].surface == "unclassified"
+
+
+def test_an_unclassified_mutation_with_a_dangling_reference_fails(tmp_path: Path) -> None:
+    _plant(tmp_path, "driftwood/gitops/apps/sneaky.yaml", SNEAKY)
+    mutations, groups, _ = rs.scan_tree(tmp_path)
+    v = rs.grade(mutations, groups, {"accepted": []})
+    assert v.code == 1
+    assert any("cage-does-not-exist" in line for line in v.lines)
+
+
+def test_an_unclassified_mutation_that_is_otherwise_clean_could_not_be_looked_at(
+        tmp_path: Path) -> None:
+    _plant(tmp_path, "driftwood/gitops/apps/sneaky.yaml",
+           SNEAKY.replace("cage-does-not-exist", "cage-here") + """---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: cage-here
+value: -10
+""")
+    mutations, groups, _ = rs.scan_tree(tmp_path)
+    v = rs.grade(mutations, groups, {"accepted": []})
+    assert v.code == 3
+    assert any("does not know whether" in line for line in v.lines)
+
+
+# ------------------------------- F3: the row is graded per policy, not against the union
+
+def _two(fields_second):
+    """Two served policies the same glob matches: the real one, and a second whose writes
+    are a SUBSET. The union hides the second entirely."""
+    body_full = CAGE_BODY
+    body_subset = 'Object{spec: Object.spec{priorityClassName: variables.dial.pc, ' \
+                  'priority: 1, preemptionPolicy: "Never"}}'
+    return [
+        rs.mutation(cage(operations=("CREATE", "UPDATE"), body=body_full),
+                    path="platform/a.yaml", surface="served-cut"),
+        rs.mutation(cage(operations=("CREATE", "UPDATE"),
+                         body=body_subset if fields_second else body_full,
+                         name="cage-tier-5-0-0"),
+                    path="platform/b.yaml", surface="served-cut"),
+    ]
+
+
+_SHIPPED = {"PriorityClass": {"cage-baseline-4-0-0", "cage-isolated-4-0-0"}}
+
+
+def _reg2(**over):
+    row = dict(_reg()["accepted"][0])
+    row["policies"] = ["cage-tier-4-0-0", "cage-tier-5-0-0"]
+    row.update(over)
+    return {"accepted": [row]}
+
+
+def test_a_second_policy_writing_a_subset_is_not_hidden_by_the_union() -> None:
+    v = rs.grade(_two(True), shipped=_SHIPPED, register=_reg2())
+    assert v.code == 1
+    assert any("cage-tier-5-0-0" in line and "field set" in line for line in v.lines)
+
+
+def test_two_policies_that_both_match_the_row_exactly_pass() -> None:
+    v = rs.grade(_two(False), shipped=_SHIPPED, register=_reg2())
+    assert v.code == 0
+
+
+def test_a_row_must_name_the_policies_it_covers() -> None:
+    """Widening the glob to `*` used to pass, because the union still equalled the row.
+    The row names its policies now, so a new match is a change the row has to admit."""
+    v = rs.grade(_two(False), shipped=_SHIPPED,
+                 register=_reg2(policy="*", policies=["cage-tier-4-0-0"]))
+    assert v.code == 1
+    assert any("cage-tier-5-0-0" in line for line in v.lines)
+
+
+def test_a_row_that_names_a_policy_the_surface_no_longer_carries_fails() -> None:
+    v = rs.grade(_two(False), shipped=_SHIPPED,
+                 register=_reg2(policies=["cage-tier-4-0-0", "cage-tier-5-0-0",
+                                          "cage-tier-6-0-0"]))
+    assert v.code == 1
+
+
+# ------------------------------------------ F4: the mutability table is pinned by a test
+
+def test_the_mutable_on_update_table_is_the_api_servers_own_list() -> None:
+    """Observed on kind-driftwood (v1.36.1) on 2026-09-06, refusing a pod update:
+
+        The Pod "t98-probe" is invalid: spec: Forbidden: pod updates may not change fields
+        other than `spec.containers[*].image`,`spec.initContainers[*].image`,
+        `spec.activeDeadlineSeconds`,`spec.tolerations` (only additions to existing
+        tolerations),`spec.terminationGracePeriodSeconds` (allow it to be set to 1 if it
+        was previously negative)
+
+    Nothing pinned this tuple before the review: adding an entry silently deleted that field
+    from every hazard set with nothing red. platform/graded/verify-graded.sh step 8b compares
+    the same five to the live message as a SET, in both directions."""
+    assert rs.MUTABLE_ON_UPDATE == (
+        "metadata",
+        "status",
+        "spec.containers[*].image",
+        "spec.initContainers[*].image",
+        "spec.activeDeadlineSeconds",
+        "spec.tolerations",
+        "spec.terminationGracePeriodSeconds",
+    )
+
+
+def test_the_posture_authoring_tree_is_excluded_in_the_platforms_own_words() -> None:
+    """Found by the F2 fix: `posture/policies/` was the one real file the new unclassified
+    bucket caught. It is an authoring tree — render-and-prove.py and posture/up.sh both call
+    it that — and the served copies are the per-version ones render-version-tree.py emits."""
+    s = rs.classify("platform/posture/policies/stamp-posture.yaml", declared={}, cut={})
+    assert s.surface == "authoring"
+    assert s.graded is False
+
+
+def test_a_wildcard_reaches_the_execution_probe_too(tmp_path: Path) -> None:
+    """F1's other half: refusal_probe.collect() gated on the same literal, so a policy set to
+    `operations: ["*"]` silently dropped out of leg B and the count fell with no omission
+    named."""
+    _plant(tmp_path, "platform/distribution/policies/v4.0.0/cage.yaml",
+           SNEAKY.replace('operations: ["CREATE"]', 'operations: ["*"]')
+                 .replace("cage-does-not-exist", "cage-here"))
+    _plant(tmp_path, "platform/distribution/versions.yaml",
+           "apiVersion: fluxcd.controlplane.io/v1\nkind: ResourceSet\nmetadata:\n"
+           "  name: policy-versions\nspec:\n  inputs:\n    - versions:\n"
+           "        - {version: \"4.0.0\", commit: abc}\n")
+    mutations, _, _ = rs.scan_tree(tmp_path)
+    m = [x for x in mutations if x.name == "apps-sneaky-cage"]
+    assert m and m[0].surface == "served-cut"
+    assert "UPDATE" in m[0].operations

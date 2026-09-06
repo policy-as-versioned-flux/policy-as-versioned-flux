@@ -149,6 +149,79 @@ become a blanket permission.
 
   No policy denied anything. Not citable: a local run, not a gate run.
 
+
+### Round 2, 2026-09-06 — the review found two blocking, two major and three minor, and every one was the ticket's own subject one level up
+
+Not a wrong measurement anywhere: a SERVED thing that was never measured while the run's sentence
+claimed it was. That is the sentence this ticket exists to make impossible, and the check was
+committing it about itself.
+
+**F1 (blocking). `operations: ["*"]` voided the central join, silently.** It is legal in a
+resourceRule and means every operation, UPDATE among them. `hazards()` gated on the literal
+`"UPDATE" in m.operations` and `refusal_probe.collect()` on the same string, so the reviewer set
+v5.0.0's cage-tier to `["*"]` and the policy dropped out of BOTH the register join and the
+execution probe — inventory printing `ops=*`, leg B falling from six probes to five naming no
+omission, and the verdict still reading "every write on UPDATE that a running pod forbids is
+recorded". One field edit. Fixed by `canonical_operations()`, which expands `*` (and `ALL`) once,
+where the Mutation is built, so no caller can gate on the literal again. Measured after the fix
+on the reviewer's own plant: `ops=CREATE,UPDATE,DELETE,CONNECT`, the row still covers it, leg B
+still probes it.
+
+**F2 (blocking). A mutation on a path the scan did not recognise was neither graded, nor
+excluded, nor counted.** `scan_tree` called `continue` on `Surface("other")` BEFORE reading the
+file, so `classify()`'s own honest string — "not part of any policy delivery path this scan
+knows" — could never be printed. The reviewer dropped a MutatingPolicy naming
+`priorityClassName: "cage-does-not-exist"` into `driftwood/gitops/apps/`, a tree that adopter's
+root Kustomization really reconciles with `prune: true`: a dangling PriorityClass invisible to the
+check built to catch dangling PriorityClasses. The file is read now; a mutating document on an
+unplaceable path is **unclassified** — graded for everything that does not turn on the delivery
+path (the reference name, the trio, the fields per operation) and a could-not-look on the path
+itself, which is never a pass.
+
+That fix immediately caught one real file: `platform/posture/policies/stamp-posture.yaml`. It is
+an AUTHORING tree — `distribution/render-and-prove.py` and `posture/up.sh` both call
+`graded/policies/` and `posture/policies/` "authoring copies", and the served copies are the
+per-version ones `render-version-tree.py` emits — so it is excluded by name in the platform's own
+words rather than in this scan's guess, and a test pins that. The unclassified bucket stays for
+paths nobody can place.
+
+**F3 (major). The row was graded against the UNION of every policy its glob matched.** So
+"graded in both directions" was true of narrowing only: a second served policy writing a SUBSET
+of the recorded fields was accepted in silence, and widening the glob to `*` passed. Two changes:
+the field set is compared **per policy**, and the row now NAMES the policies it covers
+(`policies:`), graded as a set both ways — so a new served copy is a change the row has to admit,
+in the same edit that says why it is accepted. Measured on the reviewer's plant (v5.0.0's
+`spec.mutations` emptied): `FAIL register row cage-tier* names ['cage-tier-4-0-0',
+'cage-tier-5-0-0'] and the served surface matches ['cage-tier-4-0-0'] -- named but not found`.
+
+Leg B caught the same plant independently, and had to: it reported "identical applied to its own
+output" for a policy that writes nothing, because `kyverno apply` returns `pass: 2` for an empty
+mutation list and byte-identity is then vacuously true. It asserts the mutation actually CHANGED
+the pod it was handed now — the same "nothing applied" rule, one level in.
+
+**F4 (major, and it was this record over-claiming).** See D8 above.
+
+**F5 (minor). Leg B named the rungs ATTEMPTED, not the rungs OBSERVED.** Dropping the tier label
+from `_values()` left the sentence byte-identical while all five probes landed on the same
+fail-closed rung. A body that reads its Namespace's tier must now produce at least two DIFFERENT
+objects across the ladder or the probe FAILS saying the values file is not reaching it; a body
+that does not read the tier says so and one object is the correct answer. The line reports the
+distinct count either way.
+
+**F6 (minor).** Every replay reached into `mutations[0]` and crashed with an IndexError when the
+served body's mutation list was emptied — a traceback instead of the replay's own "the estate's
+body changed, rewrite this replay" sentence, which is the whole point of a replay that can no
+longer put the defect back. All four are guarded.
+
+**F7 (minor, and the reviewer was right about where it belonged).** The finding that
+`graded/verify-graded.sh`'s live tail still grades the two guards as REFUSALS — which ticket 89
+replaced with mutations — was recorded only in this hub ticket's "Not done", in a different
+repository from the code, which is the drift ticket 89's D1 forbids. The non-proxy fix was thirty
+lines above it in the same file: the block branches on what the cluster actually carries, exactly
+as step 8b does, prints NOT LOOKED AT naming ticket 89's replacement where the machinery is
+installed, and carries a dated in-file note. Its two PASS sentences say "the PRE-ticket-89 guard"
+now, so the beat cannot claim a refusal the doctrine no longer allows.
+
 ### The suite, and what was actually observed of it
 
 The full test suite ran to completion **on CI, on this branch's first commit** — the `twin`
@@ -211,10 +284,17 @@ two immutable fields. The claim route is printed as a NOT LOOKED AT line naming 
 rather than the tail going dark while the machinery is in flight.
 
 **D8 (delegated). The API server grades the offline table.** Kubernetes' refusal message enumerates
-the fields a pod update MAY change. Step 8b asserts that list is exactly the five
-`refusal_scan.MUTABLE_ON_UPDATE` carries, so the central constant of the offline check is measured
-against the real API server rather than believed. The day Kubernetes widens it, that step goes red
-and names the field.
+the fields a pod update MAY change. Step 8b parses the back-ticked names out of that message and
+compares them to the five `refusal_scan.MUTABLE_ON_UPDATE` carries as a SET, in both directions, so
+the central constant of the offline check is measured against the real API server rather than
+believed. The day Kubernetes widens or narrows the list, that step goes red and names the field.
+
+*Written first as five `grep -q` calls, which is PRESENCE and not set equality, while this
+paragraph claimed equality — the review caught it (F4). Measured on a doctored message carrying a
+sixth field: all five greps green, the set comparison red with `added=['spec.schedulingGates']`.
+The hub end was worse: nothing pinned the tuple at all, so adding an entry deleted that field from
+every hazard set with nothing red. It is pinned by a test now, with the observed message quoted
+beside it.*
 
 ### The hard part: `kyverno apply` has no UPDATE mode, and it is worse than "matches nothing"
 
@@ -253,10 +333,16 @@ replay comes back with the engine's own sentence:
 
 | what | red | green |
 |---|---|---|
-| the seam's 37 tests | `FileNotFoundError: .../refusal_scan.py` (collection error, before the module existed) | `37 passed in 0.06s` |
+| the seam's tests (37, now 49) | `FileNotFoundError: .../refusal_scan.py` (collection error, before the module existed) | `37 passed in 0.06s` |
 | the pinned-tier dial lookup | `assert frozenset({'cage-baseline-4-0-0','cage-isolated-4-0-0'}) == frozenset({'cage-isolated-4-0-0'})` | passes; the machinery no longer needs three classes it cannot name |
 | replay 1b, the sidecar | `NOT CAUGHT -- leg B grades nothing` (probing without the values file, on `baseline`) | `error: failed to evaluate policy: ... .spec.containers: duplicate entries for key [name="waf-sidecar"]` |
 | replay 3, the full body on UPDATE | — | `13 unrecorded writes on a running pod` |
+| F1, `operations: ["*"]` on served v5.0.0 (round 2) | the policy vanished from the join AND from leg B, verdict still "every write on UPDATE ... is recorded" | `ops=CREATE,UPDATE,DELETE,CONNECT`, still joined, still probed |
+| F2, a MutatingPolicy in `driftwood/gitops/apps/` (round 2) | absent from every bucket, verdict "PASS: every mutation the estate SERVES was graded" | surface `unclassified`, and `cage-does-not-exist` FAILs leg A |
+| F3, v5.0.0's `spec.mutations` emptied (round 2) | GREEN, leg B saying "identical applied to its own output" | `FAIL register row cage-tier* names [...] -- named but not found: ['cage-tier-5-0-0']`, and leg B `the mutation applied and changed NOTHING on any rung` |
+| F4, a sixth field in the API server's message (round 2) | all five `grep -q` green | `the API server's mutable-on-update set has MOVED. added=['spec.schedulingGates']` |
+| F4, a sixth entry in `MUTABLE_ON_UPDATE` (round 2) | nothing red anywhere | `FAILED test_the_mutable_on_update_table_is_the_api_servers_own_list` |
+| F5, the tier dropped from `_values()` (round 2) | "on every rung it reaches (baseline, isolated, quarantine, restricted, unlabelled)", byte-identical | `this body reads its Namespace's tier and yet every rung it reached produced the SAME object` |
 | the register, narrowed to one field | — | `register row cage-tier* declares field set [...] and the code writes [...] -- the row no longer describes the code` |
 
 ### What this cannot see
@@ -274,7 +360,7 @@ bytes served. That is this ticket's own subject one level out. It bites nothing 
 array declares a version whose directory exists at HEAD, and every such directory is named in the
 excluded list on every run) and closing it means reading each path out of `git show <tag>:<path>`.
 
-Map line: `- [98 — A refusal by another name is graded by nothing](issues/98-a-refusal-by-another-name-is-graded-by-nothing.md) — the other way a workload is stopped is now graded: verify/refusal-by-another-name/ reads every mutation the estate SERVES and grades four things offline — a name written into a reference field is one the SAME RELEASE ships (the unsuffixed cage-isolated), the priority trio is whole (the trio that refused every pod on every released line), every write on UPDATE that a running pod forbids is on register.yaml with a reason, a remediation and the leg that bounds it, and every UPDATE-scoped mutation is EXECUTED against its own output on every rung and must come back identical (the waf-sidecar appended twice). All four instances the estate produced are replayed against its OWN bodies on every run and every one goes red; the fourth is LIVE and decided correct, so it is reported with its remediation (recreate) rather than called a defect, and the row is graded in both directions so it cannot outlive the code — narrowing it by one field is asserted to go red. The served partition is the ticket's own rule: graded are the declared-and-cut version trees, the machinery inside the ResourceSet template and the uncut tail; excluded and NAMED are graded/policies/ (no Kustomization applies it), vselfcheck/ and the fifteen version directories on disk that no array declares. kyverno apply has no UPDATE mode and is worse than that — it prints "Mutation has been applied successfully", writes an UNMUTATED file and counts pass:0 — so the limit is MEASURED on every run rather than disclosed (it goes red the day the CLI grows one), scoping is asserted structurally, the body runs on a throwaway copy whose every difference is printed, and applied means the pass count, so no step can pass because nothing applied. Probing without a values file was that same bug in this build: it landed every pod on baseline, where no sidecar exists, and replayed the 2026-08-28 defect GREEN. The live half is graded/verify-graded.sh step 8b, which OBSERVED the refusal on kind-driftwood on 2026-09-06 — a quarantine-caged pod, its Namespace moved to baseline, and one kubectl label refused with PriorityClassName cage-quarantine-4-0-0 -> cage-baseline-4-0-0 and Priority -1000 -> -10 — and which asserts the API server's own list of mutable-on-update fields is exactly the five the offline table carries, so the check's central constant is graded by the API server rather than believed. deny_register.BLIND_SPOTS now points at all of it.`
+Map line: `- [98 — A refusal by another name is graded by nothing](issues/98-a-refusal-by-another-name-is-graded-by-nothing.md) — the other way a workload is stopped is now graded: verify/refusal-by-another-name/ reads every mutation the estate SERVES and grades four things offline — a name written into a reference field is one the SAME RELEASE ships (the unsuffixed cage-isolated), the priority trio is whole (the trio that refused every pod on every released line), every write on UPDATE that a running pod forbids is on register.yaml with a reason, a remediation and the leg that bounds it, and every UPDATE-scoped mutation is EXECUTED against its own output on every rung and must come back identical (the waf-sidecar appended twice). All four instances the estate produced are replayed against its OWN bodies on every run and every one goes red; the fourth is LIVE and decided correct, so it is reported with its remediation (recreate) rather than called a defect, and the row is graded in both directions so it cannot outlive the code — narrowing it by one field is asserted to go red. The served partition is the ticket's own rule: graded are the declared-and-cut version trees, the machinery inside the ResourceSet template and the uncut tail; excluded and NAMED are graded/policies/ (no Kustomization applies it), vselfcheck/ and the fifteen version directories on disk that no array declares. kyverno apply has no UPDATE mode and is worse than that — it prints "Mutation has been applied successfully", writes an UNMUTATED file and counts pass:0 — so the limit is MEASURED on every run rather than disclosed (it goes red the day the CLI grows one), scoping is asserted structurally, the body runs on a throwaway copy whose every difference is printed, and applied means the pass count, so no step can pass because nothing applied. Probing without a values file was that same bug in this build: it landed every pod on baseline, where no sidecar exists, and replayed the 2026-08-28 defect GREEN. The live half is graded/verify-graded.sh step 8b, which OBSERVED the refusal on kind-driftwood on 2026-09-06 — a quarantine-caged pod, its Namespace moved to baseline, and one kubectl label refused with PriorityClassName cage-quarantine-4-0-0 -> cage-baseline-4-0-0 and Priority -1000 -> -10 — and which asserts the API server's own list of mutable-on-update fields is exactly the five the offline table carries, so the check's central constant is graded by the API server rather than believed. deny_register.BLIND_SPOTS now points at all of it. Round 2 (2026-09-06 review, two blocking) found the check committing this ticket's own sin about itself, never a wrong measurement but a served thing never measured while the sentence claimed it was: `operations: ["*"]` is legal and dropped a served policy out of BOTH the register join and the execution probe in silence (expanded once, where the Mutation is built); an unrecognised path was skipped BEFORE the file was read, so a MutatingPolicy on an adopter's reconciled gitops/apps/ tree naming a PriorityClass that exists nowhere was in no bucket at all (read now, graded as `unclassified` for everything that does not turn on the delivery path, could-not-look on the path, and it caught one real file -- posture/policies/, an authoring tree in the platform's own words); the register row was compared to the UNION of the policies its glob matched, so a subset-writing second copy passed and widening the glob to `*` passed (per-policy now, and the row NAMES its policies, graded both ways); step 8b grepped five field names for PRESENCE while this record claimed set equality (parsed and compared as a set both ways now, and the hub pins the tuple in a test with the observed message beside it); leg B named the rungs ATTEMPTED not observed (a tier-reading body must now produce two distinct objects across the ladder) and called a policy that writes NOTHING byte-identical (it must change the pod it was handed); and the stale-tail finding lived only in a hub ticket in another repository, which is the drift ticket 89's D1 forbids, so verify-graded.sh branches on what the cluster carries and says PRE-ticket-89 where it grades the old shape.`
 
 ## Waits on the owner
 
@@ -287,12 +373,14 @@ Nothing. Both branches are pushed and both pull requests are open; the integrato
   version) needs `governed-namespace-cage` on a cluster, and kind-driftwood still carries the
   pre-ticket-89 ValidatingPolicy. The step prints that as a NOT LOOKED AT line naming what is
   missing rather than skipping.
-* **`graded/verify-graded.sh`'s live tail still asserts the two guards REFUSE**, as
-  ValidatingPolicies, which ticket 89 replaced with mutations. It passes today only because
-  kind-driftwood carries the old objects; the day platform's machinery reaches a cluster that tail
-  goes red for a reason that is ticket 89's, not this ticket's. Found while adding step 8b, not
-  fixed here: it is a rewrite of somebody else's beat, and doing it blind — with no cluster carrying
-  the new machinery to measure against — is exactly the reasoning-from-a-proxy this ticket is about.
+* **`graded/verify-graded.sh`'s live tail is not rewritten to DRIVE ticket 89's mutations.** It
+  branches now (round 2, F7): on a cluster carrying `governed-namespace-cage` it prints NOT LOOKED
+  AT naming ticket 89's replacement instead of grading a refusal that no longer exists, and where
+  the old ValidatingPolicies are installed its PASS lines say "the PRE-ticket-89 guard". A dated
+  in-file note carries the reason. Driving the mutations from that tail needs a cluster carrying
+  them, which none does yet, and it is ticket 89's beat, not this ticket's. What is fixed is the
+  drift: the finding lived only in this hub ticket's Not done, in a different repository from the
+  code, which is the thing ticket 89's D1 forbids.
 * **Only the pod's mutability is tabulated.** A mutation on any other resource is counted and named
   as untabulated. None ships today.
 * **The adopters' composed trees are graded but empty of served content**: all three declare

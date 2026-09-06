@@ -117,7 +117,7 @@ if [ "$functional" != 0 ]; then exit "$functional"; fi
 if [ "$static" = 3 ]; then
   # The could-not-look has to be the LAST line, because that is the line the manifest judges --
   # and step 5 ran after step 4 and printed over it.
-  echo "SKIP: a name a mutation writes into a reference field could not be resolved offline (named in step 4), so this run could not look at every name -- an unresolved name is never a pass"
+  echo "SKIP: this scan could not look at something it found, named in step 4 -- a reference name it could not resolve to a literal offline, a mutating policy on a path it cannot place (so nothing here knows whether anything delivers it), or a resource whose mutability it does not tabulate. None of the three is a pass"
   exit 3
 fi
 echo "PASS: every mutation the estate SERVES was graded four ways -- every name written into a reference field is one its own release ships, every priority trio is whole, every UPDATE-scoped mutation was EXECUTED against its own output on every rung it reaches and came back identical, and every write a running pod forbids is recorded in register.yaml with a reason, a remediation and the leg that bounds it. The one live refusal (ticket 89 S3: a served-version claim added to a bottom-rung pod) is reported with its remediation rather than called a defect, and the row is graded in both directions so it cannot outlive the code. The four instances the estate has produced were replayed against its own bodies and every one went red. The authoring tree, the pruned version directories and the renderers' fixture directory were named and NOT graded, because a file on disk is not a policy on a cluster."

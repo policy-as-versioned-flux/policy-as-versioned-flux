@@ -18,9 +18,16 @@
 # Fields:
 #   policy       an fnmatch glob over the policy's own name (the served copies are
 #                version-suffixed, so `cage-tier*` is one decision across every served line)
+#   policies     EXACTLY the policy names on the served surface that the glob matches. Graded
+#                both ways (review, 2026-09-06): without it a glob is a standing permission --
+#                widen it to `*` and the row silently covers every mutation the estate grows.
+#                A new served copy is a change this row has to admit, in the same edit that
+#                says why it is accepted
 #   operation    the operation that reaches the write. Only UPDATE can be accepted: a CREATE
 #                writes an object that does not exist yet, so nothing of it is immutable
-#   fields       EXACTLY the paths the code writes on that operation. Not a subset
+#   fields       EXACTLY the paths the code writes on that operation, compared PER POLICY and
+#                not against the union of them (review, 2026-09-06: the union hid a second
+#                served policy whose writes were a subset of the first's). Not a subset
 #   decision     `accepted`
 #   reason       why the refusal is correct, in the estate's own terms
 #   remediation  what an operator does instead, so the refusal is not a dead end
@@ -29,6 +36,9 @@
 
 accepted:
   - policy: cage-tier*
+    policies:
+      - cage-tier-4-0-0
+      - cage-tier-5-0-0
     operation: UPDATE
     fields:
       - spec.containers[*].name

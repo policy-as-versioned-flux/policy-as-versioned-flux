@@ -509,6 +509,29 @@ class Mutation:
         return bool(self.resources) and not (set(self.resources) & SUPPORTED_RESOURCES)
 
 
+#: Every operation a resourceRule's `*` stands for. Admission's own set (`OperationAll`).
+ALL_OPERATIONS = ("CREATE", "UPDATE", "DELETE", "CONNECT")
+
+
+def canonical_operations(ops: list[str]) -> tuple[str, ...]:
+    """The operations a rule really matches, with `*` expanded.
+
+    REVIEW, 2026-09-06, blocking. `operations: ["*"]` is legal and means every operation,
+    UPDATE among them. Reading the literal string dropped such a policy out of the register
+    join AND out of the execution probe -- the reviewer set v5.0.0's cage-tier to `["*"]`, the
+    inventory printed `ops=*`, leg B fell from six probes to five naming no omission, and the
+    verdict still said every write on UPDATE was recorded. One field edit voided this ticket's
+    central join, which is the shape of every defect it exists to catch. Expanded here, once,
+    where the Mutation is built, so no caller can gate on the literal again.
+    """
+    out: list[str] = []
+    for op in ops:
+        for one in (ALL_OPERATIONS if str(op).strip() in ("*", "ALL") else [str(op)]):
+            if one not in out:
+                out.append(one)
+    return tuple(out)
+
+
 def mutation(doc: dict, path: str = "-", unit: str = "-", surface: str = "served-cut",
              group: str = "-") -> Mutation | None:
     """The facts of one document, or None if it is not a mutating policy at all."""
@@ -519,7 +542,7 @@ def mutation(doc: dict, path: str = "-", unit: str = "-", surface: str = "served
     ops: list[str] = []
     res: list[str] = []
     for rule in rules:
-        ops += list(rule.get("operations") or [])
+        ops += list(canonical_operations(list(rule.get("operations") or [])))
         res += list(rule.get("resources") or [])
     return Mutation(
         name=((doc.get("metadata") or {}).get("name") or "?"),
@@ -640,7 +663,15 @@ class Surface:
 
 _VERSION_DIR = re.compile(r"policies/v(\d+\.\d+\.\d+)/")
 
-GRADED_SURFACES = ("served-cut", "served-machinery", "pending")
+GRADED_SURFACES = ("served-cut", "served-machinery", "pending", "unclassified")
+
+
+def unclassified_why(rel: str) -> str:
+    return (f"{rel} carries a mutating policy on a path this scan cannot place: it is not a "
+            f"version tree, not a ResourceSet template and not a composed machinery object, so "
+            f"this scan does not know whether anything delivers it. It is graded for everything "
+            f"that does not turn on the delivery path -- a reference name, the priority trio, "
+            f"the fields it writes on each operation -- and the path itself is a could-not-look")
 
 
 def classify(path: str, declared: dict[str, set[str]], cut: dict[str, set[str]]) -> Surface:
@@ -665,6 +696,15 @@ def classify(path: str, declared: dict[str, set[str]], cut: dict[str, set[str]])
         return Surface("authoring", False,
                        "the authoring tree: no Kustomization anywhere applies graded/policies/, "
                        "and graded/up.sh applies only the rendered, versioned copies")
+    if "/posture/policies/" in "/" + path:
+        # The estate's own word for this tree, not this scan's guess: distribution/
+        # render-and-prove.py calls `graded/policies/` and `posture/policies/` "authoring
+        # copies", and posture/up.sh says the same in its header. The SERVED copies are the
+        # per-version ones render-version-tree.py emits into distribution/policies/v<X>/.
+        return Surface("authoring", False,
+                       "an authoring tree in the platform's own words (render-and-prove.py, "
+                       "posture/up.sh): the served copies are the per-version ones "
+                       "render-version-tree.py emits, and only a demo up.sh applies this one")
     if "/vselfcheck/" in path:
         return Surface("authoring", False, "a renderer's own fixture directory, served nowhere")
     if path.endswith("versions.yaml") or "composed-set.yaml" in path:
@@ -752,8 +792,8 @@ class Verdict:
     lines: list[str]
 
 
-REQUIRED_ROW_FIELDS = ("policy", "operation", "fields", "decision", "reason", "remediation",
-                       "recorded")
+REQUIRED_ROW_FIELDS = ("policy", "policies", "operation", "fields", "decision", "reason",
+                       "remediation", "recorded")
 
 
 def _shipped_for(shipped: dict, group: str) -> dict[str, set[str]]:
@@ -773,10 +813,16 @@ def grade(mutations: list[Mutation], shipped: dict, register: dict) -> Verdict:
     notes: list[str] = []
     could_not: list[str] = []
     rows = list((register or {}).get("accepted") or [])
-    matched: dict[int, list[Hazard]] = {i: [] for i, _ in enumerate(rows)}
+    # Hazards are collected PER POLICY, never pooled. Pooling was the review's F3: a row was
+    # compared to the UNION of every policy its glob matched, so a second served policy writing
+    # a SUBSET of the recorded fields was accepted in silence, and widening the glob to `*` made
+    # the row cover anything at all while still reading as accurate.
+    matched: dict[int, dict[str, set[str]]] = {i: {} for i, _ in enumerate(rows)}
 
     graded = [m for m in mutations if m.surface in GRADED_SURFACES or m.surface == "-"]
     for m in graded:
+        if m.surface == "unclassified":
+            could_not.append(f"  ??   {m.name}: {unclassified_why(m.path)}")
         if m.untabulated:
             what = ",".join(m.resources) or "an unknown resource"
             could_not.append(
@@ -804,7 +850,7 @@ def grade(mutations: list[Mutation], shipped: dict, register: dict) -> Verdict:
             # row itself would still read as accurate. The field-set comparison below is what
             # grades the row against the code, in both directions.
             for i in hit:
-                matched[i].append(h)
+                matched[i].setdefault(m.name, set()).add(h.path)
 
     for i, row in enumerate(rows):
         missing = [f for f in REQUIRED_ROW_FIELDS if not row.get(f)]
@@ -819,13 +865,31 @@ def grade(mutations: list[Mutation], shipped: dict, register: dict) -> Verdict:
                 f"in the served surface -- the code moved and the row did not; delete it")
             continue
         want = set(row["fields"])
-        got = {h.path for h in matched[i]}
-        if want != got:
+        # The row NAMES the policies it covers, and the set is graded both ways. Without it a
+        # glob is a standing permission: widen it to `*` and the row silently covers every
+        # mutation the estate ever grows. A new policy the glob matches is a change the row has
+        # to admit, in the same edit that says why it is accepted.
+        want_policies = set(row.get("policies") or [])
+        got_policies = set(matched[i])
+        if want_policies != got_policies:
+            new = sorted(got_policies - want_policies)
+            gone = sorted(want_policies - got_policies)
             fails.append(
-                f"  FAIL register row {row['policy']} declares field set {sorted(want)} and the "
-                f"code writes {sorted(got)} -- the row no longer describes the code")
+                f"  FAIL register row {row['policy']} names {sorted(want_policies)} and the "
+                f"served surface matches {sorted(got_policies)}"
+                + (f" -- NOT NAMED: {new}, and an accepted refusal covers only the policies its "
+                   f"row names" if new else "")
+                + (f" -- named but not found: {gone}" if gone else ""))
             continue
-        policies = sorted({h.policy for h in matched[i]})
+        bad = {p: got for p, got in sorted(matched[i].items()) if got != want}
+        if bad:
+            for policy, got in bad.items():
+                fails.append(
+                    f"  FAIL register row {row['policy']} declares field set {sorted(want)} and "
+                    f"{policy} writes {sorted(got)} -- the row no longer describes the code")
+            continue
+        got = set(want)
+        policies = sorted(matched[i])
         notes.append(
             f"  ok   accepted refusal ({row['recorded']}): {', '.join(policies)} "
             f"write{'' if len(policies) > 1 else 's'} {len(got)} field(s) a running pod forbids "
@@ -915,10 +979,27 @@ def scan_tree(root: Path) -> tuple[list[Mutation], dict[str, dict[str, set[str]]
                 continue
             rel = f"{unit}/" + "/".join(rel_parts)
             surface = classify(rel, declared, cut)
-            if surface.surface == "other":
-                continue
             try:
-                docs = read_documents(file.read_text())
+                text = file.read_text()
+            except (OSError, UnicodeDecodeError):
+                continue
+            if surface.surface == "other":
+                # REVIEW, 2026-09-06, blocking. This used to `continue` HERE, before the file
+                # was read, so a MutatingPolicy on any path outside the four recognised shapes
+                # was neither graded, nor excluded with a reason, nor counted -- and the verdict
+                # still read "every mutation the estate SERVES was graded four ways". The
+                # reviewer dropped one into `driftwood/gitops/apps/`, a tree that adopter's root
+                # Kustomization really reconciles with `prune: true`, naming a PriorityClass that
+                # exists nowhere: invisible to the check built to catch exactly that.
+                # A path this scan cannot place is not a path with nothing on it. The file is
+                # read, and a mutating document on it is UNCLASSIFIED: graded for everything
+                # that does not depend on knowing the delivery path, and a could-not-look on the
+                # path itself, which is never a pass.
+                if "MutatingPolicy" not in text:
+                    continue
+                surface = Surface("unclassified", True, unclassified_why(rel))
+            try:
+                docs = read_documents(text)
             except (OSError, UnicodeDecodeError):
                 continue
             if not docs:
@@ -953,6 +1034,11 @@ def _group_of(unit: str, rel: str, surface: Surface) -> str:
     m = _VERSION_DIR.search(rel)
     if m and surface.surface in ("served-cut", "pending", "unserved-on-disk"):
         return f"{unit}:v{m.group(1)}"
+    if surface.surface == "unclassified":
+        # Nothing here says what delivers this file, so the smallest set that plausibly
+        # travels with it is its own directory -- a kustomize directory is applied whole.
+        # Naming the directory in the group also puts it in the FAIL line.
+        return f"{unit}:{rel.split('/', 1)[1].rsplit('/', 1)[0] if '/' in rel else '.'}"
     return f"{unit}:machinery"
 
 
@@ -987,7 +1073,8 @@ def selfcheck() -> None:
     # an unrecorded hazard fails, and a recorded one is reported rather than called a defect
     v = grade([m], {"PriorityClass": {"cage-isolated"}}, {"accepted": []})
     assert v.code == 1, v
-    row = {"policy": "cage-*", "operation": "UPDATE", "decision": "accepted",
+    row = {"policy": "cage-*", "policies": ["cage-x"], "operation": "UPDATE",
+           "decision": "accepted",
            "fields": ["spec.priorityClassName", "spec.priority", "spec.preemptionPolicy",
                       "spec.containers[*].name"],
            "reason": "r", "remediation": "recreate", "recorded": "2026-09-06"}
@@ -999,13 +1086,24 @@ def selfcheck() -> None:
                  {"accepted": [dict(row, fields=["spec.priority"])]}).code == 1
     assert grade([m], {"PriorityClass": {"cage-isolated"}},
                  {"accepted": [row, dict(row, policy="gone-*")]}).code == 1
+    # ...a row whose named policy set is not what the surface carries fails (review F3)
+    assert grade([m], {"PriorityClass": {"cage-isolated"}},
+                 {"accepted": [dict(row, policies=["cage-x", "cage-y"])]}).code == 1
+    # ...and `operations: ["*"]` reaches UPDATE rather than vanishing from the join (F1)
+    wild = dict(doc)
+    wild["spec"] = {**doc["spec"], "matchConstraints": {"resourceRules": [
+        {"operations": ["*"], "resources": ["pods"]}]}}
+    wm = mutation(wild, path="platform/distribution/policies/v4.0.0/x.yaml")
+    assert wm is not None and "UPDATE" in wm.operations, wm
+    assert hazards(wm), "a wildcard operation must reach the register join"
     # a name the release does not ship is a refusal by another name (instance 2)
     assert grade([m], {"PriorityClass": {"cage-isolated-4-0-0"}},
                  {"accepted": [row]}).code == 1
     assert BLIND_SPOTS and all("2026-" in b for b in BLIND_SPOTS)
     print("selfcheck ok: writes are read out of the CEL body, an unrecorded hazard fails, an "
           "accepted one is reported with its reason, a stale row fails, a row whose field set "
-          "has drifted fails, and a dangling reference name fails")
+          "or named policy set has drifted fails, a dangling reference name fails, and "
+          "operations: [\"*\"] reaches the UPDATE join instead of vanishing from it")
 
 
 def main(argv: list[str]) -> int:
@@ -1039,8 +1137,12 @@ def main(argv: list[str]) -> int:
               f"remediation. {len(mutations) - len(graded)} authoring or pruned copies were "
               f"named and not graded")
     elif verdict.code == 3:
-        print(f"SKIP: {len([ln for ln in verdict.lines if ln.startswith('  ??')])} mutation "
-              f"writes could not be resolved offline, so this run could not look at them")
+        n = len([ln for ln in verdict.lines if ln.startswith("  ??")])
+        print(f"SKIP: this scan could not look at something it found -- {n} thing(s), each "
+              f"named above: a reference "
+              f"name it could not resolve to a literal offline, a mutating policy on a path it "
+              f"cannot place, or a resource whose mutability it does not tabulate. None is a "
+              f"pass")
     else:
         print(f"FAIL: {len([ln for ln in verdict.lines if ln.startswith('  FAIL')])} refusals by "
               f"another name on the served surface")
