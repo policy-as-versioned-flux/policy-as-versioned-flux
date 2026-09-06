@@ -46,6 +46,28 @@ def trees(**mapping: set[str]) -> Any:
     return lambda commit: mapping.get(commit)
 
 
+def adds(mapping: dict[str, list[tuple[str, str]]] | None) -> Any:
+    """An add_lookup over a literal {path: [(sha, subject), ...]} map (eco-system ticket 102).
+
+    A path the map does not carry has NO adding commit, which is a red of its own: git names
+    somebody for every path in a tree. `None` for the whole map is a checkout that cannot read
+    history at all -- also a red, never a shrug.
+    """
+    def lookup(commit: str, path: str) -> Any:
+        if mapping is None:
+            return None
+        return [ct.Added(sha, subject) for sha, subject in mapping.get(path, [])]
+    return lookup
+
+
+# The real subjects, quoted from the hub log on 2026-09-06, because the convention's spellings are
+# the thing under test and an invented subject would test the invention.
+OWNS_21 = "ecosystem: ticket 21 feed contract verify + ticket 52 harness skeleton"
+OWNS_NOBODY = "Delete estate/ from the hub; verify and talk move to root (mo-12)"
+FEED = "verify/feed-contract/verify-feed-contract.sh"
+PARTY = "verify/party/verify-party.sh"
+
+
 # -- reading a citation out of prose --------------------------------------------------------------
 
 def test_a_dated_citation_is_found_with_its_date() -> None:
@@ -103,8 +125,12 @@ CLAIM = (
 
 
 def test_a_gate_proof_whose_cited_tree_carries_the_check_passes() -> None:
+    # and, since ticket 102, whose adding commit names the ticket making the claim: `21.md` is
+    # ticket 21, and 3e83a16's real subject names 21 and 52
     findings = ct.grade({"21.md": CLAIM}, ct.recorded(LOG),
-                        trees(**{"918022b": {"verify/feed-contract/verify-feed-contract.sh"}}))
+                        trees(**{"918022b": {"verify/feed-contract/verify-feed-contract.sh"}}),
+                        adds({"verify/feed-contract/verify-feed-contract.sh":
+                              [("3e83a16", "ecosystem: ticket 21 feed contract verify")]}))
     assert findings == []
 
 
@@ -377,7 +403,8 @@ def test_a_check_named_in_the_same_section_does_prove_it() -> None:
             "Definition of done: its check is in `talk/verify-all.sh`. "
             "The run that recorded it is the TRUTH line of 2026-08-29.\n")
     tree = trees(**{"918022b": {"verify/party/verify-party.sh"}})
-    assert ct.grade({"a.md": text}, ct.recorded(LOG), tree) == []
+    assert ct.grade({"12-party.md": text}, ct.recorded(LOG), tree,
+                    adds({PARTY: [("aaaaaaa", "Ticket 12: a roles declaration per party")]})) == []
 
 
 def test_the_hatch_is_only_spent_where_it_actually_suppresses_a_grade() -> None:
@@ -422,3 +449,191 @@ def test_a_negation_further_off_than_a_word_does_not_reach_the_phrase() -> None:
                     ct.recorded(LOG), trees())
     assert rep.findings == []
     assert rep.exempted == [("m.md", 1, "not citable")]
+
+
+# -- ticket 102: the cited tree names who ADDED the check -------------------------------------------
+#
+# Rule 1 let through a ticket that names, in its own Answer, a check it does not own and the cited
+# tree happens to carry -- ticket 80's disclosed "case D". It is not a text question and no amount
+# of reading the ticket closes it: GIT knows who put the path there. These tests inject that answer,
+# so the rule is exercised with no repository and no estate.
+
+CLAIM_FEED = (
+    "## Answer\n\n"
+    "Built it. `verify/feed-contract/` grades every publisher.\n\n"
+    "Definition of done: its check is in `talk/verify-all.sh`. "
+    "The run that recorded it is the TRUTH line of 2026-08-29.\n"
+)
+CLAIM_PARTY = CLAIM_FEED.replace("verify/feed-contract/", "verify/party/")
+TREE = trees(**{"918022b": {FEED, PARTY}})
+
+
+def test_an_adding_commit_naming_the_ticket_proves_the_claim() -> None:
+    assert ct.grade({"21-feeds.md": CLAIM_FEED}, ct.recorded(LOG), TREE,
+                    adds({FEED: [("3e83a16", OWNS_21)]})) == []
+
+
+def test_case_d_a_check_the_ticket_does_not_own_is_now_named() -> None:
+    # THE ROUTE THIS TICKET CLOSES. Ticket 99 names run 7's `verify/party/`, which run 7's tree of
+    # course carries, and c9d0f20 -- the commit that put it there -- names no ticket at all.
+    findings = ct.grade({"99-borrowed.md": CLAIM_PARTY}, ct.recorded(LOG), TREE,
+                        adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))
+    assert [f.kind for f in findings] == ["unattributed-check"]
+    assert "c9d0f20" in findings[0].detail and "verify/party/" in findings[0].detail
+    assert "99" in findings[0].detail
+
+
+def test_a_check_added_for_another_ticket_does_not_prove_this_claim() -> None:
+    findings = ct.grade({"99-borrowed.md": CLAIM_FEED}, ct.recorded(LOG), TREE,
+                        adds({FEED: [("3e83a16", OWNS_21)]}))
+    assert [f.kind for f in findings] == ["unattributed-check"]
+
+
+def test_one_commit_that_built_two_tickets_checks_satisfies_both() -> None:
+    # 3e83a16's real subject names 21 and 52; a `^Ticket NN:` prefix match would satisfy neither
+    log, adding = ct.recorded(LOG), adds({FEED: [("3e83a16", OWNS_21)]})
+    assert ct.grade({"21-feeds.md": CLAIM_FEED}, log, TREE, adding) == []
+    assert ct.grade({"52-harness.md": CLAIM_FEED}, log, TREE, adding) == []
+
+
+def test_every_spelling_of_the_convention_in_the_log_is_read() -> None:
+    # the six spellings measured in the hub log on 2026-09-06, plus the list form
+    assert ct.ticket_numbers("Ticket 39: ADR-0026 supersedes ADR-0013") == {"39"}
+    assert ct.ticket_numbers("ticket 61: the step-2 grader reads the PR record") == {"61"}
+    assert ct.ticket_numbers("ecosystem ticket 28: cage the truth clock") == {"28"}
+    assert ct.ticket_numbers("ecosystem ticket 47: generate the deck from captures") == {"47"}
+    assert ct.ticket_numbers(OWNS_21) == {"21", "52"}
+    assert ct.ticket_numbers(
+        "Tickets 62 and 77: no branch refs, and pins are checked for content") == {"62", "77"}
+
+
+def test_a_number_before_the_word_tickets_is_not_a_ticket_number() -> None:
+    # the `--follow` answer for verify/provenance/: a laxer scan reads "27" and hands ticket 27 a
+    # check it never wrote
+    assert ct.ticket_numbers(
+        "Estate build: 27 tickets implemented via dependency-wave workflow (waves 2-9)") == set()
+    assert ct.ticket_numbers(OWNS_NOBODY) == set()
+
+
+# -- the escape: a dated attribution line, bound to the sha, the path and the ticket ----------------
+
+ATTRIB = ("\n> **Attribution, 2026-09-06 (ticket 99).** `verify/party/` was added by `c9d0f20`, "
+          "which names no ticket: it is the commit that moved `verify/` to the repository root.\n")
+
+
+def test_a_dated_attribution_line_carries_a_check_the_convention_predates() -> None:
+    assert ct.grade({"99-borrowed.md": CLAIM_PARTY + ATTRIB}, ct.recorded(LOG), TREE,
+                    adds({PARTY: [("c9d0f20", OWNS_NOBODY)]})) == []
+
+
+def test_an_attribution_line_naming_a_sha_that_did_not_add_the_path_is_refused() -> None:
+    # THE PLANT. The line is text the check reads, so it is verified against git and not believed:
+    # `deadbee` adds nothing, and writing it down does not make it so.
+    planted = CLAIM_PARTY + ATTRIB.replace("c9d0f20", "deadbee")
+    findings = ct.grade({"99-borrowed.md": planted}, ct.recorded(LOG), TREE,
+                        adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))
+    assert [f.kind for f in findings] == ["attribution-does-not-hold"]
+    assert "deadbee" in findings[0].detail and "c9d0f20" in findings[0].detail
+
+
+def test_an_attribution_line_copied_from_another_ticket_carries_nothing() -> None:
+    findings = ct.grade({"98-copied.md": CLAIM_PARTY + ATTRIB}, ct.recorded(LOG), TREE,
+                        adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))
+    assert [f.kind for f in findings] == ["unattributed-check"]
+
+
+def test_an_attribution_line_naming_a_different_check_carries_nothing() -> None:
+    findings = ct.grade({"99-borrowed.md": CLAIM_PARTY + ATTRIB.replace("verify/party/",
+                                                                       "verify/provenance/")},
+                        ct.recorded(LOG), TREE, adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))
+    assert [f.kind for f in findings] == ["unattributed-check"]
+
+
+def test_an_undated_attribution_line_carries_nothing() -> None:
+    undated = CLAIM_PARTY + ATTRIB.replace("**Attribution, 2026-09-06 (ticket 99).**",
+                                           "**Attribution (ticket 99).**")
+    assert [f.kind for f in ct.grade({"99-borrowed.md": undated}, ct.recorded(LOG), TREE,
+                                     adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))] == \
+        ["unattributed-check"]
+
+
+# -- no could-not-look: every state it cannot see in is a red with its own sentence -----------------
+
+def test_history_this_checkout_cannot_read_is_red_and_not_a_shrug() -> None:
+    findings = ct.grade({"21-feeds.md": CLAIM_FEED}, ct.recorded(LOG), TREE, adds(None))
+    assert [f.kind for f in findings] == ["unreadable-history"]
+
+
+def test_a_path_no_commit_is_recorded_as_adding_is_red() -> None:
+    findings = ct.grade({"21-feeds.md": CLAIM_FEED}, ct.recorded(LOG), TREE, adds({}))
+    assert [f.kind for f in findings] == ["no-adding-commit"]
+
+
+def test_a_ticket_file_that_names_no_number_can_attribute_nothing() -> None:
+    findings = ct.grade({"notes.md": CLAIM_FEED}, ct.recorded(LOG), TREE,
+                        adds({FEED: [("3e83a16", OWNS_21)]}))
+    assert [f.kind for f in findings] == ["no-ticket-number"]
+
+
+def test_a_dated_correction_still_disposes_of_what_the_history_refuses() -> None:
+    corrected = CLAIM_PARTY + (
+        "\n> **Correction, 2026-09-06 (ticket 102).** The TRUTH line of 2026-08-29 is run 7, "
+        "graded before the build, and this ticket did not write `verify/party/`.\n")
+    assert ct.grade({"99-borrowed.md": corrected}, ct.recorded(LOG), TREE,
+                    adds({PARTY: [("c9d0f20", OWNS_NOBODY)]})) == []
+
+
+def test_a_legitimate_later_citation_stays_green() -> None:
+    # the alternative the round-2 reviewer rejected ("absent from the prior run, present in this
+    # one") would call this a lie: a ticket may honestly cite a run long after the one that first
+    # carried its check
+    later = CLAIM_FEED.replace("the TRUTH line of 2026-08-29", "run 113")
+    assert ct.grade({"21-feeds.md": later}, ct.recorded(LOG),
+                    trees(**{"2a1bb3a": {FEED}}), adds({FEED: [("3e83a16", OWNS_21)]})) == []
+
+
+# -- the run says HOW each citation passed, and prints every attribution ----------------------------
+
+def test_the_report_says_how_every_gate_proof_citation_passed() -> None:
+    files = {"21-feeds.md": CLAIM_FEED, "99-borrowed.md": CLAIM_PARTY + ATTRIB}
+    rep = ct.report(files, ct.recorded(LOG), TREE,
+                    adds({FEED: [("3e83a16", OWNS_21)], PARTY: [("c9d0f20", OWNS_NOBODY)]}))
+    assert rep.findings == []
+    assert rep.proved_by_commit == 1
+    assert rep.proved_by_attribution == 1
+    assert rep.claims_graded == 2
+
+
+def test_the_attributions_are_printed_and_not_only_counted() -> None:
+    rep = ct.report({"99-borrowed.md": CLAIM_PARTY + ATTRIB}, ct.recorded(LOG), TREE,
+                    adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))
+    assert [(p, n, sha, check) for p, n, sha, check, _subject in rep.attributed] == \
+        [("99-borrowed.md", 7, "c9d0f20", "verify/party/")]
+
+
+def test_a_disposed_citation_is_counted_as_disposed() -> None:
+    corrected = CLAIM_PARTY + (
+        "\n> **Correction, 2026-09-06 (ticket 102).** The TRUTH line of 2026-08-29 is run 7, "
+        "graded before the build.\n")
+    rep = ct.report({"99-borrowed.md": corrected}, ct.recorded(LOG), TREE,
+                    adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))
+    assert rep.findings == [] and rep.disposed == 1
+
+
+# -- R2-5, from round 2 of the ticket-80 review ----------------------------------------------------
+
+def test_each_d1_to_d5_fact_carries_a_load_bearing_sentence_as_well_as_a_marker() -> None:
+    # the three facts added for the D1-D5 ruling had a marker sentence and no load-bearing one, so
+    # an entry gutted to its heading stayed green -- the shape review F5 closed for every other item
+    for name in ("ticket13", "map", "adr/0025"):
+        wanted = [f for f in ct.RECORD_FACTS if f.item == 3 and f.file == name and f.want]
+        assert len(wanted) >= 2, name
+
+
+def test_a_finding_points_at_the_line_the_run_is_cited_on() -> None:
+    # measured on ticket 80 on 2026-09-06: `run 5` was reported fourteen lines early, against the
+    # `total=56` of a quoted TRUTH line, because the search was for the digits and not the citation
+    para = ("Run 7 is `TRUTH 2026-08-29T12:03Z run=7 hub=918022b pass=43 fail=11 total=56`.\n"
+            "Its check is in the gate, and ticket 18 cites run 5 correctly.\n")
+    found = ct.para_citations(para, 100)
+    assert [(c.kind, c.value, c.lineno) for c in found if c.value == "5"] == [("run", "5", 101)]

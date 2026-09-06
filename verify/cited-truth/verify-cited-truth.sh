@@ -10,8 +10,8 @@
 # WHAT IT GRADES. Every `.scratch/ecosystem/issues/*.md`:
 #   1. a paragraph offering a TRUTH line as proof that a check is in the gate must cite a line
 #      talk/truth.log actually recorded, whose `hub=` commit this checkout can read, whose TREE
-#      carries a check the ticket names -- or the ticket must carry a DATED correction naming
-#      that citation;
+#      carries a check the ticket names, WHICH GIT SAYS THAT TICKET ADDED -- or the ticket must
+#      carry a DATED correction naming that citation;
 #   2. a TRUTH figure (`pass= fail= skip= excluded= total= ceiling=`) quoted on the same text
 #      line as a run citation must be that run's figure.
 #
@@ -36,10 +36,28 @@
 #     printed on every run, and every exempted line is NAMED by path and line, so what is not
 #     graded is on the record instead of being a sentence somebody wrote once.
 #   * A NAMED CHECK is a `verify*.sh` matched by path suffix, or a directory the CITED tree
-#     carries one under, read from the section the claim is made in with correction paragraphs
-#     stripped. A bare `verify/` names nothing. What no text analysis can catch, and what makes
-#     rule 1 necessary rather than sufficient: a ticket naming, in its own Answer, a check it
-#     does not own that the cited tree happens to carry.
+#     carries one under, read from the section the claim is made in with correction and
+#     attribution paragraphs stripped. A bare `verify/` names nothing.
+#
+# WHO ADDED THE CHECK (eco-system ticket 102, 2026-09-06). Rule 1 used to end on a disclosed limit:
+# a ticket naming, in its own Answer, a check it does NOT own that the cited tree happens to carry,
+# passed. That is not a text question -- git knows who put the path there. The named check is now
+# resolved to its path in the cited tree, `git log --diff-filter=A --format=%H%x09%s <hub> --
+# <path>` is asked who added it, and the adding commit's subject must name the ticket making the
+# claim (the number the ticket's own filename carries). The scan is case-insensitive and collects
+# EVERY number a subject names, because the convention has six spellings in the log and one commit
+# built two tickets' checks; and the number must FOLLOW the word, because `27 tickets implemented`
+# names no ticket. No `--follow`: it is silently ignored on a directory, and where it does change
+# the answer it does not change the verdict. Measured 2026-09-06: 36 of 39 hub verify scripts have
+# an adding commit naming a ticket, and the three that do not are exactly run 7's directories.
+#
+# THE ESCAPE IS LOUD. A check that predates the convention or moved between trees is carried by a
+# DATED ATTRIBUTION LINE -- `**Attribution, YYYY-MM-DD (ticket NN)` naming the commit and the
+# check. It is bound to the ticket making the claim, to the check, and to a sha GIT agrees added
+# that path as of the cited commit: a line is text this check reads, so it is verified and never
+# believed. Every attribution used is printed, with the subject of the commit it names, and the run
+# says how many citations passed each way. What that cannot bind, and what is printed instead of
+# asserted: a ticket may still claim a check whose adding commit is genuinely nameless.
 #
 # NO COULD-NOT-LOOK, by decision (delegated, ADR-0025, 2026-09-06), following
 # verify/can-record/'s call. Everything it reads is in this repository and everything it runs is
@@ -48,6 +66,10 @@
 #     that is every historic commit, which is the honest answer and not a shrug; truth.yml's gate
 #     checkout is `fetch-depth: 0`, and this script says so when it finds a shallow one.
 #   * a cited line talk/truth.log does not record -> `no-such-line`.
+#   * history this checkout cannot read -> `unreadable-history`; a path git names no adding commit
+#     for -> `no-adding-commit`; a record file whose own name carries no ticket number, so nothing
+#     can be attributed to it -> `no-ticket-number`. Three more ways to be unable to look, three
+#     more reds (ticket 102).
 #   * no python, no git, no talk/truth.log, no issues directory -> FAIL here, named.
 # So this row's manifest entry declares NO skip pattern, and there is none to declare.
 #
@@ -66,7 +88,7 @@ GRADER="$HERE/cited_truth.py"
 
 if [ "${1:-}" = selfcheck ]; then
   "$PY" "$GRADER" selfcheck || exit 1
-  echo "PASS: selfcheck: a carried check passes; a lacking tree, an unreadable commit, an unrecorded line and a disagreeing figure each fail by name; a dated correction disposes and an undated one does not"
+  echo "PASS: selfcheck: a carried check its ticket added passes; a lacking tree, an unreadable commit, an unrecorded line, a disagreeing figure, a check added by a commit naming no ticket or another ticket, an attribution naming a sha that added nothing and a history this checkout cannot read each fail by name; a dated correction disposes and an undated one does not"
   exit 0
 fi
 
@@ -87,7 +109,7 @@ fi
 [ -d "$ROOT/.scratch/ecosystem/issues" ] || { echo "  !! .scratch/ecosystem/issues is missing: there is no record to grade"; bad=$((bad + 1)); }
 [ "$bad" -eq 0 ] && echo "  ok   git, talk/truth.log and .scratch/ecosystem/issues are all readable, and the checkout is not shallow"
 
-say "2. every TRUTH line the tickets cite is real, and its tree carries the check it is offered as proof of"
+say "2. every TRUTH line the tickets cite is real, its tree carries the check it is offered as proof of, and git says the ticket making the claim added that check"
 if [ "$bad" -eq 0 ]; then
   "$PY" "$GRADER" grade "$ROOT" || bad=$((bad + 1))
 else
@@ -105,7 +127,7 @@ fi
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: every TRUTH line quoted in .scratch/ecosystem/issues/*.md resolves to a line talk/truth.log records, every gate-proof citation names a commit whose tree carries a check the ticket names or carries a dated correction saying it does not, every figure quoted beside its run is that run's figure, and ticket 80's nine record corrections are each still there"
+  echo "PASS: every TRUTH line quoted in .scratch/ecosystem/issues/*.md resolves to a line talk/truth.log records, every gate-proof citation names a commit whose tree carries a check git says that ticket added -- or carries a dated attribution line naming the commit that added it, printed above, or a dated correction saying the citation proves nothing -- every figure quoted beside its run is that run's figure, and ticket 80's nine record corrections are each still there"
   exit 0
 fi
 echo "FAIL: $bad check(s) observed false (named above): the record cites a measurement that did not measure the thing"

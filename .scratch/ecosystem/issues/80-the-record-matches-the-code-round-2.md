@@ -41,6 +41,14 @@ interrupt the owner.
 > check reads the Question as a gate-proof paragraph because it cannot tell reported speech from
 > a claim, and this note is how the record says which it is.
 
+> **Correction, 2026-09-06 (eco-system ticket 102).** Item 1 below mentions run 5, inside a
+> sentence about a citation *ticket 18* makes correctly. Reported speech again: this ticket claims
+> nothing of run 5. The checks run 5's tree carries are `verify/party/`,
+> `verify/proportionality/` and `verify/provenance/`, none of them ticket 80's, and `c9d0f20`,
+> which added all three, names no ticket at all. Under ticket 80's own rule that sentence passed
+> silently, because the tree really does carry a check this ticket names somewhere in the same
+> section; under ticket 102's it is a red until the record says, as it now does, whose check it is.
+
 **The durable half is item 1's check, not item 1's sweep.** Ten corrections were the visible task.
 Fifteen tickets citing a measurement that never measured the thing is the estate's central defect,
 and a sweep fixes fifteen instances while a check stops the sixteenth.
@@ -78,13 +86,20 @@ date. A correction says what a citation failed to prove and may never supply the
 **What it refuses to grade, and prints rather than asserts.**
 
 - Whether the named check is the **right** check. It grades that the check existed in the measured
-  tree: necessary, never sufficient. What no text analysis closes, and what this leniency now
-  reduces to: a ticket naming, in its own Answer, a check it does not own that the cited tree
-  happens to carry. **Ticket 102 owns it** (charted 2026-09-06): "no text analysis closes it" was
-  right and beside the point — it is a git question, and the check already reads git. Resolve the
-  named check to its path in the cited tree, ask `git log --diff-filter=A` who added it, and
-  require that commit's subject to name the ticket making the claim. Measured: 34 of 37 hub checks
-  already qualify, and the three that do not are exactly run 7's three directories.
+  tree: necessary, never sufficient. **The case-D limit this bullet used to disclose is closed, by
+  ticket 102, on 2026-09-06**, and is struck rather than restated: a ticket naming, in its own
+  Answer, a check it does not own that the cited tree happens to carry no longer passes. "No text
+  analysis closes it" was right and beside the point — it is a git question, and this check already
+  reads git. The named check is resolved to its path in the cited tree,
+  `git log --diff-filter=A --format=%H%x09%s <hub> -- <path>` is asked who added it, and that
+  commit's subject must name the ticket making the claim; the escape is a dated attribution line,
+  bound to the ticket, the check and a sha git agrees added that path, and printed on every run.
+  Measured on this record, 2026-09-06: **36 of the 39** hub verify scripts have an adding commit
+  naming a ticket, and the three that do not are exactly run 7's `verify/party/`,
+  `verify/proportionality/` and `verify/provenance/`, all added by `c9d0f20`, which names none.
+  What is left, and is a disclosed limit of ticket 102's rather than of this one: a ticket may
+  still claim a check whose adding commit is genuinely nameless, and what the rule denies that
+  claim is silence.
 - Anything outside `issues/*.md`. A figure in `map.md`, an ADR or the deck is ticket 67(d)'s and
   `verify-demo.sh`'s question.
 - Three populations, **counted on every run and never written down here as fixed numbers**: lines
