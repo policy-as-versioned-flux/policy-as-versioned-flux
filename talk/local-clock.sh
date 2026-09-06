@@ -119,11 +119,13 @@ SCHEDULED="${LOCAL_CLOCK_LAUNCHD:-0}"
 #        skill's directory, run as `<validator> FILE --twin <hub> --headless` on every file
 #      | what it is
 # A row's validator is what makes its files proposable: a step whose validator is not shipped
-# cannot propose a file, whatever the file says about itself. Ticket 93 owns the derive row's
-# paths, pattern and validator names; they are placeholders until its skill lands.
+# cannot propose a file, whatever the file says about itself. The derive row (ticket 93) lands
+# beside twin/claims and NOT under twin/orgs/<org>/: the overlay loader (twin/model.py
+# Overlay.load) refuses any directory it does not read, so a forecasts/ collection there would
+# fail every adopter's twin gate. The round-4 placeholder said twin/orgs/{adopter}/forecasts.
 STEPS=(
   "classify|classify-and-judge|twin/claims|*.claim.yaml|assets/validate_claim.py|the unbound pool (news, market moves) classified against the adopter's overlay: bindings and positions, grade 5, no override, one claim file on a branch"
-  "derive|derive-probability|twin/orgs/{adopter}/forecasts|*.forecast.yaml|assets/validate_forecast.py|ticket 93: a probability derived from the adopter's world model and the subscribed feeds' dated series, with its basis, grade and the signals it rested on, written to the adopter's overlay; runs once .claude/skills/derive-probability/SKILL.md exists"
+  "derive|derive-probability|twin/forecasts|*.forecast.yaml|assets/validate_forecast.py|a probability derived from the adopter's world model and the served pool's dated series (market moves, news events), with its basis (derived or recorded), the grade the schema allows and the observations it rested on, one forecast file beside twin/claims; pre-registered by the merge onto main, scored by verify/twin-evals/verify-derived-forecast.sh (ticket 93)"
 )
 ALL_ADOPTERS="driftwood tuppence ludlow"
 
@@ -278,8 +280,8 @@ unit_config() {  # wt -- every config entry git reads there (system, global, loc
   cgit -C "$1" config --list --show-origin 2>/dev/null | grep -v '^command line:' || true
 }
 
-render_prompt() {  # step skill adopter unit_wt branch paths out
-  STEP="$1" SKILL="$2" ADOPTER="$3" UNIT_WT="$4" BRANCH="$5" PATHS="$6" OUT="$7" \
+render_prompt() {  # step skill adopter unit_wt branch paths pattern validator out
+  STEP="$1" SKILL="$2" ADOPTER="$3" UNIT_WT="$4" BRANCH="$5" PATHS="$6" PATTERN="$7" VALIDATOR="$8" OUT="$9" \
   RUN_DIR="$RUN_DIR" HUB="$HUB" ESTATE="$ESTATE" INJECTED_FILE="$INJECTED_FILE" TEMPLATE="$TEMPLATE" \
   "$PY" - <<'PY'
 import json, os
@@ -290,13 +292,13 @@ if inj:
              "An INJECTED external signal is present at `" + inj + "`:\n\n```json\n"
              + open(inj).read().strip() + "\n```\n\n"
              "Treat it as one more unbound dated statement beside the real pool. It is not in any "
-             "published feed and it is NOT real. Every claim file you write MUST carry "
-             "`injected: true` at its top level and `injected: true` on every claim, and its "
-             "`derived_from` must NOT cite the injected signal as a pin (it has none). Nothing "
-             "from this run is citable and it will never be pushed.\n")
+             "published feed and it is NOT real. Every file you write MUST carry "
+             "`injected: true` at its top level and `injected: true` on every claim or forecast in "
+             "it, and its `derived_from` must NOT cite the injected signal as a pin (it has none). "
+             "Nothing from this run is citable and it will never be pushed.\n")
 else:
-    block = "## This is a live run\n\nNo injected signal. Read only the published pool at the pinned versions.\n"
-fields = {k: os.environ.get(k, "") for k in ("STEP", "SKILL", "ADOPTER", "UNIT_WT", "BRANCH", "PATHS", "RUN_DIR", "HUB", "ESTATE")}
+    block = "## This is a live run\n\nNo injected signal. Read only the published pool at the served versions.\n"
+fields = {k: os.environ.get(k, "") for k in ("STEP", "SKILL", "ADOPTER", "UNIT_WT", "BRANCH", "PATHS", "PATTERN", "VALIDATOR", "RUN_DIR", "HUB", "ESTATE")}
 fields["TITLE_FILE"] = os.path.join(os.environ["RUN_DIR"], f"{fields['STEP']}-{fields['ADOPTER']}.pr-title")
 fields["BODY_FILE"] = os.path.join(os.environ["RUN_DIR"], f"{fields['STEP']}-{fields['ADOPTER']}.pr-body.md")
 fields["INJECTED_BLOCK"] = block
@@ -342,7 +344,7 @@ run_step() {  # step skill paths pattern validator adopter
     record --step "$step" --adopter "$adopter" --status fail --reason "worktree add failed" --base "$base"; return 1
   fi
   local prompt="$RUN_DIR/$tag.system.md" title="$RUN_DIR/$tag.pr-title" body="$RUN_DIR/$tag.pr-body.md"
-  render_prompt "$step" "$skill" "$adopter" "$wt" "$branch" "$paths" "$prompt"
+  render_prompt "$step" "$skill" "$adopter" "$wt" "$branch" "$paths" "$pattern" "$validator_rel" "$prompt"
 
   if [ "$DRY" = 1 ]; then
     echo "dry   $tag: would run  $CLAUDE -p \"/$skill $adopter\" --max-turns $MAX_TURNS --append-system-prompt \"\$(cat $prompt)\"  (worktree $wt on $branch; prompt kept at $prompt)"

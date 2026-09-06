@@ -166,3 +166,19 @@ causal accounts coexist as ensemble spread**, adjudicated by calibration rather 
 - [x] Identification/confounding discipline + its honest limits.
 - [x] Exercised on a real claim from each co-flagship (Qwikster→churn grade-1 elasticity; EUV→node slip
       causal chain vs the structural fan-out below it).
+
+## Note, 2026-09-06 (eco-system ticket 93, delegated under ADR-0025): two rulings reopened, this far
+
+Q1's corollary -- "reject arithmetic on ordinal scales" -- and Q2's use-gating by grade are what
+eco-system ticket 93 (the twin derives a probability from signals; owner-reasoned, ticket 75 Q10)
+had to reopen, and it reopens them only as far as a derivation needs. **Q1:** one operation on
+grades is admitted and no other: a derived probability carries the WEAKEST grade among the
+signals it rests on, an order statistic the ladder already makes when it gates, not a sum, a mean
+or a weight. `twin/derived_forecast.py::validate` refuses a `weight` or `score` on a signal, any
+`probability` on a market signal (a level is never a probability), and a forecast graded stronger
+than its weakest input. **Q2:** unchanged in substance -- a model's derivation is a model
+assertion, grade 5, informs and ranks, never prices -- and extended to the probability itself:
+every derived forecast carries `evidence_grade: 5` and `price_eligible: false`. Two things the
+ladder could not grade are recorded rather than graded: a recorded belief (the world-model
+schema carries no source and no grade for one; the artefact says `null` and why), and the ladder
+itself gains no rung. ADR-0024 point 6 carries the dated note beside the clock that runs it.

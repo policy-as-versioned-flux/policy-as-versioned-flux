@@ -53,6 +53,26 @@ step="${LOCAL_CLOCK_STEP:?}"; adopter="${LOCAL_CLOCK_ADOPTER:?}"
 what="${LOCAL_CLOCK_STUB:-claim}"
 case "$what" in
   nothing) echo '{"type":"result","result":"LOCAL-CLOCK: nothing every pool entry is bound (stub-claude.sh, a stand-in)"}'; exit 0;;
+  forecast|forecast-fabricated)
+    # Ticket 93, the derive row: the skill's own worked example (which cites the observations
+    # verify/twin-evals/derived_forecast_fixture.py serves) committed as if a model had derived
+    # it. `forecast-fabricated` changes one cited level to one the feed does not carry -- the
+    # clock must refuse it. On a rehearsal the file says injected on its face and on every
+    # forecast, so the validator refuses it, by design.
+    mkdir -p "$wt/twin/forecasts"
+    f="$wt/twin/forecasts/$(date -u +%Y-%m-%d)-stub-$step.forecast.yaml"
+    src="$(dirname "${BASH_SOURCE[0]}")/../../.claude/skills/derive-probability/assets/example-forecast.yaml"
+    if [ -n "${LOCAL_CLOCK_INJECTED:-}" ]; then
+      { echo "injected: true"; awk '{print} /^  - id: /{print "    injected: true"}' "$src"; } >"$f"
+    else
+      cp "$src" "$f"
+    fi
+    [ "$what" = forecast-fabricated ] && sed -i.bak 's/to_level: 0\.45/to_level: 0.99/' "$f" && rm -f "$f.bak"
+    git -C "$wt" add -- twin/forecasts
+    git -C "$wt" commit -q -m "twin: a stub forecast from the local clock ($step, $adopter)"
+    echo "twin: stub forecast ($step, $adopter)" >"$run/$step-$adopter.pr-title"
+    printf '%s\n' "A stub forecast. A model ran on the owner's local clock (ticket 92), not on a GitHub clock; no override is claimed; nothing prices; the clock never merges." >"$run/$step-$adopter.pr-body.md"
+    echo '{"type":"result","result":"LOCAL-CLOCK: ok one stub forecast committed (stub-claude.sh, a stand-in for claude)"}'; exit 0;;
 esac
 mkdir -p "$wt/twin/claims"
 claim="$wt/twin/claims/$(date -u +%Y-%m-%d)-stub-$step.claim.yaml"

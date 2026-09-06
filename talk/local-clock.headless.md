@@ -11,25 +11,31 @@ differs from a human-run one. Where they conflict, this note wins.
   skill's own `assets/`.
 - The adopter's checkout for THIS run: `{{UNIT_WT}}`, a worktree already on the branch
   `{{BRANCH}}` (cut from `origin/main` as fetched at the start of this run, never from the
-  clone's own `main`). Read the overlay, the pins and `twin/signals.yaml` there, and write the
-  claim file there. Do not touch `{{ESTATE}}/{{ADOPTER}}` itself.
+  clone's own `main`). Read the overlay, the pins and `twin/signals.yaml` there, and write this
+  step's file there. Do not touch `{{ESTATE}}/{{ADOPTER}}` itself.
 - The publishers: `{{ESTATE}}/feeds`, `{{ESTATE}}/ico`, `{{ESTATE}}/nist`, `{{ESTATE}}/platform`,
-  `{{ESTATE}}/insurer` -- read feeds at the version the adopter's `party.yaml` pins.
+  `{{ESTATE}}/insurer` -- read feeds at the version the adopter's `party.yaml` pins, and the
+  pool (`news`, `market-moves`) at the version its served envelope declares.
 - This run's directory: `{{RUN_DIR}}`.
+- This step's file: one `{{PATTERN}}` under `{{PATHS}}`, checked by
+  `.claude/skills/{{SKILL}}/{{VALIDATOR}}`.
 
 ## What a headless run may and may not do
 
 1. **Where the skill says "stop and ask", do not ask.** Leave the item unbound (or the position
-   as the twin inferred it) and record the reason in the claim file's `evidence`.
-2. **Write no `override` claim.** An override is a human's calibrated judgement, claimed by a
-   role; nobody is at the keyboard. Bindings and positions only, `evidence_grade: 5`,
-   `price_eligible: false`. Nothing you write prices.
-3. In the claim file's `run:` block set `headless: true`, `clock: local-clock`,
+   as the twin inferred it, or the probability as the world model records it) and record the
+   reason in the file's `evidence` or `reasoning`.
+2. **Write no `override` claim, and price nothing.** An override is a human's calibrated
+   judgement, claimed by a role; nobody is at the keyboard. Bindings and positions only,
+   `evidence_grade: 5`, `price_eligible: false`. A derived probability is grade 5 for the same
+   reason, and a recorded belief carries the grade the schema allows, which is none. Nothing
+   you write prices.
+3. In the file's `run:` block set `headless: true`, `clock: local-clock`,
    `operator_role: model-steward` (the role that answers for what is committed against the
    model; the owner holds it and the owner's schedule ran you), and
    `no_model_ran_on_a_clock: false` with `clock_kind: local (ticket 92), not a GitHub clock`.
 4. **Commit on `{{BRANCH}}` in `{{UNIT_WT}}` and only files under: `{{PATHS}}`.** One commit.
-   Use `git -C {{UNIT_WT}} add -- <the claim file>` and `git -C {{UNIT_WT}} commit`. Anything
+   Use `git -C {{UNIT_WT}} add -- <the file>` and `git -C {{UNIT_WT}} commit`. Anything
    outside those paths is a declaration, and the clock refuses the whole commit. **Do not pass
    `--author`, `--gpg-sign`/`-S` or any `-c commit.gpgsign`/`-c user.*`:** your environment
    already names the commit as the clock's (`local clock (headless model, ticket 92)`) and
@@ -43,10 +49,10 @@ differs from a human-run one. Where they conflict, this note wins.
    GitHub clock; no override is claimed; the clock never merges."
 6. If there is nothing to propose (every pool entry is already bound, or nothing fits), commit
    nothing and say so. Leave the worktree clean.
-7. Validate before you commit: `python3 .claude/skills/{{SKILL}}/assets/validate_claim.py
-   <claim file> --twin . --headless` where that validator exists. The clock runs the same
-   command after you stop; a file that does not say `headless: true` or carries an override
-   fails the step, whatever this note was answered with.
+7. Validate before you commit: `python3 .claude/skills/{{SKILL}}/{{VALIDATOR}} <the file>
+   --twin . --headless`. The clock runs the same command after you stop; a file that does not
+   say `headless: true`, carries an override, or cites an observation the served feed does not
+   carry fails the step, whatever this note was answered with.
 8. End with one line: `LOCAL-CLOCK: <ok|nothing|failed> <one sentence>`.
 
 {{INJECTED_BLOCK}}

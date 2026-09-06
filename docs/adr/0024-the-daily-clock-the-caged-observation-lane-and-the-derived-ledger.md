@@ -143,6 +143,34 @@ write, and what it may never write.
      verdicts, reading the origin afterwards; the gate's leak scan now reads the committed tree
      of HEAD and `origin/main` of every checkout plus every `local-clock/**` branch by ref, and
      prints its limits as numbers.
+   - *2026-09-06, ticket 93 (the twin derives a probability; ticket 75 Q10 owner-reasoned, the
+     rest delegated under ADR-0025).* The `derive` row of the steps table is live:
+     `/derive-probability` writes one `twin/forecasts/<date>-<slug>.forecast.yaml` in the
+     adopter's repository, **beside `twin/claims/` and never under `twin/orgs/<org>/`** -- the
+     overlay loader refuses a directory it does not read, so the round-4 placeholder path would
+     have failed every adopter's twin gate. Three rulings this row reopens, each only as far as
+     the derivation needs. **The grade-5 ruling** (twin tickets 08 Q2 and 11 Q2: an automated or
+     model assertion is grade 5, informs and ranks, never prices) extends without change to the
+     derived probability itself: it is a model's assertion, it carries `evidence_grade: 5`, and
+     `price_eligible: false` is required on every forecast. The "headless run binds and
+     positions at grade 5" rule above is the same rule wearing the derive row. **The
+     ordinal-arithmetic ruling** (twin ticket 08 Q1, track 02: no arithmetic on ordinal scales)
+     is reopened to admit exactly one operation and no other: a derived probability's grade is
+     the WEAKEST grade among the signals it rests on -- an order statistic, a comparison the
+     ladder already makes -- and the validator refuses a `weight` or `score` on a signal and any
+     grade stronger than the weakest input. Sums, means and weights on grades stay refused.
+     **The world-model schema** (`twin/schema.py` `world-model`: `beliefs: mapping_of(probability)`)
+     carries neither a source nor a grade for a recorded belief, and the ladder has no rung for an
+     unsourced authored number. That is recorded as a finding on the artefact (`evidence_grade:
+     null`, `grade_absent_because`) and printed as a count by the check; the schema is not
+     loosened. What the row adds to the lane: the forecast is pre-registered by the date the
+     MERGE brings it onto the adopter's `main` (first-parent history of `origin/main`, never a
+     field the twin writes), the outcome is the overlay's own `outcomes/` record merged on or
+     after its `resolved_on`, and the score is computed by
+     `verify/twin-evals/verify-derived-forecast.sh` with `twin/scoring.py` and never read from a
+     file. The pool the derivation rests on (`news`, `market-moves`) is pinned by no adopter and
+     tagged by no publisher on this date; the check prints both counts, and ticket 23's rule
+     holds: nothing derived from it is price-eligible.
 
 ## Alternatives
 

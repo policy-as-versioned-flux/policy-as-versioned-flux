@@ -1,0 +1,121 @@
+# A worked forecast file from the derive-probability skill (ecosystem ticket 93), and the
+# fixture the gate validates it against (verify/twin-evals/derived_forecast_fixture.py builds a
+# throwaway adopter and a throwaway feeds publisher whose served envelopes carry exactly the two
+# observations cited below). It is a WORKED EXAMPLE over a FIXTURE, not a committed forecast: a
+# real run writes this file into the adopter's own repo at twin/forecasts/<date>-<slug>.forecast.yaml
+# (never under twin/orgs/<org>/: the overlay loader refuses a directory it does not read) and the
+# local clock lands it as a pull request there. Nothing here is merged anywhere.
+#
+# Two probabilities, one of each basis the ticket names (item 4): the first is DERIVED from two
+# served observations and says so; the second is a RECORDED belief the world model carries,
+# unchanged, because nothing in the pool bore on it. Both carry the perspective they are a
+# forecast for and the currency that seat prices in. Neither prices: a derivation is a model
+# assertion (grade 5) and the ladder prices only inside pricing_threshold (2).
+schema: twin.derived-forecast/v1
+org: driftwood
+
+run:
+  skill: derive-probability
+  run_at: '2026-02-01'
+  # The role that answers for what is committed against the model (twin/roles.yaml). Headless:
+  # the local clock ran this with nobody at the keyboard, and the clock tells the validator so
+  # (--headless); the file must agree on its face.
+  operator_role: model-steward
+  headless: true
+  clock: local-clock
+  clock_kind: local (ticket 92), not a GitHub clock
+  no_model_ran_on_a_clock: false
+
+# Every served envelope the signals below came from, in inherits[] shape -- the same shape a
+# claim file's derived_from uses, so provenance reads the same on both sides of the seam. Cited
+# by the envelope's OWN name and version, as classify-and-judge cites the pool: on 2026-09-06 no
+# adopter pinned either feed and the publisher had cut no signed tag for either, which the check
+# prints as a number and is why nothing derived from them is price-eligible (ticket 23).
+derived_from:
+  - { party: feeds, kind: feed, name: market-moves, version: '1.0.0' }
+  - { party: feeds, kind: feed, name: news, version: '1.0.0' }
+
+forecasts:
+  # 1. DERIVED. The recorded belief was 0.2; two dated observations moved it; the model's
+  #    judgement of where it now sits is 0.27, and the reasoning says why in words. No number
+  #    below was added, averaged or weighted to reach it: the grades are compared (a derivation
+  #    is no stronger than its weakest signal), never summed, and a market LEVEL is never read
+  #    as a probability -- only the MOVE between two levels is a signal.
+  - id: driftwood-fixture-supply-2026-2026-02-01
+    scenario: fixture-supply-2026
+    proposition: a-fixture-supplier-fails-within-the-horizon
+    # The scenario's own horizon, copied so the file is readable alone; the validator checks it
+    # equals the scenario's. The outcome date is the scenario's, never the forecast's to choose.
+    resolves_on: '2026-06-30'
+    perspective: driftwood
+    currency: GBP
+    probability: 0.27
+    basis: derived
+    evidence_grade: 5
+    price_eligible: false
+    prices_through: >-
+      composition under the perspective, only through a causal path graded inside
+      path_admission_threshold; this artefact itself never prices
+    # The world model's own number, kept beside the derivation the way an override keeps the
+    # position it answers, so the disagreement is on the record and both can be scored.
+    recorded_belief:
+      world_model: reference-map
+      probability: 0.2
+    signals:
+      - kind: market-move
+        from: { party: feeds, kind: feed, name: market-moves, version: '1.0.0' }
+        market: '0xfixture'
+        venue: polymarket
+        from_date: '2026-01-02'
+        to_date: '2026-01-03'
+        from_level: 0.40
+        to_level: 0.45
+        # twin/market_signals.move_statement's own sentence, verbatim; the validator compares it.
+        statement: >-
+          polymarket price for '0xfixture' moved from 0.40 to 0.45 (up) between 2026-01-02 and
+          2026-01-03
+        evidence_grade: 5
+      - kind: news-event
+        from: { party: feeds, kind: feed, name: news, version: '1.0.0' }
+        event: fixture-publisher-tagged
+        date: '2026-01-03'
+        url: https://example.invalid/fixture/releases/tag/v1.0.0
+        statement: the fixture publisher tagged v1.0.0 of the feed this organisation reads.
+        evidence_grade: 5
+    reasoning: >-
+      The reference map put a tier-one supplier failure at 0.2 over the horizon. On 2026-01-03 a
+      liquid market moved up five points on the supply-constraint question in one day, and the
+      same day the publisher this organisation pins cut a release. Neither is an observation of
+      the supplier; both are dated, externally authored changes that bear on it. The belief moves
+      up, not to the market's level (a level is a biased estimator of unknown scale), and not by
+      an arithmetic of grades: to 0.27, a judgement, recorded as grade 5 so it is auditable as an
+      assertion and never mistaken for evidence.
+
+  # 2. RECORDED. Nothing served bore on this scenario, so the probability is the number read from
+  #    the world model, unchanged, and the artefact says so. It carries NO grade: the world-model
+  #    schema (twin/schema.py `world-model`: beliefs is mapping_of(probability)) carries neither a
+  #    source nor a grade for a belief, and the ladder has no rung for an unsourced authored
+  #    number. The artefact records that finding instead of inventing a rung.
+  - id: driftwood-fixture-quiet-2026-2026-02-01
+    scenario: fixture-quiet-2026
+    proposition: a-fixture-quiet-thing-happens
+    resolves_on: '2026-06-30'
+    perspective: driftwood
+    currency: GBP
+    probability: 0.1
+    basis: recorded
+    evidence_grade: null
+    grade_absent_because: >-
+      twin/schema.py world-model: beliefs is mapping_of(probability) -- a recorded belief carries
+      no source and no grade, and twin/evidence-ladder.yaml has no rung for an unsourced authored
+      number (ecosystem ticket 93, a finding, not a schema change)
+    price_eligible: false
+    prices_through: >-
+      composition under the perspective, only through a causal path graded inside
+      path_admission_threshold; this artefact itself never prices
+    recorded_belief:
+      world_model: reference-map
+      probability: 0.1
+    reasoning: >-
+      No move and no event in the served pool bears on this scenario's components. The reference
+      map's 0.1 stands, unchanged, and is scored as what it is: a recorded belief.

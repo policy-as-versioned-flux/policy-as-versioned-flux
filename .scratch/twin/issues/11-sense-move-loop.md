@@ -153,3 +153,18 @@ emission protecting the calibration record from selection bias.
 - [x] Cadence + re-price triggers, sufficient to generate forecast volume.
 - [x] Exercised on a co-flagship signal each (Intel process-node observation propagating bidirectionally;
       the unbound materials-paper → crypto-dependency rescue as the generalised quantum/HNDL case).
+
+## Note, 2026-09-06 (eco-system ticket 93, delegated under ADR-0025): the grade-5 ruling, reopened
+
+Q2 made an automated binding grade 5 -- "it informs and ranks, it cannot price a scored forecast
+on its own" -- and Q1 said an inferred position "must not be presented with false precision (no
+arithmetic on ordinal scales)". Eco-system ticket 93 builds the thing this ticket's loop was
+missing: the twin now DERIVES a probability from bound signals (a model call on the owner's
+local clock, ticket 92) instead of reading one from a world model's `beliefs`. The ruling
+extends without change to the derivation: it is a model assertion, `evidence_grade: 5`, never
+price-eligible, and it carries the weakest grade of the signals it rests on (a comparison, never
+arithmetic). What the loop gains is the scoring half Q1 promised for overrides, now for the
+twin's own forecast: pre-registered by the date the merge lands it on the adopter's `main`,
+scored by `twin/scoring.py` against the overlay's own `outcome` record, with the recorded belief
+kept beside the derivation so the disagreement is on the record. The full note is on ADR-0024
+point 6 and twin ticket 08.

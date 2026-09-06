@@ -229,10 +229,18 @@ the units for the flag, and one hit is a FAIL: a rehearsal is never cited.
 Every file the step's commit carries must sit under the allowed paths AND match the pattern, and
 every one is run through `<skill dir>/<validator> FILE --twin <hub> --headless`; a row whose
 validator is not shipped cannot propose anything, whatever the file says about itself. The
-`derive` row is already there, pointing at `/derive-probability`, with placeholder names
-(`twin/orgs/{adopter}/forecasts`, `*.forecast.yaml`, `assets/validate_forecast.py`) that ticket
-93 owns and may rename in one line; until `.claude/skills/derive-probability/SKILL.md` exists
-the clock records that step as `skip: skill derive-probability not shipped`, by name. Ship the
-skill with its validator and the row runs. What the clock guarantees for any row: the branch is
-cut from `origin/main`, the commit is the clock's and unsigned, nothing outside the row's paths
-or pattern is proposed, and `--push` is refused unless `gh` and the origin answered first.
+headless note the clock appends to the system prompt names the row's paths, pattern and
+validator to the model, so a new row needs no change to it. What the clock guarantees for any
+row: the branch is cut from `origin/main`, the commit is the clock's and unsigned, nothing
+outside the row's paths or pattern is proposed, and `--push` is refused unless `gh` and the
+origin answered first.
+
+The `derive` row (ticket 93, 2026-09-06) runs `/derive-probability`: one
+`twin/forecasts/<date>-<slug>.forecast.yaml` in the adopter's repo, beside `twin/claims/` and
+NOT under `twin/orgs/<org>/` (the overlay loader refuses a directory it does not read), checked
+by `.claude/skills/derive-probability/assets/validate_forecast.py`. Every probability in it
+carries a perspective, a currency, a basis (`derived` from served observations, or `recorded`
+from the world model unchanged) and the grade the schema allows; none prices. It is
+pre-registered by the date the merge brings it onto the adopter's `main` and scored by
+`verify/twin-evals/verify-derived-forecast.sh` against the overlay's own `outcomes/` record,
+so propose early: a forecast merged on or after its outcome date is not scored.
