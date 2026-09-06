@@ -143,7 +143,7 @@ body. Command and output are in the report.
 2. **The stop runs after the cage, not before it.** `delegated`. A clock appends observations
    (ADR-0024); a fall that stopped the recording would destroy the evidence of itself.
 3. **Only the NEWEST transition is graded; older ones are counted.** `delegated`.
-   `talk/truth.log` is append-only and `verify/can-record/` refuses a hand-edited line, so a fall
+   `talk/truth.log` is append-only and ticket 100's check refuses a hand-edited line, so a fall
    between two 2026-08-31 runs has no finishing move, and a red with no finishing move is the
    shape ticket 55 rules out. Thirteen of the log's forty-two transitions carried an unaccounted
    fall on 2026-09-06; the number is printed on every run.
@@ -158,9 +158,9 @@ body. Command and output are in the report.
    out of scope (ticket 90's shape), so there is nothing to answer; demanding an Answer would
    have made the record write a fake one. Ticket 68's 2026-09-02 closure line is the shape.
 7. **Neither new script declares a could-not-look for its own instruments.** `delegated`,
-   following `verify/can-record/` and `verify/cited-truth/`. Everything they read is in this
+   following the calls tickets 100 and 80 recorded for their own checks. Everything they read is in this
    repository and everything they run is git and python, so a missing interpreter is RED, not a
-   shrug. `verify-derived-status.sh` does declare a `waits:` — but for the ESTATE's state (no
+   shrug. The derived-status wrapper does declare a `waits:` — but for the ESTATE's state (no
    grade table recorded yet), which is what `waits:` means.
 8. **A resolved ticket naming no gate check is counted, never failed.** `delegated`. Research,
    grilling and org-setup tickets exist and no gate check can grade a reading list; failing them

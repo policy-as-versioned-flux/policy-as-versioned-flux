@@ -433,8 +433,13 @@ jobs:
                    --falls talk/verify-falls.txt --root . 2>&1)"; rc=$?
           printf '%s\n' "${out}"
           printf '%s\n' "${out}" >> "$GITHUB_STEP_SUMMARY"
-          if [ "${CAN_RECORD}" != "yes" ]; then
-            echo "this run recorded nothing, so the transition above is the default branch's newest and not this run's. It is reported here and blocks nothing."
+          # `:-` on purpose: if the guard step failed before writing CAN_RECORD (a shallow
+          # checkout, an empty default branch name) this step must still print the comparison
+          # rather than die on an unbound variable. A run with no verdict is treated as a run
+          # that did not record, which is the reporting path; the guard's own failure is what
+          # reds that run.
+          if [ "${CAN_RECORD:-}" != "yes" ]; then
+            echo "this run recorded nothing, or could not say whether it did, so the transition above is the default branch's newest and not this run's. It is reported here and blocks nothing."
             exit 0
           fi
           if [ "${rc}" -ne 0 ]; then

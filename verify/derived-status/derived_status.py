@@ -46,6 +46,15 @@ Everything else is COUNTED, never failed: a resolved ticket that names no check 
 carry. Those counts are printed on every run, so what is outside the derivation is a number that
 moves rather than a sentence somebody wrote once.
 
+ONE LIMIT INHERITED FROM named_checks(), which verify/cited-truth/ records for itself and which
+bites harder here. "The check a ticket names" is every check-shaped path in backticks in its
+Answer, and no text analysis can tell a check a ticket OWNS from one it merely mentions. So a
+ticket that discusses another ticket's check in its Answer will derive its own status partly from
+that check, and a red there reads as this ticket's regression. The mitigation is the record's,
+not this module's: name in an Answer the checks the ticket built, and refer to other people's by
+their ticket number. Ticket 59's own Answer was rewritten once, on the day it was written, for
+exactly this reason -- it had named can-record's and cited-truth's directories in passing.
+
     derived_status.py report --issues DIR --grades FILE --log FILE
     derived_status.py selfcheck
 """
