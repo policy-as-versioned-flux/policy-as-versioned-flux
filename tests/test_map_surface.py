@@ -57,12 +57,13 @@ def test_the_prose_shape_is_read_with_and_without_the_skip_clause():
     assert b.counts == {"pass": 65, "fail": 0, "skip": 16, "total": 83}
 
 
-def test_the_key_shape_needs_two_keys_or_a_run_beside_it():
+def test_the_key_shape_is_read_and_a_lone_key_identifies_nothing():
     (fig,) = ms.figures_quoted("pass=53 fail=7 skip=21\n")
     assert fig.counts == {"pass": 53, "fail": 7, "skip": 21}
-    assert ms.figures_quoted("decomposes the local `fail=24` row by row\n") == []
-    (lone,) = ms.figures_quoted("run 13 recorded fail=7 and nothing else\n")
-    assert lone.counts == {"fail": 7}
+    (lone,) = ms.figures_quoted("decomposes the local `fail=24` row by row\n")
+    assert lone.counts == {"fail": 7 * 0 + 24}
+    r = ms.grade_figures("decomposes the local `fail=24` row by row\n", LOG)
+    assert r.findings == [] and r.exempted == [] and r.unattributed == 1
 
 
 def test_a_bare_number_is_not_a_figure():
@@ -102,23 +103,80 @@ def test_a_figure_beside_a_run_the_log_never_recorded_is_red():
     assert kinds(r.findings) == ["no-such-line"]
 
 
-def test_a_line_that_calls_itself_a_rehearsal_is_counted_not_graded():
-    r = ms.grade_figures("a local rehearsal reached 65 pass, 0 fail, 16 could-not-look of 83\n",
+def test_a_line_that_says_not_citable_is_exempt_and_the_exemption_is_named():
+    r = ms.grade_figures("65 pass, 0 fail, 16 could-not-look of 83, from a run not citable here\n",
                          LOG)
     assert r.findings == []
     assert r.declared_uncitable == 1
     assert r.graded == 0
+    assert r.exempted == [(ms.MAP, 1, "not citable")]
 
 
-def test_a_dated_correction_naming_the_figure_disposes_of_it():
+def test_the_runners_own_uncitable_tokens_are_the_other_two_phrases():
+    for token in ("fixture=1", "run=local"):
+        r = ms.grade_figures(f"65 pass, 0 fail of 83 on a line carrying {token}\n", LOG)
+        assert r.findings == [], token
+        assert r.declared_uncitable == 1, token
+
+
+@pytest.mark.parametrize("laundered", [
+    # review F1: each of these was exempt under the seven-substring bag, reported as +1 in a count
+    "verify/local-clock: the surface stood at 65 pass, 0 fail, 16 could-not-look of 83\n",
+    "the surface stood at 65 pass, 0 fail of 83, and that is NOT a rehearsal\n",
+    "as the Actions log confirms, the surface stood at 65 pass, 0 fail of 83\n",
+    "no fixture was used: the surface stood at 65 pass, 0 fail of 83\n",
+    "the surface stood at 65 pass, 0 fail of 83, hypothetically\n",
+])
+def test_a_bag_of_words_disclaimer_launders_nothing(laundered):
+    r = ms.grade_figures(laundered, LOG)
+    assert r.findings and not r.exempted
+
+
+def test_a_negated_marker_and_a_quoted_one_each_spend_nothing():
+    negated = ms.grade_figures("65 pass, 0 fail of 83, and this does not make it not citable\n",
+                               LOG)
+    assert negated.findings and not negated.exempted
+    quoted = ms.grade_figures("grep for `not citable`: 65 pass, 0 fail of 83\n", LOG)
+    assert quoted.findings and not quoted.exempted
+    linked = ms.grade_figures("see [x](docs/not citable.md): 65 pass, 0 fail of 83\n", LOG)
+    assert linked.findings and not linked.exempted
+
+
+def test_a_wrong_run_figure_is_not_excused_by_a_disclaimer_word():
+    # review F1's third case: `planted` anywhere on the line excused a figure that disagreed
+    # with the run cited beside it.
+    r = ms.grade_figures("run 13 recorded 43/11/0 of 56 and was planted\n", LOG)
+    assert kinds(r.findings) == ["figure-disagrees"]
+
+
+def test_a_dated_correction_directly_below_the_claim_disposes_of_it_and_says_so():
     text = (
         "The surface went to 65 pass, 0 fail, 16 could-not-look of 83.\n"
         "\n"
-        "> **Correction, 2026-08-31.** The 65/0/16 figure was a local rehearsal and no TRUTH\n"
-        "> line records it.\n"
+        "> **Correction, 2026-08-31.** The 65/0/16 figure was unrecorded and no TRUTH\n"
+        "> line carries it.\n"
     )
     r = ms.grade_figures(text, LOG)
     assert r.findings == []
+    assert r.disposed == 1
+    assert r.disposals == [(ms.MAP, 1, "2026-08-31")]
+
+
+def test_a_correction_disposes_only_for_the_paragraph_directly_above_it():
+    # review F2: the correction of a sentence used to launder a fresh copy of that same sentence
+    # written into a later section -- the exact sentence this ticket was charted to refuse.
+    text = (
+        "The surface went to 65 pass, 0 fail, 16 could-not-look of 83.\n"
+        "\n"
+        "> **Correction, 2026-08-31.** The 65/0/16 figure was unrecorded.\n"
+        "\n"
+        "## A section written later\n"
+        "\n"
+        "Nothing is red: 65 pass, 0 fail, 16 could-not-look of 83.\n"
+    )
+    r = ms.grade_figures(text, LOG)
+    assert kinds(r.findings) == ["no-such-figure"]
+    assert r.findings[0].lineno == 7
     assert r.disposed == 1
 
 
@@ -126,7 +184,7 @@ def test_an_undated_correction_disposes_of_nothing():
     text = (
         "The surface went to 65 pass, 0 fail, 16 could-not-look of 83.\n"
         "\n"
-        "> **Correction.** The 65/0/16 figure was a local rehearsal.\n"
+        "> **Correction.** The 65/0/16 figure was unrecorded.\n"
     )
     assert kinds(ms.grade_figures(text, LOG).findings) == ["no-such-figure"]
 
@@ -147,7 +205,7 @@ def test_a_correction_naming_a_different_figure_disposes_of_nothing():
     text = (
         "The surface went to 65 pass, 0 fail, 16 could-not-look of 83.\n"
         "\n"
-        "> **Correction, 2026-08-31.** The 40/16/0 figure was a local rehearsal.\n"
+        "> **Correction, 2026-08-31.** The 40/16/0 figure was unrecorded.\n"
     )
     assert kinds(ms.grade_figures(text, LOG).findings) == ["no-such-figure"]
 
@@ -184,18 +242,14 @@ def test_the_runner_is_never_graded_as_one_of_the_checks_it_runs():
     assert ms.grade_checks("`verify-all.sh --selfcheck` proves the instrument\n", MANIFEST) == []
 
 
-def test_a_check_the_line_declares_not_in_the_gate_yet_is_counted_not_graded():
-    pending: list[int] = []
-    line = "the counterpart to `verify/cited-truth/` (built, PR 44, not yet merged)\n"
-    assert ms.grade_checks(line, MANIFEST, pending) == []
-    assert pending == [1]
-
-
-def test_a_check_absent_from_the_gate_with_no_such_declaration_is_still_red():
-    pending: list[int] = []
-    findings = ms.grade_checks("the counterpart to `verify/cited-truth/`\n", MANIFEST, pending)
+@pytest.mark.parametrize("excuse", [
+    "", " (built, PR 44, not yet merged)", " (unmerged)", " (not yet in the gate)",
+])
+def test_a_check_the_gate_does_not_discover_is_red_whatever_the_line_says(excuse):
+    # review F4: the hatch's phrases were ordinary prose -- map.md line 29 already contains
+    # "unmerged" -- and it never checked the named script existed anywhere at all.
+    findings = ms.grade_checks(f"the counterpart to `verify/cited-truth/`{excuse}\n", MANIFEST)
     assert kinds(findings) == ["check-not-in-the-gate"]
-    assert pending == []
 
 
 def test_a_backticked_token_that_is_not_a_check_path_is_ignored():
@@ -279,3 +333,87 @@ def test_selfcheck_fails_when_a_rule_stops_biting(monkeypatch):
                         lambda *a, **k: ms.FigureReport())
     with pytest.raises(AssertionError):
         ms.selfcheck()
+
+
+# --- review F3: the verdict must not turn on the venue -----------------------------------------
+#
+# The rule reads what `origin/main` SERVES. Read from the working copy it turned on where the
+# check happened to run: the reviewer got 0 findings with the units checked out at the ticket
+# branch, 33 at origin/main, and made ico's three findings vanish with an uncommitted
+# `git checkout <branch> -- fetch.yml`. These run over real throwaway repositories, no estate.
+
+WORKFLOW = """\
+name: fetch
+on:
+  schedule: [{{cron: "0 6 * * *"}}]
+env:
+  OBSERVATION_LANE: "{lane}"
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - run: mkdir -p observations && echo x >> observations/feed.jsonl
+"""
+
+
+def _repo(tmp_path, served_lane, checkout_lane=None):
+    """A throwaway unit: `origin/main` declares `served_lane`; the working copy declares
+    `checkout_lane` when that differs, uncommitted."""
+    import subprocess
+
+    origin = tmp_path / "origin"
+    work = tmp_path / "unit"
+    subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(origin)], check=True)
+    seed = tmp_path / "seed"
+    (seed / ".github" / "workflows").mkdir(parents=True)
+    (seed / ".github" / "workflows" / "fetch.yml").write_text(
+        WORKFLOW.format(lane=served_lane))
+    git = ["git", "-C", str(seed), "-c", "user.name=t", "-c", "user.email=t@t.invalid"]
+    subprocess.run(["git", "init", "-q", "-b", "main", str(seed)], check=True)
+    subprocess.run(git + ["add", "-A"], check=True)
+    subprocess.run(git + ["commit", "-qm", "seed"], check=True)
+    subprocess.run(git + ["push", "-q", str(origin), "main"], check=True)
+    subprocess.run(["git", "clone", "-q", str(origin), str(work)], check=True)
+    if checkout_lane is not None:
+        (work / ".github" / "workflows" / "fetch.yml").write_text(
+            WORKFLOW.format(lane=checkout_lane))
+    return work
+
+
+def test_the_served_ref_is_what_is_graded_not_the_working_copy(tmp_path):
+    unit = _repo(tmp_path, served_lane="observations",
+                 checkout_lane="talk/truth.log drift/samples.jsonl talk/captures observations")
+    assert ms.refresh_served_ref(unit) is None
+    texts = ms._workflow_texts(unit)
+    assert 'OBSERVATION_LANE: "observations"' in texts["fetch.yml"]
+    assert "talk/truth.log" not in texts["fetch.yml"]
+    assert ms.checkout_behind(unit) == ["fetch.yml"]
+
+
+def test_a_served_lane_the_repo_does_not_own_is_red_however_clean_the_checkout(tmp_path):
+    unit = _repo(tmp_path, served_lane="talk/truth.log observations",
+                 checkout_lane="observations")
+    lanes = {"u": {"fetch.yml": []}}
+    for m in ms.LANE_ENV.finditer(ms._workflow_texts(unit)["fetch.yml"]):
+        lanes["u"]["fetch.yml"] = m.group(1).split()
+    owned = ms.owned_lane_paths(unit)
+    assert owned == {"observations"}, owned
+    findings = ms.grade_lanes(lanes, {"u": owned})
+    assert kinds(findings) == ["lane-not-owned"]
+    assert "talk/truth.log" in str(findings[0])
+
+
+def test_ownership_is_read_from_the_served_tree_a_ref_and_the_workflow_shell(tmp_path):
+    unit = _repo(tmp_path, served_lane="observations")
+    # nothing named `observations` is in the tree and no observations branch exists here: it is
+    # owned because this repository's own scheduled shell appends to it
+    assert ms.owned_lane_paths(unit) == {"observations"}
+
+
+def test_a_checkout_whose_remote_is_gone_is_red_rather_than_read_locally(tmp_path):
+    import shutil
+
+    unit = _repo(tmp_path, served_lane="observations")
+    shutil.rmtree(tmp_path / "origin")
+    why = ms.refresh_served_ref(unit)
+    assert why and "fetch" in why

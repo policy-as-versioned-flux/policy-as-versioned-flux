@@ -39,6 +39,7 @@ WHAT IT GRADES, five rules over `.scratch/ecosystem/map.md`:
      a repository against the union of THAT repository's own declarations, so a copied path is
      not cosmetic: it is a path a clock in that repository may land and be graded green for. It
      is also a promise the cage step reads, and none of the eight had ever owned all four.
+     Read at `origin/main`, freshly fetched, and never at the checkout: see SERVED_REF.
   5. RECORD. Ticket 67's items (a) and (c) as literal facts the record must carry or must no
      longer carry, because a correction appended below a claim it never removed leaves the estate
      saying both things at once.
@@ -51,17 +52,21 @@ WHAT IT REFUSES TO GRADE, said plainly because a disclosed limit rots like any o
     `.github/scripts/verify-declared-bump.sh`, which is in the manifest and is the script that
     would refuse a wrong number at release time. Reading a working copy of another party's
     declaration here would be the proxy this ticket exists to end.
-  * a figure with no run beside it and no recorded line to match, where the text line says of
-    itself that it is `local`, a `rehearsal`, a `fixture`, `planted`, `hypothetical`, `not
-    citable` or from the `Actions log`; and a figure a DATED correction elsewhere in the map
-    names. Both populations are COUNTED and printed on every run, so the size of what is not
-    graded is a number that moves rather than a sentence somebody wrote once.
+  * a figure whose own text line says, in those words, `not citable`, or quotes the runner's own
+    `fixture=1` or `run=local` token; and a figure disposed of by the DATED correction in the
+    paragraph directly below it. Both are printed BY PATH AND LINE NUMBER on every run, not
+    merely counted (review F1): an escape hatch nobody can see being used is one nobody audits.
+    Three fixed phrases, not a bag of words, and a negated or code-span-quoted occurrence spends
+    nothing -- see `_UNCITABLE` for the three ways the earlier bag laundered on this very map.
+  * a key-shaped figure of one key with no run beside it. It identifies no line; the count of
+    those is printed too.
 
 WHAT IT NEVER SHRUGS AT. There is no could-not-look, by decision (delegated, ADR-0025,
 2026-09-06), following `verify/can-record/` and `verify/cited-truth/`. Rules 1 to 3 and 5 read
-only files in this repository; rule 4 reads `.estate-clone/`, which `clone-estate.sh` assembles
-and which `verify/schedules/verify-lane.sh` already refuses (exit 1) rather than shrugs for. So
-every state in which this cannot see is RED with its own named line, and its manifest row declares
+only files in this repository; rule 4 reads `.estate-clone/` at `origin/main`, which
+`clone-estate.sh` assembles and which `verify/schedules/verify-lane.sh` already refuses (exit 1)
+rather than shrugs for. So every state in which this cannot see is RED with its own named line --
+a missing unit, and a unit whose `origin/main` does not resolve -- and its manifest row declares
 no skip pattern because there is none to declare.
 
     map_surface.py grade <hub-root>   # the five rules; 0 nothing false, 1 one or more named
@@ -71,6 +76,7 @@ from __future__ import annotations
 
 import importlib.util
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -101,9 +107,29 @@ _RUN = re.compile(r"\brun[= ](\d{1,4})\b", re.I)
 # A dated correction. The date is required: an undated correction is a claim with no time on it.
 _CORRECTION = re.compile(r"\*\*Correct(?:ed|ion)[^*]*?(\d{4}-\d{2}-\d{2})", re.I)
 
-# The words a text line uses to say of itself that it is not evidence.
-_UNCITABLE = ("local", "rehearsal", "fixture", "planted", "hypothetical", "not citable",
-              "actions log")
+# THE ESCAPE HATCH (review F1, 2026-09-06). THREE FIXED PHRASES, not a bag of words, following
+# verify/cited-truth/ which was fixed for this same defect at 09:00 the same morning.
+#
+# It used to be seven substrings -- local, rehearsal, fixture, planted, hypothetical, not citable,
+# actions log -- matched anywhere on the line. Three ways that laundered, all reachable on THIS
+# map: the word `local` appears on line 23 ("a local clock"), line 78 ("[92 -- The local clock]")
+# and line 101 ("a local rehearsal"), so any figure ever added to one of those lines was exempt
+# for good; a sentence asserting the OPPOSITE of a disclaimer ("and that is NOT a rehearsal")
+# exempted itself; and `run 7 recorded 43/11/0 of 56 and was planted` excused a wrong run figure.
+# Every one of those surfaced as +1 in a count and nothing more.
+#
+# A line that wants its figure ungraded now says `not citable`, in those words, or quotes the
+# runner's own `fixture=1` or `run=local` token -- the two things talk/verify-all.sh itself writes
+# on a line that is not a citable measurement. `_NEGATION` then rejects an occurrence that is
+# itself negated; a phrase beginning "not" cannot negate itself, because only the text BEFORE an
+# occurrence is examined.
+_UNCITABLE = ("not citable", "fixture=1", "run=local")
+# The negation must MODIFY the phrase, so the window is short: 12 characters, about one word.
+_NEGATION = re.compile(r"(?:\bnot\b|\bno\b|\bwithout\b|\bnever\b)[^.]{0,12}$", re.I)
+# A marker inside a `code span` or a [link](target) is QUOTING the phrase, not spending it. Both
+# are blanked -- not deleted, so every offset the caller holds still lines up.
+_CODE_SPAN = re.compile(r"`[^`\n]*`")
+_LINK_TARGET = re.compile(r"\]\([^)\n]*\)")
 
 # A backticked token that names a CHECK: a shell script whose basename starts with `verify`, or a
 # directory under `verify/`. Deliberately not "any path with `verify` in it": `verify/schedules/
@@ -117,10 +143,12 @@ _RUNNER = ("verify-all.sh",)
 def _is_check_token(token: str) -> bool:
     return bool(_CHECK_SCRIPT.match(token) or _CHECK_DIR.match(token))
 
-# The words a text line uses to say that the check it names is not in the gate yet. A map may
-# point at work that is built and unmerged; it may not present it as something the gate runs.
-_NOT_YET = ("not yet merged", "not merged", "unmerged", "not yet in the gate",
-            "waits on the integrator")
+
+# There is NO hatch on rule 2 (review F4, 2026-09-06). It briefly had one -- a check the line
+# declared "not yet merged" was counted rather than graded -- and the phrases were ordinary prose:
+# map.md line 29 already contains "unmerged", so a check named there that existed NOWHERE was
+# exempt. Unmerged work now goes red until it merges, exactly as the lane rule does, and the map
+# says so in a sentence rather than in a word the check reads.
 
 # [text](target)
 _LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
@@ -156,6 +184,11 @@ class FigureReport:
     declared_uncitable: int = 0
     disposed: int = 0
     unattributed: int = 0
+    # every exempted line, NAMED: (path, lineno, the phrase that spent the hatch). A count alone
+    # is an escape hatch nobody can see being used (review F1).
+    exempted: list[tuple[str, int, str]] = field(default_factory=list)
+    # every disposal, NAMED: (path, lineno, the correction's date)
+    disposals: list[tuple[str, int, str]] = field(default_factory=list)
 
 
 # -- reading -------------------------------------------------------------------------------------
@@ -191,9 +224,10 @@ def run_cited(line: str) -> str | None:
 def figures_quoted(text: str) -> list[Figure]:
     """Every pass/fail figure quoted in `text`, one per match, in the order they appear.
 
-    A key-shaped figure needs two of the six keys, or one key with a run citation beside it: a
-    lone `fail=24` names no run and identifies no line, and the map uses exactly that shape for a
-    local decomposition. Those are counted as unattributed by grade_figures, never graded.
+    A key-shaped figure of ONE key identifies no line on its own -- the map uses exactly that
+    shape for a local decomposition (`fail=24`) -- so it is returned here and counted as
+    unattributed by grade_figures unless a run citation stands beside it. Counting it there rather
+    than dropping it here keeps the ungraded population on the record instead of invisible.
     """
     out: list[Figure] = []
     for lineno, line in enumerate(text.splitlines(), start=1):
@@ -208,7 +242,7 @@ def figures_quoted(text: str) -> list[Figure]:
                 counts["skip"] = int(m.group(3))
             out.append(Figure(lineno, line, counts, "prose"))
         keys = {k: int(v) for k, v in _KEYS.findall(line)}
-        if keys and (len(keys) >= 2 or run_cited(line)):
+        if keys:
             out.append(Figure(lineno, line, keys, "keys"))
     return out
 
@@ -236,39 +270,94 @@ def paragraphs(text: str) -> list[_Para]:
     return out
 
 
-def dated_corrections(text: str) -> list[tuple[int, int, str]]:
-    """(first line, last line, text) for each paragraph carrying a DATED correction."""
-    return [(p.lineno, p.lineno + p.text.count("\n"), p.text)
-            for p in paragraphs(text) if _CORRECTION.search(p.text)]
+@dataclass(frozen=True)
+class Correction:
+    """A dated correction, and the ONE paragraph it may dispose for.
+
+    Review F2, 2026-09-06. A correction used to dispose of its figure ANYWHERE in the map, so the
+    2026-08-31 correction of "65 pass, 0 fail, 16 could-not-look of 83" laundered a FRESH
+    occurrence of that same sentence written into a new section today — the exact sentence this
+    ticket was charted to refuse, excused by the correction of it.
+
+    A correction now disposes only for the paragraph it IMMEDIATELY FOLLOWS, which is where the
+    estate writes one and is the only place a reader meets the two together. A claim anywhere else
+    must be rewritten in place under a banner, as ticket 67 item (a) did to the drift-review
+    NORTH-STAR, or it is graded.
+    """
+    date: str
+    first: int          # first line of the correction paragraph
+    last: int           # last line of the correction paragraph
+    text: str
+    covers_first: int   # first line of the paragraph it immediately follows
+    covers_last: int    # last line of that paragraph
 
 
-def _declared_uncitable(line: str) -> bool:
-    low = line.lower()
-    return any(word in low for word in _UNCITABLE)
+def dated_corrections(text: str) -> list[Correction]:
+    paras = paragraphs(text)
+    out: list[Correction] = []
+    for i, para in enumerate(paras):
+        m = _CORRECTION.search(para.text)
+        if not m:
+            continue
+        last = para.lineno + para.text.count("\n")
+        if i == 0:
+            covers = (0, -1)                     # nothing above it to correct
+        else:
+            above = paras[i - 1]
+            covers = (above.lineno, above.lineno + above.text.count("\n"))
+        out.append(Correction(m.group(1), para.lineno, last, para.text, covers[0], covers[1]))
+    return out
 
 
-def _disposed(fig: Figure, corrections: Iterable[tuple[int, int, str]]) -> bool:
-    """A dated correction disposes of a figure when it names that figure's own numbers. `65/0/16`
-    in the correction disposes of `65 pass, 0 fail, 16 could-not-look of 83`; a correction naming
-    a different figure disposes of nothing.
+def _blank(pattern: re.Pattern[str], text: str) -> str:
+    """Replace each match with spaces of the same length, so offsets do not move."""
+    return pattern.sub(lambda m: " " * len(m.group(0)), text)
 
-    A correction never disposes of a figure standing INSIDE itself. The replacement figure a
-    correction offers is the one thing in the paragraph that must be true, so it is graded like
-    any other; otherwise a correction could excuse its own wrong number by carrying it.
+
+def uncitable(line: str) -> str | None:
+    """The fixed phrase by which this line disowns its own figure, or None.
+
+    A negated occurrence is not a disclaimer: "this does not make it not citable" asserts the
+    opposite of one. Only the text BEFORE an occurrence is examined, so a phrase beginning "not"
+    never negates itself. A marker inside a `code span` or a [link](target) is the phrase being
+    QUOTED and spends nothing.
+    """
+    low = _blank(_CODE_SPAN, _blank(_LINK_TARGET, line)).lower()
+    for phrase in _UNCITABLE:
+        start = low.find(phrase)
+        while start != -1:
+            if not _NEGATION.search(low[:start]):
+                return phrase
+            start = low.find(phrase, start + 1)
+    return None
+
+
+def _disposed(fig: Figure, corrections: Iterable[Correction]) -> str | None:
+    """The date of the correction that disposes of this figure, or None.
+
+    A correction disposes when it names the figure's own numbers AND the figure stands in the
+    paragraph it immediately follows. `65/0/16` in the correction disposes of `65 pass, 0 fail,
+    16 could-not-look of 83` directly above it; the same correction disposes of nothing in a
+    section written later.
+
+    A correction never disposes of a figure standing INSIDE itself. The replacement figure it
+    offers is the one thing in the paragraph that must be true, so it is graded like any other.
     """
     wanted = [str(fig.counts[k]) for k in ("pass", "fail", "skip") if k in fig.counts]
     if len(wanted) < 2:
-        return False
+        return None
     slash = "/".join(wanted)
-    for first, last, para in corrections:
-        if first <= fig.lineno <= last:
+    for corr in corrections:
+        if corr.first <= fig.lineno <= corr.last:
             continue
-        if slash in para:
-            return True
-        got = {k: int(v) for k, v in _KEYS.findall(para)}
+        if not (corr.covers_first <= fig.lineno <= corr.covers_last):
+            continue
+        if slash in corr.text:
+            return corr.date
+        got = {k: int(v) for k, v in _KEYS.findall(corr.text)}
         if all(k in got and got[k] == v for k, v in fig.counts.items()):
-            return True
-    return False
+            return corr.date
+    return None
 
 
 # -- rule 1: every figure the map quotes is a figure the log recorded ----------------------------
@@ -283,11 +372,22 @@ def grade_figures(map_text: str, log_text: str) -> FigureReport:
 
     for fig in figures_quoted(map_text):
         run = run_cited(fig.line)
-        if _declared_uncitable(fig.line):
-            report.declared_uncitable += 1
+        # A key-shaped figure of one key is only a figure when a run stands beside it; without
+        # one it identifies nothing and is counted, never graded or exempted.
+        if len(fig.counts) < 2 and run is None:
+            report.unattributed += 1
             continue
-        if _disposed(fig, corrections):
+        # The hatch is spent only where it actually SUPPRESSES a grade, so the printed list of
+        # exemptions means what it says (review F1, following verify/cited-truth/).
+        phrase = uncitable(fig.line)
+        if phrase:
+            report.declared_uncitable += 1
+            report.exempted.append((MAP, fig.lineno, phrase))
+            continue
+        date = _disposed(fig, corrections)
+        if date:
             report.disposed += 1
+            report.disposals.append((MAP, fig.lineno, date))
             continue
         shown = " ".join(f"{k}={v}" for k, v in fig.counts.items())
         if run is not None:
@@ -321,11 +421,16 @@ def _agrees(fig: Figure, line: dict) -> bool:
 
 # -- rule 2: every check the map names is one the gate discovers ---------------------------------
 
-def grade_checks(map_text: str, manifest_paths: Iterable[str],
-                 pending: list[int] | None = None) -> list[Finding]:
-    """`pending`, when given, receives one entry per check the map names and declares, on the same
-    text line, as not in the gate yet. That population is COUNTED and printed, never graded: a map
-    may name a check that is built and unmerged, but it must say so where it names it."""
+def grade_checks(map_text: str, manifest_paths: Iterable[str]) -> list[Finding]:
+    """Every check the map names in backticks must be one the gate discovers.
+
+    NO HATCH (review F4, 2026-09-06). This briefly excused a check whose line said "not yet
+    merged", "unmerged" or "not in the gate yet". Those are ordinary prose: map.md line 29 already
+    contains "unmerged", so a check named on that line that existed NOWHERE was exempt, and the
+    excuse never checked that the named script existed anywhere at all. Unmerged work goes red
+    until it merges, exactly as the lane rule does, and a map that wants to point at it says so in
+    a sentence a reader reads rather than in a word this check reads.
+    """
     paths = sorted(manifest_paths)
     basenames = {p.rsplit("/", 1)[-1] for p in paths}
     findings: list[Finding] = []
@@ -339,10 +444,6 @@ def grade_checks(map_text: str, manifest_paths: Iterable[str],
             stem = token.rstrip("/")
             if stem in basenames or any(p == stem or p.endswith("/" + stem)
                                         or p.startswith(stem + "/") for p in paths):
-                continue
-            if any(word in line.lower() for word in _NOT_YET):
-                if pending is not None:
-                    pending.append(lineno)
                 continue
             findings.append(Finding(
                 "check-not-in-the-gate", MAP, lineno,
@@ -433,25 +534,121 @@ def grade_record(files: dict[str, str]) -> list[Finding]:
 LANE_ENV = re.compile(r"^\s*OBSERVATION_LANE:\s*\"([^\"]*)\"\s*$", re.M)
 UNITS = ("driftwood", "feeds", "ico", "insurer", "ludlow", "nist", "platform", "tuppence")
 
-# What each repository owns in the lane, read from the repository rather than asserted: a path
-# that exists in its checkout, or one its own scheduled workflows write outside the cage loop.
+# What each repository owns in the lane, read from the repository rather than asserted.
 LANE_PATHS = ("talk/truth.log", "drift/samples.jsonl", "talk/captures", "observations")
+
+# THE REF THIS GRADES (review F3, 2026-09-06). What GitHub serves is `origin/main`, not whatever
+# happens to be checked out in `.estate-clone/<unit>`. Reading the working copy made the verdict
+# turn on the VENUE: the reviewer checked the units out at this ticket's branch and got 0
+# findings, at origin/main and got 33, and an uncommitted `git checkout <branch> -- fetch.yml` in
+# ico made ico's three findings disappear. It read green on CI only because clone-estate.sh clones
+# fresh there, and four units in the real local clone were behind origin/main that morning.
+#
+# So both halves -- what a unit DECLARES and what it OWNS -- are read from `origin/main` UNIONED
+# with the checkout, which is what verify/schedules/lane.py already does
+# (`workflows_on_ref(root, 'origin/main')` unioned with `S.workflows(root)`). Union, not either:
+# a declaration in either copy is a declaration a reader can meet, and a unit whose local copy has
+# moved on is still judged by the lane its served copy configures. The recorded sentence is then
+# true by code rather than by where the check happened to run.
+SERVED_REF = "origin/main"
+
+
+def _git(root: Path, *args: str) -> str | None:
+    """git output, or None when the command cannot run or the ref is not there."""
+    try:
+        done = subprocess.run(["git", "-C", str(root), *args],
+                              capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return done.stdout if done.returncode == 0 else None
+
+
+def _workflow_texts(unit_root: Path) -> dict[str, str]:
+    """{filename: text} for the unit's workflows AS `origin/main` SERVES THEM. The checkout is not
+    read, and the difference matters in both directions.
+
+    verify/schedules/lane.py unions the ref with the checkout, and is right to: it grades commits
+    a clock LANDED, and a clock is judged by the configuration that was in force when it landed,
+    whichever copy carries it. This rule asks a different question -- what does the estate DECLARE
+    -- and the only declaration a reader of the estate can meet is the served one.
+
+    Unioning here made the verdict turn on the venue in the other direction, measured 2026-09-06:
+    after the eight unit pull requests merged, `clone-estate.sh --refresh` KEPT platform and
+    tuppence because they carried `.work/` worktrees, so their working copies still held the old
+    four-path list while `origin/main` held the trimmed one. The union reported twelve findings
+    against an estate that had none. A stale checkout is the venue, not a claim.
+
+    Where the checkout disagrees it is REPORTED (`checkout_behind`), never graded, so a builder
+    sees their copy is behind without the verdict moving.
+    """
+    found: dict[str, str] = {}
+    names = _git(unit_root, "ls-tree", "--name-only", SERVED_REF, "--", ".github/workflows/")
+    for path in (names or "").split():
+        if not path.endswith((".yml", ".yaml")):
+            continue
+        text = _git(unit_root, "show", f"{SERVED_REF}:{path}")
+        if text is not None:
+            found[path.rsplit("/", 1)[-1]] = text
+    return found
+
+
+def checkout_behind(unit_root: Path) -> list[str]:
+    """Workflow files whose checkout copy declares a different lane from the served copy."""
+    differs = []
+    local = unit_root / ".github" / "workflows"
+    if not local.is_dir():
+        return differs
+    served = _workflow_texts(unit_root)
+    for wf in sorted(local.glob("*.yml")):
+        mine = LANE_ENV.findall(wf.read_text(errors="replace"))
+        theirs = LANE_ENV.findall(served.get(wf.name, ""))
+        if mine != theirs:
+            differs.append(wf.name)
+    return differs
+
+
+def refresh_served_ref(unit_root: Path) -> str | None:
+    """Fetch `origin/main`, then confirm it resolves. The reason it cannot be trusted, or None.
+
+    Fetching is part of the rule, not a convenience. `origin/main` in a local clone is only what
+    GitHub serves if somebody fetched it: on 2026-09-06 the eight unit pull requests were merged
+    and `clone-estate.sh --refresh` KEPT platform and tuppence because they carried `.work/`, so
+    their `origin/main` was two hours stale and this check reported twelve findings that the
+    served estate no longer had. A stale ref is the same venue-dependent reading as a working
+    copy, one level down, so a fetch that fails is RED with its reason rather than a quiet read of
+    whatever is local.
+    """
+    if _git(unit_root, "rev-parse", "--git-dir") is None:
+        return "not a git checkout"
+    if _git(unit_root, "fetch", "--quiet", "origin",
+            "+refs/heads/main:refs/remotes/origin/main") is None:
+        return "could not fetch origin/main, so what is here may be behind what GitHub serves"
+    if _git(unit_root, "rev-parse", "--verify", f"{SERVED_REF}^{{commit}}") is None:
+        return f"{SERVED_REF} does not resolve"
+    return None
 
 
 def owned_lane_paths(unit_root: Path) -> set[str]:
-    """The lane paths this repository owns: one that exists in its checkout, one that exists on
-    any ref it holds, or one its own workflow shell writes. Read, never assumed."""
+    """The lane paths this repository owns. Read from git, never from the working copy alone:
+
+      * the path is in the tree `origin/main` serves;
+      * the path is the root of an observation ref the repository has (`origin/observations`);
+      * the repository's own workflow shell writes it, outside the OBSERVATION_LANE declaration
+        and outside the cage's loop over it. driftwood owns `observations` this way and by no
+        other: its twin-sweep appends `observations/twin-sweep.jsonl` on main.
+    """
     owned: set[str] = set()
-    workflows = unit_root / ".github" / "workflows"
-    texts = []
-    if workflows.is_dir():
-        texts = [p.read_text(errors="replace") for p in sorted(workflows.glob("*.yml"))]
+    texts = list(_workflow_texts(unit_root).values())
+    refs = _git(unit_root, "for-each-ref", "--format=%(refname:short)", "refs/remotes/origin") or ""
+    ref_roots = {r.split("/", 1)[1] for r in refs.split() if "/" in r}
     for path in LANE_PATHS:
-        if (unit_root / path).exists():
+        listed = _git(unit_root, "ls-tree", "-r", "--name-only", SERVED_REF, "--", path)
+        if listed:
             owned.add(path)
             continue
-        # a path the repository's own clock writes: named in a shell line that is not the
-        # OBSERVATION_LANE declaration and not the cage's loop over it
+        if path in ref_roots:
+            owned.add(path)
+            continue
         for text in texts:
             for line in text.splitlines():
                 if "OBSERVATION_LANE" in line or path not in line:
@@ -468,16 +665,16 @@ def owned_lane_paths(unit_root: Path) -> set[str]:
 def declared_lanes(estate: Path) -> dict[str, dict[str, list[str]]]:
     out: dict[str, dict[str, list[str]]] = {}
     for unit in UNITS:
-        workflows = estate / unit / ".github" / "workflows"
-        if not workflows.is_dir():
+        unit_root = estate / unit
+        if not unit_root.is_dir():
             continue
         found: dict[str, list[str]] = {}
-        for wf in sorted(workflows.glob("*.yml")):
-            for m in LANE_ENV.finditer(wf.read_text(errors="replace")):
-                found.setdefault(wf.name, [])
+        for name, text in sorted(_workflow_texts(unit_root).items()):
+            for m in LANE_ENV.finditer(text):
+                found.setdefault(name, [])
                 for path in m.group(1).split():
-                    if path not in found[wf.name]:
-                        found[wf.name].append(path)
+                    if path not in found[name]:
+                        found[name].append(path)
         if found:
             out[unit] = found
     return out
@@ -509,22 +706,36 @@ def grade(root: Path) -> int:
     findings: list[Finding] = []
     fr = grade_figures(map_text, log_text)
     findings += fr.findings
-    pending: list[int] = []
-    findings += grade_checks(map_text, manifest_paths(root), pending)
+    findings += grade_checks(map_text, manifest_paths(root))
     findings += grade_links(map_text, lambda t: (map_path.parent / t).exists())
 
     estate = root / ".estate-clone"
-    declared = declared_lanes(estate)
     missing = [u for u in UNITS if not (estate / u).is_dir()]
+    unserved = {u: why for u in UNITS if (estate / u).is_dir()
+                and (why := refresh_served_ref(estate / u))}
+    declared = declared_lanes(estate)
     if missing:
         print(f"  !! .estate-clone is missing {missing}: a lane declaration cannot be read "
               f"against a repository that is not here. clone-estate.sh assembles it; this is a "
               f"red, not a shrug")
         findings.append(Finding("estate-unreadable", ".estate-clone", 0,
                                 f"{len(missing)} unit(s) absent"))
-    else:
+    for unit, why in unserved.items():
+        print(f"  !! {unit}: {why} -- so what GitHub SERVES cannot be read here and only a local "
+              f"copy could be graded, which is the venue-dependent reading this rule was "
+              f"corrected for. A red, not a shrug")
+        findings.append(Finding("served-ref-unreadable", unit, 0, why))
+    if not missing and not unserved:
         owned = {u: owned_lane_paths(estate / u) for u in UNITS}
         findings += grade_lanes(declared, owned)
+        print(f"  -- lane declarations and ownership read at {SERVED_REF}, freshly fetched; the "
+              f"checkout is never graded")
+        for unit in UNITS:
+            stale = checkout_behind(estate / unit)
+            if stale:
+                print(f"  -- note     .estate-clone/{unit}: the checkout declares a different "
+                      f"lane from {SERVED_REF} in {stale} -- reported, never graded; a stale "
+                      f"clone is the venue, not a claim")
 
     files = {}
     for path in {f[0] for f in RECORD_FACTS}:
@@ -541,11 +752,18 @@ def grade(root: Path) -> int:
             tally[f.kind] = tally.get(f.kind, 0) + 1
         print("  == " + str(len(findings)) + " finding(s): "
               + ", ".join(f"{k} x{v}" for k, v in sorted(tally.items())))
-    print(f"  -- {fr.graded} figure(s) graded against talk/truth.log; "
-          f"{fr.declared_uncitable} declared uncitable on their own line and "
-          f"{fr.disposed} disposed of by a dated correction, both counted and not graded")
-    print(f"  -- {len(pending)} check(s) named and declared not in the gate yet "
-          f"(line{'s' if len(pending) != 1 else ''} {pending or 'none'}), counted and not graded")
+    print(f"  -- {fr.graded} figure(s) graded against talk/truth.log; {fr.unattributed} "
+          f"identified no line and were not graded")
+    # every exemption and every disposal is NAMED, not only counted (review F1): an escape hatch
+    # nobody can see being used is an escape hatch nobody audits.
+    print(f"  -- {fr.declared_uncitable} figure(s) exempted by a fixed disclaimer, "
+          f"{fr.disposed} disposed of by the dated correction directly below them:")
+    for path, lineno, phrase in fr.exempted:
+        print(f"  -- exempt   {path}:{lineno}  ({phrase})")
+    for path, lineno, date in fr.disposals:
+        print(f"  -- disposed {path}:{lineno}  (correction of {date}, the paragraph below it)")
+    if not fr.exempted and not fr.disposals:
+        print("  -- exempt   none")
     print(f"  -- {sum(len(v) for v in declared.values())} lane declaration(s) read across "
           f"{len(declared)} unit(s)")
     return 1 if findings else 0
@@ -575,22 +793,64 @@ def selfcheck() -> int:
     assert [f.kind for f in gone.findings] == ["no-such-line"], gone.findings
     print("ok  a run talk/truth.log never recorded is red")
 
-    excused = grade_figures("a local rehearsal reached 65 pass, 0 fail of 83\n", log)
-    assert excused.findings == [] and excused.declared_uncitable == 1
+    excused = grade_figures("65 pass, 0 fail of 83, from a run that is not citable\n", log)
+    assert excused.findings == [] and excused.declared_uncitable == 1, excused
+    assert excused.exempted == [(MAP, 1, "not citable")], excused.exempted
+    print("ok  a figure whose line says `not citable` is exempt, and the exemption is NAMED, not "
+          "only counted")
+
+    # review F1: the hatch used to be seven substrings matched anywhere on the line. Each of these
+    # went green and reported nothing but +1 in a count.
+    for laundered in (
+            "verify/local-clock: the surface stood at 65 pass, 0 fail, 16 could-not-look of 83\n",
+            "the surface stood at 65 pass, 0 fail of 83, and that is NOT a rehearsal\n",
+            "run 13 recorded 43/11/0 of 56 and was planted\n",
+            "as the Actions log confirms, the surface stood at 65 pass, 0 fail of 83\n",
+            "no fixture was used: the surface stood at 65 pass, 0 fail of 83\n"):
+        got = grade_figures(laundered, log)
+        assert got.findings and not got.exempted, f"laundered: {laundered.strip()!r} -> {got}"
+    print("ok  a bag-of-words disclaimer launders nothing: an ordinary word, a NEGATED marker and "
+          "a claim about the Actions log are each graded")
+    quoted = grade_figures("grep for `not citable`: the surface stood at 65 pass, 0 fail of 83\n",
+                           log)
+    assert quoted.findings and not quoted.exempted, quoted
+    print("ok  a marker quoted in a code span is the phrase, not a line disowning its figure")
+
+    spent = grade_figures("run 13 recorded fail=7, which is not citable anyway\n", log)
+    assert spent.declared_uncitable == 1 and spent.exempted, spent
+    unspent = grade_figures("decomposes the local `fail=24` row by row\n", log)
+    assert unspent.findings == [] and unspent.exempted == [] and unspent.unattributed == 1, unspent
+    print("ok  the hatch is spent only where it suppresses a grade; a lone key with no run beside "
+          "it is counted as identifying nothing, not exempted")
+
     disposed = grade_figures(
         "the surface reached 65 pass, 0 fail, 16 could-not-look of 83.\n\n"
-        "> **Correction, 2026-08-31.** The 65/0/16 figure was a rehearsal.\n", log)
-    assert disposed.findings == [] and disposed.disposed == 1
+        "> **Correction, 2026-08-31.** The 65/0/16 figure was from a run nobody recorded.\n", log)
+    assert disposed.findings == [] and disposed.disposed == 1, disposed
+    assert disposed.disposals == [(MAP, 1, "2026-08-31")], disposed.disposals
     undated = grade_figures(
         "the surface reached 65 pass, 0 fail, 16 could-not-look of 83.\n\n"
-        "> **Correction.** The 65/0/16 figure was a rehearsal.\n", log)
+        "> **Correction.** The 65/0/16 figure was from a run nobody recorded.\n", log)
     assert [f.kind for f in undated.findings] == ["no-such-figure"], undated.findings
-    print("ok  a declared rehearsal and a dated correction excuse a figure; an undated one does "
-          "not")
+    print("ok  the dated correction directly below a claim disposes of it and says so by line; an "
+          "undated one disposes of nothing")
+
+    # review F2: a correction used to dispose of its figure ANYWHERE in the map, so the correction
+    # of a sentence laundered a fresh copy of that sentence written into a new section.
+    elsewhere = grade_figures(
+        "the surface reached 65 pass, 0 fail, 16 could-not-look of 83.\n\n"
+        "> **Correction, 2026-08-31.** The 65/0/16 figure was from a run nobody recorded.\n\n"
+        "## A section written later\n\n"
+        "Nothing is red: 65 pass, 0 fail, 16 could-not-look of 83.\n", log)
+    assert [f.kind for f in elsewhere.findings] == ["no-such-figure"], elsewhere.findings
+    assert elsewhere.findings[0].lineno == 7, elsewhere.findings
+    assert elsewhere.disposed == 1, elsewhere
+    print("ok  a correction disposes only for the paragraph directly above it: the same sentence "
+          "written into a later section is graded, and red")
 
     own = grade_figures(
         "the surface reached 65 pass, 0 fail, 16 could-not-look of 83.\n\n"
-        "> **Correction, 2026-08-31.** The 65/0/16 figure was a rehearsal; the citable line is\n"
+        "> **Correction, 2026-08-31.** The 65/0/16 figure was unrecorded; the citable line is\n"
         "> run 13, 52/7/21 of 83.\n", log)
     assert [f.kind for f in own.findings] == ["figure-disagrees"], own.findings
     print("ok  a correction does not excuse the replacement figure it offers: that one is graded")
@@ -600,11 +860,12 @@ def selfcheck() -> int:
     absent = grade_checks("graded by `verify-nothing.sh`\n", manifest)
     assert [f.kind for f in absent] == ["check-not-in-the-gate"], absent
     assert grade_checks("`talk/verify-all.sh` discovers them\n", manifest) == []
-    waiting: list[int] = []
-    assert grade_checks("`verify-later.sh` (built, not yet merged)\n", manifest, waiting) == []
-    assert waiting == [1], waiting
-    print("ok  a check the manifest carries passes; one it does not is red unless the line says "
-          "it is not in the gate yet, and then it is counted; the runner is not a check")
+    # review F4: there is no "not yet merged" hatch, and there must not be one -- the phrases were
+    # ordinary prose and the excuse never checked the named script existed anywhere.
+    still = grade_checks("`verify-later.sh` (built, unmerged, not yet in the gate)\n", manifest)
+    assert [f.kind for f in still] == ["check-not-in-the-gate"], still
+    print("ok  a check the manifest carries passes and one it does not is red, whatever the line "
+          "says about it being unmerged; the runner is not a check")
 
     dead = grade_links("see [a](issues/gone.md)\n", lambda p: False)
     assert [f.kind for f in dead] == ["dead-link"], dead

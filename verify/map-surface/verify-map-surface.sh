@@ -29,21 +29,29 @@
 # talk/truth_manifest.py's parse_truth -- so a change to the TRUTH line's shape cannot make one of
 # the two quietly wrong.
 #
-# WHAT IT REFUSES TO GRADE, counted rather than asserted: whether the figure the map quotes is the
+# WHAT IT REFUSES TO GRADE, named rather than asserted: whether the figure the map quotes is the
 # RIGHT figure, or the check it names the right check -- it grades that both exist on the surface.
 # Ticket 67 item (b) is graded by ico's own .github/scripts/verify-declared-bump.sh, in the
 # manifest, because reading another party's declaration from a working copy here would be the
-# proxy this ticket exists to end. A figure whose own text line calls it local, a rehearsal, a
-# fixture, planted, hypothetical, not citable or an Actions-log quote, and one a DATED correction
-# elsewhere in the map disposes of, are not graded -- and both counts are PRINTED on every run, so
-# the size of the ungraded population is a number that moves rather than a sentence written once.
+# proxy this ticket exists to end. Two exemptions, and each is PRINTED BY PATH AND LINE NUMBER on
+# every run, not merely counted (review F1): a figure whose own line says `not citable` in those
+# words or carries the runner's own `fixture=1` / `run=local` token, and a figure the DATED
+# correction in the paragraph directly below it disposes of. THREE FIXED PHRASES, not a bag of
+# words -- the bag exempted an ordinary "local", a sentence asserting the OPPOSITE of a disclaimer
+# and a wrong run figure sitting beside the word "planted", each as +1 in a count. A correction
+# disposes only for the paragraph it immediately follows (review F2), so the correction of a
+# sentence cannot launder a fresh copy of that sentence written into a later section. There is NO
+# hatch on rule 2 (review F4): unmerged work goes red until it merges, as the lane rule does.
 #
 # NO COULD-NOT-LOOK, by decision (delegated, ADR-0025, 2026-09-06), following verify/can-record/
 # and verify/cited-truth/. Rules 1 to 3 and 5 read only files in this repository. Rule 4 reads
-# .estate-clone/, which clone-estate.sh assembles and which verify/schedules/verify-lane.sh
-# already refuses rather than shrugs for. So this row declares no skip pattern in
-# talk/verify-manifest.txt and there is none to declare: a missing map, a missing truth.log, a
-# missing manifest and a missing unit are each RED with their own line.
+# .estate-clone/ at origin/main, fetching it first -- a unit whose fetch fails or whose
+# origin/main does not resolve is RED with its reason, because a verdict on a ref nobody
+# refreshed is the same venue-dependent reading, one level down. clone-estate.sh assembles that
+# directory and verify/schedules/verify-lane.sh already refuses rather than shrugs for it. So
+# this row declares no skip pattern in talk/verify-manifest.txt and there is none to declare: a
+# missing map, a missing truth.log, a missing manifest and a missing unit are each RED with their
+# own line.
 #
 # Exit 0 PASS, 1 FAIL. Never 3.
 #
