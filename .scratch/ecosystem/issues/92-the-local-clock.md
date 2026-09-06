@@ -233,3 +233,16 @@ Map line (amended): `- [92 â€” The local clock](issues/92-the-local-clock.md) â€
 - New, an authorisation: the three adopter clones' local `main` are behind origin (2, 4, 1).
   The clock no longer depends on them, but `bash clone-estate.sh --refresh` (keeping `.work/`)
   or `git -C .estate-clone/<unit> pull --ff-only` is the owner's or the integrator's to run.
+
+**The branch `truth` run arrived (34027150333, run 131, watched to completion).** Its guard said
+first: `THIS RUN CANNOT RECORD ITS TRUTH LINE, and will not pretend to` (ticket 100: a branch run
+measures, records nothing). On the runner the gate graded this ticket's script
+`verify/local-clock/verify-local-clock.sh  SKIP (never)  SKIP: no .local-clock/last-run.json on this
+machine -- the local clock has not run here, or this is not the owner's machine` -- the declared
+could-not-look, matched by the manifest row on the real substrate. The line it printed and did not
+record, quoted from the Actions log and NOT citable:
+
+    
+
+The gate's red on that run is the estate's standing set, not this branch's: `verify-schedules.sh`'s
+three and the rest of what run 113 on `main` already carried.
