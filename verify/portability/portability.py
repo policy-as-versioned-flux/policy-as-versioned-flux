@@ -107,15 +107,22 @@ def months_apart(a: str, b: str) -> int:
 
 
 def adopters(estate: str) -> list[str]:
-    """Every party in the clone whose own party.yaml claims the adopter role. Derived, never
-    a hardcoded list — verify-twin-per-adopter.sh's own rule."""
+    """Every party in the clone whose own SERVED party.yaml claims the adopter role. Derived,
+    never a hardcoded list — verify-twin-per-adopter.sh's own rule.
+
+    Read with `git show HEAD:` and not off disk. The directory listing is only how the candidate
+    names are found; the role that decides whether a party is graded is a fact about the commit
+    that party SERVES, so an uncommitted edit to a working copy cannot add an adopter to this
+    run or remove one from it (the venue mistake review F3 caught in verify-map-surface)."""
     found = []
     for name in sorted(os.listdir(estate)) if os.path.isdir(estate) else []:
-        path = os.path.join(estate, name, "party.yaml")
-        if not os.path.isfile(path):
+        if not os.path.isdir(os.path.join(estate, name, ".git")):
+            continue
+        text = show(os.path.join(estate, name), "HEAD", "party.yaml")
+        if text is None:
             continue
         try:
-            doc = yaml.safe_load(open(path).read()) or {}
+            doc = yaml.safe_load(text) or {}
         except yaml.YAMLError:
             continue
         if "adopter" in (doc.get("roles") or []):
