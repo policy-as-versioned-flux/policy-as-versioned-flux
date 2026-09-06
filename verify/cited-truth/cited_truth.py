@@ -11,8 +11,8 @@ this module is what refuses the sixteenth.
 
 THE RULE, in one sentence: a paragraph that offers a TRUTH line as proof that a check is in the
 gate must cite a line `talk/truth.log` actually recorded, whose `hub=` commit this checkout can
-read, whose TREE carries a check the ticket names -- or the ticket must carry a DATED correction
-that names that citation.
+read, whose TREE carries a check the ticket names, WHICH GIT SAYS THAT TICKET ADDED -- or the
+ticket must carry a DATED correction that names that citation.
 
 WHAT "NAMES A CHECK" MEANS, and why it is narrow (review F1, 2026-09-06). The first cut of this
 module asked whether the cited tree carried ANY backticked token containing the word `verify`,
@@ -23,9 +23,85 @@ script satisfied it; and ticket 80's OWN twelve corrections name `verify/party/`
 passed on the correction's own words and the dated correction never did any work. Now: the token
 must be a `verify*.sh` matched by path suffix, or a directory the CITED TREE carries a
 `verify*.sh` under; it is read from the SECTION the claim is made in, with correction paragraphs
-stripped whether or not they are dated. What remains, and is not closable by reading text: a
-ticket that names, in its own Answer, a check it does not own and the cited tree happens to
-carry, passes. That is the reason rule 1 is necessary and never sufficient.
+stripped whether or not they are dated.
+
+WHO ADDED THE CHECK (eco-system ticket 102, 2026-09-06). What the paragraph above used to end on
+was "case D": a ticket that names, in its own Answer, a check it does NOT own and the cited tree
+happens to carry, passed -- and ticket 80 disclosed it as not closable by reading the ticket text.
+That was right and beside the point. It is not a text question. GIT knows who put the path in the
+tree, and this module already reads git to resolve the cited `hub=` commit. So the named check is
+now resolved to its PATH in the cited tree, and
+
+    git log --diff-filter=A --format=%H%x09%s <hub> -- <path>
+
+is asked who added it. The adding commit's subject must NAME THE TICKET MAKING THE CLAIM -- the
+number the ticket's own filename carries. A ticket whose named check was added by a commit naming
+some other ticket, or naming none, has not shown the check is its own, and falls back to the dated
+correction exactly as it did before.
+
+Three things about that scan, each measured on the hub log on 2026-09-06 rather than assumed:
+
+  * The `Ticket NN:` convention has SIX spellings already (`Ticket 39:`, `ticket 61:`, `Tickets 62
+    and 77:`, `ecosystem ticket 28:`, `ecosystem ticket 47:`, `ecosystem: ticket 21 ... + ticket
+    52 ...`), so the match is a case-insensitive scan collecting EVERY number a subject names, not
+    a `^Ticket NN:` prefix. A commit that built two tickets' checks satisfies both.
+  * The number must FOLLOW the word. `Estate build: 27 tickets implemented via dependency-wave
+    workflow` names no ticket; a scan that also read `\\d+\\s+tickets?` would hand ticket 27 a check
+    it never wrote.
+  * 36 of the 39 hub verify scripts at `caefdd3` have an adding commit whose subject names a
+    ticket. The three that do not are exactly run 7's three directories -- `verify/party/`,
+    `verify/proportionality/`, `verify/provenance/`, all added by `c9d0f20`, which names none -- so
+    every case-D route through run 7 goes red and the other 36 are untouched.
+
+NO `--follow`, decided in the build (delegated, ADR-0025) and measured. `--diff-filter=A` names
+where the bytes first appeared AT THIS PATH, so for anything older than `c9d0f20` (which moved
+`verify/` to the repository root) the adding commit is the move. `--follow` gives a different
+answer and not a better one: for `verify/party/verify-party.sh` it names `1f2b3d4 Add a
+machine-checked roles: declaration per party`, which names no ticket either, so run 7 stays red
+both ways; for `verify/proportionality/` and `verify/provenance/` it names `26770f8 Estate build:
+27 tickets implemented ...`, whose "27 tickets" a looser scan would misread as ticket 27; and git
+takes `--follow` on a DIRECTORY without complaint and quietly ignores it, returning the same
+`c9d0f20` -- so half of what a named check can be cannot be followed at all, and the half that can
+would look followed when it was not. A moved check is carried by the attribution line instead.
+
+THE ESCAPE, AND IT IS LOUD. Some checks legitimately predate the convention or moved between
+trees. So the ticket may carry a DATED ATTRIBUTION LINE, in this shape and no other:
+
+    > **Attribution, YYYY-MM-DD (ticket NN).** `<check>` was added by `<sha>`, ...
+
+It is bound five ways, because the line is text this check reads, and a check that reads the text
+it grades treats the fix somebody writes into that text as input:
+
+  * THE TICKET, read from the line's own header and nowhere else in the paragraph (review F3), so
+    a line copied from another ticket carries nothing;
+  * THE CHECK, so a line about a different check carries nothing;
+  * THE SHA, which must ACTUALLY be an adding commit of that path AS OF THE CITED COMMIT, read
+    from git and never believed from the line. A planted sha is `attribution-does-not-hold`. It is
+    the sha after `added by`, or the only one in the paragraph: five backticked shas with one of
+    them right is a guess, and a guess must not be able to hold;
+  * THAT SHA'S SUBJECT MUST NAME NO TICKET (review F1, 2026-09-06 -- the blocker of the first
+    build). The first cut confirmed that the sha existed and added the file, never what the sha
+    SAID, so ticket 99 could attribute `verify/feed-contract/verify-feed-contract.sh` to
+    `3e83a16`, whose subject names tickets 21 and 52, and pass; and with a directory token the sha
+    of any script under it would do -- `verify/provenance/` attributed to `065e497`, which is
+    ticket 53's. An attribution is the escape for a check git attributes to NOBODY. Where git
+    attributes it to somebody else, that is an answer and not a gap, and no line may overrule it:
+    `attribution-over-a-named-commit`, printing the ticket(s) the subject names;
+  * and it may not introduce the check itself -- see `named_checks`.
+
+What it cannot bind, said plainly, because a disclosed limit rots like any other claim:
+
+  * A ticket may still claim a check whose adding commit is genuinely nameless. Three such paths
+    exist in the hub today, all added by `c9d0f20`. What the rule denies that claim is SILENCE:
+    every attribution used is printed with its path, line, sha and the subject of the commit it
+    names, every attribution consulted and REFUSED is printed too (review F4), and the run counts
+    how many citations passed each way.
+  * The claiming ticket's identity is the record file's own NAME, which is text the ticket
+    controls. Renaming a file, or adding one, under another ticket's number inherits that ticket's
+    checks. Two cheap greens are available and neither is built here: the `# NN` heading agrees
+    with the filename in 103 of 103 files today, and no number is used twice -- but an author who
+    edits the name and the heading in one diff passes both, so they would raise the cost of the
+    forgery and not close it. Named rather than built (eco-system ticket 102, review F2).
 
 The second rule is narrower and older: a TRUTH FIGURE (`pass=`, `fail=`, `skip=`, `excluded=`,
 `total=`, `ceiling=`) quoted on the same text line as a run citation must be that run's figure.
@@ -143,6 +219,48 @@ _LINK_TARGET = re.compile(r"\]\([^)\n]*\)")
 _CHECK_TOKEN = re.compile(r"^[\w./-]*verify[\w./-]*(?:\.sh|/)$")
 _SCRIPT_NAME = re.compile(r"(?:^|/)verify[\w.-]*\.sh$")
 
+# WHICH TICKET A COMMIT SUBJECT NAMES (ticket 102). Six spellings are in the hub log already, so
+# this is a case-insensitive scan collecting EVERY number in the subject and not a `^Ticket NN:`
+# prefix. The number must FOLLOW the word: "27 tickets implemented" names no ticket, and reading
+# it as one would hand ticket 27 a check it never wrote. A trailing list is read too, because
+# `Tickets 62 and 77:` built two tickets' checks in one commit and owes both.
+# `(?!\d)(?!-\d)` (review F5): a ticket number is a whole number and not a date. Without them
+# `ticket 2026-09-05` read as ticket 2026 and `ticket 12345` as ticket 1234, because `\d{1,4}`
+# backtracks happily. Neither shape is in the 699 real subjects today; both would have been a
+# check attributed to a ticket nobody wrote.
+_TICKET_IN_SUBJECT = re.compile(
+    r"\btickets?\s+#?(\d{1,4})(?!\d)(?!-\d)"
+    r"((?:\s*(?:,|and|&|\+|/)\s*#?\d{1,4}(?!\d)(?!-\d))*)", re.I)
+_A_NUMBER = re.compile(r"\d{1,4}")
+
+# The ticket number a record file carries in its own name: `102-the-cited-tree-....md` -> 102.
+_TICKET_FILE = re.compile(r"^(\d{1,4})\b")
+
+# THE ESCAPE HATCH FOR A CHECK GIT CANNOT ATTRIBUTE (ticket 102): a DATED attribution line, whose
+# shape is fixed because every part of it is load-bearing --
+#
+#     **Attribution, YYYY-MM-DD (ticket NN).** `<check>` was added by `<sha>`, ...
+#
+# The date must follow the word directly, as a correction's must (review F4), and the TICKET IS
+# READ FROM THIS HEADER and nowhere else (review F3): collecting it from anywhere in the paragraph
+# let a line headed `(ticket 80)` hold for file 99 because its prose said "as ticket 99 noted".
+_ATTRIBUTION = re.compile(
+    r"\*\*Attribution[^*\n]{0,3}?(\d{4}-\d{2}-\d{2})\s*"
+    r"\((?:eco-system\s+)?tickets?\s+#?(\d{1,4})(?!\d)", re.I)
+# ...and the sha is the one after `added by` (review F3). Five backticked shas with one of them
+# right is a guess, not an attribution.
+_ADDED_BY = re.compile(r"\badded\s+by\b", re.I)
+# ...and the looser shape, used ONLY to strip a paragraph out of `named_checks`, for the reason a
+# correction is stripped: an attribution says WHO ADDED a check the claim already names, and may
+# never introduce the check itself. Dated or not.
+_ATTRIBUTION_ANY = re.compile(r"\*\*Attribution\b", re.I)
+# A commit this record names, in backticks, as the one that added a check. Seven hex characters is
+# the shortest the estate writes, and at least one of them must be a LETTER (review F3): otherwise
+# `2026090` and `1234567` were shas, which the comment already claimed they were not. An all-digit
+# short sha does exist in principle; it would be refused here rather than passed, which is the safe
+# direction, and the run says so by name.
+_SHA = re.compile(r"^(?=.*[a-f])[0-9a-f]{7,40}$")
+
 # How near a citation must sit to a gate-proof phrase, in the flattened paragraph, to be read as
 # offered in support of it. The done-line's own two sentences span about 90 characters.
 GATE_PROOF_REACH = 200
@@ -158,8 +276,27 @@ class Citation:
 
 
 @dataclass(frozen=True)
+class Added:
+    """A commit git names as having ADDED a path, and the subject it did it under."""
+    sha: str
+    subject: str
+
+
+@dataclass(frozen=True)
+class Attribution:
+    """A ticket's dated claim that a named commit added a named check (ticket 102)."""
+    date: str
+    lineno: int
+    tickets: set[str]
+    checks: tuple[str, ...]
+    shas: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class Finding:
     kind: str          # no-such-line | unreadable-tree | tree-lacks-the-check | figure-disagrees
+                       # | unattributed-check | attribution-does-not-hold | unreadable-history
+                       # | no-adding-commit | no-ticket-number
     path: str
     lineno: int
     detail: str
@@ -181,9 +318,23 @@ class Report:
     # citations in a paragraph that is NOT a gate-proof: outside rule 1 by construction, counted
     # so the size of what rule 1 never looks at is on the record too (review F3).
     outside_the_rule: int = 0
+    # HOW each gate-proof citation passed (ticket 102). A green that does not say which route it
+    # took cannot be read: the positive path, the escape and the withdrawal look identical from
+    # outside, and the escape is the one a reader has to audit by hand.
+    proved_by_commit: int = 0
+    proved_by_attribution: int = 0
+    disposed: int = 0
+    claims_false: int = 0
+    # every attribution actually used, named: (path, lineno, sha, check, the commit's subject)
+    attributed: list[tuple[str, int, str, str, str]] = field(default_factory=list)
+    # and every one consulted and refused: (path, lineno, sha, check, why). Review F4.
+    attributions_refused: list[tuple[str, int, str, str, str]] = field(default_factory=list)
 
 
 TreeLookup = Callable[[str], "set[str] | None"]
+# (the cited hub commit, a path in its tree) -> the commits that ADDED that path as of that
+# commit, or None where this checkout cannot read history at all.
+AddLookup = Callable[[str, str], "list[Added] | None"]
 
 
 # -- reading -------------------------------------------------------------------------------------
@@ -228,7 +379,11 @@ def figures(line: str) -> dict[str, int]:
 def named_checks(text: str) -> list[str]:
     """The check paths a ticket names in backticks, sorted.
 
-    CORRECTION PARAGRAPHS ARE STRIPPED FIRST (review F1, 2026-09-06). Ticket 80's own correction
+    CORRECTION AND ATTRIBUTION PARAGRAPHS ARE STRIPPED FIRST (review F1, 2026-09-06; ticket 102).
+    An attribution is stripped for the same reason a correction is, and it matters more: it may
+    only say WHO ADDED a check the claim already names in its own section. If it could introduce
+    the check as well, one planted paragraph would supply both halves of the proof, which is the
+    shape F1 closed for corrections. Ticket 80's own correction
     names `verify/party/`, `verify/proportionality/` and `verify/provenance/` -- the three
     directories run 7's tree actually carries -- so with corrections in scope the twelve corrected
     tickets satisfied rule 1 on the correction's own words, and the dated correction never did
@@ -238,18 +393,80 @@ def named_checks(text: str) -> list[str]:
     every hub check that has ever existed.
     """
     body = "\n\n".join(para.text for para in _paragraphs(text)
-                        if not _CORRECTION_ANY.search(para.text))
+                        if not _CORRECTION_ANY.search(para.text)
+                        and not _ATTRIBUTION_ANY.search(para.text))
+    return check_tokens(body)
+
+
+def ticket_numbers(subject: str) -> set[str]:
+    """Every eco-system ticket a commit subject names (ticket 102).
+
+    Case-insensitive, and the number must FOLLOW the word: `Estate build: 27 tickets implemented
+    ...` names no ticket, and a scan that read the number before the word would hand ticket 27 a
+    check it never wrote. A trailing list is collected too -- `Tickets 62 and 77:` built two
+    tickets' checks in one commit and owes both -- as is a second mention later in the subject,
+    which is how `ecosystem: ticket 21 ... + ticket 52 ...` is spelt.
+    """
+    out: set[str] = set()
+    for m in _TICKET_IN_SUBJECT.finditer(subject):
+        out.add(str(int(m.group(1))))
+        out.update(str(int(n)) for n in _A_NUMBER.findall(m.group(2) or ""))
+    return out
+
+
+def claiming_ticket(path: str) -> str | None:
+    """The ticket number a record file's own name carries, or None if it carries none."""
+    m = _TICKET_FILE.match(path.rsplit("/", 1)[-1])
+    return str(int(m.group(1))) if m else None
+
+
+def check_tokens(text: str) -> list[str]:
+    """The backticked check paths in one piece of text, corrections and all."""
     found = set()
-    for token in re.findall(r"`([^`\n]+)`", body):
+    for token in re.findall(r"`([^`\n]+)`", text):
         token = token.strip()
         if not _CHECK_TOKEN.match(token):
             continue
-        if token.rsplit("/", 1)[-1] == "verify-all.sh":
-            continue
-        if token.strip("/") == "verify":
+        if token.rsplit("/", 1)[-1] == "verify-all.sh" or token.strip("/") == "verify":
             continue
         found.add(token)
     return sorted(found)
+
+
+def attributions(text: str) -> list[Attribution]:
+    """Every dated attribution line the ticket carries (ticket 102).
+
+    An attribution says: this check was added by this commit, and that commit's subject does not
+    name me. It is the escape for a check that predates the `Ticket NN:` convention or moved
+    between trees. It is never believed -- `_attribution_holds` puts its sha back to git -- and it
+    is never silent: `report()` records every one that is used so the run can print it.
+    """
+    out: list[Attribution] = []
+    for para in _paragraphs(text):
+        flat = unquote_flat(para.text)
+        m = _ATTRIBUTION.search(flat)
+        if not m:
+            continue
+        out.append(Attribution(m.group(1), para.lineno, {str(int(m.group(2)))},
+                               tuple(check_tokens(flat)), _named_sha(flat)))
+    return out
+
+
+def _named_sha(flat: str) -> tuple[str, ...]:
+    """The one commit an attribution line names as having added the check (review F3).
+
+    It is the first sha-shaped token after `added by`, or -- where the line does not use those
+    words -- the only one in the paragraph. Five backticked shas with one of them right is a
+    guess, and a guess must not be able to hold: an ambiguous line names no commit and carries
+    nothing.
+    """
+    tokens = [(m.start(), m.group(1).strip()) for m in re.finditer(r"`([^`\n]+)`", flat)]
+    shas = [(at, t) for at, t in tokens if _SHA.match(t)]
+    said = _ADDED_BY.search(flat)
+    if said:
+        after = [t for at, t in shas if at > said.start()]
+        return (after[0],) if after else ()
+    return (shas[0][1],) if len(shas) == 1 else ()
 
 
 def unquote_flat(text: str) -> str:
@@ -271,10 +488,15 @@ def para_citations(para_text: str, lineno: int) -> list[Citation]:
     out: list[Citation] = []
     for cite in citations(unquote_flat(para_text)):
         at, line = lineno, lines[0] if lines else ""
-        for offset, raw in enumerate(lines):
-            if cite.value in raw:
-                at, line = lineno + offset, raw
-                break
+        # the line where this run is CITED, not the first line the digits appear on (ticket 102).
+        # `run 5` used to be reported fourteen lines early, against `total=56`, and a red pointing
+        # somewhere the reader cannot see the claim is a red nobody can check.
+        here = [(off, raw) for off, raw in enumerate(lines)
+                if any(c.kind == cite.kind and c.value == cite.value for c in citations(raw))]
+        if not here:
+            here = [(off, raw) for off, raw in enumerate(lines) if cite.value in raw]
+        if here:
+            at, line = lineno + here[0][0], here[0][1]
         out.append(Citation(cite.kind, cite.value, at, line, cite.at))
     return out
 
@@ -405,24 +627,42 @@ def tree_carries(tree: set[str], checks: Sequence[str]) -> list[str]:
     where the tree carries a `verify*.sh` UNDER it -- a directory that resolves to no script
     names no check, which is what `startswith` alone could not tell.
     """
-    out = []
-    for c in checks:
-        if c.endswith("/"):
-            if any(p.startswith(c) and _SCRIPT_NAME.search(p) for p in tree):
-                out.append(c)
-        elif any(p == c or p.endswith("/" + c) for p in tree):
-            out.append(c)
-    return out
+    return [c for c in checks if resolved_paths(tree, c)]
+
+
+def covers(token: str, path: str) -> bool:
+    """Does this backticked token name that path in a tree?"""
+    if token.endswith("/"):
+        return path.startswith(token) and bool(_SCRIPT_NAME.search(path))
+    return path == token or path.endswith("/" + token)
+
+
+def resolved_paths(tree: set[str], check: str) -> list[str]:
+    """The paths in the cited tree a named check resolves to (ticket 102).
+
+    `tree_carries` asks whether a check is in the tree; asking WHO ADDED it needs the path it is,
+    which a directory token has several of and a script token has one. Sorted, so a run's output
+    does not move about between runs over the same tree.
+    """
+    return sorted(p for p in tree if covers(check, p))
 
 
 # -- the rule ------------------------------------------------------------------------------------
 
-def report(files: dict[str, str], log: Sequence[dict], tree_lookup: TreeLookup) -> Report:
-    """Grade every citation in every file. `files` maps a display path to its text."""
+def report(files: dict[str, str], log: Sequence[dict], tree_lookup: TreeLookup,
+           add_lookup: AddLookup | None = None) -> Report:
+    """Grade every citation in every file. `files` maps a display path to its text.
+
+    `add_lookup` answers who ADDED a path in a cited tree (ticket 102). None means this checkout
+    cannot read history at all, which is a red on every gate-proof citation whose tree carries the
+    check -- never a shrug, and never a silent pass.
+    """
     rep = Report()
     for path in sorted(files):
         text = files[path]
         corrs = corrections(text)
+        attribs = attributions(text)
+        ticket = claiming_ticket(path)
         context = uncitable_context(text)
 
         # rule 1: a TRUTH line offered as proof that a check is in the gate.
@@ -437,8 +677,8 @@ def report(files: dict[str, str], log: Sequence[dict], tree_lookup: TreeLookup) 
             # done-line's own two sentences span.
             spans = [m.start() for m in _GATE_PROOF.finditer(flat)]
             for cite in para_citations(para.text, para.lineno):
-                proof = any(abs(s - cite.at) <= GATE_PROOF_REACH for s in spans)
-                if not proof:
+                offered_as_proof = any(abs(s - cite.at) <= GATE_PROOF_REACH for s in spans)
+                if not offered_as_proof:
                     rep.outside_the_rule += 1
                     continue
                 phrase = uncitable(context.get(cite.lineno, cite.line))
@@ -448,10 +688,22 @@ def report(files: dict[str, str], log: Sequence[dict], tree_lookup: TreeLookup) 
                     continue
                 rep.claims_graded += 1
                 checks = named_checks(section_of(text, para.lineno))
-                ok, why = _grade_proof(cite, log, tree_lookup, checks)
-                if ok or _disposed(cite, corrs):
+                proof = _grade_proof(cite, log, tree_lookup, checks, add_lookup, ticket, attribs)
+                for sha, check, at, why in proof.refused:
+                    rep.attributions_refused.append((path, at, sha, check, why))
+                if proof.ok:
+                    if proof.how == "attribution":
+                        sha, check, subject, at = proof.used
+                        rep.proved_by_attribution += 1
+                        rep.attributed.append((path, at, sha, check, subject))
+                    else:
+                        rep.proved_by_commit += 1
                     continue
-                rep.findings.append(Finding(why[0], path, cite.lineno, why[1]))
+                if _disposed(cite, corrs):
+                    rep.disposed += 1
+                    continue
+                rep.claims_false += 1
+                rep.findings.append(Finding(proof.why[0], path, cite.lineno, proof.why[1]))
 
         # rule 2: a figure quoted beside its run
         for lineno, line in enumerate(text.splitlines(), start=1):
@@ -494,33 +746,158 @@ def report(files: dict[str, str], log: Sequence[dict], tree_lookup: TreeLookup) 
     return rep
 
 
+@dataclass(frozen=True)
+class Proof:
+    ok: bool
+    how: str = ""                       # adding-commit | attribution
+    why: tuple[str, str] = ("", "")     # kind, detail -- when it is not ok
+    used: tuple[str, str, str, int] = ("", "", "", 0)   # sha, check, subject, the line it is on
+    # every attribution CONSULTED and refused, whether or not another one held (review F4): a
+    # false attribution standing beside a true one used to leave no trace at all
+    refused: tuple[tuple[str, str, int, str], ...] = ()
+
+
 def _grade_proof(cite: Citation, log: Sequence[dict], tree_lookup: TreeLookup,
-                 checks: Sequence[str]) -> tuple[bool, tuple[str, str]]:
+                 checks: Sequence[str], add_lookup: AddLookup | None = None,
+                 ticket: str | None = None,
+                 attribs: Sequence[Attribution] = ()) -> Proof:
+    """Is this citation proof that a check the ticket OWNS was in the tree that was measured?
+
+    Two questions, in order, because the second is only worth asking about a check that is there:
+    does the cited tree carry a check the ticket names, and does git say the ticket added it.
+    """
     lines = resolve(cite, log)
     if not lines:
-        return False, ("no-such-line",
-                       f"{_say(cite)} is offered as proof that a check is in the gate, and "
-                       f"talk/truth.log records no such line")
+        return Proof(False, why=("no-such-line",
+                                 f"{_say(cite)} is offered as proof that a check is in the gate, "
+                                 f"and talk/truth.log records no such line"))
     unreadable = []
-    lacking = []
+    carried: list[tuple[str, str, str]] = []   # (hub, the named check, the path it resolves to)
     for t in lines:
         hub = str(t.get("hub", ""))
         tree = tree_lookup(hub)
         if tree is None:
             unreadable.append(hub)
             continue
-        if tree_carries(tree, checks):
-            return True, ("", "")
-    if unreadable and not lacking:
-        return False, ("unreadable-tree",
-                       f"{_say(cite)} names hub commit(s) {', '.join(unreadable)}, which this "
-                       f"checkout cannot read, so the tree that was measured cannot be shown to "
-                       f"carry the check")
-    named = ", ".join(checks) if checks else "no check path at all"
-    hubs = ", ".join(str(t.get("hub", "")) for t in lines)
-    return False, ("tree-lacks-the-check",
-                   f"{_say(cite)} is offered as proof that a check is in the gate, but the tree "
-                   f"of {hubs} carries none of the checks this ticket names ({named})")
+        for c in checks:
+            for p in resolved_paths(tree, c):
+                carried.append((hub, c, p))
+    if not carried:
+        if unreadable:
+            return Proof(False, why=(
+                "unreadable-tree",
+                f"{_say(cite)} names hub commit(s) {', '.join(unreadable)}, which this checkout "
+                f"cannot read, so the tree that was measured cannot be shown to carry the check"))
+        named = ", ".join(checks) if checks else "no check path at all"
+        hubs = ", ".join(str(t.get("hub", "")) for t in lines)
+        return Proof(False, why=(
+            "tree-lacks-the-check",
+            f"{_say(cite)} is offered as proof that a check is in the gate, but the tree of "
+            f"{hubs} carries none of the checks this ticket names ({named})"))
+    return _grade_attribution(cite, carried, add_lookup, ticket, attribs)
+
+
+def _grade_attribution(cite: Citation, carried: Sequence[tuple[str, str, str]],
+                       add_lookup: AddLookup | None, ticket: str | None,
+                       attribs: Sequence[Attribution]) -> Proof:
+    """The cited tree carries the check. Did the ticket making the claim put it there?
+
+    Ticket 102: this is what closes case D. Every state in which the answer cannot be read is a
+    RED with its own sentence, following verify/can-record/'s call -- a shallow checkout, no git,
+    a path git names nobody for, a file that names no ticket number.
+    """
+    failures: list[tuple[str, str]] = []
+    refused: list[tuple[str, str, int, str]] = []   # sha, check, line, why -- review F4
+    for hub, check, path in carried:
+        adding = add_lookup(hub, path) if add_lookup else None
+        if adding is None:
+            failures.append(("unreadable-history",
+                             f"this checkout cannot read who added {path}"))
+            continue
+        if not adding:
+            failures.append(("no-adding-commit",
+                             f"git names no commit that added {path} as of {hub}"))
+            continue
+        who = ", ".join(f"{a.sha[:7]} {a.subject!r}" for a in adding)
+        if ticket is None:
+            failures.append(("no-ticket-number",
+                             f"{path} was added by {who}, and this file's name carries no ticket "
+                             f"number to match it against"))
+            continue
+        if any(ticket in ticket_numbers(a.subject) for a in adding):
+            return Proof(True, how="adding-commit", refused=tuple(refused))
+        held, over, missed = _attribution_holds(attribs, ticket, check, path, adding)
+        refused.extend(over + missed)
+        if held:
+            return Proof(True, how="attribution", used=held, refused=tuple(refused))
+        if over:
+            # REVIEW F1, the blocker. The line named a commit git DOES attribute, to somebody
+            # else. That is an answer, not a gap, and an attribution may not overrule it.
+            failures.append((
+                "attribution-over-a-named-commit",
+                f"the attribution of {check} names {over[0][0]}, which git says added {path} "
+                f"under a subject that names {over[0][3]} — an attribution is for a check git "
+                f"attributes to nobody, and this one it attributes to somebody else"))
+        elif missed:
+            failures.append((
+                "attribution-does-not-hold",
+                f"the attribution of {check} names commit(s) "
+                f"{', '.join(sha for sha, _c, _l, _w in missed)}, and git says {path} was added "
+                f"by {who}"))
+        else:
+            failures.append((
+                "unattributed-check",
+                f"{path} was added by {who}, which names no ticket {ticket}, and ticket {ticket} "
+                f"carries no dated attribution line naming the commit that added it"))
+    order = ("unreadable-history", "no-adding-commit", "no-ticket-number",
+             "attribution-over-a-named-commit", "attribution-does-not-hold", "unattributed-check")
+    kind = min((f[0] for f in failures), key=order.index)
+    detail = "; ".join(d for k, d in failures if k == kind)
+    return Proof(False, why=(
+        kind,
+        f"{_say(cite)} is offered as proof that a check is in the gate, and the tree carries it, "
+        f"but not as this ticket's: {detail}"), refused=tuple(refused))
+
+
+def _attribution_holds(
+        attribs: Sequence[Attribution], ticket: str, check: str, path: str,
+        adding: Sequence[Added]) -> tuple[
+            tuple[str, str, str, int] | None,
+            list[tuple[str, str, int, str]],
+            list[tuple[str, str, int, str]]]:
+    """Does a dated attribution line carry this check for this ticket -- and does git agree?
+
+    Returns (what held, the ones refused because git names their commit for somebody else, the
+    ones refused because git does not name their commit for this path at all).
+
+    Four binds, because the line is text this check reads: the TICKET making the claim, read from
+    the line's own header; the CHECK being claimed; a SHA git actually names as having added that
+    path; and -- review F1, 2026-09-06 -- that sha's subject must name NO ticket. The last is the
+    one the first cut missed: it confirmed the sha existed and added the file, never what the sha
+    said. An attribution is the escape for a check git can attribute to nobody. Where git
+    attributes it to somebody else, that is an answer and not a gap, and no line may overrule it.
+    """
+    over: list[tuple[str, str, int, str]] = []
+    missed: list[tuple[str, str, int, str]] = []
+    for a in attribs:
+        if ticket not in a.tickets:
+            continue
+        if not any(covers(t, path) or t == check for t in a.checks):
+            continue
+        for sha in a.shas:
+            add = next((x for x in adding
+                        if x.sha.startswith(sha) or sha.startswith(x.sha)), None)
+            if add is None:
+                missed.append((sha, check, a.lineno,
+                               f"git names no such adding commit for {path}"))
+                continue
+            named = ticket_numbers(add.subject)
+            if named:
+                over.append((sha, check, a.lineno,
+                             "ticket " + " and ".join(sorted(named, key=int))))
+                continue
+            return (add.sha[:7], check, add.subject, a.lineno), over, missed
+    return None, over, missed
 
 
 def _say(cite: Citation) -> str:
@@ -531,8 +908,9 @@ def _show(d: dict) -> str:
     return " ".join(f"{k}={v}" for k, v in d.items())
 
 
-def grade(files: dict[str, str], log: Sequence[dict], tree_lookup: TreeLookup) -> list[Finding]:
-    return report(files, log, tree_lookup).findings
+def grade(files: dict[str, str], log: Sequence[dict], tree_lookup: TreeLookup,
+          add_lookup: AddLookup | None = None) -> list[Finding]:
+    return report(files, log, tree_lookup, add_lookup).findings
 
 
 # -- ticket 80's other nine items, as a table of facts --------------------------------------------
@@ -681,6 +1059,28 @@ RECORD_FACTS: tuple[Fact, ...] = (
          "the ruling is an interpretation of point 3, not an application of point 4, and belongs "
          "in the ADR it interprets rather than inside one banner",
          "## Note, 2026-09-06: what point 3 does to the five panel decisions"),
+    # ONE LOAD-BEARING SENTENCE FOR THE D1-D5 RULING TOO (review R2-5, done by ticket 102). The
+    # three facts above are markers: a heading, a phrase and a date. Every other item gained a
+    # second sentence after review F5, so that an entry gutted to its heading is a red; these
+    # three did not, and the ruling is the one that contradicts the older record hardest.
+    Fact(3, "ticket13", "the assistant's decision, recorded with the assistant's reason, not "
+         "re-asked and not reopened", True,
+         "the re-labelling's load-bearing clause: what 'delegated' MEANS here, and that nothing "
+         "is reopened by saying it",
+         "So D5 reads **delegated**: the assistant's decision, recorded with the assistant's "
+         "reason, not re-asked and not reopened."),
+    Fact(3, "map", "the ranking that put a panel verdict above a bare agree is what ADR-0025 "
+         "retired", True,
+         "the map's batch record has to say WHY the five were re-labelled, or the re-labelling "
+         "reads as a change of mind about the decisions themselves",
+         "-- re-labelled delegated 2026-09-06 by ticket 80 item 3, because the ranking that put "
+         "a panel verdict above a bare agree is what ADR-0025 retired."),
+    Fact(3, "adr/0025", "an endorsement of the assistant's reasoning is a delegation whatever "
+         "shape the question was put in", True,
+         "the ADR's ruling is a rule for the next question, not only a re-label of five old "
+         "ones; without this sentence the note settles nothing",
+         "from here, an endorsement of the assistant's reasoning is a delegation whatever shape "
+         "the question was put in."),
     # item 9 -- declined, with the material recorded and marked as not applied
     Fact(9, "signpost", "**Nothing in this file has been applied to any repository.**", True,
          "the legacy signpost is an enactment the build brief does not authorise and an org "
@@ -757,6 +1157,41 @@ def git_tree_lookup(root: Path) -> TreeLookup:
     return lookup
 
 
+def git_add_lookup(root: Path) -> AddLookup:
+    """Who added a path, as of a cited commit, or None when this checkout cannot answer.
+
+    NO `--follow`, decided in ticket 102 and measured -- see the module docstring: it changes the
+    answer for the three checks that predate the convention without changing their verdict, it is
+    silently ignored on a directory, and the subject it surfaces for two of them carries a number
+    a looser scan would misread as a ticket. A moved check is carried by an attribution line.
+    """
+    cache: dict[tuple[str, str], list[Added] | None] = {}
+
+    def lookup(commit: str, path: str) -> list[Added] | None:
+        key = (commit, path)
+        if key not in cache:
+            try:
+                out = subprocess.run(
+                    ["git", "-C", str(root), "log", "--diff-filter=A", "--format=%H%x09%s",
+                     commit, "--", path],
+                    capture_output=True, text=True, timeout=60)
+            except (OSError, subprocess.SubprocessError):
+                cache[key] = None
+                return None
+            if out.returncode != 0:
+                cache[key] = None
+                return None
+            found = []
+            for line in out.stdout.splitlines():
+                sha, _, subject = line.partition("\t")
+                if sha.strip():
+                    found.append(Added(sha.strip(), subject.strip()))
+            cache[key] = found
+        return cache[key]
+
+    return lookup
+
+
 def _issue_files(root: Path) -> dict[str, str]:
     issues = root / ".scratch" / "ecosystem" / "issues"
     return {str(p.relative_to(root)): p.read_text(encoding="utf-8")
@@ -786,12 +1221,18 @@ def _run(root: Path) -> int:
         return 1
     log = recorded(truth.read_text(encoding="utf-8"))
     files = _issue_files(root)
-    rep = report(files, log, git_tree_lookup(root))
+    rep = report(files, log, git_tree_lookup(root), git_add_lookup(root))
     for f in sorted(rep.findings, key=lambda f: (f.path, f.lineno)):
         print(f"  !! {f}")
     print(f"  {len(files)} ticket files, {len(log)} recorded TRUTH lines, "
           f"{rep.claims_graded} gate-proof citation(s) and {rep.citations_graded} quoted "
           f"figure line(s) graded")
+    # HOW each gate-proof citation passed (ticket 102). A green that does not say which route it
+    # took cannot be read, and the escape is the route a reader has to audit by hand.
+    print(f"  gate-proof citations: {rep.proved_by_commit} proved by an adding commit naming the "
+          f"ticket, {rep.proved_by_attribution} by a dated attribution line, {rep.disposed} "
+          f"disposed of by a dated correction, {rep.claims_false} observed false; "
+          f"{len(rep.attributions_refused)} attribution(s) consulted and refused")
     print(f"  not graded, on the record: {rep.unattributed} line(s) quote a figure with no run "
           f"beside it; {rep.declared_uncitable} line(s) say of themselves that they are not "
           f"citable; {rep.outside_the_rule} citation(s) sit in no gate-proof paragraph")
@@ -799,6 +1240,14 @@ def _run(root: Path) -> int:
     # not an escape hatch, and the reader has to be able to check each one by eye.
     for path, lineno, phrase in rep.exempted:
         print(f"  -- exempt  {path}:{lineno}  ({phrase})")
+    # and every attribution that carried a claim, with the subject that failed to name the ticket,
+    # so the reader can check by eye what git could not confirm (ticket 102)
+    for path, lineno, sha, check, subject in rep.attributed:
+        print(f"  -- attributed  {path}:{lineno}  {check} <- {sha} {subject!r}")
+    # and every attribution consulted and refused, so a false one standing beside a true one is
+    # visible rather than silently stepped over (review F4)
+    for path, lineno, sha, check, why in rep.attributions_refused:
+        print(f"  -- REFUSED attribution  {path}:{lineno}  {check} <- {sha}: {why}")
     return 1 if rep.findings else 0
 
 
@@ -809,6 +1258,15 @@ _LOG = ("TRUTH 2026-08-29T12:03Z run=7 hub=aaaaaaa units=[p=1] pass=43 fail=11 s
 _PROOF = ("Built it. `verify/thing/verify-thing.sh` grades it.\n\n"
           "Definition of done: its check is in `talk/verify-all.sh`. The run that recorded it "
           "is the TRUTH line of 2026-08-29.\n")
+# who added the check, as git would answer it: the subject names ticket 12, and 12 is the number
+# the file `12.md` carries. `_ADDED_BY_NOBODY` is c9d0f20's real shape -- a commit that moved a
+# tree and named no ticket -- which is the case-D route this must refuse.
+_ADDED_BY_12: AddLookup = lambda c, p: [Added("a111111", "Ticket 12: build the thing")]
+_ADDED_BY_NOBODY: AddLookup = lambda c, p: [Added("c9d0f20", "Delete estate/ from the hub")]
+_ADDED_BY_NOONE_AT_ALL: AddLookup = lambda c, p: []
+_HISTORY_BLIND: AddLookup = lambda c, p: None
+_ATTRIB = ("\n> **Attribution, 2026-09-06 (ticket 12).** `verify/thing/verify-thing.sh` was added "
+           "by `c9d0f20`, which names no ticket.\n")
 
 
 def selfcheck() -> int:
@@ -817,7 +1275,70 @@ def selfcheck() -> int:
     bad: TreeLookup = lambda c: {"verify/other/verify-other.sh"} if c == "aaaaaaa" else None
     blind: TreeLookup = lambda c: None
     problems = []
-    if grade({"a.md": _PROOF}, log, good):
+    # ticket 102: the same proof, graded for WHO ADDED the check it names
+    if grade({"12.md": _PROOF}, log, good, _ADDED_BY_12):
+        problems.append("a check whose adding commit names the ticket was graded false")
+    if [f.kind for f in grade({"12.md": _PROOF}, log, good, _ADDED_BY_NOBODY)] != \
+            ["unattributed-check"]:
+        problems.append("CASE D: a check the ticket does not own, added by a commit naming no "
+                        "ticket, was not named")
+    if [f.kind for f in grade({"13.md": _PROOF}, log, good, _ADDED_BY_12)] != \
+            ["unattributed-check"]:
+        problems.append("a check added for ANOTHER ticket proved this ticket's claim")
+    if grade({"12.md": _PROOF + _ATTRIB}, log, good, _ADDED_BY_NOBODY):
+        problems.append("a dated attribution line naming the adding commit did not carry it")
+    planted = _PROOF + _ATTRIB.replace("c9d0f20", "deadbee")
+    if [f.kind for f in grade({"12.md": planted}, log, good, _ADDED_BY_NOBODY)] != \
+            ["attribution-does-not-hold"]:
+        problems.append("an attribution naming a sha that added nothing was believed")
+    if [f.kind for f in grade({"13.md": _PROOF + _ATTRIB}, log, good, _ADDED_BY_NOBODY)] != \
+            ["unattributed-check"]:
+        problems.append("an attribution line written for another ticket carried this claim")
+    if [f.kind for f in grade({"12.md": _PROOF}, log, good, _HISTORY_BLIND)] != \
+            ["unreadable-history"]:
+        problems.append("a checkout that cannot read history shrugged instead of going red")
+    if [f.kind for f in grade({"12.md": _PROOF}, log, good, _ADDED_BY_NOONE_AT_ALL)] != \
+            ["no-adding-commit"]:
+        problems.append("a path git names no adding commit for was not named")
+    if [f.kind for f in grade({"notes.md": _PROOF}, log, good, _ADDED_BY_12)] != \
+            ["no-ticket-number"]:
+        problems.append("a file whose name carries no ticket number attributed something anyway")
+    if ticket_numbers("Tickets 62 and 77: no branch refs") != {"62", "77"}:
+        problems.append("a commit that built two tickets' checks satisfied only one")
+    if ticket_numbers("Estate build: 27 tickets implemented via dependency-wave workflow"):
+        problems.append("a number BEFORE the word tickets was read as a ticket number")
+    # review F1: the line names the commit git DOES return, and its subject names ticket 12. An
+    # attribution is the escape for a check git attributes to NOBODY; this one it attributes to
+    # somebody else. (This selfcheck leg used to assert the opposite, which is how the defect
+    # survived the first build.)
+    borrowed = _PROOF + _ATTRIB.replace("ticket 12", "ticket 13").replace("c9d0f20", "a111111")
+    over = grade({"13.md": borrowed}, log, good, _ADDED_BY_12)
+    if [f.kind for f in over] != ["attribution-over-a-named-commit"] or \
+            "ticket 12" not in over[0].detail:
+        problems.append("an attribution stood over a commit whose subject names another ticket")
+    rep_commit = report({"12.md": _PROOF}, log, good, _ADDED_BY_12)
+    rep_attrib = report({"12.md": _PROOF + _ATTRIB}, log, good, _ADDED_BY_NOBODY)
+    if (rep_commit.proved_by_commit, rep_commit.proved_by_attribution) != (1, 0) or \
+            (rep_attrib.proved_by_commit, rep_attrib.proved_by_attribution) != (0, 1):
+        problems.append("the run does not say how each gate-proof citation passed")
+    if [(p, sha, check) for p, _n, sha, check, _s in rep_attrib.attributed] != \
+            [("12.md", "c9d0f20", "verify/thing/verify-thing.sh")]:
+        problems.append("an attribution carried a claim and was not printed")
+    # review F4: an attribution consulted and refused leaves a trace even where another holds
+    two = _PROOF + _ATTRIB.replace("c9d0f20", "deadbee1") + _ATTRIB
+    rep_two = report({"12.md": two}, log, good, _ADDED_BY_NOBODY)
+    if rep_two.findings or [s for _p, _n, s, _c, _w in rep_two.attributions_refused] != \
+            ["deadbee1"]:
+        problems.append("an attribution was consulted and refused, and left no trace")
+    if attributions("> **Attribution, 2026-09-06 (ticket 12).** `x` added by `2026090`.\n"
+                    )[0].shas:
+        problems.append("an all-digit token was read as a commit sha")
+    if attributions("> **Attribution, 2026-09-06 (ticket 12).** added by `deadbee1`, not "
+                    "`c9d0f20`.\n")[0].shas != ("deadbee1",):
+        problems.append("an attribution naming several shas was not read as naming the first")
+    if ticket_numbers("ticket 2026-09-05 sweep") or ticket_numbers("ticket 12345"):
+        problems.append("a date or an over-long number after the word ticket was read as one")
+    if grade({"12.md": _PROOF}, log, good, _ADDED_BY_12):
         problems.append("a proof whose cited tree carries the check was graded false")
     if [f.kind for f in grade({"a.md": _PROOF}, log, bad)] != ["tree-lacks-the-check"]:
         problems.append("a proof whose cited tree lacks the check was not named")
@@ -876,7 +1397,15 @@ def selfcheck() -> int:
             print(f"  !! {p}")
         print("FAIL: selfcheck: the grader does not grade")
         return 1
-    print("  ok   selfcheck: a carried check passes; a lacking tree, an unreadable commit, an "
+    print("  ok   selfcheck: a carried check its own ticket added passes; a check added by a "
+          "commit naming no ticket (case D) or another ticket fails, as do an attribution naming "
+          "a sha that added nothing, one copied from another ticket, one standing over a commit "
+          "whose subject names somebody else, a history this checkout cannot read, a path git "
+          "names no adding commit for and a file whose name carries no ticket number; an "
+          "all-digit token is no sha, several shas mean the one after `added by`, a date after "
+          "the word ticket is no ticket number; the run says how each citation passed, prints "
+          "every attribution and every attribution it refused; "
+          "a carried check passes; a lacking tree, an unreadable commit, an "
           "unrecorded line and a disagreeing figure each fail by name; a dated correction "
           "disposes and an undated one does not; a bare `verify/` and a directory carrying "
           "no script name no check; a marker that is negated, quoted in a code span or "
