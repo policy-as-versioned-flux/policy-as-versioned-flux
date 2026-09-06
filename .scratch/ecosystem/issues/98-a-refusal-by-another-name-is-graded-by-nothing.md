@@ -245,13 +245,18 @@ replay comes back with the engine's own sentence:
 
 ### What this cannot see
 
-`refusal_scan.BLIND_SPOTS`, five entries, every one DATED and printed on every run, and held
+`refusal_scan.BLIND_SPOTS`, six entries, every one DATED and printed on every run, and held
 non-empty and dated by a test. The first is the one that matters: whether the API SERVER accepts
 the mutated object is a cluster fact, and the live half has never had a cluster on a citable run
 (P2-6). The others: a mutation whose written VALUE differs from what the object already carries;
 the 2022 ClusterPolicy `rules[].mutate` and any other engine's mutation (none ships today);
-resources other than the pod, which are counted and named as untabulated rather than graded; and a
-JSONPatch path computed from something other than concatenated literals.
+resources other than the pod, which are counted and named as untabulated rather than graded; a
+JSONPatch path computed from something other than concatenated literals; and the one worth a
+reviewer's attention — every tree is read at the clone's HEAD, while an ADOPTER serves the tree at
+the tag its own composed GitRepository pins, so where those differ the bytes graded are not the
+bytes served. That is this ticket's own subject one level out. It bites nothing today (no adopter
+array declares a version whose directory exists at HEAD, and every such directory is named in the
+excluded list on every run) and closing it means reading each path out of `git show <tag>:<path>`.
 
 Map line: `- [98 — A refusal by another name is graded by nothing](issues/98-a-refusal-by-another-name-is-graded-by-nothing.md) — the other way a workload is stopped is now graded: verify/refusal-by-another-name/ reads every mutation the estate SERVES and grades four things offline — a name written into a reference field is one the SAME RELEASE ships (the unsuffixed cage-isolated), the priority trio is whole (the trio that refused every pod on every released line), every write on UPDATE that a running pod forbids is on register.yaml with a reason, a remediation and the leg that bounds it, and every UPDATE-scoped mutation is EXECUTED against its own output on every rung and must come back identical (the waf-sidecar appended twice). All four instances the estate produced are replayed against its OWN bodies on every run and every one goes red; the fourth is LIVE and decided correct, so it is reported with its remediation (recreate) rather than called a defect, and the row is graded in both directions so it cannot outlive the code — narrowing it by one field is asserted to go red. The served partition is the ticket's own rule: graded are the declared-and-cut version trees, the machinery inside the ResourceSet template and the uncut tail; excluded and NAMED are graded/policies/ (no Kustomization applies it), vselfcheck/ and the fifteen version directories on disk that no array declares. kyverno apply has no UPDATE mode and is worse than that — it prints "Mutation has been applied successfully", writes an UNMUTATED file and counts pass:0 — so the limit is MEASURED on every run rather than disclosed (it goes red the day the CLI grows one), scoping is asserted structurally, the body runs on a throwaway copy whose every difference is printed, and applied means the pass count, so no step can pass because nothing applied. Probing without a values file was that same bug in this build: it landed every pod on baseline, where no sidecar exists, and replayed the 2026-08-28 defect GREEN. The live half is graded/verify-graded.sh step 8b, which OBSERVED the refusal on kind-driftwood on 2026-09-06 — a quarantine-caged pod, its Namespace moved to baseline, and one kubectl label refused with PriorityClassName cage-quarantine-4-0-0 -> cage-baseline-4-0-0 and Priority -1000 -> -10 — and which asserts the API server's own list of mutable-on-update fields is exactly the five the offline table carries, so the check's central constant is graded by the API server rather than believed. deny_register.BLIND_SPOTS now points at all of it.`
 

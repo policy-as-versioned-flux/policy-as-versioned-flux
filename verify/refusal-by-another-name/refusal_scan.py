@@ -99,6 +99,12 @@ BLIND_SPOTS = (
     "2026-09-06: a field written through a JSONPatch whose `path` is computed from something "
     "other than string concatenation of literals is read as a wildcard, so a narrower defect "
     "inside it is invisible",
+    "2026-09-06: every tree is read at the clone's HEAD, and an ADOPTER serves the tree at the "
+    "tag its own composed GitRepository pins (driftwood: v1.1.0). Where HEAD and that tag "
+    "differ, the bytes graded are not the bytes served -- the same proxy this ticket is about, "
+    "one level out. It bites nothing today because no adopter's composed-set array declares a "
+    "version whose directory exists at HEAD, and every such directory is NAMED in the excluded "
+    "list on each run. Closing it means reading each path out of `git show <pinned tag>:<path>`",
 )
 
 # ------------------------------------------------------------------ the pod mutability table
