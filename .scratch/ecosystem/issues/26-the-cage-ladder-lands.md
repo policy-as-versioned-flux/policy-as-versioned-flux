@@ -44,3 +44,13 @@ Found while greening the truth surface. Each is observed on the live driftwood K
 Built 2026-08-29 by the /implement run of 2026-08-28 to 29. The cage ladder is live on kind-driftwood at policy version 4.0.0. The tier is read from the governed Namespace through namespaceObject and written onto the pod as an output; a governed Namespace with no tier falls closed to isolated; the cage is tighten-only; the isolated rung has no reach; per-tier reach is generated. THE BLOCKER: the mutation had to write all three fields the Priority admission plugin derives (priorityClassName, priority, preemptionPolicy) or the API server refused every pod. Versions 2.0.0, 2.0.1 and 3.0.0 could never admit a pod and were RETIRED, not patched: teaching them the Namespace tier source is ADR-0022, which the engine computes as major, so it cannot ride on a patch. cage_engine.py now classifies a write of false over a workload true as a loosening.
 
 Definition of done: its check is in `talk/verify-all.sh`. The run that recorded it is the TRUTH line of 2026-08-29.
+
+> **Correction, 2026-09-06 (eco-system ticket 80 item 1).** The done-line above cites "the TRUTH
+> line of 2026-08-29" as proof this ticket's check is in the gate. That citation is withdrawn.
+> The line is run 7, `hub=918022b`, recorded at 2026-08-29T12:03Z, and `git ls-tree -r 918022b`
+> carries three verify directories -- `verify/party/`, `verify/proportionality/` and
+> `verify/provenance/` -- and none of the checks this ticket names. It was graded BEFORE the
+> build it is offered as proof of, so it recorded nothing at all about this check. What this
+> check actually rests on is whichever later run first discovered it, which the gate names for
+> itself on every run. `verify/cited-truth/` grades this rule from today and refuses the next
+> citation of a measurement that did not measure the thing.

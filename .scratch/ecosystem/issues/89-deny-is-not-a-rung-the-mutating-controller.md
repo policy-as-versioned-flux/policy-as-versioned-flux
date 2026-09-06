@@ -517,7 +517,8 @@ indistinguishable from one the clock landed.
 
 **The first: `origin/main` moved.** Run 92, on hub commit `c28541e`
 ([Actions run 33936905680](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/33936905680)),
-produced this line at 2026-09-05T02:03:57Z and it never reached `talk/truth.log`:
+produced this line at 2026-09-05T02:03:57Z and it never reached `talk/truth.log`, so it is
+quoted from the Actions log and is not citable (ticket 80 item 1, 2026-09-06):
 
 ```
 TRUTH 2026-09-05T02:03Z run=92 hub=c28541e units=[driftwood=a1a2a78@main feeds=b6eaa0a@main ico=6217c3a@main insurer=9e90e1b@main ludlow=d092400@main nist=b9f5fff@main platform=bbda376@main tuppence=fca6a58@main] pass=65 [observed=15 self=40 simulated=6 meta=4] fail=13 skip=19 [never=10 waits=9] excluded=8 total=105 ceiling=86
@@ -540,7 +541,8 @@ observations this way. That is a property of `truth.yml`, not of this ticket.
 
 **The second: rejected, and I had also pushed.** Run 95, on hub commit `f91c0f6`
 ([Actions run 33941571076](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/33941571076)),
-produced this line at 2026-09-05T03:44:07Z:
+produced this line at 2026-09-05T03:44:07Z. It never reached `talk/truth.log` either, so it
+too is quoted from the Actions log and is not citable (ticket 80 item 1, 2026-09-06):
 
 ```
 TRUTH 2026-09-05T03:44Z run=95 hub=f91c0f6 units=[driftwood=a1a2a78@main feeds=b6eaa0a@main ico=6217c3a@main insurer=9e90e1b@main ludlow=d092400@main nist=b9f5fff@main platform=bbda376@main tuppence=fca6a58@main] pass=68 [observed=16 self=40 simulated=6 meta=6] fail=6 skip=24 [never=10 waits=14] excluded=8 total=106 ceiling=87
