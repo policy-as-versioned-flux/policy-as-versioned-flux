@@ -5,9 +5,10 @@ ok  regime removed -> major
 ok  payload schema changed -> major
 ok  a cap moved -> patch
 ok  the real penalty-schema/bump.yaml and rule.yaml parse with the standard library
+ok  --tree refuses a declaration off the ladder rather than shrugging at it
 
 == the real declaration against the real tree ==
-OK: declared bump 'major' == computed bump 'major' (v2 -> v3)
+OK: declared bump 'none' == computed bump 'none' (v3.0.0 -> v3.0.1)
 
 PASS: the bump ladder holds on fixtures, and ico's own declared bump agrees with the
 bump computed from its published tree under its own rule.yaml -- so a release cut

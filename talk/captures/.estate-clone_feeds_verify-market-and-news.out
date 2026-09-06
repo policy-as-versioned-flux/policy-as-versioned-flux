@@ -15,7 +15,7 @@ ok  a sub-threshold reading proposes nothing; a move of at least the declared th
 == the observation branch path: every run writes a line, and it carries the reading ==
 ok  observations/market-moves.jsonl <- {"price_levels": {"0x2b1974": 0.2, "0x7f3c9a": 0.46, "0x9ad402": 0.63}, "venue": "polymarket"}
 ok  observations/news.jsonl <- {"events": 4, "newest": "platform-implementations-1-1-1-tagged", "newest_date": "2026-08-25"}
-ok  the clock's cage lets it write only: talk/truth.log drift/samples.jsonl talk/captures observations
+ok  the clock's cage lets it write only: observations
 ok  both feeds are on the daily clock's matrix
 
 == news: the minimal payload, admitted only with a provenance URL ==

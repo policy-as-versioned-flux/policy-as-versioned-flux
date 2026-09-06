@@ -1,0 +1,17 @@
+[1;36m==>[0m 0. the grader can fail
+  ok   selfcheck: a carried check passes; a lacking tree, an unreadable commit, an unrecorded line and a disagreeing figure each fail by name; a dated correction disposes and an undated one does not; a bare `verify/` and a directory carrying no script name no check; a marker that is negated, quoted in a code span or sitting in a link target exempts nothing; every exempted line is named as well as counted; the fact table names a missing sentence, a removed sentence that came back and an unreadable file
+[1;36m==>[0m 1. this checkout can read what a citation points at
+  ok   git, talk/truth.log and .scratch/ecosystem/issues are all readable, and the checkout is not shallow
+[1;36m==>[0m 2. every TRUTH line the tickets cite is real, and its tree carries the check it is offered as proof of
+  103 ticket files, 43 recorded TRUTH lines, 47 gate-proof citation(s) and 10 quoted figure line(s) graded
+  not graded, on the record: 30 line(s) quote a figure with no run beside it; 5 line(s) say of themselves that they are not citable; 140 citation(s) sit in no gate-proof paragraph
+  -- exempt  .scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md:203  (not citable)
+  -- exempt  .scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md:205  (not citable)
+  -- exempt  .scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md:207  (not citable)
+  -- exempt  .scratch/ecosystem/issues/89-deny-is-not-a-rung-the-mutating-controller.md:524  (not citable)
+  -- exempt  .scratch/ecosystem/issues/89-deny-is-not-a-rung-the-mutating-controller.md:548  (not citable)
+[1;36m==>[0m 3. ticket 80's other nine corrections are still in the record, and what they removed has not come back
+  29 sentence(s) graded across items [2, 3, 4, 5, 6, 7, 8, 9], in 15 files
+  item 1 is graded above; item 6 by platform's verify-currency.sh (only its hub-side residue is here); item 10 by platform's own gate on that repository's pull request
+
+PASS: every TRUTH line quoted in .scratch/ecosystem/issues/*.md resolves to a line talk/truth.log records, every gate-proof citation names a commit whose tree carries a check the ticket names or carries a dated correction saying it does not, every figure quoted beside its run is that run's figure, and ticket 80's nine record corrections are each still there

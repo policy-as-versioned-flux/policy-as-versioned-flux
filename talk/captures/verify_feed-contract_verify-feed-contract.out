@@ -34,13 +34,13 @@ PASS: feeds/news/v1/feed.json: bump.yaml bump=none
 PASS: ico/party.yaml vs party schema
 PASS: ico/penalty-schema/v1/feed.json: envelope valid (feed/penalty-schema 1.0.0)
 PASS: ico/penalty-schema/v1/feed.json: payload vs penalty-schema/payload.schema.v2.json
-PASS: ico/penalty-schema/v1/feed.json: bump.yaml bump=major
+PASS: ico/penalty-schema/v1/feed.json: bump.yaml bump=none
 PASS: ico/penalty-schema/v2/feed.json: envelope valid (feed/penalty-schema 2.0.0)
 PASS: ico/penalty-schema/v2/feed.json: payload vs penalty-schema/payload.schema.v2.json
-PASS: ico/penalty-schema/v2/feed.json: bump.yaml bump=major
+PASS: ico/penalty-schema/v2/feed.json: bump.yaml bump=none
 PASS: ico/penalty-schema/v3/feed.json: envelope valid (feed/penalty-schema 3.0.0)
 PASS: ico/penalty-schema/v3/feed.json: payload vs penalty-schema/payload.schema.json
-PASS: ico/penalty-schema/v3/feed.json: bump.yaml bump=major
+PASS: ico/penalty-schema/v3/feed.json: bump.yaml bump=none
 PASS: insurer/party.yaml vs party schema
 PASS: insurer/quote/driftwood/v1/feed.json: envelope valid (feed/quote-driftwood 1.0.0)
 PASS: insurer/quote/driftwood/v1/feed.json: payload vs quote/payload.schema.json
