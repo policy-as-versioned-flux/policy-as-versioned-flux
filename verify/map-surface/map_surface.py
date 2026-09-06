@@ -544,12 +544,15 @@ LANE_PATHS = ("talk/truth.log", "drift/samples.jsonl", "talk/captures", "observa
 # ico made ico's three findings disappear. It read green on CI only because clone-estate.sh clones
 # fresh there, and four units in the real local clone were behind origin/main that morning.
 #
-# So both halves -- what a unit DECLARES and what it OWNS -- are read from `origin/main` UNIONED
-# with the checkout, which is what verify/schedules/lane.py already does
-# (`workflows_on_ref(root, 'origin/main')` unioned with `S.workflows(root)`). Union, not either:
-# a declaration in either copy is a declaration a reader can meet, and a unit whose local copy has
-# moved on is still judged by the lane its served copy configures. The recorded sentence is then
-# true by code rather than by where the check happened to run.
+# So both halves -- what a unit DECLARES and what it OWNS -- are read from `origin/main`, freshly
+# fetched per unit, and the checkout is only compared and reported (a note, graded by nothing).
+# NOT unioned with the checkout, and deliberately unlike verify/schedules/lane.py, which unions:
+# lane.py grades commits a clock LANDED and a landed commit was governed by whichever copy was in
+# force, so it must read both; this rule grades what the estate DECLARES, and the only declaration
+# a reader can meet is the served one. A union here re-created the venue dependence the other way
+# round -- two `.work/`-kept stale clones produced 12 findings against an estate that had none.
+# The recorded sentence is then true by code rather than by where the check happened to run.
+# (An earlier draft of this comment said "UNIONED"; the code never was. Corrected 2026-09-06.)
 SERVED_REF = "origin/main"
 
 
