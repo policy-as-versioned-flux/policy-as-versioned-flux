@@ -207,7 +207,7 @@ def grade_adopter(estate: str, adopter: str, unsized: dict[str, dict] | None = N
         return
 
     evidence_text = show(repo, "HEAD", "composed/evidence.json")
-    prices = []
+    prices: list[dict] = []
     if evidence_text is None:
         out("SKIP", f"{adopter} serves no composed/evidence.json at HEAD")
     else:
@@ -237,8 +237,14 @@ def grade_adopter(estate: str, adopter: str, unsized: dict[str, dict] | None = N
                     f"— is the publisher's statutory cap, not a figure about this institution "
                     f"(ticket 64)")
 
+    # The standing figure this check exists to put somewhere: what THIS adopter prices from
+    # publishers it could not re-read. One perspective, one currency, and deliberately NOT
+    # totalled across adopters -- three adopters' exposures are three balance sheets, and a sum
+    # that crosses a perspective is the one thing the £ seam refuses (ADR-0020).
+    unre_derivable = 0.0
     for edge in edges:
-        party, name, version = edge.get("party"), edge.get("name"), str(edge.get("version"))
+        party = str(edge.get("party") or "")
+        name, version = edge.get("name"), str(edge.get("version"))
         tag = pinned_tag(estate, adopter, party)
         record = by_pin.get((party, name, version))
         if record is None:
@@ -247,6 +253,8 @@ def grade_adopter(estate: str, adopter: str, unsized: dict[str, dict] | None = N
             priced = next((p.get("amount") for p in prices
                            if p.get("source") == party and p.get("name") == name), None)
             amount = f"{priced:.2f} {currency}/yr" if isinstance(priced, (int, float)) else "an unpriced edge"
+            if isinstance(priced, (int, float)):
+                unre_derivable += priced
             out("SKIP", f"{adopter} carries no vendored copy of {party}'s {name}@{version} at "
                         f"HEAD, so {amount} of what it signed cannot be re-derived without "
                         f"{party}'s clone; it waits on {VENDORING_LANDS_IN} and on this "
@@ -288,6 +296,11 @@ def grade_adopter(estate: str, adopter: str, unsized: dict[str, dict] | None = N
                             f"{party} serves at {tag}, the tag {adopter} itself pins")
         # 4. and it RUNS with nothing else on disk
         run_standalone(repo, adopter, record)
+    if unre_derivable:
+        out("SKIP", f"{adopter} prices {unre_derivable:.2f} {currency}/yr, under its own "
+                    f"perspective, from publishers whose clone it would need to re-derive any "
+                    f"of it — no total is taken across adopters, because three adopters' "
+                    f"exposures are three balance sheets")
 
 
 def run_standalone(repo: str, adopter: str, record: dict) -> None:
@@ -415,7 +428,7 @@ def _plant(root: str, *, vendored=True, digest_ok=True, payload_matches=True,
     os.makedirs(os.path.join(ado, "composed"))
     open(os.path.join(ado, "composed", "evidence.json"), "w").write(
         json.dumps({"prices": prices}, indent=2))
-    header = {"policy-as-versioned.dev/composed": True}
+    header: dict = {"policy-as-versioned.dev/composed": True}
     if vendored:
         base = "composed/feeds/pub/v1"
         vend_payload = payload if payload_matches else payload.replace("GBP", "USD")
