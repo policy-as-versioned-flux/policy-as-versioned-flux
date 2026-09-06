@@ -393,6 +393,54 @@ jobs:
                    "above was NOT recorded."
               exit 1
             }
+      # --- a fall is a blocking event (NORTH-STAR §5, ticket 59) --------------------------------
+      # §5's last bullet is two sentences and only the first was ever built. "The number and its
+      # date are recorded on every run" has been true since GAPS 2.1. "A fall is a blocking
+      # event" had no implementation at all: nothing compared a TRUTH line to its predecessor,
+      # run 13 fell 54 -> 53 and nothing fired, and run 105 took `fail` from 6 to 11 with no
+      # signal of any kind. The gate's own red could not carry it -- 17 of 21 runs were failing
+      # at the same step, so the one signal was saturated and a fall inside it was invisible.
+      #
+      # This step is the DISTINCT one. It runs AFTER the cage, so the observation is recorded
+      # first whatever it says (a clock appends observations, ADR-0024), and it turns the RUN red
+      # by itself, with its own ::error:: and its own step-summary line, whether or not the gate
+      # was red. talk/fall_check.py holds the comparison and talk/truth_manifest.py's CONTRACT FOR
+      # TICKET 59 is what it implements: class by class, with the ceiling and the total graded
+      # against the diff between the two commits the lines name, because a re-class and an
+      # exclusion move those two numbers down honestly.
+      #
+      # WHAT IT BLOCKS, decided in ticket 59 (delegated, ADR-0025). The served artefact is this
+      # workflow's own run conclusion, which NORTH-STAR §5 makes the only citable source for
+      # "what works": a run whose number fell unexplained is not a green run, and no document may
+      # cite it as one. It does not block the recording, because a clock that hides a fall is
+      # worse than one that reports it. It does not block a unit's release either: those live in
+      # eight independently versioned repositories, and gating their release on the hub's number
+      # would make each unit hostage to this repository's record, which NORTH-STAR §2 says the
+      # platform must never be. The number of workflows in THIS repository that key off a
+      # successful truth run is printed by verify/a-fall-blocks/verify-a-fall-blocks.sh on every
+      # run, so the day one is added the scope of this stop changes visibly rather than silently.
+      #
+      # On a branch the comparison is REPORTED and blocks nothing: the branch recorded no line
+      # (ticket 100), so the newest transition in the log is main's and not this run's.
+      #
+      # The escape hatch is a committed talk/verify-falls.txt of `run=N | reason` lines,
+      # validated the way talk/verify-exclusions.txt is.
+      - name: a fall is a blocking event
+        if: ${{ !cancelled() }}
+        run: |
+          set -uo pipefail
+          out="$(python3 talk/fall_check.py check --log talk/truth.log \
+                   --falls talk/verify-falls.txt --root . 2>&1)"; rc=$?
+          printf '%s\n' "${out}"
+          printf '%s\n' "${out}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${CAN_RECORD}" != "yes" ]; then
+            echo "this run recorded nothing, so the transition above is the default branch's newest and not this run's. It is reported here and blocks nothing."
+            exit 0
+          fi
+          if [ "${rc}" -ne 0 ]; then
+            echo "::error::THE NUMBER FELL, and no committed reason accepts it. NORTH-STAR section 5: a fall is a blocking event. This run is not a green run and no document may cite it as one. Either fix what fell, or commit a line to talk/verify-falls.txt saying run=${GITHUB_RUN_NUMBER} and why the fall is accepted."
+            exit 1
+          fi
       - name: fail if the gate failed
-        if: steps.gate.outcome == 'failure'
+        if: ${{ !cancelled() && steps.gate.outcome == 'failure' }}
         run: exit 1
