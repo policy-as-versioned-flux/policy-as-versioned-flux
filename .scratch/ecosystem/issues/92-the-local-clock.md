@@ -79,3 +79,271 @@ that is not named `*.claim.yaml` had been admitted with no check. Now any such f
 deletes the PR title and body the model wrote, so nothing the clock leaves in the run directory
 says a proposal was clean. Stub case `misnamed`, verify case 3c and a pytest pin it (commit
 b90a780). Approved after this round; merged as `pavc-other-hand`.
+
+## Round 4, 2026-09-06 — re-graded under tickets 98 and 100 (the assistant, delegated)
+
+**The ticket was already resolved and merged (PR 15, three review rounds) when this round
+began**, with its map line applied. This round is not a rebuild. It takes the two rules that
+landed after it — ticket 98's *name the served artefact and the operation that reaches it,
+and measure against both* and ticket 100's *a clock says what it can land before it
+measures* — and finds three places where the local clock reasoned from a proxy, plus the seam
+ticket 93 needs. Branch `ticket-92-the-local-clock-round-4` (the original branch name is still
+on origin from PR 15 and could not be reused without a force push; the session's permission
+classifier also refused deleting it).
+
+### What was wrong, each found by measuring and not by reading
+
+1. **The base was the clone's `main`, not the served branch.** `git worktree add ... main` cut
+   every proposal from `.estate-clone/<adopter>`'s local `main`, which is whatever the last
+   `clone-estate.sh` or pull left there. Measured on 2026-09-06: driftwood 2 behind
+   `origin/main`, tuppence 4, ludlow 1. A model reading that pool proposes against a tree the
+   served branch has moved past. Decision (delegated): every step fetches `origin main` and cuts
+   from `refs/remotes/origin/main`; the run prints `base <step>: origin/main@<sha> (local main N
+   behind, M ahead; fetched now)`; a fetch that fails is printed and dated and the last-fetched
+   ref stands (no network before measuring on a non-citable run is a fault, not a safety); no
+   `origin/main` at all refuses the step — a missing instrument (ADR-0020). Recorded per step as
+   `base` in `steps.jsonl` and the marker.
+2. **The proposal commit would have been authored and SSH-signed as the owner.** Every clone's
+   `.git/config` carries `user.name Chris Nesbitt-Smith`, `commit.gpgsign true`,
+   `user.signingkey ~/.ssh/id_ed25519.pub`; a worktree shares it; the headless child's `git
+   commit` would therefore have produced a commit the owner never read, under the owner's name
+   and key. That is the nearest thing to a faked signature this estate can produce, and the
+   first three rounds never looked. Decision (delegated): the child's environment carries
+   `GIT_AUTHOR_*`/`GIT_COMMITTER_*` naming `local clock (headless model, ticket 92)
+   <local-clock@policy-as-versioned-flux.invalid>` (the reserved TLD: not a mailbox) and
+   `GIT_CONFIG_COUNT=1 commit.gpgsign=false`; and because an environment is a hint the model can
+   override with `-c`, the clock READS THE COMMIT BACK — a `gpgsig` header or any other author
+   is `fail`, branch kept, PR body deleted. Why unsigned rather than signed as something: ADR-0024
+   point 4 signs a clock's commit with the run's own identity, and this clock has none (ticket 90
+   shelved identity). A signature that vouches for content nobody read is worse than none; the
+   merge is the human act and the tag is the signature that prices (ticket 23). Recorded per step
+   as `signature_block: false` and `author`.
+3. **`--push` discovered its missing instrument after spending the model call.** Observed live
+   while the round's first test ran against the OLD script: with a stub model and a fixture
+   origin, `--push` ran the model, pushed the branch to the fixture origin, and then invoked the
+   real `gh pr create --repo policy-as-versioned-driftwood/driftwood`, which failed (`Head sha
+   can't be blank ... No commits between main and local-clock/...`) — a branch on an origin with
+   nothing naming it, and a real API call from a test. Nothing was created on GitHub. Decision
+   (delegated): before the run directory exists, `--push` requires `gh auth status` to pass and
+   `git ls-remote --exit-code --heads origin main` to answer for every adopter, and refuses the
+   whole run otherwise (exit 2, `FAIL: --push needs ...`). `LOCAL_CLOCK_GH` names a stand-in so
+   the path can be proved offline. The second line of every run now says, before anything
+   happens, what it proposes from, as whom, where it writes, whether it may push and why, and
+   what it never does (ticket 100's shape).
+4. **The gate's leak scan read a proxy.** `git ls-files` over the working tree of whatever branch
+   `.estate-clone/<unit>` happened to have checked out — a ticket or integration branch as often
+   as `main` — and it could not see any other ref. Decision (delegated): `injected_leaks(repo,
+   ref)` reads the COMMITTED tree of a ref with `git grep`, and `check` scans HEAD and
+   `refs/remotes/origin/main` (the served default branch as last fetched) of every checkout, plus
+   every local `local-clock/**` branch: a rehearsal branch carrying the mark is counted and
+   expected, a LIVE one carrying it is a FAIL (the mark escaped its rehearsal). The limits are
+   numbers on every run: how many checkouts' `origin/main` were scanned and how long ago that ref
+   was last updated (newest of `FETCH_HEAD`, the ref file, `packed-refs` — `FETCH_HEAD` alone is
+   per-worktree and lies in a linked worktree), how many have no `origin/main` (SKIP, not clean),
+   how many rehearsal branches carry the mark.
+5. **A fixture's marker could be graded as the clock having run.** The marker now records which
+   binary stood as the model; `marker_verdict` returns SKIP for any name but `claude`, dated and
+   not graded. The stub's own result line says it is a stand-in, and the gate's offline PASS line
+   says "a fixture, not the clock having run".
+
+### What ticket 93 gets
+
+The steps table is now `name|skill|allowed paths|file pattern|validator|what`, `{adopter}` is
+substituted in the paths, every committed file must match the row's pattern and pass the row's
+validator with `--headless`, and a row whose validator is not shipped proposes nothing. The
+`derive` row carries placeholder names (`twin/orgs/{adopter}/forecasts`, `*.forecast.yaml`,
+`assets/validate_forecast.py`) that ticket 93 owns and renames in one line. What the clock
+guarantees for that row without 93 doing anything: base is `origin/main`, the commit is the
+clock's and unsigned, nothing outside the row's paths or pattern is proposed, and `--push` is
+refused unless `gh` and the origin answered first. What 93 must still build: the skill, its
+validator, and the pre-registration and scoring it names.
+
+### Proved over a throwaway repository, the way `verify/can-record/` does
+
+`verify-local-clock.sh`'s fixture adopter now has a throwaway BARE ORIGIN, its local `main` one
+commit behind `origin/main`, and the real clones' signing config with a throwaway ed25519 key
+(the control commit is shown to sign as "The Owner" before the clock runs). The clock then runs
+with `stub-claude.sh` and `stub-gh.sh` and the script reads the ORIGIN: the proposal's parent is
+origin/main's tip, `origin`'s `main` is unmoved, the pushed commit has no `gpgsig`, `gh` was asked
+for `pr create --repo policy-as-versioned-driftwood/driftwood --base main --head
+local-clock/classify-<run>`, the local worktree and branch are gone; with the stub logged out the
+run is refused with exit 2 and the stub's "I was called" file is absent; a model that signs with
+`-c commit.gpgsign=true` or names a person with `--author` is refused with its branch kept. The
+scan reads the rehearsal branch without checking it out and prints its counts. Run on this
+machine: offline half PASS, marker SKIP, exit 3, 33.6 s.
+
+### Tests at the seam, red before green
+
+| command | red | green |
+| --- | --- | --- |
+| `.venv/bin/python -m pytest tests/test_local_clock.py -n0 -q` | `10 failed, 27 passed in 56.51s` — e.g. `assert ([])` on the `base ` line; `assert 1 == 2` on the `--push` pre-flight (the model ran, the branch pushed, the real `gh pr create` failed) | `37 passed in 59.68s` |
+| `bash verify/local-clock/verify-local-clock.sh` (old script, new fixture) | would fail at `the proposal's parent is ..., not origin/main ...: it was cut from the clone's stale main` | offline PASS, marker SKIP, exit 3 |
+
+### Verify commands run on this branch (2026-09-06, this machine, load 25 so the full pytest suite is quoted from CI, below)
+
+Pull request 47, branch `ticket-92-the-local-clock-round-4` at 491e5a3 (rebased onto `origin/main`
+4c8af62). Every line below was watched arrive, not predicted.
+
+- `bash talk/verify-all.sh --selfcheck` — PASS.
+- `bash verify/truth-line/verify-truth-line.sh` — PASS: 110 verify scripts placed; measured 69 passes
+  (observed 16 + self 40 + simulated 6 + meta 7) against a ceiling of 90 of 109.
+- `bash verify/every-green/verify-every-green.sh` — PASS: none of the 110 discovered scripts prints
+  SKIP and then exits 0.
+- `bash verify/can-record/verify-can-record.sh` — PASS: every recorded TRUTH line was added by a
+  clock commit naming the same run; six fixture states record exactly when the guard says so.
+- `bash verify/schedules/verify-schedules.sh` — FAIL: 3 (insurer/fetch.yml, ludlow, tuppence), the
+  same three ticket 100 recorded on 2026-09-05; not this ticket's.
+- `bash verify/local-clock/verify-local-clock.sh` — offline PASS (stand-ins over a throwaway adopter
+  and bare origin, said so on the line), then on this machine: README names its 7 flags exactly; no
+  injected mark on HEAD of 9 repositories or origin/main of 9 (oldest last updated 0h ago), 0 live
+  local-clock branches, 0 rehearsal branches; no run=local TRUTH line since 2026-09-03; plist holds
+  no credential; marker absent — SKIP, exit 3, 33.6 s.
+- `.venv/bin/python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores`
+  — Success: no issues found in 175 source files (and the helper `verify/local-clock/local_clock.py`
+  on its own: clean).
+- `.venv/bin/python -m pytest tests/test_local_clock.py -n0 -q` — 37 passed in 59.68s.
+- **The full pytest suite is quoted from CI**, `twin` run 34027150352 on this branch, because this
+  machine's load average was 25 (the brief's threshold is 10): job `tests`, `1 failed, 1983 passed
+  in 128.48s`; the one failure is `test_the_suite_is_green`, on
+  `flux_coverage_floor_is_still_reachable` (invariant 45). Job `invariants`: `71 passed, 1 failed,
+  3 skipped`, the one FAIL the same invariant 45 (`3/1966 sample(s), only 60 days`); invariant 44
+  `drift_window_is_actually_being_sampled` PASSED on CI. `typecheck`, `demo`, three `determinism`
+  matrix legs and `reproduce-elsewhere` all succeeded. `main`'s three newest `twin` runs that
+  morning failed the same way, so the branch adds no red. Not measured here: the serial-only
+  `tests/test_seam1_cli.py` leak under `-n0`, which needs the whole suite serial on a quiet machine.
+- The `truth` run this push fired (34027150333, a branch run: it measures and records nothing,
+  ticket 100) was still `pending` behind other branches' runs when this was written; its result is
+  appended below if it arrived before the pull request was handed over.
+
+### Decisions in this round, all delegated (ADR-0025)
+
+Listed inline above: base from `origin/main` (1); clock identity, unsigned, read back (2);
+`--push` pre-flight refuses before the model (3); ref-based scan with printed numbers (4);
+stand-in marker never graded (5); the manifest row stays `meta` with the fixture named as the
+instrument and the two new could-not-looks declared (`stand-in model`, `ssh-keygen`); the round-4
+branch name. ADR-0024 point 6 carries the dated note.
+
+Map line (amended): `- [92 — The local clock](issues/92-the-local-clock.md) — the local clock: `talk/local-clock.sh` runs the model steps from the owner's machine as `claude -p "/<skill> <adopter>"` under the guard, cut from `origin/main` as fetched now (never the clone's stale `main`), committed as the clock's own name and unsigned (the clone's config would have signed as the owner; a signed or person-authored commit is refused on read-back), landing a branch + PR body; `--push` proves `gh` and the origin answer before any model call, and the owner's hand pushes; `--inject` rehearsals are marked `injected: true` and refused everywhere citable; `verify-local-clock.sh` runs the clock over a throwaway adopter and bare origin with stand-ins that say so, reads the origin, scans HEAD, `origin/main` and every `local-clock/**` branch by ref and prints its limits as numbers; the steps table declares each row's paths, pattern and validator (ticket 93's seam); headless runs write no override; ADR-0024 point 6, round 4.`
+
+## Waits on the owner (round 4)
+
+- Unchanged: the first real run and the cadence. The first real run will now print `base
+  <step>: origin/main@<sha> (local main N behind ...)` and `signature: none; author: local
+  clock ...` — those two lines are what to read.
+- New, an authorisation: the three adopter clones' local `main` are behind origin (2, 4, 1).
+  The clock no longer depends on them, but `bash clone-estate.sh --refresh` (keeping `.work/`)
+  or `git -C .estate-clone/<unit> pull --ff-only` is the owner's or the integrator's to run.
+
+**The branch `truth` run arrived (34027150333, run 131, watched to completion).** Its guard said
+first: `THIS RUN CANNOT RECORD ITS TRUTH LINE, and will not pretend to` (ticket 100: a branch run
+measures, records nothing). On the runner the gate graded this ticket's script
+`verify/local-clock/verify-local-clock.sh  SKIP (never)  SKIP: no .local-clock/last-run.json on this
+machine -- the local clock has not run here, or this is not the owner's machine` -- the declared
+could-not-look, matched by the manifest row on the real substrate. The line it printed and did not
+record, quoted from the Actions log and NOT citable:
+
+    TRUTH 2026-09-06T10:54Z run=131 hub=491e5a3 enact=development units=[driftwood=6e23dbe@main feeds=8cb7ae8@main ico=c65b6b2@main insurer=c991160@main ludlow=cd2cc9b@main nist=9dd7c31@main platform=a270fce@main tuppence=fe60091@main] pass=71 [observed=17 self=40 simulated=6 meta=8] fail=11 skip=21 [never=9 waits=12] excluded=8 total=111 ceiling=92
+
+The gate's red on that run is the estate's standing set, not this branch's: `verify-schedules.sh`'s
+three and the rest of what run 113 on `main` already carried.
+
+## Round 4 review, 2026-09-06 — one blocking finding, five notes (the assistant, delegated)
+
+**F1, blocking, fixed.** The read-back looked at HEAD (`cat-file commit HEAD`, `log -1 HEAD`)
+while the allowed-paths check was a tree diff, so a branch of TWO commits — the first signed with
+the throwaway key and authored `The Owner`, the second clean as the clock — printed `signature:
+none; author: local clock`, was pushed whole to the fixture origin, and had `signature_block:
+false` recorded for it; a declaration added in commit 1 and deleted in commit 2 passed the same
+way. Round 4 had therefore RECORDED a false "unsigned, the clock's" for a branch carrying an
+owner-signed commit, by the very path it proved. Fix: every commit between the base and HEAD is
+read (signature block, author, committer), the clock admits exactly ONE commit — which the
+headless brief already demands, and which is what closes both hiding places — and `commits` is
+recorded on every step, `commit` and `committer` on an admitted one. Stub cases `twocommits` and
+`history`; the gate fixture runs `twocommits` under `--push` and reads the ORIGIN (nothing landed,
+gh never asked); pytest does the same.
+
+**F2, fixed.** "Cannot tag" was false: the guard admits `git tag -a` and the owner's global
+`tag.gpgsign=true` would sign it. Now `tag.gpgsign=false` rides in the child's environment, and
+the clock snapshots the unit's `refs/heads` and `refs/tags` (all but its own branch) before the
+child and refuses, naming the ref, any that appeared or moved — which also catches
+`git update-ref refs/heads/main HEAD`. Stub case `tag`; the fixture also asserts the tag the child
+made is unsigned. The comments and the README no longer say "cannot tag".
+
+**F3, fixed.** `CLAUDECODE` is a convention the owner's terminal upholds, said so in the README;
+the control is that a clock started with `LOCAL_CLOCK_STEP` or `LOCAL_CLOCK_RUN_DIR` already in
+its environment (a child of a running clock) is refused before anything starts, whatever it did
+to `CLAUDECODE`. Fixture case and pytest.
+
+**F4, corrected.** The signing and identity settings are in the owner's GLOBAL git config
+(`~/.gitconfig`: `user.name`, `user.email`, `user.signingkey`, `gpg.format ssh`,
+`commit.gpgsign true`, `tag.gpgsign true`, `core.hookspath`), inherited by every clone and
+worktree; driftwood's own `.git/config` carries only `gpg.x509.program gitsign`. The earlier
+paragraphs above that say "every clone's `.git/config`" are wrong on location, right on effect;
+this paragraph is the correction and the script header, README and ADR note now say global.
+
+**F5, fixed.** The leak scan reads the mark case-insensitively (`re.I`, `git grep -i`);
+`Injected: True` on a live branch is now found. **F6, done.** Just before `git push` the clock
+asks `ls-remote origin refs/heads/main`; if it differs from the fetched base it prints a note and
+records `origin_main_at_push`, so the printed base is the truth at push time.
+
+Red first: the six new tests failed against the pre-fix clock (`assert 0 == 1` / `assert 0 == 2`
+— every shape admitted; `[] == ['twin/claims/x.claim.yaml']` for the case) and pass after.
+
+## Round 5 re-review, 2026-09-06 — three more routes, one shape (the assistant, delegated)
+
+A fresh reviewer confirmed the round-4 F1 fix in every shape it was stated in, then found three
+routes to the same outcome that the whole-branch read-back did not cover. They share one shape
+and take the fix pattern already used for refs: snapshot before the child, compare after, refuse
+by name.
+
+- **F1, blocking, fixed — `git replace`.** A signed, person-authored commit S with a clean double C
+  and `git replace S C`: every ordinary read saw C (`signature: none` printed and recorded) and the
+  origin received S. `refs/replace/*` was outside the `refs/heads refs/tags` snapshot and the guard
+  admits `git replace`. Now every git command the clock runs goes through `cgit`, which sets
+  `GIT_NO_REPLACE_OBJECTS=1`, and the ref snapshot is ALL refs (heads, tags, remotes, replace,
+  notes) minus the step's branch. Stub `replace`; the fixture and pytest run it under `--push`,
+  read the origin (nothing landed, gh never asked) and read the real object behind the replace
+  ref with replacement off (it is the signed one).
+- **F2, blocking, fixed — the child can write the unit's git config.** Proved three ways by the
+  reviewer: `core.hooksPath` ran the model's pre-push hook in the owner's shell under the clock's
+  own push, with the owner's gh on PATH and no guard; `core.fsmonitor` ran at the clock's `git
+  status` on every run; `remote set-url origin evil` sent the push to evil and reported ok. Now
+  the clock snapshots `git config --list --show-origin` (system, global, local, worktree) before
+  the child and refuses any key that differs, naming it; `cgit` runs with `core.hooksPath` at a
+  directory that never exists and `core.fsmonitor=false`; `remote.origin.url`/`pushurl` are
+  re-read just before the push against the step's starting value. Stubs `hooks` (both keys, each
+  touching a marker if it runs) and `remoteurl` (a throwaway evil.git); markers absent, evil.git
+  empty, refusals name `core.hookspath`, `core.fsmonitor`, `remote.origin.url`. The README says
+  this snapshot is the control and why.
+- **F3, medium, fixed — the parent.** The admitted commit must have exactly one parent and it must
+  be `$base`: `commit --amend --reset-author` of the base (one clean clock commit, parent base^,
+  upstream's tree folded under the clock's name) and a `commit-tree -p base -p base^` merge-shaped
+  commit were both admitted with `base:` recorded as origin/main. Stubs `amend` and `merge`;
+  refusal names the parents and the base; `commits: 1` and the parents recorded.
+- **F4, low.** README and script header now say `CLAUDECODE` and `LOCAL_CLOCK_STEP`/`RUN_DIR` are
+  conventions a child with `Bash(git *)` can unset (`git -c alias.x='!...' x`), and that the
+  read-back plus F1/F2 is what bounds a nested clock.
+- **F5, low, fixed.** The signature is read from the header block only (`sed '/^$/q'`), so a
+  `gpgsig` word in the message body is text (stub `bodysig`, admitted); `Signed-off-by` /
+  `Co-authored-by` trailers naming anyone but the clock are refused via `git interpret-trailers
+  --parse` (stub `signoff`).
+- **F6, low, fixed.** `mkfixture` sets `tag.gpgsign true` and a control tag is shown signed before
+  the unsigned-tag assertion, so the control is not empty on CI; every SKIP text the script can
+  print is declared on the manifest row.
+- **No change, by round-4 decision:** a moved `origin/main` at push time is recorded, not refused.
+
+**The head's own CI, cited (watched by this session's monitor):** `twin` run 34029974153 on
+ab8a6fb, job `tests` `1 failed, 2035 passed in 165.28s` — `test_the_suite_is_green` on
+`flux_coverage_floor_is_still_reachable` (invariant 45) only; job `invariants` red on the same;
+typecheck, demo, three determinism legs and reproduce-elsewhere green. The 491e5a3 figures above
+are superseded by these.
+
+Red first: the five round-5 tests failed against the round-4 clock (every route admitted, or the
+wrong reason) and pass after; the fixture grew from 15 to 22 runs.
+
+Local run of `tests/test_local_clock.py -n0` after round 5: `1 failed, 47 passed in 992.35s` on a
+machine at load 43-55 (the file takes ~100 s unloaded; each clock invocation in the tests has a
+120 s cap), the failed test being round 4's `signed`/`asowner` pair, which passes alone in 8.76 s;
+the exception text was not captured, so the cause is not asserted here. `verify-local-clock.sh`
+with the same fixture cases: offline PASS, marker SKIP, exit 3. The suite is quoted from CI on the
+pushed head, below.
