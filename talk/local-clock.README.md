@@ -17,9 +17,13 @@ leaves) and that no rehearsal ever reached a citable path.
   answers). For an unattended launchd run Claude Code's own docs say an OAuth session may not
   refresh headlessly; if a scheduled run fails to authenticate, run `claude setup-token` once. That
   token lives in your keychain, not in any file here.
-- `gh` logged in as you (`gh auth status`) -- only needed for `--push`.
+- `gh` logged in as you (`gh auth status`) -- only needed for `--push`, and checked BEFORE the
+  model runs: a `--push` run whose `gh` is not authenticated, or whose adopter origin does not
+  answer `git ls-remote`, is refused on the spot and spends no tokens.
 - The estate assembled: `bash clone-estate.sh` (the clock reads `.estate-clone/<adopter>` and
-  makes its own worktree under `.estate-clone/<adopter>/.work/local-clock/`).
+  makes its own worktree under `.estate-clone/<adopter>/.work/local-clock/`). The clone's own
+  `main` is not what the clock proposes against: every run fetches `origin main` and cuts its
+  branch from `origin/main`, and prints how far the clone's `main` lags behind it.
 - The hub venv (`.venv/bin/python`) or a `python3` with pyyaml.
 
 ## The one command
@@ -64,23 +68,38 @@ when two runs start in the same second (the first line of every run prints it).
 | path | what |
 |---|---|
 | `.local-clock/runs/<run>/` | one directory per run: the rendered headless prompt per step, the child's JSON transcript (`*.claude.json`) and stderr, the PR title and body per step, `steps.jsonl`, `marker.json`, and on a rehearsal `injected-signal.json` |
-| `.local-clock/last-run.json` | the dated marker the gate grades: when, scheduled or by hand, live or rehearsal, hub commit, each step's status and branch |
+| `.local-clock/last-run.json` | the dated marker the gate grades: when, scheduled or by hand, live or rehearsal, which binary stood as the model (`claude`, or a stand-in's name -- a stand-in's marker is never graded as the clock having run), hub commit, and per step its status, branch, the `origin/main` sha it was cut from (`base`), `signature_block: false` and the clock's `author` |
 | `.local-clock/logs/` | launchd's stdout and stderr when the plist runs it |
 
 And in the adopter's clone: a worktree at `.estate-clone/<adopter>/.work/local-clock/<run>-<step>`
-on the branch `local-clock/<step>-<run>` (or `local-clock/rehearsal/<step>-<run>`), carrying
-the one commit the model made. It is kept until pushed (`--push` removes it and the local
-branch after the PR opens) so you can read the diff first. A step that proposes nothing, and a
-dry run, remove their worktree and branch before the run ends, and the run records `fail` if
-that removal did not happen. Nothing is written to the adopter's `main`, ever.
+on the branch `local-clock/<step>-<run>` (or `local-clock/rehearsal/<step>-<run>`), cut from
+`origin/main` as fetched at the start of the run and carrying the one commit the model made.
+It is kept until pushed (`--push` removes it and the local branch after the PR opens) so you
+can read the diff first. A step that proposes nothing, and a dry run, remove their worktree
+and branch before the run ends, and the run records `fail` if that removal did not happen.
+Nothing is written to the adopter's `main`, ever -- not the clone's and not origin's.
+
+**Whose commit is it, and is it signed?** The clock's, and no. Your clone's config names you
+as author and signs every commit with your SSH key; a model with nobody at the keyboard may do
+neither, so the child commits as `local clock (headless model, ticket 92)
+<local-clock@policy-as-versioned-flux.invalid>` with signing off, and the clock reads the commit
+back: a signature block, or any author but the clock's, is a `fail` with the branch kept. The
+pull request you open with `--push` is your hand; the merge is the human act; the tag is the
+signature that prices (ticket 23).
 
 ## How to read the result
 
-The run prints one line per step: `ok`, `skip` (with why: the skill is not shipped yet, nothing
-to propose, dry run), or `fail` (the model left uncommitted work, touched a path outside the
-step's allowed paths, committed a file under those paths that is not a `*.claim.yaml`, wrote a
-claim file that does not say `headless: true` or claims an override, or wrote one the twin
-cannot read). The last line names the marker. Then:
+The run's second line, `this run: ...`, says what it may do before it does any of it: the base
+(`origin/main` of each adopter, fetched now), the identity it commits under, the two places it
+writes, whether `--push` is on and why it is allowed, and what it never does. Then one `base`
+line per step (`origin/main@<sha> (local main N behind, M ahead; fetched now)` -- or `fetch
+FAILED (...)`, in which case the last-fetched `origin/main` stands and the line says so), and
+one result line per step: `ok`, `skip` (with why: the skill is not shipped yet, nothing to
+propose, dry run), or `fail` (the model left uncommitted work, signed its commit or authored it
+as a person, touched a path outside the step's allowed paths, committed a file under those
+paths that does not match the step's pattern, wrote a claim file that does not say `headless:
+true` or claims an override, or wrote one the twin cannot read; with no `origin/main` to
+propose against the step fails before the model runs). The last line names the marker. Then:
 
 ```
 cat .local-clock/last-run.json                      # the marker
@@ -178,8 +197,15 @@ the units for the flag, and one hit is a FAIL: a rehearsal is never cited.
 
 ## Adding a step (ticket 93's seam)
 
-`STEPS` in `talk/local-clock.sh` is a table: `name|skill|allowed paths|what`. The `derive` row
-is already there, pointing at `/derive-probability`; until `.claude/skills/derive-probability/SKILL.md`
-exists the clock records that step as `skip: skill derive-probability not shipped`, by name. Ship
-the skill and the row runs. A step whose claim files need a different validator names it in its
-own `assets/validate_claim.py`, the way classify-and-judge does.
+`STEPS` in `talk/local-clock.sh` is a table: `name|skill|allowed paths|file pattern|validator|what`
+(`talk/local-clock.sh --list-steps` prints it). `{adopter}` in the paths is substituted per run.
+Every file the step's commit carries must sit under the allowed paths AND match the pattern, and
+every one is run through `<skill dir>/<validator> FILE --twin <hub> --headless`; a row whose
+validator is not shipped cannot propose anything, whatever the file says about itself. The
+`derive` row is already there, pointing at `/derive-probability`, with placeholder names
+(`twin/orgs/{adopter}/forecasts`, `*.forecast.yaml`, `assets/validate_forecast.py`) that ticket
+93 owns and may rename in one line; until `.claude/skills/derive-probability/SKILL.md` exists
+the clock records that step as `skip: skill derive-probability not shipped`, by name. Ship the
+skill with its validator and the row runs. What the clock guarantees for any row: the branch is
+cut from `origin/main`, the commit is the clock's and unsigned, nothing outside the row's paths
+or pattern is proposed, and `--push` is refused unless `gh` and the origin answered first.

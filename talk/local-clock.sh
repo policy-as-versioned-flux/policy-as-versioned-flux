@@ -24,6 +24,28 @@
 # The steps table below is the seam ticket 93 stacks on: add a row, ship the skill, and the
 # clock runs it. A row whose skill is not in .claude/skills yet is recorded as skipped, by name.
 #
+# Round 4 (2026-09-06), the SERVED artefact and the OPERATION that reaches it (ticket 98's
+# rule; ticket 100's "say what you can land before you measure"):
+#   * the proposal is cut from origin/main AS FETCHED NOW, never from the clone's own `main`
+#     (every clone under .estate-clone was behind origin/main on 2026-09-06, by 1 to 4
+#     commits; a proposal cut from local main reads a pool the served branch has moved past).
+#     The run prints the base sha and how far local main lags. A fetch that fails is said so
+#     and the last-fetched origin/main is used; no origin/main at all refuses the step
+#     (a missing instrument refuses, ADR-0020).
+#   * the child commits as THE CLOCK, unsigned. Every real clone's config signs every commit
+#     with the owner's SSH key and names the owner as author; a model with nobody at the
+#     keyboard may do neither. GIT_AUTHOR_*/GIT_COMMITTER_* and commit.gpgsign=false go into
+#     the child's environment, and the clock then READS the commit back: a signature block or
+#     any other author is refused, branch kept. The merge is the human act; the tag is the
+#     signature that prices.
+#   * --push establishes its instruments BEFORE the model runs: `gh auth status` and
+#     `git ls-remote origin main` for every adopter. Either failing refuses the whole run, so a
+#     model call is never spent on a proposal that cannot reach its PR (before this, a run with
+#     no usable gh pushed the branch and then failed to open the PR: a branch on origin with
+#     nothing naming it). LOCAL_CLOCK_GH names a stand-in for tests.
+#   * the marker records which binary stood as the model; a stand-in's marker is never graded
+#     as the clock having run.
+#
 # World simulator (--inject FILE): the same run reads one dated external signal from a file (a
 # headline, a market move, a regulator publish). It is stamped `injected: true` with its
 # provenance, written ONLY under the run root, and the run is a rehearsal: its branch is named
@@ -51,16 +73,28 @@ HELPER="$HUB/verify/local-clock/local_clock.py"
 TEMPLATE="$HUB/talk/local-clock.headless.md"
 PY="${LOCAL_CLOCK_PYTHON:-$HUB/.venv/bin/python}"; [ -x "$PY" ] || PY=python3
 CLAUDE="${LOCAL_CLOCK_CLAUDE:-claude}"
+GH="${LOCAL_CLOCK_GH:-gh}"
 ROOT="${LOCAL_CLOCK_HOME:-$HUB/.local-clock}"
+# the identity the child commits under: the clock's own, never a person's. `.invalid` is the
+# reserved TLD -- it is not a mailbox and cannot be mistaken for one. No signature: nobody at
+# the keyboard signed anything (the clone's own config would sign as the owner; see below).
+CLOCK_AUTHOR_NAME="local clock (headless model, ticket 92)"
+CLOCK_AUTHOR_EMAIL="local-clock@policy-as-versioned-flux.invalid"
 ESTATE="${LOCAL_CLOCK_ESTATE:-$HUB/.estate-clone}"
 MAX_TURNS="${LOCAL_CLOCK_MAX_TURNS:-80}"
 PERIOD="${LOCAL_CLOCK_PERIOD_HOURS:-24}"
 SCHEDULED="${LOCAL_CLOCK_LAUNCHD:-0}"
 
-# name | skill | paths the step's commit may touch (space-separated) | what it is
+# name | skill | paths the step's commit may touch (space-separated; {adopter} is substituted)
+#      | the name pattern every committed file must match | the validator, relative to the
+#        skill's directory, run as `<validator> FILE --twin <hub> --headless` on every file
+#      | what it is
+# A row's validator is what makes its files proposable: a step whose validator is not shipped
+# cannot propose a file, whatever the file says about itself. Ticket 93 owns the derive row's
+# paths, pattern and validator names; they are placeholders until its skill lands.
 STEPS=(
-  "classify|classify-and-judge|twin/claims|the unbound pool (news, market moves) classified against the adopter's overlay: bindings and positions, grade 5, no override, one claim file on a branch"
-  "derive|derive-probability|twin/claims|ticket 93: a probability derived from the adopter's world model and the subscribed feeds' dated series, with its basis, grade and the signals it rested on; runs once .claude/skills/derive-probability/SKILL.md exists"
+  "classify|classify-and-judge|twin/claims|*.claim.yaml|assets/validate_claim.py|the unbound pool (news, market moves) classified against the adopter's overlay: bindings and positions, grade 5, no override, one claim file on a branch"
+  "derive|derive-probability|twin/orgs/{adopter}/forecasts|*.forecast.yaml|assets/validate_forecast.py|ticket 93: a probability derived from the adopter's world model and the subscribed feeds' dated series, with its basis, grade and the signals it rested on, written to the adopter's overlay; runs once .claude/skills/derive-probability/SKILL.md exists"
 )
 ALL_ADOPTERS="driftwood tuppence ludlow"
 
@@ -108,7 +142,7 @@ while [ $# -gt 0 ]; do
     --inject) shift; [ $# -gt 0 ] || { echo "FAIL: --inject needs a file"; exit 2; }; INJECT="$1";;
     --push) PUSH=1;;
     --dry-run) DRY=1;;
-    --list-steps) for row in "${STEPS[@]}"; do IFS='|' read -r n s p d <<<"$row"; printf '%-10s /%-22s %-14s %s\n' "$n" "$s" "$p" "$d"; done; exit 0;;
+    --list-steps) for row in "${STEPS[@]}"; do IFS='|' read -r n s p g v d <<<"$row"; printf '%-10s /%-22s %-32s %-16s %-28s %s\n' "$n" "$s" "$p" "$g" "$v" "$d"; done; exit 0;;
     --help|-h) usage; exit 0;;
     *) echo "FAIL: unknown flag $1 (see --help)"; exit 2;;
   esac
@@ -127,6 +161,28 @@ fi
 if [ "$PUSH" = 1 ] && [ -n "$INJECT" ]; then
   echo "FAIL: --push is refused on a rehearsal (--inject): an injected signal never leaves this machine"; exit 2
 fi
+# --push: establish the instruments BEFORE any model runs (ADR-0020: a missing instrument
+# refuses; ticket 100: say what this run can land before it measures). The served artefact of
+# a pushed step is a branch on the adopter's origin and the pull request naming it; both need
+# an authenticated gh and a reachable origin with a main. Nothing below is started otherwise,
+# so no model call is spent on a proposal that cannot reach its PR.
+PUSH_NOTE="no: the exact push-and-PR command is printed for the owner"
+if [ "$PUSH" = 1 ]; then
+  command -v "$GH" >/dev/null 2>&1 || { echo "FAIL: --push needs gh and none is at '$GH' -- refused before any model runs"; exit 2; }
+  if ! "$GH" auth status >/dev/null 2>&1; then
+    echo "FAIL: --push needs an authenticated gh and '$GH auth status' failed (exit $?) -- refused before any model runs; log in with gh auth login, or drop --push"; exit 2
+  fi
+  for a in "${ADOPTERS[@]}"; do
+    u="$ESTATE/$a"
+    if [ ! -d "$u/.git" ] && [ ! -f "$u/.git" ]; then
+      echo "FAIL: --push needs a checkout of $a at $u and there is none (run clone-estate.sh) -- refused before any model runs"; exit 2
+    fi
+    if ! GIT_TERMINAL_PROMPT=0 git -C "$u" ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
+      echo "FAIL: --push needs origin of $a reachable with a main branch, and 'git ls-remote origin main' at $u failed -- refused before any model runs"; exit 2
+    fi
+  done
+  PUSH_NOTE="yes: gh is authenticated and origin/main of [${ADOPTERS[*]}] answered ls-remote"
+fi
 
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$ROOT/runs" "$ROOT/logs"
@@ -144,6 +200,7 @@ if [ -n "$INJECT" ]; then
     || { echo "FAIL: the injected signal was refused (see above)"; exit 2; }
 fi
 echo "local clock: run $RUN_ID mode=$MODE scheduled=$SCHEDULED adopters=[${ADOPTERS[*]}] run_dir=$RUN_DIR"
+echo "this run: proposes from origin/main of each adopter as fetched now; commits as '$CLOCK_AUTHOR_NAME', unsigned; writes only $ROOT and .estate-clone/<adopter>/.work/local-clock; push=$PUSH_NOTE; never main, never a merge, never a tag, and never appends talk/truth.log; not citable"
 
 record() { "$PY" "$HELPER" record --run-dir "$RUN_DIR" "$@" </dev/null; }
 
@@ -204,8 +261,8 @@ open(os.environ["OUT"], "w").write(text)
 PY
 }
 
-run_step() {  # step skill paths adopter
-  local step="$1" skill="$2" paths="$3" adopter="$4"
+run_step() {  # step skill paths pattern validator adopter
+  local step="$1" skill="$2" paths="${3//\{adopter\}/$6}" pattern="$4" validator_rel="$5" adopter="$6"
   local unit="$ESTATE/$adopter" tag="$step-$adopter"
   if [ ! -f "$HUB/.claude/skills/$skill/SKILL.md" ]; then
     echo "skip  $tag: no .claude/skills/$skill/SKILL.md yet -- the step is charted, the skill is not shipped"
@@ -215,11 +272,29 @@ run_step() {  # step skill paths adopter
     echo "skip  $tag: no checkout at $unit (run clone-estate.sh)"
     record --step "$step" --adopter "$adopter" --status skip --reason "no checkout at $unit"; return 0
   fi
+  # The base is the SERVED default branch, origin/main as fetched now. The clone's own `main`
+  # is nobody's artefact: it lags origin by however long since somebody last pulled it, and a
+  # proposal cut from it reads a pool the served branch has moved past. A fetch that fails is
+  # said so and the last-fetched origin/main stands, dated by the run log; no origin/main at
+  # all is a missing instrument and refuses the step.
+  local base fetch_note behind ahead
+  if GIT_TERMINAL_PROMPT=0 git -C "$unit" fetch -q origin main 2>"$RUN_DIR/$tag.fetch.err"; then
+    fetch_note="fetched now"
+  else
+    fetch_note="fetch FAILED ($(tail -1 "$RUN_DIR/$tag.fetch.err" | cut -c1-80)); using origin/main as last fetched"
+  fi
+  if ! base="$(git -C "$unit" rev-parse --verify -q refs/remotes/origin/main)"; then
+    echo "fail  $tag: no origin/main in $unit to propose against ($fetch_note) -- a missing instrument refuses; run clone-estate.sh or git fetch"
+    record --step "$step" --adopter "$adopter" --status fail --reason "no origin/main to propose against"; return 1
+  fi
+  behind="$(git -C "$unit" rev-list --count main..origin/main 2>/dev/null || echo '?')"
+  ahead="$(git -C "$unit" rev-list --count origin/main..main 2>/dev/null || echo '?')"
+  echo "base  $tag: origin/main@${base:0:7} (local main $behind behind, $ahead ahead; $fetch_note)"
   local branch="$BRANCH_PREFIX/$step-$RUN_ID" wt="$unit/.work/local-clock/$RUN_ID-$step"
   mkdir -p "$unit/.work/local-clock"
-  if ! git -C "$unit" worktree add -q "$wt" -b "$branch" main 2>"$RUN_DIR/$tag.worktree.err"; then
-    echo "fail  $tag: could not make a worktree on $branch from main ($(tail -1 "$RUN_DIR/$tag.worktree.err"))"
-    record --step "$step" --adopter "$adopter" --status fail --reason "worktree add failed"; return 1
+  if ! git -C "$unit" worktree add -q "$wt" -b "$branch" "$base" 2>"$RUN_DIR/$tag.worktree.err"; then
+    echo "fail  $tag: could not make a worktree on $branch from origin/main@${base:0:7} ($(tail -1 "$RUN_DIR/$tag.worktree.err"))"
+    record --step "$step" --adopter "$adopter" --status fail --reason "worktree add failed" --base "$base"; return 1
   fi
   local prompt="$RUN_DIR/$tag.system.md" title="$RUN_DIR/$tag.pr-title" body="$RUN_DIR/$tag.pr-body.md"
   render_prompt "$step" "$skill" "$adopter" "$wt" "$branch" "$paths" "$prompt"
@@ -231,9 +306,16 @@ run_step() {  # step skill paths adopter
 
   echo "run   $tag: /$skill $adopter on $branch (worktree $wt, max $MAX_TURNS turns)"
   # TWIN_ENACT_MODE=operations: the refusing mode for the whole child, whatever twin/ENACT_MODE
-  # says today. The child cannot merge, cannot push an enactment repository, cannot tag.
+  # says today (the guard reads the environment before the file: twin/enact_guard.py). The child
+  # cannot merge, cannot push an enactment repository, cannot tag.
+  # GIT_AUTHOR_* / GIT_COMMITTER_* and commit.gpgsign=false: the child commits as the clock,
+  # unsigned. The clone's own config names the owner and signs with the owner's SSH key; a
+  # model with nobody at the keyboard may do neither, and the clock reads the commit back below.
   env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION \
     TWIN_ENACT_MODE=operations \
+    GIT_AUTHOR_NAME="$CLOCK_AUTHOR_NAME" GIT_AUTHOR_EMAIL="$CLOCK_AUTHOR_EMAIL" \
+    GIT_COMMITTER_NAME="$CLOCK_AUTHOR_NAME" GIT_COMMITTER_EMAIL="$CLOCK_AUTHOR_EMAIL" \
+    GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false \
     LOCAL_CLOCK_STEP="$step" LOCAL_CLOCK_ADOPTER="$adopter" LOCAL_CLOCK_UNIT_WT="$wt" \
     LOCAL_CLOCK_RUN_DIR="$RUN_DIR" LOCAL_CLOCK_INJECTED="$INJECTED_FILE" \
     LOCAL_CLOCK_TITLE_FILE="$title" LOCAL_CLOCK_BODY_FILE="$body" \
@@ -255,11 +337,28 @@ run_step() {  # step skill paths adopter
     echo "fail  $tag: the model left uncommitted changes in $wt:"; echo "$dirty" | sed 's/^/        /'
     refuse "$step" "$adopter" "$branch" "$title" "$body" "uncommitted changes left in the worktree"; return 1
   fi
-  changed="$(git -C "$wt" diff --name-only "main...HEAD")"
+  changed="$(git -C "$wt" diff --name-only "$base" HEAD)"
   if [ -z "$changed" ]; then
     echo "skip  $tag: nothing to propose (no commit on $branch)"
     cleanup_or_fail "$step" "$adopter" "$unit" "$wt" "$branch" skip "nothing to propose"; return $?
   fi
+  # The commit is read back before its files are: whose is it, and does it carry a signature?
+  # A signature block means a key signed content nobody at the keyboard read -- with the
+  # clone's config, the owner's key. Any author but the clock's is a person's name on a
+  # model's work. Both refuse, branch kept.
+  local sig_lines author commits
+  sig_lines="$(git -C "$wt" cat-file commit HEAD | grep -c '^gpgsig')"
+  author="$(git -C "$wt" log -1 --format='%an <%ae>' HEAD)"
+  commits="$(git -C "$wt" rev-list --count "$base..HEAD")"
+  if [ "$sig_lines" != 0 ]; then
+    echo "fail  $tag: the proposal commit carries a signature block -- nobody at the keyboard signed it; a headless commit is unsigned by design and the merge is the human act. Branch kept at $wt, never pushed."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "proposal commit carries a signature block"; return 1
+  fi
+  if [ "$author" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then
+    echo "fail  $tag: the proposal commit's author is '$author', not the clock's -- a headless commit is the clock's, never a person's. Branch kept at $wt, never pushed."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "proposal commit authored as '$author', not the clock"; return 1
+  fi
+  echo "ok    $tag: $commits commit(s) on origin/main@${base:0:7}; signature: none; author: $author"
   local f ok bad=""
   while IFS= read -r f; do
     [ -n "$f" ] || continue
@@ -282,15 +381,16 @@ run_step() {  # step skill paths adopter
   # here rather than trusting it. A skill that ships no validator cannot propose a claim file.
   # Nothing below this loop (the PR body and its "no override is claimed") is written unless
   # every file passed, and a refusal deletes what the model wrote to the title and body files.
-  local validator="$HUB/.claude/skills/$skill/assets/validate_claim.py" vout="$RUN_DIR/$tag.validate.out"
+  local validator="$HUB/.claude/skills/$skill/$validator_rel" vout="$RUN_DIR/$tag.validate.out"
   while IFS= read -r f; do
-    case "$f" in
-      *.claim.yaml) ;;
-      *) echo "fail  $tag: $f is under $paths but is not a *.claim.yaml -- the clock has no check for a file with that name, and a file nobody can check is not proposed. Branch kept at $wt, never pushed."
-         refuse "$step" "$adopter" "$branch" "$title" "$body" "$f is not a *.claim.yaml; unchecked"; return 1;;
+    # shellcheck disable=SC2254  # the pattern is the row's glob, unquoted on purpose
+    case "$(basename "$f")" in
+      $pattern) ;;
+      *) echo "fail  $tag: $f is under $paths but is not a $pattern -- the clock has no check for a file with that name, and a file nobody can check is not proposed. Branch kept at $wt, never pushed."
+         refuse "$step" "$adopter" "$branch" "$title" "$body" "$f is not a $pattern; unchecked"; return 1;;
     esac
     if [ ! -f "$validator" ]; then
-      echo "fail  $tag: $f is a claim file and /$skill ships no assets/validate_claim.py -- a claim nobody can check is not proposed. Branch kept at $wt, never pushed."
+      echo "fail  $tag: $f matches $pattern and /$skill ships no $validator_rel -- a file nobody can check is not proposed. Branch kept at $wt, never pushed."
       refuse "$step" "$adopter" "$branch" "$title" "$body" "no validator for $skill; $f unchecked"; return 1
     fi
     if [ "$MODE" = rehearsal ]; then
@@ -320,14 +420,15 @@ run_step() {  # step skill paths adopter
     fi
   done <<<"$changed"
   [ -s "$title" ] || git -C "$wt" log -1 --format=%s >"$title"
-  [ -s "$body" ] || { git -C "$wt" log -1 --format=%b >"$body"; printf '\n%s\n' "Made by the local clock (talk/local-clock.sh, ticket 92), run $RUN_ID. A model ran on the owner's local clock, not on a GitHub clock. No override is claimed. Never merged by the clock." >>"$body"; }
+  [ -s "$body" ] || { git -C "$wt" log -1 --format=%b >"$body"; printf '\n%s\n' "Made by the local clock (talk/local-clock.sh, ticket 92), run $RUN_ID, on origin/main@${base:0:7}. A model ran on the owner's local clock, not on a GitHub clock. No override is claimed. The commit is unsigned and authored as the clock: nobody at the keyboard signed it, and the merge is the human act. Never merged by the clock." >>"$body"; }
 
   if [ "$PUSH" = 1 ]; then
     local repo="policy-as-versioned-$adopter/$adopter" url
-    if git -C "$wt" push -q -u origin "$branch" 2>"$RUN_DIR/$tag.push.err" \
-       && url="$(gh pr create --repo "$repo" --base main --head "$branch" --title "$(cat "$title")" --body-file "$body" 2>"$RUN_DIR/$tag.pr.err")"; then
+    if GIT_TERMINAL_PROMPT=0 git -C "$wt" push -q -u origin "$branch" 2>"$RUN_DIR/$tag.push.err" \
+       && url="$("$GH" pr create --repo "$repo" --base main --head "$branch" --title "$(cat "$title")" --body-file "$body" 2>"$RUN_DIR/$tag.pr.err")"; then
       echo "ok    $tag: pushed $branch and opened $url"
-      record --step "$step" --adopter "$adopter" --status ok --branch "$branch" --pr "$url"
+      record --step "$step" --adopter "$adopter" --status ok --branch "$branch" --pr "$url" \
+             --base "$base" --signature-block false --author "$author"
       # the branch lives on origin now; the local worktree and branch have done their work
       if drop_worktree "$unit" "$wt" "$branch"; then
         echo "        $tag: worktree and local branch removed"
@@ -336,7 +437,7 @@ run_step() {  # step skill paths adopter
       fi
     else
       echo "fail  $tag: push or gh pr create failed ($(tail -1 "$RUN_DIR/$tag.push.err" "$RUN_DIR/$tag.pr.err" 2>/dev/null | tail -1 | cut -c1-120)); branch kept at $wt"
-      record --step "$step" --adopter "$adopter" --status fail --reason "push or pr create failed" --branch "$branch"; return 1
+      record --step "$step" --adopter "$adopter" --status fail --reason "push or pr create failed" --branch "$branch" --base "$base"; return 1
     fi
   else
     echo "ok    $tag: committed on $branch at $wt; PR title/body in $RUN_DIR"
@@ -345,23 +446,24 @@ run_step() {  # step skill paths adopter
     else
       echo "        to land it as a PR (the owner's hand):  git -C $wt push -u origin $branch && gh pr create --repo policy-as-versioned-$adopter/$adopter --base main --head $branch --title \"\$(cat $title)\" --body-file $body"
     fi
-    record --step "$step" --adopter "$adopter" --status ok --branch "$branch"
+    record --step "$step" --adopter "$adopter" --status ok --branch "$branch" \
+           --base "$base" --signature-block false --author "$author"
   fi
 }
 
 failed=0
 for row in "${STEPS[@]}"; do
-  IFS='|' read -r name skill paths _desc <<<"$row"
+  IFS='|' read -r name skill paths pattern validator _desc <<<"$row"
   if [ "${#ONLY_STEPS[@]}" -gt 0 ]; then
     wanted=0; for s in "${ONLY_STEPS[@]}"; do [ "$s" = "$name" ] && wanted=1; done
     [ "$wanted" = 1 ] || continue
   fi
   for adopter in "${ADOPTERS[@]}"; do
-    run_step "$name" "$skill" "$paths" "$adopter" || failed=$((failed+1))
+    run_step "$name" "$skill" "$paths" "$pattern" "$validator" "$adopter" || failed=$((failed+1))
   done
 done
 
 "$PY" "$HELPER" finish --run-dir "$RUN_DIR" --root "$ROOT" --hub "$HUB" --scheduled "$SCHEDULED" \
-  --period-hours "$PERIOD" ${INJECTED_FILE:+--injected "$INJECTED_FILE"}
+  --period-hours "$PERIOD" --model "$(basename "$CLAUDE")" ${INJECTED_FILE:+--injected "$INJECTED_FILE"}
 echo "local clock: done mode=$MODE failed=$failed marker=$ROOT/last-run.json (this run never appends talk/truth.log; it is not citable)"
 [ "$failed" = 0 ] || exit 1

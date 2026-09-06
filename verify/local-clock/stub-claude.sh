@@ -13,13 +13,20 @@
 #            (twin/claims/<date>-probe-<step>.yaml) AND write a PR title and body claiming no
 #            override -- the clock must refuse the file unchecked, keep the branch, and delete
 #            the title and body the stub wrote
+#   signed   as claim, but commit with `-c commit.gpgsign=true` and the throwaway SSH key at
+#            LOCAL_CLOCK_STUB_KEY (a `-c` outranks the clock's GIT_CONFIG_* environment, so
+#            this is a model that went out of its way to sign) -- the clock must refuse
+#   asowner  as claim, but commit with --author naming a person -- the clock must refuse
 # LOCAL_CLOCK_INJECTED (set by the clock on a rehearsal) makes the claim say injected: true.
+# Every invocation touches $LOCAL_CLOCK_HOME/model-was-called first, so a test can prove the
+# clock refused BEFORE the model ran. This is a stand-in and says so in its result line.
 set -euo pipefail
+if [ -n "${LOCAL_CLOCK_HOME:-}" ]; then mkdir -p "$LOCAL_CLOCK_HOME"; touch "$LOCAL_CLOCK_HOME/model-was-called"; fi
 wt="${LOCAL_CLOCK_UNIT_WT:?}"; run="${LOCAL_CLOCK_RUN_DIR:?}"
 step="${LOCAL_CLOCK_STEP:?}"; adopter="${LOCAL_CLOCK_ADOPTER:?}"
 what="${LOCAL_CLOCK_STUB:-claim}"
 case "$what" in
-  nothing) echo '{"type":"result","result":"LOCAL-CLOCK: nothing every pool entry is bound"}'; exit 0;;
+  nothing) echo '{"type":"result","result":"LOCAL-CLOCK: nothing every pool entry is bound (stub-claude.sh, a stand-in)"}'; exit 0;;
 esac
 mkdir -p "$wt/twin/claims"
 claim="$wt/twin/claims/$(date -u +%Y-%m-%d)-stub-$step.claim.yaml"
@@ -76,7 +83,14 @@ EOF
 if [ "$what" = dirty ]; then echo '{"type":"result","result":"LOCAL-CLOCK: failed ran out of turns"}'; exit 0; fi
 git -C "$wt" add -- "twin/claims"
 if [ "$what" = leak ]; then mkdir -p "$wt/composed"; echo "tier: 3" >"$wt/composed/x.yaml"; git -C "$wt" add -- composed; fi
-git -C "$wt" -c user.name=stub -c user.email=stub@local-clock.invalid commit -q -m "twin: stub claim from the local clock ($step, $adopter)"
+# The identity and the no-signature come from the environment the clock set (GIT_AUTHOR_*,
+# GIT_CONFIG_* commit.gpgsign=false), exactly as they would for the real model's `git commit`.
+case "$what" in
+  signed)  git -C "$wt" -c commit.gpgsign=true -c gpg.format=ssh -c user.signingkey="${LOCAL_CLOCK_STUB_KEY:?}" \
+             commit -q -m "twin: stub claim, SIGNED against the clock's environment ($step, $adopter)";;
+  asowner) git -C "$wt" commit -q --author="The Owner <owner@fixture.invalid>" -m "twin: stub claim authored as a person ($step, $adopter)";;
+  *)       git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)";;
+esac
 echo "twin: stub claim ($step, $adopter)" >"$run/$step-$adopter.pr-title"
 printf '%s\n' "A stub claim. A model ran on the owner's local clock (ticket 92), not on a GitHub clock; no override is claimed; the clock never merges." >"$run/$step-$adopter.pr-body.md"
-echo '{"type":"result","result":"LOCAL-CLOCK: ok one stub binding committed"}'
+echo '{"type":"result","result":"LOCAL-CLOCK: ok one stub binding committed (stub-claude.sh, a stand-in for claude)"}'

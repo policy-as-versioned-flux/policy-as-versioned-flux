@@ -122,6 +122,25 @@ write, and what it may never write.
      other hand's (ticket 88). `verify-schedules.sh` does not grade this clock: it parses
      workflow YAML and this clock is not a workflow; its own check is the fifth script under
      `verify/`.
+   - *round 4, 2026-09-06 (ticket 92 re-graded under tickets 98 and 100; delegated).* Three
+     facts this clock had reasoned past. **The base is `origin/main` as fetched now**, never
+     the clone's own `main`: on 2026-09-06 every adopter clone was behind origin by one to
+     four commits, so a proposal cut from local main read a pool the served branch had moved
+     past; the run prints the base sha and the lag, a failed fetch is said so and dated, and no
+     `origin/main` refuses the step (ADR-0020). **The child commits as the clock, unsigned.**
+     Every clone's config names the owner and signs with the owner's SSH key; a model with
+     nobody at the keyboard may do neither. Point 4's rule that a clock's commit is signed by
+     the *run's own identity* holds here by its negative: this clock has no identity of its own
+     (ticket 90 shelved identity), so it signs nothing and says so, and the clock refuses a
+     commit that carries a signature block or any other author. The merge is the human act and
+     the tag prices. **`--push` establishes its instruments before the model runs** -- `gh auth
+     status`, `git ls-remote origin main` -- and refuses the whole run otherwise, because a
+     branch pushed with no PR to name it was the failure mode observed when the old path was
+     run against a fixture. All three are proved by running the clock over a throwaway adopter
+     with a throwaway bare origin and stand-ins for `claude` and `gh` that say so in their
+     verdicts, reading the origin afterwards; the gate's leak scan now reads the committed tree
+     of HEAD and `origin/main` of every checkout plus every `local-clock/**` branch by ref, and
+     prints its limits as numbers.
 
 ## Alternatives
 

@@ -10,8 +10,9 @@ differs from a human-run one. Where they conflict, this note wins.
 - Hub root (your working directory): `{{HUB}}` -- the `twin` package, `twin/roles.yaml`, the
   skill's own `assets/`.
 - The adopter's checkout for THIS run: `{{UNIT_WT}}`, a worktree already on the branch
-  `{{BRANCH}}` (made from `main`). Read the overlay, the pins and `twin/signals.yaml` there, and
-  write the claim file there. Do not touch `{{ESTATE}}/{{ADOPTER}}` itself.
+  `{{BRANCH}}` (cut from `origin/main` as fetched at the start of this run, never from the
+  clone's own `main`). Read the overlay, the pins and `twin/signals.yaml` there, and write the
+  claim file there. Do not touch `{{ESTATE}}/{{ADOPTER}}` itself.
 - The publishers: `{{ESTATE}}/feeds`, `{{ESTATE}}/ico`, `{{ESTATE}}/nist`, `{{ESTATE}}/platform`,
   `{{ESTATE}}/insurer` -- read feeds at the version the adopter's `party.yaml` pins.
 - This run's directory: `{{RUN_DIR}}`.
@@ -29,7 +30,12 @@ differs from a human-run one. Where they conflict, this note wins.
    `no_model_ran_on_a_clock: false` with `clock_kind: local (ticket 92), not a GitHub clock`.
 4. **Commit on `{{BRANCH}}` in `{{UNIT_WT}}` and only files under: `{{PATHS}}`.** One commit.
    Use `git -C {{UNIT_WT}} add -- <the claim file>` and `git -C {{UNIT_WT}} commit`. Anything
-   outside those paths is a declaration, and the clock refuses the whole commit.
+   outside those paths is a declaration, and the clock refuses the whole commit. **Do not pass
+   `--author`, `--gpg-sign`/`-S` or any `-c commit.gpgsign`/`-c user.*`:** your environment
+   already names the commit as the clock's (`local clock (headless model, ticket 92)`) and
+   turns signing off. The clone's own config would sign as the owner, and a commit signed or
+   authored as a person by a model with nobody at the keyboard is refused by the clock, branch
+   kept. The merge is the human act.
 5. **Do not push. Do not run `gh`. Do not merge. Do not tag.** The hub's hook refuses an
    enactment push anyway. Instead write the pull request's title (one line) to
    `{{TITLE_FILE}}` and its body (markdown) to `{{BODY_FILE}}`. The body carries what the skill

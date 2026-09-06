@@ -9,10 +9,15 @@ on the owner's machine, because the model-backed steps can only run inside Claud
   1. the script exists, is executable, and its README names exactly the flags `--help` prints;
   2. the last run left a dated marker (`.local-clock/last-run.json`), and a scheduled run that
      is older than its declared period plus a day of slack is a clock that has stopped;
-  3. no injected signal reached a citable path: every committed .json/.jsonl/.yaml/.yml file in
-     the hub and in every unit checkout (a clone or a linked worktree) is scanned for an
-     `injected: true` flag, and one hit is a FAIL; a checkout that cannot be listed is SKIP,
-     never clean. A world-simulator rehearsal is never cited;
+  3. no injected signal reached a citable path: every .json/.jsonl/.yaml/.yml file in the
+     COMMITTED tree of HEAD and of `origin/main` (the served default branch, as last fetched --
+     the check prints how long ago that was, as a number) in the hub and in every unit checkout
+     (a clone or a linked worktree) is scanned for an `injected: true` flag, and one hit is a
+     FAIL; every local `local-clock/**` branch is scanned too: a rehearsal branch carrying the
+     mark is counted and expected, a LIVE one carrying it is a FAIL (the mark escaped its
+     rehearsal). A ref that cannot be read is SKIP, never clean. Round 4 (2026-09-06): before
+     it, the scan was `git ls-files` over the working tree of whatever branch the checkout
+     happened to be on -- a proxy for the served branch, and blind to every other ref;
   4. the local clock never appends talk/truth.log: no `run=local` TRUTH line dated on or after
      2026-09-03 (the one on 2026-08-28 predates the local clock and is a presenter run the
      record already knows about);
@@ -31,7 +36,8 @@ Usage:
     local_clock.py selfcheck
     local_clock.py stamp     --signal FILE --out PATH --root R [--by WHO]
     local_clock.py record    --run-dir D --step S --adopter A --status ok|skip|fail [--reason R] [--branch B] [--pr URL]
-    local_clock.py finish    --run-dir D --root R --hub H --scheduled 0|1 --period-hours N [--injected FILE]
+                             [--base SHA] [--signature-block true|false] [--author "NAME <EMAIL>"]
+    local_clock.py finish    --run-dir D --root R --hub H --scheduled 0|1 --period-hours N [--injected FILE] [--model NAME]
     local_clock.py plist     --hour H --minute M [--hub H] [--home DIR]     (prints the filled launchd plist)
 """
 from __future__ import annotations
@@ -61,9 +67,14 @@ SLACK_HOURS = 24                          # launchd skips a slot when the machin
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _FLAG = re.compile(r"(?<![\w-])(--[a-z][a-z0-9-]+)")
 _INJECTED = re.compile(r"""(?:^|[{,\s])["']?injected["']?\s*:\s*true\b""", re.M)
+# the same flag as a POSIX ERE for `git grep -E`, which reads a ref's committed tree directly
+_INJECTED_ERE = r"""(^|[{,[:space:]])["']?injected["']?[[:space:]]*:[[:space:]]*true"""
 _TRUTH_LOCAL = re.compile(r"^TRUTH\s+(\d{4}-\d{2}-\d{2})T\S+\s+run=local\b", re.M)
 _CREDENTIAL = re.compile(r"(?i)token|secret|password|api[_-]?key|credential")
 _SCANNED = (".json", ".jsonl", ".yaml", ".yml")
+_SCANNED_PATHSPECS = ["*.json", "*.jsonl", "*.yaml", "*.yml"]   # git pathspec: `*` crosses `/`
+SERVED_REF = "refs/remotes/origin/main"   # the served default branch, as this checkout last fetched it
+REAL_MODEL = "claude"                     # a marker left by any other binary is a fixture's, not the clock's
 
 
 class LocalClockError(ValueError):
@@ -114,7 +125,7 @@ def stamp(signal_path: str, out: str, root: str, by: str, now: str | None = None
 
 
 # --- the marker --------------------------------------------------------------------------------
-def record(run_dir: str, **fields: str) -> None:
+def record(run_dir: str, **fields: object) -> None:
     os.makedirs(run_dir, exist_ok=True)
     fields.setdefault("at", _now())
     with open(os.path.join(run_dir, "steps.jsonl"), "a") as fh:
@@ -130,10 +141,12 @@ def steps_of(run_dir: str) -> list[dict]:
 
 
 def finish(run_dir: str, root: str, hub: str, scheduled: bool, period_hours: int,
-           injected: str | None) -> dict:
+           injected: str | None, model: str = REAL_MODEL) -> dict:
     """Write the run's marker and copy it to `<root>/last-run.json`, the dated fact the gate
     grades. `mode` is `rehearsal` whenever an injected signal was read: a local run is never
-    citable in either mode, and a rehearsal says so twice."""
+    citable in either mode, and a rehearsal says so twice. `model` is the basename of the
+    binary that stood where `claude` stands; a fixture's marker says so and is never graded as
+    the clock having run."""
     try:
         commit = subprocess.run(["git", "-C", hub, "rev-parse", "--short", "HEAD"],
                                 capture_output=True, text=True, timeout=10).stdout.strip()
@@ -146,6 +159,7 @@ def finish(run_dir: str, root: str, hub: str, scheduled: bool, period_hours: int
         "mode": "rehearsal" if injected else "live",
         "injected": bool(injected),
         "injected_signal": os.path.abspath(injected) if injected else None,
+        "model": os.path.basename(model) or REAL_MODEL,
         "hub_commit": commit,
         "run_dir": os.path.abspath(run_dir),
         "steps": steps_of(run_dir),
@@ -171,7 +185,9 @@ def marker_verdict(marker: dict | None, now: dt.datetime) -> tuple[str, str]:
     """(PASS|SKIP|FAIL, reason). Absent is could-not-look: the gate runs on a machine that is
     not the owner's most days. A scheduled run older than its period plus a day of slack is a
     clock observed stopped. A run by hand is dated and reported, never graded stale: nobody
-    promised it would recur."""
+    promised it would recur. A marker whose `model` names a stand-in binary was left by a
+    fixture and says so: dated, never graded as the clock having run (a marker from before the
+    field existed names no binary and is graded as before)."""
     if marker is None:
         return ("SKIP", f"no {RUN_ROOT}/{MARKER} on this machine -- the local clock has not run "
                         f"here, or this is not the owner's machine")
@@ -180,6 +196,11 @@ def marker_verdict(marker: dict | None, now: dt.datetime) -> tuple[str, str]:
     except ValueError:
         return ("FAIL", f"the marker's ran_at {marker.get('ran_at')!r} is not a date")
     age = (now - ran).total_seconds() / 3600
+    model = str(marker.get("model") or REAL_MODEL)
+    if model != REAL_MODEL:
+        return ("SKIP", f"the last run here ({age:.0f}h ago at {marker['ran_at']}) used a stand-in "
+                        f"model ({model}), not {REAL_MODEL} -- a fixture run is not the clock "
+                        f"running, so the marker is dated and not graded")
     steps = marker.get("steps") or []
     summary = ", ".join(f"{s.get('step')}/{s.get('adopter')}={s.get('status')}" for s in steps) or "no steps"
     mode = "a rehearsal (injected signal, never citable)" if marker.get("mode") == "rehearsal" \
@@ -196,29 +217,99 @@ def marker_verdict(marker: dict | None, now: dt.datetime) -> tuple[str, str]:
 
 
 # --- no injected signal reaches a citable path --------------------------------------------------
-def injected_leaks(repo: str) -> list[str] | None:
-    """Committed .json/.jsonl/.yaml/.yml files carrying an `injected: true` flag, or None when
-    the repository could not be listed (then it was not scanned, and not-scanned is never
-    clean). Committed is the line: `git ls-files` sees the checked-out branch, so a rehearsal
-    branch that was never merged or checked out is invisible to it, and a rehearsal file that is
-    not committed at all is where a rehearsal is allowed to be."""
+def _git(repo: str, *args: str, timeout: int = 60) -> subprocess.CompletedProcess[str] | None:
+    """Run git in `repo`; None when git itself could not run (then nothing was observed)."""
     try:
-        listed = subprocess.run(["git", "-C", repo, "ls-files", "-z"], capture_output=True,
-                                text=True, timeout=60, check=True).stdout
+        return subprocess.run(["git", "-C", repo, *args], capture_output=True, text=True,
+                              timeout=timeout)
     except (OSError, subprocess.SubprocessError):
         return None
+
+
+def injected_leaks(repo: str, ref: str = "HEAD") -> list[str] | None:
+    """.json/.jsonl/.yaml/.yml files in the COMMITTED tree of `ref` carrying an `injected: true`
+    flag, or None when that tree could not be read (then it was not scanned, and not-scanned
+    is never clean). `git grep` reads the ref's tree, not the working directory, so a file that
+    is modified or untracked on disk is not seen -- uncommitted is where a rehearsal is allowed
+    to be -- and a ref other than the checked-out one (`origin/main`, a `local-clock/**`
+    branch) is read the same way. An unborn HEAD (a repository with no commit yet) has an
+    empty committed tree and is []."""
+    inside = _git(repo, "rev-parse", "--git-dir")
+    if inside is None or inside.returncode != 0:
+        return None
+    resolved = _git(repo, "rev-parse", "--verify", "-q", f"{ref}^{{commit}}")
+    if resolved is None:
+        return None
+    if resolved.returncode != 0:
+        if ref == "HEAD":
+            unborn = _git(repo, "symbolic-ref", "-q", "HEAD")
+            if unborn is not None and unborn.returncode == 0:
+                return []
+        return None
+    tree = resolved.stdout.strip()
+    done = _git(repo, "grep", "-I", "-l", "-E", "-e", _INJECTED_ERE, tree, "--", *_SCANNED_PATHSPECS)
+    if done is None or done.returncode not in (0, 1):     # 1 is "no match"
+        return None
     hits = []
-    for rel in listed.split("\0"):
-        if not rel.endswith(_SCANNED):
-            continue
-        path = os.path.join(repo, rel)
-        try:
-            with open(path, encoding="utf-8", errors="replace") as fh:
-                if _INJECTED.search(fh.read()):
-                    hits.append(rel)
-        except OSError:
-            continue
+    for line in done.stdout.splitlines():
+        _sha, _sep, rel = line.partition(":")
+        if rel:
+            hits.append(rel)
     return sorted(hits)
+
+
+def local_clock_branches(repo: str) -> list[tuple[str, str]]:
+    """Every `refs/heads/local-clock/**` branch in the checkout as (name, kind): `rehearsal`
+    for `local-clock/rehearsal/...` (the mark is expected there), `live` otherwise."""
+    done = _git(repo, "for-each-ref", "--format=%(refname:short)", "refs/heads/local-clock/")
+    if done is None or done.returncode != 0:
+        return []
+    return [(name, "rehearsal" if name.startswith("local-clock/rehearsal/") else "live")
+            for name in done.stdout.split()]
+
+
+def fetched_hours_ago(repo: str, now: dt.datetime) -> float | None:
+    """Hours since this checkout last learned what origin/main is: the newest of FETCH_HEAD
+    (per worktree, so a linked worktree may have none), the loose ref file and packed-refs.
+    None when none of them exists. This is the number that says how stale the served ref may
+    be; it is not the ref's commit date, which says how old the tip is, not how old the look."""
+    newest: float | None = None
+    for name in ("FETCH_HEAD", SERVED_REF, "packed-refs"):
+        done = _git(repo, "rev-parse", "--git-path", name)
+        if done is None or done.returncode != 0:
+            continue
+        path = done.stdout.strip()
+        if not os.path.isabs(path):
+            path = os.path.join(repo, path)
+        if os.path.exists(path):
+            stamp = os.path.getmtime(path)
+            newest = stamp if newest is None else max(newest, stamp)
+    if newest is None:
+        return None
+    return max(0.0, (now.timestamp() - newest) / 3600)
+
+
+def ref_age_hours(repo: str, ref: str, now: dt.datetime) -> float | None:
+    done = _git(repo, "log", "-1", "--format=%ct", ref)
+    if done is None or done.returncode != 0 or not done.stdout.strip():
+        return None
+    return max(0.0, (now.timestamp() - int(done.stdout.strip())) / 3600)
+
+
+def scan_repo(repo: str, now: dt.datetime | None = None) -> dict:
+    """One checkout, every ref that matters: HEAD, the served default branch as last fetched,
+    and every local-clock branch. Each value is a list of hits or None (could not read)."""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    served = _git(repo, "rev-parse", "--verify", "-q", SERVED_REF)
+    has_served = served is not None and served.returncode == 0
+    return {
+        "HEAD": injected_leaks(repo, "HEAD"),
+        "origin/main": injected_leaks(repo, SERVED_REF) if has_served else None,
+        "fetched_hours_ago": fetched_hours_ago(repo, now),
+        "origin_main_age_hours": ref_age_hours(repo, SERVED_REF, now) if has_served else None,
+        "branches": [(name, kind, injected_leaks(repo, f"refs/heads/{name}"))
+                     for name, kind in local_clock_branches(repo)],
+    }
 
 
 def estate_repos(estate: str) -> list[tuple[str, str]]:
@@ -321,23 +412,72 @@ def check(hub: str, root: str, estate: str, now: dt.datetime | None = None) -> i
     status, reason = marker_verdict(read_marker(root), now)
     out(status, reason)
 
-    # 3. no injected signal on a citable path, hub and every unit
+    # 3. no injected signal on a citable path: HEAD and the SERVED default branch (origin/main
+    #    as last fetched) of the hub and every unit, plus every local-clock branch. The limits
+    #    are printed as numbers, not prose: how long ago origin/main was fetched, how many
+    #    checkouts have no origin/main to read, how many rehearsal branches carry the mark.
     repos = [("hub", hub)] + estate_repos(estate)
-    leaked, scanned = False, 0
+    leaked, scanned_head, scanned_served = False, 0, 0
+    no_served: list[str] = []
+    never_fetched: list[str] = []
+    oldest_fetch: float | None = None
+    live_branches = rehearsal_branches = rehearsal_marked = 0
     for name, repo in repos:
-        hits = injected_leaks(repo)
-        if hits is None:
-            out("SKIP", f"{name}: git ls-files failed at {repo}, so it was not scanned for an "
-                        f"injected signal -- not scanned is not clean")
-        elif hits:
+        scan = scan_repo(repo, now)
+        if scan["HEAD"] is None:
+            out("SKIP", f"{name}: the committed tree of HEAD at {repo} could not be read, so it was "
+                        f"not scanned for an injected signal -- not scanned is not clean")
+            continue
+        scanned_head += 1
+        if scan["HEAD"]:
             leaked = True
-            out("FAIL", f"{name}: an injected (rehearsal) signal is committed at "
-                        f"{', '.join(hits)} -- a rehearsal reached a citable path")
+            out("FAIL", f"{name}: an injected (rehearsal) signal is committed on HEAD at "
+                        f"{', '.join(scan['HEAD'])} -- a rehearsal reached a citable path")
+        if scan["origin/main"] is None:
+            no_served.append(name)
         else:
-            scanned += 1
-    if not leaked and scanned:
-        out("PASS", f"no committed envelope, claim, observation or capture in {scanned} "
-                    f"repositories carries injected: true")
+            scanned_served += 1
+            if scan["origin/main"]:
+                leaked = True
+                out("FAIL", f"{name}: an injected (rehearsal) signal is committed on origin/main at "
+                            f"{', '.join(scan['origin/main'])} -- a rehearsal reached the served "
+                            f"default branch")
+            fetched = scan["fetched_hours_ago"]
+            if fetched is None:
+                never_fetched.append(name)
+            elif oldest_fetch is None or fetched > oldest_fetch:
+                oldest_fetch = fetched
+        for branch, kind, hits in scan["branches"]:
+            if hits is None:
+                out("SKIP", f"{name}: the branch {branch} could not be read, so it was not scanned")
+                continue
+            if kind == "live":
+                live_branches += 1
+                if hits:
+                    leaked = True
+                    out("FAIL", f"{name}: the LIVE local-clock branch {branch} carries injected: true "
+                                f"at {', '.join(hits)} -- the rehearsal mark escaped its rehearsal, "
+                                f"and --push would have offered it as a proposal")
+            else:
+                rehearsal_branches += 1
+                if hits:
+                    rehearsal_marked += 1
+    if no_served:
+        out("SKIP", f"{len(no_served)} repository(ies) ({', '.join(no_served)}) have no origin/main "
+                    f"in the checkout, so the served default branch was not scanned there -- not "
+                    f"scanned is not clean (HEAD was)")
+    if rehearsal_branches:
+        print(f"  note: {rehearsal_branches} rehearsal branch(es) in the checkouts, {rehearsal_marked} "
+              f"carrying injected: true by design -- never pushed, never citable")
+    if not leaked and scanned_head:
+        fetch_note = (f"oldest last updated {oldest_fetch:.0f}h ago" if oldest_fetch is not None
+                      else "update age unknown")
+        if never_fetched:
+            fetch_note += f", {len(never_fetched)} with no dated ref ({', '.join(never_fetched)})"
+        out("PASS", f"no committed envelope, claim, observation or capture carries injected: true on "
+                    f"HEAD of {scanned_head} repositories or origin/main of {scanned_served} "
+                    f"({fetch_note}); {live_branches} live local-clock branch(es) carry none, "
+                    f"{rehearsal_branches} rehearsal branch(es) may")
 
     # 4. the local clock never appends the truth log
     local_lines = local_truth_lines(os.path.join(hub, "talk", "truth.log"))
@@ -426,6 +566,29 @@ def selfcheck() -> None:
         assert os.path.isfile(os.path.join(estate, "linked", ".git"))
         assert injected_leaks(os.path.join(estate, "linked")) == ["observations/twin-sweep.jsonl"]
         assert injected_leaks(os.path.join(estate, "broken")) is None
+        # round 4: the scan reads a REF's committed tree, so a rehearsal branch is read without
+        # checking it out, a modified-but-uncommitted file is not seen, and a ref that does not
+        # exist is unread rather than clean; a rehearsal branch is told from a live one by name
+        subprocess.run(["git", "-C", repo, "checkout", "-q", "-b", "local-clock/rehearsal/classify-r"],
+                       check=True, capture_output=True)
+        with open(os.path.join(repo, "rehearsal.yaml"), "w") as fh:
+            fh.write("injected: true\n")
+        subprocess.run(["git", "-C", repo, "add", "rehearsal.yaml"], check=True)
+        subprocess.run(["git", "-C", repo, "-c", "user.name=s", "-c", "user.email=s@s",
+                        "commit", "-q", "-m", "r"], check=True)
+        subprocess.run(["git", "-C", repo, "checkout", "-q", "-"], check=True, capture_output=True)
+        with open(os.path.join(repo, "notes.md"), "a") as fh:
+            fh.write("still prose\n")
+        assert injected_leaks(repo, "refs/heads/local-clock/rehearsal/classify-r") == \
+            ["observations/twin-sweep.jsonl", "rehearsal.yaml"]
+        assert injected_leaks(repo, "HEAD") == ["observations/twin-sweep.jsonl"]
+        assert injected_leaks(repo, "refs/heads/no-such-branch") is None
+        assert local_clock_branches(repo) == [("local-clock/rehearsal/classify-r", "rehearsal")]
+        scanned = scan_repo(repo, now)
+        assert scanned["origin/main"] is None and scanned["branches"][0][1] == "rehearsal", scanned
+        # a marker left by a stand-in model is dated, never graded as the clock having run
+        assert marker_verdict({**good, "model": "stub-claude.sh"}, now)[0] == "SKIP"
+        assert marker_verdict({**good, "model": "claude"}, now)[0] == "PASS"
 
         # the truth log: absent is unread; the 2026-08-28 presenter line is known; a later
         # run=local is a fault
@@ -456,9 +619,10 @@ def selfcheck() -> None:
           "scheduled marker fails while a hand run is only dated, a committed injected envelope "
           "is found and an uncommitted one is not, an unlistable repository or absent truth "
           "log is unscanned rather than clean, a linked worktree (.git a file) is scanned like "
-          "a clone, a run=local TRUTH line since "
-          f"{LOCAL_CLOCK_BORN} fails, a credential in the plist fails, and the README's flags "
-          "are read from its Flags section only")
+          "a clone, a ref's committed tree is read without checking it out and a missing ref is "
+          "unread rather than clean, a stand-in model's marker is dated and not graded, a "
+          f"run=local TRUTH line since {LOCAL_CLOCK_BORN} fails, a credential in the plist "
+          "fails, and the README's flags are read from its Flags section only")
 
 
 def main(argv: list[str]) -> int:
@@ -482,6 +646,9 @@ def main(argv: list[str]) -> int:
     r.add_argument("--reason", default="")
     r.add_argument("--branch", default="")
     r.add_argument("--pr", default="")
+    r.add_argument("--base", default="", help="the served tip the proposal was cut from")
+    r.add_argument("--signature-block", default=None, choices=("true", "false"))
+    r.add_argument("--author", default="")
     f = sub.add_parser("finish")
     f.add_argument("--run-dir", required=True)
     f.add_argument("--root", required=True)
@@ -489,6 +656,7 @@ def main(argv: list[str]) -> int:
     f.add_argument("--scheduled", default="0")
     f.add_argument("--period-hours", default="24")
     f.add_argument("--injected", default=None)
+    f.add_argument("--model", default=REAL_MODEL, help="basename of the binary that ran as the model")
     p = sub.add_parser("plist", help="print the launchd plist with the owner's cadence and paths filled in")
     p.add_argument("--hour", type=int, required=True)
     p.add_argument("--minute", type=int, required=True)
@@ -509,8 +677,15 @@ def main(argv: list[str]) -> int:
             print(f"ok  injected signal stamped at {args.out}: {doc['kind']} dated {doc['date']}")
             return 0
         if args.cmd == "record":
+            extra: dict[str, object] = {}
+            if args.base:
+                extra["base"] = args.base
+            if args.signature_block is not None:
+                extra["signature_block"] = args.signature_block == "true"
+            if args.author:
+                extra["author"] = args.author
             record(args.run_dir, step=args.step, adopter=args.adopter, status=args.status,
-                   reason=args.reason, branch=args.branch, pr=args.pr)
+                   reason=args.reason, branch=args.branch, pr=args.pr, **extra)
             return 0
         if args.cmd == "plist":
             sys.stdout.write(render_plist(os.path.join(os.path.abspath(args.hub), PLIST),
@@ -518,9 +693,9 @@ def main(argv: list[str]) -> int:
             return 0
         if args.cmd == "finish":
             marker = finish(args.run_dir, args.root, args.hub, args.scheduled == "1",
-                            int(args.period_hours), args.injected)
+                            int(args.period_hours), args.injected, args.model)
             print(f"ok  marker written: {os.path.join(args.root, MARKER)} mode={marker['mode']} "
-                  f"steps={len(marker['steps'])}")
+                  f"model={marker['model']} steps={len(marker['steps'])}")
             return 0
     except LocalClockError as exc:
         print(f"FAIL: {exc}")

@@ -20,6 +20,7 @@ import json
 import os
 import plistlib
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -234,13 +235,31 @@ def test_a_linked_worktree_in_the_estate_is_scanned_like_a_clone(lc, tmp_path: P
 STUB = HUB / "verify" / "local-clock" / "stub-claude.sh"
 
 
-def _fixture_adopter(unit: Path) -> None:
+def _git(repo: Path, *args: str) -> str:
+    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True,
+                          check=True).stdout.strip()
+
+
+def _fixture_adopter(unit: Path, behind: int = 1) -> Path:
+    """A throwaway adopter whose `origin` is a throwaway bare repository, with the clone's local
+    `main` BEHIND origin/main by `behind` commits -- the state every real clone under
+    .estate-clone was in on 2026-09-06 (driftwood 2, tuppence 4, ludlow 1). Returns the origin."""
     (unit / "twin").mkdir(parents=True)
     subprocess.run(["git", "init", "-q", "-b", "main", str(unit)], check=True)
     (unit / "twin" / "signals.yaml").write_text("org: driftwood\n")
-    subprocess.run(["git", "-C", str(unit), "add", "-A"], check=True)
-    subprocess.run(["git", "-C", str(unit), "-c", "user.name=f", "-c", "user.email=f@f",
-                    "commit", "-q", "-m", "fixture"], check=True)
+    _git(unit, "add", "-A")
+    _git(unit, "-c", "user.name=f", "-c", "user.email=f@f", "commit", "-q", "-m", "fixture")
+    origin = unit.parent / f"{unit.name}.origin.git"
+    subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(origin)], check=True)
+    _git(unit, "remote", "add", "origin", str(origin))
+    for i in range(behind):
+        (unit / "twin" / "signals.yaml").write_text(f"org: driftwood\nupstream: {i + 1}\n")
+        _git(unit, "-c", "user.name=f", "-c", "user.email=f@f", "commit", "-q", "-am", f"upstream {i + 1}")
+    _git(unit, "push", "-q", "-u", "origin", "main")
+    _git(unit, "fetch", "-q", "origin")               # FETCH_HEAD exists: the clone has fetched once
+    if behind:
+        _git(unit, "reset", "-q", "--hard", f"HEAD~{behind}")
+    return origin
 
 
 def _clock_env(tmp_path: Path, stub: str) -> dict[str, str]:
@@ -435,3 +454,235 @@ def test_validator_cli_headless_flag_refuses_the_worked_example(tmp_path: Path) 
                               capture_output=True, text=True, cwd=str(HUB))
     assert headless.returncode == 1, headless.stdout + headless.stderr
     assert "run.headless" in headless.stdout and "override from a headless run" in headless.stdout, headless.stdout
+
+
+# --- round 4 (2026-09-06): the SERVED artefact and the OPERATION that reaches it -----------
+# Ticket 98's rule, applied to this clock. The served artefact of a live step is a branch on the
+# adopter's ORIGIN (after --push) whose one commit sits on origin/main, and the pull request that
+# names it; the operation is `git push` then `gh pr create`. None of that is proved by a local
+# ref existing. These tests run the clock over a throwaway adopter with a throwaway bare origin
+# and a stub `gh`, and read the origin.
+STUB_GH = HUB / "verify" / "local-clock" / "stub-gh.sh"
+
+
+def _run_id(stdout: str) -> str:
+    return re.search(r"^local clock: run (\S+) ", stdout, re.M).group(1)  # type: ignore[union-attr]
+
+
+def _push_env(tmp_path: Path, stub: str, gh: str) -> dict[str, str]:
+    env = _clock_env(tmp_path, stub)
+    env.update({"LOCAL_CLOCK_GH": str(STUB_GH), "LOCAL_CLOCK_GH_STUB": gh,
+                "LOCAL_CLOCK_GH_LOG": str(tmp_path / "gh-calls.log")})
+    env.pop("CLAUDECODE", None)            # --push is refused inside a session, for another reason
+    env.pop("CLAUDE_CODE_CHILD_SESSION", None)
+    return env
+
+
+def test_a_proposal_is_cut_from_origin_main_not_the_clones_stale_main(tmp_path: Path) -> None:
+    # every real clone's local main was behind origin/main on 2026-09-06; a proposal cut from
+    # local main reads a pool the served artefact has moved past
+    unit = tmp_path / "estate" / "driftwood"
+    origin = _fixture_adopter(unit, behind=2)
+    served = _git(origin, "rev-parse", "main")
+    assert _git(unit, "rev-parse", "main") != served
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "claim"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 0, done.stdout + done.stderr
+    base_line = [l for l in done.stdout.splitlines() if l.startswith("base ")]
+    assert base_line and f"origin/main@{served[:7]}" in base_line[0] and "local main 2 behind" in base_line[0], done.stdout
+    rid = _run_id(done.stdout)
+    branch = f"local-clock/classify-{rid}"
+    assert _git(unit, "rev-parse", f"{branch}~1") == served, "the proposal's parent is the served tip"
+    steps = [json.loads(l) for l in (tmp_path / ".local-clock" / "runs" / rid / "steps.jsonl").read_text().splitlines()]
+    assert steps[0]["base"] == served, steps[0]
+    assert _git(unit, "rev-parse", "main") != served, "the clock does not move the clone's own main either"
+
+
+def test_the_push_preflight_refuses_before_any_model_runs_when_gh_cannot_answer(tmp_path: Path) -> None:
+    # ADR-0020: a missing instrument refuses. With --push the instruments are an authenticated
+    # gh and a reachable origin; the clock establishes both BEFORE it spends a model call
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify", "--push"],
+                          env=_push_env(tmp_path, "claim", "unauth"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 2, done.stdout + done.stderr
+    assert done.stdout.splitlines()[-1].startswith("FAIL:") and "gh" in done.stdout.splitlines()[-1], done.stdout
+    assert not (tmp_path / ".local-clock" / "model-was-called").exists(), "the model ran before the refusal"
+    assert not (tmp_path / ".local-clock" / "runs").exists() or not any((tmp_path / ".local-clock" / "runs").iterdir())
+    assert _git(unit, "for-each-ref", "refs/heads/local-clock/") == ""
+
+
+def test_push_lands_the_branch_on_origin_and_moves_nothing_else(tmp_path: Path) -> None:
+    unit = tmp_path / "estate" / "driftwood"
+    origin = _fixture_adopter(unit)
+    served = _git(origin, "rev-parse", "main")
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify", "--push"],
+                          env=_push_env(tmp_path, "claim", "ok"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 0, done.stdout + done.stderr
+    rid = _run_id(done.stdout)
+    branch = f"local-clock/classify-{rid}"
+    # the served ref: on the ORIGIN, one commit, parent is origin/main, main unmoved
+    on_origin = _git(origin, "rev-parse", "--verify", f"refs/heads/{branch}")
+    assert _git(origin, "rev-parse", f"{on_origin}~1") == served
+    assert _git(origin, "rev-parse", "main") == served, "the clock moved origin's main"
+    assert _git(origin, "diff", "--name-only", f"main..{branch}").startswith("twin/claims/")
+    # the operation: gh was asked to open exactly this PR
+    calls = (tmp_path / "gh-calls.log").read_text()
+    assert f"pr create --repo policy-as-versioned-driftwood/driftwood --base main --head {branch}" in calls, calls
+    steps = [json.loads(l) for l in (tmp_path / ".local-clock" / "runs" / rid / "steps.jsonl").read_text().splitlines()]
+    assert steps[0]["status"] == "ok" and steps[0]["pr"].startswith("https://"), steps[0]
+    # and the local worktree and branch are gone: origin has them
+    assert _git(unit, "for-each-ref", "refs/heads/local-clock/") == ""
+    assert _git(unit, "worktree", "list", "--porcelain").count("worktree ") == 1
+
+
+def _signing_key(tmp_path: Path) -> Path:
+    if not shutil.which("ssh-keygen"):
+        pytest.skip("ssh-keygen is not on PATH: the signing fixture cannot be built")
+    key = tmp_path / "throwaway_ed25519"
+    subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "throwaway", "-f", str(key)], check=True)
+    return key
+
+
+def _configure_signing_as_owner(unit: Path, key: Path) -> None:
+    # exactly what .estate-clone/<unit>/.git/config carried on 2026-09-06, with a throwaway key
+    for k, v in (("user.name", "The Owner"), ("user.email", "owner@fixture.invalid"),
+                 ("gpg.format", "ssh"), ("user.signingkey", str(key)), ("commit.gpgsign", "true")):
+        _git(unit, "config", k, v)
+
+
+def _has_signature_block(repo: Path, rev: str) -> bool:
+    return any(l.startswith("gpgsig") for l in _git(repo, "cat-file", "commit", rev).splitlines())
+
+
+def test_a_headless_commit_is_unsigned_and_authored_by_the_clock_even_where_the_clone_signs(tmp_path: Path) -> None:
+    # the real clones sign every commit with the owner's SSH key and name the owner as author.
+    # A model with nobody at the keyboard must not commit in the owner's name or under the
+    # owner's signature: the commit is the clock's, unsigned, and the merge is the human act
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    key = _signing_key(tmp_path)
+    _configure_signing_as_owner(unit, key)
+    _git(unit, "commit", "-q", "--allow-empty", "-m", "control: the clone's own config signs")
+    assert _has_signature_block(unit, "HEAD"), "the fixture's config does sign a plain commit"
+    assert _git(unit, "log", "-1", "--format=%an", "HEAD") == "The Owner"
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "claim"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 0, done.stdout + done.stderr
+    rid = _run_id(done.stdout)
+    branch = f"local-clock/classify-{rid}"
+    assert not _has_signature_block(unit, branch), "the proposal carries a signature it has no right to"
+    author = _git(unit, "log", "-1", "--format=%an <%ae>", branch)
+    assert "local clock" in author and "The Owner" not in author, author
+    assert "signature: none" in done.stdout and "author: local clock" in done.stdout, done.stdout
+    steps = [json.loads(l) for l in (tmp_path / ".local-clock" / "runs" / rid / "steps.jsonl").read_text().splitlines()]
+    assert steps[0]["signature_block"] is False and "local clock" in steps[0]["author"], steps[0]
+
+
+def test_a_proposal_that_carries_a_signature_or_the_owners_name_is_refused(tmp_path: Path) -> None:
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    key = _signing_key(tmp_path)
+    for stub, word in (("signed", "signature"), ("asowner", "author")):
+        env = _clock_env(tmp_path, stub)
+        env["LOCAL_CLOCK_STUB_KEY"] = str(key)
+        done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                              env=env, capture_output=True, text=True, timeout=120)
+        assert done.returncode == 1, (stub, done.stdout + done.stderr)
+        fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+        assert fail_lines and word in fail_lines[0], (stub, done.stdout)
+        rid = _run_id(done.stdout)
+        assert rid in _git(unit, "for-each-ref", "refs/heads/local-clock/"), "branch kept for inspection"
+        assert not (tmp_path / ".local-clock" / "runs" / rid / "classify-driftwood.pr-body.md").exists()
+
+
+# --- round 4: the leak scan reads refs, and its limits are numbers ---------------------------
+def _commit_injected_on(repo: Path, branch: str, path: str, base: str = "main") -> None:
+    _git(repo, "checkout", "-q", "-b", branch, base)
+    (repo / path).parent.mkdir(parents=True, exist_ok=True)
+    (repo / path).write_text("injected: true\nschema: twin.headline-claim/v1\n")
+    _git(repo, "add", "-A")
+    _git(repo, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", f"injected on {branch}")
+    _git(repo, "checkout", "-q", base)
+
+
+def test_leak_scan_reads_the_committed_tree_of_a_ref_not_the_working_tree(lc, tmp_path: Path) -> None:
+    repo = tmp_path / "unit"
+    (repo / "observations").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True)
+    (repo / "observations" / "x.jsonl").write_text('{"injected": false}\n')
+    _git(repo, "add", "-A")
+    _git(repo, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "clean")
+    (repo / "observations" / "x.jsonl").write_text('{"injected": true}\n')     # tracked, modified, uncommitted
+    assert lc.injected_leaks(str(repo)) == [], "the working tree is not the committed tree"
+    _git(repo, "checkout", "-q", "--", "observations/x.jsonl")
+    _commit_injected_on(repo, "local-clock/rehearsal/classify-r1", "twin/claims/2026-09-06-r.claim.yaml")
+    assert lc.injected_leaks(str(repo), "refs/heads/local-clock/rehearsal/classify-r1") == ["twin/claims/2026-09-06-r.claim.yaml"]
+    assert lc.injected_leaks(str(repo), "HEAD") == []
+    assert lc.injected_leaks(str(repo), "refs/heads/no-such-ref") is None
+
+
+def test_a_live_local_clock_branch_carrying_the_mark_fails_and_a_rehearsal_branch_is_counted(lc, tmp_path: Path, capsys) -> None:
+    estate = tmp_path / "estate"
+    unit = estate / "driftwood"
+    _fixture_adopter(unit, behind=0)
+    _commit_injected_on(unit, "local-clock/rehearsal/classify-r1", "twin/claims/2026-09-06-r.claim.yaml")
+    rc = lc.check(str(HUB), str(tmp_path / ".local-clock"), str(estate))
+    lines = capsys.readouterr().out.splitlines()
+    assert rc == 3, lines                                   # only the marker is could-not-look
+    assert not any(l.startswith("FAIL:") for l in lines), lines
+    assert any("1 rehearsal branch" in l and "by design" in l for l in lines), lines
+    # a LIVE local-clock branch carrying the mark means the mark escaped its rehearsal
+    _commit_injected_on(unit, "local-clock/classify-l1", "twin/claims/2026-09-06-l.claim.yaml")
+    rc = lc.check(str(HUB), str(tmp_path / ".local-clock"), str(estate))
+    lines = capsys.readouterr().out.splitlines()
+    assert rc == 1
+    assert any(l.startswith("FAIL:") and "local-clock/classify-l1" in l for l in lines), lines
+
+
+def test_the_scan_names_the_served_ref_and_prints_what_it_could_not_see_as_numbers(lc, tmp_path: Path, capsys) -> None:
+    estate = tmp_path / "estate"
+    unit = estate / "driftwood"
+    _fixture_adopter(unit, behind=1)
+    scan = lc.scan_repo(str(unit))
+    assert scan["HEAD"] == [] and scan["origin/main"] == [], scan
+    assert isinstance(scan["fetched_hours_ago"], float) and scan["fetched_hours_ago"] >= 0, scan
+    assert scan["branches"] == [], scan
+    lc.check(str(HUB), str(tmp_path / ".local-clock"), str(estate))
+    lines = capsys.readouterr().out.splitlines()
+    summary = [l for l in lines if l.startswith("PASS:") and "origin/main" in l]
+    # the hub itself is the second repository with an origin/main
+    assert summary and re.search(r"origin/main of 2 ", summary[0]) and re.search(r"updated \d+h ago", summary[0]), lines
+    # a unit with no origin/main at all is said so, as a count, never as clean
+    lone = estate / "lone"
+    (lone / "twin").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", "-b", "main", str(lone)], check=True)
+    (lone / "twin" / "signals.yaml").write_text("org: lone\n")
+    _git(lone, "add", "-A")
+    _git(lone, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
+    assert lc.scan_repo(str(lone))["origin/main"] is None
+    lc.check(str(HUB), str(tmp_path / ".local-clock"), str(estate))
+    lines = capsys.readouterr().out.splitlines()
+    assert any("1 repository" in l and "no origin/main" in l for l in lines), lines
+
+
+def test_a_marker_left_by_a_stand_in_model_is_not_the_clock_running(lc) -> None:
+    now = dt.datetime(2026, 9, 6, 12, tzinfo=dt.timezone.utc)
+    marker = {"ran_at": "2026-09-06T06:00:00Z", "scheduled": True, "period_hours": 24, "steps": [],
+              "model": "stub-claude.sh"}
+    status, reason = lc.marker_verdict(marker, now)
+    assert status == "SKIP" and "stand-in" in reason and "stub-claude.sh" in reason, (status, reason)
+    assert lc.marker_verdict({**marker, "model": "claude"}, now)[0] == "PASS"
+    # a marker that does not say which binary ran is from before this fact was recorded: dated, graded
+    assert lc.marker_verdict({k: v for k, v in marker.items() if k != "model"}, now)[0] == "PASS"
+
+
+def test_the_steps_table_declares_each_rows_file_pattern_and_validator() -> None:
+    # ticket 93's seam: a row says where its files go, what they are named and which validator
+    # checks them; a row whose validator is not shipped cannot propose
+    done = subprocess.run(["bash", str(CLOCK), "--list-steps"], capture_output=True, text=True, check=True)
+    rows = {l.split()[0]: l for l in done.stdout.splitlines() if l.strip()}
+    assert set(rows) >= {"classify", "derive"}, rows
+    assert "*.claim.yaml" in rows["classify"] and "assets/validate_claim.py" in rows["classify"], rows["classify"]
+    assert "{adopter}" not in rows["derive"] or "twin/orgs/" in rows["derive"], rows["derive"]
+    assert re.search(r"\*\.\S+\.yaml", rows["derive"]) and "assets/validate_" in rows["derive"], rows["derive"]
