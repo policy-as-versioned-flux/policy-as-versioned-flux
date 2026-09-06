@@ -26,9 +26,11 @@ actually pins, and not against whatever the publisher's main happens to hold tod
    says — so the adopter's own tag signs bytes that are really there;
 3. the vendored payload is byte-identical to the publisher's own artefact at the tag the
    adopter pins;
-4. the vendored converter RUNS, standalone, over the vendored payload, in a directory holding
-   nothing else — no publisher clone, no estate. That is the whole portability claim reduced to
-   an experiment;
+4. the vendored converter RUNS, standalone, in a directory holding nothing but itself and the
+   vendored payload — no publisher clone, no estate — so it carries no hidden dependency on the
+   repository it came from. See `run_standalone` for the named ceiling: this runs the converter's
+   selfcheck, not a conversion, because the invocation a conversion needs is publisher-specific
+   and that convention lives in platform;
 5. every `switching` entry carries the adopter's own perspective and reporting currency, and
    either an amount whose `over_pin_life` really is that amount over the window between the
    edge's signed `since` and the composition's own as-of, or NO amount and a named
@@ -301,7 +303,7 @@ def grade_adopter(estate: str, adopter: str, unsized: dict[str, dict] | None = N
             else:
                 out("PASS", f"{adopter}'s vendored {name}@{version} is byte-identical to what "
                             f"{party} serves at {tag}, the tag {adopter} itself pins")
-        # 4. and it RUNS with nothing else on disk
+        # 4. and it RUNS with nothing else on disk (selfcheck; see run_standalone's ceiling)
         run_standalone(repo, adopter, record)
     if unre_derivable:
         out("SKIP", f"{adopter} prices {unre_derivable:.2f} {currency}/yr, under its own "
@@ -311,8 +313,19 @@ def grade_adopter(estate: str, adopter: str, unsized: dict[str, dict] | None = N
 
 
 def run_standalone(repo: str, adopter: str, record: dict) -> None:
-    """The portability claim as an experiment: the vendored converter, over the vendored
-    payload, in a directory holding nothing else — no publisher clone, no estate, no hub."""
+    """The portability claim as an experiment: the vendored converter RUNS — its own selfcheck
+    passes — in a directory holding nothing but itself and the vendored payload. No publisher
+    clone, no estate, no hub. That is what proves the converter carries no hidden dependency on
+    the repository it came from, which is the thing that would make a vendored copy useless.
+
+    NAMED CEILING: this runs the converter's selfcheck, not a conversion of this payload. The
+    invocation a conversion needs is publisher-specific (`build <payload> <regime> <violation>`
+    for ico, `threat <payload> <party>` for the register) and that convention lives in platform's
+    `_run_converter`; restating it here would be a second copy of it in a repository that is not
+    a party. The conversion from the vendored copy IS exercised, at the seam that owns the
+    convention: platform's `compose/composition.py --selfcheck` composes driftwood with ico's
+    clone removed and re-renders all 24 files byte-identically. The payload is written beside the
+    converter so the directory is a faithful two-file reproduction of what the adopter carries."""
     converter = record.get("converter")
     if not converter:
         out("PASS", f"{adopter}'s vendored {record['name']}@{record['version']} declares no "
@@ -339,8 +352,9 @@ def run_standalone(repo: str, adopter: str, record: dict) -> None:
                            capture_output=True, text=True, cwd=tmp)
     if r.returncode == 0:
         out("PASS", f"{adopter}'s vendored converter for {record['name']}@{record['version']} "
-                    f"runs standalone, in a directory holding nothing but itself and the "
-                    f"payload — no publisher clone reachable")
+                    f"runs its own selfcheck standalone, in a directory holding nothing but "
+                    f"itself and the vendored payload — so it carries no hidden dependency on "
+                    f"{record['party']}'s repository")
     else:
         out("FAIL", f"{adopter}'s vendored converter for {record['name']}@{record['version']} "
                     f"does not run with the publisher's clone absent: "

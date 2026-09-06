@@ -134,6 +134,16 @@ Its strongest leg is an experiment rather than an assertion: the vendored conver
 a temporary directory holding nothing but itself and the vendored payload, with no publisher clone
 and no estate reachable, and RUN. A converter that will not run there is a FAIL.
 
+**Named ceiling, corrected during the build.** That leg runs the converter's own `--selfcheck`, not
+a conversion of this payload, and the first draft of the header claimed the latter. The invocation a
+conversion needs is publisher-specific (`build <payload> <regime> <violation>` for ico,
+`threat <payload> <party>` for the register) and that convention lives in platform's
+`_run_converter`; restating it in a repository that is not a party would be a second copy of it. So
+what this leg proves is that the vendored converter carries no hidden dependency on the repository
+it came from — which is the thing that would make a vendored copy useless — and the conversion
+itself is exercised at the seam that owns the convention. The ceiling is stated in
+`run_standalone`'s docstring and in the manifest row, not left for a reader to discover.
+
 The full re-derivation runs at the seam that owns it, `platform/compose/composition.py
 --selfcheck`, and this script does not restate it. That seam proves the stronger claim: with ico's
 clone removed, driftwood does not merely get the same PRICES back, it re-renders all 24 files of
