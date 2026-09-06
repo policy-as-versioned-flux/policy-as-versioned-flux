@@ -126,8 +126,9 @@ def test_a_resolved_ticket_whose_named_check_failed_derives_regressed() -> None:
     assert "verify/red/verify-red.sh" in d.why
 
 
-def test_a_dated_paragraph_naming_the_red_check_disposes_of_the_disagreement() -> None:
+def test_a_dated_paragraph_after_the_answer_disposes_of_the_disagreement() -> None:
     d = derive("\n## Answer\n\nBuilt it; `verify/red/verify-red.sh` grades it.\n\n"
+               "## Follow-up\n\n"
                "> **Correction, 2026-09-06.** `verify/red/verify-red.sh` is red on the clock "
                "because the insurer has not cut its tag; ticket 74 owns it.\n")
     assert d.derived == "regressed" and d.disagrees is False and d.acknowledged
@@ -136,12 +137,14 @@ def test_a_dated_paragraph_naming_the_red_check_disposes_of_the_disagreement() -
 def test_a_dated_paragraph_naming_a_different_check_does_not_dispose() -> None:
     """The adversary case: a correction that says something dated but not about the red check."""
     d = derive("\n## Answer\n\nBuilt it; `verify/red/verify-red.sh` grades it.\n\n"
+               "## Follow-up\n\n"
                "> **Correction, 2026-09-06.** `verify/good/verify-good.sh` was renamed.\n")
     assert d.disagrees is True
 
 
 def test_an_undated_paragraph_naming_the_red_check_does_not_dispose() -> None:
     d = derive("\n## Answer\n\nBuilt it; `verify/red/verify-red.sh` grades it.\n\n"
+               "## Follow-up\n\n"
                "> **Correction.** `verify/red/verify-red.sh` is red and we know.\n")
     assert d.disagrees is True
 
@@ -210,3 +213,97 @@ def test_a_clean_record_passes() -> None:
              "b.md": ticket("open")}
     rep = ds.report(files, ds.parse_grades(GRADES), TRUTH)
     assert rep.ok is True and rep.findings == []
+
+
+# ------------------------------------------------------------------ review 2026-09-06, F2
+
+def owned(_check: str) -> set[str]:
+    """Ownership stub: every check is owned by ticket 42, the number these fixtures use."""
+    return {"42"}
+
+
+def derive2(body: str, status: str = "resolved", owners=owned):
+    return ds.derive_one("42-a.md", ticket(status, body), ds.parse_grades(GRADES), owners=owners)
+
+
+RED = "\n## Answer\n\nBuilt it; `verify/red/verify-red.sh` grades it.\n"
+
+
+def test_a_dated_paragraph_inside_the_answer_does_not_acknowledge() -> None:
+    """F2. Only the FIRST paragraph naming the check was treated as the claim, so a second dated
+    paragraph inside the same Answer disposed of the red the Answer itself had just claimed."""
+    d = derive2(RED + "\n**Round 2, 2026-09-05.** `verify/red/verify-red.sh` grew a leg.\n")
+    assert d.disagrees is True
+
+
+def test_a_dated_paragraph_that_predates_the_answer_does_not_acknowledge() -> None:
+    """F2. A Comments section sits ABOVE the Answer in this record, so a note written before the
+    ticket was resolved was disposing of a red discovered long after it."""
+    text = ("# 42\n\nStatus: resolved\n\n## Comments\n\n**2026-09-02, review.** "
+            "`verify/red/verify-red.sh` was flaky then too.\n\n"
+            "## Answer\n\nBuilt it; `verify/red/verify-red.sh` grades it.\n")
+    d = ds.derive_one("42-a.md", text, ds.parse_grades(GRADES), owners=owned)
+    assert d.disagrees is True
+
+
+def test_an_acknowledgement_must_carry_the_check_in_backticks() -> None:
+    """F2. A bare mention, a URL or a path inside prose is not the ticket naming the check."""
+    d = derive2(RED + "\n## Follow-up\n\n**Correction, 2026-09-06.** see "
+                      "https://example.invalid/verify/red/verify-red.sh for why\n")
+    assert d.disagrees is True
+    good = derive2(RED + "\n## Follow-up\n\n**Correction, 2026-09-06.** "
+                         "`verify/red/verify-red.sh` is red; ticket 74 owns it.\n")
+    assert good.disagrees is False
+
+
+def test_an_acknowledgement_by_directory_disposes_of_the_scripts_under_it() -> None:
+    """F2. grade_of() resolves a directory by prefix, so an acknowledgement must too, or a
+    ticket that names its check as a directory could never acknowledge its own red."""
+    d = derive2("\n## Answer\n\nBuilt it; `verify/red/` holds the check.\n\n"
+                "## Follow-up\n\n**Correction, 2026-09-06.** `verify/red/` is red on the clock; "
+                "ticket 74 owns it.\n")
+    assert d.derived == "regressed" and d.disagrees is False
+
+
+# ------------------------------------------------------------------ review 2026-09-06, ownership
+
+def test_a_red_check_the_ticket_does_not_own_is_counted_not_failed() -> None:
+    """The narrowing the review asked for. Naming a check in an Answer is not owning it: nine of
+    the twelve tickets the first derivation named were discussing somebody else's check."""
+    d = derive2(RED, owners=lambda check: {"89"})
+    assert d.derived == "resolved-ungraded"
+    assert d.mentioned_red == ["verify/red/verify-red.sh"]
+    assert d.disagrees is False
+
+
+def test_ownership_is_read_from_the_number_in_the_filename() -> None:
+    d = ds.derive_one(".scratch/ecosystem/issues/99-a-thing.md", ticket("resolved", RED),
+                      ds.parse_grades(GRADES), owners=lambda check: {"99", "101"})
+    assert d.derived == "regressed" and d.disagrees is True
+
+
+def test_a_check_no_commit_ever_named_a_ticket_for_is_counted_as_unownable() -> None:
+    d = derive2(RED, owners=lambda check: set())
+    assert d.derived == "resolved-ungraded" and d.unownable == ["verify/red/verify-red.sh"]
+
+
+# ------------------------------------------------------------------ review 2026-09-06, F4
+
+def test_a_local_grade_table_is_a_could_not_look_not_a_failure() -> None:
+    """F4. A developer's own `bash talk/verify-all.sh` writes run=local, which can never be the
+    newest recorded run; failing on it would make a local gate run red for looking."""
+    local = GRADES.replace("run=122", "run=local").replace("hub=c9509cc", "hub=0000000")
+    table = ds.parse_grades(local)
+    assert ds.table_is_local(table) is True
+    assert ds.table_is_the_newest_run(table, TRUTH) == []
+
+
+def test_a_fixture_grade_table_is_also_a_could_not_look() -> None:
+    table = ds.parse_grades(GRADES.replace("ceiling=4", "ceiling=4 fixture=1"))
+    assert ds.table_is_local(table) is True
+
+
+def test_a_real_table_from_an_older_run_is_still_a_failure() -> None:
+    table = ds.parse_grades(GRADES.replace("run=122", "run=113"))
+    assert ds.table_is_local(table) is False
+    assert len(ds.table_is_the_newest_run(table, TRUTH)) == 1

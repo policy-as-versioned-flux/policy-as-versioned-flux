@@ -64,3 +64,17 @@ Graduated 2026-08-28 from ticket 15's resolution. Definition of done includes wi
 - Push of the platform branch `ticket-38-priced-holes-in-composition` (on `ecosystem/build-2026-09-03`) and its merge as `pavc-other-hand`; the guard refuses an enactment push.
 - A platform signed tag (cut-release.yml in Actions) so the new composition shape is citable by the adopters' pins.
 - Re-composing and pushing driftwood, tuppence and ludlow so their `composed/evidence.json` carries `deltas[]` and the priced `ungoverned[]` entry; until then `verify-priced-holes.sh` reads `SKIP` for each adopter. Their `HEADER.yaml` re-renders byte-identical on this branch (the header shape did not change), so no tag date moves.
+
+## Follow-up
+
+> **Correction, 2026-09-06 (eco-system ticket 59).** This ticket is `resolved`, and one of the
+> four checks its Answer names is RED on the truth surface: run 135 (2026-09-06T11:04Z, branch
+> `ticket-59-a-fall-blocks-and-status-is-derived`, `hub=33c9ac5`, not citable) graded
+> `.estate-clone/platform/compose/verify-composition.sh` `FAIL: composition.py --selfcheck`. The
+> capture shows the failure is inside `composition.py`'s own selfcheck, not in this ticket's
+> priced-holes arithmetic: `assert "acme" not in text, path` against
+> `composed/governed-namespace-guard.yaml`, which now carries `acme`. `git log --full-history` on
+> that script names tickets 38 and 63, so this ticket is one of the two the check answers to; five
+> tickets mention the governed-namespace guard (03, 09, 63, 89, 91) and all five are `resolved`,
+> so no open ticket owns this red today. Recorded here so the ticket's word and the run's grade
+> stop disagreeing in silence.

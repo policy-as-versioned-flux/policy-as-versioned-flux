@@ -27,7 +27,13 @@ on:
     - cron: '47 5 * * *'
   workflow_dispatch:
   push:
-    paths: ['talk/verify-all.sh', 'talk/verify-exclusions.txt', 'clone-estate.sh', 'verify/**', '.github/workflows/truth.yml']
+    # Ticket 59 review, F5. The four `talk/` files the gate's own arithmetic and its
+    # comparison live in were missing: a push changing only talk/truth_manifest.py,
+    # talk/verify-manifest.txt, talk/fall_check.py or talk/verify-falls.txt changed what
+    # the number MEANS and did not re-run the gate until the next day's schedule.
+    paths: ['talk/verify-all.sh', 'talk/verify-exclusions.txt', 'talk/verify-manifest.txt',
+            'talk/truth_manifest.py', 'talk/fall_check.py', 'talk/verify-falls.txt',
+            'clone-estate.sh', 'verify/**', '.github/workflows/truth.yml']
 
 permissions:
   contents: write
@@ -429,8 +435,18 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           set -uo pipefail
+          # `|| rc=$?`, NOT `; rc=$?` (ticket 59 review, F1). This step has no `shell:` key, so
+          # Actions runs it as `/usr/bin/bash -e {0}` -- the line above this output in every run
+          # log -- and `set -uo pipefail` does not clear `-e`: `set -o` adds a flag, it never
+          # removes one. A bare assignment from a command substitution that exits non-zero
+          # therefore KILLS the shell at that line: nothing printed, nothing in the step summary,
+          # no ::error::, and the CAN_RECORD test below never reached, so a branch run would have
+          # been blocked by the default branch's newest fall. The `||` list makes the failure the
+          # left arm of an OR, which `-e` does not act on. Measured:
+          # `bash -e -c 'set -uo pipefail; out="$(exit 1)"; rc=$?; echo reached'` prints nothing.
+          rc=0
           out="$(python3 talk/fall_check.py check --log talk/truth.log \
-                   --falls talk/verify-falls.txt --root . 2>&1)"; rc=$?
+                   --falls talk/verify-falls.txt --root . 2>&1)" || rc=$?
           printf '%s\n' "${out}"
           printf '%s\n' "${out}" >> "$GITHUB_STEP_SUMMARY"
           # `:-` on purpose: if the guard step failed before writing CAN_RECORD (a shallow

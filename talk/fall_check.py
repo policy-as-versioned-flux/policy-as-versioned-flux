@@ -108,21 +108,39 @@ def compare(prev_line: str, cur_line: str, changed: set[str] | None) -> list[Fal
     fail_rose = _int(cur, "fail") > _int(prev, "fail")
 
     if prev["split"] is not None and cur["split"] is not None:
+        # THE CAUSE IS READ, NEVER ASSUMED (review F3, 2026-09-06). The first version said "a pass
+        # became a could-not-look" whenever `fail` had not risen, and that is false for the most
+        # ordinary movement there is: a re-class moves a PASSING script from one class to another,
+        # so one class falls, another rises, the total is unchanged and nothing stopped looking.
+        # A checker that reports a cause it cannot see teaches its readers to discount it.
+        total_pass_moved = _int(cur, "pass") - _int(prev, "pass")
+        skips_rose = _int(cur, "skip") > _int(prev, "skip")
         for key in SPLIT_KEYS:
             was, now = prev["split"].get(key, 0), cur["split"].get(key, 0)
             if now >= was:
                 continue
-            how = ("and `fail` rose in the same step, so the passes that left became reds"
-                   if fail_rose else
-                   "and `fail` did not move, so a pass became a could-not-look inside the class "
-                   "-- a green that stopped looking, which the bare pass/fail counts cannot see")
+            if total_pass_moved >= 0:
+                how = ("while the total number of passes did not fall, so the passes moved "
+                       "between classes -- a re-class, not a lost green. It is still a fall by "
+                       "the contract, and it needs a line in " + FALLS_NAME)
+            elif fail_rose:
+                how = "and `fail` rose in the same step, so passes that left became reds"
+            elif skips_rose:
+                how = ("and `fail` did not move while `skip` rose, so a pass became a "
+                       "could-not-look -- a green that stopped looking, which the bare "
+                       "pass/fail counts cannot see")
+            else:
+                how = ("and neither `fail` nor `skip` rose, so those checks left the surface "
+                       "altogether (excluded, deleted, or no longer discovered)")
             falls.append(Fall("class-pass",
                               f"class `{key}` fell from {was} passes to {now} {how}"))
     elif _int(cur, "pass") < _int(prev, "pass"):
+        which = ("the older line carries no split" if prev["split"] is None and cur["split"]
+                 else "the newer line carries no split" if cur["split"] is None and prev["split"]
+                 else "no split on either line")
         falls.append(Fall("pass",
-                          f"passes fell from {prev['pass']} to {cur['pass']}; neither line "
-                          f"carries a split -- no split on either line, so this is the bare "
-                          f"count and no class can be named (both runs predate "
+                          f"passes fell from {prev['pass']} to {cur['pass']}; {which}, so this "
+                          f"is the bare count and no class can be named (a run predating "
                           f"{MANIFEST_FILE})"))
 
     if fail_rose:
@@ -159,8 +177,11 @@ def parse_falls(text: str) -> tuple[dict[str, str], list[str]]:
     accepted: dict[str, str] = {}
     problems: list[str] = []
     for n, raw in enumerate(text.splitlines(), 1):
-        line = raw.split("#", 1)[0].strip()
-        if not line:
+        # A WHOLE-LINE comment only (review F5, 2026-09-06). Splitting on the first `#` anywhere
+        # truncated `run=105 | issue #12 reddened it` to `issue` and refused
+        # `# a note` shaped reasons as having none. A reason is prose and prose contains hashes.
+        line = raw.strip()
+        if not line or line.startswith("#"):
             continue
         m = _FALL_LINE.match(line)
         if not m:
@@ -204,13 +225,27 @@ def report(truth_lines: Sequence[str], falls_text: str,
         return Report(ok=not problems, newest=[], problems=problems, note=note)
 
     older_unaccounted = older_accounted = 0
-    for i in range(len(lines) - 2):
+    fell: set[str] = set()
+    for i in range(len(lines) - 1):
         run = str(parsed[i + 1]["run"])
-        if compare(lines[i], lines[i + 1], changed(str(parsed[i]["hub"]), str(parsed[i + 1]["hub"]))):
-            if run in accepted:
-                older_accounted += 1
-            else:
-                older_unaccounted += 1
+        if not compare(lines[i], lines[i + 1],
+                       changed(str(parsed[i]["hub"]), str(parsed[i + 1]["hub"]))):
+            continue
+        fell.add(run)
+        if i == len(lines) - 2:
+            continue                          # the newest transition is graded below
+        if run in accepted:
+            older_accounted += 1
+        else:
+            older_unaccounted += 1
+
+    # A reason for a transition that did not fall (review F5, 2026-09-06). It used to be accepted
+    # in silence, so the hatch could fill with entries nobody could check -- the same defect as an
+    # exclusion naming a script that no longer exists, which this file's own header calls a hole.
+    problems += [f"{FALLS_NAME} accepts a fall at run={run}, but that transition did not fall; "
+                 f"remove the line, or the hatch stops being checkable"
+                 for run in sorted(accepted) if run not in fell
+                 and any(str(t["run"]) == run for t in parsed)]
 
     prev, cur = lines[-2], lines[-1]
     run = str(parsed[-1]["run"])
@@ -226,21 +261,74 @@ def report(truth_lines: Sequence[str], falls_text: str,
 
 # ------------------------------------------------------------------ git, the one impure part
 
+def _meaning(text: str) -> list[str]:
+    """A record file's meaning: its lines with comments and blanks removed.
+
+    Both files this module consults are read that way by the code that owns them --
+    talk/truth_manifest.py's parse_manifest and talk/verify-all.sh's exclusion reader both take
+    the text before the first `#` -- so normalising the same way is not a guess about the format.
+    """
+    out = []
+    for raw in text.splitlines():
+        body = raw.split("#", 1)[0].strip()
+        if body:
+            out.append(body)
+    return out
+
+
+def material_paths(before: dict[str, str], after: dict[str, str]) -> set[str]:
+    """The files whose MEANING moved, not the files that were touched (review F5, 2026-09-06).
+
+    The ceiling and total excuses were graded by file NAME, so any commit in the span that
+    retyped a comment in the manifest excused any ceiling drop at all -- and this repository
+    edits those comments constantly. A file added or removed in the span is material by
+    definition."""
+    moved = set()
+    for path in set(before) | set(after):
+        if path not in before or path not in after:
+            moved.add(path)
+        elif _meaning(before[path]) != _meaning(after[path]):
+            moved.add(path)
+    return moved
+
+
 def git_changed(root: str) -> Callable[[str, str], set[str] | None]:
-    """The paths that changed between two commits, or None if this checkout cannot read them."""
+    """The record files whose meaning moved between two commits, or None if this checkout cannot
+    read them at all."""
+
+    def show(commit: str, path: str) -> str | None:
+        try:
+            out = subprocess.run(["git", "-C", root, "show", f"{commit}:{path}"],
+                                 capture_output=True, text=True, check=False)
+        except OSError:
+            return None
+        return out.stdout if out.returncode == 0 else None
 
     def changed(a: str, b: str) -> set[str] | None:
         if not a or not b:
             return None
-        try:
-            out = subprocess.run(["git", "-C", root, "diff", "--name-only", f"{a}..{b}", "--",
-                                  MANIFEST_FILE, EXCLUSIONS_FILE],
-                                 capture_output=True, text=True, check=False)
-        except OSError:
-            return None
-        if out.returncode != 0:
-            return None
-        return {p.strip() for p in out.stdout.splitlines() if p.strip()}
+        # ONE commit per call: `git rev-parse --verify` takes exactly one parameter and exits 128
+        # on two, so the two-argument form said "unreadable" for every span and turned both
+        # excused states into falls. Caught by the fixture the moment the material-change rule
+        # landed, which is what the fixture is for.
+        for commit in (a, b):
+            try:
+                probe = subprocess.run(["git", "-C", root, "rev-parse", "--verify",
+                                        f"{commit}^{{commit}}"],
+                                       capture_output=True, text=True, check=False)
+            except OSError:
+                return None
+            if probe.returncode != 0:
+                return None                   # a commit this checkout does not carry
+        before: dict[str, str] = {}
+        after: dict[str, str] = {}
+        for path in (MANIFEST_FILE, EXCLUSIONS_FILE):
+            was, now = show(a, path), show(b, path)
+            if was is not None:
+                before[path] = was
+            if now is not None:
+                after[path] = now
+        return material_paths(before, after)
 
     return changed
 
@@ -281,6 +369,23 @@ def selfcheck() -> None:
     assert len(parse_falls("105 no pipe\n")[1]) == 1
     assert len(parse_falls("run=105 |\n")[1]) == 1
     assert len(falls_problems({"113": "r"}, {"105"})) == 1
+    # review F5: a hash inside a reason survives; only a whole-line comment is a comment
+    assert parse_falls("run=105 | issue #12 reddened it\n")[0] == {"105": "issue #12 reddened it"}
+    assert parse_falls("  # run=1 | not real\nrun=2 | real\n")[0] == {"2": "real"}
+    # review F3: a re-class of a passing script is a fall, and is not called a lost look
+    reclass = compare(line("1", observed=10, meta=3), line("2", observed=9, meta=4),
+                      {MANIFEST_FILE})
+    assert [x.kind for x in reclass] == ["class-pass"]
+    assert "between classes" in reclass[0].detail
+    assert "became a could-not-look" not in reclass[0].detail
+    # review F5: meaning, not file names
+    assert material_paths({MANIFEST_FILE: "a.sh | meta | -  # one\n"},
+                          {MANIFEST_FILE: "a.sh | meta | -  # two\n"}) == set()
+    assert material_paths({MANIFEST_FILE: "a.sh | meta | -\n"},
+                          {MANIFEST_FILE: "a.sh | self-proof | -\n"}) == {MANIFEST_FILE}
+    # review F5: a reason for a transition that did not fall is a fault
+    flat = report([line("1"), line("2"), line("3")], "run=2 | nothing fell", lambda a, b: set())
+    assert not flat.ok and any("did not fall" in q for q in flat.problems)
 
     log = [line("1", observed=10), line("2", observed=9, waits=4), line("3", observed=9)]
     rep = report(log, "", lambda a, b: set())

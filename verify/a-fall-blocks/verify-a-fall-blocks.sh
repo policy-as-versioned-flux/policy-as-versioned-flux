@@ -159,7 +159,22 @@ if ! "$PY" verify/can-record/can_record.py step "$WORKFLOW" gate "$STEP_NAME" \
   exit 1
 fi
 sed 's/^/  (lift) /' "$T/fall.notes"
-ok "lifted the step's shell verbatim out of truth.yml ($(grep -c . "$T/fall.sh") lines)"
+
+# THE RUNNER'S OWN FLAGS, read out of the step, never assumed (review F1, 2026-09-06). This step
+# declares no `shell:`, so GitHub Actions executes it as `/usr/bin/bash -e {0}`; `set -uo
+# pipefail` in the body does not clear `-e`. The first version of this fixture ran the lifted
+# shell under a plain `bash`, so `-e` was OFF, so `out="$(...)"; rc=$?` survived a non-zero exit
+# here and died on the runner -- and every state in which the checker exits 1 was measured under
+# a shell the runner does not use. Six of the eleven states were green for that reason alone.
+# can_record.py step_shell_flags() is now the one place that answers "what will the runner run
+# this under", so the fixture and the workflow cannot diverge again.
+if ! FLAGS="$("$PY" verify/can-record/can_record.py stepshell "$WORKFLOW" gate "$STEP_NAME")"; then
+  note "could not read the step's effective shell out of truth.yml"
+  echo; echo "FAIL: the runner's own flags for this step could not be read, so running it under a guessed shell would prove nothing"
+  exit 1
+fi
+# shellcheck disable=SC2086
+ok "lifted the step's shell verbatim out of truth.yml ($(grep -c . "$T/fall.sh") lines), and it will be run under the runner's own flags: bash ${FLAGS:-<none>}"
 
 export GIT_CONFIG_GLOBAL="$T/gitconfig" GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
 : >"$GIT_CONFIG_GLOBAL"
@@ -193,6 +208,11 @@ new_repo() {
   case "$touch" in
     manifest)   printf 'b/verify-b.sh | meta | never: nothing here can look\n' >>"$d/talk/verify-manifest.txt" ;;
     exclusions) printf 'y/verify-y.sh | a second helper\n' >>"$d/talk/verify-exclusions.txt" ;;
+    # A COMMENT-ONLY touch of BOTH record files (review F5, 2026-09-06). The excuse used to be
+    # granted by file NAME, so this -- which this repository does several times a week -- excused
+    # any ceiling or total drop at all. Nothing a reader of either file would act on has changed.
+    comments)   printf '# a note about the class legend\n' >>"$d/talk/verify-manifest.txt"
+                printf '# a note about why this one is excluded\n' >>"$d/talk/verify-exclusions.txt" ;;
     *)          printf 'something\n' >>"$d/other.txt" ;;
   esac
   git -C "$d" add -A >/dev/null && git -C "$d" commit -qm two
@@ -203,8 +223,10 @@ new_repo() {
 run_step() {
   local d="$1" can="$2"
   : >"$d/summary"
+  # ${FLAGS} unquoted on purpose: it is a word list of shell flags, not one argument.
+  # shellcheck disable=SC2086
   ( cd "$d" && CAN_RECORD="$can" GITHUB_STEP_SUMMARY="$d/summary" GITHUB_RUN_NUMBER=fixture-run \
-      bash "$T/fall.sh" ) >"$d/out" 2>&1
+      bash ${FLAGS} "$T/fall.sh" ) >"$d/out" 2>&1
   echo $?
 }
 
@@ -251,10 +273,18 @@ grade_case pass-became-a-skip other "" yes 1 yes "meta 3 -> 2 with fail unchange
 LINE_B='$(line fixture-2 $SHA2 10 3 4 3 60 54)'
 grade_case ceiling-fell-with-manifest manifest "" yes 0 no "a re-class lowered the ceiling and the manifest moved in the same span: not a fall"
 grade_case ceiling-fell-alone other "" yes 1 yes "the ceiling fell with no manifest change: a fall"
+grade_case ceiling-fell-comment-only comments "" yes 1 yes "the manifest was touched but only its COMMENTS moved: still a fall (review F5)"
 
 LINE_B='$(line fixture-2 $SHA2 10 3 4 3 59 55)'
 grade_case total-fell-with-exclusion exclusions "" yes 0 no "an exclusion lowered the total: not a fall"
 grade_case total-fell-alone other "" yes 1 yes "the total fell with no exclusions change: a fall"
+grade_case total-fell-comment-only comments "" yes 1 yes "the exclusions file was touched but only its COMMENTS moved: still a fall (review F5)"
+
+# A re-class that moves a PASSING script between classes: the split sum does not fall, so nothing
+# became a could-not-look, and the message must not say one did (review F3).
+LINE_A='$(line fixture-1 $SHA1 10 3 4 3 60 55)'
+LINE_B='$(line fixture-2 $SHA2 9 4 4 3 60 55)'
+grade_case reclass-of-a-passing-script manifest "" yes 1 yes "a passing script moved class: a fall, and reported as a re-class rather than a lost look"
 
 LINE_B='$(line fixture-2 $SHA2 9 3 4 4 60 55)'
 grade_case fall-with-a-reason other \
@@ -310,7 +340,7 @@ printf '%s\n' "$record"
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, that step's OWN shell -- lifted verbatim and run over throwaway git repositories in eleven states -- turns the run red on a lost class pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total while letting a re-class, an exclusion, an accepted fall and a branch run through, and the newest transition talk/truth.log recorded carries no fall no committed reason accepts"
+  echo "PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, that step's OWN shell -- lifted verbatim and run over throwaway git repositories in fifteen states -- turns the run red on a lost class pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total while letting a re-class, an exclusion, an accepted fall and a branch run through, and the newest transition talk/truth.log recorded carries no fall no committed reason accepts"
   exit 0
 fi
 echo "FAIL: $bad fault(s) -- a fall in the citable number is not a blocking event (ticket 59)"

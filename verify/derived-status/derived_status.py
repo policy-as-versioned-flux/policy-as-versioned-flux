@@ -62,9 +62,11 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Callable
 
 HERE = Path(__file__).resolve().parent
 HUB = HERE.parents[1]
@@ -121,6 +123,8 @@ class Derived:
     acknowledged: str = ""
     checks: list[str] = field(default_factory=list)
     unlisted: list[str] = field(default_factory=list)
+    mentioned_red: list[str] = field(default_factory=list)   # red, but another ticket's check
+    unownable: list[str] = field(default_factory=list)       # red, and no commit names a ticket
 
 
 @dataclass
@@ -159,10 +163,21 @@ def parse_grades(text: str) -> Table:
     return table
 
 
+def table_is_local(table: Table) -> bool:
+    """A table no clock wrote: `run=local` (a developer's own `bash talk/verify-all.sh`) or
+    `fixture=1` (the gate's selfcheck). Review F4, 2026-09-06: such a table can never be the
+    newest RECORDED run, so grading against it would turn a local gate run red for the crime of
+    having been run locally. It is a could-not-look, and the wrapper says which."""
+    if not table.truth_line:
+        return False
+    t = parse_truth(table.truth_line)
+    return str(t["run"]) == "local" or bool(t["fixture"])
+
+
 def table_is_the_newest_run(table: Table, newest: str) -> list[str]:
     """The table may only grade the record if it IS the newest recorded run's."""
-    if not table.truth_line:
-        return []                       # already a problem of its own
+    if not table.truth_line or table_is_local(table):
+        return []                       # already handled: a problem of its own, or a shrug
     mine, theirs = parse_truth(table.truth_line), parse_truth(newest)
     if str(mine["run"]) == str(theirs["run"]) and mine["hub"] == theirs["hub"]:
         return []
@@ -246,34 +261,105 @@ def answer_section(text: str) -> str:
     return rest[:nxt.start()] if nxt else rest
 
 
-def acknowledges(text: str, answer: str, check: str) -> str:
+def _match(token: str, check: str) -> bool:
+    """A named token covers a check path: the same script, or a directory above it. The same
+    prefix rule Table.grade_of() uses, so an acknowledgement can be written the way the ticket
+    named the check in the first place (review F2, 2026-09-06)."""
+    if token == check:
+        return True
+    prefix = token if token.endswith("/") else token + "/"
+    return not token.endswith(".sh") and check.startswith(prefix)
+
+
+def acknowledges(text: str, check: str) -> str:
     """The dated paragraph that acknowledges `check` being red, or "".
 
-    A dated paragraph is one carrying a date inside a bolded lead-in -- `**Correction,
-    2026-09-06.**`, `**Follow-up, 2026-08-31**`, `**2026-09-02, review.**` -- which is how every
-    dated note in this record is written.
+    THREE THINGS THE FIRST VERSION GOT WRONG (review F2, 2026-09-06). It treated only the FIRST
+    paragraph naming the check as the claim, so a second dated paragraph inside the same Answer
+    disposed of the red the Answer had just claimed. It searched the WHOLE file, so a `## Comments`
+    paragraph -- which sits ABOVE the Answer in this record -- could dispose of a red discovered
+    long after it was written. And it matched the path as a bare substring, so a URL or a mention
+    in running prose counted.
 
-    THE CLAIM CANNOT ACKNOWLEDGE ITSELF. The first paragraph of the Answer that names the check
-    is the ticket's claim to have built it; every Answer names its own check, so counting that
-    would let each ticket dispose of its own red. Only a LATER dated paragraph naming the same
-    check counts. This is the same lesson as verify/cited-truth/'s review finding F1: a
-    correction says what a claim failed to prove, it cannot supply the proof.
+    So: an acknowledgement is a paragraph that starts AFTER the `## Answer` section ends, carries
+    a dated bolded lead-in, and names the check IN BACKTICKS, by the same prefix rule the grade
+    table is read with. A correction says what a claim failed to prove; it cannot live inside the
+    claim, and it cannot predate it.
     """
-    paras = re.split(r"\n\s*\n", text)
-    claim = next((i for i, p in enumerate(paras)
-                  if check in unquote_flat(p) and unquote_flat(p) in unquote_flat(answer)), -1)
-    for i, para in enumerate(paras):
-        if i == claim:
-            continue
+    m = re.search(r"^## Answer\b", text, re.M)
+    if not m:
+        return ""
+    rest = text[m.end():]
+    nxt = re.search(r"^## ", rest, re.M)
+    if not nxt:
+        return ""                       # the Answer is the last section: nothing can come after
+    after = rest[nxt.start():]
+    for para in re.split(r"\n\s*\n", after):
         flat = unquote_flat(para)
-        if check in flat and _DATED.search(flat):
-            return flat
+        if not _DATED.search(flat):
+            continue
+        if any(_match(tok.strip(), check) for tok in re.findall(r"`([^`\n]+)`", flat)):
+            return flat[:200]
     return ""
+
+
+# ------------------------------------------------------------------ who owns a check
+
+_TICKET_IN_SUBJECT = re.compile(r"\bticket\s+(\d{1,4})\b", re.I)
+
+
+def git_owners(root: Path) -> Callable[[str], set[str]]:
+    """The ticket numbers whose commits touched a check script.
+
+    THE NARROWING THE REVIEW ASKED FOR. `named_checks()` cannot tell a check a ticket OWNS from
+    one it merely mentions, and against run 135's real grade table nine of the twelve tickets it
+    named were discussing somebody else's red: ticket 80 quoting 89's check while correcting the
+    record, ticket 83 citing driftwood's sweep script as an example of a manifest class, four
+    tickets mentioning `verify-schedules.sh` where 57's own Answer says in as many words that
+    "ticket 56 owns" the reason it is red. Prose cannot separate those. GIT CAN: a check is owned
+    by the tickets whose commits touched its file.
+
+    The served artefact is the check script; the operation that reaches it is a commit. `git log
+    --full-history -- <path>` names every commit that touched it, whatever merges happened in
+    between (the trap the build brief records for `git blame`), and this estate's commit subjects
+    are `Ticket NN: ...`. A `.estate-clone/<unit>/...` path is looked up in THAT unit's own
+    repository, because that is where its history lives.
+
+    An empty set means no commit that touched the file names any ticket at all -- squashed or
+    differently-worded history. That is UNOWNABLE, and it is counted and printed, never failed:
+    inferring an owner from silence is how a false ownership statement gets into the record.
+    """
+
+    def owners(check: str) -> set[str]:
+        cwd, path = root, check
+        if check.startswith(".estate-clone/"):
+            parts = check.split("/", 2)
+            if len(parts) < 3:
+                return set()
+            cwd, path = root / parts[0] / parts[1], parts[2]
+        if not (cwd / ".git").exists():
+            return set()
+        try:
+            out = subprocess.run(["git", "-C", str(cwd), "log", "--full-history", "--format=%s",
+                                  "--", path], capture_output=True, text=True, check=False)
+        except OSError:
+            return set()
+        if out.returncode != 0:
+            return set()
+        return {m.group(1) for m in _TICKET_IN_SUBJECT.finditer(out.stdout)}
+
+    return owners
+
+
+def ticket_number(path: str) -> str:
+    m = re.match(r"(\d{1,4})-", Path(path).name)
+    return m.group(1) if m else ""
 
 
 # ------------------------------------------------------------------ the derivation
 
-def derive_one(path: str, text: str, table: Table) -> Derived:
+def derive_one(path: str, text: str, table: Table,
+               owners: Callable[[str], set[str]] | None = None) -> Derived:
     written = written_status(text)
     d = Derived(path=path, written=written)
     if written != "resolved":
@@ -292,21 +378,36 @@ def derive_one(path: str, text: str, table: Table) -> Derived:
         d.why = ("no check this ticket names in its Answer is in the run's grade table"
                  if d.checks else "the Answer names no check in the gate")
         return d
-    red = [p for p, s in rows if s == "FAIL"]
+    all_red = [p for p, s in rows if s == "FAIL"]
     green = [p for p, s in rows if s == "PASS"]
+    # A red check this ticket does not OWN is another ticket's business (review, 2026-09-06).
+    mine = ticket_number(path)
+    red: list[str] = []
+    for check in all_red:
+        who = owners(check) if owners is not None else {mine}
+        if not who:
+            d.unownable.append(check)
+        elif mine in who:
+            red.append(check)
+        else:
+            d.mentioned_red.append(check)
     if red:
         d.derived = "regressed"
         d.why = (f"{len(red)} of the {len(rows)} check(s) it names graded FAIL on the run the "
                  f"table records: {', '.join(red)}")
         for check in red:
-            hit = acknowledges(text, answer, check)
+            hit = acknowledges(text, check)
             if hit:
                 d.acknowledged = hit[:200]
                 break
         d.disagrees = not d.acknowledged
-    elif green:
+    elif green and not (d.mentioned_red or d.unownable):
         d.derived = "resolved"
         d.why = f"{len(green)} of {len(rows)} named check(s) graded PASS and none FAIL"
+    elif d.mentioned_red or d.unownable:
+        d.derived = "resolved-ungraded"
+        d.why = (f"the red check(s) it names are not its own: "
+                 f"{', '.join(d.mentioned_red + d.unownable)}")
     else:
         d.derived = "resolved-unobserved"
         d.why = (f"every check it names could not look on that run: "
@@ -314,19 +415,23 @@ def derive_one(path: str, text: str, table: Table) -> Derived:
     return d
 
 
-def report(files: dict[str, str], table: Table, newest_truth: str) -> Report:
+def report(files: dict[str, str], table: Table, newest_truth: str,
+           owners: Callable[[str], set[str]] | None = None) -> Report:
     problems = list(table.problems) + table_is_the_newest_run(table, newest_truth)
     findings = vocabulary_findings(files) + answer_findings(files)
     derived: list[Derived] = []
     counts = {"tickets": len(files), "resolved": 0, "derived-green": 0, "regressed": 0,
-              "acknowledged": 0, "unobserved": 0, "ungraded": 0, "checks-not-in-the-table": 0}
+              "acknowledged": 0, "unobserved": 0, "ungraded": 0, "checks-not-in-the-table": 0,
+              "red-but-another-ticket's": 0, "red-and-unownable": 0}
     for path, text in sorted(files.items()):
-        d = derive_one(path, text, table)
+        d = derive_one(path, text, table, owners=owners)
         if not d.derived:
             continue
         derived.append(d)
         counts["resolved"] += 1
         counts["checks-not-in-the-table"] += len(d.unlisted)
+        counts["red-but-another-ticket's"] += len(d.mentioned_red)
+        counts["red-and-unownable"] += len(d.unownable)
         if d.derived == "resolved":
             counts["derived-green"] += 1
         elif d.derived == "resolved-unobserved":
@@ -386,17 +491,41 @@ def selfcheck() -> int:
     red = derive_one("b.md", _t("resolved", "\n## Answer\n\n`verify/red/verify-red.sh`\n"), table)
     assert red.derived == "regressed" and red.disagrees
     ack = derive_one("b.md", _t("resolved", "\n## Answer\n\n`verify/red/verify-red.sh`\n\n"
+                                "## Follow-up\n\n"
                                 "> **Correction, 2026-09-06.** `verify/red/verify-red.sh` is red "
                                 "on the clock; ticket 74 owns it.\n"), table)
     assert ack.derived == "regressed" and not ack.disagrees and ack.acknowledged
     wrong = derive_one("b.md", _t("resolved", "\n## Answer\n\n`verify/red/verify-red.sh`\n\n"
+                                  "## Follow-up\n\n"
                                   "> **Correction, 2026-09-06.** `verify/good/verify-good.sh` "
                                   "was renamed.\n"), table)
     assert wrong.disagrees, "a dated note about another check disposed of the red"
     undated = derive_one("b.md", _t("resolved", "\n## Answer\n\n`verify/red/verify-red.sh`\n\n"
+                                    "## Follow-up\n\n"
                                     "> **Correction.** `verify/red/verify-red.sh` is red.\n"),
                          table)
     assert undated.disagrees, "an undated note disposed of the red"
+    # review F2: inside the Answer, and before the Answer, are both refused
+    inside = derive_one("b.md", _t("resolved", "\n## Answer\n\n`verify/red/verify-red.sh`\n\n"
+                                   "**Round 2, 2026-09-05.** `verify/red/verify-red.sh` grew a "
+                                   "leg.\n"), table)
+    assert inside.disagrees, "a dated paragraph inside the Answer disposed of the red"
+    before = derive_one("b.md", "# 42\n\nStatus: resolved\n\n## Comments\n\n"
+                        "**2026-09-02, review.** `verify/red/verify-red.sh` was flaky.\n\n"
+                        "## Answer\n\n`verify/red/verify-red.sh`\n", table)
+    assert before.disagrees, "a paragraph predating the Answer disposed of the red"
+    # review, 2026-09-06: a red the ticket does not own is counted, not failed
+    other = derive_one("b.md", _t("resolved", "\n## Answer\n\n`verify/red/verify-red.sh`\n"),
+                       table, owners=lambda c: {"999"})
+    assert other.derived == "resolved-ungraded" and not other.disagrees
+    assert other.mentioned_red == ["verify/red/verify-red.sh"]
+    none_own = derive_one("b.md", _t("resolved", "\n## Answer\n\n`verify/red/verify-red.sh`\n"),
+                          table, owners=lambda c: set())
+    assert none_own.unownable == ["verify/red/verify-red.sh"] and not none_own.disagrees
+    # review F4: a local or fixture table is a could-not-look, an older real one is not
+    assert table_is_local(parse_grades(_GRADES.replace("run=122", "run=local")))
+    assert table_is_local(parse_grades(_GRADES.replace("ceiling=4", "ceiling=4 fixture=1")))
+    assert not table_is_local(parse_grades(_GRADES.replace("run=122", "run=113")))
     inline = derive_one("b.md", _t("resolved", "\n## Answer\n\n`verify/red/verify-red.sh` is red, "
                                    "**2026-09-06**.\n"), table)
     assert inline.disagrees, "the Answer's own words disposed of its own red"
@@ -458,7 +587,13 @@ def _run(args: argparse.Namespace) -> int:
               "table could be the newest one")
         return 1
     table = parse_grades(Path(args.grades).read_text(encoding="utf-8"))
-    rep = report(issues, table, lines[-1])
+    if table_is_local(table):
+        run = parse_truth(table.truth_line)["run"]
+        print(f"  the grade table on disk was written by run={run}"
+              f"{' with fixture=1' if parse_truth(table.truth_line)['fixture'] else ''}, which no "
+              f"clock recorded")
+        return 3
+    rep = report(issues, table, lines[-1], owners=git_owners(HUB))
     run = parse_truth(table.truth_line)["run"] if table.truth_line else "?"
     print(f"  derived from the grade table run {run} recorded, "
           f"{len(table.grades)} script(s) graded")
@@ -467,9 +602,13 @@ def _run(args: argparse.Namespace) -> int:
           f"{c['derived-green']} derive resolved from a named check that passed, "
           f"{c['regressed']} derive regressed ({c['acknowledged']} of those acknowledged by a "
           f"dated line in the ticket), {c['unobserved']} rest only on checks that could not "
-          f"look, and {c['ungraded']} name no check the table carries")
+          f"look, and {c['ungraded']} name no check of their own the table carries")
     print(f"  {c['checks-not-in-the-table']} check(s) named by a resolved ticket are not rows in "
-          f"the table at all (a unit's script this run did not discover, or a renamed one)")
+          f"the table at all (a unit's script this run did not discover, or a renamed one); "
+          f"{c["red-but-another-ticket's"]} red row(s) are named by a ticket that does not own "
+          f"the check (git says another ticket's commits touched it) and "
+          f"{c['red-and-unownable']} are named by a ticket where NO commit touching the check "
+          f"names any ticket at all, so ownership could not be established for anyone")
     for p in rep.problems:
         print(f"  !! {p}")
     for f in rep.findings:

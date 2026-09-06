@@ -34,24 +34,49 @@
 #      Answer are looked up in the grade table: any FAIL derives `regressed`, otherwise a PASS
 #      derives `resolved`, only could-not-looks derive `resolved-unobserved`, and no check the
 #      table carries derives `resolved-ungraded`. A ticket written `resolved` that derives
-#      `regressed` is a FAULT unless the file carries a DATED paragraph naming that red check --
-#      and the Answer's own claim cannot be that paragraph, because every Answer names its own
-#      check and ticket 80 was defeated this morning by a check that took the fix written into
-#      the text it graded as input.
+#      `regressed` is a FAULT unless the file carries a DATED paragraph, in a section AFTER its
+#      `## Answer`, naming that red check IN BACKTICKS. Three shapes are refused, each with a
+#      test: a dated paragraph INSIDE the Answer (the claim cannot acknowledge itself), one that
+#      PREDATES the Answer (a `## Comments` note sits above it in this record and would have
+#      disposed of a red found long afterwards), and a bare mention or a URL rather than a
+#      backticked path. Ticket 80 was defeated this morning by a check that took the fix written
+#      into the text it graded as input.
 #   3. NO GRADE TABLE YET -> exit 3, SKIP. `talk/captures/_grades.tsv` is written by
 #      talk/verify-all.sh and committed by the clock's cage, so it arrives on the first scheduled
 #      run of the default branch after this lands. That is a `waits:` in the manifest, not a
 #      `never:`: the estate's own state has not arrived, and the day it does this looks.
 #
+# WHOSE CHECK IS IT (review, 2026-09-06). Naming a check in an Answer is not owning one. Against
+# run 135's REAL grade table the first version named twelve tickets, and nine of them were
+# discussing somebody else's red -- ticket 80 quoting 89's check while correcting the record,
+# ticket 83 citing driftwood's sweep script as an example of a manifest class, four tickets
+# mentioning `verify-schedules.sh` where ticket 57's own Answer says in as many words that
+# "ticket 56 owns" the reason it is red. Writing an acknowledgement into each would have put nine
+# false ownership statements into the record. Prose cannot separate them; GIT CAN. A check is
+# owned by the tickets whose commits touched its file (`git log --full-history -- <path>`, in the
+# unit's own repository for a `.estate-clone/` path), and the narrowing lands on exactly three:
+# 38, 89 and 99. A red check a ticket does not own is COUNTED. A check no commit names any ticket
+# for is UNOWNABLE and also counted -- inferring an owner from silence is how a false ownership
+# statement gets written.
+#
+# THE ONE-RUN LAG, stated because it would otherwise be found (review F4). talk/verify-all.sh
+# writes the grade table AFTER its script loop, so when this script runs inside run N the table on
+# disk is the one run N-1's cage committed -- and talk/truth.log's newest line at that moment is
+# run N-1's too, so the two agree and the tie holds. What this check grades is therefore the
+# record against the PREVIOUS run's grades, one clock tick behind, always self-consistent. A table
+# written by `run=local` or a `fixture=1` selfcheck is a could-not-look, not a fault.
+#
 # WHAT IS COUNTED AND NEVER FAILED, printed as numbers on every run so that what is outside the
 # derivation moves with the record instead of rotting in a sentence: resolved tickets that name
-# no check the table carries (37 of 79 on 2026-09-06 -- the research, grilling and org-setup
-# tickets, which no gate check can grade), and named checks that are not rows in the table at all.
+# no check of their own the table carries (55 of 79 against run 135), named checks that are not
+# rows in the table at all (124), red rows named by a ticket that does not own the check (9) and
+# red rows no commit ties to any ticket (2).
 #
 #   PASS (exit 0)  the record uses the vocabulary, every done ticket has something behind it, and
-#                  no ticket claims resolved while a check it names is red and unacknowledged
+#                  no ticket claims resolved while a check IT OWNS is red and unacknowledged
 #   FAIL (exit 1)  one of those is false, named
-#   SKIP (exit 3)  no grade table has been recorded yet, or no python
+#   SKIP (exit 3)  no grade table has been recorded yet, the one on disk was written by a local
+#                  or fixture run, or no python
 #
 #   verify-derived-status.sh            selfcheck, then the record, then the derivation
 #   verify-derived-status.sh selfcheck  the pure half only; the record is not read
@@ -105,7 +130,21 @@ fi
 der="$("$PY" "$HERE/derived_status.py" report --issues "$ISSUES" --grades "$GRADES" \
          --log "$ROOT/talk/truth.log")"; drc=$?
 printf '%s\n' "$der"
-[ "$drc" -eq 0 ] || note "a ticket is written resolved while a check it names is red on the newest recorded run, and nothing dated in the ticket says so"
+if [ "$drc" -eq 3 ]; then
+  # A table no clock wrote (review F4, 2026-09-06): `run=local` from a developer's own
+  # `bash talk/verify-all.sh`, or `fixture=1` from the gate's selfcheck. It can never be the
+  # newest RECORDED run, so grading against it would turn a local gate run red for the crime of
+  # having been run at all. Leg 2's faults are already a FAIL above, so this shrug hides nothing.
+  if [ "$bad" -gt 0 ]; then
+    echo
+    echo "FAIL: $bad fault(s) in the record itself, named above; the derivation could not be attempted because the grade table on disk was not written by a clock"
+    exit 1
+  fi
+  echo
+  echo "SKIP: the grade table on disk was written by a local or fixture run, which talk/truth.log never records, so no ticket's Status can be derived from it; the first table a clock records replaces it"
+  exit 3
+fi
+[ "$drc" -eq 0 ] || note "a ticket is written resolved while a check it OWNS is red on the run the grade table records, and nothing dated after that ticket's Answer names that check"
 
 echo
 if [ "$bad" -eq 0 ]; then

@@ -639,3 +639,15 @@ the owner.
   claiming population on a cluster; nothing yet drives an unclaimed or orphan pod through a real
   API server, which is the only place the PriorityClass and NetworkPolicy facts above become
   observations rather than renders.
+
+## Follow-up
+
+> **Correction, 2026-09-06 (eco-system ticket 59).** This ticket is `resolved` and the check its
+> Answer names is RED. Run 135 (2026-09-06T11:04Z, branch
+> `ticket-59-a-fall-blocks-and-status-is-derived`, `hub=33c9ac5`, not citable) graded
+> `verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh` `FAIL: 1 problem(s) -- the register
+> does not honestly account for the Deny-shaped rules this estate carries (ticket 89)`. The check
+> names THIS ticket in its own verdict, and its detail line is `FAIL
+> governed-namespace-requires-claim: the register says waiting, but every source it names ...`.
+> `git log --full-history` on the script names tickets 89 and 98. So the finishing move is this
+> ticket's own remaining work on the register, and nobody else's.

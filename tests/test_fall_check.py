@@ -184,3 +184,79 @@ def test_a_log_with_no_truth_line_is_not_a_crash(bad: str) -> None:
     rep = fc.report([l for l in bad.splitlines() if l.startswith("TRUTH ")],
                     falls_text="", changed=lambda a, b: set())
     assert rep.ok is True and "no recorded" in rep.note
+
+
+# ------------------------------------------------------------------ review 2026-09-06, F3
+
+def test_a_reclass_that_moves_a_passing_script_between_classes_is_not_called_a_lost_look() -> None:
+    """F3. The split sum is unchanged and the manifest moved in the span: a PASSING script was
+    re-classed. It is still a fall by the contract (a class's passes fell), but nothing became a
+    could-not-look and the message must not say one did."""
+    before = line("1", observed=10, meta=3)
+    after = line("2", observed=9, meta=4)
+    falls = fc.compare(before, after, changed={"talk/verify-manifest.txt"})
+    assert [f.kind for f in falls] == ["class-pass"]
+    assert "became a could-not-look" not in falls[0].detail
+    assert "between classes" in falls[0].detail
+
+
+def test_a_lost_pass_with_no_cause_visible_does_not_invent_one() -> None:
+    """Total passes fell, fail did not rise and skips did not rise: something left the surface.
+    The message says what is known and names nothing it cannot see."""
+    falls = fc.compare(line("1", observed=10, total=60), line("2", observed=9, total=59),
+                       changed={"talk/verify-exclusions.txt"})
+    assert [f.kind for f in falls] == ["class-pass"]
+    assert "became a could-not-look" not in falls[0].detail
+    assert "the surface" in falls[0].detail
+
+
+def test_the_no_split_message_says_which_line_lacks_the_split() -> None:
+    old = "TRUTH 2026-09-03T19:09Z run=1 hub=aaaaaaa units=[] pass=58 fail=7 skip=18 excluded=2 total=85"
+    falls = fc.compare(old, line("2", observed=1, self_=1, simulated=1, meta=1,
+                                total=85, ceiling=80), changed=set())
+    assert [f.kind for f in falls] == ["pass"]
+    assert "the older line" in falls[0].detail and "neither" not in falls[0].detail
+
+
+# ------------------------------------------------------------------ review 2026-09-06, F5
+
+def test_a_reason_may_contain_a_hash_and_is_not_truncated() -> None:
+    accepted, problems = fc.parse_falls("run=105 | issue #12 reddened it; ticket 61 owns it\n")
+    assert problems == []
+    assert accepted["105"] == "issue #12 reddened it; ticket 61 owns it"
+
+
+def test_a_whole_line_comment_is_still_a_comment() -> None:
+    accepted, problems = fc.parse_falls("  # run=105 | not a real entry\nrun=106 | a real one\n")
+    assert problems == [] and set(accepted) == {"106"}
+
+
+def test_a_committed_reason_for_a_transition_that_did_not_fall_is_a_fault() -> None:
+    """F5. A stale reason was accepted in silence, so the hatch grew entries nobody could
+    check -- the same defect as an exclusion for a script that no longer exists."""
+    log = [line("1"), line("2"), line("3")]
+    rep = fc.report(log, falls_text="run=2 | nothing fell here", changed=lambda a, b: set())
+    assert rep.ok is False
+    assert any("did not fall" in p for p in rep.problems)
+
+
+def test_the_ceiling_excuse_needs_a_material_change_not_just_a_touched_file() -> None:
+    """F5. `changed` now carries only files whose MEANING moved between the two commits, so a
+    comment-only edit to the manifest no longer excuses a ceiling drop. The seam is the caller's
+    lookup; this pins that compare() trusts it and nothing else."""
+    assert [f.kind for f in fc.compare(line("1"), line("2", ceiling=54), set())] == ["ceiling"]
+    assert fc.compare(line("1"), line("2", ceiling=54), {"talk/verify-manifest.txt"}) == []
+
+
+def test_material_paths_ignores_a_comment_only_edit() -> None:
+    before = {"talk/verify-manifest.txt": "a.sh | meta | -   # one comment\n"}
+    after = {"talk/verify-manifest.txt": "a.sh | meta | -   # a different comment\n\n# and a new one\n"}
+    assert fc.material_paths(before, after) == set()
+
+
+def test_material_paths_sees_a_real_edit_and_an_added_or_removed_file() -> None:
+    before = {"talk/verify-manifest.txt": "a.sh | meta | -\n"}
+    after = {"talk/verify-manifest.txt": "a.sh | meta | never: nothing to look at\n"}
+    assert fc.material_paths(before, after) == {"talk/verify-manifest.txt"}
+    assert fc.material_paths({}, after) == {"talk/verify-manifest.txt"}
+    assert fc.material_paths(before, {}) == {"talk/verify-manifest.txt"}
