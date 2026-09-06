@@ -2,7 +2,9 @@
 
 Type: task (AFK)
 Status: open
-Blocked by: 09
+Blocked by: none
+
+> **Unblocked 2026-09-06 (record correction).** This line read `Blocked by: 09` until today. Ticket 09 resolved on 2026-08-28; nobody re-read this line, so the ticket sat behind a blocker that no longer existed. A `Blocked by:` line is a claim about another file and rots the same way a cited figure does (ticket 80).
 
 ## Question
 
