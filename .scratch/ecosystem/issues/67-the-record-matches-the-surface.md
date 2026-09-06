@@ -40,15 +40,17 @@ tests at the pure seam in `tests/test_map_surface.py` (31, no git, no estate). F
 5. **Record.** Item (a)'s two corrections as four literal facts the record must carry or must no
    longer carry.
 
-**How it composes with `verify/cited-truth/`** (ticket 80, PR 44, not merged when this was built).
+**How it composes with `verify/cited-truth/`** (ticket 80, PR 44, which merged to main on
+2026-09-06 while this was being built; this branch was rebased onto it).
 That module grades the same class of claim — a record citing a measurement that never measured the
 thing — in `.scratch/ecosystem/issues/*.md`, and its own docstring names `map.md` as out of its
 scope and this ticket's question. The populations are **disjoint** and neither reads the other's
 files, so nothing is graded twice and the union covers the ticket record and the wayfinder. What is
 shared is the **parser**: both resolve a citation through `talk/truth_manifest.py`'s `parse_truth`,
 so there is one reader of the TRUTH line in the estate and a change to the line's shape cannot make
-one of the two quietly wrong. This module does not import 80's, so it stands whether or not PR 44
-merges; when it does, no rebase is needed.
+one of the two quietly wrong. This module imports nothing of 80's, so it stood before PR 44
+merged and stands after. Proved both ways: `verify/cited-truth/verify-cited-truth.sh` was run over 80's branch with this ticket
+file copied in and passed, and it passes again on main with this branch rebased onto it.
 
 **What it refuses to grade, counted rather than asserted.** Whether the figure the map quotes is
 the *right* figure, or the check it names the right check — it grades that both exist on the
@@ -58,8 +60,8 @@ working copy here would be the proxy this ticket exists to end. Three population
 each is **printed as a number on every run**, so a disclosed limit cannot go stale: figures whose
 own text line calls them local, a rehearsal, a fixture, planted, hypothetical, not citable or an
 Actions-log quote (0 today); figures a **dated** correction elsewhere in the map disposes of (1
-today); and checks the map names and declares on the same line as not in the gate yet (1 today —
-ticket 80's, at map.md:88). A correction never excuses the replacement figure standing inside
+today); and checks the map names and declares on the same line as not in the gate yet (1 while ticket 80's
+check was unmerged, 0 now that it is). A correction never excuses the replacement figure standing inside
 itself; that one is graded like any other, or a correction could excuse its own wrong number.
 
 **No could-not-look**, by decision (delegated, ADR-0025), following `verify/can-record/`'s and
@@ -126,7 +128,8 @@ branches already fall inside the trimmed lists. The change is strictly stricter 
 item as written. The comment's widening — "any TRUTH figure quoted in `issues/*.md` must resolve to
 a real line whose tree contains the named check" — was built by ticket 80 as
 `verify/cited-truth/`, with the tree-lookup half this ticket did not ask for; it is not rebuilt
-here. See the composition note above.
+here. It merged to main on 2026-09-06 and this branch is rebased onto it, so both halves of the
+widened item are in the gate together. See the composition note above.
 
 ### Decisions
 
@@ -238,12 +241,18 @@ Item (b), red before green in ico:
 Battery, all exit 0 on this branch:
 
     bash talk/verify-all.sh --selfcheck                            PASS
-    bash verify/truth-line/verify-truth-line.sh                    PASS  (111 scripts placed)
-    bash verify/every-green/verify-every-green.sh                  PASS  (111 discovered)
+    bash verify/truth-line/verify-truth-line.sh                    PASS  (112 scripts placed)
+    bash verify/every-green/verify-every-green.sh                  PASS  (112 discovered)
     bash verify/can-record/verify-can-record.sh                    PASS
     bash verify/adr-supersession/verify-adr-supersession.sh        PASS
     bash verify/schedules/verify-lane.sh                           PASS  (unchanged by the trim)
-    .venv/bin/python -m mypy twin tests conftest.py …              Success: no issues, 176 files
+    bash verify/cited-truth/verify-cited-truth.sh                  PASS  (ticket 80's, over this
+                                                                         ticket's own file)
+    .venv/bin/python -m mypy twin tests conftest.py …              Success: no issues, 177 files
+
+The counts are the branch's after its second rebase, onto the main that carries ticket 80's merge
+(PR 44). They were 110/175 before the first rebase and 111/176 before the second; each was true of
+a different tree, and each was re-run rather than left standing.
 
 **The full `pytest tests/` was not run locally and no local figure from it is quoted here.** The
 machine was loaded and a number nobody watched arrive is not a number. CI on this branch is the
@@ -274,9 +283,9 @@ Map line:
   reds a pass/fail figure this file quotes that no line in `talk/truth.log` records, a figure
   quoted beside a run that is not that run's, a check named in backticks that the gate does not
   discover, a relative link that resolves to nothing, and a unit repository declaring an
-  observation-lane path it does not own — the counterpart to ticket 80's `verify/cited-truth/`
-  (built, PR 44, not yet merged, so the gate does not run it), which grades `issues/*.md` and names
-  this file as out of its scope; the two share one TRUTH-line parser and read no file in common.
+  observation-lane path it does not own — the counterpart to ticket 80's `verify/cited-truth/`,
+  which grades `issues/*.md` and names this file as out of its scope; the two share one
+  TRUTH-line parser and read no file in common.
   Item (a): the Destination now links the root `NORTH-STAR.md`, the one referent, and the
   drift-review original says the 22 reversals were confirmed. Item (b): ico's `bump.yaml` is `none`
   again, and its release gate, which had been computing the gap between the two newest published
