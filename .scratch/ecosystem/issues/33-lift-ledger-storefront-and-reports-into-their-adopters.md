@@ -33,6 +33,32 @@ document; nothing in it is a credential, and the only hex strings are the four p
 digests and three public commit SHAs. The three unit commits (tuppence, driftwood, ludlow) were
 made before the quota ran out and passed the hook normally (`No secrets have been found`).
 
+### 6. CI, watched to completion, on all four branches
+
+Hub [PR 57](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/57), branch
+rebased onto `3713a56` (never merged into): `demo`, `typecheck`, `reproduce-elsewhere` and all
+three `determinism` legs pass. `tests` is `1 failed, 2091 passed in 177.63s`, and `invariants` is
+`RESULT: 71 passed, 1 failed, 3 skipped`. The one failure in each is the same standing red —
+invariant 45, `flux_coverage_floor_is_still_reachable` (`the pre-registered coverage floor of 90%
+can no longer be reached: 3/1966 sample(s) … a ceiling of 66.4%`), which build ticket 70 finding 1
+records as the finding rather than a defect, and `tests/test_invariant_suite.py::test_the_suite_is_green`
+is that same invariant reported once more. The 18 tests this ticket adds are inside the 2091.
+
+Invariant 44 is green and the samples are fresh: driftwood's newest drift sample is
+`2026-09-06T11:04:15Z`, tuppence's `2026-09-06T12:13:09Z`, ludlow's `2026-09-06T12:53:37Z` — under
+five hours old at the time of the run.
+
+Adopter pull requests, re-run after each branch was rebased onto its own unit's `origin/main`
+(each of which had moved by exactly one clock-observation commit): `shift-left` and
+`compose-check` pass on [tuppence 21](https://github.com/policy-as-versioned-tuppence/tuppence/pull/21)
+(run 34043741343), [driftwood 27](https://github.com/policy-as-versioned-driftwood/driftwood/pull/27)
+(run 34043743846) and [ludlow 18](https://github.com/policy-as-versioned-ludlow/ludlow/pull/18)
+(run 34043746392).
+
+No hub `truth` run was dispatched for this branch: `gh run list --workflow truth.yml --branch
+ticket-33-lift-ledger-storefront-and-reports` was empty before the push, and a branch run records
+nothing (ticket 100), so there is no citable gate observation of this work and none is claimed.
+
 ## Waits on the owner`.
 
 ### 0. Where the three actually were, before anything was built
