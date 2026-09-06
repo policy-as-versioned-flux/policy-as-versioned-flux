@@ -686,3 +686,98 @@ def test_the_steps_table_declares_each_rows_file_pattern_and_validator() -> None
     assert "*.claim.yaml" in rows["classify"] and "assets/validate_claim.py" in rows["classify"], rows["classify"]
     assert "{adopter}" not in rows["derive"] or "twin/orgs/" in rows["derive"], rows["derive"]
     assert re.search(r"\*\.\S+\.yaml", rows["derive"]) and "assets/validate_" in rows["derive"], rows["derive"]
+
+
+# --- round 4 review (2026-09-06): the read-back covers the whole branch, not HEAD -----------
+def test_a_branch_whose_history_carries_a_signed_or_owner_commit_is_refused_and_never_pushed(tmp_path: Path) -> None:
+    # F1: commit 1 signed and a person's, commit 2 clean as the clock. A read-back of HEAD alone
+    # said "unsigned, the clock's" and --push landed BOTH on the origin. Read on the ORIGIN.
+    unit = tmp_path / "estate" / "driftwood"
+    origin = _fixture_adopter(unit)
+    key = _signing_key(tmp_path)
+    env = _push_env(tmp_path, "twocommits", "ok")
+    env["LOCAL_CLOCK_STUB_KEY"] = str(key)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify", "--push"],
+                          env=env, capture_output=True, text=True, timeout=120)
+    assert done.returncode == 1, done.stdout + done.stderr
+    fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+    assert fail_lines and "2 commit" in fail_lines[0], done.stdout
+    assert "signature: none" not in done.stdout, "the clock vouched for a branch it had not read whole"
+    assert _git(origin, "for-each-ref", "refs/heads/local-clock/") == "", "the branch reached the origin"
+    assert "pr create" not in (tmp_path / "gh-calls.log").read_text() if (tmp_path / "gh-calls.log").exists() else True
+    rid = _run_id(done.stdout)
+    steps = [json.loads(l) for l in (tmp_path / ".local-clock" / "runs" / rid / "steps.jsonl").read_text().splitlines()]
+    assert steps[0]["status"] == "fail" and steps[0]["commits"] == 2 and "signature_block" not in steps[0], steps[0]
+    assert rid in _git(unit, "for-each-ref", "refs/heads/local-clock/"), "branch kept for inspection"
+
+
+def test_a_declaration_hidden_in_history_behind_a_clean_tree_is_refused(tmp_path: Path) -> None:
+    # F1, second shape: commit 1 adds composed/x.yaml, commit 2 deletes it; the tree diff shows
+    # one claim file and the branch's history carries the declaration
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "history"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 1, done.stdout + done.stderr
+    fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+    assert fail_lines and "2 commit" in fail_lines[0], done.stdout
+    assert not any("all in the twin" in l for l in done.stdout.splitlines()), "the validator ran on a refused branch"
+
+
+def test_a_single_clean_commit_records_its_count_and_sha(tmp_path: Path) -> None:
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "claim"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 0, done.stdout + done.stderr
+    rid = _run_id(done.stdout)
+    steps = [json.loads(l) for l in (tmp_path / ".local-clock" / "runs" / rid / "steps.jsonl").read_text().splitlines()]
+    assert steps[0]["commits"] == 1 and steps[0]["commit"] == _git(unit, "rev-parse", f"local-clock/classify-{rid}"), steps[0]
+    assert steps[0]["committer"].startswith("local clock"), steps[0]
+
+
+def test_a_child_that_makes_any_ref_but_its_branch_is_refused_and_the_ref_named(tmp_path: Path) -> None:
+    # F2: the guard admits `git tag -a` (and `git update-ref refs/heads/main HEAD`); the owner's
+    # global tag.gpgsign would sign the tag with the owner's key. The clock snapshots the unit's
+    # refs before the child and refuses any ref that appeared or moved besides its own branch.
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    _git(unit, "config", "tag.gpgsign", "true")
+    _git(unit, "config", "gpg.format", "ssh")
+    _git(unit, "config", "user.signingkey", str(_signing_key(tmp_path)))
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "tag"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 1, done.stdout + done.stderr
+    fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+    assert fail_lines and "refs/tags/local-clock-v1" in fail_lines[0], done.stdout
+    # and even the tag the child made is unsigned: tag.gpgsign=false rides in the child's environment
+    tag_obj = _git(unit, "cat-file", "tag", "refs/tags/local-clock-v1")
+    assert "SSH SIGNATURE" not in tag_obj and "BEGIN" not in tag_obj, tag_obj
+
+
+def test_a_nested_clock_is_refused_before_anything_starts(tmp_path: Path) -> None:
+    # F3: a child of the clock inherits LOCAL_CLOCK_STEP / LOCAL_CLOCK_RUN_DIR; a clock started
+    # inside one must refuse, whatever CLAUDECODE says
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    env = _clock_env(tmp_path, "claim")
+    env["LOCAL_CLOCK_STEP"] = "classify"
+    env["LOCAL_CLOCK_RUN_DIR"] = str(tmp_path / "outer-run")
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=env, capture_output=True, text=True, timeout=120)
+    assert done.returncode == 2, done.stdout + done.stderr
+    assert done.stdout.splitlines()[-1].startswith("FAIL:") and "nested" in done.stdout.splitlines()[-1], done.stdout
+    assert not (tmp_path / ".local-clock" / "runs").exists()
+    assert _git(unit, "for-each-ref", "refs/heads/local-clock/") == ""
+
+
+def test_the_leak_scan_is_case_insensitive(lc, tmp_path: Path) -> None:
+    # F5: YAML reads `Injected: True` as the same boolean; the scan must too
+    repo = tmp_path / "unit"
+    (repo / "twin" / "claims").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True)
+    (repo / "twin" / "claims" / "x.claim.yaml").write_text("Injected: True\n")
+    _git(repo, "add", "-A")
+    _git(repo, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
+    assert lc.injected_leaks(str(repo)) == ["twin/claims/x.claim.yaml"]
+    assert lc._INJECTED.search('{"INJECTED": TRUE}')

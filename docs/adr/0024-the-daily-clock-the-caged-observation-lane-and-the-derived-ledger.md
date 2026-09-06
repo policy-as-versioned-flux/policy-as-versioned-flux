@@ -128,12 +128,14 @@ write, and what it may never write.
      four commits, so a proposal cut from local main read a pool the served branch had moved
      past; the run prints the base sha and the lag, a failed fetch is said so and dated, and no
      `origin/main` refuses the step (ADR-0020). **The child commits as the clock, unsigned.**
-     Every clone's config names the owner and signs with the owner's SSH key; a model with
-     nobody at the keyboard may do neither. Point 4's rule that a clock's commit is signed by
-     the *run's own identity* holds here by its negative: this clock has no identity of its own
-     (ticket 90 shelved identity), so it signs nothing and says so, and the clock refuses a
-     commit that carries a signature block or any other author. The merge is the human act and
-     the tag prices. **`--push` establishes its instruments before the model runs** -- `gh auth
+     The owner's global git config, which every clone and worktree inherits, names the owner
+     and signs commits and tags with the owner's SSH key; a model with nobody at the keyboard
+     may do neither. Point 4's rule that a clock's commit is signed by the *run's own identity*
+     holds here by its negative: this clock has no identity of its own (ticket 90 shelved
+     identity), so it signs nothing and says so, and the clock reads the whole branch back --
+     exactly one commit, authored and committed as the clock, no signature block, no other ref
+     made or moved (the guard admits `git tag`; the clock does not). The merge is the human
+     act and the release tag prices. **`--push` establishes its instruments before the model runs** -- `gh auth
      status`, `git ls-remote origin main` -- and refuses the whole run otherwise, because a
      branch pushed with no PR to name it was the failure mode observed when the old path was
      run against a fixture. All three are proved by running the clock over a throwaway adopter

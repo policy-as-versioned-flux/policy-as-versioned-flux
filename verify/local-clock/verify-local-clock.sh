@@ -145,16 +145,34 @@ tail -1 "$TMP/push-unauth.out" | grep -q '^FAIL: --push needs an authenticated g
 [ ! -e "$LOCAL_CLOCK_HOME/model-was-called" ] || fail "the model was called before the missing instrument was noticed"
 [ "$(ls -d "$LOCAL_CLOCK_HOME"/runs/*/ 2>/dev/null | wc -l | tr -d ' ')" = "$n_before" ] || fail "a refused --push still started a run"
 
-# 1d. a model that signs anyway, or names a person as author, is refused with the branch kept
-for case in signed:signature asowner:author; do
-  stub="${case%%:*}"; word="${case##*:}"
+# 1d. a model that signs anyway, names a person as author, hides a signed person's commit
+#     under a clean second commit (review F1), hides a declaration in history behind a clean
+#     tree (F1), or makes a tag (F2) is refused with the branch kept and nothing pushed
+for case in signed:signature asowner:author twocommits:"2 commit" history:"2 commit" tag:refs/tags/local-clock-v1; do
+  stub="${case%%:*}"; word="${case#*:}"
   LOCAL_CLOCK_STUB="$stub" LOCAL_CLOCK_STUB_KEY="$KEY" bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/$stub.out" 2>&1 \
     && fail "a $stub proposal was admitted"
-  grep -Eq "^fail .*$word" "$TMP/$stub.out" || fail "the $stub proposal was refused for the wrong reason: $(grep '^fail' "$TMP/$stub.out" | head -1)"
+  grep '^fail' "$TMP/$stub.out" | head -1 | grep -Fq "$word" || fail "the $stub proposal was refused for the wrong reason: $(grep '^fail' "$TMP/$stub.out" | head -1)"
+  grep -q 'signature: none' "$TMP/$stub.out" && fail "the clock vouched 'signature: none' for the $stub branch"
   rid="$(run_id "$TMP/$stub.out")"
   git -C "$UNIT" for-each-ref 'refs/heads/local-clock/' | grep -q -- "$rid" || fail "the $stub proposal's branch was not kept for inspection"
   [ ! -e "$LOCAL_CLOCK_HOME/runs/$rid/classify-driftwood.pr-body.md" ] || fail "a PR body survived the $stub refusal"
 done
+git -C "$UNIT" cat-file tag refs/tags/local-clock-v1 | grep -q 'SIGNATURE' && fail "the tag the child made was signed: tag.gpgsign=false did not reach the child"
+git -C "$UNIT" tag -d local-clock-v1 >/dev/null
+# 1e. the twocommits branch under --push: read the ORIGIN -- nothing landed, gh never asked
+n_gh="$(grep -c 'pr create' "$LOCAL_CLOCK_GH_LOG" 2>/dev/null || echo 0)"
+env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION LOCAL_CLOCK_STUB=twocommits LOCAL_CLOCK_STUB_KEY="$KEY" LOCAL_CLOCK_GH_STUB=ok \
+  bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify --push >"$TMP/twocommits-push.out" 2>&1 && fail "a two-commit branch with a signed person's commit was pushed"
+trid="$(run_id "$TMP/twocommits-push.out")"
+git -C "$ORIGIN" for-each-ref 'refs/heads/local-clock/' | grep -q -- "$trid" && fail "the two-commit branch reached the origin"
+[ "$(grep -c 'pr create' "$LOCAL_CLOCK_GH_LOG" 2>/dev/null || echo 0)" = "$n_gh" ] || fail "gh was asked for a PR on the refused two-commit branch"
+grep -q '"commits": 2' "$LOCAL_CLOCK_HOME/runs/$trid/steps.jsonl" || fail "the refusal did not record the commit count"
+# 1f. a nested clock (a child that inherited LOCAL_CLOCK_STEP) is refused before anything starts
+n_before="$(ls -d "$LOCAL_CLOCK_HOME"/runs/*/ 2>/dev/null | wc -l | tr -d ' ')"
+LOCAL_CLOCK_STEP=classify LOCAL_CLOCK_RUN_DIR="$TMP/outer" LOCAL_CLOCK_STUB=claim bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/nested.out" 2>&1
+[ $? -eq 2 ] && tail -1 "$TMP/nested.out" | grep -q '^FAIL: a nested clock is refused' || fail "a nested clock was not refused: $(tail -1 "$TMP/nested.out")"
+[ "$(ls -d "$LOCAL_CLOCK_HOME"/runs/*/ 2>/dev/null | wc -l | tr -d ' ')" = "$n_before" ] || fail "a nested clock started a run"
 
 # 2. a rehearsal: the signal is stamped under the run root only, the claim says injected, --push refused
 cat >"$TMP/signal.yaml" <<'EOF'
@@ -247,13 +265,13 @@ bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify --dry-run >
 grep -q '^dry .*would run' "$TMP/dry.out" || fail "the dry run did not print the command it would run"
 left_nothing "$TMP/dry.out" dry
 n_runs="$(ls -d "$TMP"/.local-clock/runs/*/ | wc -l | tr -d ' ')"
-[ "$n_runs" -eq 11 ] || fail "11 runs were started (live, push, signed, asowner, rehearsal, leak, dirty, example, misnamed, nothing, dry; the refused --push started none) and $n_runs run directories exist: run ids collided or a refusal started a run"
+[ "$n_runs" -eq 15 ] || fail "15 runs were started (live, push, signed, asowner, twocommits, history, tag, twocommits-push, rehearsal, leak, dirty, example, misnamed, nothing, dry; the refused --push and the nested clock started none) and $n_runs run directories exist: run ids collided or a refusal started a run"
 # the derive step (ticket 93's seam) is recorded as skipped by name until its skill ships, and
 # its row declares where its files go, what they are named and which validator checks them
 LOCAL_CLOCK_STUB=nothing bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step derive >"$TMP/derive.out" 2>&1
 grep -q 'derive-driftwood' "$TMP/derive.out" || fail "the derive step is not in the steps table"
 bash "$ROOT/talk/local-clock.sh" --list-steps | grep -E '^derive ' | grep -q 'assets/validate_' || fail "the derive row names no validator: ticket 93 has no seam to fill"
-echo "PASS: offline, with stub-claude.sh and stub-gh.sh standing in over a throwaway adopter and a throwaway bare origin (a fixture, not the clock having run) -- the proposal is cut from origin/main with local main 1 behind, is unsigned and authored as the clock although the clone's config signs as the owner, --push lands it on the origin with main unmoved and asks gh for that PR, --push with gh logged out refuses before any model call, a signed or person-authored proposal is refused, a rehearsal is stamped, marked, counted by the scan and refused by the validator, a declaration, unfinished work, a file that is not a *.claim.yaml or a claim without the headless mark is refused with the model's PR body deleted, and a nothing run or a dry run leaves no worktree or branch"
+echo "PASS: offline, with stub-claude.sh and stub-gh.sh standing in over a throwaway adopter and a throwaway bare origin (a fixture, not the clock having run) -- the proposal is cut from origin/main with local main 1 behind, is one commit, unsigned, authored and committed as the clock although the config signs as the owner, --push lands it on the origin with main unmoved and asks gh for that PR, --push with gh logged out refuses before any model call, a signed or person-authored proposal, a two-commit branch hiding either behind a clean tip, a tag the child made and a nested clock are each refused, a rehearsal is stamped, marked, counted by the scan and refused by the validator, a declaration, unfinished work, a file that is not a *.claim.yaml or a claim without the headless mark is refused with the model's PR body deleted, and a nothing run or a dry run leaves no worktree or branch"
 
 # --- the real machine: the script, README, marker, leak scan, truth log, template --------------
 unset LOCAL_CLOCK_CLAUDE LOCAL_CLOCK_HOME LOCAL_CLOCK_ESTATE LOCAL_CLOCK_GH LOCAL_CLOCK_GH_LOG

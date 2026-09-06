@@ -66,8 +66,9 @@ SLACK_HOURS = 24                          # launchd skips a slot when the machin
 
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _FLAG = re.compile(r"(?<![\w-])(--[a-z][a-z0-9-]+)")
-_INJECTED = re.compile(r"""(?:^|[{,\s])["']?injected["']?\s*:\s*true\b""", re.M)
-# the same flag as a POSIX ERE for `git grep -E`, which reads a ref's committed tree directly
+# case-insensitive (review F5): YAML reads `Injected: True` as the same boolean
+_INJECTED = re.compile(r"""(?:^|[{,\s])["']?injected["']?\s*:\s*true\b""", re.M | re.I)
+# the same flag as a POSIX ERE for `git grep -E -i`, which reads a ref's committed tree directly
 _INJECTED_ERE = r"""(^|[{,[:space:]])["']?injected["']?[[:space:]]*:[[:space:]]*true"""
 _TRUTH_LOCAL = re.compile(r"^TRUTH\s+(\d{4}-\d{2}-\d{2})T\S+\s+run=local\b", re.M)
 _CREDENTIAL = re.compile(r"(?i)token|secret|password|api[_-]?key|credential")
@@ -247,7 +248,7 @@ def injected_leaks(repo: str, ref: str = "HEAD") -> list[str] | None:
                 return []
         return None
     tree = resolved.stdout.strip()
-    done = _git(repo, "grep", "-I", "-l", "-E", "-e", _INJECTED_ERE, tree, "--", *_SCANNED_PATHSPECS)
+    done = _git(repo, "grep", "-I", "-i", "-l", "-E", "-e", _INJECTED_ERE, tree, "--", *_SCANNED_PATHSPECS)
     if done is None or done.returncode not in (0, 1):     # 1 is "no match"
         return None
     hits = []
@@ -583,6 +584,14 @@ def selfcheck() -> None:
             ["observations/twin-sweep.jsonl", "rehearsal.yaml"]
         assert injected_leaks(repo, "HEAD") == ["observations/twin-sweep.jsonl"]
         assert injected_leaks(repo, "refs/heads/no-such-branch") is None
+        # review F5: the mark is read case-insensitively, as YAML reads the boolean
+        with open(os.path.join(repo, "shout.yaml"), "w") as fh:
+            fh.write("Injected: True\n")
+        subprocess.run(["git", "-C", repo, "add", "shout.yaml"], check=True)
+        subprocess.run(["git", "-C", repo, "-c", "user.name=s", "-c", "user.email=s@s",
+                        "commit", "-q", "-m", "shout"], check=True)
+        assert "shout.yaml" in (injected_leaks(repo, "HEAD") or []), injected_leaks(repo, "HEAD")
+        assert _INJECTED.search('{"INJECTED": TRUE}')
         assert local_clock_branches(repo) == [("local-clock/rehearsal/classify-r", "rehearsal")]
         scanned = scan_repo(repo, now)
         assert scanned["origin/main"] is None and scanned["branches"][0][1] == "rehearsal", scanned
@@ -647,8 +656,12 @@ def main(argv: list[str]) -> int:
     r.add_argument("--branch", default="")
     r.add_argument("--pr", default="")
     r.add_argument("--base", default="", help="the served tip the proposal was cut from")
+    r.add_argument("--commits", type=int, default=None, help="commits between the base and HEAD")
+    r.add_argument("--commit", default="", help="the one admitted commit")
     r.add_argument("--signature-block", default=None, choices=("true", "false"))
     r.add_argument("--author", default="")
+    r.add_argument("--committer", default="")
+    r.add_argument("--origin-main-at-push", default="", help="origin/main as ls-remote saw it just before the push")
     f = sub.add_parser("finish")
     f.add_argument("--run-dir", required=True)
     f.add_argument("--root", required=True)
@@ -680,10 +693,18 @@ def main(argv: list[str]) -> int:
             extra: dict[str, object] = {}
             if args.base:
                 extra["base"] = args.base
+            if args.commits is not None:
+                extra["commits"] = args.commits
+            if args.commit:
+                extra["commit"] = args.commit
             if args.signature_block is not None:
                 extra["signature_block"] = args.signature_block == "true"
             if args.author:
                 extra["author"] = args.author
+            if args.committer:
+                extra["committer"] = args.committer
+            if args.origin_main_at_push:
+                extra["origin_main_at_push"] = args.origin_main_at_push
             record(args.run_dir, step=args.step, adopter=args.adopter, status=args.status,
                    reason=args.reason, branch=args.branch, pr=args.pr, **extra)
             return 0

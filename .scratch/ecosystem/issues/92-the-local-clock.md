@@ -246,3 +246,45 @@ record, quoted from the Actions log and NOT citable:
 
 The gate's red on that run is the estate's standing set, not this branch's: `verify-schedules.sh`'s
 three and the rest of what run 113 on `main` already carried.
+
+## Round 4 review, 2026-09-06 — one blocking finding, five notes (the assistant, delegated)
+
+**F1, blocking, fixed.** The read-back looked at HEAD (`cat-file commit HEAD`, `log -1 HEAD`)
+while the allowed-paths check was a tree diff, so a branch of TWO commits — the first signed with
+the throwaway key and authored `The Owner`, the second clean as the clock — printed `signature:
+none; author: local clock`, was pushed whole to the fixture origin, and had `signature_block:
+false` recorded for it; a declaration added in commit 1 and deleted in commit 2 passed the same
+way. Round 4 had therefore RECORDED a false "unsigned, the clock's" for a branch carrying an
+owner-signed commit, by the very path it proved. Fix: every commit between the base and HEAD is
+read (signature block, author, committer), the clock admits exactly ONE commit — which the
+headless brief already demands, and which is what closes both hiding places — and `commits` is
+recorded on every step, `commit` and `committer` on an admitted one. Stub cases `twocommits` and
+`history`; the gate fixture runs `twocommits` under `--push` and reads the ORIGIN (nothing landed,
+gh never asked); pytest does the same.
+
+**F2, fixed.** "Cannot tag" was false: the guard admits `git tag -a` and the owner's global
+`tag.gpgsign=true` would sign it. Now `tag.gpgsign=false` rides in the child's environment, and
+the clock snapshots the unit's `refs/heads` and `refs/tags` (all but its own branch) before the
+child and refuses, naming the ref, any that appeared or moved — which also catches
+`git update-ref refs/heads/main HEAD`. Stub case `tag`; the fixture also asserts the tag the child
+made is unsigned. The comments and the README no longer say "cannot tag".
+
+**F3, fixed.** `CLAUDECODE` is a convention the owner's terminal upholds, said so in the README;
+the control is that a clock started with `LOCAL_CLOCK_STEP` or `LOCAL_CLOCK_RUN_DIR` already in
+its environment (a child of a running clock) is refused before anything starts, whatever it did
+to `CLAUDECODE`. Fixture case and pytest.
+
+**F4, corrected.** The signing and identity settings are in the owner's GLOBAL git config
+(`~/.gitconfig`: `user.name`, `user.email`, `user.signingkey`, `gpg.format ssh`,
+`commit.gpgsign true`, `tag.gpgsign true`, `core.hookspath`), inherited by every clone and
+worktree; driftwood's own `.git/config` carries only `gpg.x509.program gitsign`. The earlier
+paragraphs above that say "every clone's `.git/config`" are wrong on location, right on effect;
+this paragraph is the correction and the script header, README and ADR note now say global.
+
+**F5, fixed.** The leak scan reads the mark case-insensitively (`re.I`, `git grep -i`);
+`Injected: True` on a live branch is now found. **F6, done.** Just before `git push` the clock
+asks `ls-remote origin refs/heads/main`; if it differs from the fetched base it prints a note and
+records `origin_main_at_push`, so the printed base is the truth at push time.
+
+Red first: the six new tests failed against the pre-fix clock (`assert 0 == 1` / `assert 0 == 2`
+— every shape admitted; `[] == ['twin/claims/x.claim.yaml']` for the case) and pass after.

@@ -17,6 +17,16 @@
 #            LOCAL_CLOCK_STUB_KEY (a `-c` outranks the clock's GIT_CONFIG_* environment, so
 #            this is a model that went out of its way to sign) -- the clock must refuse
 #   asowner  as claim, but commit with --author naming a person -- the clock must refuse
+#   twocommits  TWO commits: the first signed with the throwaway key and authored as a person,
+#            the second a clean claim as the clock (review F1: a read-back of HEAD alone says
+#            "unsigned, the clock's" of a branch whose history carries an owner-signed commit)
+#            -- the clock must refuse the branch
+#   history  TWO commits: the first adds composed/x.yaml beside the claim, the second deletes
+#            composed/x.yaml -- the tree diff is one claim file, the history carries a
+#            declaration -- the clock must refuse the branch
+#   tag      as claim, plus `git tag -a local-clock-v1` in the unit (review F2: the guard admits
+#            a tag and the owner's global tag.gpgsign would sign it) -- the clock must refuse
+#            the run and name the ref
 # LOCAL_CLOCK_INJECTED (set by the clock on a rehearsal) makes the claim say injected: true.
 # Every invocation touches $LOCAL_CLOCK_HOME/model-was-called first, so a test can prove the
 # clock refused BEFORE the model ran. This is a stand-in and says so in its result line.
@@ -89,6 +99,24 @@ case "$what" in
   signed)  git -C "$wt" -c commit.gpgsign=true -c gpg.format=ssh -c user.signingkey="${LOCAL_CLOCK_STUB_KEY:?}" \
              commit -q -m "twin: stub claim, SIGNED against the clock's environment ($step, $adopter)";;
   asowner) git -C "$wt" commit -q --author="The Owner <owner@fixture.invalid>" -m "twin: stub claim authored as a person ($step, $adopter)";;
+  twocommits)
+    # commit 1: a person's, signed; commit 2: the clock's, clean. HEAD alone reads clean.
+    git -C "$wt" reset -q -- twin/claims
+    echo "seed: 1" >"$wt/twin/claims/seed.claim.yaml"; git -C "$wt" add -- twin/claims/seed.claim.yaml
+    git -C "$wt" -c commit.gpgsign=true -c gpg.format=ssh -c user.signingkey="${LOCAL_CLOCK_STUB_KEY:?}" \
+      commit -q --author="The Owner <owner@fixture.invalid>" -m "twin: commit 1 of 2, signed and a person's ($step, $adopter)"
+    git -C "$wt" rm -q -- twin/claims/seed.claim.yaml; git -C "$wt" add -- twin/claims
+    git -C "$wt" commit -q -m "twin: commit 2 of 2, the clock's ($step, $adopter)";;
+  history)
+    # commit 1: the claim plus a declaration; commit 2: the declaration deleted. The tree diff
+    # against the base is one claim file; the branch's history carries the declaration.
+    mkdir -p "$wt/composed"; echo "tier: 3" >"$wt/composed/x.yaml"; git -C "$wt" add -- composed
+    git -C "$wt" commit -q -m "twin: commit 1 of 2, a claim and a declaration ($step, $adopter)"
+    git -C "$wt" rm -q -- composed/x.yaml
+    git -C "$wt" commit -q -m "twin: commit 2 of 2, the declaration removed again ($step, $adopter)";;
+  tag)
+    git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)"
+    git -C "$wt" tag -a local-clock-v1 -m "a tag the guard admits";;
   *)       git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)";;
 esac
 echo "twin: stub claim ($step, $adopter)" >"$run/$step-$adopter.pr-title"

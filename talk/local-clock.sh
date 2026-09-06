@@ -11,7 +11,9 @@
 # Each step calls Claude Code non-interactively with a NAMED SKILL:
 #   claude -p "/<skill> <adopter>" --max-turns N --permission-mode acceptEdits --allowedTools ...
 # with the hub's own PreToolUse hook (twin/enact_guard.py) in force, under TWIN_ENACT_MODE=operations
-# (the refusing mode: no merge, no enactment push, no tag), and with `gh` kept out of the child's
+# (the refusing mode: no merge, no enactment push -- the guard ADMITS `git tag` and
+# `git update-ref`, so any ref the child makes or moves besides its own branch is refused by
+# this script's read-back, below), and with `gh` kept out of the child's
 # allowed tools altogether. What the model may do is read, write the adopter's worktree, commit
 # on the branch this script made for it, and stop. This script then reads what it committed,
 # refuses anything outside the step's allowed paths, refuses any file under them that is not a
@@ -32,12 +34,18 @@
 #     The run prints the base sha and how far local main lags. A fetch that fails is said so
 #     and the last-fetched origin/main is used; no origin/main at all refuses the step
 #     (a missing instrument refuses, ADR-0020).
-#   * the child commits as THE CLOCK, unsigned. Every real clone's config signs every commit
-#     with the owner's SSH key and names the owner as author; a model with nobody at the
-#     keyboard may do neither. GIT_AUTHOR_*/GIT_COMMITTER_* and commit.gpgsign=false go into
-#     the child's environment, and the clock then READS the commit back: a signature block or
-#     any other author is refused, branch kept. The merge is the human act; the tag is the
-#     signature that prices.
+#   * the child commits as THE CLOCK, unsigned. The owner's GLOBAL git config (~/.gitconfig:
+#     user.name, user.signingkey, commit.gpgsign=true, tag.gpgsign=true, core.hookspath), which
+#     every clone and worktree inherits (the clones' own .git/config carry none of it), signs
+#     every commit and tag with the owner's SSH key and names the owner; a model with nobody at
+#     the keyboard may do neither. GIT_AUTHOR_*/GIT_COMMITTER_*, commit.gpgsign=false and
+#     tag.gpgsign=false go into the child's environment, and the clock then READS THE BRANCH
+#     back -- every commit between the base and HEAD, not HEAD alone (review F1: a signed,
+#     person-authored first commit hid behind a clean second, and a declaration added then
+#     deleted hid behind a clean tree diff) -- and admits exactly ONE commit, authored and
+#     committed as the clock, with no signature block; anything else is refused, branch kept.
+#     Any ref the child made or moved besides its branch (a tag, refs/heads/main) is refused
+#     and named. The merge is the human act; the release tag is the signature that prices.
 #   * --push establishes its instruments BEFORE the model runs: `gh auth status` and
 #     `git ls-remote origin main` for every adopter. Either failing refuses the whole run, so a
 #     model call is never spent on a proposal that cannot reach its PR (before this, a run with
@@ -155,6 +163,14 @@ done
 if [ "$DRY" = 0 ] && ! command -v "$CLAUDE" >/dev/null 2>&1; then
   echo "FAIL: no claude binary at '$CLAUDE' -- install Claude Code, or set LOCAL_CLOCK_CLAUDE"; exit 2
 fi
+# A nested clock is refused first. A child of a running clock inherits LOCAL_CLOCK_STEP and
+# LOCAL_CLOCK_RUN_DIR; the CLAUDECODE test below is a convention the owner's terminal upholds
+# (`env -u CLAUDECODE` defeats it, and so can a child with python3), so the inherited variables
+# are the control: a child that re-invokes the clock with --push under the owner's real gh
+# stops here, whatever it did to CLAUDECODE.
+if [ -n "${LOCAL_CLOCK_STEP:-}" ] || [ -n "${LOCAL_CLOCK_RUN_DIR:-}" ]; then
+  echo "FAIL: a nested clock is refused -- LOCAL_CLOCK_STEP/LOCAL_CLOCK_RUN_DIR are already set, so this shell is a child of a running clock (step '${LOCAL_CLOCK_STEP:-}', run dir '${LOCAL_CLOCK_RUN_DIR:-}')"; exit 2
+fi
 if [ "$PUSH" = 1 ] && [ -n "${CLAUDECODE:-}" ]; then
   echo "FAIL: --push is refused inside a Claude Code session; the push to an adopter's repository is the owner's hand, from a terminal"; exit 2
 fi
@@ -228,9 +244,14 @@ refuse() {  # step adopter branch title body reason -- a live step the clock wil
   # "no override is claimed" about a commit the clock refused; the child's transcript
   # (<step>-<adopter>.claude.json) still holds the model's words.
   local step="$1" adopter="$2" branch="$3" title="$4" body="$5" reason="$6"
+  shift 6   # anything left is extra record fields (--base, --commits)
   rm -f "$title" "$body"
-  record --step "$step" --adopter "$adopter" --status fail --reason "$reason" --branch "$branch"
+  record --step "$step" --adopter "$adopter" --status fail --reason "$reason" --branch "$branch" "$@"
   return 1
+}
+
+unit_refs() {  # unit branch -- every local branch and tag but the step's own, with its object
+  git -C "$1" for-each-ref --format='%(refname) %(objectname)' refs/heads refs/tags | grep -v "^refs/heads/$2 " || true
 }
 
 render_prompt() {  # step skill adopter unit_wt branch paths out
@@ -305,17 +326,25 @@ run_step() {  # step skill paths pattern validator adopter
   fi
 
   echo "run   $tag: /$skill $adopter on $branch (worktree $wt, max $MAX_TURNS turns)"
+  # Every branch and tag of the unit but the step's own, before the child: after it, any ref
+  # that appeared or moved is refused and named. The guard admits `git tag -a` (the owner's
+  # global tag.gpgsign would sign it) and `git update-ref refs/heads/main HEAD` (which moves
+  # the clone's main under the worktree); this read-back is what catches both.
+  local refs_before refs_after
+  refs_before="$(unit_refs "$unit" "$branch")"
   # TWIN_ENACT_MODE=operations: the refusing mode for the whole child, whatever twin/ENACT_MODE
   # says today (the guard reads the environment before the file: twin/enact_guard.py). The child
-  # cannot merge, cannot push an enactment repository, cannot tag.
-  # GIT_AUTHOR_* / GIT_COMMITTER_* and commit.gpgsign=false: the child commits as the clock,
-  # unsigned. The clone's own config names the owner and signs with the owner's SSH key; a
-  # model with nobody at the keyboard may do neither, and the clock reads the commit back below.
+  # cannot merge and cannot push an enactment repository; a tag it makes is caught above.
+  # GIT_AUTHOR_* / GIT_COMMITTER_*, commit.gpgsign=false and tag.gpgsign=false: the child
+  # commits as the clock, unsigned. The owner's global git config names the owner and signs
+  # commits and tags with the owner's SSH key; a model with nobody at the keyboard may do
+  # neither, and the clock reads the whole branch back below.
   env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION \
     TWIN_ENACT_MODE=operations \
     GIT_AUTHOR_NAME="$CLOCK_AUTHOR_NAME" GIT_AUTHOR_EMAIL="$CLOCK_AUTHOR_EMAIL" \
     GIT_COMMITTER_NAME="$CLOCK_AUTHOR_NAME" GIT_COMMITTER_EMAIL="$CLOCK_AUTHOR_EMAIL" \
-    GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false \
+    GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=commit.gpgsign GIT_CONFIG_VALUE_0=false \
+    GIT_CONFIG_KEY_1=tag.gpgsign GIT_CONFIG_VALUE_1=false \
     LOCAL_CLOCK_STEP="$step" LOCAL_CLOCK_ADOPTER="$adopter" LOCAL_CLOCK_UNIT_WT="$wt" \
     LOCAL_CLOCK_RUN_DIR="$RUN_DIR" LOCAL_CLOCK_INJECTED="$INJECTED_FILE" \
     LOCAL_CLOCK_TITLE_FILE="$title" LOCAL_CLOCK_BODY_FILE="$body" \
@@ -329,9 +358,16 @@ run_step() {  # step skill paths pattern validator adopter
   local rc=$?
   [ "$rc" = 0 ] || echo "warn  $tag: claude exited $rc ($(tail -1 "$RUN_DIR/$tag.claude.err" | cut -c1-120)); reading what it left anyway"
 
-  # What did the model leave? Uncommitted work is a step that did not finish. No commit is
-  # nothing to propose. A commit is judged file by file against the step's allowed paths.
-  local dirty changed
+  # What did the model leave? First the unit's refs: a headless run writes one branch and
+  # nothing else. Then uncommitted work is a step that did not finish. No commit is nothing to
+  # propose. A commit is judged file by file against the step's allowed paths.
+  local dirty changed moved
+  refs_after="$(unit_refs "$unit" "$branch")"
+  if [ "$refs_after" != "$refs_before" ]; then
+    moved="$(diff <(echo "$refs_before") <(echo "$refs_after") | grep -E '^[<>]' | awk '{print $2}' | sort -u | tr '\n' ' ')"
+    echo "fail  $tag: the child made or moved a ref besides its branch: $moved-- a headless run writes one branch and nothing else (a tag would carry the owner's global tag.gpgsign; refs/heads/main moving would shift the clone under the worktree). Branch kept at $wt, never pushed; remove the ref by hand."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "child made or moved refs: $moved" --base "$base"; return 1
+  fi
   dirty="$(git -C "$wt" status --porcelain --untracked-files=all)"
   if [ -n "$dirty" ]; then
     echo "fail  $tag: the model left uncommitted changes in $wt:"; echo "$dirty" | sed 's/^/        /'
@@ -342,23 +378,34 @@ run_step() {  # step skill paths pattern validator adopter
     echo "skip  $tag: nothing to propose (no commit on $branch)"
     cleanup_or_fail "$step" "$adopter" "$unit" "$wt" "$branch" skip "nothing to propose"; return $?
   fi
-  # The commit is read back before its files are: whose is it, and does it carry a signature?
-  # A signature block means a key signed content nobody at the keyboard read -- with the
-  # clone's config, the owner's key. Any author but the clock's is a person's name on a
-  # model's work. Both refuse, branch kept.
-  local sig_lines author commits
-  sig_lines="$(git -C "$wt" cat-file commit HEAD | grep -c '^gpgsig')"
-  author="$(git -C "$wt" log -1 --format='%an <%ae>' HEAD)"
+  # The BRANCH is read back before its files are -- every commit between the base and HEAD,
+  # not HEAD alone. Whose is each, and does it carry a signature? A signature block means a
+  # key signed content nobody at the keyboard read -- with the owner's global config, the
+  # owner's key. Any author or committer but the clock's is a person's name on a model's work.
+  # And the headless brief asks for ONE commit, which is what the clock admits: with two, a
+  # signed first commit hides behind a clean second and a declaration added then deleted hides
+  # behind a clean tree diff (review F1, proved over this script's own fixture). Refusals name
+  # the commit and the fact; the count is recorded either way.
+  local commits sig_lines author committer c bad_commit=""
   commits="$(git -C "$wt" rev-list --count "$base..HEAD")"
-  if [ "$sig_lines" != 0 ]; then
-    echo "fail  $tag: the proposal commit carries a signature block -- nobody at the keyboard signed it; a headless commit is unsigned by design and the merge is the human act. Branch kept at $wt, never pushed."
-    refuse "$step" "$adopter" "$branch" "$title" "$body" "proposal commit carries a signature block"; return 1
+  for c in $(git -C "$wt" rev-list "$base..HEAD"); do
+    sig_lines="$(git -C "$wt" cat-file commit "$c" | grep -c '^gpgsig')"
+    author="$(git -C "$wt" log -1 --format='%an <%ae>' "$c")"
+    committer="$(git -C "$wt" log -1 --format='%cn <%ce>' "$c")"
+    if [ "$sig_lines" != 0 ]; then bad_commit="commit ${c:0:7} carries a signature block"; break; fi
+    if [ "$author" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then bad_commit="commit ${c:0:7} is authored as '$author', not the clock"; break; fi
+    if [ "$committer" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then bad_commit="commit ${c:0:7} is committed as '$committer', not the clock"; break; fi
+  done
+  if [ -n "$bad_commit" ]; then
+    echo "fail  $tag: $commits commit(s) on $branch and $bad_commit -- nobody at the keyboard signed or was named; a headless commit is the clock's and unsigned by design, and the merge is the human act. Branch kept at $wt, never pushed."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "$bad_commit" --base "$base" --commits "$commits"; return 1
   fi
-  if [ "$author" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then
-    echo "fail  $tag: the proposal commit's author is '$author', not the clock's -- a headless commit is the clock's, never a person's. Branch kept at $wt, never pushed."
-    refuse "$step" "$adopter" "$branch" "$title" "$body" "proposal commit authored as '$author', not the clock"; return 1
+  if [ "$commits" != 1 ]; then
+    echo "fail  $tag: $commits commit(s) on $branch -- the headless brief asks for one and the clock admits one: history is where a signed commit or a declaration hides behind a clean tip. Branch kept at $wt, never pushed."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "$commits commits on the branch, not 1" --base "$base" --commits "$commits"; return 1
   fi
-  echo "ok    $tag: $commits commit(s) on origin/main@${base:0:7}; signature: none; author: $author"
+  local commit; commit="$(git -C "$wt" rev-parse HEAD)"
+  echo "ok    $tag: 1 commit ${commit:0:7} on origin/main@${base:0:7}; signature: none; author: $author; committer: $committer"
   local f ok bad=""
   while IFS= read -r f; do
     [ -n "$f" ] || continue
@@ -423,12 +470,19 @@ run_step() {  # step skill paths pattern validator adopter
   [ -s "$body" ] || { git -C "$wt" log -1 --format=%b >"$body"; printf '\n%s\n' "Made by the local clock (talk/local-clock.sh, ticket 92), run $RUN_ID, on origin/main@${base:0:7}. A model ran on the owner's local clock, not on a GitHub clock. No override is claimed. The commit is unsigned and authored as the clock: nobody at the keyboard signed it, and the merge is the human act. Never merged by the clock." >>"$body"; }
 
   if [ "$PUSH" = 1 ]; then
-    local repo="policy-as-versioned-$adopter/$adopter" url
+    local repo="policy-as-versioned-$adopter/$adopter" url tip_now
+    # origin/main may have moved since the fetch; the branch lands on the fetched base and the
+    # record says which tip origin had at push time (review F6)
+    tip_now="$(GIT_TERMINAL_PROMPT=0 git -C "$wt" ls-remote --exit-code origin refs/heads/main 2>/dev/null | cut -f1)"
+    if [ -n "$tip_now" ] && [ "$tip_now" != "$base" ]; then
+      echo "note  $tag: origin/main is ${tip_now:0:7} now, ${base:0:7} when fetched -- the branch lands on the fetched base"
+    fi
     if GIT_TERMINAL_PROMPT=0 git -C "$wt" push -q -u origin "$branch" 2>"$RUN_DIR/$tag.push.err" \
        && url="$("$GH" pr create --repo "$repo" --base main --head "$branch" --title "$(cat "$title")" --body-file "$body" 2>"$RUN_DIR/$tag.pr.err")"; then
       echo "ok    $tag: pushed $branch and opened $url"
       record --step "$step" --adopter "$adopter" --status ok --branch "$branch" --pr "$url" \
-             --base "$base" --signature-block false --author "$author"
+             --base "$base" --commits 1 --commit "$commit" --signature-block false \
+             --author "$author" --committer "$committer" ${tip_now:+--origin-main-at-push "$tip_now"}
       # the branch lives on origin now; the local worktree and branch have done their work
       if drop_worktree "$unit" "$wt" "$branch"; then
         echo "        $tag: worktree and local branch removed"
@@ -447,7 +501,8 @@ run_step() {  # step skill paths pattern validator adopter
       echo "        to land it as a PR (the owner's hand):  git -C $wt push -u origin $branch && gh pr create --repo policy-as-versioned-$adopter/$adopter --base main --head $branch --title \"\$(cat $title)\" --body-file $body"
     fi
     record --step "$step" --adopter "$adopter" --status ok --branch "$branch" \
-           --base "$base" --signature-block false --author "$author"
+           --base "$base" --commits 1 --commit "$commit" --signature-block false \
+           --author "$author" --committer "$committer"
   fi
 }
 

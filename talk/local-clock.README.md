@@ -79,13 +79,25 @@ can read the diff first. A step that proposes nothing, and a dry run, remove the
 and branch before the run ends, and the run records `fail` if that removal did not happen.
 Nothing is written to the adopter's `main`, ever -- not the clone's and not origin's.
 
-**Whose commit is it, and is it signed?** The clock's, and no. Your clone's config names you
-as author and signs every commit with your SSH key; a model with nobody at the keyboard may do
-neither, so the child commits as `local clock (headless model, ticket 92)
-<local-clock@policy-as-versioned-flux.invalid>` with signing off, and the clock reads the commit
-back: a signature block, or any author but the clock's, is a `fail` with the branch kept. The
-pull request you open with `--push` is your hand; the merge is the human act; the tag is the
-signature that prices (ticket 23).
+**Whose commit is it, and is it signed?** The clock's, and no. Your GLOBAL git config
+(`~/.gitconfig`: `user.name`, `user.signingkey`, `commit.gpgsign true`, `tag.gpgsign true`,
+`core.hookspath`) reaches every clone and worktree -- the clones' own `.git/config` carry none
+of it -- and would name you as author and sign every commit and tag with your SSH key. A model
+with nobody at the keyboard may do neither, so the child commits as `local clock (headless
+model, ticket 92) <local-clock@policy-as-versioned-flux.invalid>` with commit and tag signing
+off, and the clock reads the WHOLE BRANCH back, not just its tip: it admits exactly one commit,
+authored and committed as the clock, with no signature block; two commits (where a signed
+first commit or a declaration added-then-deleted hides behind a clean tip), any other author or
+committer, or a signature is a `fail` with the branch kept. It also snapshots the clone's
+branches and tags before the model runs: a tag or any other ref the child made or moved is a
+`fail` naming the ref (the enactment guard admits `git tag`; this read-back does not). The
+pull request you open with `--push` is your hand; the merge is the human act; the release tag
+is the signature that prices (ticket 23).
+
+**`--push` inside a Claude Code session.** The refusal keys on `CLAUDECODE` being set, which is
+a convention your terminal upholds, not a control: `env -u CLAUDECODE` defeats it. The control
+is that a clock started from inside a running clock -- which inherits `LOCAL_CLOCK_STEP` and
+`LOCAL_CLOCK_RUN_DIR` -- is refused before anything starts, whatever it did to `CLAUDECODE`.
 
 ## How to read the result
 
