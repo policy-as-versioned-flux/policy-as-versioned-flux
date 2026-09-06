@@ -187,6 +187,35 @@ into its throwaway repositories and their commit environment, so its proofs do n
 scanner's quota; the ticket commit itself was made with the hook bypassed after an offline grep
 of the staged diff for secret-shaped strings found none. CI on the branch is the citation.
 
+**CI on this branch, pull request 54, head `7f59ba4`, watched to completion.** `twin` run
+34042185114 (and its twin 34042153749 on the push): job `tests` `1 failed, 2072 passed in
+142.04s`, the one failure `test_the_suite_is_green` on `flux_coverage_floor_is_still_reachable`
+(invariant 45, `3/1966 sample(s)`, the estate's standing red); job `invariants` `71 passed, 1
+failed, 3 skipped`, the same invariant, with invariant 44 passing on the runner; `typecheck`,
+`demo`, the three `determinism` legs and `reproduce-elsewhere` all succeeded. The branch adds no
+red. The `truth` run (34042153763, run 148, watched to completion) is a branch run: its guard said
+first `THIS RUN CANNOT RECORD ITS TRUTH LINE, and will not pretend to ... Why: this run is on
+ticket-93-the-twin-derives-a-probability`, and the gate graded this ticket's script on the runner
+as the declared wait. The line it printed and did not record, quoted from the Actions log and NOT
+citable:
+
+    TRUTH 2026-09-06T15:46Z run=148 hub=7f59ba4 enact=development units=[driftwood=6a7ba02@main feeds=8cb7ae8@main ico=c65b6b2@main insurer=c991160@main ludlow=5981260@main nist=9dd7c31@main platform=a270fce@main tuppence=17fafdb@main] pass=71 [observed=18 self=40 simulated=6 meta=7] fail=12 skip=22 [never=9 waits=13] excluded=8 total=113 ceiling=94
+
+The twelve reds are the estate's standing set (ticket 100's run 131 carried eleven; the manifest
+gained ticket 67's map-surface row and this one since), not this branch's.
+
+**Rebased onto `main`, 2026-09-06 16:00Z.** PR 47 merged (e5bca74), then PR 55 (a38a912: the
+fixture hook-off in ticket 92's tests, selfcheck, `mkfixture` and stub) and PR 56 (3713a56). The
+two commits here were rebased with `--onto origin/main` at 3713a56, no conflict, and the whole
+battery re-run from the worktree: `tests/test_derived_forecast.py -n0` `32 passed in 23.81s`;
+mypy `Success: no issues found in 179 source files`; `tests/test_local_clock.py -n0` `52 passed
+in 28.02s` and `verify-local-clock.sh` offline PASS / marker SKIP, exit 3 -- the ggshield red
+above was ticket 92's fixture running the machine's hooks, and PR 55's hook-off closed it;
+`verify-derived-forecast.sh --selfcheck` PASS and the full run the same SKIP by name;
+`verify-twin-evals.sh` PASS (7 harness-mechanism metrics); `verify-all --selfcheck`,
+`verify-truth-line.sh` (113 placed), `verify-every-green.sh` (113), `verify-can-record.sh` all
+PASS. The branch no longer depends on anything open.
+
 ## Waits on the owner
 
 - **The first real derive run** (identity, money): `talk/local-clock.sh --step derive --adopter
