@@ -286,20 +286,32 @@ machine was loaded and a number nobody watched arrive is not a number. CI on thi
 citable read, and it was watched to completion — both the push run and the pull-request run, whose
 results agree:
 
-    twin, push run 34026412998, branch ticket-67-the-record-matches-the-surface at 0a26ebc
-      tests       1 failed, 2000 passed in 177.14s
+    twin, push run 34028267142, branch ticket-67-the-record-matches-the-surface at 043d77c
+      tests       2 failed, 2018 passed in 194.96s
                   FAILED tests/test_invariant_suite.py::test_the_suite_is_green
-                    -- flux_coverage_floor_is_still_reachable: the pre-registered coverage floor
-                       of 90% can no longer be reached
-      invariants  RESULT: 71 passed, 1 failed, 3 skipped (0 pending, 3 skipped and not faked)
+                    -- invariant 44 drift_window_is_actually_being_sampled: the newest sample is
+                       1 day old, so the probe has stopped
+                    -- invariant 45 flux_coverage_floor_is_still_reachable: the floor can no
+                       longer be reached
+                  FAILED tests/test_seam1_cli.py
+                         ::test_an_attestation_sidecar_accompanies_every_artefact
+      invariants  RESULT: 70 passed, 2 failed, 3 skipped (0 pending, 3 skipped and not faked)
+                  the two are 44 and 45, named on their own rows
       typecheck, demo, reproduce-elsewhere, determinism x4   all success
 
-    twin, pull_request run 34026415135 (PR 45) at 0a26ebc
-      tests       1 failed, 2000 passed in 154.38s, the same one
-      invariants  RESULT: 71 passed, 1 failed, 3 skipped
+    twin, pull_request run 34028269947 (PR 45) at 043d77c
+      tests       2 failed, 2018 passed in 202.71s, the same two
+      invariants  RESULT: 70 passed, 2 failed, 3 skipped
 
-Both watched to completion. Before the second rebase the same pair read 1 failed, 1958 passed
-(runs 34025933959 and 34025966944); the 42 extra tests are ticket 80's, which merged in between.
+Both watched to completion. Every failure is a red the build brief names as standing and
+environment-dependent: invariants 44 and 45, `test_the_suite_is_green` while either is red, and
+the serial-only `tests/test_seam1_cli.py` leak. Invariant 44 passed on the earlier runs of this
+same branch and fails on these, which is exactly the environment-dependence the brief warns of and
+the reason no fixed count is quoted. Nothing this ticket changed is in any of them.
+
+Earlier runs of this branch, each true of a different tree: 1 failed, 1958 passed at `a176445`
+(runs 34025933959, 34025966944), and 1 failed, 2000 passed at `0a26ebc` (runs 34026412998,
+34026415135) after ticket 80 merged. The 18 further tests are review round 1's.
 
 The one red is the standing one: invariant 45, `flux_coverage_floor_is_still_reachable`, and
 `test_the_suite_is_green` while it is red. Invariant 44 passed on the runner — these are
