@@ -58,6 +58,21 @@ TRUTH 2026-09-06T07:12Z run=local hub=5af3639 enact=other-hand units=[fixture] p
 `twin/ENACT_MODE` was not touched: it reads `development` by the owner's standing instruction, and
 every mode above was reached with `TWIN_ENACT_MODE`.
 
+**And then by the real gate, on the real surface.** The branch push fired `truth.yml`, which ran
+all 109 scripts on the runner and printed:
+
+```
+TRUTH 2026-09-06T07:42Z run=114 hub=958a190 enact=development units=[driftwood=96f4d0d@main
+feeds=b6eaa0a@main ico=6217c3a@main insurer=9e90e1b@main ludlow=d40b3fb@main nist=b9f5fff@main
+platform=e27187e@main tuppence=f7c9f6a@main] pass=69 [observed=16 self=40 simulated=6 meta=7]
+fail=11 skip=21 [never=9 waits=12] excluded=8 total=109 ceiling=90
+```
+
+Every count is identical to recorded run 113: the field arrived and moved no grade. That line is
+NOT citable and is not in `talk/truth.log` — it is a branch run, which under ticket 100 records
+nothing and said so ("THIS RUN CANNOT RECORD ITS TRUTH LINE"). It is quoted here from the Actions
+log as ticket 100's note allows, and was not written by hand into the record.
+
 ### Where the field went, and why (delegated)
 
 **Between `hub=` and `units=`.** Two reasons, and one of them is the ticket's own.
@@ -153,6 +168,18 @@ The ticket's list of twelve was written on 2026-09-04 and had grown by three fil
    `FAIL: selfcheck: the instrument does not grade as documented (see above)`.
    GREEN: the PASS sentence, ending `... and a run at each of the three enactment modes prints
    that mode on its own TRUTH line`.
+
+### One hardening, found in review of the diff (delegated)
+
+The hub root reaches python through the ENVIRONMENT (`ENACT_HUB_ROOT`), not interpolated into a
+quoted `-c` literal. A checkout under a path containing a quote would not have errored; it would
+have quietly written `enact=unknown` on every line — a wrong answer wearing the shape of an honest
+one, which is the same failure the exclusion-reason `xargs` bug had. Proved by copying the checkout
+to a directory literally named `it's a hub` and running the gate there:
+
+```
+TRUTH 2026-09-06T07:23Z run=local hub=958a190 enact=development units=[fixture] pass=1 ...
+```
 
 ### The recording rule (ticket 100)
 
