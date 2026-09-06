@@ -29,11 +29,13 @@
 #       prove the instrument over a fixture of tiny scripts (a pass, a declared
 #       skip, a fail, an undeclared skip, a script with no manifest line, an
 #       exclusion, a `never` that passes, a declared reason that sits past the
-#       display cut) and assert the TRUTH line's counts.
+#       display cut) and assert the TRUTH line's counts, then run that fixture once
+#       at each enactment mode and assert the line names the mode it ran at.
 #       Never runs the estate; its TRUTH line says fixture=1 and is not citable.
 #
 # Every run ends with one TRUTH line carrying the date, the run number, the
-# hub commit, the unit commits, the counts, the split of passes by class, the
+# hub commit, the enactment mode the run happened at (ticket 96: reported, never
+# graded), the unit commits, the counts, the split of passes by class, the
 # split of skips by kind, and the ceiling (total - excluded - never). Quote that
 # line, nothing else. After it, the slowest five scripts by wall-clock time are
 # printed, so drift toward the timeout is visible before it happens. Each
@@ -109,7 +111,7 @@ EOF
   chk "verify-f-excluded.sh +EXCLUDED  a helper the others call, and SPIRE is Istio's CA$"
   chk 'verify-g-never-passes.sh +PASS \(manifest says never\)'
   chk '^FAIL manifest: .*verify-g-never-passes.sh passed, but talk/verify-manifest.txt says it can never pass'
-  chk '^TRUTH .* run=local hub=[0-9a-f]+ units=\[fixture\] pass=1 \[observed=0 self=1 simulated=0 meta=0\] fail=4 skip=3 \[never=1 waits=2\] excluded=1 total=9 ceiling=6 fixture=1$'
+  chk '^TRUTH .* run=local hub=[0-9a-f]+ enact=[a-z-]+ units=\[fixture\] pass=1 \[observed=0 self=1 simulated=0 meta=0\] fail=4 skip=3 \[never=1 waits=2\] excluded=1 total=9 ceiling=6 fixture=1$'
   # the same fixture, --live: both declared skips become fails, nothing else moves
   out="$(env -u GITHUB_RUN_NUMBER VERIFY_SCRIPTS_FROM="$t/scripts.txt" VERIFY_MANIFEST="$t/manifest.txt" \
            VERIFY_EXCLUSIONS="$t/exclusions.txt" VERIFY_CAPDIR="$t/captures" \
@@ -131,8 +133,21 @@ EOF
            bash "$ROOT/talk/verify-all.sh")"
   chk '^NOTE manifest: \.estate-clone/nowhere/verify-nowhere.sh is listed .* not in this checkout'
   chk '^TRUTH .* fail=6 .* fixture=1$'
+  # ticket 96: the line says which mode twin/enact_guard.py was at while the run happened, so a
+  # reader of talk/truth.log can tell whether the run they cite had the enactment refusal on or
+  # off. REPORTED, never graded: which mode the estate runs in is the owner's authorisation
+  # (ADR-0025), so no mode is a failure here and this asserts only that the word on the line is
+  # the word the guard was at. Proved by RUNNING the gate once per mode and reading its line
+  # back, because what this file emits is the thing under test.
+  for m in development operations other-hand; do
+    mout="$(env -u GITHUB_RUN_NUMBER TWIN_ENACT_MODE="$m" VERIFY_SCRIPTS_FROM="$t/scripts.txt" \
+             VERIFY_MANIFEST="$t/manifest.txt" VERIFY_EXCLUSIONS="$t/exclusions.txt" \
+             VERIFY_CAPDIR="$t/captures" bash "$ROOT/talk/verify-all.sh")"
+    printf '%s\n' "$mout" | grep -qE "^TRUTH .* hub=[0-9a-f]+ enact=$m units=" \
+      || { echo "selfcheck: a run at TWIN_ENACT_MODE=$m printed no 'enact=$m' on its TRUTH line"; good=0; }
+  done
   if [ "$good" = 1 ]; then
-    echo "PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, an exclusion reason containing an apostrophe survives the trim whole, and a unit line this checkout does not carry is a note"
+    echo "PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, an exclusion reason containing an apostrophe survives the trim whole, a unit line this checkout does not carry is a note, and a run at each of the three enactment modes prints that mode on its own TRUTH line"
     exit 0
   fi
   echo "FAIL: selfcheck: the instrument does not grade as documented (see above)"; exit 1
@@ -259,8 +274,36 @@ else
     units="$units ${u#.estate-clone/}"; units="${units%/}=${sha}@${what}"
   done
 fi
+
+# enact=<mode>. Ticket 96. `twin/ENACT_MODE` decides whether the twin may merge and may push to
+# an enactment repository, and until now the estate's one citable record did not say which mode
+# produced a run: two runs of the same tree, one with the refusal on and one with it off, wrote
+# indistinguishable lines. This field is the answer to "which was it".
+#
+# REPORTED, NEVER GRADED. Which mode the estate runs in is the owner's authorisation and ADR-0025
+# keeps authorisations with the owner. Nothing here makes a mode a failure, nothing here compares
+# the mode to a record of who authorised it, and nothing here invents a place where such a record
+# would live -- that is ticket 97 and ticket 87 item 3, both open and both the owner's.
+#
+# The word comes from twin/enact_guard.py's own enact_mode(), never re-derived here: it resolves
+# TWIN_ENACT_MODE, then twin/ENACT_MODE, then its refusing default, and a second copy of that
+# ladder in bash would be a way for the line to disagree with the guard it describes. enact_guard
+# is stdlib-only and imports nothing from twin/, so a plain sys.path insert loads it.
+#
+# `unknown` when the resolver could not be run at all. That is not a mode; it is the absence of an
+# answer, and it is what an honest line says instead of guessing one. The gate already needs
+# python3 for talk/truth_manifest.py, so a run that reaches here and writes `unknown` has
+# something wrong with twin/ rather than with its interpreter.
+#
+# It sits between hub= and units= (delegated, 2026-09-06): run=, hub= and enact= all say what the
+# RUN was, units= onward says what it MEASURED, so the field reads with its own kind. It is also
+# unconditional, unlike live=1 and fixture=1, which are flags that appear only when set -- putting
+# an always-present field after the sometimes-present ones would have read as another flag.
+enact="$(python3 -c "import sys; sys.path.insert(0, '$ROOT/twin'); import enact_guard; print(enact_guard.enact_mode())" 2>/dev/null)" || enact=""
+[ -n "$enact" ] || enact=unknown
+
 echo
-echo "TRUTH $(date -u +%Y-%m-%dT%H:%MZ) run=${GITHUB_RUN_NUMBER:-local} hub=$(git rev-parse --short HEAD) units=[${units# }] ${counts}$([ "$REQUIRE_LIVE" = 1 ] && echo " live=1")$([ -n "$FIXTURE" ] && echo " fixture=1")"
+echo "TRUTH $(date -u +%Y-%m-%dT%H:%MZ) run=${GITHUB_RUN_NUMBER:-local} hub=$(git rev-parse --short HEAD) enact=${enact} units=[${units# }] ${counts}$([ "$REQUIRE_LIVE" = 1 ] && echo " live=1")$([ -n "$FIXTURE" ] && echo " fixture=1")"
 
 if [ "${#durs[@]}" -gt 0 ]; then
   echo

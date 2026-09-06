@@ -88,7 +88,10 @@ EXCLUDED is a fourth row for a script the gate found but was told not to run
 (`talk/verify-exclusions.txt`) — not a run outcome. Every script's full
 output is captured to `talk/captures/<slug>.out`, named on a FAIL row;
 local captures are untracked, the scheduled `truth` workflow commits them as
-observations (D1). The slowest five scripts print after the TRUTH line. The
+observations (D1). The TRUTH line also carries `enact=<mode>` (ticket 96): the
+mode `twin/ENACT_MODE` was at while the run happened, reported so a reader can
+tell whether the run they cite had the enactment refusal on or off. No mode is
+a grade. The slowest five scripts print after the TRUTH line. The
 rule: **a green that could not look is a red** — SKIP is never evidence
 anything passed. See [`talk/RUNBOOK.md`](RUNBOOK.md#6-reading-a-red-gate)
 for the full version.

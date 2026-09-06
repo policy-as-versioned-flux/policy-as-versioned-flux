@@ -149,6 +149,44 @@ def test_parse_truth_reads_old_and_new_lines_and_keeps_the_unit_text_for_ticket_
         tm.parse_truth("not a line")
 
 
+def test_parse_truth_reads_the_enact_mode_and_an_old_line_says_nothing_about_it() -> None:
+    """Ticket 96: the citable line says which mode the enactment guard was at when the run
+    happened, so a reader of talk/truth.log can tell whether the run they are citing had the
+    refusal on or off.
+
+    REPORTED, never graded. Which mode the estate runs in is the owner's authorisation
+    (ADR-0025), so parse_truth hands the word back and judges nothing: no mode is a failure
+    here, and there is no allow-list of modes in the parser.
+
+    A line written before the field existed carries no `enact=` at all, and `enact` is then
+    None -- "this run does not say", which is not the same as any mode and must never be read
+    as one. That is the same shape `split`, `skip_split` and `ceiling` already use for lines
+    that predate ticket 83. A parser that REQUIRED the field would refuse every line
+    talk/truth.log already holds, which is the record it exists to read.
+    """
+    for mode in ("development", "operations", "other-hand"):
+        line = (f"TRUTH 2026-09-06T09:00Z run=120 hub=abc1234 enact={mode} "
+                "units=[driftwood=4b28aa3@main] pass=1 [observed=1 self=0 simulated=0 meta=0] "
+                "fail=0 skip=0 [never=0 waits=0] excluded=0 total=1 ceiling=1")
+        t = tm.parse_truth(line)
+        assert t["enact"] == mode, f"{mode}: {t['enact']!r}"
+        # the field sits between hub= and units=, so both of its neighbours must still read
+        assert t["hub"] == "abc1234" and t["units"] == {"driftwood": "4b28aa3@main"}
+        assert (t["pass"], t["ceiling"]) == (1, 1)
+    # `unknown` is what verify-all.sh writes when it could not resolve the mode at all. It is
+    # not a mode; it is the honest absence of an answer, and it parses like any other word.
+    unknown = "TRUTH 2026-09-06T09:00Z run=121 hub=abc1234 enact=unknown units=[] pass=1"
+    assert tm.parse_truth(unknown)["enact"] == "unknown"
+    old = ("TRUTH 2026-09-03T19:09Z run=23 hub=b75eecb units=[] "
+           "pass=58 fail=7 skip=18 excluded=2 total=85")
+    assert tm.parse_truth(old)["enact"] is None
+    # and the flags that sit at the end are unmoved by a field that went in the middle
+    fixture = ("TRUTH 2026-09-06T09:00Z run=local hub=abc1234 enact=operations units=[fixture] "
+               "pass=1 fail=0 skip=0 excluded=0 total=1 ceiling=1 live=1 fixture=1")
+    t = tm.parse_truth(fixture)
+    assert t["enact"] == "operations" and t["live"] and t["fixture"]
+
+
 def test_measured_states_the_split_and_ceiling_or_says_the_line_has_none() -> None:
     new = ("TRUTH 2026-09-05T05:47Z run=24 hub=abc1234 units=[] pass=57 [observed=20 self=31 "
            "simulated=5 meta=1] fail=7 skip=18 [never=12 waits=6] excluded=2 total=84 ceiling=70")

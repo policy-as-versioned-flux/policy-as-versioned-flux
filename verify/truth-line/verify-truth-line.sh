@@ -21,7 +21,8 @@
 # placed and dishonest. Neither net catches the other's fish, and neither reruns the other.
 #
 #   PASS (exit 0)  the manifest covers every discovered script, the loader and the gate's own
-#                  selfchecks bite, and the last recorded TRUTH line's arithmetic holds
+#                  selfchecks bite, the last recorded TRUTH line's arithmetic holds, and the
+#                  enactment mode the line carries (ticket 96) reads back as written
 #   FAIL (exit 1)  one of those is false, named
 #   SKIP (exit 3)  no .estate-clone to discover (half the surface is missing, so coverage
 #                  cannot be observed), or no python3
@@ -143,8 +144,65 @@ EOF
 printf '  %s\n' "$pop"
 [ "$prc" -eq 0 ] || note "the published 'can never pass' count is not the ceiling's population"
 
+say "6. the line says which enactment mode the run happened at, and a line that predates the field says nothing rather than a mode"
+# Ticket 96. `twin/ENACT_MODE` decides whether the twin may merge and may push to an enactment
+# repository, and the citable record now says which mode produced a run.
+#
+# REPORTED, NEVER GRADED. Which mode the estate runs in is the owner's authorisation and ADR-0025
+# keeps authorisations with the owner, so NOTHING below turns a mode red. What is graded is the
+# reading: that the field arrives whole for each word the producer can write, that an old line
+# reads as None instead of being refused or being read as a mode, and that the flags after it are
+# unmoved. Leg 2 grades the PRODUCER by running it (talk/verify-all.sh --selfcheck runs its
+# fixture once per mode); this leg is the parser's half.
+#
+# The count of recorded lines carrying the field is REPORTED, not asserted: every line the log
+# held on 2026-09-06 predates ticket 96, so the number starts at 0 and rises one per scheduled
+# run. Stating it as a live number rather than as a sentence about "the log has none yet" is what
+# keeps the limit from going stale.
+mode="$("$PY" - <<'EOF'
+import sys
+sys.path.insert(0, "talk")
+from truth_manifest import parse_truth
+
+problems = []
+for word in ("development", "operations", "other-hand", "unknown"):
+    line = (f"TRUTH 2026-09-06T09:00Z run=120 hub=abc1234 enact={word} units=[platform=46cd775] "
+            "pass=1 [observed=1 self=0 simulated=0 meta=0] fail=0 skip=0 [never=0 waits=0] "
+            "excluded=0 total=1 ceiling=1 live=1 fixture=1")
+    t = parse_truth(line)
+    if t["enact"] != word:
+        problems.append(f"a line saying enact={word} reads back as {t['enact']!r}")
+    if t["hub"] != "abc1234" or t["units"] != {"platform": "46cd775"}:
+        problems.append(f"enact={word} broke its neighbours: hub={t['hub']!r} units={t['units']!r}")
+    if not (t["live"] and t["fixture"]):
+        problems.append(f"enact={word} moved the trailing flags: live={t['live']} fixture={t['fixture']}")
+
+old = ("TRUTH 2026-09-03T19:09Z run=23 hub=b75eecb units=[] pass=58 fail=7 skip=18 "
+       "excluded=2 total=85")
+if parse_truth(old)["enact"] is not None:
+    problems.append("a line predating the field does not read as None; a reader would take "
+                    "silence for a mode")
+
+lines = [l for l in open("talk/truth.log", encoding="utf-8") if l.startswith("TRUTH ")]
+named = [parse_truth(l) for l in lines]
+with_mode = [t for t in named if t["enact"] is not None]
+for t in named:
+    if t["enact"] == "unknown":
+        problems.append(f"run {t['run']} recorded enact=unknown: the gate could not resolve the "
+                        f"mode at all, which is a broken twin/, not a mode")
+last = named[-1] if named else None
+print(f"{len(with_mode)} of {len(lines)} recorded lines name the mode; the newest, run "
+      f"{last['run'] if last else '(none)'}, says "
+      + (f"enact={last['enact']}" if last and last["enact"] else "nothing (it predates the field)"))
+print("\n".join(problems), end="" if not problems else "\n")
+raise SystemExit(1 if problems else 0)
+EOF
+)"; mrc=$?
+printf '  %s\n' "$mode"
+[ "$mrc" -eq 0 ] || note "the enactment mode on the TRUTH line does not read back as written"
+
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: talk/verify-manifest.txt places every one of the $n verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all.sh turns an undeclared could-not-look and a stale ceiling red, the last TRUTH line talk/truth.log recorded adds up, and the published 'can never pass' count is the population the ceiling was cut from"
+  echo "PASS: talk/verify-manifest.txt places every one of the $n verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all.sh turns an undeclared could-not-look and a stale ceiling red, the last TRUTH line talk/truth.log recorded adds up, the published 'can never pass' count is the population the ceiling was cut from, and the enactment mode the line carries reads back as written while a line predating that field reads as no mode at all"
   exit 0
 fi
 echo "FAIL: $bad truth-line check(s) observed false (named above): the split, the ceiling or the manifest behind them cannot be trusted"
