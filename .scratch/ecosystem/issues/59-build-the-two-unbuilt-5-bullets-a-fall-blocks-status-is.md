@@ -301,15 +301,37 @@ are review-and-charting commits; measured over the whole hub log on 2026-09-06, 
 TOUCHES a verify script spells a range at all, so reading one would add a guess and attribute
 nothing real. Ticket 102 does not read them either.
 
-**R2-2.** Ticket 102 owns "which ticket does a commit subject name" and defines `ticket_numbers()`
-in `verify/cited-truth/cited_truth.py` — on pull request 51, which is **not merged**, so this
-module cannot import it unconditionally: the gate runs against whatever tree is checked out and a
-hard import would crash the check on `main` today. And that file must not be edited while its
-builder is editing it. So the function is imported WHEN PRESENT and mirrored when not, the two are
-asserted to AGREE on the nine subject shapes this estate's log uses (a disagreement fails the
-check), and the run PRINTS which of the two it used. When 102 lands the import wins by itself and
-the mirror is dead code to delete. Two copies that cannot silently diverge is the most this ticket
-can do without touching another builder's file; the module move is a follow-up.
+**R2-2, and it resolved itself mid-round.** Ticket 102 owns "which ticket does a commit subject
+name" and defines `ticket_numbers()` in `verify/cited-truth/cited_truth.py`. When this round
+started that work was on an unmerged pull request, so the function was imported when present and
+mirrored when not, with the two asserted to agree. Pull request 51 then merged (`a6b823a`), and
+the mirror is **deleted**: this module imports `ticket_numbers` and there is no second copy of the
+regex anywhere. The agreement guard is replaced by something better — `shared_contract()` declares
+executably which of that function's behaviours this check is built on, and a change over there
+now fails this check by name instead of moving its verdicts in silence. The one disagreement the
+guard did catch before the mirror went is worth recording, because it is what the guard is for:
+the mirror read `tickets 54-67 chart the remediation` as `{54}` and ticket 102's final function
+reads it as `{}`.
+
+**Two behaviours of the shared function this check is built on**, written down because it is now
+load-bearing for two checks:
+
+*Ranges are not expanded, and are read conservatively rather than wrongly.* `tickets 09-16` reads
+as nothing at all — the `(?!-\d)` lookahead refuses the whole range — and `tickets 88 to 95
+graduated`, which is ticket 75's real subject, reads as `{75, 88}` because `to` is not a list
+separator. **No range expansion is added here, and the measurement says why**: over the whole hub
+log on 2026-09-06, thirteen subjects use a range or a `to` form and **none of them touches any of
+the 40 hub verify scripts**. They are review, charting and worktree-sync commits
+(`Ambition review: … tickets 54-67 chart the remediation`, `Sync worktree to main (tickets
+01-44, 60, 62)`, and so on). If one ever does, this check will under-attribute rather than
+mis-attribute, which is the direction that cannot write a false ownership statement.
+
+*A bare number after a list separator is collected.* `Ticket 80 and 3 fixes` reads as `{3, 80}`.
+Mildly over-inclusive here — it could hand a check to a ticket that never touched it, turning a
+red into somebody else's regression. Accepted rather than worked around, because the alternative
+is a second reading of the same vocabulary and this round has just finished deleting one; and
+because the failure it would cause is loud, a ticket named for a check it plainly does not own,
+in a finding a reader sees. No subject of that shape exists in the hub log today.
 
 **R2-3, the honest limit of the runner evidence.** Run 142's `verify/a-fall-blocks/...sh PASS` row
 proves that **the fixture executed under the runner's own python, git and bash — including the
@@ -329,7 +351,10 @@ the fifteen lines are in the record.
     reading the estate's plural subjects is part of the rule, not a detail (R2-1). A red check a
     ticket does not own is COUNTED (7 red rows on run 135). A check no commit ties to any ticket
     is UNOWNABLE and also counted (0, once the plural subjects are read): inferring an owner from
-    silence is how a false ownership statement gets written.
+    silence is how a false ownership statement gets written. The subjects are read by ticket
+    102's `ticket_numbers`, imported from `verify/cited-truth/cited_truth.py` — one reading for
+    the estate, no fork — and `shared_contract()` pins the behaviours of it this check depends on,
+    ranges included.
     **This module reads every TOUCHING commit; ticket 102 reads the ADDING commit** (R2-2), and
     both are right for their own question. 102 asks who ADDED a check, so a ticket cannot claim
     proof from a tree that predates it — one commit, the first. This asks who is ANSWERABLE for a
@@ -344,20 +369,21 @@ the fifteen lines are in the record.
     can never be the newest recorded run, and failing on it would redden a local gate run for the
     crime of having been run.
 
-### Found while rebasing, and NOT this ticket's to fix
+### Found while rebasing, reported, and fixed by its owner
 
-`verify/cited-truth/verify-cited-truth.sh` is RED on `origin/main` at `e5bca74`, and has been
-since pull request 47 (ticket 92 round 6) merged:
+`verify/cited-truth/verify-cited-truth.sh` was RED on `origin/main` at `e5bca74` for about an
+hour, from pull request 47 (ticket 92 round 6):
 
     .scratch/ecosystem/issues/92-the-local-clock.md:245: no-such-line: run 131 is quoted with
     pass=71 fail=11 skip=21 excluded=8 total=111 ceiling=92, and talk/truth.log records no such line
 
-Run 131 was a BRANCH run, so ticket 100's guard correctly stopped it recording, and the line it
-measured is only in the Actions log. This branch's copy of that file is byte-identical to main's
-(`git diff origin/main -- .scratch/ecosystem/issues/92-the-local-clock.md` is empty), so the red
-is inherited and not caused here. The fix is one dated line in ticket 92 saying the quoted figure
-is from a run nobody recorded — the same shape ticket 92's own text already uses elsewhere — and
-it belongs to ticket 92, not to this one. Recorded so it is not mistaken for this branch's.
+Run 131 was a BRANCH run, so ticket 100's guard correctly stopped it recording and the line it
+measured is only in the Actions log. This branch's copy of that file was byte-identical to main's,
+so the red was inherited and not caused here; it was reported rather than fixed in passing, since
+another builder's record is not this ticket's to edit. Ticket 92's own follow-up (pull request 55,
+`a38a912`) has since fixed it, and `verify-cited-truth.sh` is green again on this branch. Recorded
+because "a red appeared and then went away" is exactly the kind of thing the truth surface exists
+to stop being invisible.
 
 ## Waits on the owner
 

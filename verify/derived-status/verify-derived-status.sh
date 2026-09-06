@@ -60,9 +60,9 @@
 # read only `ticket NN` reported both unowned and told four tickets that a check they had built
 # was not their own (re-review R2-1). With the plural read the narrowing lands on SEVEN tickets --
 # 38, 56, 62, 77, 85, 89, 99 -- and leaves seven red rows named by tickets that own none of them
-# (57, 72, 73, 80, 83). The reading itself is ticket 102's `ticket_numbers` where this checkout
-# carries it and a mirror of the same rule where it does not; the two must agree, and the run
-# prints which one it used. A red check a ticket does not own is COUNTED. A check no commit names
+# (57, 72, 73, 80, 83). The reading itself is ticket 102's `ticket_numbers`, imported from
+# verify/cited-truth/cited_truth.py -- one reading for the estate, no fork -- with
+# `shared_contract()` declaring executably which of its behaviours this check is built on. A red check a ticket does not own is COUNTED. A check no commit names
 # any ticket for is UNOWNABLE and also counted -- inferring an owner from silence is how a false
 # ownership statement gets written.
 #

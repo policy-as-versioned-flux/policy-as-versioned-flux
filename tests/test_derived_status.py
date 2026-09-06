@@ -341,9 +341,26 @@ def test_a_hyphenated_branch_name_in_a_merge_subject_names_no_ticket() -> None:
         "Merge pull request #24 from policy-as-versioned-flux/ticket-62-and-77-pins") == set()
 
 
-def test_a_range_is_read_as_its_first_number_only_and_that_is_recorded() -> None:
-    """A decision, not an oversight: `tickets 76-87 charted` is a review's charting commit, and
-    no commit that TOUCHES a verify script uses a range (measured over the hub log, 2026-09-06).
-    Ticket 102 owns this vocabulary and does not read ranges either; matching it matters more
-    than covering a spelling that never attributes a check."""
-    assert ds.ticket_numbers("Ambition review: tickets 54-67 chart the remediation") == {"54"}
+def test_a_range_is_not_expanded_and_is_read_conservatively() -> None:
+    r"""A decision, not an oversight (re-review R2, 2026-09-06). Ticket 102's function refuses a
+    range outright (`(?!-\d)`) and does not treat `to` as a separator. Measured over the whole
+    hub log: thirteen subjects use a range or a `to` form and NONE of them touches any of the 40
+    hub verify scripts -- they are review, charting and worktree-sync commits. So no range
+    expansion is added here; under-attributing cannot write a false ownership statement, and
+    over-attributing can."""
+    assert ds.ticket_numbers("Ambition review: tickets 54-67 chart the remediation") == set()
+    assert ds.ticket_numbers("Ticket 75 resolved: tickets 88 to 95 graduated") == {"75", "88"}
+
+
+def test_a_bare_number_after_a_separator_is_collected_and_that_is_known() -> None:
+    """The other behaviour this check inherits: mildly over-inclusive, accepted rather than
+    forked around, and loud when it bites."""
+    assert ds.ticket_numbers("Ticket 80 and 3 fixes") == {"3", "80"}
+
+
+def test_the_shared_reading_is_the_only_reading() -> None:
+    """R2-2. There is no second copy of the regex in this module; `shared_contract()` declares
+    executably which of ticket 102's behaviours this check is built on, and a change over there
+    fails this check by name instead of moving its verdicts in silence."""
+    assert ds.shared_contract() == []
+    assert ds.ticket_numbers.__module__ == "cited_truth"
