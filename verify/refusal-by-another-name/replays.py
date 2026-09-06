@@ -176,11 +176,13 @@ def replay_3(register: dict) -> bool:
 def replay_4(register: dict) -> bool:
     mutations, groups, _ = rs.scan_tree(ROOT)
     v = rs.grade(mutations, groups, register)
-    reported = [ln for ln in v.lines if "accepted refusal" in ln]
-    remediation = [ln for ln in v.lines if "remediation:" in ln]
-    ok = bool(reported) and bool(remediation) and v.code == 0
+    # The question is about the ROW, not about the whole run's exit code. Asking `v.code == 0`
+    # made any could-not-look anywhere -- an unplaceable path, an untabulated resource, an
+    # unresolvable name -- report a stale register row that was not stale, and exit the run
+    # before the SKIP line the manifest declares could ever be printed (review R1).
+    ok, why = rs.live_instance_reported(v)
     print(f"  {'ok  ' if ok else 'FAIL'} instance 4, LIVE and decided: "
-          f"{'reported as an accepted refusal with its remediation, not as a defect' if ok else 'the live instance is NOT reported -- either the row went stale or the code moved'}")
+          f"{'reported as an accepted refusal with its remediation, not as a defect' if ok else why}")
     # ...and the row is not a blanket permission: narrow it and the check goes red
     narrowed = copy.deepcopy(register)
     if narrowed.get("accepted"):

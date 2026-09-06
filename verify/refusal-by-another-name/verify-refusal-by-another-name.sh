@@ -113,8 +113,8 @@ say "5. leg B: every UPDATE-scoped mutation applied to its own output, on every 
 functional=$?
 
 if [ "$static" != 0 ] && [ "$static" != 3 ]; then exit "$static"; fi
-if [ "$functional" != 0 ]; then exit "$functional"; fi
-if [ "$static" = 3 ]; then
+if [ "$functional" != 0 ] && [ "$functional" != 3 ]; then exit "$functional"; fi
+if [ "$static" = 3 ] || [ "$functional" = 3 ]; then
   # The could-not-look has to be the LAST line, because that is the line the manifest judges --
   # and step 5 ran after step 4 and printed over it.
   echo "SKIP: this scan could not look at something it found, named in step 4 -- a reference name it could not resolve to a literal offline, a mutating policy on a path it cannot place (so nothing here knows whether anything delivers it), or a resource whose mutability it does not tabulate. None of the three is a pass"

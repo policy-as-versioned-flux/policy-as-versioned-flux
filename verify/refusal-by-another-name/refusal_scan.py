@@ -503,6 +503,11 @@ class Mutation:
     writes: frozenset[str]
     references: dict[str, Reference] = field(compare=False, default_factory=dict)
 
+    #: No resourceRule declared any operation. Admission defaults are the API's business, not
+    #: this scan's to guess at, so it is NAMED as a could-not-look rather than read as "does not
+    #: reach UPDATE" -- which is what it silently was until 2026-09-06 (review R3).
+    operations_unstated: bool = field(compare=False, default=False)
+
     @property
     def untabulated(self) -> bool:
         """A resource whose mutability this file does not tabulate. Named, never graded."""
@@ -526,7 +531,13 @@ def canonical_operations(ops: list[str]) -> tuple[str, ...]:
     """
     out: list[str] = []
     for op in ops:
-        for one in (ALL_OPERATIONS if str(op).strip() in ("*", "ALL") else [str(op)]):
+        # Upper-cased before anything is decided about it. REVIEW, 2026-09-06 (R3): the CRD
+        # accepts `operations: ["Update"]` -- confirmed with `kubectl apply --dry-run=server` --
+        # and a lower- or mixed-case spelling read as "does not reach UPDATE" with nothing said.
+        # A policy already on the register is caught by its `policies:` set; a NEW one written
+        # that way was not.
+        token = str(op).strip().upper()
+        for one in (ALL_OPERATIONS if token in ("*", "ALL") else [token]):
             if one not in out:
                 out.append(one)
     return tuple(out)
@@ -549,6 +560,7 @@ def mutation(doc: dict, path: str = "-", unit: str = "-", surface: str = "served
         path=path, unit=unit, surface=surface, group=group,
         operations=tuple(dict.fromkeys(ops)), resources=tuple(dict.fromkeys(res)),
         writes=frozenset(written_paths(doc)), references=reference_names(doc),
+        operations_unstated=bool(rules) and not ops,
     )
 
 
@@ -823,6 +835,11 @@ def grade(mutations: list[Mutation], shipped: dict, register: dict) -> Verdict:
     for m in graded:
         if m.surface == "unclassified":
             could_not.append(f"  ??   {m.name}: {unclassified_why(m.path)}")
+        if m.operations_unstated:
+            could_not.append(
+                f"  ??   {m.name} ({m.path}) declares no operations in any resourceRule, so "
+                f"which operations reach it is the API server's default and not something this "
+                f"scan may assume -- it is named rather than read as 'does not reach UPDATE'")
         if m.untabulated:
             what = ",".join(m.resources) or "an unknown resource"
             could_not.append(
@@ -905,6 +922,29 @@ def grade(mutations: list[Mutation], shipped: dict, register: dict) -> Verdict:
     if could_not:
         return Verdict(3, lines)
     return Verdict(0, lines)
+
+
+def live_instance_reported(verdict: Verdict) -> tuple[bool, str]:
+    """Is the accepted refusal REPORTED, with its remediation, and is its row still true?
+
+    REVIEW, 2026-09-06 (R1). `replays.replay_4` asked `verdict.code == 0`, which is a question
+    about the WHOLE run: any could-not-look anywhere -- an unplaceable path, an untabulated
+    resource, a name that will not resolve -- turned the live instance red with a reason that
+    was false ("the row went stale or the code moved") and exited the run at step 2. The third
+    could-not-look the manifest row declares could therefore never be reached, which is a stale
+    disclosure in the check built to stop stale disclosures. The question is about the ROW.
+    """
+    reported = [ln for ln in verdict.lines if "accepted refusal" in ln]
+    remediation = [ln for ln in verdict.lines if "remediation:" in ln]
+    about_row = [ln for ln in verdict.lines
+                 if ln.startswith("  FAIL") and ("register row" in ln or "no register row" in ln)]
+    if about_row:
+        return False, about_row[0].strip()
+    if not reported or not remediation:
+        return False, ("the live instance is not reported at all: no accepted-refusal line and "
+                       "no remediation, so either the register lost the row or the code stopped "
+                       "writing the fields it records")
+    return True, reported[0].strip()
 
 
 def _row_matches(row: dict, m: Mutation, h: Hazard) -> bool:

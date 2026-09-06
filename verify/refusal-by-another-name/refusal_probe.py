@@ -55,10 +55,28 @@ VERSION_RE = re.compile(r"(\d+\.\d+\.\d+)")
 
 
 def _pod(name: str, claim: str | None) -> dict:
-    labels = {"policy-as-versioned.dev/policy-version": claim} if claim else {}
+    """The probe pod, and every value on it is deliberately WRONG.
+
+    REVIEW, 2026-09-06 (R2). Leg B's "the mutation must change the pod it was handed" rule
+    false-reds a legitimate DEFENSIVE CLOBBER -- the shape `stamp-posture`'s own header
+    describes, which overwrites unconditionally so that a post-admission relabel is
+    re-clobbered. Handed a pod that already carries the value, such a body changes nothing and
+    the rule called it "a policy that writes nothing". D6 again: a red that is wrong is worse
+    than no check.
+
+    So the pod arrives carrying a forged tier, a forged caged marker, a PriorityClass no cage
+    ever names and an integer priority no rung uses, with container limits far looser than any
+    dial. A clobber has something to clobber, a tighten-only dial has something to tighten, and
+    a body that still changes nothing is genuinely writing nothing.
+    """
+    labels = {"posture.acme.io/tier": "forged-by-the-probe",
+              "posture.acme.io/caged": "false"}
+    if claim:
+        labels["policy-as-versioned.dev/policy-version"] = claim
     return {"apiVersion": "v1", "kind": "Pod",
             "metadata": {"name": name, "namespace": "governed-ns", "labels": labels},
-            "spec": {"containers": [{"name": "app", "image": "nginx",
+            "spec": {"priorityClassName": "not-a-cage-class", "priority": 7,
+                     "containers": [{"name": "app", "image": "nginx",
                                      "resources": {"limits": {"cpu": "2", "memory": "1Gi"}}}]}}
 
 
@@ -124,10 +142,13 @@ def _candidate_claims(doc: dict, path: str) -> list[str | None]:
 
 @dataclass
 class Probe:
+    """One policy's leg-B result. Three outcomes, not two: `skip` is a could-not-look."""
+
     policy: str
     path: str
     ok: bool
     detail: str
+    status: str = ""       # "skip" marks a could-not-look; otherwise `ok` decides
 
 
 _COUNTS = re.compile(r"pass:\s*(\d+),\s*fail:\s*(\d+),\s*warn:\s*(\d+),\s*error:\s*(\d+),"
@@ -264,10 +285,22 @@ def probe(kyverno: str, doc: dict, path: str) -> Probe:
         wrote = any(_canonical(r.obj) != _canonical(_pod("probe", c))
                     for c, _, r in reached if r.obj)
         if not wrote:
+            # Two different things, and conflating them was the review's R2. A body with no
+            # write paths at all IS the emptied-mutation case this rule was added for, and it
+            # fails. A body that DOES declare writes and still changed nothing is a probe that
+            # could not show them -- a could-not-look naming the policy, never a pass and never
+            # a wrong red.
+            if not rs.written_paths(doc):
+                return Probe(name, path, False,
+                             "this policy declares no field writes at all and the object came "
+                             "back exactly as it went in, so byte-identity on its own output is "
+                             "vacuously true: the leg measured a policy that writes nothing")
             return Probe(name, path, False,
-                         "the mutation applied and changed NOTHING on any rung: the object came "
-                         "back exactly as it went in, so byte-identity on its own output is "
-                         "vacuously true and this leg measured a policy that writes nothing")
+                         f"this policy writes {len(rs.written_paths(doc))} field path(s) and yet "
+                         f"the probe pod came back unchanged on every rung, so this leg could "
+                         f"not SHOW the write and its byte-identity proves nothing about it -- "
+                         f"the probe pod would need a value these paths actually change",
+                         status="skip")
         for claim, tier, first in reached:
             assert first.obj is not None
             tag = f"{claims.index(claim)}-{TIERS.index(tier)}"
@@ -389,7 +422,21 @@ def selfcheck(kyverno: str) -> int:
     none = probe(kyverno, nothing, "<fixture: a policy that matches nothing>")
     print(f"  {'ok  ' if not none.ok else 'FAIL'} a policy that applies to nothing: "
           f"{'refused to pass -- ' + none.detail if not none.ok else 'PASSED on an empty run'}")
-    return 0 if (good.ok and not bad.ok and not none.ok) else 1
+    empty = copy.deepcopy(doc)
+    empty["spec"]["mutations"] = []
+    e = probe(kyverno, empty, "<fixture: a policy with no mutations at all>")
+    print(f"  {'ok  ' if (not e.ok and e.status != 'skip') else 'FAIL'} a policy that writes "
+          f"nothing: {'caught -- ' + e.detail if not e.ok and e.status != 'skip' else 'PASSED, so the emptied-body case is ungraded'}")
+    # ...and the shape that made this rule wrong: a defensive clobber writing the value the
+    # object already carries. It must be a could-not-look, never a red (review R2).
+    same = copy.deepcopy(doc)
+    same["spec"]["mutations"][0]["applyConfiguration"]["expression"] = (
+        'Object{metadata: Object.metadata{labels: {"posture.acme.io/caged": "false"}}}')
+    c = probe(kyverno, same, "<fixture: a clobber writing the value the pod already carries>")
+    print(f"  {'ok  ' if c.status == 'skip' else 'FAIL'} a defensive clobber that changes "
+          f"nothing on this pod: {'could-not-look, not a red -- ' + c.detail if c.status == 'skip' else 'graded ' + ('PASS' if c.ok else 'FAIL') + ', and a wrong red is worse than no check'}")
+    return 0 if (good.ok and not bad.ok and not none.ok and not e.ok and e.status != "skip"
+                 and c.status == "skip") else 1
 
 
 def main(argv: list[str]) -> int:
@@ -410,16 +457,23 @@ def main(argv: list[str]) -> int:
         return 1
     probes = [probe(kyverno, doc, path) for doc, path in collect(Path(args.root).resolve())]
     for p in probes:
-        print(f"  {'ok  ' if p.ok else 'FAIL'} {p.policy} ({p.path}): {p.detail}")
+        mark = "??  " if p.status == "skip" else ("ok  " if p.ok else "FAIL")
+        print(f"  {mark} {p.policy} ({p.path}): {p.detail}")
     if not probes:
         print("FAIL: no UPDATE-scoped mutation was found on the served surface at all, so this "
               "leg measured nothing -- either the clone is missing or the scan stopped scanning")
         return 1
-    bad = [p for p in probes if not p.ok]
+    bad = [p for p in probes if not p.ok and p.status != "skip"]
     if bad:
         print(f"FAIL: {len(bad)} of {len(probes)} UPDATE-scoped mutations are not byte-identical "
               f"on an already-mutated object")
         return 1
+    unseen = [p for p in probes if p.status == "skip"]
+    if unseen:
+        print(f"SKIP: this scan could not look at something it found -- {len(unseen)} of "
+              f"{len(probes)} UPDATE-scoped mutations declare writes the probe pod could not "
+              f"make visible, so their byte-identity proves nothing about those writes")
+        return 3
     print(f"  {len(probes)} UPDATE-scoped mutations applied to their own output, byte for byte")
     return 0
 

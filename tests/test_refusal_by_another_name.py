@@ -599,3 +599,80 @@ def test_a_wildcard_reaches_the_execution_probe_too(tmp_path: Path) -> None:
     m = [x for x in mutations if x.name == "apps-sneaky-cage"]
     assert m and m[0].surface == "served-cut"
     assert "UPDATE" in m[0].operations
+
+
+# ======================================================================================
+# Review round 3, 2026-09-06. A could-not-look anywhere used to turn the live instance red
+# with a WRONG reason, which made the third declared could-not-look unreachable -- a stale
+# disclosure, this week's lesson, in the check that exists to stop stale disclosures.
+# ======================================================================================
+
+def test_the_live_instance_is_still_reported_when_something_else_could_not_be_looked_at(
+        tmp_path: Path) -> None:
+    """The reviewer planted a HARMLESS label-only hold in `driftwood/gitops/apps/`, register
+    row intact. The grade correctly returned 3 (the hold's path cannot be placed), and
+    `replay_4` -- which asserted `v.code == 0` -- reported "the live instance is NOT reported
+    -- either the row went stale or the code moved", exited the run at step 2, and the SKIP
+    line the manifest declares never printed. The predicate asks about the ROW now."""
+    ms = _mutations() + [rs.mutation(
+        {"kind": "MutatingPolicy", "metadata": {"name": "apps-hold"},
+         "spec": {"matchConstraints": {"resourceRules": [
+             {"operations": ["UPDATE"], "resources": ["pods"]}]},
+             "mutations": [{"patchType": "ApplyConfiguration", "applyConfiguration": {
+                 "expression": HOLD_BODY}}]}},
+        path="driftwood/gitops/apps/hold.yaml", surface="unclassified")]
+    v = rs.grade(ms, shipped={"PriorityClass": {"cage-baseline-4-0-0", "cage-isolated-4-0-0"}},
+                 register=_reg())
+    assert v.code == 3, "the unplaceable path is still a could-not-look"
+    ok, why = rs.live_instance_reported(v)
+    assert ok, why
+    assert "accepted refusal" in why
+
+
+def test_the_live_instance_predicate_is_red_when_the_row_really_did_go_stale() -> None:
+    v = rs.grade(_mutations(), shipped={"PriorityClass": {"cage-baseline-4-0-0",
+                                                         "cage-isolated-4-0-0"}},
+                 register={"accepted": []})
+    ok, why = rs.live_instance_reported(v)
+    assert not ok
+    assert "no register row" in why or "not reported" in why
+
+
+# ------------------------------- R3: case, and an operations list nobody wrote
+
+def test_operations_are_matched_case_insensitively() -> None:
+    """Confirmed against the CRD with `kubectl apply --dry-run=server`: `operations: ["Update"]`
+    is accepted. A registered policy is caught by the row's `policies:` set; a NEW one written
+    that way would have been read as not reaching UPDATE at all."""
+    m = rs.mutation(cage(operations=("Update", "create")))
+    assert m is not None
+    assert set(m.operations) == {"UPDATE", "CREATE"}
+    assert "spec.priorityClassName" in {h.path for h in rs.hazards(m)}
+
+
+def test_a_mutating_policy_with_no_operations_at_all_is_a_could_not_look() -> None:
+    doc = cage()
+    doc["spec"]["matchConstraints"]["resourceRules"][0].pop("operations")
+    m = rs.mutation(doc, path="platform/x.yaml", surface="served-cut")
+    assert m is not None and m.operations_unstated is True
+    v = rs.grade([m], shipped={"PriorityClass": {"cage-baseline-4-0-0", "cage-isolated-4-0-0"}},
+                 register={"accepted": []})
+    assert v.code == 3
+    assert any("declares no operations" in line for line in v.lines)
+
+
+# --------------------- R2: a mutation that writes nothing, versus one that writes the same
+
+def test_a_body_with_no_mutations_writes_nothing() -> None:
+    doc = cage()
+    doc["spec"]["mutations"] = []
+    assert rs.written_paths(doc) == set()
+
+
+def test_a_clobber_that_writes_the_value_the_object_already_has_still_writes() -> None:
+    """D6 in a new place: a red that is wrong is worse than no check. `stamp-posture`'s own
+    header describes a defensive clobber -- it OVERWRITES unconditionally so a post-admission
+    relabel is re-clobbered. Handed a pod that already carries the value, it changes nothing,
+    and leg B's `must change the pod` rule called that `a policy that writes nothing`."""
+    body = 'Object{metadata: Object.metadata{labels: {"posture.acme.io/caged": "true"}}}'
+    assert rs.written_paths(cage(body=body)) == {"metadata.labels"}
