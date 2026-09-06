@@ -643,6 +643,12 @@ def selfcheck():
     assert deck_name("x\n<!-- deck run=22 hub=ccccccc source=recorded -->\ny") == {
         "run": "22", "hub": "ccccccc", "source": "recorded"}
     assert deck_name("no marker") == {}
+    # ticket 96 put `enact=<mode>` between hub= and units=. The deck neither names nor grades
+    # the mode -- it names a run and a hub -- so all that is asserted here is that the field
+    # passes through the two readers the deck's provenance check compares against the marker.
+    withmode = ("TRUTH 2026-09-06T00:00Z run=23 hub=eeeeeee enact=other-hand units=[] "
+                "pass=1 fail=0 skip=0 excluded=0 total=1")
+    assert (line_run(withmode), line_hub(withmode)) == ("23", "eeeeeee")
 
     # what the line measured (ticket 83): the sentence comes from the line, and its figures are
     # outside the figure check because check() pins them to the line exactly

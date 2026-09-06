@@ -44,8 +44,8 @@ THE MANIFEST  talk/verify-manifest.txt, one line per script the gate discovers:
 
 THE TRUTH LINE  what talk/verify-all.sh prints, and what parse_truth reads back:
 
-    TRUTH <utc> run=N hub=H units=[u=sha ...] pass=P [observed=a self=b simulated=c meta=d]
-      fail=F skip=S [never=x waits=y] excluded=E total=T ceiling=C [live=1] [fixture=1]
+    TRUTH <utc> run=N hub=H enact=M units=[u=sha ...] pass=P [observed=a self=b simulated=c
+      meta=d] fail=F skip=S [never=x waits=y] excluded=E total=T ceiling=C [live=1] [fixture=1]
 
   a+b+c+d == P (the split is of PASSES, by manifest class)
   x+y == S     (the split is of SKIPS, by the manifest's skip kind; both declared)
@@ -59,6 +59,14 @@ THE TRUTH LINE  what talk/verify-all.sh prints, and what parse_truth reads back:
   `fixture=1` marks a run over a fixture list (the selfcheck) and is never citable.
   `units=[...]` is written by verify-all.sh; ticket 77 adds the tag beside each sha there and
   parse_truth keeps the text of each unit's value, so that seam is clean.
+  `enact=M` (ticket 96) is the mode twin/enact_guard.py was at while the run happened -- whether
+  the twin could merge and could push to an enactment repository. It is REPORTED and never
+  graded: which mode the estate runs in is the owner's authorisation (ADR-0025), so parse_truth
+  hands the word back, no mode is a failure, and nothing here compares it to a record of who
+  authorised it. `unknown` means verify-all.sh could not resolve the mode. A line written before
+  2026-09-06 carries no `enact=` at all and parses with `enact` None -- "this run does not say",
+  which a reader must not read as any mode. Nothing may REQUIRE the field: the 42 lines the log
+  held when it landed carry none, and they are the record this parser exists to read.
 
 CONTRACT FOR TICKET 59 (the fall-checker), so it can build without reopening this ticket:
   - Read two consecutive TRUTH lines with parse_truth(); compare class by class. A FALL is any
@@ -327,22 +335,27 @@ _KV = re.compile(r"\b(\w+)=(\[[^\]]*\]|\S+)")
 
 
 def parse_truth(line: str) -> dict:
-    """A TRUTH line as a dict. Old lines (no split, no ceiling) parse too: their `split`,
-    `skip_split` and `ceiling` are None, so a reader can tell "unmeasured" from zero.
+    """A TRUTH line as a dict. Old lines (no split, no ceiling, no enact) parse too: their
+    `split`, `skip_split`, `ceiling` and `enact` are None, so a reader can tell "unmeasured"
+    from zero and "this run does not say" from a mode.
 
-    Keys: ts, run, hub, units (dict unit -> text after '='), pass, split (dict by SPLIT_KEYS),
-    fail, skip, skip_split (dict by SKIP_KINDS), excluded, total, ceiling, live, fixture."""
+    Keys: ts, run, hub, enact (str or None), units (dict unit -> text after '='), pass, split
+    (dict by SPLIT_KEYS), fail, skip, skip_split (dict by SKIP_KINDS), excluded, total, ceiling,
+    live, fixture."""
     line = line.strip()
     if not line.startswith("TRUTH "):
         raise ValueError("not a TRUTH line")
     m = re.match(r"TRUTH (\S+)", line)
     out: dict = {"ts": m.group(1) if m else "", "split": None, "skip_split": None,
-                 "ceiling": None, "live": False, "fixture": False, "units": {}}
+                 "ceiling": None, "enact": None, "live": False, "fixture": False, "units": {}}
     counts = {}
     for key, val in _KV.findall(line):
         counts[key] = val
     out["run"] = counts.get("run", "")
     out["hub"] = counts.get("hub", "")
+    # ticket 96. Absent -> None, and no allow-list: the mode is the owner's authorisation, not
+    # this module's to grade, and a parser that refused an unfamiliar word would be grading it.
+    out["enact"] = counts.get("enact")
     units_txt = counts.get("units", "[]").strip("[]")
     for tok in units_txt.split():
         u, _, v = tok.partition("=")
@@ -461,6 +474,7 @@ def selfcheck() -> None:
     assert (t["run"], t["hub"], t["pass"], t["total"]) == ("23", "b75eecb", 58, 85)
     assert t["units"] == {"driftwood": "4b28aa3", "feeds": "69c89b0"}
     assert t["split"] is None and t["ceiling"] is None and not t["fixture"]
+    assert t["enact"] is None                                 # ticket 96: predates the field
     assert "carries no split" in measured(old) and "pass=58 of total=85" in measured(old)
     new = ("TRUTH 2026-09-05T05:47Z run=24 hub=abc1234 units=[driftwood=4b28aa3@v1.2.0] "
            "pass=57 [observed=20 self=31 simulated=5 meta=1] fail=7 skip=18 [never=12 waits=6] "
@@ -483,6 +497,19 @@ def selfcheck() -> None:
     m = measured(diverged)
     assert "ceiling of 7 of 11 (1 excluded, 3 can never pass on this runner)" in m, m
     assert "skip 2 (never 1, waits 1)" in m, m
+
+    # ticket 96: the mode, read back from between hub= and units=, for each of the three words
+    # verify-all.sh can write plus the `unknown` it writes when it could not resolve one. No
+    # allow-list, no grade: this asserts only that the field arrives whole and that its
+    # neighbours still read.
+    for mode in ("development", "operations", "other-hand", "unknown"):
+        line = (f"TRUTH 2026-09-06T09:00Z run=120 hub=abc1234 enact={mode} "
+                "units=[driftwood=4b28aa3@main] pass=1 [observed=1 self=0 simulated=0 meta=0] "
+                "fail=0 skip=0 [never=0 waits=0] excluded=0 total=1 ceiling=1")
+        t = parse_truth(line)
+        assert t["enact"] == mode, (mode, t["enact"])
+        assert t["hub"] == "abc1234" and t["units"] == {"driftwood": "4b28aa3@main"}
+        assert t["pass"] == 1 and t["ceiling"] == 1
     print("selfcheck ok")
 
 

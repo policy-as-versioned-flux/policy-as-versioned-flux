@@ -30,7 +30,10 @@ STEP = "verify/e2e/verify-e2e-step{n}-x.sh"
 HONESTY = "verify/e2e/verify-e2e-step7-honesty.sh"
 RUN1 = ("TRUTH 2026-09-01T09:41Z run=1 hub=aaaaaaa units=[driftwood=1111111] "
         "pass=5 fail=0 skip=2 excluded=0 total=7")
-RUN2 = ("TRUTH 2026-09-02T09:41Z run=2 hub=bbbbbbb units=[driftwood=2222222] "
+# run 2 carries ticket 96's `enact=` between hub= and units=, and run 1 does not: the deck is
+# built and checked over a log holding both shapes, so the field cannot break the run the deck
+# names and its absence cannot break the run before it.
+RUN2 = ("TRUTH 2026-09-02T09:41Z run=2 hub=bbbbbbb enact=other-hand units=[driftwood=2222222] "
         "pass=4 fail=1 skip=2 excluded=0 total=7")
 LOCAL = ("TRUTH 2026-09-02T12:00Z run=local hub=ccccccc units=[driftwood=2222222] "
          "pass=4 fail=1 skip=2 excluded=0 total=7")

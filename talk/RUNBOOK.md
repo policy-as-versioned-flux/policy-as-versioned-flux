@@ -41,7 +41,8 @@ talk/verify-all.sh
 # -> clones the six units into .estate-clone/ (skipped if already present), then
 #    runs every verify*.sh it finds there and in verify/. Each ends PASS (observed
 #    true), FAIL (observed false) or SKIP (could not look, exit 3, with a reason).
-#    The last line is the TRUTH stamp: date, run number, commits, counts. Quote that.
+#    The last line is the TRUTH stamp: date, run number, commits, the enactment
+#    mode the run happened at, counts. Quote that.
 ```
 
 Bring the estate up (idempotent — safe to re-run any time to converge):
@@ -258,6 +259,15 @@ The rule to say out loud: **a green that could not look is a red.** SKIP is
 not a soft pass — the check never ran. Read `pass=` in the TRUTH line as the
 only count of things actually observed true; an offline run's `skip=` proves
 nothing either way.
+
+**`enact=<mode>`** (2026-09-06, ticket 96) says which mode
+[`twin/ENACT_MODE`](../twin/ENACT_MODE) was at while the run happened — whether
+the twin could merge and could push to an enactment repository. It is a
+*record*, not a grade: no mode is a failure, and nothing in the gate compares
+the mode to a record of who authorised it (that is ticket 97 and ticket 87 item
+3, both open and both the owner's). `unknown` means the gate could not resolve
+the mode at all. A line recorded before 2026-09-06 carries no `enact=` — that
+run does not say, which is not the same as saying `operations`.
 
 ### What the number is made of
 
