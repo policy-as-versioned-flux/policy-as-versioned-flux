@@ -51,7 +51,25 @@ OCI path and is a north-star item.)
 > answered ticket 13's round with "ive already read the recommendations and I can't find fault
 > with a single one", a bare agree, recorded as the assistant's decision and not re-asked. Record:
 > [issues/13](../../.scratch/ecosystem/issues/13-lift-or-retire-the-original-mechanisms.md) Q4.
-> **Not yet built**: nothing in the estate renders a handbook today.
+>
+> **Built 2026-09-06** (eco-system ticket 34), and the line above — "nothing in the estate renders
+> a handbook today" — is what it replaces. `platform/compose/handbook.py` renders one page from an
+> adopter's composed artefact; `composition.py`'s `compose()` calls it and puts the page in the
+> same `rendered` mapping as `HEADER.yaml`, so it lands in the same pull request, is byte-compared
+> by the same `verify()`, is failed by the same `compose-check` drift check, and is carried under
+> the same gitsign tag. `platform/compose/verify-fresh.sh` is the truth-surface script this section
+> names; the hub's `verify/handbook/verify-handbook-is-a-compose-time-render.sh` grades all three
+> adopters on every gate run. The `claude -p` summaries are the human-run skill
+> `.claude/skills/handbook-summaries/`, and its output lands **outside** `composed/` — a summary is
+> not derivable from the artefact, so carrying it inside the render would break the one property
+> the render has. `verify.sh` is retired with its reason in `platform/compose/README.md`; it was
+> never lifted into this estate, so no file was deleted for it.
+>
+> What the render is *not* is worth stating in the same breath, because this section's own last
+> sentence is still true: it is a page derived from fields, not an argument that the rules are the
+> right rules, and full adoption by non-technical humans stays partly cultural and stays named as
+> a residual open problem. Two things it can never say, by construction, and it says so on itself:
+> whether the rules are right, and whether a human accepted the change that produced them.
 
 Attempt the last mile by **auto-generating an always-in-sync, human-readable policy handbook** from
 the versioned source (so the "operational manual" the talk's Cleaner reads can never drift from the
