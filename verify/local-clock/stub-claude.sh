@@ -173,6 +173,10 @@ case "$what" in
     # follow-up R1b: a value that CONTAINS the clock's identity beside a person's
     git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)" \
       --trailer "Co-authored-by: The Owner <owner@fixture.invalid>, local clock (headless model, ticket 92) <local-clock@policy-as-versioned-flux.invalid>";;
+  signoffspace)
+    # tidy R3: whitespace before the colon, and lower case -- interpret-trailers normalises it
+    # to a Signed-off-by trailer, so a tool reading trailers would credit the person
+    git -C "$wt" commit -q -m "$(printf 'twin: stub claim from the local clock (%s, %s)\n\nsigned-off-by : The Owner <owner@fixture.invalid>' "$step" "$adopter")";;
   globalcfg)
     # follow-up: a write to the GLOBAL config (whatever file git's global is for this run)
     git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)"

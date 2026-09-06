@@ -242,7 +242,7 @@ machine -- the local clock has not run here, or this is not the owner's machine`
 could-not-look, matched by the manifest row on the real substrate. The line it printed and did not
 record, quoted from the Actions log and NOT citable:
 
-    TRUTH 2026-09-06T10:54Z run=131 hub=491e5a3 enact=development units=[driftwood=6e23dbe@main feeds=8cb7ae8@main ico=c65b6b2@main insurer=c991160@main ludlow=cd2cc9b@main nist=9dd7c31@main platform=a270fce@main tuppence=fe60091@main] pass=71 [observed=17 self=40 simulated=6 meta=8] fail=11 skip=21 [never=9 waits=12] excluded=8 total=111 ceiling=92
+- run 131 (hub `491e5a3`, this branch's own run, not citable: a branch run records nothing, ticket 100, so no run recorded it) → `TRUTH 2026-09-06T10:54Z run=131 hub=491e5a3 enact=development units=[driftwood=6e23dbe@main feeds=8cb7ae8@main ico=c65b6b2@main insurer=c991160@main ludlow=cd2cc9b@main nist=9dd7c31@main platform=a270fce@main tuppence=fe60091@main] pass=71 [observed=17 self=40 simulated=6 meta=8] fail=11 skip=21 [never=9 waits=12] excluded=8 total=111 ceiling=92`
 
 The gate's red on that run is the estate's standing set, not this branch's: `verify-schedules.sh`'s
 three and the rest of what run 113 on `main` already carried.
@@ -395,3 +395,17 @@ Note on this commit itself (delegated): the owner's global ggshield pre-commit h
 `-c core.hooksPath=<empty dir>`. The secret scan therefore did NOT run on this commit; the diff is
 shell, python and markdown, the fixture's ssh key is generated at test time and never committed,
 and the reviewer should read the diff with that in mind.
+
+**PR 55 (b7bf96d) merged as a38a912.** Its own CI, watched: `twin` run 34042675467, job `tests`
+`1 failed, 2043 passed in 199.76s` — invariant 45 only (the serial `test_seam1_cli` leak did not
+fire on that run); job `invariants` red on 45; everything else green.
+
+**Tidy, 2026-09-06 (R3, delegated).** `Signed-off-by :` with whitespace before the colon, in any
+case, was not matched by `^(Signed-off-by|Co-authored-by):`, while `git interpret-trailers
+--parse` normalises it to a `Signed-off-by:` trailer — so a tool reading trailers would credit the
+person. The match is now `^(Signed-off-by|Co-authored-by)[[:space:]]*:`, case-insensitive as
+before. Stub `signoffspace` (`signed-off-by : The Owner`, lower case and a space): red first (the
+clock admitted it and printed `signature: none`), then refused naming "The Owner". The same PR
+carries two corrections to ticket 102's Answer (N1: bind 4's qualifier on a moved check; N2: the
+quoted run's sha, 417ac08 → 7046106 after the rebase), which `verify-cited-truth.sh` reads as
+input and was run against.

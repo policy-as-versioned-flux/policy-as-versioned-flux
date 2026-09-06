@@ -920,3 +920,16 @@ def test_the_fixture_bypasses_the_owners_global_hook_and_the_clock_does_not() ->
     text = CLOCK.read_text()
     assert "GIT_CONFIG_GLOBAL" not in text, "the clock must read the real global config"
     assert 'core.hooksPath="$NO_HOOKS"' in text, "the clock's own git runs no hooks"
+
+
+# --- tidy (2026-09-06): whitespace before the trailer's colon, lower case -----------------------
+def test_a_trailer_with_space_before_the_colon_in_any_case_is_refused(tmp_path: Path) -> None:
+    # `signed-off-by : The Owner` -- interpret-trailers normalises it to Signed-off-by:, so a tool
+    # reading trailers would credit the person; the clock's match must widen the same way
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "signoffspace"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 1, done.stdout + done.stderr
+    fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+    assert fail_lines and "trailer" in fail_lines[0] and "The Owner" in fail_lines[0], done.stdout
