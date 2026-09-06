@@ -180,6 +180,109 @@ it is the failure this ticket was told to avoid.
 
 Map line: **59 — the two unbuilt §5 bullets** — a fall in the citable number now blocks: `talk/fall_check.py` compares two consecutive TRUTH lines class by class against the diff of the commits they name, `talk/verify-falls.txt` is the committed-reason escape, and a step of its own in `truth.yml` — after the cage, so the line is still recorded — turns the run red with its own `::error::`, proved by lifting that step's shell verbatim and running it over throwaway repositories in eleven states; what it blocks is this repository's citable run conclusion and not any unit's release, because no unit may be hostage to the hub's number, and the reach is printed as a number (0 of 2 workflows). Status became derivable only once the run recorded WHAT IT GRADED: `talk/verify-all.sh` now writes `talk/captures/_grades.tsv` inside the observation lane, and `verify/derived-status/` derives each resolved ticket's status from the checks its Answer names, refusing a table that is not the newest run's and refusing a red disposed of by the Answer's own words; the eight free-typed Status lines are normalised to the tracker's vocabulary with their qualifications kept verbatim in the body.
 
+## Review round, 2026-09-06
+
+Six findings. One was blocking and it is the one worth reading.
+
+**F1 — the fixture's shell was not the runner's, so the fall path had never run.** The step
+declares no `shell:`, so Actions executes it as `/usr/bin/bash -e {0}`. `set -uo pipefail` does
+not clear `-e` — `set -o` adds a flag, it never removes one — and `out="$(python3 …)"; rc=$?` is a
+bare assignment, so on any non-zero exit the shell died at that line: nothing printed, nothing in
+the step summary, no `::error::`, and the `CAN_RECORD` guard never reached, which would also have
+blocked a BRANCH run on the default branch's newest fall. Reproduced in one line:
+`bash -e -c 'set -uo pipefail; out="$(exit 1)"; rc=$?; echo reached'` prints nothing and exits 1.
+The fixture had passed only because it ran the lifted shell under a plain `bash`. Run 135's green
+was the no-fall path; the fall path had never executed anywhere but under the wrong shell.
+
+Fixed in three places, because fixing one would let it come back. The step now uses
+`rc=0; out="$(…)" || rc=$?`. `verify/can-record/can_record.py` gained `step_shell_flags()`, which
+reads a step's effective interpreter out of the workflow (`-e` where nothing is declared, none
+where the step opts out, whatever a custom `shell:` says) and a `stepshell` subcommand; the `step`
+extractor now prints the flags as a note, so a fixture that ignores them is ignoring something it
+was told. And `verify/a-fall-blocks/verify-a-fall-blocks.sh` runs the lifted shell under exactly
+those flags. Red-first, with the old step restored under the new fixture: **14 faults** — all six
+blocking states `rc=1 blocked=no` with no summary line, plus `fall-on-a-branch rc=1` where this
+ticket decided 0.
+
+**F2 — the acknowledgement rule was thinner than the Answer claimed.** It treated only the first
+paragraph naming the check as the claim, searched the whole file, and matched the path as a bare
+substring. So a second dated paragraph inside the same Answer, a `## Comments` note that PREDATES
+the Answer, a URL or a plain mention could all dispose of a red. An acknowledgement is now a
+paragraph that starts after the `## Answer` section ends, carries a dated bolded lead-in, and
+names the check in backticks by the same prefix rule the grade table is read with — so a
+directory acknowledgement works, which it did not before. Four adversarial tests.
+
+**F3 — `compare()` reported a cause it could not see.** It said "a pass became a could-not-look"
+whenever `fail` had not risen, which is false for the most ordinary movement there is: a re-class
+moves a PASSING script between classes, one class falls, another rises, the total is unchanged and
+nothing stopped looking. The cause is now read — passes moved between classes / became reds /
+became could-not-looks / left the surface altogether — and the no-split message names WHICH line
+lacks the split rather than saying "neither". A re-class of a passing script is still a fall by
+the contract and still needs a line in `talk/verify-falls.txt`; the message now says so.
+
+**F4 — the lag, the local table, and the day-one collision.** `verify-all.sh` writes the grade
+table after its loop, so at run N the derivation reads run N−1's table against a log whose newest
+line is also run N−1's: one clock tick behind and always self-consistent. Stated in the script,
+the module and the manifest row rather than left to be found. A table written by `run=local` or a
+`fixture=1` selfcheck is now a could-not-look, not a failure, so a local gate run is not reddened
+for having been run. The collision itself is answered below.
+
+**F5.** A reason may now contain `#` (only a whole-line comment is a comment); a committed reason
+for a transition that did not fall is a fault rather than silently accepted; and the ceiling and
+total excuses are granted on the record files' MEANING, not their names — a comment-only touch to
+`talk/verify-manifest.txt` or `talk/verify-exclusions.txt` no longer excuses any drop, which is
+two more fixture states. `truth.yml`'s push `paths:` filter gained the four `talk/` files the
+gate's own arithmetic lives in. Found while fixing it: `git rev-parse --verify` takes exactly one
+parameter and exits 128 on two, so the first version of the material-change lookup called every
+span unreadable and turned both excused states into falls — caught by the fixture the moment it
+landed, which is what the fixture is for.
+
+**F6 — charted as [ticket 104](104-a-branch-push-cancels-main-s-own-recording-run.md).** The
+concurrency hazard is worse than this build first found. `truth-${{ github.event_name }}` is one
+lane for every push on every branch, so branch pushes cancel `main` push runs, which CAN record:
+8 of the newest 22 `main` push runs were cancelled and none of those eight run numbers is in
+`talk/truth.log`. Ticket 56's per-event group protected the scheduled lane; ticket 100 then made
+branch runs pure measurement that still occupies main's lane.
+
+### The day-one collision, and what it cost the record
+
+The first derivation was going to flip SKIP → FAIL with twelve findings, raising `fail` 11 → 12
+and firing the fall stop. Against run 135's REAL grade table — read out of that run's own gate log,
+113 rows summing exactly to its `pass=72 fail=11 skip=22 excluded=8 total=113` — the twelve were:
+38, 56, 57, 62, 72, 73, 77, 80, 83, 85, 89, 99. **Nine of them were discussing somebody else's
+check**: ticket 80 quoting 89's check while correcting the record, ticket 83 citing driftwood's
+sweep script as an example of a manifest class, four tickets mentioning `verify-schedules.sh`
+where ticket 57's own Answer says in as many words that "ticket 56 owns" the reason it is red.
+Writing an acknowledgement into each would have put nine false ownership statements into the
+record — which is exactly what refusing to write eleven against the earlier approximate table
+avoided, one round earlier.
+
+So ownership is now read from git, not from prose: a check is owned by the tickets whose commits
+touched its file, looked up in the unit's own repository for a `.estate-clone/` path. The
+narrowing lands on three, and they are the three: **38, 89 and 99**. Each now carries a dated
+`## Follow-up` naming its red check, quoting run 135's exact verdict line, saying it is not
+citable, and saying what git names as owning it — 38's failure is `composition.py`'s own selfcheck
+finding `acme` in `composed/governed-namespace-guard.yaml` and no OPEN ticket owns it; 89's check
+names ticket 89 in its own verdict; 99's two reds are also touched by ticket 101, which is open and
+is the only open ticket naming either. With those three written the derivation is clean, so the
+first table to land will PASS rather than raise `fail` — the collision is answered by narrowing
+and by three true sentences, not by twelve invented ones.
+
+### Further decisions
+
+12. **Ownership of a check is read from git, never from the Answer's prose.** `delegated`. The
+    served artefact is the check script and the operation that reaches it is a commit; `git log
+    --full-history -- <path>` names every commit that touched it whatever merges intervened. A red
+    check a ticket does not own is COUNTED (9 on run 135). A check no commit ties to any ticket is
+    UNOWNABLE and also counted (2): inferring an owner from silence is how a false ownership
+    statement gets written.
+13. **The step's effective shell is resolved in one place, `can_record.py`.** `delegated`. Two
+    copies of "what will the runner run this under" is how the fixture and the workflow diverged
+    in the first place.
+14. **A `run=local` or `fixture=1` grade table is a could-not-look, not a fault.** `delegated`. It
+    can never be the newest recorded run, and failing on it would redden a local gate run for the
+    crime of having been run.
+
 ## Waits on the owner
 
 Nothing. The grade table and the first derivation arrive on the first scheduled run of the
