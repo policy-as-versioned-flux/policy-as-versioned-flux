@@ -238,12 +238,12 @@ Item (b), red before green in ico:
 Battery, all exit 0 on this branch:
 
     bash talk/verify-all.sh --selfcheck                            PASS
-    bash verify/truth-line/verify-truth-line.sh                    PASS  (110 scripts placed)
-    bash verify/every-green/verify-every-green.sh                  PASS  (110 discovered)
+    bash verify/truth-line/verify-truth-line.sh                    PASS  (111 scripts placed)
+    bash verify/every-green/verify-every-green.sh                  PASS  (111 discovered)
     bash verify/can-record/verify-can-record.sh                    PASS
     bash verify/adr-supersession/verify-adr-supersession.sh        PASS
     bash verify/schedules/verify-lane.sh                           PASS  (unchanged by the trim)
-    .venv/bin/python -m mypy twin tests conftest.py …              Success: no issues, 175 files
+    .venv/bin/python -m mypy twin tests conftest.py …              Success: no issues, 176 files
 
 **The full `pytest tests/` was not run and no figure from it is quoted here.** The machine was
 loaded and a number nobody watched arrive is not a number. CI on this branch is the citable read.
