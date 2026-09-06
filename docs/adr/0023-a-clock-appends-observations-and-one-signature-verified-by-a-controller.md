@@ -7,7 +7,16 @@ status: accepted
 Five held rounds answered the same two questions differently: whether a scheduled run may commit
 to `main` (tickets 03, 10, 16, 20) and whether Flux needs a second signature on the tag
 (tickets 12, 16, 18). Put to the owner on 2026-08-28 with a three-lens panel. The owner wrote
-"I agree with you're more advanced reasoning". Decided in `.scratch/ecosystem/issues/10` and `16`.
+"I agree with you're more advanced reasoning". Decided in
+[issues/10](../../.scratch/ecosystem/issues/10-schedules-and-skills.md) and
+[issues/16](../../.scratch/ecosystem/issues/16-flux-rescoped-and-verified-at-the-cluster.md).
+**Delegated** ([ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md) point 3, recorded 2026-09-06 by ticket 80 item 3): the owner endorsed
+the panel verdict without giving a reason of the owner's own, so this is the assistant's
+decision, recorded with the reasons above and not re-asked. It rests on a bare agree, not a
+ratification. The same words disposed of ticket 13 D5, which
+[ADR-0010](0010-sunset-scheduled-proposals-not-application.md)'s banner records the same way:
+under the vocabulary of 2026-08-28 a panel verdict ranked above a bare agree and those five
+were written down as "decided"; ADR-0025 retired that ranking, so they read as delegated too.
 
 ## Amendment, 2026-08-29: what "one signature" is true of today
 

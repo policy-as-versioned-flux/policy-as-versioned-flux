@@ -6,7 +6,11 @@ status: accepted
 
 Two risk engines existed with no seam (findings H3-01, H1-13). The twin prices one shock under a
 perspective and has no frequency. The estate's `fair.py` annualises loss and is wired to
-`prices[]` and the proposer. Decided 2026-08-28 in `.scratch/ecosystem/issues/08`.
+`prices[]` and the proposer. Decided 2026-08-28 in
+[issues/08](../../.scratch/ecosystem/issues/08-the-pound-seam.md).
+**Delegated** ([ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md) point 3, recorded 2026-09-06 by ticket 80 item 3): the owner answered
+"Lgtm" and gave no reason, so this is the assistant's decision, recorded with the reasons
+above and not re-asked. It rests on a bare agree, not a ratification.
 
 ## The decision
 

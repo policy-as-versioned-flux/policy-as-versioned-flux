@@ -202,3 +202,37 @@ def test_a_line_marked_fixture_or_not_citable_is_declared_not_graded() -> None:
     report = ct.report({"d.md": text}, ct.recorded(LOG), trees())
     assert report.findings == []
     assert report.declared_uncitable == 2
+
+
+# -- the other nine items' facts, as a table of greps ----------------------------------------------
+
+def test_the_record_fact_table_names_every_file_it_grades() -> None:
+    # a fact whose file is not in the map is a grader bug, not a record defect
+    for fact in ct.RECORD_FACTS:
+        assert fact.file in ct.RECORD_FILES, fact.file
+
+
+def test_a_missing_fact_is_named_with_its_item_and_its_file() -> None:
+    files = {name: "" for name in ct.RECORD_FILES}
+    findings = ct.record_facts(files)
+    assert len(findings) == len([f for f in ct.RECORD_FACTS if f.want])
+    assert all(f.kind == "record-fact" for f in findings)
+    assert any("item 3" in f.detail for f in findings)
+
+
+def test_a_fact_the_record_carries_is_not_named() -> None:
+    files = {name: "" for name in ct.RECORD_FILES}
+    fact = next(f for f in ct.RECORD_FACTS if f.want and f.item == 5)
+    files[fact.file] = fact.example
+    assert not [f for f in ct.record_facts(files)
+                if f.path == fact.file and fact.pattern in f.detail]
+
+
+def test_a_sentence_the_correction_had_to_remove_is_named_when_it_comes_back() -> None:
+    # the `want=False` half: a fact is not only "the new words are there", it is also "the old
+    # words are gone", or a correction can be appended below a claim it never removed
+    banned = next(f for f in ct.RECORD_FACTS if not f.want)
+    clean = {name: "" for name in ct.RECORD_FILES}
+    dirty = dict(clean, **{banned.file: banned.example})
+    assert [f for f in ct.record_facts(dirty) if "still says" in f.detail]
+    assert not [f for f in ct.record_facts(clean) if "still says" in f.detail]

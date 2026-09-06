@@ -84,10 +84,33 @@ does is citable; the gate reads only its marker.
 shipped. Dependency order (it never creates/deletes a cluster itself — the
 institution `up.sh` does, reusing an existing same-named KinD cluster):
 
-1. `.estate-clone/driftwood/scripts/up.sh` — KinD `driftwood` + Flux, pointed at the
-   real `policy-as-versioned-driftwood` GitHub repo (mo-09 retired the in-cluster
-   git-server this used to seed) + reconcile. **The base cluster carries every
-   platform layer and every live beat.**
+1. `.estate-clone/driftwood/scripts/up.sh` — KinD `driftwood` + Flux + reconcile.
+   **The base cluster carries every platform layer and every live beat.**
+
+   > **Corrected 2026-09-06 (eco-system ticket 80 item 8).** This step used to say the
+   > cluster is "pointed at the real `policy-as-versioned-driftwood` GitHub repo (mo-09
+   > retired the in-cluster git-server this used to seed)". It is not, and mo-09 did not.
+   > Read `scripts/up.sh` step 3: it copies `gitops/` into `.work/`, runs `git init`,
+   > commits as `demo@driftwood`, makes an **unsigned annotated tag `v1.0.0`**, clones
+   > that bare into a lighttpd image, `kind load`s it, and applies a `GitRepository`
+   > whose `url` is the in-cluster git server and whose `ref` is that tag and commit.
+   > The seed is a fresh `git init` on every run, so its sha is new every run and can
+   > never equal the github.com pin in `gitops/flux-system/gotk-sync.yaml`; the script
+   > writes what it actually seeded to `.work/seeded-pin.yaml` and calls that "an
+   > observation of the seed", not a declaration. So the live reconcile beat on a
+   > laptop reconciles **an unsigned tag from a git server built on this machine out of
+   > the local working tree** — not a signed release fetched from GitHub, and no
+   > signature is verified anywhere in it. `verify-reconcile.sh` reads whichever the
+   > live `GitRepository` url says applies and grades accordingly.
+   >
+   > **Why this is not being fixed here.** A `--remote` mode was the alternative
+   > (ticket 80 item 8 is a disjunction) and is declined: making the cluster reconcile
+   > the real remote at a signed tag is GAPS 3.15 and the substance of eco-system
+   > tickets 16, 40 and 42 — it needs the venue network at reconcile time, a tag that
+   > exists, and the gitsign-verifying source controller (ADR-0023 D3) to make the
+   > signature mean anything. Shipping a half-built `--remote` would put a second
+   > unmeasured claim next to the one this correction removes. The runbook now says what
+   > the script does. Delegated (ADR-0025), 2026-09-06.
 2. Platform layers on that cluster, in order: `identity` (SPIRE+Istio+OpenBao) →
    `posture` → `currency-controller` → `graded` → `access` → `eud` →
    `tuppence/reset` (the `customer-accounts-reset` workload flagship).

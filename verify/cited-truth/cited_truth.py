@@ -46,7 +46,8 @@ each on its own named line, following verify/can-record/'s decision:
 The seam is pure: `report()` takes the file texts, the recorded log and a `tree_lookup` callable,
 so every rule is exercised in tests/test_cited_truth.py with no git and no estate.
 
-    cited_truth.py grade <hub-root>   # 0 nothing false, 1 one or more named
+    cited_truth.py grade <hub-root>   # rules 1 and 2 above; 0 nothing false, 1 one or more named
+    cited_truth.py record <hub-root>  # ticket 80's other nine corrections, as a fact table
     cited_truth.py selfcheck          # planted defects grade as planted
 """
 from __future__ import annotations
@@ -356,6 +357,150 @@ def grade(files: dict[str, str], log: Sequence[dict], tree_lookup: TreeLookup) -
     return report(files, log, tree_lookup).findings
 
 
+# -- ticket 80's other nine items, as a table of facts --------------------------------------------
+#
+# Item 1 is the rule above; it is the one that stops the NEXT defect. These are the nine
+# corrections themselves: each is one sentence the record must carry, or one sentence it must no
+# longer carry -- because a correction appended below a claim it never removed leaves the estate
+# saying both things at once, which is the shape ticket 80 exists to end.
+#
+# NOT HERE, on purpose, and graded elsewhere:
+#   * item 6 (the currency controller) closed on 2026-09-05 with ticket 91 and is graded by
+#     platform's own `verify-currency.sh`. The one hub-side residue is in the table.
+#   * item 10 (platform/README.md) is another party's repository. It is graded by that
+#     repository's gate, on the pull request platform#15, and reading a working copy of somebody
+#     else's README here would be the proxy this ticket is about.
+
+@dataclass(frozen=True)
+class Fact:
+    item: int
+    file: str
+    pattern: str      # ERE-free: a literal substring, so the record can be read by eye
+    want: bool        # True: the record must say it. False: the record must no longer say it.
+    why: str
+    example: str      # a text that satisfies this fact; the selfcheck and the tests use it
+
+
+RECORD_FILES = {
+    "adr/0004": "docs/adr/0004-cloud-plane-fork-collie.md",
+    "adr/0007": "docs/adr/0007-agent-assisted-editorial-governance.md",
+    "adr/0008": "docs/adr/0008-measurable-layered-ground-truth.md",
+    "adr/0010": "docs/adr/0010-sunset-scheduled-proposals-not-application.md",
+    "adr/0019": "docs/adr/0019-one-feed-envelope-signed-by-the-tag.md",
+    "adr/0020": "docs/adr/0020-a-missing-instrument-refuses-a-missing-behaviour-is-priced.md",
+    "adr/0021": "docs/adr/0021-the-twin-emits-a-scenario-the-estate-selects-the-tier.md",
+    "adr/0022": "docs/adr/0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md",
+    "adr/0023": "docs/adr/0023-a-clock-appends-observations-and-one-signature-verified-by-a-controller.md",
+    "map": ".scratch/ecosystem/map.md",
+    "runbook": "talk/RUNBOOK.md",
+    "ticket75": ".scratch/ecosystem/issues/75-grilling-what-is-this-for-the-twelve-questions.md",
+    "signpost": ".scratch/ecosystem/patches/ticket-80/legacy-signpost.md",
+}
+
+_DELEGATED = "**Delegated** ([ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md)"
+
+RECORD_FACTS: tuple[Fact, ...] = (
+    # item 2 -- the two ADRs whose decisions were taken away and never said so
+    Fact(2, "adr/0008", "> **Superseded in part, 2026-07-20 (the owner)", True,
+         "the owner rejected the dashboard this ADR delivers 'measurable' through, on 2026-07-20",
+         "> **Superseded in part, 2026-07-20 (the owner), written 2026-09-06.** dashboard"),
+    Fact(2, "adr/0008", "dashboard", True,
+         "the banner has to name the thing that was rejected",
+         "> **Superseded in part, 2026-07-20 (the owner), written 2026-09-06.** dashboard"),
+    Fact(2, "adr/0010", "> **Superseded in part, 2026-08-28 (eco-system ticket 13 D5)", True,
+         "ticket 13 D5 decided the consumer-side `sunset:` away on 2026-08-28",
+         "> **Superseded in part, 2026-08-28 (eco-system ticket 13 D5), written 2026-09-06.**"),
+    # item 3 -- four accepted ADRs that never said what their acceptance rests on, and the fifth
+    # whose line still used the word ADR-0025 point 4 retired
+    Fact(3, "adr/0019", _DELEGATED, True, "ADR-0019 rests on a bare agree and must say so",
+         _DELEGATED + " point 3): the owner agreed twice without a reason."),
+    Fact(3, "adr/0020", _DELEGATED, True, "ADR-0020 rests on a bare agree and must say so",
+         _DELEGATED + " point 3): reason given for the currency default only."),
+    Fact(3, "adr/0021", _DELEGATED, True, "ADR-0021 rests on a bare agree and must say so",
+         _DELEGATED + ' point 3): the owner answered "Lgtm".'),
+    Fact(3, "adr/0022", _DELEGATED, True, "ADR-0022's line is re-labelled, not deleted",
+         _DELEGATED + " point 3, re-labelled by ticket 80 item 3)."),
+    Fact(3, "adr/0023", _DELEGATED, True, "ADR-0023 rests on a bare agree and must say so",
+         _DELEGATED + " point 3): an endorsement is not a reason."),
+    Fact(3, "adr/0022", "Provisional: the owner agreed", False,
+         "ADR-0025 point 4 retires the word and names ticket 80 as what re-labels it",
+         "Decided 2026-08-28. Provisional: the owner agreed\nwithout a reason."),
+    # item 4 -- the Deny promotion, listed as an assistant-made call, not re-decided
+    Fact(4, "ticket75", "## Assistant-made calls listed here, not re-decided", True,
+         "ADR-0022's 2026-08-28 addendum promoted a rule to Deny inside an implementation run "
+         "with no round, and nothing recorded whose call it was",
+         "## Assistant-made calls listed here, not re-decided\ngoverned-namespace-requires-claim"),
+    Fact(4, "ticket75", "governed-namespace-requires-claim", True,
+         "the entry has to name the rule that was promoted",
+         "## Assistant-made calls listed here, not re-decided\ngoverned-namespace-requires-claim"),
+    # item 5 -- GAPS process rule 1, dropped when the rules were copied into the map
+    Fact(5, "map", "No recommendation is attached to a question put to the owner", True,
+         "GAPS process rule 1 was dropped in the copy; its first half still binds the questions "
+         "that reach the owner",
+         "**No recommendation is attached to a question put to the owner: state the trade.** "
+         "(GAPS process rule 1, restored 2026-09-06.)"),
+    # item 6 -- the hub-side residue of the un-retirement (the module itself is platform's)
+    Fact(6, "map", "The currency controller is retired", False,
+         "ticket 75 Q13 withdrew the retirement and ticket 91 executed it on 2026-09-05",
+         "Not yet specified: The currency controller is retired (ticket 13)."),
+    # item 7 -- the three ADR notes ticket 13 assigned itself and never wrote
+    Fact(7, "adr/0004", "Sequencing note, 2026-08-28 (eco-system ticket 13 Q3)", True,
+         "ticket 13 Q3 settled where the cloud plane lands and when it is built",
+         "## Sequencing note, 2026-08-28 (eco-system ticket 13 Q3)"),
+    Fact(7, "adr/0007", "**Confirmed 2026-08-28 (eco-system ticket 13 Q4)", True,
+         "the last-mile section carried '(proposed - confirm)' inside an accepted ADR",
+         "> **Confirmed 2026-08-28 (eco-system ticket 13 Q4).** a compose-time render"),
+    Fact(7, "adr/0007", "Last-mile to non-technical consumers (proposed", False,
+         "an accepted ADR does not carry an unconfirmed section",
+         "## Last-mile to non-technical consumers (proposed — confirm)"),
+    # item 8 -- the runbook's untrue reconcile line
+    Fact(8, "runbook", "Corrected 2026-09-06 (eco-system ticket 80 item 8)", True,
+         "section 1 said driftwood's bring-up reconciles the real signed GitHub remote; "
+         "scripts/up.sh reconciles an unsigned tag from a git server built on the laptop",
+         "> **Corrected 2026-09-06 (eco-system ticket 80 item 8).** the in-cluster git server"),
+    Fact(8, "runbook", "pointed at the\n   real `policy-as-versioned-driftwood` GitHub repo", False,
+         "the false sentence is removed, not merely annotated",
+         "1. `up.sh` — KinD `driftwood` + Flux, pointed at the\n"
+         "   real `policy-as-versioned-driftwood` GitHub repo + reconcile."),
+    # item 9 -- declined, with the material recorded and marked as not applied
+    Fact(9, "signpost", "**Nothing in this file has been applied to any repository.**", True,
+         "the legacy signpost is an enactment the build brief does not authorise and an org "
+         "description this token cannot write; the material is held, and says it is not applied",
+         "**Nothing in this file has been applied to any repository.**"),
+)
+
+
+def record_facts(files: dict[str, str]) -> list[Finding]:
+    """Grade ticket 80's corrections themselves. `files` maps a RECORD_FILES key to its text."""
+    out: list[Finding] = []
+    for fact in RECORD_FACTS:
+        text = files.get(fact.file)
+        if text is None:
+            out.append(Finding("record-fact", fact.file, 0,
+                               f"item {fact.item}: {RECORD_FILES.get(fact.file, fact.file)} is "
+                               f"not readable, so the correction cannot be graded"))
+            continue
+        present = fact.pattern in text
+        if fact.want and not present:
+            out.append(Finding("record-fact", fact.file, 0,
+                               f"item {fact.item}: {fact.pattern!r} is not in "
+                               f"{RECORD_FILES[fact.file]} -- {fact.why}"))
+        elif not fact.want and present:
+            out.append(Finding("record-fact", fact.file, 0,
+                               f"item {fact.item}: {RECORD_FILES[fact.file]} still says "
+                               f"{fact.pattern!r} -- {fact.why}"))
+    return out
+
+
+def _read_record(root: Path) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for name, rel in RECORD_FILES.items():
+        p = root / rel
+        if p.is_file():
+            out[name] = p.read_text(encoding="utf-8")
+    return out
+
+
 # -- the real three ------------------------------------------------------------------------------
 
 def git_tree_lookup(root: Path) -> TreeLookup:
@@ -380,6 +525,18 @@ def _issue_files(root: Path) -> dict[str, str]:
     issues = root / ".scratch" / "ecosystem" / "issues"
     return {str(p.relative_to(root)): p.read_text(encoding="utf-8")
             for p in sorted(issues.glob("*.md"))}
+
+
+def _run_record(root: Path) -> int:
+    findings = record_facts(_read_record(root))
+    for f in findings:
+        print(f"  !! {f}")
+    items = sorted({fact.item for fact in RECORD_FACTS})
+    print(f"  {len(RECORD_FACTS)} sentence(s) graded across items {items}, in "
+          f"{len(RECORD_FILES)} files")
+    print("  item 1 is graded above; item 6 by platform's verify-currency.sh (only its hub-side "
+          "residue is here); item 10 by platform's own gate on that repository's pull request")
+    return 1 if findings else 0
 
 
 def _run(root: Path) -> int:
@@ -437,6 +594,15 @@ def selfcheck() -> int:
                  log, good)
     if (rep.findings, rep.declared_uncitable, rep.unattributed) != ([], 1, 1):
         problems.append("the declared-uncitable and unattributed counts do not add up")
+    clean = {name: "" for name in RECORD_FILES}
+    if len(record_facts(clean)) != len([f for f in RECORD_FACTS if f.want]):
+        problems.append("an empty record did not produce one finding per required sentence")
+    banned = next(f for f in RECORD_FACTS if not f.want)
+    if not [f for f in record_facts(dict(clean, **{banned.file: banned.example}))
+            if "still says" in f.detail]:
+        problems.append("a sentence the correction had to remove came back and was not named")
+    if record_facts({}) == []:
+        problems.append("an unreadable record file graded as if it were fine")
     if problems:
         for p in problems:
             print(f"  !! {p}")
@@ -444,7 +610,9 @@ def selfcheck() -> int:
         return 1
     print("  ok   selfcheck: a carried check passes; a lacking tree, an unreadable commit, an "
           "unrecorded line and a disagreeing figure each fail by name; a dated correction "
-          "disposes and an undated one does not; the ungraded populations are counted")
+          "disposes and an undated one does not; the ungraded populations are counted; the "
+          "fact table names a missing sentence, a removed sentence that came back and an "
+          "unreadable file")
     return 0
 
 
@@ -453,6 +621,8 @@ def main(argv: Sequence[str]) -> int:
         return selfcheck()
     if len(argv) >= 2 and argv[1] == "grade":
         return _run(Path(argv[2]) if len(argv) > 2 else HUB)
+    if len(argv) >= 2 and argv[1] == "record":
+        return _run_record(Path(argv[2]) if len(argv) > 2 else HUB)
     print(__doc__)
     return 2
 

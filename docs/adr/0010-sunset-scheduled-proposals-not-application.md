@@ -2,6 +2,34 @@
 status: accepted
 ---
 
+> **Superseded in part, 2026-08-28 (eco-system ticket 13 D5), written 2026-09-06 (ticket 80
+> items 2 and 7).** The **consumer-side `sunset:` field is not carried into the eco-system.**
+> Supersede is publisher-side only: the publisher publishes the newer version, a pin behind it is
+> priced by the existing EOL ramp from that version's publish date, `revoked[]` stays withdrawal
+> priced now, and the adopter's scheduled proposer opens a retirement PR under the dedupe ledger.
+> That rule is [ADR-0023](0023-a-clock-appends-observations-and-one-signature-verified-by-a-controller.md)'s
+> last decision point; the alternative this ADR's field represents, a dated supersede carried on
+> the consumer's own entry, is in ADR-0023's Alternatives as rejected ("two formulas for one
+> state"), to be revisited with an explicit `supersedes: {version, eol_date}` if the ramp
+> misprices. D5 was put to the owner as a three-lens panel verdict and the owner wrote "I
+> agree with you're more advanced reasoning" -- an endorsement of the assistant's reasoning
+> and not a reason of the owner's own, so under
+> [ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md) point 3 it is
+> **delegated**: the assistant's decision, recorded with the reason above, not re-asked.
+> Ticket 13 calls it "Decided" against the earlier vocabulary, in which a panel verdict
+> ranked above a bare agree; that ranking is what ADR-0025 retired. Record:
+> [issues/13](../../.scratch/ecosystem/issues/13-lift-or-retire-the-original-mechanisms.md) D5.
+>
+> **What survives.** Points 2, 3 and 4 -- escalating issues, a machine opening the retirement PR
+> on the date, and a human having to merge it -- and the whole ADR-0006 boundary argument, which
+> the eco-system restates as "a clock appends observations, never declarations" (ADR-0023). The
+> adopter's sovereignty survives too: an adopter drops a version by an ordinary PR.
+>
+> **Superseded in part, 2026-07-20 (the owner), written 2026-09-06 (ticket 80 item 2).** Point 1
+> ("the estate dashboard shows a countdown") and the dashboard countdown in the Consequences are
+> retired with every other dashboard: see [ADR-0008](0008-measurable-layered-ground-truth.md)'s
+> banner. The visible governance debt this ADR wanted a countdown for is the truth surface's job.
+
 # Sunset: scheduled proposals, never scheduled application
 
 A fleet may want to signal, in advance, that it intends to retire a policy version — "we plan to

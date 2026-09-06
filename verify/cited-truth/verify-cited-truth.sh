@@ -15,6 +15,16 @@
 #   2. a TRUTH figure (`pass= fail= skip= excluded= total= ceiling=`) quoted on the same text
 #      line as a run citation must be that run's figure.
 #
+# It also grades TICKET 80's OTHER NINE CORRECTIONS as a table of literal sentences (item 2's two
+# superseded-in-part banners, item 3's five delegated lines and the retired word, item 4's listed
+# assistant-made call, item 5's restored GAPS rule 1, item 6's hub-side residue, item 7's two ADR
+# notes and the confirmed section, item 8's runbook correction, item 9's unapplied signpost). Each
+# fact is either a sentence the record must carry or a sentence it must no longer carry, because a
+# correction appended below a claim it never removed leaves the estate saying both things at once,
+# which is the shape this ticket exists to end. Item 6's module is graded by platform's own
+# `verify-currency.sh`, and item 10 by platform's gate on that repository's pull request: reading
+# a working copy of another party's README here would be the proxy this ticket is about.
+#
 # WHAT IT REFUSES TO GRADE, named because a disclosed limit rots like any other claim:
 #   * whether the named check is the RIGHT check for what the ticket built. It grades that the
 #     check existed in the tree that was measured: necessary, never sufficient.
@@ -74,9 +84,12 @@ fi
 say "2. every TRUTH line the tickets cite is real, and its tree carries the check it is offered as proof of"
 "$PY" "$GRADER" grade "$ROOT" || bad=$((bad + 1))
 
+say "3. ticket 80's other nine corrections are still in the record, and what they removed has not come back"
+"$PY" "$GRADER" record "$ROOT" || bad=$((bad + 1))
+
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: every TRUTH line quoted in .scratch/ecosystem/issues/*.md resolves to a line talk/truth.log records, every gate-proof citation names a commit whose tree carries a check the ticket names or carries a dated correction saying it does not, and every figure quoted beside its run is that run's figure"
+  echo "PASS: every TRUTH line quoted in .scratch/ecosystem/issues/*.md resolves to a line talk/truth.log records, every gate-proof citation names a commit whose tree carries a check the ticket names or carries a dated correction saying it does not, every figure quoted beside its run is that run's figure, and ticket 80's nine record corrections are each still there"
   exit 0
 fi
 echo "FAIL: $bad check(s) observed false (named above): the record cites a measurement that did not measure the thing"

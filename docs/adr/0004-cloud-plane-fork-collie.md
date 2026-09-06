@@ -59,6 +59,29 @@ we are deleting, not in a handful of hand-authored policies.
   bootstrap harness. The two 2023 "stalled issues" (lula build cache; cluster bootstrap target) are
   moot — those components are gone.
 
+## Sequencing note, 2026-08-28 (eco-system ticket 13 Q3), written 2026-09-06 (ticket 80 item 7)
+
+This ADR stays **accepted** and the cloud plane stays an *integral second plane, not deferred*.
+What ticket 13 Q3 settled is **where it lands and when it is built**, which this ADR never said:
+
+- The cloud plane lands in **tuppence**, beside the lifted `ledger` workload. `datastore`'s
+  Crossplane claims are the workload.
+- The RDS and S3 policies become **versioned members of the platform's published
+  `implementations` package** ([ADR-0017](0017-a-control-claim-belongs-to-whoever-ships-the-implementation.md)),
+  not hub fixtures.
+- The truth surface grades them at admission in KinD, exactly as this ADR's proof does.
+- It is built **after** the Pod slice of NORTH-STAR section 4 runs end to end once. Sequencing,
+  not deferral: no section 4 step needs a non-Pod resource, and the cage ladder
+  ([ADR-0022](0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md)) is still
+  being cut for Pods. The dials a Crossplane CR takes on that ladder are a later round on ticket
+  09, filed by ticket 13.
+
+Delegated ([ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md)): the owner read
+ticket 13's held round and wrote "ive already read the recommendations and I can't find fault with
+a single one", a bare agree. Under ADR-0025 point 3 that is a delegation, recorded as the
+assistant's decision with the reason above, and not re-asked. Record:
+[issues/13](../../.scratch/ecosystem/issues/13-lift-or-retire-the-original-mechanisms.md) Q3.
+
 ## Consequences
 
 - Adds **Crossplane v2** (+ AWS provider-family CRDs) and the **C2P** OSCAL emitter (ADR-0009) as
