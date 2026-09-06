@@ -71,6 +71,19 @@ currency controller's re-cage patch — ticket 91's, and the only way a pod on a
 reaches the bottom rung). Two of the three were this ticket's own. Read the register for what was
 decided; read the beats for what runs.
 
+**Graded since 2026-09-06 (ticket 98).** `verify/refusal-by-another-name/` is the check. It reads
+every mutation the estate SERVES and grades four things — a name written into a reference field is
+one the same release ships; the priority trio is whole; a write on UPDATE that a running pod
+forbids is on its own register with a reason and a remediation; and every UPDATE-scoped mutation
+is EXECUTED against its own output and must come back identical. A fourth instance came out of
+ticket 89's round 4 and is LIVE: a rung that changes under a running pod makes `cage-tier` rewrite
+`priorityClassName` and `priority`, and the API server refuses the edit. That one is DECIDED
+correct (ticket 89 S3), so it is reported with its remediation — recreate the pod — rather than
+called a defect, and the row is graded in both directions so it cannot outlive the code. All four
+instances are replayed against the estate's own bodies on every run and every one goes red. What
+remains outside both checks is whether the API SERVER accepts a mutated object: that is
+`platform/graded/verify-graded.sh` step 8b, where a cluster is.
+
 Four other blind spots a reviewer planted on 2026-09-05 are now closed, each with a test that was
 red first: a `.json` policy, a one-line flow mapping, a multi-line flow sequence, and
 `validationFailureActionOverrides`. The exploitable one is closed too — name attribution was

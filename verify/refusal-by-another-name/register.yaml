@@ -1,0 +1,79 @@
+# The refusals by another name this estate has DECIDED to accept.
+#
+# Eco-system ticket 98. A mutation that writes a field a running pod does not allow to change is
+# a refusal by another name: no Deny-shaped text anywhere, and the API server stops the workload
+# all the same. Three of the four instances the estate has produced were defects and are fixed.
+# The fourth is live, and ticket 89 (S3, 2026-09-05) decided it is the CORRECT outcome. A
+# decision that stops being visible stops being a decision, so it is recorded here and printed
+# on every gate run, with its reason and its remediation.
+#
+# THE JOIN IS GRADED IN BOTH DIRECTIONS, exactly as verify/deny-is-not-a-rung/register.yaml is.
+#   * a write on UPDATE that a running pod forbids and no row records          -> FAIL
+#   * a row whose `fields` set is not what the code writes, either way         -> FAIL
+#   * a row that matches no mutation on the served surface (the code moved)    -> FAIL
+#   * a row with no reason, remediation or date                                -> FAIL
+# There is no `waiting` state and no exemption: a row is a decision with a reason, or it is a
+# defect that has to be fixed.
+#
+# Fields:
+#   policy       an fnmatch glob over the policy's own name (the served copies are
+#                version-suffixed, so `cage-tier*` is one decision across every served line)
+#   policies     EXACTLY the policy names on the served surface that the glob matches. Graded
+#                both ways (review, 2026-09-06): without it a glob is a standing permission --
+#                widen it to `*` and the row silently covers every mutation the estate grows.
+#                A new served copy is a change this row has to admit, in the same edit that
+#                says why it is accepted
+#   operation    the operation that reaches the write. Only UPDATE can be accepted: a CREATE
+#                writes an object that does not exist yet, so nothing of it is immutable
+#   fields       EXACTLY the paths the code writes on that operation, compared PER POLICY and
+#                not against the union of them (review, 2026-09-06: the union hid a second
+#                served policy whose writes were a subset of the first's). Not a subset
+#   decision     `accepted`
+#   reason       why the refusal is correct, in the estate's own terms
+#   remediation  what an operator does instead, so the refusal is not a dead end
+#   bounded_by   the check that keeps the acceptance from growing into something wider
+#   recorded     the date the decision was made
+
+accepted:
+  - policy: cage-tier*
+    policies:
+      - cage-tier-4-0-0
+      - cage-tier-5-0-0
+    operation: UPDATE
+    fields:
+      - spec.containers[*].name
+      - spec.containers[*].resources.limits
+      - spec.containers[*].securityContext.allowPrivilegeEscalation
+      - spec.containers[*].securityContext.capabilities
+      - spec.containers[*].securityContext.privileged
+      - spec.containers[*].securityContext.readOnlyRootFilesystem
+      - spec.containers[*].securityContext.runAsNonRoot
+      - spec.hostIPC
+      - spec.hostNetwork
+      - spec.hostPID
+      - spec.preemptionPolicy
+      - spec.priority
+      - spec.priorityClassName
+    decision: accepted
+    recorded: 2026-09-05
+    reason: >-
+      the shared cage matches UPDATE so that a forged `posture.acme.io/tier` label on a running
+      pod is clobbered back to its Namespace's rung -- the pod label is an OUTPUT only. For a pod
+      whose rung has not changed the mutation writes exactly what the pod already carries, which
+      is why it is admitted and why leg B measures byte-identity on every run. It differs only
+      when the pod's rung CHANGES under it, and the one way that happens is ticket 89's live
+      instance: a pod the guard caged on the bottom rung is given a served-version claim, so
+      `cage-tier` takes it over and rewrites `tier: isolated -> baseline`, `priorityClassName:
+      cage-isolated -> cage-baseline-4-0-0` and `priority: -10000 -> -10`. The last two are
+      immutable on a running pod and the API server refuses the edit. Ticket 89 (S3, delegated,
+      2026-09-05) decided the refusal is CORRECT: letting it through would be a workload moving
+      itself off the bottom rung by asserting a label, which is the self-service exemption
+      principle 1 bans. A pod's cage is written at admission from what it declared then
+    remediation: >-
+      recreate the pod with the claim declared, which is the route CONTEXT.md's De-postured entry
+      already describes -- adding a label to a running pod is not a remediation and never was
+    bounded_by: >-
+      leg B (refusal_probe.py) applies each of these bodies to its own output on every run and
+      requires the result to be identical. The acceptance covers a value that CHANGES; it does
+      not cover a body that rewrites a pod it has already caged, and the day one does, leg B
+      goes red rather than this row growing to cover it

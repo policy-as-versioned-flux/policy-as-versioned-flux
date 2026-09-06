@@ -112,14 +112,23 @@ BLIND_SPOTS = (
     "a REFUSAL BY ANOTHER NAME: a mutation that makes a pod inadmissible -- naming a "
     "PriorityClass that does not exist, or injecting a container into a running pod, or "
     "rewriting an immutable field on one -- refuses the workload without any Deny-shaped text "
-    "in it, and is graded by nothing here. Ticket 98 owns grading it. Four instances so far, "
-    "every one found by RUNNING a policy and none by reading one: 2026-08-28 ticket 26 (a "
-    "sidecar appended twice); 2026-09-05 ticket 89's first cut (a PriorityClass no cluster "
-    "has); 2026-09-05 ticket 89's second (the full cage body on UPDATE, which would have "
-    "refused the currency controller's re-cage patch); and one that is LIVE and decided rather "
-    "than fixed -- labelling a bottom-rung pod with a served version makes cage-tier rewrite "
-    "priorityClassName and priority, which the API server refuses on a running pod, so adding a "
-    "claim is not a remediation and the remediation is a recreate (ticket 89 S3, CONTEXT.md)",
+    "in it, so nothing in THIS scan can see it. It is no longer graded by nothing: ticket 98 "
+    "built verify/refusal-by-another-name/, which reads every mutation the estate SERVES and "
+    "grades four things -- every name written into a reference field is one the same release "
+    "ships; the priority trio is whole; every write on UPDATE that a running pod forbids is on "
+    "its own register.yaml with a reason and a remediation; and every UPDATE-scoped mutation is "
+    "EXECUTED against its own output and must come back identical. All four instances this "
+    "estate produced are replayed against its own bodies on every run and every one goes red: "
+    "2026-08-28 ticket 26 (the priority trio, and a sidecar appended twice); 2026-09-05 ticket "
+    "89's first cut (a PriorityClass no cluster has); 2026-09-05 ticket 89's second (the full "
+    "cage body on UPDATE, which would have refused the currency controller's re-cage patch); "
+    "and the fourth, LIVE and decided rather than fixed -- a rung that changes under a running "
+    "pod makes cage-tier rewrite priorityClassName and priority, which the API server refuses, "
+    "so the remediation is a recreate (ticket 89 S3, CONTEXT.md). That one is REPORTED with its "
+    "reason rather than called a defect, and the row is graded in both directions so it cannot "
+    "outlive the code. What stays outside both checks is whether the API SERVER accepts a "
+    "mutated object, which is a cluster fact: platform/graded/verify-graded.sh step 8b observes "
+    "it where a cluster exists",
 )
 
 #: Directories never walked. `.estate-clone` is walked explicitly by root, not by recursion,

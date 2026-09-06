@@ -20,9 +20,10 @@
 #                  reason, and none is left in a served copy. What it cannot see is printed on
 #                  every run from deny_register.BLIND_SPOTS -- a YAML anchor, a template
 #                  engine's conditional arm, an action computed at admission, and a refusal by
-#                  another name (a mutation that makes a pod inadmissible), which is graded by
-#                  nothing here and has bitten this estate twice, both times found by running
-#                  the policy rather than reading it
+#                  another name (a mutation that makes a pod inadmissible), which is invisible
+#                  to THIS scan and has bitten this estate four times, every one found by
+#                  running the policy rather than reading it. Since 2026-09-06 it is graded by
+#                  verify/refusal-by-another-name/ (ticket 98), which replays all four
 #   FAIL (exit 1)  a Deny no register row claims; a row that says converted while a copy
 #                  survives; a row that says a copy survives when none does; a row whose source
 #                  no longer emits the Deny while the row still says `waiting`; a row with no
