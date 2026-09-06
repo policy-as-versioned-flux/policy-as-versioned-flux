@@ -259,17 +259,20 @@ machine was loaded and a number nobody watched arrive is not a number. CI on thi
 citable read, and it was watched to completion — both the push run and the pull-request run, whose
 results agree:
 
-    twin, push run 34025933959, branch ticket-67-the-record-matches-the-surface
-      tests       1 failed, 1958 passed in 208.78s
+    twin, push run 34026412998, branch ticket-67-the-record-matches-the-surface at 0a26ebc
+      tests       1 failed, 2000 passed in 177.14s
                   FAILED tests/test_invariant_suite.py::test_the_suite_is_green
                     -- flux_coverage_floor_is_still_reachable: the pre-registered coverage floor
                        of 90% can no longer be reached
       invariants  RESULT: 71 passed, 1 failed, 3 skipped (0 pending, 3 skipped and not faked)
       typecheck, demo, reproduce-elsewhere, determinism x4   all success
 
-    twin, pull_request run 34025966944 (PR 45)
-      tests       1 failed, 1958 passed in 188.03s, the same one
+    twin, pull_request run 34026415135 (PR 45) at 0a26ebc
+      tests       1 failed, 2000 passed in 154.38s, the same one
       invariants  RESULT: 71 passed, 1 failed, 3 skipped
+
+Both watched to completion. Before the second rebase the same pair read 1 failed, 1958 passed
+(runs 34025933959 and 34025966944); the 42 extra tests are ticket 80's, which merged in between.
 
 The one red is the standing one: invariant 45, `flux_coverage_floor_is_still_reachable`, and
 `test_the_suite_is_green` while it is red. Invariant 44 passed on the runner — these are
