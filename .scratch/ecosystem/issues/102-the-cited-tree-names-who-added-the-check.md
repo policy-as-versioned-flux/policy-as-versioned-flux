@@ -175,31 +175,58 @@ Three reasons, in the order they weigh:
 A check that genuinely moved between trees is carried by the attribution line, which is the escape
 this ticket built for exactly that case.
 
-### The escape, and why it cannot be planted
+### The escape, and what it can and cannot be planted against
 
-A dated **attribution line** — `> **Attribution, 2026-09-06 (ticket NN).** \`verify/x/\` was added
-by \`sha\`, which names no ticket.` — carries a check whose adding commit predates the convention.
-The lesson that has cost every review this week is that a check reading the text it grades treats
-the fix somebody writes into that text as input, so the line is verified and never believed. Four
-binds, three of them refusing text on the strength of git:
+A dated **attribution line**, in this shape and no other —
 
-1. **The ticket.** The line must name the number the claiming file's own name carries. A line
-   copied from another ticket carries nothing.
+    > **Attribution, 2026-09-06 (ticket NN).** `verify/x/` was added by `sha`, which names no ticket.
+
+— carries a check whose adding commit predates the convention or moved between trees. The lesson
+that has cost every review this week is that a check reading the text it grades treats the fix
+somebody writes into that text as input, so the line is verified and never believed. **Five binds**,
+four of them refusing text on the strength of git:
+
+1. **The ticket, from the line's own header.** `(ticket NN)` must be the number the claiming
+   file's name carries. A line copied from another ticket carries nothing — and the number is read
+   from the header alone, because collecting it from anywhere in the paragraph let a line headed
+   `(ticket 80)` hold for file 99 on the strength of its prose saying "as ticket 99 noted".
 2. **The check.** The line must name the check being claimed. A line about a different check
    carries nothing.
-3. **The sha, against git.** The sha it names must be one `git log --diff-filter=A` actually
-   returns for that path as of the cited commit. A planted sha is `attribution-does-not-hold`, and
-   the finding prints both what the line claims and what git says.
-4. **It cannot supply its own subject.** Attribution paragraphs are stripped from `named_checks`,
-   exactly as correction paragraphs already were (review F1): an attribution may say who added a
-   check the claim ALREADY names in its own section, never introduce one. Otherwise one planted
-   paragraph would supply both halves of the proof, which is the shape F1 closed for corrections.
+3. **The sha, against git.** It must be one `git log --diff-filter=A` actually returns for that
+   path as of the cited commit. A planted sha is `attribution-does-not-hold`, and the finding
+   prints both what the line claims and what git says. It is the sha after `added by`, or the only
+   one in the paragraph: five backticked shas with one of them right is a guess, and a guess must
+   not be able to hold.
+4. **That sha's subject must name no ticket.** *This is review F1 of PR 51, and it was the
+   blocker.* The first cut of this rule confirmed that the sha EXISTED and added the file, and
+   never asked what the sha SAID — the very defect this ticket exists to close, one level up.
+   Measured on the record: `99-plant.md` attributing
+   `verify/feed-contract/verify-feed-contract.sh` to `3e83a16` **passed**, though that subject
+   names tickets 21 and 52; and with a directory token the sha of any script under it would do, so
+   `verify/provenance/` attributed to `065e497` — ticket 53's release-evidence script — **passed**
+   too. An attribution is the escape for a check git attributes to **nobody**. Where git attributes
+   it to somebody else, that is an answer and not a gap, and no line may overrule it:
+   `attribution-over-a-named-commit`, printing the ticket(s) the subject names.
+5. **It cannot supply its own subject.** Attribution paragraphs are stripped from `named_checks`,
+   exactly as correction paragraphs already were (review F1 of the ticket-80 round): an attribution
+   may say who added a check the claim ALREADY names in its own section, never introduce one.
+   Otherwise one planted paragraph would supply both halves of the proof.
 
-What that cannot bind, said plainly rather than left for the next reviewer: a ticket may still
-assert ownership of a check whose adding commit is genuinely nameless. What the rule denies that
-assertion is **silence**. Every attribution used is printed on every run with its path, line, sha
-and the subject of the commit it names — the subject that failed to name the ticket, so the reader
-sees the gap the line is bridging — and the run counts how many citations passed each way.
+**What it cannot bind, said plainly rather than left for the next reviewer.**
+
+- A ticket may still claim a check whose adding commit is **genuinely nameless**. Three such paths
+  exist in the hub, all added by `c9d0f20`. What the rule denies that claim is **silence**: every
+  attribution used is printed with its path, line, sha and the subject of the commit it names, and
+  — since review F4 — every attribution **consulted and refused** is printed too, so a false one
+  standing beside a true one leaves a trace instead of being silently stepped over.
+- **The claiming ticket's identity is the record file's own name, which is text the ticket
+  controls.** Rename a file, or add one, under another ticket's number and it inherits that
+  ticket's checks: `69-plant.md` whose H1 reads `# 99` passes by commit today. Two cheap greens
+  are available and **neither is built here** (review F2, named not built): the `# NN` heading
+  agrees with the filename in **103 of 103** issue files today, and no number is used twice. Both
+  would raise the cost of the forgery; neither closes it, because an author who edits the filename
+  and the heading in one diff passes both. The honest statement is that this rule trusts the
+  filename for identity, and that nothing in the estate currently checks it.
 
 ### No could-not-look, three more reds
 
@@ -211,9 +238,12 @@ the three is a shrug and none has a `SKIP`.
 
 ### What the committed record grades as, and the number that must not go stale
 
-    103 ticket files, 43 recorded TRUTH lines, 47 gate-proof citation(s) and 10 quoted figure line(s) graded
+    103 ticket files, 44 recorded TRUTH lines, 47 gate-proof citation(s) and 10 quoted figure line(s) graded
     gate-proof citations: 0 proved by an adding commit naming the ticket, 0 by a dated attribution
-    line, 47 disposed of by a dated correction, 0 observed false
+    line, 47 disposed of by a dated correction, 0 observed false; 0 attribution(s) consulted and refused
+
+(Quoted from the run at `417ac08`; the recorded-lines figure moves with the clock, the rest with
+the record.)
 
 The charting recorded "rule 1's positive path is proven by no real ticket" as a sentence. It is now
 a **printed number on every run**, and the number is starker than the sentence was: the four
@@ -250,19 +280,30 @@ assistant's reasoning is a delegation whatever shape the question was put in". T
 ### One thing found while building, and fixed (delegated)
 
 A finding pointed at the wrong line. `para_citations` located a citation by searching each physical
-line for the citation's VALUE, so `run 5` was reported fourteen lines early, against the `total=56`
-of a quoted TRUTH line. It now looks for the line the run is actually CITED on and falls back to
-the old search. A red nobody can look at is a red nobody can check. One test.
+line for the citation's VALUE, so a citation of run 5 was reported fourteen lines early, against
+the totals of a quoted TRUTH line, which happen to contain the digit. It now looks for the line the
+run is actually CITED on and falls back to the old search. A red nobody can look at is a red nobody
+can check. One test.
+
+(This paragraph is also review F6's: it used to quote that run and that figure on one text line,
+which made it the eleventh graded figure line on the record and made the run output quoted below
+wrong by one. A ticket about false citations should not need luck to pass its own rule.)
 
 ### Tests at the seam, red first
 
 `tests/test_cited_truth.py`, still pure — file texts, log text, an injected `tree_lookup` and now
-an injected `add_lookup`, so the rule is exercised with no repository and no estate. **20 new tests
-were red before the code existed** (`20 failed, 46 passed`), and the two record-level plants were
-green under the old rule and are red under this one; the exact commands and outputs are in the
-pull request. 67 pass now. The commit subjects the tests assert on are quoted from the real hub
-log, because the convention's spellings are the thing under test and an invented subject would
-test the invention.
+an injected `add_lookup`, so the rule is exercised with no repository and no estate. Red first,
+twice:
+
+- the build's own 20 new tests were red before the code existed (`20 failed, 46 passed`), and the
+  two record-level plants were green under the old rule and red under this one;
+- the review round's 7 more were red before their fix (`7 failed, 68 passed`), including both of
+  review F1's measured plants, and the **selfcheck leg that had asserted the defective behaviour
+  went red too** — which is how the defect survived the first build and is worth recording.
+
+**75 pass now**, and the exact commands and outputs are in the pull request. The commit subjects
+the tests assert on are quoted from the real hub log, because the convention's spellings are the
+thing under test and an invented subject would test the invention.
 
 ### Verified
 
@@ -272,7 +313,7 @@ test the invention.
     bash verify/truth-line/verify-truth-line.sh                    PASS (exit 0)
     bash verify/every-green/verify-every-green.sh                  PASS (exit 0)
     bash verify/can-record/verify-can-record.sh                    PASS (exit 0)
-    .venv/bin/python -m pytest tests/test_cited_truth.py -n0 -q    67 passed
+    .venv/bin/python -m pytest tests/test_cited_truth.py -n0 -q    75 passed
     .venv/bin/python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores
                                                                   Success: no issues, 177 files
     .venv/bin/python -m mypy verify/cited-truth/cited_truth.py --ignore-missing-imports --warn-unused-ignores
@@ -288,11 +329,11 @@ day old, and `tests/test_seam1_cli.py` serial-only.
 Nothing. No money, date, identity, authorisation or real person is touched by this ticket; the
 change is one hub check, its tests and three record files.
 
-Map line: [102 — The cited tree names who added the check](issues/102-the-cited-tree-names-who-added-the-check.md) — case D is closed, and it was a git question rather than a text one: `verify/cited-truth/` resolves a named check to its path in the cited tree, reads `git log --diff-filter=A --format=%H%x09%s <hub> -- <path>`, and requires the adding commit's subject to name the ticket making the claim — the number the ticket's own filename carries — or the ticket to carry a dated attribution line that is bound to the ticket, to the check and to a sha git agrees added that path, printed on every run with the subject that failed to name the ticket. The ticket scan is case-insensitive, collects every number and a trailing list because the convention has six spellings and one commit built two tickets' checks, and requires the number to FOLLOW the word because `27 tickets implemented` names no ticket. **No `--follow`** (delegated), measured: it changes no verdict for run 7's three directories, git accepts it on a directory and silently ignores it, and the subject it surfaces for two of them is the one a looser scan would misread as ticket 27; a moved check is carried by the attribution line. Three more states are red rather than a shrug — `unreadable-history`, `no-adding-commit`, `no-ticket-number`. Measured 2026-09-06 at `caefdd3`: 36 of 39 hub verify scripts have an adding commit naming a ticket and the three that do not are exactly run 7's `verify/party/`, `verify/proportionality/` and `verify/provenance/`, all added by `c9d0f20`, which names none. On the committed record all 47 gate-proof citations now pass by dated correction, 0 by an adding commit and 0 by attribution — rule 1's positive path is exercised by no real ticket at all, printed as a number every run instead of disclosed as a sentence. Ticket 80's case-D bullet is struck and its run-5 paragraph gains a dated correction; R2-5 gives the three D1–D5 facts a load-bearing sentence each (32 graded sentences, up from 29); and a finding now points at the line the run is cited on rather than the first line its digits appear on.
+Map line: [102 — The cited tree names who added the check](issues/102-the-cited-tree-names-who-added-the-check.md) — case D is closed, and it was a git question rather than a text one: `verify/cited-truth/` resolves a named check to its path in the cited tree, reads `git log --diff-filter=A --format=%H%x09%s <hub> -- <path>`, and requires the adding commit's subject to name the ticket making the claim — the number the ticket's own filename carries — or the ticket to carry a dated attribution line that is bound to the ticket (read from its own header), to the check, to a sha git agrees added that path (the one after `added by`) and to that sha's subject naming NO ticket — an attribution is the escape for a check git attributes to nobody, and where git attributes it to somebody else that is an answer and not a gap — printed on every run with the subject it names, as is every attribution consulted and refused. The ticket scan is case-insensitive, collects every number and a trailing list because the convention has six spellings and one commit built two tickets' checks, and requires the number to FOLLOW the word because `27 tickets implemented` names no ticket. **No `--follow`** (delegated), measured: it changes no verdict for run 7's three directories, git accepts it on a directory and silently ignores it, and the subject it surfaces for two of them is the one a looser scan would misread as ticket 27; a moved check is carried by the attribution line. Three more states are red rather than a shrug — `unreadable-history`, `no-adding-commit`, `no-ticket-number`. Measured 2026-09-06 at `caefdd3`: 36 of 39 hub verify scripts have an adding commit naming a ticket and the three that do not are exactly run 7's `verify/party/`, `verify/proportionality/` and `verify/provenance/`, all added by `c9d0f20`, which names none. On the committed record all 47 gate-proof citations now pass by dated correction, 0 by an adding commit and 0 by attribution — rule 1's positive path is exercised by no real ticket at all, printed as a number every run instead of disclosed as a sentence. Two limits are named rather than closed: a check whose adding commit is genuinely nameless can still be claimed, and the claiming ticket's identity is the record file's own name, which the ticket controls (the `# NN` heading agrees with the filename in 103 of 103 files today, and an author who edits both in one diff passes anyway). Ticket 80's case-D bullet is struck and its run-5 paragraph gains a dated correction; R2-5 gives the three D1–D5 facts a load-bearing sentence each (32 graded sentences, up from 29); and a finding now points at the line the run is cited on rather than the first line its digits appear on.
 
 ## Notes
 
 Charted 2026-09-06 by the round-2 review of ticket 80 (hub PR #44, merged `8348b8e`). Sibling of
 ticket 80; the rule it narrows is ticket 80 item 1's.
 
-Map line: [102 — The cited tree names who added the check](issues/102-the-cited-tree-names-who-added-the-check.md) — closes case D, the one route ticket 80 left open through `verify/cited-truth/` rule 1, and it is a git question rather than a text one: resolve the named check to its path in the cited tree, read `git log --diff-filter=A` for that path, and require the adding commit's subject to name the ticket making the claim, or the ticket to carry a dated, printed attribution line naming the commit. Measured 2026-09-06: 34 of 37 hub checks already have an adding commit naming a ticket, and the three that do not are exactly run 7's `verify/party/`, `verify/proportionality/` and `verify/provenance/`, all added by `c9d0f20`, which names none — so every case-D route through run 7 goes red; the `Ticket NN:` convention has six spellings in the log, so the match is a case-insensitive scan collecting every number; and of the 46 gate-proof citations at `8348b8e`, 43 pass by dated correction and the other 3 are ticket 80's own run-7 paragraphs, so rule 1's positive path is proven today by the selfcheck and 42 seam tests and by no real ticket. Two alternatives are recorded as rejected (absent-from-the-prior-run fails legitimate later citations; "the ticket's own diff added it" is the same git question the check cannot read from the ticket file), the `--follow` question is left for the build with a recommendation, and ticket-80 review items R2-1 (strip code spans and link targets before the not-citable test) and R2-5 (load-bearing sentences for the three D1–D5 facts) are folded in.
+Map line: [102 — The cited tree names who added the check](issues/102-the-cited-tree-names-who-added-the-check.md) — case D is closed, and it was a git question rather than a text one: `verify/cited-truth/` resolves a named check to its path in the cited tree, reads `git log --diff-filter=A --format=%H%x09%s <hub> -- <path>`, and requires the adding commit's subject to name the ticket making the claim — the number the ticket's own filename carries — or the ticket to carry a dated attribution line that is bound to the ticket (read from its own header), to the check, to a sha git agrees added that path (the one after `added by`) and to that sha's subject naming NO ticket — an attribution is the escape for a check git attributes to nobody, and where git attributes it to somebody else that is an answer and not a gap — printed on every run with the subject it names, as is every attribution consulted and refused. The ticket scan is case-insensitive, collects every number and a trailing list because the convention has six spellings and one commit built two tickets' checks, and requires the number to FOLLOW the word because `27 tickets implemented` names no ticket. **No `--follow`** (delegated), measured: it changes no verdict for run 7's three directories, git accepts it on a directory and silently ignores it, and the subject it surfaces for two of them is the one a looser scan would misread as ticket 27; a moved check is carried by the attribution line. Three more states are red rather than a shrug — `unreadable-history`, `no-adding-commit`, `no-ticket-number`. Measured 2026-09-06 at `caefdd3`: 36 of 39 hub verify scripts have an adding commit naming a ticket and the three that do not are exactly run 7's `verify/party/`, `verify/proportionality/` and `verify/provenance/`, all added by `c9d0f20`, which names none. On the committed record all 47 gate-proof citations now pass by dated correction, 0 by an adding commit and 0 by attribution — rule 1's positive path is exercised by no real ticket at all, printed as a number every run instead of disclosed as a sentence. Two limits are named rather than closed: a check whose adding commit is genuinely nameless can still be claimed, and the claiming ticket's identity is the record file's own name, which the ticket controls (the `# NN` heading agrees with the filename in 103 of 103 files today, and an author who edits both in one diff passes anyway). Ticket 80's case-D bullet is struck and its run-5 paragraph gains a dated correction; R2-5 gives the three D1–D5 facts a load-bearing sentence each (32 graded sentences, up from 29); and a finding now points at the line the run is cited on rather than the first line its digits appear on.

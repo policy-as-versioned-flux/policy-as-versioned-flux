@@ -637,3 +637,94 @@ def test_a_finding_points_at_the_line_the_run_is_cited_on() -> None:
             "Its check is in the gate, and ticket 18 cites run 5 correctly.\n")
     found = ct.para_citations(para, 100)
     assert [(c.kind, c.value, c.lineno) for c in found if c.value == "5"] == [("run", "5", 101)]
+
+
+# -- ticket 102 review F1: an attribution may not stand over a commit that names somebody else -----
+#
+# The blocker the Fable review of PR 51 measured. The escape checked that the sha EXISTS and added
+# the file -- not what the sha SAYS. So `99-plant.md` could attribute `verify/feed-contract/...` to
+# 3e83a16, whose subject names tickets 21 and 52, and pass; and with a directory token the sha of
+# ANY script under it would do. An attribution is for a check git cannot attribute to anyone. Where
+# git attributes it to somebody else, that is an answer, not a gap, and the line may not overrule it.
+
+OWNS_53 = "Ticket 53: check that signed release evidence reaches what adopters read"
+RELEASE = "verify/provenance/verify-release-evidence-reaches-main.sh"
+PROV = "verify/provenance/verify-provenance.sh"
+
+
+def test_an_attribution_over_a_commit_that_names_another_ticket_is_refused() -> None:
+    text = CLAIM_FEED + ("\n> **Attribution, 2026-09-06 (ticket 99).** "
+                         "`verify/feed-contract/` was added by `3e83a16`, which names no ticket.\n")
+    findings = ct.grade({"99-plant.md": text}, ct.recorded(LOG), trees(**{"918022b": {FEED}}),
+                        adds({FEED: [("3e83a16", OWNS_21)]}))
+    assert [f.kind for f in findings] == ["attribution-over-a-named-commit"]
+    assert "21" in findings[0].detail and "52" in findings[0].detail
+
+
+def test_an_attribution_may_not_borrow_a_sibling_scripts_sha_from_the_directory() -> None:
+    # `verify/provenance/` resolves to two scripts; one is c9d0f20's and nameless, the other is
+    # ticket 53's. Attributing the DIRECTORY to ticket 53's commit used to pass.
+    text = CLAIM_FEED.replace("verify/feed-contract/", "verify/provenance/") + (
+        "\n> **Attribution, 2026-09-06 (ticket 98).** `verify/provenance/` was added by "
+        "`065e497`, which names no ticket.\n")
+    findings = ct.grade({"98-plant.md": text}, ct.recorded(LOG),
+                        trees(**{"918022b": {PROV, RELEASE}}),
+                        adds({PROV: [("c9d0f20", OWNS_NOBODY)], RELEASE: [("065e497", OWNS_53)]}))
+    assert [f.kind for f in findings] == ["attribution-over-a-named-commit"]
+    assert "53" in findings[0].detail
+
+
+def test_an_attribution_over_a_nameless_commit_still_holds() -> None:
+    # the route is not withdrawn, only narrowed to the case it was built for
+    assert ct.grade({"99-borrowed.md": CLAIM_PARTY + ATTRIB}, ct.recorded(LOG), TREE,
+                    adds({PARTY: [("c9d0f20", OWNS_NOBODY)]})) == []
+
+
+# -- F3: the line's ticket comes from its own header, and its sha from "added by" -------------------
+
+def test_the_attribution_ticket_is_read_from_its_header_not_from_its_prose() -> None:
+    borrowed = CLAIM_PARTY + (
+        "\n> **Attribution, 2026-09-06 (ticket 80).** `verify/party/` was added by `c9d0f20`, "
+        "as ticket 99 noted.\n")
+    assert [f.kind for f in ct.grade({"99-borrowed.md": borrowed}, ct.recorded(LOG), TREE,
+                                     adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))] == \
+        ["unattributed-check"]
+
+
+def test_the_attribution_sha_is_the_one_after_added_by() -> None:
+    # five shas and one of them right is not an attribution, it is a guess
+    scatter = CLAIM_PARTY + (
+        "\n> **Attribution, 2026-09-06 (ticket 99).** `verify/party/` was added by `deadbee1`, "
+        "not `c9d0f20`, `beefcaf1`, `facade11` or `1abcdef`.\n")
+    assert [f.kind for f in ct.grade({"99-borrowed.md": scatter}, ct.recorded(LOG), TREE,
+                                     adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))] == \
+        ["attribution-does-not-hold"]
+
+
+def test_an_all_digit_token_is_not_a_sha() -> None:
+    assert ct.attributions(
+        "> **Attribution, 2026-09-06 (ticket 99).** `verify/party/` was added by `2026090`.\n"
+    )[0].shas == ()
+
+
+# -- F4: an attribution that was consulted and refused leaves a trace -------------------------------
+
+def test_a_refused_attribution_is_recorded_even_when_another_one_holds() -> None:
+    text = (CLAIM_PARTY
+            + "\n> **Attribution, 2026-09-06 (ticket 99).** `verify/party/` was added by "
+              "`deadbee1`, which names no ticket.\n"
+            + "\n> **Attribution, 2026-09-06 (ticket 99).** `verify/party/` was added by "
+              "`c9d0f20`, which names no ticket.\n")
+    rep = ct.report({"99-borrowed.md": text}, ct.recorded(LOG), TREE,
+                    adds({PARTY: [("c9d0f20", OWNS_NOBODY)]}))
+    assert rep.findings == [] and rep.proved_by_attribution == 1
+    assert [(sha, check) for _p, _n, sha, check, _why in rep.attributions_refused] == \
+        [("deadbee1", "verify/party/")]
+
+
+# -- F5: a date or a long number after the word "ticket" is not a ticket number ---------------------
+
+def test_a_date_or_an_over_long_number_after_the_word_ticket_is_not_one() -> None:
+    assert ct.ticket_numbers("ticket 2026-09-05 sweep") == set()
+    assert ct.ticket_numbers("ticket 12345") == set()
+    assert ct.ticket_numbers("Ticket 39: ADR-0026 supersedes ADR-0013") == {"39"}

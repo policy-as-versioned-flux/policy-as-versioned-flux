@@ -52,12 +52,17 @@
 # an adding commit naming a ticket, and the three that do not are exactly run 7's directories.
 #
 # THE ESCAPE IS LOUD. A check that predates the convention or moved between trees is carried by a
-# DATED ATTRIBUTION LINE -- `**Attribution, YYYY-MM-DD (ticket NN)` naming the commit and the
-# check. It is bound to the ticket making the claim, to the check, and to a sha GIT agrees added
-# that path as of the cited commit: a line is text this check reads, so it is verified and never
-# believed. Every attribution used is printed, with the subject of the commit it names, and the run
-# says how many citations passed each way. What that cannot bind, and what is printed instead of
-# asserted: a ticket may still claim a check whose adding commit is genuinely nameless.
+# DATED ATTRIBUTION LINE -- `**Attribution, YYYY-MM-DD (ticket NN).** \`<check>\` was added by
+# \`<sha>\`. It is bound to the ticket making the claim (read from its own header), to the check,
+# to a sha GIT agrees added that path as of the cited commit (the one after `added by`), and to
+# that sha's subject NAMING NO TICKET: an attribution is the escape for a check git attributes to
+# nobody, and where git attributes it to somebody else that is an answer, not a gap
+# (`attribution-over-a-named-commit`, review F1). A line is text this check reads, so it is
+# verified and never believed. Every attribution used is printed with the subject of the commit it
+# names, every attribution consulted and refused is printed too, and the run says how many
+# citations passed each way. What that cannot bind, printed rather than asserted: a ticket may
+# still claim a check whose adding commit is genuinely nameless, and the claiming ticket's
+# identity is the record file's own name, which the ticket controls (review F2).
 #
 # NO COULD-NOT-LOOK, by decision (delegated, ADR-0025, 2026-09-06), following
 # verify/can-record/'s call. Everything it reads is in this repository and everything it runs is
