@@ -272,8 +272,18 @@ green** — 34041169274, 34041955787 and 34042143614, each superseded while pend
 what happened, not worked around: a cancelled run is not a pass and this branch has no citable
 observation of its own. The build brief (2026-09-03) already records that a branch TRUTH line is
 usually only in the Actions log and is not citable. The gate evidence for this ticket is therefore
-the local runs listed above, each with its exit code, and the checks that grade the record
-(`verify-map-surface`, `verify-cited-truth`) passing on this tree.
+the local runs listed above, each with its exit code, and `verify-map-surface` passing on this tree.
+
+**One inherited red, named so nobody attributes it here.** After rebasing onto `origin/main`
+(`e5bca74`, which merged ticket 92 round 4), `verify/cited-truth/verify-cited-truth.sh` exits 1:
+
+    !! .scratch/ecosystem/issues/92-the-local-clock.md:245: no-such-line: run 131 is quoted with
+       pass=71 fail=11 skip=21 excluded=8 total=111 ceiling=92, and talk/truth.log records no such line
+
+It exits 1 on `origin/main` itself — measured in a throwaway worktree, not assumed — so it arrived
+with the rebase and belongs to ticket 92. It passed on this branch before the rebase. Nothing in
+ticket 45 quotes a TRUTH line at all, by choice: this branch has no citable observation, and the
+figures in this Answer are the checks' own printed output.
 
 ## Waits on the owner
 
