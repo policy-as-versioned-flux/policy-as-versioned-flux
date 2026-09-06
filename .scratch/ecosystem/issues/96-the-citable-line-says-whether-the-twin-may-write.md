@@ -181,6 +181,29 @@ to a directory literally named `it's a hub` and running the gate there:
 TRUTH 2026-09-06T07:23Z run=local hub=958a190 enact=development units=[fixture] pass=1 ...
 ```
 
+### The commands that were run, and what they said
+
+| Command | Result |
+|---|---|
+| `bash talk/verify-all.sh --selfcheck` | PASS (the sentence now names the three-mode leg) |
+| `bash verify/truth-line/verify-truth-line.sh` | PASS, leg 6 reporting `0 of 42 recorded lines name the mode` |
+| `bash verify/every-green/verify-every-green.sh` | PASS over 109 discovered scripts |
+| `bash verify/can-record/verify-can-record.sh` | PASS |
+| `bash verify/schedules/verify-schedules.sh` | FAIL: `insurer/fetch.yml ludlow tuppence` — byte-identical to the committed capture of run 113; not this branch |
+| `bash verify/local-clock/verify-local-clock.sh` | SKIP (no `.local-clock/last-run.json` on this machine) |
+| `bash talk/verify-demo.sh` | PASS against run 22 |
+| `.venv/bin/python talk/build_deck.py --selfcheck` | `selfcheck ok` |
+| `.venv/bin/python -m pytest tests/ -n0 -q` | `2 failed, 1871 passed in 2695.04s (0:44:55)` |
+| `.venv/bin/python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores` | `Success: no issues found in 174 source files` |
+
+The two reds are the two the brief names as standing and environment-dependent, neither mine:
+`test_the_suite_is_green`, failing on invariant 44 `drift_window_is_actually_being_sampled` ("the
+window is open and the newest sample is 1 day(s) old"), and the serial-only
+`tests/test_seam1_cli.py::test_an_attestation_sidecar_accompanies_every_artefact` leak under `-n0`.
+CI, which runs in parallel, saw 44 pass and 45 fail instead: `invariants` 71 passed, 1 failed, 3
+skipped and `tests` 1 failed, 1872 passed — byte-identical to the last `twin` run on `main`
+(33987516971). Nothing on this branch is worse than `main` on either machine.
+
 ### The recording rule (ticket 100)
 
 No TRUTH line was hand-written into `talk/truth.log`; the log is untouched by this branch. The
