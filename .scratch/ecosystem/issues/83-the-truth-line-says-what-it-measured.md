@@ -197,12 +197,14 @@ none of the comparison.
 - `.venv/bin/python talk/build_deck.py --check talk/deck.md` → no bad rows; breaking the
   `measured:` line by hand produces one.
 - **The replay (re-run 2026-09-04 against the fixed files).** Two real grade tables, fetched with
-  `gh run view --log` and replayed row by row through `truth_manifest.summarise`:
-  - run 65 (94 rows, hub `824959d`) → `pass=59 [observed=13 self=37 simulated=6 meta=3] fail=11
+  `gh run view --log` and replayed row by row through `truth_manifest.summarise`. Both are
+  BRANCH runs whose lines never reached `talk/truth.log`, so every figure below is quoted from
+  the Actions log and is not citable (ticket 80 item 1, 2026-09-06):
+  - run 65 (94 rows, hub `824959d`, not citable) → `pass=59 [observed=13 self=37 simulated=6 meta=3] fail=11
     skip=16 [never=9 waits=7] excluded=8 total=94 ceiling=77`; 0 undeclared, 0 stale `never`.
-  - run 70 (97 rows, hub `b2e87fc`, this branch's own run) → `pass=61 [observed=13 self=37
+  - run 70 (97 rows, hub `b2e87fc`, this branch's own run, not citable) → `pass=61 [observed=13 self=37
     simulated=6 meta=5] fail=12 skip=16 [never=9 waits=7] excluded=8 total=97 ceiling=80`;
-    0 undeclared, 0 stale `never`. Run 70's own printed line said `fail=13 skip=15 [never=9
+    0 undeclared, 0 stale `never`. Run 70's own printed line, not citable, said `fail=13 skip=15 [never=9
     waits=6]`: that one row is the truncation bug, and it is the whole difference.
   The earlier figures in this Answer (`skip=22 ... excluded=2`) were replayed before ticket 90's
   commits on this same branch excluded the six identity scripts; six declared `never` skips became

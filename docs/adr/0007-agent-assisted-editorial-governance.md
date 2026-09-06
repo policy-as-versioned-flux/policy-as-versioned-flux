@@ -28,7 +28,30 @@ humans and agents only**; the engine never consumes it. (Resolves the old D8.1: 
 *carried* on the floor, not hard-enforced; enforcing it via a signed cosign attestation needs the
 OCI path and is a north-star item.)
 
-## Last-mile to non-technical consumers (proposed — confirm)
+## Last-mile to non-technical consumers
+
+> **Confirmed 2026-08-28 (eco-system ticket 13 Q4), written 2026-09-06 (ticket 80 item 7).** This
+> section carried "(proposed — confirm)" inside an accepted ADR for the whole of the original
+> build. It is confirmed, with a mechanism: the handbook is a **compose-time render**. A tool the
+> platform publishes runs inside each adopter's compose step over that adopter's own composed
+> artefact; the render lands in the same PR and under the same gitsign tag as the artefact; and
+> `verify-fresh.sh` (render-at-tag equals committed render) becomes the truth-surface script,
+> gradable offline, with the end-to-end `verify.sh` retired beside it. The `claude -p`
+> plain-language summaries become a Claude Code skill a human runs, whose output lands by PR.
+>
+> **Why this shape and not the original's.** A scheduled job committing a render to `main` is a
+> machine write outside the reviewed PR, which the eco-system forbids
+> ([ADR-0023](0023-a-clock-appends-observations-and-one-signature-verified-by-a-controller.md): a
+> clock appends observations, never declarations), so "on a schedule, signed with the artefact"
+> could not both hold. Rendering from the signed tag cannot drift from the enforced policy, which
+> is the owner's dashboard objection in reverse. Full adoption by non-technical humans stays
+> partly cultural and stays named as a residual open problem.
+>
+> Delegated ([ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md)): the owner
+> answered ticket 13's round with "ive already read the recommendations and I can't find fault
+> with a single one", a bare agree, recorded as the assistant's decision and not re-asked. Record:
+> [issues/13](../../.scratch/ecosystem/issues/13-lift-or-retire-the-original-mechanisms.md) Q4.
+> **Not yet built**: nothing in the estate renders a handbook today.
 
 Attempt the last mile by **auto-generating an always-in-sync, human-readable policy handbook** from
 the versioned source (so the "operational manual" the talk's Cleaner reads can never drift from the

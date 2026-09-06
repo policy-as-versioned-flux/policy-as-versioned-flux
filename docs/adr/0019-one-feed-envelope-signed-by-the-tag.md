@@ -6,7 +6,11 @@ status: accepted
 
 Five signed feeds used three version keys and five payload shapes. The party schema's parent-kind
 enum was closed to four values, so a sixth feed could not be declared. No private key existed, so
-nobody could publish a feed version. Decided 2026-08-28 in `.scratch/ecosystem/issues/04`.
+nobody could publish a feed version. Decided 2026-08-28 in
+[issues/04](../../.scratch/ecosystem/issues/04-the-feed-contract.md).
+**Delegated** ([ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md) point 3, recorded 2026-09-06 by ticket 80 item 3): the owner agreed
+twice without a reason, so this is the assistant's decision, recorded with the reasons above
+and not re-asked. It rests on a bare agree, not a ratification.
 
 ## The decision
 

@@ -31,8 +31,12 @@ status: accepted
 The cage was the only enforcement in vocabulary but not in code (findings H2-01, H2-03, H2-12,
 H2-13, H8-03). The tier label was forgeable, an unknown tier fell to the loosest cage, the bottom
 rung was a GitHub issue, and the baseline cage wrote `readOnlyRootFilesystem: false` over pods that
-set `true`. Decided 2026-08-28 in `.scratch/ecosystem/issues/09`. Provisional: the owner agreed
-without a reason.
+set `true`. Decided 2026-08-28 in
+[issues/09](../../.scratch/ecosystem/issues/09-the-cage-ladder-v2.md).
+**Delegated** ([ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md) point 3, re-labelled 2026-09-06 by ticket 80 item 3, which ADR-0025
+point 4 names): the owner agreed without a reason, so this is the assistant's decision,
+recorded with the reasons above and not re-asked. It rests on a bare agree, not a
+ratification.
 
 ## The decision
 

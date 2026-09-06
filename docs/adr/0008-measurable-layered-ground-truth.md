@@ -2,6 +2,23 @@
 status: accepted
 ---
 
+> **Superseded in part, 2026-07-20 (the owner), written 2026-09-06 (eco-system ticket 80
+> item 2).** The **dashboard this ADR delivers "measurable" through does not survive.** At the
+> second show and tell the owner rejected it in those words: "slideware", "a bullshit grafana or
+> other made up dashboard that could be not real data"
+> (`.scratch/drift-review-2026-08-27/REPORT.md`, Phase 1). Eco-system ticket 13 records the
+> consequence -- Grafana dashboards are retired and no dashboard of any kind is re-asked -- and
+> NORTH-STAR section 5 makes `talk/verify-all.sh`'s dated TRUTH line the only citable read of
+> whether anything works. The estate has shipped no dashboard since and will not.
+>
+> **What survives:** the four signals themselves, the OSCAL control-satisfaction route through
+> C2P ([ADR-0009](0009-oscal-attestation-via-c2p.md)), and the demotion of PR-acceptance to
+> adoption velocity. **What is superseded:** the delivery vehicle -- four Grafana panels over four
+> datasources joined by a shared template variable, Policy Reporter as the Prometheus route, the
+> `infinity` and `github` datasource plugins, and the "surfaced in one dashboard" clause of the
+> opening sentence. The signals are read where they are produced and graded by the gate.
+> Owner-reasoned: the owner gave the rejection and the reason.
+
 # "Measurable" = layered ground-truth; PR-acceptance demoted to adoption velocity
 
 The measurable pillar is delivered as four complementary signals, each answering a distinct

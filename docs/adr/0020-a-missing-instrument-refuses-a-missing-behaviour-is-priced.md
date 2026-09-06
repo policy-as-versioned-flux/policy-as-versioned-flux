@@ -6,7 +6,12 @@ status: accepted
 
 The north star says price and cage, never count, refuse or file. Ticket 07 needed a rule for two
 cases the £ cannot compute: an obligation with no regime in any subscribed pricing feed, and a sum
-across currencies with no FX rate for the date. Decided 2026-08-28 in `.scratch/ecosystem/issues/07`.
+across currencies with no FX rate for the date. Decided 2026-08-28 in
+[issues/07](../../.scratch/ecosystem/issues/07-org-size-obligations-and-currency.md).
+**Delegated** ([ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md) point 3, recorded 2026-09-06 by ticket 80 item 3): the owner agreed
+and gave a reason for one point only, the currency default; every other point here rests on
+a bare agree, so it is the assistant's decision, recorded with the reasons above and not
+re-asked.
 
 ## The decision
 

@@ -133,3 +133,29 @@ Graduated:
 - 93 The twin derives a probability
 - 94 Research: the studied firms behind the adopters
 - 95 The record states the purpose
+
+## Assistant-made calls listed here, not re-decided
+
+Added 2026-09-06 by ticket 80 item 4. ADR-0025 point 3 makes an architectural call the assistant
+made without an owner round the assistant's own, recorded and labelled. This section is where the
+calls that were made *inside implementation runs* — where no round happened at all — get listed
+against this ticket, so a reader who finds one can see that nobody was asked and does not have to
+guess. Listing is not re-deciding: each entry names what was decided, who decided it, when, and
+where it now lives.
+
+1. **`governed-namespace-requires-claim` was promoted from Audit to Deny inside an implementation
+   run, with no round.** ADR-0022's addendum of 2026-08-28 recorded the promotion, and called the
+   result "the one refusal the doctrine allows". Nothing was put to the owner: the promotion was
+   an assistant-made call taken while the cage ladder was being built, and it shipped. It ran
+   against the doctrine of NORTH-STAR principle 1 ("price and cage, never count, refuse, deny or
+   file") for four days on the record and longer in the served artefacts. **Delegated
+   ([ADR-0025](../../../docs/adr/0025-the-assistant-decides-architecture-and-records-it.md)),
+   listed 2026-09-06, not re-decided:** the owner's Q5 answer above already disposed of it — "we've
+   built a Mutating admission controller more than a Approving admission and control" — and
+   ticket 89 executed the reversal on 2026-09-05. `CONTEXT.md`'s **Governed namespace** entry now
+   says there is no `CREATE` deny *in what the platform renders*, names the window in which that
+   sentence was false, and names the gap that is still open: all three adopters still SERVE the
+   `Deny` in what they composed under platform `v2.0.1`, and `verify/deny-is-not-a-rung/` grades
+   exactly that and will not read green while a copy survives. What this entry adds is only the
+   attribution the record never carried: the promotion was the assistant's, made with no round,
+   and it is listed rather than re-argued.

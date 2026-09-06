@@ -44,3 +44,11 @@ The owner answered: "ask fable to decide then record".
   owner was asked. They should assume this ADR.
 - Reversal: the owner writes a dated line in NORTH-STAR §8 restoring the earlier rule. Nothing
   decided under this ADR is undone by that; it is re-put from that date.
+
+## Note, 2026-09-06 (eco-system ticket 80 item 3): what point 3 does to the five panel decisions
+
+Point 4 retires the word "provisional" and hands ticket 80 the re-labelling. Ticket 80 found that the re-labelling is not only clerical, and records the ruling here rather than leaving it inside one ADR's banner.
+
+Five decisions of 2026-08-28 (D1 to D5, in tickets 10, 13 and 16, carried by ADR-0023) were written down as **decided** rather than provisional, on a vocabulary in which a three-lens panel verdict outranked a bare agree. All five rest on one sentence of the owner's: "I agree with you're more advanced reasoning". That endorses the assistant's reasoning and gives none of the owner's own, which is what **point 3** calls a delegation. So the five read **delegated**, the same as the items point 4 re-labels, and the ranking itself is retired: from here, an endorsement of the assistant's reasoning is a delegation whatever shape the question was put in.
+
+This is an interpretive ruling on point 3, taken by the assistant under this ADR and recorded, not an application of point 4. **Nothing is reopened or re-asked** — that is what point 3's last sentence requires. If the owner's reason for any of the five exists somewhere unrecorded, a dated line in the ticket restores it as owner-reasoned. The affected records carry the same note: ticket 13's Answer, `map.md`'s batch record, [ADR-0010](0010-sunset-scheduled-proposals-not-application.md)'s banner and [ADR-0023](0023-a-clock-appends-observations-and-one-signature-verified-by-a-controller.md)'s delegated line.
