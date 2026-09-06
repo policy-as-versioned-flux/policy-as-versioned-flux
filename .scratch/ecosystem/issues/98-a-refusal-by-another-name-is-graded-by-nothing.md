@@ -149,6 +149,22 @@ become a blanket permission.
 
   No policy denied anything. Not citable: a local run, not a gate run.
 
+### The suite, and what was actually observed of it
+
+The full test suite ran to completion **on CI, on this branch's first commit** — the `twin`
+workflow, [run 34019956456](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/34019956456):
+`1 failed, 1908 passed in 115.37s`, the 37 new tests among them. The one failure is
+`test_the_suite_is_green`, from invariant 45 `flux_coverage_floor_is_still_reachable` — the
+standing red the build brief names, whose staying red is the finding. The `invariants` job on the
+same branch reports `RESULT: 71 passed, 1 failed, 3 skipped`, the same one. Invariant 44
+`drift_window_is_actually_being_sampled` PASSED there. Neither is this ticket's.
+
+**The local `-n0` run did not complete inside this session and its result is therefore not
+recorded.** It was started twice: the first reached 45% and was killed with its parent shell; the
+second was still at 3% under machine load (a second full suite from another build was running on
+the same machine). Rather than write a number nobody watched arrive, the observation cited above
+is CI's. Everything else in this section is a local run I watched finish.
+
 ### Decisions
 
 **D1 (delegated). The check grades the SERVED surface and names everything it excludes, and that
