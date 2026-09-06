@@ -781,3 +781,88 @@ def test_the_leak_scan_is_case_insensitive(lc, tmp_path: Path) -> None:
     _git(repo, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
     assert lc.injected_leaks(str(repo)) == ["twin/claims/x.claim.yaml"]
     assert lc._INJECTED.search('{"INJECTED": TRUE}')
+
+
+# --- round 5 re-review (2026-09-06): three more routes, one shape, read on the ORIGIN ---------
+def _push_refused(tmp_path: Path, stub: str, word: str, key: Path | None = None) -> tuple[str, str]:
+    unit = tmp_path / "estate" / "driftwood"
+    origin = _fixture_adopter(unit)
+    env = _push_env(tmp_path, stub, "ok")
+    if key is not None:
+        env["LOCAL_CLOCK_STUB_KEY"] = str(key)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify", "--push"],
+                          env=env, capture_output=True, text=True, timeout=120)
+    assert done.returncode == 1, done.stdout + done.stderr
+    fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+    assert fail_lines and word in fail_lines[0], done.stdout
+    assert "signature: none" not in done.stdout, done.stdout
+    assert _git(origin, "for-each-ref", "refs/heads/local-clock/") == "", f"the {stub} branch reached the origin"
+    log = tmp_path / "gh-calls.log"
+    assert not log.exists() or "pr create" not in log.read_text(), "gh was asked for a PR"
+    return done.stdout, _run_id(done.stdout)
+
+
+def test_a_git_replace_cannot_stand_a_clean_double_before_a_signed_commit(tmp_path: Path) -> None:
+    # F1: S signed and a person's, C a clean double, `git replace S C`. Every ordinary read saw C
+    # and the origin received S. Refused by the all-refs snapshot; the real object is S.
+    key = _signing_key(tmp_path)
+    _push_refused(tmp_path, "replace", "refs/replace/", key)
+    unit = tmp_path / "estate" / "driftwood"
+    s = _git(unit, "for-each-ref", "--format=%(refname)", "refs/replace/").split("/")[-1]
+    real = subprocess.run(["git", "-C", str(unit), "cat-file", "commit", s], capture_output=True, text=True,
+                          check=True, env={**os.environ, "GIT_NO_REPLACE_OBJECTS": "1"}).stdout
+    assert "gpgsig" in real.split("\n\n")[0] and "The Owner" in real, real[:300]
+
+
+def test_a_hook_or_monitor_the_child_wrote_never_runs_and_the_config_change_is_refused(tmp_path: Path) -> None:
+    # F2a/F2b: core.hooksPath -> the clock's own push ran the model's pre-push hook in the owner's
+    # shell; core.fsmonitor -> ran at the clock's git status. Now: refused by key, markers absent.
+    out, _ = _push_refused(tmp_path, "hooks", "core.hookspath")
+    assert "core.fsmonitor" in out
+    assert not (tmp_path / ".local-clock" / "hook-ran").exists(), "the child's pre-push hook ran"
+    assert not (tmp_path / ".local-clock" / "fsmonitor-ran").exists(), "the child's fsmonitor ran"
+
+
+def test_a_remote_the_child_rewrote_receives_nothing(tmp_path: Path) -> None:
+    # F2c: `git remote set-url origin evil.git` -> the clock pushed there and reported ok
+    _push_refused(tmp_path, "remoteurl", "remote.origin.url")
+    evil = tmp_path / ".local-clock" / "evil.git"
+    assert evil.exists() and _git(evil, "for-each-ref") == "", "evil.git received a push"
+
+
+def test_an_amended_base_or_a_merge_shaped_commit_is_refused_by_its_parents(tmp_path: Path) -> None:
+    # F3: one clean clock commit whose parent is base^ (amend), or with two parents (merge-shaped)
+    for stub in ("amend", "merge"):
+        unit = tmp_path / "estate" / f"driftwood-{stub}"
+        unit.parent.mkdir(exist_ok=True)
+        origin = _fixture_adopter(unit)
+        env = _clock_env(tmp_path, stub)
+        env["LOCAL_CLOCK_ESTATE"] = str(tmp_path / "estate")
+        # the clock looks up ESTATE/<adopter>; alias this unit as driftwood via a symlink
+        link = tmp_path / "estate" / "driftwood"
+        if link.exists() or link.is_symlink():
+            link.unlink()
+        link.symlink_to(unit)
+        done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                              env=env, capture_output=True, text=True, timeout=120)
+        assert done.returncode == 1, (stub, done.stdout + done.stderr)
+        fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+        assert fail_lines and "not the base" in fail_lines[0] and _git(origin, "rev-parse", "main")[:7] in fail_lines[0], (stub, done.stdout)
+        rid = _run_id(done.stdout)
+        steps = [json.loads(l) for l in (tmp_path / ".local-clock" / "runs" / rid / "steps.jsonl").read_text().splitlines()]
+        assert steps[0]["status"] == "fail" and steps[0]["commits"] == 1 and "parents" in steps[0]["reason"], steps[0]
+        link.unlink()
+
+
+def test_a_trailer_naming_a_person_is_refused_and_a_gpgsig_word_in_the_body_is_not(tmp_path: Path) -> None:
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "signoff"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 1, done.stdout + done.stderr
+    fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+    assert fail_lines and "trailer" in fail_lines[0] and "The Owner" in fail_lines[0], done.stdout
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "bodysig"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 0, done.stdout + done.stderr
+    assert "signature: none" in done.stdout, done.stdout

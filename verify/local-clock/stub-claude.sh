@@ -27,6 +27,14 @@
 #   tag      as claim, plus `git tag -a local-clock-v1` in the unit (review F2: the guard admits
 #            a tag and the owner's global tag.gpgsign would sign it) -- the clock must refuse
 #            the run and name the ref
+#   replace  a signed person's commit S with a clean double C and `git replace S C` -- refused
+#   hooks    core.hooksPath (pre-push) and core.fsmonitor written into the unit's config, each
+#            touching a marker if it runs -- refused by key, and the markers must stay absent
+#   remoteurl  `git remote set-url origin` to a throwaway evil.git -- refused, evil.git empty
+#   amend    `commit --amend` of the base itself: one clean commit, parent base^ -- refused
+#   merge    one commit with parents base and base^ -- refused
+#   signoff  a Signed-off-by trailer naming a person -- refused
+#   bodysig  the word gpgsig in the message BODY -- admitted: it is text, not a header
 # LOCAL_CLOCK_INJECTED (set by the clock on a rehearsal) makes the claim say injected: true.
 # Every invocation touches $LOCAL_CLOCK_HOME/model-was-called first, so a test can prove the
 # clock refused BEFORE the model ran. This is a stand-in and says so in its result line.
@@ -117,6 +125,41 @@ case "$what" in
   tag)
     git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)"
     git -C "$wt" tag -a local-clock-v1 -m "a tag the guard admits";;
+  replace)
+    # round 5 F1: S is signed and a person's; C is a clean double; `git replace S C` makes every
+    # ordinary read see C while the origin receives S
+    git -C "$wt" -c commit.gpgsign=true -c gpg.format=ssh -c user.signingkey="${LOCAL_CLOCK_STUB_KEY:?}" \
+      commit -q --author="The Owner <owner@fixture.invalid>" -m "twin: S, signed and a person's ($step, $adopter)"
+    S="$(git -C "$wt" rev-parse HEAD)"
+    C="$(git -C "$wt" commit-tree "$(git -C "$wt" rev-parse 'HEAD^{tree}')" -p "$(git -C "$wt" rev-parse 'HEAD^')" -m "twin: C, a clean double of S ($step, $adopter)")"
+    git -C "$wt" replace "$S" "$C";;
+  hooks)
+    # round 5 F2a/b: a pre-push hook and an fsmonitor written into the unit's config; each
+    # touches a marker under LOCAL_CLOCK_HOME if it ever runs
+    git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)"
+    h="${LOCAL_CLOCK_HOME:?}/evil-hooks"; mkdir -p "$h"
+    printf '#!/bin/sh\ntouch "%s/hook-ran"\n' "$LOCAL_CLOCK_HOME" >"$h/pre-push"; chmod +x "$h/pre-push"
+    printf '#!/bin/sh\ntouch "%s/fsmonitor-ran"\nprintf "/"\n' "$LOCAL_CLOCK_HOME" >"$h/fsmonitor"; chmod +x "$h/fsmonitor"
+    git -C "$wt" config core.hooksPath "$h"
+    git -C "$wt" config core.fsmonitor "$h/fsmonitor";;
+  remoteurl)
+    # round 5 F2c: the push would go wherever origin points now
+    git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)"
+    [ -d "${LOCAL_CLOCK_HOME:?}/evil.git" ] || git init -q --bare -b main "$LOCAL_CLOCK_HOME/evil.git"
+    git -C "$wt" remote set-url origin "$LOCAL_CLOCK_HOME/evil.git";;
+  amend)
+    # round 5 F3: HEAD is the base; amending it yields ONE clean clock commit whose parent is
+    # base^ and whose tree folds the upstream commit under the clock's name
+    git -C "$wt" commit -q --amend --no-edit --reset-author;;
+  merge)
+    # round 5 F3: one commit with two parents, base and base^
+    tree="$(git -C "$wt" write-tree)"
+    m="$(git -C "$wt" commit-tree "$tree" -p HEAD -p 'HEAD^' -m "twin: merge-shaped, one commit two parents ($step, $adopter)")"
+    git -C "$wt" update-ref HEAD "$m";;
+  signoff)
+    git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)" --trailer "Signed-off-by: The Owner <owner@fixture.invalid>";;
+  bodysig)
+    git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)" -m "gpgsig -- this line is in the message body and is text, not a header";;
   *)       git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)";;
 esac
 echo "twin: stub claim ($step, $adopter)" >"$run/$step-$adopter.pr-title"

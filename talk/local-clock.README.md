@@ -94,10 +94,25 @@ branches and tags before the model runs: a tag or any other ref the child made o
 pull request you open with `--push` is your hand; the merge is the human act; the release tag
 is the signature that prices (ticket 23).
 
-**`--push` inside a Claude Code session.** The refusal keys on `CLAUDECODE` being set, which is
-a convention your terminal upholds, not a control: `env -u CLAUDECODE` defeats it. The control
-is that a clock started from inside a running clock -- which inherits `LOCAL_CLOCK_STEP` and
-`LOCAL_CLOCK_RUN_DIR` -- is refused before anything starts, whatever it did to `CLAUDECODE`.
+**`--push` inside a Claude Code session, and a nested clock.** The refusal keys on `CLAUDECODE`
+being set, and a clock started from inside a running clock (which inherits `LOCAL_CLOCK_STEP`
+and `LOCAL_CLOCK_RUN_DIR`) is refused before anything starts. Both are CONVENTIONS a child with
+`Bash(git *)` can unset (`env -u`, or `git -c alias.x='!env -u ... bash talk/local-clock.sh' x`);
+neither is a control. What bounds what any clock -- nested or not -- can land is the read-back
+above and the two snapshots below, which do not depend on the environment.
+
+**The child can write the unit's git config, and the clock refuses it.** `Bash(git *)` admits
+`git config` and `git remote set-url`. A `core.hooksPath` the model wrote would run its pre-push
+hook in YOUR shell under the clock's own `git push` (with your `gh` on PATH and no guard); a
+`core.fsmonitor` would run at the clock's `git status`; a rewritten `remote.origin.url` would
+send the push elsewhere. So the clock snapshots the unit's git config (every entry, with its
+file) before the model runs and refuses any key that differs afterwards, naming it; its own git
+always runs with hooks and fsmonitor off and `GIT_NO_REPLACE_OBJECTS=1` (a `git replace` would
+otherwise show it a clean double of a signed commit while the origin received the real one);
+ALL refs, not only branches and tags, are snapshotted the same way; and the one admitted commit
+must have exactly one parent, the fetched `origin/main` (an amend of the base or a merge-shaped
+commit is one clean commit that is not a proposal on `origin/main`). A refused config change is
+yours to repair by hand before the next run: the refusal names the key.
 
 ## How to read the result
 

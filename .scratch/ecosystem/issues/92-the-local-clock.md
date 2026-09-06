@@ -288,3 +288,62 @@ records `origin_main_at_push`, so the printed base is the truth at push time.
 
 Red first: the six new tests failed against the pre-fix clock (`assert 0 == 1` / `assert 0 == 2`
 — every shape admitted; `[] == ['twin/claims/x.claim.yaml']` for the case) and pass after.
+
+## Round 5 re-review, 2026-09-06 — three more routes, one shape (the assistant, delegated)
+
+A fresh reviewer confirmed the round-4 F1 fix in every shape it was stated in, then found three
+routes to the same outcome that the whole-branch read-back did not cover. They share one shape
+and take the fix pattern already used for refs: snapshot before the child, compare after, refuse
+by name.
+
+- **F1, blocking, fixed — `git replace`.** A signed, person-authored commit S with a clean double C
+  and `git replace S C`: every ordinary read saw C (`signature: none` printed and recorded) and the
+  origin received S. `refs/replace/*` was outside the `refs/heads refs/tags` snapshot and the guard
+  admits `git replace`. Now every git command the clock runs goes through `cgit`, which sets
+  `GIT_NO_REPLACE_OBJECTS=1`, and the ref snapshot is ALL refs (heads, tags, remotes, replace,
+  notes) minus the step's branch. Stub `replace`; the fixture and pytest run it under `--push`,
+  read the origin (nothing landed, gh never asked) and read the real object behind the replace
+  ref with replacement off (it is the signed one).
+- **F2, blocking, fixed — the child can write the unit's git config.** Proved three ways by the
+  reviewer: `core.hooksPath` ran the model's pre-push hook in the owner's shell under the clock's
+  own push, with the owner's gh on PATH and no guard; `core.fsmonitor` ran at the clock's `git
+  status` on every run; `remote set-url origin evil` sent the push to evil and reported ok. Now
+  the clock snapshots `git config --list --show-origin` (system, global, local, worktree) before
+  the child and refuses any key that differs, naming it; `cgit` runs with `core.hooksPath` at a
+  directory that never exists and `core.fsmonitor=false`; `remote.origin.url`/`pushurl` are
+  re-read just before the push against the step's starting value. Stubs `hooks` (both keys, each
+  touching a marker if it runs) and `remoteurl` (a throwaway evil.git); markers absent, evil.git
+  empty, refusals name `core.hookspath`, `core.fsmonitor`, `remote.origin.url`. The README says
+  this snapshot is the control and why.
+- **F3, medium, fixed — the parent.** The admitted commit must have exactly one parent and it must
+  be `$base`: `commit --amend --reset-author` of the base (one clean clock commit, parent base^,
+  upstream's tree folded under the clock's name) and a `commit-tree -p base -p base^` merge-shaped
+  commit were both admitted with `base:` recorded as origin/main. Stubs `amend` and `merge`;
+  refusal names the parents and the base; `commits: 1` and the parents recorded.
+- **F4, low.** README and script header now say `CLAUDECODE` and `LOCAL_CLOCK_STEP`/`RUN_DIR` are
+  conventions a child with `Bash(git *)` can unset (`git -c alias.x='!...' x`), and that the
+  read-back plus F1/F2 is what bounds a nested clock.
+- **F5, low, fixed.** The signature is read from the header block only (`sed '/^$/q'`), so a
+  `gpgsig` word in the message body is text (stub `bodysig`, admitted); `Signed-off-by` /
+  `Co-authored-by` trailers naming anyone but the clock are refused via `git interpret-trailers
+  --parse` (stub `signoff`).
+- **F6, low, fixed.** `mkfixture` sets `tag.gpgsign true` and a control tag is shown signed before
+  the unsigned-tag assertion, so the control is not empty on CI; every SKIP text the script can
+  print is declared on the manifest row.
+- **No change, by round-4 decision:** a moved `origin/main` at push time is recorded, not refused.
+
+**The head's own CI, cited (watched by this session's monitor):** `twin` run 34029974153 on
+ab8a6fb, job `tests` `1 failed, 2035 passed in 165.28s` — `test_the_suite_is_green` on
+`flux_coverage_floor_is_still_reachable` (invariant 45) only; job `invariants` red on the same;
+typecheck, demo, three determinism legs and reproduce-elsewhere green. The 491e5a3 figures above
+are superseded by these.
+
+Red first: the five round-5 tests failed against the round-4 clock (every route admitted, or the
+wrong reason) and pass after; the fixture grew from 15 to 22 runs.
+
+Local run of `tests/test_local_clock.py -n0` after round 5: `1 failed, 47 passed in 992.35s` on a
+machine at load 43-55 (the file takes ~100 s unloaded; each clock invocation in the tests has a
+120 s cap), the failed test being round 4's `signed`/`asowner` pair, which passes alone in 8.76 s;
+the exception text was not captured, so the cause is not asserted here. `verify-local-clock.sh`
+with the same fixture cases: offline PASS, marker SKIP, exit 3. The suite is quoted from CI on the
+pushed head, below.

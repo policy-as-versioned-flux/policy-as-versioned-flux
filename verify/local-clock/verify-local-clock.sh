@@ -68,6 +68,7 @@ mkfixture() {  # a throwaway adopter checkout, a throwaway bare origin, local ma
   # what every real clone's config carried on 2026-09-06: an owner's name, SSH signing on
   git -C "$u" config user.name "The Owner"; git -C "$u" config user.email owner@fixture.invalid
   git -C "$u" config gpg.format ssh; git -C "$u" config user.signingkey "$KEY"; git -C "$u" config commit.gpgsign true
+  git -C "$u" config tag.gpgsign true   # the owner's global config signs tags too (round 5 F6)
 }
 mkfixture driftwood
 UNIT="$TMP/estate/driftwood"; ORIGIN="$TMP/estate/driftwood.origin.git"
@@ -84,6 +85,8 @@ has_sig() { git -C "$1" cat-file commit "$2" | grep -q '^gpgsig'; }
 git -C "$UNIT" commit -q --allow-empty -m "control: the clone's own config signs as the owner" || fail "the control commit failed"
 has_sig "$UNIT" HEAD || fail "the fixture's config did not sign the control commit, so the proof below would be empty"
 [ "$(git -C "$UNIT" log -1 --format=%an HEAD)" = "The Owner" ] || fail "the control commit is not authored as the owner"
+git -C "$UNIT" tag -a control-signed -m "control: the config signs tags" || fail "the control tag failed"
+git -C "$UNIT" cat-file tag control-signed | grep -q 'SIGNATURE' || fail "the fixture's config did not sign the control tag, so the unsigned-tag proof below would be empty"
 
 # 1. a live run: one stub claim committed on a local-clock/ branch, cut from ORIGIN/MAIN,
 #    unsigned, authored as the clock, validated, marker written, main and origin unmoved
@@ -148,7 +151,7 @@ tail -1 "$TMP/push-unauth.out" | grep -q '^FAIL: --push needs an authenticated g
 # 1d. a model that signs anyway, names a person as author, hides a signed person's commit
 #     under a clean second commit (review F1), hides a declaration in history behind a clean
 #     tree (F1), or makes a tag (F2) is refused with the branch kept and nothing pushed
-for case in signed:signature asowner:author twocommits:"2 commit" history:"2 commit" tag:refs/tags/local-clock-v1; do
+for case in signed:signature asowner:author twocommits:"2 commit" history:"2 commit" tag:refs/tags/local-clock-v1 amend:"not the base" merge:"not the base" signoff:trailer; do
   stub="${case%%:*}"; word="${case#*:}"
   LOCAL_CLOCK_STUB="$stub" LOCAL_CLOCK_STUB_KEY="$KEY" bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/$stub.out" 2>&1 \
     && fail "a $stub proposal was admitted"
@@ -160,6 +163,34 @@ for case in signed:signature asowner:author twocommits:"2 commit" history:"2 com
 done
 git -C "$UNIT" cat-file tag refs/tags/local-clock-v1 | grep -q 'SIGNATURE' && fail "the tag the child made was signed: tag.gpgsign=false did not reach the child"
 git -C "$UNIT" tag -d local-clock-v1 >/dev/null
+# a gpgsig WORD in the message body is text: admitted (round 5 F5)
+LOCAL_CLOCK_STUB=bodysig bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/bodysig.out" 2>&1 || fail "a commit whose message body says gpgsig was refused: $(grep '^fail' "$TMP/bodysig.out" | head -1)"
+grep -q 'signature: none' "$TMP/bodysig.out" || fail "the bodysig run did not read the header block"
+# 1d2. round 5: three routes under --push, each read on the ORIGIN (and on evil.git)
+push_refused() {  # stub word -- run --push with the stub, expect refusal naming word, nothing on origin, gh not asked
+  local stub="$1" word="$2" before rid
+  before="$(grep -c 'pr create' "$LOCAL_CLOCK_GH_LOG" 2>/dev/null || echo 0)"
+  env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION LOCAL_CLOCK_STUB="$stub" LOCAL_CLOCK_STUB_KEY="$KEY" LOCAL_CLOCK_GH_STUB=ok \
+    bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify --push >"$TMP/$stub-push.out" 2>&1 && fail "the $stub branch was pushed"
+  grep '^fail' "$TMP/$stub-push.out" | head -1 | grep -Fq "$word" || fail "the $stub run was refused for the wrong reason: $(grep '^fail' "$TMP/$stub-push.out" | head -1)"
+  grep -q 'signature: none' "$TMP/$stub-push.out" && fail "the clock vouched 'signature: none' for the $stub branch"
+  rid="$(run_id "$TMP/$stub-push.out")"
+  git -C "$ORIGIN" for-each-ref 'refs/heads/local-clock/' | grep -q -- "$rid" && fail "the $stub branch reached the origin"
+  [ "$(grep -c 'pr create' "$LOCAL_CLOCK_GH_LOG" 2>/dev/null || echo 0)" = "$before" ] || fail "gh was asked for a PR on the refused $stub branch"
+}
+push_refused replace refs/replace/
+# the real object behind the replace ref is the signed person's commit, read with replacement off
+S="$(git -C "$UNIT" for-each-ref --format='%(refname)' refs/replace/ | head -1 | sed 's#refs/replace/##')"
+[ -n "$S" ] || fail "the replace stub left no refs/replace entry"
+GIT_NO_REPLACE_OBJECTS=1 git -C "$UNIT" cat-file commit "$S" | sed '/^$/q' | grep -q '^gpgsig' || fail "the replaced object is not the signed commit the stub made"
+git -C "$UNIT" update-ref -d "refs/replace/$S"
+push_refused hooks core.hookspath
+[ ! -e "$LOCAL_CLOCK_HOME/hook-ran" ] || fail "the child's pre-push hook ran under the clock's git"
+[ ! -e "$LOCAL_CLOCK_HOME/fsmonitor-ran" ] || fail "the child's fsmonitor ran under the clock's git"
+git -C "$UNIT" config --unset core.hooksPath; git -C "$UNIT" config --unset core.fsmonitor   # the owner's repair by hand
+push_refused remoteurl remote.origin.url
+[ -z "$(git -C "$LOCAL_CLOCK_HOME/evil.git" for-each-ref)" ] || fail "evil.git received a push"
+git -C "$UNIT" remote set-url origin "$ORIGIN"   # the owner's repair by hand
 # 1e. the twocommits branch under --push: read the ORIGIN -- nothing landed, gh never asked
 n_gh="$(grep -c 'pr create' "$LOCAL_CLOCK_GH_LOG" 2>/dev/null || echo 0)"
 env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION LOCAL_CLOCK_STUB=twocommits LOCAL_CLOCK_STUB_KEY="$KEY" LOCAL_CLOCK_GH_STUB=ok \
@@ -265,13 +296,13 @@ bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify --dry-run >
 grep -q '^dry .*would run' "$TMP/dry.out" || fail "the dry run did not print the command it would run"
 left_nothing "$TMP/dry.out" dry
 n_runs="$(ls -d "$TMP"/.local-clock/runs/*/ | wc -l | tr -d ' ')"
-[ "$n_runs" -eq 15 ] || fail "15 runs were started (live, push, signed, asowner, twocommits, history, tag, twocommits-push, rehearsal, leak, dirty, example, misnamed, nothing, dry; the refused --push and the nested clock started none) and $n_runs run directories exist: run ids collided or a refusal started a run"
+[ "$n_runs" -eq 22 ] || fail "22 runs were started (live, push, signed, asowner, twocommits, history, tag, amend, merge, signoff, bodysig, replace-push, hooks-push, remoteurl-push, twocommits-push, rehearsal, leak, dirty, example, misnamed, nothing, dry; the refused --push and the nested clock started none) and $n_runs run directories exist: run ids collided or a refusal started a run"
 # the derive step (ticket 93's seam) is recorded as skipped by name until its skill ships, and
 # its row declares where its files go, what they are named and which validator checks them
 LOCAL_CLOCK_STUB=nothing bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step derive >"$TMP/derive.out" 2>&1
 grep -q 'derive-driftwood' "$TMP/derive.out" || fail "the derive step is not in the steps table"
 bash "$ROOT/talk/local-clock.sh" --list-steps | grep -E '^derive ' | grep -q 'assets/validate_' || fail "the derive row names no validator: ticket 93 has no seam to fill"
-echo "PASS: offline, with stub-claude.sh and stub-gh.sh standing in over a throwaway adopter and a throwaway bare origin (a fixture, not the clock having run) -- the proposal is cut from origin/main with local main 1 behind, is one commit, unsigned, authored and committed as the clock although the config signs as the owner, --push lands it on the origin with main unmoved and asks gh for that PR, --push with gh logged out refuses before any model call, a signed or person-authored proposal, a two-commit branch hiding either behind a clean tip, a tag the child made and a nested clock are each refused, a rehearsal is stamped, marked, counted by the scan and refused by the validator, a declaration, unfinished work, a file that is not a *.claim.yaml or a claim without the headless mark is refused with the model's PR body deleted, and a nothing run or a dry run leaves no worktree or branch"
+echo "PASS: offline, with stub-claude.sh and stub-gh.sh standing in over a throwaway adopter and a throwaway bare origin (a fixture, not the clock having run) -- the proposal is cut from origin/main with local main 1 behind, is one commit, unsigned, authored and committed as the clock although the config signs as the owner, --push lands it on the origin with main unmoved and asks gh for that PR, --push with gh logged out refuses before any model call, a signed or person-authored proposal, a two-commit branch hiding either behind a clean tip, a git replace standing a clean double before a signed commit, a hook or fsmonitor or remote written into the unit's config (the hook never ran, evil.git got nothing), an amended base or merge-shaped commit, a trailer naming a person, a tag the child made and a nested clock are each refused, a rehearsal is stamped, marked, counted by the scan and refused by the validator, a declaration, unfinished work, a file that is not a *.claim.yaml or a claim without the headless mark is refused with the model's PR body deleted, and a nothing run or a dry run leaves no worktree or branch"
 
 # --- the real machine: the script, README, marker, leak scan, truth log, template --------------
 unset LOCAL_CLOCK_CLAUDE LOCAL_CLOCK_HOME LOCAL_CLOCK_ESTATE LOCAL_CLOCK_GH LOCAL_CLOCK_GH_LOG

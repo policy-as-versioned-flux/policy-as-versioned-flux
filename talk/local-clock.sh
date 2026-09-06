@@ -46,6 +46,18 @@
 #     committed as the clock, with no signature block; anything else is refused, branch kept.
 #     Any ref the child made or moved besides its branch (a tag, refs/heads/main) is refused
 #     and named. The merge is the human act; the release tag is the signature that prices.
+#   * round 5 (2026-09-06 re-review): the same snapshot-compare-refuse shape, widened. ALL refs
+#     (a `git replace` under refs/replace/ stood a clean double before a signed commit and the
+#     origin received the signed one); the unit's git CONFIG by key (a core.hooksPath the child
+#     wrote ran its pre-push hook in the owner's shell under the clock's own push; a
+#     core.fsmonitor ran at the clock's `git status`; a `remote set-url origin` sent the push
+#     elsewhere); the admitted commit's PARENT must be the base and only the base (an amend of
+#     the base or a merge-shaped commit is one clean commit that is not a proposal on
+#     origin/main); trailers naming anyone but the clock; and the signature read from the
+#     header block only. The clock's own git runs with GIT_NO_REPLACE_OBJECTS=1, no hooks and
+#     no fsmonitor (cgit, above). CLAUDECODE and LOCAL_CLOCK_STEP/RUN_DIR are conventions a
+#     child with Bash(git *) can unset (`git -c alias.x='!...' x`); what bounds a nested clock
+#     is this read-back, not those variables.
 #   * --push establishes its instruments BEFORE the model runs: `gh auth status` and
 #     `git ls-remote origin main` for every adopter. Either failing refuses the whole run, so a
 #     model call is never spent on a proposal that cannot reach its PR (before this, a run with
@@ -83,6 +95,15 @@ PY="${LOCAL_CLOCK_PYTHON:-$HUB/.venv/bin/python}"; [ -x "$PY" ] || PY=python3
 CLAUDE="${LOCAL_CLOCK_CLAUDE:-claude}"
 GH="${LOCAL_CLOCK_GH:-gh}"
 ROOT="${LOCAL_CLOCK_HOME:-$HUB/.local-clock}"
+# Every git command THIS script runs goes through cgit (review round 5). GIT_NO_REPLACE_OBJECTS=1:
+# a `git replace` the child made would otherwise stand a clean double in front of a signed
+# commit for every read here while the origin receives the real object. core.hooksPath at a
+# directory that is never created and core.fsmonitor off: a hook or monitor the child wrote
+# into the unit's config must never run in the owner's shell under the clock's own git (a
+# pre-push hook ran with the owner's gh on PATH and no guard when this was probed). The child's
+# config writes themselves are refused by the snapshot in run_step.
+NO_HOOKS="$ROOT/no-hooks"
+cgit() { GIT_NO_REPLACE_OBJECTS=1 git -c core.hooksPath="$NO_HOOKS" -c core.fsmonitor=false "$@"; }
 # the identity the child commits under: the clock's own, never a person's. `.invalid` is the
 # reserved TLD -- it is not a mailbox and cannot be mistaken for one. No signature: nobody at
 # the keyboard signed anything (the clone's own config would sign as the owner; see below).
@@ -193,7 +214,7 @@ if [ "$PUSH" = 1 ]; then
     if [ ! -d "$u/.git" ] && [ ! -f "$u/.git" ]; then
       echo "FAIL: --push needs a checkout of $a at $u and there is none (run clone-estate.sh) -- refused before any model runs"; exit 2
     fi
-    if ! GIT_TERMINAL_PROMPT=0 git -C "$u" ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
+    if ! GIT_TERMINAL_PROMPT=0 cgit -C "$u" ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
       echo "FAIL: --push needs origin of $a reachable with a main branch, and 'git ls-remote origin main' at $u failed -- refused before any model runs"; exit 2
     fi
   done
@@ -222,10 +243,10 @@ record() { "$PY" "$HELPER" record --run-dir "$RUN_DIR" "$@" </dev/null; }
 
 drop_worktree() {  # unit wt branch -- remove a step's worktree and its branch; true only when both are gone
   local unit="$1" wt="$2" branch="$3" err="$RUN_DIR/cleanup.err"
-  git -C "$unit" worktree remove --force "$wt" 2>>"$err" \
-    && git -C "$unit" branch -q -D "$branch" 2>>"$err" \
+  cgit -C "$unit" worktree remove --force "$wt" 2>>"$err" \
+    && cgit -C "$unit" branch -q -D "$branch" 2>>"$err" \
     && [ ! -e "$wt" ] \
-    && ! git -C "$unit" show-ref -q --verify "refs/heads/$branch"
+    && ! cgit -C "$unit" show-ref -q --verify "refs/heads/$branch"
 }
 
 cleanup_or_fail() {  # step adopter unit wt branch status reason -- drop the worktree, record, and say what is true
@@ -250,8 +271,11 @@ refuse() {  # step adopter branch title body reason -- a live step the clock wil
   return 1
 }
 
-unit_refs() {  # unit branch -- every local branch and tag but the step's own, with its object
-  git -C "$1" for-each-ref --format='%(refname) %(objectname)' refs/heads refs/tags | grep -v "^refs/heads/$2 " || true
+unit_refs() {  # unit branch -- EVERY ref (heads, tags, remotes, replace, notes, ...) but the step's own
+  cgit -C "$1" for-each-ref --format='%(refname) %(objectname)' | grep -v "^refs/heads/$2 " || true
+}
+unit_config() {  # wt -- every config entry git reads there (system, global, local, worktree), with its file
+  cgit -C "$1" config --list --show-origin 2>/dev/null | grep -v '^command line:' || true
 }
 
 render_prompt() {  # step skill adopter unit_wt branch paths out
@@ -299,21 +323,21 @@ run_step() {  # step skill paths pattern validator adopter
   # said so and the last-fetched origin/main stands, dated by the run log; no origin/main at
   # all is a missing instrument and refuses the step.
   local base fetch_note behind ahead
-  if GIT_TERMINAL_PROMPT=0 git -C "$unit" fetch -q origin main 2>"$RUN_DIR/$tag.fetch.err"; then
+  if GIT_TERMINAL_PROMPT=0 cgit -C "$unit" fetch -q origin main 2>"$RUN_DIR/$tag.fetch.err"; then
     fetch_note="fetched now"
   else
     fetch_note="fetch FAILED ($(tail -1 "$RUN_DIR/$tag.fetch.err" | cut -c1-80)); using origin/main as last fetched"
   fi
-  if ! base="$(git -C "$unit" rev-parse --verify -q refs/remotes/origin/main)"; then
+  if ! base="$(cgit -C "$unit" rev-parse --verify -q refs/remotes/origin/main)"; then
     echo "fail  $tag: no origin/main in $unit to propose against ($fetch_note) -- a missing instrument refuses; run clone-estate.sh or git fetch"
     record --step "$step" --adopter "$adopter" --status fail --reason "no origin/main to propose against"; return 1
   fi
-  behind="$(git -C "$unit" rev-list --count main..origin/main 2>/dev/null || echo '?')"
-  ahead="$(git -C "$unit" rev-list --count origin/main..main 2>/dev/null || echo '?')"
+  behind="$(cgit -C "$unit" rev-list --count main..origin/main 2>/dev/null || echo '?')"
+  ahead="$(cgit -C "$unit" rev-list --count origin/main..main 2>/dev/null || echo '?')"
   echo "base  $tag: origin/main@${base:0:7} (local main $behind behind, $ahead ahead; $fetch_note)"
   local branch="$BRANCH_PREFIX/$step-$RUN_ID" wt="$unit/.work/local-clock/$RUN_ID-$step"
   mkdir -p "$unit/.work/local-clock"
-  if ! git -C "$unit" worktree add -q "$wt" -b "$branch" "$base" 2>"$RUN_DIR/$tag.worktree.err"; then
+  if ! cgit -C "$unit" worktree add -q "$wt" -b "$branch" "$base" 2>"$RUN_DIR/$tag.worktree.err"; then
     echo "fail  $tag: could not make a worktree on $branch from origin/main@${base:0:7} ($(tail -1 "$RUN_DIR/$tag.worktree.err"))"
     record --step "$step" --adopter "$adopter" --status fail --reason "worktree add failed" --base "$base"; return 1
   fi
@@ -330,8 +354,14 @@ run_step() {  # step skill paths pattern validator adopter
   # that appeared or moved is refused and named. The guard admits `git tag -a` (the owner's
   # global tag.gpgsign would sign it) and `git update-ref refs/heads/main HEAD` (which moves
   # the clone's main under the worktree); this read-back is what catches both.
-  local refs_before refs_after
+  local refs_before refs_after config_before config_after origin_url origin_pushurl
   refs_before="$(unit_refs "$unit" "$branch")"
+  # ... and the unit's git config, every entry with its file: Bash(git *) admits `git config`
+  # and `git remote set-url`, and a hooksPath, an fsmonitor or a remote written there would run
+  # under, or be pushed to by, the owner's own shell. Any key that differs afterwards is refused.
+  config_before="$(unit_config "$wt")"
+  origin_url="$(cgit -C "$unit" config --get remote.origin.url || true)"
+  origin_pushurl="$(cgit -C "$unit" config --get remote.origin.pushurl || true)"
   # TWIN_ENACT_MODE=operations: the refusing mode for the whole child, whatever twin/ENACT_MODE
   # says today (the guard reads the environment before the file: twin/enact_guard.py). The child
   # cannot merge and cannot push an enactment repository; a tag it makes is caught above.
@@ -361,19 +391,25 @@ run_step() {  # step skill paths pattern validator adopter
   # What did the model leave? First the unit's refs: a headless run writes one branch and
   # nothing else. Then uncommitted work is a step that did not finish. No commit is nothing to
   # propose. A commit is judged file by file against the step's allowed paths.
-  local dirty changed moved
+  local dirty changed moved changed_keys
+  config_after="$(unit_config "$wt")"
+  if [ "$config_after" != "$config_before" ]; then
+    changed_keys="$(diff <(echo "$config_before") <(echo "$config_after") | grep -E '^[<>]' | sed $'s/^[<>] [^\t]*\t//' | cut -d= -f1 | sort -u | tr '\n' ' ')"
+    echo "fail  $tag: the child changed the unit's git config: $changed_keys-- a hook, a monitor or a remote written there would run under, or be pushed to by, the owner's own shell. Branch kept at $wt, never pushed; repair the config by hand before the next run."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "child changed git config: $changed_keys" --base "$base"; return 1
+  fi
   refs_after="$(unit_refs "$unit" "$branch")"
   if [ "$refs_after" != "$refs_before" ]; then
     moved="$(diff <(echo "$refs_before") <(echo "$refs_after") | grep -E '^[<>]' | awk '{print $2}' | sort -u | tr '\n' ' ')"
     echo "fail  $tag: the child made or moved a ref besides its branch: $moved-- a headless run writes one branch and nothing else (a tag would carry the owner's global tag.gpgsign; refs/heads/main moving would shift the clone under the worktree). Branch kept at $wt, never pushed; remove the ref by hand."
     refuse "$step" "$adopter" "$branch" "$title" "$body" "child made or moved refs: $moved" --base "$base"; return 1
   fi
-  dirty="$(git -C "$wt" status --porcelain --untracked-files=all)"
+  dirty="$(cgit -C "$wt" status --porcelain --untracked-files=all)"
   if [ -n "$dirty" ]; then
     echo "fail  $tag: the model left uncommitted changes in $wt:"; echo "$dirty" | sed 's/^/        /'
     refuse "$step" "$adopter" "$branch" "$title" "$body" "uncommitted changes left in the worktree"; return 1
   fi
-  changed="$(git -C "$wt" diff --name-only "$base" HEAD)"
+  changed="$(cgit -C "$wt" diff --name-only "$base" HEAD)"
   if [ -z "$changed" ]; then
     echo "skip  $tag: nothing to propose (no commit on $branch)"
     cleanup_or_fail "$step" "$adopter" "$unit" "$wt" "$branch" skip "nothing to propose"; return $?
@@ -386,15 +422,20 @@ run_step() {  # step skill paths pattern validator adopter
   # signed first commit hides behind a clean second and a declaration added then deleted hides
   # behind a clean tree diff (review F1, proved over this script's own fixture). Refusals name
   # the commit and the fact; the count is recorded either way.
-  local commits sig_lines author committer c bad_commit=""
-  commits="$(git -C "$wt" rev-list --count "$base..HEAD")"
-  for c in $(git -C "$wt" rev-list "$base..HEAD"); do
-    sig_lines="$(git -C "$wt" cat-file commit "$c" | grep -c '^gpgsig')"
-    author="$(git -C "$wt" log -1 --format='%an <%ae>' "$c")"
-    committer="$(git -C "$wt" log -1 --format='%cn <%ce>' "$c")"
+  local commits sig_lines author committer trailers c bad_commit=""
+  commits="$(cgit -C "$wt" rev-list --count "$base..HEAD")"
+  for c in $(cgit -C "$wt" rev-list "$base..HEAD"); do
+    # the signature is a HEADER: read the header block only (up to the first blank line), so a
+    # `gpgsig` word in the message body is text, not a signature (review round 5, F5)
+    sig_lines="$(cgit -C "$wt" cat-file commit "$c" | sed '/^$/q' | grep -c '^gpgsig')"
+    author="$(cgit -C "$wt" log -1 --format='%an <%ae>' "$c")"
+    committer="$(cgit -C "$wt" log -1 --format='%cn <%ce>' "$c")"
+    # a Signed-off-by / Co-authored-by trailer is a person's name on a model's work
+    trailers="$(cgit -C "$wt" log -1 --format=%B "$c" | git interpret-trailers --parse | grep -Ei '^(Signed-off-by|Co-authored-by):' | grep -Fv "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" || true)"
     if [ "$sig_lines" != 0 ]; then bad_commit="commit ${c:0:7} carries a signature block"; break; fi
     if [ "$author" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then bad_commit="commit ${c:0:7} is authored as '$author', not the clock"; break; fi
     if [ "$committer" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then bad_commit="commit ${c:0:7} is committed as '$committer', not the clock"; break; fi
+    if [ -n "$trailers" ]; then bad_commit="commit ${c:0:7} carries a trailer naming someone but the clock: $(echo "$trailers" | head -1)"; break; fi
   done
   if [ -n "$bad_commit" ]; then
     echo "fail  $tag: $commits commit(s) on $branch and $bad_commit -- nobody at the keyboard signed or was named; a headless commit is the clock's and unsigned by design, and the merge is the human act. Branch kept at $wt, never pushed."
@@ -404,7 +445,16 @@ run_step() {  # step skill paths pattern validator adopter
     echo "fail  $tag: $commits commit(s) on $branch -- the headless brief asks for one and the clock admits one: history is where a signed commit or a declaration hides behind a clean tip. Branch kept at $wt, never pushed."
     refuse "$step" "$adopter" "$branch" "$title" "$body" "$commits commits on the branch, not 1" --base "$base" --commits "$commits"; return 1
   fi
-  local commit; commit="$(git -C "$wt" rev-parse HEAD)"
+  # The one commit's PARENT is the base, and it has one parent: an amend of the base folds the
+  # upstream commit's changes under the clock's name with parent base^, and a merge-shaped
+  # commit (-p base -p base^) is one commit too; either would make the record's `base` a lie
+  # about what the pushed commit sits on (review round 5, F3).
+  local commit parents; commit="$(cgit -C "$wt" rev-parse HEAD)"
+  parents="$(cgit -C "$wt" rev-parse 'HEAD^@' | tr '\n' ' ')"
+  if [ "$parents" != "$base " ]; then
+    echo "fail  $tag: commit ${commit:0:7} has parent(s) $parents-- not the base ${base:0:7} alone: an amended base or a merge-shaped commit is not a proposal on origin/main, whatever the record would say. Branch kept at $wt, never pushed."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "commit $commit parents [$parents] are not the base $base" --base "$base" --commits 1; return 1
+  fi
   echo "ok    $tag: 1 commit ${commit:0:7} on origin/main@${base:0:7}; signature: none; author: $author; committer: $committer"
   local f ok bad=""
   while IFS= read -r f; do
@@ -466,18 +516,25 @@ run_step() {  # step skill paths pattern validator adopter
       echo "ok    $tag: $(tail -1 "$vout" | sed "s#$wt/##" | cut -c1-160)"
     fi
   done <<<"$changed"
-  [ -s "$title" ] || git -C "$wt" log -1 --format=%s >"$title"
-  [ -s "$body" ] || { git -C "$wt" log -1 --format=%b >"$body"; printf '\n%s\n' "Made by the local clock (talk/local-clock.sh, ticket 92), run $RUN_ID, on origin/main@${base:0:7}. A model ran on the owner's local clock, not on a GitHub clock. No override is claimed. The commit is unsigned and authored as the clock: nobody at the keyboard signed it, and the merge is the human act. Never merged by the clock." >>"$body"; }
+  [ -s "$title" ] || cgit -C "$wt" log -1 --format=%s >"$title"
+  [ -s "$body" ] || { cgit -C "$wt" log -1 --format=%b >"$body"; printf '\n%s\n' "Made by the local clock (talk/local-clock.sh, ticket 92), run $RUN_ID, on origin/main@${base:0:7}. A model ran on the owner's local clock, not on a GitHub clock. No override is claimed. The commit is unsigned and authored as the clock: nobody at the keyboard signed it, and the merge is the human act. Never merged by the clock." >>"$body"; }
 
   if [ "$PUSH" = 1 ]; then
     local repo="policy-as-versioned-$adopter/$adopter" url tip_now
     # origin/main may have moved since the fetch; the branch lands on the fetched base and the
     # record says which tip origin had at push time (review F6)
-    tip_now="$(GIT_TERMINAL_PROMPT=0 git -C "$wt" ls-remote --exit-code origin refs/heads/main 2>/dev/null | cut -f1)"
+    # the remote the branch goes to is the one the step began with (the config snapshot above
+    # already refused a rewrite; this is the second net, read just before the push)
+    if [ "$(cgit -C "$unit" config --get remote.origin.url || true)" != "$origin_url" ] \
+       || [ "$(cgit -C "$unit" config --get remote.origin.pushurl || true)" != "$origin_pushurl" ]; then
+      echo "fail  $tag: remote.origin.url or pushurl changed since the step began ('$origin_url' -> '$(cgit -C "$unit" config --get remote.origin.url || true)'); not pushing. Branch kept at $wt."
+      record --step "$step" --adopter "$adopter" --status fail --reason "remote.origin.url changed during the step" --branch "$branch" --base "$base"; return 1
+    fi
+    tip_now="$(GIT_TERMINAL_PROMPT=0 cgit -C "$wt" ls-remote --exit-code origin refs/heads/main 2>/dev/null | cut -f1)"
     if [ -n "$tip_now" ] && [ "$tip_now" != "$base" ]; then
       echo "note  $tag: origin/main is ${tip_now:0:7} now, ${base:0:7} when fetched -- the branch lands on the fetched base"
     fi
-    if GIT_TERMINAL_PROMPT=0 git -C "$wt" push -q -u origin "$branch" 2>"$RUN_DIR/$tag.push.err" \
+    if GIT_TERMINAL_PROMPT=0 cgit -C "$wt" push -q -u origin "$branch" 2>"$RUN_DIR/$tag.push.err" \
        && url="$("$GH" pr create --repo "$repo" --base main --head "$branch" --title "$(cat "$title")" --body-file "$body" 2>"$RUN_DIR/$tag.pr.err")"; then
       echo "ok    $tag: pushed $branch and opened $url"
       record --step "$step" --adopter "$adopter" --status ok --branch "$branch" --pr "$url" \
