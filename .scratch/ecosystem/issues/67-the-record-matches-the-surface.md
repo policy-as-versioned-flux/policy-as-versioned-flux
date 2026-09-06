@@ -183,7 +183,10 @@ none of these is a purpose, date, identity, money, authorisation or a real perso
 11. **The disclaimer is three fixed phrases, and `verify/cited-truth/`'s two plus `run=local`.**
     *delegated* (review F1). `not citable` is the estate's own words; `fixture=1` and `run=local`
     are the tokens `talk/verify-all.sh` writes itself on a line that is not a citable measurement,
-    so a line quoting such a TRUTH line verbatim needs no extra disclaimer. Nothing else. The
+    so a line quoting such a TRUTH line verbatim OUTSIDE A CODE SPAN needs no extra disclaimer
+    (corrected 2026-09-06 after review: code spans are blanked before the phrase test, so a TRUTH
+    line quoted in backticks -- the shape map.md line 103 uses -- is graded and must say `not
+    citable` in its prose). Nothing else. The
     seven-word bag is what a reader would have written; it is also what laundered.
 12. **A correction disposes only for the paragraph it immediately follows.** *delegated* (review
     F2). The alternative the review offered — require the corrected claim to be rewritten in place
