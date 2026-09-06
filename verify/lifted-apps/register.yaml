@@ -1,0 +1,55 @@
+# Eco-system ticket 33 — which app went to which adopter, and with what.
+#
+# Ticket 13's resolution, item 1 (2026-08-28): "The three apps with an institutional home move
+# now. ledger goes to tuppence, storefront to driftwood, reports to ludlow. A lift is a re-label
+# to `policy-as-versioned.dev/policy-version`, a re-pin to the adopter's composed artefact, and a
+# renovate.json that enables the stack's manager and the dependency dashboard." `api` and
+# `datastore` wait; they are deliberately absent from this file rather than listed as pending,
+# because a row here is a claim this grader measures and there is nothing yet to measure.
+#
+# `origin_commit` is the tree that was lifted. It is not decoration: it is what lets a reader
+# diff the adopter's `source_dir` against the incumbent repository and see exactly what changed
+# in the move (the re-label, the dropped `k8s/` manifest, the dropped release workflow) without
+# taking this file's word for any of it.
+#
+# `image` / `image_publisher`: the digest the incumbent repository's own manifest pinned, and who
+# publishes it. They are separate fields on purpose — the grader counts the rows where the
+# publisher is still the incumbent org and prints that count on every run, so the one part of
+# these lifts that did NOT move cannot quietly become prose that nobody re-reads.
+
+lifts:
+- app: ledger
+  origin: policy-as-versioned-flux/ledger
+  origin_commit: 036bb972dd733eb12c00791415b145648d453e18
+  adopter: tuppence
+  served: gitops/apps/ledger.yaml
+  source_dir: apps/ledger
+  stack_manifest: apps/ledger/pom.xml
+  renovate_manager: maven
+  image: ghcr.io/policy-as-versioned-flux/ledger@sha256:9709e1075a503fe59ca85deae2b748fcbbfd80b464e56d2e1f82ec8182268111
+  image_publisher: policy-as-versioned-flux
+  pull_request: https://github.com/policy-as-versioned-tuppence/tuppence/pull/21
+
+- app: storefront
+  origin: policy-as-versioned-flux/storefront
+  origin_commit: a97344e4ba767564192240278492456ef76b8b2d
+  adopter: driftwood
+  served: gitops/apps/storefront.yaml
+  source_dir: apps/storefront
+  stack_manifest: apps/storefront/package.json
+  renovate_manager: npm
+  image: ghcr.io/policy-as-versioned-flux/storefront@sha256:ef53f41d380af4f56aa3e1f1e4ad922fa64e8f47361a41e83822fa8ace0f96bc
+  image_publisher: policy-as-versioned-flux
+  pull_request: https://github.com/policy-as-versioned-driftwood/driftwood/pull/27
+
+- app: reports
+  origin: policy-as-versioned-flux/reports
+  origin_commit: b809e063514dedee5a1df8701d71d3a1856d5693
+  adopter: ludlow
+  served: gitops/apps/reports.yaml
+  source_dir: apps/reports
+  stack_manifest: apps/reports/requirements.txt
+  renovate_manager: pip_requirements
+  image: ghcr.io/policy-as-versioned-flux/reports@sha256:36dc3d7d1bd5193f46a55d57b505beb5e99d7925f65b0fad3c1f7d1aeafefcf5
+  image_publisher: policy-as-versioned-flux
+  pull_request: https://github.com/policy-as-versioned-ludlow/ludlow/pull/18
