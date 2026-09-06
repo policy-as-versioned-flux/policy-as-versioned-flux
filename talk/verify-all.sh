@@ -313,8 +313,30 @@ enact="$(ENACT_HUB_ROOT="$ROOT" python3 -c 'import os, sys; sys.path.insert(0, o
 # stdout line is read, and anything that is not a mode-shaped word becomes an honest `unknown`.
 case "$enact" in ''|*[!a-z-]*) enact=unknown;; esac
 
+TRUTH_LINE="TRUTH $(date -u +%Y-%m-%dT%H:%MZ) run=${GITHUB_RUN_NUMBER:-local} hub=$(git rev-parse --short HEAD) enact=${enact} units=[${units# }] ${counts}$([ "$REQUIRE_LIVE" = 1 ] && echo " live=1")$([ -n "$FIXTURE" ] && echo " fixture=1")"
+
+# THE GRADE TABLE (ticket 59). The TRUTH line carries the COUNTS; until now nothing carried the
+# grade of each named script, so NORTH-STAR §5's "ticket Status: is derived from a named check"
+# had nothing to derive from. The capture files are not it: verify-all.sh grades a script by its
+# EXIT CODE, and a capture's last line is only the reason -- 29 of 107 captures on 2026-09-06 end
+# in the continuation of a multi-line PASS: sentence, so reading a grade out of one is a proxy,
+# and a proxy is how the estate has been wrong before.
+#
+# So the run records what it graded, beside the captures, inside the observation lane the cage
+# already commits (`talk/captures`, ADR-0024 D1) and with an extension no `*.out` glob picks up.
+# The file opens with this run's own TRUTH line, so a reader can tie the table to the number:
+# verify/derived-status/ refuses to derive anything from a table whose line is not the newest one
+# talk/truth.log recorded.
+{
+  echo "# talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,"
+  echo "# one row per script, TAB separated: path, status, the last line of its capture."
+  echo "# Written by the run whose TRUTH line follows, and committed with the captures it grades."
+  echo "# ${TRUTH_LINE}"
+  cat "$RESULTS"
+} >"$CAPDIR/_grades.tsv"
+
 echo
-echo "TRUTH $(date -u +%Y-%m-%dT%H:%MZ) run=${GITHUB_RUN_NUMBER:-local} hub=$(git rev-parse --short HEAD) enact=${enact} units=[${units# }] ${counts}$([ "$REQUIRE_LIVE" = 1 ] && echo " live=1")$([ -n "$FIXTURE" ] && echo " fixture=1")"
+echo "${TRUTH_LINE}"
 
 if [ "${#durs[@]}" -gt 0 ]; then
   echo

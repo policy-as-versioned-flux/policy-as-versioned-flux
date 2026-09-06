@@ -1,7 +1,7 @@
 # 77 — Every pin is checked for content, and the estate consumes itself the way it tells adopters to
 
 Type: task (AFK build, HITL tag dispatch)
-Status: resolved (items 2 and 3 wait on the owner's dispatch; the insurer's half of item 1 is armed but inert until a platform release carries the rule -- Waits item 3; item 6 is the 56+85 builder's)
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -274,3 +274,9 @@ would serve:
    here can be pre-staged: writing a tag that does not exist is fabrication.
 4. **Push and merge** the seven unit branches (`ticket-62-and-77` on platform, driftwood,
    tuppence, ludlow, ico, feeds, insurer), as `pavc-other-hand`.
+
+> **Status note, 2026-09-06 (eco-system ticket 59).** NORTH-STAR §5 says this ticket's
+> `Status:` is a DERIVED field, so it now carries the vocabulary word and nothing else
+> (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
+> field used to say, kept verbatim because it is the qualification a reader needs:
+> “(items 2 and 3 wait on the owner's dispatch; the insurer's half of item 1 is armed but inert until a platform release carries the rule -- Waits item 3; item 6 is the 56+85 builder's)”

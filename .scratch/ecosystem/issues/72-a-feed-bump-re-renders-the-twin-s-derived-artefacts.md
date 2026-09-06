@@ -1,7 +1,7 @@
 # 72 — A feed bump re-renders the twin's derived artefacts
 
 Type: task (AFK)
-Status: resolved (AFK scope built 2026-09-03; the citable bump-commit run waits on the owner)
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -154,3 +154,9 @@ pushed to driftwood.
   PR it opens is a human act.
 
 Map line: 72 built 2026-09-03 — a feed bump re-derives feed.json and signals.yaml in the bump commit (completer + widened fileFilters); twin-sweep's moved branch, dead under bash -e since written, now runs, proposes both files and appends moved=true observations; verify-twin-sweep-moved.sh could-not-look until it fires live; driftwood branch waits on the owner's push, the bump-commit TRUTH run on the next feed tag.
+
+> **Status note, 2026-09-06 (eco-system ticket 59).** NORTH-STAR §5 says this ticket's
+> `Status:` is a DERIVED field, so it now carries the vocabulary word and nothing else
+> (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
+> field used to say, kept verbatim because it is the qualification a reader needs:
+> “(AFK scope built 2026-09-03; the citable bump-commit run waits on the owner)”

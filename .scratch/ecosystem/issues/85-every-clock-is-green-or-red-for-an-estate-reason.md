@@ -1,7 +1,7 @@
 # 85 — Every clock is green, or red for an estate reason
 
 Type: task (AFK)
-Status: resolved for what an agent can build (both unowned reds fixed and every red now names its ticket; "green on the newest run" waits on the merges of the three pushed unit branches and the next scheduled runs)
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -138,3 +138,9 @@ Map line: Ticket 85 -- the two unowned red clocks are fixed at the source (feeds
    upstream clock run and must not fake one.
 3. **The three reds this ticket does not own**: driftwood twin-sweep (72), tuppence and ludlow
    propose-tier (62), insurer requote (77). Each is named in the gate's output with its ticket.
+
+> **Status note, 2026-09-06 (eco-system ticket 59).** NORTH-STAR §5 says this ticket's
+> `Status:` is a DERIVED field, so it now carries the vocabulary word and nothing else
+> (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
+> field used to say, kept verbatim because it is the qualification a reader needs:
+> “for what an agent can build (both unowned reds fixed and every red now names its ticket; "green on the newest run" waits on the merges of the three pushed unit branches and the next scheduled runs)”

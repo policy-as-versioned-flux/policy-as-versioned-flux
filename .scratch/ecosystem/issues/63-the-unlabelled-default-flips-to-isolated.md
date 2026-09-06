@@ -1,7 +1,7 @@
 # 63 — The unlabelled default flips to isolated
 
 Type: task (AFK)
-Status: resolved (platform half built; the cut, the adopter pins and the recompose wait on the owner and ticket 64)
+Status: resolved
 Blocked by: 58 (resolved 2026-08-31; no wait remained as of 2026-09-02)
 
 ## Question
@@ -761,3 +761,9 @@ ludlow all still exist; nothing was deleted.
   today (from "the branch lives only in retired 2.0.1" to "5.0.0 carries it, relabel the fixtures
   to 5.0.0 before trusting this tail") and it names its own next step. Relabelling belongs with the
   cut, not before it.
+
+> **Status note, 2026-09-06 (eco-system ticket 59).** NORTH-STAR §5 says this ticket's
+> `Status:` is a DERIVED field, so it now carries the vocabulary word and nothing else
+> (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
+> field used to say, kept verbatim because it is the qualification a reader needs:
+> “(platform half built; the cut, the adopter pins and the recompose wait on the owner and ticket 64)”

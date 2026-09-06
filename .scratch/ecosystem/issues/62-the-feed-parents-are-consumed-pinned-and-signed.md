@@ -1,7 +1,7 @@
 # 62 — The feed parents are consumed pinned and signed
 
 Type: task (AFK)
-Status: resolved (the done clause's citable green run waits on the owner's three adopter releases -- see ticket 77's Waits item 1)
+Status: resolved
 Blocked by: 57
 
 ## Question
@@ -293,3 +293,9 @@ the versions a pull request **adds or retires**, so both are green the same day 
 against the same evidence. tuppence's last green `shift-left` is 2026-08-28. Nothing was changed
 to make it green; the diagnosis is recorded in the file itself and in ticket 64's Answer, and what
 it waits on is in ticket 64's `## Waits on the owner`.
+
+> **Status note, 2026-09-06 (eco-system ticket 59).** NORTH-STAR §5 says this ticket's
+> `Status:` is a DERIVED field, so it now carries the vocabulary word and nothing else
+> (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
+> field used to say, kept verbatim because it is the qualification a reader needs:
+> “(the done clause's citable green run waits on the owner's three adopter releases -- see ticket 77's Waits item 1)”
