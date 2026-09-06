@@ -181,7 +181,39 @@ machine: offline half PASS, marker SKIP, exit 3, 33.6 s.
 
 ### Verify commands run on this branch (2026-09-06, this machine, load 25 so the full pytest suite is quoted from CI, below)
 
-Recorded in the pull request body and in the section that follows.
+Pull request 47, branch `ticket-92-the-local-clock-round-4` at 491e5a3 (rebased onto `origin/main`
+4c8af62). Every line below was watched arrive, not predicted.
+
+- `bash talk/verify-all.sh --selfcheck` — PASS.
+- `bash verify/truth-line/verify-truth-line.sh` — PASS: 110 verify scripts placed; measured 69 passes
+  (observed 16 + self 40 + simulated 6 + meta 7) against a ceiling of 90 of 109.
+- `bash verify/every-green/verify-every-green.sh` — PASS: none of the 110 discovered scripts prints
+  SKIP and then exits 0.
+- `bash verify/can-record/verify-can-record.sh` — PASS: every recorded TRUTH line was added by a
+  clock commit naming the same run; six fixture states record exactly when the guard says so.
+- `bash verify/schedules/verify-schedules.sh` — FAIL: 3 (insurer/fetch.yml, ludlow, tuppence), the
+  same three ticket 100 recorded on 2026-09-05; not this ticket's.
+- `bash verify/local-clock/verify-local-clock.sh` — offline PASS (stand-ins over a throwaway adopter
+  and bare origin, said so on the line), then on this machine: README names its 7 flags exactly; no
+  injected mark on HEAD of 9 repositories or origin/main of 9 (oldest last updated 0h ago), 0 live
+  local-clock branches, 0 rehearsal branches; no run=local TRUTH line since 2026-09-03; plist holds
+  no credential; marker absent — SKIP, exit 3, 33.6 s.
+- `.venv/bin/python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores`
+  — Success: no issues found in 175 source files (and the helper `verify/local-clock/local_clock.py`
+  on its own: clean).
+- `.venv/bin/python -m pytest tests/test_local_clock.py -n0 -q` — 37 passed in 59.68s.
+- **The full pytest suite is quoted from CI**, `twin` run 34027150352 on this branch, because this
+  machine's load average was 25 (the brief's threshold is 10): job `tests`, `1 failed, 1983 passed
+  in 128.48s`; the one failure is `test_the_suite_is_green`, on
+  `flux_coverage_floor_is_still_reachable` (invariant 45). Job `invariants`: `71 passed, 1 failed,
+  3 skipped`, the one FAIL the same invariant 45 (`3/1966 sample(s), only 60 days`); invariant 44
+  `drift_window_is_actually_being_sampled` PASSED on CI. `typecheck`, `demo`, three `determinism`
+  matrix legs and `reproduce-elsewhere` all succeeded. `main`'s three newest `twin` runs that
+  morning failed the same way, so the branch adds no red. Not measured here: the serial-only
+  `tests/test_seam1_cli.py` leak under `-n0`, which needs the whole suite serial on a quiet machine.
+- The `truth` run this push fired (34027150333, a branch run: it measures and records nothing,
+  ticket 100) was still `pending` behind other branches' runs when this was written; its result is
+  appended below if it arrived before the pull request was handed over.
 
 ### Decisions in this round, all delegated (ADR-0025)
 
