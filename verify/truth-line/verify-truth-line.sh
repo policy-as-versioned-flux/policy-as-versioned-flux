@@ -186,11 +186,19 @@ if parse_truth(old)["enact"] is not None:
 lines = [l for l in open("talk/truth.log", encoding="utf-8") if l.startswith("TRUTH ")]
 named = [parse_truth(l) for l in lines]
 with_mode = [t for t in named if t["enact"] is not None]
-for t in named:
-    if t["enact"] == "unknown":
-        problems.append(f"run {t['run']} recorded enact=unknown: the gate could not resolve the "
-                        f"mode at all, which is a broken twin/, not a mode")
 last = named[-1] if named else None
+# Only the NEWEST recorded line is graded for `unknown` (review, 2026-09-06). talk/truth.log is
+# append-only and verify-can-record.sh refuses a hand-edited line, so a historical `unknown` graded
+# forever would be a red with no finishing move -- the shape ticket 55 rules out. The newest line is
+# the one leg 4 already grades, and fixing twin/ clears it on the next scheduled run. Older
+# `unknown` lines are counted and named, not failed.
+stale_unknown = [t["run"] for t in named[:-1] if t["enact"] == "unknown"]
+if last and last["enact"] == "unknown":
+    problems.append(f"run {last['run']} recorded enact=unknown: the gate could not resolve the "
+                    f"mode at all, which is a broken twin/, not a mode")
+if stale_unknown:
+    print(f"  note: {len(stale_unknown)} older recorded line(s) say enact=unknown "
+          f"(runs {', '.join(map(str, stale_unknown))}); graded once, when each was newest")
 print(f"{len(with_mode)} of {len(lines)} recorded lines name the mode; the newest, run "
       f"{last['run'] if last else '(none)'}, says "
       + (f"enact={last['enact']}" if last and last["enact"] else "nothing (it predates the field)"))
@@ -199,7 +207,7 @@ raise SystemExit(1 if problems else 0)
 EOF
 )"; mrc=$?
 printf '  %s\n' "$mode"
-[ "$mrc" -eq 0 ] || note "the enactment mode on the TRUTH line does not read back as written"
+[ "$mrc" -eq 0 ] || note "the enactment mode does not read back as written, or the newest recorded run could not resolve one"
 
 if [ "$bad" -eq 0 ]; then
   echo "PASS: talk/verify-manifest.txt places every one of the $n verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all.sh turns an undeclared could-not-look and a stale ceiling red, the last TRUTH line talk/truth.log recorded adds up, the published 'can never pass' count is the population the ceiling was cut from, and the enactment mode the line carries reads back as written while a line predating that field reads as no mode at all"

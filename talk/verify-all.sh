@@ -305,8 +305,13 @@ fi
 # apostrophe, above): a checkout under a path with a quote in it would not error here, it would
 # quietly write `enact=unknown` on every line, which is a wrong answer that looks like an honest
 # one. os.path.join of an env var cannot be quote-confused.
-enact="$(ENACT_HUB_ROOT="$ROOT" python3 -c 'import os, sys; sys.path.insert(0, os.path.join(os.environ["ENACT_HUB_ROOT"], "twin")); import enact_guard; print(enact_guard.enact_mode())' 2>/dev/null)" || enact=""
-[ -n "$enact" ] || enact=unknown
+enact="$(ENACT_HUB_ROOT="$ROOT" python3 -c 'import os, sys; sys.path.insert(0, os.path.join(os.environ["ENACT_HUB_ROOT"], "twin")); import enact_guard; print(enact_guard.enact_mode())' 2>/dev/null | tail -n1 | tr -d '[:space:]')" || enact=""
+# The word is shape-checked before it is written (review, 2026-09-06). stderr is discarded above
+# but stdout is not: an import-time print or a warning routed to stdout would land in the field
+# verbatim and SPLIT the citable line in two, and truth.yml's `grep '^TRUTH '` would then append a
+# half-line with no counts to talk/truth.log -- a record nobody can repair. So only the last
+# stdout line is read, and anything that is not a mode-shaped word becomes an honest `unknown`.
+case "$enact" in ''|*[!a-z-]*) enact=unknown;; esac
 
 echo
 echo "TRUTH $(date -u +%Y-%m-%dT%H:%MZ) run=${GITHUB_RUN_NUMBER:-local} hub=$(git rev-parse --short HEAD) enact=${enact} units=[${units# }] ${counts}$([ "$REQUIRE_LIVE" = 1 ] && echo " live=1")$([ -n "$FIXTURE" ] && echo " fixture=1")"
