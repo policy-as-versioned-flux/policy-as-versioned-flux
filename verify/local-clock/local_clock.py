@@ -511,6 +511,28 @@ def check(hub: str, root: str, estate: str, now: dt.datetime | None = None) -> i
 def selfcheck() -> None:
     now = dt.datetime(2026, 9, 3, 12, tzinfo=dt.timezone.utc)
     with tempfile.TemporaryDirectory() as tmp:
+        # the fixture's own commits run no hook: the owner's global core.hooksPath runs a
+        # network secret scan on every commit, and a quota refusal there is not a fault of the
+        # thing under check (ticket 92 follow-up R2). The clock under check still reads the
+        # real global; only these fixture commits bypass it.
+        no_hooks = os.path.join(tmp, "no-hooks")
+        os.makedirs(no_hooks)
+        saved = {k: os.environ.get(k) for k in ("GIT_CONFIG_COUNT", "GIT_CONFIG_KEY_0", "GIT_CONFIG_VALUE_0")}
+        os.environ.update({"GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "core.hooksPath",
+                           "GIT_CONFIG_VALUE_0": no_hooks})
+        try:
+            _selfcheck_body(tmp)
+        finally:
+            for k, v in saved.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+
+
+def _selfcheck_body(tmp: str) -> None:
+    now = dt.datetime(2026, 9, 3, 12, tzinfo=dt.timezone.utc)
+    if True:
         root = os.path.join(tmp, RUN_ROOT)
         sig = os.path.join(tmp, "signal.yaml")
         with open(sig, "w") as fh:

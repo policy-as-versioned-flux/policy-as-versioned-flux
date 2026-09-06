@@ -347,3 +347,51 @@ machine at load 43-55 (the file takes ~100 s unloaded; each clock invocation in 
 the exception text was not captured, so the cause is not asserted here. `verify-local-clock.sh`
 with the same fixture cases: offline PASS, marker SKIP, exit 3. The suite is quoted from CI on the
 pushed head, below.
+
+## Follow-up, 2026-09-06 — two low residues after the round-5 approval (the assistant, delegated)
+
+PR 47 (head b340ec7) was approved on a re-review that closed every round-5 blocker by measurement
+on the reviewer's own bare origin, and merged as e5bca74. **Its own CI, cited:** `twin` runs
+34040997591 / 34040999459 on b340ec7, job `tests` `2 failed, 2039 passed in 200.62s` — invariant
+45 (`flux_coverage_floor_is_still_reachable`) and the standing serial-only
+`tests/test_seam1_cli.py::test_an_attestation_sidecar_accompanies_every_artefact` leak; job
+`invariants` 71 passed / 1 failed (45) / 3 skipped; invariant 44 PASS; typecheck, demo, three
+determinism legs and reproduce-elsewhere green (the `tests` line was also read by this session's
+watch). The ab8a6fb figures above are superseded.
+
+**R1, fixed — two trailer shapes slipped the F5 filter.** (a) `Signed-off-by: The Owner` on line
+2 of a one-paragraph message: `git interpret-trailers --parse` yields nothing without a blank
+line, so it was admitted. (b) `Co-authored-by: The Owner <...>, local clock (...) <...>`: `grep
+-Fv` dropped any line CONTAINING the clock identity, so it was admitted. Now the two keys are
+matched over the whole `%B`, and the value must EQUAL the clock's identity (`grep -Fvx`). Stubs
+`signoff2` and `coauthor`; red first (`assert 0 == 1`, both admitted), then refused naming
+"The Owner" in the fixture and in pytest.
+
+**R2, fixed — the local failure was the owner's global hook, not a read-back intermittent.** The
+reviewer's judgement, with the measurement: every fixture commit ran the owner's GLOBAL
+pre-commit hook (`~/.gitconfig core.hookspath=/Users/cns/.git/hooks` → ggshield secret scan, a
+network API call), which failed on quota that day; the `signed`/`asowner` pair failed in 1.24 s
+(reviewer) / 1.61 s (this session, `CalledProcessError` on the fixture's own commit), and passed in
+27.7 s with a hook-free global. The 992 s "1 failed" recorded above was that, not the clock. Now
+the FIXTURE's own git carries `-c core.hooksPath=<empty dir>` (tests: `GIT` / `_git`; selfcheck:
+`GIT_CONFIG_*` for its duration; the gate's `mkfixture` and controls: `fgit`) and so does the
+stand-in model's, because it is fixture too; the clock under test still reads the real global
+(`GIT_CONFIG_GLOBAL` never set on it; asserted by a test), which is what its config snapshot
+covers. Proved on this machine with the hook still installed: the pair `1 passed, 50 deselected in 2.01s real 2.46 `; the whole file
+`51 passed in 50.52s`; the gate offline PASS then SKIP exit 3 in 43.9 s. A `git config --global`
+by the child is refused too, proved under a throwaway `GIT_CONFIG_GLOBAL` copy of the owner's file
+(stub `globalcfg`; the key lands in the copy and the owner's file is asserted untouched). What the
+real model's commits will do: run the owner's hooks, so a ggshield quota refusal on a real run
+makes the model's commit fail and the clock records "uncommitted changes" — a fact about the
+owner's hook, said as such.
+
+Battery on this branch: `verify-local-clock.sh` offline PASS / marker SKIP / exit 3 (25 fixture
+runs); `verify-truth-line.sh`, `verify-every-green.sh` (112 scripts), `verify-can-record.sh`
+PASS; `mypy twin tests conftest.py` clean (177 files); the full suite is quoted from CI on the
+follow-up head (below, when it lands).
+
+Note on this commit itself (delegated): the owner's global ggshield pre-commit hook refused it with
+`no more API calls available` — the same quota failure R2 describes — so it was made with
+`-c core.hooksPath=<empty dir>`. The secret scan therefore did NOT run on this commit; the diff is
+shell, python and markdown, the fixture's ssh key is generated at test time and never committed,
+and the reviewer should read the diff with that in mind.
