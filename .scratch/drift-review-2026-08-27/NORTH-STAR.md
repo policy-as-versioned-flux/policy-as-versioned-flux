@@ -77,6 +77,16 @@ Add a dated banner to each. Do not rewrite history.
 
 ## 8. Decisions made after ratification
 
-The 41 re-grills were answered on 2026-08-28. The record is REGRILL-ANSWERS.md. Six of the answers overrode the assistant's recommendation and three reframed the question; all are binding on any future build. The 22 reversals in Appendix C still await the owner's yes or no.
+The 41 re-grills were answered on 2026-08-28. The record is REGRILL-ANSWERS.md. Six of the answers overrode the assistant's recommendation and three reframed the question; all are binding on any future build. All 22 reversals in Appendix C were **confirmed on 2026-08-28**, with one nuance: reversals 7, 14 and 15 are confirmed in the owner's own shape (schedule the LLM-free data gathering; package reasoning as Claude Code skills). The record is REGRILL-ANSWERS.md and GAPS.md line 0.7.
+
+> **Correction, 2026-09-06 (eco-system ticket 67 item (a)).** The sentence above said the 22
+> reversals were still awaiting the owner's answer, and went on saying it for nine days after
+> they had been answered. It is corrected in place rather than contradicted below, because a
+> correction appended under a claim it never removed leaves the record saying both things at
+> once. This file is the drift-review ORIGINAL and is kept as the record; the copy every
+> document cites is [`NORTH-STAR.md`](../../NORTH-STAR.md) at the repository root (eco-system
+> ticket 02), which diverged from this one on 2026-09-03 when ticket 95 added §0. The eco-system
+> map now links the root copy, so a reader following the map is not sent to this one.
+> `verify/map-surface/verify-map-surface.sh` grades both halves of that sentence.
 
 **2026-09-02.** Ticket 75 put twelve questions about the underlying goals to the owner, plus one on the currency controller and three follow-ups. Sixteen decisions are recorded in [ticket 75's Answer](../ecosystem/issues/75-grilling-what-is-this-for-the-twelve-questions.md), each labelled owner-reasoned, owner-instructed or delegated (ADR-0025). The ones that change this document: the purpose is a chain (talk, then reference implementation, then adoption available because open source, underwritten by the written argument); §4 is the assistant's build order, not the owner's definition of done; "at least three" coexisting versions binds in the owner's 2022 words; there is no gate, in the owner's words (a mutating admission controller, never a deliberate deny); a human merges binds, with a second identity as development-window theatre; the talk is a byproduct and a marketing tool; the twin derives a probability with a model run on the owner's machine; identity is designed and shelved for this build. Ticket 95 rewrites §0 to §6 accordingly.
