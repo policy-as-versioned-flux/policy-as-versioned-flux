@@ -134,9 +134,14 @@ Its strongest leg is an experiment rather than an assertion: the vendored conver
 a temporary directory holding nothing but itself and the vendored payload, with no publisher clone
 and no estate reachable, and RUN. A converter that will not run there is a FAIL.
 
-The full re-derivation — composing an adopter with a publisher's clone REMOVED and getting every
-signed price back — runs at the seam that owns it, `platform/compose/composition.py --selfcheck`,
-and this script does not restate it.
+The full re-derivation runs at the seam that owns it, `platform/compose/composition.py
+--selfcheck`, and this script does not restate it. That seam proves the stronger claim: with ico's
+clone removed, driftwood does not merely get the same PRICES back, it re-renders all 24 files of
+its composed artefact BYTE-IDENTICALLY — `composed/HEADER.yaml` and the parent SHAs included — so
+an adopter can run `composition.py verify` on its own signed tree with the publisher unreachable.
+That is what the provenance record's own `sha` field is for: a vendored tree is not a git
+repository, and without it `_resolve_unpinned_sha` would digest the copy and every re-derivation
+would disagree with the artefact it was re-deriving.
 
 **What it says today, and why that is a wait and not a pass:** no adopter has vendored anything,
 because the composition that vendors is on an unmerged platform branch and each adopter composes
@@ -177,9 +182,10 @@ which `fair.sum_prices` exists to refuse; the check now prints the three separat
     converter that priced it are vendored under the adopter's own signature, digested into a
     PROVENANCE.json the header names, with the converter's real source party recorded and a quote
     feed's absent converter named rather than faked
-    OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed, from its
-    own vendored payload and converter, and prints the substitution as an open limit; a tampered
-    vendored payload refuses against the digest its own tag signed
+    OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed and
+    re-renders all 24 files of its composed artefact BYTE-IDENTICALLY -- header, parent SHAs and
+    all -- from its own vendored payload and converter, printing the substitution as an open
+    limit; a tampered vendored payload refuses against the digest its own tag signed
     OK switching: a feed edge carrying no `since` refuses as a missing instrument naming the edge
     -- a pin's life is a window between two signed dates, never a default
 
@@ -242,7 +248,10 @@ vendored file that does not match the digest its own header signed.
 
     # platform (worktree, PAVC_ESTATE_CLONE set to the real clone)
     .venv/bin/python compose/composition.py --selfcheck      # exit 0
-    bash compose/verify-composition.sh                       # exit 0
+    bash compose/verify-composition.sh                       # exit 3 -- and exit 3 on
+      origin/main too, measured in a throwaway worktree rather than assumed: its step-2 SKIP
+      ("the composed set renders policy versions the pinned parent commit does not contain")
+      is the pre-existing pin/version state and nothing this ticket did
 
     # hub
     bash verify/portability/verify-portability.sh            # exit 3, the named wait
@@ -254,6 +263,17 @@ vendored file that does not match the digest its own header signed.
                                                              # Success: no issues in 177 files
 
 **Map line:** `- [45 — Switching cost computed in composition](issues/45-switching-cost-computed-in-composition.md) — `switching` stops being a reserved schema value and becomes a measured one: one entry per feed parent, priced by RE-COMPOSING with that publisher's edges dropped rather than by subtracting the line about to be lost, under the adopter's own perspective and currency, carried over the window between the edge's signed `since` and the composition's own as-of. A counterfactual that cannot be priced is a named could-not-look with no amount — driftwood's twin borrows the threat register's LEF and stops pricing without it, which no subtraction would have found. `composed/feeds/<party>/<version>/` vendors every priced payload, its publisher's party artefact and the converter that priced it, digested onto the header the adopter's own tag signs, so an adopter can re-derive its own signed prices with the publisher's clone absent. `verify/portability/` grades the served half against each publisher's tree at the tag that adopter pins, runs the vendored converter with nothing else on disk, and reports, per adopter and never totalled, what each prices today from a publisher whose clone it would need to re-derive any of it: driftwood GBP 1,920,138.92/yr, ludlow GBP 9,358,020.80/yr, tuppence GBP 9,262,365.33/yr.`
+
+## CI
+
+The `truth` workflow serialises across every branch at once (`concurrency: truth-${{ github.event_name }}`),
+and several builders pushed today, so **all three `truth` runs on this branch were CANCELLED, not
+green** — 34041169274, 34041955787 and 34042143614, each superseded while pending. That is quoted as
+what happened, not worked around: a cancelled run is not a pass and this branch has no citable
+observation of its own. The build brief (2026-09-03) already records that a branch TRUTH line is
+usually only in the Actions log and is not citable. The gate evidence for this ticket is therefore
+the local runs listed above, each with its exit code, and the checks that grade the record
+(`verify-map-surface`, `verify-cited-truth`) passing on this tree.
 
 ## Waits on the owner
 
