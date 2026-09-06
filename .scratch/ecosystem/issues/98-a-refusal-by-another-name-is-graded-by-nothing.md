@@ -1,7 +1,7 @@
 # 98 — A refusal by another name is graded by nothing
 
 Type: task (AFK)
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -93,3 +93,191 @@ safety claim must name the SERVED artefact and the OPERATION that reaches it, an
 against both.** The estate cannot currently do the second half — `kyverno apply` has no `UPDATE`
 mode, and no cluster has run these policies on a citable run — so three of the four were only
 catchable by reading, and the fourth only by running.
+
+## Answer
+
+Built 2026-09-06. A refusal by another name is graded by
+`verify/refusal-by-another-name/verify-refusal-by-another-name.sh`, discovered by
+`talk/verify-all.sh` (110 scripts on this branch, measured by `verify-truth-line.sh` and never
+typed into a check), with a row in `talk/verify-manifest.txt` as `estate-observation | waits:`
+declaring both of its could-not-looks. The live half is `graded/verify-graded.sh` step 8b on the
+platform branch, and it has now observed the refusal on a real API server.
+
+**Four legs, one per way the estate has actually produced this failure.** Each is red-first
+against the estate's OWN bodies, replayed on every run by `replays.py` — a grader that has never
+gone red is a grader nobody has tested:
+
+| leg | what it grades | the instance it catches |
+|---|---|---|
+| A | every name a mutation writes into a reference field is one the SAME RELEASE ships | 2 — `cage-isolated` where every served class is `cage-isolated-4-0-0` |
+| B | an UPDATE-scoped mutation is identical applied to its own output — EXECUTED, on every rung | 1b — the `waf-sidecar` appended twice |
+| C | a field written on UPDATE is one a running pod allows to change, joined to `register.yaml` | 3 and 4 |
+| D | a mutation writing `priorityClassName` writes the whole priority trio | 1a — the trio that refused every pod on every released line |
+
+**The live one is reported, not called a defect.** `register.yaml` records the decision ticket 89
+made (S3): `cage-tier` writes thirteen fields a running pod forbids, and when a pod's rung changes
+under it the API server refuses the edit — correctly, because the alternative is a workload moving
+itself off the bottom rung by asserting a label. The row carries the reason, the remediation
+(recreate) and the leg that bounds it, and the join is graded in BOTH directions: an unrecorded
+write fails, a row narrower or wider than the code fails, a row matching no served mutation fails.
+Narrowing the row to one field is asserted to go red on every run, so the acceptance can never
+become a blanket permission.
+
+### What the run observed
+
+* `verify-refusal-by-another-name.sh` PASSES in 28s on this machine: 4 mutating policies on the
+  served surface of the estate clone as it stands (`platform:v4.0.0`, `platform:v5.0.0`), 15
+  authoring or pruned copies named and not graded, all four replays red, leg B executing four
+  UPDATE-scoped mutations against their own output on all five rungs.
+* Against a clone carrying platform's current `origin/main` (ticket 89 merged), the same check
+  passes with 8 served mutations, including the four machinery policies inside the ResourceSet
+  template. That was measured through a throwaway root of symlinks, not by refreshing the shared
+  clone, which another builder was using.
+* **The refusal itself, observed live on kind-driftwood, 2026-09-06** (`graded/verify-graded.sh`
+  step 8b, whole script PASS). A pod admitted and caged at `quarantine`
+  (`cage-quarantine-4-0-0` / `-1000`), the Namespace's declared tier moved to `baseline`, then one
+  `kubectl label` on the running pod:
+
+  ```
+  The Pod "t98-probe" is invalid: spec: Forbidden: pod updates may not change fields other than
+  `spec.containers[*].image`,`spec.initContainers[*].image`,`spec.activeDeadlineSeconds`,
+  `spec.tolerations` (only additions to existing tolerations),`spec.terminationGracePeriodSeconds`
+  ...
+  - "PriorityClassName": "cage-quarantine-4-0-0",   + "PriorityClassName": "cage-baseline-4-0-0",
+  - "Priority": -1000,                              + "Priority": -10,
+  ```
+
+  No policy denied anything. Not citable: a local run, not a gate run.
+
+### Decisions
+
+**D1 (delegated). The check grades the SERVED surface and names everything it excludes, and that
+partition is the ticket.** Graded: platform's version directories for versions the array DECLARES
+and has CUT (`commit` present — `verify-declared-versions-admit.sh`'s own partition), the machinery
+documents inside `versions.yaml`'s ResourceSet template, an adopter's composed version tree its own
+array declares, and a declared-but-uncut tail (on no cluster, but what the next tag serves).
+Excluded, each named with its reason on every run: `graded/policies/` (no Kustomization applies it
+— ticket 89 round 1's mistake), `vselfcheck/`, and a version directory on disk the array no longer
+declares (Flux pruned it: history, not service). Fifteen copies fall in that last set today,
+including all three adopters' `composed/policies/v4.0.0`, whose own arrays declare 2.0.0/2.0.1/3.0.0.
+
+**D2 (delegated). Leg C flags a hazard and the register holds the decision; it does not decide
+alone.** Whether writing an immutable field on UPDATE actually refuses depends on whether the VALUE
+changes, which depends on the object at that moment and is not decidable offline. So the structural
+fact — this field, this operation — is what is graded, and the estate records what it means. That is
+ticket 89's register shape, and for the same reason: a decision that stops being visible stops
+being a decision.
+
+**D3 (delegated). Leg B probes UPDATE-scoped mutations only.** A CREATE-only mutation never meets
+its own output, because the object it writes does not exist until it has written it.
+
+**D4 (delegated). A missing kyverno CLI is a FAIL, not a could-not-look.** Leg B is the only leg
+that has ever caught one of these, and every other beat that needs the CLI declares no skip for it
+either. A runner that has lost its instrument goes red rather than shrugging.
+
+**D5 (delegated). The machinery is its own release group, so it may not borrow a version tree's
+PriorityClass.** The ResourceSet installs the machinery beside every version tree, and a version can
+be retired from the array and pruned at any time. A machinery cage naming `cage-isolated-4-0-0`
+would refuse every pod it caged the day 4.0.0 retired. That is why leg A groups by delivery unit
+rather than by cluster, and why ticket 89's unsuffixed `cage-isolated` is correct rather than sloppy.
+
+**D6 (delegated). A dial table indexed by a PINNED tier resolves to that rung only.** The machinery
+cages share `cage-tier`'s dial table and index it with `tier` pinned to `'isolated'`. Reading all
+four rungs' classes out of it would demand the machinery ship three PriorityClasses no policy of its
+can ever name — a red that is WRONG, which is worse than no check. Where the index is computed
+(`cage-tier`'s own ternary) every rung is read. Test first, red first.
+
+**D7 (delegated). The live half went into `graded/verify-graded.sh`'s tail, as the ticket says, and
+reaches the refusal by moving the NAMESPACE's declaration rather than adding a claim.** Ticket 89's
+exact route needs its machinery on a cluster and no cluster carries it yet. The Namespace is where
+the tier is declared (ADR-0022), so moving it produces the identical rung change on the identical
+two immutable fields. The claim route is printed as a NOT LOOKED AT line naming what is missing,
+rather than the tail going dark while the machinery is in flight.
+
+**D8 (delegated). The API server grades the offline table.** Kubernetes' refusal message enumerates
+the fields a pod update MAY change. Step 8b asserts that list is exactly the five
+`refusal_scan.MUTABLE_ON_UPDATE` carries, so the central constant of the offline check is measured
+against the real API server rather than believed. The day Kubernetes widens it, that step goes red
+and names the field.
+
+### The hard part: `kyverno apply` has no UPDATE mode, and it is worse than "matches nothing"
+
+Ticket 89 recorded that the CLI matches nothing against an UPDATE-scoped policy. Measured here on
+2026-09-06, it is more dangerous than that. It prints **"Mutation has been applied successfully"**,
+writes `<name>-mutated.yaml`, and the file it writes is the UNMUTATED resource; the counts line
+reads `pass: 0`. A beat that greps that sentence, or reads the file's existence, measures nothing
+and calls it a pass — which is the defect this ticket exists to catch, sitting inside the
+instrument the ticket has to use.
+
+What the build does about it, and it is four things, not one:
+
+1. **The limit is measured, not disclosed.** `assert_no_update_mode()` runs on every invocation:
+   an UPDATE-only policy, a resource it would match, and the requirement that the CLI apply
+   nothing. If a future CLI grows an UPDATE mode, that probe FAILS with "the disclosed limit has
+   LIFTED — rewrite this file". A disclosed limit is an assertion and goes stale like any other;
+   this one cannot.
+2. **Operation scoping is asserted STRUCTURALLY**, from `matchConstraints.resourceRules[].operations`
+   in the served manifest (leg C), never from a run.
+3. **The body is measured on a throwaway copy** whose operations are rewritten to CREATE, with
+   `namespaceSelector` (kyverno/kyverno#13605), the `oldObject` gate and any template-ranged
+   matchCondition removed — each difference from the served body printed beside the result.
+4. **Nothing may pass because nothing applied.** `applied` is the PASS COUNT, never a file's
+   existence; a policy no candidate pod reaches on any rung is a FAIL naming it; and the selfcheck
+   plants a policy that matches nothing and requires the leg to refuse it.
+
+One more thing the run found, and it changed the check: probing without a values file lands every
+pod on whatever the body's fail-closed else-branch happens to be. The v4.0.0 body lands on
+`baseline`, which carries no WAF sidecar — and the 2026-08-28 duplicate-sidecar defect replayed
+GREEN. A leg that cannot reach the rung the defect lived on is not a leg. Leg B now supplies the
+Namespace through a CLI values file and walks all four rungs plus the unlabelled case, and the
+replay comes back with the engine's own sentence:
+`.spec.containers: duplicate entries for key [name="waf-sidecar"]`.
+
+### Red first, exact output
+
+| what | red | green |
+|---|---|---|
+| the seam's 37 tests | `FileNotFoundError: .../refusal_scan.py` (collection error, before the module existed) | `37 passed in 0.06s` |
+| the pinned-tier dial lookup | `assert frozenset({'cage-baseline-4-0-0','cage-isolated-4-0-0'}) == frozenset({'cage-isolated-4-0-0'})` | passes; the machinery no longer needs three classes it cannot name |
+| replay 1b, the sidecar | `NOT CAUGHT -- leg B grades nothing` (probing without the values file, on `baseline`) | `error: failed to evaluate policy: ... .spec.containers: duplicate entries for key [name="waf-sidecar"]` |
+| replay 3, the full body on UPDATE | — | `13 unrecorded writes on a running pod` |
+| the register, narrowed to one field | — | `register row cage-tier* declares field set [...] and the code writes [...] -- the row no longer describes the code` |
+
+### What this cannot see
+
+`refusal_scan.BLIND_SPOTS`, five entries, every one DATED and printed on every run, and held
+non-empty and dated by a test. The first is the one that matters: whether the API SERVER accepts
+the mutated object is a cluster fact, and the live half has never had a cluster on a citable run
+(P2-6). The others: a mutation whose written VALUE differs from what the object already carries;
+the 2022 ClusterPolicy `rules[].mutate` and any other engine's mutation (none ships today);
+resources other than the pod, which are counted and named as untabulated rather than graded; and a
+JSONPatch path computed from something other than concatenated literals.
+
+Map line: `- [98 — A refusal by another name is graded by nothing](issues/98-a-refusal-by-another-name-is-graded-by-nothing.md) — the other way a workload is stopped is now graded: verify/refusal-by-another-name/ reads every mutation the estate SERVES and grades four things offline — a name written into a reference field is one the SAME RELEASE ships (the unsuffixed cage-isolated), the priority trio is whole (the trio that refused every pod on every released line), every write on UPDATE that a running pod forbids is on register.yaml with a reason, a remediation and the leg that bounds it, and every UPDATE-scoped mutation is EXECUTED against its own output on every rung and must come back identical (the waf-sidecar appended twice). All four instances the estate produced are replayed against its OWN bodies on every run and every one goes red; the fourth is LIVE and decided correct, so it is reported with its remediation (recreate) rather than called a defect, and the row is graded in both directions so it cannot outlive the code — narrowing it by one field is asserted to go red. The served partition is the ticket's own rule: graded are the declared-and-cut version trees, the machinery inside the ResourceSet template and the uncut tail; excluded and NAMED are graded/policies/ (no Kustomization applies it), vselfcheck/ and the fifteen version directories on disk that no array declares. kyverno apply has no UPDATE mode and is worse than that — it prints "Mutation has been applied successfully", writes an UNMUTATED file and counts pass:0 — so the limit is MEASURED on every run rather than disclosed (it goes red the day the CLI grows one), scoping is asserted structurally, the body runs on a throwaway copy whose every difference is printed, and applied means the pass count, so no step can pass because nothing applied. Probing without a values file was that same bug in this build: it landed every pod on baseline, where no sidecar exists, and replayed the 2026-08-28 defect GREEN. The live half is graded/verify-graded.sh step 8b, which OBSERVED the refusal on kind-driftwood on 2026-09-06 — a quarantine-caged pod, its Namespace moved to baseline, and one kubectl label refused with PriorityClassName cage-quarantine-4-0-0 -> cage-baseline-4-0-0 and Priority -1000 -> -10 — and which asserts the API server's own list of mutable-on-update fields is exactly the five the offline table carries, so the check's central constant is graded by the API server rather than believed. deny_register.BLIND_SPOTS now points at all of it.`
+
+## Waits on the owner
+
+Nothing. Both branches are pushed and both pull requests are open; the integrator merges.
+
+## Not done
+
+* **The claim route of instance 4 is not observed live.** Step 8b observes the same rung change by
+  moving the Namespace's declaration; ticket 89's exact route (label a bottom-rung pod with a served
+  version) needs `governed-namespace-cage` on a cluster, and kind-driftwood still carries the
+  pre-ticket-89 ValidatingPolicy. The step prints that as a NOT LOOKED AT line naming what is
+  missing rather than skipping.
+* **`graded/verify-graded.sh`'s live tail still asserts the two guards REFUSE**, as
+  ValidatingPolicies, which ticket 89 replaced with mutations. It passes today only because
+  kind-driftwood carries the old objects; the day platform's machinery reaches a cluster that tail
+  goes red for a reason that is ticket 89's, not this ticket's. Found while adding step 8b, not
+  fixed here: it is a rewrite of somebody else's beat, and doing it blind — with no cluster carrying
+  the new machinery to measure against — is exactly the reasoning-from-a-proxy this ticket is about.
+* **Only the pod's mutability is tabulated.** A mutation on any other resource is counted and named
+  as untabulated. None ships today.
+* **The adopters' composed trees are graded but empty of served content**: all three declare
+  2.0.0/2.0.1/3.0.0 in their composed-set arrays and carry only `composed/policies/v4.0.0` on disk,
+  so every adopter copy lands in the excluded set. That mismatch is real and is not this ticket's;
+  the check names it on every run rather than passing over it.
+* No `kyverno` CLI in the estate can evaluate an UPDATE, so nothing offline proves that an
+  UPDATE-scoped policy MATCHES what its manifest says it matches. That is asserted structurally and
+  said so, in the script, in the manifest row and here.

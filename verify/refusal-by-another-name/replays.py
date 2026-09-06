@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+"""replays.py -- the four instances, replayed against the estate's OWN bodies.
+
+A grader that has never gone red is a grader nobody has tested. Each replay below takes a real
+body out of the estate clone, puts it back in the state the defect was in, and requires the
+check to FAIL on it. Where a body is no longer on disk the replay says so and derives the
+fixture from the served body instead, so a check cannot go quietly untested because history was
+tidied away.
+
+  1a. THE PRIORITY TRIO (2026-08-28, ticket 26). `distribution/policies/v2.0.0/cage-tier.yaml`
+      is still on disk, retired from the array and pruned from every cluster. It writes
+      `priorityClassName` and neither `priority` nor `preemptionPolicy`, which is exactly why
+      every 2.x and 3.x line refused every pod. Leg D must go red on it.
+  1b. THE DUPLICATE SIDECAR (2026-08-28, ticket 26). The served cage body with its
+      `.filter(c, c.name != "waf-sidecar")` removed -- the whole of that day's fix. Leg B must
+      go red on it, and can only do so by RUNNING it.
+  2.  THE UNSUFFIXED PRIORITYCLASS (2026-09-05, ticket 89 round 2). `graded/policies/
+      cage-tier.yaml` is the authoring body the machinery cage was copied from, and its dial
+      table names `cage-baseline`, `cage-restricted`, `cage-quarantine`, `cage-isolated` --
+      unsuffixed, because it belongs to no version. Put that body in a served version's release
+      group, where every class is suffixed, and leg A must go red on all four names.
+  3.  THE FULL CAGE BODY ON UPDATE (2026-09-05, ticket 89 round 2). The served cage body on a
+      policy the register does not cover, matching UPDATE. Leg C must go red: a container
+      appended to an immutable list and two immutable priority fields rewritten on a running
+      pod.
+  4.  THE LIVE ONE (2026-09-05, ticket 89 S3). Not a defect and not replayed: the served
+      `cage-tier` writes those same fields on UPDATE today, and the register records the
+      decision. The assertion is that the check REPORTS it, names the remediation, and would go
+      red if the row stopped describing the code.
+"""
+
+from __future__ import annotations
+
+import copy
+import shutil
+import sys
+from pathlib import Path
+
+import yaml
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import refusal_probe as rp  # noqa: E402
+import refusal_scan as rs  # noqa: E402
+
+ROOT = HERE.parents[1]
+CLONE = ROOT / ".estate-clone"
+
+
+def _served_cage() -> tuple[dict, str]:
+    """The cage body the estate SERVES today: declared, cut, and reconciled by a Kustomization."""
+    mutations, _, _ = rs.scan_tree(ROOT)
+    served = [m for m in mutations
+              if m.surface == "served-cut" and m.name.startswith("cage-tier")]
+    if not served:
+        raise SystemExit("no served cage-tier on the surface at all -- nothing to replay against")
+    m = sorted(served, key=lambda x: x.path)[-1]
+    for doc in rs.read_documents((CLONE / m.path).read_text()):
+        if (doc.get("metadata") or {}).get("name") == m.name:
+            return doc, m.path
+    raise SystemExit(f"could not re-read {m.path}")
+
+
+def replay_1a() -> bool:
+    body = CLONE / "platform/distribution/policies/v2.0.0/cage-tier.yaml"
+    if body.is_file():
+        doc = [d for d in rs.read_documents(body.read_text())
+               if d.get("kind") in rs.MUTATING_KINDS][0]
+        where = "platform/distribution/policies/v2.0.0/cage-tier.yaml, the real retired body"
+    else:
+        doc, path = _served_cage()
+        doc = copy.deepcopy(doc)
+        expr = doc["spec"]["mutations"][0]["applyConfiguration"]["expression"]
+        for drop in ("priority: int(variables.dial.prio),", 'preemptionPolicy: "Never",'):
+            expr = expr.replace(drop, "")
+        doc["spec"]["mutations"][0]["applyConfiguration"]["expression"] = expr
+        where = f"derived from {path} (v2.0.0 is no longer on disk)"
+    broken = rs.priority_trio(rs.mutation(doc, surface="served-cut"))
+    print(f"  {'ok  ' if broken else 'FAIL'} replay 1a, the priority trio ({where}): "
+          f"{broken[0].why[:120] if broken else 'NOT CAUGHT -- leg D grades nothing'}")
+    return bool(broken)
+
+
+def replay_1b(kyverno: str) -> bool:
+    doc, path = _served_cage()
+    broken = copy.deepcopy(doc)
+    expr = broken["spec"]["mutations"][0]["applyConfiguration"]["expression"]
+    if '.filter(c, c.name != "waf-sidecar")' not in expr:
+        print("  FAIL replay 1b: the served cage no longer carries the 2026-08-28 sidecar "
+              "filter, so this replay cannot put the defect back -- rewrite it")
+        return False
+    broken["spec"]["mutations"][0]["applyConfiguration"]["expression"] = expr.replace(
+        '.filter(c, c.name != "waf-sidecar")', "")
+    p = rp.probe(kyverno, broken, f"<{path} with the 2026-08-28 sidecar filter removed>")
+    print(f"  {'ok  ' if not p.ok else 'FAIL'} replay 1b, the duplicate sidecar ({path}): "
+          f"{p.detail if not p.ok else 'NOT CAUGHT -- leg B grades nothing'}")
+    return not p.ok
+
+
+def replay_2() -> bool:
+    authoring = CLONE / "platform/graded/policies/cage-tier.yaml"
+    if authoring.is_file():
+        doc = [d for d in rs.read_documents(authoring.read_text())
+               if d.get("kind") in rs.MUTATING_KINDS][0]
+        where = "platform/graded/policies/cage-tier.yaml, the authoring body it was copied from"
+    else:
+        doc, path = _served_cage()
+        doc = copy.deepcopy(doc)
+        for var in doc["spec"]["variables"]:
+            var["expression"] = var["expression"].replace("-4-0-0", "").replace("-5-0-0", "")
+        where = f"derived from {path} (the authoring body is no longer on disk)"
+    m = rs.mutation(doc, path=where, surface="served-cut", group="platform:v4.0.0")
+    _, groups, _ = rs.scan_tree(ROOT)
+    shipped = groups.get("platform:v4.0.0", {})
+    dangling = rs.dangling_references(m, shipped)
+    names = ", ".join(d.name for d in dangling)
+    print(f"  {'ok  ' if dangling else 'FAIL'} replay 2, the unsuffixed PriorityClass ({where}): "
+          f"{'names ' + names + ' where the release ships ' + ', '.join(sorted(shipped.get('PriorityClass') or [])) if dangling else 'NOT CAUGHT -- leg A grades nothing'}")
+    return bool(dangling)
+
+
+def replay_3(register: dict) -> bool:
+    doc, path = _served_cage()
+    doc = copy.deepcopy(doc)
+    # ticket 89 round 2's shape: the bottom-rung cage, full body, matching UPDATE. The register
+    # covers `cage-tier*` and nothing else, so this must be an unrecorded hazard.
+    doc["metadata"]["name"] = "governed-namespace-cage"
+    for rule in doc["spec"]["matchConstraints"]["resourceRules"]:
+        rule["operations"] = ["CREATE", "UPDATE"]
+    m = rs.mutation(doc, path=path, surface="served-cut", group="platform:v4.0.0")
+    _, groups, _ = rs.scan_tree(ROOT)
+    v = rs.grade([m], groups.get("platform:v4.0.0", {}), register)
+    caught = v.code == 1 and any("no register row" in ln for ln in v.lines)
+    n = len([ln for ln in v.lines if "no register row" in ln])
+    print(f"  {'ok  ' if caught else 'FAIL'} replay 3, the full cage body on UPDATE "
+          f"(governed-namespace-cage, from {path}): "
+          f"{str(n) + ' unrecorded writes on a running pod' if caught else 'NOT CAUGHT -- leg C grades nothing'}")
+    return caught
+
+
+def replay_4(register: dict) -> bool:
+    mutations, groups, _ = rs.scan_tree(ROOT)
+    v = rs.grade(mutations, groups, register)
+    reported = [ln for ln in v.lines if "accepted refusal" in ln]
+    remediation = [ln for ln in v.lines if "remediation:" in ln]
+    ok = bool(reported) and bool(remediation) and v.code == 0
+    print(f"  {'ok  ' if ok else 'FAIL'} instance 4, LIVE and decided: "
+          f"{'reported as an accepted refusal with its remediation, not as a defect' if ok else 'the live instance is NOT reported -- either the row went stale or the code moved'}")
+    # ...and the row is not a blanket permission: narrow it and the check goes red
+    narrowed = copy.deepcopy(register)
+    if narrowed.get("accepted"):
+        narrowed["accepted"][0]["fields"] = ["spec.priorityClassName"]
+    still_red = rs.grade(mutations, groups, narrowed).code == 1
+    print(f"  {'ok  ' if still_red else 'FAIL'} the acceptance is not a blanket permission: a "
+          f"row narrower than the code {'fails' if still_red else 'PASSES, so the row grades nothing'}")
+    return ok and still_red
+
+
+def main() -> int:
+    kyverno = shutil.which("kyverno")
+    if not kyverno:
+        print("FAIL: the kyverno CLI is not on PATH, so the replay that can only be measured by "
+              "RUNNING a policy could not run")
+        return 1
+    register = yaml.safe_load((HERE / "register.yaml").read_text()) or {}
+    results = [replay_1a(), replay_1b(kyverno), replay_2(), replay_3(register),
+               replay_4(register)]
+    return 0 if all(results) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
