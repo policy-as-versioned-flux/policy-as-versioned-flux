@@ -46,7 +46,11 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 "$PY" "$HERE/fold_agreement.py" --selfcheck >/dev/null \
   || { echo "FAIL: fold_agreement.py --selfcheck -- the planted rules no longer grade as written"; exit 1; }
 
-log="$(mktemp)"; "$PY" "$HERE/fold_agreement.py" "$ESTATE" | tee "$log"; rc=${PIPESTATUS[0]}
+# 2>&1 into the tee: a grader that stops before it grades anything says WHY on stderr, and a
+# red whose reason reached only the terminal is a red nobody can act on. Measured during
+# ticket 101's review: a failed planting printed "FAIL: ... without grading a single
+# adopter gate:" with nothing after the colon.
+log="$(mktemp)"; "$PY" "$HERE/fold_agreement.py" "$ESTATE" 2>&1 | tee "$log"; rc=${PIPESTATUS[0]}
 case $rc in
   # The PASS line is the module's own SUMMARY, quoted rather than restated, so it names HOW MANY
   # gates answered instead of hard-coding "the three adopters" over however many did. It says what

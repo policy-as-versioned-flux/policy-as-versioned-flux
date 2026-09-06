@@ -185,3 +185,33 @@ def test_the_planting_is_hermetic_against_the_operators_git_config(grader: Modul
     env = grader._hermetic_git()
     assert set(env) == {"GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM"}
     assert all(value == os.devnull for value in env.values())
+
+
+# --------------------------------------------------------------------------------------------
+# the cold environment — ticket 101 review, F2
+# --------------------------------------------------------------------------------------------
+def test_the_cold_environment_clears_no_proxy(grader: ModuleType, tmp_path) -> None:
+    """Setting the proxies is not enough to make the network unreachable. Measured 2026-09-06:
+    with an ambient `NO_PROXY=*` exported, Go bypasses the closed port, cosign reaches Sigstore's
+    CDN, and the offline measurement returns 0 — so the number printed would read "no network
+    needed" for a gate that had just used the network. A measurement that fails in the reassuring
+    direction is worse than none, because nobody looks behind a green one."""
+    cold = grader.COLD_ENV(tmp_path / "home", tmp_path / "tuf")
+    assert cold["NO_PROXY"] == ""
+    assert cold["no_proxy"] == ""
+
+
+def test_the_cold_environment_sets_both_spellings_of_every_proxy(grader: ModuleType, tmp_path) -> None:
+    """Go reads the lowercase spellings too, and a tool that reads only those would have walked
+    straight past an upper-case-only block."""
+    cold = grader.COLD_ENV(tmp_path / "home", tmp_path / "tuf")
+    for upper, lower in (("HTTPS_PROXY", "https_proxy"), ("HTTP_PROXY", "http_proxy"),
+                         ("ALL_PROXY", "all_proxy")):
+        assert cold[upper] and cold[lower], (upper, lower)
+        assert "127.0.0.1:1" in cold[lower]
+
+
+def test_the_cold_environment_isolates_the_caches_it_is_given(grader: ModuleType, tmp_path) -> None:
+    cold = grader.COLD_ENV(tmp_path / "home", tmp_path / "tuf")
+    assert cold["HOME"] == str(tmp_path / "home")
+    assert cold["TUF_ROOT"] == str(tmp_path / "tuf")

@@ -169,7 +169,7 @@ down itself). And a trust root that goes stale now REFUSES LOUDLY AND BY NAME --
 the certificate carries and the file that does not -- instead of silently fetching a fresh one.
 Refreshing `trusted_root.json` becomes a real maintenance obligation, and Sigstore rotating a log
 would turn ludlow's gate red until a reviewed commit lands. That is the correct failure and it is
-a cost; ticket 103 proposes a staleness report so it arrives as a schedule rather than a surprise.
+a cost; ticket 105 proposes a staleness report so it arrives as a schedule rather than a surprise.
 
 **A bundle shape the gate cannot read is refused before cosign is called** (`delegated`). Choosing
 trust material means reading the bundle; calling cosign without it is exactly the live TUF fetch
@@ -244,7 +244,7 @@ proxy pointed at a closed port. Today: ludlow 0, driftwood 1, tuppence 1.
 run**, and both said the opposite in their own docstrings ("offline"; "no network at all"). Not a
 correctness hole -- the fetched root is genuine -- but an availability dependency in a required
 check, a trust-distribution difference nobody chose, and a false sentence. The sentences are
-corrected and the number is printed; closing the difference is charted as **ticket 103**, with the
+corrected and the number is printed; closing the difference is charted as **ticket 105**, with the
 three things that have to be decided rather than typed.
 
 **Caused, then fixed: this build's own first green run was false.** This machine's global
@@ -273,7 +273,7 @@ checking that observations were really made.
    permanently where a corrected sentence would go stale again.
 4. **The offline measurement is reported, never graded** (`delegated`). Grading it would make two
    adopters red on a property this ticket did not undertake to give them, and a red with no ticket
-   behind it teaches readers to ignore reds. It is a number on every run, and ticket 103 flips it.
+   behind it teaches readers to ignore reds. It is a number on every run, and ticket 105 flips it.
 5. **The hub check re-runs each adopter's own gate for the offline measurement rather than calling
    cosign itself** (`delegated`). The first draft hand-rolled a flagless `cosign verify-blob` and
    reported ludlow as network-dependent when ludlow's own gate is not -- a proxy for the operation,
@@ -334,10 +334,10 @@ and those reds are mutations, not a test-first sequence. ludlow's is the genuine
     ok: the same tag re-cut with one base64 character of policy 2.0.1's real signature changed
         (2c440612b7b7) -- nothing else moved, so a gate that adopts it adopted an unverified signature
     note: driftwood: its own gate cannot verify platform's real published bundle with a cold TUF
-          cache and egress blocked -- exit 1 ... (eco-system ticket 103)
+          cache and egress blocked -- exit 1 ... (eco-system ticket 105)
     note: ludlow: its own gate verifies platform's real published bundle with a cold TUF cache and
           every proxy pointed at a closed port -- exit 0, no network needed
-    note: tuppence: ... exit 1 ... (eco-system ticket 103)
+    note: tuppence: ... exit 1 ... (eco-system ticket 105)
     ok: driftwood: real cosign accepted platform's own published signature for policy 2.0.1, and the
         gate adopted
     ok: driftwood: the same bundle with one signature byte changed was refused, naming the signature
@@ -350,6 +350,16 @@ and those reds are mutations, not a test-first sequence. ludlow's is the genuine
     PASS: every adopter gate in this estate accepted platform's own published signature and refused
           the same evidence with one byte of it changed, each through its own workflow's own
           invocation and its own identity constant
+
+**What the green unit CI does NOT say (review F5).** `shift-left` and `compose-check` pass on
+all three unit pull requests, and that is worth exactly one thing: the path those workflows
+already ran still passes. **No unit CI job runs `--selfcheck` or the harness.** ludlow's gate
+change is not exercised by ludlow's own CI at all -- `shift-left` reaches `verify_evidence()`
+only when the composed member set moves, which is the same latency that hid the original
+defect for weeks. Everything that grades this ticket's work ran locally and in the hub gate:
+the three harnesses, the two selfchecks, and `verify/real-signature/`. Wiring each adopter's
+harness into its own CI is not done here and is not charted either; it is named so that a
+reader does not read three green checkmarks as this ticket being covered by unit CI.
 
 Pull requests, none merged: hub policy-as-versioned-flux#53, ludlow
 policy-as-versioned-ludlow/ludlow#19, driftwood policy-as-versioned-driftwood/driftwood#28,

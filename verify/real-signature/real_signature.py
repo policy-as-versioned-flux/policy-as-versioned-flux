@@ -38,7 +38,7 @@ pass cosign no trust root, so they fetch a trust root from Sigstore's TUF CDN on
 which is cold every time. That is a real difference between the three and it is printed as an
 exit code per adopter rather than written down as a sentence -- eco-system ticket 101's own lesson
 is that a sentence about what a check cannot do goes stale and nothing re-reads it. Closing the
-difference is ticket 103.
+difference is ticket 105.
 
 Usage:
     real_signature.py <estate-dir>
@@ -54,6 +54,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from types import ModuleType
 
 HERE = Path(__file__).resolve().parent
 FOLD = HERE.parent / "fold-agreement" / "fold_agreement.py"
@@ -66,8 +67,9 @@ HEAD_TAG = "v2.0.1"
 STANDING = "2.0.0"
 
 
-def _fold():
+def _fold() -> ModuleType:
     spec = importlib.util.spec_from_file_location("fold_agreement", FOLD)
+    assert spec is not None and spec.loader is not None, f"cannot load {FOLD}"
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -178,6 +180,27 @@ def _clone(src: Path, dst: Path) -> None:
                    check=True, capture_output=True)
 
 
+CLOSED = "http://127.0.0.1:1"
+
+
+def COLD_ENV(home: Path, tuf: Path) -> dict[str, str]:
+    """An environment in which reaching the network is impossible, not merely discouraged.
+
+    Every proxy variable points at a closed port -- and NO_PROXY is CLEARED, in both cases, along
+    with the lowercase spellings. Measured 2026-09-06 during this ticket's own review: with an
+    ambient `NO_PROXY=*` exported, Go's proxy resolution bypasses the closed port entirely, cosign
+    reaches Sigstore's CDN, and offline_exit returns 0 -- so the number this check prints would have
+    read "no network needed" for a gate that had just used the network. A measurement that fails in
+    the reassuring direction is worse than no measurement, because nobody goes looking behind a
+    green one. Setting the variable to the empty string rather than unsetting it is deliberate: an
+    empty NO_PROXY is what Go reads as "proxy everything", and it survives being merged into an
+    inherited environment, which an unset would not."""
+    return {"HOME": str(home), "TUF_ROOT": str(tuf),
+            "HTTPS_PROXY": CLOSED, "HTTP_PROXY": CLOSED, "ALL_PROXY": "socks5://127.0.0.1:1",
+            "https_proxy": CLOSED, "http_proxy": CLOSED, "all_proxy": "socks5://127.0.0.1:1",
+            "NO_PROXY": "", "no_proxy": ""}
+
+
 def offline_exit(fold, unit: str, unit_dir: Path, planted: dict, platform_dir: Path,
                  adopter_repo: Path, workdir: Path) -> int | None:
     """The number this check reports and does not grade: what THIS adopter's OWN gate, invoked
@@ -196,9 +219,7 @@ def offline_exit(fold, unit: str, unit_dir: Path, planted: dict, platform_dir: P
     cold_home, cold_tuf = workdir / "cold-home", workdir / "cold-tuf"
     cold_home.mkdir(parents=True, exist_ok=True)
     cold_tuf.mkdir(parents=True, exist_ok=True)
-    cold = {"HOME": str(cold_home), "TUF_ROOT": str(cold_tuf),
-            "HTTPS_PROXY": "http://127.0.0.1:1", "HTTP_PROXY": "http://127.0.0.1:1",
-            "ALL_PROXY": "socks5://127.0.0.1:1"}
+    cold = COLD_ENV(cold_home, cold_tuf)
     restore = {k: os.environ.get(k) for k in cold}
     os.environ.update(cold)
     try:
@@ -248,6 +269,7 @@ def run(estate: Path) -> tuple[str, list[tuple[str, str]]]:
 
     spec = importlib.util.spec_from_file_location(
         "twin_per_adopter", HERE.parent / "twin-per-adopter" / "twin_per_adopter.py")
+    assert spec is not None and spec.loader is not None, "cannot load twin_per_adopter.py"
     tpa = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(tpa)
     units = [u for u in tpa.adopters(estate) if (estate / u).is_dir()]
@@ -361,7 +383,7 @@ def _observe(estate: Path, fold, units: list[str], platform_src: Path,
                                        f"bundle with a cold TUF cache and egress blocked -- exit "
                                        f"{cold}, so this repository's signature check fetches a "
                                        f"Sigstore trust root on every CI run, which is cold every "
-                                       f"time (eco-system ticket 103)"))
+                                       f"time (eco-system ticket 105)"))
 
     verdict, graded = grade(observations)
     return verdict, lines + graded
@@ -393,11 +415,11 @@ def selfcheck() -> int:
         except ValueError:
             pass
 
-    adopt = {"verdict": "adopt", "composed": "none", "exit": 0, "argv": [], "output": "PASS"}
-    refuse_sig = {"verdict": "refuse", "composed": None, "exit": 1, "argv": [],
-                  "output": "cosign verify-blob refused the evidence signature"}
-    refuse_flag = {"verdict": "refuse", "composed": None, "exit": 1, "argv": [],
-                   "output": "Error: --trusted-root only supported with --new-bundle-format"}
+    adopt: dict = {"verdict": "adopt", "composed": "none", "exit": 0, "argv": [], "output": "PASS"}
+    refuse_sig: dict = {"verdict": "refuse", "composed": None, "exit": 1, "argv": [],
+                        "output": "cosign verify-blob refused the evidence signature"}
+    refuse_flag: dict = {"verdict": "refuse", "composed": None, "exit": 1, "argv": [],
+                         "output": "Error: --trusted-root only supported with --new-bundle-format"}
 
     verdict, lines = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_sig}})
     check("a gate that accepts the real signature and refuses the corrupted one passes", verdict, "PASS")
@@ -415,8 +437,8 @@ def selfcheck() -> int:
           any("ADOPTED the same evidence" in text for level, text in lines if level == "FAIL"), True)
 
     # A refusal about something other than the signature is not evidence the signature was read.
-    refuse_pin = {"verdict": "refuse", "composed": None, "exit": 1, "argv": [],
-                  "output": "platform tag resolves to a different commit than the pin names"}
+    refuse_pin: dict = {"verdict": "refuse", "composed": None, "exit": 1, "argv": [],
+                        "output": "platform tag resolves to a different commit than the pin names"}
     verdict, _ = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_pin}})
     check("a refusal that names neither cosign nor the signature is false", verdict, "FAIL")
 
@@ -428,11 +450,21 @@ def selfcheck() -> int:
                         "b": {"version": "1.0.0", "accept": None, "refuse": None, "reason": "x"}})
     check("one unknown among the observed is still a could-not-look for the estate", verdict, "SKIP")
 
+    # F2: the cold environment must CLEAR NO_PROXY, not merely set the proxies. An ambient
+    # NO_PROXY=* makes Go bypass the closed port, and the number this check prints then lies in
+    # the reassuring direction.
+    cold = COLD_ENV(Path("/tmp/h"), Path("/tmp/t"))
+    check("the cold env clears NO_PROXY", cold.get("NO_PROXY"), "")
+    check("the cold env clears no_proxy", cold.get("no_proxy"), "")
+    check("the cold env sets the lowercase proxy spellings too", cold.get("https_proxy"), CLOSED)
+    check("the cold env points HTTPS_PROXY at a closed port", cold.get("HTTPS_PROXY"), CLOSED)
+
     for failure in failures:
         print(f"FAIL: {failure}")
     if failures:
         return 1
-    print("PASS: real_signature.py selfcheck -- the tamper touches exactly one signature and "
+    print("PASS: real_signature.py selfcheck -- the cold environment clears NO_PROXY as well as "
+          "setting the proxies, the tamper touches exactly one signature and "
           "refuses a shape it cannot corrupt, a gate that refuses the real signature is false, a "
           "gate that adopts a corrupted one is false, a refusal naming neither cosign nor the "
           "signature is false, and a gate that could not be invoked is a could-not-look")
@@ -445,7 +477,15 @@ def main(argv: list[str]) -> int:
     if not argv:
         print("SKIP: no estate directory given")
         return 3
-    verdict, lines = run(Path(argv[0]))
+    try:
+        verdict, lines = run(Path(argv[0]))
+    except RuntimeError as exc:
+        # The planting itself failed. It goes to STDOUT and it goes out BY NAME: the wrapper reads
+        # stdout, and a red whose reason reached only stderr is a red nobody can act on -- which is
+        # what this printed during its own review, `FAIL: ... exited 1 without grading a single
+        # adopter gate:` with nothing after the colon.
+        print(f"FAIL: {exc}")
+        return 1
     for level, text in lines:
         print(f"{level}: {text}")
     if verdict == "PASS":

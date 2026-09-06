@@ -348,14 +348,19 @@ def _commit(repo: Path, message: str) -> str:
     agreement it had not observed (eco-system ticket 101, 2026-09-06). Half a planting is not a
     weaker observation, it is a different one."""
     _git(repo, "add", "-A")
-    _git(repo, "-c", "user.name=fold-agreement", "-c", "user.email=fold@example.invalid",
-         "-c", "commit.gpgsign=false", "commit", "-q", "-m", message)
+    committed = _git(repo, "-c", "user.name=fold-agreement", "-c", "user.email=fold@example.invalid",
+                     "-c", "commit.gpgsign=false", "commit", "-q", "-m", message)
     resolved = _git(repo, "rev-parse", "HEAD")
     sha = resolved.stdout.strip()
     if resolved.returncode != 0 or len(sha) != 40:
+        # The COMMIT's own stderr, not rev-parse's. rev-parse can only say "unknown revision
+        # HEAD", which names the symptom; the commit says WHY -- a refusing hook, a signing
+        # failure, a full disk -- and that is the sentence somebody has to act on.
+        why = (committed.stderr.strip() or committed.stdout.strip()
+               or resolved.stderr.strip() or "no output from git commit")
         raise RuntimeError(
             f"the planted repository at {repo} could not be committed, so nothing was planted: "
-            f"git rev-parse HEAD came back {sha!r} ({resolved.stderr.strip()[:160]})")
+            f"git commit said {why[:300]!r} (git rev-parse HEAD then came back {sha!r})")
     return sha
 
 

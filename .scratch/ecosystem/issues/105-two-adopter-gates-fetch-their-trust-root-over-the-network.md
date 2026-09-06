@@ -1,4 +1,4 @@
-# 103 — Two adopter gates fetch their trust root over the network on every CI run
+# 105 — Two adopter gates fetch their trust root over the network on every CI run
 
 Type: task (AFK)
 Status: open
@@ -77,6 +77,31 @@ and egress blocked, and the four measurements above print 0 instead of 1.
    becomes unnecessary for new tags — though already-published bundles on cut tags are immutable,
    so both shapes coexist until every pinned tag has moved. A tag is cut only by `cut-release.yml`
    and dispatched only by the owner, so this half waits on the owner whatever else is decided.
+
+## What remedy 4 costs, measured during ticket 101's review — all three fail CLOSED
+
+The pin ludlow now carries is strictly safer than a live fetch and strictly less available. Every
+one of these refuses rather than admits, which is the right direction, and every one is a way
+ludlow can go red on a day nothing is wrong with the signature.
+
+1. **One CT key is pinned, and cosign errors on the FIRST SCT whose log is unpinned.** A Fulcio
+   certificate carrying two SCTs — one from the pinned log, one from a log the committed root does
+   not carry — is unverifiable by ludlow, even though a log it trusts did attest it. Platform's
+   certificates carry one SCT today, so this is latent, exactly like the defect ticket 101 fixed.
+   Selecting a key per SCT rather than one key for the certificate is the fix, and it belongs with
+   whatever this ticket decides about roots.
+2. **The root's second transparency-log key is not ECDSA, and the legacy path refuses it.**
+   `cf1199…` (2025-09-23) is a non-ECDSA key; presented on the legacy path cosign answers
+   `is not type ecdsa.PublicKey`. So a Rekor v2 bundle would be refused by ludlow for a KEY-TYPE
+   reason — a refusal about a command line wearing the words of a refusal about a signature, which
+   is the exact shape of the original ticket-101 defect. **This is the strongest argument for
+   remedy 2 (platform re-signs in the new bundle format) sooner rather than later**, and it should
+   be weighed here rather than left to be rediscovered.
+3. **The env-var path honours no `validFor` window.** `trusted_root.json` carries validity windows
+   per log; `SIGSTORE_CT_LOG_PUBLIC_KEY_FILE` does not read them. The retired 2021–22 CT key is
+   therefore as "live" as the current one in ludlow's pin. Nothing is admitted that Sigstore would
+   refuse on identity grounds, but a key the ecosystem has retired is still trusted here, and that
+   is a property somebody chose by accident rather than on purpose.
 
 ## Notes
 
