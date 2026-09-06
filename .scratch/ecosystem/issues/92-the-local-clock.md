@@ -242,7 +242,7 @@ machine -- the local clock has not run here, or this is not the owner's machine`
 could-not-look, matched by the manifest row on the real substrate. The line it printed and did not
 record, quoted from the Actions log and NOT citable:
 
-    
+    TRUTH 2026-09-06T10:54Z run=131 hub=491e5a3 enact=development units=[driftwood=6e23dbe@main feeds=8cb7ae8@main ico=c65b6b2@main insurer=c991160@main ludlow=cd2cc9b@main nist=9dd7c31@main platform=a270fce@main tuppence=fe60091@main] pass=71 [observed=17 self=40 simulated=6 meta=8] fail=11 skip=21 [never=9 waits=12] excluded=8 total=111 ceiling=92
 
 The gate's red on that run is the estate's standing set, not this branch's: `verify-schedules.sh`'s
 three and the rest of what run 113 on `main` already carried.
