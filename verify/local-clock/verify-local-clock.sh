@@ -53,17 +53,24 @@ TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 fail() { echo "FAIL: $*"; exit 1; }
 KEY="$TMP/throwaway_ed25519"
 ssh-keygen -q -t ed25519 -N '' -C throwaway -f "$KEY" || fail "could not make a throwaway ssh key"
+# The FIXTURE's own commits and tags run no hook (follow-up R2): the owner's global
+# core.hooksPath runs a network secret scan on every commit, and a quota refusal there failed
+# this script on 2026-09-06 for a reason that was nobody's read-back. The clock under check
+# still reads the real global config -- that is what its config snapshot covers -- and its
+# stand-in model's commits bypass the hook the same way, because they are fixture too.
+mkdir -p "$TMP/no-hooks"
+fgit() { git -c core.hooksPath="$TMP/no-hooks" "$@"; }
 mkfixture() {  # a throwaway adopter checkout, a throwaway bare origin, local main ONE BEHIND origin/main
   local u="$TMP/estate/$1" o="$TMP/estate/$1.origin.git"
   mkdir -p "$u/twin/orgs/$1/scenarios"
   git init -q -b main "$u"
   echo "org: $1" >"$u/twin/signals.yaml"; echo "roles: [adopter]" >"$u/party.yaml"
-  git -C "$u" add -A; git -C "$u" -c user.name=f -c user.email=f@f commit -q -m "fixture $1"
+  fgit -C "$u" add -A; fgit -C "$u" -c user.name=f -c user.email=f@f commit -q -m "fixture $1"
   git init -q --bare -b main "$o"
   git -C "$u" remote add origin "$o"
   echo "upstream: 1" >>"$u/twin/signals.yaml"
-  git -C "$u" -c user.name=f -c user.email=f@f commit -q -am "upstream commit the clone has not pulled"
-  git -C "$u" push -q -u origin main
+  fgit -C "$u" -c user.name=f -c user.email=f@f commit -q -am "upstream commit the clone has not pulled"
+  fgit -C "$u" push -q -u origin main
   git -C "$u" reset -q --hard HEAD~1
   # what every real clone's config carried on 2026-09-06: an owner's name, SSH signing on
   git -C "$u" config user.name "The Owner"; git -C "$u" config user.email owner@fixture.invalid
@@ -82,10 +89,10 @@ run_id() { sed -n 's/^local clock: run \([^ ]*\) .*/\1/p' "$1" | head -1; }
 has_sig() { git -C "$1" cat-file commit "$2" | grep -q '^gpgsig'; }
 
 # 0. the fixture's config really does sign, and really does name the owner (the control)
-git -C "$UNIT" commit -q --allow-empty -m "control: the clone's own config signs as the owner" || fail "the control commit failed"
+fgit -C "$UNIT" commit -q --allow-empty -m "control: the clone's own config signs as the owner" || fail "the control commit failed"
 has_sig "$UNIT" HEAD || fail "the fixture's config did not sign the control commit, so the proof below would be empty"
 [ "$(git -C "$UNIT" log -1 --format=%an HEAD)" = "The Owner" ] || fail "the control commit is not authored as the owner"
-git -C "$UNIT" tag -a control-signed -m "control: the config signs tags" || fail "the control tag failed"
+fgit -C "$UNIT" tag -a control-signed -m "control: the config signs tags" || fail "the control tag failed"
 git -C "$UNIT" cat-file tag control-signed | grep -q 'SIGNATURE' || fail "the fixture's config did not sign the control tag, so the unsigned-tag proof below would be empty"
 
 # 1. a live run: one stub claim committed on a local-clock/ branch, cut from ORIGIN/MAIN,
@@ -151,7 +158,7 @@ tail -1 "$TMP/push-unauth.out" | grep -q '^FAIL: --push needs an authenticated g
 # 1d. a model that signs anyway, names a person as author, hides a signed person's commit
 #     under a clean second commit (review F1), hides a declaration in history behind a clean
 #     tree (F1), or makes a tag (F2) is refused with the branch kept and nothing pushed
-for case in signed:signature asowner:author twocommits:"2 commit" history:"2 commit" tag:refs/tags/local-clock-v1 amend:"not the base" merge:"not the base" signoff:trailer; do
+for case in signed:signature asowner:author twocommits:"2 commit" history:"2 commit" tag:refs/tags/local-clock-v1 amend:"not the base" merge:"not the base" signoff:trailer signoff2:trailer coauthor:trailer; do
   stub="${case%%:*}"; word="${case#*:}"
   LOCAL_CLOCK_STUB="$stub" LOCAL_CLOCK_STUB_KEY="$KEY" bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/$stub.out" 2>&1 \
     && fail "a $stub proposal was admitted"
@@ -191,6 +198,14 @@ git -C "$UNIT" config --unset core.hooksPath; git -C "$UNIT" config --unset core
 push_refused remoteurl remote.origin.url
 [ -z "$(git -C "$LOCAL_CLOCK_HOME/evil.git" for-each-ref)" ] || fail "evil.git received a push"
 git -C "$UNIT" remote set-url origin "$ORIGIN"   # the owner's repair by hand
+# 1d3. a write to the GLOBAL config is refused too: for this one run the global file is a
+# throwaway copy of the owner's (GIT_CONFIG_GLOBAL), so the stub's `git config --global`
+# lands there and nowhere else, and the clock -- which reads whatever global git reads --
+# sees the key appear
+cp "${HOME}/.gitconfig" "$TMP/gitconfig.copy" 2>/dev/null || : >"$TMP/gitconfig.copy"
+GIT_CONFIG_GLOBAL="$TMP/gitconfig.copy" LOCAL_CLOCK_STUB=globalcfg bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/globalcfg.out" 2>&1 && fail "a global config write was admitted"
+grep '^fail' "$TMP/globalcfg.out" | head -1 | grep -Fq 'local-clock.probe' || fail "the global write was refused for the wrong reason: $(grep '^fail' "$TMP/globalcfg.out" | head -1)"
+grep -q 'local-clock' "${HOME}/.gitconfig" 2>/dev/null && fail "the stub wrote to the owner's real global config"
 # 1e. the twocommits branch under --push: read the ORIGIN -- nothing landed, gh never asked
 n_gh="$(grep -c 'pr create' "$LOCAL_CLOCK_GH_LOG" 2>/dev/null || echo 0)"
 env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION LOCAL_CLOCK_STUB=twocommits LOCAL_CLOCK_STUB_KEY="$KEY" LOCAL_CLOCK_GH_STUB=ok \
@@ -296,7 +311,7 @@ bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify --dry-run >
 grep -q '^dry .*would run' "$TMP/dry.out" || fail "the dry run did not print the command it would run"
 left_nothing "$TMP/dry.out" dry
 n_runs="$(ls -d "$TMP"/.local-clock/runs/*/ | wc -l | tr -d ' ')"
-[ "$n_runs" -eq 22 ] || fail "22 runs were started (live, push, signed, asowner, twocommits, history, tag, amend, merge, signoff, bodysig, replace-push, hooks-push, remoteurl-push, twocommits-push, rehearsal, leak, dirty, example, misnamed, nothing, dry; the refused --push and the nested clock started none) and $n_runs run directories exist: run ids collided or a refusal started a run"
+[ "$n_runs" -eq 25 ] || fail "25 runs were started (live, push, signed, asowner, twocommits, history, tag, amend, merge, signoff, signoff2, coauthor, bodysig, replace-push, hooks-push, remoteurl-push, globalcfg, twocommits-push, rehearsal, leak, dirty, example, misnamed, nothing, dry; the refused --push and the nested clock started none) and $n_runs run directories exist: run ids collided or a refusal started a run"
 # the derive step (ticket 93's seam) is recorded as skipped by name until its skill ships, and
 # its row declares where its files go, what they are named and which validator checks them
 LOCAL_CLOCK_STUB=nothing bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step derive >"$TMP/derive.out" 2>&1

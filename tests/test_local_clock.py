@@ -23,6 +23,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -154,12 +155,12 @@ def test_marker_of_a_rehearsal_says_so_and_is_not_a_live_run(lc) -> None:
 def test_leak_scan_finds_an_injected_flag_in_a_committed_observation(lc, tmp_path: Path) -> None:
     repo = tmp_path / "unit"
     (repo / "observations").mkdir(parents=True)
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run([*GIT, "init", "-q", str(repo)], check=True)
     (repo / "observations" / "twin-sweep.jsonl").write_text(
         '{"swept_at": "2026-09-03T07:05:00Z", "org": "driftwood", "injected": true}\n')
     (repo / "notes.md").write_text("injected: true -- prose is not an envelope\n")
-    subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
-    subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
+    subprocess.run([*GIT, "-C", str(repo), "add", "-A"], check=True)
+    subprocess.run([*GIT, "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
                     "commit", "-q", "-m", "x"], check=True)
     hits = lc.injected_leaks(str(repo))
     assert hits == ["observations/twin-sweep.jsonl"], hits
@@ -168,7 +169,7 @@ def test_leak_scan_finds_an_injected_flag_in_a_committed_observation(lc, tmp_pat
 def test_leak_scan_ignores_an_uncommitted_rehearsal_file(lc, tmp_path: Path) -> None:
     repo = tmp_path / "unit"
     (repo / "twin" / "claims").mkdir(parents=True)
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run([*GIT, "init", "-q", str(repo)], check=True)
     (repo / "twin" / "claims" / "2026-09-03-rehearsal.claim.yaml").write_text("injected: true\n")
     assert lc.injected_leaks(str(repo)) == []
 
@@ -213,15 +214,15 @@ def test_a_linked_worktree_in_the_estate_is_scanned_like_a_clone(lc, tmp_path: P
     # .git is a file in a linked worktree; git ls-files works there, so the scan must look
     repo = tmp_path / "unit"
     (repo / "observations").mkdir(parents=True)
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run([*GIT, "init", "-q", str(repo)], check=True)
     (repo / "observations" / "twin-sweep.jsonl").write_text('{"injected": true}\n')
-    subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
-    subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
+    subprocess.run([*GIT, "-C", str(repo), "add", "-A"], check=True)
+    subprocess.run([*GIT, "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
                     "commit", "-q", "-m", "x"], check=True)
     estate = tmp_path / "estate"
     estate.mkdir()
     (estate / "plain").mkdir()                       # no .git at all: not a repository
-    subprocess.run(["git", "-C", str(repo), "worktree", "add", "-q", str(estate / "linked"), "-b", "w"],
+    subprocess.run([*GIT, "-C", str(repo), "worktree", "add", "-q", str(estate / "linked"), "-b", "w"],
                    check=True, capture_output=True)
     assert (estate / "linked" / ".git").is_file()
     assert [n for n, _ in lc.estate_repos(str(estate))] == ["linked"]
@@ -235,8 +236,16 @@ def test_a_linked_worktree_in_the_estate_is_scanned_like_a_clone(lc, tmp_path: P
 STUB = HUB / "verify" / "local-clock" / "stub-claude.sh"
 
 
+# The fixture's own git runs no hook (follow-up R2): the owner's global core.hooksPath runs a
+# network secret scan on every commit, and its quota refusal failed this file on 2026-09-06 for
+# a reason that was nobody's read-back. The clock under test still reads the real global; only
+# the fixture's commands carry this -c.
+NO_HOOKS = Path(tempfile.mkdtemp(prefix="local-clock-no-hooks-"))
+GIT = ["git", "-c", f"core.hooksPath={NO_HOOKS}"]
+
+
 def _git(repo: Path, *args: str) -> str:
-    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True,
+    return subprocess.run([*GIT, "-C", str(repo), *args], capture_output=True, text=True,
                           check=True).stdout.strip()
 
 
@@ -245,12 +254,12 @@ def _fixture_adopter(unit: Path, behind: int = 1) -> Path:
     `main` BEHIND origin/main by `behind` commits -- the state every real clone under
     .estate-clone was in on 2026-09-06 (driftwood 2, tuppence 4, ludlow 1). Returns the origin."""
     (unit / "twin").mkdir(parents=True)
-    subprocess.run(["git", "init", "-q", "-b", "main", str(unit)], check=True)
+    subprocess.run([*GIT, "init", "-q", "-b", "main", str(unit)], check=True)
     (unit / "twin" / "signals.yaml").write_text("org: driftwood\n")
     _git(unit, "add", "-A")
     _git(unit, "-c", "user.name=f", "-c", "user.email=f@f", "commit", "-q", "-m", "fixture")
     origin = unit.parent / f"{unit.name}.origin.git"
-    subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(origin)], check=True)
+    subprocess.run([*GIT, "init", "-q", "--bare", "-b", "main", str(origin)], check=True)
     _git(unit, "remote", "add", "origin", str(origin))
     for i in range(behind):
         (unit / "twin" / "signals.yaml").write_text(f"org: driftwood\nupstream: {i + 1}\n")
@@ -285,7 +294,7 @@ def test_a_live_claim_without_the_headless_mark_fails_the_step_and_no_body_is_wr
     assert not (run_dir / "classify-driftwood.pr-body.md").exists(), "a body was written for a refused claim"
     steps = [json.loads(l) for l in (run_dir / "steps.jsonl").read_text().splitlines()]
     assert [s["status"] for s in steps] == ["fail"] and "headless" in steps[0]["reason"], steps
-    refs = subprocess.run(["git", "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],
+    refs = subprocess.run([*GIT, "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],
                           capture_output=True, text=True, check=True).stdout
     assert rid in refs, "the refused claim's branch is kept for inspection"
 
@@ -313,7 +322,7 @@ def test_a_file_under_the_claims_path_that_is_not_a_claim_fails_the_step_uncheck
             assert "no override is claimed" not in p.read_text(errors="replace").lower(), p
     steps = [json.loads(l) for l in (run_dir / "steps.jsonl").read_text().splitlines()]
     assert [s["status"] for s in steps] == ["fail"] and "not a *.claim.yaml" in steps[0]["reason"], steps
-    refs = subprocess.run(["git", "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],
+    refs = subprocess.run([*GIT, "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],
                           capture_output=True, text=True, check=True).stdout
     assert rid in refs, "the refused file's branch is kept for inspection"
     # and a well-formed claim beside it is still validated: the whole step fails, not just the file
@@ -350,10 +359,10 @@ def test_two_runs_in_the_same_second_get_distinct_ids_and_clean_up_after_themsel
     for done in runs:
         assert "worktree and branch removed" in done.stdout, done.stdout
     # and the removal is a fact, not a sentence: no worktree, no branch, no directory left
-    listed = subprocess.run(["git", "-C", str(unit), "worktree", "list", "--porcelain"],
+    listed = subprocess.run([*GIT, "-C", str(unit), "worktree", "list", "--porcelain"],
                             capture_output=True, text=True, check=True).stdout
     assert listed.count("worktree ") == 1, listed
-    refs = subprocess.run(["git", "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],
+    refs = subprocess.run([*GIT, "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],
                           capture_output=True, text=True, check=True).stdout
     assert refs == "", refs
     work = unit / ".work" / "local-clock"
@@ -384,7 +393,7 @@ def test_readme_flags_are_the_scripts_flags(lc) -> None:
 
 
 def test_run_root_is_ignored_by_git() -> None:
-    rc = subprocess.run(["git", "-C", str(HUB), "check-ignore", "-q", ".local-clock/last-run.json"]).returncode
+    rc = subprocess.run([*GIT, "-C", str(HUB), "check-ignore", "-q", ".local-clock/last-run.json"]).returncode
     assert rc == 0, ".local-clock/ must be gitignored: it is the one place a rehearsal may write"
 
 
@@ -609,7 +618,7 @@ def _commit_injected_on(repo: Path, branch: str, path: str, base: str = "main") 
 def test_leak_scan_reads_the_committed_tree_of_a_ref_not_the_working_tree(lc, tmp_path: Path) -> None:
     repo = tmp_path / "unit"
     (repo / "observations").mkdir(parents=True)
-    subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True)
+    subprocess.run([*GIT, "init", "-q", "-b", "main", str(repo)], check=True)
     (repo / "observations" / "x.jsonl").write_text('{"injected": false}\n')
     _git(repo, "add", "-A")
     _git(repo, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "clean")
@@ -656,7 +665,7 @@ def test_the_scan_names_the_served_ref_and_prints_what_it_could_not_see_as_numbe
     # a unit with no origin/main at all is said so, as a count, never as clean
     lone = estate / "lone"
     (lone / "twin").mkdir(parents=True)
-    subprocess.run(["git", "init", "-q", "-b", "main", str(lone)], check=True)
+    subprocess.run([*GIT, "init", "-q", "-b", "main", str(lone)], check=True)
     (lone / "twin" / "signals.yaml").write_text("org: lone\n")
     _git(lone, "add", "-A")
     _git(lone, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
@@ -775,7 +784,7 @@ def test_the_leak_scan_is_case_insensitive(lc, tmp_path: Path) -> None:
     # F5: YAML reads `Injected: True` as the same boolean; the scan must too
     repo = tmp_path / "unit"
     (repo / "twin" / "claims").mkdir(parents=True)
-    subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True)
+    subprocess.run([*GIT, "init", "-q", "-b", "main", str(repo)], check=True)
     (repo / "twin" / "claims" / "x.claim.yaml").write_text("Injected: True\n")
     _git(repo, "add", "-A")
     _git(repo, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
@@ -809,7 +818,7 @@ def test_a_git_replace_cannot_stand_a_clean_double_before_a_signed_commit(tmp_pa
     _push_refused(tmp_path, "replace", "refs/replace/", key)
     unit = tmp_path / "estate" / "driftwood"
     s = _git(unit, "for-each-ref", "--format=%(refname)", "refs/replace/").split("/")[-1]
-    real = subprocess.run(["git", "-C", str(unit), "cat-file", "commit", s], capture_output=True, text=True,
+    real = subprocess.run([*GIT, "-C", str(unit), "cat-file", "commit", s], capture_output=True, text=True,
                           check=True, env={**os.environ, "GIT_NO_REPLACE_OBJECTS": "1"}).stdout
     assert "gpgsig" in real.split("\n\n")[0] and "The Owner" in real, real[:300]
 
@@ -866,3 +875,48 @@ def test_a_trailer_naming_a_person_is_refused_and_a_gpgsig_word_in_the_body_is_n
                           env=_clock_env(tmp_path, "bodysig"), capture_output=True, text=True, timeout=120)
     assert done.returncode == 0, done.stdout + done.stderr
     assert "signature: none" in done.stdout, done.stdout
+
+
+# --- follow-up (2026-09-06): two trailer shapes, a global config write, and the hook ----------
+def test_a_trailer_on_line_two_or_a_value_that_merely_contains_the_clock_is_refused(tmp_path: Path) -> None:
+    # R1a: `Signed-off-by: The Owner` on line 2 of a one-paragraph message -- interpret-trailers
+    # --parse yields nothing; R1b: a Co-authored-by value that CONTAINS the clock identity
+    for stub in ("signoff2", "coauthor"):
+        unit = tmp_path / "estate" / "driftwood"
+        if unit.exists():
+            shutil.rmtree(unit.parent)
+        _fixture_adopter(unit)
+        done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                              env=_clock_env(tmp_path, stub), capture_output=True, text=True, timeout=120)
+        assert done.returncode == 1, (stub, done.stdout + done.stderr)
+        fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+        assert fail_lines and "trailer" in fail_lines[0] and "The Owner" in fail_lines[0], (stub, done.stdout)
+
+
+def test_a_write_to_the_global_config_is_refused_without_touching_the_owners_file(tmp_path: Path) -> None:
+    # the clock reads whatever global git reads; for this run that is a throwaway copy
+    unit = tmp_path / "estate" / "driftwood"
+    _fixture_adopter(unit)
+    real = Path.home() / ".gitconfig"
+    copy = tmp_path / "gitconfig.copy"
+    copy.write_text(real.read_text() if real.exists() else "")
+    env = _clock_env(tmp_path, "globalcfg")
+    env["GIT_CONFIG_GLOBAL"] = str(copy)
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=env, capture_output=True, text=True, timeout=120)
+    assert done.returncode == 1, done.stdout + done.stderr
+    fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
+    assert fail_lines and "local-clock.probe" in fail_lines[0], done.stdout
+    # git writes the key in section form: [local-clock] / probe = yes
+    assert "[local-clock]" in copy.read_text() and "probe = yes" in copy.read_text(), copy.read_text()[-200:]
+    assert not real.exists() or "[local-clock]" not in real.read_text(), "the stub wrote the owner's real global config"
+
+
+def test_the_fixture_bypasses_the_owners_global_hook_and_the_clock_does_not() -> None:
+    # R2: the fixture's git carries -c core.hooksPath=<empty dir>; the clock's own git and the
+    # config it snapshots still read the real global (its hooksPath is only overridden by the
+    # clock's -c for its own commands, never removed from what the child sees)
+    assert GIT[1:] == ["-c", f"core.hooksPath={NO_HOOKS}"] and NO_HOOKS.is_dir() and not any(NO_HOOKS.iterdir())
+    text = CLOCK.read_text()
+    assert "GIT_CONFIG_GLOBAL" not in text, "the clock must read the real global config"
+    assert 'core.hooksPath="$NO_HOOKS"' in text, "the clock's own git runs no hooks"

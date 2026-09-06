@@ -34,12 +34,20 @@
 #   amend    `commit --amend` of the base itself: one clean commit, parent base^ -- refused
 #   merge    one commit with parents base and base^ -- refused
 #   signoff  a Signed-off-by trailer naming a person -- refused
+#   signoff2 the same trailer on line 2 of a one-paragraph message (no blank line) -- refused
+#   coauthor a Co-authored-by whose value names a person AND the clock -- refused
+#   globalcfg  `git config --global` (run under a throwaway GIT_CONFIG_GLOBAL) -- refused
 #   bodysig  the word gpgsig in the message BODY -- admitted: it is text, not a header
 # LOCAL_CLOCK_INJECTED (set by the clock on a rehearsal) makes the claim say injected: true.
 # Every invocation touches $LOCAL_CLOCK_HOME/model-was-called first, so a test can prove the
 # clock refused BEFORE the model ran. This is a stand-in and says so in its result line.
 set -euo pipefail
 if [ -n "${LOCAL_CLOCK_HOME:-}" ]; then mkdir -p "$LOCAL_CLOCK_HOME"; touch "$LOCAL_CLOCK_HOME/model-was-called"; fi
+# This stand-in's own commits and tags run no hook (ticket 92 follow-up R2): the owner's global
+# core.hooksPath runs a network secret scan on every commit, and its quota refusal is not a
+# fact about the clock. The real model's commits DO run the owner's hooks; the clock under
+# test still reads the real global config, which is what its snapshot covers.
+git() { command git -c core.hooksPath="${LOCAL_CLOCK_HOME:-/nonexistent}/no-hooks" "$@"; }
 wt="${LOCAL_CLOCK_UNIT_WT:?}"; run="${LOCAL_CLOCK_RUN_DIR:?}"
 step="${LOCAL_CLOCK_STEP:?}"; adopter="${LOCAL_CLOCK_ADOPTER:?}"
 what="${LOCAL_CLOCK_STUB:-claim}"
@@ -158,6 +166,17 @@ case "$what" in
     git -C "$wt" update-ref HEAD "$m";;
   signoff)
     git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)" --trailer "Signed-off-by: The Owner <owner@fixture.invalid>";;
+  signoff2)
+    # follow-up R1a: the trailer on line 2 of a single paragraph -- interpret-trailers sees none
+    git -C "$wt" commit -q -m "$(printf 'twin: stub claim from the local clock (%s, %s)\nSigned-off-by: The Owner <owner@fixture.invalid>' "$step" "$adopter")";;
+  coauthor)
+    # follow-up R1b: a value that CONTAINS the clock's identity beside a person's
+    git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)" \
+      --trailer "Co-authored-by: The Owner <owner@fixture.invalid>, local clock (headless model, ticket 92) <local-clock@policy-as-versioned-flux.invalid>";;
+  globalcfg)
+    # follow-up: a write to the GLOBAL config (whatever file git's global is for this run)
+    git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)"
+    git config --global local-clock.probe yes;;
   bodysig)
     git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)" -m "gpgsig -- this line is in the message body and is text, not a header";;
   *)       git -C "$wt" commit -q -m "twin: stub claim from the local clock ($step, $adopter)";;

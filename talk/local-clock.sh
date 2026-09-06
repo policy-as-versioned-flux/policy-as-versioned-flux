@@ -430,8 +430,11 @@ run_step() {  # step skill paths pattern validator adopter
     sig_lines="$(cgit -C "$wt" cat-file commit "$c" | sed '/^$/q' | grep -c '^gpgsig')"
     author="$(cgit -C "$wt" log -1 --format='%an <%ae>' "$c")"
     committer="$(cgit -C "$wt" log -1 --format='%cn <%ce>' "$c")"
-    # a Signed-off-by / Co-authored-by trailer is a person's name on a model's work
-    trailers="$(cgit -C "$wt" log -1 --format=%B "$c" | git interpret-trailers --parse | grep -Ei '^(Signed-off-by|Co-authored-by):' | grep -Fv "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" || true)"
+    # a Signed-off-by / Co-authored-by line is a person's name on a model's work. Read over the
+    # WHOLE message, not `interpret-trailers --parse` (which sees nothing when the line sits in
+    # the first paragraph), and the value must EQUAL the clock's identity, not contain it
+    # ("The Owner <...>, local clock <...>" contains it) -- follow-up R1.
+    trailers="$(cgit -C "$wt" log -1 --format=%B "$c" | grep -Ei '^(Signed-off-by|Co-authored-by):' | sed -E 's/^[^:]+:[[:space:]]*//; s/[[:space:]]+$//' | grep -Fvx "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" || true)"
     if [ "$sig_lines" != 0 ]; then bad_commit="commit ${c:0:7} carries a signature block"; break; fi
     if [ "$author" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then bad_commit="commit ${c:0:7} is authored as '$author', not the clock"; break; fi
     if [ "$committer" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then bad_commit="commit ${c:0:7} is committed as '$committer', not the clock"; break; fi
