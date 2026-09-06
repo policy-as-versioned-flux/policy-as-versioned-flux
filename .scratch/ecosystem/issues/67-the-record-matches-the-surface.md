@@ -118,11 +118,14 @@ not off the call site; `check()` computes `declared_lane(on_ref, local)` per uni
 merge, in the same way this ticket asks of everyone else.)
 
 The new lists: driftwood `drift/samples.jsonl observations`; ludlow and tuppence
-`drift/samples.jsonl`; feeds, ico, insurer, nist and platform `observations`. Measured before
-trimming, with `git log --first-parent origin/main` and `git show --name-only`: all 7 scheduled
-commits in driftwood, 6 in ludlow, 6 in tuppence and 6 each on the five publishers' `observations`
-branches already fall inside the trimmed lists. The change is strictly stricter and breaks nothing.
-`verify-lane.sh` passes unchanged.
+`drift/samples.jsonl`; feeds, ico, insurer, nist and platform `observations`. Measured with
+`git log --first-parent` and `git show --name-only`, and **corrected 2026-09-06 (review F8)**:
+7 scheduled commits in driftwood, 6 in ludlow and 6 in tuppence on `main`; on the publishers'
+`observations` branches **13 in feeds** — one per matrix feed, `cve`, `eol`, `fx`, `market-moves`,
+`news`, `threat-register` and the branch's `README.md` — and 6 each in ico, insurer, nist and
+platform. The first draft said "6 each on the five publishers", which was true of four of them and
+wrong about the busiest. Every one of the 47 falls inside the trimmed lists, so the change is
+strictly stricter and breaks nothing. `verify-lane.sh` passes unchanged.
 
 **(d) The gate enforces it. DONE, and widened per the 2026-09-02 comment.** Rule 1 above is the
 item as written. The comment's widening — "any TRUTH figure quoted in `issues/*.md` must resolve to
@@ -177,18 +180,39 @@ none of these is a purpose, date, identity, money, authorisation or a real perso
     `verify/record/verify-record-states-the-purpose.sh` (ticket 95), `issues/*.md` by ticket 80's
     check, and the deck by `verify-demo.sh`. A fourth reader of the same files would be a second
     opinion, not a second check.
+11. **The disclaimer is three fixed phrases, and `verify/cited-truth/`'s two plus `run=local`.**
+    *delegated* (review F1). `not citable` is the estate's own words; `fixture=1` and `run=local`
+    are the tokens `talk/verify-all.sh` writes itself on a line that is not a citable measurement,
+    so a line quoting such a TRUTH line verbatim needs no extra disclaimer. Nothing else. The
+    seven-word bag is what a reader would have written; it is also what laundered.
+12. **A correction disposes only for the paragraph it immediately follows.** *delegated* (review
+    F2). The alternative the review offered — require the corrected claim to be rewritten in place
+    under a banner — is stricter and is what item (a) did, but it would invalidate the map's own
+    2026-08-31 correction, which is correctly written and which a reader meets in the right place.
+    Immediately-follows keeps that one and refuses the laundering.
+13. **Rule 4 reads the served ref ONLY, and fetches it first; it does not union the checkout.**
+    *delegated* (review F3). This deliberately parts from `verify/schedules/lane.py`, and the
+    reason is that the two ask different questions — see the round 1 note. A stale checkout is
+    reported as a note. A fetch that fails is red, not a shrug: a verdict on a ref nobody refreshed
+    is the same venue-dependent reading one level down, and it cost twelve false findings the same
+    morning.
+14. **Rule 2 has no hatch at all.** *delegated* (review F4). The review offered a policed hatch —
+    name a PR or branch and verify the script exists at that ref with `git cat-file -e`. Dropping
+    it is smaller, has no laundering surface, and matches what the lane leg already did to this
+    ticket's own eight pull requests: red until merged. A map may still point at unmerged work; it
+    says so in a sentence rather than in a token a check reads.
 
-### What is red, and the finishing move
+### The lane leg was red, and is now green
 
-`verify-map-surface.sh` exits 1 on this branch with **33 findings, all `lane-not-owned`**, and
-prints that tally. It is the estate as it stands: the trims are on eight branches with eight open
-pull requests and the gate reads each unit's default branch. The finishing move is merging them —
-driftwood #26, feeds #4, ico #5, insurer #4, ludlow #17, nist #6, platform #16, tuppence #20 —
-after which the leg reads green with no further change here. This is ticket 81's "red until merged"
-shape, and it is the honest grade: the map's own claim (item (c) is done) is not true of the served
-estate until those merge.
+`verify-map-surface.sh` exited 1 with **33 findings, all `lane-not-owned`**, for as long as the
+eight unit pull requests were open: the trims were on branches and the rule reads what each unit
+SERVES. That was ticket 81's "red until merged" shape and the honest grade — the map's claim that
+item (c) was done was not true of the served estate. All eight merged on 2026-09-06 as
+`pavc-other-hand` (driftwood 6e23dbe, feeds 8cb7ae8, ico, insurer c991160, ludlow cd2cc9b, nist
+9dd7c31, platform a270fce, tuppence fe60091) and the leg went green with no change to the rule.
 
-Every other leg is green: 0 figure findings, 0 check findings, 0 dead links, 0 record findings.
+Every leg is now green: 0 figure findings, 0 check findings, 0 dead links, 0 lane findings, 0
+record findings.
 
 ### Verified
 
@@ -201,6 +225,9 @@ Red first, at the pure seam:
 
     $ .venv/bin/python -m pytest tests/test_map_surface.py -n0 -q     # after
     31 passed in 0.09s
+
+    $ .venv/bin/python -m pytest tests/test_map_surface.py -n0 -q     # after review round 1
+    46 passed in 5.40s
 
 The rule, red against the real record before any of this ticket's corrections landed:
 
@@ -250,8 +277,8 @@ Battery, all exit 0 on this branch:
                                                                          ticket's own file)
     .venv/bin/python -m mypy twin tests conftest.py …              Success: no issues, 177 files
 
-The counts are the branch's after its second rebase, onto the main that carries ticket 80's merge
-(PR 44). They were 110/175 before the first rebase and 111/176 before the second; each was true of
+The counts are the branch's after its third rebase, onto the main that carries ticket 80's merge
+(PR 44) and its follow-up (PR 46). They were 110/175, then 111/176, then 112/177; each was true of
 a different tree, and each was re-run rather than left standing.
 
 **The full `pytest tests/` was not run locally and no local figure from it is quoted here.** The
@@ -304,18 +331,100 @@ Map line:
 
 ### Not done
 
-1. **The eight unit pull requests are not merged**, so the lane leg is red. They are
-   driftwood #26, feeds #4, ico #5, insurer #4, ludlow #17, nist #6, platform #16, tuppence #20.
+1. ~~The eight unit pull requests are not merged, so the lane leg is red.~~ **Done 2026-09-06:**
+   all eight merged as `pavc-other-hand` and the lane leg reads green.
 2. **The lane is not narrowed per job.** ludlow's and tuppence's `propose-tier.yml` and
    `renovate-run.yml`, and driftwood's `renovate-run.yml`, declare a lane they never write to.
    Decision 6 says why; the honest form is the CLEAN cage shape, which is a different change.
 3. **nist's `declared-bump-gate.py` keeps the exit-3-when-no-tags shape** ico's just lost. Its
    manifest row declares no skip either, so the same latent red sits there. Out of this ticket's
-   scope, named so it is not lost.
+   scope, and now charted with the rest of ico's inherited gate defects as
+   [ticket 103](103-icos-release-gate-computes-the-bump-it-is-about-to-cut.md).
+5. **ico's release gate can still agree about the wrong number three ways** (review F5, F6, F7),
+   all inherited and none a regression from this ticket. Ticket 103.
 4. **Rule 2 reads the manifest, not a live discovery run.** A script present in the tree, listed in
    the manifest and excluded in `talk/verify-exclusions.txt` would pass rule 2 while the gate does
    not run it. `verify-truth-line.sh` already grades manifest-versus-discovery in both directions,
    so the gap is covered there rather than re-covered here.
+
+### Review round 1, 2026-09-06
+
+Eight findings. Two blocking, both **the same class that defeated ticket 80's rule 1 that
+morning**: a substring hatch that launders, spelled with words the map already uses. Two major on
+the same theme — a rule that reads a proxy for the served thing. One minor, one of my own numbers.
+Three inherited from ico's old gate, charted rather than fixed here.
+
+**F1, blocking — the disclaimer was a bag of words.** `_UNCITABLE` was seven substrings —
+`local`, `rehearsal`, `fixture`, `planted`, `hypothetical`, `not citable`, `actions log` —
+matched anywhere on the line, with no negation test and no output beyond `+1` in a count. Three
+routes through it, all reachable on this map: the word "local" appears on map.md at line 23
+("a local clock"), line 78 ("[92 — The local clock]") and line 101 ("a local rehearsal"), so any
+figure ever added to one of those lines was exempt for good; `...and that is NOT a rehearsal`
+exempted itself by asserting the opposite of a disclaimer; and `run 7 recorded 43/11/0 of 56 and
+was planted` excused a figure that DISAGREED with the run cited beside it.
+
+Fixed by following `verify/cited-truth/` exactly, which was corrected for the same defect at 09:00.
+**Three fixed phrases**, whole-token: `not citable` in those words, and the runner's own
+`fixture=1` and `run=local` tokens — the two things `talk/verify-all.sh` itself writes on a line
+that is not a citable measurement. `_NEGATION` refuses an occurrence modified by `not`, `no`,
+`without` or `never` within twelve characters; a code span or a link target is blanked first, so a
+marker being QUOTED spends nothing; the hatch is spent only where it actually suppresses a grade;
+and **every exemption is printed by path and line number**, not counted. On the real map the
+exempted list is empty and the one disposal is named:
+`-- disposed .scratch/ecosystem/map.md:99 (correction of 2026-08-31, the paragraph below it)`.
+
+**F2, blocking — a correction disposed of its figure everywhere.** The 2026-08-31 correction of
+"65 pass, 0 fail, 16 could-not-look of 83" laundered a FRESH occurrence of that same sentence
+written into a new section today. That is the exact sentence this ticket was charted to refuse,
+excused by the correction of it. A correction now disposes only for the paragraph it **immediately
+follows**, which is where the estate writes one and the only place a reader meets the two together.
+A claim anywhere else must be rewritten in place under a banner, as item (a) did to the
+drift-review NORTH-STAR. The disposal is named by line, and a figure inside the correction is
+still graded.
+
+**F3, major — the lane rule read the working copy, not the served ref.** The Answer, the map line
+and the pull request body all said "the gate reads each unit's default branch", which was true on
+CI only because `clone-estate.sh` clones fresh there. The reviewer proved it three ways: units
+checked out at the ticket branch gave 0 findings, at `origin/main` 33, and an **uncommitted**
+`git checkout <branch> -- fetch.yml` in ico made ico's three findings vanish.
+
+Both halves — what a unit DECLARES and what it OWNS — now read `origin/main`, which the check
+**fetches first**, because a ref nobody refreshed is the same venue-dependent reading one level
+down: measured the same morning, `clone-estate.sh --refresh` KEPT platform and tuppence (they
+carried `.work/` worktrees) and their stale `origin/main` produced twelve findings against an
+estate that had none.
+
+It reads the served ref *only*, and here it deliberately parts from `verify/schedules/lane.py`,
+which unions the ref with the checkout. lane.py is right to union: it grades commits a clock
+LANDED, and a clock is judged by the configuration in force when it landed, whichever copy carries
+it. This rule asks what the estate DECLARES, and the only declaration a reader can meet is the
+served one — unioning made the verdict turn on the venue in the other direction, reporting twelve
+findings from two stale working copies. A checkout that disagrees is **reported as a note and
+graded by nothing**. Proved by re-running the reviewer's own construction: with the old four-path
+list restored into ico's working copy, uncommitted, the run prints
+`-- note .estate-clone/ico: the checkout declares a different lane from origin/main in
+['fetch.yml']` and still PASSES. Four git-backed tests over throwaway repositories hold it.
+
+**F4, major — rule 2's "not in the gate yet" hatch.** It excused a check that existed nowhere, and
+its phrases were ordinary prose: map.md line 29 already contains "unmerged". **Dropped.** Unmerged
+work goes red until it merges, exactly as the lane leg did for its own eight pull requests, and a
+map that wants to point at built-but-unmerged work says so in a sentence a reader reads rather than
+in a word this check reads. The hatch existed for one line of my own map entry naming ticket 80's
+then-unmerged check; ticket 80 merged, so nothing needed it.
+
+**F8, minor — one of my own counts was wrong**, in the class this ticket polices. "6 each on the
+five publishers' observations branches" was true of four and wrong about the busiest: feeds has 13,
+one per matrix feed. Corrected above with the per-feed breakdown and dated.
+
+**F5, F6, F7 — inherited from ico's old gate, charted not fixed.** All three predate this ticket
+and none is a regression from it; the review found them while reading the corrected file, and each
+changes what ico's release gate refuses. They are
+[ticket 103](103-icos-release-gate-computes-the-bump-it-is-about-to-cut.md): an unpublished edit to
+the newest major launders into the next major's bump, because a major's FIRST release reads its
+predecessor on disk rather than at its tag; the tag's own increment is never compared to the
+declared bump, so a `v3.0.1` may carry a minor change (the old gate refused that by accident); and
+an empty local tag list cannot be told from "never released", so a `--no-tags` or shallow checkout
+grades against the wrong predecessor instead of refusing.
 
 ## Waits on the owner
 
