@@ -245,11 +245,27 @@ Battery, all exit 0 on this branch:
     bash verify/schedules/verify-lane.sh                           PASS  (unchanged by the trim)
     .venv/bin/python -m mypy twin tests conftest.py …              Success: no issues, 176 files
 
-**The full `pytest tests/` was not run and no figure from it is quoted here.** The machine was
-loaded and a number nobody watched arrive is not a number. CI on this branch is the citable read.
-Standing reds are unchanged and environment-dependent: invariants 44 and 45,
-`test_the_suite_is_green` while either is red, and the serial-only `tests/test_seam1_cli.py` leak.
-Nothing was written into `talk/truth.log`.
+**The full `pytest tests/` was not run locally and no local figure from it is quoted here.** The
+machine was loaded and a number nobody watched arrive is not a number. CI on this branch is the
+citable read, and it was watched to completion — both the push run and the pull-request run, whose
+results agree:
+
+    twin, push run 34025933959, branch ticket-67-the-record-matches-the-surface
+      tests       1 failed, 1958 passed in 208.78s
+                  FAILED tests/test_invariant_suite.py::test_the_suite_is_green
+                    -- flux_coverage_floor_is_still_reachable: the pre-registered coverage floor
+                       of 90% can no longer be reached
+      invariants  RESULT: 71 passed, 1 failed, 3 skipped (0 pending, 3 skipped and not faked)
+      typecheck, demo, reproduce-elsewhere, determinism x4   all success
+
+    twin, pull_request run 34025966944 (PR 45)
+      tests       1 failed, 1958 passed in 188.03s, the same one
+      invariants  RESULT: 71 passed, 1 failed, 3 skipped
+
+The one red is the standing one: invariant 45, `flux_coverage_floor_is_still_reachable`, and
+`test_the_suite_is_green` while it is red. Invariant 44 passed on the runner — these are
+environment-dependent, which is why no fixed count is quoted. Nothing this ticket changed is in
+either. Nothing was written into `talk/truth.log`.
 
 Map line:
 
