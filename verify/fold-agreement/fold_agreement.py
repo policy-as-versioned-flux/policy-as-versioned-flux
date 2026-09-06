@@ -54,6 +54,7 @@ line below is an exit code and an output file from a real subprocess.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shlex
 import shutil
@@ -330,14 +331,32 @@ spec:
 
 
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
+    # Hermetic against the operator's own git configuration (eco-system ticket 101, 2026-09-06).
+    # This machine's global `core.hooksPath` hook stopped being able to run -- an API quota -- and
+    # every `git commit` in the planting below began failing silently. A grader that somebody's
+    # laptop hook can turn green is worse than no grader.
+    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True,
+                          env={**os.environ, "GIT_CONFIG_GLOBAL": os.devnull,
+                               "GIT_CONFIG_SYSTEM": os.devnull})
 
 
 def _commit(repo: Path, message: str) -> str:
+    """The new commit's sha, or a RuntimeError. It used to return `git rev-parse HEAD`'s stdout
+    unconditionally, which on a repository with no commits is the literal string "HEAD" with a
+    non-zero exit nobody read: the planting silently became nothing, and the gates then answered a
+    question no one had planted -- ludlow saw an unchanged pin and adopted, and the run reported
+    agreement it had not observed (eco-system ticket 101, 2026-09-06). Half a planting is not a
+    weaker observation, it is a different one."""
     _git(repo, "add", "-A")
     _git(repo, "-c", "user.name=fold-agreement", "-c", "user.email=fold@example.invalid",
          "-c", "commit.gpgsign=false", "commit", "-q", "-m", message)
-    return _git(repo, "rev-parse", "HEAD").stdout.strip()
+    resolved = _git(repo, "rev-parse", "HEAD")
+    sha = resolved.stdout.strip()
+    if resolved.returncode != 0 or len(sha) != 40:
+        raise RuntimeError(
+            f"the planted repository at {repo} could not be committed, so nothing was planted: "
+            f"git rev-parse HEAD came back {sha!r} ({resolved.stderr.strip()[:160]})")
+    return sha
 
 
 def _write_state(repo: Path, window: list[str], tag: str, commit: str) -> None:

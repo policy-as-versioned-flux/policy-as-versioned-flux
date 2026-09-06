@@ -250,3 +250,29 @@ def test_agreement_on_every_case_is_the_only_pass(grader: ModuleType) -> None:
                                            "ludlow": _r("adopt", "none"),
                                            "tuppence": _r("refuse", "major")}})
     assert status == "FAIL"
+
+
+def test_a_planting_that_could_not_commit_raises_instead_of_returning_HEAD(grader: ModuleType, tmp_path) -> None:
+    """Eco-system ticket 101, 2026-09-06, found by running verify/real-signature against a real
+    estate. `_commit` returned `git rev-parse HEAD`'s stdout unconditionally; on a repository with
+    no commits that is the literal string "HEAD" and a non-zero exit nobody read. The planting
+    silently became nothing, ludlow's gate saw an unchanged pin and adopted, and the run reported
+    agreement it had never observed. Half a planting is not a weaker observation, it is a
+    different one -- so this is a crash, not a shrug."""
+    import pytest as _pytest
+    empty = tmp_path / "never-initialised"
+    empty.mkdir()
+    with _pytest.raises(RuntimeError, match="could not be committed"):
+        grader._commit(empty, "this repository is not a git repository at all")
+
+
+def test_the_planting_ignores_the_operators_global_git_config(grader: ModuleType, tmp_path) -> None:
+    """The trigger was a global `core.hooksPath` hook that had run out of API calls. Every git
+    call this grader makes now runs with the global and system configuration switched off, so a
+    hook on the machine running the truth surface cannot decide what the truth surface observes."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    grader._git(repo, "init", "-q", "-b", "main")
+    (repo / "f").write_text("x")
+    sha = grader._commit(repo, "planted")
+    assert len(sha) == 40 and all(c in "0123456789abcdef" for c in sha)
