@@ -47,15 +47,25 @@ entries:
       re-pins or the score recovers. A release the publisher's own gate would block publishes at
       a degraded tier (`policy/vX.Y.Z-quarantine.N`, ticket 18) and enters the adopter's prices[]
       as a priced hole under the adopter's perspective. The adopter's £ reason to switch is the
-      switching cost composition computes (ticket 19 item 4). Today: platform/compose/
-      composition.py reserves `reliability` and `switching` in PRICE_KINDS and emits neither;
-      platform/computed-semver/gate.py sorts the degraded prerelease where semver puts it.
+      switching cost composition computes (ticket 19 item 4). Ticket 45 built it, and the two
+      halves are in different places, which this row states rather than blurs. IN FORCE, and
+      anchored below: the hub's verify/portability/verify-portability.sh, which reads each
+      adopter's SERVED tree and reports, per feed edge and per adopter, what that adopter prices
+      from a publisher whose clone it would need to re-derive any of it -- the £ reason to switch,
+      standing, on a day nobody asks. NOT YET IN FORCE, and deliberately NOT anchored: platform's
+      `compute_switching`, which emits one `switching` entry per feed parent by re-composing with
+      that publisher's edges dropped, and the vendoring of each priced payload and its converter
+      under `composed/feeds/<party>/<version>/`. Both sit on platform PR 17 (2026-09-06); an
+      anchor into the estate clone resolves against platform's main, and claiming them here before
+      that merge would be this catalogue asserting a defence the estate does not have.
+      Also still open: `reliability` is reserved in PRICE_KINDS and nothing emits it, which is what
+      ticket 46 owes; platform/computed-semver/gate.py sorts the degraded prerelease where semver
+      puts it.
     anchors:
       - platform/compose/composition.py::PRICE_KINDS
+      - verify/portability/verify-portability.sh
       - platform/computed-semver/gate.py::DEGRADED_TIER
     waits_on:
-      - ticket: "45"
-        for: the switching price in prices[], the adopter's £ reason to switch
       - ticket: "46"
         for: the publisher-reliability feed and the scorer party whose score widens the triple
     source: ticket 19 Q1/item 1 and item 4; ticket 18 item 1; ticket 24 item 3 (widen_to)

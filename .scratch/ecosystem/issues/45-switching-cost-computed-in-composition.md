@@ -285,6 +285,21 @@ with the rebase and belongs to ticket 92. It passed on this branch before the re
 ticket 45 quotes a TRUTH line at all, by choice: this branch has no citable observation, and the
 figures in this Answer are the checks' own printed output.
 
+### What resolving this ticket broke, and how it was found
+
+Marking `Status: resolved` made the misuse catalogue's `publisher-games-own-feed-price` row stale:
+its `waits_on` still named ticket 45, and `twin/misuse.py` FAILs a row that waits on a resolved
+ticket — "name the built mechanism by path". CI found it (`tests/test_misuse.py`), not review; the
+brief's instruction not to run the full suite locally is what left it to CI, which is the right
+division and worked.
+
+The row now states the split rather than blurring it. Anchored, because it is in force:
+`verify/portability/verify-portability.sh`. Deliberately NOT anchored: platform's
+`compute_switching` and the vendoring, because an estate anchor resolves against platform's `main`
+and those sit on platform PR 17 — claiming them would be the catalogue asserting a defence the
+estate does not have. The row stays a could-not-look either way, because it still waits on ticket 46
+for the publisher-reliability feed; nothing was turned green.
+
 ## Waits on the owner
 
 1. **A signed platform release tag carrying this composition.** A signed tag cannot be cut locally
