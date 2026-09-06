@@ -80,7 +80,11 @@ date. A correction says what a citation failed to prove and may never supply the
 - Whether the named check is the **right** check. It grades that the check existed in the measured
   tree: necessary, never sufficient. What no text analysis closes, and what this leniency now
   reduces to: a ticket naming, in its own Answer, a check it does not own that the cited tree
-  happens to carry.
+  happens to carry. **Ticket 102 owns it** (charted 2026-09-06): "no text analysis closes it" was
+  right and beside the point — it is a git question, and the check already reads git. Resolve the
+  named check to its path in the cited tree, ask `git log --diff-filter=A` who added it, and
+  require that commit's subject to name the ticket making the claim. Measured: 34 of 37 hub checks
+  already qualify, and the three that do not are exactly run 7's three directories.
 - Anything outside `issues/*.md`. A figure in `map.md`, an ADR or the deck is ticket 67(d)'s and
   `verify-demo.sh`'s question.
 - Three populations, **counted on every run and never written down here as fixed numbers**: lines
@@ -113,11 +117,18 @@ review finding; the pull request records the exact reds.
    already carried a dated correction that names this citation and were left alone. Ticket 29 was
    in that group until the review tightened what "a correction names the citation" means: its
    2026-09-04 correction withdraws what the Answer *claimed* and never names the line it *cited*,
-   so it now carries both. Findings of the same class the check turned up and which are fixed:
-   tickets 83 and 89 quote five figures from branch runs (65, 70, 92, 95) that never reached
-   `talk/truth.log`, and ticket 90 cites run 65 as proof break-glass is green. All six lines now
-   say they are quoted from the Actions log and are not citable. Nothing was hand-written into
-   `talk/truth.log`.
+   so it now carries both. Six more lines of the same class are fixed, and the record should be
+   exact about which of them the check actually grades. Tickets 83 and 89 quote five figures from
+   branch runs (65, 70, 92, 95) that never reached `talk/truth.log`; those are rule 2's, on lines
+   that carry both a figure and a run citation, and they are graded on every run. Ticket 90's
+   "green on run 65" is **not**: it was surfaced by the widened trigger of the review round before
+   the 200-character reach was added, and at the merged head the nearest gate-proof phrase in that
+   paragraph sits 505 characters away, so the line falls in the **outside-the-rule** population the
+   run prints. Its annotation is true and **voluntary**, and the trigger is deliberately not
+   widened to chase it: reach was added because ticket 18 carries a correct citation of run 5 about
+   700 characters from the words "in the gate", and loosening it back would re-admit that false
+   positive to catch this true one. All six lines now say they are quoted from the Actions log and
+   are not citable. Nothing was hand-written into `talk/truth.log`.
 2. **Done.** ADR-0008 carries `> **Superseded in part, 2026-07-20 (the owner)…`: the four-panel
    Grafana dashboard the whole "measurable" delivery hung on, rejected in the owner's words at the
    second show and tell. The four signals, the C2P/OSCAL route and the PR-acceptance demotion
@@ -237,5 +248,7 @@ under parallel collection and is serial-only in both.
    (153-character text in the same file, inside GitHub's 160-character limit) or grants the scope.
 3. **`apps`** is archived; a banner needs it unarchived first.
 4. **platform#15** is open and waits for the integrator to merge as `pavc-other-hand`.
+5. **Notice, not a question:** ADR-0025's note of 2026-09-06 re-labels D1–D5 delegated under
+   point 3; a dated line from the owner restores any of them as owner-reasoned.
 
 Map line: [80 — The record matches the code, round 2](issues/80-the-record-matches-the-code-round-2.md) — the fifteen tickets citing run 7 of 2026-08-29 as proof their check is in the gate are corrected (thirteen appended, two already had one), and `verify/cited-truth/` refuses the sixteenth: a TRUTH line offered as gate-proof must be a recorded line whose `hub=` tree carries a check the ticket names — a `verify*.sh` by path suffix, or a directory the cited tree carries one under, read from the claim's own section with corrections stripped so a correction can never supply the proof it withdraws — or the ticket carries a dated correction naming that citation; a figure quoted beside its run must be that run's; it declares no could-not-look, spends its two-phrase escape hatch only where a grade is actually suppressed, and prints every exemption and all three ungraded populations on each run. ADR-0008 and ADR-0010 gain dated superseded-in-part banners (the rejected dashboard, the withdrawn consumer-side `sunset:`); ADR-0019/0020/0021/0023 say their acceptance rests on a bare agree and ADR-0022's line is re-labelled delegated, the word "provisional" gone, with the ruling that the five 2026-08-28 panel decisions D1–D5 read delegated too recorded in ADR-0025, ticket 13 and the map; ticket 13's three ADR notes are written; GAPS rule 1 is restored to the map, narrowed and reworded to the questions that still reach the owner; ticket 75 lists the Deny promotion as an assistant-made call; the runbook says driftwood reconciles an unsigned tag from a git server built on the laptop, `--remote` declined; platform#15 says the adopter apparatus is three independent forks (1087/829/1213 lines, 131 shared); item 9 is declined with its material recorded unapplied, waiting on an authorisation, on the commit-or-propose shape, and on `admin:org`.

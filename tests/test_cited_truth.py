@@ -390,3 +390,35 @@ def test_the_hatch_is_only_spent_where_it_actually_suppresses_a_grade() -> None:
     assert rep.exempted == []
     assert rep.declared_uncitable == 0
     assert rep.unattributed == 1
+
+
+# -- R2-1: the hatch reads prose, not code spans, link targets or a negated clause ------------------
+
+def test_a_marker_inside_a_code_span_or_a_link_does_not_exempt_the_prose() -> None:
+    for line in ("Run 7 shows pass=99; grep for `not citable` in the log.\n",
+                 "Run 7 shows pass=99, see [the note](docs/why-it-is-not-citable.md).\n"):
+        rep = ct.report({"j.md": line}, ct.recorded(LOG), trees())
+        assert [f.kind for f in rep.findings] == ["figure-disagrees"], line
+        assert rep.exempted == [], line
+
+
+def test_a_marker_negated_by_not_or_does_not_is_not_a_marker() -> None:
+    for line in ("Run 7 shows pass=99, and it is not a not citable line.\n",
+                 "Run 7 shows pass=99; this does not make it not citable.\n"):
+        rep = ct.report({"k.md": line}, ct.recorded(LOG), trees())
+        assert [f.kind for f in rep.findings] == ["figure-disagrees"], line
+
+
+def test_a_plain_prose_marker_still_exempts() -> None:
+    rep = ct.report({"l.md": "Run 7 shows pass=99, a branch run and not citable.\n"},
+                    ct.recorded(LOG), trees())
+    assert rep.findings == []
+    assert rep.exempted == [("l.md", 1, "not citable")]
+
+
+def test_a_negation_further_off_than_a_word_does_not_reach_the_phrase() -> None:
+    # the window is a modifier's distance, not a sentence's: this line disowns its own figure
+    rep = ct.report({"m.md": "Run 7: no run recorded it, so it is not citable. pass=99\n"},
+                    ct.recorded(LOG), trees())
+    assert rep.findings == []
+    assert rep.exempted == [("m.md", 1, "not citable")]

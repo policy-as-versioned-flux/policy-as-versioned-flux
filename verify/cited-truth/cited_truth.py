@@ -121,7 +121,17 @@ _CORRECTION_ANY = re.compile(r"\*\*Correct(?:ed|ion)\b", re.I)
 # carrying the runner's own `fixture=1` token. `_NEGATION` then rejects an occurrence that is
 # itself negated; phrases beginning "not" are exempt from that test, being negative already.
 _UNCITABLE = ("not citable", "fixture=1")
-_NEGATION = re.compile(r"(?:\bnot\s+a\b|\bno\b|\bwithout\b|\bnever\b)[^.]{0,30}$", re.I)
+# The negation must MODIFY the phrase, so the window is short: 12 characters, about one word.
+# At 30 it swallowed "no run recorded it, so it is not citable", which disowns its figure
+# perfectly well. `not` is in the list since R2-1, which is why the phrase's own leading
+# "not" must not be visible here -- it never is, because only the text BEFORE it is tested.
+_NEGATION = re.compile(
+    r"(?:\bnot\b|\bno\b|\bwithout\b|\bnever\b)[^.]{0,12}$", re.I)
+# A marker inside a `code span` or a [link](target) is quoting the phrase, not spending it
+# (review R2-1). Both are blanked -- not deleted, so every offset the caller holds still lines
+# up with the text it came from.
+_CODE_SPAN = re.compile(r"`[^`\n]*`")
+_LINK_TARGET = re.compile(r"\]\([^)\n]*\)")
 
 # A backticked token that names a check. Two shapes and nothing else (review F1):
 #   * a SCRIPT, `[path/]verify*.sh` -- matched against a tree by path suffix, because tickets
@@ -314,18 +324,27 @@ def _paragraphs(text: str) -> list[_Para]:
     return paras
 
 
+def _blank(pattern: re.Pattern[str], text: str) -> str:
+    """Replace each match with spaces of the same length, so offsets do not move."""
+    return pattern.sub(lambda m: " " * len(m.group(0)), text)
+
+
 def uncitable(line: str) -> str | None:
     """The fixed phrase by which this text disowns its own figure, or None.
 
-    A negated occurrence is not a disclaimer: "no fixture was used" and "this is not a rehearsal"
-    each assert the opposite of one. Phrases that begin with "not" are already negative and are
-    not put through that test.
+    A negated occurrence is not a disclaimer: "it is not a not citable line" and "this does not
+    make it not citable" each assert the opposite of one. Every phrase is put through that test,
+    including the ones beginning "not": only the text BEFORE an occurrence is examined, so a
+    phrase never negates itself.
+
+    Code spans and link targets are blanked first (review R2-1): `not citable` inside backticks or
+    inside a URL is the phrase being QUOTED, not a line disowning its own figure.
     """
-    low = line.lower()
+    low = _blank(_CODE_SPAN, _blank(_LINK_TARGET, line)).lower()
     for phrase in _UNCITABLE:
         start = low.find(phrase)
         while start != -1:
-            if phrase.startswith("not") or not _NEGATION.search(low[:start]):
+            if not _NEGATION.search(low[:start]):
                 return phrase
             start = low.find(phrase, start + 1)
     return None
@@ -828,6 +847,12 @@ def selfcheck() -> int:
     spent = report({"a.md": "no run beside it, and not citable anyway: pass=5\n"}, log, good)
     if spent.exempted or spent.unattributed != 1:
         problems.append("the hatch was spent on a line that was never going to be graded")
+    for quoted in ("run 7: grep for `not citable` in the log, pass=99\n",
+                   "run 7, see [why](docs/it-is-not-citable.md), pass=99\n",
+                   "run 7: this does not make it not citable, pass=99\n"):
+        q = report({"a.md": quoted}, log, good)
+        if [f.kind for f in q.findings] != ["figure-disagrees"] or q.exempted:
+            problems.append(f"a quoted or negated marker exempted a line: {quoted.strip()!r}")
     for negated in ("Run 7 shows pass=99, and no fixture was used.\n",
                     "Run 7 shows pass=99; this is not a rehearsal.\n"):
         neg = report({"a.md": negated}, log, good)
@@ -854,7 +879,8 @@ def selfcheck() -> int:
     print("  ok   selfcheck: a carried check passes; a lacking tree, an unreadable commit, an "
           "unrecorded line and a disagreeing figure each fail by name; a dated correction "
           "disposes and an undated one does not; a bare `verify/` and a directory carrying "
-          "no script name no check; a negated marker word exempts nothing; every exempted "
+          "no script name no check; a marker that is negated, quoted in a code span or "
+          "sitting in a link target exempts nothing; every exempted "
           "line is named as well as counted; the fact table names a missing sentence, a "
           "removed sentence that came back and an unreadable file")
     return 0
