@@ -433,8 +433,10 @@ run_step() {  # step skill paths pattern validator adopter
     # a Signed-off-by / Co-authored-by line is a person's name on a model's work. Read over the
     # WHOLE message, not `interpret-trailers --parse` (which sees nothing when the line sits in
     # the first paragraph), and the value must EQUAL the clock's identity, not contain it
-    # ("The Owner <...>, local clock <...>" contains it) -- follow-up R1.
-    trailers="$(cgit -C "$wt" log -1 --format=%B "$c" | grep -Ei '^(Signed-off-by|Co-authored-by):' | sed -E 's/^[^:]+:[[:space:]]*//; s/[[:space:]]+$//' | grep -Fvx "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" || true)"
+    # ("The Owner <...>, local clock <...>" contains it) -- follow-up R1. Whitespace before the
+    # colon and any letter case count too: `signed-off-by : X` is what interpret-trailers
+    # normalises to a Signed-off-by trailer, so a tool reading trailers would credit X (tidy R3).
+    trailers="$(cgit -C "$wt" log -1 --format=%B "$c" | grep -Ei '^(Signed-off-by|Co-authored-by)[[:space:]]*:' | sed -E 's/^[^:]+:[[:space:]]*//; s/[[:space:]]+$//' | grep -Fvx "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" || true)"
     if [ "$sig_lines" != 0 ]; then bad_commit="commit ${c:0:7} carries a signature block"; break; fi
     if [ "$author" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then bad_commit="commit ${c:0:7} is authored as '$author', not the clock"; break; fi
     if [ "$committer" != "$CLOCK_AUTHOR_NAME <$CLOCK_AUTHOR_EMAIL>" ]; then bad_commit="commit ${c:0:7} is committed as '$committer', not the clock"; break; fi

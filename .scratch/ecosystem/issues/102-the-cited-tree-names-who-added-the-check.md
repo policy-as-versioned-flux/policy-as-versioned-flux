@@ -173,7 +173,10 @@ Three reasons, in the order they weigh:
    place whose subject carries a number that looks like a ticket and is not.
 
 A check that genuinely moved between trees is carried by the attribution line, which is the escape
-this ticket built for exactly that case.
+this ticket built for exactly that case — with bind 4's qualifier: a moved check is carried only
+where the moving commit names no ticket, and the line must name that moving commit, which is what
+`git log --diff-filter=A` returns at the new path; a move commit that names another ticket leaves
+only the dated correction.
 
 ### The escape, and what it can and cannot be planted against
 
@@ -181,7 +184,8 @@ A dated **attribution line**, in this shape and no other —
 
     > **Attribution, 2026-09-06 (ticket NN).** `verify/x/` was added by `sha`, which names no ticket.
 
-— carries a check whose adding commit predates the convention or moved between trees. The lesson
+— carries a check whose adding commit predates the convention or moved between trees under a
+commit that names no ticket (bind 4; a move commit naming another ticket is not carried). The lesson
 that has cost every review this week is that a check reading the text it grades treats the fix
 somebody writes into that text as input, so the line is verified and never believed. **Five binds**,
 four of them refusing text on the strength of git:
@@ -242,8 +246,9 @@ the three is a shrug and none has a `SKIP`.
     gate-proof citations: 0 proved by an adding commit naming the ticket, 0 by a dated attribution
     line, 47 disposed of by a dated correction, 0 observed false; 0 attribution(s) consulted and refused
 
-(Quoted from the run at `417ac08`; the recorded-lines figure moves with the clock, the rest with
-the record.)
+(Quoted from the run at `7046106`, this ticket's head after its rebase onto fb06798 — the sha first
+written here, 417ac08, was the pre-rebase commit and no longer exists; the recorded-lines figure
+moves with the clock, the rest with the record.)
 
 The charting recorded "rule 1's positive path is proven by no real ticket" as a sentence. It is now
 a **printed number on every run**, and the number is starker than the sentence was: the four
