@@ -307,3 +307,43 @@ def test_a_real_table_from_an_older_run_is_still_a_failure() -> None:
     table = ds.parse_grades(GRADES.replace("run=122", "run=113"))
     assert ds.table_is_local(table) is False
     assert len(ds.table_is_the_newest_run(table, TRUTH)) == 1
+
+
+# ------------------------------------------------------------------ re-review 2026-09-06, R2-1
+
+def test_a_plural_subject_names_every_ticket_in_its_list() -> None:
+    """R2-1, blocking. The estate builds two tickets' checks in one commit and says so:
+    `Tickets 62 and 77: ...` added verify-branch-refs.sh and `Tickets 56 and 85: ...` added
+    verify-schedules.sh. A scan reading only `ticket NN` read NEITHER, so both scripts came back
+    unownable or under-owned and four tickets were told, on every run, that a red check they had
+    built was "not their own" -- a false ownership statement, which is the exact defect the
+    ownership rule exists to prevent."""
+    assert ds.ticket_numbers("Tickets 62 and 77: no branch refs, and pins are checked for "
+                             "content") == {"62", "77"}
+    assert ds.ticket_numbers("Tickets 56 and 85: the clocks are read, graded and named") == \
+        {"56", "85"}
+
+
+def test_every_separator_the_hub_log_uses_is_read() -> None:
+    assert ds.ticket_numbers("Ticket 89: deny is not a rung") == {"89"}
+    assert ds.ticket_numbers("Tickets 21, 25 and 26: three checks") == {"21", "25", "26"}
+    assert ds.ticket_numbers("ecosystem: ticket 21 lands + ticket 52 follows") == {"21", "52"}
+    assert ds.ticket_numbers("tickets #62 & #77") == {"62", "77"}
+
+
+def test_a_number_before_the_word_is_not_a_ticket() -> None:
+    """`27 tickets implemented` would otherwise hand ticket 27 a check it never wrote."""
+    assert ds.ticket_numbers("Estate build: 27 tickets implemented this week") == set()
+
+
+def test_a_hyphenated_branch_name_in_a_merge_subject_names_no_ticket() -> None:
+    assert ds.ticket_numbers(
+        "Merge pull request #24 from policy-as-versioned-flux/ticket-62-and-77-pins") == set()
+
+
+def test_a_range_is_read_as_its_first_number_only_and_that_is_recorded() -> None:
+    """A decision, not an oversight: `tickets 76-87 charted` is a review's charting commit, and
+    no commit that TOUCHES a verify script uses a range (measured over the hub log, 2026-09-06).
+    Ticket 102 owns this vocabulary and does not read ranges either; matching it matters more
+    than covering a spelling that never attributes a check."""
+    assert ds.ticket_numbers("Ambition review: tickets 54-67 chart the remediation") == {"54"}

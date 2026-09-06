@@ -299,3 +299,13 @@ it waits on is in ticket 64's `## Waits on the owner`.
 > (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
 > field used to say, kept verbatim because it is the qualification a reader needs:
 > “(the done clause's citable green run waits on the owner's three adopter releases -- see ticket 77's Waits item 1)”
+
+## Follow-up
+
+> **Correction, 2026-09-06 (eco-system ticket 59).** This ticket is `resolved` and one of the two
+> checks its Answer names is RED. Run 135 (2026-09-06T11:04Z, branch `ticket-59-a-fall-blocks-and-status-is-derived`, `hub=33c9ac5`, a branch run and so not citable) graded `verify/branch-refs/verify-branch-refs.sh` `FAIL: 1 cross-organisation checkout(s) are not pinned to a signed tag: insurer/release.yml checks out policy-as-versioned-platform/platform with no ref:`. `git log --full-history` on that script names
+> tickets 62 and 77 -- one commit, `Tickets 62 and 77: no branch refs, and pins are checked for
+> content`, built it for both -- so it is this ticket's check as much as 77's. The red is the
+> insurer's `release.yml` checking out the platform with no `ref:`; this ticket's own Status note
+> already records that its citable green waits on the owner's three adopter releases. The
+> finishing move is a pinned `ref:` in an enactment repository, which is the owner's push.

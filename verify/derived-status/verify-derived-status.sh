@@ -54,10 +54,17 @@
 # "ticket 56 owns" the reason it is red. Writing an acknowledgement into each would have put nine
 # false ownership statements into the record. Prose cannot separate them; GIT CAN. A check is
 # owned by the tickets whose commits touched its file (`git log --full-history -- <path>`, in the
-# unit's own repository for a `.estate-clone/` path), and the narrowing lands on exactly three:
-# 38, 89 and 99. A red check a ticket does not own is COUNTED. A check no commit names any ticket
-# for is UNOWNABLE and also counted -- inferring an owner from silence is how a false ownership
-# statement gets written.
+# unit's own repository for a `.estate-clone/` path). Reading the estate's PLURAL subjects is part
+# of that rule, not a detail: `Tickets 62 and 77: ...` is the commit that added
+# verify-branch-refs.sh and `Tickets 56 and 85: ...` added verify-schedules.sh, so a scan that
+# read only `ticket NN` reported both unowned and told four tickets that a check they had built
+# was not their own (re-review R2-1). With the plural read the narrowing lands on SEVEN tickets --
+# 38, 56, 62, 77, 85, 89, 99 -- and leaves seven red rows named by tickets that own none of them
+# (57, 72, 73, 80, 83). The reading itself is ticket 102's `ticket_numbers` where this checkout
+# carries it and a mirror of the same rule where it does not; the two must agree, and the run
+# prints which one it used. A red check a ticket does not own is COUNTED. A check no commit names
+# any ticket for is UNOWNABLE and also counted -- inferring an owner from silence is how a false
+# ownership statement gets written.
 #
 # THE ONE-RUN LAG, stated because it would otherwise be found (review F4). talk/verify-all.sh
 # writes the grade table AFTER its script loop, so when this script runs inside run N the table on
@@ -68,9 +75,9 @@
 #
 # WHAT IS COUNTED AND NEVER FAILED, printed as numbers on every run so that what is outside the
 # derivation moves with the record instead of rotting in a sentence: resolved tickets that name
-# no check of their own the table carries (55 of 79 against run 135), named checks that are not
-# rows in the table at all (124), red rows named by a ticket that does not own the check (9) and
-# red rows no commit ties to any ticket (2).
+# no check of their own the table carries (51 of 79 against run 135), named checks that are not
+# rows in the table at all (124), red rows named by a ticket that does not own the check (7) and
+# red rows no commit ties to any ticket (0, now that the plural subjects are read).
 #
 #   PASS (exit 0)  the record uses the vocabulary, every done ticket has something behind it, and
 #                  no ticket claims resolved while a check IT OWNS is red and unacknowledged

@@ -144,3 +144,12 @@ Map line: Ticket 85 -- the two unowned red clocks are fixed at the source (feeds
 > (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
 > field used to say, kept verbatim because it is the qualification a reader needs:
 > “for what an agent can build (both unowned reds fixed and every red now names its ticket; "green on the newest run" waits on the merges of the three pushed unit branches and the next scheduled runs)”
+
+## Follow-up
+
+> **Correction, 2026-09-06 (eco-system ticket 59).** This ticket is `resolved` and the check its
+> Answer names is RED. Run 135 (2026-09-06T11:04Z, branch `ticket-59-a-fall-blocks-and-status-is-derived`, `hub=33c9ac5`, a branch run and so not citable) graded `verify/schedules/verify-schedules.sh` `FAIL: 3 schedule/cage check(s) observed false: insurer/fetch.yml ludlow tuppence`. `git log --full-history` on that script names tickets 28,
+> 56, 70 and 85, so it is this ticket's own check. This is the state this ticket's own Status
+> note already describes -- every red names its ticket, and "green on the newest run" waits on
+> the merges of the three pushed unit branches and the next scheduled runs. The finishing move is
+> those merges and those runs, not more work here.

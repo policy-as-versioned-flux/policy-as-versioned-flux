@@ -259,29 +259,105 @@ avoided, one round earlier.
 
 So ownership is now read from git, not from prose: a check is owned by the tickets whose commits
 touched its file, looked up in the unit's own repository for a `.estate-clone/` path. The
-narrowing lands on three, and they are the three: **38, 89 and 99**. Each now carries a dated
+narrowing kept three tickets while the ticket-number scan was singular, and SEVEN once the
+re-review found that scan wrong (R2-1, below). Each kept ticket now carries a dated
 `## Follow-up` naming its red check, quoting run 135's exact verdict line, saying it is not
-citable, and saying what git names as owning it — 38's failure is `composition.py`'s own selfcheck
-finding `acme` in `composed/governed-namespace-guard.yaml` and no OPEN ticket owns it; 89's check
-names ticket 89 in its own verdict; 99's two reds are also touched by ticket 101, which is open and
-is the only open ticket naming either. With those three written the derivation is clean, so the
-first table to land will PASS rather than raise `fail` — the collision is answered by narrowing
-and by three true sentences, not by twelve invented ones.
+citable, and saying what git names as owning it. With those written the derivation is clean, so
+the first table to land will PASS rather than raise `fail` — the collision is answered by
+narrowing and by true sentences, not by twelve invented ones.
+
+### Re-review round 2, 2026-09-06
+
+**R2-1, blocking, and it made the narrowing itself wrong.** The ticket-number scan was
+`\bticket\s+(\d{1,4})\b`, which reads NOTHING from the estate's own plural commit subjects.
+`Tickets 62 and 77: no branch refs, and pins are checked for content` is the commit that added
+`verify/branch-refs/verify-branch-refs.sh`; `Tickets 56 and 85: the clocks are read, graded and
+named` added `verify/schedules/verify-schedules.sh`. So branch-refs came back UNOWNABLE, schedules
+lost two of its four owners, and the derivation printed "the red check(s) it names are not its
+own" for tickets 56, 62, 77 and 85 on every run — four false ownership statements, which is the
+exact defect decision 12 exists to prevent. Round 1's "exactly three" and "2 unownable" rested on
+it and were wrong; they are corrected here, in the manifest row and in the wrapper's header.
+
+Reading every number in a `[Tt]ickets? N(, N)*( and N)?` list, the corrected picture against run
+135's real grade table is:
+
+| | tickets |
+| --- | --- |
+| resolved, and red on a check they OWN | **38, 56, 62, 77, 85, 89, 99** (seven) |
+| naming a red check they own none of | 57, 72, 73, 80, 83 (seven red rows) |
+| red and unownable | none (was two, both an artefact of the singular scan) |
+
+All seven now carry a dated `## Follow-up`. The four new ones are as real as the first three: 56
+and 85 name `verify/schedules/verify-schedules.sh` and its verdict `FAIL: 3 schedule/cage check(s)
+observed false: insurer/fetch.yml ludlow tuppence`, which is the estate state ticket 85's own
+Status note already describes as waiting on three unit merges; 62 and 77 name
+`verify/branch-refs/verify-branch-refs.sh` and its verdict about the insurer's `release.yml`
+checking out the platform with no `ref:`, which both tickets' own Status notes already record as
+waiting on the owner. So the derivation is clean and the first recorded grade table makes this
+check PASS rather than raise `fail`.
+
+**Ranges are deliberately not read.** `tickets 54-67 chart the remediation` and its two siblings
+are review-and-charting commits; measured over the whole hub log on 2026-09-06, no commit that
+TOUCHES a verify script spells a range at all, so reading one would add a guess and attribute
+nothing real. Ticket 102 does not read them either.
+
+**R2-2.** Ticket 102 owns "which ticket does a commit subject name" and defines `ticket_numbers()`
+in `verify/cited-truth/cited_truth.py` — on pull request 51, which is **not merged**, so this
+module cannot import it unconditionally: the gate runs against whatever tree is checked out and a
+hard import would crash the check on `main` today. And that file must not be edited while its
+builder is editing it. So the function is imported WHEN PRESENT and mirrored when not, the two are
+asserted to AGREE on the nine subject shapes this estate's log uses (a disagreement fails the
+check), and the run PRINTS which of the two it used. When 102 lands the import wins by itself and
+the mirror is dead code to delete. Two copies that cannot silently diverge is the most this ticket
+can do without touching another builder's file; the module move is a follow-up.
+
+**R2-3, the honest limit of the runner evidence.** Run 142's `verify/a-fall-blocks/...sh PASS` row
+proves that **the fixture executed under the runner's own python, git and bash — including the
+`bash -e` the lifted step runs under — and that every one of its fifteen states behaved as
+decided**, because the script exits 1 if any state disagrees. It is NOT fifteen per-state lines
+read off the runner: `talk/verify-all.sh` writes each script's output to
+`talk/captures/<slug>.out`, and a branch run commits nothing (ticket 100), so that capture exists
+only on the runner's disk. The per-state lines quoted in this ticket are from the identical script
+run locally. The first scheduled run on the default branch commits the capture, and from that day
+the fifteen lines are in the record.
 
 ### Further decisions
 
 12. **Ownership of a check is read from git, never from the Answer's prose.** `delegated`. The
     served artefact is the check script and the operation that reaches it is a commit; `git log
-    --full-history -- <path>` names every commit that touched it whatever merges intervened. A red
-    check a ticket does not own is COUNTED (9 on run 135). A check no commit ties to any ticket is
-    UNOWNABLE and also counted (2): inferring an owner from silence is how a false ownership
-    statement gets written.
+    --full-history -- <path>` names every commit that touched it whatever merges intervened — and
+    reading the estate's plural subjects is part of the rule, not a detail (R2-1). A red check a
+    ticket does not own is COUNTED (7 red rows on run 135). A check no commit ties to any ticket
+    is UNOWNABLE and also counted (0, once the plural subjects are read): inferring an owner from
+    silence is how a false ownership statement gets written.
+    **This module reads every TOUCHING commit; ticket 102 reads the ADDING commit** (R2-2), and
+    both are right for their own question. 102 asks who ADDED a check, so a ticket cannot claim
+    proof from a tree that predates it — one commit, the first. This asks who is ANSWERABLE for a
+    check being red today, and a check is maintained by more tickets than the one that created it:
+    `verify/schedules/verify-schedules.sh` was added by 56 and 85 and has since been touched by 28
+    and 70, and all four should hear that it is red. Same vocabulary, different span; the
+    vocabulary is shared, not forked.
 13. **The step's effective shell is resolved in one place, `can_record.py`.** `delegated`. Two
     copies of "what will the runner run this under" is how the fixture and the workflow diverged
     in the first place.
 14. **A `run=local` or `fixture=1` grade table is a could-not-look, not a fault.** `delegated`. It
     can never be the newest recorded run, and failing on it would redden a local gate run for the
     crime of having been run.
+
+### Found while rebasing, and NOT this ticket's to fix
+
+`verify/cited-truth/verify-cited-truth.sh` is RED on `origin/main` at `e5bca74`, and has been
+since pull request 47 (ticket 92 round 6) merged:
+
+    .scratch/ecosystem/issues/92-the-local-clock.md:245: no-such-line: run 131 is quoted with
+    pass=71 fail=11 skip=21 excluded=8 total=111 ceiling=92, and talk/truth.log records no such line
+
+Run 131 was a BRANCH run, so ticket 100's guard correctly stopped it recording, and the line it
+measured is only in the Actions log. This branch's copy of that file is byte-identical to main's
+(`git diff origin/main -- .scratch/ecosystem/issues/92-the-local-clock.md` is empty), so the red
+is inherited and not caused here. The fix is one dated line in ticket 92 saying the quoted figure
+is from a run nobody recorded — the same shape ticket 92's own text already uses elsewhere — and
+it belongs to ticket 92, not to this one. Recorded so it is not mistaken for this branch's.
 
 ## Waits on the owner
 

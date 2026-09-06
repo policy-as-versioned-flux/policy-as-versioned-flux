@@ -305,7 +305,79 @@ def acknowledges(text: str, check: str) -> str:
 
 # ------------------------------------------------------------------ who owns a check
 
-_TICKET_IN_SUBJECT = re.compile(r"\bticket\s+(\d{1,4})\b", re.I)
+# WHICH TICKETS A COMMIT SUBJECT NAMES. One definition for the estate, borrowed rather than
+# forked (re-review R2-2, 2026-09-06).
+#
+# THE DEFECT THIS REPLACES (R2-1, blocking): `\bticket\s+(\d{1,4})\b` read NOTHING from the
+# estate's own plural subjects. `Tickets 62 and 77: no branch refs, and pins are checked for
+# content` is the commit that added verify-branch-refs.sh; `Tickets 56 and 85: the clocks are
+# read, graded and named` added verify-schedules.sh. Both scripts therefore came back unownable
+# or under-owned, and four tickets that had built the very check that is red were told on every
+# run that it was "not their own" -- a false ownership statement, which is precisely what the
+# ownership rule exists to prevent.
+#
+# WHERE IT COMES FROM. Ticket 102 owns this vocabulary and defines `ticket_numbers()` in
+# verify/cited-truth/cited_truth.py. That work is on pull request 51 and is NOT on main yet, so
+# this module CANNOT import it unconditionally: the gate runs against whatever tree is checked
+# out, and a hard import would crash the check on main today. So it is imported WHEN PRESENT and
+# mirrored when not -- and the two are asserted to AGREE, on every subject shape this module
+# tests, whenever both exist. Two copies that cannot silently diverge is the most this ticket can
+# do without editing a file another builder is editing right now. When 102 lands, delete the
+# mirror: the import already prefers the shared one, and `derived_status.py report` prints which
+# of the two it used on every run.
+_MIRROR_TICKET_IN_SUBJECT = re.compile(
+    r"\btickets?\s+#?(\d{1,4})((?:\s*(?:,|and|&|\+|/)\s*#?\d{1,4})*)", re.I)
+_A_NUMBER = re.compile(r"\d{1,4}")
+
+
+def _mirror_ticket_numbers(subject: str) -> set[str]:
+    """Ticket 102's rule, mirrored: case-insensitive, the number must FOLLOW the word, and a
+    trailing list is collected. A RANGE is deliberately not read -- `tickets 54-67 chart the
+    remediation` is a review's charting commit, and measured over the whole hub log on
+    2026-09-06 no commit that TOUCHES a verify script spells a range at all, so reading one
+    would add a guess and attribute nothing real."""
+    out: set[str] = set()
+    for m in _MIRROR_TICKET_IN_SUBJECT.finditer(subject):
+        out.add(str(int(m.group(1))))
+        out.update(str(int(n)) for n in _A_NUMBER.findall(m.group(2) or ""))
+    return out
+
+
+def _shared_ticket_numbers():
+    """Ticket 102's own function if this checkout carries it, else None."""
+    return getattr(sys.modules.get("cited_truth"), "ticket_numbers", None)
+
+
+def ticket_numbers(subject: str) -> set[str]:
+    shared = _shared_ticket_numbers()
+    return shared(subject) if shared is not None else _mirror_ticket_numbers(subject)
+
+
+def ticket_numbers_source() -> str:
+    return ("verify/cited-truth/cited_truth.py's ticket_numbers (ticket 102)"
+            if _shared_ticket_numbers() is not None
+            else "this module's mirror of ticket 102's rule; pull request 51 has not landed")
+
+
+def ticket_numbers_agree() -> list[str]:
+    """Where the shared function and the mirror disagree, on the shapes this estate's log uses.
+    Empty when only one of them exists. Two copies are tolerable only while they cannot drift in
+    silence."""
+    shared = _shared_ticket_numbers()
+    if shared is None:
+        return []
+    subjects = ("Ticket 89: deny is not a rung",
+                "Tickets 62 and 77: no branch refs, and pins are checked for content",
+                "Tickets 56 and 85: the clocks are read, graded and named",
+                "Tickets 21, 25 and 26: three checks",
+                "ecosystem: ticket 21 lands + ticket 52 follows",
+                "tickets #62 & #77",
+                "Estate build: 27 tickets implemented this week",
+                "Merge pull request #24 from policy-as-versioned-flux/ticket-62-and-77-pins",
+                "Ambition review: tickets 54-67 chart the remediation")
+    return [f"{subject!r}: ticket 102 reads {sorted(shared(subject))}, this module's mirror reads "
+            f"{sorted(_mirror_ticket_numbers(subject))}"
+            for subject in subjects if shared(subject) != _mirror_ticket_numbers(subject)]
 
 
 def git_owners(root: Path) -> Callable[[str], set[str]]:
@@ -317,7 +389,12 @@ def git_owners(root: Path) -> Callable[[str], set[str]]:
     record, ticket 83 citing driftwood's sweep script as an example of a manifest class, four
     tickets mentioning `verify-schedules.sh` where 57's own Answer says in as many words that
     "ticket 56 owns" the reason it is red. Prose cannot separate those. GIT CAN: a check is owned
-    by the tickets whose commits touched its file.
+    by the tickets whose commits touched its file. Reading the estate's PLURAL subjects matters as
+    much as the rule itself: `Tickets 62 and 77: ...` added verify-branch-refs.sh and
+    `Tickets 56 and 85: ...` added verify-schedules.sh, and a scan that read neither reported both
+    scripts unowned and told four tickets that a check they had built was not theirs. With the
+    plural read, seven tickets are resolved-but-red on a check they own (38, 56, 62, 77, 85, 89,
+    99) and seven red rows are named by a ticket that owns none of them (57, 72, 73, 80, 83).
 
     The served artefact is the check script; the operation that reaches it is a commit. `git log
     --full-history -- <path>` names every commit that touched it, whatever merges happened in
@@ -346,7 +423,10 @@ def git_owners(root: Path) -> Callable[[str], set[str]]:
             return set()
         if out.returncode != 0:
             return set()
-        return {m.group(1) for m in _TICKET_IN_SUBJECT.finditer(out.stdout)}
+        found: set[str] = set()
+        for subject in out.stdout.splitlines():
+            found |= ticket_numbers(subject)
+        return found
 
     return owners
 
@@ -597,6 +677,12 @@ def _run(args: argparse.Namespace) -> int:
     run = parse_truth(table.truth_line)["run"] if table.truth_line else "?"
     print(f"  derived from the grade table run {run} recorded, "
           f"{len(table.grades)} script(s) graded")
+    # WHICH COPY read the ticket numbers out of the commit subjects (re-review R2-2). Printed,
+    # not assumed: while ticket 102's pull request is unmerged this module mirrors its rule, and
+    # the line changes by itself the day the shared one lands.
+    print(f"  ticket numbers read by {ticket_numbers_source()}")
+    for disagreement in ticket_numbers_agree():
+        print(f"  !! the two readings of a commit subject disagree -- {disagreement}")
     c = rep.counts
     print(f"  {c['resolved']} of {c['tickets']} tickets are written `resolved`: "
           f"{c['derived-green']} derive resolved from a named check that passed, "
@@ -613,7 +699,7 @@ def _run(args: argparse.Namespace) -> int:
         print(f"  !! {p}")
     for f in rep.findings:
         print(f"  !! {f}")
-    return 0 if rep.ok else 1
+    return 0 if (rep.ok and not ticket_numbers_agree()) else 1
 
 
 def main(argv: list[str]) -> int:
