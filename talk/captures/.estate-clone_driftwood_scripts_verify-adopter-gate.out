@@ -1,0 +1,63 @@
+
+== setup: a real clone of platform at the tag this repository pins ==
+this repository pins platform v2.0.1
+the served artefact: platform's own evidence for policy 2.0.1 at v2.0.1
+  bundle shape legacy; the publisher's own computed bump for it is 'none'
+
+== A: ADR-0001's pin is load-bearing -- verify-commit refuses a pin naming the wrong commit ==
+REFUSED: platform-pin.yaml pins commit cccccccccccccccccccccccccccccccccccccccc, but the checked-out tag resolves to 533dccb0a823001b396fd60ab08014bf75065a37 -- refusing, the pin is not decorative
+OK  A: the real resolved commit is accepted and a wrong one is refused, naming both
+
+== B: a pull request that moves nothing composes 'none' and reads no evidence at all ==
+  "retired": [],
+  "reasons": [],
+  "weaker_than_declared": false
+}
+OK: composed bump is 'none'
+OK  B: nothing moved, nothing was verified, composed 'none', exit 0
+
+== C: the REAL ACCEPT -- policy 2.0.1 arrives, and real cosign verifies platform's own published signature ==
+{
+  ],
+  ],
+}
+  - 2.0.1: publisher declared 'patch', computed 'none'
+  - composed bump 'none' is weaker than the publisher's declared 'patch' -- printed, never lowers what this institution treats as the obligation
+OK: composed bump is 'none'
+OK  C: real cosign ACCEPTED platform's own published signature for policy 2.0.1 at v2.0.1, under this repository's own identity constant, and the gate composed the publisher's own 'none'
+
+== D: the REAL REFUSE -- the same real bundle with one signature byte changed ==
+REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's own identity constant -- Error: error verifying bundle: signature in bundle does not match signature being verified
+error during command execution: error verifying bundle: signature in bundle does not match signature being verified
+OK  D: real cosign REFUSED the same real bundle with one signature byte changed, and the gate propagated it as a refusal about the SIGNATURE
+
+== E: the identity constant is load-bearing against a real Fulcio certificate, not just against a string ==
+REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's own identity constant -- Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+OK  E: the same real, valid bundle is REFUSED when the identity constant names a foreign publisher -- the certificate is really being read
+
+== F: a retirement is a forced major, and a composed major refuses the pull request ==
+  "weaker_than_declared": false
+}
+  - retired from the supported window: 2.0.1 (a retired version reaches the institution as a major)
+OK  F: retiring policy 2.0.1 composed major with no evidence lookup at all, and refused
+
+== G: how offline this gate actually is -- measured on this run, not claimed ==
+cold TUF cache + every proxy pointed at a closed port: exit 1
+Error: setting up clients and keys: getting rekor public keys: updating local metadata and targets: error updating to TUF remote mirror: tuf: failed to download 13.root.json: Get "https://tuf-repo-cdn.sigstore.dev/13.root.json": proxyconnect tcp: dial tcp 127.0.0.1:1: connect: connection refused
+error during command execution: setting up clients and keys: getting rekor public keys: updating local metadata and targets: error updating to TUF remote mirror: tuf: failed to download 13.root.json: Get "https://tuf-repo-cdn.sigstore.dev/13.root.json": proxyconnect tcp: dial tcp 127.0.0.1:1: connect: connection refused
+ok  G: measured, not claimed -- with a cold TUF cache and egress blocked this gate's own cosign invocation cannot verify platform's real bundle (exit 1, a TUF fetch). Scenario C above therefore ran with the network available, exactly as a real shift-left run does. Eco-system ticket 105 is the pin that closes it
+
+== H: the gate's own selfcheck -- its pure logic, on planted inputs ==
+OK splice_body: an empty starting body gets no leading separator
+
+selfcheck ok: read_pin parses the real pin shape; verify_pinned_commit matches and refuses for real against a real git repo; read_policy_array_at/diff_arrays/fetch_tag detect an add and a retirement against real git tags, fetching a tag missing from a real clone for real; verify_evidence refuses a missing file, a garbage bundle (real cosign call), and -- where a local cosign signing flow is reachable offline -- a real, validly key-signed bundle presented to identity-pinned verification (real cosign call, real refusal, since a key-signed bundle carries no certificate); EXPECTED_PLATFORM_IDENTITY_REGEXP matches real identity shapes and refuses a renamed workflow path; compose() satisfies every acceptance criterion as a pure function; render_markdown never emits a percentage. NOT provable outside a live GitHub Actions run: a real Fulcio-certificate keyless signature bound to platform's own ambient OIDC identity -- no ambient credential and no interactive browser login exist in this sandbox (same class of limit cs-13 and cs-27 already disclosed for their own signing steps).
+OK  H: adopter-gate.py --selfcheck passed
+
+PASS: driftwood's adopter gate, against platform's REAL PUBLISHED evidence for policy 2.0.1 at v2.0.1 --
+      the pin is load-bearing (A), a movement of nothing composes 'none' and verifies nothing (B), real
+      cosign ACCEPTS platform's own signature and the gate composes the publisher's own 'none' (C),
+      real cosign REFUSES the same bundle with one signature byte changed (D), the same valid bundle is
+      REFUSED under a foreign identity constant (E), a retirement is a forced major that refuses (F), and
+      the gate's own selfcheck passes (H). How offline the signature check is is measured on every run and
+      printed as an exit code (G), never asserted as a sentence.

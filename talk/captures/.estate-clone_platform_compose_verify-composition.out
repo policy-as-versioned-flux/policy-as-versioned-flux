@@ -152,8 +152,16 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "count": 0,
       "checked": 0,
       "status": "closed"
+    },
+    {
+      "name": "publisher-clone-absent",
+      "detail": "every priced feed was read from its publisher's own pinned tree",
+      "count": 0,
+      "checked": 0,
+      "status": "closed"
     }
-  ]
+  ],
+  "vendored": []
 }
 OK cmd_compose: writes the rendered files and the evidence document, exits 0 on success
 {
@@ -3087,6 +3095,108 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
         "detail": "tag v1.0.0 on the insurer checkout carries a signature block"
       },
       "hole": null
+    },
+    {
+      "source": "ico",
+      "kind": "switching",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 1787177.0751717847,
+      "per_customer": {
+        "amount": 7.446571146549103,
+        "currency": "GBP"
+      },
+      "name": "penalty-schema",
+      "version": "v3",
+      "since": "2026-08-28",
+      "as_of": "2026-08-28",
+      "pin_life_months": 0,
+      "over_pin_life": 0.0,
+      "could_not_look": null,
+      "alternates": [],
+      "unpriceable": [
+        {
+          "kind": "feed",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 1787177.0751717847
+        }
+      ],
+      "sized": true,
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "dropped_edges": [
+        "ico/feed:penalty-schema@v3"
+      ]
+    },
+    {
+      "source": "feeds",
+      "kind": "switching",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 19558.54977243999,
+      "per_customer": {
+        "amount": 0.08149395738516663,
+        "currency": "GBP"
+      },
+      "name": "threat-register",
+      "version": "v2",
+      "since": "2026-08-28",
+      "as_of": "2026-08-28",
+      "pin_life_months": 0,
+      "over_pin_life": 0.0,
+      "could_not_look": null,
+      "alternates": [],
+      "unpriceable": [
+        {
+          "kind": "feed",
+          "source": "feeds",
+          "name": "threat-register",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 19558.549772440045
+        }
+      ],
+      "sized": true,
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "dropped_edges": [
+        "feeds/feed:threat-register@v2"
+      ]
+    },
+    {
+      "source": "insurer",
+      "kind": "switching",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 0.0,
+      "per_customer": {
+        "amount": 0.0,
+        "currency": "GBP"
+      },
+      "name": "quote-driftwood",
+      "version": "v1",
+      "since": "2026-08-28",
+      "as_of": "2026-08-28",
+      "pin_life_months": 0,
+      "over_pin_life": 0.0,
+      "could_not_look": null,
+      "alternates": [],
+      "unpriceable": [
+        {
+          "kind": "premium",
+          "source": "insurer",
+          "name": "quote-driftwood",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 113403.3
+        }
+      ],
+      "sized": true,
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "dropped_edges": [
+        "insurer/feed:quote-driftwood@v1"
+      ]
     }
   ],
   "deltas": [],
@@ -3103,6 +3213,86 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "count": 1,
       "checked": 2,
       "status": "open"
+    },
+    {
+      "name": "publisher-clone-absent",
+      "detail": "every priced feed was read from its publisher's own pinned tree",
+      "count": 0,
+      "checked": 3,
+      "status": "closed"
+    }
+  ],
+  "vendored": [
+    {
+      "party": "ico",
+      "kind": "feed",
+      "name": "penalty-schema",
+      "version": "v3",
+      "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e",
+      "feed_path": "penalty-schema/v3/feed.json",
+      "party_artefact": "party.yaml",
+      "converter": "penalty-schema/to_fair_scenario.py",
+      "converter_from": "ico",
+      "invocation": [
+        "build",
+        "uk-gdpr",
+        "lower-tier",
+        "--turnover",
+        "86000000.00"
+      ],
+      "scenario_sha256": "1a7219f32bce9410cd6bd7776360348e88d0a1c5058e6ee299743f4b086ab534",
+      "payload_version_key": "schema_version",
+      "published_at": "2026-08-28",
+      "files": {
+        "party.yaml": "5c07030a7a02883fdaf217e43fb5aefb423153f8e10817097c7a74094e3fff56",
+        "penalty-schema/to_fair_scenario.py": "560a38c04397e8e98d56a279ca5b88cb2b2707a8a22a5c8d71a9be74946bb982",
+        "penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda"
+      },
+      "path": "composed/feeds/ico/v3"
+    },
+    {
+      "party": "feeds",
+      "kind": "feed",
+      "name": "threat-register",
+      "version": "v2",
+      "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268",
+      "feed_path": "threat-register/v2/feed.json",
+      "party_artefact": "party.yaml",
+      "converter": "threat-register/to_fair_scenario.py",
+      "converter_from": "platform",
+      "invocation": [
+        "threat",
+        "driftwood"
+      ],
+      "scenario_sha256": "421652b8e427918055e36d9aea2880fe160a80e48d1ef161032c02fc9164107e",
+      "payload_version_key": "feed_version",
+      "published_at": "2026-07-31",
+      "files": {
+        "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+        "threat-register/to_fair_scenario.py": "d6d32609be5c00221eb598a3e489b1359909f4029dc1b02aeb48454946a48e73",
+        "threat-register/v2/feed.json": "c94ae8335d13edcbdc63b2d8f7c7cda3fbefd4d80e78022be51aba30d70b9a6c"
+      },
+      "path": "composed/feeds/feeds/v2"
+    },
+    {
+      "party": "insurer",
+      "kind": "feed",
+      "name": "quote-driftwood",
+      "version": "v1",
+      "sha": "db767055119292e400edd63ed260785ce605eb4e",
+      "feed_path": "quote/driftwood/v1/feed.json",
+      "party_artefact": "party.yaml",
+      "converter": null,
+      "converter_from": null,
+      "invocation": null,
+      "scenario_sha256": null,
+      "payload_version_key": null,
+      "published_at": "2026-08-28",
+      "files": {
+        "party.yaml": "2b0a11a3eac2e3fa35f15fdf91d25c68bc193baab2545863734930c1c6ede7fb",
+        "quote/driftwood/v1/feed.json": "e1c39816a12a13cfe21ff137073ce33492e89abc044423372c85284dc3760329"
+      },
+      "path": "composed/feeds/insurer/v1"
     }
   ]
 }
@@ -3121,7 +3311,8 @@ OK cmd_compose: against the real estate, exits 0 -- platform's two formerly-dang
   "ungoverned": [],
   "prices": [],
   "deltas": [],
-  "limits": []
+  "limits": [],
+  "vendored": []
 }
 OK compose()/cmd_compose: a party artefact that doesn't check out refuses, renders nothing, and the CLI exits non-zero
 OK check_diamonds: two edges to ico/penalty-schema at two versions refuse, naming both
@@ -3148,12 +3339,12 @@ OK compute_ungoverned: a recorded ungoverned namespace records and does not refu
 OK compute_ungoverned: a namespace that gains the label prints as closed, and as a closed-ungoverned-namespace delta
 OK compute_ungoverned: a new ungoverned namespace (absent from the last signed artefact) composes and is priced as its workload share (1 of 4 institution workloads = 0.25) with the two things it cannot yet read named as limits
 Traceback (most recent call last):
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 5017, in <module>
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 5824, in <module>
     sys.exit(main(sys.argv))
              ^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 3144, in main
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 3664, in main
     selfcheck()
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 4543, in selfcheck
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 5066, in selfcheck
     assert "acme" not in text, path
            ^^^^^^^^^^^^^^^^^^
 AssertionError: composed/governed-namespace-guard.yaml

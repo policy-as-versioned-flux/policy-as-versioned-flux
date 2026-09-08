@@ -1,0 +1,16 @@
+... driftwood
+... ludlow
+... tuppence
+ok: platform checked out at v2.0.1 (533dccb0a823); the served artefact is its own published evidence for policy 2.0.1
+ok: the same tag re-cut with one base64 character of policy 2.0.1's real signature changed (206519da5f27) -- nothing else moved, so a gate that adopts it adopted an unverified signature
+note: driftwood: its own gate cannot verify platform's real published bundle with a cold TUF cache and egress blocked -- exit 1, so this repository's signature check fetches a Sigstore trust root on every CI run, which is cold every time (eco-system ticket 105)
+note: ludlow: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed
+note: tuppence: its own gate cannot verify platform's real published bundle with a cold TUF cache and egress blocked -- exit 1, so this repository's signature check fetches a Sigstore trust root on every CI run, which is cold every time (eco-system ticket 105)
+ok: driftwood: real cosign accepted platform's own published signature for policy 2.0.1, and the gate adopted
+ok: driftwood: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: error verifying bundle: signature in bundle does not match signature being verified
+ok: ludlow: real cosign accepted platform's own published signature for policy 2.0.1, and the gate adopted
+ok: ludlow: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: error verifying bundle: signature in bundle does not match signature being verified)
+ok: tuppence: real cosign accepted platform's own published signature for policy 2.0.1, and the gate adopted
+ok: tuppence: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: error verifying bundle: signature in bundle does not match signature being verified
+SUMMARY: every adopter gate in this estate accepted platform's own published signature and refused the same evidence with one byte of it changed, each through its own workflow's own invocation and its own identity constant
+PASS: every adopter gate in this estate accepted platform's own published signature and refused the same evidence with one byte of it changed, each through its own workflow's own invocation and its own identity constant

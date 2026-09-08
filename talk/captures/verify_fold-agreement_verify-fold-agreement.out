@@ -3,16 +3,17 @@ ok: case 'standing' driftwood: exit 0, composed 'none' -- OK: composed bump is '
 ok: case 'standing' ludlow: exit 0, composed 'none' -- 
 ok: case 'standing' tuppence: exit 0, composed 'none' -- PASS: composed bump 'none' does not exceed major; v2.0.1 may be adopted
 ok: case 'arrival' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major
-ok: case 'arrival' ludlow: exit 1, composed None -- error during command execution: --trusted-root only supported with --new-bundle-format)
+ok: case 'arrival' ludlow: exit 1, composed 'major' -- REFUSE: composed bump is major -- ['4.0.0']
 ok: case 'arrival' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1 without human review
 ok: case 'quiet' driftwood: exit 0, composed 'none' -- OK: composed bump is 'none'
-ok: case 'quiet' ludlow: exit 1, composed None -- error during command execution: --trusted-root only supported with --new-bundle-format)
+ok: case 'quiet' ludlow: exit 0, composed 'none' -- PASS: declared=patch composed=none
 ok: case 'quiet' tuppence: exit 0, composed 'none' -- PASS: composed bump 'none' does not exceed major; v2.0.1 may be adopted
 ok: case 'retirement' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major
 ok: case 'retirement' ludlow: exit 1, composed 'major' -- REFUSE: composed bump is major -- ['2.0.1']
 ok: case 'retirement' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1 without human review
-FAIL: case 'arrival': ludlow's gate answered refuse (stating no composed bump at all: error during command execution: --trusted-root only supported with --new-bundle-format)) where driftwood, tuppence answered refuse (composed 'major') -- one movement, more than one answer, and only one of them can be the estate's
-FAIL: case 'quiet': ludlow's gate answered refuse (stating no composed bump at all: error during command execution: --trusted-root only supported with --new-bundle-format)) where driftwood, tuppence answered adopt (composed 'none') -- one movement, more than one answer, and only one of them can be the estate's
+PASS: case 'arrival': 3 gates (driftwood, ludlow, tuppence) each answered refuse with composed bump 'major'
+PASS: case 'quiet': 3 gates (driftwood, ludlow, tuppence) each answered adopt with composed bump 'none'
 PASS: case 'retirement': 3 gates (driftwood, ludlow, tuppence) each answered refuse with composed bump 'major'
 PASS: case 'standing': 3 gates (driftwood, ludlow, tuppence) each answered adopt with composed bump 'none'
-FAIL: 2 planted movement(s) were answered differently by two adopter gates, or answered differently from ADR-0011's own reading
+SUMMARY: on 4 planted movements of a composed window (arrival, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- each run through the flag shape its own shift-left.yml uses, against platform's real signed evidence with real cosign -- returned the same verdict and the same composed bump, and each was the verdict ADR-0011's reading gives that movement
+PASS: on 4 planted movements of a composed window (arrival, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- each run through the flag shape its own shift-left.yml uses, against platform's real signed evidence with real cosign -- returned the same verdict and the same composed bump, and each was the verdict ADR-0011's reading gives that movement

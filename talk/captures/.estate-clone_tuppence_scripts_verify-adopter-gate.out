@@ -21,7 +21,7 @@ declared (platform tag (none) -> v2.0.1): no predecessor
 composed (this institution, over what this pull request moves -- added ['4.0.0'], retired []; window at the head is ['4.0.0']): major
    E: the real state composes a major, so the gate refuses for human review -- that is the designed answer, and every element below still had to verify
 ok  E: real cosign verify-blob ACCEPTED platform's real committed evidence for 4.0.0
-ok  E: the gate PASSES against the real, currently-committed platform-pin.yaml -- real checkout at v2.0.1, commit verification, real identity constants, real cosign signature verification
+ok  E: against the real, currently-committed platform-pin.yaml the gate reached its DESIGNED composed-major refusal, exit 1 -- and everything ahead of that refusal succeeded for real: the checkout at v2.0.1, the commit match, the identity constants read out of shift-left.yml, and every composed element's real signature verified by real cosign. That is what this scenario observed; it is not a pass, and it is not reported as one
 ok  E-multi: parse_pin() reads tag/commit past a second (Kustomization) document with no ComposerError, and the gate reaches the identical verdict
 
 == Scenario E2: the SAME real bundles, refused by REAL cosign when the identity constant names a foreign publisher -- the identity pin is load-bearing against a real Fulcio certificate, not only against a string ==
@@ -46,7 +46,7 @@ ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none')
   setup: tagged policy/v4.0.0 in the throwaway clone (the real repo waits on CI to sign it)
   setup: tagged policy/v5.0.0 in the throwaway clone (the real repo waits on CI to sign it)
 ok  'v2.0.0' is not a policy tag -- not this gate's subject, skipped
-signed: /tmp/tmp.xxcUO6lWKU/clone/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.v5QTG8XVn6/clone/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -56,7 +56,7 @@ signed: /tmp/tmp.xxcUO6lWKU/clone/computed-semver/evidence/9.0.0.json.bundle
 GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
 GATE: passed for policy/v9.0.0
 committed: signed release-gate evidence for v2.0.0, policy/v9.0.0
-committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit a0fd25b059cf85e071b6484e6ae84920f2859b75
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 78244e6b125c9784f89cdf4d272367d9fa24ca45
 tagged v2.0.0
 tagged policy/v9.0.0
 ok  'v3.0.0' is not a policy tag -- not this gate's subject, skipped
@@ -67,7 +67,7 @@ tagged v3.0.0
 ok  one real gated release (9.0.0, real evidence), plus three real array-level releases (unchanged, retired, returned), real tags v2.0.0/v2.1.0/v3.0.0/v4.0.0
 
 == Scenario A: real PASS -- the pin moves (v2.0.0 -> v2.1.0) and the array does not, so this bump adds and retires nothing and composes 'none' (eco-system ticket 99) ==
-ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (adfc2b5480631ad89f70a31fb8176e8a71db9db3)
+ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (64c2e223f580cd6282cb56c489d0163d4c547570)
 declared (platform tag v2.0.0 -> v2.1.0): minor
 composed (this institution, over what this pull request moves -- added [], retired []; window at the head is ['9.0.0']): none
 this pull request adds and retires no policy version, so it composes 'none' -- whether a major already stands in the window is reported continuously by the hub's verify-unreviewed-major-in-window.sh, not by this gate (eco-system ticket 99)
@@ -76,7 +76,7 @@ PASS: composed bump 'none' does not exceed major; v2.1.0 may be adopted
 ok  A: a bump that adds and retires nothing composes none and passes, folding no standing version
 
 == Scenario A2: real PASS -- 9.0.0 ARRIVES in the array (v3.0.0 -> v4.0.0), and the arrival's bump is RE-READ out of the publisher's own real committed evidence, never recomputed ==
-ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (f4abf69cc9b9f83413e6cbbbe0a612be2b2bb753)
+ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (321677995aff1fed2bc7e57237e9790381a3c26f)
 declared (platform tag v3.0.0 -> v4.0.0): major
 composed (this institution, over what this pull request moves -- added ['9.0.0'], retired []; window at the head is ['9.0.0']): patch
 NOTE: composed bump ('patch') is weaker than the publisher's tag ('major') -- informational only, this institution's obligation is never lowered by a local view
@@ -89,19 +89,26 @@ ok  A-render: a no-movement bump renders as no movement, no percentage anywhere
 
 == Scenario B: real FAIL -- 9.0.0 retires with nothing replacing it, composed forced major ==
 FAIL: composed bump is major -- refusing to adopt v3.0.0 without human review
-ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (70a7bf1114d13c00bf6db09dd67e506078e3b88d)
+ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (2af50642e520e47b4e35721855a31fc30a1d77d3)
 declared (platform tag v2.1.0 -> v3.0.0): major
 composed (this institution, over what this pull request moves -- added [], retired ['9.0.0']; window at the head is []): major
 RETIRED, reaching this institution as major: 9.0.0
 ok  B: real refusal -- a composed major fails the required check for real (non-zero exit), retirement named, nothing silent
+
+== Scenario G: how offline this gate's signature check actually is -- measured on this run, not claimed ==
+the same real bundle (policy 4.0.0), cold TUF cache, every proxy pointed at a closed port: exit 1
+Error: setting up clients and keys: getting rekor public keys: updating local metadata and targets: error updating to TUF remote mirror: tuf: failed to download 13.root.json: Get "https://tuf-repo-cdn.sigstore.dev/13.root.json": proxyconnect tcp: dial tcp 127.0.0.1:1: connect: connection refused
+error during command execution: setting up clients and keys: getting rekor public keys: updating local metadata and targets: error updating to TUF remote mirror: tuf: failed to download 13.root.json: Get "https://tuf-repo-cdn.sigstore.dev/13.root.json": proxyconnect tcp: dial tcp 127.0.0.1:1: connect: connection refused
+ok  G: measured, not claimed -- with a cold TUF cache and egress blocked this gate's own cosign invocation cannot verify platform's real bundle (exit 1, a TUF fetch). Scenario E therefore ran with the network available, exactly as a real shift-left run does
 
 PASS: adopter-gate.py checks out the tag under review (never the default branch), refuses a
 resolved-commit disagreement with the pinned commit field, and refuses -- with the real cosign
 binary, real subprocess, real exit code -- when signed evidence is entirely missing (the real,
 currently-tagged v1.0.0, which honestly predates cs-27), when a present bundle is malformed,
 and when a real bundle's real certificate identity is not the publisher this institution pins.
-Against the REAL committed platform-pin.yaml, and against the two-document stream it forms with
-cosign really ACCEPTS platform's real committed evidence: the gate passes unskipped. It grades
+Against the REAL committed platform-pin.yaml, and against the two-document stream it forms,
+real cosign really ACCEPTS platform's real committed evidence -- and the refusal that follows on
+an estate carrying a major is reported as the designed refusal it is, never as a pass. It grades
 what the bump MOVES (eco-system ticket 99): a bump that adds and retires no policy version
 composes 'none' and passes without reading a standing version's evidence at all, an arrival
 composes by RE-READING that version's own real committed evidence (never recomputed), and a
