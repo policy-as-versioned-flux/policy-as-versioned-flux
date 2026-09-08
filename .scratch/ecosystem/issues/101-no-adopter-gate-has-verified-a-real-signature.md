@@ -268,7 +268,7 @@ checking that observations were really made.
 3. **driftwood's and tuppence's gates are NOT changed to pin their trust material here**
    (`delegated`). It is the same helper three times and it would have been easy, but it puts new
    pinned trust material into two more organisations and raises a real question -- one root or
-   three, and who refreshes them -- that belongs in a ticket that decides it (103). What this
+   three, and who refreshes them -- that belongs in a ticket that decides it (105). What this
    ticket owed them was that their claim stop being false, and a printed number does that
    permanently where a corrected sentence would go stale again.
 4. **The offline measurement is reported, never graded** (`delegated`). Grading it would make two
@@ -281,10 +281,13 @@ checking that observations were really made.
    by reading its own output, and recorded because the mistake is the instructive part.
 6. **ludlow's manifest row is reclassified `simulation` -> `estate-observation`** (`delegated`):
    Part E's verdict now turns on the content of platform's artefact and changes the day platform
-   re-signs. **tuppence's row is deliberately left `simulation`**, which is now inconsistent with
-   ludlow's and driftwood's: its Scenario E already turned on platform's real bundles before today,
-   so the misclassification predates this ticket and correcting it is not this ticket's change to
-   make. Named here rather than quietly fixed or quietly left.
+   re-signs. **tuppence's row is reclassified the same way, at review (F8, 2026-09-06)**: this
+   ticket's first draft left it `simulation` and said so, on the ground that its Scenario E had
+   already turned on platform's real bundles before today, so the misclassification predated the
+   ticket and was not its change to make. The review asked for the inconsistency to be closed
+   rather than recorded, and closing it is the smaller lie: the row now reads `estate-observation`
+   with its one real could-not-look (no cosign) declared, and the manifest comment carries the
+   same history so the reclassification is not mistaken for a claim that tuppence changed today.
 
 ### How it is graded
 
