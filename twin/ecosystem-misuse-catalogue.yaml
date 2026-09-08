@@ -32,7 +32,7 @@
 #
 # Versioned: bump `version` in the same commit as any change to an entry below.
 schema: twin.misuse-catalogue/v1
-version: 2
+version: 3
 entries:
   - id: publisher-games-own-feed-price
     risk: >-
@@ -90,10 +90,12 @@ entries:
       - ico/schema/to_fair_scenario.py::lm_triple
       - ico/schema/to_fair_scenario.py::turnover
       - platform/feeds/to_fair_scenario.py::eol_ramp
+      # ticket 84 built the D5 formula: a pin behind a newer SIGNED major is a `supersede`
+      # prices[] line, base x (eol_ramp(tag day, as_of) - 1), graded by verify/supersede/.
+      - platform/compose/composition.py::price_supersede
+      - verify/supersede/supersede.py::grade_behind
       - docs/adr/0020-a-missing-instrument-refuses-a-missing-behaviour-is-priced.md
     waits_on:
-      - ticket: "84"
-        for: the D5 formula applied to a pricing pin behind a newer version
       - ticket: "46"
         for: the reliability score disclosed on the prices[] entry
     source: ticket 19 Q2/item 2 and D5; ticket 07 item 1; ticket 13 item 5

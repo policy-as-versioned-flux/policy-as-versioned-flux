@@ -4,6 +4,19 @@ status: accepted
 
 # Policy code is deterministic — no time-conditional state
 
+> **Note, 2026-09-08 (eco-system ticket 84, delegated under ADR-0025).** The £ now has a date, and
+> the policy bodies still do not. Composition prices "as of" one date: the newest SIGNED date among
+> its own inputs (every pinned envelope's `published_at`, every edge's own `since`), or the caller's
+> `compose --as-of`. The feeds module's `eol` converter ramps to it and a pin behind a newer signed
+> major is surcharged by the same ramp from the day that tag was cut. None of this reaches a
+> `ValidatingPolicy`, a `MutatingPolicy` or a `GeneratingPolicy`: composition's own selfcheck proves
+> the rendered policy files are byte-identical across every signature state and every as-of, and
+> that the module reads no clock. The composition an adopter SIGNS passes no `--as-of`, so it
+> re-derives from signed facts alone; only the scheduled proposer passes the day it runs on, and it
+> commits nothing (ADR-0024). So the rule this ADR states -- the same manifest against the same
+> policy version always produces the same verdict -- stands untouched; what moves with the date is
+> a price beside the verdict, printed with both of its dates.
+
 Policies must evaluate **deterministically**: the same manifest against the same policy version
 must always produce the same result, independent of *when* it is evaluated. We therefore forbid
 embedding time-based logic in policy bodies — no expiry dates, no start dates, no "active after / 

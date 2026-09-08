@@ -156,12 +156,14 @@ def signature_state(estate: str, party: str, entry: dict, version: str) -> dict:
 # the grade -- pure, so selfcheck and tests can plant every case
 # --------------------------------------------------------------------------
 def evidence_hole(evidence: dict | None, party: str, name: str) -> tuple[bool, dict | None, bool]:
-    """(entry_present, hole, graded) for the adopter's premium entry on this pin.
-    `graded` is whether the entry was written by a composer that reads signature
-    state at all -- the `pin_signature` key ticket 69 added. An entry without it
-    was composed before the rule existed and cannot carry a hole."""
+    """(entry_present, hole, graded) for the adopter's priced entry on this pin -- the premium
+    entry for a quote, the feed entry for any other feed (ticket 84 took ticket 69's rule past
+    the premium: every feed line carries `pin_signature` and `hole`). `graded` is whether the
+    entry was written by a composer that reads signature state at all -- the `pin_signature`
+    key ticket 69 added. An entry without it was composed before the rule existed and cannot
+    carry a hole."""
     for e in (evidence or {}).get("prices") or []:
-        if e.get("kind") == "premium" and e.get("source") == party and e.get("name") == name:
+        if e.get("kind") in ("premium", "feed") and e.get("source") == party and e.get("name") == name:
             hole = e.get("hole")
             return True, hole if isinstance(hole, dict) else None, "pin_signature" in e
     return False, None, False
@@ -184,7 +186,7 @@ def grade(state: dict, evidence: dict | None, *, adopter: str, currency: str, pa
     if evidence is None:
         return "FAIL", f"{label}: untagged ({state['detail']}) and {adopter} has no composed/evidence.json to price it"
     if not present:
-        return "FAIL", f"{label}: untagged ({state['detail']}) and no premium entry in prices[] carries the pin"
+        return "FAIL", f"{label}: untagged ({state['detail']}) and no priced entry in prices[] carries the pin"
     if not graded:
         # The premium entry predates ticket 69's composer: it carries no
         # `pin_signature` key at all, so it was written by a composer that does
@@ -192,12 +194,12 @@ def grade(state: dict, evidence: dict | None, *, adopter: str, currency: str, pa
         # could-not-look about the evidence, not a violation by the adopter --
         # and until the owner pushes the composer and the adopter re-composes,
         # no adopter could clear a FAIL here by any edit of its own.
-        return "SKIP", (f"{label}: untagged ({state['detail']}) and {adopter}'s premium entry "
+        return "SKIP", (f"{label}: untagged ({state['detail']}) and {adopter}'s priced entry "
                         f"carries no pin_signature key -- it was composed before ticket 69's "
                         f"composer, which the owner has yet to push, so whether it prices the "
                         f"hole cannot be read from it")
     if hole is None or hole.get("status") not in OPEN:
-        return "FAIL", (f"{label}: untagged ({state['detail']}) and the premium entry carries no open hole "
+        return "FAIL", (f"{label}: untagged ({state['detail']}) and the priced entry carries no open hole "
                         f"-- an untagged pin is a priced hole, never free (ticket 69, ADR-0020)")
     missing = sorted(HOLE_FIELDS - set(hole))
     if missing:

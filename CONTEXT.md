@@ -164,7 +164,14 @@ that a rewritten entry cites stay as the record of the decision at the time.
   rather than via a flag-day breaking change. *The crux of the original implementation.* The number
   is the owner's own (2022-03-11 post: retirement runs forward and back by one version, so at
   least three significant versions), re-affirmed 2026-09-02 (ticket 75 Q3) as three declared lines
-  and a priced supersede.
+  and a priced supersede. Built 2026-09-08 (ticket 84): `verify-coexistence.sh`'s threshold is
+  three DECLARED lines (an uncut declaration counts; the cut axis is its live tail's) and reads
+  could-not-look naming what is missing until the third is declared; and a feed pin behind a newer
+  major its publisher has SIGNED carries a `supersede` line in `prices[]` -- the line's own amount
+  times (`eol_ramp` from the day that tag was cut to the composition's as-of, minus one), under the
+  adopter's own perspective and currency, never summed into the exposure -- which the adopter's
+  scheduled proposer turns into a **retirement** pull request moving that one pin forward in
+  `party.yaml`, forward-only, keyed `<org>/retirement/<slug>` in the derived ledger.
 
 - **Version pin** — The single declaration by which a consumer (workload / cluster) states which
   policy version applies to it. The original's signature elegance: **one string** served as both
