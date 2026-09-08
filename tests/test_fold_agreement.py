@@ -250,3 +250,61 @@ def test_agreement_on_every_case_is_the_only_pass(grader: ModuleType) -> None:
                                            "ludlow": _r("adopt", "none"),
                                            "tuppence": _r("refuse", "major")}})
     assert status == "FAIL"
+
+
+def test_a_planting_that_could_not_commit_raises_instead_of_returning_HEAD(grader: ModuleType, tmp_path) -> None:
+    """Eco-system ticket 101, 2026-09-06, found by running verify/real-signature against a real
+    estate. `_commit` returned `git rev-parse HEAD`'s stdout unconditionally; on a repository with
+    no commits that is the literal string "HEAD" and a non-zero exit nobody read. The planting
+    silently became nothing, ludlow's gate saw an unchanged pin and adopted, and the run reported
+    agreement it had never observed. Half a planting is not a weaker observation, it is a
+    different one -- so this is a crash, not a shrug."""
+    import pytest as _pytest
+    empty = tmp_path / "never-initialised"
+    empty.mkdir()
+    with _pytest.raises(RuntimeError, match="could not be committed"):
+        grader._commit(empty, "this repository is not a git repository at all")
+
+
+def test_the_planting_ignores_the_operators_global_git_config(grader: ModuleType, tmp_path) -> None:
+    """The trigger was a global `core.hooksPath` hook that had run out of API calls. Every git
+    call this grader makes now runs with the global and system configuration switched off, so a
+    hook on the machine running the truth surface cannot decide what the truth surface observes."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    grader._git(repo, "init", "-q", "-b", "main")
+    (repo / "f").write_text("x")
+    sha = grader._commit(repo, "planted")
+    assert len(sha) == 40 and all(c in "0123456789abcdef" for c in sha)
+
+
+def test_a_failed_planting_names_the_commits_own_reason_not_rev_parses(grader: ModuleType, tmp_path) -> None:
+    """Ticket 101 review, F3. `git rev-parse` can only say "unknown revision HEAD", which names the
+    symptom. The commit says WHY — a refusing hook, a signing failure, a full disk — and that is
+    the sentence somebody has to act on. Planted here with a real pre-commit hook that refuses,
+    re-installed through GIT_CONFIG_COUNT so it survives the hermetic global/system config."""
+    import pytest as _pytest
+    hooks = tmp_path / "hooks"
+    hooks.mkdir()
+    hook = hooks / "pre-commit"
+    hook.write_text("#!/bin/sh\necho 'the hook refused, and this is the sentence that matters' >&2\nexit 1\n")
+    hook.chmod(0o755)
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    grader._git(repo, "init", "-q", "-b", "main")
+    (repo / "f").write_text("x")
+
+    import os
+    previous = {k: os.environ.get(k) for k in ("GIT_CONFIG_COUNT", "GIT_CONFIG_KEY_0", "GIT_CONFIG_VALUE_0")}
+    os.environ.update({"GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "core.hooksPath",
+                       "GIT_CONFIG_VALUE_0": str(hooks)})
+    try:
+        with _pytest.raises(RuntimeError) as caught:
+            grader._commit(repo, "this commit will be refused by the hook")
+    finally:
+        for key, was in previous.items():
+            os.environ.pop(key, None) if was is None else os.environ.update({key: was})
+
+    message = str(caught.value)
+    assert "the hook refused, and this is the sentence that matters" in message
+    assert "nothing was planted" in message
