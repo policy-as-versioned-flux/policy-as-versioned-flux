@@ -1,8 +1,11 @@
 [1;36m==>[0m 1. the derivation grades planted tickets and a planted grade table as documented
 selfcheck ok
 [1;36m==>[0m 2. every Status: is one word of the tracker's vocabulary, and every done ticket has something behind it
-  106 tickets: closed=1, open=18, prepared=1, resolved=86
+  106 tickets: closed=1, open=17, prepared=1, resolved=87
 [1;36m==>[0m 3. the derivation, from the grade table the newest recorded run wrote
-  talk/captures/_grades.tsv is not in this checkout
+  derived from the grade table run 181 recorded, 120 script(s) graded
+  ticket numbers read by verify/cited-truth/cited_truth.py's ticket_numbers (ticket 102), one reading for the estate
+  87 of 106 tickets are written `resolved`: 25 derive resolved from a named check that passed, 7 derive regressed (7 of those acknowledged by a dated line in the ticket), 3 rest only on checks that could not look, and 52 name no check of their own the table carries
+  143 check(s) named by a resolved ticket are not rows in the table at all (a unit's script this run did not discover, or a renamed one); 6 red row(s) are named by a ticket that does not own the check (git says another ticket's commits touched it) and 0 are named by a ticket where NO commit touching the check names any ticket at all, so ownership could not be established for anyone
 
-SKIP: no run has recorded a grade table yet (talk/captures/_grades.tsv), so no ticket's Status can be derived from a named check; talk/verify-all.sh writes it and the clock's observation cage commits it, so it arrives on the first scheduled run of the default branch after this lands
+PASS: every ticket in .scratch/ecosystem/issues/ carries one Status: line from the tracker's own vocabulary with nothing free-typed after it, every resolved ticket has an Answer and every closed one a dated closure, and every resolved ticket's Status is derived from the grade table the newest recorded run wrote -- no ticket claims resolved while a check it names graded FAIL on that run without a dated line in the ticket naming it

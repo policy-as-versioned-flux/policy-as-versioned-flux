@@ -1,0 +1,11 @@
+PASS: driftwood pins ico/feed/penalty-schema@v3: at the newest tagged major on ico's real remote; nothing to price, said by name
+PASS: driftwood pins feeds/feed/threat-register@v2: at the newest tagged major on feeds's real remote; nothing to price, said by name
+PASS: driftwood pins insurer/feed/quote-driftwood@v1: at the newest tagged major on insurer's real remote; nothing to price, said by name
+PASS: ludlow pins ico/feed/penalty-schema@v3: at the newest tagged major on ico's real remote; nothing to price, said by name
+SKIP: ludlow pins feeds/feed/threat-register@v1, behind v2 (threat-register/v2.0.0 on feeds's real remote): composed under platform v2.0.1, which carries no supersede rule, so no edit of ludlow's own could put the line there -- it waits on a platform tag carrying the rule and a pin bump
+PASS: tuppence pins ico/feed/penalty-schema@v3: at the newest tagged major on ico's real remote; nothing to price, said by name
+SKIP: tuppence pins feeds/feed/threat-register@v1, behind v2 (threat-register/v2.0.0 on feeds's real remote): composed under platform v2.0.1, which carries no supersede rule, so no edit of tuppence's own could put the line there -- it waits on a platform tag carrying the rule and a pin bump
+NOTE: adopters behind a newer tagged major: 2 pin(s) across 3 adopter(s); supersede lines carried in served evidence: 0 of 2
+NOTE: untagged-feed pins: 0 of 7; holes carried: 0 of 0
+NOTE: retirement PRs opened/merged: 0/0 (could not list for driftwood, ludlow, tuppence)
+SKIP: ludlow pins feeds/feed/threat-register@v1, behind v2 (threat-register/v2.0.0 on feeds's real remote): composed under platform v2.0.1, which carries no supersede rule, so no edit of ludlow's own could put the line there -- it waits on a platform tag carrying the rule and a pin bump -- adopters behind a newer tagged major: 2 pin(s) across 3 adopter(s); supersede lines carried in served evidence: 0 of 2; untagged-feed pins: 0 of 7; holes carried: 0 of 0; retirement PRs opened/merged: 0/0 (could not list for driftwood, ludlow, tuppence)

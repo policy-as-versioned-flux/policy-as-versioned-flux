@@ -31,7 +31,7 @@ ale(istio-1.18, 4yr+ past)   = £1087666
 ok  EOL £ ramps monotonically as the component ages past support: £218,337 -> £436,816 -> £1,087,666
 
 == 6. converter selfcheck (every feed entry valid, EOL ramp bounded) ==
-ok  20 feed entries valid (lo<=mode<=hi); EOL ramp monotonic & capped (1yr=2.00x 2yr=3.00x 10yr=5.00x)
+ok  24 feed entries valid (lo<=mode<=hi); headline pick deterministic and named; EOL ramp monotonic & capped (1yr=2.00x 2yr=3.00x 10yr=5.00x)
 
 PASS: threat-register/CVE/EOL signed+versioned, fair.py consumes them unmodified,
 a feed bump moves the £ via a reviewable diff, EOL prices as a time-varying thread.
