@@ -16,6 +16,11 @@
 # publishes it. They are separate fields on purpose — the grader counts the rows where the
 # publisher is still the incumbent org and prints that count on every run, so the one part of
 # these lifts that did NOT move cannot quietly become prose that nobody re-reads.
+#
+# `identity`: a regular expression the stack manifest's CONTENT carries and nothing else in the
+# estate does. The hub-copy rule matches it in any file named like the stack manifest, anywhere
+# under the hub's non-record directories (review 2026-09-08 F4: a path-literal rule let a full
+# copy parked at `spikes/ledger/` pass). It is the app's identity, not the hub's path for it.
 
 lifts:
 - app: ledger
@@ -29,6 +34,7 @@ lifts:
   image: ghcr.io/policy-as-versioned-flux/ledger@sha256:9709e1075a503fe59ca85deae2b748fcbbfd80b464e56d2e1f82ec8182268111
   image_publisher: policy-as-versioned-flux
   pull_request: https://github.com/policy-as-versioned-tuppence/tuppence/pull/21
+  identity: '<groupId>com\.mycompany</groupId>\s*<artifactId>ledger</artifactId>'
 
 - app: storefront
   origin: policy-as-versioned-flux/storefront
@@ -41,6 +47,7 @@ lifts:
   image: ghcr.io/policy-as-versioned-flux/storefront@sha256:ef53f41d380af4f56aa3e1f1e4ad922fa64e8f47361a41e83822fa8ace0f96bc
   image_publisher: policy-as-versioned-flux
   pull_request: https://github.com/policy-as-versioned-driftwood/driftwood/pull/27
+  identity: '"name":\s*"storefront"'
 
 - app: reports
   origin: policy-as-versioned-flux/reports
@@ -53,3 +60,4 @@ lifts:
   image: ghcr.io/policy-as-versioned-flux/reports@sha256:36dc3d7d1bd5193f46a55d57b505beb5e99d7925f65b0fad3c1f7d1aeafefcf5
   image_publisher: policy-as-versioned-flux
   pull_request: https://github.com/policy-as-versioned-ludlow/ludlow/pull/18
+  identity: '^Flask==1\.1\.4$'
