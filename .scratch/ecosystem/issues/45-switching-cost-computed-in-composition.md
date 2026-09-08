@@ -118,10 +118,15 @@ a NAMED could-not-look and never a pass, and it PROVES the reading rather than a
     9039791.02 — the same number to the penny for two different institutions, which is what a
     statutory cap looks like and is why neither line may be read as a switching cost for either
 
-Two unsized adopters pricing the same feed at DIFFERENT amounts are not two caps: at least one line
-was priced at something other than the cap, the check cannot say which, so it FAILS naming both
-adopters and both amounts (review F6; planted `.01976426` against `.02976426` used to exit 3 with
-both still called "the cap").
+Which of an unsized adopter's lines are the cap is the publisher's own statement on the served
+entry — ico's converter writes "Not sized to any subscriber: priced at the statutory cap." into the
+scenario when given no turnover, and it travels into `lef_basis` — never this check's inference from
+the missing size. Two unsized adopters whose notes both say cap and yet price the feed at DIFFERENT
+amounts are not two caps: at least one line was priced at something other than the cap, the check
+cannot say which, so it FAILs naming both adopters and both amounts (review F6; planted `.01976426`
+against `.02976426` used to exit 3 with both still called "the cap"). A feed whose note names no
+cap is priced per institution — ludlow's and tuppence's threat-register lines differ, 318,229.78
+against 222,574.31, because they are two institutions — and is neither called the cap nor compared.
 
 ### The tree that makes the cost payable
 
@@ -333,7 +338,18 @@ asked for it, and the sentences above are corrected in place rather than annotat
   the document, not rendered — differs by the open publisher-clone-absent limit. The hub docstring
   no longer carries the literal.
 * **F6 (minor), two unsized adopters at different amounts.** `check()` FAILs naming both adopters
-  and both amounts when `len(shared) > 1 and len(amounts) > 1`.
+  and both amounts when `len(shared) > 1 and len(amounts) > 1` — over the feeds whose own served
+  entry says it was priced at the cap. **The first cut of this fix FAILed the live estate**, on the
+  first battery run and again on the throwaway merge: ludlow and tuppence price `threat-register`
+  at 318,229.78 and 222,574.31, and that is right — the register prices each institution from its
+  own entry (`threat <payload> ludlow`), so it is never the cap and two institutions differ. Which
+  lines ARE the cap is now read off the served entry itself: ico's converter writes "Not sized to
+  any subscriber: priced at the statutory cap." into the scenario when it is given no turnover
+  (`schema/to_fair_scenario.py` line 113) and composition carries it into `lef_basis`; the hub
+  keys on that note (`CAP_NOTE`), compares only capped feeds across unsized adopters, calls only
+  those "the cap", and grades an unsized adopter's uncapped switching line as a could-not-look that
+  says the amount is ungraded rather than a ceiling. A plant proves the threat-register shape (two
+  amounts, no note) is no FAIL.
 
       # hub, red (HEAD 5ebd818): ado at 9039791.01976426, bdo at 9039791.02976426
       old exit = 3 | FAIL lines: 0 | SKIP lines: 4
@@ -352,7 +368,7 @@ asked for it, and the sentences above are corrected in place rather than annotat
   priced — the sentence was kept and the code made true. `dropped_edges` lists them all; switching
   entries are never summed, so a publisher supplying two feeds carries one cost on two entries and
   nothing double-counts. No figure in today's estate moves.
-* **F9 (note).** The hub selfcheck's plant count is printed from a counter (21 today), not typed.
+* **F9 (note).** The hub selfcheck's plant count is printed from a counter (22 today), not typed.
   Platform's selfcheck still hardcodes `since == '2026-08-28'` and `alternates == []` for the real
   driftwood: those are the estate's values today and the assertion will go red the day either moves,
   which is what an assertion is for, but it is a typed expectation and is named here as one.
@@ -424,7 +440,7 @@ asked for it, and the sentences above are corrected in place rather than annotat
 
     # hub
     bash verify/portability/verify-portability.sh            # exit 3, the named wait
-    .venv/bin/python verify/portability/portability.py selfcheck   # exit 0, 21 plants (counted, review F9)
+    .venv/bin/python verify/portability/portability.py selfcheck   # exit 0, 22 plants (counted, review F9)
     bash talk/verify-all.sh --selfcheck                      # PASS
     bash verify/truth-line/verify-truth-line.sh              # PASS
     bash verify/every-green/verify-every-green.sh            # PASS, 113 scripts discovered

@@ -55,13 +55,18 @@ actually pins, and not against whatever the publisher's main happens to hold tod
    `could_not_look`. A window that runs BACKWARDS — as-of before since — FAILS naming both
    dates; it is not a pin's life of |N| months (review F3);
 6. an adopter that publishes no signed `size:` has its switching lines reported as a NAMED
-   could-not-look, never a pass. The regime half of every price such an adopter carries is the
-   publisher's statutory cap — a ceiling every firm in the estate shares — so the figure is not
-   a statement about THAT institution. The check prints the identical figures as the proof
+   could-not-look, never a pass. Which of its feed prices are the publisher's statutory cap is
+   read off the served entry itself, never assumed from the missing size: ico's converter writes
+   "Not sized to any subscriber: priced at the statutory cap." into the scenario it returns when
+   it is given no turnover, and that note travels into the entry's `lef_basis` (CAP_NOTE). A
+   capped line is a ceiling every firm in the estate shares, so it is not a statement about THAT
+   institution; the check prints the identical figures across unsized adopters as the proof
    rather than asserting it (ticket 64: tuppence and ludlow publish no size). Two unsized
-   adopters pricing the same feed at DIFFERENT amounts FAIL, naming both adopters and both
-   amounts: a cap is one number, so two numbers mean at least one of those lines was not priced
-   at the cap and this check cannot say which (review F6);
+   adopters whose own notes both say "priced at the statutory cap" for the same feed and yet
+   carry DIFFERENT amounts FAIL, naming both adopters and both amounts: a cap is one number
+   (review F6). A feed whose note names no cap — the threat register prices each institution
+   from its own entry — is neither called the cap nor compared: on the live estate ludlow and
+   tuppence price it at 318,229.78 and 222,574.31 and that is two institutions, not a defect;
 7. no string anywhere in `prices[]` carries an absolute path (review F2): composed/evidence.json
    is what the served commit carries, and a refusal that names the builder's home directory
    makes the served bytes depend on whose machine composed them.
@@ -117,6 +122,12 @@ MONTHS_PER_YEAR = 12
 # was priced from makes the premium an input to its own formula (review F4).
 EXPOSURE_KINDS = ("feed", "twin")
 PROVENANCE = "PROVENANCE.json"
+# The publisher's own words for a price it computed at its statutory cap: ico's
+# schema/to_fair_scenario.py appends this to the scenario note when it is given no turnover, and
+# composition carries the note into the served entry's `lef_basis`. Read from the entry, so which
+# lines are a cap is the publisher's statement and never this check's inference from a missing
+# size (review F6, sharpened by the live estate: the threat register is priced per institution).
+CAP_NOTE = "priced at the statutory cap"
 # A slash-rooted path of two or more segments that is not the tail of a word, a URL scheme or a
 # `./`: the shape of a builder's machine leaking into a signed artefact (review F2).
 ABSOLUTE_PATH = re.compile(r"(?<![\w.:/])/[\w.-]+(?:/[\w.-]+)+")
@@ -242,8 +253,15 @@ def feed_edges(party_doc: dict) -> list[dict]:
 # --------------------------------------------------------------------------
 # the per-adopter grade — pure over what was read, so selfcheck can plant
 # --------------------------------------------------------------------------
-def grade_switching(entries: list[dict], adopter: str, currency: str, sized: bool) -> None:
+def capped(entry: dict) -> bool:
+    """Whether the publisher's own note on this served entry says it was priced at the cap."""
+    return CAP_NOTE in str(entry.get("lef_basis") or "")
+
+
+def grade_switching(entries: list[dict], adopter: str, currency: str, sized: bool,
+                    capped_feeds: set[str] | None = None) -> None:
     """Sentence 5, and the half of sentence 6 that is about an entry rather than the estate."""
+    capped_feeds = capped_feeds or set()
     for entry in entries:
         who = f"{adopter}'s switching entry for {entry.get('source')}/{entry.get('name')}"
         if entry.get("perspective") != adopter or entry.get("currency") != currency:
@@ -282,13 +300,23 @@ def grade_switching(entries: list[dict], adopter: str, currency: str, sized: boo
             out("FAIL", f"{who} carries over_pin_life {got}, and {amount} over {months} months "
                         f"is {expect}")
             continue
-        if not sized:
+        if not sized and entry.get("name") in capped_feeds:
             # Never a pass. The amount is real arithmetic on the publisher's own statutory cap,
             # which is a ceiling every firm shares — so it is not a figure about this one.
             out("SKIP", f"{who} rests on a price computed at the publisher's statutory cap, "
                         f"because {adopter} publishes no signed size: — so the number is a "
                         f"ceiling every firm in this estate shares and says nothing about this "
                         f"institution (ticket 64)")
+        elif not sized:
+            # Also never a pass, for a stated reason that is policy rather than arithmetic: this
+            # check grades no switching cost of an unsized adopter (ticket 64, decision 6). The
+            # publisher's own note on this feed names no cap, so the amount may well be this
+            # institution's; it stays unverified until a size is signed, and the line says so.
+            out("SKIP", f"{who} is not graded: {adopter} publishes no signed size:, and this "
+                        f"check grades no switching cost of an unsized adopter (ticket 64) — the "
+                        f"publisher's own note on {entry.get('name')} names no cap, so the amount "
+                        f"may be this institution's, and it stays unverified until a size is "
+                        f"signed")
         else:
             out("PASS", f"{who} is {amount:.2f} {currency}/yr under {adopter}'s own perspective, "
                         f"carried over the {months} months the pin has stood since {since}")
@@ -378,20 +406,24 @@ def grade_adopter(estate: str, adopter: str, unsized: dict[str, dict] | None = N
     by_pin = {(r.get("party"), r.get("name"), str(r.get("version"))): r for r in records}
 
     switching = [e for e in prices if e.get("kind") == "switching"]
-    grade_switching(switching, adopter, currency, sized)
+    feeds = [p for p in prices if p.get("kind") == "feed"]
+    capped_feeds = {str(p.get("name")) for p in feeds if capped(p)}
+    uncapped_feeds = sorted(str(p.get("name")) for p in feeds if not capped(p))
+    grade_switching(switching, adopter, currency, sized, capped_feeds)
     grade_no_absolute_paths(prices, adopter)
     if not sized and unsized is not None:
         # Reported whether or not a switching entry exists yet, because the rule is about the
-        # INPUT and the input is missing today: every figure this adopter carries that scales
-        # on turnover was computed at the publisher's own statutory cap. check() turns two
-        # unsized adopters carrying the IDENTICAL figure into the proof of that, rather than
-        # asserting it in prose (ticket 64).
-        unsized[adopter] = {p.get("name"): p.get("amount") for p in prices
-                             if p.get("kind") == "feed"}
-        out("SKIP", f"{adopter} publishes no signed size:, so every price it carries that "
-                    f"scales on turnover — and therefore every switching cost derived from one "
-                    f"— is the publisher's statutory cap, not a figure about this institution "
-                    f"(ticket 64)")
+        # INPUT and the input is missing today. Which lines are the cap is the publisher's own
+        # statement on the served entry (CAP_NOTE), never an inference from the missing size.
+        # check() turns two unsized adopters carrying the IDENTICAL capped figure into the proof
+        # of that, rather than asserting it in prose (ticket 64).
+        unsized[adopter] = {p.get("name"): p.get("amount") for p in feeds if capped(p)}
+        out("SKIP", f"{adopter} publishes no signed size:, so the feed prices its own served "
+                    f"entries say were `{CAP_NOTE}` — {', '.join(sorted(capped_feeds)) or 'none'}"
+                    f" — and every switching cost derived from one are the publisher's ceiling, "
+                    f"not a figure about this institution (ticket 64); its other feed prices "
+                    f"({', '.join(uncapped_feeds) or 'none'}) name no cap and are not graded "
+                    f"either")
 
     # The standing figure this check exists to put somewhere: what THIS adopter prices from
     # publishers it could not re-read. One perspective, one currency, EXPOSURE kinds only, and
@@ -571,10 +603,12 @@ def check(estate: str = ESTATE) -> int:
     for adopter in names:
         grade_adopter(estate, adopter, unsized)
     # The proof, not the claim: where two unsized adopters price the same feed at the SAME
-    # number to the penny, that number is a property of the publisher's cap and not of either
-    # firm. Printed by name so the reading is checkable rather than asserted. Two DIFFERENT
-    # numbers are not two caps (review F6): at least one of those lines was priced at something
-    # other than the cap, and this check cannot say which, so it says both.
+    # number to the penny, and each entry's own note says it was priced at the cap, that number
+    # is a property of the publisher's cap and not of either firm. Printed by name so the
+    # reading is checkable rather than asserted. Two DIFFERENT numbers under two cap notes are
+    # not two caps (review F6): at least one of those lines was priced at something other than
+    # the cap, and this check cannot say which, so it says both. Only capped entries are here:
+    # a feed priced per institution differs between institutions, and that is not a finding.
     for name in sorted({n for prices in unsized.values() for n in prices}):
         shared = sorted(a for a, prices in unsized.items()
                         if isinstance(prices.get(name), (int, float)))
@@ -585,7 +619,8 @@ def check(estate: str = ESTATE) -> int:
                         f"different institutions, which is what a statutory cap looks like and "
                         f"is why neither line may be read as a switching cost for either")
         elif len(shared) > 1:
-            out("FAIL", f"{' and '.join(shared)} publish no signed size and price {name} at "
+            out("FAIL", f"{' and '.join(shared)} publish no signed size, each one's own served "
+                        f"entry for {name} says it was `{CAP_NOTE}`, and they price it at "
                         f"DIFFERENT amounts — "
                         + ", ".join(f"{a} at {unsized[a][name]!r}" for a in shared)
                         + " — a statutory cap is one number, so two numbers mean at least one "
@@ -732,8 +767,9 @@ def _commit_and_push(repo: str, message: str) -> None:
     _git_fixture(repo, "push", "-q", "origin", "main")
 
 
-def _unsize(repo: str, name: str, amount: float) -> None:
-    """Strip the signed size from a fixture adopter and set its one feed price."""
+def _unsize(repo: str, name: str, amount: float, cap_note: bool = True) -> None:
+    """Strip the signed size from a fixture adopter and set its one feed price, carrying the
+    publisher's own cap note on the entry as ico's converter would (or not, as the register's)."""
     path = os.path.join(repo, "party.yaml")
     doc = yaml.safe_load(open(path).read())
     doc.pop("size")
@@ -745,10 +781,13 @@ def _unsize(repo: str, name: str, amount: float) -> None:
         p["perspective"] = name
         if p["kind"] == "feed":
             p["amount"] = amount
+            if cap_note:
+                p["lef_basis"] = "lm sourced from the publisher's own fines. Not sized to any " \
+                                 "subscriber: priced at the statutory cap."
     open(evidence, "w").write(json.dumps(ev, indent=2))
 
 
-def _plant_unsized_pair(root: str, first: float, second: float) -> str:
+def _plant_unsized_pair(root: str, first: float, second: float, cap_note: bool = True) -> str:
     """Two unsized adopters pinning the same publisher feed, priced at `first` and `second`."""
     _plant(root)
     ado = os.path.join(root, "ado")
@@ -757,7 +796,7 @@ def _plant_unsized_pair(root: str, first: float, second: float) -> str:
     _git_fixture(bdo, "remote", "remove", "origin")
     _serve(bdo)
     for repo, name, amount in ((ado, "ado", first), (bdo, "bdo", second)):
-        _unsize(repo, name, amount)
+        _unsize(repo, name, amount, cap_note)
         _commit_and_push(repo, "unsized")
     return root
 
@@ -922,9 +961,21 @@ def selfcheck() -> None:
             assert rc == 1 and any("DIFFERENT amounts" in m and "ado at 9039791.01976426" in m
                                    and "bdo at 9039791.02976426" in m for m in MESSAGES), MESSAGES
         plants += 1
-    print("OK two unsized adopters pricing one feed at the same number to the penny are the "
-          "proof of a cap (SKIP), and at two different numbers FAIL naming both adopters and "
-          "both amounts")
+    print("OK two unsized adopters whose own entries say `priced at the statutory cap` and price "
+          "one feed at the same number to the penny are the proof of a cap (SKIP), and at two "
+          "different numbers FAIL naming both adopters and both amounts")
+    # ...and a feed whose note names no cap is priced per institution: two numbers, no finding.
+    LINES.clear()
+    MESSAGES.clear()
+    with tempfile.TemporaryDirectory() as root:
+        _plant_unsized_pair(root, 318229.7785850087, 222574.31190283748, cap_note=False)
+        rc = check(root)
+    assert rc == 3 and "FAIL" not in LINES, MESSAGES
+    assert any("is not graded" in m and "names no cap" in m for m in MESSAGES), MESSAGES
+    plants += 1
+    print("OK two unsized adopters pricing a feed whose own note names NO cap at different "
+          "amounts are two institutions, not a defect: no FAIL, and each switching line is a "
+          "named could-not-look that says the amount is ungraded rather than a cap")
     print(f"\nselfcheck ok: {plants} plants, each proved to bite")
 
 
