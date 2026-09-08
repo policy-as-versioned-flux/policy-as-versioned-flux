@@ -162,7 +162,8 @@ def _kustomization(resources: list[str]) -> str:
 
 def _estate(tmp_path: Path, *, served: str = SERVED, resources: list[str] | None = None,
             renovate: dict | None = None, stack: bool = True, flux_path: str = "./gitops/apps",
-            sync: bool = True, pinned_has_lift: bool = False) -> Path:
+            sync: bool = True, pinned_has_lift: bool = False, tag: str = "v1.0.0",
+            extra_sync: str = "") -> Path:
     """One adopter, as a real git repository: v1.0.0 is tagged BEFORE the lift lands (the shape
     all three real adopters have today) unless pinned_has_lift moves the tag to the checkout."""
     estate = tmp_path / "estate"
@@ -194,7 +195,8 @@ def _estate(tmp_path: Path, *, served: str = SERVED, resources: list[str] | None
     commit = _git(a, "rev-parse", "v1.0.0^{commit}")
     if sync:
         (a / "gitops" / "flux-system" / "gotk-sync.yaml").write_text(
-            GOTK_SYNC % {"commit": commit, "path": flux_path})
+            (GOTK_SYNC % {"commit": commit, "path": flux_path}).replace("tag: v1.0.0", f"tag: {tag}")
+            + extra_sync)
     return estate
 
 
@@ -511,3 +513,74 @@ def test_the_kyverno_plan_names_the_orphan_guard(tmp_path):
     assert policies.endswith("composed/policies/v4.0.0")
     assert guard.endswith("composed/orphan-guard.yaml")
     assert served.endswith("gitops/apps/ledger.yaml")
+
+
+# --------------------------------------------------------------------------- tidy 2026-09-08 (R2-1..3)
+
+def test_a_pin_this_clone_cannot_read_is_a_printed_count_not_a_zero(tmp_path):
+    # R2-1: the pin names v9.9.9 and the clone has no such tag. Before this test the headline
+    # LIMIT and the PASS sentence said `0 of 1 ... not in the tree the GitRepository pins
+    # (v9.9.9)` -- a zero derived from nothing read. The number of pinned trees that could not
+    # be read is printed beside it, on the same line the PASS sentence is built from.
+    report = _grade(tmp_path, tag="v9.9.9")
+    assert report.exit_code == 0, report.text()
+    assert report.rows[0].pinned is not None and report.rows[0].pinned.state == "unreadable"
+    assert ("LIMIT  0 of 1 lifts are listed at main and not in the tree the GitRepository pins "
+            "(v9.9.9); 1 of 1 pinned trees could not be read") in report.text()
+    assert "tag v9.9.9 is not in this clone" in report.text()
+
+
+def test_a_readable_pin_prints_zero_unreadable_on_the_same_line(tmp_path):
+    report = _grade(tmp_path)
+    assert ("LIMIT  1 of 1 lifts are listed at main and not in the tree the GitRepository pins "
+            "(v1.0.0): ledger->tuppence; 0 of 1 pinned trees could not be read") in report.text()
+
+
+def test_a_wrong_path_claims_no_directory_only_where_git_show_failed(tmp_path):
+    # R2-2: `./gitops` IS a directory of the pinned tree, so the sentence may not say it
+    # resolves to none; it says which directory the served file is in instead.
+    report = _grade(tmp_path, flux_path="./gitops")
+    assert report.exit_code == 1, report.text()
+    assert "`./gitops` is not the directory gitops/apps/ledger.yaml is in" in report.text()
+    assert "no directory" not in report.text()
+    # ...and `./apps` is not in the pinned tree at all: `git show v1.0.0:apps` fails, and only
+    # then is the never-Ready claim made.
+    second = tmp_path / "second"
+    second.mkdir()
+    report = _grade(second, flux_path="./apps")
+    assert report.exit_code == 1, report.text()
+    assert "`./apps` is not the directory gitops/apps/ledger.yaml is in" in report.text()
+    assert "git show v1.0.0:apps` finds no such directory" in report.text()
+    assert "never becomes Ready" in report.text()
+
+
+SECOND_KUSTOMIZATION = """\
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata: {name: %(name)s, namespace: flux-system}
+spec:
+  interval: 5m
+  sourceRef: {kind: GitRepository, name: %(source)s}
+  path: ./composed
+  prune: true
+"""
+
+
+def test_the_kustomization_paired_is_the_one_whose_source_ref_names_the_git_repository(tmp_path):
+    # R2-3: a second Kustomization, LAST in the file, sourcing a different GitRepository (the
+    # platform pin lives in its own file, but nothing stops one being appended here). The
+    # first cut paired the last Kustomization with the last GitRepository and never read
+    # sourceRef, so this graded `path: ./composed` against the served directory and FAILed.
+    report = _grade(tmp_path, extra_sync=SECOND_KUSTOMIZATION % {"name": "platform",
+                                                                  "source": "platform"})
+    assert report.exit_code == 0, report.text()
+    assert "(./gitops/apps)" in report.text()
+
+
+def test_two_kustomizations_sourcing_the_same_git_repository_fail_by_name(tmp_path):
+    report = _grade(tmp_path, extra_sync=SECOND_KUSTOMIZATION % {"name": "tuppence-2",
+                                                                  "source": "tuppence"})
+    assert report.exit_code == 1, report.text()
+    assert "tuppence-2" in report.text() and "'tuppence'" in report.text()
+    assert "cannot be derived" in report.text()

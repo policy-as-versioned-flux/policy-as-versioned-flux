@@ -150,7 +150,9 @@ Two facts the build turned up and wrote down rather than smoothed over:
 
 `verify/portability/verify-portability.sh` (+ `portability.py`), discovered by
 `talk/verify-all.sh` — 113 scripts on this branch, measured by the gate itself and never typed
-into a check — with a manifest row declaring all NINE could-not-looks it can print. Its header
+into a check — with a manifest row declaring all ELEVEN could-not-looks it can print (eleven
+alternates in the row's `waits:` pattern; an earlier draft here said nine, which was never the
+row's count -- corrected in the tidy of 2026-09-08, F12). Its header
 carries the served-artefact/operation table. It reads each adopter's SERVED commit — `origin/main`,
 fetched and then `git show origin/main:` — and each publisher's tree AT THE TAG THAT ADOPTER PINS,
 out of the adopter's own `gitops/flux-system/gotk-sync-<party>.yaml`: never HEAD, never platform's
@@ -368,7 +370,7 @@ asked for it, and the sentences above are corrected in place rather than annotat
   priced — the sentence was kept and the code made true. `dropped_edges` lists them all; switching
   entries are never summed, so a publisher supplying two feeds carries one cost on two entries and
   nothing double-counts. No figure in today's estate moves.
-* **F9 (note).** The hub selfcheck's plant count is printed from a counter (22 today), not typed.
+* **F9 (note).** The hub selfcheck's plant count is printed from a counter (22 at the merge; 29 after the tidy of 2026-09-08), not typed.
   Platform's selfcheck still hardcodes `since == '2026-08-28'` and `alternates == []` for the real
   driftwood: those are the estate's values today and the assertion will go red the day either moves,
   which is what an assertion is for, but it is a typed expectation and is named here as one.
@@ -377,6 +379,63 @@ asked for it, and the sentences above are corrected in place rather than annotat
   SHA and digests — the fixture had put the extra keys on the header, so the check would have raised
   `KeyError: 'feed_path'` on the first real vendored tree. The hub now reads `PROVENANCE.json` from
   the served commit for those fields and holds it to the header on every field they share.
+
+### Tidy 2026-09-08: F10–F12, carried after the merge
+
+The round-2 review left three minor findings; each is in the tidy pull request that follows the
+merge, red first, and the manifest row's eleven declared could-not-looks do not change.
+
+* **F10 (minor), a ceiling graded as a figure.** `grade_switching` graded a switching line by
+  whether `party.yaml` carried a `size:`, not by the served entry's own cap note. Platform prices a
+  size signed more than `SIZE_STALE_MONTHS` (12) ago at the cap too: such an adopter's entry
+  carries `priced at the statutory cap` in `lef_basis`, its vendored record an invocation with no
+  `--turnover`, and the hub PASSed `9039791.02 GBP/yr under driftwood's own perspective`. Now the
+  NOTE decides: a switching entry whose feed entry carries the cap note is a SKIP whether or not
+  the adopter is sized (`rests on a price computed at the publisher's statutory cap: its own
+  served entry ... says ... because the publisher gave it no turnover to scale against — <adopter>
+  publishes a size:, so the size it signed is one the publisher would not use, a stale one
+  (platform SIZE_STALE_MONTHS)`), and where a vendored record exists, `grade_cap_note` FAILs when
+  the note and the recorded invocation disagree: `--turnover` recorded beside the note, or no
+  `--turnover` beside no note. Only a converter whose vendored source declares `--turnover` is
+  compared -- the threat register's declares none, so its bare `['threat', '<adopter>']` beside no
+  note is not a finding (a plant holds that shape clean). Red first, both plants:
+
+      # sized adopter, cap note on the entry, record with no --turnover
+      PASS: ado's switching entry for pub/wares is 100.00 GBP/yr under ado's own perspective, carried over the 6 months the pin has stood since 2026-01-15
+      # sized adopter, cap note on the entry, record WITH --turnover 10.00
+      PASS: ado's switching entry for pub/wares is 100.00 GBP/yr under ado's own perspective, carried over the 6 months the pin has stood since 2026-01-15
+      # green: the first is `SKIP: ado's switching entry for pub/wares rests on a price computed at
+      # the publisher's statutory cap: ...`; the second is `FAIL: ado's vendored record for wares@v1
+      # records an invocation that passed --turnover, and ado's own served entry for wares says
+      # `priced at the statutory cap` — the note and the command disagree ...`
+
+* **F11 (minor), `converter: null` beside a signed `*.py`.** `provenance()` now requires
+  `feed_path` and `converter` (when set) to be keys of the header-signed `files`, and FAILs
+  `converter: null` while `files` carries a `*.py` -- that is a converter the record disowns, not a
+  named absence, and it would have skipped the replay leg. Red first:
+
+      PASS: ado's vendored wares@v1 declares no converter, and its publisher prices it without one — a named absence
+      # green
+      FAIL: ado's served composed/feeds/pub/v1/PROVENANCE.json says converter: null while the files its own header signed carry ['wares/to_fair_scenario.py'] — that is not a named absence, it is a converter the record disowns, and the replay leg would have skipped it
+
+  A `feed_path` that is not a signed file FAILs at the record (`names feed_path='wares/v1/other.json',
+  which is not among the files its own header signed`), before any publisher is asked for it; the
+  first cut reached a proxy FAIL (`missing its converter or payload`) and a SKIP naming a file in
+  the publisher's tree.
+* **F12 (low), an undeclared SKIP hiding behind the first line.** The per-adopter EXPOSURE
+  observation printed with the SKIP token and was not in the manifest row; it escaped because the
+  wrapper reports the first SKIP line only. It prints as `NOTE:` now (`NOTE: driftwood prices
+  1806735.62 GBP/yr of EXPOSURE ...`), which the exit code does not read. Every SKIP text the
+  script can print -- 13 distinct from the 29 selfcheck plants plus 10 from the live estate, 23
+  distinct in all -- was judged against the row with `talk/truth_manifest.py judge`: 0 undeclared.
+* **Known limit, recorded and not edited (platform).** `_INVOCATIONS` in
+  `compose/composition.py` is a module-global keyed on `(name, version)` only. A future caller
+  pricing the same pair with different arguments inside one compose (the same feed under two
+  regimes, or sized and unsized in one run) would overwrite the record, and `vendor_feed` would
+  then write the LAST invocation beside a payload the first one priced. Today each compose prices
+  each `(name, version)` once per adopter, so nothing is misrecorded; the hub's replay leg would
+  catch a wrong record the day it happens (a different command digests to a different scenario),
+  and F10's note-versus-invocation rule catches the sized/unsized case by name.
 
 ### Decisions
 
@@ -440,7 +499,7 @@ asked for it, and the sentences above are corrected in place rather than annotat
 
     # hub
     bash verify/portability/verify-portability.sh            # exit 3, the named wait
-    .venv/bin/python verify/portability/portability.py selfcheck   # exit 0, 22 plants (counted, review F9)
+    .venv/bin/python verify/portability/portability.py selfcheck   # exit 0, 29 plants (counted, review F9; 22 at the merge)
     bash talk/verify-all.sh --selfcheck                      # PASS
     bash verify/truth-line/verify-truth-line.sh              # PASS
     bash verify/every-green/verify-every-green.sh            # PASS, 113 scripts discovered

@@ -66,7 +66,14 @@ actually pins, and not against whatever the publisher's main happens to hold tod
    carry DIFFERENT amounts FAIL, naming both adopters and both amounts: a cap is one number
    (review F6). A feed whose note names no cap — the threat register prices each institution
    from its own entry — is neither called the cap nor compared: on the live estate ludlow and
-   tuppence price it at 318,229.78 and 222,574.31 and that is two institutions, not a defect;
+   tuppence price it at 318,229.78 and 222,574.31 and that is two institutions, not a defect.
+   The note, not the size, decides (tidy 2026-09-08, F10): platform prices a size signed more
+   than SIZE_STALE_MONTHS ago at the cap too, so a SIZED adopter's entry can carry the note and
+   its switching line is then the same ceiling. And where a vendored record exists, the note
+   and the recorded invocation must agree: a converter that declares `--turnover` was given one
+   or it was not, and the note says which -- a note beside a recorded `--turnover`, or a bare
+   invocation beside no note, FAILS. A converter that declares no `--turnover` (the threat
+   register's) has nothing to agree with and is not compared;
 7. no string anywhere in `prices[]` carries an absolute path (review F2): composed/evidence.json
    is what the served commit carries, and a refusal that names the builder's home directory
    makes the served bytes depend on whose machine composed them.
@@ -300,13 +307,19 @@ def grade_switching(entries: list[dict], adopter: str, currency: str, sized: boo
             out("FAIL", f"{who} carries over_pin_life {got}, and {amount} over {months} months "
                         f"is {expect}")
             continue
-        if not sized and entry.get("name") in capped_feeds:
-            # Never a pass. The amount is real arithmetic on the publisher's own statutory cap,
-            # which is a ceiling every firm shares — so it is not a figure about this one.
-            out("SKIP", f"{who} rests on a price computed at the publisher's statutory cap, "
-                        f"because {adopter} publishes no signed size: — so the number is a "
-                        f"ceiling every firm in this estate shares and says nothing about this "
-                        f"institution (ticket 64)")
+        if entry.get("name") in capped_feeds:
+            # Never a pass, sized or not. The amount is real arithmetic on the publisher's own
+            # statutory cap, which is a ceiling every firm shares — so it is not a figure about
+            # this one. The served entry's own note decides, never the size (F10): platform
+            # prices a size signed more than SIZE_STALE_MONTHS ago at the cap as well.
+            why = (f"{adopter} publishes no signed size:" if not sized else
+                   f"the publisher gave it no turnover to scale against — {adopter} publishes "
+                   f"a size:, so the size it signed is one the publisher would not use, a "
+                   f"stale one (platform SIZE_STALE_MONTHS)")
+            out("SKIP", f"{who} rests on a price computed at the publisher's statutory cap: "
+                        f"its own served entry for {entry.get('name')} says `{CAP_NOTE}` "
+                        f"because {why} — so the number is a ceiling every firm in this estate "
+                        f"shares and says nothing about this institution (ticket 64)")
         elif not sized:
             # Also never a pass, for a stated reason that is policy rather than arithmetic: this
             # check grades no switching cost of an unsized adopter (ticket 64, decision 6). The
@@ -320,6 +333,27 @@ def grade_switching(entries: list[dict], adopter: str, currency: str, sized: boo
         else:
             out("PASS", f"{who} is {amount:.2f} {currency}/yr under {adopter}'s own perspective, "
                         f"carried over the {months} months the pin has stood since {since}")
+
+
+def grade_cap_note(adopter: str, name: str, version: str, capped: bool,
+                   invocation: object, converter_text: str | None) -> None:
+    """The publisher's note and the command the vendored record says priced the feed must
+    agree (F10). Only a converter that declares `--turnover` can have been given one; for any
+    other converter there is nothing to compare and nothing is said."""
+    if not converter_text or "--turnover" not in converter_text \
+            or not isinstance(invocation, list):
+        return
+    who = f"{adopter}'s vendored record for {name}@{version}"
+    given = "--turnover" in [str(a) for a in invocation]
+    if capped and given:
+        out("FAIL", f"{who} records an invocation that passed --turnover, and {adopter}'s own "
+                    f"served entry for {name} says `{CAP_NOTE}` — the note and the command "
+                    f"disagree, so one of them describes a price that was not computed")
+    elif not capped and not given:
+        out("FAIL", f"{who} records an invocation with no --turnover, so the converter priced "
+                    f"at its cap, and {adopter}'s own served entry for {name} carries no "
+                    f"`{CAP_NOTE}` note — the note and the command disagree, so the entry is "
+                    f"presented as a figure about this institution when it is the ceiling")
 
 
 def _strings(value: object, at: str = "") -> list[tuple[str, str]]:
@@ -353,7 +387,11 @@ def provenance(repo: str, adopter: str, header_record: dict) -> dict | None:
     SHA and the file digests; the record beside the files carries what the header does not:
     the feed path, the converter, the invocation that priced it and the digest of what it
     returned. The two must agree on every field they share, or the record is describing a
-    tree other than the one the header signed. Returns the merged record, header winning."""
+    tree other than the one the header signed. And the record must describe the files the
+    header signed (tidy 2026-09-08, F11): `feed_path` and `converter` must be keys of `files`,
+    and `converter: null` beside a signed `*.py` is not a named absence, it is a converter the
+    record disowns -- which would have skipped the replay leg. Returns the merged record,
+    header winning."""
     path = f"{header_record['path']}/{PROVENANCE}"
     text = show(repo, SERVED_REF, path)
     if text is None:
@@ -372,6 +410,24 @@ def provenance(repo: str, adopter: str, header_record: dict) -> dict | None:
                         f"composed/HEADER.yaml signed {header_record.get(key)!r} — a record "
                         f"that disagrees with the header it rides under")
             return None
+    files = sorted(str(f) for f in (record.get("files") or {}))
+    feed_path, converter = record.get("feed_path"), record.get("converter")
+    if not feed_path or feed_path not in files:
+        out("FAIL", f"{adopter}'s served {path} names feed_path={feed_path!r}, which is not "
+                    f"among the files its own header signed ({files}) — the record prices "
+                    f"from a payload the signed tree does not carry")
+        return None
+    if converter and converter not in files:
+        out("FAIL", f"{adopter}'s served {path} names converter={converter!r}, which is not "
+                    f"among the files its own header signed ({files}) — a converter the tree "
+                    f"does not carry cannot be replayed")
+        return None
+    scripts = [f for f in files if f.endswith(".py")]
+    if not converter and scripts:
+        out("FAIL", f"{adopter}'s served {path} says converter: null while the files its own "
+                    f"header signed carry {scripts} — that is not a named absence, it is a "
+                    f"converter the record disowns, and the replay leg would have skipped it")
+        return None
     return {**record, **header_record}
 
 
@@ -465,6 +521,10 @@ def grade_adopter(estate: str, adopter: str, unsized: dict[str, dict] | None = N
         record = provenance(repo, adopter, record)
         if record is None:
             continue
+        grade_cap_note(adopter, str(name), version, str(name) in capped_feeds,
+                       record.get("invocation"),
+                       show(repo, SERVED_REF, f"{record['path']}/{record['converter']}")
+                       if record.get("converter") else None)
         broken = False
         for rel, want in (record.get("files") or {}).items():
             blob = show(repo, SERVED_REF, f"{record['path']}/{rel}")
@@ -507,7 +567,10 @@ def grade_adopter(estate: str, adopter: str, unsized: dict[str, dict] | None = N
         if costs:
             beside = (" Beside it, and never added to it: " + "; ".join(costs)
                       + " — a cost, not an exposure, and one array must not add them")
-        out("SKIP", f"{adopter} prices {exposure:.2f} {currency}/yr of EXPOSURE (kinds "
+        # An OBSERVATION, printed as one: it is not a reason this check could not look, and a
+        # SKIP here was one the manifest row never declared -- it escaped only because the
+        # wrapper reports the first SKIP line (tidy 2026-09-08, F12).
+        out("NOTE", f"{adopter} prices {exposure:.2f} {currency}/yr of EXPOSURE (kinds "
                     f"{' and '.join(EXPOSURE_KINDS)} only), under its own perspective, from "
                     f"publishers whose clone it would need to re-derive any of it — no total is "
                     f"taken across adopters, because three adopters' exposures are three balance "
@@ -646,6 +709,7 @@ sub = p.add_subparsers(dest="cmd", required=True)
 b = sub.add_parser("build")
 b.add_argument("payload")
 b.add_argument("regime")
+__TURNOVER_OPTION__
 args = p.parse_args()
 body = json.load(open(args.payload))
 print(json.dumps({"name": "wares:%s %s" % (body.get("feed_version"), args.regime),
@@ -655,7 +719,12 @@ print(json.dumps({"name": "wares:%s %s" % (body.get("feed_version"), args.regime
 # stated by the plant, not computed by running it, so the digest the check is held to is an
 # independent statement of the expected scenario.
 SCENARIO = {"name": "wares:v1 uk", "currency": "GBP"}
-INVOCATION = ["build", "uk"]
+# The recorded command carries the subscriber's turnover, as ico's does for a sized adopter;
+# the fixture converter accepts the flag and prices the same either way, so the scenario digest
+# does not move with it. A plant that records NO turnover beside a cap note is consistent; one
+# that records a turnover beside a cap note is not (tidy 2026-09-08, F10).
+INVOCATION = ["build", "uk", "--turnover", "10.00"]
+TURNOVER_OPTION = 'b.add_argument("--turnover", type=float, default=None)'
 
 
 # A fixture repository must not depend on the machine's global git config. `core.hooksPath`
@@ -683,9 +752,15 @@ def _serve(repo: str) -> None:
 
 def _plant(root: str, *, vendored=True, digest_ok=True, payload_matches=True,
            converter_runs=True, invocation_recorded=True, scenario_digest_ok=True,
-           provenance="present", premium=False, switching=None) -> str:
+           provenance="present", premium=False, switching=None, invocation=None,
+           cap_note=False, turnover_option=True) -> str:
     """A two-party fixture estate: one adopter, one publisher, both real git repos with a real
-    origin, the publisher carrying a real tag the adopter really pins."""
+    origin, the publisher carrying a real tag the adopter really pins.
+
+    `invocation` is what the vendored record says priced the feed (INVOCATION by default);
+    `cap_note` puts the publisher's cap note on the served feed entry as ico's converter would;
+    `turnover_option` is whether the vendored converter declares `--turnover` at all (the
+    threat register's does not, so for it a bare invocation beside no note is consistent)."""
     pub = os.path.join(root, "pub")
     os.makedirs(os.path.join(pub, "wares", "v1"))
     payload = json.dumps({"name": "wares", "payload": {"currency": "GBP"}}, indent=2)
@@ -717,8 +792,12 @@ def _plant(root: str, *, vendored=True, digest_ok=True, payload_matches=True,
         "amount": 100.0, "name": "wares", "version": "v1", "since": "2026-01-15",
         "as_of": "2026-07-15", "pin_life_months": 6, "over_pin_life": 50.0,
         "could_not_look": None}
-    prices = [{"source": "pub", "kind": "feed", "name": "wares", "perspective": "ado",
-               "currency": "GBP", "amount": 100.0}] + ([entry] if entry else [])
+    feed_entry = {"source": "pub", "kind": "feed", "name": "wares", "perspective": "ado",
+                  "currency": "GBP", "amount": 100.0}
+    if cap_note:
+        feed_entry["lef_basis"] = ("lm sourced from the publisher's own fines. Not sized to any "
+                                   "subscriber: priced at the statutory cap.")
+    prices = [feed_entry] + ([entry] if entry else [])
     if premium:
         prices.append({"source": "ins", "kind": "premium", "name": "quote-ado",
                        "perspective": "ado", "currency": "GBP", "amount": 7.0})
@@ -729,8 +808,9 @@ def _plant(root: str, *, vendored=True, digest_ok=True, payload_matches=True,
     if vendored:
         base = "composed/feeds/pub/v1"
         vend_payload = payload if payload_matches else payload.replace("GBP", "USD")
-        script = CONVERTER if converter_runs else \
-            CONVERTER.replace("body = json.load", "sys.exit(2)\nbody = json.load")
+        script = CONVERTER.replace("__TURNOVER_OPTION__", TURNOVER_OPTION if turnover_option else "")
+        if not converter_runs:
+            script = script.replace("body = json.load", "sys.exit(2)\nbody = json.load")
         files = {"wares/v1/feed.json": vend_payload, "wares/to_fair_scenario.py": script}
         digests = {rel: digest(text) for rel, text in files.items()}
         if not digest_ok:
@@ -741,12 +821,17 @@ def _plant(root: str, *, vendored=True, digest_ok=True, payload_matches=True,
                   "party_artefact": None, "converter": "wares/to_fair_scenario.py",
                   "converter_from": "pub", "published_at": "2026-01-15",
                   "payload_version_key": "feed_version",
-                  "invocation": INVOCATION if invocation_recorded else None,
+                  "invocation": (INVOCATION if invocation is None else invocation)
+                  if invocation_recorded else None,
                   "scenario_sha256": (digest(json.dumps(SCENARIO, sort_keys=True))
                                       if scenario_digest_ok else "0" * 64)
                   if invocation_recorded else None}
         if provenance == "disagrees":
             record["sha"] = "cafebabe"
+        elif provenance == "converter-null":
+            record["converter"] = None          # ...while files[] still carries the .py (F11)
+        elif provenance == "feed-path-unlisted":
+            record["feed_path"] = "wares/v1/other.json"
         if provenance != "missing":
             files[PROVENANCE] = json.dumps(record, indent=2, sort_keys=True) + "\n"
         for rel, text in files.items():
@@ -788,8 +873,10 @@ def _unsize(repo: str, name: str, amount: float, cap_note: bool = True) -> None:
 
 
 def _plant_unsized_pair(root: str, first: float, second: float, cap_note: bool = True) -> str:
-    """Two unsized adopters pinning the same publisher feed, priced at `first` and `second`."""
-    _plant(root)
+    """Two unsized adopters pinning the same publisher feed, priced at `first` and `second`.
+    Their vendored records name an invocation with no `--turnover` (what a cap note means);
+    where no note is planted the converter is the threat register's shape, declaring none."""
+    _plant(root, invocation=["build", "uk"], turnover_option=cap_note)
     ado = os.path.join(root, "ado")
     bdo = os.path.join(root, "bdo")
     shutil.copytree(ado, bdo)
@@ -823,7 +910,7 @@ def selfcheck() -> None:
     # flag the first cut guessed is not something it accepts.
     with tempfile.TemporaryDirectory() as bare:
         script = os.path.join(bare, "to_fair_scenario.py")
-        open(script, "w").write(CONVERTER)
+        open(script, "w").write(CONVERTER.replace("__TURNOVER_OPTION__", TURNOVER_OPTION))
         r = subprocess.run([sys.executable, script, "--selfcheck"], capture_output=True,
                            text=True, cwd=bare)
     assert r.returncode == 2, (r.returncode, r.stderr[-200:])
@@ -936,7 +1023,7 @@ def selfcheck() -> None:
     LINES.clear()
     MESSAGES.clear()
     with tempfile.TemporaryDirectory() as root:
-        _plant(root)
+        _plant(root, invocation=["build", "uk"])
         ado = os.path.join(root, "ado")
         _unsize(ado, "ado", 100.0)
         _commit_and_push(ado, "unsized")
@@ -976,6 +1063,56 @@ def selfcheck() -> None:
     print("OK two unsized adopters pricing a feed whose own note names NO cap at different "
           "amounts are two institutions, not a defect: no FAIL, and each switching line is a "
           "named could-not-look that says the amount is ungraded rather than a cap")
+    # Tidy 2026-09-08, F10: the served entry's own cap note decides, not the presence of a
+    # size -- and where a vendored record exists, the note and the recorded command agree.
+    lines = _run(cap_note=True, invocation=["build", "uk"])
+    assert "FAIL" not in lines and "SKIP" in lines, MESSAGES
+    assert any(m.startswith("SKIP") and "rests on a price computed at the publisher's "
+               "statutory cap" in m and "stale" in m for m in MESSAGES), MESSAGES
+    assert not any(m.startswith("PASS") and "switching entry" in m for m in MESSAGES), MESSAGES
+    plants += 1
+    print("OK a SIZED adopter whose own served entry says `priced at the statutory cap` has its "
+          "switching line graded a could-not-look naming the stale size, never a figure")
+    lines = _run(cap_note=True)
+    assert "FAIL" in lines and any("passed --turnover" in m and "disagree" in m
+                                   for m in MESSAGES), MESSAGES
+    plants += 1
+    print("OK a cap note beside a recorded invocation that passed --turnover FAILS: the note "
+          "and the command disagree")
+    lines = _run(invocation=["build", "uk"])
+    assert "FAIL" in lines and any("no --turnover" in m and "carries no" in m
+                                   for m in MESSAGES), MESSAGES
+    plants += 1
+    print("OK a recorded invocation with no --turnover beside an entry with no cap note FAILS "
+          "when the converter declares --turnover")
+    lines = _run(invocation=["build", "uk"], turnover_option=False)
+    assert "FAIL" not in lines and "SKIP" not in lines, MESSAGES
+    plants += 1
+    print("OK a converter that declares no --turnover (the threat register's shape) has "
+          "nothing to agree with: a bare invocation beside no note is clean")
+
+    # Tidy 2026-09-08, F11: the record describes the files the header signed.
+    lines = _run(provenance="converter-null")
+    assert "FAIL" in lines and any("converter: null" in m and "disowns" in m
+                                   for m in MESSAGES), MESSAGES
+    assert not any(m.startswith("PASS") and "a named absence" in m for m in MESSAGES), MESSAGES
+    plants += 1
+    print("OK `converter: null` beside a signed *.py FAILS as a disowned converter, and is "
+          "never a named absence that skips the replay")
+    lines = _run(provenance="feed-path-unlisted")
+    assert any(m.startswith("FAIL") and "feed_path=" in m and "not among the files" in m
+               for m in MESSAGES), MESSAGES
+    plants += 1
+    print("OK a feed_path that is not a key of the signed files FAILS at the record, before "
+          "any publisher is asked for it")
+
+    # Tidy 2026-09-08, F12: the per-adopter exposure is an observation, not a could-not-look.
+    _run(vendored=False, premium=True)
+    assert any(m.startswith("NOTE: ") and "of EXPOSURE" in m for m in MESSAGES), MESSAGES
+    assert not any(m.startswith("SKIP") and "of EXPOSURE" in m for m in MESSAGES), MESSAGES
+    plants += 1
+    print("OK the per-adopter EXPOSURE figure prints as a NOTE, so no undeclared SKIP text "
+          "can hide behind the wrapper's first-SKIP-line report")
     print(f"\nselfcheck ok: {plants} plants, each proved to bite")
 
 

@@ -30,7 +30,10 @@
 #     writes is the BASELINE dial (500m/256Mi), not the isolated dial (100m/64Mi, drop ALL) the
 #     governed Namespace declares. And exit 0 is not admission: a pod claiming a version the set
 #     does not carry is SKIPPED by every policy and kyverno exits 0 with `skip: 6` (review F2),
-#     so the summary line is parsed and `skip: 0` with `pass >= <policy files>` is required;
+#     so the summary line is parsed and `skip: 0` is required, and the `--table` output is
+#     parsed so that EVERY policy in the set, by its own metadata.name, has a Pass row (tidy
+#     2026-09-08, R2-7: `pass >= <policy files>` compared rule verdicts to files -- 8 to 6 --
+#     and would have admitted a set with one policy silent and another passing twice);
 #   * the stack's Renovate manager must POINT AT the lifted stack manifest, not merely be named
 #     in `enabledManagers`, and its bumps must sit behind dependencyDashboardApproval.
 #
@@ -71,12 +74,12 @@ G() {
 }
 
 # ------------------------------------------------------------------ the kyverno verdict, parsed
-# summary_admits <summary line> <kyverno exit> <policy files> -> 0 admitted, 1 not; KV_WHY says why.
+# summary_admits <summary line> <kyverno exit> -> 0 admitted, 1 not; KV_WHY says why.
 # Exit 0 from `kyverno apply` means the CLI ran, not that the workload was admitted: a policy
 # whose matchConditions exclude the pod is a SKIP, and a pod claiming a version the set does not
 # carry is skipped by every policy in it.
 summary_admits() {
-  local line="$1" rc="$2" nfiles="$3" pass fail err skip
+  local line="$1" rc="$2" pass fail err skip
   KV_WHY=""
   if [ "$rc" != 0 ]; then KV_WHY="kyverno exited $rc"; return 1; fi
   if [ -z "$line" ]; then KV_WHY="kyverno printed no summary line"; return 1; fi
@@ -88,21 +91,52 @@ summary_admits() {
   if [ "$fail" -gt 0 ] || [ "$err" -gt 0 ]; then KV_WHY="fail: $fail, error: $err"; return 1; fi
   if [ "$skip" -gt 0 ]; then
     KV_WHY="skip: $skip -- $skip of the policies did not match the workload at all (a version the set does not carry is skipped, not admitted)"; return 1; fi
-  if [ "$pass" -lt "$nfiles" ]; then
-    KV_WHY="pass: $pass of $nfiles policy files -- a policy in the set produced no verdict"; return 1; fi
   return 0
 }
 
-# kyverno_run <policy dir> <orphan guard> <served manifest> -> summary_admits over a real apply;
-# KV_LINE is the summary line, KV_FILES the policy-file count, KV_OUT the whole output.
+# table_admits <kyverno --table output> <policy name>... -> 0 when every named policy has a
+# row whose RESULT is Pass and no row says otherwise; 1 with KV_WHY naming the policy. The
+# summary's `pass:` counts RULE verdicts, so it cannot say whether each POLICY spoke (R2-7).
+table_admits() {
+  local table="$1" name result rows; shift
+  rows="$(printf '%s\n' "$table" | sed 's/\x1b\[[0-9;]*m//g' | grep -E '^│ *[0-9]+ *│')"
+  [ -n "$rows" ] || { KV_WHY="kyverno --table printed no policy rows"; return 1; }
+  for name in "$@"; do
+    result="$(printf '%s\n' "$rows" | awk -F'│' -v n="$name" '{gsub(/ /,"",$3); gsub(/ /,"",$6); if ($3==n) print $6}' | sort -u | tr '\n' ',' | sed 's/,$//')"
+    case "$result" in
+      Pass) ;;
+      "")   KV_WHY="policy $name produced no verdict at all (no row in the kyverno table)"; return 1 ;;
+      *)    KV_WHY="policy $name: $result"; return 1 ;;
+    esac
+  done
+  return 0
+}
+
+# kyverno_run <policy dir> <orphan guard> <served manifest> -> summary_admits over a real apply,
+# then table_admits over a second apply with --table (the CLI prints one or the other);
+# KV_LINE is the summary line, KV_FILES the policy-file count, KV_NAMES the policies' own
+# metadata.names (space-separated, read from the files), KV_OUT the whole summary output.
 kyverno_run() {
-  local policies="$1" guard="$2" served="$3" rc
-  KV_LINE=""; KV_OUT=""; KV_FILES=0
+  local policies="$1" guard="$2" served="$3" rc table
+  KV_LINE=""; KV_OUT=""; KV_FILES=0; KV_NAMES=""
   [ -f "$guard" ] || { KV_WHY="$guard is missing: the set was applied without its orphan guard, which is the one policy that refuses a version the array does not declare"; return 1; }
   KV_FILES=$(( $(ls "$policies"/*.yaml 2>/dev/null | wc -l | tr -d ' ') + 1 ))
+  KV_NAMES="$("$PY" - "$policies"/*.yaml "$guard" <<'NAMES'
+import sys, yaml
+names = []
+for path in sys.argv[1:]:
+    for doc in yaml.safe_load_all(open(path)):
+        if isinstance(doc, dict) and (doc.get("metadata") or {}).get("name"):
+            names.append(str(doc["metadata"]["name"]))
+print(" ".join(names))
+NAMES
+)"
   KV_OUT="$(kyverno apply "$policies"/*.yaml "$guard" --resource "$served" 2>&1)"; rc=$?
-  KV_LINE="$(printf '%s\n' "$KV_OUT" | grep -E '^pass: ' | tail -1)"
-  summary_admits "$KV_LINE" "$rc" "$KV_FILES"
+  KV_LINE="$(printf '%s\n' "$KV_OUT" | grep -E '^pass: ' | tail -1 | sed 's/ *$//')"
+  summary_admits "$KV_LINE" "$rc" || return 1
+  table="$(kyverno apply "$policies"/*.yaml "$guard" --resource "$served" --table 2>&1)"
+  # shellcheck disable=SC2086
+  table_admits "$table" $KV_NAMES
 }
 
 # ----------------------------------------------------------------------------------- the fixture
@@ -338,10 +372,19 @@ selfcheck() {
     echo "FAIL: selfcheck: the report does not count the un-lifted image builds"; cat "$t/out.txt"; good=0; }
   grep -qE 'LIMIT +1 of 1 lifts are listed at main and not in the tree the GitRepository pins \(v1\.0\.0\): ledger->tuppence' "$t/out.txt" || {
     echo "FAIL: selfcheck: a lift listed at the checkout and absent from the pinned tree is not counted by name"; cat "$t/out.txt"; good=0; }
+  grep -qE 'pins \(v1\.0\.0\): ledger->tuppence; 0 of 1 pinned trees could not be read' "$t/out.txt" || {
+    echo "FAIL: selfcheck: the headline LIMIT does not carry the count of pinned trees that could not be read"; cat "$t/out.txt"; good=0; }
   repin_to_head "$t"
   grade_fixture "$t"; rc=$?
   [ "$rc" = 0 ] && grep -qE 'LIMIT +0 of 1 lifts are listed at main and not in the tree the GitRepository pins \(v1\.0\.0\)' "$t/out.txt" || {
     echo "FAIL: selfcheck: a lift the pinned tree DOES list is still counted as absent (rc $rc)"; cat "$t/out.txt"; good=0; }
+  # A pin naming a tag this clone does not carry is a COUNT on the same line, never a zero
+  # derived from nothing read (tidy 2026-09-08, R2-1).
+  sed -i.bak -E "s/^    tag: .*/    tag: v9.9.9/" "$t/estate/tuppence/gitops/flux-system/gotk-sync.yaml"
+  grade_fixture "$t"; rc=$?
+  [ "$rc" = 0 ] && grep -qE 'LIMIT +0 of 1 lifts are listed at main and not in the tree the GitRepository pins \(v9\.9\.9\); 1 of 1 pinned trees could not be read' "$t/out.txt" || {
+    echo "FAIL: selfcheck: a pinned tag this clone cannot read graded $rc or was folded into '0 of 1 not in the pinned tree' with no count of what could not be read"; cat "$t/out.txt"; good=0; }
+  sed -i.bak -E "s/^    tag: .*/    tag: v1.0.0/" "$t/estate/tuppence/gitops/flux-system/gotk-sync.yaml"
   # A pin whose tag and commit disagree is refused by Flux and must be refused here.
   sed -i.bak -E "s/^    commit: .*/    commit: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef/" "$t/estate/tuppence/gitops/flux-system/gotk-sync.yaml"
   grade_fixture "$t"; rc=$?
@@ -349,14 +392,20 @@ selfcheck() {
     echo "FAIL: selfcheck: a tag+commit pair that disagree graded $rc (want 1, naming the mismatch)"; cat "$t/out.txt"; good=0; }
 
   # The kyverno verdict is parsed, not trusted (review F2): the exact shape the review measured.
-  summary_admits "pass: 1, fail: 0, warn: 0, error: 0, skip: 6" 0 7 && {
+  summary_admits "pass: 1, fail: 0, warn: 0, error: 0, skip: 6" 0 && {
     echo "FAIL: selfcheck: 'pass: 1 ... skip: 6' at exit 0 was taken as admission"; good=0; }
-  summary_admits "pass: 7, fail: 0, warn: 0, error: 0, skip: 0" 0 8 && {
-    echo "FAIL: selfcheck: 7 passes over 8 policy files was taken as admission"; good=0; }
-  summary_admits "pass: 8, fail: 0, warn: 0, error: 0, skip: 0" 0 8 || {
+  summary_admits "pass: 8, fail: 0, warn: 0, error: 0, skip: 0" 0 || {
     echo "FAIL: selfcheck: a full pass was refused: $KV_WHY"; good=0; }
-  summary_admits "pass: 8, fail: 0, warn: 0, error: 0, skip: 0" 1 8 && {
+  summary_admits "pass: 8, fail: 0, warn: 0, error: 0, skip: 0" 1 && {
     echo "FAIL: selfcheck: a non-zero kyverno exit was taken as admission"; good=0; }
+  # ...and per POLICY by name (R2-7): a table where one policy is silent, or one row is not
+  # Pass, is not admission however the rule count adds up.
+  local tbl
+  tbl="$(printf '│ 1  │ a-4-0-0 │      │ ns/Pod/x │ Pass   │        │\n│ 2  │ guard   │      │ ns/Pod/x │ Pass   │        │\n')"
+  table_admits "$tbl" a-4-0-0 guard || { echo "FAIL: selfcheck: a table with every policy passing was refused: $KV_WHY"; good=0; }
+  table_admits "$tbl" a-4-0-0 b-4-0-0 guard && { echo "FAIL: selfcheck: a policy with no row in the table was taken as admitted"; good=0; }
+  tbl="$(printf '│ 1  │ a-4-0-0 │      │ ns/Pod/x │ Skip   │        │\n│ 2  │ guard   │      │ ns/Pod/x │ Pass   │        │\n')"
+  table_admits "$tbl" a-4-0-0 guard && { echo "FAIL: selfcheck: a Skip row in the table was taken as admission"; good=0; }
   # ...and against the real engine over the planted set: the 4.0.0 pod is admitted, the 9.9.9
   # pod is skipped by the version-scoped policy and refused by the guard.
   rm -rf "$t"; t="$(mktemp -d)"; plant "$t"
@@ -364,6 +413,7 @@ selfcheck() {
   kyverno_run "$a/composed/policies/v4.0.0" "$a/composed/orphan-guard.yaml" "$a/gitops/apps/ledger.yaml" || {
     echo "FAIL: selfcheck: the real kyverno refused the planted 4.0.0 pod: $KV_WHY"; printf '%s\n' "$KV_OUT" | tail -5; good=0; }
   [ "$KV_FILES" = 2 ] || { echo "FAIL: selfcheck: counted $KV_FILES policy files (want 2: one composed policy plus the guard)"; good=0; }
+  [ "$KV_NAMES" = "require-nonroot-4-0-0 policy-version-orphan-guard" ] || { echo "FAIL: selfcheck: read policy names '$KV_NAMES' (want the two the planted files declare)"; good=0; }
   sed 's/"4\.0\.0"/"9.9.9"/' "$a/gitops/apps/ledger.yaml" >"$t/ledger-999.yaml"
   if kyverno_run "$a/composed/policies/v4.0.0" "$a/composed/orphan-guard.yaml" "$t/ledger-999.yaml"; then
     echo "FAIL: selfcheck: the real kyverno over a 9.9.9 pod was taken as admission ($KV_LINE)"; good=0
@@ -375,13 +425,13 @@ selfcheck() {
 
   rm -rf "$t"
   [ "$good" = 1 ] || return 1
-  echo "  ok   selfcheck: the grader fails fifteen ways a lift can look done and not be (the served path read from the adopter's own gotk-sync.yaml among them), could-not-looks (naming the pull request) when one has not landed, counts both residuals, accepts a glob pattern and a ./ entry, and parses the kyverno verdict (a skipped 9.9.9 pod at exit 0 is not admitted)"
+  echo "  ok   selfcheck: the grader fails fifteen ways a lift can look done and not be (the served path read from the adopter's own gotk-sync.yaml among them), could-not-looks (naming the pull request) when one has not landed, counts both residuals and the pinned trees it could not read, accepts a glob pattern and a ./ entry, and parses the kyverno verdict per policy by name (a skipped 9.9.9 pod at exit 0 is not admitted)"
 }
 
 case "${1:-}" in
   --selfcheck)
     selfcheck || exit 1
-    echo "PASS: selfcheck: an unlisted served manifest, a wrong Flux path, a missing gotk-sync.yaml, a tag+commit mismatch, an orphan version claim, a surviving incumbent label, a missing stack manifest, four broken renovate shapes, four hub copies and a second adopter all fail; an unlanded lift could-not-looks and names its pull request; a pinned tree without the lift is a counted limit; a skipped kyverno verdict at exit 0 is not admission"
+    echo "PASS: selfcheck: an unlisted served manifest, a wrong Flux path, a missing gotk-sync.yaml, a tag+commit mismatch, an orphan version claim, a surviving incumbent label, a missing stack manifest, four broken renovate shapes, four hub copies and a second adopter all fail; an unlanded lift could-not-looks and names its pull request; a pinned tree without the lift, and a pinned tag this clone cannot read, are counted limits on one line; a skipped kyverno verdict at exit 0, and a policy with no row of its own in the kyverno table, are not admission"
     exit 0 ;;
 esac
 
@@ -408,6 +458,7 @@ structural=$?
 printf '%s\n' "$report" | sed 's/^/  /'
 pinned_absent="$(printf '%s\n' "$report" | sed -nE 's/^LIMIT +([0-9]+) of [0-9]+ lifts are listed at main and not in the tree the GitRepository pins \(([^)]*)\).*/\1/p')"
 pinned_tags="$(printf '%s\n' "$report" | sed -nE 's/^LIMIT +[0-9]+ of [0-9]+ lifts are listed at main and not in the tree the GitRepository pins \(([^)]*)\).*/\1/p')"
+pinned_unread="$(printf '%s\n' "$report" | sed -nE 's/^LIMIT +[0-9]+ of [0-9]+ lifts are listed at main and not in the tree the GitRepository pins .*; ([0-9]+) of [0-9]+ pinned trees could not be read.*/\1/p')"
 
 say "2. the same discovery the adopters' own shift-left gates run"
 # Not a second implementation: this EXECUTES each adopter's own
@@ -441,7 +492,7 @@ while IFS=$'\t' read -r app unit policies guard served; do
   [ -n "${app:-}" ] || continue
   graded=$((graded + 1))
   if kyverno_run "$policies" "$guard" "$served"; then
-    echo "  ok   $app: ${unit}'s own composed set plus orphan guard admits ${served#"$ESTATE/"} at CREATE only, baseline dial, no namespaceObject -- ${KV_LINE} over ${KV_FILES} policy files, every one matched"
+    echo "  ok   $app: ${unit}'s own composed set plus orphan guard admits ${served#"$ESTATE/"} at CREATE only, baseline dial, no namespaceObject -- ${KV_LINE}; every one of the ${KV_FILES} policies has a Pass row of its own (${KV_NAMES})"
   else
     echo "  FAIL $app: ${unit}'s composed set does not admit ${served#"$ESTATE/"} -- ${KV_WHY} (${KV_LINE:-no summary line})"
     printf '%s\n' "$KV_OUT" | tail -20 | sed 's/^/       /'
@@ -462,5 +513,5 @@ if [ "$structural" = 3 ]; then
   echo "SKIP: ${graded} of ${total} lifts have landed in their adopter; the rest are proposed and unmerged, and the rows above name the pull request each one waits on"
   exit 3
 fi
-echo "PASS: ${graded} lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml reconciles; admitted at CREATE under the baseline dial by that adopter's own composed set plus orphan guard (kyverno apply, no namespaceObject); discovered by that adopter's own served-workloads.py; bumped by that adopter's own renovate manager behind dashboard approval; ${pinned_absent:-?} of ${total} are not in the tree the GitRepository pins (${pinned_tags:-unread}); the hub carries no working copy of any of them"
+echo "PASS: ${graded} lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml reconciles; admitted at CREATE under the baseline dial by that adopter's own composed set plus orphan guard (kyverno apply, no namespaceObject); discovered by that adopter's own served-workloads.py; bumped by that adopter's own renovate manager behind dashboard approval; ${pinned_absent:-?} of ${total} are not in the tree the GitRepository pins (${pinned_tags:-unread}) and ${pinned_unread:-?} of ${total} pinned trees could not be read; the hub carries no working copy of any of them"
 exit 0

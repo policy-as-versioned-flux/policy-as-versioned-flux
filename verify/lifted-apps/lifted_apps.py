@@ -122,11 +122,17 @@ def load_register(path: Path) -> list[Lift]:
 @dataclass(frozen=True)
 class FluxSync:
     """What the adopter's own gotk-sync.yaml says Flux reads: the GitRepository's pin and the
-    Kustomization's path. Read, never assumed."""
+    path of the Kustomization whose `sourceRef` names it. Read, never assumed -- and paired by
+    name, never by position (tidy 2026-09-08, R2-3: the first cut took the LAST Kustomization
+    and the LAST GitRepository in the file and never read sourceRef)."""
     path: str | None
     tag: str | None
     commit: str | None
     url: str | None
+    # The GitRepository the pin was read from, and every Kustomization whose sourceRef names
+    # it. One candidate is the pairing; more than one is a FAIL by name.
+    repository: str | None = None
+    candidates: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -134,11 +140,14 @@ class PinnedRead:
     """`git show <tag>:<path>/kustomization.yaml`, parsed for the served manifest.
 
     state: listed | absent | unreadable | unpinned
+    directory: whether `<tag>:<path>` is a tree at all (None where nothing was read) -- the
+    one fact that licenses "resolves to no directory" (tidy 2026-09-08, R2-2)
     """
     state: str
     tag: str | None
     resolved: str | None
     detail: str
+    directory: bool | None = None
 
 
 @dataclass
@@ -225,25 +234,48 @@ def served_resources(adopter_dir: Path) -> list[str] | None:
 
 def flux_sync(adopter_dir: Path) -> FluxSync | None:
     """Read `gitops/flux-system/gotk-sync.yaml`: the GitRepository's `ref.tag`/`ref.commit`/`url`
-    and the Flux Kustomization's `spec.path`. None when the file is not there at all."""
+    and the `spec.path` of the Kustomization whose `sourceRef` names that GitRepository. None
+    when the file is not there at all.
+
+    The pairing is by `sourceRef.name`, not by position in the file: a Kustomization sourcing
+    some other GitRepository (a parent pin appended here instead of in its own file) is not the
+    one that renders the served directory, wherever it sits. Where more than one Kustomization
+    sources the pinned GitRepository, `candidates` names them all and `path` is None: which
+    of them reconciles the served file cannot be derived, and grade_sync says so."""
     f = adopter_dir / FLUX_SYNC
     if not f.is_file():
         return None
-    path = tag = commit = url = None
+    repos: dict[str, dict] = {}
+    kustomizations: list[tuple[str, str | None, str | None]] = []   # (name, source, path)
     for d in yaml.safe_load_all(f.read_text()):
         if not isinstance(d, dict):
             continue
         spec = d.get("spec") or {}
         api = str(d.get("apiVersion") or "")
+        name = str((d.get("metadata") or {}).get("name") or "")
         if d.get("kind") == "Kustomization" and api.startswith("kustomize.toolkit.fluxcd.io"):
-            path = spec.get("path")
+            ref = spec.get("sourceRef") or {}
+            source = str(ref.get("name")) if ref.get("name") is not None \
+                and str(ref.get("kind") or "GitRepository") == "GitRepository" else None
+            kustomizations.append((name, source, spec.get("path")))
         elif d.get("kind") == "GitRepository" and api.startswith("source.toolkit.fluxcd.io"):
-            url = spec.get("url")
-            ref = spec.get("ref") or {}
-            # str(): YAML reads an all-digit sha as an integer, and 0 is falsy.
-            tag = None if ref.get("tag") is None else str(ref.get("tag"))
-            commit = None if ref.get("commit") is None else str(ref.get("commit"))
-    return FluxSync(path=path, tag=tag, commit=commit, url=url)
+            repos[name] = spec
+    if not repos:
+        return FluxSync(path=None, tag=None, commit=None, url=None)
+    # The GitRepository some Kustomization here sources; failing that, the only one there is.
+    sourced = [r for r in repos if any(k[1] == r for k in kustomizations)]
+    repository = sourced[0] if sourced else (next(iter(repos)) if len(repos) == 1 else None)
+    spec = repos.get(repository or "", {})
+    url = spec.get("url")
+    ref = spec.get("ref") or {}
+    # str(): YAML reads an all-digit sha as an integer, and 0 is falsy.
+    tag = None if ref.get("tag") is None else str(ref.get("tag"))
+    commit = None if ref.get("commit") is None else str(ref.get("commit"))
+    candidates = tuple(k[0] for k in kustomizations if repository is not None and k[1] == repository)
+    path = next((k[2] for k in kustomizations if k[0] == candidates[0]), None) \
+        if len(candidates) == 1 else None
+    return FluxSync(path=path, tag=tag, commit=commit, url=url, repository=repository,
+                    candidates=candidates)
 
 
 def _git(adopter_dir: Path, *args: str) -> tuple[int, str]:
@@ -279,18 +311,25 @@ def pinned_membership(adopter_dir: Path, sync: FluxSync | None, served: str) -> 
     rc, text = _git(adopter_dir, "show", f"{sync.tag}:{path}/kustomization.yaml")
     short = resolved[:7]
     if rc != 0:
+        # `git show <tag>:<path>` on a tree lists it; on nothing it fails. That is the one
+        # reading that licenses "resolves to no directory" (R2-2).
+        is_dir = _git(adopter_dir, "cat-file", "-t", f"{sync.tag}:{path}")[1] == "tree"
         return PinnedRead("absent", sync.tag, resolved,
-                          f"{sync.tag} ({short}) carries no {path}/kustomization.yaml, so "
-                          f"nothing under {path} is served from the pinned tree")
+                          f"{sync.tag} ({short}) carries no {path}/kustomization.yaml"
+                          + ("" if is_dir else f" -- `git show {sync.tag}:{path}` finds no "
+                                               f"such directory")
+                          + f", so nothing under {path} is served from the pinned tree",
+                          directory=is_dir)
     names = kustomization_names(text)
     rel = posixpath.relpath(served, path) if served.startswith(path + "/") else Path(served).name
     if rel in names:
         return PinnedRead("listed", sync.tag, resolved,
-                          f"{sync.tag} ({short}) lists {rel} in {path}/kustomization.yaml")
+                          f"{sync.tag} ({short}) lists {rel} in {path}/kustomization.yaml",
+                          directory=True)
     return PinnedRead("absent", sync.tag, resolved,
                       f"{sync.tag} ({short}) does not list {rel} in {path}/kustomization.yaml "
                       f"(it lists {names}); the lift is listed at the checkout and not in the "
-                      f"tree the GitRepository pins")
+                      f"tree the GitRepository pins", directory=True)
 
 
 def _old_labels(node: object) -> list[str]:
@@ -306,23 +345,36 @@ def _old_labels(node: object) -> list[str]:
     return found
 
 
-def grade_sync(lift: Lift, sync: FluxSync | None) -> list[str]:
-    """The operation that reaches the served artefact, read from the adopter's own file."""
+def grade_sync(lift: Lift, sync: FluxSync | None, pinned: PinnedRead | None = None) -> list[str]:
+    """The operation that reaches the served artefact, read from the adopter's own file.
+
+    `pinned` is what `git show <tag>:<path>` found; it is the only thing that may say a path
+    "resolves to no directory" (R2-2). Without it the wrong-path sentence says only what was
+    derived: the path is not the directory the served file is in."""
     served_dir = posixpath.dirname(lift.served)
     if sync is None:
         return [f"{lift.adopter} has no {FLUX_SYNC}, so nothing names the path Flux reconciles "
                 f"or the tree it pins, and whether {lift.served} is served cannot be derived"]
     bad: list[str] = []
-    if sync.path is None:
-        bad.append(f"{lift.adopter}/{FLUX_SYNC} has no Flux Kustomization with a spec.path, so "
-                   f"the directory Flux renders is unknown and {lift.served} is served to nobody "
-                   f"that this check can name")
+    if len(sync.candidates) > 1:
+        bad.append(f"{lift.adopter}/{FLUX_SYNC} carries {len(sync.candidates)} Flux "
+                   f"Kustomizations whose sourceRef names GitRepository {sync.repository!r}: "
+                   f"{list(sync.candidates)}; which of them reconciles {lift.served} cannot be "
+                   f"derived from the file, so this check pairs none of them")
+    elif sync.path is None:
+        bad.append(f"{lift.adopter}/{FLUX_SYNC} has no Flux Kustomization whose sourceRef names "
+                   f"its GitRepository ({sync.repository or 'none read'}) and carries a spec.path, "
+                   f"so the directory Flux renders is unknown and {lift.served} is served to "
+                   f"nobody that this check can name")
     elif posixpath.normpath(sync.path) != served_dir:
+        why = ""
+        if pinned is not None and pinned.state == "absent" and pinned.directory is False:
+            why = (f"; and `git show {pinned.tag}:{posixpath.normpath(sync.path)}` finds no such "
+                   f"directory in the tree the GitRepository pins, so that Kustomization never "
+                   f"becomes Ready there")
         bad.append(f"{lift.adopter}/{FLUX_SYNC} reconciles `path: {sync.path}`, not "
-                   f"{served_dir}: at the GitRepository's remote ({sync.url}) the tree root holds "
-                   f"gitops/, so `{sync.path}` resolves to no directory, the Kustomization never "
-                   f"becomes Ready, and {lift.served} -- the file this check reads -- is served "
-                   f"to nobody")
+                   f"{served_dir}: `{sync.path}` is not the directory {lift.served} is in, so "
+                   f"the file this check reads is served to nobody by that Kustomization{why}")
     if not sync.tag:
         bad.append(f"{lift.adopter}/{FLUX_SYNC}'s GitRepository pins no ref.tag, so there is no "
                    f"pinned tree to grade the lift against")
@@ -463,8 +515,8 @@ def grade_lift(lift: Lift, estate_root: Path) -> Row:
 
     bad: list[str] = []
     sync = flux_sync(adopter_dir)
-    bad.extend(grade_sync(lift, sync))
     row.pinned = pinned_membership(adopter_dir, sync, lift.served)
+    bad.extend(grade_sync(lift, sync, row.pinned))
     if sync is not None and sync.commit and row.pinned.resolved \
             and not row.pinned.resolved.startswith(sync.commit):
         bad.append(f"{lift.adopter}/{FLUX_SYNC} pins tag {sync.tag} and commit {sync.commit[:7]}, "
@@ -580,24 +632,30 @@ def grade(hub_root: Path, estate_root: Path, register_path: Path) -> Report:
         f"workflow job and a registry under the adopter's own organisation -- ticket 33, waits "
         f"on the owner)")
     absent = report.pinned_absent
+    unreadable = report.pinned_unreadable
     tags = sorted({r.pinned.tag for r in absent if r.pinned and r.pinned.tag}) or \
         sorted({r.pinned.tag for r in report.rows if r.pinned and r.pinned.tag})
+    # Both counts on ONE line, because the PASS sentence is built from this line: `0 of N not
+    # in the pinned tree` beside `K of N could not be read` is a number derived from what was
+    # read; alone it was a zero derived from nothing (tidy 2026-09-08, R2-1).
     report.notes.append(
         f"LIMIT  {len(absent)} of {len(lifts)} lifts are listed at main and not in the tree the "
         f"GitRepository pins ({', '.join(tags) if tags else 'no tag read'})"
         + (f": {', '.join(f'{r.app}->{r.adopter}' for r in absent)}" if absent else "")
+        + f"; {len(unreadable)} of {len(lifts)} pinned trees could not be read"
         + ": a cluster reconciling that pin is served none of these until the adopter cuts a "
           "tag and moves its own ref.tag+commit, which no renovate customManager bumps")
-    unreadable = report.pinned_unreadable
     if unreadable:
         report.notes.append(
             f"LIMIT  {len(unreadable)} of {len(lifts)} pinned trees could not be read: "
             + "; ".join(f"{r.app}->{r.adopter}: {r.pinned.detail}" for r in unreadable if r.pinned))
     for b in BLIND_SPOTS:
         report.notes.append(f"BLIND  {b}")
-    report.notes.append(f"NOTE   the hub's record directories are not read as working copies: "
-                        f"{list(HUB_RECORD_DIRS)}; not the hub's tree at all: "
-                        f"{list(HUB_SKIP_DIRS)}; the register names the images on purpose")
+    report.notes.append(f"NOTE   the hub is read as a WORKING TREE, untracked files included -- "
+                        f"a copy parked and never committed is still a copy here; its record "
+                        f"directories are not read as working copies: {list(HUB_RECORD_DIRS)}; "
+                        f"not the hub's tree at all: {list(HUB_SKIP_DIRS)}; the register names "
+                        f"the images on purpose")
     return report
 
 
