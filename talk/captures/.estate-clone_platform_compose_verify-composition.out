@@ -13,7 +13,7 @@ OK untagged pin: a second composition records the hole and prints no delta
 OK unobserved pin: a parent tree with no git metadata, and a checkout carrying no tag at all, both read `unobserved` -- they keep a recorded hole and open none, a could-not-look and never a signature
 OK unobserved pin: a real signed tag flattened onto its commit by a second fetch reads `unobserved` and books NO hole -- a fabricated hole is worse than a missed one, and the fetch is the workflow's to fix (ticket 69)
 OK closed pin: composing against the insurer's real signed tag closes the hole, prints one closed-untagged-pin delta, and the next composition carries no hole -- the hole heals itself when the tag lands
-OK untagged pin: the rendered artefact is byte-identical across untagged, recorded and unobserved -- signature state lives in the evidence, never the render
+OK untagged pin: every object the engine applies is byte-identical across untagged, recorded and unobserved -- signature state lives in the evidence, never the enforced render -- and the handbook, which nothing applies, names the hole as untagged-pin `insurer/quote-driftwood@v2` with its premium while it is open and drops it once it heals
 OK prices[]: the one summing helper refuses a list that crosses a perspective or a currency -- no number in this estate is a lie by addition
 OK prices[]: driftwood's own forward-intel feed prices as one source:twin entry -- perspective driftwood, GBP, tail bounded-pert, curve sha256:70e5e, policy version 1.1.0
 OK prices[]: an adopter with no forward-intel feed simply has no twin entry -- a missing twin feed is never a refusal (ticket 25)
@@ -3332,19 +3332,19 @@ OK check_selected_set: TINY drops aa-1.1 and aa-2 from SMALL's selected set, and
 OK baseline_widening_delta: SMALL -> BIG composes and prints one widening delta (1 control added, 0 of them named by a pinned weight, so no amount) beside the new hole it opens; nothing refuses, and a removal does not also fire
 OK resolve_claims: an adopter claim against fixture-platform's own member-a refuses (ADR-0017) -- 'fixture-adopter14 claims aa-2 is evidenced by "member-a", which fixture-platform ships, not fixture-adopter14' -- and still counts as coverage (a claim exists), orthogonal to the claim's own validity
 OK resolve_claims: the real platform component-definition's two formerly-dangling claims (ac-6, cm-6) are fixed -- zero dangling-claim refusals against the real estate
-OK HEADER.yaml: 'holes' and 'selected-controls' live only in the advisory header -- stripping it leaves every other rendered file unchanged
+OK HEADER.yaml: 'holes' and 'selected-controls' live only in the advisory header -- stripping it leaves every file the engine reads unchanged -- and the handbook, which the engine never reads, states both counts (287 selected, 285 holes)
 OK ungoverned_namespaces: a Namespace with no institution label is ignored entirely, never entering the ungoverned set
 OK compute_ungoverned: a first composition (nothing committed yet) records a pre-existing ungoverned namespace, priced, and refuses on none
 OK compute_ungoverned: a recorded ungoverned namespace records and does not refuse
 OK compute_ungoverned: a namespace that gains the label prints as closed, and as a closed-ungoverned-namespace delta
 OK compute_ungoverned: a new ungoverned namespace (absent from the last signed artefact) composes and is priced as its workload share (1 of 4 institution workloads = 0.25) with the two things it cannot yet read named as limits
 Traceback (most recent call last):
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 5824, in <module>
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 5927, in <module>
     sys.exit(main(sys.argv))
              ^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 3664, in main
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 3680, in main
     selfcheck()
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 5066, in selfcheck
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 5126, in selfcheck
     assert "acme" not in text, path
            ^^^^^^^^^^^^^^^^^^
 AssertionError: composed/governed-namespace-guard.yaml
