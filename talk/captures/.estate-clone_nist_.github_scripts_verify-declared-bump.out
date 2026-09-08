@@ -6,9 +6,22 @@ ok  control renamed -> major
 ok  prose edited -> patch
 ok  nested control enhancements are counted as ids
 ok  the real catalog/bump.yaml and rule.yaml parse with the standard library
+ok  (1) the predecessor's file name is read at v1.0.0, not from the tree: a rename computes none
+ok  (1) ...and a rename carrying a removed control computes major against the tag's bytes
+ok  (2) v1.1.0 declared minor over v1.0.0 is admitted
+ok  (2) v1.0.1 declared minor is refused: the tag is a patch increment
+ok  (2) v2.0.0 declared minor is refused: the tag is a major increment
+ok  (2) --tree derives v1.1.0 from the declared minor and admits it
+ok  (2) --tree refuses a declared none while the tree carries a minor
+ok  (2) v1.0.1 declared none is refused: no tag carries none
+ok  (2) --tree under a declared none admits an unchanged tree: no release is queued
+ok  (3) a --no-tags clone of a released repository is refused, not graded as a first release
+ok  (3) ...and --tree refuses the same way, not exit 3
+ok  (3) a clone of a repository that never released takes the first-release path
+ok  (3) ...and --tree names the tree's own publishedVersion as that first release
 
 == the real declaration against the real tree ==
-OK: declared bump 'none' == computed bump 'none' (v1.1.0 -> v1.1.1)
+OK: declared bump 'none' == computed bump 'none' (v1.1.0 -> tree: no release is queued)
 
 PASS: the bump ladder holds on fixtures, and nist's own declared bump agrees with the
 bump computed from its published tree under its own rule.yaml -- so a release cut

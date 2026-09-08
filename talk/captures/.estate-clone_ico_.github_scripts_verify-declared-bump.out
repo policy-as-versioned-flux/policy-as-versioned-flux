@@ -6,9 +6,21 @@ ok  payload schema changed -> major
 ok  a cap moved -> patch
 ok  the real penalty-schema/bump.yaml and rule.yaml parse with the standard library
 ok  --tree refuses a declaration off the ladder rather than shrugging at it
+ok  (1) a first release of v2 refuses v1's unreleased edit, naming the tag it drifted from
+ok  (1) ...and admits it once v1 on disk is what v1.0.0 published
+ok  (2) v1.1.0 declared minor over v1.0.0 is admitted
+ok  (2) v1.0.1 declared minor is refused: the tag is a patch increment
+ok  (2) --tree derives v1.1.0 from the declared minor and admits it
+ok  (2) --tree refuses a declared none while the tree carries a minor
+ok  (2) v2.0.0 declared minor is refused: the tag is a major increment
+ok  (2) v1.0.1 declared none is refused: no tag carries none
+ok  (3) a --no-tags clone of a released repository is refused, not graded as a first release
+ok  (3) ...and --tree refuses the same way
+ok  (3) a clone of a repository that never released takes the first-release path
+ok  (3) ...and --tree names v1.0.0 as that first release
 
 == the real declaration against the real tree ==
-OK: declared bump 'none' == computed bump 'none' (v3.0.0 -> v3.0.1)
+OK: declared bump 'none' == computed bump 'none' (v3.0.0 -> tree: no release is queued)
 
 PASS: the bump ladder holds on fixtures, and ico's own declared bump agrees with the
 bump computed from its published tree under its own rule.yaml -- so a release cut

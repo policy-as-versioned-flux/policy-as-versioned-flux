@@ -24,7 +24,7 @@ REFUSE: composed bump is major -- ['2.0.0']
 OK: retirement of 2.0.0 correctly refused the pull request check, comment names it
 
 B2. resolved-commit mismatch -> refuse (ADR-0001's pin made load-bearing, bug #2)
-REFUSE: platform tag 'v1.0.0' resolves to '79229f523723d006fd467f48a9eb000e89e1363b', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
+REFUSE: platform tag 'v1.0.0' resolves to '0c743d69dc774a6da3dfea34ce41732cb21f6a38', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
 OK: a pin naming the wrong commit for a real tag is refused, real git rev-parse caught it
 
 B3. composed weaker than the publisher's tag (unchanged array, major tag jump) -> informational, exit 0, never lowers
@@ -34,11 +34,11 @@ OK: composed=none against declared=major (v0.1.0 -> v1.0.0) passes, prints infor
 
 == Part C: a bundle this gate cannot read, and a missing one -- refused by name, before cosign ==
 -- a CHANGED version whose evidence file exists but whose bundle is not a real Sigstore bundle --
-REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit c1a94f4bf03a189a0c71537f2112d1ba330acd2f) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot tell which pinned trust material verifies it -- refusing rather than handing cosign no trust root and letting it fetch a live one
+REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit 1b41deb37cf310f66673b5c73163002673a381ba) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot tell which pinned trust material verifies it -- refusing rather than handing cosign no trust root and letting it fetch a live one
 OK: a bundle whose shape this gate cannot read is refused by name, and no cosign call is made without pinned trust material
 
 -- a CHANGED version with no committed evidence file at all --
-REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit 887f5c4fb2002ce6b8170af342b383e4efa698fe
+REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit cf266331835d904897d8b40e4ae7d1752cf4166c
 OK: a changed version with no committed evidence file is refused before cosign is even invoked
 
 == Part D: splice_body via the REAL CLI, with backslash-bearing evidence -- the exact re.sub() hazard ==

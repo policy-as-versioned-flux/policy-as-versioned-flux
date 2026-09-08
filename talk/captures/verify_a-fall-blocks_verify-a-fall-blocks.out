@@ -1,0 +1,43 @@
+[1;36m==>[0m 1. the comparison grades planted lines as documented: what is a fall, and what is not
+selfcheck ok
+[1;36m==>[0m 2. truth.yml carries the stop, after the cage, failing the run on its own
+  the gate job's steps are: does this run record? -- the clock says so before it measures | install pinned gitsign (binary + checksum, no marketplace action) | kyverno, cosign, flux CLIs the offline proofs call | the gate | record the TRUTH line | the observation cage -- a clock appends observations, never a declaration | a fall is a blocking event | fail if the gate failed
+[1;36m==>[0m 3. the step's own shell, lifted verbatim out of truth.yml, over throwaway repositories
+  (lift) note: the runner executes this step as `bash -e {0}`; a fixture that runs it under a plain `bash` is measuring a different shell
+  ok   lifted the step's shell verbatim out of truth.yml (28 lines), and it will be run under the runner's own flags: bash -e
+  no-fall                rc=0  blocked=no   nothing moved
+  ok   no-fall: the step did what ticket 59 decided (rc=0, blocked=no)
+  class-lost-a-pass      rc=1  blocked=yes  the observed class fell 10 -> 9
+  ok   class-lost-a-pass: the step did what ticket 59 decided (rc=1, blocked=yes)
+  fail-rose              rc=1  blocked=yes  fail rose 4 -> 5
+  ok   fail-rose: the step did what ticket 59 decided (rc=1, blocked=yes)
+  pass-became-a-skip     rc=1  blocked=yes  meta 3 -> 2 with fail unchanged: the degradation that used to go green
+  ok   pass-became-a-skip: the step did what ticket 59 decided (rc=1, blocked=yes)
+  ceiling-fell-with-manifest rc=0  blocked=no   a re-class lowered the ceiling and the manifest moved in the same span: not a fall
+  ok   ceiling-fell-with-manifest: the step did what ticket 59 decided (rc=0, blocked=no)
+  ceiling-fell-alone     rc=1  blocked=yes  the ceiling fell with no manifest change: a fall
+  ok   ceiling-fell-alone: the step did what ticket 59 decided (rc=1, blocked=yes)
+  ceiling-fell-comment-only rc=1  blocked=yes  the manifest was touched but only its COMMENTS moved: still a fall (review F5)
+  ok   ceiling-fell-comment-only: the step did what ticket 59 decided (rc=1, blocked=yes)
+  total-fell-with-exclusion rc=0  blocked=no   an exclusion lowered the total: not a fall
+  ok   total-fell-with-exclusion: the step did what ticket 59 decided (rc=0, blocked=no)
+  total-fell-alone       rc=1  blocked=yes  the total fell with no exclusions change: a fall
+  ok   total-fell-alone: the step did what ticket 59 decided (rc=1, blocked=yes)
+  total-fell-comment-only rc=1  blocked=yes  the exclusions file was touched but only its COMMENTS moved: still a fall (review F5)
+  ok   total-fell-comment-only: the step did what ticket 59 decided (rc=1, blocked=yes)
+  reclass-of-a-passing-script rc=1  blocked=yes  a passing script moved class: a fall, and reported as a re-class rather than a lost look
+  ok   reclass-of-a-passing-script: the step did what ticket 59 decided (rc=1, blocked=yes)
+  fall-with-a-reason     rc=0  blocked=no   a committed reason accepts the fall
+  ok   fall-with-a-reason: the step did what ticket 59 decided (rc=0, blocked=no)
+  reason-for-an-unrecorded-run rc=1  blocked=yes  the escape hatch names a run talk/truth.log has never recorded
+  ok   reason-for-an-unrecorded-run: the step did what ticket 59 decided (rc=1, blocked=yes)
+  fall-on-a-branch       rc=0  blocked=no   a branch recorded nothing, so the transition is not this run's and blocks nothing
+  ok   fall-on-a-branch: the step did what ticket 59 decided (rc=0, blocked=no)
+[1;36m==>[0m 4. how much this stop reaches, as a number rather than a claim
+  0 of 2 workflows in this repository are triggered by another workflow finishing, so today this stop reaches this run's own conclusion and nothing downstream
+[1;36m==>[0m 5. the newest transition talk/truth.log recorded carries no unaccounted fall
+  newest transition: run 177 (2026-09-08T13:20Z) -> run 179 (2026-09-08T14:11Z)
+  no fall: no class lost a pass, `fail` did not rise, and neither the ceiling nor the total fell unexplained
+  history: 49 recorded transition(s); 14 older one(s) carry an unaccounted fall and 0 carry an accepted one (older transitions are counted, never graded: the log is append-only)
+
+PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, that step's OWN shell -- lifted verbatim and run over throwaway git repositories in 14 states -- turns the run red on a lost class pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total while letting a re-class, an exclusion, an accepted fall and a branch run through, and the newest transition talk/truth.log recorded carries no fall no committed reason accepts
