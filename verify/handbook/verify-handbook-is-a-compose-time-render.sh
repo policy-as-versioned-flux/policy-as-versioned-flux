@@ -23,10 +23,13 @@
 # this check exists for, and it goes red rather than skipping. Three properties are proved on the
 # real artefact every run so the byte comparison cannot pass vacuously: the render is PURE (the
 # same served bytes rendered again in a SEPARATE PROCESS under an emptied environment, a random
-# hash seed and a fresh cwd must be identical -- review F-06), its SOURCE reachable from render()
-# opens no file and reads no environment, clock, socket or subprocess (a scan of the served
-# renderer's text, which is what this check trusts beyond the process test), and it BITES (one
-# field of the served artefact moved in memory must move the page).
+# hash seed and a fresh cwd must be identical -- review F-06), its SOURCE names none of
+# open/os/sys/socket/time/datetime/subprocess in module-level functions called by name from
+# render() and imports none of those modules at module level under any alias (a text scan of
+# the served renderer that does not see import-time bindings, and is what this check trusts
+# beyond the process test -- review R2-02), and it BITES (one field of the served artefact moved
+# in memory must move the page). A served renderer that does not EXECUTE is red, not a skip
+# (review R2-03).
 #
 # THREE DISCLOSED LIMITS, PRINTED AS NUMBERS, never asserted: how many adopters serve a page at
 # origin/main, how many ALSO serve one at a SIGNED TAG (graded too), and how many pin a platform
@@ -69,8 +72,10 @@ for ref in ${PAVC_HANDBOOK_PLATFORM_REF:-} origin/main; do
   fi
 done
 [ -n "${found:-}" ] || { echo "SKIP: no ref of $ESTATE/platform serves compose/handbook.py, so the grader has no renderer to prove its own rules with"; exit 3; }
-"$PY" "$HERE/handbook_check.py" --selfcheck "$SERVED_RENDERER" >/dev/null \
-  || { echo "FAIL: handbook_check.py --selfcheck -- the planted rules no longer grade as written, so nothing this run says about the estate can be trusted"; exit 1; }
+SELF_LOG="$(mktemp)"
+trap 'rm -f "$SERVED_RENDERER" "$SELF_LOG" "${LOG:-}"' EXIT
+"$PY" "$HERE/handbook_check.py" --selfcheck "$SERVED_RENDERER" >"$SELF_LOG" 2>&1 \
+  || { echo "FAIL: handbook_check.py --selfcheck with the renderer platform serves at $found -- the planted rules no longer grade as written, so nothing this run says about the estate can be trusted: $( (grep -E '^      FAIL: ' "$SELF_LOG" || grep -E '^FAIL' "$SELF_LOG") | head -1 | sed 's/^ *//')"; exit 1; }
 
 LOG="$(mktemp)"
 "$PY" "$HERE/handbook_check.py" "$ESTATE" | tee "$LOG"; rc=${PIPESTATUS[0]}

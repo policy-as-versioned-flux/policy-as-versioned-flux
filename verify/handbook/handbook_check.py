@@ -30,11 +30,19 @@ are proved on the real artefact every run, because a byte comparison alone could
                 identical output. An in-process second render shared HOME, the hostname, every
                 module-level cache and the interpreter's hash seed with the first, so it could
                 not see a renderer reading any of them (review F-06).
-  source        the served renderer's code reachable from `render()` names no `open`, no
-                `os.environ`, no `socket`, `time`, `datetime`, `subprocess` or `sys`. This is a
-                scan of the source text platform serves, and it is what the check TRUSTS beyond
-                the process test: a renderer that reads `/etc/hosts` renders the same bytes in
-                every process on one machine, so only reading its code catches it.
+  source        the served renderer's code names none of `open`, `os`, `sys`, `socket`,
+                `time`, `datetime`, `subprocess` (and the rest of FORBIDDEN_ROOTS) in module-level
+                functions called by name from `render()`, and the module imports none of those
+                modules at module level under any alias. This is a scan of the source text
+                platform serves, and it is what the check TRUSTS beyond the process test: a
+                renderer that reads `/etc/hosts` renders the same bytes in every process on one
+                machine, so only reading its code catches it. It is a text scan and it does not
+                see import-time bindings that need no import: `functools.partial(open, ...)` and
+                a lambda in a module-level dict both escape it (round-2 review R2-02, measured
+                in the selfcheck), and the PASS line says so.
+  execution     a renderer platform serves at the ref that does not execute (ImportError,
+                SyntaxError) is a FAIL, not a could-not-look: the artefact was read; the tool
+                the estate publishes is what is broken (round-2 review R2-03).
   sensitivity   one field of the served artefact, changed in memory, must change the render.
                 A renderer that ignored its input would pass every byte comparison forever.
 
@@ -217,12 +225,14 @@ def _exec(path: Path, name: str) -> Any:
     return module
 
 
-def load_renderer(platform: Path, ref: str, into: Path) -> tuple[Any, Path]:
-    """The SERVED renderer, executed from the bytes platform publishes at that ref; and the path
-    those bytes were written to, for the separate-process render."""
+def read_renderer(platform: Path, ref: str, into: Path) -> Path:
+    """The SERVED renderer's bytes, as platform publishes them at that ref, written to a file
+    for the in-process exec and the separate-process render. Reading is one step and executing
+    is another (review R2-03): a ref that cannot be read is a could-not-look, a renderer that
+    is read and does not execute is a red."""
     target = into / "handbook.py"
     target.write_text(show(platform, ref, RENDERER))
-    return _exec(target, "served_handbook"), target
+    return target
 
 
 def read_served(adopter: Path, ref: str) -> tuple[dict[str, str], dict]:
@@ -263,13 +273,34 @@ def impure_reads(source: str) -> list[str]:
     """Names the served renderer's code reachable from `render()` must not touch, found by a
     static walk of its module-level functions. Returns `function: name` strings; empty is clean.
 
+    Two walks. The first is every statement that runs at IMPORT time -- module level, class
+    bodies, `if`/`try` blocks -- and refuses any `import`/`from ... import` of a FORBIDDEN_ROOTS
+    module under any alias (`import datetime as dt`, `from socket import gethostname as _g`),
+    because an aliased name or a module-level binding (`_HOST = socket.gethostname()`) is
+    invisible to the second walk (round-2 review R2-02). The second follows calls by name from
+    `render()` through module-level functions.
+
     This trusts the text: a renderer that hides a read behind `getattr(__builtins__, ...)` or an
-    imported helper module is not seen, and the PASS line says the scan is a scan."""
+    imported helper module is not seen, and neither is an import-time binding that needs no
+    import -- `functools.partial(open, ...)` or a lambda in a module-level dict -- and the PASS
+    line says the scan is a scan that does not see import-time bindings."""
     tree = ast.parse(source)
+    found: list[str] = []
+    for node in _import_time(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".")[0] in FORBIDDEN_ROOTS:
+                    found.append(f"module: import {alias.name}"
+                                 + (f" as {alias.asname}" if alias.asname else ""))
+        elif isinstance(node, ast.ImportFrom):
+            if (node.module or "").split(".")[0] in FORBIDDEN_ROOTS:
+                names = ", ".join(a.name + (f" as {a.asname}" if a.asname else "")
+                                  for a in node.names)
+                found.append(f"module: from {node.module} import {names}")
     funcs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
     if "render" not in funcs:
-        return ["render: not defined at module level"]
-    seen, todo, found = set(), ["render"], []
+        return sorted(set(found)) + ["render: not defined at module level"]
+    seen, todo = set(), ["render"]
     while todo:
         name = todo.pop()
         if name in seen or name not in funcs:
@@ -292,6 +323,31 @@ def impure_reads(source: str) -> list[str]:
             if isinstance(node, (ast.Import, ast.ImportFrom)):
                 found.append(f"{name}: import inside the function")
     return sorted(set(found))
+
+
+def _import_time(tree: ast.Module):
+    """Every node that executes when the module is imported: the walk descends into class
+    bodies and `if`/`try`/`with` blocks but never into a function or lambda body, which runs
+    only when called, nor into `if __name__ == "__main__":`, which does not run under
+    `exec_module` (the module is executed as `served_handbook`) -- so a name bound only there
+    is not a hidden read but a NameError the byte leg would already have caught."""
+    todo: list[ast.AST] = list(tree.body)
+    while todo:
+        node = todo.pop()
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+            continue
+        if isinstance(node, ast.If) and _is_main_guard(node.test):
+            continue
+        yield node
+        todo.extend(ast.iter_child_nodes(node))
+
+
+def _is_main_guard(test: ast.expr) -> bool:
+    return (isinstance(test, ast.Compare) and isinstance(test.left, ast.Name)
+            and test.left.id == "__name__" and len(test.ops) == 1
+            and isinstance(test.ops[0], ast.Eq) and len(test.comparators) == 1
+            and isinstance(test.comparators[0], ast.Constant)
+            and test.comparators[0].value == "__main__")
 
 
 def _mutate(files: dict[str, str], evidence: dict) -> tuple[tuple | None, str]:
@@ -324,12 +380,20 @@ def grade_ref(adopter: Path, platform: Path, ref: str, why_ref: str, tag_graded:
         return {**common, "state": "skip", "line": f"{name}@{ref}: {why_renderer}"}
 
     try:
-        module, renderer_path = load_renderer(platform, rref, work)
+        renderer_path = read_renderer(platform, rref, work)
         files, evidence = read_served(adopter, ref)
     except Exception as exc:                                    # noqa: BLE001
         return {**common, "state": "skip",
                 "line": f"{name}@{ref}: could not read the served artefact or renderer at "
                         f"{ref}/{rref}: {exc}"}
+    # Read is not executed. A renderer platform serves that cannot be executed is the estate's
+    # published tool being broken, which is a red, not a could-not-look (review R2-03).
+    try:
+        module = _exec(renderer_path, "served_handbook")
+    except Exception as exc:                                    # noqa: BLE001
+        return {**common, "state": "fail",
+                "line": f"{name}@{ref}: the renderer platform serves at {rref} does not "
+                        f"execute: {type(exc).__name__}: {exc}"}
 
     served = files.get(PAGE)
     if served is None:
@@ -365,8 +429,8 @@ def grade_ref(adopter: Path, platform: Path, ref: str, why_ref: str, tag_graded:
     if reads:
         return {**common, "state": "fail",
                 "line": f"{name}@{ref}: the served renderer at platform {rref} reaches, from "
-                        f"render(), {', '.join(reads)} -- a read outside the artefact, so the "
-                        "byte comparison above proves nothing"}
+                        f"render() or at import time, {', '.join(reads)} -- a read outside the "
+                        "artefact, so the byte comparison above proves nothing"}
 
     # SENSITIVITY. A renderer that ignored its input would pass every comparison forever.
     moved, what = _mutate(files, evidence)
@@ -382,9 +446,11 @@ def grade_ref(adopter: Path, platform: Path, ref: str, why_ref: str, tag_graded:
     return {**common, "state": "pass",
             "line": f"{name}@{ref}: {nbytes} bytes, byte-identical to a re-render of the "
                     f"artefact served at the same ref; the same bytes again from a separate "
-                    f"process under an emptied environment; the served renderer's code reachable "
-                    f"from render() opens no file and reads no environment, clock, socket or "
-                    f"subprocess (a source scan); moving {what} moves the page"}
+                    f"process under an emptied environment; the served renderer names none of "
+                    f"open/os/sys/socket/time/datetime/subprocess in module-level functions "
+                    f"called by name from render(), and imports none of those modules at module "
+                    f"level under any alias (a text scan that does not see import-time "
+                    f"bindings); moving {what} moves the page"}
 
 
 # ---------------------------------------------------------------- entry points
@@ -446,8 +512,10 @@ def run(estate: Path, overrides: dict[str, str]) -> int:
           f"adopter(s) ({', '.join(f'{r['name']}@{r['ref']}' for r in passes)}) each serve a "
           f"composed/HANDBOOK.md byte-identical to a re-render of the artefact served at the same "
           f"ref by the renderer platform serves; the same bytes again from a separate process "
-          f"under an emptied environment; the served renderer's code reachable from render() "
-          f"reads nothing outside the artefact (a source scan, which is what this check trusts); "
+          f"under an emptied environment; the served renderer names none of "
+          f"open/os/sys/socket/time/datetime/subprocess in module-level functions called by name "
+          f"from render() and imports none of those modules at module level under any alias (a "
+          f"text scan that does not see import-time bindings, which is what this check trusts); "
           f"the page moves when the artefact moves; {len(at_tag)} adopter(s) graded at a signed "
           f"tag as well; {len(on_pin)} pin a platform tag carrying {RENDERER}")
     return 0
@@ -507,14 +575,15 @@ def _commit(path: Path, message: str) -> None:
                    check=True)
 
 
-def _replace_render(plat: Path, body: str) -> str:
+def _replace_render(plat: Path, body: str, prefix: str = "") -> str:
     """Swap the planted renderer's render() for one whose body is `body` (which may call the
-    real one, renamed _real_render). Returns the original source for restoring."""
+    real one, renamed _real_render), with `prefix` inserted at MODULE level just before it.
+    Returns the original source for restoring."""
     src = (plat / RENDERER).read_text()
     head = "def render(files: Mapping[str, str], evidence: Mapping[str, Any]) -> str:"
     assert src.count(head) == 1, "the served renderer's render() signature moved"
     (plat / RENDERER).write_text(src.replace(
-        head, f"{head}\n{body}\n\n\ndef _real_render(files: Mapping[str, str], "
+        head, f"{prefix}\n\n{head}\n{body}\n\n\ndef _real_render(files: Mapping[str, str], "
               "evidence: Mapping[str, Any]) -> str:", 1))
     return src
 
@@ -524,10 +593,17 @@ def selfcheck(renderer_src: Path) -> int:
     has proved nothing about what it does when they do not."""
     ok = 0
 
-    def check(claim: str, cond: bool) -> None:
+    def check(claim: str, cond: bool, detail: str = "") -> None:
+        """`detail` is the graded run's own output; its FAIL / ?? lines are printed under the
+        claim so a red on the FIRST case says what the served renderer did, not only that the
+        rules no longer grade (a renderer refused by the source scan looks like broken rules
+        otherwise -- round 2, 2026-09-08)."""
         nonlocal ok
         if not cond:
             print(f"FAIL: selfcheck: {claim}")
+            for line in detail.splitlines():
+                if line.startswith(("FAIL", "  ??", "SKIP")):
+                    print(f"      {line}")
             raise SystemExit(1)
         ok += 1
         print(f"  ok   {claim}")
@@ -549,7 +625,7 @@ def selfcheck(renderer_src: Path) -> int:
 
         rc, out = graded(estate)
         check("a page that re-renders from its own served artefact grades 0",
-              rc == 0 and "SUMMARY:" in out)
+              rc == 0 and "SUMMARY:" in out, out)
         check("the counts are printed even on a pass", "COUNTS:" in out)
         check("the served branch is graded and no signed tag is counted",
               f"planted@{SERVED_BRANCH}:" in out and "0 of 1 also serve one at a signed tag" in out)
@@ -636,7 +712,70 @@ def selfcheck(renderer_src: Path) -> int:
         rc, out = graded(estate)
         check("a renderer that reads /etc/hosts renders identically in every process and is "
               "caught by the source scan of the served renderer",
-              rc == 1 and "reaches, from render(), render: open" in out)
+              rc == 1 and "reaches, from render() or at import time, render: open" in out)
+        (plat / RENDERER).write_text(src)
+        _commit(plat, "restore the renderer")
+        rc, out = graded(estate)
+        check("...and with the real renderer back, the same artefact grades 0 again", rc == 0)
+
+        # R2-02: six ways a read can sit OUTSIDE a module-level function called from render(),
+        # none of them moving the bytes (each appends '' whatever it read), so the byte and
+        # purity legs pass and only the source scan can see them. Measured red first on
+        # 2026-09-08: all six graded 0 under the reviewed scan. Four are caught now by the
+        # import-time walk; two need no import and still escape, and the PASS line says the
+        # scan does not see import-time bindings.
+        tail = "\n    return _real_render(files, evidence) + ('' if _x else '')"
+        caught = [
+            ("an aliased from-import (from socket import gethostname as _g)",
+             "from socket import gethostname as _g\n", "    _x = _g()" + tail,
+             "module: from socket import gethostname as _g"),
+            ("an aliased import (import datetime as dt)",
+             "import datetime as dt\n", "    _x = dt.date.today()" + tail,
+             "module: import datetime as dt"),
+            ("a module-level binding (_HOST = socket.gethostname())",
+             "import socket\n_HOST = socket.gethostname()\n", "    _x = _HOST" + tail,
+             "module: import socket"),
+            ("a @staticmethod on a module-level class reading time.time()",
+             "import time\nclass _Clock:\n    @staticmethod\n    def now():\n"
+             "        return time.time()\n", "    _x = _Clock.now()" + tail,
+             "module: import time"),
+        ]
+        for claim, prefix, body, expect in caught:
+            src = _replace_render(plat, body, prefix)
+            _commit(plat, claim)
+            rc, out = graded(estate)
+            check(f"{claim} is caught by the import-time walk of the source scan",
+                  rc == 1 and expect in out and "at import time" in out)
+            (plat / RENDERER).write_text(src)
+            _commit(plat, "restore the renderer")
+        escapes = [
+            ("functools.partial(open, '/etc/hosts') bound at module level",
+             "import functools\n_rd = functools.partial(open, '/etc/hosts')\n",
+             "    _x = _rd().read()" + tail),
+            ("a lambda in a module-level dict calling open()",
+             "_F = {'hosts': lambda: open('/etc/hosts').read()}\n",
+             "    _x = _F['hosts']()" + tail),
+        ]
+        for claim, prefix, body in escapes:
+            src = _replace_render(plat, body, prefix)
+            _commit(plat, claim)
+            rc, out = graded(estate)
+            check(f"{claim} ESCAPES the source scan (measured: grades 0), which is why the PASS "
+                  "line says the scan does not see import-time bindings",
+                  rc == 0 and "does not see import-time bindings" in out)
+            (plat / RENDERER).write_text(src)
+            _commit(plat, "restore the renderer")
+
+        # R2-03: a renderer that platform serves at the ref but that does not EXECUTE. Measured
+        # red first on 2026-09-08: it graded 3 (a declared could-not-look, so the gate row went
+        # NOTE) under the reviewed check. The artefact was read; the published tool is broken.
+        src = _replace_render(plat, "    return _real_render(files, evidence)",
+                              "import hb_helpers\n")
+        _commit(plat, "a renderer that imports a helper module platform does not serve")
+        rc, out = graded(estate)
+        check("a served renderer that does not execute (import hb_helpers -> ImportError) "
+              "grades 1, not 3: the artefact was read, the published tool is what is broken",
+              rc == 1 and "does not execute: ModuleNotFoundError" in out)
         (plat / RENDERER).write_text(src)
         _commit(plat, "restore the renderer")
         rc, out = graded(estate)
@@ -682,9 +821,12 @@ def selfcheck(renderer_src: Path) -> int:
     print(f"PASS: selfcheck: {ok} planted cases -- a fresh page passes, a local-only edit is not "
           "graded, a hand-edited page fails, an artefact that moved under an unmoved page fails, "
           "a renderer that ignores its input is caught by sensitivity, one that reads $HOME by the "
-          "separate emptied-environment process, one that reads /etc/hosts by the source scan, a "
-          "signed tag is graded beside origin/main and never instead of it, and both a missing "
-          "page and a missing renderer exit 3 rather than 0")
+          "separate emptied-environment process, one that reads /etc/hosts by the source scan, "
+          "four import-time reads (aliased imports, a module-level binding, a staticmethod) by "
+          "its import-time walk while two that need no import (functools.partial(open), a "
+          "lambda in a dict) are measured to escape it, a served renderer that does not execute "
+          "is red rather than a skip, a signed tag is graded beside origin/main and never "
+          "instead of it, and both a missing page and a missing renderer exit 3 rather than 0")
     return 0
 
 

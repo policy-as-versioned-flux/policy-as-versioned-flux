@@ -520,8 +520,9 @@ that a rewritten entry cites stay as the record of the decision at the time.
 
 - **Handbook** (added 2026-08-28, ticket 13; **built 2026-09-06, ticket 34**) — The human-readable
   render of an adopter's composed policy, `composed/HANDBOOK.md`, produced at compose time by
-  `platform/compose/handbook.py` and carried under the same signed tag as the artefact, so
-  render-at-tag equals the committed render. It is a **pure function of the artefact**: it reads no
+  `platform/compose/handbook.py` and -- from the platform tag that carries the renderer on --
+  carried under the same signed tag as the artefact, so render-at-tag equals the committed
+  render (at today's `v2.0.1` pins the pinned tool neither writes nor verifies it; ticket 34). It is a **pure function of the artefact**: it reads no
   clock, no environment, no network and no file outside the composed tree it is handed, so anyone
   holding the artefact can re-derive it and a page that said something the artefact does not could
   not survive the byte comparison. Where a field is absent the render names the field and states
