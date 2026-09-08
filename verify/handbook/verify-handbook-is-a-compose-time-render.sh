@@ -8,24 +8,32 @@
 # repositories and this is where the three real adopters are read.
 #
 # WHAT IS GRADED, AND AGAINST WHAT.
-#   served artefact  each adopter's composed/ tree at ONE named ref of that adopter's repository,
-#                    read with git ls-tree/git show -- newest signed tag carrying a handbook,
-#                    else the branch tip, and the run PRINTS which and why.
-#   operation        handbook.py render, taken from the copy of compose/handbook.py that PLATFORM
-#                    SERVES at the tag the adopter pins (falling back to platform's branch tip and
-#                    saying so). This check carries no renderer of its own: a hub copy would grade
-#                    the hub's idea of the render instead of the estate's.
+#   served artefact  each adopter's composed/ tree at NAMED REFS of that adopter's repository,
+#                    read with git ls-tree/git show: origin/main, AND the newest signed tag
+#                    carrying a handbook when one exists (both graded, both printed; review
+#                    F-10). Never a local branch and never a working tree (review F-08).
+#   operation        render() from the copy of compose/handbook.py that PLATFORM SERVES at the
+#                    tag the adopter's SERVED pin names (read with git show at the graded ref),
+#                    falling back to platform's origin/main and saying so. This check carries no
+#                    renderer of its own: a hub copy would grade the hub's idea of the render
+#                    instead of the estate's.
 #   comparison       bytes, against `git show <ref>:composed/HANDBOOK.md`.
 #
 # A file EXISTING is graded by nothing. A page that exists and does not re-render is the failure
-# this check exists for, and it goes red rather than skipping. Two properties are proved on the
-# real artefact every run so the byte comparison cannot pass vacuously: the render is PURE (same
-# served bytes, another directory, another environment, identical output) and it BITES (one field
-# of the served artefact moved in memory must move the page).
+# this check exists for, and it goes red rather than skipping. Three properties are proved on the
+# real artefact every run so the byte comparison cannot pass vacuously: the render is PURE (the
+# same served bytes rendered again in a SEPARATE PROCESS under an emptied environment, a random
+# hash seed and a fresh cwd must be identical -- review F-06), its SOURCE reachable from render()
+# opens no file and reads no environment, clock, socket or subprocess (a scan of the served
+# renderer's text, which is what this check trusts beyond the process test), and it BITES (one
+# field of the served artefact moved in memory must move the page).
 #
 # THREE DISCLOSED LIMITS, PRINTED AS NUMBERS, never asserted: how many adopters serve a page at
-# all, how many were graded at a SIGNED TAG rather than a branch tip, and how many pin a platform
-# tag that already carries the renderer. Each moves on its own the day a tag is cut or a pin moves.
+# origin/main, how many ALSO serve one at a SIGNED TAG (graded too), and how many pin a platform
+# tag that already carries the renderer. Each moves on its own the day a tag is cut or a pin
+# moves. The last one matters most today: until a pin carries the renderer, the composition.py at
+# that pin neither writes nor verifies the page, so cut-release.yml there would sign a hand-edited
+# page -- this check is the only thing reading it.
 #
 # THREE OVERRIDES, none of them set by the gate, all for grading a branch before it merges:
 # PAVC_ESTATE_CLONE names another estate, PAVC_HANDBOOK_REFS="unit=ref,..." names an adopter's ref,
@@ -53,7 +61,9 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 # caught by the sensitivity leg rather than sliding through the byte comparison.
 SERVED_RENDERER="$(mktemp)"
 trap 'rm -f "$SERVED_RENDERER" "${LOG:-}"' EXIT
-for ref in ${PAVC_HANDBOOK_PLATFORM_REF:-} origin/main main HEAD; do
+# origin/main only -- never local main, never HEAD (review F-08): a local branch is whatever this
+# checkout last had, and a working tree is not what anybody installs.
+for ref in ${PAVC_HANDBOOK_PLATFORM_REF:-} origin/main; do
   if git -C "$ESTATE/platform" show "$ref:compose/handbook.py" >"$SERVED_RENDERER" 2>/dev/null; then
     found="$ref"; break
   fi

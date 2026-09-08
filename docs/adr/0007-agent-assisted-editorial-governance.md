@@ -65,6 +65,17 @@ OCI path and is a north-star item.)
 > the render has. `verify.sh` is retired with its reason in `platform/compose/README.md`; it was
 > never lifted into this estate, so no file was deleted for it.
 >
+> **Corrected 2026-09-08 (ticket 34 review, F-02).** The sentence above — same pull request,
+> same `verify()`, same tag — holds only **from the platform tag that carries
+> `compose/handbook.py` on**. Every adopter pins `v2.0.1` today, whose `composition.py` neither
+> writes nor verifies the page. Measured: a hand-edited `composed/HANDBOOK.md` passes `v2.0.1`
+> `composition.py verify` (`OK: composed artefact re-renders byte-for-byte from the recorded parent
+> SHAs`), the very step `cut-release.yml` runs before the tag is cut, so at that pin `cut-release`
+> would sign a hand-edited page. Until the pins move, the page is graded only by
+> `verify-fresh.sh` and the hub's `verify/handbook/`, which prints how many pins carry the
+> renderer (`0 of 3`) and reads the page at `origin/main` and at any signed tag. The page's own
+> preamble says only what a re-render proves: which tool derives it and from which files.
+>
 > What the render is *not* is worth stating in the same breath, because this section's own last
 > sentence is still true: it is a page derived from fields, not an argument that the rules are the
 > right rules, and full adoption by non-technical humans stays partly cultural and stays named as
