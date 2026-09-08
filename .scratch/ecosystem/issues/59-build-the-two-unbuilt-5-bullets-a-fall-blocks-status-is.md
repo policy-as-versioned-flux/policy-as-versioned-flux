@@ -90,14 +90,16 @@ stop changes visibly instead of a disclosed limit going quietly stale.
 
 **How the stop is proved.** `verify/a-fall-blocks/verify-a-fall-blocks.sh` lifts that step's own
 shell verbatim out of `truth.yml` through `verify/can-record/can_record.py step` — the same
-extractor ticket 100 uses — and runs it over throwaway git repositories in eleven states, each
-graded by what the step DOES (its exit status, whether it printed `::error::`, what it wrote to
-the step summary): nothing moved; a class lost a pass; `fail` rose; a pass became a
-could-not-look with `fail` unchanged; the ceiling fell with a manifest commit in the span and
-without one; the total fell with an exclusions commit and without one; a fall with a committed
-reason; a falls file naming a run the log does not record; and a fall on a branch. The two
-ceiling states and the two total states differ ONLY in which file the second commit touched, so
-the diff rule is measured rather than described. Nothing is inferred from the YAML looking right.
+extractor ticket 100 uses — and runs it over throwaway git repositories in fourteen states,
+counted by the fixture as it runs them and printed in its PASS line, each graded by what the step
+DOES (its exit status, whether it printed `::error::`, what it wrote to the step summary): nothing
+moved; a class lost a pass; `fail` rose; a pass became a could-not-look with `fail` unchanged; the
+ceiling fell with a manifest commit in the span, without one, and with a comment-only touch; the
+total fell with an exclusions commit, without one, and with a comment-only touch; a re-class of a
+passing script; a fall with a committed reason; a falls file naming a run the log does not record;
+and a fall on a branch. The ceiling states and the total states differ ONLY in what the second
+commit touched, so the diff rule is measured rather than described. Nothing is inferred from the
+YAML looking right.
 
 ### (b) Status is derived from a named check
 
@@ -178,7 +180,7 @@ what owns it. Those lines were deliberately NOT written here: written against an
 they could each be false, and a check whose green came from prose its own builder wrote to satisfy
 it is the failure this ticket was told to avoid.
 
-Map line: **59 — the two unbuilt §5 bullets** — a fall in the citable number now blocks: `talk/fall_check.py` compares two consecutive TRUTH lines class by class against the diff of the commits they name, `talk/verify-falls.txt` is the committed-reason escape, and a step of its own in `truth.yml` — after the cage, so the line is still recorded — turns the run red with its own `::error::`, proved by lifting that step's shell verbatim and running it over throwaway repositories in eleven states; what it blocks is this repository's citable run conclusion and not any unit's release, because no unit may be hostage to the hub's number, and the reach is printed as a number (0 of 2 workflows). Status became derivable only once the run recorded WHAT IT GRADED: `talk/verify-all.sh` now writes `talk/captures/_grades.tsv` inside the observation lane, and `verify/derived-status/` derives each resolved ticket's status from the checks its Answer names, refusing a table that is not the newest run's and refusing a red disposed of by the Answer's own words; the eight free-typed Status lines are normalised to the tracker's vocabulary with their qualifications kept verbatim in the body.
+Map line: - [59 — Build the two unbuilt §5 bullets](issues/59-build-the-two-unbuilt-5-bullets-a-fall-blocks-status-is.md) — a fall in the citable number now blocks: `talk/fall_check.py` compares two consecutive TRUTH lines class by class against the diff of the commits they name, `talk/verify-falls.txt` is the committed-reason escape, and a step of its own in `truth.yml` — after the cage, so the line is still recorded — turns the run red with its own `::error::`, proved by lifting that step's shell verbatim and running it over throwaway repositories in fourteen states; what it blocks is this repository's citable run conclusion and not any unit's release, because no unit may be hostage to the hub's number, and the reach is printed as a number (0 of 2 workflows). Status became derivable only once the run recorded WHAT IT GRADED: `talk/verify-all.sh` now writes `talk/captures/_grades.tsv` inside the observation lane, and `verify/derived-status/` derives each resolved ticket's status from the checks its Answer names, refusing a table that is not the newest run's and refusing a red disposed of by the Answer's own words; the eight free-typed Status lines are normalised to the tracker's vocabulary with their qualifications kept verbatim in the body. Reviewed 2026-09-06: the step runs under the runner's `bash -e {0}`, which killed it at `out=$(...)` before it printed anything, so the fall path had never executed — the step, `can_record.py`'s new `step_shell_flags()` and the fixture now share one answer to "what will the runner run this under", and the fixture's fourteen states run under it, counted by the fixture and printed in its PASS line. Ownership of a check is read from git rather than from an Answer's prose, which took the first derivation's twelve named tickets down to the seven genuinely resolved-but-red on a check they own (38, 56, 62, 77, 85, 89, 99), each now carrying a dated follow-up; the rest were discussing somebody else's red. Re-reviewed the same day: the ticket-number scan could not read the estate's own plural commit subjects (`Tickets 62 and 77: ...` added verify-branch-refs.sh), so it had reported four of those seven as not owning the check they built — it now imports ticket 102's `ticket_numbers`; `shared_contract()` pins the behaviours it depends on. Round 3 (2026-09-08), measured on a rebase onto today's main against run 179's table: the derivation named an eighth resolved ticket, 101, which git owns for ticket 99's unreviewed-major check only through ticket 99's "ticket 101 is charted" subject -- the accepted over-attribution, loud by design -- and 101 now carries its dated follow-up, so the derivation is clean: 86 resolved, 22 green, 8 regressed all acknowledged, 3 unobserved, 53 ungraded.
 
 ## Review round, 2026-09-06
 
@@ -293,8 +295,14 @@ observed false: insurer/fetch.yml ludlow tuppence`, which is the estate state ti
 Status note already describes as waiting on three unit merges; 62 and 77 name
 `verify/branch-refs/verify-branch-refs.sh` and its verdict about the insurer's `release.yml`
 checking out the platform with no `ref:`, which both tickets' own Status notes already record as
-waiting on the owner. So the derivation is clean and the first recorded grade table makes this
-check PASS rather than raise `fail`.
+waiting on the owner. That was measured against run 135's table on 2026-09-06. **Measured again
+on 2026-09-08 against run 179's table (review round 3, below), on this branch rebased onto
+`origin/main` at `0af3a38`: the derivation named an EIGHTH ticket, 101, and only after 101's own
+dated follow-up is the derivation clean** — 86 tickets written `resolved`, 22 derive resolved
+from a check that passed, 8 derive regressed and all 8 are acknowledged, 3 rest on could-not-looks,
+53 name no check the table carries; 7 red rows are another ticket's and 0 are unownable. The
+first recorded grade table PASSES this check only on a tree that carries those eight follow-ups;
+on `main` before this merges it does not, and the sentence this replaces said otherwise.
 
 **Ranges are deliberately not read.** `tickets 54-67 chart the remediation` and its two siblings
 are review-and-charting commits; measured over the whole hub log on 2026-09-06, no commit that
@@ -333,15 +341,25 @@ is a second reading of the same vocabulary and this round has just finished dele
 because the failure it would cause is loud, a ticket named for a check it plainly does not own,
 in a finding a reader sees. No subject of that shape exists in the hub log today.
 
+*A "charted" or "review" mention in a subject is read as ownership, and that is accepted.*
+`721fd3b Review fixes: the resolver whitelists flags, and ticket 101 is charted` is a ticket 99
+commit that touched ticket 99's unreviewed-major check (named, in backticks, in ticket 101's
+Follow-up and not here: an Answer names the checks its ticket built); `git log --full-history`
+therefore names 99 AND 101 for that script, and 101's own commits never touched it. So ticket 101 is asked to answer for a red it did not build. This is the same over-inclusion
+as the bare number, accepted for the same reason (decision 12): the alternative is a second
+reading of commit subjects that guesses what "charted" means, and the failure is loud — a named
+ticket, a dated paragraph a reader sees — never a silent green. Found on 2026-09-08 (round 3) on
+the first real table after ticket 101 resolved; 101's follow-up says exactly this.
+
 **R2-3, the honest limit of the runner evidence.** Run 142's `verify/a-fall-blocks/...sh PASS` row
 proves that **the fixture executed under the runner's own python, git and bash — including the
-`bash -e` the lifted step runs under — and that every one of its fifteen states behaved as
-decided**, because the script exits 1 if any state disagrees. It is NOT fifteen per-state lines
+`bash -e` the lifted step runs under — and that every one of its fourteen states behaved as
+decided**, because the script exits 1 if any state disagrees. It is NOT fourteen per-state lines
 read off the runner: `talk/verify-all.sh` writes each script's output to
 `talk/captures/<slug>.out`, and a branch run commits nothing (ticket 100), so that capture exists
 only on the runner's disk. The per-state lines quoted in this ticket are from the identical script
 run locally. The first scheduled run on the default branch commits the capture, and from that day
-the fifteen lines are in the record.
+the fourteen lines are in the record.
 
 ### Further decisions
 
@@ -361,7 +379,8 @@ the fifteen lines are in the record.
     check being red today, and a check is maintained by more tickets than the one that created it:
     `verify/schedules/verify-schedules.sh` was added by 56 and 85 and has since been touched by 28
     and 70, and all four should hear that it is red. Same vocabulary, different span; the
-    vocabulary is shared, not forked.
+    vocabulary is shared, not forked. **A subject that merely CHARTS or REVIEWS a ticket is read
+    as naming it** (round 3, 2026-09-08): an over-attribution, accepted because it is loud.
 13. **The step's effective shell is resolved in one place, `can_record.py`.** `delegated`. Two
     copies of "what will the runner run this under" is how the fixture and the workflow diverged
     in the first place.
@@ -384,6 +403,37 @@ another builder's record is not this ticket's to edit. Ticket 92's own follow-up
 `a38a912`) has since fixed it, and `verify-cited-truth.sh` is green again on this branch. Recorded
 because "a red appeared and then went away" is exactly the kind of thing the truth surface exists
 to stop being invisible.
+
+## Review round 3, 2026-09-08
+
+Three findings, one blocking, all on a throwaway merge onto the current `origin/main`.
+
+**F1 — the derivation FAILED on today's main.** Against run 179's table (118 rows, the newest
+line in `talk/truth.log`) the derivation named ticket 101, resolved and merged as PR 53 after
+round 2: its Answer names `verify/unreviewed-major/verify-unreviewed-major-in-window.sh`, that
+check is FAIL on run 179, and git names {99, 101} for it — 101 only via ticket 99's "ticket 101
+is charted" subject. 101's Answer already said the red is the owner's carried-major reason, but
+not in the acknowledgement shape, so `acknowledges()` returned nothing and the merge would have
+raised `fail` 10 → 11 and fired the fall stop: the exact collision this ticket exists to avoid,
+and the sentence above that claimed the first table "makes this check PASS" was false on today's
+main. Fixed by this ticket's own rule — a dated `## Follow-up` in 101 after its Answer, quoting
+run 179's verdict and saying what git names and why — plus the corrected sentence, and the
+"charted" over-attribution written down above. Re-measured on the rebased tree: clean, figures
+above.
+
+**F2 — the fixture ran FOURTEEN states and said fifteen** (its header said ten, its F1 comment
+eleven, the manifest row and map line eleven). The fixture now counts `grade_case` calls and
+prints the count in its PASS line; every prose copy says fourteen.
+
+**F3 — the map line described a mirror deleted in R2-2.** Replaced, and this ticket's `Map line:`
+is byte-identical to map.md's.
+
+The rebase itself (onto `0af3a38`) conflicted only in map.md's "Decisions so far", where main had
+added ticket 45's line; all three lines are kept. Also measured on the rebased tree because
+another builder found it red on bare main: the RECORD leg (`derived_status.py record`) is green
+— 106 tickets, `closed=1 open=18 prepared=1 resolved=86`, no free-typed Status — because this
+branch carries the normalised lines for 77 and 85 and main has not touched either file since;
+on main alone, until this merges, those two lines are still free-typed and that leg is red.
 
 ## Waits on the owner
 

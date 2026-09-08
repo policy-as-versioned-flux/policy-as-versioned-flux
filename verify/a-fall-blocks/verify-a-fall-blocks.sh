@@ -30,14 +30,17 @@
 #
 # HOW THE STOP IS PROVED, and this is the part a YAML reader cannot do. Leg 3 lifts the step's
 # OWN SHELL verbatim out of truth.yml -- through verify/can-record/can_record.py, the same
-# extractor ticket 100 uses -- and runs it over throwaway git repositories in ten states: no
-# fall, a class losing a pass, a rise in fail, a pass that became a could-not-look inside one
-# class with `fail` unchanged (the degradation that used to go green), a ceiling that fell with
-# and without a manifest commit between the two commits the lines name, a total that fell with
-# and without an exclusions commit, a fall with a committed reason, and a falls file naming a
-# run the log does not record. Each state is measured by what the step DOES: its exit status,
-# whether it printed ::error::, and what it wrote to the step summary. Nothing is inferred from
-# the YAML looking right.
+# extractor ticket 100 uses -- and runs it over throwaway git repositories in FOURTEEN states,
+# counted by the fixture itself as it runs them and printed in its PASS line (review round 3,
+# 2026-09-08: three prose copies of this number had drifted to ten, eleven and fifteen): no
+# fall; a class losing a pass; a rise in fail; a pass that became a could-not-look inside one
+# class with `fail` unchanged (the degradation that used to go green); a ceiling that fell with
+# a manifest commit between the two commits the lines name, without one, and with a comment-only
+# touch; a total that fell with an exclusions commit, without one, and with a comment-only touch;
+# a re-class of a passing script; a fall with a committed reason; a falls file naming a run the
+# log does not record; and a fall on a branch. Each state is measured by what the step DOES: its
+# exit status, whether it printed ::error::, and what it wrote to the step summary. Nothing is
+# inferred from the YAML looking right.
 #
 # Everything the fixture writes lives under a mktemp directory and is deleted. Every TRUTH-shaped
 # line it plants is dated 1970 with a `fixture` run number, so no reader could mistake one for an
@@ -165,7 +168,8 @@ sed 's/^/  (lift) /' "$T/fall.notes"
 # pipefail` in the body does not clear `-e`. The first version of this fixture ran the lifted
 # shell under a plain `bash`, so `-e` was OFF, so `out="$(...)"; rc=$?` survived a non-zero exit
 # here and died on the runner -- and every state in which the checker exits 1 was measured under
-# a shell the runner does not use. Six of the eleven states were green for that reason alone.
+# a shell the runner does not use. Six of the eleven states that then existed (fourteen now; the
+# `states` counter below is the one place the number lives) were green for that reason alone.
 # can_record.py step_shell_flags() is now the one place that answers "what will the runner run
 # this under", so the fixture and the workflow cannot diverge again.
 if ! FLAGS="$("$PY" verify/can-record/can_record.py stepshell "$WORKFLOW" gate "$STEP_NAME")"; then
@@ -233,9 +237,11 @@ run_step() {
 # grade_case <name> <touch> <falls> <can_record> <expect-rc> <expect-blocked> <what>
 #   the two planted lines come from LINE_A and LINE_B, set by the caller with the two shas
 #   substituted in; <expect-blocked> is yes when the step must print the ::error::
+states=0
 grade_case() {
   local name="$1" touch="$2" falls="$3" can="$4" want_rc="$5" want_block="$6" what="$7"
   local d="$T/$name"
+  states=$((states + 1))
   local shas; shas="$(new_repo "$d" "$touch")"
   SHA1="${shas%% *}"; SHA2="${shas##* }"
   eval "printf '%s\n' \"$LINE_A\" \"$LINE_B\"" >"$d/talk/truth.log"
@@ -325,7 +331,7 @@ printf '  %s\n' "$downstream"
 if [ "$ONLY_SELFCHECK" = 1 ]; then
   echo
   if [ "$bad" -eq 0 ]; then
-    echo "PASS: selfcheck: the comparison grades planted lines as documented, truth.yml carries the stop after the cage, and the step's own shell blocks a lost pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total, while letting a re-class, an exclusion, an accepted fall and a branch run through"
+    echo "PASS: selfcheck: the comparison grades planted lines as documented, truth.yml carries the stop after the cage, and the step's own shell -- run over throwaway git repositories in $states states -- blocks a lost pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total, while letting a re-class, an exclusion, an accepted fall and a branch run through"
     exit 0
   fi
   echo "FAIL: $bad selfcheck fault(s) (named above)"
@@ -340,7 +346,7 @@ printf '%s\n' "$record"
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, that step's OWN shell -- lifted verbatim and run over throwaway git repositories in fifteen states -- turns the run red on a lost class pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total while letting a re-class, an exclusion, an accepted fall and a branch run through, and the newest transition talk/truth.log recorded carries no fall no committed reason accepts"
+  echo "PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, that step's OWN shell -- lifted verbatim and run over throwaway git repositories in $states states -- turns the run red on a lost class pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total while letting a re-class, an exclusion, an accepted fall and a branch run through, and the newest transition talk/truth.log recorded carries no fall no committed reason accepts"
   exit 0
 fi
 echo "FAIL: $bad fault(s) -- a fall in the citable number is not a blocking event (ticket 59)"

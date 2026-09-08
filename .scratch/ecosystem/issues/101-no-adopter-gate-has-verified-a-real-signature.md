@@ -392,3 +392,20 @@ three is now a number the run prints, and
 `verify/real-signature/verify-a-real-signature-is-checked.sh` grades the sentence nothing graded --
 every adopter's own gate accepts platform's real published evidence AND refuses it with one byte of
 the signature changed -- which names the old ludlow defect on both halves when pointed at main.
+
+## Follow-up
+
+> **Follow-up, 2026-09-08 (eco-system ticket 59).** This ticket is `resolved` and one of the four
+> checks its Answer names is RED on the newest recorded run.
+> `talk/truth.log` records run 179 (2026-09-08T14:11Z, `hub=fbbb547`) as pass=78 fail=10 skip=22 excluded=8 total=118 ceiling=99, and on that run `verify/unreviewed-major/verify-unreviewed-major-in-window.sh` graded
+> `FAIL: 3 line(s) observed false: a major carried in an adopter's composed window, or evidence at
+> an adopter's own pin that did not verify -- each named above`, which is the last line of that
+> run's committed capture. Ticket 59's derivation reads ownership from git, and `git log
+> --full-history` on that script names tickets 99 and 101 -- but 101 only through ticket 99's own
+> commit `721fd3b Review fixes: the resolver whitelists flags, and ticket 101 is charted`; none of
+> this ticket's five commits (`7808746` to `aca7eca`) touched the script. A "charted" mention in a
+> commit subject reading as ownership is the over-attribution ticket 59 accepts rather than works
+> around, because it is loud (this paragraph is what it produced). The red itself is not anything
+> this ticket built: it is the owner's carried-major authorisation -- all three adopters carry
+> platform policy 4.0.0 -- which is Waits item 1 above, and it stays red until the owner records
+> that review.
