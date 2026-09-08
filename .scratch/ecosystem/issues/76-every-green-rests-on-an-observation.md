@@ -1,7 +1,7 @@
 # 76 — Every green rests on an observation
 
 Type: task (AFK)
-Status: resolved (seven of the eight built; item 6 is ticket 78's, and is not done here)
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -297,3 +297,9 @@ tell a false green from an honest narrowing; the run counts only what it can obs
 many discovered scripts call a `selfcheck_absent` leg, and it counts call sites so the sentence
 naming the leg cannot count itself. Giving the prose-printing scripts their own leg stays the
 follow-on ticket.
+
+> **Status note, 2026-09-06 (eco-system ticket 59).** NORTH-STAR §5 says this ticket's
+> `Status:` is a DERIVED field, so it now carries the vocabulary word and nothing else
+> (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
+> field used to say, kept verbatim because it is the qualification a reader needs:
+> “(seven of the eight built; item 6 is ticket 78's, and is not done here)”

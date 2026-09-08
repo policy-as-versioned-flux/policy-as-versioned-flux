@@ -1,7 +1,7 @@
 # 68 — Federation gets its peer
 
 Type: task (AFK)
-Status: closed (out of scope, ticket 75 Q12)
+Status: closed
 Blocked by: none
 
 ## Question
@@ -15,3 +15,9 @@ Graduated from ticket 58 (2026-08-31), decision provisional on a bare "Agree".
 ## Comments
 
 **2026-09-02, ticket 75 resolved.** Q12 is (b): identity is shelved for this build, so a federation peer sits past this map's destination. Closed, out of scope. Returns with the identity lane as a fresh effort. See the map's Out of scope.
+
+> **Status note, 2026-09-06 (eco-system ticket 59).** NORTH-STAR §5 says this ticket's
+> `Status:` is a DERIVED field, so it now carries the vocabulary word and nothing else
+> (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
+> field used to say, kept verbatim because it is the qualification a reader needs:
+> “(out of scope, ticket 75 Q12)”

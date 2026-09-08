@@ -293,3 +293,19 @@ reading, the property it was protecting is a standing truth-surface report
 day two of them diverge -- which it did on its first run, finding that ludlow's gate cannot verify a
 real bundle with the cosign it pins, and that no adopter gate in the estate had ever been observed
 verifying a real published signature at all (charted as ticket 101).
+
+## Follow-up
+
+> **Correction, 2026-09-06 (eco-system ticket 59).** This ticket is `resolved` and two of the
+> checks its Answer names are RED. Run 135 (2026-09-06T11:04Z, branch
+> `ticket-59-a-fall-blocks-and-status-is-derived`, `hub=33c9ac5`, not citable) graded
+> `verify/fold-agreement/verify-fold-agreement.sh` `FAIL: 2 planted movement(s) were answered
+> differently by two adopter gates, or answered differently from ADR-0011's own reading`, and
+> `verify/unreviewed-major/verify-unreviewed-major-in-window.sh` `FAIL: 3 line(s) observed false:
+> a major carried in an adopter's composed window, or evidence at an adopter's own pin that did
+> not verify`. `git log --full-history` on both scripts names tickets 99 and 101, and
+> [ticket 101](101-no-adopter-gate-has-verified-a-real-signature.md) is open and is the only open
+> ticket that names either check, so that is where the work sits. The other two red rows this
+> ticket's Answer mentions -- `.estate-clone/platform/compose/verify-composition.sh` and
+> `verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh` -- are not this ticket's: git names 38
+> and 63 for the first and 89 and 98 for the second, and they are recorded there.

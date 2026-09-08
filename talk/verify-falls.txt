@@ -1,0 +1,20 @@
+# Accepted falls in the citable number (NORTH-STAR §5, eco-system ticket 59).
+#
+# One line per accepted fall:
+#
+#     run=N | reason
+#
+# N is the run number of the LATER of the two TRUTH lines -- the run that recorded the fall.
+# The reason is what a reader needs to know that the fall was a decision and not a loss: what
+# fell, why, and which ticket owns getting it back. talk/fall_check.py validates this file the
+# way talk/verify-all.sh validates talk/verify-exclusions.txt: a malformed line is a fault, a
+# line with no reason is a fault, and a line naming a run talk/truth.log does not record is a
+# fault, because an escape hatch nobody can check against the log is a hole.
+#
+# THIS FILE IS EMPTY ON PURPOSE, 2026-09-06. The recorded log carries thirteen transitions with
+# an unaccounted fall, the oldest on 2026-08-31. No reason for any of them was written down at
+# the time, and inventing thirteen now would be the estate telling itself a story. The count is
+# printed on every run by verify/a-fall-blocks/verify-a-fall-blocks.sh instead, so the history
+# is a number that moves rather than a sentence that rots. Only the NEWEST transition is graded,
+# because that is the only one a run can still do something about (ticket 55: every red is real,
+# explained and finishable).

@@ -1,7 +1,7 @@
 # 56 — The citable run can see whether the clocks ran
 
 Type: task (AFK)
-Status: resolved (the surface grades clock liveness from 2026-09-04; the first CITABLE grade waits on the next scheduled truth run)
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -189,3 +189,20 @@ hand-written verdict file; it does not, because every script in the job can read
 from the environment, so it now says it stops a stray or stale one and names what it does not stop.
 And a refused verdict file was announced as "GitHub unreachable", which is not what happened; the
 line now says the run declined to grade from the verdict, with the reason after it.
+
+> **Status note, 2026-09-06 (eco-system ticket 59).** NORTH-STAR §5 says this ticket's
+> `Status:` is a DERIVED field, so it now carries the vocabulary word and nothing else
+> (`verify/derived-status/verify-derived-status.sh` refuses free text after it). What the
+> field used to say, kept verbatim because it is the qualification a reader needs:
+> “(the surface grades clock liveness from 2026-09-04; the first CITABLE grade waits on the next scheduled truth run)”
+
+## Follow-up
+
+> **Correction, 2026-09-06 (eco-system ticket 59).** This ticket is `resolved` and the check its
+> Answer names is RED. Run 135 (2026-09-06T11:04Z, branch `ticket-59-a-fall-blocks-and-status-is-derived`, `hub=33c9ac5`, a branch run and so not citable) graded `verify/schedules/verify-schedules.sh` `FAIL: 3 schedule/cage check(s) observed false: insurer/fetch.yml ludlow tuppence`. `git log --full-history` on that script names tickets 28,
+> 56, 70 and 85, so this ticket is one of the four it answers to. The three reds are estate state,
+> not a fault in the grading this ticket built: the insurer's `fetch.yml` and ludlow's and
+> tuppence's clocks. Ticket 85 is the one that owns "every clock is green or red for an estate
+> reason", and its own Status note already records that green on the newest run waits on the
+> merges of three pushed unit branches and the scheduled runs after them. Recorded here so this
+> ticket's word and the run's grade stop disagreeing in silence.

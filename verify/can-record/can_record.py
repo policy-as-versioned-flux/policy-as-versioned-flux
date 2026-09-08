@@ -90,6 +90,40 @@ def step_shell(doc: dict, job: str, fragment: str) -> str:
     return str(steps[i].get("run") or "")
 
 
+# The flags GitHub Actions actually runs a `run:` under. Ticket 59, F1: a step with no `shell:`
+# key on a Linux runner is executed as `/usr/bin/bash -e {0}` -- documented by GitHub, and visible
+# in every run's log as the line above the step's output. `-e` is ON, and a step body that says
+# `set -uo pipefail` does NOT clear it: `set -o pipefail` adds a flag, it does not remove one.
+# A fixture that runs a lifted step under a plain `bash` therefore measures a DIFFERENT shell
+# from the runner's, and every path that depends on a command failing without killing the script
+# is untested. That is exactly how ticket 59 shipped a fall-stop whose fall path had never run.
+#
+# `bash {0}` (no -e) and `bash --noprofile --norc -eo pipefail {0}` are the two other spellings
+# the estate might use; the mapping below reads whatever the step declares rather than assuming.
+DEFAULT_SHELL_FLAGS = ("-e",)
+
+
+def step_shell_flags(doc: dict, job: str, fragment: str) -> list[str]:
+    """The flags the runner will execute this step's `run:` with.
+
+    No `shell:` key -> Actions' default for `run:` on Linux, `bash -e {0}`. An explicit
+    `shell: bash` is the SAME (`bash -e {0}`); `shell: bash {0}` and any custom template are read
+    literally, so a step that opts out of `-e` is seen to have opted out.
+    """
+    steps = _steps(doc, job)
+    i = _index_of(steps, fragment)
+    if i < 0:
+        raise KeyError(f"no step in job {job!r} is named {fragment!r}")
+    declared = str(steps[i].get("shell") or "").strip()
+    if not declared or declared == "bash":
+        return list(DEFAULT_SHELL_FLAGS)
+    if not declared.startswith("bash"):
+        return []                      # not bash at all; the caller decides what to do
+    # `bash {0}`, `bash -eo pipefail {0}`, ... -- everything between the word and the template
+    words = declared.split()
+    return [w for w in words[1:] if w.startswith("-")]
+
+
 def shape_faults(doc: dict, text: str) -> list[str]:
     """The workflow still has the shape ticket 100 decided, or the reasons it does not.
 
@@ -472,11 +506,31 @@ def selfcheck() -> int:
     else:
         print("selfcheck: an unknown step name did not raise")
         return 1
+    # ticket 59 F1: the flags a lifted step must be run under, read from the step, not assumed
+    doc = {"jobs": {"gate": {"steps": [
+        {"name": "plain run", "run": "true"},
+        {"name": "says bash", "shell": "bash", "run": "true"},
+        {"name": "opts out", "shell": "bash {0}", "run": "true"},
+        {"name": "explicit flags", "shell": "bash --noprofile -eo pipefail {0}", "run": "true"},
+        {"name": "not bash", "shell": "python", "run": "pass"}]}}}
+    assert step_shell_flags(doc, "gate", "plain run") == ["-e"]
+    assert step_shell_flags(doc, "gate", "says bash") == ["-e"]
+    assert step_shell_flags(doc, "gate", "opts out") == []
+    assert step_shell_flags(doc, "gate", "explicit flags") == ["--noprofile", "-eo"]
+    assert step_shell_flags(doc, "gate", "not bash") == []
+    try:
+        step_shell_flags(doc, "gate", "nothing")
+    except KeyError:
+        pass
+    else:
+        print("selfcheck: an unknown step name did not raise in step_shell_flags")
+        return 1
     print("  ok   selfcheck: a hand-written line, a line whose run number disagrees with its "
           "commit, a second run=local line, a run that is neither a number nor `local`, a "
           "citable line stranded off the default branch, and an unknown step name each fail as "
           "documented; a rescued line and one whose measured tree never reached the default "
-          "branch are notes, not faults")
+          "branch are notes, not faults; and a step's effective shell flags are read from the "
+          "step -- `-e` where nothing is declared, none where the step opts out")
     return 0
 
 
@@ -529,7 +583,18 @@ def main(argv: list[str]) -> int:
         shell, notes = portable(step_shell(doc, argv[3], argv[4]))
         for n in notes:
             print(f"note: {n}", file=sys.stderr)
+        # Ticket 59 F1: say what the runner would run this under, on the same stream as the other
+        # substitutions, so a fixture that ignores it is ignoring something it was told.
+        flags = step_shell_flags(doc, argv[3], argv[4])
+        print(f"note: the runner executes this step as `bash {' '.join(flags)} {{0}}`; a fixture "
+              f"that runs it under a plain `bash` is measuring a different shell",
+              file=sys.stderr)
         sys.stdout.write(shell)
+        return 0
+    if cmd == "stepshell":
+        path = Path(argv[2])
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        print(" ".join(step_shell_flags(doc, argv[3], argv[4])))
         return 0
     print(f"unknown command {cmd!r}")
     return 1

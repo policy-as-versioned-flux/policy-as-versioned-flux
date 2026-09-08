@@ -27,7 +27,13 @@ on:
     - cron: '47 5 * * *'
   workflow_dispatch:
   push:
-    paths: ['talk/verify-all.sh', 'talk/verify-exclusions.txt', 'clone-estate.sh', 'verify/**', '.github/workflows/truth.yml']
+    # Ticket 59 review, F5. The four `talk/` files the gate's own arithmetic and its
+    # comparison live in were missing: a push changing only talk/truth_manifest.py,
+    # talk/verify-manifest.txt, talk/fall_check.py or talk/verify-falls.txt changed what
+    # the number MEANS and did not re-run the gate until the next day's schedule.
+    paths: ['talk/verify-all.sh', 'talk/verify-exclusions.txt', 'talk/verify-manifest.txt',
+            'talk/truth_manifest.py', 'talk/fall_check.py', 'talk/verify-falls.txt',
+            'clone-estate.sh', 'verify/**', '.github/workflows/truth.yml']
 
 permissions:
   contents: write
@@ -393,6 +399,69 @@ jobs:
                    "above was NOT recorded."
               exit 1
             }
+      # --- a fall is a blocking event (NORTH-STAR §5, ticket 59) --------------------------------
+      # §5's last bullet is two sentences and only the first was ever built. "The number and its
+      # date are recorded on every run" has been true since GAPS 2.1. "A fall is a blocking
+      # event" had no implementation at all: nothing compared a TRUTH line to its predecessor,
+      # run 13 fell 54 -> 53 and nothing fired, and run 105 took `fail` from 6 to 11 with no
+      # signal of any kind. The gate's own red could not carry it -- 17 of 21 runs were failing
+      # at the same step, so the one signal was saturated and a fall inside it was invisible.
+      #
+      # This step is the DISTINCT one. It runs AFTER the cage, so the observation is recorded
+      # first whatever it says (a clock appends observations, ADR-0024), and it turns the RUN red
+      # by itself, with its own ::error:: and its own step-summary line, whether or not the gate
+      # was red. talk/fall_check.py holds the comparison and talk/truth_manifest.py's CONTRACT FOR
+      # TICKET 59 is what it implements: class by class, with the ceiling and the total graded
+      # against the diff between the two commits the lines name, because a re-class and an
+      # exclusion move those two numbers down honestly.
+      #
+      # WHAT IT BLOCKS, decided in ticket 59 (delegated, ADR-0025). The served artefact is this
+      # workflow's own run conclusion, which NORTH-STAR §5 makes the only citable source for
+      # "what works": a run whose number fell unexplained is not a green run, and no document may
+      # cite it as one. It does not block the recording, because a clock that hides a fall is
+      # worse than one that reports it. It does not block a unit's release either: those live in
+      # eight independently versioned repositories, and gating their release on the hub's number
+      # would make each unit hostage to this repository's record, which NORTH-STAR §2 says the
+      # platform must never be. The number of workflows in THIS repository that key off a
+      # successful truth run is printed by verify/a-fall-blocks/verify-a-fall-blocks.sh on every
+      # run, so the day one is added the scope of this stop changes visibly rather than silently.
+      #
+      # On a branch the comparison is REPORTED and blocks nothing: the branch recorded no line
+      # (ticket 100), so the newest transition in the log is main's and not this run's.
+      #
+      # The escape hatch is a committed talk/verify-falls.txt of `run=N | reason` lines,
+      # validated the way talk/verify-exclusions.txt is.
+      - name: a fall is a blocking event
+        if: ${{ !cancelled() }}
+        run: |
+          set -uo pipefail
+          # `|| rc=$?`, NOT `; rc=$?` (ticket 59 review, F1). This step has no `shell:` key, so
+          # Actions runs it as `/usr/bin/bash -e {0}` -- the line above this output in every run
+          # log -- and `set -uo pipefail` does not clear `-e`: `set -o` adds a flag, it never
+          # removes one. A bare assignment from a command substitution that exits non-zero
+          # therefore KILLS the shell at that line: nothing printed, nothing in the step summary,
+          # no ::error::, and the CAN_RECORD test below never reached, so a branch run would have
+          # been blocked by the default branch's newest fall. The `||` list makes the failure the
+          # left arm of an OR, which `-e` does not act on. Measured:
+          # `bash -e -c 'set -uo pipefail; out="$(exit 1)"; rc=$?; echo reached'` prints nothing.
+          rc=0
+          out="$(python3 talk/fall_check.py check --log talk/truth.log \
+                   --falls talk/verify-falls.txt --root . 2>&1)" || rc=$?
+          printf '%s\n' "${out}"
+          printf '%s\n' "${out}" >> "$GITHUB_STEP_SUMMARY"
+          # `:-` on purpose: if the guard step failed before writing CAN_RECORD (a shallow
+          # checkout, an empty default branch name) this step must still print the comparison
+          # rather than die on an unbound variable. A run with no verdict is treated as a run
+          # that did not record, which is the reporting path; the guard's own failure is what
+          # reds that run.
+          if [ "${CAN_RECORD:-}" != "yes" ]; then
+            echo "this run recorded nothing, or could not say whether it did, so the transition above is the default branch's newest and not this run's. It is reported here and blocks nothing."
+            exit 0
+          fi
+          if [ "${rc}" -ne 0 ]; then
+            echo "::error::THE NUMBER FELL, and no committed reason accepts it. NORTH-STAR section 5: a fall is a blocking event. This run is not a green run and no document may cite it as one. Either fix what fell, or commit a line to talk/verify-falls.txt saying run=${GITHUB_RUN_NUMBER} and why the fall is accepted."
+            exit 1
+          fi
       - name: fail if the gate failed
-        if: steps.gate.outcome == 'failure'
+        if: ${{ !cancelled() && steps.gate.outcome == 'failure' }}
         run: exit 1
