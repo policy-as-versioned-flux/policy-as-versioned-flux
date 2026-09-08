@@ -61,7 +61,10 @@ from _estate import ESTATE  # noqa: E402
 LINES: list[str] = []
 
 ISO4217 = re.compile(r"^[A-Z]{3}$")
-KINDS = {"feed", "twin", "premium", "switching", "reliability"}
+# `supersede` (eco-system ticket 84): the surcharge on a feed line whose pin sits behind a newer
+# tagged major, carried beside the line under the same perspective and currency, never summed
+# into the exposure; verify/supersede/ grades its arithmetic.
+KINDS = {"feed", "twin", "premium", "switching", "reliability", "supersede"}
 SOURCES = {"ico", "feeds", "twin", "insurer", "platform"}   # plus any party name in the estate
 AMOUNT_KEYS = ("amount", "total", "new_price", "old_price")
 RETIRED_APPETITE = "risk/appetite.json"
