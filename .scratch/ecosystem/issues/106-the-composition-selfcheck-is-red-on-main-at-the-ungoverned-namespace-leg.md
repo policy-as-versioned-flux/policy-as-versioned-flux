@@ -121,7 +121,7 @@ Not fixed here: ticket 34's follow-up (2026-09-08) measured and recorded this on
 ## Answer
 
 Resolved 2026-09-08 on platform branch `ticket-106-composition-selfcheck-fixture-namespace`
-(head `956c2e8`, platform PR 20; one file: `compose/composition.py`, the ticket-15 leg only -- ticket 84 is queued
+(head `c28b28e` after review round 1, platform PR 20; one file: `compose/composition.py`, the ticket-15 leg only -- ticket 84 is queued
 on the same file and nothing outside that leg moved). Every decision below is labelled; under
 [ADR-0025](../../../docs/adr/0025-the-assistant-decides-architecture-and-records-it.md) the
 unlabelled default is **delegated**.
@@ -161,17 +161,20 @@ The name is set once (`fixture_ns`) and every use in the leg reads it. Before th
 leg **measures** that the token is absent from every file under platform's `distribution/` and
 `graded/` (the trees the guard bodies are rendered from) -- so a hit in a rendered file can only be
 the leg's own bookkeeping, and the check's precondition is derived rather than assumed. The
-name is then matched as a whole token: `(?<![A-Za-z0-9_-])<ns>(?![A-Za-z0-9_-])`.
+name is then matched as a whole token: `(?<![A-Za-z0-9_])<ns>(?![A-Za-z0-9_])`.
 
-**Whole token, with `.` as a boundary, rather than the substring form the ticket suggested
-keeping (delegated).** The collision was exactly a substring reading a label domain
-(`posture.acme.io/`) and a registry path (`ghcr.io/acme/`) as a namespace name. A distinctive
-token makes the substring form safe today, but the next rename to an org-shaped word would
-collide again and nothing would say so; the whole-token form cannot read `<x>.<ns>.<y>` as the
-name. `.` is a boundary on purpose, and differs from the ticket's sketch (`(?<![\w.-])`): the
-DNS form `<ns>.svc.cluster.local` is the commonest way a namespace name reaches a policy body,
-and a boundary class that included `.` would miss it. `-` is not a boundary, so
-`fixture-outside-the-cage-2` is another namespace, not a leak.
+**Whole token, with `.` and `-` both boundaries, rather than the substring form the ticket
+suggested keeping (delegated; the `-` half is review F-01, below).** The collision was exactly a
+substring reading a label domain (`posture.acme.io/`) and a registry path (`ghcr.io/acme/`) as a
+namespace name. A distinctive token makes the substring form safe today, but the next rename to
+an org-shaped word would collide again and nothing would say so; the whole-token form cannot
+read `<x>.<ns>.<y>` as the name. Both `.` and `-` are boundaries, which differs from the ticket's
+sketch (`(?<![\w.-])`): the DNS form `<ns>.svc.cluster.local` and the DNS-1123 hyphen join
+`exception-for-<ns>` are the two commonest ways a namespace name reaches a policy body or a
+resource NAME, and a class holding either character misses that shape. What the boundary still
+refuses to read as the name is a longer word it is embedded in (`<ns>2`); the label-domain
+collision that motivated a token at all is carried by the pre-loop absence assertion, not by the
+boundary.
 
 ### Change (b): GOVERNED_LABEL is graded by parsed position, not by file (delegated: parsed)
 
@@ -185,39 +188,57 @@ offered:
   label leaking into the guard's own `matchConditions`, or into an `objectSelector`, would pass in
   all three files, and those are the files a leak is likeliest to reach because they are the ones
   that already read the label.
-- **parse and walk** -- built. Each rendered YAML file is loaded and walked with its path. The label
-  may appear as a KEY whose path contains `namespaceSelector`, or inside a STRING whose key is
-  `message`. Anywhere else -- a match condition, an object selector, a mutation body, a resource
-  name, a metadata label -- is red, and the finding names the file and the path
-  (`spec/matchConstraints/objectSelector/matchLabels`). The old file exception is gone.
+- **parse and walk** -- built. Each rendered YAML file is loaded and walked with its path. Three
+  positions are allowed, each by exact path (narrowed by review F-02/F-03 from "any key under a
+  `namespaceSelector`" and "any key named `message`"): a KEY at a path ending
+  `namespaceSelector/matchLabels`; a STRING equal to the label at a path ending
+  `namespaceSelector/matchExpressions/<i>/key` (the set-based form of the same structural use --
+  no served body uses it today; allowed rather than left red, because refusing a correct use
+  would only ever be fixed by widening this, F-03, delegated); and a STRING at a path ending
+  `validations/<i>/message`, the one place the served report quotes the label to a human.
+  Anywhere else -- a matchConditions name, expression or message, an object selector, a mutation
+  body, an annotation, a resource name, a metadata label -- is red, and the finding names the
+  file and the path. The old file exception is gone.
 
 ### No masking: the plant, red by name
 
-The leg now also copies the fixture platform, plants BOTH leaks in its one member -- the
-namespace's name in a `matchConditions` expression, the governed label as an `objectSelector`
-key -- composes, and asserts each check reports exactly that, then that the un-planted render of
-the same member is clean under both. Its OK line:
+The leg now also copies the fixture platform, plants five leak shapes in its one member -- the
+namespace's name in a `matchConditions` expression, hyphen-joined into that condition's NAME
+(`skip-<ns>`) and into an annotation (`note: exception-for-<ns>`), and the governed label as an
+`objectSelector` key and inside a `matchConditions` message -- composes, asserts three name hits
+and both label findings by path, that a longer word (`<ns>2`) is not the name, and that the
+un-planted render of the same member is clean under both. Its OK line:
 
-    OK leak check: the ungoverned namespace's name planted in a member's matchConditions, and policy-as-versioned.dev/governed planted as its objectSelector key, are each red by name -- policy-as-versioned.dev/governed is a key at spec/matchConstraints/objectSelector/matchLabels, outside any namespaceSelector
+    OK leak check: the ungoverned namespace's name planted in a member's matchConditions expression, hyphen-joined into that condition's name and into an annotation, and policy-as-versioned.dev/governed planted as its objectSelector key and in a matchConditions message, are each red by name -- policy-as-versioned.dev/governed is a key at spec/matchConstraints/objectSelector/matchLabels, not under namespaceSelector/matchLabels; policy-as-versioned.dev/governed is in the value at spec/matchConditions/0/message, which is neither a validations message nor a namespaceSelector matchExpressions key
 
-And under the real assertions, not the in-leg harness: two throwaway copies of the branch tree
-with the plant written into `_write_fixture_platform` itself, so the MAIN render carries the leak.
+And under the real assertions, not the in-leg harness: throwaway copies of the branch tree with
+one plant written into `_write_fixture_platform` itself, so the MAIN render carries the leak.
 Each stops at the same 58 OK the original red sat at:
 
-    # name planted in the member's matchConditions
+    # name planted in the member's matchConditions expression
         assert not name_token.search(text), f"{path}: carries the ungoverned namespace's name {fixture_ns!r}"
+    AssertionError: composed/policies/v1.0.0/member-a.yaml: carries the ungoverned namespace's name 'fixture-outside-the-cage'
+    exit=1
+
+    # name hyphen-joined into an annotation, `note: exception-for-fixture-outside-the-cage` (review F-01)
+    #   under the first cut's class [A-Za-z0-9_-]:  82 OK, exit 0  -- the weakness, reproduced
+    #   under the class [A-Za-z0-9_]:               58 OK, then
     AssertionError: composed/policies/v1.0.0/member-a.yaml: carries the ungoverned namespace's name 'fixture-outside-the-cage'
     exit=1
 
     # label planted as the member's objectSelector key
         assert not _governed_label_leaks(path, text), _governed_label_leaks(path, text)
-    AssertionError: ['composed/policies/v1.0.0/member-a.yaml: policy-as-versioned.dev/governed is a key at spec/matchConstraints/objectSelector/matchLabels, outside any namespaceSelector']
+    AssertionError: ['composed/policies/v1.0.0/member-a.yaml: policy-as-versioned.dev/governed is a key at spec/matchConstraints/objectSelector/matchLabels, not under namespaceSelector/matchLabels']
+    exit=1
+
+    # label planted in a matchConditions message (review F-02)
+    AssertionError: ['composed/policies/v1.0.0/member-a.yaml: policy-as-versioned.dev/governed is in the value at spec/matchConditions/0/message, which is neither a validations message nor a namespaceSelector matchExpressions key']
     exit=1
 
 The `"ungoverned" not in text` assertion is untouched: the new name does not contain the word, so
 the two checks stay independent.
 
-### Verified, platform (estate at `origin/main` as above, branch head `956c2e8`)
+### Verified, platform (estate at `origin/main` as above, branch head `c28b28e`)
 
     python composition.py --selfcheck                 82 OK, exit 0
     bash compose/verify-composition.sh                exit 3, last line the declared SKIP:
@@ -240,9 +261,27 @@ builder running) moves that checkout onto a main carrying it.
     bash verify/map-surface/verify-map-surface.sh      PASS, exit 0
     bash talk/verify-all.sh --selfcheck                PASS, exit 0
 
+### Review round 1 (platform PR 20, 2026-09-08)
+
+- **F-01 (medium), fixed.** `-` was inside the boundary class, so the hyphen-joined
+  `exception-for-<ns>` in an annotation and `skip-<ns>` as a condition name reached the rendered
+  member at 82 OK. The reason given for excluding it (`<ns>-2` is another namespace) had no
+  instance in this fixture and the collision worry was already carried by the pre-loop
+  assertion. Now a boundary; red first, above. Comment, Answer and map line changed together.
+- **F-02 (low), fixed.** The `message` allowance was any key literally named `message`; it is now
+  only a path ending `validations/<i>/message`. A label in a `matchConditions` message is red by
+  path, above.
+- **F-03 (info), allowed (delegated).** The label as `namespaceSelector/matchExpressions/<i>/key`
+  is allowed when the string equals the label: it is the set-based form of the same structural
+  use, and a red there would only ever be fixed by widening the walk. No served body uses it.
+  The `matchLabels` allowance was narrowed to that exact path at the same time.
+
+The commit is `c28b28e`; the selfcheck is still 82 OK, exit 0 against every unit at
+`origin/main`, and `verify-composition.sh` still exits 3 at its declared SKIP.
+
 ### Hook bypass, disclosed
 
-The platform commit was made with the pre-commit hook bypassed: the owner's global ggshield hook
+Both platform commits were made with the pre-commit hook bypassed: the owner's global ggshield hook
 answered `no more API calls available`. The staged diff was grepped for key, token, secret,
 credential and private-key shapes; the only hits are the `name_token` regex variable this change
 introduces. The commit message says the same. A reviewer should grep it again.
@@ -259,4 +298,4 @@ introduces. The commit message says the same. A reviewer should grep it again.
 
 Nothing. No money, date, identity, authorisation or real person is touched.
 
-Map line: [106 — The composition selfcheck is red on main at the ungoverned-namespace leg](issues/106-the-composition-selfcheck-is-red-on-main-at-the-ungoverned-namespace-leg.md) — the ticket-15 leg named its fixture namespace `acme` and read the served cage bodies' own `posture.acme.io/` label domain and `ghcr.io/acme/` WAF image as the name leaking, so `composition.py --selfcheck` was red on platform `origin/main` at 58 OK with the three ticket-34 price legs behind it never running there. The fixture is now `fixture-outside-the-cage`, measured absent from platform's `distribution/` and `graded/` before the check runs and matched as a whole token with `.` as a boundary so `<ns>.svc.cluster.local` is still a leak (delegated); and GOVERNED_LABEL is graded by parsed position rather than by file -- a key under a `namespaceSelector` or a string at a `message` is its correct use, anywhere else is red by path -- because listing the holds and report beside the guard would have exempted the files, not the uses (delegated: parsed). A new leg plants both leaks in a copy of the fixture member and shows each red by name; under the real assertions each plant stops at the same 58 OK. 82 OK, exit 0 against every unit at `origin/main`; `verify-composition.sh` reaches its declared SKIP (exit 3) on the branch and goes from FAIL to SKIP on the gate once the platform checkout carries the merge. Platform PR 20 and hub PR 61, both open at charting.
+Map line: [106 — The composition selfcheck is red on main at the ungoverned-namespace leg](issues/106-the-composition-selfcheck-is-red-on-main-at-the-ungoverned-namespace-leg.md) — the ticket-15 leg named its fixture namespace `acme` and read the served cage bodies' own `posture.acme.io/` label domain and `ghcr.io/acme/` WAF image as the name leaking, so `composition.py --selfcheck` was red on platform `origin/main` at 58 OK with the three ticket-34 price legs behind it never running there. The fixture is now `fixture-outside-the-cage`, measured absent from platform's `distribution/` and `graded/` before the check runs and matched as a whole token with `.` and `-` both boundaries so `<ns>.svc.cluster.local` and the hyphen-joined `exception-for-<ns>` are each still a leak (delegated; review F-01 measured the hyphen join passing with `-` inside the class); and GOVERNED_LABEL is graded by parsed position rather than by file -- a key at `namespaceSelector/matchLabels`, a string equal to it at `namespaceSelector/matchExpressions/<i>/key`, or a string at `validations/<i>/message` is its correct use, anywhere else is red by path -- because listing the holds and report beside the guard would have exempted the files, not the uses (delegated: parsed). A new leg plants five leak shapes in a copy of the fixture member and shows each red by name; under the real assertions each plant stops at the same 58 OK. 82 OK, exit 0 against every unit at `origin/main`; `verify-composition.sh` reaches its declared SKIP (exit 3) on the branch and goes from FAIL to SKIP on the gate once the platform checkout carries the merge. Platform PR 20 and hub PR 61, both open at charting.
