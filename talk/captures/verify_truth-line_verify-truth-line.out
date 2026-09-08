@@ -4,9 +4,9 @@ selfcheck ok
 PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, an exclusion reason containing an apostrophe survives the trim whole, a unit line this checkout does not carry is a note, and a run at each of the three enactment modes prints that mode on its own TRUTH line
 [1;36m==>[0m 3. the manifest covers every script the gate discovers right now, in both directions
 [1;36m==>[0m 4. the last TRUTH line talk/truth.log recorded still adds up
-  run 138: 72 passes split {'observed': 18, 'self': 40, 'simulated': 6, 'meta': 8}, ceiling 93 of 112, skips {'never': 9, 'waits': 12}
+  run 165: 72 passes split {'observed': 18, 'self': 40, 'simulated': 6, 'meta': 8}, ceiling 93 of 112, skips {'never': 9, 'waits': 12}
 [1;36m==>[0m 5. the sentence the deck publishes counts the same 'can never pass' population the ceiling does
   measured: 72 passes are observed 18 + self 40 + simulated 6 + meta 8, against a ceiling of 93 of 112 (8 excluded, 11 can never pass on this runner); fail 11, skip 21 (never 9, waits 12)
 [1;36m==>[0m 6. the line says which enactment mode the run happened at, and a line that predates the field says nothing rather than a mode
-  2 of 44 recorded lines name the mode; the newest, run 138, says enact=development
+  3 of 45 recorded lines name the mode; the newest, run 165, says enact=development
 PASS: talk/verify-manifest.txt places every one of the 112 verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all.sh turns an undeclared could-not-look and a stale ceiling red, the last TRUTH line talk/truth.log recorded adds up, the published 'can never pass' count is the population the ceiling was cut from, and the enactment mode the line carries reads back as written while a line predating that field reads as no mode at all

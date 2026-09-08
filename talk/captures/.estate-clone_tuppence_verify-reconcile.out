@@ -1,5 +1,5 @@
 [1;36m==>[0m 0. the five-fact sample: the composed set in force, from signed sources (graded first, cluster-free)
-   five-fact sample 2026-09-06T12:13:09Z on cluster dsample-34032373363 (run 34032373363), 3 sources
+   five-fact sample 2026-09-07T14:20:21Z on cluster dsample-34132234986 (run 34132234986), 3 sources
      nist                 true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      nist                 true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
      nist                 true  fact_3_last_applied_revision_equals_the_pinned_commit: nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524
