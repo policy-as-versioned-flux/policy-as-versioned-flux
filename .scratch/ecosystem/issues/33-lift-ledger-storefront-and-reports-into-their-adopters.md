@@ -125,24 +125,40 @@ made before the quota ran out and passed the hook normally (`No secrets have bee
 ### 6. CI, watched to completion, on all four branches
 
 Hub [PR 57](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/57), branch
-rebased onto `3713a56` (never merged into): `demo`, `typecheck`, `reproduce-elsewhere` and all
-three `determinism` legs pass. `tests` is `1 failed, 2091 passed` (run 34044055551 on fc62f9b -- the first cut quoted `177.63s`, which is not what that run printed (`202.05s`), so no duration is quoted, review F7), and `invariants` is
-`RESULT: 71 passed, 1 failed, 3 skipped`. The one failure in each is the same standing red —
-invariant 45, `flux_coverage_floor_is_still_reachable` (`the pre-registered coverage floor of 90%
-can no longer be reached: 3/1966 sample(s) … a ceiling of 66.4%`), which build ticket 70 finding 1
-records as the finding rather than a defect, and `tests/test_invariant_suite.py::test_the_suite_is_green`
-is that same invariant reported once more. The 18 tests this ticket adds are inside the 2091.
+rebased onto `3713a56` (never merged into). The merged head is `767718a`, run 34219654057:
+`demo`, `typecheck`, `reproduce-elsewhere` and all three `determinism` legs pass; `tests` is
+`2 failed, 2129 passed` and `invariants` is `RESULT: 71 passed, 1 failed, 3 skipped`. (Round 1
+quoted run 34044055551 on `fc62f9b`, `1 failed, 2091 passed`; the first cut quoted `177.63s`,
+which is not what that run printed (`202.05s`), so no duration is quoted, review F7.) The 33
+tests this ticket adds (`tests/test_lifted_apps.py`) are inside the 2129 and all pass.
+
+The two reds on the head:
+
+1. the standing red — invariant 45, `flux_coverage_floor_is_still_reachable` (`the pre-registered
+   coverage floor of 90% can no longer be reached: 3/1966 sample(s) … a ceiling of 66.4%`), which
+   build ticket 70 finding 1 records as the finding rather than a defect, reported once more as
+   `tests/test_invariant_suite.py::test_the_suite_is_green`;
+2. `tests/test_seam1_cli.py::test_an_attestation_sidecar_accompanies_every_artefact`, the
+   cross-branch xdist flake: it is red on this head (34219654057) and on the ticket-45, ticket-92
+   and ticket-101 branch runs, and on `main` runs 34042404585 and 34029217127, which carry none of
+   this ticket's files. It is not this ticket's and is not fixed here.
 
 Invariant 44 is green and the samples are fresh: driftwood's newest drift sample is
 `2026-09-06T11:04:15Z`, tuppence's `2026-09-06T12:13:09Z`, ludlow's `2026-09-06T12:53:37Z` — under
 five hours old at the time of the run.
 
-Adopter pull requests, re-run after each branch was rebased onto its own unit's `origin/main`
-(each of which had moved by exactly one clock-observation commit): `shift-left` and
-`compose-check` pass on [tuppence 21](https://github.com/policy-as-versioned-tuppence/tuppence/pull/21)
-(run 34043741343), [driftwood 27](https://github.com/policy-as-versioned-driftwood/driftwood/pull/27)
-(run 34043743846) and [ludlow 18](https://github.com/policy-as-versioned-ludlow/ludlow/pull/18)
-(run 34043746392).
+Adopter pull requests, at their merged heads: `shift-left` and `compose-check` pass on
+[tuppence 21](https://github.com/policy-as-versioned-tuppence/tuppence/pull/21) at `cdc922d`
+(run 34219273575), [driftwood 27](https://github.com/policy-as-versioned-driftwood/driftwood/pull/27)
+at `60827c7` (run 34219278129) and [ludlow 18](https://github.com/policy-as-versioned-ludlow/ludlow/pull/18)
+at `ce283d6` (run 34219282794). (Round 1's runs, after each branch was rebased onto its unit's
+`origin/main`: 34043741343, 34043743846, 34043746392.)
+
+**Merged 2026-09-08**, all four by `pavc-other-hand`: tuppence `8644b40` (11:39:52Z), driftwood
+`02725ff` (11:39:58Z), ludlow `7071002` (11:40:03Z), hub `c021b58` (11:40:10Z).
+`verify-lifted-apps.sh` with `LIFTED_APPS_ESTATE` at those three unit mains exits 0; the two
+counted limits read `3 of 3` and `3 of 3`, and (since the tidy below) `0 of 3 pinned trees could
+not be read`.
 
 No hub `truth` run was dispatched for this branch: `gh run list --workflow truth.yml --branch
 ticket-33-lift-ledger-storefront-and-reports` was empty before the push, and a branch run records
@@ -163,6 +179,52 @@ The first cut committed instance 3 of the derive-what-you-assert rule: a directo
 | F7 | `177.63s` quoted against a run that printed `202.05s` | run id quoted with the counts, duration dropped |
 
 Also recorded, because the review asked and it is cheap to derive: no UPDATE-scoped evaluation exists anywhere -- all five composed policies and the orphan guard declare CREATE+UPDATE, `kyverno apply` evaluates CREATE only -- so "admitted by the composed set" is true for CREATE only, and the check's fourth blind spot now says so on every run. And the live half, read-only on 2026-09-08: the three kind clusters' Flux Kustomizations are 38 days old (`kind-tuppence` at 454a6ee, `kind-driftwood` at b241a80, `kind-ludlow` at 416bf3f, each reconciling an in-cluster git server seeded then), and `kubectl get pods -A` on all eight local contexts shows no `ledger`, `storefront` or `reports` pod anywhere. Nothing in this ticket has been served to a cluster; the check says `3 of 3 … not in the tree the GitRepository pins` rather than "served" for exactly that reason.
+
+### 8. Tidy 2026-09-08: the round-2 minor findings, carried after the merge
+
+Round 2 left five minor findings (R2-1, R2-2, R2-3, R2-6, R2-7) and one record item (R2-5, the
+run ids above). Each is in the tidy pull request that follows PR 57; the check's contract, the
+manifest row's declared could-not-looks and the Map line do not change.
+
+- **R2-1, a zero derived from nothing read.** `pinned_membership` returns `unreadable` when the
+  pinned tag is not in the clone; `grade_sync` did not fail it and `Report.pinned_absent` excluded
+  it, so the headline LIMIT and the PASS sentence said `0 of N ... not in the tree the GitRepository
+  pins (<tag>)`. The count of pinned trees that could not be read is now on the SAME line the PASS
+  sentence is built from, and the sentence carries it: `... 3 of 3 are not in the tree the
+  GitRepository pins (v1.0.0) and 0 of 3 pinned trees could not be read`. Red first, a fixture whose
+  `gotk-sync.yaml` pins `tag: v9.9.9`:
+  `test_a_pin_this_clone_cannot_read_is_a_printed_count_not_a_zero` → `assert 'LIMIT  0 of 1 lifts
+  are listed at main and not in the tree the GitRepository pins (v9.9.9); 1 of 1 pinned trees could
+  not be read' in "PASS  ledger -> tuppence ..."` (the report said `(v9.9.9): a cluster ...` and
+  nothing about what it had not read); green after. The shell selfcheck holds the same plant.
+- **R2-2, "resolves to no directory" claimed for any mismatch.** The wrong-path FAIL now says
+  `` `<path>` is not the directory <served> is in ``, and adds `` `git show <tag>:<path>` finds no
+  such directory in the tree the GitRepository pins, so that Kustomization never becomes Ready
+  there `` only where `git cat-file -t <tag>:<path>` is not a tree. A fixture at `path: ./gitops`
+  (a real directory with no kustomization) FAILs without the never-Ready claim; `./apps` FAILs
+  with it.
+- **R2-3, the last Kustomization paired with the last GitRepository.** `flux_sync` pairs by
+  `sourceRef.name`: the Kustomization chosen is the one whose sourceRef names the GitRepository
+  read; a Kustomization sourcing another GitRepository is ignored wherever it sits in the file;
+  two Kustomizations sourcing the same GitRepository FAIL by name (`carries 2 Flux Kustomizations
+  whose sourceRef names GitRepository 'tuppence': ['tuppence', 'tuppence-2']; which of them
+  reconciles ... cannot be derived`). All three real files carry one of each and are unaffected.
+- **R2-6.** The NOTE line says the hub is read as a working tree, untracked files included.
+- **R2-7, `pass >= policy files` compared rule verdicts (8) to files (6).** `kyverno_run` now runs
+  `kyverno apply --table` as well and requires every policy in the set, by the `metadata.name` read
+  from its own file, to have a row whose RESULT is `Pass`; the ok line names them (`every one of
+  the 6 policies has a Pass row of its own (cage-netpol-4-0-0 cage-tier-4-0-0
+  posture-trust-boundary-4-0-0 require-nonroot-4-0-0 stamp-posture-4-0-0
+  policy-version-orphan-guard)`). The summary line is still parsed for `skip: 0`, `fail: 0`,
+  `error: 0` and the exit code; the `pass >= files` rule is gone. Selfcheck: a table missing a
+  policy's row, and a table with a `Skip` row, are refused.
+
+`tests/test_lifted_apps.py -n0` → `38 passed` (33 before). `verify-lifted-apps.sh --selfcheck` →
+exit 0. The check against the three merged mains → exit 0, last line `PASS: 3 lifted applications
+are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path
+that adopter's own gotk-sync.yaml reconciles; ...; 3 of 3 are not in the tree the GitRepository
+pins (v1.0.0) and 0 of 3 pinned trees could not be read; the hub carries no working copy of any of
+them`.
 
 ## Waits on the owner
 
