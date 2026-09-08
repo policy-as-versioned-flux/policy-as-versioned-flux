@@ -1,7 +1,7 @@
 # 81 — Round 3 of the sampler wait-order lands on tuppence and ludlow
 
 Type: task (HITL)
-Status: prepared
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -83,6 +83,11 @@ Map line: Ticket 81 -- round 3 of the sampler wait order cherry-picked onto toda
 
 ## Waits on the owner
 
+**Spent 2026-09-04, recorded 2026-09-08.** Nothing below is still owed: the three commits reached each
+adopter's `main` by the second route (the wave's integration branch), the proof ran on the schedule,
+and what it proved is written under *Recorded 2026-09-08* at the bottom of this file. The commands are
+left as the record of what was asked.
+
 Push is refused to an agent by `enact_guard` on every enactment repo; the merge must be the other
 hand's. Run from the hub root, in this order, for each of driftwood, tuppence, ludlow:
 
@@ -126,3 +131,154 @@ If the owner prefers to let the wave land it: the same three commits reach `main
 integrator merges the ticket-81 unit branches into `ecosystem/build-2026-09-03` and the owner
 pushes the eight integration branches. That route ties the proof to the whole wave's review; the
 route above lets the next clock prove this one fix on its own, which is what the ticket asks.
+
+## Recorded 2026-09-08 — round 3 landed, the order is measured, Done is not met and is re-charted
+
+Every sentence below was measured on 2026-09-08 against `origin/main` of each repository after
+`git fetch`, and against the runs named. The build of 2026-09-03 above is left as it was written.
+
+**What landed, and how.** On each adopter's `origin/main` the newest commit touching
+`.github/workflows/drift-sample.yml` is the round-3 commit this ticket cherry-picked
+(`git log --oneline origin/main -- .github/workflows/drift-sample.yml | head -1`):
+
+| adopter   | commit    | authored               | reached `main` by                                   | merged (UTC)          | merged by            |
+|-----------|-----------|------------------------|-----------------------------------------------------|-----------------------|----------------------|
+| driftwood | `41b09c9` | 2026-09-03T20:03+01:00 | PR #23 (head `ecosystem/build-2026-09-03`, `fdd66c1`) | 2026-09-04T14:50:21Z | `app/pavc-other-hand` |
+| tuppence  | `10fcf41` | 2026-09-03T20:03+01:00 | PR #15 (head `ecosystem/build-2026-09-03`, `f74dbdf`) | 2026-09-04T14:51:13Z | `app/pavc-other-hand` |
+| ludlow    | `9d14e39` | 2026-09-03T20:03+01:00 | PR #13 (head `ecosystem/build-2026-09-03`, `6cfb529`) | 2026-09-04T14:51:19Z | `app/pavc-other-hand` |
+
+So the three `ticket-60-wait-order` pull requests the section above prescribes were never opened; the
+wave route it names as the alternative is the one that happened, and the merge identity is the other
+hand's, as ticket 88 requires.
+
+**What the citable hub runs say.** `verify/sampler-wait-order/verify-sampler-wait-order.sh` grades
+PASS on run 177 (`hub=a08f868`) and on run 179 (`hub=fbbb547`), both recorded in `talk/truth.log`;
+both trees carry the check, which commit `4b24c48` (Ticket 81) added. The recorded capture
+`talk/captures/verify_sampler-wait-order_verify-sampler-wait-order.out` on `origin/main` reads:
+
+    ok   driftwood: kyverno wait@174 flux-operator wait@175 composed apply@176 Kustomization waits@180 ResourceSet waits@183 five-fact sample@188
+    ok   tuppence: kyverno wait@177 flux-operator wait@178 composed apply@179 Kustomization waits@183 ResourceSet waits@186 five-fact sample@191
+    ok   ludlow: kyverno wait@177 flux-operator wait@178 composed apply@179 Kustomization waits@183 ResourceSet waits@186 five-fact sample@191
+    PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for what they applied (round 3 order)
+
+The clock rewrites and force-adds every capture on every run (`truth.yml`, `OBSERVATION_LANE`,
+`git add -Af`), and those bytes have not changed since the clock commit `93d862c` of 2026-09-04; the
+Actions logs of run 177 and run 179 each print
+`verify/sampler-wait-order/verify-sampler-wait-order.sh PASS` as well. The manifest row is
+`estate-observation | -`. Item 3 of the Answer ("red until merged") is therefore over: the map line
+that still said so was corrected on 2026-09-08.
+
+**Done is not met.** The served record is each adopter's `drift/samples.jsonl` at its `origin/main`,
+appended by the adopter's own scheduled `drift-sample` lane. The newest line per adopter, composed
+source, quoting the sample's own `why` strings:
+
+- tuppence, drift-sample run 34228832561 (schedule, `ts` 2026-09-08T12:56:30Z), source
+  `tuppence-composed`: fact 3 **True** — "every Kustomization consuming tuppence-composed applied
+  751522b3bca9"; fact 4 **False** — "1 of 16 rendered objects are absent from the cluster and 0 are
+  live but unequal to the offline render", `objects_absent` =
+  `policies.kyverno.io/v1alpha1/GeneratingPolicy/cage-netpol-2-0-0`; fact 5 **False** — "15 of 16
+  rendered objects are in no Flux inventory (absent from the cluster, or live but put there by
+  something other than Flux)", `inventory_entries` 8.
+- ludlow, drift-sample run 34232921856 (schedule, `ts` 2026-09-08T13:36:58Z), source
+  `ludlow-composed`: fact 3 **True** — "every Kustomization consuming ludlow-composed applied
+  a800a58e2547", so the item-4 question in the section above (3 of 3 not at pinned commit a800a58e) is
+  answered by the sample: it is at the pin now; fact 4 **True** — "all 16 rendered objects are live
+  and equal to the offline render"; fact 5 **False** — the same 15-of-16 sentence, `inventory_entries`
+  8.
+
+Every scheduled sample since the merge, composed source (`f4`/`f5` observed, `absent` =
+`objects_absent`, `uninv` = `objects_not_in_inventory`, `inv` = `inventory_entries`):
+
+| adopter   | `ts`                  | drift-sample run | f3    | f4    | absent | f5    | uninv | inv |
+|-----------|-----------------------|------------------|-------|-------|--------|-------|-------|-----|
+| tuppence  | 2026-09-05T11:53:26Z  | 33964466808      | True  | True  | 0      | False | 15    | 8   |
+| tuppence  | 2026-09-06T12:13:09Z  | 34032373363      | True  | False | 5      | False | 15    | 8   |
+| tuppence  | 2026-09-07T14:20:21Z  | 34132234986      | True  | False | 5      | False | 15    | 8   |
+| tuppence  | 2026-09-08T12:56:30Z  | 34228832561      | True  | False | 1      | False | 15    | 8   |
+| ludlow    | 2026-09-05T12:42:12Z  | 33966710005      | True  | True  | 0      | False | 10    | 13  |
+| ludlow    | 2026-09-06T12:53:37Z  | 34034379528      | True  | True  | 0      | False | 15    | 8   |
+| ludlow    | 2026-09-07T15:04:12Z  | 34136173752      | True  | True  | 0      | False | 15    | 8   |
+| ludlow    | 2026-09-08T13:36:58Z  | 34232921856      | True  | True  | 0      | False | 15    | 8   |
+| driftwood | 2026-09-05T10:41:34Z  | 33961154234      | True  | True  | 0      | True  | 0     | 19  |
+| driftwood | 2026-09-06T11:04:15Z  | 34028943241      | True  | True  | 0      | True  | 0     | 19  |
+| driftwood | 2026-09-07T12:40:10Z  | 34122734820      | True  | True  | 0      | True  | 0     | 19  |
+| driftwood | 2026-09-08T11:25:31Z  | 34220235347      | False | False | 15     | False | 15    | 4   |
+
+The fifteen objects tuppence and ludlow record as uninventoried are the fifteen under
+`composed/policies/v{2.0.0,2.0.1,3.0.0}/` (five kinds by three versions); the sixteenth, the
+orphan-guard the ResourceSet itself renders, is the one that IS in an inventory. Fact 4's absence on
+tuppence is not one fixed object: five on 09-06 and 09-07, one (`cage-netpol-2-0-0`) on 09-08, none on
+09-05. It moves because it is timing, below.
+
+**Why, traced rather than read off the sentence.** Fact 5's `why` offers two readings, "absent" or
+"put there by something other than Flux". Neither is what happened. `kubectl apply -k
+gitops/composed/` (tuppence line 179, ludlow line 179, driftwood line 176 of `drift-sample.yml`, in
+the step `install the engine, then reconcile from the REAL remotes`) applies exactly two objects: the
+GitRepository `<unit>-composed` and the ResourceSet `composed-set`. The fifteen policies are applied
+by the three Kustomizations `composed-v2-0-0`, `composed-v2-0-1`, `composed-v3-0-0` that the
+ResourceSet's `resourcesTemplate` generates (`path: ./composed/policies/v<version>`, `wait: true`).
+Nothing but Flux puts a policy on that cluster.
+
+The Actions log of tuppence run 34228832561, step by step, with the workflow's line numbers:
+
+1. 12:56:29.36 — `resourceset.fluxcd.controlplane.io/composed-set created`: the apply (line 179)
+   returns.
+2. 12:56:29.65 — `kustomization.kustomize.toolkit.fluxcd.io/tuppence condition met`: the
+   Kustomization loop (line 183) has enumerated `get kustomizations -o name`, found only `tuppence`,
+   which was already Ready, and returned. The composed Kustomizations do not exist yet.
+3. 12:56:30.28 — `resourceset.fluxcd.controlplane.io/composed-set condition met`: the ResourceSet
+   loop (line 186). Ready on a ResourceSet means it has applied the objects it renders, not that
+   they have reconciled.
+4. 12:56:30.41 — the `get ... -o wide` listing shows `composed-v2-0-0`, `composed-v2-0-1`,
+   `composed-v3-0-0` aged `0s` with no status, and `tuppence-composed` at `Unknown  building artifact`.
+5. `ts` 2026-09-08T12:56:30Z — the sample is taken, the second the composed Kustomizations exist.
+   `drift/five-facts.py` reads the inventories once, at the top of `composed_set_facts` (line 260),
+   and the sixteen objects afterwards, so during the seconds the sample takes the policies land: by
+   the object reads fifteen (tuppence) or sixteen (ludlow) are live and byte-equal, and at the
+   inventory read none of them was in any inventory. Which eight objects the inventories did hold
+   was not read off the run; what is measured is that none of the fifteen is among them.
+
+Run 33964466808 of 09-05 has the same shape (`composed-v*` aged `0s` at 11:53:26.78, inventory 8),
+and ludlow's `inv 13 / uninv 10` on 09-05 is the same race won for one version. No line in any of these
+logs says `composed-v2-0-0 condition met`: nothing waited for them.
+
+Driftwood is the control, and its green is the accident item 3 of the Decisions above warned about.
+Its `kustomizations/driftwood` did not reach Ready on the ephemeral cluster in either run read, so
+the Kustomization loop blocks on it for the full bound — `error: timed out waiting for the condition on
+kustomizations/driftwood` at 12:40:10 in run 34122734820, three minutes after the ResourceSet was
+created at 12:37:09 — and that three-minute stall is what gave `composed-v*` time to apply
+(`Applied revision` on all three at `3m`, inventory 19, facts 4 and 5 True on the three scheduled
+samples of 09-05 to 09-07).
+On 09-08 (run 34220235347) the stall was not enough: `composed-v*` at `3m` with no status, fact 3
+False, fifteen absent, inventory 4. Driftwood's fact 5 is therefore reachable as defined, under this
+exact code, which is why fact 5 is not to be redefined; it is the moment of sampling that is wrong.
+
+**The finding.** Round 3's order — Kustomization waits before ResourceSet waits — cannot wait for
+Kustomizations a ResourceSet has not generated yet, and the composed Kustomizations are all of that
+kind. `verify-sampler-wait-order.sh` grades that order green because its `NAMES` array (line 40) pins
+it, so the check is honest about what the workflow does and wrong about what the workflow should do.
+Done — facts 4 and 5 true for tuppence's and ludlow's composed source on a scheduled sample — is a
+wait-order question still, but not this order's. It is charted as ticket 107, with the fix candidates
+and what each costs, no decision.
+
+**Status: resolved, and why that word.** This ticket's own scope is the third round of the wait order:
+cherry-picked, graded, landed on three adopters' `main`, and measured on the schedule. All of that is
+done and on the record. Its Done is not met, and pretending otherwise would be the false green this
+estate exists to refuse; but re-opening this ticket would hand round 4 to a ticket whose Answer,
+Decisions and patches are all round 3's. The unmet Done moves to 107 with its evidence. Delegated
+(ADR-0025).
+
+**How the checks read this section.** The drift-sample run ids above are the adopters' own scheduled
+observations, recorded by each adopter's lane commit into its `drift/samples.jsonl`; they are not hub
+TRUTH runs and do not appear in `talk/truth.log`. `verify/cited-truth/` reads a run citation as one to
+four digits, so an eleven-digit Actions id is no citation to it and is graded by nothing in the hub;
+what grades those lines is the adopter's own `verify-reconcile.sh`, whose runner path reads that
+committed file. The two hub runs this section cites, 177 and 179, are the only ones offered as proof
+of a hub check.
+
+Map line (2026-09-08): Ticket 81 -- round 3 is on all three adopters' main (driftwood 41b09c9,
+tuppence 10fcf41, ludlow 9d14e39, merged 2026-09-04 by the other hand through the wave's pull
+requests); verify-sampler-wait-order.sh PASS on recorded runs 177 and 179. Done is not met: tuppence's
+and ludlow's composed source records fact 5 false on every scheduled sample since, because the order
+waits for Kustomizations before the ResourceSet has generated them, and driftwood's greens rest on a
+three-minute timeout on its own Kustomization. Re-charted as ticket 107.
