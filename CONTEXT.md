@@ -518,9 +518,17 @@ that a rewritten entry cites stay as the record of the decision at the time.
   one. A pin behind a newer published version is priced by the EOL ramp from the newer version's
   publish date. No consumer-side sunset field exists. Contrast **revocation**, which is withdrawal.
 
-- **Handbook** (added 2026-08-28, ticket 13) — The human-readable render of an adopter's composed
-  policy, produced at compose time and carried under the same signed tag as the artefact, so
-  render-at-tag equals the committed render.
+- **Handbook** (added 2026-08-28, ticket 13; **built 2026-09-06, ticket 34**) — The human-readable
+  render of an adopter's composed policy, `composed/HANDBOOK.md`, produced at compose time by
+  `platform/compose/handbook.py` and carried under the same signed tag as the artefact, so
+  render-at-tag equals the committed render. It is a **pure function of the artefact**: it reads no
+  clock, no environment, no network and no file outside the composed tree it is handed, so anyone
+  holding the artefact can re-derive it and a page that said something the artefact does not could
+  not survive the byte comparison. Where a field is absent the render names the field and states
+  nothing in its place (ADR-0020); the absences are counted on the page. Graded by
+  `platform/compose/verify-fresh.sh` at a ref and by the hub's `verify/handbook/`. Distinct from a
+  **summary**, which is a human's paraphrase, is not derivable from the artefact, and therefore
+  lives outside `composed/` (`.claude/skills/handbook-summaries/`).
 
 - **Lift** (added 2026-08-28, ticket 13) — Moving a mechanism or application from the original org
   into an eco-system party by re-label and re-pin, graded green by the truth surface before the
