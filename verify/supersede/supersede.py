@@ -113,17 +113,29 @@ def fetch_served(repo: str) -> str | None:
     return fetch(repo, f"+refs/heads/main:refs/remotes/{SERVED_REF}")
 
 
-def tag_date(repo: str, tag: str) -> str | None:
-    """The day `tag` was cut, off the tag object fetched read-only into the publisher's clone.
-    None where it cannot be fetched or is not an annotated tag object."""
+def tag_object(repo: str, tag: str) -> dict:
+    """What the tag object fetched read-only into the publisher's clone says (review F4):
+    {"state": signed | unsigned | unreachable, "date"}. `signed` is an annotated tag object
+    carrying a signature block -- the same reading platform's composer makes, so the hub counts
+    exactly what the composer counts; whether the block VERIFIES is verify-untagged-pin's claim.
+    A lightweight tag, or an annotated one with no block, is `unsigned`."""
     if fetch(repo, f"+refs/tags/{tag}:refs/tags/{tag}"):
-        return None
+        return {"state": "unreachable", "date": None}
     rc, text = git(repo, "for-each-ref", "--format=%(objecttype) %(creatordate:short)",
                    f"refs/tags/{tag}")
     if rc != 0 or not text:
-        return None
+        return {"state": "unreachable", "date": None}
     kind, date = (text.split() + ["", ""])[:2]
-    return date if kind == "tag" and date else None
+    if kind != "tag" or not date:
+        return {"state": "unsigned", "date": date or None}
+    rc, body = git(repo, "cat-file", "-p", tag)
+    return {"state": "signed" if rc == 0 and "-----BEGIN" in body else "unsigned", "date": date}
+
+
+def tag_date(repo: str, tag: str) -> str | None:
+    """The day a SIGNED `tag` was cut; None otherwise (kept for callers that only need the day)."""
+    obj = tag_object(repo, tag)
+    return obj["date"] if obj["state"] == "signed" else None
 
 
 def served_yaml(repo: str, path: str) -> dict | None:
@@ -196,15 +208,18 @@ def pinned_major(version: str) -> int | None:
     return int(digits.group(1)) if digits else None
 
 
-def newest_tagged_major(name: str, tags: set[str]) -> tuple[int | None, str | None]:
-    """(major, tag) of the highest tag of this feed's form on the remote: `<name>/vX.Y.Z` or bare
-    `vX.Y.Z`, the two shapes feed_contract.tag_forms admits. (None, None) where none exists."""
+def tags_ahead(name: str, pinned: int, tags: set[str]) -> list[tuple[int, str]]:
+    """Every remote tag of this feed's form (`<name>/vX.Y.Z` or bare `vX.Y.Z`, the two shapes
+    feed_contract.tag_forms admits) whose major is ahead of the pin, oldest first."""
     shape = re.compile(rf"^(?:{re.escape(name)}/)?v(\d+)\.(\d+)\.(\d+)$")
     hits = [(tuple(int(g) for g in m.groups()), t) for t in tags for m in [shape.match(t)] if m]
-    if not hits:
-        return None, None
-    key, tag = max(hits)
-    return key[0], tag
+    return [(key[0], tag) for key, tag in sorted(hits) if key[0] > pinned]
+
+
+def newest_tagged_major(name: str, tags: set[str]) -> tuple[int | None, str | None]:
+    """(major, tag) of the highest tag of this feed's form on the remote. (None, None) if none."""
+    ahead = tags_ahead(name, -1, tags)
+    return ahead[-1] if ahead else (None, None)
 
 
 def eol_ramp(since: str, as_of: str) -> float:
@@ -235,10 +250,20 @@ def supersede_line(evidence: dict | None, party: str, name: str) -> dict | None:
 
 def grade_behind(*, adopter: str, currency: str, party: str, name: str, version: str,
                  newest_major: int, newest_tag: str, tagged: str | None, line: dict | None,
-                 entry: dict | None, rule: bool | None, platform_tag: str | None) -> tuple[str, str]:
-    """One (status, message) for a pin that is BEHIND a newer tagged major."""
+                 entry: dict | None, rule: bool | None, platform_tag: str | None,
+                 signed_ahead: list[str] | None = None, unsigned_ahead: list[str] | None = None,
+                 since_tag: str | None = None) -> tuple[str, str]:
+    """One (status, message) for a pin that is BEHIND a newer tagged major. `signed_ahead` are
+    the signed tags ahead (any of them is a target the composer may have chosen, depending on
+    which directories its checkout carried -- review F1), `since_tag` the oldest of them and
+    `tagged` its cut day (review F3), `unsigned_ahead` the tags ahead the composer counts as
+    nothing, named."""
+    signed_ahead = signed_ahead if signed_ahead is not None else [newest_tag]
+    since_tag = since_tag or newest_tag
+    noted = (f" ({', '.join(unsigned_ahead)} also ahead but unsigned: counted as nothing, as the "
+             f"composer counts it)") if unsigned_ahead else ""
     label = (f"{adopter} pins {party}/feed/{name}@{version}, behind v{newest_major} "
-             f"({newest_tag} on {party}'s real remote)")
+             f"({newest_tag} on {party}'s real remote{noted})")
     if line is None:
         if rule is False:
             return "SKIP", (f"{label}: composed under platform {platform_tag}, which carries no "
@@ -255,12 +280,14 @@ def grade_behind(*, adopter: str, currency: str, party: str, name: str, version:
     if line.get("perspective") != adopter or line.get("currency") != currency:
         problems.append(f"under {line.get('perspective')}/{line.get('currency')}, not {adopter}/{currency}")
     newer = line.get("newer") or {}
-    if newer.get("tag") != newest_tag:
-        problems.append(f"names newer tag {newer.get('tag')!r}, the remote's newest is {newest_tag}")
+    if newer.get("tag") not in signed_ahead:
+        problems.append(f"names newer tag {newer.get('tag')!r}, not a signed tag ahead on the remote "
+                        f"({', '.join(signed_ahead)})")
     if tagged is None:
-        return "SKIP", f"{label}: could not fetch tag {newest_tag} from {party} to read the day it was cut"
-    if line.get("since") != tagged or newer.get("tagged") != tagged:
-        problems.append(f"since {line.get('since')!r} is not the day {newest_tag} was cut ({tagged})")
+        return "SKIP", f"{label}: could not fetch tag {since_tag} from {party} to read the day it was cut"
+    if line.get("since") != tagged or newer.get("since") != tagged:
+        problems.append(f"since {line.get('since')!r} is not the day {since_tag}, the oldest signed "
+                        f"major ahead, was cut ({tagged})")
     as_of = line.get("as_of")
     try:
         want_ramp = eol_ramp(tagged, str(as_of)) if as_of else 1.0
@@ -283,8 +310,14 @@ def grade_behind(*, adopter: str, currency: str, party: str, name: str, version:
         return "FAIL", f"{label}: the supersede line " + "; ".join(problems)
     assert isinstance(amount, (int, float)) and isinstance(ramp, (int, float)) \
         and isinstance(base, (int, float))
+    if as_of and str(as_of) < tagged:
+        # Review F2(iii): a signed artefact's as-of can precede the tag day; that is a zero
+        # said with both dates, never a bare 0.00 and never a backwards window as a price.
+        return "PASS", (f"{label}: zero (as_of {as_of} precedes the tag day {tagged}) under "
+                        f"{adopter}'s own perspective -- the signed artefact's as-of is its newest "
+                        f"signed input; only the clock's --as-of re-composition grows this line")
     return "PASS", (f"{label}: priced {amount:,.2f} {currency} under {adopter}'s own perspective "
-                    f"as of {as_of} (ramp {ramp:.4f} since {tagged}, the day {newest_tag} was cut, "
+                    f"as of {as_of} (ramp {ramp:.4f} since {tagged}, the day {since_tag} was cut, "
                     f"on the line's own {float(base):,.2f})")
 
 
@@ -350,7 +383,6 @@ def check(estate: str = ESTATE) -> int:
                 out("SKIP", f"{adopter} pins {publisher}/feed/{name}@{version}: could not reach "
                             f"{fc.REMOTE.format(p=publisher)} to read its tags")
                 continue
-            newest_major, newest_tag = newest_tagged_major(name, tags)
             mine = pinned_major(version)
             entry = edge_entry(evidence, publisher, name)
             if fc.match_tag({"name": name}, version, tags) is None:
@@ -362,20 +394,40 @@ def check(estate: str = ESTATE) -> int:
                             f"hole carried in the served evidence: {'yes' if isinstance(hole, dict) and hole.get('status') in OPEN else 'no'} "
                             f"(graded by verify-untagged-pin-is-priced.sh)")
                 continue
-            if newest_major is None or mine is None or newest_major <= mine:
+            ahead = tags_ahead(name, mine if mine is not None else 10**9, tags)
+            if not ahead:
                 out("PASS", f"{adopter} pins {publisher}/feed/{name}@{version}: at the newest tagged "
-                            f"major on {publisher}'s real remote ({newest_tag}); nothing to price, said by name")
+                            f"major on {publisher}'s real remote; nothing to price, said by name")
+                continue
+            # Review F4: a tag on the remote is not a publication until its OBJECT is an
+            # annotated tag carrying a signature block, which is what the composer counts.
+            pub_repo = os.path.join(estate, publisher)
+            objects = {tag: (tag_object(pub_repo, tag) if os.path.isdir(pub_repo)
+                             else {"state": "unreachable", "date": None}) for _, tag in ahead}
+            if any(o["state"] == "unreachable" for o in objects.values()):
+                bad = [t for t, o in objects.items() if o["state"] == "unreachable"]
+                out("SKIP", f"{adopter} pins {publisher}/feed/{name}@{version}: could not fetch tag "
+                            f"{', '.join(bad)} from {publisher} to read the day it was cut")
+                continue
+            signed = [t for _, t in ahead if objects[t]["state"] == "signed"]
+            unsigned = [t for _, t in ahead if objects[t]["state"] != "signed"]
+            if not signed:
+                out("SKIP", f"{adopter} pins {publisher}/feed/{name}@{version}: {', '.join(unsigned)} "
+                            f"sit(s) ahead on {publisher}'s real remote but is not a signed annotated "
+                            f"tag object; the composer counts it as nothing, so this check cannot say "
+                            f"the pin is behind -- an unsigned tag ahead is a could-not-look, named")
                 continue
             behind += 1
             line = supersede_line(evidence, publisher, name)
             if line is not None:
                 carried += 1
-            assert newest_tag is not None
-            tagged = tag_date(os.path.join(estate, publisher), newest_tag) if os.path.isdir(os.path.join(estate, publisher)) else None
+            newest_major, newest_tag = next((m, t) for m, t in reversed(ahead) if t in signed)
+            since_tag = signed[0]
             status, msg = grade_behind(adopter=adopter, currency=currency, party=publisher, name=name,
                                        version=version, newest_major=newest_major, newest_tag=newest_tag,
-                                       tagged=tagged, line=line, entry=entry, rule=rule,
-                                       platform_tag=platform_tag)
+                                       tagged=objects[since_tag]["date"], line=line, entry=entry,
+                                       rule=rule, platform_tag=platform_tag, signed_ahead=signed,
+                                       unsigned_ahead=unsigned, since_tag=since_tag)
             out(status, msg)
         counts = retirement_prs(adopter)
         if counts is None:
@@ -412,7 +464,8 @@ def selfcheck() -> None:
         base: dict[str, Any] = {
             "source": "pub", "kind": SUPERSEDE_KIND, "name": "wares", "version": "v1",
             "perspective": "ado", "currency": "GBP",
-            "newer": {"version": "v2", "tag": "wares/v2.0.0", "tagged": "2026-09-01"},
+            "newer": {"version": "v2", "tag": "wares/v2.0.0", "tagged": "2026-09-01",
+                      "since_tag": "wares/v2.0.0", "since": "2026-09-01"},
             "since": "2026-09-01", "as_of": "2026-09-08", "ramp": ramp, "base": 1000.0,
             "amount": 1000.0 * (ramp - 1.0)}
         base.update(over)
@@ -431,6 +484,7 @@ def selfcheck() -> None:
     assert abs(eol_ramp("2025-10-31", "2026-10-31") - 2.0) < 1e-9 and eol_ramp("2025-10-31", "2035-10-31") == 5.0
     # the newest tagged major of a form family, and a pin's major
     assert newest_tagged_major("wares", {"wares/v1.0.0", "wares/v2.0.0", "other/v3.0.0", "v1.9.9"}) == (2, "wares/v2.0.0")
+    assert tags_ahead("wares", 1, {"wares/v1.0.0", "wares/v2.0.0", "wares/v3.0.0", "v0.1.0"}) == [(2, "wares/v2.0.0"), (3, "wares/v3.0.0")]
     assert newest_tagged_major("q", {"v1.0.0", "v3.1.0", "v3.0.9"}) == (3, "v3.1.0")
     assert newest_tagged_major("q", {"z/v9.0.0"}) == (None, None)
     assert pinned_major("v2") == 2 and pinned_major("2.1.0") == 2 and pinned_major("x") is None
@@ -450,6 +504,18 @@ def selfcheck() -> None:
         ("base not the feed line's amount", grade(line=line(), entry={"amount": 5.0}), "FAIL"),
         ("unpriced line", grade(line=line(amount=None)), "FAIL"),
         ("zero on the signing day is a PASS with both dates", grade(line=line(as_of="2026-09-01", ramp=1.0, amount=0.0)), "PASS"),
+        # review F1/F3: the composer may target an OLDER signed major than the remote's newest
+        # (its checkout lacked the newest's directory); since is still the oldest signed ahead
+        ("targets v2 while v3 is signed too", grade(newest_major=3, newest_tag="wares/v3.0.0",
+                                                    signed_ahead=["wares/v2.0.0", "wares/v3.0.0"],
+                                                    since_tag="wares/v2.0.0"), "PASS"),
+        ("since is the newest's day, not the oldest's", grade(newest_major=3, newest_tag="wares/v3.0.0",
+                                                              signed_ahead=["wares/v2.0.0", "wares/v3.0.0"],
+                                                              since_tag="wares/v2.0.0", tagged="2026-09-01",
+                                                              line=line(since="2026-09-05", newer={"version": "v3", "tag": "wares/v3.0.0", "since_tag": "wares/v3.0.0", "since": "2026-09-05"}, ramp=eol_ramp("2026-09-05", "2026-09-08"), amount=1000.0 * (eol_ramp("2026-09-05", "2026-09-08") - 1.0))), "FAIL"),
+        # review F4: an unsigned tag ahead is named on the label, never counted
+        ("unsigned tag ahead is named", grade(unsigned_ahead=["wares/v3.0.0"]), "PASS"),
+        ("as_of before the tag day is zero, said so", grade(line=line(as_of="2026-08-28", ramp=1.0, amount=0.0)), "PASS"),
     ]
     for label, (status, msg), want in cases:
         assert status == want, (label, status, msg)
@@ -460,6 +526,32 @@ def selfcheck() -> None:
     assert "0.00 GBP" in msg and "2026-09-01" in msg, msg
     _, msg = grade(line=None)
     assert "never free" in msg, msg
+    _, msg = grade(unsigned_ahead=["wares/v3.0.0"])
+    assert "wares/v3.0.0 also ahead but unsigned" in msg, msg
+    _, msg = grade(line=line(as_of="2026-08-28", ramp=1.0, amount=0.0))
+    assert "zero (as_of 2026-08-28 precedes the tag day 2026-09-01)" in msg, msg
+    # the tag OBJECT is read, not the ref: a lightweight tag and an annotated tag with no block
+    # are `unsigned`, an annotated tag with a block is `signed` (review F4), on a throwaway repo
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        repo = os.path.join(td, "pub"); bare = os.path.join(td, "pub.git")
+        hooks = os.path.join(td, "nohooks"); os.makedirs(hooks)
+        g = ["git", "-c", "commit.gpgsign=false", "-c", "tag.gpgsign=false", "-c", f"core.hooksPath={hooks}",
+             "-c", "user.name=fixture", "-c", "user.email=fixture@invalid"]
+        subprocess.run(["git", "init", "-q", repo], check=True)
+        subprocess.run(g + ["-C", repo, "commit", "-q", "--allow-empty", "-m", "fixture"], check=True, capture_output=True)
+        subprocess.run(g + ["-C", repo, "tag", "wares/v2.0.0"], check=True)
+        subprocess.run(g + ["-C", repo, "tag", "-a", "wares/v3.0.0", "-m", "no block"], check=True)
+        subprocess.run(g + ["-C", repo, "tag", "-a", "wares/v4.0.0", "-m", "x\n-----BEGIN FIXTURE BLOCK-----\n"], check=True)
+        subprocess.run(["git", "clone", "-q", "--bare", repo, bare], check=True)
+        clone = os.path.join(td, "clone")
+        subprocess.run(["git", "clone", "-q", "--no-tags", bare, clone], check=True, capture_output=True)
+        assert tag_object(clone, "wares/v2.0.0")["state"] == "unsigned", "a lightweight tag is unsigned"
+        assert tag_object(clone, "wares/v3.0.0")["state"] == "unsigned", "an annotated tag with no block is unsigned"
+        assert tag_object(clone, "wares/v4.0.0")["state"] == "signed" and tag_object(clone, "wares/v4.0.0")["date"]
+        assert tag_object(clone, "wares/v9.0.0")["state"] == "unreachable"
+        assert tag_date(clone, "wares/v3.0.0") is None and tag_date(clone, "wares/v4.0.0")
+    plants += 4
     # the lookups
     ev = {"prices": [{"kind": "feed", "source": "pub", "name": "wares", "amount": 7.0, "hole": {"status": "new"}},
                      line()]}

@@ -212,19 +212,45 @@ compose with zero refusals.
   number in a signed artefact. Consequence, named: a feed the publisher carries but has never
   tagged (cve, eol today) is a HOLE for whoever pins it (ticket 69's kind) and supersedes
   nothing.
-- **D2 (delegated) -- `since` is the day the tag was cut, not the envelope's `published_at`.**
-  The v2 envelope says 2026-07-31; its tag was cut 2026-09-01; between the two dates nobody
-  could have pinned a published v2, so ramping from the envelope date would have charged a
-  month of being behind a version that did not exist. Both dates travel on the entry.
+- **D2 (delegated) -- `since` is the day the OLDEST signed major ahead of the pin was cut**,
+  not the envelope's `published_at` and (review F3, round 2) not the newest major's cut day.
+  The v2 envelope says 2026-07-31; its tag was cut 2026-09-01; between the two nobody could have
+  pinned a published v2. And measuring from the newest major reset the ramp on every cut -- a pin
+  two majors behind paid less than one behind (4,268.55 -> 0.00 the day a v3 landed). The entry
+  carries `newer.since_tag`/`since` (the oldest signed major ahead, the day the pin fell behind)
+  beside `newer.tag`/`version` (the newest readable signed major, the retirement's target).
+  Review F1 (round 2): the target is the newest signed major whose directory the checkout
+  CARRIES -- every adopter checks the publisher out at one pinned commit, so the newest tag's
+  directory is routinely absent, and treating that as `unobserved` wrote no line and made being
+  behind silently free; a signed major ahead that is unreadable here is named on the
+  observation and skipped for the target.
 - **D3 (delegated) -- the composition's as-of is the newest SIGNED date among its inputs**, the
   envelopes' `published_at` (ticket 38 D3) and the edges' own `since`. Reason: a fresh
   subscription is signed after every envelope it pins, and pricing it as of the newest envelope
   priced it as of a day before the adopter's own declaration existed; ticket 45's backwards-
   window refusal was that contradiction surfacing on the ordinary case of subscribing. Under the
-  new rule a fresh edge's life is 0 months, nothing refuses, and no clock enters. On the live
-  estate every edge was signed 2026-08-28 and ico v3 was published that day, so no served
-  number moves. The refusal stays for the one case left: a caller's `--as-of` earlier than a
-  signed `since`.
+  new rule a fresh edge's life is 0 months, nothing refuses, and no clock enters. **What that
+  means for the supersede line, said plainly (review F2):** the composition an adopter SIGNS
+  passes no `--as-of`, so its line is FROZEN at the newest signed input date. On the live estate
+  that date is 2026-08-28 for every adopter (every edge signed that day, ico v3 published that
+  day), which PRECEDES the day `threat-register/v2.0.0` was cut (2026-09-01): tuppence and
+  ludlow at origin/main composed with this composer give `amount 0.0, as_of 2026-08-28, since
+  2026-09-01, ramp 1.0`, and the entry says so -- `limits: ["zero (as_of 2026-08-28 precedes the
+  tag day 2026-09-01): the signed artefact's as-of is its newest signed input; only a
+  re-composition --as-of a later day (the scheduled proposer's) grows this line"]` -- never a
+  bare 0.00. The 4,268.55 GBP measured on the scratch copy came from the copy's NEW edge (since
+  2026-09-08) moving the as-of, not from a clock. Only the scheduled proposer's re-composition
+  grows the line: `propose-tier.yml`'s recompose step now passes `--as-of "$as_of"` on all three
+  adopters wherever the pinned composer takes the flag (review F2(i); at v2.0.1 it does not,
+  and the step says so rather than stopping the clock). Review F11: a `since` later than every
+  envelope moves the as-of forward, and a since in the FUTURE would move it into the future --
+  a signed number that only ever grows, never cheaper (a since 2027-06-01 prices a supersede of
+  166,473.39 on the scratch copy). That is accepted for the signed artefact and named here: the
+  date is the adopter's own signed declaration, and a future date on it is a false declaration
+  the party signs, not a rule this module can price around. A caller's `--as-of` earlier than a
+  signed `since` refuses by the DAY (not the month `_months_apart` rounds to), naming both
+  dates and the as-of's source -- a clock composing today against a future since refuses every
+  run until that day, which is the honest reading of a declaration dated after today.
 - **D4 (delegated) -- amount = base x (ramp - 1), not summed into the exposure.** The line it
   surcharges is already in the exposure; adding the surcharge would need a rule for counting one
   line twice. Zero on the signing day is printed as zero with both dates, never omitted. The
@@ -237,6 +263,12 @@ compose with zero refusals.
 - **D6 (delegated) -- quotes are not surcharged.** A premium is a cost, not an exposure; the
   supersede rule runs over exposure feed lines only, and the premium keeps ticket 69's hole.
 - **D7 (delegated) -- how a retirement fits ticket 78's clamp: it does not, and it need not.**
+  Review F9: a retirement moves the edge's `version` and leaves its `since` at the old date,
+  as Renovate's bump does -- `since` is "the date this party first pinned this parent" (the
+  schema's own words), the subscription's date, not the version's; the pin's life is the
+  subscription's life. Recorded, not changed. Review F10: the target written into `party.yaml`
+  must be a bare major (`^v\d+$`); a forged `newer.version` carrying a quote and a newline
+  would have injected a second edge, and is refused before any text is written (selfcheck case).
   The tighten-only clamp binds the tier written on the governed Namespace; a retirement writes
   no tier and touches no Namespace. Its own clamp is FORWARD-ONLY, re-judged on `origin/<base>`
   at the write: the target must be ahead of the pinned major, and it is the version composition
@@ -246,8 +278,11 @@ compose with zero refusals.
   gitsign configuration `propose-tier.yml` already sets (ticket 78), no workflow change.
 - **D8 (delegated) -- a retirement is structural, not band-edge.** `tolerance: None` so the
   bounds grade it at `STRUCTURAL_CONFIDENCE` and it proposes on the first clock run after the
-  newer tag; the price grows in the body on every run. The ledger key carries the target major,
-  so a still newer major is a new question.
+  newer tag. The price in the body is the CLOCK's: the proposer reads the evidence the recompose
+  step wrote `--as-of` today (review F2), so it grows on every run; the signed artefact's own
+  line stays frozen at its newest signed input and says `zero (as_of precedes the tag)` where
+  that date precedes the cut. The ledger key carries the target major, so a still newer major
+  is a new question.
 - **D9 (delegated) -- the retirement PR does not re-compose.** `compose-check` refuses drift on
   it as on a Renovate bump; the body says so and says Renovate may open the same one-line edit,
   this being the PR that carries the price and the ledger key.
@@ -275,10 +310,50 @@ compose with zero refusals.
 - The composer's own "no wall clock" prose said no converter takes `--as-of`; the eol converter
   now does, with a date the caller hands in.
 
+### Review round 2 (2026-09-08): F1 and F2 blocking, F3-F11 -- what changed and what is recorded
+
+- **F1 changed (red first).** Round-1 `newest_published_major` on a fixture publisher carrying a
+  signed `fixture-feed/v3.0.0` tag and no `v3/` directory: `(None, {'state': 'unobserved',
+  'detail': 'tag fixture-feed/v3.0.0 signs fixture-feed v3 ahead of the pinned v1, but this
+  checkout carries no fixture-feed/v3/feed.json to read it from'})` -- line absent, being behind
+  free. Round 2: `({'version': 'v2', 'tag': 'fixture-feed/v2.0.0', 'tagged': '2026-09-01',
+  'since_tag': 'fixture-feed/v2.0.0', 'since': '2026-09-01', ...}, {'state': 'behind', 'detail':
+  '... behind since 2026-09-01, the day fixture-feed/v2.0.0 was cut; fixture-feed/v3.0.0 signed
+  ahead of it but unreadable here (this checkout carries no directory for it)'})`. Selfcheck
+  legs: v3 signed + unreadable -> prices against v2; v3 readable -> target v3, since still v2's
+  day; pin at v2 -> since v3's day; nothing readable -> `unobserved` naming every signed tag.
+- **F2 changed.** (i) `propose-tier.yml` on driftwood, tuppence and ludlow passes `--as-of
+  "$as_of"` to `composition.py compose` wherever the pinned composer takes the flag (a `run:`
+  body edit; `actionlint` clean; at v2.0.1 it prints a note and re-composes at the newest
+  signed input rather than stopping the clock). (ii) D3, D8 and Done rewritten above. (iii) a
+  since behind the as-of prints `zero (as_of <date> precedes the tag day <date>)` on the entry's
+  `limits` and on the hub PASS line, never a bare 0.00. Red first: tuppence at origin/main
+  composed with the round-1 composer: `supersede amount 0.0 as_of 2026-08-28 since 2026-09-01
+  ramp 1.0`, no note; the round-1 workflows passed `--as-of` to `tier_pr.py` only.
+- **F3 changed** (D2): since = the OLDEST signed major ahead; the target = the newest readable.
+- **F4 changed** (hub): `tag_object()` reads the fetched tag's type and signature block; an
+  unsigned tag ahead is named on the label and never counted, and unsigned-only ahead is a
+  could-not-look by name; the composer always names not-counted tags on `superseded.detail`
+  (behind and current alike). Plants: lightweight, annotated-without-block, annotated-with-block.
+- **F5 changed**: the note reads `largest mode-product entry, mode lef x mode lm -- an ordinal
+  proxy, not fair.py's PERT expectation; ticket 75 Q4`.
+- **F6 recorded** (Waits 5): HOLD tuppence 27 and ludlow 24; the FAIL quoted.
+- **F7 changed**: an untagged pin with nothing signed ahead reads `superseded.state:
+  unpublished`, not `current`.
+- **F8 changed**: `_composition_as_of_source()` names where the date came from (the caller's
+  `--as-of` / an edge's since / an envelope's published_at); both refusals and the `--as-of`
+  help say "this composition's as-of (<date>, <source>)".
+- **F9 recorded** (D7): `since` stays on a retirement, as on a Renovate bump.
+- **F10 changed** (D7): bare-major guard on `from`/`to`, forged target refused, selfcheck case.
+- **F11 recorded and half-changed** (D3): a future since is named as accepted for the signed
+  artefact; a caller's `--as-of` earlier than a signed since refuses by the day.
+
 **Map line:** Ticket 84: cve and eol price (headline entry, the eol as of the composition's own
 date); a feed pin behind a newer major its publisher has signed carries a `supersede` line, base x
-(eol_ramp from the tag's cut day, minus one), never summed into the exposure; every feed line
-carries ticket 69's hole; the proposer opens a forward-only retirement PR on party.yaml keyed
+(eol_ramp from the day the oldest signed major ahead was cut, minus one), targeting the newest
+readable one, frozen at the signed artefact's newest input date and grown only by the clock's
+`--as-of` re-composition, never summed into the exposure; every feed line carries ticket 69's
+hole; the proposer opens a forward-only retirement PR on party.yaml keyed
 `<org>/retirement/<slug>`; `verify-coexistence.sh` reads three declared lines and could-not-looks
 naming two; `verify/supersede/` prints 2 adopters behind, 0 of 2 lines carried, 0/0 retirement
 PRs until platform tags and the pins move.
@@ -296,14 +371,30 @@ PRs until platform tags and the pins move.
 3. **The `policy/v5.0.0` cut** (declared by ticket 63) and **the third declared line** (the next
    bump the release gate computes): `verify-coexistence.sh` reads could-not-look naming three
    until the array declares three, and its live tail needs two cut.
-4. **Done's second half: one retirement PR opened by the clock and merged by a human.** Nothing
-   here fakes it. The clock (`propose-tier.yml`, re-composing at today's date) opens it the first
-   run after (1) lands and a served `supersede` line exists; the merge is a human's. The hub
-   check counts both off GitHub: 0/0 today.
-5. **The adopter pull requests** (tuppence, ludlow) are red on `compose-check` until (1) and (2):
-   at platform v2.0.1 the composer refuses `cve`/`eol` as "no converter", and `composed/` was
-   not regenerated from an untagged branch. Merge them after (1) with a re-composition, or
-   hold them; either is the owner's call.
+4. **Done's second half, restated (review F2): a NON-ZERO supersede line on a citable run
+   comes from the clock, not the signed artefact.** After (1), the served
+   `composed/evidence.json` carries the line at 0.00 with `zero (as_of 2026-08-28 precedes the
+   tag day 2026-09-01)` on it -- frozen at the newest signed input -- and `verify-supersede.sh`
+   reads PASS saying exactly that. The non-zero figure is the scheduled proposer's
+   re-composition `--as-of` today (now wired on all three adopters), which commits nothing
+   (ADR-0024) and opens the retirement PR with that day's price in its body; the merge is a
+   human's. The hub check counts both off GitHub: 0/0 today. So "on the next citable run" is
+   true of the LINE (zero, dated) and of the RETIREMENT PR's body (non-zero), not of a signed
+   non-zero amount, unless a pinned feed publishes an envelope dated after the tag.
+5. **HOLD tuppence 27 and ludlow 24 until (1) and (2) -- do not merge them first (review F6).**
+   Merged alone they turn the hub gate RED, not could-not-look: on an estate with the two at
+   their PR heads, `verify/feed-contract/verify-untagged-pin-is-priced.sh` prints `FAIL:
+   tuppence pins feeds/feed/cve@v2: untagged (no tag of the form cve/v* or v* signs @v2 on
+   feeds's real remote) and no priced entry in prices[] carries the pin` and the same for
+   ludlow's eol, `FAIL: 2 untagged-pin check(s) observed false`, because the served evidence
+   was composed under v2.0.1 and carries no hole for a pin it refused. Each merges together with
+   its platform pin bump and a re-composition after the platform tag (then the hole is priced
+   and the check PASSes), or after the feeds tags (then the pin is signed). Their
+   `compose-check` is red for the same reason: v2.0.1 refuses `cve`/`eol` as "no converter".
+6. **driftwood 31 (new, review F2(i))** carries only the guarded `--as-of` in
+   `propose-tier.yml`'s recompose step; it is safe to merge at v2.0.1 (the guard passes the
+   flag only where the pinned composer takes it) and is what makes the clock's line grow after
+   (1).
 
 ## Not done
 
