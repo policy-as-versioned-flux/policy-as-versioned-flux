@@ -48,13 +48,14 @@ import sys
 import tempfile
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, NamedTuple
 
 import yaml
 
 from . import PACKAGE_DIR
 from . import ethics_gate
 from .sign import PERSONAL_FIELDS
+from .strict_yaml import StrictLoader, duplicate_key
 
 RULE_PATH = PACKAGE_DIR / "sensor-admission.yaml"
 SCHEMA = "twin.sensor-admission/v1"
@@ -89,10 +90,14 @@ _KEY_SETS = (
     "ladder_alternative", "ladder_proportionality", "ladder_dpia", "dpia_record", "people_file",
 )
 
+_TYPE_KINDS = ("bool", "number")
+
 REFUSAL_IDS = (
     "names-or-identifies-an-individual",
     "key-not-declared",
     "value-not-the-declared-shape",
+    "duplicate-key",
+    "required-key-missing",
     "not-this-scenario-class",
     "scenario-not-served",
     "field-not-admissible",
@@ -121,7 +126,8 @@ def load_rule(path: Path | None = None) -> dict[str, Any]:
         raise SensorAdmissionError(f"{source}: not a {SCHEMA} document")
     for field in ("scenario_class", "admissible", "admissible_fields", "refusals", "requires",
                   "closed_keys", "free_prose_fields", "nested_maps", "nested_lists",
-                  "scalar_lists", "typed_keys", "terminal_batch_clause"):
+                  "scalar_lists", "typed_keys", "terminal_batch_clause", "required_keys",
+                  "fixed_values", "dpia_must_agree"):
         if not doc.get(field):
             raise SensorAdmissionError(f"{source}: declares no {field}")
     for name in _KEY_SETS:
@@ -131,10 +137,37 @@ def load_rule(path: Path | None = None) -> dict[str, Any]:
     # the node it names, which is the G1 hole again by another route.
     for parent, children in {**doc["nested_maps"], **doc["nested_lists"]}.items():
         for key, child in (children or {}).items():
-            if child not in doc["closed_keys"]:
+            # Re-check R5: membership is not usability. `child not in closed_keys` passed a set
+            # DECLARED AS NULL, which then raised an uncaught TypeError at grade time.
+            if not doc["closed_keys"].get(child):
                 raise SensorAdmissionError(
                     f"{source}: {parent}.{key} points at the key set {child!r}, which "
-                    "closed_keys does not declare")
+                    "closed_keys does not declare, or declares empty")
+    # Re-check R2: the declarations added by the G1 fix were validated by nothing. `bool`
+    # mistyped as `boolean` loaded clean and made the type check a silent no-op, because the
+    # recursion computes `wrong` as a disjunction over the names it knows.
+    for table, what in (("typed_keys", "type"), ("scalar_lists", "scalar list"),
+                        ("required_keys", "required key"), ("fixed_values", "fixed value")):
+        for set_name, entry in (doc.get(table) or {}).items():
+            declared = doc["closed_keys"].get(set_name)
+            if not declared:
+                raise SensorAdmissionError(
+                    f"{source}: {table} names the key set {set_name!r}, which closed_keys does "
+                    "not declare, or declares empty")
+            keys = entry if isinstance(entry, (list, tuple)) else list(entry or {})
+            for key in keys:
+                if str(key) not in {str(k) for k in declared}:
+                    raise SensorAdmissionError(
+                        f"{source}: {table}.{set_name} names the {what} {key!r}, which the "
+                        f"{set_name} key set does not declare")
+            if table == "typed_keys":
+                for key, kind in (entry or {}).items():
+                    if str(kind) not in _TYPE_KINDS:
+                        raise SensorAdmissionError(
+                            f"{source}: typed_keys.{set_name}.{key} declares the type "
+                            f"{kind!r}, which this module does not know (have: "
+                            f"{', '.join(_TYPE_KINDS)}) — an unknown name makes the check a "
+                            "silent no-op")
     declared = {str(r.get("id")) for r in doc["refusals"] if isinstance(r, dict)}
     missing = [r for r in REFUSAL_IDS if r not in declared]
     if missing:
@@ -243,6 +276,44 @@ def individual_problems(document: Any, *, scan_names: bool = True) -> list[str]:
 
 # -- the closed key sets (review F1) --------------------------------------------------------------
 
+class Unreadable(NamedTuple):
+    """Served bytes this check will not read, and why. Never a silent None: a document the
+    parser could not be trusted with is a FAIL row for that file, not an absence."""
+
+    path: str
+    why: str
+
+
+def load_served(path: str, text: str) -> Any:
+    """Parse bytes an adopter SERVES, refusing a duplicate mapping key.
+
+    Re-check R1. `yaml.safe_load` silently discards a repeated key, last one wins, so the closed
+    key sets closed the PARSED document and not the served bytes the whole design rests on. A
+    served record reading
+
+        senses_role: <a person's name> <an email address>
+        senses_role: platform-engineer
+
+    was ADMITTED with a green PASS: the parser threw the first line away before
+    `identifier_in_value` — whose whole job is that email shape — ever saw it. `StrictLoader`
+    (`twin/strict_yaml.py`, lifted from ticket 93's clock rather than forked) refuses it.
+
+    Re-check R4: the exception is caught BROADLY, not as `yaml.YAMLError` alone. A `fields:`
+    nested 500 deep blows the parser's stack, and `RecursionError` is not a YAMLError, so it
+    propagated out of the reader and aborted the grading of every other adopter.
+    """
+    try:
+        return yaml.load(text, Loader=StrictLoader)
+    except Exception as exc:  # noqa: BLE001 -- see R4 above; a reader must not abort the run
+        key = duplicate_key(exc)
+        if key is not None:
+            return Unreadable(path, f"duplicate key {key} in the served bytes: PyYAML keeps the "
+                                    "last, so the document a reader sees is not the document a "
+                                    "parser builds")
+        return Unreadable(path, f"the served bytes are not YAML this check will read "
+                                f"({exc.__class__.__name__})")
+
+
 _SCALAR = (str, int, float, bool, type(None))
 _TYPE_NAMES = {"bool": "a boolean", "number": "a number"}
 
@@ -279,7 +350,15 @@ def closed_document_problems(node: Any, rule: dict[str, Any], set_name: str = "r
     lists_ = rule["nested_lists"].get(set_name) or {}
     scalar_lists = set(rule["scalar_lists"].get(set_name) or [])
     typed = rule["typed_keys"].get(set_name) or {}
+    fixed = (rule.get("fixed_values") or {}).get(set_name) or {}
     listed = ", ".join(sorted(allowed))
+    # Re-check R3: the closure graded the shape of keys that were PRESENT and never that a
+    # required one was there, and `ethics_gate` indexes these slots with `[]`.
+    for required in (rule.get("required_keys") or {}).get(set_name) or []:
+        if str(required) not in {str(k) for k in node}:
+            out.append(("required-key-missing",
+                        f"{(where + '.') if where else ''}{required} is not there, and the "
+                        f"{set_name} set declares it required"))
     for key, value in node.items():
         name = str(key)
         path = f"{where}.{name}" if where else name
@@ -314,6 +393,11 @@ def closed_document_problems(node: Any, rule: dict[str, Any], set_name: str = "r
             out.append(("key-not-declared",
                         f"the key {path!r} holds a {type(value).__name__}, and the table declares "
                         "no key set for it"))
+        elif name in fixed:
+            if value != fixed[name]:
+                out.append(("value-not-the-declared-shape",
+                            f"the key {path!r} holds {value!r}, and the table fixes it at "
+                            f"{fixed[name]!r}"))
         elif name in typed:
             want = str(typed[name])
             wrong = (want == "bool" and not isinstance(value, bool)) or (
@@ -341,9 +425,8 @@ def people_file_problems(filename: str, doc: Any, rule: dict[str, Any]) -> list[
     """
     if not isinstance(doc, dict):
         return [f"{filename}: is not a mapping, so it is not a role file"]
-    problems = [f"{filename}: carries the undeclared key {what}" if rid == "key-not-declared"
-                else f"{filename}: {what}"
-                for rid, what in closed_document_problems(doc, rule, "people_file", "")]
+    problems = [f"{filename}: {what}"
+                for _rid, what in closed_document_problems(doc, rule, "people_file", "")]
     stem = filename.rsplit("/", 1)[-1].rsplit(".", 1)[0]
     token = identifier_in_name(stem)
     if token is not None:
@@ -373,10 +456,9 @@ def _missing_dpia(text: str | None, path: str, sensor: str,
         return ["the record names no DPIA path at all"], {}
     if text is None:
         return [f"no DPIA record at {path}"], {}
-    try:
-        doc = yaml.safe_load(text)
-    except yaml.YAMLError as exc:
-        return [f"the DPIA record at {path} does not parse ({exc.__class__.__name__})"], {}
+    doc = load_served(path, text)
+    if isinstance(doc, Unreadable):
+        return [f"the DPIA record at {path}: {doc.why}"], {}
     if not isinstance(doc, dict):
         return [f"the DPIA record at {path} is not a mapping"], {}
     problems: list[str] = []
@@ -447,13 +529,13 @@ def grade_record(
     dpia_text = dpia_reader(dpia_path) if (dpia_reader and dpia_path) else None
     dpia_doc: dict[str, Any] = {}
     if dpia_text is not None:
-        try:
-            loaded = yaml.safe_load(dpia_text)
-        except yaml.YAMLError:
-            loaded = None
-        if isinstance(loaded, dict):
+        loaded = load_served(dpia_path, dpia_text)
+        if isinstance(loaded, Unreadable):
+            shape.append(("duplicate-key" if "duplicate key" in loaded.why else "no-dpia-record",
+                          f"the DPIA record at {dpia_path}: {loaded.why}"))
+        elif isinstance(loaded, dict):
             dpia_doc = loaded
-            shape += [(rid, f"the DPIA record's key {what}")
+            shape += [(rid, f"in the DPIA record, {what}")
                       for rid, what in closed_document_problems(dpia_doc, rule, "dpia_record")]
 
     problems: list[tuple[str, str]] = (
@@ -563,6 +645,30 @@ def grade_record(
                 f"the notice dates published_on {when!r}, not YYYY-MM-DD, so nothing says when "
                 "anybody was told"))
 
+    # Re-check R7/R9: two more slots a plain-words name survived in, each closed by deriving
+    # rather than by scanning. A DPIA that names another sensor or another scenario is a DPIA
+    # about something else.
+    for field in rule["dpia_must_agree"]:
+        if not dpia_doc:
+            break
+        mine = {"sensor": sensor, "scenario": str(safe.get("scenario", "")).strip()}[field]
+        theirs = str(dpia_doc.get(field, "")).strip()
+        if theirs != mine:
+            refusals.append(out(
+                "value-not-the-declared-shape",
+                f"the DPIA record at {dpia_path} is filed for {field} {theirs!r} and this record "
+                f"names {mine!r}, so it is a DPIA about something else"))
+    # The one admissible sensor for this class reads a commit graph, so it declares NO
+    # monitoring channel; a channel is free prose the ICO triage would then act on.
+    channels = (ladder_doc.get("dpia") or {}).get("channels") if isinstance(
+        ladder_doc.get("dpia"), dict) else None
+    for channel in channels or []:
+        if str(channel) not in [str(c) for c in rule["admissible_channels"]]:
+            refusals.append(out(
+                "value-not-the-declared-shape",
+                f"its ladder declares the monitoring channel {str(channel)!r}, and this class "
+                f"declares {rule['admissible_channels'] or 'none'}"))
+
     # (b) the DPIA record.
     dpia_problems, _ = _missing_dpia(dpia_text, dpia_path, sensor, rule)
     for problem in dpia_problems:
@@ -599,6 +705,36 @@ def grade_record(
     }
 
 
+def limits(rule: dict[str, Any] | None = None) -> list[str]:
+    """What this check refuses and what it does NOT, derived from the table rather than typed.
+
+    Re-check R7: the printed block was stale in BOTH directions. It never mentioned
+    `value-not-the-declared-shape` or a mapping under a declared key, both new and terminal, and
+    its list of places a plain-words name survives was incomplete — the re-check planted one into
+    `record.schema`, the DPIA's `sensor:` and `scenario:` and `ladder.dpia.channels[]` and
+    watched each graded green. Four of those five are now CLOSED by deriving the value instead of
+    scanning it, so this block is generated from the same table that closes them and cannot drift
+    from it again.
+    """
+    rule = rule or load_rule()
+    refuses = ", ".join(str(r["id"]) for r in rule["refusals"])
+    survives = [f"a DPIA's {f}" for f in rule["free_prose_fields"]]
+    survives += ["a notice's published_at path", "a role id or a role file's own role: prose"]
+    return [
+        "this run grades the RULE and any admission record an adopter serves. Nothing here "
+        "observes a sensor running or a person; no sensing substrate exists in this estate.",
+        f"the refusals it can reach are: {refuses}.",
+        "served bytes are parsed with a loader that refuses a DUPLICATE mapping key, so the "
+        "document this check grades is the document a reader sees, not the one PyYAML builds "
+        "by keeping the last of two identical keys.",
+        "no rule here reads English. A personal name written in plain words survives in "
+        + "; ".join(survives) + ", and is refused by nothing. What IS refused is a key the "
+        "table does not declare, a mapping or list under a declared key, a slot whose type or "
+        "fixed value the table declares, a required key that is absent, an identifier-SHAPED "
+        "filename, id, key or value, an email address and a UK national insurance number.",
+    ]
+
+
 # -- the served artefact --------------------------------------------------------------------------
 
 def served(unit: Path, path: str) -> str | None:
@@ -631,10 +767,7 @@ def adopters(estate: Path) -> list[str]:
         text = served(unit, "party.yaml")
         if not text:
             continue
-        try:
-            doc = yaml.safe_load(text) or {}
-        except yaml.YAMLError:
-            continue
+        doc = load_served(f"{unit.name}/party.yaml", text)
         if isinstance(doc, dict) and "adopter" in (doc.get("roles") or []):
             found.append(unit.name)
     return found
@@ -656,10 +789,7 @@ def people_files(estate: Path, org: str) -> dict[str, Any]:
         text = served(unit, path)
         if text is None:
             continue
-        try:
-            files[path] = yaml.safe_load(text)
-        except yaml.YAMLError:
-            files[path] = None
+        files[path] = load_served(path, text)
     return files
 
 
@@ -672,9 +802,12 @@ def people_register(estate: Path, org: str) -> dict[str, dict[str, Any]]:
     return register
 
 
-def key_person_scenarios(estate: Path, org: str) -> dict[str, dict[str, Any]]:
+def key_person_scenarios(estate: Path, org: str,
+                         unreadable: dict[str, Unreadable] | None = None
+                         ) -> dict[str, dict[str, Any]]:
     prefix = SCENARIOS_DIR.format(org=org) + "/"
     unit = estate / org
+    unreadable = {} if unreadable is None else unreadable
     out: dict[str, dict[str, Any]] = {}
     for path in served_paths(unit):
         if not path.startswith(prefix) or not path.endswith(".yaml"):
@@ -682,31 +815,29 @@ def key_person_scenarios(estate: Path, org: str) -> dict[str, dict[str, Any]]:
         text = served(unit, path)
         if text is None:
             continue
-        try:
-            doc = yaml.safe_load(text) or {}
-        except yaml.YAMLError:
+        doc = load_served(path, text)
+        if isinstance(doc, Unreadable):
+            unreadable[path] = doc
             continue
         if isinstance(doc, dict) and doc.get("class") == SCENARIO_CLASS:
             out[path] = doc
     return out
 
 
-def admission_records(estate: Path, org: str) -> dict[str, dict[str, Any] | None]:
+def admission_records(estate: Path, org: str) -> dict[str, Any]:
     prefix = ADMISSIONS_DIR.format(org=org) + "/"
     unit = estate / org
-    out: dict[str, dict[str, Any] | None] = {}
+    out: dict[str, Any] = {}
     for path in served_paths(unit):
         if not path.startswith(prefix) or not path.endswith(".yaml"):
             continue
         text = served(unit, path)
         if text is None:
-            out[path] = None
+            out[path] = Unreadable(path, "origin/main serves no bytes at this path")
             continue
-        try:
-            doc = yaml.safe_load(text)
-        except yaml.YAMLError:
-            doc = None
-        out[path] = doc if isinstance(doc, dict) else None
+        doc = load_served(path, text)
+        out[path] = doc if isinstance(doc, (dict, Unreadable)) else Unreadable(
+            path, f"the served bytes are a {type(doc).__name__}, not an admission record")
     return out
 
 
@@ -727,6 +858,8 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
     Leg 3 is the one ticket 31 exists for and it is the one that cannot look today: nothing is
     admitted, because nobody has declared a sensor. That is printed as a COUNT, never as a pass.
     """
+    for line in limits():
+        out(f"  LIMIT: {line}")
     if not estate.is_dir():
         out(f"SKIP: no estate clone at {estate}")
         return 3
@@ -755,6 +888,10 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
         # leg 2: the register itself. Widened after review F2: the file's NAME, its `id`, its
         # keys (closed set) and its values, not the keys and values alone.
         for path, doc in sorted(files.items()):
+            if isinstance(doc, Unreadable):
+                out(f"FAIL {org}: {path}: {doc.why}")
+                fail += 1
+                continue
             for problem in people_file_problems(path, doc, rule):
                 out(f"FAIL {org}: {problem}")
                 fail += 1
@@ -770,7 +907,11 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
         # that a departure is sensed as a role and never as a person. If it could vanish and
         # leave this script printing "0 carry a bus-factor-key-person scenario" as a
         # could-not-look, the count would move and nothing would go red.
-        found = key_person_scenarios(estate, org)
+        unreadable_scenarios: dict[str, Unreadable] = {}
+        found = key_person_scenarios(estate, org, unreadable_scenarios)
+        for path, why in sorted(unreadable_scenarios.items()):
+            out(f"FAIL {org}: {path}: {why.why}")
+            fail += 1
         scenarios_seen += len(found)
         if not found:
             out(f"FAIL {org}: serves no {SCENARIO_CLASS} scenario under "
@@ -800,14 +941,27 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
 
         for path, maybe in sorted(records.items()):
             records_seen += 1
-            if maybe is None:
-                out(f"FAIL {org}: {path} is not a readable admission record")
+            if isinstance(maybe, Unreadable):
+                out(f"FAIL {org}: {path}: {maybe.why}")
+                refused_count += 1
                 fail += 1
                 continue
-            result = grade_record(
-                maybe, people=register.keys(),
-                scenarios=[str(s.get("id", "")) for s in found.values() if isinstance(s, dict)],
-                rule=rule, dpia_reader=read_dpia)
+            # Re-check R4: one adopter's malformed record used to abort the grading of the whole
+            # estate. The refusals above make each measured crash a refusal instead, and this
+            # belt holds for anything neither the closure nor the loader anticipated: a bad file
+            # is a FAIL row for that file and the other adopters are still graded.
+            try:
+                result = grade_record(
+                    maybe, people=register.keys(),
+                    scenarios=[str(s.get("id", "")) for s in found.values()
+                               if isinstance(s, dict)],
+                    rule=rule, dpia_reader=read_dpia)
+            except Exception as exc:  # noqa: BLE001 -- see R4 above
+                out(f"FAIL {org}: {path}: grading it raised {exc.__class__.__name__}: {exc}. "
+                    "That is a defect in this check, not a pass for the record")
+                refused_count += 1
+                fail += 1
+                continue
             if result["admitted"]:
                 admitted_count += 1
                 out(f"PASS {org}: {path}: {result['sensor']} admitted -- "
@@ -887,7 +1041,8 @@ def _git(repo: Path, *args: str, hooks: Path) -> None:
 
 
 def _plant(root: Path, hooks: Path, record: str | None, scenario: bool = True,
-           extra_role_file: tuple[str, str] | None = None) -> Path:
+           extra_role_file: tuple[str, str] | None = None,
+           extra_record: tuple[str, str] | None = None) -> Path:
     """A one-unit estate whose SERVED ref is a real `refs/remotes/origin/main`."""
     estate = root / "estate"
     unit = estate / "planted"
@@ -912,6 +1067,9 @@ def _plant(root: Path, hooks: Path, record: str | None, scenario: bool = True,
     if record is not None:
         admissions.mkdir(parents=True, exist_ok=True)
         (admissions / "bus-factor-structural-aggregate.yaml").write_text(record, encoding="utf-8")
+    if extra_record is not None:
+        admissions.mkdir(parents=True, exist_ok=True)
+        (admissions / extra_record[0]).write_text(extra_record[1], encoding="utf-8")
     _git(unit, "init", "-q", "-b", "main", hooks=hooks)
     _git(unit, "config", "user.email", "selfcheck@example.invalid", hooks=hooks)
     _git(unit, "config", "user.name", "selfcheck", hooks=hooks)
@@ -1015,6 +1173,20 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
            variant(scenario_class="support-ticket-volume"), "not-this-scenario-class")
     expect("a scenario this adopter does not serve is refused",
            variant(scenario="not-a-served-scenario"), "scenario-not-served")
+    expect("a record of the wrong schema is refused",
+           variant(schema="something else"), "value-not-the-declared-shape")
+    missing = copy.deepcopy(good["ladder"])
+    missing["necessity"].pop("kind")
+    expect("a ladder rung with no kind is refused rather than indexed",
+           variant(ladder=missing), "required-key-missing")
+    channels = copy.deepcopy(good["ladder"])
+    channels["dpia"]["channels"] = ["a channel this class never reads"]
+    expect("a ladder declaring a monitoring channel is refused",
+           variant(ladder=channels), "value-not-the-declared-shape")
+    expect("a DPIA filed for another sensor is refused", variant(),
+           "value-not-the-declared-shape",
+           dpia=_GOOD_DPIA.replace("sensor: bus-factor-structural-aggregate",
+                                   "sensor: payroll-record"))
     expect("the one admissible sensor is admitted", variant(), None)
 
     # and the served read itself, on a real git repository.
@@ -1087,6 +1259,53 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
                 f"grade FAIL, got exit {rc}: {lines[-1] if lines else 'nothing'}")
             failures += 1
 
+        # Re-check R1, end to end at a real served ref, with the re-check's own plant: a
+        # DUPLICATED key carrying an email shape past a closure that reads the parsed document.
+        lines = []
+        estate = _plant(root / "dupkey", hooks, _GOOD_RECORD.replace(
+            "senses_role: platform-engineer\n",
+            "senses_role: someone@example.invalid\nsenses_role: platform-engineer\n"))
+        rc = grade_estate(estate, out=lines.append)
+        if rc == 1 and any("duplicate key" in ln and "senses_role" in ln for ln in lines):
+            out(f"PASS: selfcheck: a served record with a duplicated key grades FAIL and names "
+                f"the key the parser would have discarded ({lines[-1][:120]})")
+        else:
+            out(f"FAIL: selfcheck: a served record with a duplicated key should grade FAIL, got "
+                f"exit {rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
+        # Re-check R3 and R4: four served records used to raise an uncaught KeyError, and a
+        # deeply nested one a RecursionError, each aborting the grading of every other adopter.
+        # Here the malformed record sits BESIDE a good one: the bad file must be its own FAIL row
+        # and the good one must still be graded.
+        lines = []
+        estate = _plant(root / "malformed", hooks, _GOOD_RECORD, extra_record=(
+            "payroll-record.yaml", "fields: " + "[" * 400 + "]" * 400 + "\n"))
+        rc = grade_estate(estate, out=lines.append)
+        good_still_graded = any("admitted" in ln and "PASS" in ln for ln in lines)
+        bad_named = any("payroll-record.yaml" in ln and "FAIL" in ln for ln in lines)
+        if rc == 1 and good_still_graded and bad_named:
+            out("PASS: selfcheck: one adopter's unreadable record is its own FAIL row and the "
+                "record beside it is still graded")
+        else:
+            out(f"FAIL: selfcheck: an unreadable record must not abort the run; got exit {rc}, "
+                f"good-graded={good_still_graded}, bad-named={bad_named}")
+            failures += 1
+
+        lines = []
+        broken = _GOOD_RECORD.replace(
+            "    alternatives: [{kind: behavioural, level: individual}]",
+            "    alternatives: [{kind: behavioural}]")
+        estate = _plant(root / "missingkey", hooks, broken)
+        rc = grade_estate(estate, out=lines.append)
+        if rc == 1 and any("required-key-missing" in ln and "level" in ln for ln in lines):
+            out("PASS: selfcheck: a ladder alternative with no `level` is refused by name rather "
+                "than indexed with [] downstream")
+        else:
+            out(f"FAIL: selfcheck: a ladder alternative with no `level` should be refused by "
+                f"name, got exit {rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
         # Review F2, end to end: a role file carrying an undeclared key, and one named after
         # something that is not a role.
         lines = []
@@ -1128,7 +1347,7 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
     if failures:
         out(f"FAIL: selfcheck: {failures} planted case(s) did not grade as planted")
         return 1
-    out(f"PASS: selfcheck: {planted} planted records and eight planted served estates "
+    out(f"PASS: selfcheck: {planted} planted records and eleven planted served estates "
         "grade as planted")
     return 0
 

@@ -122,6 +122,29 @@ typed_keys:
   ladder_dpia: {profiling: bool, financial_loss_risk: bool, complete: bool}
   ladder_proportionality: {intrusion_cost: number, value_illuminated: number}
 
+# The keys that must be PRESENT, not merely well shaped when present (re-check R3). The closure
+# checked the shape of keys it found and never that a required one was there, and
+# `ethics_gate._check_necessity` and `_check_proportionality` index these four slots with `[]`:
+# four served records each produced an uncaught KeyError that aborted the grading of the whole
+# estate. Only the slots something downstream INDEXES are listed. A key read with `.get()` is not
+# required here, because refusing it would change a refusal that already has better words for it
+# (a notice with no `told` is covert sensing; a record naming no DPIA path has its own line).
+required_keys:
+  ladder_necessity: [kind, level]
+  ladder_alternative: [kind, level]
+  ladder_proportionality: [intrusion_cost, value_illuminated]
+
+# Slots whose VALUE is fixed by this table rather than typed (re-check R7/R9). Each is a place
+# the re-check planted a real name into and watched it graded green, and each is derivable, so
+# closing it costs nothing but the line: the record's schema is a constant this module already
+# defines and never used; the DPIA must be about the sensor and the scenario it is filed
+# against, or it is a DPIA about something else; and the one admissible sensor for this class
+# reads a commit graph, so it declares NO monitoring channel at all.
+fixed_values:
+  record: {schema: twin.sensor-admission-record/v1}
+dpia_must_agree: [sensor, scenario]
+admissible_channels: []
+
 # The three keys of `dpia_record` above that are free prose, and the one PLACE a person could
 # still arrive under a declared key. Printed as a limit on every run rather than left implied:
 # no rule here reads English, so a personal name written into a DPIA's narrative is not
@@ -177,9 +200,21 @@ refusals:
   - id: value-not-the-declared-shape
     terminal: true
     sentence: >-
-      REFUSED value-not-the-declared-shape: {sensor}: {what}. A slot the table types is checked
-      for its type, because a value of the wrong shape is read by something downstream that was
-      never told, and prose in a slot nobody reads as prose is where a person arrives.
+      REFUSED value-not-the-declared-shape: {sensor}: {what}. A slot the table types or fixes is
+      checked against what it declares, because a value of the wrong shape is read by something
+      downstream that was never told, and a slot nobody reads as prose is where a person
+      arrives.
+  - id: duplicate-key
+    terminal: true
+    sentence: >-
+      REFUSED duplicate-key: {sensor}: {what}. PyYAML keeps the LAST of two identical keys, so a
+      closure over the parsed document would never see the discarded line -- and that discarded
+      line is where a name and an email reached a green PASS before this refusal existed.
+  - id: required-key-missing
+    terminal: true
+    sentence: >-
+      REFUSED required-key-missing: {sensor}: {what}. The slot is indexed downstream rather than
+      read with a default, so a record without it is not a record.
   - id: not-this-scenario-class
     terminal: false
     sentence: >-

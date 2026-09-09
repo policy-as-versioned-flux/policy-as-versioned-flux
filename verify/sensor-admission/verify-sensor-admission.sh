@@ -65,13 +65,9 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 
 # Printed on every run, not only in this header: what this check does NOT observe. Ticket 31
 # built a rule and a grader, and no sensing substrate exists anywhere in this estate.
-echo "  LIMIT: this run grades the RULE and any admission record an adopter serves. Nothing here"
-echo "  LIMIT: observes a sensor running or a person; no sensing substrate exists in this estate."
-echo "  LIMIT: no rule here reads English. A personal name written in plain words -- into a DPIA's"
-echo "  LIMIT: lawful_basis, what_is_sensed or what_is_not_sensed, into a notice path, or as a"
-echo "  LIMIT: role id -- matches no token and no value shape, and is refused by nothing. What is"
-echo "  LIMIT: refused is a key the table does not declare, an identifier-SHAPED filename, id, key"
-echo "  LIMIT: or value, an email address and a UK national insurance number (review F1/F2)."
+# The LIMIT lines are printed by twin/sensor_admission.py itself, derived from the rule table
+# (re-check R7): a block typed here went stale in both directions the moment the table gained
+# two refusal classes and closed four of the five slots it named.
 
 log="$(mktemp)"; (cd "$ROOT" && "$PY" -m twin.sensor_admission "$ESTATE") | tee "$log"; rc=${PIPESTATUS[0]}
 last="$(tail -1 "$log")"

@@ -477,6 +477,142 @@ number, because neither branch run wrote a line to `talk/truth.log`; `verify/cit
 refused an earlier draft of this paragraph for pairing a run number with a figure the log does
 not record, which is the correct refusal.
 
+## Re-check round 3 — 2026-09-09, request-changes on R1 and R2
+
+### R1 (high) — the closure closed the PARSED document, not the SERVED BYTES
+
+`yaml.safe_load` silently discards a repeated mapping key, last one wins. So a served record
+reading
+
+```
+senses_role: <a person's name> <an email address>
+senses_role: platform-engineer
+```
+
+was **admitted with a green PASS**: the parser threw the first line away before
+`identifier_in_value` — whose whole job is that email shape — ever saw it. Pre-existing rather
+than a regression, but it is the G1 class exactly and it defeats the commit sentence "the
+document is closed".
+
+**Fixed with the loader that already exists, not a new one.** `StrictLoader` was written by
+ticket 93 for the same reason in the clock (a visible `probability: 0.999` above a real
+`probability: 0.27` validated as `0.27`). Ticket 102's rule is no fork, so it is **lifted** to
+`twin/strict_yaml.py` and both modules import it; `twin/derived_forecast.py` keeps the name
+bound, and its 47 tests still pass. `load_served()` is now the only way this check parses
+adopter-served bytes, and it is used at **every** one: `adopters()`, `people_files()`,
+`key_person_scenarios()`, `admission_records()` and both DPIA reads. A duplicate is the new
+terminal refusal `duplicate-key`, which names the key the parser would have discarded.
+
+**Red first:**
+
+| | |
+|---|---|
+| red | `AttributeError: module 'twin.sensor_admission' has no attribute 'load_served'` |
+| green | `duplicate key 'senses_role' in the served bytes: PyYAML keeps the last, so the document a reader sees is not the document a parser builds` |
+
+The loop the re-check asked for is closed by an assertion, not by prose:
+`test_the_bytes_are_what_was_graded_not_the_parsed_dict` asserts that `yaml.safe_load` of the
+same bytes returns a clean dict with `senses_role == 'platform-engineer'` and that
+`individual_problems()` finds nothing in it — **and** that `load_served` refuses those bytes and
+names `senses_role`. A duplicated `notice:` block is planted the same way, and the whole thing
+again **end to end at a real served ref** in the selfcheck.
+
+### R2 (medium, and new in the previous commit, which is why it blocked)
+
+`load_rule()` validated nothing about `typed_keys`. `bool` mistyped as `boolean` **loaded
+clean** and made the type check a silent no-op, because the recursion computes `wrong` as a
+disjunction over the names it knows. The `nested_maps`/`nested_lists` guard written in the same
+commit was not extended to the declaration added beside it.
+
+Now refused at load, for `typed_keys`, `scalar_lists`, `required_keys` and `fixed_values` alike:
+a set name `closed_keys` does not declare, a key that set's closed list does not declare, and —
+for `typed_keys` — a type name outside `("bool", "number")`. Red first, each
+`Failed: DID NOT RAISE <class 'twin.sensor_admission.SensorAdmissionError'>`; green, e.g.
+`typed_keys.ladder_purpose.will_act declares the type 'boolean', which this module does not know
+(have: bool, number) — an unknown name makes the check a silent no-op`. A further test asserts
+the plant the mistyped name silenced is still refused with the table as shipped.
+
+### R5 (low) — membership is not usability
+
+`child not in closed_keys` passed a set **declared as null**, which then raised an uncaught
+`TypeError` at grade time. Every guard now tests `not doc["closed_keys"].get(name)`. Red first
+on both a null `closed_keys` entry and a `nested_maps` child pointing at one.
+
+### R3 and R4 (medium, pre-existing, the G2 class alive by another route)
+
+**R3.** The closure graded the shape of keys that were **present** and never that a **required**
+one was there, and `ethics_gate` indexes those slots with `[]`. `required_keys:` now declares
+them — `ladder_necessity [kind, level]`, `ladder_alternative [kind, level]`,
+`ladder_proportionality [intrusion_cost, value_illuminated]` — and a missing one is the new
+terminal refusal `required-key-missing`. Only slots something downstream **indexes** are listed;
+a key read with `.get()` is not, because refusing it would displace a refusal that already has
+better words (a notice with no `told` is covert sensing). The four measured crashes
+(`KeyError: 'level'`, `'kind'` twice, `'intrusion_cost'`) are red first and now refusals.
+
+**R4.** `RecursionError` is not a `yaml.YAMLError`, so a `fields:` nested 500 deep propagated out
+of the reader. `load_served()` catches **broadly**, and `grade_estate` wraps the per-record grade
+so a bad file is a FAIL row for **that file** while the other adopters are still graded. A
+planted estate carries a malformed record **beside** a good one and asserts both: the bad one is
+named, the good one is still admitted.
+
+### R6 (low) — the doubled wording
+
+Both callers assumed `what` was a bare key path. `people_file_problems()` printed *"carries the
+undeclared key the key 'id' holds a dict…"* and `grade_record()` *"the DPIA record's key the key
+'schema' holds a dict…"*. Fixed, with a test for each.
+
+### R7 and R9 — four of the five surviving slots are CLOSED, and the block is derived
+
+The re-check planted a real name into `record.schema`, the DPIA's `sensor:` and `scenario:`, and
+`ladder.dpia.channels[]`, and watched each graded green. Rather than only documenting them, four
+are now **closed by deriving the value**, under `value-not-the-declared-shape`:
+
+- `record.schema` must equal `RECORD_SCHEMA` — the constant defined at line 61 and used nowhere,
+  which is exactly why that plant landed (**R9** closed by use, not by deletion);
+- the DPIA must name the **same** `sensor` and `scenario` as the record it is filed against, or
+  it is a DPIA about something else;
+- `ladder.dpia.channels[]` must be empty: the one admissible sensor for this class reads a
+  commit graph, not a channel.
+
+The printed LIMIT block is now **generated from the table** by `limits()`, so it cannot go stale
+in either direction again. It names every refusal id the table declares, says the loader refuses
+a duplicate key, and lists what a plain-words name still survives in: a DPIA's `lawful_basis`,
+`what_is_sensed` and `what_is_not_sensed`, a notice's `published_at` path, and a role id or a
+role file's own `role:` prose. Those five are the residual, and the adopter's own register review
+is where they live.
+
+### R8 — the knock-on, measured
+
+The promotion to terminal is not confined to `notice.told`: **every** mapping or list under a
+declared scalar key, every typed- or fixed-slot error, every undeclared key, every missing
+required key and a duplicate key are terminal, and each pre-empts the whole non-terminal battery
+for that record. Measured here, first-hand, on one record carrying five independent problems (a
+prose `notice.told`, an unregistered `senses_role`, `behavioural`/`individual`, a field outside
+the closed set, and no DPIA path):
+
+- at `867075c`: `refusals=5 classes=5 terminal=False admitted=False`
+- now: `refusals=1 classes=1 terminal=True admitted=False`
+
+The verdict is unchanged — refused either way, exit 1 either way — and nothing became less safe.
+What changes is that an adopter is told one thing at a time once a terminal problem is present.
+That is the intended trade and it is recorded here rather than left to be rediscovered.
+
+### The limit that became a line about the loader
+
+Recorded, as the re-check asked: a duplicate key in a served document **used to be** discarded by
+the parser before any rule saw it, and was a limit this check printed nowhere. It is now a
+refusal, so the LIMIT block carries a line about what the loader does instead.
+
+### Battery, re-run after the fixes
+
+- `pytest tests/test_sensor_admission.py -n0 -q` → **102 passed** (21 failed first, including the
+  three `KeyError`s R3 names).
+- `pytest tests/test_derived_forecast.py -n0 -q` → 47 passed, with `StrictLoader` imported from
+  its new home.
+- `verify/sensor-admission/verify-sensor-admission.sh` → exit 3, **32 planted records and eleven
+  planted served estates grade as planted**.
+- `mypy twin tests conftest.py` → Success, 187 source files.
+
 ## Waits on the owner
 
 **Nothing.** Ticket 82's named-individuals ruling (its "Waits on the owner" item 3) is still

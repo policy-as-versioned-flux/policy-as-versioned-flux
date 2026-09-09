@@ -560,6 +560,205 @@ def test_the_terminal_clause_is_printed_once_at_the_end_of_the_batch() -> None:
     assert len(result["refusals"]) >= 3
 
 
+
+# -- R1: the closure closes the SERVED BYTES, not the parsed dict ---------------------------------
+# `yaml.safe_load` silently discards a repeated mapping key, last one wins. The re-check's plant
+# carried a name AND an email past every rule to a green PASS on a real served ref, because the
+# parser threw the first line away before `identifier_in_value` — whose whole job is that email
+# shape — ever saw it. The plant is reproduced here with the identifier shapes and no name.
+
+DUPLICATED_SENSES_ROLE = """schema: twin.sensor-admission-record/v1
+sensor: bus-factor-structural-aggregate
+senses_role: someone@example.invalid
+senses_role: platform-engineer
+"""
+
+
+def test_the_plain_parser_hides_the_duplicate_this_check_must_refuse() -> None:
+    """The premise, asserted rather than assumed: `safe_load` returns a clean document, so a
+    closure over the PARSED dict cannot see the line the served bytes carry."""
+    import yaml
+    parsed = yaml.safe_load(DUPLICATED_SENSES_ROLE)
+    assert parsed["senses_role"] == "platform-engineer"
+    assert sa.individual_problems(parsed) == []
+
+
+def test_a_duplicate_key_in_served_bytes_is_refused() -> None:
+    problems = sa.load_served("twin/orgs/x/sensor-admissions/y.yaml", DUPLICATED_SENSES_ROLE)
+    assert isinstance(problems, sa.Unreadable), (
+        f"served bytes with a duplicated key must be unreadable, got {problems!r}")
+    assert "duplicate key" in problems.why, problems.why
+    assert "senses_role" in problems.why, problems.why
+
+
+def test_the_bytes_are_what_was_graded_not_the_parsed_dict() -> None:
+    """Closing the loop the re-check asked for: the same bytes that `safe_load` reads as clean
+    are refused, and the refusal names the key the parser discarded."""
+    import yaml
+    assert isinstance(yaml.safe_load(DUPLICATED_SENSES_ROLE), dict)
+    result = sa.load_served("p.yaml", DUPLICATED_SENSES_ROLE)
+    assert isinstance(result, sa.Unreadable) and "senses_role" in result.why
+
+
+def test_a_duplicated_notice_block_is_refused() -> None:
+    body = ("schema: twin.sensor-admission-record/v1\n"
+            "notice:\n  holder: someone@example.invalid\n"
+            "notice:\n  told: [platform-engineer]\n")
+    result = sa.load_served("p.yaml", body)
+    assert isinstance(result, sa.Unreadable) and "notice" in result.why
+
+
+def test_a_readable_document_comes_back_as_itself() -> None:
+    assert sa.load_served("p.yaml", "a: 1\n") == {"a": 1}
+
+
+def test_unparseable_served_bytes_are_unreadable_not_a_crash() -> None:
+    assert isinstance(sa.load_served("p.yaml", "a: [1, 2\n"), sa.Unreadable)
+
+
+def test_served_bytes_that_blow_the_parser_stack_are_unreadable_not_a_crash() -> None:
+    """R4: `admission_records()` caught only `yaml.YAMLError`, so a deeply nested document's
+    `RecursionError` propagated out of the reader and aborted the whole estate run."""
+    deep = "fields: " + "[" * 500 + "]" * 500 + "\n"
+    assert isinstance(sa.load_served("p.yaml", deep), sa.Unreadable)
+
+
+# -- R2: the declarations added in the last commit are validated ----------------------------------
+
+def _rule_doc():
+    import yaml
+    return yaml.safe_load(sa.RULE_PATH.read_text(encoding="utf-8"))
+
+
+def _write(tmp_path, doc, name="rule.yaml"):
+    import yaml
+    path = tmp_path / name
+    path.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    return path
+
+
+def test_a_typed_keys_type_name_the_module_does_not_know_is_refused_at_load(tmp_path) -> None:
+    """The re-check's own plant: `bool` mistyped as `boolean` loaded clean and made the check a
+    silent no-op, because the recursion computes `wrong` as a disjunction over known names."""
+    doc = _rule_doc()
+    doc["typed_keys"]["ladder_purpose"]["will_act"] = "boolean"
+    with pytest.raises(sa.SensorAdmissionError, match="boolean"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_a_typed_keys_set_that_closed_keys_does_not_declare_is_refused_at_load(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["typed_keys"]["no_such_set"] = {"a": "bool"}
+    with pytest.raises(sa.SensorAdmissionError, match="no_such_set"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_a_typed_keys_key_its_own_set_does_not_declare_is_refused_at_load(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["typed_keys"]["ladder_purpose"]["not_a_key"] = "bool"
+    with pytest.raises(sa.SensorAdmissionError, match="not_a_key"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_a_scalar_lists_set_or_key_the_table_does_not_declare_is_refused_at_load(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["scalar_lists"]["no_such_set"] = ["a"]
+    with pytest.raises(sa.SensorAdmissionError, match="no_such_set"):
+        sa.load_rule(_write(tmp_path, doc))
+    doc = _rule_doc()
+    doc["scalar_lists"]["record"] = ["not_a_key"]
+    with pytest.raises(sa.SensorAdmissionError, match="not_a_key"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_the_typed_check_still_bites_after_the_guard(tmp_path) -> None:
+    """The plant the mistyped name silenced, still refused with the table as shipped."""
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["purpose"]["will_act"] = "agreed with the on-call rota"
+    assert "value-not-the-declared-shape" in ids(grade(record(ladder=ladder)))
+
+
+# -- R5: a declared-but-null key set is refused, not merely a missing one --------------------------
+
+def test_a_closed_key_set_declared_null_is_refused_at_load(tmp_path) -> None:
+    """Membership is not usability: `child not in closed_keys` passed a null entry, which then
+    raised an uncaught TypeError at grade time."""
+    doc = _rule_doc()
+    doc["closed_keys"]["notice"] = None
+    with pytest.raises(sa.SensorAdmissionError, match="notice"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_a_nested_map_pointing_at_a_null_key_set_is_refused_at_load(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["closed_keys"]["spare_set"] = None
+    doc["nested_maps"]["record"]["notice"] = "spare_set"
+    with pytest.raises(sa.SensorAdmissionError, match="spare_set"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+# -- R3: a required key that is absent is refused, never indexed by the ladder --------------------
+
+@pytest.mark.parametrize("mutate,missing", [
+    (lambda l: l["necessity"]["alternatives"][0].pop("level"), "level"),
+    (lambda l: l["necessity"].pop("kind"), "kind"),
+    (lambda l: l["necessity"].clear(), "kind"),
+    (lambda l: l["proportionality"].pop("intrusion_cost"), "intrusion_cost"),
+])
+def test_a_missing_required_ladder_key_is_refused_rather_than_indexed(mutate, missing) -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    mutate(ladder)
+    result = grade(record(ladder=ladder))
+    assert "required-key-missing" in ids(result), (
+        f"a ladder rung with no {missing!r} must be refused by name rather than indexed with [], "
+        f"got {result['refusals']}")
+    assert missing in " ".join(result["refusals"])
+    assert result["admitted"] is False
+
+
+# -- R6: the callers do not double the wording ----------------------------------------------------
+
+def test_the_people_file_problem_is_not_doubled() -> None:
+    problems = sa.people_file_problems("p.yaml", {"id": {"a": 1}, "role": "x"}, sa.load_rule())
+    assert problems and "the undeclared key the key" not in problems[0], problems
+
+
+def test_the_dpia_key_problem_is_not_doubled() -> None:
+    text = DPIA_TEXT.replace("schema: twin.dpia/v1", "schema: {a: 1}")
+    result = grade(record(), dpia_reader=reader(text=text))
+    assert "the DPIA record's key the key" not in " ".join(result["refusals"]), result["refusals"]
+
+
+# -- R7/R9: four of the five slots a plain-words name survived in are closed ----------------------
+
+def test_a_record_whose_schema_is_not_the_declared_one_is_refused() -> None:
+    result = grade(record(schema="something else"))
+    assert "value-not-the-declared-shape" in ids(result), result["refusals"]
+
+
+def test_a_dpia_naming_another_sensor_or_scenario_is_refused() -> None:
+    text = DPIA_TEXT.replace("sensor: bus-factor-structural-aggregate", "sensor: payroll-record")
+    result = grade(record(), dpia_reader=reader(text=text))
+    assert "value-not-the-declared-shape" in ids(result), result["refusals"]
+    text = DPIA_TEXT.replace("scenario: key-person-2026", "scenario: something-else-2026")
+    result = grade(record(), dpia_reader=reader(text=text))
+    assert "value-not-the-declared-shape" in ids(result), result["refusals"]
+
+
+def test_a_ladder_declaring_any_dpia_channel_is_refused() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["dpia"]["channels"] = ["a channel this class never reads"]
+    result = grade(record(ladder=ladder))
+    assert "value-not-the-declared-shape" in ids(result), result["refusals"]
+
+
+def test_the_limits_are_derived_from_the_table_and_name_both_new_refusals() -> None:
+    text = " ".join(sa.limits(sa.load_rule()))
+    for expected in ("value-not-the-declared-shape", "key-not-declared", "duplicate",
+                     "lawful_basis", "published_at", "role id"):
+        assert expected in text, f"the printed limits do not mention {expected!r}: {text}"
+
+
 # -- the sensor table stays closed ----------------------------------------------------------------
 
 def test_a_sensor_id_that_is_not_in_sensors_yaml_is_refused_rather_than_raising() -> None:
