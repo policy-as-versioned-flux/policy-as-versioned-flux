@@ -124,7 +124,8 @@ scoreable through a named question.
 **In driftwood** (branch `ticket-51-the-supply-constraint-actor-path`):
 
 - `twin/orgs/driftwood/claims/supply-constraint-position-2026-09-09.yaml` -- the first `override`
-  claim in the estate. `component: tier-one-supplier-relationship`, `evolution_position: 0.55`
+  claim in the estate, corrected in review round 2 (driftwood `a06bfbb`) to say on its face that it
+  ASSERTS a position and applies none. `component: tier-one-supplier-relationship`, `evolution_position: 0.55`
   against the 0.625 the `product` band derives, `claimed_by: model-steward` (the role register's,
   which the schema enforces), `evidence_grade: 4` (calibrated judgement recorded AS judgement). Its
   `evidence` says on its face what it asserts, what it does not, that at rung 4 it prices nothing
@@ -132,8 +133,16 @@ scoreable through a named question.
 - `twin/orgs/driftwood/scenarios/niobium-supply-shock-2026.yaml` -- `note` gains the resolution
   question and the registration rule, inside the signed artefact rather than in a README beside it.
 - `twin/forward-intel/v1/feed.json` re-rendered. **The only thing that moved is the overlay's
-  content pin** (`derived_from[].ref`): the priced payload is byte-identical, which is grade 4
-  use-gating working -- an override at a rung that cannot price did not price.
+  content pin** (`derived_from[].ref`): the priced payload is byte-identical because **nothing in
+  the estate reads a committed `override` claim to move a coordinate.** `twin/wardley.py`'s
+  `Position.of()` takes `evolution_position` off the COMPONENT DOCUMENT and nothing else
+  (`authored = doc.get("evolution_position")`), and no module under `twin/` loads the `claims/`
+  collection to move a position; `evolution_judge.override()` and `pushback()` build and compare
+  claim dicts in memory and are never fed from an overlay. Grade-4 use-gating would ALSO have
+  stopped a price, but it is not what stopped this one. Measured rather than argued (review round
+  2, F3): the same claim edited to `evidence_grade: 1` in a throwaway clone of this branch and
+  re-rendered gives a feed whose ONLY difference from the grade-4 render is the same
+  `derived_from[].ref` content pin -- `payload` is byte-identical, every price and every field.
 
 **In the hub** (branch of the same name):
 
@@ -203,6 +212,49 @@ re-renders clean.
 - **The first score still waits on the calendar**: the earliest horizon in the estate is
   2027-08-28, and no outcome can be honestly recorded before then.
 
+### Review round 2 (2026-09-09) -- three required corrections, and four smaller ones
+
+The round approved the substance and re-derived it first-hand: Decision 1's premise re-measured at
+the served refs, ticket 93's seven registration attacks re-run and all caught, the `(collection,
+id)` defect confirmed by planting a claim and a scenario sharing an id, and the forecast-placement
+refusal reproduced verbatim. All three required findings were over-claims, not admissions -- the
+module said more than it had measured. **One pattern behind three of them: it reasoned ABOUT
+reachability without ever RUNNING the traversal that produces it.** Everything it says about dates
+it derives from git; everything it said about reachability it derived from reading another module.
+That asymmetry is closed, and closing it closed the findings.
+
+| # | what was wrong | red, on `002bf98` | green, on this head |
+| --- | --- | --- | --- |
+| F1 | `admits()` refused `reachability` on a `priced-causal` relation, and the refusal stated a false fact about the estate's own traversal | `refuse_move(adm, 'reachability')` -> `a priced-causal relation does not move 'reachability'`, while `blast.radius(g, 'a')` on a graph with one `influences` edge a->b returns `[('b', depth 1)]` and `[]` without it | `verdict: priced-causal admits: ('reachability', 'magnitude')`, and the leg asserts the BLAST SET: a planted `influences` edge moves the unpriced set, and the coordinate stays refused |
+| F2 | `admits()` read only DIRECT relations and reported the absence as an absolute | with `unwatched-thing needs pq-cryptanalysis needs nb-refining-capacity` planted: `verdict: no-relation-in-this-model`, `refused['reachability']: there is no dependency between them, in either direction` -- while `blast.radius(g, 'nb-refining-capacity')` returns `pq-cryptanalysis` at depth 1 and `unwatched-thing` at depth 2 | a fifth verdict, `reachable-not-adjacent`: `nothing in overlay 'driftwood' relates them DIRECTLY ... but reachability is transitive and adjacency is not: twin/blast.py's traversal, run here, reaches 'unwatched-thing' from 'nb-refining-capacity' at depth 2, graded 'no-claimed-mechanism'`. A pair the walk genuinely cannot connect says so as a measurement: `... reaches the other at no depth up to its max_depth of 6` |
+| F3 | the record explained driftwood's byte-identical payload as grade-4 use-gating; that is not what happened | the sentence stood in this file and in driftwood commit `ceb3697` | the mechanism above, measured at grade 1 by this builder before it was written down |
+| F4 | "moves reachability" was asserted and cited to `blast.py`, and no run observed a reachability set change: no call of the traversal in `twin/registration.py`, the verify script, the fixture or the tests (only four prose mentions of `blast.py`) | `grep -rn "blast.radius" twin/registration.py verify/twin-evals/verify-scenario-registration.sh verify/twin-evals/registration_fixture.py tests/test_registration.py` -> no match, and `grep -n "blast" twin/registration.py` -> four lines, all prose | the fixture builds the same overlay with the planted `needs` entries and without (`--no-needs`), and the check and the tests assert the set MOVES: `the unpriced reachability set from 'nb-refining-capacity' is [] without the planted needs entries and ['pq-cryptanalysis (depth 1)', 'unwatched-thing (depth 2)'] with them` |
+| F5 | the measurement Decision 1 rests on was PRINTED, never GRADED | a planted platform whose `nb-refining-capacity` row names `links_risk: pq-cryptanalysis` -- the other id, the shape ticket 23 recorded -- left the check at **exit 0** | **exit 1**: `FAIL: platform's intel row 'nb-refining-capacity' names links_risk 'pq-cryptanalysis', which is the OTHER id in the pair. Ecosystem ticket 51's Decision 1 rests on neither row pointing at the other; it now does, and the decision needs re-reading, not re-asserting` |
+| F8 | an entry was reported `rewritten` without saying WHAT moved -- what ticket 93's review G2 insisted on for a forecast | on `002bf98`, a note appended to an entry and a question rewritten produce the same sentence: `... (rewritten after it landed)` | `question_moved()`/`override_moved()` beside `derived_forecast::probabilities_moved`, diffing `proposition`, `horizon`, `question`: a rewritten question says `question: 'Does the planted supplier fail inside the horizon?' -> 'A DIFFERENT question...'`, and an appended note says `none of proposition, horizon, question moved -- the rewrite was to another field` |
+
+**Dated correction, 2026-09-09.** Driftwood commit **`ceb3697`** ("Ticket 51: the first override,
+and the question it is scored through") carries the same wrong attribution its message inherited
+from this file: *"the priced payload is byte-identical, which is grade-4 use-gating working -- an
+override at a rung that cannot price did not price."* A commit message is immutable, so the
+correction lives here: the payload is byte-identical because **no code path in this estate reads a
+committed override claim to move a coordinate at ANY grade**, measured by re-rendering the same
+overlay at `evidence_grade: 1`. Everything else that commit says stands, including its disclosure
+of the ggshield hook bypass. Driftwood commit **`a06bfbb`** carries the same correction into the
+claim's own words: the file now says it ASSERTS a position and does not APPLY one, and that the
+map and the payload render identically with it and without it. It re-rendered the feed, and once
+again the only field that moved is `derived_from[].ref`.
+
+**The hook bypass, round 2.** The owner's global ggshield pre-commit hook is still out of API
+quota. Both round-2 commits -- this branch's own, and driftwood `a06bfbb` -- were made with
+`-c core.hooksPath` pointed at an empty directory, so the hook did not run. The staged diff of each
+was grepped first for private-key, api-key, token, secret, password and credential shapes; there
+were none. Each commit says so on its own face, and this is the ticket's record of it.
+
+**Not corrected, and named rather than fixed.** Two contradictory `override` claims on the same
+component both register today; nothing picks between them or refuses the pair. Out of scope for
+this ticket -- it is a rule about which claim wins, not about what a relation moves or when a
+question registers -- and it wants its own ticket.
+
 ### Not done
 
 - Nothing is scored. The apparatus for scoring an override exists and names the proposition it
@@ -220,3 +272,19 @@ re-renders clean.
 - The clock-provenance limit (ticket 93 F10) is inherited unchanged: a registering committer date
   merged through GitHub is GitHub's and a fast-forward push carries the laptop's, and this check
   cannot tell them apart offline either.
+- **The affirmative half of Decision 1 is a rule for an operation with no implementation.** "A
+  coordinate moves only by an attributable `position` or `override` claim" names something nothing
+  in this estate does: `twin/wardley.py::Position.of()` reads `evolution_position` off the
+  component document and no module loads `claims/` to move a position. The estate's first
+  override is attributable, dated and refusable, and it moves no map. The refusal half -- that no
+  propagation moves a coordinate -- is real, and is what the check grades.
+- **A scenario with no `horizon` is now a gate FAILURE, so an optional schema field is de-facto
+  mandatory on every adopter's main.** `twin/schema.py` keeps `horizon` in the scenario `optional`
+  block; `resolution_question()` refuses an entry without one, and the gate reads every entry on
+  `origin/main`. An entry that is a standing question rather than a resolvable one has nowhere to
+  live today. Loosening that (a `standing: true`, or grading only entries that declare a horizon)
+  is a change with its own blast radius across every committed scenario and is not made here.
+- The comparison between a forecast's registration and the registration of the question it names
+  is still not a leg of the check (see the row above and ADR-0024 point 6, amended). What IS graded
+  is an entry's own registration against its own horizon: a question rewritten after it landed but
+  BEFORE its horizon exits 0 and PASSes today.

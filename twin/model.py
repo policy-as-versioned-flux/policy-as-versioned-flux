@@ -477,36 +477,14 @@ class Overlay:
         should read as one; person edges are authored as first-class objects because they are not
         a chain. Both arrive here as the same typed edge.
         """
-        components = {**self.world.components, **self.components}
         # Both layers: the world layer carries the common value chain and an overlay may shadow a
         # node of it. Reading only the overlay would drop the shared spine from every graph.
-        edges = [
-            Edge(id=f"{ident}--{STRUCTURAL_EDGE}--{need}", type=STRUCTURAL_EDGE, source=ident, target=str(need))
-            for ident, comp in sorted(components.items())
-            for need in dict.fromkeys(comp.get("needs", []) or [])  # a repeated `needs` is one edge
-        ]
-        edges += [
-            Edge(
-                id=ident,
-                type=str(e["type"]),
-                source=str(e["from"]),
-                target=str(e["to"]),
-                # `CAUSAL_ONLY_OPTIONAL` (`calibration`) is optional provenance, not a causal
-                # assertion (build ticket 23) — carried through beside `confidence` for the same
-                # reason: a reader of the graph should not have to open the source file to see it.
-                # Read from the schema's own constant so a future addition there does not also
-                # need remembering here.
-                causal={
-                    f: e[f] for f in CAUSAL_FIELDS + CAUSAL_ONLY_OPTIONAL + ("confidence",) if f in e
-                } or None,
-            )
-            for ident, e in sorted(self.edges.items())
-        ]
-        return Graph(
+        components = {**self.world.components, **self.components}
+        return typed_graph(
             org=self.org,
             components=components,
             people=dict(self.people),
-            edges=tuple(sorted(edges, key=lambda e: (e.type, e.source, e.target))),
+            edges=structural_edges(components) + authored_edges(self.edges),
             regrades=tuple(self.regrade_records()),
         )
 
@@ -541,6 +519,55 @@ class Overlay:
 
     def pins(self) -> dict[str, Any]:
         return {"overlay": self.ref.as_dict(), "world": self.world.ref.as_dict(), "org": self.org}
+
+
+def structural_edges(components: dict[str, dict[str, Any]]) -> list["Edge"]:
+    """The `needs` lists of a component collection, as typed structural edges.
+
+    Module-level rather than inline in `Overlay.graph()` because a second caller needs the SAME
+    edges: `twin/registration.py` grades what a relation moves by RUNNING `twin/blast.py` over
+    the graph, and a graph it built for itself would be a second answer to "what edges does this
+    overlay have". One id convention, one direction, one place.
+    """
+    return [
+        Edge(id=f"{ident}--{STRUCTURAL_EDGE}--{need}", type=STRUCTURAL_EDGE, source=ident, target=str(need))
+        for ident, comp in sorted(components.items())
+        for need in dict.fromkeys(comp.get("needs", []) or [])  # a repeated `needs` is one edge
+    ]
+
+
+def authored_edges(edge_docs: dict[str, dict[str, Any]]) -> list["Edge"]:
+    """The edge files of an overlay, as typed edges.
+
+    `CAUSAL_ONLY_OPTIONAL` (`calibration`) is optional provenance, not a causal assertion (build
+    ticket 23) — carried through beside `confidence` for the same reason: a reader of the graph
+    should not have to open the source file to see it. Read from the schema's own constant so a
+    future addition there does not also need remembering here.
+    """
+    return [
+        Edge(
+            id=ident,
+            type=str(e["type"]),
+            source=str(e["from"]),
+            target=str(e["to"]),
+            causal={
+                f: e[f] for f in CAUSAL_FIELDS + CAUSAL_ONLY_OPTIONAL + ("confidence",) if f in e
+            } or None,
+        )
+        for ident, e in sorted(edge_docs.items())
+    ]
+
+
+def typed_graph(org: str, components: dict[str, dict[str, Any]], people: dict[str, dict[str, Any]],
+                edges: list["Edge"], regrades: tuple[dict[str, Any], ...] = ()) -> "Graph":
+    """A graph with its edges in the one canonical order every caller reads them in."""
+    return Graph(
+        org=org,
+        components=components,
+        people=people,
+        edges=tuple(sorted(edges, key=lambda e: (e.type, e.source, e.target))),
+        regrades=regrades,
+    )
 
 
 @dataclass(frozen=True)

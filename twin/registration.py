@@ -11,8 +11,14 @@ carries no direction of effect, no magnitude and no rate; the twin has no `veloc
 anywhere and no `horizon` outside a scenario, so there is nothing to move a coordinate *by* and no
 time to move it *over*. `twin/propagate.py` already walks `influences` and nothing else, and
 `twin/blast.py` already follows `needs` backwards to an unpriced reachability set graded
-`no-claimed-mechanism`. This module makes the ruling callable, and extends it in the one direction
-neither module covers: **no edge of any type moves an evolution coordinate.** The evolution axis is
+`no-claimed-mechanism` -- and this module RUNS that traversal rather than describing it, because
+the first round of this module reasoned about reachability by reading `blast.py` and got it wrong
+twice (review F1: it refused `reachability` on a causal edge, though `radius()` walks `influences`
+forwards into the blast radius; review F2: it called a two-hop dependency path "no dependency
+between them, in either direction"). Reachability is transitive to `blast.MAX_DEPTH`, adjacency is
+not, and `admits()` now says which of the two it measured. This module makes the ruling callable,
+and extends it in the one direction neither module covers: **no edge of any type moves an
+evolution coordinate.** The evolution axis is
 an interpretive ordinal judgement (twin ticket 11 Q1), and the one operation ecosystem ticket 93
 reopened the ordinal ruling to admit is an ORDER STATISTIC OVER EVIDENCE GRADES -- the weakest
 grade among a derivation's signals -- and nothing else. A coordinate move is neither that operation
@@ -38,8 +44,10 @@ names the component the override moves -- and an override that reaches no such s
 
 Its own module rather than more of `twin/derived_forecast.py`, for the reason `blast.py` is not
 part of `model.py`: that module is the derivation and its artefact, this one is a ruling over the
-graph and over git history. The git reads are `derived_forecast`'s, imported and never copied -- a
-second implementation of "when did this reach main" is exactly how one of them goes on passing
+graph and over git history. **Nothing it asserts is re-implemented here.** The git reads are
+`derived_forecast`'s, the graph is `model.py`'s (`structural_edges`, `authored_edges`) and the
+traversal is `blast.py`'s (`radius`), all imported -- a second implementation of "when did this
+reach main", or of "what edges does this overlay have", is exactly how one of them goes on passing
 after the other is fixed.
 """
 
@@ -56,15 +64,18 @@ from typing import Any, NamedTuple
 
 import yaml
 
+from . import blast
 from .derived_forecast import (
     Arrival,
     _date_of,
+    _git,
     _read_yaml,
     _served_tree,
     adopters_in,
     first_reached,
     overlay_dir,
 )
+from .model import Graph, authored_edges, structural_edges, typed_graph
 from .schema import CAUSAL_EDGE, STRUCTURAL_EDGE
 
 # The ticket's own pair, kept here as data so the check measures it rather than asserting it.
@@ -79,8 +90,18 @@ MOVES = ("reachability", "magnitude", "evolution_position", "evidence_grade", "w
 # both here and nothing connects them" are different answers and were being read as one.
 PRICED_CAUSAL = "priced-causal"
 UNPRICED_STRUCTURAL = "unpriced-structural"
+# Reachability is TRANSITIVE and adjacency is not, so "nothing relates them" and "nothing relates
+# them DIRECTLY" are different answers too. This module used to give the second and print the
+# first, which made an absolute claim about a traversal it never ran (review F2).
+REACHABLE_NOT_ADJACENT = "reachable-not-adjacent"
 NO_RELATION = "no-relation-in-this-model"
 NOT_IN_THIS_MODEL = "not-in-this-model"
+
+# The three fields that MAKE a resolution question, and the four that make an override the claim
+# it is. Rewriting one of these is the question changing; rewriting a `note` beside them is not.
+# Ticket 93's review G2 said a refusal must name what moved rather than only that something did.
+QUESTION_FIELDS = ("proposition", "horizon", "question")
+OVERRIDE_FIELDS = ("component", "evolution_position", "claimed_by", "evidence_grade")
 
 # Refused on EVERY relation, whatever its type. The first is ticket 51's own ruling; the rest are
 # the reopened ordinal ruling (ecosystem ticket 93 on twin 08 Q1) read as what it says.
@@ -194,6 +215,101 @@ def repo_relative(model: Model, kind: str, ident: str) -> str | None:
 
 
 # --- 1. what a relation admits ------------------------------------------------------------------
+#
+# Everything this section says about DATES it derives from git. Everything it used to say about
+# REACHABILITY it derived from reading `twin/blast.py` -- and a module that reasons about a
+# traversal without running it will eventually describe one that no longer behaves that way (it
+# did: review findings F1 and F2). So the traversal is RUN here, on the same model, and what
+# `admits()` says about reachability is what `blast.radius()` returned.
+
+
+class Reach(NamedTuple):
+    """One end reached from the other by `twin/blast.py`'s own traversal, and how far away it is."""
+
+    origin: str
+    reached: str
+    depth: int
+    priced: bool
+    reason: str | None
+    detail: str | None
+
+    def sentence(self) -> str:
+        graded = "admitted to pricing" if self.priced else f"graded {self.reason!r}"
+        return (f"twin/blast.py's traversal, run here, reaches {self.reached!r} from "
+                f"{self.origin!r} at depth {self.depth}, {graded}")
+
+    @property
+    def all_causal(self) -> bool:
+        """Every hop claims a mechanism. `blast.classify` grades a path with any structural hop
+        `no-claimed-mechanism`, so anything else means the whole path is `influences` -- which is
+        what `twin/propagate.py` composes a magnitude along, use-gated by grade."""
+        return self.reason != blast.NO_MECHANISM
+
+
+def graph_of(model: Model) -> Graph:
+    """`twin/model.py`'s own typed graph, over the plain dicts this module read off a served tree.
+
+    The edges come from `model.structural_edges()` and `model.authored_edges()`, imported. Building
+    them here would be a second answer to what this overlay's graph IS, and the whole point of
+    running the traversal is that the answer is measured rather than restated -- the same reason
+    `first_reached()` is imported rather than re-implemented.
+    """
+    components = {**model.world_components, **model.components}
+    return typed_graph(
+        org=model.org, components=components, people={},
+        edges=structural_edges(components) + authored_edges(model.edges),
+    )
+
+
+def reachability(model: Model, origin: str, max_depth: int = blast.MAX_DEPTH) -> dict[str, Any]:
+    """`twin/blast.py`'s blast radius from `origin`, over this model. The traversal itself, run."""
+    return blast.radius(graph_of(model), origin, max_depth=max_depth)
+
+
+def reached_set(model: Model, origin: str, max_depth: int = blast.MAX_DEPTH) -> tuple[tuple[str, int], ...]:
+    """Every component the traversal reaches from `origin`, with its depth. Sorted, so a caller
+    can assert on the SET rather than on a sentence about it."""
+    artefact = reachability(model, origin, max_depth)
+    return tuple(sorted(
+        (str(r["component"]), int(r["depth"]))
+        for r in artefact["admitted_to_pricing"] + artefact["unpriced"]
+    ))
+
+
+def _path_between(model: Model, source: str, target: str,
+                  max_depth: int = blast.MAX_DEPTH) -> tuple[Reach | None, bool]:
+    """The best path the traversal finds between the two, in either direction, and whether either
+    walk stopped at the depth cap.
+
+    Either direction, because a structural dependency is the same unpriced exposure whichever end
+    you name first -- and because `radius()` walks causal edges forwards and structural edges
+    backwards from ONE origin, so asking from one end only would answer half the question.
+    """
+    truncated = False
+    found: Reach | None = None
+    for a, b in ((source, target), (target, source)):
+        artefact = reachability(model, a, max_depth)
+        truncated = truncated or bool(artefact["traversal"]["truncated"])
+        if found is not None:
+            continue
+        for entry in artefact["admitted_to_pricing"] + artefact["unpriced"]:
+            if str(entry["component"]) != b:
+                continue
+            found = Reach(origin=a, reached=b, depth=int(entry["depth"]),
+                          priced="reason" not in entry, reason=entry.get("reason"),
+                          detail=entry.get("detail"))
+            break
+    return found, truncated
+
+
+def _no_path(source: str, target: str, max_depth: int, truncated: bool) -> str:
+    """What "they are not connected" is allowed to say once the traversal has actually been run."""
+    text = (f"twin/blast.py's traversal, run here from each of {source!r} and {target!r}, reaches "
+            f"the other at no depth up to its max_depth of {max_depth}")
+    if truncated:
+        text += (", and one of those walks stopped at that cap, so a path longer than it is not "
+                 "ruled out")
+    return text
 
 
 @dataclass(frozen=True)
@@ -241,25 +357,51 @@ def _causal_edge(model: Model, source: str, target: str) -> str | None:
     return None
 
 
-def admits(model: Model, source: str, target: str) -> Admission:
+def admits(model: Model, source: str, target: str,
+           max_depth: int = blast.MAX_DEPTH) -> Admission:
     """What, if anything, moves from `source` to `target` in this model.
 
-    Four verdicts, and the two that read alike are kept apart on purpose: components that are not
-    in this model at all cannot be connected by anything, and components that ARE both here with
-    nothing between them are a modelling gap somebody could close. Reading the first as the second
-    is how a pair that exists in another repository's JSON gets discussed as an edge.
+    Five verdicts, and the ones that read alike are kept apart on purpose:
+
+    * components that are not in this model at all cannot be connected by anything;
+    * components that ARE both here with an edge between them are adjacent;
+    * components that are both here, are not adjacent, but which the traversal REACHES one from
+      the other are a dependency path of more than one hop -- reachability is transitive to
+      `blast.MAX_DEPTH` and adjacency is not, and answering the first with the second is how a
+      component two hops downstream gets called unrelated (review F2);
+    * components that are both here and that nothing reaches from the other are a modelling gap
+      somebody could close.
+
+    Reading "not in this model" as "nothing between them" is how a pair that exists in another
+    repository's JSON gets discussed as an edge, and reading "not adjacent" as "not connected" is
+    how an exposure that `twin/blast.py` prints every day gets denied in a sentence.
+
+    Whatever the verdict, what it says about REACHABILITY is what the traversal returned: the walk
+    is run here, not read about.
     """
     missing = [ident for ident in (source, target) if model.component(ident) is None]
     if missing:
+        absent = (f"{' and '.join(repr(m) for m in missing)} "
+                  f"{'is' if len(missing) == 1 else 'are'} not a component of overlay "
+                  f"{model.org!r} or of the world layer under it")
+        refused = dict(ALWAYS_REFUSED)
+        refused["reachability"] = (
+            f"{absent}, so twin/blast.py has no node to start or finish a traversal on -- this is "
+            "not a claim that nothing connects them somewhere else, only that this model has no "
+            "end to walk from"
+        )
+        refused["magnitude"] = f"{absent}, so there is no edge here to compose anything along"
+        refused["price"] = f"{absent}, so there is nothing here to price"
         return Admission(
             source=source, target=target, verdict=NOT_IN_THIS_MODEL,
-            reason=(
-                f"{' and '.join(repr(m) for m in missing)} "
-                f"{'is' if len(missing) == 1 else 'are'} not a component of overlay {model.org!r} "
-                f"or of the world layer under it, so there is no relation here to propagate along"
-            ),
-            admits=(), refused=dict(ALWAYS_REFUSED),
+            reason=f"{absent}, so there is no relation here to propagate along",
+            admits=(), refused=refused,
         )
+
+    # The traversal, RUN, before any verdict is chosen. Everything below that mentions
+    # reachability quotes this measurement.
+    reach, truncated = _path_between(model, source, target, max_depth)
+
     causal = _causal_edge(model, source, target)
     if causal is not None:
         refused = dict(ALWAYS_REFUSED)
@@ -268,10 +410,14 @@ def admits(model: Model, source: str, target: str) -> Admission:
             reason=(
                 f"edge {causal!r} is an {CAUSAL_EDGE!r} edge asserting sign, lag and a calibrated "
                 f"elasticity, so twin/propagate.py composes a MAGNITUDE along it, use-gated by "
-                f"evidence grade; it still moves no coordinate"
+                f"evidence grade. It is a dependency path as well as a priced one -- "
+                f"twin/blast.py walks {CAUSAL_EDGE!r} edges FORWARDS into the blast radius, and "
+                f"{reach.sentence() if reach else _no_path(source, target, max_depth, truncated)}. "
+                f"It still moves no coordinate"
             ),
-            admits=("magnitude",), refused=refused,
+            admits=("reachability", "magnitude"), refused=refused,
         )
+
     structural = _needs_related(model, source, target)
     if structural is not None:
         refused = dict(ALWAYS_REFUSED)
@@ -289,22 +435,88 @@ def admits(model: Model, source: str, target: str) -> Admission:
             reason=(
                 f"{structural}. A structural dependency propagates REACHABILITY -- 'this is "
                 "downstream and exposed, and nobody has claimed a mechanism' -- which is a "
-                "first-class answer (twin 08 Q3), not a gap"
+                f"first-class answer (twin 08 Q3), not a gap: "
+                f"{reach.sentence() if reach else _no_path(source, target, max_depth, truncated)}"
             ),
             admits=("reachability",), refused=refused,
         )
+
+    if reach is not None:
+        refused = dict(ALWAYS_REFUSED)
+        admitted = ("reachability", "magnitude") if reach.all_causal else ("reachability",)
+        if not reach.all_causal:
+            refused["magnitude"] = (
+                f"{reach.detail or 'at least one hop is structural'}, so twin/propagate.py "
+                f"composes nothing along this path: it walks {CAUSAL_EDGE!r} edges and nothing else"
+            )
+        refused["price"] = (
+            "twin/blast.py grades this path "
+            f"{reach.reason!r} and the blast-radius artefact has no key a price could be written "
+            "into" if not reach.priced else
+            "a price is the estate's own gate to compute from a magnitude, not something a "
+            "relation hands over"
+        )
+        return Admission(
+            source=source, target=target, verdict=REACHABLE_NOT_ADJACENT,
+            reason=(
+                f"nothing in overlay {model.org!r} relates them DIRECTLY -- no {CAUSAL_EDGE!r} "
+                f"edge, no {STRUCTURAL_EDGE!r} edge and no needs: entry -- but reachability is "
+                f"transitive and adjacency is not: {reach.sentence()}"
+            ),
+            admits=admitted, refused=refused,
+        )
+
     refused = dict(ALWAYS_REFUSED)
     refused["magnitude"] = "there is no edge between them to compose anything along"
-    refused["reachability"] = "there is no dependency between them, in either direction"
+    refused["reachability"] = _no_path(source, target, max_depth, truncated)
     refused["price"] = "there is no edge between them to price"
     return Admission(
         source=source, target=target, verdict=NO_RELATION,
         reason=(
-            f"both are components of this model and nothing in overlay {model.org!r} relates them "
-            f"-- no {CAUSAL_EDGE!r} edge, no {STRUCTURAL_EDGE!r} edge and no needs: entry"
+            f"both are components of this model, nothing in overlay {model.org!r} relates them "
+            f"directly -- no {CAUSAL_EDGE!r} edge, no {STRUCTURAL_EDGE!r} edge and no needs: "
+            f"entry -- and {_no_path(source, target, max_depth, truncated)}"
         ),
         admits=(), refused=refused,
     )
+
+
+def grade_admission(model: Model, source: str, target: str,
+                    max_depth: int = blast.MAX_DEPTH) -> list[str]:
+    """The ruling GRADED rather than printed, and its reachability claim checked against the walk.
+
+    Two things are observed, both falsifiable:
+
+    1. every move in `ALWAYS_REFUSED` is refused, on whatever verdict this pair returns -- that is
+       the ruling itself, and a run that only printed the verdict would not notice it changing;
+    2. what the admission SAYS about reachability is what `twin/blast.py` actually returns for the
+       pair. The module's one affirmative claim was asserted and never observed until now, which
+       is exactly how it came to be wrong about a causal edge (review F1) and about a two-hop path
+       (review F2).
+    """
+    admission = admits(model, source, target, max_depth)
+    failures: list[str] = []
+    for asked in sorted(ALWAYS_REFUSED):
+        try:
+            refuse_move(admission, asked)
+        except RegistrationError:
+            continue
+        failures.append(
+            f"a {admission.verdict} relation between {source!r} and {target!r} was admitted to "
+            f"move {asked!r}: no relation of any type moves it (ecosystem ticket 51, Decision 1)"
+        )
+    if admission.verdict == NOT_IN_THIS_MODEL:
+        return failures
+    reach, _ = _path_between(model, source, target, max_depth)
+    says = "reachability" in admission.admits
+    if says != (reach is not None):
+        failures.append(
+            f"admits({source!r}, {target!r}) says it "
+            f"{'moves' if says else 'does not move'} reachability, and twin/blast.py's traversal "
+            f"{'found no path' if reach is None else 'reached it at depth ' + str(reach.depth)}: "
+            "the ruling and the traversal it cites disagree"
+        )
+    return failures
 
 
 def refuse_move(admission: Admission, what: str) -> None:
@@ -461,8 +673,65 @@ def override_resolution(model: Model, claim_id: str) -> dict[str, Any]:
 # --- 3. when it registered ----------------------------------------------------------------------
 
 
+def _blob(repo: Path, sha: str, path: str) -> dict[str, Any] | None:
+    """One committed blob, parsed. None when git cannot show it or it is not a mapping."""
+    text = _git(Path(repo), "show", f"{sha}:{path}")
+    if text is None:
+        return None
+    try:
+        doc = yaml.safe_load(text)
+    except yaml.YAMLError:
+        return None
+    return doc if isinstance(doc, dict) else None
+
+
+def fields_moved(repo: Path, arrival: Arrival, path: str,
+                 fields: tuple[str, ...]) -> list[str] | None:
+    """Which of `fields` differ between the blob that ARRIVED on the ref and the blob there now.
+
+    `[]` when the rewrite moved none of them, `None` when either blob cannot be read. The
+    counterpart of `twin/derived_forecast.py::probabilities_moved`, and it exists for the same
+    reason review G2 gave there: the registration rule is blob identity, so a rewrite is a rewrite
+    whatever changed -- but a report that says only "rewritten" cannot tell an appended note from
+    a changed question, and those are not the same event to anyone reading it.
+    """
+    before = _blob(repo, arrival.added_sha, path)
+    after = _blob(repo, arrival.last_sha, path)
+    if before is None or after is None:
+        return None
+    return [f"{field}: {before.get(field)!r} -> {after.get(field)!r}"
+            for field in fields if before.get(field) != after.get(field)]
+
+
+def question_moved(repo: Path, arrival: Arrival, path: str) -> list[str] | None:
+    """Which of a scenario entry's `proposition`, `horizon` and `question` moved since it landed.
+
+    Those three are the question: the thing resolved on, the day it resolves, and the words it is
+    asked in. A `note` beside them can be appended without the question changing -- and the
+    override PR this ticket writes does exactly that, so the distinction is not hypothetical.
+    """
+    return fields_moved(repo, arrival, path, QUESTION_FIELDS)
+
+
+def override_moved(repo: Path, arrival: Arrival, path: str) -> list[str] | None:
+    """Which of an override's `component`, `evolution_position`, `claimed_by` and `evidence_grade`
+    moved since it landed -- the coordinate it asserts, whose it is, and at what rung."""
+    return fields_moved(repo, arrival, path, OVERRIDE_FIELDS)
+
+
+def _moved_sentence(moved: list[str] | None, fields: tuple[str, ...]) -> str:
+    """What a rewrite is allowed to say it moved."""
+    if moved is None:
+        return "what moved could not be read: the blob that arrived is no longer readable here"
+    if not moved:
+        return (f"none of {', '.join(fields)} moved -- the rewrite was to another field (a note, a "
+                "comment or whitespace), and it re-registers the file all the same")
+    return "; ".join(moved)
+
+
 def registered_on(repo: Path, path: str, before: str | None = None,
-                  ref: str = "refs/remotes/origin/main") -> dict[str, Any]:
+                  ref: str = "refs/remotes/origin/main",
+                  moved_fields: tuple[str, ...] | None = None) -> dict[str, Any]:
     """When the CONTENT at `path` was registered on the served ref, measured ticket 93's way.
 
     `first_reached()` is imported, never re-implemented: it returns BOTH first-parent dates, when
@@ -471,6 +740,8 @@ def registered_on(repo: Path, path: str, before: str | None = None,
     which is the whole of review F1, applied here to the QUESTION and to the OVERRIDE rather than
     to the forecast. `before`, when given, is the date the registration must be strictly earlier
     than (a scenario's own horizon, or the horizon of a scenario an override is scored through).
+    `moved_fields`, when given, says WHAT moved in a rewrite as well as that one happened -- the
+    distinction ticket 93's review G2 insisted on for a forecast's numbers.
     """
     arrival: Arrival | None = first_reached(Path(repo), path, ref=ref)
     if arrival is None:
@@ -486,6 +757,11 @@ def registered_on(repo: Path, path: str, before: str | None = None,
         "rewritten": arrival.rewritten,
         "sentence": arrival.where(ref),
     }
+    if moved_fields is not None and arrival.rewritten:
+        moved = fields_moved(Path(repo), arrival, path, moved_fields)
+        out["moved"] = moved
+        out["moved_sentence"] = _moved_sentence(moved, moved_fields)
+        out["sentence"] += f" -- {out['moved_sentence']}"
     if before is not None:
         out["before"] = before
         out["in_time"] = dt.date.fromisoformat(registers_on) < dt.date.fromisoformat(str(before))
@@ -495,38 +771,52 @@ def registered_on(repo: Path, path: str, before: str | None = None,
 # --- the check ----------------------------------------------------------------------------------
 
 
-def _platform_intel_pair(estate: Path, pair: tuple[str, str]) -> str:
+def _platform_intel_pair(estate: Path, pair: tuple[str, str]) -> tuple[str, str | None]:
     """What the two ids the ticket names actually ARE, measured on the platform's served intel.
 
-    Printed rather than asserted, because "there is no such edge" is the finding, and a reader
-    should be able to see the rows it was read off.
+    Returns the sentence to print and, when the measurement contradicts the finding it was taken
+    for, the failure to grade on.
+
+    Decision 1's factual half is that the pair is two rows of platform's Wardley intel that both
+    point at a FAIR RISK and never at each other. That is a claim about somebody else's file,
+    which somebody else can edit -- so it is graded and not only printed (review F5). A
+    could-not-look stays a could-not-look and is never graded green.
     """
     repo = estate / "platform"
     if not (repo / ".git").exists():
-        return "could not look: no platform checkout to read wardley/intel/market-intel.json from"
+        return "could not look: no platform checkout to read wardley/intel/market-intel.json from", None
     with tempfile.TemporaryDirectory() as tmp:
         tree = _served_tree(repo, "refs/remotes/origin/main", Path(tmp), paths=("wardley",))
         if tree is None:
-            return "could not look: platform's refs/remotes/origin/main carries no wardley/ tree"
+            return "could not look: platform's refs/remotes/origin/main carries no wardley/ tree", None
         intel = tree / "wardley" / "intel" / "market-intel.json"
         if not intel.is_file():
-            return "could not look: no wardley/intel/market-intel.json on platform's served ref"
+            return "could not look: no wardley/intel/market-intel.json on platform's served ref", None
         doc = json.loads(intel.read_text(encoding="utf-8"))
     rows = {str(c.get("id")): c for c in doc.get("components", []) if str(c.get("id")) in pair}
     if len(rows) != len(pair):
         absent = [ident for ident in pair if ident not in rows]
-        return f"platform's served intel carries no row for {', '.join(absent)}"
+        return f"platform's served intel carries no row for {', '.join(absent)}", None
     described = "; ".join(
         f"{ident} actor={rows[ident].get('actor')!r} evolution={rows[ident].get('evolution')} "
         f"velocity={rows[ident].get('velocity')} links_risk={rows[ident].get('links_risk')!r}"
         for ident in pair
     )
+    # The graded half: does either row point at the OTHER id? That is the shape ticket 23 recorded
+    # as "the links_risk edge to the capability it constrains", and finding it would mean the
+    # premise this decision rests on had stopped being true.
+    points_at_each_other = [
+        f"platform's intel row {ident!r} names links_risk {rows[ident].get('links_risk')!r}, which "
+        f"is the OTHER id in the pair. Ecosystem ticket 51's Decision 1 rests on neither row "
+        f"pointing at the other; it now does, and the decision needs re-reading, not re-asserting"
+        for ident in pair if str(rows[ident].get("links_risk")) in pair
+    ]
     targets = {str(rows[ident].get("links_risk")) for ident in pair}
     shared = (
-        f"both name the same links_risk ({targets.pop()!r}), which is a FAIR risk id and not a "
-        "component, so neither row points at the other"
+        f"both name the same links_risk ({sorted(targets)[0]!r}), which is a FAIR risk id and not "
+        "a component, so neither row points at the other"
     ) if len(targets) == 1 else f"they name different links_risk targets ({sorted(targets)})"
-    return f"{described} -- {shared}"
+    return f"{described} -- {shared}", (points_at_each_other[0] if points_at_each_other else None)
 
 
 def check(estate: str, hub: str, adopters: list[str] | None = None,
@@ -570,7 +860,8 @@ def check(estate: str, hub: str, adopters: list[str] | None = None,
                 path = repo_relative(model, "scenarios", scenario_id)
                 if path is None:  # pragma: no cover - every scenario came from a file
                     continue
-                mark = registered_on(repo, path, before=question["resolves_on"], ref=ref)
+                mark = registered_on(repo, path, before=question["resolves_on"], ref=ref,
+                                     moved_fields=QUESTION_FIELDS)
                 if mark["on_ref"]:
                     registered += 1
                     if mark["rewritten"]:
@@ -602,7 +893,8 @@ def check(estate: str, hub: str, adopters: list[str] | None = None,
                 # date at all.
                 dated = [e for e in resolution["through"] if "resolves_on" in e]
                 first = min(dated, key=lambda e: str(e["resolves_on"])) if dated else None
-                mark = registered_on(repo, path, before=first["resolves_on"] if first else None, ref=ref) \
+                mark = registered_on(repo, path, before=first["resolves_on"] if first else None,
+                                     ref=ref, moved_fields=OVERRIDE_FIELDS) \
                     if path else {"on_ref": False, "sentence": "no file"}
                 if resolution["scoreable"]:
                     scoreable += 1
@@ -616,12 +908,30 @@ def check(estate: str, hub: str, adopters: list[str] | None = None,
                       f"{mark['sentence']}")
             admission = admits(model, *SUPPLY_CONSTRAINT_PATH)
             admissions.append(f"{name}: {admission.sentence()}")
+            # The ruling, GRADED. Printing a verdict tells a reader what the module thinks;
+            # grading it is what notices the day it stops being true (review F5).
+            fails.extend(grade_admission(model, *SUPPLY_CONSTRAINT_PATH))
+            # And the traversal itself, RUN over this adopter's own graph, so the module's one
+            # affirmative claim is a measurement on every run rather than a citation (review F4).
+            for origin in SUPPLY_CONSTRAINT_PATH:
+                if model.component(origin) is None:
+                    continue
+                reached = reached_set(model, origin)
+                admissions.append(
+                    f"{name}: twin/blast.py's traversal from {origin!r} reaches "
+                    + (", ".join(f"{c} (depth {d})" for c, d in reached) if reached else "nothing")
+                )
 
     for line in admissions:
         print(f"    {line}")
-    print(f"    the ticket's pair on platform's served intel: {_platform_intel_pair(estate_path, SUPPLY_CONSTRAINT_PATH)}")
-    print(f"    ruling: no relation of any type moves an evolution_position, an evidence_grade, a "
-          f"weight or a probability -- {len(ALWAYS_REFUSED)} refusals that hold on every verdict")
+    intel_sentence, intel_finding = _platform_intel_pair(estate_path, SUPPLY_CONSTRAINT_PATH)
+    print(f"    the ticket's pair on platform's served intel: {intel_sentence}")
+    if intel_finding is not None:
+        fails.append(intel_finding)
+    print(f"    ruling, graded on every adopter above rather than printed: no relation of any type "
+          f"moves an evolution_position, an evidence_grade, a weight or a probability -- "
+          f"{len(ALWAYS_REFUSED)} refusals that hold on every verdict, and what each admission says "
+          f"about reachability is checked against twin/blast.py's traversal of that same model")
     print(f"    limits: {scenarios_read} scenario(s) read, {resolvable} resolvable, "
           f"{registered} registered on {ref} ({rewritten} rewritten since they arrived); "
           f"{overrides_read} override(s), {scoreable} scoreable through a proposition; "
@@ -645,7 +955,8 @@ def check(estate: str, hub: str, adopters: list[str] | None = None,
           f"resolution question -- a proposition the world layer carries, a horizon after their own "
           f"authoring date, and a registration date read off first-parent history -- and "
           f"{scoreable} of {overrides_read} override(s) are scoreable through one of them, none on "
-          "its own coordinate")
+          "its own coordinate; the ruling was graded on every adopter and its reachability claim "
+          "checked against twin/blast.py's own traversal, not against a reading of it")
     return 0
 
 

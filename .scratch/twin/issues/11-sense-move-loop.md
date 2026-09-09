@@ -201,4 +201,10 @@ ticket 93 did not have: a question is as rewritable as an answer, and editing a 
 horizon or the words of a question after a forecast is registered against it moves every score
 already taken. `verify/twin-evals/verify-scenario-registration.sh` grades both on `origin/main`, and
 refuses an entry whose horizon is not strictly after its own `at`, because nothing could ever be
-pre-registered against one. ADR-0024 point 6 and twin ticket 08 carry the rest.
+pre-registered against one. **What is graded today is narrower than that paragraph reads** (added
+2026-09-09, ticket 51 review F7): the check grades an entry's own registration against its OWN
+horizon, and names which of `proposition`, `horizon` and `question` moved when it was rewritten. It
+does not yet compare a forecast's registration to the registration of the question it names -- a
+question rewritten after it landed but before its horizon PASSes -- because no forecast has reached
+any adopter's `origin/main`. That leg becomes measurable on the day the first one merges.
+ADR-0024 point 6 and twin ticket 08 carry the rest.

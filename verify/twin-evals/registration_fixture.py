@@ -7,9 +7,18 @@ components `nb-refining-capacity` and `pq-cryptanalysis`, with the second declar
 finding -- so the only way to exercise the ruling on the pair it asks about is to plant it here and
 say so. Every line the check prints about this fixture says fixture.
 
+`unwatched-thing` extends the chain by one hop (`needs: [pq-cryptanalysis]`) and `island-thing` is
+on no chain at all, so the difference between "not adjacent" and "not connected" can be MEASURED
+rather than argued -- and `--no-needs` builds the same overlay with every `needs` list removed, so
+a reachability set can be observed moving from empty to two components when one line of YAML
+arrives. Everything this module's ruling says about dates it derives from git; before review F4
+everything it said about reachability it derived from reading another module.
+
 It also carries the shapes the ruling has to refuse: a scenario whose horizon is not after its own
 authoring date, an override on a component no scenario names, an override whose number is rewritten
-after it landed on the served ref, and a scenario whose question is rewritten after its own horizon.
+after it landed on the served ref, and a scenario whose question is rewritten after its own horizon
+-- beside a scenario whose NOTE was appended and whose question was not, which re-registers just
+the same and must not be reported as the question moving.
 
 Dates are fixed and the commits are made with fixed committer dates, so first-parent history is the
 same on every machine. `core.hooksPath` is written to the null device in every throwaway repository
@@ -19,6 +28,7 @@ whether a machine's secret scanner has quota left is not a proof.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import subprocess
 import sys
@@ -79,7 +89,7 @@ def override_doc(position: float = 0.55) -> dict[str, Any]:
     }
 
 
-def build(root: Path, with_override: bool = True) -> Path:
+def build(root: Path, with_override: bool = True, with_needs: bool = True) -> Path:
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
     repo, origin = root / ORG, root / f"{ORG}.origin.git"
@@ -100,11 +110,25 @@ def build(root: Path, with_override: bool = True) -> Path:
     })
     _write(org / "components" / "pq-cryptanalysis.yaml", {
         "id": "pq-cryptanalysis", "name": "planted cryptanalysis capability", "kind": "activity",
-        "evolution": "custom-built", "visibility": 0.4, "needs": ["nb-refining-capacity"],
+        "evolution": "custom-built", "visibility": 0.4,
+        **({"needs": ["nb-refining-capacity"]} if with_needs else {}),
     })
+    # The SECOND hop, and the reason it is here: reachability is transitive to blast.MAX_DEPTH and
+    # adjacency is not. `unwatched-thing` is two hops from `nb-refining-capacity` and adjacent to
+    # neither end of the ticket's pair, so the traversal reaches it and no edge between them says
+    # so -- which is the shape review F2 found being reported as "no dependency, in either
+    # direction".
     _write(org / "components" / "unwatched-thing.yaml", {
         "id": "unwatched-thing", "name": "a component no scenario names", "kind": "activity",
         "evolution": "product", "visibility": 0.3,
+        **({"needs": ["pq-cryptanalysis"]} if with_needs else {}),
+    })
+    # A component nothing needs and which needs nothing: the pair that really is unrelated, so
+    # `no-relation-in-this-model` is exercised on a pair the traversal genuinely cannot connect
+    # rather than on one it was never asked about.
+    _write(org / "components" / "island-thing.yaml", {
+        "id": "island-thing", "name": "a component on no value chain here", "kind": "activity",
+        "evolution": "product", "visibility": 0.1,
     })
     _write(repo / SCENARIO_PATH, {
         "id": "planted-supply-2026", "question": "Does the planted supplier fail inside the horizon?",
@@ -176,22 +200,81 @@ def rewrite_question(root: Path) -> str:
     return SCENARIO_PATH
 
 
+def append_note(root: Path) -> str:
+    """A `note` appended to the entry after it landed, and NOTHING else touched.
+
+    Still a rewrite -- the blob changed, so the file re-registers on the day of the edit -- but
+    the QUESTION did not move. The override PR ecosystem ticket 51 writes does exactly this to
+    driftwood's niobium entry, and a report that says only "rewritten" cannot tell the two apart
+    (ticket 93 review G2, applied to the words instead of the numbers).
+    """
+    repo = Path(root) / ORG
+    _write(repo / SCENARIO_PATH, {
+        "id": "planted-supply-2026", "question": "Does the planted supplier fail inside the horizon?",
+        "proposition": "a-planted-supplier-fails-within-the-horizon", "at": "2026-01-01",
+        "horizon": HORIZON, "components": ["pq-cryptanalysis"], "world_models": ["reference-map"],
+        "affected_parties": AFFECTED,
+        "note": "a note appended after this entry landed; the question itself is untouched",
+    })
+    _commit_push(repo, "fixture: a note appended, the question untouched", REWRITE_DATE)
+    return SCENARIO_PATH
+
+
+RISK = "pq-harvest-now-decrypt-later"
+
+
+def plant_platform(root: Path, cross_link: bool = False) -> Path:
+    """A throwaway `platform` unit carrying the two Wardley intel rows the ticket reads.
+
+    Decision 1's factual half is a claim about somebody ELSE's file: the two rows both name a FAIR
+    risk id and never each other. `cross_link` builds the version where one row DOES name the
+    other -- the shape ticket 23 recorded and this decision rests on not existing -- so the
+    grading of that claim has a red to be measured against (review F5).
+    """
+    repo = Path(root) / "platform"
+    intel = repo / "wardley" / "intel"
+    intel.mkdir(parents=True, exist_ok=True)
+    rows = [
+        {"id": "nb-refining-capacity", "actor": "planted refiner", "evolution": "product",
+         "velocity": 0.1, "links_risk": "pq-cryptanalysis" if cross_link else RISK},
+        {"id": "pq-cryptanalysis", "actor": "planted analyst", "evolution": "custom-built",
+         "velocity": 0.2, "links_risk": RISK},
+    ]
+    (intel / "market-intel.json").write_text(
+        json.dumps({"components": rows}, indent=2) + "\n", encoding="utf-8")
+    _git(repo.parent, "init", "-q", "-b", "main", str(repo))
+    _git(repo, "config", "core.hooksPath", os.devnull)
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "fixture platform intel (planted)", date=BASE_DATE)
+    sha = _git(repo, "rev-parse", "HEAD").strip()
+    _git(repo, "update-ref", "refs/remotes/origin/main", sha)
+    return repo
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("command", choices=[
-        "build", "bad-horizon", "rewrite-override", "orphan-override", "rewrite-question"])
+        "build", "bad-horizon", "rewrite-override", "orphan-override", "rewrite-question",
+        "append-note", "platform", "platform-cross-linked"])
     parser.add_argument("root")
     parser.add_argument("--no-override", action="store_true")
+    parser.add_argument("--no-needs", action="store_true",
+                        help="the same overlay with every `needs` list removed: the graph WITHOUT "
+                             "the planted edge, so a reachability set can be measured moving")
     args = parser.parse_args(argv)
     root = Path(args.root)
     if args.command == "build":
-        print(build(root, with_override=not args.no_override))
+        print(build(root, with_override=not args.no_override, with_needs=not args.no_needs))
     elif args.command == "bad-horizon":
         print(bad_horizon(root))
     elif args.command == "rewrite-override":
         print(rewrite_override(root))
     elif args.command == "orphan-override":
         print(orphan_override(root))
+    elif args.command == "append-note":
+        print(append_note(root))
+    elif args.command in ("platform", "platform-cross-linked"):
+        print(plant_platform(root, cross_link=args.command == "platform-cross-linked"))
     else:
         print(rewrite_question(root))
     return 0

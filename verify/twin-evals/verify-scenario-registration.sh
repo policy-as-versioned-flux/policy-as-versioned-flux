@@ -18,6 +18,14 @@
 #                  measured the third leg: edit a scenario's proposition, horizon or words after
 #                  a forecast is registered against it and every score moves.
 #
+# WHAT IT MEASURES RATHER THAN CITES. Everything this seam says about DATES it derives from git.
+# Everything it said about REACHABILITY it used to derive from reading `twin/blast.py` -- and a
+# module that reasons about a traversal without running it was wrong about it twice (review F1: a
+# causal edge was refused reachability, though radius() walks `influences` forwards; review F2: a
+# two-hop dependency path was reported as "no dependency between them, in either direction"). So
+# the traversal is RUN here, over the fixture graph with the planted `needs` entries and without
+# them, and the unpriced set is asserted as a SET.
+#
 # The five rules, each a refusal by name:
 #   1. a scenario declares a `horizon` -- one is optional in twin/schema.py, and without one the
 #      entry names no date an outcome falls on and none a registration could be strictly before;
@@ -81,6 +89,10 @@ grep -q '1 override(s), 1 scoreable' "$TMP/clean.out" || fail "the override coun
 # 2. RED (a): the actor path. The pair is PLANTED here as two components with the `needs` edge
 #    between them -- no real model has either -- and the ruling still refuses every move but
 #    reachability, each by name. `refuse_move` is the callable form of the ruling.
+#
+#    What the ruling says about REACHABILITY is measured against `twin/blast.py`'s own traversal,
+#    run over the same model, and never against the admission's own sentence (review F1, F2, F4:
+#    the module reasoned about a traversal it had never run, and was wrong twice in the same way).
 (cd "$ROOT" && EST="$TMP/clean" "$PY" - <<'PY'
 import os, pathlib, sys
 sys.path.insert(0, os.getcwd())
@@ -102,9 +114,25 @@ except reg.RegistrationError as exc:
     assert "is not one of the things a relation could move" in str(exc), str(exc)
 else:
     raise SystemExit("a move nobody named was admitted by omission")
-# and a REAL causal edge still moves no coordinate either
-causal = reg.Admission(source="a", target="b", verdict=reg.PRICED_CAUSAL, reason="fixture",
-                       admits=("magnitude",), refused=dict(reg.ALWAYS_REFUSED))
+
+# A REAL causal edge, planted rather than hand-constructed as an Admission: it moves a MAGNITUDE
+# and it moves REACHABILITY -- twin/blast.py walks `influences` forwards, so a causal edge is a
+# dependency path as well as a priced one -- and it still moves no coordinate. Measured on the
+# BLAST SET, which is the thing the claim is about.
+before = reg.reached_set(model, "nb-refining-capacity")
+model.edges["planted-influence"] = {
+    "id": "planted-influence", "type": "influences",
+    "from": "nb-refining-capacity", "to": "island-thing",
+    "sign": "increases", "lag_days": 30,
+    "elasticity": {"min": 0.1, "mode": 0.2, "max": 0.3}, "evidence_grade": 2,
+}
+after = reg.reached_set(model, "nb-refining-capacity")
+if [c for c, _ in after] != sorted([c for c, _ in before] + ["island-thing"]):
+    raise SystemExit(f"a planted influences edge did not move the blast set: {before} -> {after}")
+causal = reg.admits(model, "nb-refining-capacity", "island-thing")
+assert causal.verdict == reg.PRICED_CAUSAL, causal.verdict
+reg.refuse_move(causal, "magnitude")
+reg.refuse_move(causal, "reachability")
 for asked in ("evolution_position", "evidence_grade", "weight", "probability"):
     try:
         reg.refuse_move(causal, asked)
@@ -114,6 +142,48 @@ for asked in ("evolution_position", "evidence_grade", "weight", "probability"):
         raise SystemExit(f"a {reg.PRICED_CAUSAL} relation was allowed to move {asked!r}")
 PY
 ) || fail "the needs-edge ruling admitted something it does not admit"
+
+# 2b. The module's ONE affirmative claim, converted from a citation into a measurement. The
+#     fixture builds the same overlay twice -- with the planted `needs` entries and without -- and
+#     the unpriced reachability set moves from EMPTY to two components. Nothing in this seam ran
+#     the traversal before review F4: everything it said about dates it derived from git, and
+#     everything it said about reachability it derived from reading twin/blast.py.
+fx build "$TMP/no-needs" --no-needs
+(cd "$ROOT" && WITH="$TMP/clean" WITHOUT="$TMP/no-needs" "$PY" - <<'PY'
+import os, pathlib, sys
+sys.path.insert(0, os.getcwd())
+from twin import registration as reg
+with_needs = reg.read_model(pathlib.Path(os.environ["WITH"]) / "driftwood", "driftwood")
+without = reg.read_model(pathlib.Path(os.environ["WITHOUT"]) / "driftwood", "driftwood")
+moved = reg.reached_set(with_needs, "nb-refining-capacity")
+empty = reg.reached_set(without, "nb-refining-capacity")
+if empty != ():
+    raise SystemExit(f"with every `needs` removed the traversal still reached {empty}")
+if moved != (("pq-cryptanalysis", 1), ("unwatched-thing", 2)):
+    raise SystemExit(f"the planted needs entries did not produce the expected blast set: {moved}")
+print(f"    fixture: the unpriced reachability set from 'nb-refining-capacity' is {list(empty)} "
+      f"without the planted needs entries and {[f'{c} (depth {d})' for c, d in moved]} with them")
+# and the two-hop end is REACHED without being ADJACENT: the distinction review F2 found being
+# reported as "there is no dependency between them, in either direction"
+two_hops = reg.admits(with_needs, "unwatched-thing", "nb-refining-capacity")
+if two_hops.verdict != reg.REACHABLE_NOT_ADJACENT:
+    raise SystemExit(f"a two-hop dependency path was graded {two_hops.verdict}")
+reg.refuse_move(two_hops, "reachability")
+for asked in ("magnitude", "price", "evolution_position", "evidence_grade", "weight", "probability"):
+    try:
+        reg.refuse_move(two_hops, asked)
+    except reg.RegistrationError:
+        pass
+    else:
+        raise SystemExit(f"a {reg.REACHABLE_NOT_ADJACENT} relation was allowed to move {asked!r}")
+# a pair the traversal genuinely cannot connect still says so, and says it as a measurement
+island = reg.admits(with_needs, "island-thing", "nb-refining-capacity")
+if island.verdict != reg.NO_RELATION:
+    raise SystemExit(f"an unconnected pair was graded {island.verdict}")
+if "at no depth up to its max_depth of" not in island.refused["reachability"]:
+    raise SystemExit(f"the no-relation refusal is not bounded by the traversal: {island.refused['reachability']}")
+PY
+) || fail "the reachability set did not move when the planted needs edge did"
 
 # 3. RED (b): a scenario whose horizon is its own authoring date. Measured ACCEPTED by
 #    twin/schema.py before this ticket -- `validate('scenario', ...)` returns cleanly -- so the
@@ -156,6 +226,20 @@ grep -q "the resolution question of scenario 'planted-supply-2026' registered on
   || fail "the rewritten question was not re-registered on the day of the rewrite: $(grep 'FAIL:' "$TMP/moved.out" | head -1)"
 grep -q "moves every score taken against it" "$TMP/moved.out" \
   || fail "the refusal does not say what a rewritten question does to the scores already taken"
+grep -q "question: 'Does the planted supplier fail inside the horizon?' -> 'A DIFFERENT question" "$TMP/moved.out" \
+  || fail "the rewrite does not say WHICH field moved: $(grep 'FAIL:' "$TMP/moved.out" | head -1)"
+
+# 5b. and the same measurement on a rewrite that appended a NOTE and left the question alone. It
+#     re-registers all the same -- the rule is blob identity -- but a report that could not tell
+#     the two apart is what ticket 93's review G2 refused for a forecast's numbers. The niobium
+#     entry in this ticket's own driftwood PR is exactly this shape.
+fx build "$TMP/noted"
+fx append-note "$TMP/noted"
+check --estate "$TMP/noted" >"$TMP/noted.out" 2>&1
+grep -q "none of proposition, horizon, question moved" "$TMP/noted.out" \
+  || fail "an appended note was reported as the question moving: $(grep 'FAIL:' "$TMP/noted.out" | head -1)"
+grep -q "rewritten after it landed" "$TMP/noted.out" \
+  || fail "an appended note stopped counting as a rewrite: the registration rule is blob identity"
 
 # 6. an override no question reaches is UNSCOREABLE WITH A REASON, not a zero and not a failure
 fx build "$TMP/orphan"
@@ -189,7 +273,26 @@ else:
 PY
 ) || fail "a dangling override component was admitted"
 
-echo "PASS: offline, over throwaway repositories the fixture PLANTS (a fixture, not a real model: no twin model anywhere carries nb-refining-capacity or pq-cryptanalysis, which is the ticket's finding, so the pair is planted here as two components with a needs edge to exercise the ruling on). The planted needs edge moves REACHABILITY and nothing else -- an evolution_position, an evidence_grade, a weight, a probability, a magnitude and a price are each refused by name, a priced causal edge moves no coordinate either, and a move nobody named is refused rather than admitted by omission. A scenario whose horizon is its own authoring date validates under twin/schema.py (re-run here, so the RED is reproducible) and is refused here, because nothing could ever be registered against it. An override rewritten after it landed on the served ref registers on the day of the rewrite with both dates printed, and so does a QUESTION rewritten after its own horizon -- the leg ticket 93 did not have. An override no question reaches is unscoreable with a reason rather than a zero or a failure, one on a component the model does not carry is refused, and no override is ever scored on its own coordinate. platform's intel rows are read on the real-estate half below, never here"
+# 9. Decision 1's factual half is a claim about PLATFORM's file, so it is graded and not only
+#    printed (review F5). RED: before this, editing platform's intel so one row's links_risk names
+#    the other id left the check at exit 0 -- the finding the whole decision rests on was printed
+#    on every run and observed on none.
+fx build "$TMP/intel"
+fx platform "$TMP/intel"
+check --estate "$TMP/intel" >"$TMP/intel.out" 2>&1
+[ $? -eq 0 ] || fail "a platform whose two rows both name the FAIR risk was graded false: $(tail -1 "$TMP/intel.out")"
+grep -q "which is a FAIR risk id and not a component, so neither row points at the other" "$TMP/intel.out" \
+  || fail "the intel rows were not read off the planted platform's served ref"
+fx build "$TMP/intel-crossed"
+fx platform-cross-linked "$TMP/intel-crossed"
+check --estate "$TMP/intel-crossed" >"$TMP/intel-crossed.out" 2>&1
+[ $? -eq 1 ] || fail "one intel row naming the other id left the decision's own premise ungraded: $(tail -1 "$TMP/intel-crossed.out")"
+grep -q "which is the OTHER id in the pair" "$TMP/intel-crossed.out" \
+  || fail "the cross-linked intel row was not named: $(grep 'FAIL:' "$TMP/intel-crossed.out" | head -1)"
+grep -q "needs re-reading, not re-asserting" "$TMP/intel-crossed.out" \
+  || fail "the finding does not say what a reader should do with it"
+
+echo "PASS: offline, over throwaway repositories the fixture PLANTS (a fixture, not a real model: no twin model anywhere carries nb-refining-capacity or pq-cryptanalysis, which is the ticket's finding, so the pair is planted here as two components with a needs edge to exercise the ruling on). REACHABILITY IS MEASURED, NOT CITED: twin/blast.py's own traversal is run over the fixture graph with the planted needs entries and without them, and the unpriced set from nb-refining-capacity moves from [] to pq-cryptanalysis at depth 1 and unwatched-thing at depth 2. The planted needs edge moves that reachability and nothing else -- an evolution_position, an evidence_grade, a weight, a probability, a magnitude and a price are each refused by name; a planted causal edge moves a magnitude AND reachability (blast.py walks influences forwards) and still no coordinate; a two-hop path is reachable-not-adjacent rather than unrelated; a component on no chain is unrelated and says so as a depth-bounded measurement; and a move nobody named is refused rather than admitted by omission. A scenario whose horizon is its own authoring date validates under twin/schema.py (re-run here, so the RED is reproducible) and is refused here, because nothing could ever be registered against it. An override rewritten after it landed on the served ref registers on the day of the rewrite with both dates printed, and so does a QUESTION rewritten after its own horizon -- the leg ticket 93 did not have -- and each names WHICH field moved, so an appended note is not reported as the question changing. An override no question reaches is unscoreable with a reason rather than a zero or a failure, one on a component the model does not carry is refused, and no override is ever scored on its own coordinate. The claim Decision 1 rests on -- that platform's two intel rows name a FAIR risk and never each other -- is GRADED, not printed: a planted platform whose rows cross-link turns this half red. The REAL platform's rows are read on the real-estate half below, never here"
 [ "$SELFCHECK" = 1 ] && exit 0
 
 # --- the real estate: every adopter's origin/main ---------------------------------------------

@@ -219,6 +219,23 @@ write, and what it may never write.
      THROUGH the proposition of a scenario that names the component it moves, and never on its own
      coordinate, which has no published answer key: an override no question reaches is
      `unscoreable` with a reason, `twin/scoring.py`'s own first-class result, never a zero.
+     *What of this is GRADED today, and what is only recorded (added 2026-09-09, ticket 51 review
+     F7).* The check grades an entry's own registration against its OWN horizon: a question
+     rewritten after its horizon is refused, and the refusal now names which of `proposition`,
+     `horizon` and `question` moved, so an appended note is not reported as the question changing.
+     It does NOT yet grade a forecast's registration against the registration of the question it
+     names -- a question rewritten after it landed but BEFORE its horizon exits 0 and PASSes. That
+     comparison is stated in this record and becomes measurable on the day the first forecast
+     merges onto an adopter's `origin/main`; no forecast is on any adopter's main today, and none
+     was written to make this leg look finished.
+     *And what the ruling now MEASURES rather than cites (added 2026-09-09, ticket 51 review F1,
+     F2 and F4).* Reachability is `twin/blast.py`'s traversal, and `admits()` runs it rather than
+     describing it. A CAUSAL edge moves reachability as well as a magnitude -- `radius()` walks
+     `influences` forwards into the blast radius exactly as it walks `needs` backwards -- and
+     reachability is TRANSITIVE to `blast.MAX_DEPTH` while adjacency is not, so a pair with no
+     edge between them but a path of more than one hop is `reachable-not-adjacent` and not
+     unrelated. Neither correction touches the coordinate ruling: no relation of any type, at any
+     depth, moves an evolution position.
 
 ## Alternatives
 
