@@ -36,8 +36,10 @@ selfcheck ok
 [1;36m==>[0m 4. how much this stop reaches, as a number rather than a claim
   0 of 2 workflows in this repository are triggered by another workflow finishing, so today this stop reaches this run's own conclusion and nothing downstream
 [1;36m==>[0m 5. the newest transition talk/truth.log recorded carries no unaccounted fall
-  newest transition: run 179 (2026-09-08T14:11Z) -> run 181 (2026-09-08T19:59Z)
-  no fall: no class lost a pass, `fail` did not rise, and neither the ceiling nor the total fell unexplained
-  history: 50 recorded transition(s); 14 older one(s) carry an unaccounted fall and 0 carry an accepted one (older transitions are counted, never graded: the log is append-only)
+  newest transition: run 181 (2026-09-08T19:59Z) -> run 184 (2026-09-08T23:26Z)
+  FALL class-pass: class `observed` fell from 25 passes to 24 while the total number of passes did not fall, so the passes moved between classes -- a re-class, not a lost green. It is still a fall by the contract, and it needs a line in talk/verify-falls.txt
+  FALL fail: `fail` rose from 9 to 10
+  history: 51 recorded transition(s); 14 older one(s) carry an unaccounted fall and 0 carry an accepted one (older transitions are counted, never graded: the log is append-only)
+  !! the newest recorded transition carries a fall no committed reason accepts
 
-PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, that step's OWN shell -- lifted verbatim and run over throwaway git repositories in 14 states -- turns the run red on a lost class pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total while letting a re-class, an exclusion, an accepted fall and a branch run through, and the newest transition talk/truth.log recorded carries no fall no committed reason accepts
+FAIL: 1 fault(s) -- a fall in the citable number is not a blocking event (ticket 59)

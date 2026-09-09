@@ -2,15 +2,19 @@
 ... ludlow
 ... tuppence
 ok: platform checked out at v2.0.1 (533dccb0a823); the served artefact is its own published evidence for policy 2.0.1
-ok: the same tag re-cut with one base64 character of policy 2.0.1's real signature changed (d07a682bcd6f) -- nothing else moved, so a gate that adopts it adopted an unverified signature
-note: driftwood: its own gate cannot verify platform's real published bundle with a cold TUF cache and egress blocked -- exit 1, so this repository's signature check fetches a Sigstore trust root on every CI run, which is cold every time (eco-system ticket 105)
+ok: the same tag re-cut with one base64 character of policy 2.0.1's real signature changed (8b6d88043838) -- nothing else moved, so a gate that adopts it adopted an unverified signature
+ok: the same tag re-cut with ONE BYTE APPENDED to policy 2.0.1's evidence document (9a186ac072be) -- it parses to the identical object and platform's own signature is untouched, so the only thing that can refuse it is the digest that signature covers
+note: driftwood: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed
 note: ludlow: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed
-note: tuppence: its own gate cannot verify platform's real published bundle with a cold TUF cache and egress blocked -- exit 1, so this repository's signature check fetches a Sigstore trust root on every CI run, which is cold every time (eco-system ticket 105)
+note: tuppence: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed
 ok: driftwood: real cosign accepted platform's own published signature for policy 2.0.1, and the gate adopted
-ok: driftwood: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: error verifying bundle: signature in bundle does not match signature being verified
+ok: driftwood: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: failed to verify log inclusion: transparency log signature does not match
+ok: driftwood: the same evidence document with one byte appended -- it parses identically and every field the gate reads is unchanged -- was refused, naming the digest or the signature -- error during command execution: failed to verify log inclusion: transparency log hashedrekord entry digest f9dd3389d149a
 ok: ludlow: real cosign accepted platform's own published signature for policy 2.0.1, and the gate adopted
-ok: ludlow: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: error verifying bundle: signature in bundle does not match signature being verified)
+ok: ludlow: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: failed to verify log inclusion: transparency log signature does not match)
+ok: ludlow: the same evidence document with one byte appended -- it parses identically and every field the gate reads is unchanged -- was refused, naming the digest or the signature -- error during command execution: failed to verify log inclusion: transparency log hashedrekord entry digest f9dd3389d149a
 ok: tuppence: real cosign accepted platform's own published signature for policy 2.0.1, and the gate adopted
-ok: tuppence: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: error verifying bundle: signature in bundle does not match signature being verified
-SUMMARY: every adopter gate in this estate accepted platform's own published signature and refused the same evidence with one byte of it changed, each through its own workflow's own invocation and its own identity constant
-PASS: every adopter gate in this estate accepted platform's own published signature and refused the same evidence with one byte of it changed, each through its own workflow's own invocation and its own identity constant
+ok: tuppence: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: failed to verify log inclusion: transparency log signature does not match
+ok: tuppence: the same evidence document with one byte appended -- it parses identically and every field the gate reads is unchanged -- was refused, naming the digest or the signature -- error during command execution: failed to verify log inclusion: transparency log hashedrekord entry digest f9dd3389d149a
+SUMMARY: every adopter gate in this estate accepted platform's own published signature, refused the same evidence with one byte of that signature changed, and refused that untouched signature over an evidence document with one byte appended -- each through its own workflow's own invocation and its own identity constant
+PASS: every adopter gate in this estate accepted platform's own published signature, refused the same evidence with one byte of that signature changed, and refused that untouched signature over an evidence document with one byte appended -- each through its own workflow's own invocation and its own identity constant

@@ -6,7 +6,7 @@
   -- lane declarations and ownership read at origin/main, freshly fetched; the checkout is never graded
   -- 5 figure(s) graded against talk/truth.log; 1 identified no line and were not graded
   -- 0 figure(s) exempted by a fixed disclaimer, 1 disposed of by the dated correction directly below them:
-  -- disposed .scratch/ecosystem/map.md:106  (correction of 2026-08-31, the paragraph below it)
+  -- disposed .scratch/ecosystem/map.md:107  (correction of 2026-08-31, the paragraph below it)
   -- 15 lane declaration(s) read across 8 unit(s)
 
 PASS: every pass/fail figure .scratch/ecosystem/map.md quotes is a figure talk/truth.log records, every check it names is one talk/verify-all.sh discovers, every relative link resolves, no unit declares an observation-lane path it does not own, and ticket 67's record corrections are each still there

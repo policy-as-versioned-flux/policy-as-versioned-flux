@@ -8,11 +8,10 @@ ok  D: real refusal against the real repo's own current tags -- no evidence exis
 REFUSED: platform-pin.yaml names commit 0000000000000000000000000000000000000c for tag v1.0.0, but the tag actually resolves to e34ae7f5d38feede2c30ef45037ec9af0d3f43b3 -- ADR-0001's pin disagrees with reality
 ok  C: a pin naming the wrong commit for its own tag is refused, naming the real resolved commit
 
-== Scenario D2: a REAL cosign verify-blob rejection of a present-but-malformed bundle (the real binary reaches the trust check itself, not just the file-existence check) ==
+== Scenario D2: a present-but-malformed bundle is refused BY NAME, before cosign is called (eco-system ticket 105 -- handing cosign a bundle it cannot place is the live TUF fetch the pinned root exists to prevent; the real binary's own refusals are Scenarios E2 and H) ==
 ok  platform checked out at v1.0.0, resolved commit matches the pinned commit field (e34ae7f5d38feede2c30ef45037ec9af0d3f43b3)
-REFUSED: cosign verify-blob failed for policy version 2.0.0 evidence (identity '.*'): Error: bundle does not contain cert for verification, please provide public key
-error during command execution: bundle does not contain cert for verification, please provide public key
-ok  D2: real cosign verify-blob genuinely rejects a present-but-malformed bundle (not just a missing-file check)
+REFUSED: the committed bundle for policy version 2.0.0 at 2.0.0.json.bundle is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
+ok  D2: a present-but-malformed bundle is refused by name before cosign, and the refusal says why it stops there
 
 == Scenario E: the REAL, unmodified, currently-committed platform-pin.yaml -- a genuine two-document YAML stream (GitRepository + Kustomization) -- verified end to end with REAL cosign against platform's REAL committed evidence bundles ==
 FAIL: composed bump is major -- refusing to adopt v2.0.1 without human review
@@ -26,8 +25,9 @@ ok  E-multi: parse_pin() reads tag/commit past a second (Kustomization) document
 
 == Scenario E2: the SAME real bundles, refused by REAL cosign when the identity constant names a foreign publisher -- the identity pin is load-bearing against a real Fulcio certificate, not only against a string ==
 ok  platform checked out at v2.0.1, resolved commit matches the pinned commit field (533dccb0a823001b396fd60ab08014bf75065a37)
-REFUSED: cosign verify-blob failed for policy version 4.0.0 evidence (identity '^https://github\\.com/evil-org/platform/\\.github/workflows/cut-release\\.yml@refs/heads/main$'): Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
-error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+REFUSED: cosign verify-blob failed for policy version 4.0.0 evidence (identity '^https://github\\.com/evil-org/platform/\\.github/workflows/cut-release\\.yml@refs/heads/main$'): Flag --new-bundle-format has been deprecated, this will be the only supported format in future versions
+Error: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value to match regex "^https://github\.com/evil-org/platform/\.github/workflows/cut-release\.yml@refs/heads/main$", got "https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main"
+error during command execution: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value to match regex "^https://github\.com/evil-org/platform/\.github/workflows/cut-release\.yml@refs/heads/main$", got "https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main"
 ok  E2: the same real bundle that just verified is refused by the real binary when the identity constant names a different publisher
 
 == Scenario F: old_tag == new_tag -- the ordinary PR that never touches gitops/platform/platform-pin.yaml at all ==
@@ -46,7 +46,7 @@ ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none')
   setup: tagged policy/v4.0.0 in the throwaway clone (the real repo waits on CI to sign it)
   setup: tagged policy/v5.0.0 in the throwaway clone (the real repo waits on CI to sign it)
 ok  'v2.0.0' is not a policy tag -- not this gate's subject, skipped
-signed: /tmp/tmp.tUygvMNYxU/clone/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.tQy7EjjkGy/clone/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -56,7 +56,7 @@ signed: /tmp/tmp.tUygvMNYxU/clone/computed-semver/evidence/9.0.0.json.bundle
 GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
 GATE: passed for policy/v9.0.0
 committed: signed release-gate evidence for v2.0.0, policy/v9.0.0
-committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 354ff1c34b6d44e7607f876674f9fdcdf35c2484
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 6f8cf83dcced576b239b795f0d3170163c2055c9
 tagged v2.0.0
 tagged policy/v9.0.0
 ok  'v3.0.0' is not a policy tag -- not this gate's subject, skipped
@@ -67,7 +67,7 @@ tagged v3.0.0
 ok  one real gated release (9.0.0, real evidence), plus three real array-level releases (unchanged, retired, returned), real tags v2.0.0/v2.1.0/v3.0.0/v4.0.0
 
 == Scenario A: real PASS -- the pin moves (v2.0.0 -> v2.1.0) and the array does not, so this bump adds and retires nothing and composes 'none' (eco-system ticket 99) ==
-ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (58e005f34d0bcd836fa1b52cadf128f9f0ae6a48)
+ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (5916d09fb7dc11d8825ad8b0da0d3419b4073371)
 declared (platform tag v2.0.0 -> v2.1.0): minor
 composed (this institution, over what this pull request moves -- added [], retired []; window at the head is ['9.0.0']): none
 this pull request adds and retires no policy version, so it composes 'none' -- whether a major already stands in the window is reported continuously by the hub's verify-unreviewed-major-in-window.sh, not by this gate (eco-system ticket 99)
@@ -76,7 +76,7 @@ PASS: composed bump 'none' does not exceed major; v2.1.0 may be adopted
 ok  A: a bump that adds and retires nothing composes none and passes, folding no standing version
 
 == Scenario A2: real PASS -- 9.0.0 ARRIVES in the array (v3.0.0 -> v4.0.0), and the arrival's bump is RE-READ out of the publisher's own real committed evidence, never recomputed ==
-ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (4be0185d19b66a850f6dd27330fbefbae7eb9ac5)
+ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (30b182026f1fc5c682cfbf2789257db72c7d5867)
 declared (platform tag v3.0.0 -> v4.0.0): major
 composed (this institution, over what this pull request moves -- added ['9.0.0'], retired []; window at the head is ['9.0.0']): patch
 NOTE: composed bump ('patch') is weaker than the publisher's tag ('major') -- informational only, this institution's obligation is never lowered by a local view
@@ -89,17 +89,35 @@ ok  A-render: a no-movement bump renders as no movement, no percentage anywhere
 
 == Scenario B: real FAIL -- 9.0.0 retires with nothing replacing it, composed forced major ==
 FAIL: composed bump is major -- refusing to adopt v3.0.0 without human review
-ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (2f7e0a690d86c3dd2922544207cb114d8eb236cc)
+ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (f79e8e1a431404d3dd7eea3063fd455d2d6de1be)
 declared (platform tag v2.1.0 -> v3.0.0): major
 composed (this institution, over what this pull request moves -- added [], retired ['9.0.0']; window at the head is []): major
 RETIRED, reaching this institution as major: 9.0.0
 ok  B: real refusal -- a composed major fails the required check for real (non-zero exit), retirement named, nothing silent
 
-== Scenario G: how offline this gate's signature check actually is -- measured on this run, not claimed ==
-the same real bundle (policy 4.0.0), cold TUF cache, every proxy pointed at a closed port: exit 1
-Error: setting up clients and keys: getting rekor public keys: updating local metadata and targets: error updating to TUF remote mirror: tuf: failed to download 13.root.json: Get "https://tuf-repo-cdn.sigstore.dev/13.root.json": proxyconnect tcp: dial tcp 127.0.0.1:1: connect: connection refused
-error during command execution: setting up clients and keys: getting rekor public keys: updating local metadata and targets: error updating to TUF remote mirror: tuf: failed to download 13.root.json: Get "https://tuf-repo-cdn.sigstore.dev/13.root.json": proxyconnect tcp: dial tcp 127.0.0.1:1: connect: connection refused
-ok  G: measured, not claimed -- with a cold TUF cache and egress blocked this gate's own cosign invocation cannot verify platform's real bundle (exit 1, a TUF fetch). Scenario E therefore ran with the network available, exactly as a real shift-left run does
+== Scenario G: how offline this gate's signature check actually is -- measured on this run, through the gate itself ==
+this gate's own CLI, policy 2.0.1 arriving beside 2.0.0, cold TUF cache + every proxy pointed at a closed port: exit 0
+declared (platform tag (none) -> v2.0.1): no predecessor
+composed (this institution, over what this pull request moves -- added ['2.0.1'], retired []; window at the head is ['2.0.0', '2.0.1']): none
+PASS: composed bump 'none' does not exceed major; v2.0.1 may be adopted
+the same real bundle (policy 2.0.1) WITHOUT the committed trust material, cold TUF cache, every proxy pointed at a closed port: exit 1
+ok  G: this gate verifies platform's real published bundle with NO network (exit 0, cold cache, egress blocked, through its own CLI), and the identical bytes without the committed root cannot be verified offline at all (exit 1, a TUF fetch) -- the pin is what makes it offline, measured on this run
+
+== Scenario H: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm ==
+ok  H[genuine]: the copied gate with the real committed root ACCEPTS, cold (exit 0) -- the copy mechanism is sound
+ok  H[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.tQy7EjjkGy/gate-absent-roo
+ok  H[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.tQy7EjjkGy/gate-absent-roo
+ok  H[wrong-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
+ok  H[wrong-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
+ok  H[corrupt-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: structure error: tag
+ok  H[corrupt-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: structure error: tag
+ok  H[wrong-ct-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
+ok  H[wrong-ct-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
+ok  H[wrong-fulcio-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify leaf certificate: leaf certificate verification failed
+ok  H[wrong-fulcio-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify leaf certificate: leaf certificate verification failed
+ok  H[ct-window-closed,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
+ok  H[ct-window-closed,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
+    (warm = this machine's own HOME, whose ~/.sigstore is warm on a laptop that has ever run cosign online and cold on a CI runner; either way the doctored root, not a cached one, is what refused)
 
 PASS: adopter-gate.py checks out the tag under review (never the default branch), refuses a
 resolved-commit disagreement with the pinned commit field, and refuses -- with the real cosign
@@ -113,4 +131,6 @@ what the bump MOVES (eco-system ticket 99): a bump that adds and retires no poli
 composes 'none' and passes without reading a standing version's evidence at all, an arrival
 composes by RE-READING that version's own real committed evidence (never recomputed), and a
 retirement still forces a real non-zero-exit FAIL naming the version. The weaker-than-declared
-note prints and never downgrades.
+note prints and never downgrades. Eco-system ticket 105: the gate verifies platform's real bundle
+with a cold TUF cache and egress blocked, exit 0, through its own CLI (G), and a wrong, corrupt,
+retired or absent trust root refuses on the trust material and never on the network, cold and warm (H).

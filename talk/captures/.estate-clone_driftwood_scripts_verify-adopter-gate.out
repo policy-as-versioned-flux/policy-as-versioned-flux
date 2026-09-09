@@ -27,13 +27,14 @@ OK: composed bump is 'none'
 OK  C: real cosign ACCEPTED platform's own published signature for policy 2.0.1 at v2.0.1, under this repository's own identity constant, and the gate composed the publisher's own 'none'
 
 == D: the REAL REFUSE -- the same real bundle with one signature byte changed ==
-REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's own identity constant -- Error: error verifying bundle: signature in bundle does not match signature being verified
-error during command execution: error verifying bundle: signature in bundle does not match signature being verified
+REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's own identity constant -- Flag --new-bundle-format has been deprecated, this will be the only supported format in future versions
+Error: failed to verify log inclusion: transparency log signature does not match
+error during command execution: failed to verify log inclusion: transparency log signature does not match
 OK  D: real cosign REFUSED the same real bundle with one signature byte changed, and the gate propagated it as a refusal about the SIGNATURE
 
 == E: the identity constant is load-bearing against a real Fulcio certificate, not just against a string ==
-REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's own identity constant -- Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
-error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+Error: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value to match regex "^https://github\.com/evil-org/platform/\.github/workflows/cut-release\.yml@refs/heads/main$", got "https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main"
+error during command execution: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value to match regex "^https://github\.com/evil-org/platform/\.github/workflows/cut-release\.yml@refs/heads/main$", got "https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main"
 OK  E: the same real, valid bundle is REFUSED when the identity constant names a foreign publisher -- the certificate is really being read
 
 == F: a retirement is a forced major, and a composed major refuses the pull request ==
@@ -42,11 +43,29 @@ OK  E: the same real, valid bundle is REFUSED when the identity constant names a
   - retired from the supported window: 2.0.1 (a retired version reaches the institution as a major)
 OK  F: retiring policy 2.0.1 composed major with no evidence lookup at all, and refused
 
-== G: how offline this gate actually is -- measured on this run, not claimed ==
-cold TUF cache + every proxy pointed at a closed port: exit 1
-Error: setting up clients and keys: getting rekor public keys: updating local metadata and targets: error updating to TUF remote mirror: tuf: failed to download 13.root.json: Get "https://tuf-repo-cdn.sigstore.dev/13.root.json": proxyconnect tcp: dial tcp 127.0.0.1:1: connect: connection refused
-error during command execution: setting up clients and keys: getting rekor public keys: updating local metadata and targets: error updating to TUF remote mirror: tuf: failed to download 13.root.json: Get "https://tuf-repo-cdn.sigstore.dev/13.root.json": proxyconnect tcp: dial tcp 127.0.0.1:1: connect: connection refused
-ok  G: measured, not claimed -- with a cold TUF cache and egress blocked this gate's own cosign invocation cannot verify platform's real bundle (exit 1, a TUF fetch). Scenario C above therefore ran with the network available, exactly as a real shift-left run does. Eco-system ticket 105 is the pin that closes it
+== G: how offline this gate actually is -- measured on this run, through the gate itself ==
+this gate's own compose, policy 2.0.1 arriving, cold TUF cache + every proxy pointed at a closed port: exit 0
+  - 2.0.1: publisher declared 'patch', computed 'none'
+  - composed bump 'none' is weaker than the publisher's declared 'patch' -- printed, never lowers what this institution treats as the obligation
+OK: composed bump is 'none'
+the same real bundle WITHOUT the committed trust material, cold TUF cache, every proxy pointed at a closed port: exit 1
+ok  G: this gate verifies platform's real published bundle with NO network (exit 0, cold cache, egress blocked, through its own compose), and the identical bytes without the committed root cannot be verified offline at all (exit 1, a TUF fetch) -- the pin is what makes it offline, measured on this run
+
+== I: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm ==
+ok  I[genuine]: the copied gate with the real committed root ACCEPTS, cold (exit 0) -- the copy mechanism is sound
+ok  I[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.T77Gyw53Se/gate-absent-roo
+ok  I[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.T77Gyw53Se/gate-absent-roo
+ok  I[wrong-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
+ok  I[wrong-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
+ok  I[corrupt-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
+ok  I[corrupt-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
+ok  I[wrong-ct-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
+ok  I[wrong-ct-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
+ok  I[wrong-fulcio-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify leaf certificate: leaf certificate verification failed
+ok  I[wrong-fulcio-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify leaf certificate: leaf certificate verification failed
+ok  I[ct-window-closed,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
+ok  I[ct-window-closed,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
+    (warm = this machine's own HOME, whose ~/.sigstore is warm on a laptop that has ever run cosign online and cold on a CI runner; either way the doctored root, not a cached one, is what refused)
 
 == H: the gate's own selfcheck -- its pure logic, on planted inputs ==
 OK splice_body: an empty starting body gets no leading separator
@@ -58,6 +77,7 @@ PASS: driftwood's adopter gate, against platform's REAL PUBLISHED evidence for p
       the pin is load-bearing (A), a movement of nothing composes 'none' and verifies nothing (B), real
       cosign ACCEPTS platform's own signature and the gate composes the publisher's own 'none' (C),
       real cosign REFUSES the same bundle with one signature byte changed (D), the same valid bundle is
-      REFUSED under a foreign identity constant (E), a retirement is a forced major that refuses (F), and
-      the gate's own selfcheck passes (H). How offline the signature check is is measured on every run and
-      printed as an exit code (G), never asserted as a sentence.
+      REFUSED under a foreign identity constant (E), a retirement is a forced major that refuses (F), the
+      gate's own selfcheck passes (H), and -- eco-system ticket 105 -- the gate verifies that bundle with a
+      cold TUF cache and egress blocked, exit 0, through its own compose (G), while a wrong, corrupt, retired
+      or absent trust root refuses on the trust material and never on the network, cold and warm (I).

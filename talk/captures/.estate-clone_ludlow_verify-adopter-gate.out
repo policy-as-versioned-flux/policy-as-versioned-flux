@@ -24,7 +24,7 @@ REFUSE: composed bump is major -- ['2.0.0']
 OK: retirement of 2.0.0 correctly refused the pull request check, comment names it
 
 B2. resolved-commit mismatch -> refuse (ADR-0001's pin made load-bearing, bug #2)
-REFUSE: platform tag 'v1.0.0' resolves to 'b213f10207a8d816b1c0f3753993557c50d95f17', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
+REFUSE: platform tag 'v1.0.0' resolves to 'df111589f89db7f11fe1227d3fb8452b4997627c', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
 OK: a pin naming the wrong commit for a real tag is refused, real git rev-parse caught it
 
 B3. composed weaker than the publisher's tag (unchanged array, major tag jump) -> informational, exit 0, never lowers
@@ -34,11 +34,11 @@ OK: composed=none against declared=major (v0.1.0 -> v1.0.0) passes, prints infor
 
 == Part C: a bundle this gate cannot read, and a missing one -- refused by name, before cosign ==
 -- a CHANGED version whose evidence file exists but whose bundle is not a real Sigstore bundle --
-REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit 93e4335a93a9dfde0b774a5aeecc7a4341e9b4bf) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot tell which pinned trust material verifies it -- refusing rather than handing cosign no trust root and letting it fetch a live one
+REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit df9cbae4d7deb931372880ad70b53729732f6625) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
 OK: a bundle whose shape this gate cannot read is refused by name, and no cosign call is made without pinned trust material
 
 -- a CHANGED version with no committed evidence file at all --
-REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit 57183febddf47ec020e9b17b99e1e894d0b08fa5
+REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit e3df8af11d7fcef5ba6e4fe14646a5d85671ed9e
 OK: a changed version with no committed evidence file is refused before cosign is even invoked
 
 == Part D: splice_body via the REAL CLI, with backslash-bearing evidence -- the exact re.sub() hazard ==
@@ -68,13 +68,15 @@ OK: real cosign ACCEPTED platform's own published signature for policy 2.0.0 at 
      itself -- so between the two, both paths into this gate are graded. Eco-system ticket 101 review, F4.)
 
 -- E3: the REAL REFUSE -- the same real bundle with one signature byte changed --
-REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Error: error verifying bundle: signature in bundle does not match signature being verified
-error during command execution: error verifying bundle: signature in bundle does not match signature being verified)
+REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag --new-bundle-format has been deprecated, this will be the only supported format in future versions
+Error: failed to verify log inclusion: transparency log signature does not match
+error during command execution: failed to verify log inclusion: transparency log signature does not match)
 OK: real cosign REFUSED the same real bundle with one signature byte changed, offline, and the gate propagated it as a refusal about the SIGNATURE
 
 -- E4: the identity pin is load-bearing against a real Fulcio certificate, not just against a string --
-REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
-error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main] with issuer https://token.actions.githubusercontent.com)
+REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag --new-bundle-format has been deprecated, this will be the only supported format in future versions
+Error: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value to match regex "^https://github\.com/evil-org/platform/\.github/workflows/cut-release\.yml@refs/heads/main$", got "https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main"
+error during command execution: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value to match regex "^https://github\.com/evil-org/platform/\.github/workflows/cut-release\.yml@refs/heads/main$", got "https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main")
 OK: the same real, valid bundle is REFUSED when the identity constant names a foreign publisher -- the certificate is really being read
 
 -- E5: the contrast -- the same real bundle with NO pinned trust material, cold cache, egress blocked --
@@ -84,6 +86,22 @@ error during command execution: setting up clients and keys: getting rekor publi
 the same real bundle (policy 2.0.0) WITHOUT the committed trust material, cold TUF cache, every proxy pointed at a closed port: exit 1
 OK: without the committed trust material the identical bytes cannot be verified offline at all -- the pin is what makes E2 offline, and it is measured on this run, not asserted
 
+-- E6: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm --
+OK: E6[genuine] -- the copied gate with the real committed root ACCEPTS, cold (exit 0); the copy mechanism is sound
+OK: E6[absent-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.SQmeKQOOU2/ga
+OK: E6[absent-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.SQmeKQOOU2/ga
+OK: E6[wrong-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
+OK: E6[wrong-rekor-key,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
+OK: E6[corrupt-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
+OK: E6[corrupt-rekor-key,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
+OK: E6[wrong-ct-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1)
+OK: E6[wrong-ct-key,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1)
+OK: E6[wrong-fulcio-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify leaf certificate: leaf certificate verification failed)
+OK: E6[wrong-fulcio-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify leaf certificate: leaf certificate verification failed)
+OK: E6[ct-window-closed,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1)
+OK: E6[ct-window-closed,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1)
+    (warm = this machine's own HOME, whose ~/.sigstore is warm on a laptop that has ever run cosign online and cold on a CI runner; either way the doctored root, not a cached one, is what refused)
+
 PASS: verify-adopter-gate.sh -- identity regexp (match/reject/rename-breaks-it), resolved-commit refusal,
       retirement-forces-major, composed-major fails the check, weaker-than-declared is informational-only,
       a bundle shape this gate cannot read is refused by name and a missing evidence file before that,
@@ -92,6 +110,8 @@ PASS: verify-adopter-gate.sh -- identity regexp (match/reject/rename-breaks-it),
       pins, through adopter_gate.py's own CLI, with a cold TUF cache and egress hard-blocked -- real cosign
       ACCEPTS platform's own signature (E2, exit 0), REFUSES the same bundle with one signature byte changed
       (E3), REFUSES it under a foreign identity constant (E4), cannot verify it at all without the committed
-      trust material (E5), and still refuses the pre-2026-09-06 --trusted-root invocation on the flag (E1).
+      trust material (E5), still refuses the pre-2026-09-06 --trusted-root invocation on the flag (E1), and
+      REFUSES on the trust material and never on the network when the committed root is wrong, corrupt,
+      retired or absent, cold and warm (E6, eco-system ticket 105).
       Out of reach here and dated 2026-09-06: SIGNING new evidence (Fulcio keyless needs a live Actions
       credential). Verifying what platform already signed is not, and is proved above.
