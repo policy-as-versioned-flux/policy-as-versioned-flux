@@ -46,3 +46,27 @@ which no push shares, so it is the only reliable way for a builder to get a bran
 
 Record: eco-system ticket 59's Answer; `verify/schedules/schedules.py`'s `PERIOD_HOURS` and its
 excused-conclusion table; ticket 56's per-event group; ticket 100's recording guard.
+
+**2026-09-09, a fresh instance, and the first one measured on a BRANCH rather than on `main`.**
+Run 34386266006's predecessor, push run **34384890318** on `ticket-48-the-demos-remaining-beats`
+at head `1aa4054`, went `completed/cancelled` while queued. It was displaced by a push run on
+`ticket-31-sensor-admission`, which entered the same `truth-push` lane a few minutes earlier. So
+the fault is symmetric and the ticket's title understates it: a branch push does not only cancel
+`main`'s recording run, it cancels other branches' measurement runs too, and two builders working
+at once will take turns losing their gate observation of their own work.
+
+That half costs no citable line, because a branch run records nothing (ticket 100). It costs
+something else, and the cost is what makes the ordering wrong rather than merely untidy: the
+reviewer of that branch has no gate run of the tree under review, so the branch either merges
+unmeasured or somebody dispatches by hand. Here it was dispatched by hand, run 34386266006 in
+`truth-workflow_dispatch`, which confirms the note above is still the only reliable route.
+
+The `main` half did NOT fire today. `truth.yml` ran six times on `main` on 2026-09-09, five on
+push (`cdc5fb9`, `302bf73`, `c1aee32`, `0c1cb54`, `041ecc8`) and one on schedule (`9517d98`).
+Every one completed, and `talk/truth.log` carries a line for every one of the six shas: runs 186,
+192, 194, 197, 200 and 207. Nothing was displaced on `main` today. Two `main` push runs were cancelled on 2026-09-08 (`e307152`,
+`a12c2f7`), so the eight the Question counts are now ten. That is a count and not a new decision;
+build item (b) still owns turning it into something the gate says on every run.
+
+One thing this instance settles for item (a): keying the group on `github.ref` fixes BOTH halves
+at once, because it puts every branch in its own lane, and no other option in the Question does.
