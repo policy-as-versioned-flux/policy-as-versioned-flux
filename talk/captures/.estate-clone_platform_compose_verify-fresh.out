@@ -29,5 +29,31 @@
   ok   an artefact with no exposure names `exposure` as absent
   ok   ...and states no total for it
   ok   an artefact with no selection-policy names `selection-policy` as absent
-FAIL: the absences are counted, and the count is the number listed
-FAIL: handbook.py --selfcheck
+  ok   the absences are counted, and the count is the number listed
+  ok   the fixture page names exactly the absences this file states it names
+  ok   the footer repeats the same count
+  ok   the publisher-clone-absent limit moving from closed to open leaves the page byte-identical, and the page names the exclusion
+  ok   the limit named `two-publisher-conflict` is still stated
+  ok   an empty list present in the artefact renders as a real zero
+  ok   evidence with no `members` names it absent and prints no `records 0`
+  ok   evidence with no `holes` names it absent and prints no `(`holes[]`): 0`
+  ok   evidence with no `limits` names it absent and prints no `**0 recorded limit(s)`
+  ok   evidence with no `cages` names it absent and prints no ``cages[]` entries: 0`
+  ok   evidence with no `refusals` names it absent and prints no `- `refusals[]`: 0`
+  ok   evidence with no `restatements` names it absent and prints no `- `restatements[]`: 0`
+  ok   evidence with no `deltas` names it absent and prints no `- `deltas[]`: 0`
+  ok   evidence with no `ungoverned` names it absent and prints no `- `ungoverned[]`: 0`
+  ok   a header with no `selected-controls` names it absent and prints no `Controls selected: 0`
+  ok   a list field that is not a list is refused, not counted
+  ok   an artefact with no HEADER.yaml is refused
+  ok   an artefact with a refused composition is refused
+PASS: handbook render seam: 47 checks -- pure in-process and in a separate emptied-environment process, clock-free, biting, complete, perspective-and-currency bearing, naming every absent field (lists included) rather than printing a zero, refusing a non-artefact
+[1;36m==>[0m 2. the render committed beside its artefact is fresh at the tag that carries both
+  ok   /tmp/tmp.p0zpX8AT68/adopter@planted-v1: the served handbook is byte-identical to a re-render of the served artefact (7172 bytes)
+[1;36m==>[0m 3. a hand-edited page over an untouched artefact is STALE (the lie with a nicer font)
+  ok   a sentence added by hand is caught at the tag
+[1;36m==>[0m 4. a moved ARTEFACT under an untouched page is STALE too (the page went stale, not wrong)
+  ok   a price that moved without the page is caught at the tag
+[1;36m==>[0m 5. a ref that serves no artefact is a could-not-look, never a pass and never a red
+  ok   a ref with no handbook exits 3
+PASS: verify-fresh.sh grades render-at-ref against the page served at the same ref: a fresh render passes, a hand-edited page fails, an artefact that moved under an unmoved page fails, a ref with no artefact exits 3, and git being unreachable exits 3

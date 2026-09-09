@@ -24,7 +24,7 @@ REFUSE: composed bump is major -- ['2.0.0']
 OK: retirement of 2.0.0 correctly refused the pull request check, comment names it
 
 B2. resolved-commit mismatch -> refuse (ADR-0001's pin made load-bearing, bug #2)
-REFUSE: platform tag 'v1.0.0' resolves to 'dc20aa8dc029c515b44a54592e05ceb670c7934d', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
+REFUSE: platform tag 'v1.0.0' resolves to '6f5d970ec76e966bbe5a9b43e9345cedf56fe4b5', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
 OK: a pin naming the wrong commit for a real tag is refused, real git rev-parse caught it
 
 B3. composed weaker than the publisher's tag (unchanged array, major tag jump) -> informational, exit 0, never lowers
@@ -34,11 +34,11 @@ OK: composed=none against declared=major (v0.1.0 -> v1.0.0) passes, prints infor
 
 == Part C: a bundle this gate cannot read, and a missing one -- refused by name, before cosign ==
 -- a CHANGED version whose evidence file exists but whose bundle is not a real Sigstore bundle --
-REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit 7eb19f3ccfd3736ea968384c92c5b357369b9845) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
+REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit df11f8647f738aea4482f3d1626d23dc7c8458d2) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
 OK: a bundle whose shape this gate cannot read is refused by name, and no cosign call is made without pinned trust material
 
 -- a CHANGED version with no committed evidence file at all --
-REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit f20ff5982eff09eaacda0dfb2b9dd339f9e5b613
+REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit 4d2236a7ea5a21a49c5601624bb5b82d0d7c4212
 OK: a changed version with no committed evidence file is refused before cosign is even invoked
 
 == Part D: splice_body via the REAL CLI, with backslash-bearing evidence -- the exact re.sub() hazard ==
@@ -88,8 +88,8 @@ OK: without the committed trust material the identical bytes cannot be verified 
 
 -- E6: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm --
 OK: E6[genuine] -- the copied gate with the real committed root ACCEPTS, cold (exit 0); the copy mechanism is sound
-OK: E6[absent-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.bmLT6SMmiO/ga
-OK: E6[absent-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.bmLT6SMmiO/ga
+OK: E6[absent-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.DtRq9siDQ8/ga
+OK: E6[absent-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.DtRq9siDQ8/ga
 OK: E6[wrong-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
 OK: E6[wrong-rekor-key,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
 OK: E6[corrupt-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
