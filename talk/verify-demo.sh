@@ -122,7 +122,16 @@ python3 talk/build_deck.py --check "$TMP/deck.md" >"$TMP/rebuild" 2>&1; rc=$?
 sed 's/^/  /' "$TMP/rebuild"
 case "$rc" in
   0) ;;
-  3) echo "SKIP: a deck of this run's captures names a read this run wrote no capture for, so it could not be graded whole: $(grep -m1 'could not look  ' "$TMP/rebuild" | sed 's/^ *could not look  //')"
+  3) # Two different could-not-looks, and the sentence must not say the wrong one. A capture the
+     # run never wrote is one thing; a capture it wrote and never graded is another (ticket 48
+     # review F1), and calling the second "wrote no capture for" would be a false sentence in the
+     # place this check exists to keep true.
+     why="$(grep -m1 'could not look  ' "$TMP/rebuild" | sed 's/^ *could not look  //')"
+     case "$why" in
+       *"recorded no grade for"*) what="recorded no grade for" ;;
+       *)                         what="wrote no capture for" ;;
+     esac
+     echo "SKIP: a deck of this run's captures names a read this run $what, so it could not be graded whole: $why"
      exit 3 ;;
   *) echo "FAIL: the built deck does not survive its own checks"; exit 1 ;;
 esac
@@ -176,7 +185,12 @@ sed 's/^/  /' "$TMP/committed"
 case "$rc" in
   0) echo "ok  the committed talk/deck.md survives the figure, status, headline and phrase checks against run $named" ;;
   3) if grep -q '^  could not look  ' "$TMP/committed"; then
-       echo "SKIP: the committed talk/deck.md names a read whose capture run $named never wrote, so it could not be graded whole: $(grep -m1 '^  could not look  ' "$TMP/committed" | sed 's/^ *could not look  //')"
+       why="$(grep -m1 '^  could not look  ' "$TMP/committed" | sed 's/^ *could not look  //')"
+       case "$why" in
+         *"recorded no grade for"*) what="run $named recorded no grade for" ;;
+         *)                         what="whose capture run $named never wrote" ;;
+       esac
+       echo "SKIP: the committed talk/deck.md names a read $what, so it could not be graded whole: $why"
        exit 3
      fi
      echo "SKIP: run $named's recording commit became unreachable between two reads; run this check again"
