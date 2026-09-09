@@ -494,3 +494,29 @@ def test_a_commit_dated_before_its_own_parent_is_counted(fx, tmp_path: Path, cap
     out = capsys.readouterr().out
     assert "1 registering commit(s) dated before their own first parent" in out, out
     assert "1 distinct evidence grade(s) across every signal read (5)" in out, out
+
+
+def test_the_refusal_says_the_file_was_rewritten_and_derives_whether_a_number_moved(
+        fx, tmp_path: Path, capsys) -> None:
+    """Review G2: the RULE is blob identity, so the refusal must not claim "a number rewritten
+    after it landed" -- a whitespace-only commit produces a rewrite and moves nothing. What
+    actually changed is derived from the two blobs and printed, so the reader is told which."""
+    quiet = fx.build(tmp_path / "quiet")
+    fx.whitespace_rewrite(quiet)
+    arrival = df.first_reached(quiet / "driftwood", fx.FORECAST_PATH, "refs/remotes/origin/main")
+    assert arrival is not None and arrival.rewritten
+    assert df.probabilities_moved(quiet / "driftwood", arrival, fx.FORECAST_PATH) == []
+    rc = df.check(str(quiet), str(HUB), adopters=["driftwood"], now="2026-09-06T00:00:00Z")
+    out = capsys.readouterr().out
+    assert rc == 1 and "the file was rewritten after it landed" in out, out
+    assert "no probability differs -- the rewrite changed something else" in out, out
+    assert "a number rewritten after it landed" not in out, out
+
+    loud = fx.build(tmp_path / "loud")
+    fx.rewrite_after_the_answer(loud)
+    loud_arrival = df.first_reached(loud / "driftwood", fx.FORECAST_PATH, "refs/remotes/origin/main")
+    assert loud_arrival is not None
+    moved = df.probabilities_moved(loud / "driftwood", loud_arrival, fx.FORECAST_PATH)
+    assert moved == ["driftwood-fixture-supply-2026-2026-02-01 0.27 -> 0.999"], moved
+    df.check(str(loud), str(HUB), adopters=["driftwood"], now="2026-09-06T00:00:00Z")
+    assert "probabilities moved: driftwood-fixture-supply-2026-2026-02-01 0.27 -> 0.999" in capsys.readouterr().out

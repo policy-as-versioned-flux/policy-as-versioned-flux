@@ -222,9 +222,11 @@ replayed `e120c96` as `eb11419`, so `e120c96` is not an ancestor of this head an
 measured a tree with a different base. **That is the general shape of F6, not a one-off: every
 rebase orphans the head a CI paragraph cites**, so a paragraph written before the last rebase is
 stale by construction, and the fix is to check `git merge-base --is-ancestor <cited sha> HEAD`
-before believing one. The runs below are this head's own, and the commit that records them
-changes only this file -- `git diff f3b547b..HEAD --name-only` names it alone -- so they measured
-the code that is on the branch.*
+before believing one. The runs below carry headSha `f3b547b`, which is this head's PARENT, and
+the commit that records them changes only this file -- `git diff --name-only f3b547b <head>` names
+it alone -- so they measured exactly the code that is on the branch. That is the same structural
+rule as F6, applied forward instead of backward: a CI citation is good for a head when every
+commit between the two touches nothing the run measured.*
 
 `twin` run **34338483423** (pull request; its twin **34338479353** on the push): job `tests`
 `1 failed, 2279 passed in 207.94s`, the one failure `test_the_suite_is_green` on
@@ -232,18 +234,22 @@ the code that is on the branch.*
 `invariants` `RESULT: 71 passed, 1 failed, 3 skipped`, the same invariant; `typecheck`, `demo`,
 the three `determinism` legs and `reproduce-elsewhere` all succeeded. The branch adds no red.
 
-The `truth` run on this exact head (**34338479256**) was still `pending` when this was written --
-`truth` serialises across every branch and it is queued behind `main` and `ticket-79`. The last
-COMPLETED truth run on this branch is **34336081659**, on the review commit at `44e0a88`, which
-differs from this head only in `talk/local-clock.sh` (a comment and the dry-run ordering),
-`twin/derived_forecast.py` (one print line naming a forecast the check declines to read) and this
-ticket file. It is a branch run and correctly said so: `THIS RUN CANNOT RECORD ITS TRUTH LINE, and
+The `truth` run **34338479256** (head `f3b547b`) completed: `clocks` success, `gate` failure --
+the estate's standing twelve, none of them this branch's. *This sentence replaces one written
+while that run was still queued, which said it was `pending`; it was, and then it was not.*
+It is a branch run and correctly refused to record: `THIS RUN CANNOT RECORD ITS TRUTH LINE, and
 will not pretend to. It still runs the whole gate and still prints its TRUTH line`. Its gate
 graded this ticket's script as `verify-derived-forecast.sh  SKIP (waits)  SKIP: no
 *.forecast.yaml has reached refs/remotes/origin/main of any adopter (driftwood, ludlow,
-tuppence)` -- the declared wait, on the runner. Quoted from the Actions log:
+tuppence)` -- the declared wait, on the runner, not on this machine. Quoted from the Actions log:
 
-- run 189 (hub `44e0a88`, a branch run, not citable: a branch run records nothing, ticket 100, so no run recorded it) -> `TRUTH 2026-09-09T10:05Z run=189 hub=44e0a88 enact=development units=[driftwood=f2fcab3@main feeds=f1ff89e@main ico=ec0ece4@main insurer=c991160@main ludlow=793b7b1@main nist=f83126f@main platform=b6d5045@main tuppence=e519341@main] pass=78 [observed=25 self=41 simulated=4 meta=8] fail=12 skip=25 [never=9 waits=16] excluded=8 total=123 ceiling=104`
+- run 191 (hub `f3b547b`, a branch run, not citable: a branch run records nothing, ticket 100, so no run recorded it) -> `TRUTH 2026-09-09T10:58Z run=191 hub=f3b547b enact=development units=[driftwood=f2fcab3@main feeds=f1ff89e@main ico=ec0ece4@main insurer=c991160@main ludlow=793b7b1@main nist=f83126f@main platform=b6d5045@main tuppence=e519341@main] pass=78 [observed=25 self=41 simulated=4 meta=8] fail=12 skip=25 [never=9 waits=16] excluded=8 total=123 ceiling=104`
+
+The documentation commit that first recorded this (`10e6064`) carried its own `twin` run
+**34339416466**: `1 failed, 2279 passed in 129.45s`, the same invariant 45 and nothing else, every
+other job green. It started no `truth` run of its own -- `truth` serialises estate-wide and the
+push arrived while `34338479256` held the lane -- which is exactly why the parent-citation rule
+above is the one that makes the record exact.
 
 The twelve reds are the estate's standing set, unchanged in count from run 148 and run 163 while
 the manifest grew from 113 scripts to 123: none of them is this branch's.
@@ -389,12 +395,12 @@ sort order alone); `f3-unsigned-tags-called-signed rc=0 ... 2 signed tag(s)`; `f
 validator rc=0`; `f7-no-prices_through ACCEPTED`; `f7-no-recorded_belief ACCEPTED`; through the
 clock, `forecast-two` and `forecast-tamper` both exited 0. `f1-rename-stays-refused` was already
 `rc=1 pre-registered: no` and still is. Every one of them is now a leg of
-`verify/twin-evals/verify-derived-forecast.sh` (legs 8-18) and a test in
+`verify/twin-evals/verify-derived-forecast.sh` (legs 8-18, and G2's beside leg 12) and a test in
 `tests/test_derived_forecast.py`, and every one is refused.
 
 **Verify commands run after the fix, 2026-09-09, this machine.**
 
-- `bash verify/twin-evals/verify-derived-forecast.sh --selfcheck` -- PASS, exit 0, 26s, 18 legs.
+- `bash verify/twin-evals/verify-derived-forecast.sh --selfcheck` -- PASS, exit 0, 19 legs after G2.
 - `bash verify/twin-evals/verify-derived-forecast.sh` -- offline PASS, then the same SKIP by name
   on the real estate, exit 3.
 - `bash verify/twin-evals/verify-twin-evals.sh` -- PASS (7 harness-mechanism metrics).
@@ -406,7 +412,7 @@ clock, `forecast-two` and `forecast-tamper` both exited 0. `f1-rename-stays-refu
   no-such-line: run 148 is quoted ... and talk/truth.log records no such line`).
 - `bash verify/map-surface/verify-map-surface.sh` -- PASS.
 - `bash verify/can-record/verify-can-record.sh` -- PASS (and see the re-measurement note above).
-- `.venv/bin/python -m pytest tests/test_derived_forecast.py -n0 -q` -- 46 passed (32 before).
+- `.venv/bin/python -m pytest tests/test_derived_forecast.py -n0 -q` -- 47 passed (32 before).
 - `.venv/bin/python -m pytest tests/test_local_clock.py -n0 -q` -- 52 passed.
 - `.venv/bin/python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores`
   -- Success: no issues found in 184 source files.
@@ -418,6 +424,52 @@ how two separately-green branches went red together on 2026-09-06. The manifest 
 the 113 this ticket's earlier rounds quote: main gained eight verify scripts since.
 
 Two of ticket 92's own checks were amended, minimally and by name: the run directory's "nothing
-the clock wrote says *no override is claimed*" rule now skips `<step>-<adopter>.judge/`, which is
-a verbatim copy of the hub's skill and not the clock's words
+the clock wrote says *no override is claimed*" rule has to exempt the judge copy, which is a
+verbatim copy of the hub's skill and not the clock's words
 (`tests/test_local_clock.py` and `verify/local-clock/verify-local-clock.sh`).
+
+## Review round 2, 2026-09-09 (three findings on the fixes; the assistant, delegated)
+
+**G1 (minor, blocking the amendment above).** The first exemption read the FILENAME, and the two
+copies of the rule disagreed on the same tree. The exemption is needed for exactly ONE file --
+`grep -rli 'no override is claimed' twin .claude/skills` returns only
+`.claude/skills/classify-and-judge/SKILL.md`, and the derive row's judge copy carries the phrase
+nowhere. Measured red, with a stand-in writing `$RUN_DIR/evil.judge/note.md` and a file literally
+named `$RUN_DIR/sneaky.judge`, both saying the phrase: the **pytest** rule
+(`'.judge/' in rel or name.endswith('.judge')`) caught **NOTHING**; the **shell** rule
+(`grep -v '\.judge/'` over ABSOLUTE paths) caught `sneaky.judge` and missed
+`evil.judge/note.md` -- and because it filtered the absolute path, a `.judge/` component anywhere
+in the run-directory prefix would have exempted the whole tree.
+
+The fix DERIVES the exemption instead of inferring it: a file is exempt only when its BYTES are a
+file the hub itself carries, which is what the comment always claimed ("a VERBATIM COPY"). Both
+copies now read that way -- `says_it()` in the shell, `_says_no_override()` in the tests, each
+hashing the hub's phrase-carrying files once and comparing -- because ticket 102's rule is one
+reading, never a fork. Each also asserts the hub carries at least one such file, so the exemption
+cannot quietly become vacuous. Both smuggle shapes are planted, caught and cleaned up in both.
+
+**G2 (low, fixed and then derived).** The refusal asserted more than the rule measures: the rule
+is blob identity, and the sentence said "a number rewritten after it landed" -- which a
+whitespace-only commit produces while touching no number. It now says "**the file** was rewritten
+after it landed", and rather than stop at the wording it DERIVES the rest: `probabilities_moved()`
+reads the blob that arrived (`git show <added_sha>:<path>`) beside the blob on the ref now and
+prints either `probabilities moved: driftwood-fixture-supply-2026-2026-02-01 0.27 -> 0.999` or
+`no probability differs -- the rewrite changed something else, and a rewritten file re-registers
+whatever it changed`. Both are fixture legs and a test. A rewrite that moves no number still
+re-registers the file: that is the rule, and now the record says which case it was.
+
+**G3 (note, fixed).** The CI paragraph opened "the runs below are this head's own" while their
+`headSha` is the head's parent. It now names `f3b547b` in the same sentence, with the doc-only
+proof, and states the forward form of F6's rule: a CI citation is good for a head when every
+commit between the two touches nothing the run measured.
+
+**G4 and G5 (no change, recorded).** `signed_feed_tags()` counts a signature BLOCK, not a valid
+signature -- deliberate, consistent with ticket 84's `verify/supersede`, and the printed line
+already says exactly that ("carrying a signature block", "read with `git cat-file tag`"). A
+string market level and probabilities at 1e-12 / 0.9999999999 are accepted; both benign, both by
+design, and the string case is already in "Not done" as F12.
+
+**Re-run after G1-G3, 2026-09-09.** `verify-derived-forecast.sh --selfcheck` PASS, exit 0, 19
+legs; `tests/test_derived_forecast.py -n0` 47 passed; `tests/test_local_clock.py -n0` 52 passed;
+`verify-local-clock.sh` offline PASS / marker SKIP, exit 3; `verify-cited-truth.sh`,
+`verify-truth-line.sh`, `verify-every-green.sh` PASS; mypy Success.

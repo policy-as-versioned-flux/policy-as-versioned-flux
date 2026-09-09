@@ -565,7 +565,7 @@ class Arrival(NamedTuple):
     Both are first-parent committer dates on the served ref. They differ whenever the file was
     rewritten after it landed -- edited in place, deleted and re-added, or squashed in again --
     and that difference is the whole of review F1: measuring pre-registration on the path's
-    first add measures the PATH, not the CONTENT, so a number rewritten once the answer was
+    first add measures the PATH, not the CONTENT, so a file rewritten once the answer was
     already on main still reported `pre-registered: yes` at the original date and was scored
     (measured: re-added 2026-07-20 with `probability: 0.999` against an outcome on main since
     2026-07-01, `brier=1e-06`, PASS).
@@ -634,6 +634,46 @@ def committed_before_its_parent(repo: Path, sha: str) -> bool | None:
 def _stamp(stamp: str) -> dt.datetime:
     parsed = dt.datetime.fromisoformat(stamp.replace("Z", "+00:00"))
     return parsed.replace(tzinfo=dt.timezone.utc) if parsed.tzinfo is None else parsed
+
+
+def probabilities_moved(repo: Path, arrival: "Arrival", path: str) -> list[str] | None:
+    """Which probabilities differ between the blob that ARRIVED on the ref and the blob there now.
+
+    [] when the rewrite moved no number (a whitespace or comment change is still a rewrite, and
+    still re-registers the file, but it is not "a number rewritten"). None when the earlier blob
+    cannot be read. Review G2: the rule is blob identity, so the refusal must not claim a number
+    moved unless it saw one move.
+    """
+    text = _git(repo, "show", f"{arrival.added_sha}:{path}")
+    if text is None:
+        return None
+    try:
+        before = load_yaml(text, f"{arrival.added_sha}:{path}")
+    except DerivedForecastError:
+        return None
+    if not isinstance(before, dict):
+        return None
+    was = {str(f.get("id")): f.get("probability") for f in before.get("forecasts") or []}
+    now_text = _git(repo, "show", f"{arrival.last_sha}:{path}")
+    if now_text is None:
+        return None
+    try:
+        after = load_yaml(now_text, f"{arrival.last_sha}:{path}")
+    except DerivedForecastError:
+        return None
+    if not isinstance(after, dict):
+        return None
+    moved = []
+    for f in after.get("forecasts") or []:
+        fid = str(f.get("id"))
+        if fid not in was:
+            moved.append(f"{fid} was not in the file that arrived (p={f.get('probability')!r} now)")
+        elif not _close(was[fid], f.get("probability")):
+            moved.append(f"{fid} {was[fid]!r} -> {f.get('probability')!r}")
+    for fid in was:
+        if fid not in {str(f.get("id")) for f in after.get("forecasts") or []}:
+            moved.append(f"{fid} (p={was[fid]!r}) is gone from the file")
+    return moved
 
 
 def _date_of(stamp: str) -> dt.date:
@@ -891,9 +931,23 @@ def check(estate: str, hub: str, adopters: list[str] | None = None, now: str | N
                           f"(registered {_date_of(reached.last)}, added {_date_of(reached.added)})")
                     if not pre:
                         late_total += 1
-                        rewrite = (f" (added {_date_of(reached.added)} and rewritten there in {reached.last_sha[:7]}: "
-                                   f"a number rewritten after it landed is registered on the day of the rewrite)"
-                                   if reached.rewritten else "")
+                        rewrite = ""
+                        if reached.rewritten:
+                            # G2: the RULE is blob identity, so the sentence says "the file was
+                            # rewritten", never "a number was". What actually moved is derived
+                            # from the two blobs and printed beside it, so the reader is told
+                            # which it was rather than left to assume the worse one.
+                            moved = probabilities_moved(repo, reached, rel)
+                            if moved is None:
+                                what = "the file that arrived could not be read back, so what changed is not said"
+                            elif moved:
+                                what = "probabilities moved: " + "; ".join(moved)
+                            else:
+                                what = ("no probability differs -- the rewrite changed something else, and a "
+                                        "rewritten file re-registers whatever it changed")
+                            rewrite = (f" (added {_date_of(reached.added)} and rewritten there in "
+                                       f"{reached.last_sha[:7]}: the file was rewritten after it landed, so it is "
+                                       f"registered on the day of the rewrite; {what})")
                         fails.append(f"{adopter}: forecast {f['id']} was last written onto {ref} on "
                                      f"{_date_of(reached.last)}{rewrite}, not before its outcome date {closes}: "
                                      f"not pre-registered, not scored")

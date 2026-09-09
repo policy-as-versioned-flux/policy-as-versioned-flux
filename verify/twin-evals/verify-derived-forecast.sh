@@ -200,6 +200,20 @@ for shape in "" --in-place; do
   grep -q 'brier=' "$TMP/rw$shape.out" && fail "a rewritten forecast was still scored (${shape:-delete-and-re-add})"
 done
 
+#     ... and REVIEW G2: a rewrite that moves NO number is still a rewrite (the rule is blob
+#     identity) and still re-registers the file, but the refusal says so in those words and
+#     derives what actually changed from the two blobs instead of asserting a number moved.
+"$PY" "$FIXTURE" build "$TMP/ws" >/dev/null || fail "could not build the whitespace fixture"
+"$PY" "$FIXTURE" whitespace "$TMP/ws" >/dev/null || fail "could not rewrite the forecast without moving a number"
+check --estate "$TMP/ws" --now 2026-09-06T00:00:00Z >"$TMP/ws.out" 2>&1
+[ $? -eq 1 ] || fail "a whitespace-only rewrite after the answer landed was admitted: $(tail -1 "$TMP/ws.out")"
+grep -q 'the file was rewritten after it landed' "$TMP/ws.out" || fail "the refusal does not say the FILE was rewritten: $(grep 'not pre-registered' "$TMP/ws.out" | head -1)"
+grep -q 'no probability differs -- the rewrite changed something else' "$TMP/ws.out" \
+  || fail "the refusal did not derive that no number moved: $(grep 'not pre-registered' "$TMP/ws.out" | head -1)"
+grep -q 'a number rewritten after it landed' "$TMP/ws.out" && fail "the refusal still asserts a number moved when none did (review G2)"
+grep -q 'probabilities moved' "$TMP/rw.out" || fail "the delete-and-re-add refusal does not name the probability that actually moved: $(grep 'not pre-registered' "$TMP/rw.out" | head -1)"
+grep -q '0.27 -> 0.999' "$TMP/rw.out" || fail "the moved probability is not printed as the two numbers it moved between"
+
 # 12. REVIEW F1, the honest direction, KEPT: a RENAME costs a forecast its registration (the new
 #    path's first add is the rename commit), so a rename cannot launder one
 "$PY" "$FIXTURE" build "$TMP/renamed" >/dev/null || fail "could not build the rename fixture"

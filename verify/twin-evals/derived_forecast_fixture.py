@@ -6,6 +6,7 @@ derived-forecast seam (ecosystem ticket 93) with no token, no network and no rea
     derived_forecast_fixture.py late DIR        # merge a forecast onto main AFTER the horizon
     derived_forecast_fixture.py rewrite DIR [--in-place]   # rewrite the number AFTER the answer
     derived_forecast_fixture.py rename DIR      # rename the forecast (must still lose its date)
+    derived_forecast_fixture.py whitespace DIR  # rewrite that moves no number (G2)
     derived_forecast_fixture.py edit-outcome DIR    # flip the answer key after it reached main
     derived_forecast_fixture.py second-outcome DIR  # a second, contradicting answer key
     derived_forecast_fixture.py tag-feeds DIR   # two ANNOTATED UNSIGNED tags on the publisher
@@ -240,6 +241,20 @@ def backdated_forecast(root: Path) -> str:
     return FORECAST_PATH
 
 
+def whitespace_rewrite(root: Path) -> str:
+    """Ticket 93 review G2: a rewrite that moves NO number. The rule is blob identity, so this is
+    still a rewrite and still re-registers the file -- but the refusal must not say "a number
+    rewritten after it landed", because no number was."""
+    repo = Path(root) / "driftwood"
+    path = repo / FORECAST_PATH
+    path.write_text(path.read_text(encoding="utf-8") + "\n# a trailing comment, and not one number\n",
+                    encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "twin: whitespace only (fixture)", date="2026-07-20T00:00:00+00:00")
+    _git(repo, "push", "-q", "origin", "main")
+    return FORECAST_PATH
+
+
 def rename_the_forecast(root: Path) -> str:
     """The honest direction the review asked to KEEP: a rename costs a forecast its registration
     (the new path's first add is the rename commit), rather than laundering one."""
@@ -330,7 +345,7 @@ def main(argv: list[str] | None = None) -> int:
     rw = sub.add_parser("rewrite")
     rw.add_argument("dir")
     rw.add_argument("--in-place", action="store_true")
-    for name in ("rename", "edit-outcome", "second-outcome", "duplicate-key", "backdated"):
+    for name in ("rename", "edit-outcome", "second-outcome", "duplicate-key", "backdated", "whitespace"):
         one = sub.add_parser(name)
         one.add_argument("dir")
     tg = sub.add_parser("tag-feeds")
@@ -347,6 +362,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "rewrite":
         print(rewrite_after_the_answer(Path(args.dir), in_place=args.in_place))
+        return 0
+    if args.cmd == "whitespace":
+        print(whitespace_rewrite(Path(args.dir)))
         return 0
     if args.cmd == "backdated":
         print(backdated_forecast(Path(args.dir)))
