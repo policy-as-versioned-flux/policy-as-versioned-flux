@@ -179,3 +179,26 @@ resolving one proposition are refused rather than the first sorted one silently 
 carries the weakest grade of the signals it rests on"* is, today, a comparison with one value to
 compare, because every signal is required to be grade 5; the check prints the count of distinct
 grades so the tautology is visible rather than implied.
+
+**Amended 2026-09-09 (eco-system ticket 51, delegated under ADR-0025): what "scored like any other
+forecast" can mean for an override.** Q1 says an override "is a recorded claim with provenance ...
+so it can be scored later like any other forecast", and that sentence taken literally scores
+`|asserted - revealed|` on the evolution axis: arithmetic on an ordinal scale, against an answer
+key nobody publishes -- which is the very thing Q1's own guard refuses two paragraphs later, and
+which eco-system ticket 93's reopening does not reach (that admits an order statistic over
+evidence GRADES and nothing else). So the sentence is sharpened rather than dropped. **An override
+is never scored on its coordinate. It is scoreable only THROUGH a falsifiable proposition** -- the
+proposition of a scenario in the same overlay that names the component the override moves -- and
+an override that reaches no such scenario is `unscoreable` WITH A REASON, twin ticket 08's own
+first-class result, never a zero. Q1's promise survives intact where it matters: the human is
+still calibrated against evidence, on the same footing as the twin, because the proposition the
+override is scored through is the same proposition the twin's own derived probability is scored on.
+**And the date is measured, not authored.** An override registers on the LAST first-parent write of
+its file onto the adopter's `origin/main` (eco-system ticket 93's `first_reached`, imported and
+never re-implemented), so an override whose number is rewritten after it landed is a new claim and
+re-registers on the day of the rewrite -- and so does a scenario-library ENTRY, which is the leg
+ticket 93 did not have: a question is as rewritable as an answer, and editing a proposition, a
+horizon or the words of a question after a forecast is registered against it moves every score
+already taken. `verify/twin-evals/verify-scenario-registration.sh` grades both on `origin/main`, and
+refuses an entry whose horizon is not strictly after its own `at`, because nothing could ever be
+pre-registered against one. ADR-0024 point 6 and twin ticket 08 carry the rest.

@@ -188,6 +188,37 @@ write, and what it may never write.
      The pool the derivation rests on (`news`, `market-moves`) is pinned by no adopter and
      tagged by no publisher on this date; the check prints both counts, and ticket 23's rule
      holds: nothing derived from it is price-eligible.
+     *Amended 2026-09-09, ticket 51 (the supply-constraint actor path and the resolution
+     question; delegated under ADR-0025).* The reopened ordinal ruling is read as what it says,
+     and applied one step out from the derivation. **The one admitted operation is an order
+     statistic over evidence GRADES and nothing else, so no relation between two components moves
+     an evolution coordinate.** A `needs` edge is `schema.STRUCTURAL_EDGE`: `_refine_edge` refuses
+     `sign`, `lag_days` and `elasticity` on one, the twin carries no `velocity` field anywhere and
+     no `horizon` outside a scenario, so there is nothing to move a coordinate BY and no time to
+     move it OVER. `twin/propagate.py` already walks `influences` and nothing else and
+     `twin/blast.py` already grades a structural hop `no-claimed-mechanism`; what ticket 51 adds
+     is that a CAUSAL edge moves no coordinate either. The evolution axis is an interpretive
+     ordinal judgement (twin ticket 11 Q1) and a coordinate moves only by an attributable
+     `position` or `override` claim, never by a propagation. `twin/registration.py`'s `admits()`
+     is the callable form and `refuse_move()` names the refusal; a move nobody named is refused
+     rather than admitted by omission. Measured, and the reason the pair the question was asked
+     about is not an edge: neither `nb-refining-capacity` nor `pq-cryptanalysis` is a component of
+     any twin model in this estate (0 of 3 adopters, world layer included), and both are rows of
+     `platform/wardley/intel/market-intel.json` naming the SAME `links_risk`
+     (`pq-harvest-now-decrypt-later`, a FAIR risk id, not a component), so neither row points at
+     the other in either model.
+     *And the same date measurement, applied to the QUESTION.* Ticket 93 made the forecast and the
+     answer key immune to a silent rewrite and left the third leg unmeasured: a scenario-library
+     entry carries the proposition, the horizon and the words the question is asked in, so editing
+     any of the three after a forecast is registered against it moves every score already taken.
+     So a scenario entry, and an `override` claim, now register the same way -- the LAST
+     first-parent write onto `origin/main`, `first_reached()` imported and never re-implemented --
+     and `verify/twin-evals/verify-scenario-registration.sh` refuses a registration that is not
+     strictly before the entry's own horizon, and an entry whose horizon is not strictly after its
+     own `at` (nothing could ever be registered against one). An override is scoreable only
+     THROUGH the proposition of a scenario that names the component it moves, and never on its own
+     coordinate, which has no published answer key: an override no question reaches is
+     `unscoreable` with a reason, `twin/scoring.py`'s own first-class result, never a zero.
 
 ## Alternatives
 

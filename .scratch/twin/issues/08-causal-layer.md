@@ -190,3 +190,21 @@ one value to compare and cannot fail; it is built for the day a signal at anothe
 The check now prints the number of DISTINCT grades it saw across every signal read (one, today),
 so a reader cannot take the passing comparison for evidence that anything was ever compared.
 Nothing about Q1's ruling changes: a sum, a mean or a weight on a grade stays refused.
+
+**Amended 2026-09-09 (eco-system ticket 51, delegated under ADR-0025).** Q1's corollary is read
+one step further out, and the reading changes nothing about the ruling: **the one operation the
+reopening admits is an order statistic over evidence GRADES, so no edge of any type moves a
+component's position on the evolution axis.** Q3 already said a structural-only path yields an
+unpriced blast radius rather than a magnitude, and `twin/blast.py` and `twin/propagate.py` already
+enforce that half; what was never said is that a CAUSAL edge does not move a coordinate either. It
+does not: the axis is an interpretive judgement about ubiquity and certainty (ticket 11 Q1), not a
+quantity, and a coordinate moves only by an attributable `position` or `override` claim.
+`twin/registration.py::admits` is the callable form of the ruling and `refuse_move` names each
+refusal; a move nobody named is refused rather than admitted by omission. The occasion was
+eco-system ticket 23's deferred question, "is `nb-refining-capacity -> pq-cryptanalysis` a twin
+`needs` edge whose propagation moves the linked capability". Measured on the estate's own served
+artefacts: neither id is a component of any twin overlay or of the world layer (0 of 3 adopters),
+and both are rows of `platform/wardley/intel/market-intel.json` naming the same `links_risk`, which
+is a FAIR risk id and not a component -- so there is no edge between them in either model, and the
+ruling would refuse the coordinate move even if there were. ADR-0024 point 6 carries the dated note
+beside the clock; twin ticket 11 carries the override half.
