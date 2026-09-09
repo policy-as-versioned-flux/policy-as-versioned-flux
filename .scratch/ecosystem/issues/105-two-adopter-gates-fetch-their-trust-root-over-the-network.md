@@ -256,6 +256,11 @@ every proxy at a closed port with `NO_PROXY`/`no_proxy` cleared:
 * a wrong Rekor key, a corrupt Rekor key, a wrong CT key, a wrong Fulcio CA, a CT key whose window
   closed before the artefact, and an absent root → refused on all three, cold AND warm, on the
   trust material and never on the network (12 cases per adopter);
+* **a genuine Rekor entry lifted from ANOTHER of platform's own published bundles** — policy
+  3.0.0's whole `rekorBundle` spliced into policy 2.0.1's, certificate and signature untouched, so
+  every field the re-encoding copies is real and signed, just signed about something else →
+  refused: `failed to verify log inclusion: transparency log signature does not match`. This is
+  the one that says the re-encoding cannot be assembled out of genuine parts;
 * an unplaceable bundle shape → refused BY NAME before cosign is invoked.
 
 **One refusal IS removed, and it is named rather than left to be found.** Under ticket 101's

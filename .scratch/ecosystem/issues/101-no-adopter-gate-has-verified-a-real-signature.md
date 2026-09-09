@@ -414,7 +414,9 @@ the signature changed -- which names the old ludlow defect on both halves when p
 > written and are not now, and this ticket's own lesson is that nothing re-reads them. (a) "driftwood
 > scenario G and tuppence scenario G ... prints `exit 1` today" and "Today: ludlow 0, driftwood 1,
 > tuppence 1": both gates pin their trust root since ticket 105 and all three numbers are `0`, and
-> the two scenarios now GRADE the exit rather than printing it. (b) The remedy-4 note "cosign reads
+> the two scenarios now GRADE the exit rather than printing it. The transcript under "The exact
+> green, quoted" is a run of that day and stays as written; its three `note:` lines all read
+> `exit 0, no network needed` when the same check is run today. (b) The remedy-4 note "cosign reads
 > only the FIRST PEM block of the CT key file ... so the gate must select the right key, which means
 > parsing the SCT extension out of the certificate's DER" describes the LEGACY env-var door, which
 > ludlow no longer uses: ticket 105 moved every bundle onto `--trusted-root` by re-encoding a legacy
