@@ -63,6 +63,11 @@ fi
 ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 [ -d "$ESTATE" ] || { echo "SKIP: no $ESTATE/ -- run ./clone-estate.sh first, so origin/main can be read for each adopter"; exit 3; }
 
+# Printed on every run, not only in this header: what this check does NOT observe. Ticket 31
+# built a rule and a grader, and no sensing substrate exists anywhere in this estate.
+echo "  LIMIT: this run grades the RULE and any admission record an adopter serves. Nothing here"
+echo "  LIMIT: observes a sensor running or a person; no sensing substrate exists in this estate."
+
 log="$(mktemp)"; (cd "$ROOT" && "$PY" -m twin.sensor_admission "$ESTATE") | tee "$log"; rc=${PIPESTATUS[0]}
 last="$(tail -1 "$log")"
 rm -f "$log"
