@@ -41,16 +41,61 @@ lines, one per accepted fall, where N is the run number of the LATER line of the
 line naming a run talk/truth.log does not record is itself a fault, exactly as an exclusion for a
 script that does not exist is: an escape hatch nobody can check is a hole.
 
-WHAT IS GRADED AND WHAT IS COUNTED. `report()` grades the NEWEST transition only and COUNTS the
-older unaccounted ones. talk/truth.log is append-only and verify/can-record/ refuses a
+WHICH TRANSITION IS GRADED: THE ONE ENDING AT THE RUN BEING RECORDED (ticket 108, 2026-09-09).
+The clock's own recording commit appends the run's line and carries `[skip ci]`, so it moves this
+module's input and nothing re-measures. Read "the newest line on disk" and the answer is one thing
+inside the gate and a different thing one commit later, on a tree no run will ever grade again.
+
+So `report()` takes `recording_run`, the run this process belongs to, and grades the transition
+ENDING at it:
+
+  * `recording_run` empty (a builder, a review, a throwaway merge, any checkout with no run in
+    flight) -- the run being recorded is the newest line the log carries, and the transition
+    ending at it is graded exactly as before. A fall on the record still blocks, and is still
+    finishable by a line in talk/verify-falls.txt.
+  * `recording_run` equal to the newest recorded run (truth.yml's own step, which runs AFTER the
+    cage has appended the line) -- identical, and that step is where NORTH-STAR §5's stop lives.
+  * `recording_run` naming a run the log does not carry (the GATE of a clock run: the line does
+    not exist yet, and cannot, because this check's own verdict is one of the counts in it) --
+    DEFERRED. The transition ending at that run is graded by truth.yml's `a fall is a blocking
+    event` step once the line exists. Grading the newest RECORDED transition here instead would
+    re-grade a transition the run that recorded it already blocked on, and write that stale red
+    into talk/captures/_grades.tsv, where verify/derived-status/ reads it as a live regression.
+    The older transition is still COMPARED and its verdict PRINTED; it is counted, not faulted.
+  * `recording_run` naming a run the log carries that is NOT the newest -- a problem, not a
+    shrug: the log moved under the run and neither reading can be trusted. A RE-RUN of an older
+    truth run lands here by construction and is now red where it used to be green, and that run's
+    cage would commit the red as this check's grade row (review F6, recorded not fixed).
+  * `recording_run` that is not digits -- a problem too, never a defer. Deferring means not
+    grading, so the key is checked before it is trusted, and run numbers are compared by value.
+
+WHERE DEFERRED REACHES, said because the first version of this note understated it (review F5a).
+`GITHUB_RUN_NUMBER` is set on EVERY truth.yml run, not only the recording one, so a branch or
+pull-request CI run defers as well -- where it previously reddened on the DEFAULT branch's newest
+unaccounted fall. That is right: a branch records no line (ticket 100), so the newest transition
+in the log is main's and not this run's, and truth.yml's own stop step already reports it and
+blocks nothing on a branch for exactly that reason. The empty case is a checkout with no run in
+flight at all: a builder, a review, a throwaway merge.
+
+THE RESIDUAL IN truth.yml'S OWN STEP (review F8, recorded not fixed). That step's reading is
+identical to this one ONLY while the cage actually appended this run's line. If `CAN_RECORD=yes`
+but the cage short-circuits -- `git diff --cached --quiet` finding nothing to commit -- the step
+grades the PREVIOUS run's transition, and the two readings are not unconditionally the same.
+
+`inversions()` is the size of what remains, as a number rather than a sentence: how many recorded
+runs turned this comparison from green to red by the act of recording their own line.
+
+WHAT IS GRADED AND WHAT IS COUNTED. `report()` grades ONE transition -- the one ending at the run
+being recorded -- and COUNTS the older unaccounted ones. talk/truth.log is append-only and verify/can-record/ refuses a
 hand-edited line, so a fall between two 2026-08-31 runs has no finishing move and grading it
 forever would be the shape ticket 55 rules out ("every red is real, explained and finishable").
 The count is printed on every run, so the history is on the record rather than in a sentence
 somebody wrote once.
 
     python3 talk/fall_check.py check [--log FILE] [--falls FILE] [--root DIR]
-        exit 0 no unaccounted fall on the newest transition; 1 if there is one, or if the escape
-        file is malformed or names a run the log does not record
+                                     [--recording-run N]
+        exit 0 no unaccounted fall on the transition ending at the run being recorded; 1 if there
+        is one, or if the escape file is malformed or names a run the log does not record
     python3 talk/fall_check.py selfcheck
 """
 from __future__ import annotations
@@ -92,6 +137,8 @@ class Report:
     transitions: int = 0
     problems: list[str] = field(default_factory=list)
     note: str = ""
+    deferred_to: str = ""          # the run being recorded, whose line is not in the log yet
+    deferred_falls: list[Fall] = field(default_factory=list)   # compared, printed, not faulted
     span: str = ""
 
 
@@ -161,6 +208,13 @@ def compare(prev_line: str, cur_line: str, changed: set[str] | None) -> list[Fal
     return falls
 
 
+def _run_key(run: str) -> str:
+    """A run number compared by VALUE, so `0200` and `200` are the same run and a non-numeric
+    recorded run (`local`, `fixture-2`) is still comparable as itself."""
+    run = str(run).strip()
+    return str(int(run)) if run.isdigit() else run
+
+
 def _int(t: dict, key: str) -> int:
     value = t.get(key)
     return int(value) if isinstance(value, int) else 0
@@ -210,19 +264,54 @@ def falls_problems(accepted: dict[str, str], recorded: Iterable[str]) -> list[st
 # ------------------------------------------------------------------ the report
 
 def report(truth_lines: Sequence[str], falls_text: str,
-           changed: Callable[[str, str], set[str] | None]) -> Report:
-    """Grade the newest transition; count the older ones. `changed(prev_hub, cur_hub)` returns
-    the paths that moved between the two commits, or None when the diff cannot be read."""
+           changed: Callable[[str, str], set[str] | None],
+           recording_run: str = "") -> Report:
+    """Grade the transition ENDING AT THE RUN BEING RECORDED; count the older ones.
+
+    `changed(prev_hub, cur_hub)` returns the paths that moved between the two commits, or None
+    when the diff cannot be read. `recording_run` is the run this process belongs to; empty means
+    no run is in flight, and then the run being recorded is the newest line the log carries.
+    """
     accepted, problems = parse_falls(falls_text)
     lines = [l for l in truth_lines if l.startswith("TRUTH ")]
     parsed = [parse_truth(l) for l in lines]
-    problems += falls_problems(accepted, (str(t["run"]) for t in parsed))
+    recorded = [str(t["run"]) for t in parsed]
+    problems += falls_problems(accepted, recorded)
+
+    # WHICH TRANSITION IS THIS PROCESS'S (ticket 108). Not "the newest line on disk": that is one
+    # transition inside the gate and a different one a commit later, because the recording commit
+    # moves this file and carries the skip-ci marker.
+    #
+    # THE DEFER KEY IS VALIDATED BEFORE IT IS USED (review F5b, 2026-09-09). Deferring means NOT
+    # grading, so a key nobody checks is an escape hatch keyed on an unchecked string -- the exact
+    # shape this ticket exists to refuse. Two measured holes it closes: `--recording-run abc`
+    # deferred and exited 0, and `--recording-run 0200` deferred where `200` graded, because the
+    # membership test was on strings. A run number is digits, and it is compared by VALUE.
+    recording_run = str(recording_run or "").strip()
+    if recording_run and not re.fullmatch(r"\d+", recording_run):
+        problems.append(
+            f"--recording-run {recording_run!r} is not a run number, and this module will not "
+            f"defer on a key it cannot check: a run number is digits and the clock takes it from "
+            f"GITHUB_RUN_NUMBER. The transition ending at the newest recorded line is graded "
+            f"instead, and this run is red on the key")
+        recording_run = ""
+    key = _run_key(recording_run)
+    recorded_keys = [_run_key(r) for r in recorded]
+    deferred = bool(key) and key not in recorded_keys
+    if key and not deferred and recorded_keys and key != recorded_keys[-1]:
+        problems.append(
+            f"the run being recorded is {recording_run}, which talk/truth.log carries but not as "
+            f"its newest line (the newest is run {recorded[-1]}); the log moved under this run, "
+            f"so neither reading is this run's and this module does not pick one. A RE-RUN of an "
+            f"older recorded run lands here by construction (review F6): it is red, and its cage "
+            f"would commit that red as this check's grade row")
 
     if len(lines) < 2:
         note = ("no recorded TRUTH line in the log yet, so there is no transition to grade"
                 if not lines else
                 "the log holds one recorded line, so there is no transition to grade")
-        return Report(ok=not problems, newest=[], problems=problems, note=note)
+        return Report(ok=not problems, newest=[], problems=problems, note=note,
+                      deferred_to=recording_run if deferred else "")
 
     older_unaccounted = older_accounted = 0
     fell: set[str] = set()
@@ -232,8 +321,10 @@ def report(truth_lines: Sequence[str], falls_text: str,
                        changed(str(parsed[i]["hub"]), str(parsed[i + 1]["hub"]))):
             continue
         fell.add(run)
-        if i == len(lines) - 2:
+        if i == len(lines) - 2 and not deferred:
             continue                          # the newest transition is graded below
+        # DEFERRED: the newest RECORDED transition is not this run's either -- the run that
+        # recorded it graded it and blocked on it already -- so it is counted here, never faulted.
         if run in accepted:
             older_accounted += 1
         else:
@@ -250,13 +341,38 @@ def report(truth_lines: Sequence[str], falls_text: str,
     prev, cur = lines[-2], lines[-1]
     run = str(parsed[-1]["run"])
     newest = compare(prev, cur, changed(str(parsed[-2]["hub"]), str(parsed[-1]["hub"])))
+    span = (f"run {parsed[-2]['run']} ({parsed[-2]['ts']}) -> run {run} ({parsed[-1]['ts']})")
+    if deferred:
+        return Report(ok=not problems, newest=[], deferred_to=recording_run,
+                      deferred_falls=newest, older_unaccounted=older_unaccounted,
+                      older_accounted=older_accounted, transitions=len(lines) - 1,
+                      problems=problems, span=span)
     reason = accepted.get(run, "") if newest else ""
     ok = not problems and (not newest or bool(reason))
     return Report(ok=ok, newest=newest, accepted_reason=reason,
                   older_unaccounted=older_unaccounted, older_accounted=older_accounted,
-                  transitions=len(lines) - 1, problems=problems,
-                  span=f"run {parsed[-2]['run']} ({parsed[-2]['ts']}) -> run {run} "
-                       f"({parsed[-1]['ts']})")
+                  transitions=len(lines) - 1, problems=problems, span=span)
+
+
+def inversions(truth_lines: Sequence[str], falls_text: str,
+               changed: Callable[[str, str], set[str] | None]) -> tuple[int, int]:
+    """(inverted, transitions) -- ticket 108's defect as a number over the whole recorded log.
+
+    An INVERSION is a run whose own recording commit turned this comparison from green to red:
+    before the append the graded transition was the one ending at the previous line and it was
+    clean or accepted; after it, the graded transition is this run's and it falls unaccounted.
+    That is the state `[skip ci]` then freezes, because no run measures the tree the recording
+    commit made. Counted, never asserted: the day the number is 0 the coupling has gone.
+    """
+    accepted, _ = parse_falls(falls_text)
+    lines = [l for l in truth_lines if l.startswith("TRUTH ")]
+    parsed = [parse_truth(l) for l in lines]
+    red: list[bool] = []
+    for i in range(len(lines) - 1):
+        fallen = bool(compare(lines[i], lines[i + 1],
+                              changed(str(parsed[i]["hub"]), str(parsed[i + 1]["hub"]))))
+        red.append(fallen and str(parsed[i + 1]["run"]) not in accepted)
+    return sum(1 for i, r in enumerate(red) if r and (i == 0 or not red[i - 1])), len(red)
 
 
 # ------------------------------------------------------------------ git, the one impure part
@@ -398,6 +514,49 @@ def selfcheck() -> None:
     assert not rep.ok
     assert report([line("1")], "", lambda a, b: set()).ok
     assert "no recorded" in report([], "", lambda a, b: set()).note
+
+    # ---- ticket 108: the transition graded is the one ending at the RUN BEING RECORDED --------
+    flat_then_fall = [line("1", observed=10), line("2", observed=10),
+                      line("3", observed=9, waits=4)]
+    # no run in flight: the newest recorded transition is the run being recorded. Unchanged.
+    r = report(flat_then_fall, "", lambda a, b: set())
+    assert not r.ok and [x.kind for x in r.newest] == ["class-pass"] and not r.deferred_to
+    # the run being recorded IS the newest recorded line (truth.yml's step, after the cage):
+    # identical, and the fall still blocks. This is the stop, and this change does not touch it.
+    r = report(flat_then_fall, "", lambda a, b: set(), recording_run="3")
+    assert not r.ok and [x.kind for x in r.newest] == ["class-pass"] and not r.deferred_to
+    # the run being recorded has NO line yet (the gate of a clock run): deferred. The older
+    # transition is still compared and still printed -- nothing stops looking -- and counted.
+    r = report(flat_then_fall, "", lambda a, b: set(), recording_run="4")
+    assert r.ok and r.deferred_to == "4" and r.newest == []
+    assert [x.kind for x in r.deferred_falls] == ["class-pass"]
+    assert r.older_unaccounted == 1
+    # a malformed escape hatch is STILL a fault while deferred: the append cannot fix a hole
+    assert not report(flat_then_fall, "run=99 | not recorded", lambda a, b: set(),
+                      recording_run="4").ok
+    # the run being recorded is in the log but is not the newest: the log moved under the run
+    r = report(flat_then_fall, "", lambda a, b: set(), recording_run="2")
+    assert not r.ok and any("moved under this run" in q for q in r.problems)
+    # review F5b: the defer key is validated before it is used, never deferred on
+    r = report(flat_then_fall, "", lambda a, b: set(), recording_run="abc")
+    assert not r.ok and not r.deferred_to and any("not a run number" in q for q in r.problems)
+    assert [x.kind for x in r.newest] == ["class-pass"]        # it graded, it did not shrug
+    # `0200` is run 200, not a run the log has never heard of
+    assert report(flat_then_fall, "", lambda a, b: set(), recording_run="003").ok is False
+    assert report(flat_then_fall, "", lambda a, b: set(),
+                  recording_run="003").deferred_to == ""
+    assert _run_key("0200") == "200" and _run_key("fixture-2") == "fixture-2"
+
+    # ---- ticket 108: the coupling, counted ---------------------------------------------------
+    # run 3's own recording commit is what turns the comparison red: before it the graded
+    # transition (1 -> 2) was clean.
+    assert inversions(flat_then_fall, "", lambda a, b: set()) == (1, 2)
+    # a committed reason removes it from the count as well as from the grade
+    assert inversions(flat_then_fall, "run=3 | accepted", lambda a, b: set()) == (0, 2)
+    # a fall that stays red across two recordings inverted once, not twice
+    stays = flat_then_fall + [line("4", observed=8, waits=5)]
+    assert inversions(stays, "", lambda a, b: set()) == (1, 3)
+    assert inversions([line("1")], "", lambda a, b: set()) == (0, 0)
     print("selfcheck ok")
 
 
@@ -408,14 +567,31 @@ def _render(rep: Report) -> None:
         print(f"FAIL falls: {p}")
     if rep.note:
         print(f"  {rep.note}")
+        if rep.deferred_to:
+            print(f"  DEFERRED: the run being recorded is {rep.deferred_to} and its line is not "
+                  f"in the log yet; the transition ending at it is graded by truth.yml's `a fall "
+                  f"is a blocking event` step, after the cage records the line (ticket 108)")
         return
-    print(f"  newest transition: {rep.span}")
-    if not rep.newest:
+    if rep.deferred_to:
+        print(f"  DEFERRED: the run being recorded is {rep.deferred_to}. Its TRUTH line is not in "
+              f"talk/truth.log yet -- and cannot be, because this comparison's own verdict is one "
+              f"of the counts in it -- so the transition ending at it is graded by truth.yml's "
+              f"`a fall is a blocking event` step once the cage has recorded the line (ticket "
+              f"108). What follows is the newest RECORDED transition, which the run "
+              f"that recorded it already graded and blocked on: it is compared and "
+              f"printed here, and never faulted here, because re-grading it writes "
+              f"another run's red into this run's grade row, where "
+              f"verify/derived-status/ reads it as a live regression.")
+    print(f"  newest recorded transition: {rep.span}")
+    shown = rep.newest or rep.deferred_falls
+    if not shown:
         print("  no fall: no class lost a pass, `fail` did not rise, and neither the ceiling "
               "nor the total fell unexplained")
-    for f in rep.newest:
-        print(f"  FALL {f}")
-    if rep.newest and rep.accepted_reason:
+    label = ("fall, already graded by the run that recorded it:" if rep.deferred_to
+             else "FALL")
+    for f in shown:
+        print(f"  {label} {f}")
+    if shown and rep.accepted_reason:
         print(f"  accepted by {FALLS_NAME}: {rep.accepted_reason}")
     print(f"  history: {rep.transitions} recorded transition(s); {rep.older_unaccounted} older "
           f"one(s) carry an unaccounted fall and {rep.older_accounted} carry an accepted one "
@@ -429,6 +605,13 @@ def main(argv: list[str]) -> int:
     c.add_argument("--log", default="talk/truth.log")
     c.add_argument("--falls", default=FALLS_NAME)
     c.add_argument("--root", default=".")
+    # NOT read from the environment inside this module, on purpose (ticket 108). The gate's
+    # fixture lifts truth.yml's own step shell and runs it over planted logs whose runs are named
+    # `fixture-N`; a GITHUB_RUN_NUMBER picked up implicitly would defer every one of those states
+    # in CI and grade nothing. The caller that knows it is inside a run says so.
+    c.add_argument("--recording-run", default="",
+                   help="the run this process belongs to; empty means no run is in flight and "
+                        "the newest recorded line is the run being recorded")
     sub.add_parser("selfcheck")
     a = ap.parse_args(argv)
     if a.cmd == "selfcheck":
@@ -445,8 +628,15 @@ def main(argv: list[str]) -> int:
             falls_text = fh.read()
     except FileNotFoundError:
         falls_text = ""
-    rep = report(lines, falls_text, git_changed(a.root))
+    changed = git_changed(a.root)
+    rep = report(lines, falls_text, changed, recording_run=a.recording_run)
     _render(rep)
+    inverted, spans = inversions(lines, falls_text, changed)
+    print(f"  the recording commit's reach: {inverted} of {spans} recorded transition(s) went "
+          f"from green to red at the moment the run recorded its own line (ticket 108). That is "
+          f"the window this split does not close: a fall is still graded twice, once by the run "
+          f"that records it and once by every later checkout of the record, and `[skip ci]` "
+          f"means no run measures the tree the recording commit made")
     return 0 if rep.ok else 1
 
 

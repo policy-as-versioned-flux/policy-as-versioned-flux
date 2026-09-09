@@ -79,6 +79,17 @@
 # rows in the table at all (124), red rows named by a ticket that does not own the check (7) and
 # red rows no commit ties to any ticket (0, now that the plural subjects are read).
 #
+# THIS CHECK IS NOT ITS OWN EVIDENCE (ticket 108, 2026-09-09). Its own grade row is excluded from
+# the derivation of the ticket that built it, and counted instead. Without that rule the
+# derivation LATCHES: this script fails for any reason, the cage commits FAIL in its own row, and
+# on the next run the owning ticket derives `regressed` FROM THAT ROW -- which fails the script
+# again, and again, whatever happened to the estate. Runs 186 and 192 both carry
+# `verify/derived-status/... FAIL` and by construction no later run could have cleared it. It is
+# ticket 108's shape one level up: a check whose own output is its own input. Nothing is less
+# safe -- the FAIL still reds the gate by its own exit status on the same day, every OTHER check
+# the ticket owns still derives its status, and a ticket left with only this row derives
+# `resolved-ungraded`, never `resolved`, so the row is not evidence FOR it either.
+#
 #   PASS (exit 0)  the record uses the vocabulary, every done ticket has something behind it, and
 #                  no ticket claims resolved while a check IT OWNS is red and unacknowledged
 #   FAIL (exit 1)  one of those is false, named

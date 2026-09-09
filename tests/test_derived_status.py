@@ -364,3 +364,59 @@ def test_the_shared_reading_is_the_only_reading() -> None:
     fails this check by name instead of moving its verdicts in silence."""
     assert ds.shared_contract() == []
     assert ds.ticket_numbers.__module__ == "cited_truth"
+
+
+# ----------------------------------------- ticket 108: this check is not its own evidence
+#
+# Without this rule the derivation LATCHES. verify-derived-status.sh fails for any reason; the
+# cage commits FAIL in its own row; next run the ticket that owns it derives `regressed` from
+# that row, which fails the script again, for ever, whatever happened to the estate. Measured on
+# this estate: runs 186 and 192 both carry `verify/derived-status/... FAIL` and by construction
+# no later run could have cleared it. Nothing is less safe: the FAIL still reds the gate by its
+# own exit status, and every other check the ticket owns still derives its status.
+
+def _table_with_this_check_red() -> object:
+    return ds.parse_grades(
+        f"# {TRUTH}\n"
+        f"{ds.THIS_CHECK}\tFAIL\tFAIL: it did not\n"
+        "verify/good/verify-good.sh\tPASS\tPASS: it looked\n"
+        "verify/red/verify-red.sh\tFAIL\tFAIL: it did not\n")
+
+
+def test_this_checks_own_red_row_does_not_make_its_owner_regressed() -> None:
+    d = ds.derive_one("59-x.md", ticket("resolved", f"\n## Answer\n\n`{ds.THIS_CHECK}`\n"),
+                      _table_with_this_check_red(), owners=lambda c: {"59"})
+    assert d.derived == "resolved-ungraded" and not d.disagrees
+    assert d.self_referential == [ds.THIS_CHECK] and "ticket 108" in d.why
+
+
+def test_this_checks_own_red_row_is_not_evidence_for_the_ticket_either() -> None:
+    """A green sibling must not turn the ticket `resolved` while this row is red and ignored."""
+    d = ds.derive_one("59-x.md",
+                      ticket("resolved",
+                             f"\n## Answer\n\n`{ds.THIS_CHECK}`\n\n`verify/good/verify-good.sh`\n"),
+                      _table_with_this_check_red(), owners=lambda c: {"59"})
+    assert d.derived == "resolved-ungraded"
+
+
+def test_any_other_red_check_the_ticket_owns_still_derives_regressed() -> None:
+    d = ds.derive_one("59-x.md",
+                      ticket("resolved",
+                             f"\n## Answer\n\n`{ds.THIS_CHECK}`\n\n`verify/red/verify-red.sh`\n"),
+                      _table_with_this_check_red(), owners=lambda c: {"59"})
+    assert d.derived == "regressed" and d.disagrees
+    assert d.self_referential == [ds.THIS_CHECK]
+
+
+def test_another_tickets_answer_naming_this_check_is_still_not_its_own_evidence() -> None:
+    d = ds.derive_one("34-x.md", ticket("resolved", f"\n## Answer\n\n`{ds.THIS_CHECK}`\n"),
+                      _table_with_this_check_red(), owners=lambda c: {"59"})
+    assert d.derived == "resolved-ungraded" and d.self_referential == [ds.THIS_CHECK]
+
+
+def test_this_check_is_derived_from_the_modules_own_location_not_typed() -> None:
+    """Review F4: as a literal it was unpinned, and every test was written in terms of the
+    constant, so a plant that renamed the wrapper brought the latch back with nothing red."""
+    assert ds.THIS_CHECK == "verify/derived-status/verify-derived-status.sh"
+    assert (ds.HUB / ds.THIS_CHECK).exists()
+    assert (ds.HERE / "verify-derived-status.sh").resolve() == (ds.HUB / ds.THIS_CHECK).resolve()

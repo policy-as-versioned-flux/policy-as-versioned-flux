@@ -54,9 +54,40 @@
 #
 #   PASS (exit 0)  the pure half grades planted data as documented, truth.yml still carries the
 #                  step in the right place, the step's own shell blocks exactly the states ticket
-#                  59 decided it should, and the newest transition talk/truth.log recorded
+#                  59 decided it should, and the transition ENDING AT THE RUN BEING RECORDED
 #                  carries no unaccounted fall
 #   FAIL (exit 1)  one of those is false, named
+#
+# WHICH TRANSITION LEG 5 GRADES, and why it is not "the newest line on disk" (ticket 108,
+# 2026-09-09). The clock's recording commit appends the run's own TRUTH line and carries
+# `[skip ci]`, so it moves this check's input and nothing re-measures. Read the newest line on
+# disk and run N's gate grades the transition ending at run N-1 -- which run N-1's OWN step had
+# already graded and already blocked on -- then the cage commits that stale red into
+# talk/captures/_grades.tsv, where verify/derived-status/ reads it as a live regression of the
+# ticket that built this check. Measured on this estate, 2026-09-09: main's committed grade table
+# says this script FAILED, and this script PASSES on the very tree that table is committed on.
+#
+# So leg 5 grades the transition ending at the RUN BEING RECORDED, named by `--recording-run`:
+# the newest recorded line when no run is in flight (a builder, a review, a throwaway merge onto
+# origin/main -- where a fall on the record still blocks here, unchanged), and DEFERRED to
+# truth.yml's own step when the run being recorded has not landed its line yet, because inside
+# the gate that line cannot exist -- this check's own verdict is one of the counts in it. The
+# older transition is still compared, still printed and still counted; it is never faulted twice.
+# THE STOP IS UNCHANGED: truth.yml's `a fall is a blocking event` step runs after the cage, sees
+# the run's own line, and reds the run. Leg 3 below grades that step and is untouched.
+#
+# ON A BRANCH OR PULL-REQUEST CI RUN LEG 5 ALSO DEFERS, and that reaches further than the first
+# draft of this note said (review F5a). GITHUB_RUN_NUMBER is set on EVERY truth.yml run, not only
+# the recording one, so a branch run defers too -- where it previously reddened on the DEFAULT
+# branch's newest unaccounted fall. That is right and it blocks nothing: a branch records no line
+# (ticket 100), so the newest transition in the log is main's and not this run's, which is the
+# same reason truth.yml's own stop step reports and does not block on a branch. The comparison is
+# still printed in full for a reader to quote. The EMPTY case -- graded exactly as before -- is a
+# checkout with no run in flight at all: a builder, a review, a throwaway merge onto origin/main.
+#
+# THE KEY IS VALIDATED BEFORE IT IS TRUSTED. A non-numeric --recording-run is a FAULT, not a
+# defer, and run numbers are compared by value so `0200` is run 200: deferring means not grading,
+# and an escape hatch keyed on an unchecked string is the shape this ticket exists to refuse.
 #
 # NO could-not-look, by decision (ticket 59, delegated under ADR-0025), following
 # verify/can-record/ and verify/cited-truth/. Everything this script reads is in this repository
@@ -338,15 +369,34 @@ if [ "$ONLY_SELFCHECK" = 1 ]; then
   exit 1
 fi
 
-say "5. the newest transition talk/truth.log recorded carries no unaccounted fall"
+# THE TRANSITION THIS PROCESS OWNS IS THE ONE ENDING AT THE RUN BEING RECORDED (ticket 108).
+# `--recording-run` is passed from GITHUB_RUN_NUMBER, and it is passed HERE rather than read
+# inside talk/fall_check.py, because leg 3 above lifts truth.yml's own step shell and runs it over
+# planted logs whose runs are named `fixture-N`: a run number picked up implicitly by the module
+# would defer every one of those fourteen states the moment this script ran in CI, and the fixture
+# would grade nothing while still printing fourteen ok lines.
+#
+# Empty (a builder, a review, a throwaway merge onto origin/main) -> the run being recorded is the
+# newest line the log carries and the transition ending at it is graded, exactly as before: a fall
+# on the record still blocks here. Set, and its line not in the log yet (the GATE of a clock run,
+# where this comparison's own verdict is one of the counts in the line that does not exist) ->
+# DEFERRED to truth.yml's `a fall is a blocking event` step, which runs after the cage has recorded
+# it. That step is unchanged by ticket 108 and is where NORTH-STAR §5's stop lives.
+#
+# What the split removes: without it, run N's gate re-graded the transition ending at run N-1 --
+# which run N-1's own step had already graded and already blocked on -- and wrote that stale red
+# into talk/captures/_grades.tsv, where verify/derived-status/ read it as a live regression of the
+# ticket that built this check. Measured on this estate: main's committed grade table said this
+# script FAILED while this script PASSED on the very tree that table is committed on.
+say "5. the transition ending at the run being recorded carries no unaccounted fall"
 record="$("$PY" talk/fall_check.py check --log talk/truth.log --falls talk/verify-falls.txt \
-            --root "$ROOT")"; rrc=$?
+            --root "$ROOT" --recording-run "${GITHUB_RUN_NUMBER:-}")"; rrc=$?
 printf '%s\n' "$record"
-[ "$rrc" -eq 0 ] || note "the newest recorded transition carries a fall no committed reason accepts"
+[ "$rrc" -eq 0 ] || note "the transition ending at the run being recorded carries a fall no committed reason accepts"
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, that step's OWN shell -- lifted verbatim and run over throwaway git repositories in $states states -- turns the run red on a lost class pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total while letting a re-class, an exclusion, an accepted fall and a branch run through, and the newest transition talk/truth.log recorded carries no fall no committed reason accepts"
+  echo "PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, that step's OWN shell -- lifted verbatim and run over throwaway git repositories in $states states -- turns the run red on a lost class pass, a rise in fail, a pass that became a could-not-look, an unexplained ceiling and an unexplained total while letting a re-class, an exclusion, an accepted fall and a branch run through, and the transition ending at the run being recorded carries no fall no committed reason accepts -- deferring that transition to truth.yml's own step, and never re-grading it, when the run being recorded has not yet landed its line (ticket 108)"
   exit 0
 fi
 echo "FAIL: $bad fault(s) -- a fall in the citable number is not a blocking event (ticket 59)"

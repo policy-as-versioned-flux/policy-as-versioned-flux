@@ -11,10 +11,26 @@
 # line with no reason is a fault, and a line naming a run talk/truth.log does not record is a
 # fault, because an escape hatch nobody can check against the log is a hole.
 #
-# THIS FILE IS EMPTY ON PURPOSE, 2026-09-06. The recorded log carries thirteen transitions with
-# an unaccounted fall, the oldest on 2026-08-31. No reason for any of them was written down at
-# the time, and inventing thirteen now would be the estate telling itself a story. The count is
-# printed on every run by verify/a-fall-blocks/verify-a-fall-blocks.sh instead, so the history
-# is a number that moves rather than a sentence that rots. Only the NEWEST transition is graded,
-# because that is the only one a run can still do something about (ticket 55: every red is real,
-# explained and finishable).
+# THE KEY IS NOT GLOBALLY UNIQUE, and nothing here can make it so (ticket 59's design, named
+# 2026-09-09 by ticket 108's review, F7). `N` is GITHUB_RUN_NUMBER. Re-running a workflow reuses
+# the number, and deleting and recreating the workflow restarts it at 1, so two different
+# observations could one day answer to the same `run=`. Today talk/truth.log's numbers are
+# strictly increasing and every one of them is distinct, which is checkable and is checked; the
+# day that stops being true, a reason accepted here would attach to whichever line the log
+# carries. Nothing keys off the run number except this file and the log itself.
+#
+# THE OLDER FALLS ARE STILL NOT LISTED HERE, and that is still on purpose (2026-09-06, restated
+# 2026-09-09). The recorded log carries fifteen older transitions with an unaccounted fall, the
+# oldest on 2026-08-31. No reason for any of them was written down at the time, and inventing
+# fifteen now would be the estate telling itself a story. The count is printed on every run by
+# verify/a-fall-blocks/verify-a-fall-blocks.sh instead, so the history is a number that moves
+# rather than a sentence that rots. Only the transition ENDING AT THE RUN BEING RECORDED is
+# graded, because that is the only one a run can still do something about (ticket 55: every red
+# is real, explained and finishable; ticket 108 for which transition that is).
+#
+# The one entry below is the first, written 2026-09-09 by ticket 108's build. It is the
+# acknowledgement hatch used for its designed purpose: a fall that was a consequence of a defect
+# in the instruments, named, dated, and owned by an open ticket. Nothing was written into
+# talk/truth.log -- a builder does not author a clock's observation.
+
+run=186 | 2026-09-09, ticket 108. `fail` rose 10 -> 12 and class `meta` lost two passes (79 -> 78 overall) between run 184 (hub 691a32a, 2026-09-08T23:26Z) and run 186 (hub cdc5fb9, 2026-09-09T08:28Z). The two lost meta passes ARE `verify/a-fall-blocks/verify-a-fall-blocks.sh` and `verify/derived-status/verify-derived-status.sh`, and both went red one run BEHIND the estate's actual move because the commit that recorded run 184 -- 6772a7a, `truth: record run 184 [skip ci]`, which touches only talk/truth.log, talk/captures/_grades.tsv and 28 captures -- changed what each of them reads: the fall checker graded the newest line on disk, which that commit made run 184's, and the status checker read the grade table that same commit wrote. So run 186 counted as two fresh reds of its own the ONE regression run 184 had already counted once, `verify/handbook/verify-handbook-is-a-compose-time-render.sh` (PASS in run 181's grade table, FAIL in run 184's). No check of the estate lost a green at run 186 that was not this echo. Ticket 108 owns the coupling and splits the two readings so a fall is graded by the run that records it and not again by the next one; ticket 34 owns getting the handbook back to green.
