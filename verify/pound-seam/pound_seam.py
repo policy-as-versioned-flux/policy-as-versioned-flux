@@ -23,7 +23,13 @@ What it observes, per adopter, on `.estate-clone/<adopter>/composed/evidence.jso
   9. the adopter's OWN selection-policy package and platform/graded/cage.py pick the SAME rung
      over the same residuals — at each band boundary, and with every rung tried as a floor;
  10. the FX bridge resolves a published rate through the fx publisher's OWN converter, and
-     refuses an unpublished date as a missing instrument rather than widening it.
+     refuses an unpublished date as a missing instrument rather than widening it;
+ 11. every SERVED total says what the number is -- "an ordinal, auditable comparison under one
+     perspective; not an expected annual loss" (ticket 75 Q4 (a)) -- and carries the aggregate
+     of its selected-tier residuals beside the one tolerance the appetite declares, so a breach
+     of that aggregate is visible. Both sentences are written by the COMPOSER, so an adopter
+     composed under an older platform tag is a NAMED could-not-look that says which tag it
+     waits for (eco-system ticket 79 items 9 and 10).
 
 Checks 8 and 9 are the two-implementations guard: ADR-0021 has a versioned package the adopter
 publishes make the selection, while cage.py is the engine wired to prices[] and the proposer. If
@@ -683,6 +689,108 @@ def _forward_intel_feed(estate, name, doc):
     return found[-1] if found else None
 
 
+
+# --------------------------------------------------------------------------
+# 11. what the number IS, and the aggregate beside the band
+#     (eco-system ticket 79 items 9 and 10; ticket 75 Q4 (a))
+# --------------------------------------------------------------------------
+
+ORDINAL_STATEMENT = ("an ordinal, auditable comparison under one perspective; not an expected "
+                      "annual loss")
+
+
+def check_ordinal_and_aggregate(estate, adopters):
+    """Ticket 75 Q4 answered (a): the GBP is an ordinal, auditable comparison
+    instrument under one perspective, and EVERY ARTEFACT THAT SHOWS A TOTAL SAYS
+    SO. And ticket 79 item 9: `appetite.tolerance` is ONE annual aggregate, so
+    the sum of what the selected tiers leave belongs beside it, because lines
+    that each fit the band can breach it together.
+
+    WHAT THIS READS, and what it therefore may say. The served artefact is
+    `<adopter>/composed/HEADER.yaml` on the adopter's own checkout -- the file
+    the adopter's own tag signs and the insurer prices a layer from. Both
+    sentences are written by the COMPOSER (platform/compose/composition.py
+    `exposure_section`), so an adopter carries them only from the first
+    composition run under a platform tag that has them. Until then this is a
+    NAMED could-not-look that says which tag it waits for -- never a pass, and
+    never a FAIL against an adopter that has done nothing wrong.
+    """
+    composer = os.path.join(estate, "platform", "compose", "composition.py")
+    composer_has_it = False
+    if os.path.exists(composer):
+        with open(composer) as fh:
+            src = fh.read()
+        composer_has_it = ("ORDINAL_STATEMENT" in src and "def aggregate_section" in src)
+    if not composer_has_it:
+        # A NAMED could-not-look, not a FAIL. Nothing an adopter did is wrong: the
+        # composer in THIS estate checkout cannot produce either sentence, so
+        # grading the adopters for carrying them would be grading them against a
+        # thing that does not exist. The hard assertion lives where the composer
+        # IS the served artefact -- platform's own compose/composition.py
+        # --selfcheck, which refuses an exposure section with no `ordinal` and no
+        # `aggregate` by name.
+        out("SKIP", f"the composer in this estate checkout ({composer}) carries no "
+                    f"ORDINAL_STATEMENT and no aggregate_section, so no adopter here can carry "
+                    f"either by composing and this check cannot look at whether they do. "
+                    f"Graded in platform's own compose/composition.py --selfcheck; this leg "
+                    f"reads green once the estate clone carries a composer that has them "
+                    f"(eco-system ticket 79 items 9 and 10)")
+        return
+    out("PASS", "the composer carries both: ORDINAL_STATEMENT is written onto every exposure "
+                "section it renders, and aggregate_section sums what the selected tiers leave "
+                "beside the declared tolerance")
+
+    for name in adopters:
+        header = os.path.join(estate, name, "composed", "HEADER.yaml")
+        if not os.path.exists(header):
+            out("SKIP", f"{name} has no composed/HEADER.yaml, so no total of its is served and "
+                        f"there is nothing to grade for the ordinal statement")
+            continue
+        try:
+            doc = load_yaml(header) or {}
+        except Exception as exc:                       # noqa: BLE001 -- any parse failure
+            out("FAIL", f"{name}: composed/HEADER.yaml does not parse: {exc}")
+            continue
+        exposure = doc.get("exposure")
+        if not isinstance(exposure, dict) or exposure.get("total") is None:
+            out("PASS", f"{name} serves no exposure total, so nothing of its states a number "
+                        f"that would need the sentence (a named absence)")
+            continue
+        total, currency = exposure["total"], exposure.get("currency")
+        pin = _platform_pin(estate, name)
+        missing = []
+        if (exposure.get("ordinal") or "").strip() != ORDINAL_STATEMENT:
+            missing.append("`ordinal`")
+        if not isinstance(exposure.get("aggregate"), dict):
+            missing.append("`aggregate`")
+        if not missing:
+            agg = exposure["aggregate"]
+            out("PASS", f"{name} serves a total of {total:,.2f} {currency} that says what it "
+                        f"is -- {ORDINAL_STATEMENT} -- with the aggregate of its selected-tier "
+                        f"residuals ({agg.get('selected_tier_residual_total')}) beside a "
+                        f"tolerance of {agg.get('tolerance')}")
+            continue
+        out("SKIP", f"{name} serves a total of {total:,.2f} {currency} carrying no "
+                    f"{' and no '.join(missing)}: composition.py writes both, and this adopter "
+                    f"was composed under platform {pin or 'an unrecorded pin'}, which predates "
+                    f"them. It waits on the owner's next signed platform tag and on this "
+                    f"adopter's pin moving to it; nothing here may be re-rendered from an "
+                    f"untagged branch (eco-system ticket 79 items 9 and 10)")
+
+
+def _platform_pin(estate, name):
+    """The platform version this adopter's own party.yaml pins, for naming the
+    tag a could-not-look waits on. None where it pins none."""
+    try:
+        doc = load_yaml(os.path.join(estate, name, "party.yaml")) or {}
+    except Exception:                                   # noqa: BLE001
+        return None
+    for edge in doc.get("inherits") or []:
+        if edge.get("party") == "platform" and edge.get("kind") == "implementations":
+            return f"v{edge.get('version')}"
+    return None
+
+
 def run(estate):
     parties = _parties(estate)
     if not parties:
@@ -697,6 +805,7 @@ def run(estate):
     adopters = [n for n, d in sorted(parties.items()) if "adopter" in (d.get("roles") or [])]
     if not adopters:
         out("FAIL", f"no adopter party in {estate}")
+    check_ordinal_and_aggregate(estate, adopters)
     for name in adopters:
         ev = os.path.join(estate, name, "composed", "evidence.json")
         if not os.path.exists(ev):

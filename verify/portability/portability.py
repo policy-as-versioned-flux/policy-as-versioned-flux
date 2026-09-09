@@ -897,6 +897,108 @@ def _run(**kwargs) -> list[str]:
     return list(LINES)
 
 
+# --------------------------------------------------------------------------
+# eco-system ticket 79 item 4: the MOVED converter, replayed for real
+# --------------------------------------------------------------------------
+def _t79_moved_converter(estate: str = ESTATE) -> None:
+    """Sentence 4 again, against the REAL converter ticket 79 moved rather than a
+    fixture shaped like one.
+
+    The threat register's converter used to live in the SUBSCRIBER's repository
+    (`platform/feeds/to_fair_scenario.py`), holding an adopter-keyed table of loss
+    magnitudes that no publisher had published. Ticket 79 item 4 moved it to its
+    publisher, `feeds/threat-register/to_fair_scenario.py`, which is the FIRST
+    place platform's `_converter()` looks -- so from the next composition it is
+    THIS file that gets vendored into every adopter's `composed/feeds/feeds/<v>/`
+    and THIS file the replay above runs.
+
+    So it is run here the way `run_standalone` will run it: written into a
+    directory holding nothing but itself and the vendored payload, with the exact
+    argv platform's `_run_converter` records for a threat register
+    (`["threat", "<institution>"]`), and held to the digest of what it returned.
+    A converter that reaches back into the repository it came from -- a sibling
+    import, a relative path, a sys.path edit -- cannot pass this, and that is the
+    whole point of moving it rather than copying it.
+
+    A wrong invocation is planted too: the record says the run priced driftwood
+    and the invocation names tuppence. The digests must then differ and the
+    failure must NAME them, because a replay that quietly accepts any output is
+    not a replay.
+    """
+    conv = os.path.join(estate, "feeds", "threat-register", "to_fair_scenario.py")
+    feed = os.path.join(estate, "feeds", "threat-register", "v2", "feed.json")
+    if not (os.path.isfile(conv) and os.path.isfile(feed)):
+        print(f"SKIP the moved threat-register converter is not in this estate checkout "
+              f"({conv}), so the real replay could not be run -- a named absence, and the "
+              f"fixture legs above still prove the mechanism")
+        return
+
+    envelope = json.loads(open(feed).read())
+    payload = dict(envelope["payload"])
+    payload.setdefault("feed_version", "v2")
+
+    def price(institution: str) -> tuple[str, dict]:
+        with tempfile.TemporaryDirectory() as bare:
+            script = os.path.join(bare, "to_fair_scenario.py")
+            open(script, "w").write(open(conv).read())
+            body = os.path.join(bare, "payload.json")
+            open(body, "w").write(json.dumps(payload))
+            r = subprocess.run([sys.executable, script, "threat", body, institution],
+                               capture_output=True, text=True, cwd=bare)
+        assert r.returncode == 0, (institution, r.returncode, r.stderr[-400:])
+        scenario = json.loads(r.stdout)
+        return digest(json.dumps(scenario, sort_keys=True)), scenario
+
+    want, scenario = price("driftwood")
+
+    with tempfile.TemporaryDirectory() as root:
+        ado = os.path.join(root, "ado")
+        base = "composed/feeds/feeds/v2"
+        files = {"threat-register/v2/feed.json": open(feed).read(),
+                 "threat-register/to_fair_scenario.py": open(conv).read()}
+        record = {"party": "feeds", "kind": "feed", "name": "threat-register", "version": "v2",
+                  "sha": "deadbeef", "feed_path": "threat-register/v2/feed.json",
+                  "party_artefact": None,
+                  "converter": "threat-register/to_fair_scenario.py",
+                  "converter_from": "feeds", "published_at": "2026-07-31",
+                  "payload_version_key": "feed_version",
+                  "invocation": ["threat", "driftwood"], "scenario_sha256": want,
+                  "files": {rel: digest(text) for rel, text in sorted(files.items())},
+                  "path": base}
+        for rel, text in files.items():
+            path = os.path.join(ado, base, rel)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            open(path, "w").write(text)
+        open(os.path.join(ado, base, PROVENANCE), "w").write(
+            json.dumps(record, indent=2, sort_keys=True) + "\n")
+        for cmd in (["init", "-q", "-b", "main"], ["add", "-A"], ["commit", "-qm", "seed"]):
+            _git_fixture(ado, *cmd)
+        _serve(ado)
+        _git_fixture(ado, "push", "-q", "origin", "main")
+
+        MESSAGES.clear()
+        run_standalone(ado, "ado", record)
+        assert MESSAGES and MESSAGES[0].startswith("PASS"), MESSAGES
+        assert want[:12] in MESSAGES[0], MESSAGES
+        print(f"OK (c) the MOVED converter (feeds/threat-register/to_fair_scenario.py) replays "
+              f"its recorded invocation `to_fair_scenario.py threat <payload> driftwood` in a "
+              f"directory holding nothing but itself and the vendored payload -- no publisher "
+              f"clone, no platform, no hub -- and returns the very scenario it was priced from "
+              f"(sha256 {want[:12]}), pricing lm {scenario['warn']['lm']} at lef "
+              f"{scenario['warn']['lef']}")
+
+        other, _ = price("tuppence")
+        assert other != want, (other, want)
+        MESSAGES.clear()
+        run_standalone(ado, "ado", {**record, "invocation": ["threat", "tuppence"]})
+        assert MESSAGES and MESSAGES[0].startswith("FAIL"), MESSAGES
+        assert other[:12] in MESSAGES[0] and want[:12] in MESSAGES[0], MESSAGES
+        print(f"OK (c) a WRONG invocation on the same record is caught by name: replaying "
+              f"`threat <payload> tuppence` against a record that says driftwood returns "
+              f"{other[:12]} where the record says {want[:12]}, and the failure prints both")
+    MESSAGES.clear()
+
+
 def selfcheck() -> None:
     plants = 0
     ok = _run()
@@ -1113,6 +1215,7 @@ def selfcheck() -> None:
     plants += 1
     print("OK the per-adopter EXPOSURE figure prints as a NOTE, so no undeclared SKIP text "
           "can hide behind the wrapper's first-SKIP-line report")
+    _t79_moved_converter()
     print(f"\nselfcheck ok: {plants} plants, each proved to bite")
 
 
