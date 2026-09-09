@@ -92,6 +92,7 @@ _KEY_SETS = (
 REFUSAL_IDS = (
     "names-or-identifies-an-individual",
     "key-not-declared",
+    "value-not-the-declared-shape",
     "not-this-scenario-class",
     "scenario-not-served",
     "field-not-admissible",
@@ -119,12 +120,21 @@ def load_rule(path: Path | None = None) -> dict[str, Any]:
     if not isinstance(doc, dict) or doc.get("schema") != SCHEMA:
         raise SensorAdmissionError(f"{source}: not a {SCHEMA} document")
     for field in ("scenario_class", "admissible", "admissible_fields", "refusals", "requires",
-                  "closed_keys", "free_prose_fields"):
+                  "closed_keys", "free_prose_fields", "nested_maps", "nested_lists",
+                  "scalar_lists", "typed_keys", "terminal_batch_clause"):
         if not doc.get(field):
             raise SensorAdmissionError(f"{source}: declares no {field}")
     for name in _KEY_SETS:
         if not doc["closed_keys"].get(name):
             raise SensorAdmissionError(f"{source}: closed_keys declares no {name} set")
+    # A nested set the table points at but never declares would silently stop the recursion at
+    # the node it names, which is the G1 hole again by another route.
+    for parent, children in {**doc["nested_maps"], **doc["nested_lists"]}.items():
+        for key, child in (children or {}).items():
+            if child not in doc["closed_keys"]:
+                raise SensorAdmissionError(
+                    f"{source}: {parent}.{key} points at the key set {child!r}, which "
+                    "closed_keys does not declare")
     declared = {str(r.get("id")) for r in doc["refusals"] if isinstance(r, dict)}
     missing = [r for r in REFUSAL_IDS if r not in declared]
     if missing:
@@ -233,46 +243,86 @@ def individual_problems(document: Any, *, scan_names: bool = True) -> list[str]:
 
 # -- the closed key sets (review F1) --------------------------------------------------------------
 
-def _undeclared(node: Any, rule: dict[str, Any], set_name: str, where: str) -> list[str]:
-    """Every key of `node` the table's `set_name` list does not declare, as a dotted path."""
-    if not isinstance(node, dict):
-        return []
-    allowed = {str(k) for k in rule["closed_keys"][set_name]}
-    out = []
-    for key in node:
-        if str(key) not in allowed:
-            path = f"{where}.{key}" if where else str(key)
-            out.append(f"{path!r} (the {set_name} keys are: {', '.join(sorted(allowed))})")
-    return out
+_SCALAR = (str, int, float, bool, type(None))
+_TYPE_NAMES = {"bool": "a boolean", "number": "a number"}
 
 
-def undeclared_keys(record: dict[str, Any], rule: dict[str, Any]) -> list[str]:
-    """Every key in an admission record that this table does not declare.
+def closed_document_problems(node: Any, rule: dict[str, Any], set_name: str = "record",
+                             where: str = "") -> list[tuple[str, str]]:
+    """`(refusal id, what)` for every way this document is not the shape the table declares.
 
-    Review F1, 2026-09-09: before this, only `fields:` was closed. A served record carrying
-    `maintained_by`, `escalation_contact`, `github`, `owner`, `stakeholders` or a nested
-    `context.escalation.to` was ADMITTED with a green PASS, because `identifier_in_value`
-    recognises exactly two shapes and nothing looked at keys it had never heard of. A homoglyph
-    key (`\u0435mployee_id`) evaded `identifier_in_name` for the same reason: `_WORD` splits on
-    `[^a-z0-9]+`, so a Cyrillic e is a separator. A closed set does not care what the key is
-    spelled like — only whether the table declares it.
+    Re-check G1, 2026-09-09. The first cut walked a hand-enumerated list of ELEVEN PATHS, so any
+    mapping sitting under a DECLARED key that had no closed set of its own was never reached:
+    `notice.published_at: {holder: <a name>}` and `ladder.purpose.will_act: 'agreed with <a
+    name>'` were both ADMITTED with a green PASS at a real served ref, the second because
+    `ethics_gate._check_purpose` only tests `will_act` for truthiness. A whitelist of paths is
+    not a closure of a document.
+
+    This is the closure. Every key a set declares is a nested mapping, a list of nested
+    mappings, a list of scalars, or -- the default the enumeration missed -- a SCALAR, and a
+    typed slot is checked for its type. It is also total: it never calls `.get()` on anything it
+    has not first shown to be a mapping, so a type-confused record (`dpia:` as a list) comes back
+    as a refusal instead of the `AttributeError` that used to abort the whole estate run at one
+    adopter's malformed file (re-check G2).
+
+    YAML anchors and merge keys need no case of their own: `yaml.safe_load` expands `<<:` into
+    real keys before this ever runs, so a merged-in key is caught as undeclared like any other.
     """
-    out = _undeclared(record, rule, "record", "")
-    out += _undeclared(record.get("notice"), rule, "notice", "notice")
-    out += _undeclared(record.get("dpia"), rule, "dpia_ref", "dpia")
-    ladder = record.get("ladder")
-    out += _undeclared(ladder, rule, "ladder", "ladder")
-    if isinstance(ladder, dict):
-        out += _undeclared(ladder.get("purpose"), rule, "ladder_purpose", "ladder.purpose")
-        necessity = ladder.get("necessity")
-        out += _undeclared(necessity, rule, "ladder_necessity", "ladder.necessity")
-        if isinstance(necessity, dict) and isinstance(necessity.get("alternatives"), list):
-            for index, alt in enumerate(necessity["alternatives"]):
-                out += _undeclared(alt, rule, "ladder_alternative",
-                                   f"ladder.necessity.alternatives[{index}]")
-        out += _undeclared(ladder.get("proportionality"), rule, "ladder_proportionality",
-                           "ladder.proportionality")
-        out += _undeclared(ladder.get("dpia"), rule, "ladder_dpia", "ladder.dpia")
+    out: list[tuple[str, str]] = []
+    if not isinstance(node, dict):
+        out.append(("key-not-declared",
+                    f"{where or 'the record'} is a {type(node).__name__} where the table declares "
+                    f"a {set_name} mapping"))
+        return out
+    allowed = {str(k) for k in rule["closed_keys"][set_name]}
+    maps = rule["nested_maps"].get(set_name) or {}
+    lists_ = rule["nested_lists"].get(set_name) or {}
+    scalar_lists = set(rule["scalar_lists"].get(set_name) or [])
+    typed = rule["typed_keys"].get(set_name) or {}
+    listed = ", ".join(sorted(allowed))
+    for key, value in node.items():
+        name = str(key)
+        path = f"{where}.{name}" if where else name
+        if name not in allowed:
+            out.append(("key-not-declared",
+                        f"the key {path!r} is not one this table declares "
+                        f"(the {set_name} keys are: {listed})"))
+            continue
+        if name in maps:
+            out += closed_document_problems(value, rule, maps[name], path)
+        elif name in lists_:
+            if not isinstance(value, list):
+                out.append(("key-not-declared",
+                            f"the key {path!r} holds a {type(value).__name__} where the table "
+                            f"declares a list of {lists_[name]} mappings"))
+            else:
+                for index, item in enumerate(value):
+                    out += closed_document_problems(item, rule, lists_[name], f"{path}[{index}]")
+        elif name in scalar_lists:
+            if not isinstance(value, list):
+                out.append(("key-not-declared",
+                            f"the key {path!r} holds a {type(value).__name__} where the table "
+                            "declares a list of scalars"))
+            else:
+                for index, item in enumerate(value):
+                    if not isinstance(item, _SCALAR):
+                        out.append(("key-not-declared",
+                                    f"the item at {path}[{index}] holds a "
+                                    f"{type(item).__name__}, and the table declares no key set "
+                                    "for it"))
+        elif not isinstance(value, _SCALAR):
+            out.append(("key-not-declared",
+                        f"the key {path!r} holds a {type(value).__name__}, and the table declares "
+                        "no key set for it"))
+        elif name in typed:
+            want = str(typed[name])
+            wrong = (want == "bool" and not isinstance(value, bool)) or (
+                want == "number" and (isinstance(value, bool)
+                                      or not isinstance(value, (int, float))))
+            if wrong:
+                out.append(("value-not-the-declared-shape",
+                            f"the key {path!r} holds {value!r}, and the table declares "
+                            f"{_TYPE_NAMES.get(want, want)}"))
     return out
 
 
@@ -291,8 +341,9 @@ def people_file_problems(filename: str, doc: Any, rule: dict[str, Any]) -> list[
     """
     if not isinstance(doc, dict):
         return [f"{filename}: is not a mapping, so it is not a role file"]
-    problems = [f"{filename}: carries the undeclared key {p}"
-                for p in _undeclared(doc, rule, "people_file", "")]
+    problems = [f"{filename}: carries the undeclared key {what}" if rid == "key-not-declared"
+                else f"{filename}: {what}"
+                for rid, what in closed_document_problems(doc, rule, "people_file", "")]
     stem = filename.rsplit("/", 1)[-1].rsplit(".", 1)[0]
     token = identifier_in_name(stem)
     if token is not None:
@@ -376,13 +427,23 @@ def grade_record(
     rule = rule or load_rule()
     known_people = {str(p) for p in people}
     served_scenarios = {str(s) for s in scenarios}
-    sensor = str(record.get("sensor", "")).strip()
-    declared_class = str(record.get("scenario_class", "")).strip()
-    admissible = admissible_pairs(rule)
-    admissible_text = ", ".join(f"{k}/{g}" for k, g in admissible)
+    safe: dict[str, Any] = record if isinstance(record, dict) else {}
+    sensor = str(safe.get("sensor", "")).strip() if isinstance(safe.get("sensor"), _SCALAR) else ""
+    declared_class = str(safe.get("scenario_class", "")).strip()
 
-    # The DPIA is read first, because its KEYS are part of the terminal scan.
-    dpia_path = str((record.get("dpia") or {}).get("record", "")).strip()
+    def out(rid: str, what: str, admissible_list: str = "") -> str:
+        return refusal(rule, rid, sensor, what, admissible_list)
+
+    # -- the document's own shape, FIRST -----------------------------------------------------
+    # Re-check G2: this runs before any `.get()` chain, so a type-confused record (`dpia:` as a
+    # list) is refused rather than aborting the whole estate run with an AttributeError at one
+    # adopter's malformed file. `closed_document_problems` calls `.get()` on nothing it has not
+    # first shown to be a mapping.
+    shape: list[tuple[str, str]] = closed_document_problems(record, rule)
+    dpia_block = safe.get("dpia")
+    dpia_path = ""
+    if isinstance(dpia_block, dict) and isinstance(dpia_block.get("record"), str):
+        dpia_path = dpia_block["record"].strip()
     dpia_text = dpia_reader(dpia_path) if (dpia_reader and dpia_path) else None
     dpia_doc: dict[str, Any] = {}
     if dpia_text is not None:
@@ -392,25 +453,23 @@ def grade_record(
             loaded = None
         if isinstance(loaded, dict):
             dpia_doc = loaded
+            shape += [(rid, f"the DPIA record's key {what}")
+                      for rid, what in closed_document_problems(dpia_doc, rule, "dpia_record")]
 
-    def out(rid: str, what: str, admissible_list: str = "") -> str:
-        return refusal(rule, rid, sensor, what, admissible_list)
-
-    # -- terminal, and reported alone -------------------------------------------------------
-    terminal: list[str] = []
-    for problem in individual_problems(record):
-        terminal.append(out("names-or-identifies-an-individual", problem))
-    for problem in individual_problems(dpia_doc):
-        terminal.append(out("names-or-identifies-an-individual",
-                            f"the DPIA record at {dpia_path} carries {problem}"))
-    for key in undeclared_keys(record, rule):
-        terminal.append(out("key-not-declared", key, ", ".join(rule["closed_keys"]["record"])))
-    for key in _undeclared(dpia_doc, rule, "dpia_record", ""):
-        terminal.append(out("key-not-declared", f"the DPIA record's key {key}",
-                            ", ".join(rule["closed_keys"]["dpia_record"])))
-    terminal = [line for line in terminal
-                if is_terminal(rule, line.split(":")[0].removeprefix("REFUSED ").strip())]
+    problems: list[tuple[str, str]] = (
+        [("names-or-identifies-an-individual", w) for w in individual_problems(safe)]
+        + [("names-or-identifies-an-individual",
+            f"the DPIA record at {dpia_path} carries {w}") for w in individual_problems(dpia_doc)]
+        + shape
+    )
+    listed = {"key-not-declared": ", ".join(rule["closed_keys"]["record"])}
+    terminal = [out(rid, what, listed.get(rid, "")) for rid, what in problems
+                if is_terminal(rule, rid)]
     if terminal:
+        # Re-check G3: the clause is appended ONCE, to the batch, instead of ending every
+        # sentence in it.
+        clause = " ".join(str(rule["terminal_batch_clause"]).split())
+        terminal[-1] = f"{terminal[-1]} {clause}"
         return {
             "sensor": sensor,
             "scenario_class": declared_class or rule["scenario_class"],
@@ -420,19 +479,9 @@ def grade_record(
             "admitted": False,
         }
 
-    refusals: list[str] = []
-
-    # A table that says these are not terminal reports them beside the rest instead of alone.
-    for problem in individual_problems(record):
-        refusals.append(out("names-or-identifies-an-individual", problem))
-    for problem in individual_problems(dpia_doc):
-        refusals.append(out("names-or-identifies-an-individual",
-                            f"the DPIA record at {dpia_path} carries {problem}"))
-    for key in undeclared_keys(record, rule):
-        refusals.append(out("key-not-declared", key, ", ".join(rule["closed_keys"]["record"])))
-    for key in _undeclared(dpia_doc, rule, "dpia_record", ""):
-        refusals.append(out("key-not-declared", f"the DPIA record's key {key}",
-                            ", ".join(rule["closed_keys"]["dpia_record"])))
+    refusals: list[str] = [out(rid, what, listed.get(rid, "")) for rid, what in problems]
+    admissible = admissible_pairs(rule)
+    admissible_text = ", ".join(f"{k}/{g}" for k, g in admissible)
 
     # this table rules one class, and says which one it graded (review F5).
     if declared_class != rule["scenario_class"]:
@@ -448,11 +497,11 @@ def grade_record(
                             f"(have: {', '.join(known_sensors)})"))
 
     # the scenario this sensor feeds is one the adopter serves, and the ladder walks the same one.
-    scenario = str(record.get("scenario", "")).strip()
+    scenario = str(safe.get("scenario", "")).strip()
     served_text = ", ".join(sorted(served_scenarios)) or "none"
     if scenario not in served_scenarios:
         refusals.append(out("scenario-not-served", repr(scenario or "(none)"), served_text))
-    raw_ladder = record.get("ladder")
+    raw_ladder = safe.get("ladder")
     ladder_doc: dict[str, Any] = raw_ladder if isinstance(raw_ladder, dict) else {}
     purpose_scenario = str((ladder_doc.get("purpose") or {}).get("scenario", "")).strip()
     if purpose_scenario != scenario:
@@ -462,7 +511,7 @@ def grade_record(
             "the two is not what runs", served_text))
 
     # (c) kind and granularity, declared and as the ladder walks them.
-    kind, gran = str(record.get("kind", "")), str(record.get("granularity", ""))
+    kind, gran = str(safe.get("kind", "")), str(safe.get("granularity", ""))
     if (kind, gran) not in admissible:
         refusals.append(out("kind-not-admissible", f"{kind}/{gran}", admissible_text))
     necessity = ladder_doc.get("necessity") or {}
@@ -474,7 +523,7 @@ def grade_record(
             f"{walked[0]}/{walked[1]}, so one of the two is not what runs", admissible_text))
 
     # the closed field set.
-    fields = record.get("fields")
+    fields = safe.get("fields")
     if not isinstance(fields, list) or not fields:
         refusals.append(out("field-not-admissible", "(the record declares no fields)",
                             ", ".join(rule["admissible_fields"])))
@@ -485,7 +534,7 @@ def grade_record(
                                     ", ".join(rule["admissible_fields"])))
 
     # (d) covert sensing. `told` is a LIST OF ROLE IDS, never prose (review F1).
-    notice = record.get("notice")
+    notice = safe.get("notice")
     if not isinstance(notice, dict) or not notice:
         refusals.append(out("covert-sensing",
                             "the record carries no notice, so the sensed party is not told"))
@@ -495,8 +544,8 @@ def grade_record(
             refusals.append(out(
                 "covert-sensing",
                 "the notice names who is told as "
-                f"{type(told).__name__ if told is not None else 'nothing'} rather than a list of "
-                "role ids, and prose is where a personal name arrives"))
+                f"{type(told).__name__ if told is not None else 'nothing'} rather than a non-empty "
+                "list of role ids, and prose is where a personal name arrives"))
         else:
             for role in told:
                 if str(role) not in known_people:
@@ -520,7 +569,7 @@ def grade_record(
         refusals.append(out("no-dpia-record", problem))
 
     # (e) the roles register.
-    senses = str(record.get("senses_role", "")).strip()
+    senses = str(safe.get("senses_role", "")).strip()
     if not senses:
         refusals.append(out("role-not-registered", "no sensed role at all"))
     elif senses not in known_people:
@@ -941,9 +990,25 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
     expect("an undeclared key in the DPIA record is refused terminally", variant(),
            "key-not-declared", dpia=_GOOD_DPIA + "reviewed_by: <never read>\n")
     notice = copy.deepcopy(good["notice"])
-    expect("a notice naming who was told in prose rather than role ids is refused",
+    expect("a notice naming who was told in prose rather than role ids is refused terminally",
            variant(notice={**notice, "told": "the whole team was told in person"}),
-           "covert-sensing")
+           "key-not-declared")
+    expect("a notice telling nobody is refused",
+           variant(notice={**notice, "told": []}), "covert-sensing")
+    # Re-check G1, 2026-09-09: a mapping under a DECLARED key with no closed set of its own was
+    # never reached by the enumerated walk, and both of these were admitted with a green PASS.
+    expect("a mapping under the declared scalar notice.published_at is refused",
+           variant(notice={**notice, "published_at": {"holder": "<never read>"}}),
+           "key-not-declared")
+    prose_ladder = copy.deepcopy(good["ladder"])
+    prose_ladder["purpose"]["will_act"] = "agreed with the on-call rota"
+    expect("prose in the boolean ladder.purpose.will_act is refused",
+           variant(ladder=prose_ladder), "value-not-the-declared-shape")
+    # Re-check G2: a type-confused record must be a refusal, never an AttributeError that aborts
+    # the whole estate run at one adopter's malformed file.
+    expect("a dpia block that is a list is refused rather than raising",
+           variant(dpia=["twin/orgs/planted/dpia/bus-factor-structural-aggregate.yaml"]),
+           "key-not-declared")
     expect("a notice naming an unregistered role is refused",
            variant(notice={**notice, "told": ["unregistered-role"]}), "role-not-registered")
     expect("a record of another scenario class is refused",
@@ -994,6 +1059,34 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
                 f"got exit {rc}: {lines[-1] if lines else 'nothing'}")
             failures += 1
 
+        # Re-check G1, end to end at a real served ref: both of these were ADMITTED with a green
+        # PASS before the document was closed, because the walk was eleven enumerated paths.
+        lines = []
+        estate = _plant(root / "opennested", hooks, _GOOD_RECORD.replace(
+            "  published_at: docs/monitoring-notice.md\n",
+            "  published_at: {holder: <a value the grader never reads>}\n"))
+        rc = grade_estate(estate, out=lines.append)
+        if rc == 1 and any("notice.published_at" in ln for ln in lines):
+            out(f"PASS: selfcheck: a served record with a mapping under a declared scalar key "
+                f"grades FAIL ({lines[-1][:130]})")
+        else:
+            out(f"FAIL: selfcheck: a served record with a mapping under a declared scalar key "
+                f"should grade FAIL, got exit {rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
+        lines = []
+        estate = _plant(root / "prosebool", hooks, _GOOD_RECORD.replace(
+            "  purpose: {scenario: key-person-2026, will_act: true}",
+            "  purpose: {scenario: key-person-2026, will_act: agreed with the on-call rota}"))
+        rc = grade_estate(estate, out=lines.append)
+        if rc == 1 and any("will_act" in ln for ln in lines):
+            out(f"PASS: selfcheck: a served record with prose in the boolean will_act grades "
+                f"FAIL ({lines[-1][:130]})")
+        else:
+            out(f"FAIL: selfcheck: a served record with prose in the boolean will_act should "
+                f"grade FAIL, got exit {rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
         # Review F2, end to end: a role file carrying an undeclared key, and one named after
         # something that is not a role.
         lines = []
@@ -1035,8 +1128,8 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
     if failures:
         out(f"FAIL: selfcheck: {failures} planted case(s) did not grade as planted")
         return 1
-    out(f"PASS: selfcheck: {planted} planted records and six planted served estates grade "
-        "as planted")
+    out(f"PASS: selfcheck: {planted} planted records and eight planted served estates "
+        "grade as planted")
     return 0
 
 

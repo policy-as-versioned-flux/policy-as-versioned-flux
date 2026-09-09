@@ -89,6 +89,39 @@ closed_keys:
      what_is_sensed, what_is_not_sensed]
   people_file: [id, role]
 
+# WHICH DECLARED KEY MAY HOLD WHAT (re-check G1, 2026-09-09). The first cut of `closed_keys`
+# was walked by a hand-enumerated list of ELEVEN PATHS, so a mapping sitting under a DECLARED
+# key that had no closed set of its own was never reached at all: `notice.published_at:
+# {holder: <a name>}` and `ladder.purpose.will_act: 'agreed with <a name>'` were both ADMITTED
+# with a green PASS at a real served ref. A whitelist of paths is not a closure of a document.
+#
+# These three tables turn the enumeration into a recursion. Every key a `closed_keys` set
+# declares falls into exactly one case: it holds a nested mapping ruled by a named set
+# (`nested_maps`), a list of such mappings (`nested_lists`), a list of scalars
+# (`scalar_lists`), or -- the default, and the case the enumeration missed -- a SCALAR. A
+# mapping or list reached anywhere else is refused as `key-not-declared`, because a mapping
+# under a declared key is exactly where a person arrives.
+nested_maps:
+  record: {notice: notice, dpia: dpia_ref, ladder: ladder}
+  ladder:
+    {purpose: ladder_purpose, necessity: ladder_necessity,
+     proportionality: ladder_proportionality, dpia: ladder_dpia}
+nested_lists:
+  ladder_necessity: {alternatives: ladder_alternative}
+scalar_lists:
+  record: [fields]
+  notice: [told]
+  ladder_dpia: [channels]
+
+# The scalar slots whose TYPE matters. `will_act` is the one that bit: `_check_purpose` only
+# tests it for truthiness, so any non-empty string passed the purpose rung -- a boolean slot
+# accepting arbitrary prose, and prose is where a name arrives. `number` admits an int or a
+# float and refuses a bool.
+typed_keys:
+  ladder_purpose: {will_act: bool}
+  ladder_dpia: {profiling: bool, financial_loss_risk: bool, complete: bool}
+  ladder_proportionality: {intrusion_cost: number, value_illuminated: number}
+
 # The three keys of `dpia_record` above that are free prose, and the one PLACE a person could
 # still arrive under a declared key. Printed as a limit on every run rather than left implied:
 # no rule here reads English, so a personal name written into a DPIA's narrative is not
@@ -120,6 +153,11 @@ requires:
   completed_by_role: >-
     The role accountable for the DPIA, which must also be an id in that same register.
 
+# Appended ONCE to the last line of a terminal batch (re-check G3): the clause used to sit in
+# each terminal sentence and printed several times in one run.
+terminal_batch_clause: >-
+  No refusal beyond these was evaluated.
+
 # The exact sentence each refusal prints. Declared here rather than formatted in the module, so
 # the refusal a reader is shown and the refusal the gate grades are the same bytes.
 # `{}` fields are filled by `twin/sensor_admission.py`.
@@ -129,15 +167,19 @@ refusals:
     sentence: >-
       REFUSED names-or-identifies-an-individual: {sensor}: {what} names or identifies an
       individual. A bus-factor-key-person sensor senses a role, never a person, and this record
-      is refused before its proportionality is computed. No other refusal on this record was
-      evaluated.
+      is refused before its proportionality is computed.
   - id: key-not-declared
     terminal: true
     sentence: >-
-      REFUSED key-not-declared: {sensor}: the key {what} is not one this table declares
-      ({admissible}). The key set is closed, because an undeclared key is where a person
-      arrives, and no deny-list of identifier shapes can be longer than the names somebody can
-      think of. No other refusal on this record was evaluated.
+      REFUSED key-not-declared: {sensor}: {what}. The key set is closed, because an undeclared
+      key -- or a mapping under a declared one -- is where a person arrives, and no deny-list of
+      identifier shapes can be longer than the names somebody can think of.
+  - id: value-not-the-declared-shape
+    terminal: true
+    sentence: >-
+      REFUSED value-not-the-declared-shape: {sensor}: {what}. A slot the table types is checked
+      for its type, because a value of the wrong shape is read by something downstream that was
+      never told, and prose in a slot nobody reads as prose is where a person arrives.
   - id: not-this-scenario-class
     terminal: false
     sentence: >-

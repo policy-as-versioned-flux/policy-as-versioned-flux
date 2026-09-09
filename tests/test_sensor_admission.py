@@ -214,7 +214,7 @@ def test_a_sensor_the_sensed_party_is_not_told_about_is_refused() -> None:
 
 
 def test_a_notice_with_no_publication_date_has_told_nobody() -> None:
-    result = grade(record(notice={"told": "every holder of a role in the people register",
+    result = grade(record(notice={"told": ["platform-engineer"],
                                   "published_at": "docs/monitoring-notice.md"}))
     assert "covert-sensing" in ids(result), (
         f"a notice with no publication date must be refused by name, got {result['refusals']}")
@@ -300,10 +300,22 @@ def test_an_undeclared_key_inside_the_dpia_record_is_refused() -> None:
 
 
 def test_the_notice_must_name_the_roles_told_as_role_ids_not_prose() -> None:
+    """After G1 the document closure reaches this first and refuses it TERMINALLY, which is
+    stricter than the covert-sensing refusal that used to catch it: prose in a slot the table
+    declares as a list of role ids is where a name arrives."""
     result = grade(record(notice={"told": "the whole team was told in person",
                                   "published_at": "docs/n.md", "published_on": "2026-09-09"}))
-    assert "covert-sensing" in ids(result), (
+    assert "key-not-declared" in ids(result), (
         f"a prose notice must be refused by name, got {result['refusals']}")
+    assert "notice.told" in " ".join(result["refusals"])
+    assert result["terminal"] is True and result["ladder"] is None
+
+
+def test_an_empty_told_list_is_still_covert_sensing() -> None:
+    result = grade(record(notice={"told": [], "published_at": "docs/n.md",
+                                  "published_on": "2026-09-09"}))
+    assert "covert-sensing" in ids(result), (
+        f"a notice telling nobody must be refused by name, got {result['refusals']}")
     assert "role ids" in " ".join(result["refusals"])
 
 
@@ -418,7 +430,7 @@ def test_terminality_is_read_from_the_table_at_the_branch(tmp_path) -> None:
 
 def test_the_terminal_sentence_says_nothing_else_was_evaluated() -> None:
     result = grade(record(fields=["component", "employee_id"]))
-    assert "No other refusal on this record was evaluated." in result["refusals"][0]
+    assert result["refusals"][-1].endswith("No refusal beyond these was evaluated.")
 
 
 # -- F2: the people register, widened -------------------------------------------------------------
@@ -445,6 +457,107 @@ def test_a_clean_role_file_has_no_problem() -> None:
         "platform-engineer.yaml",
         {"id": "platform-engineer", "role": "On call for the checkout namespace."},
         sa.load_rule()) == []
+
+
+
+# -- G1: the DOCUMENT is closed, not eleven enumerated paths --------------------------------------
+# The enumerated walk visited exactly eleven positions, so a mapping sitting under a DECLARED key
+# that has no closed set of its own was never reached. Both plants below were measured by the
+# 2026-09-09 re-check at a real served ref as `exit 0, 1 admitted, 0 refused`.
+
+def test_a_mapping_under_a_declared_scalar_key_is_refused() -> None:
+    result = grade(record(notice={"told": ["platform-engineer"],
+                                  "published_at": {"holder": "<a value this test never reads>"},
+                                  "published_on": "2026-09-09"}))
+    assert "key-not-declared" in ids(result), (
+        "a mapping under notice.published_at must be refused by name, got "
+        f"{result['refusals']}")
+    assert "notice.published_at" in " ".join(result["refusals"])
+    assert result["terminal"] is True
+    assert result["ladder"] is None
+    assert result["admitted"] is False
+
+
+def test_a_prose_value_in_a_boolean_slot_is_refused() -> None:
+    """`will_act` is a boolean the ladder only tests for truthiness, so any non-empty string
+    passed `_check_purpose` — a boolean slot accepting arbitrary prose."""
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["purpose"]["will_act"] = "agreed with the on-call rota"
+    result = grade(record(ladder=ladder))
+    assert "value-not-the-declared-shape" in ids(result), (
+        "prose in the boolean ladder.purpose.will_act must be refused by name, got "
+        f"{result['refusals']}")
+    assert "ladder.purpose.will_act" in " ".join(result["refusals"])
+    assert result["terminal"] is True
+    assert result["ladder"] is None
+
+
+@pytest.mark.parametrize("where,value", [
+    ("schema", {"a": 1}),
+    ("sensor", {"a": 1}),
+    ("kind", {"a": 1}),
+    ("granularity", ["structural"]),
+    ("senses_role", {"a": 1}),
+])
+def test_a_mapping_or_list_under_any_other_declared_scalar_key_is_refused(where, value) -> None:
+    result = grade(record(**{where: value}))
+    assert "key-not-declared" in ids(result), (
+        f"a non-scalar under the declared key {where!r} must be refused by name, got "
+        f"{result['refusals']}")
+
+
+def test_a_mapping_inside_a_declared_scalar_list_is_refused() -> None:
+    result = grade(record(fields=["component", {"holder": "x"}]))
+    assert "key-not-declared" in ids(result), result["refusals"]
+    assert "fields[1]" in " ".join(result["refusals"])
+
+
+def test_a_deeply_nested_mapping_under_a_declared_scalar_key_is_refused() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["necessity"]["alternatives"][0]["level"] = {"holder": "x"}
+    result = grade(record(ladder=ladder))
+    assert "key-not-declared" in ids(result), result["refusals"]
+    assert "ladder.necessity.alternatives[0].level" in " ".join(result["refusals"])
+
+
+def test_a_mapping_under_a_declared_scalar_key_of_the_dpia_record_is_refused() -> None:
+    text = DPIA_TEXT.replace("completed_by: data-protection-lead",
+                             "completed_by: {holder: <never read>}")
+    result = grade(record(), dpia_reader=reader(text=text))
+    assert "key-not-declared" in ids(result), result["refusals"]
+    assert "completed_by" in " ".join(result["refusals"])
+
+
+# -- G2: a type-confused record is refused, never a crash -----------------------------------------
+
+@pytest.mark.parametrize("value", [["twin/orgs/x/dpia/y.yaml"], "a string", 7, None])
+def test_a_type_confused_dpia_block_is_refused_and_never_raises(value) -> None:
+    result = grade(record(dpia=value))
+    assert result["admitted"] is False
+    assert result["refusals"], "a type-confused dpia block must produce a refusal, not a crash"
+
+
+@pytest.mark.parametrize("key", ["notice", "ladder"])
+def test_a_type_confused_mapping_key_is_refused_and_never_raises(key) -> None:
+    result = grade(record(**{key: ["not", "a", "mapping"]}))
+    assert result["admitted"] is False
+    assert result["refusals"]
+
+
+def test_a_record_that_is_not_a_mapping_at_all_is_refused_and_never_raises() -> None:
+    result = grade(["not", "a", "record"])  # type: ignore[arg-type]
+    assert result["admitted"] is False
+    assert result["refusals"]
+
+
+# -- G3: the clause is printed once, on the last terminal line ------------------------------------
+
+def test_the_terminal_clause_is_printed_once_at_the_end_of_the_batch() -> None:
+    result = grade(record(fields=["component", "employee_id"], owner="x", github="y"))
+    joined = " ".join(result["refusals"])
+    assert joined.count("No refusal beyond these was evaluated") == 1
+    assert result["refusals"][-1].endswith("No refusal beyond these was evaluated.")
+    assert len(result["refusals"]) >= 3
 
 
 # -- the sensor table stays closed ----------------------------------------------------------------

@@ -370,6 +370,83 @@ clone shows in the verdict line rather than grading stale bytes silently.
   planted served estates grade as planted**, then the same 3 / 3 / 0 line on the real estate.
 - `mypy twin tests conftest.py` → Success, 186 source files.
 
+## Review round 2 — 2026-09-09, request-changes, one new medium finding
+
+Head is now the branch tip after rebase onto current `origin/main`.
+
+### G1 (medium) — the walk was a whitelist of eleven PATHS, not a closure of the DOCUMENT
+
+`undeclared_keys()` visited exactly eleven positions, so any mapping sitting under a **declared**
+key that had no closed set of its own — `published_at`, `schema`, `sensor`, `kind`,
+`granularity`, `will_act`, `intrusion_cost`, `completed_by` — was never walked. The reviewer
+measured both at a real served ref as `exit 0, PASS planted: … admitted, 1 admitted, 0 refused`.
+
+**Fixed as a recursion, not a longer enumeration.** `closed_document_problems()` replaces
+`undeclared_keys()`/`_undeclared()`. Three new tables make the shape declarable rather than
+hand-written: `nested_maps` (a key holding a mapping ruled by a named set), `nested_lists` (a key
+holding a list of such mappings), `scalar_lists` (a key holding a list of scalars) — and the
+**default is SCALAR**, which is the case the enumeration missed. A mapping or list reached
+anywhere else is `key-not-declared`. `typed_keys` adds the type check the reviewer asked for:
+`will_act`, `profiling`, `financial_loss_risk` and `complete` must be booleans, `intrusion_cost`
+and `value_illuminated` numbers, under the new terminal refusal `value-not-the-declared-shape`.
+`load_rule()` also refuses a table whose `nested_maps`/`nested_lists` point at a key set
+`closed_keys` does not declare, because that would silently stop the recursion at the node it
+names — G1 again by another route.
+
+**Red first, the two lines the re-check asked for:**
+
+| plant | red line | green line |
+|---|---|---|
+| `notice.published_at: {holder: …}` | `AssertionError: a mapping under notice.published_at must be refused by name, got []` | `REFUSED key-not-declared: bus-factor-structural-aggregate: the key 'notice.published_at' holds a dict, and the table declares no key set for it. The key set is closed, because an undeclared key — or a mapping under a declared one — is where a person arrives, and no deny-list of identifier shapes can be longer than the names somebody can think of. No refusal beyond these was evaluated.` |
+| `ladder.purpose.will_act: 'agreed with …'` | `AssertionError: prose in the boolean ladder.purpose.will_act must be refused by name, got []` | `REFUSED value-not-the-declared-shape: bus-factor-structural-aggregate: the key 'ladder.purpose.will_act' holds 'agreed with the on-call rota', and the table declares a boolean. A slot the table types is checked for its type, because a value of the wrong shape is read by something downstream that was never told, and prose in a slot nobody reads as prose is where a person arrives. No refusal beyond these was evaluated.` |
+
+Both are also planted **end to end at a real served ref** (two new planted estates), where each
+now grades FAIL. Eight further plants cover the same family: a mapping or list under `schema`,
+`sensor`, `kind`, `granularity` and `senses_role`, a mapping inside the `fields` scalar list, a
+mapping at `ladder.necessity.alternatives[0].level`, and a mapping under the DPIA's
+`completed_by`.
+
+**One knock-on, recorded because it makes a refusal stricter.** A prose `notice.told` is now
+reached by the closure first and refused **terminally** as `key-not-declared`, where before it
+was the non-terminal `covert-sensing`. That is the safer direction and the test says so; the
+`covert-sensing` branch still owns an empty or missing `told`, and a new test pins that.
+
+### G2 (low) — a type-confused record crashed the estate run
+
+`grade_record` raised an uncaught `AttributeError` on `dpia:` as a list, contradicting its own
+docstring, and one adopter's malformed record aborted the grading of the other two. Fixed in the
+same change by running the closure **before** any `.get()` chain, and by reading the DPIA path
+only through an `isinstance` guard. `closed_document_problems` calls `.get()` on nothing it has
+not first shown to be a mapping. Nine plants: `dpia` as a list, a string, an int and `None`,
+`notice` and `ladder` as lists, and a record that is not a mapping at all — every one now a
+refusal, none a crash.
+
+### G3 (cosmetic) — the clause printed several times per run
+
+The clause is out of both terminal sentences and is appended **once**, to the last line of the
+batch, from a new `terminal_batch_clause:` in the table: *"No refusal beyond these was
+evaluated."* A test asserts it appears exactly once in a three-refusal batch.
+
+### Not touched, as instructed
+
+**`verify/map-surface/verify-map-surface.sh` line 90 runs `clone-estate.sh`, so the check
+RE-FETCHES the estate it then grades.** In a clone-of-a-clone whose `origin` points at the shared
+`.estate-clone`, that resets each unit's `origin/main` back to the stale sha immediately after it
+was set correctly, and at the stale sha platform's `fetch.yml` serves the old four-path
+observation lane while tuppence's and nist's serve their old declarations — twelve declarations,
+twelve findings, exactly the `lane-not-owned x12` the round-1 reviewer saw and the mid-run ref
+drift it could not attribute. So that check **mutates the estate it grades**, and its rule-4
+verdict follows a remote URL rather than the estate's content. Not this ticket's to fix; recorded
+so the next reader does not re-derive it.
+
+### Battery, re-run after the fixes
+
+- `pytest tests/test_sensor_admission.py -n0 -q` → **78 passed** (24 failed first, including the
+  three `AttributeError`s G2 names).
+- `verify/sensor-admission/verify-sensor-admission.sh` → exit 3, **28 planted records and eight
+  planted served estates grade as planted**, then the same 3 / 3 / 0 line on the real estate.
+- `mypy twin tests conftest.py` → Success, 186 source files.
+
 ## Waits on the owner
 
 **Nothing.** Ticket 82's named-individuals ruling (its "Waits on the owner" item 3) is still
