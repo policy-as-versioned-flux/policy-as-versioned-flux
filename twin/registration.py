@@ -836,6 +836,7 @@ def check(estate: str, hub: str, adopters: list[str] | None = None,
 
     fails: list[str] = []
     scenarios_read = resolvable = overrides_read = scoreable = registered = rewritten = 0
+    traversed = reaching = 0
     horizons: set[str] = set()
     admissions: list[str] = []
     with tempfile.TemporaryDirectory() as tmp:
@@ -906,6 +907,26 @@ def check(estate: str, hub: str, adopters: list[str] | None = None,
                 print(f"      override {claim_id}: moves {resolution['component']}, "
                       f"{'scoreable through ' + ', '.join(str(e['scenario']) for e in resolution['through'] if 'proposition' in e) if resolution['scoreable'] else 'UNSCOREABLE -- ' + str(resolution['unscoreable_because'])}; "
                       f"{mark['sentence']}")
+            # The traversal over THIS adopter's real graph, on the components its own questions
+            # name. The ticket's pair is in no real model, so grading only that pair would leave
+            # the real-estate half deriving its dates from git and its reachability from nothing --
+            # which is the asymmetry review F4 was about, and it does not stop being one because
+            # the fixture half closed it.
+            asked_about = sorted({
+                str(c) for scenario in model.scenarios.values()
+                for c in (scenario.get("components") or [])
+                if model.component(str(c)) is not None
+            })
+            for ident in asked_about:
+                downstream = reached_set(model, ident)
+                traversed += 1
+                reaching += 1 if downstream else 0
+                admissions.append(
+                    f"{name}: twin/blast.py's traversal from {ident!r}, a component this overlay's "
+                    f"own questions name, reaches "
+                    + (", ".join(f"{c} (depth {d})" for c, d in downstream) if downstream
+                       else "nothing: nothing in this overlay declares it as a need")
+                )
             admission = admits(model, *SUPPLY_CONSTRAINT_PATH)
             admissions.append(f"{name}: {admission.sentence()}")
             # The ruling, GRADED. Printing a verdict tells a reader what the module thinks;
@@ -935,7 +956,9 @@ def check(estate: str, hub: str, adopters: list[str] | None = None,
     print(f"    limits: {scenarios_read} scenario(s) read, {resolvable} resolvable, "
           f"{registered} registered on {ref} ({rewritten} rewritten since they arrived); "
           f"{overrides_read} override(s), {scoreable} scoreable through a proposition; "
-          f"horizons {', '.join(sorted(horizons)) if horizons else 'none'}")
+          f"horizons {', '.join(sorted(horizons)) if horizons else 'none'}; "
+          f"twin/blast.py's traversal run over {traversed} component(s) the questions name, "
+          f"{reaching} of which reach anything at all")
 
     if fails:
         for line in fails:

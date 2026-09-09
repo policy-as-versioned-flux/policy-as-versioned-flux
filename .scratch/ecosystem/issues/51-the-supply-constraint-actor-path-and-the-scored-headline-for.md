@@ -232,6 +232,18 @@ That asymmetry is closed, and closing it closed the findings.
 | F5 | the measurement Decision 1 rests on was PRINTED, never GRADED | a planted platform whose `nb-refining-capacity` row names `links_risk: pq-cryptanalysis` -- the other id, the shape ticket 23 recorded -- left the check at **exit 0** | **exit 1**: `FAIL: platform's intel row 'nb-refining-capacity' names links_risk 'pq-cryptanalysis', which is the OTHER id in the pair. Ecosystem ticket 51's Decision 1 rests on neither row pointing at the other; it now does, and the decision needs re-reading, not re-asserting` |
 | F8 | an entry was reported `rewritten` without saying WHAT moved -- what ticket 93's review G2 insisted on for a forecast | on `002bf98`, a note appended to an entry and a question rewritten produce the same sentence: `... (rewritten after it landed)` | `question_moved()`/`override_moved()` beside `derived_forecast::probabilities_moved`, diffing `proposition`, `horizon`, `question`: a rewritten question says `question: 'Does the planted supplier fail inside the horizon?' -> 'A DIFFERENT question...'`, and an appended note says `none of proposition, horizon, question moved -- the rewrite was to another field` |
 
+**And the same asymmetry on the real-estate half.** Closing F4 in the fixture would have left the
+half that grades the estate deriving its dates from git and its reachability from nothing. So the
+check now runs `twin/blast.py`'s traversal over each adopter's OWN graph, on the components that
+adopter's own questions name, and prints what it reached: `twin/blast.py's traversal run over 30
+component(s) the questions name, 6 of which reach anything at all`. It is a real measurement, and
+it says something this ticket had not noticed: `driftwood: twin/blast.py's traversal from
+'tier-one-supplier-relationship' ... reaches nothing`. **The component the estate's first override
+moves has an empty blast radius.** It is on no adopter's value chain -- nothing declares it as a
+need -- so even the reachability a `needs` edge does move does not reach it. Recorded, not fixed:
+adding a `needs` edge to make the number look better would be authoring a dependency to suit a
+claim.
+
 **Dated correction, 2026-09-09.** Driftwood commit **`ceb3697`** ("Ticket 51: the first override,
 and the question it is scored through") carries the same wrong attribution its message inherited
 from this file: *"the priced payload is byte-identical, which is grade-4 use-gating working -- an
