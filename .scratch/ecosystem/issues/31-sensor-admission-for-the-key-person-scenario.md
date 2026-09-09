@@ -163,16 +163,19 @@ Then green: **30 passed**.
 with a row in `talk/verify-manifest.txt` classed `estate-observation`.
 
 - **Leg 1, the instrument**, on planted material that says it is planted: ten planted records
-  (each of the seven refusals red, then the one admissible sensor green) and **three planted
+  (each of the seven refusals red, then the one admissible sensor green) and **four planted
   single-unit estates whose served ref is a real `refs/remotes/origin/main`** — one that grades
-  PASS, one whose record names an individual and grades FAIL, one with no admission record that
+  PASS, one whose record names an individual and grades FAIL, one that serves no
+  `bus-factor-key-person` scenario at all and grades FAIL, and one with no admission record that
   grades SKIP with a count. The fixture's own git runs with `core.hooksPath` pointed at an empty
   directory, so the owner's global ggshield hook cannot make a fixture commit a load intermittent.
 - **Leg 2, the estate, at the SERVED artefact.** Every fact is read with
   `git show origin/main:<path>` in the fetched clone, never the working tree: an uncommitted
   admission record is not one an adopter has published, and grading a worktree would let an
-  uncommitted edit change the verdict. Three sub-legs: every `bus-factor-key-person` scenario
-  still says "A role, never a person" and names a `people/<role>.yaml` the served tree carries;
+  uncommitted edit change the verdict. Three sub-legs: every adopter serves a `bus-factor-key-person`
+  scenario, it still says "A role, never a person", and it names a `people/<role>.yaml` the
+  served tree carries — an adopter that stopped serving one is observed **false**, not skipped
+  past, because otherwise the printed count could fall from 3 to 0 with nothing going red;
   every role file carries an id, a role sentence and no individual-shaped key or value; every
   admission record grades through the rule.
 

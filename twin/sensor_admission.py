@@ -462,8 +462,8 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
     """Grade every adopter's SERVED tree. 0 observed true, 1 observed false, 3 could not look.
 
     Three legs, each on `origin/main`:
-      1. every `bus-factor-key-person` scenario says "A role, never a person" and names a role
-         file that the served tree carries;
+      1. every adopter serves a `bus-factor-key-person` scenario, it says "A role, never a
+         person", and it names a role file that the served tree carries;
       2. every role file in the adopter's people register carries an id and a role and names no
          individual;
       3. every admission record grades through the rule above.
@@ -510,8 +510,19 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
             fail += 1
 
         # leg 1: the scenario keeps saying it.
+        #
+        # An adopter serving NO scenario of this class is observed FALSE, not skipped past. All
+        # three serve one today, and the note on it is this estate's only published statement
+        # that a departure is sensed as a role and never as a person. If it could vanish and
+        # leave this script printing "0 carry a bus-factor-key-person scenario" as a
+        # could-not-look, the count would move and nothing would go red.
         found = key_person_scenarios(estate, org)
         scenarios_seen += len(found)
+        if not found:
+            out(f"FAIL {org}: serves no {SCENARIO_CLASS} scenario under "
+                f"{SCENARIOS_DIR.format(org=org)}/, so the sentence this check grades -- "
+                f"{NOTE_SENTENCE!r} -- is published nowhere for this adopter")
+            fail += 1
         for path, doc in sorted(found.items()):
             note = " ".join(str(doc.get("note", "")).split())
             if NOTE_SENTENCE.lower() not in note.lower():
@@ -619,7 +630,7 @@ def _git(repo: Path, *args: str, hooks: Path) -> None:
                    check=True, capture_output=True, text=True)
 
 
-def _plant(root: Path, hooks: Path, record: str | None) -> Path:
+def _plant(root: Path, hooks: Path, record: str | None, scenario: bool = True) -> Path:
     """A one-unit estate whose SERVED ref is a real `refs/remotes/origin/main`."""
     estate = root / "estate"
     unit = estate / "planted"
@@ -632,7 +643,9 @@ def _plant(root: Path, hooks: Path, record: str | None) -> Path:
         "id: platform-engineer\nrole: On call for the planted namespace.\n", encoding="utf-8")
     (unit / f"twin/orgs/{org}/people/platform-lead.yaml").write_text(
         "id: platform-lead\nrole: Accountable for the planted DPIA.\n", encoding="utf-8")
-    (unit / f"twin/orgs/{org}/scenarios/key-person-2026.yaml").write_text(_SCENARIO, encoding="utf-8")
+    if scenario:
+        (unit / f"twin/orgs/{org}/scenarios/key-person-2026.yaml").write_text(
+            _SCENARIO, encoding="utf-8")
     (unit / f"twin/orgs/{org}/dpia/bus-factor-structural-aggregate.yaml").write_text(
         _GOOD_DPIA, encoding="utf-8")
     admissions = unit / f"twin/orgs/{org}/sensor-admissions"
@@ -732,6 +745,17 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
             failures += 1
 
         lines = []
+        estate = _plant(root / "noscenario", hooks, None, scenario=False)
+        rc = grade_estate(estate, out=lines.append)
+        if rc == 1 and any("serves no bus-factor-key-person scenario" in ln for ln in lines):
+            out(f"PASS: selfcheck: an adopter that stopped serving the key-person scenario "
+                f"grades FAIL ({lines[-1][:150]})")
+        else:
+            out(f"FAIL: selfcheck: an adopter that stopped serving the key-person scenario "
+                f"should grade FAIL, got exit {rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
+        lines = []
         estate = _plant(root / "skip", hooks, None)
         rc = grade_estate(estate, out=lines.append)
         if rc == 3 and any("0 declare a sensor admission" in ln for ln in lines):
@@ -745,7 +769,7 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
     if failures:
         out(f"FAIL: selfcheck: {failures} planted case(s) did not grade as planted")
         return 1
-    out("PASS: selfcheck: ten planted records and three planted served estates grade as planted")
+    out("PASS: selfcheck: ten planted records and four planted served estates grade as planted")
     return 0
 
 
