@@ -69,8 +69,15 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 # (re-check R7): a block typed here went stale in both directions the moment the table gained
 # two refusal classes and closed four of the five slots it named.
 
-log="$(mktemp)"; (cd "$ROOT" && "$PY" -m twin.sensor_admission "$ESTATE") | tee "$log"; rc=${PIPESTATUS[0]}
-last="$(tail -1 "$log")"
+# Round-4 F2: stderr is merged into the log. A traceback used to go to stderr, which `tee` never
+# captured, so `tail -1` picked up the last LIMIT line and the operator was shown a LIMIT as the
+# reason for the failure.
+log="$(mktemp)"; (cd "$ROOT" && "$PY" -m twin.sensor_admission "$ESTATE" 2>&1) | tee "$log"; rc=${PIPESTATUS[0]}
+last="$(grep -E "^(PASS|FAIL|SKIP): " "$log" | tail -1)"
+if [ -z "$last" ]; then
+  echo "FAIL: twin/sensor_admission.py printed no verdict line at all; its output is above"
+  rm -f "$log"; exit 1
+fi
 rm -f "$log"
 case "$rc" in
   0) echo "PASS: ${last#PASS: }"; exit 0;;

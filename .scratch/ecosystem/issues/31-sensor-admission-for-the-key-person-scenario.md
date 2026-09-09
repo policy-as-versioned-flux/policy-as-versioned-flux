@@ -567,15 +567,24 @@ The re-check planted a real name into `record.schema`, the DPIA's `sensor:` and 
 `ladder.dpia.channels[]`, and watched each graded green. Rather than only documenting them, four
 are now **closed by deriving the value**, under `value-not-the-declared-shape`:
 
-- `record.schema` must equal `RECORD_SCHEMA` — the constant defined at line 61 and used nowhere,
-  which is exactly why that plant landed (**R9** closed by use, not by deletion);
+- `record.schema` must equal the value the table declares — the plant landed because
+  `RECORD_SCHEMA` was defined and used nowhere. **Round 4 F9 corrected this record**: at that
+  point the constant was still unused, because the value lived a second time as a literal in the
+  table with nothing asserting the two agreed. `load_rule()` now refuses a table whose
+  `fixed_values.record.schema` differs from `RECORD_SCHEMA`, and `schema` is in
+  `required_keys.record`, so deleting the key is a refusal too. Only now is "closed by use"
+  true;
 - the DPIA must name the **same** `sensor` and `scenario` as the record it is filed against, or
   it is a DPIA about something else;
 - `ladder.dpia.channels[]` must be empty: the one admissible sensor for this class reads a
   commit graph, not a channel.
 
-The printed LIMIT block is now **generated from the table** by `limits()`, so it cannot go stale
-in either direction again. It names every refusal id the table declares, says the loader refuses
+The printed LIMIT block is **generated from the table** by `limits()`. **Round 4 F5 and F6
+corrected the claim that it therefore cannot go stale**: it could still grow to advertise a
+refusal id no code path emits, it could name a DPIA field that does not exist, and its list of
+residual slots was missing at least four. All three are now closed — see round 4 below — and the
+honest sentence is that the block cannot drift from the table, and the table is now validated in
+both directions. It names every refusal id the table declares, says the loader refuses
 a duplicate key, and lists what a plain-words name still survives in: a DPIA's `lawful_basis`,
 `what_is_sensed` and `what_is_not_sensed`, a notice's `published_at` path, and a role id or a
 role file's own `role:` prose. Those five are the residual, and the adopter's own register review
@@ -611,6 +620,125 @@ refusal, so the LIMIT block carries a line about what the loader does instead.
   its new home.
 - `verify/sensor-admission/verify-sensor-admission.sh` → exit 3, **32 planted records and eleven
   planted served estates grade as planted**.
+- `mypy twin tests conftest.py` → Success, 187 source files.
+
+## Re-check round 4 — 2026-09-09, request-changes on F1
+
+### F1 (high, blocking) — a regression the R1 fix caused: an adopter VANISHED
+
+`adopters()` parsed `party.yaml` through `load_served`, got an `Unreadable`, failed the
+`isinstance(doc, dict)` test and `continue`d **with no output at all**. Every fact that adopter
+served went ungraded and a red estate printed green. The previous cut worked by accident: it used
+`yaml.safe_load` inside `try/except yaml.YAMLError: continue`, so a duplicate-keyed `party.yaml`
+parsed fine and the adopter WAS graded. The R1 fix widened the silent-skip class from
+"unparseable" to "unparseable or duplicate-keyed".
+
+**Red first**, on the re-check's own two-adopter plant at real served refs — `alpha` serves a
+`party.yaml` with a duplicated `roles:` **and** a record reading `fields: [component,
+employee_id]`; `bravo` is clean:
+
+> **red** — `AssertionError: an adopter whose party.yaml cannot be read must be NAMED, not
+> silently dropped; the run said: … PASS bravo: … bus-factor-structural-aggregate admitted …
+> PASS: 1 adopters read at origin/main [bravo=46e3bbe]; 1 bus-factor-key-person scenarios still
+> say 'A role, never a person'; 1 admission records graded, 1 admitted, 0 refused`
+>
+> **green** — `FAIL alpha: alpha/party.yaml: duplicate key 'roles' in the served bytes: PyYAML
+> keeps the last, so the document a reader sees is not the document a parser builds`, and the run
+> ends `FAIL:` at exit 1 with `alpha`'s record refused by name.
+
+`adopters()` now returns the units it could **not** read alongside the ones it could, and
+`grade_estate` prints a FAIL row per unreadable party artefact and counts it — the treatment the
+other four readers already had. The pre-existing half is closed in the same change: an
+**unparseable** `party.yaml`, and one that parses to something that is not a mapping, are FAIL
+rows too. The silent skip that REMAINS is the correct one, and a test pins it: a directory that
+serves no `party.yaml` at all is not a party.
+
+### F2 (high, pre-existing) — a fifth way to abort the run, in the layer above
+
+`served()` decoded git output with `text=True`, so a served file that is not valid UTF-8 raised
+an uncaught `UnicodeDecodeError` inside `subprocess` — outside `grade_estate`'s per-record try,
+so it aborted every other adopter, and its traceback went to **stderr**, which the verify
+script's `tee` never captured, so the operator was shown a LIMIT line as the reason for the
+failure. `served()` now reads **bytes** and returns the `Unreadable` shape its callers already
+handle; `served_paths()` decodes with `surrogateescape` so a non-UTF-8 filename round-trips to
+git rather than raising. The wrapper now merges stderr into its log and takes its last line from
+a `^(PASS|FAIL|SKIP): ` match, refusing outright if the module printed no verdict line at all.
+Planted end to end: a binary role file beside a clean adopter is a FAIL row naming
+`binary.yaml`, and the clean adopter is still graded.
+
+### F3, F4 and F5 — R2's own lesson, applied to the four declarations added beside it
+
+- **F3.** The falsiness guard reached the top level and `closed_keys`, not the derived tables'
+  **sub-entries**. `typed_keys.ladder_purpose: null`, `fixed_values.record: null` and
+  `required_keys.ladder_necessity: null` each loaded clean and silently disabled the check they
+  name — two of them readmitting plants closed the round before. One line in the loop: an empty
+  sub-entry is refused at load.
+- **F4.** `dpia_must_agree`, `requires.dpia_fields` and `admissible_channels` were indexed with
+  no guard. Now: each must be a list of the type the module indexes; `dpia_must_agree` may name
+  only a field the module can resolve against the record; `requires.dpia_fields` and
+  `free_prose_fields` must name keys the `dpia_record` set declares. `admissible_channels` gets
+  a **presence-and-type** check, not a truthiness one, because its correct value is `[]`.
+- **F5.** The subset was enforced in one direction only, so a well-formed but **unreachable**
+  refusal id loaded clean and the generated block grew to advertise it. Both directions now.
+
+### F6 — two more slots closed, and the block's scope made honest
+
+Closed: the **DPIA's own `schema:`** is now a fixed value like the record's; and the **whole
+`dpia.record` path** is derived against `dpia_path_pattern`
+(`^twin/orgs/[a-z0-9-]+/dpia/{sensor}\.yaml$`) rather than only its basename, which had left the
+directory part free text.
+
+Not closed, and now stated instead of implied: a served **scenario file** and **party.yaml** have
+no closed key set. Both are now run through the **value** scan, which is what closes the
+falsification the re-check found (they admitted an email address). They are deliberately **not**
+run through the key-token scan: `note:` is a legitimate key in a scenario file, and the token
+list was written for a closed field set. The block now says exactly that — five documents, keys
+and values in three of them, values only in the other two — and lists the residual slots
+including "any other prose in a served scenario file or a party.yaml".
+
+### F7 — the right test is slot by slot, not "is it indexed"
+
+`ladder.necessity.alternatives` is read with `.get()` and has **no** better-worded refusal behind
+it: deleting the line gave a green admission with a vacuously passed necessity rung ("no less
+intrusive alternative among 0 considered"). It is now in `required_keys`, and a new `non_empty:`
+table refuses an explicitly empty one for the same reason. The ticket's earlier rule — "only
+indexed slots are required" — is **corrected here**: the test is slot by slot, does this `.get()`
+slot have a refusal with better words.
+
+### F8 — the joke, and it landed
+
+The one YAML this check still read with `yaml.safe_load` on a real path was **its own rule
+table**, so a second `typed_keys:` block appended to it loaded clean and silently dropped two of
+the three typed sets. `load_rule()` now uses the `StrictLoader` this ticket had just imported.
+
+### F9 — R9 was recorded as closed and was not
+
+`grep -rn RECORD_SCHEMA` returned the definition and a ticket sentence claiming use. Fixed by
+making the claim true: `load_rule()` refuses a table whose `fixed_values.record.schema` differs
+from the constant, and `schema` is in `required_keys.record` so deleting it is a refusal. The
+sentence in round 3's section above is corrected rather than left standing.
+
+### F10 to F13 — all four fixed
+
+- **F10.** `StrictLoader` refused **every** merge key, duplicate or not, because it constructed
+  the `<<` key node before `flatten_mapping` removed it — and said the bytes were not YAML when
+  they are. It now skips the merge tag. Two tests: one merge key, and two in one mapping.
+- **F11.** A record could be counted FAIL with **no line saying why**, when the ladder stopped
+  and nothing else had anything to add. A record that is not admitted now always carries at
+  least one refusal.
+- **F12.** Any `EthicsGateError` was reported as `sensor-not-named`, so a ladder missing a whole
+  rung was refused with words saying the sensor id is not registered, when it is. New refusal
+  `ladder-could-not-walk`, in its own words.
+- **F13.** A complex key raised `TypeError` from the loader's own membership test, surfacing as
+  "not YAML this check will read (TypeError)" and refusing a complex key carrying no duplicate.
+  Keys are compared by a hashable rendering now.
+
+### Battery, re-run after the fixes
+
+- `pytest tests/test_sensor_admission.py -n0 -q` → **128 passed** (24 failed first).
+- `pytest tests/test_derived_forecast.py -n0 -q` → 47 passed, loader unchanged for ticket 93.
+- `verify/sensor-admission/verify-sensor-admission.sh` → exit 3, **34 planted records and
+  thirteen planted served estates grade as planted**.
 - `mypy twin tests conftest.py` → Success, 187 source files.
 
 ## Waits on the owner

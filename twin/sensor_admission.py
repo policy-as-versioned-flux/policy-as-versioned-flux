@@ -92,12 +92,17 @@ _KEY_SETS = (
 
 _TYPE_KINDS = ("bool", "number")
 
+#: The record fields a DPIA can be checked to agree with (F4). Anything else is a declaration
+#: this module cannot resolve, and was a KeyError at grade time.
+_DPIA_AGREES_ON = ("sensor", "scenario")
+
 REFUSAL_IDS = (
     "names-or-identifies-an-individual",
     "key-not-declared",
     "value-not-the-declared-shape",
     "duplicate-key",
     "required-key-missing",
+    "ladder-could-not-walk",
     "not-this-scenario-class",
     "scenario-not-served",
     "field-not-admissible",
@@ -121,13 +126,18 @@ def load_rule(path: Path | None = None) -> dict[str, Any]:
     already applies to `sensors.yaml`. A table missing a refusal id the module can emit is
     refused here, so a sentence can never go missing and leave a refusal printing nothing."""
     source = path or RULE_PATH
-    doc = yaml.safe_load(source.read_text(encoding="utf-8"))
+    # F8: the one YAML this check read with `safe_load` on a real path was its own rule table,
+    # so a second `typed_keys:` block appended to it loaded CLEAN and silently dropped two of the
+    # three typed sets.
+    doc = load_served(str(source), source.read_text(encoding="utf-8"))
+    if isinstance(doc, Unreadable):
+        raise SensorAdmissionError(f"{source}: {doc.why}")
     if not isinstance(doc, dict) or doc.get("schema") != SCHEMA:
         raise SensorAdmissionError(f"{source}: not a {SCHEMA} document")
     for field in ("scenario_class", "admissible", "admissible_fields", "refusals", "requires",
                   "closed_keys", "free_prose_fields", "nested_maps", "nested_lists",
                   "scalar_lists", "typed_keys", "terminal_batch_clause", "required_keys",
-                  "fixed_values", "dpia_must_agree"):
+                  "fixed_values", "dpia_must_agree", "dpia_path_pattern", "non_empty"):
         if not doc.get(field):
             raise SensorAdmissionError(f"{source}: declares no {field}")
     for name in _KEY_SETS:
@@ -147,8 +157,17 @@ def load_rule(path: Path | None = None) -> dict[str, Any]:
     # mistyped as `boolean` loaded clean and made the type check a silent no-op, because the
     # recursion computes `wrong` as a disjunction over the names it knows.
     for table, what in (("typed_keys", "type"), ("scalar_lists", "scalar list"),
-                        ("required_keys", "required key"), ("fixed_values", "fixed value")):
+                        ("required_keys", "required key"), ("fixed_values", "fixed value"),
+                        ("non_empty", "non-empty key")):
         for set_name, entry in (doc.get(table) or {}).items():
+            # F3: the falsiness guard reached the top level and `closed_keys`, not these tables'
+            # SUB-ENTRIES. Nulling one loaded clean and silently disabled the check it names --
+            # `typed_keys.ladder_purpose: null` readmitted the prose-in-a-boolean plant, and
+            # `required_keys.ladder_necessity: null` brought back `KeyError: 'kind'`.
+            if not entry:
+                raise SensorAdmissionError(
+                    f"{source}: {table}.{set_name} is declared empty, which silently disables "
+                    f"the {what} check it names")
             declared = doc["closed_keys"].get(set_name)
             if not declared:
                 raise SensorAdmissionError(
@@ -168,7 +187,40 @@ def load_rule(path: Path | None = None) -> dict[str, Any]:
                             f"{kind!r}, which this module does not know (have: "
                             f"{', '.join(_TYPE_KINDS)}) — an unknown name makes the check a "
                             "silent no-op")
-    declared = {str(r.get("id")) for r in doc["refusals"] if isinstance(r, dict)}
+    # F4: three declarations the module INDEXES had no load guard at all, each a KeyError at
+    # grade time. `admissible_channels` needs a presence-and-type check and not a truthiness
+    # one, because its correct value is an empty list.
+    for field in ("dpia_must_agree", "admissible_channels", "free_prose_fields"):
+        if not isinstance(doc.get(field), list):
+            raise SensorAdmissionError(
+                f"{source}: {field} is {doc.get(field)!r}, and this module indexes it as a list")
+    for field in doc["dpia_must_agree"]:
+        if str(field) not in _DPIA_AGREES_ON:
+            raise SensorAdmissionError(
+                f"{source}: dpia_must_agree names {field!r}, which this module cannot resolve "
+                f"against the record (have: {', '.join(sorted(_DPIA_AGREES_ON))})")
+    dpia_keys = {str(k) for k in doc["closed_keys"]["dpia_record"]}
+    if not doc.get("requires", {}).get("dpia_fields"):
+        raise SensorAdmissionError(f"{source}: requires declares no dpia_fields")
+    for field in list(doc["requires"]["dpia_fields"]) + list(doc["free_prose_fields"]):
+        if str(field) not in dpia_keys:
+            raise SensorAdmissionError(
+                f"{source}: {field!r} is named as a DPIA field and the dpia_record key set does "
+                "not declare it")
+    declared_ids = {str(r.get("id")) for r in doc["refusals"] if isinstance(r, dict)}
+    declared = declared_ids
+    # F5: the subset was enforced in one direction only, so a well-formed but UNREACHABLE
+    # refusal id loaded clean and the generated limits block grew to include it.
+    for extra in sorted(declared_ids - set(REFUSAL_IDS)):
+        raise SensorAdmissionError(
+            f"{source}: declares the refusal {extra!r}, which no code path in this module can "
+            "emit — a generated limits block would advertise a refusal that cannot happen")
+    # F9: the record schema lives here AND as a module constant. Nothing asserted they agree.
+    declared_schema = (doc["fixed_values"].get("record") or {}).get("schema")
+    if declared_schema != RECORD_SCHEMA:
+        raise SensorAdmissionError(
+            f"{source}: fixed_values.record.schema is {declared_schema!r} and RECORD_SCHEMA is "
+            f"{RECORD_SCHEMA!r}; the two are the same fact and must not drift")
     missing = [r for r in REFUSAL_IDS if r not in declared]
     if missing:
         raise SensorAdmissionError(f"{source}: declares no sentence for {', '.join(missing)}")
@@ -354,11 +406,17 @@ def closed_document_problems(node: Any, rule: dict[str, Any], set_name: str = "r
     listed = ", ".join(sorted(allowed))
     # Re-check R3: the closure graded the shape of keys that were PRESENT and never that a
     # required one was there, and `ethics_gate` indexes these slots with `[]`.
+    here = (where + ".") if where else ""
     for required in (rule.get("required_keys") or {}).get(set_name) or []:
         if str(required) not in {str(k) for k in node}:
             out.append(("required-key-missing",
-                        f"{(where + '.') if where else ''}{required} is not there, and the "
-                        f"{set_name} set declares it required"))
+                        f"{here}{required} is not there, and the {set_name} set declares it "
+                        "required"))
+    for wanted in (rule.get("non_empty") or {}).get(set_name) or []:
+        if str(wanted) in {str(k) for k in node} and not node[wanted]:
+            out.append(("required-key-missing",
+                        f"{here}{wanted} is empty, and the {set_name} set declares it required "
+                        "and non-empty: an empty one passes the rung it feeds vacuously"))
     for key, value in node.items():
         name = str(key)
         path = f"{where}.{name}" if where else name
@@ -464,10 +522,13 @@ def _missing_dpia(text: str | None, path: str, sensor: str,
     problems: list[str] = []
     # Review F1: a DPIA filed under somebody's name is a DPIA about a person. The basename is the
     # sensor's own id, which is a row in a closed table, so there is nothing to name it after.
-    if sensor and path.rsplit("/", 1)[-1] != f"{sensor}.yaml":
-        problems.append(
-            f"the DPIA record at {path} has a basename that is not {sensor}.yaml — a DPIA is "
-            "filed under the sensor it is about, never under anything else")
+    if sensor:
+        pattern = str(rule["dpia_path_pattern"]).replace("{sensor}", re.escape(sensor))
+        if not re.match(pattern, path):
+            problems.append(
+                f"the DPIA record at {path} is not filed at {pattern} — round-4 F6: deriving "
+                "only the BASENAME left the directory part free text, which is a place a name "
+                "can live")
     for field in rule["requires"]["dpia_fields"]:
         if not str(doc.get(field, "")).strip():
             problems.append(f"the DPIA record at {path} carries no {field}")
@@ -692,9 +753,21 @@ def grade_record(
         try:
             ladder = ethics_gate.admit(payload)
         except ethics_gate.EthicsGateError as exc:
-            refusals.append(out("sensor-not-named", str(exc)))
+            # F12: this was reported as `sensor-not-named` whatever it was about, so a ladder
+            # missing a whole rung was refused with words saying the sensor id is not
+            # registered, when it is.
+            refusals.append(out("ladder-could-not-walk", str(exc)))
 
     admitted = not refusals and ladder is not None and bool(ladder["admitted"])
+    if not admitted and not refusals:
+        # F11: a record could be counted FAIL with no line saying why, when the ladder stopped
+        # and nothing else had anything to add.
+        stopped = (ladder or {}).get("stopped_at") if ladder else None
+        why = ((ladder or {}).get("ladder", {}) or {}).get("rungs")
+        detail = why[-1]["justification"] if why else "the ethics gate did not admit it"
+        refusals.append(out(
+            "ladder-could-not-walk",
+            f"the ethics gate stopped at the {stopped or 'DPIA'} gate: {detail}"))
     return {
         "sensor": sensor,
         "scenario_class": declared_class or rule["scenario_class"],
@@ -719,7 +792,8 @@ def limits(rule: dict[str, Any] | None = None) -> list[str]:
     rule = rule or load_rule()
     refuses = ", ".join(str(r["id"]) for r in rule["refusals"])
     survives = [f"a DPIA's {f}" for f in rule["free_prose_fields"]]
-    survives += ["a notice's published_at path", "a role id or a role file's own role: prose"]
+    survives += ["a notice's published_at path", "a role id or a role file's own role: prose",
+                 "any other prose in a served scenario file or a party.yaml"]
     return [
         "this run grades the RULE and any admission record an adopter serves. Nothing here "
         "observes a sensor running or a person; no sensing substrate exists in this estate.",
@@ -727,28 +801,52 @@ def limits(rule: dict[str, Any] | None = None) -> list[str]:
         "served bytes are parsed with a loader that refuses a DUPLICATE mapping key, so the "
         "document this check grades is the document a reader sees, not the one PyYAML builds "
         "by keeping the last of two identical keys.",
-        "no rule here reads English. A personal name written in plain words survives in "
-        + "; ".join(survives) + ", and is refused by nothing. What IS refused is a key the "
+        "the identifier scan covers FIVE served documents and no others: the admission record, "
+        "the DPIA record it names and every role file in the people register are scanned for "
+        "identifier-shaped KEYS AND VALUES; every "
+        f"{SCENARIO_CLASS} scenario file and every party.yaml are scanned for identifier-shaped "
+        "VALUES only, because their shape is not closed and `note:` is a legitimate key there. "
+        "Within those it refuses a key the "
         "table does not declare, a mapping or list under a declared key, a slot whose type or "
-        "fixed value the table declares, a required key that is absent, an identifier-SHAPED "
-        "filename, id, key or value, an email address and a UK national insurance number.",
+        "fixed value the table declares, a required or non-empty key that is absent, an "
+        "identifier-SHAPED filename, id, key or value, an email address and a UK national "
+        "insurance number.",
+        "no rule here reads English, so within those documents a personal name written in plain "
+        "words survives in " + "; ".join(survives) + ", and is refused by nothing.",
     ]
 
 
 # -- the served artefact --------------------------------------------------------------------------
 
-def served(unit: Path, path: str) -> str | None:
-    """The bytes GitHub serves at `origin/main:<path>`, or None. Never the working tree: an
-    uncommitted admission record is not one an adopter has published."""
+def served(unit: Path, path: str) -> str | Unreadable | None:
+    """The bytes GitHub serves at `origin/main:<path>`. Never the working tree: an uncommitted
+    admission record is not one an adopter has published.
+
+    Three outcomes, and the middle one is round-4 finding F2: `None` when `origin/main` serves
+    nothing at that path, an `Unreadable` when it serves bytes that are not UTF-8, and the text
+    otherwise. This used to decode with `text=True`, so a served file of
+    `b'id: \xff\xfe\x00binary\nrole: x\n'` raised an uncaught `UnicodeDecodeError` inside
+    `subprocess` — in the layer ABOVE the per-record guard, so it aborted the grading of every
+    other adopter, and its traceback went to stderr where the verify script's `tee` never saw it.
+    """
     out = subprocess.run(["git", "-C", str(unit), "show", f"origin/main:{path}"],
-                         capture_output=True, text=True)
-    return out.stdout if out.returncode == 0 else None
+                         capture_output=True)
+    if out.returncode != 0:
+        return None
+    try:
+        return out.stdout.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        return Unreadable(path, f"the served bytes are not UTF-8 ({exc})")
 
 
 def served_paths(unit: Path) -> list[str]:
+    """Every path `origin/main` serves. Decoded with `surrogateescape` so a name that is not
+    UTF-8 round-trips back to git unchanged rather than raising here (F2)."""
     out = subprocess.run(["git", "-C", str(unit), "ls-tree", "-r", "--name-only", "origin/main"],
-                         capture_output=True, text=True)
-    return out.stdout.splitlines() if out.returncode == 0 else []
+                         capture_output=True)
+    if out.returncode != 0:
+        return []
+    return out.stdout.decode("utf-8", errors="surrogateescape").splitlines()
 
 
 def served_sha(unit: Path) -> str | None:
@@ -757,19 +855,46 @@ def served_sha(unit: Path) -> str | None:
     return out.stdout.strip() if out.returncode == 0 else None
 
 
-def adopters(estate: Path) -> list[str]:
-    """Every unit whose SERVED party artefact claims the adopter role. Derived, never typed: a
-    fourth adopter arrives here by publishing a party artefact."""
+def adopters(estate: Path,
+             unreadable: dict[str, Unreadable] | None = None) -> list[str]:
+    """Every unit whose SERVED party artefact claims the adopter role, and — in `unreadable` —
+    every unit that SERVES a party artefact this check could not read.
+
+    Round-4 finding F1, a regression the strict loader caused. This used to `continue` in
+    silence on anything that was not a dict, so an adopter whose `party.yaml` carried a
+    duplicated key VANISHED from the run: its scenario note, its people register and a record
+    naming an individual all went ungraded, and a red estate printed `PASS: 1 adopters read`
+    with the dropped adopter named nowhere. The pre-existing half was the same shape
+    (`except yaml.YAMLError: continue`).
+
+    The silent skip that REMAINS is the correct one: a directory that serves no `party.yaml` at
+    all is not a party, and `.git`, a scratch directory and a nested worktree all land there.
+    """
     found: list[str] = []
+    unreadable = {} if unreadable is None else unreadable
     if not estate.is_dir():
         return found
     for unit in sorted(p for p in estate.iterdir() if p.is_dir()):
+        where = f"{unit.name}/party.yaml"
         text = served(unit, "party.yaml")
-        if not text:
+        if text is None:
             continue
-        doc = load_served(f"{unit.name}/party.yaml", text)
-        if isinstance(doc, dict) and "adopter" in (doc.get("roles") or []):
+        if isinstance(text, Unreadable):
+            unreadable[unit.name] = Unreadable(where, text.why)
+            continue
+        doc = load_served(where, text)
+        if isinstance(doc, Unreadable):
+            unreadable[unit.name] = doc
+            continue
+        if not isinstance(doc, dict):
+            unreadable[unit.name] = Unreadable(
+                where, f"the served party artefact is a {type(doc).__name__}, not a mapping")
+            continue
+        if "adopter" in (doc.get("roles") or []):
             found.append(unit.name)
+            for problem in individual_problems(doc, scan_names=False):
+                unreadable[f"{unit.name}::{len(unreadable)}"] = Unreadable(
+                    where, f"carries {problem}")
     return found
 
 
@@ -789,7 +914,7 @@ def people_files(estate: Path, org: str) -> dict[str, Any]:
         text = served(unit, path)
         if text is None:
             continue
-        files[path] = load_served(path, text)
+        files[path] = text if isinstance(text, Unreadable) else load_served(path, text)
     return files
 
 
@@ -815,11 +940,18 @@ def key_person_scenarios(estate: Path, org: str,
         text = served(unit, path)
         if text is None:
             continue
-        doc = load_served(path, text)
+        doc = text if isinstance(text, Unreadable) else load_served(path, text)
         if isinstance(doc, Unreadable):
             unreadable[path] = doc
             continue
         if isinstance(doc, dict) and doc.get("class") == SCENARIO_CLASS:
+            # F6: a served scenario file has no closed key set, so an EMAIL ADDRESS lived in it
+            # unrefused and falsified the limits block's own sentence. Its shape is ticket 11's
+            # and varies, so it is not closed; the VALUE scan is run over it (`scan_names=False`,
+            # because `note:` is a legitimate key here and the token list was written for a
+            # closed field set), and the limits block says exactly that.
+            for problem in individual_problems(doc, scan_names=False):
+                unreadable[f"{path}::{len(unreadable)}"] = Unreadable(path, f"carries {problem}")
             out[path] = doc
     return out
 
@@ -835,7 +967,7 @@ def admission_records(estate: Path, org: str) -> dict[str, Any]:
         if text is None:
             out[path] = Unreadable(path, "origin/main serves no bytes at this path")
             continue
-        doc = load_served(path, text)
+        doc = text if isinstance(text, Unreadable) else load_served(path, text)
         out[path] = doc if isinstance(doc, (dict, Unreadable)) else Unreadable(
             path, f"the served bytes are a {type(doc).__name__}, not an admission record")
     return out
@@ -863,14 +995,20 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
     if not estate.is_dir():
         out(f"SKIP: no estate clone at {estate}")
         return 3
-    orgs = adopters(estate)
-    if not orgs:
+    unreadable_parties: dict[str, Unreadable] = {}
+    orgs = adopters(estate, unreadable_parties)
+    fail_parties = 0
+    for name, why in sorted(unreadable_parties.items()):
+        print_ = f"FAIL {name.split('::')[0]}: {why.path}: {why.why}"
+        out(print_)
+        fail_parties += 1
+    if not orgs and not unreadable_parties:
         out(f"SKIP: no party in {estate} serves a party.yaml claiming the adopter role at "
             "origin/main")
         return 3
 
     rule = load_rule()
-    fail = 0
+    fail = fail_parties
     scenarios_seen = 0
     records_seen = 0
     admitted_count = 0
@@ -937,7 +1075,8 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
         records = admission_records(estate, org)
 
         def read_dpia(dpia_path: str, u: Path = unit) -> str | None:
-            return served(u, dpia_path)
+            text = served(u, dpia_path)
+            return text if isinstance(text, str) else None
 
         for path, maybe in sorted(records.items()):
             records_seen += 1
@@ -1042,15 +1181,21 @@ def _git(repo: Path, *args: str, hooks: Path) -> None:
 
 def _plant(root: Path, hooks: Path, record: str | None, scenario: bool = True,
            extra_role_file: tuple[str, str] | None = None,
-           extra_record: tuple[str, str] | None = None) -> Path:
-    """A one-unit estate whose SERVED ref is a real `refs/remotes/origin/main`."""
+           extra_record: tuple[str, str] | None = None,
+           org: str = "planted", party: str | None = None,
+           extra_bytes: tuple[str, bytes] | None = None) -> Path:
+    """A planted unit whose SERVED ref is a real `refs/remotes/origin/main`.
+
+    `org` names the unit, so several can be planted into one estate directory; `party` overrides
+    the served `party.yaml` bytes, and `extra_bytes` writes a file that is not text at all.
+    """
     estate = root / "estate"
-    unit = estate / "planted"
-    org = "planted"
+    unit = estate / org
     (unit / f"twin/orgs/{org}/people").mkdir(parents=True, exist_ok=True)
     (unit / f"twin/orgs/{org}/scenarios").mkdir(parents=True, exist_ok=True)
     (unit / f"twin/orgs/{org}/dpia").mkdir(parents=True, exist_ok=True)
-    (unit / "party.yaml").write_text("party: planted\nroles: [adopter]\n", encoding="utf-8")
+    (unit / "party.yaml").write_text(
+        party if party is not None else f"party: {org}\nroles: [adopter]\n", encoding="utf-8")
     (unit / f"twin/orgs/{org}/people/platform-engineer.yaml").write_text(
         "id: platform-engineer\nrole: On call for the planted namespace.\n", encoding="utf-8")
     (unit / f"twin/orgs/{org}/people/platform-lead.yaml").write_text(
@@ -1059,7 +1204,7 @@ def _plant(root: Path, hooks: Path, record: str | None, scenario: bool = True,
         (unit / f"twin/orgs/{org}/scenarios/key-person-2026.yaml").write_text(
             _SCENARIO, encoding="utf-8")
     (unit / f"twin/orgs/{org}/dpia/bus-factor-structural-aggregate.yaml").write_text(
-        _GOOD_DPIA, encoding="utf-8")
+        _GOOD_DPIA.replace("planted", org), encoding="utf-8")
     if extra_role_file is not None:
         name, body = extra_role_file
         (unit / f"twin/orgs/{org}/people/{name}").write_text(body, encoding="utf-8")
@@ -1070,6 +1215,10 @@ def _plant(root: Path, hooks: Path, record: str | None, scenario: bool = True,
     if extra_record is not None:
         admissions.mkdir(parents=True, exist_ok=True)
         (admissions / extra_record[0]).write_text(extra_record[1], encoding="utf-8")
+    if extra_bytes is not None:
+        target = unit / extra_bytes[0]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(extra_bytes[1])
     _git(unit, "init", "-q", "-b", "main", hooks=hooks)
     _git(unit, "config", "user.email", "selfcheck@example.invalid", hooks=hooks)
     _git(unit, "config", "user.name", "selfcheck", hooks=hooks)
@@ -1123,7 +1272,8 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
     expect("a DPIA record with no retention period is refused", variant(), "no-dpia-record",
            dpia=_GOOD_DPIA.replace("retention_days: 90\n", ""))
     ladder = copy.deepcopy(good["ladder"])
-    ladder["necessity"] = {"kind": "behavioural", "level": "individual", "alternatives": []}
+    ladder["necessity"] = {"kind": "behavioural", "level": "individual",
+                           "alternatives": [{"kind": "structural", "level": "aggregate"}]}
     expect("a behavioural/individual reading is refused",
            variant(kind="behavioural", granularity="individual", ladder=ladder),
            "kind-not-admissible")
@@ -1187,6 +1337,12 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
            "value-not-the-declared-shape",
            dpia=_GOOD_DPIA.replace("sensor: bus-factor-structural-aggregate",
                                    "sensor: payroll-record"))
+    empty_alt = copy.deepcopy(good["ladder"])
+    empty_alt["necessity"]["alternatives"] = []
+    expect("a necessity rung with no alternatives considered is refused",
+           variant(ladder=empty_alt), "required-key-missing")
+    expect("a DPIA of the wrong schema is refused", variant(), "value-not-the-declared-shape",
+           dpia=_GOOD_DPIA.replace("schema: twin.dpia/v1", "schema: whatever you like"))
     expect("the one admissible sensor is admitted", variant(), None)
 
     # and the served read itself, on a real git repository.
@@ -1306,6 +1462,45 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
                 f"name, got exit {rc}: {lines[-1] if lines else 'nothing'}")
             failures += 1
 
+        # Round-4 F1, the blocking regression, end to end at real served refs: an adopter whose
+        # party.yaml cannot be read used to VANISH, taking a record naming an individual with it,
+        # and the estate printed PASS.
+        lines = []
+        bad = _GOOD_RECORD.replace("planted", "alpha").replace(
+            "fields: [component, distinct_committer_count, window_days]",
+            "fields: [component, employee_id]")
+        root4 = root / "twoadopters"
+        _plant(root4, hooks, bad, org="alpha",
+               party="party: alpha\nroles: [adopter]\nroles: [adopter]\n")
+        estate = _plant(root4, hooks, _GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+        rc = grade_estate(estate, out=lines.append)
+        joined = "\n".join(lines)
+        if rc == 1 and "alpha" in joined and "duplicate key" in joined:
+            out("PASS: selfcheck: an adopter whose party.yaml cannot be read is NAMED and the "
+                "estate stays red, rather than vanishing from the count")
+        else:
+            out(f"FAIL: selfcheck: an unreadable party.yaml must be a FAIL row naming the "
+                f"adopter, got exit {rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
+        # Round-4 F2: a served file that is not UTF-8 aborted the run from the layer above the
+        # per-record guard, and its traceback went to stderr where the wrapper never saw it.
+        lines = []
+        root5 = root / "notutf8"
+        _plant(root5, hooks, _GOOD_RECORD.replace("planted", "alpha"), org="alpha",
+               extra_bytes=("twin/orgs/alpha/people/binary.yaml",
+                            b"id: \xff\xfe\x00binary\nrole: x\n"))
+        estate = _plant(root5, hooks, _GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+        rc = grade_estate(estate, out=lines.append)
+        joined = "\n".join(lines)
+        if rc == 1 and "binary.yaml" in joined and "bravo" in joined:
+            out("PASS: selfcheck: a served file that is not UTF-8 is a FAIL row and the other "
+                "adopter is still graded")
+        else:
+            out(f"FAIL: selfcheck: a non-UTF-8 served file must be a FAIL row, got exit {rc}: "
+                f"{lines[-1] if lines else 'nothing'}")
+            failures += 1
+
         # Review F2, end to end: a role file carrying an undeclared key, and one named after
         # something that is not a role.
         lines = []
@@ -1347,8 +1542,8 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
     if failures:
         out(f"FAIL: selfcheck: {failures} planted case(s) did not grade as planted")
         return 1
-    out(f"PASS: selfcheck: {planted} planted records and eleven planted served estates "
-        "grade as planted")
+    out(f"PASS: selfcheck: {planted} planted records and thirteen planted served "
+        "estates grade as planted")
     return 0
 
 

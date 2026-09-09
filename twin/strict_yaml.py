@@ -22,6 +22,7 @@ to `derived_forecast.StrictLoader` changes.
 
 from __future__ import annotations
 
+from collections.abc import Hashable
 from typing import Any
 
 import yaml
@@ -31,19 +32,41 @@ import yaml
 DUPLICATE_KEY = "duplicate key"
 
 
+#: YAML's merge key. It legitimately appears more than once in one mapping and PyYAML removes it
+#: in `flatten_mapping` before any of it reaches a document, so it is never a duplicate (F10).
+MERGE_TAG = "tag:yaml.org,2002:merge"
+
+
 class StrictLoader(yaml.SafeLoader):
-    """`yaml.SafeLoader`, with a duplicate mapping key REFUSED instead of silently resolved."""
+    """`yaml.SafeLoader`, with a duplicate mapping key REFUSED instead of silently resolved.
+
+    Two things it deliberately does NOT refuse (round-4 findings F10 and F13):
+
+    * a **merge key**. The first cut constructed every key node before `flatten_mapping` had
+      removed `<<`, so `<<: *a` was refused as a duplicate the moment a mapping carried two of
+      them — and the refusal said the bytes were not YAML when they are.
+    * a **complex key**. `key in seen` raised `TypeError` on an unhashable key, which surfaced as
+      "not YAML this check will read (TypeError)" instead of PyYAML's own better message, and
+      refused a complex key carrying no duplicate at all. Keys are compared by a hashable
+      rendering, so a genuine duplicate complex key is still refused.
+    """
 
     def construct_mapping(self, node: Any, deep: bool = False) -> dict[Any, Any]:
         seen: set[Any] = set()
         for key_node, _ in node.value:
+            if getattr(key_node, "tag", None) == MERGE_TAG:
+                continue
             key = self.construct_object(key_node, deep=deep)
-            if key in seen:
+            try:
+                token = key if isinstance(key, Hashable) else repr(key)
+            except Exception:  # noqa: BLE001 -- a key whose repr raises is still a key
+                token = object()
+            if token in seen:
                 raise yaml.constructor.ConstructorError(
                     "while constructing a mapping", node.start_mark,
                     f"{DUPLICATE_KEY} {key!r}: PyYAML keeps the last, so the file a human reads "
                     f"is not the file this validator reads", key_node.start_mark)
-            seen.add(key)
+            seen.add(token)
         return super().construct_mapping(node, deep=deep)
 
 

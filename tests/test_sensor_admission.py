@@ -177,9 +177,12 @@ def test_the_admission_record_naming_no_dpia_path_at_all_is_refused() -> None:
     ("behavioural", "individual"),
 ])
 def test_a_kind_or_granularity_outside_the_admissible_set_is_refused(kind: str, gran: str) -> None:
+    alt = [{"kind": "structural", "level": "aggregate"}] if (kind, gran) != (
+        "structural", "aggregate") else [{"kind": "behavioural", "level": "individual"}]
     result = grade(record(kind=kind, granularity=gran,
                           ladder={**record()["ladder"],
-                                  "necessity": {"kind": kind, "level": gran, "alternatives": []}}))
+                                  "necessity": {"kind": kind, "level": gran,
+                                                "alternatives": alt}}))
     assert "kind-not-admissible" in ids(result), (
         f"{kind}/{gran} is not in the admissible set and must be refused by name, got "
         f"{result['refusals']}")
@@ -188,7 +191,8 @@ def test_a_kind_or_granularity_outside_the_admissible_set_is_refused(kind: str, 
 
 def test_a_record_whose_ladder_walks_a_different_pair_than_it_declares_is_refused() -> None:
     ladder = copy.deepcopy(record()["ladder"])
-    ladder["necessity"] = {"kind": "behavioural", "level": "individual", "alternatives": []}
+    ladder["necessity"] = {"kind": "behavioural", "level": "individual",
+                           "alternatives": [{"kind": "structural", "level": "aggregate"}]}
     result = grade(record(ladder=ladder))
     assert "kind-not-admissible" in ids(result), (
         f"a record declaring structural/aggregate whose ladder walks behavioural/individual must "
@@ -327,12 +331,12 @@ def test_a_notice_naming_a_role_the_register_does_not_carry_is_refused() -> None
 
 
 def test_a_dpia_filed_under_a_basename_that_is_not_the_sensor_id_is_refused() -> None:
-    path = "twin/orgs/driftwood/dpia/whoever-signed-it.yaml"
+    path = "twin/orgs/driftwood/dpia/whoever-signed-it.yaml"  # noqa: S105
     result = grade(record(dpia={"record": path}), dpia_reader=reader(at=path))
     assert "no-dpia-record" in ids(result), (
         f"a DPIA filed under a name that is not the sensor id must be refused, got "
         f"{result['refusals']}")
-    assert "basename" in " ".join(result["refusals"])
+    assert "twin/orgs/" in " ".join(result["refusals"])
 
 
 # -- F5: the record is graded by the table that rules its own class ------------------------------
@@ -757,6 +761,241 @@ def test_the_limits_are_derived_from_the_table_and_name_both_new_refusals() -> N
     for expected in ("value-not-the-declared-shape", "key-not-declared", "duplicate",
                      "lawful_basis", "published_at", "role id"):
         assert expected in text, f"the printed limits do not mention {expected!r}: {text}"
+
+
+
+# -- F1: an adopter whose party.yaml cannot be read must not VANISH -------------------------------
+# Round 4's blocking finding, and a regression the R1 fix caused: `adopters()` parsed party.yaml
+# through `load_served`, got an `Unreadable`, failed `isinstance(doc, dict)` and `continue`d with
+# no output, so a red estate went green. The reviewer's exact two-adopter plant.
+
+@pytest.fixture
+def two_adopters(tmp_path):
+    """`alpha` serves a duplicate-keyed party.yaml AND a record naming an individual; `bravo` is
+    clean. Both at real `refs/remotes/origin/main`."""
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    bad = sa._GOOD_RECORD.replace("planted", "alpha").replace(
+        "fields: [component, distinct_committer_count, window_days]",
+        "fields: [component, employee_id]")
+    sa._plant(tmp_path, hooks, bad, org="alpha",
+              party="party: alpha\nroles: [adopter]\nroles: [adopter]\n")
+    return sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+
+
+def test_an_adopter_with_an_unreadable_party_artefact_is_named_not_dropped(two_adopters) -> None:
+    lines: list[str] = []
+    rc = sa.grade_estate(two_adopters, out=lines.append)
+    joined = "\n".join(lines)
+    assert "alpha" in joined, (
+        "an adopter whose party.yaml cannot be read must be NAMED, not silently dropped; "
+        f"the run said:\n{joined}")
+    assert rc == 1, f"a red estate must stay red, got exit {rc}:\n{joined}"
+    assert any("duplicate key" in ln and "alpha" in ln for ln in lines), lines
+
+
+def test_an_unparseable_party_artefact_is_also_a_fail_row(tmp_path) -> None:
+    """The pre-existing half of the same hole: `except yaml.YAMLError: continue`."""
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, None, org="alpha", party="roles: [adopter\n")
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    assert rc == 1 and any("alpha" in ln and "party.yaml" in ln for ln in lines), lines
+
+
+def test_a_directory_that_is_not_a_party_at_all_is_still_silently_skipped(tmp_path) -> None:
+    """The silent skip that is CORRECT: no party.yaml served at all is not a party."""
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD, org="planted")
+    (estate / "scratch").mkdir()
+    lines: list[str] = []
+    sa.grade_estate(estate, out=lines.append)
+    assert not any("scratch" in ln for ln in lines), lines
+
+
+# -- F2: a served file that is not UTF-8 must not abort the run ----------------------------------
+
+def test_a_served_file_that_is_not_utf8_is_unreadable_not_a_traceback(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "alpha"), org="alpha",
+              extra_bytes=("twin/orgs/alpha/people/binary.yaml",
+                           b"id: \xff\xfe\x00binary\nrole: x\n"))
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1, f"a non-UTF-8 served file must be a FAIL row, got exit {rc}:\n{joined}"
+    assert "binary.yaml" in joined, joined
+    assert any("bravo" in ln for ln in lines), f"bravo must still be graded:\n{joined}"
+
+
+# -- F3/F4/F5: the declarations added last round are validated where they are read ----------------
+
+@pytest.mark.parametrize("table,key", [
+    ("typed_keys", "ladder_purpose"),
+    ("fixed_values", "record"),
+    ("required_keys", "ladder_necessity"),
+    ("scalar_lists", "record"),
+])
+def test_a_null_sub_entry_of_a_derived_table_is_refused_at_load(tmp_path, table, key) -> None:
+    doc = _rule_doc()
+    doc[table][key] = None
+    with pytest.raises(sa.SensorAdmissionError, match=key):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_dpia_must_agree_naming_a_field_the_module_cannot_resolve_is_refused(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["dpia_must_agree"] = ["completed_by"]
+    with pytest.raises(sa.SensorAdmissionError, match="completed_by"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_requires_dpia_fields_missing_is_refused_at_load(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["requires"].pop("dpia_fields")
+    with pytest.raises(sa.SensorAdmissionError, match="dpia_fields"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_admissible_channels_absent_is_refused_even_though_empty_is_legal(tmp_path) -> None:
+    """The truthiness loop cannot express this: the correct value IS an empty list."""
+    doc = _rule_doc()
+    doc.pop("admissible_channels")
+    with pytest.raises(sa.SensorAdmissionError, match="admissible_channels"):
+        sa.load_rule(_write(tmp_path, doc))
+    doc = _rule_doc()
+    doc["admissible_channels"] = "none"
+    with pytest.raises(sa.SensorAdmissionError, match="admissible_channels"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_a_refusal_id_no_code_path_can_emit_is_refused_at_load(tmp_path) -> None:
+    """F5: `load_rule` enforced one direction of the subset. A well-formed but unreachable id
+    loaded clean and the generated LIMIT block GREW to include it."""
+    doc = _rule_doc()
+    doc["refusals"].append({
+        "id": "invented-refusal", "terminal": False,
+        "sentence": "REFUSED invented-refusal: {sensor}: {what}."})
+    with pytest.raises(sa.SensorAdmissionError, match="invented-refusal"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_free_prose_fields_naming_a_field_the_dpia_does_not_carry_is_refused(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["free_prose_fields"] = ["not_a_dpia_field"]
+    with pytest.raises(sa.SensorAdmissionError, match="not_a_dpia_field"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+# -- F6: the block's scope is honest, and two more slots are closed -------------------------------
+
+def test_the_dpia_schema_is_fixed_too() -> None:
+    text = DPIA_TEXT.replace("schema: twin.dpia/v1", "schema: whatever you like")
+    result = grade(record(), dpia_reader=reader(text=text))
+    assert "value-not-the-declared-shape" in ids(result), result["refusals"]
+
+
+def test_the_whole_dpia_path_is_derived_not_only_its_basename() -> None:
+    path = "somewhere/else/bus-factor-structural-aggregate.yaml"
+    result = grade(record(dpia={"record": path}), dpia_reader=reader(at=path))
+    assert "no-dpia-record" in ids(result), result["refusals"]
+    assert "twin/orgs/" in " ".join(result["refusals"])
+
+
+def test_the_limit_block_says_which_documents_the_identifier_scan_covers() -> None:
+    text = " ".join(sa.limits(sa.load_rule()))
+    assert "identifier scan" in text
+    for document in ("admission record", "DPIA", "role file", "scenario", "party.yaml"):
+        assert document in text, f"the block does not say it covers the {document}: {text}"
+
+
+# -- F7: a `.get()` slot with no better-worded refusal behind it is required ----------------------
+
+def test_a_necessity_rung_with_no_alternatives_is_refused() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["necessity"].pop("alternatives")
+    result = grade(record(ladder=ladder))
+    assert "required-key-missing" in ids(result), (
+        "deleting `alternatives:` gave a green admission with a vacuously passed necessity rung, "
+        f"got {result['refusals']}")
+
+
+def test_an_empty_alternatives_list_is_refused_too() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["necessity"]["alternatives"] = []
+    result = grade(record(ladder=ladder))
+    assert "required-key-missing" in ids(result), result["refusals"]
+
+
+# -- F8: the rule table itself is read with the strict loader ------------------------------------
+
+def test_a_duplicated_block_in_the_rule_table_is_refused_at_load(tmp_path) -> None:
+    body = sa.RULE_PATH.read_text(encoding="utf-8") + "\ntyped_keys:\n  ladder_purpose: {will_act: bool}\n"
+    bad = tmp_path / "dup.yaml"
+    bad.write_text(body, encoding="utf-8")
+    with pytest.raises(sa.SensorAdmissionError, match="typed_keys"):
+        sa.load_rule(bad)
+
+
+# -- F9: the constant and the table cannot drift, and a missing schema is refused -----------------
+
+def test_the_record_schema_constant_and_the_table_must_agree(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["fixed_values"]["record"]["schema"] = "twin.sensor-admission-record/v99"
+    with pytest.raises(sa.SensorAdmissionError, match="RECORD_SCHEMA"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_a_record_with_no_schema_key_at_all_is_refused() -> None:
+    rec = record()
+    rec.pop("schema")
+    result = grade(rec)
+    assert "required-key-missing" in ids(result), result["refusals"]
+
+
+# -- F10/F13: the loader refuses duplicates, not legal YAML ---------------------------------------
+
+def test_a_merge_key_is_not_refused_as_a_duplicate() -> None:
+    body = ("base: &b\n  told: [platform-engineer]\n"
+            "notice:\n  <<: *b\n  published_on: '2026-09-09'\n")
+    doc = sa.load_served("p.yaml", body)
+    assert not isinstance(doc, sa.Unreadable), f"a merge key is legal YAML, got {doc!r}"
+    assert doc["notice"]["told"] == ["platform-engineer"]
+
+
+def test_two_merge_keys_in_one_mapping_are_still_not_a_duplicate() -> None:
+    body = ("a: &a {x: 1}\nb: &b {y: 2}\nc:\n  <<: *a\n  <<: *b\n")
+    assert not isinstance(sa.load_served("p.yaml", body), sa.Unreadable)
+
+
+def test_a_complex_key_carrying_no_duplicate_is_not_refused_as_one() -> None:
+    body = "? [a, b]\n: 1\n"
+    result = sa.load_served("p.yaml", body)
+    if isinstance(result, sa.Unreadable):
+        assert "duplicate" not in result.why, result.why
+
+
+# -- F11/F12: a refusal always says why, and in its own words -------------------------------------
+
+def test_a_refused_record_always_carries_at_least_one_line() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["proportionality"] = {"intrusion_cost": 100000.0, "value_illuminated": 1.0}
+    result = grade(record(ladder=ladder))
+    assert result["admitted"] is False
+    assert result["refusals"], "a record that is not admitted must say why"
+
+
+def test_a_ladder_missing_a_whole_rung_is_not_called_an_unregistered_sensor() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder.pop("proportionality")
+    result = grade(record(ladder=ladder))
+    joined = " ".join(result["refusals"])
+    assert "sensor-not-named" not in ids(result), (
+        f"a ladder fault must not be reported as an unregistered sensor id: {joined}")
 
 
 # -- the sensor table stays closed ----------------------------------------------------------------

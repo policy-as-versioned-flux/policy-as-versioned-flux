@@ -130,7 +130,8 @@ typed_keys:
 # required here, because refusing it would change a refusal that already has better words for it
 # (a notice with no `told` is covert sensing; a record naming no DPIA path has its own line).
 required_keys:
-  ladder_necessity: [kind, level]
+  record: [schema]
+  ladder_necessity: [kind, level, alternatives]
   ladder_alternative: [kind, level]
   ladder_proportionality: [intrusion_cost, value_illuminated]
 
@@ -142,8 +143,21 @@ required_keys:
 # reads a commit graph, so it declares NO monitoring channel at all.
 fixed_values:
   record: {schema: twin.sensor-admission-record/v1}
+  dpia_record: {schema: twin.dpia/v1}
 dpia_must_agree: [sensor, scenario]
 admissible_channels: []
+
+# The whole path a DPIA is filed at, not only its basename (round-4 F6): the DIRECTORY part was
+# free text, so a name could live there. `{sensor}` is filled with the sensor's own id.
+dpia_path_pattern: '^twin/orgs/[a-z0-9-]+/dpia/{sensor}\.yaml$'
+
+# Keys that must be present AND non-empty (round-4 F7). `required_keys` alone tests presence, and
+# `ladder.necessity.alternatives` deleted OR set to `[]` both give a vacuously passed necessity
+# rung -- "no less intrusive alternative among 0 considered outranks structural/aggregate" -- and
+# a green admission. The rule that put it here is slot by slot: does this `.get()` slot have a
+# refusal with better words behind it? For `alternatives` there is none.
+non_empty:
+  ladder_necessity: [alternatives]
 
 # The three keys of `dpia_record` above that are free prose, and the one PLACE a person could
 # still arrive under a declared key. Printed as a limit on every run rather than left implied:
@@ -215,6 +229,12 @@ refusals:
     sentence: >-
       REFUSED required-key-missing: {sensor}: {what}. The slot is indexed downstream rather than
       read with a default, so a record without it is not a record.
+  - id: ladder-could-not-walk
+    terminal: false
+    sentence: >-
+      REFUSED ladder-could-not-walk: {sensor}: {what}. The ethics gate refused the payload
+      itself, which is a different fault from an unregistered sensor id and is reported in its
+      own words.
   - id: not-this-scenario-class
     terminal: false
     sentence: >-
