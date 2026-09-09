@@ -104,3 +104,49 @@ Consequences:
 Graduated:
 - Build the news feed and the headline skill (task).
 - The supply-constraint actor path and the scored headline forecast (grilling).
+
+## Correction, 2026-09-09 (eco-system ticket 51, delegated under ADR-0025): four claims in this file, measured
+
+Ticket 51 was graduated from this ticket to answer the two deferred questions, and answering them
+measured four sentences written here on 2026-08-28. This record is not rewritten; the corrections
+are dated and sit below the claims they correct.
+
+1. **Item 3's "The actor path is a twin `needs` edge" is wrong, and so is the framing of the
+   question in the deferred-rounds list.** There is no edge between `nb-refining-capacity` and
+   `pq-cryptanalysis` in either model. Measured 2026-09-09 across every twin overlay and the world
+   layer in `.estate-clone` (driftwood, ludlow, tuppence): neither id is a component, in 0 of 3
+   overlays and not in the world layer, so neither can be an end of a twin edge. Both are rows of
+   `platform/wardley/intel/market-intel.json`, and both name the SAME `links_risk`,
+   `pq-harvest-now-decrypt-later` -- which is a FAIR risk id, not a component. Two rows pointing at
+   one risk is not one row pointing at the other. `verify/twin-evals/verify-scenario-registration.sh`
+   prints both rows off platform's served ref on every run so the finding stays a measurement.
+2. **The note at the head of this ticket reads H4-12 as "the `links_risk` edge to the capability it
+   constrains exists and is simply not traversed".** `links_risk` is a pointer from an intel row to
+   a FAIR risk, not to a capability, and `pq-cryptanalysis` names the same risk rather than being
+   named by `nb-refining-capacity`. What is true and unchanged: the row emits nothing, because
+   `forward_signal()` branches only on `attacker-capability` and `defensive-capability`. What is not
+   true is that an edge to the constrained capability exists.
+3. **Item 3's named cost -- "the twin has no velocity or horizon" -- is confirmed, and it is the
+   reason rather than a side note.** Measured 2026-09-09: before this ticket the string `velocity`
+   appeared in no file of the `twin` package at all, and `twin/registration.py` now names it in one
+   place only, to print platform's own intel row. `horizon` is a field of `twin/schema.py`'s
+   `scenario` and of no other model object -- no component, no edge and no claim carries one; the
+   `min_horizon_days`/`max_horizon_days` in `twin/benchmark.py` are the external question set's
+   resolution window (twin decision ticket 21) and are not a position on a map. So there is nothing
+   for a coordinate to move by and no time for it to move over. Revisit trigger Q3b ("the twin's map
+   gains velocity or horizon") has not fired. Ticket 51 rules that it would not change the answer if
+   it did: no relation of any type moves an evolution coordinate, because the axis is an
+   interpretive ordinal judgement and the one operation eco-system ticket 93 reopened the ordinal
+   ruling to admit is an order statistic over evidence GRADES.
+4. **"Pre-registration date is the signal's `date`" is wrong.** A `date` is authored text inside a
+   file, and a file can be rewritten after the answer is known -- measured under eco-system ticket
+   93's review F1, where a forecast deleted and re-added on 2026-07-20 against an outcome on main
+   since 2026-07-01 printed `pre-registered: yes` at its original date and scored `brier=1e-06`.
+   The pre-registration date is the day the CONTENT last reaches the adopter's `origin/main`, read
+   off first-parent history (`twin/derived_forecast.py::first_reached`). Ticket 51 applies the same
+   measurement to the scenario-library entry and to the override.
+
+What stands unchanged: item 1 (niobium never enters the news feed and lives in each org twin's
+scenario library), item 2, item 4 (only the override or a regrade is price-eligible -- which says
+which artefact CAN price, not that any given override does; the one driftwood carries is rung 4 and
+prices nothing), and item 5.

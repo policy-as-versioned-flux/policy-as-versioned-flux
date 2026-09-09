@@ -188,6 +188,54 @@ write, and what it may never write.
      The pool the derivation rests on (`news`, `market-moves`) is pinned by no adopter and
      tagged by no publisher on this date; the check prints both counts, and ticket 23's rule
      holds: nothing derived from it is price-eligible.
+     *Amended 2026-09-09, ticket 51 (the supply-constraint actor path and the resolution
+     question; delegated under ADR-0025).* The reopened ordinal ruling is read as what it says,
+     and applied one step out from the derivation. **The one admitted operation is an order
+     statistic over evidence GRADES and nothing else, so no relation between two components moves
+     an evolution coordinate.** A `needs` edge is `schema.STRUCTURAL_EDGE`: `_refine_edge` refuses
+     `sign`, `lag_days` and `elasticity` on one, the twin carries no `velocity` field anywhere and
+     no `horizon` outside a scenario, so there is nothing to move a coordinate BY and no time to
+     move it OVER. `twin/propagate.py` already walks `influences` and nothing else and
+     `twin/blast.py` already grades a structural hop `no-claimed-mechanism`; what ticket 51 adds
+     is that a CAUSAL edge moves no coordinate either. The evolution axis is an interpretive
+     ordinal judgement (twin ticket 11 Q1) and a coordinate moves only by an attributable
+     `position` or `override` claim, never by a propagation. `twin/registration.py`'s `admits()`
+     is the callable form and `refuse_move()` names the refusal; a move nobody named is refused
+     rather than admitted by omission. Measured, and the reason the pair the question was asked
+     about is not an edge: neither `nb-refining-capacity` nor `pq-cryptanalysis` is a component of
+     any twin model in this estate (0 of 3 adopters, world layer included), and both are rows of
+     `platform/wardley/intel/market-intel.json` naming the SAME `links_risk`
+     (`pq-harvest-now-decrypt-later`, a FAIR risk id, not a component), so neither row points at
+     the other in either model.
+     *And the same date measurement, applied to the QUESTION.* Ticket 93 made the forecast and the
+     answer key immune to a silent rewrite and left the third leg unmeasured: a scenario-library
+     entry carries the proposition, the horizon and the words the question is asked in, so editing
+     any of the three after a forecast is registered against it moves every score already taken.
+     So a scenario entry, and an `override` claim, now register the same way -- the LAST
+     first-parent write onto `origin/main`, `first_reached()` imported and never re-implemented --
+     and `verify/twin-evals/verify-scenario-registration.sh` refuses a registration that is not
+     strictly before the entry's own horizon, and an entry whose horizon is not strictly after its
+     own `at` (nothing could ever be registered against one). An override is scoreable only
+     THROUGH the proposition of a scenario that names the component it moves, and never on its own
+     coordinate, which has no published answer key: an override no question reaches is
+     `unscoreable` with a reason, `twin/scoring.py`'s own first-class result, never a zero.
+     *What of this is GRADED today, and what is only recorded (added 2026-09-09, ticket 51 review
+     F7).* The check grades an entry's own registration against its OWN horizon: a question
+     rewritten after its horizon is refused, and the refusal now names which of `proposition`,
+     `horizon` and `question` moved, so an appended note is not reported as the question changing.
+     It does NOT yet grade a forecast's registration against the registration of the question it
+     names -- a question rewritten after it landed but BEFORE its horizon exits 0 and PASSes. That
+     comparison is stated in this record and becomes measurable on the day the first forecast
+     merges onto an adopter's `origin/main`; no forecast is on any adopter's main today, and none
+     was written to make this leg look finished.
+     *And what the ruling now MEASURES rather than cites (added 2026-09-09, ticket 51 review F1,
+     F2 and F4).* Reachability is `twin/blast.py`'s traversal, and `admits()` runs it rather than
+     describing it. A CAUSAL edge moves reachability as well as a magnitude -- `radius()` walks
+     `influences` forwards into the blast radius exactly as it walks `needs` backwards -- and
+     reachability is TRANSITIVE to `blast.MAX_DEPTH` while adjacency is not, so a pair with no
+     edge between them but a path of more than one hop is `reachable-not-adjacent` and not
+     unrelated. Neither correction touches the coordinate ruling: no relation of any type, at any
+     depth, moves an evolution position.
 
 ## Alternatives
 
