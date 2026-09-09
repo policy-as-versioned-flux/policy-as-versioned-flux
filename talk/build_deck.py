@@ -712,9 +712,16 @@ def check(path, root=ROOT):
                 if not cap.exists():
                     bad.append(f"step {step}: cites a capture that is not in {run_word}: {kv['capture']}")
                     continue
-                tag, _ = grade(capture_lines(kv["script"], capdir))
+                # The same reading the renderer uses: the run's own grade where it recorded one.
+                # These two used to be different readings of the same thing (the renderer moved to
+                # the grade table in ticket 48 and this did not), which would have reddened every
+                # beat whose capture ends mid-verdict.
+                tag, _r, disagreement = resolved_grade(kv["script"], capture_lines(kv["script"], capdir), capdir)
                 if tag != kv["status"]:
-                    bad.append(f"step {step}: deck says {kv['status']}, the capture of {run_word} says {tag}")
+                    bad.append(f"step {step}: deck says {kv['status']}, {run_word} graded "
+                               f"{kv['script']} {tag}")
+                if disagreement:
+                    bad.append(f"step {step}: {disagreement}")
                 if table.get(step) and table[step] != kv["status"]:
                     bad.append(f"step {step}: deck says {kv['status']}, the run's own honesty table says {table[step]}")
                 # Set membership, not substring: '8,269.23' is a substring of the

@@ -192,12 +192,22 @@ building a slide against a check that does not exist is the shape this deck refu
   `refused_phrases()` reading the record and `flatten()` stripping emphasis; `grades_table()`,
   `verdict()` and `resolved_grade()` so a slide's status is the run's exit-code grade and the whole
   verdict sentence reaches the slide; `select()` drops the whole verdict block rather than one line
-  of it; `check()` returns a could-not-look list; four new seam tests in `--selfcheck`.
+  of it; `check()` returns a could-not-look list and its beat loop reads the same grade the renderer does, which they had stopped doing; four new seam tests in `--selfcheck`.
 - `talk/narration.json` — the four asides, step 5's narration naming driftwood and why, and the
   closing slide's video sentence.
 - `talk/verify-demo.sh` — grades the asides, exits 3 with the aside's own reason when a capture is
   absent, compares aside markers as well as beat markers against the rebuild, and says all of this
   on its PASS line.
+- `tests/test_build_deck.py` — the same three seams over the GIT path (a recorded run's captures
+  read out of its recording commit), which the `--selfcheck` fixture cannot reach: an aside carries
+  the run's own grade and not the FAIL its capture's last line reads back; an aside whose capture
+  the run never wrote is a could-not-look naming the file; a record with no refused-phrase table is
+  a fault. The fixture's own git now runs with `core.hooksPath` at an empty directory, the rule
+  ticket 92 round 5 R2 set for every fixture in the estate: the owner's global ggshield hook was
+  out of quota and ten tests errored on the fixture's `git commit` rather than on anything under
+  test. `_captures` now writes the per-script `_grades.tsv` every real run has written since ticket
+  59, and the fixture's honesty capture ends with the verdict the fixture says that run gave it
+  rather than always `PASS`.
 - `talk/verify-manifest.txt` — the demo row's declared could-not-looks: the two new ones plus two
   that the script could already print and nobody had declared. `no python3` and `not inside a git
   work tree` are deliberately left undeclared (recorded on the row): both are the runner missing
