@@ -23,6 +23,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -312,3 +313,184 @@ def test_a_rehearsal_forecast_is_marked_and_refused(fx, tmp_path: Path) -> None:
                          capture_output=True, text=True, env=env, cwd=str(HUB))
     assert run.returncode == 0, run.stdout + run.stderr
     assert "is marked injected and the validator refused it" in run.stdout, run.stdout
+
+
+# --- the 2026-09-09 review: pre-registration is measured on CONTENT, not on a path ------------
+@pytest.mark.parametrize("in_place", [False, True])
+def test_a_forecast_rewritten_after_the_answer_is_registered_on_the_day_of_the_rewrite(
+        fx, tmp_path: Path, capsys, in_place: bool) -> None:
+    """Review F1, the blocking one. `--diff-filter=A --reverse | head -1` answers "when did this
+    PATH first appear", not "when was this CONTENT registered". Measured against the old code:
+    delete 2026-07-02 and re-add 2026-07-20 with `probability: 0.999` against an outcome on main
+    since 2026-07-01 read `pre-registered: yes` at 2026-02-01 and scored `brier=1e-06`, PASS;
+    editing the same path in place read the same at `brier=0.0001`."""
+    estate = fx.build(tmp_path / "estate")
+    fx.rewrite_after_the_answer(estate, in_place=in_place)
+    arrival = df.first_reached(estate / "driftwood", fx.FORECAST_PATH, "refs/remotes/origin/main")
+    assert arrival is not None and arrival.rewritten
+    assert arrival.added.startswith("2026-02-01") and arrival.last.startswith("2026-07-20"), arrival
+    assert df.pre_registered(arrival.added, "2026-06-30") is True, "the old reading, kept only as a contrast"
+    assert df.pre_registered(arrival.last, "2026-06-30") is False
+    rc = df.check(str(estate), str(HUB), adopters=["driftwood"], now="2026-09-06T00:00:00Z")
+    out = capsys.readouterr().out
+    assert rc == 1, out
+    assert "pre-registered: no" in out and "rewritten after it landed" in out, out
+    assert "registered on the day of the rewrite" in out, out
+    assert "reached refs/remotes/origin/main 2026-02-01" in out, "both dates stay on the record"
+    assert "brier=" not in out, out
+
+
+def test_a_rename_still_costs_a_forecast_its_registration(fx, tmp_path: Path, capsys) -> None:
+    """The honest direction of F1, kept: the renamed path's first add IS the rename commit, so a
+    rename costs a forecast its registration rather than laundering one."""
+    estate = fx.build(tmp_path / "estate")
+    renamed = fx.rename_the_forecast(estate)
+    arrival = df.first_reached(estate / "driftwood", renamed, "refs/remotes/origin/main")
+    assert arrival is not None and not arrival.rewritten and arrival.added.startswith("2026-07-20")
+    rc = df.check(str(estate), str(HUB), adopters=["driftwood"], now="2026-09-06T00:00:00Z")
+    out = capsys.readouterr().out
+    assert rc == 1 and "pre-registered: no" in out, out
+
+
+def test_an_answer_key_edited_after_it_reached_main_is_refused(fx, tmp_path: Path, capsys) -> None:
+    """Review F2. `sed 's/observed: true/observed: false/'` committed 2026-07-25 moved brier
+    0.5329 -> 0.0729, both PASS, and the run went on printing the ORIGINAL arrival date."""
+    estate = fx.build(tmp_path / "estate")
+    fx.edit_the_answer_key(estate)
+    rc = df.check(str(estate), str(HUB), adopters=["driftwood"], now="2026-09-06T00:00:00Z")
+    out = capsys.readouterr().out
+    assert rc == 1, out
+    assert "an answer key edited after it landed rescores every forecast it resolves" in out, out
+    assert "brier=" not in out, out
+
+
+def test_two_outcomes_resolving_one_proposition_are_refused(fx, tmp_path: Path, capsys) -> None:
+    """Review F2. `matching[0]` silently took whichever sorted first and the run PASSed with no
+    word that two answer keys disagree."""
+    estate = fx.build(tmp_path / "estate")
+    fx.second_answer_key(estate)
+    rc = df.check(str(estate), str(HUB), adopters=["driftwood"], now="2026-09-06T00:00:00Z")
+    out = capsys.readouterr().out
+    assert rc == 1 and "two answer keys for one question" in out, out
+    assert "brier=" not in out, out
+
+
+def test_a_tag_that_exists_is_not_a_tag_that_is_signed(fx, tmp_path: Path, capsys) -> None:
+    """Review F3. `git tag --list` counts NAMES: two unsigned annotated tags produced
+    "2 signed tag(s)" -- the exact "never fake a signature" rule."""
+    estate = fx.build(tmp_path / "estate")
+    fx.tag_the_feeds(estate)
+    listed, signed = df.signed_feed_tags(estate / "feeds")
+    assert len(listed) == 3 and signed == [], (listed, signed)
+    df.check(str(estate), str(HUB), adopters=["driftwood"], now="2026-09-06T00:00:00Z")
+    assert "3 tag(s) naming either, 0 of them carrying a signature block" in capsys.readouterr().out
+
+
+def test_a_really_signed_tag_is_still_counted(fx, tmp_path: Path) -> None:
+    """The other half, or the 0 above proves nothing."""
+    if not shutil.which("ssh-keygen"):
+        pytest.skip("ssh-keygen is needed to make a throwaway signing key")
+    estate = fx.build(tmp_path / "estate")
+    key = tmp_path / "tagkey"
+    subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "throwaway", "-f", str(key)], check=True)
+    fx.tag_the_feeds(estate, sign_with=str(key))
+    listed, signed = df.signed_feed_tags(estate / "feeds")
+    assert len(listed) == 3 and signed == ["news/v1.0.0"], (listed, signed)
+
+
+def test_a_duplicate_yaml_key_is_refused_by_the_loader_and_the_cli(fx, tmp_path: Path, capsys) -> None:
+    """Review F4. PyYAML keeps the LAST of two identical keys, so a visible `probability: 0.999`
+    above a real 0.27 validated as 0.27 and the clock committed it: the file a human reviews in
+    the pull request is not the file the validator read."""
+    estate = fx.build(tmp_path / "estate", with_forecast=False, with_outcome=False)
+    fx.duplicate_key_forecast(estate)
+    path = estate / "driftwood" / fx.FORECAST_PATH
+    assert "probability: 0.999" in path.read_text()
+    assert yaml.safe_load(path.read_text())["forecasts"][0]["probability"] == 0.27, "the old reading"
+    with pytest.raises(df.DerivedForecastError, match="duplicate key 'probability'"):
+        df.load_yaml(path.read_text(), str(path))
+    run = subprocess.run([sys.executable, str(VALIDATOR), str(path), "--twin", str(HUB), "--headless",
+                          "--feeds", str(estate / "feeds")], capture_output=True, text=True)
+    assert run.returncode == 1 and "duplicate key 'probability'" in run.stdout, run.stdout
+    rc = df.check(str(estate), str(HUB), adopters=["driftwood"], now="2026-09-06T00:00:00Z")
+    assert rc == 1 and "duplicate key 'probability'" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("field", ["prices_through", "recorded_belief"])
+def test_every_forecast_carries_prices_through_and_recorded_belief(fx, estate: Path, field: str) -> None:
+    """Review F7: SKILL.md section 2 and the ticket's Answer promise both on EVERY forecast, and
+    `validate()` required neither -- both measured ACCEPTED when absent."""
+    doc = fx.forecast_doc()
+    doc["forecasts"][0].pop(field, None)
+    bad = df.validate(doc, _roles(), headless=True, adopter_root=estate / "driftwood",
+                      feeds_root=estate / "feeds")
+    assert any(field in reason for reason in bad), bad
+
+
+def test_the_clock_refuses_two_forecast_files_in_one_commit(fx, tmp_path: Path) -> None:
+    """Review F8: "it writes one file and stops" was prose. Both files validate, so nothing
+    unchecked lands -- but two files are two proposals in one review."""
+    estate = fx.build(tmp_path / "estate", with_forecast=False, with_outcome=False)
+    run = _clock(estate, tmp_path / ".local-clock", "forecast-two")
+    assert run.returncode != 0, run.stdout
+    assert "the commit carries 2 files under twin/forecasts" in run.stdout, run.stdout
+
+
+def test_the_clock_judges_with_a_copy_taken_before_the_child_and_names_a_hub_edit(
+        fx, tmp_path: Path) -> None:
+    """Review F5: the validator validated ITSELF. The clock ran
+    `$HUB/.claude/skills/derive-probability/assets/validate_forecast.py --twin $HUB` from the
+    WORKING TREE, and the model's cwd is that tree with `Edit` in ALLOWED_TOOLS; a reviewer
+    overwrote the validator with a three-line always-pass stub and committed a fabricated
+    forecast (only the GATE caught it). The clock now copies the twin package and the skill out
+    of the hub BEFORE the child starts, judges with the copy, and names any hub edit.
+
+    Run over a THROWAWAY COPY of the hub, because the attack destroys the validator of whatever
+    hub it is pointed at; `stub-claude.sh` refuses to run it without LOCAL_CLOCK_STUB_HUB_IS_A_COPY.
+    """
+    hub = tmp_path / "hub"
+    hub.mkdir()
+    for d in ("twin", "talk", "verify", ".claude"):
+        shutil.copytree(HUB / d, hub / d, symlinks=True)
+    estate = fx.build(tmp_path / "estate", with_forecast=False, with_outcome=False)
+    env = {k: v for k, v in os.environ.items() if not k.startswith("LOCAL_CLOCK_")}
+    env.update({"LOCAL_CLOCK_CLAUDE": str(hub / "verify/local-clock/stub-claude.sh"),
+                "LOCAL_CLOCK_HOME": str(tmp_path / ".local-clock"), "LOCAL_CLOCK_ESTATE": str(estate),
+                "LOCAL_CLOCK_PYTHON": sys.executable, "LOCAL_CLOCK_STUB": "forecast-tamper",
+                "LOCAL_CLOCK_STUB_HUB_IS_A_COPY": "1"})
+    run = subprocess.run(["bash", str(hub / "talk" / "local-clock.sh"), "--adopter", "driftwood",
+                          "--step", "derive"], capture_output=True, text=True, env=env, cwd=str(hub))
+    assert run.returncode != 0, run.stdout
+    assert "the child changed the hub's own twin package or /derive-probability" in run.stdout, run.stdout
+    # the tamper really did land: the copy's validator is now the always-pass stub
+    assert "A stub that passes anything" in (hub / ".claude/skills/derive-probability/assets/validate_forecast.py").read_text()
+    # and nothing was proposed: a refusal deletes the PR title and body the model wrote
+    bodies = sorted((tmp_path / ".local-clock" / "runs").glob("*/derive-driftwood.pr-body.md"))
+    assert bodies == [], f"a PR body survived the refusal: {bodies}"
+
+
+def test_the_clock_says_the_local_layer_is_advisory(fx, tmp_path: Path) -> None:
+    """Review F5, the sentence half: L1 is advisory and L3 (the gate, over origin/main) is the
+    measurement, and the run says so rather than leaving a reader to assume otherwise."""
+    estate = fx.build(tmp_path / "estate", with_forecast=False, with_outcome=False)
+    run = _clock(estate, tmp_path / ".local-clock", "forecast")
+    assert run.returncode == 0, run.stdout + run.stderr
+    assert "BEFORE the model started and run from there" in run.stdout, run.stdout
+    assert "This local layer is ADVISORY" in run.stdout, run.stdout
+    assert "verify/twin-evals/verify-derived-forecast.sh" in run.stdout, run.stdout
+
+
+def test_a_commit_dated_before_its_own_parent_is_counted(fx, tmp_path: Path, capsys) -> None:
+    """Review F10: the clock-provenance limit was a sentence and the cheap tell was not taken --
+    an add commit dated 2025-01-01 whose own first parent is dated 2026-01-01 was scored as
+    pre-registered with nothing said. The limit stands (GitHub's clock versus a laptop's cannot be
+    told apart offline); the impossibility is now a number on every run."""
+    estate = fx.build(tmp_path / "estate", with_forecast=False, with_outcome=False)
+    fx.backdated_forecast(estate)
+    arrival = df.first_reached(estate / "driftwood", fx.FORECAST_PATH, "refs/remotes/origin/main")
+    assert arrival is not None
+    assert df.committed_before_its_parent(estate / "driftwood", arrival.last_sha) is True
+    df.check(str(estate), str(HUB), adopters=["driftwood"], now="2026-09-06T00:00:00Z")
+    out = capsys.readouterr().out
+    assert "1 registering commit(s) dated before their own first parent" in out, out
+    assert "1 distinct evidence grade(s) across every signal read (5)" in out, out

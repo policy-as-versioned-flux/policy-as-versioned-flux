@@ -41,17 +41,29 @@ Every probability in it carries:
     served envelope CARRIES that observation. A statement with no observation behind it is a
     scenario, not a signal.
 
-**Pre-registration is git history, not a field.** `first_reached()` reads the committer date of
-the first-parent commit that brought the file onto the served ref (`refs/remotes/origin/main`)
--- on GitHub that is the merge, dated by GitHub. `pre_registered()` is true only when that date
-is strictly before the outcome date. A forecast the twin dates early and a human merges late is
-not pre-registered, and a probability that was not pre-registered is not scored (item 3).
+**Pre-registration is git history, not a field.** `first_reached()` reads TWO first-parent
+committer dates on the served ref (`refs/remotes/origin/main`): when the path ARRIVED, and when
+it was LAST WRITTEN there. On GitHub the arrival is the merge, dated by GitHub. `pre_registered()`
+keys on the last write and both dates are printed, because measuring the arrival alone measures
+the PATH and not the CONTENT: a forecast rewritten after it landed -- in place, by delete and
+re-add, or by a squash-add -- kept the original arrival date and was scored (review F1, measured:
+re-added 2026-07-20 with `probability: 0.999` against an outcome on main since 2026-07-01,
+`pre-registered: yes` at 2026-02-01, `brier=1e-06`, PASS). Under the last write, a number
+rewritten after it landed is a NEW forecast and re-registers on the day of the rewrite. A RENAME
+still costs a forecast its registration, which is the honest direction and is kept. A forecast
+the twin dates early and a human merges late is not pre-registered, and a probability that was
+not pre-registered is not scored (item 3).
 
 **Scoring is `twin/scoring.py`, computed, never read.** The outcome is the overlay's own
 `outcomes/` record (`twin/schema.py` `outcome`: `proposition, observed, resolved_on, source,
 contamination, source_dated`), authored by a human, merged by a human, and it too must have
-reached the served ref on or after the date it says it resolved. `check()` pairs each forecast
-with the outcome resolving its proposition and prints the Brier and log scores it computes.
+reached the served ref on or after the date it says it resolved. The answer key is immutable once
+it is there: an outcome REWRITTEN on the served ref is refused by name, because editing it
+silently rescores every forecast it resolves while the run goes on printing the original date
+(review F2, measured: `observed: true` -> `false` moved brier 0.5329 -> 0.0729, both PASS). Two
+outcomes resolving one proposition are refused too, rather than the first sorted one silently
+winning. `check()` pairs each forecast with the outcome resolving its proposition and prints the
+Brier and log scores it computes.
 
 `ponytail:` hand-rolled rules, no jsonschema, for the same reason `validate_claim.py` gives:
 the adopter-side python has pyyaml and not jsonschema. The claim kinds, the roles and the
@@ -68,7 +80,7 @@ import sys
 import tarfile
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 import yaml
 
@@ -112,6 +124,36 @@ class DerivedForecastError(ValueError):
 
 class CannotLook(RuntimeError):
     """A validator or check that could not read what it grades against. Never a pass."""
+
+
+class StrictLoader(yaml.SafeLoader):
+    """`yaml.SafeLoader`, with a duplicate mapping key REFUSED instead of silently resolved.
+
+    PyYAML keeps the LAST of two identical keys, so a file whose visible `probability: 0.999`
+    sits above a real `probability: 0.27` validates as 0.27: the file a human reviews in the
+    pull request is not the file the validator read (review F4, measured -- the clock committed
+    it). Every YAML this module reads goes through here.
+    """
+
+    def construct_mapping(self, node: Any, deep: bool = False) -> dict[Any, Any]:
+        seen: set[Any] = set()
+        for key_node, _ in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            if key in seen:
+                raise yaml.constructor.ConstructorError(
+                    "while constructing a mapping", node.start_mark,
+                    f"duplicate key {key!r}: PyYAML keeps the last, so the file a human reads is "
+                    f"not the file this validator reads", key_node.start_mark)
+            seen.add(key)
+        return super().construct_mapping(node, deep=deep)
+
+
+def load_yaml(text: str, where: str) -> Any:
+    """`yaml.safe_load` with duplicate keys refused (StrictLoader), as a DerivedForecastError."""
+    try:
+        return yaml.load(text, Loader=StrictLoader)
+    except yaml.YAMLError as exc:
+        raise DerivedForecastError(f"{where} is not YAML this validator will read: {exc}") from exc
 
 
 # --- the served envelopes ---------------------------------------------------------------------
@@ -231,7 +273,7 @@ def observation_missing(signal: dict[str, Any], feeds_root: Path) -> str | None:
 def _read_yaml(path: Path) -> dict[str, Any] | None:
     if not path.is_file():
         return None
-    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    doc = load_yaml(path.read_text(encoding="utf-8"), str(path))
     return doc if isinstance(doc, dict) else None
 
 
@@ -369,7 +411,13 @@ def validate(doc: dict[str, Any], roles: set[str], headless: bool = False,
     for f in forecasts:
         where = f"forecast {f.get('id')!r}"
         need(not f.get("injected"), f"{where}: injected: true -- a rehearsal forecast is refused")
-        for field in ("scenario", "proposition", "perspective", "reasoning"):
+        # SKILL.md 2 and this ticket's Answer both say EVERY forecast carries these. `reasoning`
+        # says why the number is what it is; `prices_through` names the only path a number here
+        # could ever reach money by; `recorded_belief` keeps the world model's own number beside
+        # the derivation so the disagreement is on the record and both can be scored. All three
+        # were promised and none of the last two was required (review F7, both measured ACCEPTED
+        # when absent) -- a sentence claiming more than the run measured.
+        for field in ("scenario", "proposition", "perspective", "reasoning", "prices_through"):
             need(bool(f.get(field)), f"{where}: no {field}")
         try:
             schema.probability(f.get("probability"), where)
@@ -390,6 +438,10 @@ def validate(doc: dict[str, Any], roles: set[str], headless: bool = False,
         need(basis in BASES, f"{where}: basis {basis!r} is not one of {BASES}")
         signals = f.get("signals") or []
         belief = f.get("recorded_belief")
+        need(belief is not None,
+             f"{where}: no recorded_belief -- every forecast keeps the world model's own number "
+             f"beside it, the way an override keeps the position it answers, so the disagreement "
+             f"is on the record and both are scored (SKILL.md 2)")
         if belief is not None:
             need(isinstance(belief, dict) and bool(belief.get("world_model"))
                  and isinstance(belief.get("probability"), (int, float)),
@@ -507,15 +559,81 @@ def _git(repo: Path, *args: str) -> str | None:
     return run.stdout if run.returncode == 0 else None
 
 
-def first_reached(repo: Path, path: str, ref: str = "refs/remotes/origin/main") -> tuple[str, str] | None:
-    """(committer date ISO-8601, sha) of the FIRST-PARENT commit that brought `path` onto `ref`.
-    On the served branch that is the merge commit, dated by whoever performed the merge -- for a
-    pull request merged through GitHub, GitHub's clock. None when the path is not on the ref."""
-    out = _git(repo, "log", "--first-parent", "--diff-filter=A", "--format=%cI %H", "--reverse", ref, "--", path)
-    if not out or not out.strip():
+class Arrival(NamedTuple):
+    """When a path ARRIVED on the served ref, and when it was last WRITTEN there.
+
+    Both are first-parent committer dates on the served ref. They differ whenever the file was
+    rewritten after it landed -- edited in place, deleted and re-added, or squashed in again --
+    and that difference is the whole of review F1: measuring pre-registration on the path's
+    first add measures the PATH, not the CONTENT, so a number rewritten once the answer was
+    already on main still reported `pre-registered: yes` at the original date and was scored
+    (measured: re-added 2026-07-20 with `probability: 0.999` against an outcome on main since
+    2026-07-01, `brier=1e-06`, PASS).
+    """
+
+    added: str
+    added_sha: str
+    last: str
+    last_sha: str
+
+    @property
+    def rewritten(self) -> bool:
+        return self.added_sha != self.last_sha
+
+    def where(self, ref: str) -> str:
+        """The sentence both dates are printed in, so the limit stays a number on every run."""
+        text = f"reached {ref} {self.added} in {self.added_sha[:7]}"
+        if self.rewritten:
+            text += f", last written there {self.last} in {self.last_sha[:7]} (rewritten after it landed)"
+        else:
+            text += f", never rewritten there since"
+        return text
+
+
+def first_reached(repo: Path, path: str, ref: str = "refs/remotes/origin/main") -> Arrival | None:
+    """When `path` arrived on `ref` and when it was last written there, both read off FIRST-PARENT
+    history. On the served branch the arrival is the merge commit, dated by whoever performed the
+    merge -- for a pull request merged through GitHub, GitHub's clock. None when the path is not
+    on the ref.
+
+    Two reads, not one. `--diff-filter=A --reverse | head -1` answers "when did this PATH first
+    appear", which is not "when was this CONTENT registered": a rewrite in place, a delete and
+    re-add, or a squash-add leaves the first add exactly where it was. `pre_registered()` keys on
+    the LAST write, so a forecast rewritten after it landed is a NEW forecast and re-registers on
+    the day of the rewrite. A RENAME still costs a forecast its registration -- the new path's
+    first add is the rename commit -- which is the honest direction and is kept.
+    """
+    added = _git(repo, "log", "--first-parent", "--diff-filter=A", "--format=%cI %H", "--reverse", ref, "--", path)
+    if not added or not added.strip():
         return None
-    stamp, sha = out.strip().splitlines()[0].split(" ", 1)
-    return stamp, sha
+    add_stamp, add_sha = added.strip().splitlines()[0].split(" ", 1)
+    last = _git(repo, "log", "--first-parent", "-1", "--format=%cI %H", ref, "--", path)
+    if not last or not last.strip():  # unreachable while the add is readable; never guess
+        return None
+    last_stamp, last_sha = last.strip().splitlines()[0].split(" ", 1)
+    return Arrival(add_stamp, add_sha, last_stamp, last_sha)
+
+
+def committed_before_its_parent(repo: Path, sha: str) -> bool | None:
+    """True when `sha`'s committer date is EARLIER than its own first parent's -- the cheap tell
+    that a committer date was chosen rather than taken (review F10).
+
+    The pre-registration date is a committer date. Merged through GitHub it is GitHub's clock; a
+    fast-forward push from a laptop carries the laptop's, and `GIT_COMMITTER_DATE` carries
+    whatever was typed. This check cannot tell those apart offline -- that limit stands. But a
+    commit dated BEFORE the commit it sits on is not a clock disagreement, it is an impossibility,
+    and it is free to count. None when there is no parent to compare against.
+    """
+    here = _git(repo, "log", "-1", "--format=%cI", sha)
+    parent = _git(repo, "log", "-1", "--format=%cI", f"{sha}^")
+    if not here or not parent or not here.strip() or not parent.strip():
+        return None
+    return _stamp(here.strip()) < _stamp(parent.strip())
+
+
+def _stamp(stamp: str) -> dt.datetime:
+    parsed = dt.datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+    return parsed.replace(tzinfo=dt.timezone.utc) if parsed.tzinfo is None else parsed
 
 
 def _date_of(stamp: str) -> dt.date:
@@ -527,10 +645,28 @@ def _date_of(stamp: str) -> dt.date:
 
 
 def pre_registered(reached: str, resolves_on: str) -> bool:
-    """True only when the forecast reached the served ref on a UTC date strictly before the
-    outcome date. Strictly: a forecast merged on the day the question resolves could have seen
-    the answer."""
+    """True only when the forecast was LAST WRITTEN onto the served ref on a UTC date strictly
+    before the outcome date. Strictly: a forecast merged on the day the question resolves could
+    have seen the answer. Callers pass `Arrival.last`, never `Arrival.added` -- a number rewritten
+    after it landed is registered on the day of the rewrite (review F1)."""
     return _date_of(reached) < dt.date.fromisoformat(str(resolves_on))
+
+
+def signed_feed_tags(feeds_repo: Path) -> tuple[list[str], list[str]]:
+    """(every tag naming a pool feed, those of them carrying a signature block).
+
+    `git tag --list` counts NAMES: two unsigned annotated tags satisfied it and the run printed
+    "2 signed tag(s)" (review F3, measured). Ticket 84's verify/supersede reads the tag OBJECT
+    and requires the armour block, and so does this. A lightweight tag has no object to read --
+    `git cat-file tag` refuses it -- and counts as unsigned, which is what it is.
+    """
+    listed = [t for t in (_git(feeds_repo, "tag", "--list", *(f"{name}/*" for name in POOL_FEEDS)) or "").split() if t]
+    signed = []
+    for tag in listed:
+        body = _git(feeds_repo, "cat-file", "tag", tag)
+        if body and "SIGNATURE-----" in body:
+            signed.append(tag)
+    return listed, signed
 
 
 def score(forecast: dict[str, Any], outcome: dict[str, Any]) -> dict[str, float]:
@@ -620,13 +756,19 @@ def check(estate: str, hub: str, adopters: list[str] | None = None, now: str | N
     derived_total = recorded_total = late_total = 0
     earliest_pending: str | None = None
     pinned = 0
+    # Review F9: every signal's grade is FORCED to 5 by validate() before `weakest = max(grades)`,
+    # so the reopened ordinal comparison is a TAUTOLOGY today -- it is built for the day a signal
+    # at another rung exists, and until then the run says how many distinct grades it saw.
+    # Review F10: how many registering commits are dated before their own first parent.
+    grades_seen: set[int] = set()
+    impossible_dates: set[str] = set()
     with tempfile.TemporaryDirectory() as tmp:
         feeds_tree = _served_tree(feeds_repo, ref, Path(tmp) / "feeds", POOL_FEEDS + ("party.yaml",))
         if feeds_tree is None:
             print(f"SKIP: could not read {ref} of {feeds_repo}: the served pool cannot be confirmed")
             return 3
         feeds_root = feeds_tree
-        feed_tags = _git(feeds_repo, "tag", "--list", "news/*", "market-moves/*") or ""
+        feed_tags, signed_tags = signed_feed_tags(feeds_repo)
         for adopter in names:
             repo = estate_path / adopter
             tree = _served_tree(repo, ref, Path(tmp) / adopter)
@@ -643,7 +785,11 @@ def check(estate: str, hub: str, adopters: list[str] | None = None, now: str | N
             outcomes = []
             for path in sorted((tree / "twin" / "orgs" / adopter / "outcomes").glob("*.yaml")) \
                     if (tree / "twin" / "orgs" / adopter / "outcomes").is_dir() else []:
-                doc = _read_yaml(path) or {}
+                try:
+                    doc = _read_yaml(path) or {}
+                except DerivedForecastError as exc:
+                    fails.append(f"{adopter}: outcome {path.name}: {exc}")
+                    continue
                 try:
                     schema.validate("outcome", doc, f"{adopter}:{path.name}")
                 except schema.SchemaError as exc:
@@ -654,15 +800,40 @@ def check(estate: str, hub: str, adopters: list[str] | None = None, now: str | N
                 if reached is None:
                     fails.append(f"{adopter}: outcome {rel} is on the tree but not in {ref}'s first-parent history")
                     continue
-                if _date_of(reached[0]) < dt.date.fromisoformat(str(doc["resolved_on"])):
-                    fails.append(f"{adopter}: outcome {doc['id']} reached {ref} on {_date_of(reached[0])}, before the "
+                # The answer key is immutable once it is on the served ref. An outcome edited
+                # afterwards silently rescores every forecast it resolves while the run goes on
+                # printing the ORIGINAL date (review F2, measured: `observed: true` -> `false`
+                # committed 2026-07-25 moved brier 0.5329 -> 0.0729, both PASS). A correction is
+                # a new record, and it arrives with its own date where anyone can see it.
+                if reached.rewritten:
+                    fails.append(f"{adopter}: outcome {doc['id']} reached {ref} on {_date_of(reached.added)} in "
+                                 f"{reached.added_sha[:7]} and was rewritten there on {_date_of(reached.last)} in "
+                                 f"{reached.last_sha[:7]} -- an answer key edited after it landed rescores every "
+                                 f"forecast it resolves, and nothing on the record would say so")
+                    continue
+                if _date_of(reached.added) < dt.date.fromisoformat(str(doc["resolved_on"])):
+                    fails.append(f"{adopter}: outcome {doc['id']} reached {ref} on {_date_of(reached.added)}, before the "
                                  f"date it says it resolved ({doc['resolved_on']}) -- an answer recorded before the question closed")
                     continue
                 outcomes.append((doc, reached))
+            # Two answer keys for one question: `matching[0]` silently took whichever sorted
+            # first and the run PASSed with no word that they disagree (review F2, measured).
+            by_proposition: dict[str, list[str]] = {}
+            for doc, _ in outcomes:
+                by_proposition.setdefault(str(doc.get("proposition")), []).append(str(doc.get("id")))
+            for proposition, ids in sorted(by_proposition.items()):
+                if len(ids) > 1:
+                    fails.append(f"{adopter}: {len(ids)} outcomes resolve {proposition!r} ({', '.join(sorted(ids))}) "
+                                 f"-- two answer keys for one question; the check will not pick one, and a forecast "
+                                 f"on that proposition is not scored until one of them is withdrawn")
             print(f"    {adopter}: {len(files)} *{SUFFIX} on {ref} (ref last updated {age_text}); "
                   f"{len(outcomes)} outcome(s) in twin/orgs/{adopter}/outcomes")
             for rel in files:
-                fdoc = _read_yaml(tree / rel)
+                try:
+                    fdoc = _read_yaml(tree / rel)
+                except DerivedForecastError as exc:
+                    fails.append(f"{adopter}: {rel}: {exc}")
+                    continue
                 if fdoc is None:
                     fails.append(f"{adopter}: {rel} is not a YAML mapping")
                     continue
@@ -671,6 +842,9 @@ def check(estate: str, hub: str, adopters: list[str] | None = None, now: str | N
                                    adopter_root=tree, feeds_root=feeds_root)
                 except CannotLook as exc:
                     waits.append(f"{adopter}: {rel}: could not look: {exc}")
+                    continue
+                except DerivedForecastError as exc:
+                    fails.append(f"{adopter}: {rel}: {exc}")
                     continue
                 if bad:
                     for reason in bad:
@@ -688,22 +862,41 @@ def check(estate: str, hub: str, adopters: list[str] | None = None, now: str | N
                     else:
                         recorded_total += 1
                     matching = [o for o in outcomes if str(o[0].get("proposition")) == str(f["proposition"])]
+                    if len(matching) > 1:
+                        # already failed above, by proposition. Say so on the forecast's own line
+                        # rather than dropping it out of the listing: a forecast that vanishes
+                        # from the record is a gap a reader has to notice.
+                        print(f"    forecast {f['id']}: p={f['probability']} basis={basis} -- not read: "
+                              f"{len(matching)} outcomes resolve {f['proposition']!r} and the check picks neither")
+                        continue
                     closes = str(f["resolves_on"])
                     if matching:
                         closes = min(closes, str(matching[0][0]["resolved_on"]))
-                    pre = pre_registered(reached[0], closes)
+                    # The LAST write onto the served ref, not the first add. Both are printed.
+                    pre = pre_registered(reached.last, closes)
+                    for s_grade in (s.get("evidence_grade") for s in f.get("signals") or []):
+                        if isinstance(s_grade, int):
+                            grades_seen.add(s_grade)
+                    # by COMMIT, not by forecast: one file can carry several probabilities
+                    if committed_before_its_parent(repo, reached.last_sha):
+                        impossible_dates.add(reached.last_sha)
                     signals = ", ".join(
                         f"{s['kind']} {s.get('market') or s.get('event')} ({s['from']['name']}@{s['from']['version']})"
                         for s in f.get("signals") or []) or "none (recorded belief)"
                     grade = f"grade {f['evidence_grade']}" if f.get("evidence_grade") is not None \
                         else "carries no grade (the world-model schema carries none for a recorded belief)"
                     print(f"    forecast {f['id']}: p={f['probability']} basis={basis} {grade} perspective={f['perspective']} "
-                          f"currency={f['currency']} signals: {signals}; reached {ref} {reached[0]} in {reached[1][:7]}, "
-                          f"outcome date {closes}: pre-registered: {'yes' if pre else 'no'}")
+                          f"currency={f['currency']} signals: {signals}; {reached.where(ref)}, "
+                          f"outcome date {closes}: pre-registered: {'yes' if pre else 'no'} "
+                          f"(registered {_date_of(reached.last)}, added {_date_of(reached.added)})")
                     if not pre:
                         late_total += 1
-                        fails.append(f"{adopter}: forecast {f['id']} reached {ref} on {_date_of(reached[0])}, not before "
-                                     f"its outcome date {closes}: not pre-registered, not scored")
+                        rewrite = (f" (added {_date_of(reached.added)} and rewritten there in {reached.last_sha[:7]}: "
+                                   f"a number rewritten after it landed is registered on the day of the rewrite)"
+                                   if reached.rewritten else "")
+                        fails.append(f"{adopter}: forecast {f['id']} was last written onto {ref} on "
+                                     f"{_date_of(reached.last)}{rewrite}, not before its outcome date {closes}: "
+                                     f"not pre-registered, not scored")
                         continue
                     if dt.date.fromisoformat(str(f["resolves_on"])) > moment.date() and not matching:
                         if earliest_pending is None or str(f["resolves_on"]) < earliest_pending:
@@ -714,21 +907,32 @@ def check(estate: str, hub: str, adopters: list[str] | None = None, now: str | N
                                      f"outcome in twin/orgs/{adopter}/outcomes resolves {f['proposition']!r} yet")
                         continue
                     outcome, o_reached = matching[0]
-                    if _date_of(o_reached[0]) <= _date_of(reached[0]):
-                        fails.append(f"{adopter}: outcome {outcome['id']} reached {ref} ({o_reached[0]}) no later than "
-                                     f"forecast {f['id']} ({reached[0]}): the answer was on main before the forecast")
+                    if _date_of(o_reached.added) <= _date_of(reached.last):
+                        fails.append(f"{adopter}: outcome {outcome['id']} reached {ref} ({o_reached.added}) no later than "
+                                     f"forecast {f['id']} was last written there ({reached.last}): the answer was on main "
+                                     f"before the forecast")
                         continue
                     result = score(f, outcome)
                     scored += 1 if basis == "derived" else 0
                     print(f"    scored   {f['id']} against outcome {outcome['id']} (observed={outcome['observed']}, "
-                          f"reached {o_reached[0]}): " + " ".join(f"{k}={v}" for k, v in result.items())
+                          f"reached {o_reached.added}, never rewritten there): " + " ".join(f"{k}={v}" for k, v in result.items())
                           + f" (lower is better; computed now, {moment.date()}, by twin/scoring.py; {basis})")
-        tags = [t for t in feed_tags.split() if t]
         print(f"    note: {pinned} of {len(names)} adopter(s) pin news or market-moves in party.yaml inherits[]; "
-              f"the feeds publisher has {len(tags)} signed tag(s) naming either -- the pool is served unpinned and "
-              f"untagged, so nothing derived from it is price-eligible (ticket 23)")
+              f"the feeds publisher has {len(feed_tags)} tag(s) naming either, {len(signed_tags)} of them carrying a "
+              f"signature block (read with `git cat-file tag`, ticket 84's rule; a lightweight tag has no object to "
+              f"read and counts as unsigned) -- the pool is served unpinned and untagged, so nothing derived from it "
+              f"is price-eligible (ticket 23)")
     print(f"    totals: {derived_total} derived, {recorded_total} recorded (carrying no grade), {late_total} late, "
           f"{scored} derived and scored")
+    tautology = ("" if len(grades_seen) > 1 else
+                 " -- until that is more than one, 'no stronger than its weakest signal' is a "
+                 "comparison with nothing to compare, and it is built for the day a signal at "
+                 "another rung exists")
+    print(f"    limits: {len(grades_seen)} distinct evidence grade(s) across every signal read "
+          f"({', '.join(str(g) for g in sorted(grades_seen)) or 'no signal read'}){tautology}; "
+          f"{len(impossible_dates)} registering commit(s) dated before their own first parent. A "
+          f"committer date merged through GitHub is GitHub's; a fast-forward push from a laptop "
+          f"carries the laptop's, and this check cannot tell those two apart offline")
     if fails:
         for line in fails:
             print(f"    FAIL: {line}")

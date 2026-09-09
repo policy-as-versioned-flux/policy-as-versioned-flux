@@ -316,8 +316,13 @@ def test_a_file_under_the_claims_path_that_is_not_a_claim_fails_the_step_uncheck
     assert not (run_dir / "classify-driftwood.pr-body.md").exists(), "the model's body survived the refusal"
     assert not (run_dir / "classify-driftwood.pr-title").exists(), "the model's title survived the refusal"
     # the rendered prompt carries the phrase as the instruction to the model, and the transcript
-    # is the model's words; every other file in the run directory is the clock's, and none may say it
+    # is the model's words; every other file in the run directory is the clock's, and none may say
+    # it. `<step>-<adopter>.judge/` is exempt because it is a VERBATIM COPY of the hub's twin
+    # package and the skill, taken before the child so the validator is not the tree the child can
+    # write to (ecosystem ticket 93 review F5) -- the skill's own text is not the clock's words.
     for p in run_dir.rglob("*"):
+        if ".judge/" in str(p.relative_to(run_dir).as_posix()) or p.name.endswith(".judge"):
+            continue
         if p.is_file() and not p.name.endswith((".system.md", ".claude.json", ".claude.err")):
             assert "no override is claimed" not in p.read_text(errors="replace").lower(), p
     steps = [json.loads(l) for l in (run_dir / "steps.jsonl").read_text().splitlines()]

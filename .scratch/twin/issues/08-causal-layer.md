@@ -182,3 +182,11 @@ every derived forecast carries `evidence_grade: 5` and `price_eligible: false`. 
 ladder could not grade are recorded rather than graded: a recorded belief (the world-model
 schema carries no source and no grade for one; the artefact says `null` and why), and the ladder
 itself gains no rung. ADR-0024 point 6 carries the dated note beside the clock that runs it.
+
+**Amended 2026-09-09 (eco-system ticket 93 review, F9).** The one admitted operation is a
+tautology on today's population, and the note above did not say so. `validate()` requires every
+signal to be `evidence_grade: 5` before `weakest = max(grades)` is taken, so the comparison has
+one value to compare and cannot fail; it is built for the day a signal at another rung exists.
+The check now prints the number of DISTINCT grades it saw across every signal read (one, today),
+so a reader cannot take the passing comparison for evidence that anything was ever compared.
+Nothing about Q1's ruling changes: a sum, a mean or a weight on a grade stays refused.

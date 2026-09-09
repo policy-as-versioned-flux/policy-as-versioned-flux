@@ -13,7 +13,16 @@ the schema allows -- 5 for a derivation, none for a recorded belief; a derived p
 on at least one signal whose observation the SERVED feed envelope carries (a move between two
 dated levels, or a news event with its URL), cited by envelope; no weight, score or probability
 on a signal (no arithmetic on ordinals, no level read as a probability); a recorded belief is the
-world model's number unchanged; the scenario, its horizon and the perspective are the overlay's.
+world model's number unchanged; the scenario, its horizon and the perspective are the overlay's;
+`prices_through` and `recorded_belief` on every forecast, both of which SKILL.md 2 promises;
+and a DUPLICATE YAML KEY anywhere in the file is refused, so the file a human reads in the pull
+request is the file this validator read.
+
+**This layer is advisory.** It runs on the owner's machine, in a tree a headless model can write
+to; the measurement of record is the gate, `verify/twin-evals/verify-derived-forecast.sh`, over
+`origin/main`. The local clock copies this file and the twin package OUT of the hub before the
+model starts and runs the copy, and reads the hub's own copies back afterwards (review F5), but
+the copy is still only as good as the machine it sits on.
 
 `--headless` is the local clock's word (ticket 92): the file must say `run.headless: true`.
 `--feeds` defaults to `$LOCAL_CLOCK_ESTATE/feeds`, then `<hub>/.estate-clone/feeds`. `--adopter`
@@ -64,7 +73,16 @@ def main(argv=None):
               f"perspective and recorded belief cannot be checked against an overlay")
         return 2
 
-    doc = yaml.safe_load(open(path))
+    # `df.load_yaml`, never `yaml.safe_load`: a duplicate mapping key is REFUSED here, because
+    # PyYAML keeps the last of two and the file a human reads in the pull request would not be
+    # the file this validator read (review F4, measured: a visible `probability: 0.999` above a
+    # real 0.27 validated as 0.27 and the clock committed it).
+    try:
+        doc = df.load_yaml(open(path, encoding="utf-8").read(), path)
+    except df.DerivedForecastError as exc:
+        print(f"not ok  {exc}")
+        print(f"FAIL: {path} is not a forecast file the twin can read")
+        return 1
     if not isinstance(doc, dict):
         print(f"not ok  {path} is not a YAML mapping")
         print(f"FAIL: {path} is not a forecast file the twin can read")
@@ -74,6 +92,10 @@ def main(argv=None):
     except df.CannotLook as exc:
         print(f"SKIP: {exc}")
         return 2
+    except df.DerivedForecastError as exc:
+        print(f"not ok  {exc}")
+        print(f"FAIL: {path} is not a forecast file the twin can read")
+        return 1
     if bad:
         for line in bad:
             print(f"not ok  {line}")

@@ -159,6 +159,11 @@ write, and what it may never write.
      the WEAKEST grade among the signals it rests on -- an order statistic, a comparison the
      ladder already makes -- and the validator refuses a `weight` or `score` on a signal and any
      grade stronger than the weakest input. Sums, means and weights on grades stay refused.
+     *Amended 2026-09-09 (review F9):* `validate()` forces every signal to grade 5 before the
+     comparison is made, so on today's population that comparison is a TAUTOLOGY -- it is built
+     for the day a signal at another rung exists, and until then the check prints the number of
+     distinct grades it saw (one) so nobody reads the passing comparison as evidence it ever
+     compared anything.
      **The world-model schema** (`twin/schema.py` `world-model`: `beliefs: mapping_of(probability)`)
      carries neither a source nor a grade for a recorded belief, and the ladder has no rung for an
      unsourced authored number. That is recorded as a finding on the artefact (`evidence_grade:
@@ -168,7 +173,19 @@ write, and what it may never write.
      field the twin writes), the outcome is the overlay's own `outcomes/` record merged on or
      after its `resolved_on`, and the score is computed by
      `verify/twin-evals/verify-derived-forecast.sh` with `twin/scoring.py` and never read from a
-     file. The pool the derivation rests on (`news`, `market-moves`) is pinned by no adopter and
+     file.
+     *Amended 2026-09-09 (review F1 and F2, both blocking).* Pre-registration is measured on the
+     CONTENT, not on the path: the check reads TWO first-parent dates on `origin/main` -- when the
+     file arrived and when it was LAST WRITTEN there -- keys pre-registration on the last write,
+     and prints both. Measuring the arrival alone measured only where a path first appeared, so a
+     number rewritten after the answer was already on main (in place, by delete and re-add, or by
+     a squash-add) kept its original date and was scored. A rewritten forecast is a new forecast
+     and re-registers on the day of the rewrite; a RENAME still costs a forecast its registration,
+     which is the honest direction, and is kept. The ANSWER KEY is immutable once it is on the
+     served ref for the same reason: an outcome edited afterwards silently rescores every forecast
+     it resolves, so a rewritten outcome is refused by name, and two outcomes resolving one
+     proposition are refused rather than the first sorted one silently winning.
+     The pool the derivation rests on (`news`, `market-moves`) is pinned by no adopter and
      tagged by no publisher on this date; the check prints both counts, and ticket 23's rule
      holds: nothing derived from it is price-eligible.
 

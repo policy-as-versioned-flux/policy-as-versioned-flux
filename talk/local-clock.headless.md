@@ -17,8 +17,10 @@ differs from a human-run one. Where they conflict, this note wins.
   `{{ESTATE}}/insurer` -- read feeds at the version the adopter's `party.yaml` pins, and the
   pool (`news`, `market-moves`) at the version its served envelope declares.
 - This run's directory: `{{RUN_DIR}}`.
-- This step's file: one `{{PATTERN}}` under `{{PATHS}}`, checked by
-  `.claude/skills/{{SKILL}}/{{VALIDATOR}}`.
+- This step's file: EXACTLY ONE `{{PATTERN}}` under `{{PATHS}}`, checked by
+  `.claude/skills/{{SKILL}}/{{VALIDATOR}}`. The clock counts the files in your commit and refuses
+  two: two files are two proposals in one review, and the pull-request body it writes about your
+  commit speaks about one.
 
 ## What a headless run may and may not do
 
@@ -50,9 +52,12 @@ differs from a human-run one. Where they conflict, this note wins.
 6. If there is nothing to propose (every pool entry is already bound, or nothing fits), commit
    nothing and say so. Leave the worktree clean.
 7. Validate before you commit: `python3 .claude/skills/{{SKILL}}/{{VALIDATOR}} <the file>
-   --twin . --headless`. The clock runs the same command after you stop; a file that does not
-   say `headless: true`, carries an override, or cites an observation the served feed does not
-   carry fails the step, whatever this note was answered with.
+   --twin . --headless`. After you stop, the clock runs that validator again -- but from a COPY
+   of the twin package and the skill that it took BEFORE you started, and it refuses the run if
+   the hub's own copies changed while you worked. Editing the validator, or the rules it imports,
+   changes nothing about the judgement and loses the step. A file that does not say
+   `headless: true`, carries an override, cites an observation the served feed does not carry, or
+   repeats a YAML key fails the step, whatever this note was answered with.
 8. End with one line: `LOCAL-CLOCK: <ok|nothing|failed> <one sentence>`.
 
 {{INJECTED_BLOCK}}

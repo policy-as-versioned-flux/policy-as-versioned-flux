@@ -65,15 +65,26 @@ a rebase drops them. Ticket 75 Q10 is owner-reasoned and was not re-decided: the
    validator to the model (`{{PATTERN}}`, `{{VALIDATOR}}`), so the note is not wrong for either
    row. `stub-claude.sh` gains `forecast` and `forecast-fabricated` so the row is proved end to
    end with a stand-in that says so.
-5. **Pre-registration and scoring**, `twin/derived_forecast.py`: `first_reached()` reads the
-   committer date of the FIRST-PARENT commit that brought the file onto `refs/remotes/origin/main`
-   (on GitHub, the merge, on GitHub's clock); `pre_registered()` is true only when that UTC date
-   is strictly before the outcome date; `score()` is `twin/scoring.py`'s Brier and log loss on
-   the forecast and the overlay's own `outcome` record, never a second implementation and never
-   read from a file. The outcome must itself have reached the ref on or after its `resolved_on`
-   and after the forecast.
+5. **Pre-registration and scoring**, `twin/derived_forecast.py`: `first_reached()` reads
+   `refs/remotes/origin/main`'s first-parent history for the file. *Corrected 2026-09-09 (review
+   F1, blocking): it read only the FIRST-PARENT commit that ADDED the path -- which answers "when
+   did this path first appear", not "when was this content registered" -- so a forecast rewritten
+   after the answer was already on main kept its original date and was scored. It now returns an
+   `Arrival` carrying BOTH dates, when the path arrived and when it was LAST WRITTEN there;
+   `pre_registered()` is true only when the LAST WRITE's UTC date is strictly before the outcome
+   date, and both dates are printed on every forecast line.* `score()` is `twin/scoring.py`'s
+   Brier and log loss on the forecast and the overlay's own `outcome` record, never a second
+   implementation and never read from a file. The outcome must itself have reached the ref on or
+   after its `resolved_on` and after the forecast, must NOT have been rewritten there since
+   (*review F2: an answer key edited after it lands rescores every forecast it resolves and
+   nothing on the record would say so*), and must be the only outcome resolving its proposition.
 6. **The check**, `verify/twin-evals/verify-derived-forecast.sh` (discovered by
-   `talk/verify-all.sh`; manifest row `estate-observation`, five declared waits). First half:
+   `talk/verify-all.sh`; manifest row `estate-observation`, five declared waits and -- *corrected
+   2026-09-09, review F11* -- FIVE undeclared could-not-looks, not the two the row's comment
+   named: no feeds checkout, no unit carrying a twin overlay, and the wrapper's three interpreter
+   and environment SKIPs (no `.venv` and a `python3` without pyyaml, no `git`, no `twin/VERSION`
+   in the root). All five go red, which is `verify-untagged-pin-is-priced.sh`'s precedent and the
+   right call; the record simply did not say so). First half:
    the whole seam over throwaway repositories with bare origins built by
    `verify/twin-evals/derived_forecast_fixture.py` (a forecast merged 2026-02-01 before a
    2026-06-30 horizon and an outcome merged 2026-07-01 score; no forecast waits; a forecast
@@ -91,7 +102,7 @@ a rebase drops them. Ticket 75 Q10 is owner-reasoned and was not re-decided: the
 PASS (a fixture, said so), then on the real estate `SKIP: no *.forecast.yaml has reached
 refs/remotes/origin/main of any adopter (driftwood, ludlow, tuppence): the derive step of
 talk/local-clock.sh has not run and been merged`, exit 3, with `0 of 3 adopter(s) pin news or
-market-moves ... 0 signed tag(s)` printed above it. Item 5 named `verify-twin-evals.sh`; the
+market-moves ... 0 tag(s) naming either, 0 of them carrying a signature block` printed above it. Item 5 named `verify-twin-evals.sh`; the
 grading lives in a sibling script in the same directory instead (decision below).
 
 **Decisions, all delegated (ADR-0025); ticket 75 Q10 is owner-reasoned and untouched.**
@@ -117,7 +128,10 @@ grading lives in a sibling script in the same directory instead (decision below)
   no hub ADR held the ordinal ruling, so the records that do were amended.
 - **The pool is read the way classify-and-judge reads it: the served envelope, cited by its own
   name and version.** No adopter pins `news` or `market-moves` and the feeds publisher has no
-  signed tag for either (both printed as numbers on every run). Under ticket 23 nothing derived
+  tag naming either at all (all three printed as numbers on every run: how many adopters pin,
+  how many tags name either, and how many of THOSE carry a signature block -- *corrected
+  2026-09-09, review F3: the count was `git tag --list`, which counts NAMES, and the line said
+  "signed"; two unsigned annotated tags printed "2 signed tag(s)"*). Under ticket 23 nothing derived
   from it is price-eligible, which every forecast says on its face. Subscribing an adopter to the
   pool is a declaration PR (and, with no tag, a priced hole under ticket 69) -- not this ticket's.
 - **The scoring lives in `verify/twin-evals/verify-derived-forecast.sh`, not inside
@@ -125,12 +139,20 @@ grading lives in a sibling script in the same directory instead (decision below)
   FAILS the gate, and the derived forecast is an estate observation with five waits-class
   could-not-looks. Same directory, its own row.
 - **Pre-registration is the merge's first-parent date on `origin/main`.** Strictly before the
-  outcome date, UTC calendar days. Limit, dated 2026-09-06 and in the script header: merged
+  outcome date, UTC calendar days. *Amended 2026-09-09 (review F1): it is the LAST first-parent
+  write onto `origin/main`, not the first add -- a forecast rewritten after it landed is a new
+  forecast and re-registers on the day of the rewrite -- and the arrival date is printed beside
+  it. A RENAME still costs a forecast its registration, which is the honest direction, and is
+  kept.* Limit, dated 2026-09-06 and in the script header, and it stands: merged
   through GitHub it is GitHub's clock; a fast-forward push from a laptop would carry the
-  laptop's, and the check cannot tell them apart offline.
+  laptop's, and the check cannot tell them apart offline. What it can see it now counts (F10): how
+  many registering commits are dated before their own first parent.
 - **The outcome is the twin's own `outcome` record** (`twin/schema.py`: `proposition, observed,
   resolved_on, source, contamination, source_dated`) in the overlay's `outcomes/`, authored and
-  merged by a human on or after its date. No new record type.
+  merged by a human on or after its date. No new record type. *Amended 2026-09-09 (review F2): it
+  is the answer key, so it is immutable once it is on the served ref -- an outcome rewritten there
+  is refused by name -- and two outcomes resolving one proposition are refused rather than the
+  first sorted one silently winning. A correction is a new record with its own visible date.*
 - **The score is computed by the check, never read.** A `*.score.yaml` does not exist and would
   be ignored if it did.
 - **No real model call was made.** A live run of the derive row spends the owner's tokens under
@@ -152,13 +174,18 @@ grading lives in a sibling script in the same directory instead (decision below)
   row accepted); measured 69 passes against a ceiling of 90 of 109 on the last recorded line.
 - `bash verify/every-green/verify-every-green.sh` -- PASS: none of the 112 discovered scripts prints
   SKIP and then exits 0.
-- `bash verify/can-record/verify-can-record.sh` -- PASS.
+- `bash verify/can-record/verify-can-record.sh` -- PASS. *Re-measured 2026-09-09, after a review
+  reported it FAILING on plain `origin/main`: PASS at `cdc5fb9` (today's `origin/main`), at
+  `6772a7a` (the commit that review named) and at `691a32a` (the one before it), each in a clean
+  detached worktree of the hub. It passes at all three and on this branch; the reported red could
+  not be reproduced from the hub's own object store. Nobody need chase it again.*
 - `bash verify/local-clock/verify-local-clock.sh` -- offline PASS (stand-ins over a throwaway adopter
   and bare origin), marker SKIP on this machine, exit 3, 1:05.
 - `bash verify/twin-evals/verify-derived-forecast.sh --selfcheck` -- PASS, exit 0, 1:17.
 - `bash verify/twin-evals/verify-derived-forecast.sh` -- offline PASS, then `driftwood: 0
   *.forecast.yaml on refs/remotes/origin/main (ref last updated 0h ago); 0 outcome(s)`, the same for
-  ludlow and tuppence, `note: 0 of 3 adopter(s) pin news or market-moves ... 0 signed tag(s)`,
+  ludlow and tuppence, `note: 0 of 3 adopter(s) pin news or market-moves ... 0 tag(s) naming
+  either, 0 of them carrying a signature block`,
   `totals: 0 derived, 0 recorded (carrying no grade), 0 late, 0 derived and scored`, then the SKIP
   quoted above, exit 3.
 - `.venv/bin/python -m pytest tests/test_derived_forecast.py -n0 -q` -- 32 passed in 351.79s.
@@ -187,19 +214,21 @@ into its throwaway repositories and their commit environment, so its proofs do n
 scanner's quota; the ticket commit itself was made with the hook bypassed after an offline grep
 of the staged diff for secret-shaped strings found none. CI on the branch is the citation.
 
-**CI on this branch, pull request 54, head `7f59ba4`, watched to completion.** `twin` run
-34042185114 (and its twin 34042153749 on the push): job `tests` `1 failed, 2072 passed in
-142.04s`, the one failure `test_the_suite_is_green` on `flux_coverage_floor_is_still_reachable`
-(invariant 45, `3/1966 sample(s)`, the estate's standing red); job `invariants` `71 passed, 1
-failed, 3 skipped`, the same invariant, with invariant 44 passing on the runner; `typecheck`,
-`demo`, the three `determinism` legs and `reproduce-elsewhere` all succeeded. The branch adds no
-red. The `truth` run (34042153763, run 148, watched to completion) is a branch run: its guard said
-first `THIS RUN CANNOT RECORD ITS TRUTH LINE, and will not pretend to ... Why: this run is on
+**CI on this branch, pull request 54, head `e120c96`, watched to completion.** *Corrected
+2026-09-09 (review F6): this paragraph cited head `7f59ba4` and runs 34042185114 / 34042153763,
+and `7f59ba4` is NOT an ancestor of `e120c96` -- the final rebase orphaned it, so the Answer was
+quoting runs of a tree that is no longer on this branch. The runs below are `e120c96`'s own.*
+`twin` run **34043878336** (and its twin 34043875785 on the push): job `tests` `1 failed, 2105
+passed in 202.36s`, the one failure `test_the_suite_is_green` on
+`flux_coverage_floor_is_still_reachable` (invariant 45, the estate's standing red); job
+`invariants` `71 passed, 1 failed, 3 skipped`, the same invariant; `typecheck`, `demo`, the three
+`determinism` legs and `reproduce-elsewhere` all succeeded. The branch adds no red. The `truth`
+run **34043875798** is a branch run and correctly said it cannot record: its guard printed
+`THIS RUN CANNOT RECORD ITS TRUTH LINE, and will not pretend to ... Why: this run is on
 ticket-93-the-twin-derives-a-probability`, and the gate graded this ticket's script on the runner
-as the declared wait. The line it printed and did not record, quoted from the Actions log and NOT
-citable:
+as the declared wait. Quoted from the Actions log:
 
-    TRUTH 2026-09-06T15:46Z run=148 hub=7f59ba4 enact=development units=[driftwood=6a7ba02@main feeds=8cb7ae8@main ico=c65b6b2@main insurer=c991160@main ludlow=5981260@main nist=9dd7c31@main platform=a270fce@main tuppence=17fafdb@main] pass=71 [observed=18 self=40 simulated=6 meta=7] fail=12 skip=22 [never=9 waits=13] excluded=8 total=113 ceiling=94
+- run 163 (hub `e120c96`, this branch's own run, not citable: a branch run records nothing, ticket 100, so no run recorded it) -> `TRUTH 2026-09-06T16:35Z run=163 hub=e120c96 enact=development units=[driftwood=6a7ba02@main feeds=8cb7ae8@main ico=c65b6b2@main insurer=c991160@main ludlow=5981260@main nist=9dd7c31@main platform=a270fce@main tuppence=17fafdb@main] pass=71 [observed=18 self=40 simulated=6 meta=7] fail=12 skip=22 [never=9 waits=13] excluded=8 total=113 ceiling=94`
 
 The twelve reds are the estate's standing set (ticket 100's run 131 carried eleven; the manifest
 gained ticket 67's map-surface row and this one since), not this branch's.
@@ -228,7 +257,8 @@ PASS. The branch no longer depends on anything open.
   a human recording the outcome in the overlay's `outcomes/`.
 - **Whether an adopter subscribes to `news` and `market-moves`** (a declaration on `party.yaml`,
   and with no signed tag a priced hole under ticket 69): today the pool is unpinned and untagged,
-  so nothing derived from it is price-eligible, and the check prints that as `0 of 3` and `0`.
+  so nothing derived from it is price-eligible, and the check prints that as `0 of 3` adopters
+  pinning, `0` tags naming either, and `0` of those carrying a signature block.
 
 ## Not done
 
@@ -238,3 +268,141 @@ PASS. The branch no longer depends on anything open.
   script (decision above).
 - `local_clock.py stamp` still cannot serialise an unquoted YAML date in an injected signal (found
   by this ticket's fixture; ticket 92's file; the fixture quotes its date and says why).
+- The clock-provenance limit stands (F10 below): a committer date merged through GitHub is
+  GitHub's, and a fast-forward push from a laptop carries the laptop's. The check cannot tell
+  those apart offline. It now counts the one impossibility it can see.
+- The reopened ordinal comparison is a tautology on today's population (F9 below): every signal
+  is required to be grade 5, so "no stronger than its weakest signal" has one value to compare.
+  The count of distinct grades is printed so nobody reads it as more than that.
+- A market level supplied as a STRING (`from_level: '0.40'`) is accepted: `_close()` coerces with
+  `float()` before comparing, so `'0.40'` and `0.40` compare equal (F12 below). Nothing is
+  mis-scored by it -- the level still has to be the one the served envelope carries -- but the
+  artefact's types are not enforced, and a reader would expect them to be.
+
+## Review round, 2026-09-09 (twelve findings; the assistant, delegated under ADR-0025)
+
+A reviewer put roughly sixty fabrication attempts at the citation layer and every one was refused.
+Twelve findings came back, two blocking, and every one of them is fixed or recorded below. Every
+attack was reproduced RED against the code as it stood before it was fixed, and re-run after.
+
+**F1 and F2, both blocking, one root: pre-registration and the answer key were measured on a
+PATH, not on CONTENT.** `first_reached()` read `git log --first-parent --diff-filter=A --reverse
+... | head -1`, which answers "when did this path first appear". Measured red: a forecast deleted
+2026-07-02 and re-added 2026-07-20 with `probability: 0.999` and the reasoning "written on
+2026-07-20, after the outcome was already on main", against an outcome on main since 2026-07-01,
+printed `reached refs/remotes/origin/main 2026-02-01T00:00:00Z in 56df5ea, outcome date
+2026-06-30: pre-registered: yes`, scored `brier=1e-06`, PASS. The same by editing in place
+(`p=0.99`, `brier=0.0001`, PASS). The answer key had the same hole: `sed 's/observed: true/observed:
+false/'` committed 2026-07-25 moved brier 0.5329 -> 0.0729, both PASS, with the printed date
+unmoved; and two contradicting outcomes for one proposition let `matching[0]` win silently.
+
+The fix is one change. `first_reached()` now returns an `Arrival` carrying BOTH first-parent
+dates: when the path arrived and when it was LAST WRITTEN on the ref. `pre_registered()` keys on
+the last write -- a forecast rewritten after it landed is a NEW forecast and re-registers on the
+day of the rewrite -- and both dates are printed on every forecast line, so the limit stays a
+number. The same read is applied to the OUTCOME path, where the rule is stricter: the answer key
+is immutable once it is on the served ref, and an outcome rewritten there is refused by name,
+because a correction that silently rescores every forecast it resolves is exactly what nothing on
+the record would say. Two outcomes resolving one proposition are refused rather than picked
+between. The honest direction is kept: a RENAME still costs a forecast its registration, because
+the renamed path's first add IS the rename commit, so a rename cannot launder a forecast.
+
+**F3 (fixed).** `git tag --list news/* market-moves/*` counted tag NAMES and the run printed "N
+signed tag(s)" -- the estate's own "never fake a signature" rule, broken by its own check.
+Measured: two annotated UNSIGNED tags printed `2 signed tag(s)`. `signed_feed_tags()` now reads
+the tag OBJECT with `git cat-file tag` and requires the armour block, the way ticket 84's
+`verify/supersede` does; a lightweight tag has no object to read and counts as unsigned. Both
+directions are measured: three tags of which none is signed print `3 tag(s) naming either, 0 of
+them carrying a signature block`, and a tag really signed with a throwaway ssh key prints 1.
+Nothing false was ever on the record (the real count is 0), which is why this was not blocking.
+
+**F4 (fixed).** Duplicate YAML keys were not refused, so the file a human reviews in the pull
+request was not the file the validator read. Measured: a visible `probability: 0.999` above a real
+`0.27` validated as 0.27 and the clock committed it. `StrictLoader` (a `SafeLoader` subclass that
+raises on a repeated mapping key) is now what every YAML this module reads goes through, in the
+check and in the CLI, and the refusal names the key and both line numbers.
+
+**F5 (fixed).** The validator validated ITSELF: the clock ran
+`$HUB/.claude/skills/derive-probability/assets/validate_forecast.py --twin $HUB` from the WORKING
+TREE, and the child's cwd is that tree with `Edit` in its allowed tools. A reviewer overwrote the
+validator with a three-line always-pass stub and committed a fabricated forecast; only the GATE
+caught it. The clock now copies the twin package and the skill to `$RUN_DIR/<step>-<adopter>.judge`
+BEFORE the child starts, judges with that copy, and digests the hub's own copies before and after
+-- an edit is refused by name rather than silently ignored. It also SAYS, on every run, that the
+local layer is advisory and that `verify-twin-evals/verify-derived-forecast.sh` over `origin/main`
+is the measurement. Proved end to end by `stub-claude.sh`'s new `forecast-tamper` mode over a
+throwaway COPY of the hub (it refuses to run without `LOCAL_CLOCK_STUB_HUB_IS_A_COPY=1`, because
+it destroys the validator of whatever hub it is pointed at). The residual limit, stated rather
+than implied: the copy is taken from the hub's WORKING TREE, so a hub already tampered with
+before the run starts is copied as it is. That is why the sentence matters -- L1 is advisory, and
+the gate reading `origin/main` is the measurement.
+
+**F6 (fixed).** The Answer cited CI head `7f59ba4`, which the final rebase orphaned. Re-headed on
+`e120c96` and re-quoted from that head's own runs; see the CI paragraph above.
+
+**F7 (fixed).** The Answer and SKILL.md section 2 promise `prices_through` and `recorded_belief`
+on EVERY forecast; `validate()` required neither, and both were measured ACCEPTED when absent.
+Both are required now.
+
+**F8 (fixed).** "It writes one file and stops" was prose: two `*.forecast.yaml` in one derive
+commit were accepted. Both validated, so nothing unchecked landed -- but two files are two
+proposals in one review and the pull-request body the clock writes speaks about one. The clock now
+counts the files in the commit and refuses anything but one, for both rows.
+
+**F9 (recorded, and counted).** `validate()` forces every signal to grade 5 before
+`weakest = max(grades)`, so the reopened ordinal comparison is a TAUTOLOGY on today's population.
+It is built for the day a signal at another rung exists. Recorded in one clause on ADR-0024 point
+6 and on twin tickets 08 and 11, and the check now prints the number of DISTINCT grades it saw.
+
+**F10 (recorded, and counted).** The clock-provenance limit (GitHub's clock versus a laptop's) is
+a sentence, and it stands: it cannot be closed offline. But the cheap tell was not taken -- an add
+commit dated 2025-01-01 whose own first parent is dated 2026-01-01 was scored as pre-registered.
+The check now counts, as a number, how many registering commits are dated before their own first
+parent, with a fixture leg that makes that number 1.
+
+**F11 (corrected).** The Answer and the manifest row named two undeclared could-not-look reasons;
+there are five. Corrected above and in the manifest row.
+
+**F12 (recorded, no change).** A market level supplied as a STRING is accepted, because `_close()`
+coerces with `float()`. In "Not done" above.
+
+**Red first, exact (2026-09-09).** Every attack above was run against the code as it stood, from a
+harness over the fixture estate. The reds: `f1-delete-and-re-add rc=0 ... pre-registered: yes ...
+brier=1e-06`; `f1-edit-in-place rc=0 ... p=0.99`; `f2-outcome-edited-after-main rc=0 ...
+observed=False, reached 2026-07-01`; `f2-two-outcomes-one-proposition rc=0` (the `-b` key won on
+sort order alone); `f3-unsigned-tags-called-signed rc=0 ... 2 signed tag(s)`; `f4-duplicate-yaml-key
+validator rc=0`; `f7-no-prices_through ACCEPTED`; `f7-no-recorded_belief ACCEPTED`; through the
+clock, `forecast-two` and `forecast-tamper` both exited 0. `f1-rename-stays-refused` was already
+`rc=1 pre-registered: no` and still is. Every one of them is now a leg of
+`verify/twin-evals/verify-derived-forecast.sh` (legs 8-18) and a test in
+`tests/test_derived_forecast.py`, and every one is refused.
+
+**Verify commands run after the fix, 2026-09-09, this machine.**
+
+- `bash verify/twin-evals/verify-derived-forecast.sh --selfcheck` -- PASS, exit 0, 26s, 18 legs.
+- `bash verify/twin-evals/verify-derived-forecast.sh` -- offline PASS, then the same SKIP by name
+  on the real estate, exit 3.
+- `bash verify/twin-evals/verify-twin-evals.sh` -- PASS (7 harness-mechanism metrics).
+- `bash verify/local-clock/verify-local-clock.sh` -- offline PASS, marker SKIP, exit 3.
+- `bash talk/verify-all.sh --selfcheck` -- PASS.
+- `bash verify/truth-line/verify-truth-line.sh` -- PASS (121 placed).
+- `bash verify/every-green/verify-every-green.sh` -- PASS (121).
+- `bash verify/cited-truth/verify-cited-truth.sh` -- PASS (red before F6 was fixed: `93-...md:202:
+  no-such-line: run 148 is quoted ... and talk/truth.log records no such line`).
+- `bash verify/map-surface/verify-map-surface.sh` -- PASS.
+- `bash verify/can-record/verify-can-record.sh` -- PASS (and see the re-measurement note above).
+- `.venv/bin/python -m pytest tests/test_derived_forecast.py -n0 -q` -- 46 passed (32 before).
+- `.venv/bin/python -m pytest tests/test_local_clock.py -n0 -q` -- 52 passed.
+- `.venv/bin/python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores`
+  -- Success: no issues found in 184 source files.
+
+Every figure above is post-rebase. `origin/main` had moved from `cdc5fb9` to `9517d98` (run 186's
+recording) while this round was built; the review commit was rebased onto it with no conflict and
+the whole battery re-run from the worktree, because main moving between a review and a merge is
+how two separately-green branches went red together on 2026-09-06. The manifest count is 121, not
+the 113 this ticket's earlier rounds quote: main gained eight verify scripts since.
+
+Two of ticket 92's own checks were amended, minimally and by name: the run directory's "nothing
+the clock wrote says *no override is claimed*" rule now skips `<step>-<adopter>.judge/`, which is
+a verbatim copy of the hub's skill and not the clock's words
+(`tests/test_local_clock.py` and `verify/local-clock/verify-local-clock.sh`).

@@ -286,7 +286,10 @@ mrid="$(sed -n 's/^local clock: run \([^ ]*\) .*/\1/p' "$TMP/misnamed.out" | hea
 [ ! -e "$TMP/.local-clock/runs/$mrid/classify-driftwood.pr-title" ] || fail "the model's PR title survived the refusal"
 # (the rendered prompt *.system.md carries the phrase as the instruction to the model, and the
 # transcript *.claude.json is the model's words; every other file in the run dir is the clock's)
-said="$(grep -rli 'no override is claimed' "$TMP/.local-clock/runs/$mrid" | grep -Ev '\.(system\.md|claude\.json|claude\.err)$' | head -1)"
+# <step>-<adopter>.judge/ is exempt: it is a VERBATIM COPY of the hub's twin package and the
+# skill, taken before the child so the validator is never the tree the child can write to
+# (ecosystem ticket 93 review F5). The skill's own text is not a file the clock wrote.
+said="$(grep -rli 'no override is claimed' "$TMP/.local-clock/runs/$mrid" | grep -v '\.judge/' | grep -Ev '\.(system\.md|claude\.json|claude\.err)$' | head -1)"
 [ -z "$said" ] || fail "a file the clock wrote for the refused run still says no override is claimed: $said"
 git -C "$TMP/estate/driftwood" for-each-ref 'refs/heads/local-clock/' | grep -q -- "$mrid" || fail "the misnamed file's branch was not kept for inspection"
 grep -q '"status": "fail"' "$TMP/.local-clock/runs/$mrid/steps.jsonl" || fail "the misnamed file was not recorded as fail"

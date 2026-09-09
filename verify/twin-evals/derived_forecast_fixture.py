@@ -4,6 +4,11 @@ derived-forecast seam (ecosystem ticket 93) with no token, no network and no rea
 
     derived_forecast_fixture.py build DIR [--no-forecast] [--no-outcome] [--outcome-committed ISO]
     derived_forecast_fixture.py late DIR        # merge a forecast onto main AFTER the horizon
+    derived_forecast_fixture.py rewrite DIR [--in-place]   # rewrite the number AFTER the answer
+    derived_forecast_fixture.py rename DIR      # rename the forecast (must still lose its date)
+    derived_forecast_fixture.py edit-outcome DIR    # flip the answer key after it reached main
+    derived_forecast_fixture.py second-outcome DIR  # a second, contradicting answer key
+    derived_forecast_fixture.py tag-feeds DIR   # two ANNOTATED UNSIGNED tags on the publisher
 
 What it builds is exactly what `.claude/skills/derive-probability/assets/example-forecast.yaml`
 cites, so the worked example validates against it: a `market-moves` envelope carrying the move
@@ -203,6 +208,115 @@ def merge_late_forecast(root: Path) -> str:
     return LATE_PATH
 
 
+def rewrite_after_the_answer(root: Path, in_place: bool = False) -> str:
+    """Ticket 93 review F1: a forecast whose NUMBER is rewritten after the outcome is already on
+    main. Two shapes, both measured against the old code as `pre-registered: yes` at the original
+    date and SCORED: delete on 2026-07-02 and re-add on 2026-07-20 with `probability: 0.999`, or
+    edit the same path in place. The path's first add does not move; the last write does."""
+    repo = Path(root) / "driftwood"
+    doc = forecast_doc()
+    doc["forecasts"][0]["probability"] = 0.999
+    doc["forecasts"][0]["reasoning"] = ("written on 2026-07-20, after the outcome was already on main -- "
+                                        "a fixture of ticket 93 review F1, never a forecast")
+    if not in_place:
+        _git(repo, "rm", "-q", "--", FORECAST_PATH)
+        _git(repo, "commit", "-q", "-m", "twin: drop the forecast (fixture)", date="2026-07-02T00:00:00+00:00")
+    _write(repo / FORECAST_PATH, doc)
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "twin: the forecast again, knowing the answer (fixture)",
+         date="2026-07-20T00:00:00+00:00")
+    _git(repo, "push", "-q", "origin", "main")
+    return FORECAST_PATH
+
+
+def backdated_forecast(root: Path) -> str:
+    """Ticket 93 review F10: a forecast whose registering commit is dated 2025-01-01 while its own
+    first parent is dated 2026-01-01. The clock-provenance limit (GitHub's clock versus a laptop's)
+    stands and cannot be closed offline; a commit dated before the commit it sits on is not a clock
+    disagreement but an impossibility, and the check counts those as a number."""
+    repo = Path(root) / "driftwood"
+    _write(repo / FORECAST_PATH, forecast_doc())
+    _commit_push(repo, "twin: a forecast dated 2025-01-01 (fixture)", "2025-01-01T00:00:00+00:00")
+    return FORECAST_PATH
+
+
+def rename_the_forecast(root: Path) -> str:
+    """The honest direction the review asked to KEEP: a rename costs a forecast its registration
+    (the new path's first add is the rename commit), rather than laundering one."""
+    repo = Path(root) / "driftwood"
+    renamed = "twin/forecasts/2026-02-01-renamed.forecast.yaml"
+    _git(repo, "mv", FORECAST_PATH, renamed)
+    _git(repo, "commit", "-q", "-m", "twin: rename the forecast (fixture)", date="2026-07-20T00:00:00+00:00")
+    _git(repo, "push", "-q", "origin", "main")
+    return renamed
+
+
+def edit_the_answer_key(root: Path) -> str:
+    """Ticket 93 review F2: `observed: true` -> `false`, committed after the outcome reached main.
+    Measured against the old code as brier 0.5329 -> 0.0729, both PASS, the printed date unmoved."""
+    repo = Path(root) / "driftwood"
+    doc = outcome_doc()
+    doc["observed"] = False
+    doc["source"] = "the fixture's answer key, EDITED after it reached main (ticket 93 review F2)"
+    _write(repo / OUTCOME_PATH, doc)
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "twin: correct the outcome (fixture)", date="2026-07-25T00:00:00+00:00")
+    _git(repo, "push", "-q", "origin", "main")
+    return OUTCOME_PATH
+
+
+def second_answer_key(root: Path) -> str:
+    """Ticket 93 review F2: two outcomes resolving one proposition, disagreeing. `matching[0]`
+    silently took whichever sorted first and the run PASSed with no word that they disagree."""
+    repo = Path(root) / "driftwood"
+    doc = outcome_doc()
+    doc["id"] = "fixture-supply-2026-resolved-b"
+    doc["observed"] = False
+    doc["source"] = "a second answer key that contradicts the first (ticket 93 review F2)"
+    path = "twin/orgs/driftwood/outcomes/fixture-supply-2026-resolved-b.yaml"
+    _write(repo / path, doc)
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "twin: a second outcome for the same proposition (fixture)",
+         date="2026-07-05T00:00:00+00:00")
+    _git(repo, "push", "-q", "origin", "main")
+    return path
+
+
+def tag_the_feeds(root: Path, sign_with: str | None = None) -> list[str]:
+    """Ticket 93 review F3: tags on the publisher naming both pool feeds. `--no-sign` because the
+    owner's GLOBAL `tag.gpgsign=true` would otherwise sign them for real and the proof would be
+    empty; a lightweight tag has no object to read at all. With `sign_with` (a path to an ssh
+    key) the first tag is REALLY signed, so the count is measured in both directions."""
+    repo = Path(root) / "feeds"
+    made = []
+    if sign_with:
+        _git(repo, "-c", "gpg.format=ssh", "-c", f"user.signingkey={sign_with}", "-c", "tag.gpgsign=true",
+             "tag", "-a", "news/v1.0.0", "-m", "a really signed tag (fixture)")
+    else:
+        _git(repo, "tag", "-a", "--no-sign", "news/v1.0.0", "-m", "an ANNOTATED, UNSIGNED tag (fixture)")
+    made.append("news/v1.0.0")
+    _git(repo, "tag", "-a", "--no-sign", "market-moves/v1.0.0", "-m", "an ANNOTATED, UNSIGNED tag (fixture)")
+    made.append("market-moves/v1.0.0")
+    _git(repo, "-c", "tag.gpgsign=false", "tag", "news/v0.9.0-lightweight")
+    made.append("news/v0.9.0-lightweight")
+    return made
+
+
+def duplicate_key_forecast(root: Path) -> str:
+    """Ticket 93 review F4: a visible `probability: 0.999` above the real `0.27`. PyYAML keeps the
+    last, so the file a human reviews in the pull request is not the file the validator read."""
+    repo = Path(root) / "driftwood"
+    text = EXAMPLE.read_text(encoding="utf-8").replace(
+        "    probability: 0.27\n", "    probability: 0.999\n    probability: 0.27\n")
+    path = repo / FORECAST_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "twin: a forecast a human reads as 0.999 (fixture)", date=FORECAST_DATE)
+    _git(repo, "push", "-q", "origin", "main")
+    return FORECAST_PATH
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -213,13 +327,43 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--outcome-committed", default=OUTCOME_DATE)
     late = sub.add_parser("late")
     late.add_argument("dir")
+    rw = sub.add_parser("rewrite")
+    rw.add_argument("dir")
+    rw.add_argument("--in-place", action="store_true")
+    for name in ("rename", "edit-outcome", "second-outcome", "duplicate-key", "backdated"):
+        one = sub.add_parser(name)
+        one.add_argument("dir")
+    tg = sub.add_parser("tag-feeds")
+    tg.add_argument("dir")
+    tg.add_argument("--sign-with", default=None)
     args = parser.parse_args(argv)
     if args.cmd == "build":
         build(Path(args.dir), with_forecast=not args.no_forecast, with_outcome=not args.no_outcome,
               outcome_committed=args.outcome_committed)
         print(f"fixture estate built under {args.dir} (a stand-in: throwaway repositories with bare origins)")
         return 0
-    print(merge_late_forecast(Path(args.dir)))
+    if args.cmd == "late":
+        print(merge_late_forecast(Path(args.dir)))
+        return 0
+    if args.cmd == "rewrite":
+        print(rewrite_after_the_answer(Path(args.dir), in_place=args.in_place))
+        return 0
+    if args.cmd == "backdated":
+        print(backdated_forecast(Path(args.dir)))
+        return 0
+    if args.cmd == "rename":
+        print(rename_the_forecast(Path(args.dir)))
+        return 0
+    if args.cmd == "edit-outcome":
+        print(edit_the_answer_key(Path(args.dir)))
+        return 0
+    if args.cmd == "second-outcome":
+        print(second_answer_key(Path(args.dir)))
+        return 0
+    if args.cmd == "duplicate-key":
+        print(duplicate_key_forecast(Path(args.dir)))
+        return 0
+    print(" ".join(tag_the_feeds(Path(args.dir), sign_with=args.sign_with)))
     return 0
 
 

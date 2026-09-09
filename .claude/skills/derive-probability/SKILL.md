@@ -127,7 +127,14 @@ so you write them right the first time:
   observation**, and one it does not carry fails the file;
 - a `recorded` forecast has `evidence_grade: null`, `grade_absent_because`, no signals, and a
   probability equal to `recorded_belief.probability`, which must be what the named world model
-  carries for the proposition.
+  carries for the proposition;
+- **no key appears twice.** A duplicate mapping key is refused outright. PyYAML keeps the last of
+  two, so a `probability: 0.999` written above a real `0.27` validates as 0.27 while every human
+  reading the pull request reads 0.999 -- the file under review would not be the file that was
+  checked (2026-09-09 review F4, measured: the clock committed it).
+
+**ONE file.** Not "roughly one": the clock counts the files in your commit and refuses two, because
+two files are two proposals in one review and the pull-request body it writes speaks about one.
 
 Validate before you commit:
 
@@ -138,6 +145,15 @@ python3 .claude/skills/derive-probability/assets/validate_forecast.py <the forec
 (`--headless` on the clock; at the keyboard, without it.) Exit 0 prints the count of derived and
 recorded probabilities and the envelopes cited; exit 2 means the validator could not read the
 served feeds, and a file nobody could check is not proposed.
+
+**This validation is advisory, and the clock says so on every run.** It runs on the owner's own
+machine, in a tree you can write to; a model that edited the validator would be edited its own
+judge. So the clock copies the twin package and this skill OUT of the hub before you start, runs
+the copy, and refuses the run if the hub's copies changed while you worked (2026-09-09 review F5,
+measured: a three-line always-pass stub in place of the validator, and only the gate caught the
+fabricated forecast that followed). The measurement of record is
+`verify/twin-evals/verify-derived-forecast.sh` on the gate, over `origin/main`, after a human
+merges. Write the file so it survives that, not so it survives this.
 
 Done when: the validator exits 0.
 
@@ -161,13 +177,22 @@ Done when: the PR is open, or its title and body are written for the owner to pu
 
 Neither is this skill's to write, and both are read off things the twin does not control:
 
-- **Pre-registration is git history.** The forecast is pre-registered on the date the merge
-  brings the file onto the adopter's `main` -- the first-parent commit on `origin/main`, dated by
-  whoever merged it -- and only when that date is strictly before the outcome date. A field the
-  twin writes (`run_at`, `derived_at`) is never what decides it. Propose early.
+- **Pre-registration is git history, and it is measured on the CONTENT.** The gate reads two
+  first-parent committer dates on `origin/main`: when the file arrived (the merge, dated by
+  whoever performed it) and when it was **last written there**. Pre-registration is the last
+  write, and both dates are printed. So a number rewritten after it landed -- edited in place,
+  deleted and re-added, or squashed in again -- is a NEW forecast and re-registers on the day of
+  the rewrite; if the answer is already on main by then, it is not pre-registered and it is not
+  scored (2026-09-09 review F1). Renaming the file costs it its registration too. A field the
+  twin writes (`run_at`, `derived_at`) is never what decides any of it. Propose early, and leave
+  it alone once it is merged.
 - **The outcome is a human's observation**, recorded in the overlay's own `outcomes/`
   collection (`twin/schema.py` `outcome`: `proposition`, `observed`, `resolved_on`, `source`,
-  `contamination`, `source_dated`) and merged by a human on or after the date it resolved.
+  `contamination`, `source_dated`) and merged by a human on or after the date it resolved. It is
+  the answer key, so it is immutable once it is on `main`: an outcome edited afterwards is
+  refused by name, because editing it silently rescores every forecast it resolves while the run
+  goes on printing the original date. Two outcomes resolving one proposition are refused too --
+  the gate will not pick between two answer keys (review F2).
 - **The score is computed by the gate**, `verify/twin-evals/verify-derived-forecast.sh`, with
   `twin/scoring.py`'s proper rules (Brier and log loss), from the pre-registered forecast and the
   outcome, and never read from a file. A probability that was not pre-registered is not scored.
