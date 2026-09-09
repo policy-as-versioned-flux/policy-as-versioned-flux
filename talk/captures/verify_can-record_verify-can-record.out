@@ -1,7 +1,7 @@
 [1;36m==>[0m 0. the pure half grades planted data as documented
   ok   selfcheck: a hand-written line, a line whose run number disagrees with its commit, a second run=local line, a run that is neither a number nor `local`, a citable line stranded off the default branch, and an unknown step name each fail as documented; a rescued line and one whose measured tree never reached the default branch are notes, not faults; and a step's effective shell flags are read from the step -- `-e` where nothing is declared, none where the step opts out
 [1;36m==>[0m 1. every TRUTH line in talk/truth.log was ADDED by a run that could record it
-  ok   54 recorded TRUTH line(s), each ADDED by the clock commit whose message names the same run; 1 declared run=local line(s)
+  ok   55 recorded TRUTH line(s), each ADDED by the clock commit whose message names the same run; 1 declared run=local line(s)
 [1;36m==>[0m 1b. no citable TRUTH line is stranded on a branch that merged without it
   --   TRUTH 2026-09-05T14:45Z run=101: committed on origin/ticket-89-deny-is-not-a-rung and its line is in the default branch's log (commit f8968f6 was rescued, or the branch merged with it)
   --   TRUTH 2026-09-05T01:20Z run=88: committed on origin/ticket-64-the-twin-is-three-adopters and its line is in the default branch's log (commit 2545d1a was rescued, or the branch merged with it)
