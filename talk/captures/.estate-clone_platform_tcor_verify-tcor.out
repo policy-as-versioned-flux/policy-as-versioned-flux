@@ -1,7 +1,13 @@
 [1;36m==>[0m 1. offline: the balance sheet is TCoR, the crossover is computed, the £ moves
-ok  balance sheet £47921 = residual £27271 + controls £3500 + premium £17150 | levers: accept->£72127  tighten->£27771  threat/EOL->£76801 | crossover: cheap-fix->fix, ruinous-fix->cage
+ok  balance sheet £42923 = residual £27264 + controls £3500 + premium £12159 | levers: accept->£67127  tighten->£22800  threat/EOL->£71801 | crossover: cheap-fix->fix, ruinous-fix->cage
+    transfer, deductible GBP 50000.00: E[loss] GBP 152526.05 = E[below] GBP 49776.61 + E[above] GBP 102749.44
+    observed:       premium GBP 143849.21, residual GBP 49776.61, TCoR GBP 193625.82
+    partition rule: premium GBP 143849.21 = (1 + 0.40) x E[above], residual GBP 49776.61 = E[below], TCoR GBP 193625.82
+    deductible GBP 1,000 -> TCoR GBP 213136.46; deductible GBP 80,000 -> TCoR GBP 182251.09
+ok  (d) a transfer premium is (1 + load) x E[loss above the deductible]
+ok  (d) a higher deductible buys a cheaper premium
 [1;36m==>[0m 2. offline: the demo book prices out to fix + cage + transfer (all three lines real)
-  ok   TCoR £47,921 = residual £27,271 + controls £3,500 + premium £17,150  moves=['cage', 'fix', 'transfer']
+  ok   TCoR £42,923 = residual £27,264 + controls £3,500 + premium £12,159  moves=['cage', 'fix', 'transfer']
 [1;36m==>[0m 3. offline: proportionality — the same book cages harder under a stricter band
   ok   caged row control-spend: driftwood £500 -> ludlow £6,000 (stricter band cages harder)
 PASS: the board line is TCoR, it moves as the levers predict, and the four-move crossover is computed.

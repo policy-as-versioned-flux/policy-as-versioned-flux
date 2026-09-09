@@ -31,6 +31,7 @@ ale(istio-1.18, 4yr+ past)   = £1087666
 ok  EOL £ ramps monotonically as the component ages past support: £218,337 -> £436,816 -> £1,087,666
 
 == 6. converter selfcheck (every feed entry valid, EOL ramp bounded) ==
+ok  this fallback copy and the publisher's own threat-register converter agree byte-for-byte on all 9 published (version, institution) scenarios. WHAT THIS RESTS ON (review F7, corrected by review N5): the runner is the FEEDS repository's own `verify-feeds.sh`, which invokes this selfcheck; the hub's gate manifest carries `.estate-clone/platform/feeds/verify-feeds.sh`, and .estate-clone always holds a feeds tree beside platform, so the agreement IS asserted on every full-estate gate run. What still does not assert it is PLATFORM's own CI: no workflow in this repository runs this selfcheck and none clones feeds beside it
 ok  24 feed entries valid (lo<=mode<=hi); headline pick deterministic and named; EOL ramp monotonic & capped (1yr=2.00x 2yr=3.00x 10yr=5.00x)
 
 PASS: threat-register/CVE/EOL signed+versioned, fair.py consumes them unmodified,

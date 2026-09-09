@@ -1,8 +1,8 @@
-FAIL:  driftwood@origin/main: composed/HANDBOOK.md is NOT what its own served artefact renders to (1 line(s) differ, 8811 bytes served vs 8824 re-rendered) -- the page says something the artefact does not
+FAIL:  driftwood@origin/main: composed/HANDBOOK.md is NOT what its own served artefact renders to (7 line(s) differ, 8811 bytes served vs 9339 re-rendered) -- the page says something the artefact does not
          ref: the served branch origin/main; renderer from platform origin/main; the pinned tag v2.0.1 does not carry compose/handbook.py
-FAIL:  ludlow@origin/main: composed/HANDBOOK.md is NOT what its own served artefact renders to (1 line(s) differ, 8184 bytes served vs 8197 re-rendered) -- the page says something the artefact does not
+FAIL:  ludlow@origin/main: composed/HANDBOOK.md is NOT what its own served artefact renders to (7 line(s) differ, 8184 bytes served vs 8712 re-rendered) -- the page says something the artefact does not
          ref: the served branch origin/main; renderer from platform origin/main; the pinned tag v2.0.1 does not carry compose/handbook.py
-FAIL:  tuppence@origin/main: composed/HANDBOOK.md is NOT what its own served artefact renders to (1 line(s) differ, 8171 bytes served vs 8184 re-rendered) -- the page says something the artefact does not
+FAIL:  tuppence@origin/main: composed/HANDBOOK.md is NOT what its own served artefact renders to (7 line(s) differ, 8171 bytes served vs 8699 re-rendered) -- the page says something the artefact does not
          ref: the served branch origin/main; renderer from platform origin/main; the pinned tag v2.0.1 does not carry compose/handbook.py
 COUNTS: 3 of 3 adopter(s) serve a handbook at origin/main this check could read; 0 of 3 also serve one at a signed tag, graded as well; 0 of 3 pin a platform tag that already carries compose/handbook.py.
 FAILED: 3 graded ref(s): driftwood@origin/main, ludlow@origin/main, tuppence@origin/main

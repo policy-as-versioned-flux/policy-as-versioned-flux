@@ -6,7 +6,7 @@ E2E step 5 twin forecasts
   ok  driftwood/twin/signals.yaml (the pin -> standing-scenario table)
   ok  driftwood/verify-twin-overlay.sh: PASS: driftwood's twin emits one forward-intel feed from its own overlay, labelled and unpicked
   ok  driftwood/twin/verify-twin-scenarios.sh: PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
-  ok  driftwood's scheduled sweep (`5 7 * * *`) has appended 4 dated observation(s); the most recent swept_at is 2026-09-08T12:06:00Z
+  ok  driftwood's scheduled sweep (`5 7 * * *`) has appended 5 dated observation(s); the most recent swept_at is 2026-09-09T12:17:34Z
   ok  ludlow/twin/orgs/ludlow/meta.yaml (the adopter's own overlay)
   ok  ludlow/twin/world/ (the world layer, vendored)
   ok  ludlow/twin/emit-forward-intel.py (the forward-intel emitter)

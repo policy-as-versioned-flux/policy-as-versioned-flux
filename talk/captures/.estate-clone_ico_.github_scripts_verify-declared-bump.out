@@ -20,7 +20,7 @@ ok  (3) a clone of a repository that never released takes the first-release path
 ok  (3) ...and --tree names v1.0.0 as that first release
 
 == the real declaration against the real tree ==
-OK: declared bump 'none' == computed bump 'none' (v3.0.0 -> tree: no release is queued)
+OK: declared bump 'major' == computed bump 'major' (v3.0.0 -> v4.0.0)
 
 PASS: the bump ladder holds on fixtures, and ico's own declared bump agrees with the
 bump computed from its published tree under its own rule.yaml -- so a release cut

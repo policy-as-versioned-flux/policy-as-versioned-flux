@@ -20,12 +20,14 @@ ale(uk-gdpr/lower-tier alone)               = £9039791
 ale(uk-gdpr/lower-tier + pci-dss, combined)  = £11006429
 ok  £ rose by £1,966,638 once a second regime can draw on the same breach -- fatter, not thinner
 
-== 6. the three published feed envelopes match the one feed contract (ADR-0019) ==
+== 6. the four published feed envelopes match the one feed contract (ADR-0019) ==
 ok  penalty-schema/v1/feed.json  penalty-schema v1.0.0 by ico at 2026-07-31T16:22:39+01:00, payload validates against penalty-schema/payload.schema.v2.json
 ok  penalty-schema/v2/feed.json  penalty-schema v2.0.0 by ico at 2026-07-31T16:22:39+01:00, payload validates against penalty-schema/payload.schema.v2.json
 ok  penalty-schema/v3/feed.json  penalty-schema v3.0.0 by ico at 2026-08-28T10:00:00+01:00, payload validates against penalty-schema/payload.schema.json
+ok  penalty-schema/v4/feed.json  penalty-schema v4.0.0 by ico at 2026-09-09T12:00:00+01:00, payload validates against penalty-schema/payload.schema.v4.json
 ok  v1 and v2 envelopes carry the schema/ regimes payloads unchanged
 ok  major 3 adds control_weights and leaves the regimes payload alone
+ok  major 4 corrects finality and adds frequency; no formula rate or cap moved with it
 ok  party.yaml publishes[] resolves: penalty-schema -> penalty-schema, schema penalty-schema/payload.schema.json
 
 == 7. major 3's control weights partition each regime, never add to it ==
@@ -39,4 +41,50 @@ ok  fca      systems-and-controls-failure 4 controls, sum 1.0 (si-4, ca-7, cm-3,
 ico pins nist controls at 1.1.0
 ok  nist tag v1.1.0 is on the remote -- major 3's control ids key on a real catalogue version
 
-PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the three published feeds match the one envelope, major 3 partitions each regime into weighted controls, and the nist pin is a real tag
+== 9. every real example in major 4 names its SOURCE and carries a finality status, a date and a litigation note ==
+ok  uk-gdpr/higher-tier British Airways            imposed-appeal-unchecked -           ICO monetary penalty notice, 16 Oct 2020
+ok  uk-gdpr/higher-tier Marriott International     imposed-appeal-unchecked -           ICO monetary penalty notice, 30 Oct 2020
+ok  uk-gdpr/higher-tier TikTok Information Technologies UK imposed-appeal-unchecked -           ICO monetary penalty notice, 4 Apr 2023 -- children's data
+ok  uk-gdpr/lower-tier Clearview AI Inc            not-collected            -           ICO monetary penalty notice, 23 May 2022; set aside 2023, reinstated on jurisdiction by 
+ok  uk-gdpr/lower-tier Doorstep Dispensaree Ltd    final                    2024        ICO monetary penalty notice, 12 Dec 2019 -- unsecured storage of patient records; reduce
+ok  pci-dss/non-compliance-escalating commonly-published acquirer non-compliance bands not-a-penalty            -           PCI SSC / acquiring-bank compliance bulletins
+ok  hipaa/willful-neglect-uncorrected Anthem Inc   final                    2018-10-15  HHS OCR resolution agreement, Oct 2018
+ok  hipaa/willful-neglect-uncorrected Premera Blue Cross imposed-appeal-unchecked -           HHS OCR resolution agreement, Nov 2020
+ok  fca/systems-and-controls-failure Standard Chartered Bank imposed-appeal-unchecked -           FCA final notice, 9 Apr 2019 -- AML controls
+ok  fca/systems-and-controls-failure TSB Bank      imposed-appeal-unchecked -           FCA final notice, 20 Dec 2022 -- IT migration failures
+ok  fca/systems-and-controls-failure Starling Bank Limited final                    2024-09-27  FCA final notice, 27 Sep 2024, ref 730166 -- financial-crime controls
+ok  11 real example(s) in major 4, every one naming its source and carrying a status, a date field and a litigation note; 9 of them price
+
+== 10. every control weight and every frequency in major 4 carries a basis ==
+ok  uk-gdpr/higher-tier                      frequency (0, 2, 4)    basis editorial, read 2026-09-09
+ok  uk-gdpr/lower-tier                       frequency (0, 2, 4)    basis editorial, read 2026-09-09
+ok  pci-dss/non-compliance-escalating        frequency (0, 2, 4)    basis editorial, read 2026-09-09
+ok  hipaa/willful-neglect-uncorrected        frequency (0, 2, 4)    basis editorial, read 2026-09-09
+ok  fca/systems-and-controls-failure         frequency (0, 2, 4)    basis editorial, read 2026-09-09
+ok  uk-gdpr  higher-tier                 5 weight(s), every one with a dated basis
+ok  uk-gdpr  lower-tier                  4 weight(s), every one with a dated basis
+ok  pci-dss  non-compliance-escalating   5 weight(s), every one with a dated basis
+ok  hipaa    willful-neglect-uncorrected 5 weight(s), every one with a dated basis
+ok  fca      systems-and-controls-failure 4 weight(s), every one with a dated basis
+ok  5 frequencies and 23 control weights in major 4, every one with a basis carrying a kind, a statement and a date
+
+== 11. the converter refuses a bare number and prices only what the finality rule allows ==
+ok  10 (schema-version, regime, violation-type) triples are all lo<=mode<=hi
+ok  combining uk-gdpr + pci-dss on one breach yields 2 lo<=mode<=hi triples, not 1
+ok  a subscriber's own turnover scales the lm triple; no turnover stays at the cap
+ok  (a) an example with no `status` beside one that has it is refused by name
+ok  (a) a payload where no example carries a status is a NAMED could-not-look
+ok  (a) a penalty that was never collected does not enter the loss triple
+ok  (b) a published frequency with no `basis` is refused, naming where the basis goes
+ok  (b) a frequency with no published basis names its own number on the scenario
+ok  (b) a published frequency and its dated basis are read and carried
+ok  (f1) an example with a status and no source is refused by name
+ok  (f1) the scenario names what each priced figure rests on
+ok  (d) the sized triple never tops the statutory maximum max(cap, rate x turnover)
+ok  major 4 uk-gdpr/lower-tier prices lm (92000.0, 92000.0, 8700000.0) at lef (0, 2, 4), names Clearview's uncollected 7,552,800 as not priced, and carries its frequency's basis and its could-not-look
+ok  a frequency with no basis refuses, naming the violation type and where the basis goes
+ok  an example with no status beside one that has it refuses, naming the example
+ok  an invented figure with a status and no source refuses, naming it, and moves no price
+ok  the scenario names what every priced figure rests on, including which court moved Doorstep Dispensaree's and in what year
+
+PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the four published feeds match the one envelope, major 3 partitions each regime into weighted controls, major 4 grades every published fine for finality and carries a dated basis on every frequency and every control weight, the converter refuses a bare number and prices only what the finality rule allows, and the nist pin is a real tag

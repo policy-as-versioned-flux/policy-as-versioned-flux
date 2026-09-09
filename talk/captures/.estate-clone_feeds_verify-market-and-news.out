@@ -27,7 +27,7 @@ ok  the committed pool computes none
 ok  the moved pool computes minor
 
 == niobium is a SCENARIO and is absent from this feed (ticket 23 answer 1) ==
-ok  10 published payloads and the news pool carry no niobium anywhere in their data: it is a SCENARIO in the adopter's twin library (ticket 29), not an observation
+ok  11 published payloads and the news pool carry no niobium anywhere in their data: it is a SCENARIO in the adopter's twin library (ticket 29), not an observation
 
 == no clock in this repository invokes a model (ADR-0024) ==
 scheduled workflows: .github/workflows/fetch.yml

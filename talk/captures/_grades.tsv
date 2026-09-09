@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-09T12:15Z run=194 hub=302bf73 enact=development units=[driftwood=a4584ea@main feeds=f1ff89e@main ico=ec0ece4@main insurer=c991160@main ludlow=793b7b1@main nist=f83126f@main platform=b6d5045@main tuppence=e519341@main] pass=79 [observed=25 self=41 simulated=4 meta=9] fail=9 skip=27 [never=9 waits=18] excluded=8 total=123 ceiling=104
+# TRUTH 2026-09-09T13:45Z run=197 hub=c1aee32 enact=development units=[driftwood=08ca32e@main feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=793b7b1@main nist=f83126f@main platform=2998571@main tuppence=fbf952f@main] pass=76 [observed=23 self=40 simulated=4 meta=9] fail=9 skip=30 [never=9 waits=21] excluded=8 total=123 ceiling=104
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      or absent trust root refuses on the trust material and never on the network, cold and warm (I).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -14,9 +14,9 @@
 .estate-clone/ico/.github/scripts/verify-declared-bump.sh	PASS	today would publish the number the reviewed file declares.
 .estate-clone/ico/schema/verify.sh	EXCLUDED	
 .estate-clone/ico/verify-certificate-identity-regexp.sh	PASS	and rejects every foreign org/repo/path and unanchored variant tried.
-.estate-clone/ico/verify-penalty-feed.sh	PASS	PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the three published
+.estate-clone/ico/verify-penalty-feed.sh	PASS	PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the four published 
 .estate-clone/insurer/verify-insurer-party.sh	PASS	PASS: insurer party artefact
-.estate-clone/insurer/verify-insurer-quote.sh	SKIP	SKIP: 1 of 21 checks could not be looked at (reasons above)
+.estate-clone/insurer/verify-insurer-quote.sh	SKIP	SKIP: 1 of 24 checks could not be looked at (reasons above)
 .estate-clone/ludlow/twin/verify-twin-scenarios.sh	SKIP	SKIP: the overlay with its six scenarios loads, and the emitter could not price it: CANNOT LOOK: ludlow's twin cannot price a forward-intel payload today, and t
 .estate-clone/ludlow/verify-adopter-gate.sh	PASS	      credential). Verifying what platform already signed is not, and is proved above.
 .estate-clone/ludlow/verify-certificate-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only policy-as-versioned-ludlow/ludlow's propose-tier.yml on main; the release and proposal identities do not ov
@@ -28,7 +28,7 @@
 .estate-clone/platform/access/verify-access.sh	EXCLUDED	
 .estate-clone/platform/break-glass/verify-break-glass.sh	PASS	verify-break-glass: done (offline; rides on the access plane — see ../access/verify-access.sh for the live IAP checks)
 .estate-clone/platform/compose/verify-composition.sh	SKIP	SKIP: the composed set renders policy versions the pinned parent commit does not contain; the header names a parent release that holds none of these trees. plat
-.estate-clone/platform/compose/verify-fresh.sh	PASS	PASS: verify-fresh.sh grades render-at-ref against the page served at the same ref: a fresh render passes, a hand-edited page fails, an artefact that moved unde
+.estate-clone/platform/compose/verify-fresh.sh	FAIL	FAIL: handbook.py --selfcheck
 .estate-clone/platform/computed-semver/verify-cage-engine.sh	PASS	selfcheck ok: dial_table parses the real cage-tier.yaml; UNCAGED sits at the top of the permissiveness lattice, every real tier below it, tighter tiers below lo
 .estate-clone/platform/computed-semver/verify-comparison-window.sh	PASS	selfcheck ok: a prerelease sorts below its own release and above the version beneath it (ticket 43's degraded publish); window_below filters and sorts ascending
 .estate-clone/platform/computed-semver/verify-corpus-generator.sh	PASS	PASS: corpus generator selfcheck ok, spine regenerates byte-identical, sample entry is a real Pod
@@ -76,7 +76,7 @@
 .estate-clone/tuppence/scripts/verify-adopter-gate.sh	PASS	retired or absent trust root refuses on the trust material and never on the network, cold and warm (H).
 .estate-clone/tuppence/scripts/verify-identity-regexp.sh	PASS	    the release and proposal identities do not overlap in either direction
 .estate-clone/tuppence/twin/verify-twin-scenarios.sh	SKIP	SKIP: the overlay with its six scenarios loads, and the emitter could not price it: CANNOT LOOK: tuppence's twin cannot price a forward-intel payload today, and
-.estate-clone/tuppence/verify-reconcile.sh	FAIL	FAIL: FAIL: a fact of the five-fact sample was observed false
+.estate-clone/tuppence/verify-reconcile.sh	SKIP	SKIP: no local kind cluster 'tuppence' to observe here, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a 
 .estate-clone/tuppence/verify-twin-overlay.sh	SKIP	SKIP: the emitter could not look: CANNOT LOOK: tuppence's twin cannot price a forward-intel payload today, and the instruments it is missing are named rather th
 verify/a-fall-blocks/verify-a-fall-blocks.sh	PASS	PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, tha
 verify/adr-supersession/verify-adr-supersession.sh	PASS	PASS: ADR-0026 records the priced-hole decision; ADR-0013, ADR-0017 and ADR-0018 point 3 carry dated banners naming it; CONTEXT.md cites it and no entry still r
@@ -87,13 +87,13 @@ verify/demo/verify-demo.sh	PASS	PASS: a deck builds from this run's captures and
 verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh	FAIL	FAIL: 1 problem(s) -- the register does not honestly account for the Deny-shaped rules this estate carries (ticket 89)
 verify/derived-status/verify-derived-status.sh	FAIL	FAIL: 1 fault(s) -- a ticket's Status: is typed rather than derived (ticket 59)
 verify/disclaimer/verify-disclaimer.sh	PASS	PASS: all eight parties say they are a demonstration on their signed artefact and their README, the two regulators carry the long form, nist attributes NIST's p
-verify/e2e/verify-e2e-step1-regulator-publishes.sh	PASS	PASS: ico's newest penalty-schema envelope validates and its tag is on the real remote
-verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh	PASS	PASS: a SYNTHETIC pin bump (threat-register v1 -> v2, made here on a throwaway copy of tuppence, not tuppence's own merged history) re-prices tuppence's prices[
+verify/e2e/verify-e2e-step1-regulator-publishes.sh	SKIP	SKIP: ico/penalty-schema@4.0.0: waiting for tag v4.0.0 on ico (cut by cut-release.yml after merge)
+verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh	PASS	PASS: a SYNTHETIC pin bump (penalty-schema v3 -> v4, made here on a throwaway copy of driftwood, not driftwood's own merged history) re-prices driftwood's price
 verify/e2e/verify-e2e-step3-price-crosses-band-pr-opens.sh	PASS	PASS: a SYNTHETIC residual placed either side of driftwood's own signed appetite band of 40,000 GBP (20,000.00 -> 58,269.23 GBP, not driftwood's real priced pos
 verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh	SKIP	SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass
 verify/e2e/verify-e2e-step5-twin-forecasts.sh	SKIP	SKIP: the twin did not play a dated signal forward for every adopter: driftwood/twin/verify-twin-sweep-moved.sh could not look: SKIP: the moved path has not fir
 verify/e2e/verify-e2e-step6-provenance.sh	PASS	PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 18 lines the 8 release-shipping units declare in their own party.yam
-verify/e2e/verify-e2e-step7-honesty.sh	PASS	PASS: steps 1-6 each report one honest verdict (verdicts: PASS PASS PASS SKIP SKIP PASS PASS)
+verify/e2e/verify-e2e-step7-honesty.sh	PASS	PASS: steps 1-6 each report one honest verdict (verdicts: SKIP PASS PASS SKIP SKIP PASS PASS)
 verify/every-green/verify-every-green.sh	PASS	PASS: none of the 123 discovered verify scripts prints the SKIP verdict token and then reaches exit 0; the prose-worded could-not-look is not graded here (see t
 verify/feed-contract/verify-feed-contract.sh	SKIP	SKIP: insurer pins driftwood/feed/exposure@v1.1.0: the tree of v1.1.0 carries no exposure section in composed/HEADER.yaml -- the tag resolves, but not to the co
 verify/feed-contract/verify-untagged-pin-is-priced.sh	PASS	PASS: every adopter feed pin resolves to a tag that verifies under its publisher's own identity pins, or is priced as a hole under the adopter's own perspective
@@ -105,7 +105,7 @@ verify/map-surface/verify-map-surface.sh	PASS	PASS: every pass/fail figure .scra
 verify/misuse/verify-misuse.sh	PASS	PASS: three misuse catalogues load through one loader and every row names a mechanism (misuse_catalogues_load_and_every_row_names_a_mechanism); eco-system rows:
 verify/party/verify-party.sh	PASS	mirror each party's OWN signed party.yaml rather than standing in for it.
 verify/portability/verify-portability.sh	SKIP	SKIP: driftwood carries no vendored copy of ico's penalty-schema@v3 at origin/main, so 1787177.08 GBP/yr of exposure it signed cannot be re-derived without ico'
-verify/pound-seam/verify-pound-seam.sh	PASS	PASS: every price names its perspective, currency, source and per-customer share; no sum crosses either; and wherever a party publishes both a selection-policy 
+verify/pound-seam/verify-pound-seam.sh	SKIP	SKIP: driftwood serves a total of 3,704,381.74 GBP carrying no `ordinal` and no `aggregate`: composition.py writes both, and this adopter was composed under pla
 verify/priced-holes/verify-priced-holes.sh	SKIP	SKIP: driftwood: composed/evidence.json carries no deltas[] — it was composed under the refusal shape; re-composing an adopter is an enactment push the owner 
 verify/proportionality/verify-proportionality.sh	SKIP	SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- kind-driftwood is not reachable, so driftwood's ren
 verify/provenance/verify-provenance.sh	SKIP	SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- no rekor-cli here to query the transparency log, so

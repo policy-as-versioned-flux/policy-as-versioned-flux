@@ -3,7 +3,7 @@
 [1;36m==>[0m 1. this checkout can read what a citation points at
   ok   git, talk/truth.log and .scratch/ecosystem/issues are all readable, and the checkout is not shallow
 [1;36m==>[0m 2. every TRUTH line the tickets cite is real, its tree carries the check it is offered as proof of, and git says the ticket making the claim added that check
-  108 ticket files, 54 recorded TRUTH lines, 47 gate-proof citation(s) and 13 quoted figure line(s) graded
+  108 ticket files, 55 recorded TRUTH lines, 47 gate-proof citation(s) and 13 quoted figure line(s) graded
   gate-proof citations: 0 proved by an adding commit naming the ticket, 0 by a dated attribution line, 47 disposed of by a dated correction, 0 observed false; 0 attribution(s) consulted and refused
   not graded, on the record: 36 line(s) quote a figure with no run beside it; 8 line(s) say of themselves that they are not citable; 198 citation(s) sit in no gate-proof paragraph
   -- exempt  .scratch/ecosystem/issues/108-the-recording-commit-turns-two-checks-red-and-nothing-re-measures.md:33  (not citable)

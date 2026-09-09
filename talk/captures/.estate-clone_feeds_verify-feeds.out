@@ -8,7 +8,8 @@ ok  market-moves/v1/feed.json -> envelope + market-moves/payload.schema.json
 ok  news/v1/feed.json -> envelope + news/payload.schema.json
 ok  threat-register/v1/feed.json -> envelope + threat-register/payload.schema.json
 ok  threat-register/v2/feed.json -> envelope + threat-register/payload.schema.json
-ok  9 published feed versions validated
+ok  threat-register/v3/feed.json -> envelope + threat-register/payload.schema.v3.json
+ok  10 published feed versions validated
 ok  party.yaml publishes threat-register
 ok  party.yaml publishes threat-register/payload.schema.json
 ok  party.yaml publishes cve
@@ -71,4 +72,14 @@ ok  converters/fx.py selfcheck: 7 cases
 ok  1000 GBP -> 1284.0 USD on 2026-08-14, at the published HMRC rate
 ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
 
-PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed; the bump ladder holds; publishes[] names only real paths; a twin scenario validates against the 2.0.0 forward-intel payload schema; fx prices a date it publishes and refuses one it does not.
+
+== the threat register publishes its own magnitudes, and ships the converter that reads them ==
+ok  9 (version, institution) scenarios; 3 price a magnitude the PUBLISHER published, 6 price the frozen table and say so by name
+ok  every magnitude in major 3 is the number the platform's own table held, so the move re-homes it and does not re-price it
+ok  a magnitude with no basis refuses, naming the institution and where its basis goes
+ok  the converter imports only the standard library, so the hub's portability replay can run it in a directory holding nothing but itself and the payload
+ok  threat-register/v3/feed.json institutions.driftwood: lm (1000, 4000, 9000) GBP, lef (2, 4, 9), both with a dated basis
+ok  threat-register/v3/feed.json institutions.tuppence: lm (5000, 25000, 90000) GBP, lef (4, 9, 20), both with a dated basis
+ok  threat-register/v3/feed.json institutions.ludlow: lm (20000, 100000, 400000) GBP, lef (1, 2, 5), both with a dated basis
+ok  3 institution(s) in major 3 and above publish their own loss magnitude, each with a basis carrying a kind, a statement and a date
+PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed; the bump ladder holds; publishes[] names only real paths; a twin scenario validates against the 2.0.0 forward-intel payload schema; fx prices a date it publishes and refuses one it does not; and the threat register publishes its own loss magnitudes with a dated basis on each and ships the converter that reads them.

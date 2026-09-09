@@ -6,6 +6,9 @@ OK prices[]: every entry names its perspective, currency, source and kind, and r
 OK prices[]: the insurer's signed quote books as one `premium` cost line under driftwood's own perspective (113403.30 GBP), and the insurer's layer arithmetic stays under its own
 OK prices[]: a quote insuring another party, or booking its premium on another party's sheet, refuses as a missing instrument and prices nothing
 OK exposure: driftwood's composed artefact signs its total priced exposure (3704381.74 GBP), its appetite as the attachment and the 3 breakdown by regime name and control id; the premium it buys is a cost and is not counted in it
+OK (N3) a total that excludes an untiered line gives NO VERDICT against the aggregate: 10,000.00 tiered + 50,000,000.00 untiered against a 40,000.00 band returns 7000.00 with breaches_band=None and a could-not-look naming `huge`, not the False it used to return
+OK (F3) an appetite declared in USD against a GBP exposure is CONVERTED through the signed FX feed (40,000.00 USD = 31152.65 GBP at 2026-08-15, breaches_band=True), and with no rate for the date there is no verdict at all: breaches_band=None and a named could-not-look, never a comparison of two currencies. (F8) a book whose every line is untiered still returns a section, naming all 3 of them.
+OK (e) driftwood's exposure.total of 3704381.74 GBP says what it is ('an ordinal, auditable comparison under one perspective; not an expected annual loss'), and the aggregate of its 3 selected-tier residuals is 87387.45 GBP against a tolerance of 40000.00 GBP: breaches_band=True
 OK pin signature: the real driftwood's quote pin resolves to the insurer's signed tag v1.0.0 on the checkout, and carries no hole
 OK pin signature: only a checkout that can show the publisher's tag namespace may say `untagged` -- no tag at all, a lightweight tag and a flattened annotated tag all read `unobserved`; an annotated tag with no signature block is untagged
 OK untagged pin: a quote pinned at a version no tag on the insurer's checkout signs composes (no refusal) with a hole of its own premium (113403.30 GBP) under driftwood's perspective, printed as a new-untagged-pin delta
@@ -2961,7 +2964,7 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
         2,
         4
       ],
-      "lef_basis": "lm sourced from ICO (Information Commissioner's Office) real public fines (UK GDPR / Data Protection Act 2018 s157). warn/deny lef are editorial (schema doesn't carry frequency). Scaled to a subscriber turnover of 86,000,000.00 GBP.",
+      "lef_basis": "lm sourced from ICO (Information Commissioner's Office) real public fines (UK GDPR / Data Protection Act 2018 s157). Scaled to a subscriber turnover of 86,000,000.00 GBP, clamped at the statutory maximum max(cap, rate x turnover). FINALITY UNCHECKED: no example in payload version v3 carries a `status`, so whether any of the 2 figure(s) below is the FINAL collected penalty or a notice figure since reduced, set aside or never collected could not be looked at. From major 4 every example carries `status`, `final_as_of` and `litigation` (eco-system ticket 79 item 1). A named could-not-look. FREQUENCY UNSOURCED: this line annualises at (1, 2, 4) events/yr, which is this converter's editorial default and not a counted rate. Payload version v3 predates the publisher's `frequency` field, so no basis and no denominator could be read for it; from major 4 the basis belongs on regimes.uk-gdpr.violation_types.lower-tier.frequency.basis. A named could-not-look (eco-system ticket 79 item 3), never a bare number.",
       "proposed_as": "label",
       "holes": [
         {
@@ -3024,11 +3027,11 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "proposed_tier": "baseline",
       "changed": false,
       "lef": [
-        2,
-        4,
-        9
+        2.0,
+        4.0,
+        9.0
       ],
-      "lef_basis": "cart/checkout PII exfiltration (e-commerce, short-life cart data, high traffic/low sensitivity per-record). lef sourced from DBIR retail-sector web-app-attack base rate, editorial midpoint.",
+      "lef_basis": "cart/checkout PII exfiltration (e-commerce, short-life cart data, high traffic/low sensitivity per-record). lef sourced from DBIR retail-sector web-app-attack base rate, editorial midpoint. MAGNITUDE UNSOURCED: the impact per event (1000.0, 4000.0, 9000.0) GBP is not in payload version v2, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
       "proposed_as": "label",
       "holes": [],
       "total": null,
@@ -3260,12 +3263,12 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
         "--turnover",
         "86000000.00"
       ],
-      "scenario_sha256": "1a7219f32bce9410cd6bd7776360348e88d0a1c5058e6ee299743f4b086ab534",
+      "scenario_sha256": "beab3ee23fa7145858466434ef26d63f5312d0354e03f33e0284d5419edd8bea",
       "payload_version_key": "schema_version",
       "published_at": "2026-08-28",
       "files": {
         "party.yaml": "5c07030a7a02883fdaf217e43fb5aefb423153f8e10817097c7a74094e3fff56",
-        "penalty-schema/to_fair_scenario.py": "560a38c04397e8e98d56a279ca5b88cb2b2707a8a22a5c8d71a9be74946bb982",
+        "penalty-schema/to_fair_scenario.py": "4d313e86d2d139788b5e46d43d534f3ce64b6ec49b9da8f10dcc9ad8d7ca4d6f",
         "penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda"
       },
       "path": "composed/feeds/ico/v3"
@@ -3279,17 +3282,17 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "feed_path": "threat-register/v2/feed.json",
       "party_artefact": "party.yaml",
       "converter": "threat-register/to_fair_scenario.py",
-      "converter_from": "platform",
+      "converter_from": "feeds",
       "invocation": [
         "threat",
         "driftwood"
       ],
-      "scenario_sha256": "421652b8e427918055e36d9aea2880fe160a80e48d1ef161032c02fc9164107e",
+      "scenario_sha256": "6046699614c5d4ebc35e0bb00b3c521d1c4e5ab07930527cdc595c745d2a008c",
       "payload_version_key": "feed_version",
       "published_at": "2026-07-31",
       "files": {
         "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
-        "threat-register/to_fair_scenario.py": "b778de62f062a76d38ec1c8e9eefcefb2e3940f0dc4cc4bb1a2c7397986e85a8",
+        "threat-register/to_fair_scenario.py": "6afad65dd84451206ed276d08e34473cba652f97ef782bc7e2385ec4dc0e445d",
         "threat-register/v2/feed.json": "c94ae8335d13edcbdc63b2d8f7c7cda3fbefd4d80e78022be51aba30d70b9a6c"
       },
       "path": "composed/feeds/feeds/v2"
@@ -6178,7 +6181,7 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
         2,
         4
       ],
-      "lef_basis": "lm sourced from ICO (Information Commissioner's Office) real public fines (UK GDPR / Data Protection Act 2018 s157). warn/deny lef are editorial (schema doesn't carry frequency). Not sized to any subscriber: priced at the statutory cap.",
+      "lef_basis": "lm sourced from ICO (Information Commissioner's Office) real public fines (UK GDPR / Data Protection Act 2018 s157). Not sized to any subscriber: priced at the statutory cap. FINALITY UNCHECKED: no example in payload version v3 carries a `status`, so whether any of the 2 figure(s) below is the FINAL collected penalty or a notice figure since reduced, set aside or never collected could not be looked at. From major 4 every example carries `status`, `final_as_of` and `litigation` (eco-system ticket 79 item 1). A named could-not-look. FREQUENCY UNSOURCED: this line annualises at (1, 2, 4) events/yr, which is this converter's editorial default and not a counted rate. Payload version v3 predates the publisher's `frequency` field, so no basis and no denominator could be read for it; from major 4 the basis belongs on regimes.uk-gdpr.violation_types.lower-tier.frequency.basis. A named could-not-look (eco-system ticket 79 item 3), never a bare number.",
       "proposed_as": "label",
       "holes": [
         {
@@ -6238,11 +6241,11 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
       "proposed_tier": "isolated",
       "changed": false,
       "lef": [
-        1,
-        2,
-        5
+        1.0,
+        2.0,
+        5.0
       ],
-      "lef_basis": "confidential health-record exfiltration (HIPAA, decades-confidential, HNDL/harvest-now-decrypt-later exposure). lef sourced from DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon.",
+      "lef_basis": "confidential health-record exfiltration (HIPAA, decades-confidential, HNDL/harvest-now-decrypt-later exposure). lef sourced from DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon. MAGNITUDE UNSOURCED: the impact per event (20000.0, 100000.0, 400000.0) GBP is not in payload version v1, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
       "proposed_as": "label",
       "holes": [],
       "total": null,
@@ -6509,12 +6512,12 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
         "uk-gdpr",
         "lower-tier"
       ],
-      "scenario_sha256": "3382ab9371d2040558594909c6301f771b5c6f6c452e675fb5adbb42399aa1b4",
+      "scenario_sha256": "585b32f5d87d3778d87a6dee15c43b4df28bcc4bf5ae68a20b61571f257468f0",
       "payload_version_key": "schema_version",
       "published_at": "2026-08-28",
       "files": {
         "party.yaml": "5c07030a7a02883fdaf217e43fb5aefb423153f8e10817097c7a74094e3fff56",
-        "penalty-schema/to_fair_scenario.py": "560a38c04397e8e98d56a279ca5b88cb2b2707a8a22a5c8d71a9be74946bb982",
+        "penalty-schema/to_fair_scenario.py": "4d313e86d2d139788b5e46d43d534f3ce64b6ec49b9da8f10dcc9ad8d7ca4d6f",
         "penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda"
       },
       "path": "composed/feeds/ico/v3"
@@ -6528,17 +6531,17 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
       "feed_path": "threat-register/v1/feed.json",
       "party_artefact": "party.yaml",
       "converter": "threat-register/to_fair_scenario.py",
-      "converter_from": "platform",
+      "converter_from": "feeds",
       "invocation": [
         "threat",
         "ludlow"
       ],
-      "scenario_sha256": "8e9c76a8a390a3aa663a390a2e401c1b9fc74a5d5c66e06f61a5d34c0bd642c0",
+      "scenario_sha256": "c7d81c0ce0abc18d6f5d2d3e8304289e1019da28073615baab4daacbb83356d6",
       "payload_version_key": "feed_version",
       "published_at": "2026-07-31",
       "files": {
         "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
-        "threat-register/to_fair_scenario.py": "b778de62f062a76d38ec1c8e9eefcefb2e3940f0dc4cc4bb1a2c7397986e85a8",
+        "threat-register/to_fair_scenario.py": "6afad65dd84451206ed276d08e34473cba652f97ef782bc7e2385ec4dc0e445d",
         "threat-register/v1/feed.json": "50af335e60b247d2a202fa747fd3a2b80c485fc587896dc0ab4841f0e54a8b60"
       },
       "path": "composed/feeds/feeds/v1"
@@ -6562,7 +6565,7 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
       "payload_version_key": "feed_version",
       "published_at": "2026-07-31",
       "files": {
-        "eol/to_fair_scenario.py": "b778de62f062a76d38ec1c8e9eefcefb2e3940f0dc4cc4bb1a2c7397986e85a8",
+        "eol/to_fair_scenario.py": "10e2f5b412b09a16ff8bff2e1fe108938c79b25ac20b95b4047b4e17631bcbe7",
         "eol/v2/feed.json": "401f564c7b370833888c74d612afffee80f947d7522e63b2be66d1a41b6f533b",
         "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823"
       },
