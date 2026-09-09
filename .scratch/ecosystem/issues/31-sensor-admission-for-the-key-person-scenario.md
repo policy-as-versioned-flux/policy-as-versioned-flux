@@ -447,6 +447,36 @@ so the next reader does not re-derive it.
   planted served estates grade as planted**, then the same 3 / 3 / 0 line on the real estate.
 - `mypy twin tests conftest.py` → Success, 186 source files.
 
+### Measured on the real runner, on this exact tree
+
+`truth` run 205, dispatched on `a70e9d2` because the workflow's push filter is
+`talk/…`, `clone-estate.sh`, `verify/**` and `.github/workflows/truth.yml`, and the last commit
+touches only `twin/`, `tests/` and this file. Quoted **from the Actions log and NOT citable** — a
+branch run records nothing (ticket 100), and the run's own gate printed `CAN_RECORD: no`:
+
+```
+TRUTH 2026-09-09T16:32Z run=205 hub=a70e9d2 enact=development units=[driftwood=08ca32e@main
+feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=a2e9d02@main nist=f83126f@main
+platform=8da250d@main tuppence=fbf952f@main] pass=77 [observed=23 self=41 simulated=4 meta=9]
+fail=8 skip=31 [never=9 waits=22] excluded=8 total=124 ceiling=105
+```
+
+The gate graded this check `SKIP (waits)` with the intended line, against the real fetched estate.
+None of the eight fails is this check: they are `verify/branch-refs`, `verify/deny-is-not-a-rung`,
+`verify/derived-status`, `verify/handbook`, `verify/schedules`,
+`verify/unreviewed-major` and two in `.estate-clone/`. `verify/derived-status`'s single fault
+names **ticket 34**, not this one; ticket 31 falls in its "7 rest only on checks that could not
+look", which it counts and does not fault. That check is red byte-identically on pristine
+`origin/main` in this clone.
+
+One number moved between the branch run on `867075c` and the one above, one fail becoming one
+pass. It is **not** this branch: `platform`'s served sha moved from `2998571` to `8da250d`
+between the two, and the pass that arrived is in the `self` class, which this branch does not add
+to. This branch's own row is `SKIP (waits)` in both. Neither figure is quoted here as a citable
+number, because neither branch run wrote a line to `talk/truth.log`; `verify/cited-truth`
+refused an earlier draft of this paragraph for pairing a run number with a figure the log does
+not record, which is the correct refusal.
+
 ## Waits on the owner
 
 **Nothing.** Ticket 82's named-individuals ruling (its "Waits on the owner" item 3) is still
