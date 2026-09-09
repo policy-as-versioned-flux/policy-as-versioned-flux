@@ -409,3 +409,20 @@ the signature changed -- which names the old ludlow defect on both halves when p
 > this ticket built: it is the owner's carried-major authorisation -- all three adopters carry
 > platform policy 4.0.0 -- which is Waits item 1 above, and it stays red until the owner records
 > that review.
+
+> **Follow-up, 2026-09-09 (eco-system ticket 105).** Three sentences in this record were true when
+> written and are not now, and this ticket's own lesson is that nothing re-reads them. (a) "driftwood
+> scenario G and tuppence scenario G ... prints `exit 1` today" and "Today: ludlow 0, driftwood 1,
+> tuppence 1": both gates pin their trust root since ticket 105 and all three numbers are `0`, and
+> the two scenarios now GRADE the exit rather than printing it. (b) The remedy-4 note "cosign reads
+> only the FIRST PEM block of the CT key file ... so the gate must select the right key, which means
+> parsing the SCT extension out of the certificate's DER" describes the LEGACY env-var door, which
+> ludlow no longer uses: ticket 105 moved every bundle onto `--trusted-root` by re-encoding a legacy
+> bundle locally, and the DER parser and per-role key selection are deleted. (c) The review's
+> "strongest argument for remedy 2 (platform re-signs) sooner rather than later" -- a non-ECDSA Rekor
+> key refused on a key-type ground -- was an argument about that same door and no longer holds;
+> ticket 105 decision 4 re-weighs remedy 2 as a tidying and says what it would and would not remove.
+> What this ticket built for ludlow is superseded in mechanism and unchanged in property: the trust
+> material is still one committed, reviewed file per institution, still read with a cold TUF cache
+> and no egress, and still refuses by name when it goes stale. Everything else here stands, including
+> Waits item 1, which is the owner's and still open.

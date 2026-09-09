@@ -215,3 +215,30 @@ def test_the_cold_environment_isolates_the_caches_it_is_given(grader: ModuleType
     cold = grader.COLD_ENV(tmp_path / "home", tmp_path / "tuf")
     assert cold["HOME"] == str(tmp_path / "home")
     assert cold["TUF_ROOT"] == str(tmp_path / "tuf")
+
+
+# --------------------------------------------------------------------------------------------
+# the offline NOTE derives "fetches a trust root" from the output, not from a non-zero exit
+# (ticket 101 review R2-1; closed by ticket 105)
+# --------------------------------------------------------------------------------------------
+def test_the_offline_note_says_no_network_needed_only_on_exit_zero(grader: ModuleType) -> None:
+    text = grader.offline_note("driftwood", 0, "Verified OK")
+    assert "exit 0" in text and "no network needed" in text
+
+
+def test_the_offline_note_names_a_trust_root_fetch_only_when_the_output_shows_one(grader: ModuleType) -> None:
+    text = grader.offline_note("tuppence", 1, "tuf: failed to download 13.root.json: dial tcp 127.0.0.1:1: connect: connection refused")
+    assert "exit 1" in text and "fetches a Sigstore trust root" in text
+
+
+def test_the_offline_note_does_not_call_a_pin_refusal_a_network_fetch(grader: ModuleType) -> None:
+    # A gate that pins a root and refuses because the pin is wrong returns exit 1 with no network in
+    # the story at all. Before ticket 105 this line would have read "fetches a trust root".
+    text = grader.offline_note("ludlow", 1, "REFUSE: policy 2.0.1: cosign verify-blob refused the evidence signature (transparency log signature does not match)")
+    assert "fetches a Sigstore trust root" not in text
+    assert "exit 1" in text and "not the network" in text and "transparency log signature" in text
+
+
+def test_the_offline_note_could_not_be_taken_when_the_gate_did_not_run(grader: ModuleType) -> None:
+    text = grader.offline_note("x", None, "")
+    assert "could not be taken" in text

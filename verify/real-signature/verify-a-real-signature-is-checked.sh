@@ -28,11 +28,13 @@
 # corrupts the served artefact rather than fabricating a fixture.
 #
 # ALSO PRINTED, NEVER GRADED: how offline each adopter's signature check is, as an exit code per
-# adopter. ludlow pins its Sigstore trust material and verifies with a cold TUF cache and blocked
-# egress; driftwood and tuppence pass cosign no trust root and fetch one from Sigstore's TUF CDN,
-# which a CI runner does on every run because it is cold every time. That difference is printed as
-# a number rather than written down as a sentence, because this ticket's own lesson is that a
-# sentence about what a check cannot do goes stale and nothing re-reads it. Closing it is ticket 105.
+# adopter. Until ticket 105 (2026-09-09) ludlow pinned its Sigstore trust material and verified with
+# a cold TUF cache and blocked egress while driftwood and tuppence passed cosign no trust root and
+# fetched one from Sigstore's TUF CDN on every CI run; every adopter now pins, and all three print
+# 0. It stays a number rather than a sentence, because this ticket's own lesson is that a sentence
+# about what a check cannot do goes stale and nothing re-reads it -- and the words beside a
+# non-zero number are derived from the gate's own output (a TUF fetch or a refused connection),
+# never from the exit code alone (review R2-1): a pinned gate refusing a wrong pin returns exit 1 too.
 #
 # Exit 0 observed true; 1 observed false; 3 could not look, reason on the last line.
 set -uo pipefail

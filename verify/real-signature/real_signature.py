@@ -32,13 +32,16 @@ WHAT IS SERVED AND WHAT REACHES IT.
 Only the MOVEMENT is planted (which versions the adopter's composed window names before and
 after), because that is the thing a Renovate pull request changes.
 
-ALSO REPORTED, NEVER GRADED: how offline each adopter's signature check is. ludlow pins its
-Sigstore trust material and verifies with a cold TUF cache and no egress; driftwood and tuppence
-pass cosign no trust root, so they fetch a trust root from Sigstore's TUF CDN on every CI run,
-which is cold every time. That is a real difference between the three and it is printed as an
-exit code per adopter rather than written down as a sentence -- eco-system ticket 101's own lesson
-is that a sentence about what a check cannot do goes stale and nothing re-reads it. Closing the
-difference is ticket 105.
+ALSO REPORTED, NEVER GRADED: how offline each adopter's signature check is. Until ticket 105
+(2026-09-09) ludlow pinned its Sigstore trust material and verified with a cold TUF cache and no
+egress while driftwood and tuppence passed cosign no trust root and fetched one from Sigstore's
+TUF CDN on every CI run, which is cold every time; every adopter now pins. The number is still
+printed as an exit code per adopter rather than written down as a sentence -- eco-system ticket
+101's own lesson is that a sentence about what a check cannot do goes stale and nothing re-reads
+it -- and the WORDS beside the number are derived from the gate's own output (R2-1): "fetches a
+trust root" is said only when the output shows a TUF fetch or a refused connection, never from a
+non-zero exit alone, because a pinned gate refusing a wrong pin returns exit 1 too, with no network in
+the story.
 
 Usage:
     real_signature.py <estate-dir>
@@ -49,6 +52,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -201,8 +205,30 @@ def COLD_ENV(home: Path, tuf: Path) -> dict[str, str]:
             "NO_PROXY": "", "no_proxy": ""}
 
 
+NETWORK = re.compile(r"tuf|dial tcp|connection refused", re.IGNORECASE)
+
+
+def offline_note(unit: str, exit_code: int | None, output: str) -> str:
+    """The sentence beside the number, derived from the gate's own output. Until ticket 105 a
+    non-zero exit alone was worded as "fetches a Sigstore trust root" (ticket 101 review, R2-1),
+    which is true of a gate with no pin and false of a gate refusing a wrong one."""
+    if exit_code is None:
+        return f"{unit}: the offline measurement could not be taken -- its gate could not be invoked at all"
+    if exit_code == 0:
+        return (f"{unit}: its own gate verifies platform's real published bundle with a cold TUF cache and "
+                f"every proxy pointed at a closed port -- exit 0, no network needed")
+    tail = (output.strip().splitlines() or [""])[-1][:160]
+    if NETWORK.search(output):
+        return (f"{unit}: its own gate cannot verify platform's real published bundle with a cold TUF cache "
+                f"and egress blocked -- exit {exit_code}, and its output shows the fetch ({tail}), so this "
+                f"repository's signature check fetches a Sigstore trust root on every CI run, which is cold "
+                f"every time (eco-system ticket 105)")
+    return (f"{unit}: its own gate refuses with a cold TUF cache and egress blocked -- exit {exit_code}, for a reason "
+            f"that is not the network -- its output names no TUF fetch and no refused connection: {tail}")
+
+
 def offline_exit(fold, unit: str, unit_dir: Path, planted: dict, platform_dir: Path,
-                 adopter_repo: Path, workdir: Path) -> int | None:
+                 adopter_repo: Path, workdir: Path) -> tuple[int | None, str]:
     """The number this check reports and does not grade: what THIS adopter's OWN gate, invoked
     exactly the way its own workflow invokes it, does against platform's real published evidence
     with a cold TUF cache and every proxy pointed at a closed port.
@@ -230,7 +256,7 @@ def offline_exit(fold, unit: str, unit_dir: Path, planted: dict, platform_dir: P
                 os.environ.pop(key, None)
             else:
                 os.environ[key] = was
-    return None if result is None else result["exit"]
+    return (None, "") if result is None else (result["exit"], result["output"])
 
 
 SHA = 40
@@ -368,22 +394,10 @@ def _observe(estate: Path, fold, units: list[str], platform_src: Path,
             cold_dir.mkdir(parents=True, exist_ok=True)
             cold_planted = fold.plant(cold_dir / "adopter", ([STANDING], [STANDING, version],
                                                              BASE_TAG, HEAD_TAG), tag_commits)
-            cold = (None if _planted_or_none(cold_planted) is not None
-                    else offline_exit(fold, unit, unit_dir, cold_planted, clean,
-                                      cold_dir / "adopter", cold_dir))
-            if cold is None:
-                lines.append(("note", f"{unit}: the offline measurement could not be taken -- its "
-                                       f"gate could not be invoked at all"))
-            elif cold == 0:
-                lines.append(("note", f"{unit}: its own gate verifies platform's real published "
-                                       f"bundle with a cold TUF cache and every proxy pointed at a "
-                                       f"closed port -- exit 0, no network needed"))
-            else:
-                lines.append(("note", f"{unit}: its own gate cannot verify platform's real published "
-                                       f"bundle with a cold TUF cache and egress blocked -- exit "
-                                       f"{cold}, so this repository's signature check fetches a "
-                                       f"Sigstore trust root on every CI run, which is cold every "
-                                       f"time (eco-system ticket 105)"))
+            cold, cold_output = ((None, "") if _planted_or_none(cold_planted) is not None
+                                 else offline_exit(fold, unit, unit_dir, cold_planted, clean,
+                                                   cold_dir / "adopter", cold_dir))
+            lines.append(("note", offline_note(unit, cold, cold_output)))
 
     verdict, graded = grade(observations)
     return verdict, lines + graded
