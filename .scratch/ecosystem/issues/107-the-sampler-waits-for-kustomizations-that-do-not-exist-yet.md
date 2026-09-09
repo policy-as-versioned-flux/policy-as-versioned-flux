@@ -22,9 +22,11 @@ still `building artifact`), `drift/five-facts.py` reads the inventories once at 
 for fact 4, in no inventory for fact 5.
 
 Driftwood is the control. Its facts 4 and 5 read True on the scheduled samples of 09-05, 09-06 and
-09-07 under the same workflow, because its own `kustomizations/driftwood` does not reach Ready on the
-ephemeral cluster and the loop's `--timeout=180s` on it stalls the job for three minutes, long enough
-for `composed-v*` to apply. On 09-08 the stall was not enough and driftwood read fact 3 false,
+09-07 under the same workflow, because on each of those three runs its own `kustomizations/driftwood`
+does not reach Ready on the ephemeral cluster and the loop's `--timeout=180s` on it stalls the job for
+~3 minutes, long enough for `composed-v*` to apply: run 33961154234 timed out at
+2026-09-05T10:41:33.58Z, run 34028943241 at 2026-09-06T11:04:14.49Z, run 34122734820 at
+2026-09-07T12:40:10.14Z. On 09-08 the stall was not enough and driftwood read fact 3 false,
 fifteen absent, inventory 4. A green that rests on a timeout is the accident ticket 81's Decisions
 warned about, and it says fact 5 is reachable as defined: the fact is right, the moment of sampling
 is wrong.
@@ -50,10 +52,16 @@ measured 2026-09-08:
   false (one absent, `GeneratingPolicy/cage-netpol-2-0-0`), fact 5 false (15 of 16, inventory 8).
 - ludlow drift-sample run 34232921856 (`ts` 2026-09-08T13:36:58Z): the same shape one hour later;
   fact 4 true (all sixteen live and equal), fact 5 false (15 of 16, inventory 8).
-- driftwood drift-sample run 34122734820 (09-07): `error: timed out waiting for the condition on
-  kustomizations/driftwood` at 12:40:10, ResourceSet created 12:37:09; `composed-v*` at `3m`,
-  `Applied revision`; facts 4 and 5 true, inventory 19. Run 34220235347 (09-08): the same timeout,
-  `composed-v*` at `3m` with no status, fact 3 false.
+- driftwood, all three post-merge green runs: `error: timed out waiting for the condition on
+  kustomizations/driftwood` ~3m after that run created the ResourceSet — run 33961154234 at
+  2026-09-05T10:41:33.58Z (created 10:38:33.24Z), run 34028943241 at 2026-09-06T11:04:14.49Z (created
+  11:01:14.26Z), run 34122734820 at 2026-09-07T12:40:10.14Z (created 12:37:09.78Z) — each with
+  `composed-v*` at `2m59s`/`3m` carrying `Applied revision`, facts 4 and 5 true, inventory 19. Run
+  34220235347 (09-08): the same timeout, `composed-v*` at `3m` with no status, fact 3 false.
+- the same run measures the race inside itself: `take_sample` re-reads the Kustomization list after
+  `composed_set_facts` returns (five-facts.py line 330) and fact 3 derives from that later read, so
+  tuppence run 34228832561 records `inventory_entries` 8 and, from a strictly later instant, all three
+  `composed-v*` having applied `751522b3bca9`.
 - The hub check's `NAMES` array (`verify-sampler-wait-order.sh` line 40) requires `Kustomization
   waits` strictly before `ResourceSet waits`. The fix below flips that, so the check goes red on the
   fix unless it changes in the same wave: the eighth instance in the derive-what-you-assert note
@@ -98,6 +106,6 @@ fact is reachable as defined, and the redefinition would have graded a hand-appl
 which is the case fact 5 exists to catch (`gitops/composed/composed-set.yaml`, header comment).
 
 Two observations to read before charting anything from them, not part of this ticket's Done:
-`kustomizations/driftwood` not reaching Ready on the ephemeral cluster (both driftwood runs read),
+`kustomizations/driftwood` not reaching Ready on the ephemeral cluster (all four driftwood runs read),
 and tuppence's moving fact-4 absence (five objects on 09-06 and 09-07, one on 09-08, none on 09-05),
 which is the same race seen from the object side and should close with it.

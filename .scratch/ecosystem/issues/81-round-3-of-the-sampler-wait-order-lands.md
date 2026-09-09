@@ -141,11 +141,11 @@ Every sentence below was measured on 2026-09-08 against `origin/main` of each re
 `.github/workflows/drift-sample.yml` is the round-3 commit this ticket cherry-picked
 (`git log --oneline origin/main -- .github/workflows/drift-sample.yml | head -1`):
 
-| adopter   | commit    | authored               | reached `main` by                                   | merged (UTC)          | merged by            |
-|-----------|-----------|------------------------|-----------------------------------------------------|-----------------------|----------------------|
-| driftwood | `41b09c9` | 2026-09-03T20:03+01:00 | PR #23 (head `ecosystem/build-2026-09-03`, `fdd66c1`) | 2026-09-04T14:50:21Z | `app/pavc-other-hand` |
-| tuppence  | `10fcf41` | 2026-09-03T20:03+01:00 | PR #15 (head `ecosystem/build-2026-09-03`, `f74dbdf`) | 2026-09-04T14:51:13Z | `app/pavc-other-hand` |
-| ludlow    | `9d14e39` | 2026-09-03T20:03+01:00 | PR #13 (head `ecosystem/build-2026-09-03`, `6cfb529`) | 2026-09-04T14:51:19Z | `app/pavc-other-hand` |
+| adopter   | commit    | cherry-picked (committer) | authored (preserved)   | reached `main` by                                   | merged (UTC)          | merged by            |
+|-----------|-----------|---------------------------|------------------------|-----------------------------------------------------|-----------------------|----------------------|
+| driftwood | `41b09c9` | 2026-09-03T20:03:33+01:00 | 2026-09-01T22:13:39+01:00 | PR #23 (head `ecosystem/build-2026-09-03`, `fdd66c1`) | 2026-09-04T14:50:21Z | `app/pavc-other-hand` |
+| tuppence  | `10fcf41` | 2026-09-03T20:03:33+01:00 | 2026-09-01T22:13:40+01:00 | PR #15 (head `ecosystem/build-2026-09-03`, `f74dbdf`) | 2026-09-04T14:51:13Z | `app/pavc-other-hand` |
+| ludlow    | `9d14e39` | 2026-09-03T20:03:34+01:00 | 2026-09-01T22:13:41+01:00 | PR #13 (head `ecosystem/build-2026-09-03`, `6cfb529`) | 2026-09-04T14:51:19Z | `app/pavc-other-hand` |
 
 So the three `ticket-60-wait-order` pull requests the section above prescribes were never opened; the
 wave route it names as the alternative is the one that happened, and the merge identity is the other
@@ -235,18 +235,31 @@ The Actions log of tuppence run 34228832561, step by step, with the workflow's l
    `drift/five-facts.py` reads the inventories once, at the top of `composed_set_facts` (line 260),
    and the sixteen objects afterwards, so during the seconds the sample takes the policies land: by
    the object reads fifteen (tuppence) or sixteen (ludlow) are live and byte-equal, and at the
-   inventory read none of them was in any inventory. Which eight objects the inventories did hold
-   was not read off the run; what is measured is that none of the fifteen is among them.
+   inventory read none of the fifteen policies was in any inventory. Which eight objects the
+   inventories did hold was not read off the run; what is measured is that none of the fifteen
+   is among them.
+
+The race is not only inferred from the log's clock; the sample measures it inside itself.
+`take_sample` reads the Kustomization list a SECOND time, AFTER `composed_set_facts` has returned
+(`kustomizations = cluster.get("-n", "flux-system", "get", "kustomizations...")`, five-facts.py
+line 330), and fact 3 derives `last_applied_revisions` from THAT later list. So tuppence run
+34228832561 records `inventory_entries` 8 with the fifteen policies uninventoried and, from a
+strictly later instant of the same run, records all three `composed-v*` Kustomizations as having
+applied `751522b3bca9`. The composed Kustomizations were transitioning while the sample was being
+taken: the two facts disagree because they were read seconds apart, which is the race stated as a
+measurement rather than an inference.
 
 Run 33964466808 of 09-05 has the same shape (`composed-v*` aged `0s` at 11:53:26.78, inventory 8),
 and ludlow's `inv 13 / uninv 10` on 09-05 is the same race won for one version. No line in any of these
 logs says `composed-v2-0-0 condition met`: nothing waited for them.
 
 Driftwood is the control, and its green is the accident item 3 of the Decisions above warned about.
-Its `kustomizations/driftwood` did not reach Ready on the ephemeral cluster in either run read, so
-the Kustomization loop blocks on it for the full bound — `error: timed out waiting for the condition on
-kustomizations/driftwood` at 12:40:10 in run 34122734820, three minutes after the ResourceSet was
-created at 12:37:09 — and that three-minute stall is what gave `composed-v*` time to apply
+Its `kustomizations/driftwood` reaches Ready on none of the three post-merge green runs, so the
+Kustomization loop blocks on it for the full bound. `error: timed out waiting for the condition on
+kustomizations/driftwood`, each ~3m after that run created the ResourceSet: run 33961154234 at
+2026-09-05T10:41:33.58Z (created 10:38:33.24Z), run 34028943241 at 2026-09-06T11:04:14.49Z (created
+11:01:14.26Z), run 34122734820 at 2026-09-07T12:40:10.14Z (created 12:37:09.78Z). That stall is what
+gave `composed-v*` time to apply
 (`Applied revision` on all three at `3m`, inventory 19, facts 4 and 5 True on the three scheduled
 samples of 09-05 to 09-07).
 On 09-08 (run 34220235347) the stall was not enough: `composed-v*` at `3m` with no status, fact 3
@@ -280,5 +293,5 @@ Map line (2026-09-08): Ticket 81 -- round 3 is on all three adopters' main (drif
 tuppence 10fcf41, ludlow 9d14e39, merged 2026-09-04 by the other hand through the wave's pull
 requests); verify-sampler-wait-order.sh PASS on recorded runs 177 and 179. Done is not met: tuppence's
 and ludlow's composed source records fact 5 false on every scheduled sample since, because the order
-waits for Kustomizations before the ResourceSet has generated them, and driftwood's greens rest on a
-three-minute timeout on its own Kustomization. Re-charted as ticket 107.
+waits for Kustomizations before the ResourceSet has generated them, and driftwood's three greens each rest on a
+~3-minute timeout on its own Kustomization (runs 33961154234, 34028943241, 34122734820). Re-charted as ticket 107.
