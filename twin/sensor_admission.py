@@ -82,8 +82,18 @@ _NI_NUMBER = re.compile(r"\b[A-CEGHJ-PR-TW-Z]{2}\d{6}[A-D]?\b")
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _WORD = re.compile(r"[^a-z0-9]+")
 
+#: Every closed key set `closed_keys` must declare (review F1). A set the table forgets is a
+#: refusal at load, never an open node.
+_KEY_SETS = (
+    "record", "notice", "dpia_ref", "ladder", "ladder_purpose", "ladder_necessity",
+    "ladder_alternative", "ladder_proportionality", "ladder_dpia", "dpia_record", "people_file",
+)
+
 REFUSAL_IDS = (
     "names-or-identifies-an-individual",
+    "key-not-declared",
+    "not-this-scenario-class",
+    "scenario-not-served",
     "field-not-admissible",
     "kind-not-admissible",
     "no-dpia-record",
@@ -108,13 +118,33 @@ def load_rule(path: Path | None = None) -> dict[str, Any]:
     doc = yaml.safe_load(source.read_text(encoding="utf-8"))
     if not isinstance(doc, dict) or doc.get("schema") != SCHEMA:
         raise SensorAdmissionError(f"{source}: not a {SCHEMA} document")
-    for field in ("scenario_class", "admissible", "admissible_fields", "refusals", "requires"):
+    for field in ("scenario_class", "admissible", "admissible_fields", "refusals", "requires",
+                  "closed_keys", "free_prose_fields"):
         if not doc.get(field):
             raise SensorAdmissionError(f"{source}: declares no {field}")
+    for name in _KEY_SETS:
+        if not doc["closed_keys"].get(name):
+            raise SensorAdmissionError(f"{source}: closed_keys declares no {name} set")
     declared = {str(r.get("id")) for r in doc["refusals"] if isinstance(r, dict)}
     missing = [r for r in REFUSAL_IDS if r not in declared]
     if missing:
         raise SensorAdmissionError(f"{source}: declares no sentence for {', '.join(missing)}")
+    # A row that declares an id and no usable sentence used to load and then either raise an
+    # uncaught KeyError at emit or print a blank FAIL line with no reason (review F3).
+    for row in doc["refusals"]:
+        rid = str(row.get("id"))
+        sentence = " ".join(str(row.get("sentence") or "").split())
+        if not sentence:
+            raise SensorAdmissionError(f"{source}: refusal {rid!r} declares no sentence")
+        for placeholder in ("{sensor}", "{what}"):
+            if placeholder not in sentence:
+                raise SensorAdmissionError(
+                    f"{source}: refusal {rid!r} declares a sentence with no {placeholder} — it "
+                    "would refuse without saying what it refused")
+        if not sentence.startswith(f"REFUSED {rid}:"):
+            raise SensorAdmissionError(
+                f"{source}: refusal {rid!r} declares a sentence that does not open "
+                f"'REFUSED {rid}:', so the gate could not read the id off the line")
     for row in doc["admissible"]:
         if row.get("kind") not in ("structural", "behavioural"):
             raise SensorAdmissionError(f"{source}: unknown kind {row.get('kind')!r}")
@@ -200,9 +230,93 @@ def individual_problems(document: Any, *, scan_names: bool = True) -> list[str]:
     return problems
 
 
+
+# -- the closed key sets (review F1) --------------------------------------------------------------
+
+def _undeclared(node: Any, rule: dict[str, Any], set_name: str, where: str) -> list[str]:
+    """Every key of `node` the table's `set_name` list does not declare, as a dotted path."""
+    if not isinstance(node, dict):
+        return []
+    allowed = {str(k) for k in rule["closed_keys"][set_name]}
+    out = []
+    for key in node:
+        if str(key) not in allowed:
+            path = f"{where}.{key}" if where else str(key)
+            out.append(f"{path!r} (the {set_name} keys are: {', '.join(sorted(allowed))})")
+    return out
+
+
+def undeclared_keys(record: dict[str, Any], rule: dict[str, Any]) -> list[str]:
+    """Every key in an admission record that this table does not declare.
+
+    Review F1, 2026-09-09: before this, only `fields:` was closed. A served record carrying
+    `maintained_by`, `escalation_contact`, `github`, `owner`, `stakeholders` or a nested
+    `context.escalation.to` was ADMITTED with a green PASS, because `identifier_in_value`
+    recognises exactly two shapes and nothing looked at keys it had never heard of. A homoglyph
+    key (`\u0435mployee_id`) evaded `identifier_in_name` for the same reason: `_WORD` splits on
+    `[^a-z0-9]+`, so a Cyrillic e is a separator. A closed set does not care what the key is
+    spelled like — only whether the table declares it.
+    """
+    out = _undeclared(record, rule, "record", "")
+    out += _undeclared(record.get("notice"), rule, "notice", "notice")
+    out += _undeclared(record.get("dpia"), rule, "dpia_ref", "dpia")
+    ladder = record.get("ladder")
+    out += _undeclared(ladder, rule, "ladder", "ladder")
+    if isinstance(ladder, dict):
+        out += _undeclared(ladder.get("purpose"), rule, "ladder_purpose", "ladder.purpose")
+        necessity = ladder.get("necessity")
+        out += _undeclared(necessity, rule, "ladder_necessity", "ladder.necessity")
+        if isinstance(necessity, dict) and isinstance(necessity.get("alternatives"), list):
+            for index, alt in enumerate(necessity["alternatives"]):
+                out += _undeclared(alt, rule, "ladder_alternative",
+                                   f"ladder.necessity.alternatives[{index}]")
+        out += _undeclared(ladder.get("proportionality"), rule, "ladder_proportionality",
+                           "ladder.proportionality")
+        out += _undeclared(ladder.get("dpia"), rule, "ladder_dpia", "ladder.dpia")
+    return out
+
+
+def people_file_problems(filename: str, doc: Any, rule: dict[str, Any]) -> list[str]:
+    """What is wrong with one role file in an adopter's people register.
+
+    Review F2, 2026-09-09: leg 2 used to scan the document's keys and values for the token list
+    only, so `held_by: <a full name>` passed, and a register replaced with `people/<a person's
+    name>.yaml` carrying that as its `id` passed too — neither the filename nor the id was ever
+    read. All three are read here, and the key set is closed the way the record's now is.
+
+    NAMED LIMIT, and it is why this function's callers must not claim more: a role id that is
+    simply a person's name in plain words matches no token and no value shape. No rule here reads
+    English. What this refuses is an undeclared key, an identifier-SHAPED id, filename, key or
+    value, and a role file that says nothing about what it is accountable for.
+    """
+    if not isinstance(doc, dict):
+        return [f"{filename}: is not a mapping, so it is not a role file"]
+    problems = [f"{filename}: carries the undeclared key {p}"
+                for p in _undeclared(doc, rule, "people_file", "")]
+    stem = filename.rsplit("/", 1)[-1].rsplit(".", 1)[0]
+    token = identifier_in_name(stem)
+    if token is not None:
+        problems.append(f"{filename}: is named after {token!r}, which names an individual")
+    role_id = str(doc.get("id", "")).strip()
+    if not role_id:
+        problems.append(f"{filename}: declares no id")
+    else:
+        token = identifier_in_name(role_id)
+        if token is not None:
+            problems.append(f"{filename}: declares the id {role_id!r} (the word {token!r}), "
+                            "which names an individual")
+    for shape in individual_problems(doc):
+        problems.append(f"{filename}: carries {shape}")
+    if not str(doc.get("role", "")).strip():
+        problems.append(f"{filename}: says what it is accountable for nowhere, so "
+                        "'a role, never a person' rests on the id alone")
+    return problems
+
+
 # -- grading one record ---------------------------------------------------------------------------
 
-def _missing_dpia(text: str | None, path: str, rule: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
+def _missing_dpia(text: str | None, path: str, sensor: str,
+                  rule: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
     """What is wrong with the DPIA record at `path`, and whatever of it could be read."""
     if not path:
         return ["the record names no DPIA path at all"], {}
@@ -215,6 +329,12 @@ def _missing_dpia(text: str | None, path: str, rule: dict[str, Any]) -> tuple[li
     if not isinstance(doc, dict):
         return [f"the DPIA record at {path} is not a mapping"], {}
     problems: list[str] = []
+    # Review F1: a DPIA filed under somebody's name is a DPIA about a person. The basename is the
+    # sensor's own id, which is a row in a closed table, so there is nothing to name it after.
+    if sensor and path.rsplit("/", 1)[-1] != f"{sensor}.yaml":
+        problems.append(
+            f"the DPIA record at {path} has a basename that is not {sensor}.yaml — a DPIA is "
+            "filed under the sensor it is about, never under anything else")
     for field in rule["requires"]["dpia_fields"]:
         if not str(doc.get(field, "")).strip():
             problems.append(f"the DPIA record at {path} carries no {field}")
@@ -226,40 +346,75 @@ def _missing_dpia(text: str | None, path: str, rule: dict[str, Any]) -> tuple[li
         problems.append(
             f"the DPIA record at {path} states retention_days {days!r}, not a positive whole "
             "number of days")
-    for shape in individual_problems(doc, scan_names=False):
-        problems.append(f"the DPIA record at {path} carries {shape}")
     return problems, doc
 
 
 def grade_record(
     record: dict[str, Any],
     *,
-    people: Iterable[str] = (),
+    people: Iterable[str],
+    scenarios: Iterable[str],
     dpia_reader: Callable[[str], str | None] | None = None,
     rule: dict[str, Any] | None = None,
     sensors_path: Path | None = None,
 ) -> dict[str, Any]:
-    """Grade one admission record. Returns `{"sensor", "admitted", "refusals", "terminal",
-    "ladder"}`; never raises on a bad record, because a refusal a caller must handle is the
-    product, not an exception a caller might not.
+    """Grade one admission record. Returns `{"sensor", "scenario_class", "admitted", "refusals",
+    "terminal", "ladder"}`; never raises on a bad record, because a refusal a caller must handle
+    is the product, not an exception a caller might not.
 
-    Refusal (a) is terminal and is evaluated alone: when it fires, `ladder` is None and no other
-    refusal is reported. Every other refusal is reported together, so an adopter fixing one
-    learns of the rest in the same run instead of over four round trips.
+    `people` is the adopter's own people register and `scenarios` the ids of the scenarios it
+    SERVES for this class. Both are required keyword arguments, with no default: a default of
+    "not checked" is how a refusal comes to be silently skipped.
+
+    A TERMINAL refusal is reported alone, and `ladder` comes back None. Which refusals are
+    terminal is read from the table at the branch (`is_terminal()`), not decided here — review
+    F4 found the field decorative because the branch was hardcoded. Two are terminal today:
+    a record that names or identifies an individual, and a record carrying a key the table does
+    not declare. Computing a proportionality ratio for either would put a price on sensing a
+    named person, and an undeclared key is exactly where a person arrives.
     """
     rule = rule or load_rule()
-    known_people = set(str(p) for p in people)
+    known_people = {str(p) for p in people}
+    served_scenarios = {str(s) for s in scenarios}
     sensor = str(record.get("sensor", "")).strip()
+    declared_class = str(record.get("scenario_class", "")).strip()
     admissible = admissible_pairs(rule)
     admissible_text = ", ".join(f"{k}/{g}" for k, g in admissible)
 
-    # (a) terminal.
-    named = individual_problems(record)
-    if named:
+    # The DPIA is read first, because its KEYS are part of the terminal scan.
+    dpia_path = str((record.get("dpia") or {}).get("record", "")).strip()
+    dpia_text = dpia_reader(dpia_path) if (dpia_reader and dpia_path) else None
+    dpia_doc: dict[str, Any] = {}
+    if dpia_text is not None:
+        try:
+            loaded = yaml.safe_load(dpia_text)
+        except yaml.YAMLError:
+            loaded = None
+        if isinstance(loaded, dict):
+            dpia_doc = loaded
+
+    def out(rid: str, what: str, admissible_list: str = "") -> str:
+        return refusal(rule, rid, sensor, what, admissible_list)
+
+    # -- terminal, and reported alone -------------------------------------------------------
+    terminal: list[str] = []
+    for problem in individual_problems(record):
+        terminal.append(out("names-or-identifies-an-individual", problem))
+    for problem in individual_problems(dpia_doc):
+        terminal.append(out("names-or-identifies-an-individual",
+                            f"the DPIA record at {dpia_path} carries {problem}"))
+    for key in undeclared_keys(record, rule):
+        terminal.append(out("key-not-declared", key, ", ".join(rule["closed_keys"]["record"])))
+    for key in _undeclared(dpia_doc, rule, "dpia_record", ""):
+        terminal.append(out("key-not-declared", f"the DPIA record's key {key}",
+                            ", ".join(rule["closed_keys"]["dpia_record"])))
+    terminal = [line for line in terminal
+                if is_terminal(rule, line.split(":")[0].removeprefix("REFUSED ").strip())]
+    if terminal:
         return {
             "sensor": sensor,
-            "scenario_class": rule["scenario_class"],
-            "refusals": [refusal(rule, "names-or-identifies-an-individual", sensor, named[0])],
+            "scenario_class": declared_class or rule["scenario_class"],
+            "refusals": terminal,
             "terminal": True,
             "ladder": None,
             "admitted": False,
@@ -267,88 +422,127 @@ def grade_record(
 
     refusals: list[str] = []
 
+    # A table that says these are not terminal reports them beside the rest instead of alone.
+    for problem in individual_problems(record):
+        refusals.append(out("names-or-identifies-an-individual", problem))
+    for problem in individual_problems(dpia_doc):
+        refusals.append(out("names-or-identifies-an-individual",
+                            f"the DPIA record at {dpia_path} carries {problem}"))
+    for key in undeclared_keys(record, rule):
+        refusals.append(out("key-not-declared", key, ", ".join(rule["closed_keys"]["record"])))
+    for key in _undeclared(dpia_doc, rule, "dpia_record", ""):
+        refusals.append(out("key-not-declared", f"the DPIA record's key {key}",
+                            ", ".join(rule["closed_keys"]["dpia_record"])))
+
+    # this table rules one class, and says which one it graded (review F5).
+    if declared_class != rule["scenario_class"]:
+        refusals.append(out("not-this-scenario-class", declared_class or "(none)",
+                            rule["scenario_class"]))
+
     # sensor id: `sensors.yaml` stays the closed table, reported as a refusal rather than raised.
     known_sensors = ethics_gate.sensor_ids(sensors_path)
     sensor_named = sensor in known_sensors
     if not sensor_named:
-        refusals.append(refusal(
-            rule, "sensor-not-named", sensor,
-            f"{sensor!r} is not a named sensor (have: {', '.join(known_sensors)})"))
+        refusals.append(out("sensor-not-named",
+                            f"{sensor!r} is not a named sensor "
+                            f"(have: {', '.join(known_sensors)})"))
+
+    # the scenario this sensor feeds is one the adopter serves, and the ladder walks the same one.
+    scenario = str(record.get("scenario", "")).strip()
+    served_text = ", ".join(sorted(served_scenarios)) or "none"
+    if scenario not in served_scenarios:
+        refusals.append(out("scenario-not-served", repr(scenario or "(none)"), served_text))
+    raw_ladder = record.get("ladder")
+    ladder_doc: dict[str, Any] = raw_ladder if isinstance(raw_ladder, dict) else {}
+    purpose_scenario = str((ladder_doc.get("purpose") or {}).get("scenario", "")).strip()
+    if purpose_scenario != scenario:
+        refusals.append(out(
+            "scenario-not-served",
+            f"{scenario!r} while its ladder's purpose rung walks {purpose_scenario!r}, so one of "
+            "the two is not what runs", served_text))
 
     # (c) kind and granularity, declared and as the ladder walks them.
     kind, gran = str(record.get("kind", "")), str(record.get("granularity", ""))
     if (kind, gran) not in admissible:
-        refusals.append(refusal(rule, "kind-not-admissible", sensor, f"{kind}/{gran}",
-                                admissible_text))
-    necessity = record.get("ladder", {}).get("necessity", {}) if isinstance(record.get("ladder"), dict) else {}
+        refusals.append(out("kind-not-admissible", f"{kind}/{gran}", admissible_text))
+    necessity = ladder_doc.get("necessity") or {}
     walked = (str(necessity.get("kind", "")), str(necessity.get("level", "")))
     if walked != (kind, gran):
-        refusals.append(refusal(
-            rule, "kind-not-admissible", sensor,
+        refusals.append(out(
+            "kind-not-admissible",
             f"the record declares {kind}/{gran} and its ladder walks "
-            f"{walked[0]}/{walked[1]}, so one of the two is not what runs",
-            admissible_text))
+            f"{walked[0]}/{walked[1]}, so one of the two is not what runs", admissible_text))
 
     # the closed field set.
     fields = record.get("fields")
     if not isinstance(fields, list) or not fields:
-        refusals.append(refusal(rule, "field-not-admissible", sensor,
-                                "(the record declares no fields)", ", ".join(rule["admissible_fields"])))
+        refusals.append(out("field-not-admissible", "(the record declares no fields)",
+                            ", ".join(rule["admissible_fields"])))
     else:
         for field in fields:
             if str(field) not in rule["admissible_fields"]:
-                refusals.append(refusal(rule, "field-not-admissible", sensor, str(field),
-                                        ", ".join(rule["admissible_fields"])))
+                refusals.append(out("field-not-admissible", str(field),
+                                    ", ".join(rule["admissible_fields"])))
 
-    # (d) covert sensing.
+    # (d) covert sensing. `told` is a LIST OF ROLE IDS, never prose (review F1).
     notice = record.get("notice")
     if not isinstance(notice, dict) or not notice:
-        refusals.append(refusal(rule, "covert-sensing", sensor,
-                                "the record carries no notice, so the sensed party is not told"))
+        refusals.append(out("covert-sensing",
+                            "the record carries no notice, so the sensed party is not told"))
     else:
-        for field in ("told", "published_at", "published_on"):
+        told = notice.get("told")
+        if not isinstance(told, list) or not told:
+            refusals.append(out(
+                "covert-sensing",
+                "the notice names who is told as "
+                f"{type(told).__name__ if told is not None else 'nothing'} rather than a list of "
+                "role ids, and prose is where a personal name arrives"))
+        else:
+            for role in told:
+                if str(role) not in known_people:
+                    refusals.append(out("role-not-registered",
+                                        f"{str(role)!r} among the roles the notice says it told"))
+        for field in ("published_at", "published_on"):
             if not str(notice.get(field, "")).strip():
-                refusals.append(refusal(
-                    rule, "covert-sensing", sensor,
+                refusals.append(out(
+                    "covert-sensing",
                     f"the notice carries no {field}, so the sensed party is not told"))
         when = str(notice.get("published_on", "")).strip()
         if when and not _DATE.match(when):
-            refusals.append(refusal(
-                rule, "covert-sensing", sensor,
+            refusals.append(out(
+                "covert-sensing",
                 f"the notice dates published_on {when!r}, not YYYY-MM-DD, so nothing says when "
                 "anybody was told"))
 
     # (b) the DPIA record.
-    dpia_path = str((record.get("dpia") or {}).get("record", "")).strip()
-    text = dpia_reader(dpia_path) if (dpia_reader and dpia_path) else None
-    dpia_problems, dpia_doc = _missing_dpia(text, dpia_path, rule)
+    dpia_problems, _ = _missing_dpia(dpia_text, dpia_path, sensor, rule)
     for problem in dpia_problems:
-        refusals.append(refusal(rule, "no-dpia-record", sensor, problem))
+        refusals.append(out("no-dpia-record", problem))
 
     # (e) the roles register.
     senses = str(record.get("senses_role", "")).strip()
     if not senses:
-        refusals.append(refusal(rule, "role-not-registered", sensor, "no sensed role at all"))
+        refusals.append(out("role-not-registered", "no sensed role at all"))
     elif senses not in known_people:
-        refusals.append(refusal(rule, "role-not-registered", sensor, f"the sensed role {senses!r}"))
+        refusals.append(out("role-not-registered", f"the sensed role {senses!r}"))
     signed_off = str(dpia_doc.get("completed_by", "")).strip()
     if signed_off and signed_off not in known_people:
-        refusals.append(refusal(rule, "role-not-registered", sensor,
-                                f"{signed_off!r} as the role accountable for the DPIA"))
+        refusals.append(out("role-not-registered",
+                            f"{signed_off!r} as the role accountable for the DPIA"))
 
     # the existing ladder, last, and only for a sensor the closed table names.
     ladder: dict[str, Any] | None = None
-    if sensor_named and isinstance(record.get("ladder"), dict):
-        payload = {"sensor": {"id": sensor, "name": sensor}, **record["ladder"]}
+    if sensor_named and ladder_doc:
+        payload = {"sensor": {"id": sensor, "name": sensor}, **ladder_doc}
         try:
             ladder = ethics_gate.admit(payload)
         except ethics_gate.EthicsGateError as exc:
-            refusals.append(refusal(rule, "sensor-not-named", sensor, str(exc)))
+            refusals.append(out("sensor-not-named", str(exc)))
 
     admitted = not refusals and ladder is not None and bool(ladder["admitted"])
     return {
         "sensor": sensor,
-        "scenario_class": rule["scenario_class"],
+        "scenario_class": declared_class or rule["scenario_class"],
         "refusals": refusals,
         "terminal": False,
         "ladder": ladder,
@@ -397,11 +591,16 @@ def adopters(estate: Path) -> list[str]:
     return found
 
 
-def people_register(estate: Path, org: str) -> dict[str, dict[str, Any]]:
-    """The adopter's own roles register, read at `origin/main`."""
+def people_files(estate: Path, org: str) -> dict[str, Any]:
+    """Every role file in the adopter's people register, BY SERVED PATH.
+
+    By path and not by id, because review F2 found that reading the register into an id-keyed
+    dict threw away the filename — and a register replaced with a file named after a person,
+    carrying that as its id, was invisible to every rule the check had.
+    """
     prefix = PEOPLE_DIR.format(org=org) + "/"
     unit = estate / org
-    register: dict[str, dict[str, Any]] = {}
+    files: dict[str, Any] = {}
     for path in served_paths(unit):
         if not path.startswith(prefix) or not path.endswith(".yaml"):
             continue
@@ -409,9 +608,16 @@ def people_register(estate: Path, org: str) -> dict[str, dict[str, Any]]:
         if text is None:
             continue
         try:
-            doc = yaml.safe_load(text) or {}
+            files[path] = yaml.safe_load(text)
         except yaml.YAMLError:
-            continue
+            files[path] = None
+    return files
+
+
+def people_register(estate: Path, org: str) -> dict[str, dict[str, Any]]:
+    """The adopter's own roles register, keyed by role id, read at `origin/main`."""
+    register: dict[str, dict[str, Any]] = {}
+    for doc in people_files(estate, org).values():
         if isinstance(doc, dict) and doc.get("id"):
             register[str(doc["id"])] = doc
     return register
@@ -464,8 +670,9 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
     Three legs, each on `origin/main`:
       1. every adopter serves a `bus-factor-key-person` scenario, it says "A role, never a
          person", and it names a role file that the served tree carries;
-      2. every role file in the adopter's people register carries an id and a role and names no
-         individual;
+      2. every role file in the adopter's people register carries an id and a role, carries no
+         key the table does not declare, and has no identifier-shaped filename, id, key or
+         value;
       3. every admission record grades through the rule above.
 
     Leg 3 is the one ticket 31 exists for and it is the one that cannot look today: nothing is
@@ -492,17 +699,15 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
         unit = estate / org
         sha = served_sha(unit)
         shas.append(f"{org}={sha or 'unknown'}")
-        register = people_register(estate, org)
+        files = people_files(estate, org)
+        register = {str(d["id"]): d for d in files.values()
+                    if isinstance(d, dict) and d.get("id")}
 
-        # leg 2: the register itself names nobody.
-        for role_id, doc in sorted(register.items()):
-            problems = individual_problems(doc)
-            if problems:
-                out(f"FAIL {org}: the role file for {role_id!r} carries {problems[0]}")
-                fail += 1
-            elif not str(doc.get("role", "")).strip():
-                out(f"FAIL {org}: the role file for {role_id!r} says what it is accountable for "
-                    "nowhere, so 'a role, never a person' rests on the id alone")
+        # leg 2: the register itself. Widened after review F2: the file's NAME, its `id`, its
+        # keys (closed set) and its values, not the keys and values alone.
+        for path, doc in sorted(files.items()):
+            for problem in people_file_problems(path, doc, rule):
+                out(f"FAIL {org}: {problem}")
                 fail += 1
         if not register:
             out(f"FAIL {org}: serves no people register at "
@@ -550,8 +755,10 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
                 out(f"FAIL {org}: {path} is not a readable admission record")
                 fail += 1
                 continue
-            result = grade_record(maybe, people=register.keys(), rule=rule,
-                                  dpia_reader=read_dpia)
+            result = grade_record(
+                maybe, people=register.keys(),
+                scenarios=[str(s.get("id", "")) for s in found.values() if isinstance(s, dict)],
+                rule=rule, dpia_reader=read_dpia)
             if result["admitted"]:
                 admitted_count += 1
                 out(f"PASS {org}: {path}: {result['sensor']} admitted -- "
@@ -602,7 +809,7 @@ kind: structural
 granularity: aggregate
 fields: [component, distinct_committer_count, window_days]
 notice:
-  told: every holder of a role in the people register, before the sensor first runs
+  told: [platform-engineer, platform-lead]
   published_at: docs/monitoring-notice.md
   published_on: '2026-09-09'
 dpia:
@@ -630,7 +837,8 @@ def _git(repo: Path, *args: str, hooks: Path) -> None:
                    check=True, capture_output=True, text=True)
 
 
-def _plant(root: Path, hooks: Path, record: str | None, scenario: bool = True) -> Path:
+def _plant(root: Path, hooks: Path, record: str | None, scenario: bool = True,
+           extra_role_file: tuple[str, str] | None = None) -> Path:
     """A one-unit estate whose SERVED ref is a real `refs/remotes/origin/main`."""
     estate = root / "estate"
     unit = estate / "planted"
@@ -648,6 +856,9 @@ def _plant(root: Path, hooks: Path, record: str | None, scenario: bool = True) -
             _SCENARIO, encoding="utf-8")
     (unit / f"twin/orgs/{org}/dpia/bus-factor-structural-aggregate.yaml").write_text(
         _GOOD_DPIA, encoding="utf-8")
+    if extra_role_file is not None:
+        name, body = extra_role_file
+        (unit / f"twin/orgs/{org}/people/{name}").write_text(body, encoding="utf-8")
     admissions = unit / f"twin/orgs/{org}/sensor-admissions"
     if record is not None:
         admissions.mkdir(parents=True, exist_ok=True)
@@ -668,14 +879,17 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
     people = ("platform-engineer", "platform-lead")
     good = yaml.safe_load(_GOOD_RECORD)
     failures = 0
+    planted = 0
 
     def reader(text: str | None) -> Callable[[str], str | None]:
         return lambda path: text if path.endswith("bus-factor-structural-aggregate.yaml") else None
 
     def expect(what: str, record: dict[str, Any], rid: str | None,
                dpia: str | None = _GOOD_DPIA) -> None:
-        nonlocal failures
-        result = grade_record(record, people=people, rule=rule, dpia_reader=reader(dpia))
+        nonlocal failures, planted
+        planted += 1
+        result = grade_record(record, people=people, scenarios=("key-person-2026",),
+                              rule=rule, dpia_reader=reader(dpia))
         got = [line.split(":")[0].removeprefix("REFUSED ").strip() for line in result["refusals"]]
         if rid is None:
             if result["admitted"] and not got:
@@ -690,6 +904,7 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
         failures += 1
 
     import copy
+
     def variant(**over: Any) -> dict[str, Any]:
         rec = copy.deepcopy(good)
         rec.update(copy.deepcopy(over))
@@ -714,6 +929,27 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
            variant(sensor="not-a-named-sensor"), "sensor-not-named")
     expect("a field outside the closed set is refused",
            variant(fields=["component", "lines_of_code"]), "field-not-admissible")
+    # Review F1, 2026-09-09. Each of these was ADMITTED with a green PASS before the record's key
+    # set was closed. The plants are the KEYS the review used; no value here is a name.
+    for key in ("maintained_by", "escalation_contact", "github", "owner", "stakeholders",
+                "context", "held_by"):
+        expect(f"an undeclared record key {key!r} is refused terminally",
+               variant(**{key: "<a value the grader never reads>"}), "key-not-declared")
+    for key in ("\u0435mployee_id", "e\u200bmployee_id"):
+        expect("a homoglyph key the name scanner cannot see is refused by the closed set",
+               variant(**{key: 1}), "key-not-declared")
+    expect("an undeclared key in the DPIA record is refused terminally", variant(),
+           "key-not-declared", dpia=_GOOD_DPIA + "reviewed_by: <never read>\n")
+    notice = copy.deepcopy(good["notice"])
+    expect("a notice naming who was told in prose rather than role ids is refused",
+           variant(notice={**notice, "told": "the whole team was told in person"}),
+           "covert-sensing")
+    expect("a notice naming an unregistered role is refused",
+           variant(notice={**notice, "told": ["unregistered-role"]}), "role-not-registered")
+    expect("a record of another scenario class is refused",
+           variant(scenario_class="support-ticket-volume"), "not-this-scenario-class")
+    expect("a scenario this adopter does not serve is refused",
+           variant(scenario="not-a-served-scenario"), "scenario-not-served")
     expect("the one admissible sensor is admitted", variant(), None)
 
     # and the served read itself, on a real git repository.
@@ -744,6 +980,36 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
                 f"FAIL, got exit {rc}: {lines[-1] if lines else 'nothing'}")
             failures += 1
 
+        # Review F1, end to end at a real served ref: this exact record was ADMITTED with a
+        # green PASS before the key set was closed.
+        lines = []
+        estate = _plant(root / "openkey", hooks, _GOOD_RECORD
+                        + "maintained_by: <a value the grader never reads>\n")
+        rc = grade_estate(estate, out=lines.append)
+        if rc == 1 and any("key-not-declared" in ln for ln in lines):
+            out(f"PASS: selfcheck: a served record carrying an undeclared key grades FAIL "
+                f"({lines[-1][:150]})")
+        else:
+            out(f"FAIL: selfcheck: a served record carrying an undeclared key should grade FAIL, "
+                f"got exit {rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
+        # Review F2, end to end: a role file carrying an undeclared key, and one named after
+        # something that is not a role.
+        lines = []
+        estate = _plant(root / "openrole", hooks, None, extra_role_file=(
+            "employee-of-the-month.yaml",
+            "id: on-call-secondary\nrole: Second on call.\nheld_by: <never read>\n"))
+        rc = grade_estate(estate, out=lines.append)
+        named = [ln for ln in lines if "held_by" in ln or "employee" in ln]
+        if rc == 1 and len(named) >= 2:
+            out(f"PASS: selfcheck: a served role file with an undeclared key and a filename that "
+                f"is not a role grades FAIL ({named[0][:120]})")
+        else:
+            out(f"FAIL: selfcheck: a served role file with an undeclared key and a filename that "
+                f"is not a role should grade FAIL, got exit {rc} and {len(named)} finding(s)")
+            failures += 1
+
         lines = []
         estate = _plant(root / "noscenario", hooks, None, scenario=False)
         rc = grade_estate(estate, out=lines.append)
@@ -769,7 +1035,8 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
     if failures:
         out(f"FAIL: selfcheck: {failures} planted case(s) did not grade as planted")
         return 1
-    out("PASS: selfcheck: ten planted records and four planted served estates grade as planted")
+    out(f"PASS: selfcheck: {planted} planted records and six planted served estates grade "
+        "as planted")
     return 0
 
 

@@ -32,7 +32,14 @@ scenario_class: bus-factor-key-person
 #  - `cohort` is excluded because a bus factor of ONE means the cohort IS the person. A
 #    cohort-granularity reading of "which components would lose their only committer" is an
 #    individual reading wearing a coarser word, and the ladder's `_LEVEL_RANK` would rank it
-#    safer than it is.
+#    safer than it is. SCOPE OF THAT REASON (review F6, 2026-09-09): it is stated at a bus
+#    factor of one, which is what `bus_factor_scope` below fixes this class to and what all
+#    three adopters' propositions ask ("a-bus-factor-one-holder-departs-within-the-horizon").
+#    At n greater than one a cohort is not identically a person and the reason weakens, while
+#    the EXCLUSION does not: nothing in this estate derives n, so no run could tell the two
+#    cases apart, and a rule that admitted cohort whenever somebody asserted n>1 would be a
+#    self-service exemption. A later ticket that wants cohort must first make n a derived
+#    fact; it may not loosen this on the grounds that the stated reason does not bind at n=3.
 #  - `behavioural` is excluded because the question is answered by commit-graph STRUCTURE, so
 #    `ethics_gate._check_necessity` would refuse a behavioural route anyway; naming it here
 #    refuses it before the ladder rather than inside it.
@@ -49,18 +56,59 @@ admissible_fields:
   - commits_in_window
   - window_days
 
+# What this class is about, and the reason the cohort exclusion above is stated at. Read by
+# nothing in the module: it is the scope of a REASON, and it is here so a later ticket cannot
+# loosen the exclusion by pointing out that the reason does not bind at a larger n.
+bus_factor_scope: one
+
+# THE CLOSED KEY SETS (review F1, 2026-09-09). Before this, only `fields:` was closed, so the
+# record DOCUMENT was open: an admission record carrying `maintained_by:`, `escalation_contact:`,
+# `github:`, `owner:`, `stakeholders:` or a nested `context.escalation.to` was ADMITTED with a
+# green PASS, because `identifier_in_value` recognises exactly two shapes (an email address and
+# a UK national insurance number) and nothing looked at the keys it had never heard of. A
+# homoglyph key evaded the name scanner for the same reason.
+#
+# The fix is the estate's own idiom and the one this table already argues for two blocks up: a
+# closed list, not a longer deny-list. A key this table does not declare is refused TERMINALLY,
+# because an undeclared key is exactly where a person arrives, and a homoglyph key is by
+# definition not in a closed set.
+closed_keys:
+  record:
+    [schema, sensor, scenario, scenario_class, senses_role, kind, granularity, fields, notice,
+     dpia, ladder]
+  notice: [told, published_at, published_on]
+  dpia_ref: [record]
+  ladder: [purpose, necessity, proportionality, dpia]
+  ladder_purpose: [scenario, will_act]
+  ladder_necessity: [kind, level, alternatives]
+  ladder_alternative: [kind, level]
+  ladder_proportionality: [intrusion_cost, value_illuminated]
+  ladder_dpia: [channels, profiling, financial_loss_risk, complete]
+  dpia_record:
+    [schema, sensor, scenario, completed_on, completed_by, retention_days, lawful_basis,
+     what_is_sensed, what_is_not_sensed]
+  people_file: [id, role]
+
+# The three keys of `dpia_record` above that are free prose, and the one PLACE a person could
+# still arrive under a declared key. Printed as a limit on every run rather than left implied:
+# no rule here reads English, so a personal name written into a DPIA's narrative is not
+# detectable by this check, and the adopter's own register review is where that lives.
+free_prose_fields: [lawful_basis, what_is_sensed, what_is_not_sensed]
+
 # What must be shown before a record reaches the ethics gate's ladder at all. Each is a fact on
 # the served artefact, not a promise: a path that resolves, a date that is printed, a role that
 # is in a register, a count that is a number.
 requires:
   notice: >-
-    A published, dated notice naming who is told. Covert sensing is permanently excluded
-    (NORTH-STAR section 6, twin decision ticket 15), so a sensor whose notice has no publication
-    date has not told anybody.
+    A published, dated notice naming who is told, as a LIST of role ids out of the adopter's own
+    people register -- never free prose, which is where a personal name arrived before review F1.
+    Covert sensing is permanently excluded (NORTH-STAR section 6, twin decision ticket 15), so a
+    sensor whose notice has no publication date has not told anybody.
   dpia_record: >-
     A DPIA record in the adopter's own repository, at the path the admission record names,
-    carrying `completed_on`, `completed_by` and `retention_days`. The adopter is the controller;
-    the hub is not, so the record lives where the adopter signs it.
+    carrying `completed_on`, `completed_by` and `retention_days`, at a path whose basename is
+    the sensor's own id, so a DPIA cannot be filed under somebody's name. The adopter is the
+    controller; the hub is not, so the record lives where the adopter signs it.
   dpia_fields:
     - completed_on
     - completed_by
@@ -81,7 +129,27 @@ refusals:
     sentence: >-
       REFUSED names-or-identifies-an-individual: {sensor}: {what} names or identifies an
       individual. A bus-factor-key-person sensor senses a role, never a person, and this record
-      is refused before its proportionality is computed.
+      is refused before its proportionality is computed. No other refusal on this record was
+      evaluated.
+  - id: key-not-declared
+    terminal: true
+    sentence: >-
+      REFUSED key-not-declared: {sensor}: the key {what} is not one this table declares
+      ({admissible}). The key set is closed, because an undeclared key is where a person
+      arrives, and no deny-list of identifier shapes can be longer than the names somebody can
+      think of. No other refusal on this record was evaluated.
+  - id: not-this-scenario-class
+    terminal: false
+    sentence: >-
+      REFUSED not-this-scenario-class: {sensor}: the record declares scenario_class {what} and
+      this table rules {admissible}. A record graded by the wrong table would come back
+      asserting a class nobody applied to it.
+  - id: scenario-not-served
+    terminal: false
+    sentence: >-
+      REFUSED scenario-not-served: {sensor}: it names the scenario {what}, and the scenarios this
+      adopter SERVES for this class are {admissible}. A sensor feeding a scenario nobody
+      published is feeding nothing.
   - id: field-not-admissible
     terminal: false
     sentence: >-
@@ -102,8 +170,8 @@ refusals:
     terminal: false
     sentence: >-
       REFUSED covert-sensing: {sensor}: {what}. Covert sensing is permanently excluded
-      (NORTH-STAR section 6), so a sensor with no published, dated notice is refused before its
-      ladder is walked.
+      (NORTH-STAR section 6), so a sensor with no published, dated notice naming the roles told,
+      as role ids, is refused before its ladder is walked.
   - id: role-not-registered
     terminal: false
     sentence: >-

@@ -1,8 +1,11 @@
 """The admission rule for `bus-factor-key-person` (eco-system ticket 31).
 
-Nothing in this file names or senses a real person. Every role is a role id out of an adopter's
-own people register, every planted identifier is a FIELD NAME or a value at `example.invalid`,
-and the one place a value shape is asserted uses a reserved-by-RFC-2606 domain and a zeroed id.
+NOTHING IN THIS FILE NAMES A PERSON, real or invented. Every role is a role id out of an
+adopter's own people register; every planted identifier is a KEY NAME, a FIELD NAME or a value on
+the RFC 2606 reserved domain `example.invalid`. The review of 2026-09-09 demonstrated the F1 hole
+with plants like `maintained_by: <a full name>`; every one of those plants is reproduced here
+through its KEY alone, because after the fix it is the undeclared KEY that refuses the record and
+the value is never reached. So the hole is closed and no name is written down.
 """
 
 from __future__ import annotations
@@ -48,7 +51,7 @@ def record(**over: Any) -> dict[str, Any]:
         "granularity": "aggregate",
         "fields": ["component", "distinct_committer_count", "window_days"],
         "notice": {
-            "told": "every holder of a role in the people register, before the sensor first runs",
+            "told": ["platform-engineer", "data-protection-lead"],
             "published_at": "docs/monitoring-notice.md",
             "published_on": "2026-09-09",
         },
@@ -72,6 +75,7 @@ def record(**over: Any) -> dict[str, Any]:
 
 def grade(rec: dict[str, Any], **kw: Any) -> dict[str, Any]:
     kw.setdefault("people", PEOPLE)
+    kw.setdefault("scenarios", ("key-person-2026",))
     kw.setdefault("dpia_reader", reader())
     return sa.grade_record(rec, **kw)
 
@@ -128,7 +132,7 @@ def test_a_record_that_identifies_an_individual_is_refused_before_its_ladder_is_
 
 def test_an_individual_shaped_value_anywhere_in_the_record_is_refused() -> None:
     result = grade(record(senses_role="platform-engineer",
-                          notice={"told": "someone@example.invalid",
+                          notice={"told": ["someone@example.invalid"],
                                   "published_at": "docs/monitoring-notice.md",
                                   "published_on": "2026-09-09"}))
     assert "names-or-identifies-an-individual" in ids(result)
@@ -240,6 +244,207 @@ def test_a_dpia_signed_off_by_a_role_absent_from_the_people_register_is_refused(
     assert "role-not-registered" in ids(result), (
         f"a DPIA signed off by an unregistered role must be refused by name, got "
         f"{result['refusals']}")
+
+
+
+# -- F1: the record's KEY set is closed ----------------------------------------------------------
+# Every plant below is one the 2026-09-09 review measured as ADMITTED with a green PASS before
+# the key set was closed. Each is reproduced by its key alone; no value here is a name.
+
+@pytest.mark.parametrize("key", [
+    "maintained_by", "escalation_contact", "github", "owner", "stakeholders", "context",
+    "reviewed_by", "held_by",
+])
+def test_a_top_level_key_the_table_does_not_declare_is_refused(key: str) -> None:
+    result = grade(record(**{key: "<a value this test never reads>"}))
+    assert "key-not-declared" in ids(result), (
+        f"an undeclared key {key!r} must be refused by name, got {result['refusals']}")
+    assert result["terminal"] is True
+    assert result["ladder"] is None
+    assert result["admitted"] is False
+
+
+@pytest.mark.parametrize("key", ["\u0435mployee_id", "e\u200bmployee_id", "employe\u0435"])
+def test_a_homoglyph_or_zero_width_key_is_refused_by_the_closed_set(key: str) -> None:
+    """The name scanner splits on [^a-z0-9]+, so a Cyrillic e or a zero-width space evades it.
+    A closed key set does not care: the key is simply not one the table declares."""
+    assert sa.identifier_in_name(key) is None, "this plant only tests the closed set"
+    result = grade(record(**{key: 1}))
+    assert "key-not-declared" in ids(result), (
+        f"a homoglyph key {key!r} must be refused by the closed set, got {result['refusals']}")
+
+
+def test_an_undeclared_key_inside_the_notice_is_refused() -> None:
+    result = grade(record(notice={"told": ["platform-engineer"], "published_at": "docs/n.md",
+                                  "published_on": "2026-09-09", "contact": "x"}))
+    assert "key-not-declared" in ids(result), (
+        f"an undeclared key inside the notice must be refused, got {result['refusals']}")
+    assert "notice.contact" in " ".join(result["refusals"])
+
+
+def test_an_undeclared_key_inside_the_ladder_is_refused() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["purpose"]["raised_by"] = "x"
+    result = grade(record(ladder=ladder))
+    assert "key-not-declared" in ids(result), (
+        f"an undeclared key inside the ladder must be refused, got {result['refusals']}")
+    assert "ladder.purpose.raised_by" in " ".join(result["refusals"])
+
+
+def test_an_undeclared_key_inside_the_dpia_record_is_refused() -> None:
+    text = DPIA_TEXT + "reviewed_by: <a value this test never reads>\n"
+    result = grade(record(), dpia_reader=reader(text=text))
+    assert "key-not-declared" in ids(result), (
+        f"an undeclared key in the DPIA record must be refused, got {result['refusals']}")
+    assert result["terminal"] is True
+
+
+def test_the_notice_must_name_the_roles_told_as_role_ids_not_prose() -> None:
+    result = grade(record(notice={"told": "the whole team was told in person",
+                                  "published_at": "docs/n.md", "published_on": "2026-09-09"}))
+    assert "covert-sensing" in ids(result), (
+        f"a prose notice must be refused by name, got {result['refusals']}")
+    assert "role ids" in " ".join(result["refusals"])
+
+
+def test_a_notice_naming_a_role_the_register_does_not_carry_is_refused() -> None:
+    result = grade(record(notice={"told": ["platform-engineer", "unregistered-role"],
+                                  "published_at": "docs/n.md", "published_on": "2026-09-09"}))
+    assert "role-not-registered" in ids(result), (
+        f"a notice naming an unregistered role must be refused, got {result['refusals']}")
+
+
+def test_a_dpia_filed_under_a_basename_that_is_not_the_sensor_id_is_refused() -> None:
+    path = "twin/orgs/driftwood/dpia/whoever-signed-it.yaml"
+    result = grade(record(dpia={"record": path}), dpia_reader=reader(at=path))
+    assert "no-dpia-record" in ids(result), (
+        f"a DPIA filed under a name that is not the sensor id must be refused, got "
+        f"{result['refusals']}")
+    assert "basename" in " ".join(result["refusals"])
+
+
+# -- F5: the record is graded by the table that rules its own class ------------------------------
+
+def test_a_record_declaring_another_scenario_class_is_refused() -> None:
+    result = grade(record(scenario_class="support-ticket-volume"))
+    assert "not-this-scenario-class" in ids(result), (
+        f"a record of another class must be refused by name, got {result['refusals']}")
+    assert result["scenario_class"] == "support-ticket-volume", (
+        "the result must report the class the RECORD declared, never stamp the table's on it")
+
+
+def test_a_record_naming_a_scenario_this_adopter_does_not_serve_is_refused() -> None:
+    result = grade(record(scenario="not-a-served-scenario",
+                          ladder={**copy.deepcopy(record()["ladder"]),
+                                  "purpose": {"scenario": "not-a-served-scenario",
+                                              "will_act": True}}))
+    assert "scenario-not-served" in ids(result), (
+        f"a scenario the adopter does not serve must be refused by name, got "
+        f"{result['refusals']}")
+
+
+def test_the_ladders_purpose_scenario_must_be_the_one_the_record_names() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["purpose"] = {"scenario": "eol-date-passes-2026", "will_act": True}
+    result = grade(record(ladder=ladder))
+    assert "scenario-not-served" in ids(result), result["refusals"]
+    assert "is not what runs" in " ".join(result["refusals"])
+
+
+# -- F3: every declared refusal carries a usable sentence ----------------------------------------
+
+def test_a_refusal_row_with_no_sentence_is_refused_at_load(tmp_path) -> None:
+    import yaml
+    doc = yaml.safe_load(sa.RULE_PATH.read_text(encoding="utf-8"))
+    doc["refusals"][0].pop("sentence")
+    bad = tmp_path / "no-sentence.yaml"
+    bad.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    with pytest.raises(sa.SensorAdmissionError, match="sentence"):
+        sa.load_rule(bad)
+
+
+def test_a_refusal_row_with_a_blank_sentence_is_refused_at_load(tmp_path) -> None:
+    import yaml
+    doc = yaml.safe_load(sa.RULE_PATH.read_text(encoding="utf-8"))
+    doc["refusals"][0]["sentence"] = "   "
+    bad = tmp_path / "blank-sentence.yaml"
+    bad.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    with pytest.raises(sa.SensorAdmissionError, match="sentence"):
+        sa.load_rule(bad)
+
+
+def test_a_refusal_sentence_that_names_no_placeholder_is_refused_at_load(tmp_path) -> None:
+    import yaml
+    doc = yaml.safe_load(sa.RULE_PATH.read_text(encoding="utf-8"))
+    rid = doc["refusals"][0]["id"]
+    doc["refusals"][0]["sentence"] = f"REFUSED {rid}: something went wrong."
+    bad = tmp_path / "no-placeholder.yaml"
+    bad.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    with pytest.raises(sa.SensorAdmissionError, match="sensor|what"):
+        sa.load_rule(bad)
+
+
+def test_a_refusal_sentence_that_does_not_open_with_its_own_id_is_refused_at_load(tmp_path) -> None:
+    import yaml
+    doc = yaml.safe_load(sa.RULE_PATH.read_text(encoding="utf-8"))
+    doc["refusals"][0]["sentence"] = "{sensor} was refused because of {what}."
+    bad = tmp_path / "bad-opening.yaml"
+    bad.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    with pytest.raises(sa.SensorAdmissionError, match="REFUSED"):
+        sa.load_rule(bad)
+
+
+# -- F4: terminality is read from the table, not hardcoded ---------------------------------------
+
+def test_terminality_is_read_from_the_table_at_the_branch(tmp_path) -> None:
+    """`is_terminal()` was defined and never called: `terminal: true` in the table was
+    decorative. It is now the branch condition, so a table that says a refusal is not terminal
+    reports it beside the others instead of alone."""
+    import yaml
+    doc = yaml.safe_load(sa.RULE_PATH.read_text(encoding="utf-8"))
+    for row in doc["refusals"]:
+        if row["id"] == "names-or-identifies-an-individual":
+            row["terminal"] = False
+    loosened = tmp_path / "loosened.yaml"
+    loosened.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    rule = sa.load_rule(loosened)
+    result = grade(record(fields=["component", "employee_id"]), rule=rule)
+    assert result["terminal"] is False
+    assert result["ladder"] is not None, "the module must have read the table, not its own mind"
+    assert "names-or-identifies-an-individual" in ids(result)
+    # and the shipped table still says terminal
+    assert sa.is_terminal(sa.load_rule(), "names-or-identifies-an-individual") is True
+
+
+def test_the_terminal_sentence_says_nothing_else_was_evaluated() -> None:
+    result = grade(record(fields=["component", "employee_id"]))
+    assert "No other refusal on this record was evaluated." in result["refusals"][0]
+
+
+# -- F2: the people register, widened -------------------------------------------------------------
+
+def test_a_role_file_with_a_key_the_table_does_not_declare_is_a_problem() -> None:
+    problems = sa.people_file_problems("platform-engineer.yaml",
+                                       {"id": "platform-engineer", "role": "On call.",
+                                        "held_by": "<a value this test never reads>"},
+                                       sa.load_rule())
+    assert any("held_by" in p for p in problems), problems
+
+
+def test_a_role_file_whose_id_or_filename_is_identifier_shaped_is_a_problem() -> None:
+    by_id = sa.people_file_problems("user-account.yaml",
+                                    {"id": "user-account", "role": "On call."}, sa.load_rule())
+    assert any("user" in p for p in by_id), by_id
+    by_name = sa.people_file_problems("employee-of-the-month.yaml",
+                                      {"id": "on-call", "role": "On call."}, sa.load_rule())
+    assert any("employee" in p for p in by_name), by_name
+
+
+def test_a_clean_role_file_has_no_problem() -> None:
+    assert sa.people_file_problems(
+        "platform-engineer.yaml",
+        {"id": "platform-engineer", "role": "On call for the checkout namespace."},
+        sa.load_rule()) == []
 
 
 # -- the sensor table stays closed ----------------------------------------------------------------

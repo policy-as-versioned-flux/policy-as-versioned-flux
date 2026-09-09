@@ -214,10 +214,13 @@ publishes one, this script grades it and can pass, which is why it is not `never
   planted git author is `selfcheck@example.invalid`, both on the RFC 2606 reserved domain; the
   planted identifiers are field *names* (`employee_id`, `work_email`, `full_name`,
   `person_handle`, `free_text_note`, `user`), never values that could be a person.
-- The three adopters' own people registers were read at `origin/main` and each names a role and
-  nobody: `driftwood` `platform-engineer` + `data-protection-lead`, `tuppence`
-  `payments-engineer` + `financial-crime-lead`, `ludlow` `platform-engineer` +
-  `privacy-officer`. The check now refuses the day one of them gains a name.
+- The three adopters' own people registers were read at `origin/main`: `driftwood`
+  `platform-engineer` + `data-protection-lead`, `tuppence` `payments-engineer` +
+  `financial-crime-lead`, `ludlow` `platform-engineer` + `privacy-officer`. Six served role
+  files, each carrying an `id`, a `role` and no third key, and no identifier-shaped filename,
+  id, key or value. **That is the measurement, and it is narrower than "names nobody"** (review
+  F2): a role id that is simply a person's name in plain words matches no token and no value
+  shape, and no rule here reads English.
 
 ### Files changed
 
@@ -234,6 +237,138 @@ publishes one, this script grades it and can pass, which is why it is not `never
 No unit repository is changed by this ticket (D7, D8).
 
 Map line: 31 built: one admissible pair (structural/aggregate; cohort refused because a bus factor of one means the cohort IS the person) and a closed four-field set; a published dated notice, a DPIA in the adopter's own repo with a date, an accountable role and a retention period in days, and a sensed role in the adopter's own `people/` register, all before the ethics gate's ladder; naming an individual is a terminal refusal evaluated alone; `verify/sensor-admission/` grades three adopters at origin/main and prints 3/3/0 today, a could-not-look with counts, never a pass.
+
+## Review round 1 — 2026-09-09, request-changes, one high finding
+
+The reviewer's F1 was right and the fix is theirs: **close the record's KEY set the way
+`admissible_fields` closes the field set**, which is what this rule table already argued for two
+blocks above the hole ("a deny-list refuses the identifiers somebody thought of"). Head is now
+`ec4dfbb`.
+
+### F1 (high) — the record document was open, so a served record could name a person and be admitted
+
+Only `fields:` was closed. The record DOCUMENT had no closed key set, and `identifier_in_value`
+recognises exactly two shapes. The reviewer measured, end to end at a real served ref, that a
+record carrying `maintained_by`, `escalation_contact`, `github`, `owner`, `stakeholders`, a
+nested `context.escalation.to`, a prose `notice.told`, a person-shaped `scenario:` id, or a DPIA
+`reviewed_by` key came back `exit 0, 1 admission records graded, 1 admitted, 0 refused`. A
+homoglyph key (`еmployee_id`, a zero-width space, `employeе`) evaded `identifier_in_name`
+for the same reason: `_WORD` splits on `[^a-z0-9]+`, so a Cyrillic e is a separator.
+
+**Fixed, and `identifier_in_value` was NOT lengthened.** `twin/sensor-admission.yaml` gains
+`closed_keys:` with eleven sets — `record`, `notice`, `dpia_ref`, `ladder`, the four ladder rung
+sets, `ladder_alternative`, `dpia_record` and `people_file` — and a key at any level that the
+table does not declare is a **terminal** refusal, `key-not-declared`. That closes the homoglyph
+gap for free: a homoglyph key is by definition not in a closed set. Three further closures came
+out of the same plants: `notice.told` is now a **list of role ids** out of the adopter's own
+register rather than prose; the record's `scenario` must be one the adopter **serves** for this
+class and must equal the ladder's own purpose rung; and the DPIA's **basename must be the
+sensor's id**, so a DPIA cannot be filed under anybody's name.
+
+**Red first, one line per plant the review measured.** Every plant is reproduced through its KEY
+alone, because after the fix it is the undeclared key that refuses the record and the value is
+never reached — so the hole is closed and no name is written down anywhere in this repository.
+
+| plant (the review's, by key) | red line | green line |
+|---|---|---|
+| `maintained_by` | `AssertionError: an undeclared key 'maintained_by' must be refused by name, got []` | `REFUSED key-not-declared: bus-factor-structural-aggregate: 'maintained_by' (the record keys are: dpia, fields, granularity, kind, ladder, notice, scenario, scenario_class, schema, senses_role, sensor) is not one this table declares … No other refusal on this record was evaluated.` |
+| `escalation_contact` | `AssertionError: an undeclared key 'escalation_contact' must be refused by name, got []` | same sentence, `'escalation_contact'` |
+| `github` | `AssertionError: an undeclared key 'github' must be refused by name, got []` | same sentence, `'github'` |
+| `owner` | `AssertionError: an undeclared key 'owner' must be refused by name, got []` | same sentence, `'owner'` |
+| `stakeholders` | `AssertionError: an undeclared key 'stakeholders' must be refused by name, got []` | same sentence, `'stakeholders'` |
+| `context` (the nested `context.escalation.to` case) | `AssertionError: an undeclared key 'context' must be refused by name, got []` | same sentence, `'context'` |
+| `held_by` | `AssertionError: an undeclared key 'held_by' must be refused by name, got []` | same sentence, `'held_by'` |
+| DPIA `reviewed_by` | `AssertionError: an undeclared key in the DPIA record must be refused, got []` | `REFUSED key-not-declared: bus-factor-structural-aggregate: the DPIA record's key 'reviewed_by' (the dpia_record keys are: …) is not one this table declares …` |
+| homoglyph `еmployee_id` | `AssertionError: a homoglyph key 'еmployee_id' must be refused by the closed set, got []` | `REFUSED key-not-declared: … 'еmployee_id' …` (the test first asserts `identifier_in_name` cannot see it) |
+| zero-width `e​mployee_id` | `AssertionError: a homoglyph key 'e\u200bmployee_id' must be refused by the closed set, got []` | same |
+| `notice.contact` | `AssertionError: an undeclared key inside the notice must be refused, got []` | `REFUSED key-not-declared: … 'notice.contact' (the notice keys are: published_at, published_on, told) …` |
+| `ladder.purpose.raised_by` | `AssertionError: an undeclared key inside the ladder must be refused, got []` | `REFUSED key-not-declared: … 'ladder.purpose.raised_by' (the ladder_purpose keys are: scenario, will_act) …` |
+| prose `notice.told` | `AssertionError: a prose notice must be refused by name, got []` | `REFUSED covert-sensing: bus-factor-structural-aggregate: the notice names who is told as str rather than a list of role ids, and prose is where a personal name arrives. …` |
+| `notice.told` naming an unregistered role | `AssertionError: a notice naming an unregistered role must be refused, got []` | `REFUSED role-not-registered: bus-factor-structural-aggregate: it names 'unregistered-role' among the roles the notice says it told, which the adopter's people register does not carry. …` |
+| a DPIA filed under any other basename | `AssertionError: a DPIA filed under a name that is not the sensor id must be refused, got []` | `REFUSED no-dpia-record: … the DPIA record at twin/orgs/driftwood/dpia/whoever-signed-it.yaml has a basename that is not bus-factor-structural-aggregate.yaml — a DPIA is filed under the sensor it is about, never under anything else. …` |
+
+**End to end at a real served ref**, two new planted estates: a served record carrying
+`maintained_by` grades **FAIL** with `key-not-declared` (it graded PASS before), and a served
+role file carrying `held_by` under the filename `employee-of-the-month.yaml` produces two
+findings and grades **FAIL**.
+
+The reviewer's good news is kept and is why `committer`/`author`/`contributor` stay out of the
+token list: **the SENSOR still cannot read a person under any spelling**, because what binds the
+read is the closed `admissible_fields` set, not the token list.
+
+### F2 (medium) — the register sentences were wider than the measurement
+
+Both fixed by **widening the measurement and narrowing the sentence**, since widening alone
+cannot close it. Widened: `people_file_problems()` now reads the role file's served
+**filename**, its `id`, its **closed key set** (`id`, `role`) and its values, where before only
+keys and values were scanned against the token list — so `held_by: <a name>` and
+`people/employee-of-the-month.yaml` are both findings. `people_files()` keys the register by
+**path** rather than by id, because reading it into an id-keyed dict is what threw the filename
+away.
+
+Narrowed, because a role id that is simply a person's name in plain words matches no token and
+no value shape and no rule proposed would catch it: the map line and the ticket now say **"no
+undeclared key and no identifier-shaped filename, id, key or value"**, and the script prints
+five `LIMIT:` lines on every run naming exactly what is not refused — a personal name in plain
+words, in a DPIA's `lawful_basis`, `what_is_sensed` or `what_is_not_sensed`, in a notice path, or
+as a role id. That residual belongs to the adopter's own register review.
+
+### F3 (medium) — a refusal could have no sentence
+
+`load_rule()` validated the refusal **id** only. A row with no `sentence:` loaded and raised an
+uncaught `KeyError` at emit; `sentence: ''` loaded and emitted `refusals=['']`, a blank FAIL line
+with no reason. `load_rule()` now refuses a row whose sentence is absent or blank, does not carry
+both `{sensor}` and `{what}`, or does not open `REFUSED <id>:` so the gate can read the id off
+the line. Four tests, red first (`Failed: DID NOT RAISE <class
+'twin.sensor_admission.SensorAdmissionError'>` on each).
+
+### F4 — **changed.** `is_terminal()` is called at the branch
+
+It was defined and never called; `terminal: true` was decorative. The terminal set is now built
+from the table (`terminal = [line for line in terminal if is_terminal(rule, id_of(line))]`), and
+`test_terminality_is_read_from_the_table_at_the_branch` loosens a copy of the shipped table to
+`terminal: false` and asserts the module then reports the refusal beside the others **with a
+ladder**, then asserts the shipped table still says terminal.
+
+### F5 — **changed.** A record of another class is refused, and the result reports its own class
+
+`grade_record` stamped the table's `scenario_class` onto every result, so a record declaring
+`support-ticket-volume` came back asserting it was `bus-factor-key-person`. The result now
+carries the class **the record declared**, and a mismatch is the refusal
+`not-this-scenario-class`.
+
+### F6 — **changed.** The cohort reason is scoped to a bus factor of one
+
+D1's cohort reason ("the cohort IS the person") holds at n=1; nothing derives n, and the
+adopters carry it only as unread prose in `proposition:`. `bus_factor_scope: one` is now in the
+table with a comment saying the **outcome** is right at every n and the **reason** is not, that
+no run could tell the two cases apart because nothing derives n, and that a later ticket wanting
+cohort must first make n a derived fact rather than loosening this on the grounds that the
+reason fails at n=3.
+
+### F7 — **recorded, no change.** Leg 1's sentence check is a substring test
+
+`"It is not true that: A role, never a person"` would pass it. Left as is, with the reason: the
+five real evasions planted are each caught distinctly, and a rule that tried to read the
+surrounding English would be the "record that describes intent, not code" trap. The sentence's
+presence is a tripwire against silent deletion, not a proof that the note means it.
+
+### The optional clause, taken
+
+Both terminal sentences now end **"No other refusal on this record was evaluated."**
+
+### Kept, as the reviewer asked
+
+The printed `origin/main` sha per adopter is derived from what was actually read, so a stale
+clone shows in the verdict line rather than grading stale bytes silently.
+
+### Battery, re-run after the fixes
+
+- `pytest tests/test_sensor_admission.py -n0 -q` → **59 passed** (54 failed first).
+- `pytest tests/test_sensor_admission.py tests/test_ethics_gate.py -n0 -q` → 98 passed.
+- `verify/sensor-admission/verify-sensor-admission.sh` → exit 3, **24 planted records and six
+  planted served estates grade as planted**, then the same 3 / 3 / 0 line on the real estate.
+- `mypy twin tests conftest.py` → Success, 186 source files.
 
 ## Waits on the owner
 
