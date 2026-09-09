@@ -1,0 +1,117 @@
+# What a real adopter may sense for the `bus-factor-key-person` scenario class (eco-system
+# ticket 31, from ticket 19's resolution: "covert sensing excluded, role-not-person signatures").
+#
+# The three adopter scenarios already say the sentence this table makes checkable:
+#
+#   "A role, never a person: `people/<role>.yaml` is the subject and it names no individual.
+#    Sensing a real departure would need admission through the ethics gate, a DPIA and the roles
+#    register, which is a separate ticket."
+#
+# This is that separate ticket's answer. It is a CLOSED table in the shape `sensors.yaml` and
+# `enactment-channels.yaml` already use: a row that is not here is refused, never assumed. It
+# admits nothing on its own -- `twin/sensor_admission.py` walks a declared admission record
+# against it, and only then hands the survivor to `ethics_gate.admit()`'s existing ladder.
+#
+# THE ONE RULE BEHIND EVERY ROW: no design in this file can reach a real person. Every
+# admissible kind is structural and aggregate, every admissible field is a count or a component
+# id, and the first refusal is terminal -- a record that names or identifies an individual is
+# refused before its proportionality is computed, because computing one would put a price on
+# sensing a named person, which is the thing NORTH-STAR section 6 excludes outright.
+#
+# Versioned. Bump `version` in the same commit as any change below.
+schema: twin.sensor-admission/v1
+version: 1
+
+scenario_class: bus-factor-key-person
+
+# The admissible (kind, granularity) pairs, in `ethics_gate.py`'s own `_KIND_RANK`/`_LEVEL_RANK`
+# vocabulary rather than a second one. Exactly one pair, and the exclusions are reasoned:
+#
+#  - `individual` is excluded because the scenario's subject is a role file that names nobody;
+#    an individual reading would answer a question the scenario does not ask.
+#  - `cohort` is excluded because a bus factor of ONE means the cohort IS the person. A
+#    cohort-granularity reading of "which components would lose their only committer" is an
+#    individual reading wearing a coarser word, and the ladder's `_LEVEL_RANK` would rank it
+#    safer than it is.
+#  - `behavioural` is excluded because the question is answered by commit-graph STRUCTURE, so
+#    `ethics_gate._check_necessity` would refuse a behavioural route anyway; naming it here
+#    refuses it before the ladder rather than inside it.
+admissible:
+  - kind: structural
+    granularity: aggregate
+
+# The closed set of fields an admissible sensor may read. Anything else is refused. A closed
+# list, not a deny-list of identifier shapes: a deny-list refuses the identifiers somebody
+# thought of, and this class needs three numbers and a component id to answer its question.
+admissible_fields:
+  - component
+  - distinct_committer_count
+  - commits_in_window
+  - window_days
+
+# What must be shown before a record reaches the ethics gate's ladder at all. Each is a fact on
+# the served artefact, not a promise: a path that resolves, a date that is printed, a role that
+# is in a register, a count that is a number.
+requires:
+  notice: >-
+    A published, dated notice naming who is told. Covert sensing is permanently excluded
+    (NORTH-STAR section 6, twin decision ticket 15), so a sensor whose notice has no publication
+    date has not told anybody.
+  dpia_record: >-
+    A DPIA record in the adopter's own repository, at the path the admission record names,
+    carrying `completed_on`, `completed_by` and `retention_days`. The adopter is the controller;
+    the hub is not, so the record lives where the adopter signs it.
+  dpia_fields:
+    - completed_on
+    - completed_by
+    - retention_days
+  senses_role: >-
+    The role the sensor senses, which must be an id in the adopter's own people register
+    (`twin/orgs/<org>/people/`). That register is the roles register for this rule: it is where
+    the scenario's own subject lives, and it is signed under the adopter's tag.
+  completed_by_role: >-
+    The role accountable for the DPIA, which must also be an id in that same register.
+
+# The exact sentence each refusal prints. Declared here rather than formatted in the module, so
+# the refusal a reader is shown and the refusal the gate grades are the same bytes.
+# `{}` fields are filled by `twin/sensor_admission.py`.
+refusals:
+  - id: names-or-identifies-an-individual
+    terminal: true
+    sentence: >-
+      REFUSED names-or-identifies-an-individual: {sensor}: {what} names or identifies an
+      individual. A bus-factor-key-person sensor senses a role, never a person, and this record
+      is refused before its proportionality is computed.
+  - id: field-not-admissible
+    terminal: false
+    sentence: >-
+      REFUSED field-not-admissible: {sensor}: the field {what} is not in the admissible set
+      ({admissible}). The set is closed: a field nobody declared is not a field nobody reads.
+  - id: kind-not-admissible
+    terminal: false
+    sentence: >-
+      REFUSED kind-not-admissible: {sensor}: {what} is not admissible for bus-factor-key-person;
+      the admissible set is {admissible}.
+  - id: no-dpia-record
+    terminal: false
+    sentence: >-
+      REFUSED no-dpia-record: {sensor}: {what}. A sensor of people is admitted only against a
+      completed DPIA in the adopter's own repository, carrying a date, an accountable role and a
+      retention period in days.
+  - id: covert-sensing
+    terminal: false
+    sentence: >-
+      REFUSED covert-sensing: {sensor}: {what}. Covert sensing is permanently excluded
+      (NORTH-STAR section 6), so a sensor with no published, dated notice is refused before its
+      ladder is walked.
+  - id: role-not-registered
+    terminal: false
+    sentence: >-
+      REFUSED role-not-registered: {sensor}: it names {what}, which the adopter's people register
+      does not carry. A sensor may sense only a role somebody has registered, and a DPIA may be
+      signed off only by one.
+  - id: sensor-not-named
+    terminal: false
+    sentence: >-
+      REFUSED sensor-not-named: {sensor}: {what}. `twin/sensors.yaml` is the closed sensor table,
+      not any string a record proposes.
