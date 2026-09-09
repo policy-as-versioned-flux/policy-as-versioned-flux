@@ -260,3 +260,105 @@ def test_material_paths_sees_a_real_edit_and_an_added_or_removed_file() -> None:
     assert fc.material_paths(before, after) == {"talk/verify-manifest.txt"}
     assert fc.material_paths({}, after) == {"talk/verify-manifest.txt"}
     assert fc.material_paths(before, {}) == {"talk/verify-manifest.txt"}
+
+
+# ---------------------------------------------------------- ticket 108: which transition is mine
+#
+# The clock's recording commit moves this module's input and carries `[skip ci]`, so "the newest
+# line on disk" is one transition inside the gate and a different one a commit later. `report()`
+# grades the transition ENDING AT THE RUN BEING RECORDED instead. These tests pin the four cases
+# and the counted residue.
+
+def _flat_then_fall() -> list[str]:
+    return [line("1"), line("2"), line("3", observed=9, fail=5)]
+
+
+def test_no_run_in_flight_grades_the_newest_recorded_transition() -> None:
+    rep = fc.report(_flat_then_fall(), "", lambda a, b: set())
+    assert not rep.ok and not rep.deferred_to
+    assert {f.kind for f in rep.newest} == {"class-pass", "fail"}
+
+
+def test_the_recording_run_is_the_newest_line_so_the_fall_still_blocks() -> None:
+    """truth.yml's own step, which runs after the cage has appended the line. Unchanged."""
+    rep = fc.report(_flat_then_fall(), "", lambda a, b: set(), recording_run="3")
+    assert not rep.ok and not rep.deferred_to and rep.newest
+
+
+def test_a_run_whose_line_is_not_recorded_yet_defers_and_does_not_re_grade() -> None:
+    rep = fc.report(_flat_then_fall(), "", lambda a, b: set(), recording_run="4")
+    assert rep.ok and rep.deferred_to == "4" and rep.newest == []
+    # nothing stops looking: the older transition is still compared, printed and counted
+    assert {f.kind for f in rep.deferred_falls} == {"class-pass", "fail"}
+    assert rep.older_unaccounted == 1
+
+
+def test_deferring_does_not_excuse_a_broken_escape_hatch() -> None:
+    """The append cannot fix a hole in talk/verify-falls.txt, so deferral must not hide one."""
+    rep = fc.report(_flat_then_fall(), "run=99 | no such run", lambda a, b: set(),
+                    recording_run="4")
+    assert not rep.ok and rep.deferred_to == "4"
+
+
+def test_a_recording_run_that_is_recorded_but_not_newest_is_a_problem() -> None:
+    rep = fc.report(_flat_then_fall(), "", lambda a, b: set(), recording_run="2")
+    assert not rep.ok and any("moved under this run" in p for p in rep.problems)
+
+
+def test_a_reason_accepts_the_fall_for_the_run_being_recorded() -> None:
+    rep = fc.report(_flat_then_fall(), "run=3 | ticket 108 owns it", lambda a, b: set(),
+                    recording_run="3")
+    assert rep.ok and rep.accepted_reason
+
+
+@pytest.mark.parametrize("recording_run", ["", "1"])
+def test_one_line_log_has_no_transition(recording_run: str) -> None:
+    assert fc.report([line("1")], "", lambda a, b: set(), recording_run=recording_run).ok
+
+
+# ------------------------------------------------------- ticket 108: the residue, as a number
+
+def test_inversions_counts_the_runs_whose_own_recording_turned_it_red() -> None:
+    assert fc.inversions(_flat_then_fall(), "", lambda a, b: set()) == (1, 2)
+
+
+def test_a_committed_reason_removes_a_run_from_the_inversion_count() -> None:
+    assert fc.inversions(_flat_then_fall(), "run=3 | accepted", lambda a, b: set()) == (0, 2)
+
+
+def test_a_fall_that_stays_red_across_two_recordings_inverted_once() -> None:
+    log = _flat_then_fall() + [line("4", observed=8, fail=6)]
+    assert fc.inversions(log, "", lambda a, b: set()) == (1, 3)
+
+
+def test_inversions_on_a_log_with_no_transition() -> None:
+    assert fc.inversions([line("1")], "", lambda a, b: set()) == (0, 0)
+
+
+# ------------------------------------- ticket 108 review F5b: the defer key is validated
+#
+# Deferring means NOT grading, so a key nobody checks is an escape hatch keyed on an unchecked
+# string -- the shape this ticket exists to refuse. Both holes below were measured on the first
+# build: `abc` deferred and exited 0, and `0200` deferred where `200` graded.
+
+def test_a_non_numeric_recording_run_is_a_problem_and_never_a_defer() -> None:
+    rep = fc.report(_flat_then_fall(), "", lambda a, b: set(), recording_run="abc")
+    assert not rep.ok and rep.deferred_to == ""
+    assert any("not a run number" in p for p in rep.problems)
+    # and it GRADED rather than shrugging: the fall is still reported
+    assert {f.kind for f in rep.newest} == {"class-pass", "fail"}
+
+
+def test_a_run_number_is_compared_by_value_not_by_string() -> None:
+    """`0200` is run 200. Comparing strings made a padded key defer on a run the log carries."""
+    assert fc._run_key("0200") == "200"
+    assert fc._run_key("fixture-2") == "fixture-2"      # a non-numeric recorded run is itself
+    rep = fc.report(_flat_then_fall(), "", lambda a, b: set(), recording_run="003")
+    assert rep.deferred_to == "" and not rep.ok        # graded run 3's transition, which fell
+
+
+def test_a_re_run_of_an_older_recorded_run_is_red_and_says_why() -> None:
+    """Review F6, recorded not fixed: re-running an older truth run now guarantees this red."""
+    rep = fc.report(_flat_then_fall(), "", lambda a, b: set(), recording_run="2")
+    assert not rep.ok and any("moved under this run" in p for p in rep.problems)
+    assert any("RE-RUN" in p for p in rep.problems)

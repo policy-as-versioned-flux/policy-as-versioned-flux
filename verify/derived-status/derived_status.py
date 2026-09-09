@@ -125,6 +125,7 @@ class Derived:
     unlisted: list[str] = field(default_factory=list)
     mentioned_red: list[str] = field(default_factory=list)   # red, but another ticket's check
     unownable: list[str] = field(default_factory=list)       # red, and no commit names a ticket
+    self_referential: list[str] = field(default_factory=list)  # red, and it is THIS check
 
 
 @dataclass
@@ -416,6 +417,35 @@ def git_owners(root: Path) -> Callable[[str], set[str]]:
     return owners
 
 
+# THIS CHECK ITSELF (ticket 108, 2026-09-09). Its own grade row is not evidence about the ticket
+# that built it. Without this rule the derivation latches: this script fails for ANY reason, the
+# cage commits FAIL in its own row, and next run the ticket that owns it derives `regressed` FROM
+# THAT ROW -- which fails the script again, and again, for ever, whatever happened to the estate.
+# Measured on this estate: runs 186 and 192 both carry `verify/derived-status/... FAIL`, and by
+# construction no later run could have cleared it. It is ticket 108's shape one level up -- a
+# check whose own output is its own input -- and it is the shape ticket 59 exists to refuse.
+#
+# NOTHING IS LESS SAFE. The FAIL is unchanged: a red here still reds the gate and still reds the
+# run, by its own exit status, on the same day. Every OTHER check the ticket owns still derives
+# its status, and a red in any of them still makes the ticket `regressed`. What stops is the
+# tautology "this ticket regressed because the check that reports regressions reported one",
+# which carries no information a reader did not already have from the check's own exit code.
+# A ticket left with nothing but this row derives `resolved-ungraded`, never `resolved`: it is
+# not evidence FOR the ticket either.
+#
+# DERIVED FROM THIS MODULE'S OWN LOCATION, not typed (review F4, 2026-09-09). As a literal it was
+# an unpinned string, and every reference -- both selfchecks and all five pytest tests -- was
+# written in terms of the constant, so the tests stayed self-consistent with ANY value. A plant
+# that renamed the wrapper brought the latch back SILENTLY, with nothing red. The relative_to()
+# raises if this module is ever moved out of the hub, and the assert refuses a wrapper that is
+# not there: an exemption that can go stale without a sound is the shape this rule exists to stop.
+THIS_CHECK = str((HERE / "verify-derived-status.sh").relative_to(HUB))
+assert (HUB / THIS_CHECK).exists(), (
+    f"derived_status.py exempts {THIS_CHECK} from its own derivation, and that file does not "
+    f"exist. The exemption must name the wrapper this module is the pure half of; a renamed or "
+    f"moved wrapper brings the latch back in silence.")
+
+
 def ticket_number(path: str) -> str:
     m = re.match(r"(\d{1,4})-", Path(path).name)
     return m.group(1) if m else ""
@@ -449,6 +479,9 @@ def derive_one(path: str, text: str, table: Table,
     mine = ticket_number(path)
     red: list[str] = []
     for check in all_red:
+        if check == THIS_CHECK:
+            d.self_referential.append(check)     # ticket 108: this check is not its own evidence
+            continue
         who = owners(check) if owners is not None else {mine}
         if not who:
             d.unownable.append(check)
@@ -466,13 +499,20 @@ def derive_one(path: str, text: str, table: Table,
                 d.acknowledged = hit[:200]
                 break
         d.disagrees = not d.acknowledged
-    elif green and not (d.mentioned_red or d.unownable):
+    elif green and not (d.mentioned_red or d.unownable or d.self_referential):
         d.derived = "resolved"
         d.why = f"{len(green)} of {len(rows)} named check(s) graded PASS and none FAIL"
-    elif d.mentioned_red or d.unownable:
+    elif d.mentioned_red or d.unownable or d.self_referential:
         d.derived = "resolved-ungraded"
-        d.why = (f"the red check(s) it names are not its own: "
-                 f"{', '.join(d.mentioned_red + d.unownable)}")
+        why = []
+        if d.mentioned_red or d.unownable:
+            why.append("the red check(s) it names are not its own: "
+                       + ", ".join(d.mentioned_red + d.unownable))
+        if d.self_referential:
+            why.append("the red check(s) it names include the one doing the deriving, which is "
+                       "not evidence about the ticket that built it (ticket 108): "
+                       + ", ".join(d.self_referential))
+        d.why = "; ".join(why)
     else:
         d.derived = "resolved-unobserved"
         d.why = (f"every check it names could not look on that run: "
@@ -487,7 +527,7 @@ def report(files: dict[str, str], table: Table, newest_truth: str,
     derived: list[Derived] = []
     counts = {"tickets": len(files), "resolved": 0, "derived-green": 0, "regressed": 0,
               "acknowledged": 0, "unobserved": 0, "ungraded": 0, "checks-not-in-the-table": 0,
-              "red-but-another-ticket's": 0, "red-and-unownable": 0}
+              "red-but-another-ticket's": 0, "red-and-unownable": 0, "red-and-this-check": 0}
     for path, text in sorted(files.items()):
         d = derive_one(path, text, table, owners=owners)
         if not d.derived:
@@ -497,6 +537,7 @@ def report(files: dict[str, str], table: Table, newest_truth: str,
         counts["checks-not-in-the-table"] += len(d.unlisted)
         counts["red-but-another-ticket's"] += len(d.mentioned_red)
         counts["red-and-unownable"] += len(d.unownable)
+        counts["red-and-this-check"] += len(d.self_referential)
         if d.derived == "resolved":
             counts["derived-green"] += 1
         elif d.derived == "resolved-unobserved":
@@ -584,6 +625,26 @@ def selfcheck() -> int:
                        table, owners=lambda c: {"999"})
     assert other.derived == "resolved-ungraded" and not other.disagrees
     assert other.mentioned_red == ["verify/red/verify-red.sh"]
+    # ticket 108: this check's OWN red row is not evidence about the ticket that built it, and
+    # it is not evidence for it either -- the ticket derives ungraded, never resolved.
+    _self = parse_grades(f"# {_TRUTH}\n{THIS_CHECK}\tFAIL\tFAIL: it did not\n"
+                         "verify/good/verify-good.sh\tPASS\tPASS: it looked\n")
+    mine = derive_one("59-x.md", _t("resolved", f"\n## Answer\n\n`{THIS_CHECK}`\n"), _self,
+                      owners=lambda c: {"59"})
+    assert mine.derived == "resolved-ungraded" and mine.self_referential == [THIS_CHECK]
+    assert not mine.disagrees and "ticket 108" in mine.why
+    both = derive_one("59-x.md",
+                      _t("resolved", f"\n## Answer\n\n`{THIS_CHECK}`\n\n`verify/good/verify-good.sh`\n"),
+                      _self, owners=lambda c: {"59"})
+    assert both.derived == "resolved-ungraded", both.derived
+    # and a red in ANY OTHER check the ticket owns still derives regressed: nothing is less safe
+    _self2 = parse_grades(f"# {_TRUTH}\n{THIS_CHECK}\tFAIL\tFAIL: it did not\n"
+                          "verify/red/verify-red.sh\tFAIL\tFAIL: it did not\n")
+    still = derive_one("59-x.md",
+                       _t("resolved", f"\n## Answer\n\n`{THIS_CHECK}`\n\n`verify/red/verify-red.sh`\n"),
+                       _self2, owners=lambda c: {"59"})
+    assert still.derived == "regressed" and still.disagrees and still.self_referential
+
     none_own = derive_one("b.md", _t("resolved", "\n## Answer\n\n`verify/red/verify-red.sh`\n"),
                           table, owners=lambda c: set())
     assert none_own.unownable == ["verify/red/verify-red.sh"] and not none_own.disagrees
@@ -681,7 +742,9 @@ def _run(args: argparse.Namespace) -> int:
           f"{c["red-but-another-ticket's"]} red row(s) are named by a ticket that does not own "
           f"the check (git says another ticket's commits touched it) and "
           f"{c['red-and-unownable']} are named by a ticket where NO commit touching the check "
-          f"names any ticket at all, so ownership could not be established for anyone")
+          f"names any ticket at all, so ownership could not be established for anyone; "
+          f"{c['red-and-this-check']} are THIS check's own row, which is not evidence about the "
+          f"ticket that built it (ticket 108: a check whose output is its own input latches)")
     for p in rep.problems:
         print(f"  !! {p}")
     for f in rep.findings:
