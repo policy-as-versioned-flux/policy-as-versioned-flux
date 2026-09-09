@@ -72,8 +72,25 @@ from truth_manifest import measured                                          # n
 WORD = {"PASS": "observed true", "SKIP": "could not look", "FAIL": "observed false"}
 # What grade() says when a capture's last line is not a verdict at all. Named, because
 # resolved_grade() has to tell "the last line disagrees with the run" from "there is no last-line
-# opinion to disagree with", and 29 of 121 captures on 2026-09-08 are the second kind.
+# opinion to disagree with", and 30 of run 186's 120 captures are the second kind (16 of them
+# specifically the wrapped-verdict shape; run 184 is 30 of 119).
+# Hyphens, en and em dashes and slashes join words a phrase lint must read as separate ones.
+JOINERS = re.compile(r"[-\u2010-\u2015/]+")
+# The row count the record states about its own table, e.g. "**There are 5 rows below**".
+DECLARED_ROWS = re.compile(r"[Tt]here (?:is|are) \*{0,2}(\d+) rows? below")
 NO_VERDICT = "the capture's last line does not carry a PASS:, SKIP: or FAIL: verdict"
+
+# A run that recorded no grade for a script is a COULD-NOT-LOOK, and it says which of the two
+# shapes it is. It is not a grade, so it never appears in WORD, and the deck may not render it as
+# one. Ticket 48 review F1: before this, the absent table fell back to the capture's last line --
+# the very proxy the grade table exists to replace -- and a script whose verdict wraps then
+# rendered `observed false` with the whole check green. 48 of the 51 recorded runs committed no
+# table at all, so that fallback was the normal case and not a legacy one.
+UNGRADED = "UNGRADED"
+NO_TABLE = ("this run committed no `talk/captures/_grades.tsv`, so it recorded no grade for "
+            "`{script}` and this deck will not read one off the capture's last line")
+NO_ROW = ("this run's `talk/captures/_grades.tsv` carries no row for `{script}`, so the run "
+          "recorded no grade for it and this deck will not read one off the capture's last line")
 
 # ponytail: build order. A deck of the captures ON DISK is built from whatever
 # is there when the build runs. Inside a gate run, a script that sorts after
@@ -136,8 +153,11 @@ def grades_table(capdir):
     Monte Carlo aside's own capture. verify-all.sh has written this per-script table inside the
     observation lane since ticket 59, so the deck reads what the run recorded.
 
-    {} for a run that committed no table (every run up to and including 22). Then, and only then,
-    the last-line reading stands, which is what the deck did before this.
+    {} for a run that committed no table. That is not a legacy case: of the 51 runs talk/truth.log
+    records, only runs 181, 184 and 186 carry a table, so 48 of them return {} here. A run with no
+    table, and a run whose table has no row for one script, both mean the same thing -- this run
+    recorded no grade for it -- and resolved_grade() says so by name rather than falling back to
+    the capture's last line.
     """
     p = Path(capdir) / "_grades.tsv"
     if not p.exists():
@@ -178,7 +198,10 @@ def resolved_grade(script, rows, capdir):
     last_tag, last_reason = grade(rows)
     table = grades_table(capdir)
     if script not in table:
-        return last_tag, last_reason, None
+        # Never the last-line proxy. The run recorded no grade, the deck says which shape of
+        # nothing that is, and check() puts it on the could-not-look list (exit 3).
+        shape = NO_TABLE if not table else NO_ROW
+        return UNGRADED, shape.format(script=script), None
     tag = table[script]
     reason = verdict(rows, tag) or last_reason
     bad = None
@@ -398,6 +421,8 @@ def render_beat(b, scheduled, capdir):
     if tag == "NOCHECK":
         out += [f"**no check yet, {reason}** — this step has no capture in this run, so the deck "
                 "shows no result for it. That is the generator saying so, not the gate.", ""]
+    elif tag == UNGRADED:
+        out += [f"**could not look** — {reason}.", ""]
     else:
         out += [f"**{WORD[tag]}** — {reason}", ""]
     if rows:
@@ -433,6 +458,8 @@ def render_aside(a, capdir):
     if tag == "ABSENT":
         out += [f"**could not look** — this run wrote no `{want}`, so this slide has nothing to "
                 f"show and shows nothing. {reason}", ""]
+    elif tag == UNGRADED:
+        out += [f"**could not look** — {reason}.", ""]
     else:
         out += [f"**{WORD[tag]}** — {reason}", ""]
     if rows:
@@ -550,8 +577,13 @@ def flatten(s):
     Not a nicety. `Deny is the *bottom* rung` is how the phrase last shipped on a slide
     (talk/deck-2026-07-31-superseded.md:149), and a literal substring list would have walked
     straight past it -- as would a phrase broken over two lines by the wrapper.
+
+    Hyphens, dashes and slashes are whitespace here too (ticket 48 review F6). `deny-gate` is the
+    same phrase as `deny gate` and is the next wrapper the refused phrase would plausibly wear;
+    before this it passed as a review item rather than a red. Both sides are flattened, the slide
+    text and the table's phrase cell, so the rule stays symmetric.
     """
-    return SPACES.sub(" ", EMPHASIS.sub("", s.lower())).strip()
+    return SPACES.sub(" ", JOINERS.sub(" ", EMPHASIS.sub("", s.lower()))).strip()
 
 
 def refused_phrases(root=ROOT):
@@ -565,24 +597,51 @@ def refused_phrases(root=ROOT):
     carries them with the entry or dated decision that refuses each one, and the checker follows
     the record. Adding a word to the lint is an edit to CONTEXT.md.
     """
+    return _phrase_table(root)[0]
+
+
+def _phrase_table(root=ROOT):
+    """(rows, problems, declared) -- ONE parse of the table, three views of it.
+
+    `problems` is ticket 48 review F3. A row that does not parse to three non-empty cells used to
+    be SKIPPED in silence, so one stray `|` inside a row's own prose dropped that phrase from the
+    lint while the table still read complete to a human -- a failure mode the python literal this
+    replaced did not have, because a list in code cannot be truncated by punctuation. Measured:
+    `| `deny gate` | the bottom rung | of the cage ladder, `isolated` |` left `deny gate` unlinted
+    and a slide carrying it exited 0. Now the malformed line is named and red.
+
+    `declared` is the row count the record states in its own prose, or None. Comparing it with the
+    rows found makes DELETING a row a deliberate two-place edit rather than a silent one.
+    """
     path = Path(root) / "CONTEXT.md"
     if not path.exists():
-        return []
-    rows, inside = [], False
+        return [], [], None
+    rows, problems, declared, inside = [], [], None, False
     for line in path.read_text(errors="replace").splitlines():
         if line.startswith("## "):
             inside = line.startswith(REFUSED_HEADING)
             continue
-        if not inside or not line.lstrip().startswith("|"):
+        if not inside:
+            continue
+        if declared is None:
+            m = DECLARED_ROWS.search(line)
+            if m:
+                declared = int(m.group(1))
+        if not line.lstrip().startswith("|"):
             continue
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) != 3:
+        # The separator row is every cell made of nothing but `-` and `:`. It is not a row and is
+        # not malformed. The header names its own columns and is skipped by name.
+        if cells and all(c and set(c) <= set("-:") for c in cells):
+            continue
+        if len(cells) != 3 or not flatten(cells[0]):
+            problems.append(line.strip())
             continue
         phrase = flatten(cells[0])
-        if not phrase or set(phrase) <= {"-", " "} or phrase == "refused on a slide":
+        if phrase == "refused on a slide":
             continue
         rows.append({"phrase": phrase, "instead": cells[1], "why": cells[2]})
-    return rows
+    return rows, problems, declared
 
 
 def _body(sl):
@@ -722,7 +781,10 @@ def check(path, root=ROOT):
                                f"{kv['script']} {tag}")
                 if disagreement:
                     bad.append(f"step {step}: {disagreement}")
-                if table.get(step) and table[step] != kv["status"]:
+                if tag == UNGRADED:
+                    cannot.append(f"step {step}: {run_word} recorded no grade for {kv['script']}, "
+                                  "so this check may not say the deck is whole")
+                if kv["status"] in WORD and table.get(step) and table[step] != kv["status"]:
                     bad.append(f"step {step}: deck says {kv['status']}, the run's own honesty table says {table[step]}")
                 # Set membership, not substring: '8,269.23' is a substring of the
                 # capture's '58,269.23' and used to pass as a figure that appears
@@ -767,6 +829,9 @@ def check(path, root=ROOT):
                                f"{kv['script']} {tag}")
                 if disagreement:
                     bad.append(f"aside {nm}: {disagreement}")
+                if tag == UNGRADED:
+                    cannot.append(f"aside {nm}: {run_word} recorded no grade for {kv['script']}, "
+                                  "so this check may not say the deck is whole")
                 captured = set(figures(cap.read_text(errors="replace")))
                 for f in figures(body):
                     if f not in captured:
@@ -797,7 +862,21 @@ def check(path, root=ROOT):
             bad.append(f"a non-beat slide carries the figure '{f}'; only a beat slide may carry a "
                        "figure, because only a beat has a capture to check it against")
 
-    refused = refused_phrases(root)
+    refused, problems, declared = _phrase_table(root)
+    for line in problems:
+        bad.append("CONTEXT.md's `" + REFUSED_HEADING + "` table carries a row that does not parse "
+                   "to three non-empty cells, so the phrase it names is not linted while the table "
+                   f"still reads complete: {line}")
+    # Both only when there IS a table. A record carrying no table at all gets the one fault
+    # below, which says the whole thing; three messages for one absence would read as three
+    # problems.
+    if refused or problems:
+        if declared is None:
+            bad.append("CONTEXT.md's `" + REFUSED_HEADING + "` section states no row count, so a "
+                       "deleted row would be a one-place edit nothing notices")
+        elif declared != len(refused):
+            bad.append(f"CONTEXT.md's `{REFUSED_HEADING}` section says it carries {declared} "
+                       f"row(s) and the table parses to {len(refused)}")
     if not refused:
         bad.append("CONTEXT.md carries no `" + REFUSED_HEADING + "` table, so the phrase lint has "
                    "no list to apply; a lint whose list is derived from nothing is not a lint")
@@ -849,17 +928,41 @@ def selfcheck():
         b4 = {"step": 4, "title": "t", "script": "verify/selfcheck/verify-scheduled-only-probe.sh",
               "ticket": "16", "narration": "n", "scheduled_only": True}
         probe = capture_path(b4["script"], capdir)
-        probe.write_text("looked at a cluster\nFAIL: the cage is NOT in force\n")
+
+        def observed(tag, line):
+            """The run graded this script `tag` and wrote this capture. Both, together: a probe
+            with a capture and no row in the run's grade table is UNGRADED, not graded off its
+            last line, so a fixture that writes only the capture would be testing the fallback
+            this file no longer has (ticket 48 review F1)."""
+            probe.write_text(f"looked at a cluster\n{line}\n")
+            (capdir / "_grades.tsv").write_text(f"{b4['script']}\t{tag}\t{line}\n")
+
+        observed("FAIL", "FAIL: the cage is NOT in force")
         tag, reason, _rows, cited = beat_status(b4, False, capdir)
         assert (tag, cited) == ("FAIL", True), (tag, cited)
         assert reason == "the cage is NOT in force", reason
-        probe.write_text("looked at a cluster\nSKIP: no Running pod to carry the cage\n")
+        observed("SKIP", "SKIP: no Running pod to carry the cage")
         tag, reason, _rows, cited = beat_status(b4, False, capdir)
         assert (tag, cited) == ("SKIP", True) and reason == "no Running pod to carry the cage"
-        probe.write_text("looked at a cluster\nPASS: reconciled at the pinned revision\n")
+        observed("PASS", "PASS: reconciled at the pinned revision")
         tag, reason, _rows, cited = beat_status(b4, False, capdir)
         assert (tag, cited) == ("SKIP", True), (tag, cited)
         assert "reconciled at the pinned revision" in reason and "local build" in reason
+
+        # ...and the same probe with its ROW taken away is a could-not-look that names the
+        # script, never a grade read off the capture's last line. Both shapes: no table at all,
+        # and a table with no row for this script.
+        (capdir / "_grades.tsv").unlink()
+        tag, reason, _rows, cited = beat_status(b4, False, capdir)
+        assert (tag, cited) == (UNGRADED, True), (tag, cited)
+        assert reason == NO_TABLE.format(script=b4["script"]), reason
+        assert "**could not look**" in "\n".join(render_beat(b4, False, capdir))
+        (capdir / "_grades.tsv").write_text("verify/somewhere/verify-else.sh\tPASS\tfine\n")
+        tag, reason, _rows, cited = beat_status(b4, False, capdir)
+        assert (tag, cited) == (UNGRADED, True), (tag, cited)
+        assert reason == NO_ROW.format(script=b4["script"]), reason
+        # ...and on a scheduled run, with the run's own PASS row back, the downgrade is gone.
+        observed("PASS", "PASS: reconciled at the pinned revision")
         assert beat_status(b4, True, capdir)[0] == "PASS"
 
     # the figure check is set membership, not substring: 8,269.23 is inside
@@ -904,13 +1007,16 @@ def selfcheck():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         (root / "talk" / "captures").mkdir(parents=True)
-        (root / "CONTEXT.md").write_text(
-            "# c\n\n" + REFUSED_HEADING + "\n\n"
-            "| refused on a slide | say instead | refused by |\n"
-            "| --- | --- | --- |\n"
-            "| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n"
-            "| `admission gate` | the mutating admission controller | ticket 75 Q5 |\n\n"
-            "## Another section\n\n| this | is not | a refusal |\n")
+        def record(rows, count="There are 2 rows below."):
+            (root / "CONTEXT.md").write_text(
+                "# c\n\n" + REFUSED_HEADING + "\n\n" + count + "\n\n"
+                "| refused on a slide | say instead | refused by |\n"
+                "| --- | --- | --- |\n" + rows + "\n"
+                "## Another section\n\n| this | is not | a refusal |\n")
+
+        GOOD = ("| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n"
+                "| `admission gate` | the mutating admission controller | ticket 75 Q5 |\n")
+        record(GOOD)
         capdir = root / "talk" / "captures"
         (capdir / "verify_fx_verify-fx.out").write_text(
             "ok  priced 58,269.23 GBP\nPASS: two lines of verdict,\nand the second one.\n")
@@ -921,6 +1027,32 @@ def selfcheck():
         assert [r["phrase"] for r in refused_phrases(root)] == ["deny is the bottom rung",
                                                                "admission gate"]
         assert refused_phrases(Path(tmp) / "nowhere") == []
+        assert _phrase_table(root)[1:] == ([], 2)
+
+        # F3, both halves. A row broken by one stray `|` inside its own prose is NAMED, not
+        # dropped: before this it left the phrase unlinted while the table read complete.
+        record("| `deny is the bottom rung` | `isolated` is the bottom rung of the cage | "
+               "ladder | ticket 89 |\n"
+               "| `admission gate` | the controller | ticket 75 Q5 |\n")
+        rows, problems, _n = _phrase_table(root)
+        assert [r["phrase"] for r in rows] == ["admission gate"], rows
+        assert len(problems) == 1 and "deny is the bottom rung" in problems[0], problems
+        # ...and an emptied phrase cell is the same fault.
+        record("|  | `isolated` is the bottom rung | ticket 89 |\n" + GOOD)
+        assert len(_phrase_table(root)[1]) == 1
+        # A deleted row disagrees with the count the record states about itself.
+        record("| `admission gate` | the mutating admission controller | ticket 75 Q5 |\n")
+        rows, problems, declared = _phrase_table(root)
+        assert (len(rows), problems, declared) == (1, [], 2)
+        # A record that states no count at all is a fault of its own.
+        record(GOOD, count="")
+        assert _phrase_table(root)[2] is None
+        record(GOOD)
+
+        # F6: a hyphen is whitespace to the lint, so the refused phrase cannot wear one.
+        assert flatten("This is the deny-gate for every workload.") == \
+            "this is the deny gate for every workload."
+        assert flatten("`deny gate`") == "deny gate"
 
         # the run's own grade, not the capture's last line. This capture is the Monte Carlo
         # capture's shape: a script that exited 0 whose last line is the second half of its

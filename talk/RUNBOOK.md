@@ -161,7 +161,9 @@ you want their reconcile beat live for that room.
 >
 > **The video (decided 2026-08-28, ticket 20 item 5; not re-decided).** The
 > by-product is a **screen recording of a human driving these slides**.
-> `pitch-v6.mp4` is a **release asset on the hub**, the audio track is not kept,
+> `pitch-v6.mp4` is **to become a release asset on the hub** (ticket 20 item 5; the
+> hub carries no releases yet, so nothing has been cut — see ticket 48, Waits on
+> the owner), the audio track is not kept,
 > and the local TTS/puppeteer/ffmpeg pipeline in `.scratch/talk-spec/pitch-v6/`
 > is not the route to it: it is committed as the record of what was rendered on
 > the twenty-fifth of August and is not run again. The deliverable is the run;

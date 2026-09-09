@@ -120,8 +120,10 @@ def hub(tmp_path: Path) -> dict:
     (root / "talk" / "narration.json").write_text(json.dumps(_narration()))
     # The refused-phrase list lives in the vocabulary record and the checker reads it there
     # (eco-system ticket 48), so a hub with no record has no lint and check() says so.
+    # The record states its own row count, so deleting a row is a two-place edit and not a
+    # silent one (ticket 48 review F3).
     (root / "CONTEXT.md").write_text(
-        "# c\n\n" + bd.REFUSED_HEADING + "\n\n"
+        "# c\n\n" + bd.REFUSED_HEADING + "\n\nThere is 1 row below.\n\n"
         "| refused on a slide | say instead | refused by |\n| --- | --- | --- |\n"
         "| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n")
     (root / "talk" / "truth.log").write_text("")
@@ -298,3 +300,86 @@ def test_a_hub_whose_record_carries_no_refused_table_has_no_lint(hub: dict, tmp_
     bad = bd.check(p, root=root)[0]
     assert bad == [f"CONTEXT.md carries no `{bd.REFUSED_HEADING}` table, so the phrase lint has "
                    "no list to apply; a lint whose list is derived from nothing is not a lint"], bad
+
+
+def test_a_row_that_does_not_parse_is_named_rather_than_dropped(hub: dict, tmp_path: Path) -> None:
+    """Ticket 48 review F3. A row broken by one stray `|` inside its own prose used to be skipped
+    in silence, so the phrase it names left the lint while the table still read complete to a
+    reader. That is a failure mode the python literal this replaced did not have."""
+    root = hub["root"]
+    p = tmp_path / "deck.md"
+
+    def record(rows: str, count: str = "There is 1 row below.") -> None:
+        (root / "CONTEXT.md").write_text(
+            "# c\n\n" + bd.REFUSED_HEADING + "\n\n" + count + "\n\n"
+            "| refused on a slide | say instead | refused by |\n| --- | --- | --- |\n" + rows)
+
+    # one stray pipe inside the row's own prose: named, and the count disagrees as well
+    record("| `deny is the bottom rung` | `isolated` is the bottom | rung | ticket 89 |\n")
+    p.write_text(bd.build(run=2, root=root))
+    bad = bd.check(p, root=root)[0]
+    assert any("does not parse to three non-empty cells" in b for b in bad), bad
+    assert any("says it carries 1 row(s) and the table parses to 0" in b for b in bad), bad
+
+    # an emptied phrase cell is the same fault
+    record("|  | `isolated` is the bottom rung | ticket 89 |\n")
+    assert bd._phrase_table(root)[1] != []
+
+    # a deleted row disagrees with the count the record states about itself
+    record("| `admission gate` | the controller | ticket 75 Q5 |\n"
+           "| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n")
+    bad = bd.check(p, root=root)[0]
+    assert any("says it carries 1 row(s) and the table parses to 2" in b for b in bad), bad
+
+    # a record that states no count at all is a fault of its own
+    record("| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n", count="")
+    bad = bd.check(p, root=root)[0]
+    assert any("states no row count" in b for b in bad), bad
+
+
+def test_a_hyphen_does_not_carry_a_refused_phrase_past_the_lint(hub: dict, tmp_path: Path) -> None:
+    """Ticket 48 review F6. `deny-gate` is the same phrase as `deny gate` and is the next wrapper
+    the refused phrase would plausibly wear after the asterisks flatten() was written for."""
+    root = hub["root"]
+    (root / "CONTEXT.md").write_text(
+        "# c\n\n" + bd.REFUSED_HEADING + "\n\nThere is 1 row below.\n\n"
+        "| refused on a slide | say instead | refused by |\n| --- | --- | --- |\n"
+        "| `deny gate` | the bottom rung of the cage ladder | ticket 89 |\n")
+    p = tmp_path / "deck.md"
+    p.write_text(bd.build(run=2, root=root) + "\n---\n\n## x\n\nThis is the deny-gate here.\n")
+    bad = bd.check(p, root=root)[0]
+    assert any("'deny gate' is refused vocabulary" in b for b in bad), bad
+    # and the em dash and slash shapes go the same way
+    p.write_text(bd.build(run=2, root=root) + "\n---\n\n## x\n\nThe deny/gate here.\n")
+    assert any("'deny gate' is refused vocabulary" in b for b in bd.check(p, root=root)[0])
+
+
+def test_a_run_that_recorded_no_grade_is_a_could_not_look_not_a_last_line_reading(
+        hub: dict, tmp_path: Path) -> None:
+    """Ticket 48 review F1. The whole point of reading the run's grade table is that a capture's
+    last line is a proxy. When the run recorded no grade -- no table at all, or a table with no
+    row for this script -- falling back to that proxy is the defect the table exists to replace,
+    and it rendered `observed false` for a script that exited 0 with the check green."""
+    root = hub["root"]
+    capdir = root / "talk" / "captures"
+    script = "verify/wrapped/verify-wrapped.sh"
+    (capdir / (bd.slug(script) + ".out")).write_text(
+        "ok  looked\nPASS: a verdict that wraps,\nand its second line.\n")
+    rows = bd.capture_lines(script, capdir)
+    # the capture on its own reads back FAIL, which is exactly why the table is read instead
+    assert bd.grade(rows) == ("FAIL", bd.NO_VERDICT)
+
+    (capdir / "_grades.tsv").unlink(missing_ok=True)
+    tag, reason, bad = bd.resolved_grade(script, rows, capdir)
+    assert (tag, bad) == (bd.UNGRADED, None)
+    assert reason == bd.NO_TABLE.format(script=script)
+
+    (capdir / "_grades.tsv").write_text("verify/other/verify-other.sh\tPASS\tfine\n")
+    tag, reason, _bad = bd.resolved_grade(script, rows, capdir)
+    assert tag == bd.UNGRADED
+    assert reason == bd.NO_ROW.format(script=script)
+
+    # and the run's own grade wins the moment the run recorded one
+    (capdir / "_grades.tsv").write_text(f"{script}\tPASS\ta verdict that wraps, and its "
+                                        "second line.\n")
+    assert bd.resolved_grade(script, rows, capdir)[0] == "PASS"

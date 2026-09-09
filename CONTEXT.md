@@ -691,6 +691,10 @@ answer is that this estate is a mutating admission controller, so no slide may n
 or refusing one. Every other use of the word is printed by the check as a human review item, and is
 never a failure.
 
+**There are 5 rows below**, and `talk/build_deck.py` refuses the table when that number and the
+rows disagree. So removing a row is a two-place edit somebody has to mean, and a row broken by a
+stray `|` inside its own prose is named and red rather than dropped in silence.
+
 | refused on a slide | say instead | refused by |
 | --- | --- | --- |
 | `exemption` | a priced hole, or a declared inability that is caged and priced | the **Exemption** entry above: a banned concept, there are none, ever, at any scope, in any file, under any name |

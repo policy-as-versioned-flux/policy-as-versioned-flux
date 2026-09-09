@@ -28,7 +28,11 @@ Every claim below was measured in this worktree, not carried from the record.
   records what the gate graded each script from its EXIT CODE. The Monte Carlo capture
   `.estate-clone_platform_fair_verify-fair-tail.out` ends in the second line of a two-line `PASS:`
   sentence, so the last-line reading says FAIL for a script that exited 0. Measured on both runs
-  this build read: 29 of run 184's 121 captures and 30 of run 186's 120 have that shape. This
+  this build read: 30 of run 184's 119 captures and 30 of run 186's 120 have that shape, 16 of
+  them on each run specifically the wrapped-verdict kind, and 32 scripts per run are graded
+  differently by the table and by the last line. (Corrected 2026-09-09 after review: this said
+  "29 of run 184's 121", and neither number is one any run produced. Re-measured from the
+  recording commits themselves.) This
   decided where a slide's status comes from (below).
 - **The four captures this ticket's beats need are in the recording commit of both runs**
   (184 at 6772a7a, 186 at 9517d98): fair-tail, schedules, pound-seam, local-clock.
@@ -246,7 +250,73 @@ red), and once end to end through `verify/demo/verify-demo.sh` over a planted `t
   the honesty gate keep their names; the truth surface is still called the gate.` — produced
   `review, not a lint failure: the word gate appears on 1 lines` and **exit 0**.
 
-Map line: `- [48 — The demo's remaining beats](issues/48-the-demo-s-remaining-beats.md) — the video by-product is not re-decided (ticket 20 item 5: a screen recording of a human drive, the mp4 a hub release asset, the audio dropped, so the TTS/puppeteer pipeline is not the route) and the deck and RUNBOOK now say so; the Monte Carlo and continuous-refresh beats become ASIDES, a capture-reading slide that is not one of the seven §4 steps, reading `.estate-clone/platform/fair/verify-fair-tail.sh` before step 3 and `verify/schedules/verify-schedules.sh` before step 1, each carrying the run's own grade and, when the run wrote no capture, naming the file it wanted while `verify-demo.sh` exits 3 rather than passing; the refused-phrase list moves out of `talk/build_deck.py` into CONTEXT.md's `## Words a slide may not use` table with what to say instead beside each row, gains `deny is the bottom rung` and matches with markdown emphasis stripped, while `the gate`, `release gate` and `adopter gate` stay human review items because ticket 75 Q5 refused the admission sense and not the word; the twin beat runs on driftwood because step 5's capture is where the other two adopters say they cannot price, its priced cage is an aside on `verify/pound-seam/` and its model call an aside on `verify/local-clock/` reading a recorded local clock and never a schedule, with ticket 93's derived probability named as the follow-on; and a slide's status is now the run's own `talk/captures/_grades.tsv` grade, not a capture's last line, which reads back FAIL off the Monte Carlo capture's own script that exited zero.`
+Map line: `- [48 — The demo's remaining beats](issues/48-the-demo-s-remaining-beats.md) — the video by-product is not re-decided (ticket 20 item 5: a screen recording of a human drive, the mp4 to become a hub release asset once one is cut, the audio dropped, so the TTS/puppeteer pipeline is not the route) and the deck and RUNBOOK now say so; the Monte Carlo and continuous-refresh beats become ASIDES, a capture-reading slide that is not one of the seven §4 steps, reading `.estate-clone/platform/fair/verify-fair-tail.sh` before step 3 and `verify/schedules/verify-schedules.sh` before step 1, each carrying the run's own grade and, when the run wrote no capture, naming the file it wanted while `verify-demo.sh` exits 3 rather than passing; the refused-phrase list moves out of `talk/build_deck.py` into CONTEXT.md's `## Words a slide may not use` table with what to say instead beside each row, gains `deny is the bottom rung` and matches with markdown emphasis stripped, while `the gate`, `release gate` and `adopter gate` stay human review items because ticket 75 Q5 refused the admission sense and not the word; the twin beat runs on driftwood because step 5's capture is where the other two adopters say they cannot price, its priced cage is an aside on `verify/pound-seam/` and its model call an aside on `verify/local-clock/` reading a recorded local clock and never a schedule, with ticket 93's derived probability named as the follow-on; and a slide's status is now the run's own `talk/captures/_grades.tsv` grade, not a capture's last line, which reads back FAIL off the Monte Carlo capture's own script that exited zero.`
+
+## Review round 1 (2026-09-09)
+
+An adversarial review returned **request changes on two**, and reproduced everything else the
+build claimed. It confirmed the four decisions are sound, that decision 4 is genuinely derived
+from step 5's own capture, that decision 1 is faithful to ticket 20 with nothing re-decided, and
+that all five phrases' cited authorities are real and accurately quoted. It measured the deck
+rebuild as idempotent and the committed deck as the generated deck. It judged the five newly
+declared could-not-look reasons as declared and both deliberate omissions as undeclared, which
+is the intended pair.
+
+**F1, blocking, fixed.** A run that recorded no grade for a script silently fell back to the
+capture's LAST LINE, which is the exact proxy decision 4b exists to replace. With
+`talk/captures/_grades.tsv` removed, the Monte Carlo aside rendered `status=FAIL` and
+`**observed false**` for a script that exited 0, and `--check` returned **0**. The same happened
+per-script when a present table simply had no row. The docstring said the fallback covered
+"every run up to and including 22"; only runs 181, 184 and 186 of the 51 recorded runs carry a
+table, so it was the normal case and not a legacy one. `python3 talk/build_deck.py --run 179`
+reproduced it without touching anything.
+
+A run that recorded no grade is now `UNGRADED`, which is a could-not-look and not a grade. It
+never appears in `WORD`, the slide reads "could not look" and names the script and which shape of
+nothing it is, and `check()` puts it on the `cannot` list. Measured after the fix: no table at
+all gives exit **3** with all eleven reads named; a present table with the fair-tail row removed
+gives exit **3** naming that one; and `--run 179` gives exit **3**. All eleven of the deck's
+scripts are in the current run's table, so today's deck is byte-identical apart from its stamp.
+
+**F2, blocking, fixed.** The closing slide and `talk/RUNBOOK.md` stated as present fact that
+`pitch-v6.mp4` is published as a release asset on the hub. `gh release list` prints nothing; the
+hub has no releases at all, and this ticket's own "Waits on the owner" says so. Both now read as
+a future, and the RUNBOOK names the wait. The map line above carried the same tense and is
+corrected with it.
+
+**F3, fixed.** A refused-phrase row could be silently disabled while still looking present: any
+row not parsing to three cells was skipped without a diagnostic, so one stray `|` inside a row's
+own prose dropped that phrase from the lint. That is a failure mode the python literal this
+replaced did not have. A malformed row is now named and red, and CONTEXT.md states its own row
+count so a deletion is a two-place edit. Measured on the real record: the stray pipe gives two
+reds, the malformed row by name and the count disagreeing, and deleting a row outright gives the
+count red.
+
+**F5, fixed.** The count behind decision 4b was not a count any run produced. Re-measured from
+the recording commits: run 184's tree carries 119 `.out` files and run 186's 120, and 30 captures
+in each end on a line carrying no verdict, 16 of those specifically the wrapped-verdict shape,
+with 32 scripts per run graded differently by the table and by the last line. Corrected in the
+three places that carried the wrong pair.
+
+**F6, fixed.** `flatten()` normalised markdown emphasis and whitespace but not hyphens, so
+`deny-gate` passed as a review item rather than a red. Hyphens, dashes and slashes are now
+whitespace to the lint on both sides. Measured on the real deck: `deny-gate` on a slide is now
+`bad phrase lint: 'deny gate' is refused vocabulary`, exit 1.
+
+**F7, recorded as a ceiling, not fixed.** The figure rule binds the PROVENANCE of a digit token
+and not its meaning. A digit run appearing anywhere in the capture licenses that figure on the
+slide, so a `sha256:` prefix or a count of something else will do it. The review's own advice was
+to leave the rule alone and say what it binds; `talk/verify-demo.sh`'s header now does.
+
+**F4 and F8, not fixed, and named here so nobody reads a green as more than it is.** F4: the
+"say instead" and "refused by" columns are prose no check reads against the entries they cite, so
+a row's citation is a courtesy to a reader and not a derivation. The honest form of the claim is
+that the list now lives in the record beside its reasons, that an edit to the record moves the
+lint with no code change, and that an absent or malformed table is a named FAIL: all measured.
+Binding the third column to the entry it names is follow-on work. F8: `verify-demo.sh` compares
+the committed deck with a rebuild by MARKERS, so a hand-edited sentence carrying no figure and no
+refused phrase survives; the review planted one and it passed. Both are the same shape of
+follow-on and neither is introduced here.
 
 ## Waits on the owner
 

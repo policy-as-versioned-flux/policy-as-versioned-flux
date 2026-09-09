@@ -43,9 +43,22 @@
 #     capture's last line only for a run recorded before that table existed.
 #     The two are compared whenever the last line carries a verdict of its own,
 #     and disagreement is a failure. The last line alone was the rule until
-#     ticket 48 and it is a proxy: 29 of run 184's 121 captures end in the
-#     continuation of a multi-line verdict, one of them the Monte Carlo capture
+#     ticket 48 and it is a proxy: 30 of run 184's 119 captures end on a line
+#     carrying no verdict, 16 of them in the continuation of a multi-line one,
+#     and run 186 is 30 of 120 with the same 16. One is the Monte Carlo capture
 #     this deck now reads, which reads back FAIL off a script that exited 0.
+#     On both runs, 32 scripts are graded differently by the table and by the
+#     last line.
+#     A run that recorded NO grade for a script -- no table at all, or a table
+#     with no row for it -- is a COULD NOT LOOK named on the slide, never a
+#     grade read off the last line (ticket 48 review F1). Only runs 181, 184
+#     and 186 of the 51 recorded runs carry a table, so that is the common
+#     case and not a legacy one.
+#     WHAT THE FIGURE RULE BINDS, and what it does not. A figure passes when
+#     the same run of digits appears anywhere in the slide's own capture. That
+#     is provenance -- this run printed this token -- and it is not meaning. A
+#     digit run inside a hash or a count of something else licenses the figure,
+#     so a green here is not a semantic guarantee (ticket 48 review F7).
 #     Step 7's table is read as a third, independently produced opinion;
 #   - an aside whose capture the named run did not write is a COULD NOT LOOK
 #     (exit 3) and never a pass. It is not red: an extra read the run did not
