@@ -25,12 +25,13 @@ Every claim below was measured in this worktree, not carried from the record.
   stands and the comment striking it does not.
 - **Blocked by 10, 11, 18, 20 — all four read `Status: resolved`.** Checked in the four files.
 - **The capture's last line is not the run's grade.** `talk/captures/_grades.tsv` (ticket 59)
-  records what the gate graded each script from its EXIT CODE. At run 184 the Monte Carlo capture
+  records what the gate graded each script from its EXIT CODE. The Monte Carlo capture
   `.estate-clone_platform_fair_verify-fair-tail.out` ends in the second line of a two-line `PASS:`
-  sentence, so the last-line reading says FAIL for a script that exited 0. 29 of run 184's 121
-  captures have that shape. This decided where a slide's status comes from (below).
-- **The four captures this ticket's beats need are all in run 184's recording commit** (6772a7a):
-  fair-tail, schedules, pound-seam, local-clock.
+  sentence, so the last-line reading says FAIL for a script that exited 0. Measured on both runs
+  this build read: 29 of run 184's 121 captures and 30 of run 186's 120 have that shape. This
+  decided where a slide's status comes from (below).
+- **The four captures this ticket's beats need are in the recording commit of both runs**
+  (184 at 6772a7a, 186 at 9517d98): fair-tail, schedules, pound-seam, local-clock.
 - **The hub has no releases at all** (`gh release list` prints nothing), so ticket 20 item 5's
   release asset does not exist yet. See Waits on the owner.
 
@@ -170,7 +171,8 @@ applies and proves nothing about what runs.
 **The model call is a recorded local clock, never a schedule.** Since ticket 92 the call runs from
 `talk/local-clock.sh` on the owner's machine under the enact guard; no twin pod runs on any cluster
 and no schedule makes the call. So the `local-clock` aside reads
-`verify/local-clock/verify-local-clock.out`, which on run 184 is a **could-not-look** in the
+`verify/local-clock/verify-local-clock.out`, which on runs 184 and 186 alike is a
+**could-not-look** in the
 check's own words (`no .local-clock/last-run.json on this machine`) beside the offline fixture
 passing. That is the honest state and the slide says it: the machine that grades the deck is not
 the machine the clock runs on.
@@ -202,12 +204,16 @@ building a slide against a check that does not exist is the shape this deck refu
   something the gate itself needs, so either should be a red, not a shrug declared in advance.
 - `talk/RUNBOOK.md` — the four asides and the video decision, as dated notes under the existing
   superseded banner. Never a rewrite.
-- `talk/deck.md` — regenerated. It now describes run 184 (it described run 22) and carries sixteen
-  slides: seven beats, four asides, three diagrams, two prose.
+- `talk/deck.md` — regenerated. It now describes run 186 (it described run 22) and carries sixteen
+  slides: seven beats, four asides, three diagrams, two prose. Its four asides carry run 186's own
+  grades: continuous refresh observed false, Monte Carlo observed true, priced cage observed true,
+  the local clock could-not-look.
 
 ### Red first
 
-Each seam was made to fail before it passed, twice: once as a permanent test in
+Measured against the deck as it then stood, describing run 184; the branch was then rebased onto
+`origin/main`, the deck rebuilt onto run 186 and the same battery re-run green. Each seam was made
+to fail before it passed, twice: once as a permanent test in
 `build_deck.py --selfcheck` (proved by mutating the implementation and watching the assertion go
 red), and once end to end through `verify/demo/verify-demo.sh` over a planted `talk/deck.md`.
 
