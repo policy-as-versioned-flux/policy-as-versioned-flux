@@ -214,24 +214,39 @@ into its throwaway repositories and their commit environment, so its proofs do n
 scanner's quota; the ticket commit itself was made with the hook bypassed after an offline grep
 of the staged diff for secret-shaped strings found none. CI on the branch is the citation.
 
-**CI on this branch, pull request 54, head `e120c96`, watched to completion.** *Corrected
-2026-09-09 (review F6): this paragraph cited head `7f59ba4` and runs 34042185114 / 34042153763,
-and `7f59ba4` is NOT an ancestor of `e120c96` -- the final rebase orphaned it, so the Answer was
-quoting runs of a tree that is no longer on this branch. The runs below are `e120c96`'s own.*
-`twin` run **34043878336** (and its twin 34043875785 on the push): job `tests` `1 failed, 2105
-passed in 202.36s`, the one failure `test_the_suite_is_green` on
+**CI on this branch, pull request 54, head `f3b547b`, watched to completion.** *Corrected twice.
+This paragraph first cited head `7f59ba4` and runs 34042185114 / 34042153763; the 2026-09-09
+review (F6) found `7f59ba4` is not an ancestor of `e120c96`, because the final rebase orphaned
+it. Re-heading on `e120c96` did not hold either: rebasing the review commit onto `9517d98`
+replayed `e120c96` as `eb11419`, so `e120c96` is not an ancestor of this head and its runs
+measured a tree with a different base. **That is the general shape of F6, not a one-off: every
+rebase orphans the head a CI paragraph cites**, so a paragraph written before the last rebase is
+stale by construction, and the fix is to check `git merge-base --is-ancestor <cited sha> HEAD`
+before believing one. The runs below are this head's own, and the commit that records them
+changes only this file -- `git diff f3b547b..HEAD --name-only` names it alone -- so they measured
+the code that is on the branch.*
+
+`twin` run **34338483423** (pull request; its twin **34338479353** on the push): job `tests`
+`1 failed, 2279 passed in 207.94s`, the one failure `test_the_suite_is_green` on
 `flux_coverage_floor_is_still_reachable` (invariant 45, the estate's standing red); job
-`invariants` `71 passed, 1 failed, 3 skipped`, the same invariant; `typecheck`, `demo`, the three
-`determinism` legs and `reproduce-elsewhere` all succeeded. The branch adds no red. The `truth`
-run **34043875798** is a branch run and correctly said it cannot record: its guard printed
-`THIS RUN CANNOT RECORD ITS TRUTH LINE, and will not pretend to ... Why: this run is on
-ticket-93-the-twin-derives-a-probability`, and the gate graded this ticket's script on the runner
-as the declared wait. Quoted from the Actions log:
+`invariants` `RESULT: 71 passed, 1 failed, 3 skipped`, the same invariant; `typecheck`, `demo`,
+the three `determinism` legs and `reproduce-elsewhere` all succeeded. The branch adds no red.
 
-- run 163 (hub `e120c96`, this branch's own run, not citable: a branch run records nothing, ticket 100, so no run recorded it) -> `TRUTH 2026-09-06T16:35Z run=163 hub=e120c96 enact=development units=[driftwood=6a7ba02@main feeds=8cb7ae8@main ico=c65b6b2@main insurer=c991160@main ludlow=5981260@main nist=9dd7c31@main platform=a270fce@main tuppence=17fafdb@main] pass=71 [observed=18 self=40 simulated=6 meta=7] fail=12 skip=22 [never=9 waits=13] excluded=8 total=113 ceiling=94`
+The `truth` run on this exact head (**34338479256**) was still `pending` when this was written --
+`truth` serialises across every branch and it is queued behind `main` and `ticket-79`. The last
+COMPLETED truth run on this branch is **34336081659**, on the review commit at `44e0a88`, which
+differs from this head only in `talk/local-clock.sh` (a comment and the dry-run ordering),
+`twin/derived_forecast.py` (one print line naming a forecast the check declines to read) and this
+ticket file. It is a branch run and correctly said so: `THIS RUN CANNOT RECORD ITS TRUTH LINE, and
+will not pretend to. It still runs the whole gate and still prints its TRUTH line`. Its gate
+graded this ticket's script as `verify-derived-forecast.sh  SKIP (waits)  SKIP: no
+*.forecast.yaml has reached refs/remotes/origin/main of any adopter (driftwood, ludlow,
+tuppence)` -- the declared wait, on the runner. Quoted from the Actions log:
 
-The twelve reds are the estate's standing set (ticket 100's run 131 carried eleven; the manifest
-gained ticket 67's map-surface row and this one since), not this branch's.
+- run 189 (hub `44e0a88`, a branch run, not citable: a branch run records nothing, ticket 100, so no run recorded it) -> `TRUTH 2026-09-09T10:05Z run=189 hub=44e0a88 enact=development units=[driftwood=f2fcab3@main feeds=f1ff89e@main ico=ec0ece4@main insurer=c991160@main ludlow=793b7b1@main nist=f83126f@main platform=b6d5045@main tuppence=e519341@main] pass=78 [observed=25 self=41 simulated=4 meta=8] fail=12 skip=25 [never=9 waits=16] excluded=8 total=123 ceiling=104`
+
+The twelve reds are the estate's standing set, unchanged in count from run 148 and run 163 while
+the manifest grew from 113 scripts to 123: none of them is this branch's.
 
 **Rebased onto `main`, 2026-09-06 16:00Z.** PR 47 merged (e5bca74), then PR 55 (a38a912: the
 fixture hook-off in ticket 92's tests, selfcheck, `mkfixture` and stub) and PR 56 (3713a56). The
