@@ -135,11 +135,19 @@ cost was where the names come from — reimplementing `2.0.0` → `2-0-0` in the
 copy of a rule the ResourceSet template owns, and two copies of a rule drift.
 
 So the names are not re-spelled. They are read off the live ResourceSet's own `status.inventory`,
-whose entries carry Flux's `<ns>_<name>_<group>_<Kind>` ids — **the same ids
-`drift/five-facts.py` reads for fact 5** (`inventory_ids`, `inventory_id`, five-facts.py lines
-214-232). The workflow therefore waits for exactly the objects the ResourceSet says it applied,
-named by the ResourceSet, and the slugify rule stays in one place. Deriving what you assert rather
-than restating it is the estate's standing rule and it applies here without amendment.
+whose entries carry Flux's `<ns>_<name>_<group>_<Kind>` ids. The workflow therefore waits for the
+objects the ResourceSet says it applied, named by the ResourceSet, and the slugify rule stays in
+one place. Deriving what you assert rather than restating it is the estate's standing rule and it
+applies here without amendment.
+
+**What those ids are and are not** (corrected 2026-09-10, review F3; the first version of this
+paragraph said "the same ids `drift/five-facts.py` reads for fact 5", which is wrong in both
+directions). `inventory_ids` reads the union of the **Kustomization AND ResourceSet** inventories
+(five-facts.py lines 214-225), and the ids that decide fact 5 are the **fifteen policy ids** that
+live in the composed Kustomizations' OWN inventories — which this step never reads. What the step
+reads is the ResourceSet's inventory filtered to Kind `Kustomization`: the four objects whose
+reconcile populates those fifteen. It is a sound **proxy** for what fact 5 counts, and it is a
+different set. The workflow comment now says so.
 
 Candidate 3 (move the wait into `five-facts.py`) was rejected for the reason the ticket already
 gives against it: the workflow's order would stop being the thing that decides when the sample is
@@ -161,12 +169,23 @@ NOT A WAIT." Three things enforce it:
 3. Each name is then waited for individually, so the log carries one `condition met` line per
    composed Kustomization, which is the evidence Done asks for and which no enumeration can fake.
 
-**Why sorting removes driftwood's accident.** The last loop waits over the union of the derived
-names and the enumeration, `sort -u`. `kustomization.kustomize.toolkit.fluxcd.io/composed-v*`
-sorts before `.../driftwood`, `.../ludlow` and `.../tuppence`, so the composed waits complete
-before this repo's own Kustomization stalls the loop for its full bound. Driftwood's facts 4 and 5
-no longer depend on that stall in either direction: the composed set is waited for whether or not
-`kustomizations/driftwood` ever reaches Ready.
+**Why driftwood's accident is removed** (corrected 2026-09-10, review F2). The first version of
+this paragraph said sorting was what removed it — that `composed-v*` sorts above the adopter's own
+name, so the composed waits finish before the adopter's own Kustomization stalls the loop. **That
+argument is not load-bearing and the claim was wrong.** `drift-sample.yml` sets no
+`timeout-minutes` (measured: zero occurrences in all three files), so the job default is 360
+minutes and **every member of the union is waited for regardless of order**; the worst case is
+about 12 minutes. Sorting changes wall-clock time and nothing else — `sort -u` is there to dedupe
+the derived names against the enumeration. The ordering claim was not even generally true: it
+holds only for adopter names that sort after the literal `composed-`, and `acme` or `bramble`
+would invert it (`composed-v10-0-0` would not).
+
+What actually removes the dependence is that **`composed-v*` is in the wait list at all**. The
+wrong sentence also reached `map.md` and all three adopters' first pushed commit messages
+(driftwood `872ae63`, tuppence `ff8d5af`, ludlow `5d0993b`); `map.md` is corrected in the same
+commit as this paragraph, and the adopter commits were amended to `53b0a48`, `3b49a5a` and
+`129d550`, which state the corrected reason. The superseded shas are named here so the correction
+is checkable rather than laundered.
 
 **What stayed the same, deliberately.** Every wait is still bounded and best-effort (`|| true`, no
 `set -e`). This order does not make the sample wait for green; it makes the sample wait for the
@@ -266,12 +285,33 @@ together. They do. The OLD check against the NEW workflows:
       FAIL ludlow: ResourceSet waits appears 2 times (lines 199 219); round 2's bug was a duplicate
 
 (the old check's `ResourceSet waits` pattern is not anchored to `-o name`, so it also matches the
-new `-o json` derivation and reads it as round 2's duplicate bug). There is no merge order that
-avoids a red window: the hub PR is red until the three adopter PRs merge, and the adopter PRs turn
-the hub's current check red the moment they do. **The integrator must merge the three adopter pull
-requests and the hub pull request in the same wave, adopters first**, and run
-`verify-sampler-wait-order.sh` on a throwaway merge before either side lands. This is the eighth
-instance of the derive-what-you-assert shape and it is recorded as such.
+new `-o json` derivation and reads it as round 2's duplicate bug).
+
+**Corrected 2026-09-10 (review F5). "There is no merge order that avoids a red window" is false
+about the RECORDED red, and the correction changes the instruction.** The logical state does have
+a window — between the two merges one side grades the other's old shape — but nothing records it
+unless a hub `truth` run fires inside that window, and `truth.yml`'s `on:` block decides that:
+
+    push:
+      paths: ['talk/verify-all.sh', 'talk/verify-exclusions.txt', 'talk/verify-manifest.txt',
+              'talk/truth_manifest.py', 'talk/fall_check.py', 'talk/verify-falls.txt',
+              'clone-estate.sh', 'verify/**', '.github/workflows/truth.yml']
+
+An adopter merge is a push to an ADOPTER repository. It fires no hub run at all. So:
+
+- **Adopters first, then the hub, before the next scheduled hub run (05:47 UTC): zero recorded
+  reds.** The only hub run that fires is the one the hub merge itself triggers via `verify/**`,
+  and by then both sides are round 4 and the row is green.
+- **Hub first is strictly worse than the original claim.** The hub merge fires a run immediately;
+  that run grades round-4 markers against round-3 adopters and goes red, and because
+  `verify/a-fall-blocks` makes a fall a blocking event, the run's own conclusion fails AND the
+  fall owes a `run=N | reason` line in `talk/verify-falls.txt` — which is itself on the push-path
+  list above, so committing the reason fires another run. A permanent accepted-fall entry in the
+  citable record, for a ten-minute ordering choice.
+
+**So: merge driftwood, tuppence and ludlow first, then the hub, in the same window and ahead of
+05:47 UTC**, and run `verify-sampler-wait-order.sh` on a throwaway merge before either side lands.
+This is the eighth instance of the derive-what-you-assert shape and it is recorded as such.
 
 **6. The step must not be able to fail the job, and nearly could.** The default shell for a
 GitHub Actions `run:` step is `bash -e {0}`, and the step's own `set -uo pipefail` does not undo
@@ -311,20 +351,22 @@ ticket found and did not fix.
 
 | repo | branch | commit | PR |
 |------|--------|--------|----|
-| policy-as-versioned-driftwood/driftwood | `ticket-107-the-sampler-waits-for-what-exists` | `872ae63` | [#35](https://github.com/policy-as-versioned-driftwood/driftwood/pull/35) |
-| policy-as-versioned-tuppence/tuppence | `ticket-107-the-sampler-waits-for-what-exists` | `ff8d5af` | [#29](https://github.com/policy-as-versioned-tuppence/tuppence/pull/29) |
-| policy-as-versioned-ludlow/ludlow | `ticket-107-the-sampler-waits-for-what-exists` | `5d0993b` | [#26](https://github.com/policy-as-versioned-ludlow/ludlow/pull/26) |
+| policy-as-versioned-driftwood/driftwood | `ticket-107-the-sampler-waits-for-what-exists` | `53b0a48` | [#35](https://github.com/policy-as-versioned-driftwood/driftwood/pull/35) |
+| policy-as-versioned-tuppence/tuppence | `ticket-107-the-sampler-waits-for-what-exists` | `3b49a5a` | [#29](https://github.com/policy-as-versioned-tuppence/tuppence/pull/29) |
+| policy-as-versioned-ludlow/ludlow | `ticket-107-the-sampler-waits-for-what-exists` | `129d550` | [#26](https://github.com/policy-as-versioned-ludlow/ludlow/pull/26) |
 
-One file each, `.github/workflows/drift-sample.yml`, 56 insertions and 5 deletions, identical
-diff on all three. All three pull requests are green on the adopters' own CI (`compose-check`
+One file each, `.github/workflows/drift-sample.yml`, 77 insertions and 5 deletions, identical
+diff on all three (56/5 before the review round below). All three pull requests are green on the adopters' own CI (`compose-check`
 and `shift-left` pass on each). Nothing is merged.
 
-The hub side is `ticket-107-the-sampler-waits-for-what-exists` at `464dab5` (rebased onto
-`origin/main` `c60dee5`, never merged into it), pull request
-[#73](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/73). The
-throwaway merge onto current `origin/main` is a fast-forward whose tree is
-`f3fa319`, byte-identical to the branch's, so the battery run on the branch IS the battery run
-on the merge.
+The hub side is branch `ticket-107-the-sampler-waits-for-what-exists`, **rebased onto
+`origin/main` and never merged into it**, pull request
+[#73](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/73). No sha is
+quoted for it, deliberately: the branch head is whatever the newest commit in this file makes it,
+and a sha written here is stale the moment it is written (see *The self-reference, stated rather
+than chased*, below). Because the branch is rebased and not merged, the throwaway merge onto
+`origin/main` is a fast-forward and its tree is the branch's tree — so any battery run on the
+branch IS the battery run on the merge, at whatever head it was taken.
 
 ### The line of Done that is outstanding, and what closes it
 
@@ -377,32 +419,58 @@ written, edited or invented by this build.
   other workflows in the estate already use.
 - **The hub check gains a seventh marker rather than only swapping two** — delegated. Grading the
   swap alone would grade "the enumeration happens later", which is a better bet and not a
-  different question. The seventh marker grades that the workflow derives the names, which is the
-  part that cannot go green on silence. The `late` selfcheck fixture exists to make that
-  distinction load-bearing.
+  different question. The seventh marker grades that the workflow derives the names. The `late`
+  selfcheck fixture makes that distinction load-bearing.
+- **And an eighth rule: the enumeration line must carry `${composed}`** — delegated, added
+  2026-09-10 (review F1). A seventh marker alone grades that the names are *computed*, not that
+  they are *waited for*. Measured: deleting `${composed}` from the union loop's word list on all
+  three adopters left the check green while the workflow still printed that it was waiting for
+  three Kustomizations and waited for none — round 3 restored with a log line asserting the
+  opposite. Rule B closes it. The cost is that the check now grades a shell variable NAME, which
+  is a coupling; it is the same kind of coupling as grading specific `kubectl` invocations, which
+  this check already does, and it buys the one plant that produced a false green.
 - **The check's `ResourceSet waits` pattern is narrowed to `-o name`** — delegated. Without it the
   derivation line matches the same marker and reads as round 2's duplicate bug, which is what the
   old check does against the new workflows (measured above). Narrowing is the smallest change that
-  keeps "a duplicate is a FAIL" honest.
+  keeps "a duplicate is a FAIL" honest. **It has a price, named** (review F8): duplicate detection
+  now only covers the two output formats the markers name. A third ResourceSet read planted as
+  `-o yaml` beside them **passes the new check and fails the old one** (measured 2026-09-10). The
+  old check would have caught a stray third read; this one will not.
 - **One commit, three repositories, identical diff, pushed but not merged** — delegated. The task
   brief forbids merging; the three PRs carry the same body and name the merge order the coupling
   requires.
 
 ### Not this ticket's, found while measuring
 
-- `kustomizations/driftwood` still does not reach Ready on the ephemeral cluster, on every
-  driftwood run read. Round 4 removes the estate's dependence on that fact but does not explain it.
-  Already named as an observation to read before charting, in this ticket's Notes.
-- `scripts/verify-adopter-gate.sh` disagrees with itself across adopters when no platform clone is
-  present: driftwood exits 3 with `SKIP: no clone of platform at ...`, tuppence exits 1 with
-  `FAIL: no platform clone at ...`. Same absent input, two different verdicts, and ludlow carries
-  no copy of the script at all. Unchanged by this build (measured identical before and after) and
-  not charted here.
-- The `install the engine` step's header says "Deliberately NOT `set -e`", and `-e` is on all
-  the same: the default shell for a `run:` step is `bash -e {0}` and `set -uo pipefail` does not
-  clear it. Every existing line in that step happens to end in `|| true`, so nothing has broken,
-  but the file's stated contract and the shell it runs in disagree. Round 4's one assignment is
-  guarded explicitly; the header is not this ticket's to rewrite.
+- **WITHDRAWN 2026-09-10 (review F6), and the opposite is the interesting fact.**
+  `kustomizations/driftwood` DID reach Ready on driftwood's newest scheduled run: 34345475988,
+  2026-09-09T11:27Z, `kustomization.kustomize.toolkit.fluxcd.io/driftwood condition met` at
+  11:27:01.51, **0.34s** after the apply created the ResourceSet, and that run's log contains no
+  `timed out waiting` line at all. The stall is gone — and with it the accident. That run's
+  driftwood sample records fact 3 True, fact 4 True (all 16 live and equal) and **fact 5 FALSE**,
+  the same fifteen policies, `inventory_entries` 7, verdict FAIL. **All three adopters now record
+  fact 5 false on the schedule**, which this ticket's evidence, stopping at 2026-09-08, did not
+  show. Round 4 is more urgent than the ticket said, not less.
+- `verify-adopter-gate.sh` disagrees with itself across adopters when no platform clone is present,
+  and the shape is **three scripts at two paths** (corrected 2026-09-10, review F7; the first
+  version said ludlow carried no copy, which was wrong — I globbed `scripts/*.sh` only).
+  driftwood `scripts/verify-adopter-gate.sh` exits 3, `SKIP: no clone of platform at ...`; ludlow
+  `verify-adopter-gate.sh`, at the repository ROOT, exits 3 with the same SKIP sentence; tuppence
+  `scripts/verify-adopter-gate.sh` exits 1, `FAIL: no platform clone at ...`. Two agree, tuppence
+  is the sole outlier, and the same question is asked from two different paths. Unchanged by this
+  build (measured identical before and after) and not charted here.
+- **A LIVE COVERAGE HOLE, not a footnote** (corrected 2026-09-10, review F9; the first version of
+  this entry said every line in the step ends in `|| true` and called it luck — that is false).
+  The `install the engine` step declares no `shell:`, so it runs under the default `bash -e {0}`,
+  and its own `set -uo pipefail` does not clear `-e`. **Six commands in that step carry no
+  `|| true` at all**: the two `kubectl apply --server-side` installs of kyverno and flux-operator,
+  `flux install`, `kubectl apply -f gitops/flux-system/`, `kubectl apply -f
+  gitops/platform/platform-pin.yaml`, and `kubectl apply -k gitops/composed/`. Under `-e` any one
+  of them failing kills the job and **writes no sample at all** — which is the exact outcome the
+  step's own header says it exists to prevent ("a job that failed instead would leave a coverage
+  hole and report nothing"). Round 4's one new assignment is guarded explicitly and measured; the
+  other six are a hole in the observation lane on all three adopters and want a ticket of their
+  own, not a line in this one.
 - In a bare clone with no `.work/` and no twin package above it, all three adopters'
   `verify-reconcile.sh` exit 3 on `git could not verify the signature on that lane commit
   (%G? = 'N')`. That is the clone's shape, not the estate's, but it means an adopter's own lane
@@ -410,9 +478,12 @@ written, edited or invented by this build.
 
 ### The battery, and what moved
 
-Local, on this laptop, `talk/verify-all.sh` on the branch (tree `f3fa319`, the same tree as the
-throwaway merge onto `origin/main` `c60dee5`) and on a pristine `origin/main` checkout, run
-back to back against the same estate clone:
+Local, on this laptop, `talk/verify-all.sh` on the branch at tree `f3fa319` — `eba17ee`'s tree,
+which is also the throwaway merge's tree at that head, since the branch is rebased onto
+`origin/main` `c60dee5` — and on a pristine `origin/main` checkout, run back to back against the
+same estate clone. The review round below changes
+`verify/sampler-wait-order/verify-sampler-wait-order.sh`, so these figures describe the tree named
+and not the head a reader has:
 
     branch  TRUTH ... hub=c50207b ... pass=69 [observed=20 self=38 simulated=2 meta=9] fail=32 skip=15 [never=4 waits=11] excluded=8 total=124 ceiling=105
     main    TRUTH ... hub=c60dee5 ... pass=70 [observed=21 self=38 simulated=2 meta=9] fail=31 skip=15 [never=4 waits=11] excluded=8 total=124 ceiling=105
@@ -466,9 +537,28 @@ So a future edit that quietly puts the old order back cannot pass its own selfch
 
 ### The gate run of the final head
 
-Actions run 34403542737, push, branch `ticket-107-the-sampler-waits-for-what-exists`, head
-`464dab5`, finished 2026-09-09T21:21Z, conclusion failure. **This line is not citable and is not
-in `talk/truth.log`**: a branch run records nothing (ticket 100), and the job says so itself —
+Actions runs **34406905104** (push) and **34406929631** (dispatch), branch
+`ticket-107-the-sampler-waits-for-what-exists`, head `b63ee92`, finished 2026-09-09T21:47Z and
+21:52Z, both conclusion failure, `run=218` and `run=219`, identical figures and byte-identical
+failing sets. An earlier run, 34403542737 at head `464dab5`, measured the same thing; `464dab5` is
+an unreachable head and is named only because the paragraph below was first written under it.
+
+**The self-reference, stated rather than chased** (review F4). No section of this file can name a
+gate run of the commit that carries it: writing the sentence makes a new head, and the run for that
+head does not exist until after the sentence is written. Naming one anyway is how the citation
+above came to sit at `464dab5`, a head no longer reachable. So this paragraph does not promise a
+run id; it states the limit, and what a reader can check instead.
+
+What is checkable is whether the GRADED ARTEFACT moved between the head a run measured and the head
+a reader has. `verify/sampler-wait-order/verify-sampler-wait-order.sh` was byte-identical at
+`eba17ee`, `464dab5` and `b63ee92`, so runs 218 and 219 measured the check as those three heads
+carry it. The review round below CHANGES that file, so those runs do not speak for any head after
+it, and a reader wanting a gate verdict on the check as it now stands should read the newest
+`truth` run on this branch in the Actions log rather than a sha quoted here. The local battery
+figures quoted further down were measured on tree `f3fa319`, which is `eba17ee`'s tree, not the
+merge tree of any later head.
+
+**These lines are not citable and are not in `talk/truth.log`**: a branch run records nothing (ticket 100), and the job says so itself —
 "the line above is NOT being written to talk/truth.log: this run is on
 ticket-107-the-sampler-waits-for-what-exists, not main, and only main's talk/truth.log is
 citable". It is quoted here from the Actions log only.
@@ -488,3 +578,79 @@ with the same eight fails on both — `.estate-clone/driftwood/twin/verify-twin-
 `verify/deny-is-not-a-rung`, `verify/derived-status`, `verify/handbook`, `verify/schedules` and
 `verify/unreviewed-major`. So the gate says what this build claims it says: one new red, it is the
 one the coupling predicts, and it turns green when the three adopter pull requests merge.
+
+## Review round, 2026-09-10 — nine findings, all verified first-hand before being written down
+
+An adversarial review request-changed **on the record, not the code**: it would merge the adopter
+workflow diff unchanged, and confirmed by object identity that no sample line was written, edited
+or invented (the `drift/samples.jsonl` blob sha is identical between `main` and the branch on all
+three adopters, and the hub's `talk/truth.log`, `talk/verify-falls.txt` and grade table are
+byte-identical too). Every finding below was re-measured here before it was believed; two of the
+nine came back sharper than the review stated them, and both are recorded as measured.
+
+**Corrections written into the sections above**, each dated and each naming what it replaces, so
+the record does not end up saying both things at once:
+
+| # | what was wrong | where it is corrected |
+|---|----------------|------------------------|
+| F5 | "There is no merge order that avoids a red window" — false about the RECORDED red | *The coupling, measured* |
+| F2 | sorting removes driftwood's dependence on a timeout — not load-bearing, and not generally true | *Why driftwood's accident is removed* |
+| F3 | "the same ids `drift/five-facts.py` reads for fact 5" — wrong in both directions | *The decision*, and the workflow comment |
+| F4 | a run citation at an unreachable head, and a merge tree three heads stale | *The gate run of the final head* |
+| F6 | "`kustomizations/driftwood` still does not reach Ready" — it does, and fact 5 went false anyway | *Not this ticket's* |
+| F7 | "ludlow carries no copy of the script at all" — it does, at the repository root | *Not this ticket's* |
+| F8 | narrowing marker 4 to `-o name` was recorded without its price | *Decisions* |
+| F9 | "every existing line happens to end in `|| true`" — six do not | *Not this ticket's* |
+
+**F1 got code, and it is the one that produced a false green.** The check could be satisfied by a
+workflow that computes the derived names and never waits for them. Measured on all three adopters
+by deleting `${composed}` from the union loop's word list and leaving the derivation in place:
+
+    RED  (before rule B)   exit=0, PASS — while the workflow still printed
+                           "the ResourceSet names these Kustomizations; each is waited for by
+                           name: composed-v2-0-0 composed-v2-0-1 composed-v3-0-0" and waited for
+                           none of them. Round 3 restored, with a log line asserting the opposite.
+
+    GREEN (with rule B)    FAIL driftwood: the Kustomization waits (line 234) do not include
+                           ${composed}: the names are derived and then never waited for, which is
+                           round 3 with a log line that says otherwise
+                           (and the same for tuppence and ludlow)
+
+Rule B is six lines: the line matching marker 6 must also carry `${composed}`. Its selfcheck
+fixture `unused` is round 4's exact ORDER with the round-3 enumeration line, so it fails on rule B
+alone and on nothing else. Three further plants were measured and are **not** closed, and the
+check's header now names them instead of claiming more than a grep can do: `seq 1 30` cut to
+`seq 1 1`; `--timeout=180s` set to `--timeout=0s`; and a marker surviving inside a TRAILING
+comment on a code line, because the comment filter is anchored at line start. So are two the
+review named that this check structurally cannot see: a derivation hoisted into a function invoked
+below the enumeration, and `if: false` on the step. The header's old sentence — that marker 5
+"requires the workflow to derive the names … so found-nothing is a list it can see is empty" — was
+stronger than the grep behind it, and has been replaced by an explicit *what this grades / what it
+does not* pair.
+
+**F3 got code too, because the defect is this ticket's own class.** The derivation dropped the
+namespace while the wait hardcodes `-n flux-system`. Measured against a fake ResourceSet naming
+`tenant-a/composed-v3-0-0`:
+
+    RED    wait-order: the ResourceSet names these Kustomizations; each is waited for by name:
+             ... composed-v2-0-0 ... composed-v2-0-1 ... composed-v3-0-0
+           kustomization.../composed-v2-0-0 condition met
+           kustomization.../composed-v2-0-1 condition met
+           error: no matching resources found          <- swallowed by `|| true`, in milliseconds
+
+    GREEN  wait-order: REFUSING tenant-a/composed-v3-0-0 -- a ResourceSet names a Kustomization
+             outside flux-system and the wait below is -n flux-system, so it cannot be waited for here
+           wait-order: about to wait, by name, for the Kustomizations the ResourceSet names in
+             flux-system; each wait below prints its own verdict: ... composed-v2-0-0 ... composed-v2-0-1
+           kustomization.../composed-v2-0-0 condition met
+           kustomization.../composed-v2-0-1 condition met
+
+A claimed wait that never happened, in the log this ticket's Done line reads its evidence from, is
+the same failure this ticket exists to end — one level down. The announcement is now a statement of
+intent and each `kubectl wait` prints its own verdict. Unreachable while everything is in
+`flux-system`; refused anyway.
+
+**What did not change.** The `-e` guard measurement re-ran identically after both code changes: 62
+seconds and exit 0 with the guard, against a fake whose `-o json` call fails on all thirty
+attempts. The healthy path is unchanged: three `composed-v* condition met` lines, all above the
+adopter's own, all above the sample step.
