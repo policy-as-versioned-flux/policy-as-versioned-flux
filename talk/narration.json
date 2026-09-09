@@ -1,5 +1,5 @@
 {
-  "_": "The ONE prose file for talk/deck.md. Titles, captions and spoken narration live here and nowhere else. Figures do not: every number on a beat slide is read out of talk/captures/ at build time by talk/build_deck.py, and talk/verify-demo.sh refuses a beat body carrying a figure its capture does not contain. Do not put a figure in this file.",
+  "_": "The ONE prose file for talk/deck.md. Titles, captions and spoken narration live here and nowhere else. Figures do not: every number on a beat slide is read out of talk/captures/ at build time by talk/build_deck.py, and talk/verify-demo.sh refuses a beat body carrying a figure its capture does not contain. Do not put a figure in this file. A slide of kind `aside` (ticket 48) is the other kind of capture-reading slide: a read the demo makes that is not one of the seven NORTH-STAR section 4 steps. It carries a `script`, the same optional `grep`/`drop`/`limit` selection a beat has, and an `absent` sentence — what the slide says, by name, when the run wrote no capture for it. `absent` must carry no figure: it is the sentence a reader sees INSTEAD of a number, and the demo check exits could-not-look rather than pass whenever it is used.",
   "title": "The eco-system, read from its own truth surface",
   "subtitle": "Seven steps, each carrying the grade its own check gave, in the check's own words.",
   "opening": "Everything on the slides that follow was read out of one run of one command. Not a screenshot I took on a good day, not a diagram of how it ought to work: the actual output of the checks, quoted, with the verdict the run gave. Where a step could not be looked at, the slide says so and prints the reason the check itself gave. I would rather show you a red cell than a green one I cannot stand behind.",
@@ -8,9 +8,9 @@
       "kind": "prose",
       "title": "How to read this deck",
       "body": [
-        "Every figure on a numbered slide is read out of `talk/captures/`, one file per check, written by the truth surface on the run this deck names. Nothing is retyped, and a slide that is not a numbered step carries no figure at all \u2014 there would be no capture behind it.",
+        "Every figure on a numbered slide is read out of `talk/captures/`, one file per check, written by the truth surface on the run this deck names. Nothing is retyped, and a slide that is not a numbered step carries no figure at all — there would be no capture behind it.",
         "",
-        "Three outcomes, and only three: **observed true**, **could not look**, **observed false**. A check that could not look prints its own reason, in its own words \u2014 never a reason the deck made up on its behalf.",
+        "Three outcomes, and only three: **observed true**, **could not look**, **observed false**. A check that could not look prints its own reason, in its own words — never a reason the deck made up on its behalf.",
         "",
         "A step with no capture in the run renders as **no check yet, owned by ticket NN**, and only where the check has genuinely not been written. A check that exists and produced no output is a missing observation, and the deck is refused.",
         "",
@@ -24,6 +24,18 @@
       "image": "diagrams/estate.png",
       "caption": "Pre-rendered from `talk/diagrams/estate.mmd`, drawn on the twenty-fifth of August. Two parties have joined the eco-system since it was drawn and are not on it: the intelligence publisher and the insurer. It is a picture of the dependency direction, not a read of the truth surface.",
       "narration": "Regulators publish controls and penalties. A platform publishes implementations. Adopter organisations compose what they inherit into their own signed artefact. Nothing here is a tenant of anything else: each party lives in its own organisation, ships on its own cadence, and is consumed only through a pinned, signed dependency. Two more parties have joined since this was drawn, so treat it as the shape, not the census."
+    },
+    {
+      "kind": "aside",
+      "name": "continuous-refresh",
+      "title": "Continuous refresh: what runs on a clock, and when each last fired",
+      "script": "verify/schedules/verify-schedules.sh",
+      "grep": [
+        "last scheduled run"
+      ],
+      "limit": 6,
+      "absent": "Which clocks this eco-system runs, and when each of them last fired, is a fact only this check gathers, from the parties' own workflow files and their own run history. With no capture there is nothing honest to put here, so nothing is put here: not a blank pretending to be a pass, and not the number from the last run that did look.",
+      "narration": "Continuous refresh is the part people expect to be a person with a calendar reminder. It is not. Every party in this eco-system carries its own clock, in its own repository, on its own cadence, and each one appends observations and never declarations. This slide is the register of those clocks and the last time each of them actually ran — including, at the bottom of the list, the clock that produced this deck. Note the red one. A clock whose run dies records nothing, and a clock that records nothing is indistinguishable from a clock that was never wired up, which is why it is graded rather than assumed."
     },
     {
       "kind": "beat",
@@ -55,6 +67,15 @@
       "narration": "One seam. The adopter's declaration goes in, its parents go in at resolved commits, and out come the rendered files, an advisory header, the prices, and a short list of refusals. The prices are recomputed every run and never applied by the machine: they are an input to a reviewed pull request."
     },
     {
+      "kind": "aside",
+      "name": "monte-carlo",
+      "title": "The pound behind the re-pricing is a simulation, and it names its tail",
+      "script": ".estate-clone/platform/fair/verify-fair-tail.sh",
+      "limit": 9,
+      "absent": "The engine's own assertions are the only place these amounts exist; nothing else in the estate recomputes them, and this deck will not retype them from a previous run. So the slide says it could not look, and the demo check says so too.",
+      "narration": "Every price you have seen so far comes out of this. It is a seeded Monte Carlo over a loss distribution, run by the platform, and the thing worth watching is not the amount: it is that the engine names its tail. The same shock, priced with a spliced heavy tail rather than a bounded one, buys a materially larger annual loss at the ninety-fifth percentile. A model that hides which tail it used can be argued with forever. This one prints it, refuses a malformed severity spec rather than defaulting it, and refuses to sum across perspectives or currencies at all."
+    },
+    {
       "kind": "beat",
       "step": 3,
       "title": "The price crosses a band, the cage tier moves, a proposal opens",
@@ -84,7 +105,31 @@
       "title": "The twin plays a dated signal forward and is scored",
       "script": "verify/e2e/verify-e2e-step5-twin-forecasts.sh",
       "ticket": "29",
-      "narration": "The twin sits above the adopter, not inside the platform. It has the adopter's own overlay, a set of standing scenarios, and a lookup from a pinned feed version to the dated signal that justifies it. It publishes forward intelligence as a feed the platform consumes, on the same envelope as everything else. And its own skill is graded by the truth surface, which is the part that matters: a forecaster that is never scored is decoration."
+      "narration": "The twin sits above the adopter, not inside the platform. It has the adopter's own overlay, a set of standing scenarios, and a lookup from a pinned feed version to the dated signal that justifies it. It publishes forward intelligence as a feed the platform consumes, on the same envelope as everything else. And its own skill is graded by the truth surface, which is the part that matters: a forecaster that is never scored is decoration. The demo runs on driftwood's twin. Not a preference: it is the only one of the three adopters whose overlay can price a forward-intel payload today, and the capture on this slide is where the other two say so themselves, naming the instrument each is missing rather than defaulting it."
+    },
+    {
+      "kind": "aside",
+      "name": "priced-cage",
+      "title": "driftwood's cage has a price, and two independent engines pick the same rung",
+      "script": "verify/pound-seam/verify-pound-seam.sh",
+      "grep": [
+        "driftwood: appetite",
+        "pick the same rung as cheapest",
+        "one twin edge",
+        "names the reduction set"
+      ],
+      "limit": 4,
+      "absent": "The rung driftwood's workloads run in, and what the alternatives would have cost it, are derived by this check from driftwood's own signed appetite and its own selection policy. Absent the capture there is no priced cage to show, and an unpriced picture of one would be the exact claim this estate refuses to make.",
+      "narration": "This is what a priced cage looks like, and it is driftwood's, because driftwood is the one adopter of the three whose twin can price a scenario today — the other two publish no signed size, so their own emitters refuse rather than invent a figure, and you will have seen that said in their own words on the previous slide. Read the middle line. The platform's tier table and driftwood's own graded curve are two separate implementations, and they pick the same rung as cheapest on the same shock, while disagreeing about what the other rungs cost. The agreement that matters is the decision, not the arithmetic."
+    },
+    {
+      "kind": "aside",
+      "name": "local-clock",
+      "title": "Where the twin's model call actually runs",
+      "script": "verify/local-clock/verify-local-clock.sh",
+      "limit": 4,
+      "absent": "Whether the local clock has run on this machine, and what it left behind, is a fact about one laptop. This check is the only thing that reads it, so with no capture the slide says nothing rather than implying a run nobody observed.",
+      "narration": "One honest caveat about the twin, said out loud rather than buried. No pod anywhere in this eco-system makes a model call, and no schedule makes one either. The call runs from a script on the owner's own machine, under a guard, and what it may do is bounded by a fixture that proves the refusals rather than describing them: the clock may open a proposal and it may not sign one, may not author as a person, may not tag, and may not start another clock. What you are looking at here is that fixture passing and the marker itself absent, because the machine that grades this deck is not the machine the clock runs on. That is a could-not-look, and it is the honest word for it."
     },
     {
       "kind": "beat",
@@ -110,9 +155,9 @@
         "",
         "The red and amber cells in this deck are the roadmap. They are generated, they move when the eco-system moves, and no one can quietly retype them.",
         "",
-        "What the headline counts, and what it does not: the truth surface grades the estate's own verify scripts. It does not run the twin's python test suite, which carries one standing red of its own \u2014 the drift window is open and its newest sample is weeks old, a recorded gap, not a surprise. A count is only honest with its scope beside it.",
+        "What the headline counts, and what it does not: the truth surface grades the estate's own verify scripts. It does not run the twin's python test suite, which carries one standing red of its own — the drift window is open and its newest sample is weeks old, a recorded gap, not a surprise. A count is only honest with its scope beside it.",
         "",
-        "The recording of this talk is a by-product. The deliverable is the run."
+        "The recording of this talk is a by-product, and it is a screen recording of a human driving these slides — published as a release asset on the hub, with no audio track kept and no synthetic narration anywhere in the pipeline. The deliverable is the run."
       ],
       "narration": "If you take one thing away, take this. A green result that could not look at the thing it grades is the most expensive kind of lie a governance programme can tell itself, because it survives audit. Everything here is built to make that particular lie hard to tell: three outcomes rather than two, the reason travelling with the refusal, and the slides generated from the run rather than from my memory of it. And one caveat I will say out loud rather than bury: the number counts the estate's verify scripts, not the twin's own test suite, which has a standing red about a drift window nobody has sampled recently. It is recorded, it is not fixed, and it is not inside the headline."
     }

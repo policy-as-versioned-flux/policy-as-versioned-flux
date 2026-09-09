@@ -15,9 +15,19 @@
 #   - a money amount, percentage or count in a beat body is not in that beat's
 #     capture, verbatim, or sits on a beat with no capture behind it;
 #   - the beats are not the seven NORTH-STAR section 4 steps, in order;
-#   - the phrase lint hits one of exactly four refused phrases: exemption,
-#     hourglass, admission gate, deny gate. Every OTHER use of the word gate is
-#     printed as a human review item and is not a failure;
+#   - an ASIDE (ticket 48) -- a capture-reading slide that is not one of the
+#     seven steps -- carries a status that is not the run's grade for its
+#     script, a figure its capture does not carry, or a claim at all when the
+#     run wrote no capture for it;
+#   - the phrase lint hits a phrase CONTEXT.md's `## Words a slide may not use`
+#     table refuses. The list is READ FROM THAT TABLE and is not typed into any
+#     script: from ticket 47 until ticket 48 four phrases were hard-coded in
+#     talk/build_deck.py, derived from nothing and answerable to no decision,
+#     which is the defect class every review of this estate finds. Matching is
+#     done with markdown emphasis stripped, because the phrase this lint exists
+#     for last shipped as `Deny is the *bottom* rung`. Every OTHER use of the
+#     word gate is printed as a human review item and is not a failure: the
+#     truth surface keeps the name (ticket 03) and ADR-0011 keeps release gate;
 #   - the committed talk/deck.md is not the generated file, names no recorded
 #     run, or is not what a rebuild from the run it names produces (hand edited
 #     or stale) -- every check above is run over the committed file as well;
@@ -28,9 +38,21 @@
 #   - headers, dates, tags, step numbers, ticket and ADR references, the deck's
 #     own run/hub stamp and the "$ bash <script>" command line are OUTSIDE the
 #     figure check;
-#   - the grade comes from the capture's last line, because the gate keeps the
-#     capture and not the exit code. Step 7's table is read as a second,
-#     independently produced opinion of the same verdicts;
+#   - the grade comes from talk/captures/_grades.tsv, the per-script table the
+#     run itself wrote from the EXIT CODES it saw (ticket 59), and from the
+#     capture's last line only for a run recorded before that table existed.
+#     The two are compared whenever the last line carries a verdict of its own,
+#     and disagreement is a failure. The last line alone was the rule until
+#     ticket 48 and it is a proxy: 29 of run 184's 121 captures end in the
+#     continuation of a multi-line verdict, one of them the Monte Carlo capture
+#     this deck now reads, which reads back FAIL off a script that exited 0.
+#     Step 7's table is read as a third, independently produced opinion;
+#   - an aside whose capture the named run did not write is a COULD NOT LOOK
+#     (exit 3) and never a pass. It is not red: an extra read the run did not
+#     produce is not a fault in the deck and not a fault in the estate. The
+#     seven steps keep the stricter rule -- a step check on disk with no
+#     capture is a missing observation and red -- because those seven are what
+#     the estate promises and an aside is not;
 #   - build order: this script sorts before verify/e2e/ in the gate's glob, so
 #     inside a gate run the e2e captures the REBUILD reads are the ones on disk,
 #     which may be the previous run's. The rebuild is graded against the
@@ -83,7 +105,14 @@ python3 talk/build_deck.py --selfcheck || { echo "FAIL: build_deck.py selfcheck 
 python3 talk/build_deck.py --out "$TMP/deck.md" || { echo "FAIL: the deck does not build from this run's captures"; exit 1; }
 echo "ok  the deck builds: $(wc -l <"$TMP/deck.md" | tr -d ' ') lines from $(ls -A talk/captures | grep -c '\.out$') captures"
 
-python3 talk/build_deck.py --check "$TMP/deck.md" || { echo "FAIL: the built deck does not survive its own checks"; exit 1; }
+python3 talk/build_deck.py --check "$TMP/deck.md" >"$TMP/rebuild" 2>&1; rc=$?
+sed 's/^/  /' "$TMP/rebuild"
+case "$rc" in
+  0) ;;
+  3) echo "SKIP: a deck of this run's captures names a read this run wrote no capture for, so it could not be graded whole: $(grep -m1 'could not look  ' "$TMP/rebuild" | sed 's/^ *could not look  //')"
+     exit 3 ;;
+  *) echo "FAIL: the built deck does not survive its own checks"; exit 1 ;;
+esac
 
 grep -q "GENERATED FILE" talk/deck.md 2>/dev/null || {
   echo "FAIL: talk/deck.md is not the generated file; run python3 talk/build_deck.py"; exit 1; }
@@ -117,8 +146,8 @@ named="${name_out#run=}"; named="${named%% *}"
 # checks are run over the committed file instead.
 python3 talk/build_deck.py --run "$named" --out "$TMP/named.md" >/dev/null || {
   echo "FAIL: the deck does not rebuild from run $named's committed captures"; exit 1; }
-if ! diff <(grep -o 'beat step=[0-9]* status=[A-Z]*' talk/deck.md) \
-          <(grep -o 'beat step=[0-9]* status=[A-Z]*' "$TMP/named.md") >"$TMP/d" 2>&1; then
+markers() { grep -oE 'beat step=[0-9]+ status=[A-Z]+|aside name=[a-z0-9-]+ status=[A-Z]+' "$1"; }
+if ! diff <(markers talk/deck.md) <(markers "$TMP/named.md") >"$TMP/d" 2>&1; then
   echo "  the committed deck's beats differ from a rebuild of run $named:"; sed 's/^/    /' "$TMP/d"
   echo "FAIL: talk/deck.md has been hand edited; run python3 talk/build_deck.py"; exit 1
 fi
@@ -129,10 +158,16 @@ echo "ok  the committed talk/deck.md is the generated file, with the same beats 
 # TRUTH headline and a rewritten could-not-look reason all passed (review
 # 2026-08-29). So the deck's own checks are run over the committed file as
 # well, against the captures of the run it names.
-python3 talk/build_deck.py --check talk/deck.md; rc=$?
+python3 talk/build_deck.py --check talk/deck.md >"$TMP/committed" 2>&1; rc=$?
+sed 's/^/  /' "$TMP/committed"
 case "$rc" in
   0) echo "ok  the committed talk/deck.md survives the figure, status, headline and phrase checks against run $named" ;;
-  3) echo "SKIP: run $named's recording commit became unreachable between two reads; run this check again"; exit 3 ;;
+  3) if grep -q '^  could not look  ' "$TMP/committed"; then
+       echo "SKIP: the committed talk/deck.md names a read whose capture run $named never wrote, so it could not be graded whole: $(grep -m1 '^  could not look  ' "$TMP/committed" | sed 's/^ *could not look  //')"
+       exit 3
+     fi
+     echo "SKIP: run $named's recording commit became unreachable between two reads; run this check again"
+     exit 3 ;;
   *) echo "FAIL: the committed talk/deck.md does not survive its own checks against run $named"; exit 1 ;;
 esac
 
@@ -150,4 +185,4 @@ newest="$(grep '^TRUTH ' talk/truth.log | grep -o 'run=[0-9]*' | tail -1)"; newe
 if [ -n "$newest" ] && [ "$newest" != "$named" ]; then
   echo "  note: the newest recorded run is $newest and the committed deck describes run $named; run python3 talk/build_deck.py and commit it to move the deck on (not a failure)"
 fi
-echo "PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck.md is the generated file describing recorded run $named, matches a rebuild from that run's committed captures, and survives the figure, status, headline and phrase checks against that run: its seven beats are the section 4 steps in order carrying run $named's own grades, every figure on a beat is a figure in that beat's capture and no figure sits off a beat, its quoted TRUTH line is the line that recorded run $named, and the phrase lint is clean"
+echo "PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck.md is the generated file describing recorded run $named, matches a rebuild from that run's committed captures, and survives the figure, status, headline and phrase checks against that run: its seven beats are the section 4 steps in order carrying run $named's own grades as run $named's own _grades.tsv recorded them, its asides each carry that run's grade for the script each names and were all read from a capture that run wrote, every figure on a beat or an aside is a figure in that slide's capture and no figure sits on a slide with no capture behind it, its quoted TRUTH line is the line that recorded run $named, and no phrase CONTEXT.md's refused-vocabulary table names appears anywhere in it"

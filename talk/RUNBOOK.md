@@ -148,6 +148,24 @@ you want their reconcile beat live for that room.
 > for a chosen one), read the beats, commit `talk/deck.md`. `verify-demo.sh`
 > prints a note when a newer run has been recorded since; that is a prompt to
 > rebuild, not a red.
+>
+> **Four asides (2026-09-09, ticket 48).** Besides the seven steps the deck now
+> carries four slides that read a capture without being one of the steps: the
+> Monte Carlo the pound rests on (`.estate-clone/platform/fair/verify-fair-tail.sh`),
+> the clocks that refresh the eco-system (`verify/schedules/verify-schedules.sh`),
+> driftwood's priced cage (`verify/pound-seam/verify-pound-seam.sh`) and the local
+> clock the twin's model call runs on (`verify/local-clock/verify-local-clock.sh`).
+> Each carries the run's own grade for its script. When a run wrote no capture for
+> one, the slide says so and names the file, and `verify-demo.sh` exits 3 — a
+> could-not-look, never a pass. Prose lives in `narration.json` like everything else.
+>
+> **The video (decided 2026-08-28, ticket 20 item 5; not re-decided).** The
+> by-product is a **screen recording of a human driving these slides**.
+> `pitch-v6.mp4` is a **release asset on the hub**, the audio track is not kept,
+> and the local TTS/puppeteer/ffmpeg pipeline in `.scratch/talk-spec/pitch-v6/`
+> is not the route to it: it is committed as the record of what was rendered on
+> the twenty-fifth of August and is not run again. The deliverable is the run;
+> the recording markets it (ticket 75 Q9).
 
 
 Each **[LIVE]** beat is one command; each exits non-zero if the beat would fail
