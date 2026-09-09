@@ -16,8 +16,11 @@
 # this script's read-back, below), and with `gh` kept out of the child's
 # allowed tools altogether. What the model may do is read, write the adopter's worktree, commit
 # on the branch this script made for it, and stop. This script then reads what it committed,
-# refuses anything outside the step's allowed paths, refuses any file under them that is not a
-# *.claim.yaml, validates every claim file with the validator told --headless (the file must
+# refuses anything outside the step's allowed paths, refuses more than ONE file (ticket 93 review
+# F8: two files are two proposals in one review, and the body written below speaks about one),
+# refuses any file under them that is not a *.claim.yaml, validates every claim file -- with a
+# COPY of the twin package and the skill taken BEFORE the child started, never the hub's own tree,
+# which the child can write to (ticket 93 review F5) -- told --headless (the file must
 # say run.headless: true and carry no override; the model's own say-so is not what the
 # no-override invariant rests on), and either pushes and opens the PR (--push, the owner's
 # hand, never from inside a Claude Code session) or prints the command for the owner to run.
@@ -119,11 +122,13 @@ SCHEDULED="${LOCAL_CLOCK_LAUNCHD:-0}"
 #        skill's directory, run as `<validator> FILE --twin <hub> --headless` on every file
 #      | what it is
 # A row's validator is what makes its files proposable: a step whose validator is not shipped
-# cannot propose a file, whatever the file says about itself. Ticket 93 owns the derive row's
-# paths, pattern and validator names; they are placeholders until its skill lands.
+# cannot propose a file, whatever the file says about itself. The derive row (ticket 93) lands
+# beside twin/claims and NOT under twin/orgs/<org>/: the overlay loader (twin/model.py
+# Overlay.load) refuses any directory it does not read, so a forecasts/ collection there would
+# fail every adopter's twin gate. The round-4 placeholder said twin/orgs/{adopter}/forecasts.
 STEPS=(
   "classify|classify-and-judge|twin/claims|*.claim.yaml|assets/validate_claim.py|the unbound pool (news, market moves) classified against the adopter's overlay: bindings and positions, grade 5, no override, one claim file on a branch"
-  "derive|derive-probability|twin/orgs/{adopter}/forecasts|*.forecast.yaml|assets/validate_forecast.py|ticket 93: a probability derived from the adopter's world model and the subscribed feeds' dated series, with its basis, grade and the signals it rested on, written to the adopter's overlay; runs once .claude/skills/derive-probability/SKILL.md exists"
+  "derive|derive-probability|twin/forecasts|*.forecast.yaml|assets/validate_forecast.py|a probability derived from the adopter's world model and the served pool's dated series (market moves, news events), with its basis (derived or recorded), the grade the schema allows and the observations it rested on, one forecast file beside twin/claims; pre-registered by the merge onto main, scored by verify/twin-evals/verify-derived-forecast.sh (ticket 93)"
 )
 ALL_ADOPTERS="driftwood tuppence ludlow"
 
@@ -277,9 +282,30 @@ unit_refs() {  # unit branch -- EVERY ref (heads, tags, remotes, replace, notes,
 unit_config() {  # wt -- every config entry git reads there (system, global, local, worktree), with its file
   cgit -C "$1" config --list --show-origin 2>/dev/null | grep -v '^command line:' || true
 }
+# THE VALIDATOR MUST NOT BE THE TREE THE CHILD CAN WRITE TO (ticket 93 review, F5). The child's
+# cwd is this hub and `Edit` is in ALLOWED_TOOLS, so a model can overwrite
+# .claude/skills/<skill>/assets/<validator>.py with a three-line stub that passes anything, or
+# edit the twin package the validator imports its rules from -- a reviewer did exactly that, and
+# only the GATE caught the fabricated forecast that followed. So: copy what judges OUT of the hub
+# BEFORE the child starts and run the copy, and digest the hub's own copies before and after so
+# an edit is NAMED rather than silently ignored. The copy comes from the WORKING TREE, so a hub
+# already tampered with before the run starts is copied as it is; that residual is why the local
+# layer is advisory either way, and the measurement of record is the gate, over origin/main.
+judge_digest() {  # skill -- the bytes of everything that decides whether a file is proposable
+  { find "$HUB/twin" "$HUB/.claude/skills/$1" -type f -print0 2>/dev/null | sort -z | xargs -0 shasum 2>/dev/null; } | shasum | cut -d' ' -f1
+}
+make_judge() {  # skill dest -- a pristine copy of the twin package and the skill, taken before the child
+  local skill="$1" dest="$2"
+  mkdir -p "$dest/.claude/skills" || return 1
+  cp -R "$HUB/twin" "$dest/twin" || return 1
+  cp -R "$HUB/.claude/skills/$skill" "$dest/.claude/skills/$skill" || return 1
+  # the validators default --feeds to <twin root>/.estate-clone/feeds when LOCAL_CLOCK_ESTATE is
+  # unset; a symlink keeps every row's own defaulting intact without a per-row flag
+  ln -snf "$ESTATE" "$dest/.estate-clone" || return 1
+}
 
-render_prompt() {  # step skill adopter unit_wt branch paths out
-  STEP="$1" SKILL="$2" ADOPTER="$3" UNIT_WT="$4" BRANCH="$5" PATHS="$6" OUT="$7" \
+render_prompt() {  # step skill adopter unit_wt branch paths pattern validator out
+  STEP="$1" SKILL="$2" ADOPTER="$3" UNIT_WT="$4" BRANCH="$5" PATHS="$6" PATTERN="$7" VALIDATOR="$8" OUT="$9" \
   RUN_DIR="$RUN_DIR" HUB="$HUB" ESTATE="$ESTATE" INJECTED_FILE="$INJECTED_FILE" TEMPLATE="$TEMPLATE" \
   "$PY" - <<'PY'
 import json, os
@@ -290,13 +316,13 @@ if inj:
              "An INJECTED external signal is present at `" + inj + "`:\n\n```json\n"
              + open(inj).read().strip() + "\n```\n\n"
              "Treat it as one more unbound dated statement beside the real pool. It is not in any "
-             "published feed and it is NOT real. Every claim file you write MUST carry "
-             "`injected: true` at its top level and `injected: true` on every claim, and its "
-             "`derived_from` must NOT cite the injected signal as a pin (it has none). Nothing "
-             "from this run is citable and it will never be pushed.\n")
+             "published feed and it is NOT real. Every file you write MUST carry "
+             "`injected: true` at its top level and `injected: true` on every claim or forecast in "
+             "it, and its `derived_from` must NOT cite the injected signal as a pin (it has none). "
+             "Nothing from this run is citable and it will never be pushed.\n")
 else:
-    block = "## This is a live run\n\nNo injected signal. Read only the published pool at the pinned versions.\n"
-fields = {k: os.environ.get(k, "") for k in ("STEP", "SKILL", "ADOPTER", "UNIT_WT", "BRANCH", "PATHS", "RUN_DIR", "HUB", "ESTATE")}
+    block = "## This is a live run\n\nNo injected signal. Read only the published pool at the served versions.\n"
+fields = {k: os.environ.get(k, "") for k in ("STEP", "SKILL", "ADOPTER", "UNIT_WT", "BRANCH", "PATHS", "PATTERN", "VALIDATOR", "RUN_DIR", "HUB", "ESTATE")}
 fields["TITLE_FILE"] = os.path.join(os.environ["RUN_DIR"], f"{fields['STEP']}-{fields['ADOPTER']}.pr-title")
 fields["BODY_FILE"] = os.path.join(os.environ["RUN_DIR"], f"{fields['STEP']}-{fields['ADOPTER']}.pr-body.md")
 fields["INJECTED_BLOCK"] = block
@@ -342,12 +368,22 @@ run_step() {  # step skill paths pattern validator adopter
     record --step "$step" --adopter "$adopter" --status fail --reason "worktree add failed" --base "$base"; return 1
   fi
   local prompt="$RUN_DIR/$tag.system.md" title="$RUN_DIR/$tag.pr-title" body="$RUN_DIR/$tag.pr-body.md"
-  render_prompt "$step" "$skill" "$adopter" "$wt" "$branch" "$paths" "$prompt"
+  render_prompt "$step" "$skill" "$adopter" "$wt" "$branch" "$paths" "$pattern" "$validator_rel" "$prompt"
+  local judge="$RUN_DIR/$tag.judge" judge_before judge_after
 
   if [ "$DRY" = 1 ]; then
     echo "dry   $tag: would run  $CLAUDE -p \"/$skill $adopter\" --max-turns $MAX_TURNS --append-system-prompt \"\$(cat $prompt)\"  (worktree $wt on $branch; prompt kept at $prompt)"
     cleanup_or_fail "$step" "$adopter" "$unit" "$wt" "$branch" skip "dry run"; return $?
   fi
+
+  # review F5: the judge is copied out of the hub BEFORE the child starts (and after the dry-run
+  # exit, which calls no model and needs none), and the hub's own copies are digested now and
+  # read back after.
+  if ! make_judge "$skill" "$judge"; then
+    echo "fail  $tag: could not copy the twin package and /$skill to $judge -- the validator would then be the same tree the child can write to, and a file judged by a tree its author edited is not checked"
+    record --step "$step" --adopter "$adopter" --status fail --reason "could not make the pristine judge copy" --base "$base"; return 1
+  fi
+  judge_before="$(judge_digest "$skill")"
 
   echo "run   $tag: /$skill $adopter on $branch (worktree $wt, max $MAX_TURNS turns)"
   # Every branch and tag of the unit but the step's own, before the child: after it, any ref
@@ -391,7 +427,12 @@ run_step() {  # step skill paths pattern validator adopter
   # What did the model leave? First the unit's refs: a headless run writes one branch and
   # nothing else. Then uncommitted work is a step that did not finish. No commit is nothing to
   # propose. A commit is judged file by file against the step's allowed paths.
-  local dirty changed moved changed_keys
+  local dirty changed moved changed_keys nfiles
+  judge_after="$(judge_digest "$skill")"
+  if [ "$judge_after" != "$judge_before" ]; then
+    echo "fail  $tag: the child changed the hub's own twin package or /$skill while it ran -- the validator and the rules it imports are what decide whether this file is proposable, and a file judged by a tree its author edited is not checked. The copy taken before the child ($judge) is what judged below; repair the hub by hand (git status; git checkout -- twin .claude/skills/$skill). Branch kept at $wt, never pushed."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "child edited the hub's twin package or /$skill during the run" --base "$base"; return 1
+  fi
   config_after="$(unit_config "$wt")"
   if [ "$config_after" != "$config_before" ]; then
     changed_keys="$(diff <(echo "$config_before") <(echo "$config_after") | grep -E '^[<>]' | sed $'s/^[<>] [^\t]*\t//' | cut -d= -f1 | sort -u | tr '\n' ' ')"
@@ -471,6 +512,14 @@ run_step() {  # step skill paths pattern validator adopter
     echo "fail  $tag: the commit touches$bad -- outside this step's allowed paths ($paths). A claim is a claim; a declaration is a different review. Branch kept for inspection, never pushed."
     refuse "$step" "$adopter" "$branch" "$title" "$body" "commit outside $paths:$bad"; return 1
   fi
+  # ONE file, counted, not described (review F8: every row's description and both skills say
+  # "one file and stops", and two files in one commit were accepted). Two files are two
+  # proposals in one review, and the PR body the clock writes speaks about one.
+  nfiles="$(printf '%s\n' "$changed" | grep -c . || true)"
+  if [ "$nfiles" != 1 ]; then
+    echo "fail  $tag: the commit carries $nfiles files under $paths -- the step writes ONE file and stops, and the pull-request body this clock writes speaks about one. Branch kept at $wt, never pushed."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "$nfiles files in the commit, not 1" --base "$base" --commits 1; return 1
+  fi
   # Every file the commit carries must be a claim file (*.claim.yaml), and every claim file is
   # run through the skill's own validator, told --headless: THIS script knows nobody was at the
   # keyboard, so the validator requires run.headless: true on the file and refuses an override
@@ -483,7 +532,7 @@ run_step() {  # step skill paths pattern validator adopter
   # here rather than trusting it. A skill that ships no validator cannot propose a claim file.
   # Nothing below this loop (the PR body and its "no override is claimed") is written unless
   # every file passed, and a refusal deletes what the model wrote to the title and body files.
-  local validator="$HUB/.claude/skills/$skill/$validator_rel" vout="$RUN_DIR/$tag.validate.out"
+  local validator="$judge/.claude/skills/$skill/$validator_rel" vout="$RUN_DIR/$tag.validate.out"
   while IFS= read -r f; do
     # shellcheck disable=SC2254  # the pattern is the row's glob, unquoted on purpose
     case "$(basename "$f")" in
@@ -500,7 +549,7 @@ run_step() {  # step skill paths pattern validator adopter
         echo "fail  $tag: rehearsal claim $f does not carry injected: true at its top level"
         refuse "$step" "$adopter" "$branch" "$title" "$body" "rehearsal claim $f not marked injected"; return 1
       fi
-      if "$PY" "$validator" "$wt/$f" --twin "$HUB" --headless >"$vout" 2>&1 </dev/null; then
+      if "$PY" "$validator" "$wt/$f" --twin "$judge" --headless >"$vout" 2>&1 </dev/null; then
         echo "fail  $tag: the validator ACCEPTED rehearsal claim $f -- an injected claim must be refused, and this one would pass a gate. Branch kept at $wt, never pushed."
         refuse "$step" "$adopter" "$branch" "$title" "$body" "validator accepted rehearsal claim $f"; return 1
       fi
@@ -514,13 +563,14 @@ run_step() {  # step skill paths pattern validator adopter
         echo "fail  $tag: live claim $f does not carry headless: true in its run block -- a claim this clock made says so on its face, or it is not this clock's claim. Branch kept at $wt, never pushed."
         refuse "$step" "$adopter" "$branch" "$title" "$body" "live claim $f not marked headless"; return 1
       fi
-      if ! "$PY" "$validator" "$wt/$f" --twin "$HUB" --headless >"$vout" 2>&1 </dev/null; then
+      if ! "$PY" "$validator" "$wt/$f" --twin "$judge" --headless >"$vout" 2>&1 </dev/null; then
         echo "fail  $tag: the validator refused live claim $f ($(grep -c '^not ok' "$vout") reason(s); first: $(grep -m1 '^not ok' "$vout" | cut -c9-160)). Branch kept at $wt, never pushed."
         refuse "$step" "$adopter" "$branch" "$title" "$body" "claim file refused: $f: $(grep -m1 '^not ok' "$vout" | cut -c9-160)"; return 1
       fi
       echo "ok    $tag: $(tail -1 "$vout" | sed "s#$wt/##" | cut -c1-160)"
     fi
   done <<<"$changed"
+  echo "note  $tag: the validator and the twin package that judged the file above were copied to $judge BEFORE the model started and run from there; the hub's own copies are unchanged (digest $judge_before). This local layer is ADVISORY -- it runs on this machine, in a tree a headless model can write to. The measurement of record is verify/twin-evals/verify-derived-forecast.sh on the gate, over origin/main, after a human merges."
   [ -s "$title" ] || cgit -C "$wt" log -1 --format=%s >"$title"
   [ -s "$body" ] || { cgit -C "$wt" log -1 --format=%b >"$body"; printf '\n%s\n' "Made by the local clock (talk/local-clock.sh, ticket 92), run $RUN_ID, on origin/main@${base:0:7}. A model ran on the owner's local clock, not on a GitHub clock. No override is claimed. The commit is unsigned and authored as the clock: nobody at the keyboard signed it, and the merge is the human act. Never merged by the clock." >>"$body"; }
 

@@ -15,6 +15,7 @@ Four seams, all pure code, none needing a token or a network:
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 import importlib.util
 import json
 import os
@@ -299,6 +300,41 @@ def test_a_live_claim_without_the_headless_mark_fails_the_step_and_no_body_is_wr
     assert rid in refs, "the refused claim's branch is kept for inspection"
 
 
+PHRASE = "no override is claimed"
+
+
+def _hub_bytes_that_say_it() -> set[str]:
+    """The sha of every file the HUB itself carries that says the phrase. Measured 2026-09-09:
+    exactly one, .claude/skills/classify-and-judge/SKILL.md."""
+    out = set()
+    for base in (HUB / "twin", HUB / ".claude" / "skills"):
+        for p in base.rglob("*"):
+            if p.is_file() and PHRASE in p.read_text(errors="replace").lower():
+                out.add(hashlib.sha256(p.read_bytes()).hexdigest())
+    assert out, "no hub file carries the phrase, so the exemption below would prove nothing"
+    return out
+
+
+def _says_no_override(run_dir: Path) -> list[Path]:
+    """Every file under `run_dir` that says the phrase and whose BYTES the hub does not carry.
+
+    The exemption is DERIVED, not inferred from a filename: the clock's judge copy is a verbatim
+    copy of the hub's twin package and skill, so its bytes ARE the hub's. A file that merely sits
+    in a directory called `.judge`, or is called `.judge`, is not (ticket 93 review G1).
+    """
+    hub = _hub_bytes_that_say_it()
+    said = []
+    for p in sorted(run_dir.rglob("*")):
+        if not p.is_file() or p.name.endswith((".system.md", ".claude.json", ".claude.err")):
+            continue
+        if PHRASE not in p.read_text(errors="replace").lower():
+            continue
+        if hashlib.sha256(p.read_bytes()).hexdigest() in hub:
+            continue
+        said.append(p)
+    return said
+
+
 def test_a_file_under_the_claims_path_that_is_not_a_claim_fails_the_step_unchecked(tmp_path: Path) -> None:
     # the stub commits the same worked example as twin/claims/<date>-probe-classify.yaml (not a
     # *.claim.yaml) and writes its own PR title and body saying no override is claimed. The
@@ -316,10 +352,22 @@ def test_a_file_under_the_claims_path_that_is_not_a_claim_fails_the_step_uncheck
     assert not (run_dir / "classify-driftwood.pr-body.md").exists(), "the model's body survived the refusal"
     assert not (run_dir / "classify-driftwood.pr-title").exists(), "the model's title survived the refusal"
     # the rendered prompt carries the phrase as the instruction to the model, and the transcript
-    # is the model's words; every other file in the run directory is the clock's, and none may say it
-    for p in run_dir.rglob("*"):
-        if p.is_file() and not p.name.endswith((".system.md", ".claude.json", ".claude.err")):
-            assert "no override is claimed" not in p.read_text(errors="replace").lower(), p
+    # is the model's words; every other file in the run directory is the clock's, and none may
+    # say it. The judge copy is exempt because it is a VERBATIM COPY of the hub's twin package
+    # and the skill, taken before the child so the validator is not the tree the child can write
+    # to (ticket 93 review F5) -- and `_says_no_override` DERIVES that from the BYTES rather than
+    # inferring it from a filename (review G1). Reading the name let two shapes through, both
+    # planted below. verify/local-clock/verify-local-clock.sh reads the same way, deliberately.
+    assert _says_no_override(run_dir) == [], _says_no_override(run_dir)
+    # red first, both smuggle shapes: a file inside a .judge DIRECTORY and a file NAMED .judge
+    (run_dir / "evil.judge").mkdir(exist_ok=True)
+    (run_dir / "evil.judge" / "note.md").write_text("no override is claimed\n")
+    (run_dir / "sneaky.judge").write_text("no override is claimed\n")
+    caught = {p.name for p in _says_no_override(run_dir)}
+    assert caught == {"note.md", "sneaky.judge"}, caught
+    shutil.rmtree(run_dir / "evil.judge")
+    (run_dir / "sneaky.judge").unlink()
+    assert _says_no_override(run_dir) == []
     steps = [json.loads(l) for l in (run_dir / "steps.jsonl").read_text().splitlines()]
     assert [s["status"] for s in steps] == ["fail"] and "not a *.claim.yaml" in steps[0]["reason"], steps
     refs = subprocess.run([*GIT, "-C", str(unit), "for-each-ref", "refs/heads/local-clock/"],

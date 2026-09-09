@@ -286,8 +286,39 @@ mrid="$(sed -n 's/^local clock: run \([^ ]*\) .*/\1/p' "$TMP/misnamed.out" | hea
 [ ! -e "$TMP/.local-clock/runs/$mrid/classify-driftwood.pr-title" ] || fail "the model's PR title survived the refusal"
 # (the rendered prompt *.system.md carries the phrase as the instruction to the model, and the
 # transcript *.claude.json is the model's words; every other file in the run dir is the clock's)
-said="$(grep -rli 'no override is claimed' "$TMP/.local-clock/runs/$mrid" | grep -Ev '\.(system\.md|claude\.json|claude\.err)$' | head -1)"
+# The judge copy is exempt because it is a VERBATIM COPY of the hub's twin package and the skill,
+# taken before the child so the validator is never the tree the child can write to (ticket 93
+# review F5). `says_it` DERIVES that rather than inferring it from a filename: a file is exempt
+# only when its BYTES are a file the hub itself carries. Ticket 93 review G1 measured what the
+# filename reading missed -- a stand-in writing $RUN_DIR/evil.judge/note.md and a file literally
+# named sneaky.judge, both carrying the phrase: `grep -v '.judge/'` over ABSOLUTE paths caught
+# sneaky.judge and missed evil.judge/note.md, and would have exempted the WHOLE tree had any
+# component of the run-dir prefix been called .judge. tests/test_local_clock.py reads the same
+# way, deliberately: ticket 102's rule is one reading, never a fork.
+hub_says="$TMP/hub-says-it.sha"
+grep -rli 'no override is claimed' "$ROOT/twin" "$ROOT/.claude/skills" 2>/dev/null \
+  | while IFS= read -r hf; do shasum "$hf" | cut -d' ' -f1; done | sort -u >"$hub_says"
+[ -s "$hub_says" ] || fail "no file under $ROOT/twin or $ROOT/.claude/skills carries the phrase, so the byte-identity exemption below would exempt nothing and prove nothing"
+says_it() {  # run dir -> EVERY file that says it and whose bytes the hub does not carry
+  local f
+  while IFS= read -r f; do
+    case "$f" in *.system.md|*.claude.json|*.claude.err) continue;; esac
+    grep -qxF "$(shasum "$f" | cut -d' ' -f1)" "$hub_says" && continue
+    printf '%s\n' "$f"
+  done < <(grep -rli 'no override is claimed' "$1" 2>/dev/null)
+}
+said="$(says_it "$TMP/.local-clock/runs/$mrid" | head -1)"
 [ -z "$said" ] || fail "a file the clock wrote for the refused run still says no override is claimed: $said"
+# ... and the rule really does catch a file that is NOT the hub's bytes, in both smuggle shapes
+# ticket 93 review G1 measured. Planted here, in the run directory the clock just refused.
+mkdir -p "$TMP/.local-clock/runs/$mrid/evil.judge"
+printf 'no override is claimed\n' >"$TMP/.local-clock/runs/$mrid/evil.judge/note.md"
+printf 'no override is claimed\n' >"$TMP/.local-clock/runs/$mrid/sneaky.judge"
+smuggled="$(says_it "$TMP/.local-clock/runs/$mrid")"
+echo "$smuggled" | grep -q 'evil.judge/note.md' || fail "the byte-identity rule missed a smuggled file INSIDE a .judge directory (review G1): $smuggled"
+echo "$smuggled" | grep -q 'sneaky.judge' || fail "the byte-identity rule missed a smuggled file NAMED .judge (review G1): $smuggled"
+rm -rf "$TMP/.local-clock/runs/$mrid/evil.judge" "$TMP/.local-clock/runs/$mrid/sneaky.judge"
+[ -z "$(says_it "$TMP/.local-clock/runs/$mrid")" ] || fail "the planted files were not cleaned up"
 git -C "$TMP/estate/driftwood" for-each-ref 'refs/heads/local-clock/' | grep -q -- "$mrid" || fail "the misnamed file's branch was not kept for inspection"
 grep -q '"status": "fail"' "$TMP/.local-clock/runs/$mrid/steps.jsonl" || fail "the misnamed file was not recorded as fail"
 

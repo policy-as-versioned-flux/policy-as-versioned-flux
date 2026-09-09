@@ -153,3 +153,29 @@ emission protecting the calibration record from selection bias.
 - [x] Cadence + re-price triggers, sufficient to generate forecast volume.
 - [x] Exercised on a co-flagship signal each (Intel process-node observation propagating bidirectionally;
       the unbound materials-paper → crypto-dependency rescue as the generalised quantum/HNDL case).
+
+## Note, 2026-09-06 (eco-system ticket 93, delegated under ADR-0025): the grade-5 ruling, reopened
+
+Q2 made an automated binding grade 5 -- "it informs and ranks, it cannot price a scored forecast
+on its own" -- and Q1 said an inferred position "must not be presented with false precision (no
+arithmetic on ordinal scales)". Eco-system ticket 93 builds the thing this ticket's loop was
+missing: the twin now DERIVES a probability from bound signals (a model call on the owner's
+local clock, ticket 92) instead of reading one from a world model's `beliefs`. The ruling
+extends without change to the derivation: it is a model assertion, `evidence_grade: 5`, never
+price-eligible, and it carries the weakest grade of the signals it rests on (a comparison, never
+arithmetic). What the loop gains is the scoring half Q1 promised for overrides, now for the
+twin's own forecast: pre-registered by the date the merge lands it on the adopter's `main`,
+scored by `twin/scoring.py` against the overlay's own `outcome` record, with the recorded belief
+kept beside the derivation so the disagreement is on the record. The full note is on ADR-0024
+point 6 and twin ticket 08.
+
+**Amended 2026-09-09 (eco-system ticket 93 review, F1/F2/F9).** Three corrections to the sentence
+above. *Pre-registration* is not "the date the merge lands it on the adopter's `main`" alone: that
+measures where a PATH first appeared, and a number rewritten after the answer was already on main
+kept the original date and was scored. It is the date of the LAST first-parent write onto
+`origin/main`, with the arrival date printed beside it. *The outcome record* is the answer key and
+is immutable once it is there -- an outcome edited afterwards is refused by name, and two outcomes
+resolving one proposition are refused rather than the first sorted one silently winning. *"It
+carries the weakest grade of the signals it rests on"* is, today, a comparison with one value to
+compare, because every signal is required to be grade 5; the check prints the count of distinct
+grades so the tautology is visible rather than implied.
