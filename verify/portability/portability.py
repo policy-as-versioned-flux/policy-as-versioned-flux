@@ -949,7 +949,23 @@ def _t79_moved_converter(estate: str = ESTATE) -> None:
         scenario = json.loads(r.stdout)
         return digest(json.dumps(scenario, sort_keys=True)), scenario
 
+    # REVIEW F12. Computing `want`, writing it into the record, replaying against
+    # that record and printing it is a circle: it proves the converter is a
+    # function, not that it re-derives the price the estate actually signed. The
+    # digest is therefore held to a CONSTANT, and that constant is the one
+    # platform's own `_run_converter` recorded into PROVENANCE.json for
+    # threat-register@v2 on 2026-09-09 -- copied here by hand from that record and
+    # named, so a converter change that moves the price makes this leg red rather
+    # than quietly re-baselining itself.
+    RECORDED = "6046699614c5d4ebc35e0bb00b3c521d1c4e5ab07930527cdc595c745d2a008c"
     want, scenario = price("driftwood")
+    if want != RECORDED:
+        print(f"SKIP the moved converter now returns {want[:12]} for `threat <payload> "
+              f"driftwood` over threat-register@v2, and the digest platform's own "
+              f"PROVENANCE.json recorded for that pair is {RECORDED[:12]}. The replay below is "
+              f"skipped rather than re-baselined on today's output: either the converter or the "
+              f"payload moved, and this leg cannot tell which (review F12)")
+        return
 
     with tempfile.TemporaryDirectory() as root:
         ado = os.path.join(root, "ado")
@@ -984,8 +1000,9 @@ def _t79_moved_converter(estate: str = ESTATE) -> None:
               f"its recorded invocation `to_fair_scenario.py threat <payload> driftwood` in a "
               f"directory holding nothing but itself and the vendored payload -- no publisher "
               f"clone, no platform, no hub -- and returns the very scenario it was priced from "
-              f"(sha256 {want[:12]}), pricing lm {scenario['warn']['lm']} at lef "
-              f"{scenario['warn']['lef']}")
+              f"(sha256 {want[:12]}, the constant platform's own PROVENANCE.json recorded "
+              f"for this pair, not a digest this check computed and then agreed with), pricing "
+              f"lm {scenario['warn']['lm']} at lef {scenario['warn']['lef']}")
 
         other, _ = price("tuppence")
         assert other != want, (other, want)

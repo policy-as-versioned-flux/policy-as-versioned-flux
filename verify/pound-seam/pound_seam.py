@@ -715,12 +715,40 @@ def check_ordinal_and_aggregate(estate, adopters):
     NAMED could-not-look that says which tag it waits for -- never a pass, and
     never a FAIL against an adopter that has done nothing wrong.
     """
+    # REVIEW F9. The first cut set this by substring-matching `ORDINAL_STATEMENT`
+    # and `def aggregate_section` in the composer's SOURCE and then claimed
+    # BEHAVIOUR -- a comment naming either would have satisfied it. It now IMPORTS
+    # the composer and RUNS `exposure_section` over a two-line synthetic book,
+    # then reads the two keys off what comes back. That is the property the line
+    # asserts, derived rather than inferred. An import that fails, or a composer
+    # too old to have the function at all, is a named could-not-look.
     composer = os.path.join(estate, "platform", "compose", "composition.py")
-    composer_has_it = False
+    composer_has_it, why = False, "no platform/compose/composition.py in this estate checkout"
     if os.path.exists(composer):
-        with open(composer) as fh:
-            src = fh.read()
-        composer_has_it = ("ORDINAL_STATEMENT" in src and "def aggregate_section" in src)
+        try:
+            spec = importlib.util.spec_from_file_location("t79_composition", composer)
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules["t79_composition"] = mod
+            spec.loader.exec_module(mod)
+            probe = [{"source": "p", "kind": "feed", "name": "a", "perspective": "x",
+                      "currency": "GBP", "amount": 100.0, "proposed_tier": "baseline"},
+                     {"source": "p", "kind": "feed", "name": "b", "perspective": "x",
+                      "currency": "GBP", "amount": 200.0, "proposed_tier": "baseline"}]
+            got = mod.exposure_section(probe, "x", {"amount": 1.0, "currency": "GBP"}, "GBP")
+            if not isinstance(got, dict):
+                why = "exposure_section returned nothing for a two-line synthetic book"
+            elif not (got.get("ordinal") or "").strip():
+                why = "exposure_section returned a total and no `ordinal` statement"
+            elif not isinstance(got.get("aggregate"), dict):
+                why = "exposure_section returned a total and no `aggregate` section"
+            elif got["aggregate"].get("selected_tier_residual_total") is None:
+                why = "the `aggregate` it returned carries no selected_tier_residual_total"
+            else:
+                composer_has_it = True
+                probe_total = got["aggregate"]["selected_tier_residual_total"]
+                probe_breach = got["aggregate"].get("breaches_band")
+        except Exception as exc:                       # noqa: BLE001 -- any import/run failure
+            why = f"{type(exc).__name__}: {exc}"
     if not composer_has_it:
         # A NAMED could-not-look, not a FAIL. Nothing an adopter did is wrong: the
         # composer in THIS estate checkout cannot produce either sentence, so
@@ -729,16 +757,19 @@ def check_ordinal_and_aggregate(estate, adopters):
         # IS the served artefact -- platform's own compose/composition.py
         # --selfcheck, which refuses an exposure section with no `ordinal` and no
         # `aggregate` by name.
-        out("SKIP", f"the composer in this estate checkout ({composer}) carries no "
-                    f"ORDINAL_STATEMENT and no aggregate_section, so no adopter here can carry "
-                    f"either by composing and this check cannot look at whether they do. "
+        out("SKIP", f"the composer in this estate checkout ({composer}) does not return an "
+                    f"exposure section carrying both an `ordinal` statement and an `aggregate` "
+                    f"when it is RUN over a synthetic two-line book -- {why} -- so no adopter "
+                    f"here can carry either by composing and this check cannot look at whether "
+                    f"they do. "
                     f"Graded in platform's own compose/composition.py --selfcheck; this leg "
                     f"reads green once the estate clone carries a composer that has them "
                     f"(eco-system ticket 79 items 9 and 10)")
         return
-    out("PASS", "the composer carries both: ORDINAL_STATEMENT is written onto every exposure "
-                "section it renders, and aggregate_section sums what the selected tiers leave "
-                "beside the declared tolerance")
+    out("PASS", f"the composer was RUN, not read: exposure_section over a synthetic two-line "
+                f"book (100.00 + 200.00 GBP, both at tier `baseline`, against a 1.00 GBP band) "
+                f"came back carrying the ordinal statement and an aggregate of "
+                f"{probe_total:.2f} GBP with breaches_band={probe_breach!r}")
 
     for name in adopters:
         header = os.path.join(estate, name, "composed", "HEADER.yaml")
@@ -758,11 +789,24 @@ def check_ordinal_and_aggregate(estate, adopters):
             continue
         total, currency = exposure["total"], exposure.get("currency")
         pin = _platform_pin(estate, name)
-        missing = []
-        if (exposure.get("ordinal") or "").strip() != ORDINAL_STATEMENT:
+        # REVIEW F13. A REWORDED sentence is not an ABSENT one, and saying
+        # "carrying no `ordinal`" of an artefact that carries a different one is
+        # the same class of wrong sentence this leg exists to catch.
+        missing, different = [], []
+        served_ordinal = (exposure.get("ordinal") or "").strip()
+        if not served_ordinal:
             missing.append("`ordinal`")
+        elif served_ordinal != ORDINAL_STATEMENT:
+            different.append(f"`ordinal` reads {served_ordinal!r}, and the sentence ticket 75 "
+                             f"Q4 (a) settled is {ORDINAL_STATEMENT!r}")
         if not isinstance(exposure.get("aggregate"), dict):
             missing.append("`aggregate`")
+        if different:
+            out("FAIL", f"{name} serves a total of {total:,.2f} {currency} whose statement of "
+                        f"what the number is has been REWORDED, not omitted: "
+                        f"{'; '.join(different)}. The composer writes one sentence; an adopter "
+                        f"serving another one has had it edited after composition")
+            continue
         if not missing:
             agg = exposure["aggregate"]
             out("PASS", f"{name} serves a total of {total:,.2f} {currency} that says what it "
