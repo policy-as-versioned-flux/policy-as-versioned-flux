@@ -69,6 +69,15 @@ A fourth, smaller correction: item 1 said v3's fines carry "NO `status` field". 
 majors 1 and 2, and so did every control weight and every frequency — the defect is the whole
 payload's, not the two examples'.
 
+A fifth, found by the review and corrected in the served artefact rather than argued with: **this
+ticket's own Question is wrong about Doorstep Dispensaree.** Its item 1 says "Doorstep Dispensaree
+is £92,000, confirmed by the Court of Appeal 2024-12-09". The estate's own sourced record
+(`REVIEW-2026-09-02.md`, citing Hunton and DataGuidance) says the FIRST-TIER TRIBUNAL cut it to
+GBP 92,000 in 2021 and the Court of Appeal in 2024 dismissed the further appeal, and no source the
+estate holds carries a day. The Question is left as it was written — it is the record of what was
+asked — and everything the build produced now says the sourced thing instead. See review F2 and N2
+below.
+
 ### Item by item
 
 **1. Penalty status, `final_as_of` and litigation. Built; the cut waits on the owner.**
@@ -78,7 +87,8 @@ publisher's rule in full and `penalty-schema/bump.yaml` declares `major`.
 
 *The rule, delegated:* **a published fine is the FINAL COLLECTED FIGURE, not the notice figure.**
 The reason is this schema's own data: Doorstep Dispensaree's notice was GBP 275,000 and the figure
-that stands is GBP 92,000 (Court of Appeal, 2024-12-09) — the notice overstated by 3x; Clearview
+that stands is GBP 92,000 — cut by the First-tier Tribunal in 2021 and confirmed when the Court
+of Appeal dismissed the further appeal in 2024 — so the notice overstated by 3x; Clearview
 AI's GBP 7,552,800 has never been collected; and the DSG penalty ticket 94 studied went
 GBP 500,000 -> GBP 250,000 -> set aside -> remitted, with no final figure six years on. Notice
 figures are not noisy around the truth, they are biased upward every time.
@@ -94,10 +104,11 @@ uk-gdpr higher-tier with no priceable example at all AND would have claimed "we 
 not final", which is equally untrue. `imposed-appeal-unchecked` says the one thing that is true.
 
 *What moved in v4.* Doorstep Dispensaree GBP 275,000 -> **GBP 92,000**, `final`, `final_as_of
-2024-12-09`, with the notice figure kept as `notice_gbp`. Clearview AI GBP 7,552,800 ->
-`not-collected`, stops pricing. TikTok, Premera, Standard Chartered and TSB -> `unknown`, each
-naming what was not looked at, all stop pricing. British Airways and Marriott ->
-`imposed-appeal-unchecked`. Starling Bank's FCA final notice of 2024-09-27, GBP 28,959,426, is
+2024` — the year, which is the precision the estate's own sourced record supports — with the
+notice figure kept as `notice_gbp`. Clearview AI GBP 7,552,800 -> `not-collected`, stops pricing.
+Every other example is `imposed-appeal-unchecked` under one rule (review F4): a regulator's own
+concluding instrument, whichever regulator issued it, with no adverse litigation known here and no
+register read for it. `unknown` applies to nothing in this payload. Starling Bank's FCA final notice of 2024-09-27, GBP 28,959,426, is
 ADDED as the one example whose finality a run of this estate actually established (ticket 94).
 uk-gdpr/lower-tier consequently prices `lm (92,000.00, 92,000.00, 8,700,000.00)` where v3 priced
 `(275,000.00, 3,913,900.00, 9,063,360.00)`.
@@ -321,7 +332,13 @@ Each red was committed before the logic that greens it (ico `7a34cf1`, platform 
    GBP 9,039,791.02 figures separate, and `verify/portability/`'s two standing could-not-looks
    close. Note the currencies differ (Anthem's record is USD) and the FX bridge is signed and
    working, so a USD size is priceable.
-5. **Confirm or replace the implied-loss-ratio band `5.0–50.0`** in `insurer/terms/*.yaml`. It is a
+5. **Two consequences of the widening, to know before signing a `size:` or an `obligations:`
+   list** (review F14 and N10, both measured above): the cap clamp makes `uk-gdpr/higher-tier` a
+   point estimate above a turnover of GBP 437,500,000, and both candidate sizes land above it; and
+   the fca tier's ceiling is GBP 122,595,840, 1.2 x Standard Chartered's fine, which a signed
+   `obligations: [..., fca]` for the tuppence candidate would reach. Neither reaches an adopter
+   today, because composition prices only `uk-gdpr/lower-tier`.
+6. **Confirm or replace the implied-loss-ratio band `5.0–50.0`** in `insurer/terms/*.yaml`. It is a
    ratio, not money, and it is decided here; it is listed because it is a carrier's commercial
    judgement.
 
@@ -506,4 +523,135 @@ two currencies. (F8) a book whose every line is untiered still returns a section
   handling in code this ticket did not otherwise open. Named here so the next reader does not have
   to rediscover them.
 
-Map line: **[79 — The £ inputs are published, sourced and current](issues/79-the-pound-inputs-are-published-sourced-and-current.md)** — every figure the £ engine prints now says what it rests on or names what could not be looked at. ico payload major 4 grades every published fine for finality (`status`, `final_as_of`, `litigation`): the publisher's rule is the FINAL COLLECTED FIGURE, so Doorstep Dispensaree becomes the GBP 92,000 the Court of Appeal confirmed on 2024-12-09 and Clearview AI's uncollected GBP 7,552,800 stops pricing, taking uk-gdpr/lower-tier from `(275,000.00, 3,913,900.00, 9,063,360.00)` to `(92,000.00, 92,000.00, 8,700,000.00)`; `DEFAULT_WARN_LEF = (1, 2, 4)` becomes a publisher-shipped `frequency` with a dated basis, a stated denominator gap and a zero floor, and a frequency or a control weight with no basis refuses by name. The threat register's loss magnitudes leave the SUBSCRIBER's adopter-keyed table for the publisher's own payload (major 3) and the converter goes with them, unchanged, so the move re-homes the numbers without re-pricing them; the hub replays that moved converter standalone to the digest composition recorded (sha256 6046699614c5) and names a wrong invocation by both digests. The cap rule is the statute's — the sized triple is clamped at `max(cap, rate x turnover)`, where the old arithmetic printed GBP 104,176,551.72 against a statutory maximum of GBP 100,000,000.00 — and `tcor`'s transfer partitions one loss distribution at the deductible instead of charging the retained part twice (GBP 263,536.46 -> GBP 193,625.82). The composed exposure section states what its number IS, in ticket 75 Q4's own words, and carries the aggregate of its selected-tier residuals beside the band, which showed driftwood breaching its GBP 40,000 tolerance at GBP 87,387.45 with nothing on any signed artefact saying so. Three cuts and two signed sizes wait on the owner; no `composed/` tree was regenerated.
+
+## Review round 2, 2026-09-09 — approved with five fixes
+
+The round-1 fixes were approved: F1's plants bite (empty-string and whitespace sources included),
+F2's artefact strings are character-exact against `REVIEW-2026-09-02.md:73` with all three URLs
+verified, F3 gives NO VERDICT on five separate planted failure modes, F4's widening reaches no
+adopter (the reviewer re-derived driftwood's line on the new payload as 607,314.15, byte-identical
+to the figure above), F12 SKIPs naming both digests, and F6 names which keys the terms file
+declared. Five further fixes were required and are below, then the notes.
+
+### N2 (fix first — a false legal claim was still shipping). Fixed in five places.
+
+The F2 correction reached the served payload and not four places that restate it. The retired
+claim — the wrong body, and a day no source this estate holds — still stood in:
+
+* **`ico/schema/to_fair_scenario.py`'s own module docstring**, and **that module is VENDORED into
+  every adopter's `composed/feeds/` tree under ticket 45**, so the wrong sentence travelled into
+  signed artefacts. This is the one that mattered, and it is why N2 was fixed before anything else.
+* `ico/verify-penalty-feed.sh`, inside an assertion's own output text.
+* this ticket's own Answer, in two places, in the same document that already said the sourced thing
+  three hundred lines later.
+* **the Map line, here and in `.scratch/ecosystem/map.md`** — the estate's one live wayfinder.
+  `verify/map-surface/` passes over it because it grades figures and check names, not legal facts.
+
+All five now say: the FIRST-TIER TRIBUNAL cut it to GBP 92,000 in 2021, and the Court of Appeal
+confirmed that figure in 2024 by dismissing the further appeal. A selfcheck fixture that still set
+`final_as_of` to a day precision the payload no longer uses is corrected too. `grep -c 2024-12-09`
+is now 0 in `map.md` and 3 in this file: the Question's original wording (left as written, and now
+flagged in the corrections list above), and two sentences whose job is to name the retired claim.
+**No number moved.**
+
+The reviewer's own point, recorded because it is right: naming the wrong court was worse than a
+missing citation. A missing citation is an absence; a specific false assertion about which body did
+what is the thing the citation was supposed to prevent.
+
+### N1 (the F9 probe knew the answer and did not assert it). Fixed, red first.
+
+A seven-line stub returning `{"total": 1.0, "ordinal": "not the real sentence", "aggregate":
+{"selected_tier_residual_total": 0.0, "breaches_band": False}}` produced
+
+```
+PASS: the composer was RUN, not read: … came back carrying the ordinal statement and an aggregate
+of 0.00 GBP with breaches_band=False
+```
+
+The probe hands over two lines at 100.00 and 200.00 GBP at tier `baseline` against a 1.00 GBP band,
+so it KNOWS the answer is 210.00 and True, and it was testing only that `ordinal` was non-empty and
+that the aggregate carried a total. Both are now asserted: the sentence against `ORDINAL_STATEMENT`
+(already in that file for the adopter leg) and the aggregate against `PROBE_TOTAL = 210.0` and
+`breaches_band is True`, with the arithmetic printed beside the constant (`baseline` leaves 0.70 of
+each, 0.70 x 300.00 = 210.00). Both stub shapes now SKIP by name:
+
+```
+SKIP: … exposure_section returned 'not the real sentence' as its `ordinal` statement, and the
+sentence ticket 75 Q4 (a) settled is 'an ordinal, auditable comparison under one perspective; not
+an expected annual loss' …
+SKIP: … the probe hands over 100.00 + 200.00 GBP at tier `baseline`, whose aggregate is 210.00, and
+exposure_section returned 0.00 …
+```
+
+and the green line no longer claims more than it derived: "came back with the exact sentence ticket
+75 Q4 (a) settled and the aggregate that book has to produce — 210.00 GBP, breaches_band=True — not
+merely with a non-empty string and some number".
+
+### N3 (`breaches_band` under-reported on a partial sum). Fixed, red first.
+
+RED, measured: a 10,000.00 tiered line and a **50,000,000.00 untiered** line against a 40,000.00
+band returned `total 7000.00  not_tiered ['huge']  breaches_band False  could_not_look None`, and
+the handbook rendered "within the declared aggregate". The boolean was computed from a total that
+deliberately excludes lines, so it reads False however large the excluded line is. The precedent for
+the right answer was eight lines below in the same function, and this function's own docstring
+already said "while any line is unnamed the aggregate says so rather than under-reporting" — the
+prose was right and the boolean was not.
+
+GREEN: when `untiered` is non-empty, `breaches_band` is `None` with a could-not-look naming the
+count and the names, which `handbook.py` already renders as NO VERDICT.
+
+```
+OK (N3) a total that excludes an untiered line gives NO VERDICT against the aggregate: 10,000.00
+tiered + 50,000,000.00 untiered against a 40,000.00 band returns 7000.00 with breaches_band=None
+and a could-not-look naming `huge`, not the False it used to return
+```
+
+### N5 (the F7 disclosure named the wrong script). Fixed.
+
+It said the agreement rests on `compose/verify-composition.sh`. It is the FEEDS repository's own
+`verify-feeds.sh` that runs the selfcheck, and `.estate-clone/platform/feeds/verify-feeds.sh` is in
+the hub's gate manifest, where `.estate-clone` always holds a feeds tree beside platform — so the
+hub gate DOES assert the agreement on every full-estate run. The disclosure was wrong in the safe
+direction, which is still wrong for a sentence whose whole purpose is naming what a guarantee rests
+on. It now names `verify-feeds.sh`, says the hub gate runs it against `.estate-clone` so the
+agreement IS asserted there, and says that PLATFORM's own CI still does not.
+
+### N6 (rule.yaml contradicted itself). Withdrawn.
+
+The retired outcome-driven justification — "would have left uk-gdpr higher-tier with no priceable
+example at all and refused a line the estate prices today" — sat directly above the ONE RULE
+paragraph that calls exactly that reasoning this ticket's own defect in miniature. It was also false
+on its facts: composition prices only `uk-gdpr/lower-tier`, so no line the estate prices would have
+been refused. It is withdrawn in place, with a dated note saying what it said and why it is gone,
+because this is the one file whose entire purpose is the reason.
+
+### Recorded, not fixed
+
+* **N10, added beside F14 in what waits on the owner's signature.** The F4 widening raised the fca
+  tier's ceiling. Measured across the three states: v3 `(48,650,000.00, 75,406,600.00,
+  122,595,840.00)`; v4 before F4, with only Starling priced, `(28,959,426.00, 28,959,426.00,
+  34,751,311.20)`; v4 after F4 `(28,959,426.00, 48,650,000.00, 122,595,840.00)`. The `hi` is
+  1.2 x Standard Chartered's 102,163,200 and it is the largest number the widening produced — a
+  **3.5x rise against the intermediate state**, which is what the review measured. Against v3 it is
+  UNCHANGED: v3 had no status field, so SC and TSB priced there too, and F4 restored the ceiling
+  rather than inventing it. The mode FELL, 75,406,600.00 -> 48,650,000.00, because Starling joined
+  the median. Unreachable today — composition never reads fca — and recorded because a signed
+  `obligations: [..., fca]` for the tuppence candidate would reach it.
+* **N4, half fixed and half recorded.** The `source` rule IS enforced, by section 9 and by the
+  converter. The widened `final_as_of` GRAMMAR was enforced by nothing: `final_as_of: '24'` passed
+  section 9 while jsonschema rejects it, because that section reads top-level keys and no run on
+  the estate's `python3` puts jsonschema over this payload. The three-line regex was cheap, so it
+  is in section 9 now: `FAIL: uk-gdpr/lower-tier Doorstep Dispensaree Ltd carries final_as_of '24',
+  which is not YYYY, YYYY-MM or YYYY-MM-DD -- the precisions payload.schema.v4.json declares
+  (review N4)`. What remains recorded and unfixed is the general shape: the payload schema is a
+  document nothing validates against on the runner, so every other `required` and `pattern` in it
+  is enforced only where a check happens to restate it.
+* **N7, recorded.** A bare URL, or the string "internal estimate", passes as a `source`. The check
+  can grade PRESENCE and not QUALITY. Mitigated, and deliberately: the scenario prints the source
+  string verbatim, so whatever it says travels with the price to every reader of it.
+* **N8, recorded.** `status: final` on an example carrying no figure at all is inert — nothing
+  prices — but it is nonsense, and nothing refuses it.
+* **N9, recorded.** A negative `appetite.tolerance` converts through FX and compares like any
+  other, so every total "breaches" it. No party declares one and nothing refuses one.
+
+Map line: **[79 — The £ inputs are published, sourced and current](issues/79-the-pound-inputs-are-published-sourced-and-current.md)** — every figure the £ engine prints now names its source or names what could not be looked at or names what could not be looked at. ico payload major 4 grades every published fine for finality (`status`, `final_as_of`, `litigation`): the publisher's rule is the FINAL COLLECTED FIGURE, so Doorstep Dispensaree becomes the GBP 92,000 the First-tier Tribunal set in 2021 and the Court of Appeal confirmed in 2024 by dismissing the further appeal, dated to the year because that is the precision the estate's own sourced record supports, and Clearview AI's uncollected GBP 7,552,800 stops pricing, taking uk-gdpr/lower-tier from `(275,000.00, 3,913,900.00, 9,063,360.00)` to `(92,000.00, 92,000.00, 8,700,000.00)`; `DEFAULT_WARN_LEF = (1, 2, 4)` becomes a publisher-shipped `frequency` with a dated basis, a stated denominator gap and a zero floor, and a frequency or a control weight with no basis refuses by name. The threat register's loss magnitudes leave the SUBSCRIBER's adopter-keyed table for the publisher's own payload (major 3) and the converter goes with them, unchanged, so the move re-homes the numbers without re-pricing them; the hub replays that moved converter standalone to the digest composition recorded (sha256 6046699614c5) and names a wrong invocation by both digests. The cap rule is the statute's — the sized triple is clamped at `max(cap, rate x turnover)`, where the old arithmetic printed GBP 104,176,551.72 against a statutory maximum of GBP 100,000,000.00 — and `tcor`'s transfer partitions one loss distribution at the deductible instead of charging the retained part twice (GBP 263,536.46 -> GBP 193,625.82). The composed exposure section states what its number IS, in ticket 75 Q4's own words, and carries the aggregate of its selected-tier residuals beside the band, which showed driftwood breaching its GBP 40,000 tolerance at GBP 87,387.45 with nothing on any signed artefact saying so. Three cuts and two signed sizes wait on the owner; no `composed/` tree was regenerated.

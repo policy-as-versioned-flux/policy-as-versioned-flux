@@ -697,6 +697,11 @@ def _forward_intel_feed(estate, name, doc):
 
 ORDINAL_STATEMENT = ("an ordinal, auditable comparison under one perspective; not an expected "
                       "annual loss")
+# What the probe below hands the composer, and therefore what the composer must
+# come back with: two lines at 100.00 and 200.00 GBP, both at tier `baseline`,
+# which platform/graded/cage.py leaves 0.70 of. 0.70 x 300.00 = 210.00, against
+# a 1.00 GBP band, so it breaches (review N1).
+PROBE_TOTAL = 210.0
 
 
 def check_ordinal_and_aggregate(estate, adopters):
@@ -734,19 +739,40 @@ def check_ordinal_and_aggregate(estate, adopters):
                       "currency": "GBP", "amount": 100.0, "proposed_tier": "baseline"},
                      {"source": "p", "kind": "feed", "name": "b", "perspective": "x",
                       "currency": "GBP", "amount": 200.0, "proposed_tier": "baseline"}]
+            # REVIEW N1: THE PROBE KNOWS THE ANSWER, SO IT ASSERTS IT. Two lines
+            # at 100.00 and 200.00, both at `baseline`, against a 1.00 GBP band:
+            # cage.py's baseline leaves 0.70 of each, so the aggregate is
+            # 210.00 and it breaches. Testing only that `ordinal` is non-empty
+            # and that the aggregate carries A total let a seven-line stub
+            # returning {"ordinal": "not the real sentence", "aggregate":
+            # {"selected_tier_residual_total": 0.0, "breaches_band": False}}
+            # print PASS -- a check that claims the composer works while the
+            # composer computes nothing.
             got = mod.exposure_section(probe, "x", {"amount": 1.0, "currency": "GBP"}, "GBP")
+            agg = got.get("aggregate") if isinstance(got, dict) else None
             if not isinstance(got, dict):
                 why = "exposure_section returned nothing for a two-line synthetic book"
             elif not (got.get("ordinal") or "").strip():
                 why = "exposure_section returned a total and no `ordinal` statement"
-            elif not isinstance(got.get("aggregate"), dict):
+            elif (got.get("ordinal") or "").strip() != ORDINAL_STATEMENT:
+                why = (f"exposure_section returned {got['ordinal']!r} as its `ordinal` statement, "
+                       f"and the sentence ticket 75 Q4 (a) settled is {ORDINAL_STATEMENT!r}")
+            elif not isinstance(agg, dict):
                 why = "exposure_section returned a total and no `aggregate` section"
-            elif got["aggregate"].get("selected_tier_residual_total") is None:
+            elif agg.get("selected_tier_residual_total") is None:
                 why = "the `aggregate` it returned carries no selected_tier_residual_total"
+            elif abs(float(agg["selected_tier_residual_total"]) - PROBE_TOTAL) > 1e-6:
+                why = (f"the probe hands over 100.00 + 200.00 GBP at tier `baseline`, whose "
+                       f"aggregate is {PROBE_TOTAL:.2f}, and exposure_section returned "
+                       f"{float(agg['selected_tier_residual_total']):.2f}")
+            elif agg.get("breaches_band") is not True:
+                why = (f"the probe's {PROBE_TOTAL:.2f} GBP aggregate is measured against a 1.00 "
+                       f"GBP band, which it plainly breaches, and exposure_section returned "
+                       f"breaches_band={agg.get('breaches_band')!r}")
             else:
                 composer_has_it = True
-                probe_total = got["aggregate"]["selected_tier_residual_total"]
-                probe_breach = got["aggregate"].get("breaches_band")
+                probe_total = agg["selected_tier_residual_total"]
+                probe_breach = agg["breaches_band"]
         except Exception as exc:                       # noqa: BLE001 -- any import/run failure
             why = f"{type(exc).__name__}: {exc}"
     if not composer_has_it:
@@ -768,8 +794,9 @@ def check_ordinal_and_aggregate(estate, adopters):
         return
     out("PASS", f"the composer was RUN, not read: exposure_section over a synthetic two-line "
                 f"book (100.00 + 200.00 GBP, both at tier `baseline`, against a 1.00 GBP band) "
-                f"came back carrying the ordinal statement and an aggregate of "
-                f"{probe_total:.2f} GBP with breaches_band={probe_breach!r}")
+                f"came back with the exact sentence ticket 75 Q4 (a) settled and the aggregate "
+                f"that book has to produce -- {probe_total:.2f} GBP, breaches_band="
+                f"{probe_breach!r} -- not merely with a non-empty string and some number")
 
     for name in adopters:
         header = os.path.join(estate, name, "composed", "HEADER.yaml")
