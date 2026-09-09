@@ -364,8 +364,10 @@ and it was invisible in an exit code.
   `scripts/verify-adopter-gate.sh` (G graded, I added).
 * tuppence `.github/scripts/adopter-gate.py`, `.github/scripts/trusted_root.json` (new),
   `scripts/verify-adopter-gate.sh` (G graded, H added, D2 rewritten).
-* ludlow `.github/scripts/adopter_gate.py` (net −132 lines: the DER parser and per-role selection
-  out, the re-encoding in), `verify-adopter-gate.sh` (E6 added).
+* ludlow `.github/scripts/adopter_gate.py` (**net −54 lines**: 1495 → 1441, 170 insertions and 224
+  deletions — the DER parser and per-role selection out, the re-encoding in. An earlier draft of
+  this line said −132; that number counted nothing a reader could reproduce and is corrected here,
+  review F3, 2026-09-09), `verify-adopter-gate.sh` (E6 added).
 * hub `verify/trust-root/` (new), `tests/test_trust_root.py` (new),
   `verify/real-signature/real_signature.py` + its script (R2-1), `tests/test_real_signature.py`,
   `talk/verify-manifest.txt` (one new row, three rewritten).
@@ -387,6 +389,96 @@ four pull requests.
 **What the unit CI does NOT say, repeated from ticket 101 because it is still true.** No unit CI
 job runs `--selfcheck` or a harness. `shift-left` reaches `verify_evidence()` only when the
 composed member set moves. Everything that grades this ticket ran locally and in the hub gate.
+
+### Review, 2026-09-09 — what it changed and what it recorded
+
+Approved, with nine findings. Five were fixed on the branch; four are recorded here because they
+are real and none of them is worth a change today. One was charted as its own ticket.
+
+**F1, fixed — the R2-1 fix was defeated by the estate's own refusal wording.** The needle was the
+bare substring `tuf`, and every gate's absent-root refusal ends `...refusing rather than letting
+cosign fetch a live TUF root` (ludlow: `...fall back to a live TUF fetch`). So a gate with no
+committed root — one that made no network call whatever, and said so — was reported as:
+
+    driftwood: ... exit 1, and its output shows the fetch (REFUSED: no committed Sigstore trust
+    root at ...), so this repository's signature check fetches a Sigstore trust root on every CI
+    run, which is cold every time
+
+the exact false sentence R2-1 removed, now produced by the wording of the refusal that proves the
+opposite. The needle is `tuf: ` with the colon, which is what the three harnesses already grep for.
+After:
+
+    driftwood: its own gate refuses with a cold TUF cache and egress blocked -- exit 1, for a
+    reason that is not the network -- its output names no TUF fetch and no refused connection: ...
+
+Graded in `real_signature.py --selfcheck` against the three gates' REAL absent-root refusal
+strings, and against the real contrast, not against a synthetic one — all three cases were red
+before the change. **The lesson is narrower than "use a better regex": a check that reads text the
+estate writes is graded by the estate's own worst-case text, and this estate writes refusals that
+NAME the thing they refused to do.**
+
+**F2, fixed — the one computed field had no standing check.** Every gate now computes the
+artefact's sha256 itself (`messageDigest` in the re-encoded bundle), and all three harnesses plus
+both halves of `verify/real-signature/` corrupt the SIGNATURE. The property held when measured by
+hand during the build; by this ticket's parent lesson, a property that is true and unmeasured is
+the one that stays broken. `verify/real-signature/` now has a THIRD leg: platform's real,
+untouched signature over an evidence document with **one byte appended** — it parses to the
+identical object, so `outcome.result` and `declared` are unchanged and every content check every
+gate makes still passes, and the only thing left that can refuse it is the digest the signature
+covers. An observation carrying no artefact leg is a could-not-look, never a pass. Mutation-tested:
+making `grade()` stop reading the leg turns two tests red.
+
+**F3, fixed.** The Files section said ludlow's gate was "net −132 lines". Measured: 1495 → 1441,
+170 insertions and 224 deletions, **net −54**. The old number counted nothing a reader could
+reproduce. Corrected above.
+
+**F4, fixed — the `cut` defect's structural cause, not just its instance.** driftwood scenario I
+and ludlow E6 both PRINTED `tail -1` of the gate's output while GRADING a `grep -q` for a
+different needle. Today's text was genuine only because the refusal happened to be the last line;
+the identical shape in tuppence's copy printed another program's stdout for twelve cases and no
+exit code noticed. Both now print the line they grade.
+
+**F5, fixed.** tuppence's harness still DEFINED a shell function named `cut`; the build removed the
+one `| cut` pipe, not the shadow. Renamed `cut_release` (three call sites). Removing the pipe fixed
+the symptom; renaming removes the trap.
+
+**F6, recorded, not fixed — a multi-block PEM certificate chain fails closed, but is worded as a
+shape error.** `sigstore_bundle()` base64-decodes `cert` and, if it is PEM, strips the `-----`
+lines and decodes what is left. A chain of two or more PEM blocks concatenated would decode to
+concatenated DER, which sigstore-go refuses as an unparseable certificate — the safe direction, but
+the refusal talks about the certificate rather than about the chain, which is one hop from the
+refusal-wearing-the-wrong-words defect ticket 101 was about. Platform publishes a single
+certificate; measured, its `cert` is one block. Left as is because inventing a chain parser for an
+artefact shape nobody publishes is speculative, and the failure is closed.
+
+**F7, recorded — `kindVersion` is derived and cosign ignores it.** The re-encoding fills
+`kindVersion` from the Rekor body's own `kind` and `apiVersion`. sigstore-go re-reads the
+canonicalised body itself and does not trust that field, so a wrong value cannot admit anything.
+It is copied rather than computed and it is graded field-for-field in the selfcheck; noted so a
+reader does not mistake it for load-bearing.
+
+**F8, recorded — nothing grades that a committed root carries nothing EXTRA.** `verify/trust-root/`
+grades that every log the served artefact NAMES is carried. A root carrying an additional log the
+estate never asked for would pass. Every key in every root IS printed on every run, with its type
+and its window, so an extra one is visible — but visible is not graded. Grading it would need a
+statement of what the root is allowed to carry, which is a second pin to maintain and the wrong
+trade today; the reviewer independently confirmed the three committed roots are byte-identical to
+this machine's own genuinely TUF-fetched root, which is the stronger fact and one this ticket had
+not claimed.
+
+**F9, recorded — `sct_entries()` takes the first raw OID match.** The grader finds the SCT
+extension by searching the certificate DER for the OID bytes and reading the OCTET STRING after
+them, rather than walking the certificate structure. It is a cheap read, it is the grader's and not
+the gate's — the gate no longer parses DER at all, sigstore-go does — and a certificate that
+somehow carried those bytes elsewhere would make the check name a log the artefact does not use,
+which fails toward a false RED, not a false green. Left as is, named so nobody reads it as a
+parser.
+
+**Charted, not fixed here: ticket 108.** `verify/a-fall-blocks/` and `verify/derived-status/` are
+red on today's `origin/main` and PASS at the immediately preceding commit `691a32a`; the only
+difference is `truth: record run 184 [skip ci]`, whose TRUTH line and captures are those two
+checks' input, and whose `[skip ci]` means nothing re-measures main afterwards. Neither red is this
+ticket's. Both were reproduced here on plain worktrees of both commits.
 
 ## Waits on the owner
 
