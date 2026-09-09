@@ -337,6 +337,35 @@ def test_a_row_that_does_not_parse_is_named_rather_than_dropped(hub: dict, tmp_p
     assert any("states no row count" in b for b in bad), bad
 
 
+def test_the_declared_count_comes_from_a_sentence_not_a_fence_or_a_cell(
+        hub: dict, tmp_path: Path) -> None:
+    """Ticket 48 review R6. The count is located by a first-match-wins search, so before this it
+    could be set by a fenced example rather than by the sentence a reader reads. Measured against
+    the committed parser: a fenced `There are 2 rows below` above the real sentence gave 2, and
+    the record's own bold form `There are **5** rows below` gave None. A count inside a table cell
+    did NOT reproduce, because the cell came after the real sentence and the first match already
+    won; it is covered here anyway, because the ordering is an accident of the record."""
+    root = hub["root"]
+    real = "There is 1 row below."
+    row = "| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n"
+
+    def record(prose: str) -> None:
+        (root / "CONTEXT.md").write_text(
+            "# c\n\n" + bd.REFUSED_HEADING + "\n\n" + prose + "\n\n"
+            "| refused on a slide | say instead | refused by |\n| --- | --- | --- |\n" + row)
+
+    record("```\nThere are 2 rows below.\n```\n\n" + real)
+    assert bd._phrase_table(root)[2] == 1
+    record("There are **1** rows below.")
+    assert bd._phrase_table(root)[2] == 1
+    record(real)
+    (root / "CONTEXT.md").write_text(
+        (root / "CONTEXT.md").read_text().replace(
+            "| `deny is the bottom rung` |",
+            "| `deny is the bottom rung` (there are 3 rows below) |"))
+    assert bd._phrase_table(root)[2] == 1
+
+
 def test_a_hyphen_does_not_carry_a_refused_phrase_past_the_lint(hub: dict, tmp_path: Path) -> None:
     """Ticket 48 review F6. `deny-gate` is the same phrase as `deny gate` and is the next wrapper
     the refused phrase would plausibly wear after the asterisks flatten() was written for."""

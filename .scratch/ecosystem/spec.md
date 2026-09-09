@@ -174,7 +174,7 @@ scheduled truth run. Nothing is refused; everything is caged and priced.
 - Exclusions keyed on regime names and control ids. Attachment equals appetite. The adopter's composed artefact gains a signed exposure section. The insurer pins the platform and the exposure, runs the pricing under its own perspective on a clock, and publishes one quote feed per adopter. A human merges.
 
 ### The demo (ticket 47)
-- The deck is generated from gate captures. The live run id is the scheduled one. Seven steps from day one. A verify-demo script in the gate. The mp4 is a release asset, never the deliverable.
+- The deck is generated from gate captures. The live run id is the scheduled one. Seven steps from day one. A verify-demo script in the gate. The mp4 is to become a release asset, never the deliverable. (Corrected 2026-09-09: this read "is a release asset" and the hub has no releases and no tags, so nothing has been cut. Pre-dates ticket 48 and is the same false present tense its review found in three other places.)
 
 ## Testing Decisions
 

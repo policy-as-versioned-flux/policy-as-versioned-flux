@@ -267,8 +267,12 @@ capture's LAST LINE, which is the exact proxy decision 4b exists to replace. Wit
 `talk/captures/_grades.tsv` removed, the Monte Carlo aside rendered `status=FAIL` and
 `**observed false**` for a script that exited 0, and `--check` returned **0**. The same happened
 per-script when a present table simply had no row. The docstring said the fallback covered
-"every run up to and including 22"; only runs 181, 184 and 186 of the 51 recorded runs carry a
-table, so it was the normal case and not a legacy one. `python3 talk/build_deck.py --run 179`
+"every run up to and including 22", which was false. As of run 207 (2026-09-09) talk/truth.log
+records 57 numbered runs, 8 carry a table (181, 184, 186, 192, 194, 197, 200, 207), 46 verifiably
+do not, and 3 have a recording commit this checkout cannot reach. That count moves, and every
+scheduled run since 181 has carried a table, so it is dated here and nothing reads it. The reason
+the fix is right does not rest on it: a table can also lack a ROW for one script, and six of run
+186's own 120 captures do, so the fallback is reachable on a run that has a table. `python3 talk/build_deck.py --run 179`
 reproduced it without touching anything.
 
 A run that recorded no grade is now `UNGRADED`, which is a could-not-look and not a grade. It
@@ -317,6 +321,73 @@ Binding the third column to the entry it names is follow-on work. F8: `verify-de
 the committed deck with a rebuild by MARKERS, so a hand-edited sentence carrying no figure and no
 refused phrase survives; the review planted one and it passed. Both are the same shape of
 follow-on and neither is introduced here.
+
+## Review round 2 (2026-09-09)
+
+The round 1 fixes were written by the integrator, so they were reviewed as an unverified change
+by somebody else. That review reproduced every fix first-hand and could not defeat any of them:
+F1's three paths, F3 under a sixteen-case mutation battery, F6 on the real deck, and the four F5
+counts re-measured independently from the recording commits, all four matching. It confirmed
+`UNGRADED` never indexes the grade vocabulary, that a deck lying about an UNGRADED marker is red,
+that the figure check still runs on an UNGRADED slide, and that the scheduled-only downgrade
+cannot mask one. It also confirmed the rebase kept all 199 manifest lines, 198 of them identical
+to main, with ticket 108's paragraph intact and all seven waits patterns present. It returned
+**request changes on three record faults**, and it was right about all three.
+
+**R2, blocking, and the sharpest finding of the round: the commit that fixed a count that no run
+produced introduced a count that no run produced.** The round 1 census -- "51 recorded runs, only
+181, 184 and 186 carry a table, 48 of them return nothing" -- was measured before the branch was
+rebased and was 23 runs stale by the time it shipped, in five places including
+`talk/verify-manifest.txt`. Re-measured at the head with the module's own `run_commit()` and
+cross-checked against git: `talk/truth.log` records 57 numbered runs; 8 carry a table (181, 184,
+186, 192, 194, 197, 200, 207); 46 verifiably do not; 3 have a recording commit this checkout
+cannot reach. Worse than the arithmetic, the number was load-bearing: `verify-demo.sh` argued
+"that is the common case and not a legacy one" from it, and with every scheduled run since 181
+carrying a table that argument now runs the other way.
+
+All five sites are corrected and DATED, in the shape ticket 108's own manifest row uses. And the
+argument no longer rests on the count, because the durable half does not move: a table can lack a
+ROW for one script, and six of run 186's own 120 captures do, so the fallback is reachable on a
+run that HAS a table. Nothing in the code reads the number.
+
+**R1, major: the map line was corrected in this ticket's transcription of it and not in the map.**
+`.scratch/ecosystem/map.md` still stated the mp4 IS a hub release asset. It now carries the
+ticket's own corrected wording, and the two are byte-identical. Nothing compares a ticket's `Map
+line:` block with `map.md`, which is why the divergence went unnoticed; that is worth a check one
+day and is not built here. The reviewer also found the same false present tense in
+`.scratch/ecosystem/spec.md`, which pre-dates this ticket. It is corrected in the same pass with a
+dated note, because the hub has no releases and no tags and the sentence was untrue wherever it
+sat.
+
+**R3, major: F8 was disclosed in the ticket and not in the instrument.** A reader of a green meets
+the check, not the ticket. `verify-demo.sh` claimed to refuse a committed deck that "is not what a
+rebuild produces", its named-ceilings block had an entry for F7 and none for F8, and the PASS
+sentence the gate records said the deck "matches a rebuild". The comparison is by MARKERS. All
+three now say so, and the ceilings block carries the measured plant: a sentence about a regulator
+and a board, inserted into a slide, passes at exit 0 because it carries no figure and no refused
+phrase.
+
+**R4, minor.** The header still described the removed last-line fallback as live, two paragraphs
+above the paragraph that replaced it. Corrected.
+
+**R6, minor, fixed with a test.** The declared row count was located by a first-match-wins search
+over every line of the section, so a fenced example could set it. Measured against the committed
+parser: a fenced "There are 2 rows below" above the real sentence gave 2, and the record's own
+bold form gave nothing. Fenced blocks and table rows are now skipped and bold digits are read. A
+count inside a table cell did NOT reproduce as a fault, because that cell fell after the real
+sentence and the first match already won; it is covered by the test anyway, since the ordering is
+an accident of the record and not a rule.
+
+**R5 and R7 are recorded and not built.** R5: when a beat is UNGRADED, step 7's independently
+produced honesty table is not consulted, because the cross-read is gated on the status being a
+real grade. It costs a third reading at the moment the run's own grade is missing. The result is
+still exit 3 and never a false green, and step 7's own check carries any red itself. R7: the
+branch is no longer a fast-forward onto main, which has moved; it merges cleanly.
+
+The reviewer's own observation, worth keeping: two estate scripts carry a table grade of FAIL
+against a last line reading SKIP. Both are already among the gate's eight standing reds, so
+nothing is hidden, but it is a sharper illustration of why the last-line proxy had to go than this
+ticket gives.
 
 ## Waits on the owner
 

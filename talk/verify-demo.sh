@@ -29,8 +29,10 @@
 #     word gate is printed as a human review item and is not a failure: the
 #     truth surface keeps the name (ticket 03) and ADR-0011 keeps release gate;
 #   - the committed talk/deck.md is not the generated file, names no recorded
-#     run, or is not what a rebuild from the run it names produces (hand edited
-#     or stale) -- every check above is run over the committed file as well;
+#     run, or does not carry the same beat and aside MARKERS as a rebuild from
+#     the run it names -- every check above is run over the committed file as
+#     well. Markers, not bytes: that is weaker than "is what the rebuild
+#     produces" and the gap is a named ceiling below;
 #   - a section 4 step check exists on disk but this run wrote no capture for it;
 #   - a quoted TRUTH line is not the line that recorded the run the deck names.
 #
@@ -40,7 +42,8 @@
 #     figure check;
 #   - the grade comes from talk/captures/_grades.tsv, the per-script table the
 #     run itself wrote from the EXIT CODES it saw (ticket 59), and from the
-#     capture's last line only for a run recorded before that table existed.
+#     capture's last line NEVER -- see the paragraph below on a run that
+#     recorded no grade, which replaced that fallback (ticket 48 review F1).
 #     The two are compared whenever the last line carries a verdict of its own,
 #     and disagreement is a failure. The last line alone was the rule until
 #     ticket 48 and it is a proxy: 30 of run 184's 119 captures end on a line
@@ -51,9 +54,13 @@
 #     last line.
 #     A run that recorded NO grade for a script -- no table at all, or a table
 #     with no row for it -- is a COULD NOT LOOK named on the slide, never a
-#     grade read off the last line (ticket 48 review F1). Only runs 181, 184
-#     and 186 of the 51 recorded runs carry a table, so that is the common
-#     case and not a legacy one.
+#     grade read off the last line (ticket 48 review F1). Both halves matter,
+#     and the second is the durable one: six of run 186's own 120 captures
+#     have no row in that run's table, so a run that HAS a table still reaches
+#     this. As of run 207 (2026-09-09), 46 of the 57 runs talk/truth.log
+#     records carry no table at all, and every scheduled run since 181 has
+#     carried one -- so that count is moving and is dated here rather than
+#     stated as a standing fact. Nothing reads it.
 #     WHAT THE FIGURE RULE BINDS, and what it does not. A figure passes when
 #     the same run of digits appears anywhere in the slide's own capture. That
 #     is provenance -- this run printed this token -- and it is not meaning. A
@@ -66,6 +73,16 @@
 #     seven steps keep the stricter rule -- a step check on disk with no
 #     capture is a missing observation and red -- because those seven are what
 #     the estate promises and an aside is not;
+#   - WHAT THE COMMITTED-DECK COMPARISON BINDS (ticket 48 review F8). The
+#     committed deck is compared with a rebuild by MARKERS -- the `beat step=N
+#     status=X` and `aside name=Y status=Z` comments -- and not byte for byte,
+#     because the two `built HH:MMZ` stamps differ on every rebuild. So a
+#     sentence hand-edited into the committed deck survives if it carries no
+#     figure and no refused phrase. Measured: `Driftwood's cage was approved by
+#     the regulator and signed off by the board.` inserted into a slide passes
+#     this check at exit 0. What IS bound is every status, every figure against
+#     its own capture, the quoted TRUTH line and the refused vocabulary. A
+#     green here does not mean nobody wrote a sentence into the deck by hand;
 #   - build order: this script sorts before verify/e2e/ in the gate's glob, so
 #     inside a gate run the e2e captures the REBUILD reads are the ones on disk,
 #     which may be the previous run's. The rebuild is graded against the
@@ -212,4 +229,4 @@ newest="$(grep '^TRUTH ' talk/truth.log | grep -o 'run=[0-9]*' | tail -1)"; newe
 if [ -n "$newest" ] && [ "$newest" != "$named" ]; then
   echo "  note: the newest recorded run is $newest and the committed deck describes run $named; run python3 talk/build_deck.py and commit it to move the deck on (not a failure)"
 fi
-echo "PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck.md is the generated file describing recorded run $named, matches a rebuild from that run's committed captures, and survives the figure, status, headline and phrase checks against that run: its seven beats are the section 4 steps in order carrying run $named's own grades as run $named's own _grades.tsv recorded them, its asides each carry that run's grade for the script each names and were all read from a capture that run wrote, every figure on a beat or an aside is a figure in that slide's capture and no figure sits on a slide with no capture behind it, its quoted TRUTH line is the line that recorded run $named, and no phrase CONTEXT.md's refused-vocabulary table names appears anywhere in it"
+echo "PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck.md is the generated file describing recorded run $named, carries the same beat and aside markers as a rebuild from that run's committed captures, and survives the figure, status, headline and phrase checks against that run: its seven beats are the section 4 steps in order carrying run $named's own grades as run $named's own _grades.tsv recorded them, its asides each carry that run's grade for the script each names and were all read from a capture that run wrote, every figure on a beat or an aside is a figure in that slide's capture and no figure sits on a slide with no capture behind it, its quoted TRUTH line is the line that recorded run $named, and no phrase CONTEXT.md's refused-vocabulary table names appears anywhere in it"
