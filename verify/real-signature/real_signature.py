@@ -12,16 +12,21 @@ THE SENTENCE GRADED HERE. Every adopter's own gate, run the way its own shift-le
 ACCEPTS platform's real published evidence for a version arriving in its window, and REFUSES the
 same evidence when one byte of the publisher's own signature is changed.
 
-Both halves matter and neither alone is enough. A gate that refuses everything passes the second
-half and fails the first -- which is exactly what ludlow did. A gate that accepts everything
-passes the first and fails the second, and would adopt a forged bump.
+THREE legs since 2026-09-09 (review F2), and no one of them is enough. A gate that refuses
+everything passes the refuse leg and fails the accept leg -- which is exactly what ludlow did. A
+gate that accepts everything passes the accept leg and would adopt a forged bump. And a gate that
+does both correctly can still bind the signature to the WRONG BYTES: every adopter gate now
+re-encodes the legacy bundle platform publishes and computes the artefact's own sha256 itself, so
+the third leg hands it the publisher's REAL, untouched signature over a CHANGED document. An
+observation missing a leg is a could-not-look, never a pass.
 
 WHAT IS SERVED AND WHAT REACHES IT.
 
   served artefact   platform's own committed computed-semver/evidence/<version>.json[.bundle] at
                     a real tag, read out of a real clone. Nothing is signed here and no bundle,
-                    certificate or signature is fabricated: the REFUSE half changes one byte of a
-                    real signature, which is a corruption of the served artefact, not a fixture.
+                    certificate or signature is fabricated: the REFUSE leg changes one byte of a
+                    real signature and the ARTEFACT leg appends one byte to the real document --
+                    both corrupt the served artefact rather than fabricating a fixture.
   operation         each adopter's own committed gate script, invoked through the flags its own
                     .github/workflows/shift-left.yml spells, under the identity constant that
                     repository itself holds. Read out of the workflow by
@@ -32,13 +37,16 @@ WHAT IS SERVED AND WHAT REACHES IT.
 Only the MOVEMENT is planted (which versions the adopter's composed window names before and
 after), because that is the thing a Renovate pull request changes.
 
-ALSO REPORTED, NEVER GRADED: how offline each adopter's signature check is. ludlow pins its
-Sigstore trust material and verifies with a cold TUF cache and no egress; driftwood and tuppence
-pass cosign no trust root, so they fetch a trust root from Sigstore's TUF CDN on every CI run,
-which is cold every time. That is a real difference between the three and it is printed as an
-exit code per adopter rather than written down as a sentence -- eco-system ticket 101's own lesson
-is that a sentence about what a check cannot do goes stale and nothing re-reads it. Closing the
-difference is ticket 105.
+ALSO REPORTED, NEVER GRADED: how offline each adopter's signature check is. Until ticket 105
+(2026-09-09) ludlow pinned its Sigstore trust material and verified with a cold TUF cache and no
+egress while driftwood and tuppence passed cosign no trust root and fetched one from Sigstore's
+TUF CDN on every CI run, which is cold every time; every adopter now pins. The number is still
+printed as an exit code per adopter rather than written down as a sentence -- eco-system ticket
+101's own lesson is that a sentence about what a check cannot do goes stale and nothing re-reads
+it -- and the WORDS beside the number are derived from the gate's own output (R2-1): "fetches a
+trust root" is said only when the output shows a TUF fetch or a refused connection, never from a
+non-zero exit alone, because a pinned gate refusing a wrong pin returns exit 1 too, with no network in
+the story.
 
 Usage:
     real_signature.py <estate-dir>
@@ -49,6 +57,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -101,6 +110,37 @@ def tamper_signature(bundle_text: str) -> str:
     return json.dumps(doc)
 
 
+def tamper_artefact(evidence_text: str) -> str:
+    """The same real evidence DOCUMENT with one byte appended (review F2, 2026-09-09).
+
+    One byte, and deliberately a byte that changes NOTHING a gate reads: the document still parses
+    to the identical object, `outcome.result` and `declared` are untouched, so every content check
+    every gate makes still passes and the only thing left that can refuse it is the sha256 the
+    publisher's signature covers.
+
+    That is the leg this check did not have. All three gates now hand cosign a bundle in which the
+    artefact's digest is COMPUTED locally -- `messageDigest` in the re-encoded Sigstore bundle --
+    and a check that only ever corrupts the SIGNATURE never asks whether that computation can
+    launder a changed artefact. Ticket 101's own lesson is that a property which is true and
+    unmeasured is the one that stays broken.
+
+    Raises ValueError on a document this cannot corrupt, for the same reason tamper_signature does:
+    a tamper that changed nothing would make this half a third accept, and it would pass."""
+    if not evidence_text:
+        raise ValueError("the evidence document is empty, so there is nothing to corrupt")
+    try:
+        before = json.loads(evidence_text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"the evidence document is not readable JSON ({exc})") from exc
+    after_text = evidence_text + " "
+    if after_text == evidence_text:
+        raise ValueError("appending a byte changed nothing")
+    if json.loads(after_text) != before:
+        raise ValueError("appending a byte changed the document's own content, which would let a "
+                         "gate refuse it on content rather than on the digest")
+    return after_text
+
+
 def grade(observations: dict[str, dict]) -> tuple[str, list[tuple[str, str]]]:
     """observations: unit -> {"accept": result|None, "refuse": result|None, "reason": str,
     "version": str}, where a result is fold_agreement.run_gate's own dict.
@@ -141,14 +181,44 @@ def grade(observations: dict[str, dict]) -> tuple[str, list[tuple[str, str]]]:
         else:
             lines.append(("ok", f"{unit}: the same bundle with one signature byte changed was "
                                  f"refused, naming the signature -- {refuse['output'][:120]}"))
+
+        # F2: the artefact leg. Absent from `obs` only on an estate whose platform document could
+        # not be corrupted, which is reported as a could-not-look by the caller, never skipped here.
+        artefact = obs.get("artefact")
+        if artefact is None:
+            unknown += 1
+            lines.append(("SKIP", f"{unit}: the artefact half could not be observed, so nothing was "
+                                   f"observed about whether the digest this gate computes is "
+                                   f"load-bearing: {obs.get('artefact_reason', '')}"))
+        elif artefact["verdict"] != "refuse":
+            bad += 1
+            lines.append(("FAIL", f"{unit}'s gate ADOPTED platform's real signature over a CHANGED "
+                                   f"evidence document (exit {artefact['exit']}) -- the digest it "
+                                   f"computes for that document is not load-bearing, so a changed "
+                                   f"artefact passes under a genuine signature"))
+        elif ("cosign" not in artefact["output"].lower()
+              and "signature" not in artefact["output"].lower()
+              and "digest" not in artefact["output"].lower()):
+            bad += 1
+            lines.append(("FAIL", f"{unit}'s gate refused the changed evidence document, but for a "
+                                   f"reason that names neither cosign nor the signature nor a digest "
+                                   f"-- a refusal about something else is not evidence that the "
+                                   f"artefact was bound to the signature: {artefact['output']}"))
+        else:
+            lines.append(("ok", f"{unit}: the same evidence document with one byte appended -- it "
+                                 f"parses identically and every field the gate reads is unchanged -- "
+                                 f"was refused, naming the digest or the signature -- "
+                                 f"{artefact['output'][:120]}"))
     if bad:
         return "FAIL", lines + [("FAIL", f"{bad} half-check(s) observed false: an adopter gate that "
-                                          f"did not verify platform's real published signature, or "
-                                          f"did not refuse a corrupted one -- each named above")]
+                                          f"did not verify platform's real published signature, did "
+                                          f"not refuse a corrupted one, or did not refuse a changed "
+                                          f"artefact under a genuine one -- each named above")]
     if unknown and not lines:
         return "SKIP", lines
     if unknown:
-        return "SKIP", lines + [("SKIP", f"{unknown} adopter gate(s) could not be invoked, so the "
+        return "SKIP", lines + [("SKIP", f"{unknown} leg(s) could not be looked at -- a gate that could "
+                                          f"not be invoked, or a leg that could not be planted -- so the "
                                           f"estate has not been observed whole")]
     return "PASS", lines
 
@@ -201,8 +271,37 @@ def COLD_ENV(home: Path, tuf: Path) -> dict[str, str]:
             "NO_PROXY": "", "no_proxy": ""}
 
 
+# `tuf: ` carries the colon on purpose (review F1, 2026-09-09). The bare substring `tuf` also
+# matches every gate's own absent-root refusal -- each ends "...letting cosign fetch a live TUF
+# root" or "...fall back to a live TUF fetch" -- so a gate that made no network call was
+# reported as one that fetches a root on every run, which is the sentence R2-1 exists to
+# remove. The colon is the needle the three adopter harnesses already grep for, and it still
+# matches the real contrast, `tuf: failed to download 13.root.json`. Graded in the selfcheck
+# against the three gates' real refusal strings, not against a synthetic one.
+NETWORK = re.compile(r"tuf: |dial tcp|connection refused", re.IGNORECASE)
+
+
+def offline_note(unit: str, exit_code: int | None, output: str) -> str:
+    """The sentence beside the number, derived from the gate's own output. Until ticket 105 a
+    non-zero exit alone was worded as "fetches a Sigstore trust root" (ticket 101 review, R2-1),
+    which is true of a gate with no pin and false of a gate refusing a wrong one."""
+    if exit_code is None:
+        return f"{unit}: the offline measurement could not be taken -- its gate could not be invoked at all"
+    if exit_code == 0:
+        return (f"{unit}: its own gate verifies platform's real published bundle with a cold TUF cache and "
+                f"every proxy pointed at a closed port -- exit 0, no network needed")
+    tail = (output.strip().splitlines() or [""])[-1][:160]
+    if NETWORK.search(output):
+        return (f"{unit}: its own gate cannot verify platform's real published bundle with a cold TUF cache "
+                f"and egress blocked -- exit {exit_code}, and its output shows the fetch ({tail}), so this "
+                f"repository's signature check fetches a Sigstore trust root on every CI run, which is cold "
+                f"every time (eco-system ticket 105)")
+    return (f"{unit}: its own gate refuses with a cold TUF cache and egress blocked -- exit {exit_code}, for a reason "
+            f"that is not the network -- its output names no TUF fetch and no refused connection: {tail}")
+
+
 def offline_exit(fold, unit: str, unit_dir: Path, planted: dict, platform_dir: Path,
-                 adopter_repo: Path, workdir: Path) -> int | None:
+                 adopter_repo: Path, workdir: Path) -> tuple[int | None, str]:
     """The number this check reports and does not grade: what THIS adopter's OWN gate, invoked
     exactly the way its own workflow invokes it, does against platform's real published evidence
     with a cold TUF cache and every proxy pointed at a closed port.
@@ -230,7 +329,7 @@ def offline_exit(fold, unit: str, unit_dir: Path, planted: dict, platform_dir: P
                 os.environ.pop(key, None)
             else:
                 os.environ[key] = was
-    return None if result is None else result["exit"]
+    return (None, "") if result is None else (result["exit"], result["output"])
 
 
 SHA = 40
@@ -343,12 +442,41 @@ def _observe(estate: Path, fold, units: list[str], platform_src: Path,
                              f"real signature changed ({corrupt_commit[:12]}) -- nothing else moved, "
                              f"so a gate that adopts it adopted an unverified signature"))
 
+        # F2, 2026-09-09: the third estate. The publisher's REAL, untouched signature over a
+        # CHANGED document. Every gate now computes the artefact's own sha256 itself (the
+        # re-encoded bundle's messageDigest), and a check that only ever corrupts the signature
+        # never asks whether that computation can launder a changed artefact.
+        changed = root / "platform-artefact"
+        _clone(platform_src, changed)
+        fold._git(changed, "checkout", "--quiet", HEAD_TAG)
+        doc = changed / "computed-semver" / "evidence" / f"{version}.json"
+        artefact_reason = ""
+        try:
+            doc.write_text(tamper_artefact(doc.read_text()))
+            artefact_commit = fold._commit(changed, "one byte appended to the publisher's evidence")
+            fold._git(changed, "tag", "-f", HEAD_TAG)
+            artefact_tags: dict | None = dict(tag_commits, **{HEAD_TAG: artefact_commit})
+            lines.append(("ok", f"the same tag re-cut with ONE BYTE APPENDED to policy {version}'s "
+                                 f"evidence document ({artefact_commit[:12]}) -- it parses to the "
+                                 f"identical object and platform's own signature is untouched, so "
+                                 f"the only thing that can refuse it is the digest that signature "
+                                 f"covers"))
+        except (ValueError, json.JSONDecodeError, OSError) as exc:
+            artefact_tags = None
+            artefact_reason = (f"platform's published evidence document for {version} could not be "
+                                f"corrupted ({exc}), so the artefact half could not be planted")
+            lines.append(("SKIP", artefact_reason))
+
         for unit in units:
             print(f"... {unit}", file=sys.stderr, flush=True)
             unit_dir = estate / unit
             obs: dict = {"version": version, "reason": ""}
-            for half, platform_dir, tags in (("accept", clean, tag_commits),
-                                             ("refuse", corrupt, corrupt_tags)):
+            halves = [("accept", clean, tag_commits), ("refuse", corrupt, corrupt_tags)]
+            if artefact_tags is not None:
+                halves.append(("artefact", changed, artefact_tags))
+            else:
+                obs["artefact"], obs["artefact_reason"] = None, artefact_reason
+            for half, platform_dir, tags in halves:
                 workdir = root / f"{unit}-{half}"
                 workdir.mkdir(parents=True, exist_ok=True)
                 planted = fold.plant(workdir / "adopter", ([STANDING], [STANDING, version],
@@ -368,22 +496,10 @@ def _observe(estate: Path, fold, units: list[str], platform_src: Path,
             cold_dir.mkdir(parents=True, exist_ok=True)
             cold_planted = fold.plant(cold_dir / "adopter", ([STANDING], [STANDING, version],
                                                              BASE_TAG, HEAD_TAG), tag_commits)
-            cold = (None if _planted_or_none(cold_planted) is not None
-                    else offline_exit(fold, unit, unit_dir, cold_planted, clean,
-                                      cold_dir / "adopter", cold_dir))
-            if cold is None:
-                lines.append(("note", f"{unit}: the offline measurement could not be taken -- its "
-                                       f"gate could not be invoked at all"))
-            elif cold == 0:
-                lines.append(("note", f"{unit}: its own gate verifies platform's real published "
-                                       f"bundle with a cold TUF cache and every proxy pointed at a "
-                                       f"closed port -- exit 0, no network needed"))
-            else:
-                lines.append(("note", f"{unit}: its own gate cannot verify platform's real published "
-                                       f"bundle with a cold TUF cache and egress blocked -- exit "
-                                       f"{cold}, so this repository's signature check fetches a "
-                                       f"Sigstore trust root on every CI run, which is cold every "
-                                       f"time (eco-system ticket 105)"))
+            cold, cold_output = ((None, "") if _planted_or_none(cold_planted) is not None
+                                 else offline_exit(fold, unit, unit_dir, cold_planted, clean,
+                                                   cold_dir / "adopter", cold_dir))
+            lines.append(("note", offline_note(unit, cold, cold_output)))
 
     verdict, graded = grade(observations)
     return verdict, lines + graded
@@ -421,17 +537,19 @@ def selfcheck() -> int:
     refuse_flag: dict = {"verdict": "refuse", "composed": None, "exit": 1, "argv": [],
                          "output": "Error: --trusted-root only supported with --new-bundle-format"}
 
-    verdict, lines = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_sig}})
-    check("a gate that accepts the real signature and refuses the corrupted one passes", verdict, "PASS")
+    verdict, lines = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_sig,
+                                  "artefact": refuse_sig}})
+    check("a gate that accepts the real signature and refuses both corruptions passes", verdict, "PASS")
 
     # The exact shape ludlow shipped: it refused BOTH halves. A check that graded only the refuse
     # half would have called that a pass, which is how the defect survived.
-    verdict, lines = grade({"ludlow": {"version": "1.0.0", "accept": refuse_flag, "refuse": refuse_flag}})
+    verdict, lines = grade({"ludlow": {"version": "1.0.0", "accept": refuse_flag, "refuse": refuse_flag,
+                                       "artefact": refuse_flag}})
     check("a gate that refuses the real signature too is false", verdict, "FAIL")
     check("and it is named", any("ludlow" in text and "did NOT accept" in text
                                  for level, text in lines if level == "FAIL"), True)
 
-    verdict, lines = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": adopt}})
+    verdict, lines = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": adopt, "artefact": refuse_sig}})
     check("a gate that adopts a corrupted signature is false", verdict, "FAIL")
     check("and it is named as adopting the tampered evidence",
           any("ADOPTED the same evidence" in text for level, text in lines if level == "FAIL"), True)
@@ -439,16 +557,85 @@ def selfcheck() -> int:
     # A refusal about something other than the signature is not evidence the signature was read.
     refuse_pin: dict = {"verdict": "refuse", "composed": None, "exit": 1, "argv": [],
                         "output": "platform tag resolves to a different commit than the pin names"}
-    verdict, _ = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_pin}})
+    verdict, _ = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_pin,
+                                  "artefact": refuse_sig}})
     check("a refusal that names neither cosign nor the signature is false", verdict, "FAIL")
 
     verdict, lines = grade({"a": {"version": "1.0.0", "accept": None, "refuse": None,
                                    "reason": "no gate script"}})
     check("a gate that could not be invoked is a could-not-look, never a pass", verdict, "SKIP")
 
-    verdict, _ = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_sig},
+    verdict, _ = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_sig,
+                              "artefact": refuse_sig},
                         "b": {"version": "1.0.0", "accept": None, "refuse": None, "reason": "x"}})
     check("one unknown among the observed is still a could-not-look for the estate", verdict, "SKIP")
+
+    # F2, 2026-09-09: the artefact leg. Every gate now computes the served document's own sha256
+    # itself, and until today nothing in this estate asked whether that computation can launder a
+    # changed artefact -- all three harnesses and both halves here corrupt the SIGNATURE.
+    check("appending a byte changes the bytes", tamper_artefact('{"a": 1}\n'), '{"a": 1}\n ')
+    check("and leaves the document parsing identically",
+          json.loads(tamper_artefact('{"a": 1}\n')), {"a": 1})
+    for bad_doc, why in (("", "an empty document"), ("{not json", "an unreadable document")):
+        try:
+            tamper_artefact(bad_doc)
+            failures.append(f"tamper_artefact accepted {why} -- the artefact half would then be a "
+                            f"third accept and would pass")
+        except ValueError:
+            pass
+
+    refuse_digest: dict = {"verdict": "refuse", "composed": None, "exit": 1, "argv": [],
+                           "output": "cosign verify-blob refused: transparency log hashedrekord entry "
+                                     "digest abc does not match artifact def"}
+    verdict, lines = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_sig,
+                                  "artefact": adopt}})
+    check("a gate that adopts a CHANGED ARTEFACT under a genuine signature is false", verdict, "FAIL")
+    check("and it is named as the digest not being load-bearing",
+          any("digest it computes for that document is not load-bearing" in text
+              for level, text in lines if level == "FAIL"), True)
+    verdict, _ = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_sig,
+                              "artefact": refuse_pin}})
+    check("an artefact refusal naming neither cosign nor a signature nor a digest is false",
+          verdict, "FAIL")
+    verdict, _ = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_sig,
+                              "artefact": refuse_digest}})
+    check("an artefact refusal naming the digest passes", verdict, "PASS")
+    verdict, lines = grade({"a": {"version": "1.0.0", "accept": adopt, "refuse": refuse_sig}})
+    check("an observation carrying no artefact leg at all is a could-not-look, never a pass",
+          verdict, "SKIP")
+    check("and it says what was not observed",
+          any("digest this gate computes is" in text for level, text in lines if level == "SKIP"), True)
+
+    # R2-1 round 2 (review F1, 2026-09-09). The first fix's needle was the bare substring `tuf`,
+    # and EVERY gate's absent-root refusal ends "...letting cosign fetch a live TUF root" / "...fall
+    # back to a live TUF fetch". So a gate that made no network call at all was reported as one that
+    # "fetches a Sigstore trust root on every CI run" -- the exact false sentence R2-1 removed, now
+    # produced by the wording of the refusal that proves the opposite. The needle is `tuf: `, with
+    # the colon, which is what the three harnesses already grep for. These are the REAL refusals,
+    # copied from the three gates, so the regex is graded against what the estate actually prints.
+    for unit, refusal in (
+        ("driftwood", "REFUSED: no committed Sigstore trust root at /r/.github/scripts/trusted_root.json "
+                      "to verify evidence for 2.0.1 against -- refusing rather than letting cosign fetch "
+                      "a live TUF root"),
+        ("tuppence", "REFUSED: no committed Sigstore trust root at /r/.github/scripts/trusted_root.json to "
+                     "verify policy version 2.0.1 evidence against -- refusing rather than letting cosign "
+                     "fetch a live TUF root"),
+        ("ludlow", "REFUSE: policy 2.0.1: no committed Sigstore trust root at /r/.github/scripts/"
+                   "trusted_root.json -- refusing rather than letting cosign fall back to a live TUF fetch"),
+    ):
+        note = offline_note(unit, 1, refusal)
+        check(f"{unit}'s own absent-root refusal is not reported as a network fetch",
+              "fetches a Sigstore trust root" in note, False)
+        check(f"and {unit} is reported as refusing for a reason that is not the network",
+              "for a reason that is not the network" in note, True)
+    # ...while the real contrast, the one thing the sentence exists to describe, still matches.
+    real_fetch = ("Error: setting up clients and keys: getting rekor public keys: updating local metadata "
+                  "and targets: error updating to TUF remote mirror: tuf: failed to download 13.root.json: "
+                  'Get "https://tuf-repo-cdn.sigstore.dev/13.root.json": proxyconnect tcp: dial tcp '
+                  "127.0.0.1:1: connect: connection refused")
+    check("a real TUF fetch is still reported as one",
+          "fetches a Sigstore trust root" in offline_note("a", 1, real_fetch), True)
+    check("a gate that verifies offline says so", "no network needed" in offline_note("a", 0, ""), True)
 
     # F2: the cold environment must CLEAR NO_PROXY, not merely set the proxies. An ambient
     # NO_PROXY=* makes Go bypass the closed port, and the number this check prints then lies in
@@ -467,7 +654,10 @@ def selfcheck() -> int:
           "setting the proxies, the tamper touches exactly one signature and "
           "refuses a shape it cannot corrupt, a gate that refuses the real signature is false, a "
           "gate that adopts a corrupted one is false, a refusal naming neither cosign nor the "
-          "signature is false, and a gate that could not be invoked is a could-not-look")
+          "signature is false, a gate that adopts a CHANGED ARTEFACT under a genuine signature is "
+          "false and an observation carrying no artefact leg is a could-not-look, the offline note "
+          "says 'fetches a trust root' only for a real TUF fetch and not for a gate's own absent-root "
+          "refusal, and a gate that could not be invoked is a could-not-look")
     return 0
 
 
@@ -490,8 +680,9 @@ def main(argv: list[str]) -> int:
         print(f"{level}: {text}")
     if verdict == "PASS":
         print(f"SUMMARY: every adopter gate in this estate accepted platform's own published "
-              f"signature and refused the same evidence with one byte of it changed, each through "
-              f"its own workflow's own invocation and its own identity constant")
+              f"signature, refused the same evidence with one byte of that signature changed, and "
+              f"refused that untouched signature over an evidence document with one byte appended "
+              f"-- each through its own workflow's own invocation and its own identity constant")
         return 0
     return 3 if verdict == "SKIP" else 1
 

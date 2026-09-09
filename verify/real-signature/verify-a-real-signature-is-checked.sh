@@ -2,8 +2,12 @@
 # Eco-system ticket 101. Does every adopter gate really check a real signature?
 #
 # THE SENTENCE GRADED. Every adopter's own gate, run the way its own shift-left.yml runs it,
-# ACCEPTS platform's real published evidence for a version arriving in its window, and REFUSES the
-# same evidence when one byte of the publisher's own signature is changed.
+# ACCEPTS platform's real published evidence for a version arriving in its window, REFUSES the
+# same evidence when one byte of the publisher's own signature is changed, and REFUSES platform's
+# real, untouched signature over a document with one byte appended (the third leg, added at review
+# 2026-09-09: every gate now computes the artefact's own sha256 itself when it re-encodes the
+# legacy bundle, and nothing asked whether that computation can launder a changed artefact). An
+# adopter missing a leg is a could-not-look, never a pass.
 #
 # WHY BOTH HALVES. On 2026-09-05 ticket 99's fold-agreement check found that ludlow's gate could
 # not verify ANY bundle platform publishes: it passed --trusted-root with --new-bundle-format=true
@@ -24,15 +28,19 @@
 # holds -- read out of the workflow by verify/fold-agreement/fold_agreement.py, whose argument
 # whitelist this reuses rather than re-deriving. Only the MOVEMENT is planted (which versions the
 # adopter's composed window names before and after), because that is what a Renovate pull request
-# changes. Nothing is signed here: the REFUSE half changes one byte of a real signature, which
-# corrupts the served artefact rather than fabricating a fixture.
+# changes. Nothing is signed here: the REFUSE leg changes one byte of a real signature and the
+# ARTEFACT leg appends one byte to the real evidence document -- which parses to the identical
+# object, so every content check every gate makes still passes and only the digest can refuse it.
+# Both corrupt the served artefact rather than fabricating a fixture.
 #
 # ALSO PRINTED, NEVER GRADED: how offline each adopter's signature check is, as an exit code per
-# adopter. ludlow pins its Sigstore trust material and verifies with a cold TUF cache and blocked
-# egress; driftwood and tuppence pass cosign no trust root and fetch one from Sigstore's TUF CDN,
-# which a CI runner does on every run because it is cold every time. That difference is printed as
-# a number rather than written down as a sentence, because this ticket's own lesson is that a
-# sentence about what a check cannot do goes stale and nothing re-reads it. Closing it is ticket 105.
+# adopter. Until ticket 105 (2026-09-09) ludlow pinned its Sigstore trust material and verified with
+# a cold TUF cache and blocked egress while driftwood and tuppence passed cosign no trust root and
+# fetched one from Sigstore's TUF CDN on every CI run; every adopter now pins, and all three print
+# 0. It stays a number rather than a sentence, because this ticket's own lesson is that a sentence
+# about what a check cannot do goes stale and nothing re-reads it -- and the words beside a
+# non-zero number are derived from the gate's own output (a TUF fetch or a refused connection),
+# never from the exit code alone (review R2-1): a pinned gate refusing a wrong pin returns exit 1 too.
 #
 # Exit 0 observed true; 1 observed false; 3 could not look, reason on the last line.
 set -uo pipefail

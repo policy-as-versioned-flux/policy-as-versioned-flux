@@ -1,7 +1,7 @@
 # 105 — Two adopter gates fetch their trust root over the network on every CI run
 
 Type: task (AFK)
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -108,3 +108,401 @@ ludlow can go red on a day nothing is wrong with the signature.
 Charted 2026-09-06 from ticket 101's build. The finding is ticket 101's, not this ticket's: it is
 recorded here because a finding that points at no ticket anyone can pick up is not reported, it is
 mentioned.
+
+## Answer
+
+Built 2026-09-09. All three adopter gates now verify platform's real published evidence with a
+cold TUF cache, an empty `TUF_ROOT` and every proxy pointed at a closed port, and the four
+measurements ticket 101 left printing `1` print `0`. The three things the ticket said had to be
+decided are decided below, each labelled, and one of them dissolved rather than being answered:
+the door ludlow's ticket-101 pin used is the reason per-SCT key selection was needed at all.
+
+### Decision 1 — three committed roots, one per institution, and each institution refreshes its own (`delegated`, ADR-0025)
+
+Each adopter commits its own `.github/scripts/trusted_root.json`. Today all three files are
+byte-identical (`sha256 6494e21ea73f…`) and nothing enforces that they stay so.
+
+**Why not one platform-served root.** NORTH-STAR §2: the publisher sets nothing inside an
+adopter's repository. A root served by platform would make the party being checked the supplier of
+the ruler it is checked by, which is the sentence ADR-0011 exists to prevent and which every one
+of these gates already refuses to do for the IDENTITY constant. Trust material is the same kind of
+thing as an identity constant, and it gets the same treatment.
+
+**Why not one shared file in the hub.** The hub is not in any adopter's dependency path at
+verification time; a gate that reached out of its own repository for its trust root would be
+fetching a root over a network again, with a different CDN.
+
+**What that costs, said plainly.** Three copies of a pin that must be refreshed together, and
+nothing enforces agreement. That is deliberate: during a Sigstore rotation one institution
+refreshes before the others, and a check that graded byte-agreement would go red on a transient
+and teach readers to ignore it. So agreement is PRINTED as a fact
+(`the 3 adopters' committed roots are byte-identical (sha256 6494e21ea73f)`) and what is GRADED is
+the thing that cannot go stale in the reassuring direction — decision 3.
+
+**Who refreshes.** The adopter's own maintainers, by pull request: `cosign initialize`, then copy
+`$HOME/.sigstore/root/*/targets/trusted_root.json` over the committed file. The instruction is in
+each gate's own ticket-105 block, next to the code that reads it, not in a document somewhere
+else. Nobody is told when it is due by a green line; they are told by the dates decision 3 prints.
+
+### Decision 2 — per-SCT key selection is not built, because the door it was needed for is gone (`delegated`)
+
+The ticket asked whether to select a certificate-transparency key per SCT, since ticket 101's
+review measured that cosign errors on the FIRST embedded SCT whose log the pin does not carry, so
+a two-SCT Fulcio certificate is unverifiable under a single-key pin.
+
+**That is a property of the LEGACY verification path, not of pinning.** ludlow's ticket-101 pin
+fed `SIGSTORE_ROOT_FILE` / `SIGSTORE_REKOR_PUBLIC_KEY` / `SIGSTORE_CT_LOG_PUBLIC_KEY_FILE`,
+because cosign v3.1.3 refuses `--trusted-root` for the legacy bundle shape platform publishes.
+Those variables take ONE key per role and cosign demands a key for every SCT it finds. So this
+build took the other door instead: **a legacy bundle is re-encoded, locally, into the v0.1
+Sigstore bundle `--trusted-root` reads**, and the whole committed root verifies it.
+
+Nothing is signed and nothing is trusted that the served bundle does not carry: the certificate,
+the signature, the Rekor entry body, its log id, its log index, its integrated time and its signed
+entry timestamp are copied across, and **the only computed field is the artefact's own sha256** —
+which cosign checks against the artefact it is handed anyway. A re-encoding that is wrong is a
+refusal, never an acceptance; the selfcheck grades the mapping field by field on bytes it lays
+down itself, and a legacy bundle missing any of those fields refuses by name before cosign is
+called. The DER parsing and per-role key selection ludlow carried are **deleted**.
+
+What that buys, each measured on this build rather than argued:
+
+| ticket 101's measured cost of the pin | on the `--trusted-root` door |
+|---|---|
+| cosign demands a key for EVERY embedded SCT, so a two-log certificate is unverifiable | sigstore-go applies a THRESHOLD: `only able to verify 0 SCT entries; unable to meet threshold of 1` is what the wrong-CT-key attack prints on every harness run — a threshold of one, not a key per SCT |
+| the env-var path honours no `validFor` window, so the retired 2021–22 CT key is as live as the current one | windows are honoured: the `ct-window-closed` attack (the current CT key given an `end` before the artefact was signed) REFUSES on all three, cold and warm |
+| the root's second transparency-log key is not ECDSA, so a Rekor v2 bundle would be refused for a KEY-TYPE reason | that refusal lived on the legacy door and is gone with it; the root's `PKIX_ED25519` key loads |
+
+The third row matters beyond itself: ticket 101 called it **"the strongest argument for remedy 2
+sooner rather than later"**. That argument no longer exists, which is why decision 4 weighs remedy
+2 lower than ticket 101 did.
+
+### Decision 3 — the staleness report is graded on the served artefact, not on a date (`delegated`)
+
+`verify/trust-root/verify-the-committed-trust-root-is-dated.sh` (+ `trust_root.py`, manifest row,
+`tests/test_trust_root.py`, 15 cases).
+
+**PRINTED, never graded**, per adopter: the committed root's sha256, the date it was committed and
+how many days ago, the date its newest log key starts and how many days ago, and every key's
+validity window against today as `current since <date> (<n> days)` / `retired <date> (<n> days
+ago)` / `not yet valid (starts <date>, in <n> days)`. Today, all three adopters:
+
+    committed trust root sha256 6494e21ea73f, committed 2026-09-09 (0 days ago)   [ludlow: 2026-08-24 (15 days ago)]
+    newest log key starts 2025-09-23 (351 days ago); pins platform v2.0.1
+      tlog  https://rekor.sigstore.dev       key c0d23d6ad406973f PKIX_ECDSA_P256_SHA_256: current since 2021-01-12 (2065 days)
+      tlog  https://log2025-1.rekor.sigstore.dev key cf1199155bddd051 PKIX_ED25519:        current since 2025-09-23 (351 days)
+      ctlog https://ctfe.sigstore.dev/test   key 086092f02852ff68 PKIX_ECDSA_P256_SHA_256: retired 2022-10-31 (1408 days ago)
+      ctlog https://ctfe.sigstore.dev/2022   key dd3d306ac6c71132 PKIX_ECDSA_P256_SHA_256: current since 2022-10-20 (1420 days)
+      ca    https://fulcio.sigstore.dev: retired 2022-12-31 (1347 days ago)
+      ca    https://fulcio.sigstore.dev: current since 2022-04-13 (1609 days)
+    the 3 adopters' committed roots are byte-identical (sha256 6494e21ea73f)
+
+**No sentence of the form "the root is fresh" is printed**, because that sentence goes stale the
+day it is written — this ticket's parent lesson.
+
+**GRADED, because it cannot go stale in the reassuring direction:** every log the SERVED artefact
+names is carried by THAT adopter's committed root, by key id, with the artefact's own timestamp
+inside that key's `validFor` window. The served artefact is platform's own committed
+`computed-semver/evidence/<version>.json.bundle` at the tag THAT ADOPTER pins, read with
+`git show` at the tag; the logs are the SCT log ids and timestamps out of the Fulcio certificate's
+own DER and the Rekor log id and integrated time out of the bundle's own `rekorBundle`. The
+operation is the adopter's committed root at HEAD, read with `git show`. The day this is false the
+adopter's gate refuses by name, so **this line is red before a Renovate pull request is**. A root
+that is absent, an adopter that pins no tag, a tag this platform clone lacks, or a bundle that
+cannot be read is a could-not-look BY NAME, never a pass.
+
+Today it grades 8 log names per adopter, 24 in all, all carried, all inside window.
+
+### Decision 4 — remedy 2 stays the follow-on, and it is worth less than ticket 101 thought (`delegated`)
+
+Remedy 2 is platform re-signing its evidence in the new bundle format. It still waits on the
+owner: a tag is cut only by `cut-release.yml` and dispatched only by the owner, and nothing here
+fakes one.
+
+**What it would remove:** `sigstore_bundle()` and its selfcheck in three gates — about 45 lines
+each — for tags cut after it lands.
+
+**What it would NOT remove, which is the part ticket 101 did not have to weigh:** the pin itself,
+the three committed roots, the refresh obligation, decision 3's check, or the re-encoding, because
+bundles on already-cut tags are immutable and every adopter pins `v2.0.1` today. Both shapes
+coexist until every pinned tag has moved, so `sigstore_bundle()` has to stay after remedy 2 lands
+and stays exercised by the selfcheck.
+
+**So it is a tidying, not a fix.** Ticket 101 rated it urgent on the strength of the non-ECDSA
+Rekor key refusing on a key-type ground — a refusal about a key type wearing the words of a
+refusal about a signature. That refusal lived on the legacy env-var door, and this build removed
+the door.
+
+### Is anything now LESS safe?
+
+Asked first, because two gates that failed closed on a cold cache now accept, and one gate's
+verification path changed shape entirely.
+
+**Availability: yes, deliberately, and that is the whole trade.** A stale or wrong root now
+refuses where a live fetch used to paper over it. Decision 3 turns that into a schedule.
+
+**Correctness: measured no, on every axis this estate can reach.** Each of these was run against
+platform's real published bundle for policy 2.0.1 at `v2.0.1`, cold `HOME`, empty `TUF_ROOT`,
+every proxy at a closed port with `NO_PROXY`/`no_proxy` cleared:
+
+* one changed signature byte → refused by all three, naming the signature
+  (`failed to verify log inclusion: transparency log signature does not match`);
+* **one changed byte of the ARTEFACT — new here, because the re-encoding computes the artefact's
+  digest itself and a check that computed it from a tampered artefact would verify a lie** →
+  refused by all three: `transparency log hashedrekord entry digest f9dd3389… does not match
+  artifact 858a9472…`. driftwood and tuppence read the served evidence from platform's working
+  tree and ludlow reads it out of git at the pinned tag, so the tamper was planted in both places;
+* a foreign identity constant → refused (harness E/E4/E2);
+* a wrong Rekor key, a corrupt Rekor key, a wrong CT key, a wrong Fulcio CA, a CT key whose window
+  closed before the artefact, and an absent root → refused on all three, cold AND warm, on the
+  trust material and never on the network (12 cases per adopter);
+* **a genuine Rekor entry lifted from ANOTHER of platform's own published bundles** — policy
+  3.0.0's whole `rekorBundle` spliced into policy 2.0.1's, certificate and signature untouched, so
+  every field the re-encoding copies is real and signed, just signed about something else →
+  refused: `failed to verify log inclusion: transparency log signature does not match`. This is
+  the one that says the re-encoding cannot be assembled out of genuine parts;
+* an unplaceable bundle shape → refused BY NAME before cosign is invoked.
+
+**One refusal IS removed, and it is named rather than left to be found.** Under ticket 101's
+env-var pin, an SCT from a log the committed root does not carry was FATAL. Under `--trusted-root`
+it is skipped and the threshold is one verified SCT. So a Fulcio certificate carrying one SCT from
+a pinned log and one from an unpinned log is ACCEPTED here where ludlow refused it three days ago.
+That is Sigstore's own policy and it is exactly what makes ticket 101's cost 1 go away, but it is
+a refusal removed and it is recorded as one. Nothing platform has published carries two SCTs:
+decision 3's check reads the DER of every bundle at every adopter's pin and names exactly one
+ctlog per artefact.
+
+**The refusal TEXTS changed, because the door changed.** Ticket 101's negative proofs quoted the
+legacy path's wording — `rekor log public key not found for payload`, `P256 point not on curve`,
+`ctfe public key not found for payload`, `x509: certificate signed by unknown authority`. Those
+strings are cosign's legacy-path messages and none of them appears now. The ATTACKS all still
+refuse; sigstore-go words them differently, and in each case more specifically:
+
+| attack | refusal, measured on this build, all three adopters |
+|---|---|
+| wrong Rekor key | `failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1` |
+| corrupt Rekor key | `setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: …` |
+| wrong CT key | `failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1` |
+| wrong Fulcio root | `failed to verify leaf certificate: leaf certificate verification failed` |
+| CT key window closed before the artefact | same as wrong CT key — the key is not carried for this artefact |
+| absent pins, empty `TUF_ROOT`, egress blocked | `tuf: failed to download 13.root.json` (the contrast each harness measures on every run) |
+| pinned-but-wrong, WARM `~/.sigstore` | still refused, identically — the env beats the cache |
+
+No script anywhere in the estate still asserts the old strings; they were quoted only in ticket
+101's own record, which is history and stays as written.
+
+### The zero-connections proof
+
+Exit codes say a run did not SUCCEED at reaching the network; they do not say it did not TRY. So
+the gates were run again through a proxy that logs every connection attempt and serves none
+(`127.0.0.1:18443`, one line per request), with `HTTPS_PROXY`/`HTTP_PROXY`/`ALL_PROXY` and their
+lowercase spellings all pointed at it, `NO_PROXY` and `no_proxy` cleared, a fresh empty `HOME` and
+a fresh empty `TUF_ROOT` per run, each gate's own `verify_evidence()` against platform's real
+published evidence for policy 2.0.1:
+
+    contrast: cosign verify-blob with NO trust root   exit 1, 2 connections logged
+                                                      CONNECT tuf-repo-cdn.sigstore.dev:443
+                                                      CONNECT tuf-repo-cdn.sigstore.dev:443
+    driftwood's own gate                              VERIFIED 2.0.1, exit 0, 0 connections
+    tuppence's own gate                               VERIFIED 2.0.1, exit 0, 0 connections
+    ludlow's own gate                                 VERIFIED 2.0.1, exit 0, 0 connections
+
+The contrast is what makes the zero mean something: the same proxy, on the same machine, in the
+same minute, logged the unpinned invocation twice.
+
+### Red before green, exactly
+
+`G` is the scenario each adopter's harness prints on every run. Before this ticket, on the same
+machine, same command, same real bundle:
+
+    driftwood scenario G   exit 1   tuf: failed to download 13.root.json ... connection refused
+    tuppence  scenario G   exit 1   tuf: failed to download 13.root.json ... connection refused
+    ludlow    Part E5      exit 1   (the contrast: the same bytes with the pin removed)
+
+    driftwood scenario G   exit 0   and GRADED, not merely printed
+    tuppence  scenario G   exit 0   and GRADED, not merely printed
+    ludlow    E2           exit 0   unchanged, E5 still prints the contrast's exit 1
+
+And the hub's own three notes, which read `driftwood 1 / ludlow 0 / tuppence 1` on main:
+
+    note: driftwood: its own gate verifies platform's real published bundle with a cold TUF cache
+          and every proxy pointed at a closed port -- exit 0, no network needed
+    note: ludlow:    ... exit 0, no network needed
+    note: tuppence:  ... exit 0, no network needed
+
+`trust_root.py`'s two newest rules were written red: `a bundle that could not be read is false`
+and `and says so, rather than saying the artefact named no log` both failed against the grader as
+it stood — it called an unreadable served bundle "names no transparency log at all", which is a
+different fact — before the FAIL branch that distinguishes them was written.
+
+### Ticket 101 review item R2-1, fixed while here
+
+The hub's offline note derived the words "fetches a Sigstore trust root" from a non-zero exit
+alone. That is true of a gate with no pin and false of a gate refusing a wrong one — and after
+this ticket every gate is the second kind, so the wrong sentence would have been printed at the
+first stale root. `offline_note()` now greps the gate's own output for `tuf|dial tcp|connection
+refused` before saying anything about the network, and otherwise prints
+`exit N ... for a reason that is not the network -- its output names no TUF fetch and no refused
+connection: <last line>`.
+
+### The defect this build's own review found
+
+tuppence's `scripts/verify-adopter-gate.sh` defines its own shell function named `cut` (the
+release helper, line ~459). Scenario H's `echo "... -- $(echo "$tail_line" | cut -c1-150)"` ran
+THAT — four real release scripts, twelve times — and printed their last line,
+`no evidence changes to commit (no policy tags in this dispatch)`, as the refusal text of every
+doctored-root case. The grading was correct throughout (it greps the gate's captured output for
+the case's own refusal); every printed REASON was another command's output. Fixed by making the
+printed line the line graded — the case's own needle, matched in the gate's output, truncated by
+parameter expansion rather than by a command the file shadows. **A green whose evidence sentence
+is another program's stdout is the same defect class as a green that never measured anything**,
+and it was invisible in an exit code.
+
+### Files
+
+* driftwood `.github/scripts/adopter-gate.py`, `.github/scripts/trusted_root.json` (new),
+  `scripts/verify-adopter-gate.sh` (G graded, I added).
+* tuppence `.github/scripts/adopter-gate.py`, `.github/scripts/trusted_root.json` (new),
+  `scripts/verify-adopter-gate.sh` (G graded, H added, D2 rewritten).
+* ludlow `.github/scripts/adopter_gate.py` (**net −54 lines**: 1495 → 1441, 170 insertions and 224
+  deletions — the DER parser and per-role selection out, the re-encoding in. An earlier draft of
+  this line said −132; that number counted nothing a reader could reproduce and is corrected here,
+  review F3, 2026-09-09), `verify-adopter-gate.sh` (E6 added).
+* hub `verify/trust-root/` (new), `tests/test_trust_root.py` (new),
+  `verify/real-signature/real_signature.py` + its script (R2-1), `tests/test_real_signature.py`,
+  `talk/verify-manifest.txt` (one new row, three rewritten).
+
+No workflow file is touched in any repository, so no `workflows` grant is needed for any of the
+four pull requests.
+
+### How it is graded
+
+* `verify/trust-root/verify-the-committed-trust-root-is-dated.sh` — decision 3's sentence.
+* `verify/real-signature/verify-a-real-signature-is-checked.sh` — unchanged sentence, three
+  notes now reading 0, and the R2-1 wording.
+* `verify/fold-agreement/verify-fold-agreement.sh` — still green on all four planted movements.
+* `driftwood/scripts/verify-adopter-gate.sh` A–I, `tuppence/scripts/verify-adopter-gate.sh` A–H,
+  `ludlow/verify-adopter-gate.sh` Parts A–E6.
+* each gate's own `--selfcheck`; `tests/test_trust_root.py` (15), `tests/test_real_signature.py`
+  (25).
+
+**What the unit CI does NOT say, repeated from ticket 101 because it is still true.** No unit CI
+job runs `--selfcheck` or a harness. `shift-left` reaches `verify_evidence()` only when the
+composed member set moves. Everything that grades this ticket ran locally and in the hub gate.
+
+### Review, 2026-09-09 — what it changed and what it recorded
+
+Approved, with nine findings. Five were fixed on the branch; four are recorded here because they
+are real and none of them is worth a change today. One was charted as its own ticket.
+
+**F1, fixed — the R2-1 fix was defeated by the estate's own refusal wording.** The needle was the
+bare substring `tuf`, and every gate's absent-root refusal ends `...refusing rather than letting
+cosign fetch a live TUF root` (ludlow: `...fall back to a live TUF fetch`). So a gate with no
+committed root — one that made no network call whatever, and said so — was reported as:
+
+    driftwood: ... exit 1, and its output shows the fetch (REFUSED: no committed Sigstore trust
+    root at ...), so this repository's signature check fetches a Sigstore trust root on every CI
+    run, which is cold every time
+
+the exact false sentence R2-1 removed, now produced by the wording of the refusal that proves the
+opposite. The needle is `tuf: ` with the colon, which is what the three harnesses already grep for.
+After:
+
+    driftwood: its own gate refuses with a cold TUF cache and egress blocked -- exit 1, for a
+    reason that is not the network -- its output names no TUF fetch and no refused connection: ...
+
+Graded in `real_signature.py --selfcheck` against the three gates' REAL absent-root refusal
+strings, and against the real contrast, not against a synthetic one — all three cases were red
+before the change. **The lesson is narrower than "use a better regex": a check that reads text the
+estate writes is graded by the estate's own worst-case text, and this estate writes refusals that
+NAME the thing they refused to do.**
+
+**F2, fixed — the one computed field had no standing check.** Every gate now computes the
+artefact's sha256 itself (`messageDigest` in the re-encoded bundle), and all three harnesses plus
+both halves of `verify/real-signature/` corrupt the SIGNATURE. The property held when measured by
+hand during the build; by this ticket's parent lesson, a property that is true and unmeasured is
+the one that stays broken. `verify/real-signature/` now has a THIRD leg: platform's real,
+untouched signature over an evidence document with **one byte appended** — it parses to the
+identical object, so `outcome.result` and `declared` are unchanged and every content check every
+gate makes still passes, and the only thing left that can refuse it is the digest the signature
+covers. An observation carrying no artefact leg is a could-not-look, never a pass. Mutation-tested:
+making `grade()` stop reading the leg turns two tests red.
+
+**F3, fixed.** The Files section said ludlow's gate was "net −132 lines". Measured: 1495 → 1441,
+170 insertions and 224 deletions, **net −54**. The old number counted nothing a reader could
+reproduce. Corrected above.
+
+**F4, fixed — the `cut` defect's structural cause, not just its instance.** driftwood scenario I
+and ludlow E6 both PRINTED `tail -1` of the gate's output while GRADING a `grep -q` for a
+different needle. Today's text was genuine only because the refusal happened to be the last line;
+the identical shape in tuppence's copy printed another program's stdout for twelve cases and no
+exit code noticed. Both now print the line they grade.
+
+**F5, fixed.** tuppence's harness still DEFINED a shell function named `cut`; the build removed the
+one `| cut` pipe, not the shadow. Renamed `cut_release` (three call sites). Removing the pipe fixed
+the symptom; renaming removes the trap.
+
+**F6, recorded, not fixed — a multi-block PEM certificate chain fails closed, but is worded as a
+shape error.** `sigstore_bundle()` base64-decodes `cert` and, if it is PEM, strips the `-----`
+lines and decodes what is left. A chain of two or more PEM blocks concatenated would decode to
+concatenated DER, which sigstore-go refuses as an unparseable certificate — the safe direction, but
+the refusal talks about the certificate rather than about the chain, which is one hop from the
+refusal-wearing-the-wrong-words defect ticket 101 was about. Platform publishes a single
+certificate; measured, its `cert` is one block. Left as is because inventing a chain parser for an
+artefact shape nobody publishes is speculative, and the failure is closed.
+
+**F7, recorded — `kindVersion` is derived and cosign ignores it.** The re-encoding fills
+`kindVersion` from the Rekor body's own `kind` and `apiVersion`. sigstore-go re-reads the
+canonicalised body itself and does not trust that field, so a wrong value cannot admit anything.
+It is copied rather than computed and it is graded field-for-field in the selfcheck; noted so a
+reader does not mistake it for load-bearing.
+
+**F8, recorded — nothing grades that a committed root carries nothing EXTRA.** `verify/trust-root/`
+grades that every log the served artefact NAMES is carried. A root carrying an additional log the
+estate never asked for would pass. Every key in every root IS printed on every run, with its type
+and its window, so an extra one is visible — but visible is not graded. Grading it would need a
+statement of what the root is allowed to carry, which is a second pin to maintain and the wrong
+trade today; the reviewer independently confirmed the three committed roots are byte-identical to
+this machine's own genuinely TUF-fetched root, which is the stronger fact and one this ticket had
+not claimed.
+
+**F9, recorded — `sct_entries()` takes the first raw OID match.** The grader finds the SCT
+extension by searching the certificate DER for the OID bytes and reading the OCTET STRING after
+them, rather than walking the certificate structure. It is a cheap read, it is the grader's and not
+the gate's — the gate no longer parses DER at all, sigstore-go does — and a certificate that
+somehow carried those bytes elsewhere would make the check name a log the artefact does not use,
+which fails toward a false RED, not a false green. Left as is, named so nobody reads it as a
+parser.
+
+**Charted, not fixed here: ticket 108.** `verify/a-fall-blocks/` and `verify/derived-status/` are
+red on today's `origin/main` and PASS at the immediately preceding commit `691a32a`; the only
+difference is `truth: record run 184 [skip ci]`, whose TRUTH line and captures are those two
+checks' input, and whose `[skip ci]` means nothing re-measures main afterwards. Neither red is this
+ticket's. Both were reproduced here on plain worktrees of both commits.
+
+## Waits on the owner
+
+1. **Re-signing platform's evidence in the new bundle format** (ticket 101 remedy 2). A tag is cut
+   only by `cut-release.yml` and dispatched only by the owner. Decision 4 says what it removes and
+   what it does not; nothing here is blocked on it.
+2. **Whether platform policy 4.0.0's major is accepted for driftwood, for ludlow and for
+   tuppence.** Unchanged from tickets 99 and 101, untouched here, and still the whole of
+   `verify-unreviewed-major-in-window.sh`'s remaining red.
+3. Nothing else.
+
+Map line: Ticket 105 (2026-09-09): driftwood's and tuppence's gates stopped fetching a Sigstore
+trust root over the network on every CI run -- all three adopters now commit their own
+`trusted_root.json` (byte-identical today, and nobody serves one to anybody, because the party
+being checked does not supply the ruler) and hand it to cosign whole through `--trusted-root`,
+with a legacy bundle re-encoded locally into the v0.1 Sigstore shape that door reads and the
+artefact's own sha256 as the only computed field; that dissolved rather than answered the per-SCT
+key question -- sigstore-go applies a threshold of one verified SCT where the legacy env-var path
+ludlow used demanded a key for every one -- and it honours `validFor` windows and loads the
+non-ECDSA Rekor key, which removes the argument ticket 101 called the strongest case for the
+publisher re-signing; measured through a logging proxy the three gates made 0 connections where
+the unpinned contrast made 2, a changed signature byte and a changed artefact byte are both
+refused, and 12 doctored-root attacks per adopter refuse on the trust material and never on the
+network, cold and warm; `verify/trust-root/` prints each committed root's age and every key's
+validity window as dates and numbers and grades only what cannot go stale reassuringly -- that
+every log the served bundle at that adopter's pin names is carried by that adopter's own root
+inside the key's window.

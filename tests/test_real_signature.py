@@ -46,6 +46,8 @@ def _result(verdict: str, output: str = "", exit_code: int | None = None) -> dic
 ADOPT = _result("adopt", "PASS: declared=minor composed=none")
 REFUSE_SIGNATURE = _result("refuse", "cosign verify-blob refused the evidence signature")
 REFUSE_FLAG = _result("refuse", "Error: --trusted-root only supported with --new-bundle-format")
+REFUSE_DIGEST = _result("refuse", "cosign verify-blob refused: transparency log hashedrekord entry "
+                                  "digest abc does not match artifact def")
 
 
 # --------------------------------------------------------------------------------------------
@@ -95,7 +97,8 @@ def test_a_bundle_whose_signature_cannot_be_reached_raises(grader: ModuleType, b
 # grade — both halves, and neither alone
 # --------------------------------------------------------------------------------------------
 def test_accepting_the_real_signature_and_refusing_the_corrupted_one_passes(grader: ModuleType) -> None:
-    verdict, _ = grader.grade({"driftwood": {"version": "2.0.1", "accept": ADOPT, "refuse": REFUSE_SIGNATURE}})
+    verdict, _ = grader.grade({"driftwood": {"version": "2.0.1", "accept": ADOPT, "refuse": REFUSE_SIGNATURE,
+                                            "artefact": REFUSE_DIGEST}})
     assert verdict == "PASS"
 
 
@@ -104,13 +107,15 @@ def test_a_gate_that_refuses_both_halves_is_false(grader: ModuleType) -> None:
     platform publishes, on the flag, before reaching the signature. A grader that only asked
     "does it refuse a corrupted signature?" would have called that a pass and the defect would
     have survived another week."""
-    verdict, lines = grader.grade({"ludlow": {"version": "2.0.1", "accept": REFUSE_FLAG, "refuse": REFUSE_FLAG}})
+    verdict, lines = grader.grade({"ludlow": {"version": "2.0.1", "accept": REFUSE_FLAG, "refuse": REFUSE_FLAG,
+                                         "artefact": REFUSE_FLAG}})
     assert verdict == "FAIL"
     assert any("ludlow" in text and "did NOT accept" in text for level, text in lines if level == "FAIL")
 
 
 def test_a_gate_that_adopts_a_corrupted_signature_is_false(grader: ModuleType) -> None:
-    verdict, lines = grader.grade({"a": {"version": "2.0.1", "accept": ADOPT, "refuse": ADOPT}})
+    verdict, lines = grader.grade({"a": {"version": "2.0.1", "accept": ADOPT, "refuse": ADOPT,
+                                    "artefact": REFUSE_DIGEST}})
     assert verdict == "FAIL"
     assert any("ADOPTED the same evidence" in text for level, text in lines if level == "FAIL")
 
@@ -120,7 +125,8 @@ def test_a_refusal_that_names_neither_cosign_nor_the_signature_is_false(grader: 
     signature — a pin mismatch, a missing file, a crash. That is not evidence that the signature
     was read, and reading it as one is how a check comes to grade its own assumption."""
     refuse_pin = _result("refuse", "platform tag resolves to a different commit than the pin names")
-    verdict, _ = grader.grade({"a": {"version": "2.0.1", "accept": ADOPT, "refuse": refuse_pin}})
+    verdict, _ = grader.grade({"a": {"version": "2.0.1", "accept": ADOPT, "refuse": refuse_pin,
+                                     "artefact": REFUSE_DIGEST}})
     assert verdict == "FAIL"
 
 
@@ -136,7 +142,7 @@ def test_a_gate_that_could_not_be_invoked_is_a_could_not_look(grader: ModuleType
 def test_one_unknown_beside_an_observed_pass_is_still_a_could_not_look(grader: ModuleType) -> None:
     """The estate has not been observed whole, and saying PASS would claim it had."""
     verdict, _ = grader.grade({
-        "a": {"version": "2.0.1", "accept": ADOPT, "refuse": REFUSE_SIGNATURE},
+        "a": {"version": "2.0.1", "accept": ADOPT, "refuse": REFUSE_SIGNATURE, "artefact": REFUSE_DIGEST},
         "b": {"version": "2.0.1", "accept": None, "refuse": None, "reason": "no identity constant"},
     })
     assert verdict == "SKIP"
@@ -146,10 +152,57 @@ def test_one_false_beside_one_unknown_is_false(grader: ModuleType) -> None:
     """An observed falsehood outranks an unobserved one: a red that is real is not softened to a
     could-not-look because some other unit could not be looked at."""
     verdict, _ = grader.grade({
-        "ludlow": {"version": "2.0.1", "accept": REFUSE_FLAG, "refuse": REFUSE_FLAG},
+        "ludlow": {"version": "2.0.1", "accept": REFUSE_FLAG, "refuse": REFUSE_FLAG, "artefact": REFUSE_FLAG},
         "b": {"version": "2.0.1", "accept": None, "refuse": None, "reason": "no identity constant"},
     })
     assert verdict == "FAIL"
+
+
+# --------------------------------------------------------------------------------------------
+# the artefact leg (review F2, 2026-09-09)
+# --------------------------------------------------------------------------------------------
+def test_tamper_artefact_changes_the_bytes_and_not_the_document(grader: ModuleType) -> None:
+    """The point of appending rather than editing: the served document parses to the IDENTICAL
+    object, so every content check every gate makes still passes and the only thing left that can
+    refuse it is the sha256 the publisher's signature covers -- which is the one field the
+    re-encoded bundle computes locally."""
+    original = '{"outcome": {"result": "passed"}, "declared": "2.0.1"}\n'
+    changed = grader.tamper_artefact(original)
+    assert changed != original
+    assert json.loads(changed) == json.loads(original)
+
+
+@pytest.mark.parametrize("doc, why", [("", "empty"), ("{not json", "unreadable")])
+def test_tamper_artefact_refuses_a_document_it_cannot_corrupt(grader: ModuleType, doc: str, why: str) -> None:
+    """A tamper that changed nothing would make the artefact half a third ACCEPT, and it would
+    pass -- the same trap tamper_signature is guarded against."""
+    with pytest.raises(ValueError):
+        grader.tamper_artefact(doc)
+
+
+def test_a_gate_that_adopts_a_changed_artefact_under_a_genuine_signature_is_false(grader: ModuleType) -> None:
+    """The property nothing graded until today. All three gates hand cosign a bundle whose
+    messageDigest they computed from the artefact themselves; a check that only ever corrupts the
+    SIGNATURE never asks whether that computation can launder a changed artefact."""
+    verdict, lines = grader.grade({"a": {"version": "2.0.1", "accept": ADOPT,
+                                          "refuse": REFUSE_SIGNATURE, "artefact": ADOPT}})
+    assert verdict == "FAIL"
+    assert any("not load-bearing" in text for level, text in lines if level == "FAIL")
+
+
+def test_an_artefact_refusal_about_something_else_is_false(grader: ModuleType) -> None:
+    refuse_pin = _result("refuse", "platform tag resolves to a different commit than the pin names")
+    verdict, _ = grader.grade({"a": {"version": "2.0.1", "accept": ADOPT,
+                                      "refuse": REFUSE_SIGNATURE, "artefact": refuse_pin}})
+    assert verdict == "FAIL"
+
+
+def test_an_observation_with_no_artefact_leg_is_a_could_not_look_never_a_pass(grader: ModuleType) -> None:
+    """A caller that forgets the leg gets a could-not-look. Treating an absent leg as satisfied is
+    the defect class this whole check exists to refuse."""
+    verdict, lines = grader.grade({"a": {"version": "2.0.1", "accept": ADOPT, "refuse": REFUSE_SIGNATURE}})
+    assert verdict == "SKIP"
+    assert any("digest this gate computes" in text for level, text in lines if level == "SKIP")
 
 
 def test_the_selfcheck_the_verify_script_runs_first_passes(grader: ModuleType) -> None:
@@ -215,3 +268,30 @@ def test_the_cold_environment_isolates_the_caches_it_is_given(grader: ModuleType
     cold = grader.COLD_ENV(tmp_path / "home", tmp_path / "tuf")
     assert cold["HOME"] == str(tmp_path / "home")
     assert cold["TUF_ROOT"] == str(tmp_path / "tuf")
+
+
+# --------------------------------------------------------------------------------------------
+# the offline NOTE derives "fetches a trust root" from the output, not from a non-zero exit
+# (ticket 101 review R2-1; closed by ticket 105)
+# --------------------------------------------------------------------------------------------
+def test_the_offline_note_says_no_network_needed_only_on_exit_zero(grader: ModuleType) -> None:
+    text = grader.offline_note("driftwood", 0, "Verified OK")
+    assert "exit 0" in text and "no network needed" in text
+
+
+def test_the_offline_note_names_a_trust_root_fetch_only_when_the_output_shows_one(grader: ModuleType) -> None:
+    text = grader.offline_note("tuppence", 1, "tuf: failed to download 13.root.json: dial tcp 127.0.0.1:1: connect: connection refused")
+    assert "exit 1" in text and "fetches a Sigstore trust root" in text
+
+
+def test_the_offline_note_does_not_call_a_pin_refusal_a_network_fetch(grader: ModuleType) -> None:
+    # A gate that pins a root and refuses because the pin is wrong returns exit 1 with no network in
+    # the story at all. Before ticket 105 this line would have read "fetches a trust root".
+    text = grader.offline_note("ludlow", 1, "REFUSE: policy 2.0.1: cosign verify-blob refused the evidence signature (transparency log signature does not match)")
+    assert "fetches a Sigstore trust root" not in text
+    assert "exit 1" in text and "not the network" in text and "transparency log signature" in text
+
+
+def test_the_offline_note_could_not_be_taken_when_the_gate_did_not_run(grader: ModuleType) -> None:
+    text = grader.offline_note("x", None, "")
+    assert "could not be taken" in text
