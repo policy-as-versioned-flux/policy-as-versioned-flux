@@ -49,7 +49,7 @@
   ok   an artefact with a refused composition is refused
 PASS: handbook render seam: 47 checks -- pure in-process and in a separate emptied-environment process, clock-free, biting, complete, perspective-and-currency bearing, naming every absent field (lists included) rather than printing a zero, refusing a non-artefact
 [1;36m==>[0m 2. the render committed beside its artefact is fresh at the tag that carries both
-  ok   /tmp/tmp.wSXlUjjHYK/adopter@planted-v1: the served handbook is byte-identical to a re-render of the served artefact (7172 bytes)
+  ok   /tmp/tmp.iDaNoQCxUg/adopter@planted-v1: the served handbook is byte-identical to a re-render of the served artefact (7172 bytes)
 [1;36m==>[0m 3. a hand-edited page over an untouched artefact is STALE (the lie with a nicer font)
   ok   a sentence added by hand is caught at the tag
 [1;36m==>[0m 4. a moved ARTEFACT under an untouched page is STALE too (the page went stale, not wrong)

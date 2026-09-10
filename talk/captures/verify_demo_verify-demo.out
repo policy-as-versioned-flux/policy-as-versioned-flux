@@ -1,12 +1,12 @@
 selfcheck ok
-/tmp/tmp.MmM3NCZhJ7/deck.md: 478 lines from 122 captures on disk
+/tmp/tmp.rPdIKOHOoR/deck.md: 478 lines from 122 captures on disk
 ok  the deck builds: 478 lines from 122 captures
   review, not a lint failure: the word gate appears on 1 lines; every use outside the 5 phrases CONTEXT.md refuses is a human review item:
     line 324: **could not look** — driftwood serves a total of 3,704,381.74 GBP carrying no `ordinal` and no `aggregate`: co
-  checked 7 beats and 4 asides in /tmp/tmp.MmM3NCZhJ7/deck.md
+  checked 7 beats and 4 asides in /tmp/tmp.rPdIKOHOoR/deck.md
 ok  the committed talk/deck.md describes recorded run=186 hub=cdc5fb9 commit=9517d98
 ok  the committed talk/deck.md is the generated file, with the same beats as a rebuild of run 186
   checked 7 beats and 4 asides in talk/deck.md
 ok  the committed talk/deck.md survives the figure, status, headline and phrase checks against run 186
-  note: the newest recorded run is 224 and the committed deck describes run 186; run python3 talk/build_deck.py and commit it to move the deck on (not a failure)
+  note: the newest recorded run is 225 and the committed deck describes run 186; run python3 talk/build_deck.py and commit it to move the deck on (not a failure)
 PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck.md is the generated file describing recorded run 186, carries the same beat and aside markers as a rebuild from that run's committed captures, and survives the figure, status, headline and phrase checks against that run: its seven beats are the section 4 steps in order carrying run 186's own grades as run 186's own _grades.tsv recorded them, its asides each carry that run's grade for the script each names and were all read from a capture that run wrote, every figure on a beat or an aside is a figure in that slide's capture and no figure sits on a slide with no capture behind it, its quoted TRUTH line is the line that recorded run 186, and no phrase CONTEXT.md's refused-vocabulary table names appears anywhere in it
