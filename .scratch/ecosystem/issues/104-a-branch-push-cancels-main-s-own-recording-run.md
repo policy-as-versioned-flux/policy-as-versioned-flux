@@ -1,7 +1,7 @@
 # 104 — A branch push cancels main's own recording run
 
 Type: task (AFK)
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -109,3 +109,40 @@ proof and a scheduled capture remain required. The 39 focused tests pass after t
 The repository-wide type check passes across 190 source files. The configured commit hook's
 remote secret-scan quota rejected the checkpoint commit; a separate local TruffleHog scan found
 zero secrets, but substitution permission remains pending and no production hook was bypassed.
+
+
+## Answer — completed against the original Done, 2026-09-10
+
+The reviewed implementation merged through hub PR77 as e214bed. Real push runs
+[34505271984](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/34505271984)
+on the implementation branch and
+[34505741926](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/34505741926)
+on main executed their gate jobs concurrently: the former began at 16:58:29Z and was still
+running when the latter began at 17:03:21Z. Both completed; neither was cancelled. This is actual
+workflow execution in distinct ref groups, not inference from the YAML alone.
+
+Main's recording commit 5ebeba4 appended run 242 at 17:28Z and is retained by main's later merge
+0647a55. Its committed `talk/captures/verify_schedules_verify-schedules.out` begins with
+`LOST RECORDING count=19` and names the missing run numbers, the 242-run retained-history
+boundary, unknown cancellation cause and no-replay disposition. The clock wrote this evidence;
+no observation was written by hand. Its overall 80 pass/8 fail/29 skip result remains red.
+
+Earlier implementation/review notes asked for a scheduled capture. The original Done requires
+that the citable record contain the count, not that its event be schedule. Ticket 100 admits a
+main push recording, and run 242 is in `talk/truth.log`; it therefore meets that original
+criterion. The extra event restriction is not retained. Same-ref pending cancellations remain
+an explicitly stated limit, not a promise of an unlimited queue.
+
+## Existing clock failures, 2026-09-10
+
+**2026-09-10, standing schedule failures.**
+`verify/schedules/verify-schedules.sh` remains FAIL in recorded run 242 for feeds/fetch.yml,
+insurer/fetch.yml and the missing ludlow/tuppence `twin-sweep.yml` workflows. The lost-recording census is a
+reported historical count and does not excuse any of those failures. Tickets 85/77 and the
+missing-workflow findings retain their own work; ticket 104's queue isolation and census are complete.
+
+### Superseded map entry retained as history
+
+- [104 — A branch push cancels main's own recording run](issues/104-a-branch-push-cancels-main-s-own-recording-run.md) — CHARTED, not built. `truth.yml`'s concurrency group is `truth-${{ github.event_name }}`, so every push on every branch shares one lane and GitHub cancels all but the running and the newest queued run: 8 of the newest 22 `main` push runs were cancelled (136, 130, 127, 125, 119, 112, 48, 42) and none of those run numbers is in `talk/truth.log` — eight lost citable observations. Ticket 56's per-event group protected the scheduled lane; ticket 100 then made branch runs pure measurement that still occupies main's lane. Key the group on event AND ref, and teach `verify/schedules/` to read a cancelled default-branch run as a lost recording, which it cannot today.
+
+Map line: `- [104 — A branch push cancels main's own recording run](issues/104-a-branch-push-cancels-main-s-own-recording-run.md) — resolved, event-and-ref queues are proven by overlapping real main/branch push gates, and recorded run 242 captures LOST RECORDING count=19 across 242 retained runs. Historical cancellations have unknown cause and are reported without replay; same-ref pending runs can still displace each other.`
