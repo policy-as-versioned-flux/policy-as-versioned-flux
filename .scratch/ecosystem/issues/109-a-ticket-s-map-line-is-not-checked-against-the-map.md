@@ -1,7 +1,7 @@
 # 109 — A ticket's map line is not checked against the map, and four instruments carry a moving count
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -111,7 +111,7 @@ This checkout's exact-copy comparison reads eight agreeing transcriptions (inclu
 historical summaries separately; the map's check references and links also resolve. These are
 local verification results, not a citable TRUTH claim. Status stays open pending both reviews.
 
-Map line: `- [109 — A ticket's map line is not checked against the map](issues/109-a-ticket-s-map-line-is-not-checked-against-the-map.md) — built locally, review pending: the existing map-surface check compares exact backticked ticket/map transcriptions byte for byte, refusing missing, duplicate, malformed and wrong-ticket copies and naming older prose summaries separately; the reviewed map wins a disagreement unless the ticket records a later supported decision, and current transcriptions have no correction exemption. Four stale transcriptions retain their history beside corrected copies, missing reviewed entries 89 and 91 are restored, and the four instrument census statements are removed while ticket 48 retains its dated record. The deck check refuses multiple row-count declarations instead of selecting the first and names unclosed backtick fences at a section boundary or end of file. Focused seam tests and both instrument selfchecks pass; no citable run of this change is claimed.`
+Historical map transcription, superseded after publication: `- [109 — A ticket's map line is not checked against the map](issues/109-a-ticket-s-map-line-is-not-checked-against-the-map.md) — built locally, review pending: the existing map-surface check compares exact backticked ticket/map transcriptions byte for byte, refusing missing, duplicate, malformed and wrong-ticket copies and naming older prose summaries separately; the reviewed map wins a disagreement unless the ticket records a later supported decision, and current transcriptions have no correction exemption. Four stale transcriptions retain their history beside corrected copies, missing reviewed entries 89 and 91 are restored, and the four instrument census statements are removed while ticket 48 retains its dated record. The deck check refuses multiple row-count declarations instead of selecting the first and names unclosed backtick fences at a section boundary or end of file. Focused seam tests and both instrument selfchecks pass; no citable run of this change is claimed.`
 
 ### Spec-review correction, 2026-09-10
 
@@ -126,3 +126,16 @@ exact doubled-space defect. No exemption was added.
 Independent Spec re-review confirmed the malformed-prefix finding closed; Standards reported
 no findings in this ticket. Publication remains pending the configured secret-scan hook's quota
 or authorization of the proposed local-scan substitute.
+
+
+## Publication and completion, 2026-09-10
+
+Both review axes passed after the malformed-prefix correction. Signed commit 22b5bd0 merged
+through [hub PR77](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/77)
+as main e214bed. The owner authorized local scanning in place of the exhausted hook; the scan
+found zero secrets and signing was retained. All requested comparison, census and parser changes
+are implemented. The completed branch validation passed these instruments; its overall existing
+eight estate failures were unchanged and its result is not a citable observation. Later combined
+integration checks pass 159 focused map/deck/citation tests and the served-ref map wrapper.
+
+Map line: `- [109 — A ticket's map line is not checked against the map](issues/109-a-ticket-s-map-line-is-not-checked-against-the-map.md) — resolved, reviewed and merged through hub PR77 on 2026-09-10: the existing map-surface check compares exact backticked ticket/map transcriptions byte for byte, refusing missing, duplicate, malformed and wrong-ticket copies and naming older prose summaries separately; the reviewed map wins a disagreement unless the ticket records a later supported decision, and current transcriptions have no correction exemption. Four stale transcriptions retain their history beside corrected copies, missing reviewed entries 89 and 91 are restored, and the four instrument census statements are removed while ticket 48 retains its dated record. The deck check refuses multiple row-count declarations instead of selecting the first and names unclosed backtick fences at a section boundary or end of file. Focused seam tests and both instrument selfchecks pass; no citable run of this change is claimed.`

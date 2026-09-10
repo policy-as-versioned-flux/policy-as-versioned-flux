@@ -82,7 +82,25 @@ its result and identity-pinned release verification remain pending. The prior au
 is cleared by this explicit authorization.
 
 
-Platform v3.0.0 is published: both workflows passed, release resolves to reviewed3602142,
-published 16:52:01Z. Adopter rollout is unblocked. Sensor fixture repair is signed commitc69f048;
-local TruffleHog scan completed without errors and found zero secrets. Ticket86's review P2 is
+Platform v3.0.0 is published: both workflows passed, release resolves to reviewed 3602142,
+published 16:52:01Z. Adopter rollout is unblocked. Sensor fixture repair is signed commit c69f048;
+local TruffleHog scan completed without errors and found zero secrets. Ticket 86's review P2 is
 fixed; both review axes pass. Its integration remains in the isolated worktree, not published.
+
+
+## Integration checkpoint
+
+Hub PR77 merged as e214bed after truth run 240 matched recorded 235's exact eight failed paths
+and counts (80 pass/8 fail/29 skip). This branch result is not citable. PR78 holds signed follow-up
+commits c69f048,218deb3,a5576bc; its full CI suite reports 2563 passes and the same sole coverage
+invariant failure, while the other completed jobs pass. Its truth gate remains in progress.
+
+The three cage integrations passed both review axes after fixing unsupported-selector false
+attribution and stale registration prose. Signed heads: driftwood 5aab7da (PR 36), tuppence 4d3bede
+(PR 31), ludlow 98b811c (PR 28). All selfchecks and wait-order checks pass; samples are unchanged;
+local scans found zero secrets. These PRs are held behind hub 78 and actual scheduled proof.
+
+The first prepared software migration exposed a composed-major addition of policy 5.0.0. It is
+held and unpublished. The composer already supports separating its executable from implementation
+inputs, so a delegated architectural correction is being implemented with independently pinned
+v3 tools and unchanged accepted v2.0.1 implementation, money, dates and deployed policy pins.
