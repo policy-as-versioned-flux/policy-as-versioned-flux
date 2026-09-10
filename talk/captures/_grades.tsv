@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-10T09:12Z run=234 hub=be1229b enact=development units=[driftwood=a181725@main feeds=ca40396@threat-register/v3.0.0 ico=9653fd9@v4.0.0 insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main platform=5b88f1d@policy/v5.0.0 tuppence=bd15aae@main] pass=79 [observed=25 self=41 simulated=4 meta=9] fail=9 skip=29 [never=10 waits=19] excluded=8 total=125 ceiling=106
+# TRUTH 2026-09-10T10:30Z run=235 hub=6bfb7dd enact=development units=[driftwood=a181725@main feeds=c3c654a@main ico=abcb3a8@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main platform=5b88f1d@policy/v5.0.0 tuppence=bd15aae@main] pass=80 [observed=25 self=42 simulated=4 meta=9] fail=8 skip=29 [never=10 waits=19] excluded=8 total=125 ceiling=106
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      or absent trust root refuses on the trust material and never on the network, cold and warm (I).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -11,7 +11,7 @@
 .estate-clone/feeds/verify-feeds.sh	PASS	PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed
 .estate-clone/feeds/verify-market-and-news.sh	PASS	PASS: market-moves publishes a dated series from one mechanical rule over one venue with no probability-shaped field, and its own threshold is what opens a PR; 
 .estate-clone/feeds/verify-news-headline-skill.sh	PASS	PASS: classify-and-judge is a human-run skill (disable-model-invocation) whose claim file carries only claim kinds the twin has and a derived_from that names ex
-.estate-clone/ico/.github/scripts/verify-declared-bump.sh	FAIL	FAIL: the declared bump in bump.yaml and the bump computed from the tree disagree
+.estate-clone/ico/.github/scripts/verify-declared-bump.sh	PASS	today would publish the number the reviewed file declares.
 .estate-clone/ico/schema/verify.sh	EXCLUDED	
 .estate-clone/ico/verify-certificate-identity-regexp.sh	PASS	and rejects every foreign org/repo/path and unanchored variant tried.
 .estate-clone/ico/verify-penalty-feed.sh	PASS	PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the four published 

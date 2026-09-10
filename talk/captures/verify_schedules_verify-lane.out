@@ -8,7 +8,7 @@ PASS: ico@main: no scheduled identity has landed a commit here -- the lane holds
 PASS: ico@observations: 10 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['observations'] and none a merge
 INFO: insurer: scheduled identities ['fetch-bot@policy-as-versioned-insurer.invalid', 'requote-bot@policy-as-versioned-insurer.invalid'], lane ['observations'], refs main fetched now; observations fetched now
 PASS: insurer@main: no scheduled identity has landed a commit here -- the lane holds vacuously; whether the clock runs at all is verify-schedules' question, not this one's
-PASS: insurer@observations: 9 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['observations'] and none a merge
+PASS: insurer@observations: 10 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['observations'] and none a merge
 INFO: ludlow: scheduled identities ['drift-sample@policy-as-versioned-ludlow.invalid', 'wargamer-proposer@policy-as-versioned-ludlow.invalid'], lane ['drift/samples.jsonl'], refs main fetched now; observations absent on origin
 PASS: ludlow@main: 10 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['drift/samples.jsonl'] and none a merge
 INFO: nist: scheduled identities ['fetch-bot@policy-as-versioned-nist.invalid'], lane ['observations'], refs main fetched now; observations fetched now
@@ -21,6 +21,6 @@ PASS: platform@observations: 10 commit(s) by a scheduled identity on the first-p
 INFO: tuppence: scheduled identities ['drift-sample@policy-as-versioned-tuppence.invalid', 'wargamer-proposer@policy-as-versioned-tuppence.invalid'], lane ['drift/samples.jsonl'], refs main fetched now; observations absent on origin
 PASS: tuppence@main: 10 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['drift/samples.jsonl'] and none a merge
 INFO: hub: scheduled identities ['truth@users.noreply.github.com'], lane ['talk/truth.log', 'drift/samples.jsonl', 'talk/captures', 'observations'], refs main fetched now; observations absent on origin
-PASS: hub@main: 50 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['talk/truth.log', 'drift/samples.jsonl', 'talk/captures', 'observations'] and none a merge
+PASS: hub@main: 51 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['talk/truth.log', 'drift/samples.jsonl', 'talk/captures', 'observations'] and none a merge
 PASS: every commit a scheduled identity has landed on an observation ref touched only
 PASS: the observation lane, and none of them is a merge
