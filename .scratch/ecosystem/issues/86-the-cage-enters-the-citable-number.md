@@ -400,6 +400,17 @@ ceiling=105`) the hub half of this ticket moves `pass` and `fail` not at all; `t
 `main` between the two runs. That is the expected answer: the units are still at their own mains,
 so until the three adopter branches merge, the hub half moves the record and not the number.
 
-**Final heads.** Hub `269bcc5`; driftwood `cecd1e4`, tuppence `c069cf2`, ludlow `a9f2f7c`, each
-`verify-reconcile.sh` rc 1 and `drift/five-facts.py selfcheck` rc 0 in a clean clone with gitsign
-configured. Nothing is merged.
+Run **233**, `gh run view 34446814409`, was then dispatched on hub `df413c1` -- the head that
+carries the whole build, record included -- and reads the same line, figure for figure:
+
+    TRUTH 2026-09-10T07:13Z run=233 hub=df413c1 ... pass=78 [observed=24 self=41 simulated=4
+    meta=9] fail=8 skip=31 [never=9 waits=22] excluded=8 total=125 ceiling=106
+
+**A record commit cannot name its own run**, and this paragraph is the proof: naming run 233 moves
+the head past the commit run 233 measured. The regress terminates here rather than being hidden --
+everything after `df413c1` is these three sentences, and a run of the head that carries them would
+find the same 125 scripts.
+
+**Final heads.** Hub `df413c1` plus this note; driftwood `cecd1e4`, tuppence `c069cf2`, ludlow
+`a9f2f7c`, each `verify-reconcile.sh` rc 1 and `drift/five-facts.py selfcheck` rc 0 in a clean
+clone with gitsign configured. Nothing is merged.
