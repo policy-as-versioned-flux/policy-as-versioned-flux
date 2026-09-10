@@ -215,10 +215,16 @@ branch (after).
 - **Plain clone, as `git clone` leaves it:** identical exits on all three adopters — driftwood 3,0,3,3,3,3;
   tuppence 0,1,0,3,3,3; ludlow 3,3,0,3,3.
 - **With `gpg.x509.program gitsign` configured, which is what `clone-estate.sh` leaves and therefore
-  what the truth runner sees:** exactly one change per adopter, and it is the intended one.
-  `verify-reconcile.sh` goes **3 → 1** on driftwood, tuppence and ludlow. Every other script is
-  unchanged, including tuppence's pre-existing `scripts/verify-adopter-gate.sh` red (rc 1 before and
-  after, not this ticket's).
+  what the truth runner sees:** at most one change per adopter, and it is the intended one.
+  `verify-reconcile.sh` goes **3 → 1** wherever that adopter's newest lane sample carries a fact
+  observed FALSE. Every other script is unchanged, including tuppence's pre-existing
+  `scripts/verify-adopter-gate.sh` red (rc 1 before and after, not this ticket's).
+- **Re-measured 2026-09-10 against each adopter's own `main` as it stands**, after driftwood's
+  11:23Z scheduled sample landed: tuppence **3 → 1**, ludlow **3 → 1**, driftwood **3 → 3**, because
+  driftwood's newest sample now carries no FALSE at all — ticket 107's round-4 wait order working.
+  An earlier measurement, against the samples of 2026-09-09, gave 3 → 1 on all three. Both are
+  recorded because the difference between them is the point: this change makes the grader tell the
+  truth about whatever the lane observed, and what the lane observes moves.
 
 ### What the citable number will do, and why
 
@@ -432,16 +438,33 @@ clone with gitsign configured. Nothing is merged.
 
 ## The fall this merge will record, and the order to merge in (review F-06)
 
-**Predicted, before the day, so the entry is not written from memory.** The first `main` run after
-the three adopter branches merge will record `fail` **plus four** and `skip` **minus four**. Under
-this estate's contract a rise in `fail` on the run that records it is a blocking event and owes an
-entry in `talk/verify-falls.txt`, in that file's own grammar (`run=N | reason`), keyed to the run
-that records it.
+**Predicted by MECHANISM, not by a number, because the number moves daily.** Under this estate's
+contract a rise in `fail` on the run that records it is a blocking event and owes an entry in
+`talk/verify-falls.txt`, in that file's own grammar (`run=N | reason`), keyed to the run that
+records it.
 
-**The four rows, named in advance rather than inferred from the counts on the day:**
-`.estate-clone/driftwood/verify-reconcile.sh`, `.estate-clone/tuppence/verify-reconcile.sh`,
-`.estate-clone/ludlow/verify-reconcile.sh` and
-`verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh`, each SKIP -> FAIL.
+**The rule that decides how many rows move**, which is what should be written down rather than a
+count that will be stale by the time it is read: after the merge, one row moves SKIP -> FAIL for
+**each adopter whose newest lane sample, on the day, carries a fact observed FALSE**, plus
+`verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh` when the adopter IT grades (driftwood) is one
+of them. Nothing else in the four moves, and no other check is touched.
+
+**The first version of this paragraph said four rows, and it was already out of date when I wrote
+it.** It was measured against run 225's grade table, where all three adopters carried
+`FALSE fact_5_every_rendered_object_is_in_the_flux_inventory`. Ticket 107's round-4 wait order has
+since done its work: re-measured 2026-09-10 against each adopter's own `main` after driftwood's
+11:23Z scheduled sample (run 34470909429),
+
+| adopter | FALSE facts in its newest lane sample | `verify-reconcile.sh` before | after |
+|---|---|---|---|
+| driftwood | 0 | SKIP (3) | SKIP (3) — no change |
+| tuppence | 3 | SKIP (3) | FAIL (1) |
+| ludlow | 3 | SKIP (3) | FAIL (1) |
+
+so a merge on 2026-09-10 records `fail` **+2**, not +4: driftwood's sample is clean, so its row does
+not move and neither does step 4's, which grades driftwood. A merge on a day when driftwood's
+sample is red again records +3 or +4. **Write the entry from the two grade tables on the day.** The
+prediction here is the mechanism and the direction; the count is whatever the lane observed.
 
 **The cause is not a regression.** All four grade the adopters' lane sample through
 `drift/five-facts.py grade`, and that grader accumulated its verdict with `max(verdict, 1)`: once
@@ -456,11 +479,12 @@ The reds themselves are ticket 107's and ticket 81's to clear, not this ticket's
 **A draft of the entry, to be dated and given its real run number on the day** — the integrator
 writes it, and it should not have to be reconstructed:
 
-    run=N | 2026-09-DD, ticket 86's merge across the three adopters. `fail` rose F -> F+4 and
-    `skip` fell S -> S-4 between run <before> (hub <sha>) and run N (hub <sha>). The four rows are
-    `.estate-clone/{driftwood,tuppence,ludlow}/verify-reconcile.sh` and
-    `verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh`, each SKIP -> FAIL, measured by diffing
-    the grade tables the two recording commits carry. NO CHECK OF THE ESTATE LOST A GREEN. All four
+    run=N | 2026-09-DD, ticket 86's merge across the three adopters. `fail` rose F -> F+K and
+    `skip` fell S -> S-K between run <before> (hub <sha>) and run N (hub <sha>). The K rows are
+    <named from the two grade tables>, each SKIP -> FAIL, one per adopter whose newest lane sample
+    carried a fact observed FALSE, plus verify-e2e-step4 if driftwood was among them; measured by
+    diffing the grade tables the two recording commits carry, not inferred from the counts.
+    NO CHECK OF THE ESTATE LOST A GREEN. All of them
     grade the adopters' lane sample, and ticket 86 fixed a grader that could not fail:
     `max(verdict, 1)` softened every fact observed FALSE that followed a could-not-look, so those
     four SKIPs were already FAILs that the instrument was reporting as could-not-looks -- on run
@@ -524,3 +548,42 @@ because they are real:
 - **The two connects are two ports on two addresses.** "Reaches nothing" is grounded in exactly
   those, and the fact says so on its ceiling. Widening it is a measurement design question, not a
   defect.
+
+### The battery and the gate run, after the review round
+
+Branch and a throwaway merge onto `origin/main` at `21b4514`: real merge, **zero conflicts**, and
+the two trees identical (`git diff --stat` between them is empty).
+
+| check | branch | throwaway merge |
+|---|---|---|
+| `talk/verify-all.sh --selfcheck` | PASS, exit 0 | PASS, exit 0 |
+| `verify/cited-truth/verify-cited-truth.sh` | PASS | PASS |
+| `verify/truth-line/verify-truth-line.sh` | PASS | PASS |
+| `verify/every-green/verify-every-green.sh` | PASS | PASS |
+| `talk/verify-demo.sh` | PASS | PASS |
+| `talk/truth_manifest.py check` | rc 0 | rc 0 |
+| `mypy twin tests conftest.py` | Success, 189 files | Success, 189 files |
+| `pytest -q` | — | 7 failed, 2525 passed |
+
+`truth-line` and `every-green` first returned 3 in the merge worktree, on
+`SKIP: no .estate-clone (run clone-estate.sh)`; the branch worktree had a clone and the merge
+worktree did not. Given the same substrate — the branch's clone COPIED across rather than
+re-fetched, because `--refresh` near a shared clone deletes other builders' worktrees — both PASS.
+The seven pytest failures are the same seven as before and are `main`'s: one standing coverage-floor
+red and six that reproduce file-for-file on a clean `origin/main` worktree.
+
+The gate run of the final head is run **238**, `gh run view 34474968513`, hub `40dde19`, conclusion
+`failure` as `main`'s own runs are. `talk/truth.log` records no such line and this quotation is
+**not citable**:
+
+```
+TRUTH 2026-09-10T12:34Z run=238 hub=40dde19 enact=development units=[driftwood=b0eb73a@main
+feeds=c3c654a@main ico=abcb3a8@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main
+platform=5b88f1d@policy/v5.0.0 tuppence=bd15aae@main] pass=80 [observed=25 self=42 simulated=4
+meta=9] fail=8 skip=29 [never=10 waits=19] excluded=8 total=125 ceiling=106
+```
+
+`fail=8`, unmoved, for the fourth time across runs 230, 232, 233 and 238: the hub half of this
+ticket moves the record and not the number. `pass` is 80 rather than 78 and `platform` is read at
+`policy/v5.0.0` because three signed tags were cut this morning on the owner's authorisation; that
+is the estate's own step and none of it is this ticket's.
