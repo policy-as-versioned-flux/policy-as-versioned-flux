@@ -22,7 +22,7 @@ PASS: ico/release.yml checks out policy-as-versioned-platform/platform at the ta
 PASS: insurer/fetch.yml checks out policy-as-versioned-driftwood/driftwood at the tag insurer pins it to (v1.1.0)
 PASS: insurer/fetch.yml checks out policy-as-versioned-tuppence/tuppence at the tag insurer pins it to (v1.1.0)
 PASS: insurer/fetch.yml checks out policy-as-versioned-ludlow/ludlow at the tag insurer pins it to (v1.1.0)
-FAIL: insurer/release.yml checks out policy-as-versioned-platform/platform with no `ref:` -- that is platform's default branch, which carries no signature and can move under this consumer
+PASS: insurer/release.yml checks out policy-as-versioned-platform/platform at the tag insurer pins it to (v1.1.1, v3.0.0)
 PASS: ludlow/cut-release.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
 PASS: ludlow/cut-release.yml checks out policy-as-versioned-nist/nist at the tag ludlow pins it to (v1.1.0)
 PASS: ludlow/cut-release.yml checks out policy-as-versioned-ico/ico at the tag ludlow pins it to (v3.0.0)
@@ -51,4 +51,4 @@ PASS: tuppence/shift-left.yml checks out policy-as-versioned-platform/platform a
 PASS: tuppence/shift-left.yml checks out policy-as-versioned-nist/nist at the tag tuppence pins it to (v1.1.0)
 PASS: tuppence/shift-left.yml checks out policy-as-versioned-ico/ico at the tag tuppence pins it to (v3.0.0)
 PASS: tuppence/shift-left.yml checks out policy-as-versioned-feeds/feeds at the tag tuppence pins it to (threat-register/v1.0.0)
-FAIL: 1 cross-organisation checkout(s) are not pinned to a signed tag: insurer/release.yml checks out policy-as-versioned-platform/platform with no `ref:` -- that is platform's default branch, which carries no signature and can move under this consumer
+SKIP: driftwood/twin-sweep.yml checks out policy-as-versioned-flux/policy-as-versioned-flux: flux has cut no tag at all, so there is no signed version to pin to -- the consumer is not at fault and this is not a pass

@@ -1,13 +1,11 @@
 [1;36m==>[0m 1. the derivation grades planted tickets and a planted grade table as documented
 selfcheck ok
 [1;36m==>[0m 2. every Status: is one word of the tracker's vocabulary, and every done ticket has something behind it
-  110 tickets: closed=1, open=14, resolved=95
+  110 tickets: closed=1, open=12, resolved=97
 [1;36m==>[0m 3. the derivation, from the grade table the newest recorded run wrote
-  derived from the grade table run 235 recorded, 125 script(s) graded
+  derived from the grade table run 242 recorded, 125 script(s) graded
   ticket numbers read by verify/cited-truth/cited_truth.py's ticket_numbers (ticket 102), one reading for the estate
-  95 of 110 tickets are written `resolved`: 26 derive resolved from a named check that passed, 9 derive regressed (8 of those acknowledged by a dated line in the ticket), 6 rest only on checks that could not look, and 54 name no check of their own the table carries
-  162 check(s) named by a resolved ticket are not rows in the table at all (a unit's script this run did not discover, or a renamed one); 7 red row(s) are named by a ticket that does not own the check (git says another ticket's commits touched it) and 0 are named by a ticket where NO commit touching the check names any ticket at all, so ownership could not be established for anyone; 5 are THIS check's own row, which is not evidence about the ticket that built it (ticket 108: a check whose output is its own input latches)
-  !! .scratch/ecosystem/issues/34-handbook-as-a-compose-time-render.md: is written `Status: resolved` and derives `regressed`: 2 of the 2 check(s) it names graded FAIL on the run the table records: verify/handbook/verify-handbook-is-a-compose-time-render.sh, verify/handbook/verify-handbook-is-a-compose-time-render.sh. No dated paragraph in the file names that check, so the record does not say the thing this ticket built is currently red. Either the check goes green again, or the ticket carries a dated line naming it and what owns it
-  !! a ticket is written resolved while a check it OWNS is red on the run the grade table records, and nothing dated after that ticket's Answer names that check
+  97 of 110 tickets are written `resolved`: 27 derive resolved from a named check that passed, 9 derive regressed (9 of those acknowledged by a dated line in the ticket), 6 rest only on checks that could not look, and 55 name no check of their own the table carries
+  166 check(s) named by a resolved ticket are not rows in the table at all (a unit's script this run did not discover, or a renamed one); 9 red row(s) are named by a ticket that does not own the check (git says another ticket's commits touched it) and 0 are named by a ticket where NO commit touching the check names any ticket at all, so ownership could not be established for anyone; 5 are THIS check's own row, which is not evidence about the ticket that built it (ticket 108: a check whose output is its own input latches)
 
-FAIL: 1 fault(s) -- a ticket's Status: is typed rather than derived (ticket 59)
+PASS: every ticket in .scratch/ecosystem/issues/ carries one Status: line from the tracker's own vocabulary with nothing free-typed after it, every resolved ticket has an Answer and every closed one a dated closure, and every resolved ticket's Status is derived from the grade table the newest recorded run wrote -- no ticket claims resolved while a check it names graded FAIL on that run without a dated line in the ticket naming it
