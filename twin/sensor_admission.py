@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import ast
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -67,6 +68,13 @@ SCENARIO_CLASS = "bus-factor-key-person"
 ADMISSIONS_DIR = "twin/orgs/{org}/sensor-admissions"
 PEOPLE_DIR = "twin/orgs/{org}/people"
 SCENARIOS_DIR = "twin/orgs/{org}/scenarios"
+ORG_DIR = "twin/orgs/{org}"
+
+#: Both spellings (round-6 F3). Reading only the long one dropped a record or a role file under
+#: the short one in silence -- and the short one is what this estate uses for every workflow
+#: file. Anything under a scanned directory that is neither is a NAMED row, not a third silent
+#: class.
+YAML_SUFFIXES = (".yaml", ".yml")
 
 #: Tokens in a FIELD OR KEY name that mean the thing read is an individual. `sign.PERSONAL_FIELDS`
 #: is the register this estate already refuses a signature for; the rest are the shapes that list
@@ -79,12 +87,32 @@ INDIVIDUAL_NAME_TOKENS: tuple[str, ...] = tuple(sorted(set(PERSONAL_FIELDS) | {
 }))
 
 #: Shapes in a VALUE that identify an individual whatever the field is called.
-# R5-5: an adopter's own served bytes could deny the whole gate. This pattern backtracks
-# quadratically on a value with NO at-sign -- 8 KiB 0.275s, 32 KiB 4.44s, 128 KiB 73s, 1 MiB
+# R5-5 and round-6 F8: an adopter's own served bytes could deny the whole gate. A regular
+# expression here backtracked quadratically -- 8 KiB 0.275s, 32 KiB 4.44s, 128 KiB 73s, 1 MiB
 # about 75 minutes -- and neither the module nor the wrapper has a timeout, so in the gate that
-# is a job that dies with no verdict. `identifier_in_value` returns early when there is no
-# at-sign, which is precisely the pathological case. The NI pattern is bounded and needs nothing.
-_EMAIL = re.compile(r"[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+")
+# is a job that dies with no verdict. R5-5 returned early when the value had NO at-sign; F8
+# measured that ONE at-sign, one character an adopter serves, restored it completely (24 KiB
+# 2.4s, 128 KiB 73.5s), and R5-7 had just widened the scan to every readable party file, so the
+# denial surface GREW. The pathological case was the pattern, not the input.
+#
+# So there is no pattern. `_looks_like_an_email` is a LINEAR scan: split once on whitespace and
+# the two separators, then partition each chunk on its first at-sign and test the two halves
+# with `in` and `not in`. No repetition operator, nothing to backtrack, cost strictly linear in
+# the length of the value. The NI number is a bounded pattern and needs nothing.
+_EMAIL_SEPARATORS = str.maketrans({",": " ", ";": " "})
+
+
+def _looks_like_an_email(text: str) -> bool:
+    if "@" not in text:
+        return False
+    for chunk in text.translate(_EMAIL_SEPARATORS).split():
+        local, at, domain = chunk.partition("@")
+        if not at or not local or "@" in domain:
+            continue
+        head, dot, tail = domain.rpartition(".")
+        if dot and head and tail:
+            return True
+    return False
 _NI_NUMBER = re.compile(r"\b[A-CEGHJ-PR-TW-Z]{2}\d{6}[A-D]?\b")
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _WORD = re.compile(r"[^a-z0-9]+")
@@ -104,15 +132,26 @@ _ID_SHAPE = re.compile(r"^[a-z]+(?:-[a-z]+)+$")
 #: The functions that build `(refusal id, what)` pairs rather than calling `out()` directly.
 _PROBLEM_BUILDERS = ("closed_document_problems", "grade_record")
 
+#: The function whose `out(...)` calls are the refusal emitter. Round-6: the walk matched by
+#: NAME, so `grade_estate`'s `out` parameter -- the printer -- was conflated with it.
+_EMITTER_FUNCTIONS = ("grade_record",)
+
 
 def emitted_refusal_ids(source: Path | None = None) -> set[str]:
     """Every refusal id this module's own SOURCE can actually emit, read off the call sites.
 
     Round-5 finding R5-8: the two-way subset `load_rule()` enforced was between two
     DECLARATIONS -- the table and a hand-written `REFUSAL_IDS` -- not between a declaration and
-    the CODE. An id added to BOTH loaded clean and appeared verbatim in the printed block under
-    the words "the refusals it can reach are". This walks the module's AST instead, so that
-    sentence is true by construction rather than true by inspection.
+    the CODE. An id added to BOTH loaded clean and appeared verbatim in the printed block.
+
+    WHAT THIS PROVES, narrowed in round 6 to what the walk supports: every refusal id this
+    module's source passes LITERALLY to the emitter. It does not prove reachability -- dead code
+    behind a never-true condition still counts -- so the printed block says "the refusals it can
+    EMIT are". The valuable direction is the fail-closed one, and it is total: a sentence the
+    table declares for an id no call site spells is refused at load, and an id a call site
+    spells with no sentence is refused too. `_EMITTER_FUNCTIONS` scopes the first pass so
+    `grade_estate`'s `out` PARAMETER -- a printer that happens to share the name -- is not
+    mistaken for the emitter.
 
     Two shapes, because the module emits in two ways: a literal first argument to `out(...)`
     anywhere, and the first element of the `(refusal id, what)` pairs that the two collectors
@@ -129,11 +168,14 @@ def emitted_refusal_ids(source: Path | None = None) -> set[str]:
             found.add(node.value)
 
     for node in ast.walk(tree):
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) \
-                and node.func.id == "out" and node.args:
-            first = node.args[0]
-            if isinstance(first, ast.Constant) and isinstance(first.value, str):
-                found.add(first.value)
+        if not isinstance(node, ast.FunctionDef) or node.name not in _EMITTER_FUNCTIONS:
+            continue
+        for inner in ast.walk(node):
+            if isinstance(inner, ast.Call) and isinstance(inner.func, ast.Name) \
+                    and inner.func.id == "out" and inner.args:
+                first = inner.args[0]
+                if isinstance(first, ast.Constant) and isinstance(first.value, str):
+                    found.add(first.value)
     for node in ast.walk(tree):
         if not isinstance(node, ast.FunctionDef) or node.name not in _PROBLEM_BUILDERS:
             continue
@@ -146,6 +188,26 @@ def emitted_refusal_ids(source: Path | None = None) -> set[str]:
     return {i for i in found if _ID_SHAPE.match(i)}
 
 
+#: The declaration slots earlier rounds' fixes rest on (round-6 F6): (table, set, keys, why).
+_DECLARATIONS_FIXES_REST_ON = (
+    ("non_empty", "ladder_necessity", ("alternatives",),
+     "round-4 F7 rests on it: an empty alternatives list passes the necessity rung vacuously"),
+    ("required_keys", "ladder_necessity", ("kind", "level", "alternatives"),
+     "round-4 F7 and round-5 R3 rest on it: ethics_gate indexes those slots with []"),
+    ("required_keys", "ladder_proportionality", ("intrusion_cost", "value_illuminated"),
+     "round-5 R3 rests on it: ethics_gate indexes both with []"),
+    ("required_keys", "record", ("schema",),
+     "round-4 F9 rests on it: without it, deleting the key is a green admission"),
+    ("fixed_values", "record", ("schema",),
+     "round-4 F9 rests on it: it is what pins the record schema to RECORD_SCHEMA"),
+    ("fixed_values", "dpia_record", ("schema",),
+     "round-4 F6 rests on it: the DPIA's own schema was a slot a name lived in"),
+    ("typed_keys", "ladder_purpose", ("will_act",),
+     "round-4 G1b rests on it: the ladder only tests will_act for truthiness, so prose passed"),
+    ("requires", "dpia_fields", ("completed_on", "completed_by", "retention_days"),
+     "the DPIA gate rests on all three: a date, an accountable role and a retention period"),
+)
+
 #: The record fields a DPIA can be checked to agree with (F4). Anything else is a declaration
 #: this module cannot resolve, and was a KeyError at grade time.
 _DPIA_AGREES_ON = ("sensor", "scenario")
@@ -154,6 +216,14 @@ _DPIA_AGREES_ON = ("sensor", "scenario")
 #: table may mark terminal (R5-13). Anything else marked terminal would be decorative.
 _TERMINAL_CAPABLE = ("names-or-identifies-an-individual", "key-not-declared",
                      "value-not-the-declared-shape", "duplicate-key", "required-key-missing")
+
+#: The refusals the table MUST mark terminal (round-6 F5). R5-13 constrained which ids MAY be
+#: terminal and nothing constrained which must be, so a one-word table edit -- or simply
+#: dropping the key, since the guard defaults it to False -- made this module walk the ethics
+#: gate for a record that names a person and return `admitted: True` with a proportionality
+#: justification. That is a PRICE on sensing a named individual, which this module's own
+#: docstring says it has no code path for. The whole purpose of the ticket rests on this row.
+_TERMINAL_REQUIRED = ("names-or-identifies-an-individual",)
 
 REFUSAL_IDS = (
     "names-or-identifies-an-individual",
@@ -304,11 +374,31 @@ def load_rule(path: Path | None = None) -> dict[str, Any]:
         raise SensorAdmissionError(
             f"{source}: dpia_path_pattern is not a compilable regular expression ({exc})"
         ) from exc
+    # Round-6 F6: three earlier fixes could be re-opened by a mis-authoring that loads clean.
+    # Each slot a fix RESTS ON is asserted by name, so narrowing it is a refusal rather than a
+    # silently readmitted plant.
+    for table, set_name, keys, why in _DECLARATIONS_FIXES_REST_ON:
+        rests_on = {str(k) for k in ((doc.get(table) or {}).get(set_name) or [])}
+        for key in keys:
+            if key not in rests_on:
+                raise SensorAdmissionError(
+                    f"{source}: {table}.{set_name} does not declare {key!r}, and {why}")
+    if not pattern.startswith("^") or not pattern.endswith("$"):
+        raise SensorAdmissionError(
+            f"{source}: dpia_path_pattern {pattern!r} is not anchored at both ends, so a "
+            "trivially permissive form naming {sensor} passes and the directory part is free "
+            "text again")
     # R5-14: read rather than left as prose nothing checks.
     if not isinstance(doc.get("version"), int) or isinstance(doc.get("version"), bool):
         raise SensorAdmissionError(
             f"{source}: version is {doc.get('version')!r} and must be a whole number, since the "
             "table's own instruction is to bump it")
+    for row in doc["admissible"]:
+        if doc.get("bus_factor_scope") == "one" and row.get("granularity") != "aggregate":
+            raise SensorAdmissionError(
+                f"{source}: admissible declares {row.get('kind')}/{row.get('granularity')} while "
+                "bus_factor_scope reads one. At a bus factor of one a cohort IS the person, and "
+                "the table's own comment forbids loosening this without deriving n first")
     if doc.get("bus_factor_scope") != "one":
         raise SensorAdmissionError(
             f"{source}: bus_factor_scope is {doc.get('bus_factor_scope')!r}; the cohort "
@@ -351,6 +441,12 @@ def load_rule(path: Path | None = None) -> dict[str, Any]:
                 f"{source}: refusal {rid!r} is marked terminal and this module never evaluates "
                 f"it before the ladder (those that are: {', '.join(_TERMINAL_CAPABLE)}), so the "
                 "flag would be decorative")
+        if rid in _TERMINAL_REQUIRED and not row.get("terminal"):
+            raise SensorAdmissionError(
+                f"{source}: refusal {rid!r} is not marked terminal. It must be: without it this "
+                "module walks the ethics gate for a record that names a person and computes a "
+                "proportionality ratio for it, which is a PRICE on sensing a named individual "
+                "and the one thing ticket 31 must never build")
         if not sentence.startswith(f"REFUSED {rid}:"):
             raise SensorAdmissionError(
                 f"{source}: refusal {rid!r} declares a sentence that does not open "
@@ -398,7 +494,7 @@ def identifier_in_name(name: str) -> str | None:
 def identifier_in_value(value: str) -> str | None:
     """The shape that makes this value an individual's, whatever the field is called."""
     text = str(value)
-    if "@" in text and _EMAIL.search(text):
+    if _looks_like_an_email(text):
         return "an email address"
     if _NI_NUMBER.search(text):
         return "a national insurance number"
@@ -921,7 +1017,8 @@ def limits(rule: dict[str, Any] | None = None) -> list[str]:
     from it again.
     """
     rule = rule or load_rule()
-    # R5-8: read off the CALL SITES, not the table, so this sentence is true by construction.
+    # R5-8, narrowed in round 6: read off the CALL SITES, not the table. It establishes that a
+    # literal call site exists, not that the id is reachable, so the sentence says EMIT.
     refuses = ", ".join(sorted(emitted_refusal_ids()))
     survives = [f"a DPIA's {f}" for f in rule["free_prose_fields"]]
     survives += ["a notice's published_at path", "a role id or a role file's own role: prose",
@@ -929,12 +1026,14 @@ def limits(rule: dict[str, Any] | None = None) -> list[str]:
     return [
         "this run grades the RULE and any admission record an adopter serves. Nothing here "
         "observes a sensor running or a person; no sensing substrate exists in this estate.",
-        f"the refusals it can reach are: {refuses}.",
+        f"the refusals it can emit are: {refuses}. That list is read off this module's own call "
+        "sites, so a refusal the table declares and no call site spells is refused at load; it "
+        "does not prove every one of them is reachable.",
         "served bytes are parsed with a loader that refuses a DUPLICATE mapping key, so the "
         "document this check grades is the document a reader sees, not the one PyYAML builds "
         "by keeping the last of two identical keys.",
         "the identifier scan covers FIVE served documents and no others: the admission record, "
-        "the DPIA record it names and every role file in the people register are scanned for "
+        f"the DPIA record it names and every role file in the people register (both {' and '.join(YAML_SUFFIXES)}) are scanned for "
         "identifier-shaped KEYS AND VALUES; every "
         f"{SCENARIO_CLASS} scenario file and every readable party.yaml, whatever roles it "
         "claims, are scanned for identifier-shaped "
@@ -950,6 +1049,17 @@ def limits(rule: dict[str, Any] | None = None) -> list[str]:
 
 
 # -- the served artefact --------------------------------------------------------------------------
+
+def display(path: str) -> str:
+    """A path rendered so printing it cannot kill the run (round-6 F4).
+
+    A genuinely non-UTF-8 path decodes with `surrogateescape`, is read and graded correctly, and
+    was then killed on the way OUT when the estate grader printed it -- outside every guard the
+    earlier rounds installed, and reopening round-4 F2 at the path layer. The run went red rather
+    than green, so nothing was hidden, but it measured nothing.
+    """
+    return str(path).encode("utf-8", "surrogateescape").decode("utf-8", "replace")
+
 
 def served(unit: Path, path: str) -> str | Unreadable | None:
     """The bytes GitHub serves at `origin/main:<path>`. Never the working tree: an uncommitted
@@ -1003,8 +1113,13 @@ def ref_resolves(unit: Path) -> bool:
     repository, or its remote-tracking main is gone". Reading the second as the first is how a
     unit whose repository was damaged came to be dropped in silence, beside a real adopter.
     """
+    # Round-6 F1: `rev-parse --verify -q origin/main` proves a ref PARSES, not that it POINTS
+    # AT ANYTHING. For a pruned clone, a ref naming a sha the repository never had, or a ref
+    # that is a blob, it printed a sha while `ls-tree` said "not a tree object" -- and the unit
+    # landed in exactly the silent skip R5-2 was written to close. Peeling to a commit is what
+    # actually asks the question.
     out = subprocess.run(
-        ["git", "-C", str(unit), "rev-parse", "--verify", "-q", "origin/main"],
+        ["git", "-C", str(unit), "rev-parse", "--verify", "-q", "origin/main^{commit}"],
         capture_output=True)
     return out.returncode == 0
 
@@ -1055,8 +1170,28 @@ def adopters(estate: Path,
                     f"{unit.name}", "origin/main does not resolve in this unit: the repository "
                     "or its remote-tracking main cannot be read, so nothing it serves was graded")
             continue
+        paths = served_paths(unit)
+        if not paths:
+            # F1, belt and braces: the ref resolved and nothing came back.
+            unreadable[unit.name] = Unreadable(
+                unit.name, "origin/main resolves and its tree came back empty, so nothing this "
+                           "unit serves could be read")
+            continue
         text = served(unit, "party.yaml")
         if text is None:
+            # F2: a unit that SERVES an org tree and no readable adopter claim used to vanish
+            # with all of it -- register, key-person scenario and admission record. Leg 1 states
+            # the opposite principle for the scenario, and for the same reason: if it can vanish,
+            # the count moves and nothing goes red. A repository serving no org tree at all stays
+            # the correct silent skip.
+            org_prefix = "twin/orgs/"
+            if any(p.startswith(org_prefix) for p in paths):
+                served_orgs = sorted({p.split("/")[2] for p in paths
+                                      if p.startswith(org_prefix) and p.count("/") >= 2})
+                unreadable[unit.name] = Unreadable(
+                    unit.name, f"serves a twin org tree ({', '.join(served_orgs)}) and no "
+                               "readable party.yaml, so it stopped saying it is a party while "
+                               "still serving everything this check grades")
             continue
         if isinstance(text, Unreadable):
             unreadable[unit.name] = Unreadable(where, text.why)
@@ -1091,7 +1226,11 @@ def people_files(estate: Path, org: str) -> dict[str, Any]:
     unit = estate / org
     files: dict[str, Any] = {}
     for path in served_paths(unit):
-        if not path.startswith(prefix) or not path.endswith(".yaml"):
+        if not path.startswith(prefix):
+            continue
+        if not path.endswith(YAML_SUFFIXES):
+            files[path] = Unreadable(path, "is under the people register and is neither "
+                                           f"{' nor '.join(YAML_SUFFIXES)}, so nothing read it")
             continue
         text = served(unit, path)
         if text is None:
@@ -1117,7 +1256,11 @@ def key_person_scenarios(estate: Path, org: str,
     unreadable = {} if unreadable is None else unreadable
     out: dict[str, dict[str, Any]] = {}
     for path in served_paths(unit):
-        if not path.startswith(prefix) or not path.endswith(".yaml"):
+        if not path.startswith(prefix):
+            continue
+        if not path.endswith(YAML_SUFFIXES):
+            unreadable[path] = Unreadable(path, "is under the scenarios directory and is neither "
+                                                f"{' nor '.join(YAML_SUFFIXES)}")
             continue
         text = served(unit, path)
         if text is None:
@@ -1143,7 +1286,11 @@ def admission_records(estate: Path, org: str) -> dict[str, Any]:
     unit = estate / org
     out: dict[str, Any] = {}
     for path in served_paths(unit):
-        if not path.startswith(prefix) or not path.endswith(".yaml"):
+        if not path.startswith(prefix):
+            continue
+        if not path.endswith(YAML_SUFFIXES):
+            out[path] = Unreadable(path, "is under the sensor-admissions directory and is "
+                                         f"neither {' nor '.join(YAML_SUFFIXES)}")
             continue
         text = served(unit, path)
         if text is None:
@@ -1172,20 +1319,28 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
     Leg 3 is the one ticket 31 exists for and it is the one that cannot look today: nothing is
     admitted, because nobody has declared a sensor. That is printed as a COUNT, never as a pass.
     """
+    # Round-6 F4: one wrapper, so no print site anywhere below can kill the run on a path that
+    # decoded with surrogates. `display()` is still applied where a path is embedded, so the
+    # message reads sensibly; this is the belt that makes the guarantee total.
+    plain = out
+
+    def say(line: str) -> None:
+        plain(display(line))
+
     for line in limits():
-        out(f"  LIMIT: {line}")
+        say(f"  LIMIT: {line}")
     if not estate.is_dir():
-        out(f"SKIP: no estate clone at {estate}")
+        say(f"SKIP: no estate clone at {estate}")
         return 3
     unreadable_parties: dict[str, Unreadable] = {}
     orgs = adopters(estate, unreadable_parties)
     fail_parties = 0
     for name, why in sorted(unreadable_parties.items()):
         print_ = f"FAIL {name.split('::')[0]}: {why.path}: {why.why}"
-        out(print_)
+        say(print_)
         fail_parties += 1
     if not orgs and not unreadable_parties:
-        out(f"SKIP: no party in {estate} serves a party.yaml claiming the adopter role at "
+        say(f"SKIP: no party in {estate} serves a party.yaml claiming the adopter role at "
             "origin/main")
         return 3
 
@@ -1209,14 +1364,14 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
         # keys (closed set) and its values, not the keys and values alone.
         for path, doc in sorted(files.items()):
             if isinstance(doc, Unreadable):
-                out(f"FAIL {org}: {path}: {doc.why}")
+                say(f"FAIL {org}: {path}: {doc.why}")
                 fail += 1
                 continue
             for problem in people_file_problems(path, doc, rule):
-                out(f"FAIL {org}: {problem}")
+                say(f"FAIL {org}: {problem}")
                 fail += 1
         if not register:
-            out(f"FAIL {org}: serves no people register at "
+            say(f"FAIL {org}: serves no people register at "
                 f"{PEOPLE_DIR.format(org=org)}/, so no sensor could name a registered role")
             fail += 1
 
@@ -1230,26 +1385,26 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
         unreadable_scenarios: dict[str, Unreadable] = {}
         found = key_person_scenarios(estate, org, unreadable_scenarios)
         for path, why in sorted(unreadable_scenarios.items()):
-            out(f"FAIL {org}: {path}: {why.why}")
+            say(f"FAIL {org}: {path}: {why.why}")
             fail += 1
         scenarios_seen += len(found)
         if not found:
-            out(f"FAIL {org}: serves no {SCENARIO_CLASS} scenario under "
+            say(f"FAIL {org}: serves no {SCENARIO_CLASS} scenario under "
                 f"{SCENARIOS_DIR.format(org=org)}/, so the sentence this check grades -- "
                 f"{NOTE_SENTENCE!r} -- is published nowhere for this adopter")
             fail += 1
         for path, doc in sorted(found.items()):
             note = " ".join(str(doc.get("note", "")).split())
             if NOTE_SENTENCE.lower() not in note.lower():
-                out(f"FAIL {org}: {path} is a {SCENARIO_CLASS} scenario whose note no longer "
+                say(f"FAIL {org}: {path} is a {SCENARIO_CLASS} scenario whose note no longer "
                     f"says {NOTE_SENTENCE!r}")
                 fail += 1
             subject = re.search(r"`people/([a-z0-9-]+)\.yaml`", note)
             if subject is None:
-                out(f"FAIL {org}: {path} names no `people/<role>.yaml` subject in its note")
+                say(f"FAIL {org}: {path} names no `people/<role>.yaml` subject in its note")
                 fail += 1
             elif subject.group(1) not in register:
-                out(f"FAIL {org}: {path} names `people/{subject.group(1)}.yaml` as its subject "
+                say(f"FAIL {org}: {path} names `people/{subject.group(1)}.yaml` as its subject "
                     f"and the served people register carries {sorted(register) or 'nothing'}")
                 fail += 1
 
@@ -1265,7 +1420,7 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
         for path, maybe in sorted(records.items()):
             records_seen += 1
             if isinstance(maybe, Unreadable):
-                out(f"FAIL {org}: {path}: {maybe.why}")
+                say(f"FAIL {org}: {path}: {maybe.why}")
                 refused_count += 1
                 fail += 1
                 continue
@@ -1280,34 +1435,34 @@ def grade_estate(estate: Path, out: Callable[[str], None] = print) -> int:
                                if isinstance(s, dict)],
                     rule=rule, dpia_reader=read_dpia)
             except Exception as exc:  # noqa: BLE001 -- see R4 above
-                out(f"FAIL {org}: {path}: grading it raised {exc.__class__.__name__}: {exc}. "
+                say(f"FAIL {org}: {path}: grading it raised {exc.__class__.__name__}: {exc}. "
                     "That is a defect in this check, not a pass for the record")
                 refused_count += 1
                 fail += 1
                 continue
             if result["admitted"]:
                 admitted_count += 1
-                out(f"PASS {org}: {path}: {result['sensor']} admitted -- "
+                say(f"PASS {org}: {path}: {result['sensor']} admitted -- "
                     f"{result['ladder']['claim']['evidence']}")
             else:
                 refused_count += 1
                 for line in result["refusals"]:
-                    out(f"FAIL {org}: {path}: {line}")
+                    say(f"FAIL {org}: {path}: {line}")
                 fail += 1
 
     units = " ".join(shas)
     if fail:
-        out(f"FAIL: {fail} observed false across {len(orgs)} adopters at origin/main "
+        say(f"FAIL: {fail} observed false across {len(orgs)} adopters at origin/main "
             f"[{units}]; {scenarios_seen} {SCENARIO_CLASS} scenarios, {records_seen} admission "
             f"records ({admitted_count} admitted, {refused_count} refused)")
         return 1
     if records_seen == 0:
-        out(f"SKIP: {len(orgs)} adopters read at origin/main [{units}]; {scenarios_seen} carry a "
+        say(f"SKIP: {len(orgs)} adopters read at origin/main [{units}]; {scenarios_seen} carry a "
             f"{SCENARIO_CLASS} scenario and every one still says {NOTE_SENTENCE!r}; 0 declare a "
             f"sensor admission under twin/orgs/<org>/sensor-admissions/, so 0 admission decisions "
             f"could be graded")
         return 3
-    out(f"PASS: {len(orgs)} adopters read at origin/main [{units}]; {scenarios_seen} "
+    say(f"PASS: {len(orgs)} adopters read at origin/main [{units}]; {scenarios_seen} "
         f"{SCENARIO_CLASS} scenarios still say {NOTE_SENTENCE!r}; {records_seen} admission "
         f"records graded, {admitted_count} admitted, {refused_count} refused")
     return 0
@@ -1704,6 +1859,63 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
                 f"{rc}: {lines[-1] if lines else 'nothing'}")
             failures += 1
 
+        # Round-6 F1: `rev-parse --verify -q origin/main` proves a ref PARSES, not that it
+        # POINTS AT ANYTHING; a pruned object store resolved and `ls-tree` said "not a tree
+        # object", so the unit landed in the silent skip R5-2 was written to close.
+        lines = []
+        root8 = root / "prunedref"
+        bad_alpha = _GOOD_RECORD.replace("planted", "alpha").replace(
+            "fields: [component, distinct_committer_count, window_days]",
+            "fields: [component, employee_id]")
+        _plant(root8, hooks, bad_alpha, org="alpha")
+        estate = _plant(root8, hooks, _GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+        objects = estate / "alpha" / ".git" / "objects"
+        shutil.rmtree(objects)
+        objects.mkdir()
+        rc = grade_estate(estate, out=lines.append)
+        joined = "\n".join(lines)
+        if rc == 1 and "alpha" in joined and "bravo" in joined:
+            out("PASS: selfcheck: a ref that parses but points at no tree is a named row, and "
+                "the healthy unit beside it is still graded")
+        else:
+            out(f"FAIL: selfcheck: a ref that parses but points at no tree must be named, got "
+                f"exit {rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
+        # Round-6 F2: a unit that SERVES the whole org tree and stops serving its adopter claim
+        # vanished with all of it, unnamed.
+        lines = []
+        root9 = root / "noclaim"
+        _plant(root9, hooks, bad_alpha, org="alpha")
+        estate = _plant(root9, hooks, _GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+        unit = estate / "alpha"
+        _git(unit, "rm", "-q", "--cached", "party.yaml", hooks=hooks)
+        _git(unit, "commit", "-q", "-m", "stop claiming", hooks=hooks)
+        _git(unit, "update-ref", "refs/remotes/origin/main", "HEAD", hooks=hooks)
+        rc = grade_estate(estate, out=lines.append)
+        joined = "\n".join(lines)
+        if rc == 1 and "stopped saying it is a party" in joined:
+            out("PASS: selfcheck: a unit serving an org tree with no readable adopter claim is "
+                "a named row, not a silent drop")
+        else:
+            out(f"FAIL: selfcheck: a unit serving an org tree with no adopter claim must be "
+                f"named, got exit {rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
+        # Round-6 F3: only one spelling of the extension was read, and the short one is what
+        # this estate uses for every workflow file.
+        lines = []
+        estate = _plant(root / "shortext", hooks, None, org="alpha", extra_record=(
+            "bus-factor-structural-aggregate.yml", bad_alpha))
+        rc = grade_estate(estate, out=lines.append)
+        joined = "\n".join(lines)
+        if rc == 1 and "names-or-identifies-an-individual" in joined:
+            out("PASS: selfcheck: a record under the short extension is still graded")
+        else:
+            out(f"FAIL: selfcheck: a record under the short extension must be graded, got exit "
+                f"{rc}: {lines[-1] if lines else 'nothing'}")
+            failures += 1
+
         # Round-4 F2: a served file that is not UTF-8 aborted the run from the layer above the
         # per-record guard, and its traceback went to stderr where the wrapper never saw it.
         lines = []
@@ -1763,7 +1975,7 @@ def selfcheck(out: Callable[[str], None] = print) -> int:
     if failures:
         out(f"FAIL: selfcheck: {failures} planted case(s) did not grade as planted")
         return 1
-    out(f"PASS: selfcheck: {planted} planted records and fifteen planted served "
+    out(f"PASS: selfcheck: {planted} planted records and eighteen planted served "
         "estates grade as planted")
     return 0
 

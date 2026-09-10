@@ -770,6 +770,13 @@ sees the bytes.
 Both plants are in the tests and in the selfcheck. The `served()` docstring and the round-4 F2
 sentence in this ticket, both of which claimed the round-trip worked, are corrected in place.
 
+**Corrected again in round 6 (F4).** This section also said the surrogate-escape decode "does
+handle" the genuinely non-UTF-8 name. It handled READING it: the path decoded and the file was
+read and graded correctly, and then the run was killed on the way OUT when the estate grader
+printed it — outside every guard the earlier rounds installed, reopening round-4 F2 at the path
+layer. Red rather than green, so nothing was hidden, but the run measured nothing. `display()`
+and one sanitising wrapper over the grader's print site make the sentence true.
+
 ### R5-2 (blocking, pre-existing) — a damaged repository vanished the same way
 
 `adopters()` read a `None` from `served()` as "serves no party file", which is also what it
@@ -859,6 +866,159 @@ docstring (R5-2), and the `served()` docstring plus this ticket's round-4 F2 sen
 - `pytest tests/test_sensor_admission.py -n0 -q` → **153 passed** (21 failed first).
 - `verify/sensor-admission/verify-sensor-admission.sh` → exit 3, **34 planted records and fifteen
   planted served estates grade as planted**.
+- `mypy twin tests conftest.py` → Success, 189 source files.
+
+## Re-check round 6 — 2026-09-10, request-changes on five
+
+The reviewer established, first-hand and three ways, that **nothing in this branch is less safe
+than at the previous head**: the previous head's whole 128-test suite passes unchanged against
+this module; a 54-case differential fuzz across record, DPIA, register, scenario and combination
+mutations, graded as real estates by both module versions as subprocesses, found **zero**
+differing exit codes; and 32 path and unit attacks came back equal or stronger everywhere. It
+also confirmed the document itself is closed: it could not get a person through it, and every
+plant rounds 1 to 3 installed still fires. Five findings flipped a verdict or contradicted this
+ticket's own purpose, and those are fixed; two more are charted.
+
+### F5 (high) — a one-word table edit made this module PRICE sensing a named individual
+
+`terminal: false` on `names-or-identifies-an-individual` — or simply dropping the key, since the
+guard was `isinstance(row.get('terminal', False), bool)` — loaded clean, and the record then
+walked the ethics gate to `admitted: True` with a ladder carrying
+`{"rung": "proportionality", "passed": true, "justification": "the illuminated value (50000.0)
+outweighs the intrusion imposed (500.0)"}`. R5-13 constrained which ids MAY be terminal and
+nothing constrained which MUST be.
+
+> **red** — `Failed: DID NOT RAISE <class 'twin.sensor_admission.SensorAdmissionError'>` for both
+> the `terminal: false` edit and the dropped key
+>
+> **green** — `refusal 'names-or-identifies-an-individual' is not marked terminal. It must be:
+> without it this module walks the ethics gate for a record that names a person and computes a
+> proportionality ratio for it, which is a PRICE on sensing a named individual and the one thing
+> ticket 31 must never build`
+
+`_TERMINAL_REQUIRED` sits beside `_TERMINAL_CAPABLE`, with that reason spelled out where the
+constant is defined. A second test asserts the shipped table still returns `ladder: None`.
+
+### F1 (blocking) — a ref that PARSES is not a ref that points at anything
+
+R5-2's own sentence was false at the case it names. `rev-parse --verify -q origin/main` prints a
+sha for a pruned clone, for a ref naming a sha the repository never had, and for a ref that is a
+blob — while `ls-tree` says "not a tree object". The unit landed in exactly the silent skip R5-2
+was written to close.
+
+> **red** — `AssertionError: `rev-parse --verify -q` proves a ref PARSES, not that it points at
+> anything; with a pruned object store the unit landed in the silent skip R5-2 was written to
+> close: … assert 0 == 1` (and the same for a sha the repository never had, and for a blob)
+>
+> **green** — `FAIL alpha: alpha: origin/main does not resolve in this unit: the repository or
+> its remote-tracking main cannot be read, so nothing it serves was graded`, exit 1, with `bravo`
+> still graded
+
+The ref is peeled — `origin/main^{commit}` — and, belt and braces, a ref that resolves whose tree
+comes back empty is its own named row. All three plants sit beside the deleted-ref plant.
+
+### F2 (blocking) — a unit that stopped saying it is one
+
+A unit serving a whole org tree, people register, key-person scenario and an admission record,
+but no readable adopter claim, vanished with all of it. The `looks_like_a_unit` guard covered the
+damaged case by looking at DISK; nothing guarded the branch where the ref resolves, and there the
+evidence is stronger, because the unit SERVES the tree rather than merely carrying it. Leg 1
+already states the opposite principle for the scenario, and the manifest declares the adopter
+claim as a `waits` reason, so an estate where every adopter stopped claiming would have degraded
+to a declared could-not-look and never reddened.
+
+> **red** — `AssertionError: a unit serving an org tree and no adopter claim vanished with all of
+> it: … assert 0 == 1`
+>
+> **green** — `FAIL alpha: alpha: serves a twin org tree (alpha) and no readable party.yaml, so
+> it stopped saying it is a party while still serving everything this check grades`
+
+A repository serving no org tree stays the correct silent skip, and so does a party file whose
+roles legitimately omit the adopter role — five real units rely on that, and a test pins it.
+
+### F3 (blocking, and the likeliest to happen for real)
+
+Only one spelling of the extension was read, and the short one is what this estate uses for every
+workflow file.
+
+> **red** — `AssertionError: the short spelling is what this estate uses for every workflow file:
+> … assert 0 == 1`
+>
+> **green** — the record under `.yml` is refused `REFUSED
+> names-or-identifies-an-individual: … the field 'employee_id' …` at exit 1
+
+Both spellings are read now, **and** anything else under the three scanned directories is a named
+row rather than a third silent class. The limits block names both extensions.
+
+### F4 (high) — the non-UTF-8 path killed the run on the way OUT
+
+Fixed with `display()` and one sanitising wrapper over the estate grader's print site, so no
+print site below it can abort the run. The round-5 sentence that claimed the decode "does handle"
+that case is corrected above rather than left standing.
+
+### F6 (medium) — three earlier fixes could be re-opened by a mis-authoring that loads clean
+
+`_DECLARATIONS_FIXES_REST_ON` names the slot each fix depends on and why, so narrowing one is a
+refusal: `non_empty.ladder_necessity.alternatives` and `required_keys.ladder_necessity`
+(round-4 F7), `required_keys.ladder_proportionality` (round-5 R3), `required_keys.record.schema`
+and `fixed_values.record.schema` and `fixed_values.dpia_record.schema` (round-4 F9 and F6),
+`typed_keys.ladder_purpose.will_act` (round-4 G1b) and `requires.dpia_fields`. The path pattern
+must now be **anchored at both ends**, so `.*{sensor}.*` no longer passes R5-3 by merely naming
+the placeholder. And an `admissible` row at cohort granularity is refused while
+`bus_factor_scope` reads `one` — the self-service exemption the table's own comment forbids.
+
+### F8 (medium) — one at-sign restored the bomb completely
+
+R5-5 closed it only for values with **no** at-sign; one at-sign, one character an adopter serves,
+brought it back (24 KiB 2.4s, 128 KiB 73.5s — the same figure the R5-5 commit cites), and R5-7 had
+just widened the scan to every readable party file, so the denial surface GREW that round. My own
+comment called the no-at-sign case "precisely the pathological case"; the pathological case was
+the pattern. **There is no pattern now.** `_looks_like_an_email` is a linear scan: split once on
+whitespace and the two separators, partition each chunk on its first at-sign, test the halves
+with `in` and `not in`. No repetition operator, nothing to backtrack, cost strictly linear. The
+test is written WITH an at-sign present, and five shapes assert the scan still finds what it
+should and still refuses what it should not.
+
+### R5-8's sentence, brought back to what the walk supports
+
+"True by construction" and "the refusals it can reach are" were stronger than the mechanism. The
+walk establishes that a **syntactic call site exists with a literal first argument** — not that
+the id is reachable, and dead code behind a never-true condition would still grow the list. The
+printed block now reads *"the refusals it can **emit** are …, read off this module's own call
+sites, so a refusal the table declares and no call site spells is refused at load; it does not
+prove every one of them is reachable."* The fail-closed direction is the valuable one and is
+kept. `_EMITTER_FUNCTIONS` scopes the first pass so `grade_estate`'s `out` **parameter** — a
+printer sharing the name — is no longer conflated with the emitter, and a new test asserts the
+derivation's boundaries against a synthetic source rather than only asserting set equality.
+
+## Charted, not built (round 6, F9 and F10)
+
+Recorded here rather than as a ticket of their own, because each is a one-line hardening in this
+module and none flips a verdict; a separate ticket would cost more to route than to fix. The
+coordinator's round-6 bar is a plant that turns a red estate green or a sentence that claims what
+the code does not do, and none of these is either.
+
+1. **Three more scalar-typed tables crash rather than refuse.** `closed_keys`, `refusals` and
+   `requires` declared as scalars raise out of `load_rule` instead of returning a refusal. The
+   four tables round-5 R5-11 named are guarded; these three are not. Fail-loud, never a false
+   green.
+2. **A `requires` clause that accepts a mapping.** `requires.dpia_fields` is validated; the
+   sibling prose clauses are not type-checked, so one authored as a mapping reads oddly in the
+   table and is inert in the code.
+3. **`twin.dpia/v1` is not cross-checked the way `RECORD_SCHEMA` is.** The DPIA schema is fixed in
+   the table (round-4 F6) but has no module constant to disagree with, so the two cannot drift —
+   there is only one of them. Named because the asymmetry with the record schema is worth a
+   reader knowing.
+4. **`version` is not bumped by this round.** The table's own instruction says to bump it in the
+   same commit as any change, and rounds 4 to 6 changed it repeatedly. Round 5 made `version` a
+   validated integer but nothing checks the bump, and nothing can without reading git. Recorded
+   as the limit it is.
+
+### Battery, re-run after the fixes
+
+- `pytest tests/test_sensor_admission.py -n0 -q` → **176 passed** (18 failed first).
+- `verify/sensor-admission/verify-sensor-admission.sh` → exit 3, **34 planted records and
+  eighteen planted served estates grade as planted**.
 - `mypy twin tests conftest.py` → Success, 189 source files.
 
 ## Waits on the owner

@@ -418,17 +418,20 @@ def test_terminality_is_read_from_the_table_at_the_branch(tmp_path) -> None:
     reports it beside the others instead of alone."""
     import yaml
     doc = yaml.safe_load(sa.RULE_PATH.read_text(encoding="utf-8"))
+    # `names-or-identifies-an-individual` cannot be used here: round-6 F5 makes the table's
+    # marking of THAT row mandatory. Any other terminal-capable id shows the same thing.
     for row in doc["refusals"]:
-        if row["id"] == "names-or-identifies-an-individual":
+        if row["id"] == "key-not-declared":
             row["terminal"] = False
     loosened = tmp_path / "loosened.yaml"
     loosened.write_text(yaml.safe_dump(doc), encoding="utf-8")
     rule = sa.load_rule(loosened)
-    result = grade(record(fields=["component", "employee_id"]), rule=rule)
+    result = grade(record(maintained_by="x"), rule=rule)
     assert result["terminal"] is False
     assert result["ladder"] is not None, "the module must have read the table, not its own mind"
-    assert "names-or-identifies-an-individual" in ids(result)
-    # and the shipped table still says terminal
+    assert "key-not-declared" in ids(result)
+    # and the shipped table still says terminal, for both
+    assert sa.is_terminal(sa.load_rule(), "key-not-declared") is True
     assert sa.is_terminal(sa.load_rule(), "names-or-identifies-an-individual") is True
 
 
@@ -1244,6 +1247,271 @@ def test_an_unreadable_dpia_is_not_reported_as_a_missing_one(tmp_path) -> None:
     assert rc == 1, joined
     assert "no DPIA record at" not in joined, (
         f"the DPIA IS served; saying it is not there is a different claim:\n{joined}")
+
+
+
+# -- F5: the table may not un-terminal the one refusal the module's purpose rests on --------------
+
+def test_a_table_that_does_not_mark_naming_an_individual_terminal_is_refused(tmp_path) -> None:
+    """Round-6 F5. R5-13 constrained which ids MAY be terminal and nothing constrained which
+    MUST be, so a one-word edit -- or simply dropping the key, since the guard defaults it to
+    False -- made this module walk the ethics gate for a record that names a person and return
+    `admitted: True` with a proportionality justification. That is a PRICE on sensing a named
+    individual, which is the one thing the module docstring says it must never compute."""
+    for mutate in (lambda row: row.__setitem__("terminal", False),
+                   lambda row: row.pop("terminal")):
+        doc = _rule_doc()
+        for row in doc["refusals"]:
+            if row["id"] == "names-or-identifies-an-individual":
+                mutate(row)
+        with pytest.raises(sa.SensorAdmissionError, match="names-or-identifies-an-individual"):
+            sa.load_rule(_write(tmp_path, doc, f"f5-{id(mutate)}.yaml"))
+
+
+def test_no_price_is_ever_computed_for_a_record_that_names_a_person() -> None:
+    result = grade(record(fields=["component", "employee_id"]))
+    assert result["ladder"] is None and result["terminal"] is True
+    assert result["admitted"] is False
+
+
+# -- F1: a ref that PARSES is not a ref that points at a tree -------------------------------------
+
+def _two_units(tmp_path, damage):
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    bad = sa._GOOD_RECORD.replace("planted", "alpha").replace(
+        "fields: [component, distinct_committer_count, window_days]",
+        "fields: [component, employee_id]")
+    sa._plant(tmp_path, hooks, bad, org="alpha")
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+    damage(estate / "alpha")
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    return rc, "\n".join(lines)
+
+
+def _point_at_a_missing_sha(unit) -> None:
+    import subprocess
+    subprocess.run(["git", "-C", str(unit), "update-ref", "refs/remotes/origin/main",
+                    "0" * 40], capture_output=True)
+    (unit / ".git" / "refs" / "remotes" / "origin").mkdir(parents=True, exist_ok=True)
+    (unit / ".git" / "refs" / "remotes" / "origin" / "main").write_text("0" * 40 + "\n")
+
+
+def _point_at_a_blob(unit) -> None:
+    import subprocess
+    blob = subprocess.run(["git", "-C", str(unit), "hash-object", "-w", "--stdin"],
+                          input="not a commit\n", capture_output=True, text=True).stdout.strip()
+    (unit / ".git" / "refs" / "remotes" / "origin").mkdir(parents=True, exist_ok=True)
+    (unit / ".git" / "refs" / "remotes" / "origin" / "main").write_text(blob + "\n")
+
+
+def _prune_the_objects(unit) -> None:
+    import shutil
+    shutil.rmtree(unit / ".git" / "objects")
+    (unit / ".git" / "objects").mkdir()
+
+
+@pytest.mark.parametrize("damage,name", [
+    (_point_at_a_missing_sha, "a sha the repository never had"),
+    (_point_at_a_blob, "a blob rather than a commit"),
+    (_prune_the_objects, "a pruned object store"),
+])
+def test_a_ref_that_parses_but_points_at_no_tree_is_named(tmp_path, damage, name) -> None:
+    rc, joined = _two_units(tmp_path, damage)
+    assert rc == 1, (
+        f"`rev-parse --verify -q` proves a ref PARSES, not that it points at anything; with "
+        f"{name} the unit landed in the silent skip R5-2 was written to close:\n{joined}")
+    assert "alpha" in joined, joined
+
+
+def test_a_healthy_unit_beside_a_damaged_one_is_still_graded(tmp_path) -> None:
+    rc, joined = _two_units(tmp_path, _prune_the_objects)
+    assert "bravo" in joined, joined
+
+
+# -- F2: a unit that serves an org tree and stops claiming the role is named ----------------------
+
+def test_a_unit_serving_an_org_tree_with_no_adopter_claim_is_named(tmp_path) -> None:
+    """It serves the whole tree -- register, key-person scenario, admission record -- and only
+    the claim is gone. Leg 1 already says an adopter serving no scenario of this class is
+    observed false rather than skipped past, for exactly this reason."""
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    import subprocess
+    bad = sa._GOOD_RECORD.replace("planted", "alpha").replace(
+        "fields: [component, distinct_committer_count, window_days]",
+        "fields: [component, employee_id]")
+    sa._plant(tmp_path, hooks, bad, org="alpha")
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+    unit = estate / "alpha"
+    subprocess.run(["git", "-C", str(unit), "rm", "-q", "--cached", "party.yaml"],
+                   check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(unit), "-c", f"core.hooksPath={hooks}",
+                    "-c", "user.email=t@t.invalid", "-c", "user.name=t",
+                    "commit", "-q", "-m", "stop claiming"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(unit), "update-ref", "refs/remotes/origin/main", "HEAD"],
+                   check=True, capture_output=True)
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1, (
+        f"a unit serving an org tree and no adopter claim vanished with all of it:\n{joined}")
+    assert "alpha" in joined, joined
+
+
+def test_a_party_file_legitimately_claiming_no_adopter_role_is_still_not_a_finding(
+        tmp_path) -> None:
+    """Five real units rely on this: a publisher is not a broken adopter."""
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+    sa._plant(tmp_path, hooks, None, org="publisher",
+              party="party: publisher\nroles: [publisher]\n")
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    assert rc == 0, "\n".join(lines)
+
+
+# -- F3: both spellings of the extension ----------------------------------------------------------
+
+def test_a_record_under_the_short_extension_is_still_graded(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    bad = sa._GOOD_RECORD.replace("planted", "alpha").replace(
+        "fields: [component, distinct_committer_count, window_days]",
+        "fields: [component, employee_id]")
+    estate = sa._plant(tmp_path, hooks, None, org="alpha",
+                       extra_record=("bus-factor-structural-aggregate.yml", bad))
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1, (
+        f"the short spelling is what this estate uses for every workflow file:\n{joined}")
+    assert "names-or-identifies-an-individual" in joined, joined
+
+
+def test_a_role_file_under_the_short_extension_is_still_scanned(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "alpha"), org="alpha",
+                       extra_role_file=("second.yml", "id: someone@example.invalid\nrole: x\n"))
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    assert rc == 1, "\n".join(lines)
+
+
+def test_a_file_under_a_scanned_directory_with_neither_extension_is_a_named_row(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "alpha"), org="alpha",
+                       extra_role_file=("notes.txt", "whatever\n"))
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    assert rc == 1 and "notes.txt" in "\n".join(lines), "\n".join(lines)
+
+
+def test_the_limits_block_names_the_extensions_it_reads() -> None:
+    text = " ".join(sa.limits(sa.load_rule()))
+    assert ".yaml" in text and ".yml" in text, text
+
+
+# -- F4: a non-UTF-8 path must not kill the run on the way OUT ------------------------------------
+
+def test_a_non_utf8_path_does_not_abort_the_run_when_it_is_printed(tmp_path) -> None:
+    """It decodes, is read and graded correctly, and used to be killed on the way out, outside
+    every guard the earlier rounds installed."""
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "alpha"), org="alpha")
+    import subprocess
+    unit = estate / "alpha"
+    blob = subprocess.run(["git", "-C", str(unit), "hash-object", "-w", "--stdin"],
+                          input=b"id: someone@example.invalid\nrole: x\n",
+                          capture_output=True).stdout.decode().strip()
+    index = f"100644 {blob}\t" + "twin/orgs/alpha/people/bad\xff.yaml"
+    subprocess.run(["git", "-C", str(unit), "update-index", "--add", "--index-info"],
+                   input=index.encode("utf-8", "surrogateescape") + b"\n",
+                   check=True, capture_output=True)
+    tree = subprocess.run(["git", "-C", str(unit), "write-tree"],
+                          capture_output=True, text=True, check=True).stdout.strip()
+    commit = subprocess.run(["git", "-C", str(unit), "-c", "user.email=t@t.invalid",
+                             "-c", "user.name=t", "commit-tree", tree, "-p", "HEAD",
+                             "-m", "non-utf8"], capture_output=True, text=True,
+                            check=True).stdout.strip()
+    subprocess.run(["git", "-C", str(unit), "update-ref", "refs/remotes/origin/main", commit],
+                   check=True, capture_output=True)
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)          # must not raise
+    printed = "\n".join(lines)
+    printed.encode("utf-8")                                  # must be printable
+    assert rc == 1, printed
+
+
+# -- F6: the specific slots each earlier fix depends on --------------------------------------------
+
+@pytest.mark.parametrize("mutate,match", [
+    (lambda d: d["non_empty"].__setitem__("ladder_necessity", ["kind"]), "alternatives"),
+    (lambda d: d["required_keys"].__setitem__("ladder_necessity", ["kind"]), "ladder_necessity"),
+    (lambda d: d["requires"].__setitem__("dpia_fields", ["completed_on"]), "dpia_fields"),
+    (lambda d: d["fixed_values"]["record"].pop("schema"), "fixed_values.record"),
+    (lambda d: d["typed_keys"].__setitem__("ladder_purpose", {"scenario": "bool"}), "will_act"),
+])
+def test_narrowing_a_declaration_an_earlier_fix_rests_on_is_refused(tmp_path, mutate, match):
+    doc = _rule_doc()
+    mutate(doc)
+    with pytest.raises(sa.SensorAdmissionError, match=match):
+        sa.load_rule(_write(tmp_path, doc, f"f6-{id(mutate)}.yaml"))
+
+
+def test_a_permissive_dpia_path_pattern_that_names_the_sensor_is_still_refused(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["dpia_path_pattern"] = ".*{sensor}.*"
+    with pytest.raises(sa.SensorAdmissionError, match="anchor"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_an_admissible_row_at_cohort_granularity_is_refused_while_the_scope_reads_one(
+        tmp_path) -> None:
+    doc = _rule_doc()
+    doc["admissible"].append({"kind": "structural", "granularity": "cohort"})
+    with pytest.raises(sa.SensorAdmissionError, match="cohort"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+# -- F8: one at-sign restored the bomb completely --------------------------------------------------
+
+def test_a_long_value_WITH_an_at_sign_is_not_a_backtracking_bomb() -> None:
+    import time
+    started = time.monotonic()
+    sa.identifier_in_value("x" * 24_000 + "@")
+    assert time.monotonic() - started < 0.5, (
+        "one at-sign, one character an adopter serves, restored the bomb completely")
+
+
+def test_the_email_shape_is_still_found_beside_a_long_value() -> None:
+    assert sa.identifier_in_value("x" * 5000 + " someone@example.invalid") is not None
+    assert sa.identifier_in_value("someone@example.invalid") is not None
+    assert sa.identifier_in_value("a@b.c,d@e.f") is not None
+    assert sa.identifier_in_value("no at sign here") is None
+    assert sa.identifier_in_value("nodomain@nodot") is None
+
+
+# -- R5-8's boundaries, since the only test asserted set equality ---------------------------------
+
+def test_the_derivation_sees_the_emitter_and_not_a_printer_of_the_same_name(tmp_path) -> None:
+    source = tmp_path / "fake.py"
+    source.write_text(
+        "def grade_record():\n"
+        "    out('a-real-id', 'x')\n"
+        "def grade_estate(out):\n"
+        "    out('not-an-id')\n"
+        "def closed_document_problems():\n"
+        "    return [('a-pair-id', 'y')]\n"
+        "def selfcheck():\n"
+        "    people = ('platform-engineer', 'platform-lead')\n", encoding="utf-8")
+    seen = sa.emitted_refusal_ids(source)
+    assert seen == {"a-real-id", "a-pair-id"}, seen
 
 
 # -- the sensor table stays closed ----------------------------------------------------------------
