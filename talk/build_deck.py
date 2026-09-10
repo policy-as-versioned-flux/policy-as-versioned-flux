@@ -46,6 +46,8 @@ Three statuses, and only three, on a beat:
   python3 talk/build_deck.py --name PATH   print the run a built deck describes and its commit
   python3 talk/build_deck.py --check PATH  run the demo checks over a built deck, against the run it names
   python3 talk/build_deck.py --selfcheck   assert the four statuses render right
+  python3 talk/build_deck.py --record-ref origin/observations --run N --out PATH
+      opt in to a separate committed observation history; source hub= stays unchanged
 """
 import argparse
 import io
@@ -275,7 +277,23 @@ def hub_sha(root=ROOT):
 
 # ------------------------------------------------------- the run a deck names
 
-def truth_lines(root=ROOT):
+def observation_tip(root, record_ref):
+    """Resolve an explicitly selected record once; never fall back to source HEAD."""
+    try:
+        return _git(root, "rev-parse", "--verify", "--end-of-options",
+                    f"{record_ref}^{{commit}}").strip()
+    except subprocess.CalledProcessError as exc:
+        raise CouldNotLook(f"observation ref {record_ref!r} is not reachable; fetch its history") from exc
+
+
+def truth_lines(root=ROOT, record_ref=None):
+    if record_ref is not None:
+        tip = observation_tip(root, record_ref)
+        try:
+            text = _git(root, "show", f"{tip}:talk/truth.log")
+        except subprocess.CalledProcessError as exc:
+            raise CouldNotLook(f"observation commit {tip} carries no talk/truth.log") from exc
+        return [line.strip() for line in text.splitlines() if line.strip().startswith("TRUTH ")]
     p = Path(root) / "talk" / "truth.log"
     if not p.exists():
         return []
@@ -292,14 +310,14 @@ def line_hub(line):
     return m.group(1) if m else ""
 
 
-def recorded_run(which, root=ROOT):
+def recorded_run(which, root=ROOT, record_ref=None):
     """The TRUTH line of recorded run `which` ("newest" or a run number), or "".
 
     Only a NUMBERED run can be named. A local run writes `run=local` and its
     captures are throwaway scratch the lane never commits, so there is nothing
     a deck of it could be graded against tomorrow.
     """
-    lines = [l for l in truth_lines(root) if line_run(l).isdigit()]
+    lines = [l for l in truth_lines(root, record_ref) if line_run(l).isdigit()]
     if which == "newest":
         return lines[-1] if lines else ""
     for l in reversed(lines):
@@ -308,7 +326,7 @@ def recorded_run(which, root=ROOT):
     return ""
 
 
-def run_commit(run, root=ROOT):
+def run_commit(run, root=ROOT, record_ref=None):
     """The commit that recorded run N, or None if this checkout cannot reach it.
 
     The lane commit appends the TRUTH line and the captures together, so the
@@ -318,7 +336,9 @@ def run_commit(run, root=ROOT):
     contains, pairing run N's line with a later run's captures.
     """
     try:
-        shas = _git(root, "log", "--format=%H", "--", "talk/truth.log").split()
+        history = [] if record_ref is None else [observation_tip(root, record_ref)]
+        selected_line = recorded_run(run, root, history[0]) if history else None
+        shas = _git(root, "log", "--format=%H", *history, "--", "talk/truth.log").split()
     except Exception:
         return None
     for sha in shas:
@@ -328,6 +348,43 @@ def run_commit(run, root=ROOT):
             continue
         tail = [l for l in txt.splitlines() if l.startswith("TRUTH ")]
         if tail and line_run(tail[-1]) == str(run):
+            if record_ref is not None:
+                # A run number alone does not bind evidence: a later edit can change
+                # its verdict without appending a run. Never pair that selected line
+                # with the older recording's captures, even when the run id matches.
+                if tail[-1] != selected_line:
+                    continue
+                # A copied log at an orphan/shallow boundary is not a recording.
+                # Require the actual append and its readable parent, not just a tail
+                # that happens to name this run. Historical commits stay in ancestry.
+                parents = []
+                try:
+                    parents = _git(root, "rev-list", "--parents", "-n", "1", sha).split()[1:]
+                    if len(parents) != 1:
+                        continue
+                    old = _git(root, "show", f"{parents[0]}:talk/truth.log")
+                except subprocess.CalledProcessError:
+                    # The first recording legitimately creates the log, provided
+                    # its parent exists and git confirms that path was absent.
+                    if len(parents) != 1:
+                        continue
+                    try:
+                        paths = _git(root, "ls-tree", "--name-only", parents[0], "--", "talk/truth.log")
+                    except subprocess.CalledProcessError:
+                        continue
+                    if paths.strip():
+                        continue
+                    old = ""
+                if not txt.startswith(old) or tail[-1] in old.splitlines():
+                    continue
+                source = line_hub(tail[-1])
+                if not re.fullmatch(r"[0-9a-f]{7,64}", source):
+                    continue
+                try:
+                    _git(root, "rev-parse", "--verify", f"{source}^{{commit}}")
+                    _git(root, "rev-parse", "--verify", f"{sha}:talk/captures")
+                except subprocess.CalledProcessError:
+                    continue
             return sha
     return None
 
@@ -347,16 +404,23 @@ def export_captures(sha, dest, root=ROOT):
     return dest / "talk" / "captures"
 
 
-def named_run(run, root=ROOT):
+def named_run(run, root=ROOT, record_ref=None):
     """(TRUTH line, recording commit) for run `run`. Refuses a run the log does
     not record; raises CouldNotLook when the commit is unreachable."""
-    line = recorded_run(run, root)
+    if record_ref is not None:
+        record_ref = observation_tip(root, record_ref)
+    line = recorded_run(run, root, record_ref)
     if not line:
         raise SystemExit(f"talk/truth.log records no numbered run {run!r}; a deck can only "
                          "describe a run the truth surface recorded and committed the captures of")
-    sha = run_commit(line_run(line), root)
+    sha = run_commit(line_run(line), root, record_ref)
     if sha is None:
-        raise CouldNotLook(named_run_reason(line))
+        reason = named_run_reason(line)
+        if record_ref is not None:
+            reason = (f"run {line_run(line)} in observation commit {record_ref}: cannot prove its "
+                      "recording append, capture tree and measured hub source from this history; "
+                      "fetch complete observation and source histories")
+        raise CouldNotLook(reason)
     return line, sha
 
 
@@ -469,11 +533,13 @@ def render_aside(a, capdir):
     return out
 
 
-def build(run=None, root=ROOT):
+def build(run=None, root=ROOT, record_ref=None):
     """The deck as text. `run` names a recorded run ("newest" or N) and reads
     that run's captures out of its recording commit; None reads the captures on
-    disk as this, unrecorded, run."""
+    disk as this, unrecorded, run. An explicit record_ref defaults to newest."""
     root = Path(root)
+    if run is None and record_ref is not None:
+        run = "newest"
     narr = json.loads((root / "talk" / "narration.json").read_text())
     built = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
     with tempfile.TemporaryDirectory() as tmp:
@@ -483,8 +549,10 @@ def build(run=None, root=ROOT):
             scheduled, tail = bool(r), ""
             capdir = root / "talk" / "captures"
         else:
-            tail, sha = named_run(run, root)
+            tail, sha = named_run(run, root, record_ref)
             name = {"run": line_run(tail), "hub": line_hub(tail), "source": "recorded"}
+            if record_ref is not None:
+                name["recording"] = sha
             scheduled = True   # every numbered run is the scheduled clock's
             capdir = export_captures(sha, Path(tmp), root)
         return _render(narr, name, scheduled, tail, capdir, built)
@@ -723,7 +791,7 @@ def step7_table(capdir, script="verify/e2e/verify-e2e-step7-honesty.sh"):
     return out
 
 
-def check(path, root=ROOT):
+def check(path, root=ROOT, record_ref=None):
     """(bad, review, cannot, beats, asides). Grades the deck against the run IT NAMES: a
     recorded run's captures come out of its recording commit; a disk deck is
     read against talk/captures/. Raises CouldNotLook when the named run's
@@ -734,6 +802,8 @@ def check(path, root=ROOT):
     estate, so it may not be red -- and it may not be green either, because a slide with nothing
     behind it went on the deck. The demo check exits 3 and prints these."""
     root = Path(root)
+    if record_ref is not None:
+        record_ref = observation_tip(root, record_ref)
     md = Path(path).read_text()
     bad, review, cannot = [], [], []
     beats, asides, prose = parse(md)
@@ -748,7 +818,7 @@ def check(path, root=ROOT):
         elif name.get("source") == "recorded":
             n = name.get("run", "?")
             run_word = f"run {n}"
-            line = recorded_run(n, root)
+            line = recorded_run(n, root, record_ref)
             if not line:
                 bad.append(f"the deck describes run {n}, but talk/truth.log records no numbered run {n}")
                 capdir = root / "talk" / "captures"
@@ -765,9 +835,11 @@ def check(path, root=ROOT):
                     # split the line does not carry, or states none at all, is caught here.
                     bad.append("the deck quotes the TRUTH line but not what it measured; the "
                                f"line's own split and ceiling read: {measured(line)}")
-                sha = run_commit(n, root)
+                sha = run_commit(n, root, record_ref)
                 if sha is None:
                     raise CouldNotLook(named_run_reason(line))
+                if name.get("recording") is not None and name["recording"] != sha:
+                    bad.append("the deck's recording commit differs from the selected record's commit")
                 capdir = export_captures(sha, Path(tmp), root)
         else:
             run_word, capdir = "this run", root / "talk" / "captures"
@@ -917,7 +989,7 @@ def check(path, root=ROOT):
             review.append(f"  line {i}: {line.strip()[:110]}")
 
     for s in quoted:
-        if s not in truth_lines(root):
+        if s not in truth_lines(root, record_ref):
             bad.append("a quoted TRUTH line is not a line in talk/truth.log")
 
     return bad, review, cannot, beats, asides
@@ -1186,6 +1258,8 @@ def main(argv):
     ap.add_argument("--name", metavar="PATH", help="print the run a built deck describes")
     ap.add_argument("--check", metavar="PATH", help="run the demo checks over a built deck")
     ap.add_argument("--selfcheck", action="store_true")
+    ap.add_argument("--record-ref", help="read the committed log and captures from this local ref; "
+                    "never substitutes its commit for the TRUTH line's hub source commit")
     a = ap.parse_args(argv)
 
     if a.selfcheck:
@@ -1199,15 +1273,19 @@ def main(argv):
                 else "it carries no deck marker"))
             return 1
         try:
-            line, sha = named_run(name["run"])
+            line, sha = named_run(name["run"], record_ref=a.record_ref)
         except CouldNotLook as e:
             print(f"could not look: {e}")
             return 3
-        print(f"run={line_run(line)} hub={line_hub(line)} commit={sha[:7]}")
+        if name.get("recording") is not None and name["recording"] != sha:
+            print("the deck's recording commit differs from the selected record's commit")
+            return 1
+        suffix = f" recording={sha}" if a.record_ref is not None else ""
+        print(f"run={line_run(line)} hub={line_hub(line)} commit={sha[:7]}{suffix}")
         return 0
     if a.check:
         try:
-            bad, review, cannot, beats, asides = check(a.check)
+            bad, review, cannot, beats, asides = check(a.check, record_ref=a.record_ref)
         except CouldNotLook as e:
             print(f"could not look: {e}")
             return 3
@@ -1230,11 +1308,11 @@ def main(argv):
     # --run says which); an --out deck describes the captures on disk unless
     # --run names a run.
     run = a.run
-    if run is None and not a.out:
+    if run is None and (not a.out or a.record_ref is not None):
         run = "newest"
     out = Path(a.out) if a.out else ROOT / "talk" / "deck.md"
     try:
-        text = build(run)
+        text = build(run, record_ref=a.record_ref)
     except CouldNotLook as e:
         print(f"could not look: {e}")
         return 3
