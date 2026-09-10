@@ -1347,9 +1347,7 @@ def test_a_unit_serving_an_org_tree_with_no_adopter_claim_is_named(tmp_path) -> 
     unit = estate / "alpha"
     subprocess.run(["git", "-C", str(unit), "rm", "-q", "--cached", "party.yaml"],
                    check=True, capture_output=True)
-    subprocess.run(["git", "-C", str(unit), "-c", f"core.hooksPath={hooks}",
-                    "-c", "user.email=t@t.invalid", "-c", "user.name=t",
-                    "commit", "-q", "-m", "stop claiming"], check=True, capture_output=True)
+    sa._git(unit, "commit", "-q", "-m", "stop claiming", hooks=hooks)
     subprocess.run(["git", "-C", str(unit), "update-ref", "refs/remotes/origin/main", "HEAD"],
                    check=True, capture_output=True)
     lines: list[str] = []
@@ -1627,3 +1625,16 @@ def test_every_admissible_field_is_a_count_or_a_component_id() -> None:
 def test_no_admissible_pair_is_individual_or_cohort_granularity() -> None:
     for _kind, gran in sa.admissible_pairs(sa.load_rule()):
         assert gran == "aggregate"
+
+
+def test_served_admission_fixtures_do_not_use_the_developers_signing_key(tmp_path, monkeypatch) -> None:
+    """The synthetic served-ref seam runs even when the developer requires signed commits."""
+    config = tmp_path / "signing.gitconfig"
+    config.write_text("[commit]\n\tgpgsign = true\n[gpg]\n\tprogram = /usr/bin/false\n", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(config))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD)
+    lines: list[str] = []
+    assert sa.grade_estate(estate, out=lines.append) == 0, lines

@@ -1,7 +1,7 @@
 # 107 — The sampler waits for Kustomizations that do not exist yet
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -800,3 +800,28 @@ graded PASS on a recorded hub run (run 224, hub 8a95445, the first main run afte
 and its selfcheck refuses round 3's order planted verbatim.
 
 **Status stays open** until ludlow's row turns, because the ticket's own Done names ludlow.
+
+
+## Completion evidence, 2026-09-10
+
+Ludlow's [scheduled run 34483506093](https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/34483506093)
+started at 13:34:40Z and completed successfully. Its actual log reports the ResourceSet Ready
+at 13:35:57.488Z, derives the named wait list at 13:35:57.802Z, and reports composed-v2-0-0,
+composed-v2-0-1 and composed-v3-0-0 Ready at 13:35:58.901Z, 13:35:59.257Z and
+13:35:59.565Z, respectively. The ludlow Kustomization is Ready at 13:35:59.842Z.
+The committed ludlow-composed sample is timestamped 13:36:00Z and records fact 4 and fact 5
+observed true, with all 16 rendered objects represented in 23 inventory entries and no objects
+outside the inventory. This is the real schedule event, not a dispatched measurement.
+
+Together with the already recorded driftwood and tuppence evidence above, all three scheduled
+sample clauses are met. The instrument/selfcheck clauses were already met on recorded hub run
+224. Status is therefore resolved. This does not assert that unrelated source-signature or cage
+facts are green; ludlow's source-signature fact remains unobserved in this sample.
+
+### Superseded map entry retained as history
+
+The map still described the pre-merge state when this final observation was checked:
+
+- [107 — The sampler waits for Kustomizations that do not exist yet](issues/107-the-sampler-waits-for-kustomizations-that-do-not-exist-yet.md) — open, round 4 built and pushed 2026-09-09, reviewed and corrected 2026-09-10, not merged. The decision (delegated): wait for the ResourceSet first, then wait BY NAME for the Kustomizations it names in its own `status.inventory`, restricted to flux-system and with entries elsewhere refused out loud — a PROXY for fact 5, not the same ids — and only then enumerate. An enumeration that finds nothing is silence, not a yes; the derivation is retried for 60s and says so when the inventory names none. `verify-sampler-wait-order.sh` grades the textual order of seven markers AND that the enumeration line, with any trailing comment stripped, carries `${composed}` in any of its three waiting spellings, since a workflow that derives the names and waits for none of them passed the order rule and then passed the first version of that containment rule by moving the token into a comment (four waits became one); its selfcheck plants round 3, the deleted token and the commented token verbatim and requires each to FAIL, and its header names the class it does NOT close, a mention anywhere else on the line, rather than claiming it does. What removes driftwood's dependence on a timeout is that `composed-v*` is in the wait list at all, not the sort order (corrected 2026-09-10). By the scheduled runs of 2026-09-09 ALL THREE adopters record fact 5 false: driftwood's own Kustomization reached Ready in 0.34s on run 34345475988 and the stall that had been protecting it stopped. Pushed as `ticket-107-the-sampler-waits-for-what-exists` on driftwood 53b0a48 (PR #35), tuppence 3b49a5a (PR #29), ludlow 129d550 (PR #26) and hub PR #73. MERGE ADOPTERS FIRST, then the hub, before 05:47 UTC: an adopter merge fires no hub run, so that order records zero reds, while hub-first records a fall and owes a permanent verify-falls.txt line. Done's third clause is OUTSTANDING and needs a SCHEDULED sample after the merge; a dispatch is not offered as the proof and no sample line was invented.
+
+Map line: `- [107 — The sampler waits for Kustomizations that do not exist yet](issues/107-the-sampler-waits-for-kustomizations-that-do-not-exist-yet.md) — resolved, the sampler waits for the ResourceSet and its named Kustomizations before sampling. Real scheduled runs on driftwood (34470909429), tuppence (34479714340) and ludlow (34483506093) confirm the ordering and fact 5; no dispatched observation substitutes for this proof.`
