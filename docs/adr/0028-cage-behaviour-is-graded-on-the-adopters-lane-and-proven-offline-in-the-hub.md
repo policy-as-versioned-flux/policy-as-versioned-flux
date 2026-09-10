@@ -68,13 +68,38 @@ decision):
    `isolated` appears nowhere in the probe. An adopter whose composed array declares a different
    ladder gets its own answer with no edit to the instrument.
 
-3. **The negative is only a fact beside its control.** A pod that reaches nothing because the
-   cluster is broken must not read the same as a pod that reaches nothing because the cage holds.
-   So a run whose control reached nothing either is recorded UNMEASURED against a declared
-   falsifier — not a null result, not a pass, and it may not be quoted as either. The same applies
-   when the cage puts both pods on the same rung (there is then no bottom rung to look at), when a
-   connect could not be run at all, and when nothing in the cage selects the bottom-rung pod, so
-   nothing observed explains its silence.
+3. **The negative is only a fact beside its control, and the control BRACKETS it.** A pod that
+   reaches nothing because the cluster is broken must not read the same as a pod that reaches
+   nothing because the cage holds. So the control is read FIRST — the network is established as
+   working before a silence is measured, not after — the bottom rung's silence must then PERSIST
+   across further reads, and the control is read AGAIN afterwards, so a network that changed under
+   the measurement is unmeasured rather than a cage that held. A run whose control reached nothing
+   either, before or after, is recorded UNMEASURED against a declared falsifier: not a null result,
+   not a pass, and it may not be quoted as either. The same applies when the cage puts both pods on
+   the same rung (there is then no bottom rung to look at), when a connect could not be run at all,
+   and when nothing in the cage selects the bottom-rung pod, so nothing observed explains its
+   silence.
+
+   Corrected 2026-09-10, before anything was merged or scored (review F-02). The first cut read the
+   control ten times per target and the caged pod ONCE, so a cluster-wide outage that cleared
+   between the two scored as a cage that held — measured true for every outage clearing between the
+   third and twelfth exec of the run. The residual, on the fact's own ceiling: an outage entirely
+   contained between two working control reads is still unobservable. That is narrower than one
+   read, not zero.
+
+3b. **A fact about the cage requires the cage to have ACTED.** `cage-tier` stamps
+   `posture.acme.io/tier` and `posture.acme.io/caged` on everything it mutates; neither present
+   means the mutating webhook did not act, and then nothing the workload did afterwards is evidence
+   about the cage. Fact 6 is a could-not-look in that case, saying so. And the cage in force is
+   selected by the policy's own readiness, not by its name alone, because an installed policy whose
+   webhook is not yet configured admits workloads unmutated while looking, to a name match,
+   exactly like a cage.
+
+   Added 2026-09-10 (review F-03), measured live: with `cage-tier` installed and Ready but its
+   version match neutered, fact 6 returned TRUE saying "the workload the cage put on its bottom rung
+   (no tier stamped) was ADMITTED and is Running, on priority class none (priority 0)". The estate's
+   headline fact passed on a cage that did nothing, and asserted a placement the instrument had not
+   derived.
 
 4. **Pre-registration is measured, not asserted.** `grade` walks the first-parent history of
    `drift/window.yaml` on the served ref, reads the `cage_behaviour_sample` block out of the blob
@@ -92,6 +117,16 @@ decision):
    because this window carries three instruments and an addendum to one of the others is not a
    rewrite of this question. Within the section it is raw text, comments included, because a
    comment here carries the reasoning a reader trusts.
+
+   The section is BOUNDED at the first following line that begins at column zero, whatever it is,
+   with trailing blank lines normalised away. Corrected 2026-09-10 (review F-04): the cage entry is
+   the last top-level key in all three window files, so a reader that ended the section at the next
+   top-level KEY found none and ran to end of file — putting every later append inside the
+   pre-registration and re-registering it. Measured on a throwaway clone: a trailing comment moved
+   the registration commit, and a new instrument appended with a leading comment moved it again,
+   each silently discarding every score taken before. The direction of that error was safe —
+   over-registration unscores rather than falsely passes — and it would have thrown away real
+   scores the first time anyone appended to the file.
 
 5. **In the hub, cage behaviour is proven OFFLINE ONLY, and every document says so** until a
    citable run scores the two facts. The decision logic is proven live-with-the-real-engine and

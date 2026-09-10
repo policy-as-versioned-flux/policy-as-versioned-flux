@@ -358,7 +358,8 @@ measured on the other, and both were run anyway.
 
 | check | branch | throwaway merge onto `origin/main` (6fd9cc1) |
 |---|---|---|
-| `talk/verify-all.sh selfcheck` | ran to completion, exit 1 | ran to completion, exit 1 |
+| `talk/verify-all.sh --selfcheck` | PASS, exit 0, 7s | PASS, exit 0, 7s |
+| a full local gate run (`talk/verify-all.sh`, no flag) | ran to completion, exit 1 | ran to completion, exit 1 |
 | `verify/cited-truth/verify-cited-truth.sh` | PASS | PASS |
 | `verify/every-green/verify-every-green.sh` | PASS | PASS |
 | `verify/truth-line/verify-truth-line.sh` | PASS | PASS |
@@ -367,7 +368,15 @@ measured on the other, and both were run anyway.
 | `mypy twin tests conftest.py` | Success, 189 files | Success, 189 files |
 | `pytest -q` | 7 failed, 2525 passed | 7 failed, 2525 passed |
 
-**The local `verify-all.sh` numbers are not the runner's and are not quoted as such.** This machine
+**The selfcheck row was mislabelled and is corrected here (review F-13).** `talk/verify-all.sh`
+matches only the double-dashed `--selfcheck`; a bare `selfcheck` matches no case, is silently
+ignored, and the script runs the full local gate. That is what the first version of this table timed
+at thirty-five minutes and reported as a selfcheck exiting 1, and it is why the row needed a
+paragraph of caveat under it. With the real flag it is seven seconds and exits 0 on both trees. A
+battery row that names one thing and runs another is the shape this ticket exists to fix, one level
+up. Both rows are kept: the full local gate run is worth having, under its own name.
+
+**The local full-gate numbers are not the runner's and are not quoted as such.** This machine
 has docker and the three named KinD clusters, so the live tails the manifest classes `never:` do
 run here and several fail; the manifest's own header names that substrate difference. On the serial
 merge run the line reads `pass=70 fail=30 skip=17 excluded=8 total=125 ceiling=106`, and three of
@@ -420,3 +429,98 @@ find the same 125 scripts.
 **Final heads.** Hub `df413c1` plus this note; driftwood `cecd1e4`, tuppence `c069cf2`, ludlow
 `a9f2f7c`, each `verify-reconcile.sh` rc 1 and `drift/five-facts.py selfcheck` rc 0 in a clean
 clone with gitsign configured. Nothing is merged.
+
+## The fall this merge will record, and the order to merge in (review F-06)
+
+**Predicted, before the day, so the entry is not written from memory.** The first `main` run after
+the three adopter branches merge will record `fail` **plus four** and `skip` **minus four**. Under
+this estate's contract a rise in `fail` on the run that records it is a blocking event and owes an
+entry in `talk/verify-falls.txt`, in that file's own grammar (`run=N | reason`), keyed to the run
+that records it.
+
+**The four rows, named in advance rather than inferred from the counts on the day:**
+`.estate-clone/driftwood/verify-reconcile.sh`, `.estate-clone/tuppence/verify-reconcile.sh`,
+`.estate-clone/ludlow/verify-reconcile.sh` and
+`verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh`, each SKIP -> FAIL.
+
+**The cause is not a regression.** All four grade the adopters' lane sample through
+`drift/five-facts.py grade`, and that grader accumulated its verdict with `max(verdict, 1)`: once
+any earlier fact had been recorded as a could-not-look the verdict was 3, and `max(3, 1)` is 3, so
+every fact observed FALSE after it was reported as a fact that could not be looked at. On run 225's
+own grade table all four rows read
+`SKIP: ... a fact could not be looked at, and a fact not looked at is never a pass`, while the
+sample they graded carried three `FALSE fact_5_every_rendered_object_is_in_the_flux_inventory`
+lines. Nothing about the estate gets worse at that run; four already-true reds stop being laundered.
+The reds themselves are ticket 107's and ticket 81's to clear, not this ticket's.
+
+**A draft of the entry, to be dated and given its real run number on the day** — the integrator
+writes it, and it should not have to be reconstructed:
+
+    run=N | 2026-09-DD, ticket 86's merge across the three adopters. `fail` rose F -> F+4 and
+    `skip` fell S -> S-4 between run <before> (hub <sha>) and run N (hub <sha>). The four rows are
+    `.estate-clone/{driftwood,tuppence,ludlow}/verify-reconcile.sh` and
+    `verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh`, each SKIP -> FAIL, measured by diffing
+    the grade tables the two recording commits carry. NO CHECK OF THE ESTATE LOST A GREEN. All four
+    grade the adopters' lane sample, and ticket 86 fixed a grader that could not fail:
+    `max(verdict, 1)` softened every fact observed FALSE that followed a could-not-look, so those
+    four SKIPs were already FAILs that the instrument was reporting as could-not-looks -- on run
+    225 all four printed "a fact could not be looked at" over a sample carrying three
+    `FALSE fact_5_...` lines. The underlying red is fact 5, owned by tickets 81 and 107. Ticket 86
+    owns the instrument, and the instrument is now telling the truth.
+
+**Merge order, which I will hold to:**
+
+1. **The hub branch first.** It moves the record and not the number — proved three times, runs 230,
+   232 and 233 all read `pass=78 fail=8` against `main`'s own run 225 — so ADR-0028, the manifest
+   annotations and this ticket are on `main` and findable *before* any run records the rise they
+   explain.
+2. **Then the three adopters, all three before the next 06:20 UTC lane cron**, so all three register
+   their pre-registration on the same day and the first scheduled sample that can carry facts 6 and
+   7 carries them for the whole estate rather than for one adopter. Order among the three does not
+   matter; being inside one cron window does.
+3. **Then the falls entry, on the day, keyed to the run that records it**, from the two grade tables
+   rather than from this prediction. If the four rows are not exactly the four named above, the
+   entry says what actually moved and this paragraph was wrong.
+
+## Adversarial review, 2026-09-10 — five findings taken, one renamed
+
+Three blocking, two major, one minor. All six are addressed; the code fixes carry their own red and
+green above and in the adopter commits.
+
+| # | finding | where |
+|---|---|---|
+| F-01 | the record cited run 233, which `talk/truth.log` does not carry, so `verify/cited-truth` exited 1 | hub `89fd9c9` |
+| F-02 | fact 7 could go green when the cage was not the reason | adopters `a0ad108` / `40f05bb` / `a4cb73b` |
+| F-03 | fact 6 went green for a pod the cage never touched | same |
+| F-04 | the pre-registration section was unbounded at end of file | same |
+| F-06 | no falls entry and no merge order for a predicted `fail` +4 | the section above |
+| F-13 | a battery row named `selfcheck` that ran the full local gate | the table above |
+
+**F-01.** Only a FENCED block inherits the paragraph above it as the scope a `not citable` marker
+may live in. My run quotations were indented blocks, so the marker did not bind. All three are now
+fenced with the disclaimer in the preamble. Runs 230 and 232 were not flagged and are fixed anyway:
+they escaped only because their `run=` and `pass=` tokens happened to land on different wrapped
+lines, and an exemption that rests on where a line wrapped is not an exemption.
+
+**F-02, F-03, F-04** are in the adopter commit above, each with the measurement that found it.
+F-03's red was reproduced live on a throwaway cluster; F-02's over the real function with sleeps
+counted; F-04's on a throwaway clone with the served ref advanced commit by commit.
+
+**F-13** is the reporting version of this ticket's own defect, and it is named as such in the
+battery section: `talk/verify-all.sh` matches only `--selfcheck`, so a bare `selfcheck` ran the
+whole local gate for thirty-five minutes under the wrong name. Both rows are now in the table, each
+under the name of what it actually runs.
+
+### Charted rather than built
+
+The reviewer's remaining findings are non-blocking and I have not built them. Two are worth naming
+because they are real:
+
+- **`_cage_networkpolicies` matches on the two labels the cage stamps**, so a NetworkPolicy
+  selecting the bottom-rung pod on some other label is not counted, and fact 7 becomes a
+  could-not-look on a cage that is really holding. A false red, never a false green, and it is on
+  the function's own docstring. Fixing it properly means implementing label-selector semantics
+  including `matchExpressions`, which is a second implementation of something the API server owns.
+- **The two connects are two ports on two addresses.** "Reaches nothing" is grounded in exactly
+  those, and the fact says so on its ceiling. Widening it is a measurement design question, not a
+  defect.
