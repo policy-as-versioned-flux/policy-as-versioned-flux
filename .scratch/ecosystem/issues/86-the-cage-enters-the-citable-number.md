@@ -587,3 +587,23 @@ meta=9] fail=8 skip=29 [never=10 waits=19] excluded=8 total=125 ceiling=106
 ticket moves the record and not the number. `pass` is 80 rather than 78 and `platform` is read at
 `policy/v5.0.0` because three signed tags were cut this morning on the owner's authorisation; that
 is the estate's own step and none of it is this ticket's.
+
+Run **239**, `gh run view 34478290894`, was then dispatched on hub `a21e99c` — the head carrying
+the whole build and the whole review round. `talk/truth.log` records no such line and this
+quotation is **not citable**:
+
+```
+TRUTH 2026-09-10T13:09Z run=239 hub=a21e99c enact=development units=[driftwood=aa8ca08@main
+feeds=c3c654a@main ico=abcb3a8@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main
+platform=5b88f1d@policy/v5.0.0 tuppence=bd15aae@main] pass=80 [observed=25 self=42 simulated=4
+meta=9] fail=8 skip=29 [never=10 waits=19] excluded=8 total=125 ceiling=106
+```
+
+Identical to run 238. Every one of the five branch runs this ticket has taken — 230, 232, 233, 238,
+239 — is a branch run whose figures are **not citable**, and across all five the `fail` count did
+not move. The regress named earlier applies again and terminates the same way: everything on this
+branch after `a21e99c` is this paragraph.
+
+**Final heads.** Hub `a21e99c` plus this note; driftwood `35e46ee`, tuppence `40f05bb`, ludlow
+`a4cb73b`. Each adopter's `drift/five-facts.py selfcheck` exits 0 in a clean clone. Nothing is
+merged, and all four `main` branches are untouched.
