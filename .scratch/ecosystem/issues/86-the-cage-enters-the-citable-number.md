@@ -347,3 +347,59 @@ Figure for figure the same as run 225 on `main`, which is the expected answer: t
 their own mains, so the hub half of this ticket moves the record and not the number. The run's
 conclusion is `failure`, as `main`'s own runs 34425782322 and 34422085511 are, on the estate's
 standing eight reds.
+
+## The battery, and what it says
+
+**On the branch and on a throwaway merge onto `origin/main`.** The merge is a fast-forward and the
+trees are identical — `git diff --stat <branch> <merge>` is empty — so anything measured on one is
+measured on the other, and both were run anyway.
+
+| check | branch | throwaway merge onto `origin/main` (6fd9cc1) |
+|---|---|---|
+| `talk/verify-all.sh selfcheck` | ran to completion, exit 1 | ran to completion, exit 1 |
+| `verify/cited-truth/verify-cited-truth.sh` | PASS | PASS |
+| `verify/every-green/verify-every-green.sh` | PASS | PASS |
+| `verify/truth-line/verify-truth-line.sh` | PASS | PASS |
+| `talk/verify-demo.sh` | PASS | PASS |
+| `talk/truth_manifest.py check` | rc 0 | rc 0 |
+| `mypy twin tests conftest.py` | Success, 189 files | Success, 189 files |
+| `pytest -q` | 7 failed, 2525 passed | 7 failed, 2525 passed |
+
+**The local `verify-all.sh` numbers are not the runner's and are not quoted as such.** This machine
+has docker and the three named KinD clusters, so the live tails the manifest classes `never:` do
+run here and several fail; the manifest's own header names that substrate difference. On the serial
+merge run the line reads `pass=70 fail=30 skip=17 excluded=8 total=125 ceiling=106`, and three of
+those thirty are the adopters' `verify-reconcile.sh` taking their LIVE path and printing
+`GitRepository ... points at the in-cluster git server` — a reason that exists only on a machine
+with those clusters. The comparison that means anything is the gate run below and the clean-clone
+adopter runs above.
+
+**The seven pytest failures are `origin/main`'s, not this branch's.** One is the standing red,
+`flux_coverage_floor_is_still_reachable` (build ticket 70's finding 1). The other six are
+`tests/test_map_surface.py` (four) and `tests/test_can_record.py` (two); running exactly those two
+files gives `6 failed, 68 passed` on a clean `origin/main` worktree at 6fd9cc1, and the same six at
+88fe6fc. The whole suite on a clean `origin/main` worktree gives `23 failed, 2499 passed` — worse,
+because that worktree has no estate clone — so the outcome there turns on the checkout's estate
+clone and not on anything here. `.github/workflows/twin.yml` is `failure` on `main`'s own last three
+runs.
+
+### The gate run of the final head
+
+Run **232**, `gh run view 34441742700`, hub `269bcc5`, conclusion `failure` — as `main`'s own runs
+are, on the estate's standing eight reds. **A branch run records nothing** (ticket 100), so this
+line is quoted from the run log and is not citable:
+
+    TRUTH 2026-09-10T06:18Z run=232 hub=269bcc5 enact=development units=[driftwood=a181725@main
+    feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main
+    platform=8da250d@main tuppence=bd15aae@main] pass=78 [observed=24 self=41 simulated=4 meta=9]
+    fail=8 skip=31 [never=9 waits=22] excluded=8 total=125 ceiling=106
+
+Against run 225 on `main` (`pass=78 ... fail=8 skip=30 [never=9 waits=21] excluded=8 total=124
+ceiling=105`) the hub half of this ticket moves `pass` and `fail` not at all; `total`, `skip`,
+`waits` and `ceiling` are each one higher because ticket 31's sensor-admission check landed on
+`main` between the two runs. That is the expected answer: the units are still at their own mains,
+so until the three adopter branches merge, the hub half moves the record and not the number.
+
+**Final heads.** Hub `269bcc5`; driftwood `cecd1e4`, tuppence `c069cf2`, ludlow `a9f2f7c`, each
+`verify-reconcile.sh` rc 1 and `drift/five-facts.py selfcheck` rc 0 in a clean clone with gitsign
+configured. Nothing is merged.
