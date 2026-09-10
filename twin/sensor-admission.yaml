@@ -1,0 +1,288 @@
+# What a real adopter may sense for the `bus-factor-key-person` scenario class (eco-system
+# ticket 31, from ticket 19's resolution: "covert sensing excluded, role-not-person signatures").
+#
+# The three adopter scenarios already say the sentence this table makes checkable:
+#
+#   "A role, never a person: `people/<role>.yaml` is the subject and it names no individual.
+#    Sensing a real departure would need admission through the ethics gate, a DPIA and the roles
+#    register, which is a separate ticket."
+#
+# This is that separate ticket's answer. It is a CLOSED table in the shape `sensors.yaml` and
+# `enactment-channels.yaml` already use: a row that is not here is refused, never assumed. It
+# admits nothing on its own -- `twin/sensor_admission.py` walks a declared admission record
+# against it, and only then hands the survivor to `ethics_gate.admit()`'s existing ladder.
+#
+# THE ONE RULE BEHIND EVERY ROW: no design in this file can reach a real person. Every
+# admissible kind is structural and aggregate, every admissible field is a count or a component
+# id, and the first refusal is terminal -- a record that names or identifies an individual is
+# refused before its proportionality is computed, because computing one would put a price on
+# sensing a named person, which is the thing NORTH-STAR section 6 excludes outright.
+#
+# WHAT IS READ AND WHAT IS PROSE (round-5 R5-14). `version` must be a whole number and
+# `bus_factor_scope` must read `one`; both are checked at load, so the instruction below is not
+# an instruction nothing enforces. The `requires:` sentences are prose FOR A READER and are read
+# by no code except `requires.dpia_fields`, which is validated against the `dpia_record` key set;
+# they are here because a rule a person cannot read is not a rule.
+#
+# Versioned. Bump `version` in the same commit as any change below.
+schema: twin.sensor-admission/v1
+version: 1
+
+scenario_class: bus-factor-key-person
+
+# The admissible (kind, granularity) pairs, in `ethics_gate.py`'s own `_KIND_RANK`/`_LEVEL_RANK`
+# vocabulary rather than a second one. Exactly one pair, and the exclusions are reasoned:
+#
+#  - `individual` is excluded because the scenario's subject is a role file that names nobody;
+#    an individual reading would answer a question the scenario does not ask.
+#  - `cohort` is excluded because a bus factor of ONE means the cohort IS the person. A
+#    cohort-granularity reading of "which components would lose their only committer" is an
+#    individual reading wearing a coarser word, and the ladder's `_LEVEL_RANK` would rank it
+#    safer than it is. SCOPE OF THAT REASON (review F6, 2026-09-09): it is stated at a bus
+#    factor of one, which is what `bus_factor_scope` below fixes this class to and what all
+#    three adopters' propositions ask ("a-bus-factor-one-holder-departs-within-the-horizon").
+#    At n greater than one a cohort is not identically a person and the reason weakens, while
+#    the EXCLUSION does not: nothing in this estate derives n, so no run could tell the two
+#    cases apart, and a rule that admitted cohort whenever somebody asserted n>1 would be a
+#    self-service exemption. A later ticket that wants cohort must first make n a derived
+#    fact; it may not loosen this on the grounds that the stated reason does not bind at n=3.
+#  - `behavioural` is excluded because the question is answered by commit-graph STRUCTURE, so
+#    `ethics_gate._check_necessity` would refuse a behavioural route anyway; naming it here
+#    refuses it before the ladder rather than inside it.
+admissible:
+  - kind: structural
+    granularity: aggregate
+
+# The closed set of fields an admissible sensor may read. Anything else is refused. A closed
+# list, not a deny-list of identifier shapes: a deny-list refuses the identifiers somebody
+# thought of, and this class needs three numbers and a component id to answer its question.
+admissible_fields:
+  - component
+  - distinct_committer_count
+  - commits_in_window
+  - window_days
+
+# What this class is about, and the reason the cohort exclusion above is stated at. Read by
+# nothing in the module: it is the scope of a REASON, and it is here so a later ticket cannot
+# loosen the exclusion by pointing out that the reason does not bind at a larger n.
+bus_factor_scope: one
+
+# THE CLOSED KEY SETS (review F1, 2026-09-09). Before this, only `fields:` was closed, so the
+# record DOCUMENT was open: an admission record carrying `maintained_by:`, `escalation_contact:`,
+# `github:`, `owner:`, `stakeholders:` or a nested `context.escalation.to` was ADMITTED with a
+# green PASS, because `identifier_in_value` recognises exactly two shapes (an email address and
+# a UK national insurance number) and nothing looked at the keys it had never heard of. A
+# homoglyph key evaded the name scanner for the same reason.
+#
+# The fix is the estate's own idiom and the one this table already argues for two blocks up: a
+# closed list, not a longer deny-list. A key this table does not declare is refused TERMINALLY,
+# because an undeclared key is exactly where a person arrives, and a homoglyph key is by
+# definition not in a closed set.
+closed_keys:
+  record:
+    [schema, sensor, scenario, scenario_class, senses_role, kind, granularity, fields, notice,
+     dpia, ladder]
+  notice: [told, published_at, published_on]
+  dpia_ref: [record]
+  ladder: [purpose, necessity, proportionality, dpia]
+  ladder_purpose: [scenario, will_act]
+  ladder_necessity: [kind, level, alternatives]
+  ladder_alternative: [kind, level]
+  ladder_proportionality: [intrusion_cost, value_illuminated]
+  ladder_dpia: [channels, profiling, financial_loss_risk, complete]
+  dpia_record:
+    [schema, sensor, scenario, completed_on, completed_by, retention_days, lawful_basis,
+     what_is_sensed, what_is_not_sensed]
+  people_file: [id, role]
+
+# WHICH DECLARED KEY MAY HOLD WHAT (re-check G1, 2026-09-09). The first cut of `closed_keys`
+# was walked by a hand-enumerated list of ELEVEN PATHS, so a mapping sitting under a DECLARED
+# key that had no closed set of its own was never reached at all: `notice.published_at:
+# {holder: <a name>}` and `ladder.purpose.will_act: 'agreed with <a name>'` were both ADMITTED
+# with a green PASS at a real served ref. A whitelist of paths is not a closure of a document.
+#
+# These three tables turn the enumeration into a recursion. Every key a `closed_keys` set
+# declares falls into exactly one case: it holds a nested mapping ruled by a named set
+# (`nested_maps`), a list of such mappings (`nested_lists`), a list of scalars
+# (`scalar_lists`), or -- the default, and the case the enumeration missed -- a SCALAR. A
+# mapping or list reached anywhere else is refused as `key-not-declared`, because a mapping
+# under a declared key is exactly where a person arrives.
+nested_maps:
+  record: {notice: notice, dpia: dpia_ref, ladder: ladder}
+  ladder:
+    {purpose: ladder_purpose, necessity: ladder_necessity,
+     proportionality: ladder_proportionality, dpia: ladder_dpia}
+nested_lists:
+  ladder_necessity: {alternatives: ladder_alternative}
+scalar_lists:
+  record: [fields]
+  notice: [told]
+  ladder_dpia: [channels]
+
+# The scalar slots whose TYPE matters. `will_act` is the one that bit: `_check_purpose` only
+# tests it for truthiness, so any non-empty string passed the purpose rung -- a boolean slot
+# accepting arbitrary prose, and prose is where a name arrives. `number` admits an int or a
+# float and refuses a bool.
+typed_keys:
+  ladder_purpose: {will_act: bool}
+  ladder_dpia: {profiling: bool, financial_loss_risk: bool, complete: bool}
+  ladder_proportionality: {intrusion_cost: number, value_illuminated: number}
+
+# The keys that must be PRESENT, not merely well shaped when present (re-check R3). The closure
+# checked the shape of keys it found and never that a required one was there, and
+# `ethics_gate._check_necessity` and `_check_proportionality` index these four slots with `[]`:
+# four served records each produced an uncaught KeyError that aborted the grading of the whole
+# estate. Only the slots something downstream INDEXES are listed. A key read with `.get()` is not
+# required here, because refusing it would change a refusal that already has better words for it
+# (a notice with no `told` is covert sensing; a record naming no DPIA path has its own line).
+required_keys:
+  record: [schema]
+  ladder_necessity: [kind, level, alternatives]
+  ladder_alternative: [kind, level]
+  ladder_proportionality: [intrusion_cost, value_illuminated]
+
+# Slots whose VALUE is fixed by this table rather than typed (re-check R7/R9). Each is a place
+# the re-check planted a real name into and watched it graded green, and each is derivable, so
+# closing it costs nothing but the line: the record's schema is a constant this module already
+# defines and never used; the DPIA must be about the sensor and the scenario it is filed
+# against, or it is a DPIA about something else; and the one admissible sensor for this class
+# reads a commit graph, so it declares NO monitoring channel at all.
+fixed_values:
+  record: {schema: twin.sensor-admission-record/v1}
+  dpia_record: {schema: twin.dpia/v1}
+dpia_must_agree: [sensor, scenario]
+admissible_channels: []
+
+# The whole path a DPIA is filed at, not only its basename (round-4 F6): the DIRECTORY part was
+# free text, so a name could live there. `{sensor}` is filled with the sensor's own id.
+dpia_path_pattern: '^twin/orgs/[a-z0-9-]+/dpia/{sensor}\.yaml$'
+
+# Keys that must be present AND non-empty (round-4 F7). `required_keys` alone tests presence, and
+# `ladder.necessity.alternatives` deleted OR set to `[]` both give a vacuously passed necessity
+# rung -- "no less intrusive alternative among 0 considered outranks structural/aggregate" -- and
+# a green admission. The rule that put it here is slot by slot: does this `.get()` slot have a
+# refusal with better words behind it? For `alternatives` there is none.
+non_empty:
+  ladder_necessity: [alternatives]
+
+# The three keys of `dpia_record` above that are free prose, and the one PLACE a person could
+# still arrive under a declared key. Printed as a limit on every run rather than left implied:
+# no rule here reads English, so a personal name written into a DPIA's narrative is not
+# detectable by this check, and the adopter's own register review is where that lives.
+free_prose_fields: [lawful_basis, what_is_sensed, what_is_not_sensed]
+
+# What must be shown before a record reaches the ethics gate's ladder at all. Each is a fact on
+# the served artefact, not a promise: a path that resolves, a date that is printed, a role that
+# is in a register, a count that is a number.
+requires:
+  notice: >-
+    A published, dated notice naming who is told, as a LIST of role ids out of the adopter's own
+    people register -- never free prose, which is where a personal name arrived before review F1.
+    Covert sensing is permanently excluded (NORTH-STAR section 6, twin decision ticket 15), so a
+    sensor whose notice has no publication date has not told anybody.
+  dpia_record: >-
+    A DPIA record in the adopter's own repository, at the path the admission record names,
+    carrying `completed_on`, `completed_by` and `retention_days`, at a path whose basename is
+    the sensor's own id, so a DPIA cannot be filed under somebody's name. The adopter is the
+    controller; the hub is not, so the record lives where the adopter signs it.
+  dpia_fields:
+    - completed_on
+    - completed_by
+    - retention_days
+  senses_role: >-
+    The role the sensor senses, which must be an id in the adopter's own people register
+    (`twin/orgs/<org>/people/`). That register is the roles register for this rule: it is where
+    the scenario's own subject lives, and it is signed under the adopter's tag.
+  completed_by_role: >-
+    The role accountable for the DPIA, which must also be an id in that same register.
+
+# Appended ONCE to the last line of a terminal batch (re-check G3): the clause used to sit in
+# each terminal sentence and printed several times in one run.
+terminal_batch_clause: >-
+  No refusal beyond these was evaluated.
+
+# The exact sentence each refusal prints. Declared here rather than formatted in the module, so
+# the refusal a reader is shown and the refusal the gate grades are the same bytes.
+# `{}` fields are filled by `twin/sensor_admission.py`.
+refusals:
+  - id: names-or-identifies-an-individual
+    terminal: true
+    sentence: >-
+      REFUSED names-or-identifies-an-individual: {sensor}: {what} names or identifies an
+      individual. A bus-factor-key-person sensor senses a role, never a person, and this record
+      is refused before its proportionality is computed.
+  - id: key-not-declared
+    terminal: true
+    sentence: >-
+      REFUSED key-not-declared: {sensor}: {what}. The key set is closed, because an undeclared
+      key -- or a mapping under a declared one -- is where a person arrives, and no deny-list of
+      identifier shapes can be longer than the names somebody can think of.
+  - id: value-not-the-declared-shape
+    terminal: true
+    sentence: >-
+      REFUSED value-not-the-declared-shape: {sensor}: {what}. A slot the table types or fixes is
+      checked against what it declares, because a value of the wrong shape is read by something
+      downstream that was never told, and a slot nobody reads as prose is where a person
+      arrives.
+  - id: duplicate-key
+    terminal: true
+    sentence: >-
+      REFUSED duplicate-key: {sensor}: {what}. PyYAML keeps the LAST of two identical keys, so a
+      closure over the parsed document would never see the discarded line -- and that discarded
+      line is where a name and an email reached a green PASS before this refusal existed.
+  - id: required-key-missing
+    terminal: true
+    sentence: >-
+      REFUSED required-key-missing: {sensor}: {what}. The slot is indexed downstream rather than
+      read with a default, so a record without it is not a record.
+  - id: ladder-could-not-walk
+    terminal: false
+    sentence: >-
+      REFUSED ladder-could-not-walk: {sensor}: {what}. The ethics gate refused the payload
+      itself, which is a different fault from an unregistered sensor id and is reported in its
+      own words.
+  - id: not-this-scenario-class
+    terminal: false
+    sentence: >-
+      REFUSED not-this-scenario-class: {sensor}: the record declares scenario_class {what} and
+      this table rules {admissible}. A record graded by the wrong table would come back
+      asserting a class nobody applied to it.
+  - id: scenario-not-served
+    terminal: false
+    sentence: >-
+      REFUSED scenario-not-served: {sensor}: it names the scenario {what}, and the scenarios this
+      adopter SERVES for this class are {admissible}. A sensor feeding a scenario nobody
+      published is feeding nothing.
+  - id: field-not-admissible
+    terminal: false
+    sentence: >-
+      REFUSED field-not-admissible: {sensor}: the field {what} is not in the admissible set
+      ({admissible}). The set is closed: a field nobody declared is not a field nobody reads.
+  - id: kind-not-admissible
+    terminal: false
+    sentence: >-
+      REFUSED kind-not-admissible: {sensor}: {what} is not admissible for bus-factor-key-person;
+      the admissible set is {admissible}.
+  - id: no-dpia-record
+    terminal: false
+    sentence: >-
+      REFUSED no-dpia-record: {sensor}: {what}. A sensor of people is admitted only against a
+      completed DPIA in the adopter's own repository, carrying a date, an accountable role and a
+      retention period in days.
+  - id: covert-sensing
+    terminal: false
+    sentence: >-
+      REFUSED covert-sensing: {sensor}: {what}. Covert sensing is permanently excluded
+      (NORTH-STAR section 6), so a sensor with no published, dated notice naming the roles told,
+      as role ids, is refused before its ladder is walked.
+  - id: role-not-registered
+    terminal: false
+    sentence: >-
+      REFUSED role-not-registered: {sensor}: it names {what}, which the adopter's people register
+      does not carry. A sensor may sense only a role somebody has registered, and a DPIA may be
+      signed off only by one.
+  - id: sensor-not-named
+    terminal: false
+    sentence: >-
+      REFUSED sensor-not-named: {sensor}: {what}. `twin/sensors.yaml` is the closed sensor table,
+      not any string a record proposes.

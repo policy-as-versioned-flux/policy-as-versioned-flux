@@ -87,6 +87,7 @@ import yaml
 from . import market_signals, schema, scoring
 from .evidence import threshold as pricing_threshold
 from .feed_signal import EVIDENCE_GRADE as FEED_GRADE
+from .strict_yaml import StrictLoader
 
 SCHEMA = "twin.derived-forecast/v1"
 SKILL = "derive-probability"
@@ -126,26 +127,9 @@ class CannotLook(RuntimeError):
     """A validator or check that could not read what it grades against. Never a pass."""
 
 
-class StrictLoader(yaml.SafeLoader):
-    """`yaml.SafeLoader`, with a duplicate mapping key REFUSED instead of silently resolved.
-
-    PyYAML keeps the LAST of two identical keys, so a file whose visible `probability: 0.999`
-    sits above a real `probability: 0.27` validates as 0.27: the file a human reviews in the
-    pull request is not the file the validator read (review F4, measured -- the clock committed
-    it). Every YAML this module reads goes through here.
-    """
-
-    def construct_mapping(self, node: Any, deep: bool = False) -> dict[Any, Any]:
-        seen: set[Any] = set()
-        for key_node, _ in node.value:
-            key = self.construct_object(key_node, deep=deep)
-            if key in seen:
-                raise yaml.constructor.ConstructorError(
-                    "while constructing a mapping", node.start_mark,
-                    f"duplicate key {key!r}: PyYAML keeps the last, so the file a human reads is "
-                    f"not the file this validator reads", key_node.start_mark)
-            seen.add(key)
-        return super().construct_mapping(node, deep=deep)
+# `StrictLoader` moved to `twin/strict_yaml.py` (eco-system ticket 31 re-check R1), which found
+# the same duplicate-key hole in sensor admission. Imported, never forked (ticket 102); the name
+# stays bound here so anything that referred to `derived_forecast.StrictLoader` is unchanged.
 
 
 def load_yaml(text: str, where: str) -> Any:
