@@ -303,3 +303,18 @@ driftwood #29, tuppence #23, ludlow #20, and the hub's own #58. Merge order: hub
 manifest row), then platform, then the adopters (decision 16).
 
 Map line: 34 — Handbook as a compose-time render: `platform/compose/handbook.py` renders `composed/HANDBOOK.md` from the composed artefact and nothing else, and `composition.py` emits it in the same `rendered` mapping — so from the platform tag that carries the renderer on it rides the same pull request, drift check and signed tag, while at today's `v2.0.1` pins (0 of 3 carry it) the pinned tool neither writes nor verifies it and cut-release there would sign a hand-edited page; `verify-fresh.sh` and the hub's `verify/handbook/` are what grade it, by re-rendering the served bytes at `origin/main` and at any signed tag and comparing, with a separate-process purity leg, a source scan of the served renderer and a sensitivity leg so the comparison cannot pass vacuously; the page says of itself only what a re-render proves; an absent field, list fields included, is named and counted, never defaulted (ADR-0020); the first recomposition at `v2.0.1` after the five merges leaves the page stale and the hub gate red until a human re-renders it, ended only by a platform tag carrying the renderer and then three pin bumps (ticket 78's order); the composition selfcheck's price legs are unreachable on current main until ticket 106 lands; `claude -p` summaries become a human-run skill landing outside `composed/`; the legacy `verify.sh` is retired with a reason and no file to delete.
+
+
+## Recorded regression, 2026-09-10
+
+**2026-09-10, recorded regression.** The newest committed grade table, recorded run 235, grades
+`verify/handbook/verify-handbook-is-a-compose-time-render.sh` FAIL. The implementation remains
+merged, but the served handbook is not currently proven fresh. This is the rollout gap already
+identified above: the adopters still pin platform v2.0.1, whose composer does not render or verify
+the handbook. Ticket 110's corrected provenance replay has now merged into platform main through
+PR24; the validated v3.0.0 software release was explicitly approved, published and identity-verified at reviewed main 3602142 (cut run
+34504582573 and release run 34504674000).
+The repair sequence is software release, adopter platform pin upgrades, fresh composition with
+publisher checkouts present, reviewed merges, then a recorded gate that measures those served
+artifacts. Until that evidence lands, this paragraph acknowledges the regression; it does not
+turn the failed check into a pass or claim the rollout is complete.
