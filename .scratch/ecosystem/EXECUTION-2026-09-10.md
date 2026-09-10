@@ -104,3 +104,39 @@ The first prepared software migration exposed a composed-major addition of polic
 held and unpublished. The composer already supports separating its executable from implementation
 inputs, so a delegated architectural correction is being implemented with independently pinned
 v3 tools and unchanged accepted v2.0.1 implementation, money, dates and deployed policy pins.
+
+
+## Reviewed rollout checkpoint
+
+Hub PR78 merged as 0647a55. Branch truth run 241 has 81 pass/7 fail/29 skip, with only the
+acknowledged derived-status red removed from the previous failed-path set; it is not citable.
+The full current-head CI suite has 2563 passes and the standing coverage invariant failure.
+Main run 242 is citable and recorded by 5ebeba4: 80 pass/8 fail/29 skip. Its real overlap with
+the branch gate and recorded LOST RECORDING count=19 satisfy ticket104's original Done.
+
+All three ticket86 implementations merged: driftwood PR36 as77c1cde, tuppence PR31 as65acf4c,
+ludlow PR28 as7fb6338. Actual scheduled facts6/7 remain a completion gate. Insurer PR6 merged
+as d1c1844: only its verifier software pin moved to released v3.0.0; economic inputs are unchanged.
+
+The independent compiler boundary preserves platform implementation v2.0.1 and the accepted
+policy4 window while using signed software v3.0.0. Driftwood PR37 merged as4cfd952 and Ludlow
+PR29 as416a2a3 after both reviews and CI passed. Tuppence PR32 also merged after CI passed at
+2c714b1. Its CI exposed a depth-one adopter checkout losing signed-tag history; the exact CI
+checkout reproduced the changed historical ramp. Restoring only history made unchanged tests
+pass. The reviewed fix fetches full adopter history; no price or evidence was edited.
+
+Platform PR25 merged as332ab19 with replayable floor-change evidence (ticket27's bounded
+portion). Both reviews and release checks pass; v3.1.0 publication is awaiting separate explicit
+approval. Missing Tuppence/Ludlow twin clocks are implemented and reviewed, with integration
+onto current main pending. They record actual missing-input results and remain non-green;
+they supply no feed, valuation, forecast or publishing contract.
+
+These are implementation and validation records. None substitutes for scheduled observations,
+owner monetary declarations, or an immutable publication approval.
+
+
+A follow-up production schedule-grader audit found a new containment-check regression in the
+merged tools rollout: propose-tier has two opaque local-action findings and Renovate one in
+each adopter; their pre-tools baselines have none. Ordinary PR CI did not cover this boundary.
+A focused correction is in progress, preserving the shared authoritative pins and signature
+runner and leaving the grader unchanged. The rollout is not declared complete.
