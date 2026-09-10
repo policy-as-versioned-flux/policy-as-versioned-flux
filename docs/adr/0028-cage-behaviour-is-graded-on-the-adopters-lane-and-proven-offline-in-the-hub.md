@@ -76,12 +76,22 @@ decision):
    connect could not be run at all, and when nothing in the cage selects the bottom-rung pod, so
    nothing observed explains its silence.
 
-4. **Pre-registration is measured, not asserted.** `grade` reads the commit that introduced the two
-   fact ids into `drift/window.yaml` — from git, first-parent, on the served ref — and refuses to
-   score either fact against a sample taken before it. A branch commit registers nothing, because a
-   branch run records nothing (ticket 100). Rewriting a fact after it lands re-registers it on the
-   day of the rewrite and every score taken against the old wording stops counting. That is ticket
-   93's rule for a forecast, applied one level down to a fact.
+4. **Pre-registration is measured, not asserted.** `grade` walks the first-parent history of
+   `drift/window.yaml` on the served ref, reads the `cage_behaviour_sample` block out of the blob
+   at each commit, and takes the NEWEST commit at which that block changed. It refuses to score
+   either fact against a sample taken before that commit. A branch commit registers nothing,
+   because a branch run records nothing (ticket 100). Reword the question, narrow a claim, soften a
+   falsifier or delete a ceiling after the facts have landed and the registration moves to that
+   day, so every score taken against the old wording stops counting. That is ticket 93's rule for a
+   forecast, applied one level down to a fact — **including the half that costs something**, which
+   the first cut of this build did not have: it keyed on the first commit that introduced a fact
+   id, so a later rewrite would have been free. Corrected 2026-09-10 on the same branch, before
+   anything was merged or scored.
+
+   Where this is deliberately narrower than ticket 93: the unit is the SECTION, not the file,
+   because this window carries three instruments and an addendum to one of the others is not a
+   rewrite of this question. Within the section it is raw text, comments included, because a
+   comment here carries the reasoning a reader trusts.
 
 5. **In the hub, cage behaviour is proven OFFLINE ONLY, and every document says so** until a
    citable run scores the two facts. The decision logic is proven live-with-the-real-engine and

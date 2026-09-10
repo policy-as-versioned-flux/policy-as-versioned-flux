@@ -278,3 +278,72 @@ record says in ADR form that cage behaviour is proven offline only and the deck 
 4. **Nothing else grades the lane's own instrument.** `five-facts.py selfcheck` is not run by any
    hub check; the adopters' `verify-reconcile.sh` calls `grade` and never `selfcheck`. Its asserts
    caught two real defects while this was built and no gate would notice if they stopped running.
+
+## Self-review rounds, 2026-09-10 — three findings, all in my own code, all fixed on the branch
+
+None of these was reported by anything. Each was found by running the instrument or by re-reading
+the rule it claims to obey, and each is the same failure one level down: a question answered before
+its answer could exist, or a rule half built.
+
+**R1 — the same-rung question was asked last, after four connects** (adopter commits `ecb7dc6`,
+`08484cd`, `dff7d13`). Fact 7 measured reach and only then noticed that the cage had put both
+workloads on the same rung. On the composed version every lane actually reconciles today that is the
+live case, and that cage locks down every caged pod alike, so the control would come back silent and
+the fact would have said *"the control reached nothing either"* — true, and less than *"this cage has
+no bottom rung distinct from its loosest one"*. The question needs no network and no exec, so it is
+asked first now, and the connects run only where there is a rung below the loosest one.
+
+**R2 — my own bound read as the cage failing** (`42d304e`, `8fb231c`, `91946ce`). Fact 6 graded
+FALSE whenever the bounded wait ran out with the pod still in `ContainerCreating`. An instrument
+that runs out of patience must not assert that the cage prevented a workload from running. The
+verdict is now `_cage_admission_verdict(state, applied_ok)` with seven asserts. Three states are
+could-not-looks because they are not verdicts the cage reached: a pod the cluster never SCHEDULED
+(the runner's capacity), a pod still coming up at the bound (this instrument's bound), and an apply
+that reported success with no pod behind it. Everything else that leaves a caged workload not
+running is the cage's doing, because the only difference between it and an ordinary pod is what the
+cage wrote onto it.
+
+**R3 — I had built the cheap half of ticket 93's rule and not the half that costs something**
+(`1ae6742`, `02d9deb`, `e6d8430`). The rule is that a question rewritten after it landed
+re-registers, so every score taken against the old wording stops counting. My first cut keyed on the
+FIRST commit that introduced a fact id — so the question could have been reworded, a claim narrowed,
+a falsifier softened or a ceiling deleted while the facts were being scored, and nothing would have
+moved. `cage_registration` now walks the first-parent history of `drift/window.yaml` on the served
+ref, reads the `cage_behaviour_sample` block out of each blob, and returns the NEWEST commit at
+which that block changed.
+
+Measured on a throwaway clone of the pushed branch, four commits deep:
+
+    BEFORE a rewrite:                   registered by 1d0fdfb6dc25 at 2026-09-10T04:46:13+01:00
+    AFTER  a rewrite of the question:   registered by 067b1a017878 at 2026-09-10T06:32:35+01:00
+    AFTER  a comment-only change:       registered by 39d25145941f at 2026-09-10T06:32:35+01:00
+    AFTER  an edit outside the section: registered by 39d25145941f  (unmoved)
+
+The unit is the SECTION and not the file, and the difference from ticket 93 is in the docstring
+rather than left to be found: this window carries three instruments and an addendum to one of the
+others is not a rewrite of this question. Within the section it is raw text, comments included,
+because a comment here carries the reasoning a reader trusts and a rule that re-registers on a
+changed claim but not on a rewritten reason would let the reason be weakened under a fact already
+being scored.
+
+**The registering commit is unchanged by all three rounds**: driftwood `1d0fdfb`, tuppence `7146412`,
+ludlow `0b508bd`. R1, R2 and R3 touch `drift/five-facts.py` only; `drift/window.yaml` has not been
+edited since it landed, which is exactly the property R3's rule now measures.
+
+### The gate run of the final hub head before these rounds
+
+Run **230**, `gh run view 34439399424`, on hub `5050b08`, a push to
+`ticket-86-the-cage-enters-the-citable-number`. **A branch run records nothing** (ticket 100) and the
+run says so in its own log: *"the line above is NOT being written to talk/truth.log: this run is on
+ticket-86-..., not main, and only main's talk/truth.log is citable"*. Quoted from the run log,
+therefore, and never citable:
+
+    TRUTH 2026-09-10T05:30Z run=230 hub=5050b08 enact=development units=[driftwood=a181725@main
+    feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main
+    platform=8da250d@main tuppence=bd15aae@main] pass=78 [observed=24 self=41 simulated=4 meta=9]
+    fail=8 skip=30 [never=9 waits=21] excluded=8 total=124 ceiling=105
+
+Figure for figure the same as run 225 on `main`, which is the expected answer: the units are still at
+their own mains, so the hub half of this ticket moves the record and not the number. The run's
+conclusion is `failure`, as `main`'s own runs 34425782322 and 34422085511 are, on the estate's
+standing eight reds.
