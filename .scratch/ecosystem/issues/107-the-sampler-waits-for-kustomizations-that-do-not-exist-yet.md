@@ -757,3 +757,46 @@ The three diffs remain the same change on all three adopters: the hunks are byte
 from one hunk-header line number, driftwood's file being three lines shorter above. `drift/samples.jsonl`
 is untouched — blob shas identical between `main` and the branch on all three. The `-e` guard
 measurement re-ran identically after both code changes: 63 seconds, exit 0.
+
+## The lane answered, 2026-09-10
+
+Two of the three sample clauses of Done are MET, on SCHEDULED runs, with the ordering visible in
+each run's own log. Nothing here was dispatched, and no sample line was written by hand.
+
+**tuppence — met.** Scheduled run 34479714340, `event=schedule`, 2026-09-10T12:57:41Z. Its log
+carries, in this order and at these times:
+
+```
+12:59:24  wait-order: about to wait, by name, for the Kustomizations the ResourceSet names
+          in flux-system; each wait below prints its own verdict:
+          .../composed-v2-0-0 .../composed-v2-0-1 .../composed-v3-0-0
+12:59:25  kustomization.kustomize.toolkit.fluxcd.io/composed-v2-0-0 condition met
+12:59:26  kustomization.kustomize.toolkit.fluxcd.io/composed-v2-0-1 condition met
+12:59:26  kustomization.kustomize.toolkit.fluxcd.io/composed-v3-0-0 condition met
+12:59:27  step: take the five-fact sample and append it to the observation log
+```
+
+All three composed Kustomizations reach `condition met` BEFORE the sample step begins, which is
+what Done asked for in those words. The `tuppence-composed` row that run appended reads
+`fact_4 observed=True` and `fact_5 observed=True` with `objects_not_in_inventory: []` against 23
+inventory entries. The row before it, run 34354414610 of 2026-09-09, read `fact_5 observed=False`.
+
+**driftwood — met, and the accident is gone rather than hidden.** Scheduled run 34470909429,
+`event=schedule`, 2026-09-10T11:22:01Z. Its `driftwood-composed` row reads `fact_4 observed=True`
+and `fact_5 observed=True`, `objects_not_in_inventory: []`. The clause that mattered here was that
+this must no longer depend on `kustomizations/driftwood` timing out: the log carries **zero**
+occurrences of `timed out waiting for the condition`, and `kustomization/driftwood condition met`
+appears alongside the three composed ones. So the green rests on the wait, not on a stall.
+
+**ludlow — NOT YET, and it is only waiting for its own clock.** Its newest sample run is
+34358702433 of 2026-09-09T13:41:32Z, which PRE-DATES this ticket's merge, and its
+`ludlow-composed` row still reads `fact_5 observed=False` with 15 objects in no inventory. Ludlow
+has not sampled since round 4 landed. This clause closes on its next scheduled run and needs
+nothing from anybody. Do not dispatch one: a dispatched run is a measurement and not the scheduled
+observation Done names, which is the rule this ticket followed when it refused to close itself.
+
+The two non-sample clauses were already met and are unchanged: `verify-sampler-wait-order.sh`
+graded PASS on a recorded hub run (run 224, hub 8a95445, the first main run after the four merges),
+and its selfcheck refuses round 3's order planted verbatim.
+
+**Status stays open** until ludlow's row turns, because the ticket's own Done names ludlow.
