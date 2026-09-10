@@ -61,6 +61,24 @@ def _unit(**workflows):
                       "workflows": workflows}}
 
 
+def test_recording_history_survives_the_credential_free_verdict(monkeypatch, tmp_path):
+    monkeypatch.setattr(sch, "units", lambda: [])
+    facts = {"default_branch": "main", "runs": [
+        {"run_number": 12, "head_branch": "main", "event": "push", "conclusion": "cancelled"}]}
+    monkeypatch.setattr(sch.lost_recordings, "collect", lambda remote, gh: facts)
+    doc = sch.collect()
+    path = tmp_path / "clock.json"
+    path.write_text(json.dumps(doc))
+    monkeypatch.setattr(sch, "_gh", lambda *args: pytest.fail("gate cannot call gh"))
+    read = sch.Verdict(str(path)).recording_history(sch.HUB_REMOTE)
+    assert read["runs"] == facts["runs"]
+
+
+def test_old_verdict_reports_missing_recording_history(tmp_path):
+    with pytest.raises(sch.CouldNotLook, match="recording history"):
+        sch.Verdict(_write(tmp_path)).recording_history(sch.HUB_REMOTE)
+
+
 def _run(hours_ago, conclusion, *, database_id=None, status=None):
     when = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=hours_ago)
     run = {"createdAt": when.isoformat(timespec="seconds").replace("+00:00", "Z"),

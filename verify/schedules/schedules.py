@@ -74,9 +74,13 @@ import yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
+sys.path.insert(0, HERE)
 from _estate import ESTATE  # noqa: E402
+import lost_recordings  # noqa: E402
 
 HUB = os.path.normpath(os.path.join(ESTATE, ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), "..", "talk"))
+from truth_manifest import parse_truth  # noqa: E402
 
 # ADR-0024, D1. The complete list of paths a scheduled run may ever commit.
 # Everything else is a declaration: a tier, a pin, a floor, an overlay, a
@@ -642,6 +646,9 @@ class Offline:
     def last_run(self, remote: str, workflow: str) -> dict | None:
         raise CouldNotLook(self.unreachable)
 
+    def recording_history(self, remote: str) -> dict:
+        raise CouldNotLook(self.unreachable)
+
 
 class Gh(Offline):
     """`gh`, in a process that holds a credential. Never the gate job (ticket 56)."""
@@ -659,6 +666,12 @@ class Gh(Offline):
 
     def last_run(self, remote: str, workflow: str) -> dict | None:
         return last_run(remote, workflow)
+
+    def recording_history(self, remote: str) -> dict:
+        try:
+            return lost_recordings.collect(remote, _gh)
+        except (subprocess.SubprocessError, OSError, ValueError, KeyError) as e:
+            raise CouldNotLook(f"recording history unavailable: {e}") from e
 
 
 def binding_fault(doc: dict, env: dict) -> str:
@@ -720,6 +733,7 @@ class Verdict(Offline):
             raise ValueError(f"collected {self.age_hours:.0f}h ago, past the "
                              f"{VERDICT_MAX_AGE_HOURS}h freshness window")
         self.units = doc.get("units") or {}
+        self.recordings = doc.get("recording_history") or {}
         self.collected_at = doc["collected_at"]
 
     def _unit(self, remote: str) -> dict:
@@ -756,6 +770,12 @@ class Verdict(Offline):
 
     def last_run(self, remote: str, workflow: str) -> dict | None:
         return self._workflow(remote, workflow).get("run")
+
+    def recording_history(self, remote: str) -> dict:
+        if self.recordings.get("remote") != remote or self.recordings.get("error"):
+            raise CouldNotLook("clock verdict carries no readable recording history for "
+                               + remote + ": " + str(self.recordings.get("error") or "absent"))
+        return self.recordings
 
 
 def observer(offline: bool = False) -> Offline:
@@ -890,6 +910,15 @@ def check(offline: bool = False) -> int:
     unreachable = source.unreachable
     owned = owners()
     clocks_seen: set[str] = set()
+
+    try:
+        history = source.recording_history(HUB_REMOTE)
+        with open(os.path.join(HUB, "talk", "truth.log")) as fh:
+            parsed = [parse_truth(line) for line in fh if line.startswith("TRUTH ")]
+        recorded = {int(row["run"]) for row in parsed if row["run"].isdigit()}
+        out("NOTE", lost_recordings.grade(history, recorded))
+    except (CouldNotLook, ValueError, OSError) as e:
+        out("SKIP", f"hub/truth.yml: LOST RECORDING count=unknown -- {e}")
 
     now = dt.datetime.now(dt.timezone.utc)
     for unit, root, remote in units():
@@ -1041,7 +1070,7 @@ def collect() -> dict:
     job that holds nothing. Every failure is recorded as a reason in the document rather than
     raised, so one unreachable organisation does not blind the other eight.
     """
-    doc = {
+    doc: dict = {
         "schema": VERDICT_SCHEMA,
         "collected_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
         "collector": "verify/schedules/schedules.py clocks",
@@ -1051,6 +1080,11 @@ def collect() -> dict:
         "repository": os.environ.get("GITHUB_REPOSITORY", ""),
         "units": {},
     }
+    try:
+        doc["recording_history"] = {"remote": HUB_REMOTE,
+                                    **lost_recordings.collect(HUB_REMOTE, _gh)}
+    except (subprocess.SubprocessError, OSError, ValueError, KeyError) as e:
+        doc["recording_history"] = {"remote": HUB_REMOTE, "error": str(e)}
     for unit, root, remote in units():
         entry: dict = {"remote": remote, "reachable": True, "unreachable_reason": "",
                        "ruleset": {}, "workflows": {}}

@@ -70,3 +70,42 @@ build item (b) still owns turning it into something the gate says on every run.
 
 One thing this instance settles for item (a): keying the group on `github.ref` fixes BOTH halves
 at once, because it puts every branch in its own lane, and no other option in the Question does.
+
+## Implementation, 2026-09-10 — review pending
+
+Decisions delegated under ADR-0025:
+
+- The group is keyed by event **and ref**, preserving scheduled-vs-push isolation while
+  separating every builder from main and other builders. Same-ref pending runs can still
+  displace each other; this is not a promise that GitHub retains an unlimited queue.
+- Lost recordings are a reported historical count, not a permanently red gate. The collector
+  pages through retained `truth.yml` run history, records the default branch and minimal run
+  facts, and the credential-free gate subtracts cancelled run numbers that actually appear in
+  `talk/truth.log`. A missing history is `count=unknown` and SKIP, never zero. Cancellation's
+  cause is unknown: a manual cancellation is a lost opportunity too, but is not blamed on a
+  concurrency collision. GitHub-deleted history is outside the declared census.
+- Past observations are gone. A dispatch today observes today's estate, even at yesterday's
+  hub commit; it cannot recreate a lost observation. No truth line is invented or replayed.
+
+Measured 2026-09-10 from 239 retained runs across three GitHub API pages: **19** cancelled
+main recording opportunities absent from the committed log: 34, 36, 37, 38, 42, 48, 63, 112,
+119, 125, 127, 130, 136, 149, 155, 156, 159, 168 and 175. This is a dated local API census,
+not a citable TRUTH run and not proof that all cancellations had one cause.
+
+Validation: red-first tests at the workflow concurrency-key and collected-facts seams;
+39 focused tests pass, including pagination, malformed-history refusal, recorded-run exclusion,
+duplicate suppression and collector-to-verdict reading without credentials. The schedule
+selfcheck passes. Live overlapping-run proof and a scheduled capture of the new count remain
+outstanding; the ticket stays open until review and those observations complete.
+
+Source for concurrency semantics:
+https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency
+
+### Independent review
+
+Standards: no hard violations; the one maintainability finding (a second TRUTH-field regex)
+was fixed by using `truth_manifest.parse_truth`. Spec: no code defects; live overlapping-run
+proof and a scheduled capture remain required. The 39 focused tests pass after the correction.
+The repository-wide type check passes across 190 source files. The configured commit hook's
+remote secret-scan quota rejected the checkpoint commit; a separate local TruffleHog scan found
+zero secrets, but substitution permission remains pending and no production hook was bypassed.
