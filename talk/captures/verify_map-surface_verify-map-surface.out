@@ -3,10 +3,48 @@
 [1;36m==>[0m 1. what a citation points at is here to be read
   ok   map.md, talk/truth.log, the manifest, the parser and .estate-clone are all readable
 [1;36m==>[0m 2. the map quotes no figure and names no check the surface does not carry, and item (a) holds
+  -- 8 exact ticket/map transcriptions compared; 37 historical prose summaries are not exact transcriptions
+  -- historical map summary, not compared: .scratch/ecosystem/issues/101-no-adopter-gate-has-verified-a-real-signature.md:384
+  -- historical map summary, not compared: .scratch/ecosystem/issues/102-the-cited-tree-names-who-added-the-check.md:337
+  -- historical map summary, not compared: .scratch/ecosystem/issues/102-the-cited-tree-names-who-added-the-check.md:344
+  -- historical map summary, not compared: .scratch/ecosystem/issues/103-icos-release-gate-computes-the-bump-it-is-about-to-cut.md:200
+  -- historical map summary, not compared: .scratch/ecosystem/issues/105-two-adopter-gates-fetch-their-trust-root-over-the-network.md:493
+  -- historical map summary, not compared: .scratch/ecosystem/issues/106-the-composition-selfcheck-is-red-on-main-at-the-ungoverned-namespace-leg.md:301
+  -- historical map summary, not compared: .scratch/ecosystem/issues/17-twin-follow-ups-from-the-aug-05-itemisation.md:111
+  -- historical map summary, not compared: .scratch/ecosystem/issues/31-sensor-admission-for-the-key-person-scenario.md:239
+  -- historical map summary, not compared: .scratch/ecosystem/issues/34-handbook-as-a-compose-time-render.md:305
+  -- historical map summary, not compared: .scratch/ecosystem/issues/44-eco-system-misuse-catalogue-graded-by-the-gate.md:43
+  -- historical map summary, not compared: .scratch/ecosystem/issues/53-the-release-pushes-tags-but-not-the-branch.md:147
+  -- historical map summary, not compared: .scratch/ecosystem/issues/55-every-red-on-the-clock-is-real-explained-and-finishable.md:125
+  -- historical map summary, not compared: .scratch/ecosystem/issues/56-the-citable-run-can-see-whether-the-clocks-ran.md:168
+  -- historical map summary, not compared: .scratch/ecosystem/issues/57-feeds-and-insurer-become-runnable-workflows-registered.md:267
+  -- historical map summary, not compared: .scratch/ecosystem/issues/59-build-the-two-unbuilt-5-bullets-a-fall-blocks-status-is.md:183
+  -- historical map summary, not compared: .scratch/ecosystem/issues/62-the-feed-parents-are-consumed-pinned-and-signed.md:119
+  -- historical map summary, not compared: .scratch/ecosystem/issues/63-the-unlabelled-default-flips-to-isolated.md:29
+  -- historical map summary, not compared: .scratch/ecosystem/issues/64-the-twin-is-three-adopters-tagged-and-signed.md:306
+  -- historical map summary, not compared: .scratch/ecosystem/issues/65-enact-guard-closes-the-git-dir-family.md:193
+  -- historical map summary, not compared: .scratch/ecosystem/issues/66-the-deck-check-grades-the-run-its-own-truth-line-names.md:88
+  -- historical map summary, not compared: .scratch/ecosystem/issues/67-the-record-matches-the-surface.md:324
+  -- historical map summary, not compared: .scratch/ecosystem/issues/69-an-untagged-pin-is-a-priced-hole.md:15
+  -- historical map summary, not compared: .scratch/ecosystem/issues/70-the-observation-lane-is-detectively-enforced-and-honest.md:40
+  -- historical map summary, not compared: .scratch/ecosystem/issues/72-a-feed-bump-re-renders-the-twin-s-derived-artefacts.md:156
+  -- historical map summary, not compared: .scratch/ecosystem/issues/73-the-verifier-rejects-a-tag-whose-cert-postdates-its-tagger-time.md:106
+  -- historical map summary, not compared: .scratch/ecosystem/issues/76-every-green-rests-on-an-observation.md:33
+  -- historical map summary, not compared: .scratch/ecosystem/issues/77-every-pin-is-checked-for-content.md:90
+  -- historical map summary, not compared: .scratch/ecosystem/issues/77-every-pin-is-checked-for-content.md:160
+  -- historical map summary, not compared: .scratch/ecosystem/issues/79-the-pound-inputs-are-published-sourced-and-current.md:657
+  -- historical map summary, not compared: .scratch/ecosystem/issues/80-the-record-matches-the-code-round-2.md:269
+  -- historical map summary, not compared: .scratch/ecosystem/issues/81-round-3-of-the-sampler-wait-order-lands.md:82
+  -- historical map summary, not compared: .scratch/ecosystem/issues/82-licence-attribution-and-disclaimers.md:121
+  -- historical map summary, not compared: .scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md:28
+  -- historical map summary, not compared: .scratch/ecosystem/issues/85-every-clock-is-green-or-red-for-an-estate-reason.md:123
+  -- historical map summary, not compared: .scratch/ecosystem/issues/90-identity-is-shelved-for-this-build.md:35
+  -- historical map summary, not compared: .scratch/ecosystem/issues/92-the-local-clock.md:67
+  -- historical map summary, not compared: .scratch/ecosystem/issues/99-the-adopter-gate-grades-the-change.md:288
   -- lane declarations and ownership read at origin/main, freshly fetched; the checkout is never graded
   -- 5 figure(s) graded against talk/truth.log; 1 identified no line and were not graded
   -- 0 figure(s) exempted by a fixed disclaimer, 1 disposed of by the dated correction directly below them:
-  -- disposed .scratch/ecosystem/map.md:115  (correction of 2026-08-31, the paragraph below it)
+  -- disposed .scratch/ecosystem/map.md:116  (correction of 2026-08-31, the paragraph below it)
   -- 15 lane declaration(s) read across 8 unit(s)
 
-PASS: every pass/fail figure .scratch/ecosystem/map.md quotes is a figure talk/truth.log records, every check it names is one talk/verify-all.sh discovers, every relative link resolves, no unit declares an observation-lane path it does not own, and ticket 67's record corrections are each still there
+PASS: every pass/fail figure .scratch/ecosystem/map.md quotes is a figure talk/truth.log records, every check it names is one talk/verify-all.sh discovers, every relative link resolves, no unit declares an observation-lane path it does not own, ticket 67's record corrections are each still there, and every exact ticket Map line transcription matches the live map

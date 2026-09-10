@@ -1,19 +1,19 @@
 [1;36m==>[0m 0. the five-fact sample: the composed set in force, from signed sources (graded first, cluster-free)
-   five-fact sample 2026-09-09T13:43:04Z on cluster dsample-34358702433 (run 34358702433), 3 sources
+   five-fact sample 2026-09-10T13:36:00Z on cluster dsample-34483506093 (run 34483506093), 3 sources
      ludlow-composed      true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      ludlow-composed      ?     fact_2_tag_signature_verified_at_the_source_boundary: nothing checked a signature at this source boundary: the GitRepository declares no spec.verify (Flux speaks OpenPGP and SSH only) and carries no verdict from the identity-pinned gitsign-verifying controller (ticket 41). Not looked at, and a thing not looked at is never a pass
      ludlow-composed      true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming ludlow-composed applied a800a58e2547
      ludlow-composed      true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
-     ludlow-composed      FALSE fact_5_every_rendered_object_is_in_the_flux_inventory: 15 of 16 rendered objects are in no Flux inventory (absent from the cluster, or live but put there by something other than Flux)
+     ludlow-composed      true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
      nist                 true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      nist                 true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
      nist                 true  fact_3_last_applied_revision_equals_the_pinned_commit: nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524
      nist                 true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
-     nist                 FALSE fact_5_every_rendered_object_is_in_the_flux_inventory: 15 of 16 rendered objects are in no Flux inventory (absent from the cluster, or live but put there by something other than Flux)
+     nist                 true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
      platform             true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      platform             true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v2.0.1 was verified at the source boundary against platform's own pinned identity ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
      platform             true  fact_3_last_applied_revision_equals_the_pinned_commit: platform is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 533dccb0a823 vs pin 533dccb0a823
      platform             true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
-     platform             FALSE fact_5_every_rendered_object_is_in_the_flux_inventory: 15 of 16 rendered objects are in no Flux inventory (absent from the cluster, or live but put there by something other than Flux)
+     platform             true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
    SKIP: a fact could not be looked at, and a fact not looked at is never a pass
 SKIP: no local kind cluster 'ludlow' to observe here, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass

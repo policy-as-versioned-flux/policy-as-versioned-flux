@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-10T10:30Z run=235 hub=6bfb7dd enact=development units=[driftwood=a181725@main feeds=c3c654a@main ico=abcb3a8@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main platform=5b88f1d@policy/v5.0.0 tuppence=bd15aae@main] pass=80 [observed=25 self=42 simulated=4 meta=9] fail=8 skip=29 [never=10 waits=19] excluded=8 total=125 ceiling=106
+# TRUTH 2026-09-10T17:28Z run=242 hub=e214bed enact=development units=[driftwood=aa8ca08@main feeds=c3c654a@main ico=abcb3a8@main insurer=61fba9d@main ludlow=83b8ce4@main nist=f83126f@main platform=3602142@v3.0.0 tuppence=3446d05@main] pass=80 [observed=25 self=42 simulated=4 meta=9] fail=8 skip=29 [never=10 waits=19] excluded=8 total=125 ceiling=106
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      or absent trust root refuses on the trust material and never on the network, cold and warm (I).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -117,7 +117,7 @@ verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Reno
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
 verify/schedules/verify-schedules.sh	FAIL	FAIL: 4 schedule/cage check(s) observed false: feeds/fetch.yml insurer/fetch.yml ludlow tuppence
-verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=a181725 ludlow=2c2d740 tuppence=bd15aae]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
+verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=aa8ca08 ludlow=83b8ce4 tuppence=3446d05]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
 verify/supersede/verify-supersede.sh	SKIP	SKIP: driftwood pins ico/feed/penalty-schema@v3, behind v4 (v4.0.0 on ico's real remote): composed under platform v2.0.1, which carries no supersede rule, so no
 verify/tier-binding/verify-tier-binding.sh	PASS	PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform
 verify/trust-root/verify-the-committed-trust-root-is-dated.sh	PASS	PASS: every log platform's evidence names at each adopter's pin is carried by that adopter's own committed trust root inside the key's validFor window -- the ag

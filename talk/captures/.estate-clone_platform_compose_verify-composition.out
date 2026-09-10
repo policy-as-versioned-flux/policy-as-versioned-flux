@@ -1,3 +1,9 @@
+[1;36m==>[0m 0. portable publisher observations (fixture publishers only)
+......
+----------------------------------------------------------------------
+Ran 6 tests in 4.079s
+
+OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the one remaining refusal)
 OK compose(): the real driftwood composes against its real pinned parents; platform's two formerly-dangling claims are fixed, zero refusals
 OK document: carries outcome, parents[], members[], refusals[], restatements[], cages[], holes[], ungoverned[], prices[], deltas[], limits[]
@@ -3003,6 +3009,7 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
         "detail": "tag v3.0.0 on the ico checkout carries a signature block"
       },
       "hole": null,
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
       "superseded": {
         "state": "behind",
         "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut"
@@ -3073,6 +3080,7 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
         "detail": "tag threat-register/v2.0.0 on the feeds checkout carries a signature block"
       },
       "hole": null,
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
       "superseded": {
         "state": "behind",
         "detail": "tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v2; behind since 2026-09-10, the day threat-register/v3.0.0 was cut"
@@ -3351,6 +3359,30 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
         "penalty-schema/to_fair_scenario.py": "4d313e86d2d139788b5e46d43d534f3ce64b6ec49b9da8f10dcc9ad8d7ca4d6f",
         "penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda"
       },
+      "publisher_observation": {
+        "schema": 1,
+        "party": "ico",
+        "name": "penalty-schema",
+        "version": "v3",
+        "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "v3.0.0",
+          "detail": "tag v3.0.0 on the ico checkout carries a signature block"
+        },
+        "newer": {
+          "version": "v4",
+          "tag": "v4.0.0",
+          "tagged": "2026-09-10",
+          "published_at": "2026-09-09",
+          "since_tag": "v4.0.0",
+          "since": "2026-09-10"
+        },
+        "superseded": {
+          "state": "behind",
+          "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut"
+        }
+      },
       "path": "composed/feeds/ico/v3"
     },
     {
@@ -3375,6 +3407,30 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
         "threat-register/to_fair_scenario.py": "6afad65dd84451206ed276d08e34473cba652f97ef782bc7e2385ec4dc0e445d",
         "threat-register/v2/feed.json": "c94ae8335d13edcbdc63b2d8f7c7cda3fbefd4d80e78022be51aba30d70b9a6c"
       },
+      "publisher_observation": {
+        "schema": 1,
+        "party": "feeds",
+        "name": "threat-register",
+        "version": "v2",
+        "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "threat-register/v2.0.0",
+          "detail": "tag threat-register/v2.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": {
+          "version": "v3",
+          "tag": "threat-register/v3.0.0",
+          "tagged": "2026-09-10",
+          "published_at": "2026-09-09",
+          "since_tag": "threat-register/v3.0.0",
+          "since": "2026-09-10"
+        },
+        "superseded": {
+          "state": "behind",
+          "detail": "tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v2; behind since 2026-09-10, the day threat-register/v3.0.0 was cut"
+        }
+      },
       "path": "composed/feeds/feeds/v2"
     },
     {
@@ -3394,6 +3450,23 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "files": {
         "party.yaml": "2b0a11a3eac2e3fa35f15fdf91d25c68bc193baab2545863734930c1c6ede7fb",
         "quote/driftwood/v1/feed.json": "e1c39816a12a13cfe21ff137073ce33492e89abc044423372c85284dc3760329"
+      },
+      "publisher_observation": {
+        "schema": 1,
+        "party": "insurer",
+        "name": "quote-driftwood",
+        "version": "v1",
+        "sha": "db767055119292e400edd63ed260785ce605eb4e",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "v1.0.0",
+          "detail": "tag v1.0.0 on the insurer checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form quote-driftwood/vN.x.y with N > 1 on the insurer checkout, so the pinned v1 is the newest published major"
+        }
       },
       "path": "composed/feeds/insurer/v1"
     }
@@ -3459,14 +3532,19 @@ OK prices[]: a threat-register bump (v1 -> v2) moves tuppence's exposure through
 OK prices[]: a fixture ico band (v1->v2) that crosses driftwood's real GBP40,000 tolerance prints a proposed tier through compose() (isolated -> quarantine, changed=True), marked as a label; no rendered POLICY file changes and the handbook names the proposed tier `quarantine`, which it did not before the bump
 OK prices[]: one `switching` entry per feed edge, each measured by re-composing with that publisher's edges dropped -- ico's costs its whole regime line, the threat publisher's is not a number at all because driftwood's own twin borrows that feed's LEF and stops pricing without it, and the insurer's moves the exposure by nothing and names the premium it would lose instead of folding it in
 OK composed/feeds/: every priced payload, the publisher's own party artefact and the converter that priced it are vendored under the adopter's own signature, digested into a PROVENANCE.json the header names, with the converter's real source party recorded and a quote feed's absent converter named rather than faked
+OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed, and every one of the 31 files it RENDERS comes back byte-identical -- 11 of them the vendored tree itself, the rest the composed policy set and composed/HEADER.yaml with its parent SHAs. composed/evidence.json is not among them: it is written from the document rather than rendered, and its prices are the comparison just above. The substitution prints as an open limit, and a tampered vendored payload refuses against the digest its own tag signed
+OK composed/feeds/: each vendored copy records the exact command that priced it and the digest of what that command returned -- and replaying it against the vendored payload alone, in a bare directory, reproduces the digest for penalty-schema, threat-register
+OK prices[]: no entry carries the absolute path of the machine that composed it -- the twin's own refusal travels into the signed artefact naming `twin/forward-intel/v1/feed.json`, which reads the same on every runner
+OK switching: an edge signed AFTER every pinned envelope moves the composition's as-of to that day (its own life 0 months, its siblings' measured up to it), a --as-of EARLIER than a signed since refuses naming both dates rather than reporting the window's absolute size; and on today's estate every pin was signed the day of the newest feed publication, so the window is 0 months and over_pin_life is 0.0 -- arithmetic over two signed dates, not a placeholder
+OK switching: a feed edge carrying no `since` refuses as a missing instrument naming the edge -- a pin's life is a window between two signed dates, never a default
 Traceback (most recent call last):
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 6807, in <module>
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 6951, in <module>
     sys.exit(main(sys.argv))
              ^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 4099, in main
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 4240, in main
     selfcheck()
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 6323, in selfcheck
-    assert rendered_absent == rendered_present, \
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: ['composed/HANDBOOK.md']
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 6630, in selfcheck
+    assert len(sups) == 1, sups
+           ^^^^^^^^^^^^^^
+AssertionError: [{'source': 'ico', 'kind': 'supersede', 'perspective': 'tuppence', 'currency': 'GBP', 'amount': 0.0, 'per_customer': None, 'name': 'penalty-schema', 'version': 'v3', 'newer': {'version': 'v4', 'tag': 'v4.0.0', 'tagged': '2026-09-10', 'published_at': '2026-09-09', 'since_tag': 'v4.0.0', 'since': '2026-09-10'}, 'since': '2026-09-10', 'as_of': '2026-08-28', 'ramp': 1.0, 'base': 9039791.01976426, 'proposed_tier': None, 'changed': False, 'basis': "the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge the feeds module's EOL ramp puts on a version its publisher has superseded, +1x per year behind and capped at +4x, where `since` is the day the newer major's signing tag was cut; zero on that day, printed with both dates, and never summed into the exposure the line itself is already in", 'limits': ["zero (as_of 2026-08-28 precedes the tag day 2026-09-10): the signed artefact's as-of is its newest signed input; only a re-composition --as-of a later day (the scheduled proposer's) grows this line"], 'detail': 'tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut'}, {'source': 'feeds', 'kind': 'supersede', 'perspective': 'tuppence', 'currency': 'GBP', 'amount': 0.0, 'per_customer': None, 'name': 'threat-register', 'version': 'v1', 'newer': {'version': 'v3', 'tag': 'threat-register/v3.0.0', 'tagged': '2026-09-10', 'published_at': '2026-09-09', 'since_tag': 'threat-register/v2.0.0', 'since': '2026-09-01'}, 'since': '2026-09-01', 'as_of': '2026-08-28', 'ramp': 1.0, 'base': 222574.31190283748, 'proposed_tier': None, 'changed': False, 'basis': "the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge the feeds module's EOL ramp puts on a version its publisher has superseded, +1x per year behind and capped at +4x, where `since` is the day the newer major's signing tag was cut; zero on that day, printed with both dates, and never summed into the exposure the line itself is already in", 'limits': ["zero (as_of 2026-08-28 precedes the tag day 2026-09-01): the signed artefact's as-of is its newest signed input; only a re-composition --as-of a later day (the scheduled proposer's) grows this line"], 'detail': 'tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v1; behind since 2026-09-01, the day threat-register/v2.0.0 was cut'}]
 FAIL: composition.py --selfcheck
