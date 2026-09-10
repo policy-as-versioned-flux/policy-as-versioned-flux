@@ -998,6 +998,254 @@ def test_a_ladder_missing_a_whole_rung_is_not_called_an_unregistered_sensor() ->
         f"a ladder fault must not be reported as an unregistered sensor id: {joined}")
 
 
+
+# -- R5-1: a path git QUOTES must not make an artefact vanish -------------------------------------
+# Round 5's first blocker, and one level out from the document again: `git ls-tree --name-only`
+# C-quotes any path with a non-ASCII byte, so `served_paths()` handed back
+# `"twin/orgs/alpha/people/rota-na\303\257ve.yaml"` -- quotes and backslashes included -- and
+# `served()` on that string returned None. The artefact was dropped from legs 2 and 3 in silence.
+# The surrogate-escape decode does not help: git quotes before Python sees the bytes.
+
+ACCENTED_ROLE_FILE = "rota-na\u00efve.yaml"
+ACCENTED_RECORD = "bus-factor-structural-aggregate-na\u00efve.yaml"
+
+
+def test_served_paths_round_trips_a_path_git_would_quote(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD, org="alpha", extra_role_file=(
+        ACCENTED_ROLE_FILE, "id: on-call-secondary\nrole: Second on call.\n"))
+    paths = sa.served_paths(estate / "alpha")
+    wanted = f"twin/orgs/alpha/people/{ACCENTED_ROLE_FILE}"
+    assert wanted in paths, (
+        f"a served path with one non-ASCII byte must round-trip, got {paths}")
+    assert isinstance(sa.served(estate / "alpha", wanted), str), (
+        "and served() must be able to read it back")
+
+
+def test_a_role_file_at_an_accented_path_is_still_scanned(tmp_path) -> None:
+    """It refuses at an ASCII name and used to pass green at an accented one."""
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    body = "id: someone@example.invalid\nrole: On call.\n"
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD, org="alpha",
+                       extra_role_file=(ACCENTED_ROLE_FILE, body))
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1, f"a role file carrying an email must be refused wherever it is filed:\n{joined}"
+    assert "na\u00efve" in joined or "an email address" in joined, joined
+
+
+def test_an_admission_record_at_an_accented_path_is_still_graded(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    bad = sa._GOOD_RECORD.replace("planted", "alpha").replace(
+        "fields: [component, distinct_committer_count, window_days]",
+        "fields: [component, employee_id]")
+    estate = sa._plant(tmp_path, hooks, None, org="alpha",
+                       extra_record=(ACCENTED_RECORD, bad))
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1, (
+        "a byte-identical record one directory over must not give exit 3 and "
+        f"'0 declare a sensor admission':\n{joined}")
+    assert "names-or-identifies-an-individual" in joined, joined
+
+
+# -- R5-2: a unit whose REPOSITORY cannot be read must be named, not dropped ----------------------
+
+def test_a_unit_whose_ref_does_not_resolve_is_named(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    bad = sa._GOOD_RECORD.replace("planted", "alpha").replace(
+        "fields: [component, distinct_committer_count, window_days]",
+        "fields: [component, employee_id]")
+    sa._plant(tmp_path, hooks, bad, org="alpha")
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+    import shutil
+    shutil.rmtree(estate / "alpha" / ".git")
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1, f"a unit whose repository cannot be read must be named, not dropped:\n{joined}"
+    assert "alpha" in joined, joined
+
+
+def test_a_unit_whose_origin_main_is_deleted_is_named(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "alpha"), org="alpha")
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+    import subprocess
+    subprocess.run(["git", "-C", str(estate / "alpha"), "update-ref", "-d",
+                    "refs/remotes/origin/main"], check=True, capture_output=True)
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1 and "alpha" in joined, joined
+
+
+def test_a_plain_directory_that_is_not_a_repository_at_all_is_still_skipped(tmp_path) -> None:
+    """The silent skip that stays correct, and the docstring's own example."""
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD, org="planted")
+    (estate / "scratch").mkdir()
+    lines: list[str] = []
+    sa.grade_estate(estate, out=lines.append)
+    assert not any("scratch" in ln for ln in lines), lines
+
+
+# -- R5-3, R5-4, R5-11 to R5-14: the table is validated where it is read --------------------------
+
+def test_a_dpia_path_pattern_that_does_not_name_the_sensor_is_refused(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["dpia_path_pattern"] = "^.*$"
+    with pytest.raises(sa.SensorAdmissionError, match="sensor"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_an_uncompilable_dpia_path_pattern_is_refused_at_load(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["dpia_path_pattern"] = "^twin/orgs/[a-z(/{sensor}$"
+    with pytest.raises(sa.SensorAdmissionError, match="pattern"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_admissible_fields_declared_as_a_scalar_is_refused_at_load(tmp_path) -> None:
+    """One missing list dash turned the closed field set into a SUBSTRING test."""
+    doc = _rule_doc()
+    doc["admissible_fields"] = "component distinct_committer_count"
+    with pytest.raises(sa.SensorAdmissionError, match="admissible_fields"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_a_substring_of_an_admissible_field_is_not_admissible() -> None:
+    result = grade(record(fields=["com", "pone"]))
+    assert "field-not-admissible" in ids(result), result["refusals"]
+
+
+@pytest.mark.parametrize("table", ["typed_keys", "scalar_lists", "required_keys", "fixed_values"])
+def test_a_mistyped_declaration_table_is_refused_not_a_crash(tmp_path, table) -> None:
+    doc = _rule_doc()
+    doc[table] = "not a mapping"
+    with pytest.raises(sa.SensorAdmissionError, match=table):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_a_refusal_sentence_with_an_unknown_placeholder_is_refused_at_load(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["refusals"][0]["sentence"] = (
+        "REFUSED names-or-identifies-an-individual: {sensor}: {what} at {nowhere}.")
+    with pytest.raises(sa.SensorAdmissionError, match="nowhere"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_a_terminal_flag_that_is_not_a_boolean_is_refused_at_load(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["refusals"][0]["terminal"] = "yes"
+    with pytest.raises(sa.SensorAdmissionError, match="terminal"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_marking_a_refusal_terminal_that_the_code_never_evaluates_terminally_is_refused(
+        tmp_path) -> None:
+    """The flag was decorative on nine of the refusals: only the pre-ladder batch consults it."""
+    doc = _rule_doc()
+    for row in doc["refusals"]:
+        if row["id"] == "covert-sensing":
+            row["terminal"] = True
+    with pytest.raises(sa.SensorAdmissionError, match="covert-sensing"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+def test_the_declared_refusal_ids_are_derived_from_the_call_sites(tmp_path) -> None:
+    """R5-8: the two-way subset was between two DECLARATIONS. It is now between the table and
+    the ids this module's own source actually passes to `out()`."""
+    emitted = sa.emitted_refusal_ids()
+    assert emitted, "the call-site scan found nothing, so it is not deriving anything"
+    assert emitted == set(sa.REFUSAL_IDS), (emitted ^ set(sa.REFUSAL_IDS))
+
+
+def test_bus_factor_scope_and_version_are_read(tmp_path) -> None:
+    doc = _rule_doc()
+    doc["bus_factor_scope"] = "many"
+    with pytest.raises(sa.SensorAdmissionError, match="bus_factor_scope"):
+        sa.load_rule(_write(tmp_path, doc))
+    doc = _rule_doc()
+    doc["version"] = "one"
+    with pytest.raises(sa.SensorAdmissionError, match="version"):
+        sa.load_rule(_write(tmp_path, doc))
+
+
+# -- R5-5: an adopter's own bytes must not be able to deny the gate -------------------------------
+
+def test_a_long_value_with_no_at_sign_is_not_a_backtracking_bomb() -> None:
+    import time
+    started = time.monotonic()
+    # 24 KiB, not a megabyte: the point is measured, and a red run must still finish. The
+    # re-check measured 8 KiB at 0.275s, 32 KiB at 4.44s, 128 KiB at 73s and 1 MiB at about 75
+    # minutes -- in the gate, a job that dies with no verdict.
+    assert sa.identifier_in_value("x" * 24_000) is None
+    assert time.monotonic() - started < 0.5, "the email pattern is backtracking quadratically"
+
+
+def test_the_email_shape_is_still_found_in_a_long_value() -> None:
+    assert sa.identifier_in_value("x" * 5000 + " someone@example.invalid") is not None
+
+
+# -- R5-6: the ladder fallback names the rung that actually stopped -------------------------------
+
+def test_a_proportionality_stop_is_named_as_proportionality() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["proportionality"] = {"intrusion_cost": 100000.0, "value_illuminated": 1.0}
+    result = grade(record(ladder=ladder))
+    joined = " ".join(result["refusals"])
+    assert "proportionality" in joined, (
+        f"every ladder refusal used to read 'stopped at the DPIA gate': {joined}")
+    assert "DPIA gate" not in joined, joined
+
+
+def test_a_purpose_stop_is_named_as_purpose() -> None:
+    ladder = copy.deepcopy(record()["ladder"])
+    ladder["purpose"] = {"scenario": "key-person-2026", "will_act": False}
+    result = grade(record(ladder=ladder))
+    assert "purpose" in " ".join(result["refusals"]), result["refusals"]
+
+
+# -- R5-7: every readable party file is value-scanned, which is what the block says ---------------
+
+def test_a_party_file_that_claims_no_adopter_role_is_still_value_scanned(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    sa._plant(tmp_path, hooks, None, org="publisher",
+              party="party: publisher\nroles: [publisher]\ncontact: someone@example.invalid\n")
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1 and "publisher" in joined, (
+        f"five of the eight real units declare no adopter role and were never scanned:\n{joined}")
+
+
+# -- R5-10: a served DPIA that is not UTF-8 says so -----------------------------------------------
+
+def test_an_unreadable_dpia_is_not_reported_as_a_missing_one(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "alpha"), org="alpha",
+                       extra_bytes=("twin/orgs/alpha/dpia/bus-factor-structural-aggregate.yaml",
+                                    b"schema: \xff\xfe\x00\n"))
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1, joined
+    assert "no DPIA record at" not in joined, (
+        f"the DPIA IS served; saying it is not there is a different claim:\n{joined}")
+
+
 # -- the sensor table stays closed ----------------------------------------------------------------
 
 def test_a_sensor_id_that_is_not_in_sensors_yaml_is_refused_rather_than_raising() -> None:

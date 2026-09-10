@@ -18,6 +18,12 @@
 # refused before its proportionality is computed, because computing one would put a price on
 # sensing a named person, which is the thing NORTH-STAR section 6 excludes outright.
 #
+# WHAT IS READ AND WHAT IS PROSE (round-5 R5-14). `version` must be a whole number and
+# `bus_factor_scope` must read `one`; both are checked at load, so the instruction below is not
+# an instruction nothing enforces. The `requires:` sentences are prose FOR A READER and are read
+# by no code except `requires.dpia_fields`, which is validated against the `dpia_record` key set;
+# they are here because a rule a person cannot read is not a rule.
+#
 # Versioned. Bump `version` in the same commit as any change below.
 schema: twin.sensor-admission/v1
 version: 1

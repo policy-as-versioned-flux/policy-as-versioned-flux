@@ -741,6 +741,126 @@ sentence in round 3's section above is corrected rather than left standing.
   thirteen planted served estates grade as planted**.
 - `mypy twin tests conftest.py` → Success, 187 source files.
 
+## Re-check round 5 — 2026-09-10, request-changes on R5-1 and R5-2
+
+The reviewer named the pattern for the third round running, and it is the right one to record:
+the record is closed against every plant five rounds have thrown at the **document**, and every
+remaining hole is one level **out** — in how the check decides which BYTES to look at, and in how
+it trusts its own table.
+
+### R5-1 (blocking) — a path git QUOTES made an artefact vanish
+
+`git ls-tree --name-only` **C-quotes** any path carrying a non-ASCII byte, so `served_paths()`
+returned `'"twin/orgs/alpha/people/rota-na\303\257ve.yaml"'` — quotes and backslashes included —
+and `served()` on that string returned `None`. Every such artefact was **silently dropped** from
+legs 2 and 3. The surrogate-escape decode did not help and could not: git quotes before Python
+sees the bytes.
+
+**Red first**, on the reviewer's own measurement:
+
+> **red** — `AssertionError: a served path with one non-ASCII byte must round-trip, got [...]` /
+> `assert 'twin/orgs/alpha/people/rota-naïve.yaml' in [..., '"twin/orgs/alpha/people/rota-na\303\257ve.yaml"', ...]`
+> and, end to end, `AssertionError: a byte-identical record one directory over must not give exit
+> 3 and '0 declare a sensor admission': assert 3 == 1`
+>
+> **green** — `git ls-tree -r -z --name-only` and a split on the null byte; the path round-trips,
+> `served()` reads it back, and the same record at the accented path is refused
+> `REFUSED names-or-identifies-an-individual: … the field 'employee_id' …` at exit 1.
+
+Both plants are in the tests and in the selfcheck. The `served()` docstring and the round-4 F2
+sentence in this ticket, both of which claimed the round-trip worked, are corrected in place.
+
+### R5-2 (blocking, pre-existing) — a damaged repository vanished the same way
+
+`adopters()` read a `None` from `served()` as "serves no party file", which is also what it
+returns when the directory is not a git repository, or is one whose remote-tracking main has
+gone. With the plant adopter's git directory removed the estate gave `PASS: 1 adopters read` at
+exit 0 with the record naming an individual unmentioned.
+
+> **red** — `AssertionError: a unit whose repository cannot be read must be named, not dropped: …`
+> `assert 0 == 1`
+>
+> **green** — `FAIL alpha: alpha: origin/main does not resolve in this unit: the repository or
+> its remote-tracking main cannot be read, so nothing it serves was graded`, exit 1.
+
+`ref_resolves()` runs `rev-parse --verify -q origin/main` first, and a unit that looks like a unit
+(a `.git`, a `party.yaml` or a `twin/` tree on disk) whose ref does not resolve is its own named
+row, distinct from a tree that serves no party file. A bare scratch directory is still the
+correct silent skip, and a test pins it. The `adopters()` docstring — which asserted the old,
+wrong boundary — is corrected in the same change.
+
+### R5-3 and R5-4 (major) — and R5-3 silently disabled round 4's own fix
+
+`dpia_path_pattern` was read and validated by nothing: `^.*$` loaded clean and readmitted a DPIA
+filed under a directory named after a person, which is exactly what round 4's F6 closed; an
+invalid pattern loaded clean and raised at grade time. It must now contain the literal
+`{sensor}` and compile. `admissible_fields` was truthiness-checked only, so declared as a
+**scalar** — one missing list dash — it loaded clean and turned the closed field set into a
+**substring test**: `fields: [com, pone]` was admitted, the exact opposite of the table's own
+stated reasoning. It joins the list-and-type group.
+
+### R5-5 (major) — an adopter's own bytes could deny the gate
+
+The email pattern backtracked quadratically on a value with **no at-sign**: 8 KiB 0.275s, 32 KiB
+4.44s, 128 KiB 73s, 1 MiB about 75 minutes. Neither the module nor the wrapper has a timeout, so
+in the gate that is a job that dies with no verdict. One line: `identifier_in_value` returns early
+unless the value contains an at-sign, which is precisely the pathological case. A test asserts
+24 KiB with no at-sign is under half a second — 24 KiB and not a megabyte, so a **red** run still
+finishes — and a second asserts the shape is still found in a long value. The NI pattern is
+bounded and is untouched.
+
+### R5-6 (moderate) — THE RULE, in my own new code
+
+The F11 fallback read `stopped_at` off the **top** level of the gate's result, where that key does
+not exist; it lives one level down, which the very next line already reached into. So every ladder
+refusal read *"the ethics gate stopped at the DPIA gate"* whatever actually stopped it. It reaches
+one level down now, and two tests assert a proportionality stop names proportionality and a
+purpose stop names purpose.
+
+### R5-7 and R5-8 (moderate) — two generated sentences that overstated the code
+
+**R5-7.** The block said every party file is value-scanned and the scan ran only inside the
+adopter-role branch, so five of the eight real units were never scanned. The scan is cheap and
+there was no reason to scope it: it now runs on **every readable** party file, and the sentence is
+true rather than narrowed.
+
+**R5-8.** The two-way subset was between two **declarations** — the table and a hand-written
+`REFUSAL_IDS` — not between a declaration and the **code**. `emitted_refusal_ids()` now walks this
+module's own AST for the ids it passes to `out()` and the ids in the `(refusal id, what)` pairs
+its two collectors build, `load_rule()` compares the table against **that**, and the printed block
+lists **that**. The sentence is true by construction now, not by inspection.
+
+### R5-9 (moderate) — three comments asserting what the code does not do
+
+All three corrected in place: the `scan_names` docstring (its false setting is used by the party
+and scenario readers, never on a DPIA, which is scanned **with** its keys), the `adopters()`
+docstring (R5-2), and the `served()` docstring plus this ticket's round-4 F2 sentence (R5-1).
+
+### R5-10 to R5-14 (minor) — all fixed
+
+- **R5-10.** The estate grader collapsed the new `Unreadable` back to a null, so a served DPIA
+  that is not UTF-8 was reported as *"no DPIA record"* when the DPIA **is** served. It says what
+  it is now, and the missing-record branch is skipped so the two claims cannot both print.
+- **R5-11.** Four mistyped declaration tables crashed out of load; they refuse now, and
+  `nested_maps`/`nested_lists` joined the same guard.
+- **R5-12.** A refusal sentence with an unknown placeholder loaded clean and raised at emit; only
+  `{sensor}`, `{what}` and `{admissible}` are accepted.
+- **R5-13.** `terminal` was never validated as a boolean and is consulted only over the
+  pre-ladder batch, so it was decorative on nine refusals. It must be a boolean, and the table
+  may mark terminal only what `_TERMINAL_CAPABLE` names — the five the code actually evaluates
+  before the ladder. Marking `covert-sensing` terminal is now a refusal at load.
+- **R5-14.** `version` must be a whole number and `bus_factor_scope` must read `one`, both
+  checked at load, so the table's own bump instruction is no longer an instruction nothing
+  enforces. The `requires:` sentences are stated in the table as prose for a reader, with
+  `requires.dpia_fields` the one that is validated.
+
+### Battery, re-run after the fixes
+
+- `pytest tests/test_sensor_admission.py -n0 -q` → **153 passed** (21 failed first).
+- `verify/sensor-admission/verify-sensor-admission.sh` → exit 3, **34 planted records and fifteen
+  planted served estates grade as planted**.
+- `mypy twin tests conftest.py` → Success, 189 source files.
+
 ## Waits on the owner
 
 **Nothing.** Ticket 82's named-individuals ruling (its "Waits on the owner" item 3) is still
