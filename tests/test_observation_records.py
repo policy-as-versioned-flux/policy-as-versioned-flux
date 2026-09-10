@@ -9,6 +9,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('observation_deck', ROOT / 'talk/build_deck.py')
+assert spec is not None and spec.loader is not None
 deck = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(deck)
 
