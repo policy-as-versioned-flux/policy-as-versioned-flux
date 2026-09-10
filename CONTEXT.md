@@ -669,6 +669,40 @@ that a rewritten entry cites stay as the record of the decision at the time.
 - **Provisions** (added 2026-08-28, ticket 24) — A publisher-shipped count of the distinct
   provisions a violation type breaches, multiplying a per-provision annual cap. Defaults to one.
 
+## Words a slide may not use (added 2026-09-09, ticket 48)
+
+**This table is the deck's phrase lint.** `talk/build_deck.py` parses the rows below and nothing
+else; `verify/demo/verify-demo.sh` refuses a deck slide carrying a phrase in the first column,
+names the phrase, and prints the second column as what the slide should say instead. The list lives
+here, in the vocabulary record, rather than in the checker, because **a phrase list typed into a
+script is derived from nothing** — the one defect class every review of this estate has found — and
+because every row below is refused by an entry in this file, or by the dated decision that entry
+cites. Adding a word to the lint is an edit to the record; the checker follows.
+
+Matching is over the slide text with markdown emphasis removed and whitespace collapsed, so
+`Deny is the *bottom* rung` is the same sentence as `deny is the bottom rung`. That is not a
+nicety: the phrase last shipped on a slide with the asterisks in it
+(`talk/deck-2026-07-31-superseded.md`), and a literal substring list would have missed it.
+
+**The word "gate" is not refused on its own**, and no word lint can tell which sense a line means.
+The truth surface keeps the name *the gate* (ticket 03), ADR-0011 keeps *release gate*, and the
+adopters keep *adopter gate*. What ticket 75 Q5 refused is the **admission** sense: the owner's
+answer is that this estate is a mutating admission controller, so no slide may name an approving
+or refusing one. Every other use of the word is printed by the check as a human review item, and is
+never a failure.
+
+**There are 5 rows below**, and `talk/build_deck.py` refuses the table when that number and the
+rows disagree. So removing a row is a two-place edit somebody has to mean, and a row broken by a
+stray `|` inside its own prose is named and red rather than dropped in silence.
+
+| refused on a slide | say instead | refused by |
+| --- | --- | --- |
+| `exemption` | a priced hole, or a declared inability that is caged and priced | the **Exemption** entry above: a banned concept, there are none, ever, at any scope, in any file, under any name |
+| `hourglass` | the compose graph, `talk/diagrams/compose.png` | reversal 1 of the 2026-08-27 drift review removed the neck, so there is no waist for an hourglass to describe (ticket 20's facts, 2026-08-28) |
+| `admission gate` | the mutating admission controller, and the cage it writes | the **Cage** entry above, in the owner's words (2026-09-02, ticket 75 Q5): a mutating admission controller more than a validating one |
+| `deny gate` | the bottom rung of the cage ladder, `isolated` | the **Cage** entry above: nothing is denied; a workload that does not fit its cage does not run (2026-09-05, ticket 89) |
+| `deny is the bottom rung` | `isolated` is the bottom rung, reached by the pound and never by a refusal | ticket 89, *deny is not a rung*; the **Isolated** entry above names the bottom rung, and the **Cage** entry says nothing is denied |
+
 ## Project posture (resolved)
 
 - **Fidelity = "faithful to intent."** Reproduce the thesis and its ethos 1:1, but let Flux do

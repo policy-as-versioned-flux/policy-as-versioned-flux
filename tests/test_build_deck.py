@@ -16,6 +16,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -28,6 +29,7 @@ _SPEC.loader.exec_module(bd)
 
 STEP = "verify/e2e/verify-e2e-step{n}-x.sh"
 HONESTY = "verify/e2e/verify-e2e-step7-honesty.sh"
+ASIDE = "verify/tail/verify-tail-x.sh"
 RUN1 = ("TRUTH 2026-09-01T09:41Z run=1 hub=aaaaaaa units=[driftwood=1111111] "
         "pass=5 fail=0 skip=2 excluded=0 total=7")
 # run 2 carries ticket 96's `enact=` between hub= and units=, and run 1 does not: the deck is
@@ -39,9 +41,19 @@ LOCAL = ("TRUTH 2026-09-02T12:00Z run=local hub=ccccccc units=[driftwood=2222222
          "pass=4 fail=1 skip=2 excluded=0 total=7")
 
 
+# The fixture's own git runs with NO hooks. The owner's global config points core.hooksPath at a
+# ggshield secret scan, which is a rate-limited network call on every commit; when its quota ran
+# out on 2026-09-06 every commit here raised CalledProcessError and ten tests errored on the
+# fixture rather than on anything under test (ticket 92 round 5, R2, which set this rule for every
+# fixture and grader in the estate). The thing under test still reads the real global config:
+# GIT_CONFIG_GLOBAL is never set, so a check that snapshots config still sees the truth.
+_NO_HOOKS = tempfile.mkdtemp(prefix="build-deck-no-hooks-")
+
+
 def _git(root: Path, *args: str) -> str:
     return subprocess.run(["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@t",
-                           *args], capture_output=True, text=True, check=True).stdout.strip()
+                           "-c", f"core.hooksPath={_NO_HOOKS}", *args],
+                          capture_output=True, text=True, check=True).stdout.strip()
 
 
 def _narration() -> dict:
@@ -51,6 +63,12 @@ def _narration() -> dict:
         script = HONESTY if n == 7 else STEP.format(n=n)
         slides.append({"kind": "beat", "step": n, "title": f"step {n}", "script": script,
                        "ticket": "66", "narration": "n", "scheduled_only": n == 4})
+        if n == 2:
+            # eco-system ticket 48: a capture-reading slide that is not one of the seven steps,
+            # so it sits between two of them and never in the step ordering
+            slides.append({"kind": "aside", "name": "tail", "title": "the tail",
+                           "script": ASIDE, "narration": "n",
+                           "absent": "no run has looked at the tail here."})
     return {"title": "A deck", "subtitle": "of a named run", "opening": "o", "slides": slides}
 
 
@@ -64,8 +82,20 @@ def _captures(root: Path, grades: dict[int, str], residual: str) -> None:
         body = f"residual {residual}\n{tag}: step {n} says so\n"
         (cap / (bd.slug(script) + ".out")).write_text(body)
         rows.append(f"  {n}   s{n}     {tag}      because")
-    honesty = "\n".join(rows) + f"\nresidual {residual}\nPASS: steps 1-6 each report one honest verdict\n"
+    honesty = ("\n".join(rows)
+               + f"\nresidual {residual}\n{grades[7]}: steps 1-6 each report one honest verdict\n")
     (cap / (bd.slug(HONESTY) + ".out")).write_text(honesty)
+    # The aside's capture ends in the CONTINUATION of a two-line verdict, which is the shape that
+    # made the last-line reading a proxy: the run graded this script PASS and the last line reads
+    # back FAIL. 30 of run 186's 120 real captures have it.
+    (cap / (bd.slug(ASIDE) + ".out")).write_text(
+        f"residual {residual}\nPASS: the tail is named,\nand the sentence wraps.\n")
+    table = ["# talk/captures/_grades.tsv", "# " + "x"]
+    for n in range(1, 8):
+        script = HONESTY if n == 7 else STEP.format(n=n)
+        table.append(f"{script}\t{grades[n]}\tlast line")
+    table.append(f"{ASIDE}\tPASS\tand the sentence wraps.")
+    (cap / "_grades.tsv").write_text("\n".join(table) + "\n")
 
 
 def _record(root: Path, line: str, grades: dict[int, str], residual: str) -> str:
@@ -88,6 +118,14 @@ def hub(tmp_path: Path) -> dict:
     (root / "talk").mkdir(parents=True)
     _git(root, "init", "-q")
     (root / "talk" / "narration.json").write_text(json.dumps(_narration()))
+    # The refused-phrase list lives in the vocabulary record and the checker reads it there
+    # (eco-system ticket 48), so a hub with no record has no lint and check() says so.
+    # The record states its own row count, so deleting a row is a two-place edit and not a
+    # silent one (ticket 48 review F3).
+    (root / "CONTEXT.md").write_text(
+        "# c\n\n" + bd.REFUSED_HEADING + "\n\nThere is 1 row below.\n\n"
+        "| refused on a slide | say instead | refused by |\n| --- | --- | --- |\n"
+        "| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n")
     (root / "talk" / "truth.log").write_text("")
     _git(root, "add", "-A")
     _git(root, "commit", "-q", "-m", "narration")
@@ -132,8 +170,12 @@ def test_a_named_deck_carries_that_runs_grades_line_and_hub(hub: dict) -> None:
     name = bd.deck_name(md)
     assert name == {"run": "2", "hub": "bbbbbbb", "source": "recorded"}
     assert RUN2 in md and RUN1 not in md
-    beats, _prose = bd.parse(md)
+    beats, asides, _prose = bd.parse(md)
     assert [kv["status"] for kv, _ in beats] == [GRADES2[n] for n in range(1, 8)]
+    # the aside carries the run's own grade for its script, out of that run's grade table, and
+    # NOT the FAIL its capture's last line reads back
+    assert [(kv["name"], kv["status"], kv["cited"]) for kv, _ in asides] == [("tail", "PASS", "yes")]
+    assert "the tail is named, and the sentence wraps." in md
     # a recorded run is the scheduled run, so scheduled_only never downgrades it
     assert "58,269.23" in md and "residual 1\n" not in md
 
@@ -143,10 +185,10 @@ def test_a_disk_deck_names_no_recorded_run_and_quotes_no_line(hub: dict, monkeyp
     md = bd.build(root=hub["root"])
     assert bd.deck_name(md)["source"] == "disk" and bd.deck_name(md)["run"] == "local"
     assert "TRUTH " not in md
-    beats, _prose = bd.parse(md)
-    # steps 1-6 are what the disk holds (a local run's SKIPs); step 7's honesty
-    # capture in the fixture always ends PASS
-    assert [kv["status"] for kv, _ in beats] == ["SKIP"] * 6 + ["PASS"]
+    beats, asides, _prose = bd.parse(md)
+    # what the disk holds is a local run's SKIPs, all seven of them
+    assert [kv["status"] for kv, _ in beats] == ["SKIP"] * 7
+    assert [kv["status"] for kv, _ in asides] == ["PASS"]
 
 
 def test_the_check_grades_the_run_the_deck_names_not_the_disk(hub: dict, tmp_path: Path) -> None:
@@ -154,8 +196,8 @@ def test_the_check_grades_the_run_the_deck_names_not_the_disk(hub: dict, tmp_pat
     # the false red the ticket exists to remove
     p = tmp_path / "deck1.md"
     p.write_text(bd.build(run=1, root=hub["root"]))
-    bad, _review, beats = bd.check(p, root=hub["root"])
-    assert bad == [] and len(beats) == 7
+    bad, _review, cannot, beats, asides = bd.check(p, root=hub["root"])
+    assert bad == [] and cannot == [] and len(beats) == 7 and len(asides) == 1
     p2 = tmp_path / "deck2.md"
     p2.write_text(bd.build(run=2, root=hub["root"]))
     assert bd.check(p2, root=hub["root"])[0] == []
@@ -209,3 +251,164 @@ def test_an_unreachable_recording_commit_is_a_could_not_look(hub: dict, tmp_path
 def test_a_recorded_run_cannot_be_local(hub: dict) -> None:
     with pytest.raises(SystemExit):
         bd.build(run="local", root=hub["root"])
+
+
+def test_an_aside_whose_capture_the_run_never_wrote_is_a_could_not_look(
+        hub: dict, tmp_path: Path) -> None:
+    """Eco-system ticket 48. The seven steps are what the estate promises and a missing capture
+    for one is red. An aside is an extra read: the slide names the file the run did not write,
+    claims nothing, carries no figure, and the check may say neither pass nor fail about it."""
+    root = hub["root"]
+    narr = json.loads((root / "talk" / "narration.json").read_text())
+    for slide in narr["slides"]:
+        if slide.get("kind") == "aside":
+            slide["script"] = "verify/nowhere/verify-nowhere-x.sh"
+    (root / "talk" / "narration.json").write_text(json.dumps(narr))
+
+    md = bd.build(run=2, root=root)
+    want = "talk/captures/" + bd.slug("verify/nowhere/verify-nowhere-x.sh") + ".out"
+    assert "status=ABSENT cited=no" in md and f"wanted={want}" in md
+    assert "could not look" in md and f"`{want}`" in md
+    assert "no run has looked at the tail here." in md
+
+    p = tmp_path / "deck.md"
+    p.write_text(md)
+    bad, _review, cannot, beats, asides = bd.check(p, root=root)
+    assert bad == [], bad
+    assert len(beats) == 7 and len(asides) == 1
+    assert cannot == [f"aside tail: run 2 wrote no {want}, so the slide says it could not look "
+                      "and this check may not say the deck is whole"], cannot
+
+
+def test_a_hub_whose_record_carries_no_refused_table_has_no_lint(hub: dict, tmp_path: Path) -> None:
+    """The phrase list is read from CONTEXT.md and lives nowhere else, so a record without the
+    table is a fault rather than a silently empty lint (eco-system ticket 48)."""
+    root = hub["root"]
+    assert [r["phrase"] for r in bd.refused_phrases(root)] == ["deny is the bottom rung"]
+    p = tmp_path / "deck.md"
+    p.write_text(bd.build(run=2, root=root))
+    assert bd.check(p, root=root)[0] == []
+
+    # the phrase itself, in the shape it last shipped in: emphasis is stripped before matching
+    p.write_text(bd.build(run=2, root=root) + "\n---\n\n## x\n\nDeny is the *bottom* rung.\n")
+    bad = bd.check(p, root=root)[0]
+    assert any("'deny is the bottom rung' is refused vocabulary" in b
+               and "`isolated` is the bottom rung" in b for b in bad), bad
+
+    (root / "CONTEXT.md").write_text("# c\n\n## No table here\n")
+    p.write_text(bd.build(run=2, root=root))
+    bad = bd.check(p, root=root)[0]
+    assert bad == [f"CONTEXT.md carries no `{bd.REFUSED_HEADING}` table, so the phrase lint has "
+                   "no list to apply; a lint whose list is derived from nothing is not a lint"], bad
+
+
+def test_a_row_that_does_not_parse_is_named_rather_than_dropped(hub: dict, tmp_path: Path) -> None:
+    """Ticket 48 review F3. A row broken by one stray `|` inside its own prose used to be skipped
+    in silence, so the phrase it names left the lint while the table still read complete to a
+    reader. That is a failure mode the python literal this replaced did not have."""
+    root = hub["root"]
+    p = tmp_path / "deck.md"
+
+    def record(rows: str, count: str = "There is 1 row below.") -> None:
+        (root / "CONTEXT.md").write_text(
+            "# c\n\n" + bd.REFUSED_HEADING + "\n\n" + count + "\n\n"
+            "| refused on a slide | say instead | refused by |\n| --- | --- | --- |\n" + rows)
+
+    # one stray pipe inside the row's own prose: named, and the count disagrees as well
+    record("| `deny is the bottom rung` | `isolated` is the bottom | rung | ticket 89 |\n")
+    p.write_text(bd.build(run=2, root=root))
+    bad = bd.check(p, root=root)[0]
+    assert any("does not parse to three non-empty cells" in b for b in bad), bad
+    assert any("says it carries 1 row(s) and the table parses to 0" in b for b in bad), bad
+
+    # an emptied phrase cell is the same fault
+    record("|  | `isolated` is the bottom rung | ticket 89 |\n")
+    assert bd._phrase_table(root)[1] != []
+
+    # a deleted row disagrees with the count the record states about itself
+    record("| `admission gate` | the controller | ticket 75 Q5 |\n"
+           "| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n")
+    bad = bd.check(p, root=root)[0]
+    assert any("says it carries 1 row(s) and the table parses to 2" in b for b in bad), bad
+
+    # a record that states no count at all is a fault of its own
+    record("| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n", count="")
+    bad = bd.check(p, root=root)[0]
+    assert any("states no row count" in b for b in bad), bad
+
+
+def test_the_declared_count_comes_from_a_sentence_not_a_fence_or_a_cell(
+        hub: dict, tmp_path: Path) -> None:
+    """Ticket 48 review R6. The count is located by a first-match-wins search, so before this it
+    could be set by a fenced example rather than by the sentence a reader reads. Measured against
+    the committed parser: a fenced `There are 2 rows below` above the real sentence gave 2, and
+    the record's own bold form `There are **5** rows below` gave None. A count inside a table cell
+    did NOT reproduce, because the cell came after the real sentence and the first match already
+    won; it is covered here anyway, because the ordering is an accident of the record."""
+    root = hub["root"]
+    real = "There is 1 row below."
+    row = "| `deny is the bottom rung` | `isolated` is the bottom rung | ticket 89 |\n"
+
+    def record(prose: str) -> None:
+        (root / "CONTEXT.md").write_text(
+            "# c\n\n" + bd.REFUSED_HEADING + "\n\n" + prose + "\n\n"
+            "| refused on a slide | say instead | refused by |\n| --- | --- | --- |\n" + row)
+
+    record("```\nThere are 2 rows below.\n```\n\n" + real)
+    assert bd._phrase_table(root)[2] == 1
+    record("There are **1** rows below.")
+    assert bd._phrase_table(root)[2] == 1
+    record(real)
+    (root / "CONTEXT.md").write_text(
+        (root / "CONTEXT.md").read_text().replace(
+            "| `deny is the bottom rung` |",
+            "| `deny is the bottom rung` (there are 3 rows below) |"))
+    assert bd._phrase_table(root)[2] == 1
+
+
+def test_a_hyphen_does_not_carry_a_refused_phrase_past_the_lint(hub: dict, tmp_path: Path) -> None:
+    """Ticket 48 review F6. `deny-gate` is the same phrase as `deny gate` and is the next wrapper
+    the refused phrase would plausibly wear after the asterisks flatten() was written for."""
+    root = hub["root"]
+    (root / "CONTEXT.md").write_text(
+        "# c\n\n" + bd.REFUSED_HEADING + "\n\nThere is 1 row below.\n\n"
+        "| refused on a slide | say instead | refused by |\n| --- | --- | --- |\n"
+        "| `deny gate` | the bottom rung of the cage ladder | ticket 89 |\n")
+    p = tmp_path / "deck.md"
+    p.write_text(bd.build(run=2, root=root) + "\n---\n\n## x\n\nThis is the deny-gate here.\n")
+    bad = bd.check(p, root=root)[0]
+    assert any("'deny gate' is refused vocabulary" in b for b in bad), bad
+    # and the em dash and slash shapes go the same way
+    p.write_text(bd.build(run=2, root=root) + "\n---\n\n## x\n\nThe deny/gate here.\n")
+    assert any("'deny gate' is refused vocabulary" in b for b in bd.check(p, root=root)[0])
+
+
+def test_a_run_that_recorded_no_grade_is_a_could_not_look_not_a_last_line_reading(
+        hub: dict, tmp_path: Path) -> None:
+    """Ticket 48 review F1. The whole point of reading the run's grade table is that a capture's
+    last line is a proxy. When the run recorded no grade -- no table at all, or a table with no
+    row for this script -- falling back to that proxy is the defect the table exists to replace,
+    and it rendered `observed false` for a script that exited 0 with the check green."""
+    root = hub["root"]
+    capdir = root / "talk" / "captures"
+    script = "verify/wrapped/verify-wrapped.sh"
+    (capdir / (bd.slug(script) + ".out")).write_text(
+        "ok  looked\nPASS: a verdict that wraps,\nand its second line.\n")
+    rows = bd.capture_lines(script, capdir)
+    # the capture on its own reads back FAIL, which is exactly why the table is read instead
+    assert bd.grade(rows) == ("FAIL", bd.NO_VERDICT)
+
+    (capdir / "_grades.tsv").unlink(missing_ok=True)
+    tag, reason, bad = bd.resolved_grade(script, rows, capdir)
+    assert (tag, bad) == (bd.UNGRADED, None)
+    assert reason == bd.NO_TABLE.format(script=script)
+
+    (capdir / "_grades.tsv").write_text("verify/other/verify-other.sh\tPASS\tfine\n")
+    tag, reason, _bad = bd.resolved_grade(script, rows, capdir)
+    assert tag == bd.UNGRADED
+    assert reason == bd.NO_ROW.format(script=script)
+
+    # and the run's own grade wins the moment the run recorded one
+    (capdir / "_grades.tsv").write_text(f"{script}\tPASS\ta verdict that wraps, and its "
+                                        "second line.\n")
+    assert bd.resolved_grade(script, rows, capdir)[0] == "PASS"
