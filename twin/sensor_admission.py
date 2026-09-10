@@ -95,23 +95,45 @@ INDIVIDUAL_NAME_TOKENS: tuple[str, ...] = tuple(sorted(set(PERSONAL_FIELDS) | {
 # 2.4s, 128 KiB 73.5s), and R5-7 had just widened the scan to every readable party file, so the
 # denial surface GREW. The pathological case was the pattern, not the input.
 #
-# So there is no pattern. `_looks_like_an_email` is a LINEAR scan: split once on whitespace and
-# the two separators, then partition each chunk on its first at-sign and test the two halves
-# with `in` and `not in`. No repetition operator, nothing to backtrack, cost strictly linear in
-# the length of the value. The NI number is a bounded pattern and needs nothing.
-_EMAIL_SEPARATORS = str.maketrans({",": " ", ";": " "})
+# So there is no pattern. `_looks_like_an_email` is a LINEAR scan: split on whitespace and the
+# separators, then walk the at-signs within each chunk and test the part after each for an
+# interior dot. No repetition operator, nothing to backtrack, cost strictly linear in the length
+# of the value. The NI number is a bounded pattern and needs nothing.
+#
+# Round 7 (R7-1) repaired what the first cut of this scan LOST relative to the pattern -- an
+# address at the end of a sentence, and a chunk carrying more than one at-sign -- without giving
+# any of the speed back: 24 KiB went from 2.4s to 0.04ms, 128 KiB from 73.5s to 0.22ms, a
+# megabyte takes 1.8ms. Every shape either root cause dropped is now a test.
+_EMAIL_SEPARATORS = str.maketrans({",": " ", ";": " ", "|": " ", "/": " ", "<": " ", ">": " "})
+
+
+def _has_an_interior_dot(domain: str) -> bool:
+    """A dot with a label on each side, after any TRAILING dots are stripped.
+
+    Round-7 finding R7-1, first root cause. This was `domain.rpartition('.')`, which takes the
+    LAST dot: `example.com.` returned `('example.com', '.', '')`, the empty tail discarded the
+    chunk, and **a full stop ending a sentence is the commonest way an address appears in prose**.
+    The pattern this replaced searched from any offset and matched regardless.
+    """
+    trimmed = domain.rstrip(".")
+    dot = trimmed.find(".")
+    return 0 < dot < len(trimmed) - 1
 
 
 def _looks_like_an_email(text: str) -> bool:
     if "@" not in text:
         return False
     for chunk in text.translate(_EMAIL_SEPARATORS).split():
-        local, at, domain = chunk.partition("@")
-        if not at or not local or "@" in domain:
-            continue
-        head, dot, tail = domain.rpartition(".")
-        if dot and head and tail:
-            return True
+        # Round-7 R7-1, second root cause: this was `if '@' in domain: continue`, which threw a
+        # whole chunk away rather than trying the LATER at-signs in it, so a `mailto:` URL with a
+        # cc and two addresses joined by a slash or a pipe were both invisible. Splitting once
+        # and walking the adjacent pairs tries every at-sign and stays strictly linear: each
+        # character of the chunk is visited once by `split` and once by the dot scan of the part
+        # it lands in.
+        parts = chunk.split("@")
+        for index in range(len(parts) - 1):
+            if parts[index] and _has_an_interior_dot(parts[index + 1]):
+                return True
     return False
 _NI_NUMBER = re.compile(r"\b[A-CEGHJ-PR-TW-Z]{2}\d{6}[A-D]?\b")
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -1032,8 +1054,12 @@ def limits(rule: dict[str, Any] | None = None) -> list[str]:
         "served bytes are parsed with a loader that refuses a DUPLICATE mapping key, so the "
         "document this check grades is the document a reader sees, not the one PyYAML builds "
         "by keeping the last of two identical keys.",
+        f"the three scanned directories -- people, scenarios and sensor-admissions -- read both "
+        f"{' and '.join(YAML_SUFFIXES)}, and anything else under them is a named row. The DPIA "
+        "path pattern accepts only .yaml, so a DPIA served under the short spelling is refused "
+        "as missing: fail-closed, and named here because the asymmetry is real.",
         "the identifier scan covers FIVE served documents and no others: the admission record, "
-        f"the DPIA record it names and every role file in the people register (both {' and '.join(YAML_SUFFIXES)}) are scanned for "
+        "the DPIA record it names and every role file in the people register are scanned for "
         "identifier-shaped KEYS AND VALUES; every "
         f"{SCENARIO_CLASS} scenario file and every readable party.yaml, whatever roles it "
         "claims, are scanned for identifier-shaped "

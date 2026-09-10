@@ -1514,6 +1514,94 @@ def test_the_derivation_sees_the_emitter_and_not_a_printer_of_the_same_name(tmp_
     assert seen == {"a-real-id", "a-pair-id"}, seen
 
 
+
+# -- R7-1: the linear scan must not lose what the pattern found -----------------------------------
+# Round 7. Closing F8 by hand cost two detections, and the loss lands on the sentence this ticket
+# exists to make true. `rpartition('.')` takes the LAST dot, so `example.com.` yielded an empty
+# tail and the chunk was discarded -- and a full stop ending a sentence is the commonest way an
+# address appears in prose. And `if '@' in domain: continue` threw away a whole chunk carrying a
+# second at-sign instead of trying the later ones, so a mailto with a cc was invisible.
+
+@pytest.mark.parametrize("value", [
+    "alice@example.com.",
+    "Escalate to alice@example.com.",
+    "The DPIA owner is alice.smith@example.com. Ring first.",
+    "mailto:a@x.com?cc=b@y.com",
+    "mailto:alice@example.com?cc=bob@example.com",
+    "alice@example.com/bob@example.com",
+    "alice@example.com|bob@example.com",
+])
+def test_an_email_shape_the_pattern_found_is_still_found(value: str) -> None:
+    assert sa.identifier_in_value(value) == "an email address", (
+        f"the linear scan lost a shape the pattern matched: {value!r}")
+
+
+@pytest.mark.parametrize("value", [
+    "no at sign here", "nodomain@nodot", "a@.com", "a@b.", "@", "x" * 100 + "@",
+])
+def test_a_value_that_is_not_an_address_is_still_not_one(value: str) -> None:
+    assert sa.identifier_in_value(value) is None, value
+
+
+def test_plant_43_a_mailto_with_a_cc_in_a_notice_path_is_refused() -> None:
+    """The re-check's plant 43, at the pure seam: it was refused at the previous head, admitted
+    at the last one, and the refusal must come back TERMINAL so no ladder is walked for it."""
+    result = grade(record(notice={"told": ["platform-engineer"],
+                                  "published_at": "mailto:alice@example.com?cc=bob@example.com",
+                                  "published_on": "2026-09-09"}))
+    assert "names-or-identifies-an-individual" in ids(result), result["refusals"]
+    assert result["terminal"] is True and result["ladder"] is None
+    assert result["admitted"] is False
+
+
+def test_plant_43_is_refused_at_a_real_served_ref(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    body = sa._GOOD_RECORD.replace("planted", "alpha").replace(
+        "  published_at: docs/monitoring-notice.md",
+        "  published_at: mailto:alice@example.com?cc=bob@example.com")
+    estate = sa._plant(tmp_path, hooks, body, org="alpha")
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    joined = "\n".join(lines)
+    assert rc == 1, f"plant 43 must be refused, not admitted:\n{joined}"
+    assert "names-or-identifies-an-individual" in joined, joined
+
+
+@pytest.mark.parametrize("where,body", [
+    ("people/second.yaml", "id: on-call-secondary\nrole: Escalate to alice@example.com.\n"),
+    ("people/third.yaml", "id: on-call-third\nrole: alice@example.com/bob@example.com\n"),
+])
+def test_a_role_file_with_an_end_of_sentence_or_double_address_is_refused(
+        tmp_path, where, body) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "alpha"), org="alpha",
+                       extra_role_file=(where.split("/")[1], body))
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    assert rc == 1 and "an email address" in "\n".join(lines), "\n".join(lines)
+
+
+def test_a_party_file_with_an_end_of_sentence_address_is_refused(tmp_path) -> None:
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    sa._plant(tmp_path, hooks, None, org="publisher",
+              party="party: publisher\nroles: [publisher]\nnote: Contact alice@example.com.\n")
+    estate = sa._plant(tmp_path, hooks, sa._GOOD_RECORD.replace("planted", "bravo"), org="bravo")
+    lines: list[str] = []
+    rc = sa.grade_estate(estate, out=lines.append)
+    assert rc == 1 and "publisher" in "\n".join(lines), "\n".join(lines)
+
+
+def test_the_speed_win_is_kept() -> None:
+    """None of F8's win is given back: still strictly linear, with an at-sign present."""
+    import time
+    started = time.monotonic()
+    sa.identifier_in_value("x" * 128 * 1024 + "@")
+    assert time.monotonic() - started < 0.5
+
+
 # -- the sensor table stays closed ----------------------------------------------------------------
 
 def test_a_sensor_id_that_is_not_in_sensors_yaml_is_refused_rather_than_raising() -> None:

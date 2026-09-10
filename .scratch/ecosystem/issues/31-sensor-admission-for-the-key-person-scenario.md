@@ -1021,6 +1021,69 @@ the code does not do, and none of these is either.
   eighteen planted served estates grade as planted**.
 - `mypy twin tests conftest.py` → Success, 189 source files.
 
+## Round 7 — 2026-09-10, one blocking finding, and it was mine
+
+### R7-1 — closing F8 by hand lost two detections the pattern had
+
+Both root causes were small and both landed on the sentence this ticket exists to make true.
+
+1. **`domain.rpartition('.')` takes the LAST dot.** For `example.com.` it returns
+   `('example.com', '.', '')`, the empty tail discarded the chunk — and **a full stop ending a
+   sentence is the commonest way an address appears in prose**. The pattern it replaced searched
+   from any offset and matched regardless.
+2. **`if '@' in domain: continue` threw a whole chunk away** rather than trying the later
+   at-signs in it, so a `mailto:` URL with a cc, and two addresses joined by a slash or a pipe,
+   were invisible.
+
+**It flipped a verdict.** The re-check's plant 43 — an admission record whose
+`notice.published_at` is `mailto:alice@example.com?cc=bob@example.com`:
+
+> **red** — `PASS alpha: twin/orgs/alpha/sensor-admissions/bus-factor-structural-aggregate.yaml:
+> bus-factor-structural-aggregate admitted -- the ladder passed and no outstanding DPIA gate
+> blocks admission`, exit 0. And at the pure seam,
+> `AssertionError: the linear scan lost a shape the pattern matched: 'alice@example.com.'`
+>
+> **green** — `identifier_in_value('mailto:alice@example.com?cc=bob@example.com')` →
+> `an email address`; the record is refused
+> `REFUSED names-or-identifies-an-individual: … this record is refused before its
+> proportionality is computed. No refusal beyond these was evaluated.` with `terminal: True`,
+> `ladder: None`, exit 1.
+
+**Three sentences it falsified, all now true again**: this module's docstring ("no code path that
+computes a proportionality ratio for a record that names a person" — plant 43 walked the ladder
+and admitted), the printed limits block's claim to refuse an email address, and this ticket's own
+F8 paragraph claiming five shapes covered it.
+
+**The fix, and none of F8's win given back.** `_has_an_interior_dot` strips trailing dots and
+looks for a dot with a label on each side; `_looks_like_an_email` splits the chunk once on the
+at-sign and walks the adjacent pairs, so every at-sign is tried. Both stay strictly linear: each
+character is visited once by the split and once by the dot scan of the part it lands in.
+Re-measured here with an at-sign present: **24 KiB 0.21 ms, 128 KiB 1.11 ms, 1 MiB 9.9 ms**,
+against 2.4 s and 73.5 s before F8. Seven found-shapes and six not-an-address shapes are tests
+now, plus plant 43 at the pure seam **and** at a real served ref, and the same two shapes in a
+role file and a party file.
+
+### Two more recorded, no code changed for them
+
+- **The DPIA path pattern accepts only `.yaml`** while the three scanned directories now read
+  both spellings, so a DPIA served under the short one is refused as *missing*. Fail-closed and
+  safe, and the asymmetry was named nowhere; it is now a printed LIMIT line.
+- **The both-extensions parenthetical was attached only to the people register.** It covers
+  scenarios and admission records too, and the block now says so once, for all three.
+
+### Two stale sentences, both understating, both one line
+
+The check's header said leg 1 runs *three* planted single-unit estates; the selfcheck prints
+eighteen, and the header now lists what they plant. This ticket's F8 paragraph is corrected above.
+
+### Battery
+
+- `pytest tests/test_sensor_admission.py -n0 -q` → **195 passed** (13 failed first: the seven
+  found-shapes, plant 43 twice, and the four served plants).
+- `verify/sensor-admission/verify-sensor-admission.sh` → exit 3, selfcheck exit 0.
+- The real estate is unchanged at 3 / 3 / 0: the repaired scan finds no address in any adopter's
+  served bytes, which is what it should find.
+
 ## Waits on the owner
 
 **Nothing.** Ticket 82's named-individuals ruling (its "Waits on the owner" item 3) is still

@@ -12,11 +12,14 @@
 # `twin/sensor-admission.yaml` is the rule; `twin/sensor_admission.py` walks it. This script
 # runs both legs:
 #
-#   1. the rules, on planted records and three planted single-unit estates whose served ref is a
-#      real refs/remotes/origin/main -- an employee id, a missing DPIA, a cohort reading, a
-#      missing notice, an unregistered role, an unnamed sensor and a field outside the closed set
-#      are each refused BY NAME, and the one admissible sensor is admitted. A grader only ever
-#      run against material that passes it proves nothing.
+#   1. the rules, on planted records and eighteen planted single-unit and two-unit estates whose
+#      served ref is a real refs/remotes/origin/main -- an employee id, a missing DPIA, a cohort
+#      reading, a missing notice, an unregistered role, an unnamed sensor, a field outside the
+#      closed set, a duplicate key, an undeclared key, a mapping under a declared scalar, prose
+#      in a boolean, a damaged ref, a unit that stopped claiming the adopter role, a path git
+#      would quote and a record under the short extension are each refused BY NAME, and the one
+#      admissible sensor is admitted. The selfcheck's own last line prints the counts. A grader
+#      only ever run against material that passes it proves nothing.
 #   2. the estate, at the SERVED artefact: every fact is read with `git show origin/main:<path>`
 #      in the fetched clone, never the working tree, because an uncommitted admission record is
 #      not one an adopter has published.
