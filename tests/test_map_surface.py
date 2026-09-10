@@ -6,7 +6,8 @@ estate, no filesystem.
 
 Sibling: tests/test_cited_truth.py (ticket 80) grades the same class of claim in
 .scratch/ecosystem/issues/*.md. This file grades .scratch/ecosystem/map.md, which ticket 80's
-module names as out of its scope, and the two never read the same file.
+module names as out of its scope. Ticket 109 additionally compares exact ticket/map
+transcriptions; it grades the pair rather than the evidence claim.
 """
 from __future__ import annotations
 
@@ -368,7 +369,12 @@ def _repo(tmp_path, served_lane, checkout_lane=None):
     (seed / ".github" / "workflows").mkdir(parents=True)
     (seed / ".github" / "workflows" / "fetch.yml").write_text(
         WORKFLOW.format(lane=served_lane))
-    git = ["git", "-C", str(seed), "-c", "user.name=t", "-c", "user.email=t@t.invalid"]
+    # Fixture history is synthetic. Global signing and network hooks are unrelated to the
+    # served-tree reading under test and must not require a real identity or consume API quota.
+    hooks = tmp_path / "no-hooks"
+    hooks.mkdir()
+    git = ["git", "-C", str(seed), "-c", "user.name=t", "-c", "user.email=t@t.invalid",
+           "-c", "commit.gpgsign=false", "-c", f"core.hooksPath={hooks}"]
     subprocess.run(["git", "init", "-q", "-b", "main", str(seed)], check=True)
     subprocess.run(git + ["add", "-A"], check=True)
     subprocess.run(git + ["commit", "-qm", "seed"], check=True)
@@ -417,3 +423,62 @@ def test_a_checkout_whose_remote_is_gone_is_red_rather_than_read_locally(tmp_pat
     shutil.rmtree(tmp_path / "origin")
     why = ms.refresh_served_ref(unit)
     assert why and "fetch" in why
+
+
+def test_a_ticket_map_transcription_must_match_the_live_map():
+    line = '- [48 — The demo](issues/48-demo.md) — the video is pending.'
+    tickets = {'48-demo.md': f'Map line: `{line}`\n'}
+    report = ms.grade_map_lines(line + '\n', tickets)
+    assert report.findings == [] and report.compared == 1
+    report = ms.grade_map_lines(line.replace('pending', 'published') + '\n', tickets)
+    assert kinds(report.findings) == ['map-line-disagrees']
+    assert 'ticket' in report.findings[0].detail
+
+
+@pytest.mark.parametrize('map_text', ['', '- [48 — Demo](issues/48-demo.md) — pending.\n' * 2])
+def test_a_missing_or_duplicate_map_entry_is_not_agreement(map_text):
+    line = '- [48 — Demo](issues/48-demo.md) — pending.'
+    report = ms.grade_map_lines(map_text, {'48-demo.md': f'Map line: `{line}`\n'})
+    assert kinds(report.findings) == ['map-line-disagrees']
+
+
+def test_a_truncated_exact_map_block_is_red_and_old_summaries_are_reported():
+    report = ms.grade_map_lines('', {
+        '48-demo.md': 'Map line: `- [48 — Demo](issues/48-demo.md) — pending.\n',
+        '64-twin.md': 'Map line: `Ticket 64: a dated summary`\n',
+        '01-org.md': 'No map transcription here.\n',
+    })
+    assert kinds(report.findings) == ['map-line-malformed']
+    assert report.historical == ['64-twin.md:1']
+
+
+def test_map_transcription_comparison_keeps_inline_code_and_significant_whitespace():
+    line = '- [48 — Demo](issues/48-demo.md) — runs `check()`.'
+    tickets = {'48-demo.md': f'Map line: `{line}`\n'}
+    assert ms.grade_map_lines(line, tickets).findings == []
+    assert kinds(ms.grade_map_lines(line.replace(' — runs', ' —  runs'), tickets).findings) == [
+        'map-line-disagrees']
+
+
+def test_a_ticket_cannot_claim_another_tickets_matching_map_line():
+    line = '- [48 — Demo](issues/48-demo.md) — pending.'
+    report = ms.grade_map_lines(line, {'49-feed.md': f'Map line: `{line}`\n'})
+    assert kinds(report.findings) == ['map-line-wrong-ticket']
+
+
+@pytest.mark.parametrize('prefix', ['`-  [', '`-[', '`* [', '` [', '``- [', '- [', '`- [ '])
+def test_a_damaged_map_transcription_prefix_is_not_historical_prose(prefix):
+    block = prefix + '48 — Demo](issues/48-demo.md) — pending.`'
+    report = ms.grade_map_lines('', {'48-demo.md': 'Map line: ' + block + '\n'})
+    assert kinds(report.findings) == ['map-line-malformed']
+    assert report.historical == []
+
+
+def test_historical_summaries_keep_their_original_prose_formats():
+    report = ms.grade_map_lines('', {'64-twin.md': (
+        'Map line: `Ticket 64: a dated summary with [its source](somewhere.md)`\n'
+        'Map line: [64 — Twin](issues/64-twin.md) — the original unquoted proposal.\n'
+        'Map line: Ticket 64: the old prose summary.\n'
+        'Map line: - [64 — Twin](issues/64-twin.md) — the unquoted `tool` summary.\n')})
+    assert report.findings == []
+    assert report.historical == ['64-twin.md:1', '64-twin.md:2', '64-twin.md:3', '64-twin.md:4']

@@ -85,10 +85,9 @@ NO_VERDICT = "the capture's last line does not carry a PASS:, SKIP: or FAIL: ver
 # shapes it is. It is not a grade, so it never appears in WORD, and the deck may not render it as
 # one. Ticket 48 review F1: before this, the absent table fell back to the capture's last line --
 # the very proxy the grade table exists to replace -- and a script whose verdict wraps then
-# rendered `observed false` with the whole check green. As of run 207 (2026-09-09), 46 of the 57
-# runs talk/truth.log records committed no table at all. That count MOVES, and the argument does
-# not rest on it: a table can also lack a row for one script, which six of run 186's own 120
-# captures do, so the fallback is reachable on a run that has a table.
+# rendered `observed false` with the whole check green. A table can also lack a row for one
+# script, which six of run 186's own 120 captures do, so the fallback is reachable on a run
+# that has a table. The dated census is in ticket 48; this instrument needs no moving count.
 UNGRADED = "UNGRADED"
 NO_TABLE = ("this run committed no `talk/captures/_grades.tsv`, so it recorded no grade for "
             "`{script}` and this deck will not read one off the capture's last line")
@@ -156,13 +155,7 @@ def grades_table(capdir):
     Monte Carlo aside's own capture. verify-all.sh has written this per-script table inside the
     observation lane since ticket 59, so the deck reads what the run recorded.
 
-    {} for a run that committed no table. AS OF RUN 207 (2026-09-09), talk/truth.log records 57
-    numbered runs; 8 carry a table (181, 184, 186, 192, 194, 197, 200, 207), 46 verifiably do not
-    and 3 have a recording commit this checkout cannot reach. Every scheduled run since 181 has
-    carried one, so that count is moving the other way and a reader should re-measure rather than
-    quote it -- which is why the sentence is dated and why nothing in the code reads it.
-
-    The count is not the reason, and this is the half that does not rot: a run with no table, and
+    {} for a run that committed no table. A run with no table, and
     a run whose table has no row for one script, mean the same thing -- this run recorded no grade
     for it. Six of run 186's own 120 captures have no row. resolved_grade() says so by name rather
     than falling back to the capture's last line.
@@ -625,8 +618,12 @@ def _phrase_table(root=ROOT):
     if not path.exists():
         return [], [], None
     rows, problems, declared, inside, fenced = [], [], None, False, False
+    declarations = []
     for line in path.read_text(errors="replace").splitlines():
         if line.startswith("## "):
+            if inside and fenced:
+                problems.append("unclosed backtick fence in refused-vocabulary section")
+            fenced = False
             inside = line.startswith(REFUSED_HEADING)
             continue
         if not inside:
@@ -634,17 +631,16 @@ def _phrase_table(root=ROOT):
         # A fenced block is quoted material and a `|` line is the table itself. The count is a
         # sentence a reader reads, so neither may set it (ticket 48 review R6): without this the
         # first match wins and a fenced example, or prose inside a cell, silently becomes the
-        # declaration.
+        # declaration. Of the remaining matches NONE may silently win over another: comments,
+        # quotations, tilde fences and indented examples count as ambiguous declarations too
+        # (ticket 109). This conservative refusal avoids a second Markdown parser.
         if line.lstrip().startswith("```"):
             fenced = not fenced
             continue
         if fenced:
             continue
         if not line.lstrip().startswith("|"):
-            if declared is None:
-                m = DECLARED_ROWS.search(line)
-                if m:
-                    declared = int(m.group(1))
+            declarations.extend(int(m.group(1)) for m in DECLARED_ROWS.finditer(line))
             continue
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         # The separator row is every cell made of nothing but `-` and `:`. It is not a row and is
@@ -658,6 +654,13 @@ def _phrase_table(root=ROOT):
         if phrase == "refused on a slide":
             continue
         rows.append({"phrase": phrase, "instead": cells[1], "why": cells[2]})
+    if inside and fenced:
+        problems.append("unclosed backtick fence in refused-vocabulary section")
+    if len(declarations) > 1:
+        problems.append("multiple row-count declarations in refused-vocabulary section: "
+                        + ", ".join(map(str, declarations)))
+    if declarations:
+        declared = declarations[0]
     return rows, problems, declared
 
 
@@ -881,6 +884,9 @@ def check(path, root=ROOT):
 
     refused, problems, declared = _phrase_table(root)
     for line in problems:
+        if line.startswith(("multiple row-count declarations", "unclosed backtick fence")):
+            bad.append("CONTEXT.md: " + line)
+            continue
         bad.append("CONTEXT.md's `" + REFUSED_HEADING + "` table carries a row that does not parse "
                    "to three non-empty cells, so the phrase it names is not linted while the table "
                    f"still reads complete: {line}")

@@ -52,6 +52,7 @@ _NO_HOOKS = tempfile.mkdtemp(prefix="build-deck-no-hooks-")
 
 def _git(root: Path, *args: str) -> str:
     return subprocess.run(["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@t",
+                           "-c", "commit.gpgsign=false",
                            "-c", f"core.hooksPath={_NO_HOOKS}", *args],
                           capture_output=True, text=True, check=True).stdout.strip()
 
@@ -412,3 +413,35 @@ def test_a_run_that_recorded_no_grade_is_a_could_not_look_not_a_last_line_readin
     (capdir / "_grades.tsv").write_text(f"{script}\tPASS\ta verdict that wraps, and its "
                                         "second line.\n")
     assert bd.resolved_grade(script, rows, capdir)[0] == "PASS"
+
+
+@pytest.mark.parametrize('plant', [
+    '<!-- There is 1 row below. -->',
+    '> There is 1 row below.',
+    '~~~\nThere is 1 row below.\n~~~',
+    '    There is 1 row below.',
+    'There is 1 row below.',
+    'There is 1 row below. There is 1 row below.',
+])
+def test_a_second_count_cannot_hide_a_deleted_vocabulary_row(
+        hub: dict, tmp_path: Path, plant: str) -> None:
+    root = hub['root']
+    record = root / 'CONTEXT.md'
+    record.write_text(record.read_text().replace(
+        'There is 1 row below.', plant + '\nThere are 2 rows below.'))
+    deck = tmp_path / 'deck.md'
+    deck.write_text(bd.build(run=2, root=root))
+    bad = bd.check(deck, root=root)[0]
+    assert any('multiple row-count declarations' in message for message in bad), bad
+
+
+@pytest.mark.parametrize('ending', ['', '\n## Next section\nThere are 8 rows below.\n'])
+def test_an_unclosed_fence_names_the_fault_in_the_vocabulary_section(
+        hub: dict, tmp_path: Path, ending: str) -> None:
+    root = hub['root']
+    record = root / 'CONTEXT.md'
+    record.write_text(record.read_text() + '\n```\nexample\n' + ending)
+    deck = tmp_path / 'deck.md'
+    deck.write_text(bd.build(run=2, root=root))
+    bad = bd.check(deck, root=root)[0]
+    assert any('unclosed backtick fence' in message for message in bad), bad
