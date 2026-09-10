@@ -336,12 +336,14 @@ Run **230**, `gh run view 34439399424`, on hub `5050b08`, a push to
 `ticket-86-the-cage-enters-the-citable-number`. **A branch run records nothing** (ticket 100) and the
 run says so in its own log: *"the line above is NOT being written to talk/truth.log: this run is on
 ticket-86-..., not main, and only main's talk/truth.log is citable"*. Quoted from the run log,
-therefore, and never citable:
+therefore, and never citable. `talk/truth.log` records no such line and this quotation is **not citable**:
 
-    TRUTH 2026-09-10T05:30Z run=230 hub=5050b08 enact=development units=[driftwood=a181725@main
-    feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main
-    platform=8da250d@main tuppence=bd15aae@main] pass=78 [observed=24 self=41 simulated=4 meta=9]
-    fail=8 skip=30 [never=9 waits=21] excluded=8 total=124 ceiling=105
+```
+TRUTH 2026-09-10T05:30Z run=230 hub=5050b08 enact=development units=[driftwood=a181725@main
+feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main
+platform=8da250d@main tuppence=bd15aae@main] pass=78 [observed=24 self=41 simulated=4 meta=9]
+fail=8 skip=30 [never=9 waits=21] excluded=8 total=124 ceiling=105
+```
 
 Figure for figure the same as run 225 on `main`, which is the expected answer: the units are still at
 their own mains, so the hub half of this ticket moves the record and not the number. The run's
@@ -387,12 +389,14 @@ runs.
 
 Run **232**, `gh run view 34441742700`, hub `269bcc5`, conclusion `failure` — as `main`'s own runs
 are, on the estate's standing eight reds. **A branch run records nothing** (ticket 100), so this
-line is quoted from the run log and is not citable:
+line is quoted from the run log and is not citable. `talk/truth.log` records no such line and this quotation is **not citable**:
 
-    TRUTH 2026-09-10T06:18Z run=232 hub=269bcc5 enact=development units=[driftwood=a181725@main
-    feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main
-    platform=8da250d@main tuppence=bd15aae@main] pass=78 [observed=24 self=41 simulated=4 meta=9]
-    fail=8 skip=31 [never=9 waits=22] excluded=8 total=125 ceiling=106
+```
+TRUTH 2026-09-10T06:18Z run=232 hub=269bcc5 enact=development units=[driftwood=a181725@main
+feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main
+platform=8da250d@main tuppence=bd15aae@main] pass=78 [observed=24 self=41 simulated=4 meta=9]
+fail=8 skip=31 [never=9 waits=22] excluded=8 total=125 ceiling=106
+```
 
 Against run 225 on `main` (`pass=78 ... fail=8 skip=30 [never=9 waits=21] excluded=8 total=124
 ceiling=105`) the hub half of this ticket moves `pass` and `fail` not at all; `total`, `skip`,
@@ -401,10 +405,12 @@ ceiling=105`) the hub half of this ticket moves `pass` and `fail` not at all; `t
 so until the three adopter branches merge, the hub half moves the record and not the number.
 
 Run **233**, `gh run view 34446814409`, was then dispatched on hub `df413c1` -- the head that
-carries the whole build, record included -- and reads the same line, figure for figure:
+carries the whole build, record included -- and reads the same line, figure for figure. `talk/truth.log` records no such line and this quotation is **not citable**:
 
-    TRUTH 2026-09-10T07:13Z run=233 hub=df413c1 ... pass=78 [observed=24 self=41 simulated=4
-    meta=9] fail=8 skip=31 [never=9 waits=22] excluded=8 total=125 ceiling=106
+```
+TRUTH 2026-09-10T07:13Z run=233 hub=df413c1 ... pass=78 [observed=24 self=41 simulated=4
+meta=9] fail=8 skip=31 [never=9 waits=22] excluded=8 total=125 ceiling=106
+```
 
 **A record commit cannot name its own run**, and this paragraph is the proof: naming run 233 moves
 the head past the commit run 233 measured. The regress terminates here rather than being hidden --
