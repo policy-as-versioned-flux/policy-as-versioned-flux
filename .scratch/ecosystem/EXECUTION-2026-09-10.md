@@ -140,3 +140,20 @@ merged tools rollout: propose-tier has two opaque local-action findings and Reno
 each adopter; their pre-tools baselines have none. Ordinary PR CI did not cover this boundary.
 A focused correction is in progress, preserving the shared authoritative pins and signature
 runner and leaving the grader unchanged. The rollout is not declared complete.
+
+
+## Publication and clock correction checkpoint
+
+The owner approved v3.1.0; signed cut 34512212053 and identity-pinned release 34512281836 passed.
+The release was published at 18:06:47Z from reviewed 332ab19. Existing adopter compiler pins
+still name v3.0.0; publication alone does not move them.
+
+Tuppence clock PR33 merged as ffb0418; Ludlow PR30 as 8ef36c7. Their first scheduled result remains
+outstanding. All three schedule-tool corrections passed both reviews and CI and merged through
+Driftwood38, Tuppence34 and Ludlow31. The unchanged production containment grader shows nine
+new opaque-action findings before correction and zero after; pre-tools baselines also show zero.
+No permissions, observation lanes, signature checks or generated evidence were weakened.
+
+Hub PR79 merged as e436d11 and includes the clock-written run 243 from its main parent:
+81 pass/6 fail/30 skip at 17:52Z. This is citable, but its captured adopter SHAs precede the compiler
+and clock corrections. It is not evidence that those later changes have run on a real schedule.
