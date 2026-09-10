@@ -173,7 +173,10 @@ NOT A WAIT." Three things enforce it:
 this paragraph said sorting was what removed it — that `composed-v*` sorts above the adopter's own
 name, so the composed waits finish before the adopter's own Kustomization stalls the loop. **That
 argument is not load-bearing and the claim was wrong.** `drift-sample.yml` sets no
-`timeout-minutes` (measured: zero occurrences in all three files), so the job default is 360
+`timeout-minutes` **key on the job** (measured 2026-09-10 by parsing the YAML: no such key on the
+job and none on any step; the earlier form of this parenthetical said "zero occurrences in all
+three files", which the fix's own explanatory comment falsified the moment it landed), so the
+default is 360
 minutes and **every member of the union is waited for regardless of order**; the worst case is
 about 12 minutes. Sorting changes wall-clock time and nothing else — `sort -u` is there to dedupe
 the derived names against the enumeration. The ordering claim was not even generally true: it
@@ -183,8 +186,8 @@ would invert it (`composed-v10-0-0` would not).
 What actually removes the dependence is that **`composed-v*` is in the wait list at all**. The
 wrong sentence also reached `map.md` and all three adopters' first pushed commit messages
 (driftwood `872ae63`, tuppence `ff8d5af`, ludlow `5d0993b`); `map.md` is corrected in the same
-commit as this paragraph, and the adopter commits were amended to `53b0a48`, `3b49a5a` and
-`129d550`, which state the corrected reason. The superseded shas are named here so the correction
+commit as this paragraph, and the adopter commits were amended to `2ba377e`, `f3205e9` and
+`54fc513`, which state the corrected reason. The superseded shas are named here so the correction
 is checkable rather than laundered.
 
 **What stayed the same, deliberately.** Every wait is still bounded and best-effort (`|| true`, no
@@ -351,12 +354,13 @@ ticket found and did not fix.
 
 | repo | branch | commit | PR |
 |------|--------|--------|----|
-| policy-as-versioned-driftwood/driftwood | `ticket-107-the-sampler-waits-for-what-exists` | `53b0a48` | [#35](https://github.com/policy-as-versioned-driftwood/driftwood/pull/35) |
-| policy-as-versioned-tuppence/tuppence | `ticket-107-the-sampler-waits-for-what-exists` | `3b49a5a` | [#29](https://github.com/policy-as-versioned-tuppence/tuppence/pull/29) |
-| policy-as-versioned-ludlow/ludlow | `ticket-107-the-sampler-waits-for-what-exists` | `129d550` | [#26](https://github.com/policy-as-versioned-ludlow/ludlow/pull/26) |
+| policy-as-versioned-driftwood/driftwood | `ticket-107-the-sampler-waits-for-what-exists` | `2ba377e` | [#35](https://github.com/policy-as-versioned-driftwood/driftwood/pull/35) |
+| policy-as-versioned-tuppence/tuppence | `ticket-107-the-sampler-waits-for-what-exists` | `f3205e9` | [#29](https://github.com/policy-as-versioned-tuppence/tuppence/pull/29) |
+| policy-as-versioned-ludlow/ludlow | `ticket-107-the-sampler-waits-for-what-exists` | `54fc513` | [#26](https://github.com/policy-as-versioned-ludlow/ludlow/pull/26) |
 
-One file each, `.github/workflows/drift-sample.yml`, 77 insertions and 5 deletions, identical
-diff on all three (56/5 before the review round below). All three pull requests are green on the adopters' own CI (`compose-check`
+One file each, `.github/workflows/drift-sample.yml`, 90 insertions and 5 deletions, identical
+diff on all three (56/5 as first pushed, 77/5 after the review round, 90/5 after the narrow
+re-check). All three pull requests are green on the adopters' own CI (`compose-check`
 and `shift-left` pass on each). Nothing is merged.
 
 The hub side is branch `ticket-107-the-sampler-waits-for-what-exists`, **rebased onto
@@ -377,9 +381,14 @@ Done has three clauses. Two are met and one is not:
   recorded clock run; a branch run records nothing and its TRUTH line is quotable from the Actions
   log only, never citable — ticket 100.)
 - **met, pending the merge** — driftwood's fact 5 no longer depends on `kustomizations/driftwood`
-  timing out: the composed waits are by name and sort above driftwood's own. This is a property of
-  the order, provable by reading it and by the harness above; the estate proves it when the run
-  happens.
+  timing out. **Corrected 2026-09-10 (re-check F-02):** this clause used to justify itself with
+  "the composed waits are by name and sort above driftwood's own … a property of the order", which
+  rests on the sort argument review F2 withdrew. It does not need it. What makes the clause true is
+  that **`composed-v*` is in the wait list at all**, by name, whether or not
+  `kustomizations/driftwood` ever reaches Ready and whatever order the list is walked in. Measured
+  against a fake whose enumeration never lists the composed Kustomizations, so only the derivation
+  can reach them: the round-4 block makes **four** Kustomization waits, three of them the composed
+  ones. The estate proves it when the scheduled run happens.
 - **NOT MET, and it cannot be met today** — "tuppence's and ludlow's newest scheduled
   `drift/samples.jsonl` line records facts 4 and 5 true for the composed source, on a run whose
   Actions log shows the three composed Kustomizations `condition met` before the five-fact sample
@@ -406,8 +415,12 @@ written, edited or invented by this build.
 
 - **The names are derived from the ResourceSet's own status inventory, not re-spelled from the
   version array** — delegated. Two copies of the slugify rule drift; one copy, read off the object
-  that applied them, cannot. It also makes the wait assert the same thing fact 5 asserts, from the
-  same ids.
+  that applied them, cannot. **Corrected 2026-09-10 (re-check F-02):** this bullet used to end "it
+  also makes the wait assert the same thing fact 5 asserts, from the same ids", which is the
+  sentence review F3 established is wrong in both directions and which was corrected in *The
+  decision* while this copy was missed. What the step reads is the ResourceSet's inventory
+  filtered to Kind `Kustomization` — a **proxy** for fact 5, whose deciding ids are the fifteen
+  policy ids inside the composed Kustomizations' own inventories, which this step never reads.
 - **The general enumeration stays, and moves below the derivation** — delegated. It is what waits
   for the adopter's own Kustomization, which fact 3 and the sample's `revision` read. Deleting it
   would trade one hole for another; moving it below means no enumeration in this file runs before
@@ -654,3 +667,93 @@ intent and each `kubectl wait` prints its own verdict. Unreachable while everyth
 seconds and exit 0 with the guard, against a fake whose `-o json` call fails on all thirty
 attempts. The healthy path is unchanged: three `composed-v* condition met` lines, all above the
 adopter's own, all above the sample step.
+
+## Narrow re-check of the two code changes, 2026-09-10 — five findings, two blocking
+
+A second, narrow review took only the two code changes. **Change 2 (the adopter workflows) it would
+merge as it stands**: it reproduced the red and green under the real `bash -e`, attacked the refusal
+six ways, and confirmed every path that removes all candidates reaches the spoken-silence line
+rather than a silent pass. It re-measured the `-e` guard rather than taking it on report — present,
+exit 0 at 63s; removed, exit 1 at 0s. Two findings blocked, both fixed below.
+
+### F-01 (blocking) — rule B asserted a property it did not derive, which is this ticket's own defect one level down
+
+Rule B grepped the marker-6 line for `${composed}` **anywhere on that line**. It graded nothing
+about the loop's word list. On the real head files, moving the token off the word list into a
+trailing comment on the same line left the check at:
+
+    ok   driftwood: ... Kustomization waits@255 five-fact sample@260 +derived-names-waited
+    PASS: ... and wait for those names ... (round 4 order)
+
+while the shell that PASS describes waited for none of the three. Measured by extracting that
+mutated step and driving it under `bash -e` against a fake whose enumeration never lists the
+composed Kustomizations, so only the derivation can reach them:
+
+    round 4, as shipped                 Kustomization waits actually made: 4
+    the same file, token in a comment   Kustomization waits actually made: 1   (the adopter's own)
+
+A rule added to stop a check asserting a property it does not derive must not itself do that, which
+is why this blocked rather than waited.
+
+**The fix, and its exact reach.** The marker line is passed through `sed 's/#.*$//'` before
+matching. That closes the token being **deleted** from the line and the token being **relocated
+into a trailing comment** on it. It does **not** parse the word list, so four forms that mention
+the token elsewhere on the line still pass — an `echo` on the loop line, an assignment to a
+variable nothing reads, an expansion redirected away, and the token inside single quotes. The
+check's header now says exactly that, and the limits table no longer says "CLOSED" without
+qualification: it names the two forms closed and the one class that is not. Grading the word list
+needs a shell parser and is not what a grep of one file is.
+
+The strip could also cut a `#` inside a string. That direction of error is a **false red on a
+workflow that waits correctly, never a false green**, which is the direction to be wrong in, and it
+is written into the header as such.
+
+**The two false rejections are fixed too.** Rule B's pattern was the literal `${composed}`, so
+`${composed:-}` and the unbraced `$composed` — both of which wait correctly — were rejected. A
+future author writing either would have got a red for a working workflow. The pattern now accepts
+all three spellings and still rejects `$composedfoo`, which is a different variable:
+
+    braced          ${composed}     exit=0     accepted
+    default-form    ${composed:-}   exit=0     accepted
+    unbraced        $composed       exit=0     accepted
+    composedfoo     $composedfoo    exit=1     correctly rejected
+
+New selfcheck fixture `unused-comment` plants the escape verbatim, so the distinction is
+load-bearing the way `unused` already is for the order.
+
+### F-02 (blocking) — two corrections landed in one section and missed another
+
+Both were real, and both left this file saying two things at once, which is the shape
+`verify/cited-truth` exists to end:
+
+- the **Decisions** bullet still ended "it also makes the wait assert the same thing fact 5
+  asserts, from the same ids" — the sentence review F3 corrected in *The decision*. Now says proxy,
+  and names the miss.
+- the **Done** clause still justified its met verdict with "the composed waits are by name and sort
+  above driftwood's own. This is a property of the order" — the argument review F2 withdrew. It
+  never needed it: what makes the clause true is that `composed-v*` is in the wait list **at all**.
+  Rewritten to rest on that, with the four-waits-versus-one measurement as its evidence.
+
+### F-03, F-04, F-05 — priced, and two of them fixed rather than priced
+
+- **F-03, fixed rather than priced.** Removing `2>/dev/null` from the python invocation was
+  necessary while the refusal went to stderr, and it cost a traceback per attempt — thirty of them
+  into the same step log the Done clause reads its evidence from. Narrowed instead: refusals now
+  come back on **stdout** carrying a marker the shell splits off, and the stderr redirect is
+  restored. Nothing is hidden that matters, because a derivation that never produces names still
+  ends at the spoken-silence line.
+- **F-04, fixed.** The refusal printed once per retry, so three persistent out-of-namespace entries
+  produced sixty lines. It is now captured in the loop and printed **once**, after it. Measured:
+  three entries, three lines, then the spoken-silence line, and the enumeration still waits for the
+  adopter's own.
+- **F-05, corrected.** "Measured: zero occurrences in all three files" was self-falsifying at the
+  head that carried it, because the fix's own comment uses the word. The durable form — no
+  `timeout-minutes` **key** on the job and none on any step — is what the text says now, verified by
+  parsing the YAML rather than counting a string.
+
+### What did not change
+
+The three diffs remain the same change on all three adopters: the hunks are byte-identical apart
+from one hunk-header line number, driftwood's file being three lines shorter above. `drift/samples.jsonl`
+is untouched — blob shas identical between `main` and the branch on all three. The `-e` guard
+measurement re-ran identically after both code changes: 63 seconds, exit 0.

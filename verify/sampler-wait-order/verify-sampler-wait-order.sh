@@ -38,16 +38,34 @@
 #                                                 and 5, so the enumeration runs when its answers
 #                                                 can exist
 #        7 the five-fact sample step
-#   B. CONTAINMENT: marker 6's line must also carry `${composed}`, the variable marker 5 assigns.
+#   B. CONTAINMENT: marker 6's line, with any trailing `#` comment stripped, must carry the
+#      variable marker 5 assigns -- `${composed}`, `${composed:-...}` or the unbraced `$composed`.
 #      Without this a workflow can derive the names, print that it is waiting for them, and wait
-#      for none of them -- round 3 restored with a log line asserting the opposite. Measured:
-#      deleting `${composed}` from the union loop's word list left this check green until rule B
-#      existed.
+#      for none of them: round 3 restored with a log line asserting the opposite. Measured on the
+#      real head files -- deleting the token, or moving it out of the loop's word list into a
+#      trailing comment on the same line, each dropped the waits actually made from four to one
+#      (the adopter's own) while the step still announced all three composed names.
+#
+#      WHAT RULE B DOES AND DOES NOT CLOSE, because a rule added to stop a check asserting a
+#      property it does not derive must not itself do that. It greps ONE LINE for a token. It
+#      closes the token being DELETED from that line, and the token being RELOCATED into a
+#      trailing comment on it. It does NOT parse the loop's word list, so a mention of the token
+#      ANYWHERE ELSE on that line still satisfies it -- an `echo` on the loop line, an assignment
+#      to a variable nothing reads, an expansion redirected away, or the token inside single
+#      quotes. Four forms, each measured passing. Grading the word list needs a shell parser and
+#      is not what this is. The comment strip is `sed 's/#.*$//'`, which would also cut a `#`
+#      inside a string: that direction of error is a FALSE RED on a workflow that waits
+#      correctly, never a false green, which is the direction to be wrong in.
 #
 # WHAT IT DOES NOT GRADE, named because an undisclosed limit rots like any other claim. Each of
 # these was PLANTED on all three adopters and passed the order rule; only the first is closed, by
 # rule B:
-#   * the derivation computed and never waited for                     -- CLOSED by rule B
+#   * the token deleted from the enumeration line                       -- CLOSED by rule B
+#   * the token moved into a trailing comment on that line              -- CLOSED by rule B
+#   * the token present on that line but not in the loop's word list
+#     (echo, unread assignment, redirected expansion, single quotes)    -- still passes: rule B
+#                                                                          greps a line, it does
+#                                                                          not parse shell
 #   * `seq 1 30` cut to `seq 1 1`: the retry becomes a single look     -- still passes
 #   * `--timeout=180s` set to `--timeout=0s`: the waits do not wait    -- still passes
 #   * a marker inside a TRAILING comment on a code line: the comment
@@ -69,8 +87,9 @@
 #   verify-sampler-wait-order.sh            selfcheck first, then grade the three checkouts
 #   verify-sampler-wait-order.sh selfcheck  selfcheck only: round 4's order passes; round 3's
 #                                           order, round 2's order, a derivation below the
-#                                           enumeration, a derivation computed and unused, a
-#                                           duplicated wait and a missing wait fail
+#                                           enumeration, one computed and unused, one named only
+#                                           in a trailing comment, a duplicated wait and a
+#                                           missing wait fail
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ESTATE="${SAMPLER_ESTATE:-$ROOT/.estate-clone}"   # overridden only by the selfcheck
@@ -92,7 +111,10 @@ PATS=(
   '- name: take the five-fact sample'
 )
 WAITS_IDX=5          # index of "Kustomization waits" in NAMES/PATS: rule B's subject
-DERIVED='\$\{composed\}'
+# `${composed}`, `${composed:-...}` and the unbraced `$composed` all wait for the derived names;
+# `$composedfoo` is a different variable and does not match. Rejecting a form that waits correctly
+# would be a red for a working workflow, so all three spellings are accepted.
+DERIVED='\$\{composed[:}]|\$composed([^A-Za-z0-9_]|$)'
 
 # grade <unit> <file>: prints ok/FAIL lines, counts failures in $bad.
 grade() {
@@ -110,11 +132,14 @@ grade() {
     prev="$lines"; prevname="${NAMES[$i]}"; order="$order ${NAMES[$i]}@$lines"
   done
   # Rule B: the enumeration must wait for the names marker 5 derived, not merely beside them.
+  # The trailing comment is stripped FIRST: without that, moving the token off the word list and
+  # into a comment on the same line satisfied this rule while the step waited for none of the
+  # composed Kustomizations (measured on the real head files, 2026-09-10).
   if [ -n "$waitline" ]; then
-    if sed -n "${waitline}p" "$f" | grep -qE -- "$DERIVED"; then
+    if sed -n "${waitline}p" "$f" | sed 's/#.*$//' | grep -qE -- "$DERIVED"; then
       order="$order +derived-names-waited"
     else
-      fail "$unit: the ${NAMES[$WAITS_IDX]} (line $waitline) do not include \${composed}: the names are derived and then never waited for, which is round 3 with a log line that says otherwise"
+      fail "$unit: the ${NAMES[$WAITS_IDX]} (line $waitline) carry no \${composed} outside a comment: the names are derived and then never waited for, which is round 3 with a log line that says otherwise"
     fi
   fi
   [ "$bad" -eq "$before" ] && ok "$unit:${order}"
@@ -132,6 +157,9 @@ selfcheck() {
   local A='          kubectl --context "${CTX}" apply -k gitops/composed/'
   local Z='          for k in $(kubectl --context "${CTX}" -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io -o name 2>/dev/null); do'
   local Z4='          for k in $( { printf '"'"'%s\n'"'"' ${composed}; kubectl --context "${CTX}" -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io -o name 2>/dev/null; } | sed '"'"'/^$/d'"'"' | sort -u); do'
+  # the token present on the line but only inside a trailing comment: the escape rule B's first
+  # version left open, and the reason the strip above exists.
+  local ZC='          for k in $( { kubectl --context "${CTX}" -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io -o name 2>/dev/null; } | sed '"'"'/^$/d'"'"' | sort -u); do   # ${composed} handled above'
   local R='          for r in $(kubectl --context "${CTX}" -n flux-system get resourcesets.fluxcd.controlplane.io -o name 2>/dev/null); do'
   local J='            composed="$(kubectl --context "${CTX}" -n flux-system get resourcesets.fluxcd.controlplane.io -o json 2>/dev/null | python3 -c "${composed_names}")" || composed=""'
   local S='      - name: take the five-fact sample and append it to the observation log'
@@ -145,6 +173,7 @@ selfcheck() {
   write "$t/round2"   "$R" "$F" "$A" "$K" "$Z" "$S"                 # round 2 as merged: kyverno below the apply
   write "$t/late"     "$C" "$K" "$F" "$A" "$R" "$Z4" "$J" "$S"      # the derivation added, but below the enumeration
   write "$t/unused"   "$C" "$K" "$F" "$A" "$R" "$J" "$Z" "$S"       # round 4's ORDER, derived names never waited for (rule B)
+  write "$t/unused-comment" "$C" "$K" "$F" "$A" "$R" "$J" "$ZC" "$S" # the token on the line, but only in a trailing comment (rule B's strip)
   write "$t/dup"      "$C" "$K" "$F" "$A" "$K" "$R" "$J" "$Z4" "$S" # the kyverno wait twice (round 2's replace bug)
   write "$t/missing"  "$F" "$A" "$R" "$J" "$Z4" "$S"                # no kyverno wait at all
   SAMPLER_ESTATE="$t/round4"  bash "$me" >/dev/null 2>&1 || { echo "selfcheck: the round-4 order failed"; good=0; }
@@ -152,17 +181,18 @@ selfcheck() {
   SAMPLER_ESTATE="$t/round2"  bash "$me" >/dev/null 2>&1 && { echo "selfcheck: round 2's order passed"; good=0; }
   SAMPLER_ESTATE="$t/late"    bash "$me" >/dev/null 2>&1 && { echo "selfcheck: the derivation below the enumeration passed"; good=0; }
   SAMPLER_ESTATE="$t/unused"  bash "$me" >/dev/null 2>&1 && { echo "selfcheck: a derivation that is computed and never waited for passed"; good=0; }
+  SAMPLER_ESTATE="$t/unused-comment" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: the derived names mentioned only in a trailing comment passed"; good=0; }
   SAMPLER_ESTATE="$t/dup"     bash "$me" >/dev/null 2>&1 && { echo "selfcheck: a duplicated kyverno wait passed"; good=0; }
   SAMPLER_ESTATE="$t/missing" bash "$me" >/dev/null 2>&1 && { echo "selfcheck: a missing kyverno wait passed"; good=0; }
   SAMPLER_ESTATE="$t/nowhere" bash "$me" >/dev/null 2>&1; [ $? -eq 3 ] || { echo "selfcheck: an absent estate did not exit 3"; good=0; }
   rm -rf "$t"
-  if [ "$good" = 1 ]; then echo "  ok   selfcheck: round 4 passes; round 3, round 2, a late derivation, an unused derivation, a duplicate and a missing wait fail; no clone skips"; return 0; fi
+  if [ "$good" = 1 ]; then echo "  ok   selfcheck: round 4 passes; round 3, round 2, a late derivation, an unused derivation, one named only in a comment, a duplicate and a missing wait fail; no clone skips"; return 0; fi
   echo "FAIL: selfcheck: the grader does not grade"; return 1
 }
 
 if [ "${1:-}" = selfcheck ]; then
   selfcheck || exit 1
-  echo "PASS: selfcheck: round 4's order passes; round 3's order, round 2's order, a derivation below the enumeration, a derivation computed and never waited for, a duplicated wait and a missing wait fail; an absent clone skips"; exit 0
+  echo "PASS: selfcheck: round 4's order passes; round 3's order, round 2's order, a derivation below the enumeration, a derivation computed and never waited for, one whose names are mentioned only in a trailing comment, a duplicated wait and a missing wait fail; an absent clone skips"; exit 0
 fi
 if [ -z "${SAMPLER_ESTATE:-}" ]; then
   echo "0. the grader can fail"
