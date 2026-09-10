@@ -1540,7 +1540,9 @@ note: >-
 
 
 def _git(repo: Path, *args: str, hooks: Path) -> None:
-    subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-C", str(repo), *args],
+    """Git for synthetic served-ref fixtures only; never use a developer's signing key."""
+    subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgsign=false",
+                    "-C", str(repo), *args],
                    check=True, capture_output=True, text=True)
 
 
