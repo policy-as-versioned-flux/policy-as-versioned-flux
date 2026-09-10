@@ -97,7 +97,7 @@ say "2. the map quotes no figure and names no check the surface does not carry, 
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: every pass/fail figure .scratch/ecosystem/map.md quotes is a figure talk/truth.log records, every check it names is one talk/verify-all.sh discovers, every relative link resolves, no unit declares an observation-lane path it does not own, and ticket 67's record corrections are each still there"
+  echo "PASS: every pass/fail figure .scratch/ecosystem/map.md quotes is a figure talk/truth.log records, every check it names is one talk/verify-all.sh discovers, every relative link resolves, no unit declares an observation-lane path it does not own, ticket 67's record corrections are each still there, and every exact ticket Map line transcription matches the live map"
   exit 0
 fi
 echo "FAIL: the record and the surface disagree -- $bad of this script's legs observed false; the ' == ' tally above says how many findings of which kind, and every one of them names its own file"

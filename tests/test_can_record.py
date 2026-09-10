@@ -63,6 +63,10 @@ def _repo(tmp_path: Path) -> Path:
     env = dict(os.environ, GIT_AUTHOR_NAME="truth", GIT_AUTHOR_EMAIL=cr.CLOCK_EMAIL,
                GIT_COMMITTER_NAME="truth", GIT_COMMITTER_EMAIL=cr.CLOCK_EMAIL)
     subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True, capture_output=True)
+    # Synthetic author-attribution history must not use the operator's signing key or
+    # remote secret-scanning hook. Production repository configuration is untouched.
+    subprocess.run(["git", "-C", str(repo), "config", "commit.gpgsign", "false"], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "core.hooksPath", os.devnull], check=True)
     subprocess.run(["git", "-C", str(repo), "config", "user.email", "chris@cns.me.uk"], check=True)
     subprocess.run(["git", "-C", str(repo), "config", "user.name", "Chris Nesbitt-Smith"], check=True)
     (repo / "talk" / "truth.log").write_text(

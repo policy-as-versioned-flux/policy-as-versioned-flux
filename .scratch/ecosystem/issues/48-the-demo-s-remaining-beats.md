@@ -49,7 +49,7 @@ which is the check ticket 20 graduated this ticket with and which this ticket ex
 
 **Delegated; nothing is decided here because ticket 20 already decided it.** Ticket 20's Answer
 item 5 (2026-08-28) reads: `pitch-v6.mp4` becomes a GitHub release asset on the hub, the audio is
-not kept, and the by-product video is a screen recording of a human drive. `map.md` line 52 carries
+not kept, and the by-product video is a screen recording of a human drive. `map.md`'s ticket-20 entry carries
 the same sentence. **Reason for not re-opening it:** the later round listed "screen recording versus
 optional local TTS/puppeteer pipeline" as still open, but item 5 disposed of both halves — the
 audio is the only input to the TTS/puppeteer pipeline and it is not kept, so keeping the pipeline as

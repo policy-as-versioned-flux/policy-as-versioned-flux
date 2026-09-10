@@ -66,7 +66,10 @@ env:
   FLUX_VERSION: 2.9.3
   FLUX_SHA256: eae4e8608c0ade2bf4e8dec1669dbb6b0c28b5822b252d97feccfb4fb1181fd2
 
-# Per EVENT, not one group for the whole workflow (ticket 56, 2026-09-04). With a single `truth`
+# Per EVENT AND REF (tickets 56 and 104). A builder's pending measurement cannot displace
+# main's pending recording, or a different builder's measurement. Runs on the same ref/event
+# still share one pending slot; cancelled recording opportunities are reported by schedules.py.
+# With a single `truth`
 # group and `cancel-in-progress: false`, GitHub keeps the running job and the newest QUEUED one
 # and cancels the rest -- so a scheduled run that queued behind a push was cancelled before it
 # recorded anything. Observed 2026-09-04: the 09:55:43Z scheduled run read `cancelled`, and
@@ -74,7 +77,7 @@ env:
 # queues only behind other clock runs; pushes and dispatches keep their own lanes. Two truth runs
 # can therefore overlap, which the cage step's `git pull --rebase --autostash` already exists for.
 concurrency:
-  group: truth-${{ github.event_name }}
+  group: truth-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:

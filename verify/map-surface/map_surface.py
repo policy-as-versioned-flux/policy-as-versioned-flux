@@ -14,14 +14,18 @@ actually recorded, and a check the map names must be one `talk/verify-all.sh` ac
 HOW THIS COMPOSES WITH verify/cited-truth/ (ticket 80, PR 44). That module grades the same class
 of claim -- a record citing a measurement that never measured the thing -- in
 `.scratch/ecosystem/issues/*.md`, and its own docstring names `map.md` as out of its scope and
-ticket 67(d)'s question. The two populations are disjoint and neither reads the other's files:
-issues/*.md is 80's, map.md is this one's, and between them the ticket record and the wayfinder
-are both covered. The composition point is the PARSER, not the rule: both resolve a citation
+ticket 67(d)'s question. Ticket 109 also reads explicit map transcriptions in issues/*.md
+and compares their bytes against map.md. That rule grades the pair, not the ticket's evidence
+claims, which remain ticket 80's. The composition point is the PARSER, not the rule: both resolve a citation
 through `talk/truth_manifest.py`'s `parse_truth`, so there is one reader of the TRUTH line in the
 estate and a change to the line's shape cannot make one of the two checks quietly wrong. This
 module does not import 80's, so it stands whether or not PR 44 has merged.
 
-WHAT IT GRADES, five rules over `.scratch/ecosystem/map.md`:
+WHAT IT GRADES, the map rules plus ticket 109's transcription comparison:
+
+Explicit `Map line: ` blocks wrapping a complete `- [NN — ...` entry in backticks must match
+exactly one live map entry for their own ticket. Older prose summaries are reported separately;
+there is no dated-correction escape for an exact transcription.
 
   1. FIGURES. Every pass/fail figure the map quotes -- `57/7/18 of 84`, `65 pass, 0 fail, 16
      could-not-look of 83`, or the `pass= fail= skip=` keys of a quoted TRUTH line -- must equal
@@ -69,7 +73,7 @@ rather than shrugs for. So every state in which this cannot see is RED with its 
 a missing unit, and a unit whose `origin/main` does not resolve -- and its manifest row declares
 no skip pattern because there is none to declare.
 
-    map_surface.py grade <hub-root>   # the five rules; 0 nothing false, 1 one or more named
+    map_surface.py grade <hub-root>   # the record rules and ticket/map transcriptions; 0 nothing false, 1 one or more named
     map_surface.py selfcheck          # planted defects grade as planted
 """
 from __future__ import annotations
@@ -694,6 +698,57 @@ def manifest_paths(root: Path) -> set[str]:
     return found
 
 
+@dataclass
+class MapLineReport:
+    findings: list[Finding] = field(default_factory=list)
+    compared: int = 0
+    historical: list[str] = field(default_factory=list)
+
+
+def grade_map_lines(map_text: str, tickets: dict[str, str]) -> MapLineReport:
+    """Grade explicit, backticked map-line transcriptions; report older prose summaries.
+
+    Prefer the reviewed live map on disagreement, unless the ticket records a later decision
+    supported by its Answer. This comparison establishes disagreement, never the truth of either
+    sentence. Superseded prose stays as explicitly labelled history, not another Map line block;
+    there is no correction escape hatch for a current transcription (ticket 109).
+    """
+    report = MapLineReport()
+    for path, text in sorted(tickets.items()):
+        for lineno, line in enumerate(text.splitlines(), 1):
+            if not line.startswith("Map line:"):
+                continue
+            block = line.removeprefix("Map line:").strip()
+            # Classify the intended link/list shape before validating its exact spelling.
+            # Otherwise a second space or damaged bullet demotes a broken transcription to
+            # historical prose and silently removes it from the comparison (review 109).
+            link_shaped = (block.startswith("`") and re.match(r"^\W*\[", block))
+            list_shaped = (block.endswith("`") and re.match(r"^[-*+]\s*\[", block))
+            if not (link_shaped or list_shaped):
+                report.historical.append(f"{path}:{lineno}")
+                continue
+            match = re.fullmatch(r"`(- \[(\d+) — .+)`", block)
+            if not match:
+                report.findings.append(Finding("map-line-malformed", path, lineno,
+                                              "expected one complete backticked map line"))
+                continue
+            expected, number = match.groups()
+            owner = re.match(r"(\d+)-", Path(path).name)
+            if owner is None or int(owner.group(1)) != int(number):
+                report.findings.append(Finding("map-line-wrong-ticket", path, lineno,
+                                              f"transcription names ticket {number}, not this ticket"))
+                continue
+            actual = [row for row in map_text.splitlines()
+                      if row.startswith(f"- [{number} — ")]
+            report.compared += 1
+            if actual != [expected]:
+                report.findings.append(Finding("map-line-disagrees", path, lineno,
+                    f"ticket {number} has {len(actual)} matching map entries; expected its exact "
+                    "transcription. Prefer the reviewed live map unless the ticket's Answer records "
+                    "a later supported decision; check that evidence before correcting either copy."))
+    return report
+
+
 def grade(root: Path) -> int:
     map_path = root / MAP
     if not map_path.is_file():
@@ -711,6 +766,17 @@ def grade(root: Path) -> int:
     findings += fr.findings
     findings += grade_checks(map_text, manifest_paths(root))
     findings += grade_links(map_text, lambda t: (map_path.parent / t).exists())
+    issues = map_path.parent / "issues"
+    if not issues.is_dir():
+        findings.append(Finding("tickets-unreadable", str(issues), 0,
+                                "no ticket directory to compare with the map"))
+    mr = grade_map_lines(map_text, {str(p.relative_to(root)): p.read_text()
+                                  for p in issues.glob("*.md")})
+    findings += mr.findings
+    print(f"  -- {mr.compared} exact ticket/map transcriptions compared; "
+          f"{len(mr.historical)} historical prose summaries are not exact transcriptions")
+    for path in mr.historical:
+        print(f"  -- historical map summary, not compared: {path}")
 
     estate = root / ".estate-clone"
     missing = [u for u in UNITS if not (estate / u).is_dir()]
@@ -776,6 +842,16 @@ def grade(root: Path) -> int:
 
 def selfcheck() -> int:
     """Every rule, planted red and planted green, with no filesystem and no estate."""
+    line = "- [48 — Demo](issues/48-demo.md) — pending."
+    tickets = {"48-demo.md": f"Map line: `{line}`\n"}
+    assert grade_map_lines(line, tickets).findings == []
+    for changed in ("", line + "\n" + line, line.replace("pending", "published")):
+        assert grade_map_lines(changed, tickets).findings
+    assert grade_map_lines(line, {"48-demo.md": f"Map line: `{line}"}).findings
+    assert grade_map_lines(line, {"48-demo.md": "Map line: `-  [48 — Demo](x) — pending.`"}).findings
+    print("ok  exact ticket/map transcriptions agree; missing, duplicate, changed and truncated "
+          "copies fail with no correction escape")
+
     log = ("TRUTH 2026-08-31T17:22Z run=13 hub=eba3569 units=[ico=9d09222] "
            "pass=53 fail=7 skip=21 excluded=2 total=83\n")
 

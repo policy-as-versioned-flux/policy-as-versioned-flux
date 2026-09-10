@@ -161,8 +161,7 @@ def test_leak_scan_finds_an_injected_flag_in_a_committed_observation(lc, tmp_pat
         '{"swept_at": "2026-09-03T07:05:00Z", "org": "driftwood", "injected": true}\n')
     (repo / "notes.md").write_text("injected: true -- prose is not an envelope\n")
     subprocess.run([*GIT, "-C", str(repo), "add", "-A"], check=True)
-    subprocess.run([*GIT, "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
-                    "commit", "-q", "-m", "x"], check=True)
+    _git(repo, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
     hits = lc.injected_leaks(str(repo))
     assert hits == ["observations/twin-sweep.jsonl"], hits
 
@@ -218,8 +217,7 @@ def test_a_linked_worktree_in_the_estate_is_scanned_like_a_clone(lc, tmp_path: P
     subprocess.run([*GIT, "init", "-q", str(repo)], check=True)
     (repo / "observations" / "twin-sweep.jsonl").write_text('{"injected": true}\n')
     subprocess.run([*GIT, "-C", str(repo), "add", "-A"], check=True)
-    subprocess.run([*GIT, "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
-                    "commit", "-q", "-m", "x"], check=True)
+    _git(repo, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
     estate = tmp_path / "estate"
     estate.mkdir()
     (estate / "plain").mkdir()                       # no .git at all: not a repository
@@ -246,8 +244,12 @@ GIT = ["git", "-c", f"core.hooksPath={NO_HOOKS}"]
 
 
 def _git(repo: Path, *args: str) -> str:
+    # Fixture history must not require the operator's encrypted signing key. Local
+    # fixture configuration (including the explicit signing tests below) still applies.
+    # Only fixture git receives this environment; the clock keeps reading the real global.
+    env = {**os.environ, "GIT_CONFIG_GLOBAL": os.devnull}
     return subprocess.run([*GIT, "-C", str(repo), *args], capture_output=True, text=True,
-                          check=True).stdout.strip()
+                          check=True, env=env).stdout.strip()
 
 
 def _fixture_adopter(unit: Path, behind: int = 1) -> Path:

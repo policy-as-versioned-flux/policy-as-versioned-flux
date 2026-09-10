@@ -57,10 +57,7 @@
 #     grade read off the last line (ticket 48 review F1). Both halves matter,
 #     and the second is the durable one: six of run 186's own 120 captures
 #     have no row in that run's table, so a run that HAS a table still reaches
-#     this. As of run 207 (2026-09-09), 46 of the 57 runs talk/truth.log
-#     records carry no table at all, and every scheduled run since 181 has
-#     carried one -- so that count is moving and is dated here rather than
-#     stated as a standing fact. Nothing reads it.
+#     this. The dated census is in ticket 48; the argument needs no moving run count.
 #     WHAT THE FIGURE RULE BINDS, and what it does not. A figure passes when
 #     the same run of digits appears anywhere in the slide's own capture. That
 #     is provenance -- this run printed this token -- and it is not meaning. A
