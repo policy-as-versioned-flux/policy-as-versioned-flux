@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-09T19:20Z run=213 hub=c50207b enact=development units=[driftwood=0164cda@main feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=a2e9d02@main nist=f83126f@main platform=8da250d@main tuppence=fbf952f@main] pass=78 [observed=24 self=41 simulated=4 meta=9] fail=8 skip=30 [never=9 waits=21] excluded=8 total=124 ceiling=105
+# TRUTH 2026-09-10T01:12Z run=224 hub=8a95445 enact=development units=[driftwood=a181725@main feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main platform=8da250d@main tuppence=bd15aae@main] pass=78 [observed=24 self=41 simulated=4 meta=9] fail=8 skip=30 [never=9 waits=21] excluded=8 total=124 ceiling=105
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      or absent trust root refuses on the trust material and never on the network, cold and warm (I).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -114,7 +114,7 @@ verify/real-signature/verify-a-real-signature-is-checked.sh	PASS	PASS: every ado
 verify/record/verify-record-states-the-purpose.sh	PASS	PASS: NORTH-STAR states the purpose, the audience, the (absent) date and what done is, claims the artefact half of attestation and records the actor half as she
 verify/refusal-by-another-name/verify-refusal-by-another-name.sh	PASS	PASS: every mutation the estate SERVES was graded four ways -- every name written into a reference field is one its own release ships, every priority trio is wh
 verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Renovate raised threat-register v1 -> v2, Chris Nesbitt-Smith merged it, and party.yaml and composed/ moved together -- step 2 happened for
-verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for what they applied (round 3 order)
+verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
 verify/schedules/verify-schedules.sh	FAIL	FAIL: 3 schedule/cage check(s) observed false: insurer/fetch.yml ludlow tuppence
 verify/supersede/verify-supersede.sh	SKIP	SKIP: ludlow pins feeds/feed/threat-register@v1, behind v2 (threat-register/v2.0.0 on feeds's real remote): composed under platform v2.0.1, which carries no sup
