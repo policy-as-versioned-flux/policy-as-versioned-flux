@@ -5,7 +5,7 @@ selfcheck ok: allow-list == array; every array version has a policies/ dir; reti
   ok   the served 4.0.0 cage mutates its own claimant and skips 9.9.9 entirely
 [1;36m==>[0m 4. the orphan cage puts that same pod on the bottom rung
 [1;36m==>[0m 5. run together over one pod per DECLARED version plus an orphan: each is touched once
-    1 declared version(s) ['4.0.0'] each caged by their own served body at the Namespace's tier; the one undeclared claim caged at the bottom rung; every pod's label agrees with its dials, so no pod was written by both
+    2 declared version(s) ['4.0.0', '5.0.0'] each caged by their own served body at the Namespace's tier; the one undeclared claim caged at the bottom rung; every pod's label agrees with its dials, so no pod was written by both
 [1;36m==>[0m 5b. and on the original three-pod fixture, for the same reason
     declared -> quarantine/cage-quarantine (its Namespace's tier); orphan -> isolated/cage-isolated (the bottom rung); label and dials agree in both
 PASS: the orphan pair refuses nothing and leaves nothing uncaged. The guard is Audit and reports 9.9.9 by name; the SERVED 4.0.0 cage-tier does not match that pod at all, which is why the cage exists; the cage puts it on the bottom rung with the isolated dials, hardened containers AND initContainers, host namespaces shut and all capabilities dropped; and run together over one pod per declared version plus an undeclared claim, every pod is written by exactly one body with its label agreeing with its dials -- disjointness proved from the array, not asserted. The allow-list is still the array, in both halves. Whether the API server admits any of it is the cluster tail of ../graded/verify-graded.sh, not this run.

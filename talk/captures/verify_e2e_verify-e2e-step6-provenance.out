@@ -3,13 +3,13 @@ E2E step 6 provenance
   ok   8 release workflows pin an anchored, own-repo identity regexp at the Actions OIDC issuer
   ok   driftwood/exposure newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   driftwood/forward-intel newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   feeds/cve has no tag yet: looked for 'cve/vX.Y.Z' and 'vX.Y.Z' among 2 real tags -- queued for cut-release.yml
-  ok   feeds/eol has no tag yet: looked for 'eol/vX.Y.Z' and 'vX.Y.Z' among 2 real tags -- queued for cut-release.yml
-  ok   feeds/fx has no tag yet: looked for 'fx/vX.Y.Z' and 'vX.Y.Z' among 2 real tags -- queued for cut-release.yml
-  ok   feeds/market-moves has no tag yet: looked for 'market-moves/vX.Y.Z' and 'vX.Y.Z' among 2 real tags -- queued for cut-release.yml
-  ok   feeds/news has no tag yet: looked for 'news/vX.Y.Z' and 'vX.Y.Z' among 2 real tags -- queued for cut-release.yml
-  ok   feeds/threat-register newest tag threat-register/v2.0.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   ico/penalty-schema newest tag v3.0.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   feeds/cve has no tag yet: looked for 'cve/vX.Y.Z' and 'vX.Y.Z' among 3 real tags -- queued for cut-release.yml
+  ok   feeds/eol has no tag yet: looked for 'eol/vX.Y.Z' and 'vX.Y.Z' among 3 real tags -- queued for cut-release.yml
+  ok   feeds/fx has no tag yet: looked for 'fx/vX.Y.Z' and 'vX.Y.Z' among 3 real tags -- queued for cut-release.yml
+  ok   feeds/market-moves has no tag yet: looked for 'market-moves/vX.Y.Z' and 'vX.Y.Z' among 3 real tags -- queued for cut-release.yml
+  ok   feeds/news has no tag yet: looked for 'news/vX.Y.Z' and 'vX.Y.Z' among 3 real tags -- queued for cut-release.yml
+  ok   feeds/threat-register newest tag threat-register/v3.0.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   ico/penalty-schema newest tag v4.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   insurer/quote-driftwood newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   insurer/quote-ludlow newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   insurer/quote-tuppence newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
@@ -17,6 +17,6 @@ E2E step 6 provenance
   ok   nist/sp-800-53 newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/currency-controller newest tag v2.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/identity-substrate newest tag v2.0.1: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/policy newest tag policy/v4.0.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/policy newest tag policy/v5.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/exposure newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
 PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 18 lines the 8 release-shipping units declare in their own party.yaml publishes[], 13 newest tags matched a real Fulcio cert subject with its Rekor entry validated and 5 lines have no tag of their own shape yet

@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-10T05:56Z run=231 hub=6fd9cc1 enact=development units=[driftwood=a181725@main feeds=ca40396@main ico=9653fd9@main insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main platform=8da250d@main tuppence=bd15aae@main] pass=78 [observed=24 self=41 simulated=4 meta=9] fail=8 skip=31 [never=9 waits=22] excluded=8 total=125 ceiling=106
+# TRUTH 2026-09-10T09:12Z run=234 hub=be1229b enact=development units=[driftwood=a181725@main feeds=ca40396@threat-register/v3.0.0 ico=9653fd9@v4.0.0 insurer=61fba9d@main ludlow=2c2d740@main nist=f83126f@main platform=5b88f1d@policy/v5.0.0 tuppence=bd15aae@main] pass=79 [observed=25 self=41 simulated=4 meta=9] fail=9 skip=29 [never=10 waits=19] excluded=8 total=125 ceiling=106
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      or absent trust root refuses on the trust material and never on the network, cold and warm (I).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -11,7 +11,7 @@
 .estate-clone/feeds/verify-feeds.sh	PASS	PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed
 .estate-clone/feeds/verify-market-and-news.sh	PASS	PASS: market-moves publishes a dated series from one mechanical rule over one venue with no probability-shaped field, and its own threshold is what opens a PR; 
 .estate-clone/feeds/verify-news-headline-skill.sh	PASS	PASS: classify-and-judge is a human-run skill (disable-model-invocation) whose claim file carries only claim kinds the twin has and a derived_from that names ex
-.estate-clone/ico/.github/scripts/verify-declared-bump.sh	PASS	today would publish the number the reviewed file declares.
+.estate-clone/ico/.github/scripts/verify-declared-bump.sh	FAIL	FAIL: the declared bump in bump.yaml and the bump computed from the tree disagree
 .estate-clone/ico/schema/verify.sh	EXCLUDED	
 .estate-clone/ico/verify-certificate-identity-regexp.sh	PASS	and rejects every foreign org/repo/path and unanchored variant tried.
 .estate-clone/ico/verify-penalty-feed.sh	PASS	PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the four published 
@@ -27,14 +27,14 @@
 .estate-clone/nist/scripts/verify-cert-identity-regexp.sh	PASS	OK: EXPECTED_IDENTITY_REGEXP anchors org/repo/workflow and allows only main + release/<major>.<minor>.x
 .estate-clone/platform/access/verify-access.sh	EXCLUDED	
 .estate-clone/platform/break-glass/verify-break-glass.sh	PASS	verify-break-glass: done (offline; rides on the access plane — see ../access/verify-access.sh for the live IAP checks)
-.estate-clone/platform/compose/verify-composition.sh	SKIP	SKIP: the composed set renders policy versions the pinned parent commit does not contain; the header names a parent release that holds none of these trees. plat
+.estate-clone/platform/compose/verify-composition.sh	FAIL	FAIL: composition.py --selfcheck
 .estate-clone/platform/compose/verify-fresh.sh	PASS	PASS: verify-fresh.sh grades render-at-ref against the page served at the same ref: a fresh render passes, a hand-edited page fails, an artefact that moved unde
 .estate-clone/platform/computed-semver/verify-cage-engine.sh	PASS	selfcheck ok: dial_table parses the real cage-tier.yaml; UNCAGED sits at the top of the permissiveness lattice, every real tier below it, tighter tiers below lo
 .estate-clone/platform/computed-semver/verify-comparison-window.sh	PASS	selfcheck ok: a prerelease sorts below its own release and above the version beneath it (ticket 43's degraded publish); window_below filters and sorts ascending
 .estate-clone/platform/computed-semver/verify-corpus-generator.sh	PASS	PASS: corpus generator selfcheck ok, spine regenerates byte-identical, sample entry is a real Pod
 .estate-clone/platform/computed-semver/verify-coverage.sh	PASS	PASS: coverage selfcheck ok, wired correctly through the gate seam
 .estate-clone/platform/computed-semver/verify-gate.sh	PASS	selfcheck ok: the declared bump is read from the reviewed file and a declaration that disagrees with the number refuses; a degraded prerelease number is legal a
-.estate-clone/platform/computed-semver/verify-generator-standing-check.sh	PASS	ok  4.0.0: recomputes identically under the current generator
+.estate-clone/platform/computed-semver/verify-generator-standing-check.sh	PASS	ok  5.0.0: recomputes identically under the current generator
 .estate-clone/platform/computed-semver/verify-pairing.sh	PASS	selfcheck ok: parses YAML, never a text diff -- a comment-only change is no movement; pairing uses (identity, name-with-version-stripped), proven by two family 
 .estate-clone/platform/computed-semver/verify-rederive-bumps.sh	PASS	validationActions, never by watching the pass/fail move on a fixed corpus.
 .estate-clone/platform/computed-semver/verify-release-integrity.sh	PASS	selfcheck ok: rule 1 refuses a hand-edited HEAD copy of a released tree against its real tag, and refuses a missing tag rather than trusting HEAD; rule 2 refuse
@@ -46,7 +46,7 @@
 .estate-clone/platform/distribution/verify-infra-declaration.sh	PASS	PASS: the platform's infra declaration covers kube-system, flux-system and kyverno, entitled by the platform role on party.yaml, and no served policy body's unl
 .estate-clone/platform/distribution/verify-orphan-guard.sh	PASS	PASS: the orphan pair refuses nothing and leaves nothing uncaged. The guard is Audit and reports 9.9.9 by name; the SERVED 4.0.0 cage-tier does not match that p
 .estate-clone/platform/distribution/verify-render-version-tree.sh	PASS	      versions coexist, each judging only its own claim.
-.estate-clone/platform/distribution/verify-retirement.sh	FAIL	SKIP: distribution/versions.yaml declares 2 version(s) of which one CUT version (4.0.0) -- an uncut element has no tag and no served cage, so the orphan pair al
+.estate-clone/platform/distribution/verify-retirement.sh	SKIP	SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — retiring a version (one array deletion) pru
 .estate-clone/platform/engine/verify-engine.sh	SKIP	SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — Kyverno and flux-operator are pinned Flux H
 .estate-clone/platform/eud/verify-eud.sh	EXCLUDED	
 .estate-clone/platform/fair/verify-fair-tail.sh	PASS	bounded PERT at the same shock, and a malformed severity spec refuses.
@@ -67,7 +67,7 @@
 .estate-clone/platform/tcor/verify-tcor.sh	PASS	PASS: the board line is TCoR, it moves as the levers predict, and the four-move crossover is computed.
 .estate-clone/platform/verify-certificate-identity-regexp.sh	PASS	and rejects every foreign org/repo/path and unanchored variant tried.
 .estate-clone/platform/verify-cut-release-tags.sh	PASS	all (ticket 53).
-.estate-clone/platform/verify-first-gate-determined-release.sh	SKIP	SKIP: waiting for the owner to let cut-release.yml cut policy/v5.0.0 in Actions
+.estate-clone/platform/verify-first-gate-determined-release.sh	PASS	agree, and the signed tag resolves one commit ahead of the commit the array names.
 .estate-clone/platform/verify-publisher-gate.sh	SKIP	SKIP: part(s) c could not look -- the reason is on their own SKIP line above; every other part of the publisher gate was observed true
 .estate-clone/platform/verify-source-verification.sh	SKIP	SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — the gitsign verifier accepts this repo's ow
 .estate-clone/platform/wardley/verify-wardley.sh	PASS	planted violation is refused -- and the map update is a signed, tamper-evident commit.
@@ -87,13 +87,13 @@ verify/demo/verify-demo.sh	PASS	PASS: a deck builds from this run's captures and
 verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh	FAIL	FAIL: 1 problem(s) -- the register does not honestly account for the Deny-shaped rules this estate carries (ticket 89)
 verify/derived-status/verify-derived-status.sh	FAIL	FAIL: 1 fault(s) -- a ticket's Status: is typed rather than derived (ticket 59)
 verify/disclaimer/verify-disclaimer.sh	PASS	PASS: all eight parties say they are a demonstration on their signed artefact and their README, the two regulators carry the long form, nist attributes NIST's p
-verify/e2e/verify-e2e-step1-regulator-publishes.sh	SKIP	SKIP: ico/penalty-schema@4.0.0: waiting for tag v4.0.0 on ico (cut by cut-release.yml after merge)
+verify/e2e/verify-e2e-step1-regulator-publishes.sh	PASS	PASS: ico's newest penalty-schema envelope validates and its tag is on the real remote
 verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh	PASS	PASS: a SYNTHETIC pin bump (penalty-schema v3 -> v4, made here on a throwaway copy of driftwood, not driftwood's own merged history) re-prices driftwood's price
 verify/e2e/verify-e2e-step3-price-crosses-band-pr-opens.sh	PASS	PASS: a SYNTHETIC residual placed either side of driftwood's own signed appetite band of 40,000 GBP (20,000.00 -> 58,269.23 GBP, not driftwood's real priced pos
 verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh	SKIP	SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass
 verify/e2e/verify-e2e-step5-twin-forecasts.sh	SKIP	SKIP: the twin did not play a dated signal forward for every adopter: driftwood/twin/verify-twin-sweep-moved.sh could not look: SKIP: the moved path has not fir
 verify/e2e/verify-e2e-step6-provenance.sh	PASS	PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 18 lines the 8 release-shipping units declare in their own party.yam
-verify/e2e/verify-e2e-step7-honesty.sh	PASS	PASS: steps 1-6 each report one honest verdict (verdicts: SKIP PASS PASS SKIP SKIP PASS PASS)
+verify/e2e/verify-e2e-step7-honesty.sh	PASS	PASS: steps 1-6 each report one honest verdict (verdicts: PASS PASS PASS SKIP SKIP PASS PASS)
 verify/every-green/verify-every-green.sh	PASS	PASS: none of the 125 discovered verify scripts prints the SKIP verdict token and then reaches exit 0; the prose-worded could-not-look is not graded here (see t
 verify/feed-contract/verify-feed-contract.sh	SKIP	SKIP: insurer pins driftwood/feed/exposure@v1.1.0: the tree of v1.1.0 carries no exposure section in composed/HEADER.yaml -- the tag resolves, but not to the co
 verify/feed-contract/verify-untagged-pin-is-priced.sh	PASS	PASS: every adopter feed pin resolves to a tag that verifies under its publisher's own identity pins, or is priced as a hole under the adopter's own perspective
@@ -116,9 +116,9 @@ verify/refusal-by-another-name/verify-refusal-by-another-name.sh	PASS	PASS: ever
 verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Renovate raised threat-register v1 -> v2, Chris Nesbitt-Smith merged it, and party.yaml and composed/ moved together -- step 2 happened for
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
-verify/schedules/verify-schedules.sh	FAIL	FAIL: 3 schedule/cage check(s) observed false: insurer/fetch.yml ludlow tuppence
+verify/schedules/verify-schedules.sh	FAIL	FAIL: 4 schedule/cage check(s) observed false: feeds/fetch.yml insurer/fetch.yml ludlow tuppence
 verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=a181725 ludlow=2c2d740 tuppence=bd15aae]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
-verify/supersede/verify-supersede.sh	SKIP	SKIP: ludlow pins feeds/feed/threat-register@v1, behind v2 (threat-register/v2.0.0 on feeds's real remote): composed under platform v2.0.1, which carries no sup
+verify/supersede/verify-supersede.sh	SKIP	SKIP: driftwood pins ico/feed/penalty-schema@v3, behind v4 (v4.0.0 on ico's real remote): composed under platform v2.0.1, which carries no supersede rule, so no
 verify/tier-binding/verify-tier-binding.sh	PASS	PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform
 verify/trust-root/verify-the-committed-trust-root-is-dated.sh	PASS	PASS: every log platform's evidence names at each adopter's pin is carried by that adopter's own committed trust root inside the key's validFor window -- the ag
 verify/truth-line/verify-truth-line.sh	PASS	PASS: talk/verify-manifest.txt places every one of the 125 verify scripts this checkout discovers, the loader refuses a malformed or stale line, talk/verify-all

@@ -2,7 +2,7 @@
 == 1. single-tag legacy form still works ==
 ok: v1.0.0 does not exist yet
 tagged v1.0.0
-To /tmp/tmp.Kqzl8MdI69/remote.git
+To /tmp/tmp.bHOGUiLf4n/remote.git
  * [new tag]         v1.0.0 -> v1.0.0
 ok: v1.0.0 pushed
 
@@ -11,11 +11,11 @@ ok: v1.0.1 does not exist yet
 ok: v2.0.0 does not exist yet
 tagged v1.0.1
 tagged v2.0.0
-To /tmp/tmp.Kqzl8MdI69/remote.git
-   17c5cee..800eb74  HEAD -> main
+To /tmp/tmp.bHOGUiLf4n/remote.git
+   981e096..7337dd5  HEAD -> main
  * [new tag]         v1.0.1 -> v1.0.1
  * [new tag]         v2.0.0 -> v2.0.0
-ok: v1.0.1 and v2.0.0 both landed on the same commit (800eb74d7169394bbcf91098c3f7e9466e199e5c)
+ok: v1.0.1 and v2.0.0 both landed on the same commit (7337dd5483386c11be0b4d735bbb158a0626ce46)
 
 == 3. existing-tag refusal fires for EVERY tag before ANY tag is created ==
 ok: v3.0.0 does not exist yet
@@ -39,14 +39,14 @@ ok: policy/v4.0.1-quarantine.1 accepted and ordered below policy/v4.0.1; a suffi
 == 8. ticket 53: the branch lands with the tags, in the same atomic push -- or neither does ==
 ok: v10.0.0 does not exist yet
 tagged v10.0.0
-To /tmp/tmp.Kqzl8MdI69/remote.git
-   800eb74..213167a  HEAD -> main
+To /tmp/tmp.bHOGUiLf4n/remote.git
+   7337dd5..09de508  HEAD -> main
  * [new tag]         v10.0.0 -> v10.0.0
-ok: refs/heads/main on the remote moved to 213167aca0b36c847656f5d6f02906330e892b66, the same commit v10.0.0 points at
+ok: refs/heads/main on the remote moved to 09de508f23b92572b399047fb3151631e7989409, the same commit v10.0.0 points at
 tagged v11.0.0
 tagged v12.0.0
-ok: rejected push moved neither the tags nor refs/heads/main (still 213167aca0b36c847656f5d6f02906330e892b66)
-ok: a detached HEAD is refused; the remote holds neither v11.0.0 nor a moved refs/heads/main (still 213167aca0b36c847656f5d6f02906330e892b66)
+ok: rejected push moved neither the tags nor refs/heads/main (still 09de508f23b92572b399047fb3151631e7989409)
+ok: a detached HEAD is refused; the remote holds neither v11.0.0 nor a moved refs/heads/main (still 09de508f23b92572b399047fb3151631e7989409)
 
 PASS: single-tag legacy form works, multi-tag dispatch cuts every tag
 on the same commit, the existing-tag refusal runs for every tag before

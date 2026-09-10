@@ -53,8 +53,8 @@ ok  G: this gate verifies platform's real published bundle with NO network (exit
 
 == I: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm ==
 ok  I[genuine]: the copied gate with the real committed root ACCEPTS, cold (exit 0) -- the copy mechanism is sound
-ok  I[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.gZRPzj4E2D/gate-absent-roo
-ok  I[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.gZRPzj4E2D/gate-absent-roo
+ok  I[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.maLsihbAgo/gate-absent-roo
+ok  I[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.maLsihbAgo/gate-absent-roo
 ok  I[wrong-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  I[wrong-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  I[corrupt-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 

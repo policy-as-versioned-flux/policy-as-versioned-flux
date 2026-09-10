@@ -20,8 +20,5 @@ ok  (3) a clone of a repository that never released takes the first-release path
 ok  (3) ...and --tree names v1.0.0 as that first release
 
 == the real declaration against the real tree ==
-OK: declared bump 'major' == computed bump 'major' (v3.0.0 -> v4.0.0)
-
-PASS: the bump ladder holds on fixtures, and ico's own declared bump agrees with the
-bump computed from its published tree under its own rule.yaml -- so a release cut
-today would publish the number the reviewed file declares.
+FAIL: /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/ico/penalty-schema/v5/feed.json does not exist -- the tag names a feed version this repository has not published
+FAIL: the declared bump in bump.yaml and the bump computed from the tree disagree
