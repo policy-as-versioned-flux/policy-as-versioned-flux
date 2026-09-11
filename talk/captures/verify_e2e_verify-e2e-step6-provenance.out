@@ -15,8 +15,8 @@ E2E step 6 provenance
   ok   insurer/quote-tuppence newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   ludlow/exposure newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   nist/sp-800-53 newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/currency-controller newest tag v3.0.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/identity-substrate newest tag v3.0.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/currency-controller newest tag v3.2.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/identity-substrate newest tag v3.2.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/policy newest tag policy/v5.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/exposure newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
 PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 18 lines the 8 release-shipping units declare in their own party.yaml publishes[], 13 newest tags matched a real Fulcio cert subject with its Rekor entry validated and 5 lines have no tag of their own shape yet

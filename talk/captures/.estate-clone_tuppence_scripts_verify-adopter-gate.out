@@ -46,7 +46,7 @@ ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none')
   setup: tagged policy/v4.0.0 in the throwaway clone (the real repo waits on CI to sign it)
   setup: tagged policy/v5.0.0 in the throwaway clone (the real repo waits on CI to sign it)
 ok  'v2.0.0' is not a policy tag -- not this gate's subject, skipped
-signed: /tmp/tmp.jvilNIOB4V/clone/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.vFgIWwetgg/clone/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -56,7 +56,7 @@ signed: /tmp/tmp.jvilNIOB4V/clone/computed-semver/evidence/9.0.0.json.bundle
 GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
 GATE: passed for policy/v9.0.0
 committed: signed release-gate evidence for v2.0.0, policy/v9.0.0
-committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 5522a164ba7578cecd282dab96aa6481121c0b05
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 7aa0910963c011b20cc276d5317954cd9039238e
 tagged v2.0.0
 tagged policy/v9.0.0
 ok  'v3.0.0' is not a policy tag -- not this gate's subject, skipped
@@ -67,7 +67,7 @@ tagged v3.0.0
 ok  one real gated release (9.0.0, real evidence), plus three real array-level releases (unchanged, retired, returned), real tags v2.0.0/v2.1.0/v3.0.0/v4.0.0
 
 == Scenario A: real PASS -- the pin moves (v2.0.0 -> v2.1.0) and the array does not, so this bump adds and retires nothing and composes 'none' (eco-system ticket 99) ==
-ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (e3f947cb93c953fa3cb14c71dd0347512b0f8408)
+ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (8d59be5cc292b9379255f75bb2c5fbbb25402887)
 declared (platform tag v2.0.0 -> v2.1.0): minor
 composed (this institution, over what this pull request moves -- added [], retired []; window at the head is ['9.0.0']): none
 this pull request adds and retires no policy version, so it composes 'none' -- whether a major already stands in the window is reported continuously by the hub's verify-unreviewed-major-in-window.sh, not by this gate (eco-system ticket 99)
@@ -76,7 +76,7 @@ PASS: composed bump 'none' does not exceed major; v2.1.0 may be adopted
 ok  A: a bump that adds and retires nothing composes none and passes, folding no standing version
 
 == Scenario A2: real PASS -- 9.0.0 ARRIVES in the array (v3.0.0 -> v4.0.0), and the arrival's bump is RE-READ out of the publisher's own real committed evidence, never recomputed ==
-ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (8d3235264699bdfab4ccaaa39161a499dbf57566)
+ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (23930e5a187ec2561d88a1b349f8e983347ded20)
 declared (platform tag v3.0.0 -> v4.0.0): major
 composed (this institution, over what this pull request moves -- added ['9.0.0'], retired []; window at the head is ['9.0.0']): patch
 NOTE: composed bump ('patch') is weaker than the publisher's tag ('major') -- informational only, this institution's obligation is never lowered by a local view
@@ -89,7 +89,7 @@ ok  A-render: a no-movement bump renders as no movement, no percentage anywhere
 
 == Scenario B: real FAIL -- 9.0.0 retires with nothing replacing it, composed forced major ==
 FAIL: composed bump is major -- refusing to adopt v3.0.0 without human review
-ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (69359c004051368cdba4ebb1a5b5c34d036a0324)
+ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (429c8f8883997bbb0d77051d9d9639f657f7bc00)
 declared (platform tag v2.1.0 -> v3.0.0): major
 composed (this institution, over what this pull request moves -- added [], retired ['9.0.0']; window at the head is []): major
 RETIRED, reaching this institution as major: 9.0.0
@@ -105,8 +105,8 @@ ok  G: this gate verifies platform's real published bundle with NO network (exit
 
 == Scenario H: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm ==
 ok  H[genuine]: the copied gate with the real committed root ACCEPTS, cold (exit 0) -- the copy mechanism is sound
-ok  H[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.jvilNIOB4V/gate-absent-roo
-ok  H[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.jvilNIOB4V/gate-absent-roo
+ok  H[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.vFgIWwetgg/gate-absent-roo
+ok  H[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.vFgIWwetgg/gate-absent-roo
 ok  H[wrong-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  H[wrong-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  H[corrupt-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: structure error: tag

@@ -1,6 +1,16 @@
 PASS: composition.py emits none of new-hole, baseline-widening, new-ungoverned-namespace
 PASS: party schema.json admits overlay.controls as bare ids and `party:id`, and says an addition is priced, never refused
-SKIP: driftwood: composed/evidence.json carries no deltas[] — it was composed under the refusal shape; re-composing an adopter is an enactment push the owner makes
-SKIP: ludlow: composed/evidence.json carries no deltas[] — it was composed under the refusal shape; re-composing an adopter is an enactment push the owner makes
-SKIP: tuppence: composed/evidence.json carries no deltas[] — it was composed under the refusal shape; re-composing an adopter is an enactment push the owner makes
-SKIP: driftwood: composed/evidence.json carries no deltas[] — it was composed under the refusal shape; re-composing an adopter is an enactment push the owner makes
+PASS: driftwood: no new-hole, baseline-widening or new-ungoverned-namespace refusal
+PASS: driftwood: 285 hole(s) keyed (source, id) under driftwood/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
+PASS: driftwood regime entry (penalty-schema): all 4 weighted holes carry the adopter's status (recorded)
+PASS: driftwood: 0 delta(s), each one of the 7 kinds under driftwood/GBP, matching the holes and namespaces they report
+PASS: ludlow: no new-hole, baseline-widening or new-ungoverned-namespace refusal
+PASS: ludlow: 285 hole(s) keyed (source, id) under ludlow/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
+PASS: ludlow regime entry (penalty-schema): all 4 weighted holes carry the adopter's status (recorded)
+PASS: ludlow: 0 delta(s), each one of the 7 kinds under ludlow/GBP, matching the holes and namespaces they report
+PASS: tuppence: no new-hole, baseline-widening or new-ungoverned-namespace refusal
+PASS: tuppence: 285 hole(s) keyed (source, id) under tuppence/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
+PASS: tuppence ungoverned tuppence-reset: 9,262,365.33 GBP = 3/3 workloads x ramp 1.0082 from since 2026-08-25 as of 2026-08-28, of 9,262,365.33, bounded at the whole residual
+PASS: tuppence regime entry (penalty-schema): all 4 weighted holes carry the adopter's status (recorded)
+PASS: tuppence: 0 delta(s), each one of the 7 kinds under tuppence/GBP, matching the holes and namespaces they report
+PASS: no hole, widening or ungoverned namespace refuses; each is a priced delta keyed (source, id), the ungoverned share ramps from a signed since and stays within the residual, and only a bespoke control with no scenario still refuses

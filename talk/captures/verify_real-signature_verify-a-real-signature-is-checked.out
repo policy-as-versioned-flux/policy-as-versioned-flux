@@ -2,8 +2,8 @@
 ... ludlow
 ... tuppence
 ok: platform checked out at v2.0.1 (533dccb0a823); the served artefact is its own published evidence for policy 2.0.1
-ok: the same tag re-cut with one base64 character of policy 2.0.1's real signature changed (7048f8ddaee6) -- nothing else moved, so a gate that adopts it adopted an unverified signature
-ok: the same tag re-cut with ONE BYTE APPENDED to policy 2.0.1's evidence document (a9aafaadb86e) -- it parses to the identical object and platform's own signature is untouched, so the only thing that can refuse it is the digest that signature covers
+ok: the same tag re-cut with one base64 character of policy 2.0.1's real signature changed (aa584a403fc5) -- nothing else moved, so a gate that adopts it adopted an unverified signature
+ok: the same tag re-cut with ONE BYTE APPENDED to policy 2.0.1's evidence document (7a8784689b80) -- it parses to the identical object and platform's own signature is untouched, so the only thing that can refuse it is the digest that signature covers
 note: driftwood: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed
 note: ludlow: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed
 note: tuppence: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed

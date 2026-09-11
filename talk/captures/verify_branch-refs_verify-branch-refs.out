@@ -5,6 +5,7 @@ PASS: driftwood/cut-release.yml checks out policy-as-versioned-feeds/feeds at th
 PASS: driftwood/cut-release.yml checks out policy-as-versioned-insurer/insurer at the tag driftwood pins it to (v1.0.0)
 PASS: driftwood/drift-sample.yml checks out policy-as-versioned-platform/platform at the tag driftwood pins it to (v2.0.1)
 PASS: driftwood/propose-tier.yml checks out policy-as-versioned-platform/platform at the tag driftwood pins it to (v2.0.1)
+PASS: driftwood/propose-tier.yml checks out policy-as-versioned-platform/platform at the tag driftwood pins it to (v2.0.1)
 PASS: driftwood/propose-tier.yml checks out policy-as-versioned-nist/nist at the tag driftwood pins it to (v1.1.0)
 PASS: driftwood/propose-tier.yml checks out policy-as-versioned-ico/ico at the tag driftwood pins it to (v3.0.0)
 PASS: driftwood/propose-tier.yml checks out policy-as-versioned-feeds/feeds at the tag driftwood pins it to (threat-register/v2.0.0)
@@ -29,6 +30,7 @@ PASS: ludlow/cut-release.yml checks out policy-as-versioned-ico/ico at the tag l
 PASS: ludlow/cut-release.yml checks out policy-as-versioned-feeds/feeds at the tag ludlow pins it to (threat-register/v1.0.0)
 PASS: ludlow/drift-sample.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
 PASS: ludlow/propose-tier.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
+PASS: ludlow/propose-tier.yml checks out policy-as-versioned-platform/platform at the tag ludlow pins it to (v2.0.1)
 PASS: ludlow/propose-tier.yml checks out policy-as-versioned-nist/nist at the tag ludlow pins it to (v1.1.0)
 PASS: ludlow/propose-tier.yml checks out policy-as-versioned-ico/ico at the tag ludlow pins it to (v3.0.0)
 PASS: ludlow/propose-tier.yml checks out policy-as-versioned-feeds/feeds at the tag ludlow pins it to (threat-register/v1.0.0)
@@ -37,11 +39,13 @@ PASS: ludlow/shift-left.yml checks out policy-as-versioned-platform/platform at 
 PASS: ludlow/shift-left.yml checks out policy-as-versioned-nist/nist at the tag ludlow pins it to (v1.1.0)
 PASS: ludlow/shift-left.yml checks out policy-as-versioned-ico/ico at the tag ludlow pins it to (v3.0.0)
 PASS: ludlow/shift-left.yml checks out policy-as-versioned-feeds/feeds at the tag ludlow pins it to (threat-register/v1.0.0)
+SKIP: ludlow/twin-sweep.yml checks out policy-as-versioned-flux/policy-as-versioned-flux: flux has cut no tag at all, so there is no signed version to pin to -- the consumer is not at fault and this is not a pass
 PASS: tuppence/cut-release.yml checks out policy-as-versioned-platform/platform at the tag tuppence pins it to (v2.0.1)
 PASS: tuppence/cut-release.yml checks out policy-as-versioned-nist/nist at the tag tuppence pins it to (v1.1.0)
 PASS: tuppence/cut-release.yml checks out policy-as-versioned-ico/ico at the tag tuppence pins it to (v3.0.0)
 PASS: tuppence/cut-release.yml checks out policy-as-versioned-feeds/feeds at the tag tuppence pins it to (threat-register/v1.0.0)
 PASS: tuppence/drift-sample.yml checks out policy-as-versioned-platform/platform at the tag tuppence pins it to (v2.0.1)
+PASS: tuppence/propose-tier.yml checks out policy-as-versioned-platform/platform at the tag tuppence pins it to (v2.0.1)
 PASS: tuppence/propose-tier.yml checks out policy-as-versioned-platform/platform at the tag tuppence pins it to (v2.0.1)
 PASS: tuppence/propose-tier.yml checks out policy-as-versioned-nist/nist at the tag tuppence pins it to (v1.1.0)
 PASS: tuppence/propose-tier.yml checks out policy-as-versioned-ico/ico at the tag tuppence pins it to (v3.0.0)
@@ -51,4 +55,5 @@ PASS: tuppence/shift-left.yml checks out policy-as-versioned-platform/platform a
 PASS: tuppence/shift-left.yml checks out policy-as-versioned-nist/nist at the tag tuppence pins it to (v1.1.0)
 PASS: tuppence/shift-left.yml checks out policy-as-versioned-ico/ico at the tag tuppence pins it to (v3.0.0)
 PASS: tuppence/shift-left.yml checks out policy-as-versioned-feeds/feeds at the tag tuppence pins it to (threat-register/v1.0.0)
+SKIP: tuppence/twin-sweep.yml checks out policy-as-versioned-flux/policy-as-versioned-flux: flux has cut no tag at all, so there is no signed version to pin to -- the consumer is not at fault and this is not a pass
 SKIP: driftwood/twin-sweep.yml checks out policy-as-versioned-flux/policy-as-versioned-flux: flux has cut no tag at all, so there is no signed version to pin to -- the consumer is not at fault and this is not a pass

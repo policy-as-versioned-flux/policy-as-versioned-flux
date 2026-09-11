@@ -13,19 +13,23 @@ PASS: tuppence selects no tier through a selection-policy package and its eviden
 PASS: the FX bridge reads the publisher's own converter: GBP->AUD on 2026-08-15 is 1.936, the rate the signed fx feed publishes, recorded against feeds's fx feed 1.0.0
 PASS: a date the fx feed does not publish (2025-08-15) refuses as a missing instrument, and prices nothing (ADR-0020)
 PASS: the composer was RUN, not read: exposure_section over a synthetic two-line book (100.00 + 200.00 GBP, both at tier `baseline`, against a 1.00 GBP band) came back with the exact sentence ticket 75 Q4 (a) settled and the aggregate that book has to produce -- 210.00 GBP, breaches_band=True -- not merely with a non-empty string and some number
-SKIP: driftwood serves a total of 3,704,381.74 GBP carrying no `ordinal` and no `aggregate`: composition.py writes both, and this adopter was composed under platform v2.0.1, which predates them. It waits on the owner's next signed platform tag and on this adopter's pin moving to it; nothing here may be re-rendered from an untagged branch (eco-system ticket 79 items 9 and 10)
-SKIP: ludlow serves a total of 9,358,020.80 GBP carrying no `ordinal` and no `aggregate`: composition.py writes both, and this adopter was composed under platform v2.0.1, which predates them. It waits on the owner's next signed platform tag and on this adopter's pin moving to it; nothing here may be re-rendered from an untagged branch (eco-system ticket 79 items 9 and 10)
-SKIP: tuppence serves a total of 9,262,365.33 GBP carrying no `ordinal` and no `aggregate`: composition.py writes both, and this adopter was composed under platform v2.0.1, which predates them. It waits on the owner's next signed platform tag and on this adopter's pin moving to it; nothing here may be re-rendered from an untagged branch (eco-system ticket 79 items 9 and 10)
+PASS: driftwood serves a total of 3,704,381.74 GBP that says what it is -- an ordinal, auditable comparison under one perspective; not an expected annual loss -- with the aggregate of its selected-tier residuals (87387.44860430132) beside a tolerance of 40000.0
+PASS: ludlow serves a total of 9,358,020.80 GBP that says what it is -- an ordinal, auditable comparison under one perspective; not an expected annual loss -- with the aggregate of its selected-tier residuals (187160.41596698554) beside a tolerance of 5000.0
+PASS: tuppence serves a total of 9,262,365.33 GBP that says what it is -- an ordinal, auditable comparison under one perspective; not an expected annual loss -- with the aggregate of its selected-tier residuals (185247.30663334212) beside a tolerance of 15000.0
+FAIL: driftwood prices[5]: carries no numeric amount, so nothing can be restated per customer or summed
 PASS: driftwood: one twin edge, policy 1.1.0, curve sha256:70e5e, tail bounded-pert, perspective driftwood in GBP
 PASS: driftwood regime entry (penalty-schema): 4 priced hole(s) sum to its total 1,787,177.08 GBP
+FAIL: driftwood regime entry (penalty-schema): carries no holes[] — a regime price is the sum of its holes, so implementing one reduces it (ticket 15 answer 1)
 PASS: driftwood: every list of amounts in the document is one perspective in one currency
 PASS: driftwood: selection policy 1.1.0 matches driftwood/selection-policy/VERSION
 PASS: ludlow: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
 PASS: ludlow regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP
+FAIL: ludlow regime entry (penalty-schema): carries no holes[] — a regime price is the sum of its holes, so implementing one reduces it (ticket 15 answer 1)
 PASS: ludlow: every list of amounts in the document is one perspective in one currency
 PASS: ludlow: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
 PASS: tuppence: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
 PASS: tuppence regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP
+FAIL: tuppence regime entry (penalty-schema): carries no holes[] — a regime price is the sum of its holes, so implementing one reduces it (ticket 15 answer 1)
 PASS: tuppence: every list of amounts in the document is one perspective in one currency
 PASS: tuppence: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
-SKIP: driftwood serves a total of 3,704,381.74 GBP carrying no `ordinal` and no `aggregate`: composition.py writes both, and this adopter was composed under platform v2.0.1, which predates them. It waits on the owner's next signed platform tag and on this adopter's pin moving to it; nothing here may be re-rendered from an untagged branch (eco-system ticket 79 items 9 and 10)
+FAIL: 4 £-seam check(s) observed false

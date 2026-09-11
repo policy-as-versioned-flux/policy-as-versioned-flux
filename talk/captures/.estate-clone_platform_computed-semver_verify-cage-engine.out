@@ -1,2 +1,105 @@
   ok   selfcheck: with kyverno unreachable this script exits 3 and its last line is SKIP:
 selfcheck ok: dial_table parses the real cage-tier.yaml; UNCAGED sits at the top of the permissiveness lattice, every real tier below it, tighter tiers below looser ones; a dial tightening classifies major and names the moved corpus entries and the dial CEL expression (never an enumerated dial list); a widen-only change is patch; no change is none; one field regressing while another improves is still major (spec-level, not dial-level); priorityClass ranks on the ACTUAL assigned PriorityClass's real value, so a tier's pc field repointed at a different PriorityClass registers as major even with every other dial untouched (cs-21 regression guard); cage-tier added/removed fall out of the same per-pod comparison with no special case; the major detail is one sentence with no viability language; Track 1 reuses rederive_bumps.classify_policy unchanged; classify_repo reproduces the three known-good bumps; a whole-body release whose only movement is a policy removal computes patch; cs-16: a self-scoped pair (real render-version-tree.py bodies, real generated corpus, real kyverno apply) differing ONLY in the version literal classifies 'none', never the old spurious 'major' the vacuous self-scope match used to produce, and a real narrowing bundled with the same version bump still classifies 'major' -- the fix removes the artifact without suppressing real movement; ticket 09 item 2: the real v3.0.0 -> v4.0.0 cage release computes major against the real committed corpus and names both real reasons (the tier source moved to namespaceObject, so a governed Namespace with no tier falls closed to isolated and a forged pod label is clobbered; and the cage became tighten-only), and a body that starts writing false over a workload's own true -- invisible to a dial-table comparison, proven identical first -- classifies major as a loosening
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 1.055s
+
+OK
+{
+  "schema": 1,
+  "scope": "published-cage-fixtures-v1",
+  "outcome": "passed",
+  "engine": {
+    "name": "kyverno",
+    "version": "1.18.2",
+    "sha256": "791e5a4a68e50823f0c101761acfa7976f49c4c073a8b3d1e15b4461a4e21124"
+  },
+  "rows": [
+    {
+      "policy_version": "4.0.0",
+      "tag": "policy/v4.0.0",
+      "array_commit": "64635dfdff3a835e7b0c2e51eae0650951ef2607",
+      "tag_commit": "1d8cec2977f3ce0120f319c93e5032f960c5164c",
+      "policy_tree": "c744b68f5216951b49195116b6e9b1c17f47017c",
+      "fixtures_tree": "929c51142433520a87100eb66c716c628f76ebf9",
+      "policy_sha256": "e5380d776f5c7d2e56aec1eb2f615339ccf458f8da2d896a82b6cb1049005469",
+      "api_versions": [
+        "kustomize.config.k8s.io/v1beta1",
+        "policies.kyverno.io/v1alpha1",
+        "scheduling.k8s.io/v1"
+      ],
+      "prerelease_api_versions": [
+        "kustomize.config.k8s.io/v1beta1",
+        "policies.kyverno.io/v1alpha1"
+      ],
+      "matrices": [
+        {
+          "family": "cage-tier",
+          "outcome": "passed",
+          "passed_assertions": 13,
+          "failed_assertions": 0,
+          "exit_code": 0,
+          "output_sha256": "a22b724bfb65ebdf26f4a0f0c4f429e4bb2e00dcc163043546936b64eb19bbbd",
+          "diagnostic": null
+        },
+        {
+          "family": "cage-netpol",
+          "outcome": "passed",
+          "passed_assertions": 11,
+          "failed_assertions": 0,
+          "exit_code": 0,
+          "output_sha256": "abcaeaa7c553a3f7be7cc796715d0ae307b2c58188406dd2b6830a8f343d6419",
+          "diagnostic": null
+        }
+      ],
+      "outcome": "passed"
+    },
+    {
+      "policy_version": "5.0.0",
+      "tag": "policy/v5.0.0",
+      "array_commit": "597f214bcdf10a77c957debc7e8a7842e1156fb8",
+      "tag_commit": "5b88f1d0bb33274e3348db93645d972c893b3c2c",
+      "policy_tree": "a8468fb3e156f91f826750dd543ba6e1bfa99439",
+      "fixtures_tree": "1a5beae73c2259fd786d3a616ea9ad4de928938b",
+      "policy_sha256": "6b61be47ded40234f73366ecaf9855c3dd58bb62b24f355a2fb04d91d3b2b9b5",
+      "api_versions": [
+        "kustomize.config.k8s.io/v1beta1",
+        "policies.kyverno.io/v1alpha1",
+        "scheduling.k8s.io/v1"
+      ],
+      "prerelease_api_versions": [
+        "kustomize.config.k8s.io/v1beta1",
+        "policies.kyverno.io/v1alpha1"
+      ],
+      "matrices": [
+        {
+          "family": "cage-tier",
+          "outcome": "passed",
+          "passed_assertions": 13,
+          "failed_assertions": 0,
+          "exit_code": 0,
+          "output_sha256": "fbdf996b79f278c22278c0137dc77e0d9d9ac5e4f572de1bced81ec8aa07c458",
+          "diagnostic": null
+        },
+        {
+          "family": "cage-netpol",
+          "outcome": "passed",
+          "passed_assertions": 11,
+          "failed_assertions": 0,
+          "exit_code": 0,
+          "output_sha256": "754598946f23f9c43056ca65567e9749da14ffccff22f1a17778f0f1d9ca2165",
+          "diagnostic": null
+        }
+      ],
+      "outcome": "passed"
+    }
+  ],
+  "limits": [
+    "Only the released cage-tier mutation and cage-netpol generation fixtures are graded; no complete policy, validation, Kubernetes admission or live network compatibility claim.",
+    "Exact CLI versions only; no patch range, Kubernetes version or adopter runtime is inferred.",
+    "Tag signature verification remains the provenance gate; this check binds tag and array policy trees.",
+    "Executable SHA256 identifies this run; binary authenticity rests on the caller checksum pin.",
+    "This evidence changes no policy body, policy bump, money, or release authorization."
+  ]
+}
+PASS: published cage fixture compatibility -- passed

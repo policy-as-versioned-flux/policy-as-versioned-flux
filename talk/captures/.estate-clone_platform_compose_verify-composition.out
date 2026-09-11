@@ -1,7 +1,19 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ......
 ----------------------------------------------------------------------
-Ran 6 tests in 2.996s
+Ran 6 tests in 4.278s
+
+OK
+[1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 7.209s
+
+OK
+[1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 7.643s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the one remaining refusal)
@@ -18,11 +30,11 @@ OK (e) driftwood's exposure.total of 3704381.74 GBP says what it is ('an ordinal
 OK pin signature: the real driftwood's quote pin resolves to the insurer's signed tag v1.0.0 on the checkout, and carries no hole
 OK pin signature: only a checkout that can show the publisher's tag namespace may say `untagged` -- no tag at all, a lightweight tag and a flattened annotated tag all read `unobserved`; an annotated tag with no signature block is untagged
 OK untagged pin: a quote pinned at a version no tag on the insurer's checkout signs composes (no refusal) with a hole of its own premium (113403.30 GBP) under driftwood's perspective, printed as a new-untagged-pin delta
-OK untagged pin: a second composition records the hole and prints no delta
+OK untagged pin: identical composition preserves the opening delta for replay
 OK unobserved pin: a parent tree with no git metadata, and a checkout carrying no tag at all, both read `unobserved` -- they keep a recorded hole and open none, a could-not-look and never a signature
 OK unobserved pin: a real signed tag flattened onto its commit by a second fetch reads `unobserved` and books NO hole -- a fabricated hole is worse than a missed one, and the fetch is the workflow's to fix (ticket 69)
-OK closed pin: composing against the insurer's real signed tag closes the hole, prints one closed-untagged-pin delta, and the next composition carries no hole -- the hole heals itself when the tag lands
-OK untagged pin: every object the engine applies is byte-identical across untagged, recorded and unobserved -- signature state lives in the evidence, never the enforced render -- and the handbook, which nothing applies, names the hole as untagged-pin `insurer/quote-driftwood@v2` with its premium while it is open and drops it once it heals
+OK closed pin: composing against the insurer's real signed tag closes the hole, prints one closed-untagged-pin delta, and the next composition retains the closure transition so its handbook replays
+OK untagged pin: every object the engine applies is byte-identical across untagged, recorded and unobserved -- signature state lives in the evidence, never the enforced render -- and the handbook, which nothing applies, names the hole as untagged-pin `insurer/quote-driftwood@v2` with its premium while open and explicitly records its closure
 OK prices[]: the one summing helper refuses a list that crosses a perspective or a currency -- no number in this estate is a lie by addition
 OK prices[]: driftwood's own forward-intel feed prices as one source:twin entry -- perspective driftwood, GBP, tail bounded-pert, curve sha256:70e5e, policy version 1.1.0
 OK prices[]: an adopter with no forward-intel feed simply has no twin entry -- a missing twin feed is never a refusal (ticket 25)
@@ -148,6 +160,22 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
   "ungoverned": [],
   "prices": [],
   "deltas": [],
+  "floor_change": {
+    "schema": 1,
+    "before": {
+      "known": false
+    },
+    "after": {
+      "known": true,
+      "value": null
+    },
+    "changed": null,
+    "basis": "floor-only counterfactual at current publisher, scenario, appetite and selection inputs",
+    "residual_basis": "platform-cage-tiers@1.0.0",
+    "lines": [],
+    "could_not_look": "previous floor was not recorded; absence of history is not an absent floor",
+    "limit": "selection evidence, not an enacted Namespace tier; platform reductions are self-declared calibration, not measured effectiveness"
+  },
   "limits": [
     {
       "name": "two-publisher-conflict",
@@ -3311,6 +3339,49 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
     }
   ],
   "deltas": [],
+  "floor_change": {
+    "schema": 1,
+    "before": {
+      "known": false
+    },
+    "after": {
+      "known": true,
+      "value": null
+    },
+    "changed": null,
+    "basis": "floor-only counterfactual at current publisher, scenario, appetite and selection inputs",
+    "residual_basis": "platform-cage-tiers@1.0.0",
+    "lines": [
+      {
+        "source": "ico",
+        "kind": "feed",
+        "name": "penalty-schema",
+        "perspective": "driftwood",
+        "currency": "GBP",
+        "uncaged_amount": 1787177.0751717847,
+        "before_tier": null,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "after_residual": 35743.54150343573,
+        "residual_delta": null
+      },
+      {
+        "source": "feeds",
+        "kind": "feed",
+        "name": "threat-register",
+        "perspective": "driftwood",
+        "currency": "GBP",
+        "uncaged_amount": 19558.549772440045,
+        "before_tier": null,
+        "after_tier": "baseline",
+        "before_residual": null,
+        "after_residual": 13690.98484070803,
+        "residual_delta": null
+      }
+    ],
+    "could_not_look": "previous floor was not recorded; absence of history is not an absent floor",
+    "limit": "selection evidence, not an enacted Namespace tier; platform reductions are self-declared calibration, not measured effectiveness"
+  },
   "limits": [
     {
       "name": "two-publisher-conflict",
@@ -3532,18 +3603,18 @@ OK prices[]: a threat-register bump (v1 -> v2) moves tuppence's exposure through
 OK prices[]: a fixture ico band (v1->v2) that crosses driftwood's real GBP40,000 tolerance prints a proposed tier through compose() (isolated -> quarantine, changed=True), marked as a label; no rendered POLICY file changes and the handbook names the proposed tier `quarantine`, which it did not before the bump
 OK prices[]: one `switching` entry per feed edge, each measured by re-composing with that publisher's edges dropped -- ico's costs its whole regime line, the threat publisher's is not a number at all because driftwood's own twin borrows that feed's LEF and stops pricing without it, and the insurer's moves the exposure by nothing and names the premium it would lose instead of folding it in
 OK composed/feeds/: every priced payload, the publisher's own party artefact and the converter that priced it are vendored under the adopter's own signature, digested into a PROVENANCE.json the header names, with the converter's real source party recorded and a quote feed's absent converter named rather than faked
-OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed, and every one of the 31 files it RENDERS comes back byte-identical -- 11 of them the vendored tree itself, the rest the composed policy set and composed/HEADER.yaml with its parent SHAs. composed/evidence.json is not among them: it is written from the document rather than rendered, and its prices are the comparison just above. The substitution prints as an open limit, and a tampered vendored payload refuses against the digest its own tag signed
+OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed, and every one of the 32 files it RENDERS comes back byte-identical -- 11 of them the vendored tree itself, the rest the composed policy set and composed/HEADER.yaml with its parent SHAs. composed/evidence.json is not among them: it is written from the document rather than rendered, and its prices are the comparison just above. The substitution prints as an open limit, and a tampered vendored payload refuses against the digest its own tag signed
 OK composed/feeds/: each vendored copy records the exact command that priced it and the digest of what that command returned -- and replaying it against the vendored payload alone, in a bare directory, reproduces the digest for penalty-schema, threat-register
 OK prices[]: no entry carries the absolute path of the machine that composed it -- the twin's own refusal travels into the signed artefact naming `twin/forward-intel/v1/feed.json`, which reads the same on every runner
 OK switching: an edge signed AFTER every pinned envelope moves the composition's as-of to that day (its own life 0 months, its siblings' measured up to it), a --as-of EARLIER than a signed since refuses naming both dates rather than reporting the window's absolute size; and on today's estate every pin was signed the day of the newest feed publication, so the window is 0 months and over_pin_life is 0.0 -- arithmetic over two signed dates, not a placeholder
 OK switching: a feed edge carrying no `since` refuses as a missing instrument naming the edge -- a pin's life is a window between two signed dates, never a default
 Traceback (most recent call last):
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 6951, in <module>
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 7070, in <module>
     sys.exit(main(sys.argv))
              ^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 4240, in main
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 4358, in main
     selfcheck()
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 6630, in selfcheck
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 6747, in selfcheck
     assert len(sups) == 1, sups
            ^^^^^^^^^^^^^^
 AssertionError: [{'source': 'ico', 'kind': 'supersede', 'perspective': 'tuppence', 'currency': 'GBP', 'amount': 0.0, 'per_customer': None, 'name': 'penalty-schema', 'version': 'v3', 'newer': {'version': 'v4', 'tag': 'v4.0.0', 'tagged': '2026-09-10', 'published_at': '2026-09-09', 'since_tag': 'v4.0.0', 'since': '2026-09-10'}, 'since': '2026-09-10', 'as_of': '2026-08-28', 'ramp': 1.0, 'base': 9039791.01976426, 'proposed_tier': None, 'changed': False, 'basis': "the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge the feeds module's EOL ramp puts on a version its publisher has superseded, +1x per year behind and capped at +4x, where `since` is the day the newer major's signing tag was cut; zero on that day, printed with both dates, and never summed into the exposure the line itself is already in", 'limits': ["zero (as_of 2026-08-28 precedes the tag day 2026-09-10): the signed artefact's as-of is its newest signed input; only a re-composition --as-of a later day (the scheduled proposer's) grows this line"], 'detail': 'tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut'}, {'source': 'feeds', 'kind': 'supersede', 'perspective': 'tuppence', 'currency': 'GBP', 'amount': 0.0, 'per_customer': None, 'name': 'threat-register', 'version': 'v1', 'newer': {'version': 'v3', 'tag': 'threat-register/v3.0.0', 'tagged': '2026-09-10', 'published_at': '2026-09-09', 'since_tag': 'threat-register/v2.0.0', 'since': '2026-09-01'}, 'since': '2026-09-01', 'as_of': '2026-08-28', 'ramp': 1.0, 'base': 222574.31190283748, 'proposed_tier': None, 'changed': False, 'basis': "the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge the feeds module's EOL ramp puts on a version its publisher has superseded, +1x per year behind and capped at +4x, where `since` is the day the newer major's signing tag was cut; zero on that day, printed with both dates, and never summed into the exposure the line itself is already in", 'limits': ["zero (as_of 2026-08-28 precedes the tag day 2026-09-01): the signed artefact's as-of is its newest signed input; only a re-composition --as-of a later day (the scheduled proposer's) grows this line"], 'detail': 'tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v1; behind since 2026-09-01, the day threat-register/v2.0.0 was cut'}]
