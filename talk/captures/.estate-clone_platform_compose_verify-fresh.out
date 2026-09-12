@@ -3,7 +3,7 @@
   ok   render() returns a non-empty page from an artefact
   ok   render() is a pure function of its inputs (same bytes from another cwd, another environment, a moment later)
   ok   render() gives the same bytes from a separate process under an emptied environment, a random PYTHONHASHSEED and a fresh cwd
-  ok   the page carries no wall-clock date (2026-09-11 does not appear)
+  ok   the page carries no wall-clock date (2026-09-12 does not appear)
   ok   changing a parent's sha changes the render
   ok   changing a price amount changes the render
   ok   changing a limit's status changes the render
@@ -49,7 +49,7 @@
   ok   an artefact with a refused composition is refused
 PASS: handbook render seam: 47 checks -- pure in-process and in a separate emptied-environment process, clock-free, biting, complete, perspective-and-currency bearing, naming every absent field (lists included) rather than printing a zero, refusing a non-artefact
 [1;36m==>[0m 2. the render committed beside its artefact is fresh at the tag that carries both
-  ok   /tmp/tmp.li62riqA8d/adopter@planted-v1: the served handbook is byte-identical to a re-render of the served artefact (7172 bytes)
+  ok   /tmp/tmp.pZZkrI05pY/adopter@planted-v1: the served handbook is byte-identical to a re-render of the served artefact (7172 bytes)
 [1;36m==>[0m 3. a hand-edited page over an untouched artefact is STALE (the lie with a nicer font)
   ok   a sentence added by hand is caught at the tag
 [1;36m==>[0m 4. a moved ARTEFACT under an untouched page is STALE too (the page went stale, not wrong)

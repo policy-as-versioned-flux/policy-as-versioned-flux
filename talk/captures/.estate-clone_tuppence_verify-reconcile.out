@@ -1,20 +1,27 @@
 [1;36m==>[0m 0. the five-fact sample: the composed set in force, from signed sources (graded first, cluster-free)
-   five-fact sample 2026-09-10T12:59:27Z on cluster dsample-34479714340 (run 34479714340), 3 sources
-     the cage facts (6, 7) are NOT SCORED on this sample: it was taken 2026-09-10T12:59:27Z, before they were registered by 65acf4c02af8 at 2026-09-10T18:30:27+01:00 on refs/remotes/origin/main
+   five-fact sample 2026-09-11T12:54:23Z on cluster dsample-34601206783 (run 34601206783), 3 sources
+     the cage facts (6, 7) ARE scored on this sample: registered by 65acf4c02af8 at 2026-09-10T18:30:27+01:00 on refs/remotes/origin/main, and the sample is later
      nist                 true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      nist                 true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
      nist                 true  fact_3_last_applied_revision_equals_the_pinned_commit: nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524
      nist                 true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
      nist                 true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
+     nist                 FALSE fact_6_the_bottom_rung_is_admitted_and_runs: the cage REFUSED the workload: Error from server (Forbidden): error when creating "STDIN": pods "cage-probe" is forbidden: no PriorityClass with name cage-baseline-3-0-0 was found
+     nist                 ?     fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches: fact 6 did not deliver a workload running on the cage's bottom rung, so there was nothing to measure reach from; fact 6 carries what happened to it
      platform             true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      platform             true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v2.0.1 was verified at the source boundary against platform's own pinned identity ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
      platform             true  fact_3_last_applied_revision_equals_the_pinned_commit: platform is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 533dccb0a823 vs pin 533dccb0a823
      platform             true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
      platform             true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
+     platform             FALSE fact_6_the_bottom_rung_is_admitted_and_runs: the cage REFUSED the workload: Error from server (Forbidden): error when creating "STDIN": pods "cage-probe" is forbidden: no PriorityClass with name cage-baseline-3-0-0 was found
+     platform             ?     fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches: fact 6 did not deliver a workload running on the cage's bottom rung, so there was nothing to measure reach from; fact 6 carries what happened to it
      tuppence-composed    true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
-     tuppence-composed    ?     fact_2_tag_signature_verified_at_the_source_boundary: nothing checked a signature at this source boundary: the GitRepository declares no spec.verify (Flux speaks OpenPGP and SSH only) and carries no verdict from the identity-pinned gitsign-verifying controller (ticket 41). Not looked at, and a thing not looked at is never a pass
+     tuppence-composed    true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against tuppence's own pinned identity ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
      tuppence-composed    true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming tuppence-composed applied 751522b3bca9
      tuppence-composed    true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
      tuppence-composed    true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
-   SKIP: a fact could not be looked at, and a fact not looked at is never a pass
-SKIP: no local kind cluster 'tuppence' to observe here, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass
+     tuppence-composed    FALSE fact_6_the_bottom_rung_is_admitted_and_runs: the cage REFUSED the workload: Error from server (Forbidden): error when creating "STDIN": pods "cage-probe" is forbidden: no PriorityClass with name cage-baseline-3-0-0 was found
+     tuppence-composed    ?     fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches: fact 6 did not deliver a workload running on the cage's bottom rung, so there was nothing to measure reach from; fact 6 carries what happened to it
+     FALSIFIER FIRED: the_cage_refuses_or_never_runs_the_workload_it_caged -- the cage REFUSED the workload: Error from server (Forbidden): error when creating "STDIN": pods "cage-probe" is forbidden: no PriorityClass with name cage-baseline-3-0-0 was found
+   FAIL: a fact of the five-fact sample was observed false
+FAIL: FAIL: a fact of the five-fact sample was observed false

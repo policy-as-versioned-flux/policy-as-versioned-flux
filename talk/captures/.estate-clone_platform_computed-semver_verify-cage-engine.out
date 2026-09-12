@@ -2,7 +2,7 @@
 selfcheck ok: dial_table parses the real cage-tier.yaml; UNCAGED sits at the top of the permissiveness lattice, every real tier below it, tighter tiers below looser ones; a dial tightening classifies major and names the moved corpus entries and the dial CEL expression (never an enumerated dial list); a widen-only change is patch; no change is none; one field regressing while another improves is still major (spec-level, not dial-level); priorityClass ranks on the ACTUAL assigned PriorityClass's real value, so a tier's pc field repointed at a different PriorityClass registers as major even with every other dial untouched (cs-21 regression guard); cage-tier added/removed fall out of the same per-pod comparison with no special case; the major detail is one sentence with no viability language; Track 1 reuses rederive_bumps.classify_policy unchanged; classify_repo reproduces the three known-good bumps; a whole-body release whose only movement is a policy removal computes patch; cs-16: a self-scoped pair (real render-version-tree.py bodies, real generated corpus, real kyverno apply) differing ONLY in the version literal classifies 'none', never the old spurious 'major' the vacuous self-scope match used to produce, and a real narrowing bundled with the same version bump still classifies 'major' -- the fix removes the artifact without suppressing real movement; ticket 09 item 2: the real v3.0.0 -> v4.0.0 cage release computes major against the real committed corpus and names both real reasons (the tier source moved to namespaceObject, so a governed Namespace with no tier falls closed to isolated and a forged pod label is clobbered; and the cage became tighten-only), and a body that starts writing false over a workload's own true -- invisible to a dial-table comparison, proven identical first -- classifies major as a loosening
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 1.055s
+Ran 9 tests in 1.071s
 
 OK
 {
@@ -39,7 +39,7 @@ OK
           "passed_assertions": 13,
           "failed_assertions": 0,
           "exit_code": 0,
-          "output_sha256": "a22b724bfb65ebdf26f4a0f0c4f429e4bb2e00dcc163043546936b64eb19bbbd",
+          "output_sha256": "246dd49132c46270e401dbbbcf8934d3616ed18579d6a81768e67692015a4118",
           "diagnostic": null
         },
         {
@@ -48,7 +48,7 @@ OK
           "passed_assertions": 11,
           "failed_assertions": 0,
           "exit_code": 0,
-          "output_sha256": "abcaeaa7c553a3f7be7cc796715d0ae307b2c58188406dd2b6830a8f343d6419",
+          "output_sha256": "d06dff8f2f673c2996a2922f1ce7697f85c04ac2493fdf33aee659e74abdfc1b",
           "diagnostic": null
         }
       ],
@@ -78,7 +78,7 @@ OK
           "passed_assertions": 13,
           "failed_assertions": 0,
           "exit_code": 0,
-          "output_sha256": "fbdf996b79f278c22278c0137dc77e0d9d9ac5e4f572de1bced81ec8aa07c458",
+          "output_sha256": "8c75619d6c4e979ab42df005312718519df5a66c41a2fcabe9e1dd14a77920d8",
           "diagnostic": null
         },
         {
@@ -87,7 +87,7 @@ OK
           "passed_assertions": 11,
           "failed_assertions": 0,
           "exit_code": 0,
-          "output_sha256": "754598946f23f9c43056ca65567e9749da14ffccff22f1a17778f0f1d9ca2165",
+          "output_sha256": "5dc36a72611349490185721d9c85ece0f6d0a05324a39fe815ff5a26f0d264c4",
           "diagnostic": null
         }
       ],

@@ -1,19 +1,19 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ......
 ----------------------------------------------------------------------
-Ran 6 tests in 4.278s
+Ran 6 tests in 4.140s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 7.209s
+Ran 9 tests in 6.995s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 7.643s
+Ran 9 tests in 7.253s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the one remaining refusal)
