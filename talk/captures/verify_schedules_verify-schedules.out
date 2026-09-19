@@ -1,4 +1,4 @@
-NOTE: LOST RECORDING count=19 runs=34,36,37,38,42,48,63,112,119,125,127,130,136,149,155,156,159,168,175; 252 runs in retained GitHub history; cancelled main recording opportunities without a TRUTH line, cause unknown; historical losses reported, not replayed
+NOTE: LOST RECORDING count=19 runs=34,36,37,38,42,48,63,112,119,125,127,130,136,149,155,156,159,168,175; 253 runs in retained GitHub history; cancelled main recording opportunities without a TRUTH line, cause unknown; historical losses reported, not replayed
 PASS: driftwood/propose-tier.yml: daily clock at 47 6 * * * -- driftwood is an adopter, and the price moves with the date
 PASS: driftwood/renovate-run.yml: daily clock at 11 6 * * * -- driftwood is an adopter, and Renovate's PR starts every re-price
 PASS: driftwood/twin-sweep.yml: daily clock at 5 7 * * * -- driftwood carries a twin overlay under twin/
@@ -17,7 +17,7 @@ PASS: feeds/fetch.yml: last scheduled run 2h ago (success)
 PASS: ico/fetch.yml: daily clock at 09 4 * * * -- ico publishes penalty-schema; it opens no pull request anywhere, so it records what ico has already published and the hash of it rather than reading upstream and computing a bump -- D2's proposal half is vacuous for a party whose feed is its own artefact (ADR-0024 Consequences), and the upstream-reading half of story 9 is not built here and is not graded by this line
 PASS: ico/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 SKIP: ico: no observation-lane ruleset on policy-as-versioned-ico/ico: the repository is public and GitHub allows a push ruleset -- the only kind that carries file_path_restriction -- on private or internal repositories only, so the server-side leg of ADR-0024 cannot be applied here at all. The client-side cage step and this checker are the whole cage today (ADR-0024 point 3, amended 2026-08-28)
-PASS: ico/fetch.yml: last scheduled run 2h ago (success)
+PASS: ico/fetch.yml: last scheduled run 1h ago (success)
 PASS: insurer/fetch.yml: daily clock at 31 5 * * * -- insurer publishes quote-driftwood, quote-tuppence, quote-ludlow
 PASS: insurer/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 PASS: insurer/fetch.yml job requote: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
@@ -32,7 +32,7 @@ PASS: ludlow/renovate-run.yml job renovate: caged -- no shell step in this job s
 PASS: ludlow/twin-sweep.yml job sweep: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
 SKIP: ludlow: no observation-lane ruleset on policy-as-versioned-ludlow/ludlow: the repository is public and GitHub allows a push ruleset -- the only kind that carries file_path_restriction -- on private or internal repositories only, so the server-side leg of ADR-0024 cannot be applied here at all. The client-side cage step and this checker are the whole cage today (ADR-0024 point 3, amended 2026-08-28)
 FAIL: ludlow/propose-tier.yml: last scheduled run 20h ago concluded 'failure' -- a clock whose run dies or is cancelled records no observation -- ticket 62 owns it (the same deleted platform ref as tuppence's; ticket 62 lands both adopters' refs together), and that ticket reads 'resolved': either the fix has not reached a scheduled run yet, or this red is a new one wearing an old ticket's name
-PASS: ludlow/renovate-run.yml: last scheduled run 20h ago (success)
+PASS: ludlow/renovate-run.yml: last scheduled run 21h ago (success)
 FAIL: ludlow/twin-sweep.yml: last scheduled run 22h ago concluded 'failure' -- a clock whose run dies or is cancelled records no observation -- and no ticket in .scratch/ecosystem/issues names this clock in verify/schedules/clock-owners.yaml, so this red is unowned
 PASS: nist/fetch.yml: daily clock at 41 2 * * * -- nist publishes sp-800-53; it opens no pull request anywhere, so it records what nist has already published and the hash of it rather than reading upstream and computing a bump -- D2's proposal half is vacuous for a party whose feed is its own artefact (ADR-0024 Consequences), and the upstream-reading half of story 9 is not built here and is not graded by this line
 PASS: nist/fetch.yml job fetch: caged -- no shell step in this job stages a declaration or mints a signed artefact, and nothing it runs is opaque to this checker
