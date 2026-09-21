@@ -1,0 +1,3135 @@
+{
+ "act_probability": {
+  "distinct": [
+   1.0
+  ],
+  "max": 1.0,
+  "min": 1.0,
+  "n": 93
+ },
+ "calls": 39,
+ "device": "cpu",
+ "dtype": "torch.float32",
+ "files_mutated_by_load": [],
+ "load_seconds": 7.52,
+ "measured_at": "2026-09-21T19:17:22+0100",
+ "ms_per_question": 182.46,
+ "network": "blocked at socket.connect for the whole run",
+ "not_measurable": {
+  "substrate-generator": "Laya is a classifier over typed questions and emits no tokens (`output_tokens: 0` on every call ticket 02 recorded). `substrate-generator` must GENERATE a multi-channel message schedule from a recipe. No rendering of the input makes a classifier able to produce that output, so this skill is not measurable against this model at all. It is reported as not measurable, never as a score of zero."
+ },
+ "predictions": {
+  "causal-claims": {
+   "by_item": {
+    "intel:euv-delay-slips-the-node": {
+     "alternatives": [
+      "Reverse causation: Leading-edge process node could be influencing EUV lithography tooling rather than the direction claimed here."
+     ],
+     "claimed_by": "laya (candidate model)",
+     "confounders": [
+      {
+       "discounted_because": "candidate common cause",
+       "id": "foundry-services",
+       "name": "Foundry services"
+      }
+     ],
+     "edge": {
+      "elasticity": {
+       "max": 0.844,
+       "min": 0.644,
+       "mode": 0.744
+      },
+      "evidence_grade": 2,
+      "from": "euv-lithography",
+      "lag_days": 180,
+      "sign": "positive",
+      "to": "leading-edge-process-node",
+      "type": "influences"
+     }
+    },
+    "netflix:cdn-capacity-lifts-streaming": {
+     "alternatives": [
+      "Reverse causation: Streaming experience could be influencing Content delivery network rather than the direction claimed here."
+     ],
+     "claimed_by": "laya (candidate model)",
+     "confounders": [
+      {
+       "discounted_because": "candidate common cause",
+       "id": "dvd-by-mail",
+       "name": "DVD by mail"
+      }
+     ],
+     "edge": {
+      "elasticity": {
+       "max": 0.7737,
+       "min": 0.5737,
+       "mode": 0.6737
+      },
+      "evidence_grade": 2,
+      "from": "content-delivery-network",
+      "lag_days": 60,
+      "sign": "positive",
+      "to": "streaming-experience",
+      "type": "influences"
+     }
+    },
+    "netflix:price-separation-erodes-goodwill": {
+     "alternatives": [
+      "Reverse causation: Brand goodwill could be influencing DVD by mail rather than the direction claimed here."
+     ],
+     "claimed_by": "laya (candidate model)",
+     "confounders": [],
+     "edge": {
+      "elasticity": {
+       "max": 0.3903,
+       "min": 0.0,
+       "mode": 0.1403
+      },
+      "evidence_grade": 5,
+      "from": "dvd-by-mail",
+      "lag_days": 30,
+      "sign": "negative",
+      "to": "brand-goodwill",
+      "type": "influences"
+     }
+    },
+    "netflix:streaming-displaces-dvd": {
+     "alternatives": [
+      "Reverse causation: DVD by mail could be influencing Streaming experience rather than the direction claimed here."
+     ],
+     "claimed_by": "laya (candidate model)",
+     "confounders": [
+      {
+       "discounted_because": "candidate common cause",
+       "id": "content-delivery-network",
+       "name": "Content delivery network"
+      }
+     ],
+     "edge": {
+      "elasticity": {
+       "max": 0.7892,
+       "min": 0.4892,
+       "mode": 0.6392
+      },
+      "evidence_grade": 3,
+      "from": "streaming-experience",
+      "lag_days": 180,
+      "sign": "negative",
+      "to": "dvd-by-mail",
+      "type": "influences"
+     }
+    }
+   },
+   "corpus_digest": "6c8f7f4a4aae6971954ea97e332b3131048dd90b0584c76bfabaf07def2f9c98"
+  },
+  "ethics-gate": {
+   "by_item": {
+    "bus-factor-structural-aggregate": {
+     "admitted": true,
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "bus-factor-structural-aggregate",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "sensor-admission"
+     },
+     "dpia": {},
+     "ladder": {
+      "admitted": true,
+      "rungs": [],
+      "stopped_at": null
+     }
+    },
+    "expensive-surveillance-low-value": {
+     "admitted": true,
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "expensive-surveillance-low-value",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "sensor-admission"
+     },
+     "dpia": {},
+     "ladder": {
+      "admitted": true,
+      "rungs": [],
+      "stopped_at": null
+     }
+    },
+    "individual-email-content-when-aggregate-suffices": {
+     "admitted": true,
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "individual-email-content-when-aggregate-suffices",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "sensor-admission"
+     },
+     "dpia": {},
+     "ladder": {
+      "admitted": true,
+      "rungs": [],
+      "stopped_at": null
+     }
+    },
+    "keystroke-monitoring-no-dpia": {
+     "admitted": true,
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "keystroke-monitoring-no-dpia",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "sensor-admission"
+     },
+     "dpia": {},
+     "ladder": {
+      "admitted": true,
+      "rungs": [],
+      "stopped_at": null
+     }
+    },
+    "mood-sensor-no-scenario": {
+     "admitted": true,
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "mood-sensor-no-scenario",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "sensor-admission"
+     },
+     "dpia": {},
+     "ladder": {
+      "admitted": true,
+      "rungs": [],
+      "stopped_at": null
+     }
+    }
+   },
+   "corpus_digest": "478b8081ecda531d81f5dd9c5b8a968dbf743f322597620b8fcc9ce19d97c387"
+  },
+  "evolution-judge": {
+   "by_item": {
+    "carillion": {
+     "_noul_position": 0.7148,
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "carillion-uk-construction",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "evolution_position": 0.625,
+      "kind": "position"
+     },
+     "evolution": "product",
+     "evolution_position": 0.625
+    },
+    "enron": {
+     "_noul_position": 0.5398,
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "energy-trading-book",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "evolution_position": 0.625,
+      "kind": "position"
+     },
+     "evolution": "product",
+     "evolution_position": 0.625
+    },
+    "nmc": {
+     "_noul_position": 0.6401,
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "uk-listed-hospital-group",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "evolution_position": 0.625,
+      "kind": "position"
+     },
+     "evolution": "product",
+     "evolution_position": 0.625
+    },
+    "wirecard": {
+     "_noul_position": 0.7615,
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "third-party-acquiring-business",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "evolution_position": 0.625,
+      "kind": "position"
+     },
+     "evolution": "product",
+     "evolution_position": 0.625
+    }
+   },
+   "corpus_digest": "8aad990237e0fde29d41f29925ab4d9bea38d76cbb4f13a57069a7680908be2f"
+  },
+  "gameplay-lens": {
+   "by_item": {
+    "intel": {
+     "opportunities": []
+    },
+    "netflix": {
+     "opportunities": [
+      {
+       "claim": {
+        "claimed_by": "laya (candidate model)",
+        "component": "brand-goodwill",
+        "evidence": "Laya typed-decision output",
+        "evidence_grade": 5,
+        "kind": "opportunity"
+       },
+       "component": "brand-goodwill",
+       "play": "exploit-commoditisation",
+       "preconditions": {},
+       "reason": "Laya typed-decision output"
+      },
+      {
+       "claim": {
+        "claimed_by": "laya (candidate model)",
+        "component": "dvd-by-mail",
+        "evidence": "Laya typed-decision output",
+        "evidence_grade": 5,
+        "kind": "opportunity"
+       },
+       "component": "dvd-by-mail",
+       "play": "exploit-commoditisation",
+       "preconditions": {},
+       "reason": "Laya typed-decision output"
+      },
+      {
+       "claim": {
+        "claimed_by": "laya (candidate model)",
+        "component": "streaming-experience",
+        "evidence": "Laya typed-decision output",
+        "evidence_grade": 5,
+        "kind": "opportunity"
+       },
+       "component": "streaming-experience",
+       "play": "exploit-commoditisation",
+       "preconditions": {},
+       "reason": "Laya typed-decision output"
+      },
+      {
+       "claim": {
+        "claimed_by": "laya (candidate model)",
+        "component": "brand-goodwill",
+        "evidence": "Laya typed-decision output",
+        "evidence_grade": 5,
+        "kind": "opportunity"
+       },
+       "component": "brand-goodwill",
+       "play": "land-grab",
+       "preconditions": {},
+       "reason": "Laya typed-decision output"
+      },
+      {
+       "claim": {
+        "claimed_by": "laya (candidate model)",
+        "component": "dvd-by-mail",
+        "evidence": "Laya typed-decision output",
+        "evidence_grade": 5,
+        "kind": "opportunity"
+       },
+       "component": "dvd-by-mail",
+       "play": "land-grab",
+       "preconditions": {},
+       "reason": "Laya typed-decision output"
+      },
+      {
+       "claim": {
+        "claimed_by": "laya (candidate model)",
+        "component": "streaming-experience",
+        "evidence": "Laya typed-decision output",
+        "evidence_grade": 5,
+        "kind": "opportunity"
+       },
+       "component": "streaming-experience",
+       "play": "land-grab",
+       "preconditions": {},
+       "reason": "Laya typed-decision output"
+      }
+     ]
+    },
+    "pocket": {
+     "opportunities": []
+    }
+   },
+   "corpus_digest": "be67c9b9eef9557d54fa1478e3be817d7201f6b2e7718ec0dedbd3518a3fed90"
+  },
+  "signal-classify": {
+   "by_item": {
+    "carillion:compulsory-liquidation-2018-01-15": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "carillion-uk-construction",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "carillion:profit-warning-2017-07-10": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "carillion-uk-construction",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "carillion:profit-warning-2017-09-29": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "carillion-uk-construction",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "carillion:profit-warning-2017-11-17": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "carillion-uk-construction",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "carillion:rns-2016-12-07": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "carillion-uk-construction",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "carillion:rns-2017-03-01": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "carillion-uk-construction",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "carillion:rns-2017-05-03": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "carillion-uk-construction",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "carillion:short-interest-2017-09-30": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "carillion-uk-construction",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "enron:chapter-11-filed-2001-12-02": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "energy-trading-book",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "enron:q3-loss-and-equity-writedown-2001-10-16": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "energy-trading-book",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "enron:restatement-1997-2000-2001-11-08": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "energy-trading-book",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "enron:skilling-resigns-2001-08-14": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "energy-trading-book",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "political"
+    },
+    "nmc:administrators-appointed-2020-04-09": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "uk-listed-hospital-group",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "nmc:debt-revised-5bn-2020-03-10": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "uk-listed-hospital-group",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "nmc:debt-revised-6-6bn-2020-03-24": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "uk-listed-hospital-group",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "nmc:muddy-waters-report-2019-12-17": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "uk-listed-hospital-group",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "nmc:trading-suspended-2020-02-27": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "uk-listed-hospital-group",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "wirecard:bafin-short-selling-ban-2019-02-18": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "third-party-acquiring-business",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "wirecard:ey-refuses-signoff-2020-06-18": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "third-party-acquiring-business",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "wirecard:ft-investigation-2019-01-30": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "third-party-acquiring-business",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "wirecard:insolvency-filed-2020-06-25": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "third-party-acquiring-business",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "wirecard:kpmg-special-audit-2020-04-28": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "third-party-acquiring-business",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    },
+    "wirecard:zatarra-report-2016-02-24": {
+     "claim": {
+      "claimed_by": "laya (candidate model)",
+      "component": "third-party-acquiring-business",
+      "evidence": "Laya typed-decision output",
+      "evidence_grade": 5,
+      "kind": "binding"
+     },
+     "steep": "economic"
+    }
+   },
+   "corpus_digest": "d5f0c6610fae0cd9d85a1659e8cfca88c08918a10187dd9c3cf7e995981db198"
+  }
+ },
+ "predictions_sha256": "82727492d5bae4ee0c4ae29b5c2455914ef03c6ae5ef35a5a9829b5ea1c0823c",
+ "questions": 93,
+ "raw": {
+  "causal-claims": {
+   "intel:euv-delay-slips-the-node": {
+    "answers": {
+     "elasticity": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.744,
+      "noul": 0.744,
+      "type": "noul"
+     },
+     "grade": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.4496,
+      "legend": {
+       "0": "1: a dated natural experiment, measured before and after an observable change",
+       "1": "2: repeated historical co-movement across more than one episode",
+       "2": "3: an established mechanism from domain theory or published work",
+       "3": "4: calibrated expert judgement, named by role",
+       "4": "5: a model assertion with nothing stronger behind it"
+      },
+      "probabilities": {
+       "0": 0.0586,
+       "1": 0.6971,
+       "2": 0.2095,
+       "3": 0.0151,
+       "4": 0.0196
+      },
+      "score": 1.2401,
+      "type": "score"
+     },
+     "lag": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.0403,
+      "legend": {
+       "0": "about a month",
+       "1": "a few months",
+       "2": "about six months",
+       "3": "a year or more"
+      },
+      "probabilities": {
+       "0": 0.119,
+       "1": 0.3008,
+       "2": 0.3155,
+       "3": 0.2648
+      },
+      "score": 1.726,
+      "type": "score"
+     },
+     "sign": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "positive",
+      "confidence": 0.0008,
+      "probabilities": {
+       "negative": 0.4829,
+       "positive": 0.5171
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 547.44,
+    "questions": {
+     "elasticity": {
+      "instructions": "How large is the proportional response? 0 is no response at all and 1 is a one-for-one proportional response.",
+      "type": "noul"
+     },
+     "grade": {
+      "criteria": [
+       "1: a dated natural experiment, measured before and after an observable change",
+       "2: repeated historical co-movement across more than one episode",
+       "3: an established mechanism from domain theory or published work",
+       "4: calibrated expert judgement, named by role",
+       "5: a model assertion with nothing stronger behind it"
+      ],
+      "instructions": "How strong is the evidence offered for this causal claim?",
+      "type": "score"
+     },
+     "lag": {
+      "criteria": [
+       "about a month",
+       "a few months",
+       "about six months",
+       "a year or more"
+      ],
+      "instructions": "How long does the effect take to appear after the cause?",
+      "type": "score"
+     },
+     "sign": {
+      "criteria": {
+       "negative": "more of the cause produces less of the effect",
+       "positive": "more of the cause produces more of the effect"
+      },
+      "instructions": "In which direction does the cause move the effect?",
+      "type": "choice"
+     }
+    },
+    "state": "A causal claim is being proposed between two components of a value chain.\n\nCause: EUV lithography tooling\n\nEffect: Leading-edge process node\n\nEvidence offered:\n- Lithography tooling deliveries slipping ahead of a process-node slip has been observed repeatedly, across more than one node generation in the semiconductor industry \u2014 a repeated historical co-movement rather than a single dated instance, taking a year or more to show up in the following node.\n\nComponents adjacent to both ends in the graph: Foundry services",
+    "usage": {
+     "input_tokens": 679,
+     "output_tokens": 0
+    }
+   },
+   "netflix:cdn-capacity-lifts-streaming": {
+    "answers": {
+     "elasticity": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.6737,
+      "noul": 0.6737,
+      "type": "noul"
+     },
+     "grade": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.497,
+      "legend": {
+       "0": "1: a dated natural experiment, measured before and after an observable change",
+       "1": "2: repeated historical co-movement across more than one episode",
+       "2": "3: an established mechanism from domain theory or published work",
+       "3": "4: calibrated expert judgement, named by role",
+       "4": "5: a model assertion with nothing stronger behind it"
+      },
+      "probabilities": {
+       "0": 0.0347,
+       "1": 0.7189,
+       "2": 0.2159,
+       "3": 0.0086,
+       "4": 0.0219
+      },
+      "score": 1.264,
+      "type": "score"
+     },
+     "lag": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.1697,
+      "legend": {
+       "0": "about a month",
+       "1": "a few months",
+       "2": "about six months",
+       "3": "a year or more"
+      },
+      "probabilities": {
+       "0": 0.0799,
+       "1": 0.4607,
+       "2": 0.3639,
+       "3": 0.0955
+      },
+      "score": 1.475,
+      "type": "score"
+     },
+     "sign": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "positive",
+      "confidence": 0.3657,
+      "probabilities": {
+       "negative": 0.16,
+       "positive": 0.84
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 506.03,
+    "questions": {
+     "elasticity": {
+      "instructions": "How large is the proportional response? 0 is no response at all and 1 is a one-for-one proportional response.",
+      "type": "noul"
+     },
+     "grade": {
+      "criteria": [
+       "1: a dated natural experiment, measured before and after an observable change",
+       "2: repeated historical co-movement across more than one episode",
+       "3: an established mechanism from domain theory or published work",
+       "4: calibrated expert judgement, named by role",
+       "5: a model assertion with nothing stronger behind it"
+      ],
+      "instructions": "How strong is the evidence offered for this causal claim?",
+      "type": "score"
+     },
+     "lag": {
+      "criteria": [
+       "about a month",
+       "a few months",
+       "about six months",
+       "a year or more"
+      ],
+      "instructions": "How long does the effect take to appear after the cause?",
+      "type": "score"
+     },
+     "sign": {
+      "criteria": {
+       "negative": "more of the cause produces less of the effect",
+       "positive": "more of the cause produces more of the effect"
+      },
+      "instructions": "In which direction does the cause move the effect?",
+      "type": "choice"
+     }
+    },
+    "state": "A causal claim is being proposed between two components of a value chain.\n\nCause: Content delivery network\n\nEffect: Streaming experience\n\nEvidence offered:\n- Content-delivery capacity lifting streaming quality has been observed moving together, repeated across more than one delivery-network build-out rather than a single instance, felt within a couple of months of a build-out completing.\n\nComponents adjacent to both ends in the graph: DVD by mail",
+    "usage": {
+     "input_tokens": 607,
+     "output_tokens": 0
+    }
+   },
+   "netflix:price-separation-erodes-goodwill": {
+    "answers": {
+     "elasticity": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.8597,
+      "noul": 0.1403,
+      "type": "noul"
+     },
+     "grade": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.1254,
+      "legend": {
+       "0": "1: a dated natural experiment, measured before and after an observable change",
+       "1": "2: repeated historical co-movement across more than one episode",
+       "2": "3: an established mechanism from domain theory or published work",
+       "3": "4: calibrated expert judgement, named by role",
+       "4": "5: a model assertion with nothing stronger behind it"
+      },
+      "probabilities": {
+       "0": 0.2003,
+       "1": 0.1961,
+       "2": 0.2275,
+       "3": 0.0145,
+       "4": 0.3616
+      },
+      "score": 2.1411,
+      "type": "score"
+     },
+     "lag": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.4039,
+      "legend": {
+       "0": "about a month",
+       "1": "a few months",
+       "2": "about six months",
+       "3": "a year or more"
+      },
+      "probabilities": {
+       "0": 0.706,
+       "1": 0.2057,
+       "2": 0.0728,
+       "3": 0.0155
+      },
+      "score": 0.3978,
+      "type": "score"
+     },
+     "sign": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "negative",
+      "confidence": 0.5478,
+      "probabilities": {
+       "negative": 0.9052,
+       "positive": 0.0948
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 523.31,
+    "questions": {
+     "elasticity": {
+      "instructions": "How large is the proportional response? 0 is no response at all and 1 is a one-for-one proportional response.",
+      "type": "noul"
+     },
+     "grade": {
+      "criteria": [
+       "1: a dated natural experiment, measured before and after an observable change",
+       "2: repeated historical co-movement across more than one episode",
+       "3: an established mechanism from domain theory or published work",
+       "4: calibrated expert judgement, named by role",
+       "5: a model assertion with nothing stronger behind it"
+      ],
+      "instructions": "How strong is the evidence offered for this causal claim?",
+      "type": "score"
+     },
+     "lag": {
+      "criteria": [
+       "about a month",
+       "a few months",
+       "about six months",
+       "a year or more"
+      ],
+      "instructions": "How long does the effect take to appear after the cause?",
+      "type": "score"
+     },
+     "sign": {
+      "criteria": {
+       "negative": "more of the cause produces less of the effect",
+       "positive": "more of the cause produces more of the effect"
+      },
+      "instructions": "In which direction does the cause move the effect?",
+      "type": "choice"
+     }
+    },
+    "state": "A causal claim is being proposed between two components of a value chain.\n\nCause: DVD by mail\n\nEffect: Brand goodwill\n\nEvidence offered:\n- No dataset has observed this relationship and no study has published it; the claim that price separation erodes goodwill is asserted from general familiarity with brand economics, not from any measurement. If it exists at all it would show up within about a month.\n\nNo component in the graph is adjacent to both ends.",
+    "usage": {
+     "input_tokens": 627,
+     "output_tokens": 0
+    }
+   },
+   "netflix:streaming-displaces-dvd": {
+    "answers": {
+     "elasticity": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.6392,
+      "noul": 0.6392,
+      "type": "noul"
+     },
+     "grade": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.4525,
+      "legend": {
+       "0": "1: a dated natural experiment, measured before and after an observable change",
+       "1": "2: repeated historical co-movement across more than one episode",
+       "2": "3: an established mechanism from domain theory or published work",
+       "3": "4: calibrated expert judgement, named by role",
+       "4": "5: a model assertion with nothing stronger behind it"
+      },
+      "probabilities": {
+       "0": 0.0551,
+       "1": 0.207,
+       "2": 0.7001,
+       "3": 0.0102,
+       "4": 0.0276
+      },
+      "score": 1.7481,
+      "type": "score"
+     },
+     "lag": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.3834,
+      "legend": {
+       "0": "about a month",
+       "1": "a few months",
+       "2": "about six months",
+       "3": "a year or more"
+      },
+      "probabilities": {
+       "0": 0.0351,
+       "1": 0.2904,
+       "2": 0.6478,
+       "3": 0.0267
+      },
+      "score": 1.6661,
+      "type": "score"
+     },
+     "sign": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "negative",
+      "confidence": 0.083,
+      "probabilities": {
+       "negative": 0.668,
+       "positive": 0.332
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 621.08,
+    "questions": {
+     "elasticity": {
+      "instructions": "How large is the proportional response? 0 is no response at all and 1 is a one-for-one proportional response.",
+      "type": "noul"
+     },
+     "grade": {
+      "criteria": [
+       "1: a dated natural experiment, measured before and after an observable change",
+       "2: repeated historical co-movement across more than one episode",
+       "3: an established mechanism from domain theory or published work",
+       "4: calibrated expert judgement, named by role",
+       "5: a model assertion with nothing stronger behind it"
+      ],
+      "instructions": "How strong is the evidence offered for this causal claim?",
+      "type": "score"
+     },
+     "lag": {
+      "criteria": [
+       "about a month",
+       "a few months",
+       "about six months",
+       "a year or more"
+      ],
+      "instructions": "How long does the effect take to appear after the cause?",
+      "type": "score"
+     },
+     "sign": {
+      "criteria": {
+       "negative": "more of the cause produces less of the effect",
+       "positive": "more of the cause produces more of the effect"
+      },
+      "instructions": "In which direction does the cause move the effect?",
+      "type": "choice"
+     }
+    },
+    "state": "A causal claim is being proposed between two components of a value chain.\n\nCause: Streaming experience\n\nEffect: DVD by mail\n\nEvidence offered:\n- Streaming displacing physical-disc subscriptions is an established mechanism in media-industry literature and domain theory; the general substitution effect is documented in published accounts of digital disruption, but this organisation's own figure has not been separately measured. The effect is not visible for roughly six months after streaming take-up.\n\nComponents adjacent to both ends in the graph: Content delivery network",
+    "usage": {
+     "input_tokens": 683,
+     "output_tokens": 0
+    }
+   }
+  },
+  "ethics-gate": {
+   "bus-factor-structural-aggregate": {
+    "answers": {
+     "outcome": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "admit",
+      "confidence": 0.2818,
+      "probabilities": {
+       "admit": 0.6379,
+       "refuse-for-missing-dpia": 0.0989,
+       "stop-at-necessity": 0.0884,
+       "stop-at-proportionality": 0.0828,
+       "stop-at-purpose": 0.092
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 277.47,
+    "questions": {
+     "outcome": {
+      "criteria": {
+       "admit": "all three rungs pass and no outstanding impact assessment blocks it",
+       "refuse-for-missing-dpia": "all three rungs pass but a mandatory impact assessment is not complete",
+       "stop-at-necessity": "the purpose rung passes but a less intrusive alternative exists",
+       "stop-at-proportionality": "purpose and necessity pass but the intrusion outweighs the value",
+       "stop-at-purpose": "the purpose rung fails: no named scenario, or nobody will act"
+      },
+      "instructions": "What does the gate do with this sensor?",
+      "type": "choice"
+     }
+    },
+    "state": "A proposed workplace sensor is being put through an admission gate. The gate walks three rungs in order, purpose then necessity then proportionality, and stops at the first that fails. A sensor that clears all three is still refused if a mandatory data protection impact assessment is not recorded complete.\n\nSensor: Commit-structure bus-factor, aggregated\nPurpose: the stated scenario is 'key-person-succession-planning', and the organisation will act on what it learns.\nNecessity: the proposed measurement is structural at aggregate level. Less intrusive alternatives offered: behavioural at individual level.\nProportionality: the intrusion costs 500 and the value illuminated is 50000.\nData protection: channels observed are none; profiling is no; financial loss risk is no; a data protection impact assessment is not recorded complete.",
+    "usage": {
+     "input_tokens": 285,
+     "output_tokens": 0
+    }
+   },
+   "expensive-surveillance-low-value": {
+    "answers": {
+     "outcome": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "admit",
+      "confidence": 0.328,
+      "probabilities": {
+       "admit": 0.6743,
+       "refuse-for-missing-dpia": 0.086,
+       "stop-at-necessity": 0.0779,
+       "stop-at-proportionality": 0.0728,
+       "stop-at-purpose": 0.089
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 270.25,
+    "questions": {
+     "outcome": {
+      "criteria": {
+       "admit": "all three rungs pass and no outstanding impact assessment blocks it",
+       "refuse-for-missing-dpia": "all three rungs pass but a mandatory impact assessment is not complete",
+       "stop-at-necessity": "the purpose rung passes but a less intrusive alternative exists",
+       "stop-at-proportionality": "purpose and necessity pass but the intrusion outweighs the value",
+       "stop-at-purpose": "the purpose rung fails: no named scenario, or nobody will act"
+      },
+      "instructions": "What does the gate do with this sensor?",
+      "type": "choice"
+     }
+    },
+    "state": "A proposed workplace sensor is being put through an admission gate. The gate walks three rungs in order, purpose then necessity then proportionality, and stops at the first that fails. A sensor that clears all three is still refused if a mandatory data protection impact assessment is not recorded complete.\n\nSensor: Full-team activity dashboard\nPurpose: the stated scenario is 'attrition-risk-monitoring', and the organisation will act on what it learns.\nNecessity: the proposed measurement is structural at aggregate level. Less intrusive alternatives offered: none offered.\nProportionality: the intrusion costs 100000 and the value illuminated is 1000.\nData protection: channels observed are none; profiling is no; financial loss risk is no; a data protection impact assessment is not recorded complete.",
+    "usage": {
+     "input_tokens": 277,
+     "output_tokens": 0
+    }
+   },
+   "individual-email-content-when-aggregate-suffices": {
+    "answers": {
+     "outcome": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "admit",
+      "confidence": 0.3092,
+      "probabilities": {
+       "admit": 0.6588,
+       "refuse-for-missing-dpia": 0.1037,
+       "stop-at-necessity": 0.0864,
+       "stop-at-proportionality": 0.0729,
+       "stop-at-purpose": 0.0783
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 266.57,
+    "questions": {
+     "outcome": {
+      "criteria": {
+       "admit": "all three rungs pass and no outstanding impact assessment blocks it",
+       "refuse-for-missing-dpia": "all three rungs pass but a mandatory impact assessment is not complete",
+       "stop-at-necessity": "the purpose rung passes but a less intrusive alternative exists",
+       "stop-at-proportionality": "purpose and necessity pass but the intrusion outweighs the value",
+       "stop-at-purpose": "the purpose rung fails: no named scenario, or nobody will act"
+      },
+      "instructions": "What does the gate do with this sensor?",
+      "type": "choice"
+     }
+    },
+    "state": "A proposed workplace sensor is being put through an admission gate. The gate walks three rungs in order, purpose then necessity then proportionality, and stops at the first that fails. A sensor that clears all three is still refused if a mandatory data protection impact assessment is not recorded complete.\n\nSensor: Per-person email content scan\nPurpose: the stated scenario is 'insider-risk-monitoring', and the organisation will act on what it learns.\nNecessity: the proposed measurement is behavioural at individual level. Less intrusive alternatives offered: structural at aggregate level.\nProportionality: the intrusion costs 1000 and the value illuminated is 100000.\nData protection: channels observed are email; profiling is no; financial loss risk is no; a data protection impact assessment is not recorded complete.",
+    "usage": {
+     "input_tokens": 280,
+     "output_tokens": 0
+    }
+   },
+   "keystroke-monitoring-no-dpia": {
+    "answers": {
+     "outcome": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "admit",
+      "confidence": 0.3205,
+      "probabilities": {
+       "admit": 0.6664,
+       "refuse-for-missing-dpia": 0.1084,
+       "stop-at-necessity": 0.084,
+       "stop-at-proportionality": 0.0685,
+       "stop-at-purpose": 0.0727
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 262.71,
+    "questions": {
+     "outcome": {
+      "criteria": {
+       "admit": "all three rungs pass and no outstanding impact assessment blocks it",
+       "refuse-for-missing-dpia": "all three rungs pass but a mandatory impact assessment is not complete",
+       "stop-at-necessity": "the purpose rung passes but a less intrusive alternative exists",
+       "stop-at-proportionality": "purpose and necessity pass but the intrusion outweighs the value",
+       "stop-at-purpose": "the purpose rung fails: no named scenario, or nobody will act"
+      },
+      "instructions": "What does the gate do with this sensor?",
+      "type": "choice"
+     }
+    },
+    "state": "A proposed workplace sensor is being put through an admission gate. The gate walks three rungs in order, purpose then necessity then proportionality, and stops at the first that fails. A sensor that clears all three is still refused if a mandatory data protection impact assessment is not recorded complete.\n\nSensor: Keystroke-cadence monitor\nPurpose: the stated scenario is 'insider-risk-monitoring', and the organisation will act on what it learns.\nNecessity: the proposed measurement is structural at aggregate level. Less intrusive alternatives offered: none offered.\nProportionality: the intrusion costs 1000 and the value illuminated is 50000.\nData protection: channels observed are keystroke; profiling is no; financial loss risk is no; a data protection impact assessment is not recorded complete.",
+    "usage": {
+     "input_tokens": 280,
+     "output_tokens": 0
+    }
+   },
+   "mood-sensor-no-scenario": {
+    "answers": {
+     "outcome": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "admit",
+      "confidence": 0.2741,
+      "probabilities": {
+       "admit": 0.6297,
+       "refuse-for-missing-dpia": 0.0964,
+       "stop-at-necessity": 0.0955,
+       "stop-at-proportionality": 0.0703,
+       "stop-at-purpose": 0.1082
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 261.28,
+    "questions": {
+     "outcome": {
+      "criteria": {
+       "admit": "all three rungs pass and no outstanding impact assessment blocks it",
+       "refuse-for-missing-dpia": "all three rungs pass but a mandatory impact assessment is not complete",
+       "stop-at-necessity": "the purpose rung passes but a less intrusive alternative exists",
+       "stop-at-proportionality": "purpose and necessity pass but the intrusion outweighs the value",
+       "stop-at-purpose": "the purpose rung fails: no named scenario, or nobody will act"
+      },
+      "instructions": "What does the gate do with this sensor?",
+      "type": "choice"
+     }
+    },
+    "state": "A proposed workplace sensor is being put through an admission gate. The gate walks three rungs in order, purpose then necessity then proportionality, and stops at the first that fails. A sensor that clears all three is still refused if a mandatory data protection impact assessment is not recorded complete.\n\nSensor: Ambient sentiment sensor\nPurpose: the stated scenario is '', and the organisation will not act on what it learns.\nNecessity: the proposed measurement is structural at aggregate level. Less intrusive alternatives offered: none offered.\nProportionality: the intrusion costs 100 and the value illuminated is 1000.\nData protection: channels observed are none; profiling is no; financial loss risk is no; a data protection impact assessment is not recorded complete.",
+    "usage": {
+     "input_tokens": 269,
+     "output_tokens": 0
+    }
+   }
+  },
+  "evolution-judge": {
+   "carillion": {
+    "answers": {
+     "position_noul": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.7148,
+      "noul": 0.7148,
+      "type": "noul"
+     },
+     "stage": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.1574,
+      "legend": {
+       "0": "genesis: brand new, nobody agrees what it is, built from scratch every time",
+       "1": "custom-built: understood but still hand-made for each user, no standard product",
+       "2": "product: bought as a product or service, competing suppliers, feature differentiation",
+       "3": "commodity: a utility, standardised, bought on price, nobody differentiates on it"
+      },
+      "probabilities": {
+       "0": 0.0416,
+       "1": 0.3649,
+       "2": 0.4204,
+       "3": 0.1732
+      },
+      "score": 1.7251,
+      "type": "score"
+     }
+    },
+    "call_ms": 776.87,
+    "questions": {
+     "position_noul": {
+      "instructions": "On a scale where 0 is a brand-new genesis capability and 1 is a bought-on-price commodity utility, how evolved is this component?",
+      "type": "noul"
+     },
+     "stage": {
+      "criteria": [
+       "genesis: brand new, nobody agrees what it is, built from scratch every time",
+       "custom-built: understood but still hand-made for each user, no standard product",
+       "product: bought as a product or service, competing suppliers, feature differentiation",
+       "commodity: a utility, standardised, bought on price, nobody differentiates on it"
+      ],
+      "instructions": "How far along the evolution axis has this component travelled?",
+      "type": "score"
+     }
+    },
+    "state": "A component of an organisation's value chain is being placed on the Wardley evolution axis.\n\nComponent: Carillion's UK construction and support-services business\n\nEvidence accumulated against it:\n- 2016-12-07: A trading update on financial performance generally and the UK construction business specifically. The FCA's 2022 decision notices later found this announcement, and two that followed it, reckless and misleading for not reflecting the business's true deterioration.\n- 2017-03-01: A second trading update, also later found reckless and misleading by the FCA for the same reason as the 2016-12-07 announcement.\n- 2017-05-03: A third trading update, the last of the three the FCA's 2022 decision notices found reckless and misleading \u2014 after this date the finding is that increasing financial risk in the UK construction business was being concealed rather than merely unrecognised.\n- 2017-07-10: A profit warning: GBP 845m of contract write-downs concentrated in UK construction and Middle East markets, the chief executive resigns with immediate effect, the interim dividend is cancelled, and the shares lose roughly 70% of their value over the announcement and the two trading days that followed.\n- 2017-09-29: A second profit warning: cumulative contract write-downs reach GBP 1,045m, equivalent to the company's previous seven years of profit combined.\n- 2017-09-30: Carillion is reported among the most heavily shorted stocks on the London Stock Exchange by percentage of shares outstanding on loan \u2014 a dated, adversarial market position visible under the FCA's net-short-position disclosure regime, not a retrospective narrative.\n- 2017-11-17: A third profit warning; the shares fall further and net debt guidance deteriorates again.\n- 2018-01-15: A compulsory liquidation order is made against Carillion plc on the petition of its own directors. The High Court appoints the Official Receiver as liquidator with immediate effect.",
+    "usage": {
+     "input_tokens": 986,
+     "output_tokens": 0
+    }
+   },
+   "enron": {
+    "answers": {
+     "position_noul": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.5398,
+      "noul": 0.5398,
+      "type": "noul"
+     },
+     "stage": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.0978,
+      "legend": {
+       "0": "genesis: brand new, nobody agrees what it is, built from scratch every time",
+       "1": "custom-built: understood but still hand-made for each user, no standard product",
+       "2": "product: bought as a product or service, competing suppliers, feature differentiation",
+       "3": "commodity: a utility, standardised, bought on price, nobody differentiates on it"
+      },
+      "probabilities": {
+       "0": 0.0575,
+       "1": 0.3345,
+       "2": 0.3378,
+       "3": 0.2701
+      },
+      "score": 1.8205,
+      "type": "score"
+     }
+    },
+    "call_ms": 516.43,
+    "questions": {
+     "position_noul": {
+      "instructions": "On a scale where 0 is a brand-new genesis capability and 1 is a bought-on-price commodity utility, how evolved is this component?",
+      "type": "noul"
+     },
+     "stage": {
+      "criteria": [
+       "genesis: brand new, nobody agrees what it is, built from scratch every time",
+       "custom-built: understood but still hand-made for each user, no standard product",
+       "product: bought as a product or service, competing suppliers, feature differentiation",
+       "commodity: a utility, standardised, bought on price, nobody differentiates on it"
+      ],
+      "instructions": "How far along the evolution axis has this component travelled?",
+      "type": "score"
+     }
+    },
+    "state": "A component of an organisation's value chain is being placed on the Wardley evolution axis.\n\nComponent: The subject's energy-trading and mark-to-market business\n\nEvidence accumulated against it:\n- 2001-08-14: The president and chief executive resigns with no forewarning, citing personal reasons; the chairman resumes the CEO role he had held for fifteen years before the departing executive took it over.\n- 2001-10-16: A third-quarter loss of USD 618 million is announced alongside a USD 1.2 billion reduction to shareholders' equity, tied to the unwind of related-party special-purpose entities.\n- 2001-11-08: The subject restates 1997-2000 financial results, reducing previously reported net income by USD 586 million and increasing reported debt by USD 2.6 billion, after concluding three related-party special-purpose entities should have been consolidated onto its own balance sheet.\n- 2001-12-02: The subject and a first group of affiliated entities file voluntary Chapter 11 petitions in the US Bankruptcy Court for the Southern District of New York \u2014 at the time the largest such filing in US history.",
+    "usage": {
+     "input_tokens": 632,
+     "output_tokens": 0
+    }
+   },
+   "nmc": {
+    "answers": {
+     "position_noul": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.6401,
+      "noul": 0.6401,
+      "type": "noul"
+     },
+     "stage": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.1394,
+      "legend": {
+       "0": "genesis: brand new, nobody agrees what it is, built from scratch every time",
+       "1": "custom-built: understood but still hand-made for each user, no standard product",
+       "2": "product: bought as a product or service, competing suppliers, feature differentiation",
+       "3": "commodity: a utility, standardised, bought on price, nobody differentiates on it"
+      },
+      "probabilities": {
+       "0": 0.0414,
+       "1": 0.3292,
+       "2": 0.4147,
+       "3": 0.2147
+      },
+      "score": 1.8026,
+      "type": "score"
+     }
+    },
+    "call_ms": 555.12,
+    "questions": {
+     "position_noul": {
+      "instructions": "On a scale where 0 is a brand-new genesis capability and 1 is a bought-on-price commodity utility, how evolved is this component?",
+      "type": "noul"
+     },
+     "stage": {
+      "criteria": [
+       "genesis: brand new, nobody agrees what it is, built from scratch every time",
+       "custom-built: understood but still hand-made for each user, no standard product",
+       "product: bought as a product or service, competing suppliers, feature differentiation",
+       "commodity: a utility, standardised, bought on price, nobody differentiates on it"
+      ],
+      "instructions": "How far along the evolution axis has this component travelled?",
+      "type": "score"
+     }
+    },
+    "state": "A component of an organisation's value chain is being placed on the Wardley evolution axis.\n\nComponent: The subject's UK-listed hospital operations\n\nEvidence accumulated against it:\n- 2019-12-17: A capital-backed short-seller publishes a dated research report alleging inflated asset purchase prices, an overstated cash balance and understated group debt, and discloses a short position in the subject.\n- 2020-02-27: Trading in the subject's shares is suspended on the London Stock Exchange, the night after the chief executive is dismissed, the treasury team is suspended and the chief financial officer is granted an extended leave of absence.\n- 2020-03-10: The subject discloses that group debt is materially above the previously reported figure, at approximately USD 5 billion against USD 2.1 billion last reported, and that over USD 2.7 billion of facilities were not previously disclosed to or approved by the board.\n- 2020-03-24: The subject discloses group debt now estimated at approximately USD 6.6 billion, comprised of over 75 debt facilities from over 80 financial institutions; the chief financial officer resigns with immediate effect.\n- 2020-04-09: The High Court of England and Wales appoints administrators to the subject's UK holding company following a creditor petition.",
+    "usage": {
+     "input_tokens": 690,
+     "output_tokens": 0
+    }
+   },
+   "wirecard": {
+    "answers": {
+     "position_noul": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.7615,
+      "noul": 0.7615,
+      "type": "noul"
+     },
+     "stage": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "confidence": 0.143,
+      "legend": {
+       "0": "genesis: brand new, nobody agrees what it is, built from scratch every time",
+       "1": "custom-built: understood but still hand-made for each user, no standard product",
+       "2": "product: bought as a product or service, competing suppliers, feature differentiation",
+       "3": "commodity: a utility, standardised, bought on price, nobody differentiates on it"
+      },
+      "probabilities": {
+       "0": 0.0435,
+       "1": 0.33,
+       "2": 0.4259,
+       "3": 0.2006
+      },
+      "score": 1.7835,
+      "type": "score"
+     }
+    },
+    "call_ms": 670.78,
+    "questions": {
+     "position_noul": {
+      "instructions": "On a scale where 0 is a brand-new genesis capability and 1 is a bought-on-price commodity utility, how evolved is this component?",
+      "type": "noul"
+     },
+     "stage": {
+      "criteria": [
+       "genesis: brand new, nobody agrees what it is, built from scratch every time",
+       "custom-built: understood but still hand-made for each user, no standard product",
+       "product: bought as a product or service, competing suppliers, feature differentiation",
+       "commodity: a utility, standardised, bought on price, nobody differentiates on it"
+      ],
+      "instructions": "How far along the evolution axis has this component travelled?",
+      "type": "score"
+     }
+    },
+    "state": "A component of an organisation's value chain is being placed on the Wardley evolution axis.\n\nComponent: The subject's third-party payment-acquiring business\n\nEvidence accumulated against it:\n- 2016-02-24: An anonymous 100-page dossier alleges money laundering and accounting irregularities tied to the subject's Asian operations; the subject's shares fall sharply intraday before recovering most of the loss on the CEO's denial.\n- 2019-01-30: A Financial Times investigation, drawing on internal whistleblower documents, alleges forged and backdated contracts in a string of suspicious transactions in the subject's Asia-Pacific business.\n- 2019-02-18: Germany's federal financial regulator bans, with immediate effect, the establishment or increase of net short positions in the subject's shares \u2014 its first-ever single-firm short ban, and a dated, official record that the subject's accounts were under public dispute.\n- 2020-04-28: A special audit commissioned in response to the press allegations reports that KPMG could not verify the majority of the third-party acquiring business's reported sales revenue and customer relationships for 2016-2018.\n- 2020-06-18: The subject's auditor declines to sign off the prior year's accounts, stating it cannot find sufficient evidence for EUR 1.9 billion of cash reported on trust accounts, around a quarter of the balance sheet; the subject notes indications the confirming balances may have been falsified.\n- 2020-06-25: The management board files an application for the opening of insolvency proceedings with the district court of Munich, citing impending insolvency and over-indebtedness.",
+    "usage": {
+     "input_tokens": 842,
+     "output_tokens": 0
+    }
+   }
+  },
+  "gameplay-lens": {
+   "intel": {
+    "answers": {
+     "exploit-commoditisation|foundry-services": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.1956,
+      "probabilities": {
+       "available": 0.2457,
+       "not-available": 0.7543
+      },
+      "type": "choice"
+     },
+     "land-grab|foundry-services": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.2646,
+      "probabilities": {
+       "available": 0.2069,
+       "not-available": 0.7931
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 403.68,
+    "questions": {
+     "exploit-commoditisation|foundry-services": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the exploit-commoditisation play available on foundry-services right now? That play needs: the component has reached the commodity stage and an immature component still depends on it from the genesis or custom-built stage.",
+      "type": "choice"
+     },
+     "land-grab|foundry-services": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the land-grab play available on foundry-services right now? That play needs: the component is deep in the product stage and nearing commodity, and the organisation already holds an adjacent capability in the value chain next to it.",
+      "type": "choice"
+     }
+    },
+    "state": "An organisation's value chain has been mapped. The organisation itself owns these components: foundry-services.\n\nThe full map, including components it does not own:\n- cloud-compute is at evolution position 0.88, in the commodity stage.\n- content-delivery-network is at evolution position 0.62, in the product stage.\n- euv-lithography is at evolution position 0.38, in the custom-built stage; foundry-services depend on it.\n- foundry-services is at evolution position 0.38, in the custom-built stage; it depends on euv-lithography, leading-edge-process-node.\n- leading-edge-process-node is at evolution position 0.62, in the product stage; foundry-services depend on it.",
+    "usage": {
+     "input_tokens": 516,
+     "output_tokens": 0
+    }
+   },
+   "netflix": {
+    "answers": {
+     "exploit-commoditisation|brand-goodwill": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "available",
+      "confidence": 0.0137,
+      "probabilities": {
+       "available": 0.5687,
+       "not-available": 0.4313
+      },
+      "type": "choice"
+     },
+     "exploit-commoditisation|dvd-by-mail": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "available",
+      "confidence": 0.0086,
+      "probabilities": {
+       "available": 0.5545,
+       "not-available": 0.4455
+      },
+      "type": "choice"
+     },
+     "exploit-commoditisation|streaming-experience": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "available",
+      "confidence": 0.0529,
+      "probabilities": {
+       "available": 0.6345,
+       "not-available": 0.3655
+      },
+      "type": "choice"
+     },
+     "land-grab|brand-goodwill": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "available",
+      "confidence": 0.0155,
+      "probabilities": {
+       "available": 0.5732,
+       "not-available": 0.4268
+      },
+      "type": "choice"
+     },
+     "land-grab|dvd-by-mail": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "available",
+      "confidence": 0.0154,
+      "probabilities": {
+       "available": 0.573,
+       "not-available": 0.427
+      },
+      "type": "choice"
+     },
+     "land-grab|streaming-experience": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "available",
+      "confidence": 0.0366,
+      "probabilities": {
+       "available": 0.6121,
+       "not-available": 0.3879
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 1545.97,
+    "questions": {
+     "exploit-commoditisation|brand-goodwill": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the exploit-commoditisation play available on brand-goodwill right now? That play needs: the component has reached the commodity stage and an immature component still depends on it from the genesis or custom-built stage.",
+      "type": "choice"
+     },
+     "exploit-commoditisation|dvd-by-mail": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the exploit-commoditisation play available on dvd-by-mail right now? That play needs: the component has reached the commodity stage and an immature component still depends on it from the genesis or custom-built stage.",
+      "type": "choice"
+     },
+     "exploit-commoditisation|streaming-experience": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the exploit-commoditisation play available on streaming-experience right now? That play needs: the component has reached the commodity stage and an immature component still depends on it from the genesis or custom-built stage.",
+      "type": "choice"
+     },
+     "land-grab|brand-goodwill": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the land-grab play available on brand-goodwill right now? That play needs: the component is deep in the product stage and nearing commodity, and the organisation already holds an adjacent capability in the value chain next to it.",
+      "type": "choice"
+     },
+     "land-grab|dvd-by-mail": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the land-grab play available on dvd-by-mail right now? That play needs: the component is deep in the product stage and nearing commodity, and the organisation already holds an adjacent capability in the value chain next to it.",
+      "type": "choice"
+     },
+     "land-grab|streaming-experience": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the land-grab play available on streaming-experience right now? That play needs: the component is deep in the product stage and nearing commodity, and the organisation already holds an adjacent capability in the value chain next to it.",
+      "type": "choice"
+     }
+    },
+    "state": "An organisation's value chain has been mapped. The organisation itself owns these components: brand-goodwill, dvd-by-mail, streaming-experience.\n\nThe full map, including components it does not own:\n- brand-goodwill is at evolution position 0.12, in the genesis stage.\n- cloud-compute is at evolution position 0.88, in the commodity stage; streaming-experience depend on it; it is held by alex-rivera.\n- content-delivery-network is at evolution position 0.62, in the product stage; dvd-by-mail, streaming-experience depend on it.\n- dvd-by-mail is at evolution position 0.88, in the commodity stage; it depends on content-delivery-network; it is held by sam-okafor.\n- euv-lithography is at evolution position 0.38, in the custom-built stage.\n- leading-edge-process-node is at evolution position 0.62, in the product stage.\n- streaming-experience is at evolution position 0.62, in the product stage; it depends on cloud-compute, content-delivery-network; it is held by alex-rivera.",
+    "usage": {
+     "input_tokens": 2084,
+     "output_tokens": 0
+    }
+   },
+   "pocket": {
+    "answers": {
+     "exploit-commoditisation|customer-portal": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0152,
+      "probabilities": {
+       "available": 0.4276,
+       "not-available": 0.5724
+      },
+      "type": "choice"
+     },
+     "exploit-commoditisation|identity-store": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0183,
+      "probabilities": {
+       "available": 0.4206,
+       "not-available": 0.5794
+      },
+      "type": "choice"
+     },
+     "exploit-commoditisation|order-service": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0142,
+      "probabilities": {
+       "available": 0.43,
+       "not-available": 0.57
+      },
+      "type": "choice"
+     },
+     "exploit-commoditisation|payment-gateway": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0191,
+      "probabilities": {
+       "available": 0.4188,
+       "not-available": 0.5812
+      },
+      "type": "choice"
+     },
+     "exploit-commoditisation|shared-database": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0032,
+      "probabilities": {
+       "available": 0.4666,
+       "not-available": 0.5334
+      },
+      "type": "choice"
+     },
+     "land-grab|customer-portal": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0085,
+      "probabilities": {
+       "available": 0.4457,
+       "not-available": 0.5543
+      },
+      "type": "choice"
+     },
+     "land-grab|identity-store": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0055,
+      "probabilities": {
+       "available": 0.4564,
+       "not-available": 0.5436
+      },
+      "type": "choice"
+     },
+     "land-grab|order-service": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0165,
+      "probabilities": {
+       "available": 0.4244,
+       "not-available": 0.5756
+      },
+      "type": "choice"
+     },
+     "land-grab|payment-gateway": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0074,
+      "probabilities": {
+       "available": 0.4494,
+       "not-available": 0.5506
+      },
+      "type": "choice"
+     },
+     "land-grab|shared-database": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "not-available",
+      "confidence": 0.0112,
+      "probabilities": {
+       "available": 0.4377,
+       "not-available": 0.5623
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 2090.68,
+    "questions": {
+     "exploit-commoditisation|customer-portal": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the exploit-commoditisation play available on customer-portal right now? That play needs: the component has reached the commodity stage and an immature component still depends on it from the genesis or custom-built stage.",
+      "type": "choice"
+     },
+     "exploit-commoditisation|identity-store": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the exploit-commoditisation play available on identity-store right now? That play needs: the component has reached the commodity stage and an immature component still depends on it from the genesis or custom-built stage.",
+      "type": "choice"
+     },
+     "exploit-commoditisation|order-service": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the exploit-commoditisation play available on order-service right now? That play needs: the component has reached the commodity stage and an immature component still depends on it from the genesis or custom-built stage.",
+      "type": "choice"
+     },
+     "exploit-commoditisation|payment-gateway": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the exploit-commoditisation play available on payment-gateway right now? That play needs: the component has reached the commodity stage and an immature component still depends on it from the genesis or custom-built stage.",
+      "type": "choice"
+     },
+     "exploit-commoditisation|shared-database": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the exploit-commoditisation play available on shared-database right now? That play needs: the component has reached the commodity stage and an immature component still depends on it from the genesis or custom-built stage.",
+      "type": "choice"
+     },
+     "land-grab|customer-portal": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the land-grab play available on customer-portal right now? That play needs: the component is deep in the product stage and nearing commodity, and the organisation already holds an adjacent capability in the value chain next to it.",
+      "type": "choice"
+     },
+     "land-grab|identity-store": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the land-grab play available on identity-store right now? That play needs: the component is deep in the product stage and nearing commodity, and the organisation already holds an adjacent capability in the value chain next to it.",
+      "type": "choice"
+     },
+     "land-grab|order-service": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the land-grab play available on order-service right now? That play needs: the component is deep in the product stage and nearing commodity, and the organisation already holds an adjacent capability in the value chain next to it.",
+      "type": "choice"
+     },
+     "land-grab|payment-gateway": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the land-grab play available on payment-gateway right now? That play needs: the component is deep in the product stage and nearing commodity, and the organisation already holds an adjacent capability in the value chain next to it.",
+      "type": "choice"
+     },
+     "land-grab|shared-database": {
+      "criteria": {
+       "available": "every precondition of the play holds for this component today",
+       "not-available": "at least one precondition of the play does not hold"
+      },
+      "instructions": "Is the land-grab play available on shared-database right now? That play needs: the component is deep in the product stage and nearing commodity, and the organisation already holds an adjacent capability in the value chain next to it.",
+      "type": "choice"
+     }
+    },
+    "state": "An organisation's value chain has been mapped. The organisation itself owns these components: customer-portal, identity-store, order-service, payment-gateway, shared-database.\n\nThe full map, including components it does not own:\n- customer-portal is at evolution position 0.60, in the product stage; it depends on order-service.\n- identity-store is at evolution position 0.40, in the custom-built stage; it depends on shared-database; order-service depend on it.\n- order-service is at evolution position 0.50, in the product stage; it depends on identity-store, payment-gateway; customer-portal depend on it.\n- payment-gateway is at evolution position 0.80, in the commodity stage; order-service depend on it.\n- shared-database is at evolution position 0.90, in the commodity stage; identity-store depend on it.",
+    "usage": {
+     "input_tokens": 2844,
+     "output_tokens": 0
+    }
+   }
+  },
+  "signal-classify": {
+   "carillion:compulsory-liquidation-2018-01-15": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "carillion-uk-construction",
+      "confidence": 1.0,
+      "probabilities": {
+       "carillion-uk-construction": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.6726,
+      "probabilities": {
+       "economic": 0.881,
+       "environmental": 0.027,
+       "political": 0.0391,
+       "social": 0.0216,
+       "technological": 0.0313
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 352.79,
+    "questions": {
+     "component": {
+      "criteria": {
+       "carillion-uk-construction": "Carillion's UK construction and support-services business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A compulsory liquidation order is made against Carillion plc on the petition of its own directors. The High Court appoints the Official Receiver as liquidator with immediate effect.\n\nSource: High Court compulsory liquidation order, 2018-01-15",
+    "usage": {
+     "input_tokens": 256,
+     "output_tokens": 0
+    }
+   },
+   "carillion:profit-warning-2017-07-10": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "carillion-uk-construction",
+      "confidence": 1.0,
+      "probabilities": {
+       "carillion-uk-construction": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.6591,
+      "probabilities": {
+       "economic": 0.875,
+       "environmental": 0.028,
+       "political": 0.0387,
+       "social": 0.027,
+       "technological": 0.0313
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 319.75,
+    "questions": {
+     "component": {
+      "criteria": {
+       "carillion-uk-construction": "Carillion's UK construction and support-services business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A profit warning: GBP 845m of contract write-downs concentrated in UK construction and Middle East markets, the chief executive resigns with immediate effect, the interim dividend is cancelled, and the shares lose roughly 70% of their value over the announcement and the two trading days that followed.\n\nSource: Carillion plc trading update and press coverage, 2017-07-10",
+    "usage": {
+     "input_tokens": 310,
+     "output_tokens": 0
+    }
+   },
+   "carillion:profit-warning-2017-09-29": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "carillion-uk-construction",
+      "confidence": 1.0,
+      "probabilities": {
+       "carillion-uk-construction": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.7084,
+      "probabilities": {
+       "economic": 0.8981,
+       "environmental": 0.0233,
+       "political": 0.0316,
+       "social": 0.0209,
+       "technological": 0.0262
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 317.75,
+    "questions": {
+     "component": {
+      "criteria": {
+       "carillion-uk-construction": "Carillion's UK construction and support-services business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A second profit warning: cumulative contract write-downs reach GBP 1,045m, equivalent to the company's previous seven years of profit combined.\n\nSource: Carillion plc trading update, 2017-09-29",
+    "usage": {
+     "input_tokens": 246,
+     "output_tokens": 0
+    }
+   },
+   "carillion:profit-warning-2017-11-17": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "carillion-uk-construction",
+      "confidence": 1.0,
+      "probabilities": {
+       "carillion-uk-construction": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.5953,
+      "probabilities": {
+       "economic": 0.843,
+       "environmental": 0.0348,
+       "political": 0.0439,
+       "social": 0.035,
+       "technological": 0.0434
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 298.97,
+    "questions": {
+     "component": {
+      "criteria": {
+       "carillion-uk-construction": "Carillion's UK construction and support-services business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A third profit warning; the shares fall further and net debt guidance deteriorates again.\n\nSource: Carillion plc trading update, 2017-11-17",
+    "usage": {
+     "input_tokens": 218,
+     "output_tokens": 0
+    }
+   },
+   "carillion:rns-2016-12-07": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "carillion-uk-construction",
+      "confidence": 1.0,
+      "probabilities": {
+       "carillion-uk-construction": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.674,
+      "probabilities": {
+       "economic": 0.8816,
+       "environmental": 0.0252,
+       "political": 0.0423,
+       "social": 0.0247,
+       "technological": 0.0262
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 317.27,
+    "questions": {
+     "component": {
+      "criteria": {
+       "carillion-uk-construction": "Carillion's UK construction and support-services business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A trading update on financial performance generally and the UK construction business specifically. The FCA's 2022 decision notices later found this announcement, and two that followed it, reckless and misleading for not reflecting the business's true deterioration.\n\nSource: Carillion plc RNS announcement, 2016-12-07",
+    "usage": {
+     "input_tokens": 276,
+     "output_tokens": 0
+    }
+   },
+   "carillion:rns-2017-03-01": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "carillion-uk-construction",
+      "confidence": 1.0,
+      "probabilities": {
+       "carillion-uk-construction": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.5719,
+      "probabilities": {
+       "economic": 0.8273,
+       "environmental": 0.0344,
+       "political": 0.0701,
+       "social": 0.0304,
+       "technological": 0.0378
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 298.53,
+    "questions": {
+     "component": {
+      "criteria": {
+       "carillion-uk-construction": "Carillion's UK construction and support-services business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A second trading update, also later found reckless and misleading by the FCA for the same reason as the 2016-12-07 announcement.\n\nSource: Carillion plc RNS announcement, 2017-03-01",
+    "usage": {
+     "input_tokens": 242,
+     "output_tokens": 0
+    }
+   },
+   "carillion:rns-2017-05-03": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "carillion-uk-construction",
+      "confidence": 1.0,
+      "probabilities": {
+       "carillion-uk-construction": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.5907,
+      "probabilities": {
+       "economic": 0.8373,
+       "environmental": 0.0326,
+       "political": 0.0678,
+       "social": 0.0295,
+       "technological": 0.0329
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 317.23,
+    "questions": {
+     "component": {
+      "criteria": {
+       "carillion-uk-construction": "Carillion's UK construction and support-services business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A third trading update, the last of the three the FCA's 2022 decision notices found reckless and misleading \u2014 after this date the finding is that increasing financial risk in the UK construction business was being concealed rather than merely unrecognised.\n\nSource: Carillion plc RNS announcement, 2017-05-03",
+    "usage": {
+     "input_tokens": 282,
+     "output_tokens": 0
+    }
+   },
+   "carillion:short-interest-2017-09-30": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "carillion-uk-construction",
+      "confidence": 1.0,
+      "probabilities": {
+       "carillion-uk-construction": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.2417,
+      "probabilities": {
+       "economic": 0.5574,
+       "environmental": 0.0752,
+       "political": 0.0915,
+       "social": 0.047,
+       "technological": 0.2289
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 311.65,
+    "questions": {
+     "component": {
+      "criteria": {
+       "carillion-uk-construction": "Carillion's UK construction and support-services business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: Carillion is reported among the most heavily shorted stocks on the London Stock Exchange by percentage of shares outstanding on loan \u2014 a dated, adversarial market position visible under the FCA's net-short-position disclosure regime, not a retrospective narrative.\n\nSource: IHS Markit securities-lending data, reported in financial press, 2017-09-30",
+    "usage": {
+     "input_tokens": 298,
+     "output_tokens": 0
+    }
+   },
+   "enron:chapter-11-filed-2001-12-02": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "energy-trading-book",
+      "confidence": 1.0,
+      "probabilities": {
+       "energy-trading-book": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.4741,
+      "probabilities": {
+       "economic": 0.7668,
+       "environmental": 0.0397,
+       "political": 0.1021,
+       "social": 0.0417,
+       "technological": 0.0497
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 330.88,
+    "questions": {
+     "component": {
+      "criteria": {
+       "energy-trading-book": "The subject's energy-trading and mark-to-market business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: The subject and a first group of affiliated entities file voluntary Chapter 11 petitions in the US Bankruptcy Court for the Southern District of New York \u2014 at the time the largest such filing in US history.\n\nSource: The subject's own SEC 8-K press-release exhibit, 2001-12-02",
+    "usage": {
+     "input_tokens": 276,
+     "output_tokens": 0
+    }
+   },
+   "enron:q3-loss-and-equity-writedown-2001-10-16": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "energy-trading-book",
+      "confidence": 1.0,
+      "probabilities": {
+       "energy-trading-book": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.6978,
+      "probabilities": {
+       "economic": 0.893,
+       "environmental": 0.0225,
+       "political": 0.0363,
+       "social": 0.022,
+       "technological": 0.0263
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 341.72,
+    "questions": {
+     "component": {
+      "criteria": {
+       "energy-trading-book": "The subject's energy-trading and mark-to-market business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A third-quarter loss of USD 618 million is announced alongside a USD 1.2 billion reduction to shareholders' equity, tied to the unwind of related-party special-purpose entities.\n\nSource: The subject's own SEC 8-K earnings-release exhibit, 2001-10-16",
+    "usage": {
+     "input_tokens": 276,
+     "output_tokens": 0
+    }
+   },
+   "enron:restatement-1997-2000-2001-11-08": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "energy-trading-book",
+      "confidence": 1.0,
+      "probabilities": {
+       "energy-trading-book": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.6383,
+      "probabilities": {
+       "economic": 0.8637,
+       "environmental": 0.0266,
+       "political": 0.0478,
+       "social": 0.0241,
+       "technological": 0.0379
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 301.97,
+    "questions": {
+     "component": {
+      "criteria": {
+       "energy-trading-book": "The subject's energy-trading and mark-to-market business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: The subject restates 1997-2000 financial results, reducing previously reported net income by USD 586 million and increasing reported debt by USD 2.6 billion, after concluding three related-party special-purpose entities should have been consolidated onto its own balance sheet.\n\nSource: The subject's own SEC 8-K filing, 2001-11-08",
+    "usage": {
+     "input_tokens": 294,
+     "output_tokens": 0
+    }
+   },
+   "enron:skilling-resigns-2001-08-14": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "energy-trading-book",
+      "confidence": 1.0,
+      "probabilities": {
+       "energy-trading-book": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "political",
+      "confidence": 0.1376,
+      "probabilities": {
+       "economic": 0.3117,
+       "environmental": 0.0654,
+       "political": 0.3908,
+       "social": 0.1646,
+       "technological": 0.0675
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 303.5,
+    "questions": {
+     "component": {
+      "criteria": {
+       "energy-trading-book": "The subject's energy-trading and mark-to-market business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: The president and chief executive resigns with no forewarning, citing personal reasons; the chairman resumes the CEO role he had held for fifteen years before the departing executive took it over.\n\nSource: Press coverage of the subject's own announcement, 2001-08-14",
+    "usage": {
+     "input_tokens": 266,
+     "output_tokens": 0
+    }
+   },
+   "nmc:administrators-appointed-2020-04-09": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "uk-listed-hospital-group",
+      "confidence": 1.0,
+      "probabilities": {
+       "uk-listed-hospital-group": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.5549,
+      "probabilities": {
+       "economic": 0.8173,
+       "environmental": 0.0315,
+       "political": 0.0737,
+       "social": 0.0315,
+       "technological": 0.046
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 262.84,
+    "questions": {
+     "component": {
+      "criteria": {
+       "uk-listed-hospital-group": "The subject's UK-listed hospital operations"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: The High Court of England and Wales appoints administrators to the subject's UK holding company following a creditor petition.\n\nSource: Company announcement, 2020-04-09",
+    "usage": {
+     "input_tokens": 219,
+     "output_tokens": 0
+    }
+   },
+   "nmc:debt-revised-5bn-2020-03-10": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "uk-listed-hospital-group",
+      "confidence": 1.0,
+      "probabilities": {
+       "uk-listed-hospital-group": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.7032,
+      "probabilities": {
+       "economic": 0.8956,
+       "environmental": 0.023,
+       "political": 0.0337,
+       "social": 0.0208,
+       "technological": 0.0269
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 281.29,
+    "questions": {
+     "component": {
+      "criteria": {
+       "uk-listed-hospital-group": "The subject's UK-listed hospital operations"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: The subject discloses that group debt is materially above the previously reported figure, at approximately USD 5 billion against USD 2.1 billion last reported, and that over USD 2.7 billion of facilities were not previously disclosed to or approved by the board.\n\nSource: Company trading update, 2020-03-10",
+    "usage": {
+     "input_tokens": 275,
+     "output_tokens": 0
+    }
+   },
+   "nmc:debt-revised-6-6bn-2020-03-24": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "uk-listed-hospital-group",
+      "confidence": 1.0,
+      "probabilities": {
+       "uk-listed-hospital-group": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.6933,
+      "probabilities": {
+       "economic": 0.8902,
+       "environmental": 0.0224,
+       "political": 0.0404,
+       "social": 0.0189,
+       "technological": 0.028
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 274.62,
+    "questions": {
+     "component": {
+      "criteria": {
+       "uk-listed-hospital-group": "The subject's UK-listed hospital operations"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: The subject discloses group debt now estimated at approximately USD 6.6 billion, comprised of over 75 debt facilities from over 80 financial institutions; the chief financial officer resigns with immediate effect.\n\nSource: Company disclosure via the London Stock Exchange, 2020-03-24",
+    "usage": {
+     "input_tokens": 259,
+     "output_tokens": 0
+    }
+   },
+   "nmc:muddy-waters-report-2019-12-17": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "uk-listed-hospital-group",
+      "confidence": 1.0,
+      "probabilities": {
+       "uk-listed-hospital-group": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.3238,
+      "probabilities": {
+       "economic": 0.6498,
+       "environmental": 0.071,
+       "political": 0.0666,
+       "social": 0.0458,
+       "technological": 0.1668
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 275.76,
+    "questions": {
+     "component": {
+      "criteria": {
+       "uk-listed-hospital-group": "The subject's UK-listed hospital operations"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A capital-backed short-seller publishes a dated research report alleging inflated asset purchase prices, an overstated cash balance and understated group debt, and discloses a short position in the subject.\n\nSource: Muddy Waters Capital LLC research report, 2019-12-17",
+    "usage": {
+     "input_tokens": 267,
+     "output_tokens": 0
+    }
+   },
+   "nmc:trading-suspended-2020-02-27": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "uk-listed-hospital-group",
+      "confidence": 1.0,
+      "probabilities": {
+       "uk-listed-hospital-group": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.6168,
+      "probabilities": {
+       "economic": 0.8498,
+       "environmental": 0.0256,
+       "political": 0.0674,
+       "social": 0.0251,
+       "technological": 0.0321
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 272.26,
+    "questions": {
+     "component": {
+      "criteria": {
+       "uk-listed-hospital-group": "The subject's UK-listed hospital operations"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: Trading in the subject's shares is suspended on the London Stock Exchange, the night after the chief executive is dismissed, the treasury team is suspended and the chief financial officer is granted an extended leave of absence.\n\nSource: Financial press, 2020-02-27",
+    "usage": {
+     "input_tokens": 259,
+     "output_tokens": 0
+    }
+   },
+   "wirecard:bafin-short-selling-ban-2019-02-18": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "third-party-acquiring-business",
+      "confidence": 1.0,
+      "probabilities": {
+       "third-party-acquiring-business": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.5744,
+      "probabilities": {
+       "economic": 0.8003,
+       "environmental": 0.0167,
+       "political": 0.1409,
+       "social": 0.0178,
+       "technological": 0.0244
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 289.44,
+    "questions": {
+     "component": {
+      "criteria": {
+       "third-party-acquiring-business": "The subject's third-party payment-acquiring business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: Germany's federal financial regulator bans, with immediate effect, the establishment or increase of net short positions in the subject's shares \u2014 its first-ever single-firm short ban, and a dated, official record that the subject's accounts were under public dispute.\n\nSource: BaFin General Administrative Act, 2019-02-18",
+    "usage": {
+     "input_tokens": 289,
+     "output_tokens": 0
+    }
+   },
+   "wirecard:ey-refuses-signoff-2020-06-18": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "third-party-acquiring-business",
+      "confidence": 1.0,
+      "probabilities": {
+       "third-party-acquiring-business": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.3755,
+      "probabilities": {
+       "economic": 0.7042,
+       "environmental": 0.07,
+       "political": 0.1104,
+       "social": 0.0526,
+       "technological": 0.0628
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 295.28,
+    "questions": {
+     "component": {
+      "criteria": {
+       "third-party-acquiring-business": "The subject's third-party payment-acquiring business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: The subject's auditor declines to sign off the prior year's accounts, stating it cannot find sufficient evidence for EUR 1.9 billion of cash reported on trust accounts, around a quarter of the balance sheet; the subject notes indications the confirming balances may have been falsified.\n\nSource: Auditor statement reported in financial press, 2020-06-18",
+    "usage": {
+     "input_tokens": 299,
+     "output_tokens": 0
+    }
+   },
+   "wirecard:ft-investigation-2019-01-30": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "third-party-acquiring-business",
+      "confidence": 1.0,
+      "probabilities": {
+       "third-party-acquiring-business": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.5841,
+      "probabilities": {
+       "economic": 0.8074,
+       "environmental": 0.0186,
+       "political": 0.1356,
+       "social": 0.0184,
+       "technological": 0.0199
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 263.76,
+    "questions": {
+     "component": {
+      "criteria": {
+       "third-party-acquiring-business": "The subject's third-party payment-acquiring business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A Financial Times investigation, drawing on internal whistleblower documents, alleges forged and backdated contracts in a string of suspicious transactions in the subject's Asia-Pacific business.\n\nSource: Press coverage of the Financial Times investigation, 2019-01-30",
+    "usage": {
+     "input_tokens": 257,
+     "output_tokens": 0
+    }
+   },
+   "wirecard:insolvency-filed-2020-06-25": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "third-party-acquiring-business",
+      "confidence": 1.0,
+      "probabilities": {
+       "third-party-acquiring-business": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.259,
+      "probabilities": {
+       "economic": 0.5947,
+       "environmental": 0.066,
+       "political": 0.1874,
+       "social": 0.066,
+       "technological": 0.086
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 267.64,
+    "questions": {
+     "component": {
+      "criteria": {
+       "third-party-acquiring-business": "The subject's third-party payment-acquiring business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: The management board files an application for the opening of insolvency proceedings with the district court of Munich, citing impending insolvency and over-indebtedness.\n\nSource: Company disclosure under EU Market Abuse Regulation Article 17, 2020-06-25",
+    "usage": {
+     "input_tokens": 263,
+     "output_tokens": 0
+    }
+   },
+   "wirecard:kpmg-special-audit-2020-04-28": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "third-party-acquiring-business",
+      "confidence": 1.0,
+      "probabilities": {
+       "third-party-acquiring-business": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.2723,
+      "probabilities": {
+       "economic": 0.6208,
+       "environmental": 0.0681,
+       "political": 0.1411,
+       "social": 0.0688,
+       "technological": 0.1013
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 293.4,
+    "questions": {
+     "component": {
+      "criteria": {
+       "third-party-acquiring-business": "The subject's third-party payment-acquiring business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: A special audit commissioned in response to the press allegations reports that KPMG could not verify the majority of the third-party acquiring business's reported sales revenue and customer relationships for 2016-2018.\n\nSource: KPMG special audit report, delivered 2020-04-27, disclosed 2020-04-28",
+    "usage": {
+     "input_tokens": 283,
+     "output_tokens": 0
+    }
+   },
+   "wirecard:zatarra-report-2016-02-24": {
+    "answers": {
+     "component": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "third-party-acquiring-business",
+      "confidence": 1.0,
+      "probabilities": {
+       "third-party-acquiring-business": 1.0
+      },
+      "type": "choice"
+     },
+     "steep": {
+      "action": {
+       "act_probability": 1.0
+      },
+      "choice": "economic",
+      "confidence": 0.735,
+      "probabilities": {
+       "economic": 0.9078,
+       "environmental": 0.0151,
+       "political": 0.0412,
+       "social": 0.0159,
+       "technological": 0.02
+      },
+      "type": "choice"
+     }
+    },
+    "call_ms": 284.44,
+    "questions": {
+     "component": {
+      "criteria": {
+       "third-party-acquiring-business": "The subject's third-party payment-acquiring business"
+      },
+      "instructions": "Which part of the business does this signal bear on?",
+      "type": "choice"
+     },
+     "steep": {
+      "criteria": {
+       "economic": "money, trading, demand, costs, financing, accounts, solvency, markets",
+       "environmental": "climate, energy use, physical resources, the natural environment",
+       "political": "a government, a regulator, a court, a law or an official act of state",
+       "social": "demographics, culture, public attitudes, workforce behaviour",
+       "technological": "a technology, a product capability, an engineering change"
+      },
+      "instructions": "Which STEEP category does this signal belong to?",
+      "type": "choice"
+     }
+    },
+    "state": "A signal has been observed.\n\nStatement: An anonymous 100-page dossier alleges money laundering and accounting irregularities tied to the subject's Asian operations; the subject's shares fall sharply intraday before recovering most of the loss on the CEO's denial.\n\nSource: Contemporaneous commentary on the anonymous Zatarra Research & Investigations dossier",
+    "usage": {
+     "input_tokens": 285,
+     "output_tokens": 0
+    }
+   }
+  }
+ },
+ "repo_id": "convaiinnovations/laya",
+ "revision": "1c5edc17a7acd8701df6fc341c0d179f1c62c982",
+ "ticket": "04",
+ "torch": "2.9.1",
+ "torch_threads": 4,
+ "wall_seconds": 16.97,
+ "weights_sha256": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c"
+}

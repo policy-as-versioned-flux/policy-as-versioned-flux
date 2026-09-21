@@ -194,6 +194,51 @@ This map measures and decides. It does not adopt anything into production.
   declares only `transformers>=4.45.0`, so its own metadata permits the wrong build. Found by
   ticket 02.
 
+- **Laya loses five of six metrics to the heuristics, ties the sixth, and beats a constant answer
+  on one.** Measured by ticket 04, the first independent evaluation of this model on anything.
+  `signal-classify` 0.870, `evolution-judge` 0.500, `causal-claims` 0.000,
+  `causal-claims-grade-accuracy` 1.000, `gameplay-lens` 0.333, `ethics-gate` 0.200, against 1.000
+  for the heuristic on every one. All six corpus digests match the digests `heuristic-0.1.0` was
+  scored on.
+- **Five of the six Laya scores are at or below the best constant answer their own corpus admits.**
+  The one exception, `causal-claims-grade-accuracy` at 1.000 against a 0.750 constant, bounds at
+  0.473 on 4 items against a 0.800 threshold. So no metric is measurable in Laya's favour.
+  Measured by ticket 04.
+- **`signal-classify`'s threshold is 0.80 and its own majority-class baseline is 0.913.** The
+  corpus is 21 economic items and 2 political ones. Laya caught 0 of the 2 political items, scored
+  0.870, and the log records `"passed": true`. The threshold cannot detect a classifier that has
+  learned nothing. Measured by ticket 04.
+- **`causal-claims`' elasticity leg cannot fail on its own corpus.** `twin/causal_claims.py`
+  `_BASE_MODE` is 0.375, which is exactly the mean of that corpus's four elasticity labels, and the
+  tolerance is 0.15. The heuristic's 1.000 on that metric is the fit, not the judgement. Laya's
+  0.000 is one leg too: sign is 3 of 4 and lag is 3 of 4, and elasticity 0 of 4 sinks every item.
+  Measured by ticket 04.
+- **`act_probability` read exactly 1.000000 on all 279 calls across three runs.** Ticket 02's
+  hypothesis at n=16 is now a finding at n=279 on the estate's own corpora. Ticket 05 may not use
+  it as the escalate signal. Measured by ticket 04.
+- **Two more near-constant heads, in the same run.** Laya answered "admit" on all five
+  `ethics-gate` sensors at 0.630 to 0.674, and "product" on all four `evolution-judge`
+  organisations at 0.338 to 0.426. Map call 14 measured three more times. Measured by ticket 04.
+- **The pooled raw calibration error is 0.1338 over 85 questions.** Item 8 of ticket 04 predicted
+  about 0.13 from ticket 01's correction. It is raw and uncalibrated on a different question
+  distribution from the vendor's, so the agreement is suggestive, not like-for-like. 0.081 stays
+  the wrong number. Measured by ticket 04.
+- **`substrate-generator` is not measurable against Laya at all.** That skill must generate a
+  multi-channel message schedule, and Laya emits `output_tokens: 0` on every call. No row was
+  written, because a 0.000 would read as a quality measurement. Recorded by ticket 04.
+- **Laya's continuous head carries signal where its band classifier does not.** On
+  `evolution-judge` the declared primary route scores 0.500 and the declared sensitivity route,
+  the bare `noul`, scores 4 of 4 with the rank order of all four organisations correct. Both routes
+  were fixed in code before the run. Only the primary is recorded. On 4 items the two cannot be
+  told apart at 95%. Measured by ticket 04.
+- **The bake-off needed no change to `twin/skills.py`, as map call 3 predicted.** 39 model calls,
+  three scripts outside `twin/`, and a replay closure `evaluate()` cannot tell from the heuristic.
+  The predictions digest is identical across three processes at two thread counts. Measured by
+  ticket 04.
+- **`verify/twin-evals/verify-twin-evals.sh` grades the incumbent against the last recorded row of
+  any model version.** Recording Laya changed what the heuristic is graded against on the next run.
+  It is harmless only while the incumbent scores 1.000. Found by ticket 04; unfixed.
+
 ### The owner's answers, 2026-09-21, binding
 
 1. **Destination is (b): measure, then decide.** Owner-instructed. The map builds the measurement.
@@ -279,6 +324,23 @@ This map measures and decides. It does not adopt anything into production.
     refuses both heads as filters, and ticket 05 takes the rule: a permission that always says yes
     is not a permission, which is the same sentence as call 8 from the other side.
 
+15. **A threshold below its own corpus's majority-class baseline is not a threshold.** Added
+    2026-09-21 after ticket 04. `signal-classify` grades at 0.80 on a corpus a constant answer
+    scores 0.913 on. Every score this map reports from here carries the best constant answer its
+    corpus admits beside it. Ticket 09's ADR states a corpus baseline as a condition of entry, and
+    eco-system ticket 112 sizes a minimum corpus against the baseline rather than against zero.
+
+16. **A model that cannot produce a skill's output shape is not measured at zero.** Added
+    2026-09-21 after ticket 04. `substrate-generator` needs generated text and Laya emits none. No
+    score row was written, because a 0.000 in the log reads as a quality measurement and is not
+    one. "Not measurable" and "bad" are different answers and the record keeps them apart.
+
+17. **The route is declared before the run, and the other route is reported anyway.** Added
+    2026-09-21 after ticket 04. Laya can answer a continuous question two ways, and the two
+    disagree: 0.500 against 4 of 4. Both were fixed in code before any result was seen. The
+    declared route is recorded; the other is reported and not recorded. Choosing the winner
+    afterwards would be fitting the instrument to a four-item corpus, which map call 12 refuses.
+
 ### The sentence this map changes
 
 `CONTEXT.md` defines the twin this way today: "A subscribed feed version becomes a sensed signal by
@@ -305,7 +367,7 @@ flowchart TD
         T01["01 · Laya's terms and<br/>independent evidence<br/><i>resolved</i>"]
         T02["02 · Laya runs offline,<br/>pinned, measured here<br/><i>resolved</i>"]
         T03["03 · A labelled corpus from<br/>merged human claims<br/><i>resolved</i>"]
-        T04["04 · The bake-off against<br/>the six heuristics<br/><i>task</i>"]
+        T04["04 · The bake-off against<br/>the six heuristics<br/><i>resolved</i>"]
         T01 --> T02 --> T04
         T03 --> T04
     end
@@ -337,17 +399,35 @@ flowchart TD
     classDef blocked fill:#30363d,stroke:#8b949e,color:#e6edf3
     classDef done fill:#8957e5,stroke:#4c2889,color:#fff
     classDef dest fill:#238636,stroke:#0f5323,color:#fff
-    class T04,T05 frontier
+    class T05 frontier
     class T09 blocked
-    class T01,T02,T03,T06,T07,T08,T10,T11 done
+    class T01,T02,T03,T04,T06,T07,T08,T10,T11 done
     class DEST,ECO dest
 ```
 
-Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 06, 07, 08, 10 and 11.
+Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 04, 06, 07, 08, 10 and 11. Ticket 09 now waits on ticket 05 alone.
 
 ## Decisions so far
 
 <!-- one line per closed ticket -->
+
+- [04 — The bake-off: Laya against the six heuristics](issues/04-the-bake-off-laya-against-the-six-heuristics.md):
+  **Laya loses five of six metrics, ties the sixth, and on five of six does not beat a constant
+  answer.** 0.870, 0.500, 0.000, 1.000, 0.333 and 0.200 against 1.000 for the heuristic on every
+  one, on the same six corpus digests, with `twin/skills.py` untouched. The one tie,
+  `causal-claims-grade-accuracy`, bounds at 0.473 on 4 items against a 0.800 threshold, so it is
+  not measurable either. `substrate-generator` is **not measurable at all**: Laya emits no tokens.
+  Six rows recorded at `model_version: laya-1c5edc17`, and the gate stays green. **Two ways the
+  incumbent cannot fail, found while measuring it**: `signal-classify`'s 0.80 threshold sits below
+  its own 0.913 majority-class baseline, and `causal-claims`' elasticity constant is exactly the
+  mean of its own four labels inside a tolerance that covers all four. **`act_probability` read
+  1.000000 on all 279 calls**, so ticket 02's hypothesis is now a finding and ticket 05 may not use
+  it. Two more near-constant heads found in the same run. Pooled raw calibration error 0.1338 over
+  85 questions, against item 8's predicted 0.13. One route disagreement reported and not recorded:
+  the declared `noul` sensitivity route scores 4 of 4 on `evolution-judge` where the declared
+  primary route scores 0.500, and 4 items cannot tell them apart. Side finding: the twin-evals gate
+  grades the incumbent against the last row of **any** model version, so recording a candidate
+  moves the incumbent's baseline.
 
 - [11 — Does a second round find the same holes?](issues/11-does-a-second-round-find-the-same-holes.md):
   **Two more rounds ran, and the overlap between any two is 1 to 3 candidates of 6.** Same harness
@@ -459,18 +539,20 @@ Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-
   number moves, and "on what terms" in the destination includes hardware. This stays fog rather
   than a ticket because it evaporates if ticket 09 decides a human runs Laya locally, which is
   exactly what call 5 forced for loophole. Waits on ticket 09.
-- Whether any of the six heuristics is actually replaced. Waits on ticket 04's number.
 - Whether the 12 candidates from ticket 11's rounds two and three earn a ticket-08 style
   deterministic check. Four restate a reason round one already gave; eight are new, and eight
   checks is roughly ticket 08's whole cost again. It is only worth charting if ticket 09 decides
   loophole enters on repeated rounds, because a single unchecked round is what the decision is
   about. Waits on ticket 09.
-- Whether this estate pays for a corpus that could support a specialised fit. Ticket 03 priced the
-  only route with real supply at roughly 57 backtest organisations for one skill, against the four
-  it has. That is a large build, and it is only worth charting if ticket 04's zero-shot number is
-  good enough to make a specialised number interesting. Waits on ticket 04.
-- Whether the `derive-probability` skill, eco-system ticket 93, could take a Laya input. Waits on
-  ticket 04.
+- Whether the `derive-probability` skill, eco-system ticket 93, could take a Laya input. **Ticket
+  04 sharpened this and did not answer it.** Laya's classification routes went near-constant on
+  three of the six skills, but its `noul` head placed all four `evolution-judge` organisations in
+  the right rank order, every one inside 0.095 of its label, and its pooled raw calibration error
+  is 0.1338. So the continuous head is the interesting one and the choice head is not. The precise
+  question is whether that head produces a calibrated probability on the estate's own forecasts.
+  **Nothing can measure it today**: ticket 03 measured that the first label the world writes
+  arrives on 2027-08-28, so there is no labelled probability corpus to calibrate against. It stays
+  fog rather than a ticket because a ticket nobody can resolve for 341 days is not a frontier.
 - Named firms and named executives in loophole output. Waits on eco-system ticket 82.
   Ticket 07's round produced none: the only proper nouns in the six candidates are `CoreDNS`
   and Kubernetes terms. One round is not a guarantee, so this stays fog.
@@ -483,6 +565,13 @@ Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-
   owner's call, not the assistant's. It is not needed to reach this map's destination.
 
 ## Out of scope
+
+- **Paying for a corpus that could support a specialised fit.** Ticket 03 priced the only route
+  with real supply at roughly 57 backtest organisations for one skill, against the four the estate
+  has. [Ticket 04](issues/04-the-bake-off-laya-against-the-six-heuristics.md) then measured the
+  zero-shot number as at or below a constant answer on five of six metrics, so a specialised fit
+  has nothing to improve on here. It is also a build, and this map measures and decides. Out of
+  scope for that second reason whatever a later number says.
 
 - Laya as a propagation engine. `twin/pert.py` stays. See call 1.
 - Either tool as a gate check. See call 2.
