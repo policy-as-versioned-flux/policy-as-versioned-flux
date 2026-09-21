@@ -237,6 +237,7 @@ green). The estate's one standing red is unchanged: invariant 45,
 
 ## Not yet specified
 
+- Whether Laya, a 421M calibrated decision model, and loophole, an adversarial norm-breaking agent loop, enter the estate. Charted 2026-09-21 as a subordinate map, [Laya, loophole and the trdrbot prior art, measured then decided](../laya-loophole/map.md), because its destination is a decision rather than a NORTH-STAR §4 joint. The owner permitted a model to judge on a GitHub clock within thresholds on 2026-09-21, which amends ticket 75 Q10 and ADR-0024. That map's ticket 09 graduates any adoption work back here, or records it below in Out of scope. Its ticket 10 resolved on 2026-09-21 and graduated two tickets here: [111 — A green that rests on luck may not promote](issues/111-a-green-that-rests-on-luck-may-not-promote.md) and [112 — A threshold states the corpus it needs](issues/112-a-threshold-states-the-corpus-it-needs.md). Ticket 10 left four other ideas on the floor, including the size ladder itself, whose own open defect records it as consulted in 2 of 89 decide cycles.
 - After ticket 75 (2026-09-02):
 - The identity lane that grades the actor half of attestation, and a federation peer with it. First thing after this map (ticket 75 Q12).
 - A shared, pinned adopter package instead of three forks, once a real divergence shows what the package must hold (ticket 75 Q7).
