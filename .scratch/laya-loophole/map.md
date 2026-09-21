@@ -108,6 +108,34 @@ This map measures and decides. It does not adopt anything into production.
   including an empty string and a destructive instruction. The head that says "escalate" said the
   same thing every time. n is 16, so this is a hypothesis for ticket 04, not a finding. It is
   enough to stop ticket 05 reaching for the head as an escalate signal.
+- **One loophole round against ADR-0022 costs 8 model calls here, 185.8 s and 0.4150 USD at list
+  price**, which the subscription absorbs. The published loop costs 14. The 6 extra calls are the
+  Legislator rewriting the norm document, and this estate does not make them. Measured by ticket 07.
+- **It produced 6 candidates, 3 loophole and 3 overreach, with 0 parse failures.** The zero is
+  falsifiable: a negative control fires on a truncated tag and on wrong inner tags. Measured by
+  ticket 07.
+- **The `<scenario>` tag counter alone cannot catch a total format collapse.** A model that
+  abandons the format opens no tag, so the parse-failure count reads 0 and the candidate count
+  reads 0. A second counter, under-production, catches it. A clean run needs both at zero. Found by
+  ticket 07.
+- **`claude -p --bare` breaks the run silently.** It never reads OAuth, so with no
+  `ANTHROPIC_API_KEY` the call fails with exit code 0, `subtype: "success"`, `is_error: true` and
+  `result: "Not logged in · Please run /login"`. The obvious adapter returns that sentence, the
+  parser finds no tags, and loophole prints that the legal code appears robust. Ticket 06 named
+  `--bare` in the invocation. Found and guarded by ticket 07.
+- **The estate may keep loophole's output, never its input.** Every system prompt and user
+  message in a run is loophole's own prompt text verbatim, and loophole carries no licence. The
+  committed log holds the responses and a sha256 of each prompt. A check confirms that no sentence
+  of 8 words or more from `loophole/prompts.py` reaches the tree. Found by ticket 07, and ticket
+  09's ADR inherits it.
+- **loophole's judge carries the same silent-failure defect in a second place.**
+  `agents/judge.py:62-63` reads a missing `<verdict>` tag as the literal verdict "unresolvable".
+  Found by ticket 07. The tag was present on all 6 judge calls.
+- **loophole numbers both finders' cases identically in every round.** Both run before any case is
+  appended to `state.cases`, so a round holds two cases numbered 1, two numbered 2 and two numbered
+  3. The case log, the HTML report and the judge's prior-case text all address cases by that
+  number. Found by ticket 07.
+
 - **transformers 4.x loads this checkpoint and silently gives different numbers.**
   `encoder/config.json` at the pin declares `transformers_version: 5.0.0` and carries
   `rope_parameters` and `layer_types`, which 4.x `ModernBertConfig` does not read. `laya` 0.3.4
@@ -170,6 +198,13 @@ This map measures and decides. It does not adopt anything into production.
     entry, not as a footnote, because a reader who follows Convai's README gets an unpinned model
     and no error.
 
+11. **The Legislator never runs, so no model rewrites a norm document.** Added 2026-09-21 after
+    ticket 07. loophole's published loop drafts the legal code and then revises it after every
+    resolved case, so cases 2 to 6 are judged against text a model wrote. This estate supplies its
+    real ADR and holds it fixed for the whole round. Two reasons: the target stays the estate's own
+    document, and the six verdicts stay comparable. It also costs 6 fewer calls. Ticket 09's ADR
+    states this as the shape of adoption, not as a tuning choice.
+
 ### The sentence this map changes
 
 `CONTEXT.md` defines the twin this way today: "A subscribed feed version becomes a sensed signal by
@@ -209,15 +244,17 @@ flowchart TD
 
     subgraph loophole["loophole — does adversarial attack find real holes?"]
         T06["06 · Can loophole run<br/>with no paid API?<br/><i>resolved</i>"]
-        T07["07 · One round against<br/>a named norm document<br/><i>task</i>"]
+        T07["07 · One round against<br/>a named norm document<br/><i>resolved</i>"]
         T08["08 · A candidate becomes a<br/>fixture, or is discarded<br/><i>task</i>"]
-        T06 --> T07 --> T08
+        T11["11 · Does a second round<br/>find the same holes?<br/><i>task</i>"]
+        T06 --> T07 --> T08 --> T11
     end
 
     T09["09 · The two ADRs<br/>and the amendments<br/><i>task</i>"]
     T04 --> T09
     T05 --> T09
     T08 --> T09
+    T11 --> T09
     T09 --> DEST(["Destination:<br/>two ADRs, each resting<br/>on a measured number"])
     T10 -. "ideas taken graduate" .-> ECO(["Eco-system map"])
 
@@ -225,13 +262,13 @@ flowchart TD
     classDef blocked fill:#30363d,stroke:#8b949e,color:#e6edf3
     classDef done fill:#8957e5,stroke:#4c2889,color:#fff
     classDef dest fill:#238636,stroke:#0f5323,color:#fff
-    class T04,T05,T07 frontier
-    class T08,T09 blocked
-    class T01,T02,T03,T06,T10 done
+    class T04,T05,T08 frontier
+    class T09,T11 blocked
+    class T01,T02,T03,T06,T07,T10 done
     class DEST,ECO dest
 ```
 
-Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 06 and 10.
+Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 06, 07 and 10.
 
 ## Decisions so far
 
@@ -292,6 +329,23 @@ Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-
   package **cannot pin a revision**; `act_probability` read 1.000000 on all 16 calls; transformers
   4.x would load this checkpoint and give different numbers without raising.
 
+- [07 — One loophole round against a named norm document](issues/07-one-loophole-round-against-a-named-norm-document.md):
+  **The round ran against ADR-0022 and produced 6 candidates, 3 loophole and 3 overreach, from 8
+  model calls, 185.8 s and 0.4150 USD at list price, with 0 parse failures.** The zero is
+  falsifiable: a negative control fires the detector on a truncated tag and on wrong inner tags,
+  and **misses** a total format collapse, which a second counter catches. So a clean run needs two
+  counters at zero. The harness is `.scratch/laya-loophole/bench/loophole_round.py`; it holds no
+  loophole source and no loophole prompt, and imports the scratchpad clone through `LOOPHOLE_SRC`.
+  Three side findings: **`--bare`, which ticket 06 named, breaks the run silently** and turns a
+  broken login into "the legal code appears robust"; the judge reads a missing `<verdict>` tag as
+  the verdict "unresolvable"; and both finders number their cases identically in every round.
+  A fourth finding is about the estate, not the tool: **the log ticket 07 demanded holds
+  loophole's prompts verbatim**, so the committed log keeps the responses and a digest of each
+  prompt, and the unredacted copy stays in the scratchpad.
+  Nothing is asserted about the six candidates. Five read resolvable and one unresolvable. Ticket
+  08 decides what survives. Ticket 11 is new: one round is one draw, and the tool's repeatability
+  is unmeasured.
+
 ## Not yet specified
 
 - What Laya costs on the hardware this estate would actually run it on. Ticket 02's 169.7 ms is
@@ -307,6 +361,8 @@ Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-
 - Whether the `derive-probability` skill, eco-system ticket 93, could take a Laya input. Waits on
   ticket 04.
 - Named firms and named executives in loophole output. Waits on eco-system ticket 82.
+  Ticket 07's round produced none: the only proper nouns in the six candidates are `CoreDNS`
+  and Kubernetes terms. One round is not a guarantee, so this stays fog.
 - Whether this estate may credit the trdrbot author in public. A named-individual question for
   eco-system ticket 82.
 - Whether a Convai corporate record exists. Ticket 01 found an organisation, a site, a named

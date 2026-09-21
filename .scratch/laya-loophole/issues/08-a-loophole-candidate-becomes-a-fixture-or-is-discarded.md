@@ -31,3 +31,15 @@ Every candidate resolved to a fixture or to a recorded discard. A stated surviva
 
 The survival rate is the honest verdict on the tool. A rate near zero says the tool generates
 noise, and that result is as valuable as a rate near one. Do not tune the run to raise it.
+
+**Added 2026-09-21, from ticket 07.** The six candidates are in
+[`research/07-loophole-round/candidates.json`](../research/07-loophole-round/candidates.json), keyed
+`loophole-1` to `loophole-3` and `overreach-4` to `overreach-6`. Each carries the scenario, the
+explanation and the judge's verdict. Five read resolvable and `overreach-5` reads unresolvable.
+
+Two things this ticket must not do. Do not treat the judge's "resolvable" as evidence that a
+candidate is real; it is the same non-deterministic model. Do not copy a scenario's wording into a
+fixture; write the fixture from what the scenario describes, because loophole carries no licence
+and the model's output was produced under loophole's prompts.
+
+Denominator for the survival rate: 6.

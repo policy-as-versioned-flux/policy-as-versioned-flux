@@ -1,0 +1,6 @@
+input                                      parsed  opens  parse_failures  under_production
+A well-formed, 3 scenarios                      3      3               0                 0
+B truncated: tag opened, never closed           1      2               1                 1
+C wrong inner tags (weak model)                 0      3               3                 0
+D prose only, no tags at all                    0      0               0                 3
+E markdown fence round the XML                  1      1               0                 2
