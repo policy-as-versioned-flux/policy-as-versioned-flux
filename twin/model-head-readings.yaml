@@ -1,0 +1,48 @@
+# The measured variance of a model head, for a model this gate cannot re-run (wayfinder ticket
+# 05 item 8, read by twin/model_permission.py).
+#
+# Item 8's rule: a head whose recorded outputs carry one distinct value across a run revokes the
+# permission it was supposed to grant, whatever that value is. A permission that always says yes
+# is not a permission, and a signal that never varies is not a signal.
+#
+# `verify/model-permission/verify-model-permission.sh` MEASURES this live for the incumbent, by
+# running it over each corpus and counting the distinct values of every field the scorer reads.
+# This file is only for a model the gate cannot run, because the weights are not in the tree.
+# Every row cites the ticket that measured it, so nothing here is a vendor number.
+#
+# n          how many calls the reading covers
+# distinct   how many distinct values the head took across those calls
+schema: twin.model-head-readings/v1
+version: 1
+readings:
+  - model_version: laya-1c5edc17
+    head: act_probability
+    n: 279
+    distinct: 1
+    distinct_sample: [1.0]
+    measured_by: .scratch/laya-loophole/issues/04-the-bake-off-laya-against-the-six-heuristics.md
+    note: >-
+      Ticket 02 read exactly 1.000000 on all 16 calls and handed it on as a hypothesis at n=16.
+      Ticket 04 ran the model over the estate's own six corpora and read exactly 1.000000 on all
+      93 questions, and on all 279 across three runs. The distinct-value set is [1.0]. This is
+      the head anybody wiring Laya in would reach for as the escalate signal, and it is not one.
+  - model_version: laya-1c5edc17
+    head: ethics-gate.choice
+    n: 5
+    distinct: 1
+    distinct_sample: ["admit"]
+    measured_by: .scratch/laya-loophole/issues/04-the-bake-off-laya-against-the-six-heuristics.md
+    note: >-
+      Laya answered "admit" on all five ethics-gate sensors, at confidences 0.630 to 0.674. Five
+      calls is a small n and the rule needs only two, so this row states what was seen rather
+      than more than was seen.
+  - model_version: laya-1c5edc17
+    head: evolution-judge.choice
+    n: 4
+    distinct: 1
+    distinct_sample: ["product"]
+    measured_by: .scratch/laya-loophole/issues/04-the-bake-off-laya-against-the-six-heuristics.md
+    note: >-
+      Laya answered "product" on all four evolution-judge organisations, at 0.338 to 0.426. The
+      same model's continuous head placed all four in the right rank order, which is why ticket
+      04 reported both routes and recorded only the one declared before the run.

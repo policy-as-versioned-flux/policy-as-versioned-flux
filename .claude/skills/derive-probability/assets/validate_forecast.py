@@ -44,6 +44,11 @@ def main(argv=None):
     parser.add_argument("--twin", default=".", help="the hub checkout holding the twin package and roles.yaml")
     parser.add_argument("--headless", action="store_true",
                         help="the caller knows nobody was at the keyboard (the local clock, ticket 92)")
+    parser.add_argument("--clock", default=None, choices=("human", "local", "github"),
+                        help="which clock ran (wayfinder ticket 05). The environment overrules it: a "
+                             "GitHub Actions marker makes this a github clock whatever is passed. A "
+                             "forecast from a github clock is REFUSED outright, because no skill score "
+                             "governs a derived probability and absence is not consent")
     parser.add_argument("--feeds", default=None, help="the feeds publisher's checkout (served envelopes)")
     parser.add_argument("--adopter", default=None, help="the adopter checkout the forecast belongs to")
     args = parser.parse_args(argv)
@@ -57,6 +62,26 @@ def main(argv=None):
         return 2
     register = yaml.safe_load(open(os.path.join(hub, "twin", "roles.yaml")))
     roles = {str(role["id"]) for role in register["roles"]}
+
+    # WAYFINDER TICKET 05. This validator is the second path to a model-made assertion, and item
+    # 6 asks that no path reach one without crossing the seam. The clock is DERIVED, never read
+    # off the file: a run carrying a GitHub Actions marker is a github clock whatever anybody
+    # says. A forecast from a github clock is refused outright rather than graded, because no
+    # skill score in twin/skill-thresholds.yaml governs a derived probability, and item 5's rule
+    # is that absence is not consent. The day one does, this becomes a permission lookup.
+    try:
+        from twin import model_permission as mp
+    except Exception as exc:  # noqa: BLE001 - any import failure is "cannot look"
+        print(f"SKIP: no twin package at {hub!r} to read the model permission from ({exc})")
+        return 2
+    clock, why = mp.derive_clock(args.clock)
+    print(f"ok  clock is {clock!r}: {why}")
+    if clock == mp.GOVERNED_CLOCK:
+        print("not ok  a derived probability from a model on a GitHub clock: no entry in "
+              "twin/skill-thresholds.yaml governs this skill, so no permission can be granted for "
+              "it, and absence is not consent (wayfinder ticket 05, items 5 and 6)")
+        print(f"FAIL: {os.path.abspath(args.forecast)} is not a forecast file the twin can read")
+        return 1
 
     path = os.path.abspath(args.forecast)
     adopter = args.adopter

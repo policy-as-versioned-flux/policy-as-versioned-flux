@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate a claim file written by the classify-and-judge skill.
 
-    validate_claim.py <claim file> --twin <hub root> [--headless]
+    validate_claim.py <claim file> --twin <hub root> [--headless] [--clock CLOCK]
 
 This is the check ecosystem ticket 50 asks the gate to run over the skill's PR:
 **only existing claim kinds, and `derived_from` names them.** The claim kinds and
@@ -13,6 +13,15 @@ after the thing it checks has moved.
 the keyboard, so the file must say `run.headless: true` and may carry no override,
 whatever the file itself declares. Without the flag the file's own `run.headless`
 is what is believed.
+
+`--clock` is the caller's word about WHICH clock ran (wayfinder ticket 05), and the
+environment overrules both it and the file: a run carrying a GitHub Actions marker
+is a `github` clock whatever anybody wrote down (`twin.model_permission.derive_clock`).
+THIS FILE IS THE SEAM the model-judging permission binds at. `talk/local-clock.sh`
+copies this validator and the twin package to a judge tree BEFORE the child model
+starts and runs it over every committed claim file, so the model never chooses
+whether it runs. Only a `github` clock is governed here: a `human` run is the skill's
+ordinary path, and a `local` run keeps ticket 92's own terms.
 
 Exit 0 valid, 1 invalid (every reason printed), 2 could not read the twin.
 
@@ -42,14 +51,61 @@ def twin_facts(hub):
     return tuple(CLAIM_KINDS), {str(role["id"]) for role in register["roles"]}
 
 
+def permission_rules(hub):
+    """The model-judging permission, read off the twin package itself -- never copied here, the
+    same reason `twin_facts` gives: a copy is how a check goes on passing after the thing it
+    checks has moved. Returns (derive_clock, check_claim_document, permission_lookup)."""
+    sys.path.insert(0, os.path.abspath(hub))
+    try:
+        from twin import model_permission as mp
+        from twin import record_skill_scores as rss
+        from twin.skills import load_scores, threshold_for
+    except Exception as exc:  # noqa: BLE001 - any import failure is "cannot look"
+        raise SystemExit(f"SKIP: no twin package at {hub!r} to read the model permission from ({exc})")
+
+    scores = load_scores()
+    readings = mp.load_head_readings()
+    fitted = rss.fitted_models()
+    measured = {}
+
+    def lookup(skill, model_version):
+        """One skill's permission for one model. The corpus digest, the baseline and the
+        variance are DERIVED from the corpus in the tree, so a stale scoring run cannot grant
+        anything (item 2) and a constant field cannot hide (item 8)."""
+        if skill not in measured:
+            measured[skill] = rss.corpus_facts(skill)
+        facts = measured[skill]
+        return mp.permission_for(
+            skill,
+            model_version,
+            scores=scores,
+            corpus_digest_now=facts["corpus_digest"],
+            threshold_now=threshold_for(skill),
+            baseline=facts["baseline"],
+            variance=facts["variance"],
+            readings=readings,
+            seam_crossed=True,
+            seam_detail=f"the seam ran: {mp.SEAM}",
+            fitted_models=fitted,
+        )
+
+    return mp.derive_clock, mp.check_claim_document, lookup
+
+
 def pin_key(pin):
     return tuple(str(pin.get(field, "")) for field in PIN_FIELDS)
 
 
-def validate(doc, kinds, roles, headless=False):
+def validate(doc, kinds, roles, headless=False, clock=None, permission=None):
     """Every reason the file is not a claim file the twin can read; [] when it is. `headless`
     is the caller's fact (the local clock passes --headless): then the file must say so and
-    the override rule applies even if the file forgot to declare it."""
+    the override rule applies even if the file forgot to declare it.
+
+    `clock` is the DERIVED clock (wayfinder ticket 05) and `permission` is the pair
+    `(check_claim_document, lookup)` read off the twin by `permission_rules()`. Given both, and
+    only on a `github` clock, the model-judging permission is graded here -- this function is
+    the seam. Given neither, the file is checked exactly as before, which is what every
+    human-run and local-clock path gets."""
     bad = []
 
     def need(condition, message):
@@ -161,6 +217,12 @@ def validate(doc, kinds, roles, headless=False):
 
     for pin in declared - cited:
         bad.append(f"derived_from names {pin}, which no claim cites")
+
+    # THE SEAM (wayfinder ticket 05). Only a `github` clock is governed; the rule itself lives
+    # in twin/model_permission.py and is read from there, never restated here.
+    if clock is not None and permission is not None:
+        check_claim_document, lookup = permission
+        bad.extend(check_claim_document(doc, clock, lookup))
     return bad
 
 
@@ -172,11 +234,20 @@ def main(argv=None):
     parser.add_argument("--headless", action="store_true",
                         help="the caller knows nobody was at the keyboard (the local clock, "
                              "ticket 92): the file must say run.headless: true and carry no override")
+    parser.add_argument("--clock", default=None, choices=("human", "local", "github"),
+                        help="which clock ran (wayfinder ticket 05). The environment overrules "
+                             "it: a GitHub Actions marker makes this a github clock whatever is "
+                             "passed. Only a github clock is graded against the model-judging "
+                             "permission")
     args = parser.parse_args(argv)
 
     kinds, roles = twin_facts(args.twin)
+    derive_clock, check_claim_document, lookup = permission_rules(args.twin)
+    clock, why = derive_clock(args.clock)
     doc = yaml.safe_load(open(args.claim))
-    bad = validate(doc, kinds, roles, headless=args.headless)
+    bad = validate(doc, kinds, roles, headless=args.headless, clock=clock,
+                   permission=(check_claim_document, lookup))
+    print(f"ok  clock is {clock!r}: {why}")
     if bad:
         for line in bad:
             print(f"not ok  {line}")

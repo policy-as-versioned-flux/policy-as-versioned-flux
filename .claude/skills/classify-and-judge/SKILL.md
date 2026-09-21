@@ -34,6 +34,22 @@ GitHub clock to produce this; it ran on the owner's local clock" for such a run.
 `talk/local-clock.headless.md` is the note the clock appends to the system prompt and is the
 authority on what a headless run may do.
 
+**Amended 2026-09-21 (wayfinder ticket 05).** On 2026-09-21 the owner permitted a model to judge
+on a GitHub clock, **within thresholds**. The sentence above still stands, because the permission
+is a mechanism and not a grant: `twin/model_permission.py` turns "within thresholds" into ten
+conditions, and **no model in this estate holds a permission on any skill today**. The candidate
+model fails on its score, its corpus digest and the variance of its own heads; the incumbent
+heuristic fails because it is graded on the corpus it was fitted on. So nothing here runs on a
+GitHub clock, and now that is a thing a check observes rather than a sentence somebody keeps.
+
+The seam is `assets/validate_claim.py::validate` itself, which `talk/local-clock.sh` already runs
+over every committed claim file out of a tree the model cannot write to. It takes `--clock` as
+well as `--headless`, and the clock is **derived**: a run carrying a GitHub Actions marker is a
+GitHub clock whatever the file says. A `human` run and a `local` run are untouched by the new
+rule, so this skill's ordinary path and ticket 92's terms both read exactly as before.
+
+`verify/model-permission/verify-model-permission.sh` grades the rule on the gate.
+
 **Two things this skill may never do:** merge its own PR, and invent an entry. If a statement is
 not in the published pool with a URL, it does not become a signal here — it is a **scenario**, and
 scenarios live in the adopter's `twin/orgs/<org>/scenarios/` library. The niobium supply shock is

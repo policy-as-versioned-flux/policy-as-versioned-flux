@@ -90,3 +90,30 @@ six corpus digests `heuristic-0.1.0` was scored on. Five things the ADR must car
    only while the incumbent scores 1.000 and a candidate can at best tie. Either scope the
    comparison to the incumbent's own `model_version`, or record the hazard with its reason. Found
    by ticket 04 and unfixed.
+
+**Added 2026-09-21, from ticket 05. This ticket is now the frontier: every other ticket on the
+map is resolved.**
+
+The permission exists, it is on the truth surface, and **it grants nothing**. 0 of 14 (metric,
+model version) pairs hold one. That changes what three of the five items above have to say.
+
+- **Item 1, the Laya ADR.** Laya is now refused by the estate's own rule, not only by a bad
+  score. It fails items 1, 2, 5, 8 and 9 across the seven metrics. State the refusal as the
+  rule's output, and cite `verify/model-permission/verify-model-permission.sh`.
+- **The ADR must also say the incumbent is refused**, on the tenth condition: `heuristic-0.1.0`
+  is graded on the corpus it was fitted on. A rule that cleared the incumbent and refused the
+  candidate would be a rule fitted to the answer. This is the strongest thing the ADR can say
+  about its own fairness.
+- **Item 3, the two prose amendments.** `.claude/skills/classify-and-judge/SKILL.md` already
+  carries a dated amendment from ticket 05 that describes the mechanism and changes no rule: its
+  "nothing here ever runs on a GitHub clock" still stands, because nothing holds a permission.
+  ADR-0024 still needs its own. **`CONTEXT.md` is untouched on purpose** — the map forbids
+  assuming the new wording before this ticket lands.
+- **Item 4, the ticket 75 Q10 note.** The condition to record is the ten-condition rule in
+  `twin/model_permission.py`, and the scope: the permission governs the **GitHub** clock alone,
+  because that is the clock the owner's words named and the one ADR-0024 forbade. A human run
+  and the local clock keep their own terms.
+- **A new measured fact for whichever ADR carries the corpus argument.** Five of the seven
+  thresholds sit at or below the best constant answer their own corpus admits. Ticket 04 found
+  one; ticket 05 derived all seven. It is reported and not graded on the gate, and eco-system
+  ticket 112 owns the sizing.

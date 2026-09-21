@@ -188,6 +188,38 @@ This map measures and decides. It does not adopt anything into production.
   `loophole/prompts.py`, fires on all 1,287 against the source as a negative control, and finds 0
   in all six committed files across the three rounds. Built by ticket 11.
 
+- **Five of the seven skill thresholds sit at or below the best constant answer their own corpus
+  admits.** Ticket 04 found this for `signal-classify` (0.80 against 0.913). Ticket 05 derived the
+  baseline for all seven and extended it: `evolution-judge` 0.75 against 0.750, `causal-claims`
+  0.80 against 1.000, `substrate-generator` 0.80 against 1.000, `ethics-gate` 0.80 against 0.800.
+  Only `causal-claims-grade-accuracy` (0.80 against 0.750) and `gameplay-lens` (0.65 against
+  0.333) clear their own corpus. Measured by ticket 05.
+- **`substrate-generator`'s corpus does not grade channel content at all.** Its scorer checks that
+  a channel is non-empty and never what is in it, so a model that always emits the same events
+  channel scores 1.000 while everything else is granted. Found by ticket 05.
+- **The frozen-field baseline reproduces ticket 04's two hand-measured numbers by an independent
+  route.** `twin/model_permission.frozen_field_baseline()` perturbs each leaf of the answer to
+  find which fields the scorer reads, then freezes one at a candidate and grants the rest. It
+  gives `signal-classify` 0.913 on `steep` and `causal-claims` 1.000 on `edge.elasticity.mode`,
+  with no skill named in it. The gate asserts the agreement on every run. Measured by ticket 05.
+- **The estate's own incumbent holds no permission either.** The first run of ticket 05's nine
+  conditions granted `heuristic-0.1.0` five of seven metrics. It is graded on the corpus it was
+  fitted on, which `twin/evolution_judge.py`'s own `CORPUS_KIND` already calls
+  `harness-mechanism`. A tenth condition refuses it. **0 of 14 (metric, model version) pairs hold
+  a permission on 2026-09-21.** Measured by ticket 05.
+- **The seam the permission binds at already existed.** `talk/local-clock.sh` copies the twin
+  package and the skill to a judge tree before the child model starts and runs the claim
+  validator over every committed claim file; a refusal fails the step and the branch is never
+  pushed. Ticket 05 put the permission inside that validator and made the clock **derived** from
+  `GITHUB_ACTIONS`, `GITHUB_RUN_ID` and `GITHUB_WORKFLOW` rather than read off the file. Built by
+  ticket 05.
+- **There were two paths to a model-made artefact, not one.** The clock's steps table names
+  `validate_claim.py` for the `classify` row and `validate_forecast.py` for the `derive` row.
+  Ticket 05 found the second by breaking it: the flag reached a validator that did not accept
+  it, and `verify-derived-forecast.sh` went red on the gate. Both now take it, and the check
+  asserts that every validator the table names does, so a third skill cannot skip the seam.
+  Found and closed by ticket 05.
+
 - **transformers 4.x loads this checkpoint and silently gives different numbers.**
   `encoder/config.json` at the pin declares `transformers_version: 5.0.0` and carries
   `rope_parameters` and `layer_types`, which 4.x `ModernBertConfig` does not read. `laya` 0.3.4
@@ -341,6 +373,21 @@ This map measures and decides. It does not adopt anything into production.
     declared route is recorded; the other is reported and not recorded. Choosing the winner
     afterwards would be fitting the instrument to a four-item corpus, which map call 12 refuses.
 
+18. **A model graded on the corpus it was fitted on has earned nothing, and that is a condition,
+    not a footnote.** Added 2026-09-21 after ticket 05. The nine conditions the owner's answer and
+    the earlier tickets produced granted the incumbent heuristic five of seven metrics on their
+    first run. The estate had already said why that is wrong, in `twin/evolution_judge.py`'s own
+    `CORPUS_KIND`. So the permission carries ten conditions, not nine. A rule that cleared the
+    incumbent and refused the candidate would be a rule fitted to the answer, which is the same
+    defect as calls 15 and 16 one level up.
+
+19. **The permission governs the GitHub clock alone, and the clock is derived.** Added 2026-09-21
+    after ticket 05. The owner's words were "on a GitHub clock", and ADR-0024 forbade exactly that
+    before 2026-09-21. A `human` run and a local-clock run keep their own terms, so nothing
+    working changed. The route around a per-clock rule is to declare the wrong clock, and that is
+    closed by deriving the clock from the environment and by asserting that no workflow in the
+    tree sets or clears a marker.
+
 ### The sentence this map changes
 
 `CONTEXT.md` defines the twin this way today: "A subscribed feed version becomes a sensed signal by
@@ -374,7 +421,7 @@ flowchart TD
 
     subgraph doctrine["Doctrine — what 'within thresholds' means"]
         T10["10 · What the trdrbot<br/>prior art teaches<br/><i>resolved</i>"]
-        T05["05 · 'Within thresholds' becomes<br/>a checkable permission<br/><i>task</i>"]
+        T05["05 · 'Within thresholds' becomes<br/>a checkable permission<br/><i>resolved</i>"]
         T10 -.-> T05
     end
 
@@ -399,17 +446,41 @@ flowchart TD
     classDef blocked fill:#30363d,stroke:#8b949e,color:#e6edf3
     classDef done fill:#8957e5,stroke:#4c2889,color:#fff
     classDef dest fill:#238636,stroke:#0f5323,color:#fff
-    class T05 frontier
-    class T09 blocked
-    class T01,T02,T03,T04,T06,T07,T08,T10,T11 done
+    class T09 frontier
+    class T01,T02,T03,T04,T05,T06,T07,T08,T10,T11 done
     class DEST,ECO dest
 ```
 
-Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 04, 06, 07, 08, 10 and 11. Ticket 09 now waits on ticket 05 alone.
+Blue is the frontier. Purple is resolved. Redrawn 2026-09-21 after ticket 05. **Every ticket on
+this map but ticket 09 is resolved, and ticket 09 is now the frontier.** It is the destination
+itself: the two ADRs and the amendments.
 
 ## Decisions so far
 
 <!-- one line per closed ticket -->
+
+- [05 — "Within thresholds" becomes a checkable permission](issues/05-within-thresholds-becomes-a-checkable-permission.md):
+  **Built, and it grants nothing: 0 of 14 (metric, model version) pairs hold a permission.** Ten
+  conditions in `twin/model_permission.py`, the seam inside the claim validator the local clock
+  already runs out of a tree the model cannot write to, and
+  `verify/model-permission/verify-model-permission.sh` on the truth surface. Every condition
+  carries a negative control and the rule carries a **positive** one, because nothing holds a
+  permission today and a stuck "no" passes every refusal test there is. **A tenth condition was
+  forced by the first run of the nine**: it granted the incumbent heuristic five of seven metrics
+  on a score the estate's own `CORPUS_KIND` already calls `harness-mechanism`. The clock is
+  **derived** from `GITHUB_ACTIONS`, `GITHUB_RUN_ID` and `GITHUB_WORKFLOW`, never read off the
+  file, and no workflow in the tree may set or clear one. Item 9's bar is derived by perturbation
+  and **reproduces ticket 04's two hand-measured numbers**, 0.913 on `steep` and 1.000 on
+  `edge.elasticity.mode`. New finding: **five of the seven thresholds sit at or below the best
+  constant answer their own corpus admits**, reported and not graded, because ticket 03 measured
+  the corpus is 326 items short and eco-system ticket 112 owns the sizing. Side finding:
+  `substrate-generator`'s scorer never grades channel content. Two holes were found while
+  building and closed: item 1 read the threshold the row was recorded against rather than the
+  one the tree sets today, and the seam covered only one of the clock's two validators.
+  `CONTEXT.md` is untouched, which ticket 09 owns. Citable run:
+  `TRUTH 2026-09-21T20:50Z run=local hub=10d3b7b ... pass=70 fail=17 skip=29 total=124`, on
+  which the new check reads PASS. That is a local run on a moved estate clone, so its counts do
+  not compare to run 254; the ticket says so and names what was checked directly instead.
 
 - [04 — The bake-off: Laya against the six heuristics](issues/04-the-bake-off-laya-against-the-six-heuristics.md):
   **Laya loses five of six metrics, ties the sixth, and on five of six does not beat a constant
@@ -553,6 +624,12 @@ Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-
   **Nothing can measure it today**: ticket 03 measured that the first label the world writes
   arrives on 2027-08-28, so there is no labelled probability corpus to calibrate against. It stays
   fog rather than a ticket because a ticket nobody can resolve for 341 days is not a frontier.
+- Whether a model on a GitHub clock ever presents itself honestly in a real Actions run. Ticket
+  05 built the derivation and exercised it with a synthetic environment; the only remaining lie,
+  a workflow unsetting a marker, is asserted against the workflow files rather than observed at
+  run time. Nothing can measure the real thing until a model holds a permission, and none does.
+  Waits on ticket 09.
+
 - Named firms and named executives in loophole output. Waits on eco-system ticket 82.
   Ticket 07's round produced none: the only proper nouns in the six candidates are `CoreDNS`
   and Kubernetes terms. One round is not a guarantee, so this stays fog.
