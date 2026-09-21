@@ -90,7 +90,29 @@ This map measures and decides. It does not adopt anything into production.
   multilingual. **For typed decisions alone the same file records 0.207 falling to 0.129.** A refit
   on twin-like decisions should expect about 0.13, not 0.081. Corrected by ticket 01.
 - The 32.8 ms latency belongs to the **multilingual** checkpoint. The 421M English checkpoint is
-  **39.5 ms**, p95 44.8. Corrected by ticket 01.
+  **39.5 ms**, p95 44.8. Corrected by ticket 01. **That is a T4 GPU number, and this estate has no
+  GPU.** Ticket 02 measured the English checkpoint on this CPU at **169.74 ms p50, 203.67 ms p99**
+  for one question, 470.8 ms for five, at 4 threads over 120 timed passes. 169.7 ms is the number
+  later tickets use. Corrected by ticket 02.
+- **Convai's own published CPU artefact is three times slower than this hardware.**
+  `research/results/cpu_51_language_sweep.json`, `part_b.by_model.english`, records 1392.5 ms per
+  5-question case at `device: cpu`, `threads: 4`. The same shape here costs 470.8 ms. The card's
+  unsourced "CPU latency 193-464 ms" is roughly right for an Apple-silicon laptop while the
+  vendor's own measurement is three times worse than both. Measured by ticket 02.
+- **The vendor's package cannot pin a revision.** `laya.Agent.__init__` (0.3.4,
+  `laya/agent.py:122-128`) calls `snapshot_download` with no `revision`, so it can only fetch
+  whatever `main` points at. Anyone who adopts Laya by following its README runs an unpinned model
+  on a repository whose `main` moved ten times in two days. `Agent` does accept a local directory,
+  so the pin has to be done outside it. Found by ticket 02.
+- **`act_probability` read exactly 1.000000 on all 16 calls ticket 02 made**, across 8 states
+  including an empty string and a destructive instruction. The head that says "escalate" said the
+  same thing every time. n is 16, so this is a hypothesis for ticket 04, not a finding. It is
+  enough to stop ticket 05 reaching for the head as an escalate signal.
+- **transformers 4.x loads this checkpoint and silently gives different numbers.**
+  `encoder/config.json` at the pin declares `transformers_version: 5.0.0` and carries
+  `rope_parameters` and `layer_types`, which 4.x `ModernBertConfig` does not read. `laya` 0.3.4
+  declares only `transformers>=4.45.0`, so its own metadata permits the wrong build. Found by
+  ticket 02.
 
 ### The owner's answers, 2026-09-21, binding
 
@@ -141,6 +163,13 @@ This map measures and decides. It does not adopt anything into production.
    that the code appears robust. Ticket 07 must tell zero candidates apart from a failed parse.
    This is the estate's own defect class, eco-system ticket 98, found in somebody else's code.
 
+10. **The pin is taken outside the vendor's package, and any adoption inherits that.** Added
+    2026-09-21 after ticket 02. `laya.Agent` passes no `revision` to `snapshot_download`, so the
+    documented entry point cannot pin. Every path this estate takes into Laya resolves the digest
+    itself and hands `Agent` a local directory. Ticket 09's ADR states this as a condition of
+    entry, not as a footnote, because a reader who follows Convai's README gets an unpinned model
+    and no error.
+
 ### The sentence this map changes
 
 `CONTEXT.md` defines the twin this way today: "A subscribed feed version becomes a sensed signal by
@@ -165,7 +194,7 @@ wording before ticket 09 lands.
 flowchart TD
     subgraph laya["Laya — does a small local model judge well enough?"]
         T01["01 · Laya's terms and<br/>independent evidence<br/><i>resolved</i>"]
-        T02["02 · Laya runs offline,<br/>pinned, measured here<br/><i>task</i>"]
+        T02["02 · Laya runs offline,<br/>pinned, measured here<br/><i>resolved</i>"]
         T03["03 · A labelled corpus from<br/>merged human claims<br/><i>resolved</i>"]
         T04["04 · The bake-off against<br/>the six heuristics<br/><i>task</i>"]
         T01 --> T02 --> T04
@@ -196,13 +225,13 @@ flowchart TD
     classDef blocked fill:#30363d,stroke:#8b949e,color:#e6edf3
     classDef done fill:#8957e5,stroke:#4c2889,color:#fff
     classDef dest fill:#238636,stroke:#0f5323,color:#fff
-    class T02,T05,T07 frontier
-    class T04,T08,T09 blocked
-    class T01,T03,T06,T10 done
+    class T04,T05,T07 frontier
+    class T08,T09 blocked
+    class T01,T02,T03,T06,T10 done
     class DEST,ECO dest
 ```
 
-Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 03, 06 and 10.
+Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 06 and 10.
 
 ## Decisions so far
 
@@ -250,8 +279,26 @@ Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-
   cannot be cleared at 95% confidence even by a perfect score**, which is a measured number for
   eco-system ticket 112.
 
+- [02 — Laya runs offline, pinned, and measured here](issues/02-laya-runs-offline-pinned-and-measured-here.md):
+  **It runs, at the pin, on CPU, with the network closed, and it costs 169.7 ms per question, not
+  39.5 ms.** The 39.5 ms was a T4 GPU figure. Measured here: p50 169.74 ms and p99 203.67 ms for
+  one question, 470.8 ms for five, over 120 timed passes at 4 threads, swept across 1 to 10
+  threads to show the setting is not doing the work. Against the only like-for-like vendor
+  artefact, `cpu_51_language_sweep.json` at 1392.5 ms per 5-question case on the same device and
+  thread count, this hardware is 3.0x faster. The pin reproduces: one `answers_sha256` across
+  three processes and two thread counts. The instrument is
+  `.scratch/laya-loophole/bench/measure_laya.py`, which blocks `socket.connect` for the whole
+  measured run rather than trusting an environment variable. Three side findings: the vendor's own
+  package **cannot pin a revision**; `act_probability` read 1.000000 on all 16 calls; transformers
+  4.x would load this checkpoint and give different numbers without raising.
+
 ## Not yet specified
 
+- What Laya costs on the hardware this estate would actually run it on. Ticket 02's 169.7 ms is
+  an Apple-silicon laptop with 8 performance cores. A GitHub Actions runner is 4 vCPU, so the
+  number moves, and "on what terms" in the destination includes hardware. This stays fog rather
+  than a ticket because it evaporates if ticket 09 decides a human runs Laya locally, which is
+  exactly what call 5 forced for loophole. Waits on ticket 09.
 - Whether any of the six heuristics is actually replaced. Waits on ticket 04's number.
 - Whether this estate pays for a corpus that could support a specialised fit. Ticket 03 priced the
   only route with real supply at roughly 57 backtest organisations for one skill, against the four

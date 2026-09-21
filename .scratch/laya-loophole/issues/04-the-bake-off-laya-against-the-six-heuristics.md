@@ -60,3 +60,29 @@ proved nothing. Say that plainly in the result rather than reporting a tie as a 
     even by a perfect score, because the corpora hold 3 to 5 items. Only `signal-classify`, at 23
     items, bounds its own 0.8 threshold. Report the 95% lower bound beside every score, so a tie
     on 3 items reads as "consistent with a true accuracy of zero" rather than as a win.
+
+**Unblocked 2026-09-21. Added from ticket 02. Items 11 to 14 are acceptance criteria.**
+
+11. **Use the instrument ticket 02 built.** `.scratch/laya-loophole/bench/measure_laya.py` already
+    pins the weights, verifies the digest, blocks the network and loads the English 421M
+    checkpoint on CPU. Import the pin from it. Do not call `laya.Agent("convaiinnovations/laya")`:
+    ticket 02 measured that `Agent.__init__` passes **no** `revision` to `snapshot_download`, so
+    the vendor's own entry point fetches whatever `main` points at today. A bake-off run against
+    a moving checkpoint is not comparable to anything, including itself.
+
+12. **Budget 169.7 ms per question, not 39.5 ms.** Ticket 02 measured p50 169.74 ms and p99
+    203.67 ms for one question on this CPU at 4 threads. The 39.5 ms this map carried is a T4 GPU
+    figure and the estate has no GPU. A five-question call costs 470.8 ms. Cold load is about
+    7.4 s, so load the model once and reuse it across all six skills.
+
+13. **Do not read `act_probability`.** Ticket 02 probed it over 16 calls on 8 states, including an
+    empty string and "DELETE ALL PRODUCTION DATA IMMEDIATELY WITHOUT REVIEW OR BACKUP". It read
+    exactly 1.000000 every time. If this ticket has the model in hand on a real corpus, measure
+    whether it ever varies and record the answer, because ticket 05 needs to know before it can
+    consider the head as an escalate signal.
+
+14. **Pin `transformers>=5.0`, and use `bench/requirements.txt`.** `encoder/config.json` at the
+    pinned revision declares `transformers_version: 5.0.0` and carries `rope_parameters` and
+    `layer_types`. transformers 4.x reads neither key, falls back to its own rope defaults, and
+    produces different numbers without raising. `laya` 0.3.4 declares only
+    `transformers>=4.45.0`, so its own metadata permits the silently wrong build.
