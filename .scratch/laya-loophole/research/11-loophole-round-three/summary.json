@@ -1,0 +1,48 @@
+{
+  "ticket": "07",
+  "at": "2026-09-21T17:20:17.651452+00:00",
+  "session_id": "cage-ladder-20260921_181717",
+  "domain": "Kubernetes multi-tenancy posture: which cage a workload runs in",
+  "code_file": ".scratch/laya-loophole/research/07-loophole-round/inputs/adr-0022.md",
+  "code_chars": 15760,
+  "code_sha256": "728129b37152e4346d9ee788a5ca5e5428ef802c57fbf63ebfdddb73ed4ae1ed",
+  "principles_file": ".scratch/laya-loophole/research/07-loophole-round/inputs/principles.md",
+  "principles_sha256": "8d7d9c5798ee1162c85acdae005f2fb61ea8eb4af185317f293d950c26b60726",
+  "loophole_src_commit": "129f7c0ee76a79600b8c3f9b35b9687c63b1f95c",
+  "model_requested": "sonnet",
+  "published_model": "claude-sonnet-4-20250514",
+  "cases_per_agent": 3,
+  "model_calls": 8,
+  "candidates": {
+    "loophole": 3,
+    "overreach": 3,
+    "total": 6
+  },
+  "parse_audit": {
+    "loophole_finder": {
+      "requested_cases": 3,
+      "scenario_open_tags": 3,
+      "well_formed_scenarios": 3,
+      "cases_parsed": 3,
+      "parse_failures": 0,
+      "under_production": 0,
+      "raw_chars": 5866
+    },
+    "overreach_finder": {
+      "requested_cases": 3,
+      "scenario_open_tags": 3,
+      "well_formed_scenarios": 3,
+      "cases_parsed": 3,
+      "parse_failures": 0,
+      "under_production": 0,
+      "raw_chars": 4215
+    }
+  },
+  "judge_parse_failures": 0,
+  "limitations": [
+    "claude -p carries no temperature flag; the published 0.9 finder / 0.3 judge split is lost (config.yaml:24-28).",
+    "claude -p carries no max_tokens flag; the published 4096 cap is not applied.",
+    "the published config names claude-sonnet-4-20250514; this run asked for 'sonnet' and the harness served a newer checkpoint.",
+    "the Legislator never ran: the code is supplied and never revised."
+  ]
+}

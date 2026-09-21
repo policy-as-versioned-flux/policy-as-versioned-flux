@@ -1,0 +1,238 @@
+{
+  "summary": {
+    "ticket": "11",
+    "at": "2026-09-21T17:24:56.285729+00:00",
+    "a_round": "two",
+    "b_round": "three",
+    "repeats": 3,
+    "seed": 11,
+    "model_requested": "sonnet",
+    "match_counts": {
+      "loophole-3 ~ loophole-3": 3,
+      "overreach-4 ~ overreach-5": 2,
+      "overreach-5 ~ overreach-4": 2,
+      "loophole-1 ~ loophole-2": 1
+    },
+    "clause_only_counts": {
+      "loophole-2 ~ loophole-1": 3,
+      "loophole-1 ~ loophole-2": 2,
+      "overreach-5 ~ overreach-4": 1
+    },
+    "unanimous_matches": [
+      "loophole-3 ~ loophole-3"
+    ],
+    "split_matches": [
+      "overreach-4 ~ overreach-5",
+      "overreach-5 ~ overreach-4",
+      "loophole-1 ~ loophole-2"
+    ],
+    "total_cost_usd": 0.161702
+  },
+  "repeats": [
+    {
+      "repeat": 1,
+      "a_map": {
+        "A1": "loophole-3",
+        "A2": "loophole-1",
+        "A3": "loophole-2",
+        "A4": "overreach-6",
+        "A5": "overreach-5",
+        "A6": "overreach-4"
+      },
+      "b_map": {
+        "B1": "overreach-6",
+        "B2": "loophole-1",
+        "B3": "loophole-3",
+        "B4": "overreach-4",
+        "B5": "overreach-5",
+        "B6": "loophole-2"
+      },
+      "raw": "{\n  \"matches\": [\n    {\"a\": \"A1\", \"b\": \"B3\", \"clause\": \"tighten-only tier binding (tier_binding.py comparing proposed_tier to current Namespace label)\", \"reason\": \"Deleting and recreating a governed Namespace resets tier history, letting a party evade the tighten-only ratchet and re-enter at a looser starting tier without going through the priced loosening pipeline.\"},\n    {\"a\": \"A5\", \"b\": \"B4\", \"clause\": \"loosening-is-a-human-PR-edit-only rule (no fast/expedited loosening mechanism)\", \"reason\": \"The only lawful path to loosen a Namespace's tier is a slow, reviewed manual PR edit, which is incompatible with legitimate time-sensitive needs (pre-approved pentest window / live incident) and chills or forces rule-breaking for beneficial, authorized work.\"},\n    {\"a\": \"A6\", \"b\": \"B5\", \"clause\": \"unlabelled/ungoverned Namespace fails closed to `isolated` (principle 7, 'silence buys nothing')\", \"reason\": \"The blanket fail-closed default punishes benign or beneficial actors (an emergency responder, a harmless test namespace) with the harshest cage regardless of actual risk or intent, chilling legitimate activity.\"}\n  ],\n  \"clause_only\": [\n    {\"a\": \"A2\", \"b\": \"B6\", \"clause\": \"infra declaration / platform role escape from the priced ladder (ADR-0022 'infra is a declaration, not a selection')\", \"why_not\": \"A2 attacks the ungoverned granting of the `platform` role itself (a party can self-declare role: platform), while B6 attacks the unrestricted scope of what a legitimate platform-role party may label `infra` (no requirement that the namespace be genuine infrastructure) \u2014 different defects in the same clause.\"},\n    {\"a\": \"A3\", \"b\": \"B2\", \"clause\": \"ungoverned Namespace fallback behavior\", \"why_not\": \"A3 attacks a discovery/coverage gap where a Namespace invisible to the mutating policy's watch is never caged at all, while B2 attacks a documented, working fallthrough where an ungoverned Namespace with a policy-version-claiming pod renders `baseline` \u2014 a designed loophole, not a coverage bug.\"}\n  ]\n}",
+      "named": {
+        "matches": [
+          {
+            "a": "A1",
+            "b": "B3",
+            "clause": "tighten-only tier binding (tier_binding.py comparing proposed_tier to current Namespace label)",
+            "reason": "Deleting and recreating a governed Namespace resets tier history, letting a party evade the tighten-only ratchet and re-enter at a looser starting tier without going through the priced loosening pipeline.",
+            "a_key": "loophole-3",
+            "b_key": "loophole-3"
+          },
+          {
+            "a": "A5",
+            "b": "B4",
+            "clause": "loosening-is-a-human-PR-edit-only rule (no fast/expedited loosening mechanism)",
+            "reason": "The only lawful path to loosen a Namespace's tier is a slow, reviewed manual PR edit, which is incompatible with legitimate time-sensitive needs (pre-approved pentest window / live incident) and chills or forces rule-breaking for beneficial, authorized work.",
+            "a_key": "overreach-5",
+            "b_key": "overreach-4"
+          },
+          {
+            "a": "A6",
+            "b": "B5",
+            "clause": "unlabelled/ungoverned Namespace fails closed to `isolated` (principle 7, 'silence buys nothing')",
+            "reason": "The blanket fail-closed default punishes benign or beneficial actors (an emergency responder, a harmless test namespace) with the harshest cage regardless of actual risk or intent, chilling legitimate activity.",
+            "a_key": "overreach-4",
+            "b_key": "overreach-5"
+          }
+        ],
+        "clause_only": [
+          {
+            "a": "A2",
+            "b": "B6",
+            "clause": "infra declaration / platform role escape from the priced ladder (ADR-0022 'infra is a declaration, not a selection')",
+            "why_not": "A2 attacks the ungoverned granting of the `platform` role itself (a party can self-declare role: platform), while B6 attacks the unrestricted scope of what a legitimate platform-role party may label `infra` (no requirement that the namespace be genuine infrastructure) \u2014 different defects in the same clause.",
+            "a_key": "loophole-1",
+            "b_key": "loophole-2"
+          },
+          {
+            "a": "A3",
+            "b": "B2",
+            "clause": "ungoverned Namespace fallback behavior",
+            "why_not": "A3 attacks a discovery/coverage gap where a Namespace invisible to the mutating policy's watch is never caged at all, while B2 attacks a documented, working fallthrough where an ungoverned Namespace with a policy-version-claiming pod renders `baseline` \u2014 a designed loophole, not a coverage bug.",
+            "a_key": "loophole-2",
+            "b_key": "loophole-1"
+          }
+        ]
+      },
+      "elapsed_s": 30.62,
+      "total_cost_usd": 0.058994,
+      "model_served": [
+        "claude-sonnet-5"
+      ]
+    },
+    {
+      "repeat": 2,
+      "a_map": {
+        "A1": "loophole-2",
+        "A2": "overreach-5",
+        "A3": "overreach-6",
+        "A4": "loophole-3",
+        "A5": "overreach-4",
+        "A6": "loophole-1"
+      },
+      "b_map": {
+        "B1": "loophole-3",
+        "B2": "overreach-6",
+        "B3": "loophole-2",
+        "B4": "overreach-4",
+        "B5": "loophole-1",
+        "B6": "overreach-5"
+      },
+      "raw": "{\n  \"matches\": [\n    {\"a\": \"A4\", \"b\": \"B1\", \"clause\": \"tighten-only binding check (tier_binding.py) compares proposed_tier only against the currently governed Namespace's label\", \"reason\": \"Deleting/recreating (or renaming) the governed Namespace resets tier history, letting a party escape its worst-priced tighter tier without going through the priced floor-lowering mechanism.\"},\n    {\"a\": \"A6\", \"b\": \"B3\", \"clause\": \"infra is a declaration, not a selection; only a platform-role party may declare infra\", \"reason\": \"Nothing gates who can hold/grant the platform role or requires review of an infra declaration, letting a party self-declare infra to bypass the entire priced tier ladder.\"},\n    {\"a\": \"A5\", \"b\": \"B6\", \"clause\": \"unlabelled/ungoverned Namespace fails closed to isolated (principle 7, no exemptions)\", \"reason\": \"The blanket, exception-free isolated default punishes benign or urgent legitimate activity that poses no real risk, with no fast-path or risk-based carve-out.\"}\n  ],\n  \"clause_only\": [\n    {\"a\": \"A2\", \"b\": \"B4\", \"clause\": \"loosening a tier requires a human PR edit under the binding check; no expedited/manual path\", \"why_not\": \"A2 argues the slow official PR channel is bureaucratically incompatible with pre-approved scheduled testing, while B4 argues an unauthorized manual edit should be excused as good-samaritan action during an unplanned live incident.\"},\n    {\"a\": \"A1\", \"b\": \"B5\", \"clause\": \"ungoverned Namespace handling under the fail-closed default\", \"why_not\": \"A1 attacks a discovery/enumeration gap that leaves some Namespaces entirely unmutated and uncaged, while B5 attacks a documented, intentional fixture behavior where an ungoverned Namespace with a version-claiming pod renders baseline instead of isolated.\"}\n  ]\n}",
+      "named": {
+        "matches": [
+          {
+            "a": "A4",
+            "b": "B1",
+            "clause": "tighten-only binding check (tier_binding.py) compares proposed_tier only against the currently governed Namespace's label",
+            "reason": "Deleting/recreating (or renaming) the governed Namespace resets tier history, letting a party escape its worst-priced tighter tier without going through the priced floor-lowering mechanism.",
+            "a_key": "loophole-3",
+            "b_key": "loophole-3"
+          },
+          {
+            "a": "A6",
+            "b": "B3",
+            "clause": "infra is a declaration, not a selection; only a platform-role party may declare infra",
+            "reason": "Nothing gates who can hold/grant the platform role or requires review of an infra declaration, letting a party self-declare infra to bypass the entire priced tier ladder.",
+            "a_key": "loophole-1",
+            "b_key": "loophole-2"
+          },
+          {
+            "a": "A5",
+            "b": "B6",
+            "clause": "unlabelled/ungoverned Namespace fails closed to isolated (principle 7, no exemptions)",
+            "reason": "The blanket, exception-free isolated default punishes benign or urgent legitimate activity that poses no real risk, with no fast-path or risk-based carve-out.",
+            "a_key": "overreach-4",
+            "b_key": "overreach-5"
+          }
+        ],
+        "clause_only": [
+          {
+            "a": "A2",
+            "b": "B4",
+            "clause": "loosening a tier requires a human PR edit under the binding check; no expedited/manual path",
+            "why_not": "A2 argues the slow official PR channel is bureaucratically incompatible with pre-approved scheduled testing, while B4 argues an unauthorized manual edit should be excused as good-samaritan action during an unplanned live incident.",
+            "a_key": "overreach-5",
+            "b_key": "overreach-4"
+          },
+          {
+            "a": "A1",
+            "b": "B5",
+            "clause": "ungoverned Namespace handling under the fail-closed default",
+            "why_not": "A1 attacks a discovery/enumeration gap that leaves some Namespaces entirely unmutated and uncaged, while B5 attacks a documented, intentional fixture behavior where an ungoverned Namespace with a version-claiming pod renders baseline instead of isolated.",
+            "a_key": "loophole-2",
+            "b_key": "loophole-1"
+          }
+        ]
+      },
+      "elapsed_s": 27.6,
+      "total_cost_usd": 0.052264,
+      "model_served": [
+        "claude-sonnet-5"
+      ]
+    },
+    {
+      "repeat": 3,
+      "a_map": {
+        "A1": "loophole-2",
+        "A2": "loophole-3",
+        "A3": "overreach-4",
+        "A4": "overreach-6",
+        "A5": "loophole-1",
+        "A6": "overreach-5"
+      },
+      "b_map": {
+        "B1": "overreach-4",
+        "B2": "loophole-3",
+        "B3": "overreach-5",
+        "B4": "loophole-1",
+        "B5": "overreach-6",
+        "B6": "loophole-2"
+      },
+      "raw": "{\n  \"matches\": [\n    {\"a\": \"A2\", \"b\": \"B2\", \"clause\": \"tighten-only binding check (tier_binding.py comparing proposed_tier to current Namespace label)\", \"reason\": \"Deleting and recreating the governed Namespace resets tier history, letting a party launder away an accumulated tight tier without going through the priced floor-lowering mechanism\"},\n    {\"a\": \"A6\", \"b\": \"B1\", \"clause\": \"loosening is only a manual, reviewed PR edit under the binding check, with no expedited path\", \"reason\": \"Legitimate, time-sensitive needs to loosen a tier (scheduled pentest / active incident) have no lawful fast channel, only the unbounded-latency open-PR process\"}\n  ],\n  \"clause_only\": [\n    {\"a\": \"A1\", \"b\": \"B4\", \"clause\": \"treatment of ungoverned Namespaces under the fail-closed default\", \"why_not\": \"A1 argues a Namespace can escape the mutation/discovery mechanism entirely and run fully uncaged; B4 argues the documented ungoverned+claim fallthrough deliberately grants a looser baseline cage than being governed-with-no-tier, a different documented loophole\"},\n    {\"a\": \"A5\", \"b\": \"B6\", \"clause\": \"who may declare a Namespace at the infra tier / platform role gating\", \"why_not\": \"A5 attacks the lack of governance over who can grant themselves the platform role in the first place; B6 attacks the lack of restriction on which Namespaces an already-legitimate platform-role party may label infra\"}\n  ]\n}",
+      "named": {
+        "matches": [
+          {
+            "a": "A2",
+            "b": "B2",
+            "clause": "tighten-only binding check (tier_binding.py comparing proposed_tier to current Namespace label)",
+            "reason": "Deleting and recreating the governed Namespace resets tier history, letting a party launder away an accumulated tight tier without going through the priced floor-lowering mechanism",
+            "a_key": "loophole-3",
+            "b_key": "loophole-3"
+          },
+          {
+            "a": "A6",
+            "b": "B1",
+            "clause": "loosening is only a manual, reviewed PR edit under the binding check, with no expedited path",
+            "reason": "Legitimate, time-sensitive needs to loosen a tier (scheduled pentest / active incident) have no lawful fast channel, only the unbounded-latency open-PR process",
+            "a_key": "overreach-5",
+            "b_key": "overreach-4"
+          }
+        ],
+        "clause_only": [
+          {
+            "a": "A1",
+            "b": "B4",
+            "clause": "treatment of ungoverned Namespaces under the fail-closed default",
+            "why_not": "A1 argues a Namespace can escape the mutation/discovery mechanism entirely and run fully uncaged; B4 argues the documented ungoverned+claim fallthrough deliberately grants a looser baseline cage than being governed-with-no-tier, a different documented loophole",
+            "a_key": "loophole-2",
+            "b_key": "loophole-1"
+          },
+          {
+            "a": "A5",
+            "b": "B6",
+            "clause": "who may declare a Namespace at the infra tier / platform role gating",
+            "why_not": "A5 attacks the lack of governance over who can grant themselves the platform role in the first place; B6 attacks the lack of restriction on which Namespaces an already-legitimate platform-role party may label infra",
+            "a_key": "loophole-1",
+            "b_key": "loophole-2"
+          }
+        ]
+      },
+      "elapsed_s": 22.75,
+      "total_cost_usd": 0.050444,
+      "model_served": [
+        "claude-sonnet-5"
+      ]
+    }
+  ]
+}

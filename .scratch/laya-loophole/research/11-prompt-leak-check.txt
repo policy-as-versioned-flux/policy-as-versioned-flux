@@ -1,0 +1,8 @@
+prompt module: /private/tmp/claude-501/-Users-cns-httpdocs-controlplane-policy-as-versioned-flux/2f46871f-fadd-4dbc-b647-f1276893253f/scratchpad/loophole/loophole/prompts.py
+distinct 8-word runs: 1287
+negative control: 1287/1287 runs found in the source itself, so the detector fires
+clean: .scratch/laya-loophole/research/11-loophole-round-two/calls.jsonl (0 runs)
+clean: .scratch/laya-loophole/research/11-loophole-round-two/candidates.json (0 runs)
+clean: .scratch/laya-loophole/research/11-loophole-round-three/calls.jsonl (0 runs)
+clean: .scratch/laya-loophole/research/11-loophole-round-three/candidates.json (0 runs)
+total leaked runs: 0

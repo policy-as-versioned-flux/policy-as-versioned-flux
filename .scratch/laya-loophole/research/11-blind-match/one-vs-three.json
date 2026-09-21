@@ -1,0 +1,220 @@
+{
+  "summary": {
+    "ticket": "11",
+    "at": "2026-09-21T17:23:35.259820+00:00",
+    "a_round": "one",
+    "b_round": "three",
+    "repeats": 3,
+    "seed": 11,
+    "model_requested": "sonnet",
+    "match_counts": {
+      "loophole-3 ~ loophole-3": 3,
+      "overreach-5 ~ overreach-5": 3,
+      "overreach-4 ~ overreach-4": 2,
+      "loophole-2 ~ loophole-2": 1
+    },
+    "clause_only_counts": {
+      "loophole-2 ~ loophole-2": 2,
+      "overreach-6 ~ loophole-2": 1
+    },
+    "unanimous_matches": [
+      "loophole-3 ~ loophole-3",
+      "overreach-5 ~ overreach-5"
+    ],
+    "split_matches": [
+      "overreach-4 ~ overreach-4",
+      "loophole-2 ~ loophole-2"
+    ],
+    "total_cost_usd": 0.147158
+  },
+  "repeats": [
+    {
+      "repeat": 1,
+      "a_map": {
+        "A1": "loophole-3",
+        "A2": "loophole-1",
+        "A3": "loophole-2",
+        "A4": "overreach-6",
+        "A5": "overreach-5",
+        "A6": "overreach-4"
+      },
+      "b_map": {
+        "B1": "overreach-6",
+        "B2": "loophole-1",
+        "B3": "loophole-3",
+        "B4": "overreach-4",
+        "B5": "overreach-5",
+        "B6": "loophole-2"
+      },
+      "raw": "{\"matches\":[{\"a\":\"A5\",\"b\":\"B5\",\"clause\":\"ungoverned/unlabelled Namespace fails closed to isolated\",\"reason\":\"benign, low-risk workload gets treated identically to a hostile one, disproportionate blanket cage\"},{\"a\":\"A1\",\"b\":\"B3\",\"clause\":\"tighten-only guarantee / tier_binding comparison against currently governed Namespace label\",\"reason\":\"a party can engineer ambiguity or object churn so the tighten-only ratchet never applies and a stale/looser tier persists or is reset\"}],\"clause_only\":[{\"a\":\"A3\",\"b\":\"B6\",\"clause\":\"infra is a declaration, not a selection (platform-role infra labeling)\",\"why_not\":\"A3 exploits lack of control over who deploys workloads into an already-declared infra Namespace, while B6 exploits lack of restriction on which Namespaces a platform party may label infra in the first place\"}]}",
+      "named": {
+        "matches": [
+          {
+            "a": "A5",
+            "b": "B5",
+            "clause": "ungoverned/unlabelled Namespace fails closed to isolated",
+            "reason": "benign, low-risk workload gets treated identically to a hostile one, disproportionate blanket cage",
+            "a_key": "overreach-5",
+            "b_key": "overreach-5"
+          },
+          {
+            "a": "A1",
+            "b": "B3",
+            "clause": "tighten-only guarantee / tier_binding comparison against currently governed Namespace label",
+            "reason": "a party can engineer ambiguity or object churn so the tighten-only ratchet never applies and a stale/looser tier persists or is reset",
+            "a_key": "loophole-3",
+            "b_key": "loophole-3"
+          }
+        ],
+        "clause_only": [
+          {
+            "a": "A3",
+            "b": "B6",
+            "clause": "infra is a declaration, not a selection (platform-role infra labeling)",
+            "why_not": "A3 exploits lack of control over who deploys workloads into an already-declared infra Namespace, while B6 exploits lack of restriction on which Namespaces a platform party may label infra in the first place",
+            "a_key": "loophole-2",
+            "b_key": "loophole-2"
+          }
+        ]
+      },
+      "elapsed_s": 20.38,
+      "total_cost_usd": 0.047116000000000005,
+      "model_served": [
+        "claude-sonnet-5"
+      ]
+    },
+    {
+      "repeat": 2,
+      "a_map": {
+        "A1": "loophole-2",
+        "A2": "overreach-5",
+        "A3": "overreach-6",
+        "A4": "loophole-3",
+        "A5": "overreach-4",
+        "A6": "loophole-1"
+      },
+      "b_map": {
+        "B1": "loophole-3",
+        "B2": "overreach-6",
+        "B3": "loophole-2",
+        "B4": "overreach-4",
+        "B5": "loophole-1",
+        "B6": "overreach-5"
+      },
+      "raw": "{\"matches\":[{\"a\":\"A1\",\"b\":\"B3\",\"clause\":\"infra is a declaration, not a selection (role-gated infra tier)\",\"reason\":\"Nothing restricts what workloads legitimately count as infra once a platform-role party's declaration lands, letting non-control-plane/business workloads inherit the loosest-privileged infra tier\"},{\"a\":\"A2\",\"b\":\"B6\",\"clause\":\"unlabelled/ungoverned Namespace fails closed to isolated\",\"reason\":\"Overbroad blanket rule treats a brand-new, benign, low-risk Namespace identically to an adversarial one, imposing harsh quarantine/eviction on harmless onboarding delay\"},{\"a\":\"A4\",\"b\":\"B1\",\"clause\":\"tighten-only guarantee / binding check comparison against the currently governed tier\",\"reason\":\"The tighten-only ratchet can be circumvented by manipulating the governed Namespace object's state (ambiguous documents vs delete-recreate) rather than through the priced pipeline, freezing or resetting to a looser tier\"},{\"a\":\"A5\",\"b\":\"B4\",\"clause\":\"no emergency/break-glass path around the priced tier pipeline (principle 4/13)\",\"reason\":\"During a live incident, rigid adherence to the PR-priced tightening process blocks the one legitimate, urgent action needed to prevent real customer harm\"}],\"clause_only\":[]}",
+      "named": {
+        "matches": [
+          {
+            "a": "A1",
+            "b": "B3",
+            "clause": "infra is a declaration, not a selection (role-gated infra tier)",
+            "reason": "Nothing restricts what workloads legitimately count as infra once a platform-role party's declaration lands, letting non-control-plane/business workloads inherit the loosest-privileged infra tier",
+            "a_key": "loophole-2",
+            "b_key": "loophole-2"
+          },
+          {
+            "a": "A2",
+            "b": "B6",
+            "clause": "unlabelled/ungoverned Namespace fails closed to isolated",
+            "reason": "Overbroad blanket rule treats a brand-new, benign, low-risk Namespace identically to an adversarial one, imposing harsh quarantine/eviction on harmless onboarding delay",
+            "a_key": "overreach-5",
+            "b_key": "overreach-5"
+          },
+          {
+            "a": "A4",
+            "b": "B1",
+            "clause": "tighten-only guarantee / binding check comparison against the currently governed tier",
+            "reason": "The tighten-only ratchet can be circumvented by manipulating the governed Namespace object's state (ambiguous documents vs delete-recreate) rather than through the priced pipeline, freezing or resetting to a looser tier",
+            "a_key": "loophole-3",
+            "b_key": "loophole-3"
+          },
+          {
+            "a": "A5",
+            "b": "B4",
+            "clause": "no emergency/break-glass path around the priced tier pipeline (principle 4/13)",
+            "reason": "During a live incident, rigid adherence to the PR-priced tightening process blocks the one legitimate, urgent action needed to prevent real customer harm",
+            "a_key": "overreach-4",
+            "b_key": "overreach-4"
+          }
+        ],
+        "clause_only": []
+      },
+      "elapsed_s": 28.43,
+      "total_cost_usd": 0.054136000000000004,
+      "model_served": [
+        "claude-sonnet-5"
+      ]
+    },
+    {
+      "repeat": 3,
+      "a_map": {
+        "A1": "loophole-2",
+        "A2": "loophole-3",
+        "A3": "overreach-4",
+        "A4": "overreach-6",
+        "A5": "loophole-1",
+        "A6": "overreach-5"
+      },
+      "b_map": {
+        "B1": "overreach-4",
+        "B2": "loophole-3",
+        "B3": "overreach-5",
+        "B4": "loophole-1",
+        "B5": "overreach-6",
+        "B6": "loophole-2"
+      },
+      "raw": "{\n  \"matches\": [\n    {\"a\": \"A3\", \"b\": \"B1\", \"clause\": \"No emergency break-glass path; principle 13 requires PR-based change, not urgent exceptions\", \"reason\": \"Both argue rigid process-only remediation blocks legitimate incident response, causing real-world harm despite moral justification for an immediate fix\"},\n    {\"a\": \"A6\", \"b\": \"B3\", \"clause\": \"Ungoverned/unlabelled Namespace fails closed to isolated (principle 7)\", \"reason\": \"Both argue the blanket unlabelled-to-isolated rule disproportionately punishes benign, low-risk workloads that pose no real threat\"},\n    {\"a\": \"A2\", \"b\": \"B2\", \"clause\": \"Tighten-only guarantee / binding check comparison (principle 8)\", \"reason\": \"Both exploit a procedural gap in how the binding/proposer machinery tracks current tier, letting a party retain or regain a looser tier than their true priced regime warrants\"}\n  ],\n  \"clause_only\": [\n    {\"a\": \"A1\", \"b\": \"B6\", \"clause\": \"\\\"infra is a declaration, not a selection\\\" \u2014 scope of infra tier assignment\", \"why_not\": \"A1 attacks lack of control over who runs workloads inside an already-declared infra Namespace; B6 attacks lack of restriction on which Namespaces a platform party may label infra in the first place\"},\n    {\"a\": \"A4\", \"b\": \"B6\", \"clause\": \"Role-gating and scope of the infra tier declaration (principle 12)\", \"why_not\": \"A4 attacks the silent-render-isolated failure mode harming a well-intentioned non-platform actor; B6 attacks a platform-role actor deliberately misusing the infra label on an unrelated production Namespace\"}\n  ]\n}",
+      "named": {
+        "matches": [
+          {
+            "a": "A3",
+            "b": "B1",
+            "clause": "No emergency break-glass path; principle 13 requires PR-based change, not urgent exceptions",
+            "reason": "Both argue rigid process-only remediation blocks legitimate incident response, causing real-world harm despite moral justification for an immediate fix",
+            "a_key": "overreach-4",
+            "b_key": "overreach-4"
+          },
+          {
+            "a": "A6",
+            "b": "B3",
+            "clause": "Ungoverned/unlabelled Namespace fails closed to isolated (principle 7)",
+            "reason": "Both argue the blanket unlabelled-to-isolated rule disproportionately punishes benign, low-risk workloads that pose no real threat",
+            "a_key": "overreach-5",
+            "b_key": "overreach-5"
+          },
+          {
+            "a": "A2",
+            "b": "B2",
+            "clause": "Tighten-only guarantee / binding check comparison (principle 8)",
+            "reason": "Both exploit a procedural gap in how the binding/proposer machinery tracks current tier, letting a party retain or regain a looser tier than their true priced regime warrants",
+            "a_key": "loophole-3",
+            "b_key": "loophole-3"
+          }
+        ],
+        "clause_only": [
+          {
+            "a": "A1",
+            "b": "B6",
+            "clause": "\"infra is a declaration, not a selection\" \u2014 scope of infra tier assignment",
+            "why_not": "A1 attacks lack of control over who runs workloads inside an already-declared infra Namespace; B6 attacks lack of restriction on which Namespaces a platform party may label infra in the first place",
+            "a_key": "loophole-2",
+            "b_key": "loophole-2"
+          },
+          {
+            "a": "A4",
+            "b": "B6",
+            "clause": "Role-gating and scope of the infra tier declaration (principle 12)",
+            "why_not": "A4 attacks the silent-render-isolated failure mode harming a well-intentioned non-platform actor; B6 attacks a platform-role actor deliberately misusing the infra label on an unrelated production Namespace",
+            "a_key": "overreach-6",
+            "b_key": "loophole-2"
+          }
+        ]
+      },
+      "elapsed_s": 19.88,
+      "total_cost_usd": 0.045906,
+      "model_served": [
+        "claude-sonnet-5"
+      ]
+    }
+  ]
+}

@@ -158,6 +158,36 @@ This map measures and decides. It does not adopt anything into production.
   3. The case log, the HTML report and the judge's prior-case text all address cases by that
   number. Found by ticket 07.
 
+- **Three rounds against the same document at the same pin overlap by 1 to 3 candidates of 6.**
+  Measured by ticket 11, which ran a second and a third round. By reason the pairwise overlap is
+  2, 1 and 3 of 6; by clause it is 2, 2 and 3. All three rounds share exactly one reason and two
+  clauses. No two of the 18 candidates share a run of 8 consecutive words, across all 153 pairs,
+  so a word test reports zero.
+- **The tool repeats its target and never its mechanism.** The `infra` declaration is attacked in
+  every round, by four candidates, and no two give the same reason. The place repeats, the
+  mechanism never does. That is map call 12 measured rather than asserted. Measured by ticket 11.
+- **One round reads about 23% of what the tool has to say about a document.** Three rounds gave 13
+  distinct reasons from 18 candidates; Chao1 on the frequencies estimates the population at 26.5.
+  That is a lower bound from three samples of six, with a wide interval, and the population is the
+  tool's output rather than the document's real defect set. Derived by ticket 11.
+- **The overlap number is itself a draw.** An independent reader, asked the same question three
+  times with the candidates anonymised and shuffled, named no pair in all three repeats for rounds
+  one and two. Its mean unanimous overlap is 1 of 6 against the assistant's 2 of 6. The overlap
+  depends on the resolution the reader chooses, and the tool supplies no resolution. Measured by
+  ticket 11.
+- **loophole's judge called 17 of 18 candidates resolvable across three rounds.** Ticket 08 then
+  found 3 of round one's 5 resolvable candidates false against the code, and the single
+  unresolvable one false too. The verdict is near-constant, so it is not a filter. This is the same
+  shape ticket 02 measured in Laya, where `act_probability` read 1.000000 on all 16 calls. Measured
+  by ticket 11.
+- **A round costs 8 calls, about 180 s and about 0.41 USD at list price, stable to 3%.** Ticket 07
+  0.4150, ticket 11 round two 0.4069 and round three 0.4197. Three rounds cost 1.2416 USD, absorbed
+  by the subscription. Measured by ticket 11.
+- **No loophole prompt text reaches the tree, and a reusable check now proves it.**
+  `.scratch/laya-loophole/bench/check_no_prompt_leak.py` finds 1,287 distinct 8-word runs in
+  `loophole/prompts.py`, fires on all 1,287 against the source as a negative control, and finds 0
+  in all six committed files across the three rounds. Built by ticket 11.
+
 - **transformers 4.x loads this checkpoint and silently gives different numbers.**
   `encoder/config.json` at the pin declares `transformers_version: 5.0.0` and carries
   `rope_parameters` and `layer_types`, which 4.x `ModernBertConfig` does not read. `laya` 0.3.4
@@ -235,6 +265,20 @@ This map measures and decides. It does not adopt anything into production.
     and count the survival rate on the candidates as stated so the tool is not flattered by the
     measurement's own work.
 
+13. **The tool is a pointer generator, and a round is a sample, so adoption is stated in rounds.**
+    Added 2026-09-21 after ticket 11. Three rounds against one document overlap by 1 to 3 of 6,
+    the `infra` declaration is attacked in every round by a different mechanism each time, and one
+    round reads about 23% of the tool's population. So the unit of adoption is not "run loophole",
+    it is "run N rounds and read the places that recur". Ticket 09's ADR states the number of
+    rounds and states that the human keeps the pointer and throws the sentence away.
+
+14. **A near-constant head is not a signal, in anyone's tool or in this estate's.** Added
+    2026-09-21 after ticket 11. loophole's judge called 17 of 18 candidates resolvable, and ticket
+    08 showed the verdict does not separate real from unreal. Laya's `act_probability` read
+    1.000000 on all 16 calls ticket 02 made. Two unrelated tools, one defect. Ticket 09's ADR
+    refuses both heads as filters, and ticket 05 takes the rule: a permission that always says yes
+    is not a permission, which is the same sentence as call 8 from the other side.
+
 ### The sentence this map changes
 
 `CONTEXT.md` defines the twin this way today: "A subscribed feed version becomes a sensed signal by
@@ -276,7 +320,7 @@ flowchart TD
         T06["06 · Can loophole run<br/>with no paid API?<br/><i>resolved</i>"]
         T07["07 · One round against<br/>a named norm document<br/><i>resolved</i>"]
         T08["08 · A candidate becomes a<br/>fixture, or is discarded<br/><i>resolved</i>"]
-        T11["11 · Does a second round<br/>find the same holes?<br/><i>task</i>"]
+        T11["11 · Does a second round<br/>find the same holes?<br/><i>resolved</i>"]
         T06 --> T07 --> T08 --> T11
     end
 
@@ -293,17 +337,32 @@ flowchart TD
     classDef blocked fill:#30363d,stroke:#8b949e,color:#e6edf3
     classDef done fill:#8957e5,stroke:#4c2889,color:#fff
     classDef dest fill:#238636,stroke:#0f5323,color:#fff
-    class T04,T05,T11 frontier
+    class T04,T05 frontier
     class T09 blocked
-    class T01,T02,T03,T06,T07,T08,T10 done
+    class T01,T02,T03,T06,T07,T08,T10,T11 done
     class DEST,ECO dest
 ```
 
-Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 06, 07, 08 and 10.
+Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 06, 07, 08, 10 and 11.
 
 ## Decisions so far
 
 <!-- one line per closed ticket -->
+
+- [11 — Does a second round find the same holes?](issues/11-does-a-second-round-find-the-same-holes.md):
+  **Two more rounds ran, and the overlap between any two is 1 to 3 candidates of 6.** Same harness
+  by sha256, same inputs, same clone commit, same served model, 0 parse failures and 0
+  under-production in both. By reason the pairwise overlap is 2, 1 and 3 of 6; by clause 2, 2 and
+  3. All three rounds share one reason and two clauses. **The tool repeats its target and never its
+  mechanism**: the `infra` declaration is attacked in every round by four candidates and no two
+  give the same reason, which is map call 12 measured. One round reads about 23% of the tool's
+  population, by Chao1 on 13 distinct reasons from 18 candidates. **The overlap number is itself a
+  draw**: a blind reader asked three times named no pair in all three repeats for rounds one and
+  two. Cost is stable at 8 calls, about 180 s and about 0.41 USD per round. Three side findings:
+  **the judge called 17 of 18 candidates resolvable**, so its verdict is not a filter and echoes
+  Laya's constant `act_probability`; round three's `loophole-1` is false as written but points at
+  the served-body fact eco-system ticket 113 already holds; and the harness writes `"ticket": "07"`
+  into both new summaries because it was not edited. 12 candidates stay unchecked.
 
 - [10 — What the trdrbot prior art teaches](issues/10-what-the-trdrbot-prior-art-teaches.md):
   Three ideas taken, four left. **Taken:** luck-versus-skill attribution, graduated as eco-system
@@ -401,6 +460,11 @@ Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-
   than a ticket because it evaporates if ticket 09 decides a human runs Laya locally, which is
   exactly what call 5 forced for loophole. Waits on ticket 09.
 - Whether any of the six heuristics is actually replaced. Waits on ticket 04's number.
+- Whether the 12 candidates from ticket 11's rounds two and three earn a ticket-08 style
+  deterministic check. Four restate a reason round one already gave; eight are new, and eight
+  checks is roughly ticket 08's whole cost again. It is only worth charting if ticket 09 decides
+  loophole enters on repeated rounds, because a single unchecked round is what the decision is
+  about. Waits on ticket 09.
 - Whether this estate pays for a corpus that could support a specialised fit. Ticket 03 priced the
   only route with real supply at roughly 57 backtest organisations for one skill, against the four
   it has. That is a large build, and it is only worth charting if ticket 04's zero-shot number is
