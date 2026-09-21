@@ -32,7 +32,7 @@
 #
 # Versioned: bump `version` in the same commit as any change to an entry below.
 schema: twin.misuse-catalogue/v1
-version: 3
+version: 4
 entries:
   - id: publisher-games-own-feed-price
     risk: >-
@@ -142,3 +142,68 @@ entries:
       - "docs/adr/0021-the-twin-emits-a-scenario-the-estate-selects-the-tier.md::Every price carries `perspective` and"
       - twin/invariants/checks.py::no_recommended_action_field
     source: ticket 19 Q3/item 3; ADR-0021; twin decision ticket 09
+
+  - id: adopter-runs-uncaged-in-the-platform-substrate
+    risk: >-
+      A party with deploy access to the platform's substrate Namespaces -- kube-system,
+      flux-system, kyverno -- runs workloads there believing `posture.acme.io/tier: infra` is the
+      rung that governs them. It is not. No served policy body reads the word, so a workload that
+      claims a policy version lands on the LOOSEST rung and one that claims none lands on no rung
+      at all.
+    mechanism: >-
+      Nothing prices or cages this today, and saying so by name is the point of the row. Measured
+      2026-09-21 under kyverno 1.18.2, the version release.yml pins, from the Laya and loophole
+      map's ticket 08. Three facts. `infra` appears in no served `cage-tier` body with comments
+      stripped -- not v4.0.0, not v5.0.0, not graded/, not any adopter's composed copy -- so an
+      `infra` Namespace falls to `variables.tier`'s else branch. The three Namespaces carry no
+      `policy-as-versioned.dev/governed` label by design, so under v4.0.0, which all three
+      adopters serve, that branch is `baseline`: 500m/256Mi, priority -10, no hardening, no WAF
+      sidecar. And an UNCLAIMED pod is skipped by `cage-tier`'s own matchConditions with the
+      declaration and without it, so pulling the declaration changes nothing for CoreDNS -- which
+      is the configuration `distribution/verify-infra-declaration.sh` calls its proof-3 tripwire
+      the guard for. The tripwire guards a hazard no served body produces. The instrument that
+      exists is the reproduction: `tests/test_cage_ladder_holes.py` holds all three facts against
+      the real bodies and the pinned engine, and skips BY NAME on any other engine rather than
+      passing unmeasured. `platform/wargamer/wargamer.py` INFRA and `rank()` are anchored because
+      the proposer's model of the rung -- tighter than everything -- is the one the served body
+      contradicts.
+    anchors:
+      - "tests/test_cage_ladder_holes.py::test_infra_appears_in_no_served_cage_tier_body"
+      - "tests/test_cage_ladder_holes.py::test_pulling_the_infra_declaration_changes_nothing_for_an_unclaimed_pod"
+      - "platform/engine/namespaces.yaml::posture.acme.io/tier: infra"
+      - "platform/wargamer/wargamer.py::INFRA"
+      - platform/distribution/verify-infra-declaration.sh
+    waits_on:
+      - ticket: "113"
+        for: what `infra` means in a served body, and a proof 3 that guards a hazard that exists
+    source: laya-loophole ticket 08 (survivor 1 of 6); ticket 07's loophole round against
+      ADR-0022; ADR-0022's `infra is a declaration, not a selection` note
+
+  - id: adopter-silences-its-own-binding-observation
+    risk: >-
+      An adopter stops the estate observing whether its cage is bound to its price, without
+      failing anything. It declares a second governed Namespace, the binding check refuses to
+      guess which one carries the party's tier, and the hub reports the estate green.
+    mechanism: >-
+      Nothing prices or cages this today. Measured 2026-09-21 on a planted estate of two bound
+      parties, from the Laya and loophole map's ticket 08.
+      `platform/shift-left/tier_binding.py` returns 3 -- could-not-look -- for two governed
+      Namespace declarations, which is right and is what ticket 78 built. The hub's walk then
+      drops it: `verify/tier-binding/tier_binding_estate.py` prints the party's SKIP line,
+      continues, and returns `1 if failed else 0`, so a skipped party is neither looked at nor
+      failed. `talk/verify-all.sh` grades a script by its exit code alone, so the gate reads PASS
+      for an estate with one party unobserved. Two things bound it and neither closes it: each
+      adopter's own `shift-left.yml` turns exit 3 into a failed pull request, so the ambiguity
+      cannot arrive through a pull request that runs that job; and the cage the cluster serves
+      does not move, so this is a hole in the observation and not in the cage. The instrument
+      that exists is the reproduction in `tests/test_cage_ladder_holes.py`, which plants the
+      ambiguous estate, runs the real walk and asserts the exit code the gate would read.
+    anchors:
+      - "tests/test_cage_ladder_holes.py::test_a_second_governed_namespace_document_silences_one_party_and_the_walk_still_exits_zero"
+      - "verify/tier-binding/tier_binding_estate.py::return 1 if failed else 0"
+      - "platform/shift-left/tier_binding.py::governed Namespace declarations"
+    waits_on:
+      - ticket: "114"
+        for: an unobserved party that does not leave the walk at exit 0, and a selfcheck leg
+    source: laya-loophole ticket 08 (survivor 2 of 6); ticket 07's loophole round against
+      ADR-0022; ADR-0020; ticket 78

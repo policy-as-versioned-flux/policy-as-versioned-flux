@@ -106,19 +106,26 @@ def test_a_catalogue_entry_with_no_mechanism_is_refused(tmp_path: Path) -> None:
 def test_the_ecosystem_catalogue_loads_through_the_same_loader_and_names_a_mechanism_each() -> None:
     """Third file, same `load_catalogue()` — ticket 19's default: no third loader."""
     doc = load_catalogue(ECOSYSTEM_CATALOGUE_PATH)
-    assert len(doc["entries"]) == 4
+    assert len(doc["entries"]) == 6
     for entry in doc["entries"]:
         assert entry["risk"].strip()
         assert entry["mechanism"].strip()
 
 
 def test_the_ecosystem_catalogue_names_ticket_19s_four_rows() -> None:
+    """Ticket 19's four, by name, so a row cannot quietly vanish. The file is not closed to a
+    later row: the Laya and loophole map's ticket 08 added two from a measured loophole round,
+    and each is named here for the same reason -- an addition is as visible as a removal."""
     ids = {entry["id"] for entry in load_catalogue(ECOSYSTEM_CATALOGUE_PATH)["entries"]}
-    assert ids == set(ECOSYSTEM_ROW_IDS) == {
+    assert set(ECOSYSTEM_ROW_IDS) == {
         "publisher-games-own-feed-price",
         "regulator-data-mispriced-downstream",
         "adopter-buys-intel-on-rival",
         "twin-valuation-used-in-negotiation",
+    }
+    assert ids == set(ECOSYSTEM_ROW_IDS) | {
+        "adopter-runs-uncaged-in-the-platform-substrate",
+        "adopter-silences-its-own-binding-observation",
     }
 
 
@@ -140,7 +147,8 @@ def test_the_three_catalogues_do_not_conflate_their_scopes() -> None:
             f"{word!r} found in a twin-scoped catalogue's own ids — the eco-system scope has leaked"
         )
     for entry in loaded[2][1]["entries"]:
-        assert any(w in entry["id"] for w in ("publisher", "regulator", "adopter", "twin-valuation"))
+        assert any(w in entry["id"] for w in ("publisher", "regulator", "adopter", "twin-valuation")), (
+            f"{entry['id']!r} names no marketplace party -- the eco-system scope has leaked")
 
 
 def test_load_all_catalogues_refuses_an_id_declared_in_two_catalogues(tmp_path: Path) -> None:
@@ -175,7 +183,8 @@ def test_the_harness_check_loads_all_three_catalogues_and_proves_the_refusal(tmp
 
     check = harness_registry()["misuse_catalogues_load_and_every_row_names_a_mechanism"]
     claim = check(context(tmp_path))
-    assert "3 catalogues" in claim and "4 eco-system rows" in claim and "refused" in claim
+    rows = len(load_catalogue(ECOSYSTEM_CATALOGUE_PATH)["entries"])
+    assert "3 catalogues" in claim and f"{rows} eco-system rows" in claim and "refused" in claim
 
 
 # -- grading one row against a checkout ------------------------------------------------------
@@ -301,7 +310,11 @@ def test_ecosystem_ticket_status_reads_the_status_line(tmp_path: Path) -> None:
 
 def test_the_four_rows_grade_against_this_checkout() -> None:
     """Every anchor the real rows name resolves in this checkout (hub, or the estate clone when
-    it is assembled), and the rows that wait on a ticket name one that is still open."""
+    it is assembled), and the rows that wait on a ticket name one that is still open.
+
+    STANDING RED, 2026-09-21: `regulator-data-mispriced-downstream` anchors
+    `platform/compose/composition.py::price_supersede`, which that file does not carry. It
+    pre-dates ticket 08 and `verify/misuse/verify-misuse.sh` reports it by name on every run."""
     from twin import ESTATE_CLONE_DIR, REPO_DIR
 
     estate = ESTATE_CLONE_DIR if ESTATE_CLONE_DIR.is_dir() else None

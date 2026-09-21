@@ -131,6 +131,28 @@ This map measures and decides. It does not adopt anything into production.
 - **loophole's judge carries the same silent-failure defect in a second place.**
   `agents/judge.py:62-63` reads a missing `<verdict>` tag as the literal verdict "unresolvable".
   Found by ticket 07. The tag was present on all 6 judge calls.
+- **Two of ticket 07's six candidates survived a deterministic check: a survival rate of 2/6.**
+  Both needed their stated mechanism thrown away and rebuilt from measurement. Three of the four
+  discards are false against the code, not merely unproven. Measured by ticket 08.
+- **`infra` is read by no served `cage-tier` body**, with comments stripped: not the hub's v4.0.0
+  or v5.0.0, not `graded/`, not any adopter's composed copy. A pod claiming a policy version in
+  the platform's three `infra` Namespaces renders `baseline`, the LOOSEST rung, under the body all
+  three adopters serve, because those Namespaces carry no `governed` label by design. An unclaimed
+  pod is skipped with the declaration and without it, so pulling the declaration changes nothing
+  for CoreDNS, which is the hazard `verify-infra-declaration.sh` says its proof 3 is the tripwire
+  for. Measured by ticket 08 under kyverno 1.18.2, the pinned version.
+- **A party can make the hub's tier-binding walk stop observing it, at exit 0.** Two governed
+  Namespace documents make `tier_binding.check()` return 3, and
+  `verify/tier-binding/tier_binding_estate.py` prints the SKIP, continues, and returns
+  `1 if failed else 0`. `talk/verify-all.sh` grades by exit code alone, so the gate reads PASS.
+  The adopter's own `shift-left.yml` does turn that 3 into a failed pull request, so the hole is
+  in the hub's observation, not in the cage. Measured by ticket 08.
+- **kyverno 1.19.1 cannot compile the served `cage-tier` body** (`expected type 'string' but found
+  'dyn'`). The release workflows pin 1.18.2; `graded/verify-graded.sh` calls a bare `kyverno` and
+  asserts no version. It fails loudly rather than quietly. Found by ticket 08.
+- **`.scratch/ecosystem/issues/` holds two tickets numbered 111**, and `twin/misuse.py`
+  `ecosystem_ticket_status()` takes `sorted(glob(...))[0]`, so a `waits_on` row reads whichever
+  sorts first, silently. Found by ticket 08; unfixed.
 - **loophole numbers both finders' cases identically in every round.** Both run before any case is
   appended to `state.cases`, so a round holds two cases numbered 1, two numbered 2 and two numbered
   3. The case log, the HTML report and the judge's prior-case text all address cases by that
@@ -205,6 +227,14 @@ This map measures and decides. It does not adopt anything into production.
     document, and the six verdicts stay comparable. It also costs 6 fewer calls. Ticket 09's ADR
     states this as the shape of adoption, not as a tuning choice.
 
+12. **A survivor is what the check found, not what the model wrote.** Added 2026-09-21 after
+    ticket 08. Both survivors kept the place the candidate pointed at and lost the mechanism it
+    named. Neither would have graded as real if ticket 08 had asked "is this scenario true as
+    written", and neither would have been found if the pointer had been thrown away for being
+    wrong. So the rule for ticket 11 and for any later round: test the place, never the sentence,
+    and count the survival rate on the candidates as stated so the tool is not flattered by the
+    measurement's own work.
+
 ### The sentence this map changes
 
 `CONTEXT.md` defines the twin this way today: "A subscribed feed version becomes a sensed signal by
@@ -245,7 +275,7 @@ flowchart TD
     subgraph loophole["loophole — does adversarial attack find real holes?"]
         T06["06 · Can loophole run<br/>with no paid API?<br/><i>resolved</i>"]
         T07["07 · One round against<br/>a named norm document<br/><i>resolved</i>"]
-        T08["08 · A candidate becomes a<br/>fixture, or is discarded<br/><i>task</i>"]
+        T08["08 · A candidate becomes a<br/>fixture, or is discarded<br/><i>resolved</i>"]
         T11["11 · Does a second round<br/>find the same holes?<br/><i>task</i>"]
         T06 --> T07 --> T08 --> T11
     end
@@ -257,18 +287,19 @@ flowchart TD
     T11 --> T09
     T09 --> DEST(["Destination:<br/>two ADRs, each resting<br/>on a measured number"])
     T10 -. "ideas taken graduate" .-> ECO(["Eco-system map"])
+    T08 -. "2 survivors graduate" .-> ECO
 
     classDef frontier fill:#1f6feb,stroke:#0b3d91,color:#fff
     classDef blocked fill:#30363d,stroke:#8b949e,color:#e6edf3
     classDef done fill:#8957e5,stroke:#4c2889,color:#fff
     classDef dest fill:#238636,stroke:#0f5323,color:#fff
-    class T04,T05,T08 frontier
-    class T09,T11 blocked
-    class T01,T02,T03,T06,T07,T10 done
+    class T04,T05,T11 frontier
+    class T09 blocked
+    class T01,T02,T03,T06,T07,T08,T10 done
     class DEST,ECO dest
 ```
 
-Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 06, 07 and 10.
+Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 02, 03, 06, 07, 08 and 10.
 
 ## Decisions so far
 
@@ -283,6 +314,22 @@ Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-
   as consulted in 2 of 89 decide cycles, because "the refusals that matter happen upstream in
   prose". The "~50 forecasts" bar is chosen, not derived, and importing it would put all six
   skills below the bar at once.
+
+- [08 — A loophole candidate becomes a fixture, or is discarded](issues/08-a-loophole-candidate-becomes-a-fixture-or-is-discarded.md):
+  **2 of 6 survived, a survival rate of 33%**, and both survivors lost the mechanism the model
+  named and kept only the place it pointed at. **Survivor 1:** `infra` is read by no served
+  `cage-tier` body, so a claiming pod in the platform's three `infra` Namespaces lands on
+  `baseline`, the loosest rung, and pulling the declaration changes nothing for CoreDNS, which is
+  the hazard `verify-infra-declaration.sh`'s proof 3 claims to guard. **Survivor 2:** two governed
+  Namespace documents make the hub's tier-binding walk skip that party and still exit 0, and the
+  gate grades by exit code alone. Both are held by `tests/test_cage_ladder_holes.py`, nine legs,
+  measured under the pinned kyverno 1.18.2 and skipping by name on any other engine, and both
+  entered `twin/ecosystem-misuse-catalogue.yaml` at version 4 waiting on eco-system tickets 113
+  and 114. The four discards: `loophole-1` names a per-workload price line the schema does not
+  have; `overreach-4` and `overreach-5` restate decisions ADR-0022 records with their reasons, and
+  `overreach-5` does not reproduce on any served tree; `overreach-6`'s render is the entitlement
+  rule working and the declaration is named in the check's output on every run. Four side
+  findings, including a duplicate eco-system ticket number 111 that `waits_on` resolves silently.
 
 - [01 — Laya's terms and independent evidence](issues/01-laya-s-terms-and-independent-evidence.md):
   Apache 2.0, but the weights repository ships no LICENSE file and the grant rests on a card tag.
