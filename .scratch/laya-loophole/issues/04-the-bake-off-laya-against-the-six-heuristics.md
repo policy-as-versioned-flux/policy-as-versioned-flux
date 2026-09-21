@@ -45,3 +45,18 @@ numbers no weight.
 
 The heuristics score 1.0 on their own corpora today. A model that ties at 1.0 on 4 items has
 proved nothing. Say that plainly in the result rather than reporting a tie as a win.
+
+**Added 2026-09-21, from ticket 03. Item 9 is an acceptance criterion.**
+
+9. **Report the zero-shot number only. No specialised number is available.** Ticket 03 resolved
+   "not measurable on this corpus". The merged human claims give **one** labelled item across all
+   six skills, and it belongs to `evolution-judge`. A per-question-type temperature fit needs
+   **326 items per skill** on the charitable route and **3,260** on the honest one. So item 7's
+   two options collapse to one: report raw uncalibrated probabilities and say so. There are no
+   held-out items to refit temperatures on.
+
+10. **A tie at 1.0 is weaker than it looks, and by a measured amount.** Ticket 03 applied the rule
+    of three to the six corpora. Five of the six thresholds cannot be cleared at 95% confidence
+    even by a perfect score, because the corpora hold 3 to 5 items. Only `signal-classify`, at 23
+    items, bounds its own 0.8 threshold. Report the 95% lower bound beside every score, so a tie
+    on 3 items reads as "consistent with a true accuracy of zero" rather than as a win.

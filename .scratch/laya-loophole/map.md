@@ -37,6 +37,22 @@ This map measures and decides. It does not adopt anything into production.
 - The six twin skills hold 42 labelled items in total. The largest corpus is 23 items.
   `signal-classify` holds 23, `ethics-gate` 5, `evolution-judge` 4, `causal-claims` 4,
   `gameplay-lens` 3, `substrate-generator` 3.
+- **The merged human claims give one labelled item, not a corpus.** Confirmed by ticket 03
+  against `origin/main` on all three adopters. `classify-and-judge` has never produced a merged
+  pull request. The estate holds exactly one claim file, written by eco-system ticket 51.
+- **A bound row in `twin/signals.yaml` labels none of the six skills.** The three adopters hold 13
+  bound rows. A row binds a pinned version to a scenario. A grep for `steep` across all three
+  adopter repositories returns nothing, so no row can supply a `signal-classify` label.
+- **The three adopters hold 9 edges and not one carries a `causal:` block.** So `causal-claims`
+  gets zero items from the estate, not a small number.
+- **A per-skill corpus needs 326 items, derived from ticket 04's own target.** That is the
+  charitable whole-set route. The per-bin route over 10 calibration bins gives 3,260. Laya's own
+  published recipe uses 300 per question schema, which is the same order by an independent route.
+- **Five of the six skill thresholds are unfalsifiable on their own corpora.** By the rule of
+  three, a perfect score on 3 items is consistent with a true accuracy of zero. Only
+  `signal-classify`, at 23 items, bounds its own 0.8 threshold. Measured by ticket 03.
+- **The first label the world writes arrives on 2027-08-28**, which is 341 days after today. The
+  three adopters hold 18 scenarios, and that is the earliest horizon among them.
 - `twin/skills.py` `evaluate()` takes a bare callable and a corpus. A second model needs no
   harness change.
 - `twin/skill-scores.jsonl` already records a `model_version` field. Every row today reads
@@ -111,6 +127,15 @@ This map measures and decides. It does not adopt anything into production.
 7. **Ticket 04 is now the evidence, not a confirmation of it.** Added 2026-09-21 after ticket 01.
    No independent measurement of Laya exists, so the bake-off would be the first. That raises its
    value and lowers the weight of every vendor number in ticket 09's ADR to zero.
+9. **A merged claim is not a human label. Authorship is the test, not merging.** Added
+   2026-09-21 after ticket 03. `twin/schema.py` demands `claimed_by` against `twin/roles.yaml` for
+   an `override` and for no other claim kind. So an override at grade 4 is a human's attributable
+   judgement, and a `binding` or `position` at grade 5 is the heuristic's own output that somebody
+   reviewed. Grading the candidate model against the second group measures agreement with the
+   incumbent heuristic, not accuracy. Ticket 03's builder counts that group and excludes it. The
+   count is zero today, so the exclusion changes no number yet. It becomes the whole answer the
+   first time `classify-and-judge` runs.
+
 6. **A tool that cannot report its own failure is not measured, it is trusted.** Added 2026-09-21.
    loophole's `_parse_scenarios` returns an empty list on malformed output, and the caller prints
    that the code appears robust. Ticket 07 must tell zero candidates apart from a failed parse.
@@ -141,7 +166,7 @@ flowchart TD
     subgraph laya["Laya — does a small local model judge well enough?"]
         T01["01 · Laya's terms and<br/>independent evidence<br/><i>resolved</i>"]
         T02["02 · Laya runs offline,<br/>pinned, measured here<br/><i>task</i>"]
-        T03["03 · A labelled corpus from<br/>merged human claims<br/><i>task</i>"]
+        T03["03 · A labelled corpus from<br/>merged human claims<br/><i>resolved</i>"]
         T04["04 · The bake-off against<br/>the six heuristics<br/><i>task</i>"]
         T01 --> T02 --> T04
         T03 --> T04
@@ -171,13 +196,13 @@ flowchart TD
     classDef blocked fill:#30363d,stroke:#8b949e,color:#e6edf3
     classDef done fill:#8957e5,stroke:#4c2889,color:#fff
     classDef dest fill:#238636,stroke:#0f5323,color:#fff
-    class T02,T03,T05,T07 frontier
+    class T02,T05,T07 frontier
     class T04,T08,T09 blocked
-    class T01,T06,T10 done
+    class T01,T03,T06,T10 done
     class DEST,ECO dest
 ```
 
-Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 06 and 10.
+Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-09-21 after tickets 01, 03, 06 and 10.
 
 ## Decisions so far
 
@@ -212,14 +237,29 @@ Blue is the frontier. Purple is resolved. Grey waits on a blocker. Redrawn 2026-
   `_parse_scenarios` return an empty list, and the caller then prints that the code appears
   robust. That is a false green.
 
+- [03 — A labelled corpus from merged human claims](issues/03-a-labelled-corpus-from-merged-human-claims.md):
+  **Not measurable on this corpus**, which the ticket named as the expected answer. The builder is
+  `.scratch/laya-loophole/corpus/build_corpus.py` and it reads `origin/main`, because every clone
+  was stale. It returns **one** item, for `evolution-judge`, citing driftwood pull request 34.
+  Every other skill gets zero. `classify-and-judge` has never produced a merged pull request; a
+  bound `signals.yaml` row carries a scenario and no STEEP tag; no adopter edge carries a causal
+  block. A temperature fit needs **326 items per skill**, derived from ticket 04's own 0.048 gap,
+  or 3,260 per bin, against Laya's published 300 per schema. The estate is 326 times short. Four
+  sources of more labels were checked and none reaches the number; the local clock structurally
+  cannot write one, because it refuses an override. Side finding: **five of six skill thresholds
+  cannot be cleared at 95% confidence even by a perfect score**, which is a measured number for
+  eco-system ticket 112.
+
 ## Not yet specified
 
 - Whether any of the six heuristics is actually replaced. Waits on ticket 04's number.
+- Whether this estate pays for a corpus that could support a specialised fit. Ticket 03 priced the
+  only route with real supply at roughly 57 backtest organisations for one skill, against the four
+  it has. That is a large build, and it is only worth charting if ticket 04's zero-shot number is
+  good enough to make a specialised number interesting. Waits on ticket 04.
 - Whether the `derive-probability` skill, eco-system ticket 93, could take a Laya input. Waits on
   ticket 04.
 - Named firms and named executives in loophole output. Waits on eco-system ticket 82.
-- Whether a second honest source of labelled items exists, beyond merged human claims. Waits on
-  ticket 03's count.
 - Whether this estate may credit the trdrbot author in public. A named-individual question for
   eco-system ticket 82.
 - Whether a Convai corporate record exists. Ticket 01 found an organisation, a site, a named
