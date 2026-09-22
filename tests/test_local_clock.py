@@ -31,6 +31,17 @@ import pytest
 import yaml
 
 from twin import feed_signal
+from twin import model_permission as mp
+
+
+@pytest.fixture(autouse=True)
+def _not_on_a_github_clock(monkeypatch: pytest.MonkeyPatch) -> None:
+    """These tests stand in for a run on the owner's machine. `derive_clock` reads the GitHub
+    Actions markers from the environment and lets them overrule the declared clock, so on CI the
+    runner's own markers would turn every stubbed local run into a governed GitHub run."""
+    for name in mp.GITHUB_CLOCK_MARKERS:
+        monkeypatch.delenv(name, raising=False)
+
 
 HUB = Path(__file__).resolve().parents[1]
 CLOCK = HUB / "talk" / "local-clock.sh"
