@@ -54,8 +54,8 @@ waiting on this ticket and names the built mechanism by path.
 
 ## Build, 2026-09-22
 
-Platform PR: https://github.com/policy-as-versioned-platform/platform/pull/28. Hub PR: this
-ticket's branch `ticket-113-infra-is-a-role-not-a-rung`. Merge the platform PR first.
+Platform PR: https://github.com/policy-as-versioned-platform/platform/pull/28. Hub PR: https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/85, branch
+`ticket-113-infra-is-a-role-not-a-rung`. Merge the platform PR first.
 
 ### Decisions
 
