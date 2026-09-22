@@ -694,6 +694,13 @@ def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> 
     imports. Third, a threshold that decreased since the manifest's last committed version needs
     an `authorised_by` citing a decision ticket — the same `hash_changes_are_authorised` pattern,
     applied to a second file.
+
+    Eco-system ticket 112 widened two legs. The fixture leg now also proves the third outcome: the
+    same perfect skill on a corpus below the stated minimum is NOT_MEASURABLE, neither passed nor
+    failed. The citation leg now also covers `min_items`, and it takes the baseline the way
+    `hash_changes_are_authorised` does: the committed file for an uncommitted edit, and the
+    previous committed version otherwise. It compared against HEAD only until 2026-09-22, so in CI,
+    where the checkout IS HEAD, a lowering committed in the same diff was never seen.
     """
     import inspect
 
@@ -716,32 +723,69 @@ def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> 
     if not good.passed:
         raise Violated("the fixture skill failed its own corpus running correctly — the harness has no subject")
     bad = skills_mod.evaluate("toy-classifier", lambda x: "wrong", skills_mod.TOY_SKILL_CORPUS)
-    if bad.passed:
-        raise Violated("a skill that gets every item wrong still passed — the threshold is not gating anything")
+    if bad.passed or not bad.failed:
+        raise Violated("a skill that gets every item wrong did not fail — the threshold is not gating anything")
+    short = skills_mod.TOY_SKILL_CORPUS[: good.min_items - 1]
+    small = skills_mod.evaluate("toy-classifier", skills_mod.toy_classifier, short)
+    if small.outcome != skills_mod.NOT_MEASURABLE or small.passed or small.failed:
+        raise Violated(
+            f"a perfect run on {len(short)} item(s), below the stated minimum of {good.min_items}, "
+            f"reported {small.outcome!r} — a threshold below its corpus size must say not measurable"
+        )
 
     current = skills_mod.load_thresholds()
-    head = _thresholds_at(REPO_DIR, "HEAD")
-    if head is None:
+    baseline = _thresholds_baseline(REPO_DIR, current)
+    if baseline is None:
         return (
             f"{len(real_skills)} real skill names absent from every harness function; the fixture "
-            "skill passes and a degraded one fails; no committed threshold history to compare yet"
+            "skill passes, a degraded one fails and a short corpus is not measurable; no committed "
+            "threshold history to compare yet"
         )
-    lowered = [
-        name
-        for name, entry in current["thresholds"].items()
-        if name in head["thresholds"]
-        and float(entry["threshold"]) < float(head["thresholds"][name]["threshold"])
-        and not _cites_decision_ticket(str(entry.get("authorised_by") or ""))
-    ]
+    before, source = baseline
+    lowered = _lowered_without_citation(before, current)
     if lowered:
         raise Violated(
-            "threshold(s) lowered with no authorising decision ticket cited in `authorised_by`: "
-            + ", ".join(sorted(lowered))
+            "lowered with no authorising decision ticket cited in `authorised_by`: " + "; ".join(lowered)
         )
     return (
         f"{len(real_skills)} real skill names absent from every harness function; the fixture "
-        "skill passes and a degraded one fails; no threshold lowered since HEAD without a citation"
+        "skill passes, a degraded one fails and a short corpus is not measurable; no threshold or "
+        f"stated minimum lowered without a citation against {source}"
     )
+
+
+def _lowered_without_citation(before: dict[str, Any], after: dict[str, Any]) -> list[str]:
+    """Every threshold or `min_items` that fell between two threshold documents with no
+    `authorised_by` citing a decision ticket on the later entry (eco-system ticket 112 item 3:
+    lowering a minimum is as visible as lowering a threshold). A field the earlier document did
+    not carry is a field being introduced, not lowered."""
+    out = []
+    was_all = before.get("thresholds") or {}
+    for name, entry in (after.get("thresholds") or {}).items():
+        was = was_all.get(name)
+        if not isinstance(was, dict) or _cites_decision_ticket(str(entry.get("authorised_by") or "")):
+            continue
+        for field_name in ("threshold", "min_items"):
+            if field_name in was and field_name in entry and float(entry[field_name]) < float(was[field_name]):
+                out.append(f"{name} {field_name} {was[field_name]} -> {entry[field_name]}")
+    return sorted(out)
+
+
+def _thresholds_baseline(root: Path, current: dict[str, Any]) -> tuple[dict[str, Any], str] | None:
+    """What a lowering is measured against: `hash_changes_are_authorised`'s two-branch shape. An
+    uncommitted edit is compared with HEAD. Otherwise the file's previous committed version is the
+    baseline, because in CI the checkout is HEAD and HEAD can only ever equal itself."""
+    head = _thresholds_at(root, "HEAD")
+    if head is not None and head != current:
+        return head, "the committed thresholds (uncommitted change)"
+    rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
+    history = [line for line in (_git(root, "log", "--format=%H", "--", rel) or "").splitlines() if line]
+    if len(history) < 2:
+        return None
+    earlier = _thresholds_at(root, history[1])
+    if earlier is None:
+        return None
+    return earlier, f"the previous version ({history[1][:12]})"
 
 
 @harness_check("honest_build_inventory_matches_files_and_owning_tickets")
@@ -869,19 +913,19 @@ def _signal_classify_is_grade_5_by_construction(ctx: Context) -> str:
 
     corpus = sc.labelled_corpus(ctx.tmp / "signal-classify-corpus")
     good = skills_mod.evaluate(sc.SKILL, sc.classify, corpus, scorer=sc.scorer)
-    if not good.passed:
+    if not good.clears_threshold:
         raise Violated("signal-classify failed its own labelled corpus running correctly — the harness has no subject")
     bad = skills_mod.evaluate(
         sc.SKILL,
         lambda payload: {"steep": "environmental", "claim": {"component": "not-a-real-component"}},
         corpus, scorer=sc.scorer,
     )
-    if bad.passed:
+    if bad.clears_threshold:
         raise Violated("a classifier that gets every item wrong still passed — the threshold is not gating anything")
 
     return (
         "no grade-shaped parameter exists on classify(); every call returns evidence_grade 5; "
-        f"the real {len(corpus)}-item labelled corpus passes and a degraded classifier fails its threshold"
+        f"the real {len(corpus)}-item labelled corpus clears its threshold (outcome {good.outcome}) and a degraded classifier fails its threshold"
     )
 
 
@@ -937,19 +981,19 @@ def _evolution_judge_output_is_graded_by_construction_and_never_silent(ctx: Cont
 
     corpus = ej.labelled_corpus(ctx.tmp / "evolution-judge-corpus")
     good = skills_mod.evaluate(ej.SKILL, ej.judge, corpus, scorer=ej.scorer)
-    if not good.passed:
+    if not good.clears_threshold:
         raise Violated("evolution-judge failed its own labelled corpus running correctly — the harness has no subject")
     bad = skills_mod.evaluate(
         ej.SKILL, lambda payload: {"evolution_position": 0.999}, corpus, scorer=ej.scorer,
     )
-    if bad.passed:
+    if bad.clears_threshold:
         raise Violated("a judge that gets every item wrong still passed — the threshold is not gating anything")
 
     return (
         "no grade-shaped parameter exists on judge() or override(); judge() always emits grade 5, "
         "override() always emits grade 4 and refuses an unregistered role, override() cannot run "
         "without an inferred claim first, pushback() is never silent on agreement or disagreement; "
-        f"the real {len(corpus)}-item labelled corpus passes and a degraded judge fails its threshold"
+        f"the real {len(corpus)}-item labelled corpus clears its threshold (outcome {good.outcome}) and a degraded judge fails its threshold"
     )
 
 
@@ -985,10 +1029,10 @@ def _causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory(ctx:
         return honest
 
     claim_result = skills_mod.evaluate(cc.SKILL, over_grades_everything, corpus, scorer=cc.scorer)
-    if not claim_result.passed:
+    if not claim_result.clears_threshold:
         raise Violated("a proposer with the right sign/lag/elasticity but the wrong grade should still pass the claim metric")
     grade_result = skills_mod.evaluate(cc.GRADE_SKILL, over_grades_everything, corpus, scorer=cc.grade_scorer)
-    if grade_result.passed or grade_result.score != 0.0:
+    if grade_result.clears_threshold or grade_result.score != 0.0:
         raise Violated(
             f"a proposer that over-grades every item to the strongest rung scored {grade_result.score} on the "
             "grade metric and passed — the asymmetric penalty is not gating the dangerous direction"
@@ -1069,10 +1113,10 @@ def _gameplay_lens_is_grade_5_and_reports_no_recommendation(ctx: Context) -> str
 
     corpus = gl.labelled_corpus(ctx.tmp / "gameplay-lens-corpus")
     good = skills_mod.evaluate(gl.SKILL, gl.propose, corpus, scorer=gl.scorer)
-    if not good.passed:
+    if not good.clears_threshold:
         raise Violated("gameplay-lens failed its own labelled corpus running correctly — the harness has no subject")
     bad = skills_mod.evaluate(gl.SKILL, lambda payload: {"opportunities": []}, corpus, scorer=gl.scorer)
-    if bad.passed:
+    if bad.clears_threshold:
         raise Violated("a skill that proposes nothing still passed — the threshold is not gating anything")
 
     repo = ModelRepo.open(ctx.repo_dir)
@@ -1093,7 +1137,7 @@ def _gameplay_lens_is_grade_5_and_reports_no_recommendation(ctx: Context) -> str
 
     return (
         "no grade-shaped parameter exists on propose(); every opportunity carries evidence_grade "
-        f"5; the real {len(corpus)}-item labelled corpus passes and a skill that proposes nothing "
+        f"5; the real {len(corpus)}-item labelled corpus clears its threshold (outcome {good.outcome}) and a skill that proposes nothing "
         f"fails its threshold; the sweep reports {counts['opportunities']} opportunity candidate(s) "
         f"beside {counts['signals']} signal(s), and no action-shaped field found in it"
     )
@@ -1153,18 +1197,18 @@ def _substrate_generator_is_mundane_by_default(ctx: Context) -> str:
 
     corpus = sg.labelled_corpus()
     good = skills_mod.evaluate(sg.SKILL, sg.generate_from_recipe_yaml, corpus, scorer=sg.scorer)
-    if not good.passed:
+    if not good.clears_threshold:
         raise Violated("substrate-generator failed its own labelled corpus running correctly — the harness has no subject")
     bad = skills_mod.evaluate(
         sg.SKILL, lambda text: {"channels": {}, "plants": [], "resolution": ""}, corpus, scorer=sg.scorer,
     )
-    if bad.passed:
+    if bad.clears_threshold:
         raise Violated("a generator that emits nothing still passed — the threshold is not gating anything")
 
     return (
         "regenerating from the identical recipe reproduces byte-for-byte; a plant-per-channel "
         f"batch still clears mundane_fraction >= {sg.MIN_MUNDANE_FRACTION}; the resolution names "
-        f"measurability winning; the real {len(corpus)}-item labelled corpus passes and a silent "
+        f"measurability winning; the real {len(corpus)}-item labelled corpus clears its threshold (outcome {good.outcome}) and a silent "
         "generator fails its threshold"
     )
 
@@ -4427,19 +4471,19 @@ def _ethics_gate_ladder_stops_early_and_fast_improvement_is_never_an_automatic_f
 
     corpus = eg.labelled_corpus()
     good = skills_mod.evaluate(eg.SKILL, eg.admit, corpus, scorer=eg.scorer)
-    if not good.passed:
+    if not good.clears_threshold:
         raise Violated("ethics-gate failed its own labelled corpus running correctly — the harness has no subject")
     bad = skills_mod.evaluate(
         eg.SKILL, lambda payload: {"admitted": True, "ladder": {"stopped_at": None}}, corpus, scorer=eg.scorer,
     )
-    if bad.passed:
+    if bad.clears_threshold:
         raise Violated("a skill that admits everything still passed — the threshold is not gating anything")
 
     return (
         "the ladder stops at its first failing rung without touching the rest; a fully-passing "
         "walk carries a justification on every rung; flag_fast_improvement() carries no "
         "action/verdict-shaped field or phrase; adjudication refuses an unflagged input and an "
-        f"unregistered role; the real {len(corpus)}-item labelled corpus passes and a skill that "
+        f"unregistered role; the real {len(corpus)}-item labelled corpus clears its threshold (outcome {good.outcome}) and a skill that "
         "admits everything fails its threshold"
     )
 

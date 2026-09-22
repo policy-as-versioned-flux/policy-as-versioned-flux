@@ -399,7 +399,7 @@ def test_every_corpus_item_carries_the_fields_evaluate_requires(corpus: list[dic
 
 def test_ethics_gate_passes_its_own_labelled_corpus(corpus: list[dict]) -> None:
     result = evaluate(SKILL, admit, corpus, scorer=scorer)
-    assert result.passed, f"scored {result.score}, threshold {result.threshold}: {result.as_dict()}"
+    assert result.clears_threshold, f"scored {result.score}, threshold {result.threshold}: {result.as_dict()}"
     assert result.threshold == threshold_for(SKILL)
 
 
@@ -409,4 +409,4 @@ def test_a_degraded_gate_fails_the_threshold(corpus: list[dict]) -> None:
 
     result = evaluate(SKILL, admits_everything, corpus, scorer=scorer)
     assert result.score < 1.0
-    assert not result.passed
+    assert not result.clears_threshold

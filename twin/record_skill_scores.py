@@ -139,10 +139,16 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     recorded_at = args.at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     entries = run(recorded_at, args.model_version)
+    # Eco-system ticket 112: three outcomes. Not measurable is not a failure, so it does not fail
+    # the run; it is printed as itself so nobody reads it as a pass.
+    labels = {"pass": "PASS", "fail": "FAIL", "not-measurable": "NOT MEASURABLE"}
     for entry in entries:
-        status = "PASS" if entry["passed"] else "FAIL"
-        print(f"{status}  {entry['skill']:<28} score={entry['score']:.3f}  threshold={entry['threshold']}")
-    return 0 if all(entry["passed"] for entry in entries) else 1
+        status = labels[entry["outcome"]]
+        print(
+            f"{status:<14}  {entry['skill']:<28} score={entry['score']:.3f}  threshold={entry['threshold']}"
+            f"  items={entry['total']}  min_items={entry['min_items']}"
+        )
+    return 1 if any(entry["outcome"] == "fail" for entry in entries) else 0
 
 
 if __name__ == "__main__":

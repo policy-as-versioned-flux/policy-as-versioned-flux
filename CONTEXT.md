@@ -655,6 +655,13 @@ that a rewritten entry cites stay as the record of the decision at the time.
   entry says only what was said, when, and where it was read. It carries no classification,
   coordinate or scope. Planted stimuli never enter it.
 
+- **Not measurable** (added 2026-09-22, eco-system ticket 112) — The third outcome of a skill eval,
+  beside pass and fail. Every threshold in `twin/skill-thresholds.yaml` states the **minimum
+  corpus** it is valid at (`min_items`), derived from the threshold by `twin/corpus_size.py` and
+  never typed. A run on fewer items is not measurable: the threshold says nothing about it either
+  way. It is a run-level outcome, not an item state. Six of the seven skill metrics were not
+  measurable on the day it landed.
+
 - **Headline skill** (added 2026-08-28, ticket 23) — Judgement a human runs over unbound signals.
   It proposes which component a headline binds to and, if the human judges a move, an attributable
   position override. Its output enters by reviewed PR and is scored later.

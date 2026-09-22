@@ -41,6 +41,13 @@
 # not move the incumbent's bar, so `last_for()` below filters on the model version and carries a
 # negative control in both directions.
 #
+# A METRIC CAN BE NOT MEASURABLE (eco-system ticket 112, 2026-09-22). Every threshold states the
+# corpus size it is valid at (`min_items`, derived by twin/corpus_size.py). A metric whose corpus
+# is smaller prints "NOT MEASURABLE:" here rather than "PASS:", and it is not a failure: this
+# script's job is the harness, and verify/twin-evals/verify-corpus-size.sh is the check that
+# grades measurability and goes amber for it. A FALL still fails a not-measurable metric, because a
+# fall is a change against this model version's own record, not a claim about a threshold.
+#
 # Three outcomes only:
 #   PASS (exit 0)  every assertion observed true
 #   FAIL (exit 1)  an assertion observed false
@@ -92,21 +99,29 @@ def out(ok, msg):
     fails += 0 if ok else 1
     print(("PASS: " if ok else "FAIL: ") + msg)
 
-def verdict(score, threshold, last):
+def verdict(score, threshold, last, measurable=True):
     """`fell` even when the score is still above its threshold: a threshold is a floor, and a fall
     against the last recorded value is the regression this harness exists to catch (decision
     ticket 11 answer item 5). Named and asserted below, because a comparison that is only ever
-    exercised by scores that all pass cannot tell "correct" from "always says pass"."""
-    if score < threshold:
+    exercised by scores that all pass cannot tell "correct" from "always says pass".
+
+    `unmeasured` (eco-system ticket 112): the corpus is below the minimum the threshold states,
+    so the threshold says nothing either way. A fall still beats it."""
+    if measurable and score < threshold:
         return "below"
     if last is not None and score < last:
         return "fell"
+    if not measurable:
+        return "unmeasured"
     return "pass"
 
 
 assert verdict(0.7, 0.8, None) == "below", verdict(0.7, 0.8, None)
 assert verdict(0.9, 0.8, 1.0) == "fell", verdict(0.9, 0.8, 1.0)
 assert verdict(1.0, 0.8, 1.0) == "pass", verdict(1.0, 0.8, 1.0)
+assert verdict(1.0, 0.8, None, measurable=False) == "unmeasured"
+assert verdict(0.0, 0.8, None, measurable=False) == "unmeasured"   # a zero on 3 items bounds nothing either
+assert verdict(0.5, 0.8, 1.0, measurable=False) == "fell"          # a fall is not excused by size
 
 declared = (ROOT / "twin" / "VERSION").read_text().strip()
 out(declared == TOOL_VERSION,
@@ -169,18 +184,25 @@ assert verdict(0.6, 0.5, last_for("s", "incumbent", _ROWS)) == "fell"   # the ca
 assert verdict(0.6, 0.5, _ROWS[-2]["score"]) == "pass"                  # what the old read said
 
 
+unmeasured = 0
 for entry in entries:
     skill, score, threshold = entry["skill"], entry["score"], entry["threshold"]
     last = last_for(skill, entry["model_version"])
     shown = "none recorded" if last is None else "%.3f" % last
-    said = verdict(score, threshold, last)
+    said = verdict(score, threshold, last, entry["outcome"] != "not-measurable")
     why = {"below": "  -- below its threshold",
            "fell": "  -- FELL against the last value twin/skill-scores.jsonl records for THIS "
                    "model version",
+           "unmeasured": "  -- %d item(s), below the %d its threshold states"
+                         % (entry["total"], entry["min_items"]),
            "pass": ""}[said]
-    out(said == "pass", "%-28s score=%.3f  threshold=%.3f  last=%s (%s)  [%s: scored "
-                        "on the corpus it was fitted on]%s"
-                        % (skill, score, threshold, shown, entry["model_version"], LABEL, why))
+    line = ("%-28s score=%.3f  threshold=%.3f  last=%s (%s)  [%s: scored on the corpus it was "
+            "fitted on]%s" % (skill, score, threshold, shown, entry["model_version"], LABEL, why))
+    if said == "unmeasured":
+        unmeasured += 1
+        print("NOT MEASURABLE: " + line)
+    else:
+        out(said == "pass", line)
 
 # The label is read from the skill module, not typed here: evolution_judge declares what its own
 # corpus is, and both this harness's per-metric line above and the shell's closing PASS line are
@@ -195,6 +217,7 @@ out(LABEL == CORPUS_KIND,
     % (len(entries), LABEL, CORPUS_KIND))
 
 print("METRICS: %d" % len(entries))
+print("UNMEASURED: %d" % unmeasured)
 print("SUBTOTAL: %d skill metric(s), %d observed false" % (len(entries), fails))
 sys.exit(1 if fails else 0)
 PY
@@ -296,7 +319,7 @@ fi
 rm -f "$lookup"
 
 if [ "$fail" -eq 0 ]; then
-  echo "PASS: $(sed -n 's/^METRICS: //p' "$log" | tail -1) $CORPUS_KIND metrics (the label twin/evolution_judge.py declares for the corpus behind these scores, and the one this run asserted the harness spent; harness-mechanism means each heuristic is scored against the corpus it was fitted on, so the number grades the harness, not the twin's judgement -- a held-out corpus is not built yet), exactly the set twin/skill-thresholds.yaml declares, at their thresholds and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal"
+  echo "PASS: $(sed -n 's/^METRICS: //p' "$log" | tail -1) $CORPUS_KIND metrics, $(sed -n 's/^UNMEASURED: //p' "$log" | tail -1) of them not measurable at their corpus size (verify-corpus-size.sh grades that) (the label twin/evolution_judge.py declares for the corpus behind these scores, and the one this run asserted the harness spent; harness-mechanism means each heuristic is scored against the corpus it was fitted on, so the number grades the harness, not the twin's judgement -- a held-out corpus is not built yet), exactly the set twin/skill-thresholds.yaml declares, none below its threshold where measurable and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal"
   exit 0
 fi
 echo "FAIL: the twin's evals observed false; see the lines above"

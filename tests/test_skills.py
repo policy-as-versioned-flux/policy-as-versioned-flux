@@ -35,7 +35,7 @@ def test_score_is_a_proportion_not_a_raw_count() -> None:
         return text.upper() if text in ("hello", "WORLD", "MiXeD") else "nope"
 
     result = evaluate("toy-classifier", half_right, TOY_SKILL_CORPUS)
-    assert result.score == pytest.approx(3 / 5)
+    assert result.score == pytest.approx(3 / len(TOY_SKILL_CORPUS))
 
 
 def test_the_harness_is_skill_agnostic() -> None:
@@ -157,3 +157,126 @@ def test_a_malformed_log_line_is_refused_not_silently_skipped(tmp_path) -> None:
 
     with pytest.raises(Err, match="not a JSON object"):
         load_scores(log)
+
+
+# -- a threshold states the corpus it needs (eco-system ticket 112) ------------------------
+
+
+def _threshold_file(tmp_path, threshold: float, min_items: int | None, name: str = "toy-classifier"):
+    import yaml
+
+    entry: dict = {"threshold": threshold}
+    if min_items is not None:
+        entry["min_items"] = min_items
+    path = tmp_path / "thresholds.yaml"
+    path.write_text(yaml.safe_dump({"schema": "twin.skill-thresholds/v1", "thresholds": {name: entry}}))
+    return path
+
+
+def _corpus(n: int) -> list[dict]:
+    return [{"id": f"i{k}", "input": f"w{k}", "expected": f"W{k}"} for k in range(n)]
+
+
+def test_every_threshold_states_the_minimum_its_own_derivation_gives() -> None:
+    from twin.corpus_size import derived_min_items
+    from twin.skills import load_thresholds
+
+    for name, entry in load_thresholds()["thresholds"].items():
+        assert entry["min_items"] == derived_min_items(entry["threshold"]), name
+
+
+def test_a_threshold_that_states_no_minimum_is_refused(tmp_path) -> None:
+    path = _threshold_file(tmp_path, 0.8, None)
+    with pytest.raises(SkillError, match="states no min_items"):
+        threshold_for("toy-classifier", path)
+
+
+@pytest.mark.parametrize("stated", [1, 15, 17, 50])
+def test_a_stated_minimum_the_method_does_not_derive_is_refused(tmp_path, stated: int) -> None:
+    """Below the derivation is a threshold claiming more than its corpus can carry; above it is an
+    imported number, the prior art's ~50 included."""
+    path = _threshold_file(tmp_path, 0.8, stated)
+    with pytest.raises(SkillError, match="derives 16"):
+        threshold_for("toy-classifier", path)
+
+
+def test_a_run_below_the_minimum_is_not_measurable_rather_than_passed(tmp_path) -> None:
+    from twin.skills import NOT_MEASURABLE
+
+    path = _threshold_file(tmp_path, 0.8, 16)
+    result = evaluate("toy-classifier", toy_classifier, _corpus(3), threshold_path=path)
+    assert result.score == 1.0
+    assert result.clears_threshold
+    assert result.outcome == NOT_MEASURABLE
+    assert not result.passed
+    assert not result.failed, "not measurable is a third outcome, not a failure"
+    assert result.min_items == 16
+
+
+def test_a_wrong_run_below_the_minimum_is_also_not_measurable(tmp_path) -> None:
+    """Three wrong answers bound nothing either: the rule of three is symmetric."""
+    from twin.skills import NOT_MEASURABLE
+
+    path = _threshold_file(tmp_path, 0.8, 16)
+    result = evaluate("toy-classifier", lambda x: "WRONG", _corpus(3), threshold_path=path)
+    assert result.outcome == NOT_MEASURABLE
+    assert not result.passed and not result.failed
+
+
+def test_at_the_minimum_the_run_passes_or_fails_on_its_score(tmp_path) -> None:
+    from twin.skills import FAIL, PASS
+
+    path = _threshold_file(tmp_path, 0.8, 16)
+    good = evaluate("toy-classifier", toy_classifier, _corpus(16), threshold_path=path)
+    bad = evaluate("toy-classifier", lambda x: "WRONG", _corpus(16), threshold_path=path)
+    assert (good.outcome, good.passed, good.failed) == (PASS, True, False)
+    assert (bad.outcome, bad.passed, bad.failed) == (FAIL, False, True)
+
+
+def test_the_toy_corpus_is_large_enough_for_its_own_threshold() -> None:
+    """The fixture skill is how the harness proves itself. A fixture that is itself not
+    measurable would prove only the third outcome."""
+    result = evaluate("toy-classifier", toy_classifier, TOY_SKILL_CORPUS)
+    assert len(TOY_SKILL_CORPUS) >= result.min_items
+    assert result.passed
+
+
+def test_the_recorded_entry_carries_the_outcome_and_the_minimum(tmp_path) -> None:
+    from twin.skills import NOT_MEASURABLE
+
+    path = _threshold_file(tmp_path, 0.8, 16)
+    result = evaluate("toy-classifier", toy_classifier, _corpus(3), threshold_path=path)
+    entry = record_score(result, "model-a", "2026-01-01T00:00:00Z", path=tmp_path / "s.jsonl")
+    assert entry["outcome"] == NOT_MEASURABLE
+    assert entry["min_items"] == 16
+    assert entry["passed"] is False
+
+
+def test_measurability_counts_the_items_the_seam_names() -> None:
+    """The seam ticket 118 builds on: the run-level outcome reads the corpus size through
+    `measured_count`, and the item-level state only through `score`. A third item state changes
+    the numerator; it does not move this count unless 118 decides it should."""
+    result = evaluate("toy-classifier", toy_classifier, TOY_SKILL_CORPUS)
+    assert result.measured_count == len(result.items)
+
+
+def _doc(**entries: dict) -> dict:
+    return {"schema": "twin.skill-thresholds/v1", "thresholds": entries}
+
+
+def test_a_lowered_minimum_needs_a_citation_like_a_lowered_threshold() -> None:
+    from twin.invariants.harness import _lowered_without_citation
+
+    before = _doc(s={"threshold": 0.8, "min_items": 16})
+    assert _lowered_without_citation(before, _doc(s={"threshold": 0.8, "min_items": 9})) == ["s min_items 16 -> 9"]
+    assert _lowered_without_citation(before, _doc(s={"threshold": 0.65, "min_items": 16})) == ["s threshold 0.8 -> 0.65"]
+    cited = {"threshold": 0.65, "min_items": 9, "authorised_by": "decision ticket 20 - a reason"}
+    assert _lowered_without_citation(before, _doc(s=cited)) == []
+
+
+def test_a_minimum_appearing_for_the_first_time_is_not_a_lowering() -> None:
+    from twin.invariants.harness import _lowered_without_citation
+
+    assert _lowered_without_citation(_doc(s={"threshold": 0.8}), _doc(s={"threshold": 0.8, "min_items": 16})) == []
+    assert _lowered_without_citation(_doc(s={"threshold": 0.8, "min_items": 16}),
+                                     _doc(s={"threshold": 0.8, "min_items": 20})) == []
