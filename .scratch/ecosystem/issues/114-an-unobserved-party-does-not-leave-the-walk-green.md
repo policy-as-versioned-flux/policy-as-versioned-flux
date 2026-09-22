@@ -1,7 +1,7 @@
 # 114 — An unobserved party does not leave the walk green
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -81,7 +81,7 @@ Hub only. Platform's `shift-left/tier_binding.py` was read at platform origin/ma
    (`talk/truth_manifest.py` `judge`) against `talk/verify-manifest.txt`. That line is not
    declared, so the gate grades it red.
 6. **The catalogue row.** `adopter-silences-its-own-binding-observation` drops `waits_on: 114`
-   and anchors `def owed`, `def walked` and two tests by path. The version goes 4 to 5.
+   and anchors `def owed`, `def walked` and two tests by path. The version goes 5 to 6.
 
 ### Item 3: the sweep
 
@@ -163,3 +163,19 @@ the identical line silently, so this branch bumps it again to `version: 6`.
 ### What remains
 
 Nothing waits on the owner. The integrator closes the ticket after merge.
+
+## Answer
+
+Resolved 2026-09-22 by hub PR 86. A party that is owed an observation no longer leaves the walk
+green.
+
+1. `verify/tier-binding/tier_binding_estate.py` owes an observation to every party that claims
+   the adopter role in its `party.yaml` or publishes `composed/evidence.json`. A could-not-look on
+   an owed party makes the walk exit 3 and name the party. The gate grades that line red, because
+   `talk/verify-manifest.txt` does not declare it. An observed FAIL still outranks it.
+2. The walk's selfcheck plants the ambiguous estate, FAIL over SKIP, every adopter ambiguous, and
+   an adopter with nothing composed. With the new branch disabled, the selfcheck fails.
+3. The sweep found the same fold in `verify/handbook/handbook_check.py`, fixed the same way.
+   Four walks still drop an adopter whose clone directory is absent. The build section names them.
+
+Review: one round, pass, three minor findings. One wrong number in this record is corrected.
