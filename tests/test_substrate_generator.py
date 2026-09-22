@@ -140,7 +140,7 @@ def test_the_labelled_corpus_spans_zero_to_one_plant_per_channel() -> None:
 def test_substrate_generator_passes_its_own_labelled_corpus() -> None:
     corpus = labelled_corpus()
     result = evaluate(SKILL, generate_from_recipe_yaml, corpus, scorer=scorer)
-    assert result.passed, f"scored {result.score}, threshold {result.threshold}: {result.as_dict()}"
+    assert result.clears_threshold, f"scored {result.score}, threshold {result.threshold}: {result.as_dict()}"
     assert result.threshold == threshold_for(SKILL)
 
 
@@ -151,7 +151,7 @@ def test_a_degraded_generator_fails_the_threshold() -> None:
     corpus = labelled_corpus()
     result = evaluate(SKILL, silent, corpus, scorer=scorer)
     assert result.score < result.threshold
-    assert not result.passed
+    assert not result.clears_threshold
 
 
 # -- the depth grade: ticket 49 ticks no new criterion ---------------------------------------------

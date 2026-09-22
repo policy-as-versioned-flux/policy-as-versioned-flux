@@ -242,11 +242,11 @@ def test_every_corpus_item_carries_the_fields_evaluate_requires(corpus: list[dic
 
 def test_causal_claims_passes_its_own_labelled_corpus_on_both_metrics(corpus: list[dict]) -> None:
     claim_result = evaluate(SKILL, propose, corpus, scorer=scorer)
-    assert claim_result.passed, f"claim accuracy scored {claim_result.score}: {claim_result.as_dict()}"
+    assert claim_result.clears_threshold, f"claim accuracy scored {claim_result.score}: {claim_result.as_dict()}"
     assert claim_result.threshold == threshold_for(SKILL)
 
     grade_result = evaluate(GRADE_SKILL, propose, corpus, scorer=grade_scorer)
-    assert grade_result.passed, f"grade accuracy scored {grade_result.score}: {grade_result.as_dict()}"
+    assert grade_result.clears_threshold, f"grade accuracy scored {grade_result.score}: {grade_result.as_dict()}"
     assert grade_result.threshold == threshold_for(GRADE_SKILL)
 
 
@@ -255,10 +255,10 @@ def test_a_degraded_proposer_fails_both_thresholds(corpus: list[dict]) -> None:
         return {"edge": {"sign": "positive", "lag_days": 1, "elasticity": {"mode": 0.999}, "evidence_grade": 5}}
 
     claim_result = evaluate(SKILL, always_wrong, corpus, scorer=scorer)
-    assert not claim_result.passed
+    assert not claim_result.clears_threshold
 
     grade_result = evaluate(GRADE_SKILL, always_wrong, corpus, scorer=grade_scorer)
-    assert not grade_result.passed
+    assert not grade_result.clears_threshold
 
 
 def test_a_systematically_over_grading_proposer_fails_the_grade_threshold_but_not_necessarily_the_claim_one(
@@ -274,10 +274,10 @@ def test_a_systematically_over_grading_proposer_fails_the_grade_threshold_but_no
         return honest
 
     claim_result = evaluate(SKILL, over_grades_everything, corpus, scorer=scorer)
-    assert claim_result.passed, "the claim itself (sign/lag/elasticity) is unaffected by the grade change"
+    assert claim_result.clears_threshold, "the claim itself (sign/lag/elasticity) is unaffected by the grade change"
 
     grade_result = evaluate(GRADE_SKILL, over_grades_everything, corpus, scorer=grade_scorer)
-    assert not grade_result.passed, "over-grading every item to the strongest rung must fail the grade metric"
+    assert not grade_result.clears_threshold, "over-grading every item to the strongest rung must fail the grade metric"
     assert grade_result.score == 0.0, "every item in this corpus has a true grade above 1, so every one is an over-grade"
 
 

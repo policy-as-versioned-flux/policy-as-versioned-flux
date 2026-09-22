@@ -59,7 +59,7 @@ def permission_rules(hub):
     try:
         from twin import model_permission as mp
         from twin import record_skill_scores as rss
-        from twin.skills import load_scores, threshold_for
+        from twin.skills import load_scores, min_items_for, threshold_for
     except Exception as exc:  # noqa: BLE001 - any import failure is "cannot look"
         raise SystemExit(f"SKIP: no twin package at {hub!r} to read the model permission from ({exc})")
 
@@ -71,7 +71,9 @@ def permission_rules(hub):
     def lookup(skill, model_version):
         """One skill's permission for one model. The corpus digest, the baseline and the
         variance are DERIVED from the corpus in the tree, so a stale scoring run cannot grant
-        anything (item 2) and a constant field cannot hide (item 8)."""
+        anything (item 2) and a constant field cannot hide (item 8). The threshold and the minimum corpus it
+        states are the tree's too (ticket 112), so a row that met a minimum the tree has since
+        raised clears nothing at item 1."""
         if skill not in measured:
             measured[skill] = rss.corpus_facts(skill)
         facts = measured[skill]
@@ -81,6 +83,7 @@ def permission_rules(hub):
             scores=scores,
             corpus_digest_now=facts["corpus_digest"],
             threshold_now=threshold_for(skill),
+            min_items_now=min_items_for(skill),
             baseline=facts["baseline"],
             variance=facts["variance"],
             readings=readings,

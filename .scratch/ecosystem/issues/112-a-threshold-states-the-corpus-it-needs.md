@@ -1,7 +1,7 @@
 # 112 — A threshold states the corpus it needs
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -62,3 +62,231 @@ items. Five of the six thresholds are unfalsifiable at their current corpus size
 A perfect score on a 3-item corpus is consistent with a true accuracy of zero. That is the
 "not measurable" third outcome item 1 asks for, and the table says which five skills report it on
 the day this ticket lands.
+
+## Build, 2026-09-22
+
+Built on branch `ticket-112-threshold-states-corpus`. Hub only.
+
+### What landed
+
+- `twin/corpus_size.py` derives the minimum. It is the method from the Laya map's ticket 03,
+  moved out of `.scratch/` because the gate runs it. Two routes, and the larger binds:
+  1. **Standard error at half the effect.** The effect is `1 - threshold`: every heuristic scores
+     1.000, and the threshold exists to catch a fall from there to the floor. The binomial variance
+     is taken at its worst inside `[threshold, 1]`.
+  2. **The rule of three.** A perfect score's 95% lower bound, `1 - 3/n`, must reach the threshold.
+- `twin/skill-thresholds.yaml` states `min_items` on every entry. `twin/skills.py` refuses a file
+  whose stated number is not the derived one, above or below, and one that states none.
+- `EvalResult.outcome` is `pass`, `fail` or `not-measurable`. Below the minimum the run is not
+  measurable whatever it scored. `passed` and `failed` are both false then. `clears_threshold`
+  keeps the bare score comparison, which the per-skill guards use to prove a threshold gates
+  something. `record_score()` writes `min_items` and `outcome` into each new score row.
+- The citation guard now covers `min_items` as well as `threshold`, in
+  `skill_eval_harness_is_agnostic_and_thresholds_are_guarded`.
+- `verify/twin-evals/verify-corpus-size.sh` is the gate check. It is declared `waits:` in
+  `talk/verify-manifest.txt`.
+- `verify-twin-evals.sh` prints `NOT MEASURABLE:` for a short metric instead of `PASS:`. A fall
+  against the same model version's record still fails a short metric.
+- `CONTEXT.md` gains the term **Not measurable**. `twin/README.md`'s seam-3 bullet says the same.
+
+### The derived minimums
+
+Printed by `bash verify/twin-evals/verify-corpus-size.sh` on 2026-09-22.
+
+| threshold | effect | SE route | rule of three | bins | min_items |
+|---|---|---|---|---|---|
+| 0.80 | 0.20 | 16 | 15 | 1 | 16 |
+| 0.75 | 0.25 | 12 | 12 | 1 | 12 |
+| 0.65 | 0.35 | 8 | 9 | 1 | 9 |
+
+No threshold derives 50. The per-bin number equals the whole-set number here, because the harness
+grades one proportion with one bin. Ticket 03's tenfold factor came from a binned ECE estimate.
+
+### What the gate reports today
+
+The same run. Six of seven metrics are not measurable, so the check is amber (exit 3, declared
+`waits:`).
+
+| metric | items | min_items | outcome |
+|---|---|---|---|
+| signal-classify | 23 | 16 | pass |
+| evolution-judge | 4 | 12 | not measurable |
+| causal-claims | 4 | 16 | not measurable |
+| causal-claims-grade-accuracy | 4 | 16 | not measurable |
+| gameplay-lens | 3 | 9 | not measurable |
+| substrate-generator | 3 | 16 | not measurable |
+| ethics-gate | 5 | 16 | not measurable |
+
+Growing those corpora takes 62 more items, counted as the sum of `min_items - items` over the six
+short rows. The two causal-claims metrics share one 4-item corpus, so 12 of those serve both, and
+50 distinct items would do. The check turns PASS by itself when they arrive.
+
+### Decisions
+
+- **The minimum is the larger of two routes** (delegated). The standard-error route alone gives 8
+  at 0.65, and a perfect 8 of 8 only bounds true accuracy at 0.625, below the bar. The rule of
+  three alone gives 15 at 0.8, where the standard error is still above half the effect. Each
+  route catches what the other misses.
+- **The stated minimum must equal the derived one** (delegated). Below it the threshold claims
+  more than the corpus carries. Above it the number was imported. The ~50 is the case the ticket
+  names. So `load_thresholds()` refuses both, and a raised minimum means changing the method in
+  code, where review sees it.
+- **Not measurable is decided before the threshold** (delegated). A zero on three items bounds
+  nothing either, so a short run is not measurable whether it scored 1.0 or 0.0.
+- **Not measurable is run-level, not item-level** (delegated). The seam is
+  `EvalResult.measured_count`. The run outcome reads the items only through `score` and
+  `measured_count`. Ticket 118 adds a third item state. That changes the numerator of `score`. It
+  moves `measured_count` only if 118 decides such an item should not count toward the corpus size.
+- **A fall still fails a short metric in `verify-twin-evals.sh`** (delegated). A fall compares the
+  model version against its own record. It is not a claim about the threshold.
+- **The amber lives in its own script** (delegated). Folding exit 3 into `verify-twin-evals.sh`
+  would have hidden its beats, determinism and feed-lookup passes behind one SKIP.
+- **Not measurable is a declared `waits:` SKIP** (delegated). The gate has three outcomes. A corpus
+  not yet grown is the estate's own state, which is what `waits:` means.
+- **The fixture corpus grew from 5 to 16 items** (delegated). The toy skill proves the harness. A
+  fixture that is itself not measurable would prove only the third outcome.
+- **The citation guard takes a real baseline now** (delegated). It compared only against HEAD. In
+  CI the checkout is HEAD, so a lowering committed in the same diff was never seen. It now uses
+  `hash_changes_are_authorised`'s two-branch shape.
+
+### Found on the way
+
+- `twin/skill-thresholds.yaml`'s header named a check `skill_thresholds_lowered_only_with_citation`.
+  No check ever had that name. The real one is
+  `skill_eval_harness_is_agnostic_and_thresholds_are_guarded`. The header now says so.
+- `twin/model_permission.py` condition 1 compares a score with the threshold and does not read
+  `min_items`. No permission rests on a short corpus today: conditions 9 and 10 refuse every
+  pair, 0 of 14 held on this run of `verify-model-permission.sh`. Reading the minimum in
+  condition 1 was left as a follow-up. The review round below built it.
+- `verify-model-permission.sh`'s `WEAK THRESHOLDS` line still said ticket 112 "owns the sizing".
+  The review round below rewrote it.
+
+### How it was tested
+
+- Red first: `tests/test_corpus_size.py` failed on import and 12 new tests in `tests/test_skills.py`
+  failed before `twin/corpus_size.py` and the outcome existed. After the change, the six
+  per-skill tests that asserted `passed` on a short corpus went red as the ticket predicted. They
+  now assert `clears_threshold`, and `tests/test_record_skill_scores.py` asserts the outcome per
+  metric from each row's own `total` and `min_items`.
+- `.venv/bin/python -m pytest` over 13 files, `-n0`: 286 passed.
+- mypy over `twin tests conftest.py`: no issues in 196 source files.
+- `bin/twin verify --only` on eleven touched or adjacent checks: all PASS. A planted uncited
+  lowering of gameplay-lens to 0.6 made the citation check FAIL, then the file was restored.
+- `bash verify/twin-evals/verify-corpus-size.sh`: exit 3, last line matched by the manifest's
+  `waits:` pattern (checked with `talk/truth_manifest.py`'s `judge()`).
+- `bash verify/twin-evals/verify-twin-evals.sh`: PASS, with six `NOT MEASURABLE:` lines.
+- `bash verify/model-permission/verify-model-permission.sh`: PASS, 0 of 14 pairs granted.
+
+### What remains
+
+Nothing waits on the owner. The corpora are what is short: 50 distinct labelled items across six metrics.
+Ticket 03 of the Laya map says where labels can come from and when.
+
+### Review round, 2026-09-22
+
+The review blocked on one finding and raised three minor ones. All four are fixed on the same
+branch.
+
+- **Blocking: condition 1 granted on a short run.** `permission_for()` read only `score` and
+  `threshold`, so a candidate that was never fitted, with a perfect score on 3 gameplay-lens
+  items, held every graded condition. The reviewer ran it; so did the new test before the fix.
+  Condition 1 now also refuses a row whose `outcome` is `not-measurable`, and a row whose count
+  is below the minimum. The count is `measured_count`, else `total`. The minimum is the tree's
+  today, handed in as the new `min_items_now`, as the threshold already is. Left out, the row's
+  own `min_items` stands. A row with neither a count nor a minimum is refused.
+  `record_score()` now also writes `measured_count`, so the ticket 118 seam reaches the
+  permission. `verify-model-permission.sh` hands in `min_items_for(skill)` and gains two item 1
+  negative controls: the reviewer's reproduction, and a legacy row with 3 items. Its positive
+  control row now states 9 items, the gameplay-lens minimum. On this run the table names item 1
+  on 12 of 14 pairs, and 0 of 14 are granted, as before.
+- **Minor: the citation guard read green with no history.** It returned a PASS string when the
+  thresholds file had fewer than two committed versions. It now raises `Skip`, as
+  `hash_changes_are_authorised` does.
+- **Minor: no test at the CI-blindness seam.** `_thresholds_at()` and `_thresholds_baseline()`
+  take an optional path, and four new tests in `tests/test_skills.py` run against a throwaway git
+  repository with hooks off. One reproduces the defect: HEAD equals the tree, so the HEAD-only
+  comparison finds no lowering, and the previous-version baseline finds both. The others cover
+  an uncommitted edit, a single commit, and the Skip. The record test no longer pins today's
+  `['signal-classify']` against its own docstring; it asserts the outcome from each row's
+  `measured_count` and `min_items`.
+- **Minor: the 326 sentence.** The header comment and the `WEAK THRESHOLDS` line in
+  `verify-model-permission.sh` now name `min_items` and say item 1 refuses a run below it.
+
+Decisions, all delegated:
+
+- The permission reads measurability off the row and the tree, not off the corpus. Condition 2
+  already ties the row's digest to the tree, and the row is what the permission grades.
+- The tree's minimum wins over the row's, for the same reason the tree's threshold does: a raised
+  minimum must revoke a row that met the old one.
+- A row with no minimum anywhere is refused, as a row with no threshold is. Absence is not
+  consent.
+
+Tested: red first. The new model-permission tests failed on the missing keyword and the
+reviewer's case. The four `tests/test_skills.py` tests failed before the change. Then
+`.venv/bin/python -m pytest -n0` over the same 13 files: 295 passed. mypy: no issues in 196
+source files. `bin/twin verify --only` on the citation, append-only and two hash checks: 4 PASS.
+`verify-model-permission.sh` exit 0, `verify-twin-evals.sh` exit 0, `verify-corpus-size.sh`
+exit 3 (the declared amber, unchanged).
+
+### Review round 2, 2026-09-22
+
+The second review blocked on one finding and raised four minor ones. All five are fixed on the
+same branch.
+
+- **Blocking: the live seam did not read the tree's minimum.** `validate_claim.lookup()` called
+  `permission_for()` without `min_items_now`, so the row's own `min_items` stood. A gameplay-lens
+  row with a perfect score, `min_items` 3 and 3 items was granted at the seam, while the gate
+  script, which hands in the tree's 9, refused it. `lookup()` now hands in
+  `min_items_for(skill)`. Two new tests in `tests/test_model_permission.py` load the real
+  validator, stub only the score log, the head readings and the fitted models, and call the
+  lookup it returns. The reviewer's row is refused at item 1. The same row at the tree's minimum
+  is granted, so the refusal is item 1 and not the seam refusing everything.
+- **Minor: the citation guard skipped without declaring it.** It is now registered
+  `may_skip=True`, as `hash_changes_are_authorised` is, so the runner accepts its Skip. The Skip
+  test now also asserts `may_skip()` for both guards.
+- **Minor: `verify-corpus-size.sh` passed leg 3 with no history.** With no baseline it now prints
+  an `UNLOOKED:` line and exits 3 (SKIP), naming what it could not look at.
+- **Minor: two literal `"not-measurable"` strings.** `model_permission.py` and
+  `verify-twin-evals.sh` now compare against `twin.skills.NOT_MEASURABLE`.
+- **Minor: `as_dict()` lacked `measured_count`.** It now carries it, as `record_score()` does.
+  A test asserts the two agree.
+
+Decisions, all delegated:
+
+- The seam reads the minimum the same way it reads the threshold: from the tree, per call. One
+  keyword, no new default. Making `min_items_now` required would break the documented
+  no-threshold-file caller for no gain here, since every caller in the tree now passes it.
+- The citation guard may skip, like `hash_changes_are_authorised`. A depth-1 checkout cannot see
+  a lowering, and SKIP says so. Both CI workflows fetch full history, so the gate is unaffected.
+
+Tested: red first. The seam refusal test failed before the fix (`assert not True`: granted). The
+`may_skip` and `as_dict` assertions in `tests/test_skills.py` failed before the fix. Then
+`.venv/bin/python -m pytest -n0 -q` over `test_causal_claims`, `test_corpus_size`,
+`test_ethics_gate`, `test_evolution_judge`, `test_gameplay_lens`, `test_model_permission`,
+`test_record_skill_scores`, `test_skills`, `test_substrate_generator` and `test_local_clock`:
+274 passed. mypy over `twin tests conftest.py`: no issues in 196 source files.
+`bin/twin verify --only` on the citation, append-only and two hash checks: 4 PASS.
+`verify-model-permission.sh` exit 0 with 0 of 14 granted. `verify-twin-evals.sh` exit 0.
+`verify-corpus-size.sh` exit 3 with `UNLOOKED: none`, the declared amber. In a depth-1 clone of
+this branch, `verify-corpus-size.sh` printed the `UNLOOKED:` line and SKIP, and
+`bin/twin verify --only skill_eval_harness_is_agnostic_and_thresholds_are_guarded` read
+"1 skipped and not faked" with exit 0.
+
+## Answer
+
+Resolved 2026-09-22 by hub PR 87. Every threshold states the corpus size it is valid at.
+
+1. `twin/corpus_size.py` derives the minimum from ticket 03's method. It takes the larger of two
+   routes: a standard error at half the gap to a perfect score, and the rule of three. The result
+   is 16 items at 0.80, 12 at 0.75 and 9 at 0.65. No number is imported.
+2. `twin/skill-thresholds.yaml` states `min_items` on every entry. `load_thresholds()` refuses a
+   stated number that is not the derived one, and a lowered minimum needs a citation.
+3. `EvalResult.outcome` is `pass`, `fail` or `not-measurable`. A run below its minimum is not
+   measurable whatever it scored. `EvalResult.measured_count` is the seam ticket 118 builds on.
+4. `verify/twin-evals/verify-corpus-size.sh` grades it. Model permission condition 1 now refuses
+   a score row that is not measurable, or that has fewer items than the minimum the tree states.
+
+Review: three rounds. Round 1 found that a short run could still earn a model permission. Round 2
+found that the live validator did not pass the tree's minimum. Both are fixed, with tests.
+Measured on the day: 6 of 7 metrics are not measurable. Growing the corpus is the Laya map's
+ticket 03 work, not this ticket's.

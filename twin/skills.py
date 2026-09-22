@@ -28,6 +28,7 @@ import yaml
 
 from . import PACKAGE_DIR
 from .canon import digest_of
+from .corpus_size import CorpusSizeError, derived_min_items
 
 # -- AC 1 (build ticket 90): the determinism-split test itself, queryable rather than prose the
 #    capability inventory (`twin/honest_build.py`) would otherwise have to re-derive by hand from
@@ -63,6 +64,20 @@ THRESHOLDS_SCHEMA = "twin.skill-thresholds/v1"
 
 Scorer = Callable[[Any, Any], bool]
 
+# -- the three run-level outcomes (eco-system ticket 112) -----------------------------------
+# A run is graded at two levels, and the two are kept apart on purpose.
+#   ITEM level: `ItemResult` says whether one corpus item was got right. `score` is the fraction.
+#   RUN level:  `EvalResult.outcome` says what the run as a whole may claim. It reads the item
+#               level through two numbers only: `score` (against the threshold) and
+#               `measured_count` (against the minimum the threshold states).
+# NOT_MEASURABLE is a run-level outcome: the corpus is too small for the threshold to mean
+# anything, whatever the items scored. It is not an item state. Eco-system ticket 118 adds a third
+# ITEM state (a right answer on a wrong basis); that changes the numerator of `score` and leaves
+# this seam alone unless 118 also decides such an item should not count toward `measured_count`.
+PASS = "pass"
+FAIL = "fail"
+NOT_MEASURABLE = "not-measurable"
+
 
 class SkillError(RuntimeError):
     """A corpus that is not a corpus, a skill with no threshold, or a log that is not a log."""
@@ -89,6 +104,22 @@ def load_thresholds(path: Path | None = None) -> dict[str, Any]:
         value = float(entry["threshold"])
         if not 0.0 <= value <= 1.0:
             raise SkillError(f"{source}: skill {name!r} threshold {value} is not a fraction in [0, 1]")
+        # Eco-system ticket 112: every threshold states the corpus it is valid at, and the stated
+        # number is the derived one. Below it the threshold claims more than its corpus carries;
+        # above it the number was imported rather than derived. Both are refused on read, so a
+        # hand edit cannot leave a stale minimum in force.
+        stated = entry.get("min_items")
+        if not isinstance(stated, int) or isinstance(stated, bool):
+            raise SkillError(f"{source}: skill {name!r} states no min_items (an integer corpus size)")
+        try:
+            derived = derived_min_items(value)
+        except CorpusSizeError as exc:
+            raise SkillError(f"{source}: skill {name!r}: {exc}") from None
+        if stated != derived:
+            raise SkillError(
+                f"{source}: skill {name!r} states min_items {stated}, but its threshold {value} "
+                f"derives {derived} (twin/corpus_size.py); a minimum is derived, never typed"
+            )
     return doc
 
 
@@ -98,6 +129,12 @@ def threshold_for(skill: str, path: Path | None = None) -> float:
         known = ", ".join(sorted(thresholds)) or "none"
         raise SkillError(f"no threshold declared for skill {skill!r} (have: {known})")
     return float(thresholds[skill]["threshold"])
+
+
+def min_items_for(skill: str, path: Path | None = None) -> int:
+    """The corpus size the skill's threshold states it is valid at (eco-system ticket 112)."""
+    threshold_for(skill, path)  # the same refusal for an unknown skill
+    return int(load_thresholds(path)["thresholds"][skill]["min_items"])
 
 
 @dataclass(frozen=True)
@@ -115,21 +152,54 @@ class EvalResult:
     corpus_digest: str
     threshold: float
     items: tuple[ItemResult, ...]
+    min_items: int
 
     @property
     def score(self) -> float:
         return sum(1 for i in self.items if i.passed) / len(self.items)
 
     @property
-    def passed(self) -> bool:
+    def measured_count(self) -> int:
+        """How many items the minimum is measured against. Today every item. The seam ticket 118
+        builds on: an item state that should not count toward the corpus size changes this, and
+        only this, on the run-level side."""
+        return len(self.items)
+
+    @property
+    def measurable(self) -> bool:
+        return self.measured_count >= self.min_items
+
+    @property
+    def clears_threshold(self) -> bool:
+        """The score alone against the threshold, whatever the corpus size. What the per-skill
+        guards assert when they prove a threshold gates something; never a pass on its own."""
         return self.score >= self.threshold
+
+    @property
+    def outcome(self) -> str:
+        """PASS, FAIL or NOT_MEASURABLE. Measurability is decided first: below the minimum the
+        threshold says nothing, so neither a perfect nor a zero score may speak for it."""
+        if not self.measurable:
+            return NOT_MEASURABLE
+        return PASS if self.clears_threshold else FAIL
+
+    @property
+    def passed(self) -> bool:
+        return self.outcome == PASS
+
+    @property
+    def failed(self) -> bool:
+        return self.outcome == FAIL
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "skill": self.skill,
             "corpus_digest": self.corpus_digest,
             "threshold": self.threshold,
+            "min_items": self.min_items,
+            "measured_count": self.measured_count,
             "score": self.score,
+            "outcome": self.outcome,
             "passed": self.passed,
             "total": len(self.items),
             "correct": sum(1 for i in self.items if i.passed),
@@ -159,11 +229,14 @@ def evaluate(
             raise SkillError(f"skill {skill!r}: corpus item {i} declares no {', '.join(missing)}")
 
     threshold = threshold_for(skill, threshold_path)
+    min_items = min_items_for(skill, threshold_path)
     items = tuple(
         ItemResult(item_id=str(item["id"]), passed=bool(scorer(skill_fn(item["input"]), item["expected"])))
         for item in corpus
     )
-    return EvalResult(skill=skill, corpus_digest=digest_of(corpus), threshold=threshold, items=items)
+    return EvalResult(
+        skill=skill, corpus_digest=digest_of(corpus), threshold=threshold, items=items, min_items=min_items,
+    )
 
 
 # -- score over time -------------------------------------------------------------------------
@@ -186,9 +259,12 @@ def record_score(
         "recorded_at": recorded_at,
         "score": result.score,
         "threshold": result.threshold,
+        "min_items": result.min_items,
+        "outcome": result.outcome,
         "passed": result.passed,
         "corpus_digest": result.corpus_digest,
         "total": len(result.items),
+        "measured_count": result.measured_count,
     }
     target = path or SCORES_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -271,6 +347,19 @@ TOY_SKILL_CORPUS: list[dict[str, Any]] = [
     {"id": "mixed", "input": "MiXeD", "expected": "MIXED"},
     {"id": "empty", "input": "", "expected": ""},
     {"id": "punctuation", "input": "hi!", "expected": "HI!"},
+    # Eco-system ticket 112: the fixture's 0.8 threshold states a 16-item minimum, and a fixture
+    # that is itself not measurable would prove only the third outcome. Eleven more, all trivial.
+    {"id": "digits", "input": "abc123", "expected": "ABC123"},
+    {"id": "space", "input": "a b", "expected": "A B"},
+    {"id": "single", "input": "q", "expected": "Q"},
+    {"id": "title", "input": "Title Case", "expected": "TITLE CASE"},
+    {"id": "tab", "input": "x\ty", "expected": "X\tY"},
+    {"id": "hyphen", "input": "re-run", "expected": "RE-RUN"},
+    {"id": "underscore", "input": "snake_case", "expected": "SNAKE_CASE"},
+    {"id": "trailing-space", "input": "end ", "expected": "END "},
+    {"id": "numbers-only", "input": "2026", "expected": "2026"},
+    {"id": "sentence", "input": "a threshold states its corpus.", "expected": "A THRESHOLD STATES ITS CORPUS."},
+    {"id": "camel", "input": "camelCase", "expected": "CAMELCASE"},
 ]
 
 

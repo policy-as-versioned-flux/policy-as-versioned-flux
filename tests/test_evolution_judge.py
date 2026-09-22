@@ -211,7 +211,7 @@ def test_every_corpus_item_carries_the_fields_evaluate_requires(corpus: list[dic
 
 def test_evolution_judge_passes_its_own_labelled_corpus(corpus: list[dict]) -> None:
     result = evaluate(SKILL, judge, corpus, scorer=scorer)
-    assert result.passed, f"scored {result.score}, threshold {result.threshold}: {result.as_dict()}"
+    assert result.clears_threshold, f"scored {result.score}, threshold {result.threshold}: {result.as_dict()}"
     assert result.threshold == threshold_for(SKILL)
 
 
@@ -221,7 +221,7 @@ def test_a_degraded_judge_fails_the_threshold(corpus: list[dict]) -> None:
 
     result = evaluate(SKILL, always_wrong, corpus, scorer=scorer)
     assert result.score == 0.0
-    assert not result.passed
+    assert not result.clears_threshold
 
 
 def test_override_accuracy_is_scored_on_the_same_footing_as_the_twins_own_inference(corpus: list[dict]) -> None:
@@ -237,14 +237,14 @@ def test_override_accuracy_is_scored_on_the_same_footing_as_the_twins_own_infere
         return {"evolution_position": expected_by_component[payload["component"]["id"]]}
 
     result = evaluate(SKILL, perfect_human_override, corpus, scorer=scorer)
-    assert result.passed
+    assert result.clears_threshold
     assert result.threshold == threshold_for(SKILL)
 
     def careless_human_override(payload: dict) -> dict:
         return {"evolution_position": 0.0}
 
     bad = evaluate(SKILL, careless_human_override, corpus, scorer=scorer)
-    assert not bad.passed
+    assert not bad.clears_threshold
 
 
 # -- what the 1.000 is, and is not (ecosystem ticket 76) ------------------------------------

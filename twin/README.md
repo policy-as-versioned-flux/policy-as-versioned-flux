@@ -2960,7 +2960,11 @@ Named here so the skeleton cannot quietly become the definition of done.
   versioned threshold, record score-over-time per model version, and surface a model upgrade that
   degrades judgement as a regression rather than letting it go silent. It is skill-agnostic by
   construction — `evaluate()` takes a bare callable and a corpus, and no harness function names one
-  of the six real skills. `signal-classify` (`twin/signal_classify.py`, build ticket 43) is the
+  of the six real skills. Since eco-system ticket 112 (2026-09-22) every threshold also states the
+  corpus size it is valid at (`min_items`, derived by `twin/corpus_size.py`), and a run on fewer
+  items reports **not measurable**, a third outcome that is neither a pass nor a failure. On that
+  date six of the seven metrics are not measurable; `verify/twin-evals/verify-corpus-size.sh`
+  grades it. `signal-classify` (`twin/signal_classify.py`, build ticket 43) is the
   first real skill through it: a keyword and word-overlap heuristic, not a model call, evaluated
   against the pooled Carillion/NMC/Wirecard/Enron labelled corpus — proven only against `political`
   and `economic` signals, since every committed fixture signal is one of the two, so it makes no
