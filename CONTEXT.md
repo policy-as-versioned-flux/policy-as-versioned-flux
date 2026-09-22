@@ -460,7 +460,8 @@ that a rewritten entry cites stay as the record of the decision at the time.
   hole: the cage tightens; it is never refused.
 
 - **Tier** (added 2026-08-28, ticket 09) — The rung of the cage ladder a **governed namespace** is
-  declared at: baseline, restricted, quarantine, isolated or infra. Declared on the signed
+  declared at: baseline, restricted, quarantine or isolated. `infra` is not a rung; it is a role
+  declaration beside the ladder (see **Infra tier**, ticket 113). Declared on the signed
   Namespace manifest, rendered onto every pod in it, chosen by the **selection policy** against the
   price.
 

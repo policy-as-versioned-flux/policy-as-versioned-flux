@@ -122,3 +122,43 @@ Platform PR: https://github.com/policy-as-versioned-platform/platform/pull/28. H
 
 The gate reads FAIL for `verify-infra-declaration.sh` until both are done. That is the intended
 verdict, not a regression.
+
+### Review round, 2026-09-22
+
+1. **Blocking: proof 3a matched the claim gate by prefix.** A gate loosened to
+   `... .orValue('') != '' || true` passed proof 3, and the engine caged an unclaimed pod at
+   `isolated` under it. Fix: `claim_gate_expressions` in `distribution/verify-infra-declaration.sh`
+   now reads the whole expression scalar. It stops at the first non-blank line indented no deeper
+   than the `expression:` key. `carries_claim_gate` then requires every
+   `claims-a-policy-version` expression to EQUAL the gate, ignoring whitespace. Delegated: equality,
+   not a CEL parser. Any added clause is a change to the gate and fails by name. The served bodies
+   carry the gate exactly, so equality costs nothing today.
+   - Red first. Four new selfcheck cases (`|| true` inline and on a continuation line, block and
+     one-line forms) failed the selfcheck with an AssertionError. A fifth case checks that the next
+     key after the gate is not read as part of it.
+   - Hub: `LOOSENINGS` in `tests/test_cage_ladder_holes.py` plants three shapes (`true`,
+     `<gate> || true`, `<gate>` then `|| true` on the next line). They go into the graded block
+     scalar and into the rendered v5.0.0 one-line body. With kyverno 1.18.2 and the old platform
+     script: 4 failed, 19 passed. The 4 were the two `|| true` shapes in both bodies. With the
+     fix: 23 passed. `test_the_hazard_proof_3_guards_is_real` passes for all three shapes, so the
+     engine does cage an unclaimed substrate pod at `isolated` under each one.
+2. **Minor: the Tier glossary entry named `infra` as a rung.** Fixed in CONTEXT.md. The entry now
+   lists four rungs and points at **Infra tier**. `grep -n 'isolated or infra' CONTEXT.md` returns
+   nothing.
+3. **Minor: a declared line with no body was silently dropped.** `served_cage_tier_files` now
+   returns `(found, missing)`, and the script FAILS naming each missing version. It was red first:
+   a new selfcheck case failed with a ValueError before the return shape changed.
+4. **Minor: the body count depends on where the script runs.** It derives the estate from its
+   own parent directory. Run as `.estate-clone/platform/distribution/verify-infra-declaration.sh`
+   (the gate's path, measured here through the hub worktree's `.estate-clone` symlinks), it reads
+   6 served bodies. It names 4 at `baseline` and exits 1. Run in place in
+   `.estate-clone/platform/.work/ticket-113`, it reads 3 bodies and names only platform v4.0.0,
+   because the adopters are not beside it. The "4 bodies" in this record is the first path.
+
+After the fix, proof 3 still prints ok over all 6 real bodies. Checks rerun:
+`tests/test_misuse.py` 41 passed, `verify-misuse.sh` PASS, `verify-adr-supersession.sh` PASS,
+`verify-cited-truth.sh` PASS, mypy clean over 194 files. Platform: `--selfcheck` ok,
+`tier_binding.py selfcheck` ok, `verify-shift-left.sh` passed under kyverno 1.18.2, and
+`kyverno test graded/tests/cage-tier` 13 passed, 0 failed. Under the PATH kyverno 1.19.1,
+`verify-shift-left.sh` fails to compile the v4.0.0 and v5.0.0 bodies. That is the known pin,
+not this change.

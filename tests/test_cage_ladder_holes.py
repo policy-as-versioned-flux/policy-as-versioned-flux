@@ -192,12 +192,24 @@ def _plant_platform(root: Path, graded_body: str | None = None, namespaces: str 
     return plat
 
 
-def _without_claim_gate(body: str) -> str:
-    """The graded authoring body with its `claims-a-policy-version` matchCondition swapped for
-    one every pod passes. The one edit proof 3 exists to catch."""
-    gated = re.sub(r"object\.metadata\.\?labels\['policy-as-versioned\.dev/policy-version'\]"
-                   r"\.orValue\(''\) != ''", "true", body, count=1)
-    assert gated != body, "the graded body's claim gate moved -- re-read it before planting"
+CLAIM_GATE_EXPR = "object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != ''"
+
+# Each way a served body's claim gate can be edited so an UNCLAIMED pod passes it. `true` drops
+# the gate; the `|| true` shapes keep the real gate as a PREFIX and loosen it after, which a
+# prefix match reads as the gate (review of PR 28, 2026-09-22). The last one breaks the line.
+LOOSENINGS = {
+    "dropped": lambda gate: "true",
+    "or-true": lambda gate: f"{gate} || true",
+    "or-true-next-line": lambda gate: f"{gate}\n        || true",
+}
+
+
+def _without_claim_gate(body: str, loosen: str = "dropped") -> str:
+    """A served body with its `claims-a-policy-version` matchCondition swapped for one every pod
+    passes. The one edit proof 3 exists to catch, in each shape `LOOSENINGS` names."""
+    assert CLAIM_GATE_EXPR in body, "the body's claim gate moved -- re-read it before planting"
+    gated = body.replace(CLAIM_GATE_EXPR, LOOSENINGS[loosen](CLAIM_GATE_EXPR), 1)
+    assert gated != body
     return gated
 
 
@@ -280,13 +292,15 @@ def test_an_unclaimed_substrate_pod_is_outside_every_delivered_body(tmp_path):
             f"stop")
 
 
-def test_the_hazard_proof_3_guards_is_real(tmp_path):
-    """The tripwire must guard a configuration that does happen. Drop the claim gate from the
-    graded body and the engine puts an unclaimed substrate pod -- CoreDNS -- on `isolated`: no
-    ingress, no egress, first eviction."""
+@pytest.mark.parametrize("loosen", sorted(LOOSENINGS))
+def test_the_hazard_proof_3_guards_is_real(loosen, tmp_path):
+    """The tripwire must guard a configuration that does happen. Drop or loosen the claim gate in
+    the graded body and the engine puts an unclaimed substrate pod -- CoreDNS -- on `isolated`:
+    no ingress, no egress, first eviction."""
     exe = _kyverno()
     body = tmp_path / "ungated.yaml"
-    body.write_text(_without_claim_gate((PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text()))
+    body.write_text(_without_claim_gate(
+        (PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text(), loosen))
     pod = _render(tmp_path, exe, body, SUBSTRATE, {})
     assert pod and pod["metadata"]["labels"]["posture.acme.io/tier"] == "isolated", pod
 
@@ -297,12 +311,27 @@ def test_the_tripwire_passes_a_platform_that_serves_only_the_fixed_line(tmp_path
     assert run.returncode == 0 and "PASS:" in run.stdout, run.stdout + run.stderr
 
 
-def test_the_tripwire_fires_when_a_served_body_drops_the_claim_gate(tmp_path):
-    body = _without_claim_gate((PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text())
+@pytest.mark.parametrize("loosen", sorted(LOOSENINGS))
+def test_the_tripwire_fires_when_a_served_body_drops_the_claim_gate(loosen, tmp_path):
+    """The authoring copy, where the gate is a block scalar."""
+    body = _without_claim_gate((PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text(), loosen)
     run = _tripwire(_plant_platform(tmp_path, graded_body=body))
     out = run.stdout + run.stderr
     assert run.returncode == 1, out
     assert "without the claims-a-policy-version gate: platform/graded/policies/cage-tier.yaml" in out, out
+
+
+@pytest.mark.parametrize("loosen", sorted(LOOSENINGS))
+def test_the_tripwire_fires_when_a_declared_line_loosens_the_claim_gate(loosen, tmp_path):
+    """A rendered line, where the gate is a one-line plain scalar."""
+    plat = _plant_platform(tmp_path)
+    served = plat / "distribution" / "policies" / "v5.0.0" / "cage-tier.yaml"
+    served.write_text(_without_claim_gate(served.read_text(), loosen))
+    run = _tripwire(plat)
+    out = run.stdout + run.stderr
+    assert run.returncode == 1, out
+    assert ("without the claims-a-policy-version gate: "
+            "platform/distribution/policies/v5.0.0/cage-tier.yaml") in out, out
 
 
 def test_the_tripwire_fires_when_a_substrate_namespace_is_governed(tmp_path):
