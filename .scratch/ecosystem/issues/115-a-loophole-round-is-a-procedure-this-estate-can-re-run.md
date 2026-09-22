@@ -52,7 +52,7 @@ procedure, and the harness is not in `.scratch/`.
 
 ## Build, 2026-09-22
 
-Hub branch `ticket-115-loophole-procedure`. One pull request, hub only. No unit repo changed.
+Hub PR: https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/89, branch `ticket-115-loophole-procedure`. Hub only. No unit repo changed.
 
 ### What was built
 
