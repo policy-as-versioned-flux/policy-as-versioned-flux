@@ -1,4 +1,4 @@
-PASS: selfcheck: a row with its mechanism blanked is refused by the loader (exit 1: FAIL: /tmp/tmp.ZWFffLn0N1/blank.yaml: entry 'x' names no mechanism — a risk with no mechanism is a concern, )
+PASS: selfcheck: a row with its mechanism blanked is refused by the loader (exit 1: FAIL: /tmp/tmp.Wf9UlU9Ybn/blank.yaml: entry 'x' names no mechanism — a risk with no mechanism is a concern, )
 PASS: selfcheck: a row anchored to a file that does not exist fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: twin/no-such-file.py: no such file; 0 could-not-look by name (none))
 PASS: selfcheck: a row anchored to a token the file lacks fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: platform/c.py: does not mention 'widen_to'; 0 could-not-look by name (n)
 PASS: selfcheck: a row still waiting on a resolved ticket fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: still says it waits on ticket 19 (resolved), which is resolved — name)
@@ -13,7 +13,7 @@ PASS: misuse_catalogues_load_and_every_row_names_a_mechanism -- 3 catalogues, 24
   PASS adopter-buys-intel-on-rival: 3 anchor(s) resolve
   PASS twin-valuation-used-in-negotiation: 6 anchor(s) resolve
   PASS adopter-runs-uncaged-in-the-platform-substrate: 7 anchor(s) resolve
-  SKIP adopter-silences-its-own-binding-observation: 3 anchor(s) resolve; waits on ticket 114 (open) for an unobserved party that does not leave the walk at exit 0, and a selfcheck leg
-  PASS: 3 of 6 row(s) resolve by path; 3 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream, adopter-silences-its-own-binding-observation)
-PASS: eco-system rows: 3 of 6 row(s) resolve by path; 3 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream, adopter-silences-its-own-binding-observation)
-PASS: three misuse catalogues load through one loader and every row names a mechanism (misuse_catalogues_load_and_every_row_names_a_mechanism); eco-system rows: 3 of 6 row(s) resolve by path; 3 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream, adopter-silences-its-own-binding-observation)
+  PASS adopter-silences-its-own-binding-observation: 5 anchor(s) resolve
+  PASS: 4 of 6 row(s) resolve by path; 2 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream)
+PASS: eco-system rows: 4 of 6 row(s) resolve by path; 2 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream)
+PASS: three misuse catalogues load through one loader and every row names a mechanism (misuse_catalogues_load_and_every_row_names_a_mechanism); eco-system rows: 4 of 6 row(s) resolve by path; 2 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream)
