@@ -32,7 +32,7 @@
 #
 # Versioned: bump `version` in the same commit as any change to an entry below.
 schema: twin.misuse-catalogue/v1
-version: 5
+version: 6
 entries:
   - id: publisher-games-own-feed-price
     risk: >-

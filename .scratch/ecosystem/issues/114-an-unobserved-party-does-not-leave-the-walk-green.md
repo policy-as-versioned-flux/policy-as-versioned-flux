@@ -122,15 +122,19 @@ in each hit.
   `SKIP: 1 party/parties owed a binding observation could not be looked at (driftwood), ...`.
 - `PAVC_ESTATE_CLONE=<that> bash verify/handbook/verify-handbook-is-a-compose-time-render.sh` exits 0,
   with 3 of 3 adopters serving a page at origin/main.
-- `.venv/bin/python -m pytest tests/test_cage_ladder_holes.py -n0 -q`: 10 passed, 4 skipped. The
-  4 skips are leg A's engine legs: kyverno on PATH is 1.19.1, not the pinned 1.18.2. Before the
-  repair, 7 of the 8 leg-B tests failed and the clean control passed. The gate-reader test first
-  failed on a loader bug in the test itself. Once that was fixed it failed on the walk's exit 0.
-- `.venv/bin/python -m pytest tests/test_misuse.py -n0 -q`: 40 passed, 1 failed. The failure is
-  `regulator-data-mispriced-downstream`, whose anchor `price_supersede` is missing from the shared
-  `.estate-clone/platform` checkout (56 commits behind origin/main; `grep -c` finds 0 there and 3
-  at origin/main). The row this ticket edits resolves: `verify-misuse.sh` prints
-  `PASS adopter-silences-its-own-binding-observation: 5 anchor(s) resolve`.
+- Tests ran in the hub worktree with `.estate-clone` pointed at the origin/main estate above (the
+  shared `.estate-clone/platform` checkout is 56 commits behind and lacks what PR 28 and PR 17
+  landed). After rebasing onto origin/main, which by then carried PR 85:
+  - `.venv/bin/python -m pytest tests/test_cage_ladder_holes.py -n0 -q`: 24 passed, 10 skipped.
+    The 10 skips are ticket 113's engine legs: kyverno on PATH is 1.19.1, not the pinned 1.18.2.
+  - Before the repair, 7 of the 8 leg-B tests failed and the clean control passed. The
+    gate-reader test first failed on a loader bug in the test itself. Once that was fixed it
+    failed on the walk's exit 0.
+  - `.venv/bin/python -m pytest tests/test_misuse.py -n0 -q`: 43 passed.
+  - `bash verify/misuse/verify-misuse.sh` prints
+    `PASS adopter-silences-its-own-binding-observation: 5 anchor(s) resolve`.
+  - `verify/handbook/handbook_check.py --selfcheck` with platform origin/main's
+    `compose/handbook.py`: 28 planted cases pass.
 - mypy over `twin tests conftest.py`: no issues in 194 source files.
 
 ### Decisions (delegated, ADR-0025)
@@ -152,11 +156,9 @@ in each hit.
 
 ### Merge notes
 
-Hub PR 85 (ticket 113) also edits `tests/test_cage_ladder_holes.py` and
-`twin/ecosystem-misuse-catalogue.yaml`. This branch touches leg B's section and lines 27-30 of the
-module docstring, and PR 85 touches leg A. In the catalogue this branch edits only this row's
-`mechanism` and `anchors`. Both PRs bump the catalogue `version: 4` to `version: 5`, and git merges
-that identical change silently. Whichever PR merges second must bump it to 6 by hand.
+Hub PR 85 (ticket 113) merged to main while this was being built. This branch is rebased onto it
+with no conflict. Both PRs bumped the catalogue from `version: 4` to `version: 5`, and git applied
+the identical line silently, so this branch bumps it again to `version: 6`.
 
 ### What remains
 
