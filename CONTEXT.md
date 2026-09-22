@@ -460,7 +460,8 @@ that a rewritten entry cites stay as the record of the decision at the time.
   hole: the cage tightens; it is never refused.
 
 - **Tier** (added 2026-08-28, ticket 09) — The rung of the cage ladder a **governed namespace** is
-  declared at: baseline, restricted, quarantine, isolated or infra. Declared on the signed
+  declared at: baseline, restricted, quarantine or isolated. `infra` is not a rung; it is a role
+  declaration beside the ladder (see **Infra tier**, ticket 113). Declared on the signed
   Namespace manifest, rendered onto every pod in it, chosen by the **selection policy** against the
   price.
 
@@ -473,9 +474,11 @@ that a rewritten entry cites stay as the record of the decision at the time.
   floor is priced, never refused. It is a constraint on selection, not a default tier and not an
   **appetite**.
 
-- **Infra tier** (added 2026-08-28, ticket 09) — The cage a platform-role party declares for its
-  own namespaces. Only a party whose signed party artefact carries the platform role may declare
-  it; any other party's infra declaration renders to **isolated**.
+- **Infra tier** (added 2026-08-28, ticket 09; corrected 2026-09-22, ticket 113) — A role
+  declaration a platform-role party makes on its own substrate Namespaces. It is **not a rung**:
+  no served cage-tier body reads it. It names the substrate so the truth surface knows which
+  Namespaces to guard. An unclaimed pod there is outside the cage by the claim matchCondition; a
+  claiming pod there gets **isolated**, and so does any governed Namespace that declares `infra`.
 
 - **Observation** (added 2026-08-28, tickets 10 and 16) — A dated record a **schedule** may append
   to a repo without review: a truth line, a drift sample, a **capture**. It asserts what was seen,

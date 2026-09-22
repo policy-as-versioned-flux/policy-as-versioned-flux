@@ -32,7 +32,7 @@
 #
 # Versioned: bump `version` in the same commit as any change to an entry below.
 schema: twin.misuse-catalogue/v1
-version: 4
+version: 5
 entries:
   - id: publisher-games-own-feed-price
     risk: >-
@@ -147,37 +147,39 @@ entries:
     risk: >-
       A party with deploy access to the platform's substrate Namespaces -- kube-system,
       flux-system, kyverno -- runs workloads there believing `posture.acme.io/tier: infra` is the
-      rung that governs them. It is not. No served policy body reads the word, so a workload that
-      claims a policy version lands on the LOOSEST rung and one that claims none lands on no rung
-      at all.
+      rung that governs them. It is not a rung. No served policy body reads the word, so a
+      workload that claims a policy version takes the body's ungoverned else-branch, and one that
+      claims none is outside every cage.
     mechanism: >-
-      Nothing prices or cages this today, and saying so by name is the point of the row. Measured
-      2026-09-21 under kyverno 1.18.2, the version release.yml pins, from the Laya and loophole
-      map's ticket 08. Three facts. `infra` appears in no served `cage-tier` body with comments
-      stripped -- not v4.0.0, not v5.0.0, not graded/, not any adopter's composed copy -- so an
-      `infra` Namespace falls to `variables.tier`'s else branch. The three Namespaces carry no
-      `policy-as-versioned.dev/governed` label by design, so under v4.0.0, which all three
-      adopters serve, that branch is `baseline`: 500m/256Mi, priority -10, no hardening, no WAF
-      sidecar. And an UNCLAIMED pod is skipped by `cage-tier`'s own matchConditions with the
-      declaration and without it, so pulling the declaration changes nothing for CoreDNS -- which
-      is the configuration `distribution/verify-infra-declaration.sh` calls its proof-3 tripwire
-      the guard for. The tripwire guards a hazard no served body produces. The instrument that
-      exists is the reproduction: `tests/test_cage_ladder_holes.py` holds all three facts against
-      the real bodies and the pinned engine, and skips BY NAME on any other engine rather than
-      passing unmeasured. `platform/wargamer/wargamer.py` INFRA and `rank()` are anchored because
-      the proposer's model of the rung -- tighter than everything -- is the one the served body
-      contradicts.
+      Decided and built by eco-system ticket 113 (2026-09-22), from the Laya and loophole map's
+      ticket 08. `infra` is a ROLE declaration, not a rung: an `infra` dial row would repeat
+      `isolated` or be looser, and looser is an exemption bought by choosing a Namespace, so no
+      served `cage-tier` body reads it and `tests/test_cage_ladder_holes.py` holds that as a
+      decision. What protects the substrate is checked instead, by
+      `platform/distribution/verify-infra-declaration.sh` on every gate run. Its proof 3
+      (`outside_the_cage`) guards the real hazard: every served body keeps the
+      `claims-a-policy-version` matchCondition and no substrate Namespace is governed, because
+      break either and CoreDNS lands on `isolated` and the cluster stops. The old proof 3 guarded
+      "pull the declaration while the default reads isolated", which no served body produces.
+      Its proof 4 (`falls_closed`) grades the rung a CLAIMING substrate pod gets from every
+      delivered body and FAILS until each is `isolated`. Under 5.0.0 and graded it is. Under
+      4.0.0, which all three adopters still serve, it is `baseline`, the loosest rung: that
+      exposure is open, named by the gate, and closes when driftwood, ludlow and tuppence
+      recompose onto 5.0.0 and 4.0.0 leaves `distribution/versions.yaml`. Both need signed tags
+      only the owner cuts. The hub test holds the engine (kyverno 1.18.2) and the offline
+      tripwire to the same list of offenders, and plants each break to show the tripwire fires.
+      `platform/shift-left/tier_binding.py` `rendered` grades a governed `infra` declaration as
+      the `isolated` it renders, entitled or not, since admission cannot read a party's roles.
     anchors:
-      - "tests/test_cage_ladder_holes.py::test_infra_appears_in_no_served_cage_tier_body"
-      - "tests/test_cage_ladder_holes.py::test_pulling_the_infra_declaration_changes_nothing_for_an_unclaimed_pod"
+      - "tests/test_cage_ladder_holes.py::test_the_tripwire_names_exactly_the_bodies_the_engine_cages_loosely"
+      - "tests/test_cage_ladder_holes.py::test_the_tripwire_fires_when_a_served_body_drops_the_claim_gate"
+      - "tests/test_cage_ladder_holes.py::test_infra_stays_out_of_every_cage_tier_body_by_decision"
+      - "platform/distribution/verify-infra-declaration.sh::def outside_the_cage"
+      - "platform/distribution/verify-infra-declaration.sh::def falls_closed"
+      - "platform/shift-left/tier_binding.py::def rendered"
       - "platform/engine/namespaces.yaml::posture.acme.io/tier: infra"
-      - "platform/wargamer/wargamer.py::INFRA"
-      - platform/distribution/verify-infra-declaration.sh
-    waits_on:
-      - ticket: "113"
-        for: what `infra` means in a served body, and a proof 3 that guards a hazard that exists
     source: laya-loophole ticket 08 (survivor 1 of 6); ticket 07's loophole round against
-      ADR-0022; ADR-0022's `infra is a declaration, not a selection` note
+      ADR-0022; eco-system ticket 113's decision that `infra` is a role, not a rung
 
   - id: adopter-silences-its-own-binding-observation
     risk: >-
