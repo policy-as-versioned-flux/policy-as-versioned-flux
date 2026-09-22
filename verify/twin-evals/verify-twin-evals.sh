@@ -91,7 +91,7 @@ LABEL = os.environ["CORPUS_KIND"]
 
 from twin import TOOL_VERSION
 from twin import record_skill_scores as rss
-from twin.skills import history_for
+from twin.skills import NOT_MEASURABLE, history_for
 
 fails = 0
 def out(ok, msg):
@@ -189,7 +189,7 @@ for entry in entries:
     skill, score, threshold = entry["skill"], entry["score"], entry["threshold"]
     last = last_for(skill, entry["model_version"])
     shown = "none recorded" if last is None else "%.3f" % last
-    said = verdict(score, threshold, last, entry["outcome"] != "not-measurable")
+    said = verdict(score, threshold, last, entry["outcome"] != NOT_MEASURABLE)
     why = {"below": "  -- below its threshold",
            "fell": "  -- FELL against the last value twin/skill-scores.jsonl records for THIS "
                    "model version",

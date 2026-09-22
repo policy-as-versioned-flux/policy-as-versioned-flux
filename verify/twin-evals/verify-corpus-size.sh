@@ -24,7 +24,9 @@
 #   PASS (exit 0)  1-3 observed true and every metric is measurable and at its threshold
 #   FAIL (exit 1)  any of 1-3 observed false, or a measurable metric below its threshold
 #   SKIP (exit 3)  1-3 observed true and one or more metrics are not measurable (the last line
-#                  says how many and which), or the twin package could not be imported at all
+#                  says how many and which), or the real thresholds file has fewer than two
+#                  committed versions so leg 3 could not look at it, or the twin package could
+#                  not be imported at all
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
@@ -120,8 +122,13 @@ out(planted == ["x min_items 16 -> 9"] and cited == [],
     "a planted uncited lowering of a minimum is refused (%s) and a cited one is not" % planted)
 current = skills.load_thresholds()
 baseline = _thresholds_baseline(ROOT, current)
+unlooked = []
 if baseline is None:
-    print("note: twin/skill-thresholds.yaml has one committed version here, so no earlier one to compare with")
+    # Not a PASS: the guard could not look. The harness check raises Skip in the same state
+    # (review round 2 of ticket 112), and so does this script.
+    unlooked.append("the citation guard on the real file (twin/skill-thresholds.yaml has fewer "
+                    "than two committed versions here, so there is no earlier one to compare with)")
+    print("NOT LOOKED: " + unlooked[-1])
 else:
     lowered = _lowered_without_citation(baseline[0], current)
     out(not lowered, "no threshold or minimum in twin/skill-thresholds.yaml was lowered without a "
@@ -144,13 +151,18 @@ for e in entries:
         out(e["outcome"] == skills.PASS, line)
 
 print("SHORT: %d of %d skill metrics (%s)" % (len(short), len(entries), ", ".join(short)))
-sys.exit(1 if fails else (3 if short else 0))
+print("UNLOOKED: %s" % ("; ".join(unlooked) or "none"))
+sys.exit(1 if fails else (3 if short or unlooked else 0))
 PY
 rc=$?
 cat "$log"
 short="$(sed -n 's/^SHORT: //p' "$log" | tail -1)"
+unlooked="$(sed -n 's/^UNLOOKED: //p' "$log" | tail -1)"
 case "$rc" in
   0) echo "PASS: every threshold states the minimum corpus its own derivation gives, the harness reports not measurable below it, a lowered minimum needs a citation, and every real metric is measurable and at its threshold"; exit 0 ;;
-  3) echo "SKIP: $short are not measurable, each corpus below the minimum its threshold states; the derivation, the third outcome and the citation guard were all observed true"; exit 3 ;;
+  3) if [ "$unlooked" != "none" ]; then
+       echo "SKIP: not looked at: $unlooked. Short: $short"; exit 3
+     fi
+     echo "SKIP: $short are not measurable, each corpus below the minimum its threshold states; the derivation, the third outcome and the citation guard were all observed true"; exit 3 ;;
   *) echo "FAIL: a threshold's stated corpus, the third outcome or the citation guard observed false; see the lines above"; exit 1 ;;
 esac

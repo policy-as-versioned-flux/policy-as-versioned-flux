@@ -197,6 +197,7 @@ class EvalResult:
             "corpus_digest": self.corpus_digest,
             "threshold": self.threshold,
             "min_items": self.min_items,
+            "measured_count": self.measured_count,
             "score": self.score,
             "outcome": self.outcome,
             "passed": self.passed,

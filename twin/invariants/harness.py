@@ -676,7 +676,7 @@ def _disparate_impact_audit_channel_is_sealed_and_role_gated(ctx: Context) -> st
     )
 
 
-@harness_check("skill_eval_harness_is_agnostic_and_thresholds_are_guarded")
+@harness_check("skill_eval_harness_is_agnostic_and_thresholds_are_guarded", may_skip=True)
 def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> str:
     """Seam 3: the skill-eval harness is skill-agnostic, its thresholds are versioned, and a
     lowered threshold needs a citation the way a moved invariant hash does (build ticket 42,

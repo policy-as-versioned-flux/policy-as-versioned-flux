@@ -403,3 +403,64 @@ def test_a_readings_file_that_is_not_one_is_refused(tmp_path) -> None:
 
 def test_a_missing_readings_file_is_empty_never_an_error(tmp_path) -> None:
     assert mp.load_head_readings(tmp_path / "nothing.yaml") == []
+
+
+# -- the live seam: validate_claim.lookup() (review round 2 of ticket 112) ------------------------
+
+_VALIDATOR = (
+    __import__("pathlib").Path(__file__).resolve().parents[1]
+    / ".claude" / "skills" / "classify-and-judge" / "assets" / "validate_claim.py"
+)
+
+
+def _seam_lookup(monkeypatch, rows):
+    """The lookup the seam builds, over `rows` as the score log. Everything else is the tree's:
+    the corpus facts, the threshold and the minimum. Readings and fitted models are emptied so
+    item 1 is the only condition in question."""
+    import importlib.util
+
+    from twin import skills
+
+    spec = importlib.util.spec_from_file_location("validate_claim_seam", _VALIDATOR)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    monkeypatch.setattr(skills, "load_scores", lambda *a, **k: list(rows))
+    monkeypatch.setattr(mp, "load_head_readings", lambda *a, **k: [])
+    monkeypatch.setattr(rss, "fitted_models", lambda *a, **k: {})
+    _clock, _check, lookup = module.permission_rules(str(_VALIDATOR.parents[4]))
+    return lookup
+
+
+def test_the_seam_refuses_a_row_that_met_a_minimum_the_tree_has_since_raised(monkeypatch, facts) -> None:
+    """The reviewer's reproduction: the row states min_items 3 and counted 3, so it met its own
+    minimum. The tree states 9 for gameplay-lens. The seam must read the tree's, as the gate
+    script does, or a short run earns a permission where it matters."""
+    from twin.skills import min_items_for
+
+    assert min_items_for(_FACTS_SKILL) > 3
+    row = {
+        "skill": _FACTS_SKILL, "model_version": "fixture-model-1.0.0", "score": 1.0,
+        "threshold": 0.65, "corpus_digest": facts["corpus_digest"],
+        "recorded_at": "2026-09-22T00:00:00Z", "min_items": 3, "measured_count": 3, "total": 3,
+        "outcome": "pass",
+    }
+    perm = _seam_lookup(monkeypatch, [row])(_FACTS_SKILL, "fixture-model-1.0.0")
+    assert not perm.granted
+    assert 1 in _refused_items(perm), perm.why()
+
+
+def test_the_seam_grants_a_row_that_meets_the_trees_minimum(monkeypatch, facts) -> None:
+    """The positive control at the seam: the same row at the tree's minimum is granted, so the
+    refusal above is item 1 reading the minimum, not the seam refusing everything."""
+    from twin.skills import min_items_for
+
+    need = min_items_for(_FACTS_SKILL)
+    row = {
+        "skill": _FACTS_SKILL, "model_version": "fixture-model-1.0.0", "score": 1.0,
+        "threshold": 0.65, "corpus_digest": facts["corpus_digest"],
+        "recorded_at": "2026-09-22T00:00:00Z", "min_items": need, "measured_count": need,
+        "total": need, "outcome": "pass",
+    }
+    perm = _seam_lookup(monkeypatch, [row])(_FACTS_SKILL, "fixture-model-1.0.0")
+    assert perm.granted, perm.why()

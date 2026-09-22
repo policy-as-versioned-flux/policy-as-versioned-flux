@@ -260,6 +260,8 @@ def test_measurability_counts_the_items_the_seam_names() -> None:
     the numerator; it does not move this count unless 118 decides it should."""
     result = evaluate("toy-classifier", toy_classifier, TOY_SKILL_CORPUS)
     assert result.measured_count == len(result.items)
+    # Both serialisations of the result carry the seam, so a reader of either sees one count.
+    assert result.as_dict()["measured_count"] == result.measured_count
 
 
 def _doc(**entries: dict) -> dict:
@@ -367,3 +369,7 @@ def test_the_guard_skips_rather_than_passes_when_it_has_no_history(monkeypatch) 
     monkeypatch.setattr(harness, "_thresholds_baseline", lambda *a, **k: None)
     with pytest.raises(Skip):
         harness._skill_eval_harness_is_agnostic_and_thresholds_are_guarded(None)  # type: ignore[arg-type]
+    # ...and the runner accepts that Skip, as it accepts hash_changes_are_authorised's. An
+    # undeclared guard that skips counts as a suite failure (review round 2 of ticket 112).
+    for guard in ("hash_changes_are_authorised", "skill_eval_harness_is_agnostic_and_thresholds_are_guarded"):
+        assert harness.may_skip(guard, False, set()), guard

@@ -122,6 +122,7 @@ from typing import Any, Callable, Iterable, Mapping, Sequence
 import yaml
 
 from . import PACKAGE_DIR
+from .skills import NOT_MEASURABLE
 
 # -- what a clock is -------------------------------------------------------------------------
 
@@ -440,7 +441,7 @@ def _below_minimum(row: Mapping[str, Any], min_items_now: int | None) -> str:
     corpus its threshold states is not measurable whatever it scored, so it cannot clear item 1.
     The minimum is the tree's today, as the threshold is; the row's own number stands only when
     none is handed in."""
-    if str(row.get("outcome", "")) == "not-measurable":
+    if str(row.get("outcome", "")) == NOT_MEASURABLE:
         return "the row records its own outcome as not-measurable"
     minimum = min_items_now if min_items_now is not None else row.get("min_items")
     if minimum is None:
