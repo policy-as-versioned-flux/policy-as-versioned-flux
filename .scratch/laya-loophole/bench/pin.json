@@ -1,0 +1,211 @@
+{
+  "repo_id": "convaiinnovations/laya",
+  "revision": "1c5edc17a7acd8701df6fc341c0d179f1c62c982",
+  "revision_confirmed_by_hub": "1c5edc17a7acd8701df6fc341c0d179f1c62c982",
+  "last_modified": "2026-09-20 01:43:36+00:00",
+  "weights_sha256_hub": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c",
+  "weights_sha256_on_disk": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c",
+  "weights_sha256_expected": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c",
+  "license_files_at_revision": [],
+  "license_declared_in_card_yaml": "apache-2.0",
+  "files_at_revision": [
+    {
+      "path": ".gitattributes",
+      "size": 1913,
+      "lfs_sha256": null
+    },
+    {
+      "path": "README.md",
+      "size": 14874,
+      "lfs_sha256": null
+    },
+    {
+      "path": "assets/laya_benchmark.png",
+      "size": 260892,
+      "lfs_sha256": "e01e49f0d842b4616e44c4c9a0feb92a9ae45efeb533f8f838888715dc89c2b9"
+    },
+    {
+      "path": "assets/laya_benchmark_common.png",
+      "size": 278159,
+      "lfs_sha256": "183b0b17e8d90e091582e415d9f1da0ef34b40c3db6ccd2c8bbfd2b9232b95a6"
+    },
+    {
+      "path": "assets/laya_vs_jev.png",
+      "size": 216412,
+      "lfs_sha256": "5c06517ea7f3e5f3f84873ddaa3cb470f101ad0276f921c58886f8fb12fbe0a8"
+    },
+    {
+      "path": "assets/laya_vs_jev_full.png",
+      "size": 487005,
+      "lfs_sha256": "ee47b751d524a0bb65159e026141b4ce70cc83d03b14df8ec68afbc7bcdb95b3"
+    },
+    {
+      "path": "assets/logo-lockup-dark.png",
+      "size": 27666,
+      "lfs_sha256": null
+    },
+    {
+      "path": "assets/logo-lockup-dark.svg",
+      "size": 1590,
+      "lfs_sha256": null
+    },
+    {
+      "path": "assets/logo-lockup.png",
+      "size": 26761,
+      "lfs_sha256": null
+    },
+    {
+      "path": "assets/logo-lockup.svg",
+      "size": 1590,
+      "lfs_sha256": null
+    },
+    {
+      "path": "assets/logo-mark-ink.png",
+      "size": 17378,
+      "lfs_sha256": null
+    },
+    {
+      "path": "assets/logo-mark-ink.svg",
+      "size": 1320,
+      "lfs_sha256": null
+    },
+    {
+      "path": "assets/logo-mark-mono.svg",
+      "size": 1380,
+      "lfs_sha256": null
+    },
+    {
+      "path": "assets/logo-mark.png",
+      "size": 17962,
+      "lfs_sha256": null
+    },
+    {
+      "path": "assets/logo-mark.svg",
+      "size": 1320,
+      "lfs_sha256": null
+    },
+    {
+      "path": "email_utils.py",
+      "size": 3937,
+      "lfs_sha256": null
+    },
+    {
+      "path": "encoder/config.json",
+      "size": 2083,
+      "lfs_sha256": null
+    },
+    {
+      "path": "eval/benchmark_comparison.png",
+      "size": 467466,
+      "lfs_sha256": "78e4b926bfca3950ff5441d1030a1453515973fbe5d7dd70a1c764a81f0d3d38"
+    },
+    {
+      "path": "eval/reliability_eval_in.png",
+      "size": 65436,
+      "lfs_sha256": null
+    },
+    {
+      "path": "eval/reliability_eval_zs.png",
+      "size": 72014,
+      "lfs_sha256": null
+    },
+    {
+      "path": "eval/results.json",
+      "size": 2976,
+      "lfs_sha256": null
+    },
+    {
+      "path": "eval/results.md",
+      "size": 1608,
+      "lfs_sha256": null
+    },
+    {
+      "path": "model.safetensors",
+      "size": 842609210,
+      "lfs_sha256": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c"
+    },
+    {
+      "path": "multilingual/encoder/config.json",
+      "size": 1938,
+      "lfs_sha256": null
+    },
+    {
+      "path": "multilingual/model.safetensors",
+      "size": 643835514,
+      "lfs_sha256": "9d628fd971b700382ac6f65920a86f149777b2e748e0c955fb3b19695aa8f204"
+    },
+    {
+      "path": "multilingual/rl_agent_config.json",
+      "size": 472,
+      "lfs_sha256": null
+    },
+    {
+      "path": "multilingual/tokenizer/tokenizer.json",
+      "size": 34363188,
+      "lfs_sha256": "609d8f4c067cd3950f88594c5a802616cea245823836ef5848ee4fc40aab5b6f"
+    },
+    {
+      "path": "multilingual/tokenizer/tokenizer_config.json",
+      "size": 524,
+      "lfs_sha256": null
+    },
+    {
+      "path": "rl_agent_api.py",
+      "size": 4732,
+      "lfs_sha256": null
+    },
+    {
+      "path": "rl_agent_config.json",
+      "size": 745,
+      "lfs_sha256": null
+    },
+    {
+      "path": "rl_common.py",
+      "size": 19139,
+      "lfs_sha256": null
+    },
+    {
+      "path": "tokenizer/tokenizer.json",
+      "size": 3583228,
+      "lfs_sha256": null
+    },
+    {
+      "path": "tokenizer/tokenizer_config.json",
+      "size": 308,
+      "lfs_sha256": null
+    },
+    {
+      "path": "typed-decisions/encoder/config.json",
+      "size": 2084,
+      "lfs_sha256": null
+    },
+    {
+      "path": "typed-decisions/model.safetensors",
+      "size": 842609220,
+      "lfs_sha256": "4fa56de72383a9d3efa9cfa78955733c81b9fc8067a587ca4beb82c78107a24e"
+    },
+    {
+      "path": "typed-decisions/rl_agent_config.json",
+      "size": 847,
+      "lfs_sha256": null
+    },
+    {
+      "path": "typed-decisions/tokenizer/tokenizer.json",
+      "size": 3583228,
+      "lfs_sha256": null
+    },
+    {
+      "path": "typed-decisions/tokenizer/tokenizer_config.json",
+      "size": 337,
+      "lfs_sha256": null
+    }
+  ],
+  "downloaded": [
+    "encoder/config.json",
+    "model.safetensors",
+    "rl_agent_config.json",
+    "tokenizer/tokenizer.json",
+    "tokenizer/tokenizer_config.json"
+  ],
+  "model_dir": "/Users/cns/.cache/laya-bench/laya-english-1c5edc17"
+}

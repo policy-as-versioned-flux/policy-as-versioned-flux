@@ -1,0 +1,203 @@
+{
+  "summary": {
+    "ticket": "11",
+    "at": "2026-09-21T17:22:26.517869+00:00",
+    "a_round": "one",
+    "b_round": "two",
+    "repeats": 3,
+    "seed": 11,
+    "model_requested": "sonnet",
+    "match_counts": {
+      "loophole-3 ~ loophole-3": 2,
+      "overreach-4 ~ overreach-4": 2,
+      "overreach-5 ~ overreach-4": 1
+    },
+    "clause_only_counts": {
+      "loophole-2 ~ loophole-1": 2,
+      "overreach-6 ~ loophole-1": 2,
+      "overreach-5 ~ overreach-4": 1
+    },
+    "unanimous_matches": [],
+    "split_matches": [
+      "loophole-3 ~ loophole-3",
+      "overreach-4 ~ overreach-4",
+      "overreach-5 ~ overreach-4"
+    ],
+    "total_cost_usd": 0.160016
+  },
+  "repeats": [
+    {
+      "repeat": 1,
+      "a_map": {
+        "A1": "loophole-3",
+        "A2": "loophole-1",
+        "A3": "loophole-2",
+        "A4": "overreach-6",
+        "A5": "overreach-5",
+        "A6": "overreach-4"
+      },
+      "b_map": {
+        "B1": "overreach-6",
+        "B2": "loophole-1",
+        "B3": "loophole-3",
+        "B4": "overreach-4",
+        "B5": "overreach-5",
+        "B6": "loophole-2"
+      },
+      "raw": "{\n  \"matches\": [\n    {\"a\": \"A1\", \"b\": \"B3\", \"clause\": \"tighten-only / never-looser guarantee (Article 8, principle 6 & 11)\", \"reason\": \"Both exploit a procedural/technical gap in how tightening is tracked and enforced to keep a Namespace's effective tier looser than its true priced regime, without ever formally winning a PR-argued loosening.\"},\n    {\"a\": \"A5\", \"b\": \"B4\", \"clause\": \"ungoverned Namespace renders isolated (2026-09-04/ticket 63 flip, principle 7 'silence is the bottom rung')\", \"reason\": \"A good-faith actor with no malicious intent is caught by the same blanket fail-closed rule meant for adversarial/unlabelled workloads, producing disproportionate real-world harm.\"}\n  ],\n  \"clause_only\": [\n    {\"a\": \"A3\", \"b\": \"B2\", \"clause\": \"'infra is a declaration, not a selection' \u2014 the platform-role gate on declaring a Namespace infra\", \"why_not\": \"A3 attacks the lack of control over WHO can run workloads inside a legitimately-declared infra Namespace after the fact; B2 attacks the lack of control over WHO can grant themselves the platform role to declare infra in the first place.\"}\n  ]\n}",
+      "named": {
+        "matches": [
+          {
+            "a": "A1",
+            "b": "B3",
+            "clause": "tighten-only / never-looser guarantee (Article 8, principle 6 & 11)",
+            "reason": "Both exploit a procedural/technical gap in how tightening is tracked and enforced to keep a Namespace's effective tier looser than its true priced regime, without ever formally winning a PR-argued loosening.",
+            "a_key": "loophole-3",
+            "b_key": "loophole-3"
+          },
+          {
+            "a": "A5",
+            "b": "B4",
+            "clause": "ungoverned Namespace renders isolated (2026-09-04/ticket 63 flip, principle 7 'silence is the bottom rung')",
+            "reason": "A good-faith actor with no malicious intent is caught by the same blanket fail-closed rule meant for adversarial/unlabelled workloads, producing disproportionate real-world harm.",
+            "a_key": "overreach-5",
+            "b_key": "overreach-4"
+          }
+        ],
+        "clause_only": [
+          {
+            "a": "A3",
+            "b": "B2",
+            "clause": "'infra is a declaration, not a selection' \u2014 the platform-role gate on declaring a Namespace infra",
+            "why_not": "A3 attacks the lack of control over WHO can run workloads inside a legitimately-declared infra Namespace after the fact; B2 attacks the lack of control over WHO can grant themselves the platform role to declare infra in the first place.",
+            "a_key": "loophole-2",
+            "b_key": "loophole-1"
+          }
+        ]
+      },
+      "elapsed_s": 34.42,
+      "total_cost_usd": 0.06007199999999999,
+      "model_served": [
+        "claude-sonnet-5"
+      ]
+    },
+    {
+      "repeat": 2,
+      "a_map": {
+        "A1": "loophole-2",
+        "A2": "overreach-5",
+        "A3": "overreach-6",
+        "A4": "loophole-3",
+        "A5": "overreach-4",
+        "A6": "loophole-1"
+      },
+      "b_map": {
+        "B1": "loophole-3",
+        "B2": "overreach-6",
+        "B3": "loophole-2",
+        "B4": "overreach-4",
+        "B5": "loophole-1",
+        "B6": "overreach-5"
+      },
+      "raw": "{\n  \"matches\": [\n    {\"a\": \"A5\", \"b\": \"B4\", \"clause\": \"isolated tier / no emergency break-glass path (principles 2,4,6)\", \"reason\": \"Both argue a good-faith emergency responder is functionally blocked from needed network access with no fast lawful path, contradicting the spirit of conditional policy.\"},\n    {\"a\": \"A4\", \"b\": \"B1\", \"clause\": \"tighten-only floor / worst-priced regime binding (principles 6, 8, 11)\", \"reason\": \"Both show a technical/procedural workaround (ambiguous dual declarations vs namespace rename) that freezes or resets a tier without going through the priced tightening mechanism.\"}\n  ],\n  \"clause_only\": [\n    {\"a\": \"A2\", \"b\": \"B4\", \"clause\": \"ungoverned/unlabelled Namespace renders isolated (principle 7, 2026-09-04 flip)\", \"why_not\": \"A2 objects to punishing routine administrative labeling lag; B4 objects to blocking a live emergency incident responder \u2014 different underlying harms.\"},\n    {\"a\": \"A1\", \"b\": \"B5\", \"clause\": \"infra is a declaration, not a selection / platform-role gating (ADR-0022)\", \"why_not\": \"A1 attacks the lack of workload-level enforcement once a namespace is legitimately declared infra; B5 attacks the lack of any gate on who can grant themselves the platform role in the first place.\"},\n    {\"a\": \"A3\", \"b\": \"B5\", \"clause\": \"platform-role gating of infra declarations (principle 12/13, ADR-0022)\", \"why_not\": \"A3 attacks the silent-render-to-isolated consequence for a well-intentioned non-platform declarer; B5 attacks a malicious actor self-granting the platform role to bypass the ladder entirely.\"}\n  ]\n}",
+      "named": {
+        "matches": [
+          {
+            "a": "A5",
+            "b": "B4",
+            "clause": "isolated tier / no emergency break-glass path (principles 2,4,6)",
+            "reason": "Both argue a good-faith emergency responder is functionally blocked from needed network access with no fast lawful path, contradicting the spirit of conditional policy.",
+            "a_key": "overreach-4",
+            "b_key": "overreach-4"
+          },
+          {
+            "a": "A4",
+            "b": "B1",
+            "clause": "tighten-only floor / worst-priced regime binding (principles 6, 8, 11)",
+            "reason": "Both show a technical/procedural workaround (ambiguous dual declarations vs namespace rename) that freezes or resets a tier without going through the priced tightening mechanism.",
+            "a_key": "loophole-3",
+            "b_key": "loophole-3"
+          }
+        ],
+        "clause_only": [
+          {
+            "a": "A2",
+            "b": "B4",
+            "clause": "ungoverned/unlabelled Namespace renders isolated (principle 7, 2026-09-04 flip)",
+            "why_not": "A2 objects to punishing routine administrative labeling lag; B4 objects to blocking a live emergency incident responder \u2014 different underlying harms.",
+            "a_key": "overreach-5",
+            "b_key": "overreach-4"
+          },
+          {
+            "a": "A1",
+            "b": "B5",
+            "clause": "infra is a declaration, not a selection / platform-role gating (ADR-0022)",
+            "why_not": "A1 attacks the lack of workload-level enforcement once a namespace is legitimately declared infra; B5 attacks the lack of any gate on who can grant themselves the platform role in the first place.",
+            "a_key": "loophole-2",
+            "b_key": "loophole-1"
+          },
+          {
+            "a": "A3",
+            "b": "B5",
+            "clause": "platform-role gating of infra declarations (principle 12/13, ADR-0022)",
+            "why_not": "A3 attacks the silent-render-to-isolated consequence for a well-intentioned non-platform declarer; B5 attacks a malicious actor self-granting the platform role to bypass the ladder entirely.",
+            "a_key": "overreach-6",
+            "b_key": "loophole-1"
+          }
+        ]
+      },
+      "elapsed_s": 25.18,
+      "total_cost_usd": 0.050832,
+      "model_served": [
+        "claude-sonnet-5"
+      ]
+    },
+    {
+      "repeat": 3,
+      "a_map": {
+        "A1": "loophole-2",
+        "A2": "loophole-3",
+        "A3": "overreach-4",
+        "A4": "overreach-6",
+        "A5": "loophole-1",
+        "A6": "overreach-5"
+      },
+      "b_map": {
+        "B1": "overreach-4",
+        "B2": "loophole-3",
+        "B3": "overreach-5",
+        "B4": "loophole-1",
+        "B5": "overreach-6",
+        "B6": "loophole-2"
+      },
+      "raw": "{\n  \"matches\": [\n    {\n      \"a\": \"A3\",\n      \"b\": \"B1\",\n      \"clause\": \"Isolated tier's strict egress/ingress lockdown with no break-glass/emergency exception (principles 2/3/4/6)\",\n      \"reason\": \"An on-call SRE trying to run legitimate network diagnostics during a live incident is blocked by the isolated tier with no expedited or emergency path, worsening a customer-facing outage despite good-faith urgent need\"\n    }\n  ],\n  \"clause_only\": [\n    {\n      \"a\": \"A4\",\n      \"b\": \"B4\",\n      \"clause\": \"Only a party holding the `platform` role may declare a Namespace `infra` (Principle 12 / 'infra is a declaration, not a selection')\",\n      \"why_not\": \"A4 argues the rule causes collateral harm (silent rendering to isolated breaks an honest, non-role engineer's well-intentioned low-risk change with no feedback), whereas B4 argues the rule is a governance gap letting a malicious party self-grant the platform role to escape the priced ladder entirely\"\n    }\n  ]\n}",
+      "named": {
+        "matches": [
+          {
+            "a": "A3",
+            "b": "B1",
+            "clause": "Isolated tier's strict egress/ingress lockdown with no break-glass/emergency exception (principles 2/3/4/6)",
+            "reason": "An on-call SRE trying to run legitimate network diagnostics during a live incident is blocked by the isolated tier with no expedited or emergency path, worsening a customer-facing outage despite good-faith urgent need",
+            "a_key": "overreach-4",
+            "b_key": "overreach-4"
+          }
+        ],
+        "clause_only": [
+          {
+            "a": "A4",
+            "b": "B4",
+            "clause": "Only a party holding the `platform` role may declare a Namespace `infra` (Principle 12 / 'infra is a declaration, not a selection')",
+            "why_not": "A4 argues the rule causes collateral harm (silent rendering to isolated breaks an honest, non-role engineer's well-intentioned low-risk change with no feedback), whereas B4 argues the rule is a governance gap letting a malicious party self-grant the platform role to escape the priced ladder entirely",
+            "a_key": "overreach-6",
+            "b_key": "loophole-1"
+          }
+        ]
+      },
+      "elapsed_s": 24.3,
+      "total_cost_usd": 0.049112,
+      "model_served": [
+        "claude-sonnet-5"
+      ]
+    }
+  ]
+}

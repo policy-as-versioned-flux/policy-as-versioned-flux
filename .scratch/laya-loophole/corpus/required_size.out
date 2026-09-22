@@ -1,0 +1,26 @@
+required corpus size, derived from ticket 04's own target
+  gap to resolve                 0.129 - 0.081 = 0.048
+  charitable (whole-set SE)      326 items per skill
+  honest (per-bin, 10 bins)      3260 items per skill
+  Laya's own published recipe    300 items per question schema
+
+what this estate holds
+  merged human-authored labels   1
+  hand-authored, all six skills  42
+  largest single corpus          23
+  shortfall, merged claims       326x
+  shortfall, largest corpus      14.2x
+  six skills at 326 each        1956 items
+
+what a PERFECT score on a corpus of each size actually bounds
+  n = 1     scored 1.0  ->  nothing; one item bounds nothing
+  n = 3     scored 1.0  ->  true accuracy >= 0.000
+  n = 4     scored 1.0  ->  true accuracy >= 0.250
+  n = 5     scored 1.0  ->  true accuracy >= 0.400
+  n = 23    scored 1.0  ->  true accuracy >= 0.870
+  n = 42    scored 1.0  ->  true accuracy >= 0.929
+  n = 326   scored 1.0  ->  true accuracy >= 0.991
+
+when the first label the world wrote arrives
+  today 2026-09-21, earliest scenario horizon 2027-08-28
+  days away 341, and at most 18 items when it does

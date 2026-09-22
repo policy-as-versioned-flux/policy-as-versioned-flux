@@ -1,0 +1,77 @@
+{
+  "ticket": "laya-loophole/03",
+  "ref": "origin/main",
+  "adopters": [
+    {
+      "org": "driftwood",
+      "claim_files": [
+        "twin/orgs/driftwood/claims/supply-constraint-position-2026-09-09.yaml"
+      ],
+      "items": 1,
+      "unmapped_claims": [],
+      "ratified_machine_claims": [],
+      "signal_rows_bound": 5,
+      "unbound_scenarios": 2
+    },
+    {
+      "org": "ludlow",
+      "claim_files": [],
+      "items": 0,
+      "unmapped_claims": [],
+      "ratified_machine_claims": [],
+      "signal_rows_bound": 4,
+      "unbound_scenarios": 3
+    },
+    {
+      "org": "tuppence",
+      "claim_files": [],
+      "items": 0,
+      "unmapped_claims": [],
+      "ratified_machine_claims": [],
+      "signal_rows_bound": 4,
+      "unbound_scenarios": 3
+    }
+  ],
+  "signal_row_verdict": "A twin/signals.yaml row binds a pinned feed version to a SCENARIO id. The signal-classify corpus needs {steep, component}: a STEEP tag and exactly one component binding. A row carries no STEEP tag at all, and it reaches components only through the scenario, which names several. So a bound row is a real, merged, human-reviewed label for a question none of the six skills asks, and deriving a STEEP tag from it here would be this builder authoring the label -- the one thing ticket 03 forbids.",
+  "items_per_skill": {
+    "signal-classify": 0,
+    "evolution-judge": 1,
+    "causal-claims": 0,
+    "substrate-generator": 0,
+    "gameplay-lens": 0,
+    "ethics-gate": 0
+  },
+  "total_items": 1,
+  "items": [
+    {
+      "id": "driftwood:supply-constraint-position-2026-09-09",
+      "skill": "evolution-judge",
+      "source": "merged-claim",
+      "cites": {
+        "authored_commit": "ceb3697e8070b2ae68fb957d2a195a35de605550",
+        "authored_at": "2026-09-09",
+        "authored_subject": "Ticket 51: the first override, and the question it is scored through",
+        "merge_commit": "0164cda5413cc064f8100bc1605d2b554b70d46c",
+        "merged_at": "2026-09-09",
+        "merge_subject": "Merge pull request #34 from policy-as-versioned-driftwood/ticket-51-the-supply-constraint-actor-path"
+      },
+      "path": "driftwood:twin/orgs/driftwood/claims/supply-constraint-position-2026-09-09.yaml",
+      "input": {
+        "component": {
+          "id": "tier-one-supplier-relationship",
+          "name": "tier-one-supplier-relationship"
+        },
+        "evidence": [
+          {
+            "statement": "Calibrated expert judgement, recorded as judgement (twin evidence ladder rung 4), by the role accountable for how this model positions things. The niobium refining-capacity headline says a single-country bottleneck in qubit/SRF-grade refining is tightening; this overlay carries that headline as its own standing scenario `niobium-supply-shock-2026` rather than as a feed entry (ecosystem ticket 23 item 1), so what moves here is the position, not a signal binding. What this claim asserts: that the derived midpoint 0.625 overstates how substitutable a tier-one supplier relationship is for this company. What it does NOT assert: any magnitude, any date, and any causal path from the headline to the coordinate -- there is no edge between the two intel rows the headline names (`nb-refining-capacity` and `pq-cryptanalysis` both name the same `links_risk`, a FAIR risk id, and neither is a component of any twin model), and no edge of any type moves a coordinate anyway (ecosystem ticket 51). And what this claim MOVES today is nothing: no code path in this estate reads a committed override to move a coordinate at any evidence grade, so the map and the feed render identically with and without this file. That is not the rung-4 use gate working -- the same claim at grade 1 renders the same bytes; it is that the operation the ruling describes has no implementation yet. At rung 4 this prices nothing on its own either: only rungs 1-2 carry an interventional delta into a scored forecast (twin decision ticket 08 Q2). It is scoreable only through the proposition of a scenario that names this component -- `a-tier-one-supplier-fails-to-deliver-within-the-horizon`, resolving 2027-08-28 -- and never on the coordinate itself, which has no published answer key and lives on an ordinal axis. Its pre-registration date is the day this file's CONTENT last reaches driftwood's `origin/main` (`twin/registration.py`), not the date written above: rewrite the number after it lands and it re-registers on the day of the rewrite.",
+            "date": "2026-09-09"
+          }
+        ]
+      },
+      "expected": {
+        "evolution_position": 0.55
+      },
+      "evidence_grade": 4
+    }
+  ]
+}

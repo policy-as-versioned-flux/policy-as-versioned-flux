@@ -521,7 +521,10 @@ run_step() {  # step skill paths pattern validator adopter
     refuse "$step" "$adopter" "$branch" "$title" "$body" "$nfiles files in the commit, not 1" --base "$base" --commits 1; return 1
   fi
   # Every file the commit carries must be a claim file (*.claim.yaml), and every claim file is
-  # run through the skill's own validator, told --headless: THIS script knows nobody was at the
+  # run through the skill's own validator, told --headless AND --clock local (wayfinder ticket
+  # 05: this clock is the owner's own machine, and the validator DERIVES the clock from the
+  # environment anyway, so a run that somehow happened inside GitHub Actions would be graded as
+  # a github clock whatever this flag said): THIS script knows nobody was at the
   # keyboard, so the validator requires run.headless: true on the file and refuses an override
   # whatever the file declares about itself. A file under the step's paths with any other name
   # is refused outright: the clock has no check for it, and a file nobody can check is not
@@ -549,7 +552,7 @@ run_step() {  # step skill paths pattern validator adopter
         echo "fail  $tag: rehearsal claim $f does not carry injected: true at its top level"
         refuse "$step" "$adopter" "$branch" "$title" "$body" "rehearsal claim $f not marked injected"; return 1
       fi
-      if "$PY" "$validator" "$wt/$f" --twin "$judge" --headless >"$vout" 2>&1 </dev/null; then
+      if "$PY" "$validator" "$wt/$f" --twin "$judge" --headless --clock local >"$vout" 2>&1 </dev/null; then
         echo "fail  $tag: the validator ACCEPTED rehearsal claim $f -- an injected claim must be refused, and this one would pass a gate. Branch kept at $wt, never pushed."
         refuse "$step" "$adopter" "$branch" "$title" "$body" "validator accepted rehearsal claim $f"; return 1
       fi
@@ -563,7 +566,7 @@ run_step() {  # step skill paths pattern validator adopter
         echo "fail  $tag: live claim $f does not carry headless: true in its run block -- a claim this clock made says so on its face, or it is not this clock's claim. Branch kept at $wt, never pushed."
         refuse "$step" "$adopter" "$branch" "$title" "$body" "live claim $f not marked headless"; return 1
       fi
-      if ! "$PY" "$validator" "$wt/$f" --twin "$judge" --headless >"$vout" 2>&1 </dev/null; then
+      if ! "$PY" "$validator" "$wt/$f" --twin "$judge" --headless --clock local >"$vout" 2>&1 </dev/null; then
         echo "fail  $tag: the validator refused live claim $f ($(grep -c '^not ok' "$vout") reason(s); first: $(grep -m1 '^not ok' "$vout" | cut -c9-160)). Branch kept at $wt, never pushed."
         refuse "$step" "$adopter" "$branch" "$title" "$body" "claim file refused: $f: $(grep -m1 '^not ok' "$vout" | cut -c9-160)"; return 1
       fi

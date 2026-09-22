@@ -26,12 +26,20 @@
 # Holding out a corpus the heuristics were not fitted on is a later ticket; until one exists this
 # script must not spend the word "skill" unqualified.
 #
-# A FALL IN ANY SCORE against the last value recorded for that skill in twin/skill-scores.jsonl is
-# a FAIL, even when the fallen score is still above its threshold. That file is the committed
-# record of the last values; this script never writes to it (it is append-only, guarded by
-# `skill_score_log_is_append_only`, and a gate that recorded its own runs would move the bar it
-# checks against every time it ran). The record of what the gate saw is talk/truth.log and the
-# capture beside it.
+# A FALL IN ANY SCORE against the last value recorded for that skill BY THE SAME MODEL VERSION in
+# twin/skill-scores.jsonl is a FAIL, even when the fallen score is still above its threshold. That
+# file is the committed record of the last values; this script never writes to it (it is
+# append-only, guarded by `skill_score_log_is_append_only`, and a gate that recorded its own runs
+# would move the bar it checks against every time it ran). The record of what the gate saw is
+# talk/truth.log and the capture beside it.
+#
+# THE MODEL VERSION IS PART OF THE COMPARISON (wayfinder ticket 09 item 6, found by ticket 04,
+# fixed 2026-09-22). This read the last row of ANY model version. On 2026-09-21 the Laya bake-off
+# appended six rows at `model_version: laya-1c5edc17`, and the incumbent's fresh 1.000 was then
+# graded against Laya's 0.870, 0.500, 0.000, 0.333 and 0.200. Five of the seven comparisons were
+# dead: the incumbent could have fallen to 0.600 and still read "pass". Recording a candidate must
+# not move the incumbent's bar, so `last_for()` below filters on the model version and carries a
+# negative control in both directions.
 #
 # Three outcomes only:
 #   PASS (exit 0)  every assertion observed true
@@ -126,22 +134,53 @@ out(observed == expected,
     "(%d): missing %s, unexpected %s"
     % (len(expected), sorted(expected - observed) or "none", sorted(observed - expected) or "none"))
 
+def last_for(skill, model_version, entries=None):
+    """The last score recorded for this skill BY THIS MODEL VERSION.
+
+    Wayfinder ticket 09 item 6, from ticket 04. This read `history_for(skill)[-1]` -- the last row
+    of ANY model version -- and the comment called that deliberate. It was wrong for one reason
+    nobody had yet met: on 2026-09-21 the Laya bake-off appended six rows at
+    `model_version: laya-1c5edc17`, and this run's fresh heuristic score was then graded against
+    Laya's 0.870, 0.500, 0.000, 0.333 and 0.200 instead of against the incumbent's own 1.000.
+    Five of the seven comparisons were dead: the incumbent could have fallen from 1.000 to 0.600
+    and still read "pass" because 0.600 is above Laya's 0.500. Recording a candidate must not move
+    the incumbent's bar.
+
+    Still deliberately not `detect_regression()`, for the reason the old comment gave: that
+    function compares the latest two DISTINCT model versions, so it says nothing while only one
+    has been recorded, and a re-run of the same version that scores lower is exactly the case this
+    must fail on. Same version, chronological, last write wins.
+    """
+    prior = [e for e in (history_for(skill) if entries is None else entries)
+             if e["skill"] == skill and e["model_version"] == model_version]
+    return prior[-1]["score"] if prior else None
+
+
+# The negative control, because a comparison exercised only by scores that all pass cannot tell
+# "correct" from "always says pass". A candidate's row must be invisible to the incumbent's bar,
+# and the incumbent's own last row must still be read. Both directions, on synthetic rows.
+_ROWS = [{"skill": "s", "model_version": "incumbent", "score": 1.0},
+         {"skill": "s", "model_version": "candidate", "score": 0.2},
+         {"skill": "other", "model_version": "incumbent", "score": 0.4}]
+assert last_for("s", "incumbent", _ROWS) == 1.0, last_for("s", "incumbent", _ROWS)
+assert last_for("s", "candidate", _ROWS) == 0.2, last_for("s", "candidate", _ROWS)
+assert last_for("s", "never-recorded", _ROWS) is None
+assert verdict(0.6, 0.5, last_for("s", "incumbent", _ROWS)) == "fell"   # the case that was dead
+assert verdict(0.6, 0.5, _ROWS[-2]["score"]) == "pass"                  # what the old read said
+
+
 for entry in entries:
     skill, score, threshold = entry["skill"], entry["score"], entry["threshold"]
-    # The last value recorded for this skill, whatever model version recorded it. Deliberately
-    # not `detect_regression()`, which compares the latest two *model versions* and so says
-    # nothing at all while only one has ever been recorded: a swap that scores lower is exactly
-    # the case this must fail on, and a re-run that scores lower is the other one.
-    prior = history_for(skill)
-    last = prior[-1]["score"] if prior else None
+    last = last_for(skill, entry["model_version"])
     shown = "none recorded" if last is None else "%.3f" % last
     said = verdict(score, threshold, last)
     why = {"below": "  -- below its threshold",
-           "fell": "  -- FELL against the last recorded value in twin/skill-scores.jsonl",
+           "fell": "  -- FELL against the last value twin/skill-scores.jsonl records for THIS "
+                   "model version",
            "pass": ""}[said]
-    out(said == "pass", "%-28s score=%.3f  threshold=%.3f  last=%s  [%s: scored "
+    out(said == "pass", "%-28s score=%.3f  threshold=%.3f  last=%s (%s)  [%s: scored "
                         "on the corpus it was fitted on]%s"
-                        % (skill, score, threshold, shown, LABEL, why))
+                        % (skill, score, threshold, shown, entry["model_version"], LABEL, why))
 
 # The label is read from the skill module, not typed here: evolution_judge declares what its own
 # corpus is, and both this harness's per-metric line above and the shell's closing PASS line are

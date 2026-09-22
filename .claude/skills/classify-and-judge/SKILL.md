@@ -34,6 +34,32 @@ GitHub clock to produce this; it ran on the owner's local clock" for such a run.
 `talk/local-clock.headless.md` is the note the clock appends to the system prompt and is the
 authority on what a headless run may do.
 
+**Amended 2026-09-21 (wayfinder ticket 05).** On 2026-09-21 the owner permitted a model to judge
+on a GitHub clock, **within thresholds**. The sentence above still stands, because the permission
+is a mechanism and not a grant: `twin/model_permission.py` turns "within thresholds" into ten
+conditions, and **no model in this estate holds a permission on any skill today**. The candidate
+model fails on its score, its corpus digest and the variance of its own heads; the incumbent
+heuristic fails because it is graded on the corpus it was fitted on. So nothing here runs on a
+GitHub clock, and now that is a thing a check observes rather than a sentence somebody keeps.
+
+The seam is `assets/validate_claim.py::validate` itself, which `talk/local-clock.sh` already runs
+over every committed claim file out of a tree the model cannot write to. It takes `--clock` as
+well as `--headless`, and the clock is **derived**: a run carrying a GitHub Actions marker is a
+GitHub clock whatever the file says. A `human` run and a `local` run are untouched by the new
+rule, so this skill's ordinary path and ticket 92's terms both read exactly as before.
+
+`verify/model-permission/verify-model-permission.sh` grades the rule on the gate.
+
+**Recorded 2026-09-22 (wayfinder ticket 09).** The amendment above now has its ADRs.
+[ADR-0029](../../../docs/adr/0029-a-candidate-model-enters-on-a-measured-permission-and-laya-does-not-hold-one.md)
+records the measurement and the refusal: the candidate model loses five of six metrics, ties the
+sixth, and is at or below the best constant answer its own corpus admits on five of six, so it
+holds no permission, and neither does the incumbent.
+[ADR-0024](../../../docs/adr/0024-the-daily-clock-the-caged-observation-lane-and-the-derived-ledger.md)
+point 6 carries a dated note of
+its own with the owner's amendment, the ten conditions and the derived clock. **Nothing in the
+sentence at the top of this file changes, and nothing about this skill's ordinary path changes.**
+
 **Two things this skill may never do:** merge its own PR, and invent an entry. If a statement is
 not in the published pool with a URL, it does not become a signal here — it is a **scenario**, and
 scenarios live in the adopter's `twin/orgs/<org>/scenarios/` library. The niobium supply shock is

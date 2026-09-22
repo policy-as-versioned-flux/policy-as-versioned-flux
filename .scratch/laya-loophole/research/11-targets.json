@@ -1,0 +1,184 @@
+{
+  "note": "Ticket 11's match test is 'the same clause for the same reason', never the same words. This file states, for each of the 18 candidates, which clause it attacks and which reason it gives. Every overlap number in the ticket answer is computed from these two fields, so a reader can disagree with one row rather than with a verdict. The rows are the assistant's reading of the candidate text. The blind matcher in 11-blind-match/ is an independent check on them.",
+  "clauses": {
+    "P1": "principle 1: everything is always caged",
+    "P7-SILENCE": "principle 7 / the 2026-09-04 flip: an unknown or unlabelled tier fails closed to isolated",
+    "P8-RATCHET": "principle 8 and ticket 78's binding check: the cage mutation is tighten-only",
+    "P12-INFRA": "principle 12 and ADR-0022 'infra is a declaration, not a selection'",
+    "P13-PR": "principle 13: disagreement is resolved by an open pull request, never a silent edit",
+    "ADR-PRICES": "ADR-0022 note 2026-09-04: the proposer folds strictest across submitted prices[]",
+    "ADR-AMBIG": "ADR-0022: two governed Namespace documents is a question, not a first answer",
+    "ADR-CLAIM": "ADR-0022: a pod in a governed Namespace without a policy-version claim lands on the bottom rung",
+    "ADR-UNGOV-BASE": "ADR-0022 addition 2026-08-28: an ungoverned Namespace still renders baseline for a pod that claims a version",
+    "ADR-LOOSEN": "ADR-0022 note 2026-09-04: loosening is not implemented; a looser declaration is a reviewed human edit",
+    "ADR-TRIPWIRE": "ADR-0022: verify-infra-declaration.sh FAILS by name while any served default reads isolated",
+    "ISOLATED-DIALS": "ADR-0022: the isolated rung's own dials, no ingress, no egress, first eviction"
+  },
+  "reasons": {
+    "PRICE-UNDERDECLARE": "nothing compels a price line that reflects the sensitive workload's true risk, so the Namespace stays loose",
+    "INFRA-OCCUPANCY": "nothing restricts who may run pods inside an infra Namespace once a platform party declares it",
+    "INFRA-ROLE-GRANT": "nothing says who grants the platform role, so a party can self-assert it in its own party.yaml",
+    "INFRA-SCOPE": "nothing restricts which Namespaces a platform party may declare at infra, so a business workload escapes the ladder",
+    "AMBIGUITY-FREEZES": "a refusal to update is not a fail-closed re-render, so an ambiguous declaration freezes the stale tier",
+    "RATCHET-PER-NAMESPACE": "tighten-only memory is keyed to Namespace object identity, so delete-and-recreate resets the ratchet",
+    "COVERAGE-NOT-EXHAUSTIVE": "the policy only reaches Namespaces its discovery surface enumerates, so an undiscovered Namespace is never caged",
+    "OPTOUT-BEATS-OPTIN": "ungoverned plus a claim renders baseline, which is looser than governed with no tier, so opting out wins",
+    "NO-BREAKGLASS": "the isolated rung's own dials block the urgent legitimate action and no expedited path exists",
+    "NO-FAST-LOOSEN": "the only lawful loosening is a reviewed pull request, which is too slow for a time-bounded legitimate need",
+    "INNOCENT-OMISSION": "a benign clerical omission draws the same bottom rung as deliberate evasion, with no legible feedback",
+    "SILENT-ROLE-MUTATION": "a non-platform party's infra declaration renders isolated silently rather than raising a legible error",
+    "GLOBAL-GATE-BLOCKS-URGENT": "a gate keyed to unrelated cluster-wide drift blocks a narrow urgent fix the fixer did not cause"
+  },
+  "rounds": {
+    "one": {
+      "loophole-1": [
+        "ADR-PRICES",
+        "PRICE-UNDERDECLARE"
+      ],
+      "loophole-2": [
+        "P12-INFRA",
+        "INFRA-OCCUPANCY"
+      ],
+      "loophole-3": [
+        "ADR-AMBIG",
+        "AMBIGUITY-FREEZES"
+      ],
+      "overreach-4": [
+        "ISOLATED-DIALS",
+        "NO-BREAKGLASS"
+      ],
+      "overreach-5": [
+        "P7-SILENCE",
+        "INNOCENT-OMISSION"
+      ],
+      "overreach-6": [
+        "P12-INFRA",
+        "SILENT-ROLE-MUTATION"
+      ]
+    },
+    "two": {
+      "loophole-1": [
+        "P12-INFRA",
+        "INFRA-ROLE-GRANT"
+      ],
+      "loophole-2": [
+        "P1",
+        "COVERAGE-NOT-EXHAUSTIVE"
+      ],
+      "loophole-3": [
+        "P8-RATCHET",
+        "RATCHET-PER-NAMESPACE"
+      ],
+      "overreach-4": [
+        "P7-SILENCE",
+        "NO-BREAKGLASS"
+      ],
+      "overreach-5": [
+        "ADR-LOOSEN",
+        "NO-FAST-LOOSEN"
+      ],
+      "overreach-6": [
+        "ADR-CLAIM",
+        "INNOCENT-OMISSION"
+      ]
+    },
+    "three": {
+      "loophole-1": [
+        "ADR-UNGOV-BASE",
+        "OPTOUT-BEATS-OPTIN"
+      ],
+      "loophole-2": [
+        "P12-INFRA",
+        "INFRA-SCOPE"
+      ],
+      "loophole-3": [
+        "P8-RATCHET",
+        "RATCHET-PER-NAMESPACE"
+      ],
+      "overreach-4": [
+        "P13-PR",
+        "NO-FAST-LOOSEN"
+      ],
+      "overreach-5": [
+        "P7-SILENCE",
+        "INNOCENT-OMISSION"
+      ],
+      "overreach-6": [
+        "ADR-TRIPWIRE",
+        "GLOBAL-GATE-BLOCKS-URGENT"
+      ]
+    }
+  },
+  "overlap": {
+    "pairwise": {
+      "one-vs-two": {
+        "clause": {
+          "shared": [
+            "P12-INFRA",
+            "P7-SILENCE"
+          ],
+          "count": 2,
+          "of": 6
+        },
+        "reason": {
+          "shared": [
+            "INNOCENT-OMISSION",
+            "NO-BREAKGLASS"
+          ],
+          "count": 2,
+          "of": 6
+        }
+      },
+      "one-vs-three": {
+        "clause": {
+          "shared": [
+            "P12-INFRA",
+            "P7-SILENCE"
+          ],
+          "count": 2,
+          "of": 6
+        },
+        "reason": {
+          "shared": [
+            "INNOCENT-OMISSION"
+          ],
+          "count": 1,
+          "of": 6
+        }
+      },
+      "two-vs-three": {
+        "clause": {
+          "shared": [
+            "P12-INFRA",
+            "P7-SILENCE",
+            "P8-RATCHET"
+          ],
+          "count": 3,
+          "of": 6
+        },
+        "reason": {
+          "shared": [
+            "INNOCENT-OMISSION",
+            "NO-FAST-LOOSEN",
+            "RATCHET-PER-NAMESPACE"
+          ],
+          "count": 3,
+          "of": 6
+        }
+      }
+    },
+    "all_three": {
+      "clause": [
+        "P12-INFRA",
+        "P7-SILENCE"
+      ],
+      "reason": [
+        "INNOCENT-OMISSION"
+      ]
+    },
+    "distinct_over_18_candidates": {
+      "clause": 12,
+      "reason": 13
+    }
+  }
+}

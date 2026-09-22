@@ -1,0 +1,653 @@
+{
+ "calibration_note": "raw and uncalibrated: the shipped per-type temperatures are dead code (ticket 01) and the estate holds one merged human label against the 326 per skill a refit needs (ticket 03), so nothing was fitted here",
+ "leg_breakdown": {
+  "causal-claims": {
+   "conjunction_note": "the claim scorer ANDs sign, lag and elasticity, so one failing leg fails the item",
+   "heuristic_elasticity_is_a_fitted_constant": {
+    "all_labels_within_tolerance_of_the_constant": true,
+    "constant": 0.375,
+    "constant_equals_corpus_mean": true,
+    "corpus_mean": 0.375,
+    "corpus_modes": [
+     0.45,
+     0.25,
+     0.3,
+     0.5
+    ],
+    "note": "twin/causal_claims.py's `_BASE_MODE` is 0.375, which is exactly the mean of this corpus's own four elasticity labels, and the scorer's tolerance is 0.15. So the heuristic's elasticity leg cannot fail on this corpus by construction, whatever the evidence text says. That is where its 1.000 on this metric comes from."
+   },
+   "legs": {
+    "elasticity": 0.0,
+    "lag": 0.75,
+    "sign": 0.75
+   }
+  },
+  "signal-classify": {
+   "component_accuracy": 1.0,
+   "component_note": "every corpus item carries exactly one candidate component, so the binding half is a forced choice and measures nothing for either side",
+   "label_counts": {
+    "economic": 21,
+    "political": 2
+   },
+   "minority_class_recall": {
+    "caught": 0,
+    "class": "political",
+    "note": "the only two items on this corpus that a majority-class guesser gets wrong; the heuristic catches both with a three-keyword list fitted to these two items (signal_classify._POLITICAL_KEYWORDS)",
+    "total": 2
+   },
+   "predicted_counts": {
+    "economic": 22,
+    "political": 1
+   },
+   "steep_accuracy": 0.8696
+  }
+ },
+ "metrics": [
+  {
+   "beats_constant_baseline": false,
+   "calibration": {
+    "bins": [
+     {
+      "accuracy": 0.0,
+      "bin": "0.3-0.4",
+      "mean_confidence": 0.3908,
+      "n": 1
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.5-0.6",
+      "mean_confidence": 0.576,
+      "n": 2
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.6-0.7",
+      "mean_confidence": 0.6353,
+      "n": 2
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.7-0.8",
+      "mean_confidence": 0.7355,
+      "n": 2
+     },
+     {
+      "accuracy": 0.8667,
+      "bin": "0.8-0.9",
+      "mean_confidence": 0.8574,
+      "n": 15
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.9-1.0",
+      "mean_confidence": 0.9962,
+      "n": 24
+     }
+    ],
+    "ece": 0.0593,
+    "n": 46,
+    "questions": [
+     "component",
+     "steep"
+    ],
+    "shared_with": null
+   },
+   "clears_threshold_at_95": false,
+   "constant_baseline": {
+    "answer": "always 'economic'",
+    "correct": 21,
+    "score": 0.913,
+    "total": 23
+   },
+   "corpus_digest": "d5f0c6610fae0cd9d85a1659e8cfca88c08918a10187dd9c3cf7e995981db198",
+   "correct": 20,
+   "heuristic_score": 1.0,
+   "lower_bound_95": 0.6964,
+   "metric": "signal-classify",
+   "passed": true,
+   "per_item": [
+    {
+     "id": "carillion:compulsory-liquidation-2018-01-15",
+     "passed": false
+    },
+    {
+     "id": "carillion:profit-warning-2017-07-10",
+     "passed": true
+    },
+    {
+     "id": "carillion:profit-warning-2017-09-29",
+     "passed": true
+    },
+    {
+     "id": "carillion:profit-warning-2017-11-17",
+     "passed": true
+    },
+    {
+     "id": "carillion:rns-2016-12-07",
+     "passed": true
+    },
+    {
+     "id": "carillion:rns-2017-03-01",
+     "passed": true
+    },
+    {
+     "id": "carillion:rns-2017-05-03",
+     "passed": true
+    },
+    {
+     "id": "carillion:short-interest-2017-09-30",
+     "passed": true
+    },
+    {
+     "id": "nmc:administrators-appointed-2020-04-09",
+     "passed": true
+    },
+    {
+     "id": "nmc:debt-revised-5bn-2020-03-10",
+     "passed": true
+    },
+    {
+     "id": "nmc:debt-revised-6-6bn-2020-03-24",
+     "passed": true
+    },
+    {
+     "id": "nmc:muddy-waters-report-2019-12-17",
+     "passed": true
+    },
+    {
+     "id": "nmc:trading-suspended-2020-02-27",
+     "passed": true
+    },
+    {
+     "id": "wirecard:bafin-short-selling-ban-2019-02-18",
+     "passed": false
+    },
+    {
+     "id": "wirecard:ey-refuses-signoff-2020-06-18",
+     "passed": true
+    },
+    {
+     "id": "wirecard:ft-investigation-2019-01-30",
+     "passed": true
+    },
+    {
+     "id": "wirecard:insolvency-filed-2020-06-25",
+     "passed": true
+    },
+    {
+     "id": "wirecard:kpmg-special-audit-2020-04-28",
+     "passed": true
+    },
+    {
+     "id": "wirecard:zatarra-report-2016-02-24",
+     "passed": true
+    },
+    {
+     "id": "enron:chapter-11-filed-2001-12-02",
+     "passed": true
+    },
+    {
+     "id": "enron:q3-loss-and-equity-writedown-2001-10-16",
+     "passed": true
+    },
+    {
+     "id": "enron:restatement-1997-2000-2001-11-08",
+     "passed": true
+    },
+    {
+     "id": "enron:skilling-resigns-2001-08-14",
+     "passed": false
+    }
+   ],
+   "score": 0.8696,
+   "threshold": 0.8,
+   "total": 23,
+   "verdict": "worse, and not measurable on this corpus (at or below the constant baseline)"
+  },
+  {
+   "beats_constant_baseline": false,
+   "calibration": {
+    "bins": [
+     {
+      "accuracy": 0.0,
+      "bin": "0.3-0.4",
+      "mean_confidence": 0.3378,
+      "n": 1
+     },
+     {
+      "accuracy": 0.6667,
+      "bin": "0.4-0.5",
+      "mean_confidence": 0.4203,
+      "n": 3
+     }
+    ],
+    "ece": 0.2692,
+    "n": 4,
+    "questions": [
+     "stage"
+    ],
+    "shared_with": null
+   },
+   "clears_threshold_at_95": false,
+   "constant_baseline": {
+    "answer": "always product (0.625)",
+    "correct": 2,
+    "score": 0.5,
+    "total": 4
+   },
+   "corpus_digest": "8aad990237e0fde29d41f29925ab4d9bea38d76cbb4f13a57069a7680908be2f",
+   "correct": 2,
+   "heuristic_score": 1.0,
+   "lower_bound_95": 0.0976,
+   "metric": "evolution-judge",
+   "passed": false,
+   "per_item": [
+    {
+     "id": "carillion",
+     "passed": true
+    },
+    {
+     "id": "enron",
+     "passed": false
+    },
+    {
+     "id": "nmc",
+     "passed": true
+    },
+    {
+     "id": "wirecard",
+     "passed": false
+    }
+   ],
+   "score": 0.5,
+   "threshold": 0.75,
+   "total": 4,
+   "verdict": "worse, and not measurable on this corpus (at or below the constant baseline)"
+  },
+  {
+   "beats_constant_baseline": false,
+   "calibration": {
+    "bins": [
+     {
+      "accuracy": 0.5,
+      "bin": "0.3-0.4",
+      "mean_confidence": 0.3386,
+      "n": 2
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.4-0.5",
+      "mean_confidence": 0.4607,
+      "n": 1
+     },
+     {
+      "accuracy": 0.0,
+      "bin": "0.5-0.6",
+      "mean_confidence": 0.5171,
+      "n": 1
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.6-0.7",
+      "mean_confidence": 0.671,
+      "n": 3
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.7-0.8",
+      "mean_confidence": 0.7083,
+      "n": 3
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.8-0.9",
+      "mean_confidence": 0.84,
+      "n": 1
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.9-1.0",
+      "mean_confidence": 0.9052,
+      "n": 1
+     }
+    ],
+    "ece": 0.2913,
+    "n": 12,
+    "questions": [
+     "grade",
+     "lag",
+     "sign"
+    ],
+    "shared_with": null
+   },
+   "clears_threshold_at_95": false,
+   "constant_baseline": {
+    "answer": "always (positive, 30 days, mode 0.10)",
+    "correct": 1,
+    "score": 0.25,
+    "total": 4
+   },
+   "corpus_digest": "6c8f7f4a4aae6971954ea97e332b3131048dd90b0584c76bfabaf07def2f9c98",
+   "correct": 0,
+   "heuristic_score": 1.0,
+   "lower_bound_95": 0.0,
+   "metric": "causal-claims",
+   "passed": false,
+   "per_item": [
+    {
+     "id": "netflix:streaming-displaces-dvd",
+     "passed": false
+    },
+    {
+     "id": "netflix:cdn-capacity-lifts-streaming",
+     "passed": false
+    },
+    {
+     "id": "netflix:price-separation-erodes-goodwill",
+     "passed": false
+    },
+    {
+     "id": "intel:euv-delay-slips-the-node",
+     "passed": false
+    }
+   ],
+   "score": 0.0,
+   "threshold": 0.8,
+   "total": 4,
+   "verdict": "worse, and not measurable on this corpus (at or below the constant baseline)"
+  },
+  {
+   "beats_constant_baseline": true,
+   "calibration": {
+    "bins": [
+     {
+      "accuracy": 0.5,
+      "bin": "0.3-0.4",
+      "mean_confidence": 0.3386,
+      "n": 2
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.4-0.5",
+      "mean_confidence": 0.4607,
+      "n": 1
+     },
+     {
+      "accuracy": 0.0,
+      "bin": "0.5-0.6",
+      "mean_confidence": 0.5171,
+      "n": 1
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.6-0.7",
+      "mean_confidence": 0.671,
+      "n": 3
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.7-0.8",
+      "mean_confidence": 0.7083,
+      "n": 3
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.8-0.9",
+      "mean_confidence": 0.84,
+      "n": 1
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.9-1.0",
+      "mean_confidence": 0.9052,
+      "n": 1
+     }
+    ],
+    "ece": 0.2913,
+    "n": 12,
+    "questions": [
+     "grade",
+     "lag",
+     "sign"
+    ],
+    "shared_with": "(shared with causal-claims: one question set, two metrics)"
+   },
+   "clears_threshold_at_95": false,
+   "constant_baseline": {
+    "answer": "always grade 3",
+    "correct": 3,
+    "score": 0.75,
+    "total": 4
+   },
+   "corpus_digest": "6c8f7f4a4aae6971954ea97e332b3131048dd90b0584c76bfabaf07def2f9c98",
+   "correct": 4,
+   "heuristic_score": 1.0,
+   "lower_bound_95": 0.4729,
+   "metric": "causal-claims-grade-accuracy",
+   "passed": true,
+   "per_item": [
+    {
+     "id": "netflix:streaming-displaces-dvd",
+     "passed": true
+    },
+    {
+     "id": "netflix:cdn-capacity-lifts-streaming",
+     "passed": true
+    },
+    {
+     "id": "netflix:price-separation-erodes-goodwill",
+     "passed": true
+    },
+    {
+     "id": "intel:euv-delay-slips-the-node",
+     "passed": true
+    }
+   ],
+   "score": 1.0,
+   "threshold": 0.8,
+   "total": 4,
+   "verdict": "tied, but the corpus is too small to clear the threshold at 95% confidence"
+  },
+  {
+   "beats_constant_baseline": false,
+   "calibration": {
+    "bins": [
+     {
+      "accuracy": 0.6429,
+      "bin": "0.5-0.6",
+      "mean_confidence": 0.5637,
+      "n": 14
+     },
+     {
+      "accuracy": 0.5,
+      "bin": "0.6-0.7",
+      "mean_confidence": 0.6233,
+      "n": 2
+     },
+     {
+      "accuracy": 1.0,
+      "bin": "0.7-0.8",
+      "mean_confidence": 0.7737,
+      "n": 2
+     }
+    ],
+    "ece": 0.1004,
+    "n": 18,
+    "questions": [
+     "one per (play, component) pair"
+    ],
+    "shared_with": null
+   },
+   "clears_threshold_at_95": false,
+   "constant_baseline": {
+    "answer": "always propose nothing",
+    "correct": 1,
+    "score": 0.3333,
+    "total": 3
+   },
+   "corpus_digest": "be67c9b9eef9557d54fa1478e3be817d7201f6b2e7718ec0dedbd3518a3fed90",
+   "correct": 1,
+   "heuristic_score": 1.0,
+   "lower_bound_95": 0.017,
+   "metric": "gameplay-lens",
+   "passed": false,
+   "per_item": [
+    {
+     "id": "intel",
+     "passed": true
+    },
+    {
+     "id": "netflix",
+     "passed": false
+    },
+    {
+     "id": "pocket",
+     "passed": false
+    }
+   ],
+   "score": 0.3333,
+   "threshold": 0.65,
+   "total": 3,
+   "verdict": "worse, and not measurable on this corpus (at or below the constant baseline)"
+  },
+  {
+   "beats_constant_baseline": false,
+   "calibration": {
+    "bins": [
+     {
+      "accuracy": 0.2,
+      "bin": "0.6-0.7",
+      "mean_confidence": 0.6534,
+      "n": 5
+     }
+    ],
+    "ece": 0.4534,
+    "n": 5,
+    "questions": [
+     "outcome"
+    ],
+    "shared_with": null
+   },
+   "clears_threshold_at_95": false,
+   "constant_baseline": {
+    "answer": "always admit",
+    "correct": 1,
+    "score": 0.2,
+    "total": 5
+   },
+   "corpus_digest": "478b8081ecda531d81f5dd9c5b8a968dbf743f322597620b8fcc9ce19d97c387",
+   "correct": 1,
+   "heuristic_score": 1.0,
+   "lower_bound_95": 0.0102,
+   "metric": "ethics-gate",
+   "passed": false,
+   "per_item": [
+    {
+     "id": "bus-factor-structural-aggregate",
+     "passed": true
+    },
+    {
+     "id": "mood-sensor-no-scenario",
+     "passed": false
+    },
+    {
+     "id": "individual-email-content-when-aggregate-suffices",
+     "passed": false
+    },
+    {
+     "id": "expensive-surveillance-low-value",
+     "passed": false
+    },
+    {
+     "id": "keystroke-monitoring-no-dpia",
+     "passed": false
+    }
+   ],
+   "score": 0.2,
+   "threshold": 0.8,
+   "total": 5,
+   "verdict": "worse, and not measurable on this corpus (at or below the constant baseline)"
+  }
+ ],
+ "model_version": "laya-1c5edc17",
+ "not_measurable": {
+  "substrate-generator": "Laya is a classifier over typed questions and emits no tokens (`output_tokens: 0` on every call ticket 02 recorded). `substrate-generator` must GENERATE a multi-channel message schedule from a recipe. No rendering of the input makes a classifier able to produce that output, so this skill is not measurable against this model at all. It is reported as not measurable, never as a score of zero."
+ },
+ "pin": {
+  "repo_id": "convaiinnovations/laya",
+  "revision": "1c5edc17a7acd8701df6fc341c0d179f1c62c982",
+  "weights_sha256": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c"
+ },
+ "pooled_calibration": {
+  "ece_unweighted_mean_over_skills": 0.2347,
+  "ece_weighted_by_question_count": 0.1338,
+  "expected_by_item_8": 0.129,
+  "note": "raw and uncalibrated. The vendor's own typed-decisions file records 0.207 raw falling to 0.129 after a refit; item 8 told this ticket to expect about 0.13. The pooled raw figure here lands on that refit number without any refit, on a different question distribution, so the agreement is suggestive and not a like-for-like comparison. It is reported as such.",
+  "questions": 85
+ },
+ "recorded": [],
+ "run": {
+  "act_probability": {
+   "distinct": [
+    1.0
+   ],
+   "max": 1.0,
+   "min": 1.0,
+   "n": 93
+  },
+  "calls": 39,
+  "device": "cpu",
+  "dtype": "torch.float32",
+  "load_seconds": 7.52,
+  "measured_at": "2026-09-21T19:17:22+0100",
+  "ms_per_question": 182.46,
+  "predictions_sha256": "82727492d5bae4ee0c4ae29b5c2455914ef03c6ae5ef35a5a9829b5ea1c0823c",
+  "questions": 93,
+  "torch": "2.9.1",
+  "torch_threads": 4,
+  "wall_seconds": 16.97
+ },
+ "sensitivity_routes": {
+  "evolution-judge": {
+   "correct": 4,
+   "items": [
+    {
+     "abs_error": 0.0948,
+     "id": "carillion",
+     "label": 0.62,
+     "noul": 0.7148,
+     "passed": true
+    },
+    {
+     "abs_error": 0.0898,
+     "id": "enron",
+     "label": 0.45,
+     "noul": 0.5398,
+     "passed": true
+    },
+    {
+     "abs_error": 0.0901,
+     "id": "nmc",
+     "label": 0.55,
+     "noul": 0.6401,
+     "passed": true
+    },
+    {
+     "abs_error": 0.0385,
+     "id": "wirecard",
+     "label": 0.8,
+     "noul": 0.7615,
+     "passed": true
+    }
+   ],
+   "lower_bound_95": 0.4729,
+   "note": "declared before the run, reported after it, and NOT recorded as the score. On a four-item corpus the 95% lower bound cannot clear the 0.75 threshold even at 4/4, so this route and the primary one are not distinguishable here.",
+   "rank_order_matches_the_labels": true,
+   "route": "raw `noul`, read straight as the evolution position",
+   "score": 1.0,
+   "threshold": 0.75,
+   "total": 4
+  }
+ },
+ "ticket": "04"
+}

@@ -159,3 +159,42 @@ where it now lives.
    exactly that and will not read green while a copy survives. What this entry adds is only the
    attribution the record never carried: the promotion was the assistant's, made with no round,
    and it is listed rather than re-argued.
+
+## Amendments to the answers above, dated, with the original left as it stands
+
+### Q10 amended 2026-09-21 by the owner: a model may judge on a GitHub clock, within thresholds
+
+Recorded 2026-09-22 by wayfinder ticket 09, on
+[the Laya and loophole map](../../laya-loophole/map.md). Item 10 above is **not** rewritten. It
+recorded the owner's constraint of 2026-09-03, and that constraint was true when it was written.
+This note records what the owner added on 2026-09-21 and the condition that came with it.
+
+**The owner's answer.** "A model may judge on a GitHub clock, **within thresholds**."
+Owner-instructed, one of three answers given on 2026-09-21 when the map was charted. It amends
+this question's item 10 and [ADR-0024](../../../docs/adr/0024-the-daily-clock-the-caged-observation-lane-and-the-derived-ledger.md)
+point 6, both of which forbade exactly that.
+
+**The condition, as built.** "Within thresholds" is the versioned threshold in
+`twin/skill-thresholds.yaml`, and wayfinder ticket 05 turned it into **ten graded conditions** in
+`twin/model_permission.py`, with `verify/model-permission/verify-model-permission.sh` on the
+truth surface. The threshold alone was not enough: five of the seven thresholds sit at or below
+the best constant answer their own corpus admits, so a model that learned nothing clears one.
+
+**The scope.** The permission governs the **GitHub clock alone**. That is the clock the owner's
+words named, and the one ADR-0024 forbade before 2026-09-21. A `human` run and a local-clock run
+keep their own terms, so ticket 92's local clock is untouched and nothing that runs today runs
+differently. The clock is **derived** from `GITHUB_ACTIONS`, `GITHUB_RUN_ID` and
+`GITHUB_WORKFLOW`, never read off the file, because the route around a per-clock rule is to
+declare the wrong clock.
+
+**What it grants today: nothing.** **0 of 14 (metric, model version) pairs hold a permission on
+2026-09-21.** The candidate model is refused on items 1, 2, 5, 8 and 9; the incumbent heuristic
+on item 10, because it is graded on the corpus it was fitted on. A rule that cleared the
+incumbent and refused the candidate would be a rule fitted to the answer.
+
+**Where the detail lives.**
+[ADR-0029](../../../docs/adr/0029-a-candidate-model-enters-on-a-measured-permission-and-laya-does-not-hold-one.md)
+carries the measurement and the terms a candidate may re-enter on; ADR-0024 point 6 carries a
+dated note with the mechanism; `CONTEXT.md`'s **Twin** entry carries the amended sentence.
+Tickets 92 and 93 are unaffected: item 10's local clock and derived probability stand exactly as
+written.

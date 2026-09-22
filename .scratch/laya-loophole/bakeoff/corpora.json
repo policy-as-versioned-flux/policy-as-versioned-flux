@@ -1,0 +1,1349 @@
+{
+ "causal-claims": {
+  "corpus_digest": "6c8f7f4a4aae6971954ea97e332b3131048dd90b0584c76bfabaf07def2f9c98",
+  "items": [
+   {
+    "expected": {
+     "elasticity_mode": 0.45,
+     "evidence_grade": 3,
+     "lag_days": 180,
+     "sign": "negative"
+    },
+    "id": "netflix:streaming-displaces-dvd",
+    "input": {
+     "candidate_confounders": [
+      {
+       "id": "content-delivery-network",
+       "name": "Content delivery network"
+      }
+     ],
+     "evidence": [
+      {
+       "source": "netflix fixture, streaming-displaces-dvd",
+       "statement": "Streaming displacing physical-disc subscriptions is an established mechanism in media-industry literature and domain theory; the general substitution effect is documented in published accounts of digital disruption, but this organisation's own figure has not been separately measured. The effect is not visible for roughly six months after streaming take-up."
+      }
+     ],
+     "from": {
+      "id": "streaming-experience",
+      "name": "Streaming experience"
+     },
+     "to": {
+      "id": "dvd-by-mail",
+      "name": "DVD by mail"
+     }
+    }
+   },
+   {
+    "expected": {
+     "elasticity_mode": 0.25,
+     "evidence_grade": 2,
+     "lag_days": 60,
+     "sign": "positive"
+    },
+    "id": "netflix:cdn-capacity-lifts-streaming",
+    "input": {
+     "candidate_confounders": [
+      {
+       "id": "dvd-by-mail",
+       "name": "DVD by mail"
+      }
+     ],
+     "evidence": [
+      {
+       "source": "netflix fixture, cdn-capacity-lifts-streaming",
+       "statement": "Content-delivery capacity lifting streaming quality has been observed moving together, repeated across more than one delivery-network build-out rather than a single instance, felt within a couple of months of a build-out completing."
+      }
+     ],
+     "from": {
+      "id": "content-delivery-network",
+      "name": "Content delivery network"
+     },
+     "to": {
+      "id": "streaming-experience",
+      "name": "Streaming experience"
+     }
+    }
+   },
+   {
+    "expected": {
+     "elasticity_mode": 0.3,
+     "evidence_grade": 5,
+     "lag_days": 30,
+     "sign": "negative"
+    },
+    "id": "netflix:price-separation-erodes-goodwill",
+    "input": {
+     "candidate_confounders": [],
+     "evidence": [
+      {
+       "source": "netflix fixture, price-separation-erodes-goodwill",
+       "statement": "No dataset has observed this relationship and no study has published it; the claim that price separation erodes goodwill is asserted from general familiarity with brand economics, not from any measurement. If it exists at all it would show up within about a month."
+      }
+     ],
+     "from": {
+      "id": "dvd-by-mail",
+      "name": "DVD by mail"
+     },
+     "to": {
+      "id": "brand-goodwill",
+      "name": "Brand goodwill"
+     }
+    }
+   },
+   {
+    "expected": {
+     "elasticity_mode": 0.5,
+     "evidence_grade": 2,
+     "lag_days": 365,
+     "sign": "negative"
+    },
+    "id": "intel:euv-delay-slips-the-node",
+    "input": {
+     "candidate_confounders": [
+      {
+       "id": "foundry-services",
+       "name": "Foundry services"
+      }
+     ],
+     "evidence": [
+      {
+       "source": "intel fixture, euv-delay-slips-the-node",
+       "statement": "Lithography tooling deliveries slipping ahead of a process-node slip has been observed repeatedly, across more than one node generation in the semiconductor industry \u2014 a repeated historical co-movement rather than a single dated instance, taking a year or more to show up in the following node."
+      }
+     ],
+     "from": {
+      "id": "euv-lithography",
+      "name": "EUV lithography tooling"
+     },
+     "to": {
+      "id": "leading-edge-process-node",
+      "name": "Leading-edge process node"
+     }
+    }
+   }
+  ]
+ },
+ "ethics-gate": {
+  "corpus_digest": "478b8081ecda531d81f5dd9c5b8a968dbf743f322597620b8fcc9ce19d97c387",
+  "items": [
+   {
+    "expected": {
+     "admitted": true,
+     "stopped_at": null
+    },
+    "id": "bus-factor-structural-aggregate",
+    "input": {
+     "dpia": {
+      "channels": [],
+      "complete": false,
+      "financial_loss_risk": false,
+      "profiling": false
+     },
+     "necessity": {
+      "alternatives": [
+       {
+        "kind": "behavioural",
+        "level": "individual"
+       }
+      ],
+      "kind": "structural",
+      "level": "aggregate"
+     },
+     "proportionality": {
+      "intrusion_cost": 500.0,
+      "value_illuminated": 50000.0
+     },
+     "purpose": {
+      "scenario": "key-person-succession-planning",
+      "will_act": true
+     },
+     "sensor": {
+      "id": "bus-factor-structural-aggregate",
+      "name": "Commit-structure bus-factor, aggregated"
+     }
+    }
+   },
+   {
+    "expected": {
+     "admitted": false,
+     "stopped_at": "purpose"
+    },
+    "id": "mood-sensor-no-scenario",
+    "input": {
+     "dpia": {
+      "channels": [],
+      "complete": false,
+      "financial_loss_risk": false,
+      "profiling": false
+     },
+     "necessity": {
+      "alternatives": [],
+      "kind": "structural",
+      "level": "aggregate"
+     },
+     "proportionality": {
+      "intrusion_cost": 100.0,
+      "value_illuminated": 1000.0
+     },
+     "purpose": {
+      "scenario": "",
+      "will_act": false
+     },
+     "sensor": {
+      "id": "mood-sensor-no-scenario",
+      "name": "Ambient sentiment sensor"
+     }
+    }
+   },
+   {
+    "expected": {
+     "admitted": false,
+     "stopped_at": "necessity"
+    },
+    "id": "individual-email-content-when-aggregate-suffices",
+    "input": {
+     "dpia": {
+      "channels": [
+       "email"
+      ],
+      "complete": false,
+      "financial_loss_risk": false,
+      "profiling": false
+     },
+     "necessity": {
+      "alternatives": [
+       {
+        "kind": "structural",
+        "level": "aggregate"
+       }
+      ],
+      "kind": "behavioural",
+      "level": "individual"
+     },
+     "proportionality": {
+      "intrusion_cost": 1000.0,
+      "value_illuminated": 100000.0
+     },
+     "purpose": {
+      "scenario": "insider-risk-monitoring",
+      "will_act": true
+     },
+     "sensor": {
+      "id": "individual-email-content-when-aggregate-suffices",
+      "name": "Per-person email content scan"
+     }
+    }
+   },
+   {
+    "expected": {
+     "admitted": false,
+     "stopped_at": "proportionality"
+    },
+    "id": "expensive-surveillance-low-value",
+    "input": {
+     "dpia": {
+      "channels": [],
+      "complete": false,
+      "financial_loss_risk": false,
+      "profiling": false
+     },
+     "necessity": {
+      "alternatives": [],
+      "kind": "structural",
+      "level": "aggregate"
+     },
+     "proportionality": {
+      "intrusion_cost": 100000.0,
+      "value_illuminated": 1000.0
+     },
+     "purpose": {
+      "scenario": "attrition-risk-monitoring",
+      "will_act": true
+     },
+     "sensor": {
+      "id": "expensive-surveillance-low-value",
+      "name": "Full-team activity dashboard"
+     }
+    }
+   },
+   {
+    "expected": {
+     "admitted": false,
+     "stopped_at": null
+    },
+    "id": "keystroke-monitoring-no-dpia",
+    "input": {
+     "dpia": {
+      "channels": [
+       "keystroke"
+      ],
+      "complete": false,
+      "financial_loss_risk": false,
+      "profiling": false
+     },
+     "necessity": {
+      "alternatives": [],
+      "kind": "structural",
+      "level": "aggregate"
+     },
+     "proportionality": {
+      "intrusion_cost": 1000.0,
+      "value_illuminated": 50000.0
+     },
+     "purpose": {
+      "scenario": "insider-risk-monitoring",
+      "will_act": true
+     },
+     "sensor": {
+      "id": "keystroke-monitoring-no-dpia",
+      "name": "Keystroke-cadence monitor"
+     }
+    }
+   }
+  ]
+ },
+ "evolution-judge": {
+  "corpus_digest": "8aad990237e0fde29d41f29925ab4d9bea38d76cbb4f13a57069a7680908be2f",
+  "items": [
+   {
+    "expected": {
+     "evolution_position": 0.62
+    },
+    "id": "carillion",
+    "input": {
+     "component": {
+      "id": "carillion-uk-construction",
+      "name": "Carillion's UK construction and support-services business"
+     },
+     "evidence": [
+      {
+       "date": "2016-12-07",
+       "statement": "A trading update on financial performance generally and the UK construction business specifically. The FCA's 2022 decision notices later found this announcement, and two that followed it, reckless and misleading for not reflecting the business's true deterioration."
+      },
+      {
+       "date": "2017-03-01",
+       "statement": "A second trading update, also later found reckless and misleading by the FCA for the same reason as the 2016-12-07 announcement."
+      },
+      {
+       "date": "2017-05-03",
+       "statement": "A third trading update, the last of the three the FCA's 2022 decision notices found reckless and misleading \u2014 after this date the finding is that increasing financial risk in the UK construction business was being concealed rather than merely unrecognised."
+      },
+      {
+       "date": "2017-07-10",
+       "statement": "A profit warning: GBP 845m of contract write-downs concentrated in UK construction and Middle East markets, the chief executive resigns with immediate effect, the interim dividend is cancelled, and the shares lose roughly 70% of their value over the announcement and the two trading days that followed."
+      },
+      {
+       "date": "2017-09-29",
+       "statement": "A second profit warning: cumulative contract write-downs reach GBP 1,045m, equivalent to the company's previous seven years of profit combined."
+      },
+      {
+       "date": "2017-09-30",
+       "statement": "Carillion is reported among the most heavily shorted stocks on the London Stock Exchange by percentage of shares outstanding on loan \u2014 a dated, adversarial market position visible under the FCA's net-short-position disclosure regime, not a retrospective narrative."
+      },
+      {
+       "date": "2017-11-17",
+       "statement": "A third profit warning; the shares fall further and net debt guidance deteriorates again."
+      },
+      {
+       "date": "2018-01-15",
+       "statement": "A compulsory liquidation order is made against Carillion plc on the petition of its own directors. The High Court appoints the Official Receiver as liquidator with immediate effect."
+      }
+     ]
+    }
+   },
+   {
+    "expected": {
+     "evolution_position": 0.45
+    },
+    "id": "enron",
+    "input": {
+     "component": {
+      "id": "energy-trading-book",
+      "name": "The subject's energy-trading and mark-to-market business"
+     },
+     "evidence": [
+      {
+       "date": "2001-08-14",
+       "statement": "The president and chief executive resigns with no forewarning, citing personal reasons; the chairman resumes the CEO role he had held for fifteen years before the departing executive took it over."
+      },
+      {
+       "date": "2001-10-16",
+       "statement": "A third-quarter loss of USD 618 million is announced alongside a USD 1.2 billion reduction to shareholders' equity, tied to the unwind of related-party special-purpose entities."
+      },
+      {
+       "date": "2001-11-08",
+       "statement": "The subject restates 1997-2000 financial results, reducing previously reported net income by USD 586 million and increasing reported debt by USD 2.6 billion, after concluding three related-party special-purpose entities should have been consolidated onto its own balance sheet."
+      },
+      {
+       "date": "2001-12-02",
+       "statement": "The subject and a first group of affiliated entities file voluntary Chapter 11 petitions in the US Bankruptcy Court for the Southern District of New York \u2014 at the time the largest such filing in US history."
+      }
+     ]
+    }
+   },
+   {
+    "expected": {
+     "evolution_position": 0.55
+    },
+    "id": "nmc",
+    "input": {
+     "component": {
+      "id": "uk-listed-hospital-group",
+      "name": "The subject's UK-listed hospital operations"
+     },
+     "evidence": [
+      {
+       "date": "2019-12-17",
+       "statement": "A capital-backed short-seller publishes a dated research report alleging inflated asset purchase prices, an overstated cash balance and understated group debt, and discloses a short position in the subject."
+      },
+      {
+       "date": "2020-02-27",
+       "statement": "Trading in the subject's shares is suspended on the London Stock Exchange, the night after the chief executive is dismissed, the treasury team is suspended and the chief financial officer is granted an extended leave of absence."
+      },
+      {
+       "date": "2020-03-10",
+       "statement": "The subject discloses that group debt is materially above the previously reported figure, at approximately USD 5 billion against USD 2.1 billion last reported, and that over USD 2.7 billion of facilities were not previously disclosed to or approved by the board."
+      },
+      {
+       "date": "2020-03-24",
+       "statement": "The subject discloses group debt now estimated at approximately USD 6.6 billion, comprised of over 75 debt facilities from over 80 financial institutions; the chief financial officer resigns with immediate effect."
+      },
+      {
+       "date": "2020-04-09",
+       "statement": "The High Court of England and Wales appoints administrators to the subject's UK holding company following a creditor petition."
+      }
+     ]
+    }
+   },
+   {
+    "expected": {
+     "evolution_position": 0.8
+    },
+    "id": "wirecard",
+    "input": {
+     "component": {
+      "id": "third-party-acquiring-business",
+      "name": "The subject's third-party payment-acquiring business"
+     },
+     "evidence": [
+      {
+       "date": "2016-02-24",
+       "statement": "An anonymous 100-page dossier alleges money laundering and accounting irregularities tied to the subject's Asian operations; the subject's shares fall sharply intraday before recovering most of the loss on the CEO's denial."
+      },
+      {
+       "date": "2019-01-30",
+       "statement": "A Financial Times investigation, drawing on internal whistleblower documents, alleges forged and backdated contracts in a string of suspicious transactions in the subject's Asia-Pacific business."
+      },
+      {
+       "date": "2019-02-18",
+       "statement": "Germany's federal financial regulator bans, with immediate effect, the establishment or increase of net short positions in the subject's shares \u2014 its first-ever single-firm short ban, and a dated, official record that the subject's accounts were under public dispute."
+      },
+      {
+       "date": "2020-04-28",
+       "statement": "A special audit commissioned in response to the press allegations reports that KPMG could not verify the majority of the third-party acquiring business's reported sales revenue and customer relationships for 2016-2018."
+      },
+      {
+       "date": "2020-06-18",
+       "statement": "The subject's auditor declines to sign off the prior year's accounts, stating it cannot find sufficient evidence for EUR 1.9 billion of cash reported on trust accounts, around a quarter of the balance sheet; the subject notes indications the confirming balances may have been falsified."
+      },
+      {
+       "date": "2020-06-25",
+       "statement": "The management board files an application for the opening of insolvency proceedings with the district court of Munich, citing impending insolvency and over-indebtedness."
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "gameplay-lens": {
+  "corpus_digest": "be67c9b9eef9557d54fa1478e3be817d7201f6b2e7718ec0dedbd3518a3fed90",
+  "items": [
+   {
+    "expected": {
+     "opportunities": []
+    },
+    "id": "intel",
+    "input": {
+     "edges": [
+      {
+       "confidence": 0.4,
+       "degenerate_elasticity": true,
+       "elasticity": {
+        "max": 0.5,
+        "min": 0.5,
+        "mode": 0.5
+       },
+       "evidence_grade": 2,
+       "evidence_grade_name": "repeated historical co-movement",
+       "from": "euv-lithography",
+       "id": "euv-delay-slips-the-node",
+       "lag_days": 365,
+       "may_price": true,
+       "sign": "negative",
+       "to": "leading-edge-process-node",
+       "type": "influences"
+      },
+      {
+       "from": "foundry-services",
+       "id": "foundry-services--needs--euv-lithography",
+       "to": "euv-lithography",
+       "type": "needs"
+      },
+      {
+       "from": "foundry-services",
+       "id": "foundry-services--needs--leading-edge-process-node",
+       "to": "leading-edge-process-node",
+       "type": "needs"
+      }
+     ],
+     "org_components": [
+      "foundry-services"
+     ],
+     "positions": [
+      {
+       "commodity_leverage": 0.74375,
+       "component": "cloud-compute",
+       "differentiation_pressure": 0.01875,
+       "evolution": 0.875,
+       "evolution_position_authored": false,
+       "stage": "commodity",
+       "visibility": 0.15
+      },
+      {
+       "commodity_leverage": 0.40625,
+       "component": "content-delivery-network",
+       "differentiation_pressure": 0.13124999999999998,
+       "evolution": 0.625,
+       "evolution_position_authored": false,
+       "stage": "product",
+       "visibility": 0.35
+      },
+      {
+       "commodity_leverage": 0.30000000000000004,
+       "component": "euv-lithography",
+       "differentiation_pressure": 0.125,
+       "evolution": 0.375,
+       "evolution_position_authored": false,
+       "stage": "custom-built",
+       "visibility": 0.2
+      },
+      {
+       "commodity_leverage": 0.11250000000000002,
+       "component": "foundry-services",
+       "differentiation_pressure": 0.4375,
+       "evolution": 0.375,
+       "evolution_position_authored": false,
+       "stage": "custom-built",
+       "visibility": 0.7
+      },
+      {
+       "commodity_leverage": 0.34375,
+       "component": "leading-edge-process-node",
+       "differentiation_pressure": 0.16875,
+       "evolution": 0.625,
+       "evolution_position_authored": false,
+       "stage": "product",
+       "visibility": 0.45
+      }
+     ]
+    }
+   },
+   {
+    "expected": {
+     "opportunities": [
+      [
+       "land-grab",
+       "streaming-experience"
+      ]
+     ]
+    },
+    "id": "netflix",
+    "input": {
+     "edges": [
+      {
+       "confidence": 0.55,
+       "degenerate_elasticity": false,
+       "elasticity": {
+        "max": 0.4,
+        "min": 0.1,
+        "mode": 0.25
+       },
+       "evidence_grade": 2,
+       "evidence_grade_name": "repeated historical co-movement",
+       "from": "content-delivery-network",
+       "id": "cdn-capacity-lifts-streaming",
+       "lag_days": 60,
+       "may_price": true,
+       "sign": "positive",
+       "to": "streaming-experience",
+       "type": "influences"
+      },
+      {
+       "confidence": 0.2,
+       "degenerate_elasticity": false,
+       "elasticity": {
+        "max": 0.9,
+        "min": 0.05,
+        "mode": 0.3
+       },
+       "evidence_grade": 5,
+       "evidence_grade_name": "model assertion",
+       "from": "dvd-by-mail",
+       "id": "price-separation-erodes-goodwill",
+       "lag_days": 30,
+       "may_price": false,
+       "sign": "negative",
+       "to": "brand-goodwill",
+       "type": "influences"
+      },
+      {
+       "confidence": 0.5,
+       "degenerate_elasticity": false,
+       "elasticity": {
+        "max": 0.8,
+        "min": 0.2,
+        "mode": 0.45
+       },
+       "evidence_grade": 3,
+       "evidence_grade_name": "literature or domain theory",
+       "from": "streaming-experience",
+       "id": "streaming-displaces-dvd",
+       "lag_days": 180,
+       "may_price": false,
+       "sign": "negative",
+       "to": "dvd-by-mail",
+       "type": "influences"
+      },
+      {
+       "from": "alex-rivera",
+       "id": "alex-knows-cloud-compute",
+       "to": "cloud-compute",
+       "type": "knows"
+      },
+      {
+       "from": "alex-rivera",
+       "id": "alex-maintains-streaming-experience",
+       "to": "streaming-experience",
+       "type": "maintains"
+      },
+      {
+       "from": "dvd-by-mail",
+       "id": "dvd-by-mail--needs--content-delivery-network",
+       "to": "content-delivery-network",
+       "type": "needs"
+      },
+      {
+       "from": "streaming-experience",
+       "id": "streaming-experience--needs--cloud-compute",
+       "to": "cloud-compute",
+       "type": "needs"
+      },
+      {
+       "from": "streaming-experience",
+       "id": "streaming-experience--needs--content-delivery-network",
+       "to": "content-delivery-network",
+       "type": "needs"
+      },
+      {
+       "from": "sam-okafor",
+       "id": "sam-owns-dvd-by-mail",
+       "to": "dvd-by-mail",
+       "type": "owns"
+      }
+     ],
+     "org_components": [
+      "brand-goodwill",
+      "dvd-by-mail",
+      "streaming-experience"
+     ],
+     "positions": [
+      {
+       "commodity_leverage": 0.05,
+       "component": "brand-goodwill",
+       "differentiation_pressure": 0.525,
+       "evolution": 0.125,
+       "evolution_position_authored": false,
+       "stage": "genesis",
+       "visibility": 0.6
+      },
+      {
+       "commodity_leverage": 0.74375,
+       "component": "cloud-compute",
+       "differentiation_pressure": 0.01875,
+       "evolution": 0.875,
+       "evolution_position_authored": false,
+       "stage": "commodity",
+       "visibility": 0.15
+      },
+      {
+       "commodity_leverage": 0.40625,
+       "component": "content-delivery-network",
+       "differentiation_pressure": 0.13124999999999998,
+       "evolution": 0.625,
+       "evolution_position_authored": false,
+       "stage": "product",
+       "visibility": 0.35
+      },
+      {
+       "commodity_leverage": 0.13125000000000003,
+       "component": "dvd-by-mail",
+       "differentiation_pressure": 0.10625,
+       "evolution": 0.875,
+       "evolution_position_authored": false,
+       "stage": "commodity",
+       "visibility": 0.85
+      },
+      {
+       "commodity_leverage": 0.30000000000000004,
+       "component": "euv-lithography",
+       "differentiation_pressure": 0.125,
+       "evolution": 0.375,
+       "evolution_position_authored": false,
+       "stage": "custom-built",
+       "visibility": 0.2
+      },
+      {
+       "commodity_leverage": 0.34375,
+       "component": "leading-edge-process-node",
+       "differentiation_pressure": 0.16875,
+       "evolution": 0.625,
+       "evolution_position_authored": false,
+       "stage": "product",
+       "visibility": 0.45
+      },
+      {
+       "commodity_leverage": 0.062499999999999986,
+       "component": "streaming-experience",
+       "differentiation_pressure": 0.3375,
+       "evolution": 0.625,
+       "evolution_position_authored": false,
+       "stage": "product",
+       "visibility": 0.9
+      }
+     ]
+    }
+   },
+   {
+    "expected": {
+     "opportunities": [
+      [
+       "exploit-commoditisation",
+       "shared-database"
+      ]
+     ]
+    },
+    "id": "pocket",
+    "input": {
+     "edges": [
+      {
+       "confidence": 0.5,
+       "degenerate_elasticity": true,
+       "elasticity": {
+        "max": 0.4,
+        "min": 0.4,
+        "mode": 0.4
+       },
+       "evidence_grade": 2,
+       "evidence_grade_name": "repeated historical co-movement",
+       "from": "order-service",
+       "id": "orders-slow-the-portal",
+       "lag_days": 14,
+       "may_price": true,
+       "sign": "negative",
+       "to": "customer-portal",
+       "type": "influences"
+      },
+      {
+       "confidence": 0.4,
+       "degenerate_elasticity": true,
+       "elasticity": {
+        "max": 0.5,
+        "min": 0.5,
+        "mode": 0.5
+       },
+       "evidence_grade": 3,
+       "evidence_grade_name": "literature or domain theory",
+       "from": "order-service",
+       "id": "orders-slow-payments",
+       "lag_days": 3,
+       "may_price": false,
+       "sign": "negative",
+       "to": "payment-gateway",
+       "type": "influences"
+      },
+      {
+       "confidence": 0.4,
+       "degenerate_elasticity": true,
+       "elasticity": {
+        "max": 0.5,
+        "min": 0.5,
+        "mode": 0.5
+       },
+       "evidence_grade": 3,
+       "evidence_grade_name": "literature or domain theory",
+       "from": "payment-gateway",
+       "id": "payments-lift-the-portal",
+       "lag_days": 5,
+       "may_price": false,
+       "sign": "positive",
+       "to": "customer-portal",
+       "type": "influences"
+      },
+      {
+       "calibration": {
+        "date": "2025-12-15",
+        "estimator": "model-steward",
+        "reference_class": "outage-postmortems-for-shared-database-dependencies-on-order-processing"
+       },
+       "confidence": 0.6,
+       "degenerate_elasticity": false,
+       "elasticity": {
+        "max": 0.7,
+        "min": 0.3,
+        "mode": 0.5
+       },
+       "evidence_grade": 3,
+       "evidence_grade_name": "literature or domain theory",
+       "from": "shared-database",
+       "id": "database-slows-orders",
+       "lag_days": 7,
+       "may_price": false,
+       "sign": "negative",
+       "to": "order-service",
+       "type": "influences"
+      },
+      {
+       "from": "customer-portal",
+       "id": "customer-portal--needs--order-service",
+       "to": "order-service",
+       "type": "needs"
+      },
+      {
+       "from": "identity-store",
+       "id": "identity-store--needs--shared-database",
+       "to": "shared-database",
+       "type": "needs"
+      },
+      {
+       "from": "order-service",
+       "id": "order-service--needs--identity-store",
+       "to": "identity-store",
+       "type": "needs"
+      },
+      {
+       "from": "order-service",
+       "id": "order-service--needs--payment-gateway",
+       "to": "payment-gateway",
+       "type": "needs"
+      }
+     ],
+     "org_components": [
+      "customer-portal",
+      "identity-store",
+      "order-service",
+      "payment-gateway",
+      "shared-database"
+     ],
+     "positions": [
+      {
+       "commodity_leverage": 0.059999999999999984,
+       "component": "customer-portal",
+       "differentiation_pressure": 0.36000000000000004,
+       "evolution": 0.6,
+       "evolution_position_authored": true,
+       "stage": "product",
+       "visibility": 0.9
+      },
+      {
+       "commodity_leverage": 0.27999999999999997,
+       "component": "identity-store",
+       "differentiation_pressure": 0.18,
+       "evolution": 0.4,
+       "evolution_position_authored": true,
+       "stage": "custom-built",
+       "visibility": 0.3
+      },
+      {
+       "commodity_leverage": 0.15000000000000002,
+       "component": "order-service",
+       "differentiation_pressure": 0.35,
+       "evolution": 0.5,
+       "evolution_position_authored": true,
+       "stage": "product",
+       "visibility": 0.7
+      },
+      {
+       "commodity_leverage": 0.4,
+       "component": "payment-gateway",
+       "differentiation_pressure": 0.09999999999999998,
+       "evolution": 0.8,
+       "evolution_position_authored": true,
+       "stage": "commodity",
+       "visibility": 0.5
+      },
+      {
+       "commodity_leverage": 0.81,
+       "component": "shared-database",
+       "differentiation_pressure": 0.009999999999999998,
+       "evolution": 0.9,
+       "evolution_position_authored": true,
+       "stage": "commodity",
+       "visibility": 0.1
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "signal-classify": {
+  "corpus_digest": "d5f0c6610fae0cd9d85a1659e8cfca88c08918a10187dd9c3cf7e995981db198",
+  "items": [
+   {
+    "expected": {
+     "component": "carillion-uk-construction",
+     "steep": "political"
+    },
+    "id": "carillion:compulsory-liquidation-2018-01-15",
+    "input": {
+     "candidates": [
+      {
+       "id": "carillion-uk-construction",
+       "name": "Carillion's UK construction and support-services business"
+      }
+     ],
+     "source": "High Court compulsory liquidation order, 2018-01-15",
+     "statement": "A compulsory liquidation order is made against Carillion plc on the petition of its own directors. The High Court appoints the Official Receiver as liquidator with immediate effect."
+    }
+   },
+   {
+    "expected": {
+     "component": "carillion-uk-construction",
+     "steep": "economic"
+    },
+    "id": "carillion:profit-warning-2017-07-10",
+    "input": {
+     "candidates": [
+      {
+       "id": "carillion-uk-construction",
+       "name": "Carillion's UK construction and support-services business"
+      }
+     ],
+     "source": "Carillion plc trading update and press coverage, 2017-07-10",
+     "statement": "A profit warning: GBP 845m of contract write-downs concentrated in UK construction and Middle East markets, the chief executive resigns with immediate effect, the interim dividend is cancelled, and the shares lose roughly 70% of their value over the announcement and the two trading days that followed."
+    }
+   },
+   {
+    "expected": {
+     "component": "carillion-uk-construction",
+     "steep": "economic"
+    },
+    "id": "carillion:profit-warning-2017-09-29",
+    "input": {
+     "candidates": [
+      {
+       "id": "carillion-uk-construction",
+       "name": "Carillion's UK construction and support-services business"
+      }
+     ],
+     "source": "Carillion plc trading update, 2017-09-29",
+     "statement": "A second profit warning: cumulative contract write-downs reach GBP 1,045m, equivalent to the company's previous seven years of profit combined."
+    }
+   },
+   {
+    "expected": {
+     "component": "carillion-uk-construction",
+     "steep": "economic"
+    },
+    "id": "carillion:profit-warning-2017-11-17",
+    "input": {
+     "candidates": [
+      {
+       "id": "carillion-uk-construction",
+       "name": "Carillion's UK construction and support-services business"
+      }
+     ],
+     "source": "Carillion plc trading update, 2017-11-17",
+     "statement": "A third profit warning; the shares fall further and net debt guidance deteriorates again."
+    }
+   },
+   {
+    "expected": {
+     "component": "carillion-uk-construction",
+     "steep": "economic"
+    },
+    "id": "carillion:rns-2016-12-07",
+    "input": {
+     "candidates": [
+      {
+       "id": "carillion-uk-construction",
+       "name": "Carillion's UK construction and support-services business"
+      }
+     ],
+     "source": "Carillion plc RNS announcement, 2016-12-07",
+     "statement": "A trading update on financial performance generally and the UK construction business specifically. The FCA's 2022 decision notices later found this announcement, and two that followed it, reckless and misleading for not reflecting the business's true deterioration."
+    }
+   },
+   {
+    "expected": {
+     "component": "carillion-uk-construction",
+     "steep": "economic"
+    },
+    "id": "carillion:rns-2017-03-01",
+    "input": {
+     "candidates": [
+      {
+       "id": "carillion-uk-construction",
+       "name": "Carillion's UK construction and support-services business"
+      }
+     ],
+     "source": "Carillion plc RNS announcement, 2017-03-01",
+     "statement": "A second trading update, also later found reckless and misleading by the FCA for the same reason as the 2016-12-07 announcement."
+    }
+   },
+   {
+    "expected": {
+     "component": "carillion-uk-construction",
+     "steep": "economic"
+    },
+    "id": "carillion:rns-2017-05-03",
+    "input": {
+     "candidates": [
+      {
+       "id": "carillion-uk-construction",
+       "name": "Carillion's UK construction and support-services business"
+      }
+     ],
+     "source": "Carillion plc RNS announcement, 2017-05-03",
+     "statement": "A third trading update, the last of the three the FCA's 2022 decision notices found reckless and misleading \u2014 after this date the finding is that increasing financial risk in the UK construction business was being concealed rather than merely unrecognised."
+    }
+   },
+   {
+    "expected": {
+     "component": "carillion-uk-construction",
+     "steep": "economic"
+    },
+    "id": "carillion:short-interest-2017-09-30",
+    "input": {
+     "candidates": [
+      {
+       "id": "carillion-uk-construction",
+       "name": "Carillion's UK construction and support-services business"
+      }
+     ],
+     "source": "IHS Markit securities-lending data, reported in financial press, 2017-09-30",
+     "statement": "Carillion is reported among the most heavily shorted stocks on the London Stock Exchange by percentage of shares outstanding on loan \u2014 a dated, adversarial market position visible under the FCA's net-short-position disclosure regime, not a retrospective narrative."
+    }
+   },
+   {
+    "expected": {
+     "component": "uk-listed-hospital-group",
+     "steep": "economic"
+    },
+    "id": "nmc:administrators-appointed-2020-04-09",
+    "input": {
+     "candidates": [
+      {
+       "id": "uk-listed-hospital-group",
+       "name": "The subject's UK-listed hospital operations"
+      }
+     ],
+     "source": "Company announcement, 2020-04-09",
+     "statement": "The High Court of England and Wales appoints administrators to the subject's UK holding company following a creditor petition."
+    }
+   },
+   {
+    "expected": {
+     "component": "uk-listed-hospital-group",
+     "steep": "economic"
+    },
+    "id": "nmc:debt-revised-5bn-2020-03-10",
+    "input": {
+     "candidates": [
+      {
+       "id": "uk-listed-hospital-group",
+       "name": "The subject's UK-listed hospital operations"
+      }
+     ],
+     "source": "Company trading update, 2020-03-10",
+     "statement": "The subject discloses that group debt is materially above the previously reported figure, at approximately USD 5 billion against USD 2.1 billion last reported, and that over USD 2.7 billion of facilities were not previously disclosed to or approved by the board."
+    }
+   },
+   {
+    "expected": {
+     "component": "uk-listed-hospital-group",
+     "steep": "economic"
+    },
+    "id": "nmc:debt-revised-6-6bn-2020-03-24",
+    "input": {
+     "candidates": [
+      {
+       "id": "uk-listed-hospital-group",
+       "name": "The subject's UK-listed hospital operations"
+      }
+     ],
+     "source": "Company disclosure via the London Stock Exchange, 2020-03-24",
+     "statement": "The subject discloses group debt now estimated at approximately USD 6.6 billion, comprised of over 75 debt facilities from over 80 financial institutions; the chief financial officer resigns with immediate effect."
+    }
+   },
+   {
+    "expected": {
+     "component": "uk-listed-hospital-group",
+     "steep": "economic"
+    },
+    "id": "nmc:muddy-waters-report-2019-12-17",
+    "input": {
+     "candidates": [
+      {
+       "id": "uk-listed-hospital-group",
+       "name": "The subject's UK-listed hospital operations"
+      }
+     ],
+     "source": "Muddy Waters Capital LLC research report, 2019-12-17",
+     "statement": "A capital-backed short-seller publishes a dated research report alleging inflated asset purchase prices, an overstated cash balance and understated group debt, and discloses a short position in the subject."
+    }
+   },
+   {
+    "expected": {
+     "component": "uk-listed-hospital-group",
+     "steep": "economic"
+    },
+    "id": "nmc:trading-suspended-2020-02-27",
+    "input": {
+     "candidates": [
+      {
+       "id": "uk-listed-hospital-group",
+       "name": "The subject's UK-listed hospital operations"
+      }
+     ],
+     "source": "Financial press, 2020-02-27",
+     "statement": "Trading in the subject's shares is suspended on the London Stock Exchange, the night after the chief executive is dismissed, the treasury team is suspended and the chief financial officer is granted an extended leave of absence."
+    }
+   },
+   {
+    "expected": {
+     "component": "third-party-acquiring-business",
+     "steep": "political"
+    },
+    "id": "wirecard:bafin-short-selling-ban-2019-02-18",
+    "input": {
+     "candidates": [
+      {
+       "id": "third-party-acquiring-business",
+       "name": "The subject's third-party payment-acquiring business"
+      }
+     ],
+     "source": "BaFin General Administrative Act, 2019-02-18",
+     "statement": "Germany's federal financial regulator bans, with immediate effect, the establishment or increase of net short positions in the subject's shares \u2014 its first-ever single-firm short ban, and a dated, official record that the subject's accounts were under public dispute."
+    }
+   },
+   {
+    "expected": {
+     "component": "third-party-acquiring-business",
+     "steep": "economic"
+    },
+    "id": "wirecard:ey-refuses-signoff-2020-06-18",
+    "input": {
+     "candidates": [
+      {
+       "id": "third-party-acquiring-business",
+       "name": "The subject's third-party payment-acquiring business"
+      }
+     ],
+     "source": "Auditor statement reported in financial press, 2020-06-18",
+     "statement": "The subject's auditor declines to sign off the prior year's accounts, stating it cannot find sufficient evidence for EUR 1.9 billion of cash reported on trust accounts, around a quarter of the balance sheet; the subject notes indications the confirming balances may have been falsified."
+    }
+   },
+   {
+    "expected": {
+     "component": "third-party-acquiring-business",
+     "steep": "economic"
+    },
+    "id": "wirecard:ft-investigation-2019-01-30",
+    "input": {
+     "candidates": [
+      {
+       "id": "third-party-acquiring-business",
+       "name": "The subject's third-party payment-acquiring business"
+      }
+     ],
+     "source": "Press coverage of the Financial Times investigation, 2019-01-30",
+     "statement": "A Financial Times investigation, drawing on internal whistleblower documents, alleges forged and backdated contracts in a string of suspicious transactions in the subject's Asia-Pacific business."
+    }
+   },
+   {
+    "expected": {
+     "component": "third-party-acquiring-business",
+     "steep": "economic"
+    },
+    "id": "wirecard:insolvency-filed-2020-06-25",
+    "input": {
+     "candidates": [
+      {
+       "id": "third-party-acquiring-business",
+       "name": "The subject's third-party payment-acquiring business"
+      }
+     ],
+     "source": "Company disclosure under EU Market Abuse Regulation Article 17, 2020-06-25",
+     "statement": "The management board files an application for the opening of insolvency proceedings with the district court of Munich, citing impending insolvency and over-indebtedness."
+    }
+   },
+   {
+    "expected": {
+     "component": "third-party-acquiring-business",
+     "steep": "economic"
+    },
+    "id": "wirecard:kpmg-special-audit-2020-04-28",
+    "input": {
+     "candidates": [
+      {
+       "id": "third-party-acquiring-business",
+       "name": "The subject's third-party payment-acquiring business"
+      }
+     ],
+     "source": "KPMG special audit report, delivered 2020-04-27, disclosed 2020-04-28",
+     "statement": "A special audit commissioned in response to the press allegations reports that KPMG could not verify the majority of the third-party acquiring business's reported sales revenue and customer relationships for 2016-2018."
+    }
+   },
+   {
+    "expected": {
+     "component": "third-party-acquiring-business",
+     "steep": "economic"
+    },
+    "id": "wirecard:zatarra-report-2016-02-24",
+    "input": {
+     "candidates": [
+      {
+       "id": "third-party-acquiring-business",
+       "name": "The subject's third-party payment-acquiring business"
+      }
+     ],
+     "source": "Contemporaneous commentary on the anonymous Zatarra Research & Investigations dossier",
+     "statement": "An anonymous 100-page dossier alleges money laundering and accounting irregularities tied to the subject's Asian operations; the subject's shares fall sharply intraday before recovering most of the loss on the CEO's denial."
+    }
+   },
+   {
+    "expected": {
+     "component": "energy-trading-book",
+     "steep": "economic"
+    },
+    "id": "enron:chapter-11-filed-2001-12-02",
+    "input": {
+     "candidates": [
+      {
+       "id": "energy-trading-book",
+       "name": "The subject's energy-trading and mark-to-market business"
+      }
+     ],
+     "source": "The subject's own SEC 8-K press-release exhibit, 2001-12-02",
+     "statement": "The subject and a first group of affiliated entities file voluntary Chapter 11 petitions in the US Bankruptcy Court for the Southern District of New York \u2014 at the time the largest such filing in US history."
+    }
+   },
+   {
+    "expected": {
+     "component": "energy-trading-book",
+     "steep": "economic"
+    },
+    "id": "enron:q3-loss-and-equity-writedown-2001-10-16",
+    "input": {
+     "candidates": [
+      {
+       "id": "energy-trading-book",
+       "name": "The subject's energy-trading and mark-to-market business"
+      }
+     ],
+     "source": "The subject's own SEC 8-K earnings-release exhibit, 2001-10-16",
+     "statement": "A third-quarter loss of USD 618 million is announced alongside a USD 1.2 billion reduction to shareholders' equity, tied to the unwind of related-party special-purpose entities."
+    }
+   },
+   {
+    "expected": {
+     "component": "energy-trading-book",
+     "steep": "economic"
+    },
+    "id": "enron:restatement-1997-2000-2001-11-08",
+    "input": {
+     "candidates": [
+      {
+       "id": "energy-trading-book",
+       "name": "The subject's energy-trading and mark-to-market business"
+      }
+     ],
+     "source": "The subject's own SEC 8-K filing, 2001-11-08",
+     "statement": "The subject restates 1997-2000 financial results, reducing previously reported net income by USD 586 million and increasing reported debt by USD 2.6 billion, after concluding three related-party special-purpose entities should have been consolidated onto its own balance sheet."
+    }
+   },
+   {
+    "expected": {
+     "component": "energy-trading-book",
+     "steep": "economic"
+    },
+    "id": "enron:skilling-resigns-2001-08-14",
+    "input": {
+     "candidates": [
+      {
+       "id": "energy-trading-book",
+       "name": "The subject's energy-trading and mark-to-market business"
+      }
+     ],
+     "source": "Press coverage of the subject's own announcement, 2001-08-14",
+     "statement": "The president and chief executive resigns with no forewarning, citing personal reasons; the chairman resumes the CEO role he had held for fifteen years before the departing executive took it over."
+    }
+   }
+  ]
+ },
+ "substrate-generator": {
+  "corpus_digest": "8a28c7d8fc6dc5b30670d0192d8450d235171b31702f596a4f470b89494c9898",
+  "items": [
+   {
+    "expected": {
+     "channels": [
+      "events",
+      "communications",
+      "hr",
+      "telemetry"
+     ],
+     "min_mundane_fraction": 0.7,
+     "planted_signals": []
+    },
+    "id": "quiet-week",
+    "input": "id: ops-quiet-week\nmodel_version: toy-model-v1\nplanted_signals: []\nschema: twin.substrate-recipe/v1\nseed: 101\ntemplates:\n- 'Lunch order chat in #ops.'\n- A long thread about the staging environment.\n- Expense report chasing.\n- Sprint planning grumbling.\n- Someone asking if the deploy window moved again.\n- A calendar invite nobody can attend gets rescheduled twice.\n- Routine access request for a shared drive.\n- Onboarding checklist ticked off for a new starter.\n"
+   },
+   {
+    "expected": {
+     "channels": [
+      "events",
+      "communications",
+      "hr",
+      "telemetry"
+     ],
+     "min_mundane_fraction": 0.7,
+     "planted_signals": [
+      "unusual after-hours access to the finance share",
+      "a senior engineer's calendar clears for three unexplained days"
+     ]
+    },
+    "id": "sparse-plants",
+    "input": "id: ops-sparse-plants\nmodel_version: toy-model-v1\nplanted_signals:\n- unusual after-hours access to the finance share\n- a senior engineer's calendar clears for three unexplained days\nschema: twin.substrate-recipe/v1\nseed: 202\ntemplates:\n- 'Lunch order chat in #ops.'\n- A long thread about the staging environment.\n- Expense report chasing.\n- Sprint planning grumbling.\n- Someone asking if the deploy window moved again.\n- A calendar invite nobody can attend gets rescheduled twice.\n- Routine access request for a shared drive.\n- Onboarding checklist ticked off for a new starter.\n"
+   },
+   {
+    "expected": {
+     "channels": [
+      "events",
+      "communications",
+      "hr",
+      "telemetry"
+     ],
+     "min_mundane_fraction": 0.7,
+     "planted_signals": [
+      "unusual after-hours access to the finance share",
+      "a senior engineer's calendar clears for three unexplained days",
+      "a contractor's laptop returned unexpectedly early",
+      "an internal all-hands abruptly cancelled with no reason given"
+     ]
+    },
+    "id": "dense-plants",
+    "input": "id: ops-dense-plants\nmodel_version: toy-model-v1\nplanted_signals:\n- unusual after-hours access to the finance share\n- a senior engineer's calendar clears for three unexplained days\n- a contractor's laptop returned unexpectedly early\n- an internal all-hands abruptly cancelled with no reason given\nschema: twin.substrate-recipe/v1\nseed: 303\ntemplates:\n- 'Lunch order chat in #ops.'\n- A long thread about the staging environment.\n- Expense report chasing.\n- Sprint planning grumbling.\n- Someone asking if the deploy window moved again.\n- A calendar invite nobody can attend gets rescheduled twice.\n- Routine access request for a shared drive.\n- Onboarding checklist ticked off for a new starter.\n"
+   }
+  ]
+ }
+}

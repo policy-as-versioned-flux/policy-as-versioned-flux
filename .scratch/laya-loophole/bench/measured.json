@@ -1,0 +1,212 @@
+{
+  "ticket": "02",
+  "repo_id": "convaiinnovations/laya",
+  "revision": "1c5edc17a7acd8701df6fc341c0d179f1c62c982",
+  "weights_sha256": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c",
+  "file_digests_before_load": {
+    "rl_agent_config.json": "ae287b56bbcf5f8c4f4541ae9dfd00c914c4c48b940b8398c3058af37ba92bbd",
+    "model.safetensors": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c",
+    "encoder/config.json": "bf3ab80598fdccf414855a2ce80f22859e4492d06ca8a62ddd1cfb63972f8979",
+    "tokenizer/tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+    "tokenizer/tokenizer_config.json": "50044de60daaa73df97d262e15a40d4faf0160e7d742df64b377877a1320dd12"
+  },
+  "file_digests_after_load": {
+    "rl_agent_config.json": "ae287b56bbcf5f8c4f4541ae9dfd00c914c4c48b940b8398c3058af37ba92bbd",
+    "model.safetensors": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c",
+    "encoder/config.json": "bf3ab80598fdccf414855a2ce80f22859e4492d06ca8a62ddd1cfb63972f8979",
+    "tokenizer/tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+    "tokenizer/tokenizer_config.json": "50044de60daaa73df97d262e15a40d4faf0160e7d742df64b377877a1320dd12"
+  },
+  "files_mutated_by_load": [],
+  "network": "blocked at socket.connect for the whole measured run",
+  "device": "cpu",
+  "dtype": "torch.float32",
+  "torch_threads": 4,
+  "load_seconds": 7.39,
+  "host": {
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.12.14",
+    "torch": "2.9.1"
+  },
+  "latency": {
+    "one_question": {
+      "passes": 120,
+      "p50_ms": 169.74,
+      "p95_ms": 193.11,
+      "p99_ms": 203.67,
+      "min_ms": 162.14,
+      "max_ms": 248.38,
+      "mean_ms": 173.61,
+      "stdev_ms": 11.62
+    },
+    "three_questions": {
+      "passes": 120,
+      "p50_ms": 330.65,
+      "p95_ms": 375.26,
+      "p99_ms": 401.11,
+      "min_ms": 314.5,
+      "max_ms": 493.68,
+      "mean_ms": 338.13,
+      "stdev_ms": 25.12
+    },
+    "five_questions": {
+      "passes": 120,
+      "p50_ms": 470.81,
+      "p95_ms": 543.6,
+      "p99_ms": 577.4,
+      "min_ms": 454.88,
+      "max_ms": 592.6,
+      "mean_ms": 479.01,
+      "stdev_ms": 27.67
+    }
+  },
+  "answers": {
+    "one_question": {
+      "model": "laya-rl-agent",
+      "answers": {
+        "route": {
+          "type": "choice",
+          "choice": "platform-owner",
+          "probabilities": {
+            "platform-owner": 0.6436,
+            "adopter-owner": 0.1997,
+            "no-review-needed": 0.1567
+          },
+          "confidence": 0.1846,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 140,
+        "output_tokens": 0
+      }
+    },
+    "three_questions": {
+      "model": "laya-rl-agent",
+      "answers": {
+        "route": {
+          "type": "choice",
+          "choice": "platform-owner",
+          "probabilities": {
+            "platform-owner": 0.6436,
+            "adopter-owner": 0.1997,
+            "no-review-needed": 0.1567
+          },
+          "confidence": 0.1846,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "risk": {
+          "type": "score",
+          "score": 1.1892,
+          "legend": {
+            "0": "none",
+            "1": "one repository",
+            "2": "several repositories",
+            "3": "the whole estate"
+          },
+          "probabilities": {
+            "0": 0.1436,
+            "1": 0.6298,
+            "2": 0.1206,
+            "3": 0.1061
+          },
+          "confidence": 0.2332,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "needs_human": {
+          "type": "noul",
+          "noul": 0.4822,
+          "confidence": 0.5178,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 384,
+        "output_tokens": 0
+      }
+    },
+    "five_questions": {
+      "model": "laya-rl-agent",
+      "answers": {
+        "route": {
+          "type": "choice",
+          "choice": "platform-owner",
+          "probabilities": {
+            "platform-owner": 0.6436,
+            "adopter-owner": 0.1997,
+            "no-review-needed": 0.1567
+          },
+          "confidence": 0.1846,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "risk": {
+          "type": "score",
+          "score": 1.1892,
+          "legend": {
+            "0": "none",
+            "1": "one repository",
+            "2": "several repositories",
+            "3": "the whole estate"
+          },
+          "probabilities": {
+            "0": 0.1436,
+            "1": 0.6298,
+            "2": 0.1206,
+            "3": 0.1061
+          },
+          "confidence": 0.2332,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "needs_human": {
+          "type": "noul",
+          "noul": 0.4822,
+          "confidence": 0.5178,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "reversible": {
+          "type": "choice",
+          "choice": "coordinated",
+          "probabilities": {
+            "one-revert": 0.1491,
+            "coordinated": 0.5849,
+            "irreversible": 0.266
+          },
+          "confidence": 0.1356,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "gate_trusted": {
+          "type": "noul",
+          "noul": 0.688,
+          "confidence": 0.688,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 643,
+        "output_tokens": 0
+      }
+    }
+  },
+  "answers_sha256": "4331c3a6a790c864596851e2d05ac27c4f07767dd13614c88d199dec05aafe01",
+  "measured_at": "2026-09-21T11:24:08+0100"
+}

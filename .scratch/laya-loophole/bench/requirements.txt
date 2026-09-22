@@ -1,0 +1,28 @@
+# Ticket 02. The exact versions the recorded numbers in `measured.json` were taken with.
+#
+# Build the environment, then fetch and measure:
+#
+#   python3.12 -m venv ~/.cache/laya-bench/venv
+#   ~/.cache/laya-bench/venv/bin/pip install -r .scratch/laya-loophole/bench/requirements.txt
+#   ~/.cache/laya-bench/venv/bin/python .scratch/laya-loophole/bench/measure_laya.py fetch
+#   ~/.cache/laya-bench/venv/bin/python .scratch/laya-loophole/bench/measure_laya.py measure
+#
+# The venv and the pinned weights live under ~/.cache/laya-bench, outside the repository. The
+# weights are 842 MB and no licence permits this estate to redistribute them, so nothing here
+# vendors them. `measure_laya.py` pins them by commit digest instead.
+#
+# WHY transformers 5.x AND NOT 4.x. `encoder/config.json` at the pinned revision declares
+# `"transformers_version": "5.0.0"` and carries `rope_parameters` and `layer_types`. transformers
+# 4.x ModernBertConfig reads neither key. It would load, fall back to its own defaults, and
+# produce different numbers without raising. A silently wrong model is the worst outcome this
+# ticket could deliver, so the floor is 5.0.
+#
+# WHY huggingface_hub IS NOT PINNED HERE. transformers 5.9.0 requires hub >= 1.0, and the version
+# `laya` 0.3.4 declares (>= 0.20.0) resolves against it. Pinning both by hand gives
+# ResolutionImpossible. pip resolved 1.32.0; that is what `measured.json` records under `host`.
+
+torch==2.9.1
+transformers==5.9.0
+safetensors==0.6.2
+numpy==2.3.4
+laya==0.3.4
