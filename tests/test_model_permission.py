@@ -54,8 +54,9 @@ def test_the_baseline_freezes_the_field_that_flatters_the_model_most() -> None:
 def test_a_numeric_field_gets_its_own_corpus_mean_as_a_candidate() -> None:
     """`causal-claims`' elasticity constant is exactly its own corpus's mean, inside a tolerance
     that covers every label (ticket 04). A candidate set of only the observed values misses it."""
-    corpus = [{"id": str(i), "input": i, "expected": {"x": x}} for i, x in enumerate([0.25, 0.30, 0.45, 0.50])]
-    answers = [{"x": item["expected"]["x"]} for item in corpus]
+    labels = [0.25, 0.30, 0.45, 0.50]
+    corpus = [{"id": str(i), "input": i, "expected": {"x": x}} for i, x in enumerate(labels)]
+    answers = [{"x": x} for x in labels]
 
     def tolerant(actual, expected):
         return abs(actual["x"] - expected["x"]) <= 0.15
@@ -227,7 +228,9 @@ def test_the_newest_row_for_a_model_wins(good_row) -> None:
     older = {**good_row, "score": 0.10}
     newer = {**good_row, "score": 0.90}
     other = {**good_row, "model_version": "somebody-else", "score": 1.0}
-    assert mp.newest_score(_FACTS_SKILL, "fixture-model-1.0.0", [older, other, newer])["score"] == 0.90
+    newest = mp.newest_score(_FACTS_SKILL, "fixture-model-1.0.0", [older, other, newer])
+    assert newest is not None
+    assert newest["score"] == 0.90
 
 
 # -- item 4, as a property of the type ------------------------------------------------------------
