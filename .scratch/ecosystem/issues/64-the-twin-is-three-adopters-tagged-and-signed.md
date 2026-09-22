@@ -304,3 +304,20 @@ back onto the branch, which is why `5fcb8ff` sits between two of this ticket's c
   caused by it, and named so that the next serial run does not read it as new.**
 
 Map line: `Ticket 64 (2026-09-04): the twin is three adopters — tuppence and ludlow overlays authored complete and unpriced (no signed size, one grade-3 edge, emitters refuse by name), verify/twin-per-adopter names an adopter without one, step 5 derives its adopter list and asserts a dated swept_at, driftwood re-composed to selection-policy 1.1.0, and tuppence's permanent shift-left refusal is diagnosed as platform policy 4.0.0's major awaiting the owner.`
+
+
+## Missing observation clocks — implementation checkpoint, 2026-09-10
+
+Tuppence PR33 merged as ffb0418 and Ludlow PR30 as 8ef36c7. Both add a daily observation-only
+`twin-sweep.yml`: invoke the existing emitter with `--check`, record its actual output and exit,
+sign only `observations/twin-sweep.jsonl`, then preserve a missing-input or review-required result
+as non-green. Current emitters name the missing signed size valuation and inadmissible grade-3
+causal edge. Neither clock manufactures those instruments, emits a feed or invents a publishing
+contract. Open ticket 30 owns those named pricing prerequisites in the clock-owner map;
+this ticket retains its completed authored-but-unpriced scope.
+
+Both independent reviews, three focused tests per adopter, real missing-input recording checks,
+workflow lint, schedule containment checks and PR CI passed. Integration preserved reviewed
+clock code over merged compiler-tools main; local scans found zero secrets and commits are signed.
+Actual scheduled observations remain outstanding. Existing priced/deployed completion limits
+above remain unchanged.

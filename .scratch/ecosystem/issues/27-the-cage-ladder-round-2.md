@@ -32,3 +32,11 @@ Release checks pass, but proposed software v3.1.0 remains unpublished pending ex
 This addresses only the floor-price evidence portion. The warn rung, de-posture claim semantics,
 access.py retirement and owner-sourced per-organisation break-glass bands remain open. It does
 not prove a deployed tier move or resolve the whole ticket's talk/verify-all.sh criterion.
+
+
+**2026-09-10, publication approved and completed.** The owner explicitly approved publishing
+software v3.1.0 from reviewed main 332ab19. Signed cut run 34512212053 and identity-pinned release
+run 34512281836 both passed. [Platform v3.1.0](https://github.com/policy-as-versioned-platform/platform/releases/tag/v3.1.0)
+was published at 18:06:47Z from `332ab192e75cbeedbc072aba6a07726c070a5a61`.
+No policy definition or monetary threshold changed; publication does not close the other
+portions of this ticket or imply adoption by a compiler pin still naming v3.0.0.

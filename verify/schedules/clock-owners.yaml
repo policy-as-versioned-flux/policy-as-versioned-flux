@@ -54,3 +54,16 @@ hub/truth.yml:
     the scheduled run was cancelled by the single `truth` concurrency group when a push queued
     behind it, so it recorded nothing; the group is split per event here 2026-09-04, and the
     red stands until the clock next ticks
+
+# The clocks now record the existing emitter's refusal before returning non-green.
+tuppence/twin-sweep.yml:
+  ticket: 30
+  owns: >-
+    the overlay lacks a signed size valuation and carries a grade-3 causal edge beyond its
+    admitted threshold; the clock records could-not-look and supplies neither instrument
+
+ludlow/twin-sweep.yml:
+  ticket: 30
+  owns: >-
+    the same missing signed size valuation and inadmissible causal edge as tuppence;
+    the observation clock does not invent values or a feed publishing contract
