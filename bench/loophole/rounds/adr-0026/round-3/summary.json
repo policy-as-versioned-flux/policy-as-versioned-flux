@@ -1,0 +1,126 @@
+{
+  "ticket": "115",
+  "round": "3",
+  "at": "2026-09-22T22:50:33.745835+00:00",
+  "clean": true,
+  "failures": [],
+  "target": {
+    "path": "docs/adr/0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md",
+    "commit": "556669bbd7a5affcd52775ab8915cd1715560b23",
+    "last_changed_in": "3655bb8f127245e3ead265ed7f574863d8763b48",
+    "sha256": "e828391e4555eb45b71a0304a2dbc519212f5ce31f3180d8a65e72afda3e13ed",
+    "chars": 20485
+  },
+  "harness": {
+    "path": "bench/loophole/loophole_round.py",
+    "sha256": "aea48f738a20f40a5af43dc7f86c71505beb9d12c461875297eb90c7fb918c95",
+    "leak_check_sha256": "ee750d83b34f4b560f946952e2c8bbbec0236386348c0242150083ef1a28634b"
+  },
+  "model_served": [
+    "claude-sonnet-5"
+  ],
+  "model_calls": 8,
+  "wall_time_s": 203.6,
+  "list_price_usd": 0.4828,
+  "counters": {
+    "parse_failures": 0,
+    "under_production": 0,
+    "judge_missing_verdict": 0,
+    "per_finder": {
+      "loophole_finder": {
+        "requested_cases": 3,
+        "scenario_open_tags": 3,
+        "well_formed_scenarios": 3,
+        "cases_parsed": 3,
+        "parse_failures": 0,
+        "under_production": 0,
+        "raw_chars": 4105
+      },
+      "overreach_finder": {
+        "requested_cases": 3,
+        "scenario_open_tags": 3,
+        "well_formed_scenarios": 3,
+        "cases_parsed": 3,
+        "parse_failures": 0,
+        "under_production": 0,
+        "raw_chars": 3543
+      }
+    }
+  },
+  "candidates": {
+    "total": 6,
+    "by_type": {
+      "loophole": 3,
+      "overreach": 3
+    },
+    "judge_resolvable": 5,
+    "file": "candidates.json"
+  },
+  "prompt_digests": [
+    {
+      "role": "loophole_finder",
+      "system_prompt_sha256": "f4fb5d83cc7e6e7aa6c70e21f13cdd06be7f587ceb807c96e0dddb3e804c44f3",
+      "user_message_sha256": "08115ed3a20dd79df778b729c51672ba411eba3f3596dd9582136cef0ab8b0ac"
+    },
+    {
+      "role": "overreach_finder",
+      "system_prompt_sha256": "34c1c9740208fd3989bdc087be8eb2f38a6bfb2f241bd44830bd07bcc7911474",
+      "user_message_sha256": "95ab00a17f6e603298f330c5b7309c3d6764d0d3a1f4b4bf08ee74754f924ca2"
+    },
+    {
+      "role": "judge",
+      "system_prompt_sha256": "4f7c5008edb75b8660964e0e3a4eac0bb9ffc076246711ec34b02e63c668a756",
+      "user_message_sha256": "c2c5aa43fd3aa0b48ec04cd9b8efcc4f5d4960f4f0ef38c054aaec80c8d1681a"
+    },
+    {
+      "role": "judge",
+      "system_prompt_sha256": "4f7c5008edb75b8660964e0e3a4eac0bb9ffc076246711ec34b02e63c668a756",
+      "user_message_sha256": "c8737099cd8fc112c63e5a74bc372a557cf2c40b4ef7f70dd7194c972aff6592"
+    },
+    {
+      "role": "judge",
+      "system_prompt_sha256": "4f7c5008edb75b8660964e0e3a4eac0bb9ffc076246711ec34b02e63c668a756",
+      "user_message_sha256": "e25d15ea5e9f1be8b5f141893045f17bc1c79f800d64ba85d9d8dca65e106272"
+    },
+    {
+      "role": "judge",
+      "system_prompt_sha256": "4f7c5008edb75b8660964e0e3a4eac0bb9ffc076246711ec34b02e63c668a756",
+      "user_message_sha256": "15f35da5043627647864dec45c486d99454d9a081b5c3e2ada4295d63f029a01"
+    },
+    {
+      "role": "judge",
+      "system_prompt_sha256": "4f7c5008edb75b8660964e0e3a4eac0bb9ffc076246711ec34b02e63c668a756",
+      "user_message_sha256": "b549024f71d060c213d2d6f84a98729f4b1d32b6f0a82c41bee0dff00eda676f"
+    },
+    {
+      "role": "judge",
+      "system_prompt_sha256": "4f7c5008edb75b8660964e0e3a4eac0bb9ffc076246711ec34b02e63c668a756",
+      "user_message_sha256": "cb0b3f597a541e1f9c9ff1ee65aef57bb84e1577a199c0564af201380d922d9d"
+    }
+  ],
+  "session_id": "round-3-20260922_234710",
+  "domain": "Control selection and hole pricing: what an adopter's baseline change costs and when a composition may refuse",
+  "principles": {
+    "path": "bench/loophole/rounds/adr-0026/principles.md",
+    "sha256": "b3c444a22551211fbc2f16fd7e3f1bf29844ad28457138572ac2ff7104ac13c0"
+  },
+  "loophole_src_commit": "129f7c0ee76a79600b8c3f9b35b9687c63b1f95c",
+  "model_requested": "sonnet",
+  "published_model": "claude-sonnet-4-20250514",
+  "cases_per_agent": 3,
+  "counter_control": "5/5",
+  "leak_check": {
+    "distinct_runs": 1287,
+    "control_hits": 1287,
+    "leaked_runs": {
+      "calls.jsonl": 0,
+      "candidates.json": 0
+    }
+  },
+  "limitations": [
+    "claude -p carries no temperature flag; the published 0.9 finder / 0.3 judge split is lost (config.yaml:24-28).",
+    "claude -p carries no max_tokens flag; the published 4096 cap is not applied.",
+    "the published config names claude-sonnet-4-20250514; this run asked for 'sonnet', and model_served says what answered.",
+    "the Legislator never ran: the code is supplied and never revised."
+  ]
+}

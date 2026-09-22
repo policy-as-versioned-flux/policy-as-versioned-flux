@@ -209,7 +209,12 @@ field as "written by the ticket 07 harness".
 - **The harness lives in `.scratch/` and is not an estate artefact.** Point 1 says the estate
   commits its own harness, and today that harness is a wayfinder asset. Making it a durable
   procedure anyone can re-run is adoption work, and it is graduated to the eco-system map rather
-  than done here.
+  than done here. *Note, 2026-09-22, eco-system ticket 115:* the harness and the leak check now
+  live in [`bench/loophole/`](../../bench/loophole/README.md) with the written procedure. Its
+  guards fail the run: `--bare` is refused, both counters and a missing judge verdict exit 1,
+  and the leak check runs over each round's files. `tests/test_loophole_round.py` holds the
+  guards. The `.scratch/` copies stay as the record of the ADR-0022 rounds, whose summaries
+  name them. ADR-0026 is the second document attacked, in three rounds.
 - **Nothing about this is on a clock**, and nothing about it grades the truth surface. Point 8.
 - **kyverno 1.19.1 cannot compile the served `cage-tier` body** (`expected type 'string' but
   found 'dyn'`), found while checking a survivor. The release workflows pin 1.18.2;
