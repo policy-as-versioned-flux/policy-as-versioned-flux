@@ -403,3 +403,12 @@ MIT, `LICENSE`, © 2026 Ben Emson. No code is lifted by this note. Two of the th
 reimplementations against estate vocabulary and the third is a principle. Whether the estate may
 credit the author in public names a real individual, so it stays with eco-system ticket 82 and is
 not decided here.
+
+## Correction, 2026-09-22
+
+The two graduations above say "ticket 100" and "ticket 101". The directory already held 100 to 110
+when this note was written; "highest present is 99" came from a listing that sorts `100` before
+`99`. They landed as eco-system tickets 111 and 112. Eco-system ticket 117 then renumbered the
+first to [118](../../ecosystem/issues/118-a-green-that-rests-on-luck-may-not-promote.md), because
+111 was already taken. Ticket 101 here is
+[112](../../ecosystem/issues/112-a-threshold-states-the-corpus-it-needs.md).

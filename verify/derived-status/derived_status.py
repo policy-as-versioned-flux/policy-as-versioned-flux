@@ -218,6 +218,33 @@ def vocabulary_findings(files: dict[str, str]) -> list[Finding]:
     return out
 
 
+def number_findings(files: dict[str, str]) -> list[Finding]:
+    """Every ticket number resolves to exactly one file (eco-system ticket 117).
+
+    Two files were numbered 111 by 2026-09-22 and nothing read the directory for it, so a
+    `waits_on: 111` row and a `Blocked by: 111` line both read whichever sorted first. The number
+    is compared as an integer, because `01-` and `1-` are one ticket to a reader. A file with no
+    leading number is a finding too: nothing can refer to it by number at all."""
+    out: list[Finding] = []
+    by_number: dict[int, list[str]] = {}
+    for path in sorted(files):
+        number = ticket_number(path)
+        if not number:
+            out.append(Finding(path, "number",
+                               "carries no leading ticket number, so no `Blocked by:` line or "
+                               "`waits_on` row can name it"))
+            continue
+        by_number.setdefault(int(number), []).append(path)
+    for number, paths in sorted(by_number.items()):
+        if len(paths) > 1:
+            out.append(Finding(paths[0], "number",
+                               f"ticket number {number} names {len(paths)} files: "
+                               f"{', '.join(Path(p).name for p in paths)}. A lookup by number "
+                               f"reads whichever sorts first; renumber the later one to the next "
+                               f"free number (`ls | sort -n`)"))
+    return out
+
+
 def written_status(text: str) -> str:
     found = status_lines(text)
     return found[0].split()[0] if len(found) == 1 and found[0].split() else ""
@@ -589,6 +616,10 @@ def selfcheck() -> int:
     assert vocabulary_findings({"x.md": _t("resolved")}) == []
     assert len(vocabulary_findings({"x.md": "# 42\n\nno status\n"})) == 1
     assert len(answer_findings({"x.md": _t("resolved")})) == 1
+    # ticket 117: one number, one file
+    assert len(number_findings({"111-a.md": _t("open"), "111-b.md": _t("open")})) == 1
+    assert len(number_findings({"01-a.md": _t("open"), "1-b.md": _t("open")})) == 1
+    assert number_findings({"110-a.md": _t("open"), "111-b.md": _t("open")}) == []
     assert answer_findings({"x.md": _t("resolved", "\n## Answer\n\nbuilt.\n")}) == []
 
     green = derive_one("a.md", _t("resolved", "\n## Answer\n\n`verify/good/verify-good.sh`\n"),
@@ -693,7 +724,7 @@ def _record(args: argparse.Namespace) -> int:
     if not issues:
         print(f"no ticket files under {args.issues}")
         return 1
-    findings = vocabulary_findings(issues) + answer_findings(issues)
+    findings = number_findings(issues) + vocabulary_findings(issues) + answer_findings(issues)
     words: dict[str, int] = {}
     for text in issues.values():
         words[written_status(text) or "(none)"] = words.get(written_status(text) or "(none)", 0) + 1

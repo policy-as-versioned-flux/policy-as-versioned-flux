@@ -14,6 +14,7 @@ from twin.misuse import (
     ECOSYSTEM_ROW_IDS,
     FAIL,
     PASS,
+    AmbiguousTicketNumber,
     MisuseError,
     compute_attractiveness,
     ecosystem_ticket_status,
@@ -306,6 +307,30 @@ def test_ecosystem_ticket_status_reads_the_status_line(tmp_path: Path) -> None:
     assert ecosystem_ticket_status("45", tmp_path) == "open"
     assert ecosystem_ticket_status("19", tmp_path) == "resolved"
     assert ecosystem_ticket_status("7", tmp_path) is None
+
+
+def test_a_number_two_tickets_share_is_refused_naming_both_files(tmp_path: Path) -> None:
+    """Eco-system ticket 117: `sorted(glob(...))[0]` read whichever of two 111s sorted first. A
+    shared number is a lookup that succeeds on the wrong ticket, so it is refused, not resolved."""
+    (tmp_path / "111-a-green.md").write_text("# 111\n\nStatus: resolved\n")
+    (tmp_path / "111-the-cage.md").write_text("# 111\n\nStatus: open\n")
+    with pytest.raises(AmbiguousTicketNumber) as refused:
+        ecosystem_ticket_status("111", tmp_path)
+    assert "111-a-green.md" in str(refused.value) and "111-the-cage.md" in str(refused.value)
+
+
+def test_a_row_waiting_on_a_shared_number_fails_with_the_reason(tmp_path: Path) -> None:
+    """The refusal is a FAIL upstream, like an unknown number, and the line says why."""
+    (tmp_path / "111-a-green.md").write_text("# 111\n\nStatus: open\n")
+    (tmp_path / "111-the-cage.md").write_text("# 111\n\nStatus: open\n")
+    grade = grade_entry(
+        _row(waits_on=[{"ticket": "111", "for": "x"}]),
+        root=tmp_path, estate=None,
+        ticket_status=lambda number: ecosystem_ticket_status(number, tmp_path),
+    )
+    assert grade.outcome == FAIL
+    assert "111" in grade.reason and "2 files" in grade.reason
+    assert "111-a-green.md" in grade.reason and "111-the-cage.md" in grade.reason
 
 
 def test_the_four_rows_grade_against_this_checkout() -> None:

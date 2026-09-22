@@ -420,3 +420,50 @@ def test_this_check_is_derived_from_the_modules_own_location_not_typed() -> None
     assert ds.THIS_CHECK == "verify/derived-status/verify-derived-status.sh"
     assert (ds.HUB / ds.THIS_CHECK).exists()
     assert (ds.HERE / "verify-derived-status.sh").resolve() == (ds.HUB / ds.THIS_CHECK).resolve()
+
+
+# ------------------------------------------------------------------ ticket 117: one number, one file
+
+def test_two_tickets_sharing_a_number_is_one_finding_naming_both() -> None:
+    """Eco-system ticket 117: two files were numbered 111 and nothing read the directory for it."""
+    found = ds.number_findings({"i/111-a-green.md": ticket("open"),
+                                "i/111-the-cage.md": ticket("open"),
+                                "i/112-other.md": ticket("open")})
+    assert len(found) == 1
+    assert found[0].rule == "number"
+    assert "111-a-green.md" in found[0].detail and "111-the-cage.md" in found[0].detail
+
+
+def test_a_leading_zero_does_not_make_a_number_different() -> None:
+    found = ds.number_findings({"i/01-a.md": ticket("open"), "i/1-b.md": ticket("open")})
+    assert len(found) == 1 and "01-a.md" in found[0].detail and "1-b.md" in found[0].detail
+
+
+def test_a_ticket_file_with_no_number_is_a_finding() -> None:
+    found = ds.number_findings({"i/notes.md": ticket("open"), "i/7-a.md": ticket("open")})
+    assert [f.path for f in found] == ["i/notes.md"]
+
+
+def test_distinct_numbers_are_not_a_finding() -> None:
+    assert ds.number_findings({"i/110-a.md": ticket("open"), "i/111-b.md": ticket("open"),
+                               "i/1110-c.md": ticket("open")}) == []
+
+
+def test_the_record_command_refuses_a_shared_number(tmp_path: Path, capsys, monkeypatch) -> None:
+    """The gate's own leg (verify-derived-status.sh step 2 runs `record`) exits 1 on it."""
+    monkeypatch.setattr(ds, "HUB", tmp_path)  # the record prints hub-relative paths
+    (tmp_path / "111-a-green.md").write_text(ticket("open"))
+    (tmp_path / "111-the-cage.md").write_text(ticket("open"))
+    rc = ds.main(["record", "--issues", str(tmp_path)])
+    out = capsys.readouterr().out
+    assert rc == 1
+    assert "111-a-green.md" in out and "111-the-cage.md" in out
+
+
+def test_every_number_in_the_real_record_resolves_to_exactly_one_file() -> None:
+    """The Done line of ticket 117, read from the hub's own record rather than a fixture."""
+    issues = _ROOT / ".scratch" / "ecosystem" / "issues"
+    files = {str(p.relative_to(_ROOT)): p.read_text(encoding="utf-8")
+             for p in sorted(issues.glob("*.md"))}
+    assert files, "no ticket files to read"
+    assert ds.number_findings(files) == []

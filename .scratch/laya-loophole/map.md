@@ -6,6 +6,8 @@ destination is reached.** Laya is refused by
 loophole enters as an external tool run in rounds by
 [ADR-0030](../../docs/adr/0030-loophole-runs-as-an-external-tool-in-rounds-and-the-estate-keeps-the-pointer.md).
 Seven tickets graduated to the eco-system map: 111, 112, 113, 114, 115, 116 and 117.
+Eco-system ticket 117 renumbered the first of them to 118 on 2026-09-22, because 111 was
+already taken.
 
 Subordinate to [the eco-system map](../ecosystem/map.md). That map stays the one route to the
 north star. This map answers one question that arrived beside it. Its output graduates as tickets
@@ -545,8 +547,8 @@ scope.
 
 - [10 — What the trdrbot prior art teaches](issues/10-what-the-trdrbot-prior-art-teaches.md):
   Three ideas taken, four left. **Taken:** luck-versus-skill attribution, graduated as eco-system
-  ticket 111; a derived minimum corpus size, graduated as eco-system ticket 112; automatic
-  pre-registration, folded into 111. **Left:** the size ladder, the scoring rule, refuse-what-you-
+  ticket 111 and renumbered 118 by ticket 117; a derived minimum corpus size, graduated as
+  eco-system ticket 112; automatic pre-registration, folded into 118. **Left:** the size ladder, the scoring rule, refuse-what-you-
   cannot-price, and the defect ledger, each for a stated reason. The ladder's **failure** is taken
   instead and is now ticket 05 item 6: its own open defect I-68 records the whole sizing apparatus
   as consulted in 2 of 89 decide cycles, because "the refusals that matter happen upstream in

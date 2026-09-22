@@ -1,4 +1,4 @@
-# 111 — A green that rests on luck may not promote
+# 118 — A green that rests on luck may not promote
 
 Type: task
 Status: open
@@ -7,6 +7,11 @@ Blocked by: none
 ## Question
 
 Graduated 2026-09-21 from [the Laya and loophole map](../../laya-loophole/map.md), ticket 10.
+
+Renumbered from 111 to 118 on 2026-09-22 by
+[ticket 117](117-two-tickets-share-the-number-111.md). It took 111 after
+[111 — The cage names priority classes its own delivery does not deliver](111-the-cage-names-priority-classes-its-own-delivery-does-not-deliver.md)
+had already landed on main, so it is the later of the two.
 
 The skill-eval harness records two states. `twin/skills.py:103` declares
 `ItemResult(item_id, passed: bool)`, and `EvalResult.score` is the fraction that passed. A skill

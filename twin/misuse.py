@@ -143,12 +143,24 @@ class Grade:
     reason: str
 
 
+class AmbiguousTicketNumber(LookupError):
+    """A ticket number that names more than one file. Eco-system ticket 117: two tickets were
+    numbered 111, and taking the first match read one of them silently."""
+
+
 def ecosystem_ticket_status(number: str, issues_dir: Path | None = None) -> str | None:
     """The `Status:` line of `.scratch/ecosystem/issues/<number>-*.md`, lower-cased; None when
-    no such ticket exists (which grades as a FAIL upstream, never as a quiet skip)."""
+    no such ticket exists (which grades as a FAIL upstream, never as a quiet skip). Raises
+    AmbiguousTicketNumber when the number names more than one file: the lookup would succeed on
+    whichever sorted first, which is a wrong answer rather than a missing one (ticket 117)."""
     matches = sorted((issues_dir or ECOSYSTEM_ISSUES_DIR).glob(f"{number}-*.md"))
     if not matches:
         return None
+    if len(matches) > 1:
+        raise AmbiguousTicketNumber(
+            f"ticket {number} resolves to {len(matches)} files: "
+            + ", ".join(m.name for m in matches)
+        )
     found = re.search(r"^Status:\s*(.+)$", matches[0].read_text(encoding="utf-8"), re.M)
     return found.group(1).strip().lower() if found else None
 
@@ -190,7 +202,8 @@ def grade_entry(
 ) -> Grade:
     """Grade one eco-system row: PASS when every anchor resolves and nothing is waited on,
     COULD_NOT_LOOK (by ticket number and what it builds) when the row waits on an open ticket,
-    FAIL when an anchor is missing, a waited-on ticket is resolved or unknown, or the row names
+    FAIL when an anchor is missing, a waited-on ticket is resolved, unknown or ambiguous (its number
+    names more than one file, ticket 117), or the row names
     neither. Anchors are graded first: a waiting ticket excuses what is not built, never a path
     that is claimed and absent. A FAIL always wins over could-not-look: an estate anchor that
     cannot be looked at (no clone) does not shield a resolved or unknown waited-on ticket."""
@@ -205,16 +218,23 @@ def grade_entry(
     if hard:
         return Grade(FAIL, f"{eid}: " + "; ".join(hard))
 
-    open_waits, closed_waits, unknown_waits = [], [], []
+    open_waits, closed_waits, unknown_waits, ambiguous_waits = [], [], [], []
     for wait in waits:
         number, purpose = str(wait.get("ticket", "")).strip(), str(wait.get("for", "")).strip()
-        status = ticket_status(number)
+        try:
+            status = ticket_status(number)
+        except AmbiguousTicketNumber as refused:
+            ambiguous_waits.append(str(refused))
+            continue
         if status is None:
             unknown_waits.append(number)
         elif ticket_is_closed(status):
             closed_waits.append(f"ticket {number} ({status})")
         else:
             open_waits.append(f"ticket {number} ({status}) for {purpose}")
+    if ambiguous_waits:
+        return Grade(FAIL, f"{eid}: waits on a number that names more than one ticket: "
+                           + "; ".join(ambiguous_waits))
     if unknown_waits:
         return Grade(FAIL, f"{eid}: waits on a ticket that does not exist: {', '.join(unknown_waits)}")
     if closed_waits:
