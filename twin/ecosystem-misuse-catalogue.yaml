@@ -32,7 +32,7 @@
 #
 # Versioned: bump `version` in the same commit as any change to an entry below.
 schema: twin.misuse-catalogue/v1
-version: 5
+version: 6
 entries:
   - id: publisher-games-own-feed-price
     risk: >-
@@ -187,25 +187,28 @@ entries:
       failing anything. It declares a second governed Namespace, the binding check refuses to
       guess which one carries the party's tier, and the hub reports the estate green.
     mechanism: >-
-      Nothing prices or cages this today. Measured 2026-09-21 on a planted estate of two bound
-      parties, from the Laya and loophole map's ticket 08.
-      `platform/shift-left/tier_binding.py` returns 3 -- could-not-look -- for two governed
-      Namespace declarations, which is right and is what ticket 78 built. The hub's walk then
-      drops it: `verify/tier-binding/tier_binding_estate.py` prints the party's SKIP line,
-      continues, and returns `1 if failed else 0`, so a skipped party is neither looked at nor
-      failed. `talk/verify-all.sh` grades a script by its exit code alone, so the gate reads PASS
-      for an estate with one party unobserved. Two things bound it and neither closes it: each
-      adopter's own `shift-left.yml` turns exit 3 into a failed pull request, so the ambiguity
-      cannot arrive through a pull request that runs that job; and the cage the cluster serves
-      does not move, so this is a hole in the observation and not in the cage. The instrument
-      that exists is the reproduction in `tests/test_cage_ladder_holes.py`, which plants the
-      ambiguous estate, runs the real walk and asserts the exit code the gate would read.
+      Built by eco-system ticket 114 (2026-09-22), from the Laya and loophole map's ticket 08.
+      `platform/shift-left/tier_binding.py` still returns 3, could-not-look, for two governed
+      Namespace declarations, which is right (ADR-0020, ticket 78). The hub's walk no longer drops
+      it. `verify/tier-binding/tier_binding_estate.py` `owed` marks a party owed a binding
+      observation when its signed party.yaml claims the adopter role or it publishes a composed
+      evidence document. A SKIP on such a party makes the whole walk exit 3 and names the party
+      on its last line; an observed FAIL still outranks it, and a party that is neither
+      (platform today) holds nothing back. That last line is deliberately not the `waits:`
+      pattern `talk/verify-manifest.txt` declares for `verify/tier-binding/verify-tier-binding.sh`,
+      so `talk/verify-all.sh` grades the estate red, not waiting. `walked` also reads the adopter
+      role from each party.yaml, so a fourth adopter is walked without editing a list. The walk's
+      selfcheck plants the ambiguous estate, an adopter with nothing composed, and an estate
+      where every adopter is ambiguous, and the wrapper runs that selfcheck before it believes a
+      verdict. `tests/test_cage_ladder_holes.py` runs the real walk and the gate's own manifest
+      reader over the same plants. What stays open: each adopter's own `shift-left.yml` is still
+      the only thing that stops the ambiguity arriving, and the cage the cluster serves never
+      moved, so this was and is a hole in the observation, not in the cage.
     anchors:
-      - "tests/test_cage_ladder_holes.py::test_a_second_governed_namespace_document_silences_one_party_and_the_walk_still_exits_zero"
-      - "verify/tier-binding/tier_binding_estate.py::return 1 if failed else 0"
+      - "verify/tier-binding/tier_binding_estate.py::def owed"
+      - "verify/tier-binding/tier_binding_estate.py::def walked"
+      - "tests/test_cage_ladder_holes.py::test_a_second_governed_namespace_document_leaves_the_walk_could_not_look"
+      - "tests/test_cage_ladder_holes.py::test_the_gate_reads_the_unobserved_party_red_not_waits"
       - "platform/shift-left/tier_binding.py::governed Namespace declarations"
-    waits_on:
-      - ticket: "114"
-        for: an unobserved party that does not leave the walk at exit 0, and a selfcheck leg
     source: laya-loophole ticket 08 (survivor 2 of 6); ticket 07's loophole round against
       ADR-0022; ADR-0020; ticket 78

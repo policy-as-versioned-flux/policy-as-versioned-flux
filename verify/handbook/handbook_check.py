@@ -70,6 +70,7 @@ import importlib.util
 import json
 import os
 import random
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -508,6 +509,18 @@ def run(estate: Path, overrides: dict[str, str]) -> int:
         print(f"SKIP: no adopter of the {len(found)} in this estate serves a handbook this check "
               f"could read, so nothing was compared -- {'; '.join(r['line'] for r in results)}")
         return 3
+    # Eco-system ticket 114, item 3. Until 2026-09-22 an adopter (or a ref) that could not be
+    # read here, beside one that passed, was a `??` line and this returned 0 on the strength of
+    # the other -- the gate reads that as PASS, so an adopter could drop its page and go unseen.
+    # The line below is deliberately NOT the manifest's declared `waits:` phrase: every adopter
+    # serves a page today (3 of 3, measured 2026-09-22), so one that stops is a regression, not
+    # an arrival.
+    unread = [r for r in results if r["state"] == "skip"]
+    if unread:
+        print(f"SKIP: {len(unread)} of the refs graded across {len(found)} adopter(s) could not "
+              f"be read, so the estate was not observed whole and the {len(passes)} that passed "
+              f"do not stand for them -- {'; '.join(r['line'] for r in unread)}")
+        return 3
     print(f"SUMMARY: {len(passes)} served ref(s) across {len({r['name'] for r in passes})} "
           f"adopter(s) ({', '.join(f'{r['name']}@{r['ref']}' for r in passes)}) each serve a "
           f"composed/HANDBOOK.md byte-identical to a re-render of the artefact served at the same "
@@ -802,9 +815,31 @@ def selfcheck(renderer_src: Path) -> int:
         page.write_text(keep)
         _commit(adopter, "restore the page")
 
-        # nothing serves a page
+        # Eco-system ticket 114, item 3: the same shape as the tier-binding walk's hole. One
+        # adopter that serves no page, beside one that does, used to be a `??` line and exit 0 on
+        # the strength of the other, which the gate reads PASS. It is could-not-look for the
+        # whole check, and its last line is not the manifest's declared `waits:` phrase.
         subprocess.run(["git", "-C", str(adopter), "tag", "-d", "planted-signed-v1"],
                        check=True, capture_output=True)
+        second = estate / "planted-second"
+        shutil.copytree(adopter, second, symlinks=True)
+        subprocess.run(["git", "-C", str(second), "config", "core.hooksPath",
+                        str(second / ".nohooks")], check=True)
+        rc, out = graded(estate)
+        check("two adopters that each serve a page that re-renders grade 0", rc == 0, out)
+        subprocess.run(["git", "-C", str(second), "rm", "-q", PAGE], check=True)
+        _commit(second, "this adopter stops serving its page")
+        rc, out = graded(estate)
+        last = out.strip().splitlines()[-1]
+        check("an adopter that serves no page beside one that does is unobserved, and the check "
+              "grades 3 naming it rather than 0 on the strength of the other",
+              rc == 3 and last.startswith("SKIP:") and "planted-second" in last
+              and "serves a handbook this check could read" not in last, out)
+        shutil.rmtree(second)
+        rc, out = graded(estate)
+        check("...and with that adopter gone, the one that serves a page grades 0 again", rc == 0)
+
+        # nothing serves a page
         subprocess.run(["git", "-C", str(adopter), "rm", "-q", PAGE], check=True)
         _commit(adopter, "no page here")
         rc, out = graded(estate)
@@ -826,7 +861,8 @@ def selfcheck(renderer_src: Path) -> int:
           "its import-time walk while two that need no import (functools.partial(open), a "
           "lambda in a dict) are measured to escape it, a served renderer that does not execute "
           "is red rather than a skip, a signed tag is graded beside origin/main and never "
-          "instead of it, and both a missing page and a missing renderer exit 3 rather than 0")
+          "instead of it, an adopter that serves no page beside one that does exits 3 naming it "
+          "rather than 0 (ticket 114), and both a missing page and a missing renderer exit 3 rather than 0")
     return 0
 
 
