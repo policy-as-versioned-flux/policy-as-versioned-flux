@@ -1,0 +1,71 @@
+PASS: the derived baseline for signal-classify  is 0.913 on steep, against ticket 04's hand-measured 0.913 on steep
+PASS: the derived baseline for causal-claims    is 1.000 on edge.elasticity.mode, against ticket 04's hand-measured 1.000 on edge.elasticity.mode
+PASS: every metric's reference answer set scores 1.000 on its own corpus, so a frozen-field baseline grants the other fields CORRECTLY (weak: none)
+PASS: the score log records at least one model version to grade (2: heuristic-0.1.0, laya-1c5edc17)
+PERMISSIONS: 0 granted of 14 (metric, model version) pairs
+  signal-classify                heuristic-0.1.0    refused  refused by item(s): 10
+  signal-classify                laya-1c5edc17      refused  refused by item(s): 8,9
+  evolution-judge                heuristic-0.1.0    refused  refused by item(s): 10
+  evolution-judge                laya-1c5edc17      refused  refused by item(s): 1,8,9
+  causal-claims                  heuristic-0.1.0    refused  refused by item(s): 8,9,10
+  causal-claims                  laya-1c5edc17      refused  refused by item(s): 1,8,9
+  causal-claims-grade-accuracy   heuristic-0.1.0    refused  refused by item(s): 10
+  causal-claims-grade-accuracy   laya-1c5edc17      refused  refused by item(s): 8
+  gameplay-lens                  heuristic-0.1.0    refused  refused by item(s): 10
+  gameplay-lens                  laya-1c5edc17      refused  refused by item(s): 1,8,9
+  substrate-generator            heuristic-0.1.0    refused  refused by item(s): 9,10
+  substrate-generator            laya-1c5edc17      refused  refused by item(s): 1,2,5,8,9
+  ethics-gate                    heuristic-0.1.0    refused  refused by item(s): 10
+  ethics-gate                    laya-1c5edc17      refused  refused by item(s): 1,8,9
+PASS: every one of the 14 pairs was graded on all 7 model-side conditions (items 1, 2, 5, 6, 8, 9 and 10; items 3, 4 and 7 are properties of the claim document and are graded below)
+PASS: the candidate model holds no permission on any of the 7 metrics: item 1; item 2; item 5; item 8; item 9
+PASS: the incumbent heuristic holds no permission either, on any of the 7 metrics: its corpus kind is 'harness-mechanism', which twin/evolution_judge.py defines as fitted on the corpus it is graded against (item 10)
+PASS: POSITIVE control: a fabricated model that clears all six model-side conditions IS granted, so the rule is not simply refusing everything (fixture-model-1.0.0 may judge gameplay-lens: all 7 conditions hold)
+PASS: NEGATIVE control item 1: a score under the versioned threshold -> score 0.100 against the versioned threshold 0.650
+PASS: NEGATIVE control item 1: a score recorded against a bar the threshold file no longer sets -> score 0.950 against the versioned threshold 0.650; the score was recorded against 0.200, a different bar, so it is not a score against this one
+PASS: NEGATIVE control item 2: a scoring run against a corpus the tree no longer holds -> scored on corpus 000000000000, the tree holds be67c9b9eef9
+PASS: NEGATIVE control item 5: no recorded score at all; absence is not consent -> no row in the score log for 'gameplay-lens' and 'fixture-model-1.0.0'; absence is not consent
+PASS: NEGATIVE control item 6: the seam did not run, so nothing was checked -> the seam is .claude/skills/classify-and-judge/assets/validate_claim.py::validate, run by talk/local-clock.sh
+PASS: NEGATIVE control item 9: a score exactly equal to the corpus's best constant answer -> score 0.333 against the corpus's own best constant answer 0.333 (always opportunities=[], every other field the scorer reads granted correct)
+PASS: NEGATIVE control item 10: a score recorded on the corpus the model was fitted on -> fixture-model-1.0.0 is graded against the corpus it was fitted on (corpus kind 'harness-mechanism'), so its score grades the harness and not its judgement; the estate says so itself in twin/evolution_judge.py's CORPUS_KIND and on every verify-twin-evals.sh run
+PASS: NEGATIVE control item 8: a field the scorer reads that took one distinct value across the corpus -> the scorer reads opportunities, which took one distinct value across the corpus
+PASS: NEGATIVE control item 8: a recorded head that read one distinct value on all 279 calls -> act_probability read one distinct value on all 279 calls (ticket 04)
+PASS: NEGATIVE control item 8: no variance measured or recorded at all -> refused, because an unmeasured head is not a varying one
+PASS: twin/model-head-readings.yaml records 3 constant head(s) a permission must refuse: laya-1c5edc17/act_probability (1 distinct in 279), laya-1c5edc17/ethics-gate.choice (1 distinct in 5), laya-1c5edc17/evolution-judge.choice (1 distinct in 4)
+PASS: item 4: a GRANTED permission covers ['judge'] and refuses 'merge', so the permission itself cannot be read as covering the merge
+PASS: item 4: a refused permission covers nothing at all, so a caller reading covers() cannot act on one
+PASS: item 4: no workflow in .github/workflows and not talk/local-clock.sh merges a pull request (workflows that do: none; the clock: does not)
+PASS: item 6: GITHUB_ACTIONS in the environment makes the clock 'github' even though the caller said 'local'
+PASS: item 6: GITHUB_RUN_ID in the environment makes the clock 'github' even though the caller said 'local'
+PASS: item 6: GITHUB_WORKFLOW in the environment makes the clock 'github' even though the caller said 'local'
+PASS: item 6: with no GitHub marker the caller's own word stands, so the local clock keeps ticket 92's terms
+PASS: item 6: a caller may declare a github clock without a marker; declaring one is never refused, only denying one is
+PASS: item 6: no workflow sets, clears or exports any of GITHUB_ACTIONS, GITHUB_RUN_ID, GITHUB_WORKFLOW, so a GitHub run cannot present itself as another clock (none found)
+PASS: item 6: the seam .claude/skills/classify-and-judge/assets/validate_claim.py exists and holds validate()
+PASS: item 6: the seam reads the permission off twin/model_permission.py rather than restating it, so a rule that moves moves here too
+PASS: item 6: talk/local-clock.sh runs the validator out of $judge, the tree copied BEFORE the child model started, so the model cannot edit the thing that judges it
+PASS: item 6: all 2 validator(s) the clock's steps table names accept --clock, so no step reaches a model-made artefact without crossing the seam (none missing it)
+PASS: item 6: all 2 of the clock's validator invocations pass --headless --clock local, so the model never chooses whether the seam runs and never states its own clock; that is trdrbot defect I-68's whole failure, closed (2 of 2 flagged)
+PASS: item 3: a GitHub-clock claim file that records no model_version is refused
+PASS: item 3: a human-run claim file is not governed by this rule at all, so the ordinary path is untouched
+PASS: item 4: a local-clock claim file keeps ecosystem ticket 92's own terms; this rule does not reopen them
+PASS: item 4: an override from a model on a GitHub clock is refused; grade 4 is a human's
+PASS: item 4: a price-eligible claim from a model on a GitHub clock is refused
+PASS: item 7: a GitHub-clock claim file that counts no declines is refused; an empty list is an answer and a missing key is not
+PASS: item 7: a declined row with no reason is refused; an uncounted decline is the whole defect
+PASS: item 7: an exercise rate over zero rows is undefined and says so, never 100% (0 judged and 0 declined: no clock run has landed a claim file, so the exercise rate is not 100%, it is undefined, and this says so)
+PASS: item 7: the rate is computed from the file's own counted rows (1 judged, 2 declined, exercise rate 0.333)
+AT REST: 0 claim file(s) under twin/claims/ in this checkout and its estate clone, 0 of them on a governed clock; 0 judged and 0 declined: no clock run has landed a claim file, so the exercise rate is not 100%, it is undefined, and this says so
+PASS: every claim file at rest that says it ran on a GitHub clock satisfies items 3, 4 and 7 and holds a granted permission (none is on a governed clock today)
+PASS: POSITIVE control: a GitHub-clock claim file naming its model, counting its declines, claiming no override and holding a granted permission is accepted
+THRESHOLDS AGAINST THEIR OWN CORPUS'S BEST CONSTANT ANSWER (reported, not graded):
+  signal-classify                n=23  threshold=0.80  baseline=0.913  CANNOT DETECT A MODEL THAT LEARNED NOTHING   [always steep="economic", every other field the scorer reads granted correct]
+  evolution-judge                n=4   threshold=0.75  baseline=0.750  CANNOT DETECT A MODEL THAT LEARNED NOTHING   [always evolution_position=0.55, every other field the scorer reads granted correct]
+  causal-claims                  n=4   threshold=0.80  baseline=1.000  CANNOT DETECT A MODEL THAT LEARNED NOTHING   [always edge.elasticity.mode=0.375, every other field the scorer reads granted correct]
+  causal-claims-grade-accuracy   n=4   threshold=0.80  baseline=0.750  above its baseline   [always edge.evidence_grade=3, every other field the scorer reads granted correct]
+  gameplay-lens                  n=3   threshold=0.65  baseline=0.333  above its baseline   [always opportunities=[], every other field the scorer reads granted correct]
+  substrate-generator            n=3   threshold=0.80  baseline=1.000  CANNOT DETECT A MODEL THAT LEARNED NOTHING   [always channels.events=["[the-onboarding-flow] Lunch order chat in #ops.", "[the-on, every other field the scorer reads granted correct]
+  ethics-gate                    n=5   threshold=0.80  baseline=0.800  CANNOT DETECT A MODEL THAT LEARNED NOTHING   [always admitted=false, every other field the scorer reads granted correct]
+WEAK THRESHOLDS: 5 of 7 sit at or below the best constant answer their own corpus admits. Item 9 refuses such a score anyway, so no permission rests on them. The corpus is what is short -- ticket 03 measured 326 items needed per skill against the estate's 42, and eco-system ticket 112 owns the sizing.
+SUBTOTAL: 0 observed false
+PASS: the model-judging permission grades all ten conditions (ticket 05's nine, plus a fitted-corpus condition the first run of the nine forced), each with a negative control and the rule with a positive one; 0 granted of 14 (metric, model version) pairs hold a permission today; the clock is derived from the environment and no workflow can present itself as another; the seam is .claude/skills/classify-and-judge/assets/validate_claim.py::validate, run by talk/local-clock.sh out of a tree the model cannot write to; 5 of 7 sit at or below the best constant answer their own corpus admits (reported, not graded)

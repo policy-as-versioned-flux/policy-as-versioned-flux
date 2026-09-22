@@ -2,24 +2,10 @@
 ok  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.claude/skills/classify-and-judge/SKILL.md: disable-model-invocation, no clock, opens a PR it never merges
 
 == the claim file: only existing claim kinds, and derived_from names them ==
-ok  /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.claude/skills/classify-and-judge/assets/example-claim.yaml: 4 claims, kinds ['binding', 'override', 'position'], all in the twin's own CLAIM_KINDS; every pin derived_from names is cited by a claim and every pin a claim cites is named (2 pins); only the override prices
-
-== and the check bites: each rule, mutated, is caught ==
-ok  caught: a claim invents a kind
-ok  caught: a grade-5 binding claims to price
-ok  caught: an override is claimed by free text instead of a role
-ok  caught: an override answers no retained estimate
-ok  caught: a claim cites a pin derived_from does not name
-ok  caught: derived_from names a pin no claim cites
-
-== every claim file a real run has landed in an adopter repo, by the same rules ==
-ok  no adopter repo carries a claim file yet -- the skill has not been run for real; the worked example above is what the gate holds to the rules
-
-== the twin binds the pinned series ==
-ok  twin/market_signals.price_moves derives 6 dated moves from market-moves 1.0.0, 9 readings over 3 markets
-ok  the largest is +0.03: polymarket price for '0x9ad402' moved from 0.58 to 0.61 (up) between 2026-08-27 and 2026-08-28
-ok  and a LEVEL still refuses to be read as a probability: 0x7f3c9a (polymarket, 2026-08-26): a price LEVEL (0.41) may never be read as a probability — pri...
-ok  signal-classify binds that move to 'brand-trust' in driftwood's overlay at grade 5, steep 'economic' -- a PROPOSAL the human reviews
-ok  niobium is a scenario in driftwood's library, declared unbound by any pinned feed version: it reaches the twin only through the human-run skill
-
-PASS: classify-and-judge is a human-run skill (disable-model-invocation) whose claim file carries only claim kinds the twin has and a derived_from that names exactly the pins its claims cite, with only the override price-eligible and every rule proved to bite; the twin derives dated moves from the pinned market-moves series and still refuses to read a level as a probability; niobium is a scenario in the adopter's library, unbound by any clock.
+ok  clock is 'github': GITHUB_ACTIONS, GITHUB_RUN_ID, GITHUB_WORKFLOW is set in the environment, so this run is on a GitHub clock
+not ok  run.model_version is not stated: this ran on a GitHub clock, and a claim that does not record which model judged it is not a permitted claim (item 3)
+not ok  run.clock is None but this run is on a GitHub clock (GITHUB_ACTIONS, GITHUB_RUN_ID, GITHUB_WORKFLOW decide, not the file) (item 6)
+not ok  run.declined is not a list: a run that declines to judge must leave a counted row, or the permission's real exercise rate is unknowable (item 7). An empty list is an answer; a missing key is not
+not ok  claim 'driftwood-override-cage-policy-line': a 'override' from a model on a GitHub clock — the permission covers ['judge'] and nothing else, and a 'override' is not a judgement a model may make (item 4)
+FAIL: /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.claude/skills/classify-and-judge/assets/example-claim.yaml is not a claim file the twin can read
+FAIL: the skill's own worked claim file does not validate
