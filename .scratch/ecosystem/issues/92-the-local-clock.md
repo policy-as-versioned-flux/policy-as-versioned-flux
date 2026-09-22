@@ -410,7 +410,7 @@ carries two corrections to ticket 102's Answer (N1: bind 4's qualifier on a move
 quoted run's sha, 417ac08 → 7046106 after the rebase), which `verify-cited-truth.sh` reads as
 input and was run against.
 
-**2026-09-22, a red that was not this ticket's defect.** Truth run 263 graded
+**Correction, 2026-09-22.** A red that was not this ticket's defect. Truth run 263 graded
 `verify/local-clock/verify-local-clock.sh` FAIL. Wayfinder ticket 05's `derive_clock()` lets a
 GitHub Actions marker overrule the declared clock, and the truth clock runs on GitHub, so the
 check's stubbed local run became a governed GitHub run. Hub PR 88 makes the check remove the three
