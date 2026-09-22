@@ -1,7 +1,7 @@
 # 112 — A threshold states the corpus it needs
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -271,3 +271,22 @@ Tested: red first. The seam refusal test failed before the fix (`assert not True
 this branch, `verify-corpus-size.sh` printed the `UNLOOKED:` line and SKIP, and
 `bin/twin verify --only skill_eval_harness_is_agnostic_and_thresholds_are_guarded` read
 "1 skipped and not faked" with exit 0.
+
+## Answer
+
+Resolved 2026-09-22 by hub PR 87. Every threshold states the corpus size it is valid at.
+
+1. `twin/corpus_size.py` derives the minimum from ticket 03's method. It takes the larger of two
+   routes: a standard error at half the gap to a perfect score, and the rule of three. The result
+   is 16 items at 0.80, 12 at 0.75 and 9 at 0.65. No number is imported.
+2. `twin/skill-thresholds.yaml` states `min_items` on every entry. `load_thresholds()` refuses a
+   stated number that is not the derived one, and a lowered minimum needs a citation.
+3. `EvalResult.outcome` is `pass`, `fail` or `not-measurable`. A run below its minimum is not
+   measurable whatever it scored. `EvalResult.measured_count` is the seam ticket 118 builds on.
+4. `verify/twin-evals/verify-corpus-size.sh` grades it. Model permission condition 1 now refuses
+   a score row that is not measurable, or that has fewer items than the minimum the tree states.
+
+Review: three rounds. Round 1 found that a short run could still earn a model permission. Round 2
+found that the live validator did not pass the tree's minimum. Both are fixed, with tests.
+Measured on the day: 6 of 7 metrics are not measurable. Growing the corpus is the Laya map's
+ticket 03 work, not this ticket's.
