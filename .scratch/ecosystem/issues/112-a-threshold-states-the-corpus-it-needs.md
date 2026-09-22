@@ -227,3 +227,47 @@ reviewer's case. The four `tests/test_skills.py` tests failed before the change.
 source files. `bin/twin verify --only` on the citation, append-only and two hash checks: 4 PASS.
 `verify-model-permission.sh` exit 0, `verify-twin-evals.sh` exit 0, `verify-corpus-size.sh`
 exit 3 (the declared amber, unchanged).
+
+### Review round 2, 2026-09-22
+
+The second review blocked on one finding and raised four minor ones. All five are fixed on the
+same branch.
+
+- **Blocking: the live seam did not read the tree's minimum.** `validate_claim.lookup()` called
+  `permission_for()` without `min_items_now`, so the row's own `min_items` stood. A gameplay-lens
+  row with a perfect score, `min_items` 3 and 3 items was granted at the seam, while the gate
+  script, which hands in the tree's 9, refused it. `lookup()` now hands in
+  `min_items_for(skill)`. Two new tests in `tests/test_model_permission.py` load the real
+  validator, stub only the score log, the head readings and the fitted models, and call the
+  lookup it returns. The reviewer's row is refused at item 1. The same row at the tree's minimum
+  is granted, so the refusal is item 1 and not the seam refusing everything.
+- **Minor: the citation guard skipped without declaring it.** It is now registered
+  `may_skip=True`, as `hash_changes_are_authorised` is, so the runner accepts its Skip. The Skip
+  test now also asserts `may_skip()` for both guards.
+- **Minor: `verify-corpus-size.sh` passed leg 3 with no history.** With no baseline it now prints
+  an `UNLOOKED:` line and exits 3 (SKIP), naming what it could not look at.
+- **Minor: two literal `"not-measurable"` strings.** `model_permission.py` and
+  `verify-twin-evals.sh` now compare against `twin.skills.NOT_MEASURABLE`.
+- **Minor: `as_dict()` lacked `measured_count`.** It now carries it, as `record_score()` does.
+  A test asserts the two agree.
+
+Decisions, all delegated:
+
+- The seam reads the minimum the same way it reads the threshold: from the tree, per call. One
+  keyword, no new default. Making `min_items_now` required would break the documented
+  no-threshold-file caller for no gain here, since every caller in the tree now passes it.
+- The citation guard may skip, like `hash_changes_are_authorised`. A depth-1 checkout cannot see
+  a lowering, and SKIP says so. Both CI workflows fetch full history, so the gate is unaffected.
+
+Tested: red first. The seam refusal test failed before the fix (`assert not True`: granted). The
+`may_skip` and `as_dict` assertions in `tests/test_skills.py` failed before the fix. Then
+`.venv/bin/python -m pytest -n0 -q` over `test_causal_claims`, `test_corpus_size`,
+`test_ethics_gate`, `test_evolution_judge`, `test_gameplay_lens`, `test_model_permission`,
+`test_record_skill_scores`, `test_skills`, `test_substrate_generator` and `test_local_clock`:
+274 passed. mypy over `twin tests conftest.py`: no issues in 196 source files.
+`bin/twin verify --only` on the citation, append-only and two hash checks: 4 PASS.
+`verify-model-permission.sh` exit 0 with 0 of 14 granted. `verify-twin-evals.sh` exit 0.
+`verify-corpus-size.sh` exit 3 with `UNLOOKED: none`, the declared amber. In a depth-1 clone of
+this branch, `verify-corpus-size.sh` printed the `UNLOOKED:` line and SKIP, and
+`bin/twin verify --only skill_eval_harness_is_agnostic_and_thresholds_are_guarded` read
+"1 skipped and not faked" with exit 0.
