@@ -157,9 +157,9 @@ short rows. The two causal-claims metrics share one 4-item corpus, so 12 of thos
 - `twin/model_permission.py` condition 1 compares a score with the threshold and does not read
   `min_items`. No permission rests on a short corpus today: conditions 9 and 10 refuse every
   pair, 0 of 14 held on this run of `verify-model-permission.sh`. Reading the minimum in
-  condition 1 is a follow-up for the model-permission owner, not built here.
-- `verify-model-permission.sh`'s `WEAK THRESHOLDS` line still says ticket 112 "owns the sizing".
-  After merge the minimum exists, so that sentence can point here.
+  condition 1 was left as a follow-up. The review round below built it.
+- `verify-model-permission.sh`'s `WEAK THRESHOLDS` line still said ticket 112 "owns the sizing".
+  The review round below rewrote it.
 
 ### How it was tested
 
@@ -181,3 +181,49 @@ short rows. The two causal-claims metrics share one 4-item corpus, so 12 of thos
 
 Nothing waits on the owner. The corpora are what is short: 50 distinct labelled items across six metrics.
 Ticket 03 of the Laya map says where labels can come from and when.
+
+### Review round, 2026-09-22
+
+The review blocked on one finding and raised three minor ones. All four are fixed on the same
+branch.
+
+- **Blocking: condition 1 granted on a short run.** `permission_for()` read only `score` and
+  `threshold`, so a candidate that was never fitted, with a perfect score on 3 gameplay-lens
+  items, held every graded condition. The reviewer ran it; so did the new test before the fix.
+  Condition 1 now also refuses a row whose `outcome` is `not-measurable`, and a row whose count
+  is below the minimum. The count is `measured_count`, else `total`. The minimum is the tree's
+  today, handed in as the new `min_items_now`, as the threshold already is. Left out, the row's
+  own `min_items` stands. A row with neither a count nor a minimum is refused.
+  `record_score()` now also writes `measured_count`, so the ticket 118 seam reaches the
+  permission. `verify-model-permission.sh` hands in `min_items_for(skill)` and gains two item 1
+  negative controls: the reviewer's reproduction, and a legacy row with 3 items. Its positive
+  control row now states 9 items, the gameplay-lens minimum. On this run the table names item 1
+  on 12 of 14 pairs, and 0 of 14 are granted, as before.
+- **Minor: the citation guard read green with no history.** It returned a PASS string when the
+  thresholds file had fewer than two committed versions. It now raises `Skip`, as
+  `hash_changes_are_authorised` does.
+- **Minor: no test at the CI-blindness seam.** `_thresholds_at()` and `_thresholds_baseline()`
+  take an optional path, and four new tests in `tests/test_skills.py` run against a throwaway git
+  repository with hooks off. One reproduces the defect: HEAD equals the tree, so the HEAD-only
+  comparison finds no lowering, and the previous-version baseline finds both. The others cover
+  an uncommitted edit, a single commit, and the Skip. The record test no longer pins today's
+  `['signal-classify']` against its own docstring; it asserts the outcome from each row's
+  `measured_count` and `min_items`.
+- **Minor: the 326 sentence.** The header comment and the `WEAK THRESHOLDS` line in
+  `verify-model-permission.sh` now name `min_items` and say item 1 refuses a run below it.
+
+Decisions, all delegated:
+
+- The permission reads measurability off the row and the tree, not off the corpus. Condition 2
+  already ties the row's digest to the tree, and the row is what the permission grades.
+- The tree's minimum wins over the row's, for the same reason the tree's threshold does: a raised
+  minimum must revoke a row that met the old one.
+- A row with no minimum anywhere is refused, as a row with no threshold is. Absence is not
+  consent.
+
+Tested: red first. The new model-permission tests failed on the missing keyword and the
+reviewer's case. The four `tests/test_skills.py` tests failed before the change. Then
+`.venv/bin/python -m pytest -n0` over the same 13 files: 295 passed. mypy: no issues in 196
+source files. `bin/twin verify --only` on the citation, append-only and two hash checks: 4 PASS.
+`verify-model-permission.sh` exit 0, `verify-twin-evals.sh` exit 0, `verify-corpus-size.sh`
+exit 3 (the declared amber, unchanged).

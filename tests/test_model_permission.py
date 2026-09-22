@@ -116,6 +116,9 @@ def good_row(facts):
         "threshold": 0.65,
         "corpus_digest": facts["corpus_digest"],
         "recorded_at": "2026-09-21T00:00:00Z",
+        "min_items": 9,
+        "outcome": "pass",
+        "total": 9,
     }
 
 
@@ -128,6 +131,7 @@ def _permission(facts, rows, **over):
         "readings": (),
         "fitted_models": {},
         "threshold_now": 0.65,
+        "min_items_now": 9,
     }
     kwargs.update(over)
     return mp.permission_for(_FACTS_SKILL, "fixture-model-1.0.0", **kwargs)
@@ -162,6 +166,39 @@ def test_the_bar_is_the_one_the_tree_sets_today(facts, good_row) -> None:
 def test_a_row_with_no_threshold_and_no_bar_handed_in_is_refused(facts, good_row) -> None:
     row = {k: v for k, v in good_row.items() if k != "threshold"}
     assert 1 in _refused_items(_permission(facts, [row], threshold_now=None))
+
+
+def test_a_run_below_its_stated_minimum_is_refused_whatever_it_scored(facts, good_row) -> None:
+    """Ticket 112 item 1, where a pass has consequences. A perfect score on 3 items, recorded by a
+    candidate that was never fitted, is not measurable, and the permission must not read it as a
+    pass. This is the review's own reproduction: before the fix every graded condition passed."""
+    short = {**good_row, "score": 1.0, "total": 3, "outcome": "not-measurable", "passed": False}
+    permission = _permission(facts, [short])
+    assert 1 in _refused_items(permission), permission.why()
+    assert not permission.granted
+
+
+def test_a_legacy_row_below_the_tree_minimum_is_refused(facts, good_row) -> None:
+    """Rows written before ticket 112 carry no outcome and no min_items. The minimum the tree
+    states today is the one that counts, as the threshold is."""
+    legacy = {k: v for k, v in good_row.items() if k not in ("outcome", "min_items")}
+    assert 1 in _refused_items(_permission(facts, [{**legacy, "total": 3}]))
+
+
+def test_a_raised_minimum_revokes_a_row_that_met_the_old_one(facts, good_row) -> None:
+    assert 1 in _refused_items(_permission(facts, [good_row], min_items_now=10))
+
+
+def test_a_row_with_no_count_or_no_minimum_is_refused(facts, good_row) -> None:
+    uncounted = {k: v for k, v in good_row.items() if k != "total"}
+    assert 1 in _refused_items(_permission(facts, [uncounted]))
+    unsized = {k: v for k, v in good_row.items() if k != "min_items"}
+    assert 1 in _refused_items(_permission(facts, [unsized], min_items_now=None))
+
+
+def test_the_measured_count_is_read_before_the_total(facts, good_row) -> None:
+    """The seam ticket 118 builds on: a run may count fewer items toward its size than it holds."""
+    assert 1 in _refused_items(_permission(facts, [{**good_row, "total": 16, "measured_count": 3}]))
 
 
 def test_a_stale_corpus_digest_is_refused(facts, good_row) -> None:

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from twin.skills import (
@@ -280,3 +282,88 @@ def test_a_minimum_appearing_for_the_first_time_is_not_a_lowering() -> None:
     assert _lowered_without_citation(_doc(s={"threshold": 0.8}), _doc(s={"threshold": 0.8, "min_items": 16})) == []
     assert _lowered_without_citation(_doc(s={"threshold": 0.8, "min_items": 16}),
                                      _doc(s={"threshold": 0.8, "min_items": 20})) == []
+
+
+# -- the citation guard's baseline, at its seam (review of ticket 112) ------------------------
+
+_THRESHOLDS_REL = "twin/skill-thresholds.yaml"
+
+
+def _threshold_repo(tmp_path: Path, *versions: dict) -> Path:
+    """A throwaway git repository holding one commit per thresholds document. It runs no hook, so
+    the fixture never calls the network."""
+    import subprocess
+
+    import yaml
+
+    repo = tmp_path / "repo"
+    (repo / "twin").mkdir(parents=True)
+    hooks = tmp_path / "no-hooks"
+    hooks.mkdir()
+
+    def git(*args: str) -> None:
+        subprocess.run(
+            ["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgsign=false",
+             "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", *args],
+            cwd=repo, check=True, capture_output=True,
+        )
+
+    git("init", "-q")
+    for number, doc in enumerate(versions):
+        (repo / _THRESHOLDS_REL).write_text(yaml.safe_dump(doc), encoding="utf-8")
+        git("add", _THRESHOLDS_REL)
+        git("commit", "-q", "-m", f"version {number}")
+    return repo
+
+
+def test_a_committed_lowering_is_seen_when_the_tree_equals_head(tmp_path) -> None:
+    """The CI case. The checkout IS HEAD, so a baseline of HEAD can only equal itself and a
+    lowering committed in the same diff was never seen. The previous committed version is the
+    baseline instead, and the lowering is caught."""
+    from twin.invariants.harness import _lowered_without_citation, _thresholds_at, _thresholds_baseline
+
+    before = _doc(s={"threshold": 0.65, "min_items": 9})
+    after = _doc(s={"threshold": 0.6, "min_items": 8})
+    repo = _threshold_repo(tmp_path, before, after)
+
+    # The old HEAD-only comparison is blind: this is the defect, reproduced.
+    head = _thresholds_at(repo, "HEAD", _THRESHOLDS_REL)
+    assert head == after
+    assert _lowered_without_citation(head, after) == []
+
+    baseline = _thresholds_baseline(repo, after, _THRESHOLDS_REL)
+    assert baseline is not None
+    earlier, source = baseline
+    assert earlier == before
+    assert source.startswith("the previous version")
+    assert _lowered_without_citation(earlier, after) == ["s min_items 9 -> 8", "s threshold 0.65 -> 0.6"]
+
+
+def test_an_uncommitted_lowering_is_measured_against_head(tmp_path) -> None:
+    from twin.invariants.harness import _thresholds_baseline
+
+    before = _doc(s={"threshold": 0.65, "min_items": 9})
+    repo = _threshold_repo(tmp_path, before)
+    edited = _doc(s={"threshold": 0.6, "min_items": 8})
+    baseline = _thresholds_baseline(repo, edited, _THRESHOLDS_REL)
+    assert baseline is not None and baseline[0] == before
+    assert "uncommitted" in baseline[1]
+
+
+def test_one_committed_version_has_no_baseline(tmp_path) -> None:
+    from twin.invariants.harness import _thresholds_baseline
+
+    only = _doc(s={"threshold": 0.6, "min_items": 8})
+    assert _thresholds_baseline(_threshold_repo(tmp_path, only), only, _THRESHOLDS_REL) is None
+
+
+def test_the_guard_skips_rather_than_passes_when_it_has_no_history(monkeypatch) -> None:
+    """A check that stops looking must not read green. `hash_changes_are_authorised` raises Skip
+    on one committed version; this guard does the same, so a depth-1 checkout whose only commit
+    lowers a threshold reads SKIP, never PASS."""
+    from twin.invariants import Skip
+    from twin.invariants import harness
+
+    monkeypatch.setattr(harness, "_thresholds_baseline", lambda *a, **k: None)
+    with pytest.raises(Skip):
+        harness._skill_eval_harness_is_agnostic_and_thresholds_are_guarded(None)  # type: ignore[arg-type]

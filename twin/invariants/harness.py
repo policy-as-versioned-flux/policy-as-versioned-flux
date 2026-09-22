@@ -736,10 +736,12 @@ def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> 
     current = skills_mod.load_thresholds()
     baseline = _thresholds_baseline(REPO_DIR, current)
     if baseline is None:
-        return (
-            f"{len(real_skills)} real skill names absent from every harness function; the fixture "
-            "skill passes, a degraded one fails and a short corpus is not measurable; no committed "
-            "threshold history to compare yet"
+        # A check that stops looking must not read green: `hash_changes_are_authorised` raises
+        # Skip on one committed version, and so does this (review of ticket 112). A depth-1
+        # checkout whose only commit lowers a threshold would otherwise PASS.
+        raise Skip(
+            "the thresholds file has fewer than two committed versions, so no lowering can be "
+            "measured (the agnostic and fixture legs passed)"
         )
     before, source = baseline
     lowered = _lowered_without_citation(before, current)
@@ -771,18 +773,20 @@ def _lowered_without_citation(before: dict[str, Any], after: dict[str, Any]) -> 
     return sorted(out)
 
 
-def _thresholds_baseline(root: Path, current: dict[str, Any]) -> tuple[dict[str, Any], str] | None:
+def _thresholds_baseline(
+    root: Path, current: dict[str, Any], rel: str | None = None
+) -> tuple[dict[str, Any], str] | None:
     """What a lowering is measured against: `hash_changes_are_authorised`'s two-branch shape. An
     uncommitted edit is compared with HEAD. Otherwise the file's previous committed version is the
     baseline, because in CI the checkout is HEAD and HEAD can only ever equal itself."""
-    head = _thresholds_at(root, "HEAD")
+    rel = rel or _THRESHOLDS_REL
+    head = _thresholds_at(root, "HEAD", rel)
     if head is not None and head != current:
         return head, "the committed thresholds (uncommitted change)"
-    rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
     history = [line for line in (_git(root, "log", "--format=%H", "--", rel) or "").splitlines() if line]
     if len(history) < 2:
         return None
-    earlier = _thresholds_at(root, history[1])
+    earlier = _thresholds_at(root, history[1], rel)
     if earlier is None:
         return None
     return earlier, f"the previous version ({history[1][:12]})"
@@ -2423,8 +2427,11 @@ def _forecast_book_is_blind_by_construction_and_observe_only(ctx: Context) -> st
     )
 
 
-def _thresholds_at(root: Path, ref: str) -> dict[str, Any] | None:
-    rel = (REPO_DIR / "twin" / "skill-thresholds.yaml").relative_to(root).as_posix()
+_THRESHOLDS_REL = "twin/skill-thresholds.yaml"
+
+
+def _thresholds_at(root: Path, ref: str, rel: str | None = None) -> dict[str, Any] | None:
+    rel = rel or _THRESHOLDS_REL
     out = _git(root, "show", f"{ref}:{rel}")
     if out is None:
         return None

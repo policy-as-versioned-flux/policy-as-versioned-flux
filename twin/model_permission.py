@@ -22,7 +22,9 @@ refused.
    recorded against is that same bar. A row carries the threshold as it stood when the run
    happened, so reading the row's own number would let a raised threshold grant a permission the
    estate no longer means to give. This is item 2's reasoning applied to the bar instead of the
-   corpus.
+   corpus. The run must also be measurable (ticket 112): a row whose outcome is `not-measurable`,
+   or whose item count is below the `min_items` the tree states today, clears nothing, whatever
+   it scored.
 2. `corpus_current` — that scoring run's `corpus_digest` is the digest of the corpus in the tree
    today. A stale digest revokes the permission.
 3. `claim_names_the_model` — the claim records which `model_version` judged it. Graded on the
@@ -433,6 +435,24 @@ def newest_score(
     return found
 
 
+def _below_minimum(row: Mapping[str, Any], min_items_now: int | None) -> str:
+    """Why a score row is not measurable, or "" when it is. Ticket 112: a run below the minimum
+    corpus its threshold states is not measurable whatever it scored, so it cannot clear item 1.
+    The minimum is the tree's today, as the threshold is; the row's own number stands only when
+    none is handed in."""
+    if str(row.get("outcome", "")) == "not-measurable":
+        return "the row records its own outcome as not-measurable"
+    minimum = min_items_now if min_items_now is not None else row.get("min_items")
+    if minimum is None:
+        return "no minimum corpus size is stated for this threshold"
+    counted = row.get("measured_count", row.get("total"))
+    if counted is None:
+        return "the row records no item count to set against the minimum"
+    if int(counted) < int(minimum):
+        return f"it counted {int(counted)} items against a stated minimum of {int(minimum)}"
+    return ""
+
+
 def permission_for(
     skill: str,
     model_version: str,
@@ -440,6 +460,7 @@ def permission_for(
     scores: Iterable[Mapping[str, Any]],
     corpus_digest_now: str,
     threshold_now: float | None = None,
+    min_items_now: int | None = None,
     baseline: Baseline | None,
     variance: Mapping[str, int] | None,
     readings: Sequence[HeadReading] = (),
@@ -457,6 +478,12 @@ def permission_for(
     row's own recorded threshold is compared to it as well, because a score graded against a
     different bar is not a score against this one. Left out, the row's own number stands, which
     is only safe for a caller that has no threshold file to read.
+
+    `min_items_now` is the minimum corpus size the tree states for that threshold today (ticket
+    112). Item 1 refuses a row whose own outcome is `not-measurable`, and a row whose measured
+    count (`measured_count`, else `total`) is below this minimum, whatever it scored. Left out,
+    the row's own `min_items` stands; a row with neither has no minimum and is refused, as a row
+    with no threshold is.
 
     `fitted_models` maps a model version to the corpus kind its recorded scores were measured
     under. A model whose kind is `FITTED_CORPUS_KIND` was fitted on the corpus it is graded
@@ -494,7 +521,10 @@ def permission_for(
                     f"; the score was recorded against {recorded_threshold:.3f}, a different bar, so it "
                     f"is not a score against this one"
                 )
-            conditions.append(Condition(1, "threshold_cleared", score >= threshold and not bar_moved, detail))
+            short = _below_minimum(latest, min_items_now)
+            if short:
+                detail += f"; {short}, so the run is not measurable and its score clears nothing"
+            conditions.append(Condition(1, "threshold_cleared", score >= threshold and not bar_moved and not short, detail))
         conditions.append(
             Condition(
                 2,

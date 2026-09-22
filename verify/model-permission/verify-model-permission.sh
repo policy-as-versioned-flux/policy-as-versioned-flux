@@ -40,9 +40,10 @@
 # WHAT IS REPORTED AND NOT GRADED. Each metric's threshold is printed beside the best constant
 # answer its own corpus admits. Five of seven sit at or below it (measured 2026-09-21), which
 # means those thresholds cannot detect a model that has learned nothing. That is the corpus's
-# problem, not this rule's: ticket 03 measured that a per-skill corpus needs 326 items and the
-# estate holds 42, and eco-system ticket 112 owns the sizing. The permission refuses such a
-# score anyway, by item 9, so the weak threshold grants nothing. It is printed rather than
+# problem, not this rule's. Eco-system ticket 112 derives each threshold's minimum corpus
+# (min_items in twin/skill-thresholds.yaml: 16 at 0.80, 12 at 0.75, 9 at 0.65) and item 1
+# refuses a run below it. The permission refuses such a score anyway, by items 1 and 9, so the
+# weak threshold grants nothing. It is printed rather than
 # graded because turning it red here would make this check a proxy for a corpus nobody can grow
 # for 341 days.
 #
@@ -76,7 +77,7 @@ sys.path.insert(0, str(ROOT))
 
 from twin import model_permission as mp
 from twin import record_skill_scores as rss
-from twin.skills import load_scores, threshold_for
+from twin.skills import load_scores, min_items_for, threshold_for
 
 fails = 0
 def out(ok, msg):
@@ -93,13 +94,14 @@ FITTED = rss.fitted_models()
 
 
 def permission(skill, model_version, scores=None, facts=None, readings=None, seam=True, fitted=None,
-               threshold=None):
+               threshold=None, min_items=None):
     facts = facts or FACTS[skill]
     return mp.permission_for(
         skill, model_version,
         scores=SCORES if scores is None else scores,
         corpus_digest_now=facts["corpus_digest"],
         threshold_now=threshold_for(skill) if threshold is None else threshold,
+        min_items_now=min_items_for(skill) if min_items is None else min_items,
         baseline=facts["baseline"],
         variance=facts["variance"],
         readings=READINGS if readings is None else readings,
@@ -168,7 +170,11 @@ out(incumbent and not any(p.granted for p in incumbent),
 FAKE = "fixture-model-1.0.0"
 facts = FACTS["gameplay-lens"]           # threshold 0.65, baseline 0.333, every read field varies
 good_row = {"skill": "gameplay-lens", "model_version": FAKE, "score": 0.95,
-            "threshold": 0.65, "corpus_digest": facts["corpus_digest"], "recorded_at": "2026-09-21T00:00:00Z"}
+            "threshold": 0.65, "corpus_digest": facts["corpus_digest"], "recorded_at": "2026-09-21T00:00:00Z",
+            # A fabricated row: it claims the minimum gameplay-lens states, which the real corpus
+            # does not yet hold. The positive control needs a measurable run to grant anything.
+            "min_items": min_items_for("gameplay-lens"), "total": min_items_for("gameplay-lens"),
+            "outcome": "pass"}
 
 # POSITIVE control first. A rule that refuses everything passes every negative control there is.
 perm = permission("gameplay-lens", FAKE, scores=[good_row], facts=facts, readings=[], fitted={})
@@ -188,6 +194,12 @@ refused_by(1, row={**good_row, "score": 0.10}, label="a score under the versione
 # ...and item 1 reads the bar in the TREE, not the one the row happens to carry. A raised
 # threshold must not be cleared by a score that was graded against the old one.
 refused_by(1, row={**good_row, "threshold": 0.20}, label="a score recorded against a bar the threshold file no longer sets")
+# ...and item 1 refuses a run below the minimum corpus its threshold states (ticket 112), even
+# with a perfect score. This is the review's reproduction: a candidate never fitted, 3 items.
+refused_by(1, row={**good_row, "score": 1.0, "total": 3, "outcome": "not-measurable", "passed": False},
+           label="a perfect score on 3 items, below the stated minimum, recorded as not-measurable")
+refused_by(1, row={k: v for k, v in {**good_row, "total": 3}.items() if k not in ("outcome", "min_items")},
+           label="a legacy row with no outcome, 3 items against the minimum the tree states today")
 refused_by(2, row={**good_row, "corpus_digest": "0" * 64}, label="a scoring run against a corpus the tree no longer holds")
 refused_by(5, row={**good_row, "model_version": "somebody-else-2.0.0"}, label="no recorded score at all; absence is not consent")
 refused_by(6, seam=True and False, label="the seam did not run, so nothing was checked")
@@ -398,8 +410,8 @@ for metric in rss.METRICS:
           % (metric, f["total"], t, f["baseline"].score, verdict, f["baseline"].description))
 print("WEAK THRESHOLDS: %d of %d sit at or below the best constant answer their own corpus admits. "
       "Item 9 refuses such a score anyway, so no permission rests on them. The corpus is what is "
-      "short -- ticket 03 measured 326 items needed per skill against the estate's 42, and "
-      "eco-system ticket 112 owns the sizing." % (weakest, len(rss.METRICS)))
+      "short -- the minimum each threshold states (min_items, eco-system ticket 112) is "
+      "printed by verify-corpus-size.sh, and item 1 refuses a run below it." % (weakest, len(rss.METRICS)))
 
 print("SUBTOTAL: %d observed false" % fails)
 sys.exit(1 if fails else 0)

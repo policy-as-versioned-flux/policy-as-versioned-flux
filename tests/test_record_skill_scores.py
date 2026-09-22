@@ -51,10 +51,10 @@ def test_a_corpus_below_its_stated_minimum_is_recorded_as_not_measurable(tmp_pat
     minimum moves from not-measurable to pass without this test changing."""
     entries = rss.run("2026-09-22T00:00:00Z", "heuristic-test", path=tmp_path / "s.jsonl")
     for e in entries:
-        expected = "pass" if e["total"] >= e["min_items"] else "not-measurable"
+        # The row states the count its minimum is measured against, so the permission (condition
+        # 1 in twin/model_permission.py) can read measurability off the row it grades.
+        assert e["measured_count"] == e["total"], e
+        expected = "pass" if e["measured_count"] >= e["min_items"] else "not-measurable"
         assert e["outcome"] == expected, e
         assert e["passed"] is (expected == "pass"), e
-    # the measured state on the day the ticket landed, 2026-09-22: one of seven is measurable
-    measurable = sorted(e["skill"] for e in entries if e["outcome"] == "pass")
-    assert measurable == ["signal-classify"], measurable
 

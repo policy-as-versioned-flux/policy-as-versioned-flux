@@ -263,6 +263,7 @@ def record_score(
         "passed": result.passed,
         "corpus_digest": result.corpus_digest,
         "total": len(result.items),
+        "measured_count": result.measured_count,
     }
     target = path or SCORES_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
