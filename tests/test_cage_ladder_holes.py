@@ -141,15 +141,27 @@ def _render(tmp: Path, exe: str, body: Path, namespace_labels: dict, pod_labels:
                           "--values-file", str(tmp / "values.yaml")],
                          capture_output=True, text=True, cwd=tmp)
     assert "error: 0" in run.stdout, f"the engine refused the served body:\n{run.stdout}{run.stderr}"
-    if "skipped mutate policy" in run.stdout:
-        return {}
-    # The engine prints `policy <name> applied to <ns>/Pod/<name>:` and then the mutated object.
-    blocks = re.split(r"^policy .* applied to .*:$", run.stdout, flags=re.M)
+    return _mutated_pod(run.stdout, pod)
+
+
+def _mutated_pod(stdout: str, sent: dict) -> dict:
+    """The pod as some policy in the file CHANGED it, or {} when none did. The engine's own
+    words are not enough on either side. It prints `applied to` with the pod unchanged when a
+    body skips it (4.0.0 does), and a file with two policies can print `skipped mutate policy`
+    for one while the other cages the pod. Until the second review of PR 28 (2026-09-22) the
+    skip line alone was read as "outside the cage", so a shadow policy caging CoreDNS at
+    `isolated` read as skipped. So: compare what came back with what was sent."""
+    # The engine prints `policy <name> applied to <ns>/Pod/<name>:` and then the object.
+    blocks = re.split(r"^policy .* applied to .*:$", stdout, flags=re.M)
     for block in blocks[1:]:
-        for doc in yaml.safe_load_all(block):
-            if isinstance(doc, dict) and doc.get("kind") == "Pod":
-                return doc
-    raise AssertionError(f"no mutated pod came back:\n{run.stdout}")
+        # Only the first document after the header is the object; the engine's own prose
+        # (`Mutation: ...`) follows the `---` and is not YAML.
+        doc = yaml.safe_load(re.split(r"(?m)^---\s*$", block)[0])
+        if isinstance(doc, dict) and doc.get("kind") == "Pod" and doc != sent:
+            return doc
+    if len(blocks) > 1 or "skipped mutate policy" in stdout:
+        return {}
+    raise AssertionError(f"the engine neither applied nor skipped a policy:\n{stdout}")
 
 
 def _rung(tmp: Path, exe: str, body: Path, namespace_labels: dict) -> str:
@@ -201,6 +213,36 @@ LOOSENINGS = {
     "dropped": lambda gate: "true",
     "or-true": lambda gate: f"{gate} || true",
     "or-true-next-line": lambda gate: f"{gate}\n        || true",
+}
+
+
+GATE_ENTRY = ("    - name: claims-a-policy-version\n      expression: >-\n"
+              f"        {CLAIM_GATE_EXPR}\n")
+ANY_POD = "    - name: any-pod\n      expression: 'true'\n"
+
+
+def _second_policy_document(graded: str) -> str:
+    """The real body, then `---` and a copy named `cage-tier-shadow` whose one matchCondition
+    every pod passes. The gate is still in the file, word for word."""
+    shadow = graded.replace("  name: cage-tier\n", "  name: cage-tier-shadow\n", 1)
+    return graded + "\n---\n" + shadow.replace(GATE_ENTRY, ANY_POD, 1)
+
+
+def _gate_as_annotation_text(graded: str) -> str:
+    """The real matchCondition swapped for one every pod passes, and the gate entry parked
+    verbatim in an annotation string, where a text search still finds it."""
+    note = "".join("      " + line + "\n" for line in GATE_ENTRY.splitlines())
+    return graded.replace(GATE_ENTRY, ANY_POD, 1).replace(
+        "metadata:\n  name: cage-tier\n",
+        "metadata:\n  name: cage-tier\n  annotations:\n    note: |\n" + note, 1)
+
+
+# Each way the gate's text can stay in the file while it stops being the one policy's own
+# matchCondition (second review of PR 28, 2026-09-22). The engine cages an unclaimed pod under
+# both; a whole-file search read both as gated.
+MISPLACEMENTS = {
+    "second-policy-document": _second_policy_document,
+    "gate-as-annotation-text": _gate_as_annotation_text,
 }
 
 
@@ -303,6 +345,59 @@ def test_the_hazard_proof_3_guards_is_real(loosen, tmp_path):
         (PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text(), loosen))
     pod = _render(tmp_path, exe, body, SUBSTRATE, {})
     assert pod and pod["metadata"]["labels"]["posture.acme.io/tier"] == "isolated", pod
+
+
+@pytest.mark.parametrize("misplace", sorted(MISPLACEMENTS))
+def test_the_hazard_a_misplaced_gate_hides_is_real(misplace, tmp_path):
+    """The gate's words are still in the file, and the engine still cages CoreDNS at
+    `isolated`. This is also the engine-side leg's own check: `_render` must see the caging
+    policy even when another policy in the same file printed a skip."""
+    exe = _kyverno()
+    graded = (PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text()
+    assert GATE_ENTRY in graded, "the graded body's gate entry moved -- re-read it before planting"
+    body = tmp_path / "misplaced.yaml"
+    body.write_text(MISPLACEMENTS[misplace](graded))
+    pod = _render(tmp_path, exe, body, SUBSTRATE, {})
+    assert pod and pod["metadata"]["labels"]["posture.acme.io/tier"] == "isolated", pod
+
+
+def test_a_mutation_outranks_a_skip_line_in_the_engine_output():
+    """`_render`'s reading of kyverno's stdout, pinned without an engine. The shapes are the
+    ones kyverno 1.18.2 printed: 4.0.0 prints `applied to` with the pod unchanged and then a skip
+    line for an unclaimed pod, and the two-policy plant prints a skip for one policy while the
+    other cages the pod."""
+    sent = {"apiVersion": "v1", "kind": "Pod", "metadata": {"name": "coredns", "labels": {}}}
+    unchanged = ("policy cage-tier applied to substrate/Pod/coredns:\n"
+                 "apiVersion: v1\nkind: Pod\nmetadata:\n  name: coredns\n  labels: {}\n---\n")
+    caged = ("policy cage-tier-shadow applied to substrate/Pod/coredns:\n"
+             "apiVersion: v1\nkind: Pod\nmetadata:\n  name: coredns\n  labels:\n"
+             "    posture.acme.io/tier: isolated\n---\n")
+    skip = "skipped mutate policy cage-tier -> resource substrate/Pod/coredns\n"
+    assert _mutated_pod(unchanged + caged + skip, sent)["metadata"]["labels"] == \
+        {"posture.acme.io/tier": "isolated"}, "a caging policy beside a skipping one cages"
+    assert _mutated_pod(unchanged + skip, sent) == {}, "an unchanged pod plus a skip is a skip"
+    assert _mutated_pod(skip, sent) == {}
+
+
+@pytest.mark.parametrize("misplace", sorted(MISPLACEMENTS))
+def test_the_tripwire_fires_when_the_gate_is_not_the_policys_own(misplace, tmp_path):
+    graded = (PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text()
+    run = _tripwire(_plant_platform(tmp_path, graded_body=MISPLACEMENTS[misplace](graded)))
+    out = run.stdout + run.stderr
+    assert run.returncode == 1, out
+    assert "without the claims-a-policy-version gate: platform/graded/policies/cage-tier.yaml" in out, out
+
+
+def test_the_tripwire_fires_on_a_duplicated_matchconditions_key(tmp_path):
+    """A second `matchConditions:` key under spec. The pinned CLI loads no policy from such a
+    file (`Applying 0 policy rule(s)`), so what a cluster would do is not observed here; the
+    tripwire refuses to vouch for a gate it cannot read as one list."""
+    graded = (PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text()
+    body = graded.replace("  variables:\n", "  matchConditions:\n" + ANY_POD + "  variables:\n", 1)
+    assert body != graded
+    run = _tripwire(_plant_platform(tmp_path, graded_body=body))
+    out = run.stdout + run.stderr
+    assert run.returncode == 1 and "2 spec.matchConditions keys" in out, out
 
 
 def test_the_tripwire_passes_a_platform_that_serves_only_the_fixed_line(tmp_path):

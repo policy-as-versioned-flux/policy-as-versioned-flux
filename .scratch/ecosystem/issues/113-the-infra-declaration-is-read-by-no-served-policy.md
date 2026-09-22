@@ -162,3 +162,48 @@ After the fix, proof 3 still prints ok over all 6 real bodies. Checks rerun:
 `kyverno test graded/tests/cage-tier` 13 passed, 0 failed. Under the PATH kyverno 1.19.1,
 `verify-shift-left.sh` fails to compile the v4.0.0 and v5.0.0 bodies. That is the known pin,
 not this change.
+
+### Review round 2, 2026-09-22
+
+1. **Blocking: proof 3a was blind to placement.** It accepted the gate's text anywhere in the
+   file. Two planted bodies showed it. One is the real graded body plus `---` and a copy named
+   `cage-tier-shadow` whose one matchCondition is `'true'`. The other swaps the real
+   matchCondition for `'true'` and parks the gate entry in a `metadata.annotations` string. Under
+   kyverno 1.18.2 the engine cages an unclaimed substrate pod at `isolated` under both, and the
+   tripwire at 6bd55c6 printed PASS for both. Fix: a new `claim_gate_problem` in
+   `distribution/verify-infra-declaration.sh` reads the body's structure with regexes. The file
+   must hold exactly one YAML document, of top-level `kind: MutatingPolicy`, with one top-level
+   `spec:`. That spec must carry exactly one `matchConditions:` key, as a block list. The gate is
+   read only from an item of that list, at the list's item indent. Each failure names its reason
+   in the FAIL line.
+   - Delegated: stay regex-only, no PyYAML. The script runs on the estate's plain python3.
+     A shape the regexes cannot read fails. It is never taken on trust.
+   - Delegated: extra matchConditions stay allowed. The engine ANDs them, so they only narrow.
+   - Delegated: a duplicated `matchConditions:` key fails. The pinned CLI loads no policy from
+     such a file (`Applying 0 policy rule(s)`), so what a cluster would do is not observed. The
+     tripwire does not vouch for a gate it cannot read as one list.
+   - Red first. The new selfcheck cases (second document, `--- ` with a trailing space,
+     annotation text, duplicate key, gate nested under another key, flow-form list, a gate-shaped
+     line nested inside another item, a non-MutatingPolicy kind) ran against the old functions and
+     failed with `AssertionError: a second policy document without the gate matches every pod`.
+     With the fix the selfcheck prints ok.
+   - Hub: `MISPLACEMENTS` in `tests/test_cage_ladder_holes.py` plants both shapes in the graded
+     body. Against the old platform script, with kyverno 1.18.2: 4 failed, 25 passed (the two
+     misplacement tripwire legs, the duplicate-key leg, and the unclaimed-pod leg; see item 2).
+     With the fix: 29 passed. `test_the_hazard_a_misplaced_gate_hides_is_real` shows the engine
+     cages an unclaimed pod at `isolated` under both shapes.
+2. **Minor: `_render` trusted the skip line.** It returned "skipped" whenever any policy in the
+   file printed `skipped mutate policy`, even when another policy caged the pod. The fix compares
+   what came back with the pod that was sent. A changed pod is a mutation. The "changed" part
+   matters: kyverno 1.18.2 prints `applied to` with the pod unchanged, and then a skip line, for
+   an unclaimed pod under the v4.0.0 body (measured by `kyverno apply` on the v4.0.0 body).
+   Reading `applied to` as a mutation made
+   `test_an_unclaimed_substrate_pod_is_outside_every_delivered_body` fail on v4.0.0, which is how
+   that was found. Red first: the old `_render` fails
+   `test_the_hazard_a_misplaced_gate_hides_is_real[second-policy-document]`. The new pure test
+   `test_a_mutation_outranks_a_skip_line_in_the_engine_output` pins both output shapes.
+
+After the fix, through the gate's path, the script reads 6 served bodies. Proof 3 prints ok.
+Proof 4 still names the same 4 v4.0.0 bodies at `baseline` and exits 1. Checks rerun:
+`tests/test_cage_ladder_holes.py` and `tests/test_misuse.py` 70 passed, mypy clean over 194
+files. The reviewer's probe script now prints FAIL for all three plants and PASS for the control.
