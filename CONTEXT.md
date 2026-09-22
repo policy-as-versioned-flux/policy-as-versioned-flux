@@ -373,20 +373,29 @@ that a rewritten entry cites stay as the record of the decision at the time.
   **exemption**-free settlement in miniature — the bottom rung is "too expensive to run or not
   functional", reached by the £, and never a carve-out.
 
-- **Twin** (rewritten 2026-08-28, ticket 11) — The eco-system's intelligence participant. It
-  consumes the signed feeds, an adopter's own **twin overlay** and history; it publishes **priced
-  forecasts and forward intelligence** under a declared **perspective**, signed by the twin agent
+- **Twin** (rewritten 2026-08-28, ticket 11; the judgement sentence amended 2026-09-22, wayfinder
+  ticket 09) — The eco-system's intelligence participant. It consumes the signed feeds, an
+  adopter's own **twin overlay** and history; it publishes **priced forecasts and forward
+  intelligence** under a declared **perspective**, signed by the twin agent
   (an **actor class** of its own) and scored against reality under proper scoring rules. Each
   adopter org (`driftwood`, `tuppence`, `ludlow`) has a twin of its own, whose overlay lives in the
   adopter's own signed repo with the shared world layer vendored and pinned by the same tag; the
   twin itself is a self-versioned, signed package. The eleven real firms it models today stay as
   the backtest corpus and as evals of the model and tooling (re-grills 31, 39). A subscribed feed
-  version becomes a **sensed signal** by lookup, with no judgement; anything needing judgement is a
-  skill a human runs. On every sweep it plays its **standing scenarios**. The twin **computes a
-  cage tier** under the org's perspective; the **proposer** enacts it as a PR (re-grill 21). The
-  twin acts inside a priced cage of its own; propose-only is the outermost setting, with an Article
-  22 floor for significant decisions about people (re-grill 37). One £, many perspectives: no
-  perspective is privileged (re-grill 33).
+  version becomes a **sensed signal** by lookup, with no judgement. **Anything needing judgement is
+  a skill a human runs, unless a model holds a measured permission for that skill** (the owner,
+  2026-09-21, amending ticket 75 Q10; `twin/model_permission.py`;
+  [ADR-0029](docs/adr/0029-a-candidate-model-enters-on-a-measured-permission-and-laya-does-not-hold-one.md)).
+  A permission is a mechanism and not a grant: ten conditions, each graded by
+  `verify/model-permission/verify-model-permission.sh`, and **0 of 14 (metric, model version)
+  pairs hold one on 2026-09-21**. The candidate model is refused on its score, its heads and its
+  corpus; the incumbent heuristic is refused because it is graded on the corpus it was fitted on.
+  So today the sentence reads exactly as it did before the amendment, and the difference is that a
+  check observes it rather than a person keeping it. On every sweep it plays its **standing
+  scenarios**. The twin **computes a cage tier** under the org's perspective; the **proposer**
+  enacts it as a PR (re-grill 21). The twin acts inside a priced cage of its own; propose-only is
+  the outermost setting, with an Article 22 floor for significant decisions about people
+  (re-grill 37). One £, many perspectives: no perspective is privileged (re-grill 33).
 
 ---
 

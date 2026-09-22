@@ -378,3 +378,51 @@ truth surface rather than read off the lane five hours later.
   in, step-scoped. Splitting the commit-and-push into a third job means handing the whole tree
   between runners with `id-token: write` for gitsign, which is a bigger change than either of
   these tickets, and it is recorded here rather than done quietly.
+
+- **2026-09-22 (wayfinder ticket 09, the owner's amendment of 2026-09-21; the mechanism delegated
+  under ADR-0025): point 6 is amended — a model may judge on a GitHub clock, within thresholds,
+  and no model holds that permission.** Point 6 recorded the owner's Q10 constraint of 2026-09-03:
+  a model runs inside Claude Code on his machine, because no tokens exist anywhere else. On
+  2026-09-21 the owner amended it: **a model may judge on a GitHub clock, within thresholds.**
+  Point 6's own text is not rewritten, for the reason ADR-0015 was not rewritten; this note
+  carries the amendment.
+
+  **What changed and what did not.** The permission governs the **GitHub clock alone**, because
+  that is the clock the owner's words named and the one this ADR forbade. A `human` run and a
+  local-clock run keep their own terms, so point 6's three calls — a headless run writes no
+  override, the world simulator's stamp refuses, a rehearsal is never citable — stand unaltered,
+  and nothing that runs today runs differently.
+
+  **"Within thresholds" is ten conditions, not a sentence.** `twin/model_permission.py` grades
+  them and `verify/model-permission/verify-model-permission.sh` puts the verdict on the truth
+  surface. They are: the versioned threshold in the tree today, the corpus digest, the claim
+  naming its model, judging and never merging, a recorded score, the seam, counted refusals, a
+  head that varies, a score above the corpus's best constant answer, and a corpus the model was
+  not fitted on. **0 of 14 (metric, model version) pairs hold a permission on 2026-09-21.** The
+  candidate model is refused on items 1, 2, 5, 8 and 9; the incumbent heuristic on item 10. See
+  [ADR-0029](0029-a-candidate-model-enters-on-a-measured-permission-and-laya-does-not-hold-one.md).
+
+  **The clock is derived, never read off the file.** `derive_clock()` takes it from
+  `GITHUB_ACTIONS`, `GITHUB_RUN_ID` and `GITHUB_WORKFLOW`, so a run inside Actions is a `github`
+  clock whatever its claim file says. The route around a per-clock rule is to declare the wrong
+  clock, and the check also asserts that **no workflow in the tree sets, clears or exports any of
+  those three markers**. This is the same discipline the `--headless` fix applied when the
+  no-override rule rested on the model declaring itself headless.
+
+  **The seam is the claim validator, out of a tree the model could not write to.**
+  `.claude/skills/classify-and-judge/assets/validate_claim.py::validate`, which
+  `talk/local-clock.sh` already copies and runs over every committed claim file before the child
+  model starts. A refusal fails the step and the branch is never pushed. The model never chooses
+  whether the validator runs, which is exactly the failure the trdrbot prior art's own defect
+  I-68 records: a complete, working permission ladder consulted in 2 of 89 decide cycles, because
+  "the refusals that matter happen upstream in prose". **A permission the caller may decline to
+  consult is not a permission.**
+
+  Two paths to a model-made artefact existed, not one: the clock's steps table names
+  `validate_claim.py` for the `classify` row and `validate_forecast.py` for the `derive` row.
+  Both take `--clock`, and the check asserts that every validator the table names does, so a
+  third skill cannot skip the seam.
+
+  **What this does not change**: nothing about the lane, D1 or D2, and nothing about point 3's
+  split between the job that holds a credential and the job that grades. A clock still appends
+  only observations.

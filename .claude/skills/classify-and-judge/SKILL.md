@@ -50,6 +50,16 @@ rule, so this skill's ordinary path and ticket 92's terms both read exactly as b
 
 `verify/model-permission/verify-model-permission.sh` grades the rule on the gate.
 
+**Recorded 2026-09-22 (wayfinder ticket 09).** The amendment above now has its ADRs.
+[ADR-0029](../../../docs/adr/0029-a-candidate-model-enters-on-a-measured-permission-and-laya-does-not-hold-one.md)
+records the measurement and the refusal: the candidate model loses five of six metrics, ties the
+sixth, and is at or below the best constant answer its own corpus admits on five of six, so it
+holds no permission, and neither does the incumbent.
+[ADR-0024](../../../docs/adr/0024-the-daily-clock-the-caged-observation-lane-and-the-derived-ledger.md)
+point 6 carries a dated note of
+its own with the owner's amendment, the ten conditions and the derived clock. **Nothing in the
+sentence at the top of this file changes, and nothing about this skill's ordinary path changes.**
+
 **Two things this skill may never do:** merge its own PR, and invent an entry. If a statement is
 not in the published pool with a URL, it does not become a signal here — it is a **scenario**, and
 scenarios live in the adopter's `twin/orgs/<org>/scenarios/` library. The niobium supply shock is

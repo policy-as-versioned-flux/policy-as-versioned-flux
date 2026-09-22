@@ -1,6 +1,11 @@
 # Map — Laya, loophole and the trdrbot prior art, measured then decided
 
-Label: `wayfinder:map`. Charted 2026-09-21.
+Label: `wayfinder:map`. Charted 2026-09-21. **Closed 2026-09-22: every ticket is resolved and the
+destination is reached.** Laya is refused by
+[ADR-0029](../../docs/adr/0029-a-candidate-model-enters-on-a-measured-permission-and-laya-does-not-hold-one.md);
+loophole enters as an external tool run in rounds by
+[ADR-0030](../../docs/adr/0030-loophole-runs-as-an-external-tool-in-rounds-and-the-estate-keeps-the-pointer.md).
+Seven tickets graduated to the eco-system map: 111, 112, 113, 114, 115, 116 and 117.
 
 Subordinate to [the eco-system map](../ecosystem/map.md). That map stays the one route to the
 north star. This map answers one question that arrived beside it. Its output graduates as tickets
@@ -433,31 +438,54 @@ flowchart TD
         T06 --> T07 --> T08 --> T11
     end
 
-    T09["09 · The two ADRs<br/>and the amendments<br/><i>task</i>"]
+    T09["09 · The two ADRs<br/>and the amendments<br/><i>resolved</i>"]
     T04 --> T09
     T05 --> T09
     T08 --> T09
     T11 --> T09
-    T09 --> DEST(["Destination:<br/>two ADRs, each resting<br/>on a measured number"])
-    T10 -. "ideas taken graduate" .-> ECO(["Eco-system map"])
+    T09 --> DEST(["Destination REACHED:<br/>ADR-0029 refuses Laya,<br/>ADR-0030 admits loophole"])
+    T10 -. "3 ideas graduate" .-> ECO(["Eco-system map"])
     T08 -. "2 survivors graduate" .-> ECO
+    T09 -. "115, 116, 117 graduate" .-> ECO
 
     classDef frontier fill:#1f6feb,stroke:#0b3d91,color:#fff
     classDef blocked fill:#30363d,stroke:#8b949e,color:#e6edf3
     classDef done fill:#8957e5,stroke:#4c2889,color:#fff
     classDef dest fill:#238636,stroke:#0f5323,color:#fff
-    class T09 frontier
-    class T01,T02,T03,T04,T05,T06,T07,T08,T10,T11 done
+    class T01,T02,T03,T04,T05,T06,T07,T08,T09,T10,T11 done
     class DEST,ECO dest
 ```
 
-Blue is the frontier. Purple is resolved. Redrawn 2026-09-21 after ticket 05. **Every ticket on
-this map but ticket 09 is resolved, and ticket 09 is now the frontier.** It is the destination
-itself: the two ADRs and the amendments.
+Purple is resolved. Redrawn 2026-09-22 after ticket 09. **Every ticket on this map is resolved
+and the frontier is empty.** The map is closed: both ADRs are written, the three amendments
+landed, and what remains lives on the eco-system map as tickets 115, 116 and 117 or in its Out of
+scope.
 
 ## Decisions so far
 
 <!-- one line per closed ticket -->
+
+- [09 — The two ADRs and the amendments](issues/09-the-two-adrs-and-the-amendments.md):
+  **The destination is reached. Laya is refused; loophole enters as an external tool run in
+  rounds.**
+  [ADR-0029](../../docs/adr/0029-a-candidate-model-enters-on-a-measured-permission-and-laya-does-not-hold-one.md)
+  refuses Laya by the estate's own rule rather than by a bad score alone: 0 of 14 (metric, model
+  version) pairs hold a permission, Laya is refused on items 1, 2, 5, 8 and 9, and **the incumbent
+  heuristic is refused too**, on item 10. Eleven points, every score tabled beside the best
+  constant answer its corpus admits, `substrate-generator` recorded as not measurable rather than
+  0.000, and six stated terms a candidate may re-enter on.
+  [ADR-0030](../../docs/adr/0030-loophole-runs-as-an-external-tool-in-rounds-and-the-estate-keeps-the-pointer.md)
+  admits loophole in the only shape its licence permits, in **three rounds per document**, with
+  the model budget (about 1.24 USD, 24 calls, 9 minutes) and the real budget (roughly three times
+  ticket 08, for checking about 18 candidates) both stated. Three amendments landed: `CONTEXT.md`'s
+  Twin sentence now reads "unless a model holds a measured permission", ADR-0024 point 6 gains a
+  dated note, and `classify-and-judge` cites both ADRs. Eco-system ticket 75 Q10 gains a dated
+  amendment section, with item 10 left as it stands. **The twin-evals baseline defect is fixed,
+  not recorded**: the incumbent was being graded against Laya's rows, so five of seven regression
+  comparisons were dead and the incumbent could have fallen from 1.000 to 0.600 and read `pass`.
+  Three tickets graduated (115, 116, 117) and four lines went to the eco-system map's Out of
+  scope. Four checks named and run locally: twin-evals, model-permission, map-surface,
+  cited-truth and derived-status all PASS.
 
 - [05 — "Within thresholds" becomes a checkable permission](issues/05-within-thresholds-becomes-a-checkable-permission.md):
   **Built, and it grants nothing: 0 of 14 (metric, model version) pairs hold a permission.** Ten
@@ -605,16 +633,22 @@ itself: the two ADRs and the amendments.
 
 ## Not yet specified
 
-- What Laya costs on the hardware this estate would actually run it on. Ticket 02's 169.7 ms is
-  an Apple-silicon laptop with 8 performance cores. A GitHub Actions runner is 4 vCPU, so the
-  number moves, and "on what terms" in the destination includes hardware. This stays fog rather
-  than a ticket because it evaporates if ticket 09 decides a human runs Laya locally, which is
-  exactly what call 5 forced for loophole. Waits on ticket 09.
-- Whether the 12 candidates from ticket 11's rounds two and three earn a ticket-08 style
-  deterministic check. Four restate a reason round one already gave; eight are new, and eight
-  checks is roughly ticket 08's whole cost again. It is only worth charting if ticket 09 decides
-  loophole enters on repeated rounds, because a single unchecked round is what the decision is
-  about. Waits on ticket 09.
+**Cleared 2026-09-22 by ticket 09. Three of the seven patches below graduated or evaporated, and
+the map is closed.** What is left here is what a later effort inherits, not a frontier.
+
+- ~~What Laya costs on the hardware this estate would actually run it on.~~ **Evaporated.**
+  Ticket 09 refused Laya, so nothing in this estate runs it on any clock and the number does not
+  need measuring. It returns with ADR-0029 point 10's terms, as a fresh effort. Recorded on the
+  eco-system map's Out of scope.
+- ~~Whether the 12 candidates from ticket 11's rounds two and three earn a ticket-08 style
+  deterministic check.~~ **Graduated** as
+  [eco-system ticket 116](../ecosystem/issues/116-the-twelve-unchecked-loophole-candidates.md).
+  ADR-0030 fixed the unit of adoption at three rounds, which turns 12 unread candidates from a
+  curiosity into a gap: at the measured survival rate the eight new ones hold about two or three
+  real defects.
+- **New, and graduated with it:** making a loophole round a procedure anyone can re-run, which is
+  the adoption work ADR-0030 creates.
+  [Eco-system ticket 115](../ecosystem/issues/115-a-loophole-round-is-a-procedure-this-estate-can-re-run.md).
 - Whether the `derive-probability` skill, eco-system ticket 93, could take a Laya input. **Ticket
   04 sharpened this and did not answer it.** Laya's classification routes went near-constant on
   three of the six skills, but its `noul` head placed all four `evolution-judge` organisations in
@@ -628,7 +662,8 @@ itself: the two ADRs and the amendments.
   05 built the derivation and exercised it with a synthetic environment; the only remaining lie,
   a workflow unsetting a marker, is asserted against the workflow files rather than observed at
   run time. Nothing can measure the real thing until a model holds a permission, and none does.
-  Waits on ticket 09.
+  **Ticket 09 did not close it and could not**: ADR-0029 refused the only candidate, so 0 of 14
+  pairs hold a permission. Moved to the eco-system map's own fog, because this map is closed.
 
 - Named firms and named executives in loophole output. Waits on eco-system ticket 82.
   Ticket 07's round produced none: the only proper nouns in the six candidates are `CoreDNS`
@@ -643,6 +678,11 @@ itself: the two ADRs and the amendments.
 
 ## Out of scope
 
+- **Laya, and any adoption of it.** Refused 2026-09-22 by
+  [ADR-0029](../../docs/adr/0029-a-candidate-model-enters-on-a-measured-permission-and-laya-does-not-hold-one.md).
+  It holds no permission on any of the seven metrics, and neither does the incumbent heuristic.
+  Point 10 states the six terms a candidate may re-enter on, and that is a fresh effort rather
+  than a resumption of this one.
 - **Paying for a corpus that could support a specialised fit.** Ticket 03 priced the only route
   with real supply at roughly 57 backtest organisations for one skill, against the four the estate
   has. [Ticket 04](issues/04-the-bake-off-laya-against-the-six-heuristics.md) then measured the
@@ -654,7 +694,8 @@ itself: the two ADRs and the amendments.
 - Either tool as a gate check. See call 2.
 - loophole against Kyverno CEL. loophole attacks prose. A CEL expression is checked by
   compose-check and the adopter gate, which are deterministic and already exist.
-- Production adoption of either tool inside this map. The destination is a decision.
+- Production adoption of either tool inside this map. The destination is a decision, and ticket
+  09 made it. What follows lives on the eco-system map as tickets 115, 116 and 117.
 - Laya's multilingual checkpoint. The estate publishes in English.
 - Paid Anthropic API spend for loophole. The owner ruled on 2026-09-21.
 - Vendoring loophole, forking it into the estate, or reimplementing its prompts. No licence
