@@ -205,3 +205,37 @@ still read `baseline`; a released tree is frozen, and their defaults are a fact 
 tags contain, not a live default. Ticket 84 supplies the third line and the supersede pricing;
 ticket 64 moves the three adopters' pins and recomposes their served copies, which is when the
 flip reaches an adopter cluster.
+
+## Note, 2026-09-22 (eco-system ticket 113, delegated): `infra` is a role, not a rung
+
+Ticket 08 of the Laya and loophole map measured three things this ADR did not describe, under
+kyverno 1.18.2. No served `cage-tier` body reads `infra`. A pod that claims a version in one of
+the three substrate Namespaces takes the body's ungoverned else-branch: `baseline` under 4.0.0,
+`isolated` under 5.0.0. And an unclaimed pod there is skipped by the claim matchCondition with the
+declaration or without it, so the ordering rule above guarded nothing: pulling the declaration
+could never have put CoreDNS on `isolated`.
+
+**Delegated** (ADR-0025): the assistant decided, the owner was not asked.
+
+- **`infra` stays out of every served body.** The ladder a body renders is `baseline, restricted,
+  quarantine, isolated`. An `infra` dial row would repeat `isolated` or be looser than it, and a
+  looser one is an exemption bought by choosing a Namespace. The declaration stays: it names the
+  substrate, it is entitled by the `platform` role, and the truth surface reads it to know which
+  Namespaces to guard. Retiring it would move no rendered cage and would touch the proposer, the
+  binding check and the gate.
+- **The substrate is protected by what protects it.** `distribution/verify-infra-declaration.sh`
+  proof 3 now guards the two facts that keep CoreDNS out of the cage: every served body keeps its
+  `claims-a-policy-version` matchCondition, and no substrate Namespace is governed. Break either
+  and the cluster stops. Proof 4 requires every delivered body to cage a claiming substrate pod at
+  `isolated`, and FAILS by name while any does not.
+- **The 4.0.0 exposure closes by retirement, not by edit.** 4.0.0 is signed and frozen. It closes
+  when the three adopters recompose onto 5.0.0 and 4.0.0 leaves `versions.yaml`; both need signed
+  tags the owner cuts. Until then the gate reads FAIL for it.
+- **`tier_binding.py` grades `infra` as the `isolated` it renders.** Admission cannot read a
+  party's roles, so an entitled and an unentitled `infra` on a governed Namespace render the same
+  rung. The verdict was already `bound` in both cases and still is; it now names the rung the cage
+  delivers.
+
+The ladder sentence in "The decision" above reads `baseline, restricted, quarantine, isolated,
+infra`. Read `infra` there as a declaration beside the ladder, not a fifth rung.
+

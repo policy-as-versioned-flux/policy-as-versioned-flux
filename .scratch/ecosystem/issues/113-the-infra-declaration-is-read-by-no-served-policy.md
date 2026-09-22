@@ -51,3 +51,74 @@ The three facts are false, or each is recorded as a decision with its reason. Th
 in `tests/test_cage_ladder_holes.py` becomes the repair's regression test rather than a standing
 red. The `adopter-runs-uncaged-in-the-platform-substrate` row in `twin/ecosystem-misuse-catalogue.yaml` stops
 waiting on this ticket and names the built mechanism by path.
+
+## Build, 2026-09-22
+
+Platform PR: https://github.com/policy-as-versioned-platform/platform/pull/28. Hub PR: this
+ticket's branch `ticket-113-infra-is-a-role-not-a-rung`. Merge the platform PR first.
+
+### Decisions
+
+1. **`infra` is a role declaration, not a rung. It stays out of every served body.**
+   Delegated. An `infra` dial row would repeat `isolated` or be looser than it. A looser row is an
+   exemption bought by choosing a Namespace. The declaration stays: it names the substrate, the
+   `platform` role entitles it, and the truth surface reads it to know which Namespaces to guard.
+   Retiring it would move no rendered cage and would touch the proposer, the binding check and
+   the gate. Fact 1 is now this decision. `test_infra_stays_out_of_every_cage_tier_body_by_decision`
+   holds it, and tripwire proof 4 fails by name on any body that starts reading the word.
+2. **Proof 3 guards the hazard that exists.** Delegated. What keeps CoreDNS out of the cage is
+   (a) the `claims-a-policy-version` matchCondition in every served body and (b) no substrate
+   Namespace being governed, so `governed-namespace-requires-claim` skips them too. Proof 3 now
+   checks both. The hub plants each break and the tripwire fires. The engine confirms the hazard
+   is real: with the claim gate swapped for `true`, graded puts an unclaimed substrate pod on
+   `isolated`. Fact 3 is closed as a finding and kept as a regression leg.
+3. **Fact 2 is named by the gate, and closes by retirement.** Delegated. New proof 4 requires
+   every delivered body (each line `versions.yaml` declares, graded, each adopter's composed
+   copy) to cage a claiming substrate pod at `isolated`. It FAILS today on four bodies, all
+   4.0.0. A signed version body cannot be edited, and a second mutating policy over the same pods
+   is the incoherence ADR-0022 already measured. So it closes when the adopters recompose onto
+   5.0.0 and 4.0.0 leaves `versions.yaml`. The gate grade for this script moves from PASS to FAIL
+   on purpose: the old PASS was a tripwire passing over a live exposure.
+4. **`tier_binding.py` grades `infra` as the `isolated` it renders.** Delegated. Admission cannot
+   read a party's roles, so an entitled and an unentitled `infra` on a governed Namespace render
+   the same rung. The engine shows `isolated` under every delivered body, both ways. Writing
+   `infra` buys a party nothing that writing `isolated` does not, so no role lookup is added. The
+   verdict still reads `bound`, and `effective` now says `isolated` instead of a rung no cage has.
+5. **Rejected: govern the substrate Namespaces and exempt `infra` from the unclaimed-pod cage.**
+   That would make 4.0.0 render `isolated` for claiming pods. But it is an exemption keyed on a
+   label, which the doctrine bans, and it counts the platform as a governed party.
+
+### What was measured, and how
+
+- `kyverno version` of the CLI used: 1.18.2 (copied into this task's scratchpad; PATH kyverno is
+  1.19.1 and the engine legs skip on it by name).
+- `bash distribution/verify-infra-declaration.sh` over the estate, platform at this branch.
+  Proof 4 printed `baseline` for platform v4.0.0 and the driftwood, ludlow and tuppence v4.0.0
+  composed copies, and `isolated` for v5.0.0 and graded. Exit 1.
+- The same script on platform origin/main before the change: exit 0, PASS.
+- `git ls-tree origin/main composed/policies/` in each adopter: only `v4.0.0`, in all three.
+- `distribution/versions.yaml` on platform origin/main declares 4.0.0 and 5.0.0.
+
+### Tests
+
+- `tests/test_cage_ladder_holes.py -n0 -q`, kyverno 1.18.2, platform at origin/main (red):
+  5 failed, 11 passed.
+- Same, platform at the branch (green): 16 passed.
+- Same, kyverno 1.19.1: 10 passed, 6 skipped by name.
+- `tests/test_misuse.py -n0 -q`: 41 passed.
+- `verify/misuse/verify-misuse.sh`: PASS. The row now resolves 7 anchors and waits on nothing.
+- `verify/tier-binding/verify-tier-binding.sh`: PASS, unchanged verdicts for all three adopters.
+- `verify/adr-supersession/verify-adr-supersession.sh` and `verify/cited-truth/verify-cited-truth.sh`: PASS.
+- mypy over `twin tests conftest.py`: no issues in 194 source files.
+- Platform: tripwire `--selfcheck` ok; `tier_binding.py selfcheck` ok (case 12 red first);
+  `shift-left/verify-shift-left.sh` passed; `kyverno test graded/tests/cage-tier` 13 passed.
+
+### Waits on the owner
+
+1. **Signed composed tags for driftwood, ludlow and tuppence on 5.0.0.** Each adopter recomposes
+   onto platform policy 5.0.0 and cuts a signed composed tag. Until then all three serve 4.0.0
+   and a claiming pod in their substrate lands on `baseline`.
+2. **Retiring 4.0.0 from `distribution/versions.yaml`**, after step 1. Proof 4 then passes.
+
+The gate reads FAIL for `verify-infra-declaration.sh` until both are done. That is the intended
+verdict, not a regression.

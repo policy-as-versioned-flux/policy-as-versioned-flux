@@ -9,16 +9,21 @@ Neither survivor reproduces the wording of the scenario that pointed at it. Both
 and both came back with a different mechanism from the one the model named, which is the whole
 reason the ticket refuses to catalogue a candidate unread.
 
-  A. **`infra` is read by no served cage-tier body.** ADR-0022 gives a `platform`-role party the
-     right to declare a Namespace at `infra`, and `platform/engine/namespaces.yaml` declares
-     kube-system, flux-system and kyverno that way. No served policy body contains the word. The
-     rung is absent from `variables.tier`'s membership test, so it falls to that test's else
-     branch: `baseline` under v4.0.0, which all three adopters serve, and `isolated` under v5.0.0.
-     Two consequences, both measured below under the pinned engine. A pod that CLAIMS a policy
-     version in one of those three Namespaces lands on the LOOSEST rung, not on a substrate rung.
-     A pod that claims none is skipped whether the declaration is there or not, so pulling the
-     declaration changes nothing for CoreDNS -- and that is the hazard
-     `distribution/verify-infra-declaration.sh` says it is the tripwire for.
+  A. **`infra` is read by no served cage-tier body.** Measured 2026-09-21 as a hole; repaired and
+     decided 2026-09-22 by eco-system ticket 113, so leg A is now that repair's regression test.
+     ADR-0022 gives a `platform`-role party the right to declare a Namespace at `infra`, and
+     `platform/engine/namespaces.yaml` declares kube-system, flux-system and kyverno that way.
+     Ticket 113 decided `infra` is a ROLE declaration and not a rung: no served body reads it,
+     and that is now asserted as a decision rather than reported as a surprise. What protects
+     the substrate is measured here instead. An UNCLAIMED pod there is outside every served
+     cage-tier body by its `claims-a-policy-version` matchCondition, with the declaration or
+     without it. A CLAIMING pod there takes the body's ungoverned else-branch: `isolated` under
+     5.0.0 and graded, `baseline` -- the loosest rung -- under 4.0.0, which all three adopters
+     still serve. `distribution/verify-infra-declaration.sh` was re-aimed at those two facts:
+     its proof 3 guards the claim gate and the substrate's ungoverned state (the hazard a
+     planted body shows is real), and its proof 4 names every delivered body that still cages a
+     claiming substrate pod looser than `isolated`. The legs below hold the engine and that
+     offline script to the same answer.
 
   B. **A second governed Namespace document silences the hub's binding walk, at exit 0.**
      `platform/shift-left/tier_binding.py` returns 3 -- could-not-look -- when a party declares
@@ -51,16 +56,20 @@ ESTATE = HUB / ".estate-clone"
 PLATFORM = ESTATE / "platform"
 ADOPTERS = ("driftwood", "ludlow", "tuppence")
 PINNED_KYVERNO = "1.18.2"
+TRIPWIRE = Path("distribution") / "verify-infra-declaration.sh"
+CLAIM = "policy-as-versioned.dev/policy-version"
+SUBSTRATE = {"platform.acme.io/plane": "engine", "posture.acme.io/tier": "infra"}
 
 # The rungs `variables.tier`'s membership test admits. `infra` is deliberately not among them
-# (wargamer.LADDER says so too), which is exactly why the else branch is what an `infra`
-# Namespace gets.
+# (wargamer.LADDER says so too, and ticket 113 decided it stays that way), which is exactly why
+# the else branch is what an `infra` Namespace gets.
 SELECTABLE = ("baseline", "restricted", "quarantine", "isolated")
 
 
-def _served_cage_tier_bodies() -> list[Path]:
-    """Every copy of cage-tier anyone serves: the hub's released trees, the authoring tree, and
-    each adopter's composed copy. `.work/` is a builder's scratch tree and is not served."""
+def _every_cage_tier_body() -> list[Path]:
+    """Every copy of cage-tier anyone holds: the hub's released trees (retired ones included),
+    the authoring tree, and each adopter's composed copy. `.work/` is a builder's scratch tree
+    and vselfcheck is a fixture; neither is held by anyone."""
     found: list[Path] = []
     for pattern in ("distribution/policies/v*/cage-tier.yaml", "graded/policies/cage-tier.yaml"):
         found += [p for p in PLATFORM.glob(pattern)
@@ -70,6 +79,26 @@ def _served_cage_tier_bodies() -> list[Path]:
     return sorted(found)
 
 
+def _declared_versions() -> list[str]:
+    """The lines `distribution/versions.yaml` declares, read with a real YAML parser -- the
+    tripwire reads the same array with a regex, so the two readings check each other."""
+    doc = yaml.safe_load((PLATFORM / "distribution" / "versions.yaml").read_text())
+    return [v["version"] for block in doc["spec"]["inputs"] for v in block["versions"]]
+
+
+def _delivered_bodies() -> list[Path]:
+    """What reaches a cluster: each DECLARED line, the graded authoring copy the next line is cut
+    from, and each adopter's composed copy. The set the tripwire's proofs 3 and 4 read."""
+    found = [PLATFORM / "distribution" / "policies" / f"v{v}" / "cage-tier.yaml"
+             for v in _declared_versions()]
+    found.append(PLATFORM / "graded" / "policies" / "cage-tier.yaml")
+    for adopter in ADOPTERS:
+        found += sorted((ESTATE / adopter).glob("composed/policies/v*/cage-tier.yaml"))
+    missing = [p for p in found if not p.is_file()]
+    assert not missing, f"a delivered body is absent from the estate: {missing}"
+    return found
+
+
 def _without_comments(body: Path) -> str:
     """The policy BODY, with the prose stripped. `verify-infra-declaration.sh` had to learn the
     same lesson on 2026-09-04: its own changelog comment quoted the shape it had replaced, and
@@ -77,9 +106,11 @@ def _without_comments(body: Path) -> str:
     return "\n".join(re.sub(r"#.*$", "", line) for line in body.read_text(encoding="utf-8").splitlines())
 
 
-def _policy_version(body: Path) -> str:
+def _claim(body: Path) -> str:
+    """The claim that selects this body. A released or composed body self-scopes to its own
+    version label; the graded authoring copy carries none and matches any non-empty claim."""
     doc = yaml.safe_load(body.read_text(encoding="utf-8"))
-    return doc["metadata"]["labels"]["policy-as-versioned.dev/policy-version"]
+    return doc["metadata"].get("labels", {}).get(CLAIM, "graded")
 
 
 def _kyverno() -> str:
@@ -121,12 +152,61 @@ def _render(tmp: Path, exe: str, body: Path, namespace_labels: dict, pod_labels:
     raise AssertionError(f"no mutated pod came back:\n{run.stdout}")
 
 
+def _rung(tmp: Path, exe: str, body: Path, namespace_labels: dict) -> str:
+    """The rung a CLAIMING pod gets from `body` in a Namespace carrying `namespace_labels`."""
+    pod = _render(tmp, exe, body, namespace_labels, {CLAIM: _claim(body)})
+    assert pod, f"{body}: a claiming pod was skipped -- the body does not self-scope as assumed"
+    return pod["metadata"]["labels"]["posture.acme.io/tier"]
+
+
+def _tripwire(platform: Path) -> subprocess.CompletedProcess:
+    """`verify-infra-declaration.sh` as the gate calls it: no arguments, so its selfcheck runs
+    first. It derives the estate from its own location, so a planted platform is planted beside
+    whatever adopters its parent directory holds."""
+    return subprocess.run(["bash", str(platform / TRIPWIRE)], capture_output=True, text=True)
+
+
+def _plant_platform(root: Path, graded_body: str | None = None, namespaces: str | None = None,
+                    declared: tuple[str, ...] = ("5.0.0",)) -> Path:
+    """A platform checkout the tripwire can run over, built from the REAL files, with one thing
+    changed. The estate beside it holds no adopter, so only the platform's own bodies count."""
+    plat = root / "estate" / "platform"
+    (plat / "distribution").mkdir(parents=True)
+    shutil.copy(PLATFORM / TRIPWIRE, plat / TRIPWIRE)
+    shutil.copy(PLATFORM / "party.yaml", plat / "party.yaml")
+    (plat / "engine").mkdir()
+    (plat / "engine" / "namespaces.yaml").write_text(
+        namespaces if namespaces is not None
+        else (PLATFORM / "engine" / "namespaces.yaml").read_text())
+    (plat / "distribution" / "versions.yaml").write_text(
+        "spec:\n  inputs:\n    - versions:\n"
+        + "".join(f'        - {{ version: "{v}", tag: "policy/v{v}" }}\n' for v in declared))
+    for v in declared:
+        (plat / "distribution" / "policies" / f"v{v}").mkdir(parents=True)
+        shutil.copy(PLATFORM / "distribution" / "policies" / f"v{v}" / "cage-tier.yaml",
+                    plat / "distribution" / "policies" / f"v{v}" / "cage-tier.yaml")
+    (plat / "graded" / "policies").mkdir(parents=True)
+    (plat / "graded" / "policies" / "cage-tier.yaml").write_text(
+        graded_body if graded_body is not None
+        else (PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text())
+    return plat
+
+
+def _without_claim_gate(body: str) -> str:
+    """The graded authoring body with its `claims-a-policy-version` matchCondition swapped for
+    one every pod passes. The one edit proof 3 exists to catch."""
+    gated = re.sub(r"object\.metadata\.\?labels\['policy-as-versioned\.dev/policy-version'\]"
+                   r"\.orValue\(''\) != ''", "true", body, count=1)
+    assert gated != body, "the graded body's claim gate moved -- re-read it before planting"
+    return gated
+
+
 # --------------------------------------------------------------------------------------------
-# A. `infra` is a declaration no served body reads
+# A. `infra` is a role declaration, and the substrate is protected by what really protects it
 # --------------------------------------------------------------------------------------------
 
 def test_the_platform_declares_three_namespaces_at_infra_and_governs_none_of_them():
-    """The premise both legs below rest on, read rather than assumed."""
+    """The premise every leg below rests on, read rather than assumed."""
     docs = list(yaml.safe_load_all((PLATFORM / "engine" / "namespaces.yaml").read_text()))
     declared = {d["metadata"]["name"]: d["metadata"].get("labels", {}) for d in docs if d}
     assert set(declared) == {"kyverno", "flux-system", "kube-system"}
@@ -136,56 +216,146 @@ def test_the_platform_declares_three_namespaces_at_infra_and_governs_none_of_the
             f"{name} is governed after all -- leg A's else branch is the UNGOVERNED one"
 
 
-def test_infra_appears_in_no_served_cage_tier_body():
-    """Read as text, over every copy anyone serves. The hub's own
-    `distribution/verify-infra-declaration.sh` calls its proof-3 scan a live tripwire for CoreDNS;
-    this is the sentence that tripwire assumes and nothing states."""
-    bodies = _served_cage_tier_bodies()
-    assert len(bodies) >= 4, f"only {len(bodies)} served cage-tier bodies found -- the scan is blind"
+def test_infra_stays_out_of_every_cage_tier_body_by_decision():
+    """Ticket 113 decided `infra` is not a rung: any dial row for it would repeat `isolated` or be
+    looser, and looser is an exemption bought by choosing a Namespace. Read as text, over every
+    copy anyone holds. A body that starts reading the word needs a new decision, and the
+    tripwire's proof 4 fails on it by name until one is made."""
+    bodies = _every_cage_tier_body()
+    assert len(bodies) >= 4, f"only {len(bodies)} cage-tier bodies found -- the scan is blind"
     carrying = [str(p.relative_to(HUB)) for p in bodies if "infra" in _without_comments(p)]
-    assert carrying == [], f"a served body reads `infra` after all: {carrying}"
+    assert carrying == [], f"a body reads `infra` -- ticket 113's decision needs revisiting: {carrying}"
 
 
-@pytest.mark.parametrize("adopter", ADOPTERS)
-def test_a_claiming_pod_in_an_infra_namespace_lands_on_the_loosest_rung(adopter, tmp_path):
-    """The rung an adopter's SERVED body gives a pod in the platform's substrate Namespaces.
-    Not `infra`, and not the bottom rung either: the loosest one on the ladder."""
+def test_a_claiming_substrate_pod_falls_closed_under_the_newest_line_and_graded(tmp_path):
+    """The repair, where the platform can make it: the newest declared line and the authoring copy
+    the next line is cut from both cage a claiming pod in an `infra` Namespace at `isolated`."""
     exe = _kyverno()
-    bodies = sorted((ESTATE / adopter).glob("composed/policies/v*/cage-tier.yaml"))
-    assert bodies, f"{adopter} serves no cage-tier body"
-    for body in bodies:
-        version = _policy_version(body)
-        pod = _render(tmp_path, exe, body,
-                      {"platform.acme.io/plane": "engine", "posture.acme.io/tier": "infra"},
-                      {"policy-as-versioned.dev/policy-version": version})
-        tier = pod["metadata"]["labels"]["posture.acme.io/tier"]
-        assert tier in SELECTABLE, f"{adopter} {version}: rendered {tier!r}, which is not a rung"
-        assert tier != "infra"
-        assert tier == "baseline", (
-            f"{adopter} {version}: an ungoverned `infra` Namespace rendered {tier!r}. The finding "
-            f"was `baseline`, the LOOSEST rung, measured 2026-09-21. If this now reads `isolated` "
-            f"the adopter has re-pinned past the 2026-09-04 flip and the hole has closed -- "
-            f"re-state the catalogue row rather than loosening this assertion.")
-        assert pod["spec"]["priorityClassName"].startswith("cage-baseline-")
+    newest = max(_declared_versions(), key=lambda v: tuple(int(x) for x in v.split(".")))
+    for body in (PLATFORM / "distribution" / "policies" / f"v{newest}" / "cage-tier.yaml",
+                 PLATFORM / "graded" / "policies" / "cage-tier.yaml"):
+        tier = _rung(tmp_path, exe, body, SUBSTRATE)
+        assert tier == "isolated", f"{body.relative_to(ESTATE)}: a claiming substrate pod got {tier!r}"
 
 
-def test_pulling_the_infra_declaration_changes_nothing_for_an_unclaimed_pod(tmp_path):
-    """CoreDNS claims no policy version, so cage-tier's own matchConditions skip it -- with the
-    declaration and without it, under BOTH the flipped and the unflipped body. So the
-    configuration `verify-infra-declaration.sh` says it is the tripwire for, "CoreDNS lands in
-    isolated and the cluster stops", is not a configuration any served body produces."""
+def test_the_tripwire_names_exactly_the_bodies_the_engine_cages_loosely(tmp_path):
+    """Fact 2, as the gate now sees it. The engine renders a claiming substrate pod under every
+    delivered body; the offline tripwire reads the same bodies with regexes. They must name the
+    same offenders, and the tripwire must FAIL while there are any. The only offenders allowed
+    are 4.0.0 bodies, which are signed and frozen: the exposure closes when the adopters serve
+    5.0.0 and 4.0.0 leaves versions.yaml, and a NEW offender is a regression."""
     exe = _kyverno()
-    bodies = [p for p in PLATFORM.glob("distribution/policies/v*/cage-tier.yaml")
-              if ".work" not in p.parts]
-    assert bodies
-    for body in bodies:
-        with_label = _render(tmp_path, exe, body,
-                             {"platform.acme.io/plane": "engine", "posture.acme.io/tier": "infra"},
-                             {})
+    loose = {}
+    for body in _delivered_bodies():
+        tier = _rung(tmp_path, exe, body, SUBSTRATE)
+        assert tier in SELECTABLE, f"{body}: rendered {tier!r}, which is not a rung"
+        if tier != "isolated":
+            loose[str(body.relative_to(ESTATE))] = tier
+    for rel, tier in loose.items():
+        assert "/v4.0.0/" in rel and tier == "baseline", (
+            f"{rel} cages a claiming substrate pod at {tier!r}: only the frozen 4.0.0 bodies may "
+            f"still do that")
+    run = _tripwire(PLATFORM)
+    out = run.stdout + run.stderr
+    if not loose:
+        assert run.returncode == 0 and "PASS:" in out, out
+        return
+    assert run.returncode == 1, out
+    fail = next(line for line in out.splitlines() if line.startswith("FAIL:"))
+    assert "claims a policy version in kube-system" in fail, fail
+    named = dict(re.findall(r"(\S+/cage-tier\.yaml)=(\w+)", fail))
+    assert named == loose, f"the tripwire and the engine disagree:\n  tripwire {named}\n  engine   {loose}"
+
+
+def test_an_unclaimed_substrate_pod_is_outside_every_delivered_body(tmp_path):
+    """Fact 3, now the property proof 3 guards. CoreDNS claims no policy version, so every
+    delivered cage-tier body skips it -- with the `infra` declaration and without it. The
+    declaration is not what keeps the substrate running; the claim gate is."""
+    exe = _kyverno()
+    for body in _delivered_bodies():
+        with_label = _render(tmp_path, exe, body, SUBSTRATE, {})
         without_label = _render(tmp_path, exe, body, {"platform.acme.io/plane": "engine"}, {})
         assert with_label == {} == without_label, (
-            f"{body.name} {_policy_version(body)}: an unclaimed pod was caged -- the declaration "
-            f"is doing work after all, and this leg of the finding has closed")
+            f"{body.relative_to(ESTATE)}: an unclaimed substrate pod was caged -- CoreDNS would "
+            f"stop")
+
+
+def test_the_hazard_proof_3_guards_is_real(tmp_path):
+    """The tripwire must guard a configuration that does happen. Drop the claim gate from the
+    graded body and the engine puts an unclaimed substrate pod -- CoreDNS -- on `isolated`: no
+    ingress, no egress, first eviction."""
+    exe = _kyverno()
+    body = tmp_path / "ungated.yaml"
+    body.write_text(_without_claim_gate((PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text()))
+    pod = _render(tmp_path, exe, body, SUBSTRATE, {})
+    assert pod and pod["metadata"]["labels"]["posture.acme.io/tier"] == "isolated", pod
+
+
+def test_the_tripwire_passes_a_platform_that_serves_only_the_fixed_line(tmp_path):
+    """The control. Without it, the FAIL legs below could be the tripwire failing everything."""
+    run = _tripwire(_plant_platform(tmp_path))
+    assert run.returncode == 0 and "PASS:" in run.stdout, run.stdout + run.stderr
+
+
+def test_the_tripwire_fires_when_a_served_body_drops_the_claim_gate(tmp_path):
+    body = _without_claim_gate((PLATFORM / "graded" / "policies" / "cage-tier.yaml").read_text())
+    run = _tripwire(_plant_platform(tmp_path, graded_body=body))
+    out = run.stdout + run.stderr
+    assert run.returncode == 1, out
+    assert "without the claims-a-policy-version gate: platform/graded/policies/cage-tier.yaml" in out, out
+
+
+def test_the_tripwire_fires_when_a_substrate_namespace_is_governed(tmp_path):
+    ns = (PLATFORM / "engine" / "namespaces.yaml").read_text().replace(
+        "name: kube-system\n  labels: { platform.acme.io/plane: engine,",
+        'name: kube-system\n  labels: { policy-as-versioned.dev/governed: "true", '
+        "platform.acme.io/plane: engine,")
+    assert "governed" in ns, "the kube-system manifest moved -- re-read it before planting"
+    run = _tripwire(_plant_platform(tmp_path, namespaces=ns))
+    out = run.stdout + run.stderr
+    assert run.returncode == 1 and "governed" in out and "kube-system" in out, out
+
+
+def test_the_tripwire_fires_on_a_declared_line_that_cages_the_substrate_loosely(tmp_path):
+    """Fact 2 planted on the platform alone: declare 4.0.0 beside 5.0.0 and proof 4 names it."""
+    run = _tripwire(_plant_platform(tmp_path, declared=("4.0.0", "5.0.0")))
+    out = run.stdout + run.stderr
+    assert run.returncode == 1, out
+    assert "platform/distribution/policies/v4.0.0/cage-tier.yaml=baseline" in out, out
+    assert "v5.0.0/cage-tier.yaml=" not in out.split("FAIL:")[-1], out
+
+
+@pytest.mark.parametrize("entitled", [True, False])
+def test_a_governed_namespace_declaring_infra_renders_isolated_under_every_delivered_body(entitled, tmp_path):
+    """Ticket 113 item 4. `tier_binding.py` grades an `infra` declaration `bound` because
+    `isolated`, what it renders, is the tightest rung a price selects. That is only safe if the
+    cage really renders `isolated` for it, under every body anyone is delivered, whoever wrote
+    it -- admission cannot read a party's roles, so `entitled` changes nothing the engine sees and
+    the parameter is here to say so."""
+    exe = _kyverno()
+    labels = {"policy-as-versioned.dev/governed": "true", "posture.acme.io/tier": "infra"}
+    if entitled:
+        labels["platform.acme.io/plane"] = "engine"
+    for body in _delivered_bodies():
+        tier = _rung(tmp_path, exe, body, labels)
+        assert tier == "isolated", f"{body.relative_to(ESTATE)}: a governed `infra` rendered {tier!r}"
+
+
+def test_tier_binding_grades_infra_as_the_isolated_it_renders(tmp_path):
+    """The binding check's verdict names the rung the cage delivers, not a rung no cage has."""
+    adopter = tmp_path / "adopter"
+    (adopter / "gitops" / "apps").mkdir(parents=True)
+    (adopter / "gitops" / "apps" / "namespace.yaml").write_text(
+        "apiVersion: v1\nkind: Namespace\nmetadata:\n  name: x\n  labels:\n"
+        '    policy-as-versioned.dev/governed: "true"\n    posture.acme.io/tier: "infra"\n')
+    (tmp_path / "evidence.json").write_text(json.dumps({"prices": [
+        {"source": "ico", "kind": "feed", "proposed_tier": "isolated", "changed": False}]}))
+    run = subprocess.run(["python3", str(PLATFORM / "shift-left" / "tier_binding.py"), "check",
+                          "--evidence", str(tmp_path / "evidence.json"),
+                          "--adopter-dir", str(adopter)], capture_output=True, text=True)
+    assert run.returncode == 0, run.stdout + run.stderr
+    assert "declares 'infra' (renders 'isolated'" in run.stdout, run.stdout
+
 
 
 # --------------------------------------------------------------------------------------------
