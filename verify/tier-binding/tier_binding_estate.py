@@ -18,11 +18,25 @@ hub's side of the same question, asked of what is COMMITTED in `.estate-clone/` 
      TRANSLITERATION of platform's fold, so agreement over every shape proves the pinned copy has
      not drifted from the rule it mirrors -- copy fidelity, not two minds agreeing.
 
-Neither reads a cluster and neither writes anything. A party with nothing composed yet, or no
-governed Namespace, is could-not-look for that party, not a failure -- but if NO party could be
-looked at, the whole check is could-not-look, because a PASS sentence about no one is a lie.
+Neither reads a cluster and neither writes anything. A party the check cannot look at is
+could-not-look for that party, not a failure. Whether that holds the WHOLE walk back turns on
+whether the party is OWED an observation (eco-system ticket 114):
 
-Exit 0 observed true; 1 observed false (a `FAIL:` line for each); 3 could not look.
+  * a party whose signed `party.yaml` claims the `adopter` role, or that publishes a
+    `composed/evidence.json`, is owed one. If platform's check returns could-not-look for it --
+    two governed Namespace declarations, no governed Namespace, no evidence -- the walk has not
+    observed the estate whole and exits 3, naming the party on its last line. Until 2026-09-22
+    it printed the party's SKIP line, carried on, and exited 0 while any other party was bound,
+    so an adopter could silence its own observation by declaring a second governed Namespace
+    and `talk/verify-all.sh`, which grades by exit code alone, read PASS;
+  * a party that is neither (platform today: no adopter role, nothing composed) owes nothing,
+    and its SKIP line is printed and holds nothing back.
+
+And if NO party could be looked at, the whole check is could-not-look, because a PASS sentence
+about no one is a lie.
+
+Exit 0 observed true; 1 observed false (a `FAIL:` line for each, and it outranks a party that
+could not be looked at); 3 could not look.
 
 Usage:  tier_binding_estate.py check [--estate-clone DIR]
         tier_binding_estate.py selfcheck
@@ -43,8 +57,56 @@ POLICY_PACKAGE = "selection-policy"
 
 # Every party that could carry a governed Namespace and a priced document. `feeds`,
 # `insurer`, `nist` and `ico` publish; they declare no cage of their own, and are simply
-# not found rather than being named as holes.
+# not found rather than being named as holes. Any OTHER directory whose party.yaml claims the
+# adopter role is walked as well (ticket 114): the role is signed there, so a fourth adopter is
+# looked at the day it exists rather than the day someone edits this tuple.
 PARTIES = ("driftwood", "tuppence", "ludlow", "platform")
+ADOPTER_ROLE = "adopter"
+
+
+def claimed_roles(party_yaml: Path) -> list[str]:
+    """The `roles:` a party artefact declares, read by hand: this walk runs under whatever
+    python3 the runner has, and pyyaml is not promised (the same reason platform's tier_pr
+    reads the floor by hand). Both shapes the estate writes are read -- a flow list
+    `roles: [a, b]` and a block list under `roles:`. An unreadable file declares nothing."""
+    try:
+        text = party_yaml.read_text()
+    except (OSError, UnicodeDecodeError):
+        return []
+    lines = text.splitlines()
+    for i, line in enumerate(lines):
+        if not line.startswith("roles:"):
+            continue
+        rest = line[len("roles:"):].split("#", 1)[0].strip()
+        if rest.startswith("["):
+            return [r.strip().strip("'\"") for r in rest.strip("[]").split(",") if r.strip()]
+        found = []
+        for item in lines[i + 1:]:
+            stripped = item.split("#", 1)[0].strip()
+            if not stripped:
+                continue
+            if not item[:1].isspace() or not stripped.startswith("- "):
+                break
+            found.append(stripped[2:].strip().strip("'\""))
+        return found
+    return []
+
+
+def owed(party_dir: Path) -> str | None:
+    """Why this party is owed an observation, or None when it owes none (ticket 114)."""
+    if ADOPTER_ROLE in claimed_roles(party_dir / "party.yaml"):
+        return f"its party.yaml claims the {ADOPTER_ROLE} role"
+    if (party_dir / "composed" / "evidence.json").exists():
+        return "it publishes a composed evidence document"
+    return None
+
+
+def walked(estate: Path) -> list[str]:
+    """PARTIES in their order, then every other party in the estate claiming the adopter role."""
+    extra = sorted(p.name for p in estate.iterdir()
+                   if p.is_dir() and p.name not in PARTIES
+                   and ADOPTER_ROLE in claimed_roles(p / "party.yaml"))
+    return list(PARTIES) + extra
 
 
 def _load(path: Path, name: str):
@@ -168,13 +230,17 @@ def check(estate: Path) -> int:
 
     looked = 0
     failed = 0
-    for name in PARTIES:
+    unobserved: list[tuple[str, str]] = []
+    for name in walked(estate):
         adopter = estate / name
         if not adopter.is_dir():
             continue
         rc, last, verdict = tier_binding.check(adopter / "composed" / "evidence.json", adopter)
         if rc == 3:
             out("SKIP", f"{name}: {last[len('SKIP: '):]}")
+            why = owed(adopter)
+            if why:
+                unobserved.append((name, why))
             continue
         looked += 1
         if rc == 0:
@@ -186,11 +252,24 @@ def check(estate: Path) -> int:
         if pkg.exists():
             failed += _agree(wargamer, pkg, name, out)
 
+    if failed:
+        return 1
+    # An unobserved party that is owed an observation holds the whole walk back, and says so
+    # BEFORE the nothing-composed line below: that line is the manifest's declared `waits:`, and
+    # an estate whose every adopter silenced itself must not read as one that has not arrived.
+    if unobserved:
+        named = ", ".join(n for n, _ in unobserved)
+        reasons = "; ".join(f"{n}: {why}" for n, why in unobserved)
+        print(f"SKIP: {len(unobserved)} party/parties owed a binding observation could not be "
+              f"looked at ({named}), so this walk has not observed the estate whole and does not "
+              f"pass over them -- each one's own reason is named above; owed because {reasons} "
+              f"(eco-system ticket 114)")
+        return 3
     if not looked:
         print("SKIP: no party in this estate has both a composed evidence document and a "
               "governed Namespace manifest, so nothing here observed that any cage is bound")
         return 3
-    return 1 if failed else 0
+    return 0
 
 
 # --------------------------------------------------------------------------
@@ -259,14 +338,52 @@ def selfcheck(estate: Path = DEFAULT_ESTATE) -> int:
         rc = check(fake)
         assert rc == 0, ("a package with no select_party() yet is a skip, not a failure", rc)
 
+        # Ticket 114: a party that is owed an observation and cannot be looked at holds the
+        # WHOLE walk back. Until 2026-09-22 a second governed Namespace document silenced one
+        # party here and the walk exited 0 on the strength of the others.
+        shutil.rmtree(pkg)
+        party(fake, "tuppence", "isolated", ["restricted"])        # bound, and looked at
+        ns = fake / "driftwood" / "gitops" / "apps" / "namespace.yaml"
+        ns.write_text(ns.read_text() + "---\n" + ns.read_text().replace("name: x", "name: y")
+                      .replace('"isolated"', '"baseline"'))
+        rc = check(fake)
+        assert rc == 3, ("a party with a second governed Namespace is unobserved, and an "
+                         "unobserved party owed an observation is could-not-look for the walk", rc)
+        # ...and FAIL still outranks it: an observed loose cage is the answer
+        party(fake, "loose", "baseline", ["restricted"])
+        (fake / "loose" / "party.yaml").write_text("party: loose\nroles: [adopter]\n")
+        rc = check(fake)
+        assert rc == 1, ("an observed loose cage outranks an unobserved one", rc)
+        shutil.rmtree(fake / "loose")
+        # every owed party unobserved is still NOT the declared nothing-composed line
+        ns = fake / "tuppence" / "gitops" / "apps" / "namespace.yaml"
+        ns.write_text(ns.read_text() + "---\n" + ns.read_text().replace("name: x", "name: y"))
+        import contextlib
+        import io
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = check(fake)
+        last = buf.getvalue().strip().splitlines()[-1]
+        assert rc == 3 and "no party in this estate has both" not in last \
+            and "driftwood" in last and "tuppence" in last, (rc, last)
+        shutil.rmtree(fake / "tuppence")
+        # an adopter-role party with nothing composed at all is owed an observation too
+        shutil.rmtree(fake / "driftwood")
+        (fake / "driftwood").mkdir()
+        (fake / "driftwood" / "party.yaml").write_text(
+            "party: driftwood\nroles:\n  - risk-bearer\n  - adopter\n")
+        assert check(fake) == 3, "an adopter that composes nothing is unobserved, not absent"
+
         # nothing to look at at all is could-not-look, never a PASS about no one
         shutil.rmtree(fake / "driftwood")
         assert check(fake) == 3, "an estate with nothing composed must be could-not-look"
 
     print("ok  the estate walk grades a bound party PASS, a party declaring looser than its "
           "strictest priced line FAIL, a selection package that folds the party differently "
-          "FAIL, a package with no party fold yet SKIP, and an estate with nothing composed "
-          "could-not-look rather than a PASS about no one")
+          "FAIL, a package with no party fold yet SKIP, a party owed an observation that is "
+          "unobserved (two governed Namespace declarations, or an adopter with nothing composed) "
+          "could-not-look for the whole walk, with an observed FAIL still outranking it, and an "
+          "estate with nothing composed could-not-look rather than a PASS about no one")
     return 0
 
 

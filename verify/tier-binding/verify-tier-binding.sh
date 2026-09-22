@@ -12,7 +12,16 @@
 # no cluster, no network, and nothing written.
 #
 # Exit 0 observed true; 3 could not look (no estate, no platform checkout with
-# the rule in it, nothing composed anywhere); 1 observed false.
+# the rule in it, nothing composed anywhere, or a party that is OWED an
+# observation -- an adopter, or a party that publishes composed evidence --
+# could not be looked at); 1 observed false.
+#
+# The last of those four is eco-system ticket 114. Until 2026-09-22 an adopter
+# that declared a second governed Namespace was one SKIP line in the middle of
+# the log and this script exited 0 on the strength of the other parties, which
+# the gate reads as PASS. Its could-not-look line is deliberately NOT declared
+# in talk/verify-manifest.txt: an adopter silencing its own observation is not
+# the estate's state still arriving, so the gate grades it red.
 #
 # ESTATE_CLONE points this at another estate layout (a tree of ticket worktrees,
 # say); it defaults to the hub's own .estate-clone/.
@@ -56,7 +65,7 @@ case $rc in
   0) skipped="$(grep -c '^SKIP:' "$log" | tr -d ' ')"
      if [ "$skipped" -gt 0 ]; then
        named="$(grep '^SKIP:' "$log" | sed -E 's/^SKIP: ([^:]+):.*/\1/' | paste -sd, - )"
-       echo "PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform's; $skipped party/parties could not be looked at by name ($named) and are graded by nothing here"
+       echo "PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform's; $skipped SKIP line(s) name what could not be looked at ($named): each is a party owed no binding observation (no adopter role, nothing composed) or a selection package with no party fold to compare, because an owed party that could not be looked at holds the run at could-not-look (ticket 114)"
      else
        echo "PASS: every party in this estate that declares a governed Namespace declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform's"
      fi;;

@@ -29,10 +29,12 @@ reason the ticket refuses to catalogue a candidate unread.
      `platform/shift-left/tier_binding.py` returns 3 -- could-not-look -- when a party declares
      two governed Namespaces, because which one carries the party's tier is not the check's guess
      to make (ADR-0020). The adopter's own `shift-left.yml` turns that 3 into a failed pull
-     request. The hub's estate walk, `verify/tier-binding/tier_binding_estate.py`, prints the
-     party's SKIP line and CONTINUES, and exits 0 while any other party is bound. `verify-all.sh`
-     grades a script by its exit code, so the gate reads PASS for an estate in which one party's
-     cage is unobserved.
+     request. The hub's estate walk, `verify/tier-binding/tier_binding_estate.py`, printed the
+     party's SKIP line, CONTINUED, and exited 0 while any other party was bound, and
+     `verify-all.sh` grades a script by its exit code, so the gate read PASS for an estate in which
+     one party's cage was unobserved. Repaired 2026-09-22 by eco-system ticket 114: a party owed an
+     observation that cannot be looked at now holds the walk at exit 3, outside the manifest's
+     declared `waits:`, so leg B is that repair's regression test.
 
 The `infra` legs that need an engine run under the version the release workflows pin, 1.18.2.
 A different CLI is a could-not-look and says so: 1.19.1 refuses to compile the served body at all
@@ -46,6 +48,7 @@ import json
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -483,7 +486,7 @@ def test_tier_binding_grades_infra_as_the_isolated_it_renders(tmp_path):
 
 
 # --------------------------------------------------------------------------------------------
-# B. a second governed Namespace document silences the hub's walk, at exit 0
+# B. a second governed Namespace document silenced the hub's walk at exit 0 (repaired, ticket 114)
 # --------------------------------------------------------------------------------------------
 
 NAMESPACE = """\
@@ -497,19 +500,23 @@ metadata:
 """
 PRICE = {"source": "feeds", "kind": "feed", "name": "threat-register",
          "proposed_tier": "isolated", "changed": False}
+WALK = HUB / "verify" / "tier-binding" / "tier_binding_estate.py"
+WRAPPER = HUB / "verify" / "tier-binding" / "verify-tier-binding.sh"
 
 
-def _plant(root: Path, ambiguous: str | None) -> Path:
-    """Two parties, each bound, against the REAL platform checkout. `ambiguous` names the one
-    party that also declares a second governed Namespace."""
+def _plant(root: Path, ambiguous: str | tuple[str, ...] | None,
+           parties: tuple[str, ...] = ("driftwood", "ludlow")) -> Path:
+    """Bound parties against the REAL platform checkout. `ambiguous` names the party (or
+    parties) that also declare a second governed Namespace."""
+    named = (ambiguous,) if isinstance(ambiguous, str) else (ambiguous or ())
     estate = root / "estate"
     estate.mkdir()
     (estate / "platform").symlink_to(PLATFORM)
-    for party in ("driftwood", "ludlow"):
+    for party in parties:
         apps = estate / party / "gitops" / "apps"
         apps.mkdir(parents=True)
         body = NAMESPACE.format(name=party, tier="isolated")
-        if party == ambiguous:
+        if party in named:
             body += "---\n" + NAMESPACE.format(name=f"{party}-second", tier="baseline")
         (apps / "namespace.yaml").write_text(body)
         (estate / party / "composed").mkdir()
@@ -518,34 +525,113 @@ def _plant(root: Path, ambiguous: str | None) -> Path:
 
 
 def _walk(estate: Path) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        ["python3", str(HUB / "verify" / "tier-binding" / "tier_binding_estate.py"),
-         "check", "--estate-clone", str(estate)],
-        capture_output=True, text=True)
+    return subprocess.run(["python3", str(WALK), "check", "--estate-clone", str(estate)],
+                          capture_output=True, text=True)
+
+
+def _gate_reads(script: str, last_line: str) -> tuple[bool, str]:
+    """What `talk/verify-all.sh` makes of an exit 3 from `script`: (declared?, why), judged by
+    the gate's own manifest reader against the gate's own manifest."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("_t114_truth_manifest",
+                                                  HUB / "talk" / "truth_manifest.py")
+    assert spec is not None and spec.loader is not None
+    tm = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = tm          # @dataclass resolves its module through sys.modules
+    spec.loader.exec_module(tm)
+    entries = tm.load_manifest(str(HUB / "talk" / "verify-manifest.txt"))
+    declared, why = tm.judge(entries, script, last_line)
+    return declared, why
+
+
+def _last(run: subprocess.CompletedProcess) -> str:
+    return run.stdout.strip().splitlines()[-1]
 
 
 def test_the_hub_walk_passes_a_clean_planted_estate(tmp_path):
-    """The control. Without it, leg B's exit 0 could be the walk passing everything."""
+    """The control. Without it, leg B's exit 3 could be the walk refusing everything."""
     run = _walk(_plant(tmp_path, ambiguous=None))
     assert run.returncode == 0, run.stdout + run.stderr
     assert len(re.findall(r"^PASS: ", run.stdout, re.M)) == 2, run.stdout
+    # platform is walked too, has nothing composed and claims no adopter role: it owes no
+    # observation, so its SKIP line is named and does not hold the walk back
+    assert re.search(r"^SKIP: platform: ", run.stdout, re.M), run.stdout
 
 
-def test_a_second_governed_namespace_document_silences_one_party_and_the_walk_still_exits_zero(tmp_path):
-    """The finding. driftwood's binding goes unobserved, ludlow's passes, and the script hands
-    `talk/verify-all.sh` the exit code it grades PASS on."""
+def test_a_second_governed_namespace_document_leaves_the_walk_could_not_look(tmp_path):
+    """The finding, repaired. driftwood's binding goes unobserved while ludlow's passes. The
+    walk used to exit 0 here, which `talk/verify-all.sh` grades PASS; it now exits 3 and its
+    last line names driftwood."""
     run = _walk(_plant(tmp_path, ambiguous="driftwood"))
     assert "SKIP: driftwood: 2 governed Namespace declarations" in run.stdout, run.stdout
     assert re.search(r"^PASS: ludlow: ", run.stdout, re.M), run.stdout
-    assert run.returncode == 0, (
-        "the estate walk now refuses an unobserved party -- the hole has closed and this "
-        "reproduction should become the repair's regression test")
+    assert run.returncode == 3, run.stdout + run.stderr
+    assert "driftwood" in _last(run) and "has not observed the estate whole" in _last(run), run.stdout
+
+
+def test_the_gate_reads_the_unobserved_party_red_not_waits(tmp_path):
+    """Exit 3 alone is not enough: the gate grades an exit 3 whose last line matches the
+    manifest's declared `waits:` pattern as the estate not having arrived yet. An adopter that
+    silences its own observation is not that, so the wrapper's last line must fall outside it."""
+    estate = _plant(tmp_path, ambiguous="driftwood")
+    import os
+    run = subprocess.run(["bash", str(WRAPPER)], capture_output=True, text=True,
+                         env={**os.environ, "ESTATE_CLONE": str(estate)})
+    # the walk looked (a could-not-look for a missing instrument would also exit 3)
+    assert re.search(r"^PASS: ludlow: ", run.stdout, re.M), run.stdout + run.stderr
+    assert run.returncode == 3, run.stdout + run.stderr
+    declared, why = _gate_reads("verify/tier-binding/verify-tier-binding.sh", _last(run))
+    assert not declared, (why, _last(run))
+
+
+def test_every_party_unobserved_is_not_the_declared_nothing_composed_skip(tmp_path):
+    """Before ticket 114, when EVERY party was ambiguous the walk fell through to its 'no party
+    has both' line, which the manifest declares as `waits:`. Both parties do have both."""
+    run = _walk(_plant(tmp_path, ambiguous=("driftwood", "ludlow")))
+    assert run.returncode == 3, run.stdout + run.stderr
+    assert "no party in this estate has both" not in _last(run), run.stdout
+    declared, why = _gate_reads("verify/tier-binding/verify-tier-binding.sh", _last(run))
+    assert not declared, (why, _last(run))
+
+
+def test_an_adopter_that_composes_nothing_is_still_owed_an_observation(tmp_path):
+    """The other way out of the walk: an adopter-role party that drops its composed evidence.
+    Its signed party.yaml still claims the adopter role, so it is owed an observation."""
+    estate = _plant(tmp_path, ambiguous=None)
+    shutil.rmtree(estate / "driftwood" / "composed")
+    (estate / "driftwood" / "party.yaml").write_text(
+        "party: driftwood\nroles: [risk-bearer, adopter, publisher]\n")
+    run = _walk(estate)
+    assert run.returncode == 3, run.stdout + run.stderr
+    assert "driftwood" in _last(run), run.stdout
+
+
+def test_a_fourth_adopter_outside_the_named_parties_is_walked(tmp_path):
+    """The walk used to iterate a fixed tuple, so an adopter it did not name was never looked
+    at. The role is signed in party.yaml, so it is read from there."""
+    estate = _plant(tmp_path, ambiguous="newcomer", parties=("driftwood", "ludlow", "newcomer"))
+    (estate / "newcomer" / "party.yaml").write_text("party: newcomer\nroles:\n  - adopter\n")
+    run = _walk(estate)
+    assert "SKIP: newcomer: 2 governed Namespace declarations" in run.stdout, run.stdout
+    assert run.returncode == 3, run.stdout + run.stderr
+
+
+def test_the_walk_selfcheck_plants_the_ambiguous_estate():
+    """Item 2: the selfcheck holds the repair, so it cannot regress without the gate's own
+    wrapper going red."""
+    src = WALK.read_text(encoding="utf-8")
+    body = src[src.index("def selfcheck"):]
+    assert "second governed Namespace" in body, "no ambiguous-estate leg in the selfcheck"
+    run = subprocess.run(["python3", str(WALK), "selfcheck", "--estate-clone", str(ESTATE)],
+                         capture_output=True, text=True)
+    assert run.returncode == 0, run.stdout + run.stderr
+    assert "unobserved" in run.stdout, run.stdout
 
 
 def test_verify_all_grades_a_script_by_its_exit_code_alone():
-    """Why leg B's exit 0 is the whole finding: the gate never reads the per-party SKIP line."""
+    """Why leg B's exit code is the whole finding: the gate never reads the per-party SKIP line."""
     gate = (HUB / "talk" / "verify-all.sh").read_text(encoding="utf-8")
     assert "exit 3" in gate and "SKIP" in gate
-    walk = (HUB / "verify" / "tier-binding" / "tier_binding_estate.py").read_text(encoding="utf-8")
-    assert "return 1 if failed else 0" in walk, \
-        "the walk's return no longer reads this way -- re-measure before trusting leg B"
+    walk = WALK.read_text(encoding="utf-8")
+    assert "return 1 if failed else 0" not in walk, \
+        "the walk folds per-party verdicts into 1-or-0 again -- a skipped party is lost"
