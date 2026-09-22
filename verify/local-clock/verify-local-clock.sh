@@ -37,6 +37,12 @@ set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
 
+# These checks stand in for a run on the owner's machine. twin/model_permission.py derive_clock()
+# lets a GitHub Actions marker overrule the declared clock, so on the truth clock the runner's own
+# markers would turn every stubbed local run into a governed GitHub run (wayfinder ticket 05).
+# verify/model-permission/verify-model-permission.sh grades the GitHub path itself.
+unset GITHUB_ACTIONS GITHUB_RUN_ID GITHUB_WORKFLOW
+
 PY="$ROOT/.venv/bin/python"
 if [ ! -x "$PY" ]; then
   PY=python3
