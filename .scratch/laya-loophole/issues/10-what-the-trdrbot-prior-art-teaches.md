@@ -124,3 +124,14 @@ playbook pricing, the first position permanently unattributable, IEX feed only.
 - **LEAVE — the defect ledger.** Prose where the estate already has CI gates.
 
 Map edits for 100/101 are specified in the note and deferred: a sibling agent holds that file.
+
+## Comments
+
+**Correction, 2026-09-22 (eco-system ticket 117).** The verdict above names eco-system tickets
+100 and 101. Those numbers were already taken by unrelated tickets when this was written: the
+research note read "highest present is 99" from a listing that sorts `100` before `99`. The two
+graduations landed as 111 and 112 instead. 111 then collided with an existing 111, so eco-system
+ticket 117 renumbered the luck ticket to
+[118 — A green that rests on luck may not promote](../../ecosystem/issues/118-a-green-that-rests-on-luck-may-not-promote.md).
+Read "100" above as 118 and "101" as
+[112](../../ecosystem/issues/112-a-threshold-states-the-corpus-it-needs.md).

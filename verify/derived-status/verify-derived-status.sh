@@ -24,7 +24,9 @@
 #
 # THREE OUTCOMES, in this order, because a FAIL must not be hidden behind a could-not-look:
 #
-#   1. THE RECORD, which needs no run. Every ticket carries exactly one `Status:` line, and its
+#   1. THE RECORD, which needs no run. Every ticket number names exactly one file (ticket 117:
+#      two files were numbered 111 and `waits_on` read whichever sorted first; `01-` and `1-`
+#      count as one number). Every ticket carries exactly one `Status:` line, and its
 #      value is exactly one word of docs/agents/issue-tracker.md's vocabulary -- open, claimed,
 #      prepared, resolved, closed -- with nothing after it. A `resolved` ticket has an `## Answer`
 #      section; a `closed` one carries a dated paragraph instead, because a ticket taken out of
@@ -126,10 +128,10 @@ fi
 
 [ -d "$ISSUES" ] || { echo "FAIL: $ISSUES is missing, so there is no record to derive a status for"; exit 1; }
 
-say "2. every Status: is one word of the tracker's vocabulary, and every done ticket has something behind it"
+say "2. every ticket number names one file, every Status: is one word of the tracker's vocabulary, and every done ticket has something behind it"
 rec="$("$PY" "$HERE/derived_status.py" record --issues "$ISSUES")"; rrc=$?
 printf '%s\n' "$rec"
-[ "$rrc" -eq 0 ] || note "the record free-types a Status, or claims a state with nothing behind it"
+[ "$rrc" -eq 0 ] || note "the record reuses a ticket number, free-types a Status, or claims a state with nothing behind it"
 
 say "3. the derivation, from the grade table the newest recorded run wrote"
 if [ ! -f "$GRADES" ]; then
@@ -166,8 +168,8 @@ fi
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: every ticket in .scratch/ecosystem/issues/ carries one Status: line from the tracker's own vocabulary with nothing free-typed after it, every resolved ticket has an Answer and every closed one a dated closure, and every resolved ticket's Status is derived from the grade table the newest recorded run wrote -- no ticket claims resolved while a check it names graded FAIL on that run without a dated line in the ticket naming it"
+  echo "PASS: every ticket number in .scratch/ecosystem/issues/ names exactly one file, every ticket carries one Status: line from the tracker's own vocabulary with nothing free-typed after it, every resolved ticket has an Answer and every closed one a dated closure, and every resolved ticket's Status is derived from the grade table the newest recorded run wrote -- no ticket claims resolved while a check it names graded FAIL on that run without a dated line in the ticket naming it"
   exit 0
 fi
-echo "FAIL: $bad fault(s) -- a ticket's Status: is typed rather than derived (ticket 59)"
+echo "FAIL: $bad fault(s) -- a ticket's Status: is typed rather than derived (ticket 59), or a ticket number names more than one file (ticket 117)"
 exit 1
