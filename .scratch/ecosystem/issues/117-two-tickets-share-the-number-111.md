@@ -1,7 +1,7 @@
 # 117 — Two tickets share the number 111, and `waits_on` resolves it silently
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -143,3 +143,22 @@ directory holds 92 files and 0 shared numbers today (counted with
 `ls | sed -nE 's/^([0-9]+)-.*/\1/p' | awk '{print $1+0}' | sort -n | uniq -d`). Nothing refuses one there yet.
 
 **Waits on the owner.** Nothing. Hub-only, no tag, release or authorisation needed.
+
+## Answer
+
+Resolved 2026-09-22 by hub PR 84. Every ticket number in `.scratch/ecosystem/issues/` now names
+exactly one file.
+
+1. The luck ticket moved from 111 to 118. Git history shows it landed second: its commit
+   `f22282e` has a parent whose tree already held the cage ticket 111 from `e0374f2`.
+2. `twin/misuse.py` `ecosystem_ticket_status()` raises `AmbiguousTicketNumber` for a number that
+   names more than one file. `grade_entry()` grades that row FAIL and names the files.
+3. `verify/derived-status/verify-derived-status.sh` refuses a reused number and a file with no
+   number. It compares numbers as integers.
+
+Review: one round, pass. The reviewer planted a second 111 and the gate went FAIL, naming both
+files. Its two minor findings are fixed on the branch: a mypy error in `derived_status.py`, and a
+closing FAIL line that named only ticket 59.
+
+Not this ticket's: `twin/invariants/harness.py` `build_ticket_status()` uses the same first-match
+lookup over `.scratch/twin/build/`. That directory has no shared number today.

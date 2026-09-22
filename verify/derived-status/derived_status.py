@@ -235,10 +235,10 @@ def number_findings(files: dict[str, str]) -> list[Finding]:
                                "`waits_on` row can name it"))
             continue
         by_number.setdefault(int(number), []).append(path)
-    for number, paths in sorted(by_number.items()):
+    for value, paths in sorted(by_number.items()):
         if len(paths) > 1:
             out.append(Finding(paths[0], "number",
-                               f"ticket number {number} names {len(paths)} files: "
+                               f"ticket number {value} names {len(paths)} files: "
                                f"{', '.join(Path(p).name for p in paths)}. A lookup by number "
                                f"reads whichever sorts first; renumber the later one to the next "
                                f"free number (`ls | sort -n`)"))

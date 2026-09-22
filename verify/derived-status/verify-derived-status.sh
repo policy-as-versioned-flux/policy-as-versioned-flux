@@ -171,5 +171,5 @@ if [ "$bad" -eq 0 ]; then
   echo "PASS: every ticket number in .scratch/ecosystem/issues/ names exactly one file, every ticket carries one Status: line from the tracker's own vocabulary with nothing free-typed after it, every resolved ticket has an Answer and every closed one a dated closure, and every resolved ticket's Status is derived from the grade table the newest recorded run wrote -- no ticket claims resolved while a check it names graded FAIL on that run without a dated line in the ticket naming it"
   exit 0
 fi
-echo "FAIL: $bad fault(s) -- a ticket's Status: is typed rather than derived (ticket 59)"
+echo "FAIL: $bad fault(s) -- a ticket's Status: is typed rather than derived (ticket 59), or a ticket number names more than one file (ticket 117)"
 exit 1
