@@ -1,7 +1,7 @@
 # 126 — A control the catalogue marks withdrawn can still be selected
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -156,3 +156,24 @@ origin/main `5dadf00`, after tickets 123, 122 and 121. The hub branch sits on hu
   withdrawal prints as NIST's. Done the other way round, it prints as the adopter's
   `removed-control` for one run (decision 4).
 - **The revisit trigger** in ADR-0026, the first real withdrawal bump, has not happened.
+
+## Answer
+
+Resolved 2026-09-23 by platform PR 36 and hub PR 104. A control the catalogue marks
+`status: withdrawn` cannot be selected, and ticket 123's counterfactual uses the same rule.
+
+1. `_defines` in platform `compose/composition.py`: a catalogue defines a control id when the id
+   is present and not under `status: withdrawn`. An `overlay.controls` entry or a control claim
+   that names an id the catalogue does not define is refused with `unknown-control-id`, the kind
+   ADR-0026's Consequences already name. No refusal kind was added.
+2. `split_withdrawn` asks the same question. A control now under `status: withdrawn` counts as
+   the regulator's withdrawal only when the last header proves it was defined when selected.
+   This closes the legacy-header case from ticket 123's review.
+3. The header records `withdrawn-selectable: false`, so the next run can tell which rule
+   selected the last set.
+4. No adopter selects or claims a withdrawn-status id today. Recomposing each adopter under the
+   new composer adds one header line and leaves `evidence.json` byte-identical.
+
+Review: one round, pass. One recorded exception: the regulator's own baseline is read as signed,
+so a baseline profile that named a withdrawn id would still be selected. nist v1.1.0's LOW,
+MODERATE and HIGH baselines name none, measured.
