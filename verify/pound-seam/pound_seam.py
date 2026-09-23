@@ -10,7 +10,7 @@ What it observes, per adopter, on `.estate-clone/<adopter>/composed/evidence.jso
      or null where that party declares no customer count;
   3. exactly one `source: twin` entry when that adopter publishes a forward-intel feed, carrying
      policy_version, curve_hash and tail — and NO twin entry when it publishes no such feed;
-  4. the regime entry's (source: ico) holes[] amounts sum to its total, and the entry's own
+  4. the regime entry's (source: ico, kind: feed) holes[] amounts sum to its total, and the entry's own
      amount equals the sum of the lines the adopter has not implemented (status neither
      `covered` nor `closed`), so implementing a control reduces it (eco-system ticket 121);
   5. no list of amounts anywhere in the document mixes perspectives or currencies — a sum that
@@ -31,6 +31,10 @@ What it observes, per adopter, on `.estate-clone/<adopter>/composed/evidence.jso
      of that aggregate is visible. Both sentences are written by the COMPOSER, so an adopter
      composed under an older platform tag is a NAMED could-not-look that says which tag it
      waits for (eco-system ticket 79 items 9 and 10).
+
+A price with no amount that names why on `could_not_look` is a NAMED could-not-look (SKIP),
+never a FAIL and never a PASS; a price with neither, or with both, is a FAIL (eco-system
+ticket 127).
 
 Checks 8 and 9 are the two-implementations guard: ADR-0021 has a versioned package the adopter
 publishes make the selection, while cage.py is the engine wired to prices[] and the proposer. If
@@ -156,9 +160,25 @@ def check_doc(doc, ctx):
             out("FAIL", f"{at}: source {e['source']!r} is neither a party nor one of "
                         f"{sorted(SOURCES)}")
         amount = amount_of(e)
+        refusal = e.get("could_not_look")
+        if amount is None and isinstance(refusal, str) and refusal.strip():
+            # Eco-system ticket 127. The composer writes no amount exactly when it names why
+            # (platform compose/composition.py: `amount = None if could_not_look else ...`).
+            # That is a named could-not-look: never a FAIL, and never a PASS.
+            if e["per_customer"] is not None:
+                out("FAIL", f"{at}: could not be priced ({refusal}) yet restates an amount "
+                            f"per customer: {e['per_customer']!r}")
+            else:
+                out("SKIP", f"{at} ({e['source']}/{e.get('name', '?')} {e['kind']}) could not "
+                            f"be priced, and says why: {refusal}")
+            continue
         if amount is None:
-            out("FAIL", f"{at}: carries no numeric amount, so nothing can be restated per "
-                        f"customer or summed")
+            out("FAIL", f"{at}: carries no numeric amount and no could_not_look reason, so "
+                        f"nothing can be restated per customer or summed")
+            continue
+        if refusal:
+            out("FAIL", f"{at}: carries an amount {amount} and a could_not_look reason "
+                        f"({refusal!r}) -- one price, priced and not priced at once")
             continue
         customers = ctx["customers"].get(e.get("perspective"))
         pc = e["per_customer"]
@@ -206,12 +226,17 @@ def check_doc(doc, ctx):
         out("PASS", f"{who}: publishes no forward-intel feed yet, so no twin entry is expected "
                     f"(named absence, not a silent pass)")
 
-    # 4: the regime entry's holes partition it
-    regimes = [e for e in prices if e.get("source") == "ico"]
+    # 4: the regime entry's holes partition it. The regime entry is ico's `kind: feed`
+    # price. ico's switching and supersede prices are not regime entries and carry no
+    # holes[]; they are graded by the legs above and by verify/supersede/ (eco-system
+    # ticket 127). A regime entry the composer could not price is the SKIP leg 1 printed.
+    regimes = [e for e in prices if e.get("source") == "ico" and e.get("kind") == "feed"]
     if not regimes:
         out("PASS", f"{who}: declares no ico regime edge, so there is no hole breakdown to "
                     f"check (named absence)")
     for e in regimes:
+        if amount_of(e) is None and e.get("could_not_look"):
+            continue
         at = f"{who} regime entry ({e.get('name', 'penalty-schema')})"
         holes = e.get("holes")
         weights = ctx.get("regime_weights") or {}
@@ -938,6 +963,24 @@ def _good():
     return doc, ctx
 
 
+def _switching(source, amount, could_not_look=None):
+    """A `kind: switching` price shaped as composition.py writes one (eco-system ticket 127)."""
+    return {"source": source, "kind": "switching", "name": "penalty-schema",
+            "perspective": "driftwood", "currency": "GBP", "amount": amount,
+            "per_customer": (None if amount is None
+                             else {"amount": amount / 100, "currency": "GBP"}),
+            "version": "v3", "could_not_look": could_not_look, "alternates": [],
+            "basis": "re-composed with this publisher's feed edges dropped"}
+
+
+def _supersede(source, amount):
+    """A `kind: supersede` price shaped as composition.py writes one (eco-system ticket 128)."""
+    return {"source": source, "kind": "supersede", "name": "penalty-schema",
+            "perspective": "driftwood", "currency": "GBP", "amount": amount,
+            "per_customer": {"amount": amount / 100, "currency": "GBP"}, "version": "v3",
+            "newer": {"version": "v4", "tag": "v4.0.0"}, "ramp": 1.0, "base": 300.0}
+
+
 def _grade(doc, ctx, label, want_fail, want_skip=False):
     LINES.clear()
     check_doc(doc, ctx)
@@ -1053,6 +1096,48 @@ def selfcheck():
     doc, ctx = _good()
     doc["prices"] = []
     _grade(doc, ctx, "an empty prices[] is not a pass", True)
+
+    # Eco-system ticket 127: check 4 selects the regime entry by kind. ico also prices a
+    # switching line (what dropping its feed edges would save) and, from ticket 128, a
+    # supersede line (the surcharge for sitting behind a newer major). Neither is a regime
+    # entry and neither carries holes[]; each is graded by what its kind says it is.
+    doc, ctx = _good()
+    doc["prices"].append(_switching("ico", 300.0))
+    _grade(doc, ctx, "an ico switching price is not read as a regime entry", False)
+
+    doc, ctx = _good()
+    doc["prices"].append(_supersede("ico", 0.0))
+    _grade(doc, ctx, "an ico supersede price is not read as a regime entry", False)
+
+    doc, ctx = _good()
+    doc["prices"][0].pop("holes")
+    doc["prices"].append(_switching("ico", 300.0))
+    _grade(doc, ctx, "the ico feed entry still owes holes[] beside a switching price", True)
+
+    # A price the composer could not size carries no amount and names why. That is a named
+    # could-not-look: never a FAIL, and never a PASS either.
+    doc, ctx = _good()
+    _grade(doc, ctx, "baseline for the could-not-look count", False)
+    base_pass, base_skip = LINES.count("PASS"), LINES.count("SKIP")
+    doc["prices"].append(_switching("feeds", None, could_not_look=(
+        "missing instrument: twin/forward-intel/v1/feed.json supplies no lef")))
+    _grade(doc, ctx, "a price with no amount and a named could_not_look is a SKIP", False,
+           want_skip=True)
+    assert LINES.count("PASS") == base_pass and LINES.count("SKIP") == base_skip + 1, (
+        f"a could-not-look must add one SKIP and no PASS, got {LINES}")
+
+    doc, ctx = _good()
+    doc["prices"].append(_switching("feeds", None, could_not_look=""))
+    _grade(doc, ctx, "a price with no amount and an empty could_not_look fails", True)
+
+    doc, ctx = _good()
+    doc["prices"].append(_switching("feeds", None, could_not_look="no lef"))
+    doc["prices"][-1]["per_customer"] = {"amount": 1.0, "currency": "GBP"}
+    _grade(doc, ctx, "a could-not-look that still restates an amount per customer fails", True)
+
+    doc, ctx = _good()
+    doc["prices"].append(_switching("feeds", 10.0, could_not_look="no lef"))
+    _grade(doc, ctx, "a price that carries both an amount and a could_not_look fails", True)
 
     LINES.clear()
     print("ok  selfcheck: labelling, per-customer, twin edge, hole partition, mixed sums, "
