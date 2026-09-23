@@ -242,3 +242,91 @@ def test_a_regime_line_the_catalogue_withdrew_reads_withdrawn(grader: ModuleType
     assert "FAIL" not in _lines(grader, doc, ctx)
     entry["holes"][1]["status"] = "retired"
     assert "FAIL" in _lines(grader, doc, ctx)
+
+
+# -- eco-system ticket 122: the age follows the workloads, and a close says why ------------------
+
+
+def _repo(tmp_path: Path, name: str) -> Path:
+    """A throwaway adopter repo. Its git runs no hooks, so the fixture calls no network."""
+    repo = tmp_path / name
+    repo.mkdir()
+    _git(repo, "init", "-q")
+    return repo
+
+
+def _git(repo: Path, *args: str, date: str | None = None) -> None:
+    import os
+    import subprocess
+    hooks = repo.parent / "no-hooks"
+    hooks.mkdir(exist_ok=True)
+    env = {**os.environ, "GIT_AUTHOR_NAME": "fixture", "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
+           "GIT_COMMITTER_NAME": "fixture", "GIT_COMMITTER_EMAIL": "fixture@example.invalid"}
+    if date:
+        env["GIT_COMMITTER_DATE"] = env["GIT_AUTHOR_DATE"] = f"{date}T12:00:00+00:00"
+    subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+                    "-c", "tag.gpgSign=false", "-C", str(repo), *args],
+                   check=True, capture_output=True, env=env)
+
+
+def _deploy(name: str, where: str) -> dict:
+    return {"apiVersion": "apps/v1", "kind": "Deployment", "metadata": {"name": name, "namespace": where}}
+
+
+def _cut(repo: Path, tag: str, date: str, ungoverned: list[str]) -> None:
+    """Commit a composed header naming `ungoverned` and cut an annotated tag on `date` whose body
+    carries a FIXTURE block, the shape the grader reads. It claims no signature."""
+    import yaml
+    (repo / "composed").mkdir(exist_ok=True)
+    (repo / "composed" / "HEADER.yaml").write_text(
+        "# advisory header -- policy-as-versioned.dev/composed\n"
+        + yaml.safe_dump({"ungoverned-namespaces": ungoverned}))
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", tag, date=date)
+    _git(repo, "tag", "-a", tag, "-m", f"{tag}\n\n-----BEGIN FIXTURE BLOCK-----\n", date=date)
+
+
+def test_since_follows_a_workload_that_left_an_aged_namespace(grader: ModuleType, tmp_path: Path) -> None:
+    """The grader re-derives ticket 122's rule from the clone's own tags, not from the evidence:
+    a Namespace's since is the first signed tag naming it, or naming as ungoverned a Namespace
+    that held a workload this one holds now and no longer holds it."""
+    repo = _repo(tmp_path, "renamed")
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side"))
+    _cut(repo, "v1.0.0", "2024-09-01", ["side"])
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side-2"))
+    _cut(repo, "v1.1.0", "2026-09-01", ["side-2"])
+    assert grader._signed_since(str(repo), ["side-2"]) == {"side-2": "2024-09-01"}
+
+    fresh = _repo(tmp_path, "fresh")
+    _write(fresh / "gitops" / "apps.yaml", _deploy("app-0", "side"))
+    _cut(fresh, "v1.0.0", "2024-09-01", ["side"])
+    _write(fresh / "gitops" / "apps.yaml", _deploy("renamed", "side-2"))
+    _cut(fresh, "v1.1.0", "2026-09-01", ["side-2"])
+    assert grader._signed_since(str(fresh), ["side-2"]) == {"side-2": "2026-09-01"}
+
+
+def test_a_copy_beside_the_original_keeps_no_carried_since(grader: ModuleType, tmp_path: Path) -> None:
+    repo = _repo(tmp_path, "copy")
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side"))
+    _cut(repo, "v1.0.0", "2024-09-01", ["side"])
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side"), _deploy("app-0", "other"))
+    assert grader._signed_since(str(repo), ["side", "other"]) == {"side": "2024-09-01", "other": None}
+
+
+def test_a_closed_namespace_must_say_why_and_agree_with_the_recount(grader: ModuleType) -> None:
+    doc, ctx = grader._good()
+    ctx["institution"] = {"reset", "driftwood", "gone-home"}
+    ctx["ungoverned"] = {"reset"}
+    closed = {"namespace": "gone-home", "status": "closed", "closed_by": "governed"}
+    doc["ungoverned"].append(closed)
+    doc["deltas"].append({"kind": "closed-ungoverned-namespace", "namespace": "gone-home",
+                          "perspective": "driftwood", "currency": "GBP", "amount": None, "detail": "x"})
+    assert "FAIL" not in _lines(grader, doc, ctx)
+    closed["closed_by"] = "left-repo"
+    assert "FAIL" in _lines(grader, doc, ctx), "left-repo for a Namespace the repo still declares governed"
+    ctx["institution"] = {"reset", "driftwood"}
+    assert "FAIL" not in _lines(grader, doc, ctx)
+    closed["closed_by"] = "governed"
+    assert "FAIL" in _lines(grader, doc, ctx), "governed for a Namespace that left the repo"
+    closed.pop("closed_by")
+    assert "FAIL" in _lines(grader, doc, ctx), "a close that does not say why"

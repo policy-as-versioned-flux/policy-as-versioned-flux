@@ -310,3 +310,19 @@ catalogue removed meets `unknown-control-id`. One naming a control NIST keeps un
 `status: withdrawn` does not yet: the composition still selects it. That gap is recorded in
 ticket 123. This changes no decision above. The revisit trigger, the first such bump, still
 stands.
+
+## Note, 2026-09-23 (eco-system ticket 122, delegated): the ramp's `since` follows the workloads
+
+Point 4 dated an ungoverned Namespace from the first signed tag whose header names it, and the
+code read that by name. A rename restarted the ramp, and the old name's close printed as
+governance. Ticket 122 keeps point 4's rule and adds a second way to carry the date. `since` is
+now the first signed tag that names the Namespace, or names as ungoverned a Namespace that held,
+in that tag's tree, a workload (`Kind/name`) this one holds now and that Namespace no longer
+holds. So the age follows the workloads across a rename, and a copy beside the original starts
+its own ramp. Each closed `ungoverned[]` entry carries `closed_by`, `governed` or `left-repo`, and
+its `closed-ungoverned-namespace` delta says which, so point 4's "a governed one as
+`closed-ungoverned`" is now one of two closes. The residual: an adopter that renames every
+workload with the Namespace still restarts the ramp, because a workload's kind and name are the
+adopter's to choose too. It costs a rename of every workload rather than one Namespace, and
+ticket 122 records it for the next loophole round. The decisions and their reasons are in that
+ticket. No decision above changes.

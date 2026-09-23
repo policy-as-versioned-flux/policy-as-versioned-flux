@@ -13,7 +13,11 @@ control (the last since eco-system ticket 124, ADR-0026 point 5), and that each 
 - a `price` on every open `ungoverned[]` entry: workload share (re-counted from the adopter's own
   manifests), the EOL feed's ramp from `since` (re-derived), `min(base, base × share × ramp)` with
   `base` the header's signed exposure total, and `since` the date of the first *signed* tag whose
-  header names the namespace (re-read from the adopter clone's tags) or null with a limit;
+  header names the namespace, or names as ungoverned a namespace one of its workloads (`Kind/name`)
+  has since left (eco-system ticket 122, re-read from the adopter clone's tags and tagged trees),
+  or null with a limit;
+- a `closed_by` on every closed `ungoverned[]` entry, `governed` or `left-repo`, agreeing with the
+  recount (eco-system ticket 122). Before it every close printed as governed, a rename included;
 - every Namespace the recount finds ungoverned carrying a price (eco-system ticket 119). The
   recount follows `composition.py`'s rule: every Namespace the adopter's repo declares or a
   workload names counts, labelled or not, except the substrate the platform declares `infra` in
@@ -26,7 +30,8 @@ control (the last since eco-system ticket 124, ADR-0026 point 5), and that each 
 Exit codes follow the gate contract: 0 true, 3 could not look (`SKIP:` — no estate, no evidence,
 evidence composed under the refusal shape, a clone with no signed tag), 1 false (`FAIL:`).
 `priced_holes.py selfcheck` plants each defect and proves the check bites; the hub's
-`tests/test_priced_holes.py` covers the pure arithmetic and since-preservation.
+`tests/test_priced_holes.py` covers the pure arithmetic, since-preservation, the since a
+renamed namespace keeps, and `closed_by`.
 
 The three adopters' evidence is re-composed and pushed by the owner (enactment pushes); until
 then this check reads `SKIP` for each adopter and `PASS`/`FAIL` for the platform source and schema.

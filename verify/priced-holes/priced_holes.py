@@ -24,7 +24,11 @@ What it observes, on the estate's committed files only:
         every ungoverned one the recount finds must carry a price), whose ramp is the EOL feed's own ramp from `since` to `as_of` (re-derived
         here), whose amount is `min(base, base * share * ramp)` with `base` the header's signed
         exposure total, and whose `since` is the date of the first signed tag whose header names
-        the namespace (re-read here from the adopter clone's tags) or null with a named limit;
+        the namespace, or names as ungoverned a Namespace a workload now in it has left
+        (eco-system ticket 122; re-read here from the adopter clone's tags and tagged trees), or
+        null with a named limit;
+     d3. every closed `ungoverned[]` entry says why in `closed_by`, `governed` or `left-repo`, and
+        the recount agrees (eco-system ticket 122);
      e. the regime entry's `holes[]` lines each carry the adopter's status for that control, and
         the open ones agree with `holes[]`;
      f. every `deltas[]` entry is one of the ten kinds `DELTA_KINDS` names (the eight hole,
@@ -225,6 +229,20 @@ def check_doc(doc: dict, ctx: dict) -> None:
         ns = e.get("namespace")
         at = f"{who} ungoverned {ns}"
         if e.get("status") == "closed":
+            # d3. a close says why, and the recount agrees (eco-system ticket 122): governed when
+            # the repo still declares the Namespace and not ungoverned, left-repo when nothing
+            # declares or names it. Before ticket 122 every close printed as governed.
+            institution, ungoverned = ctx.get("institution"), ctx.get("ungoverned")
+            why = e.get("closed_by")
+            if why not in ("governed", "left-repo"):
+                out("FAIL", f"{at}: closed with closed_by {why!r}, not governed or left-repo; the "
+                            f"artefact predates eco-system ticket 122 or says nothing of why")
+            elif institution is not None and ungoverned is not None:
+                real = "governed" if ns in institution and ns not in ungoverned else "left-repo"
+                if why != real:
+                    out("FAIL", f"{at}: closed_by {why} but the repo walk says {real}")
+                else:
+                    out("PASS", f"{at}: closed_by {why}, as the repo walk finds")
             continue
         p = e.get("price")
         if not isinstance(p, dict) or not PRICE_FIELDS <= set(p):
@@ -246,8 +264,9 @@ def check_doc(doc: dict, ctx: dict) -> None:
         if "since" in ctx:
             real = ctx["since"].get(ns)
             if p["since"] != real:
-                out("FAIL", f"{at}: since {p['since']!r} but the first signed tag naming {ns} says "
-                            f"{real!r} — a since is read off a signed tag, never typed")
+                out("FAIL", f"{at}: since {p['since']!r} but the first signed tag naming {ns}, or "
+                            f"a Namespace its workloads left, says {real!r} — a since is read off "
+                            f"a signed tag, never typed")
         if p["since"] is None and not any("no signed composed artefact names" in str(lim)
                                           for lim in p.get("limits") or []):
             out("FAIL", f"{at}: since is null and no limit says so")
@@ -414,9 +433,53 @@ def _git(repo: str, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-C", repo, *args], capture_output=True, text=True, timeout=60)
 
 
+def _add_workload_keys(docs: list, into: dict[str, set[str]]) -> None:
+    for d in docs:
+        if isinstance(d, dict) and d.get("kind") in WORKLOAD_KINDS:
+            md = d.get("metadata") or {}
+            into.setdefault(str(md.get("namespace") or "default"), set()).add(f"{d['kind']}/{md.get('name')}")
+
+
+def _workloads_now(root: str) -> dict[str, set[str]]:
+    """Namespace -> `Kind/name` of every workload the adopter's checkout declares in it, over the
+    same files `_namespace_facts` walks."""
+    found: dict[str, set[str]] = {}
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in (".git", "composed", ".work")]
+        for name in sorted(filenames):
+            if not name.endswith(".yaml"):
+                continue
+            try:
+                with open(os.path.join(dirpath, name)) as fh:
+                    _add_workload_keys(list(yaml.safe_load_all(fh)), found)
+            except (OSError, yaml.YAMLError):
+                continue
+    return found
+
+
+def _workloads_at(repo: str, tag: str) -> dict[str, set[str]]:
+    """The same walk over the tree a tag points at, read one file at a time from git objects."""
+    found: dict[str, set[str]] = {}
+    listed = _git(repo, "ls-tree", "-r", "--name-only", tag)
+    for path in listed.stdout.splitlines():
+        parts = path.split("/")
+        if not path.endswith(".yaml") or {".git", "composed", ".work"} & set(parts):
+            continue
+        shown = _git(repo, "show", f"{tag}:{path}")
+        try:
+            _add_workload_keys(list(yaml.safe_load_all(shown.stdout)), found)
+        except yaml.YAMLError:
+            continue
+    return found
+
+
 def _signed_since(repo: str, namespaces: list[str]) -> dict[str, str | None] | None:
-    """namespace -> date of the first signed tag whose composed header names it, or None. None
-    overall where the clone is not a git repo or lists no tags (could not look)."""
+    """namespace -> the date of the first signed tag whose composed header names it, or names as
+    ungoverned a Namespace that held, in that tag's tree, a workload (`Kind/name`) this one holds
+    now and that Namespace no longer holds (eco-system ticket 122: the age follows the workloads,
+    so a rename keeps its ramp and a copy beside the original does not take it). None per
+    namespace where no tag carries it. None overall where the clone is not a git repo or lists no
+    tags (could not look). Re-derived here from the clone; composition.py is not imported."""
     if not os.path.exists(os.path.join(repo, ".git")):
         return None
     listed = _git(repo, "for-each-ref", "--sort=creatordate",
@@ -426,6 +489,7 @@ def _signed_since(repo: str, namespaces: list[str]) -> dict[str, str | None] | N
     if not tags:
         return None
     result: dict[str, str | None] = {ns: None for ns in namespaces}
+    now = _workloads_now(repo)
     for tag, date, _kind in tags:
         if "-----BEGIN" not in _git(repo, "cat-file", "-p", tag).stdout:
             continue
@@ -437,8 +501,12 @@ def _signed_since(repo: str, namespaces: list[str]) -> dict[str, str | None] | N
         except yaml.YAMLError:
             continue
         named = set((header or {}).get("ungoverned-namespaces") or []) if isinstance(header, dict) else set()
+        held = _workloads_at(repo, tag) if named and None in result.values() else {}
         for ns in namespaces:
-            if result[ns] is None and ns in named:
+            if result[ns] is not None:
+                continue
+            mine = now.get(ns, set())
+            if ns in named or any((held.get(x, set()) & mine) - now.get(x, set()) for x in named):
                 result[ns] = date
     return result
 
@@ -704,6 +772,16 @@ def selfcheck() -> None:
     ctx["ungoverned"] = {"reset", "openbao"}
     _grade(doc, ctx, "an ungoverned Namespace the repo walk finds and the evidence leaves unpriced "
                      "fails (ticket 119)", True)
+
+    doc, ctx = _good()
+    doc["ungoverned"].append({"namespace": "side", "status": "closed", "closed_by": "left-repo"})
+    doc["deltas"].append({"kind": "closed-ungoverned-namespace", "namespace": "side",
+                          "perspective": "driftwood", "currency": "GBP", "amount": None, "detail": "x"})
+    _grade(doc, ctx, "a close the repo walk agrees left the repo passes (ticket 122)", False)
+    doc["ungoverned"][-1]["closed_by"] = "governed"
+    _grade(doc, ctx, "a rename that prints as governance fails (ticket 122)", True)
+    doc["ungoverned"][-1].pop("closed_by")
+    _grade(doc, ctx, "a close that does not say why fails (ticket 122)", True)
 
     doc, ctx = _good()
     doc["deltas"][0]["currency"] = "USD"

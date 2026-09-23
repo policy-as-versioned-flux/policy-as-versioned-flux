@@ -3,7 +3,8 @@
 # on a new hole, a widened baseline or a new ungoverned namespace but prints each as a delta
 # under the adopter's own perspective and currency; every hole is keyed (source, id) across
 # every controls parent; an ungoverned namespace carries a ramped workload share of the uncaged
-# residual with a since read off the first signed tag naming it; the only hole-shaped refusal
+# residual with a since read off the first signed tag naming it or a Namespace its workloads
+# left (ticket 122), and a close says governed or left-repo; the only hole-shaped refusal
 # left is a bespoke control with no signed scenario; and the party schema admits overlay.controls
 # in both forms. The arithmetic (share, ramp, bound, since) is re-derived here from the adopter's
 # own manifests, tags and pinned feeds, never trusted from the producer.

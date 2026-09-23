@@ -249,3 +249,30 @@ entries:
       - "verify/priced-holes/priced_holes.py::def _substrate"
     source: eco-system ticket 116 (survivor 1 of 12); the Laya and loophole map's ticket 11,
       round two `loophole-2`; ADR-0022 ("silence buys nothing anywhere"); ADR-0026 point 4
+
+  - id: adopter-renames-an-aged-ungoverned-namespace-to-restart-its-ramp
+    risk: >-
+      An adopter renames an ungoverned Namespace that has been ungoverned for years and keeps its
+      workloads. Until eco-system ticket 122 `since` was read by the Namespace's name alone, so the
+      renamed Namespace ramped from 1.0 again and its price fell by up to four fifths. The old
+      name closed, and its delta said it "now carries governed", so the record showed governance
+      where there was a rename.
+    mechanism: >-
+      Found by eco-system ticket 120 (2026-09-23) from round one's `loophole-2`, repaired by ticket
+      122. `platform/compose/composition.py` `_signed_since` dates an ungoverned Namespace from the
+      first signed tag that names it, or names as ungoverned a Namespace that then held a workload
+      (`Kind/name`) this one holds now and that Namespace no longer holds. The age follows the
+      workloads across a rename, and a copy beside the original does not take it. The price's
+      `since_by` names the tag, Namespace and workload. `compute_ungoverned` gives each closed
+      entry a `closed_by`, `governed` or `left-repo`, and the delta says which. The hub grader
+      `verify/priced-holes/priced_holes.py` re-derives the same since from the clone's tagged
+      trees and FAILS a close whose reason the recount contradicts. The residual is named in
+      ticket 122: rename every workload with the Namespace and the ramp restarts, because a
+      workload's kind and name are the adopter's to choose too.
+    anchors:
+      - "tests/test_loophole_adr_0026.py::test_a_renamed_ungoverned_namespace_keeps_its_ramp_and_the_closed_delta_says_why"
+      - "platform/compose/composition.py::def _signed_since"
+      - "platform/compose/composition.py::closed_by"
+      - "verify/priced-holes/priced_holes.py::def _workloads_at"
+    source: eco-system ticket 120 (survivor 2 of 18); round one `loophole-2`, echoed by round
+      two `loophole-3`; ADR-0026 point 4 and its rejected "grandfather clause"
