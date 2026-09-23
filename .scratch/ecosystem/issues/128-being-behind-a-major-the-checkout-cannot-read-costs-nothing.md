@@ -164,7 +164,7 @@ two `composed/` trees were compared file by file and price by price.
 
 - platform: `ticket-128-behind-a-major-unreadable`,
   https://github.com/policy-as-versioned-platform/platform/pull/37
-- hub: `ticket-128-behind-a-major-unreadable`, this record and the supersede check.
+- hub: `ticket-128-behind-a-major-unreadable`, https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/107
 
 Merge order: platform first, then the hub. The hub change is safe either way. It grades today's
 served evidence as it did before, with a sharper FAIL message. Merging platform first keeps the
