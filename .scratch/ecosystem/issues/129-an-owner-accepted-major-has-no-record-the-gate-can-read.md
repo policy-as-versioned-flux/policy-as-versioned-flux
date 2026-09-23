@@ -1,7 +1,7 @@
 # 129 — An owner-accepted major has no record the gate can read
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -119,3 +119,22 @@ The reader and the format live in `verify/unreviewed-major/unreviewed_major.py`
 * Done holds for the instrument now: the check tells an accepted major from an unreviewed one,
   from a record in the adopter's own tree, and the tests hold both. The check turns green on the
   estate only after the records land and 4.0.0 leaves the windows.
+
+## Answer
+
+Resolved 2026-09-23 by hub PR 110. The unreviewed-major check can tell an accepted major from an
+unreviewed one.
+
+1. **The record.** One YAML file per acceptance under `accepted-majors/` in the adopter's own
+   repository: `kind: major-acceptance`, `party`, `publisher`, `version`, `accepted_by` and
+   `accepted_on`. The check reads it with `git show` at the commit the adopter serves.
+2. **The rule.** A carried major passes only when a record in that adopter's tree matches its own
+   party, publisher and exact version. Accepting one major accepts no other.
+3. **Tests** plant a matching record, and records for another institution, another publisher,
+   another version and a malformed file. Only the matching one counts.
+
+On the real estate the check still gives 3 FAILs, because each adopter carries 4.0.0 and no
+record accepts it. The owner accepted 5.0.0 on 2026-09-23. The integrator writes those records
+with the rollout.
+
+Review: one round, pass, four minor findings, not fixed.
