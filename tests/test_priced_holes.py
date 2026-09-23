@@ -10,10 +10,13 @@ from __future__ import annotations
 
 import importlib.util
 import math
+import os
+import subprocess
 from pathlib import Path
 from types import ModuleType
 
 import pytest
+import yaml
 
 GRADER = Path(__file__).resolve().parent.parent / "verify" / "priced-holes" / "priced_holes.py"
 
@@ -184,7 +187,6 @@ def test_a_schema_that_still_says_a_removal_refuses_fails(grader: ModuleType) ->
 
 
 def _write(path: Path, *docs: dict) -> None:
-    import yaml
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.safe_dump_all(list(docs)))
 
@@ -242,3 +244,140 @@ def test_a_regime_line_the_catalogue_withdrew_reads_withdrawn(grader: ModuleType
     assert "FAIL" not in _lines(grader, doc, ctx)
     entry["holes"][1]["status"] = "retired"
     assert "FAIL" in _lines(grader, doc, ctx)
+
+
+# -- eco-system ticket 122: the age follows the workloads, and a close says why ------------------
+
+
+def _repo(tmp_path: Path, name: str) -> Path:
+    """A throwaway adopter repo. Its git runs no hooks, so the fixture calls no network."""
+    repo = tmp_path / name
+    repo.mkdir()
+    _git(repo, "init", "-q")
+    return repo
+
+
+def _git(repo: Path, *args: str, date: str | None = None) -> None:
+    hooks = repo.parent / "no-hooks"
+    hooks.mkdir(exist_ok=True)
+    env = {**os.environ, "GIT_AUTHOR_NAME": "fixture", "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
+           "GIT_COMMITTER_NAME": "fixture", "GIT_COMMITTER_EMAIL": "fixture@example.invalid"}
+    if date:
+        env["GIT_COMMITTER_DATE"] = env["GIT_AUTHOR_DATE"] = f"{date}T12:00:00+00:00"
+    subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+                    "-c", "tag.gpgSign=false", "-C", str(repo), *args],
+                   check=True, capture_output=True, env=env)
+
+
+def _deploy(name: str, where: str) -> dict:
+    return {"apiVersion": "apps/v1", "kind": "Deployment", "metadata": {"name": name, "namespace": where}}
+
+
+def _cut(repo: Path, tag: str, date: str, ungoverned: list[str]) -> None:
+    """Commit a composed header naming `ungoverned` and cut an annotated tag on `date` whose body
+    carries a FIXTURE block, the shape the grader reads. It claims no signature."""
+    (repo / "composed").mkdir(exist_ok=True)
+    (repo / "composed" / "HEADER.yaml").write_text(
+        "# advisory header -- policy-as-versioned.dev/composed\n"
+        + yaml.safe_dump({"ungoverned-namespaces": ungoverned}))
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", tag, date=date)
+    _git(repo, "tag", "-a", tag, "-m", f"{tag}\n\n-----BEGIN FIXTURE BLOCK-----\n", date=date)
+
+
+def test_since_follows_a_workload_that_left_an_aged_namespace(grader: ModuleType, tmp_path: Path) -> None:
+    """The grader re-derives ticket 122's rule from the clone's own tags, not from the evidence:
+    a Namespace's since is the first signed tag naming it, or naming as ungoverned a Namespace
+    that held a workload this one holds now and no longer holds it."""
+    repo = _repo(tmp_path, "renamed")
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side"))
+    _cut(repo, "v1.0.0", "2024-09-01", ["side"])
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side-2"))
+    _cut(repo, "v1.1.0", "2026-09-01", ["side-2"])
+    assert grader._signed_since(str(repo), ["side-2"]) == {"side-2": "2024-09-01"}
+
+    fresh = _repo(tmp_path, "fresh")
+    _write(fresh / "gitops" / "apps.yaml", _deploy("app-0", "side"))
+    _cut(fresh, "v1.0.0", "2024-09-01", ["side"])
+    _write(fresh / "gitops" / "apps.yaml", _deploy("renamed", "side-2"))
+    _cut(fresh, "v1.1.0", "2026-09-01", ["side-2"])
+    assert grader._signed_since(str(fresh), ["side-2"]) == {"side-2": "2026-09-01"}
+
+
+def test_a_copy_beside_the_original_keeps_no_carried_since(grader: ModuleType, tmp_path: Path) -> None:
+    repo = _repo(tmp_path, "copy")
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side"))
+    _cut(repo, "v1.0.0", "2024-09-01", ["side"])
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side"), _deploy("app-0", "other"))
+    assert grader._signed_since(str(repo), ["side", "other"]) == {"side": "2024-09-01", "other": None}
+
+
+def test_a_closed_namespace_must_say_why_and_agree_with_the_recount(grader: ModuleType) -> None:
+    doc, ctx = grader._good()
+    ctx["institution"] = {"reset", "driftwood", "gone-home"}
+    ctx["ungoverned"] = {"reset"}
+    closed = {"namespace": "gone-home", "status": "closed", "closed_by": "governed"}
+    doc["ungoverned"].append(closed)
+    doc["deltas"].append({"kind": "closed-ungoverned-namespace", "namespace": "gone-home",
+                          "perspective": "driftwood", "currency": "GBP", "amount": None, "detail": "x"})
+    assert "FAIL" not in _lines(grader, doc, ctx)
+    closed["closed_by"] = "left-repo"
+    assert "FAIL" in _lines(grader, doc, ctx), "left-repo for a Namespace the repo still declares governed"
+    ctx["institution"] = {"reset", "driftwood"}
+    assert "FAIL" not in _lines(grader, doc, ctx)
+    closed["closed_by"] = "governed"
+    assert "FAIL" in _lines(grader, doc, ctx), "governed for a Namespace that left the repo"
+    closed.pop("closed_by")
+    assert "FAIL" in _lines(grader, doc, ctx), "a close that does not say why"
+
+
+def _governed_dummy(repo: Path, name: str, *workloads: str) -> None:
+    """Declare `name` governed and give it inert Deployments of the given names."""
+    _write(repo / "gitops" / "dummy.yaml",
+           {"apiVersion": "v1", "kind": "Namespace",
+            "metadata": {"name": name, "labels": {"policy-as-versioned.dev/governed": "true"}}},
+           *[_deploy(w, name) for w in workloads])
+
+
+def test_a_governed_shadow_of_the_old_name_keeps_the_carried_since(grader: ModuleType, tmp_path: Path) -> None:
+    """Review round of ticket 122: re-declaring the old name governed, with inert manifests of
+    the same kind and name, does not drop the age the rename carried. A governed Namespace pays
+    no ramp, so it is not where the workload still sits. The grader needs the recount's
+    ungoverned set to say so, as the composer does."""
+    repo = _repo(tmp_path, "shadow")
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side"))
+    _cut(repo, "v1.0.0", "2024-09-01", ["side"])
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side-2"))
+    _cut(repo, "v1.1.0", "2026-09-01", ["side-2"])
+    _governed_dummy(repo, "side", "app-0")
+    _cut(repo, "v1.2.0", "2026-09-02", ["side-2"])
+    ungoverned = grader._namespace_facts(str(repo), set())[2]
+    assert ungoverned == {"side-2"}, ungoverned
+    assert grader._signed_since(str(repo), ["side-2"], ungoverned) == {"side-2": "2024-09-01"}
+
+    once = _repo(tmp_path, "once")
+    _write(once / "gitops" / "apps.yaml", _deploy("app-0", "side"))
+    _cut(once, "v1.0.0", "2024-09-01", ["side"])
+    _write(once / "gitops" / "apps.yaml", _deploy("app-0", "side-2"))
+    _governed_dummy(once, "side", "app-0")
+    assert grader._signed_since(str(once), ["side-2"], {"side-2"}) == {"side-2": "2024-09-01"}
+
+
+def test_a_tagged_blob_that_is_not_utf8_is_skipped_as_the_composer_skips_it(
+        grader: ModuleType, tmp_path: Path) -> None:
+    repo = _repo(tmp_path, "binary")
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "side"))
+    (repo / "gitops" / "x.yaml").write_bytes(b"kind: Deployment\nmetadata: {name: \xff}\n")
+    _cut(repo, "v1.0.0", "2024-09-01", ["side"])
+    assert grader._workloads_at(str(repo), "v1.0.0") == {"side": {"Deployment/app-0"}}
+
+
+def test_a_close_the_recount_cannot_check_leaves_a_skip_line(grader: ModuleType) -> None:
+    doc, ctx = grader._good()
+    for key in ("institution", "ungoverned"):
+        ctx.pop(key)
+    doc["ungoverned"].append({"namespace": "gone-home", "status": "closed", "closed_by": "governed"})
+    doc["deltas"].append({"kind": "closed-ungoverned-namespace", "namespace": "gone-home",
+                          "perspective": "driftwood", "currency": "GBP", "amount": None, "detail": "x"})
+    lines = _lines(grader, doc, ctx)
+    assert "FAIL" not in lines and "SKIP" in lines, lines

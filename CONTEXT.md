@@ -606,10 +606,13 @@ that a rewritten entry cites stay as the record of the decision at the time.
   Priced as its workload share (pod-owning kinds in the repo walk, over the same across every
   institution namespace) of the adopter's whole uncaged residual, LEF-ramped by the EOL feed's
   own ramp from `since` — the date of the first signed tag whose composed header recorded it,
-  read off tag history so it survives a close and a reopen — as of the newest pinned feed's
+  or recorded as ungoverned a namespace one of its workloads has since left (ticket 122, so a
+  rename keeps its ramp; a governed namespace of the old name does not count as still holding it), read off tag history so it survives a close and a reopen — as of the
+  newest pinned feed's
   publish date, and bounded at the whole residual. What cannot be read (no signed tag names it,
   no feed prices the residual) is a named limit on the price, never an invented date or a zero.
-  Never refused. The **proposer** may open a PR to govern it. The live case is tuppence's
+  Never refused. A closed one says why: governed, or left the repo. The **proposer** may open a PR
+  to govern it. The live case is tuppence's
   `tuppence-reset`, recorded since 2026-08-25. Its `openbao` joins it at tuppence's next
   composition under a tools tag carrying ticket 119.
 

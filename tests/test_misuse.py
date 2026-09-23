@@ -107,7 +107,7 @@ def test_a_catalogue_entry_with_no_mechanism_is_refused(tmp_path: Path) -> None:
 def test_the_ecosystem_catalogue_loads_through_the_same_loader_and_names_a_mechanism_each() -> None:
     """Third file, same `load_catalogue()` — ticket 19's default: no third loader."""
     doc = load_catalogue(ECOSYSTEM_CATALOGUE_PATH)
-    assert len(doc["entries"]) == 7
+    assert len(doc["entries"]) == 8
     for entry in doc["entries"]:
         assert entry["risk"].strip()
         assert entry["mechanism"].strip()
@@ -116,8 +116,9 @@ def test_the_ecosystem_catalogue_loads_through_the_same_loader_and_names_a_mecha
 def test_the_ecosystem_catalogue_names_ticket_19s_four_rows() -> None:
     """Ticket 19's four, by name, so a row cannot quietly vanish. The file is not closed to a
     later row: the Laya and loophole map's ticket 08 added two from a measured loophole round,
-    eco-system ticket 116 added a third from rounds two and three, and each is named here for the
-    same reason -- an addition is as visible as a removal."""
+    eco-system ticket 116 added a third from rounds two and three, eco-system ticket 122 a fourth
+    from the ADR-0026 rounds, and each is named here for the same reason -- an addition is as
+    visible as a removal."""
     ids = {entry["id"] for entry in load_catalogue(ECOSYSTEM_CATALOGUE_PATH)["entries"]}
     assert set(ECOSYSTEM_ROW_IDS) == {
         "publisher-games-own-feed-price",
@@ -129,6 +130,7 @@ def test_the_ecosystem_catalogue_names_ticket_19s_four_rows() -> None:
         "adopter-runs-uncaged-in-the-platform-substrate",
         "adopter-silences-its-own-binding-observation",
         "adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace",
+        "adopter-renames-an-aged-ungoverned-namespace-to-restart-its-ramp",
     }
 
 

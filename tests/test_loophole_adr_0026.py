@@ -21,10 +21,12 @@ Three candidates survived.
   2. **The ungoverned ramp keys on a name the adopter chooses** (round 1 `loophole-2`). The
      candidate said an adopter can delay the first signed tag and run unpriced. That is false:
      the cluster runs only a signed tag, and a tag is cut only after `verify` re-renders a
-     header that names the Namespace. The place is real: `since` is the first signed tag that
-     names the Namespace by name. Rename an aged ungoverned Namespace and its workloads restart
-     at ramp 1.0, and the old name prints a `closed-ungoverned` delta that says it "now carries
-     governed" when nothing was governed.
+     header that names the Namespace. The place was real: `since` was the first signed tag that
+     named the Namespace by name. Renaming an aged ungoverned Namespace restarted its workloads
+     at ramp 1.0, and the old name printed a `closed-ungoverned` delta that said it "now carries
+     governed" when nothing was governed. Eco-system ticket 122 repaired it: `since` also follows
+     the workloads, and a closed entry says whether it was governed or left the repo. The leg
+     is now the regression test of that repair.
 
   3. **A regulator's withdrawal is booked as the adopter's removal** (round 3 `loophole-3`). The
      candidate said the withdrawn hole vanishes unpriced. That is false: it prints. ADR-0026's
@@ -78,7 +80,7 @@ VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
         "withdrawing a bespoke control prints a removed-control delta at its own scenario's "
         "residual; a bespoke hole's price reaches no tier, a limit ticket 38 D5 already named"),
     (1, "loophole-2"): (
-        "survivor", "test_renaming_an_ungoverned_namespace_restarts_its_ramp_and_prints_as_governed",
+        "survivor", "test_a_renamed_ungoverned_namespace_keeps_its_ramp_and_the_closed_delta_says_why",
         "delaying the tag is impossible, but since keys on the Namespace name, so a rename restarts "
         "the ramp"),
     (1, "loophole-3"): (
@@ -104,7 +106,7 @@ VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
         "a bespoke control never covers a regulator key, so the swap leaves the regulator's hole "
         "open and priced"),
     (2, "loophole-3"): (
-        "discard", "test_renaming_an_ungoverned_namespace_restarts_its_ramp_and_prints_as_governed",
+        "discard", "test_a_renamed_ungoverned_namespace_keeps_its_ramp_and_the_closed_delta_says_why",
         "true, and the place is round 1 loophole-2's: an echo of that survivor"),
     (2, "overreach-4"): (
         "discard", "test_a_removal_composes_and_prints_as_priced_deltas",
@@ -315,13 +317,17 @@ def test_implementing_every_weighted_control_moves_no_regime_price_and_no_tier(t
     assert "so implementing a control reduces the regime's price" in adr
 
 
-def test_renaming_an_ungoverned_namespace_restarts_its_ramp_and_prints_as_governed(tmp_path):
+def test_a_renamed_ungoverned_namespace_keeps_its_ramp_and_the_closed_delta_says_why(tmp_path):
     """Survivor 2, round 1 `loophole-2` (round 2 `loophole-3` and round 3 `loophole-2` are
-    echoes). `since` is the date of the first signed tag whose header names the Namespace, read
-    by name. A Namespace named in a tag two years old ramps at 3.0. Rename it, keep its
-    workloads, and it ramps at 1.0: the next signed tag is its first. The old name prints a
-    `closed-ungoverned` delta whose detail says it now carries governed: "true", which no
-    Namespace does."""
+    echoes), repaired by eco-system ticket 122. Until then `since` was the date of the first
+    signed tag whose header named the Namespace, read by name: a Namespace named in a tag two
+    years old ramped at 3.0, and renamed with its workloads it ramped at 1.0. The old name
+    printed a `closed-ungoverned` delta saying it now carried governed: "true", which no
+    Namespace did. Now `since` is the earliest signed tag that names the Namespace, or names as
+    ungoverned a Namespace that then held a workload this one holds now and that no longer
+    holds it as an ungoverned Namespace. A rename keeps its ramp, a governed shadow of the old
+    name does not drop it (the review round), and a closed entry says whether it was governed or
+    left the repo."""
     comp = _composition()
     repo = tmp_path / "adopter"
     repo.mkdir()
@@ -330,26 +336,102 @@ def test_renaming_an_ungoverned_namespace_restarts_its_ramp_and_prints_as_govern
     _signed_tag_naming(comp, repo, "v1.0.0", "2024-09-01", ["side"])
     as_of, base = "2026-09-01", 10_000.0
 
-    aged = comp.compute_ungoverned({"side"}, {"side"})
+    aged = comp.compute_ungoverned({"side"}, {"side"}, governed={"home"})
     comp.price_ungoverned(aged, repo, "adopter", "GBP", base, as_of)
     assert aged[0]["price"]["since"] == "2024-09-01" and aged[0]["price"]["ramp"] == 3.0, aged
     assert aged[0]["price"]["share"] == 0.25 and aged[0]["price"]["amount"] == base * 0.25 * 3.0, aged
+    assert aged[0]["price"]["since_by"] == "v1.0.0 names side", aged
 
     _namespaces(repo, "side-2")     # same workload, new name
     _signed_tag_naming(comp, repo, "v1.1.0", "2026-09-01", ["side-2"])
-    renamed = comp.compute_ungoverned({"side-2"}, {"side"})
+    renamed = comp.compute_ungoverned({"side-2"}, {"side"}, governed={"home"})
     comp.price_ungoverned(renamed, repo, "adopter", "GBP", base, as_of)
     by_name = {e["namespace"]: e for e in renamed}
-    assert by_name["side"]["status"] == "closed" and "price" not in by_name["side"], by_name
-    fresh = by_name["side-2"]["price"]
-    assert fresh["since"] == "2026-09-01" and fresh["ramp"] == 1.0, fresh
-    assert fresh["workloads"] == aged[0]["price"]["workloads"] == 1, fresh
-    assert fresh["amount"] == aged[0]["price"]["amount"] / 3.0, (fresh, aged)
+    assert by_name["side"] == {"namespace": "side", "status": "closed", "closed_by": "left-repo"}, by_name
+    kept = by_name["side-2"]["price"]
+    assert kept["since"] == "2024-09-01" and kept["ramp"] == 3.0, kept
+    assert kept["since_by"] == "v1.0.0 names side ungoverned, where Deployment/app-0 sat", kept
+    assert kept["workloads"] == aged[0]["price"]["workloads"] == 1, kept
+    assert kept["amount"] == aged[0]["price"]["amount"], (kept, aged)
 
-    closed = [d for d in comp.compute_deltas([], renamed, None, "adopter", "GBP")
-              if d["kind"] == "closed-ungoverned-namespace"]
-    assert len(closed) == 1 and 'now carries governed: "true"' in closed[0]["detail"], closed
+    deltas = comp.compute_deltas([], renamed, None, "adopter", "GBP")
+    closed = [d for d in deltas if d["kind"] == "closed-ungoverned-namespace"]
+    assert len(closed) == 1 and "left the adopter's repo" in closed[0]["detail"], closed
+    assert "governed" not in closed[0]["detail"].replace("ungoverned", ""), closed
+    opened = [d for d in deltas if d["kind"] == "new-ungoverned-namespace"]
+    assert len(opened) == 1 and "since 2024-09-01" in opened[0]["detail"], opened
     assert comp.governed_namespaces(repo) == ["home"], "the renamed Namespace was not governed"
+
+    # Review round: re-declaring the old name as a governed Namespace that holds inert manifests
+    # of the same kind and name does not drop the carried age. A governed Namespace pays no
+    # ramp, so it cannot be the place the workload still sits.
+    dummy_ns = {"apiVersion": "v1", "kind": "Namespace",
+                "metadata": {"name": "side", "labels": {INSTITUTION: "adopter", GOVERNED: "true"}}}
+    dummy = repo / "gitops" / "apps" / "dummy.yaml"
+    dummy.write_text(yaml.safe_dump_all([dummy_ns, {"apiVersion": "apps/v1", "kind": "Deployment",
+                                                    "metadata": {"name": "app-0", "namespace": "side"}}]))
+    _signed_tag_naming(comp, repo, "v1.2.0", "2026-09-02", ["side-2"])
+    shadowed = comp.compute_ungoverned({"side-2"}, {"side-2"}, governed={"home", "side"})
+    comp.price_ungoverned(shadowed, repo, "adopter", "GBP", base, as_of)
+    held = shadowed[0]["price"]
+    assert held["since"] == "2024-09-01" and held["ramp"] == 3.0, held
+    dummy.unlink()
+
+    # The same shadow cut in one step, with no signed tag between the rename and the dummy.
+    once = tmp_path / "once"
+    once.mkdir()
+    _git(once, "init", "-q")
+    _namespaces(once, "side")
+    _signed_tag_naming(comp, once, "v1.0.0", "2024-09-01", ["side"])
+    _namespaces(once, "side-2")
+    (once / "gitops" / "apps" / "dummy.yaml").write_text(yaml.safe_dump_all(
+        [dummy_ns, {"apiVersion": "apps/v1", "kind": "Deployment",
+                    "metadata": {"name": "app-0", "namespace": "side"}}]))
+    one_step = comp.compute_ungoverned({"side-2"}, {"side"}, governed={"home", "side"})
+    comp.price_ungoverned(one_step, once, "adopter", "GBP", base, as_of)
+    assert next(e for e in one_step if e["namespace"] == "side-2")["price"]["since"] == "2024-09-01", one_step
+
+    # Governing it is the close that says governed.
+    ns_file = repo / "gitops" / "apps" / "namespace.yaml"
+    docs = list(yaml.safe_load_all(ns_file.read_text()))
+    for doc in docs:
+        doc["metadata"]["labels"][GOVERNED] = "true"
+    ns_file.write_text(yaml.safe_dump_all(docs))
+    assert comp.governed_namespaces(repo) == ["home", "side-2"], comp.governed_namespaces(repo)
+    governed = comp.compute_ungoverned(set(comp.ungoverned_namespaces(repo)), {"side-2"},
+                                       governed=set(comp.governed_namespaces(repo)))
+    assert governed == [{"namespace": "side-2", "status": "closed", "closed_by": "governed"}], governed
+    [delta] = comp.compute_deltas([], governed, None, "adopter", "GBP")
+    assert 'now carries governed: "true"' in delta["detail"], delta
+
+    # A copy is not a move: a new Namespace running a workload of the same kind and name while
+    # the aged one still holds it starts its own ramp.
+    copy = tmp_path / "copy"
+    copy.mkdir()
+    _git(copy, "init", "-q")
+    _namespaces(copy, "side")
+    _signed_tag_naming(comp, copy, "v1.0.0", "2024-09-01", ["side"])
+    (copy / "gitops" / "apps" / "copy.yaml").write_text(yaml.safe_dump(
+        {"apiVersion": "apps/v1", "kind": "Deployment", "metadata": {"name": "app-0", "namespace": "other"}}))
+    both = comp.compute_ungoverned({"side", "other"}, {"side"}, governed={"home"})
+    comp.price_ungoverned(both, copy, "adopter", "GBP", base, as_of)
+    other = next(e for e in both if e["namespace"] == "other")["price"]
+    assert other["since"] is None and other["ramp"] == 1.0, other
+
+    # The residual, named in ticket 122: rename every workload with the Namespace and the ramp
+    # restarts, because a workload's kind and name are also the adopter's to choose.
+    fresh = tmp_path / "fresh"
+    fresh.mkdir()
+    _git(fresh, "init", "-q")
+    _namespaces(fresh, "side")
+    _signed_tag_naming(comp, fresh, "v1.0.0", "2024-09-01", ["side"])
+    _namespaces(fresh, "side-2")
+    (fresh / "gitops" / "apps" / "app-side-2.yaml").write_text(yaml.safe_dump(
+        {"apiVersion": "apps/v1", "kind": "Deployment", "metadata": {"name": "renamed", "namespace": "side-2"}}))
+    restarted = comp.compute_ungoverned({"side-2"}, {"side"}, governed={"home"})
+    comp.price_ungoverned(restarted, fresh, "adopter", "GBP", base, as_of)
+    again = next(e for e in restarted if e["namespace"] == "side-2")["price"]
+    assert again["since"] is None and again["ramp"] == 1.0, again
 
 
 def _withdraw(nist: Path, cid: str, *, from_catalogue: bool, baselines: tuple[str, ...]) -> None:
