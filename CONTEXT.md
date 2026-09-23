@@ -237,7 +237,10 @@ that a rewritten entry cites stay as the record of the decision at the time.
   carries, and are never keys. Which catalogue an id belongs to is stated once, by the `source` or
   `href` on the enclosing block, never repeated as a prefix on the id. Resolution is exact-string:
   no case-folding, no prefix-stripping, and an id absent from every pinned catalogue is a hard
-  failure, a **missing instrument** (ADR-0020), because nothing pinned defines it. A **control
+  failure, a **missing instrument** (ADR-0020), because nothing pinned defines it. So is an id the
+  catalogue keeps under `status: withdrawn`, as NIST keeps 182 of its 1196: an overlay or a claim
+  naming one refuses `unknown-control-id`, and the header's `withdrawn-selectable: false` says
+  its selection followed that rule (ticket 126). A **control
   claim** and a **hole** key on `(source, id)`: the catalogue the enclosing `href` names and the
   bare id there, so a second `controls` parent (an adopter's own catalogue) cannot collide with
   the regulator's ids; on the wire a bare id is the baseline catalogue's and `source:id` names any

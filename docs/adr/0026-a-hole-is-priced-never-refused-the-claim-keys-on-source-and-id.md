@@ -352,3 +352,23 @@ publisher's repo.
 The bespoke and ungoverned prices stay reported on their own lines and enter no sum and no
 tier. Ticket 121 records why. The exposure total an ungoverned Namespace takes its share of is
 now smaller where the adopter implements a weighted control. No decision above changes.
+
+## Note, 2026-09-23 (eco-system ticket 126, delegated): a withdrawn control cannot be selected
+
+The Consequences say an adopter still naming a withdrawn control in `overlay.controls` meets
+`unknown-control-id`. Until ticket 126 that held only for an id the catalogue drops. An id NIST
+keeps under `status: withdrawn` was still selected. Ticket 126 makes the Consequences true for
+both. A catalogue defines an id when the id is present and not under `status: withdrawn`. An
+overlay entry or a control claim naming an id its catalogue does not define refuses
+`unknown-control-id`, whose detail names the status. No refusal kind is added, so point 6's list
+of eleven stands. The regulator's baseline is read as signed. The header records
+`withdrawn-selectable: false`, which says every id it selected was defined at its pin.
+
+Ticket 123's counterfactual now asks the last overlay with the same rule. A control that left
+the selected set, where the regulator's pin moved, is the regulator's withdrawal when the last
+inputs would not select it now and the last header proves it was defined when selected: the id
+is gone from the catalogue, or the header carries `withdrawn-selectable: false`, or the id came
+from the last baseline. A header from an older composer cannot prove that for an id now under
+`status: withdrawn`, so its removal stays the adopter's for that one run. This changes no
+decision above. The decisions and their reasons are in ticket 126.
+
