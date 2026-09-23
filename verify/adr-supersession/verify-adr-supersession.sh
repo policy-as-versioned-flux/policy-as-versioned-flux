@@ -16,8 +16,8 @@
 # superseded ADRs say so, not that compose/composition.py behaves that way. The code is graded by
 # verify/priced-holes/verify-priced-holes.sh (ticket 38); a second grader over the same source
 # would drift from the first, so this one deliberately reads no Python. The one place record and
-# code are known to differ on 2026-09-04 (the removal refusal, ADR-0026 point 5) is named in the
-# ADR's Consequences, and this script requires that naming.
+# code differed from 2026-09-04 (the removal refusal, ADR-0026 point 5) closed with eco-system
+# ticket 124, and this script requires the ADR's Consequences to name that build.
 #
 # Exit 0 PASS, 1 FAIL. Never SKIP: every file it reads is in this repo, so it can always look.
 #
@@ -145,8 +145,9 @@ if [ -n "$newtext" ]; then
   want "ADR-$NEW" "$newtext" 'removed-control'
   want "ADR-$NEW" "$newtext" 'removal is priced'
   want "ADR-$NEW" "$newtext" 'missing instrument'
-  # the one known record/code gap is named, with the function that still refuses
-  want "ADR-$NEW consequences" "$newtext" 'check_selected_set.*still refuses'
+  # the record/code gap on the removal is closed, and the record names the build that closed it
+  want "ADR-$NEW consequences" "$newtext" 'ticket 124 built the priced removal'
+  refuse "ADR-$NEW consequences" "$newtext" 'check_selected_set.*still refuses'
   # the unknown-id refusal keeps its code kind; the record says which
   want "ADR-$NEW consequences" "$newtext" 'code kind `unknown-control-id`, not `missing-instrument`'
 fi
