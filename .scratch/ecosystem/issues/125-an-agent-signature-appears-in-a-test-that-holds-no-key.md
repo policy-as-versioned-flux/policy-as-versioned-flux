@@ -1,7 +1,7 @@
 # 125 — An agent signature appears in a test that holds no key
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -119,3 +119,20 @@ code. That needs CI runs after this merges. The flake appeared in 6 of the runs 
 the integrator should watch `twin.yml` on the next few branches after merge. The guard would fail
 any future leaker by name, on the test that leaks, not on this test. Nothing here waits on the
 owner.
+
+## Answer
+
+Resolved 2026-09-23 by hub PR 102. The writer is named, the test cannot see a key it did not set,
+and CI shows it passing.
+
+1. **The writer** was test code: `monkeypatch_session_signing_key` in `tests/test_intel_beat.py`,
+   a session-scoped fixture that kept `TWIN_SIGNING_KEY` set until its xdist worker ended. No
+   code under `twin/` leaks the key, so no real artefact was signed with a key nobody passed.
+2. **The test** removes the key itself, and the `beat` tests set it only around their own CLI
+   calls.
+3. **A guard** in `conftest.py` compares the key after each test with the value the worker
+   started with, restores it, and fails the test that changed it.
+4. **CI.** Every `twin.yml` run that completed after the merge at 2026-09-23T11:13Z was read with
+   `gh run view --log-failed`: 7 runs (35853269058, 35855074421, 35855114097, 35855149849,
+   35856167370, 35856173985, 35856578707). None failed on the test or on the new guard. Their
+   only failure is the standing flux-probe invariant.
