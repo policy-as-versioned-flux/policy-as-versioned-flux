@@ -1,25 +1,25 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ......
 ----------------------------------------------------------------------
-Ran 6 tests in 4.885s
+Ran 6 tests in 4.781s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 7.843s
+Ran 9 tests in 7.918s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
-............
+.............
 ----------------------------------------------------------------------
-Ran 12 tests in 8.373s
+Ran 13 tests in 8.565s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 1.623s
+Ran 16 tests in 1.645s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)
@@ -45,6 +45,7 @@ OK prices[]: the one summing helper refuses a list that crosses a perspective or
 OK prices[]: driftwood's own forward-intel feed prices as one source:twin entry -- perspective driftwood, GBP, tail bounded-pert, curve sha256:70e5e, policy version 1.1.0
 OK prices[]: an adopter with no forward-intel feed simply has no twin entry -- a missing twin feed is never a refusal (ticket 25)
 OK prices[]: an ico pin at v3 carries the published control weights as a per-hole breakdown -- 4 holes, weights sum to 1.0, and the entry amount IS the sum of the hole amounts (a hole partitions the regime, it never adds to it)
+OK prices[]: implementing the weighted control pl-2 takes its 536153.12 line off the regime entry, 1787177.08 -> 1251023.95; the partition still sums to 1787177.08 (eco-system ticket 121)
 OK prices[]: an adopter with no signed appetite refuses as a missing instrument (ADR-0020), naming the artefact that declares none -- and prices nothing
 OK prices[]: driftwood's own overlay.floor clamps the selection UP -- the threat-register price that picks baseline unclamped is held at the declared quarantine floor, tighten-only (ADR-0022)
 OK limits[]: the two-publisher-conflict limit prints open at driftwood's one pinned implementations publisher
@@ -3677,8 +3678,13 @@ OK split_withdrawn: the regulator drops aa-2 from its catalogue and from SMALL; 
 OK split_withdrawn: the regulator keeps aa-1.1 defined and drops it from SMALL; the last header's overlay-controls is empty, so aa-1.1 left with the regulator's baseline
 OK split_withdrawn: a last header with no overlay-controls cannot tell a same-name baseline drop from an overlay removal, so aa-1.1 stays the adopter's removal
 OK split_withdrawn: in one run the adopter drops aa-3 from its overlay and the regulator drops aa-1.1 from SMALL; aa-3 is the adopter's removed-control and aa-1.1 the regulator's withdrawn-control
-OK split_withdrawn: the adopter drops aa-3, which the pinned catalogue keeps under status: withdrawn, from its overlay with no bump; aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
-OK split_withdrawn: the adopter drops aa-3, which the pinned catalogue keeps under status: withdrawn, from its overlay with a real bump; aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK _defines: aa-3 is in fixture-nist's catalogue under status: withdrawn; an overlay naming it and a claim on it each refuse unknown-control-id, and neither selects it
+OK split_withdrawn: a header from before ticket 126 selected aa-3 while already withdrawn; the adopter drops it with no bump, and aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK split_withdrawn: a header from before ticket 126 selected aa-3 while already withdrawn; the adopter drops it with a real bump, and aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK split_withdrawn: a header from before ticket 126 with no overlay-controls selected aa-3 while already withdrawn; the adopter drops it with no bump, and aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK split_withdrawn: a header from before ticket 126 with no overlay-controls selected aa-3 while already withdrawn; the adopter drops it with a real bump, and aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK split_withdrawn: a last header with no overlay-controls and no withdrawn-selectable books aa-2 as the regulator's when the catalogue drops it, and as the adopter's removal for one run when the catalogue keeps it under status: withdrawn
+OK split_withdrawn: the adopter's overlay selected aa-3 under the new rule, and the regulator then marks it withdrawn; keeping it refuses unknown-control-id, and dropping it prints the regulator's withdrawn-control
 OK resolve_claims: an adopter claim against fixture-platform's own member-a refuses (ADR-0017) -- 'fixture-adopter14 claims aa-2 is evidenced by "member-a", which fixture-platform ships, not fixture-adopter14' -- and still counts as coverage (a claim exists), orthogonal to the claim's own validity
 OK resolve_claims: the real platform component-definition's two formerly-dangling claims (ac-6, cm-6) are fixed -- zero dangling-claim refusals against the real estate
 OK HEADER.yaml: 'holes' and 'selected-controls' live only in the advisory header -- stripping it leaves every file the engine reads unchanged -- and the handbook, which the engine never reads, states both counts (287 selected, 285 holes)

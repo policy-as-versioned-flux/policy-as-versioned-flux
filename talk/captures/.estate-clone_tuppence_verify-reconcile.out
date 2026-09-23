@@ -1,5 +1,5 @@
 [1;36m==>[0m 0. the five-fact sample: the composed set in force, from signed sources (graded first, cluster-free)
-   five-fact sample 2026-09-22T13:30:40Z on cluster dsample-35733680722 (run 35733680722), 3 sources
+   five-fact sample 2026-09-23T13:44:12Z on cluster dsample-35868955785 (run 35868955785), 3 sources
      the cage facts (6, 7) ARE scored on this sample: registered by 65acf4c02af8 at 2026-09-10T18:30:27+01:00 on refs/remotes/origin/main, and the sample is later
      nist                 true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      nist                 true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
@@ -16,7 +16,7 @@
      platform             FALSE fact_6_the_bottom_rung_is_admitted_and_runs: the cage REFUSED the workload: Error from server (Forbidden): error when creating "STDIN": pods "cage-probe" is forbidden: no PriorityClass with name cage-baseline-3-0-0 was found
      platform             ?     fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches: fact 6 did not deliver a workload running on the cage's bottom rung, so there was nothing to measure reach from; fact 6 carries what happened to it
      tuppence-composed    true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
-     tuppence-composed    true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against tuppence's own pinned identity ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+     tuppence-composed    ?     fact_2_tag_signature_verified_at_the_source_boundary: nothing checked a signature at this source boundary: the GitRepository declares no spec.verify (Flux speaks OpenPGP and SSH only) and carries no verdict from the identity-pinned gitsign-verifying controller (ticket 41). Not looked at, and a thing not looked at is never a pass
      tuppence-composed    true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming tuppence-composed applied 751522b3bca9
      tuppence-composed    true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
      tuppence-composed    true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory

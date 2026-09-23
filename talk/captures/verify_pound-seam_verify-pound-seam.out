@@ -18,17 +18,17 @@ PASS: ludlow serves a total of 9,358,020.80 GBP that says what it is -- an ordin
 PASS: tuppence serves a total of 9,262,365.33 GBP that says what it is -- an ordinal, auditable comparison under one perspective; not an expected annual loss -- with the aggregate of its selected-tier residuals (185247.30663334212) beside a tolerance of 15000.0
 FAIL: driftwood prices[5]: carries no numeric amount, so nothing can be restated per customer or summed
 PASS: driftwood: one twin edge, policy 1.1.0, curve sha256:70e5e, tail bounded-pert, perspective driftwood in GBP
-PASS: driftwood regime entry (penalty-schema): 4 priced hole(s) sum to its total 1,787,177.08 GBP
+PASS: driftwood regime entry (penalty-schema): 4 priced hole(s) sum to its total 1,787,177.08 GBP; the open lines price it at 1,787,177.08
 FAIL: driftwood regime entry (penalty-schema): carries no holes[] — a regime price is the sum of its holes, so implementing one reduces it (ticket 15 answer 1)
 PASS: driftwood: every list of amounts in the document is one perspective in one currency
 PASS: driftwood: selection policy 1.1.0 matches driftwood/selection-policy/VERSION
 PASS: ludlow: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
-PASS: ludlow regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP
+PASS: ludlow regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP; the open lines price it at 9,039,791.02
 FAIL: ludlow regime entry (penalty-schema): carries no holes[] — a regime price is the sum of its holes, so implementing one reduces it (ticket 15 answer 1)
 PASS: ludlow: every list of amounts in the document is one perspective in one currency
 PASS: ludlow: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
 PASS: tuppence: publishes no forward-intel feed yet, so no twin entry is expected (named absence, not a silent pass)
-PASS: tuppence regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP
+PASS: tuppence regime entry (penalty-schema): 4 priced hole(s) sum to its total 9,039,791.02 GBP; the open lines price it at 9,039,791.02
 FAIL: tuppence regime entry (penalty-schema): carries no holes[] — a regime price is the sum of its holes, so implementing one reduces it (ticket 15 answer 1)
 PASS: tuppence: every list of amounts in the document is one perspective in one currency
 PASS: tuppence: selects no tier through a published selection policy yet (named absence: no forward-intel feed)
