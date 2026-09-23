@@ -593,8 +593,11 @@ that a rewritten entry cites stay as the record of the decision at the time.
   the catalogue and **control id**, of which controls a violation type turns on. Part of the
   penalty feed; changing it is a major version.
 
-- **Ungoverned namespace** (added 2026-08-28, ticket 15; built 2026-09-03, ticket 38) — A
-  namespace in an adopter's repo carrying the institution label without the governed label.
+- **Ungoverned namespace** (added 2026-08-28, ticket 15; built 2026-09-03, ticket 38; widened
+  2026-09-23, ticket 119) — A namespace an adopter's repo declares, or a workload in it names,
+  without the governed label. The institution label no longer decides it: an unlabelled one
+  counts too. The only namespaces left out are the substrate the platform declares `infra` in its
+  own `engine/namespaces.yaml`, which no adopter can write.
   Priced as its workload share (pod-owning kinds in the repo walk, over the same across every
   institution namespace) of the adopter's whole uncaged residual, LEF-ramped by the EOL feed's
   own ramp from `since` — the date of the first signed tag whose composed header recorded it,
@@ -602,7 +605,8 @@ that a rewritten entry cites stay as the record of the decision at the time.
   publish date, and bounded at the whole residual. What cannot be read (no signed tag names it,
   no feed prices the residual) is a named limit on the price, never an invented date or a zero.
   Never refused. The **proposer** may open a PR to govern it. The live case is tuppence's
-  `tuppence-reset`, recorded since 2026-08-25.
+  `tuppence-reset`, recorded since 2026-08-25. Its `openbao` joins it at tuppence's next
+  composition under a tools tag carrying ticket 119.
 
 - **Bespoke control** (added 2026-08-28, ticket 15; built 2026-09-03, ticket 38) — A control an
   adopter defines itself, published as a small OSCAL catalogue of which the adopter is the source

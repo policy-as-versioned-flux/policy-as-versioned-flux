@@ -131,7 +131,7 @@ VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
         "(source, id) never collapses one id from two sources, so no merger dedup exists"),
     (3, "overreach-6"): (
         "discard", "test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier",
-        "a directory is not a Namespace, and a Namespace is priced only while it exists"),
+        "a directory is not a Namespace; a Namespace is priced only while it exists and moves no tier"),
 }
 
 # The matching across the three rounds. `place` is the code place the check tested; `reason` is
@@ -546,15 +546,20 @@ def test_a_bespoke_id_never_covers_the_regulators_control_of_the_same_id(tmp_pat
 
 def test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier(tmp_path):
     """Round 1 `overreach-5`, round 3 `overreach-6`. A directory of manifests is not a
-    Namespace: the walk reads `kind: Namespace` documents. An ungoverned Namespace with no
-    workload prices at zero. One that is deleted closes and carries no price. One with workloads
-    is priced, and that price moves no tier and no exposure total."""
+    Namespace: the walk reads `kind: Namespace` documents and the Namespace a workload names.
+    Since ticket 119 a scratch Job that names a Namespace makes it an ungoverned Namespace, as
+    the candidates say, because silence buys no exemption and neither does intent. An ungoverned
+    Namespace with no workload prices at zero. One that is deleted closes and carries no price.
+    One with workloads is priced, and that price moves no tier and no exposure total."""
     comp = _composition()
     scratch = tmp_path / "scratch-dir"
     (scratch / "gitops" / "scratch").mkdir(parents=True)
+    (scratch / "gitops" / "scratch" / "notes.yaml").write_text(yaml.safe_dump(
+        {"apiVersion": "v1", "kind": "ConfigMap", "metadata": {"name": "grant"}}))
+    assert comp.ungoverned_namespaces(scratch) == [], "a directory was read as a Namespace"
     (scratch / "gitops" / "scratch" / "job.yaml").write_text(yaml.safe_dump(
         {"apiVersion": "batch/v1", "kind": "Job", "metadata": {"name": "grant", "namespace": "scratch"}}))
-    assert comp.ungoverned_namespaces(scratch) == []
+    assert comp.ungoverned_namespaces(scratch) == ["scratch"], "a Namespace a workload names went unpriced"
 
     empty = [{"namespace": "side", "status": "new"}]
     repo = tmp_path / "empty"

@@ -14,6 +14,12 @@ control (the last since eco-system ticket 124, ADR-0026 point 5), and that each 
   manifests), the EOL feed's ramp from `since` (re-derived), `min(base, base × share × ramp)` with
   `base` the header's signed exposure total, and `since` the date of the first *signed* tag whose
   header names the namespace (re-read from the adopter clone's tags) or null with a limit;
+- every Namespace the recount finds ungoverned carrying a price (eco-system ticket 119). The
+  recount follows `composition.py`'s rule: every Namespace the adopter's repo declares or a
+  workload names counts, labelled or not, except the substrate the platform declares `infra` in
+  its own `engine/namespaces.yaml` (`_substrate`). An adopter whose committed evidence predates
+  that rule and leaves one unpriced reads `FAIL` by name. On 2026-09-23 that is tuppence's
+  `openbao`, until tuppence recomposes under a platform tools tag carrying ticket 119;
 - the regime entry's weighted `holes[]` each carrying the adopter's status;
 - the party schema admitting `overlay.controls` as bare ids and `party:id`.
 

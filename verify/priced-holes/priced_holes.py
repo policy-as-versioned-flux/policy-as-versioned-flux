@@ -19,7 +19,9 @@ What it observes, on the estate's committed files only:
         none — never a zero nobody priced;
      d. every open `ungoverned[]` entry carries a price whose share is workloads inside over
         workloads across the institution namespaces (re-counted here from the adopter's own
-        manifests), whose ramp is the EOL feed's own ramp from `since` to `as_of` (re-derived
+        manifests; since eco-system ticket 119 every Namespace the repo declares or a workload
+        names counts, labelled or not, except the substrate the platform declares `infra`, and
+        every ungoverned one the recount finds must carry a price), whose ramp is the EOL feed's own ramp from `since` to `as_of` (re-derived
         here), whose amount is `min(base, base * share * ramp)` with `base` the header's signed
         exposure total, and whose `since` is the date of the first signed tag whose header names
         the namespace (re-read here from the adopter clone's tags) or null with a named limit;
@@ -76,6 +78,7 @@ PRICE_FIELDS = {"perspective", "currency", "amount", "share", "workloads", "work
 WORKLOAD_KINDS = {"Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"}
 INSTITUTION_LABEL = "policy-as-versioned.dev/institution"
 GOVERNED_LABEL = "policy-as-versioned.dev/governed"
+TIER_LABEL = "posture.acme.io/tier"
 HEADER_COMMENT_LINE = "# advisory header -- policy-as-versioned.dev/composed"
 RAMP_CAP_YEARS = 4.0
 
@@ -278,6 +281,19 @@ def check_doc(doc: dict, ctx: dict) -> None:
                         f"{p['since']} as of {p['as_of']}, of {p['base']:,.2f}"
                         + (", bounded at the whole residual" if bounded else ""))
 
+    # d2. every Namespace the repo walk finds ungoverned carries a price (eco-system ticket 119).
+    #     Leaving a Namespace unlabelled, or never declaring it, no longer keeps it out.
+    if "ungoverned" in ctx:
+        open_ns = {e.get("namespace") for e in doc.get("ungoverned") or [] if e.get("status") != "closed"}
+        unpriced = sorted(set(ctx["ungoverned"]) - open_ns)
+        if unpriced:
+            out("FAIL", f"{who}: {', '.join(unpriced)} ungoverned in the adopter's repo but carries no "
+                        f"price in composed/evidence.json; a Namespace with no label is priced "
+                        f"since eco-system ticket 119, and the artefact predates that rule")
+        else:
+            out("PASS", f"{who}: every ungoverned Namespace the repo walk finds is priced "
+                        f"({', '.join(sorted(ctx['ungoverned'])) or 'none'})")
+
     # e. the regime entry's holes[] carry status and agree with holes[]
     status_by_key = {(h["source"], h["control_id"]): h["status"] for h in holes
                      if isinstance(h, dict) and HOLE_FIELDS <= set(h)}
@@ -343,8 +359,29 @@ def _parties(estate: str) -> dict[str, dict]:
     return found
 
 
-def _namespace_facts(root: str) -> tuple[set[str], dict[str, int]]:
+def _substrate(estate: str) -> set[str] | None:
+    """The Namespaces the platform declares `infra` in its own engine/namespaces.yaml (ADR-0022,
+    eco-system ticket 113). Since ticket 119 they are the only ones an adopter's walk leaves
+    unpriced. None where the declaration cannot be read: the recount cannot tell the substrate."""
+    path = os.path.join(estate, "platform", "engine", "namespaces.yaml")
+    try:
+        with open(path) as fh:
+            docs = [d for d in yaml.safe_load_all(fh) if isinstance(d, dict)]
+    except (OSError, yaml.YAMLError):
+        return None
+    names = {str((d.get("metadata") or {}).get("name")) for d in docs
+             if d.get("kind") == "Namespace"
+             and (((d.get("metadata") or {}).get("labels") or {}).get(TIER_LABEL) == "infra")}
+    return names or None
+
+
+def _namespace_facts(root: str, substrate: set[str]) -> tuple[set[str], dict[str, int], set[str]]:
+    """The recount, by the rule composition.py follows since eco-system ticket 119: every
+    Namespace the repo declares or a workload names is an institution Namespace, whatever labels
+    it carries, except the platform's substrate. Returns that set, the workloads per Namespace,
+    and the ungoverned ones (declared without `governed: "true"`, or never declared)."""
     institution: set[str] = set()
+    governed: set[str] = set()
     workloads: dict[str, int] = {}
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [d for d in dirnames if d not in (".git", "composed", ".work")]
@@ -359,12 +396,16 @@ def _namespace_facts(root: str) -> tuple[set[str], dict[str, int]]:
             for d in docs:
                 md = d.get("metadata") or {}
                 if d.get("kind") == "Namespace":
-                    if INSTITUTION_LABEL in (md.get("labels") or {}):
-                        institution.add(str(md.get("name")))
+                    ns = str(md.get("name"))
+                    if ns not in substrate:
+                        institution.add(ns)
+                        if (md.get("labels") or {}).get(GOVERNED_LABEL) == "true":
+                            governed.add(ns)
                 elif d.get("kind") in WORKLOAD_KINDS:
                     ns = str(md.get("namespace") or "default")
                     workloads[ns] = workloads.get(ns, 0) + 1
-    return institution, workloads
+    institution |= {ns for ns in workloads if ns not in substrate}
+    return institution, workloads, institution - governed
 
 
 def _git(repo: str, *args: str) -> subprocess.CompletedProcess:
@@ -473,15 +514,20 @@ def run(estate: str) -> None:
         except (OSError, ValueError) as exc:
             out("FAIL", f"{name}: composed/evidence.json does not parse: {exc}")
             continue
-        institution, workloads = _namespace_facts(repo)
         namespaces = [e.get("namespace") for e in doc.get("ungoverned") or []]
         ctx: dict[str, Any] = {
             "adopter": name,
             "currency": parties[name].get("reporting_currency") or "USD",
-            "workloads": workloads, "institution": institution,
             "exposure_total": (_header(repo).get("exposure") or {}).get("total"),
             "as_of": _as_of(estate, parties, parties[name]),
         }
+        substrate = _substrate(estate)
+        if substrate is None:
+            out("SKIP", f"{name}: platform/engine/namespaces.yaml declares no infra Namespace, so "
+                        f"the recount cannot tell the substrate from an adopter Namespace")
+        else:
+            institution, workloads, ungoverned = _namespace_facts(repo, substrate)
+            ctx.update(workloads=workloads, institution=institution, ungoverned=ungoverned)
         since = _signed_since(repo, [str(n) for n in namespaces]) if namespaces else {}
         if since is None:
             out("SKIP", f"{name}: the clone lists no signed tag, so the since of its ungoverned "
@@ -533,7 +579,7 @@ def _good() -> tuple[dict, dict]:
     }
     ctx = {"adopter": "driftwood", "currency": "GBP",
            "workloads": {"reset": 1, "driftwood": 1, "flux-system": 1},
-           "institution": {"reset", "driftwood"},
+           "institution": {"reset", "driftwood"}, "ungoverned": {"reset"},
            "exposure_total": 300.0, "as_of": "2026-08-28", "since": {"reset": "2026-08-25"}}
     return doc, ctx
 
@@ -651,6 +697,11 @@ def selfcheck() -> None:
     doc, ctx = _good()
     doc["deltas"] = []
     _grade(doc, ctx, "a new hole with no delta reporting it fails", True)
+
+    doc, ctx = _good()
+    ctx["ungoverned"] = {"reset", "openbao"}
+    _grade(doc, ctx, "an ungoverned Namespace the repo walk finds and the evidence leaves unpriced "
+                     "fails (ticket 119)", True)
 
     doc, ctx = _good()
     doc["deltas"][0]["currency"] = "USD"

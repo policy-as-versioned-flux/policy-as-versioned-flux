@@ -20,9 +20,14 @@ One candidate survived.
      institution label is the adopter's own choice, and nothing checks it. ADR-0022 says
      "silence buys nothing anywhere". Here silence buys both. Graduated as eco-system ticket 119.
 
-The legs below reproduce it: the engine (kyverno 1.18.2) over every policy document an adopter
-serves today and every one the platform delivers next, and the composition's own namespace walk.
-When ticket 119 closes the hole these legs flip, and that ticket owns the flip.
+Ticket 119 repaired it with a price, not a cage (delegated, ADR-0025). The composition now
+treats every Namespace an adopter's repo declares or names as an institution Namespace, except
+the substrate the platform declares `infra` in its own `engine/namespaces.yaml`, which no adopter
+can write. So a Namespace with no label is an ungoverned Namespace and prices like any other.
+The cage is left where it is, on purpose: at admission the only facts about a Namespace are its
+name and its labels, and a cage that reached an unlabelled Namespace would have to tell kube-system
+from an adopter's Namespace by one of them (ticket 113, proof 3). The engine leg is now the
+regression test of that decision, and the price legs are the regression tests of the repair.
 
 Counting rule (delegated, ticket 116): a candidate survives when checking the place it points at
 finds a real defect that no earlier survivor or ticket already holds. That is the rule ticket 08
@@ -77,13 +82,14 @@ VERDICTS: dict[tuple[str, str], tuple[str, str, str]] = {
         "discard", "test_a_self_asserted_platform_role_is_read_by_nothing_that_places_a_pod",
         "the platform role is read from platform/party.yaml alone, and no served body reads a role"),
     ("two", "loophole-2"): (
-        "survivor", "test_an_unclaimed_pod_in_an_unlabelled_namespace_is_outside_every_served_policy",
-        "no discovery list exists, but a Namespace with no label is outside the cage and the price"),
+        "survivor", "test_the_composition_prices_a_namespace_that_omits_the_institution_label",
+        "no discovery list exists, but a Namespace with no label was outside the cage and the price;"
+        " ticket 119 prices it"),
     ("two", "loophole-3"): (
         "discard", "test_a_recreated_namespace_is_bound_to_the_price_not_to_its_history",
         "the binding check compares the declaration with the price, never with an earlier label"),
     ("two", "overreach-4"): (
-        "discard", "test_an_unclaimed_pod_in_an_unlabelled_namespace_is_outside_every_served_policy",
+        "discard", "test_an_unclaimed_pod_in_an_unlabelled_namespace_stays_outside_the_cage_by_decision",
         "an ad hoc Namespace does not cage an unclaimed debug pod at all; the survivor's place"),
     ("two", "overreach-5"): (
         "discard", "test_loosening_is_a_recorded_decision_and_the_binding_check_refuses_it",
@@ -104,7 +110,7 @@ VERDICTS: dict[tuple[str, str], tuple[str, str, str]] = {
         "discard", "test_restoring_a_dropped_claim_is_a_pod_edit_the_binding_check_never_reads",
         "the claim is a pod label; putting it back needs no tier edit and meets no binding check"),
     ("three", "overreach-5"): (
-        "discard", "test_an_unclaimed_pod_in_an_unlabelled_namespace_is_outside_every_served_policy",
+        "discard", "test_an_unclaimed_pod_in_an_unlabelled_namespace_stays_outside_the_cage_by_decision",
         "a sandbox Namespace does not cage an unclaimed pod at all; the survivor's place"),
     ("three", "overreach-6"): (
         "discard", "test_the_infra_tripwire_gates_no_unit_merge",
@@ -264,13 +270,19 @@ def _namespace(name: str, labels: dict[str, str]) -> str:
 
 
 # --------------------------------------------------------------------------------------------
-# S. the survivor: a Namespace with none of the labels is outside the cage and the price
+# S. the survivor: a Namespace with none of the labels was outside the cage and the price.
+#    Ticket 119 prices it and keeps the cage where it is.
 # --------------------------------------------------------------------------------------------
 
-def test_an_unclaimed_pod_in_an_unlabelled_namespace_is_outside_every_served_policy(tmp_path):
-    """The engine half of the survivor. Every policy document each adopter serves today, and
-    every one the platform delivers next, leaves an unclaimed pod in an unlabelled Namespace
-    exactly as it arrived: no rung, no dials, no reach cage, no failed validation."""
+SUBSTRATE = {"kube-system", "flux-system", "kyverno"}
+
+
+def test_an_unclaimed_pod_in_an_unlabelled_namespace_stays_outside_the_cage_by_decision(tmp_path):
+    """The engine half of the survivor, kept as the regression test of ticket 119's decision.
+    Every policy document each adopter serves today, and every one the platform delivers next,
+    leaves an unclaimed pod in an unlabelled Namespace exactly as it arrived. That is the same
+    fact that keeps CoreDNS running (ticket 113, proof 3): at admission an unlabelled adopter
+    Namespace and kube-system look alike. The repair is the price, in the legs below."""
     exe = _kyverno()
     touched = _outcomes(tmp_path, exe, {}, {})
     assert set(touched) >= set(ADOPTERS) | {"platform machinery", "platform graded"}
@@ -289,19 +301,73 @@ def test_the_same_pod_in_a_governed_namespace_is_reached(tmp_path):
         touched["platform machinery"]
 
 
-def test_the_composition_prices_no_namespace_that_omits_the_institution_label(tmp_path):
-    """The price half of the survivor. The composition's own walk lists an ungoverned Namespace
-    only when it carries the institution label, and leaves its workloads out of the share
-    denominator otherwise. The adopter chooses the label, and the walk reads nothing else."""
+def test_the_composition_prices_a_namespace_that_omits_the_institution_label(tmp_path):
+    """The price half of the survivor, flipped by ticket 119. A Namespace the adopter declares
+    with no label is an ungoverned Namespace, its workloads enter the share's denominator, and it
+    carries a price. The same Namespace with the institution label prices the same way, so the
+    label no longer decides whether a Namespace is priced."""
     composition = _composition()
     bare = _adopter_repo(tmp_path / "bare", {})
     institution, workloads = composition._namespace_facts(bare)
-    assert "side" not in institution and workloads.get("side") == 1, (institution, workloads)
-    assert composition.ungoverned_namespaces(bare) == [], "an unlabelled Namespace was priced after all"
+    assert institution == {"home": True, "side": False} and workloads == {"home": 1, "side": 1}, \
+        (institution, workloads)
+    assert composition.ungoverned_namespaces(bare) == ["side"], "an unlabelled Namespace is still unpriced"
 
     labelled = _adopter_repo(tmp_path / "labelled", {INSTITUTION: "adopter"})
     assert composition.ungoverned_namespaces(labelled) == ["side"], \
         "the control: the same Namespace with the institution label is an ungoverned namespace"
+    assert composition._namespace_facts(labelled) == (institution, workloads), \
+        "the institution label changed what the walk reads"
+
+
+def test_a_namespace_only_a_workload_names_is_priced(tmp_path):
+    """The adopter need not declare a Namespace at all: a workload that names one is enough. This
+    is tuppence's `openbao` Job's shape, planted."""
+    composition = _composition()
+    repo = _adopter_repo(tmp_path, {})
+    job = {"apiVersion": "batch/v1", "kind": "Job", "metadata": {"name": "setup", "namespace": "elsewhere"},
+           "spec": {"template": {"spec": {"containers": [{"name": "app", "image": "nginx"}]}}}}
+    (repo / "reset.yaml").write_text(yaml.safe_dump(job))
+    assert composition.ungoverned_namespaces(repo) == ["elsewhere", "side"]
+
+
+def test_the_substrate_the_composition_skips_is_the_platform_infra_declaration(tmp_path):
+    """What keeps the price off kube-system, flux-system and kyverno is the platform's own `infra`
+    declaration, read from the platform tree. An adopter cannot add to it: the same label on the
+    adopter's own Namespace moves nothing, and the Namespace prices like any other."""
+    composition = _composition()
+    assert composition.substrate_namespaces() == SUBSTRATE
+    declared = {d["metadata"]["name"] for d in yaml.safe_load_all(
+                    (PLATFORM / "engine" / "namespaces.yaml").read_text(encoding="utf-8"))
+                if isinstance(d, dict) and d.get("kind") == "Namespace"
+                and (d["metadata"].get("labels") or {}).get(TIER) == "infra"}
+    assert declared == SUBSTRATE, declared
+
+    repo = _adopter_repo(tmp_path, {TIER: "infra"})
+    for ns in sorted(SUBSTRATE):
+        deploy = {"apiVersion": "apps/v1", "kind": "Deployment", "metadata": {"name": "x", "namespace": ns},
+                  "spec": {"template": {"spec": {"containers": [{"name": "app", "image": "nginx"}]}}}}
+        (repo / f"in-{ns}.yaml").write_text(yaml.safe_dump(deploy))
+    (repo / "kube-system.yaml").write_text(_namespace("kube-system", {}))
+    institution, workloads = composition._namespace_facts(repo)
+    assert set(institution) == {"home", "side"}, institution
+    assert all(workloads[ns] == 1 for ns in SUBSTRATE), workloads
+    assert composition.ungoverned_namespaces(repo) == ["side"], "an adopter's own `infra` label bought an exemption"
+
+
+def test_tuppence_openbao_job_is_priced_by_the_next_composition():
+    """Ticket 119's decision for the live case. tuppence's `openbao-reset-role` Job runs in the
+    platform's `openbao` Namespace, which tuppence never declares, and claims no version. It is
+    neither moved nor claimed: the next composition prices `openbao` as a tuppence ungoverned
+    Namespace, and `tuppence-reset` keeps its place."""
+    composition = _composition()
+    tuppence = ESTATE / "tuppence"
+    job = yaml.safe_load((tuppence / "reset" / "openbao-role.yaml").read_text(encoding="utf-8"))
+    assert job["kind"] == "Job" and job["metadata"]["namespace"] == "openbao"
+    assert CLAIM not in str(job["spec"]["template"]), "the Job claims a version now; the decision is stale"
+    ungoverned = composition.ungoverned_namespaces(tuppence)
+    assert {"openbao", "tuppence-reset"} <= set(ungoverned), ungoverned
+    assert "openbao" not in composition.substrate_namespaces()
 
 
 # --------------------------------------------------------------------------------------------

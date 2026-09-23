@@ -8,6 +8,8 @@ status: accepted
 
 > **Amended 2026-09-05 (eco-system ticket 89).** §4 describes a guard that refuses; the rule that renders it does not any more. It is gone from the SOURCE that renders it -- platform's `ResourceSet` template and its offline twin, on platform branch `ticket-89-deny-is-not-a-rung`. The copies the three adopters composed under platform `v2.0.1` still carry it, and can only stop carrying it when the owner merges that branch, `cut-release.yml` cuts the next signed tag and each adopter's pin bump re-composes. The hub's `verify/deny-is-not-a-rung/` grades exactly that and names the tag it waits for; it does not read green while a copy survives. The `CREATE` scope and the governed-set narrowing both stand, and what happens inside that scope is a mutation onto the bottom rung, not a refusal. **Nothing is denied; a workload that does not fit its cage does not run.** The rest stands.
 
+> **Amended 2026-09-23 (eco-system ticket 119, delegated).** Point 3 named an ungoverned namespace by the `institution` label, and called a Namespace without it infrastructure. The adopter writes that label, so leaving it off bought a Namespace out of the price. Now every Namespace the adopter's repo declares or a workload names is a candidate, labelled or not. Only the substrate the platform declares `infra` in its own `engine/namespaces.yaml` is left out (`platform/compose/composition.py` `substrate_namespaces`). The rest of point 3 stands.
+
 # The Namespace manifest is the governed declaration; the composed artefact carries no namespace list
 
 ADR-0014 made the **governed namespace** the boundary where an inherited rule reaches a workload.
