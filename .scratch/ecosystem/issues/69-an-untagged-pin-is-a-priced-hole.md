@@ -290,3 +290,11 @@ adopter's CI composes until the nine workflow blocks get `fetch-tags: true`; the
 the shell ignores a `--selfcheck` argument and runs the live check; and deleting the
 `pin_signature` key by hand turns a FAIL into a SKIP. The first is the one to close with the
 workflow change.
+
+
+**Correction, 2026-09-23.** `verify/priced-holes/verify-priced-holes.sh` grades FAIL on tuppence
+from the merge of ticket 119 (platform PR 32, hub PR 98), and that FAIL is intended. Ticket 119
+prices a Namespace that no label marks, and tuppence's `openbao` Job runs in one. tuppence's
+committed evidence was composed under the old rule and leaves it unpriced. The check returns to
+PASS when tuppence recomposes under a platform tools tag that carries PR 32 and cuts a signed
+composed tag. Both are the owner's steps, recorded in ticket 119.

@@ -78,3 +78,11 @@ Graduated 2026-08-28 from ticket 15's resolution. Definition of done includes wi
 > tickets mention the governed-namespace guard (03, 09, 63, 89, 91) and all five are `resolved`,
 > so no open ticket owns this red today. Recorded here so the ticket's word and the run's grade
 > stop disagreeing in silence.
+
+
+**Correction, 2026-09-23.** `verify/priced-holes/verify-priced-holes.sh` grades FAIL on tuppence
+from the merge of ticket 119 (platform PR 32, hub PR 98), and that FAIL is intended. Ticket 119
+prices a Namespace that no label marks, and tuppence's `openbao` Job runs in one. tuppence's
+committed evidence was composed under the old rule and leaves it unpriced. The check returns to
+PASS when tuppence recomposes under a platform tools tag that carries PR 32 and cuts a signed
+composed tag. Both are the owner's steps, recorded in ticket 119.

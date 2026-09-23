@@ -1,7 +1,7 @@
 # 119 — An unlabelled Namespace is outside the cage and the price
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -208,3 +208,26 @@ All with `.venv/bin/python -m pytest <files> -n0 -q` and kyverno 1.18.2 on PATH.
    owner cuts one and the pins move.
 2. **tuppence recomposes under that tag and cuts a signed composed tag.** Until then
    `verify-priced-holes.sh` reads FAIL on tuppence by name. That is the intended verdict.
+
+## Answer
+
+Resolved 2026-09-23 by platform PR 32 and hub PR 98. The hole is closed with a price, not a cage,
+and the no-cage choice is recorded with its reason.
+
+1. **Price.** `_namespace_facts` in platform `compose/composition.py` now counts every Namespace an
+   adopter declares or a workload names, with or without labels. `substrate_namespaces` reads
+   platform's own `engine/namespaces.yaml`, and only the Namespaces it declares `infra` stay out
+   of the price. The adopter's own copy of that label is never read.
+2. **No cage.** A cage on an unclaimed pod in an unlabelled Namespace would reach substrate pods,
+   which ticket 113's proof 3 forbids. The engine leg in
+   `tests/test_loophole_rounds_two_and_three.py` is now the regression test of that decision.
+3. **Measured.** tuppence's next composition prices `openbao`: 1 of 4 workloads,
+   2,315,591.33 GBP, one `new-ungoverned-namespace` delta. driftwood and ludlow have none.
+4. The catalogue row `adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace` names
+   `substrate_namespaces` by path and no longer waits on this ticket.
+
+The priced-holes gate check now FAILs on tuppence's committed evidence, on purpose. It returns
+to PASS when the owner cuts a platform tools tag carrying PR 32 and tuppence recomposes under it.
+
+Review: one round, pass, three minor findings. A stale summary line in the selfcheck and a
+nameless-Namespace edge case where the grader and the composer disagree are left open.

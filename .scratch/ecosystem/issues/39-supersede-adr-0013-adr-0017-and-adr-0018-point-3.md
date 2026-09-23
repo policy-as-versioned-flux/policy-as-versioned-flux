@@ -49,3 +49,11 @@ Graduated 2026-08-28 from ticket 15's resolution. Definition of done includes wi
 ## Waits on the owner
 
 Nothing new from this ticket. Ticket 38's list stands and is unchanged by it: the push of the platform integration branch `ecosystem/build-2026-09-03` and its merge as `pavc-other-hand`, a platform signed tag, and the re-composition and push of driftwood, tuppence and ludlow so their evidence carries `deltas[]`.
+
+
+**Correction, 2026-09-23.** `verify/priced-holes/verify-priced-holes.sh` grades FAIL on tuppence
+from the merge of ticket 119 (platform PR 32, hub PR 98), and that FAIL is intended. Ticket 119
+prices a Namespace that no label marks, and tuppence's `openbao` Job runs in one. tuppence's
+committed evidence was composed under the old rule and leaves it unpriced. The check returns to
+PASS when tuppence recomposes under a platform tools tag that carries PR 32 and cuts a signed
+composed tag. Both are the owner's steps, recorded in ticket 119.
