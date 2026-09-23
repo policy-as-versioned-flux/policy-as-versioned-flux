@@ -1,11 +1,11 @@
 [1;36m==>[0m 1. the derivation grades planted tickets and a planted grade table as documented
 selfcheck ok
 [1;36m==>[0m 2. every ticket number names one file, every Status: is one word of the tracker's vocabulary, and every done ticket has something behind it
-  120 tickets: closed=1, open=14, resolved=105
+  125 tickets: closed=1, open=17, resolved=107
 [1;36m==>[0m 3. the derivation, from the grade table the newest recorded run wrote
-  derived from the grade table run 277 recorded, 128 script(s) graded
+  derived from the grade table run 280 recorded, 128 script(s) graded
   ticket numbers read by verify/cited-truth/cited_truth.py's ticket_numbers (ticket 102), one reading for the estate
-  105 of 120 tickets are written `resolved`: 26 derive resolved from a named check that passed, 6 derive regressed (6 of those acknowledged by a dated line in the ticket), 8 rest only on checks that could not look, and 65 name no check of their own the table carries
-  167 check(s) named by a resolved ticket are not rows in the table at all (a unit's script this run did not discover, or a renamed one); 12 red row(s) are named by a ticket that does not own the check (git says another ticket's commits touched it) and 0 are named by a ticket where NO commit touching the check names any ticket at all, so ownership could not be established for anyone; 6 are THIS check's own row, which is not evidence about the ticket that built it (ticket 108: a check whose output is its own input latches)
+  107 of 125 tickets are written `resolved`: 30 derive resolved from a named check that passed, 6 derive regressed (6 of those acknowledged by a dated line in the ticket), 8 rest only on checks that could not look, and 63 name no check of their own the table carries
+  167 check(s) named by a resolved ticket are not rows in the table at all (a unit's script this run did not discover, or a renamed one); 12 red row(s) are named by a ticket that does not own the check (git says another ticket's commits touched it) and 0 are named by a ticket where NO commit touching the check names any ticket at all, so ownership could not be established for anyone; 0 are THIS check's own row, which is not evidence about the ticket that built it (ticket 108: a check whose output is its own input latches)
 
 PASS: every ticket number in .scratch/ecosystem/issues/ names exactly one file, every ticket carries one Status: line from the tracker's own vocabulary with nothing free-typed after it, every resolved ticket has an Answer and every closed one a dated closure, and every resolved ticket's Status is derived from the grade table the newest recorded run wrote -- no ticket claims resolved while a check it names graded FAIL on that run without a dated line in the ticket naming it

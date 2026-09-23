@@ -25,7 +25,8 @@
   ok   ADR-0026: removed-control
   ok   ADR-0026: removal is priced
   ok   ADR-0026: missing instrument
-  ok   ADR-0026 consequences: check_selected_set.*still refuses
+  ok   ADR-0026 consequences: ticket 124 built the priced removal
+  ok   ADR-0026 consequences no longer says: check_selected_set.*still refuses
   ok   ADR-0026 consequences: code kind `unknown-control-id`, not `missing-instrument`
 2b. ADR-0026 point 6 classifies every refusal kind composition emitted on 2026-09-04 (fixture of 11)
   ok   ADR-0026: Every refusal kind composition emits today, classified
